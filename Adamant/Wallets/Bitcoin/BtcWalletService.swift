@@ -99,7 +99,7 @@ class BtcWalletService: WalletService {
     
     // MARK: - Constants
     static var currencySymbol = "BTC"
-    static var currencyLogo = #imageLiteral(resourceName: "wallet_btc")
+    static var currencyLogo = #imageLiteral(resourceName: "bitcoin_wallet")
 
     static let multiplier = Decimal(sign: .plus, exponent: 8, significand: 1)
 

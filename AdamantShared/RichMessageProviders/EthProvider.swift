@@ -22,6 +22,6 @@ class EthProvider: TransferBaseProvider {
     }
     
     override var currencyLogoLarge: UIImage {
-        return #imageLiteral(resourceName: "eth_notification")
+        return #imageLiteral(resourceName: "ethereum_notification")
     }
 }

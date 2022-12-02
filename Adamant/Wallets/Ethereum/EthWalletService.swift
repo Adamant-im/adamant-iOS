@@ -60,7 +60,7 @@ class EthWalletService: WalletService {
 	let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")
 	
 	static let currencySymbol = "ETH"
-	static let currencyLogo = #imageLiteral(resourceName: "wallet_eth")
+	static let currencyLogo = #imageLiteral(resourceName: "ethereum_wallet")
 	static let currencyExponent = -18
     
     var tokenSymbol: String {

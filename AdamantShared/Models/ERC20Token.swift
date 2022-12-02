@@ -15,21 +15,6 @@ struct ERC20Token {
     let decimals: Int
     let naturalUnits: Int
     var logo: UIImage {
-        UIImage(named: "wallet_\(symbol.lowercased())") ?? UIImage()
+        UIImage(named: "\(symbol.lowercased())_wallet") ?? UIImage()
     }
-}
-
-extension ERC20Token {
-    static let supportedTokens: [ERC20Token] = [
-        ERC20Token(symbol: "BNB",
-                   name: "Binance Coin",
-                   contractAddress: "0xB8c77482e45F1F44dE1745F52C74426C631bDD52",
-                   decimals: 18,
-                   naturalUnits: 18),
-        ERC20Token(symbol: "USDS",
-                   name: "Stably Dollar",
-                   contractAddress: "0xa4bdb11dc0a2bec88d24a3aa1e6bb17201112ebe",
-                   decimals: 6,
-                   naturalUnits: 6)
-    ]
 }

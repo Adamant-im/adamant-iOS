@@ -63,7 +63,7 @@ class DogeWalletService: WalletService {
     
     // MARK: - Constants
     static var currencySymbol = "DOGE"
-    static var currencyLogo = #imageLiteral(resourceName: "wallet_doge")
+    static var currencyLogo = #imageLiteral(resourceName: "doge_wallet")
     static let currencyExponent = -8
     static let multiplier = Decimal(sign: .plus, exponent: 8, significand: 1)
     static let chunkSize = 20

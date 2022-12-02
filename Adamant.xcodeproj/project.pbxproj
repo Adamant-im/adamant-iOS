@@ -18,12 +18,15 @@
 		415441372923AB3700824478 /* BtcProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 415441362923AB3700824478 /* BtcProvider.swift */; };
 		415441382923AB3700824478 /* BtcProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 415441362923AB3700824478 /* BtcProvider.swift */; };
 		415441392923AB3700824478 /* BtcProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 415441362923AB3700824478 /* BtcProvider.swift */; };
-		4154413B2923AED000824478 /* btc_notificationContent.png in Resources */ = {isa = PBXBuildFile; fileRef = 4154413A2923AED000824478 /* btc_notificationContent.png */; };
-		4154413C2923AED000824478 /* btc_notificationContent.png in Resources */ = {isa = PBXBuildFile; fileRef = 4154413A2923AED000824478 /* btc_notificationContent.png */; };
+		4154413B2923AED000824478 /* bitcoin_notificationContent.png in Resources */ = {isa = PBXBuildFile; fileRef = 4154413A2923AED000824478 /* bitcoin_notificationContent.png */; };
+		4154413C2923AED000824478 /* bitcoin_notificationContent.png in Resources */ = {isa = PBXBuildFile; fileRef = 4154413A2923AED000824478 /* bitcoin_notificationContent.png */; };
 		4164A9D728F17D4000EEF16D /* ChatTransactionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4164A9D628F17D4000EEF16D /* ChatTransactionService.swift */; };
 		4164A9D928F17DA700EEF16D /* AdamantChatTransactionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4164A9D828F17DA700EEF16D /* AdamantChatTransactionService.swift */; };
 		416F5EA4290162EB00EF0400 /* SocketIO in Frameworks */ = {isa = PBXBuildFile; productRef = 416F5EA3290162EB00EF0400 /* SocketIO */; };
 		417BA7F428BF894F00DF94C5 /* NotificationSoundsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417BA7F328BF894F00DF94C5 /* NotificationSoundsViewController.swift */; };
+		418BBB592938C45B00CAB719 /* ethereumTokensList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418BBB582938C45B00CAB719 /* ethereumTokensList.swift */; };
+		418BBB5A2938C45B00CAB719 /* ethereumTokensList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418BBB582938C45B00CAB719 /* ethereumTokensList.swift */; };
+		418BBB5B2938C45B00CAB719 /* ethereumTokensList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418BBB582938C45B00CAB719 /* ethereumTokensList.swift */; };
 		41935848287841E20083363B /* MacOSDeterminer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41935847287841E20083363B /* MacOSDeterminer.swift */; };
 		4198D57B28C8B7DA009337F2 /* so-proud-notification.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4198D57A28C8B7DA009337F2 /* so-proud-notification.mp3 */; };
 		4198D57D28C8B7FA009337F2 /* relax-message-tone.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4198D57C28C8B7F9009337F2 /* relax-message-tone.mp3 */; };
@@ -364,10 +367,10 @@
 		E957E0FB229AB9310019732A /* AdamantProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E0FA229AB9310019732A /* AdamantProvider.swift */; };
 		E957E0FF229AC1C80019732A /* LskProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E0FE229AC1C80019732A /* LskProvider.swift */; };
 		E957E101229AC2050019732A /* EthProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E100229AC2050019732A /* EthProvider.swift */; };
-		E957E107229AF7CB0019732A /* adm_notificationContent.png in Resources */ = {isa = PBXBuildFile; fileRef = E957E103229AF7CA0019732A /* adm_notificationContent.png */; };
+		E957E107229AF7CB0019732A /* adamant_notificationContent.png in Resources */ = {isa = PBXBuildFile; fileRef = E957E103229AF7CA0019732A /* adamant_notificationContent.png */; };
 		E957E108229AF7CB0019732A /* doge_notificationContent.png in Resources */ = {isa = PBXBuildFile; fileRef = E957E104229AF7CA0019732A /* doge_notificationContent.png */; };
-		E957E109229AF7CB0019732A /* lsk_notificationContent.png in Resources */ = {isa = PBXBuildFile; fileRef = E957E105229AF7CA0019732A /* lsk_notificationContent.png */; };
-		E957E10A229AF7CB0019732A /* eth_notificationContent.png in Resources */ = {isa = PBXBuildFile; fileRef = E957E106229AF7CB0019732A /* eth_notificationContent.png */; };
+		E957E109229AF7CB0019732A /* lisk_notificationContent.png in Resources */ = {isa = PBXBuildFile; fileRef = E957E105229AF7CA0019732A /* lisk_notificationContent.png */; };
+		E957E10A229AF7CB0019732A /* ethereum_notificationContent.png in Resources */ = {isa = PBXBuildFile; fileRef = E957E106229AF7CB0019732A /* ethereum_notificationContent.png */; };
 		E957E124229B0C330019732A /* AdamantNotificationKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E123229B0C330019732A /* AdamantNotificationKeys.swift */; };
 		E957E128229B0CF10019732A /* NotificationContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E127229B0CF10019732A /* NotificationContent.swift */; };
 		E957E12E229B10F80019732A /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E957E110229B04280019732A /* UserNotifications.framework */; };
@@ -665,10 +668,11 @@
 		3AE89DDA2837F5D30051D3A9 /* ChatRoomsChats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatRoomsChats.swift; sourceTree = "<group>"; };
 		412C0ED829124A3400DE2C5E /* dash_notificationContent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dash_notificationContent.png; sourceTree = "<group>"; };
 		415441362923AB3700824478 /* BtcProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcProvider.swift; sourceTree = "<group>"; };
-		4154413A2923AED000824478 /* btc_notificationContent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = btc_notificationContent.png; sourceTree = "<group>"; };
+		4154413A2923AED000824478 /* bitcoin_notificationContent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bitcoin_notificationContent.png; sourceTree = "<group>"; };
 		4164A9D628F17D4000EEF16D /* ChatTransactionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTransactionService.swift; sourceTree = "<group>"; };
 		4164A9D828F17DA700EEF16D /* AdamantChatTransactionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantChatTransactionService.swift; sourceTree = "<group>"; };
 		417BA7F328BF894F00DF94C5 /* NotificationSoundsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSoundsViewController.swift; sourceTree = "<group>"; };
+		418BBB582938C45B00CAB719 /* ethereumTokensList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ethereumTokensList.swift; sourceTree = "<group>"; };
 		41935847287841E20083363B /* MacOSDeterminer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacOSDeterminer.swift; sourceTree = "<group>"; };
 		4198D57A28C8B7DA009337F2 /* so-proud-notification.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "so-proud-notification.mp3"; sourceTree = "<group>"; };
 		4198D57C28C8B7F9009337F2 /* relax-message-tone.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "relax-message-tone.mp3"; sourceTree = "<group>"; };
@@ -940,10 +944,10 @@
 		E957E0FA229AB9310019732A /* AdamantProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantProvider.swift; sourceTree = "<group>"; };
 		E957E0FE229AC1C80019732A /* LskProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LskProvider.swift; sourceTree = "<group>"; };
 		E957E100229AC2050019732A /* EthProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthProvider.swift; sourceTree = "<group>"; };
-		E957E103229AF7CA0019732A /* adm_notificationContent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = adm_notificationContent.png; sourceTree = "<group>"; };
+		E957E103229AF7CA0019732A /* adamant_notificationContent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = adamant_notificationContent.png; sourceTree = "<group>"; };
 		E957E104229AF7CA0019732A /* doge_notificationContent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = doge_notificationContent.png; sourceTree = "<group>"; };
-		E957E105229AF7CA0019732A /* lsk_notificationContent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = lsk_notificationContent.png; sourceTree = "<group>"; };
-		E957E106229AF7CB0019732A /* eth_notificationContent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = eth_notificationContent.png; sourceTree = "<group>"; };
+		E957E105229AF7CA0019732A /* lisk_notificationContent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = lisk_notificationContent.png; sourceTree = "<group>"; };
+		E957E106229AF7CB0019732A /* ethereum_notificationContent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ethereum_notificationContent.png; sourceTree = "<group>"; };
 		E957E110229B04280019732A /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		E957E112229B04280019732A /* UserNotificationsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotificationsUI.framework; path = System/Library/Frameworks/UserNotificationsUI.framework; sourceTree = SDKROOT; };
 		E957E123229B0C330019732A /* AdamantNotificationKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantNotificationKeys.swift; sourceTree = "<group>"; };
@@ -1688,12 +1692,12 @@
 		E957E102229AF01E0019732A /* WalletImages */ = {
 			isa = PBXGroup;
 			children = (
-				E957E103229AF7CA0019732A /* adm_notificationContent.png */,
+				E957E103229AF7CA0019732A /* adamant_notificationContent.png */,
 				E957E104229AF7CA0019732A /* doge_notificationContent.png */,
-				E957E106229AF7CB0019732A /* eth_notificationContent.png */,
-				E957E105229AF7CA0019732A /* lsk_notificationContent.png */,
+				E957E106229AF7CB0019732A /* ethereum_notificationContent.png */,
+				E957E105229AF7CA0019732A /* lisk_notificationContent.png */,
 				412C0ED829124A3400DE2C5E /* dash_notificationContent.png */,
-				4154413A2923AED000824478 /* btc_notificationContent.png */,
+				4154413A2923AED000824478 /* bitcoin_notificationContent.png */,
 			);
 			path = WalletImages;
 			sourceTree = "<group>";
@@ -1894,6 +1898,7 @@
 				64E8304F20F5FEEF006FA590 /* VotesAsset.swift */,
 				E951466D22A69654007564D7 /* ContactDescription.swift */,
 				646DF92322C29F6E00DCC864 /* ERC20Token.swift */,
+				418BBB582938C45B00CAB719 /* ethereumTokensList.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -2133,6 +2138,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E913C9001FFFA51E001A83F7 /* Build configuration list for PBXNativeTarget "Adamant" */;
 			buildPhases = (
+				418BBB14293752F800CAB719 /* Run Script - Load wallets */,
 				47866E9AB7D201F2CED0064C /* [CP] Check Pods Manifest.lock */,
 				E913C8EA1FFFA51D001A83F7 /* Sources */,
 				E913C8EB1FFFA51D001A83F7 /* Frameworks */,
@@ -2426,7 +2432,7 @@
 			files = (
 				E957E135229B10F80019732A /* MainInterface.storyboard in Resources */,
 				E9D664D722A00E2800733F8A /* notificationContent.strings in Resources */,
-				4154413C2923AED000824478 /* btc_notificationContent.png in Resources */,
+				4154413C2923AED000824478 /* bitcoin_notificationContent.png in Resources */,
 				E957E172229C56EE0019732A /* Shared.xcassets in Resources */,
 				E9D664CA22A003D900733F8A /* Warning.xib in Resources */,
 			);
@@ -2436,11 +2442,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4154413B2923AED000824478 /* btc_notificationContent.png in Resources */,
-				E957E107229AF7CB0019732A /* adm_notificationContent.png in Resources */,
+				4154413B2923AED000824478 /* bitcoin_notificationContent.png in Resources */,
+				E957E107229AF7CB0019732A /* adamant_notificationContent.png in Resources */,
 				E957E108229AF7CB0019732A /* doge_notificationContent.png in Resources */,
-				E957E10A229AF7CB0019732A /* eth_notificationContent.png in Resources */,
-				E957E109229AF7CB0019732A /* lsk_notificationContent.png in Resources */,
+				E957E10A229AF7CB0019732A /* ethereum_notificationContent.png in Resources */,
+				E957E109229AF7CB0019732A /* lisk_notificationContent.png in Resources */,
 				640EFB3625611A7D00E9724B /* Shared.xcassets in Resources */,
 				E9EF7A8122A02DC600F2E1C2 /* notificationContent.strings in Resources */,
 				412C0ED929124A3400DE2C5E /* dash_notificationContent.png in Resources */,
@@ -2479,6 +2485,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/SwiftLint/swiftlint\"\n";
+		};
+		418BBB14293752F800CAB719 /* Run Script - Load wallets */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script - Load wallets";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "ROOT=\"$PWD\"\nSCRIPTS_DIR=\"$ROOT/scripts\"\nWALLETS_DIR=\"$ROOT/scripts/wallets\"\nWALLETS_NAME_DIR=\"$ROOT/scripts/wallets/adamant-wallets-dev/assets/general\"\nWALLETS_TOKENS_DIR=\"$ROOT/scripts/wallets/adamant-wallets-dev/assets/blockchains\"\n\n# Download\nfunction download ()\n{\n    mkdir -p \"$WALLETS_DIR\"\n    cd \"$WALLETS_DIR\"\n    curl -fSsOL https://github.com/Adamant-im/adamant-wallets/archive/refs/heads/dev.zip\n    tar xzf dev.zip\n}\n\n# create Contents for the image\nfunction create_contents\n{\n    Target=$1\n    IMAGE_NAME=$2\n    With_Dark=$3\n    \n    if [ $With_Dark = true ]\n    then\n        cat > ${Target}/Contents.json << __EOF__\n{\n  \"images\" : [\n    {\n      \"filename\" : \"${IMAGE_NAME}.png\",\n      \"idiom\" : \"universal\",\n      \"scale\" : \"1x\"\n    },\n    {\n      \"appearances\" : [\n        {\n          \"appearance\" : \"luminosity\",\n          \"value\" : \"dark\"\n        }\n      ],\n      \"filename\" : \"${IMAGE_NAME}_dark.png\",\n      \"idiom\" : \"universal\",\n      \"scale\" : \"1x\"\n    },\n    {\n      \"filename\" : \"${IMAGE_NAME}@2x.png\",\n      \"idiom\" : \"universal\",\n      \"scale\" : \"2x\"\n    },\n    {\n      \"appearances\" : [\n        {\n          \"appearance\" : \"luminosity\",\n          \"value\" : \"dark\"\n        }\n      ],\n      \"filename\" : \"${IMAGE_NAME}_dark@2x.png\",\n      \"idiom\" : \"universal\",\n      \"scale\" : \"2x\"\n    },\n    {\n      \"filename\" : \"${IMAGE_NAME}@3x.png\",\n      \"idiom\" : \"universal\",\n      \"scale\" : \"3x\"\n    },\n    {\n      \"appearances\" : [\n        {\n          \"appearance\" : \"luminosity\",\n          \"value\" : \"dark\"\n        }\n      ],\n      \"filename\" : \"${IMAGE_NAME}_dark@3x.png\",\n      \"idiom\" : \"universal\",\n      \"scale\" : \"3x\"\n    }\n  ],\n  \"info\" : {\n    \"author\" : \"xcode\",\n    \"version\" : 1\n  }\n}\n__EOF__\n    else\n        cat > ${Target}/Contents.json << __EOF__\n{\n \"images\" : [\n  {\n   \"idiom\" : \"universal\",\n   \"scale\" : \"1x\",\n   \"filename\" : \"${IMAGE_NAME}.png\"\n  },\n  {\n   \"idiom\" : \"universal\",\n   \"scale\" : \"2x\",\n   \"filename\" : \"${IMAGE_NAME}@2x.png\"\n  },\n  {\n   \"idiom\" : \"universal\",\n   \"scale\" : \"3x\",\n   \"filename\" : \"${IMAGE_NAME}@3x.png\"\n  }\n ],\n \"info\" : {\n  \"version\" : 1,\n  \"author\" : \"xcode\"\n }\n}\n__EOF__\n    fi\n}\n\n# Move image to asset\nfunction moveImage ()\n{\n    FROM_DIR=$1\n    WALLET_NAME=$2\n    Target=$3\n    IMAGE_NAME=$4\n    mv $FROM_DIR/$WALLET_NAME/Images/${IMAGE_NAME}.png ${Target}/${IMAGE_NAME}.png\n    mv $FROM_DIR/$WALLET_NAME/Images/${IMAGE_NAME}@2x.png ${Target}/${IMAGE_NAME}@2x.png\n    mv $FROM_DIR/$WALLET_NAME/Images/${IMAGE_NAME}@3x.png ${Target}/${IMAGE_NAME}@3x.png\n    \n    if [ -e $FROM_DIR/$WALLET_NAME/Images/${IMAGE_NAME}_dark.png ]\n    then\n        mv $FROM_DIR/$WALLET_NAME/Images/${IMAGE_NAME}_dark.png ${Target}/${IMAGE_NAME}_dark.png\n        mv $FROM_DIR/$WALLET_NAME/Images/${IMAGE_NAME}_dark@2x.png ${Target}/${IMAGE_NAME}_dark@2x.png\n        mv $FROM_DIR/$WALLET_NAME/Images/${IMAGE_NAME}_dark@3x.png ${Target}/${IMAGE_NAME}_dark@3x.png\n        create_contents ${Target} ${IMAGE_NAME} true\n    else\n        create_contents ${Target} ${IMAGE_NAME} false\n    fi\n}\n\n# unpack\nfunction unpack ()\n{\n    cd \"$WALLETS_NAME_DIR\"\n    for dir in $WALLETS_NAME_DIR/*/; do\n        WALLET_NAME=$(basename $dir)\n        \n        # copy @3x image to Notification Service Extension\n        Target_Notification_Content=$ROOT/NotificationServiceExtension/WalletImages\n        cp $WALLETS_NAME_DIR/$WALLET_NAME/Images/${WALLET_NAME}_wallet@3x.png ${Target_Notification_Content}/${WALLET_NAME}_notificationContent.png\n            \n        # move notification images to assets\n        Target_Notification_Image=$ROOT/AdamantShared/Shared.xcassets/Wallets/${WALLET_NAME}_notification.imageset\n        mkdir -p ${Target_Notification_Image}\n        moveImage $WALLETS_NAME_DIR $WALLET_NAME ${Target_Notification_Image} ${WALLET_NAME}_notification\n        \n        # move wallet images to assets\n        Target_Wallet_Image=$ROOT/AdamantShared/Shared.xcassets/Wallets/${WALLET_NAME}_wallet.imageset\n        mkdir -p ${Target_Wallet_Image}\n        moveImage $WALLETS_NAME_DIR $WALLET_NAME ${Target_Wallet_Image} ${WALLET_NAME}_wallet\n    done\n}\n\n# update swift files\nfunction updateSwiftFiles ()\n{\n    BLOCKCHAIN_NAME=$1\n    WALLET_NAME=$2\n    WALLET_SYMBOL=$3\n    WALLET_CONTRACT=$4\n    WALLET_DECIMALS=$5\n\n    TARGET=$ROOT/AdamantShared/Models\n     cat >> ${TARGET}/${BLOCKCHAIN_NAME}TokensList.swift << __EOF__\n        ERC20Token(symbol: \"$WALLET_SYMBOL\",\n                   name: \"$WALLET_NAME\",\n                   contractAddress: \"$WALLET_CONTRACT\",\n                   decimals: $WALLET_DECIMALS,\n                   naturalUnits: $WALLET_DECIMALS),\n__EOF__\n}\n\n# set tokens\nfunction setTokens ()\n{\n    cd \"$WALLETS_TOKENS_DIR\"\n    for dir in $WALLETS_TOKENS_DIR/*/; do\n        BLOCKCHAIN_NAME=$(basename $dir)\n        TARGET=$ROOT/AdamantShared/Models\n        \n        # need to take from blockchain json type and replace ERC20Token \n        cat > ${TARGET}/${BLOCKCHAIN_NAME}TokensList.swift << __EOF__\nimport Foundation\n\nextension ERC20Token {\n    static let supportedTokens: [ERC20Token] = [\n\n__EOF__\n\n        for dir in $WALLETS_TOKENS_DIR/$BLOCKCHAIN_NAME/*/; do\n                WALLET_NAME=$(basename $dir)\n                WALLET_JSON=$WALLETS_TOKENS_DIR/$BLOCKCHAIN_NAME/$WALLET_NAME/info.json\n                echo $WALLET_NAME\n                NAME=$(perl -ne 'if (/\"name\": \"(.*)\"/) { print $1 . \"\\n\" }' $WALLET_JSON)\n                SYMBOL=$(perl -ne 'if (/\"symbol\": \"(.*)\"/) { print $1 . \"\\n\" }' $WALLET_JSON)\n                CONTRACT=$(perl -ne 'if (/\"contractId\": \"(.*)\"/) { print $1 . \"\\n\" }' $WALLET_JSON)\n                DECIMALS=$(perl -ne 'if (/\"decimals\": (.*)/) { print $1 . \"\\n\" }' $WALLET_JSON)\n\n                 updateSwiftFiles \"$BLOCKCHAIN_NAME\" \"$NAME\" \"$SYMBOL\" \"$CONTRACT\" \"$DECIMALS\"\n         done\n\n        cat >> ${TARGET}/${BLOCKCHAIN_NAME}TokensList.swift << __EOF__\n    ]\n}\n__EOF__\n\n    done\n}\n\n# remove temp directory\nfunction remove_script_directory ()\n{\n    rm -rf SCRIPTS_DIR\n}\n\n#download\n\n# unpack\n\nsetTokens\n\n# remove_script_directory\n";
 		};
 		47866E9AB7D201F2CED0064C /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2809,6 +2833,7 @@
 				6416B19D21AD7B92006089AC /* LskWalletRoutes.swift in Sources */,
 				E9B3D3A1201FA26B0019EB36 /* AdamantAccountsProvider.swift in Sources */,
 				3AD95B96284121E100767396 /* HeaderReusableView.swift in Sources */,
+				418BBB592938C45B00CAB719 /* ethereumTokensList.swift in Sources */,
 				E9FAE5DA203DBFEF008D3A6B /* Comparable+clamped.swift in Sources */,
 				E94008802114EE2000CD2D67 /* AdmWallet.swift in Sources */,
 				41E142F2289E60EB002EE8D7 /* AdamantSecret.swift in Sources */,
@@ -2953,6 +2978,7 @@
 				E957E14F229C3E530019732A /* StateType.swift in Sources */,
 				E957E14B229C3E530019732A /* ChatType.swift in Sources */,
 				64AE84622300012400F38FBD /* DashProvider.swift in Sources */,
+				418BBB5B2938C45B00CAB719 /* ethereumTokensList.swift in Sources */,
 				E957E16C229C53980019732A /* LskProvider.swift in Sources */,
 				E9D664D022A009AB00733F8A /* AdamantLocalized.swift in Sources */,
 				E957E14D229C3E530019732A /* Node.swift in Sources */,
@@ -2973,6 +2999,7 @@
 				E951466F22A697F7007564D7 /* ContactDescription.swift in Sources */,
 				E9771D9422996FEB0099AAC7 /* ChatType.swift in Sources */,
 				E957E0F02299846B0019732A /* Mnemonic.swift in Sources */,
+				418BBB5A2938C45B00CAB719 /* ethereumTokensList.swift in Sources */,
 				E9771D9322996FEB0099AAC7 /* ChatAsset.swift in Sources */,
 				E9771DA522997DBC0099AAC7 /* Decimal+adamant.swift in Sources */,
 				E9771DA122997D420099AAC7 /* AdamantUtilities.swift in Sources */,

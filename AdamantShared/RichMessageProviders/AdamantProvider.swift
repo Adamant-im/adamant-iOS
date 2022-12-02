@@ -22,6 +22,6 @@ class AdamantProvider: TransferBaseProvider {
     }
     
     override var currencyLogoLarge: UIImage {
-        return #imageLiteral(resourceName: "adm_notification")
+        return #imageLiteral(resourceName: "adamant_notification")
     }
 }

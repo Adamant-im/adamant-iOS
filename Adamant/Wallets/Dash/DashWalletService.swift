@@ -58,7 +58,7 @@ class DashWalletService: WalletService {
     
     // MARK: - Constants
     static var currencySymbol = "DASH"
-    static var currencyLogo = #imageLiteral(resourceName: "wallet_dash")
+    static var currencyLogo = #imageLiteral(resourceName: "dash_wallet")
     
     static let multiplier = Decimal(sign: .plus, exponent: 8, significand: 1)
     static let chunkSize = 20

@@ -3,17 +3,17 @@
   {
    "idiom" : "universal",
    "scale" : "1x",
-   "filename" : "dash_notification.png"
+   "filename" : "usds_notification.png"
   },
   {
    "idiom" : "universal",
    "scale" : "2x",
-   "filename" : "dash_notification@2x.png"
+   "filename" : "usds_notification@2x.png"
   },
   {
    "idiom" : "universal",
    "scale" : "3x",
-   "filename" : "dash_notification@3x.png"
+   "filename" : "usds_notification@3x.png"
   }
  ],
  "info" : {

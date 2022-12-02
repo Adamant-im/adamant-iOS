@@ -22,6 +22,6 @@ class BtcProvider: TransferBaseProvider {
     }
     
     override var currencyLogoLarge: UIImage {
-        return #imageLiteral(resourceName: "btc_notification")
+        return #imageLiteral(resourceName: "bitcoin_notification")
     }
 }

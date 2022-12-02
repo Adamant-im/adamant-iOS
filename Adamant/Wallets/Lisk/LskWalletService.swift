@@ -53,7 +53,7 @@ class LskWalletService: WalletService {
     private (set) var enabled = true
     
     static var currencySymbol = "LSK"
-    static var currencyLogo = #imageLiteral(resourceName: "wallet_lsk")
+    static var currencyLogo = #imageLiteral(resourceName: "lisk_wallet")
     static let currencyExponent = -8
     
     static let kvsAddress = "lsk:address"
