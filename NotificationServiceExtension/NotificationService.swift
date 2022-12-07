@@ -8,6 +8,7 @@
 
 import UserNotifications
 import MarkdownKit
+import os
 
 class NotificationService: UNNotificationServiceExtension {
     private let passphraseStoreKey = "accountService.passphrase"
@@ -40,6 +41,8 @@ class NotificationService: UNNotificationServiceExtension {
     var bestAttemptContent: UNMutableNotificationContent?
 
     override func didReceive(_ request: UNNotificationRequest, withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) {
+        os_log("Push notification received:\n\n%{public}@", request.content.userInfo.debugDescription)
+        
         self.contentHandler = contentHandler
         bestAttemptContent = (request.content.mutableCopy() as? UNMutableNotificationContent)
         
@@ -56,7 +59,7 @@ class NotificationService: UNNotificationServiceExtension {
         let core = NativeAdamantCore()
         let api = ExtensionsApi(keychainStore: securedStore)
         
-        if let sound = securedStore.get(StoreKey.notificationsService.notificationsSound) {
+        if let sound: String = securedStore.get(StoreKey.notificationsService.notificationsSound) {
             if sound.isEmpty {
                 bestAttemptContent.sound = nil
             } else {
@@ -65,11 +68,11 @@ class NotificationService: UNNotificationServiceExtension {
         }
         
         // No passphrase - no point of trying to get and decode
-        guard let passphrase = securedStore.get(passphraseStoreKey),
-            let keypair = core.createKeypairFor(passphrase: passphrase) else {
-                contentHandler(bestAttemptContent)
-                return
-        }
+        guard
+            let passphrase: String = securedStore.get(passphraseStoreKey),
+            let keypair = core.createKeypairFor(passphrase: passphrase),
+            AdamantUtilities.generateAddress(publicKey: keypair.publicKey) == pushRecipient
+        else { return }
         
         // MARK: 2. Get transaction
         guard let transaction = api.getTransaction(by: id) else {
@@ -91,10 +94,8 @@ class NotificationService: UNNotificationServiceExtension {
             partnerPublicKey = transaction.senderPublicKey
         }
         
-        let blackList = securedStore.getArray("blackList") ?? []
-        if blackList.contains(partnerAddress) {
-            return
-        }
+        let contactsBlackList: [String] = securedStore.get(StoreKey.accountService.blackList) ?? []
+        guard !contactsBlackList.contains(partnerAddress) else { return }
         
         // MARK: 4. Address book
         if let addressBook = api.getAddressBook(for: pushRecipient, core: core, keypair: keypair),

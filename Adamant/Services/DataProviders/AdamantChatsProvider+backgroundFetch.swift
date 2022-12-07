@@ -11,24 +11,24 @@ import Foundation
 extension AdamantChatsProvider: BackgroundFetchService {
     func fetchBackgroundData(notificationsService: NotificationsService, completion: @escaping (FetchResult) -> Void) {
         guard let securedStore = self.securedStore,
-            let address = securedStore.get(StoreKey.chatProvider.address) else {
+            let address: String = securedStore.get(StoreKey.chatProvider.address) else {
             completion(.failed)
             return
         }
         
         var lastHeight: Int64?
-        if let raw = securedStore.get(StoreKey.chatProvider.receivedLastHeight) {
+        if let raw: String = securedStore.get(StoreKey.chatProvider.receivedLastHeight) {
             lastHeight = Int64(raw)
         } else {
             lastHeight = nil
         }
         
         var notifiedCount = 0
-        if let raw = securedStore.get(StoreKey.chatProvider.notifiedLastHeight), let notifiedHeight = Int64(raw), let h = lastHeight {
+        if let raw: String = securedStore.get(StoreKey.chatProvider.notifiedLastHeight), let notifiedHeight = Int64(raw), let h = lastHeight {
             if h < notifiedHeight {
                 lastHeight = notifiedHeight
                 
-                if let raw = securedStore.get(StoreKey.chatProvider.notifiedMessagesCount), let count = Int(raw) {
+                if let raw: String = securedStore.get(StoreKey.chatProvider.notifiedMessagesCount), let count = Int(raw) {
                     notifiedCount = count
                 }
             }

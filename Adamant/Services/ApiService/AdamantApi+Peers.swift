@@ -28,12 +28,8 @@ extension AdamantApiService {
             return
         }
         
-        let headers = [
-            "Content-Type": "application/json"
-        ]
-        
         // MARK: 2. Make request
-        sendRequest(url: endpoint, method: .get, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<NodeVersion>) in
+        sendRequest(url: endpoint, method: .get) { (serverResponse: ApiServiceResult<NodeVersion>) in
             switch serverResponse {
             case .success(let version):
                 completion(.success(version))

@@ -27,19 +27,13 @@ extension AdamantApiService {
     }
     
     func getDelegates(limit: Int, offset: Int, currentDelegates: [Delegate], completion: @escaping (ApiServiceResult<[Delegate]>) -> Void) {
-        let headers = [
-            "Content-Type": "application/json"
-        ]
-        
         sendRequest(
             path: ApiCommands.Delegates.getDelegates,
             queryItems: [
                 URLQueryItem(name: "limit", value: String(limit)),
                 URLQueryItem(name: "offset", value: String(offset))
             ],
-            method: .get,
-            encoding: .json,
-            headers: headers
+            method: .get
         ) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Delegate>>) in
             switch serverResponse {
             case .success(let delegates):
@@ -80,7 +74,6 @@ extension AdamantApiService {
                         })
                         
                         completion(.success(delegatesWithVotes))
-                        break
                     case .failure(let error):
                         completion(.failure(.networkError(error: error)))
                     }
@@ -93,16 +86,10 @@ extension AdamantApiService {
     }
     
     func getForgedByAccount(publicKey: String, completion: @escaping (ApiServiceResult<DelegateForgeDetails>) -> Void) {
-        let headers = [
-            "Content-Type": "application/json"
-        ]
-        
         sendRequest(
             path: ApiCommands.Delegates.getForgedByAccount,
             queryItems: [URLQueryItem(name: "generatorPublicKey", value: publicKey)],
-            method: .get,
-            encoding: .json,
-            headers: headers
+            method: .get
         ) { (serverResponse: ApiServiceResult<DelegateForgeDetails>) in
             switch serverResponse {
             case .success(let details):
@@ -124,8 +111,6 @@ extension AdamantApiService {
                 }
                 completion(.success(forgingTime))
                 
-                break
-                
             case .failure(let error):
                 completion(.failure(.networkError(error: error)))
             }
@@ -133,47 +118,29 @@ extension AdamantApiService {
     }
     
     private func getDelegatesCount(completion: @escaping (ApiServiceResult<DelegatesCountResult>) -> Void) {
-        let headers = [
-            "Content-Type": "application/json"
-        ]
-        
         sendRequest(
             path: ApiCommands.Delegates.getDelegatesCount,
-            method: .get,
-            encoding: .json,
-            headers: headers
+            method: .get
         ) { (serverResponse: ApiServiceResult<DelegatesCountResult>) in
             completion(serverResponse)
         }
     }
     
     private func getNextForgers(completion: @escaping (ApiServiceResult<NextForgersResult>) -> Void) {
-        let headers = [
-            "Content-Type": "application/json"
-        ]
-        
         sendRequest(
             path: ApiCommands.Delegates.getNextForgers,
             queryItems: [URLQueryItem(name: "limit", value: "\(101)")],
-            method: .get,
-            encoding: .json,
-            headers: headers
+            method: .get
         ) { (serverResponse: ApiServiceResult<NextForgersResult>) in
             completion(serverResponse)
         }
     }
     
     func getVotes(for address: String, completion: @escaping (ApiServiceResult<[Delegate]>) -> Void) {
-        let headers = [
-            "Content-Type": "application/json"
-        ]
-        
         sendRequest(
             path: ApiCommands.Delegates.votes,
             queryItems: [URLQueryItem(name: "address", value: address)],
-            method: .get,
-            encoding: .json,
-            headers: headers
+            method: .get
         ) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Delegate>>) in
             switch serverResponse {
             case .success(let delegates):
@@ -202,45 +169,26 @@ extension AdamantApiService {
         let votesAsset = VotesAsset(votes: votesOrdered)
         
         // MARK: 1. Create and sign transaction
-        let asset = TransactionAsset(votes: votesAsset)
-        let transaction = NormalizedTransaction(type: .vote,
-                                                amount: 0,
-                                                senderPublicKey: keypair.publicKey,
-                                                requesterPublicKey: nil,
-                                                date: Date(),
-                                                recipientId: address,
-                                                asset: asset)
-        guard let signature = adamantCore.sign(transaction: transaction, senderId: address, keypair: keypair) else {
+        let transaction = NormalizedTransaction(
+            type: .vote,
+            amount: 0,
+            senderPublicKey: keypair.publicKey,
+            requesterPublicKey: nil,
+            date: Date(),
+            recipientId: address,
+            asset: TransactionAsset(votes: votesAsset)
+        )
+        
+        guard let transaction = adamantCore.makeSignedTransaction(
+            transaction: transaction,
+            senderId: address,
+            keypair: keypair
+        ) else {
             completion(.failure(.internalError(message: "Failed to sign transaction", error: nil)))
             return
         }
         
-        // MARK: 2. Prepare params
-        let params: [String: Any] = [
-            "type": transaction.type.rawValue,
-            "amount": 0,
-            "senderPublicKey": transaction.senderPublicKey,
-            "senderId": transaction.recipientId ?? NSNull(),
-            "timestamp": transaction.timestamp,
-            "signature": signature,
-            "recipientId": transaction.recipientId ?? NSNull(),
-            "asset": [
-                "votes": votesAsset.votes
-            ]
-        ]
-        
-        let headers = [
-            "Content-Type": "application/json"
-        ]
-        
-        // MARK: 3. Send
-        sendRequest(
-            path: ApiCommands.Delegates.votes,
-            method: .post,
-            parameters: params,
-            encoding: .json,
-            headers: headers
-        ) { (serverResponse: ApiServiceResult<ServerResponse>) in
+        sendTransaction(path: ApiCommands.Delegates.votes, transaction: transaction) { [weak self] serverResponse in
             switch serverResponse {
             case .success(let response):
                 if response.success {
@@ -253,29 +201,22 @@ extension AdamantApiService {
                 completion(.failure(.networkError(error: error)))
             }
             
-            do {
-                UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
-                self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
-            }
+            guard let self = self else { return }
+            UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
+            self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
         }
     }
     
     // MARK: - Private methods
     
     private func getBlocks(completion: @escaping (ApiServiceResult<[Block]>) -> Void) {
-        let headers = [
-            "Content-Type": "application/json"
-        ]
-        
         sendRequest(
             path: ApiCommands.Delegates.getBlocks,
             queryItems: [
                 URLQueryItem(name: "orderBy", value: "height:desc"),
                 URLQueryItem(name: "limit", value: "\(101)")
             ],
-            method: .get,
-            encoding: .json,
-            headers: headers
+            method: .get
         ) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Block>>) in
             switch serverResponse {
             case .success(let blocks):

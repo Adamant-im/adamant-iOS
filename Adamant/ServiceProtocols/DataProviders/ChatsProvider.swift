@@ -57,7 +57,8 @@ extension ChatsProviderError: RichError {
             return String.adamantLocalized.sharedErrors.networkError
             
         case .serverError(let error):
-            return ApiServiceError.serverError(error: error.localizedDescription).localized
+            return ApiServiceError.serverError(error: error.localizedDescription)
+                .localizedDescription
             
         case .accountNotFound(let address):
             return AccountsProviderResult.notFound(address: address).localized

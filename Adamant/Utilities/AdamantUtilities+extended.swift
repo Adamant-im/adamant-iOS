@@ -139,18 +139,6 @@ extension AdamantUtilities {
     }
 }
 
-// MARK: - Address generation
-extension AdamantUtilities {
-    /// Address generation algorithm:
-    ///  https://github.com/Adamant-im/adamant/wiki/Generating-ADAMANT-account-and-key-pair#3-a-users-adm-wallet-address-is-generated-from-the-publickeys-sha-256-hash
-    static func generateAddress(publicKey: String) -> String {
-        let publicKeyHashBytes = publicKey.hexBytes().sha256()
-        let data = Data(publicKeyHashBytes)
-        let number = data.withUnsafeBytes { $0.load(as: UInt64.self) }
-        return "U\(number)"
-    }
-}
-
 // MARK: - Email deeplink
 extension AdamantUtilities {
     static func openEmailApp(recipient: String, subject: String?, body: String?) {

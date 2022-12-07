@@ -11,24 +11,24 @@ import Foundation
 extension AdamantTransfersProvider: BackgroundFetchService {
     func fetchBackgroundData(notificationsService: NotificationsService, completion: @escaping (FetchResult) -> Void) {
         guard let securedStore = self.securedStore,
-            let address = securedStore.get(StoreKey.transfersProvider.address) else {
+            let address: String = securedStore.get(StoreKey.transfersProvider.address) else {
             completion(.failed)
             return
         }
         
         var lastHeight: Int64?
-        if let raw = securedStore.get(StoreKey.transfersProvider.receivedLastHeight) {
+        if let raw: String = securedStore.get(StoreKey.transfersProvider.receivedLastHeight) {
             lastHeight = Int64(raw)
         } else {
             lastHeight = nil
         }
         
         var notifiedCount = 0
-        if let raw = securedStore.get(StoreKey.transfersProvider.notifiedLastHeight), let notifiedHeight = Int64(raw), let h = lastHeight {
+        if let raw: String = securedStore.get(StoreKey.transfersProvider.notifiedLastHeight), let notifiedHeight = Int64(raw), let h = lastHeight {
             if h < notifiedHeight {
                 lastHeight = notifiedHeight
                 
-                if let raw = securedStore.get(StoreKey.transfersProvider.notifiedTransfersCount), let count = Int(raw) {
+                if let raw: String = securedStore.get(StoreKey.transfersProvider.notifiedTransfersCount), let count = Int(raw) {
                     notifiedCount = count
                 }
             }

@@ -18,6 +18,19 @@ extension AdamantApiService.ApiCommands {
 }
 
 extension AdamantApiService {
+    func sendTransaction(
+        path: String,
+        transaction: UnregisteredTransaction,
+        completion: @escaping (ApiServiceResult<TransactionIdResponse>) -> Void
+    ) {
+        sendRequest(
+            path: path,
+            method: .post,
+            body: ["transaction": transaction],
+            completion: completion
+        )
+    }
+    
     func getTransaction(id: UInt64, completion: @escaping (ApiServiceResult<Transaction>) -> Void) {
         sendRequest(
             path: ApiCommands.Transactions.getTransaction,

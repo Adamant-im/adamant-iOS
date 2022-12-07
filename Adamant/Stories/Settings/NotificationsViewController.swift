@@ -97,12 +97,15 @@ class NotificationsViewController: FormViewController {
             $0.title = Rows.notificationsMode.localized
             $0.selectorTitle = Rows.notificationsMode.localized
             $0.options = [.disabled, .backgroundFetch, .push]
-            $0.value = notificationsService.notificationsMode
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { [weak self] cell, row in
             cell.accessoryType = .disclosureIndicator
+            
+            guard let notificationsMode = self?.notificationsService.notificationsMode else { return }
+            row.value = notificationsMode
         }.onChange { [weak self] row in
             let mode = row.value ?? NotificationsMode.disabled
-            self?.setNotificationMode(mode)
+            self?.setNotificationMode(mode, completion: row.updateCell)
+            row.updateCell()
         }
         
         // Section
@@ -240,48 +243,43 @@ class NotificationsViewController: FormViewController {
         tableView.backgroundColor = .clear
     }
     
-    func setNotificationMode(_ mode: NotificationsMode) {
+    func setNotificationMode(_ mode: NotificationsMode, completion: @escaping () -> Void) {
         guard mode != notificationsService.notificationsMode else {
             return
         }
-        
+
         notificationsService.setNotificationsMode(mode) { [weak self] result in
-            switch result {
-            case .success:
-                return
+            DispatchQueue.onMainAsync {
+                defer { completion() }
                 
-            case .failure(let error):
-                if let row: SwitchRow = self?.form.rowBy(tag: Rows.notificationsMode.tag) {
-                    row.value = false
-                    row.updateCell()
-                }
-                
-                switch error {
-                case .notEnoughMoney:
-                    self?.dialogService.showRichError(error: error)
-                    
-                case .denied:
-                    self?.presentNotificationsDeniedError()
+                switch result {
+                case .success:
+                    return
+                case .failure(let error):
+                    switch error {
+                    case .notEnoughMoney:
+                        self?.dialogService.showRichError(error: error)
+                    case .denied:
+                        self?.presentNotificationsDeniedError()
+                    }
                 }
             }
         }
     }
     
     private func presentNotificationsDeniedError() {
-        DispatchQueue.main.async { [weak self] in
-            let alert = UIAlertController(title: nil, message: String.adamantLocalized.notifications.notificationsDisabled, preferredStyle: .alert)
-            
-            alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
-                DispatchQueue.main.async {
-                    if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
-                        UIApplication.shared.open(settingsURL)
-                    }
+        let alert = UIAlertController(title: nil, message: String.adamantLocalized.notifications.notificationsDisabled, preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
+            DispatchQueue.main.async {
+                if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(settingsURL)
                 }
-            })
-            
-            alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
-            alert.modalPresentationStyle = .overFullScreen
-            self?.present(alert, animated: true, completion: nil)
-        }
+            }
+        })
+        
+        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+        alert.modalPresentationStyle = .overFullScreen
+        present(alert, animated: true, completion: nil)
     }
 }
