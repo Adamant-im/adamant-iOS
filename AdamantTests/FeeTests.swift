@@ -12,7 +12,7 @@ import XCTest
 class FeeTests: XCTestCase {
     func testTransferFee() {
         let estimatedFee = Decimal(0.5)
-        XCTAssertEqual(estimatedFee, AdamantTransfersProvider().transferFee)
+        XCTAssertEqual(estimatedFee, AdamantTransfersProvider.transferFee)
     }
     
     func testShortMessageFee() {

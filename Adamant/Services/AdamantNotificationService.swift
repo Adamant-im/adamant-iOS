@@ -26,7 +26,7 @@ extension NotificationsMode {
 
 class AdamantNotificationsService: NotificationsService {
     // MARK: Dependencies
-    var securedStore: SecuredStore!
+    private let securedStore: SecuredStore
     weak var accountService: AccountService?
     
     // MARK: Properties
@@ -39,7 +39,9 @@ class AdamantNotificationsService: NotificationsService {
     private var preservedBadgeNumber: Int?
     
     // MARK: Lifecycle
-    init() {
+    init(securedStore: SecuredStore) {
+        self.securedStore = securedStore
+        
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
             UNUserNotificationCenter.current().removeAllDeliveredNotifications()
             UIApplication.shared.applicationIconBadgeNumber = 0

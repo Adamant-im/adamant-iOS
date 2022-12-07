@@ -14,13 +14,24 @@ import MarkdownKit
 class AdamantChatTransactionService: ChatTransactionService {
     
     // MARK: Dependencies
-    var adamantCore: AdamantCore!
-    var richProviders: [String:RichMessageProviderWithStatusCheck]!
+    private let adamantCore: AdamantCore
+    private let richProviders: [String: RichMessageProviderWithStatusCheck]
     
     private let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
     private var transactionInProgress: [UInt64] = []
     private var onTransactionSaved: (() -> Void)?
     private let processSemaphore = DispatchSemaphore(value: 1)
+    
+    init(adamantCore: AdamantCore, accountService: AccountService) {
+        self.adamantCore = adamantCore
+        
+        var richProviders = [String: RichMessageProviderWithStatusCheck]()
+        for case let provider as RichMessageProviderWithStatusCheck in accountService.wallets {
+            richProviders[provider.dynamicRichMessageType] = provider
+        }
+        self.richProviders = richProviders
+    }
+    
     /// Search transaction in local storage
     ///
     /// - Parameter id: Transacton ID

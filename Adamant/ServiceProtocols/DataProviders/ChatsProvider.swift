@@ -175,7 +175,7 @@ protocol ChatsProvider: DataProvider {
     var isInitiallySynced: Bool { get }
     
     var chatPositon: [String: Double] { get set }
-    var blackList: [String] { get }
+    var blockList: [String] { get }
     
     var roomsMaxCount: Int? { get }
     var roomsLoadedCount: Int? { get }
