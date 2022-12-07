@@ -44,4 +44,3 @@ extension DragGesture.Value {
         .init(width: predictedEndLocation.x - location.x, height: predictedEndLocation.y - location.y)
     }
 }
-

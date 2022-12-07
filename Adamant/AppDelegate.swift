@@ -75,22 +75,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         // MARK: 2. Init UI
-        window = UIWindow(frame: UIScreen.main.bounds)
-        window!.rootViewController = UITabBarController()
-        window!.rootViewController!.view.backgroundColor = .white
-        window!.tintColor = UIColor.adamant.primary
+        let window = UIWindow(frame: UIScreen.main.bounds)
+        self.window = window
+        window.rootViewController = UITabBarController()
+        window.rootViewController!.view.backgroundColor = .white
+        window.tintColor = UIColor.adamant.primary
         
         // MARK: 3. Prepare pages
         guard let router = container.resolve(Router.self) else {
             fatalError("Failed to get Router")
         }
         
-        if let tabbar = window?.rootViewController as? UITabBarController {
+        if let tabbar = window.rootViewController as? UITabBarController {
             // MARK: Chats
             let chats = UISplitViewController()
             chats.tabBarItem.title = String.adamantLocalized.tabItems.chats
             chats.tabBarItem.image = #imageLiteral(resourceName: "chats_tab")
-            chats.preferredDisplayMode = .allVisible
+            chats.preferredDisplayMode = .oneBesideSecondary
             chats.tabBarItem.badgeColor = UIColor.adamant.primary
             
             let chatList = UINavigationController(rootViewController: router.get(scene: AdamantScene.Chats.chatList))
@@ -99,7 +100,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let accounts = UISplitViewController()
             accounts.tabBarItem.title = String.adamantLocalized.tabItems.account
             accounts.tabBarItem.image = #imageLiteral(resourceName: "account-tab")
-            accounts.preferredDisplayMode = .allVisible
+            accounts.preferredDisplayMode = .oneBesideSecondary
             accounts.tabBarItem.badgeColor = UIColor.adamant.primary
             
             let account = UINavigationController(rootViewController: router.get(scene: AdamantScene.Account.account))
@@ -133,10 +134,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             tabbar.setViewControllers([chats, accounts], animated: false)
         }
         
-        window!.makeKeyAndVisible()
+        window.makeKeyAndVisible()
         
         // MARK: 4. Setup dialog service
-        dialogService.setup()
+        dialogService.setup(window: window)
         
         // MARK: 5. Show login
         let login = router.get(scene: AdamantScene.Login.login) as! LoginViewController
@@ -144,7 +145,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         login.requestBiometryOnFirstTimeActive = welcomeIsShown
         login.modalPresentationStyle = .overFullScreen
-        window!.rootViewController?.present(login, animated: false, completion: nil)
+        window.rootViewController?.present(login, animated: false, completion: nil)
         
         if !welcomeIsShown {
             let welcome = router.get(scene: AdamantScene.Onboard.welcome)

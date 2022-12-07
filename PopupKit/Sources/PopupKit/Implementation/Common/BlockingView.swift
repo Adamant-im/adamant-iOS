@@ -7,15 +7,8 @@
 
 import SwiftUI
 
-extension View {
-    func interactionWithBackground(enabled: Bool) -> some View {
-        enabled
-            ? self.asAnyView()
-            : background(BlockingView()).asAnyView()
-    }
-}
-
-private struct BlockingView: UIViewRepresentable {
+/// Blocks interaction with background
+struct BlockingView: UIViewRepresentable {
     func makeUIView(context _: Context) -> some UIView {
         UIBlockingView()
     }

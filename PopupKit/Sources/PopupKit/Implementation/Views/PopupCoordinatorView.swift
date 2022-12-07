@@ -13,12 +13,15 @@ struct PopupCoordinatorView: View {
     var body: some View {
         GeometryReader { geomerty in
             ZStack {
+                if !(model.alert?.userInteractionEnabled ?? true) {
+                    BlockingView()
+                }
+                
                 makeNotificationView(geometry: geomerty)
                 makeAlertView()
                 makeToastView(geometry: geomerty)
             }
             .expanded()
-            .interactionWithBackground(enabled: model.alert?.userInteractionEnabled ?? true)
             .ignoresSafeArea()
         }
     }

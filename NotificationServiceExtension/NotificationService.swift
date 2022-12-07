@@ -8,7 +8,6 @@
 
 import UserNotifications
 import MarkdownKit
-import os
 
 class NotificationService: UNNotificationServiceExtension {
     private let passphraseStoreKey = "accountService.passphrase"
@@ -41,7 +40,11 @@ class NotificationService: UNNotificationServiceExtension {
     var bestAttemptContent: UNMutableNotificationContent?
 
     override func didReceive(_ request: UNNotificationRequest, withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) {
-        os_log("Push notification received:\n\n%{public}@", request.content.userInfo.debugDescription)
+        AdamantUtilities.consoleLog(
+            "Push notification received",
+            request.content.userInfo.debugDescription,
+            separator: "\n"
+        )
         
         self.contentHandler = contentHandler
         bestAttemptContent = (request.content.mutableCopy() as? UNMutableNotificationContent)
@@ -94,8 +97,8 @@ class NotificationService: UNNotificationServiceExtension {
             partnerPublicKey = transaction.senderPublicKey
         }
         
-        let contactsBlackList: [String] = securedStore.get(StoreKey.accountService.blackList) ?? []
-        guard !contactsBlackList.contains(partnerAddress) else { return }
+        let contactsBlockList: [String] = securedStore.get(StoreKey.accountService.blackList) ?? []
+        guard !contactsBlockList.contains(partnerAddress) else { return }
         
         // MARK: 4. Address book
         if let addressBook = api.getAddressBook(for: pushRecipient, core: core, keypair: keypair),

@@ -16,13 +16,15 @@ class AdamantDialogService: DialogService {
     private let router: Router
     private let popupManager = PopupManager()
     private let mailDelegate = MailDelegate()
+    private weak var window: UIWindow?
     
     // Configure notifications
     init(router: Router) {
         self.router = router
     }
     
-    func setup() {
+    func setup(window: UIWindow) {
+        self.window = window
         popupManager.setup()
     }
 }
@@ -38,7 +40,7 @@ extension AdamantDialogService {
     }
     
     func getTopmostViewController() -> UIViewController? {
-        if var topController = UIApplication.shared.keyWindow?.rootViewController {
+        if var topController = window?.rootViewController {
             if let tab = topController as? UITabBarController, let selected = tab.selectedViewController {
                 topController = selected
             }
@@ -76,21 +78,27 @@ extension AdamantDialogService {
 // MARK: - Indicators
 extension AdamantDialogService {
     func showProgress(withMessage message: String?, userInteractionEnable enabled: Bool) {
-        popupManager.showProgressAlert(message: message, userInteractionEnabled: enabled)
+        DispatchQueue.onMainAsync { [weak popupManager] in
+            popupManager?.showProgressAlert(message: message, userInteractionEnabled: enabled)
+        }
     }
     
     func dismissProgress() {
-        DispatchQueue.onMainAsync { [popupManager] in
-            popupManager.dismissAlert()
+        DispatchQueue.onMainAsync { [weak popupManager] in
+            popupManager?.dismissAlert()
         }
     }
     
     func showSuccess(withMessage message: String) {
-        popupManager.showSuccessAlert(message: message)
+        DispatchQueue.onMainAsync { [weak popupManager] in
+            popupManager?.showSuccessAlert(message: message)
+        }
     }
     
     func showWarning(withMessage message: String) {
-        popupManager.showWarningAlert(message: message)
+        DispatchQueue.onMainAsync { [weak popupManager] in
+            popupManager?.showWarningAlert(message: message)
+        }
     }
     
     func showError(withMessage message: String, error: Error? = nil) {
@@ -179,34 +187,42 @@ extension AdamantDialogService {
     }
     
     func showNoConnectionNotification() {
-        popupManager.showNotification(
-            icon: #imageLiteral(resourceName: "error"),
-            title: .adamantLocalized.alert.noInternetNotificationTitle,
-            description: .adamantLocalized.alert.noInternetNotificationBoby,
-            autoDismiss: false,
-            tapHandler: nil
-        )
+        DispatchQueue.onMainAsync { [weak popupManager] in
+            popupManager?.showNotification(
+                icon: #imageLiteral(resourceName: "error"),
+                title: .adamantLocalized.alert.noInternetNotificationTitle,
+                description: .adamantLocalized.alert.noInternetNotificationBoby,
+                autoDismiss: false,
+                tapHandler: nil
+            )
+        }
     }
     
     func dissmisNoConnectionNotification() {
-        popupManager.dismissNotification()
+        DispatchQueue.onMainAsync { [weak popupManager] in
+            popupManager?.dismissNotification()
+        }
     }
 }
 
 // MARK: - Notifications
 extension AdamantDialogService {
     func showNotification(title: String?, message: String?, image: UIImage?, tapHandler: (() -> Void)?) {
-        popupManager.showNotification(
-            icon: image,
-            title: title,
-            description: message,
-            autoDismiss: true,
-            tapHandler: tapHandler
-        )
+        DispatchQueue.onMainAsync { [weak popupManager] in
+            popupManager?.showNotification(
+                icon: image,
+                title: title,
+                description: message,
+                autoDismiss: true,
+                tapHandler: tapHandler
+            )
+        }
     }
     
     func dismissNotification() {
-        popupManager.dismissNotification()
+        DispatchQueue.onMainAsync { [weak popupManager] in
+            popupManager?.dismissNotification()
+        }
     }
 }
 

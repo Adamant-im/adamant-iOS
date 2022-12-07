@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import os
 
 class AdamantUtilities {
     
@@ -53,5 +54,10 @@ class AdamantUtilities {
         let data = Data(publicKeyHashBytes)
         let number = data.withUnsafeBytes { $0.load(as: UInt64.self) }
         return "U\(number)"
+    }
+    
+    static func consoleLog(_ args: String..., separator: String = " ") {
+        let message = args.joined(separator: separator)
+        os_log("adamant-console-log %{public}@", message)
     }
 }
