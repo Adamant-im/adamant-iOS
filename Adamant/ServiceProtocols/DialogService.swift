@@ -91,6 +91,7 @@ struct AdamantAlertAction {
 }
 
 protocol DialogService: AnyObject {
+    func setup()
     
     func getTopmostViewController() -> UIViewController?
     

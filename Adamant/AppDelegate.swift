@@ -135,7 +135,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         window!.makeKeyAndVisible()
         
-        // MARK: 4. Show login
+        // MARK: 4. Setup dialog service
+        dialogService.setup()
+        
+        // MARK: 5. Show login
         let login = router.get(scene: AdamantScene.Login.login) as! LoginViewController
         let welcomeIsShown = UserDefaults.standard.bool(forKey: StoreKey.application.welcomeScreensIsShown)
         
@@ -150,7 +153,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             UserDefaults.standard.set(true, forKey: StoreKey.application.welcomeScreensIsShown)
         }
     
-        // MARK: 5 Reachability & Autoupdate
+        // MARK: 6 Reachability & Autoupdate
         repeater = RepeaterService()
         
         // Configure reachability
@@ -217,7 +220,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             dialogService.showError(withMessage: "Failed to register CurrencyInfoService autoupdate. Please, report a bug", error: nil)
         }
         
-        // MARK: 6. Logout reset
+        // MARK: 7. Logout reset
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
             // On logout, pop all navigators to root.
             guard let tbc = self?.window?.rootViewController as? UITabBarController, let vcs = tbc.viewControllers else {
@@ -229,10 +232,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
         
-        // MARK: 7. Welcome messages
+        // MARK: 8. Welcome messages
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantChatsProvider.initiallySyncedChanged, object: nil, queue: OperationQueue.main, using: handleWelcomeMessages)
         
-        // MARK: 8. Notifications
+        // MARK: 9. Notifications
         pushNotificationsTokenService.sendTokenDeletionTransactions()
         UNUserNotificationCenter.current().delegate = self
         

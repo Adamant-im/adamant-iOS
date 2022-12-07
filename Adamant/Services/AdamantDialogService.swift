@@ -7,23 +7,23 @@
 //
 
 import UIKit
-import FTIndicator
 import PMAlertController
 import MessageUI
+import PopupKit
 
 class AdamantDialogService: DialogService {
     // MARK: Dependencies
-    var router: Router!
-    
-    fileprivate var mailDelegate: MailDelegate = {
-        MailDelegate()
-    }()
+    private let router: Router
+    private let popupManager = PopupManager()
+    private let mailDelegate = MailDelegate()
     
     // Configure notifications
-    init() {
-        FTIndicator.setIndicatorStyle(.extraLight)
-        
-        FTNotificationIndicator.setDefaultDismissTime(4)
+    init(router: Router) {
+        self.router = router
+    }
+    
+    func setup() {
+        popupManager.setup()
     }
 }
 
@@ -65,32 +65,32 @@ extension AdamantDialogService {
 // MARK: - Toast
 extension AdamantDialogService {
     func showToastMessage(_ message: String) {
-        FTIndicator.showToastMessage(message)
+        popupManager.showToastMessage(message)
     }
     
     func dismissToast() {
-        FTIndicator.dismissToast()
+        popupManager.dismissToast()
     }
 }
 
 // MARK: - Indicators
 extension AdamantDialogService {
     func showProgress(withMessage message: String?, userInteractionEnable enabled: Bool) {
-        FTIndicator.showProgress(withMessage: message, userInteractionEnable: enabled)
+        popupManager.showProgressAlert(message: message, userInteractionEnabled: enabled)
     }
     
     func dismissProgress() {
-        DispatchQueue.onMainAsync {
-            FTIndicator.dismissProgress()
+        DispatchQueue.onMainAsync { [popupManager] in
+            popupManager.dismissAlert()
         }
     }
     
     func showSuccess(withMessage message: String) {
-        FTIndicator.showSuccess(withMessage: message)
+        popupManager.showSuccessAlert(message: message)
     }
     
     func showWarning(withMessage message: String) {
-        FTIndicator.showError(withMessage: message)
+        popupManager.showWarningAlert(message: message)
     }
     
     func showError(withMessage message: String, error: Error? = nil) {
@@ -100,7 +100,7 @@ extension AdamantDialogService {
     }
     
     private func internalShowError(withMessage message: String, error: Error? = nil) {
-        FTIndicator.dismissProgress()
+        popupManager.dismissAlert()
         
         let alertVC = PMAlertController(title: String.adamantLocalized.alert.error, description: message, image: #imageLiteral(resourceName: "error"), style: .alert)
         
@@ -179,26 +179,34 @@ extension AdamantDialogService {
     }
     
     func showNoConnectionNotification() {
-        FTIndicator.showNotification(with: #imageLiteral(resourceName: "error"), title: String.adamantLocalized.alert.noInternetNotificationTitle, message: String.adamantLocalized.alert.noInternetNotificationBoby, autoDismiss: false, tapHandler: nil, completion: nil)
+        popupManager.showNotification(
+            icon: #imageLiteral(resourceName: "error"),
+            title: .adamantLocalized.alert.noInternetNotificationTitle,
+            description: .adamantLocalized.alert.noInternetNotificationBoby,
+            autoDismiss: false,
+            tapHandler: nil
+        )
     }
     
     func dissmisNoConnectionNotification() {
-        FTIndicator.dismissNotification()
+        popupManager.dismissNotification()
     }
 }
 
 // MARK: - Notifications
 extension AdamantDialogService {
     func showNotification(title: String?, message: String?, image: UIImage?, tapHandler: (() -> Void)?) {
-        if let image = image {
-            FTIndicator.showNotification(with: image, title: title, message: message, tapHandler: tapHandler)
-        } else {
-            FTIndicator.showNotification(withTitle: title, message: message, tapHandler: tapHandler)
-        }
+        popupManager.showNotification(
+            icon: image,
+            title: title,
+            description: message,
+            autoDismiss: true,
+            tapHandler: tapHandler
+        )
     }
     
     func dismissNotification() {
-        FTIndicator.dismissNotification()
+        popupManager.dismissNotification()
     }
 }
 

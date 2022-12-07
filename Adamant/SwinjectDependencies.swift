@@ -40,9 +40,7 @@ extension Container {
         // MARK: - Services with dependencies
         // MARK: DialogService
         self.register(DialogService.self) { r in
-            let service = AdamantDialogService()
-            service.router = r.resolve(Router.self)
-            return service
+            AdamantDialogService(router: r.resolve(Router.self)!)
         }.inObjectScope(.container)
         
         // MARK: Notifications
