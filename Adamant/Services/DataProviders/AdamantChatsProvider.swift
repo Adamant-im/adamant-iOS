@@ -41,7 +41,7 @@ class AdamantChatsProvider: ChatsProvider {
     private var chatsLoading: [String] = []
     private let preLoadChatsCount = 5
     private var isConnectedToTheInternet = true
-    private var onConnectionToTheInternetRestored: (() -> Void)?
+    private var onConnectionToTheInternetRestoredTasks = [() -> Void]()
     
     private(set) var isInitiallySynced: Bool = false {
         didSet {
@@ -135,8 +135,8 @@ class AdamantChatsProvider: ChatsProvider {
             }
             
             if state {
-                if let blackList = self?.blockList {
-                    self?.securedStore.set(blackList, for: StoreKey.accountService.blackList)
+                if let blockList = self?.blockList {
+                    self?.securedStore.set(blockList, for: StoreKey.accountService.blackList)
                 }
                 
                 if let removedMessages = self?.removedMessages {
@@ -176,8 +176,7 @@ class AdamantChatsProvider: ChatsProvider {
             }
             
             if self?.isConnectedToTheInternet == false {
-                self?.onConnectionToTheInternetRestored?()
-                self?.onConnectionToTheInternetRestored = nil
+                self?.onConnectionToTheInternetRestored()
             }
             self?.isConnectedToTheInternet = true
         }
@@ -351,7 +350,7 @@ extension AdamantChatsProvider {
                             execute: getChatrooms
                         )
                     } else {
-                        self?.addOnConnectionToTheInternetRestored(task: getChatrooms)
+                        self?.onConnectionToTheInternetRestoredTasks.append(getChatrooms)
                     }
                 default:
                     completion?(nil)
@@ -424,7 +423,7 @@ extension AdamantChatsProvider {
                             execute: getChatMessages
                         )
                     } else {
-                        self?.addOnConnectionToTheInternetRestored(task: getChatMessages)
+                        self?.onConnectionToTheInternetRestoredTasks.append(getChatMessages)
                     }
                 default:
                     completion?(nil)
@@ -1473,11 +1472,9 @@ extension AdamantChatsProvider {
         }
     }
     
-    private func addOnConnectionToTheInternetRestored(task: @escaping () -> Void) {
-        onConnectionToTheInternetRestored = { [onConnectionToTheInternetRestored] in
-            onConnectionToTheInternetRestored?()
-            task()
-        }
+    private func onConnectionToTheInternetRestored() {
+        onConnectionToTheInternetRestoredTasks.forEach { $0() }
+        onConnectionToTheInternetRestoredTasks = []
     }
 }
 
