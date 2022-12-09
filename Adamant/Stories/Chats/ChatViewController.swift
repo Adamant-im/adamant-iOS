@@ -1180,7 +1180,15 @@ extension ChatViewController {
 
 // MARK: Constants
 
-private let headerHeight: CGFloat = 38
+private var headerHeight: CGFloat {
+    if #available(iOS 16.0, *) {
+        return 0
+    }
+    #if os(macOS)
+        return 0
+    #endif
+    return 38
+}
 private let chatPositionDelta: CGFloat = 150
 private let scrollToBottomButtonBottomInset: CGFloat = 20
 private let scrollToBottomButtonRightInset: CGFloat = 20
