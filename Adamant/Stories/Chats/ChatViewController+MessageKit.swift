@@ -813,33 +813,34 @@ extension ChatViewController {
                     return
                 }
                 
-                guard let room = self.chatsProvider.getChatroom(for: adm.address),
-                      let partner = room.partner
-                else {
+                if action == .send {
+                    self.sendFunds(to: adm)
+                    return
+                }
+                
+                guard let room = self.chatsProvider.getChatroom(for: adm.address) else {
                     self.findAccount(with: adm.address, name: adm.name, message: adm.message, action: action)
                     return
                 }
-                switch action {
-                case .send:
-                    self.sendFunds(to: partner)
-                case .chat:
-                    self.startNewChat(with: room, name: adm.name, message: adm.message)
-                }
+                
+                self.startNewChat(with: room, name: adm.name, message: adm.message)
             }
         }
     }
     
-    private func sendFunds(to partner: CoreDataAccount) {
-        guard let vc = router.get(scene: AdamantScene.Chats.complexTransfer) as? ComplexTransferViewController else {
-            return
+    private func sendFunds(to adm: AdamantAddress) {
+        let service = accountService.wallets.first { wallet in
+            return wallet is AdmWalletService
         }
         
-        vc.partner = partner
-        vc.transferDelegate = self
-        
-        let navigator = UINavigationController(rootViewController: vc)
-        navigator.modalPresentationStyle = .overFullScreen
-        self.present(navigator, animated: true, completion: nil)
+        guard let service = service as? WalletServiceWithSend else { return }
+        let vc = service.transferViewController()
+        if let v = vc as? TransferViewControllerBase {
+            v.recipientAddress = adm.address
+            v.recipientName = adm.name
+            v.delegate = self
+        }
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     private func startNewChat(with chatroom: Chatroom, name: String? = nil, message: String? = nil) {
@@ -890,9 +891,6 @@ extension ChatViewController {
                     account.chatroom?.isForcedVisible = true
                     if action == .chat {
                         self.startNewChat(with: chatroom, message: message)
-                    }
-                    if action == .send {
-                        self.sendFunds(to: account)
                     }
                     self.dialogService.dismissProgress()
                 }

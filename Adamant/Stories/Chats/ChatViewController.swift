@@ -54,6 +54,7 @@ protocol ChatViewControllerDelegate: AnyObject {
 // MARK: -
 class ChatViewController: MessagesViewController {
     // MARK: Dependencies
+    var accountService: AccountService!
     var chatsProvider: ChatsProvider!
     var transfersProvider: TransfersProvider!
     var dialogService: DialogService!
