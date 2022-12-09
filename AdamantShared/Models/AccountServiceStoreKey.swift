@@ -15,7 +15,7 @@ extension StoreKey {
         static let passphrase = "accountService.passphrase"
         static let showedV12 = "accountService.showedV12"
         static let pushTokenHash = "accountService.deviceTokenHash"
-        static let blackList = "blackList"
+        static let blockList = "blackList"
         static let removedMessages = "removedMessages"
     }
 }

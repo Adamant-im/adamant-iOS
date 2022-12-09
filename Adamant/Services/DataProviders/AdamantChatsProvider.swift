@@ -136,7 +136,7 @@ class AdamantChatsProvider: ChatsProvider {
             
             if state {
                 if let blockList = self?.blockList {
-                    self?.securedStore.set(blockList, for: StoreKey.accountService.blackList)
+                    self?.securedStore.set(blockList, for: StoreKey.accountService.blockList)
                 }
                 
                 if let removedMessages = self?.removedMessages {
@@ -209,7 +209,7 @@ class AdamantChatsProvider: ChatsProvider {
     }
     
     private func setupSecuredStore() {
-        blockList = securedStore.get(StoreKey.accountService.blackList) ?? []
+        blockList = securedStore.get(StoreKey.accountService.blockList) ?? []
         removedMessages = securedStore.get(StoreKey.accountService.removedMessages) ?? []
     }
 }
@@ -1457,7 +1457,7 @@ extension AdamantChatsProvider {
             self.blockList.append(address)
             
             if self.accountService.hasStayInAccount {
-                self.securedStore.set(blockList, for: StoreKey.accountService.blackList)
+                self.securedStore.set(blockList, for: StoreKey.accountService.blockList)
             }
         }
     }
