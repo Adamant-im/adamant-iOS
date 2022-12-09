@@ -146,6 +146,8 @@ class AdamantAccountService: AccountService {
         NotificationCenter.default.addObserver(forName: .AdamantAccountService.forceUpdateBalance, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.update()
         }
+        
+        setupSecuredStore()
     }
 }
 
@@ -216,7 +218,7 @@ extension AdamantAccountService {
         notificationsService?.setNotificationsMode(.disabled, completion: nil)
     }
     
-    func setupSecuredStore() {
+    private func setupSecuredStore() {
         securedStoreSemaphore.wait()
         defer { securedStoreSemaphore.signal() }
         
@@ -503,7 +505,7 @@ private enum Key: CaseIterable {
     case useBiometry
     case passphrase
     case showedV12
-    case blackListKey
+    case blockListKey
     case removedMessages
     
     var stringValue: String {
@@ -514,7 +516,7 @@ private enum Key: CaseIterable {
         case .useBiometry: return StoreKey.accountService.useBiometry
         case .passphrase: return StoreKey.accountService.passphrase
         case .showedV12: return StoreKey.accountService.showedV12
-        case .blackListKey: return StoreKey.accountService.blackList
+        case .blockListKey: return StoreKey.accountService.blockList
         case .removedMessages: return StoreKey.accountService.removedMessages
         }
     }
