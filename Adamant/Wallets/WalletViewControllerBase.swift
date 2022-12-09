@@ -149,13 +149,9 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
             
             let sendRow = LabelRow {
                 $0.tag = BaseRows.send.tag
-                if #available(iOS 14.0, *) {
-                    var content = $0.cell.defaultContentConfiguration()
-                    content.attributedText = label
-                    $0.cell.contentConfiguration = content
-                } else {
-                    $0.cell.textLabel?.attributedText = label
-                }
+                var content = $0.cell.defaultContentConfiguration()
+                content.attributedText = label
+                $0.cell.contentConfiguration = content
                 $0.cell.selectionStyle = .gray
                 $0.cell.backgroundColor = UIColor.adamant.cellColor
             }.cellUpdate { (cell, _) in
