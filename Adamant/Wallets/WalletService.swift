@@ -207,6 +207,8 @@ protocol WalletService: AnyObject {
     var tokenLogo: UIImage { get }
     var tokenNetworkSymbol: String { get }
     var consistencyMaxTime: Double { get }
+    var minBalance: Decimal { get }
+    var minAmount: Decimal { get }
     
 	// MARK: Notifications
 	

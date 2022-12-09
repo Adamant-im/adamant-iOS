@@ -21,6 +21,14 @@ class ERC20WalletService: WalletService {
     static var currencySymbol: String = ""
     static var currencyLogo: UIImage = UIImage()
     
+    var minBalance: Decimal {
+        0
+    }
+    
+    var minAmount: Decimal {
+        0
+    }
+    
     var tokenSymbol: String {
         return token?.symbol ?? ""
     }
@@ -160,9 +168,10 @@ class ERC20WalletService: WalletService {
             }
         }
         
-        guard let apiUrl = AdamantResources.ethServers.randomElement() else {
+        guard let node = EthWalletService.nodes.randomElement() else {
             fatalError("Failed to get ETH endpoint")
         }
+        let apiUrl = node.asString()
         _ethNodeUrl = apiUrl
         DispatchQueue.global(qos: .userInitiated).async {
             _ = self.setupEthNode(with: apiUrl)
@@ -500,7 +509,7 @@ extension ERC20WalletService {
 
 extension ERC20WalletService {
     func getTransactionsHistory(address: String, offset: Int = 0, limit: Int = 100, completion: @escaping (WalletServiceResult<[EthTransactionShort]>) -> Void) {
-        guard let raw = AdamantResources.ethServers.randomElement(), let url = URL(string: raw) else {
+        guard let node = EthWalletService.nodes.randomElement(), let url = node.asURL() else {
             fatalError("Failed to build ETH endpoint URL")
         }
         

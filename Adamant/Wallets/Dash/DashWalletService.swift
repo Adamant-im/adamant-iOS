@@ -12,6 +12,14 @@ import Alamofire
 import BitcoinKit
 
 class DashWalletService: WalletService {
+    var minBalance: Decimal {
+        DashWalletService.minBalance
+    }
+    
+    var minAmount: Decimal {
+        DashWalletService.minAmount
+    }
+    
     var tokenSymbol: String {
         return type(of: self).currencySymbol
     }
@@ -26,10 +34,6 @@ class DashWalletService: WalletService {
     
     var tokenNetworkSymbol: String {
         return "DASH"
-    }
-    
-    var consistencyMaxTime: Double {
-        return 800
     }
    
     var wallet: WalletAccount? { return dashWallet }
@@ -57,13 +61,14 @@ class DashWalletService: WalletService {
     var router: Router!
     
     // MARK: - Constants
-    static var currencySymbol = "DASH"
     static var currencyLogo = #imageLiteral(resourceName: "dash_wallet")
     
     static let multiplier = Decimal(sign: .plus, exponent: 8, significand: 1)
     static let chunkSize = 20
     
-    private (set) var transactionFee: Decimal = 0.0001 // 0.0001 DASH per transaction
+    var transactionFee: Decimal {
+        return DogeWalletService.fixedFee
+    }
     
     static let kvsAddress = "dash:address"
     
@@ -305,7 +310,7 @@ extension DashWalletService: SwinjectDependentService {
 // MARK: - Balances & addresses
 extension DashWalletService {
     func getBalance(_ completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-        guard let endpoint = AdamantResources.dashServers.randomElement() else {
+        guard let endpoint = DashWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DASH endpoint URL")
         }
 

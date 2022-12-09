@@ -49,7 +49,7 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
         let id = transaction.txId
         
-        return URL(string: "\(AdamantResources.liskExplorerAddress)\(id)")
+        return URL(string: "\(LskWalletService.explorerAddress)\(id)")
     }
     
     @objc func refresh() {

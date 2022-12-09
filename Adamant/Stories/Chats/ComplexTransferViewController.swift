@@ -146,7 +146,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
 		let service = accountService.wallets[index]
 		
 		guard let wallet = service.wallet else {
-			return WalletPagingItem(index: index, currencySymbol: "", currencyImage: #imageLiteral(resourceName: "wallet_adm"))
+			return WalletPagingItem(index: index, currencySymbol: "", currencyImage: #imageLiteral(resourceName: "adamant_wallet"))
 		}
         
         var network = ""

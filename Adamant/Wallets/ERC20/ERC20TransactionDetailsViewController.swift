@@ -50,7 +50,7 @@ class ERC20TransactionDetailsViewController: TransactionDetailsViewControllerBas
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
         let id = transaction.txId
         
-        return URL(string: "\(AdamantResources.ethereumExplorerAddress)\(id)")
+        return URL(string: "\(EthWalletService.explorerAddress)\(id)")
     }
     
     @objc func refresh() {

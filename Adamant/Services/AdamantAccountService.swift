@@ -108,7 +108,7 @@ class AdamantAccountService: AccountService {
             AdmWalletService(),
             BtcWalletService(),
             EthWalletService(),
-            LskWalletService(mainnet: true, nodes: AdamantResources.lskServers, services: AdamantResources.lskServiceServers),
+            LskWalletService(mainnet: true, nodes: LskWalletService.nodes, services: LskWalletService.serviceNodes),
             DogeWalletService(),
             DashWalletService()
         ]
@@ -127,9 +127,11 @@ class AdamantAccountService: AccountService {
             fatalError("Failed to get EthWalletService")
         }
         
-        guard let url = AdamantResources.ethServers.randomElement() else {
+        guard let node = EthWalletService.nodes.randomElement() else {
             fatalError("Failed to get ETH endpoint")
         }
+        
+        let url = node.asString()
         
         ethWallet.initiateNetwork(apiUrl: url) { result in
             switch result {

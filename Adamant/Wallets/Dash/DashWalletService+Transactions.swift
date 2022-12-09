@@ -40,7 +40,7 @@ extension DashWalletService {
     }
 
     func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<BTCRawTransaction>) -> Void) {
-        guard let endpoint = AdamantResources.dashServers.randomElement() else {
+        guard let endpoint = DashWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DASH endpoint URL")
         }
         
@@ -78,7 +78,7 @@ extension DashWalletService {
     }
 
     func getBlockId(by hash: String, completion: @escaping (ApiServiceResult<String>) -> Void) {
-        guard let endpoint = AdamantResources.dashServers.randomElement() else {
+        guard let endpoint = DashWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DASH endpoint URL")
         }
         
@@ -117,7 +117,7 @@ extension DashWalletService {
     }
 
     func getUnspentTransactions(_ completion: @escaping (ApiServiceResult<[UnspentTransaction]>) -> Void) {
-        guard let endpoint = AdamantResources.dashServers.randomElement() else {
+        guard let endpoint = DashWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DASH endpoint URL")
         }
         
@@ -203,7 +203,7 @@ private extension DashWalletService {
 private extension DashWalletService {
 
     func requestTransactionsIds(for address: String, completion: @escaping (ApiServiceResult<[String]>) -> Void) {
-        guard let endpoint = AdamantResources.dashServers.randomElement() else {
+        guard let endpoint = DashWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DASH endpoint URL")
         }
         

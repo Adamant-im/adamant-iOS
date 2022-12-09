@@ -52,7 +52,7 @@ class DashTransactionDetailsViewController: TransactionDetailsViewControllerBase
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
         let id = transaction.txId
         
-        return URL(string: "\(AdamantResources.dashExplorerAddress)\(id)")
+        return URL(string: "\(DashWalletService.explorerAddress)\(id)")
     }
     
     @objc func refresh() {

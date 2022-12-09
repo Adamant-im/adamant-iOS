@@ -52,15 +52,21 @@ class LskWalletService: WalletService {
     var transactionFeeRaw: BigUInt = BigUInt(integerLiteral: 141000)
     private (set) var enabled = true
     
-    static var currencySymbol = "LSK"
     static var currencyLogo = #imageLiteral(resourceName: "lisk_wallet")
-    static let currencyExponent = -8
     
     static let kvsAddress = "lsk:address"
     static let defaultFee: BigUInt = 141000
     
     var lastHeight: UInt64 = 0
 	
+    var minBalance: Decimal {
+        LskWalletService.minBalance
+    }
+    
+    var minAmount: Decimal {
+        LskWalletService.minAmount
+    }
+    
     var tokenSymbol: String {
         return type(of: self).currencySymbol
     }
@@ -77,10 +83,6 @@ class LskWalletService: WalletService {
         return "LSK"
     }
     
-    var consistencyMaxTime: Double {
-        return 60
-    }
-   
 	// MARK: - Properties
 	let transferAvailable: Bool = true
     private var initialBalanceCheck = false
@@ -127,8 +129,8 @@ class LskWalletService: WalletService {
         self.init(mainnet: mainnet, nodes: nodes, serviceNode: serviceNode)
     }
     
-    convenience init(mainnet: Bool, nodes: [String], services: [String]) {
-        self.init(mainnet: mainnet, nodes: nodes.map { APINode(origin: $0) }, serviceNode: services.map { APINode(origin: $0) })
+    convenience init(mainnet: Bool, nodes: [Node], services: [Node]) {
+        self.init(mainnet: mainnet, nodes: nodes.map { APINode(origin: $0.asString()) }, serviceNode: services.map { APINode(origin: $0.asString()) })
     }
     
     init(mainnet: Bool, nodes: [APINode], serviceNode: [APINode]) {

@@ -204,24 +204,22 @@ class TransferViewControllerBase: FormViewController {
         guard
             let service = service,
             let balance = service.wallet?.balance,
-            let minBalance = service.wallet?.minBalance,
-            balance > minBalance else {
+            balance > service.minBalance else {
             return 0
         }
         
-        let max = balance - service.transactionFee - minBalance
+        let max = balance - service.transactionFee - service.minBalance
         
         return max >= 0 ? max : 0
     }
     
     var minToTransfer: Decimal {
         guard
-            let service = service,
-            let minBalance = service.wallet?.minAmount else {
+            let service = service else {
             return 0
         }
         
-        return minBalance
+        return service.minAmount
     }
     
     override var customNavigationAccessoryView: (UIView & NavigationAccessory)? {
@@ -629,11 +627,12 @@ class TransferViewControllerBase: FormViewController {
         }
         
         guard let service = service,
-              let balance = service.wallet?.balance,
-              let minAmount = service.wallet?.minAmount
+              let balance = service.wallet?.balance
         else {
             return false
         }
+        
+        let minAmount = service.minAmount
         
         guard minAmount <= amount else {
             return false

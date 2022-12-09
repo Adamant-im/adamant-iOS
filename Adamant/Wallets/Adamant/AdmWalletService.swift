@@ -13,13 +13,19 @@ import CoreData
 import MessageKit
 
 class AdmWalletService: NSObject, WalletService {
+    
     // MARK: - Constants
     let addressRegex = try! NSRegularExpression(pattern: "^U([0-9]{6,20})$")
     
-    let transactionFee: Decimal = 0.5
-    static let currencySymbol = "ADM"
     static let currencyLogo = #imageLiteral(resourceName: "adamant_wallet")
-    static let currencyExponent: Int = AdamantUtilities.admCurrencyExponent
+    
+    var minBalance: Decimal {
+        AdmWalletService.minBalance
+    }
+    
+    var minAmount: Decimal {
+        AdmWalletService.minAmount
+    }
     
     var tokenSymbol: String {
         return type(of: self).currencySymbol
@@ -33,12 +39,12 @@ class AdmWalletService: NSObject, WalletService {
         return type(of: self).currencyLogo
     }
     
-    var tokenNetworkSymbol: String {
-        return "ADM"
+    var transactionFee: Decimal {
+        return AdmWalletService.fixedFee
     }
     
-    var consistencyMaxTime: Double {
-        return 0
+    var tokenNetworkSymbol: String {
+        return "ADM"
     }
     
 	// MARK: - Dependencies
