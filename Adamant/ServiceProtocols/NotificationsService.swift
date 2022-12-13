@@ -10,6 +10,7 @@ import Foundation
 
 extension String.adamantLocalized.notifications {
     static let notificationsDisabled = NSLocalizedString("NotificationsService.NotificationsDisabled", comment: "Notifications: User has disabled notifications. Head him into settings")
+    static let notStayedLoggedIn = NSLocalizedString("NotificationsService.NotStayedLoggedIn", comment: "Notifications: Not stayed logged in")
     
     static let newMessageTitle = NSLocalizedString("NotificationsService.NewMessage.Title", comment: "Notifications: New message notification title")
     static let newMessageBody = NSLocalizedString("NotificationsService.NewMessage.BodyFormat", comment: "Notifications: new messages notification body. Using %d for amount")
@@ -159,6 +160,7 @@ enum NotificationsServiceResult {
 enum NotificationsServiceError: Error {
     case notEnoughMoney
     case denied(error: Error?)
+    case notStayedLoggedIn
 }
 
 extension NotificationsServiceError: RichError {
@@ -166,19 +168,20 @@ extension NotificationsServiceError: RichError {
         switch self {
         case .notEnoughMoney: return String.adamantLocalized.sharedErrors.notEnoughMoney
         case .denied: return String.adamantLocalized.notifications.notificationsDisabled
+        case .notStayedLoggedIn: return String.adamantLocalized.notifications.notStayedLoggedIn
         }
     }
     
     var internalError: Error? {
         switch self {
-        case .notEnoughMoney: return nil
+        case .notEnoughMoney, .notStayedLoggedIn: return nil
         case .denied(let error): return error
         }
     }
     
     var level: ErrorLevel {
         switch self {
-        case .notEnoughMoney: return .warning
+        case .notEnoughMoney, .notStayedLoggedIn: return .warning
         case .denied: return .error
         }
     }

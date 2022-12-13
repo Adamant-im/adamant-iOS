@@ -87,7 +87,8 @@ class ChatListViewController: UIViewController {
     private var originalInsets: UIEdgeInsets?
     private var didShow: Bool = false
     
-    var didLoadedMessages: (() -> Void)?
+    private var onMessagesLoadedActions = [() -> Void]()
+    private var areMessagesLoaded = false
     
     // MARK: Lifecycle
     override func viewDidLoad() {
@@ -136,6 +137,7 @@ class ChatListViewController: UIViewController {
         }
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.initFetchedRequestControllers(provider: nil)
+            self?.areMessagesLoaded = false
         }
         
         // MARK: Busy Indicator
@@ -151,7 +153,8 @@ class ChatListViewController: UIViewController {
         
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantChatsProvider.initiallySyncedChanged, object: chatsProvider, queue: OperationQueue.main) { [weak self] notification in
             if let synced = notification.userInfo?[AdamantUserInfoKey.ChatProvider.initiallySynced] as? Bool {
-                self?.didLoadedMessages?()
+                self?.areMessagesLoaded = true
+                self?.performOnMessagesLoadedActions()
                 self?.setIsBusy(!synced)
                 self?.tableView.reloadData()
             } else if let synced = self?.chatsProvider.isInitiallySynced {
@@ -989,6 +992,13 @@ extension ChatListViewController {
         tableView.scrollToRow(at: tableViewIndexPath, at: .top, animated: false)
     }
     
+    func performOnMessagesLoaded(action: @escaping () -> Void) {
+        onMessagesLoadedActions.append(action)
+        
+        guard areMessagesLoaded else { return }
+        performOnMessagesLoadedActions()
+    }
+    
     private func chatControllerIndexPath(tableViewIndexPath: IndexPath) -> IndexPath {
         isBusy && tableViewIndexPath.row >= (lastSystemChatPositionRow ?? 0)
             ? IndexPath(row: tableViewIndexPath.row - 1, section: 0)
@@ -999,6 +1009,11 @@ extension ChatListViewController {
         isBusy && chatControllerIndexPath.row == (lastSystemChatPositionRow ?? 0)
             ? IndexPath(row: chatControllerIndexPath.row + 1, section: 0)
             : chatControllerIndexPath
+    }
+    
+    private func performOnMessagesLoadedActions() {
+        onMessagesLoadedActions.forEach { $0() }
+        onMessagesLoadedActions = []
     }
 }
 

@@ -125,6 +125,11 @@ extension AdamantNotificationsService {
             fallthrough
             
         case .backgroundFetch:
+            guard accountService?.hasStayInAccount ?? false else {
+                completion?(.failure(error: .notStayedLoggedIn))
+                return
+            }
+            
             authorizeNotifications { [weak self] (success, error) in
                 guard success else {
                     completion?(.failure(error: .denied(error: error)))

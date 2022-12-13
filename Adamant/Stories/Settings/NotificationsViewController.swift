@@ -254,7 +254,7 @@ class NotificationsViewController: FormViewController {
                     return
                 case .failure(let error):
                     switch error {
-                    case .notEnoughMoney:
+                    case .notEnoughMoney, .notStayedLoggedIn:
                         self?.dialogService.showRichError(error: error)
                     case .denied:
                         self?.presentNotificationsDeniedError()
