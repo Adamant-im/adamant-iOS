@@ -120,6 +120,7 @@ function moveImage ()
     mv $FROM_DIR/$WALLET_NAME/Images/${IMAGE_NAME}@2x.png ${Target}/${IMAGE_NAME}@2x.png
     mv $FROM_DIR/$WALLET_NAME/Images/${IMAGE_NAME}@3x.png ${Target}/${IMAGE_NAME}@3x.png
     
+    # check dark icons
     if [ -e $FROM_DIR/$WALLET_NAME/Images/${IMAGE_NAME}_dark.png ]
     then
         mv $FROM_DIR/$WALLET_NAME/Images/${IMAGE_NAME}_dark.png ${Target}/${IMAGE_NAME}_dark.png
@@ -151,6 +152,14 @@ function unpack ()
         Target_Wallet_Image=$ROOT/AdamantShared/Shared.xcassets/Wallets/${WALLET_NAME}_wallet.imageset
         mkdir -p ${Target_Wallet_Image}
         moveImage $WALLETS_NAME_DIR $WALLET_NAME ${Target_Wallet_Image} ${WALLET_NAME}_wallet
+        
+        # move row images to assets
+        Target_Row_Image=$ROOT/AdamantShared/Shared.xcassets/Wallets/${WALLET_NAME}_wallet_row.imageset
+        if [ -e $WALLETS_NAME_DIR/$WALLET_NAME/Images/${WALLET_NAME}_wallet_row.png ]
+        then
+            mkdir -p ${Target_Row_Image}
+            moveImage $WALLETS_NAME_DIR $WALLET_NAME ${Target_Row_Image} ${WALLET_NAME}_wallet_row
+        fi
     done
 }
 

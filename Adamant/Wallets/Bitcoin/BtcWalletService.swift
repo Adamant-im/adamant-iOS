@@ -756,7 +756,7 @@ extension BtcWalletService: PrivateKeyGenerator {
     }
     
     var rowImage: UIImage? {
-        return #imageLiteral(resourceName: "wallet_btc_row")
+        return #imageLiteral(resourceName: "bitcoin_wallet_row")
     }
     
     func generatePrivateKeyFor(passphrase: String) -> String? {

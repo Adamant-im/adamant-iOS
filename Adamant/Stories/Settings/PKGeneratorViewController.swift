@@ -168,7 +168,7 @@ class PKGeneratorViewController: FormViewController {
                 
                 $0.title = generator.rowTitle
                 $0.value = privateKey
-                $0.cell.imageView?.image = generator.rowImage
+                $0.cell.imageView?.image = generator.rowImage?.withRenderingMode(.alwaysTemplate)
             }.cellUpdate { (cell, _) in
                 cell.accessoryType = .disclosureIndicator
             }.onCellSelection { [weak self] (cell, row) in

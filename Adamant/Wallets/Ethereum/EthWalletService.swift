@@ -784,7 +784,7 @@ extension EthWalletService: PrivateKeyGenerator {
     }
     
     var rowImage: UIImage? {
-        return #imageLiteral(resourceName: "wallet_eth_row")
+        return #imageLiteral(resourceName: "ethereum_wallet_row")
     }
     
     func generatePrivateKeyFor(passphrase: String) -> String? {

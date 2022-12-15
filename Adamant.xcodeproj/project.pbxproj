@@ -2534,7 +2534,7 @@
 		};
 		418BBB14293752F800CAB719 /* Run Script - Load wallets */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 8;
+			buildActionMask = 12;
 			files = (
 			);
 			inputFileListPaths = (
@@ -2548,7 +2548,7 @@
 			);
 			outputPaths = (
 			);
-			runOnlyForDeploymentPostprocessing = 1;
+			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "$SCRIPT_INPUT_FILE_0 xcode\n$SCRIPT_INPUT_FILE_1 xcode\n\nrm -r $PWD/scripts\n";
 		};

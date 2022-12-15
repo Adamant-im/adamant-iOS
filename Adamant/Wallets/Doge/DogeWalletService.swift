@@ -648,7 +648,7 @@ extension DogeWalletService: PrivateKeyGenerator {
     }
     
     var rowImage: UIImage? {
-        return #imageLiteral(resourceName: "wallet_doge_row")
+        return #imageLiteral(resourceName: "doge_wallet_row")
     }
     
     func generatePrivateKeyFor(passphrase: String) -> String? {

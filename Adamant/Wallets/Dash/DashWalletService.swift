@@ -460,7 +460,7 @@ extension DashWalletService: PrivateKeyGenerator {
     }
     
     var rowImage: UIImage? {
-        return #imageLiteral(resourceName: "wallet_dash_row")
+        return #imageLiteral(resourceName: "dash_wallet_row")
     }
     
     func generatePrivateKeyFor(passphrase: String) -> String? {

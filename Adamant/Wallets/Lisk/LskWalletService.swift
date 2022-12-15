@@ -606,7 +606,7 @@ extension LskWalletService: PrivateKeyGenerator {
     }
     
     var rowImage: UIImage? {
-        return #imageLiteral(resourceName: "wallet_lsk_row")
+        return #imageLiteral(resourceName: "lisk_wallet_row")
     }
     
     func generatePrivateKeyFor(passphrase: String) -> String? {
