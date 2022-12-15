@@ -115,30 +115,11 @@ class AdamantNodesSource: NodesSource {
     }
     
     private func saveNodes() {
-        do {
-            let data = try JSONEncoder().encode(nodes)
-            guard let raw = String(data: data, encoding: String.Encoding.utf8) else {
-                return
-            }
-            
-            securedStore.set(raw, for: StoreKey.NodesSource.nodes)
-        } catch {
-            print(error.localizedDescription)
-        }
+        securedStore.set(nodes, for: StoreKey.NodesSource.nodes)
     }
     
     private func loadNodes() {
-        guard let raw = securedStore.get(StoreKey.NodesSource.nodes), let data = raw.data(using: String.Encoding.utf8) else {
-            nodes = defaultNodesGetter()
-            return
-        }
-        
-        do {
-            nodes = try JSONDecoder().decode([Node].self, from: data)
-        } catch {
-            nodes = defaultNodesGetter()
-            print(error.localizedDescription)
-        }
+        nodes = securedStore.get(StoreKey.NodesSource.nodes) ?? defaultNodesGetter()
     }
     
     private func setHealthCheckTimer() {

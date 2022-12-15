@@ -69,7 +69,11 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
     
     var securedStore: SecuredStore? {
         didSet {
-            if let securedStore = securedStore, let id = securedStore.get(StoreKey.CoinInfo.selectedCurrency), let currency = Currency(rawValue: id) {
+            if
+                let securedStore = securedStore,
+                let id: String = securedStore.get(StoreKey.CoinInfo.selectedCurrency),
+                let currency = Currency(rawValue: id)
+            {
                 currentCurrency = currency
             } else {
                 currentCurrency = Currency.default

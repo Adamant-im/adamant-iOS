@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum TransactionType {
+enum TransactionType: Hashable {
     case unknown(raw: Int)
     case send        // 0
     case signature    // 1

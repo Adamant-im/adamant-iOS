@@ -12,7 +12,7 @@ import Foundation
 /// - message: new and main message type, with 0.001 transaction fee
 /// - richMessage: json with additional data
 /// - signal: hidden system message for/from services
-enum ChatType {
+enum ChatType: Hashable {
     case unknown(raw: Int)
     case messageOld        // 0
     case message        // 1

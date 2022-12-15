@@ -177,7 +177,20 @@
 		64F085D920E2D7600006DE68 /* AdmTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F085D820E2D7600006DE68 /* AdmTransactionsViewController.swift */; };
 		64FA53CD20E1300B006783C9 /* EthTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FA53CC20E1300A006783C9 /* EthTransactionsViewController.swift */; };
 		64FA53D120E24942006783C9 /* TransactionDetailsViewControllerBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FA53D020E24941006783C9 /* TransactionDetailsViewControllerBase.swift */; };
+		9304F8BE292F88F900173F18 /* ANSPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304F8BD292F88F900173F18 /* ANSPayload.swift */; };
+		9304F8C2292F895C00173F18 /* PushNotificationsTokenService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304F8C1292F895C00173F18 /* PushNotificationsTokenService.swift */; };
+		9304F8C4292F8A3100173F18 /* AdamantPushNotificationsTokenService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304F8C3292F8A3100173F18 /* AdamantPushNotificationsTokenService.swift */; };
+		9304F8C6292F971600173F18 /* ApiServiceResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304F8C5292F971600173F18 /* ApiServiceResult.swift */; };
+		9304F8C8292F972600173F18 /* ApiServiceError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304F8C7292F972600173F18 /* ApiServiceError.swift */; };
+		930B57772934D44700F3E539 /* Encodable+Dictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 930B57762934D44700F3E539 /* Encodable+Dictionary.swift */; };
+		93457407292B930E00F8F9D6 /* AccountServiceStoreKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93457406292B930E00F8F9D6 /* AccountServiceStoreKey.swift */; };
+		93457408292B930E00F8F9D6 /* AccountServiceStoreKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93457406292B930E00F8F9D6 /* AccountServiceStoreKey.swift */; };
+		93457409292B930E00F8F9D6 /* AccountServiceStoreKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93457406292B930E00F8F9D6 /* AccountServiceStoreKey.swift */; };
 		9345769528FD0C34004E6C7A /* UIViewController+email.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9345769428FD0C34004E6C7A /* UIViewController+email.swift */; };
+		93E5D4DB293000BE00439298 /* UnregisteredTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93E5D4DA293000BE00439298 /* UnregisteredTransaction.swift */; };
+		93E5D4DC293000BE00439298 /* UnregisteredTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93E5D4DA293000BE00439298 /* UnregisteredTransaction.swift */; };
+		93E5D4DD293000BE00439298 /* UnregisteredTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93E5D4DA293000BE00439298 /* UnregisteredTransaction.swift */; };
+		93E5D4E02930029300439298 /* AdamantCore+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93E5D4DF2930029300439298 /* AdamantCore+Extensions.swift */; };
 		A50A41072822F8CE006BDFE1 /* BtcWalletRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A50A41032822F8CE006BDFE1 /* BtcWalletRoutes.swift */; };
 		A50A41082822F8CE006BDFE1 /* BtcWalletService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A50A41042822F8CE006BDFE1 /* BtcWalletService.swift */; };
 		A50A41092822F8CE006BDFE1 /* BtcWalletViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A50A41052822F8CE006BDFE1 /* BtcWalletViewController.swift */; };
@@ -814,7 +827,16 @@
 		64FA53CC20E1300A006783C9 /* EthTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthTransactionsViewController.swift; sourceTree = "<group>"; };
 		64FA53D020E24941006783C9 /* TransactionDetailsViewControllerBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionDetailsViewControllerBase.swift; sourceTree = "<group>"; };
 		74D5744703A7ECC98E244B14 /* Pods-AdmCore.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdmCore.debug.xcconfig"; path = "Target Support Files/Pods-AdmCore/Pods-AdmCore.debug.xcconfig"; sourceTree = "<group>"; };
+		9304F8BD292F88F900173F18 /* ANSPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANSPayload.swift; sourceTree = "<group>"; };
+		9304F8C1292F895C00173F18 /* PushNotificationsTokenService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationsTokenService.swift; sourceTree = "<group>"; };
+		9304F8C3292F8A3100173F18 /* AdamantPushNotificationsTokenService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantPushNotificationsTokenService.swift; sourceTree = "<group>"; };
+		9304F8C5292F971600173F18 /* ApiServiceResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiServiceResult.swift; sourceTree = "<group>"; };
+		9304F8C7292F972600173F18 /* ApiServiceError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiServiceError.swift; sourceTree = "<group>"; };
+		930B57762934D44700F3E539 /* Encodable+Dictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Encodable+Dictionary.swift"; sourceTree = "<group>"; };
+		93457406292B930E00F8F9D6 /* AccountServiceStoreKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountServiceStoreKey.swift; sourceTree = "<group>"; };
 		9345769428FD0C34004E6C7A /* UIViewController+email.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+email.swift"; sourceTree = "<group>"; };
+		93E5D4DA293000BE00439298 /* UnregisteredTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnregisteredTransaction.swift; sourceTree = "<group>"; };
+		93E5D4DF2930029300439298 /* AdamantCore+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantCore+Extensions.swift"; sourceTree = "<group>"; };
 		A50A41032822F8CE006BDFE1 /* BtcWalletRoutes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BtcWalletRoutes.swift; sourceTree = "<group>"; };
 		A50A41042822F8CE006BDFE1 /* BtcWalletService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BtcWalletService.swift; sourceTree = "<group>"; };
 		A50A41052822F8CE006BDFE1 /* BtcWalletViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BtcWalletViewController.swift; sourceTree = "<group>"; };
@@ -1334,6 +1356,15 @@
 			path = Doge;
 			sourceTree = "<group>";
 		};
+		93E5D4DE2930027F00439298 /* AdamantCore */ = {
+			isa = PBXGroup;
+			children = (
+				E913C9071FFFA943001A83F7 /* AdamantCore.swift */,
+				93E5D4DF2930029300439298 /* AdamantCore+Extensions.swift */,
+			);
+			path = AdamantCore;
+			sourceTree = "<group>";
+		};
 		A50A41022822F8CE006BDFE1 /* Bitcoin */ = {
 			isa = PBXGroup;
 			children = (
@@ -1440,9 +1471,9 @@
 		E913C9041FFFA8FE001A83F7 /* ServiceProtocols */ = {
 			isa = PBXGroup;
 			children = (
+				93E5D4DE2930027F00439298 /* AdamantCore */,
 				E9B3D398201F90320019EB36 /* DataProviders */,
 				E9E7CD8A20026B0600DFC4DB /* AccountService.swift */,
-				E913C9071FFFA943001A83F7 /* AdamantCore.swift */,
 				6455E9F021075D3600B2E94C /* AddressBookService.swift */,
 				E91947AB20001A9A001362F8 /* ApiService.swift */,
 				3AA2D5F6280EADE3000ED971 /* SocketService.swift */,
@@ -1460,6 +1491,7 @@
 				E9FEECA321413659007DD7C8 /* RichMessageProvider.swift */,
 				550066C4284D65DB0044C0B1 /* HealthCheckService.swift */,
 				E9E7CDAE2002B8A100DFC4DB /* Router.swift */,
+				9304F8C1292F895C00173F18 /* PushNotificationsTokenService.swift */,
 			);
 			path = ServiceProtocols;
 			sourceTree = "<group>";
@@ -1483,6 +1515,7 @@
 				E9E7CDB42002BA6900DFC4DB /* SwinjectedRouter.swift */,
 				E9771D9D22997A6F0099AAC7 /* NativeCore+AdamantCore.swift */,
 				550066C6284D682D0044C0B1 /* AdamantHealthCheckService.swift */,
+				9304F8C3292F8A3100173F18 /* AdamantPushNotificationsTokenService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -1502,10 +1535,14 @@
 				E9204B5120C9762300F3B9AB /* MessageStatus.swift */,
 				E9A03FD320DBC824007653A1 /* NodeVersion.swift */,
 				E95F85682006AB9D0070534A /* NormalizedTransaction.swift */,
+				93E5D4DA293000BE00439298 /* UnregisteredTransaction.swift */,
 				5558A437282AB9390024DDD6 /* NodeStatus.swift */,
 				E9FCA1E5218334C00005E83D /* SimpleTransactionDetails.swift */,
 				E971591921681D6900A5F904 /* TransactionStatus.swift */,
 				648C696E22915A12006645F5 /* DashTransaction.swift */,
+				9304F8BD292F88F900173F18 /* ANSPayload.swift */,
+				9304F8C5292F971600173F18 /* ApiServiceResult.swift */,
+				9304F8C7292F972600173F18 /* ApiServiceError.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1939,6 +1976,7 @@
 				64E8304F20F5FEEF006FA590 /* VotesAsset.swift */,
 				E951466D22A69654007564D7 /* ContactDescription.swift */,
 				646DF92322C29F6E00DCC864 /* ERC20Token.swift */,
+				93457406292B930E00F8F9D6 /* AccountServiceStoreKey.swift */,
 				418BBB582938C45B00CAB719 /* ethereumTokensList.swift */,
 			);
 			path = Models;
@@ -1970,6 +2008,7 @@
 				5522A43F28B758530029B543 /* UIKitUtilites.swift */,
 				550698B528C00AED000E8A2B /* CollectionUtilites.swift */,
 				55FBAAF428C54B230066E629 /* Nodes+Allowance.swift */,
+				930B57762934D44700F3E539 /* Encodable+Dictionary.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -2704,6 +2743,7 @@
 				648DD7A02236A59200B811FD /* DogeTransactionDetailsViewController.swift in Sources */,
 				557AC308287B1365004699D7 /* CheckmarkRowView.swift in Sources */,
 				6455E9F321075D8000B2E94C /* AdamantAddressBookService.swift in Sources */,
+				9304F8BE292F88F900173F18 /* ANSPayload.swift in Sources */,
 				E9204B5020C94C4A00F3B9AB /* Date+adamant.swift in Sources */,
 				E9E7CD9120026FA100DFC4DB /* SwinjectDependencies.swift in Sources */,
 				E96D64CA2295C4A800CA5587 /* WordList.swift in Sources */,
@@ -2722,6 +2762,7 @@
 				64F085D920E2D7600006DE68 /* AdmTransactionsViewController.swift in Sources */,
 				648DD7AA2239150E00B811FD /* DogeWalletService+RichMessageProviderWithStatusCheck.swift in Sources */,
 				E96D64CB2295C51900CA5587 /* Decimal+adamant.swift in Sources */,
+				9304F8C8292F972600173F18 /* ApiServiceError.swift in Sources */,
 				E9D1BE1C211DABE100E86B72 /* WalletPagingItem.swift in Sources */,
 				E9771D812299602D0099AAC7 /* AdamantResources.swift in Sources */,
 				E940086E2114AA2E00CD2D67 /* WalletService.swift in Sources */,
@@ -2806,6 +2847,7 @@
 				4186B33A294200F4006594A3 /* DashWalletService+DynamicConstants.swift in Sources */,
 				55FBAAF528C54B230066E629 /* Nodes+Allowance.swift in Sources */,
 				E9AA8BFA212C166600F9249F /* EthWalletService+Send.swift in Sources */,
+				93E5D4DB293000BE00439298 /* UnregisteredTransaction.swift in Sources */,
 				6449BA68235CA0930033B936 /* ERC20WalletService.swift in Sources */,
 				644793C32166314A00FC4CF5 /* OnboardPage.swift in Sources */,
 				9345769528FD0C34004E6C7A /* UIViewController+email.swift in Sources */,
@@ -2849,7 +2891,9 @@
 				E9150B802066861D0065A985 /* ChatViewController+MessageKit.swift in Sources */,
 				E90055F920ECD86800D0CB2D /* SecurityViewController+StayIn.swift in Sources */,
 				E90847322196FEA80095825D /* TransferTransaction+CoreDataClass.swift in Sources */,
+				9304F8C6292F971600173F18 /* ApiServiceResult.swift in Sources */,
 				645AE06621E67D3300AD3623 /* UITextField+adamant.swift in Sources */,
+				93E5D4E02930029300439298 /* AdamantCore+Extensions.swift in Sources */,
 				E90847392196FEF50095825D /* BaseTransaction+TransactionDetails.swift in Sources */,
 				649D6BF021BFF481009E727B /* AdamantChatsProvider+search.swift in Sources */,
 				E908473B219707200095825D /* AccountViewController+StayIn.swift in Sources */,
@@ -2861,6 +2905,7 @@
 				E9CAE8D82018ACA700345E76 /* AdamantApi+Transfers.swift in Sources */,
 				4186B3302941E642006594A3 /* AdmWalletService+DynamicConstants.swift in Sources */,
 				E95F85852008CB3A0070534A /* ChatListViewController.swift in Sources */,
+				930B57772934D44700F3E539 /* Encodable+Dictionary.swift in Sources */,
 				E9FEECA62143C300007DD7C8 /* EthWalletService+RichMessageProvider.swift in Sources */,
 				6403F5E622723FDA00D58779 /* DashWalletViewController.swift in Sources */,
 				640EFAA52558613D00E9724B /* ERC20Provider.swift in Sources */,
@@ -2882,6 +2927,7 @@
 				E9B1AA5B21283E0F00080A2A /* AdmTransferViewController.swift in Sources */,
 				648C697322916192006645F5 /* DashTransactionsViewController.swift in Sources */,
 				55E69E172868D7920025D82E /* CheckmarkView.swift in Sources */,
+				9304F8C2292F895C00173F18 /* PushNotificationsTokenService.swift in Sources */,
 				E940086B2114A70600CD2D67 /* LskAccount.swift in Sources */,
 				6416B19D21AD7B92006089AC /* LskWalletRoutes.swift in Sources */,
 				E9B3D3A1201FA26B0019EB36 /* AdamantAccountsProvider.swift in Sources */,
@@ -2901,6 +2947,7 @@
 				E9E7CDBE2003AEFB00DFC4DB /* CellFactory.swift in Sources */,
 				E923222621135F9000A7E5AF /* EthAccount.swift in Sources */,
 				E9061B97207501E40011F104 /* AdamantUserInfoKey.swift in Sources */,
+				93457407292B930E00F8F9D6 /* AccountServiceStoreKey.swift in Sources */,
 				E9CAE8D62018AC5300345E76 /* AdamantApi+Transactions.swift in Sources */,
 				E93D7ABE2052CEE1005D19DC /* NotificationsService.swift in Sources */,
 				E940087D2114EDEE00CD2D67 /* EthWallet.swift in Sources */,
@@ -2949,6 +2996,7 @@
 				640EFA962558612400E9724B /* NotificationContent.swift in Sources */,
 				415CFD39294310680008AEE8 /* AdamantDynamicResources.swift in Sources */,
 				E96D64B42295BED700CA5587 /* StateAsset.swift in Sources */,
+				9304F8C4292F8A3100173F18 /* AdamantPushNotificationsTokenService.swift in Sources */,
 				E9771D9E22997A6F0099AAC7 /* NativeCore+AdamantCore.swift in Sources */,
 				5558A436282AAFCC0024DDD6 /* AdamantApi+Status.swift in Sources */,
 				E921534E20EE1E8700C0843F /* EurekaAlertLabelRow.swift in Sources */,
@@ -2992,12 +3040,14 @@
 			files = (
 				E957E160229C4BEA0019732A /* NativeAdamantCore.swift in Sources */,
 				E957E146229C04390019732A /* UIColor+hex.swift in Sources */,
+				93457409292B930E00F8F9D6 /* AccountServiceStoreKey.swift in Sources */,
 				E957E14C229C3E530019732A /* DelegateVote.swift in Sources */,
 				E957E14E229C3E530019732A /* StateAsset.swift in Sources */,
 				E957E145229C040E0019732A /* AdamantAvatarService.swift in Sources */,
 				E957E149229C3E530019732A /* Keypair.swift in Sources */,
 				415441392923AB3700824478 /* BtcProvider.swift in Sources */,
 				E957E150229C3E530019732A /* Transaction.swift in Sources */,
+				93E5D4DD293000BE00439298 /* UnregisteredTransaction.swift in Sources */,
 				E951467022A697F7007564D7 /* ContactDescription.swift in Sources */,
 				E957E151229C3E530019732A /* TransactionAsset.swift in Sources */,
 				E957E16D229C53980019732A /* TransferBaseProvider.swift in Sources */,
@@ -3074,6 +3124,7 @@
 				64AE84612300012400F38FBD /* DashProvider.swift in Sources */,
 				E9EF7A8022A02DBC00F2E1C2 /* AdamantLocalized.swift in Sources */,
 				E9771D9722996FEB0099AAC7 /* TransactionType.swift in Sources */,
+				93E5D4DC293000BE00439298 /* UnregisteredTransaction.swift in Sources */,
 				E957E128229B0CF10019732A /* NotificationContent.swift in Sources */,
 				415441382923AB3700824478 /* BtcProvider.swift in Sources */,
 				E935C84E22AC079D00A8CA2F /* RichMessageTools.swift in Sources */,
@@ -3090,6 +3141,7 @@
 				E9771D9522996FEB0099AAC7 /* StateAsset.swift in Sources */,
 				E9771D9222996FEB0099AAC7 /* TransactionAsset.swift in Sources */,
 				55FBAAF628C54B2F0066E629 /* Nodes+Allowance.swift in Sources */,
+				93457408292B930E00F8F9D6 /* AccountServiceStoreKey.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3220,7 +3272,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.8.0;
+				MARKETING_VERSION = 2.9.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.MessageNotificationContentExtension";
@@ -3249,7 +3301,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.8.0;
+				MARKETING_VERSION = 2.9.0;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.MessageNotificationContentExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3399,7 +3451,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.8.0;
+				MARKETING_VERSION = 2.9.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3428,7 +3480,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.8.0;
+				MARKETING_VERSION = 2.9.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3455,7 +3507,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.8.0;
+				MARKETING_VERSION = 2.9.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.TransferNotificationContentExtension";
@@ -3484,7 +3536,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.8.0;
+				MARKETING_VERSION = 2.9.0;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.TransferNotificationContentExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3514,7 +3566,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.8.0;
+				MARKETING_VERSION = 2.9.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.NotificationServiceExtension";
@@ -3543,7 +3595,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.8.0;
+				MARKETING_VERSION = 2.9.0;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.NotificationServiceExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";

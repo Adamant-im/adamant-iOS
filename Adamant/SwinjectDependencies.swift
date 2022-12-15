@@ -55,6 +55,16 @@ extension Container {
             service.accountService = r.resolve(AccountService.self)
         }.inObjectScope(.container)
         
+        // MARK: PushNotificationsTokenService
+        self.register(PushNotificationsTokenService.self) { r in
+            AdamantPushNotificationsTokenService(
+                securedStore: r.resolve(SecuredStore.self)!,
+                apiService: r.resolve(ApiService.self)!,
+                adamantCore: r.resolve(AdamantCore.self)!,
+                accountService: r.resolve(AccountService.self)!
+            )
+        }.inObjectScope(.container)
+        
         // MARK: NodesSource
         self.register(NodesSource.self) { r in
             let service = AdamantNodesSource(defaultNodesGetter: { AdamantResources.nodes })
@@ -103,6 +113,7 @@ extension Container {
         }.inObjectScope(.container).initCompleted { (r, c) in
             let service = c as! AdamantAccountService
             service.notificationsService = r.resolve(NotificationsService.self)!
+            service.pushNotificationsTokenService = r.resolve(PushNotificationsTokenService.self)!
             
             for case let wallet as SwinjectDependentService in service.wallets {
                 wallet.injectDependencies(from: self)

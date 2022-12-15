@@ -75,12 +75,10 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         if let raw = notification.request.content.userInfo[AdamantNotificationUserInfoKeys.decodedMessage] as? String {
             message = raw
         } else {
-            if keychainStore == nil {
-                keychainStore = KeychainStore()
-            }
-            
+            let keychainStore = keychainStore ?? KeychainStore()
             nativeCore = NativeAdamantCore()
-            guard let passphrase = keychainStore!.get(passphraseStoreKey),
+            
+            guard let passphrase: String = keychainStore.get(passphraseStoreKey),
                 let keys = nativeCore!.createKeypairFor(passphrase: passphrase),
                 let chat = transaction.asset.chat,
                 let raw = nativeCore!.decodeMessage(rawMessage: chat.message,
@@ -115,7 +113,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
             let key: Keypair?
             if let keypair = keypair {
                 key = keypair
-            } else if let passphrase = keychain.get(passphraseStoreKey), let keypair = core.createKeypairFor(passphrase: passphrase) {
+            } else if let passphrase: String = keychain.get(passphraseStoreKey), let keypair = core.createKeypairFor(passphrase: passphrase) {
                 key = keypair
             } else {
                 key = nil

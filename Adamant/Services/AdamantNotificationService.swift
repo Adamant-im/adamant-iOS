@@ -45,7 +45,7 @@ class AdamantNotificationsService: NotificationsService {
             UIApplication.shared.applicationIconBadgeNumber = 0
             
             if let securedStore = self?.securedStore,
-                let raw = securedStore.get(StoreKey.notificationsService.notificationsMode),
+                let raw: String = securedStore.get(StoreKey.notificationsService.notificationsMode),
                 let mode = NotificationsMode(string: raw) {
                 self?.setNotificationsMode(mode, completion: nil)
             } else {
@@ -53,7 +53,7 @@ class AdamantNotificationsService: NotificationsService {
             }
             
             if let securedStore = self?.securedStore,
-                let raw = securedStore.get(StoreKey.notificationsService.notificationsSound),
+                let raw: String = securedStore.get(StoreKey.notificationsService.notificationsSound),
                 let sound = NotificationSound(fileName: raw) {
                 self?.setNotificationSound(sound)
             } else {
