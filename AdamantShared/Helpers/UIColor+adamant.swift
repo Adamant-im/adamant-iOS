@@ -115,6 +115,13 @@ extension UIColor {
             return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
         }
         
+        /// Secondary color, ~50% gray
+        static var errorOkButton: UIColor {
+            let colorWhiteTheme = UIColor(red: 0.478, green: 0.478, blue: 0.478, alpha: 1)
+            let colorDarkTheme  = UIColor(red: 0.31, green: 0.31, blue: 0.31, alpha: 1)
+            return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
+        }
+        
         // MARK: Chat colors
         
         /// User chat bubble background, ~4% gray

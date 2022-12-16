@@ -103,7 +103,8 @@ extension AdamantDialogService {
         FTIndicator.dismissProgress()
         
         let alertVC = PMAlertController(title: String.adamantLocalized.alert.error, description: message, image: #imageLiteral(resourceName: "error"), style: .alert)
-        
+        alertVC.alertView.backgroundColor = .adamant.backgroundColor
+        alertVC.headerView.backgroundColor = .adamant.backgroundColor
         alertVC.gravityDismissAnimation = false
         alertVC.alertTitle.textColor = UIColor.adamant.primary
         alertVC.alertDescription.textColor = UIColor.adamant.secondary
@@ -158,7 +159,7 @@ extension AdamantDialogService {
         
         okBtn.titleLabel?.font = UIFont.systemFont(ofSize: 16)
         okBtn.setTitleColor(UIColor.white, for: .normal)
-        okBtn.backgroundColor = UIColor.adamant.secondary
+        okBtn.backgroundColor = UIColor.adamant.errorOkButton
         alertVC.addAction(okBtn)
         
         alertVC.alertActionStackView.axis = .vertical
