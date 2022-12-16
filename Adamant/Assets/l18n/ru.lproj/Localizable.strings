@@ -367,6 +367,9 @@
 /* Delegates page: scene title */
 "Delegates.Title" = "Делегаты";
 
+/* Visible Wallets page: scene title */
+"VisibleWallets.Title" = "Видимые кошельки";
+
 /* Delegates tab: Message about 50 ADM fee for vote */
 "Delegates.NotEnoughtTokensForVote" = "Недостаточно токенов для голосования. Нужно 50 ADM";
 

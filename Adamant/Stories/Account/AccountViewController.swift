@@ -98,7 +98,7 @@ class AccountViewController: FormViewController {
             case .stayIn: return SecurityViewController.Rows.stayIn.localized
             case .biometry: return SecurityViewController.Rows.biometry.localized
             case .notifications: return SecurityViewController.Rows.notificationsMode.localized
-            case .visibleWallets: return "visibleWallets"
+            case .visibleWallets: return NSLocalizedString("VisibleWallets.Title", comment: "Visible Wallets page: scene title")
             }
         }
         
@@ -118,7 +118,7 @@ class AccountViewController: FormViewController {
             case .stayIn: return #imageLiteral(resourceName: "row_security")
             case .biometry: return nil // Determined by localAuth service
             case .notifications: return #imageLiteral(resourceName: "row_Notifications.png")
-            case .visibleWallets: return #imageLiteral(resourceName: "row_Notifications.png")
+            case .visibleWallets: return #imageLiteral(resourceName: "row_balance")
             }
         }
     }
@@ -236,16 +236,7 @@ class AccountViewController: FormViewController {
         }
         
         // MARK: Wallet pages
-        //        for walletService in accountService.wallets {
-        //            walletViewControllers.append(walletService.walletViewController)
-        //        }
-        
-        for walletService in accountService.wallets {
-            let invisibleWallets = visibleWalletsService.getInvisibleWallets()
-            if !invisibleWallets.contains(walletService.tokenContract) {
-                walletViewControllers.append(walletService.walletViewController)
-            }
-        }
+        setupWalletsVC()
         
         pagingViewController = PagingViewController()
         pagingViewController.register(UINib(nibName: "WalletCollectionViewCell", bundle: nil), for: WalletPagingItem.self)

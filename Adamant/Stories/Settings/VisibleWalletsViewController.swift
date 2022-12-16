@@ -12,7 +12,7 @@ import SnapKit
 // MARK: - Localization
 extension String.adamantLocalized {
     struct visibleWallets {
-        static let title = NSLocalizedString("Delegates.Title", comment: "Delegates page: scene title")
+        static let title = NSLocalizedString("VisibleWallets.Title", comment: "Visible Wallets page: scene title")
         
         private init() { }
     }

@@ -373,6 +373,9 @@
 /* Delegates page: scene title */
 "Delegates.Title" = "Delegierte";
 
+/* Visible Wallets page: scene title */
+"VisibleWallets.Title" = "Sichtbare Geldbörsen";
+
 /* Delegates tab: Message about 50 ADM fee for vote */
 "Delegates.NotEnoughtTokensForVote" = "Nicht genug Tokens für die Abstimmung. Sie brauchen mindestens 50 ADM auf Ihrem Konto";
 
