@@ -15,6 +15,7 @@ struct AlertView: View {
             iconView
             if let message = model.message {
                 Text(message)
+                    .multilineTextAlignment(.center)
                     .font(.system(size: 15))
             }
         }

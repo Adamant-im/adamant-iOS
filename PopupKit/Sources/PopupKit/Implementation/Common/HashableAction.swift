@@ -8,17 +8,18 @@
 import Foundation
 
 struct HashableAction {
+    let id: Int
     let action: () -> Void
 }
 
 extension HashableAction: Equatable {
     static func == (lhs: HashableAction, rhs: HashableAction) -> Bool {
-        true
+        lhs.id == rhs.id
     }
 }
 
 extension HashableAction: Hashable {
     func hash(into hasher: inout Hasher) {
-        hasher.combine(String(describing: Self.self))
+        hasher.combine(id)
     }
 }

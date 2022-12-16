@@ -12,6 +12,7 @@ struct ToastView: View {
     
     var body: some View {
         Text(message)
+            .multilineTextAlignment(.center)
             .padding(.horizontal, 20)
             .padding(.vertical, 10)
             .background(Blur(style: Constants.blurStyle))
