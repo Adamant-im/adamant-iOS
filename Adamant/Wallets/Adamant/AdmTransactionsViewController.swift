@@ -179,7 +179,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         configureCell(cell,
                       isOutgoing: transaction.isOutgoing,
                       partnerId: partnerId,
-                      partnerName: partnerName,
+                      partnerName: partnerName?.checkAndReplaceSystemWallets(),
                       amount: amount,
                       date: transaction.date as Date?)
     }
