@@ -88,6 +88,10 @@ class DogeWalletService: WalletService {
         return 900
     }
    
+    var tokenContract: String {
+        return ""
+    }
+    
     private (set) var transactionFee: Decimal = 1.0 // 1 DOGE per transaction
     
     static let kvsAddress = "doge:address"

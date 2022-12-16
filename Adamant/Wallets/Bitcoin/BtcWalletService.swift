@@ -74,6 +74,10 @@ class BtcWalletService: WalletService {
         return 10800
     }
     
+    var tokenContract: String {
+        return ""
+    }
+    
     var wallet: WalletAccount? { return btcWallet }
     
     var walletViewController: WalletViewController {

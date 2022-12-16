@@ -47,7 +47,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var dialogService: DialogService!
     var addressBookService: AddressBookService!
     var pushNotificationsTokenService: PushNotificationsTokenService!
-
+    var visibleWalletsService: VisibleWalletsService!
+    
     // MARK: - Lifecycle
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -62,6 +63,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         dialogService = container.resolve(DialogService.self)
         addressBookService = container.resolve(AddressBookService.self)
         pushNotificationsTokenService = container.resolve(PushNotificationsTokenService.self)
+        visibleWalletsService = container.resolve(VisibleWalletsService.self)
         
         // MARK: 1.1. First run flag
         let firstRun = UserDefaults.standard.bool(forKey: StoreKey.application.firstRun)

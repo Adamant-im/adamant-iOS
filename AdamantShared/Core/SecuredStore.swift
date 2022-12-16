@@ -32,6 +32,12 @@ extension StoreKey {
         
         private init() {}
     }
+    
+    struct visibleWallets {
+        static let invisibleWallets = "invisible.wallets"
+        
+        private init() {}
+    }
 }
 
 protocol SecuredStore: AnyObject {

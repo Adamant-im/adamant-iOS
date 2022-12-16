@@ -59,7 +59,7 @@ class AccountViewController: FormViewController {
     enum Rows {
         case balance, sendTokens // Wallet
         case security, nodes, theme, currency, about // Application
-        case voteForDelegates, generateQr, generatePk, logout // Actions
+        case voteForDelegates, generateQr, generatePk, logout, visibleWallets // Actions
         case stayIn, biometry, notifications // Security
         
         var tag: String {
@@ -78,6 +78,7 @@ class AccountViewController: FormViewController {
             case .stayIn: return "stayin"
             case .biometry: return "biometry"
             case .notifications: return "notifications"
+            case .visibleWallets: return "visibleWallets"
             }
         }
         
@@ -97,6 +98,7 @@ class AccountViewController: FormViewController {
             case .stayIn: return SecurityViewController.Rows.stayIn.localized
             case .biometry: return SecurityViewController.Rows.biometry.localized
             case .notifications: return SecurityViewController.Rows.notificationsMode.localized
+            case .visibleWallets: return "visibleWallets"
             }
         }
         
@@ -116,11 +118,13 @@ class AccountViewController: FormViewController {
             case .stayIn: return #imageLiteral(resourceName: "row_security")
             case .biometry: return nil // Determined by localAuth service
             case .notifications: return #imageLiteral(resourceName: "row_Notifications.png")
+            case .visibleWallets: return #imageLiteral(resourceName: "row_Notifications.png")
             }
         }
     }
     
     // MARK: - Dependencies
+    var visibleWalletsService: VisibleWalletsService!
     var accountService: AccountService!
     var dialogService: DialogService!
     var router: Router!
@@ -143,6 +147,22 @@ class AccountViewController: FormViewController {
     private var initiated = false
     
     private var walletViewControllers = [WalletViewController]()
+    //        for walletService in accountService.wallets {
+    //            walletViewControllers.append(walletService.walletViewController)
+    //        }
+    //    private var walletViewControllers: [WalletViewController] {
+    //        get {
+    //            print("walletViewControllers")
+    //            var walletViewControllers: [WalletViewController] = []
+    //            for walletService in accountService.wallets {
+    //                let invisibleWallets = visibleWalletsService.getInvisibleWallets()
+    //                if !invisibleWallets.contains(walletService.tokenContract) {
+    //                    walletViewControllers.append(walletService.walletViewController)
+    //                }
+    //            }
+    //            return walletViewControllers
+    //        }
+    //    }
     
     // MARK: StayIn
     
@@ -216,8 +236,15 @@ class AccountViewController: FormViewController {
         }
         
         // MARK: Wallet pages
+        //        for walletService in accountService.wallets {
+        //            walletViewControllers.append(walletService.walletViewController)
+        //        }
+        
         for walletService in accountService.wallets {
-            walletViewControllers.append(walletService.walletViewController)
+            let invisibleWallets = visibleWalletsService.getInvisibleWallets()
+            if !invisibleWallets.contains(walletService.tokenContract) {
+                walletViewControllers.append(walletService.walletViewController)
+            }
         }
         
         pagingViewController = PagingViewController()
@@ -252,7 +279,7 @@ class AccountViewController: FormViewController {
         let appSection = Section(Sections.application.localized) {
             $0.tag = Sections.application.tag
         }
-
+        
         // Node list
         let nodesRow = LabelRow {
             $0.title = Rows.nodes.localized
@@ -278,9 +305,9 @@ class AccountViewController: FormViewController {
             
             self?.deselectWalletViewControllers()
         }
-
+        
         appSection.append(nodesRow)
-
+        
         // Currency select
         let currencyRow = ActionSheetRow<Currency> {
             $0.title = Rows.currency.localized
@@ -305,7 +332,7 @@ class AccountViewController: FormViewController {
         }
         
         appSection.append(currencyRow)
-
+        
         // About
         let aboutRow = LabelRow {
             $0.title = Rows.about.localized
@@ -333,11 +360,40 @@ class AccountViewController: FormViewController {
         }
         
         appSection.append(aboutRow)
-            
+        
         // MARK: Actions
         let actionsSection = Section(Sections.actions.localized) {
             $0.tag = Sections.actions.tag
         }
+        
+        // Visible wallets
+        let visibleWalletsRow = LabelRow {
+            $0.tag = Rows.visibleWallets.tag
+            $0.title = Rows.visibleWallets.localized
+            $0.cell.imageView?.image = Rows.visibleWallets.image
+            $0.cell.selectionStyle = .gray
+        }.cellUpdate { (cell, _) in
+            cell.accessoryType = .disclosureIndicator
+        }.onCellSelection { [weak self] (_, _) in
+            guard let vc = self?.router.get(scene: AdamantScene.Settings.visibleWallets) else {
+                return
+            }
+            
+            if let split = self?.splitViewController {
+                let details = UINavigationController(rootViewController:vc)
+                details.definesPresentationContext = true
+                split.showDetailViewController(details, sender: self)
+            } else if let nav = self?.navigationController {
+                nav.pushViewController(vc, animated: true)
+            } else {
+                vc.modalPresentationStyle = .overFullScreen
+                self?.present(vc, animated: true, completion: nil)
+            }
+            
+            self?.deselectWalletViewControllers()
+        }
+        
+        actionsSection.append(visibleWalletsRow)
         
         // Delegates
         let delegatesRow = LabelRow {
@@ -367,7 +423,7 @@ class AccountViewController: FormViewController {
         }
         
         actionsSection.append(delegatesRow)
-            
+        
         // Generate passphrase QR
         let generateQrRow = LabelRow {
             $0.title = Rows.generateQr.localized
@@ -393,7 +449,7 @@ class AccountViewController: FormViewController {
             
             self?.deselectWalletViewControllers()
         }
-
+        
         actionsSection.append(generateQrRow)
         
         // Generatte private keys
@@ -561,84 +617,7 @@ class AccountViewController: FormViewController {
         form.allRows.forEach { $0.baseCell.imageView?.tintColor = UIColor.adamant.tableRowIcons }
         
         // MARK: Notification Center
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            self?.updateAccountInfo()
-            self?.tableView.setContentOffset(CGPoint.zero, animated: false)
-            self?.pagingViewController.reloadData()
-            self?.tableView.reloadData()
-            if let vc = self?.pagingViewController.pageViewController.selectedViewController as? WalletViewController {
-                self?.updateHeaderSize(with: vc, animated: false)
-            }
-        }
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            self?.updateAccountInfo()
-        }
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            self?.updateAccountInfo()
-        }
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.stayInChanged, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            guard let form = self?.form, let accountService = self?.accountService else {
-                return
-            }
-            
-            if let row: SwitchRow = form.rowBy(tag: Rows.stayIn.tag) {
-                row.value = accountService.hasStayInAccount
-                row.updateCell()
-            }
-            
-            if let row: SwitchRow = form.rowBy(tag: Rows.biometry.tag) {
-                row.value = accountService.hasStayInAccount && accountService.useBiometry
-                row.evaluateHidden()
-                row.updateCell()
-            }
-            
-            if let row = form.rowBy(tag: Rows.notifications.tag) {
-                row.evaluateHidden()
-            }
-        }
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantNotificationService.notificationsModeChanged, object: nil, queue: OperationQueue.main) { [weak self] notification in
-            guard let newMode = notification.userInfo?[AdamantUserInfoKey.NotificationsService.newNotificationsMode] as? NotificationsMode else {
-                return
-            }
-            
-            guard let row: LabelRow = self?.form.rowBy(tag: Rows.notifications.tag) else {
-                return
-            }
-            
-            row.value = newMode.localized
-            row.updateCell()
-        }
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.WalletViewController.heightUpdated, object: nil, queue: OperationQueue.main) { [weak self] notification in
-            if let vc = notification.object as? WalletViewController,
-                let cvc = self?.pagingViewController.pageViewController.selectedViewController,
-                vc.viewController == cvc {
-                
-                if let initiated = self?.initiated {
-                    self?.updateHeaderSize(with: vc, animated: initiated)
-                } else {
-                    self?.updateHeaderSize(with: vc, animated: false)
-                }
-            }
-        }
-        
-        for vc in walletViewControllers {
-            guard let service = vc.service else { return }
-            let notification = service.walletUpdatedNotification
-            let callback: ((Notification) -> Void) = { [weak self] _ in
-                guard let self = self else { return }
-                let collectionView = self.pagingViewController.collectionView
-                collectionView.reloadData()
-            }
-
-            NotificationCenter.default.addObserver(forName: notification,
-                                                   object: service,
-                                                   queue: OperationQueue.main,
-                                                   using: callback)
-        }
+        addObservers()
         
         if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
             layoutTableHeaderView()
@@ -706,6 +685,106 @@ class AccountViewController: FormViewController {
     }
     
     // MARK: Other
+    
+    func addObservers() {
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.updateAccountInfo()
+            self?.tableView.setContentOffset(CGPoint.zero, animated: false)
+            self?.pagingViewController.reloadData()
+            self?.tableView.reloadData()
+            if let vc = self?.pagingViewController.pageViewController.selectedViewController as? WalletViewController {
+                self?.updateHeaderSize(with: vc, animated: false)
+            }
+        }
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.updateAccountInfo()
+        }
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.updateAccountInfo()
+        }
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.stayInChanged, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            guard let form = self?.form, let accountService = self?.accountService else {
+                return
+            }
+            
+            if let row: SwitchRow = form.rowBy(tag: Rows.stayIn.tag) {
+                row.value = accountService.hasStayInAccount
+                row.updateCell()
+            }
+            
+            if let row: SwitchRow = form.rowBy(tag: Rows.biometry.tag) {
+                row.value = accountService.hasStayInAccount && accountService.useBiometry
+                row.evaluateHidden()
+                row.updateCell()
+            }
+            
+            if let row = form.rowBy(tag: Rows.notifications.tag) {
+                row.evaluateHidden()
+            }
+        }
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantNotificationService.notificationsModeChanged, object: nil, queue: OperationQueue.main) { [weak self] notification in
+            guard let newMode = notification.userInfo?[AdamantUserInfoKey.NotificationsService.newNotificationsMode] as? NotificationsMode else {
+                return
+            }
+            
+            guard let row: LabelRow = self?.form.rowBy(tag: Rows.notifications.tag) else {
+                return
+            }
+            
+            row.value = newMode.localized
+            row.updateCell()
+        }
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.WalletViewController.heightUpdated, object: nil, queue: OperationQueue.main) { [weak self] notification in
+            if let vc = notification.object as? WalletViewController,
+                let cvc = self?.pagingViewController.pageViewController.selectedViewController,
+                vc.viewController == cvc {
+                
+                if let initiated = self?.initiated {
+                    self?.updateHeaderSize(with: vc, animated: initiated)
+                } else {
+                    self?.updateHeaderSize(with: vc, animated: false)
+                }
+            }
+        }
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantVisibleWalletsService.visibleWallets, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            guard let self = self else { return }
+            
+            self.setupWalletsVC()
+            
+            self.pagingViewController.reloadData()
+            let collectionView = self.pagingViewController.collectionView
+            collectionView.reloadData()
+            self.tableView.reloadData()
+        }
+        
+        for vc in walletViewControllers {
+            guard let service = vc.service else { return }
+            let notification = service.walletUpdatedNotification
+            let callback: ((Notification) -> Void) = { [weak self] _ in
+                guard let self = self else { return }
+                let collectionView = self.pagingViewController.collectionView
+                collectionView.reloadData()
+            }
+
+            NotificationCenter.default.addObserver(forName: notification,
+                                                   object: service,
+                                                   queue: OperationQueue.main,
+                                                   using: callback)
+        }
+    }
+    
+    private func setupWalletsVC() {
+        walletViewControllers.removeAll()
+        let invisibleWallets = visibleWalletsService.getInvisibleWallets()
+        for walletService in accountService.wallets where !invisibleWallets.contains(walletService.tokenContract) {
+            walletViewControllers.append(walletService.walletViewController)
+        }
+    }
     
     private func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor

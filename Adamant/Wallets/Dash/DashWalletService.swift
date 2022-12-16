@@ -32,6 +32,10 @@ class DashWalletService: WalletService {
         return 800
     }
    
+    var tokenContract: String {
+        return ""
+    }
+    
     var wallet: WalletAccount? { return dashWallet }
     
     var walletViewController: WalletViewController {

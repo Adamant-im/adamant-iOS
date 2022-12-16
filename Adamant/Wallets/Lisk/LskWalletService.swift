@@ -80,6 +80,10 @@ class LskWalletService: WalletService {
     var consistencyMaxTime: Double {
         return 60
     }
+    
+    var tokenContract: String {
+        return ""
+    }
    
 	// MARK: - Properties
 	let transferAvailable: Bool = true

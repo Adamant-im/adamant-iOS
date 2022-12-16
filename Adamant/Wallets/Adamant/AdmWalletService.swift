@@ -41,6 +41,10 @@ class AdmWalletService: NSObject, WalletService {
         return 0
     }
     
+    var tokenContract: String {
+        return ""
+    }
+    
 	// MARK: - Dependencies
 	weak var accountService: AccountService!
 	var apiService: ApiService!
