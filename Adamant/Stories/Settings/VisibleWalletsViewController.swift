@@ -109,7 +109,12 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
         }
         cell.selectionStyle = .none
         
-        let wallet = wallets[indexPath.row]
+        let wallet: WalletService
+        if let filtered = filteredWallets {
+            wallet = filtered[indexPath.row]
+        } else {
+            wallet = wallets[indexPath.row]
+        }
         cell.backgroundColor = UIColor.adamant.cellColor
         cell.title = wallet.tokenName
         cell.caption = wallet.tokenNetworkSymbol
