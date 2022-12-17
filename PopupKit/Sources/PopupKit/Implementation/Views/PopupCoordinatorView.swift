@@ -17,9 +17,9 @@ struct PopupCoordinatorView: View {
                     BlockingView()
                 }
                 
-                makeNotificationView(geometry: geomerty)
+                makeNotificationView(safeAreaInsets: geomerty.safeAreaInsets)
                 makeAlertView()
-                makeToastView(geometry: geomerty)
+                makeToastView(safeAreaInsets: geomerty.safeAreaInsets)
             }
             .expanded()
             .ignoresSafeArea()
@@ -28,12 +28,12 @@ struct PopupCoordinatorView: View {
 }
 
 private extension PopupCoordinatorView {
-    func makeNotificationView(geometry: GeometryProxy) -> some View {
+    func makeNotificationView(safeAreaInsets: EdgeInsets) -> some View {
         VStack {
             if let notificationModel = model.notification {
                 NotificationView(
                     model: notificationModel,
-                    safeAreaInsets: geometry.safeAreaInsets,
+                    safeAreaInsets: safeAreaInsets,
                     dismissAction: { [weak model] in
                         model?.notification = nil
                     }
@@ -57,12 +57,12 @@ private extension PopupCoordinatorView {
         .animation(.easeInOut(duration: animationDuration), value: model.alert?.hashValue)
     }
     
-    func makeToastView(geometry: GeometryProxy) -> some View {
+    func makeToastView(safeAreaInsets: EdgeInsets) -> some View {
         VStack {
             Spacer()
             if let message = model.toastMessage {
                 ToastView(message: message)
-                    .padding(.bottom, geometry.safeAreaInsets.bottom)
+                    .padding(.bottom, safeAreaInsets.bottom)
                     .id(model.toastMessage?.hashValue)
                     .transition(.move(edge: .bottom))
             }
