@@ -368,7 +368,7 @@
 "Delegates.Title" = "Delegates";
 
 /* Visible Wallets page: scene title */
-"VisibleWallets.Title" = "Visible Wallets";
+"VisibleWallets.Title" = "Wallet list";
 
 /* Delegates tab: Message about 50 ADM fee for vote */
 "Delegates.NotEnoughtTokensForVote" = "Not enought tokens to vote. You need 50 ADM";

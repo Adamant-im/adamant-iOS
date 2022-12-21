@@ -58,8 +58,8 @@ class AccountViewController: FormViewController {
     
     enum Rows {
         case balance, sendTokens // Wallet
-        case security, nodes, theme, currency, about // Application
-        case voteForDelegates, generateQr, generatePk, logout, visibleWallets // Actions
+        case security, nodes, theme, currency, about, visibleWallets // Application
+        case voteForDelegates, generateQr, generatePk, logout // Actions
         case stayIn, biometry, notifications // Security
         
         var tag: String {
@@ -259,6 +259,35 @@ class AccountViewController: FormViewController {
             $0.tag = Sections.application.tag
         }
         
+        // Visible wallets
+        let visibleWalletsRow = LabelRow {
+            $0.tag = Rows.visibleWallets.tag
+            $0.title = Rows.visibleWallets.localized
+            $0.cell.imageView?.image = Rows.visibleWallets.image
+            $0.cell.selectionStyle = .gray
+        }.cellUpdate { (cell, _) in
+            cell.accessoryType = .disclosureIndicator
+        }.onCellSelection { [weak self] (_, _) in
+            guard let vc = self?.router.get(scene: AdamantScene.Settings.visibleWallets) else {
+                return
+            }
+            
+            if let split = self?.splitViewController {
+                let details = UINavigationController(rootViewController:vc)
+                details.definesPresentationContext = true
+                split.showDetailViewController(details, sender: self)
+            } else if let nav = self?.navigationController {
+                nav.pushViewController(vc, animated: true)
+            } else {
+                vc.modalPresentationStyle = .overFullScreen
+                self?.present(vc, animated: true, completion: nil)
+            }
+            
+            self?.deselectWalletViewControllers()
+        }
+        
+        appSection.append(visibleWalletsRow)
+        
         // Node list
         let nodesRow = LabelRow {
             $0.title = Rows.nodes.localized
@@ -344,35 +373,6 @@ class AccountViewController: FormViewController {
         let actionsSection = Section(Sections.actions.localized) {
             $0.tag = Sections.actions.tag
         }
-        
-        // Visible wallets
-        let visibleWalletsRow = LabelRow {
-            $0.tag = Rows.visibleWallets.tag
-            $0.title = Rows.visibleWallets.localized
-            $0.cell.imageView?.image = Rows.visibleWallets.image
-            $0.cell.selectionStyle = .gray
-        }.cellUpdate { (cell, _) in
-            cell.accessoryType = .disclosureIndicator
-        }.onCellSelection { [weak self] (_, _) in
-            guard let vc = self?.router.get(scene: AdamantScene.Settings.visibleWallets) else {
-                return
-            }
-            
-            if let split = self?.splitViewController {
-                let details = UINavigationController(rootViewController:vc)
-                details.definesPresentationContext = true
-                split.showDetailViewController(details, sender: self)
-            } else if let nav = self?.navigationController {
-                nav.pushViewController(vc, animated: true)
-            } else {
-                vc.modalPresentationStyle = .overFullScreen
-                self?.present(vc, animated: true, completion: nil)
-            }
-            
-            self?.deselectWalletViewControllers()
-        }
-        
-        actionsSection.append(visibleWalletsRow)
         
         // Delegates
         let delegatesRow = LabelRow {
