@@ -680,6 +680,7 @@ extension AdamantTransfersProvider {
                 
                 trsfr.confirmations = transaction.confirmations
                 trsfr.blockId = transaction.blockId
+                trsfr.isConfirmed = transaction.confirmations > 0 ? true : false
                 
                 do {
                     try context.save()
@@ -783,9 +784,6 @@ extension AdamantTransfersProvider {
         var partnerPublicKey: [String: String] = [:]
         
         for t in transactions {
-            if t.recipientPublicKey == nil {
-                continue
-            }
             if t.senderId == address {
                 partnerIds.insert(t.recipientId)
                 partnerPublicKey[t.recipientId] = t.recipientPublicKey ?? ""
@@ -820,9 +818,7 @@ extension AdamantTransfersProvider {
                             break
                         
                         case .invalidAddress(let address):
-//                            errors.append(ProcessingResult.accountNotFound(address: address))
                             ignorList.insert(address)
-                            break
                         
                         case .internalError(let error):
                             errors.append(ProcessingResult.error(error))
@@ -867,9 +863,6 @@ extension AdamantTransfersProvider {
         var transactionInProgress: [UInt64] = []
         
         for t in transactions {
-            if t.recipientPublicKey == nil {
-                continue
-            }
             
             if ignorList.contains(t.senderId) || ignorList.contains(t.recipientId) {
                 continue
