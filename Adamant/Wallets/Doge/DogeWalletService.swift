@@ -73,7 +73,7 @@ class DogeWalletService: WalletService {
     }
     
     var tokenName: String {
-        return ""
+        return "Doge"
     }
     
     var tokenLogo: UIImage {

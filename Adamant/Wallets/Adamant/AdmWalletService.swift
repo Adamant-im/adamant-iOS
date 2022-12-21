@@ -26,7 +26,7 @@ class AdmWalletService: NSObject, WalletService {
     }
     
     var tokenName: String {
-        return ""
+        return "Adamant"
     }
     
     var tokenLogo: UIImage {

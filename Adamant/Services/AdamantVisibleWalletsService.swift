@@ -13,10 +13,17 @@ class AdamantVisibleWalletsService: VisibleWalletsService {
     // MARK: Dependencies
     var securedStore: SecuredStore!
     
+    // MARK: Proprieties
+    private var invisibleWallets: [String] = []
+    
     // MARK: Lifecycle
     init() {
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
             self?.securedStore.remove(StoreKey.visibleWallets.invisibleWallets)
+        }
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] _ in
+            self?.invisibleWallets = self?.getInvisibleWallets() ?? []
         }
     }
     
@@ -24,33 +31,32 @@ class AdamantVisibleWalletsService: VisibleWalletsService {
         NotificationCenter.default.removeObserver(self)
     }
     
-    func addToInvisibleWallets(_ wallet: String) {
+    func addToInvisibleWallets(_ wallet: WalletService) {
         var wallets = getInvisibleWallets()
-        wallets.append(wallet)
+        wallets.append(wallet.tokenSymbol)
         setInvisibleWallets(wallets)
     }
     
-    func removeFromInvisibleWallets(_ wallet: String) {
+    func removeFromInvisibleWallets(_ wallet: WalletService) {
         var wallets = getInvisibleWallets()
-//        let index = wallets.firstIndex { ws in
-//            return ws.tokenContract == wallet.tokenContract && ws.tokenSymbol == wallet.tokenSymbol
-//        }
-//        guard let index = index else { return }
-        guard let index = wallets.firstIndex(of: wallet) else { return }
+        guard let index = wallets.firstIndex(of: wallet.tokenSymbol) else { return }
         wallets.remove(at: index)
         setInvisibleWallets(wallets)
     }
     
     func getInvisibleWallets() -> [String] {
         guard let wallets: [String] = securedStore.get(StoreKey.visibleWallets.invisibleWallets) else {
-            print("getInvisibleWallets is empty")
             return []
         }
-        print("getInvisibleWallets =", wallets)
         return wallets
+    }
+    
+    func isInvisible(_ wallet: WalletService) -> Bool {
+        return invisibleWallets.contains(wallet.tokenSymbol)
     }
     
     private func setInvisibleWallets(_ wallets: [String]) {
         securedStore.set(wallets, for: StoreKey.visibleWallets.invisibleWallets)
+        invisibleWallets = getInvisibleWallets()
     }
 }

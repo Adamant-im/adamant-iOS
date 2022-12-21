@@ -147,22 +147,6 @@ class AccountViewController: FormViewController {
     private var initiated = false
     
     private var walletViewControllers = [WalletViewController]()
-    //        for walletService in accountService.wallets {
-    //            walletViewControllers.append(walletService.walletViewController)
-    //        }
-    //    private var walletViewControllers: [WalletViewController] {
-    //        get {
-    //            print("walletViewControllers")
-    //            var walletViewControllers: [WalletViewController] = []
-    //            for walletService in accountService.wallets {
-    //                let invisibleWallets = visibleWalletsService.getInvisibleWallets()
-    //                if !invisibleWallets.contains(walletService.tokenContract) {
-    //                    walletViewControllers.append(walletService.walletViewController)
-    //                }
-    //            }
-    //            return walletViewControllers
-    //        }
-    //    }
     
     // MARK: StayIn
     
@@ -245,7 +229,9 @@ class AccountViewController: FormViewController {
         pagingViewController.indicatorOptions = .visible(height: 2, zIndex: Int.max, spacing: UIEdgeInsets.zero, insets: UIEdgeInsets.zero)
         pagingViewController.dataSource = self
         pagingViewController.delegate = self
-        pagingViewController.select(index: 0)
+        if walletViewControllers.count > 0 {
+            pagingViewController.select(index: 0)
+        }
         
         accountHeaderView.walletViewContainer.addSubview(pagingViewController.view)
         pagingViewController.view.snp.makeConstraints {
@@ -253,6 +239,8 @@ class AccountViewController: FormViewController {
         }
         
         addChild(pagingViewController)
+        
+        updatePagingItemHeight()
         
         pagingViewController.borderColor = UIColor.clear
         
@@ -746,6 +734,7 @@ class AccountViewController: FormViewController {
             guard let self = self else { return }
             
             self.setupWalletsVC()
+            self.updatePagingItemHeight()
             
             self.pagingViewController.reloadData()
             let collectionView = self.pagingViewController.collectionView
@@ -771,10 +760,19 @@ class AccountViewController: FormViewController {
     
     private func setupWalletsVC() {
         walletViewControllers.removeAll()
-        let invisibleWallets = visibleWalletsService.getInvisibleWallets()
-        for walletService in accountService.wallets where !invisibleWallets.contains(walletService.tokenContract) {
+        for walletService in accountService.wallets where !visibleWalletsService.isInvisible(walletService) {
             walletViewControllers.append(walletService.walletViewController)
         }
+    }
+    
+    private func updatePagingItemHeight() {
+        if walletViewControllers.count > 0 {
+            pagingViewController.menuItemSize = .fixed(width: 110, height: 110)
+        } else {
+            pagingViewController.menuItemSize = .fixed(width: 110, height: 0)
+        }
+        
+        updateHeaderSize(with: pagingViewController.menuItemSize.height, animated: true)
     }
     
     private func setColors() {
@@ -950,6 +948,10 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
         }
         let pagingHeight = menuHeight + walletViewController.height
         
+        updateHeaderSize(with: pagingHeight, animated: animated)
+    }
+    
+    private func updateHeaderSize(with pagingHeight: CGFloat, animated: Bool) {
         var headerBounds = accountHeaderView.bounds
         headerBounds.size.height = accountHeaderView.walletViewContainer.frame.origin.y + pagingHeight
         

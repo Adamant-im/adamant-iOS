@@ -17,6 +17,8 @@ final class VisibleWalletsCheckmarkRowView: UIView {
     private let logoImageView = makeImageView()
     private let balanceLabel = makeAdditionalLabel()
     
+    private let awaitingValueString = "⏱"
+    
     private lazy var horizontalStack: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [captionLabel, subtitleLabel])
         stack.axis = .horizontal
@@ -47,11 +49,15 @@ final class VisibleWalletsCheckmarkRowView: UIView {
     
     var balance: Decimal? {
         didSet {
-            balanceLabel.text = "\(balance ?? 0)"
-            if balance == 0 {
-                balanceLabel.font = captionLabel.font
+            if let balance = balance {
+                balanceLabel.font = balance == 0 ? captionLabel.font : titleLabel.font
+                if balance < 1 {
+                    balanceLabel.text = AdamantBalanceFormat.compact.format(balance)
+                } else {
+                    balanceLabel.text = AdamantBalanceFormat.short.format(balance)
+                }
             } else {
-                balanceLabel.font = titleLabel.font
+                balanceLabel.text = awaitingValueString
             }
         }
     }
@@ -136,7 +142,7 @@ final class VisibleWalletsCheckmarkRowView: UIView {
         addSubview(balanceLabel)
         balanceLabel.snp.makeConstraints {
             $0.centerY.equalToSuperview()
-            $0.leading.equalTo(titleLabel.snp.trailing).offset(10)
+            $0.centerX.equalToSuperview().offset(-20)
         }
     }
 }

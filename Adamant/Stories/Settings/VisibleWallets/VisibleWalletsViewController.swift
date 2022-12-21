@@ -41,13 +41,13 @@ class VisibleWalletsViewController: UIViewController {
     // MARK: - Dependencies
     
     var visibleWalletsService: VisibleWalletsService!
+    var accountService: AccountService!
     
     // MARK: - Properties
     
     private let cellIdentifier = "cell"
     private var filteredWallets: [WalletService]?
     private var wallets: [WalletService] = []
-    private var invisibleWallets: [String] = []
     
     override func loadView() {
         view = UIView()
@@ -56,11 +56,7 @@ class VisibleWalletsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let erc20WalletServices = ERC20Token.supportedTokens.map { ERC20WalletService(token: $0) }
-        wallets.append(contentsOf: erc20WalletServices)
-        
-        invisibleWallets = visibleWalletsService.getInvisibleWallets()
-        
+        wallets = accountService.wallets
         setupView()
     }
     
@@ -83,7 +79,7 @@ class VisibleWalletsViewController: UIViewController {
     }
     
     private func isInvisible(_ wallet: WalletService) -> Bool {
-        return invisibleWallets.contains(wallet.tokenContract)
+        return visibleWalletsService.isInvisible(wallet)
     }
 }
 
@@ -115,14 +111,19 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
         } else {
             wallet = wallets[indexPath.row]
         }
+        let isToken = ERC20Token.supportedTokens.contains(where: { token in
+            return token.symbol == wallet.tokenSymbol
+        })
+        
         cell.backgroundColor = UIColor.adamant.cellColor
         cell.title = wallet.tokenName
-        cell.caption = wallet.tokenNetworkSymbol
+        cell.caption = !isToken ? "Blockchain" : wallet.tokenNetworkSymbol
         cell.subtitle = wallet.tokenSymbol
         cell.logoImage = wallet.tokenLogo
-        cell.balance = wallet.wallet?.balance ?? 0
+        cell.balance = wallet.wallet?.balance
         cell.delegate = self
         cell.isChecked = !isInvisible(wallet)
+        
         return cell
     }
     
@@ -130,7 +131,7 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
         guard let cell = tableView.cellForRow(at: indexPath) as? VisibleWalletsTableViewCell else { return }
         let wallet = wallets[indexPath.row]
         delegateCell(cell, didChangeCheckedStateTo: !isInvisible(wallet))
-        tableView.reloadRows(at: [indexPath], with: .automatic)
+        tableView.reloadRows(at: [indexPath], with: .none)
     }
 }
 
@@ -142,11 +143,10 @@ extension VisibleWalletsViewController: AdamantVisibleWalletsCellDelegate {
         }
         let wallet = wallets[indexPath.row]
         if !isInvisible(wallet) {
-            visibleWalletsService.addToInvisibleWallets(wallet.tokenContract)
+            visibleWalletsService.addToInvisibleWallets(wallet)
         } else {
-            visibleWalletsService.removeFromInvisibleWallets(wallet.tokenContract)
+            visibleWalletsService.removeFromInvisibleWallets(wallet)
         }
-        invisibleWallets = visibleWalletsService.getInvisibleWallets()
         NotificationCenter.default.post(name: Notification.Name.AdamantVisibleWalletsService.visibleWallets, object: nil)
     }
 }

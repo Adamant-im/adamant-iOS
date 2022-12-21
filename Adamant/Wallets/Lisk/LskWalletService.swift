@@ -66,7 +66,7 @@ class LskWalletService: WalletService {
     }
     
     var tokenName: String {
-        return ""
+        return "Lisk"
     }
     
     var tokenLogo: UIImage {

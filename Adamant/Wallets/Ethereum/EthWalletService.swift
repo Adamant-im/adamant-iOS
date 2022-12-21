@@ -68,7 +68,7 @@ class EthWalletService: WalletService {
     }
     
     var tokenName: String {
-        return ""
+        return "Ethereum"
     }
     
     var tokenLogo: UIImage {

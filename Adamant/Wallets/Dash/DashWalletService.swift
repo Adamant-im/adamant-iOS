@@ -17,7 +17,7 @@ class DashWalletService: WalletService {
     }
     
     var tokenName: String {
-        return ""
+        return "Dash"
     }
     
     var tokenLogo: UIImage {

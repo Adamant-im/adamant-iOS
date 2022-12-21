@@ -43,7 +43,6 @@ class ComplexTransferViewController: UIViewController {
         
         // MARK: Services
         setupServices()
-        //   services = accountService.wallets.compactMap { $0 as? WalletServiceWithSend }
         
         // MARK: PagingViewController
         pagingViewController = PagingViewController()
@@ -79,10 +78,8 @@ class ComplexTransferViewController: UIViewController {
     
     private func setupServices() {
         services.removeAll()
-        let invisibleWallets = visibleWalletsService.getInvisibleWallets()
-        for walletService in accountService.wallets {
-            if !invisibleWallets.contains(walletService.tokenContract),
-               let service = walletService as? WalletServiceWithSend {
+        for walletService in accountService.wallets where !visibleWalletsService.isInvisible(walletService) {
+            if let service = walletService as? WalletServiceWithSend {
                 services.append(service)
             }
         }

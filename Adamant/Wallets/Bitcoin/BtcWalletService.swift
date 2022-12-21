@@ -59,7 +59,7 @@ class BtcWalletService: WalletService {
     }
     
     var tokenName: String {
-        return ""
+        return "Bitcoin"
     }
     
     var tokenLogo: UIImage {
