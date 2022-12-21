@@ -18,6 +18,7 @@ class AdamantAccountService: AccountService {
     weak var currencyInfoService: CurrencyInfoService?
     weak var pushNotificationsTokenService: PushNotificationsTokenService?
     var dialogService: DialogService!
+    var visibleWalletService: VisibleWalletsService!
     var securedStore: SecuredStore! {
         didSet {
             securedStoreSemaphore.wait()
@@ -301,7 +302,9 @@ extension AdamantAccountService {
         }
         
         for wallet in wallets.filter({ !($0 is AdmWalletService) }) {
-            wallet.update()
+            if !visibleWalletService.isInvisible(wallet) {
+                wallet.update()
+            }
         }
     }
 }

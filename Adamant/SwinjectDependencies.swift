@@ -115,7 +115,7 @@ extension Container {
             service.securedStore = r.resolve(SecuredStore.self)!
             service.dialogService = r.resolve(DialogService.self)!
             service.currencyInfoService = r.resolve(CurrencyInfoService.self)!
-            
+            service.visibleWalletService = r.resolve(VisibleWalletsService.self)
             return service
         }.inObjectScope(.container).initCompleted { (r, c) in
             let service = c as! AdamantAccountService
