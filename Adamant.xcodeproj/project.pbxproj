@@ -29,6 +29,7 @@
 		416F5EA4290162EB00EF0400 /* SocketIO in Frameworks */ = {isa = PBXBuildFile; productRef = 416F5EA3290162EB00EF0400 /* SocketIO */; };
 		417BA7F428BF894F00DF94C5 /* NotificationSoundsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417BA7F328BF894F00DF94C5 /* NotificationSoundsViewController.swift */; };
 		41935848287841E20083363B /* MacOSDeterminer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41935847287841E20083363B /* MacOSDeterminer.swift */; };
+		4197B9C92952FAFF004CAF64 /* VisibleWalletsCheckmarkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4197B9C82952FAFF004CAF64 /* VisibleWalletsCheckmarkView.swift */; };
 		4198D57B28C8B7DA009337F2 /* so-proud-notification.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4198D57A28C8B7DA009337F2 /* so-proud-notification.mp3 */; };
 		4198D57D28C8B7FA009337F2 /* relax-message-tone.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4198D57C28C8B7F9009337F2 /* relax-message-tone.mp3 */; };
 		4198D57F28C8B834009337F2 /* short-success.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4198D57E28C8B834009337F2 /* short-success.mp3 */; };
@@ -691,6 +692,7 @@
 		4164A9D828F17DA700EEF16D /* AdamantChatTransactionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantChatTransactionService.swift; sourceTree = "<group>"; };
 		417BA7F328BF894F00DF94C5 /* NotificationSoundsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSoundsViewController.swift; sourceTree = "<group>"; };
 		41935847287841E20083363B /* MacOSDeterminer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacOSDeterminer.swift; sourceTree = "<group>"; };
+		4197B9C82952FAFF004CAF64 /* VisibleWalletsCheckmarkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisibleWalletsCheckmarkView.swift; sourceTree = "<group>"; };
 		4198D57A28C8B7DA009337F2 /* so-proud-notification.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "so-proud-notification.mp3"; sourceTree = "<group>"; };
 		4198D57C28C8B7F9009337F2 /* relax-message-tone.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "relax-message-tone.mp3"; sourceTree = "<group>"; };
 		4198D57E28C8B834009337F2 /* short-success.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "short-success.mp3"; sourceTree = "<group>"; };
@@ -1237,6 +1239,16 @@
 				3AA2D5F9280EAF5D000ED971 /* AdamantSocketService.swift */,
 			);
 			path = SocketService;
+			sourceTree = "<group>";
+		};
+		4197B9C72952FAA2004CAF64 /* VisibleWallets */ = {
+			isa = PBXGroup;
+			children = (
+				41047B6F294B5EE10039E956 /* VisibleWalletsViewController.swift */,
+				41047B71294B5F210039E956 /* VisibleWalletsTableViewCell.swift */,
+				4197B9C82952FAFF004CAF64 /* VisibleWalletsCheckmarkView.swift */,
+			);
+			path = VisibleWallets;
 			sourceTree = "<group>";
 		};
 		5551CC8D28A8B72D00B52AD0 /* Stubs */ = {
@@ -1980,6 +1992,7 @@
 		E982F69820235AF000566AC7 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				4197B9C72952FAA2004CAF64 /* VisibleWallets */,
 				E948E03A20235E2300975D6B /* SettingsRoutes.swift */,
 				E90055F420EBF5DA00D0CB2D /* AboutViewController.swift */,
 				E90055F620EC200900D0CB2D /* SecurityViewController.swift */,
@@ -1990,8 +2003,6 @@
 				E9484B7C2285BAD8008E10F0 /* PrivateKeyGenerator.swift */,
 				E908473C219713300095825D /* NotificationsViewController.swift */,
 				417BA7F328BF894F00DF94C5 /* NotificationSoundsViewController.swift */,
-				41047B6F294B5EE10039E956 /* VisibleWalletsViewController.swift */,
-				41047B71294B5F210039E956 /* VisibleWalletsTableViewCell.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -2716,6 +2727,7 @@
 				6449BA6D235CA0930033B936 /* ERC20TransactionsViewController.swift in Sources */,
 				E983AE2A20E65F3200497E1A /* AccountViewController.swift in Sources */,
 				6449BA70235CA0930033B936 /* ERC20WalletRouter.swift in Sources */,
+				4197B9C92952FAFF004CAF64 /* VisibleWalletsCheckmarkView.swift in Sources */,
 				E957E13F229BFEBB0019732A /* AdamantNotificationKeys.swift in Sources */,
 				640EFA9D2558613400E9724B /* DogeProvider.swift in Sources */,
 				E9E7CD932002740500DFC4DB /* AdamantAccountService.swift in Sources */,

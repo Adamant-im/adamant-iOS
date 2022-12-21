@@ -16,7 +16,7 @@ protocol AdamantVisibleWalletsCellDelegate: AnyObject {
 
 // MARK: - Cell
 class VisibleWalletsTableViewCell: UITableViewCell {
-    private let checkmarkRowView = CheckmarkRowView()
+    private let checkmarkRowView = VisibleWalletsCheckmarkRowView()
     
     weak var delegate: AdamantVisibleWalletsCellDelegate? {
         didSet {
@@ -49,6 +49,16 @@ class VisibleWalletsTableViewCell: UITableViewCell {
         set { checkmarkRowView.caption = newValue }
     }
     
+    var logoImage: UIImage? {
+        get { checkmarkRowView.logoImage }
+        set { checkmarkRowView.logoImage = newValue }
+    }
+    
+    var balance: Decimal? {
+        get { checkmarkRowView.balance }
+        set { checkmarkRowView.balance = newValue }
+    }
+    
     required override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupView()
@@ -60,11 +70,9 @@ class VisibleWalletsTableViewCell: UITableViewCell {
     }
     
     func setupView() {
-        accessoryType = .disclosureIndicator
         checkmarkRowView.captionColor = .lightGray
         checkmarkRowView.checkmarkImage = #imageLiteral(resourceName: "status_success")
         checkmarkRowView.checkmarkImageBorderColor = UIColor.adamant.secondary.cgColor
-        checkmarkRowView.checkmarkImageTintColor = .adamant.good
         
         contentView.addSubview(checkmarkRowView)
         checkmarkRowView.snp.makeConstraints {

@@ -51,7 +51,7 @@ class VisibleWalletsViewController: UIViewController {
     
     override func loadView() {
         view = UIView()
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
     }
     
     override func viewDidLoad() {
@@ -119,9 +119,18 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
         cell.title = wallet.tokenName
         cell.caption = wallet.tokenNetworkSymbol
         cell.subtitle = wallet.tokenSymbol
+        cell.logoImage = wallet.tokenLogo
+        cell.balance = wallet.wallet?.balance ?? 0
         cell.delegate = self
         cell.isChecked = !isInvisible(wallet)
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let cell = tableView.cellForRow(at: indexPath) as? VisibleWalletsTableViewCell else { return }
+        let wallet = wallets[indexPath.row]
+        delegateCell(cell, didChangeCheckedStateTo: !isInvisible(wallet))
+        tableView.reloadRows(at: [indexPath], with: .automatic)
     }
 }
 
