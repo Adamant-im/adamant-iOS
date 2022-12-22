@@ -7,23 +7,25 @@
 //
 
 import UIKit
-import FTIndicator
 import PMAlertController
 import MessageUI
+import PopupKit
 
 class AdamantDialogService: DialogService {
     // MARK: Dependencies
-    var router: Router!
-    
-    fileprivate var mailDelegate: MailDelegate = {
-        MailDelegate()
-    }()
+    private let router: Router
+    private let popupManager = PopupManager()
+    private let mailDelegate = MailDelegate()
+    private weak var window: UIWindow?
     
     // Configure notifications
-    init() {
-        FTIndicator.setIndicatorStyle(.extraLight)
-        
-        FTNotificationIndicator.setDefaultDismissTime(4)
+    init(router: Router) {
+        self.router = router
+    }
+    
+    func setup(window: UIWindow) {
+        self.window = window
+        popupManager.setup()
     }
 }
 
@@ -38,7 +40,7 @@ extension AdamantDialogService {
     }
     
     func getTopmostViewController() -> UIViewController? {
-        if var topController = UIApplication.shared.keyWindow?.rootViewController {
+        if var topController = window?.rootViewController {
             if let tab = topController as? UITabBarController, let selected = tab.selectedViewController {
                 topController = selected
             }
@@ -65,32 +67,38 @@ extension AdamantDialogService {
 // MARK: - Toast
 extension AdamantDialogService {
     func showToastMessage(_ message: String) {
-        FTIndicator.showToastMessage(message)
+        popupManager.showToastMessage(message)
     }
     
     func dismissToast() {
-        FTIndicator.dismissToast()
+        popupManager.dismissToast()
     }
 }
 
 // MARK: - Indicators
 extension AdamantDialogService {
     func showProgress(withMessage message: String?, userInteractionEnable enabled: Bool) {
-        FTIndicator.showProgress(withMessage: message, userInteractionEnable: enabled)
+        DispatchQueue.onMainAsync { [weak popupManager] in
+            popupManager?.showProgressAlert(message: message, userInteractionEnabled: enabled)
+        }
     }
     
     func dismissProgress() {
-        DispatchQueue.onMainAsync {
-            FTIndicator.dismissProgress()
+        DispatchQueue.onMainAsync { [weak popupManager] in
+            popupManager?.dismissAlert()
         }
     }
     
     func showSuccess(withMessage message: String) {
-        FTIndicator.showSuccess(withMessage: message)
+        DispatchQueue.onMainAsync { [weak popupManager] in
+            popupManager?.showSuccessAlert(message: message)
+        }
     }
     
     func showWarning(withMessage message: String) {
-        FTIndicator.showError(withMessage: message)
+        DispatchQueue.onMainAsync { [weak popupManager] in
+            popupManager?.showWarningAlert(message: message)
+        }
     }
     
     func showError(withMessage message: String, error: Error? = nil) {
@@ -100,7 +108,7 @@ extension AdamantDialogService {
     }
     
     private func internalShowError(withMessage message: String, error: Error? = nil) {
-        FTIndicator.dismissProgress()
+        popupManager.dismissAlert()
         
         let alertVC = PMAlertController(title: String.adamantLocalized.alert.error, description: message, image: #imageLiteral(resourceName: "error"), style: .alert)
         
@@ -179,26 +187,42 @@ extension AdamantDialogService {
     }
     
     func showNoConnectionNotification() {
-        FTIndicator.showNotification(with: #imageLiteral(resourceName: "error"), title: String.adamantLocalized.alert.noInternetNotificationTitle, message: String.adamantLocalized.alert.noInternetNotificationBoby, autoDismiss: false, tapHandler: nil, completion: nil)
+        DispatchQueue.onMainAsync { [weak popupManager] in
+            popupManager?.showNotification(
+                icon: #imageLiteral(resourceName: "error"),
+                title: .adamantLocalized.alert.noInternetNotificationTitle,
+                description: .adamantLocalized.alert.noInternetNotificationBoby,
+                autoDismiss: false,
+                tapHandler: nil
+            )
+        }
     }
     
     func dissmisNoConnectionNotification() {
-        FTIndicator.dismissNotification()
+        DispatchQueue.onMainAsync { [weak popupManager] in
+            popupManager?.dismissNotification()
+        }
     }
 }
 
 // MARK: - Notifications
 extension AdamantDialogService {
     func showNotification(title: String?, message: String?, image: UIImage?, tapHandler: (() -> Void)?) {
-        if let image = image {
-            FTIndicator.showNotification(with: image, title: title, message: message, tapHandler: tapHandler)
-        } else {
-            FTIndicator.showNotification(withTitle: title, message: message, tapHandler: tapHandler)
+        DispatchQueue.onMainAsync { [weak popupManager] in
+            popupManager?.showNotification(
+                icon: image,
+                title: title,
+                description: message,
+                autoDismiss: true,
+                tapHandler: tapHandler
+            )
         }
     }
     
     func dismissNotification() {
-        FTIndicator.dismissNotification()
+        DispatchQueue.onMainAsync { [weak popupManager] in
+            popupManager?.dismissNotification()
+        }
     }
 }
 
