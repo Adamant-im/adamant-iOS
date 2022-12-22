@@ -190,6 +190,9 @@ private extension AdamantPushNotificationsTokenService {
 
 private extension AdamantPushNotificationsTokenService {
     func setTokenToStorage(_ token: String?) {
+        securedStoreSemaphore.wait()
+        defer { securedStoreSemaphore.signal() }
+        
         if let token = token {
             securedStore.set(token, for: StoreKey.PushNotificationsTokenService.token)
         } else {
