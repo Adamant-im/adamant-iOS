@@ -57,26 +57,7 @@ extension LoginViewController {
             self?.present(picker, animated: true, completion: nil)
         }
         
-        if #available(iOS 11.0, *) {
-            presenter()
-        } else {
-            switch PHPhotoLibrary.authorizationStatus() {
-            case .authorized, .limited:
-                presenter()
-                
-            case .notDetermined:
-                PHPhotoLibrary.requestAuthorization { status in
-                    if status == .authorized {
-                        presenter()
-                    }
-                }
-                
-            case .restricted, .denied:
-                dialogService.presentGoToSettingsAlert(title: nil, message: String.adamantLocalized.login.photolibraryNotAuthorized)
-            @unknown default:
-                break
-            }
-        }
+        presenter()
     }
 }
 

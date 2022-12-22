@@ -116,20 +116,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 accounts.viewControllers = [account]
             }
             
-            if #available(iOS 13.0, *) {
-                let tabBarAppearance: UITabBarAppearance = UITabBarAppearance()
-                tabBarAppearance.configureWithDefaultBackground()
-                UITabBar.appearance().standardAppearance = tabBarAppearance
+            let tabBarAppearance: UITabBarAppearance = UITabBarAppearance()
+            tabBarAppearance.configureWithDefaultBackground()
+            UITabBar.appearance().standardAppearance = tabBarAppearance
 
-                let navigationBarAppearance = UINavigationBarAppearance()
-                navigationBarAppearance.configureWithDefaultBackground()
-                UINavigationBar.appearance().standardAppearance = navigationBarAppearance
-                        
-                if #available(iOS 15.0, *) {
-                    UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
-                    UINavigationBar.appearance().scrollEdgeAppearance = navigationBarAppearance
-                }
-            }
+            let navigationBarAppearance = UINavigationBarAppearance()
+            navigationBarAppearance.configureWithDefaultBackground()
+            UINavigationBar.appearance().standardAppearance = navigationBarAppearance
+            UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
+            UINavigationBar.appearance().scrollEdgeAppearance = navigationBarAppearance
             
             tabbar.setViewControllers([chats, accounts], animated: false)
         }
@@ -305,15 +300,13 @@ extension AppDelegate {
         
         let vc = list.chatViewController(for: chatroom, forceScrollToBottom: true)
         if let split = list.splitViewController {
-            var timeout = 0.25
-            if #available(iOS 13.0, *) { timeout = 0 }
-            DispatchQueue.main.asyncAfter(deadline: .now() + timeout) {
-                let chat = UINavigationController(rootViewController: vc)
-                split.showDetailViewController(chat, sender: list)
-            }
+            let chat = UINavigationController(rootViewController: vc)
+            split.showDetailViewController(chat, sender: list)
         } else {
             chatList.pushViewController(vc, animated: false)
         }
+        
+        list.selectChatroomRow(chatroom: chatroom)
     }
 }
 
@@ -343,9 +336,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 
         // if not logged in
         list.didLoadedMessages = { [weak self] in
-            var timeout = 2.0
-            if #available(iOS 13.0, *) { timeout = 0.5 }
-            DispatchQueue.main.asyncAfter(deadline: .now() + timeout) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self?.dialogService.dismissProgress()
                 self?.openDialog(chatList: chatList, tabbar: tabbar, list: list, transactionID: transactionID, senderAddress: trs.senderId)
             }

@@ -49,7 +49,7 @@ class AdamantChatsProvider: ChatsProvider {
         }
     }
     
-    private let processingQueue = DispatchQueue(label: "im.adamant.processing.chat", qos: .utility, attributes: [.concurrent])
+    private let processingQueue = DispatchQueue(label: "im.adamant.processing.chat", qos: .utility)
     private let sendingQueue = DispatchQueue(label: "im.adamant.sending.chat", qos: .utility, attributes: [.concurrent])
     private let unconfirmedsSemaphore = DispatchSemaphore(value: 1)
     private let highSemaphore = DispatchSemaphore(value: 1)
