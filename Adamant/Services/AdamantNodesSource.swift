@@ -11,21 +11,9 @@ import Foundation
 class AdamantNodesSource: NodesSource {
     // MARK: - Dependencies
     
-    var apiService: ApiService!
-    
-    var healthCheckService: HealthCheckService! {
-        didSet {
-            healthCheckService.delegate = self
-            healthCheckService.nodes = nodes
-            setHealthCheckTimer()
-        }
-    }
-    
-    var securedStore: SecuredStore! {
-        didSet {
-            loadNodes()
-        }
-    }
+    private let apiService: ApiService
+    private let healthCheckService: HealthCheckService
+    private let securedStore: SecuredStore
     
     // MARK: - Properties
     
@@ -50,7 +38,15 @@ class AdamantNodesSource: NodesSource {
     
     // MARK: - Ctor
     
-    init(defaultNodesGetter: @escaping () -> [Node]) {
+    init(
+        apiService: ApiService,
+        healthCheckService: HealthCheckService,
+        securedStore: SecuredStore,
+        defaultNodesGetter: @escaping () -> [Node]
+    ) {
+        self.apiService = apiService
+        self.healthCheckService = healthCheckService
+        self.securedStore = securedStore
         self.defaultNodesGetter = defaultNodesGetter
         
         NotificationCenter.default.addObserver(
@@ -71,6 +67,10 @@ class AdamantNodesSource: NodesSource {
         }
         
         self.preferTheFastestNode = preferTheFastestNode
+        healthCheckService.delegate = self
+        healthCheckService.nodes = nodes
+        setHealthCheckTimer()
+        loadNodes()
     }
     
     deinit {

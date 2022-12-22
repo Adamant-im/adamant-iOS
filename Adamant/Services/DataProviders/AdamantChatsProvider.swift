@@ -12,21 +12,16 @@ import MarkdownKit
 
 class AdamantChatsProvider: ChatsProvider {
     // MARK: Dependencies
-    var accountService: AccountService!
-    var apiService: ApiService!
-    var socketService: SocketService!
-    var stack: CoreDataStack!
-    var adamantCore: AdamantCore!
-    var accountsProvider: AccountsProvider!
-    var transactionService: ChatTransactionService!
-    var securedStore: SecuredStore! {
-        didSet {
-            self.blackList = self.securedStore.get(StoreKey.accountService.blackList) ?? []
-            self.removedMessages = self.securedStore.get(StoreKey.accountService.removedMessages) ?? []
-        }
-    }
+    let accountService: AccountService
+    let apiService: ApiService
+    let socketService: SocketService
+    let stack: CoreDataStack
+    let adamantCore: AdamantCore
+    let accountsProvider: AccountsProvider
+    let transactionService: ChatTransactionService
+    let securedStore: SecuredStore
     
-    var richProviders: [String:RichMessageProviderWithStatusCheck]!
+    private let richProviders: [String: RichMessageProviderWithStatusCheck]
     
     // MARK: Properties
     private(set) var state: State = .empty
@@ -37,7 +32,7 @@ class AdamantChatsProvider: ChatsProvider {
     private var unconfirmedTransactionsBySignature: [String] = []
     
     public var chatPositon: [String : Double] = [:]
-    private(set) var blackList: [String] = []
+    private(set) var blockList: [String] = []
     private(set) var removedMessages: [String] = []
     
     public var isChatLoaded: [String : Bool] = [:]
@@ -68,7 +63,33 @@ class AdamantChatsProvider: ChatsProvider {
     private(set) var roomsLoadedCount: Int?
     
     // MARK: Lifecycle
-    init() {
+    init(
+        accountService: AccountService,
+        apiService: ApiService,
+        socketService: SocketService,
+        stack: CoreDataStack,
+        adamantCore: AdamantCore,
+        accountsProvider: AccountsProvider,
+        transactionService: ChatTransactionService,
+        securedStore: SecuredStore
+    ) {
+        self.accountService = accountService
+        self.apiService = apiService
+        self.socketService = socketService
+        self.stack = stack
+        self.adamantCore = adamantCore
+        self.accountsProvider = accountsProvider
+        self.transactionService = transactionService
+        self.securedStore = securedStore
+        
+        var richProviders = [String: RichMessageProviderWithStatusCheck]()
+        for case let provider as RichMessageProviderWithStatusCheck in accountService.wallets {
+            richProviders[provider.dynamicRichMessageType] = provider
+        }
+        self.richProviders = richProviders
+        
+        setupSecuredStore()
+        
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] notification in
             guard let store = self?.securedStore else {
                 return
@@ -104,7 +125,7 @@ class AdamantChatsProvider: ChatsProvider {
             // BackgroundFetch
             self?.dropStateData()
             
-            self?.blackList = []
+            self?.blockList = []
             self?.removedMessages = []
             
             self?.disconnectFromSocket()
@@ -116,8 +137,8 @@ class AdamantChatsProvider: ChatsProvider {
             }
             
             if state {
-                if let blackList = self?.blackList {
-                    self?.securedStore.set(blackList, for: StoreKey.accountService.blackList)
+                if let blackList = self?.blockList {
+                    self?.securedStore.set(blackList, for: StoreKey.accountService.blockList)
                 }
                 
                 if let removedMessages = self?.removedMessages {
@@ -188,6 +209,11 @@ class AdamantChatsProvider: ChatsProvider {
                 }
             }
         }
+    }
+    
+    private func setupSecuredStore() {
+        blockList = securedStore.get(StoreKey.accountService.blockList) ?? []
+        removedMessages = securedStore.get(StoreKey.accountService.removedMessages) ?? []
     }
 }
 
@@ -1290,7 +1316,7 @@ extension AdamantChatsProvider {
             }
             
             if let address = privateChatroom.partner?.address {
-                chatroom.isHidden = self.blackList.contains(address)
+                chatroom.isHidden = self.blockList.contains(address)
             }
         }
         
@@ -1303,7 +1329,7 @@ extension AdamantChatsProvider {
             let chatrooms = Dictionary(grouping: unreadTransactions, by: ({ (t: ChatTransaction) -> Chatroom in t.chatroom! }))
             for (chatroom, trs) in chatrooms {
                 if let address = chatroom.partner?.address {
-                    chatroom.isHidden = self.blackList.contains(address)
+                    chatroom.isHidden = self.blockList.contains(address)
                 }
                 chatroom.hasUnreadMessages = true
                 trs.forEach { $0.isUnread = true }
@@ -1430,11 +1456,11 @@ extension AdamantChatsProvider {
     }
     
     public func blockChat(with address: String) {
-        if !self.blackList.contains(address) {
-            self.blackList.append(address)
+        if !self.blockList.contains(address) {
+            self.blockList.append(address)
             
             if self.accountService.hasStayInAccount {
-                self.securedStore.set(blackList, for: StoreKey.accountService.blackList)
+                self.securedStore.set(blockList, for: StoreKey.accountService.blockList)
             }
         }
     }

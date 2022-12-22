@@ -359,7 +359,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 extension AppDelegate {
     func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         let container = Container()
-        container.registerAdamantBackgroundFetchServices()
+        container.registerAdamantServices()
         
         guard let notificationsService = container.resolve(NotificationsService.self) else {
                 UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplication.backgroundFetchIntervalNever)

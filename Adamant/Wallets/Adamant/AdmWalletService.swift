@@ -42,7 +42,7 @@ class AdmWalletService: NSObject, WalletService {
     }
     
 	// MARK: - Dependencies
-	weak var accountService: AccountService!
+	weak var accountService: AccountService?
 	var apiService: ApiService!
 	var transfersProvider: TransfersProvider!
     var router: Router!
