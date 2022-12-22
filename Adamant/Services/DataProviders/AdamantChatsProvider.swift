@@ -88,6 +88,8 @@ class AdamantChatsProvider: ChatsProvider {
         }
         self.richProviders = richProviders
         
+        setupSecuredStore()
+        
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] notification in
             guard let store = self?.securedStore else {
                 return
