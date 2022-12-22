@@ -760,7 +760,20 @@ class AccountViewController: FormViewController {
     
     private func setupWalletsVC() {
         walletViewControllers.removeAll()
+        var availableServices: [WalletService]  = []
         for walletService in accountService.wallets where !visibleWalletsService.isInvisible(walletService) {
+            availableServices.append(walletService)
+        }
+        
+        // sort manually
+        visibleWalletsService.getIndexPositionWallets(includeInvisible: false).sorted { $0.value < $1.value }.forEach { symbol, newIndex in
+            guard let index = availableServices.firstIndex(where: { wallet in
+                return wallet.tokenSymbol == symbol
+            }) else { return }
+            let wallet = availableServices.remove(at: index)
+            availableServices.insert(wallet, at: newIndex)
+        }
+        availableServices.forEach { walletService in
             walletViewControllers.append(walletService.walletViewController)
         }
     }

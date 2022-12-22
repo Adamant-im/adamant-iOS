@@ -27,6 +27,8 @@ class VisibleWalletsViewController: UIViewController {
         tableView.backgroundColor = .clear
         tableView.delegate = self
         tableView.dataSource = self
+        tableView.setEditing(true, animated: true)
+        tableView.allowsSelectionDuringEditing = true
         return tableView
     }()
     
@@ -57,6 +59,16 @@ class VisibleWalletsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         wallets = accountService.wallets
+        
+        // sort manually
+        visibleWalletsService.getIndexPositionWallets(includeInvisible: true).sorted { $0.value < $1.value }.forEach { symbol, newIndex in
+            guard let index = wallets.firstIndex(where: { wallet in
+                return wallet.tokenSymbol == symbol
+            }) else { return }
+            let wallet = wallets.remove(at: index)
+            wallets.insert(wallet, at: newIndex)
+        }
+        
         setupView()
     }
     
@@ -67,7 +79,8 @@ class VisibleWalletsViewController: UIViewController {
         
         view.addSubview(tableView)
         tableView.snp.makeConstraints { make in
-            make.left.right.top.bottom.equalToSuperview()
+            make.left.right.bottom.equalToSuperview()
+            make.top.equalToSuperview().offset(15)
         }
     }
     
@@ -133,6 +146,34 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
         delegateCell(cell, didChangeCheckedStateTo: !isInvisible(wallet))
         tableView.reloadRows(at: [indexPath], with: .none)
     }
+    
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        return .none
+    }
+    
+    func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
+        return false
+    }
+    
+    func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        let wallet = wallets.remove(at: sourceIndexPath.row)
+        wallets.insert(wallet, at: destinationIndexPath.row)
+        visibleWalletsService.setIndexPositionWallets(wallets, includeInvisible: true)
+        visibleWalletsService.setIndexPositionWallets(wallets, includeInvisible: false)
+        NotificationCenter.default.post(name: Notification.Name.AdamantVisibleWalletsService.visibleWallets, object: nil)
+    }
+    
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        if filteredWallets != nil {
+            return false
+        } else {
+            return true
+        }
+    }
 }
 
 // MARK: - AdamantVisibleWalletsCellDelegate
@@ -147,6 +188,8 @@ extension VisibleWalletsViewController: AdamantVisibleWalletsCellDelegate {
         } else {
             visibleWalletsService.removeFromInvisibleWallets(wallet)
         }
+        visibleWalletsService.setIndexPositionWallets(wallets, includeInvisible: true)
+        visibleWalletsService.setIndexPositionWallets(wallets, includeInvisible: false)
         NotificationCenter.default.post(name: Notification.Name.AdamantVisibleWalletsService.visibleWallets, object: nil)
     }
 }

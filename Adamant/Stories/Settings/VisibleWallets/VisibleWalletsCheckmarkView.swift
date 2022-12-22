@@ -22,7 +22,8 @@ final class VisibleWalletsCheckmarkRowView: UIView {
     private lazy var horizontalStack: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [captionLabel, subtitleLabel])
         stack.axis = .horizontal
-        stack.alignment = .center
+        stack.alignment = .leading
+        stack.distribution = .fillProportionally
         stack.spacing = 6
         return stack
     }()
@@ -118,7 +119,7 @@ final class VisibleWalletsCheckmarkRowView: UIView {
         logoImageView.snp.makeConstraints {
             $0.size.equalTo(25)
             $0.centerY.equalToSuperview()
-            $0.leading.equalToSuperview().inset(5)
+            $0.leading.equalToSuperview().inset(10)
         }
         
         addSubview(checkmarkView)
@@ -130,7 +131,7 @@ final class VisibleWalletsCheckmarkRowView: UIView {
         addSubview(titleLabel)
         titleLabel.snp.makeConstraints {
             $0.top.equalTo(checkmarkView)
-            $0.leading.equalTo(logoImageView.snp.trailing).offset(4)
+            $0.leading.equalTo(logoImageView.snp.trailing).offset(10)
         }
         
         addSubview(horizontalStack)
@@ -140,9 +141,11 @@ final class VisibleWalletsCheckmarkRowView: UIView {
         }
         
         addSubview(balanceLabel)
+        balanceLabel.contentMode = .left
         balanceLabel.snp.makeConstraints {
             $0.centerY.equalToSuperview()
-            $0.centerX.equalToSuperview().offset(-20)
+         //   $0.centerX.equalToSuperview().offset(25)
+            $0.trailing.equalTo(checkmarkView.snp.leading).offset(-10)
         }
     }
 }
@@ -156,12 +159,14 @@ private func makeTitleLabel() -> UILabel {
 private func makeSubtitleLabel() -> UILabel {
     let label = UILabel()
     label.font = .preferredFont(forTextStyle: .caption1)
+    label.contentMode = .left
     return label
 }
 
 private func makeCaptionLabel() -> UILabel {
     let label = UILabel()
     label.font = .systemFont(ofSize: 12, weight: .regular)
+    label.contentMode = .left
     return label
 }
 

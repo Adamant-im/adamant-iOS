@@ -78,11 +78,23 @@ class ComplexTransferViewController: UIViewController {
     
     private func setupServices() {
         services.removeAll()
+        var availableServices: [WalletServiceWithSend] = []
         for walletService in accountService.wallets where !visibleWalletsService.isInvisible(walletService) {
             if let service = walletService as? WalletServiceWithSend {
-                services.append(service)
+                availableServices.append(service)
             }
         }
+        
+        // sort manually
+        visibleWalletsService.getIndexPositionWallets(includeInvisible: false).sorted { $0.value < $1.value }.forEach { symbol, newIndex in
+            guard let index = availableServices.firstIndex(where: { wallet in
+                return wallet.tokenSymbol == symbol
+            }) else { return }
+            let wallet = availableServices.remove(at: index)
+            availableServices.insert(wallet, at: newIndex)
+        }
+        
+        services = availableServices
     }
     
     func setColors() {

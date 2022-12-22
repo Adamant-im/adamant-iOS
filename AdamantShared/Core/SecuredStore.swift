@@ -35,6 +35,8 @@ extension StoreKey {
     
     struct visibleWallets {
         static let invisibleWallets = "invisible.wallets"
+        static let indexWallets = "index.wallets"
+        static let indexWalletsWithInvisible = "index.wallets.include.ivisible"
         
         private init() {}
     }

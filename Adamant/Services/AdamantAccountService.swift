@@ -301,10 +301,8 @@ extension AdamantAccountService {
             }
         }
         
-        for wallet in wallets.filter({ !($0 is AdmWalletService) }) {
-            if !visibleWalletService.isInvisible(wallet) {
-                wallet.update()
-            }
+        for wallet in wallets.filter({ !($0 is AdmWalletService) }) where !visibleWalletService.isInvisible(wallet) {
+            wallet.update()
         }
     }
 }

@@ -15,21 +15,26 @@ class AdamantVisibleWalletsService: VisibleWalletsService {
     
     // MARK: Proprieties
     private var invisibleWallets: [String] = []
+    private var indexesWallets: [String: Int] = [:]
     
     // MARK: Lifecycle
     init() {
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
             self?.securedStore.remove(StoreKey.visibleWallets.invisibleWallets)
+            self?.securedStore.remove(StoreKey.visibleWallets.indexWallets)
         }
         
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] _ in
             self?.invisibleWallets = self?.getInvisibleWallets() ?? []
+            self?.indexesWallets = self?.getIndexPositionWallets(includeInvisible: false) ?? [:]
         }
     }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
+    
+    // MARK: Visible
     
     func addToInvisibleWallets(_ wallet: WalletService) {
         var wallets = getInvisibleWallets()
@@ -58,5 +63,40 @@ class AdamantVisibleWalletsService: VisibleWalletsService {
     private func setInvisibleWallets(_ wallets: [String]) {
         securedStore.set(wallets, for: StoreKey.visibleWallets.invisibleWallets)
         invisibleWallets = getInvisibleWallets()
+    }
+    
+    // MARK: Index Positions
+    
+    func getIndexPosition(for wallet: WalletService) -> Int? {
+        return indexesWallets[wallet.tokenSymbol]
+    }
+    
+    func getIndexPositionWallets(includeInvisible: Bool) -> [String : Int] {
+        let path = !includeInvisible ? StoreKey.visibleWallets.indexWallets : StoreKey.visibleWallets.indexWalletsWithInvisible
+        guard let indexes: [String: Int] = securedStore.get(path) else {
+            return [:]
+        }
+        return indexes
+    }
+    
+    func editIndexPosition(for wallet: WalletService, index: Int) {
+        var indexes = getIndexPositionWallets(includeInvisible: false)
+        indexes[wallet.tokenSymbol] = index
+        setIndexPositionWallets(indexes, includeInvisible: false)
+    }
+    
+    func setIndexPositionWallets(_ indexes: [String : Int], includeInvisible: Bool) {
+        let path = !includeInvisible ? StoreKey.visibleWallets.indexWallets : StoreKey.visibleWallets.indexWalletsWithInvisible
+        securedStore.set(indexes, for: path)
+        indexesWallets = getIndexPositionWallets(includeInvisible: false)
+    }
+    
+    func setIndexPositionWallets(_ wallets: [WalletService], includeInvisible: Bool) {
+        var indexes: [String: Int] = [:]
+        let wallets = includeInvisible ? wallets : wallets.filter { !isInvisible($0) }
+        for (index, wallet) in wallets.enumerated() {
+            indexes[wallet.tokenSymbol] = index
+        }
+        setIndexPositionWallets(indexes, includeInvisible: includeInvisible)
     }
 }
