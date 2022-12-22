@@ -1,16 +1,16 @@
 ROOT="$PWD"
 SCRIPTS_DIR="$ROOT/scripts"
 WALLETS_DIR="$ROOT/scripts/wallets"
-WALLETS_NAME_DIR="$ROOT/scripts/wallets/adamant-wallets-dev/assets/general"
-WALLETS_TOKENS_DIR="$ROOT/scripts/wallets/adamant-wallets-dev/assets/blockchains"
+WALLETS_NAME_DIR="$ROOT/scripts/wallets/adamant-wallets-master/assets/general"
+WALLETS_TOKENS_DIR="$ROOT/scripts/wallets/adamant-wallets-master/assets/blockchains"
 
 # Download
 function download ()
 {
     mkdir -p "$WALLETS_DIR"
     cd "$WALLETS_DIR"
-    curl -fSsOL https://github.com/Adamant-im/adamant-wallets/archive/refs/heads/dev.zip
-    tar xzf dev.zip
+    curl -fSsOL https://github.com/Adamant-im/adamant-wallets/archive/refs/heads/master.zip
+    tar xzf master.zip
 }
 
 # create Contents for the image

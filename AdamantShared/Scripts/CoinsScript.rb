@@ -120,9 +120,10 @@ extension AdamantResources {
     
     # Go over all wallets
     def startUnpack
-        wallets = Dir[Dir.pwd + "/scripts/wallets/adamant-wallets-dev/assets/general/*"]
+        wallets = Dir[Dir.pwd + "/scripts/wallets/adamant-wallets-master/assets/general/*"]
         wallets.each do |wallet|
             readJson(wallet)
+            puts wallet
         end
     end
     
