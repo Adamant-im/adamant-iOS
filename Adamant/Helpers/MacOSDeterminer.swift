@@ -10,7 +10,7 @@ import Foundation
 
 var isMacOS: Bool = {
     #if targetEnvironment(macCatalyst)
-        return true
+    true
     #else
     ProcessInfo.processInfo.isiOSAppOnMac
     #endif
