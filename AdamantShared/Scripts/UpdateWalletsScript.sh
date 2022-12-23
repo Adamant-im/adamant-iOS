@@ -189,12 +189,13 @@ function setTokens ()
     for dir in $WALLETS_TOKENS_DIR/*/; do
         BLOCKCHAIN_NAME=$(basename $dir)
         TARGET=$ROOT/AdamantShared/Models
+        BLOCKCHAIN_JSON=$WALLETS_TOKENS_DIR/$BLOCKCHAIN_NAME/info.json
+        BLOCKCHAIN_TYPE=$(perl -ne 'if (/"type": "(.*)"/) { print $1 . "\n" }' $BLOCKCHAIN_JSON)
         
-        # need to take from blockchain json type and replace ERC20Token
         cat > ${TARGET}/${BLOCKCHAIN_NAME}TokensList.swift << __EOF__
 import Foundation
 
-extension ERC20Token {
+extension ${BLOCKCHAIN_TYPE}Token {
     static let supportedTokens: [ERC20Token] = [
 
 __EOF__
@@ -212,6 +213,7 @@ __EOF__
 
         cat >> ${TARGET}/${BLOCKCHAIN_NAME}TokensList.swift << __EOF__
     ]
+    
 }
 __EOF__
 

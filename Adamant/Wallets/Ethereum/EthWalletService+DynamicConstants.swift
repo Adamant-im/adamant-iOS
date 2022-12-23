@@ -6,8 +6,16 @@ extension EthWalletService {
     static let currencySymbol = "ETH"
     static let currencyExponent: Int = -18
     
+    var tokenName: String {
+        "Ethereum"
+    }
+    
     var consistencyMaxTime: Double {
         1200
+    }
+    
+    static var qqPrefix: String {
+        "ethereum"
     }
     
     static var minBalance: Decimal {

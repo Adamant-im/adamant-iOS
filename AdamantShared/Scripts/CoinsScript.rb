@@ -35,6 +35,7 @@ class Coins
             fixedFee = 0.0
         end
         
+        fullName = json["name"]
         symbol = json["symbol"]
         decimals = json["decimals"]
         explorerTx = json["explorerTx"]
@@ -52,6 +53,7 @@ class Coins
         if minAmount == nil
             minAmount = 0
         end
+        qqPrefix = json["qqPrefix"]
         
         text = "import Foundation
 
@@ -61,8 +63,16 @@ extension #{symbol.capitalize}WalletService {
     static let currencySymbol = \"#{symbol}\"
     static let currencyExponent: Int = -#{decimals}
     
+    var tokenName: String {
+        \"#{fullName}\"
+    }
+    
     var consistencyMaxTime: Double {
         #{consistencyMaxTime}
+    }
+    
+    static var qqPrefix: String {
+        \"#{qqPrefix}\"
     }
     
     static var minBalance: Decimal {
@@ -123,7 +133,6 @@ extension AdamantResources {
         wallets = Dir[Dir.pwd + "/scripts/wallets/adamant-wallets-master/assets/general/*"]
         wallets.each do |wallet|
             readJson(wallet)
-            puts wallet
         end
     end
     

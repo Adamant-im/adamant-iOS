@@ -6,8 +6,16 @@ extension BtcWalletService {
     static let currencySymbol = "BTC"
     static let currencyExponent: Int = -8
     
+    var tokenName: String {
+        "Bitcoin"
+    }
+    
     var consistencyMaxTime: Double {
         10800
+    }
+    
+    static var qqPrefix: String {
+        "bitcoin"
     }
     
     static var minBalance: Decimal {

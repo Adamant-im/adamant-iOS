@@ -6,8 +6,16 @@ extension DashWalletService {
     static let currencySymbol = "DASH"
     static let currencyExponent: Int = -8
     
+    var tokenName: String {
+        "Dash"
+    }
+    
     var consistencyMaxTime: Double {
         800
+    }
+    
+    static var qqPrefix: String {
+        "dash"
     }
     
     static var minBalance: Decimal {

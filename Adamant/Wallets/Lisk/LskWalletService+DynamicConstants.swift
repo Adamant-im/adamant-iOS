@@ -6,8 +6,16 @@ extension LskWalletService {
     static let currencySymbol = "LSK"
     static let currencyExponent: Int = -8
     
+    var tokenName: String {
+        "Lisk"
+    }
+    
     var consistencyMaxTime: Double {
         60
+    }
+    
+    static var qqPrefix: String {
+        "lisk"
     }
     
     static var minBalance: Decimal {

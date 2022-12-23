@@ -66,10 +66,6 @@ class BtcWalletService: WalletService {
         type(of: self).currencySymbol
     }
     
-    var tokenName: String {
-        ""
-    }
-    
     var tokenLogo: UIImage {
         type(of: self).currencyLogo
     }

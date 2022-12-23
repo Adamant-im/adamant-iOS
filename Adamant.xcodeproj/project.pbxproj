@@ -39,9 +39,9 @@
 		4186B336294200D2006594A3 /* LskWalletService+DynamicConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4186B335294200D2006594A3 /* LskWalletService+DynamicConstants.swift */; };
 		4186B338294200E8006594A3 /* DogeWalletService+DynamicConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4186B337294200E8006594A3 /* DogeWalletService+DynamicConstants.swift */; };
 		4186B33A294200F4006594A3 /* DashWalletService+DynamicConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4186B339294200F4006594A3 /* DashWalletService+DynamicConstants.swift */; };
-		418BBB592938C45B00CAB719 /* ethereumTokensList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418BBB582938C45B00CAB719 /* ethereumTokensList.swift */; };
-		418BBB5A2938C45B00CAB719 /* ethereumTokensList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418BBB582938C45B00CAB719 /* ethereumTokensList.swift */; };
-		418BBB5B2938C45B00CAB719 /* ethereumTokensList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418BBB582938C45B00CAB719 /* ethereumTokensList.swift */; };
+		418BBB592938C45B00CAB719 /* EthereumTokensList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418BBB582938C45B00CAB719 /* EthereumTokensList.swift */; };
+		418BBB5A2938C45B00CAB719 /* EthereumTokensList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418BBB582938C45B00CAB719 /* EthereumTokensList.swift */; };
+		418BBB5B2938C45B00CAB719 /* EthereumTokensList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418BBB582938C45B00CAB719 /* EthereumTokensList.swift */; };
 		41935848287841E20083363B /* MacOSDeterminer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41935847287841E20083363B /* MacOSDeterminer.swift */; };
 		4198D57B28C8B7DA009337F2 /* so-proud-notification.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4198D57A28C8B7DA009337F2 /* so-proud-notification.mp3 */; };
 		4198D57D28C8B7FA009337F2 /* relax-message-tone.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4198D57C28C8B7F9009337F2 /* relax-message-tone.mp3 */; };
@@ -709,7 +709,7 @@
 		4186B335294200D2006594A3 /* LskWalletService+DynamicConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LskWalletService+DynamicConstants.swift"; sourceTree = "<group>"; };
 		4186B337294200E8006594A3 /* DogeWalletService+DynamicConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DogeWalletService+DynamicConstants.swift"; sourceTree = "<group>"; };
 		4186B339294200F4006594A3 /* DashWalletService+DynamicConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DashWalletService+DynamicConstants.swift"; sourceTree = "<group>"; };
-		418BBB582938C45B00CAB719 /* ethereumTokensList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ethereumTokensList.swift; sourceTree = "<group>"; };
+		418BBB582938C45B00CAB719 /* EthereumTokensList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthereumTokensList.swift; sourceTree = "<group>"; };
 		41935847287841E20083363B /* MacOSDeterminer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacOSDeterminer.swift; sourceTree = "<group>"; };
 		4198D57A28C8B7DA009337F2 /* so-proud-notification.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "so-proud-notification.mp3"; sourceTree = "<group>"; };
 		4198D57C28C8B7F9009337F2 /* relax-message-tone.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "relax-message-tone.mp3"; sourceTree = "<group>"; };
@@ -1977,7 +1977,7 @@
 				E951466D22A69654007564D7 /* ContactDescription.swift */,
 				646DF92322C29F6E00DCC864 /* ERC20Token.swift */,
 				93457406292B930E00F8F9D6 /* AccountServiceStoreKey.swift */,
-				418BBB582938C45B00CAB719 /* ethereumTokensList.swift */,
+				418BBB582938C45B00CAB719 /* EthereumTokensList.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -2932,7 +2932,7 @@
 				6416B19D21AD7B92006089AC /* LskWalletRoutes.swift in Sources */,
 				E9B3D3A1201FA26B0019EB36 /* AdamantAccountsProvider.swift in Sources */,
 				3AD95B96284121E100767396 /* HeaderReusableView.swift in Sources */,
-				418BBB592938C45B00CAB719 /* ethereumTokensList.swift in Sources */,
+				418BBB592938C45B00CAB719 /* EthereumTokensList.swift in Sources */,
 				E9FAE5DA203DBFEF008D3A6B /* Comparable+clamped.swift in Sources */,
 				E94008802114EE2000CD2D67 /* AdmWallet.swift in Sources */,
 				41E142F2289E60EB002EE8D7 /* AdamantSecret.swift in Sources */,
@@ -3085,7 +3085,7 @@
 				415CFD3B294310680008AEE8 /* AdamantDynamicResources.swift in Sources */,
 				E957E14B229C3E530019732A /* ChatType.swift in Sources */,
 				64AE84622300012400F38FBD /* DashProvider.swift in Sources */,
-				418BBB5B2938C45B00CAB719 /* ethereumTokensList.swift in Sources */,
+				418BBB5B2938C45B00CAB719 /* EthereumTokensList.swift in Sources */,
 				E957E16C229C53980019732A /* LskProvider.swift in Sources */,
 				E9D664D022A009AB00733F8A /* AdamantLocalized.swift in Sources */,
 				E957E14D229C3E530019732A /* Node.swift in Sources */,
@@ -3106,7 +3106,7 @@
 				E951466F22A697F7007564D7 /* ContactDescription.swift in Sources */,
 				E9771D9422996FEB0099AAC7 /* ChatType.swift in Sources */,
 				E957E0F02299846B0019732A /* Mnemonic.swift in Sources */,
-				418BBB5A2938C45B00CAB719 /* ethereumTokensList.swift in Sources */,
+				418BBB5A2938C45B00CAB719 /* EthereumTokensList.swift in Sources */,
 				E9771D9322996FEB0099AAC7 /* ChatAsset.swift in Sources */,
 				E9771DA522997DBC0099AAC7 /* Decimal+adamant.swift in Sources */,
 				E9771DA122997D420099AAC7 /* AdamantUtilities.swift in Sources */,

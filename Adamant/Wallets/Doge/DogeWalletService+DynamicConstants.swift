@@ -6,8 +6,16 @@ extension DogeWalletService {
     static let currencySymbol = "DOGE"
     static let currencyExponent: Int = -8
     
+    var tokenName: String {
+        "Dogecoin"
+    }
+    
     var consistencyMaxTime: Double {
         900
+    }
+    
+    static var qqPrefix: String {
+        "doge"
     }
     
     static var minBalance: Decimal {

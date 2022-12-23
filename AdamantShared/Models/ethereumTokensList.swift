@@ -14,4 +14,5 @@ extension ERC20Token {
                    decimals: 6,
                    naturalUnits: 6),
     ]
+    
 }

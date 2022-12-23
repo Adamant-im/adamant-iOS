@@ -73,10 +73,6 @@ class EthWalletService: WalletService {
         return type(of: self).currencySymbol
     }
     
-    var tokenName: String {
-        return ""
-    }
-    
     var tokenLogo: UIImage {
         return type(of: self).currencyLogo
     }
