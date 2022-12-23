@@ -29,6 +29,10 @@
 		4198D57D28C8B7FA009337F2 /* relax-message-tone.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4198D57C28C8B7F9009337F2 /* relax-message-tone.mp3 */; };
 		4198D57F28C8B834009337F2 /* short-success.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4198D57E28C8B834009337F2 /* short-success.mp3 */; };
 		4198D58128C8B8D1009337F2 /* default.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4198D58028C8B8D1009337F2 /* default.mp3 */; };
+		41ADFD832955BE7F0094545B /* AdamantContacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41ADFD822955BE7F0094545B /* AdamantContacts.swift */; };
+		41ADFD842955BEB30094545B /* AdamantContacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41ADFD822955BE7F0094545B /* AdamantContacts.swift */; };
+		41ADFD852955BEB30094545B /* AdamantContacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41ADFD822955BE7F0094545B /* AdamantContacts.swift */; };
+		41ADFD862955BEB40094545B /* AdamantContacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41ADFD822955BE7F0094545B /* AdamantContacts.swift */; };
 		41E142F2289E60EB002EE8D7 /* AdamantSecret.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E142F1289E60EB002EE8D7 /* AdamantSecret.swift */; };
 		41E142F3289E60EB002EE8D7 /* AdamantSecret.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E142F1289E60EB002EE8D7 /* AdamantSecret.swift */; };
 		41E142F4289E60EB002EE8D7 /* AdamantSecret.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E142F1289E60EB002EE8D7 /* AdamantSecret.swift */; };
@@ -687,6 +691,7 @@
 		4198D57C28C8B7F9009337F2 /* relax-message-tone.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "relax-message-tone.mp3"; sourceTree = "<group>"; };
 		4198D57E28C8B834009337F2 /* short-success.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "short-success.mp3"; sourceTree = "<group>"; };
 		4198D58028C8B8D1009337F2 /* default.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = default.mp3; sourceTree = "<group>"; };
+		41ADFD822955BE7F0094545B /* AdamantContacts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantContacts.swift; sourceTree = "<group>"; };
 		41E142F1289E60EB002EE8D7 /* AdamantSecret.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantSecret.swift; sourceTree = "<group>"; };
 		4A4D67BD3DC89C07D1351248 /* Pods-AdmCore.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdmCore.release.xcconfig"; path = "Target Support Files/Pods-AdmCore/Pods-AdmCore.release.xcconfig"; sourceTree = "<group>"; };
 		4E9EE86E28CE793D008359F7 /* SafeDecimalRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafeDecimalRow.swift; sourceTree = "<group>"; };
@@ -1952,6 +1957,7 @@
 			children = (
 				E940086F2114EA6800CD2D67 /* AdamantBalanceFormat.swift */,
 				E9771D9F22997D320099AAC7 /* AdamantUtilities.swift */,
+				41ADFD822955BE7F0094545B /* AdamantContacts.swift */,
 				E9204B4F20C94C4A00F3B9AB /* Date+adamant.swift */,
 				E9393FA72055C92700EE6F30 /* Decimal+adamant.swift */,
 				E96D64B02295A88400CA5587 /* String+utilites.swift */,
@@ -2587,6 +2593,7 @@
 				E9079A95229DF1DA0022CA0D /* Keypair.swift in Sources */,
 				E951467122A697F8007564D7 /* ContactDescription.swift in Sources */,
 				41E142F5289E60EB002EE8D7 /* AdamantSecret.swift in Sources */,
+				41ADFD862955BEB40094545B /* AdamantContacts.swift in Sources */,
 				E9079A9F229DF1DA0022CA0D /* VotesAsset.swift in Sources */,
 				E9079A99229DF1DA0022CA0D /* Node.swift in Sources */,
 				E9D664D122A009AB00733F8A /* AdamantLocalized.swift in Sources */,
@@ -2890,6 +2897,7 @@
 				551F66E628959A5300DE5D69 /* LoadingView.swift in Sources */,
 				E98FC34420F920BD00032D65 /* UIFont+adamant.swift in Sources */,
 				644EC35720EFAAB700F40C73 /* DelegatesListViewController.swift in Sources */,
+				41ADFD832955BE7F0094545B /* AdamantContacts.swift in Sources */,
 				E9C51EF12013F18000385EB7 /* NewChatViewController.swift in Sources */,
 				E9B4E1A8210F079E007E77FC /* DoubleDetailsTableViewCell.swift in Sources */,
 				E9FEECA92143C371007DD7C8 /* TransferCollectionViewCell.swift in Sources */,
@@ -2976,6 +2984,7 @@
 				E957E16E229C53CB0019732A /* RichMessageNotificationProvider.swift in Sources */,
 				41E142F4289E60EB002EE8D7 /* AdamantSecret.swift in Sources */,
 				E957E158229C3F840019732A /* ExtensionsApi.swift in Sources */,
+				41ADFD852955BEB30094545B /* AdamantContacts.swift in Sources */,
 				E957E15E229C43EE0019732A /* Decimal+adamant.swift in Sources */,
 				E957E141229BFF920019732A /* Date+adamant.swift in Sources */,
 				E957E148229C3E530019732A /* ServerResponse.swift in Sources */,
@@ -3022,6 +3031,7 @@
 				E9771DA222997D930099AAC7 /* DelegateVote.swift in Sources */,
 				E951466F22A697F7007564D7 /* ContactDescription.swift in Sources */,
 				E9771D9422996FEB0099AAC7 /* ChatType.swift in Sources */,
+				41ADFD842955BEB30094545B /* AdamantContacts.swift in Sources */,
 				E957E0F02299846B0019732A /* Mnemonic.swift in Sources */,
 				E9771D9322996FEB0099AAC7 /* ChatAsset.swift in Sources */,
 				E9771DA522997DBC0099AAC7 /* Decimal+adamant.swift in Sources */,

@@ -83,7 +83,7 @@ class NotificationService: UNNotificationServiceExtension {
         // MARK: 3. Working on transaction
         let partnerAddress: String
         let partnerPublicKey: String
-        let partnerName: String?
+        var partnerName: String?
         var decodedMessage: String?
         
         if transaction.senderId == pushRecipient {
@@ -106,6 +106,7 @@ class NotificationService: UNNotificationServiceExtension {
             partnerName = nil
             bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.partnerNoDislpayNameKey] = AdamantNotificationUserInfoKeys.partnerNoDisplayNameValue
         }
+        partnerName = partnerName?.checkAndReplaceSystemWallets()
         
         // MARK: 5. Content
         switch transaction.type {
