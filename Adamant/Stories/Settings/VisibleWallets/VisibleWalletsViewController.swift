@@ -61,9 +61,9 @@ class VisibleWalletsViewController: UIViewController {
         wallets = accountService.wallets
         
         // sort manually
-        visibleWalletsService.getIndexPositionWallets(includeInvisible: true).sorted { $0.value < $1.value }.forEach { symbol, newIndex in
+        visibleWalletsService.getIndexPositionWallets(includeInvisible: true).sorted { $0.value < $1.value }.forEach { tokenUnicID, newIndex in
             guard let index = wallets.firstIndex(where: { wallet in
-                return wallet.tokenSymbol == symbol
+                return wallet.tokenUnicID == tokenUnicID
             }) else { return }
             let wallet = wallets.remove(at: index)
             wallets.insert(wallet, at: newIndex)

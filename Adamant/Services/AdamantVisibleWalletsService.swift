@@ -38,13 +38,13 @@ class AdamantVisibleWalletsService: VisibleWalletsService {
     
     func addToInvisibleWallets(_ wallet: WalletService) {
         var wallets = getInvisibleWallets()
-        wallets.append(wallet.tokenSymbol)
+        wallets.append(wallet.tokenUnicID)
         setInvisibleWallets(wallets)
     }
     
     func removeFromInvisibleWallets(_ wallet: WalletService) {
         var wallets = getInvisibleWallets()
-        guard let index = wallets.firstIndex(of: wallet.tokenSymbol) else { return }
+        guard let index = wallets.firstIndex(of: wallet.tokenUnicID) else { return }
         wallets.remove(at: index)
         setInvisibleWallets(wallets)
     }
@@ -57,7 +57,7 @@ class AdamantVisibleWalletsService: VisibleWalletsService {
     }
     
     func isInvisible(_ wallet: WalletService) -> Bool {
-        return invisibleWallets.contains(wallet.tokenSymbol)
+        return invisibleWallets.contains(wallet.tokenUnicID)
     }
     
     private func setInvisibleWallets(_ wallets: [String]) {
@@ -68,7 +68,7 @@ class AdamantVisibleWalletsService: VisibleWalletsService {
     // MARK: Index Positions
     
     func getIndexPosition(for wallet: WalletService) -> Int? {
-        return indexesWallets[wallet.tokenSymbol]
+        return indexesWallets[wallet.tokenUnicID]
     }
     
     func getIndexPositionWallets(includeInvisible: Bool) -> [String : Int] {
@@ -81,7 +81,7 @@ class AdamantVisibleWalletsService: VisibleWalletsService {
     
     func editIndexPosition(for wallet: WalletService, index: Int) {
         var indexes = getIndexPositionWallets(includeInvisible: false)
-        indexes[wallet.tokenSymbol] = index
+        indexes[wallet.tokenUnicID] = index
         setIndexPositionWallets(indexes, includeInvisible: false)
     }
     
@@ -95,7 +95,7 @@ class AdamantVisibleWalletsService: VisibleWalletsService {
         var indexes: [String: Int] = [:]
         let wallets = includeInvisible ? wallets : wallets.filter { !isInvisible($0) }
         for (index, wallet) in wallets.enumerated() {
-            indexes[wallet.tokenSymbol] = index
+            indexes[wallet.tokenUnicID] = index
         }
         setIndexPositionWallets(indexes, includeInvisible: includeInvisible)
     }

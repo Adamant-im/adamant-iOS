@@ -45,6 +45,10 @@ class AdmWalletService: NSObject, WalletService {
         return ""
     }
     
+    var tokenUnicID: String {
+        return tokenNetworkSymbol + tokenSymbol
+    }
+    
 	// MARK: - Dependencies
 	weak var accountService: AccountService?
 	var apiService: ApiService!

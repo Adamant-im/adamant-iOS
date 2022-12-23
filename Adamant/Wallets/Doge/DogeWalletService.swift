@@ -92,6 +92,10 @@ class DogeWalletService: WalletService {
         return ""
     }
     
+    var tokenUnicID: String {
+        return tokenNetworkSymbol + tokenSymbol
+    }
+    
     private (set) var transactionFee: Decimal = 1.0 // 1 DOGE per transaction
     
     static let kvsAddress = "doge:address"

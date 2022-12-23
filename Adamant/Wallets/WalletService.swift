@@ -205,6 +205,7 @@ protocol WalletService: AnyObject {
     var tokenSymbol: String { get }
     var tokenName: String { get }
     var tokenLogo: UIImage { get }
+    var tokenUnicID: String { get }
     var tokenNetworkSymbol: String { get }
     var consistencyMaxTime: Double { get }
     var tokenContract: String { get }

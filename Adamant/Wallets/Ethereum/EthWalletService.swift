@@ -87,6 +87,10 @@ class EthWalletService: WalletService {
         return ""
     }
     
+    var tokenUnicID: String {
+        return tokenNetworkSymbol + tokenSymbol
+    }
+    
 	private (set) var transactionFee: Decimal = 0.0
 	
 	static let transferGas: Decimal = 21000

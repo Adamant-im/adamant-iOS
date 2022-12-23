@@ -45,6 +45,10 @@ class ERC20WalletService: WalletService {
         return token?.contractAddress ?? ""
     }
    
+    var tokenUnicID: String {
+        return tokenNetworkSymbol + tokenSymbol + tokenContract
+    }
+    
     private (set) var transactionFee: Decimal = 0.0
     private (set) var diplayTransactionFee: Decimal = 0.0
     

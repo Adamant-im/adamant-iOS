@@ -82,9 +82,9 @@ class ComplexTransferViewController: UIViewController {
         }
         
         // sort manually
-        visibleWalletsService.getIndexPositionWallets(includeInvisible: false).sorted { $0.value < $1.value }.forEach { symbol, newIndex in
+        visibleWalletsService.getIndexPositionWallets(includeInvisible: false).sorted { $0.value < $1.value }.forEach { tokenUnicID, newIndex in
             guard let index = availableServices.firstIndex(where: { wallet in
-                return wallet.tokenSymbol == symbol
+                return wallet.tokenUnicID == tokenUnicID
             }) else { return }
             let wallet = availableServices.remove(at: index)
             availableServices.insert(wallet, at: newIndex)

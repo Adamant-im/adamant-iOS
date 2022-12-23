@@ -78,6 +78,10 @@ class BtcWalletService: WalletService {
         return ""
     }
     
+    var tokenUnicID: String {
+        return tokenNetworkSymbol + tokenSymbol
+    }
+    
     var wallet: WalletAccount? { return btcWallet }
     
     var walletViewController: WalletViewController {
