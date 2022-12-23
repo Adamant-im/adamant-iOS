@@ -12,7 +12,7 @@ import Alamofire
 final class AdamantHealthCheckService: HealthCheckService {
     // MARK: - Dependencies
     
-    var apiService: ApiService!
+    private let apiService: ApiService
     
     // MARK: - Properties
     
@@ -21,6 +21,10 @@ final class AdamantHealthCheckService: HealthCheckService {
     private let semaphore = DispatchSemaphore(value: 1)
     
     weak var delegate: HealthCheckDelegate?
+    
+    init(apiService: ApiService) {
+        self.apiService = apiService
+    }
     
     var nodes: [Node] {
         get {
@@ -65,7 +69,7 @@ final class AdamantHealthCheckService: HealthCheckService {
             } ?? .synchronizing
         }
         
-        DispatchQueue.global().async { [weak delegate] in
+        DispatchQueue.main.async { [weak delegate] in
             delegate?.healthCheckUpdate()
         }
     }

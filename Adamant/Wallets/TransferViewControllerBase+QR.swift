@@ -70,34 +70,11 @@ extension TransferViewControllerBase {
             picker.allowsEditing = false
             picker.sourceType = .photoLibrary
             picker.modalPresentationStyle = .overFullScreen
-            // overrideUserInterfaceStyle is available with iOS 13
-            if #available(iOS 13.0, *) {
-                // Always adopt a light interface style.
-                picker.overrideUserInterfaceStyle = .light
-            }
+            picker.overrideUserInterfaceStyle = .light
             self?.present(picker, animated: true, completion: nil)
         }
         
-        if #available(iOS 11.0, *) {
-            presenter()
-        } else {
-            switch PHPhotoLibrary.authorizationStatus() {
-            case .authorized, .limited:
-                presenter()
-                
-            case .notDetermined:
-                PHPhotoLibrary.requestAuthorization { status in
-                    if status == .authorized {
-                        presenter()
-                    }
-                }
-                
-            case .restricted, .denied:
-                dialogService.presentGoToSettingsAlert(title: nil, message: String.adamantLocalized.login.photolibraryNotAuthorized)
-            @unknown default:
-                break
-            }
-        }
+        presenter()
     }
 }
 

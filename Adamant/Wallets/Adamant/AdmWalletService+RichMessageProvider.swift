@@ -30,7 +30,7 @@ extension AdmWalletService: RichMessageProvider {
         controller.transaction = transaction
         controller.comment = transaction.comment
         
-        if let address = accountService.account?.address {
+        if let address = accountService?.account?.address {
             if address == transaction.senderId {
                 controller.senderName = String.adamantLocalized.transactionDetails.yourAddress
             } else {

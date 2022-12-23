@@ -41,10 +41,7 @@ class SearchResultsViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .never
-        }
-        
+        navigationItem.largeTitleDisplayMode = .never
         tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: "resultCell")
         setColors()
     }

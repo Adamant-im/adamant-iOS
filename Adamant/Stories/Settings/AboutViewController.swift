@@ -126,10 +126,7 @@ class AboutViewController: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .always
-        }
-        
+        navigationItem.largeTitleDisplayMode = .always
         navigationItem.title = String.adamantLocalized.about.title
         
         // MARK: Header & Footer

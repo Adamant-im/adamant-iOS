@@ -12,13 +12,9 @@ extension UIColor {
     public struct adamant {
         
         static func returnColorByTheme(colorWhiteTheme: UIColor, colorDarkTheme: UIColor) -> UIColor {
-            var color = colorWhiteTheme
-            if #available(iOS 13.0, *) {
-                color = UIColor { traits -> UIColor in
-                    return traits.userInterfaceStyle == .dark ? colorDarkTheme : colorWhiteTheme
-                }
+            UIColor { traits -> UIColor in
+                return traits.userInterfaceStyle == .dark ? colorDarkTheme : colorWhiteTheme
             }
-            return color
         }
         
         // MARK: Colors from Adamant Guideline

@@ -38,15 +38,19 @@ class AdamantAccountsProvider: AccountsProvider {
     }
     
     // MARK: Dependencies
-    var stack: CoreDataStack!
-    var apiService: ApiService!
-    var addressBookService: AddressBookService!
+    private let stack: CoreDataStack
+    private let apiService: ApiService
+    private let addressBookService: AddressBookService
     
     // MARK: Properties
     private let knownContacts: [String:KnownContact]
     
     // MARK: Lifecycle
-    init() {
+    init(stack: CoreDataStack, apiService: ApiService, addressBookService: AddressBookService) {
+        self.stack = stack
+        self.apiService = apiService
+        self.addressBookService = addressBookService
+        
         let ico = KnownContact(contact: AdamantContacts.adamantIco)
         let bounty = KnownContact(contact: AdamantContacts.adamantBountyWallet)
         let welcome = KnownContact(contact: AdamantContacts.adamantWelcomeWallet)

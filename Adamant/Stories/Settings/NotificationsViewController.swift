@@ -83,10 +83,7 @@ class NotificationsViewController: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .always
-        }
-        
+        navigationItem.largeTitleDisplayMode = .always
         navigationItem.title = String.adamantLocalized.security.title
         navigationOptions = .Disabled
         
@@ -257,7 +254,7 @@ class NotificationsViewController: FormViewController {
                     return
                 case .failure(let error):
                     switch error {
-                    case .notEnoughMoney:
+                    case .notEnoughMoney, .notStayedLoggedIn:
                         self?.dialogService.showRichError(error: error)
                     case .denied:
                         self?.presentNotificationsDeniedError()

@@ -10,18 +10,18 @@ import Foundation
 import CoreData
 
 class AdamantTransfersProvider: TransfersProvider {
-    // MARK: Dependencies
-    var apiService: ApiService!
-    var stack: CoreDataStack!
-    var adamantCore: AdamantCore!
-    var accountService: AccountService!
-    var accountsProvider: AccountsProvider!
-    var securedStore: SecuredStore!
-    var transactionService: ChatTransactionService!
-    weak var chatsProvider: ChatsProvider?
+    // MARK: Constants
+    static let transferFee: Decimal = Decimal(sign: .plus, exponent: -1, significand: 5)
     
-    // MARK: Properties
-    let transferFee: Decimal = Decimal(sign: .plus, exponent: -1, significand: 5)
+    // MARK: Dependencies
+    let apiService: ApiService
+    private let stack: CoreDataStack
+    private let adamantCore: AdamantCore
+    private let accountService: AccountService
+    private let accountsProvider: AccountsProvider
+    let securedStore: SecuredStore
+    private let transactionService: ChatTransactionService
+    weak var chatsProvider: ChatsProvider?
     
     private(set) var state: State = .empty
     private(set) var isInitiallySynced: Bool = false
@@ -63,7 +63,23 @@ class AdamantTransfersProvider: TransfersProvider {
     }
     
     // MARK: Lifecycle
-    init() {
+    init(
+        apiService: ApiService,
+        stack: CoreDataStack,
+        adamantCore: AdamantCore,
+        accountService: AccountService,
+        accountsProvider: AccountsProvider,
+        securedStore: SecuredStore,
+        transactionService: ChatTransactionService
+    ) {
+        self.apiService = apiService
+        self.stack = stack
+        self.adamantCore = adamantCore
+        self.accountService = accountService
+        self.accountsProvider = accountsProvider
+        self.securedStore = securedStore
+        self.transactionService = transactionService
+        
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] notification in
             guard let store = self?.securedStore else {
                 return
@@ -329,7 +345,7 @@ extension AdamantTransfersProvider {
             return
         }
         
-        guard loggedAccount.balance > amount + transferFee else {
+        guard loggedAccount.balance > amount + Self.transferFee else {
             completion(.failure(.notEnoughMoney))
             return
         }
@@ -392,7 +408,7 @@ extension AdamantTransfersProvider {
         transaction.chatMessageId = UUID().uuidString
         transaction.statusEnum = MessageStatus.pending
         transaction.comment = comment
-        transaction.fee = transferFee as NSDecimalNumber
+        transaction.fee = Self.transferFee as NSDecimalNumber
         transaction.partner = partner
         
         chatroom.addToTransactions(transaction)
@@ -460,7 +476,7 @@ extension AdamantTransfersProvider {
             return
         }
         
-        guard loggedAccount.balance > amount + transferFee else {
+        guard loggedAccount.balance > amount + Self.transferFee else {
             completion(.failure(.notEnoughMoney))
             return
         }
@@ -544,7 +560,7 @@ extension AdamantTransfersProvider {
         transaction.type = Int16(TransactionType.send.rawValue)
         transaction.isOutgoing = true
         transaction.showsChatroom = false
-        transaction.fee = transferFee as NSDecimalNumber
+        transaction.fee = Self.transferFee as NSDecimalNumber
         
         transaction.transactionId = nil
         transaction.blockId = nil

@@ -99,18 +99,16 @@ class DelegatesListViewController: UIViewController {
         tableView.addSubview(self.refreshControl)
         
         // MARK: Search controller
-        if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .never
-            
-            let controller = UISearchController(searchResultsController: nil)
-            controller.searchResultsUpdater = self
-            controller.obscuresBackgroundDuringPresentation = false
-            controller.hidesNavigationBarDuringPresentation = true
-            searchController = controller
-            
-            definesPresentationContext = true
-            navigationItem.rightBarButtonItem = UIBarButtonItem.init(barButtonSystemItem: .search, target: self, action: #selector(activateSearch))
-        }
+        navigationItem.largeTitleDisplayMode = .never
+        
+        let controller = UISearchController(searchResultsController: nil)
+        controller.searchResultsUpdater = self
+        controller.obscuresBackgroundDuringPresentation = false
+        controller.hidesNavigationBarDuringPresentation = true
+        searchController = controller
+        
+        definesPresentationContext = true
+        navigationItem.rightBarButtonItem = UIBarButtonItem.init(barButtonSystemItem: .search, target: self, action: #selector(activateSearch))
         
         // MARK: Reset UI
         upVotesLabel.text = ""
@@ -136,10 +134,8 @@ class DelegatesListViewController: UIViewController {
         
         // Fix for UISplitViewController with UINavigationController with UISearchController.
         // UISplitView in collapsed mode can't figure out what navigation item is topmost, and in viewDidLoad method searchController gets assigned to a wrong navigation item.
-        if #available(iOS 11.0, *) {
-            if navigationItem.searchController == nil {
-                navigationItem.searchController = searchController
-            }
+        if navigationItem.searchController == nil {
+            navigationItem.searchController = searchController
         }
     }
     
@@ -157,19 +153,6 @@ class DelegatesListViewController: UIViewController {
         
         if let indexPath = tableView.indexPathForSelectedRow {
             tableView.deselectRow(at: indexPath, animated: animated)
-        }
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
-            if #available(iOS 11.0, *) {
-            } else if infoViewBottomConstain.constant == 0.0, let height = tabBarController?.tabBar.bounds.height {
-                infoViewBottomConstain.constant = -height
-                tableView.contentInset.bottom = 0.0
-                tableView.scrollIndicatorInsets.bottom = 0.0
-            }
         }
     }
 
@@ -209,7 +192,7 @@ class DelegatesListViewController: UIViewController {
     }
     
     @objc private func activateSearch() {
-        if #available(iOS 11.0, *), let bar = navigationItem.searchController?.searchBar, !bar.isFirstResponder {
+        if let bar = navigationItem.searchController?.searchBar, !bar.isFirstResponder {
             bar.becomeFirstResponder()
         }
     }
