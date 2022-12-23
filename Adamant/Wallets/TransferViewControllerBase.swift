@@ -302,6 +302,27 @@ class TransferViewControllerBase: FormViewController {
     
     // MARK: - Other
     
+    @objc func navigationKeybordDone() {
+        tableView?.endEditing(true)
+        validateAddress()
+        guard let recipientAddress = recipientAddress,
+              recipientAddressIsValid,
+              let amount = amount
+        else {
+            return
+        }
+        confirmSendFunds()
+    }
+
+    override func inputAccessoryView(for row: BaseRow) -> UIView? {
+        let view = super.inputAccessoryView(for: row)
+        guard var view = view as? (UIView & NavigationAccessory) else { return view }
+        view.doneClosure = { [weak self] in
+            self?.navigationKeybordDone()
+        }
+        return view
+    }
+    
     private func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
