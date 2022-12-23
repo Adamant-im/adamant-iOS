@@ -49,7 +49,7 @@ final class AdamantApiService: ApiService {
     
     // MARK: - Dependencies
     
-    var adamantCore: AdamantCore!
+    let adamantCore: AdamantCore
     
     weak var nodesSource: NodesSource? {
         didSet {
@@ -92,7 +92,9 @@ final class AdamantApiService: ApiService {
     
     // MARK: - Init
     
-    init() {
+    init(adamantCore: AdamantCore) {
+        self.adamantCore = adamantCore
+        
         NotificationCenter.default.addObserver(
             forName: Notification.Name.NodesSource.nodesUpdate,
             object: nil,

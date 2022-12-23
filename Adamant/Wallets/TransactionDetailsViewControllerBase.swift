@@ -153,10 +153,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .never // some glitches, again
-        }
-        
+        navigationItem.largeTitleDisplayMode = .never // some glitches, again
         navigationItem.title = String.adamantLocalized.transactionDetails.title
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(share))
         navigationOptions = RowNavigationOptions.Disabled
@@ -590,14 +587,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 return
             }
             
-            if #available(iOS 13.0, *) {
-                let safari = SFSafariViewController(url: url)
-                safari.preferredControlTintColor = UIColor.adamant.primary
-                safari.modalPresentationStyle = .overFullScreen
-                self?.present(safari, animated: true, completion: nil)
-            } else {
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
-            }
+            let safari = SFSafariViewController(url: url)
+            safari.preferredControlTintColor = UIColor.adamant.primary
+            safari.modalPresentationStyle = .overFullScreen
+            self?.present(safari, animated: true, completion: nil)
         }
         
         actionsSection.append(explorerRow)

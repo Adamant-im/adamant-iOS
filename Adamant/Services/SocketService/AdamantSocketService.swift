@@ -13,7 +13,7 @@ class AdamantSocketService: SocketService {
 
     // MARK: - Dependencies
     
-    weak var nodesSource: NodesSource! {
+    weak var nodesSource: NodesSource? {
         didSet {
             refreshNode()
         }
@@ -107,7 +107,7 @@ class AdamantSocketService: SocketService {
     }
     
     private func refreshNode() {
-        currentNode = nodesSource.getAllowedNodes(needWS: true).first
+        currentNode = nodesSource?.getAllowedNodes(needWS: true).first
     }
     
     private func handleTransaction(data: [Any]) {

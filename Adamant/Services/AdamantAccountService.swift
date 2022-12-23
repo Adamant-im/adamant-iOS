@@ -12,53 +12,15 @@ class AdamantAccountService: AccountService {
     
     // MARK: Dependencies
     
-    var apiService: ApiService!
-    var adamantCore: AdamantCore!
+    private let apiService: ApiService
+    private let adamantCore: AdamantCore
+    private let dialogService: DialogService
+    private let securedStore: SecuredStore
+
     weak var notificationsService: NotificationsService?
     weak var currencyInfoService: CurrencyInfoService?
     weak var pushNotificationsTokenService: PushNotificationsTokenService?
-    var dialogService: DialogService!
-    var visibleWalletService: VisibleWalletsService!
-    var securedStore: SecuredStore! {
-        didSet {
-            securedStoreSemaphore.wait()
-            defer {
-                securedStoreSemaphore.signal()
-            }
-            
-            if let old = oldValue {
-                NotificationCenter.default.removeObserver(self, name: Notification.Name.SecuredStore.securedStorePurged, object: old)
-            }
-            
-            if securedStore.get(.passphrase) != nil {
-                hasStayInAccount = true
-                _useBiometry = securedStore.get(.useBiometry) != nil
-            } else if securedStore.get(.publicKey) != nil,
-                securedStore.get(.privateKey) != nil,
-                securedStore.get(.pin) != nil {
-                hasStayInAccount = true
-                
-                _useBiometry = securedStore.get(.useBiometry) != nil
-            } else {
-                hasStayInAccount = false
-                _useBiometry = false
-            }
-            
-            NotificationCenter.default.addObserver(forName: Notification.Name.SecuredStore.securedStorePurged, object: securedStore, queue: OperationQueue.main) { [weak self] notification in
-                guard let store = notification.object as? SecuredStore else {
-                    return
-                }
-                
-                if store.get(.passphrase) != nil {
-                    self?.hasStayInAccount = true
-                    self?._useBiometry = store.get(.useBiometry) != nil
-                } else {
-                    self?.hasStayInAccount = false
-                    self?._useBiometry = false
-                }
-            }
-        }
-    }
+    weak var visibleWalletService: VisibleWalletsService?
     
     // MARK: Properties
     
@@ -124,7 +86,17 @@ class AdamantAccountService: AccountService {
         return wallets
     }()
     
-    init() {
+    init(
+        apiService: ApiService,
+        adamantCore: AdamantCore,
+        dialogService: DialogService,
+        securedStore: SecuredStore
+    ) {
+        self.apiService = apiService
+        self.adamantCore = adamantCore
+        self.dialogService = dialogService
+        self.securedStore = securedStore
+        
         guard let ethWallet = wallets[2] as? EthWalletService else {
             fatalError("Failed to get EthWalletService")
         }
@@ -176,6 +148,8 @@ class AdamantAccountService: AccountService {
         NotificationCenter.default.addObserver(forName: .AdamantAccountService.forceUpdateBalance, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.update()
         }
+        
+        setupSecuredStore()
     }
 }
 
@@ -245,6 +219,39 @@ extension AdamantAccountService {
         NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.stayInChanged, object: self, userInfo: [AdamantUserInfoKey.AccountService.newStayInState : false])
         notificationsService?.setNotificationsMode(.disabled, completion: nil)
     }
+    
+    private func setupSecuredStore() {
+        securedStoreSemaphore.wait()
+        defer { securedStoreSemaphore.signal() }
+        
+        if securedStore.get(.passphrase) != nil {
+            hasStayInAccount = true
+            _useBiometry = securedStore.get(.useBiometry) != nil
+        } else if securedStore.get(.publicKey) != nil,
+            securedStore.get(.privateKey) != nil,
+            securedStore.get(.pin) != nil {
+            hasStayInAccount = true
+            
+            _useBiometry = securedStore.get(.useBiometry) != nil
+        } else {
+            hasStayInAccount = false
+            _useBiometry = false
+        }
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.SecuredStore.securedStorePurged, object: securedStore, queue: OperationQueue.main) { [weak self] notification in
+            guard let store = notification.object as? SecuredStore else {
+                return
+            }
+            
+            if store.get(.passphrase) != nil {
+                self?.hasStayInAccount = true
+                self?._useBiometry = store.get(.useBiometry) != nil
+            } else {
+                self?.hasStayInAccount = false
+                self?._useBiometry = false
+            }
+        }
+    }
 }
 
 // MARK: - AccountService
@@ -301,7 +308,7 @@ extension AdamantAccountService {
             }
         }
         
-        for wallet in wallets.filter({ !($0 is AdmWalletService) }) where !visibleWalletService.isInvisible(wallet) {
+        for wallet in wallets.filter({ !($0 is AdmWalletService) }) where !(visibleWalletService?.isInvisible(wallet) ?? false) {
             wallet.update()
         }
     }
@@ -500,7 +507,7 @@ private enum Key: CaseIterable {
     case useBiometry
     case passphrase
     case showedV12
-    case blackListKey
+    case blockListKey
     case removedMessages
     
     var stringValue: String {
@@ -511,7 +518,7 @@ private enum Key: CaseIterable {
         case .useBiometry: return StoreKey.accountService.useBiometry
         case .passphrase: return StoreKey.accountService.passphrase
         case .showedV12: return StoreKey.accountService.showedV12
-        case .blackListKey: return StoreKey.accountService.blackList
+        case .blockListKey: return StoreKey.accountService.blockList
         case .removedMessages: return StoreKey.accountService.removedMessages
         }
     }

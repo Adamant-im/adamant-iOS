@@ -58,11 +58,7 @@ class ComplexTransferViewController: UIViewController {
         
         view.addSubview(pagingViewController.view)
         pagingViewController.view.snp.makeConstraints {
-            if #available(iOS 11, *) {
-                $0.directionalEdges.equalTo(view.safeAreaLayoutGuide)
-            } else {
-                $0.directionalEdges.equalToSuperview()
-            }
+            $0.directionalEdges.equalTo(view.safeAreaLayoutGuide)
         }
         
         addChild(pagingViewController)

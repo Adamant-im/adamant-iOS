@@ -7,7 +7,6 @@ target 'Adamant' do
   
   # UI
   pod 'FreakingSimpleRoundImageView' # Round avatars
-  pod 'FTIndicator' # Notifications and activity indicator
   pod 'MessageKit', '2.0.0' # Chat UI
   pod 'MyLittlePinpad' # Pinpad
   pod 'PMAlertController' # Custom alert controller

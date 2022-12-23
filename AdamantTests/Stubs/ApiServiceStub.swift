@@ -43,7 +43,9 @@ final class ApiServiceStub: ApiService {
     
     func getMessageTransactions(address: String, height: Int64?, offset: Int?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void) {}
     
-    func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, type: ChatType, nonce: String, amount: Decimal?, completion: @escaping (ApiServiceResult<UInt64>) -> Void) {}
+    func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, type: ChatType, nonce: String, amount: Decimal?, completion: @escaping (ApiServiceResult<UInt64>) -> Void) -> UnregisteredTransaction? { nil }
+    
+    func sendTransaction(path: String, transaction: UnregisteredTransaction, completion: @escaping (ApiServiceResult<TransactionIdResponse>) -> Void) {}
     
     func getDelegates(limit: Int, completion: @escaping (ApiServiceResult<[Delegate]>) -> Void) {}
     

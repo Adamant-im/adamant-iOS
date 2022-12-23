@@ -98,10 +98,7 @@ class NewChatViewController: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .always
-        }
-        
+        navigationItem.largeTitleDisplayMode = .always
         tableView.keyboardDismissMode = .none
         
         navigationItem.title = String.adamantLocalized.newChat.title
@@ -110,9 +107,7 @@ class NewChatViewController: FormViewController {
         navigationItem.rightBarButtonItem = doneButton
         
         if self.splitViewController != nil {
-            if #available(iOS 11.0, *) {
-                navigationItem.largeTitleDisplayMode = .never
-            }
+            navigationItem.largeTitleDisplayMode = .never
         } else {
             navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
         }
@@ -409,34 +404,12 @@ extension NewChatViewController {
             picker.allowsEditing = false
             picker.sourceType = .photoLibrary
             picker.modalPresentationStyle = .overFullScreen
-            // overrideUserInterfaceStyle is available with iOS 13
-            if #available(iOS 13.0, *) {
-                // Always adopt a light interface style.
-                picker.overrideUserInterfaceStyle = .light
-            }
+            // Always adopt a light interface style.
+            picker.overrideUserInterfaceStyle = .light
             self?.present(picker, animated: true, completion: nil)
         }
         
-        if #available(iOS 11.0, *) {
-            presenter()
-        } else {
-            switch PHPhotoLibrary.authorizationStatus() {
-            case .authorized, .limited:
-                presenter()
-                
-            case .notDetermined:
-                PHPhotoLibrary.requestAuthorization { status in
-                    if status == .authorized {
-                        presenter()
-                    }
-                }
-                
-            case .restricted, .denied:
-                dialogService.presentGoToSettingsAlert(title: nil, message: String.adamantLocalized.login.photolibraryNotAuthorized)
-            @unknown default:
-                break
-            }
-        }
+        presenter()
     }
 }
 

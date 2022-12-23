@@ -688,6 +688,9 @@
 /* Notifications: User has disabled notifications. Head him into settings */
 "NotificationsService.NotificationsDisabled" = "Benachrichtigungen deaktiviert. Sie können Benachrichtigungen in den Einstellungen aktivieren";
 
+/* Notifications: Not stayed logged in */
+"NotificationsService.NotStayedLoggedIn" = "Can't turn on notifications without staying logged in";
+
 /* Pinpad: Ask user to create new pin */
 "Pinpad.EnterNewPin" = "Neue PIN eingeben";
 
