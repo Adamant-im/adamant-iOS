@@ -63,7 +63,7 @@ extension WalletServiceError: RichError {
             return String.adamantLocalized.sharedErrors.remoteServerError(message: message)
             
         case .apiError(let error):
-            return error.localized
+            return error.localizedDescription
             
         case .internalError(let message, _):
             return String.adamantLocalized.sharedErrors.internalError(message: message)

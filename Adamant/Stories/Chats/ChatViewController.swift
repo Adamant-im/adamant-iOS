@@ -209,9 +209,7 @@ class ChatViewController: MessagesViewController {
             return
         }
         
-        if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .never
-        }
+        navigationItem.largeTitleDisplayMode = .never
         
         // MARK: 1. Initial configuration
         
@@ -1165,9 +1163,7 @@ extension ChatViewController {
         let commands = [
             UIKeyCommand(input: "\r", modifierFlags: [], action: #selector(processEnter))
         ]
-        if #available(iOS 15, *) {
-            commands.forEach { $0.wantsPriorityOverSystemBehavior = true }
-        }
+        commands.forEach { $0.wantsPriorityOverSystemBehavior = true }
         return commands
     }
     

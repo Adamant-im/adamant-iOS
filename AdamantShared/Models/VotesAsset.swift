@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct VotesAsset {
+struct VotesAsset: Hashable {
     let votes: [String]
     
     init(votes: [String]) {

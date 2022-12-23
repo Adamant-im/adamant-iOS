@@ -38,7 +38,8 @@ extension TransfersProviderError: RichError {
             return String.adamantLocalized.sharedErrors.userNotLogged
             
         case .serverError(let error):
-            return ApiServiceError.serverError(error: error.localizedDescription).localized
+            return ApiServiceError.serverError(error: error.localizedDescription)
+                .localizedDescription
             
         case .accountNotFound(let address):
             return AccountsProviderResult.notFound(address: address).localized
@@ -128,13 +129,13 @@ extension StoreKey {
 }
 
 protocol TransfersProvider: DataProvider {
+    // MARK: - Constants
+    static var transferFee: Decimal { get }
+    
     // MARK: - Properties
     var receivedLastHeight: Int64? { get }
     var readedLastHeight: Int64? { get }
     var isInitiallySynced: Bool { get }
-    
-    var transferFee: Decimal { get }
-    
     var hasTransactions: Bool { get }
     
     // MARK: Controller

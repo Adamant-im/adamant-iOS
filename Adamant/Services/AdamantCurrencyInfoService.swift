@@ -49,7 +49,7 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
     
     public var currentCurrency: Currency = Currency.default {
         didSet {
-            securedStore?.set(currentCurrency.rawValue, for: StoreKey.CoinInfo.selectedCurrency)
+            securedStore.set(currentCurrency.rawValue, for: StoreKey.CoinInfo.selectedCurrency)
             NotificationCenter.default.post(name: Notification.Name.AdamantCurrencyInfoService.currencyRatesUpdated, object: nil)
         }
     }
@@ -57,7 +57,9 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
     private var observerActive: NSObjectProtocol?
     
     // MARK: - Dependencies
-    var accountService: AccountService! {
+    private let securedStore: SecuredStore
+    
+    weak var accountService: AccountService? {
         didSet {
             if let accountService = accountService {
                 rateCoins = accountService.wallets.map { s -> String in s.tokenSymbol }
@@ -67,19 +69,11 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
         }
     }
     
-    var securedStore: SecuredStore? {
-        didSet {
-            if let securedStore = securedStore, let id = securedStore.get(StoreKey.CoinInfo.selectedCurrency), let currency = Currency(rawValue: id) {
-                currentCurrency = currency
-            } else {
-                currentCurrency = Currency.default
-            }
-        }
-    }
-    
     // MARK: - Init
-    init() {
+    init(securedStore: SecuredStore) {
+        self.securedStore = securedStore
         addObservers()
+        setupSecuredStore()
     }
     
     deinit {
@@ -182,6 +176,17 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
             case .failure(let error):
                 completion(.failure(.networkError(error: error)))
             }
+        }
+    }
+    
+    private func setupSecuredStore() {
+        if
+            let id: String = securedStore.get(StoreKey.CoinInfo.selectedCurrency),
+            let currency = Currency(rawValue: id)
+        {
+            currentCurrency = currency
+        } else {
+            currentCurrency = Currency.default
         }
     }
 }

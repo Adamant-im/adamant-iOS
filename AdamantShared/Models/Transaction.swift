@@ -96,13 +96,7 @@ extension Transaction: Codable {
         try container.encode(signatures, forKey: .signatures) // [String]
         try container.encode(asset, forKey: .asset) // TransactionAsset
         try container.encode(signSignature, forKey: .signSignature) // String?
-        
-        if confirmations > 0 {
-            try container.encode(confirmations, forKey: .confirmations)
-        } else {
-            let confirmations: Int? = nil
-            try container.encode(confirmations, forKey: .confirmations)
-        }
+        try container.encode(confirmations > .zero ? confirmations : nil, forKey: .confirmations)
         
         try container.encode(amount.shiftedToAdamant(), forKey: .amount) // Decimal
         try container.encode(fee.shiftedToAdamant(), forKey: .fee) // Decimal

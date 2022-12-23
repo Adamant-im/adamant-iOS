@@ -14,8 +14,7 @@ class AdamantHealthCheckServiceTests: XCTestCase {
     
     override func setUp() {
         super.setUp()
-        service = .init()
-        service.apiService = ApiServiceStub()
+        service = .init(apiService: ApiServiceStub())
     }
     
     override func tearDown() {

@@ -41,11 +41,8 @@ class TransactionsListViewControllerBase: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .never
-        }
-        
+
+        navigationItem.largeTitleDisplayMode = .never
         navigationItem.title = String.adamantLocalized.transactionList.title
         emptyLabel.text = String.adamantLocalized.transactionList.noTransactionYet
         

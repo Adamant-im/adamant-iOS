@@ -73,7 +73,7 @@ enum ShareContentType {
                                                     .airDrop,
                                                     .openInIBooks]
             
-            if #available(iOS 11.0, *) { types.append(.markupAsPDF) }
+            types.append(.markupAsPDF)
             return types
             
         case .address:
@@ -105,6 +105,7 @@ struct AdamantAlertAction {
 }
 
 protocol DialogService: AnyObject {
+    func setup(window: UIWindow)
     
     func getTopmostViewController() -> UIViewController?
     

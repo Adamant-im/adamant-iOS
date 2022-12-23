@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum StateType {
+enum StateType: Equatable, Hashable {
     case unknown(raw: Int)
     case keyValue // 0
     

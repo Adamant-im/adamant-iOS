@@ -12,21 +12,16 @@ import MarkdownKit
 
 class AdamantChatsProvider: ChatsProvider {
     // MARK: Dependencies
-    var accountService: AccountService!
-    var apiService: ApiService!
-    var socketService: SocketService!
-    var stack: CoreDataStack!
-    var adamantCore: AdamantCore!
-    var accountsProvider: AccountsProvider!
-    var transactionService: ChatTransactionService!
-    var securedStore: SecuredStore! {
-        didSet {
-            self.blackList = self.securedStore.getArray("blackList") ?? []
-            self.removedMessages = self.securedStore.getArray("removedMessages") ?? []
-        }
-    }
+    let accountService: AccountService
+    let apiService: ApiService
+    let socketService: SocketService
+    let stack: CoreDataStack
+    let adamantCore: AdamantCore
+    let accountsProvider: AccountsProvider
+    let transactionService: ChatTransactionService
+    let securedStore: SecuredStore
     
-    var richProviders: [String:RichMessageProviderWithStatusCheck]!
+    private let richProviders: [String: RichMessageProviderWithStatusCheck]
     
     // MARK: Properties
     private(set) var state: State = .empty
@@ -37,7 +32,7 @@ class AdamantChatsProvider: ChatsProvider {
     private var unconfirmedTransactionsBySignature: [String] = []
     
     public var chatPositon: [String : Double] = [:]
-    private(set) var blackList: [String] = []
+    private(set) var blockList: [String] = []
     private(set) var removedMessages: [String] = []
     
     public var isChatLoaded: [String : Bool] = [:]
@@ -46,7 +41,7 @@ class AdamantChatsProvider: ChatsProvider {
     private var chatsLoading: [String] = []
     private let preLoadChatsCount = 5
     private var isConnectedToTheInternet = true
-    private var onConnectionToTheInternetRestored: (() -> Void)?
+    private var onConnectionToTheInternetRestoredTasks = [() -> Void]()
     
     private(set) var isInitiallySynced: Bool = false {
         didSet {
@@ -54,7 +49,7 @@ class AdamantChatsProvider: ChatsProvider {
         }
     }
     
-    private let processingQueue = DispatchQueue(label: "im.adamant.processing.chat", qos: .utility, attributes: [.concurrent])
+    private let processingQueue = DispatchQueue(label: "im.adamant.processing.chat", qos: .utility)
     private let sendingQueue = DispatchQueue(label: "im.adamant.sending.chat", qos: .utility, attributes: [.concurrent])
     private let unconfirmedsSemaphore = DispatchSemaphore(value: 1)
     private let highSemaphore = DispatchSemaphore(value: 1)
@@ -68,7 +63,33 @@ class AdamantChatsProvider: ChatsProvider {
     private(set) var roomsLoadedCount: Int?
     
     // MARK: Lifecycle
-    init() {
+    init(
+        accountService: AccountService,
+        apiService: ApiService,
+        socketService: SocketService,
+        stack: CoreDataStack,
+        adamantCore: AdamantCore,
+        accountsProvider: AccountsProvider,
+        transactionService: ChatTransactionService,
+        securedStore: SecuredStore
+    ) {
+        self.accountService = accountService
+        self.apiService = apiService
+        self.socketService = socketService
+        self.stack = stack
+        self.adamantCore = adamantCore
+        self.accountsProvider = accountsProvider
+        self.transactionService = transactionService
+        self.securedStore = securedStore
+        
+        var richProviders = [String: RichMessageProviderWithStatusCheck]()
+        for case let provider as RichMessageProviderWithStatusCheck in accountService.wallets {
+            richProviders[provider.dynamicRichMessageType] = provider
+        }
+        self.richProviders = richProviders
+        
+        setupSecuredStore()
+        
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] notification in
             guard let store = self?.securedStore else {
                 return
@@ -82,8 +103,8 @@ class AdamantChatsProvider: ChatsProvider {
                 return
             }
             
-            if let savedAddress = store.get(StoreKey.chatProvider.address), savedAddress == loggedAddress {
-                if let raw = store.get(StoreKey.chatProvider.readedLastHeight), let h = Int64(raw) {
+            if let savedAddress: String = store.get(StoreKey.chatProvider.address), savedAddress == loggedAddress {
+                if let raw: String = store.get(StoreKey.chatProvider.readedLastHeight), let h = Int64(raw) {
                     self?.readedLastHeight = h
                 }
             } else {
@@ -104,7 +125,7 @@ class AdamantChatsProvider: ChatsProvider {
             // BackgroundFetch
             self?.dropStateData()
             
-            self?.blackList = []
+            self?.blockList = []
             self?.removedMessages = []
             
             self?.disconnectFromSocket()
@@ -116,12 +137,12 @@ class AdamantChatsProvider: ChatsProvider {
             }
             
             if state {
-                if let blackList = self?.blackList {
-                    self?.securedStore.set(blackList, for: "blackList")
+                if let blockList = self?.blockList {
+                    self?.securedStore.set(blockList, for: StoreKey.accountService.blockList)
                 }
                 
                 if let removedMessages = self?.removedMessages {
-                    self?.securedStore.set(removedMessages, for: "removedMessages")
+                    self?.securedStore.set(removedMessages, for: StoreKey.accountService.removedMessages)
                 }
             }
         }
@@ -157,8 +178,7 @@ class AdamantChatsProvider: ChatsProvider {
             }
             
             if self?.isConnectedToTheInternet == false {
-                self?.onConnectionToTheInternetRestored?()
-                self?.onConnectionToTheInternetRestored = nil
+                self?.onConnectionToTheInternetRestored()
             }
             self?.isConnectedToTheInternet = true
         }
@@ -188,6 +208,11 @@ class AdamantChatsProvider: ChatsProvider {
                 }
             }
         }
+    }
+    
+    private func setupSecuredStore() {
+        blockList = securedStore.get(StoreKey.accountService.blockList) ?? []
+        removedMessages = securedStore.get(StoreKey.accountService.removedMessages) ?? []
     }
 }
 
@@ -327,7 +352,7 @@ extension AdamantChatsProvider {
                             execute: getChatrooms
                         )
                     } else {
-                        self?.addOnConnectionToTheInternetRestored(task: getChatrooms)
+                        self?.onConnectionToTheInternetRestoredTasks.append(getChatrooms)
                     }
                 default:
                     completion?(nil)
@@ -400,7 +425,7 @@ extension AdamantChatsProvider {
                             execute: getChatMessages
                         )
                     } else {
-                        self?.addOnConnectionToTheInternetRestored(task: getChatMessages)
+                        self?.onConnectionToTheInternetRestoredTasks.append(getChatMessages)
                     }
                 default:
                     completion?(nil)
@@ -916,53 +941,35 @@ extension AdamantChatsProvider {
             return
         }
         
-        // MARK: 2. Create transaction and sign it
-        let date: Date
-        if let delta = apiService.lastRequestTimeDelta {
-            date = Date().addingTimeInterval(-delta)
-        } else {
-            date = Date()
-        }
-        
-        let normalizedTransaction = NormalizedTransaction(type: .chatMessage,
-                                                          amount: 0,
-                                                          senderPublicKey: keypair.publicKey,
-                                                          requesterPublicKey: nil,
-                                                          date: date,
-                                                          recipientId: recipientId,
-                                                          asset: TransactionAsset(
-                                                            chat: ChatAsset(
-                                                                message: encodedMessage.message,
-                                                                ownMessage: encodedMessage.nonce,
-                                                                type: type
-                                                            ),
-                                                            state: nil,
-                                                            votes: nil
-                                                          )
-        )
-        
-        guard let signature = adamantCore.sign(transaction: normalizedTransaction, senderId: senderId, keypair: keypair) else {
-            let error = AdamantApiService.InternalError.signTransactionFailed.apiServiceErrorWith(error: nil)
-            completion(.failure(ChatsProviderError.internalError(AdamantError(message: error.message, error: error))))
-            return
-        }
-        unconfirmedTransactionsBySignature.append(signature)
-        
         // MARK: 3. Send
-        apiService.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, type: type, nonce: encodedMessage.nonce, amount: nil) { result in
+        var signedTransaction: UnregisteredTransaction?
+        signedTransaction = apiService.sendMessage(
+            senderId: senderId,
+            recipientId: recipientId,
+            keypair: keypair,
+            message: encodedMessage.message,
+            type: type,
+            nonce: encodedMessage.nonce,
+            amount: nil
+        ) { [weak self] result in
             switch result {
             case .success(let id):
                 // Update ID with recieved, add to unconfirmed transactions.
                 transaction.transactionId = String(id)
                 
-                self.unconfirmedsSemaphore.wait()
-                if let index = self.unconfirmedTransactionsBySignature.firstIndex(of: signature) {
-                    self.unconfirmedTransactionsBySignature.remove(at: index)
+                self?.unconfirmedsSemaphore.wait()
+                if
+                    let signedTransaction = signedTransaction,
+                    let index = self?.unconfirmedTransactionsBySignature.firstIndex(
+                        of: signedTransaction.signature
+                    )
+                {
+                    self?.unconfirmedTransactionsBySignature.remove(at: index)
                 }
                 DispatchQueue.main.sync {
-                    self.unconfirmedTransactions[id] = transaction.objectID
+                    self?.unconfirmedTransactions[id] = transaction.objectID
                 }
-                self.unconfirmedsSemaphore.signal()
+                self?.unconfirmedsSemaphore.signal()
                 
                 completion(.success(transaction: transaction))
                 
@@ -983,8 +990,8 @@ extension AdamantChatsProvider {
                 case .serverError(let e):
                     serviceError = .serverError(AdamantError(message: e))
                     
-                case .internalError(let message, let e):
-                    serviceError = ChatsProviderError.internalError(AdamantError(message: message, error: e))
+                case .internalError(let message, _):
+                    serviceError = ChatsProviderError.internalError(AdamantError(message: message))
                     
                 case .requestCancelled:
                     serviceError = .requestCancelled
@@ -993,6 +1000,8 @@ extension AdamantChatsProvider {
                 completion(.failure(serviceError))
             }
         }
+        
+        signedTransaction.map { unconfirmedTransactionsBySignature.append($0.signature) }
     }
 }
 
@@ -1325,7 +1334,7 @@ extension AdamantChatsProvider {
             }
             
             if let address = privateChatroom.partner?.address {
-                chatroom.isHidden = self.blackList.contains(address)
+                chatroom.isHidden = self.blockList.contains(address)
             }
         }
         
@@ -1338,7 +1347,7 @@ extension AdamantChatsProvider {
             let chatrooms = Dictionary(grouping: unreadTransactions, by: ({ (t: ChatTransaction) -> Chatroom in t.chatroom! }))
             for (chatroom, trs) in chatrooms {
                 if let address = chatroom.partner?.address {
-                    chatroom.isHidden = self.blackList.contains(address)
+                    chatroom.isHidden = self.blockList.contains(address)
                 }
                 chatroom.hasUnreadMessages = true
                 trs.forEach { $0.isUnread = true }
@@ -1465,11 +1474,11 @@ extension AdamantChatsProvider {
     }
     
     public func blockChat(with address: String) {
-        if !self.blackList.contains(address) {
-            self.blackList.append(address)
+        if !self.blockList.contains(address) {
+            self.blockList.append(address)
             
             if self.accountService.hasStayInAccount {
-                self.securedStore.set(blackList, for: "blackList")
+                self.securedStore.set(blockList, for: StoreKey.accountService.blockList)
             }
         }
     }
@@ -1479,16 +1488,14 @@ extension AdamantChatsProvider {
             self.removedMessages.append(id)
             
             if self.accountService.hasStayInAccount {
-                self.securedStore.set(removedMessages, for: "removedMessages")
+                self.securedStore.set(removedMessages, for: StoreKey.accountService.removedMessages)
             }
         }
     }
     
-    private func addOnConnectionToTheInternetRestored(task: @escaping () -> Void) {
-        onConnectionToTheInternetRestored = { [onConnectionToTheInternetRestored] in
-            onConnectionToTheInternetRestored?()
-            task()
-        }
+    private func onConnectionToTheInternetRestored() {
+        onConnectionToTheInternetRestoredTasks.forEach { $0() }
+        onConnectionToTheInternetRestoredTasks = []
     }
 }
 

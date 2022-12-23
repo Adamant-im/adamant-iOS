@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct StateAsset: Codable {
+struct StateAsset: Codable, Hashable {
     let key: String
     let value: String
     let type: StateType

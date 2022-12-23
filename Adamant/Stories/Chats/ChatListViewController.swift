@@ -87,17 +87,15 @@ class ChatListViewController: UIViewController {
     private var originalInsets: UIEdgeInsets?
     private var didShow: Bool = false
     
-    var didLoadedMessages: (() -> Void)?
+    private var onMessagesLoadedActions = [() -> Void]()
+    private var areMessagesLoaded = false
     
     // MARK: Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if #available(iOS 11.0, *) {
-            navigationController?.navigationBar.prefersLargeTitles = true
-            navigationItem.largeTitleDisplayMode = .never
-        }
-
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.largeTitleDisplayMode = .never
         navigationItem.title = String.adamantLocalized.chatList.title
         navigationItem.rightBarButtonItems = [
             UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(newChat)),
@@ -129,16 +127,9 @@ class ChatListViewController: UIViewController {
         searchController.searchBar.placeholder = String.adamantLocalized.chatList.searchPlaceholder
         definesPresentationContext = true
         
-        if #available(iOS 11.0, *) {
-            searchController.obscuresBackgroundDuringPresentation = false
-            searchController.hidesNavigationBarDuringPresentation = true
-            navigationItem.searchController = searchController
-        } else {
-            searchController.dimsBackgroundDuringPresentation = false
-        
-            tableView.tableHeaderView = self.searchController!.searchBar
-            searchController!.searchBar.sizeToFit()
-        }
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.hidesNavigationBarDuringPresentation = true
+        navigationItem.searchController = searchController
         
         // MARK: Login/Logout
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
@@ -146,6 +137,7 @@ class ChatListViewController: UIViewController {
         }
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.initFetchedRequestControllers(provider: nil)
+            self?.areMessagesLoaded = false
         }
         
         // MARK: Busy Indicator
@@ -161,7 +153,8 @@ class ChatListViewController: UIViewController {
         
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantChatsProvider.initiallySyncedChanged, object: chatsProvider, queue: OperationQueue.main) { [weak self] notification in
             if let synced = notification.userInfo?[AdamantUserInfoKey.ChatProvider.initiallySynced] as? Bool {
-                self?.didLoadedMessages?()
+                self?.areMessagesLoaded = true
+                self?.performOnMessagesLoadedActions()
                 self?.setIsBusy(!synced)
                 self?.tableView.reloadData()
             } else if let synced = self?.chatsProvider.isInitiallySynced {
@@ -196,13 +189,6 @@ class ChatListViewController: UIViewController {
             var insets = tableView.contentInset
             if let rect = self.tabBarController?.tabBar.frame {
                 insets.bottom = rect.height
-            }
-            
-            if #available(iOS 11.0, *) { } else {
-                if let rect = self.navigationController?.navigationBar.frame {
-                    let y = rect.size.height + rect.origin.y
-                    insets.top = y
-                }
             }
             tableView.contentInset = insets
         }
@@ -305,7 +291,6 @@ class ChatListViewController: UIViewController {
                 DispatchQueue.main.async {
                     self?.tableView.reloadData()
                 }
-                break
                 
             case .failure(let error):
                 self?.dialogService.showRichError(error: error)
@@ -400,11 +385,12 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
         if isBusy,
            indexPath.row == lastSystemChatPositionRow,
            let cell = tableView.cellForRow(at: indexPath),
-           let _ = cell as? LoadingTableViewCell {
+           cell is LoadingTableViewCell
+        {
             tableView.deselectRow(at: indexPath, animated: true)
             return
         }
-        let nIndexPath = isBusy && indexPath.row >= (lastSystemChatPositionRow ?? 0) ? IndexPath(row: indexPath.row - 1, section: 0) : indexPath
+        let nIndexPath = chatControllerIndexPath(tableViewIndexPath: indexPath)
         if let chatroom = chatsController?.object(at: nIndexPath) {
             presentChatViewController(for: chatroom)
         }
@@ -440,7 +426,7 @@ extension ChatListViewController {
            let cell = cell as? LoadingTableViewCell {
             configureCell(cell)
         } else if let cell = cell as? ChatTableViewCell {
-            let nIndexPath = isBusy && indexPath.row >= (lastSystemChatPositionRow ?? 0) ? IndexPath(row: indexPath.row - 1, section: 0) : indexPath
+            let nIndexPath = chatControllerIndexPath(tableViewIndexPath: indexPath)
             if let chat = chatsController?.object(at: nIndexPath) {
                 configureCell(cell, for: chat)
             }
@@ -535,18 +521,11 @@ extension ChatListViewController {
     private func insertReloadRow() {
         lastSystemChatPositionRow = getBottomSystemChatIndex()
         DispatchQueue.main.async { [weak self] in
-            if #available(iOS 11.0, *) {
-                self?.tableView.performBatchUpdates {
-                    self?.tableView.insertRows(at: [
-                        IndexPath(row: self?.lastSystemChatPositionRow ?? 0, section: 0)
-                    ], with: .none)
-                    self?.tableView.reloadRows(at: [IndexPath(row: (self?.lastSystemChatPositionRow ?? 0) - 1, section: 0)], with: .none)
-                }
-            } else {
-                self?.tableView.beginUpdates()
-                self?.tableView.insertRows(at: [IndexPath(row: self?.lastSystemChatPositionRow ?? 0, section: 0)], with: .none)
+            self?.tableView.performBatchUpdates {
+                self?.tableView.insertRows(at: [
+                    IndexPath(row: self?.lastSystemChatPositionRow ?? 0, section: 0)
+                ], with: .none)
                 self?.tableView.reloadRows(at: [IndexPath(row: (self?.lastSystemChatPositionRow ?? 0) - 1, section: 0)], with: .none)
-                self?.tableView.endUpdates()
             }
         }
     }
@@ -1008,6 +987,37 @@ extension ChatListViewController {
         })
 
         return index
+    }
+    
+    func selectChatroomRow(chatroom: Chatroom) {
+        guard let chatsControllerIndexPath = chatsController?.indexPath(forObject: chatroom) else { return }
+        let tableViewIndexPath = tableViewIndexPath(chatControllerIndexPath: chatsControllerIndexPath)
+        tableView.selectRow(at: tableViewIndexPath, animated: false, scrollPosition: .none)
+        tableView.scrollToRow(at: tableViewIndexPath, at: .top, animated: false)
+    }
+    
+    func performOnMessagesLoaded(action: @escaping () -> Void) {
+        onMessagesLoadedActions.append(action)
+        
+        guard areMessagesLoaded else { return }
+        performOnMessagesLoadedActions()
+    }
+    
+    private func chatControllerIndexPath(tableViewIndexPath: IndexPath) -> IndexPath {
+        isBusy && tableViewIndexPath.row >= (lastSystemChatPositionRow ?? 0)
+            ? IndexPath(row: tableViewIndexPath.row - 1, section: 0)
+            : tableViewIndexPath
+    }
+    
+    private func tableViewIndexPath(chatControllerIndexPath: IndexPath) -> IndexPath {
+        isBusy && chatControllerIndexPath.row == (lastSystemChatPositionRow ?? 0)
+            ? IndexPath(row: chatControllerIndexPath.row + 1, section: 0)
+            : chatControllerIndexPath
+    }
+    
+    private func performOnMessagesLoadedActions() {
+        onMessagesLoadedActions.forEach { $0() }
+        onMessagesLoadedActions = []
     }
 }
 
