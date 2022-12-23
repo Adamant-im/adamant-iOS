@@ -115,20 +115,22 @@ function moveImage ()
     FROM_DIR=$1
     WALLET_NAME=$2
     Target=$3
-    IMAGE_NAME=$4
-    mv $FROM_DIR/$WALLET_NAME/Images/${IMAGE_NAME}.png ${Target}/${IMAGE_NAME}.png
-    mv $FROM_DIR/$WALLET_NAME/Images/${IMAGE_NAME}@2x.png ${Target}/${IMAGE_NAME}@2x.png
-    mv $FROM_DIR/$WALLET_NAME/Images/${IMAGE_NAME}@3x.png ${Target}/${IMAGE_NAME}@3x.png
+    IMAGE_NAME_FROM=$4
+    IMAGE_NAME_TO=$5
+    
+    cp $FROM_DIR/$WALLET_NAME/Images/${IMAGE_NAME_FROM}.png ${Target}/${IMAGE_NAME_TO}.png
+    cp $FROM_DIR/$WALLET_NAME/Images/${IMAGE_NAME_FROM}@2x.png ${Target}/${IMAGE_NAME_TO}@2x.png
+    cp $FROM_DIR/$WALLET_NAME/Images/${IMAGE_NAME_FROM}@3x.png ${Target}/${IMAGE_NAME_TO}@3x.png
     
     # check dark icons
-    if [ -e $FROM_DIR/$WALLET_NAME/Images/${IMAGE_NAME}_dark.png ]
+    if [ -e $FROM_DIR/$WALLET_NAME/Images/${IMAGE_NAME_FROM}_dark.png ]
     then
-        mv $FROM_DIR/$WALLET_NAME/Images/${IMAGE_NAME}_dark.png ${Target}/${IMAGE_NAME}_dark.png
-        mv $FROM_DIR/$WALLET_NAME/Images/${IMAGE_NAME}_dark@2x.png ${Target}/${IMAGE_NAME}_dark@2x.png
-        mv $FROM_DIR/$WALLET_NAME/Images/${IMAGE_NAME}_dark@3x.png ${Target}/${IMAGE_NAME}_dark@3x.png
-        create_contents ${Target} ${IMAGE_NAME} true
+        cp $FROM_DIR/$WALLET_NAME/Images/${IMAGE_NAME_FROM}_dark.png ${Target}/${IMAGE_NAME_TO}_dark.png
+        cp $FROM_DIR/$WALLET_NAME/Images/${IMAGE_NAME_FROM}_dark@2x.png ${Target}/${IMAGE_NAME_TO}_dark@2x.png
+        cp $FROM_DIR/$WALLET_NAME/Images/${IMAGE_NAME_FROM}_dark@3x.png ${Target}/${IMAGE_NAME_TO}_dark@3x.png
+        create_contents ${Target} ${IMAGE_NAME_TO} true
     else
-        create_contents ${Target} ${IMAGE_NAME} false
+        create_contents ${Target} ${IMAGE_NAME_TO} false
     fi
 }
 
@@ -143,22 +145,29 @@ function unpack ()
         Target_Notification_Content=$ROOT/NotificationServiceExtension/WalletImages
         cp $WALLETS_NAME_DIR/$WALLET_NAME/Images/${WALLET_NAME}_wallet@3x.png ${Target_Notification_Content}/${WALLET_NAME}_notificationContent.png
             
-        # move notification images to assets
-        Target_Notification_Image=$ROOT/AdamantShared/Shared.xcassets/Wallets/${WALLET_NAME}_notification.imageset
-        mkdir -p ${Target_Notification_Image}
-        moveImage $WALLETS_NAME_DIR $WALLET_NAME ${Target_Notification_Image} ${WALLET_NAME}_notification
-        
         # move wallet images to assets
         Target_Wallet_Image=$ROOT/AdamantShared/Shared.xcassets/Wallets/${WALLET_NAME}_wallet.imageset
         mkdir -p ${Target_Wallet_Image}
-        moveImage $WALLETS_NAME_DIR $WALLET_NAME ${Target_Wallet_Image} ${WALLET_NAME}_wallet
+        moveImage $WALLETS_NAME_DIR $WALLET_NAME ${Target_Wallet_Image} ${WALLET_NAME}_wallet ${WALLET_NAME}_wallet
+        
+        # move notification images to assets
+        Target_Notification_Image=$ROOT/AdamantShared/Shared.xcassets/Wallets/${WALLET_NAME}_notification.imageset
+        mkdir -p ${Target_Notification_Image}
+        if [ -e $WALLETS_NAME_DIR/$WALLET_NAME/Images/${WALLET_NAME}_notification.png ]
+        then
+            moveImage $WALLETS_NAME_DIR $WALLET_NAME ${Target_Notification_Image} ${WALLET_NAME}_notification ${WALLET_NAME}_notification
+        else
+            moveImage $WALLETS_NAME_DIR $WALLET_NAME ${Target_Notification_Image} ${WALLET_NAME}_wallet ${WALLET_NAME}_notification
+        fi
         
         # move row images to assets
         Target_Row_Image=$ROOT/AdamantShared/Shared.xcassets/Wallets/${WALLET_NAME}_wallet_row.imageset
+        mkdir -p ${Target_Row_Image}
         if [ -e $WALLETS_NAME_DIR/$WALLET_NAME/Images/${WALLET_NAME}_wallet_row.png ]
         then
-            mkdir -p ${Target_Row_Image}
-            moveImage $WALLETS_NAME_DIR $WALLET_NAME ${Target_Row_Image} ${WALLET_NAME}_wallet_row
+            moveImage $WALLETS_NAME_DIR $WALLET_NAME ${Target_Row_Image} ${WALLET_NAME}_wallet_row ${WALLET_NAME}_wallet_row
+        else
+            moveImage $WALLETS_NAME_DIR $WALLET_NAME ${Target_Row_Image} ${WALLET_NAME}_wallet ${WALLET_NAME}_wallet_row
         fi
     done
 }
