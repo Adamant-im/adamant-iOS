@@ -8,6 +8,7 @@
 
 import Foundation
 import MessageKit
+import UIKit
 
 protocol ChatCell: AnyObject {
 //    var bubbleStyle: MessageStyle { get set }

@@ -280,11 +280,13 @@ extension AppDelegate {
     }
     
     func openDialog(chatList: UINavigationController, tabbar: UITabBarController, list: ChatListViewController, transactionID: String, senderAddress: String) {
-        if let chatVCNav = chatList.viewControllers.last as? UINavigationController,
-           let chatVC = chatVCNav.viewControllers.first as? ChatViewController,
-           chatVC.chatroom?.partner?.address == senderAddress {
-            chatVC.forceScrollToBottom = true
-            chatVC.scrollDown()
+        if
+            let chatVCNav = chatList.viewControllers.last as? UINavigationController,
+            let chatVC = chatVCNav.viewControllers.first as? ChatViewController,
+            chatVC.viewModel.chatroom?.partner?.address == senderAddress
+        {
+            // TODO: [Chats] Implement scroll down
+//            chatVC.scrollDown()
             return
         }
         
@@ -299,7 +301,7 @@ extension AppDelegate {
         chatList.dismiss(animated: false, completion: nil)
         tabbar.selectedIndex = 0
         
-        let vc = list.chatViewController(for: chatroom, forceScrollToBottom: true)
+        let vc = list.chatViewController(for: chatroom)
         if let split = list.splitViewController {
             let chat = UINavigationController(rootViewController: vc)
             split.showDetailViewController(chat, sender: list)

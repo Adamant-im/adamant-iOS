@@ -33,24 +33,9 @@ extension AdamantScene {
         })
         
         static let chat = AdamantScene(identifier: "ChatViewController", factory: { r in
-            let c = ChatViewController()
-            c.chatsProvider = r.resolve(ChatsProvider.self)
-            c.transfersProvider = r.resolve(TransfersProvider.self)
-            c.dialogService = r.resolve(DialogService.self)
-            c.router = r.resolve(Router.self)
-            c.addressBookService = r.resolve(AddressBookService.self)
-            c.stack = r.resolve(CoreDataStack.self)
-            c.securedStore = r.resolve(SecuredStore.self)
-            
-            // MARK: RichMessage handlers
-            // Transfer handlers from accountService' wallet services
-            if let accountService = r.resolve(AccountService.self) {
-                for case let provider as RichMessageProvider in accountService.wallets {
-                    c.richMessageProviders[provider.dynamicRichMessageType] = provider
-                }
-            }
-            
-            return c
+            ChatFactory(
+                chatsProvider: r.resolve(ChatsProvider.self)!
+            ).makeViewController()
         })
         
         static let newChat = AdamantScene(identifier: "NewChatViewController", factory: { r in

@@ -8,6 +8,7 @@
 
 import Foundation
 import MessageKit
+import UIKit
 
 enum CellSource {
     case `class`(type: UICollectionViewCell.Type)

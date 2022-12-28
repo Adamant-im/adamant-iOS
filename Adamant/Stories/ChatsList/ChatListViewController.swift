@@ -213,24 +213,15 @@ class ChatListViewController: UIViewController {
     }
     
     // MARK: Helpers
-    func chatViewController(for chatroom: Chatroom, with message: MessageTransaction? = nil, forceScrollToBottom: Bool = false) -> ChatViewController {
+    func chatViewController(for chatroom: Chatroom, with message: MessageTransaction? = nil) -> ChatViewController {
         guard let vc = router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
             fatalError("Can't get ChatViewController")
         }
         
-        if let account = accountService.account {
-            vc.account = account
-        }
-        
-        if let message = message {
-            vc.messageToShow = message
-        }
-        
-        vc.forceScrollToBottom = forceScrollToBottom
-        
         vc.hidesBottomBarWhenPushed = true
-        vc.chatroom = chatroom
-        vc.delegate = self
+        vc.viewModel.setup(account: accountService.account, chatroom: chatroom, messageToShow: message)
+        // TODO: [Chats] implement delegate analog
+//        vc.delegate = self
         
         return vc
     }
@@ -379,6 +370,7 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
         let nIndexPath = chatControllerIndexPath(tableViewIndexPath: indexPath)
         if let chatroom = chatsController?.object(at: nIndexPath) {
             let vc = chatViewController(for: chatroom)
+            vc.hidesBottomBarWhenPushed = true
             
             if let split = self.splitViewController {
                 let chat = UINavigationController(rootViewController:vc)
@@ -644,7 +636,7 @@ extension ChatListViewController: NewChatViewControllerDelegate {
                 self?.present(vc, animated: true) {
                     vc.becomeFirstResponder()
                     
-                    if let count = vc.chatroom?.transactions?.count, count == 0 {
+                    if let count = vc.viewModel.chatroom?.transactions?.count, count == 0 {
                         vc.messageInputBar.inputTextView.becomeFirstResponder()
                     }
                 }
@@ -658,7 +650,7 @@ extension ChatListViewController: NewChatViewControllerDelegate {
                 navigator.viewControllers.remove(at: index)
             }
             
-            if let count = vc.chatroom?.transactions?.count, count == 0 {
+            if let count = vc.viewModel.chatroom?.transactions?.count, count == 0 {
                 vc.messageInputBar.inputTextView.becomeFirstResponder()
             }
             
@@ -677,23 +669,25 @@ extension ChatListViewController: NewChatViewControllerDelegate {
 }
 
 // MARK: - ChatViewControllerDelegate
-extension ChatListViewController: ChatViewControllerDelegate {
-    func preserveMessage(_ message: String, forAddress address: String) {
-        preservedMessagess[address] = message
-    }
-    
-    func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String? {
-        guard let message = preservedMessagess[address] else {
-            return nil
-        }
-        
-        if thenRemoveIt {
-            preservedMessagess.removeValue(forKey: address)
-        }
-        
-        return message
-    }
-}
+// TODO: [Chats] Replace ChatViewControllerDelegate
+
+//extension ChatListViewController: ChatViewControllerDelegate {
+//    func preserveMessage(_ message: String, forAddress address: String) {
+//        preservedMessagess[address] = message
+//    }
+//
+//    func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String? {
+//        guard let message = preservedMessagess[address] else {
+//            return nil
+//        }
+//
+//        if thenRemoveIt {
+//            preservedMessagess.removeValue(forKey: address)
+//        }
+//
+//        return message
+//    }
+//}
 
 // MARK: - Working with in-app notifications
 extension ChatListViewController {
@@ -965,7 +959,7 @@ extension ChatListViewController {
             return nil
         }
         
-        return vc.chatroom
+        return vc.viewModel.chatroom
     }
     
     /// First system botoom chat index

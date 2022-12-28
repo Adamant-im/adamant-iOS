@@ -39,7 +39,7 @@
 		550698B628C00AED000E8A2B /* CollectionUtilites.swift in Sources */ = {isa = PBXBuildFile; fileRef = 550698B528C00AED000E8A2B /* CollectionUtilites.swift */; };
 		551F66E628959A5300DE5D69 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551F66E528959A5200DE5D69 /* LoadingView.swift */; };
 		551F66E82895B3DA00DE5D69 /* AdamantHealthCheckServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551F66E72895B3DA00DE5D69 /* AdamantHealthCheckServiceTests.swift */; };
-		5522A44028B758530029B543 /* UIKitUtilites.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5522A43F28B758530029B543 /* UIKitUtilites.swift */; };
+		5522A44028B758530029B543 /* MessageKit+Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5522A43F28B758530029B543 /* MessageKit+Utilities.swift */; };
 		553B1284281C6EE100FFF24C /* GCDUtilites.swift in Sources */ = {isa = PBXBuildFile; fileRef = 553B1283281C6EE100FFF24C /* GCDUtilites.swift */; };
 		5551CC8F28A8B75300B52AD0 /* ApiServiceStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5551CC8E28A8B75300B52AD0 /* ApiServiceStub.swift */; };
 		5558A436282AAFCC0024DDD6 /* AdamantApi+Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5558A435282AAFCC0024DDD6 /* AdamantApi+Status.swift */; };
@@ -55,7 +55,7 @@
 		55FBAAF728C54B2F0066E629 /* Nodes+Allowance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55FBAAF428C54B230066E629 /* Nodes+Allowance.swift */; };
 		55FBAAF828C54B300066E629 /* Nodes+Allowance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55FBAAF428C54B230066E629 /* Nodes+Allowance.swift */; };
 		55FBAAFB28C550920066E629 /* NodesAllowanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55FBAAFA28C550920066E629 /* NodesAllowanceTests.swift */; };
-		6403F5DB2272389800D58779 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
+		6403F5DB2272389800D58779 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		6403F5DE22723C6800D58779 /* DashMainnet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6403F5DD22723C6800D58779 /* DashMainnet.swift */; };
 		6403F5E022723F6400D58779 /* DashWalletRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6403F5DF22723F6400D58779 /* DashWalletRouter.swift */; };
 		6403F5E222723F7500D58779 /* DashWallet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6403F5E122723F7500D58779 /* DashWallet.swift */; };
@@ -165,10 +165,26 @@
 		9304F8C6292F971600173F18 /* ApiServiceResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304F8C5292F971600173F18 /* ApiServiceResult.swift */; };
 		9304F8C8292F972600173F18 /* ApiServiceError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304F8C7292F972600173F18 /* ApiServiceError.swift */; };
 		930B57772934D44700F3E539 /* Encodable+Dictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 930B57762934D44700F3E539 /* Encodable+Dictionary.swift */; };
+		931A2955295BA5450022CAA3 /* Combine+Typealiases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931A2954295BA5450022CAA3 /* Combine+Typealiases.swift */; };
+		931A2957295BA5710022CAA3 /* CurrentValueGetterSubject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931A2956295BA5710022CAA3 /* CurrentValueGetterSubject.swift */; };
+		932354E82955F0A400EE367B /* ChatViewController+Delegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 932354E72955F0A400EE367B /* ChatViewController+Delegates.swift */; };
 		93457407292B930E00F8F9D6 /* AccountServiceStoreKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93457406292B930E00F8F9D6 /* AccountServiceStoreKey.swift */; };
 		93457408292B930E00F8F9D6 /* AccountServiceStoreKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93457406292B930E00F8F9D6 /* AccountServiceStoreKey.swift */; };
 		93457409292B930E00F8F9D6 /* AccountServiceStoreKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93457406292B930E00F8F9D6 /* AccountServiceStoreKey.swift */; };
 		9345769528FD0C34004E6C7A /* UIViewController+email.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9345769428FD0C34004E6C7A /* UIViewController+email.swift */; };
+		9371E561295CD53100438F2C /* ChatLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9371E560295CD53100438F2C /* ChatLocalization.swift */; };
+		938F7D582955C1DA001915CA /* MessageKit in Frameworks */ = {isa = PBXBuildFile; productRef = 938F7D572955C1DA001915CA /* MessageKit */; };
+		938F7D5B2955C8DA001915CA /* ChatDisplayDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 938F7D5A2955C8DA001915CA /* ChatDisplayDelegate.swift */; };
+		938F7D5D2955C8F9001915CA /* ChatLayoutDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 938F7D5C2955C8F9001915CA /* ChatLayoutDelegate.swift */; };
+		938F7D5F2955C90D001915CA /* ChatInputBarDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 938F7D5E2955C90D001915CA /* ChatInputBarDelegate.swift */; };
+		938F7D612955C92B001915CA /* ChatDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 938F7D602955C92B001915CA /* ChatDataSource.swift */; };
+		938F7D642955C94F001915CA /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 938F7D632955C94F001915CA /* ChatViewController.swift */; };
+		938F7D662955C966001915CA /* ChatInputBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 938F7D652955C966001915CA /* ChatInputBar.swift */; };
+		938F7D692955C9EC001915CA /* ChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 938F7D682955C9EC001915CA /* ChatViewModel.swift */; };
+		938F7D6D2955CB30001915CA /* ChatViewModel+Sender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 938F7D6C2955CB30001915CA /* ChatViewModel+Sender.swift */; };
+		938F7D6F2955CB41001915CA /* ChatViewModel+Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 938F7D6E2955CB41001915CA /* ChatViewModel+Message.swift */; };
+		938F7D722955CE72001915CA /* ChatFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 938F7D712955CE72001915CA /* ChatFactory.swift */; };
+		93B266B82959E00E00D6444D /* Message+ChatTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B266B72959E00E00D6444D /* Message+ChatTransaction.swift */; };
 		93E5D4DB293000BE00439298 /* UnregisteredTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93E5D4DA293000BE00439298 /* UnregisteredTransaction.swift */; };
 		93E5D4DC293000BE00439298 /* UnregisteredTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93E5D4DA293000BE00439298 /* UnregisteredTransaction.swift */; };
 		93E5D4DD293000BE00439298 /* UnregisteredTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93E5D4DA293000BE00439298 /* UnregisteredTransaction.swift */; };
@@ -188,7 +204,7 @@
 		A5241B70262DEDE1009FA43E /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5241B6F262DEDE1009FA43E /* Clibsodium */; };
 		A5241B77262DEDEF009FA43E /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5241B76262DEDEF009FA43E /* Clibsodium */; };
 		A5241B7E262DEDFE009FA43E /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5241B7D262DEDFE009FA43E /* Clibsodium */; };
-		A530B0D82842110D003F0210 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
+		A530B0D82842110D003F0210 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
 		A544F0D4262C9878001F1A6D /* Eureka in Frameworks */ = {isa = PBXBuildFile; productRef = A544F0D3262C9878001F1A6D /* Eureka */; };
 		A57282CA262C94CD00C96FA8 /* DateToolsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A57282C9262C94CD00C96FA8 /* DateToolsSwift */; };
 		A57282D1262C94DA00C96FA8 /* DateToolsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A57282D0262C94DA00C96FA8 /* DateToolsSwift */; };
@@ -294,7 +310,6 @@
 		E9147B612050599000145913 /* LoginViewController+QR.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9147B602050599000145913 /* LoginViewController+QR.swift */; };
 		E9147B6320505C7500145913 /* QRCodeReader+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9147B6220505C7500145913 /* QRCodeReader+adamant.swift */; };
 		E9147B6F205088DE00145913 /* LoginViewController+Pinpad.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9147B6E205088DE00145913 /* LoginViewController+Pinpad.swift */; };
-		E9150B802066861D0065A985 /* ChatViewController+MessageKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9150B7F2066861D0065A985 /* ChatViewController+MessageKit.swift */; };
 		E91947AC20001A9A001362F8 /* ApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947AB20001A9A001362F8 /* ApiService.swift */; };
 		E91947B020002393001362F8 /* AdamantApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947AF20002393001362F8 /* AdamantApiService.swift */; };
 		E91947B22000246A001362F8 /* AdamantError.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B12000246A001362F8 /* AdamantError.swift */; };
@@ -331,7 +346,6 @@
 		E93D7AC02052CF63005D19DC /* AdamantNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93D7ABF2052CF63005D19DC /* AdamantNotificationService.swift */; };
 		E93EB09F20DA3FA4001F9601 /* NodesEditorRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93EB09E20DA3FA4001F9601 /* NodesEditorRoutes.swift */; };
 		E93EB0A320DA4CCA001F9601 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93EB0A220DA4CCA001F9601 /* Node.swift */; };
-		E93EFE13200D1156000BB482 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93EFE12200D1156000BB482 /* ChatViewController.swift */; };
 		E940086B2114A70600CD2D67 /* LskAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = E940086A2114A70600CD2D67 /* LskAccount.swift */; };
 		E940086E2114AA2E00CD2D67 /* WalletService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E940086D2114AA2E00CD2D67 /* WalletService.swift */; };
 		E94008702114EA6800CD2D67 /* AdamantBalanceFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = E940086F2114EA6800CD2D67 /* AdamantBalanceFormat.swift */; };
@@ -696,7 +710,7 @@
 		550698B528C00AED000E8A2B /* CollectionUtilites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionUtilites.swift; sourceTree = "<group>"; };
 		551F66E528959A5200DE5D69 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		551F66E72895B3DA00DE5D69 /* AdamantHealthCheckServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantHealthCheckServiceTests.swift; sourceTree = "<group>"; };
-		5522A43F28B758530029B543 /* UIKitUtilites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIKitUtilites.swift; sourceTree = "<group>"; };
+		5522A43F28B758530029B543 /* MessageKit+Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MessageKit+Utilities.swift"; sourceTree = "<group>"; };
 		553B1283281C6EE100FFF24C /* GCDUtilites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCDUtilites.swift; sourceTree = "<group>"; };
 		5551CC8E28A8B75300B52AD0 /* ApiServiceStub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiServiceStub.swift; sourceTree = "<group>"; };
 		5558A435282AAFCC0024DDD6 /* AdamantApi+Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantApi+Status.swift"; sourceTree = "<group>"; };
@@ -806,8 +820,23 @@
 		9304F8C5292F971600173F18 /* ApiServiceResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiServiceResult.swift; sourceTree = "<group>"; };
 		9304F8C7292F972600173F18 /* ApiServiceError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiServiceError.swift; sourceTree = "<group>"; };
 		930B57762934D44700F3E539 /* Encodable+Dictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Encodable+Dictionary.swift"; sourceTree = "<group>"; };
+		931A2954295BA5450022CAA3 /* Combine+Typealiases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Combine+Typealiases.swift"; sourceTree = "<group>"; };
+		931A2956295BA5710022CAA3 /* CurrentValueGetterSubject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentValueGetterSubject.swift; sourceTree = "<group>"; };
+		932354E72955F0A400EE367B /* ChatViewController+Delegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatViewController+Delegates.swift"; sourceTree = "<group>"; };
 		93457406292B930E00F8F9D6 /* AccountServiceStoreKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountServiceStoreKey.swift; sourceTree = "<group>"; };
 		9345769428FD0C34004E6C7A /* UIViewController+email.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+email.swift"; sourceTree = "<group>"; };
+		9371E560295CD53100438F2C /* ChatLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatLocalization.swift; sourceTree = "<group>"; };
+		938F7D5A2955C8DA001915CA /* ChatDisplayDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatDisplayDelegate.swift; sourceTree = "<group>"; };
+		938F7D5C2955C8F9001915CA /* ChatLayoutDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatLayoutDelegate.swift; sourceTree = "<group>"; };
+		938F7D5E2955C90D001915CA /* ChatInputBarDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatInputBarDelegate.swift; sourceTree = "<group>"; };
+		938F7D602955C92B001915CA /* ChatDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatDataSource.swift; sourceTree = "<group>"; };
+		938F7D632955C94F001915CA /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
+		938F7D652955C966001915CA /* ChatInputBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatInputBar.swift; sourceTree = "<group>"; };
+		938F7D682955C9EC001915CA /* ChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewModel.swift; sourceTree = "<group>"; };
+		938F7D6C2955CB30001915CA /* ChatViewModel+Sender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatViewModel+Sender.swift"; sourceTree = "<group>"; };
+		938F7D6E2955CB41001915CA /* ChatViewModel+Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatViewModel+Message.swift"; sourceTree = "<group>"; };
+		938F7D712955CE72001915CA /* ChatFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatFactory.swift; sourceTree = "<group>"; };
+		93B266B72959E00E00D6444D /* Message+ChatTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Message+ChatTransaction.swift"; sourceTree = "<group>"; };
 		93E5D4DA293000BE00439298 /* UnregisteredTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnregisteredTransaction.swift; sourceTree = "<group>"; };
 		93E5D4DF2930029300439298 /* AdamantCore+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantCore+Extensions.swift"; sourceTree = "<group>"; };
 		A50A41032822F8CE006BDFE1 /* BtcWalletRoutes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BtcWalletRoutes.swift; sourceTree = "<group>"; };
@@ -876,7 +905,6 @@
 		E9147B602050599000145913 /* LoginViewController+QR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoginViewController+QR.swift"; sourceTree = "<group>"; };
 		E9147B6220505C7500145913 /* QRCodeReader+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QRCodeReader+adamant.swift"; sourceTree = "<group>"; };
 		E9147B6E205088DE00145913 /* LoginViewController+Pinpad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoginViewController+Pinpad.swift"; sourceTree = "<group>"; };
-		E9150B7F2066861D0065A985 /* ChatViewController+MessageKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatViewController+MessageKit.swift"; sourceTree = "<group>"; };
 		E919479F200010DC001362F8 /* Exo+2_400_italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo+2_400_italic.ttf"; sourceTree = "<group>"; };
 		E91947A0200010DC001362F8 /* Roboto_300_normal.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Roboto_300_normal.ttf; sourceTree = "<group>"; };
 		E91947A1200010DD001362F8 /* Roboto_400_italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Roboto_400_italic.ttf; sourceTree = "<group>"; };
@@ -925,7 +953,6 @@
 		E93D7ABF2052CF63005D19DC /* AdamantNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantNotificationService.swift; sourceTree = "<group>"; };
 		E93EB09E20DA3FA4001F9601 /* NodesEditorRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodesEditorRoutes.swift; sourceTree = "<group>"; };
 		E93EB0A220DA4CCA001F9601 /* Node.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
-		E93EFE12200D1156000BB482 /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
 		E940086A2114A70600CD2D67 /* LskAccount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LskAccount.swift; sourceTree = "<group>"; };
 		E940086D2114AA2E00CD2D67 /* WalletService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletService.swift; sourceTree = "<group>"; };
 		E940086F2114EA6800CD2D67 /* AdamantBalanceFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantBalanceFormat.swift; sourceTree = "<group>"; };
@@ -1164,7 +1191,8 @@
 				A57839FB262C95BF00428183 /* KeychainAccess in Frameworks */,
 				A5DBBABD262C7221004AC028 /* Clibsodium in Frameworks */,
 				A50AEB14262C837900B37C22 /* Alamofire in Frameworks */,
-				A530B0D82842110D003F0210 /* BuildFile in Frameworks */,
+				938F7D582955C1DA001915CA /* MessageKit in Frameworks */,
+				A530B0D82842110D003F0210 /* (null) in Frameworks */,
 				A5DBBADC262C729B004AC028 /* CryptoSwift in Frameworks */,
 				A5D87BA3262CA01D00DC28F0 /* ProcedureKit in Frameworks */,
 				A5C99E0E262C9E3A00F7B1B7 /* Reachability in Frameworks */,
@@ -1317,6 +1345,59 @@
 				648DD79F2236A59200B811FD /* DogeTransactionDetailsViewController.swift */,
 			);
 			path = Doge;
+			sourceTree = "<group>";
+		};
+		931A2953295BA52E0022CAA3 /* Combine */ = {
+			isa = PBXGroup;
+			children = (
+				931A2954295BA5450022CAA3 /* Combine+Typealiases.swift */,
+				931A2956295BA5710022CAA3 /* CurrentValueGetterSubject.swift */,
+			);
+			path = Combine;
+			sourceTree = "<group>";
+		};
+		938F7D552955C05D001915CA /* Chat */ = {
+			isa = PBXGroup;
+			children = (
+				938F7D672955C992001915CA /* ViewModel */,
+				938F7D702955CBAF001915CA /* View */,
+				938F7D712955CE72001915CA /* ChatFactory.swift */,
+				9371E560295CD53100438F2C /* ChatLocalization.swift */,
+			);
+			path = Chat;
+			sourceTree = "<group>";
+		};
+		938F7D592955C8CB001915CA /* Delegates */ = {
+			isa = PBXGroup;
+			children = (
+				938F7D5A2955C8DA001915CA /* ChatDisplayDelegate.swift */,
+				938F7D5C2955C8F9001915CA /* ChatLayoutDelegate.swift */,
+				938F7D5E2955C90D001915CA /* ChatInputBarDelegate.swift */,
+				938F7D602955C92B001915CA /* ChatDataSource.swift */,
+			);
+			path = Delegates;
+			sourceTree = "<group>";
+		};
+		938F7D672955C992001915CA /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				938F7D682955C9EC001915CA /* ChatViewModel.swift */,
+				938F7D6C2955CB30001915CA /* ChatViewModel+Sender.swift */,
+				938F7D6E2955CB41001915CA /* ChatViewModel+Message.swift */,
+				93B266B72959E00E00D6444D /* Message+ChatTransaction.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		938F7D702955CBAF001915CA /* View */ = {
+			isa = PBXGroup;
+			children = (
+				938F7D592955C8CB001915CA /* Delegates */,
+				938F7D632955C94F001915CA /* ChatViewController.swift */,
+				932354E72955F0A400EE367B /* ChatViewController+Delegates.swift */,
+				938F7D652955C966001915CA /* ChatInputBar.swift */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 		93E5D4DE2930027F00439298 /* AdamantCore */ = {
@@ -1555,8 +1636,9 @@
 		E919479920000FFD001362F8 /* Stories */ = {
 			isa = PBXGroup;
 			children = (
+				938F7D552955C05D001915CA /* Chat */,
 				E9E7CDA52002AE1C00DFC4DB /* Account */,
-				E95F857B2008C8B20070534A /* Chats */,
+				E95F857B2008C8B20070534A /* ChatsList */,
 				644EC35020EFA96700F40C73 /* Delegates */,
 				E919479A20001007001362F8 /* Login */,
 				E93EB09D20DA3F3A001F9601 /* NodesEditor */,
@@ -1791,14 +1873,12 @@
 			path = l18n;
 			sourceTree = "<group>";
 		};
-		E95F857B2008C8B20070534A /* Chats */ = {
+		E95F857B2008C8B20070534A /* ChatsList */ = {
 			isa = PBXGroup;
 			children = (
 				E95F857E2008C8D60070534A /* ChatsRoutes.swift */,
 				E95F85842008CB3A0070534A /* ChatListViewController.swift */,
 				E94E7B00205D3F090042B639 /* ChatListViewController.xib */,
-				E93EFE12200D1156000BB482 /* ChatViewController.swift */,
-				E9150B7F2066861D0065A985 /* ChatViewController+MessageKit.swift */,
 				E9C51EF02013F18000385EB7 /* NewChatViewController.swift */,
 				E9AA8BF72129F13000F9249F /* ComplexTransferViewController.swift */,
 				E95F85C5200A9B070070534A /* ChatTableViewCell.swift */,
@@ -1809,7 +1889,7 @@
 				649D6BF121C27D5C009E727B /* SearchResultsViewController.swift */,
 				6406D74821C7F06000196713 /* SearchResultsViewController.xib */,
 			);
-			path = Chats;
+			path = ChatsList;
 			sourceTree = "<group>";
 		};
 		E95F859220094B8E0070534A /* CoreData */ = {
@@ -1952,6 +2032,7 @@
 		E9771DA322997DAB0099AAC7 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				931A2953295BA52E0022CAA3 /* Combine */,
 				E940086F2114EA6800CD2D67 /* AdamantBalanceFormat.swift */,
 				E9771D9F22997D320099AAC7 /* AdamantUtilities.swift */,
 				E9204B4F20C94C4A00F3B9AB /* Date+adamant.swift */,
@@ -1961,7 +2042,7 @@
 				E927171D20C04613002BB9A6 /* UIColor+hex.swift */,
 				E935C84C22AC06E500A8CA2F /* RichMessageTools.swift */,
 				553B1283281C6EE100FFF24C /* GCDUtilites.swift */,
-				5522A43F28B758530029B543 /* UIKitUtilites.swift */,
+				5522A43F28B758530029B543 /* MessageKit+Utilities.swift */,
 				550698B528C00AED000E8A2B /* CollectionUtilites.swift */,
 				55FBAAF428C54B230066E629 /* Nodes+Allowance.swift */,
 				930B57762934D44700F3E539 /* Encodable+Dictionary.swift */,
@@ -2213,6 +2294,7 @@
 				557AC305287B10D8004699D7 /* SnapKit */,
 				416F5EA3290162EB00EF0400 /* SocketIO */,
 				93FA403529401BFC00D20DB6 /* PopupKit */,
+				938F7D572955C1DA001915CA /* MessageKit */,
 			);
 			productName = Adamant;
 			productReference = E913C8EE1FFFA51D001A83F7 /* Adamant.app */;
@@ -2359,24 +2441,25 @@
 			);
 			mainGroup = E913C8E51FFFA51D001A83F7;
 			packageReferences = (
-				A5785ADD262C63580001BC66 /* XCRemoteSwiftPackageReference "web3swift.git" */,
-				A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium.git" */,
-				A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift.git" */,
-				A50AEB02262C815200B37C22 /* XCRemoteSwiftPackageReference "EFQRCode.git" */,
-				A50AEB0A262C81E300B37C22 /* XCRemoteSwiftPackageReference "QRCodeReader.swift.git" */,
-				A50AEB12262C837900B37C22 /* XCRemoteSwiftPackageReference "Alamofire.git" */,
-				A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit.git" */,
-				A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools.git" */,
-				A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess.git" */,
-				A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor.git" */,
-				A544F0D2262C9878001F1A6D /* XCRemoteSwiftPackageReference "Eureka.git" */,
-				A5F0A049262C9CA90009672A /* XCRemoteSwiftPackageReference "Swinject.git" */,
-				A5C99E0C262C9E3A00F7B1B7 /* XCRemoteSwiftPackageReference "Reachability.swift" */,
-				A5D87BA1262CA01D00DC28F0 /* XCRemoteSwiftPackageReference "ProcedureKit.git" */,
+				A5785ADD262C63580001BC66 /* XCRemoteSwiftPackageReference "web3swift" */,
+				A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */,
+				A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */,
+				A50AEB02262C815200B37C22 /* XCRemoteSwiftPackageReference "EFQRCode" */,
+				A50AEB0A262C81E300B37C22 /* XCRemoteSwiftPackageReference "QRCodeReader.swift" */,
+				A50AEB12262C837900B37C22 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit" */,
+				A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools" */,
+				A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
+				A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor" */,
+				A544F0D2262C9878001F1A6D /* XCRemoteSwiftPackageReference "Eureka" */,
+				A5F0A049262C9CA90009672A /* XCRemoteSwiftPackageReference "Swinject" */,
+				A5C99E0C262C9E3A00F7B1B7 /* XCRemoteSwiftPackageReference "Reachability" */,
+				A5D87BA1262CA01D00DC28F0 /* XCRemoteSwiftPackageReference "ProcedureKit" */,
 				A5AC8DFD262E0B030053A7E2 /* XCRemoteSwiftPackageReference "SipHash" */,
 				3A8875ED27BBF38D00436195 /* XCRemoteSwiftPackageReference "Parchment" */,
-				557AC304287B10D8004699D7 /* XCRemoteSwiftPackageReference "SnapKit.git" */,
-				416F5EA2290162EB00EF0400 /* XCRemoteSwiftPackageReference "socket.io-client-swift" */,
+				557AC304287B10D8004699D7 /* XCRemoteSwiftPackageReference "SnapKit" */,
+				416F5EA2290162EB00EF0400 /* XCRemoteSwiftPackageReference "socket" */,
+				938F7D562955C1DA001915CA /* XCRemoteSwiftPackageReference "MessageKit" */,
 			);
 			productRefGroup = E913C8EF1FFFA51D001A83F7 /* Products */;
 			projectDirPath = "";
@@ -2552,16 +2635,12 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Adamant/Pods-Adamant-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/FreakingSimpleRoundImageView/FreakingSimpleRoundImageView.framework",
-				"${BUILT_PRODUCTS_DIR}/MessageInputBar/MessageInputBar.framework",
-				"${BUILT_PRODUCTS_DIR}/MessageKit/MessageKit.framework",
 				"${BUILT_PRODUCTS_DIR}/MyLittlePinpad/MyLittlePinpad.framework",
 				"${BUILT_PRODUCTS_DIR}/PMAlertController/PMAlertController.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FreakingSimpleRoundImageView.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MessageInputBar.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MessageKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MyLittlePinpad.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PMAlertController.framework",
 			);
@@ -2624,8 +2703,9 @@
 				E908472A2196FEA80095825D /* RichMessageTransaction+CoreDataClass.swift in Sources */,
 				4E9EE86F28CE793D008359F7 /* SafeDecimalRow.swift in Sources */,
 				64A223D620F760BB005157CB /* Localization.swift in Sources */,
+				932354E82955F0A400EE367B /* ChatViewController+Delegates.swift in Sources */,
 				64E1C82F222E95F6006C4DA7 /* DogeWallet.swift in Sources */,
-				5522A44028B758530029B543 /* UIKitUtilites.swift in Sources */,
+				5522A44028B758530029B543 /* MessageKit+Utilities.swift in Sources */,
 				E9484B7D2285BAD9008E10F0 /* PrivateKeyGenerator.swift in Sources */,
 				E94E7B08205D4CB80042B639 /* SharedRoutes.swift in Sources */,
 				E9960B3621F5154300C840A8 /* DummyAccount+CoreDataProperties.swift in Sources */,
@@ -2636,19 +2716,23 @@
 				648DD7A42237DB9E00B811FD /* DogeWalletService+Send.swift in Sources */,
 				E9942B84203CBFCE00C163AF /* AdamantQRTools.swift in Sources */,
 				6403F5E422723F8C00D58779 /* DashWalletService.swift in Sources */,
+				9371E561295CD53100438F2C /* ChatLocalization.swift in Sources */,
 				E908472F2196FEA80095825D /* BaseTransaction+CoreDataProperties.swift in Sources */,
 				640EFA902558612100E9724B /* RichMessageNotificationProvider.swift in Sources */,
 				E96D64B92295BED700CA5587 /* StateType.swift in Sources */,
 				E94008872114F05B00CD2D67 /* AddressValidationResult.swift in Sources */,
 				E974D168215D033C003AD7E8 /* ChatCell.swift in Sources */,
 				64A223D820F7A08E005157CB /* LskApiService.swift in Sources */,
+				938F7D6F2955CB41001915CA /* ChatViewModel+Message.swift in Sources */,
 				E94008702114EA6800CD2D67 /* AdamantBalanceFormat.swift in Sources */,
 				E9E7CD8F20026CD300DFC4DB /* AdamantDialogService.swift in Sources */,
 				E96D64B12295A88400CA5587 /* String+utilites.swift in Sources */,
 				E993301E212EF39700CD5200 /* EthTransferViewController.swift in Sources */,
 				E9CAE8DA2018ACD300345E76 /* AdamantApi+Chats.swift in Sources */,
+				938F7D6D2955CB30001915CA /* ChatViewModel+Sender.swift in Sources */,
 				648CE3A42299A94D0070A2CC /* DashTransactionDetailsViewController.swift in Sources */,
 				E90847362196FEA80095825D /* Chatroom+CoreDataClass.swift in Sources */,
+				93B266B82959E00E00D6444D /* Message+ChatTransaction.swift in Sources */,
 				E96D64C52295C3ED00CA5587 /* Crypto.swift in Sources */,
 				E91947B020002393001362F8 /* AdamantApiService.swift in Sources */,
 				E921597B206503000000CA5C /* ButtonsStripeView.swift in Sources */,
@@ -2723,7 +2807,7 @@
 				A50A41112822FC35006BDFE1 /* BtcWalletService+RichMessageProviderWithStatusCheck.swift in Sources */,
 				E926E032213EC43B005E536B /* FullscreenAlertView.swift in Sources */,
 				644EC35B20EFB8E900F40C73 /* AdamantDelegateCell.swift in Sources */,
-				6403F5DB2272389800D58779 /* BuildFile in Sources */,
+				6403F5DB2272389800D58779 /* (null) in Sources */,
 				6416B1A521AEE157006089AC /* LskWalletService+Transfers.swift in Sources */,
 				648DD7A62237DC4000B811FD /* DogeTransferViewController.swift in Sources */,
 				E9960B3421F5154300C840A8 /* BaseAccount+CoreDataProperties.swift in Sources */,
@@ -2747,6 +2831,7 @@
 				E9A03FD220DBC0F2007653A1 /* NodeEditorViewController.swift in Sources */,
 				E96D64B82295BED700CA5587 /* ChatType.swift in Sources */,
 				E9393FAA2055D03300EE6F30 /* AdamantMessage.swift in Sources */,
+				938F7D692955C9EC001915CA /* ChatViewModel.swift in Sources */,
 				E96D64D62295C9CB00CA5587 /* NativeAdamantCore.swift in Sources */,
 				E90A494D204DA932009F6A65 /* LocalAuthentication.swift in Sources */,
 				E96D64C62295C3ED00CA5587 /* Mnemonic+extended.swift in Sources */,
@@ -2757,6 +2842,7 @@
 				E9E7CDAF2002B8A100DFC4DB /* Router.swift in Sources */,
 				E940088F2119A9E800CD2D67 /* BigInt+Decimal.swift in Sources */,
 				E9E7CDC72003F6D200DFC4DB /* TransactionTableViewCell.swift in Sources */,
+				938F7D5D2955C8F9001915CA /* ChatLayoutDelegate.swift in Sources */,
 				6403F5DE22723C6800D58779 /* DashMainnet.swift in Sources */,
 				649D6BEA21B9627B009E727B /* LskWalletService+RichMessageProviderWithStatusCheck.swift in Sources */,
 				E940088B2114F63000CD2D67 /* NSRegularExpression+adamant.swift in Sources */,
@@ -2764,6 +2850,7 @@
 				E9B3D3A9202082450019EB36 /* AdamantTransfersProvider.swift in Sources */,
 				6449BA71235CA0930033B936 /* ERC20WalletService+RichMessageProvider.swift in Sources */,
 				648BCA6B213D37A900875EB5 /* AdamantAvatarService.swift in Sources */,
+				938F7D642955C94F001915CA /* ChatViewController.swift in Sources */,
 				E9A174B72057F1B3003667CD /* AdamantChatsProvider+backgroundFetch.swift in Sources */,
 				E96BBE3321F71290009AA738 /* BuyAndSellViewController.swift in Sources */,
 				64EAB37422463E020018D9B2 /* CurrencyInfoService.swift in Sources */,
@@ -2783,7 +2870,6 @@
 				E95F85802008C8D70070534A /* ChatsRoutes.swift in Sources */,
 				6416B1A721B024B6006089AC /* LskWalletService+Send.swift in Sources */,
 				E9942B87203D9E5100C163AF /* EurekaQRRow.swift in Sources */,
-				E93EFE13200D1156000BB482 /* ChatViewController.swift in Sources */,
 				E9AA8C02212C5BF500F9249F /* AdmWalletService+Send.swift in Sources */,
 				E90847332196FEA80095825D /* TransferTransaction+CoreDataProperties.swift in Sources */,
 				E9FEECAC2143CEED007DD7C8 /* TransferMessageSizeCalculator.swift in Sources */,
@@ -2803,6 +2889,7 @@
 				E9CAE8D42018AC1800345E76 /* AdamantApi+Keys.swift in Sources */,
 				E96D64B22295BED600CA5587 /* TransactionAsset.swift in Sources */,
 				E9C51EEF20139DC600385EB7 /* TransactionIdResponse.swift in Sources */,
+				931A2955295BA5450022CAA3 /* Combine+Typealiases.swift in Sources */,
 				A50A41092822F8CE006BDFE1 /* BtcWalletViewController.swift in Sources */,
 				E9722066201F42BB004F2AAD /* CoreDataStack.swift in Sources */,
 				E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */,
@@ -2810,10 +2897,10 @@
 				648DD79E2236A0B500B811FD /* DogeTransactionsViewController.swift in Sources */,
 				E905D39B2048A9BD00DDB504 /* KeychainStore.swift in Sources */,
 				64B5736F2209B892005DC968 /* BtcTransactionDetailsViewController.swift in Sources */,
+				938F7D612955C92B001915CA /* ChatDataSource.swift in Sources */,
 				E9AA8BFC212C169200F9249F /* EthWalletService+Transfers.swift in Sources */,
 				E96D64C82295C44400CA5587 /* Data+utilites.swift in Sources */,
 				64E1C82D222E95E2006C4DA7 /* DogeWalletRoutes.swift in Sources */,
-				E9150B802066861D0065A985 /* ChatViewController+MessageKit.swift in Sources */,
 				E90055F920ECD86800D0CB2D /* SecurityViewController+StayIn.swift in Sources */,
 				E90847322196FEA80095825D /* TransferTransaction+CoreDataClass.swift in Sources */,
 				9304F8C6292F971600173F18 /* ApiServiceResult.swift in Sources */,
@@ -2887,6 +2974,7 @@
 				A5E04229282A998C0076CD13 /* BtcTransactionResponse.swift in Sources */,
 				644EC34F20EFA77A00F40C73 /* Delegate.swift in Sources */,
 				64EAB37622463F680018D9B2 /* AdamantCurrencyInfoService.swift in Sources */,
+				938F7D5B2955C8DA001915CA /* ChatDisplayDelegate.swift in Sources */,
 				E9722068201F42CC004F2AAD /* InMemoryCoreDataStack.swift in Sources */,
 				551F66E628959A5300DE5D69 /* LoadingView.swift in Sources */,
 				E98FC34420F920BD00032D65 /* UIFont+adamant.swift in Sources */,
@@ -2904,6 +2992,8 @@
 				E93B0D762028B28E00126346 /* AdamantChatsProvider.swift in Sources */,
 				E993302021354B1800CD5200 /* AdmWalletRoutes.swift in Sources */,
 				E9332B8921F1FA4400D56E72 /* OnboardRoutes.swift in Sources */,
+				938F7D722955CE72001915CA /* ChatFactory.swift in Sources */,
+				938F7D5F2955C90D001915CA /* ChatInputBarDelegate.swift in Sources */,
 				E908472D2196FEA80095825D /* CoreDataAccount+CoreDataProperties.swift in Sources */,
 				64FA53D120E24942006783C9 /* TransactionDetailsViewControllerBase.swift in Sources */,
 				64BD2B7720E2820300E2CD36 /* TransactionDetails.swift in Sources */,
@@ -2926,6 +3016,7 @@
 				E90847352196FEA80095825D /* MessageTransaction+CoreDataProperties.swift in Sources */,
 				E9771DA722997F310099AAC7 /* ServerResponseWithTimestamp.swift in Sources */,
 				E9A03FD420DBC824007653A1 /* NodeVersion.swift in Sources */,
+				931A2957295BA5710022CAA3 /* CurrentValueGetterSubject.swift in Sources */,
 				648CE3AA229AD1F90070A2CC /* DashWalletService+RichMessageProviderWithStatusCheck.swift in Sources */,
 				E90847342196FEA80095825D /* MessageTransaction+CoreDataClass.swift in Sources */,
 				E9960B3521F5154300C840A8 /* DummyAccount+CoreDataClass.swift in Sources */,
@@ -2950,6 +3041,7 @@
 				E905D39D204C13B900DDB504 /* SecuredStore.swift in Sources */,
 				648CE3A8229AD1E20070A2CC /* DashWalletService+RichMessageProvider.swift in Sources */,
 				E90055FB20ECE78A00D0CB2D /* SecurityViewController+notifications.swift in Sources */,
+				938F7D662955C966001915CA /* ChatInputBar.swift in Sources */,
 				A50A41122822FC35006BDFE1 /* BtcWalletService+RichMessageProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3637,7 +3729,7 @@
 				kind = branch;
 			};
 		};
-		416F5EA2290162EB00EF0400 /* XCRemoteSwiftPackageReference "socket.io-client-swift" */ = {
+		416F5EA2290162EB00EF0400 /* XCRemoteSwiftPackageReference "socket" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/socketio/socket.io-client-swift";
 			requirement = {
@@ -3645,7 +3737,7 @@
 				kind = branch;
 			};
 		};
-		557AC304287B10D8004699D7 /* XCRemoteSwiftPackageReference "SnapKit.git" */ = {
+		557AC304287B10D8004699D7 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
 			requirement = {
@@ -3653,7 +3745,15 @@
 				minimumVersion = 5.0.0;
 			};
 		};
-		A50AEB02262C815200B37C22 /* XCRemoteSwiftPackageReference "EFQRCode.git" */ = {
+		938F7D562955C1DA001915CA /* XCRemoteSwiftPackageReference "MessageKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/MessageKit/MessageKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.0;
+			};
+		};
+		A50AEB02262C815200B37C22 /* XCRemoteSwiftPackageReference "EFQRCode" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/EFPrefix/EFQRCode.git";
 			requirement = {
@@ -3661,7 +3761,7 @@
 				minimumVersion = 6.1.0;
 			};
 		};
-		A50AEB0A262C81E300B37C22 /* XCRemoteSwiftPackageReference "QRCodeReader.swift.git" */ = {
+		A50AEB0A262C81E300B37C22 /* XCRemoteSwiftPackageReference "QRCodeReader.swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/yannickl/QRCodeReader.swift.git";
 			requirement = {
@@ -3669,7 +3769,7 @@
 				minimumVersion = 10.1.1;
 			};
 		};
-		A50AEB12262C837900B37C22 /* XCRemoteSwiftPackageReference "Alamofire.git" */ = {
+		A50AEB12262C837900B37C22 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
 			requirement = {
@@ -3677,7 +3777,7 @@
 				minimumVersion = 5.4.2;
 			};
 		};
-		A544F0D2262C9878001F1A6D /* XCRemoteSwiftPackageReference "Eureka.git" */ = {
+		A544F0D2262C9878001F1A6D /* XCRemoteSwiftPackageReference "Eureka" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/xmartlabs/Eureka.git";
 			requirement = {
@@ -3685,7 +3785,7 @@
 				minimumVersion = 5.3.3;
 			};
 		};
-		A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools.git" */ = {
+		A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/maniramezan/DateTools.git";
 			requirement = {
@@ -3693,7 +3793,7 @@
 				kind = branch;
 			};
 		};
-		A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess.git" */ = {
+		A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess.git";
 			requirement = {
@@ -3701,7 +3801,7 @@
 				minimumVersion = 4.2.2;
 			};
 		};
-		A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor.git" */ = {
+		A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/RNCryptor/RNCryptor.git";
 			requirement = {
@@ -3709,7 +3809,7 @@
 				minimumVersion = 5.1.0;
 			};
 		};
-		A5785ADD262C63580001BC66 /* XCRemoteSwiftPackageReference "web3swift.git" */ = {
+		A5785ADD262C63580001BC66 /* XCRemoteSwiftPackageReference "web3swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/skywinder/web3swift.git";
 			requirement = {
@@ -3725,7 +3825,7 @@
 				minimumVersion = 1.2.2;
 			};
 		};
-		A5C99E0C262C9E3A00F7B1B7 /* XCRemoteSwiftPackageReference "Reachability.swift" */ = {
+		A5C99E0C262C9E3A00F7B1B7 /* XCRemoteSwiftPackageReference "Reachability" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ashleymills/Reachability.swift";
 			requirement = {
@@ -3733,7 +3833,7 @@
 				minimumVersion = 5.1.0;
 			};
 		};
-		A5D87BA1262CA01D00DC28F0 /* XCRemoteSwiftPackageReference "ProcedureKit.git" */ = {
+		A5D87BA1262CA01D00DC28F0 /* XCRemoteSwiftPackageReference "ProcedureKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ProcedureKit/ProcedureKit.git";
 			requirement = {
@@ -3741,7 +3841,7 @@
 				minimumVersion = 5.2.0;
 			};
 		};
-		A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium.git" */ = {
+		A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/jedisct1/swift-sodium.git";
 			requirement = {
@@ -3749,7 +3849,7 @@
 				minimumVersion = 0.9.1;
 			};
 		};
-		A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift.git" */ = {
+		A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/krzyzanowskim/CryptoSwift.git";
 			requirement = {
@@ -3757,7 +3857,7 @@
 				minimumVersion = 1.5.0;
 			};
 		};
-		A5F0A049262C9CA90009672A /* XCRemoteSwiftPackageReference "Swinject.git" */ = {
+		A5F0A049262C9CA90009672A /* XCRemoteSwiftPackageReference "Swinject" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Swinject/Swinject.git";
 			requirement = {
@@ -3765,7 +3865,7 @@
 				minimumVersion = 2.7.1;
 			};
 		};
-		A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit.git" */ = {
+		A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/bmoliveira/MarkdownKit.git";
 			requirement = {
@@ -3783,23 +3883,28 @@
 		};
 		416F5EA3290162EB00EF0400 /* SocketIO */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 416F5EA2290162EB00EF0400 /* XCRemoteSwiftPackageReference "socket.io-client-swift" */;
+			package = 416F5EA2290162EB00EF0400 /* XCRemoteSwiftPackageReference "socket" */;
 			productName = SocketIO;
 		};
 		557AC305287B10D8004699D7 /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 557AC304287B10D8004699D7 /* XCRemoteSwiftPackageReference "SnapKit.git" */;
+			package = 557AC304287B10D8004699D7 /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
 		};
 		55D1D84E287B78F200F94A4E /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 557AC304287B10D8004699D7 /* XCRemoteSwiftPackageReference "SnapKit.git" */;
+			package = 557AC304287B10D8004699D7 /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
 		};
 		55D1D850287B78FC00F94A4E /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 557AC304287B10D8004699D7 /* XCRemoteSwiftPackageReference "SnapKit.git" */;
+			package = 557AC304287B10D8004699D7 /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
+		};
+		938F7D572955C1DA001915CA /* MessageKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 938F7D562955C1DA001915CA /* XCRemoteSwiftPackageReference "MessageKit" */;
+			productName = MessageKit;
 		};
 		93FA403529401BFC00D20DB6 /* PopupKit */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -3807,102 +3912,102 @@
 		};
 		A50AEB03262C815200B37C22 /* EFQRCode */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A50AEB02262C815200B37C22 /* XCRemoteSwiftPackageReference "EFQRCode.git" */;
+			package = A50AEB02262C815200B37C22 /* XCRemoteSwiftPackageReference "EFQRCode" */;
 			productName = EFQRCode;
 		};
 		A50AEB0B262C81E300B37C22 /* QRCodeReader */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A50AEB0A262C81E300B37C22 /* XCRemoteSwiftPackageReference "QRCodeReader.swift.git" */;
+			package = A50AEB0A262C81E300B37C22 /* XCRemoteSwiftPackageReference "QRCodeReader.swift" */;
 			productName = QRCodeReader;
 		};
 		A50AEB13262C837900B37C22 /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A50AEB12262C837900B37C22 /* XCRemoteSwiftPackageReference "Alamofire.git" */;
+			package = A50AEB12262C837900B37C22 /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
 		};
 		A5241B6F262DEDE1009FA43E /* Clibsodium */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium.git" */;
+			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
 			productName = Clibsodium;
 		};
 		A5241B76262DEDEF009FA43E /* Clibsodium */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium.git" */;
+			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
 			productName = Clibsodium;
 		};
 		A5241B7D262DEDFE009FA43E /* Clibsodium */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium.git" */;
+			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
 			productName = Clibsodium;
 		};
 		A544F0D3262C9878001F1A6D /* Eureka */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A544F0D2262C9878001F1A6D /* XCRemoteSwiftPackageReference "Eureka.git" */;
+			package = A544F0D2262C9878001F1A6D /* XCRemoteSwiftPackageReference "Eureka" */;
 			productName = Eureka;
 		};
 		A57282C9262C94CD00C96FA8 /* DateToolsSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools.git" */;
+			package = A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools" */;
 			productName = DateToolsSwift;
 		};
 		A57282D0262C94DA00C96FA8 /* DateToolsSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools.git" */;
+			package = A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools" */;
 			productName = DateToolsSwift;
 		};
 		A57282D2262C94DF00C96FA8 /* DateToolsSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools.git" */;
+			package = A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools" */;
 			productName = DateToolsSwift;
 		};
 		A57282D4262C94E500C96FA8 /* DateToolsSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools.git" */;
+			package = A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools" */;
 			productName = DateToolsSwift;
 		};
 		A57839FA262C95BF00428183 /* KeychainAccess */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess.git" */;
+			package = A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
 			productName = KeychainAccess;
 		};
 		A5783A01262C95CA00428183 /* KeychainAccess */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess.git" */;
+			package = A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
 			productName = KeychainAccess;
 		};
 		A5783A08262C95D000428183 /* KeychainAccess */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess.git" */;
+			package = A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
 			productName = KeychainAccess;
 		};
 		A5783A0A262C95D500428183 /* KeychainAccess */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess.git" */;
+			package = A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
 			productName = KeychainAccess;
 		};
 		A5783A0D262C964500428183 /* RNCryptor */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor.git" */;
+			package = A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor" */;
 			productName = RNCryptor;
 		};
 		A5783A14262C965000428183 /* RNCryptor */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor.git" */;
+			package = A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor" */;
 			productName = RNCryptor;
 		};
 		A5783A1B262C965600428183 /* RNCryptor */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor.git" */;
+			package = A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor" */;
 			productName = RNCryptor;
 		};
 		A5783A1D262C965D00428183 /* RNCryptor */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor.git" */;
+			package = A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor" */;
 			productName = RNCryptor;
 		};
 		A5785ADE262C63580001BC66 /* web3swift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5785ADD262C63580001BC66 /* XCRemoteSwiftPackageReference "web3swift.git" */;
+			package = A5785ADD262C63580001BC66 /* XCRemoteSwiftPackageReference "web3swift" */;
 			productName = web3swift;
 		};
 		A5AC8DFE262E0B030053A7E2 /* SipHash */ = {
@@ -3912,37 +4017,37 @@
 		};
 		A5C99E0D262C9E3A00F7B1B7 /* Reachability */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5C99E0C262C9E3A00F7B1B7 /* XCRemoteSwiftPackageReference "Reachability.swift" */;
+			package = A5C99E0C262C9E3A00F7B1B7 /* XCRemoteSwiftPackageReference "Reachability" */;
 			productName = Reachability;
 		};
 		A5D87BA2262CA01D00DC28F0 /* ProcedureKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5D87BA1262CA01D00DC28F0 /* XCRemoteSwiftPackageReference "ProcedureKit.git" */;
+			package = A5D87BA1262CA01D00DC28F0 /* XCRemoteSwiftPackageReference "ProcedureKit" */;
 			productName = ProcedureKit;
 		};
 		A5DBBABC262C7221004AC028 /* Clibsodium */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium.git" */;
+			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
 			productName = Clibsodium;
 		};
 		A5DBBADB262C729B004AC028 /* CryptoSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift.git" */;
+			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
 			productName = CryptoSwift;
 		};
 		A5DBBAE2262C72B0004AC028 /* CryptoSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift.git" */;
+			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
 			productName = CryptoSwift;
 		};
 		A5DBBAE4262C72B7004AC028 /* CryptoSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift.git" */;
+			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
 			productName = CryptoSwift;
 		};
 		A5DBBAE6262C72BD004AC028 /* CryptoSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift.git" */;
+			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
 			productName = CryptoSwift;
 		};
 		A5DBBAED262C72EF004AC028 /* BitcoinKit */ = {
@@ -3955,27 +4060,27 @@
 		};
 		A5F0A04A262C9CA90009672A /* Swinject */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5F0A049262C9CA90009672A /* XCRemoteSwiftPackageReference "Swinject.git" */;
+			package = A5F0A049262C9CA90009672A /* XCRemoteSwiftPackageReference "Swinject" */;
 			productName = Swinject;
 		};
 		A5F92993262C855B00C3E60A /* MarkdownKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit.git" */;
+			package = A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit" */;
 			productName = MarkdownKit;
 		};
 		A5F929AE262C857D00C3E60A /* MarkdownKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit.git" */;
+			package = A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit" */;
 			productName = MarkdownKit;
 		};
 		A5F929B5262C858700C3E60A /* MarkdownKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit.git" */;
+			package = A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit" */;
 			productName = MarkdownKit;
 		};
 		A5F929B7262C858F00C3E60A /* MarkdownKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit.git" */;
+			package = A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit" */;
 			productName = MarkdownKit;
 		};
 /* End XCSwiftPackageProductDependency section */

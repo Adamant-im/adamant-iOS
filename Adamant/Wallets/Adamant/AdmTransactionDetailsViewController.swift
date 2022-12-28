@@ -98,8 +98,7 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
             return
         }
 
-        vc.account = account
-        vc.chatroom = chatroom
+        vc.viewModel.setup(account: account, chatroom: chatroom, messageToShow: nil)
         vc.hidesBottomBarWhenPushed = true
 
         if let nav = self.navigationController {

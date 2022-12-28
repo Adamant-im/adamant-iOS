@@ -8,6 +8,7 @@
 
 import Foundation
 import MessageKit
+import UIKit
 
 extension EthWalletService: RichMessageProvider {
     

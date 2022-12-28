@@ -173,7 +173,7 @@ class SearchResultsViewController: UITableViewController {
         
         cell.lastMessageLabel.attributedText = shortDescription(for: message)
         
-        if let date = message.sentDate as Date?, date != Date.adamantNullDate {
+        if let date = message.dateValue, date != .adamantNullDate {
             cell.dateLabel.text = date.humanizedDay()
         } else {
             cell.dateLabel.text = nil
