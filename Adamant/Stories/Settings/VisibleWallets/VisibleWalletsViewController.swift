@@ -79,8 +79,7 @@ class VisibleWalletsViewController: UIViewController {
         
         view.addSubview(tableView)
         tableView.snp.makeConstraints { make in
-            make.left.right.bottom.equalToSuperview()
-            make.top.equalToSuperview().offset(15)
+            make.top.left.right.bottom.equalToSuperview()
         }
     }
     
@@ -111,12 +110,26 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
         return UIView()
     }
     
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        return UIView()
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 0
+    }
+    
     // MARK: Cells
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as? VisibleWalletsTableViewCell else {
             return UITableViewCell(style: .default, reuseIdentifier: cellIdentifier)
         }
         cell.selectionStyle = .none
+        
+        cell.separatorInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 0)
+        let maxCount = filteredWallets?.count ?? wallets.count
+        if indexPath.row == maxCount - 1 {
+            cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        }
         
         let wallet: WalletService
         if let filtered = filteredWallets {

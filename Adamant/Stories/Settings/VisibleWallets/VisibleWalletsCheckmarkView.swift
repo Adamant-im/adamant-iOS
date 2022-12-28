@@ -52,6 +52,7 @@ final class VisibleWalletsCheckmarkRowView: UIView {
         didSet {
             if let balance = balance {
                 balanceLabel.font = balance == 0 ? captionLabel.font : titleLabel.font
+                balanceLabel.textColor = balance == 0 ? captionLabel.textColor : titleLabel.textColor
                 if balance < 1 {
                     balanceLabel.text = AdamantBalanceFormat.compact.format(balance)
                 } else {
