@@ -29,6 +29,7 @@ class VisibleWalletsViewController: UIViewController {
         tableView.dataSource = self
         tableView.setEditing(true, animated: true)
         tableView.allowsSelectionDuringEditing = true
+        tableView.refreshControl = refreshControl
         return tableView
     }()
     
@@ -47,9 +48,17 @@ class VisibleWalletsViewController: UIViewController {
     
     // MARK: - Properties
     
+    private lazy var refreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
+        refreshControl.addTarget(self, action: #selector(updateBalances), for: UIControl.Event.valueChanged)
+        return refreshControl
+    }()
+    
     private let cellIdentifier = "cell"
     private var filteredWallets: [WalletService]?
     private var wallets: [WalletService] = []
+    private var previousAppState: UIApplication.State?
     
     override func loadView() {
         view = UIView()
@@ -70,6 +79,41 @@ class VisibleWalletsViewController: UIViewController {
         }
         
         setupView()
+        addObservers()
+        updateBalances()
+    }
+    
+    private func addObservers() {
+        for wallet in wallets {
+            let notification = wallet.walletUpdatedNotification
+            let callback: ((Notification) -> Void) = { [weak self] _ in
+                guard let self = self else { return }
+                print("updating")
+                self.tableView.reloadData()
+            }
+
+            NotificationCenter.default.addObserver(forName: notification,
+                                                   object: wallet,
+                                                   queue: OperationQueue.main,
+                                                   using: callback)
+        }
+        
+        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            if let previousAppState = self?.previousAppState,
+               previousAppState == .background {
+                self?.previousAppState = .active
+                self?.updateBalances()
+            }
+        }
+        
+        NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.previousAppState = .background
+        }
+    }
+    
+    @objc private func updateBalances() {
+        refreshControl.endRefreshing()
+        NotificationCenter.default.post(name: .AdamantAccountService.forceUpdateBalance, object: nil)
     }
     
     private func setupView() {
