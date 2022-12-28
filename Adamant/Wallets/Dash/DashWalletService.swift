@@ -40,6 +40,14 @@ class DashWalletService: WalletService {
         return tokenNetworkSymbol + tokenSymbol
     }
     
+    var defaultVisibility: Bool {
+        return true
+    }
+    
+    var defaultOrdinalLevel: Int? {
+        return nil
+    }
+    
     var wallet: WalletAccount? { return dashWallet }
     
     var walletViewController: WalletViewController {

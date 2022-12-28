@@ -82,6 +82,14 @@ class BtcWalletService: WalletService {
         return tokenNetworkSymbol + tokenSymbol
     }
     
+    var defaultVisibility: Bool {
+        return false
+    }
+    
+    var defaultOrdinalLevel: Int? {
+        return 10
+    }
+    
     var wallet: WalletAccount? { return btcWallet }
     
     var walletViewController: WalletViewController {

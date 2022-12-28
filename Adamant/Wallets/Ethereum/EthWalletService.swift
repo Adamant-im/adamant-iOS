@@ -91,6 +91,14 @@ class EthWalletService: WalletService {
         return tokenNetworkSymbol + tokenSymbol
     }
     
+    var defaultVisibility: Bool {
+        return true
+    }
+    
+    var defaultOrdinalLevel: Int? {
+        return nil
+    }
+    
 	private (set) var transactionFee: Decimal = 0.0
 	
 	static let transferGas: Decimal = 21000

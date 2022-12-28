@@ -11,17 +11,24 @@ import Foundation
 class AdamantVisibleWalletsService: VisibleWalletsService {
     
     // MARK: Dependencies
-    var securedStore: SecuredStore!
+    let securedStore: SecuredStore
+    let accountService: AccountService
     
     // MARK: Proprieties
     private var invisibleWallets: [String] = []
     private var indexesWallets: [String: Int] = [:]
     
     // MARK: Lifecycle
-    init() {
+    init( securedStore: SecuredStore,
+          accountService: AccountService
+    ) {
+        self.securedStore = securedStore
+        self.accountService = accountService
+        
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
             self?.securedStore.remove(StoreKey.visibleWallets.invisibleWallets)
             self?.securedStore.remove(StoreKey.visibleWallets.indexWallets)
+            self?.securedStore.remove(StoreKey.visibleWallets.useCustomIndexes)
         }
         
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] _ in
@@ -50,6 +57,11 @@ class AdamantVisibleWalletsService: VisibleWalletsService {
     }
     
     func getInvisibleWallets() -> [String] {
+        guard isUseCustomFilter() else {
+            let wallets = accountService.wallets.filter { $0.defaultVisibility != true }.map { $0.tokenUnicID }
+            return wallets
+        }
+        
         guard let wallets: [String] = securedStore.get(StoreKey.visibleWallets.invisibleWallets) else {
             return []
         }
@@ -62,6 +74,7 @@ class AdamantVisibleWalletsService: VisibleWalletsService {
     
     private func setInvisibleWallets(_ wallets: [String]) {
         securedStore.set(wallets, for: StoreKey.visibleWallets.invisibleWallets)
+        securedStore.set(true, for: StoreKey.visibleWallets.useCustomIndexes)
         invisibleWallets = getInvisibleWallets()
     }
     
@@ -72,6 +85,23 @@ class AdamantVisibleWalletsService: VisibleWalletsService {
     }
     
     func getIndexPositionWallets(includeInvisible: Bool) -> [String : Int] {
+        guard isUseCustomFilter() else {
+            // Sort by default ordinal number
+            // Coins without an order are shown last, alphabetically
+            let walletsIV = includeInvisible ? accountService.wallets : accountService.wallets.filter { $0.defaultVisibility == true }
+            var walletsWithIndexes = walletsIV.filter { $0.defaultOrdinalLevel != nil }.sorted(by: { $0.defaultOrdinalLevel! < $1.defaultOrdinalLevel! })
+            let walletsWithNoIndexes = walletsIV.filter { $0.defaultOrdinalLevel == nil }.sorted(by: { $0.tokenName < $1.tokenName })
+            
+            walletsWithIndexes.append(contentsOf: walletsWithNoIndexes)
+            
+            var idexes: [String: Int] = [:]
+            for (index, wallet) in walletsWithIndexes.enumerated() {
+                idexes[wallet.tokenUnicID] = index
+            }
+            
+            return idexes
+        }
+        
         let path = !includeInvisible ? StoreKey.visibleWallets.indexWallets : StoreKey.visibleWallets.indexWalletsWithInvisible
         guard let indexes: [String: Int] = securedStore.get(path) else {
             return [:]
@@ -89,6 +119,7 @@ class AdamantVisibleWalletsService: VisibleWalletsService {
         let path = !includeInvisible ? StoreKey.visibleWallets.indexWallets : StoreKey.visibleWallets.indexWalletsWithInvisible
         securedStore.set(indexes, for: path)
         indexesWallets = getIndexPositionWallets(includeInvisible: false)
+        securedStore.set(true, for: StoreKey.visibleWallets.useCustomIndexes)
     }
     
     func setIndexPositionWallets(_ wallets: [WalletService], includeInvisible: Bool) {
@@ -98,5 +129,20 @@ class AdamantVisibleWalletsService: VisibleWalletsService {
             indexes[wallet.tokenUnicID] = index
         }
         setIndexPositionWallets(indexes, includeInvisible: includeInvisible)
+    }
+    
+    func reset() {
+        securedStore.set(false, for: StoreKey.visibleWallets.useCustomIndexes)
+        indexesWallets = getIndexPositionWallets(includeInvisible: false)
+        invisibleWallets = getInvisibleWallets()
+        NotificationCenter.default.post(name: Notification.Name.AdamantVisibleWalletsService.visibleWallets, object: nil)
+    }
+    
+    func isUseCustomFilter() -> Bool {
+        let path = StoreKey.visibleWallets.useCustomIndexes
+        guard let result: Bool = securedStore.get(path) else {
+            return false
+        }
+        return result
     }
 }

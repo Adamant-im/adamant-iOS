@@ -49,6 +49,14 @@ class ERC20WalletService: WalletService {
         return tokenNetworkSymbol + tokenSymbol + tokenContract
     }
     
+    var defaultVisibility: Bool {
+        return token?.defaultVisibility ?? false
+    }
+    
+    var defaultOrdinalLevel: Int? {
+        return token?.defaultOrdinalLevel
+    }
+    
     private (set) var transactionFee: Decimal = 0.0
     private (set) var diplayTransactionFee: Decimal = 0.0
     

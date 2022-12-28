@@ -49,6 +49,14 @@ class AdmWalletService: NSObject, WalletService {
         return tokenNetworkSymbol + tokenSymbol
     }
     
+    var defaultVisibility: Bool {
+        return true
+    }
+    
+    var defaultOrdinalLevel: Int? {
+        return nil
+    }
+    
 	// MARK: - Dependencies
 	weak var accountService: AccountService?
 	var apiService: ApiService!

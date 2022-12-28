@@ -89,6 +89,14 @@ class LskWalletService: WalletService {
         return tokenNetworkSymbol + tokenSymbol
     }
     
+    var defaultVisibility: Bool {
+        return false
+    }
+    
+    var defaultOrdinalLevel: Int? {
+        return nil
+    }
+    
 	// MARK: - Properties
 	let transferAvailable: Bool = true
     private var initialBalanceCheck = false

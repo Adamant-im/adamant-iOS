@@ -27,4 +27,6 @@ protocol VisibleWalletsService: AnyObject {
     func getIndexPosition(for wallet: WalletService) -> Int?
     func editIndexPosition(for wallet: WalletService, index: Int)
     func setIndexPositionWallets(_ wallets: [WalletService], includeInvisible: Bool)
+    
+    func reset()
 }

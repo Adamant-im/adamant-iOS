@@ -13,6 +13,8 @@ import SnapKit
 extension String.adamantLocalized {
     struct visibleWallets {
         static let title = NSLocalizedString("VisibleWallets.Title", comment: "Visible Wallets page: scene title")
+        static let resetAlertTitle = NSLocalizedString("VisibleWallets.ResetListAlert", comment: "VisibleWallets: Reset wallets alert title")
+        static let reset = NSLocalizedString("NodesList.ResetButton", comment: "NodesList: 'Reset' button")
         
         private init() { }
     }
@@ -23,6 +25,7 @@ class VisibleWalletsViewController: UIViewController {
     lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.register(VisibleWalletsTableViewCell.self, forCellReuseIdentifier: cellIdentifier)
+        tableView.register(VisibleWalletsResetTableViewCell.self, forCellReuseIdentifier: cellResetIdentifier)
         tableView.rowHeight = 50
         tableView.backgroundColor = .clear
         tableView.delegate = self
@@ -56,6 +59,7 @@ class VisibleWalletsViewController: UIViewController {
     }()
     
     private let cellIdentifier = "cell"
+    private let cellResetIdentifier = "cellReset"
     private var filteredWallets: [WalletService]?
     private var wallets: [WalletService] = []
     private var previousAppState: UIApplication.State?
@@ -67,17 +71,7 @@ class VisibleWalletsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        wallets = accountService.wallets
-        
-        // sort manually
-        visibleWalletsService.getIndexPositionWallets(includeInvisible: true).sorted { $0.value < $1.value }.forEach { tokenUnicID, newIndex in
-            guard let index = wallets.firstIndex(where: { wallet in
-                return wallet.tokenUnicID == tokenUnicID
-            }) else { return }
-            let wallet = wallets.remove(at: index)
-            wallets.insert(wallet, at: newIndex)
-        }
-        
+        loadWallets()
         setupView()
         addObservers()
         updateBalances()
@@ -88,10 +82,9 @@ class VisibleWalletsViewController: UIViewController {
             let notification = wallet.walletUpdatedNotification
             let callback: ((Notification) -> Void) = { [weak self] _ in
                 guard let self = self else { return }
-                print("updating")
                 self.tableView.reloadData()
             }
-
+            
             NotificationCenter.default.addObserver(forName: notification,
                                                    object: wallet,
                                                    queue: OperationQueue.main,
@@ -108,6 +101,19 @@ class VisibleWalletsViewController: UIViewController {
         
         NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.previousAppState = .background
+        }
+    }
+    
+    private func loadWallets() {
+        wallets = accountService.wallets
+        
+        // sort manually
+        visibleWalletsService.getIndexPositionWallets(includeInvisible: true).sorted { $0.value < $1.value }.forEach { tokenUnicID, newIndex in
+            guard let index = wallets.firstIndex(where: { wallet in
+                return wallet.tokenUnicID == tokenUnicID
+            }) else { return }
+            let wallet = wallets.remove(at: index)
+            wallets.insert(wallet, at: newIndex)
         }
     }
     
@@ -137,12 +143,34 @@ class VisibleWalletsViewController: UIViewController {
     private func isInvisible(_ wallet: WalletService) -> Bool {
         return visibleWalletsService.isInvisible(wallet)
     }
+    
+    private func resetWalletsAction() {
+        let alert = UIAlertController(title: String.adamantLocalized.visibleWallets.resetAlertTitle, message: nil, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(
+            title: .adamantLocalized.visibleWallets.reset,
+            style: .destructive,
+            handler: { [weak self] _ in
+                self?.visibleWalletsService.reset()
+                self?.loadWallets()
+                self?.tableView.reloadSections(IndexSet(integer: 0), with: .automatic)
+            }
+        ))
+        alert.modalPresentationStyle = .overFullScreen
+        present(alert, animated: true, completion: nil)
+    }
 }
 
 // MARK: - UITableView
 extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelegate {
 
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 2
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        guard section == 0 else { return 1 }
+        
         if let filtered = filteredWallets {
             return filtered.count
         } else {
@@ -151,7 +179,7 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
     }
     
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        return UIView()
+        return section == 0 ? nil : UIView()
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -164,6 +192,12 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
     
     // MARK: Cells
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard indexPath.section == 0 else {
+            let cell = tableView.dequeueReusableCell(withIdentifier: cellResetIdentifier, for: indexPath) as! VisibleWalletsResetTableViewCell
+            cell.selectionStyle = .default
+            return cell
+        }
+        
         guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as? VisibleWalletsTableViewCell else {
             return UITableViewCell(style: .default, reuseIdentifier: cellIdentifier)
         }
@@ -198,7 +232,11 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let cell = tableView.cellForRow(at: indexPath) as? VisibleWalletsTableViewCell else { return }
+        guard let cell = tableView.cellForRow(at: indexPath) as? VisibleWalletsTableViewCell else {
+            tableView.deselectRow(at: indexPath, animated: true)
+            resetWalletsAction()
+            return
+        }
         let wallet = wallets[indexPath.row]
         delegateCell(cell, didChangeCheckedStateTo: !isInvisible(wallet))
         tableView.reloadRows(at: [indexPath], with: .none)
@@ -213,10 +251,21 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
     }
     
     func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        guard indexPath.section == 0 else {
+            return false
+        }
         return true
     }
     
+    func tableView(_ tableView: UITableView, targetIndexPathForMoveFromRowAt sourceIndexPath: IndexPath, toProposedIndexPath proposedDestinationIndexPath: IndexPath) -> IndexPath {
+        guard proposedDestinationIndexPath.section == 0 else {
+            return sourceIndexPath
+        }
+        return proposedDestinationIndexPath
+    }
+    
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        guard destinationIndexPath.section == 0 else { return }
         let wallet = wallets.remove(at: sourceIndexPath.row)
         wallets.insert(wallet, at: destinationIndexPath.row)
         visibleWalletsService.setIndexPositionWallets(wallets, includeInvisible: true)
@@ -225,11 +274,22 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        guard indexPath.section == 0 else {
+            return false
+        }
         if filteredWallets != nil {
             return false
         } else {
             return true
         }
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        guard indexPath.section == 0 else {
+            return 45
+        }
+        
+        return UITableView.automaticDimension
     }
 }
 

@@ -376,6 +376,9 @@
 /* Visible Wallets page: scene title */
 "VisibleWallets.Title" = "Wallet-Liste";
 
+/* VisibleWallets: Reset wallets alert title */
+"VisibleWallets.ResetListAlert" = "Brieftaschenliste auf Standard zurücksetzen?";
+
 /* Delegates tab: Message about 50 ADM fee for vote */
 "Delegates.NotEnoughtTokensForVote" = "Nicht genug Tokens für die Abstimmung. Sie brauchen mindestens 50 ADM auf Ihrem Konto";
 

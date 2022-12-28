@@ -53,9 +53,10 @@ extension Container {
         
         // MARK: VisibleWalletsService
         self.register(VisibleWalletsService.self) { r in
-            let service = AdamantVisibleWalletsService()
-            service.securedStore = r.resolve(SecuredStore.self)
-            return service
+            AdamantVisibleWalletsService(
+                securedStore: r.resolve(SecuredStore.self)!,
+                accountService: r.resolve(AccountService.self)!
+            )
         }.inObjectScope(.container)
         
         // MARK: PushNotificationsTokenService
