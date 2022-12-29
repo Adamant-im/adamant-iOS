@@ -198,6 +198,7 @@ class ERC20TransferViewController: TransferViewControllerBase {
                         }
                     }
                 }
+                _ = self?.inputAccessoryView(for: row)
         }.onCellSelection { [weak self] (cell, _) in
             self?.shareValue(self?.recipientAddress, from: cell)
         }

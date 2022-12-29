@@ -201,6 +201,7 @@ class BtcTransferViewController: TransferViewControllerBase {
                 self?.skipValueChange = false
                 return
             }
+            _ = self?.inputAccessoryView(for: row)
         }.onCellSelection { [weak self] (cell, _) in
             self?.shareValue(self?.recipientAddress, from: cell)
         }
