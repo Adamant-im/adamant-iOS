@@ -22,9 +22,9 @@ enum AddressChatShareType {
     var localized: String {
         switch self {
         case .chat:
-            return "Chat with "
+            return NSLocalizedString("Shared.ChatWith", comment: "Shared alert 'Chat With' button. Used to chat with recipient")
         case .send:
-            return "Send ADM to "
+            return NSLocalizedString("Shared.SendAdmTo", comment: "Shared alert 'Send ADM To' button. Used to send ADM to recipient")
         }
     }
 }

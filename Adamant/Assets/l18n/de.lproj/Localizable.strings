@@ -760,6 +760,12 @@
 /* Shared alert 'Copy' button. Used anywhere. Used for copy-paste info. */
 "Shared.CopyToPasteboard" = "Kopieren";
 
+/* Shared alert 'Chat With' button. Used to chat with recipient */
+"Shared.ChatWith" = "Plaudern mit ";
+
+/* Shared alert 'Send ADM To' button. Used to send ADM to recipient */
+"Shared.SendAdmTo" = "Senden Sie ADM an ";
+
 /* Shared alert Done message. Used anywhere */
 "Shared.Done" = "Fertig";
 

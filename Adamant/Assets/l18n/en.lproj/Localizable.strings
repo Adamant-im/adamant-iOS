@@ -748,6 +748,12 @@
 /* Shared alert 'Copy' button. Used anywhere. Used for copy-paste info. */
 "Shared.CopyToPasteboard" = "Copy to Pasteboard";
 
+/* Shared alert 'Chat With' button. Used to chat with recipient */
+"Shared.ChatWith" = "Chat with ";
+
+/* Shared alert 'Send ADM To' button. Used to send ADM to recipient */
+"Shared.SendAdmTo" = "Send ADM to ";
+
 /* Shared alert Done message. Used anywhere */
 "Shared.Done" = "Done";
 

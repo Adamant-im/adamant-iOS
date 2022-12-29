@@ -873,7 +873,6 @@ extension ChatViewController {
             switch result {
             case .success(let account):
                 DispatchQueue.main.async {
-                    print("from getAccount")
                     self.dialogService.dismissProgress()
                     guard let chatroom = account.chatroom else { return }
                     self.setNameIfNeeded(for: account, chatroom: account.chatroom, name: name)
