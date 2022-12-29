@@ -304,7 +304,7 @@ class TransferViewControllerBase: FormViewController {
     
     // MARK: - Other
     
-    func isReadyToSend() -> Bool {
+    private func isReadyToSend() -> Bool {
         validateAddress()
         guard recipientAddress != nil,
               recipientAddressIsValid,
@@ -321,7 +321,7 @@ class TransferViewControllerBase: FormViewController {
         return true
     }
     
-    func navigationKeybordDone() {
+    private func navigationKeybordDone() {
         tableView?.endEditing(true)
         if isReadyToSend() {
             confirmSendFunds()
