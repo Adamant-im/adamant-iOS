@@ -15,10 +15,10 @@ class AdamantAddressBookService: AddressBookService {
     
     // MARK: - Dependencies
     
-    var apiService: ApiService!
-    var adamantCore: AdamantCore!
-    var accountService: AccountService!
-    var dialogService: DialogService!
+    private let apiService: ApiService
+    private let adamantCore: AdamantCore
+    private let accountService: AccountService
+    private let dialogService: DialogService
     
     // MARK: - Properties
     
@@ -36,7 +36,17 @@ class AdamantAddressBookService: AddressBookService {
     private var savingBookOnLogoutTaskId = UIBackgroundTaskIdentifier.invalid
     
     // MARK: - Lifecycle
-    init() {
+    init(
+        apiService: ApiService,
+        adamantCore: AdamantCore,
+        accountService: AccountService,
+        dialogService: DialogService
+    ) {
+        self.apiService = apiService
+        self.adamantCore = adamantCore
+        self.accountService = accountService
+        self.dialogService = dialogService
+        
         // Update on login
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] _ in
             self?.update(nil)

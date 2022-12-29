@@ -90,7 +90,7 @@ class EthWalletService: WalletService {
     static let walletPassword = ""
     
     // MARK: - Dependencies
-    weak var accountService: AccountService!
+    weak var accountService: AccountService?
     var apiService: ApiService!
     var dialogService: DialogService!
     var router: Router!
@@ -332,7 +332,7 @@ class EthWalletService: WalletService {
 // MARK: - WalletInitiatedWithPassphrase
 extension EthWalletService: InitiatedWithPassphraseService {
     func initWallet(withPassphrase passphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) {
-        guard let adamant = accountService.account else {
+        guard let adamant = accountService?.account else {
             completion(.failure(error: .notLogged))
             return
         }
@@ -443,7 +443,7 @@ extension EthWalletService: InitiatedWithPassphraseService {
             case .notEnoughMoney:  // Possibly new account, we need to wait for dropship
                 // Register observer
                 let observer = NotificationCenter.default.addObserver(forName: NSNotification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: nil) { [weak self] _ in
-                    guard let balance = self?.accountService.account?.balance, balance > AdamantApiService.KvsFee else {
+                    guard let balance = self?.accountService?.account?.balance, balance > AdamantApiService.KvsFee else {
                         return
                     }
                     
@@ -513,7 +513,7 @@ extension EthWalletService {
     ///   - adamantAddress: Owner of Ethereum address
     ///   - completion: success
     private func save(ethAddress: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
-        guard let adamant = accountService.account, let keypair = accountService.keypair else {
+        guard let adamant = accountService?.account, let keypair = accountService?.keypair else {
             completion(.failure(error: .notLogged))
             return
         }

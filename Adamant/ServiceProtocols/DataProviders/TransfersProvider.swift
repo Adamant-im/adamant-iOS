@@ -129,13 +129,13 @@ extension StoreKey {
 }
 
 protocol TransfersProvider: DataProvider {
+    // MARK: - Constants
+    static var transferFee: Decimal { get }
+    
     // MARK: - Properties
     var receivedLastHeight: Int64? { get }
     var readedLastHeight: Int64? { get }
     var isInitiallySynced: Bool { get }
-    
-    var transferFee: Decimal { get }
-    
     var hasTransactions: Bool { get }
     
     // MARK: Controller

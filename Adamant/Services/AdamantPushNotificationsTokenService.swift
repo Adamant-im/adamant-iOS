@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import os
 
 final class AdamantPushNotificationsTokenService: PushNotificationsTokenService {
     private let securedStore: SecuredStore
@@ -80,7 +79,7 @@ private extension AdamantPushNotificationsTokenService {
         }
         
         let token = mapToken(token)
-        os_log("APNS token: %{public}@", token)
+        AdamantUtilities.consoleLog("APNS token:", token)
         
         guard token != getToken() else {
             tokenProcessingSemaphore.signal()
@@ -191,6 +190,9 @@ private extension AdamantPushNotificationsTokenService {
 
 private extension AdamantPushNotificationsTokenService {
     func setTokenToStorage(_ token: String?) {
+        securedStoreSemaphore.wait()
+        defer { securedStoreSemaphore.signal() }
+        
         if let token = token {
             securedStore.set(token, for: StoreKey.PushNotificationsTokenService.token)
         } else {

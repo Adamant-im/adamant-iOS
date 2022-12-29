@@ -75,35 +75,38 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         // MARK: 2. Init UI
-        window = UIWindow(frame: UIScreen.main.bounds)
-        window!.rootViewController = UITabBarController()
-        window!.rootViewController!.view.backgroundColor = .white
-        window!.tintColor = UIColor.adamant.primary
+        let window = UIWindow(frame: UIScreen.main.bounds)
+        self.window = window
+        
+        let rootTabBarController = UITabBarController()
+        window.rootViewController = rootTabBarController
+        window.rootViewController!.view.backgroundColor = .white
+        window.tintColor = UIColor.adamant.primary
         
         // MARK: 3. Prepare pages
         guard let router = container.resolve(Router.self) else {
             fatalError("Failed to get Router")
         }
         
-        if let tabbar = window?.rootViewController as? UITabBarController {
-            // MARK: Chats
-            let chats = UISplitViewController()
-            chats.tabBarItem.title = String.adamantLocalized.tabItems.chats
-            chats.tabBarItem.image = #imageLiteral(resourceName: "chats_tab")
-            chats.preferredDisplayMode = .allVisible
-            chats.tabBarItem.badgeColor = UIColor.adamant.primary
-            
-            let chatList = UINavigationController(rootViewController: router.get(scene: AdamantScene.Chats.chatList))
-            
-            // MARK: Accounts
-            let accounts = UISplitViewController()
-            accounts.tabBarItem.title = String.adamantLocalized.tabItems.account
-            accounts.tabBarItem.image = #imageLiteral(resourceName: "account-tab")
-            accounts.preferredDisplayMode = .allVisible
-            accounts.tabBarItem.badgeColor = UIColor.adamant.primary
-            
-            let account = UINavigationController(rootViewController: router.get(scene: AdamantScene.Account.account))
-            
+        // MARK: Chats
+        let chats = UISplitViewController()
+        chats.tabBarItem.title = String.adamantLocalized.tabItems.chats
+        chats.tabBarItem.image = #imageLiteral(resourceName: "chats_tab")
+        chats.preferredDisplayMode = .oneBesideSecondary
+        chats.tabBarItem.badgeColor = UIColor.adamant.primary
+        
+        let chatList = UINavigationController(rootViewController: router.get(scene: AdamantScene.Chats.chatList))
+        
+        // MARK: Accounts
+        let accounts = UISplitViewController()
+        accounts.tabBarItem.title = String.adamantLocalized.tabItems.account
+        accounts.tabBarItem.image = #imageLiteral(resourceName: "account-tab")
+        accounts.preferredDisplayMode = .oneBesideSecondary
+        accounts.tabBarItem.badgeColor = UIColor.adamant.primary
+        
+        let account = UINavigationController(rootViewController: router.get(scene: AdamantScene.Account.account))
+        
+        let resetScreensAction = {
             if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
                 let chatDetails = UIViewController(nibName: "WelcomeViewController", bundle: nil)
                 let accountDetails = UIViewController(nibName: "WelcomeViewController", bundle: nil)
@@ -114,34 +117,34 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 chats.viewControllers = [chatList]
                 accounts.viewControllers = [account]
             }
-            
-            if #available(iOS 13.0, *) {
-                let tabBarAppearance: UITabBarAppearance = UITabBarAppearance()
-                tabBarAppearance.configureWithDefaultBackground()
-                UITabBar.appearance().standardAppearance = tabBarAppearance
-
-                let navigationBarAppearance = UINavigationBarAppearance()
-                navigationBarAppearance.configureWithDefaultBackground()
-                UINavigationBar.appearance().standardAppearance = navigationBarAppearance
-                        
-                if #available(iOS 15.0, *) {
-                    UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
-                    UINavigationBar.appearance().scrollEdgeAppearance = navigationBarAppearance
-                }
-            }
-            
-            tabbar.setViewControllers([chats, accounts], animated: false)
         }
         
-        window!.makeKeyAndVisible()
+        resetScreensAction()
         
-        // MARK: 4. Show login
+        let tabBarAppearance: UITabBarAppearance = UITabBarAppearance()
+        tabBarAppearance.configureWithDefaultBackground()
+        UITabBar.appearance().standardAppearance = tabBarAppearance
+
+        let navigationBarAppearance = UINavigationBarAppearance()
+        navigationBarAppearance.configureWithDefaultBackground()
+        UINavigationBar.appearance().standardAppearance = navigationBarAppearance
+        UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
+        UINavigationBar.appearance().scrollEdgeAppearance = navigationBarAppearance
+        
+        rootTabBarController.setViewControllers([chats, accounts], animated: false)
+        
+        window.makeKeyAndVisible()
+        
+        // MARK: 4. Setup dialog service
+        dialogService.setup(window: window)
+        
+        // MARK: 5. Show login
         let login = router.get(scene: AdamantScene.Login.login) as! LoginViewController
         let welcomeIsShown = UserDefaults.standard.bool(forKey: StoreKey.application.welcomeScreensIsShown)
         
         login.requestBiometryOnFirstTimeActive = welcomeIsShown
         login.modalPresentationStyle = .overFullScreen
-        window!.rootViewController?.present(login, animated: false, completion: nil)
+        window.rootViewController?.present(login, animated: false, completion: nil)
         
         if !welcomeIsShown {
             let welcome = router.get(scene: AdamantScene.Onboard.welcome)
@@ -150,7 +153,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             UserDefaults.standard.set(true, forKey: StoreKey.application.welcomeScreensIsShown)
         }
     
-        // MARK: 5 Reachability & Autoupdate
+        // MARK: 6 Reachability & Autoupdate
         repeater = RepeaterService()
         
         // Configure reachability
@@ -217,22 +220,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             dialogService.showError(withMessage: "Failed to register CurrencyInfoService autoupdate. Please, report a bug", error: nil)
         }
         
-        // MARK: 6. Logout reset
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            // On logout, pop all navigators to root.
-            guard let tbc = self?.window?.rootViewController as? UITabBarController, let vcs = tbc.viewControllers else {
-                return
-            }
-            
-            for case let nav as UINavigationController in vcs {
-                nav.popToRootViewController(animated: false)
-            }
+        // MARK: 7. Logout reset
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name.AdamantAccountService.userLoggedOut,
+            object: nil,
+            queue: OperationQueue.main
+        ) { _ in
+            resetScreensAction()
         }
         
-        // MARK: 7. Welcome messages
+        // MARK: 8. Welcome messages
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantChatsProvider.initiallySyncedChanged, object: nil, queue: OperationQueue.main, using: handleWelcomeMessages)
         
-        // MARK: 8. Notifications
+        // MARK: 9. Notifications
         pushNotificationsTokenService.sendTokenDeletionTransactions()
         UNUserNotificationCenter.current().delegate = self
         
@@ -301,15 +301,13 @@ extension AppDelegate {
         
         let vc = list.chatViewController(for: chatroom, forceScrollToBottom: true)
         if let split = list.splitViewController {
-            var timeout = 0.25
-            if #available(iOS 13.0, *) { timeout = 0 }
-            DispatchQueue.main.asyncAfter(deadline: .now() + timeout) {
-                let chat = UINavigationController(rootViewController: vc)
-                split.showDetailViewController(chat, sender: list)
-            }
+            let chat = UINavigationController(rootViewController: vc)
+            split.showDetailViewController(chat, sender: list)
         } else {
             chatList.pushViewController(vc, animated: false)
         }
+        
+        list.selectChatroomRow(chatroom: chatroom)
     }
 }
 
@@ -333,15 +331,9 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             return
         }
         
-        if case .loggedIn = list.accountService.state {
-            self.openDialog(chatList: chatList, tabbar: tabbar, list: list, transactionID: transactionID, senderAddress: trs.senderId)
-        }
-
         // if not logged in
-        list.didLoadedMessages = { [weak self] in
-            var timeout = 2.0
-            if #available(iOS 13.0, *) { timeout = 0.5 }
-            DispatchQueue.main.asyncAfter(deadline: .now() + timeout) {
+        list.performOnMessagesLoaded { [weak self] in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self?.dialogService.dismissProgress()
                 self?.openDialog(chatList: chatList, tabbar: tabbar, list: list, transactionID: transactionID, senderAddress: trs.senderId)
             }
@@ -355,7 +347,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 extension AppDelegate {
     func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         let container = Container()
-        container.registerAdamantBackgroundFetchServices()
+        container.registerAdamantServices()
         
         guard let notificationsService = container.resolve(NotificationsService.self) else {
                 UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplication.backgroundFetchIntervalNever)
@@ -525,12 +517,8 @@ extension AppDelegate {
                    let router = container.resolve(Router.self),
                    let list = chatList.viewControllers.first as? ChatListViewController {
                  
-                    if case .loggedIn = list.accountService.state {
-                        self.openDialog(chatList: chatList, tabbar: tabbar, router: router, list: list, adamantAdr: adamantAdr)
-                    }
-                    
                     // if not logged in
-                    list.didLoadedMessages = { [weak self] in
+                    list.performOnMessagesLoaded { [weak self] in
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                             self?.openDialog(chatList: chatList, tabbar: tabbar, router: router, list: list, adamantAdr: adamantAdr)
                         }

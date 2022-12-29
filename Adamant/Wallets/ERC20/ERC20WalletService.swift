@@ -63,7 +63,7 @@ class ERC20WalletService: WalletService {
     static let walletPassword = ""
     
     // MARK: - Dependencies
-    weak var accountService: AccountService!
+    weak var accountService: AccountService?
     var apiService: ApiService!
     var dialogService: DialogService!
     var router: Router!

@@ -35,7 +35,7 @@ extension ERC20WalletService: RichMessageProvider {
         let senderName: String?
         let recipientName: String?
         
-        if let address = accountService.account?.address {
+        if let address = accountService?.account?.address {
             if let senderId = transaction.senderId, senderId.caseInsensitiveCompare(address) == .orderedSame {
                 senderName = String.adamantLocalized.transactionDetails.yourAddress
             } else {
