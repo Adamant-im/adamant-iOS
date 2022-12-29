@@ -43,11 +43,6 @@ final class VisibleWalletsCheckmarkRowView: UIView {
         set { captionLabel.text = newValue }
     }
     
-    var captionColor: UIColor {
-        get { captionLabel.textColor }
-        set { captionLabel.textColor = newValue }
-    }
-    
     var balance: Decimal? {
         didSet {
             if let balance = balance {
@@ -145,7 +140,6 @@ final class VisibleWalletsCheckmarkRowView: UIView {
         balanceLabel.contentMode = .left
         balanceLabel.snp.makeConstraints {
             $0.centerY.equalToSuperview()
-         //   $0.centerX.equalToSuperview().offset(25)
             $0.trailing.equalTo(checkmarkView.snp.leading).offset(-10)
         }
     }
@@ -168,6 +162,7 @@ private func makeCaptionLabel() -> UILabel {
     let label = UILabel()
     label.font = .systemFont(ofSize: 12, weight: .regular)
     label.contentMode = .left
+    label.textColor = .lightGray
     return label
 }
 

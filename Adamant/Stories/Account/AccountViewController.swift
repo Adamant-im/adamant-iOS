@@ -757,7 +757,7 @@ class AccountViewController: FormViewController {
     
     private func setupWalletsVC() {
         walletViewControllers.removeAll()
-        var availableServices: [WalletService]  = []
+        var availableServices: [WalletService] = []
         for walletService in accountService.wallets where !visibleWalletsService.isInvisible(walletService) {
             availableServices.append(walletService)
         }
