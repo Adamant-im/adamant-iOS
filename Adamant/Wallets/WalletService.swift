@@ -201,6 +201,7 @@ protocol WalletService: AnyObject {
 	// MARK: Currency
 	static var currencySymbol: String { get }
 	static var currencyLogo: UIImage { get }
+    static var qqPrefix: String { get }
     
     var tokenSymbol: String { get }
     var tokenName: String { get }

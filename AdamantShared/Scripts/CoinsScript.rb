@@ -62,6 +62,7 @@ extension #{symbol.capitalize}WalletService {
     static let fixedFee: Decimal = #{fixedFee}
     static let currencySymbol = \"#{symbol}\"
     static let currencyExponent: Int = -#{decimals}
+    static let qqPrefix: String = \"#{qqPrefix}\"
     
     var tokenName: String {
         \"#{fullName}\"
@@ -71,15 +72,11 @@ extension #{symbol.capitalize}WalletService {
         #{consistencyMaxTime}
     }
     
-    static var qqPrefix: String {
-        \"#{qqPrefix}\"
-    }
-    
-    static var minBalance: Decimal {
+    var minBalance: Decimal {
         #{minBalance}
     }
     
-    static var minAmount: Decimal {
+    var minAmount: Decimal {
         #{minAmount}
     }
     
@@ -96,11 +93,12 @@ extension #{symbol.capitalize}WalletService {
             #{serviceNodes}
         ]
     }
-}"
+}
+"
         
         # If is ADM write to share file
         if symbol == "ADM"
-           text = "import Foundation
+           textResources = "import Foundation
 
 extension AdamantResources {
     // MARK: Nodes
@@ -110,7 +108,8 @@ extension AdamantResources {
         ]
     }
 }"
-            File.open(Dir.pwd + "/AdamantShared/AdamantDynamicResources.swift", 'w') { |file| file.write(text) }
+            File.open(Dir.pwd + "/AdamantShared/AdamantDynamicResources.swift", 'w') { |file| file.write(textResources) }
+            File.open(Dir.pwd + "/Adamant/Wallets/#{name}/#{symbol}WalletService+DynamicConstants.swift", 'w') { |file| file.write(text) }
         else
             File.open(Dir.pwd + "/Adamant/Wallets/#{name}/#{symbol}WalletService+DynamicConstants.swift", 'w') { |file| file.write(text) }
         end

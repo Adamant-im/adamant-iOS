@@ -5,6 +5,7 @@ extension DashWalletService {
     static let fixedFee: Decimal = 0.0001
     static let currencySymbol = "DASH"
     static let currencyExponent: Int = -8
+    static let qqPrefix: String = "dash"
     
     var tokenName: String {
         "Dash"
@@ -14,15 +15,11 @@ extension DashWalletService {
         800
     }
     
-    static var qqPrefix: String {
-        "dash"
-    }
-    
-    static var minBalance: Decimal {
+    var minBalance: Decimal {
         0.0001
     }
     
-    static var minAmount: Decimal {
+    var minAmount: Decimal {
         2.0e-05
     }
     

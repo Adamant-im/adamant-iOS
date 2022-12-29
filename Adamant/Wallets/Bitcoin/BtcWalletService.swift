@@ -54,14 +54,6 @@ struct BtcApiCommands {
 
 class BtcWalletService: WalletService {
 
-    var minBalance: Decimal {
-        BtcWalletService.minBalance
-    }
-    
-    var minAmount: Decimal {
-        BtcWalletService.minAmount
-    }
-    
     var tokenSymbol: String {
         type(of: self).currencySymbol
     }

@@ -18,21 +18,9 @@ class AdmWalletService: NSObject, WalletService {
     let addressRegex = try! NSRegularExpression(pattern: "^U([0-9]{6,20})$")
     
     static let currencyLogo = #imageLiteral(resourceName: "adamant_wallet")
-    
-    var minBalance: Decimal {
-        AdmWalletService.minBalance
-    }
-    
-    var minAmount: Decimal {
-        AdmWalletService.minAmount
-    }
-    
+
     var tokenSymbol: String {
         return type(of: self).currencySymbol
-    }
-    
-    var tokenName: String {
-        return ""
     }
     
     var tokenLogo: UIImage {

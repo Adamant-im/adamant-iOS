@@ -65,15 +65,7 @@ class DogeWalletService: WalletService {
     static var currencyLogo = #imageLiteral(resourceName: "doge_wallet")
     static let multiplier = Decimal(sign: .plus, exponent: 8, significand: 1)
     static let chunkSize = 20
-    
-    var minBalance: Decimal {
-        DogeWalletService.minBalance
-    }
-    
-    var minAmount: Decimal {
-        DogeWalletService.minAmount
-    }
-    
+ 
     var tokenSymbol: String {
         return type(of: self).currencySymbol
     }

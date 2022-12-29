@@ -61,14 +61,6 @@ class EthWalletService: WalletService {
 	
 	static let currencyLogo = #imageLiteral(resourceName: "ethereum_wallet")
     
-    var minBalance: Decimal {
-        EthWalletService.minBalance
-    }
-    
-    var minAmount: Decimal {
-        EthWalletService.minAmount
-    }
-    
     var tokenSymbol: String {
         return type(of: self).currencySymbol
     }

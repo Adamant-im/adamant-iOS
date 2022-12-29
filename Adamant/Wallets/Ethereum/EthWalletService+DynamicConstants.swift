@@ -5,6 +5,7 @@ extension EthWalletService {
     static let fixedFee: Decimal = 0.0
     static let currencySymbol = "ETH"
     static let currencyExponent: Int = -18
+    static let qqPrefix: String = "ethereum"
     
     var tokenName: String {
         "Ethereum"
@@ -14,15 +15,11 @@ extension EthWalletService {
         1200
     }
     
-    static var qqPrefix: String {
-        "ethereum"
-    }
-    
-    static var minBalance: Decimal {
+    var minBalance: Decimal {
         0
     }
     
-    static var minAmount: Decimal {
+    var minAmount: Decimal {
         0
     }
     

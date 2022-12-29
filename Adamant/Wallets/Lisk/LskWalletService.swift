@@ -58,14 +58,6 @@ class LskWalletService: WalletService {
     static let defaultFee: BigUInt = 141000
     
     var lastHeight: UInt64 = 0
-	
-    var minBalance: Decimal {
-        LskWalletService.minBalance
-    }
-    
-    var minAmount: Decimal {
-        LskWalletService.minAmount
-    }
     
     var tokenSymbol: String {
         return type(of: self).currencySymbol

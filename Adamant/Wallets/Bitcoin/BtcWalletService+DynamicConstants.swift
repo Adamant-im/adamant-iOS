@@ -5,6 +5,7 @@ extension BtcWalletService {
     static let fixedFee: Decimal = 3.153e-05
     static let currencySymbol = "BTC"
     static let currencyExponent: Int = -8
+    static let qqPrefix: String = "bitcoin"
     
     var tokenName: String {
         "Bitcoin"
@@ -14,15 +15,11 @@ extension BtcWalletService {
         10800
     }
     
-    static var qqPrefix: String {
-        "bitcoin"
-    }
-    
-    static var minBalance: Decimal {
+    var minBalance: Decimal {
         1.0e-05
     }
     
-    static var minAmount: Decimal {
+    var minAmount: Decimal {
         5.46e-06
     }
     

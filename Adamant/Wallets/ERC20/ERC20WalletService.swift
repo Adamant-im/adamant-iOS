@@ -20,14 +20,10 @@ class ERC20WalletService: WalletService {
     
     static var currencySymbol: String = ""
     static var currencyLogo: UIImage = UIImage()
+    static var qqPrefix: String = ""
     
-    var minBalance: Decimal {
-        0
-    }
-    
-    var minAmount: Decimal {
-        0
-    }
+    var minBalance: Decimal = 0
+    var minAmount: Decimal = 0
     
     var tokenSymbol: String {
         return token?.symbol ?? ""

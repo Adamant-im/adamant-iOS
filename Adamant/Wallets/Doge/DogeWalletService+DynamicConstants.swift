@@ -5,6 +5,7 @@ extension DogeWalletService {
     static let fixedFee: Decimal = 1
     static let currencySymbol = "DOGE"
     static let currencyExponent: Int = -8
+    static let qqPrefix: String = "doge"
     
     var tokenName: String {
         "Dogecoin"
@@ -14,15 +15,11 @@ extension DogeWalletService {
         900
     }
     
-    static var qqPrefix: String {
-        "doge"
-    }
-    
-    static var minBalance: Decimal {
+    var minBalance: Decimal {
         0
     }
     
-    static var minAmount: Decimal {
+    var minAmount: Decimal {
         0
     }
     

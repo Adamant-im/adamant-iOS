@@ -28,7 +28,7 @@ class AdamantQRTools {
         )
         generator.withColors(backgroundColor: UIColor.white.cgColor, foregroundColor: UIColor.black.cgColor)
         if withLogo {
-            let hasAdm = string.contains("adm:") || string.contains("msg.adamant.im")
+            let hasAdm = string.contains("\(AdmWalletService.qqPrefix):") || string.contains("msg.adamant.im")
             let logoSize = hasAdm ? EFIntSize(width: 156, height: 156) : EFIntSize(width: 138, height: 138)
             generator.withIcon(UIImage(named: "logo")?.cgImage, size: logoSize)
         }

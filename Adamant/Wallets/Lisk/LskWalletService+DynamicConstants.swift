@@ -5,6 +5,7 @@ extension LskWalletService {
     static let fixedFee: Decimal = 0.00142
     static let currencySymbol = "LSK"
     static let currencyExponent: Int = -8
+    static let qqPrefix: String = "lisk"
     
     var tokenName: String {
         "Lisk"
@@ -14,15 +15,11 @@ extension LskWalletService {
         60
     }
     
-    static var qqPrefix: String {
-        "lisk"
-    }
-    
-    static var minBalance: Decimal {
+    var minBalance: Decimal {
         0.05
     }
     
-    static var minAmount: Decimal {
+    var minAmount: Decimal {
         0
     }
     

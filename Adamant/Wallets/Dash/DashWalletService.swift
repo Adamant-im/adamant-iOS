@@ -12,13 +12,6 @@ import Alamofire
 import BitcoinKit
 
 class DashWalletService: WalletService {
-    var minBalance: Decimal {
-        DashWalletService.minBalance
-    }
-    
-    var minAmount: Decimal {
-        DashWalletService.minAmount
-    }
     
     var tokenSymbol: String {
         return type(of: self).currencySymbol
