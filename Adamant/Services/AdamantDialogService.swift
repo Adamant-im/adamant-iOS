@@ -253,7 +253,6 @@ extension AdamantDialogService {
                    from: nil,
                    completion: nil
         )
-        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
         
         if let sourceView = from {
             alert.popoverPresentationController?.sourceView = sourceView
@@ -331,8 +330,6 @@ extension AdamantDialogService {
         
         addActions(to: alert, stringForPasteboard: stringForPasteboard, stringForShare: stringForShare, stringForQR: stringForQR, types: types, excludedActivityTypes: excludedActivityTypes, from: from, completion: completion)
         
-        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
-        
         return alert
     }
     
@@ -400,6 +397,8 @@ extension AdamantDialogService {
                 alert.addAction(action)
             }
         }
+        
+        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
     }
     
     @objc private func image(_ image: UIImage, didFinishSavingWithError error: NSError?, contextInfo: UnsafeRawPointer) {

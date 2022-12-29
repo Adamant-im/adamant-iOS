@@ -11,18 +11,18 @@ import MarkdownKit
 
 // MARK: Detect simple ADM address
 // - ex: U3716604363012166999
-class MarkdownSimpleAdm: MarkdownElement {
+final class MarkdownSimpleAdm: MarkdownElement {
     private static let regex = "U([0-9]{6,20})"
 
-    open var regex: String {
+    var regex: String {
         return MarkdownSimpleAdm.regex
     }
 
-    open func regularExpression() throws -> NSRegularExpression {
+    func regularExpression() throws -> NSRegularExpression {
       return try NSRegularExpression(pattern: regex, options: .dotMatchesLineSeparators)
     }
 
-    open func match(_ match: NSTextCheckingResult, attributedString: NSMutableAttributedString) {
+    func match(_ match: NSTextCheckingResult, attributedString: NSMutableAttributedString) {
         let attributesColor: [NSAttributedString.Key : Any] = [
             NSAttributedString.Key.foregroundColor: UIColor.adamant.active,
             NSAttributedString.Key.underlineStyle: 0,
@@ -39,7 +39,7 @@ class MarkdownSimpleAdm: MarkdownElement {
 
 // MARK: Detect advanced ADM address
 // - ex: [Джону Doe](adm:U9821606738809290000?label=John+Doe&message=Just+say+hello)
-class MarkdownAdvancedAdm: MarkdownLink {
+final class MarkdownAdvancedAdm: MarkdownLink {
     private static let regex = "\\[[^\\(]*\\]\\(adm:[^\\s]+\\)"
     private static let onlyLinkRegex = "\\(adm:[^\\s]+\\)"
     private static let onlyAddressRegex = "U([0-9]{6,20})"
@@ -122,10 +122,10 @@ class MarkdownAdvancedAdm: MarkdownLink {
 
 // MARK: Detect link ADM address
 // - ex: https://anydomainOrIP?address=U9821606738809290000&label=John+Doe
-class MarkdownLinkAdm: MarkdownLink {
+final class MarkdownLinkAdm: MarkdownLink {
     private static let regex = "(?i)\\b((?:https?://|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,4}/)(?:[^\\s()<>]+(\\?address=U([0-9]{6,20}))[^\\s()<>]+)+(?:\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’]))"
 
-    open override var regex: String {
+    override var regex: String {
         return MarkdownLinkAdm.regex
     }
 

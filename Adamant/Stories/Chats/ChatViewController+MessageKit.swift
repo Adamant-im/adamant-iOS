@@ -821,7 +821,7 @@ extension ChatViewController {
                 }
                 
                 guard let room = self.chatsProvider.getChatroom(for: adm.address) else {
-                    self.findAccount(with: adm.address, name: adm.name, message: adm.message, action: action)
+                    self.findAccount(with: adm.address, name: adm.name, message: adm.message)
                     return
                 }
                 
@@ -852,15 +852,7 @@ extension ChatViewController {
             return
         }
         
-        if let account = chatroom.partner,
-           let name = name,
-           account.name == nil {
-            account.name = name
-            
-            if chatroom.title == nil {
-                chatroom.title = name
-            }
-        }
+        self.setNameIfNeeded(for: chatroom.partner, chatroom: chatroom, name: name)
         
         let vc = chatlistVC.chatViewController(for: chatroom)
         if let count = vc.chatroom?.transactions?.count, count == 0 {
@@ -873,56 +865,28 @@ extension ChatViewController {
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
-    private func findAccount(with address: String, name: String?, message: String?, action: AddressChatShareType) {
+    private func findAccount(with address: String, name: String?, message: String?) {
         dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
-      
-        accountsProvider.getAccount(byAddress: address) { result in
+        
+        accountsProvider.getAccount(byAddress: address) { [weak self] result in
+            guard let self = self else { return }
             switch result {
             case .success(let account):
                 DispatchQueue.main.async {
-                    guard let chatroom = account.chatroom else { return }
-                    
-                    if let name = name, account.name == nil {
-                        account.name = name
-                        
-                        if let chatroom = account.chatroom, chatroom.title == nil {
-                            chatroom.title = name
-                        }
-                    }
-                    
-                    account.chatroom?.isForcedVisible = true
-                    if action == .chat {
-                        self.startNewChat(with: chatroom, message: message)
-                    }
+                    print("from getAccount")
                     self.dialogService.dismissProgress()
+                    guard let chatroom = account.chatroom else { return }
+                    self.setNameIfNeeded(for: account, chatroom: account.chatroom, name: name)
+                    account.chatroom?.isForcedVisible = true
+                    self.startNewChat(with: chatroom, message: message)
                 }
             case .dummy:
                 self.dialogService.dismissProgress()
-                
-                let alert = UIAlertController(title: nil, message: AccountsProviderResult.notInitiated(address: address).localized, preferredStyle: .alert)
-                
-                let faq = UIAlertAction(title: String.adamantLocalized.newChat.whatDoesItMean, style: .default, handler: { [weak self] _ in
-                    guard let url = URL(string: NewChatViewController.faqUrl) else {
-                        return
-                    }
-                    
-                    let safari = SFSafariViewController(url: url)
-                    safari.preferredControlTintColor = UIColor.adamant.primary
-                    safari.modalPresentationStyle = .overFullScreen
-                    self?.present(safari, animated: true, completion: nil)
-                })
-                
-                alert.addAction(faq)
-                alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
-                
                 DispatchQueue.main.async {
-                    alert.modalPresentationStyle = .overFullScreen
-                    self.present(alert, animated: true, completion: nil)
+                    self.presentDummyAlert(for: address)
                 }
-                
             case .notFound, .invalidAddress, .notInitiated, .networkError:
                 self.dialogService.showWarning(withMessage: result.localized)
-                
             case .serverError(let error):
                 if let apiError = error as? ApiServiceError, case .internalError(let message, _) = apiError, message == String.adamantLocalized.sharedErrors.unknownError {
                     self.dialogService.showWarning(withMessage: AccountsProviderResult.notFound(address: address).localized)
@@ -931,6 +895,40 @@ extension ChatViewController {
                 
                 self.dialogService.showError(withMessage: result.localized, error: error)
             }
+        }
+    }
+    
+    private func presentDummyAlert(for address: String) {
+        let alert = UIAlertController(title: nil, message: AccountsProviderResult.notInitiated(address: address).localized, preferredStyle: .alert)
+        
+        let faq = UIAlertAction(title: String.adamantLocalized.newChat.whatDoesItMean, style: .default, handler: { [weak self] _ in
+            guard let url = URL(string: NewChatViewController.faqUrl) else {
+                return
+            }
+            
+            let safari = SFSafariViewController(url: url)
+            safari.preferredControlTintColor = UIColor.adamant.primary
+            safari.modalPresentationStyle = .overFullScreen
+            self?.present(safari, animated: true, completion: nil)
+        })
+        
+        alert.addAction(faq)
+        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
+        
+        alert.modalPresentationStyle = .overFullScreen
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    private func setNameIfNeeded(for account: CoreDataAccount?, chatroom: Chatroom?, name: String?) {
+        guard let name = name,
+              let account = account,
+              account.name == nil
+        else {
+            return
+        }
+        account.name = name
+        if let chatroom = chatroom, chatroom.title == nil {
+            chatroom.title = name
         }
     }
 }
