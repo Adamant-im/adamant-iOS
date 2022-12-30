@@ -55,6 +55,13 @@ class Coins
         end
         qqPrefix = json["qqPrefix"]
         
+        defaultVisibility = json["defaultVisibility"]
+        if defaultVisibility == nil
+            defaultVisibility = false
+        end
+        
+        defaultOrdinalLevel = json["defaultOrdinalLevel"]
+        
         text = "import Foundation
 
 extension #{symbol.capitalize}WalletService {
@@ -78,6 +85,14 @@ extension #{symbol.capitalize}WalletService {
     
     var minAmount: Decimal {
         #{minAmount}
+    }
+    
+    var defaultVisibility: Bool {
+        #{defaultVisibility}
+    }
+    
+    var defaultOrdinalLevel: Int? {
+        #{defaultOrdinalLevel}
     }
     
     static let explorerAddress = \"#{explorerTx.sub! '${ID}', ''}\"

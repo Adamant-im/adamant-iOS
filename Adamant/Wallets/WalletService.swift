@@ -210,6 +210,8 @@ protocol WalletService: AnyObject {
     var consistencyMaxTime: Double { get }
     var minBalance: Decimal { get }
     var minAmount: Decimal { get }
+    var defaultVisibility: Bool { get }
+    var defaultOrdinalLevel: Int? { get }
     
 	// MARK: Notifications
 	

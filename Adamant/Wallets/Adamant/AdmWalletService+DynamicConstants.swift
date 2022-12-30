@@ -23,6 +23,14 @@ extension AdmWalletService {
         0
     }
     
+    var defaultVisibility: Bool {
+        true
+    }
+    
+    var defaultOrdinalLevel: Int? {
+        0
+    }
+    
     static let explorerAddress = "https://explorer.adamant.im/tx/"
     
     static var nodes: [Node] {

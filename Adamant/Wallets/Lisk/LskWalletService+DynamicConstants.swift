@@ -23,6 +23,14 @@ extension LskWalletService {
         0
     }
     
+    var defaultVisibility: Bool {
+        true
+    }
+    
+    var defaultOrdinalLevel: Int? {
+        30
+    }
+    
     static let explorerAddress = "https://liskscan.com/transaction/"
     
     static var nodes: [Node] {

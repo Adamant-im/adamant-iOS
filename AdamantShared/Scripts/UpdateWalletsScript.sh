@@ -141,33 +141,43 @@ function unpack ()
     for dir in $WALLETS_NAME_DIR/*/; do
         WALLET_NAME=$(basename $dir)
         
-        # copy @3x image to Notification Service Extension
-        Target_Notification_Content=$ROOT/NotificationServiceExtension/WalletImages
-        cp $WALLETS_NAME_DIR/$WALLET_NAME/Images/${WALLET_NAME}_wallet@3x.png ${Target_Notification_Content}/${WALLET_NAME}_notificationContent.png
-            
-        # move wallet images to assets
-        Target_Wallet_Image=$ROOT/AdamantShared/Shared.xcassets/Wallets/${WALLET_NAME}_wallet.imageset
-        mkdir -p ${Target_Wallet_Image}
-        moveImage $WALLETS_NAME_DIR $WALLET_NAME ${Target_Wallet_Image} ${WALLET_NAME}_wallet ${WALLET_NAME}_wallet
+        # if exist {name}
+        if [ -e $WALLETS_NAME_DIR/$WALLET_NAME/Images/${WALLET_NAME}_wallet.png ]
+        then
+            # copy @3x image to Notification Service Extension
+            Target_Notification_Content=$ROOT/NotificationServiceExtension/WalletImages
+            cp $WALLETS_NAME_DIR/$WALLET_NAME/Images/${WALLET_NAME}_wallet@3x.png ${Target_Notification_Content}/${WALLET_NAME}_notificationContent.png
+        
+            # move wallet images to assets
+            Target_Wallet_Image=$ROOT/AdamantShared/Shared.xcassets/Wallets/${WALLET_NAME}_wallet.imageset
+            mkdir -p ${Target_Wallet_Image}
+            moveImage $WALLETS_NAME_DIR $WALLET_NAME ${Target_Wallet_Image} ${WALLET_NAME}_wallet ${WALLET_NAME}_wallet
+        fi
         
         # move notification images to assets
-        Target_Notification_Image=$ROOT/AdamantShared/Shared.xcassets/Wallets/${WALLET_NAME}_notification.imageset
-        mkdir -p ${Target_Notification_Image}
-        if [ -e $WALLETS_NAME_DIR/$WALLET_NAME/Images/${WALLET_NAME}_notification.png ]
+        if [ -e $WALLETS_NAME_DIR/$WALLET_NAME/Images/${WALLET_NAME}_wallet.png ]
         then
-            moveImage $WALLETS_NAME_DIR $WALLET_NAME ${Target_Notification_Image} ${WALLET_NAME}_notification ${WALLET_NAME}_notification
-        else
-            moveImage $WALLETS_NAME_DIR $WALLET_NAME ${Target_Notification_Image} ${WALLET_NAME}_wallet ${WALLET_NAME}_notification
+            Target_Notification_Image=$ROOT/AdamantShared/Shared.xcassets/Wallets/${WALLET_NAME}_notification.imageset
+            mkdir -p ${Target_Notification_Image}
+            if [ -e $WALLETS_NAME_DIR/$WALLET_NAME/Images/${WALLET_NAME}_notification.png ]
+            then
+                moveImage $WALLETS_NAME_DIR $WALLET_NAME ${Target_Notification_Image} ${WALLET_NAME}_notification ${WALLET_NAME}_notification
+            else
+                moveImage $WALLETS_NAME_DIR $WALLET_NAME ${Target_Notification_Image} ${WALLET_NAME}_wallet ${WALLET_NAME}_notification
+            fi
         fi
         
         # move row images to assets
-        Target_Row_Image=$ROOT/AdamantShared/Shared.xcassets/Wallets/${WALLET_NAME}_wallet_row.imageset
-        mkdir -p ${Target_Row_Image}
-        if [ -e $WALLETS_NAME_DIR/$WALLET_NAME/Images/${WALLET_NAME}_wallet_row.png ]
+        if [ -e $WALLETS_NAME_DIR/$WALLET_NAME/Images/${WALLET_NAME}_wallet.png ]
         then
-            moveImage $WALLETS_NAME_DIR $WALLET_NAME ${Target_Row_Image} ${WALLET_NAME}_wallet_row ${WALLET_NAME}_wallet_row
-        else
-            moveImage $WALLETS_NAME_DIR $WALLET_NAME ${Target_Row_Image} ${WALLET_NAME}_wallet ${WALLET_NAME}_wallet_row
+            Target_Row_Image=$ROOT/AdamantShared/Shared.xcassets/Wallets/${WALLET_NAME}_wallet_row.imageset
+            mkdir -p ${Target_Row_Image}
+            if [ -e $WALLETS_NAME_DIR/$WALLET_NAME/Images/${WALLET_NAME}_wallet_row.png ]
+            then
+                moveImage $WALLETS_NAME_DIR $WALLET_NAME ${Target_Row_Image} ${WALLET_NAME}_wallet_row ${WALLET_NAME}_wallet_row
+            else
+                moveImage $WALLETS_NAME_DIR $WALLET_NAME ${Target_Row_Image} ${WALLET_NAME}_wallet ${WALLET_NAME}_wallet_row
+            fi
         fi
     done
 }
@@ -180,14 +190,26 @@ function updateSwiftFiles ()
     WALLET_SYMBOL=$3
     WALLET_CONTRACT=$4
     WALLET_DECIMALS=$5
-
+    DEFAULT_VISABILITY_RAW=$6
+    DEFAULT_ORDINAL_LEVEL_RAW=$7
+    
+    DEFAULT_VISABILITY="${DEFAULT_VISABILITY_RAW:=false}"
+    DEFAULT_ORDINAL_LEVEL="${DEFAULT_ORDINAL_LEVEL_RAW:=nil}"
+    echo "DEFAULT_VISABILITY"
+    echo $DEFAULT_VISABILITY
+    echo "DEFAULT_ORDINAL_LEVEL"
+    echo $DEFAULT_ORDINAL_LEVEL
+    
+# to-do defaultVisibility & defaultOrdinalLevel from general info
     TARGET=$ROOT/AdamantShared/Models
      cat >> ${TARGET}/${BLOCKCHAIN_NAME}TokensList.swift << __EOF__
         ERC20Token(symbol: "$WALLET_SYMBOL",
                    name: "$WALLET_NAME",
                    contractAddress: "$WALLET_CONTRACT",
                    decimals: $WALLET_DECIMALS,
-                   naturalUnits: $WALLET_DECIMALS),
+                   naturalUnits: $WALLET_DECIMALS,
+                   defaultVisibility: $DEFAULT_VISABILITY,
+                   defaultOrdinalLevel: $DEFAULT_ORDINAL_LEVEL),
 __EOF__
 }
 
@@ -217,7 +239,10 @@ __EOF__
                 CONTRACT=$(perl -ne 'if (/"contractId": "(.*)"/) { print $1 . "\n" }' $WALLET_JSON)
                 DECIMALS=$(perl -ne 'if (/"decimals": (.*)/) { print $1 . "\n" }' $WALLET_JSON)
 
-                updateSwiftFiles "$BLOCKCHAIN_NAME" "$NAME" "$SYMBOL" "$CONTRACT" "$DECIMALS"
+                WALLET_GENERAL_JSON=$WALLETS_NAME_DIR/general/$WALLET_NAME/info.json
+                DEFAULT_VISABILITY=$(perl -ne 'if (/"defaultVisibility": "(.*)"/) { print $1 . "\n" }' $WALLET_GENERAL_JSON)
+                DEFAULT_ORDINAL_LEVEL=$(perl -ne 'if (/"defaultOrdinalLevel": "(.*)"/) { print $1 . "\n" }' $WALLET_GENERAL_JSON)
+                updateSwiftFiles "$BLOCKCHAIN_NAME" "$NAME" "$SYMBOL" "$CONTRACT" "$DECIMALS"  "$DEFAULT_VISABILITY" "$DEFAULT_ORDINAL_LEVEL"
          done
 
         cat >> ${TARGET}/${BLOCKCHAIN_NAME}TokensList.swift << __EOF__

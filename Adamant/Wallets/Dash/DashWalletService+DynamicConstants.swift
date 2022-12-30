@@ -23,6 +23,14 @@ extension DashWalletService {
         2.0e-05
     }
     
+    var defaultVisibility: Bool {
+        true
+    }
+    
+    var defaultOrdinalLevel: Int? {
+        50
+    }
+    
     static let explorerAddress = "https://dashblockexplorer.com/tx/"
     
     static var nodes: [Node] {

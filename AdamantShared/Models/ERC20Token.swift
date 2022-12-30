@@ -14,7 +14,9 @@ struct ERC20Token {
     let contractAddress: String
     let decimals: Int
     let naturalUnits: Int
+    let defaultVisibility: Bool
+    let defaultOrdinalLevel: Int?
     var logo: UIImage {
-        UIImage(named: "\(symbol.lowercased())_wallet") ?? UIImage()
+        UIImage(named: "\(symbol.lowercased())_wallet") ?? UIImage(named: "ethereum_wallet") ?? UIImage()
     }
 }

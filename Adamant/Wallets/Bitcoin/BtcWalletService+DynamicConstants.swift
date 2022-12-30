@@ -23,6 +23,14 @@ extension BtcWalletService {
         5.46e-06
     }
     
+    var defaultVisibility: Bool {
+        true
+    }
+    
+    var defaultOrdinalLevel: Int? {
+        10
+    }
+    
     static let explorerAddress = "https://explorer.btc.com/btc/transaction/"
     
     static var nodes: [Node] {

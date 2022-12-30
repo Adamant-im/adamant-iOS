@@ -23,6 +23,14 @@ extension DogeWalletService {
         0
     }
     
+    var defaultVisibility: Bool {
+        true
+    }
+    
+    var defaultOrdinalLevel: Int? {
+        40
+    }
+    
     static let explorerAddress = "https://dogechain.info/tx/"
     
     static var nodes: [Node] {

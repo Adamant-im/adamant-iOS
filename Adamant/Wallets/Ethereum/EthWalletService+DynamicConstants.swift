@@ -23,6 +23,14 @@ extension EthWalletService {
         0
     }
     
+    var defaultVisibility: Bool {
+        true
+    }
+    
+    var defaultOrdinalLevel: Int? {
+        20
+    }
+    
     static let explorerAddress = "https://etherscan.io/tx/"
     
     static var nodes: [Node] {
