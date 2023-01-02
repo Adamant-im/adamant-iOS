@@ -18,6 +18,7 @@ final class ChatViewModel: NSObject {
     
     private let _sender = ObservableProperty(Sender.default)
     private let _messages = ObservableProperty([Message]())
+    private let _loadingStatus = ObservableProperty<LoadingStatus?>(nil)
     
     private var controller: NSFetchedResultsController<ChatTransaction>?
     private var account: AdamantAccount?
@@ -30,6 +31,10 @@ final class ChatViewModel: NSObject {
     
     var messages: ObservableVariable<[Message]> {
         _messages.eraseToGetter()
+    }
+    
+    var loadingStatus: ObservableVariable<LoadingStatus?> {
+        _loadingStatus.eraseToGetter()
     }
     
     init(chatsProvider: ChatsProvider) {
@@ -54,6 +59,15 @@ final class ChatViewModel: NSObject {
             DispatchQueue.onMainAsync { self?.updateMessages() }
         }
     }
+    
+    func isNeedToDisplayDateHeader(index: Int) -> Bool {
+        guard index > .zero else { return true }
+        
+        let timeIntervalFromLastMessage = messages.value[index].sentDate
+            .timeIntervalSince(messages.value[index - 1].sentDate)
+        
+        return timeIntervalFromLastMessage >= dateHeaderTimeInterval
+    }
 }
 
 private extension ChatViewModel {
@@ -63,4 +77,14 @@ private extension ChatViewModel {
             .init(chatTransaction: $0)
         }
     }
+    
+    func setIsLoading(_ isLoading: Bool) {
+        _loadingStatus.value = isLoading
+            ? messages.value.count == .zero
+                ? .fullscreen
+                : .onTop
+            : nil
+    }
 }
+
+private let dateHeaderTimeInterval: TimeInterval = 3600

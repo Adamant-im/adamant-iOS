@@ -11,10 +11,10 @@ import UIKit
 import Combine
 
 final class ChatLayoutDelegate: MessagesLayoutDelegate {
-    private let currentSender: ObservableVariable<ChatViewModel.Sender>
+    private let viewModel: ChatViewModel
     
-    init(currentSender: ObservableVariable<ChatViewModel.Sender>) {
-        self.currentSender = currentSender
+    init(viewModel: ChatViewModel) {
+        self.viewModel = viewModel
     }
     
     func avatarSize(
@@ -25,15 +25,23 @@ final class ChatLayoutDelegate: MessagesLayoutDelegate {
     
     func cellTopLabelHeight(
         for _: MessageType,
-        at _: IndexPath,
+        at indexPath: IndexPath,
         in _: MessagesCollectionView
-    ) -> CGFloat { labelHeight }
+    ) -> CGFloat {
+        viewModel.isNeedToDisplayDateHeader(index: indexPath.section)
+            ? labelHeight
+            : .zero
+    }
     
     func messageTopLabelHeight(
-        for _: MessageType,
+        for message: MessageType,
         at _: IndexPath,
         in _: MessagesCollectionView
-    ) -> CGFloat { labelHeight }
+    ) -> CGFloat {
+        message.fullModel.status == .failed
+            ? labelHeight
+            : .zero
+    }
     
     func messageBottomLabelHeight(
         for _: MessageType,
@@ -70,11 +78,20 @@ final class ChatLayoutDelegate: MessagesLayoutDelegate {
     ) -> CellSizeCalculator {
         .init()
     }
+    
+    func headerViewSize(
+        for section: Int,
+        in messagesCollectionView: MessagesCollectionView
+    ) -> CGSize {
+        section == .zero && viewModel.loadingStatus.value == .onTop
+            ? SpinnerView.size
+            : .zero
+    }
 }
 
 private extension ChatLayoutDelegate {
     func textAlignment(for message: MessageType) -> NSTextAlignment {
-        message.sender.senderId == currentSender.value.senderId
+        message.sender.senderId == viewModel.sender.value.senderId
             ? .right
             : .left
     }
@@ -84,7 +101,7 @@ private let labelHeight: CGFloat = 16
 private let labelSideInset: CGFloat = 12
 
 private let topBottomLabelInsets = UIEdgeInsets(
-    top: .zero,
+    top: 2,
     left: labelSideInset,
     bottom: .zero,
     right: labelSideInset

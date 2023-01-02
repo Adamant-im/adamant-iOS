@@ -18,7 +18,7 @@ extension ChatViewModel.Message {
         self.init(
             messageId: chatTransaction.chatMessageId ?? "",
             sentDate: chatTransaction.date.map { $0 as Date } ?? .init(),
-            sender: ChatViewModel.Sender(transaction: chatTransaction),
+            senderModel: .init(transaction: chatTransaction),
             status: .init(messageStatus: chatTransaction.statusEnum),
             text: "someChatTransaction"
         )
@@ -27,11 +27,13 @@ extension ChatViewModel.Message {
 
 private extension ChatViewModel.Message {
     init(messageTransaction: MessageTransaction) {
-        self.messageId = messageTransaction.chatMessageId ?? ""
-        self.sentDate = messageTransaction.date.map { $0 as Date } ?? .init()
-        self.status = .init(messageStatus: messageTransaction.statusEnum)
-        self.text = messageTransaction.message ?? ""
-        self.sender = ChatViewModel.Sender(transaction: messageTransaction)
+        self.init(
+            messageId: messageTransaction.chatMessageId ?? "",
+            sentDate: messageTransaction.date.map { $0 as Date } ?? .init(),
+            senderModel: .init(transaction: messageTransaction),
+            status: .init(messageStatus: messageTransaction.statusEnum),
+            text: messageTransaction.message ?? ""
+        )
     }
 }
 
@@ -50,7 +52,9 @@ private extension ChatViewModel.Message.Status {
 
 private extension ChatViewModel.Sender {
     init(transaction: ChatTransaction) {
-        self.senderId = transaction.senderId ?? ""
-        self.displayName = transaction.senderId ?? ""
+        self.init(
+            senderId: transaction.senderId ?? "",
+            displayName: transaction.senderId ?? ""
+        )
     }
 }

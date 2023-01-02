@@ -62,10 +62,12 @@ final class ChatDataSource: MessagesDataSource {
     
     func cellTopLabelAttributedText(
         for message: MessageType,
-        at _: IndexPath
+        at indexPath: IndexPath
     ) -> NSAttributedString? {
-        .init(
-            string: "Message date",
+        guard viewModel.isNeedToDisplayDateHeader(index: indexPath.section) else { return nil }
+        
+        return .init(
+            string: message.sentDate.humanizedDay(),
             attributes: [
                 .font: UIFont.boldSystemFont(ofSize: 10),
                 .foregroundColor: UIColor.adamant.secondary

@@ -10,7 +10,7 @@ import MessageKit
 import Foundation
 
 extension ChatViewModel {
-    struct Sender: SenderType {
+    struct Sender: SenderType, Equatable {
         let senderId: String
         let displayName: String
         

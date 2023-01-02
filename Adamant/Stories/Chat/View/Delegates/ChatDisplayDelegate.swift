@@ -11,10 +11,10 @@ import UIKit
 import Combine
 
 final class ChatDisplayDelegate: MessagesDisplayDelegate {
-    private let currentSender: ObservableVariable<ChatViewModel.Sender>
+    private let viewModel: ChatViewModel
     
-    init(currentSender: ObservableVariable<ChatViewModel.Sender>) {
-        self.currentSender = currentSender
+    init(viewModel: ChatViewModel) {
+        self.viewModel = viewModel
     }
     
     func messageStyle(
@@ -23,7 +23,7 @@ final class ChatDisplayDelegate: MessagesDisplayDelegate {
         in _: MessagesCollectionView
     ) -> MessageStyle {
         .bubbleTail(
-            message.sender.senderId == currentSender.value.senderId
+            message.sender.senderId == viewModel.sender.value.senderId
                 ? .bottomRight
                 : .bottomLeft,
             .curved
@@ -35,7 +35,7 @@ final class ChatDisplayDelegate: MessagesDisplayDelegate {
         at _: IndexPath,
         in _: MessagesCollectionView
     ) -> UIColor {
-        guard message.sender.senderId == currentSender.value.senderId else {
+        guard message.sender.senderId == viewModel.sender.value.senderId else {
             return .adamant.chatRecipientBackground
         }
         
@@ -54,4 +54,22 @@ final class ChatDisplayDelegate: MessagesDisplayDelegate {
         at _: IndexPath,
         in _: MessagesCollectionView
     ) -> UIColor { .adamant.primary }
+    
+    func messageHeaderView(
+        for indexPath: IndexPath,
+        in messagesCollectionView: MessagesCollectionView
+    ) -> MessageReusableView {
+        let header = messagesCollectionView.dequeueReusableHeaderView(
+            ChatViewController.SpinnerCell.self,
+            for: indexPath
+        )
+        
+        if indexPath.section == .zero, viewModel.loadingStatus.value == .onTop {
+            header.wrappedView.startAnimating()
+        } else {
+            header.wrappedView.stopAnimating()
+        }
+        
+        return header
+    }
 }

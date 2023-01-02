@@ -1,5 +1,5 @@
 //
-//  MessageKit+Utilities.swift
+//  MessageKit+Extension.swift
 //  Adamant
 //
 //  Created by Andrey on 25.08.2022.

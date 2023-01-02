@@ -24,6 +24,8 @@ extension String.adamantLocalized {
 }
 
 class ChatListViewController: UIViewController {
+    typealias SpinnerCell = TableCellWrapper<SpinnerView>
+    
     let cellIdentifier = "cell"
     let loadingCellIdentifier = "loadingCell"
     let cellHeight: CGFloat = 76.0
@@ -106,7 +108,7 @@ class ChatListViewController: UIViewController {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
-        tableView.register(LoadingTableViewCell.self, forCellReuseIdentifier: loadingCellIdentifier)
+        tableView.register(SpinnerCell.self, forCellReuseIdentifier: loadingCellIdentifier)
         tableView.refreshControl = refreshControl
         tableView.backgroundColor = .clear
         
@@ -362,7 +364,7 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
         if isBusy,
            indexPath.row == lastSystemChatPositionRow,
            let cell = tableView.cellForRow(at: indexPath),
-           cell is LoadingTableViewCell
+           cell is SpinnerCell
         {
             tableView.deselectRow(at: indexPath, animated: true)
             return
@@ -389,8 +391,8 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
 extension ChatListViewController {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if isBusy && indexPath.row == lastSystemChatPositionRow {
-            let cell = tableView.dequeueReusableCell(withIdentifier: loadingCellIdentifier, for: indexPath) as! LoadingTableViewCell
-            cell.startLoadAnimating()
+            let cell = tableView.dequeueReusableCell(withIdentifier: loadingCellIdentifier, for: indexPath) as! SpinnerCell
+            cell.wrappedView.startAnimating()
             return cell
         }
         
@@ -411,7 +413,7 @@ extension ChatListViewController {
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if isBusy,
            indexPath.row == lastSystemChatPositionRow,
-           let cell = cell as? LoadingTableViewCell {
+           let cell = cell as? SpinnerCell {
             configureCell(cell)
         } else if let cell = cell as? ChatTableViewCell {
             let nIndexPath = chatControllerIndexPath(tableViewIndexPath: indexPath)
@@ -447,8 +449,8 @@ extension ChatListViewController {
         loadNewChats(offset: roomsLoadedCount)
     }
     
-    private func configureCell(_ cell: LoadingTableViewCell) {
-        cell.startLoadAnimating()
+    private func configureCell(_ cell: SpinnerCell) {
+        cell.wrappedView.startAnimating()
         cell.backgroundColor = .clear
     }
     

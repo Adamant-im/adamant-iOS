@@ -10,11 +10,16 @@ import MessageKit
 import InputBarAccessoryView
 import Combine
 import UIKit
+import SnapKit
 
 final class ChatViewController: MessagesViewController {
+    typealias SpinnerCell = MessageCellWrapper<SpinnerView>
+    
     private let delegates: Delegates
-    private let inputBar = ChatInputBar()
     private var subscriptions = Set<AnyCancellable>()
+    
+    private let inputBar = ChatInputBar()
+    private let loadingView = LoadingView()
     
     let viewModel: ChatViewModel
     
@@ -41,6 +46,16 @@ final class ChatViewController: MessagesViewController {
         super.viewDidLoad()
         view.backgroundColor = .adamant.backgroundColor
         messagesCollectionView.backgroundColor = .adamant.backgroundColor
+        messagesCollectionView.register(
+            SpinnerCell.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader
+        )
+        
+        view.addSubview(loadingView)
+        loadingView.snp.makeConstraints {
+            $0.directionalEdges.equalToSuperview()
+        }
+        
         viewModel.loadMessages()
     }
 }
@@ -56,10 +71,17 @@ private extension ChatViewController {
         }.store(in: &subscriptions)
         
         viewModel.messages
-            .combineLatest(viewModel.sender)
+            .removeDuplicates()
+            .combineLatest(viewModel.sender.removeDuplicates())
+            .combineLatest(viewModel.loadingStatus.removeDuplicates())
             .sink { [weak messagesCollectionView] _ in
                 messagesCollectionView?.reloadData(alignment: .bottom)
             }
+            .store(in: &subscriptions)
+        
+        viewModel.loadingStatus
+            .removeDuplicates()
+            .sink { [weak self] _ in self?.updateLoadingView() }
             .store(in: &subscriptions)
     }
     
@@ -68,5 +90,16 @@ private extension ChatViewController {
         messagesCollectionView.messagesLayoutDelegate = delegates.layoutDelegate
         messagesCollectionView.messagesDisplayDelegate = delegates.displayDelegate
         messageInputBar.delegate = delegates.inputBarDelegate
+    }
+    
+    func updateLoadingView() {
+        let isLoading = viewModel.loadingStatus.value == .fullscreen
+        loadingView.isHidden = !isLoading
+        
+        if isLoading {
+            loadingView.startAnimating()
+        } else {
+            loadingView.stopAnimating()
+        }
     }
 }

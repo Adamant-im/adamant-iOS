@@ -10,17 +10,17 @@ import MessageKit
 import Foundation
 
 extension ChatViewModel {
-    struct Message {
+    struct Message: Equatable {
         let messageId: String
         let sentDate: Date
-        let sender: SenderType
+        let senderModel: Sender
         let status: Status
         let text: String
         
         static let `default` = Self(
             messageId: "",
             sentDate: .init(),
-            sender: ChatViewModel.Sender.default,
+            senderModel: .default,
             status: .delivered,
             text: ""
         )
@@ -36,6 +36,10 @@ extension ChatViewModel.Message {
 }
 
 extension ChatViewModel.Message: MessageType {
+    var sender: SenderType {
+        senderModel
+    }
+    
     var kind: MessageKind {
         .text(text)
     }
