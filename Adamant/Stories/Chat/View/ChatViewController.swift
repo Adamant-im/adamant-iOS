@@ -33,9 +33,6 @@ final class ChatViewController: MessagesViewController {
         self.viewModel = viewModel
         self.delegates = delegates
         super.init(nibName: nil, bundle: nil)
-        
-        setupObservers()
-        setupDelegates()
     }
     
     required init?(coder: NSCoder) {
@@ -56,7 +53,21 @@ final class ChatViewController: MessagesViewController {
             $0.directionalEdges.equalToSuperview()
         }
         
-        viewModel.loadMessages()
+        setupDelegates()
+        setupObservers()
+
+        // Content insets are not set yet and we can't correctly display messages on the screen.
+        // So loadFirstMessages() is not called in this task. We need to add it to the queue
+        DispatchQueue.main.async(execute: viewModel.loadFirstMessages)
+    }
+    
+    override func collectionView(
+        _: UICollectionView,
+        willDisplay _: UICollectionViewCell,
+        forItemAt indexPath: IndexPath
+    ) {
+        guard indexPath.section < 4 else { return }
+        viewModel.loadMoreMessagesIfNeeded()
     }
 }
 
@@ -73,15 +84,14 @@ private extension ChatViewController {
         viewModel.messages
             .removeDuplicates()
             .combineLatest(viewModel.sender.removeDuplicates())
-            .combineLatest(viewModel.loadingStatus.removeDuplicates())
             .sink { [weak messagesCollectionView] _ in
-                messagesCollectionView?.reloadData(alignment: .bottom)
+                messagesCollectionView?.reloadDataWithFixedBottom()
             }
             .store(in: &subscriptions)
         
         viewModel.loadingStatus
             .removeDuplicates()
-            .sink { [weak self] _ in self?.updateLoadingView() }
+            .sink { [weak self] _ in self?.updateLoadingViews() }
             .store(in: &subscriptions)
     }
     
@@ -92,7 +102,12 @@ private extension ChatViewController {
         messageInputBar.delegate = delegates.inputBarDelegate
     }
     
-    func updateLoadingView() {
+    func updateLoadingViews() {
+        updateFullscreenLoadingView()
+        updateTopLoadingView()
+    }
+    
+    func updateFullscreenLoadingView() {
         let isLoading = viewModel.loadingStatus.value == .fullscreen
         loadingView.isHidden = !isLoading
         
@@ -100,6 +115,19 @@ private extension ChatViewController {
             loadingView.startAnimating()
         } else {
             loadingView.stopAnimating()
+        }
+    }
+    
+    func updateTopLoadingView() {
+        guard messagesCollectionView.numberOfSections > .zero else { return }
+        
+        UIView.performWithoutAnimation {
+            switch viewModel.loadingStatus.value {
+            case .onTop:
+                messagesCollectionView.reloadSections(.init(integer: .zero))
+            case .fullscreen, .none:
+                messagesCollectionView.reloadSectionsWithFixedBottom(.init(integer: .zero))
+            }
         }
     }
 }

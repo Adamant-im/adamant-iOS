@@ -9,7 +9,7 @@
 import Combine
 import CoreData
 
-final class ChatViewModel: NSObject {
+final class ChatViewModel {
     // MARK: Dependencies
     
     private let chatsProvider: ChatsProvider
@@ -21,8 +21,6 @@ final class ChatViewModel: NSObject {
     private let _loadingStatus = ObservableProperty<LoadingStatus?>(nil)
     
     private var controller: NSFetchedResultsController<ChatTransaction>?
-    private var account: AdamantAccount?
-    private var messageToShow: MessageTransaction?
     private(set) var chatroom: Chatroom?
     
     var sender: ObservableVariable<Sender> {
@@ -46,18 +44,32 @@ final class ChatViewModel: NSObject {
         chatroom: Chatroom,
         messageToShow: MessageTransaction?
     ) {
-        self.account = account
+        reset()
         self.chatroom = chatroom
-        self.messageToShow = messageToShow
         controller = chatsProvider.getChatController(for: chatroom)
+        
+        guard let account = account else { return }
+        _sender.value = .init(senderId: account.address, displayName: account.address)
+        _messages.value = []
     }
     
-    func loadMessages() {
+    func loadFirstMessages() {
         guard let address = chatroom?.partner?.address else { return }
         
-        chatsProvider.getChatMessages(with: address, offset: .zero) { [weak self] in
-            DispatchQueue.onMainAsync { self?.updateMessages() }
+        if address == AdamantContacts.adamantWelcomeWallet.name {
+            updateMessages()
+        } else {
+            loadMessages(address: address, offset: .zero, loadingStatus: .fullscreen)
         }
+    }
+    
+    func loadMoreMessagesIfNeeded() {
+        guard
+            let address = chatroom?.partner?.address,
+            chatsProvider.chatMaxMessages[address] ?? .zero > messages.value.count
+        else { return }
+        
+        loadMessages(address: address, offset: messages.value.count, loadingStatus: .onTop)
     }
     
     func isNeedToDisplayDateHeader(index: Int) -> Bool {
@@ -71,6 +83,30 @@ final class ChatViewModel: NSObject {
 }
 
 private extension ChatViewModel {
+    var isLoading: Bool {
+        switch loadingStatus.value {
+        case .fullscreen, .onTop:
+            return true
+        case .none:
+            return false
+        }
+    }
+    
+    func loadMessages(address: String, offset: Int, loadingStatus: LoadingStatus) {
+        guard !isLoading else { return }
+        
+        _loadingStatus.value = loadingStatus
+        chatsProvider.getChatMessages(
+            with: address,
+            offset: offset
+        ) { [weak self] in
+            DispatchQueue.onMainAsync {
+                self?.updateMessages()
+                self?._loadingStatus.value = nil
+            }
+        }
+    }
+    
     func updateMessages() {
         try? controller?.performFetch()
         _messages.value = (controller?.fetchedObjects ?? []).map {
@@ -78,12 +114,12 @@ private extension ChatViewModel {
         }
     }
     
-    func setIsLoading(_ isLoading: Bool) {
-        _loadingStatus.value = isLoading
-            ? messages.value.count == .zero
-                ? .fullscreen
-                : .onTop
-            : nil
+    func reset() {
+        _sender.value = .default
+        _messages.value = []
+        _loadingStatus.value = nil
+        controller = nil
+        chatroom = nil
     }
 }
 

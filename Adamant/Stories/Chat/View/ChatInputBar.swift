@@ -21,6 +21,11 @@ final class ChatInputBar: InputBarAccessoryView {
         didSet { updateIsEnabled() }
     }
     
+    var text: String {
+        get { inputTextView.text }
+        set { inputTextView.text = newValue }
+    }
+    
     private lazy var feeLabel = makeFeeLabel()
     private lazy var attachmentButton = makeAttachmentButton()
     
@@ -37,6 +42,11 @@ final class ChatInputBar: InputBarAccessoryView {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         updateLayerColors()
+    }
+    
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        sendButton.isEnabled = !inputTextView.text.isEmpty
     }
 }
 

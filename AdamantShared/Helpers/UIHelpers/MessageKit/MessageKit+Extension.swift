@@ -10,42 +10,45 @@ import UIKit
 import MessageKit
 
 extension MessagesCollectionView {
-    enum DataReloadAlignment {
-        case top
-        case bottom
+    /// Saves the distance to the bottom while usual reloadData() saves the distance to the top
+    func reloadDataWithFixedBottom() {
+        let bottomOffset = getBottomOffset()
+        reloadData()
+        layoutIfNeeded()
+        setBottomOffset(bottomOffset)
     }
     
-    func reloadData(alignment: DataReloadAlignment) {
-        switch alignment {
-        case .top:
-            reloadData()
-        case .bottom:
-            reloadDataWithFixedBottom()
-        }
+    /// Saves the distance to the bottom while usual reloadSections(_) saves the distance to the top
+    func reloadSectionsWithFixedBottom(_ sections: IndexSet) {
+        let bottomOffset = getBottomOffset()
+        reloadSections(sections)
+        layoutIfNeeded()
+        setBottomOffset(bottomOffset)
     }
 }
 
 private extension MessagesCollectionView {
+    var maxBottomOffset: CGFloat {
+        contentHeightWithInsets - bounds.height
+    }
+    
     var contentHeightWithInsets: CGFloat {
         contentSize.height + contentInset.bottom + safeAreaInsets.bottom
     }
     
-    func reloadDataWithFixedBottom() {
-        let bottomOffset = getBottomOffset()
-
-        reloadData()
-        layoutIfNeeded()
-        
-        setBottomOffset(bottomOffset)
-    }
-    
     func getBottomOffset() -> CGFloat {
-        guard contentHeightWithInsets > bounds.height else { return .zero }
-        return contentHeightWithInsets - bounds.maxY
+        contentHeightWithInsets - bounds.maxY
     }
     
     func setBottomOffset(_ offset: CGFloat) {
-        guard contentHeightWithInsets > bounds.height else { return }
+        guard maxBottomOffset > .zero else { return }
+        
+        var offset = offset
+        if offset < .zero {
+            offset = .zero
+        } else if offset > maxBottomOffset {
+            offset = maxBottomOffset
+        }
         
         let newOffset = CGPoint(
             x: contentOffset.x,
