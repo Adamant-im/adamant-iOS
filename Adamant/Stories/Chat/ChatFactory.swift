@@ -12,15 +12,22 @@ import Combine
 
 struct ChatFactory {
     let chatsProvider: ChatsProvider
+    let dialogService: DialogService
+    let transferProvider: TransfersProvider
     
     func makeViewController() -> UIViewController {
-        let viewModel = ChatViewModel(chatsProvider: chatsProvider)
+        let viewModel = ChatViewModel(
+            chatsProvider: chatsProvider,
+            markdownParser: .init(font: UIFont.systemFont(ofSize: UIFont.systemFontSize)),
+            dialogService: dialogService,
+            transfersProvider: transferProvider
+        )
         
         return ChatViewController(
             viewModel: viewModel,
             delegates: .init(
                 dataSource: ChatDataSource(viewModel: viewModel),
-                inputBarDelegate: ChatInputBarDelegate(sendMessageAction: { _ in }),
+                inputBarDelegate: ChatInputBarDelegate(sendMessageAction: viewModel.sendMessage),
                 layoutDelegate: ChatLayoutDelegate(viewModel: viewModel),
                 displayDelegate: ChatDisplayDelegate(viewModel: viewModel)
             )

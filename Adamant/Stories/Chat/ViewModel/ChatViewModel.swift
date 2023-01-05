@@ -8,17 +8,24 @@
 
 import Combine
 import CoreData
+import MarkdownKit
 
-final class ChatViewModel {
+final class ChatViewModel: NSObject {
     // MARK: Dependencies
     
     private let chatsProvider: ChatsProvider
+    private let markdownParser: MarkdownParser
+    private let dialogService: DialogService
+    private let transfersProvider: TransfersProvider
     
     // MARK: Properties
     
     private let _sender = ObservableProperty(Sender.default)
     private let _messages = ObservableProperty([Message]())
     private let _loadingStatus = ObservableProperty<LoadingStatus?>(nil)
+    private let _inputTextSetter = ObservableProperty("")
+    private let _scrollDown = ObservableSender<Void>()
+    private let _showFreeTokensAlert = ObservableSender<Void>()
     
     private var controller: NSFetchedResultsController<ChatTransaction>?
     private(set) var chatroom: Chatroom?
@@ -35,8 +42,43 @@ final class ChatViewModel {
         _loadingStatus.eraseToGetter()
     }
     
-    init(chatsProvider: ChatsProvider) {
+    var scrollDown: Observable<Void> {
+        _scrollDown.eraseToAnyPublisher()
+    }
+    
+    var inputTextSetter: Observable<String> {
+        _inputTextSetter.eraseToAnyPublisher()
+    }
+    
+    var showFreeTokensAlert: Observable<Void> {
+        _showFreeTokensAlert.eraseToAnyPublisher()
+    }
+    
+    var freeTokensURL: URL? {
+        guard let address = chatroom?.partner?.address else { return nil }
+        let urlString: String = .adamantLocalized.wallets.getFreeTokensUrl(for: address)
+        
+        guard let url = URL(string: urlString) else {
+            dialogService.showError(
+                withMessage: "Failed to create URL with string: \(urlString)",
+                error: nil
+            )
+            return nil
+        }
+        
+        return url
+    }
+    
+    init(
+        chatsProvider: ChatsProvider,
+        markdownParser: MarkdownParser,
+        dialogService: DialogService,
+        transfersProvider: TransfersProvider
+    ) {
         self.chatsProvider = chatsProvider
+        self.markdownParser = markdownParser
+        self.dialogService = dialogService
+        self.transfersProvider = transfersProvider
     }
     
     func setup(
@@ -47,6 +89,7 @@ final class ChatViewModel {
         reset()
         self.chatroom = chatroom
         controller = chatsProvider.getChatController(for: chatroom)
+        controller?.delegate = self
         
         guard let account = account else { return }
         _sender.value = .init(senderId: account.address, displayName: account.address)
@@ -79,6 +122,33 @@ final class ChatViewModel {
             .timeIntervalSince(messages.value[index - 1].sentDate)
         
         return timeIntervalFromLastMessage >= dateHeaderTimeInterval
+    }
+    
+    func sendMessage(text: String) {
+        let message: AdamantMessage = markdownParser.parse(text).length == text.count
+            ? .text(text)
+            : .markdownText(text)
+        
+        guard
+            let partnerAddress = chatroom?.partner?.address,
+            validateSendingMessage(message: message)
+        else { return }
+        
+        chatsProvider.sendMessage(
+            message,
+            recipientId: partnerAddress,
+            from: chatroom
+        ) { [weak self] result in
+            DispatchQueue.onMainAsync {
+                self?.handleMessageSendingResult(result: result, sentText: text)
+            }
+        }
+    }
+}
+
+extension ChatViewModel: NSFetchedResultsControllerDelegate {
+    func controllerDidChangeContent(_: NSFetchedResultsController<NSFetchRequestResult>) {
+        updateMessages()
     }
 }
 
@@ -118,8 +188,46 @@ private extension ChatViewModel {
         _sender.value = .default
         _messages.value = []
         _loadingStatus.value = nil
+        _inputTextSetter.value = ""
         controller = nil
         chatroom = nil
+    }
+    
+    func validateSendingMessage(message: AdamantMessage) -> Bool {
+        let validationStatus = chatsProvider.validateMessage(message)
+        
+        switch validationStatus {
+        case .isValid:
+            return true
+        case .empty:
+            return false
+        case .tooLong:
+            dialogService.showToastMessage(validationStatus.localized)
+            return false
+        }
+    }
+    
+    func handleMessageSendingResult(result: ChatsProviderResultWithTransaction, sentText: String) {
+        switch result {
+        case let .success(transaction):
+            guard transaction.statusEnum == .pending else { break }
+            _scrollDown.send()
+        case let .failure(error):
+            switch error {
+            case .messageNotValid:
+                _inputTextSetter.value = sentText
+            case .notEnoughMoneyToSend:
+                _inputTextSetter.value = sentText
+                guard transfersProvider.hasTransactions else {
+                    _showFreeTokensAlert.send()
+                    return
+                }
+            case .accountNotFound, .accountNotInitiated, .dependencyError, .internalError, .networkError, .notLogged, .requestCancelled, .serverError, .transactionNotFound:
+                break
+            }
+            
+            dialogService.showRichError(error: error)
+        }
     }
 }
 

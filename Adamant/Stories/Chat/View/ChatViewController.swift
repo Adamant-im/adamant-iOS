@@ -11,6 +11,7 @@ import InputBarAccessoryView
 import Combine
 import UIKit
 import SnapKit
+import SafariServices
 
 final class ChatViewController: MessagesViewController {
     typealias SpinnerCell = MessageCellWrapper<SpinnerView>
@@ -77,6 +78,7 @@ private extension ChatViewController {
             for: UITextView.textDidBeginEditingNotification,
             object: messageInputBar.inputTextView
         )
+        .combineLatest(viewModel.scrollDown)
         .sink { [weak messagesCollectionView] _ in
             messagesCollectionView?.scrollToLastItem()
         }.store(in: &subscriptions)
@@ -92,6 +94,14 @@ private extension ChatViewController {
         viewModel.loadingStatus
             .removeDuplicates()
             .sink { [weak self] _ in self?.updateLoadingViews() }
+            .store(in: &subscriptions)
+        
+        viewModel.inputTextSetter
+            .assign(to: \.text, on: inputBar)
+            .store(in: &subscriptions)
+        
+        viewModel.showFreeTokensAlert
+            .sink { [weak self] in self?.showFreeTokenAlert() }
             .store(in: &subscriptions)
     }
     
@@ -128,6 +138,38 @@ private extension ChatViewController {
             case .fullscreen, .none:
                 messagesCollectionView.reloadSectionsWithFixedBottom(.init(integer: .zero))
             }
+        }
+    }
+    
+    func showFreeTokenAlert() {
+        let alert = UIAlertController(
+            title: "",
+            message: String.adamantLocalized.chat.freeTokensMessage,
+            preferredStyle: .alert
+        )
+        
+        let cancelAction = UIAlertAction(
+            title: String.adamantLocalized.alert.cancel,
+            style: .default,
+            handler: nil
+        )
+        
+        alert.addAction(makeFreeTokensAlertAction())
+        alert.addAction(cancelAction)
+        alert.modalPresentationStyle = .overFullScreen
+        present(alert, animated: true, completion: nil)
+    }
+    
+    func makeFreeTokensAlertAction() -> UIAlertAction {
+        .init(
+            title: String.adamantLocalized.chat.freeTokens,
+            style: .default
+        ) { [weak self] _ in
+            guard let self = self, let url = self.viewModel.freeTokensURL else { return }
+            let safari = SFSafariViewController(url: url)
+            safari.preferredControlTintColor = UIColor.adamant.primary
+            safari.modalPresentationStyle = .overFullScreen
+            self.present(safari, animated: true, completion: nil)
         }
     }
 }

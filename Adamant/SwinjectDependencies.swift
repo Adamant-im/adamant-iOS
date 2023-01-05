@@ -181,5 +181,14 @@ extension Container {
                 accountService: r.resolve(AccountService.self)!
             )
         }.inObjectScope(.container)
+        
+        // MARK: Chat screen factory
+        self.register(ChatFactory.self) { r in
+            ChatFactory(
+                chatsProvider: r.resolve(ChatsProvider.self)!,
+                dialogService: r.resolve(DialogService.self)!,
+                transferProvider: r.resolve(TransfersProvider.self)!
+            )
+        }
     }
 }
