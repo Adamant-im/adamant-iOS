@@ -19,8 +19,9 @@ final class ChatViewController: MessagesViewController {
     private let delegates: Delegates
     private var subscriptions = Set<AnyCancellable>()
     
-    private let inputBar = ChatInputBar()
-    private let loadingView = LoadingView()
+    private lazy var inputBar = ChatInputBar()
+    private lazy var chatMessagesCollectionView = ChatMessagesCollectionView()
+    private lazy var loadingView = LoadingView()
     
     let viewModel: ChatViewModel
     
@@ -28,6 +29,12 @@ final class ChatViewController: MessagesViewController {
     override var messageInputBar: InputBarAccessoryView {
         get { inputBar }
         set { assertionFailure("Do not set messageInputBar") }
+    }
+    
+    // swiftlint:disable unused_setter_value
+    override var messagesCollectionView: MessagesCollectionView {
+        get { chatMessagesCollectionView }
+        set { assertionFailure("Do not set messagesCollectionView") }
     }
     
     init(viewModel: ChatViewModel, delegates: Delegates) {
@@ -43,6 +50,7 @@ final class ChatViewController: MessagesViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .adamant.backgroundColor
+        maintainPositionOnInputBarHeightChanged = true
         messagesCollectionView.backgroundColor = .adamant.backgroundColor
         messagesCollectionView.register(
             SpinnerCell.self,
@@ -56,10 +64,7 @@ final class ChatViewController: MessagesViewController {
         
         setupDelegates()
         setupObservers()
-
-        // Content insets are not set yet and we can't correctly display messages on the screen.
-        // So loadFirstMessages() is not called in this task. We need to add it to the queue
-        DispatchQueue.main.async(execute: viewModel.loadFirstMessages)
+        viewModel.loadFirstMessages()
     }
     
     override func collectionView(
@@ -70,24 +75,26 @@ final class ChatViewController: MessagesViewController {
         guard indexPath.section < 4 else { return }
         viewModel.loadMoreMessagesIfNeeded()
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        chatMessagesCollectionView.animationEnabled = true
+    }
 }
 
 private extension ChatViewController {
     func setupObservers() {
-        NotificationCenter.default.publisher(
-            for: UITextView.textDidBeginEditingNotification,
-            object: messageInputBar.inputTextView
-        )
-        .combineLatest(viewModel.scrollDown)
-        .sink { [weak messagesCollectionView] _ in
-            messagesCollectionView?.scrollToLastItem()
-        }.store(in: &subscriptions)
+        viewModel.scrollDown
+            .sink { [weak messagesCollectionView] _ in
+                messagesCollectionView?.scrollToLastItem()
+            }
+            .store(in: &subscriptions)
         
         viewModel.messages
             .removeDuplicates()
             .combineLatest(viewModel.sender.removeDuplicates())
-            .sink { [weak messagesCollectionView] _ in
-                messagesCollectionView?.reloadDataWithFixedBottom()
+            .sink { [weak chatMessagesCollectionView] _ in
+                chatMessagesCollectionView?.reloadDataWithFixedBottom()
             }
             .store(in: &subscriptions)
         
@@ -136,7 +143,7 @@ private extension ChatViewController {
             case .onTop:
                 messagesCollectionView.reloadSections(.init(integer: .zero))
             case .fullscreen, .none:
-                messagesCollectionView.reloadSectionsWithFixedBottom(.init(integer: .zero))
+                chatMessagesCollectionView.reloadSectionsWithFixedBottom(.init(integer: .zero))
             }
         }
     }
