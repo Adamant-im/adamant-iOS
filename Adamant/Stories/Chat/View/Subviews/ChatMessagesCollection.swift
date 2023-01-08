@@ -8,17 +8,33 @@
 
 import MessageKit
 import UIKit
+import Combine
 
 final class ChatMessagesCollectionView: MessagesCollectionView {
-    private var prevoiusVerticalInsets: CGFloat = .zero
+    private var prevoiusFullInsets: UIEdgeInsets = .zero
+    private var previousBottomOffset: CGFloat = .zero
+    private var subscriptions = Set<AnyCancellable>()
+    
     var animationEnabled = false
+    
+    init(didScroll: Observable<Void>) {
+        super.init(frame: .zero, collectionViewLayout: MessagesCollectionViewFlowLayout())
+        
+        didScroll
+            .sink { [weak self] in self?.moveContentIfInsetsChanged() }
+            .store(in: &subscriptions)
+    }
+    
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     /// Saves the distance to the bottom while usual reloadData() saves the distance to the top
     func reloadDataWithFixedBottom() {
         let bottomOffset = self.bottomOffset
         reloadData()
         layoutIfNeeded()
-        self.bottomOffset = bottomOffset
+        setBottomOffset(bottomOffset, animated: false)
     }
 
     /// Saves the distance to the bottom while usual reloadSections(_) saves the distance to the top
@@ -26,7 +42,7 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
         let bottomOffset = self.bottomOffset
         reloadSections(sections)
         layoutIfNeeded()
-        self.bottomOffset = bottomOffset
+        setBottomOffset(bottomOffset, animated: false)
     }
     
     override func layoutSubviews() {
@@ -36,11 +52,8 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
 }
 
 private extension ChatMessagesCollectionView {
-    var verticalInsets: CGFloat {
-        safeAreaInsets.top
-            + safeAreaInsets.bottom
-            + contentInset.top
-            + contentInset.bottom
+    var fullInsets: UIEdgeInsets {
+        safeAreaInsets + contentInset
     }
     
     var maxVerticalOffset: CGFloat {
@@ -48,19 +61,18 @@ private extension ChatMessagesCollectionView {
     }
     
     var bottomOffset: CGFloat {
-        get {
-            contentHeightWithBottomInsets - bounds.maxY
-        }
-        set {
-            setVerticalContentOffsetSafely(
-                contentHeightWithBottomInsets - bounds.height - newValue,
-                animated: false
-            )
-        }
+        contentHeightWithBottomInsets - bounds.maxY
     }
     
     var contentHeightWithBottomInsets: CGFloat {
-        contentSize.height + contentInset.bottom + safeAreaInsets.bottom
+        contentSize.height + fullInsets.bottom
+    }
+    
+    func setBottomOffset(_ newValue: CGFloat, animated: Bool) {
+        setVerticalContentOffsetSafely(
+            contentHeightWithBottomInsets - bounds.height - newValue,
+            animated: animated
+        )
     }
     
     func setVerticalContentOffsetSafely(_ offset: CGFloat, animated: Bool) {
@@ -80,12 +92,14 @@ private extension ChatMessagesCollectionView {
     }
     
     func moveContentIfInsetsChanged() {
-        guard prevoiusVerticalInsets != verticalInsets else { return }
-        defer { prevoiusVerticalInsets = verticalInsets }
+        if prevoiusFullInsets != fullInsets {
+            if !isDragging {
+                setBottomOffset(previousBottomOffset, animated: true)
+            }
+            
+            prevoiusFullInsets = fullInsets
+        }
         
-        let diff = verticalInsets - prevoiusVerticalInsets
-        guard diff > .zero else { return }
-        
-        setVerticalContentOffsetSafely(contentOffset.y + diff, animated: true)
+        previousBottomOffset = bottomOffset
     }
 }

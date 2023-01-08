@@ -93,7 +93,6 @@ final class ChatViewModel: NSObject {
         
         guard let account = account else { return }
         _sender.value = .init(senderId: account.address, displayName: account.address)
-        _messages.value = []
     }
     
     func loadFirstMessages() {

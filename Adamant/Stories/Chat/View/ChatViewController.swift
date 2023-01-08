@@ -18,10 +18,14 @@ final class ChatViewController: MessagesViewController {
     
     private let delegates: Delegates
     private var subscriptions = Set<AnyCancellable>()
+    private var didScrollSender = ObservableSender<Void>()
     
     private lazy var inputBar = ChatInputBar()
-    private lazy var chatMessagesCollectionView = ChatMessagesCollectionView()
     private lazy var loadingView = LoadingView()
+    
+    private lazy var chatMessagesCollectionView = ChatMessagesCollectionView(
+        didScroll: didScrollSender.eraseToAnyPublisher()
+    )
     
     let viewModel: ChatViewModel
     
@@ -67,18 +71,24 @@ final class ChatViewController: MessagesViewController {
         viewModel.loadFirstMessages()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        chatMessagesCollectionView.animationEnabled = true
+    }
+    
     override func collectionView(
-        _: UICollectionView,
-        willDisplay _: UICollectionViewCell,
+        _ collectionView: UICollectionView,
+        willDisplay cell: UICollectionViewCell,
         forItemAt indexPath: IndexPath
     ) {
+        super.collectionView(collectionView, willDisplay: cell, forItemAt: indexPath)
         guard indexPath.section < 4 else { return }
         viewModel.loadMoreMessagesIfNeeded()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        chatMessagesCollectionView.animationEnabled = true
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        super.scrollViewDidScroll(scrollView)
+        didScrollSender.send()
     }
 }
 

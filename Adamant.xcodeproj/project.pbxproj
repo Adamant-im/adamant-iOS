@@ -188,6 +188,7 @@
 		93B19AF629631800005305C0 /* CGSize+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93F391472962EEDC00BFD6AE /* CGSize+adamant.swift */; };
 		93B266B82959E00E00D6444D /* Message+ChatTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B266B72959E00E00D6444D /* Message+ChatTransaction.swift */; };
 		93CD1C5829632EB300B7CACA /* ReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CD1C5729632EB300B7CACA /* ReusableView.swift */; };
+		93E0C850296B08D900FF54D3 /* UIEdgeInsets+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93E0C84F296B08D900FF54D3 /* UIEdgeInsets+adamant.swift */; };
 		93E5D4DB293000BE00439298 /* UnregisteredTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93E5D4DA293000BE00439298 /* UnregisteredTransaction.swift */; };
 		93E5D4DC293000BE00439298 /* UnregisteredTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93E5D4DA293000BE00439298 /* UnregisteredTransaction.swift */; };
 		93E5D4DD293000BE00439298 /* UnregisteredTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93E5D4DA293000BE00439298 /* UnregisteredTransaction.swift */; };
@@ -845,6 +846,7 @@
 		93996A962968209C008D080B /* ChatMessagesCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesCollection.swift; sourceTree = "<group>"; };
 		93B266B72959E00E00D6444D /* Message+ChatTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Message+ChatTransaction.swift"; sourceTree = "<group>"; };
 		93CD1C5729632EB300B7CACA /* ReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReusableView.swift; sourceTree = "<group>"; };
+		93E0C84F296B08D900FF54D3 /* UIEdgeInsets+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIEdgeInsets+adamant.swift"; sourceTree = "<group>"; };
 		93E5D4DA293000BE00439298 /* UnregisteredTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnregisteredTransaction.swift; sourceTree = "<group>"; };
 		93E5D4DF2930029300439298 /* AdamantCore+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantCore+Extensions.swift"; sourceTree = "<group>"; };
 		93F391432962E6AC00BFD6AE /* ChatViewModel+LoadingStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatViewModel+LoadingStatus.swift"; sourceTree = "<group>"; };
@@ -1441,6 +1443,7 @@
 				93F3914D2962F2D100BFD6AE /* TableCellWrapper.swift */,
 				93CD1C5729632EB300B7CACA /* ReusableView.swift */,
 				93F3914B2962F1F700BFD6AE /* MessageCellWrapper.swift */,
+				93E0C84F296B08D900FF54D3 /* UIEdgeInsets+adamant.swift */,
 			);
 			path = UIHelpers;
 			sourceTree = "<group>";
@@ -2815,6 +2818,7 @@
 				E9B3D39A201F90570019EB36 /* AccountsProvider.swift in Sources */,
 				417BA7F428BF894F00DF94C5 /* NotificationSoundsViewController.swift in Sources */,
 				E950652320404C84008352E5 /* AdamantUriTools.swift in Sources */,
+				93E0C850296B08D900FF54D3 /* UIEdgeInsets+adamant.swift in Sources */,
 				415441372923AB3700824478 /* BtcProvider.swift in Sources */,
 				E95F85C7200A9B070070534A /* ChatTableViewCell.swift in Sources */,
 				A50A41082822F8CE006BDFE1 /* BtcWalletService.swift in Sources */,
