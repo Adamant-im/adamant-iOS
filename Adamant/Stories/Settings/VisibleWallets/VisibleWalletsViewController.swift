@@ -119,7 +119,7 @@ class VisibleWalletsViewController: UIViewController {
     
     @objc private func updateBalances() {
         refreshControl.endRefreshing()
-        NotificationCenter.default.post(name: .AdamantAccountService.forceUpdateBalance, object: nil)
+        NotificationCenter.default.post(name: .AdamantAccountService.forceUpdateAllBalances, object: nil)
     }
     
     private func setupView() {
