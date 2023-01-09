@@ -78,10 +78,6 @@ final class VisibleWalletsCheckmarkRowView: UIView {
         checkmarkView.isChecked
     }
     
-    var isUpdating: Bool {
-        checkmarkView.isUpdating
-    }
-    
     var checkmarkImageBorderColor: CGColor? {
         get { checkmarkView.imageBorderColor }
         set { checkmarkView.imageBorderColor = newValue }
@@ -104,10 +100,6 @@ final class VisibleWalletsCheckmarkRowView: UIView {
     
     func setIsChecked(_ isChecked: Bool, animated: Bool) {
         checkmarkView.setIsChecked(isChecked, animated: animated)
-    }
-    
-    func setIsUpdating(_ isUpdating: Bool, animated: Bool) {
-        checkmarkView.setIsUpdating(isUpdating, animated: animated)
     }
     
     private func setupView() {

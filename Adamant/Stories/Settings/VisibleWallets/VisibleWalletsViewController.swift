@@ -232,7 +232,8 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let cell = tableView.cellForRow(at: indexPath) as? VisibleWalletsTableViewCell else {
+        guard let cell = tableView.cellForRow(at: indexPath) as? VisibleWalletsTableViewCell
+        else {
             tableView.deselectRow(at: indexPath, animated: true)
             resetWalletsAction()
             return
