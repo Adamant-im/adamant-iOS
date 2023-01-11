@@ -22,7 +22,7 @@ extension String.adamantLocalized {
 
 class VisibleWalletsViewController: UIViewController {
     
-    lazy var tableView: UITableView = {
+    private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.register(VisibleWalletsTableViewCell.self, forCellReuseIdentifier: cellIdentifier)
         tableView.register(VisibleWalletsResetTableViewCell.self, forCellReuseIdentifier: cellResetIdentifier)
@@ -36,7 +36,7 @@ class VisibleWalletsViewController: UIViewController {
         return tableView
     }()
     
-    lazy var searchController: UISearchController = {
+    private lazy var searchController: UISearchController = {
         let controller = UISearchController(searchResultsController: nil)
         controller.searchResultsUpdater = self
         controller.obscuresBackgroundDuringPresentation = false
@@ -46,8 +46,8 @@ class VisibleWalletsViewController: UIViewController {
     
     // MARK: - Dependencies
     
-    var visibleWalletsService: VisibleWalletsService!
-    var accountService: AccountService!
+    var visibleWalletsService: VisibleWalletsService
+    var accountService: AccountService
     
     // MARK: - Properties
     
@@ -64,9 +64,16 @@ class VisibleWalletsViewController: UIViewController {
     private var wallets: [WalletService] = []
     private var previousAppState: UIApplication.State?
     
-    override func loadView() {
-        view = UIView()
-        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+    // MARK: - Lifecycle
+    
+    init(visibleWalletsService: VisibleWalletsService, accountService: AccountService) {
+        self.visibleWalletsService = visibleWalletsService
+        self.accountService = accountService
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError()
     }
     
     override func viewDidLoad() {
@@ -75,6 +82,11 @@ class VisibleWalletsViewController: UIViewController {
         setupView()
         addObservers()
         updateBalances()
+        setColors()
+    }
+    
+    private func setColors() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
     }
     
     private func addObservers() {
@@ -275,22 +287,11 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        guard indexPath.section == 0 else {
-            return false
-        }
-        if filteredWallets != nil {
-            return false
-        } else {
-            return true
-        }
+        return indexPath.section == .zero && filteredWallets == nil
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        guard indexPath.section == 0 else {
-            return 45
-        }
-        
-        return UITableView.automaticDimension
+        return indexPath.section == 0 ? UITableView.automaticDimension : 45
     }
 }
 

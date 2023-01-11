@@ -10,7 +10,7 @@ import UIKit
 
 class VisibleWalletsResetTableViewCell: UITableViewCell {
 
-    lazy var titleLabel: UILabel = {
+    private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .regular)
         label.text = .adamantLocalized.visibleWallets.reset

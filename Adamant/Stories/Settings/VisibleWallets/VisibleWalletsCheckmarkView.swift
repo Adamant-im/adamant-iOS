@@ -78,9 +78,12 @@ final class VisibleWalletsCheckmarkRowView: UIView {
         checkmarkView.isChecked
     }
     
-    var checkmarkImageBorderColor: CGColor? {
-        get { checkmarkView.imageBorderColor }
-        set { checkmarkView.imageBorderColor = newValue }
+    var checkmarkImageBorderColor: UIColor? {
+        get {
+            guard let imageBorderColor = checkmarkView.imageBorderColor else { return nil }
+            return UIColor(cgColor: imageBorderColor)
+        }
+        set { checkmarkView.imageBorderColor = newValue?.cgColor }
     }
     
     var checkmarkImageTintColor: UIColor? {

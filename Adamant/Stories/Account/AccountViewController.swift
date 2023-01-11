@@ -595,10 +595,6 @@ class AccountViewController: FormViewController {
         // MARK: Notification Center
         addObservers()
         
-        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
-            layoutTableHeaderView()
-        }
-        
         setColors()
     }
     

@@ -19,9 +19,7 @@ class AdamantVisibleWalletsService: VisibleWalletsService {
     private var indexesWallets: [String: Int] = [:]
     
     // MARK: Lifecycle
-    init( securedStore: SecuredStore,
-          accountService: AccountService
-    ) {
+    init(securedStore: SecuredStore, accountService: AccountService) {
         self.securedStore = securedStore
         self.accountService = accountService
         
