@@ -211,9 +211,9 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 }
                 
                 guard let service = self?.service,
-                    let wallet = service.wallet,
-                    let vc = self,
-                    let row: BalanceRow = vc.form.rowBy(tag: BaseRows.balance.tag) else {
+                      let wallet = service.wallet,
+                      let vc = self,
+                      let row: BalanceRow = vc.form.rowBy(tag: BaseRows.balance.tag) else {
                     return
                 }
                 
@@ -407,6 +407,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
+        initiatingActivityIndicator.color = .adamant.primary
     }
 }
 

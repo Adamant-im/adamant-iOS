@@ -27,6 +27,7 @@ class TransactionsListViewControllerBase: UIViewController {
     
     internal lazy var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
+        refreshControl.tintColor = .adamant.primary
         refreshControl.addTarget(self, action:
             #selector(self.handleRefresh(_:)),
                                  for: UIControl.Event.valueChanged)
