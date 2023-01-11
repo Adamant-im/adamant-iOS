@@ -132,6 +132,8 @@ class TransferViewControllerBase: FormViewController {
     
     // MARK: - Properties
     
+    private var previousIsReadyToSend: Bool?
+    
     var commentsEnabled: Bool = false
     var rootCoinBalance: Decimal?
     
@@ -301,6 +303,58 @@ class TransferViewControllerBase: FormViewController {
     }
     
     // MARK: - Other
+    
+    private func isReadyToSend() -> Bool {
+        validateAddress()
+        guard recipientAddress != nil,
+              recipientAddressIsValid,
+              amount != nil
+        else {
+            return false
+        }
+        if commentsEnabled {
+            if let row: TextAreaRow = form.rowBy(tag: BaseRows.comments.tag) {
+                return !(row.value?.isEmpty ?? true)
+            }
+            return false
+        }
+        return true
+    }
+    
+    private func navigationKeybordDone() {
+        tableView?.endEditing(true)
+        if isReadyToSend() {
+            confirmSendFunds()
+        }
+    }
+
+    func updateToolbar(for row: BaseRow) {
+        _ = inputAccessoryView(for: row)
+    }
+    
+    override func inputAccessoryView(for row: BaseRow) -> UIView? {
+        let view = super.inputAccessoryView(for: row)
+        guard var view = view as? NavigationAccessoryView else { return view }
+        
+        view.doneClosure = { [weak self] in
+            self?.navigationKeybordDone()
+        }
+        
+        if let previousIsReadyToSend = previousIsReadyToSend,
+           previousIsReadyToSend == isReadyToSend() {
+            return view
+        }
+        previousIsReadyToSend = isReadyToSend()
+        
+        let doneBtn = UIBarButtonItem(barButtonSystemItem: .done, target: view, action: view.doneButton.action)
+        let sendBtn = UIBarButtonItem(title: String.adamantLocalized.transfer.send, style: .done, target: view, action: view.doneButton.action)
+        view.doneButton = isReadyToSend() ? sendBtn : doneBtn
+        if (view.items?.count ?? 0) > 4 {
+            view.items?.remove(at: 4)
+            view.items?.append(view.doneButton)
+        }
+        return view
+    }
     
     private func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
@@ -816,6 +870,7 @@ extension TransferViewControllerBase {
                 }
                 
                 self?.validateForm()
+                self?.updateToolbar(for: row)
             }.cellUpdate { [weak self] _, _ in
                 self?.validateForm()
             }
@@ -870,6 +925,8 @@ extension TransferViewControllerBase {
             let row = TextAreaRow {
                 $0.tag = BaseRows.comments.tag
                 $0.textAreaHeight = .dynamic(initialTextViewHeight: 44)
+            }.onChange { [weak self] row in
+                self?.updateToolbar(for: row)
             }.cellUpdate { (cell, _) in
                 cell.textView?.backgroundColor = UIColor.clear
             }
