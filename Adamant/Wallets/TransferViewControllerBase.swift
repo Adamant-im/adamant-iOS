@@ -328,6 +328,10 @@ class TransferViewControllerBase: FormViewController {
         }
     }
 
+    func updateToolbar(for row: BaseRow) {
+        _ = inputAccessoryView(for: row)
+    }
+    
     override func inputAccessoryView(for row: BaseRow) -> UIView? {
         let view = super.inputAccessoryView(for: row)
         guard var view = view as? NavigationAccessoryView else { return view }
@@ -866,7 +870,7 @@ extension TransferViewControllerBase {
                 }
                 
                 self?.validateForm()
-                _ = self?.inputAccessoryView(for: row)
+                self?.updateToolbar(for: row)
             }.cellUpdate { [weak self] _, _ in
                 self?.validateForm()
             }
@@ -922,7 +926,7 @@ extension TransferViewControllerBase {
                 $0.tag = BaseRows.comments.tag
                 $0.textAreaHeight = .dynamic(initialTextViewHeight: 44)
             }.onChange { [weak self] row in
-                _ = self?.inputAccessoryView(for: row)
+                self?.updateToolbar(for: row)
             }.cellUpdate { (cell, _) in
                 cell.textView?.backgroundColor = UIColor.clear
             }
