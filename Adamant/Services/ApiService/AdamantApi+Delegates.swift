@@ -188,7 +188,7 @@ extension AdamantApiService {
             return
         }
         
-        sendTransaction(path: ApiCommands.Delegates.votes, transaction: transaction) { [weak self] serverResponse in
+        sendDelegateVoteTransaction(path: ApiCommands.Delegates.votes, transaction: transaction) { [weak self] serverResponse in
             switch serverResponse {
             case .success(let response):
                 if response.success {
