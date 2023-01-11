@@ -20,7 +20,8 @@ class AdamantChatTransactionService: ChatTransactionService {
     private let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
     private var transactionInProgress: [UInt64] = []
     private var onTransactionSaved: (() -> Void)?
-    private let processSemaphore = DispatchSemaphore(value: 1)
+    private let processSemaphore = DispatchSemaphore(value: 0)
+    private var waitSemaphoreCount = 0
     
     init(adamantCore: AdamantCore, accountService: AccountService) {
         self.adamantCore = adamantCore
@@ -156,6 +157,7 @@ class AdamantChatTransactionService: ChatTransactionService {
             transfer.statusEnum = .delivered
             transfer.blockId = transaction.blockId
         } else if transactionInProgress.contains(transaction.id) {
+            waitSemaphoreCount += 1
             processSemaphore.wait()
             return transferTransaction(from: transaction, isOut: isOut, partner: partner, context: context)
         } else {
@@ -186,8 +188,14 @@ class AdamantChatTransactionService: ChatTransactionService {
     
     func processingComplete(_ transactions: [UInt64]) {
         transactionInProgress.removeAll { trs in
-            return transactions.contains(trs)
-        }
-        processSemaphore.signal()
+            let contains = transactions.contains(trs)
+            if contains {
+                if waitSemaphoreCount > 0 {
+                    processSemaphore.signal()
+                    waitSemaphoreCount -= 1
+                }
+            }
+            return contains
+        }        
     }
 }
