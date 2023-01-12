@@ -27,6 +27,7 @@ class AdamantVisibleWalletsService: VisibleWalletsService {
             self?.securedStore.remove(StoreKey.visibleWallets.invisibleWallets)
             self?.securedStore.remove(StoreKey.visibleWallets.indexWallets)
             self?.securedStore.remove(StoreKey.visibleWallets.useCustomIndexes)
+            NotificationCenter.default.post(name: Notification.Name.AdamantVisibleWalletsService.visibleWallets, object: nil)
         }
         
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] _ in
