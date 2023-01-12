@@ -22,10 +22,9 @@ protocol VisibleWalletsService: AnyObject {
     func getInvisibleWallets() -> [String]
     func isInvisible(_ wallet: WalletService) -> Bool
     
-    func getIndexPositionWallets(includeInvisible: Bool) -> [String : Int]
-    func setIndexPositionWallets(_ indexes: [String: Int], includeInvisible: Bool)
+    func getSortedWallets(includeInvisible: Bool) -> [String]
+    func setIndexPositionWallets(_ indexes: [String], includeInvisible: Bool)
     func getIndexPosition(for wallet: WalletService) -> Int?
-    func editIndexPosition(for wallet: WalletService, index: Int)
     func setIndexPositionWallets(_ wallets: [WalletService], includeInvisible: Bool)
     
     func reset()

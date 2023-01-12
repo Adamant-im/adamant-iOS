@@ -11,12 +11,10 @@ import SnapKit
 
 // MARK: - Localization
 extension String.adamantLocalized {
-    struct visibleWallets {
+    enum visibleWallets {
         static let title = NSLocalizedString("VisibleWallets.Title", comment: "Visible Wallets page: scene title")
         static let resetAlertTitle = NSLocalizedString("VisibleWallets.ResetListAlert", comment: "VisibleWallets: Reset wallets alert title")
         static let reset = NSLocalizedString("NodesList.ResetButton", comment: "NodesList: 'Reset' button")
-        
-        private init() { }
     }
 }
 

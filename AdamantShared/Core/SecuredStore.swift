@@ -25,21 +25,17 @@ extension Notification.Name {
 }
 
 extension StoreKey {
-    struct notificationsService {
+    enum notificationsService {
         static let notificationsMode = "notifications.mode"
         static let customBadgeNumber = "notifications.number"
         static let notificationsSound = "notifications.sound"
-        
-        private init() {}
     }
     
-    struct visibleWallets {
+    enum visibleWallets {
         static let invisibleWallets = "invisible.wallets"
         static let indexWallets = "index.wallets"
         static let indexWalletsWithInvisible = "index.wallets.include.ivisible"
         static let useCustomIndexes = "visible.wallets.useCustomIndexes"
-        
-        private init() {}
     }
 }
 
