@@ -62,7 +62,7 @@ extension ChatMessage: MessageType {
     }
 }
 
-// ChatViewModel.Message must be the only implementation of MessageType
+// ChatMessage must be the only implementation of MessageType
 extension MessageType {
     var fullModel: ChatMessage {
         if let message = self as? ChatMessage {
