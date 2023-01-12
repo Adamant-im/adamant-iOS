@@ -15,6 +15,19 @@ class AdamantVisibleWalletsService: VisibleWalletsService {
     let accountService: AccountService
     
     // MARK: Proprieties
+    
+    private enum Types {
+        case indexes
+        case visibility
+        
+        var path: String {
+            switch self {
+            case .indexes: return StoreKey.visibleWallets.useCustomIndexes
+            case .visibility: return StoreKey.visibleWallets.useCustomVisibility
+            }
+        }
+    }
+    
     private var invisibleWallets: [String] = []
     private var indexesWallets: [String] = []
     
@@ -27,6 +40,7 @@ class AdamantVisibleWalletsService: VisibleWalletsService {
             self?.securedStore.remove(StoreKey.visibleWallets.invisibleWallets)
             self?.securedStore.remove(StoreKey.visibleWallets.indexWallets)
             self?.securedStore.remove(StoreKey.visibleWallets.useCustomIndexes)
+            self?.securedStore.remove(StoreKey.visibleWallets.useCustomVisibility)
             NotificationCenter.default.post(name: Notification.Name.AdamantVisibleWalletsService.visibleWallets, object: nil)
         }
         
@@ -56,7 +70,7 @@ class AdamantVisibleWalletsService: VisibleWalletsService {
     }
     
     func getInvisibleWallets() -> [String] {
-        guard isUseCustomFilter() else {
+        guard isUseCustomFilter(for: .visibility) else {
             let wallets = accountService.wallets.filter { $0.defaultVisibility != true }.map { $0.tokenUnicID }
             return wallets
         }
@@ -73,7 +87,7 @@ class AdamantVisibleWalletsService: VisibleWalletsService {
     
     private func setInvisibleWallets(_ wallets: [String]) {
         securedStore.set(wallets, for: StoreKey.visibleWallets.invisibleWallets)
-        securedStore.set(true, for: StoreKey.visibleWallets.useCustomIndexes)
+        setUseCustomFilter(for: .visibility, value: true)
         invisibleWallets = getInvisibleWallets()
     }
     
@@ -84,7 +98,7 @@ class AdamantVisibleWalletsService: VisibleWalletsService {
     }
     
     func getSortedWallets(includeInvisible: Bool) -> [String] {
-        guard isUseCustomFilter() else {
+        guard isUseCustomFilter(for: .indexes) else {
             // Sort by default ordinal number
             // Coins without an order are shown last, alphabetically
             let walletsIV = includeInvisible ? accountService.wallets : accountService.wallets.filter { $0.defaultVisibility == true }
@@ -108,7 +122,7 @@ class AdamantVisibleWalletsService: VisibleWalletsService {
         let path = !includeInvisible ? StoreKey.visibleWallets.indexWallets : StoreKey.visibleWallets.indexWalletsWithInvisible
         securedStore.set(wallets, for: path)
         indexesWallets = getSortedWallets(includeInvisible: false)
-        securedStore.set(true, for: StoreKey.visibleWallets.useCustomIndexes)
+        setUseCustomFilter(for: .indexes, value: true)
     }
     
     func setIndexPositionWallets(_ wallets: [WalletService], includeInvisible: Bool) {
@@ -119,18 +133,22 @@ class AdamantVisibleWalletsService: VisibleWalletsService {
     }
     
     func reset() {
-        securedStore.set(false, for: StoreKey.visibleWallets.useCustomIndexes)
+        setUseCustomFilter(for: .indexes, value: false)
+        setUseCustomFilter(for: .visibility, value: false)
         indexesWallets = getSortedWallets(includeInvisible: false)
         invisibleWallets = getInvisibleWallets()
         NotificationCenter.default.post(name: Notification.Name.AdamantVisibleWalletsService.visibleWallets, object: nil)
     }
     
-    func isUseCustomFilter() -> Bool {
-        let path = StoreKey.visibleWallets.useCustomIndexes
-        guard let result: Bool = securedStore.get(path) else {
+    private func isUseCustomFilter(for type: Types) -> Bool {
+        guard let result: Bool = securedStore.get(type.path) else {
             return false
         }
         return result
+    }
+    
+    private func setUseCustomFilter(for type: Types, value: Bool) {
+        securedStore.set(value, for: type.path)
     }
     
     // MARK: - Sort by indexes

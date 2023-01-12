@@ -36,6 +36,7 @@ extension StoreKey {
         static let indexWallets = "index.wallets"
         static let indexWalletsWithInvisible = "index.wallets.include.ivisible"
         static let useCustomIndexes = "visible.wallets.useCustomIndexes"
+        static let useCustomVisibility = "visible.wallets.useCustomVisibility"
     }
 }
 
