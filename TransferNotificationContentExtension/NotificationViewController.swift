@@ -82,7 +82,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
     }
     
     private func setColors() {
-        let color = UITraitCollection.current.userInterfaceStyle == .dark ? UIColor.white : UIColor.black
+        let color = UIColor.adamant.textColor.resolvedColor(with: .current)
         senderAddressLabel.textColor = color
         senderNameLabel.textColor = color
         recipientAddressLabel.textColor = color
