@@ -57,13 +57,14 @@ class AdamantNodesSource: NodesSource {
             self?.healthCheck()
         }
         
-        guard
-            let preferTheFastestNode = UserDefaults.standard.object(
-                forKey: UserDefaults.NodesSource.preferTheFastestNodeKey
-            ) as? Bool
-        else {
+        let savedPreferTheFastestNode = UserDefaults.standard.object(
+            forKey: UserDefaults.NodesSource.preferTheFastestNodeKey
+        ) as? Bool
+        
+        let preferTheFastestNode = savedPreferTheFastestNode ?? preferTheFastestNodeDefault
+        
+        if savedPreferTheFastestNode == nil {
             savePreferTheFastestNode(preferTheFastestNodeDefault)
-            return
         }
         
         self.preferTheFastestNode = preferTheFastestNode
