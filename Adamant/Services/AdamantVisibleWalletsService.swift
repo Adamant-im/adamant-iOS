@@ -158,14 +158,8 @@ class AdamantVisibleWalletsService: VisibleWalletsService {
         ? accountService.wallets
         : accountService.wallets.filter { !isInvisible($0) }
         
-        for (newIndex, tokenUnicID) in getSortedWallets(includeInvisible: includeInvisible).enumerated() {
-            guard let index = availableServices.firstIndex(where: { wallet in
-                return wallet.tokenUnicID == tokenUnicID
-            }) else {
-                break
-            }
-            let wallet = availableServices.remove(at: index)
-            availableServices.insert(wallet, at: newIndex)
+        availableServices = getSortedWallets(includeInvisible: includeInvisible).compactMap { tokenId in
+           availableServices.first { tokenId == $0.tokenUnicID }
         }
         
         return availableServices.compactMap { $0 as? T }
