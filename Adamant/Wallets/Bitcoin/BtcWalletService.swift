@@ -87,9 +87,6 @@ class BtcWalletService: WalletService {
     
     // MARK: RichMessageProvider properties
     static let richMessageType = "btc_transaction"
-    let cellIdentifierSent = "btcTransferSent"
-    let cellIdentifierReceived = "btcTransferReceived"
-    let cellSource: CellSource? = CellSource.nib(nib: UINib(nibName: "TransferCollectionViewCell", bundle: nil))
     
     // MARK: - Dependencies
     var apiService: ApiService!

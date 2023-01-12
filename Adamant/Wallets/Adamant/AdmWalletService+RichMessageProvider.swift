@@ -53,47 +53,6 @@ extension AdmWalletService: RichMessageProvider {
         }
     }
     
-    // MARK: Cells
-    
-    func cellSizeCalculator(for messagesCollectionViewFlowLayout: MessagesCollectionViewFlowLayout) -> CellSizeCalculator {
-        let calculator = TransferMessageSizeCalculator(layout: messagesCollectionViewFlowLayout)
-        calculator.font = UIFont.systemFont(ofSize: 24)
-        return calculator
-    }
-    
-    func cell(for message: MessageType, isFromCurrentSender: Bool, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell {
-        guard case .custom(let raw) = message.kind, let richMessage = raw as? RichMessageTransfer else {
-            fatalError("ADM service tried to render wrong message kind: \(message.kind)")
-        }
-        
-        let cellIdentifier = isFromCurrentSender ? cellIdentifierSent : cellIdentifierReceived
-        guard let cell = messagesCollectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as? TransferCollectionViewCell else {
-            fatalError("Can't dequeue \(cellIdentifier) cell")
-        }
-        
-        cell.currencyLogoImageView.image = AdmWalletService.currencyLogo
-        cell.currencySymbolLabel.text = AdmWalletService.currencySymbol
-        
-        cell.amountLabel.text = AdamantBalanceFormat.full.format(richMessage.amount)
-        cell.dateLabel.text = message.sentDate.humanizedDateTime(withWeekday: false)
-        
-        if let status = (message as? TransferTransaction)?.statusEnum {
-            cell.transactionStatus = status.toTransactionStatus()
-        } else {
-            cell.transactionStatus = nil
-        }
-        
-        cell.commentsLabel.text = richMessage.comments
-        
-        if cell.isAlignedRight != isFromCurrentSender {
-            cell.isAlignedRight = isFromCurrentSender
-        }
-        
-        cell.isFromCurrentSender = isFromCurrentSender
-        
-        return cell
-    }
-    
     // MARK: Short description
     private static var formatter: NumberFormatter = {
         return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: currencySymbol)

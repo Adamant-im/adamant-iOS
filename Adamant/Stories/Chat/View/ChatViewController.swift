@@ -15,6 +15,7 @@ import SafariServices
 
 final class ChatViewController: MessagesViewController {
     typealias SpinnerCell = MessageCellWrapper<SpinnerView>
+    typealias TransactionCell = CollectionCellWrapper<ChatTransactionContainerView>
     
     private let delegates: Delegates
     private var subscriptions = Set<AnyCancellable>()
@@ -55,17 +56,8 @@ final class ChatViewController: MessagesViewController {
         super.viewDidLoad()
         view.backgroundColor = .adamant.backgroundColor
         maintainPositionOnInputBarHeightChanged = true
-        messagesCollectionView.backgroundColor = .adamant.backgroundColor
-        messagesCollectionView.register(
-            SpinnerCell.self,
-            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader
-        )
-        
-        view.addSubview(loadingView)
-        loadingView.snp.makeConstraints {
-            $0.directionalEdges.equalToSuperview()
-        }
-        
+        configureMessagesCollectionView()
+        configureLayout()
         setupDelegates()
         setupObservers()
         viewModel.loadFirstMessages()
@@ -127,6 +119,23 @@ private extension ChatViewController {
         messagesCollectionView.messagesLayoutDelegate = delegates.layoutDelegate
         messagesCollectionView.messagesDisplayDelegate = delegates.displayDelegate
         messageInputBar.delegate = delegates.inputBarDelegate
+    }
+    
+    func configureMessagesCollectionView() {
+        messagesCollectionView.backgroundColor = .adamant.backgroundColor
+        messagesCollectionView.register(TransactionCell.self)
+        
+        messagesCollectionView.register(
+            SpinnerCell.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader
+        )
+    }
+    
+    func configureLayout() {
+        view.addSubview(loadingView)
+        loadingView.snp.makeConstraints {
+            $0.directionalEdges.equalToSuperview()
+        }
     }
     
     func updateLoadingViews() {

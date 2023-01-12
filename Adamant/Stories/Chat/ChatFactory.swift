@@ -14,13 +14,19 @@ struct ChatFactory {
     let chatsProvider: ChatsProvider
     let dialogService: DialogService
     let transferProvider: TransfersProvider
+    let accountService: AccountService
     
     func makeViewController() -> UIViewController {
+        let richMessageProviders = accountService.wallets.compactMap { $0 as? RichMessageProvider }
+        
         let viewModel = ChatViewModel(
             chatsProvider: chatsProvider,
             markdownParser: .init(font: UIFont.systemFont(ofSize: UIFont.systemFontSize)),
             dialogService: dialogService,
-            transfersProvider: transferProvider
+            transfersProvider: transferProvider,
+            chatMessageFactory: .init(richMessageProviders: .init(
+                uniqueKeysWithValues: richMessageProviders.map { ($0.dynamicRichMessageType, $0) }
+            ))
         )
         
         return ChatViewController(

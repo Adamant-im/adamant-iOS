@@ -34,5 +34,8 @@ extension String.adamantLocalized {
 
         static let freeTokens = NSLocalizedString("ChatScene.FreeTokensAlert.FreeTokens", comment: "Chat: 'Free Tokens' button")
         static let freeTokensMessage = NSLocalizedString("ChatScene.FreeTokensAlert.Message", comment: "Chat: 'Free Tokens' message")
+        
+        static let transactionSent = NSLocalizedString("ChatScene.Sent", comment: "Chat: 'Sent funds' bubble title")
+        static let transactionReceived = NSLocalizedString("ChatScene.Received", comment: "Chat: 'Received funds' bubble title")
     }
 }

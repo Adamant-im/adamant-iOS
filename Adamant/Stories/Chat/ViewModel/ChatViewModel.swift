@@ -17,12 +17,13 @@ final class ChatViewModel: NSObject {
     private let markdownParser: MarkdownParser
     private let dialogService: DialogService
     private let transfersProvider: TransfersProvider
+    private let chatMessageFactory: ChatMessageFactory
     
     // MARK: Properties
     
-    private let _sender = ObservableProperty(Sender.default)
-    private let _messages = ObservableProperty([Message]())
-    private let _loadingStatus = ObservableProperty<LoadingStatus?>(nil)
+    private let _sender = ObservableProperty(ChatSender.default)
+    private let _messages = ObservableProperty([ChatMessage]())
+    private let _loadingStatus = ObservableProperty<ChatLoadingStatus?>(nil)
     private let _inputTextSetter = ObservableProperty("")
     private let _scrollDown = ObservableSender<Void>()
     private let _showFreeTokensAlert = ObservableSender<Void>()
@@ -30,15 +31,15 @@ final class ChatViewModel: NSObject {
     private var controller: NSFetchedResultsController<ChatTransaction>?
     private(set) var chatroom: Chatroom?
     
-    var sender: ObservableVariable<Sender> {
+    var sender: ObservableVariable<ChatSender> {
         _sender.eraseToGetter()
     }
     
-    var messages: ObservableVariable<[Message]> {
+    var messages: ObservableVariable<[ChatMessage]> {
         _messages.eraseToGetter()
     }
     
-    var loadingStatus: ObservableVariable<LoadingStatus?> {
+    var loadingStatus: ObservableVariable<ChatLoadingStatus?> {
         _loadingStatus.eraseToGetter()
     }
     
@@ -73,12 +74,14 @@ final class ChatViewModel: NSObject {
         chatsProvider: ChatsProvider,
         markdownParser: MarkdownParser,
         dialogService: DialogService,
-        transfersProvider: TransfersProvider
+        transfersProvider: TransfersProvider,
+        chatMessageFactory: ChatMessageFactory
     ) {
         self.chatsProvider = chatsProvider
         self.markdownParser = markdownParser
         self.dialogService = dialogService
         self.transfersProvider = transfersProvider
+        self.chatMessageFactory = chatMessageFactory
     }
     
     func setup(
@@ -114,7 +117,8 @@ final class ChatViewModel: NSObject {
         loadMessages(address: address, offset: messages.value.count, loadingStatus: .onTop)
     }
     
-    func isNeedToDisplayDateHeader(index: Int) -> Bool {
+    func isNeedToDisplayDateHeader(sentDate: Date, index: Int) -> Bool {
+        guard sentDate != .adamantNullDate else { return false }
         guard index > .zero else { return true }
         
         let timeIntervalFromLastMessage = messages.value[index].sentDate
@@ -161,7 +165,7 @@ private extension ChatViewModel {
         }
     }
     
-    func loadMessages(address: String, offset: Int, loadingStatus: LoadingStatus) {
+    func loadMessages(address: String, offset: Int, loadingStatus: ChatLoadingStatus) {
         guard !isLoading else { return }
         
         _loadingStatus.value = loadingStatus
@@ -178,9 +182,8 @@ private extension ChatViewModel {
     
     func updateMessages() {
         try? controller?.performFetch()
-        _messages.value = (controller?.fetchedObjects ?? []).map {
-            .init(chatTransaction: $0)
-        }
+        _messages.value = (controller?.fetchedObjects ?? [])
+            .map(chatMessageFactory.makeMessage)
     }
     
     func reset() {

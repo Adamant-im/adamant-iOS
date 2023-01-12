@@ -113,56 +113,8 @@ extension ERC20WalletService: RichMessageProvider {
         }
     }
     
-    // MARK: Cells
-    
-    func cellSizeCalculator(for messagesCollectionViewFlowLayout: MessagesCollectionViewFlowLayout) -> CellSizeCalculator {
-        let calculator = TransferMessageSizeCalculator(layout: messagesCollectionViewFlowLayout)
-        calculator.font = UIFont.systemFont(ofSize: 24)
-        return calculator
-    }
-    
-    func cell(for message: MessageType, isFromCurrentSender: Bool, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell {
-        guard case .custom(let raw) = message.kind, let transfer = raw as? RichMessageTransfer else {
-            fatalError("ERC20 service tried to render wrong message kind: \(message.kind)")
-        }
-        
-        let cellIdentifier = isFromCurrentSender ? cellIdentifierSent : cellIdentifierReceived
-        guard let cell = messagesCollectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as? TransferCollectionViewCell else {
-            fatalError("Can't dequeue \(cellIdentifier) cell")
-        }
-        
-        cell.currencyLogoImageView.image = self.tokenLogo
-        let currencyFont = cell.currencySymbolLabel.font ?? .systemFont(ofSize: 12)
-        let networkFont = currencyFont.withSize(8)
-        let currencyAttributes: [NSAttributedString.Key: Any] = [.font: currencyFont]
-        let networkAttributes: [NSAttributedString.Key: Any] = [.font: networkFont]
-      
-        let defaultString = NSMutableAttributedString(string: self.tokenSymbol, attributes: currencyAttributes)
-        let underlineString = NSAttributedString(string: " \(self.tokenNetworkSymbol)", attributes: networkAttributes)
-        defaultString.append(underlineString)
-        cell.currencySymbolLabel.attributedText = defaultString
-        
-        cell.amountLabel.text = AdamantBalanceFormat.full.format(transfer.amount)
-        cell.dateLabel.text = message.sentDate.humanizedDateTime(withWeekday: false)
-        cell.transactionStatus = (message as? RichMessageTransaction)?.transactionStatus
-        
-        cell.commentsLabel.text = transfer.comments
-        
-        if cell.isAlignedRight != isFromCurrentSender {
-            cell.isAlignedRight = isFromCurrentSender
-        }
-        
-        cell.isFromCurrentSender = isFromCurrentSender
-        
-        return cell
-    }
-    
     // MARK: Short description
-    
-    private static var formatter: NumberFormatter = {
-        return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: currencySymbol)
-    }()
-    
+
     func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString {
         let amount: String
         

@@ -35,18 +35,7 @@ final class ChatDisplayDelegate: MessagesDisplayDelegate {
         at _: IndexPath,
         in _: MessagesCollectionView
     ) -> UIColor {
-        guard message.sender.senderId == viewModel.sender.value.senderId else {
-            return .adamant.chatRecipientBackground
-        }
-        
-        switch message.fullModel.status {
-        case .delivered:
-            return .adamant.chatSenderBackground
-        case .pending:
-            return .adamant.pendingChatBackground
-        case .failed:
-            return .adamant.failChatBackground
-        }
+        message.fullModel.getBackgroundColor(currentSender: viewModel.sender.value)
     }
     
     func textColor(
@@ -71,5 +60,22 @@ final class ChatDisplayDelegate: MessagesDisplayDelegate {
         }
         
         return header
+    }
+}
+
+extension ChatMessage {
+    func getBackgroundColor(currentSender: SenderType) -> UIColor {
+        guard sender.senderId == currentSender.senderId else {
+            return .adamant.chatRecipientBackground
+        }
+        
+        switch status {
+        case .delivered:
+            return .adamant.chatSenderBackground
+        case .pending:
+            return .adamant.pendingChatBackground
+        case .failed:
+            return .adamant.failChatBackground
+        }
     }
 }

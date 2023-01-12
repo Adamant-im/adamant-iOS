@@ -24,11 +24,11 @@ final class ChatLayoutDelegate: MessagesLayoutDelegate {
     ) -> CGSize? { .zero }
     
     func cellTopLabelHeight(
-        for _: MessageType,
+        for message: MessageType,
         at indexPath: IndexPath,
         in _: MessagesCollectionView
     ) -> CGFloat {
-        viewModel.isNeedToDisplayDateHeader(index: indexPath.section)
+        viewModel.isNeedToDisplayDateHeader(sentDate: message.sentDate, index: indexPath.section)
             ? labelHeight
             : .zero
     }
@@ -74,9 +74,13 @@ final class ChatLayoutDelegate: MessagesLayoutDelegate {
     func customCellSizeCalculator(
         for _: MessageType,
         at _: IndexPath,
-        in _: MessagesCollectionView
+        in messagesCollectionView: MessagesCollectionView
     ) -> CellSizeCalculator {
-        .init()
+        ChatTransactionCellSizeCalculator(
+            layout: messagesCollectionView.messagesCollectionViewFlowLayout,
+            getCurrentSender: { [sender = viewModel.sender] in sender.value },
+            getMessages: { [messages = viewModel.messages] in messages.value }
+        )
     }
     
     func headerViewSize(

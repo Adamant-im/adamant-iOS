@@ -10,30 +10,20 @@ import Foundation
 import MessageKit
 import UIKit
 
-enum CellSource {
-    case `class`(type: UICollectionViewCell.Type)
-    case nib(nib: UINib)
-}
-
 protocol RichMessageProvider: AnyObject {
     /// Lowercased!!
     static var richMessageType: String { get }
     
     var dynamicRichMessageType: String { get }
     
-    var cellIdentifierSent: String { get }
-    var cellIdentifierReceived: String { get }
-    var cellSource: CellSource? { get }
+    var tokenSymbol: String { get }
+    var tokenLogo: UIImage { get }
     
     // MARK: Events
     func richMessageTapped(for transaction: RichMessageTransaction, at indexPath: IndexPath, in chat: ChatViewController)
     
     // MARK: Chats list
     func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString
-    
-    // MARK: MessageKit
-    func cellSizeCalculator(for messagesCollectionViewFlowLayout: MessagesCollectionViewFlowLayout) -> CellSizeCalculator
-    func cell(for message: MessageType, isFromCurrentSender: Bool, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell
 }
 
 protocol RichMessageProviderWithStatusCheck: RichMessageProvider {

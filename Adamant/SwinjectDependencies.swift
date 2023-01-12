@@ -187,7 +187,8 @@ extension Container {
             ChatFactory(
                 chatsProvider: r.resolve(ChatsProvider.self)!,
                 dialogService: r.resolve(DialogService.self)!,
-                transferProvider: r.resolve(TransfersProvider.self)!
+                transferProvider: r.resolve(TransfersProvider.self)!,
+                accountService: r.resolve(AccountService.self)!
             )
         }
     }
