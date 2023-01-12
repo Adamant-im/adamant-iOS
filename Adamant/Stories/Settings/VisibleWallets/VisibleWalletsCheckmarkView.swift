@@ -14,7 +14,7 @@ final class VisibleWalletsCheckmarkRowView: UIView {
     private let titleLabel = makeTitleLabel()
     private let subtitleLabel = makeSubtitleLabel()
     private let captionLabel = makeCaptionLabel()
-    private let logoImageView = makeImageView()
+    private let logoImageView = UIImageView()
     private let balanceLabel = makeAdditionalLabel()
     
     private let awaitingValueString = "⏱"
@@ -165,8 +165,4 @@ private func makeAdditionalLabel() -> UILabel {
     let label = UILabel()
     label.font = .systemFont(ofSize: 17, weight: .regular)
     return label
-}
-
-private func makeImageView() -> UIImageView {
-    return UIImageView()
 }

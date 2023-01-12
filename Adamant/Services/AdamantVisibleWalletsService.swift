@@ -143,4 +143,35 @@ class AdamantVisibleWalletsService: VisibleWalletsService {
         }
         return result
     }
+    
+    // MARK: - Sort by indexes
+    
+    func sorted<T>(includeInvisible: Bool) -> [T] {
+        var availableServices: [WalletService] = accountService.wallets
+        if !includeInvisible {
+            availableServices.removeAll()
+            for walletService in accountService.wallets where !isInvisible(walletService) {
+                availableServices.append(walletService)
+            }
+        }
+        
+        // sort manually
+        getIndexPositionWallets(includeInvisible: includeInvisible).sorted { $0.value < $1.value }.forEach { tokenUnicID, newIndex in
+            guard let index = availableServices.firstIndex(where: { wallet in
+                return wallet.tokenUnicID == tokenUnicID
+            }) else { return }
+            let wallet = availableServices.remove(at: index)
+            availableServices.insert(wallet, at: newIndex)
+        }
+        
+        // check if is the <T>
+        var arraOfAvailableServices: [T] = []
+        availableServices.forEach { wallet in
+            if let walletService = wallet as? T {
+                arraOfAvailableServices.append(walletService)
+            }
+        }
+        
+        return arraOfAvailableServices
+    }
 }

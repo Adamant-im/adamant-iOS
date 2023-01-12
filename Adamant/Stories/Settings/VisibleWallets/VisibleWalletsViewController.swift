@@ -117,16 +117,7 @@ class VisibleWalletsViewController: UIViewController {
     }
     
     private func loadWallets() {
-        wallets = accountService.wallets
-        
-        // sort manually
-        visibleWalletsService.getIndexPositionWallets(includeInvisible: true).sorted { $0.value < $1.value }.forEach { tokenUnicID, newIndex in
-            guard let index = wallets.firstIndex(where: { wallet in
-                return wallet.tokenUnicID == tokenUnicID
-            }) else { return }
-            let wallet = wallets.remove(at: index)
-            wallets.insert(wallet, at: newIndex)
-        }
+        wallets = visibleWalletsService.sorted(includeInvisible: true)
     }
     
     @objc private func updateBalances() {

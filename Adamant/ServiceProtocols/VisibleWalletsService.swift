@@ -29,4 +29,6 @@ protocol VisibleWalletsService: AnyObject {
     func setIndexPositionWallets(_ wallets: [WalletService], includeInvisible: Bool)
     
     func reset()
+    
+    func sorted<T>(includeInvisible: Bool) -> [T]
 }
