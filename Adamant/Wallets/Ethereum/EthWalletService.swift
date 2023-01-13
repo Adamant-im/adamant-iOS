@@ -68,7 +68,7 @@ class EthWalletService: WalletService {
     }
     
     var tokenName: String {
-        return ""
+        return "Ethereum"
     }
     
     var tokenLogo: UIImage {
@@ -81,6 +81,22 @@ class EthWalletService: WalletService {
     
     var consistencyMaxTime: Double {
         return 1200
+    }
+    
+    var tokenContract: String {
+        return ""
+    }
+    
+    var tokenUnicID: String {
+        return tokenNetworkSymbol + tokenSymbol
+    }
+    
+    var defaultVisibility: Bool {
+        return true
+    }
+    
+    var defaultOrdinalLevel: Int? {
+        return nil
     }
     
 	private (set) var transactionFee: Decimal = 0.0

@@ -66,7 +66,7 @@ class LskWalletService: WalletService {
     }
     
     var tokenName: String {
-        return ""
+        return "Lisk"
     }
     
     var tokenLogo: UIImage {
@@ -80,7 +80,23 @@ class LskWalletService: WalletService {
     var consistencyMaxTime: Double {
         return 60
     }
+    
+    var tokenContract: String {
+        return ""
+    }
    
+    var tokenUnicID: String {
+        return tokenNetworkSymbol + tokenSymbol
+    }
+    
+    var defaultVisibility: Bool {
+        return false
+    }
+    
+    var defaultOrdinalLevel: Int? {
+        return nil
+    }
+    
 	// MARK: - Properties
 	let transferAvailable: Bool = true
     private var initialBalanceCheck = false

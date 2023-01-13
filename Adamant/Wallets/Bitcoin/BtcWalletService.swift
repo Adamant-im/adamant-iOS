@@ -59,7 +59,7 @@ class BtcWalletService: WalletService {
     }
     
     var tokenName: String {
-        return ""
+        return "Bitcoin"
     }
     
     var tokenLogo: UIImage {
@@ -72,6 +72,22 @@ class BtcWalletService: WalletService {
     
     var consistencyMaxTime: Double {
         return 10800
+    }
+    
+    var tokenContract: String {
+        return ""
+    }
+    
+    var tokenUnicID: String {
+        return tokenNetworkSymbol + tokenSymbol
+    }
+    
+    var defaultVisibility: Bool {
+        return false
+    }
+    
+    var defaultOrdinalLevel: Int? {
+        return 10
     }
     
     var wallet: WalletAccount? { return btcWallet }

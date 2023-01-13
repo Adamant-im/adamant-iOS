@@ -17,7 +17,7 @@ class DashWalletService: WalletService {
     }
     
     var tokenName: String {
-        return ""
+        return "Dash"
     }
     
     var tokenLogo: UIImage {
@@ -32,6 +32,22 @@ class DashWalletService: WalletService {
         return 800
     }
    
+    var tokenContract: String {
+        return ""
+    }
+    
+    var tokenUnicID: String {
+        return tokenNetworkSymbol + tokenSymbol
+    }
+    
+    var defaultVisibility: Bool {
+        return true
+    }
+    
+    var defaultOrdinalLevel: Int? {
+        return nil
+    }
+    
     var wallet: WalletAccount? { return dashWallet }
     
     var walletViewController: WalletViewController {

@@ -58,7 +58,7 @@ class AccountViewController: FormViewController {
     
     enum Rows {
         case balance, sendTokens // Wallet
-        case security, nodes, theme, currency, about // Application
+        case security, nodes, theme, currency, about, visibleWallets // Application
         case voteForDelegates, generateQr, generatePk, logout // Actions
         case stayIn, biometry, notifications // Security
         
@@ -78,6 +78,7 @@ class AccountViewController: FormViewController {
             case .stayIn: return "stayin"
             case .biometry: return "biometry"
             case .notifications: return "notifications"
+            case .visibleWallets: return "visibleWallets"
             }
         }
         
@@ -97,6 +98,7 @@ class AccountViewController: FormViewController {
             case .stayIn: return SecurityViewController.Rows.stayIn.localized
             case .biometry: return SecurityViewController.Rows.biometry.localized
             case .notifications: return SecurityViewController.Rows.notificationsMode.localized
+            case .visibleWallets: return NSLocalizedString("VisibleWallets.Title", comment: "Visible Wallets page: scene title")
             }
         }
         
@@ -116,11 +118,13 @@ class AccountViewController: FormViewController {
             case .stayIn: return #imageLiteral(resourceName: "row_security")
             case .biometry: return nil // Determined by localAuth service
             case .notifications: return #imageLiteral(resourceName: "row_Notifications.png")
+            case .visibleWallets: return #imageLiteral(resourceName: "row_balance")
             }
         }
     }
     
     // MARK: - Dependencies
+    var visibleWalletsService: VisibleWalletsService!
     var accountService: AccountService!
     var dialogService: DialogService!
     var router: Router!
@@ -213,9 +217,7 @@ class AccountViewController: FormViewController {
         }
         
         // MARK: Wallet pages
-        for walletService in accountService.wallets {
-            walletViewControllers.append(walletService.walletViewController)
-        }
+        setupWalletsVC()
         
         pagingViewController = PagingViewController()
         pagingViewController.register(UINib(nibName: "WalletCollectionViewCell", bundle: nil), for: WalletPagingItem.self)
@@ -224,7 +226,9 @@ class AccountViewController: FormViewController {
         pagingViewController.indicatorOptions = .visible(height: 2, zIndex: Int.max, spacing: UIEdgeInsets.zero, insets: UIEdgeInsets.zero)
         pagingViewController.dataSource = self
         pagingViewController.delegate = self
-        pagingViewController.select(index: 0)
+        if walletViewControllers.count > 0 {
+            pagingViewController.select(index: 0)
+        }
         
         accountHeaderView.walletViewContainer.addSubview(pagingViewController.view)
         pagingViewController.view.snp.makeConstraints {
@@ -232,6 +236,8 @@ class AccountViewController: FormViewController {
         }
         
         addChild(pagingViewController)
+        
+        updatePagingItemHeight()
         
         pagingViewController.borderColor = UIColor.clear
         
@@ -249,7 +255,36 @@ class AccountViewController: FormViewController {
         let appSection = Section(Sections.application.localized) {
             $0.tag = Sections.application.tag
         }
-
+        
+        // Visible wallets
+        let visibleWalletsRow = LabelRow {
+            $0.tag = Rows.visibleWallets.tag
+            $0.title = Rows.visibleWallets.localized
+            $0.cell.imageView?.image = Rows.visibleWallets.image
+            $0.cell.selectionStyle = .gray
+        }.cellUpdate { (cell, _) in
+            cell.accessoryType = .disclosureIndicator
+        }.onCellSelection { [weak self] (_, _) in
+            guard let vc = self?.router.get(scene: AdamantScene.Settings.visibleWallets) else {
+                return
+            }
+            
+            if let split = self?.splitViewController {
+                let details = UINavigationController(rootViewController:vc)
+                details.definesPresentationContext = true
+                split.showDetailViewController(details, sender: self)
+            } else if let nav = self?.navigationController {
+                nav.pushViewController(vc, animated: true)
+            } else {
+                vc.modalPresentationStyle = .overFullScreen
+                self?.present(vc, animated: true, completion: nil)
+            }
+            
+            self?.deselectWalletViewControllers()
+        }
+        
+        appSection.append(visibleWalletsRow)
+        
         // Node list
         let nodesRow = LabelRow {
             $0.title = Rows.nodes.localized
@@ -275,9 +310,9 @@ class AccountViewController: FormViewController {
             
             self?.deselectWalletViewControllers()
         }
-
+        
         appSection.append(nodesRow)
-
+        
         // Currency select
         let currencyRow = ActionSheetRow<Currency> {
             $0.title = Rows.currency.localized
@@ -302,7 +337,7 @@ class AccountViewController: FormViewController {
         }
         
         appSection.append(currencyRow)
-
+        
         // About
         let aboutRow = LabelRow {
             $0.title = Rows.about.localized
@@ -330,7 +365,7 @@ class AccountViewController: FormViewController {
         }
         
         appSection.append(aboutRow)
-            
+        
         // MARK: Actions
         let actionsSection = Section(Sections.actions.localized) {
             $0.tag = Sections.actions.tag
@@ -364,7 +399,7 @@ class AccountViewController: FormViewController {
         }
         
         actionsSection.append(delegatesRow)
-            
+        
         // Generate passphrase QR
         let generateQrRow = LabelRow {
             $0.title = Rows.generateQr.localized
@@ -390,7 +425,7 @@ class AccountViewController: FormViewController {
             
             self?.deselectWalletViewControllers()
         }
-
+        
         actionsSection.append(generateQrRow)
         
         // Generatte private keys
@@ -558,6 +593,72 @@ class AccountViewController: FormViewController {
         form.allRows.forEach { $0.baseCell.imageView?.tintColor = UIColor.adamant.tableRowIcons }
         
         // MARK: Notification Center
+        addObservers()
+        
+        setColors()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
+        
+        if let indexPath = tableView.indexPathForSelectedRow {
+            tableView.deselectRow(at: indexPath, animated: animated)
+        }
+        
+        for vc in pagingViewController.pageViewController.children {
+            vc.viewWillAppear(animated)
+        }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        if !initiated {
+            initiated = true
+        }
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+            tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
+        }
+        
+        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad, !initiated {
+            layoutTableHeaderView()
+            layoutTableFooterView()
+            if !initiated {
+                initiated = true
+            }
+        }
+        
+        pagingViewController?.indicatorColor = UIColor.adamant.primary
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    // MARK: TableView configuration
+    
+    override func insertAnimation(forSections sections: [Section]) -> UITableView.RowAnimation {
+        return .fade
+    }
+    
+    override func deleteAnimation(forSections sections: [Section]) -> UITableView.RowAnimation {
+        return .fade
+    }
+    
+    // MARK: Other
+    
+    func addObservers() {
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.updateAccountInfo()
             self?.tableView.setContentOffset(CGPoint.zero, animated: false)
@@ -622,6 +723,18 @@ class AccountViewController: FormViewController {
             }
         }
         
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantVisibleWalletsService.visibleWallets, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            guard let self = self else { return }
+            
+            self.setupWalletsVC()
+            self.updatePagingItemHeight()
+            
+            self.pagingViewController.reloadData()
+            let collectionView = self.pagingViewController.collectionView
+            collectionView.reloadData()
+            self.tableView.reloadData()
+        }
+        
         for vc in walletViewControllers {
             guard let service = vc.service else { return }
             let notification = service.walletUpdatedNotification
@@ -636,73 +749,25 @@ class AccountViewController: FormViewController {
                                                    queue: OperationQueue.main,
                                                    using: callback)
         }
-        
-        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
-            layoutTableHeaderView()
-        }
-        
-        setColors()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(true, animated: animated)
-        
-        if let indexPath = tableView.indexPathForSelectedRow {
-            tableView.deselectRow(at: indexPath, animated: animated)
-        }
-        
-        for vc in pagingViewController.pageViewController.children {
-            vc.viewWillAppear(animated)
+    private func setupWalletsVC() {
+        walletViewControllers.removeAll()
+        let availableServices: [WalletService] = visibleWalletsService.sorted(includeInvisible: false)
+        availableServices.forEach { walletService in
+            walletViewControllers.append(walletService.walletViewController)
         }
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: animated)
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        if !initiated {
-            initiated = true
-        }
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
-            tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
+    private func updatePagingItemHeight() {
+        if walletViewControllers.count > 0 {
+            pagingViewController.menuItemSize = .fixed(width: 110, height: 110)
+        } else {
+            pagingViewController.menuItemSize = .fixed(width: 110, height: 0)
         }
         
-        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad, !initiated {
-            layoutTableHeaderView()
-            layoutTableFooterView()
-            if !initiated {
-                initiated = true
-            }
-        }
-        
-        pagingViewController?.indicatorColor = UIColor.adamant.primary
+        updateHeaderSize(with: pagingViewController.menuItemSize.height, animated: true)
     }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
-    // MARK: TableView configuration
-    
-    override func insertAnimation(forSections sections: [Section]) -> UITableView.RowAnimation {
-        return .fade
-    }
-    
-    override func deleteAnimation(forSections sections: [Section]) -> UITableView.RowAnimation {
-        return .fade
-    }
-    
-    // MARK: Other
     
     private func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
@@ -877,6 +942,10 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
         }
         let pagingHeight = menuHeight + walletViewController.height
         
+        updateHeaderSize(with: pagingHeight, animated: animated)
+    }
+    
+    private func updateHeaderSize(with pagingHeight: CGFloat, animated: Bool) {
         var headerBounds = accountHeaderView.bounds
         headerBounds.size.height = accountHeaderView.walletViewContainer.frame.origin.y + pagingHeight
         

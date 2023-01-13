@@ -26,6 +26,9 @@ extension Notification.Name {
         /// Raised on account info (balance) updated.
         static let forceUpdateBalance = Notification.Name("adamant.accountService.forceUpdateBalance")
         
+        /// Raised on account info (balance) updated.
+        static let forceUpdateAllBalances = Notification.Name("adamant.accountService.forceUpdateAllBalances")
+        
         /// Raised when user changed Stay In option.
         ///
         /// UserInfo:

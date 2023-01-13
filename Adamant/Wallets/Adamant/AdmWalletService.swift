@@ -26,7 +26,7 @@ class AdmWalletService: NSObject, WalletService {
     }
     
     var tokenName: String {
-        return ""
+        return "Adamant"
     }
     
     var tokenLogo: UIImage {
@@ -39,6 +39,22 @@ class AdmWalletService: NSObject, WalletService {
     
     var consistencyMaxTime: Double {
         return 0
+    }
+    
+    var tokenContract: String {
+        return ""
+    }
+    
+    var tokenUnicID: String {
+        return tokenNetworkSymbol + tokenSymbol
+    }
+    
+    var defaultVisibility: Bool {
+        return true
+    }
+    
+    var defaultOrdinalLevel: Int? {
+        return nil
     }
     
 	// MARK: - Dependencies
