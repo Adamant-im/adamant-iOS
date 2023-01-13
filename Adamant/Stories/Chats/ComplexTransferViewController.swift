@@ -18,12 +18,13 @@ class ComplexTransferViewController: UIViewController {
     // MARK: - Dependencies
     
     var accountService: AccountService!
+    var visibleWalletsService: VisibleWalletsService!
     
     // MARK: - Properties
     var pagingViewController: PagingViewController!
     
     weak var transferDelegate: ComplexTransferViewControllerDelegate?
-    var services: [WalletServiceWithSend]!
+    var services: [WalletServiceWithSend] = []
     var partner: CoreDataAccount? {
         didSet {
             if let partner = partner {
@@ -41,7 +42,7 @@ class ComplexTransferViewController: UIViewController {
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
         
         // MARK: Services
-        services = accountService.wallets.compactMap { $0 as? WalletServiceWithSend }
+        setupServices()
         
         // MARK: PagingViewController
         pagingViewController = PagingViewController()
@@ -71,6 +72,12 @@ class ComplexTransferViewController: UIViewController {
     
     // MARK: - Other
     
+    private func setupServices() {
+        services.removeAll()
+        let availableServices: [WalletServiceWithSend] = visibleWalletsService.sorted(includeInvisible: false)
+        services = availableServices
+    }
+    
     func setColors() {
         view.backgroundColor = UIColor.adamant.backgroundColor
         pagingViewController.backgroundColor = UIColor.adamant.backgroundColor
@@ -84,11 +91,7 @@ class ComplexTransferViewController: UIViewController {
 
 extension ComplexTransferViewController: PagingViewControllerDataSource {
     func numberOfViewControllers(in pagingViewController: PagingViewController) -> Int {
-        if let services = services {
-            return services.count
-        } else {
-            return 0
-        }
+        return services.count
     }
     
     func pagingViewController(_ pagingViewController: PagingViewController, viewControllerAt index: Int) -> UIViewController {
@@ -139,7 +142,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
 	}
 	
     func pagingViewController(_: PagingViewController, pagingItemAt index: Int) -> PagingItem {
-		let service = accountService.wallets[index]
+		let service = services[index]
 		
 		guard let wallet = service.wallet else {
 			return WalletPagingItem(index: index, currencySymbol: "", currencyImage: #imageLiteral(resourceName: "adamant_wallet"))

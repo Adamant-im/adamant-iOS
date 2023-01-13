@@ -78,6 +78,14 @@ class DogeWalletService: WalletService {
         return "DOGE"
     }
    
+    var tokenContract: String {
+        return ""
+    }
+    
+    var tokenUnicID: String {
+        return tokenNetworkSymbol + tokenSymbol
+    }
+    
     var transactionFee: Decimal {
         return DogeWalletService.fixedFee
     }

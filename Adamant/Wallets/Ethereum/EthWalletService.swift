@@ -73,6 +73,14 @@ class EthWalletService: WalletService {
         return "ERC20"
     }
     
+    var tokenContract: String {
+        return ""
+    }
+    
+    var tokenUnicID: String {
+        return tokenNetworkSymbol + tokenSymbol
+    }
+    
 	private (set) var transactionFee: Decimal = 0.0
 	
 	static let transferGas: Decimal = 21000

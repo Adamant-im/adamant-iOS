@@ -71,6 +71,14 @@ class LskWalletService: WalletService {
         return "LSK"
     }
     
+    var tokenContract: String {
+        return ""
+    }
+    
+    var tokenUnicID: String {
+        return tokenNetworkSymbol + tokenSymbol
+    }
+    
 	// MARK: - Properties
 	let transferAvailable: Bool = true
     private var initialBalanceCheck = false

@@ -16,9 +16,11 @@ class AdamantAccountService: AccountService {
     private let adamantCore: AdamantCore
     private let dialogService: DialogService
     private let securedStore: SecuredStore
+
     weak var notificationsService: NotificationsService?
     weak var currencyInfoService: CurrencyInfoService?
     weak var pushNotificationsTokenService: PushNotificationsTokenService?
+    weak var visibleWalletService: VisibleWalletsService?
     
     // MARK: Properties
     
@@ -149,6 +151,10 @@ class AdamantAccountService: AccountService {
             self?.update()
         }
         
+        NotificationCenter.default.addObserver(forName: .AdamantAccountService.forceUpdateAllBalances, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.updateAll()
+        }
+        
         setupSecuredStore()
     }
 }
@@ -261,7 +267,15 @@ extension AdamantAccountService {
         self.update(nil)
     }
     
+    func updateAll() {
+        update(nil, updateOnlyVisible: false)
+    }
+    
     func update(_ completion: ((AccountServiceResult) -> Void)?) {
+        update(completion, updateOnlyVisible: true)
+    }
+    
+    func update(_ completion: ((AccountServiceResult) -> Void)?, updateOnlyVisible: Bool) {
         stateSemaphore.wait()
         
         switch state {
@@ -308,8 +322,14 @@ extension AdamantAccountService {
             }
         }
         
-        for wallet in wallets.filter({ !($0 is AdmWalletService) }) {
-            wallet.update()
+        if updateOnlyVisible {
+            for wallet in wallets.filter({ !($0 is AdmWalletService) }) where !(visibleWalletService?.isInvisible(wallet) ?? false) {
+                wallet.update()
+            }
+        } else {
+            for wallet in wallets.filter({ !($0 is AdmWalletService) }) {
+                wallet.update()
+            }
         }
     }
 }

@@ -25,6 +25,14 @@ class DashWalletService: WalletService {
         return "DASH"
     }
    
+    var tokenContract: String {
+        return ""
+    }
+    
+    var tokenUnicID: String {
+        return tokenNetworkSymbol + tokenSymbol
+    }
+    
     var wallet: WalletAccount? { return dashWallet }
     
     var walletViewController: WalletViewController {

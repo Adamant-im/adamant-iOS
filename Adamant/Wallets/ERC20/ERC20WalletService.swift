@@ -44,7 +44,15 @@ class ERC20WalletService: WalletService {
     var consistencyMaxTime: Double {
         return 1200
     }
+    
+    var tokenContract: String {
+        return token?.contractAddress ?? ""
+    }
    
+    var tokenUnicID: String {
+        return tokenNetworkSymbol + tokenSymbol + tokenContract
+    }
+    
     var defaultVisibility: Bool {
         return token?.defaultVisibility ?? false
     }

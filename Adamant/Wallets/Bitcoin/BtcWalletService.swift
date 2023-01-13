@@ -66,6 +66,14 @@ class BtcWalletService: WalletService {
         "BTC"
     }
     
+    var tokenContract: String {
+        return ""
+    }
+    
+    var tokenUnicID: String {
+        return tokenNetworkSymbol + tokenSymbol
+    }
+    
     var wallet: WalletAccount? { return btcWallet }
     
     var walletViewController: WalletViewController {

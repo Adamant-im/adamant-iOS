@@ -53,6 +53,7 @@ protocol ChatViewControllerDelegate: AnyObject {
 
 // MARK: -
 class ChatViewController: MessagesViewController {
+    
     // MARK: Dependencies
     var chatsProvider: ChatsProvider!
     var transfersProvider: TransfersProvider!
@@ -61,6 +62,8 @@ class ChatViewController: MessagesViewController {
     var addressBookService: AddressBookService!
     var stack: CoreDataStack!
     var securedStore: SecuredStore!
+    var visibleWalletsService: VisibleWalletsService!
+    var accountService: AccountService!
     
     // MARK: Properties
     weak var delegate: ChatViewControllerDelegate?
@@ -454,6 +457,8 @@ class ChatViewController: MessagesViewController {
         }
         
         didLoaded = true
+        
+        updateUI()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -597,6 +602,8 @@ class ChatViewController: MessagesViewController {
         messagesCollectionView.backgroundColor = UIColor.adamant.backgroundColor
         messageInputBar.inputTextView.backgroundColor = UIColor.adamant.chatInputFieldBarBackground
         messageInputBar.backgroundView.backgroundColor = UIColor.adamant.chatInputBarBackground
+        attachmentButton.isEnabled = true
+        attachmentButton.layer.borderColor = UIColor.black.cgColor
         
         if messageInputBar.inputTextView.text.isEmpty {
             messageInputBar.sendButton.isEnabled = false
@@ -610,6 +617,14 @@ class ChatViewController: MessagesViewController {
             messageInputBar.inputTextView.backgroundColor = UIColor.adamant.chatInputBarBackground
             messageInputBar.inputTextView.layer.borderColor = UIColor.adamant.disableBorderColor.cgColor
             messageInputBar.sendButton.layer.borderColor = UIColor.adamant.disableBorderColor.cgColor
+            attachmentButton.layer.borderColor = UIColor.adamant.disableBorderColor.cgColor
+        }
+        
+        let visibleWallets = accountService.wallets.filter { wallet in
+            return !visibleWalletsService.isInvisible(wallet)
+        }
+        if visibleWallets.count == 0 {
+            attachmentButton.isEnabled = false
             attachmentButton.layer.borderColor = UIColor.adamant.disableBorderColor.cgColor
         }
     }

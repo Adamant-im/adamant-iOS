@@ -129,6 +129,7 @@ final class CheckmarkView: UIView {
         
         guard animated else {
             imageView.transform = CGAffineTransform.identity
+            imageBackgroundView.alpha = .zero
             return
         }
         
@@ -147,6 +148,7 @@ final class CheckmarkView: UIView {
         guard animated else {
             imageView.isHidden = true
             imageView.transform = CGAffineTransform(scaleX: .zero, y: .zero)
+            imageBackgroundView.alpha = 1
             return
         }
         
