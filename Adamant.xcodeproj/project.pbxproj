@@ -53,6 +53,7 @@
 		4198D57F28C8B834009337F2 /* short-success.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4198D57E28C8B834009337F2 /* short-success.mp3 */; };
 		4198D58128C8B8D1009337F2 /* default.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4198D58028C8B8D1009337F2 /* default.mp3 */; };
 		41BCB310295C6082004B12AB /* VisibleWalletsResetTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41BCB30F295C6082004B12AB /* VisibleWalletsResetTableViewCell.swift */; };
+		41CEE09629718A10005EF1D2 /* UIImage+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CEE09529718A10005EF1D2 /* UIImage+adamant.swift */; };
 		41E142F2289E60EB002EE8D7 /* AdamantSecret.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E142F1289E60EB002EE8D7 /* AdamantSecret.swift */; };
 		41E142F3289E60EB002EE8D7 /* AdamantSecret.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E142F1289E60EB002EE8D7 /* AdamantSecret.swift */; };
 		41E142F4289E60EB002EE8D7 /* AdamantSecret.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E142F1289E60EB002EE8D7 /* AdamantSecret.swift */; };
@@ -728,6 +729,7 @@
 		4198D57E28C8B834009337F2 /* short-success.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "short-success.mp3"; sourceTree = "<group>"; };
 		4198D58028C8B8D1009337F2 /* default.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = default.mp3; sourceTree = "<group>"; };
 		41BCB30F295C6082004B12AB /* VisibleWalletsResetTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisibleWalletsResetTableViewCell.swift; sourceTree = "<group>"; };
+		41CEE09529718A10005EF1D2 /* UIImage+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+adamant.swift"; sourceTree = "<group>"; };
 		41E142F1289E60EB002EE8D7 /* AdamantSecret.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantSecret.swift; sourceTree = "<group>"; };
 		4A4D67BD3DC89C07D1351248 /* Pods-AdmCore.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdmCore.release.xcconfig"; path = "Target Support Files/Pods-AdmCore/Pods-AdmCore.release.xcconfig"; sourceTree = "<group>"; };
 		4E9EE86E28CE793D008359F7 /* SafeDecimalRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafeDecimalRow.swift; sourceTree = "<group>"; };
@@ -1273,6 +1275,15 @@
 			path = SocketService;
 			sourceTree = "<group>";
 		};
+		4186B32A2940CBF9006594A3 /* Scripts */ = {
+			isa = PBXGroup;
+			children = (
+				4186B32D2941C2A3006594A3 /* CoinsScript.rb */,
+				415CFD3E294319310008AEE8 /* UpdateWalletsScript.sh */,
+			);
+			path = Scripts;
+			sourceTree = "<group>";
+		};
 		4197B9C72952FAA2004CAF64 /* VisibleWallets */ = {
 			isa = PBXGroup;
 			children = (
@@ -1282,15 +1293,6 @@
 				41BCB30F295C6082004B12AB /* VisibleWalletsResetTableViewCell.swift */,
 			);
 			path = VisibleWallets;
-			sourceTree = "<group>";
-		};
-		4186B32A2940CBF9006594A3 /* Scripts */ = {
-			isa = PBXGroup;
-			children = (
-				4186B32D2941C2A3006594A3 /* CoinsScript.rb */,
-				415CFD3E294319310008AEE8 /* UpdateWalletsScript.sh */,
-			);
-			path = Scripts;
 			sourceTree = "<group>";
 		};
 		5551CC8D28A8B72D00B52AD0 /* Stubs */ = {
@@ -2036,6 +2038,7 @@
 				550698B528C00AED000E8A2B /* CollectionUtilites.swift */,
 				55FBAAF428C54B230066E629 /* Nodes+Allowance.swift */,
 				930B57762934D44700F3E539 /* Encodable+Dictionary.swift */,
+				41CEE09529718A10005EF1D2 /* UIImage+adamant.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -2602,7 +2605,7 @@
 		};
 		418BBB14293752F800CAB719 /* Run Script - Load wallets */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 12;
+			buildActionMask = 8;
 			files = (
 			);
 			inputFileListPaths = (
@@ -2616,7 +2619,7 @@
 			);
 			outputPaths = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
 			shellScript = "$SCRIPT_INPUT_FILE_0 xcode\n$SCRIPT_INPUT_FILE_1 xcode\n\nrm -r $PWD/scripts\n";
 		};
@@ -2893,6 +2896,7 @@
 				E90847332196FEA80095825D /* TransferTransaction+CoreDataProperties.swift in Sources */,
 				E9FEECAC2143CEED007DD7C8 /* TransferMessageSizeCalculator.swift in Sources */,
 				E927171E20C04614002BB9A6 /* UIColor+hex.swift in Sources */,
+				41CEE09629718A10005EF1D2 /* UIImage+adamant.swift in Sources */,
 				E99818942120892F0018C84C /* WalletViewControllerBase.swift in Sources */,
 				E9B3D39E201F99F40019EB36 /* DataProvider.swift in Sources */,
 				648DD7A82239147800B811FD /* DogeWalletService+RichMessageProvider.swift in Sources */,
@@ -3296,7 +3300,7 @@
 				CODE_SIGN_ENTITLEMENTS = MessageNotificationContentExtension/Debug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 231;
+				CURRENT_PROJECT_VERSION = 247;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = MessageNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -3325,7 +3329,7 @@
 				CODE_SIGN_ENTITLEMENTS = MessageNotificationContentExtension/Release.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 231;
+				CURRENT_PROJECT_VERSION = 247;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = MessageNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -3473,7 +3477,7 @@
 				CODE_SIGN_ENTITLEMENTS = Adamant/Debug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 231;
+				CURRENT_PROJECT_VERSION = 247;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				DISPLAY_NAME = ADM.Dev;
 				EXCLUDED_SOURCE_FILE_NAMES = "";
@@ -3502,7 +3506,7 @@
 				CODE_SIGN_ENTITLEMENTS = Adamant/Release.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 231;
+				CURRENT_PROJECT_VERSION = 247;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				DISPLAY_NAME = Adamant;
 				EXCLUDED_SOURCE_FILE_NAMES = Debug.xcassets;
@@ -3531,7 +3535,7 @@
 				CODE_SIGN_ENTITLEMENTS = TransferNotificationContentExtension/Debug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 231;
+				CURRENT_PROJECT_VERSION = 247;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = TransferNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -3560,7 +3564,7 @@
 				CODE_SIGN_ENTITLEMENTS = TransferNotificationContentExtension/Release.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 231;
+				CURRENT_PROJECT_VERSION = 247;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = TransferNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -3590,7 +3594,7 @@
 				CODE_SIGN_ENTITLEMENTS = NotificationServiceExtension/Debug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 231;
+				CURRENT_PROJECT_VERSION = 247;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -3619,7 +3623,7 @@
 				CODE_SIGN_ENTITLEMENTS = NotificationServiceExtension/Release.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 231;
+				CURRENT_PROJECT_VERSION = 247;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
