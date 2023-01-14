@@ -788,6 +788,16 @@ extension AdamantTransfersProvider {
                                         currentAddress address: String,
                                         context: NSManagedObjectContext,
                                         contextMutatingSemaphore cms: DispatchSemaphore) {
+        let blockOperation = BlockOperation { [weak self] in
+            self?.processRawTransactionsSynced(transactions, currentAddress: address, context: context, contextMutatingSemaphore: cms)
+        }
+        transactionService.addOperations(blockOperation)
+    }
+    
+    private func processRawTransactionsSynced(_ transactions: [Transaction],
+                                        currentAddress address: String,
+                                        context: NSManagedObjectContext,
+                                        contextMutatingSemaphore cms: DispatchSemaphore) {
         // MARK: 0. Transactions?
         guard transactions.count > 0 else {
             return
@@ -962,7 +972,6 @@ extension AdamantTransfersProvider {
                 let viewContextChatrooms = Set<Chatroom>(transfers.compactMap { $0.chatroom }).compactMap { self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom }
                 DispatchQueue.main.async {
                     viewContextChatrooms.forEach { $0.updateLastTransaction() }
-                    self.transactionService.processingComplete(transactionInProgress)
                 }
             } catch {
                 print("TransferProvider: Failed to save changes to CoreData: \(error.localizedDescription)")
