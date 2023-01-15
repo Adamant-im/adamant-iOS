@@ -20,6 +20,7 @@ final class ChatViewController: MessagesViewController {
     private let delegates: Delegates
     private var subscriptions = Set<AnyCancellable>()
     private var didScrollSender = ObservableSender<Void>()
+    private var topMessageId: String?
     
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
@@ -95,9 +96,7 @@ private extension ChatViewController {
         viewModel.messages
             .removeDuplicates()
             .combineLatest(viewModel.sender.removeDuplicates())
-            .sink { [weak chatMessagesCollectionView] _ in
-                chatMessagesCollectionView?.reloadDataWithFixedBottom()
-            }
+            .sink { [weak self] _ in self?.updateMessages() }
             .store(in: &subscriptions)
         
         viewModel.loadingStatus
@@ -136,6 +135,16 @@ private extension ChatViewController {
         loadingView.snp.makeConstraints {
             $0.directionalEdges.equalToSuperview()
         }
+    }
+    
+    func updateMessages() {
+        if topMessageId == viewModel.messages.value.first?.messageId {
+            messagesCollectionView.reloadData()
+        } else {
+            chatMessagesCollectionView.reloadDataWithFixedBottom()
+        }
+        
+        topMessageId = viewModel.messages.value.first?.messageId
     }
     
     func updateLoadingViews() {

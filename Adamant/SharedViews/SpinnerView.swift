@@ -25,10 +25,12 @@ final class SpinnerView: UIView {
     }
 
     func startAnimating() {
+        spinner.isHidden = false
         spinner.startAnimating()
     }
 
     func stopAnimating() {
+        spinner.isHidden = true
         spinner.stopAnimating()
     }
 }

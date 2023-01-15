@@ -42,16 +42,14 @@ private extension ChatMessageFactory {
     }
     
     func makeContent(_ transaction: RichMessageTransaction) -> ChatMessage.Content {
-        guard
-            let richContent = transaction.richContent,
-            let transfer = RichMessageTransfer(content: richContent)
-        else { return .default }
+        guard let transfer = transaction.transfer else { return .default }
         
         return .transaction(.init(
             icon: richMessageProviders[transfer.type]?.tokenLogo ?? .init(),
             amount: transaction.amount.map { Float($0.doubleValue) } ?? .zero,
             currency: richMessageProviders[transfer.type]?.tokenSymbol ?? "",
-            comment: transfer.comments
+            comment: transfer.comments,
+            status: transaction.transactionStatus ?? .notInitiated
         ))
     }
     
@@ -60,7 +58,8 @@ private extension ChatMessageFactory {
             icon: AdmWalletService.currencyLogo,
             amount: transaction.amount.map { Float($0.doubleValue) } ?? .zero,
             currency: AdmWalletService.currencySymbol,
-            comment: transaction.comment
+            comment: transaction.comment,
+            status: transaction.statusEnum.toTransactionStatus()
         ))
     }
 }

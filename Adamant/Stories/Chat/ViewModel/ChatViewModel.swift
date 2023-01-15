@@ -31,6 +31,10 @@ final class ChatViewModel: NSObject {
     private var controller: NSFetchedResultsController<ChatTransaction>?
     private(set) var chatroom: Chatroom?
     
+    private var chatTransactions: [ChatTransaction] = [] {
+        didSet { _messages.value = chatTransactions.map(chatMessageFactory.makeMessage) }
+    }
+    
     var sender: ObservableVariable<ChatSender> {
         _sender.eraseToGetter()
     }
@@ -102,7 +106,7 @@ final class ChatViewModel: NSObject {
         guard let address = chatroom?.partner?.address else { return }
         
         if address == AdamantContacts.adamantWelcomeWallet.name {
-            updateMessages()
+            updateMessages(performFetch: true)
         } else {
             loadMessages(address: address, offset: .zero, loadingStatus: .fullscreen)
         }
@@ -147,11 +151,21 @@ final class ChatViewModel: NSObject {
             }
         }
     }
+    
+    func updateTransactionStatusIfNeeded(id: String) {
+        guard
+            let transaction = chatTransactions.first(where: { $0.chatMessageId == id }),
+            let richMessageTransaction = transaction as? RichMessageTransaction,
+            !(richMessageTransaction.transactionStatus?.isFinal ?? false)
+        else { return }
+        
+        chatsProvider.updateStatus(for: richMessageTransaction)
+    }
 }
 
 extension ChatViewModel: NSFetchedResultsControllerDelegate {
     func controllerDidChangeContent(_: NSFetchedResultsController<NSFetchRequestResult>) {
-        updateMessages()
+        updateMessages(performFetch: false)
     }
 }
 
@@ -174,16 +188,18 @@ private extension ChatViewModel {
             offset: offset
         ) { [weak self] in
             DispatchQueue.onMainAsync {
-                self?.updateMessages()
+                self?.updateMessages(performFetch: true)
                 self?._loadingStatus.value = nil
             }
         }
     }
     
-    func updateMessages() {
-        try? controller?.performFetch()
-        _messages.value = (controller?.fetchedObjects ?? [])
-            .map(chatMessageFactory.makeMessage)
+    func updateMessages(performFetch: Bool) {
+        if performFetch {
+            try? controller?.performFetch()
+        }
+        
+        chatTransactions = controller?.fetchedObjects ?? []
     }
     
     func reset() {

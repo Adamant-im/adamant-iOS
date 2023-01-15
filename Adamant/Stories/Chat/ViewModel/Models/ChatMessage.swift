@@ -44,6 +44,7 @@ extension ChatMessage {
         let amount: Float
         let currency: String
         let comment: String?
+        let status: TransactionStatus
     }
 }
 

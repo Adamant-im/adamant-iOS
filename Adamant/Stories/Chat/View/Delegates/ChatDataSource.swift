@@ -89,6 +89,7 @@ final class ChatDataSource: MessagesDataSource {
             for: indexPath
         )
         
+        viewModel.updateTransactionStatusIfNeeded(id: message.messageId)
         cell.wrappedView.model = message.fullModel.makeTransactionViewModel(currentSender: currentSender)
         return cell
     }
@@ -127,7 +128,7 @@ extension ChatMessage {
         
         return .init(
             isFromCurrentSender: sender.senderId == currentSender.senderId,
-            status: .notInitiated,
+            status: model.status,
             content: .init(
                 title: sender.senderId == currentSender.senderId
                     ? .adamantLocalized.chat.transactionSent
