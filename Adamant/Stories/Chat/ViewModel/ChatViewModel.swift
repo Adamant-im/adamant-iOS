@@ -27,6 +27,7 @@ final class ChatViewModel: NSObject {
     private let _inputTextSetter = ObservableProperty("")
     private let _scrollDown = ObservableSender<Void>()
     private let _showFreeTokensAlert = ObservableSender<Void>()
+    private let _isSendingAvailable = ObservableProperty(false)
     
     private var controller: NSFetchedResultsController<ChatTransaction>?
     private(set) var chatroom: Chatroom?
@@ -57,6 +58,10 @@ final class ChatViewModel: NSObject {
     
     var showFreeTokensAlert: Observable<Void> {
         _showFreeTokensAlert.eraseToAnyPublisher()
+    }
+    
+    var isSendingAvailable: ObservableVariable<Bool> {
+        _isSendingAvailable.eraseToGetter()
     }
     
     var freeTokensURL: URL? {
@@ -97,6 +102,7 @@ final class ChatViewModel: NSObject {
         self.chatroom = chatroom
         controller = chatsProvider.getChatController(for: chatroom)
         controller?.delegate = self
+        _isSendingAvailable.value = !chatroom.isReadonly
         
         guard let account = account else { return }
         _sender.value = .init(senderId: account.address, displayName: account.address)
@@ -207,6 +213,7 @@ private extension ChatViewModel {
         _messages.value = []
         _loadingStatus.value = nil
         _inputTextSetter.value = ""
+        _isSendingAvailable.value = false
         controller = nil
         chatroom = nil
     }

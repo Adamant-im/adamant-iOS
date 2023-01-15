@@ -172,6 +172,7 @@
 		932354E82955F0A400EE367B /* ChatViewController+Delegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 932354E72955F0A400EE367B /* ChatViewController+Delegates.swift */; };
 		9324C75E297170600022D7EA /* RichTransactionStatusService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9324C75D297170600022D7EA /* RichTransactionStatusService.swift */; };
 		9324C760297171040022D7EA /* AdamantRichTransactionStatusService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9324C75F297171040022D7EA /* AdamantRichTransactionStatusService.swift */; };
+		932B34E529749CB8002A75BA /* ChatTransactionRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 932B34E429749CB8002A75BA /* ChatTransactionRouter.swift */; };
 		93457407292B930E00F8F9D6 /* AccountServiceStoreKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93457406292B930E00F8F9D6 /* AccountServiceStoreKey.swift */; };
 		93457408292B930E00F8F9D6 /* AccountServiceStoreKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93457406292B930E00F8F9D6 /* AccountServiceStoreKey.swift */; };
 		93457409292B930E00F8F9D6 /* AccountServiceStoreKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93457406292B930E00F8F9D6 /* AccountServiceStoreKey.swift */; };
@@ -840,6 +841,7 @@
 		932354E72955F0A400EE367B /* ChatViewController+Delegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatViewController+Delegates.swift"; sourceTree = "<group>"; };
 		9324C75D297170600022D7EA /* RichTransactionStatusService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichTransactionStatusService.swift; sourceTree = "<group>"; };
 		9324C75F297171040022D7EA /* AdamantRichTransactionStatusService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantRichTransactionStatusService.swift; sourceTree = "<group>"; };
+		932B34E429749CB8002A75BA /* ChatTransactionRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTransactionRouter.swift; sourceTree = "<group>"; };
 		93457406292B930E00F8F9D6 /* AccountServiceStoreKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountServiceStoreKey.swift; sourceTree = "<group>"; };
 		9345769428FD0C34004E6C7A /* UIViewController+email.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+email.swift"; sourceTree = "<group>"; };
 		934B9BE4296C58210027A8D0 /* CollectionCellWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionCellWrapper.swift; sourceTree = "<group>"; };
@@ -1438,6 +1440,7 @@
 				938F7D592955C8CB001915CA /* Delegates */,
 				938F7D632955C94F001915CA /* ChatViewController.swift */,
 				932354E72955F0A400EE367B /* ChatViewController+Delegates.swift */,
+				932B34E429749CB8002A75BA /* ChatTransactionRouter.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -2834,6 +2837,7 @@
 				648DD7A02236A59200B811FD /* DogeTransactionDetailsViewController.swift in Sources */,
 				557AC308287B1365004699D7 /* CheckmarkRowView.swift in Sources */,
 				6455E9F321075D8000B2E94C /* AdamantAddressBookService.swift in Sources */,
+				932B34E529749CB8002A75BA /* ChatTransactionRouter.swift in Sources */,
 				9324C75E297170600022D7EA /* RichTransactionStatusService.swift in Sources */,
 				9304F8BE292F88F900173F18 /* ANSPayload.swift in Sources */,
 				E9204B5020C94C4A00F3B9AB /* Date+adamant.swift in Sources */,

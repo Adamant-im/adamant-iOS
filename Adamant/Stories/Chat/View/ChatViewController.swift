@@ -16,6 +16,7 @@ import SafariServices
 final class ChatViewController: MessagesViewController {
     typealias SpinnerCell = MessageCellWrapper<SpinnerView>
     typealias TransactionCell = CollectionCellWrapper<ChatTransactionContainerView>
+    typealias SendTransaction = (UIViewController & ComplexTransferViewControllerDelegate) -> Void
     
     private let delegates: Delegates
     private var subscriptions = Set<AnyCancellable>()
@@ -43,10 +44,15 @@ final class ChatViewController: MessagesViewController {
         set { assertionFailure("Do not set messagesCollectionView") }
     }
     
-    init(viewModel: ChatViewModel, delegates: Delegates) {
+    init(
+        viewModel: ChatViewModel,
+        delegates: Delegates,
+        sendTransaction: @escaping SendTransaction
+    ) {
         self.viewModel = viewModel
         self.delegates = delegates
         super.init(nibName: nil, bundle: nil)
+        inputBar.onAttachmentButtonTap = { [weak self] in self.map { sendTransaction($0) } }
     }
     
     required init?(coder: NSCoder) {
@@ -85,6 +91,24 @@ final class ChatViewController: MessagesViewController {
     }
 }
 
+extension ChatViewController: ComplexTransferViewControllerDelegate {
+    func complexTransferViewController(
+        _: ComplexTransferViewController,
+        didFinishWithTransfer: TransactionDetails?,
+        detailsViewController: UIViewController?
+    ) {
+        DispatchQueue.onMainAsync { [weak self] in
+            if didFinishWithTransfer != nil {
+                self?.messagesCollectionView.scrollToLastItem()
+            }
+            
+            self?.dismiss(animated: true)
+            guard let detailsViewController = detailsViewController else { return }
+            self?.navigationController?.pushViewController(detailsViewController, animated: true)
+        }
+    }
+}
+
 private extension ChatViewController {
     func setupObservers() {
         viewModel.scrollDown
@@ -110,6 +134,11 @@ private extension ChatViewController {
         
         viewModel.showFreeTokensAlert
             .sink { [weak self] in self?.showFreeTokenAlert() }
+            .store(in: &subscriptions)
+        
+        viewModel.isSendingAvailable
+            .removeDuplicates()
+            .assign(to: \.isEnabled, on: inputBar)
             .store(in: &subscriptions)
     }
     
