@@ -41,7 +41,7 @@ extension ChatMessage {
     
     struct Transaction: Equatable {
         let icon: UIImage
-        let amount: Float
+        let amount: Decimal
         let currency: String
         let comment: String?
         let status: TransactionStatus

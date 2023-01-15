@@ -1,5 +1,5 @@
 //
-//  ChatDisplayDelegate.swift
+//  ChatDisplayManager.swift
 //  Adamant
 //
 //  Created by Andrey Golubenko on 23.12.2022.
@@ -10,7 +10,7 @@ import MessageKit
 import UIKit
 import Combine
 
-final class ChatDisplayDelegate: MessagesDisplayDelegate {
+final class ChatDisplayManager: MessagesDisplayDelegate {
     private let viewModel: ChatViewModel
     
     init(viewModel: ChatViewModel) {

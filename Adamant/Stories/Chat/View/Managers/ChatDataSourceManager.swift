@@ -1,5 +1,5 @@
 //
-//  ChatDataSource.swift
+//  ChatDataSourceManager.swift
 //  Adamant
 //
 //  Created by Andrey Golubenko on 23.12.2022.
@@ -10,7 +10,7 @@ import MessageKit
 import UIKit
 import Combine
 
-final class ChatDataSource: MessagesDataSource {
+final class ChatDataSourceManager: MessagesDataSource {
     private let viewModel: ChatViewModel
     
     var currentSender: SenderType {
@@ -95,7 +95,7 @@ final class ChatDataSource: MessagesDataSource {
     }
 }
 
-private extension ChatDataSource {
+private extension ChatDataSourceManager {
     func makeMessageTimeString(sentDate: Date, blockchain: Bool) -> NSAttributedString {
         let prefix = blockchain ? "⚭" : nil
         let string = [prefix, sentDate.humanizedTime().string]
@@ -134,7 +134,7 @@ extension ChatMessage {
                     ? .adamantLocalized.chat.transactionSent
                     : .adamantLocalized.chat.transactionReceived,
                 icon: model.icon,
-                amount: String(format: "%g", model.amount),
+                amount: AdamantBalanceFormat.full.format(model.amount),
                 currency: model.currency,
                 date: sentDate.humanizedDateTime(withWeekday: false),
                 comment: model.comment,

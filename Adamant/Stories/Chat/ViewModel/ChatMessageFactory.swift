@@ -46,7 +46,7 @@ private extension ChatMessageFactory {
         
         return .transaction(.init(
             icon: richMessageProviders[transfer.type]?.tokenLogo ?? .init(),
-            amount: transaction.amount.map { Float($0.doubleValue) } ?? .zero,
+            amount: transfer.amount,
             currency: richMessageProviders[transfer.type]?.tokenSymbol ?? "",
             comment: transfer.comments,
             status: transaction.transactionStatus ?? .notInitiated
@@ -56,7 +56,7 @@ private extension ChatMessageFactory {
     func makeContent(_ transaction: TransferTransaction) -> ChatMessage.Content {
         .transaction(.init(
             icon: AdmWalletService.currencyLogo,
-            amount: transaction.amount.map { Float($0.doubleValue) } ?? .zero,
+            amount: (transaction.amount ?? .zero) as Decimal,
             currency: AdmWalletService.currencySymbol,
             comment: transaction.comment,
             status: transaction.statusEnum.toTransactionStatus()

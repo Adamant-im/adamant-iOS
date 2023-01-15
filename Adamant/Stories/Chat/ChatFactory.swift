@@ -8,6 +8,7 @@
 
 import UIKit
 import MessageKit
+import InputBarAccessoryView
 import Combine
 
 struct ChatFactory {
@@ -19,21 +20,31 @@ struct ChatFactory {
     
     func makeViewController() -> UIViewController {
         let viewModel = makeViewModel()
+        let managers = makeManagers(viewModel: viewModel)
         
-        return ChatViewController(
+        let viewController = ChatViewController(
             viewModel: viewModel,
-            delegates: .init(
-                dataSource: ChatDataSource(viewModel: viewModel),
-                inputBarDelegate: ChatInputBarDelegate(sendMessageAction: viewModel.sendMessage),
-                layoutDelegate: ChatLayoutDelegate(viewModel: viewModel),
-                displayDelegate: ChatDisplayDelegate(viewModel: viewModel)
-            ),
+            storedObjects: managers.asArray,
             sendTransaction: makeSendTransactionAction(viewModel: viewModel)
         )
+        
+        viewController.setupManagers(managers)
+        return viewController
     }
 }
 
 private extension ChatFactory {
+    struct Managers {
+        let dataSource: MessagesDataSource
+        let layout: MessagesLayoutDelegate
+        let display: MessagesDisplayDelegate
+        let inputBar: InputBarAccessoryViewDelegate
+        
+        var asArray: [AnyObject] {
+            [dataSource, layout, display, inputBar]
+        }
+    }
+    
     func makeViewModel() -> ChatViewModel {
         let richMessageProviders = accountService
             .wallets
@@ -50,7 +61,18 @@ private extension ChatFactory {
         )
     }
     
-    func makeSendTransactionAction(viewModel: ChatViewModel) -> ChatViewController.SendTransaction {
+    func makeManagers(viewModel: ChatViewModel) -> Managers {
+        .init(
+            dataSource: ChatDataSourceManager(viewModel: viewModel),
+            layout: ChatLayoutManager(viewModel: viewModel),
+            display: ChatDisplayManager(viewModel: viewModel),
+            inputBar: ChatInputBarManager(sendMessageAction: viewModel.sendMessage)
+        )
+    }
+    
+    func makeSendTransactionAction(
+        viewModel: ChatViewModel
+    ) -> ChatViewController.SendTransaction {
         { [router, viewModel] parentVC in
             guard let vc = router.get(scene: AdamantScene.Chats.complexTransfer) as? ComplexTransferViewController
             else { return }
@@ -62,5 +84,14 @@ private extension ChatFactory {
             navigator.modalPresentationStyle = .overFullScreen
             parentVC.present(navigator, animated: true, completion: nil)
         }
+    }
+}
+
+private extension ChatViewController {
+    func setupManagers(_ managers: ChatFactory.Managers) {
+        messagesCollectionView.messagesDataSource = managers.dataSource
+        messagesCollectionView.messagesLayoutDelegate = managers.layout
+        messagesCollectionView.messagesDisplayDelegate = managers.display
+        messageInputBar.delegate = managers.inputBar
     }
 }

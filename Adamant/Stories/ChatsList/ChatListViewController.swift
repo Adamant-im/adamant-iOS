@@ -221,10 +221,13 @@ class ChatListViewController: UIViewController {
         }
         
         vc.hidesBottomBarWhenPushed = true
-        vc.viewModel.setup(account: accountService.account, chatroom: chatroom, messageToShow: message)
-        // TODO: [Chats] implement delegate analog
-//        vc.delegate = self
-        
+        vc.viewModel.setup(
+            account: accountService.account,
+            chatroom: chatroom,
+            messageToShow: message,
+            preservationDelegate: self
+        )
+
         return vc
     }
     
@@ -670,26 +673,25 @@ extension ChatListViewController: NewChatViewControllerDelegate {
     }
 }
 
-// MARK: - ChatViewControllerDelegate
-// TODO: [Chats] Replace ChatViewControllerDelegate
+// MARK: - ChatPreservationDelegate
 
-//extension ChatListViewController: ChatViewControllerDelegate {
-//    func preserveMessage(_ message: String, forAddress address: String) {
-//        preservedMessagess[address] = message
-//    }
-//
-//    func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String? {
-//        guard let message = preservedMessagess[address] else {
-//            return nil
-//        }
-//
-//        if thenRemoveIt {
-//            preservedMessagess.removeValue(forKey: address)
-//        }
-//
-//        return message
-//    }
-//}
+extension ChatListViewController: ChatPreservationDelegate {
+    func preserveMessage(_ message: String, forAddress address: String) {
+        preservedMessagess[address] = message
+    }
+
+    func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String? {
+        guard let message = preservedMessagess[address] else {
+            return nil
+        }
+
+        if thenRemoveIt {
+            preservedMessagess.removeValue(forKey: address)
+        }
+
+        return message
+    }
+}
 
 // MARK: - Working with in-app notifications
 extension ChatListViewController {

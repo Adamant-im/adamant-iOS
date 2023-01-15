@@ -1,5 +1,5 @@
 //
-//  ChatInputBarDelegate.swift
+//  ChatInputBarManager.swift
 //  Adamant
 //
 //  Created by Andrey Golubenko on 23.12.2022.
@@ -9,7 +9,7 @@
 import InputBarAccessoryView
 import Foundation
 
-final class ChatInputBarDelegate: InputBarAccessoryViewDelegate {
+final class ChatInputBarManager: InputBarAccessoryViewDelegate {
     private let sendMessageAction: (String) -> Void
     
     init(sendMessageAction: @escaping (String) -> Void) {

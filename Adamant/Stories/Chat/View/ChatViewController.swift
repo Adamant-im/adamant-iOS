@@ -18,10 +18,11 @@ final class ChatViewController: MessagesViewController {
     typealias TransactionCell = CollectionCellWrapper<ChatTransactionContainerView>
     typealias SendTransaction = (UIViewController & ComplexTransferViewControllerDelegate) -> Void
     
-    private let delegates: Delegates
     private var subscriptions = Set<AnyCancellable>()
+    private var storedObjects: [AnyObject]
     private var didScrollSender = ObservableSender<Void>()
     private var topMessageId: String?
+    private var messagesLoaded = false
     
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
@@ -46,11 +47,11 @@ final class ChatViewController: MessagesViewController {
     
     init(
         viewModel: ChatViewModel,
-        delegates: Delegates,
+        storedObjects: [AnyObject],
         sendTransaction: @escaping SendTransaction
     ) {
         self.viewModel = viewModel
-        self.delegates = delegates
+        self.storedObjects = storedObjects
         super.init(nibName: nil, bundle: nil)
         inputBar.onAttachmentButtonTap = { [weak self] in self.map { sendTransaction($0) } }
     }
@@ -65,7 +66,6 @@ final class ChatViewController: MessagesViewController {
         maintainPositionOnInputBarHeightChanged = true
         configureMessagesCollectionView()
         configureLayout()
-        setupDelegates()
         setupObservers()
         viewModel.loadFirstMessages()
     }
@@ -73,6 +73,11 @@ final class ChatViewController: MessagesViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         chatMessagesCollectionView.animationEnabled = true
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        viewModel.preserveMessage(inputBar.text)
     }
     
     override func collectionView(
@@ -111,6 +116,12 @@ extension ChatViewController: ComplexTransferViewControllerDelegate {
 
 private extension ChatViewController {
     func setupObservers() {
+        NotificationCenter
+            .default
+            .publisher(for: UITextView.textDidChangeNotification, object: inputBar.inputTextView)
+            .sink { [weak self] _ in self?.inputTextUpdated() }
+            .store(in: &subscriptions)
+        
         viewModel.scrollDown
             .sink { [weak messagesCollectionView] _ in
                 messagesCollectionView?.scrollToLastItem()
@@ -128,7 +139,8 @@ private extension ChatViewController {
             .sink { [weak self] _ in self?.updateLoadingViews() }
             .store(in: &subscriptions)
         
-        viewModel.inputTextSetter
+        viewModel.inputText
+            .removeDuplicates()
             .assign(to: \.text, on: inputBar)
             .store(in: &subscriptions)
         
@@ -140,13 +152,17 @@ private extension ChatViewController {
             .removeDuplicates()
             .assign(to: \.isEnabled, on: inputBar)
             .store(in: &subscriptions)
+        
+        viewModel.fee
+            .removeDuplicates()
+            .assign(to: \.fee, on: inputBar)
+            .store(in: &subscriptions)
     }
     
-    func setupDelegates() {
-        messagesCollectionView.messagesDataSource = delegates.dataSource
-        messagesCollectionView.messagesLayoutDelegate = delegates.layoutDelegate
-        messagesCollectionView.messagesDisplayDelegate = delegates.displayDelegate
-        messageInputBar.delegate = delegates.inputBarDelegate
+    func setupMessageToShowObserver() {
+        viewModel.messageIdToShow
+            .sink { [weak self] in $0.map { self?.showMessage(id: $0) } }
+            .store(in: &subscriptions)
     }
     
     func configureMessagesCollectionView() {
@@ -174,6 +190,10 @@ private extension ChatViewController {
         }
         
         topMessageId = viewModel.messages.value.first?.messageId
+        
+        guard !messagesLoaded, topMessageId != nil else { return }
+        setupMessageToShowObserver()
+        messagesLoaded = true
     }
     
     func updateLoadingViews() {
@@ -235,5 +255,20 @@ private extension ChatViewController {
             safari.modalPresentationStyle = .overFullScreen
             self.present(safari, animated: true, completion: nil)
         }
+    }
+    
+    func showMessage(id: String) {
+        guard let index = viewModel.messages.value.firstIndex(where: { $0.messageId == id})
+        else { return }
+        
+        messagesCollectionView.scrollToItem(
+            at: .init(item: .zero, section: index),
+            at: [.centeredVertically, .centeredHorizontally],
+            animated: false
+        )
+    }
+    
+    func inputTextUpdated() {
+        viewModel.inputText.value = inputBar.text
     }
 }

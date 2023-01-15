@@ -1,5 +1,5 @@
 //
-//  ChatLayoutDelegate.swift
+//  ChatLayoutManager.swift
 //  Adamant
 //
 //  Created by Andrey Golubenko on 23.12.2022.
@@ -10,7 +10,7 @@ import MessageKit
 import UIKit
 import Combine
 
-final class ChatLayoutDelegate: MessagesLayoutDelegate {
+final class ChatLayoutManager: MessagesLayoutDelegate {
     private let viewModel: ChatViewModel
     
     init(viewModel: ChatViewModel) {
@@ -93,7 +93,7 @@ final class ChatLayoutDelegate: MessagesLayoutDelegate {
     }
 }
 
-private extension ChatLayoutDelegate {
+private extension ChatLayoutManager {
     func textAlignment(for message: MessageType) -> NSTextAlignment {
         message.sender.senderId == viewModel.sender.value.senderId
             ? .right
