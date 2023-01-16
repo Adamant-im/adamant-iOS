@@ -52,21 +52,15 @@ class LskWalletService: WalletService {
     var transactionFeeRaw: BigUInt = BigUInt(integerLiteral: 141000)
     private (set) var enabled = true
     
-    static var currencySymbol = "LSK"
-    static var currencyLogo = #imageLiteral(resourceName: "wallet_lsk")
-    static let currencyExponent = -8
+    static var currencyLogo = #imageLiteral(resourceName: "lisk_wallet")
     
     static let kvsAddress = "lsk:address"
     static let defaultFee: BigUInt = 141000
     
     var lastHeight: UInt64 = 0
-	
+    
     var tokenSymbol: String {
         return type(of: self).currencySymbol
-    }
-    
-    var tokenName: String {
-        return "Lisk"
     }
     
     var tokenLogo: UIImage {
@@ -77,24 +71,12 @@ class LskWalletService: WalletService {
         return "LSK"
     }
     
-    var consistencyMaxTime: Double {
-        return 60
-    }
-    
     var tokenContract: String {
         return ""
     }
-   
+    
     var tokenUnicID: String {
         return tokenNetworkSymbol + tokenSymbol
-    }
-    
-    var defaultVisibility: Bool {
-        return false
-    }
-    
-    var defaultOrdinalLevel: Int? {
-        return nil
     }
     
 	// MARK: - Properties
@@ -143,8 +125,8 @@ class LskWalletService: WalletService {
         self.init(mainnet: mainnet, nodes: nodes, serviceNode: serviceNode)
     }
     
-    convenience init(mainnet: Bool, nodes: [String], services: [String]) {
-        self.init(mainnet: mainnet, nodes: nodes.map { APINode(origin: $0) }, serviceNode: services.map { APINode(origin: $0) })
+    convenience init(mainnet: Bool, nodes: [Node], services: [Node]) {
+        self.init(mainnet: mainnet, nodes: nodes.map { APINode(origin: $0.asString()) }, serviceNode: services.map { APINode(origin: $0.asString()) })
     }
     
     init(mainnet: Bool, nodes: [APINode], serviceNode: [APINode]) {
@@ -620,7 +602,7 @@ extension LskWalletService: PrivateKeyGenerator {
     }
     
     var rowImage: UIImage? {
-        return #imageLiteral(resourceName: "wallet_lsk_row")
+        return #imageLiteral(resourceName: "lisk_wallet_row")
     }
     
     func generatePrivateKeyFor(passphrase: String) -> String? {

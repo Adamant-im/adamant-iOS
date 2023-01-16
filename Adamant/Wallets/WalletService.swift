@@ -201,6 +201,7 @@ protocol WalletService: AnyObject {
 	// MARK: Currency
 	static var currencySymbol: String { get }
 	static var currencyLogo: UIImage { get }
+    static var qqPrefix: String { get }
     
     var tokenSymbol: String { get }
     var tokenName: String { get }
@@ -209,6 +210,8 @@ protocol WalletService: AnyObject {
     var tokenNetworkSymbol: String { get }
     var consistencyMaxTime: Double { get }
     var tokenContract: String { get }
+    var minBalance: Decimal { get }
+    var minAmount: Decimal { get }
     var defaultVisibility: Bool { get }
     var defaultOrdinalLevel: Int? { get }
     

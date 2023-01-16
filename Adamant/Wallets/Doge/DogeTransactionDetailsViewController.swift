@@ -52,7 +52,7 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
         let id = transaction.txId
         
-        return URL(string: "\(AdamantResources.dogeExplorerAddress)\(id)")
+        return URL(string: "\(DogeWalletService.explorerAddress)\(id)")
     }
     
     @objc func refresh() {

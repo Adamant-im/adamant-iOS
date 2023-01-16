@@ -82,7 +82,7 @@ extension DashWalletService: WalletServiceTwoStepSend {
     }
     
     func sendTransaction(_ transaction: BitcoinKit.Transaction, completion: @escaping (WalletServiceResult<String>) -> Void) {
-        guard let endpoint = AdamantResources.dashServers.randomElement() else {
+        guard let endpoint = DashWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DASH endpoint URL")
         }
         

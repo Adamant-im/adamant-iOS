@@ -63,7 +63,7 @@ extension BtcWalletService: WalletServiceTwoStepSend {
     }
     
     func sendTransaction(_ transaction: BitcoinKit.Transaction, completion: @escaping (WalletServiceResult<String>) -> Void) {
-        guard let url = AdamantResources.btcServers.randomElement() else {
+        guard let url = BtcWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get BTC endpoint URL")
         }
         
@@ -96,7 +96,7 @@ extension BtcWalletService: WalletServiceTwoStepSend {
     }
     
     func getUnspentTransactions(_ completion: @escaping (ApiServiceResult<[UnspentTransaction]>) -> Void) {
-        guard let url = AdamantResources.btcServers.randomElement() else {
+        guard let url = BtcWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get BTC endpoint URL")
         }
         

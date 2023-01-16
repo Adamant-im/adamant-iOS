@@ -55,23 +55,15 @@ struct BtcApiCommands {
 class BtcWalletService: WalletService {
 
     var tokenSymbol: String {
-        return type(of: self).currencySymbol
-    }
-    
-    var tokenName: String {
-        return "Bitcoin"
+        type(of: self).currencySymbol
     }
     
     var tokenLogo: UIImage {
-        return type(of: self).currencyLogo
-    }
-
-    var tokenNetworkSymbol: String {
-        return "BTC"
+        type(of: self).currencyLogo
     }
     
-    var consistencyMaxTime: Double {
-        return 10800
+    var tokenNetworkSymbol: String {
+        "BTC"
     }
     
     var tokenContract: String {
@@ -80,14 +72,6 @@ class BtcWalletService: WalletService {
     
     var tokenUnicID: String {
         return tokenNetworkSymbol + tokenSymbol
-    }
-    
-    var defaultVisibility: Bool {
-        return false
-    }
-    
-    var defaultOrdinalLevel: Int? {
-        return 10
     }
     
     var wallet: WalletAccount? { return btcWallet }
@@ -114,8 +98,7 @@ class BtcWalletService: WalletService {
     var router: Router!
     
     // MARK: - Constants
-    static var currencySymbol = "BTC"
-    static var currencyLogo = #imageLiteral(resourceName: "wallet_btc")
+    static var currencyLogo = #imageLiteral(resourceName: "bitcoin_wallet")
 
     static let multiplier = Decimal(sign: .plus, exponent: 8, significand: 1)
 
@@ -431,7 +414,7 @@ extension BtcWalletService: SwinjectDependentService {
 extension BtcWalletService {
 
     func getBalance(_ completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-        guard let url = AdamantResources.btcServers.randomElement() else {
+        guard let url = BtcWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get BTC endpoint URL")
         }
         
@@ -472,7 +455,7 @@ extension BtcWalletService {
     }
 
     func getFeeRate(_ completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-        guard let url = AdamantResources.btcServers.randomElement() else {
+        guard let url = BtcWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get BTC endpoint URL")
         }
         
@@ -508,7 +491,7 @@ extension BtcWalletService {
     }
 
     func getCurrentHeight(_ completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-        guard let url = AdamantResources.btcServers.randomElement() else {
+        guard let url = BtcWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get BTC endpoint URL")
         }
         
@@ -665,7 +648,7 @@ extension BtcWalletService {
     }
 
     private func getTransactions(for address: String, completion: @escaping (ApiServiceResult<[RawBtcTransactionResponse]>) -> Void) {
-        guard let url = AdamantResources.btcServers.randomElement() else {
+        guard let url = BtcWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get BTC endpoint URL")
         }
         
@@ -706,7 +689,7 @@ extension BtcWalletService {
             return
         }
 
-        guard let url = AdamantResources.btcServers.randomElement() else {
+        guard let url = BtcWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get BTC endpoint URL")
         }
         
@@ -769,7 +752,7 @@ extension BtcWalletService: PrivateKeyGenerator {
     }
     
     var rowImage: UIImage? {
-        return #imageLiteral(resourceName: "wallet_btc_row")
+        return #imageLiteral(resourceName: "bitcoin_wallet_row")
     }
     
     func generatePrivateKeyFor(passphrase: String) -> String? {

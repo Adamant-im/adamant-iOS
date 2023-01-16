@@ -12,12 +12,9 @@ import Alamofire
 import BitcoinKit
 
 class DashWalletService: WalletService {
+    
     var tokenSymbol: String {
         return type(of: self).currencySymbol
-    }
-    
-    var tokenName: String {
-        return "Dash"
     }
     
     var tokenLogo: UIImage {
@@ -27,10 +24,6 @@ class DashWalletService: WalletService {
     var tokenNetworkSymbol: String {
         return "DASH"
     }
-    
-    var consistencyMaxTime: Double {
-        return 800
-    }
    
     var tokenContract: String {
         return ""
@@ -38,14 +31,6 @@ class DashWalletService: WalletService {
     
     var tokenUnicID: String {
         return tokenNetworkSymbol + tokenSymbol
-    }
-    
-    var defaultVisibility: Bool {
-        return true
-    }
-    
-    var defaultOrdinalLevel: Int? {
-        return nil
     }
     
     var wallet: WalletAccount? { return dashWallet }
@@ -73,13 +58,14 @@ class DashWalletService: WalletService {
     var router: Router!
     
     // MARK: - Constants
-    static var currencySymbol = "DASH"
-    static var currencyLogo = #imageLiteral(resourceName: "wallet_dash")
+    static var currencyLogo = #imageLiteral(resourceName: "dash_wallet")
     
     static let multiplier = Decimal(sign: .plus, exponent: 8, significand: 1)
     static let chunkSize = 20
     
-    private (set) var transactionFee: Decimal = 0.0001 // 0.0001 DASH per transaction
+    var transactionFee: Decimal {
+        return DogeWalletService.fixedFee
+    }
     
     static let kvsAddress = "dash:address"
     
@@ -325,7 +311,7 @@ extension DashWalletService: SwinjectDependentService {
 // MARK: - Balances & addresses
 extension DashWalletService {
     func getBalance(_ completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-        guard let endpoint = AdamantResources.dashServers.randomElement() else {
+        guard let endpoint = DashWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DASH endpoint URL")
         }
 
@@ -475,7 +461,7 @@ extension DashWalletService: PrivateKeyGenerator {
     }
     
     var rowImage: UIImage? {
-        return #imageLiteral(resourceName: "wallet_dash_row")
+        return #imageLiteral(resourceName: "dash_wallet_row")
     }
     
     func generatePrivateKeyFor(passphrase: String) -> String? {

@@ -75,7 +75,7 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
         let id = transaction.txId
         
-        return URL(string: "\(AdamantResources.adamantExplorerAddress)\(id)")
+        return URL(string: "\(AdmWalletService.explorerAddress)\(id)")
     }
     
     func goToChat() {

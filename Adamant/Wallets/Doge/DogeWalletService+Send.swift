@@ -69,7 +69,7 @@ extension DogeWalletService: WalletServiceTwoStepSend {
     }
     
     func sendTransaction(_ transaction: BitcoinKit.Transaction, completion: @escaping (WalletServiceResult<String>) -> Void) {
-        guard let url = AdamantResources.dogeServers.randomElement() else {
+        guard let url = DogeWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DOGE endpoint URL")
         }
         

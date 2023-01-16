@@ -903,7 +903,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
 
     func pagingViewController(_: PagingViewController, pagingItemAt index: Int) -> PagingItem {
         guard let service = walletViewControllers[index].service else {
-            return WalletPagingItem(index: index, currencySymbol: "", currencyImage: #imageLiteral(resourceName: "wallet_adm"))
+            return WalletPagingItem(index: index, currencySymbol: "", currencyImage: #imageLiteral(resourceName: "adamant_wallet"))
         }
         
         var network = ""
