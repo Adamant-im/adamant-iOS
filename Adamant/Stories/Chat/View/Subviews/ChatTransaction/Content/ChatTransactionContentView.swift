@@ -80,6 +80,11 @@ private extension ChatTransactionContentView {
     func configure() {
         layer.cornerRadius = 16
         
+        addGestureRecognizer(UITapGestureRecognizer(
+            target: self,
+            action: #selector(didTap)
+        ))
+        
         addSubview(verticalStack)
         verticalStack.snp.makeConstraints {
             $0.top.bottom.equalToSuperview().inset(8)
@@ -96,5 +101,9 @@ private extension ChatTransactionContentView {
         dateLabel.text = model.date
         commentLabel.text = model.comment
         commentLabel.isHidden = model.comment == nil
+    }
+    
+    @objc func didTap() {
+        model.action.action()
     }
 }

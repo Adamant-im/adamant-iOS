@@ -90,7 +90,12 @@ final class ChatDataSourceManager: MessagesDataSource {
         )
         
         viewModel.updateTransactionStatusIfNeeded(id: message.messageId)
-        cell.wrappedView.model = message.fullModel.makeTransactionViewModel(currentSender: currentSender)
+        cell.wrappedView.model = message.fullModel.makeTransactionViewModel(
+            currentSender: currentSender,
+            onTap: { [didTapTransfer = viewModel.didTapTransfer] in
+                didTapTransfer.send(message.messageId)
+            }
+        )
         return cell
     }
 }
@@ -120,7 +125,10 @@ private extension ChatDataSourceManager {
 }
 
 extension ChatMessage {
-    func makeTransactionViewModel(currentSender: SenderType) -> ChatTransactionContainerView.Model {
+    func makeTransactionViewModel(
+        currentSender: SenderType,
+        onTap: @escaping () -> Void
+    ) -> ChatTransactionContainerView.Model {
         guard case let .transaction(model) = content else {
             assertionFailure("Incorrect content type")
             return .default
@@ -138,7 +146,8 @@ extension ChatMessage {
                 currency: model.currency,
                 date: sentDate.humanizedDateTime(withWeekday: false),
                 comment: model.comment,
-                backgroundColor: getBackgroundColor(currentSender: currentSender)
+                backgroundColor: getBackgroundColor(currentSender: currentSender),
+                action: .init(action: onTap)
             )
         )
     }

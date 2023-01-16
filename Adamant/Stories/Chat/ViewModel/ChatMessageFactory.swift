@@ -31,10 +31,16 @@ struct ChatMessageFactory {
 
 private extension ChatMessageFactory {
     func makeContent(_ transaction: ChatTransaction) -> ChatMessage.Content {
-        (transaction as? MessageTransaction).map { makeContent($0) }
-            ?? (transaction as? RichMessageTransaction).map { makeContent($0) }
-            ?? (transaction as? TransferTransaction).map { makeContent($0) }
-            ?? .default
+        switch transaction {
+        case let transaction as MessageTransaction:
+            return makeContent(transaction)
+        case let transaction as RichMessageTransaction:
+            return makeContent(transaction)
+        case let transaction as TransferTransaction:
+            return makeContent(transaction)
+        default:
+            return .default
+        }
     }
     
     func makeContent(_ transaction: MessageTransaction) -> ChatMessage.Content {

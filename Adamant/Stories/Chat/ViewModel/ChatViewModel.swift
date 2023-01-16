@@ -18,6 +18,7 @@ final class ChatViewModel: NSObject {
     private let dialogService: DialogService
     private let transfersProvider: TransfersProvider
     private let chatMessageFactory: ChatMessageFactory
+    let richMessageProviders: [String: RichMessageProvider]
     
     // MARK: Properties
     
@@ -35,11 +36,12 @@ final class ChatViewModel: NSObject {
     private(set) var chatroom: Chatroom?
     private var subscriptions = Set<AnyCancellable>()
     
-    private var chatTransactions: [ChatTransaction] = [] {
+    private(set) var chatTransactions: [ChatTransaction] = [] {
         didSet { _messages.value = chatTransactions.map(chatMessageFactory.makeMessage) }
     }
     
     let inputText = ObservableProperty("")
+    let didTapTransfer = ObservableSender<String>()
     
     var sender: ObservableVariable<ChatSender> {
         _sender.eraseToGetter()
@@ -93,13 +95,15 @@ final class ChatViewModel: NSObject {
         markdownParser: MarkdownParser,
         dialogService: DialogService,
         transfersProvider: TransfersProvider,
-        chatMessageFactory: ChatMessageFactory
+        chatMessageFactory: ChatMessageFactory,
+        richMessageProviders: [String: RichMessageProvider]
     ) {
         self.chatsProvider = chatsProvider
         self.markdownParser = markdownParser
         self.dialogService = dialogService
         self.transfersProvider = transfersProvider
         self.chatMessageFactory = chatMessageFactory
+        self.richMessageProviders = richMessageProviders
         super.init()
         setupObservers()
     }
@@ -197,6 +201,26 @@ final class ChatViewModel: NSObject {
     func preserveMessage(_ message: String) {
         guard let partnerAddress = chatroom?.partner?.address else { return }
         preservationDelegate?.preserveMessage(message, forAddress: partnerAddress)
+    }
+    
+    func showDublicatedTransactionAlert() {
+        dialogService.showAlert(
+            title: nil,
+            message: .adamantLocalized.sharedErrors.duplicatedTransaction,
+            style: AdamantAlertStyle.alert,
+            actions: nil,
+            from: nil
+        )
+    }
+    
+    func showFailedTransactionAlert() {
+        dialogService.showAlert(
+            title: nil,
+            message: .adamantLocalized.sharedErrors.inconsistentTransaction,
+            style: AdamantAlertStyle.alert,
+            actions: nil,
+            from: nil
+        )
     }
 }
 

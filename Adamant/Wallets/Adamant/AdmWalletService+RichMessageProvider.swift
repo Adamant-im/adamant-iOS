@@ -18,12 +18,11 @@ extension AdmWalletService: RichMessageProvider {
     
     // MARK: Events
     
-    /// Not supported yet
-    func richMessageTapped(for transaction: RichMessageTransaction, at indexPath: IndexPath, in chat: ChatViewController) {
+    func richMessageTapped(for transaction: RichMessageTransaction, in chat: ChatViewController) {
         return
     }
     
-    func richMessageTapped(for transaction: TransferTransaction, at indexPath: IndexPath, in chat: ChatViewController) {
+    func richMessageTapped(for transaction: TransferTransaction, in chat: ChatViewController) {
         guard let controller = router.get(scene: AdamantScene.Wallets.Adamant.transactionDetails) as? TransactionDetailsViewControllerBase else {
             fatalError("Can't get TransactionDetails scene")
         }

@@ -20,7 +20,7 @@ protocol RichMessageProvider: AnyObject {
     var tokenLogo: UIImage { get }
     
     // MARK: Events
-    func richMessageTapped(for transaction: RichMessageTransaction, at indexPath: IndexPath, in chat: ChatViewController)
+    func richMessageTapped(for transaction: RichMessageTransaction, in chat: ChatViewController)
     
     // MARK: Chats list
     func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString

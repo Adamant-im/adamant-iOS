@@ -157,6 +157,10 @@ private extension ChatViewController {
             .removeDuplicates()
             .assign(to: \.fee, on: inputBar)
             .store(in: &subscriptions)
+        
+        viewModel.didTapTransfer
+            .sink { [weak self] in self?.didTapTransfer(id: $0) }
+            .store(in: &subscriptions)
     }
     
     func setupMessageToShowObserver() {
@@ -270,5 +274,47 @@ private extension ChatViewController {
     
     func inputTextUpdated() {
         viewModel.inputText.value = inputBar.text
+    }
+    
+    func didTapTransfer(id: String) {
+        guard
+            let transaction = viewModel.chatTransactions.first(
+                where: { $0.chatMessageId == id }
+            )
+        else { return }
+        
+        switch transaction {
+        case let transaction as TransferTransaction:
+            didTapTransferTransaction(transaction)
+        case let transaction as RichMessageTransaction:
+            didTapRichMessageTransaction(transaction)
+        default:
+            return
+        }
+    }
+    
+    func didTapTransferTransaction(_ transaction: TransferTransaction) {
+        guard
+            let provider = viewModel.richMessageProviders[AdmWalletService.richMessageType]
+                as? AdmWalletService
+        else { return }
+        
+        provider.richMessageTapped(for: transaction, in: self)
+    }
+    
+    func didTapRichMessageTransaction(_ transaction: RichMessageTransaction) {
+        guard
+            let type = transaction.richType,
+            let provider = viewModel.richMessageProviders[type]
+        else { return }
+        
+        switch transaction.transactionStatus {
+        case .dublicate:
+            viewModel.showDublicatedTransactionAlert()
+        case .failed:
+            viewModel.showFailedTransactionAlert()
+        case .notInitiated, .pending, .success, .updating, .warning, .none:
+            provider.richMessageTapped(for: transaction, in: self)
+        }
     }
 }

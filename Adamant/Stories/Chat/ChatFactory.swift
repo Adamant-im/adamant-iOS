@@ -46,18 +46,20 @@ private extension ChatFactory {
     }
     
     func makeViewModel() -> ChatViewModel {
-        let richMessageProviders = accountService
-            .wallets
-            .compactMap { $0 as? RichMessageProvider }
+        let richMessageProviders: Dictionary = Dictionary(
+            uniqueKeysWithValues: accountService
+                .wallets
+                .compactMap { $0 as? RichMessageProvider }
+                .map { ($0.dynamicRichMessageType, $0) }
+        )
         
         return .init(
             chatsProvider: chatsProvider,
             markdownParser: .init(font: UIFont.systemFont(ofSize: UIFont.systemFontSize)),
             dialogService: dialogService,
             transfersProvider: transferProvider,
-            chatMessageFactory: .init(richMessageProviders: .init(
-                uniqueKeysWithValues: richMessageProviders.map { ($0.dynamicRichMessageType, $0) }
-            ))
+            chatMessageFactory: .init(richMessageProviders: richMessageProviders),
+            richMessageProviders: richMessageProviders
         )
     }
     
