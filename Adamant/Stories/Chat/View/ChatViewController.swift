@@ -116,8 +116,7 @@ extension ChatViewController: ComplexTransferViewControllerDelegate {
 
 private extension ChatViewController {
     func setupObservers() {
-        NotificationCenter
-            .default
+        NotificationCenter.default
             .publisher(for: UITextView.textDidChangeNotification, object: inputBar.inputTextView)
             .sink { [weak self] _ in self?.inputTextUpdated() }
             .store(in: &subscriptions)
@@ -160,6 +159,11 @@ private extension ChatViewController {
         
         viewModel.didTapTransfer
             .sink { [weak self] in self?.didTapTransfer(id: $0) }
+            .store(in: &subscriptions)
+        
+        viewModel.navigationTitle
+            .removeDuplicates()
+            .assign(to: \.title, on: navigationItem)
             .store(in: &subscriptions)
     }
     

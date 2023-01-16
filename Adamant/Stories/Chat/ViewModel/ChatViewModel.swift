@@ -18,6 +18,7 @@ final class ChatViewModel: NSObject {
     private let dialogService: DialogService
     private let transfersProvider: TransfersProvider
     private let chatMessageFactory: ChatMessageFactory
+    private let addressBookService: AddressBookService
     let richMessageProviders: [String: RichMessageProvider]
     
     // MARK: Properties
@@ -30,6 +31,7 @@ final class ChatViewModel: NSObject {
     private let _isSendingAvailable = ObservableProperty(false)
     private let _messageIdToShow = ObservableProperty<String?>(nil)
     private let _fee = ObservableProperty("")
+    private let _navigationTitle = ObservableProperty<String?>("")
     
     private weak var preservationDelegate: ChatPreservationDelegate?
     private var controller: NSFetchedResultsController<ChatTransaction>?
@@ -75,6 +77,10 @@ final class ChatViewModel: NSObject {
         _fee.eraseToGetter()
     }
     
+    var navigationTitle: ObservableVariable<String?> {
+        _navigationTitle.eraseToGetter()
+    }
+    
     var freeTokensURL: URL? {
         guard let address = chatroom?.partner?.address else { return nil }
         let urlString: String = .adamantLocalized.wallets.getFreeTokensUrl(for: address)
@@ -96,6 +102,7 @@ final class ChatViewModel: NSObject {
         dialogService: DialogService,
         transfersProvider: TransfersProvider,
         chatMessageFactory: ChatMessageFactory,
+        addressBookService: AddressBookService,
         richMessageProviders: [String: RichMessageProvider]
     ) {
         self.chatsProvider = chatsProvider
@@ -103,6 +110,7 @@ final class ChatViewModel: NSObject {
         self.dialogService = dialogService
         self.transfersProvider = transfersProvider
         self.chatMessageFactory = chatMessageFactory
+        self.addressBookService = addressBookService
         self.richMessageProviders = richMessageProviders
         super.init()
         setupObservers()
@@ -121,6 +129,7 @@ final class ChatViewModel: NSObject {
         controller?.delegate = self
         _isSendingAvailable.value = !chatroom.isReadonly
         _messageIdToShow.value = messageToShow?.chatMessageId
+        updateTitle()
         
         if let account = account {
             _sender.value = .init(senderId: account.address, displayName: account.address)
@@ -277,6 +286,8 @@ private extension ChatViewModel {
         inputText.value = ""
         _isSendingAvailable.value = false
         _messageIdToShow.value = nil
+        _fee.value = ""
+        _navigationTitle.value = ""
         controller = nil
         chatroom = nil
         preservationDelegate = nil
@@ -331,6 +342,18 @@ private extension ChatViewModel {
         )
         
         _fee.value = "~\(feeString)"
+    }
+    
+    func updateTitle() {
+        guard let partner = chatroom?.partner else { return }
+        
+        if let address = partner.address, let name = addressBookService.addressBook[address] {
+            _navigationTitle.value = name.checkAndReplaceSystemWallets()
+        } else if let name = partner.name {
+            _navigationTitle.value = name
+        } else {
+            _navigationTitle.value = partner.address
+        }
     }
 }
 

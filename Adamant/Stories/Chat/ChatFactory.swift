@@ -16,6 +16,7 @@ struct ChatFactory {
     let dialogService: DialogService
     let transferProvider: TransfersProvider
     let accountService: AccountService
+    let addressBookService: AddressBookService
     let router: Router
     
     func makeViewController() -> UIViewController {
@@ -59,6 +60,7 @@ private extension ChatFactory {
             dialogService: dialogService,
             transfersProvider: transferProvider,
             chatMessageFactory: .init(richMessageProviders: richMessageProviders),
+            addressBookService: addressBookService,
             richMessageProviders: richMessageProviders
         )
     }

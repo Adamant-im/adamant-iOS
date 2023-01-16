@@ -190,6 +190,7 @@ extension Container {
                 dialogService: r.resolve(DialogService.self)!,
                 transferProvider: r.resolve(TransfersProvider.self)!,
                 accountService: r.resolve(AccountService.self)!,
+                addressBookService: r.resolve(AddressBookService.self)!,
                 router: r.resolve(Router.self)!
             )
         }
