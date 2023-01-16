@@ -14,14 +14,19 @@ import MarkdownKit
 class AdamantChatTransactionService: ChatTransactionService {
     
     // MARK: Dependencies
+    
     private let adamantCore: AdamantCore
     private let richProviders: [String: RichMessageProviderWithStatusCheck]
     
     private let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
-    private var transactionInProgress: [UInt64] = []
-    private var onTransactionSaved: (() -> Void)?
-    private let processSemaphore = DispatchSemaphore(value: 0)
-    private var waitSemaphoreCount = 0
+    
+    private lazy var queue: OperationQueue = {
+        let queue = OperationQueue()
+        queue.maxConcurrentOperationCount = 1
+        return queue
+    }()
+    
+    // MARK: Lifecycle
     
     init(adamantCore: AdamantCore, accountService: AccountService) {
         self.adamantCore = adamantCore
@@ -31,6 +36,11 @@ class AdamantChatTransactionService: ChatTransactionService {
             richProviders[provider.dynamicRichMessageType] = provider
         }
         self.richProviders = richProviders
+    }
+    
+    /// Make operations serial
+    func addOperations(_ op: Operation) {
+        queue.addOperation(op)
     }
     
     /// Search transaction in local storage
@@ -156,12 +166,7 @@ class AdamantChatTransactionService: ChatTransactionService {
             transfer.confirmations = transaction.confirmations
             transfer.statusEnum = .delivered
             transfer.blockId = transaction.blockId
-        } else if transactionInProgress.contains(transaction.id) {
-            waitSemaphoreCount += 1
-            processSemaphore.wait()
-            return transferTransaction(from: transaction, isOut: isOut, partner: partner, context: context)
         } else {
-            transactionInProgress.append(transaction.id)
             transfer = TransferTransaction(context: context)
             transfer.amount = transaction.amount as NSDecimalNumber
             transfer.date = transaction.date as NSDate
@@ -184,18 +189,5 @@ class AdamantChatTransactionService: ChatTransactionService {
         transfer.isOutgoing = isOut
         transfer.partner = partner
         return transfer
-    }
-    
-    func processingComplete(_ transactions: [UInt64]) {
-        transactionInProgress.removeAll { trs in
-            let contains = transactions.contains(trs)
-            if contains {
-                if waitSemaphoreCount > 0 {
-                    processSemaphore.signal()
-                    waitSemaphoreCount -= 1
-                }
-            }
-            return contains
-        }        
     }
 }
