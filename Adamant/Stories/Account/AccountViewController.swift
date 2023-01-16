@@ -168,6 +168,7 @@ class AccountViewController: FormViewController {
     
     private lazy var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
+        refreshControl.tintColor = .adamant.primary
         refreshControl.addTarget(self, action: #selector(self.handleRefresh(_:)), for: UIControl.Event.valueChanged)
         return refreshControl
     }()
@@ -770,12 +771,13 @@ class AccountViewController: FormViewController {
     }
     
     private func setColors() {
-        view.backgroundColor = UIColor.adamant.secondBackgroundColor
-        pagingViewController.backgroundColor = UIColor.adamant.backgroundColor
-        pagingViewController.menuBackgroundColor = UIColor.adamant.backgroundColor
+        view.backgroundColor = .adamant.secondBackgroundColor
+        pagingViewController.backgroundColor = .adamant.backgroundColor
+        pagingViewController.menuBackgroundColor = .adamant.backgroundColor
+        pagingViewController.view.backgroundColor = .adamant.backgroundColor
         pagingViewController.reloadData()
         tableView.backgroundColor = .clear
-        accountHeaderView.backgroundColor = UIColor.adamant.backgroundColor
+        accountHeaderView.backgroundColor = .adamant.backgroundColor
     }
     
     func updateAccountInfo() {

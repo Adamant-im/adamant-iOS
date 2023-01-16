@@ -20,6 +20,7 @@ class BtcTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     
     private lazy var refreshControl: UIRefreshControl = {
         let control = UIRefreshControl()
+        control.tintColor = .adamant.primary
         control.addTarget(self, action: #selector(refresh), for: UIControl.Event.valueChanged)
         return control
     }()

@@ -35,6 +35,16 @@ extension UIColor {
         
         // MARK: Global colors
         
+        /// Income Arrow View Background Color
+        static var incomeArrowBackgroundColor: UIColor {
+            return UIColor(hex: "36C436")
+        }
+        
+        /// Outcome Arrow View Background Color
+        static var outcomeArrowBackgroundColor: UIColor {
+            return UIColor(hex: "F44444")
+        }
+        
         /// Default background color
         static var backgroundColor: UIColor {
             let colorWhiteTheme  = UIColor.white
