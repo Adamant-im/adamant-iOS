@@ -51,16 +51,7 @@ final class ChatDataSourceManager: MessagesDataSource {
         for message: MessageType,
         at _: IndexPath
     ) -> NSAttributedString? {
-        guard message.sentDate != .adamantNullDate else { return nil }
-        
-        switch message.fullModel.status {
-        case let .delivered(blockchain):
-            return makeMessageTimeString(sentDate: message.sentDate, blockchain: blockchain)
-        case .pending:
-            return makePendingMessageString()
-        case .failed:
-            return nil
-        }
+        message.fullModel.bottomString
     }
     
     func cellTopLabelAttributedText(
@@ -97,30 +88,6 @@ final class ChatDataSourceManager: MessagesDataSource {
             }
         )
         return cell
-    }
-}
-
-private extension ChatDataSourceManager {
-    func makeMessageTimeString(sentDate: Date, blockchain: Bool) -> NSAttributedString {
-        let prefix = blockchain ? "⚭" : nil
-        let string = [prefix, sentDate.humanizedTime().string]
-            .compactMap { $0 }
-            .joined(separator: " ")
-        
-        return .init(
-            string: string,
-            attributes: [
-                .font: UIFont.preferredFont(forTextStyle: .caption2),
-                .foregroundColor: UIColor.adamant.secondary
-            ]
-        )
-    }
-    
-    func makePendingMessageString() -> NSAttributedString {
-        let attachment = NSTextAttachment()
-        attachment.image = UIImage(named: "status_pending")
-        attachment.bounds = CGRect(x: .zero, y: -1, width: 7, height: 7)
-        return NSAttributedString(attachment: attachment)
     }
 }
 

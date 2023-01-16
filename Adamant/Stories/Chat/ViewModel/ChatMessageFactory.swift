@@ -6,7 +6,7 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 struct ChatMessageFactory {
     private let richMessageProviders: [String: RichMessageProvider]
@@ -15,16 +15,27 @@ struct ChatMessageFactory {
         self.richMessageProviders = richMessageProviders
     }
     
-    func makeMessage(_ transaction: ChatTransaction) -> ChatMessage {
-        .init(
+    func makeMessage(
+        _ transaction: ChatTransaction,
+        expireDate: inout Date?
+    ) -> ChatMessage {
+        let sentDate = transaction.date.map { $0 as Date } ?? .init()
+        let status = ChatMessage.Status(
+            messageStatus: transaction.statusEnum,
+            blockId: transaction.blockId
+        )
+        
+        return .init(
             messageId: transaction.chatMessageId ?? "",
-            sentDate: transaction.date.map { $0 as Date } ?? .init(),
+            sentDate: sentDate,
             senderModel: .init(transaction: transaction),
-            status: .init(
-                messageStatus: transaction.statusEnum,
-                blockId: transaction.blockId
-            ),
-            content: makeContent(transaction)
+            status: status,
+            content: makeContent(transaction),
+            bottomString: makeBottomString(
+                sentDate: sentDate,
+                status: status,
+                expireDate: &expireDate
+            )
         )
     }
 }
@@ -67,6 +78,54 @@ private extension ChatMessageFactory {
             comment: transaction.comment,
             status: transaction.statusEnum.toTransactionStatus()
         ))
+    }
+    
+    func makeBottomString(
+        sentDate: Date,
+        status: ChatMessage.Status,
+        expireDate: inout Date?
+    ) -> NSAttributedString? {
+        switch status {
+        case let .delivered(blockchain):
+            return makeMessageTimeString(
+                sentDate: sentDate,
+                blockchain: blockchain,
+                expireDate: &expireDate
+            )
+        case .pending:
+            return makePendingMessageString()
+        case .failed:
+            return nil
+        }
+    }
+    
+    func makeMessageTimeString(
+        sentDate: Date,
+        blockchain: Bool,
+        expireDate: inout Date?
+    ) -> NSAttributedString {
+        let prefix = blockchain ? "⚭" : nil
+        let humanizedTime = sentDate.humanizedTime()
+        expireDate = humanizedTime.expireIn.map { .init().addingTimeInterval($0) }
+        
+        let string = [prefix, humanizedTime.string]
+            .compactMap { $0 }
+            .joined(separator: " ")
+        
+        return .init(
+            string: string,
+            attributes: [
+                .font: UIFont.preferredFont(forTextStyle: .caption2),
+                .foregroundColor: UIColor.adamant.secondary
+            ]
+        )
+    }
+    
+    func makePendingMessageString() -> NSAttributedString {
+        let attachment = NSTextAttachment()
+        attachment.image = UIImage(named: "status_pending")
+        attachment.bounds = CGRect(x: .zero, y: -1, width: 7, height: 7)
+        return NSAttributedString(attachment: attachment)
     }
 }
 

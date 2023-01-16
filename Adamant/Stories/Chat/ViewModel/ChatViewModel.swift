@@ -35,12 +35,11 @@ final class ChatViewModel: NSObject {
     
     private weak var preservationDelegate: ChatPreservationDelegate?
     private var controller: NSFetchedResultsController<ChatTransaction>?
-    private(set) var chatroom: Chatroom?
     private var subscriptions = Set<AnyCancellable>()
+    private var timerSubscription: AnyCancellable?
     
-    private(set) var chatTransactions: [ChatTransaction] = [] {
-        didSet { _messages.value = chatTransactions.map(chatMessageFactory.makeMessage) }
-    }
+    private(set) var chatroom: Chatroom?
+    private(set) var chatTransactions: [ChatTransaction] = []
     
     let inputText = ObservableProperty("")
     let didTapTransfer = ObservableSender<String>()
@@ -151,7 +150,7 @@ final class ChatViewModel: NSObject {
         guard let address = chatroom?.partner?.address else { return }
         
         if address == AdamantContacts.adamantWelcomeWallet.name {
-            updateMessages(performFetch: true)
+            updateTransactions(performFetch: true)
         } else {
             loadMessages(address: address, offset: .zero, loadingStatus: .fullscreen)
         }
@@ -235,7 +234,7 @@ final class ChatViewModel: NSObject {
 
 extension ChatViewModel: NSFetchedResultsControllerDelegate {
     func controllerDidChangeContent(_: NSFetchedResultsController<NSFetchRequestResult>) {
-        updateMessages(performFetch: false)
+        updateTransactions(performFetch: false)
     }
 }
 
@@ -265,18 +264,42 @@ private extension ChatViewModel {
             offset: offset
         ) { [weak self] in
             DispatchQueue.onMainAsync {
-                self?.updateMessages(performFetch: true)
+                self?.updateTransactions(performFetch: true)
                 self?._loadingStatus.value = nil
             }
         }
     }
     
-    func updateMessages(performFetch: Bool) {
+    func updateTransactions(performFetch: Bool) {
         if performFetch {
             try? controller?.performFetch()
         }
         
         chatTransactions = controller?.fetchedObjects ?? []
+        updateMessages()
+    }
+    
+    func updateMessages() {
+        timerSubscription = nil
+        var minTimestamp: TimeInterval?
+        var expireDate: Date?
+        
+        _messages.value = chatTransactions.map {
+            let message = chatMessageFactory.makeMessage($0, expireDate: &expireDate)
+            let timestamp = expireDate?.timeIntervalSince1970
+            
+            if let timestamp = timestamp, timestamp < minTimestamp ?? .greatestFiniteMagnitude {
+                minTimestamp = timestamp
+            }
+            
+            expireDate = nil
+            return message
+        }
+        
+        let currentTimestamp = Date().timeIntervalSince1970
+        if let minTimestamp = minTimestamp, currentTimestamp < minTimestamp {
+            setupMessagesUpdateTimer(interval: minTimestamp - currentTimestamp)
+        }
     }
     
     func reset() {
@@ -354,6 +377,12 @@ private extension ChatViewModel {
         } else {
             _navigationTitle.value = partner.address
         }
+    }
+    
+    func setupMessagesUpdateTimer(interval: TimeInterval) {
+        timerSubscription = Timer.publish(every: interval, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in self?.updateMessages() }
     }
 }
 

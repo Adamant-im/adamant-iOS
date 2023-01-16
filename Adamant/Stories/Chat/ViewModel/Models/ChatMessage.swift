@@ -15,13 +15,15 @@ struct ChatMessage: Equatable {
     let senderModel: ChatSender
     let status: Status
     let content: Content
+    let bottomString: NSAttributedString?
     
     static let `default` = Self(
         messageId: "",
         sentDate: .init(),
         senderModel: .default,
         status: .failed,
-        content: .default
+        content: .default,
+        bottomString: nil
     )
 }
 
