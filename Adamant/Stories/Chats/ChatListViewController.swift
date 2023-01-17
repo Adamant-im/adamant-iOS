@@ -54,6 +54,8 @@ class ChatListViewController: UIViewController {
     
     let defaultAvatar = #imageLiteral(resourceName: "avatar-chat-placeholder")
     
+    private var previousAppState: UIApplication.State?
+    
     private lazy var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(self.handleRefresh(_:)), for: UIControl.Event.valueChanged)
@@ -69,6 +71,11 @@ class ChatListViewController: UIViewController {
         parser.link.color = UIColor.adamant.active
         
         return parser
+    }()
+    
+    private lazy var updatingIndicatorView: UpdatingIndicatorView = {
+        let view = UpdatingIndicatorView(title: String.adamantLocalized.chatList.title)
+        return view
     }()
     
     private var defaultSeparatorInstets: UIEdgeInsets?
@@ -94,51 +101,15 @@ class ChatListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.largeTitleDisplayMode = .never
-        navigationItem.title = String.adamantLocalized.chatList.title
-        navigationItem.rightBarButtonItems = [
-            UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(newChat)),
-            UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(beginSearch))
-        ]
+        setupNavigationController()
         
-        // MARK: TableView
-        tableView.dataSource = self
-        tableView.delegate = self
-        tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
-        tableView.register(LoadingTableViewCell.self, forCellReuseIdentifier: loadingCellIdentifier)
-        tableView.refreshControl = refreshControl
-        tableView.backgroundColor = .clear
+        setupTableView()
         
         if self.accountService.account != nil {
             initFetchedRequestControllers(provider: chatsProvider)
         }
         
-        // MARK: Search controller
-        guard let searchResultController = router.get(scene: AdamantScene.Chats.searchResults) as? SearchResultsViewController else {
-            fatalError("Can't get SearchResultsViewController")
-        }
-        
-        searchResultController.delegate = self
-        
-        searchController = UISearchController(searchResultsController: searchResultController)
-        searchController.searchResultsUpdater = self
-        searchController.searchBar.delegate = self
-        searchController.searchBar.placeholder = String.adamantLocalized.chatList.searchPlaceholder
-        definesPresentationContext = true
-        
-        searchController.obscuresBackgroundDuringPresentation = false
-        searchController.hidesNavigationBarDuringPresentation = true
-        navigationItem.searchController = searchController
-        
-        // MARK: Login/Logout
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            self?.initFetchedRequestControllers(provider: self?.chatsProvider)
-        }
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            self?.initFetchedRequestControllers(provider: nil)
-            self?.areMessagesLoaded = false
-        }
+        setupSearchController()
         
         // MARK: Busy Indicator
         busyIndicatorLabel.text = String.adamantLocalized.chatList.syncingChats
@@ -151,22 +122,7 @@ class ChatListViewController: UIViewController {
             setIsBusy(false, animated: false)
         }
         
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantChatsProvider.initiallySyncedChanged, object: chatsProvider, queue: OperationQueue.main) { [weak self] notification in
-            if let synced = notification.userInfo?[AdamantUserInfoKey.ChatProvider.initiallySynced] as? Bool {
-                self?.areMessagesLoaded = true
-                self?.performOnMessagesLoadedActions()
-                self?.setIsBusy(!synced)
-                self?.tableView.reloadData()
-            } else if let synced = self?.chatsProvider.isInitiallySynced {
-                self?.setIsBusy(!synced)
-            } else {
-                self?.setIsBusy(true)
-            }
-        }
-        
-        // Keyboard
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+        addObservers()
         
         setColors()
     }
@@ -191,6 +147,101 @@ class ChatListViewController: UIViewController {
                 insets.bottom = rect.height
             }
             tableView.contentInset = insets
+        }
+    }
+    
+    // MARK: Navigation controller
+    
+    private func setupNavigationController() {
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.largeTitleDisplayMode = .never
+        navigationItem.titleView = updatingIndicatorView
+        navigationItem.rightBarButtonItems = [
+            UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(newChat)),
+            UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(beginSearch))
+        ]
+    }
+    
+    // MARK: Search controller
+    
+    private func setupSearchController() {
+        guard let searchResultController = router.get(scene: AdamantScene.Chats.searchResults) as? SearchResultsViewController else {
+            fatalError("Can't get SearchResultsViewController")
+        }
+        
+        searchResultController.delegate = self
+        
+        searchController = UISearchController(searchResultsController: searchResultController)
+        searchController.searchResultsUpdater = self
+        searchController.searchBar.delegate = self
+        searchController.searchBar.placeholder = String.adamantLocalized.chatList.searchPlaceholder
+        definesPresentationContext = true
+        
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.hidesNavigationBarDuringPresentation = true
+        navigationItem.searchController = searchController
+    }
+    
+    // MARK: TableView
+    
+    private func setupTableView() {
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
+        tableView.register(LoadingTableViewCell.self, forCellReuseIdentifier: loadingCellIdentifier)
+        tableView.refreshControl = refreshControl
+        tableView.backgroundColor = .clear
+    }
+    
+    // MARK: Add Observers
+    
+    private func addObservers() {
+        
+        // Login/Logout
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.initFetchedRequestControllers(provider: self?.chatsProvider)
+        }
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.initFetchedRequestControllers(provider: nil)
+            self?.areMessagesLoaded = false
+        }
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantChatsProvider.initiallySyncedChanged, object: chatsProvider, queue: OperationQueue.main) { [weak self] notification in
+            if let synced = notification.userInfo?[AdamantUserInfoKey.ChatProvider.initiallySynced] as? Bool {
+                self?.areMessagesLoaded = true
+                self?.performOnMessagesLoadedActions()
+                self?.setIsBusy(!synced)
+                self?.tableView.reloadData()
+            } else if let synced = self?.chatsProvider.isInitiallySynced {
+                self?.setIsBusy(!synced)
+            } else {
+                self?.setIsBusy(true)
+            }
+        }
+        
+        // Keyboard
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+        
+        // Control Active
+        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            if let previousAppState = self?.previousAppState,
+               previousAppState == .background {
+                self?.previousAppState = .active
+                self?.updateChats()
+            }
+        }
+        
+        NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.previousAppState = .background
+        }
+        
+    }
+    
+    private func updateChats() {
+        updatingIndicatorView.startAnimate()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            self.handleRefresh(self.refreshControl)
         }
     }
     
@@ -268,6 +319,7 @@ class ChatListViewController: UIViewController {
             guard let result = result else {
                 DispatchQueue.main.async {
                     refreshControl.endRefreshing()
+                    self?.updatingIndicatorView.stopAnimate()
                 }
                 return
             }
@@ -284,6 +336,7 @@ class ChatListViewController: UIViewController {
             
             DispatchQueue.main.async {
                 refreshControl.endRefreshing()
+                self?.updatingIndicatorView.stopAnimate()
             }
         }
     }
