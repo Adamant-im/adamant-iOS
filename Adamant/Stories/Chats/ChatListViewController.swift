@@ -240,9 +240,7 @@ class ChatListViewController: UIViewController {
     
     private func updateChats() {
         updatingIndicatorView.startAnimate()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            self.handleRefresh(self.refreshControl)
-        }
+        self.handleRefresh(self.refreshControl)
     }
     
     // MARK: IB Actions
