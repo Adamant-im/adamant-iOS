@@ -129,6 +129,18 @@ extension ChatViewController: ComplexTransferViewControllerDelegate {
     }
 }
 
+// MARK: Mac OS HotKeys
+
+extension ChatViewController {
+    override var keyCommands: [UIKeyCommand]? {
+        let commands = [
+            UIKeyCommand(input: "\r", modifierFlags: [], action: #selector(onEnterClick))
+        ]
+        commands.forEach { $0.wantsPriorityOverSystemBehavior = true }
+        return commands
+    }
+}
+
 // MARK: Observers
 
 private extension ChatViewController {
@@ -383,6 +395,14 @@ private extension ChatViewController {
             viewModel.dialog.send(.alert(.adamantLocalized.sharedErrors.inconsistentTransaction))
         case .notInitiated, .pending, .success, .updating, .warning, .none:
             provider.richMessageTapped(for: transaction, in: self)
+        }
+    }
+    
+    @objc func onEnterClick() {
+        if messageInputBar.inputTextView.isFirstResponder {
+            messageInputBar.didSelectSendButton()
+        } else {
+            messageInputBar.inputTextView.becomeFirstResponder()
         }
     }
     
