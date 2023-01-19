@@ -20,22 +20,25 @@ struct ChatFactory {
     let router: Router
     
     func makeViewController() -> UIViewController {
-        let viewModel = makeViewModel()
-        let managers = makeManagers(viewModel: viewModel)
+        let richMessageProviders = makeRichMessageProviders()
+        let viewModel = makeViewModel(richMessageProviders: richMessageProviders)
+        let delegates = makeDelegates(viewModel: viewModel)
+        let dialogManager = ChatDialogManager(viewModel: viewModel, dialogService: dialogService)
         
         let viewController = ChatViewController(
             viewModel: viewModel,
-            storedObjects: managers.asArray,
+            richMessageProviders: richMessageProviders,
+            storedObjects: delegates.asArray + [dialogManager],
             sendTransaction: makeSendTransactionAction(viewModel: viewModel)
         )
         
-        viewController.setupManagers(managers)
+        viewController.setupDelegates(delegates)
         return viewController
     }
 }
 
 private extension ChatFactory {
-    struct Managers {
+    struct Delegates {
         let dataSource: MessagesDataSource
         let layout: MessagesLayoutDelegate
         let display: MessagesDisplayDelegate
@@ -46,18 +49,10 @@ private extension ChatFactory {
         }
     }
     
-    func makeViewModel() -> ChatViewModel {
-        let richMessageProviders: Dictionary = Dictionary(
-            uniqueKeysWithValues: accountService
-                .wallets
-                .compactMap { $0 as? RichMessageProvider }
-                .map { ($0.dynamicRichMessageType, $0) }
-        )
-        
-        return .init(
+    func makeViewModel(richMessageProviders: [String: RichMessageProvider]) -> ChatViewModel {
+        .init(
             chatsProvider: chatsProvider,
             markdownParser: .init(font: UIFont.systemFont(ofSize: UIFont.systemFontSize)),
-            dialogService: dialogService,
             transfersProvider: transferProvider,
             chatMessageFactory: .init(richMessageProviders: richMessageProviders),
             addressBookService: addressBookService,
@@ -65,7 +60,16 @@ private extension ChatFactory {
         )
     }
     
-    func makeManagers(viewModel: ChatViewModel) -> Managers {
+    func makeRichMessageProviders() -> [String: RichMessageProvider] {
+        .init(
+            uniqueKeysWithValues: accountService
+                .wallets
+                .compactMap { $0 as? RichMessageProvider }
+                .map { ($0.dynamicRichMessageType, $0) }
+        )
+    }
+    
+    func makeDelegates(viewModel: ChatViewModel) -> Delegates {
         .init(
             dataSource: ChatDataSourceManager(viewModel: viewModel),
             layout: ChatLayoutManager(viewModel: viewModel),
@@ -92,10 +96,10 @@ private extension ChatFactory {
 }
 
 private extension ChatViewController {
-    func setupManagers(_ managers: ChatFactory.Managers) {
-        messagesCollectionView.messagesDataSource = managers.dataSource
-        messagesCollectionView.messagesLayoutDelegate = managers.layout
-        messagesCollectionView.messagesDisplayDelegate = managers.display
-        messageInputBar.delegate = managers.inputBar
+    func setupDelegates(_ delegates: ChatFactory.Delegates) {
+        messagesCollectionView.messagesDataSource = delegates.dataSource
+        messagesCollectionView.messagesLayoutDelegate = delegates.layout
+        messagesCollectionView.messagesDisplayDelegate = delegates.display
+        messageInputBar.delegate = delegates.inputBar
     }
 }

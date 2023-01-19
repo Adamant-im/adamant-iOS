@@ -192,6 +192,8 @@
 		938F7D662955C966001915CA /* ChatInputBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 938F7D652955C966001915CA /* ChatInputBar.swift */; };
 		938F7D692955C9EC001915CA /* ChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 938F7D682955C9EC001915CA /* ChatViewModel.swift */; };
 		938F7D722955CE72001915CA /* ChatFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 938F7D712955CE72001915CA /* ChatFactory.swift */; };
+		9390C5032976B42800270CDF /* ChatDialogManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9390C5022976B42800270CDF /* ChatDialogManager.swift */; };
+		9390C5052976B53000270CDF /* ChatDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9390C5042976B53000270CDF /* ChatDialog.swift */; };
 		93996A972968209C008D080B /* ChatMessagesCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93996A962968209C008D080B /* ChatMessagesCollection.swift */; };
 		93B19AF4296317FF005305C0 /* CGSize+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93F391472962EEDC00BFD6AE /* CGSize+adamant.swift */; };
 		93B19AF529631800005305C0 /* CGSize+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93F391472962EEDC00BFD6AE /* CGSize+adamant.swift */; };
@@ -858,6 +860,8 @@
 		938F7D652955C966001915CA /* ChatInputBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatInputBar.swift; sourceTree = "<group>"; };
 		938F7D682955C9EC001915CA /* ChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewModel.swift; sourceTree = "<group>"; };
 		938F7D712955CE72001915CA /* ChatFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatFactory.swift; sourceTree = "<group>"; };
+		9390C5022976B42800270CDF /* ChatDialogManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatDialogManager.swift; sourceTree = "<group>"; };
+		9390C5042976B53000270CDF /* ChatDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatDialog.swift; sourceTree = "<group>"; };
 		93996A962968209C008D080B /* ChatMessagesCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesCollection.swift; sourceTree = "<group>"; };
 		93CC8DC6296F00D6003772BF /* ChatTransactionContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTransactionContainerView.swift; sourceTree = "<group>"; };
 		93CC8DC8296F01DE003772BF /* ChatTransactionContainerView+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatTransactionContainerView+Model.swift"; sourceTree = "<group>"; };
@@ -1386,6 +1390,7 @@
 			children = (
 				9322E874297042F000B8357C /* ChatSender.swift */,
 				9322E876297042FA00B8357C /* ChatMessage.swift */,
+				9390C5042976B53000270CDF /* ChatDialog.swift */,
 				9322E8782970430300B8357C /* ChatLoadingStatus.swift */,
 			);
 			path = Models;
@@ -1419,6 +1424,7 @@
 				938F7D5C2955C8F9001915CA /* ChatLayoutManager.swift */,
 				938F7D5E2955C90D001915CA /* ChatInputBarManager.swift */,
 				938F7D602955C92B001915CA /* ChatDataSourceManager.swift */,
+				9390C5022976B42800270CDF /* ChatDialogManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -2836,6 +2842,7 @@
 				550066C5284D65DB0044C0B1 /* HealthCheckService.swift in Sources */,
 				648DD7A02236A59200B811FD /* DogeTransactionDetailsViewController.swift in Sources */,
 				557AC308287B1365004699D7 /* CheckmarkRowView.swift in Sources */,
+				9390C5052976B53000270CDF /* ChatDialog.swift in Sources */,
 				6455E9F321075D8000B2E94C /* AdamantAddressBookService.swift in Sources */,
 				9324C75E297170600022D7EA /* RichTransactionStatusService.swift in Sources */,
 				9304F8BE292F88F900173F18 /* ANSPayload.swift in Sources */,
@@ -3040,6 +3047,7 @@
 				E94008802114EE2000CD2D67 /* AdmWallet.swift in Sources */,
 				41E142F2289E60EB002EE8D7 /* AdamantSecret.swift in Sources */,
 				E9A03FDA20DC0B14007653A1 /* NodesSource.swift in Sources */,
+				9390C5032976B42800270CDF /* ChatDialogManager.swift in Sources */,
 				E926E02E213EAABF005E536B /* TransferViewControllerBase+Alert.swift in Sources */,
 				E9B1AA572121ACC000080A2A /* AdmWalletViewController.swift in Sources */,
 				E95F857A2007F0260070534A /* ServerResponse.swift in Sources */,

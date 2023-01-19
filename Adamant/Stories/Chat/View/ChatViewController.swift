@@ -11,18 +11,20 @@ import InputBarAccessoryView
 import Combine
 import UIKit
 import SnapKit
-import SafariServices
 
 final class ChatViewController: MessagesViewController {
     typealias SpinnerCell = MessageCellWrapper<SpinnerView>
     typealias TransactionCell = CollectionCellWrapper<ChatTransactionContainerView>
     typealias SendTransaction = (UIViewController & ComplexTransferViewControllerDelegate) -> Void
     
+    private let storedObjects: [AnyObject]
+    private let richMessageProviders: [String: RichMessageProvider]
     private var subscriptions = Set<AnyCancellable>()
-    private var storedObjects: [AnyObject]
     private var didScrollSender = ObservableSender<Void>()
     private var topMessageId: String?
     private var messagesLoaded = false
+    
+    let viewModel: ChatViewModel
     
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
@@ -30,8 +32,6 @@ final class ChatViewController: MessagesViewController {
     private lazy var chatMessagesCollectionView = ChatMessagesCollectionView(
         didScroll: didScrollSender.eraseToAnyPublisher()
     )
-    
-    let viewModel: ChatViewModel
     
     // swiftlint:disable unused_setter_value
     override var messageInputBar: InputBarAccessoryView {
@@ -47,11 +47,13 @@ final class ChatViewController: MessagesViewController {
     
     init(
         viewModel: ChatViewModel,
+        richMessageProviders: [String: RichMessageProvider],
         storedObjects: [AnyObject],
         sendTransaction: @escaping SendTransaction
     ) {
         self.viewModel = viewModel
         self.storedObjects = storedObjects
+        self.richMessageProviders = richMessageProviders
         super.init(nibName: nil, bundle: nil)
         inputBar.onAttachmentButtonTap = { [weak self] in self.map { sendTransaction($0) } }
     }
@@ -65,6 +67,7 @@ final class ChatViewController: MessagesViewController {
         view.backgroundColor = .adamant.backgroundColor
         maintainPositionOnInputBarHeightChanged = true
         configureMessagesCollectionView()
+        configureHeader()
         configureLayout()
         setupObservers()
         viewModel.loadFirstMessages()
@@ -143,10 +146,6 @@ private extension ChatViewController {
             .assign(to: \.text, on: inputBar)
             .store(in: &subscriptions)
         
-        viewModel.showFreeTokensAlert
-            .sink { [weak self] in self?.showFreeTokenAlert() }
-            .store(in: &subscriptions)
-        
         viewModel.isSendingAvailable
             .removeDuplicates()
             .assign(to: \.isEnabled, on: inputBar)
@@ -161,9 +160,13 @@ private extension ChatViewController {
             .sink { [weak self] in self?.didTapTransfer(id: $0) }
             .store(in: &subscriptions)
         
-        viewModel.navigationTitle
+        viewModel.partnerName
             .removeDuplicates()
             .assign(to: \.title, on: navigationItem)
+            .store(in: &subscriptions)
+        
+        viewModel.closeScreen
+            .sink { [weak self] in self?.close() }
             .store(in: &subscriptions)
     }
     
@@ -188,6 +191,20 @@ private extension ChatViewController {
         loadingView.snp.makeConstraints {
             $0.directionalEdges.equalToSuperview()
         }
+    }
+    
+    func configureHeader() {
+        navigationItem.largeTitleDisplayMode = .never
+        navigationItem.rightBarButtonItem = .init(
+            title: "•••",
+            style: .plain,
+            target: self,
+            action: #selector(showMenu)
+        )
+    }
+    
+    @objc func showMenu(_ sender: UIBarButtonItem) {
+        viewModel.dialog.send(.menu(sender: sender))
     }
     
     func updateMessages() {
@@ -233,38 +250,6 @@ private extension ChatViewController {
         }
     }
     
-    func showFreeTokenAlert() {
-        let alert = UIAlertController(
-            title: "",
-            message: String.adamantLocalized.chat.freeTokensMessage,
-            preferredStyle: .alert
-        )
-        
-        let cancelAction = UIAlertAction(
-            title: String.adamantLocalized.alert.cancel,
-            style: .default,
-            handler: nil
-        )
-        
-        alert.addAction(makeFreeTokensAlertAction())
-        alert.addAction(cancelAction)
-        alert.modalPresentationStyle = .overFullScreen
-        present(alert, animated: true, completion: nil)
-    }
-    
-    func makeFreeTokensAlertAction() -> UIAlertAction {
-        .init(
-            title: String.adamantLocalized.chat.freeTokens,
-            style: .default
-        ) { [weak self] _ in
-            guard let self = self, let url = self.viewModel.freeTokensURL else { return }
-            let safari = SFSafariViewController(url: url)
-            safari.preferredControlTintColor = UIColor.adamant.primary
-            safari.modalPresentationStyle = .overFullScreen
-            self.present(safari, animated: true, completion: nil)
-        }
-    }
-    
     func showMessage(id: String) {
         guard let index = viewModel.messages.value.firstIndex(where: { $0.messageId == id})
         else { return }
@@ -299,7 +284,7 @@ private extension ChatViewController {
     
     func didTapTransferTransaction(_ transaction: TransferTransaction) {
         guard
-            let provider = viewModel.richMessageProviders[AdmWalletService.richMessageType]
+            let provider = richMessageProviders[AdmWalletService.richMessageType]
                 as? AdmWalletService
         else { return }
         
@@ -309,16 +294,31 @@ private extension ChatViewController {
     func didTapRichMessageTransaction(_ transaction: RichMessageTransaction) {
         guard
             let type = transaction.richType,
-            let provider = viewModel.richMessageProviders[type]
+            let provider = richMessageProviders[type]
         else { return }
         
         switch transaction.transactionStatus {
         case .dublicate:
-            viewModel.showDublicatedTransactionAlert()
+            viewModel.dialog.send(.alert(.adamantLocalized.sharedErrors.duplicatedTransaction))
         case .failed:
-            viewModel.showFailedTransactionAlert()
+            viewModel.dialog.send(.alert(.adamantLocalized.sharedErrors.inconsistentTransaction))
         case .notInitiated, .pending, .success, .updating, .warning, .none:
             provider.richMessageTapped(for: transaction, in: self)
+        }
+    }
+    
+    // TODO: Use coordinator
+    
+    func close() {
+        let navVC = tabBarController?
+            .selectedViewController?
+            .children
+            .first as? UINavigationController
+        
+        if let navVC = navVC {
+            navVC.popToRootViewController(animated: true)
+        } else {
+            navigationController?.popViewController(animated: true)
         }
     }
 }

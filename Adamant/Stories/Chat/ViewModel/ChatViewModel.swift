@@ -15,11 +15,10 @@ final class ChatViewModel: NSObject {
     
     private let chatsProvider: ChatsProvider
     private let markdownParser: MarkdownParser
-    private let dialogService: DialogService
     private let transfersProvider: TransfersProvider
     private let chatMessageFactory: ChatMessageFactory
     private let addressBookService: AddressBookService
-    let richMessageProviders: [String: RichMessageProvider]
+    private let richMessageProviders: [String: RichMessageProvider]
     
     // MARK: Properties
     
@@ -27,11 +26,11 @@ final class ChatViewModel: NSObject {
     private let _messages = ObservableProperty([ChatMessage]())
     private let _loadingStatus = ObservableProperty<ChatLoadingStatus?>(nil)
     private let _scrollDown = ObservableSender<Void>()
-    private let _showFreeTokensAlert = ObservableSender<Void>()
     private let _isSendingAvailable = ObservableProperty(false)
     private let _messageIdToShow = ObservableProperty<String?>(nil)
     private let _fee = ObservableProperty("")
-    private let _navigationTitle = ObservableProperty<String?>("")
+    private let _partnerName = ObservableProperty<String?>(nil)
+    private let _closeScreen = ObservableSender<Void>()
     
     private weak var preservationDelegate: ChatPreservationDelegate?
     private var controller: NSFetchedResultsController<ChatTransaction>?
@@ -43,52 +42,24 @@ final class ChatViewModel: NSObject {
     
     let inputText = ObservableProperty("")
     let didTapTransfer = ObservableSender<String>()
+    let dialog = ObservableSender<ChatDialog>()
     
-    var sender: ObservableVariable<ChatSender> {
-        _sender.eraseToGetter()
-    }
-    
-    var messages: ObservableVariable<[ChatMessage]> {
-        _messages.eraseToGetter()
-    }
-    
-    var loadingStatus: ObservableVariable<ChatLoadingStatus?> {
-        _loadingStatus.eraseToGetter()
-    }
-    
-    var scrollDown: Observable<Void> {
-        _scrollDown.eraseToAnyPublisher()
-    }
-    
-    var showFreeTokensAlert: Observable<Void> {
-        _showFreeTokensAlert.eraseToAnyPublisher()
-    }
-    
-    var isSendingAvailable: ObservableVariable<Bool> {
-        _isSendingAvailable.eraseToGetter()
-    }
-    
-    var messageIdToShow: Observable<String?> {
-        _messageIdToShow.eraseToAnyPublisher()
-    }
-    
-    var fee: ObservableVariable<String> {
-        _fee.eraseToGetter()
-    }
-    
-    var navigationTitle: ObservableVariable<String?> {
-        _navigationTitle.eraseToGetter()
-    }
+    var sender: ObservableVariable<ChatSender> { _sender.eraseToGetter() }
+    var messages: ObservableVariable<[ChatMessage]> { _messages.eraseToGetter() }
+    var loadingStatus: ObservableVariable<ChatLoadingStatus?> { _loadingStatus.eraseToGetter() }
+    var scrollDown: Observable<Void> { _scrollDown.eraseToAnyPublisher() }
+    var isSendingAvailable: ObservableVariable<Bool> { _isSendingAvailable.eraseToGetter() }
+    var messageIdToShow: Observable<String?> { _messageIdToShow.eraseToAnyPublisher() }
+    var fee: ObservableVariable<String> { _fee.eraseToGetter() }
+    var partnerName: ObservableVariable<String?> { _partnerName.eraseToGetter() }
+    var closeScreen: Observable<Void> { _closeScreen.eraseToAnyPublisher() }
     
     var freeTokensURL: URL? {
         guard let address = chatroom?.partner?.address else { return nil }
         let urlString: String = .adamantLocalized.wallets.getFreeTokensUrl(for: address)
         
         guard let url = URL(string: urlString) else {
-            dialogService.showError(
-                withMessage: "Failed to create URL with string: \(urlString)",
-                error: nil
-            )
+            dialog.send(.error("Failed to create URL with string: \(urlString)"))
             return nil
         }
         
@@ -98,7 +69,6 @@ final class ChatViewModel: NSObject {
     init(
         chatsProvider: ChatsProvider,
         markdownParser: MarkdownParser,
-        dialogService: DialogService,
         transfersProvider: TransfersProvider,
         chatMessageFactory: ChatMessageFactory,
         addressBookService: AddressBookService,
@@ -106,7 +76,6 @@ final class ChatViewModel: NSObject {
     ) {
         self.chatsProvider = chatsProvider
         self.markdownParser = markdownParser
-        self.dialogService = dialogService
         self.transfersProvider = transfersProvider
         self.chatMessageFactory = chatMessageFactory
         self.addressBookService = addressBookService
@@ -211,24 +180,24 @@ final class ChatViewModel: NSObject {
         preservationDelegate?.preserveMessage(message, forAddress: partnerAddress)
     }
     
-    func showDublicatedTransactionAlert() {
-        dialogService.showAlert(
-            title: nil,
-            message: .adamantLocalized.sharedErrors.duplicatedTransaction,
-            style: AdamantAlertStyle.alert,
-            actions: nil,
-            from: nil
-        )
+    func blockChat() {
+        guard let address = chatroom?.partner?.address else {
+            return assertionFailure("Can't block user without address")
+        }
+        
+        chatroom?.isHidden = true
+        try? chatroom?.managedObjectContext?.save()
+        chatsProvider.blockChat(with: address)
+        _closeScreen.send()
     }
     
-    func showFailedTransactionAlert() {
-        dialogService.showAlert(
-            title: nil,
-            message: .adamantLocalized.sharedErrors.inconsistentTransaction,
-            style: AdamantAlertStyle.alert,
-            actions: nil,
-            from: nil
-        )
+    func setNewName(_ newName: String) {
+        guard let address = chatroom?.partner?.address else {
+            return assertionFailure("Can't set name without address")
+        }
+        
+        addressBookService.set(name: newName, for: address)
+        updateTitle()
     }
 }
 
@@ -310,7 +279,7 @@ private extension ChatViewModel {
         _isSendingAvailable.value = false
         _messageIdToShow.value = nil
         _fee.value = ""
-        _navigationTitle.value = ""
+        _partnerName.value = nil
         controller = nil
         chatroom = nil
         preservationDelegate = nil
@@ -325,7 +294,7 @@ private extension ChatViewModel {
         case .empty:
             return false
         case .tooLong:
-            dialogService.showToastMessage(validationStatus.localized)
+            dialog.send(.toast(validationStatus.localized))
             return false
         }
     }
@@ -342,14 +311,14 @@ private extension ChatViewModel {
             case .notEnoughMoneyToSend:
                 inputText.value = sentText
                 guard transfersProvider.hasTransactions else {
-                    _showFreeTokensAlert.send()
+                    dialog.send(.freeTokenAlert)
                     return
                 }
             case .accountNotFound, .accountNotInitiated, .dependencyError, .internalError, .networkError, .notLogged, .requestCancelled, .serverError, .transactionNotFound:
                 break
             }
             
-            dialogService.showRichError(error: error)
+            dialog.send(.richError(error))
         }
     }
     
@@ -371,11 +340,11 @@ private extension ChatViewModel {
         guard let partner = chatroom?.partner else { return }
         
         if let address = partner.address, let name = addressBookService.addressBook[address] {
-            _navigationTitle.value = name.checkAndReplaceSystemWallets()
+            _partnerName.value = name.checkAndReplaceSystemWallets()
         } else if let name = partner.name {
-            _navigationTitle.value = name
+            _partnerName.value = name
         } else {
-            _navigationTitle.value = partner.address
+            _partnerName.value = partner.address
         }
     }
     
