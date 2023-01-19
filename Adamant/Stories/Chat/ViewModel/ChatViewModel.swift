@@ -25,7 +25,6 @@ final class ChatViewModel: NSObject {
     private let _sender = ObservableProperty(ChatSender.default)
     private let _messages = ObservableProperty([ChatMessage]())
     private let _loadingStatus = ObservableProperty<ChatLoadingStatus?>(nil)
-    private let _scrollDown = ObservableSender<Void>()
     private let _isSendingAvailable = ObservableProperty(false)
     private let _messageIdToShow = ObservableProperty<String?>(nil)
     private let _fee = ObservableProperty("")
@@ -47,7 +46,6 @@ final class ChatViewModel: NSObject {
     var sender: ObservableVariable<ChatSender> { _sender.eraseToGetter() }
     var messages: ObservableVariable<[ChatMessage]> { _messages.eraseToGetter() }
     var loadingStatus: ObservableVariable<ChatLoadingStatus?> { _loadingStatus.eraseToGetter() }
-    var scrollDown: Observable<Void> { _scrollDown.eraseToAnyPublisher() }
     var isSendingAvailable: ObservableVariable<Bool> { _isSendingAvailable.eraseToGetter() }
     var messageIdToShow: Observable<String?> { _messageIdToShow.eraseToAnyPublisher() }
     var fee: ObservableVariable<String> { _fee.eraseToGetter() }
@@ -301,9 +299,8 @@ private extension ChatViewModel {
     
     func handleMessageSendingResult(result: ChatsProviderResultWithTransaction, sentText: String) {
         switch result {
-        case let .success(transaction):
-            guard transaction.statusEnum == .pending else { break }
-            _scrollDown.send()
+        case .success:
+            break
         case let .failure(error):
             switch error {
             case .messageNotValid:

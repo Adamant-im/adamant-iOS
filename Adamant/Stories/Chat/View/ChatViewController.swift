@@ -22,6 +22,7 @@ final class ChatViewController: MessagesViewController {
     private var subscriptions = Set<AnyCancellable>()
     private var didScrollSender = ObservableSender<Void>()
     private var topMessageId: String?
+    private var bottomMessageId: String?
     private var messagesLoaded = false
     
     let viewModel: ChatViewModel
@@ -124,12 +125,6 @@ private extension ChatViewController {
             .sink { [weak self] _ in self?.inputTextUpdated() }
             .store(in: &subscriptions)
         
-        viewModel.scrollDown
-            .sink { [weak messagesCollectionView] _ in
-                messagesCollectionView?.scrollToLastItem()
-            }
-            .store(in: &subscriptions)
-        
         viewModel.messages
             .removeDuplicates()
             .combineLatest(viewModel.sender.removeDuplicates())
@@ -209,15 +204,12 @@ private extension ChatViewController {
 
 private extension ChatViewController {
     func updateMessages() {
-        if topMessageId == viewModel.messages.value.first?.messageId {
-            messagesCollectionView.reloadData()
-        } else {
-            chatMessagesCollectionView.reloadDataWithFixedBottom()
-        }
-        
+        reloadMessagesCollection(previousTopMessageId: topMessageId)
+        scrollDownOnNewMessageIfNeeded(previousBottomMessageId: bottomMessageId)
         topMessageId = viewModel.messages.value.first?.messageId
+        bottomMessageId = viewModel.messages.value.last?.messageId
         
-        guard !messagesLoaded, topMessageId != nil else { return }
+        guard !messagesLoaded, !viewModel.messages.value.isEmpty else { return }
         setupMessageToShowObserver()
         messagesLoaded = true
     }
@@ -252,7 +244,7 @@ private extension ChatViewController {
     }
     
     func updateScrollDownButtonVisibility() {
-        scrollDownButton.isHidden = chatMessagesCollectionView.bottomOffset < 150
+        scrollDownButton.isHidden = isScrollPositionNearlyTheBottom
     }
 }
 
@@ -284,6 +276,33 @@ private extension ChatViewController {
 // MARK: Other
 
 private extension ChatViewController {
+    var isScrollPositionNearlyTheBottom: Bool {
+        chatMessagesCollectionView.bottomOffset < 150
+    }
+    
+    func scrollDownOnNewMessageIfNeeded(previousBottomMessageId: String?) {
+        let messages = viewModel.messages.value
+        
+        guard
+            let previousBottomMessageId = previousBottomMessageId,
+            let index = messages.firstIndex(where: { $0.messageId == previousBottomMessageId }),
+            index < messages.count - 1,
+            isScrollPositionNearlyTheBottom
+                || messages.last?.sender.senderId == viewModel.sender.value.senderId
+                && messages.last?.status == .pending
+        else { return }
+        
+        messagesCollectionView.scrollToLastItem()
+    }
+    
+    func reloadMessagesCollection(previousTopMessageId: String?) {
+        if previousTopMessageId == viewModel.messages.value.first?.messageId {
+            messagesCollectionView.reloadData()
+        } else {
+            chatMessagesCollectionView.reloadDataWithFixedBottom()
+        }
+    }
+    
     @objc func showMenu(_ sender: UIBarButtonItem) {
         viewModel.dialog.send(.menu(sender: sender))
     }
