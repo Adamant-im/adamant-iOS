@@ -196,6 +196,7 @@
 		9390C5052976B53000270CDF /* ChatDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9390C5042976B53000270CDF /* ChatDialog.swift */; };
 		93996A972968209C008D080B /* ChatMessagesCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93996A962968209C008D080B /* ChatMessagesCollection.swift */; };
 		93A91FD1297972B7001DB1F8 /* ChatScrollDownButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A91FD0297972B7001DB1F8 /* ChatScrollDownButton.swift */; };
+		93A91FD329799298001DB1F8 /* ChatStartPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A91FD229799298001DB1F8 /* ChatStartPosition.swift */; };
 		93B19AF4296317FF005305C0 /* CGSize+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93F391472962EEDC00BFD6AE /* CGSize+adamant.swift */; };
 		93B19AF529631800005305C0 /* CGSize+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93F391472962EEDC00BFD6AE /* CGSize+adamant.swift */; };
 		93B19AF629631800005305C0 /* CGSize+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93F391472962EEDC00BFD6AE /* CGSize+adamant.swift */; };
@@ -865,6 +866,7 @@
 		9390C5042976B53000270CDF /* ChatDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatDialog.swift; sourceTree = "<group>"; };
 		93996A962968209C008D080B /* ChatMessagesCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesCollection.swift; sourceTree = "<group>"; };
 		93A91FD0297972B7001DB1F8 /* ChatScrollDownButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatScrollDownButton.swift; sourceTree = "<group>"; };
+		93A91FD229799298001DB1F8 /* ChatStartPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatStartPosition.swift; sourceTree = "<group>"; };
 		93CC8DC6296F00D6003772BF /* ChatTransactionContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTransactionContainerView.swift; sourceTree = "<group>"; };
 		93CC8DC8296F01DE003772BF /* ChatTransactionContainerView+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatTransactionContainerView+Model.swift"; sourceTree = "<group>"; };
 		93CD1C5729632EB300B7CACA /* ReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReusableView.swift; sourceTree = "<group>"; };
@@ -1394,6 +1396,7 @@
 				9322E876297042FA00B8357C /* ChatMessage.swift */,
 				9390C5042976B53000270CDF /* ChatDialog.swift */,
 				9322E8782970430300B8357C /* ChatLoadingStatus.swift */,
+				93A91FD229799298001DB1F8 /* ChatStartPosition.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -3047,6 +3050,7 @@
 				6416B19D21AD7B92006089AC /* LskWalletRoutes.swift in Sources */,
 				E9B3D3A1201FA26B0019EB36 /* AdamantAccountsProvider.swift in Sources */,
 				E9FAE5DA203DBFEF008D3A6B /* Comparable+clamped.swift in Sources */,
+				93A91FD329799298001DB1F8 /* ChatStartPosition.swift in Sources */,
 				E94008802114EE2000CD2D67 /* AdmWallet.swift in Sources */,
 				41E142F2289E60EB002EE8D7 /* AdamantSecret.swift in Sources */,
 				93A91FD1297972B7001DB1F8 /* ChatScrollDownButton.swift in Sources */,

@@ -79,6 +79,11 @@ final class ChatViewController: MessagesViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         viewModel.preserveMessage(inputBar.text)
+        viewModel.saveChatOffset(
+            isScrollPositionNearlyTheBottom
+                ? nil
+                : messagesCollectionView.contentOffset.y
+        )
     }
     
     override func collectionView(
@@ -164,12 +169,6 @@ private extension ChatViewController {
             .sink { [weak self] in self?.close() }
             .store(in: &subscriptions)
     }
-    
-    func setupMessageToShowObserver() {
-        viewModel.messageIdToShow
-            .sink { [weak self] in $0.map { self?.showMessage(id: $0) } }
-            .store(in: &subscriptions)
-    }
 }
 
 // MARK: Configuration
@@ -210,7 +209,7 @@ private extension ChatViewController {
         bottomMessageId = viewModel.messages.value.last?.messageId
         
         guard !messagesLoaded, !viewModel.messages.value.isEmpty else { return }
-        setupMessageToShowObserver()
+        viewModel.startPosition.map { setupStartPosition($0) }
         messagesLoaded = true
     }
     
@@ -280,6 +279,22 @@ private extension ChatViewController {
         chatMessagesCollectionView.bottomOffset < 150
     }
     
+    func setupStartPosition(_ position: ChatStartPosition) {
+        switch position {
+        case let .offset(offset):
+            chatMessagesCollectionView.setVerticalContentOffsetSafely(offset, animated: false)
+        case let .messageId(id):
+            guard let index = viewModel.messages.value.firstIndex(where: { $0.messageId == id})
+            else { return }
+            
+            messagesCollectionView.scrollToItem(
+                at: .init(item: .zero, section: index),
+                at: [.centeredVertically, .centeredHorizontally],
+                animated: false
+            )
+        }
+    }
+    
     func scrollDownOnNewMessageIfNeeded(previousBottomMessageId: String?) {
         let messages = viewModel.messages.value
         
@@ -305,17 +320,6 @@ private extension ChatViewController {
     
     @objc func showMenu(_ sender: UIBarButtonItem) {
         viewModel.dialog.send(.menu(sender: sender))
-    }
-    
-    func showMessage(id: String) {
-        guard let index = viewModel.messages.value.firstIndex(where: { $0.messageId == id})
-        else { return }
-        
-        messagesCollectionView.scrollToItem(
-            at: .init(item: .zero, section: index),
-            at: [.centeredVertically, .centeredHorizontally],
-            animated: false
-        )
     }
     
     func inputTextUpdated() {

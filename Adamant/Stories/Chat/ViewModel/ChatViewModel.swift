@@ -26,7 +26,6 @@ final class ChatViewModel: NSObject {
     private let _messages = ObservableProperty([ChatMessage]())
     private let _loadingStatus = ObservableProperty<ChatLoadingStatus?>(nil)
     private let _isSendingAvailable = ObservableProperty(false)
-    private let _messageIdToShow = ObservableProperty<String?>(nil)
     private let _fee = ObservableProperty("")
     private let _partnerName = ObservableProperty<String?>(nil)
     private let _closeScreen = ObservableSender<Void>()
@@ -38,6 +37,7 @@ final class ChatViewModel: NSObject {
     
     private(set) var chatroom: Chatroom?
     private(set) var chatTransactions: [ChatTransaction] = []
+    private var messageIdToShow: String?
     
     let inputText = ObservableProperty("")
     let didTapTransfer = ObservableSender<String>()
@@ -47,10 +47,18 @@ final class ChatViewModel: NSObject {
     var messages: ObservableVariable<[ChatMessage]> { _messages.eraseToGetter() }
     var loadingStatus: ObservableVariable<ChatLoadingStatus?> { _loadingStatus.eraseToGetter() }
     var isSendingAvailable: ObservableVariable<Bool> { _isSendingAvailable.eraseToGetter() }
-    var messageIdToShow: Observable<String?> { _messageIdToShow.eraseToAnyPublisher() }
     var fee: ObservableVariable<String> { _fee.eraseToGetter() }
     var partnerName: ObservableVariable<String?> { _partnerName.eraseToGetter() }
     var closeScreen: Observable<Void> { _closeScreen.eraseToAnyPublisher() }
+    
+    var startPosition: ChatStartPosition? {
+        if let messageIdToShow = messageIdToShow {
+            return .messageId(messageIdToShow)
+        }
+        
+        guard let address = chatroom?.partner?.address else { return nil }
+        return chatsProvider.chatPositon[address].map { .offset(.init($0)) }
+    }
     
     var freeTokensURL: URL? {
         guard let address = chatroom?.partner?.address else { return nil }
@@ -94,7 +102,7 @@ final class ChatViewModel: NSObject {
         controller = chatsProvider.getChatController(for: chatroom)
         controller?.delegate = self
         _isSendingAvailable.value = !chatroom.isReadonly
-        _messageIdToShow.value = messageToShow?.chatMessageId
+        messageIdToShow = messageToShow?.chatMessageId
         updateTitle()
         
         if let account = account {
@@ -102,14 +110,10 @@ final class ChatViewModel: NSObject {
         }
         
         if let partnerAddress = chatroom.partner?.address {
-            chatsProvider.chatPositon.removeValue(forKey: partnerAddress)
-            
-            let message = preservationDelegate?.getPreservedMessageFor(
+            preservationDelegate?.getPreservedMessageFor(
                 address: partnerAddress,
                 thenRemoveIt: true
-            )
-            
-            message.map { inputText.value = $0 }
+            ).map { inputText.value = $0 }
         }
     }
     
@@ -197,6 +201,11 @@ final class ChatViewModel: NSObject {
         addressBookService.set(name: newName, for: address)
         updateTitle()
     }
+    
+    func saveChatOffset(_ offset: CGFloat?) {
+        guard let address = chatroom?.partner?.address else { return }
+        chatsProvider.chatPositon[address] = offset.map { .init($0) }
+    }
 }
 
 extension ChatViewModel: NSFetchedResultsControllerDelegate {
@@ -275,9 +284,9 @@ private extension ChatViewModel {
         _loadingStatus.value = nil
         inputText.value = ""
         _isSendingAvailable.value = false
-        _messageIdToShow.value = nil
         _fee.value = ""
         _partnerName.value = nil
+        messageIdToShow = nil
         controller = nil
         chatroom = nil
         preservationDelegate = nil

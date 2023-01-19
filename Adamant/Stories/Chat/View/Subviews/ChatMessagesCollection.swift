@@ -49,6 +49,22 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
         setBottomOffset(bottomOffset, animated: false)
     }
     
+    func setVerticalContentOffsetSafely(_ offset: CGFloat, animated: Bool) {
+        guard maxVerticalOffset > .zero else { return }
+        
+        var offset = offset
+        if offset < .zero {
+            offset = .zero
+        } else if offset > maxVerticalOffset {
+            offset = maxVerticalOffset
+        }
+        
+        setContentOffset(
+            .init(x: contentOffset.x, y: offset),
+            animated: animated && animationEnabled
+        )
+    }
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         moveContentIfInsetsChanged()
@@ -72,22 +88,6 @@ private extension ChatMessagesCollectionView {
         setVerticalContentOffsetSafely(
             contentHeightWithBottomInsets - bounds.height - newValue,
             animated: animated
-        )
-    }
-    
-    func setVerticalContentOffsetSafely(_ offset: CGFloat, animated: Bool) {
-        guard maxVerticalOffset > .zero else { return }
-        
-        var offset = offset
-        if offset < .zero {
-            offset = .zero
-        } else if offset > maxVerticalOffset {
-            offset = maxVerticalOffset
-        }
-        
-        setContentOffset(
-            .init(x: contentOffset.x, y: offset),
-            animated: animated && animationEnabled
         )
     }
     
