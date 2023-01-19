@@ -17,6 +17,10 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
     
     var animationEnabled = false
     
+    var bottomOffset: CGFloat {
+        contentHeightWithBottomInsets - bounds.maxY
+    }
+    
     init(didScroll: Observable<Void>) {
         super.init(frame: .zero, collectionViewLayout: MessagesCollectionViewFlowLayout())
         
@@ -58,10 +62,6 @@ private extension ChatMessagesCollectionView {
     
     var maxVerticalOffset: CGFloat {
         contentHeightWithBottomInsets - bounds.height
-    }
-    
-    var bottomOffset: CGFloat {
-        contentHeightWithBottomInsets - bounds.maxY
     }
     
     var contentHeightWithBottomInsets: CGFloat {

@@ -28,10 +28,8 @@ final class ChatViewController: MessagesViewController {
     
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
-    
-    private lazy var chatMessagesCollectionView = ChatMessagesCollectionView(
-        didScroll: didScrollSender.eraseToAnyPublisher()
-    )
+    private lazy var scrollDownButton = makeScrollDownButton()
+    private lazy var chatMessagesCollectionView = makeChatMessagesCollectionView()
     
     // swiftlint:disable unused_setter_value
     override var messageInputBar: InputBarAccessoryView {
@@ -66,7 +64,6 @@ final class ChatViewController: MessagesViewController {
         super.viewDidLoad()
         view.backgroundColor = .adamant.backgroundColor
         maintainPositionOnInputBarHeightChanged = true
-        configureMessagesCollectionView()
         configureHeader()
         configureLayout()
         setupObservers()
@@ -96,6 +93,7 @@ final class ChatViewController: MessagesViewController {
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         super.scrollViewDidScroll(scrollView)
         didScrollSender.send()
+        updateScrollDownButtonVisibility()
     }
 }
 
@@ -116,6 +114,8 @@ extension ChatViewController: ComplexTransferViewControllerDelegate {
         }
     }
 }
+
+// MARK: Observers
 
 private extension ChatViewController {
     func setupObservers() {
@@ -175,21 +175,22 @@ private extension ChatViewController {
             .sink { [weak self] in $0.map { self?.showMessage(id: $0) } }
             .store(in: &subscriptions)
     }
-    
-    func configureMessagesCollectionView() {
-        messagesCollectionView.backgroundColor = .adamant.backgroundColor
-        messagesCollectionView.register(TransactionCell.self)
-        
-        messagesCollectionView.register(
-            SpinnerCell.self,
-            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader
-        )
-    }
-    
+}
+
+// MARK: Configuration
+
+private extension ChatViewController {
     func configureLayout() {
         view.addSubview(loadingView)
         loadingView.snp.makeConstraints {
             $0.directionalEdges.equalToSuperview()
+        }
+        
+        view.addSubview(scrollDownButton)
+        scrollDownButton.snp.makeConstraints { [unowned inputBar] in
+            $0.trailing.equalToSuperview().inset(scrollDownButtonInset)
+            $0.bottom.equalTo(inputBar.snp.top).offset(-scrollDownButtonInset)
+            $0.size.equalTo(30)
         }
     }
     
@@ -202,11 +203,11 @@ private extension ChatViewController {
             action: #selector(showMenu)
         )
     }
-    
-    @objc func showMenu(_ sender: UIBarButtonItem) {
-        viewModel.dialog.send(.menu(sender: sender))
-    }
-    
+}
+
+// MARK: Content updating
+
+private extension ChatViewController {
     func updateMessages() {
         if topMessageId == viewModel.messages.value.first?.messageId {
             messagesCollectionView.reloadData()
@@ -248,6 +249,43 @@ private extension ChatViewController {
                 chatMessagesCollectionView.reloadSectionsWithFixedBottom(.init(integer: .zero))
             }
         }
+    }
+    
+    func updateScrollDownButtonVisibility() {
+        scrollDownButton.isHidden = chatMessagesCollectionView.bottomOffset < 150
+    }
+}
+
+// MARK: Making entities
+
+private extension ChatViewController {
+    func makeScrollDownButton() -> ChatScrollDownButton {
+        let button = ChatScrollDownButton()
+        button.action = { [weak messagesCollectionView] in
+            messagesCollectionView?.scrollToLastItem()
+        }
+        
+        return button
+    }
+    
+    func makeChatMessagesCollectionView() -> ChatMessagesCollectionView {
+        let collection = ChatMessagesCollectionView(didScroll: didScrollSender.eraseToAnyPublisher())
+        collection.backgroundColor = .adamant.backgroundColor
+        collection.register(TransactionCell.self)
+        collection.register(
+            SpinnerCell.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader
+        )
+        
+        return collection
+    }
+}
+
+// MARK: Other
+
+private extension ChatViewController {
+    @objc func showMenu(_ sender: UIBarButtonItem) {
+        viewModel.dialog.send(.menu(sender: sender))
     }
     
     func showMessage(id: String) {
@@ -322,3 +360,5 @@ private extension ChatViewController {
         }
     }
 }
+
+private let scrollDownButtonInset: CGFloat = 20
