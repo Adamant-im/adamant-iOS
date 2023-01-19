@@ -88,34 +88,45 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             fatalError("Failed to get Router")
         }
         
-        // MARK: Chats
-        let chats = UISplitViewController()
-        chats.tabBarItem.title = String.adamantLocalized.tabItems.chats
-        chats.tabBarItem.image = #imageLiteral(resourceName: "chats_tab")
-        chats.preferredDisplayMode = .oneBesideSecondary
-        chats.tabBarItem.badgeColor = UIColor.adamant.primary
+        let chatList = UINavigationController(
+            rootViewController: router.get(scene: AdamantScene.Chats.chatList)
+        )
         
-        let chatList = UINavigationController(rootViewController: router.get(scene: AdamantScene.Chats.chatList))
+        let account = UINavigationController(
+            rootViewController: router.get(scene: AdamantScene.Account.account)
+        )
         
-        // MARK: Accounts
-        let accounts = UISplitViewController()
-        accounts.tabBarItem.title = String.adamantLocalized.tabItems.account
-        accounts.tabBarItem.image = #imageLiteral(resourceName: "account-tab")
-        accounts.preferredDisplayMode = .oneBesideSecondary
-        accounts.tabBarItem.badgeColor = UIColor.adamant.primary
+        let tabScreens: TabScreens = UIScreen.main.traitCollection.userInterfaceIdiom == .pad
+            ? .splitControllers(makeSplitController(), makeSplitController())
+            : .navigationControllers(chatList, account)
         
-        let account = UINavigationController(rootViewController: router.get(scene: AdamantScene.Account.account))
+        tabScreens.viewControllers.0.tabBarItem.title = .adamantLocalized.tabItems.chats
+        tabScreens.viewControllers.0.tabBarItem.image = #imageLiteral(resourceName: "chats_tab")
+        tabScreens.viewControllers.0.tabBarItem.badgeColor = .adamant.primary
         
-        let resetScreensAction = {
-            if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
-                let chatDetails = UIViewController(nibName: "WelcomeViewController", bundle: nil)
-                let accountDetails = UIViewController(nibName: "WelcomeViewController", bundle: nil)
-                
-                chats.viewControllers = [chatList, chatDetails]
-                accounts.viewControllers = [account, accountDetails]
-            } else {
-                chats.viewControllers = [chatList]
-                accounts.viewControllers = [account]
+        tabScreens.viewControllers.1.tabBarItem.title = .adamantLocalized.tabItems.account
+        tabScreens.viewControllers.1.tabBarItem.image = #imageLiteral(resourceName: "account-tab")
+        tabScreens.viewControllers.1.tabBarItem.badgeColor = .adamant.primary
+        
+        let resetScreensAction: () -> Void
+        switch tabScreens {
+        case let .splitControllers(leftController, rightController):
+            resetScreensAction = {
+                let chatDetails = UIViewController(
+                    nibName: "WelcomeViewController",
+                    bundle: nil
+                )
+                let accountDetails = UIViewController(
+                    nibName: "WelcomeViewController",
+                    bundle: nil
+                )
+                leftController.viewControllers = [chatList, chatDetails]
+                rightController.viewControllers = [account, accountDetails]
+            }
+        case let .navigationControllers(leftController, rightController):
+            resetScreensAction = {
+                leftController.popToRootViewController(animated: false)
+                rightController.popToRootViewController(animated: false)
             }
         }
         
@@ -131,7 +142,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
         UINavigationBar.appearance().scrollEdgeAppearance = navigationBarAppearance
         
-        rootTabBarController.setViewControllers([chats, accounts], animated: false)
+        rootTabBarController.setViewControllers(
+            tabScreens.arrayOfViewControllers,
+            animated: false
+        )
         
         window.makeKeyAndVisible()
         
@@ -552,4 +566,33 @@ extension AppDelegate {
             }
         }
     }
+}
+
+private enum TabScreens {
+    case splitControllers(UISplitViewController, UISplitViewController)
+    case navigationControllers(UINavigationController, UINavigationController)
+    
+    var viewControllers: (UIViewController, UIViewController) {
+        switch self {
+        case let .splitControllers(leftController, rightController):
+            return (leftController, rightController)
+        case let .navigationControllers(leftController, rightController):
+            return (leftController, rightController)
+        }
+    }
+    
+    var arrayOfViewControllers: [UIViewController] {
+        switch self {
+        case let .splitControllers(leftController, rightController):
+            return [leftController, rightController]
+        case let .navigationControllers(leftController, rightController):
+            return [leftController, rightController]
+        }
+    }
+}
+
+private func makeSplitController() -> UISplitViewController {
+    let controller = UISplitViewController()
+    controller.preferredDisplayMode = .oneBesideSecondary
+    return controller
 }
