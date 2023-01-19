@@ -206,6 +206,11 @@ final class ChatViewModel: NSObject {
         guard let address = chatroom?.partner?.address else { return }
         chatsProvider.chatPositon[address] = offset.map { .init($0) }
     }
+    
+    func entireChatWasRead() {
+        guard chatroom?.hasUnreadMessages == true else { return }
+        chatroom?.markAsReaded()
+    }
 }
 
 extension ChatViewModel: NSFetchedResultsControllerDelegate {

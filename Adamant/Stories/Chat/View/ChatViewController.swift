@@ -24,6 +24,7 @@ final class ChatViewController: MessagesViewController {
     private var topMessageId: String?
     private var bottomMessageId: String?
     private var messagesLoaded = false
+    private var isScrollPositionNearlyTheBottom = true
     
     let viewModel: ChatViewModel
     
@@ -71,6 +72,12 @@ final class ChatViewController: MessagesViewController {
         viewModel.loadFirstMessages()
     }
     
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        updateIsScrollPositionNearlyTheBottom()
+        updateScrollDownButtonVisibility()
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         chatMessagesCollectionView.animationEnabled = true
@@ -99,6 +106,7 @@ final class ChatViewController: MessagesViewController {
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         super.scrollViewDidScroll(scrollView)
         didScrollSender.send()
+        updateIsScrollPositionNearlyTheBottom()
         updateScrollDownButtonVisibility()
     }
 }
@@ -175,16 +183,16 @@ private extension ChatViewController {
 
 private extension ChatViewController {
     func configureLayout() {
-        view.addSubview(loadingView)
-        loadingView.snp.makeConstraints {
-            $0.directionalEdges.equalToSuperview()
-        }
-        
         view.addSubview(scrollDownButton)
         scrollDownButton.snp.makeConstraints { [unowned inputBar] in
             $0.trailing.equalToSuperview().inset(scrollDownButtonInset)
             $0.bottom.equalTo(inputBar.snp.top).offset(-scrollDownButtonInset)
             $0.size.equalTo(30)
+        }
+        
+        view.addSubview(loadingView)
+        loadingView.snp.makeConstraints {
+            $0.directionalEdges.equalToSuperview()
         }
     }
     
@@ -202,7 +210,16 @@ private extension ChatViewController {
 // MARK: Content updating
 
 private extension ChatViewController {
+    func updateIsScrollPositionNearlyTheBottom() {
+        let oldValue = isScrollPositionNearlyTheBottom
+        isScrollPositionNearlyTheBottom = chatMessagesCollectionView.bottomOffset < 150
+        
+        guard oldValue != isScrollPositionNearlyTheBottom else { return }
+        checkIsChatWasRead()
+    }
+    
     func updateMessages() {
+        defer { checkIsChatWasRead() }
         reloadMessagesCollection(previousTopMessageId: topMessageId)
         scrollDownOnNewMessageIfNeeded(previousBottomMessageId: bottomMessageId)
         topMessageId = viewModel.messages.value.first?.messageId
@@ -275,8 +292,9 @@ private extension ChatViewController {
 // MARK: Other
 
 private extension ChatViewController {
-    var isScrollPositionNearlyTheBottom: Bool {
-        chatMessagesCollectionView.bottomOffset < 150
+    func checkIsChatWasRead() {
+        guard isScrollPositionNearlyTheBottom, messagesLoaded else { return }
+        viewModel.entireChatWasRead()
     }
     
     func setupStartPosition(_ position: ChatStartPosition) {
