@@ -160,6 +160,11 @@ extension UIColor {
             return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
         }
         
+        static let chatInputBarBorderColor = UIColor(red: 200/255, green: 200/255, blue: 200/255, alpha: 1)
+        
+        /// Color of input bar placeholder
+        static let chatPlaceholderTextColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1)
+        
         // MARK: Pinpad
         /// Pinpad highligh button background, 12% gray
         static let pinpadHighlightButton = UIColor(red: 0.88, green: 0.88, blue: 0.88, alpha: 1)

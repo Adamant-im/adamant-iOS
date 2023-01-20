@@ -45,9 +45,6 @@ class DashWalletService: WalletService {
     
     // MARK: RichMessageProvider properties
     static let richMessageType = "dash_transaction"
-    let cellIdentifierSent = "dashTransferSent"
-    let cellIdentifierReceived = "dashTransferReceived"
-    let cellSource: CellSource? = CellSource.nib(nib: UINib(nibName: "TransferCollectionViewCell", bundle: nil))
     
     // MARK: - Dependencies
     var apiService: ApiService!

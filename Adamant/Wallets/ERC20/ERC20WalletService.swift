@@ -72,10 +72,6 @@ class ERC20WalletService: WalletService {
         return "\(self.token?.symbol.lowercased() ?? "erc20")_transaction"
     }
     
-    let cellIdentifierSent = "erc20TransferSent"
-    let cellIdentifierReceived = "erc20TransferReceived"
-    let cellSource: CellSource? = CellSource.nib(nib: UINib(nibName: "TransferCollectionViewCell", bundle: nil))
-    
     // MARK: - Properties
     
     private (set) var token: ERC20Token?

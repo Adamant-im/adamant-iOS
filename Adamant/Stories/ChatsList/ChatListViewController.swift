@@ -24,6 +24,8 @@ extension String.adamantLocalized {
 }
 
 class ChatListViewController: UIViewController {
+    typealias SpinnerCell = TableCellWrapper<SpinnerView>
+    
     let cellIdentifier = "cell"
     let loadingCellIdentifier = "loadingCell"
     let cellHeight: CGFloat = 76.0
@@ -106,7 +108,7 @@ class ChatListViewController: UIViewController {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
-        tableView.register(LoadingTableViewCell.self, forCellReuseIdentifier: loadingCellIdentifier)
+        tableView.register(SpinnerCell.self, forCellReuseIdentifier: loadingCellIdentifier)
         tableView.refreshControl = refreshControl
         tableView.backgroundColor = .clear
         
@@ -213,25 +215,19 @@ class ChatListViewController: UIViewController {
     }
     
     // MARK: Helpers
-    func chatViewController(for chatroom: Chatroom, with message: MessageTransaction? = nil, forceScrollToBottom: Bool = false) -> ChatViewController {
+    func chatViewController(for chatroom: Chatroom, with message: MessageTransaction? = nil) -> ChatViewController {
         guard let vc = router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
             fatalError("Can't get ChatViewController")
         }
         
-        if let account = accountService.account {
-            vc.account = account
-        }
-        
-        if let message = message {
-            vc.messageToShow = message
-        }
-        
-        vc.forceScrollToBottom = forceScrollToBottom
-        
         vc.hidesBottomBarWhenPushed = true
-        vc.chatroom = chatroom
-        vc.delegate = self
-        
+        vc.viewModel.setup(
+            account: accountService.account,
+            chatroom: chatroom,
+            messageToShow: message,
+            preservationDelegate: self
+        )
+
         return vc
     }
     
@@ -385,14 +381,25 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
         if isBusy,
            indexPath.row == lastSystemChatPositionRow,
            let cell = tableView.cellForRow(at: indexPath),
-           cell is LoadingTableViewCell
+           cell is SpinnerCell
         {
             tableView.deselectRow(at: indexPath, animated: true)
             return
         }
         let nIndexPath = chatControllerIndexPath(tableViewIndexPath: indexPath)
         if let chatroom = chatsController?.object(at: nIndexPath) {
-            presentChatViewController(for: chatroom)
+            let vc = chatViewController(for: chatroom)
+            vc.hidesBottomBarWhenPushed = true
+            
+            if let split = self.splitViewController {
+                let chat = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(chat, sender: self)
+            } else if let nav = navigationController {
+                nav.pushViewController(vc, animated: true)
+            } else {
+                vc.modalPresentationStyle = .overFullScreen
+                present(vc, animated: true)
+            }
         }
     }
 }
@@ -401,8 +408,8 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
 extension ChatListViewController {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if isBusy && indexPath.row == lastSystemChatPositionRow {
-            let cell = tableView.dequeueReusableCell(withIdentifier: loadingCellIdentifier, for: indexPath) as! LoadingTableViewCell
-            cell.startLoadAnimating()
+            let cell = tableView.dequeueReusableCell(withIdentifier: loadingCellIdentifier, for: indexPath) as! SpinnerCell
+            cell.wrappedView.startAnimating()
             return cell
         }
         
@@ -423,7 +430,7 @@ extension ChatListViewController {
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if isBusy,
            indexPath.row == lastSystemChatPositionRow,
-           let cell = cell as? LoadingTableViewCell {
+           let cell = cell as? SpinnerCell {
             configureCell(cell)
         } else if let cell = cell as? ChatTableViewCell {
             let nIndexPath = chatControllerIndexPath(tableViewIndexPath: indexPath)
@@ -459,8 +466,8 @@ extension ChatListViewController {
         loadNewChats(offset: roomsLoadedCount)
     }
     
-    private func configureCell(_ cell: LoadingTableViewCell) {
-        cell.startLoadAnimating()
+    private func configureCell(_ cell: SpinnerCell) {
+        cell.wrappedView.startAnimating()
         cell.backgroundColor = .clear
     }
     
@@ -648,7 +655,7 @@ extension ChatListViewController: NewChatViewControllerDelegate {
                 self?.present(vc, animated: true) {
                     vc.becomeFirstResponder()
                     
-                    if let count = vc.chatroom?.transactions?.count, count == 0 {
+                    if let count = vc.viewModel.chatroom?.transactions?.count, count == 0 {
                         vc.messageInputBar.inputTextView.becomeFirstResponder()
                     }
                 }
@@ -662,7 +669,7 @@ extension ChatListViewController: NewChatViewControllerDelegate {
                 navigator.viewControllers.remove(at: index)
             }
             
-            if let count = vc.chatroom?.transactions?.count, count == 0 {
+            if let count = vc.viewModel.chatroom?.transactions?.count, count == 0 {
                 vc.messageInputBar.inputTextView.becomeFirstResponder()
             }
             
@@ -680,21 +687,22 @@ extension ChatListViewController: NewChatViewControllerDelegate {
     }
 }
 
-// MARK: - ChatViewControllerDelegate
-extension ChatListViewController: ChatViewControllerDelegate {
+// MARK: - ChatPreservationDelegate
+
+extension ChatListViewController: ChatPreservationDelegate {
     func preserveMessage(_ message: String, forAddress address: String) {
         preservedMessagess[address] = message
     }
-    
+
     func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String? {
         guard let message = preservedMessagess[address] else {
             return nil
         }
-        
+
         if thenRemoveIt {
             preservedMessagess.removeValue(forKey: address)
         }
-        
+
         return message
     }
 }
@@ -969,7 +977,7 @@ extension ChatListViewController {
             return nil
         }
         
-        return vc.chatroom
+        return vc.viewModel.chatroom
     }
     
     /// First system botoom chat index

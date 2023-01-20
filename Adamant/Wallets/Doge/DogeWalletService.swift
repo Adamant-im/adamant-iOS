@@ -51,9 +51,6 @@ class DogeWalletService: WalletService {
     
     // MARK: RichMessageProvider properties
     static let richMessageType = "doge_transaction"
-    let cellIdentifierSent = "dogeTransferSent"
-    let cellIdentifierReceived = "dogeTransferReceived"
-    let cellSource: CellSource? = CellSource.nib(nib: UINib(nibName: "TransferCollectionViewCell", bundle: nil))
     
     // MARK: - Dependencies
     var apiService: ApiService!

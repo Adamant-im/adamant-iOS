@@ -8,11 +8,7 @@
 
 import Foundation
 import MessageKit
-
-enum CellSource {
-    case `class`(type: UICollectionViewCell.Type)
-    case nib(nib: UINib)
-}
+import UIKit
 
 protocol RichMessageProvider: AnyObject {
     /// Lowercased!!
@@ -20,19 +16,14 @@ protocol RichMessageProvider: AnyObject {
     
     var dynamicRichMessageType: String { get }
     
-    var cellIdentifierSent: String { get }
-    var cellIdentifierReceived: String { get }
-    var cellSource: CellSource? { get }
+    var tokenSymbol: String { get }
+    var tokenLogo: UIImage { get }
     
     // MARK: Events
-    func richMessageTapped(for transaction: RichMessageTransaction, at indexPath: IndexPath, in chat: ChatViewController)
+    func richMessageTapped(for transaction: RichMessageTransaction, in chat: ChatViewController)
     
     // MARK: Chats list
     func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString
-    
-    // MARK: MessageKit
-    func cellSizeCalculator(for messagesCollectionViewFlowLayout: MessagesCollectionViewFlowLayout) -> CellSizeCalculator
-    func cell(for message: MessageType, isFromCurrentSender: Bool, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell
 }
 
 protocol RichMessageProviderWithStatusCheck: RichMessageProvider {
