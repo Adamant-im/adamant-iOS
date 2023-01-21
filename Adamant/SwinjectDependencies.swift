@@ -186,6 +186,7 @@ extension Container {
         // MARK: Chat screen factory
         self.register(ChatFactory.self) { r in
             ChatFactory(
+                accountProvider: r.resolve(AccountsProvider.self)!,
                 chatsProvider: r.resolve(ChatsProvider.self)!,
                 dialogService: r.resolve(DialogService.self)!,
                 transferProvider: r.resolve(TransfersProvider.self)!,

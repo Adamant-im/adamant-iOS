@@ -111,19 +111,31 @@ final class ChatViewController: MessagesViewController {
     }
 }
 
-extension ChatViewController: ComplexTransferViewControllerDelegate {
+extension ChatViewController: TransferViewControllerDelegate, ComplexTransferViewControllerDelegate {
+    func transferViewController(
+        _ : TransferViewControllerBase,
+        didFinishWithTransfer transfer: TransactionDetails?,
+        detailsViewController: UIViewController?
+    ) {
+        dismissTransferViewController(andPresent: detailsViewController, didFinishWithTransfer: transfer)
+    }
+    
     func complexTransferViewController(
         _: ComplexTransferViewController,
         didFinishWithTransfer: TransactionDetails?,
         detailsViewController: UIViewController?
     ) {
+        dismissTransferViewController(andPresent: detailsViewController, didFinishWithTransfer: didFinishWithTransfer)
+    }
+    
+    private func dismissTransferViewController(andPresent viewController: UIViewController?, didFinishWithTransfer: TransactionDetails?) {
         DispatchQueue.onMainAsync { [weak self] in
             if didFinishWithTransfer != nil {
                 self?.messagesCollectionView.scrollToLastItem()
             }
             
             self?.dismiss(animated: true)
-            guard let detailsViewController = detailsViewController else { return }
+            guard let detailsViewController = viewController else { return }
             self?.navigationController?.pushViewController(detailsViewController, animated: true)
         }
     }
@@ -187,6 +199,14 @@ private extension ChatViewController {
         
         viewModel.closeScreen
             .sink { [weak self] in self?.close() }
+            .store(in: &subscriptions)
+        
+        viewModel.didTapAdmChat
+            .sink { [weak self] in self?.didTapAdmChat(with: $0, message: $1) }
+            .store(in: &subscriptions)
+        
+        viewModel.didTapAdmSend
+            .sink { [weak self] in self?.didTapAdmSend(to: $0) }
             .store(in: &subscriptions)
     }
 }
@@ -404,6 +424,37 @@ private extension ChatViewController {
         } else {
             messageInputBar.inputTextView.becomeFirstResponder()
         }
+    }
+    
+    func didTapAdmChat(with chatroom: Chatroom, message: String?) {
+        guard let chatlistVC = navigationController?.viewControllers.first as? ChatListViewController
+        else {
+            return
+        }
+        
+        let vc = chatlistVC.chatViewController(for: chatroom)
+        if let message = message {
+            vc.messageInputBar.inputTextView.text = message
+            vc.viewModel.inputText.value  = message
+        }
+        
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    func didTapAdmSend(to adm: AdamantAddress) {
+        guard let accountService = storedObjects.first(where: { $0 is AccountService }) as? AccountService else { return }
+        let service = accountService.wallets.first { wallet in
+            return wallet is AdmWalletService
+        }
+        
+        guard let service = service as? WalletServiceWithSend else { return }
+        let vc = service.transferViewController()
+        if let v = vc as? TransferViewControllerBase {
+            v.recipientAddress = adm.address
+            v.recipientName = adm.name
+            v.delegate = self
+        }
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     // TODO: Use coordinator

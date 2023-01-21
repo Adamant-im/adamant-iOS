@@ -12,6 +12,7 @@ import InputBarAccessoryView
 import Combine
 
 struct ChatFactory {
+    let accountProvider: AccountsProvider
     let chatsProvider: ChatsProvider
     let dialogService: DialogService
     let transferProvider: TransfersProvider
@@ -28,7 +29,7 @@ struct ChatFactory {
         let viewController = ChatViewController(
             viewModel: viewModel,
             richMessageProviders: richMessageProviders,
-            storedObjects: delegates.asArray + [dialogManager],
+            storedObjects: delegates.asArray + [dialogManager, accountService],
             sendTransaction: makeSendTransactionAction(viewModel: viewModel)
         )
         
@@ -43,14 +44,16 @@ private extension ChatFactory {
         let layout: MessagesLayoutDelegate
         let display: MessagesDisplayDelegate
         let inputBar: InputBarAccessoryViewDelegate
+        let cell: ChatCellManager
         
         var asArray: [AnyObject] {
-            [dataSource, layout, display, inputBar]
+            [dataSource, layout, display, inputBar, cell]
         }
     }
     
     func makeViewModel(richMessageProviders: [String: RichMessageProvider]) -> ChatViewModel {
         .init(
+            accountProvider: accountProvider,
             chatsProvider: chatsProvider,
             markdownParser: .init(font: UIFont.systemFont(ofSize: UIFont.systemFontSize)),
             transfersProvider: transferProvider,
@@ -74,7 +77,8 @@ private extension ChatFactory {
             dataSource: ChatDataSourceManager(viewModel: viewModel),
             layout: ChatLayoutManager(viewModel: viewModel),
             display: ChatDisplayManager(viewModel: viewModel),
-            inputBar: ChatInputBarManager(sendMessageAction: viewModel.sendMessage)
+            inputBar: ChatInputBarManager(sendMessageAction: viewModel.sendMessage),
+            cell: ChatCellManager(viewModel: viewModel)
         )
     }
     
@@ -100,6 +104,7 @@ private extension ChatViewController {
         messagesCollectionView.messagesDataSource = delegates.dataSource
         messagesCollectionView.messagesLayoutDelegate = delegates.layout
         messagesCollectionView.messagesDisplayDelegate = delegates.display
+        messagesCollectionView.messageCellDelegate = delegates.cell
         messageInputBar.delegate = delegates.inputBar
     }
 }

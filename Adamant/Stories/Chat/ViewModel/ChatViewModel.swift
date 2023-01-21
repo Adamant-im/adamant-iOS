@@ -9,10 +9,12 @@
 import Combine
 import CoreData
 import MarkdownKit
+import UIKit
 
 final class ChatViewModel: NSObject {
     // MARK: Dependencies
     
+    private let accountProvider: AccountsProvider
     private let chatsProvider: ChatsProvider
     private let markdownParser: MarkdownParser
     private let transfersProvider: TransfersProvider
@@ -42,6 +44,8 @@ final class ChatViewModel: NSObject {
     let inputText = ObservableProperty("")
     let didTapTransfer = ObservableSender<String>()
     let dialog = ObservableSender<ChatDialog>()
+    let didTapAdmChat = ObservableSenders<Chatroom, String?>()
+    let didTapAdmSend = ObservableSender<AdamantAddress>()
     
     var sender: ObservableVariable<ChatSender> { _sender.eraseToGetter() }
     var messages: ObservableVariable<[ChatMessage]> { _messages.eraseToGetter() }
@@ -73,6 +77,7 @@ final class ChatViewModel: NSObject {
     }
     
     init(
+        accountProvider: AccountsProvider,
         chatsProvider: ChatsProvider,
         markdownParser: MarkdownParser,
         transfersProvider: TransfersProvider,
@@ -80,6 +85,7 @@ final class ChatViewModel: NSObject {
         addressBookService: AddressBookService,
         richMessageProviders: [String: RichMessageProvider]
     ) {
+        self.accountProvider = accountProvider
         self.chatsProvider = chatsProvider
         self.markdownParser = markdownParser
         self.transfersProvider = transfersProvider
@@ -210,6 +216,84 @@ final class ChatViewModel: NSObject {
     func entireChatWasRead() {
         guard chatroom?.hasUnreadMessages == true else { return }
         chatroom?.markAsReaded()
+    }
+    
+    func didSelectURL(_ url: URL) {
+        if url.scheme == "adm" {
+            guard let adm = url.absoluteString.getLegacyAdamantAddress(),
+                  let partnerAddress = chatroom?.partner?.address
+            else {
+                return
+            }
+            
+            dialog.send(.admMenu(adm, partnerAddress: partnerAddress))
+            return
+        }
+        
+        dialog.send(.url(url))
+    }
+    
+    func process(adm: AdamantAddress, action: AddressChatShareType) {
+        if action == .send {
+            didTapAdmSend.send(adm)
+            return
+        }
+
+        guard let room = self.chatsProvider.getChatroom(for: adm.address) else {
+            self.findAccount(with: adm.address, name: adm.name, message: adm.message)
+            return
+        }
+        
+        self.startNewChat(with: room, name: adm.name, message: adm.message)
+    }
+    
+    private func findAccount(with address: String, name: String?, message: String?) {
+        dialog.send(.progress(true))
+        accountProvider.getAccount(byAddress: address) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let account):
+                DispatchQueue.main.async {
+                    self.dialog.send(.progress(false))
+                    guard let chatroom = account.chatroom else { return }
+                    self.setNameIfNeeded(for: account, chatroom: account.chatroom, name: name)
+                    account.chatroom?.isForcedVisible = true
+                    self.startNewChat(with: chatroom, message: message)
+                }
+            case .dummy:
+                self.dialog.send(.progress(false))
+                self.dialog.send(.dummy(address))
+            case .notFound, .invalidAddress, .notInitiated, .networkError:
+                self.dialog.send(.progress(false))
+                self.dialog.send(.alert(result.localized))
+            case .serverError(let error):
+                self.dialog.send(.progress(false))
+                if let apiError = error as? ApiServiceError, case .internalError(let message, _) = apiError, message == String.adamantLocalized.sharedErrors.unknownError {
+                    self.dialog.send(.alert(AccountsProviderResult.notFound(address: address).localized))
+                    return
+                }
+                
+                self.dialog.send(.error(result.localized))
+            }
+        }
+    }
+    
+    private func setNameIfNeeded(for account: CoreDataAccount?, chatroom: Chatroom?, name: String?) {
+        guard let name = name,
+              let account = account,
+              account.name == nil
+        else {
+            return
+        }
+        account.name = name
+        if let chatroom = chatroom, chatroom.title == nil {
+            chatroom.title = name
+        }
+    }
+    
+    private func startNewChat(with chatroom: Chatroom, name: String? = nil, message: String? = nil) {
+        setNameIfNeeded(for: chatroom.partner, chatroom: chatroom, name: name)
+        didTapAdmChat.send((chatroom, message))
     }
 }
 

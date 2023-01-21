@@ -24,6 +24,7 @@
 		416F5EA4290162EB00EF0400 /* SocketIO in Frameworks */ = {isa = PBXBuildFile; productRef = 416F5EA3290162EB00EF0400 /* SocketIO */; };
 		4174C55E2930AAA50072D66D /* Markdown+Adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4174C55D2930AAA50072D66D /* Markdown+Adamant.swift */; };
 		417BA7F428BF894F00DF94C5 /* NotificationSoundsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417BA7F328BF894F00DF94C5 /* NotificationSoundsViewController.swift */; };
+		41857C68297AAA7D001AA6FD /* ChatCellManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41857C67297AAA7D001AA6FD /* ChatCellManager.swift */; };
 		41935848287841E20083363B /* MacOSDeterminer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41935847287841E20083363B /* MacOSDeterminer.swift */; };
 		4198D57B28C8B7DA009337F2 /* so-proud-notification.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4198D57A28C8B7DA009337F2 /* so-proud-notification.mp3 */; };
 		4198D57D28C8B7FA009337F2 /* relax-message-tone.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4198D57C28C8B7F9009337F2 /* relax-message-tone.mp3 */; };
@@ -716,6 +717,7 @@
 		4164A9D828F17DA700EEF16D /* AdamantChatTransactionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantChatTransactionService.swift; sourceTree = "<group>"; };
 		4174C55D2930AAA50072D66D /* Markdown+Adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Markdown+Adamant.swift"; sourceTree = "<group>"; };
 		417BA7F328BF894F00DF94C5 /* NotificationSoundsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSoundsViewController.swift; sourceTree = "<group>"; };
+		41857C67297AAA7D001AA6FD /* ChatCellManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatCellManager.swift; sourceTree = "<group>"; };
 		41935847287841E20083363B /* MacOSDeterminer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacOSDeterminer.swift; sourceTree = "<group>"; };
 		4198D57A28C8B7DA009337F2 /* so-proud-notification.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "so-proud-notification.mp3"; sourceTree = "<group>"; };
 		4198D57C28C8B7F9009337F2 /* relax-message-tone.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "relax-message-tone.mp3"; sourceTree = "<group>"; };
@@ -1432,6 +1434,7 @@
 				938F7D5E2955C90D001915CA /* ChatInputBarManager.swift */,
 				938F7D602955C92B001915CA /* ChatDataSourceManager.swift */,
 				9390C5022976B42800270CDF /* ChatDialogManager.swift */,
+				41857C67297AAA7D001AA6FD /* ChatCellManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -2906,6 +2909,7 @@
 				E983AE2120E655C500497E1A /* AccountHeaderView.swift in Sources */,
 				E971591C2168209800A5F904 /* EthWalletService+RichMessageProviderWithStatusCheck.swift in Sources */,
 				644EC35220EFA9A300F40C73 /* DelegateRoutes.swift in Sources */,
+				41857C68297AAA7D001AA6FD /* ChatCellManager.swift in Sources */,
 				E96BBE3121F70F5E009AA738 /* ReadonlyTextView.swift in Sources */,
 				A50A41112822FC35006BDFE1 /* BtcWalletService+RichMessageProviderWithStatusCheck.swift in Sources */,
 				E926E032213EC43B005E536B /* FullscreenAlertView.swift in Sources */,

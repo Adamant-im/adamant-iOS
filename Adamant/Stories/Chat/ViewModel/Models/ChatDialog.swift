@@ -15,4 +15,8 @@ enum ChatDialog {
     case richError(RichError)
     case freeTokenAlert
     case menu(sender: UIBarButtonItem)
+    case admMenu(AdamantAddress, partnerAddress: String)
+    case dummy(String)
+    case url(URL)
+    case progress(Bool)
 }

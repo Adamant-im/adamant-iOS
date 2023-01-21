@@ -8,6 +8,7 @@
 
 import MessageKit
 import UIKit
+import MarkdownKit
 
 struct ChatMessage: Equatable {
     let messageId: String
@@ -58,10 +59,34 @@ extension ChatMessage: MessageType {
     var kind: MessageKind {
         switch content {
         case let .message(text):
-            return .text(text)
+            let markdownText = markdownParser.parse(text)
+            return .attributedText(markdownText)
         case let .transaction(model):
             return .custom(model)
         }
+    }
+    
+    var markdownParser: MarkdownParser {
+        return MarkdownParser(font: UIFont.adamantChatDefault,
+                              color: UIColor.adamant.primary,
+                              enabledElements: [
+                                .header,
+                                .list,
+                                .quote,
+                                .bold,
+                                .italic,
+                                .code,
+                                .strikethrough
+                              ],
+                              customElements: [
+                                MarkdownSimpleAdm(),
+                                MarkdownLinkAdm(),
+                                MarkdownAdvancedAdm(
+                                    font: UIFont.adamantChatDefault,
+                                    color: UIColor.adamant.active
+                                )
+                              ]
+        )
     }
 }
 

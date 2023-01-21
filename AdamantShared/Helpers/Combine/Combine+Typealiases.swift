@@ -11,4 +11,5 @@ import Combine
 typealias ObservableProperty<T> = CurrentValueSubject<T, Never>
 typealias ObservableVariable<T> = CurrentValueGetterSubject<T, Never>
 typealias ObservableSender<T> = PassthroughSubject<T, Never>
+typealias ObservableSenders<T, V> = PassthroughSubject<(T, V), Never>
 typealias Observable<T> = AnyPublisher<T, Never>
