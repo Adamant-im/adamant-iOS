@@ -78,9 +78,21 @@ final class ChatViewController: MessagesViewController {
         updateScrollDownButtonVisibility()
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        chatMessagesCollectionView.setFullBottomInset(
+            view.bounds.height - inputContainerView.frame.minY
+        )
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        chatMessagesCollectionView.animationEnabled = true
+        inputBar.isUserInteractionEnabled = true
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        inputBar.isUserInteractionEnabled = false
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -289,7 +301,7 @@ private extension ChatViewController {
     }
     
     func makeChatMessagesCollectionView() -> ChatMessagesCollectionView {
-        let collection = ChatMessagesCollectionView(didScroll: didScrollSender.eraseToAnyPublisher())
+        let collection = ChatMessagesCollectionView()
         collection.backgroundColor = .adamant.backgroundColor
         collection.register(TransactionCell.self)
         collection.register(
@@ -312,7 +324,7 @@ private extension ChatViewController {
     func setupStartPosition(_ position: ChatStartPosition) {
         switch position {
         case let .offset(offset):
-            chatMessagesCollectionView.setVerticalContentOffsetSafely(offset, animated: false)
+            chatMessagesCollectionView.setVerticalContentOffset(offset)
         case let .messageId(id):
             guard let index = viewModel.messages.value.firstIndex(where: { $0.messageId == id})
             else { return }

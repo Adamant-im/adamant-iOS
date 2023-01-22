@@ -8,29 +8,20 @@
 
 import MessageKit
 import UIKit
-import Combine
 
 final class ChatMessagesCollectionView: MessagesCollectionView {
-    private var prevoiusFullInsets: UIEdgeInsets = .zero
-    private var previousBottomOffset: CGFloat = .zero
-    private var subscriptions = Set<AnyCancellable>()
-    
-    var animationEnabled = false
-    
     var bottomOffset: CGFloat {
         contentHeightWithBottomInsets - bounds.maxY
     }
     
-    init(didScroll: Observable<Void>) {
-        super.init(frame: .zero, collectionViewLayout: MessagesCollectionViewFlowLayout())
-        
-        didScroll
-            .sink { [weak self] in self?.moveContentIfInsetsChanged() }
-            .store(in: &subscriptions)
+    override var contentInset: UIEdgeInsets {
+        get { super.contentInset }
+        set {}
     }
     
-    required init?(coder _: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    override var verticalScrollIndicatorInsets: UIEdgeInsets {
+        get { super.verticalScrollIndicatorInsets }
+        set {}
     }
     
     /// Saves the distance to the bottom while usual reloadData() saves the distance to the top
@@ -38,7 +29,7 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
         let bottomOffset = self.bottomOffset
         reloadData()
         layoutIfNeeded()
-        setBottomOffset(bottomOffset, animated: false)
+        setBottomOffset(bottomOffset, safely: true)
     }
 
     /// Saves the distance to the bottom while usual reloadSections(_) saves the distance to the top
@@ -46,28 +37,32 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
         let bottomOffset = self.bottomOffset
         reloadSections(sections)
         layoutIfNeeded()
-        setBottomOffset(bottomOffset, animated: false)
+        setBottomOffset(bottomOffset, safely: true)
     }
     
-    func setVerticalContentOffsetSafely(_ offset: CGFloat, animated: Bool) {
+    func setVerticalContentOffset(_ offset: CGFloat, safely: Bool = true) {
         guard maxVerticalOffset > .zero else { return }
         
         var offset = offset
-        if offset < .zero {
-            offset = .zero
-        } else if offset > maxVerticalOffset {
-            offset = maxVerticalOffset
+        if safely {
+            if offset < .zero {
+                offset = .zero
+            } else if offset > maxVerticalOffset {
+                offset = maxVerticalOffset
+            }
         }
         
-        setContentOffset(
-            .init(x: contentOffset.x, y: offset),
-            animated: animated && animationEnabled
-        )
+        setContentOffset(.init(x: contentOffset.x, y: offset), animated: false)
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        moveContentIfInsetsChanged()
+    func setFullBottomInset(_ inset: CGFloat) {
+        let inset = inset - safeAreaInsets.bottom
+        let bottomOffset = self.bottomOffset
+        super.contentInset.bottom = inset
+        super.verticalScrollIndicatorInsets.bottom = inset
+
+        guard !isDragging || isDecelerating else { return }
+        setBottomOffset(bottomOffset, safely: false)
     }
 }
 
@@ -84,22 +79,10 @@ private extension ChatMessagesCollectionView {
         contentSize.height + fullInsets.bottom
     }
     
-    func setBottomOffset(_ newValue: CGFloat, animated: Bool) {
-        setVerticalContentOffsetSafely(
+    func setBottomOffset(_ newValue: CGFloat, safely: Bool) {
+        setVerticalContentOffset(
             contentHeightWithBottomInsets - bounds.height - newValue,
-            animated: animated
+            safely: safely
         )
-    }
-    
-    func moveContentIfInsetsChanged() {
-        if prevoiusFullInsets != fullInsets {
-            if !isDragging {
-                setBottomOffset(previousBottomOffset, animated: true)
-            }
-            
-            prevoiusFullInsets = fullInsets
-        }
-        
-        previousBottomOffset = bottomOffset
     }
 }
