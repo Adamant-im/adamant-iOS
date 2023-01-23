@@ -38,7 +38,7 @@ class AdamantUriBuilding: XCTestCase {
     // MARK: - Addresses
     func testEncodeAddress() {
         let address = "U123456789012345"
-        let encoded = "adm:\(address)"
+        let encoded = "\(AdmWalletService.qqPrefix):\(address)"
         let freshlyEncoded = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
         
         XCTAssertEqual(encoded, freshlyEncoded)
@@ -47,7 +47,7 @@ class AdamantUriBuilding: XCTestCase {
     func testEncodeAddressWithParams() {
         let address = "U123456789012345"
         let label = "Kingsize pineapple pizza"
-        let encoded = "adm:\(address)?label=\(label.replacingOccurrences(of: " ", with: "+"))"
+        let encoded = "\(AdmWalletService.qqPrefix):\(address)?label=\(label.replacingOccurrences(of: " ", with: "+"))"
         let freshlyEncoded = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: [AdamantAddressParam.label(label)]))
         
         XCTAssertEqual(encoded, freshlyEncoded)
@@ -55,7 +55,7 @@ class AdamantUriBuilding: XCTestCase {
     
     func testDecodeAddress() {
         let address = "U123456789012345"
-        let encoded = "adm:\(address)"
+        let encoded = "\(AdmWalletService.qqPrefix):\(address)"
         
         guard let decoded = AdamantUriTools.decode(uri: encoded) else {
             XCTFail("Failed to decode.")
@@ -75,7 +75,7 @@ class AdamantUriBuilding: XCTestCase {
     func testDecodeAddressWithParams() {
         let address = "U123456789012345"
         let value = "Kingsize pineapple pizza"
-        let encoded = "adm:\(address)?label=\(value.replacingOccurrences(of: " ", with: "+"))"
+        let encoded = "\(AdmWalletService.qqPrefix):\(address)?label=\(value.replacingOccurrences(of: " ", with: "+"))"
         
         guard let decoded = AdamantUriTools.decode(uri: encoded) else {
             XCTFail("failed to decode.")

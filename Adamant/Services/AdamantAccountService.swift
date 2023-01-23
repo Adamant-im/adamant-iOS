@@ -16,9 +16,11 @@ class AdamantAccountService: AccountService {
     private let adamantCore: AdamantCore
     private let dialogService: DialogService
     private let securedStore: SecuredStore
+
     weak var notificationsService: NotificationsService?
     weak var currencyInfoService: CurrencyInfoService?
     weak var pushNotificationsTokenService: PushNotificationsTokenService?
+    weak var visibleWalletService: VisibleWalletsService?
     
     // MARK: Properties
     
@@ -70,7 +72,7 @@ class AdamantAccountService: AccountService {
             AdmWalletService(),
             BtcWalletService(),
             EthWalletService(),
-            LskWalletService(mainnet: true, nodes: AdamantResources.lskServers, services: AdamantResources.lskServiceServers),
+            LskWalletService(mainnet: true, nodes: LskWalletService.nodes, services: LskWalletService.serviceNodes),
             DogeWalletService(),
             DashWalletService()
         ]
@@ -99,9 +101,11 @@ class AdamantAccountService: AccountService {
             fatalError("Failed to get EthWalletService")
         }
         
-        guard let url = AdamantResources.ethServers.randomElement() else {
+        guard let node = EthWalletService.nodes.randomElement() else {
             fatalError("Failed to get ETH endpoint")
         }
+        
+        let url = node.asString()
         
         ethWallet.initiateNetwork(apiUrl: url) { result in
             switch result {
@@ -145,6 +149,10 @@ class AdamantAccountService: AccountService {
         
         NotificationCenter.default.addObserver(forName: .AdamantAccountService.forceUpdateBalance, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.update()
+        }
+        
+        NotificationCenter.default.addObserver(forName: .AdamantAccountService.forceUpdateAllBalances, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.updateAll()
         }
         
         setupSecuredStore()
@@ -259,7 +267,15 @@ extension AdamantAccountService {
         self.update(nil)
     }
     
+    func updateAll() {
+        update(nil, updateOnlyVisible: false)
+    }
+    
     func update(_ completion: ((AccountServiceResult) -> Void)?) {
+        update(completion, updateOnlyVisible: true)
+    }
+    
+    func update(_ completion: ((AccountServiceResult) -> Void)?, updateOnlyVisible: Bool) {
         stateSemaphore.wait()
         
         switch state {
@@ -306,8 +322,14 @@ extension AdamantAccountService {
             }
         }
         
-        for wallet in wallets.filter({ !($0 is AdmWalletService) }) {
-            wallet.update()
+        if updateOnlyVisible {
+            for wallet in wallets.filter({ !($0 is AdmWalletService) }) where !(visibleWalletService?.isInvisible(wallet) ?? false) {
+                wallet.update()
+            }
+        } else {
+            for wallet in wallets.filter({ !($0 is AdmWalletService) }) {
+                wallet.update()
+            }
         }
     }
 }

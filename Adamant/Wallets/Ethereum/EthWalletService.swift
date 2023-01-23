@@ -59,16 +59,10 @@ class EthWalletService: WalletService {
 	// MARK: - Constants
 	let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")
 	
-	static let currencySymbol = "ETH"
-	static let currencyLogo = #imageLiteral(resourceName: "wallet_eth")
-	static let currencyExponent = -18
+	static let currencyLogo = #imageLiteral(resourceName: "ethereum_wallet")
     
     var tokenSymbol: String {
         return type(of: self).currencySymbol
-    }
-    
-    var tokenName: String {
-        return ""
     }
     
     var tokenLogo: UIImage {
@@ -79,8 +73,12 @@ class EthWalletService: WalletService {
         return "ERC20"
     }
     
-    var consistencyMaxTime: Double {
-        return 1200
+    var tokenContract: String {
+        return ""
+    }
+    
+    var tokenUnicID: String {
+        return tokenNetworkSymbol + tokenSymbol
     }
     
 	private (set) var transactionFee: Decimal = 0.0
@@ -604,7 +602,7 @@ extension EthWalletService {
     }
     
     func getTransactionsHistory(address: String, offset: Int = 0, limit: Int = 100, completion: @escaping (WalletServiceResult<[EthTransactionShort]>) -> Void) {
-        guard let raw = AdamantResources.ethServers.randomElement(), let url = URL(string: raw) else {
+        guard let node = EthWalletService.nodes.randomElement(), let url = node.asURL() else {
             fatalError("Failed to build ETH endpoint URL")
         }
         
@@ -779,7 +777,7 @@ extension EthWalletService: PrivateKeyGenerator {
     }
     
     var rowImage: UIImage? {
-        return #imageLiteral(resourceName: "wallet_eth_row")
+        return #imageLiteral(resourceName: "ethereum_wallet_row")
     }
     
     func generatePrivateKeyFor(passphrase: String) -> String? {

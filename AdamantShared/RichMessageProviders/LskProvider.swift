@@ -22,6 +22,6 @@ class LskProvider: TransferBaseProvider {
     }
     
     override var currencyLogoLarge: UIImage {
-        return #imageLiteral(resourceName: "lsk_notification")
+        return #imageLiteral(resourceName: "lisk_notification")
     }
 }

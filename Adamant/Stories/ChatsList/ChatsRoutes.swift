@@ -51,6 +51,7 @@ extension AdamantScene {
         static let complexTransfer = AdamantScene(identifier: "ComplexTransferViewController", factory: { r in
             let c = ComplexTransferViewController()
             c.accountService = r.resolve(AccountService.self)
+            c.visibleWalletsService = r.resolve(VisibleWalletsService.self)
             return c
         })
         

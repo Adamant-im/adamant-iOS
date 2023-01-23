@@ -22,6 +22,6 @@ class DashProvider: TransferBaseProvider {
     }
     
     override var currencyLogoLarge: UIImage {
-        return #imageLiteral(resourceName: "wallet_dash")
+        return #imageLiteral(resourceName: "dash_notification")
     }
 }

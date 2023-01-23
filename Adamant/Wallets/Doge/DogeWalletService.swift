@@ -13,27 +13,27 @@ import BitcoinKit
 
 struct DogeApiCommands {
     static func balance(for address: String) -> String {
-        return "/addr/\(address)/balance"
+        return "/api/addr/\(address)/balance"
     }
     
     static func getTransactions(for address: String) -> String {
-        return "/addrs/\(address)/txs"
+        return "/api/addrs/\(address)/txs"
     }
     
     static func getTransaction(by hash: String) -> String {
-        return "/tx/\(hash)"
+        return "/api/tx/\(hash)"
     }
     
     static func getBlock(by hash: String) -> String {
-        return "/block/\(hash)"
+        return "/api/block/\(hash)"
     }
     
     static func getUnspentTransactions(for address: String) -> String {
-        return "/addr/\(address)/utxo"
+        return "/api/addr/\(address)/utxo"
     }
     
     static func sendTransaction() -> String {
-        return "/tx/send"
+        return "/api/tx/send"
     }
 }
 
@@ -59,18 +59,12 @@ class DogeWalletService: WalletService {
     var router: Router!
     
     // MARK: - Constants
-    static var currencySymbol = "DOGE"
-    static var currencyLogo = #imageLiteral(resourceName: "wallet_doge")
-    static let currencyExponent = -8
+    static var currencyLogo = #imageLiteral(resourceName: "doge_wallet")
     static let multiplier = Decimal(sign: .plus, exponent: 8, significand: 1)
     static let chunkSize = 20
-    
+ 
     var tokenSymbol: String {
         return type(of: self).currencySymbol
-    }
-    
-    var tokenName: String {
-        return ""
     }
     
     var tokenLogo: UIImage {
@@ -80,12 +74,18 @@ class DogeWalletService: WalletService {
     var tokenNetworkSymbol: String {
         return "DOGE"
     }
-    
-    var consistencyMaxTime: Double {
-        return 900
-    }
    
-    private (set) var transactionFee: Decimal = 1.0 // 1 DOGE per transaction
+    var tokenContract: String {
+        return ""
+    }
+    
+    var tokenUnicID: String {
+        return tokenNetworkSymbol + tokenSymbol
+    }
+    
+    var transactionFee: Decimal {
+        return DogeWalletService.fixedFee
+    }
     
     static let kvsAddress = "doge:address"
     
@@ -316,7 +316,7 @@ extension DogeWalletService: SwinjectDependentService {
 // MARK: - Balances & addresses
 extension DogeWalletService {
     func getBalance(_ completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-        guard let url = AdamantResources.dogeServers.randomElement() else {
+        guard let url = DogeWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DOGE endpoint URL")
         }
         
@@ -459,7 +459,7 @@ extension DogeWalletService {
     }
     
     private func getTransactions(for address: String, from: Int, to: Int, completion: @escaping (ApiServiceResult<DogeGetTransactionsResponse>) -> Void) {
-        guard let url = AdamantResources.dogeServers.randomElement() else {
+        guard let url = DogeWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DOGE endpoint URL")
         }
         
@@ -497,7 +497,7 @@ extension DogeWalletService {
     }
     
     func getUnspentTransactions(_ completion: @escaping (ApiServiceResult<[UnspentTransaction]>) -> Void) {
-        guard let url = AdamantResources.dogeServers.randomElement() else {
+        guard let url = DogeWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DOGE endpoint URL")
         }
         
@@ -562,7 +562,7 @@ extension DogeWalletService {
     }
     
     func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<BTCRawTransaction>) -> Void) {
-        guard let url = AdamantResources.dogeServers.randomElement() else {
+        guard let url = DogeWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DOGE endpoint URL")
         }
         
@@ -592,7 +592,7 @@ extension DogeWalletService {
     }
     
     func getBlockId(by hash: String, completion: @escaping (ApiServiceResult<String>) -> Void) {
-        guard let url = AdamantResources.dogeServers.randomElement() else {
+        guard let url = DogeWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DOGE endpoint URL")
         }
         
@@ -641,7 +641,7 @@ extension DogeWalletService: PrivateKeyGenerator {
     }
     
     var rowImage: UIImage? {
-        return #imageLiteral(resourceName: "wallet_doge_row")
+        return #imageLiteral(resourceName: "doge_wallet_row")
     }
     
     func generatePrivateKeyFor(passphrase: String) -> String? {

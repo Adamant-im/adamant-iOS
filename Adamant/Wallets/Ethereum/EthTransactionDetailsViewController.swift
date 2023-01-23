@@ -20,6 +20,7 @@ class EthTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     
     private lazy var refreshControl: UIRefreshControl = {
         let control = UIRefreshControl()
+        control.tintColor = .adamant.primary
         control.addTarget(self, action: #selector(refresh), for: UIControl.Event.valueChanged)
         return control
     }()
@@ -47,7 +48,7 @@ class EthTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
         let id = transaction.txId
         
-        return URL(string: "\(AdamantResources.ethereumExplorerAddress)\(id)")
+        return URL(string: "\(EthWalletService.explorerAddress)\(id)")
     }
     
     @objc func refresh() {

@@ -167,11 +167,12 @@ class LoginViewController: FormViewController {
                     
                     var stripe: [StripeButtonType] = [.qrCameraReader, .qrPhotoReader]
                     
-                    if let accountService = self?.accountService, accountService.hasStayInAccount {
-                        if accountService.useBiometry, let button = self?.localAuth.biometryType.stripeButtonType {
+                    if let accountService = self?.accountService,
+                       accountService.hasStayInAccount {
+                        stripe.append(.pinpad)
+                        if accountService.useBiometry,
+                           let button = self?.localAuth.biometryType.stripeButtonType {
                             stripe.append(button)
-                        } else {
-                            stripe.append(.pinpad)
                         }
                     }
                     

@@ -35,6 +35,16 @@ extension UIColor {
         
         // MARK: Global colors
         
+        /// Income Arrow View Background Color
+        static var incomeArrowBackgroundColor: UIColor {
+            return UIColor(hex: "36C436")
+        }
+        
+        /// Outcome Arrow View Background Color
+        static var outcomeArrowBackgroundColor: UIColor {
+            return UIColor(hex: "F44444")
+        }
+        
         /// Default background color
         static var backgroundColor: UIColor {
             let colorWhiteTheme  = UIColor.white
@@ -108,6 +118,13 @@ extension UIColor {
         static var switchColor: UIColor {
             let colorWhiteTheme = UIColor(hex: "#179cec")
             let colorDarkTheme  = UIColor(hex: "#05456b")
+            return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
+        }
+        
+        /// Secondary color, ~50% gray
+        static var errorOkButton: UIColor {
+            let colorWhiteTheme = UIColor(red: 0.478, green: 0.478, blue: 0.478, alpha: 1)
+            let colorDarkTheme  = UIColor(red: 0.31, green: 0.31, blue: 0.31, alpha: 1)
             return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
         }
         

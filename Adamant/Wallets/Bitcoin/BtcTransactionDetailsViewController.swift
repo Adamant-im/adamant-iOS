@@ -20,6 +20,7 @@ class BtcTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     
     private lazy var refreshControl: UIRefreshControl = {
         let control = UIRefreshControl()
+        control.tintColor = .adamant.primary
         control.addTarget(self, action: #selector(refresh), for: UIControl.Event.valueChanged)
         return control
     }()
@@ -48,7 +49,7 @@ class BtcTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
         let id = transaction.txId
-        return URL(string: "\(AdamantResources.btcExplorerAddress)\(id)")
+        return URL(string: "\(BtcWalletService.explorerAddress)\(id)")
     }
     
     @objc func refresh() {

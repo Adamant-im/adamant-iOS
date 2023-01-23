@@ -20,6 +20,7 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     
     private lazy var refreshControl: UIRefreshControl = {
         let control = UIRefreshControl()
+        control.tintColor = .adamant.primary
         control.addTarget(self, action: #selector(refresh), for: UIControl.Event.valueChanged)
         return control
     }()
@@ -49,7 +50,7 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
         let id = transaction.txId
         
-        return URL(string: "\(AdamantResources.liskExplorerAddress)\(id)")
+        return URL(string: "\(LskWalletService.explorerAddress)\(id)")
     }
     
     @objc func refresh() {

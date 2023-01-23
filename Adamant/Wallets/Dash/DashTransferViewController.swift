@@ -190,6 +190,7 @@ class DashTransferViewController: TransferViewControllerBase {
             if let text = row.value {
                 self?._recipient = text
             }
+            self?.updateToolbar(for: row)
         }.onCellSelection { [weak self] (cell, _) in
             self?.shareValue(self?.recipientAddress, from: cell)
         }

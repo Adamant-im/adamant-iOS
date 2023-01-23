@@ -367,6 +367,12 @@
 /* Delegates page: scene title */
 "Delegates.Title" = "Delegates";
 
+/* Visible Wallets page: scene title */
+"VisibleWallets.Title" = "Wallet list";
+
+/* VisibleWallets: Reset wallets alert title */
+"VisibleWallets.ResetListAlert" = "Reset wallet list to default?";
+
 /* Delegates tab: Message about 50 ADM fee for vote */
 "Delegates.NotEnoughtTokensForVote" = "Not enought tokens to vote. You need 50 ADM";
 
@@ -542,7 +548,7 @@
 "NewChatScene.NotInitialized.HelpButton" = "What does it mean?";
 
 /* NodesList: Button label */
-"NodesList.NodesList" = "Nodes list";
+"NodesList.NodesList" = "Node list";
 
 /* NodesList: scene title */
 "NodesList.Title" = "List of nodes";

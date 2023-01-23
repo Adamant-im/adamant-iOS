@@ -12,6 +12,10 @@ import CoreData
 // - MARK: SocketService
 
 protocol ChatTransactionService: AnyObject {
+    
+    /// Make operations serial
+    func addOperations(_ op: Operation)
+    
     /// Parse raw transaction into CoreData chat transaction
     ///
     /// - Parameters:
@@ -41,10 +45,4 @@ protocol ChatTransactionService: AnyObject {
     /// - Returns: Transaction
     func transferTransaction(from transaction: Transaction, isOut: Bool, partner: BaseAccount?, context: NSManagedObjectContext) -> TransferTransaction
     
-    /// Complete processing transactions
-    ///
-    /// - Parameters:
-    ///   - transactions: Transaction
-    /// - Returns: Transaction
-    func processingComplete(_ transactions: [UInt64])
 }

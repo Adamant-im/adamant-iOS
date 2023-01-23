@@ -367,6 +367,12 @@
 /* Delegates page: scene title */
 "Delegates.Title" = "Делегаты";
 
+/* Visible Wallets page: scene title */
+"VisibleWallets.Title" = "Кошельки";
+
+/* VisibleWallets: Reset wallets alert title */
+"VisibleWallets.ResetListAlert" = "Сбросить список кошельков к списку по умолчанию?";
+
 /* Delegates tab: Message about 50 ADM fee for vote */
 "Delegates.NotEnoughtTokensForVote" = "Недостаточно токенов для голосования. Нужно 50 ADM";
 
