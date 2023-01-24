@@ -9,7 +9,14 @@
 import MessageKit
 import UIKit
 
-final class ChatMessagesCollectionView: MessagesCollectionView {
+final class ChatMessagesCollectionView<
+    SectionModel: Identifiable & Equatable
+>: MessagesCollectionView {
+    private var currentModels = [SectionModel]()
+    
+    var reportMessageAction: ((IndexPath) -> Void)?
+    var removeMessageAction: ((IndexPath) -> Void)?
+    
     var bottomOffset: CGFloat {
         contentHeightWithBottomInsets - bounds.maxY
     }
@@ -55,13 +62,29 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
         setContentOffset(.init(x: contentOffset.x, y: offset), animated: false)
     }
     
+    func reloadData(newModels: [SectionModel]) {
+        let newIds = newModels.map { $0.id }
+        let currentIds = currentModels.map { $0.id }
+        
+        if Set(newIds) == Set(currentIds) {
+            reloadSections(newModels: newModels)
+        } else if newIds.last == currentIds.last || currentIds.isEmpty {
+            let bottomOffset = self.bottomOffset
+            reloadData()
+            layoutIfNeeded()
+            setBottomOffset(bottomOffset, safely: true)
+        } else {
+            reloadData()
+        }
+    }
+    
     func setFullBottomInset(_ inset: CGFloat) {
         let inset = inset - safeAreaInsets.bottom
         let bottomOffset = self.bottomOffset
         super.contentInset.bottom = inset
         super.verticalScrollIndicatorInsets.bottom = inset
 
-        guard !isDragging || isDecelerating else { return }
+        guard !isDragging else { return }
         setBottomOffset(bottomOffset, safely: false)
     }
 }
@@ -84,5 +107,19 @@ private extension ChatMessagesCollectionView {
             contentHeightWithBottomInsets - bounds.height - newValue,
             safely: safely
         )
+    }
+    
+    func reloadSections(newModels: [SectionModel]) {
+        guard newModels.count == currentModels.count else {
+            return assertionFailure("Don't call this method if elements are not equal")
+        }
+        
+        let indices = newModels.indices.compactMap { i in
+            newModels[i] == currentModels[i]
+                ? nil
+                : i
+        }
+        
+        reloadSections(.init(indices))
     }
 }

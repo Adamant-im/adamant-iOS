@@ -51,6 +51,10 @@ private extension ChatDialogManager {
             showMenu(sender: sender)
         case .freeTokenAlert:
             showFreeTokenAlert()
+        case let .removeMessageAlert(id):
+            showRemoveMessageAlert(id: id)
+        case let .reportMessageAlert(id):
+            showReportMessageAlert(id: id)
         }
     }
     
@@ -126,6 +130,43 @@ private extension ChatDialogManager {
         alert.addAction(makeCancelAction())
         alert.modalPresentationStyle = .overFullScreen
         dialogService.present(alert, animated: true, completion: nil)
+    }
+    
+    func showRemoveMessageAlert(id: String) {
+        dialogService.showAlert(
+            title: .adamantLocalized.chat.removeMessage,
+            message: nil,
+            style: .alert,
+            actions: [
+                .init(
+                    title: .adamantLocalized.alert.ok,
+                    style: .destructive,
+                    handler: { [weak viewModel] in viewModel?.hideMessage(id: id) }
+                ),
+                makeCancelAction()
+            ],
+            from: nil
+        )
+    }
+    
+    func showReportMessageAlert(id: String) {
+        dialogService.showAlert(
+            title: .adamantLocalized.chat.reportMessage,
+            message: nil,
+            style: .alert,
+            actions: [
+                .init(
+                    title: .adamantLocalized.alert.ok,
+                    style: .destructive,
+                    handler: { [weak self] in
+                        self?.viewModel.hideMessage(id: id)
+                        self?.showToast(message: .adamantLocalized.chat.reportSent)
+                    }
+                ),
+                makeCancelAction()
+            ],
+            from: nil
+        )
     }
 }
 
@@ -245,6 +286,10 @@ private extension ChatDialogManager {
     }
     
     func makeCancelAction() -> UIAlertAction {
+        .init(title: .adamantLocalized.alert.cancel, style: .cancel, handler: nil)
+    }
+    
+    func makeCancelAction() -> AdamantAlertAction {
         .init(title: .adamantLocalized.alert.cancel, style: .cancel, handler: nil)
     }
 }

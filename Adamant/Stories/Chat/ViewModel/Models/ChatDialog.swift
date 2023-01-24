@@ -14,5 +14,7 @@ enum ChatDialog {
     case error(String)
     case richError(RichError)
     case freeTokenAlert
+    case removeMessageAlert(id: String)
+    case reportMessageAlert(id: String)
     case menu(sender: UIBarButtonItem)
 }

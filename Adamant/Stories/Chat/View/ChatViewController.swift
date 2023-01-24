@@ -66,6 +66,7 @@ final class ChatViewController: MessagesViewController {
         super.viewDidLoad()
         view.backgroundColor = .adamant.backgroundColor
         maintainPositionOnInputBarHeightChanged = true
+        configureMessageActions()
         configureHeader()
         configureLayout()
         setupObservers()
@@ -206,6 +207,19 @@ private extension ChatViewController {
 // MARK: Configuration
 
 private extension ChatViewController {
+    func configureMessageActions() {
+        UIMenuController.shared.menuItems = [
+            .init(
+                title: .adamantLocalized.chat.remove,
+                action: #selector(MessageCollectionViewCell.remove)
+            ),
+            .init(
+                title: .adamantLocalized.chat.report,
+                action: #selector(MessageCollectionViewCell.report)
+            )
+        ]
+    }
+    
     func configureLayout() {
         view.addSubview(scrollDownButton)
         scrollDownButton.snp.makeConstraints { [unowned inputBar] in
@@ -300,14 +314,24 @@ private extension ChatViewController {
         return button
     }
     
-    func makeChatMessagesCollectionView() -> ChatMessagesCollectionView {
-        let collection = ChatMessagesCollectionView()
+    func makeChatMessagesCollectionView() -> ChatMessagesCollectionView<ChatMessage> {
+        let collection = ChatMessagesCollectionView<ChatMessage>()
         collection.backgroundColor = .adamant.backgroundColor
         collection.register(TransactionCell.self)
         collection.register(
             SpinnerCell.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader
         )
+        
+        collection.removeMessageAction = { [weak self] indexPath in
+            guard let id = self?.getMessageIdByIndexPath(indexPath) else { return }
+            self?.viewModel.dialog.send(.removeMessageAlert(id: id))
+        }
+        
+        collection.reportMessageAction = { [weak self] indexPath in
+            guard let id = self?.getMessageIdByIndexPath(indexPath) else { return }
+            self?.viewModel.dialog.send(.reportMessageAlert(id: id))
+        }
         
         return collection
     }
@@ -342,7 +366,7 @@ private extension ChatViewController {
         
         guard
             let previousBottomMessageId = previousBottomMessageId,
-            let index = messages.firstIndex(where: { $0.messageId == previousBottomMessageId }),
+            let index = messages.firstIndex(where: { $0.id == previousBottomMessageId }),
             index < messages.count - 1,
             isScrollPositionNearlyTheBottom
                 || messages.last?.sender.senderId == viewModel.sender.value.senderId
@@ -418,6 +442,13 @@ private extension ChatViewController {
         }
     }
     
+    func getMessageIdByIndexPath(_ indexPath: IndexPath) -> String? {
+        messagesCollectionView.messagesDataSource?.messageForItem(
+            at: indexPath,
+            in: messagesCollectionView
+        ).messageId
+    }
+ 
     // TODO: Use coordinator
     
     func close() {

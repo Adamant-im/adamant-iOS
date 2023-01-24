@@ -211,6 +211,17 @@ final class ChatViewModel: NSObject {
         guard chatroom?.hasUnreadMessages == true else { return }
         chatroom?.markAsReaded()
     }
+    
+    func hideMessage(id: String) {
+        guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
+        else { return }
+        
+        transaction.isHidden = true
+        try? transaction.managedObjectContext?.save()
+        
+        chatroom?.updateLastTransaction()
+        transaction.transactionId.map { chatsProvider.removeMessage(with: $0) }
+    }
 }
 
 extension ChatViewModel: NSFetchedResultsControllerDelegate {

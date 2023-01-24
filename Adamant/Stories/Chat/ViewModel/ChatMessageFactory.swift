@@ -26,7 +26,7 @@ struct ChatMessageFactory {
         )
         
         return .init(
-            messageId: transaction.chatMessageId ?? "",
+            id: transaction.chatMessageId ?? "",
             sentDate: sentDate,
             senderModel: .init(transaction: transaction),
             status: status,

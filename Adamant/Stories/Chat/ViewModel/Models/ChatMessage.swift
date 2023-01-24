@@ -9,8 +9,8 @@
 import MessageKit
 import UIKit
 
-struct ChatMessage: Equatable {
-    let messageId: String
+struct ChatMessage: Identifiable, Equatable {
+    let id: String
     let sentDate: Date
     let senderModel: ChatSender
     let status: Status
@@ -18,7 +18,7 @@ struct ChatMessage: Equatable {
     let bottomString: NSAttributedString?
     
     static let `default` = Self(
-        messageId: "",
+        id: "",
         sentDate: .init(),
         senderModel: .default,
         status: .failed,
@@ -51,9 +51,8 @@ extension ChatMessage {
 }
 
 extension ChatMessage: MessageType {
-    var sender: SenderType {
-        senderModel
-    }
+    var messageId: String { id }
+    var sender: SenderType { senderModel }
     
     var kind: MessageKind {
         switch content {
