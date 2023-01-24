@@ -9,10 +9,10 @@
 import UIKit
 import web3swift
 import struct BigInt.BigUInt
-import PromiseKit
+import Web3Core
 
 extension ERC20WalletService: WalletServiceTwoStepSend {
-    typealias T = EthereumTransaction
+    typealias T = CodableTransaction
     
     func transferViewController() -> UIViewController {
         guard let vc = router.get(scene: AdamantScene.Wallets.ERC20.transfer) as? ERC20TransferViewController else {
@@ -24,57 +24,52 @@ extension ERC20WalletService: WalletServiceTwoStepSend {
     }
     
     // MARK: Create & Send
-    func createTransaction(recipient: String, amount: Decimal, completion: @escaping (WalletServiceResult<EthereumTransaction>) -> Void) {
-        // MARK: 1. Prepare
-        guard let ethWallet = ethWallet else {
-            completion(.failure(error: .notLogged))
-            return
-        }
-
-        guard let ethRecipient = EthereumAddress(recipient) else {
-            completion(.failure(error: .accountNotFound))
-            return
-        }
-
-        guard
-            let decimals = token?.decimals,
-            let bigUIntAmount = Web3.Utils.parseToBigUInt("\(amount)", decimals: decimals) else {
-            completion(.failure(error: .invalidAmount(amount)))
-            return
-        }
-
-        guard let keystoreManager = web3?.provider.attachedKeystoreManager else {
-            completion(.failure(error: .internalError(message: "Failed to get web3.provider.KeystoreManager", error: nil)))
-            return
-        }
-
-        // MARK: Go background
-        defaultDispatchQueue.async {
-            // MARK: 2. Create contract
-            var options = TransactionOptions.defaultOptions
-            options.from = ethWallet.ethAddress
-            options.gasLimit = .automatic
-            options.gasPrice = .automatic
-
-            guard let contract = self.contract else {
-                completion(.failure(error: .internalError(message: "ETH Wallet: Send - contract loading error", error: nil)))
+    func createTransaction(recipient: String, amount: Decimal, completion: @escaping (WalletServiceResult<CodableTransaction>) -> Void) {
+        Task {
+            guard let ethWallet = ethWallet else {
+                completion(.failure(error: .notLogged))
                 return
             }
             
-            guard let intermediate = contract.write("transfer", parameters: [ethRecipient, bigUIntAmount] as [AnyObject], extraData: Data(), transactionOptions: options) else {
-                completion(.failure(error: .internalError(message: "ETH Wallet: Send - create transaction issue", error: nil)))
+            guard let ethRecipient = EthereumAddress(recipient) else {
+                completion(.failure(error: .accountNotFound))
                 return
             }
-
+            
+            guard let bigUIntAmount = Utilities.parseToBigUInt(String(format: "%.18f", amount.doubleValue), units: .ether) else {
+                completion(.failure(error: .invalidAmount(amount)))
+                return
+            }
+            
+            guard let keystoreManager = await web3?.provider.attachedKeystoreManager else {
+                completion(.failure(error: .internalError(message: "Failed to get web3.provider.KeystoreManager", error: nil)))
+                return
+            }
+            
+            guard let provider = await web3?.provider else {
+                completion(.failure(error: .internalError(message: "Failed to get web3.provider", error: nil)))
+                return
+            }
+        
+            // MARK: 2. Create contract
+        
+            var transaction: CodableTransaction = .emptyTransaction
+            transaction.from = ethWallet.ethAddress
+            transaction.to = ethRecipient
+            transaction.value = bigUIntAmount
+//            transaction.gasLimit = .automatic
+//            transaction.gasPrice = .automatic
+            
+            
+            let resolver = PolicyResolver(provider: provider)
             do {
-                let transaction = try intermediate.assemblePromise().then { transaction throws -> Promise<EthereumTransaction> in
-                    var trs = transaction
-                    try Web3Signer.signTX(transaction: &trs, keystore: keystoreManager, account: ethWallet.ethAddress, password: "")
-                    let promise = Promise<EthereumTransaction>.pending()
-                    promise.resolver.fulfill(trs)
-                    return promise.promise
-                    }.wait()
-
+                try await resolver.resolveAll(for: &transaction)
+                // sign tx
+                try Web3Signer.signTX(transaction: &transaction,
+                                      keystore: keystoreManager,
+                                      account: ethWallet.ethAddress,
+                                      password: ""
+                )
                 completion(.success(result: transaction))
             } catch {
                 completion(.failure(error: WalletServiceError.internalError(message: "Transaction sign error", error: error)))
@@ -82,12 +77,14 @@ extension ERC20WalletService: WalletServiceTwoStepSend {
         }
     }
     
-    func sendTransaction(_ transaction: EthereumTransaction, completion: @escaping (WalletServiceResult<String>) -> Void) {
-        defaultDispatchQueue.async {
-            self.web3?.eth.sendRawTransactionPromise(transaction).done { result in
+    func sendTransaction(_ transaction: CodableTransaction, completion: @escaping (WalletServiceResult<String>) -> Void) {
+        Task {
+            guard let txEncoded = transaction.encode() else { return }
+            
+            if let result = try await web3?.eth.send(raw: txEncoded) {
                 completion(.success(result: result.hash))
-            }.catch { error in
-                completion(.failure(error: .internalError(message: error.localizedDescription, error: error)))
+            } else {
+                completion(.failure(error: .internalError(message: "unknown error", error: nil)))
             }
         }
     }

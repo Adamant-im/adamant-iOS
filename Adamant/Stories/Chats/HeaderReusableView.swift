@@ -8,6 +8,7 @@
 
 import Foundation
 import MessageKit
+import UIKit
 
 class HeaderReusableView: MessageReusableView {
     // MARK: - Private Properties

@@ -8,107 +8,116 @@
 
 import Foundation
 import web3swift
+import Web3Core
 
 extension EthWalletService: RichMessageProviderWithStatusCheck {
     func statusFor(transaction: RichMessageTransaction, completion: @escaping (WalletServiceResult<TransactionStatus>) -> Void) {
-        guard let web3 = self.web3, let hash = transaction.richContent?[RichContentKeys.transfer.hash] else {
-            completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction hash", error: nil)))
-            return
-        }
-        
-        // MARK: Get transaction
-        
-        let details: web3swift.TransactionDetails
-        do {
-            details = try web3.eth.getTransactionDetailsPromise(hash).wait()
-        } catch let error as Web3Error {
-            guard transaction.transactionStatus == .notInitiated else {
-                completion(.failure(error: error.asWalletServiceError()))
+        Task {
+            guard let web3 = await self.web3,
+                  let hash = transaction.richContent?[RichContentKeys.transfer.hash],
+                  let txHash = hash.data(using: .utf8)
+            else {
+                completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction hash", error: nil)))
                 return
             }
-            completion(.success(result: .pending))
-            return
-        } catch {
-            completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction", error: error)))
-            return
-        }
-        
-        let status: TransactionStatus
-        let transactionDate: Date
-        do {
-            let receipt = try web3.eth.getTransactionReceiptPromise(hash).wait()
-            status = receipt.status.asTransactionStatus()
-            guard status != .pending else {
+            
+            // MARK: Get transaction
+            
+            let details: Web3Core.TransactionDetails
+            do {
+                details = try await web3.eth.transactionDetails(txHash)
+            } catch let error as Web3Error {
+                guard transaction.transactionStatus == .notInitiated else {
+                    completion(.failure(error: error.asWalletServiceError()))
+                    return
+                }
                 completion(.success(result: .pending))
                 return
-            }
-            
-            guard status == .success, let blockNumber = details.blockNumber, let date = transaction.date as Date? else {
-                completion(.success(result: status))
+            } catch {
+                completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction", error: error)))
                 return
             }
             
-            transactionDate = date
-            _ = try web3.eth.getBlockByNumberPromise(blockNumber).wait()
-        } catch let error as Web3Error {
-            let result: WalletServiceResult<TransactionStatus>
-            
-            switch error {
-            // Transaction not delivired yet
-            case .inputError, .nodeError:
-                result = .success(result: .pending)
-                
-            default:
-                result = .failure(error: error.asWalletServiceError())
-            }
-            
-            completion(result)
-            return
-        } catch {
-            completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction", error: error)))
-            return
-        }
-        
-        let start = transactionDate.addingTimeInterval(-60 * 5)
-        let end = transactionDate.addingTimeInterval(self.consistencyMaxTime)
-        let range = start...end
-        let eth = details.transaction
-        
-        // MARK: Check addresses
-        if transaction.isOutgoing {
-            guard let sender = eth.sender?.address, let id = self.ethWallet?.address, sender == id else {
-                completion(.success(result: .warning))
-                return
-            }
-        } else {
-            guard let id = self.ethWallet?.address, eth.to.address == id else {
-                completion(.success(result: .warning))
-                return
-            }
-        }
-        
-        // MARK: Check dates
-        guard range.contains(transaction.dateValue ?? Date()) else {
-            completion(.success(result: .warning))
-            return
-        }
-        
-        // MARK: Compare amounts
-        let realAmount = eth.value.asDecimal(exponent: EthWalletService.currencyExponent)
+            let status: TransactionStatus
+            let transactionDate: Date
+            do {
+                let receipt = try await web3.eth.transactionReceipt(txHash)
+                status = receipt.status.asTransactionStatus()
+                guard status != .pending else {
+                    completion(.success(result: .pending))
+                    return
+                }
 
-        guard let raw = transaction.richContent?[RichContentKeys.transfer.amount], let reported = AdamantBalanceFormat.deserializeBalance(from: raw) else {
-            completion(.success(result: .warning))
-            return
+                guard status == .success,
+                      let blockHash = details.blockHash,
+                      let date = transaction.date as Date?
+                else {
+                    completion(.success(result: status))
+                    return
+                }
+                
+                transactionDate = date
+                _ = try await web3.eth.block(by: blockHash)
+            } catch let error as Web3Error {
+                let result: WalletServiceResult<TransactionStatus>
+                
+                switch error {
+                    // Transaction not delivired yet
+                case .inputError, .nodeError:
+                    result = .success(result: .pending)
+                    
+                default:
+                    result = .failure(error: error.asWalletServiceError())
+                }
+                
+                completion(result)
+                return
+            } catch {
+                completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction", error: error)))
+                return
+            }
+            
+            let start = transactionDate.addingTimeInterval(-60 * 5)
+            let end = transactionDate.addingTimeInterval(self.consistencyMaxTime)
+            let range = start...end
+            let eth = details.transaction
+            
+            // MARK: Check addresses
+            if transaction.isOutgoing {
+                guard let sender = eth.sender?.address, let id = self.ethWallet?.address, sender == id else {
+                    completion(.success(result: .warning))
+                    return
+                }
+            } else {
+                guard let id = self.ethWallet?.address, eth.to.address == id else {
+                    completion(.success(result: .warning))
+                    return
+                }
+            }
+            
+            // MARK: Check dates
+            guard range.contains(transaction.dateValue ?? Date()) else {
+                completion(.success(result: .warning))
+                return
+            }
+            
+            // MARK: Compare amounts
+            let realAmount = eth.value.asDecimal(exponent: EthWalletService.currencyExponent)
+            
+            guard let raw = transaction.richContent?[RichContentKeys.transfer.amount], let reported = AdamantBalanceFormat.deserializeBalance(from: raw) else {
+                completion(.success(result: .warning))
+                return
+            }
+            let min = reported - reported*0.005
+            let max = reported + reported*0.005
+            
+            guard (min...max).contains(realAmount) else {
+                completion(.success(result: .warning))
+                return
+            }
+            
+            completion(.success(result: .success))
         }
-        let min = reported - reported*0.005
-        let max = reported + reported*0.005
-        
-        guard (min...max).contains(realAmount) else {
-            completion(.success(result: .warning))
-            return
-        }
-        
-        completion(.success(result: .success))
     }
 }
 

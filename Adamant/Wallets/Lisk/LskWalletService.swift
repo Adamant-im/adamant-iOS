@@ -13,6 +13,7 @@ import LiskKit
 import web3swift
 import Alamofire
 import struct BigInt.BigUInt
+import Web3Core
 
 class LskWalletService: WalletService {
     
@@ -235,15 +236,11 @@ class LskWalletService: WalletService {
     }
     
     func fromRawLsk(value: BigInt.BigUInt) -> String {
-        if let formattedAmount = Web3.Utils.formatToPrecision(value, numberDecimals: 8, formattingDecimals: 8, decimalSeparator: ".", fallbackToScientific: false) {
-            return formattedAmount
-        } else {
-            return "--"
-        }
+        return Utilities.formatToPrecision(value, units: .custom(8), formattingDecimals: 8, decimalSeparator: ".", fallbackToScientific: false)
     }
     
     func toRawLsk(value: Double) -> String {
-        if let formattedAmount = Web3.Utils.parseToBigUInt("\(value)", decimals: 8) {
+        if let formattedAmount = Utilities.parseToBigUInt("\(value)", decimals: 8) {
             return "\(formattedAmount)"
         } else {
             return "--"

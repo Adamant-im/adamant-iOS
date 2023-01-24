@@ -2249,8 +2249,8 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E913C9001FFFA51E001A83F7 /* Build configuration list for PBXNativeTarget "Adamant" */;
 			buildPhases = (
-				418BBB14293752F800CAB719 /* Run Script - Load wallets */,
 				47866E9AB7D201F2CED0064C /* [CP] Check Pods Manifest.lock */,
+				418BBB14293752F800CAB719 /* Run Script - Load wallets */,
 				E913C8EA1FFFA51D001A83F7 /* Sources */,
 				E913C8EB1FFFA51D001A83F7 /* Frameworks */,
 				E913C8EC1FFFA51D001A83F7 /* Resources */,
@@ -3836,8 +3836,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/skywinder/web3swift.git";
 			requirement = {
-				kind = upToNextMinorVersion;
-				minimumVersion = 2.6.0;
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
 			};
 		};
 		A5AC8DFD262E0B030053A7E2 /* XCRemoteSwiftPackageReference "SipHash" */ = {

@@ -12,7 +12,7 @@ import Swinject
 import web3swift
 import Alamofire
 import struct BigInt.BigUInt
-import PromiseKit
+import Web3Core
 
 class ERC20WalletService: WalletService {
     // MARK: - Constants
@@ -105,15 +105,18 @@ class ERC20WalletService: WalletService {
     private (set) var enabled = true
     
     private var _ethNodeUrl: String?
-    private var _web3: web3?
-    var web3: web3? {
-        if _web3 != nil {
-            return _web3
+    private var _web3: Web3?
+    var web3: Web3? {
+        get async {
+            if _web3 != nil {
+                return _web3
+            }
+            guard let url = _ethNodeUrl else {
+                return nil
+            }
+            
+            return await setupEthNode(with: url)
         }
-        guard let url = _ethNodeUrl else {
-            return nil
-        }
-        return setupEthNode(with: url)
     }
     private var baseUrl: String!
     let stateSemaphore = DispatchSemaphore(value: 1)
@@ -149,7 +152,7 @@ class ERC20WalletService: WalletService {
     private (set) var ethWallet: EthWallet?
     var wallet: WalletAccount? { return ethWallet }
     
-    private (set) var contract: web3.web3contract?
+    private (set) var contract: Web3.Contract?
     private var balanceObserver: NSObjectProtocol?
     
     init(token: ERC20Token) {
@@ -185,15 +188,15 @@ class ERC20WalletService: WalletService {
         }
         let apiUrl = node.asString()
         _ethNodeUrl = apiUrl
-        DispatchQueue.global(qos: .userInitiated).async {
-            _ = self.setupEthNode(with: apiUrl)
+        Task {
+            _ = await self.setupEthNode(with: apiUrl)
         }
     }
     
-    func setupEthNode(with apiUrl: String) -> web3? {
+    func setupEthNode(with apiUrl: String) async -> Web3? {
         guard
             let url = URL(string: apiUrl),
-            let web3 = try? Web3.new(url),
+            let web3 = try? await Web3.new(url),
             let token = self.token else {
             return nil
         }
@@ -296,14 +299,16 @@ class ERC20WalletService: WalletService {
     }
     
     func getGasPrices(completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-        guard let web3 = self.web3 else {
-            completion(.failure(error: WalletServiceError.internalError(message: "Failed to get Gas Price", error: nil)))
-            return
-        }
-        web3.eth.getGasPricePromise().done { price in
-            completion(.success(result: price.asDecimal(exponent: EthWalletService.currencyExponent)))
-        }.catch { error in
-            completion(.failure(error: .internalError(message: error.localizedDescription, error: error)))
+        Task {
+            do {
+                guard let price = try await web3?.eth.gasPrice() else {
+                    completion(.failure(error: .internalError(message: "error.localizedDescription", error: nil)))
+                    return
+                }
+                completion(.success(result: price.asDecimal(exponent: EthWalletService.currencyExponent)))
+            } catch {
+                completion(.failure(error: .internalError(message: error.localizedDescription, error: error)))
+            }
         }
     }
     
@@ -339,6 +344,12 @@ class ERC20WalletService: WalletService {
 // MARK: - WalletInitiatedWithPassphrase
 extension ERC20WalletService: InitiatedWithPassphraseService {
     func initWallet(withPassphrase passphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) {
+        Task {
+            await initWallet(withPassphrase: passphrase, completion: completion)
+        }
+    }
+    
+    func initWallet(withPassphrase passphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) async {
         
         // MARK: 1. Prepare
         stateSemaphore.wait()
@@ -366,7 +377,7 @@ extension ERC20WalletService: InitiatedWithPassphraseService {
             return
         }
         
-        web3?.addKeystoreManager(KeystoreManager([keystore]))
+        await web3?.addKeystoreManager(KeystoreManager([keystore]))
         
         guard let ethAddress = keystore.addresses?.first else {
             completion(.failure(error: .internalError(message: "ETH Wallet: failed to create Keystore", error: nil)))
@@ -412,19 +423,20 @@ extension ERC20WalletService: SwinjectDependentService {
 // MARK: - Balances & addresses
 extension ERC20WalletService {
     func getTransaction(by hash: String, completion: @escaping (WalletServiceResult<EthTransaction>) -> Void) {
-        let sender = wallet?.address
-        guard let eth = web3?.eth else {
-            completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction", error: nil)))
-            return
-        }
-        
-        DispatchQueue.global(qos: .utility).async {
+        Task {
+            let sender = wallet?.address
+            guard let eth = await web3?.eth else {
+                completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction", error: nil)))
+                return
+            }
+            
+            let txHash = hash.data(using: .utf8)!
             let isOutgoing: Bool
-            let details: web3swift.TransactionDetails
+            let details: Web3Core.TransactionDetails
             
             // MARK: 1. Transaction details
             do {
-                details = try eth.getTransactionDetailsPromise(hash).wait()
+                details = try await eth.transactionDetails(txHash)
             } catch let error as Web3Error {
                 completion(.failure(error: error.asWalletServiceError()))
                 return
@@ -435,7 +447,7 @@ extension ERC20WalletService {
             
             // MARK: 2. Transaction receipt
             do {
-                let receipt = try eth.getTransactionReceiptPromise(hash).wait()
+                let receipt = try await eth.transactionReceipt(txHash)
                 
                 // MARK: 3. Check if transaction is delivered
                 guard receipt.status == .ok, let blockNumber = details.blockNumber else {
@@ -445,8 +457,8 @@ extension ERC20WalletService {
                 }
                 
                 // MARK: 4. Block timestamp & confirmations
-                let currentBlock = try eth.getBlockNumberPromise().wait()
-                let block = try eth.getBlockByNumberPromise(blockNumber).wait()
+                let currentBlock = try await eth.blockNumber()
+                let block = try await eth.block(by: receipt.blockHash)
                 let confirmations = currentBlock - blockNumber
                 
                 let transaction = details.transaction
@@ -481,19 +493,22 @@ extension ERC20WalletService {
     }
     
     func getBalance(forAddress address: EthereumAddress, completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-        DispatchQueue.global(qos: .utility).async { [weak self] in
-            guard let address = self?.ethWallet?.address, let walletAddress = EthereumAddress(address), let erc20 = self?.erc20 else {
+        Task {
+            guard let address = self.ethWallet?.address,
+                  let walletAddress = EthereumAddress(address),
+                  let erc20 = self.erc20
+            else {
                 print("Can't get address")
                 return
             }
 
             var exponent = EthWalletService.currencyExponent
-            if let naturalUnits = self?.token?.naturalUnits {
+            if let naturalUnits = self.token?.naturalUnits {
                 exponent = -1 * naturalUnits
             }
             
             do {
-                let balance = try erc20.getBalance(account: walletAddress)
+                let balance = try await erc20.getBalance(account: walletAddress)
                 let value = balance.asDecimal(exponent: exponent)
                 completion(.success(result:value))
             } catch {

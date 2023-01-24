@@ -8,7 +8,6 @@
 
 import UIKit
 import LiskKit
-import PromiseKit
 
 extension LocalTransaction: RawTransaction {
     var txHash: String? {

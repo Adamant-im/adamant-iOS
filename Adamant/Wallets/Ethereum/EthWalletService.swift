@@ -12,11 +12,12 @@ import web3swift
 import Swinject
 import Alamofire
 import BigInt
+import Web3Core
 
 struct EthWalletStorage {
     let keystore: BIP32Keystore
 
-    func getWalet(with web3: web3) -> EthWallet? {
+    func getWalet(with web3: Web3) -> EthWallet? {
         web3.addKeystoreManager(KeystoreManager([keystore]))
         
         guard let ethAddress = keystore.addresses?.first else {
@@ -49,8 +50,15 @@ extension Web3Error {
         case .transactionSerializationError,
              .dataError,
              .walletError,
-             .unknownError:
+             .unknownError,
+             .typeError:
             return .internalError(message: "Unknown error", error: nil)
+        case .valueError(desc: let desc):
+            return .internalError(message: "Unknown error \(String(describing: desc))", error: nil)
+        case .serverError(code: let code):
+            return .internalError(message: "Unknown error \(code)", error: nil)
+        case .clientError(code: let code):
+            return .internalError(message: "Unknown error \(code)", error: nil)
         }
     }
 }
@@ -112,15 +120,18 @@ class EthWalletService: WalletService {
     public static let transactionsListApiSubpath = "ethtxs"
     
     private var _ethNodeUrl: String?
-    private var _web3: web3?
-    var web3: web3? {
-        if _web3 != nil {
-            return _web3
+    private var _web3: Web3?
+    var web3: Web3? {
+        get async {
+            if _web3 != nil {
+                return _web3
+            }
+            guard let url = _ethNodeUrl else {
+                return nil
+            }
+            
+            return await setupEthNode(with: url)
         }
-        guard let url = _ethNodeUrl else {
-            return nil
-        }
-        return setupEthNode(with: url)
     }
     private var baseUrl: String!
     let defaultDispatchQueue = DispatchQueue(label: "im.adamant.ethWalletService", qos: .utility, attributes: [.concurrent])
@@ -186,17 +197,18 @@ class EthWalletService: WalletService {
     }
     
     func initiateNetwork(apiUrl: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
-        DispatchQueue.global(qos: .userInitiated).async {
+        Task {
             self._ethNodeUrl = apiUrl
-            guard let _ = self.setupEthNode(with: apiUrl) else {
+            guard let _ = await self.setupEthNode(with: apiUrl) else {
                 completion(.failure(error: WalletServiceError.networkError))
                 return
             }
         }
     }
     
-    func setupEthNode(with apiUrl: String) -> web3? {
-        guard let url = URL(string: apiUrl), let web3 = try? Web3.new(url) else {
+    func setupEthNode(with apiUrl: String) async -> Web3? {
+        guard let url = URL(string: apiUrl),
+              let web3 = try? await Web3.new(url) else {
             return nil
         }
         
@@ -206,18 +218,27 @@ class EthWalletService: WalletService {
         return web3
     }
     
-    func getWallet() -> EthWallet? {
+    func getWallet() async -> EthWallet? {
         if let wallet = ethWallet {
             return wallet
         }
-        guard let storage = waletStorage, let web3 = web3 else {
+        guard let storage = waletStorage,
+              let web3 = await web3
+        else {
             return nil
         }
         return storage.getWalet(with: web3)
     }
     
     func update() {
-        guard let wallet = getWallet() else {
+        Task {
+            await update()
+        }
+    }
+    
+    @MainActor
+    func update() async {
+        guard let wallet = await getWallet() else {
             return
         }
         
@@ -293,10 +314,16 @@ class EthWalletService: WalletService {
 	}
 	
 	func getGasPrices(completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-        web3?.eth.getGasPricePromise().done { price in
-            completion(.success(result: price.asDecimal(exponent: EthWalletService.currencyExponent)))
-        }.catch { error in
-            completion(.failure(error: .internalError(message: error.localizedDescription, error: error)))
+        Task {
+            do {
+                guard let price = try await web3?.eth.gasPrice() else {
+                    completion(.failure(error: .internalError(message: "error.localizedDescription", error: nil)))
+                    return
+                }
+                completion(.success(result: price.asDecimal(exponent: EthWalletService.currencyExponent)))
+            } catch {
+                completion(.failure(error: .internalError(message: error.localizedDescription, error: error)))
+            }
         }
 	}
 	
@@ -332,6 +359,12 @@ class EthWalletService: WalletService {
 // MARK: - WalletInitiatedWithPassphrase
 extension EthWalletService: InitiatedWithPassphraseService {
     func initWallet(withPassphrase passphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) {
+        Task {
+            await initWallet(withPassphrase: passphrase, completion: completion)
+        }
+    }
+    
+    func initWallet(withPassphrase passphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) async {
         guard let adamant = accountService?.account else {
             completion(.failure(error: .notLogged))
             return
@@ -362,7 +395,9 @@ extension EthWalletService: InitiatedWithPassphraseService {
             return
         }
         
-        guard let web3 = web3, let eWallet = waletStorage?.getWalet(with: web3) else {
+        guard let web3 = await web3,
+              let eWallet = waletStorage?.getWalet(with: web3)
+        else {
             completion(.failure(error: .internalError(message: "ETH Wallet: failed to create Keystore", error: nil)))
             stateSemaphore.signal()
             return
@@ -475,15 +510,16 @@ extension EthWalletService: SwinjectDependentService {
 // MARK: - Balances & addresses
 extension EthWalletService {
 	func getBalance(forAddress address: EthereumAddress, completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-		DispatchQueue.global(qos: .utility).async { [weak self] in
-			guard let web3 = self?.web3 else {
+        Task {
+            guard let web3 = await self.web3 else {
 				print("Can't get web3 service")
 				return
 			}
 			
-			web3.eth.getBalancePromise(address: address).done { balance in
+            do {
+                let balance = try await web3.eth.getBalance(for: address)
                 completion(.success(result: balance.asDecimal(exponent: EthWalletService.currencyExponent)))
-            }.catch { error in
+            } catch {
                 completion(.failure(error: .internalError(message: error.localizedDescription, error: error)))
             }
 		}
@@ -538,19 +574,20 @@ extension EthWalletService {
 // MARK: - Transactions
 extension EthWalletService {
     func getTransaction(by hash: String, completion: @escaping (WalletServiceResult<EthTransaction>) -> Void) {
-        let sender = wallet?.address
-        guard let eth = web3?.eth else {
-            completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction", error: nil)))
-            return
-        }
-        
-        DispatchQueue.global(qos: .utility).async {
+        Task {
+            let sender = wallet?.address
+            guard let eth = await web3?.eth else {
+                completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction", error: nil)))
+                return
+            }
+            
+            let txHash = hash.data(using: .utf8)!
             let isOutgoing: Bool
-            let details: web3swift.TransactionDetails
+            let details: Web3Core.TransactionDetails
             
             // MARK: 1. Transaction details
             do {
-                details = try eth.getTransactionDetailsPromise(hash).wait()
+                details = try await eth.transactionDetails(txHash)
                 
                 if let sender = sender {
                     isOutgoing = details.transaction.to.address != sender
@@ -567,7 +604,7 @@ extension EthWalletService {
             
             // MARK: 2. Transaction receipt
             do {
-                let receipt = try eth.getTransactionReceiptPromise(hash).wait()
+                let receipt = try await eth.transactionReceipt(txHash)
                 
                 // MARK: 3. Check if transaction is delivered
                 guard receipt.status == .ok, let blockNumber = details.blockNumber else {
@@ -577,8 +614,8 @@ extension EthWalletService {
                 }
                 
                 // MARK: 4. Block timestamp & confirmations
-                let currentBlock = try eth.getBlockNumberPromise().wait()
-                let block = try eth.getBlockByNumberPromise(blockNumber).wait()
+                let currentBlock = try await eth.blockNumber()
+                let block = try await eth.block(by: receipt.blockHash)
                 let confirmations = currentBlock - blockNumber
                 
                 let transaction = details.transaction.asEthTransaction(date: block.timestamp, gasUsed: receipt.gasUsed, blockNumber: String(blockNumber), confirmations: String(confirmations), receiptStatus: receipt.status, isOutgoing: isOutgoing, hash: details.transaction.txHash)
