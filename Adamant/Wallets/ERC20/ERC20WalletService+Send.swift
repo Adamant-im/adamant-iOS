@@ -41,36 +41,42 @@ extension ERC20WalletService: WalletServiceTwoStepSend {
                 return
             }
             
-            guard let keystoreManager = await web3?.provider.attachedKeystoreManager else {
+            guard let web3 = await web3 else {
+                completion(.failure(error: .internalError(message: "Failed to get web3", error: nil)))
+                return
+            }
+            
+            guard let keystoreManager = web3.provider.attachedKeystoreManager else {
                 completion(.failure(error: .internalError(message: "Failed to get web3.provider.KeystoreManager", error: nil)))
                 return
             }
             
-            guard let provider = await web3?.provider else {
-                completion(.failure(error: .internalError(message: "Failed to get web3.provider", error: nil)))
+            let provider = web3.provider
+            
+            // MARK: Create contract
+            
+            guard let contract = web3.contract(Web3.Utils.coldWalletABI, at: ethRecipient),
+                  var tx = contract.createWriteOperation()?.transaction
+            else {
+                completion(.failure(error: .internalError(message: "ETH Wallet: Send - contract loading error", error: nil)))
                 return
             }
-        
-            // MARK: 2. Create contract
-        
-            var transaction: CodableTransaction = .emptyTransaction
-            transaction.from = ethWallet.ethAddress
-            transaction.to = ethRecipient
-            transaction.value = bigUIntAmount
-//            transaction.gasLimit = .automatic
-//            transaction.gasPrice = .automatic
             
+            tx.from = ethWallet.ethAddress
+            tx.to = ethRecipient
+            tx.value = bigUIntAmount
             
             let resolver = PolicyResolver(provider: provider)
             do {
-                try await resolver.resolveAll(for: &transaction)
-                // sign tx
-                try Web3Signer.signTX(transaction: &transaction,
+                try await resolver.resolveAll(for: &tx)
+                
+                try Web3Signer.signTX(transaction: &tx,
                                       keystore: keystoreManager,
                                       account: ethWallet.ethAddress,
-                                      password: ""
+                                      password: ERC20WalletService.walletPassword
                 )
-                completion(.success(result: transaction))
+                
+                completion(.success(result: tx))
             } catch {
                 completion(.failure(error: WalletServiceError.internalError(message: "Transaction sign error", error: error)))
             }
@@ -79,12 +85,16 @@ extension ERC20WalletService: WalletServiceTwoStepSend {
     
     func sendTransaction(_ transaction: CodableTransaction, completion: @escaping (WalletServiceResult<String>) -> Void) {
         Task {
-            guard let txEncoded = transaction.encode() else { return }
+            guard let txEncoded = transaction.encode() else {
+                completion(.failure(error: .internalError(message: "Unknown error", error: nil)))
+                return
+            }
             
-            if let result = try await web3?.eth.send(raw: txEncoded) {
-                completion(.success(result: result.hash))
-            } else {
-                completion(.failure(error: .internalError(message: "unknown error", error: nil)))
+            do {
+                let result = try await web3?.eth.send(raw: txEncoded)
+                completion(.success(result: result?.hash ?? ""))
+            } catch {
+                completion(.failure(error: .internalError(message: "Error: \(error.localizedDescription)", error: nil)))
             }
         }
     }
