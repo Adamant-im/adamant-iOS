@@ -14,8 +14,7 @@ extension EthWalletService: RichMessageProviderWithStatusCheck {
     func statusFor(transaction: RichMessageTransaction, completion: @escaping (WalletServiceResult<TransactionStatus>) -> Void) {
         Task {
             guard let web3 = await self.web3,
-                  let hash = transaction.richContent?[RichContentKeys.transfer.hash],
-                  let txHash = hash.data(using: .utf8)
+                  let hash = transaction.richContent?[RichContentKeys.transfer.hash]
             else {
                 completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction hash", error: nil)))
                 return
@@ -25,7 +24,7 @@ extension EthWalletService: RichMessageProviderWithStatusCheck {
             
             let details: Web3Core.TransactionDetails
             do {
-                details = try await web3.eth.transactionDetails(txHash)
+                details = try await web3.eth.transactionDetails(hash)
             } catch let error as Web3Error {
                 guard transaction.transactionStatus == .notInitiated else {
                     completion(.failure(error: error.asWalletServiceError()))
@@ -41,7 +40,7 @@ extension EthWalletService: RichMessageProviderWithStatusCheck {
             let status: TransactionStatus
             let transactionDate: Date
             do {
-                let receipt = try await web3.eth.transactionReceipt(txHash)
+                let receipt = try await web3.eth.transactionReceipt(hash)
                 status = receipt.status.asTransactionStatus()
                 guard status != .pending else {
                     completion(.success(result: .pending))

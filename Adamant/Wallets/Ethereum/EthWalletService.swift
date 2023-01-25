@@ -581,13 +581,12 @@ extension EthWalletService {
                 return
             }
             
-            let txHash = hash.data(using: .utf8)!
             let isOutgoing: Bool
             let details: Web3Core.TransactionDetails
             
             // MARK: 1. Transaction details
             do {
-                details = try await eth.transactionDetails(txHash)
+                details = try await eth.transactionDetails(hash)
                 
                 if let sender = sender {
                     isOutgoing = details.transaction.to.address != sender
@@ -604,7 +603,7 @@ extension EthWalletService {
             
             // MARK: 2. Transaction receipt
             do {
-                let receipt = try await eth.transactionReceipt(txHash)
+                let receipt = try await eth.transactionReceipt(hash)
                 
                 // MARK: 3. Check if transaction is delivered
                 guard receipt.status == .ok, let blockNumber = details.blockNumber else {

@@ -430,13 +430,12 @@ extension ERC20WalletService {
                 return
             }
             
-            let txHash = hash.data(using: .utf8)!
             let isOutgoing: Bool
             let details: Web3Core.TransactionDetails
             
             // MARK: 1. Transaction details
             do {
-                details = try await eth.transactionDetails(txHash)
+                details = try await eth.transactionDetails(hash)
             } catch let error as Web3Error {
                 completion(.failure(error: error.asWalletServiceError()))
                 return
@@ -447,7 +446,7 @@ extension ERC20WalletService {
             
             // MARK: 2. Transaction receipt
             do {
-                let receipt = try await eth.transactionReceipt(txHash)
+                let receipt = try await eth.transactionReceipt(hash)
                 
                 // MARK: 3. Check if transaction is delivered
                 guard receipt.status == .ok, let blockNumber = details.blockNumber else {

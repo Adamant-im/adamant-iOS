@@ -26,18 +26,15 @@ extension ERC20WalletService: WalletServiceTwoStepSend {
     // MARK: Create & Send
     func createTransaction(recipient: String, amount: Decimal, completion: @escaping (WalletServiceResult<CodableTransaction>) -> Void) {
         Task {
-            guard let ethWallet = ethWallet else {
+            guard let ethWallet = ethWallet,
+                  let erc20 = erc20
+            else {
                 completion(.failure(error: .notLogged))
                 return
             }
             
             guard let ethRecipient = EthereumAddress(recipient) else {
                 completion(.failure(error: .accountNotFound))
-                return
-            }
-            
-            guard let bigUIntAmount = Utilities.parseToBigUInt(String(format: "%.18f", amount.doubleValue), units: .ether) else {
-                completion(.failure(error: .invalidAmount(amount)))
                 return
             }
             
@@ -52,22 +49,16 @@ extension ERC20WalletService: WalletServiceTwoStepSend {
             }
             
             let provider = web3.provider
-            
-            // MARK: Create contract
-            
-            guard let contract = web3.contract(Web3.Utils.coldWalletABI, at: ethRecipient),
-                  var tx = contract.createWriteOperation()?.transaction
-            else {
-                completion(.failure(error: .internalError(message: "ETH Wallet: Send - contract loading error", error: nil)))
-                return
-            }
-            
-            tx.from = ethWallet.ethAddress
-            tx.to = ethRecipient
-            tx.value = bigUIntAmount
-            
             let resolver = PolicyResolver(provider: provider)
+            
+            // MARK: Create transaction
+            
             do {
+                var tx = try await erc20.transfer(from: ethWallet.ethAddress,
+                                                  to: ethRecipient,
+                                                  amount: String(format: "%.18f", amount.doubleValue)
+                ).transaction
+                
                 try await resolver.resolveAll(for: &tx)
                 
                 try Web3Signer.signTX(transaction: &tx,
