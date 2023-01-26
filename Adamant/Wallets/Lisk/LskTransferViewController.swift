@@ -8,6 +8,7 @@
 
 import UIKit
 import Eureka
+import LiskKit
 
 class LskTransferViewController: TransferViewControllerBase {
     
@@ -17,6 +18,7 @@ class LskTransferViewController: TransferViewControllerBase {
     
     // MARK: Send
     
+    @MainActor
     override func sendFunds() {
         let comments: String
         if let row: TextAreaRow = form.rowBy(tag: BaseRows.comments.tag), let text = row.value {
@@ -35,55 +37,63 @@ class LskTransferViewController: TransferViewControllerBase {
         
         dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
         
-        service.createTransaction(recipient: recipient, amount: amount) { [weak self] result in
-            guard let vc = self else {
-                dialogService.dismissProgress()
-                dialogService.showError(withMessage: String.adamantLocalized.sharedErrors.unknownError, error: nil)
-                return
-            }
-            
-            switch result {
-            case .success(var transaction):
-                // MARK: Send LSK transaction
-                service.sendTransaction(transaction) { result in
-                    switch result {
-                    case .success(let transactionId):
-                        // MARK: Send adm report
-                        if let reportRecipient = vc.admReportRecipient {
-                            self?.reportTransferTo(admAddress: reportRecipient, amount: amount, comments: comments, hash: transactionId)
-                        }
-                        service.update()
-                        
-                        vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-                        if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Lisk.transactionDetails) as? LskTransactionDetailsViewController {
-                            transaction.id = transactionId
-                            detailsVc.transaction = transaction
-                            detailsVc.service = service
-                            detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                            detailsVc.recipientName = self?.recipientName
-                            
-                            if comments.count > 0 {
-                                detailsVc.comment = comments
-                            }
-                            
-                            vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
-                        } else {
-                            vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
-                        }
-                    case .failure(let error):
-                        if error.message.contains("does not meet the minimum remaining balance requirement") {
-                            let localizedErrorMessage = NSLocalizedString("TransactionSend.Minimum.Balance", comment: "Transaction send: recipient minimum remaining balance requirement")
-                            vc.dialogService.showWarning(withMessage: localizedErrorMessage)
-                        } else {
-                            vc.dialogService.showRichError(error: error)
-                        }
-                    }
+        Task {
+            do {
+                // Create transaction
+                let transaction = try await service.createTransaction(recipient: recipient, amount: amount)
+                
+                // Send adm report
+                // to do: make async and wait before send message
+                if let reportRecipient = admReportRecipient,
+                   let hash = transaction.txHash {
+                    reportTransferTo(admAddress: reportRecipient, amount: amount, comments: comments, hash: hash)
                 }
                 
-            case .failure(let error):
+                // Send transaction
+                let transactionId = try await service.sendTransaction(transaction)
+                
+                Task {
+                    service.update()
+                }
+                
                 dialogService.dismissProgress()
-                dialogService.showRichError(error: error)
+                dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                
+                // Present detail VC
+                presentDetailTransactionVC(transactionId: transactionId,
+                                           transaction: transaction,
+                                           service: service,
+                                           comments: comments
+                )
+            } catch {
+                dialogService.dismissProgress()
+                if let error = error as? ApiServiceError {
+                    dialogService.showRichError(error: error)
+                }
             }
+        }
+    }
+    
+    private func presentDetailTransactionVC(transactionId: String,
+                                            transaction: TransactionEntity,
+                                            service: LskWalletService,
+                                            comments: String
+    ) {
+        if let detailsVc = router.get(scene: AdamantScene.Wallets.Lisk.transactionDetails) as? LskTransactionDetailsViewController {
+            var transaction: TransactionEntity = transaction
+            transaction.id = transactionId
+            detailsVc.transaction = transaction
+            detailsVc.service = service
+            detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+            detailsVc.recipientName = recipientName
+            
+            if comments.count > 0 {
+                detailsVc.comment = comments
+            }
+            
+            delegate?.transferViewController(self, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
+        } else {
+            delegate?.transferViewController(self, didFinishWithTransfer: transaction, detailsViewController: nil)
         }
     }
     

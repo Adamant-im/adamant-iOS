@@ -31,6 +31,7 @@ class BtcTransferViewController: TransferViewControllerBase {
     
     // MARK: Send
     
+    @MainActor
     override func sendFunds() {
         let comments: String
         if let row: TextAreaRow = form.rowBy(tag: BaseRows.comments.tag), let text = row.value {
@@ -49,48 +50,37 @@ class BtcTransferViewController: TransferViewControllerBase {
         
         dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
         
-        service.createTransaction(recipient: recipient, amount: amount) { [weak self] result in
-            guard let vc = self else {
-                dialogService.dismissProgress()
-                dialogService.showError(withMessage: String.adamantLocalized.sharedErrors.unknownError, error: nil)
-                return
-            }
-
-            switch result {
-            case .success(let transaction):
-                // MARK: 1. Send adm report
-                if let reportRecipient = vc.admReportRecipient {
-                    let hash = transaction.txID
-                    self?.reportTransferTo(admAddress: reportRecipient, amount: amount, comments: comments, hash: hash)
+        Task {
+            do {
+                let transaction = try await service.createTransaction(recipient: recipient, amount: amount)
+                
+                // Send adm report
+                // to do: make async and wait before send message
+                if let reportRecipient = admReportRecipient,
+                   let hash = transaction.txHash {
+                    reportTransferTo(admAddress: reportRecipient, amount: amount, comments: comments, hash: hash)
                 }
-
-                // MARK: 2. Send BTC transaction
-                service.sendTransaction(transaction) { result in
-                    switch result {
-                    case .success(let hash):
-                        service.update()
-
-                        service.getTransaction(by: hash) { result in
-                            switch result {
-                            case .success(let localTransaction):
-                                DispatchQueue.onMainAsync {
-                                    self?.processSuccessTransaction(vc, localTransaction: localTransaction, service: service, comments: comments, transaction: transaction)
-                                }
-                            case .failure(let error):
-                                DispatchQueue.onMainAsync {
-                                    self?.processFailureTransaction(vc, service: service, comments: comments, transaction: transaction, error: error)
-                                }
-                            }
-                        }
-
-                    case .failure(let error):
-                        vc.dialogService.showRichError(error: error)
-                    }
+                
+                // Send transaction
+                let hash = try await service.sendTransaction(transaction)
+                
+                Task {
+                    service.update()
                 }
-
-            case .failure(let error):
+                
+                do {
+                    let detailTransaction = try await service.getTransaction(by: hash)
+                    processSuccessTransaction(self, localTransaction: detailTransaction, service: service, comments: comments, transaction: transaction)
+                } catch {
+                    let error = error as? ApiServiceError
+                    processFailureTransaction(self, service: service, comments: comments, transaction: transaction, error: error)
+                }
+                dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+            } catch {
                 dialogService.dismissProgress()
-                dialogService.showRichError(error: error)
+                if let error = error as? WalletServiceError {
+                    dialogService.showRichError(error: error)
+                }
             }
         }
     }
@@ -119,7 +109,7 @@ class BtcTransferViewController: TransferViewControllerBase {
         }
     }
     
-    private func processFailureTransaction(_ vc: BtcTransferViewController, service: BtcWalletService, comments: String, transaction: TransactionDetails, error: ApiServiceError) {
+    private func processFailureTransaction(_ vc: BtcTransferViewController, service: BtcWalletService, comments: String, transaction: TransactionDetails, error: ApiServiceError?) {
         if case let .internalError(message, _) = error, message == "No transaction" {
             vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
             
@@ -143,7 +133,9 @@ class BtcTransferViewController: TransferViewControllerBase {
                 vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
             }
         } else {
-            vc.dialogService.showRichError(error: error)
+            if let error = error {
+                vc.dialogService.showRichError(error: error)
+            }
             vc.delegate?.transferViewController(vc, didFinishWithTransfer: nil, detailsViewController: nil)
         }
     }

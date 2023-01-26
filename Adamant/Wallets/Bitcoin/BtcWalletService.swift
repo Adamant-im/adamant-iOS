@@ -155,6 +155,12 @@ class BtcWalletService: WalletService {
     }
     
     func update() {
+        Task {
+            try? await update()
+        }
+    }
+    
+    func update() async throws {
         guard let wallet = btcWallet else {
             return
         }
@@ -212,16 +218,14 @@ class BtcWalletService: WalletService {
             self?.feeRate = rate
         }
 
-        getUnspentTransactions { [weak self] result in
-            guard
-                case .success(let transactions) = result,
-                let feeRate = self?.feeRate
-            else {
-                return
-            }
-
+        do {
+            let transactions = try await getUnspentTransactions()
+            let feeRate = feeRate
+            
             let fee = Decimal(transactions.count * 181 + 78) * feeRate
-            self?.transactionFee = fee / BtcWalletService.multiplier
+            transactionFee = fee / BtcWalletService.multiplier
+        } catch {
+            
         }
 
         getCurrentHeight { [weak self] result in
@@ -683,12 +687,11 @@ extension BtcWalletService {
         }
     }
 
-    func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<BtcTransaction>) -> Void) {
+    func getTransaction(by hash: String) async throws -> BtcTransaction {
         guard let address = self.wallet?.address else {
-            completion(.failure(.notLogged))
-            return
+            throw WalletServiceError.notLogged
         }
-
+        
         guard let url = BtcWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get BTC endpoint URL")
         }
@@ -702,32 +705,34 @@ extension BtcWalletService {
         let endpoint = url.appendingPathComponent(BtcApiCommands.getTransaction(by: hash))
         
         // MARK: Sending request
-        AF.request(
-            endpoint,
-            method: .get,
-            headers: headers
-        ).responseData(queue: defaultDispatchQueue) { [weak self] response in
-            guard let self = self else { return }
-
-            switch response.result {
-            case .success(let data):
-                do {
-                    let rawTransaction = try Self.jsonDecoder.decode(
-                        RawBtcTransactionResponse.self,
-                        from: data
-                    )
-                    let transaction = rawTransaction.asBtcTransaction(
-                        BtcTransaction.self,
-                        for: address,
-                        height: self.currentHeight
-                    )
-                    completion(.success(transaction))
-                } catch {
-                    completion(.failure(.internalError(message: "Unaviable transaction", error: error)))
-                }
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<BtcTransaction, Error>) in
+            AF.request(
+                endpoint,
+                method: .get,
+                headers: headers
+            ).responseData(queue: defaultDispatchQueue) { [weak self] response in
+                guard let self = self else { return }
                 
-            case .failure(let error):
-                completion(.failure(.internalError(message: "No transaction", error: error)))
+                switch response.result {
+                case .success(let data):
+                    do {
+                        let rawTransaction = try Self.jsonDecoder.decode(
+                            RawBtcTransactionResponse.self,
+                            from: data
+                        )
+                        let transaction = rawTransaction.asBtcTransaction(
+                            BtcTransaction.self,
+                            for: address,
+                            height: self.currentHeight
+                        )
+                        continuation.resume(returning: transaction)
+                    } catch {
+                        continuation.resume(throwing: WalletServiceError.internalError(message: "Unaviable transaction", error: error))
+                    }
+                    
+                case .failure(let error):
+                    continuation.resume(throwing: WalletServiceError.internalError(message: "No transaction", error: error))
+                }
             }
         }
     }

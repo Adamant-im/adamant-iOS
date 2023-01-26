@@ -35,7 +35,7 @@ public struct TransactionOutput {
     /// Usually contains the public key as a Bitcoin script setting up conditions to claim this output
     public let lockingScript: Data
     
-    public var address: String?
+    public var addresses: [String]?
 
     public func scriptCode() -> Data {
         var data = Data()
@@ -47,24 +47,36 @@ public struct TransactionOutput {
     public init(value: UInt64, lockingScript: Data) {
         self.value = value
         self.lockingScript = lockingScript
+        self.addresses = []
+    }
+    
+    public init(value: UInt64, lockingScript: Data, addresses: [String]) {
+        self.value = value
+        self.lockingScript = lockingScript
+        self.addresses = addresses
     }
 
     public init() {
-        self.init(value: 0, lockingScript: Data())
+        self.init(value: 0, lockingScript: Data(), addresses: [])
     }
 
     public func serialized() -> Data {
+        let adressesData = (try? JSONSerialization.data(withJSONObject: addresses ?? [], options: [])) ?? Data()
         var data = Data()
         data += value
+     //   data += adressesData ?? Data()
         data += scriptLength.serialized()
         data += lockingScript
+//        data += adressesData.count
+//        data += adressesData
         return data
     }
     
     public mutating func unpack(with network: Network) {
         if Script.isPublicKeyHashOut(self.lockingScript) {
             let pubKeyHash = Script.getPublicKeyHash(from: self.lockingScript)
-            address = BitcoinKitHelpers.publicKeyToAddress(from: (Data([network.pubkeyhash]) + pubKeyHash))
+         //   address = BitcoinKitHelpers.publicKeyToAddress(from: (Data([network.pubkeyhash]) + pubKeyHash))
+   //         print("unpuck adresses=", addresses)
         }
     }
 
@@ -72,6 +84,8 @@ public struct TransactionOutput {
         let value = byteStream.read(UInt64.self)
         let scriptLength = byteStream.read(VarInt.self)
         let lockingScript = byteStream.read(Data.self, count: Int(scriptLength.underlyingValue))
-        return TransactionOutput(value: value, lockingScript: lockingScript)
+       // let addresessLength = byteStream.read(Int.self)
+        //let addresess = byteStream.read([String].self, count: 1)
+        return TransactionOutput(value: value, lockingScript: lockingScript, addresses: [])
     }
 }

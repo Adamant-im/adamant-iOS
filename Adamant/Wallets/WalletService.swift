@@ -287,8 +287,8 @@ protocol WalletServiceSimpleSend: WalletServiceWithSend {
 protocol WalletServiceTwoStepSend: WalletServiceWithSend {
     associatedtype T: RawTransaction
     
-    func createTransaction(recipient: String, amount: Decimal, completion: @escaping (WalletServiceResult<T>) -> Void)
-    func sendTransaction(_ transaction: T, completion: @escaping (WalletServiceResult<String>) -> Void)
+    func createTransaction(recipient: String, amount: Decimal) async throws -> T
+    func sendTransaction(_ transaction: T) async throws -> String
 }
 
 protocol RawTransaction {

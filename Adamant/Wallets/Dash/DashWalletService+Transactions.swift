@@ -34,12 +34,19 @@ extension DashWalletService {
             completion(.success(.init(total: transatrionsIds.count, transactions: [], hasMore: false)))
             return
         }
-        getTransaction(by: id) {
-            self.handleTransactionResponse(id: id, $0, completion)
+        Task {
+            do {
+                let transaction = try await getTransaction(by: id)
+                handleTransactionResponse(id: id, .success(transaction), completion)
+            } catch {
+                let error = error as? WalletServiceError
+                let errorApi = ApiServiceError.internalError(message: error?.message ?? "", error: error)
+                handleTransactionResponse(id: id, .failure(errorApi), completion)
+            }
         }
     }
 
-    func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<BTCRawTransaction>) -> Void) {
+    func getTransaction(by hash: String) async throws -> BTCRawTransaction {
         guard let endpoint = DashWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DASH endpoint URL")
         }
@@ -57,22 +64,24 @@ extension DashWalletService {
         ]
 
         // MARK: Sending request
-        AF.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseData(queue: defaultDispatchQueue) { response in
-            switch response.result {
-            case .success(let data):
-                do {
-                    let result = try DashWalletService.jsonDecoder.decode(BTCRPCServerResponce<BTCRawTransaction>.self, from: data)
-                    if let transaction = result.result {
-                        completion(.success(transaction))
-                    } else {
-                        completion(.failure(.internalError(message: "Unaviable transaction", error: nil)))
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<BTCRawTransaction, Error>) in
+            AF.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseData(queue: defaultDispatchQueue) { response in
+                switch response.result {
+                case .success(let data):
+                    do {
+                        let result = try DashWalletService.jsonDecoder.decode(BTCRPCServerResponce<BTCRawTransaction>.self, from: data)
+                        if let transaction = result.result {
+                            continuation.resume(returning: transaction)
+                        } else {
+                            continuation.resume(throwing: WalletServiceError.internalError(message: "Unaviable transaction", error: nil))
+                        }
+                    } catch {
+                        continuation.resume(throwing: WalletServiceError.internalError(message: "Unaviable transaction", error: error))
                     }
-                } catch {
-                    completion(.failure(.internalError(message: "Unaviable transaction", error: error)))
+                    
+                case .failure(let error):
+                    continuation.resume(throwing: WalletServiceError.internalError(message: "No transaction", error: error))
                 }
-
-            case .failure(let error):
-                completion(.failure(.internalError(message: "No transaction", error: error)))
             }
         }
     }
@@ -116,14 +125,13 @@ extension DashWalletService {
         }
     }
 
-    func getUnspentTransactions(_ completion: @escaping (ApiServiceResult<[UnspentTransaction]>) -> Void) {
+    func getUnspentTransactions() async throws -> [UnspentTransaction] {
         guard let endpoint = DashWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DASH endpoint URL")
         }
         
         guard let wallet = self.dashWallet else {
-            completion(.failure(.internalError(message: "DASH Wallet not found", error: nil)))
-            return
+            throw WalletServiceError.internalError(message: "DASH Wallet not found", error: nil)
         }
         
         // Headers
@@ -139,25 +147,27 @@ extension DashWalletService {
         ]
         
         // MARK: Sending request
-        AF.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseData(queue: defaultDispatchQueue) { response in
-            
-            switch response.result {
-            case .success(let data):
-                do {
-                    let response = try DashWalletService.jsonDecoder.decode(BTCRPCServerResponce<[DashUnspentTransaction]>.self, from: data)
-                    
-                    if let result = response.result {
-                        let transactions = result.map { $0.asUnspentTransaction(with: wallet.publicKey.toCashaddr().data) }
-                        completion(.success(transactions))
-                    } else if let error = response.error?.message {
-                        completion(.failure(.internalError(message: error, error: nil)))
-                    }
-                } catch {
-                    completion(.failure(.internalError(message: "DASH Wallet: not a valid response", error: error)))
-                }
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<[UnspentTransaction], Error>) in
+            AF.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseData(queue: defaultDispatchQueue) { response in
                 
-            case .failure(let error):
-                completion(.failure(.internalError(message: "DASH Wallet: server not responding", error: error)))
+                switch response.result {
+                case .success(let data):
+                    do {
+                        let response = try DashWalletService.jsonDecoder.decode(BTCRPCServerResponce<[DashUnspentTransaction]>.self, from: data)
+                        
+                        if let result = response.result {
+                            let transactions = result.map { $0.asUnspentTransaction(with: wallet.publicKey.toCashaddr().data) }
+                            continuation.resume(returning: transactions)
+                        } else if let error = response.error?.message {
+                            continuation.resume(throwing: WalletServiceError.internalError(message: error, error: nil))
+                        }
+                    } catch {
+                        continuation.resume(throwing: WalletServiceError.internalError(message: "DASH Wallet: not a valid response", error: error))
+                    }
+                    
+                case .failure(let error):
+                    continuation.resume(throwing: WalletServiceError.internalError(message: "DASH Wallet: server not responding", error: error))
+                }
             }
         }
     }

@@ -27,7 +27,7 @@ import Foundation
 public struct MockHelper {
 
     public static func createUtxo(lockScript: Script) -> UnspentTransaction {
-        let outputMock = TransactionOutput(value: 100_000_000, lockingScript: lockScript.data)
+        let outputMock = TransactionOutput(value: 100_000_000, lockingScript: lockScript.data, addresses: [])
         let outpointMock = TransactionOutPoint(hash: Data(), index: 0)
         return UnspentTransaction(output: outputMock, outpoint: outpointMock)
     }
@@ -51,8 +51,8 @@ public struct MockHelper {
         let lockingScriptChange = Script(address: changeAddress)!
 
         // 2-3. TransactionOutput
-        let toOutput = TransactionOutput(value: amount, lockingScript: lockingScriptTo.data)
-        let changeOutput = TransactionOutput(value: change, lockingScript: lockingScriptChange.data)
+        let toOutput = TransactionOutput(value: amount, lockingScript: lockingScriptTo.data, addresses: [toAddress.base58])
+        let changeOutput = TransactionOutput(value: change, lockingScript: lockingScriptChange.data, addresses: [changeAddress.base58])
 
         // 3. Tx
         let tx = Transaction(version: 1, inputs: unsignedInputs, outputs: [toOutput, changeOutput], lockTime: 0)

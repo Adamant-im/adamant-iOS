@@ -499,14 +499,13 @@ extension DogeWalletService {
         }
     }
     
-    func getUnspentTransactions(_ completion: @escaping (ApiServiceResult<[UnspentTransaction]>) -> Void) {
+    func getUnspentTransactions() async throws -> [UnspentTransaction] {
         guard let url = DogeWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DOGE endpoint URL")
         }
         
         guard let wallet = self.dogeWallet else {
-            completion(.failure(.notLogged))
-            return
+            throw WalletServiceError.notLogged
         }
         
         let address = wallet.address
@@ -524,42 +523,44 @@ extension DogeWalletService {
         ]
         
         // MARK: Sending request
-        AF.request(endpoint, method: .get, parameters: parameters, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
-            switch response.result {
-            case .success(let data):
-                guard let items = data as? [[String: Any]] else {
-                    completion(.failure(.internalError(message: "DOGE Wallet: not valid response", error: nil)))
-                    break
-                }
-                
-                var utxos = [UnspentTransaction]()
-                for item in items {
-                    guard
-                        let txid = item["txid"] as? String,
-                        let confirmations = item["confirmations"] as? NSNumber,
-                        confirmations.intValue > 0,
-                        let vout = item["vout"] as? NSNumber,
-                        let amount = item["amount"] as? NSNumber else {
-                        continue
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<[UnspentTransaction], Error>) in
+            AF.request(endpoint, method: .get, parameters: parameters, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
+                switch response.result {
+                case .success(let data):
+                    guard let items = data as? [[String: Any]] else {
+                        continuation.resume(throwing: WalletServiceError.internalError(message: "DOGE Wallet: not valid response", error: nil))
+                        break
                     }
+                    
+                    var utxos = [UnspentTransaction]()
+                    for item in items {
+                        guard
+                            let txid = item["txid"] as? String,
+                            let confirmations = item["confirmations"] as? NSNumber,
+                            confirmations.intValue > 0,
+                            let vout = item["vout"] as? NSNumber,
+                            let amount = item["amount"] as? NSNumber else {
+                            continue
+                        }
                         
-                    let value = NSDecimalNumber(decimal: (amount.decimalValue * DogeWalletService.multiplier)).uint64Value
+                        let value = NSDecimalNumber(decimal: (amount.decimalValue * DogeWalletService.multiplier)).uint64Value
+                        
+                        let lockScript = Script.buildPublicKeyHashOut(pubKeyHash: wallet.publicKey.toCashaddr().data)
+                        let txHash = Data(hex: txid).map { Data($0.reversed()) } ?? Data()
+                        let txIndex = vout.uint32Value
+                        
+                        let unspentOutput = TransactionOutput(value: value, lockingScript: lockScript)
+                        let unspentOutpoint = TransactionOutPoint(hash: txHash, index: txIndex)
+                        let utxo = UnspentTransaction(output: unspentOutput, outpoint: unspentOutpoint)
+                        
+                        utxos.append(utxo)
+                    }
                     
-                    let lockScript = Script.buildPublicKeyHashOut(pubKeyHash: wallet.publicKey.toCashaddr().data)
-                    let txHash = Data(hex: txid).map { Data($0.reversed()) } ?? Data()
-                    let txIndex = vout.uint32Value
+                    continuation.resume(returning: utxos)
                     
-                    let unspentOutput = TransactionOutput(value: value, lockingScript: lockScript)
-                    let unspentOutpoint = TransactionOutPoint(hash: txHash, index: txIndex)
-                    let utxo = UnspentTransaction(output: unspentOutput, outpoint: unspentOutpoint)
-                    
-                    utxos.append(utxo)
+                case .failure:
+                    continuation.resume(throwing: WalletServiceError.internalError(message: "DOGE Wallet: server not response", error: nil))
                 }
-                
-                completion(.success(utxos))
-                
-            case .failure:
-                completion(.failure(.internalError(message: "DOGE Wallet: server not response", error: nil)))
             }
         }
     }

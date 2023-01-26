@@ -75,6 +75,7 @@ public struct Transaction {
     }
     
     public mutating func unpack(with network: Network) {
+        print("unpack")
         for index in 0..<inputs.count {
             inputs[index].unpack(with: network)
         }
@@ -84,11 +85,11 @@ public struct Transaction {
         }
     }
     
-    public func isLinked(to address: Cashaddr) -> Bool {
-        let hash = address.base58
-        return inputs.filter { input -> Bool in input.address == hash }.count > 0
-            || outputs.filter { output -> Bool in output.address == hash }.count > 0
-    }
+//    public func isLinked(to address: Cashaddr) -> Bool {
+//        let hash = address.base58
+//        return inputs.filter { input -> Bool in input.address == hash }.count > 0
+//            || outputs.filter { output -> Bool in output.address == hash }.count > 0
+//    }
 
     public func isCoinbase() -> Bool {
         return inputs.count == 1 && inputs[0].isCoinbase()
@@ -117,8 +118,13 @@ public struct Transaction {
     
     static public func createNewTransaction(toAddress: Address, amount: UInt64, fee: UInt64, changeAddress: Address, utxos: [UnspentTransaction], lockTime: UInt32 = 0, keys:  [PrivateKey]) -> Transaction {
         let unsignedTx = createUnsignedTx(toAddress: toAddress, amount: amount, fee: fee, changeAddress: changeAddress, utxos: utxos, lockTime: 0)
-        let signedTransaction = signTx(unsignedTx: unsignedTx, keys: keys)
         
+        print("unsignedTx outputs=", unsignedTx.tx.outputs)
+        print("unsignedHEX=", unsignedTx.tx.serialized().hex)
+        print("unsignedHEX deser=", Transaction.deserialize(unsignedTx.tx.serialized()))
+        
+        let signedTransaction = signTx(unsignedTx: unsignedTx, keys: keys)
+        print("signedTransactionTx outputs =", signedTransaction.outputs)
         return signedTransaction
     }
     
@@ -152,9 +158,9 @@ public struct Transaction {
         let lockingScriptChange = Script.buildPublicKeyHashOut(pubKeyHash: changePubkeyHash)
         
         var outputs = [TransactionOutput]()
-        outputs.append(TransactionOutput(value: amount, lockingScript: lockingScriptTo))
+        outputs.append(TransactionOutput(value: amount, lockingScript: lockingScriptTo, addresses: [toAddress.base58]))
         if change > 0 {
-            outputs.append(TransactionOutput(value: change, lockingScript: lockingScriptChange))
+            outputs.append(TransactionOutput(value: change, lockingScript: lockingScriptChange, addresses: [changeAddress.base58]))
         }
         
         let unsignedInputs = utxos.map { TransactionInput(previousOutput: $0.outpoint, signatureScript: Data(), sequence: UInt32.max) }
