@@ -145,11 +145,8 @@ public struct Transaction {
         let totalAmount: UInt64 = UInt64(utxos.reduce(0) { $0 + $1.output.value })
         let change: UInt64 = totalAmount - amount - fee
         
-        let toPubKeyHash: Data = toAddress.data
-        let changePubkeyHash: Data = changeAddress.data
-        
-        let lockingScriptTo = Script.buildPublicKeyHashOut(pubKeyHash: toPubKeyHash)
-        let lockingScriptChange = Script.buildPublicKeyHashOut(pubKeyHash: changePubkeyHash)
+        let lockingScriptTo = toAddress.lockingScript
+        let lockingScriptChange = changeAddress.lockingScript
         
         var outputs = [TransactionOutput]()
         outputs.append(TransactionOutput(value: amount, lockingScript: lockingScriptTo))

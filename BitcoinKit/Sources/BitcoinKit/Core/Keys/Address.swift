@@ -252,3 +252,17 @@ extension Cashaddr: CustomStringConvertible {
         return cashaddr
     }
 }
+
+extension AddressProtocol {
+    public var lockingScript: Data {
+        switch type {
+        case .pubkeyHash:
+            return Script.buildPublicKeyHashOut(pubKeyHash: data)
+        case .scriptHash:
+            return Script.buildScriptHashOut(scriptHash: data)
+        default:
+            assertionFailure("Unknown type")
+            return .init()
+        }
+    }
+}
