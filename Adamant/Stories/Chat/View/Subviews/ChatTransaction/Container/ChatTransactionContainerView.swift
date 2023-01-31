@@ -102,6 +102,12 @@ private extension ChatTransactionContainerView {
     }
 }
 
+extension ChatTransactionContainerView.Model {
+    func height(for width: CGFloat) -> CGFloat {
+        content.height(for: width)
+    }
+}
+
 private extension TransactionStatus {
     var image: UIImage {
         switch self {

@@ -17,13 +17,13 @@ final class ChatTransactionContentView: UIView {
         }
     }
     
-    private let titleLabel = UILabel(font: .systemFont(ofSize: 17), textColor: .adamant.textColor)
+    private let titleLabel = UILabel(font: titleFont, textColor: .adamant.textColor)
     private let amountLabel = UILabel(font: .systemFont(ofSize: 24), textColor: .adamant.textColor)
     private let currencyLabel = UILabel(font: .systemFont(ofSize: 20), textColor: .adamant.textColor)
-    private let dateLabel = UILabel(font: .systemFont(ofSize: 16), textColor: .adamant.textColor)
+    private let dateLabel = UILabel(font: dateFont, textColor: .adamant.textColor)
     
     private let commentLabel = UILabel(
-        font: .systemFont(ofSize: 14),
+        font: commentFont,
         textColor: .adamant.textColor,
         numberOfLines: .zero
     )
@@ -39,7 +39,7 @@ final class ChatTransactionContentView: UIView {
         view.addSubview(iconView)
         iconView.snp.makeConstraints {
             $0.top.bottom.leading.equalToSuperview()
-            $0.size.equalTo(55)
+            $0.size.equalTo(iconSize)
         }
         
         view.addSubview(amountLabel)
@@ -61,7 +61,7 @@ final class ChatTransactionContentView: UIView {
     private lazy var verticalStack: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [titleLabel, moneyInfoView, dateLabel, commentLabel])
         stack.axis = .vertical
-        stack.spacing = 6
+        stack.spacing = verticalStackSpacing
         return stack
     }()
     
@@ -76,6 +76,42 @@ final class ChatTransactionContentView: UIView {
     }
 }
 
+extension ChatTransactionContentView.Model {
+    func height(for width: CGFloat) -> CGFloat {
+        let maxSize = CGSize(width: width, height: .infinity)
+        let titleString = NSAttributedString(string: title, attributes: [.font: titleFont])
+        let dateString = NSAttributedString(string: date, attributes: [.font: titleFont])
+        let commentString = comment.map {
+            NSAttributedString(string: $0, attributes: [.font: titleFont])
+        }
+        
+        let titleHeight = titleString.boundingRect(
+            with: maxSize,
+            options: .usesLineFragmentOrigin,
+            context: nil
+        ).height
+        
+        let dateHeight = dateString.boundingRect(
+            with: maxSize,
+            options: .usesLineFragmentOrigin,
+            context: nil
+        ).height
+        
+        let commentHeight: CGFloat = commentString?.boundingRect(
+            with: maxSize,
+            options: .usesLineFragmentOrigin,
+            context: nil
+        ).height ?? .zero
+        
+        return verticalInsets * 2
+            + verticalStackSpacing * 3
+            + iconSize
+            + titleHeight
+            + dateHeight
+            + commentHeight
+    }
+}
+
 private extension ChatTransactionContentView {
     func configure() {
         layer.cornerRadius = 16
@@ -87,7 +123,7 @@ private extension ChatTransactionContentView {
         
         addSubview(verticalStack)
         verticalStack.snp.makeConstraints {
-            $0.top.bottom.equalToSuperview().inset(8)
+            $0.top.bottom.equalToSuperview().inset(verticalInsets)
             $0.leading.trailing.equalToSuperview().inset(12)
         }
     }
@@ -107,3 +143,10 @@ private extension ChatTransactionContentView {
         model.action.action()
     }
 }
+
+private let titleFont = UIFont.systemFont(ofSize: 17)
+private let dateFont = UIFont.systemFont(ofSize: 16)
+private let commentFont = UIFont.systemFont(ofSize: 14)
+private let iconSize: CGFloat = 55
+private let verticalStackSpacing: CGFloat = 6
+private let verticalInsets: CGFloat = 8
