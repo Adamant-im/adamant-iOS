@@ -14,7 +14,7 @@ final class ChatDataSourceManager: MessagesDataSource {
     private let viewModel: ChatViewModel
     
     var currentSender: SenderType {
-        viewModel.sender.value
+        viewModel.sender
     }
     
     init(viewModel: ChatViewModel) {
@@ -22,14 +22,14 @@ final class ChatDataSourceManager: MessagesDataSource {
     }
     
     func numberOfSections(in messagesCollectionView: MessagesCollectionView) -> Int {
-        viewModel.messages.value.count
+        viewModel.messages.count
     }
     
     func messageForItem(
         at indexPath: IndexPath,
         in messagesCollectionView: MessagesCollectionView
     ) -> MessageType {
-        viewModel.messages.value[indexPath.section]
+        viewModel.messages[indexPath.section]
     }
     
     func messageTopLabelAttributedText(
@@ -51,7 +51,7 @@ final class ChatDataSourceManager: MessagesDataSource {
         for message: MessageType,
         at _: IndexPath
     ) -> NSAttributedString? {
-        message.fullModel.bottomString
+        message.fullModel.bottomString?.string
     }
     
     func cellTopLabelAttributedText(
@@ -79,10 +79,13 @@ final class ChatDataSourceManager: MessagesDataSource {
             ChatViewController.TransactionCell.self,
             for: indexPath
         )
-        
-        viewModel.updateTransactionStatusIfNeeded(id: message.messageId)
+    
+        viewModel.loadTransactionStatusIfNeeded(id: message.messageId)
         cell.wrappedView.model = message.fullModel.makeTransactionViewModel(
             currentSender: currentSender,
+            status: viewModel.$transactionStatuses
+                .map { $0[message.messageId] ?? .notInitiated }
+                .eraseToAnyPublisher(),
             onTap: { [didTapTransfer = viewModel.didTapTransfer] in
                 didTapTransfer.send(message.messageId)
             }
@@ -94,6 +97,7 @@ final class ChatDataSourceManager: MessagesDataSource {
 extension ChatMessage {
     func makeTransactionViewModel(
         currentSender: SenderType,
+        status: AnyObservable<TransactionStatus>?,
         onTap: @escaping () -> Void
     ) -> ChatTransactionContainerView.Model {
         guard case let .transaction(model) = content else {
@@ -103,7 +107,6 @@ extension ChatMessage {
         
         return .init(
             isFromCurrentSender: sender.senderId == currentSender.senderId,
-            status: model.status,
             content: .init(
                 title: sender.senderId == currentSender.senderId
                     ? .adamantLocalized.chat.transactionSent
@@ -115,7 +118,10 @@ extension ChatMessage {
                 comment: model.comment,
                 backgroundColor: getBackgroundColor(currentSender: currentSender),
                 action: .init(action: onTap)
-            )
+            ),
+            status: status.map {
+                .init(id: messageId, status: $0)
+            }
         )
     }
 }

@@ -25,6 +25,7 @@ final class ChatViewController: MessagesViewController {
     private var bottomMessageId: String?
     private var messagesLoaded = false
     private var isScrollPositionNearlyTheBottom = true
+    private var viewAppeared = false
     
     let viewModel: ChatViewModel
     
@@ -65,12 +66,15 @@ final class ChatViewController: MessagesViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .adamant.backgroundColor
+        messagesCollectionView.backgroundColor = .adamant.backgroundColor
+        messagesCollectionView.backgroundView?.backgroundColor = .adamant.backgroundColor
+        chatMessagesCollectionView.fixedBottomOffset = .zero
         maintainPositionOnInputBarHeightChanged = true
         configureMessageActions()
         configureHeader()
         configureLayout()
         setupObservers()
-        viewModel.loadFirstMessages()
+        viewModel.loadFirstMessagesIfNeeded()
     }
     
     override func viewWillLayoutSubviews() {
@@ -89,6 +93,8 @@ final class ChatViewController: MessagesViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         inputBar.isUserInteractionEnabled = true
+        chatMessagesCollectionView.fixedBottomOffset = nil
+        viewAppeared = true
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -102,7 +108,7 @@ final class ChatViewController: MessagesViewController {
         viewModel.saveChatOffset(
             isScrollPositionNearlyTheBottom
                 ? nil
-                : messagesCollectionView.contentOffset.y
+                : chatMessagesCollectionView.bottomOffset
         )
     }
     
@@ -163,28 +169,28 @@ private extension ChatViewController {
             .sink { [weak self] _ in self?.inputTextUpdated() }
             .store(in: &subscriptions)
         
-        viewModel.messages
+        viewModel.$messages
             .removeDuplicates()
-            .combineLatest(viewModel.sender.removeDuplicates())
+            .combineLatest(viewModel.$sender.removeDuplicates())
             .sink { [weak self] _ in self?.updateMessages() }
             .store(in: &subscriptions)
         
-        viewModel.loadingStatus
+        viewModel.$loadingStatus
             .removeDuplicates()
             .sink { [weak self] _ in self?.updateLoadingViews() }
             .store(in: &subscriptions)
         
-        viewModel.inputText
+        viewModel.$inputText
             .removeDuplicates()
             .assign(to: \.text, on: inputBar)
             .store(in: &subscriptions)
         
-        viewModel.isSendingAvailable
+        viewModel.$isSendingAvailable
             .removeDuplicates()
             .assign(to: \.isEnabled, on: inputBar)
             .store(in: &subscriptions)
         
-        viewModel.fee
+        viewModel.$fee
             .removeDuplicates()
             .assign(to: \.fee, on: inputBar)
             .store(in: &subscriptions)
@@ -193,7 +199,7 @@ private extension ChatViewController {
             .sink { [weak self] in self?.didTapTransfer(id: $0) }
             .store(in: &subscriptions)
         
-        viewModel.partnerName
+        viewModel.$partnerName
             .removeDuplicates()
             .assign(to: \.title, on: navigationItem)
             .store(in: &subscriptions)
@@ -258,12 +264,11 @@ private extension ChatViewController {
     
     func updateMessages() {
         defer { checkIsChatWasRead() }
-        reloadMessagesCollection(previousTopMessageId: topMessageId)
+        chatMessagesCollectionView.reloadData(newModels: viewModel.messages)
         scrollDownOnNewMessageIfNeeded(previousBottomMessageId: bottomMessageId)
-        topMessageId = viewModel.messages.value.first?.messageId
-        bottomMessageId = viewModel.messages.value.last?.messageId
+        bottomMessageId = viewModel.messages.last?.messageId
         
-        guard !messagesLoaded, !viewModel.messages.value.isEmpty else { return }
+        guard !messagesLoaded, !viewModel.messages.isEmpty else { return }
         viewModel.startPosition.map { setupStartPosition($0) }
         messagesLoaded = true
     }
@@ -274,7 +279,7 @@ private extension ChatViewController {
     }
     
     func updateFullscreenLoadingView() {
-        let isLoading = viewModel.loadingStatus.value == .fullscreen
+        let isLoading = viewModel.loadingStatus == .fullscreen
         loadingView.isHidden = !isLoading
         
         if isLoading {
@@ -288,7 +293,7 @@ private extension ChatViewController {
         guard messagesCollectionView.numberOfSections > .zero else { return }
         
         UIView.performWithoutAnimation {
-            switch viewModel.loadingStatus.value {
+            switch viewModel.loadingStatus {
             case .onTop:
                 messagesCollectionView.reloadSections(.init(integer: .zero))
             case .fullscreen, .none:
@@ -316,7 +321,6 @@ private extension ChatViewController {
     
     func makeChatMessagesCollectionView() -> ChatMessagesCollectionView<ChatMessage> {
         let collection = ChatMessagesCollectionView<ChatMessage>()
-        collection.backgroundColor = .adamant.backgroundColor
         collection.register(TransactionCell.self)
         collection.register(
             SpinnerCell.self,
@@ -346,11 +350,13 @@ private extension ChatViewController {
     }
     
     func setupStartPosition(_ position: ChatStartPosition) {
+        chatMessagesCollectionView.fixedBottomOffset = nil
+        
         switch position {
         case let .offset(offset):
-            chatMessagesCollectionView.setVerticalContentOffset(offset)
+            chatMessagesCollectionView.setBottomOffset(offset, safely: viewAppeared)
         case let .messageId(id):
-            guard let index = viewModel.messages.value.firstIndex(where: { $0.messageId == id})
+            guard let index = viewModel.messages.firstIndex(where: { $0.messageId == id})
             else { return }
             
             messagesCollectionView.scrollToItem(
@@ -359,29 +365,24 @@ private extension ChatViewController {
                 animated: false
             )
         }
+        
+        guard !viewAppeared else { return }
+        chatMessagesCollectionView.fixedBottomOffset = chatMessagesCollectionView.bottomOffset
     }
     
     func scrollDownOnNewMessageIfNeeded(previousBottomMessageId: String?) {
-        let messages = viewModel.messages.value
+        let messages = viewModel.messages
         
         guard
             let previousBottomMessageId = previousBottomMessageId,
             let index = messages.firstIndex(where: { $0.id == previousBottomMessageId }),
             index < messages.count - 1,
             isScrollPositionNearlyTheBottom
-                || messages.last?.sender.senderId == viewModel.sender.value.senderId
+                || messages.last?.sender.senderId == viewModel.sender.senderId
                 && messages.last?.status == .pending
         else { return }
         
         messagesCollectionView.scrollToLastItem()
-    }
-    
-    func reloadMessagesCollection(previousTopMessageId: String?) {
-        if previousTopMessageId == viewModel.messages.value.first?.messageId {
-            messagesCollectionView.reloadData()
-        } else {
-            chatMessagesCollectionView.reloadDataWithFixedBottom()
-        }
     }
     
     @objc func showMenu(_ sender: UIBarButtonItem) {
@@ -389,7 +390,7 @@ private extension ChatViewController {
     }
     
     func inputTextUpdated() {
-        viewModel.inputText.value = inputBar.text
+        viewModel.inputText = inputBar.text
     }
     
     func didTapTransfer(id: String) {

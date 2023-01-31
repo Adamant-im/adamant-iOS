@@ -211,6 +211,7 @@ protocol ChatsProvider: DataProvider {
     func blockChat(with address: String)
     func removeMessage(with id: String)
     func updateStatus(for transaction: RichMessageTransaction)
+    func markChatAsRead(chatroom: Chatroom)
     
     // MARK: - Unconfirmed Transaction
     func addUnconfirmed(transactionId: UInt64, managedObjectId: NSManagedObjectID)

@@ -86,8 +86,9 @@ private extension ChatInputBar {
     }
     
     func configure() {
-        separatorLine.backgroundColor = .adamant.chatInputBarBorderColor
+        backgroundColor = .adamant.chatInputBarBackground
         backgroundView.backgroundColor = .adamant.chatInputBarBackground
+        separatorLine.backgroundColor = .adamant.chatInputBarBorderColor
         
         configureLayout()
         configureSendButton()

@@ -35,7 +35,7 @@ struct ChatMessageFactory {
                 sentDate: sentDate,
                 status: status,
                 expireDate: &expireDate
-            )
+            ).map { .init(string: $0) }
         )
     }
 }
@@ -65,8 +65,7 @@ private extension ChatMessageFactory {
             icon: richMessageProviders[transfer.type]?.tokenLogo ?? .init(),
             amount: transfer.amount,
             currency: richMessageProviders[transfer.type]?.tokenSymbol ?? "",
-            comment: transfer.comments,
-            status: transaction.transactionStatus ?? .notInitiated
+            comment: transfer.comments
         ))
     }
     
@@ -75,8 +74,7 @@ private extension ChatMessageFactory {
             icon: AdmWalletService.currencyLogo,
             amount: (transaction.amount ?? .zero) as Decimal,
             currency: AdmWalletService.currencySymbol,
-            comment: transaction.comment,
-            status: transaction.statusEnum.toTransactionStatus()
+            comment: transaction.comment
         ))
     }
     

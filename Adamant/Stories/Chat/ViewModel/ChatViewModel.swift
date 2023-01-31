@@ -22,34 +22,31 @@ final class ChatViewModel: NSObject {
     
     // MARK: Properties
     
-    private let _sender = ObservableProperty(ChatSender.default)
-    private let _messages = ObservableProperty([ChatMessage]())
-    private let _loadingStatus = ObservableProperty<ChatLoadingStatus?>(nil)
-    private let _isSendingAvailable = ObservableProperty(false)
-    private let _fee = ObservableProperty("")
-    private let _partnerName = ObservableProperty<String?>(nil)
-    private let _closeScreen = ObservableSender<Void>()
-    
     private weak var preservationDelegate: ChatPreservationDelegate?
     private var controller: NSFetchedResultsController<ChatTransaction>?
     private var subscriptions = Set<AnyCancellable>()
     private var timerSubscription: AnyCancellable?
+    private var messageIdToShow: String?
     
     private(set) var chatroom: Chatroom?
     private(set) var chatTransactions: [ChatTransaction] = []
-    private var messageIdToShow: String?
     
-    let inputText = ObservableProperty("")
     let didTapTransfer = ObservableSender<String>()
     let dialog = ObservableSender<ChatDialog>()
     
-    var sender: ObservableVariable<ChatSender> { _sender.eraseToGetter() }
-    var messages: ObservableVariable<[ChatMessage]> { _messages.eraseToGetter() }
-    var loadingStatus: ObservableVariable<ChatLoadingStatus?> { _loadingStatus.eraseToGetter() }
-    var isSendingAvailable: ObservableVariable<Bool> { _isSendingAvailable.eraseToGetter() }
-    var fee: ObservableVariable<String> { _fee.eraseToGetter() }
-    var partnerName: ObservableVariable<String?> { _partnerName.eraseToGetter() }
-    var closeScreen: Observable<Void> { _closeScreen.eraseToAnyPublisher() }
+    private let _closeScreen = ObservableSender<Void>()
+    var closeScreen: some Observable<Void> { _closeScreen }
+    
+    @ObservableValue private(set) var loadingStatus: ChatLoadingStatus?
+    @ObservableValue private(set) var sender = ChatSender.default
+    @ObservableValue private(set) var messages = [ChatMessage]()
+    @ObservableValue private(set) var isSendingAvailable = false
+    @ObservableValue private(set) var fee = ""
+    @ObservableValue private(set) var partnerName: String?
+    @ObservableValue var inputText = ""
+    
+    /// Its needed to avoid cells resizing during content update
+    @ObservableValue private(set) var transactionStatuses = [String: TransactionStatus]()
     
     var startPosition: ChatStartPosition? {
         if let messageIdToShow = messageIdToShow {
@@ -101,26 +98,26 @@ final class ChatViewModel: NSObject {
         self.preservationDelegate = preservationDelegate
         controller = chatsProvider.getChatController(for: chatroom)
         controller?.delegate = self
-        _isSendingAvailable.value = !chatroom.isReadonly
+        isSendingAvailable = !chatroom.isReadonly
         messageIdToShow = messageToShow?.chatMessageId
         updateTitle()
         
         if let account = account {
-            _sender.value = .init(senderId: account.address, displayName: account.address)
+            sender = .init(senderId: account.address, displayName: account.address)
         }
         
         if let partnerAddress = chatroom.partner?.address {
             preservationDelegate?.getPreservedMessageFor(
                 address: partnerAddress,
                 thenRemoveIt: true
-            ).map { inputText.value = $0 }
+            ).map { inputText = $0 }
         }
     }
     
-    func loadFirstMessages() {
+    func loadFirstMessagesIfNeeded() {
         guard let address = chatroom?.partner?.address else { return }
         
-        if address == AdamantContacts.adamantWelcomeWallet.name {
+        if address == AdamantContacts.adamantWelcomeWallet.name || chatsProvider.isChatLoaded[address] == true {
             updateTransactions(performFetch: true)
         } else {
             loadMessages(address: address, offset: .zero, loadingStatus: .fullscreen)
@@ -130,18 +127,18 @@ final class ChatViewModel: NSObject {
     func loadMoreMessagesIfNeeded() {
         guard
             let address = chatroom?.partner?.address,
-            chatsProvider.chatMaxMessages[address] ?? .zero > messages.value.count
+            chatsProvider.chatMaxMessages[address] ?? .zero > messages.count
         else { return }
         
-        loadMessages(address: address, offset: messages.value.count, loadingStatus: .onTop)
+        loadMessages(address: address, offset: messages.count, loadingStatus: .onTop)
     }
     
     func isNeedToDisplayDateHeader(sentDate: Date, index: Int) -> Bool {
         guard sentDate != .adamantNullDate else { return false }
         guard index > .zero else { return true }
         
-        let timeIntervalFromLastMessage = messages.value[index].sentDate
-            .timeIntervalSince(messages.value[index - 1].sentDate)
+        let timeIntervalFromLastMessage = messages[index].sentDate
+            .timeIntervalSince(messages[index - 1].sentDate)
         
         return timeIntervalFromLastMessage >= dateHeaderTimeInterval
     }
@@ -167,7 +164,7 @@ final class ChatViewModel: NSObject {
         }
     }
     
-    func updateTransactionStatusIfNeeded(id: String) {
+    func loadTransactionStatusIfNeeded(id: String) {
         guard
             let transaction = chatTransactions.first(where: { $0.chatMessageId == id }),
             let richMessageTransaction = transaction as? RichMessageTransaction,
@@ -208,8 +205,12 @@ final class ChatViewModel: NSObject {
     }
     
     func entireChatWasRead() {
-        guard chatroom?.hasUnreadMessages == true else { return }
-        chatroom?.markAsReaded()
+        guard
+            let chatroom = chatroom,
+            chatroom.hasUnreadMessages == true
+        else { return }
+        
+        chatsProvider.markChatAsRead(chatroom: chatroom)
     }
     
     func hideMessage(id: String) {
@@ -232,7 +233,7 @@ extension ChatViewModel: NSFetchedResultsControllerDelegate {
 
 private extension ChatViewModel {
     var isLoading: Bool {
-        switch loadingStatus.value {
+        switch loadingStatus {
         case .fullscreen, .onTop:
             return true
         case .none:
@@ -241,23 +242,28 @@ private extension ChatViewModel {
     }
     
     func setupObservers() {
-        inputText
+        $inputText
             .removeDuplicates()
             .sink { [weak self] _ in self?.inputTextUpdated() }
+            .store(in: &subscriptions)
+        
+        $loadingStatus
+            .removeDuplicates()
+            .sink { [weak self] _ in self?.updateMessages() }
             .store(in: &subscriptions)
     }
     
     func loadMessages(address: String, offset: Int, loadingStatus: ChatLoadingStatus) {
         guard !isLoading else { return }
         
-        _loadingStatus.value = loadingStatus
+        self.loadingStatus = loadingStatus
         chatsProvider.getChatMessages(
             with: address,
             offset: offset
         ) { [weak self] in
             DispatchQueue.onMainAsync {
                 self?.updateTransactions(performFetch: true)
-                self?._loadingStatus.value = nil
+                self?.loadingStatus = nil
             }
         }
     }
@@ -268,7 +274,26 @@ private extension ChatViewModel {
         }
         
         chatTransactions = controller?.fetchedObjects ?? []
+        updateTransactionStatuses()
         updateMessages()
+    }
+    
+    func updateTransactionStatuses() {
+        let transactionStatuses: [(String, TransactionStatus)] = chatTransactions.compactMap {
+            guard let id = $0.chatMessageId else { return nil }
+            
+            if let transaction = $0 as? TransferTransaction {
+                return (id, transaction.statusEnum.toTransactionStatus())
+            }
+            
+            if let transaction = $0 as? RichMessageTransaction {
+                return (id, transaction.transactionStatus ?? .notInitiated)
+            }
+            
+            return nil
+        }
+        
+        self.transactionStatuses = Dictionary(uniqueKeysWithValues: transactionStatuses)
     }
     
     func updateMessages() {
@@ -276,10 +301,9 @@ private extension ChatViewModel {
         var minTimestamp: TimeInterval?
         var expireDate: Date?
         
-        _messages.value = chatTransactions.map {
+        messages = chatTransactions.map {
             let message = chatMessageFactory.makeMessage($0, expireDate: &expireDate)
             let timestamp = expireDate?.timeIntervalSince1970
-            
             if let timestamp = timestamp, timestamp < minTimestamp ?? .greatestFiniteMagnitude {
                 minTimestamp = timestamp
             }
@@ -295,13 +319,14 @@ private extension ChatViewModel {
     }
     
     func reset() {
-        _sender.value = .default
-        _messages.value = []
-        _loadingStatus.value = nil
-        inputText.value = ""
-        _isSendingAvailable.value = false
-        _fee.value = ""
-        _partnerName.value = nil
+        sender = .default
+        messages = []
+        loadingStatus = nil
+        inputText = ""
+        isSendingAvailable = false
+        fee = ""
+        transactionStatuses = .init()
+        partnerName = nil
         messageIdToShow = nil
         controller = nil
         chatroom = nil
@@ -329,9 +354,9 @@ private extension ChatViewModel {
         case let .failure(error):
             switch error {
             case .messageNotValid:
-                inputText.value = sentText
+                inputText = sentText
             case .notEnoughMoneyToSend:
-                inputText.value = sentText
+                inputText = sentText
                 guard transfersProvider.hasTransactions else {
                     dialog.send(.freeTokenAlert)
                     return
@@ -345,28 +370,28 @@ private extension ChatViewModel {
     }
     
     func inputTextUpdated() {
-        guard !inputText.value.isEmpty else {
-            _fee.value = ""
+        guard !inputText.isEmpty else {
+            fee = ""
             return
         }
         
         let feeString = AdamantBalanceFormat.full.format(
-            AdamantMessage.text(inputText.value).fee,
+            AdamantMessage.text(inputText).fee,
             withCurrencySymbol: AdmWalletService.currencySymbol
         )
         
-        _fee.value = "~\(feeString)"
+        fee = "~\(feeString)"
     }
     
     func updateTitle() {
         guard let partner = chatroom?.partner else { return }
         
         if let address = partner.address, let name = addressBookService.addressBook[address] {
-            _partnerName.value = name.checkAndReplaceSystemWallets()
+            partnerName = name.checkAndReplaceSystemWallets()
         } else if let name = partner.name {
-            _partnerName.value = name
+            partnerName = name
         } else {
-            _partnerName.value = partner.address
+            partnerName = partner.address
         }
     }
     

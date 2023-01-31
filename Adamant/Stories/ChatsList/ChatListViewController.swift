@@ -202,15 +202,13 @@ class ChatListViewController: UIViewController {
         
         if let c = controller as? NewChatViewController {
             c.delegate = self
-        } else if let nav = controller as? UINavigationController, let c = nav.viewControllers.last as? NewChatViewController {
-            c.delegate = self
         }
         
-        if let split = self.splitViewController {
-            split.showDetailViewController(controller, sender: self)
+        if let split = splitViewController {
+            let nav = UINavigationController(rootViewController: controller)
+            split.showDetailViewController(nav, sender: self)
         } else {
-            controller.modalPresentationStyle = .overFullScreen
-            present(controller, animated: true)
+            navigationController?.pushViewController(controller, animated: true)
         }
     }
     
@@ -626,33 +624,19 @@ extension ChatListViewController: NewChatViewControllerDelegate {
             }
         }
         
-        DispatchQueue.main.async { [weak self] in
-            guard let vc = self?.chatViewController(for: chatroom) else {
-                return
-            }
+        DispatchQueue.main.async { [self] in
+            let vc = chatViewController(for: chatroom)
             
-            let navigator: UINavigationController
-            if let nav = controller.navigationController {
-                navigator = nav
-            } else if let nav = self?.navigationController {
-                navigator = nav
-            } else {
-                vc.modalPresentationStyle = .overFullScreen
-                self?.present(vc, animated: true) {
-                    vc.becomeFirstResponder()
-                    
-                    if let count = vc.viewModel.chatroom?.transactions?.count, count == 0 {
-                        vc.messageInputBar.inputTextView.becomeFirstResponder()
-                    }
-                }
+            if let split = splitViewController {
+                let nav = UINavigationController(rootViewController: vc)
+                split.showDetailViewController(nav, sender: self)
+                vc.becomeFirstResponder()
                 
-                return
-            }
-            
-            navigator.pushViewController(vc, animated: true)
-            
-            if let index = navigator.viewControllers.firstIndex(of: controller) {
-                navigator.viewControllers.remove(at: index)
+                if let count = vc.viewModel.chatroom?.transactions?.count, count == 0 {
+                    vc.messageInputBar.inputTextView.becomeFirstResponder()
+                }
+            } else {
+                navigationController?.setViewControllers([self, vc], animated: true)
             }
             
             if let count = vc.viewModel.chatroom?.transactions?.count, count == 0 {

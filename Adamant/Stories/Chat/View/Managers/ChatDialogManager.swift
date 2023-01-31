@@ -221,7 +221,7 @@ private extension ChatDialogManager {
         alert.addTextField { [weak viewModel] textField in
             textField.placeholder = .adamantLocalized.chat.name
             textField.autocapitalizationType = .words
-            textField.text = viewModel?.partnerName.value
+            textField.text = viewModel?.partnerName
         }
         
         let renameAction = UIAlertAction(

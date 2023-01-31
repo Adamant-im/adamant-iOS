@@ -42,10 +42,7 @@ extension AdamantScene {
             c.accountService = r.resolve(AccountService.self)
             c.accountsProvider = r.resolve(AccountsProvider.self)
             c.router = r.resolve(Router.self)
-            
-            let navigator = UINavigationController(rootViewController: c)
-            navigator.modalPresentationStyle = .overFullScreen
-            return navigator
+            return c
         })
         
         static let complexTransfer = AdamantScene(identifier: "ComplexTransferViewController", factory: { r in

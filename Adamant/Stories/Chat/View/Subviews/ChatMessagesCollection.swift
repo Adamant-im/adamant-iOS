@@ -16,9 +16,14 @@ final class ChatMessagesCollectionView<
     
     var reportMessageAction: ((IndexPath) -> Void)?
     var removeMessageAction: ((IndexPath) -> Void)?
+    var fixedBottomOffset: CGFloat?
     
     var bottomOffset: CGFloat {
         contentHeightWithBottomInsets - bounds.maxY
+    }
+    
+    var fullInsets: UIEdgeInsets {
+        safeAreaInsets + contentInset
     }
     
     override var contentInset: UIEdgeInsets {
@@ -31,14 +36,14 @@ final class ChatMessagesCollectionView<
         set {}
     }
     
-    /// Saves the distance to the bottom while usual reloadData() saves the distance to the top
-    func reloadDataWithFixedBottom() {
-        let bottomOffset = self.bottomOffset
-        reloadData()
-        layoutIfNeeded()
-        setBottomOffset(bottomOffset, safely: true)
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        if let fixedBottomOffset = fixedBottomOffset, bottomOffset != fixedBottomOffset {
+            setBottomOffset(fixedBottomOffset, safely: true)
+        }
     }
-
+    
     /// Saves the distance to the bottom while usual reloadSections(_) saves the distance to the top
     func reloadSectionsWithFixedBottom(_ sections: IndexSet) {
         let bottomOffset = self.bottomOffset
@@ -47,35 +52,18 @@ final class ChatMessagesCollectionView<
         setBottomOffset(bottomOffset, safely: true)
     }
     
-    func setVerticalContentOffset(_ offset: CGFloat, safely: Bool = true) {
-        guard maxVerticalOffset > .zero else { return }
-        
-        var offset = offset
-        if safely {
-            if offset < .zero {
-                offset = .zero
-            } else if offset > maxVerticalOffset {
-                offset = maxVerticalOffset
-            }
-        }
-        
-        setContentOffset(.init(x: contentOffset.x, y: offset), animated: false)
-    }
-    
     func reloadData(newModels: [SectionModel]) {
-        let newIds = newModels.map { $0.id }
-        let currentIds = currentModels.map { $0.id }
-        
-        if Set(newIds) == Set(currentIds) {
-            reloadSections(newModels: newModels)
-        } else if newIds.last == currentIds.last || currentIds.isEmpty {
-            let bottomOffset = self.bottomOffset
-            reloadData()
-            layoutIfNeeded()
-            setBottomOffset(bottomOffset, safely: true)
-        } else {
-            reloadData()
+        guard newModels.last == currentModels.last || currentModels.isEmpty else {
+            return applyNewModels(newModels)
         }
+        
+        if Set(newModels.map { $0.id }) != Set(currentModels.map { $0.id }) {
+            stopDecelerating()
+        }
+        
+        let bottomOffset = self.bottomOffset
+        applyNewModels(newModels)
+        setBottomOffset(bottomOffset, safely: true)
     }
     
     func setFullBottomInset(_ inset: CGFloat) {
@@ -84,22 +72,8 @@ final class ChatMessagesCollectionView<
         super.contentInset.bottom = inset
         super.verticalScrollIndicatorInsets.bottom = inset
 
-        guard !isDragging else { return }
+        guard !isDragging || isDecelerating else { return }
         setBottomOffset(bottomOffset, safely: false)
-    }
-}
-
-private extension ChatMessagesCollectionView {
-    var fullInsets: UIEdgeInsets {
-        safeAreaInsets + contentInset
-    }
-    
-    var maxVerticalOffset: CGFloat {
-        contentHeightWithBottomInsets - bounds.height
-    }
-    
-    var contentHeightWithBottomInsets: CGFloat {
-        contentSize.height + fullInsets.bottom
     }
     
     func setBottomOffset(_ newValue: CGFloat, safely: Bool) {
@@ -108,18 +82,43 @@ private extension ChatMessagesCollectionView {
             safely: safely
         )
     }
+}
+
+private extension ChatMessagesCollectionView {
+    var maxVerticalOffset: CGFloat {
+        contentHeightWithBottomInsets - bounds.height
+    }
     
-    func reloadSections(newModels: [SectionModel]) {
-        guard newModels.count == currentModels.count else {
-            return assertionFailure("Don't call this method if elements are not equal")
+    var minVerticalOffset: CGFloat {
+        -fullInsets.top
+    }
+    
+    var contentHeightWithBottomInsets: CGFloat {
+        contentSize.height + fullInsets.bottom
+    }
+    
+    func applyNewModels(_ newModels: [SectionModel]) {
+        reloadData()
+        layoutIfNeeded()
+        currentModels = newModels
+    }
+    
+    func stopDecelerating() {
+        setContentOffset(contentOffset, animated: false)
+    }
+    
+    func setVerticalContentOffset(_ offset: CGFloat, safely: Bool) {
+        guard maxVerticalOffset > .zero else { return }
+        
+        var offset = offset
+        if safely {
+            if offset < .zero {
+                offset = minVerticalOffset
+            } else if offset > maxVerticalOffset {
+                offset = maxVerticalOffset
+            }
         }
         
-        let indices = newModels.indices.compactMap { i in
-            newModels[i] == currentModels[i]
-                ? nil
-                : i
-        }
-        
-        reloadSections(.init(indices))
+        contentOffset.y = offset
     }
 }

@@ -23,7 +23,7 @@ final class ChatDisplayManager: MessagesDisplayDelegate {
         in _: MessagesCollectionView
     ) -> MessageStyle {
         .bubbleTail(
-            message.sender.senderId == viewModel.sender.value.senderId
+            message.sender.senderId == viewModel.sender.senderId
                 ? .bottomRight
                 : .bottomLeft,
             .curved
@@ -35,7 +35,7 @@ final class ChatDisplayManager: MessagesDisplayDelegate {
         at _: IndexPath,
         in _: MessagesCollectionView
     ) -> UIColor {
-        message.fullModel.getBackgroundColor(currentSender: viewModel.sender.value)
+        message.fullModel.getBackgroundColor(currentSender: viewModel.sender)
     }
     
     func textColor(
@@ -53,7 +53,7 @@ final class ChatDisplayManager: MessagesDisplayDelegate {
             for: indexPath
         )
         
-        if indexPath.section == .zero, viewModel.loadingStatus.value == .onTop {
+        if indexPath.section == .zero, viewModel.loadingStatus == .onTop {
             header.wrappedView.startAnimating()
         } else {
             header.wrappedView.stopAnimating()

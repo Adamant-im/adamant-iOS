@@ -23,8 +23,10 @@ final class AdamantRichTransactionStatusService: RichTransactionStatusService {
         
         let updateAction = { [weak self] in
             self?.getStatus(for: transaction) { status in
-                self?.setStatus(for: transaction, status: status, parentContext: parentContext)
-                self?.updatingTransactions.remove(transaction)
+                self?.updateQueue.async {
+                    self?.setStatus(for: transaction, status: status, parentContext: parentContext)
+                    self?.updatingTransactions.remove(transaction)
+                }
             }
         }
         

@@ -15,7 +15,7 @@ struct ChatMessage: Identifiable, Equatable {
     let senderModel: ChatSender
     let status: Status
     let content: Content
-    let bottomString: NSAttributedString?
+    let bottomString: ComparableAttributedString?
     
     static let `default` = Self(
         id: "",
@@ -46,7 +46,6 @@ extension ChatMessage {
         let amount: Decimal
         let currency: String
         let comment: String?
-        let status: TransactionStatus
     }
 }
 

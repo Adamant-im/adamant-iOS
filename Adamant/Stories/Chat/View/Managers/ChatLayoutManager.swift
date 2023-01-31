@@ -78,8 +78,8 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
     ) -> CellSizeCalculator {
         ChatTransactionCellSizeCalculator(
             layout: messagesCollectionView.messagesCollectionViewFlowLayout,
-            getCurrentSender: { [sender = viewModel.sender] in sender.value },
-            getMessages: { [messages = viewModel.messages] in messages.value }
+            getCurrentSender: { [sender = viewModel.sender] in sender },
+            getMessages: { [messages = viewModel.messages] in messages }
         )
     }
     
@@ -87,7 +87,7 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
         for section: Int,
         in messagesCollectionView: MessagesCollectionView
     ) -> CGSize {
-        section == .zero && viewModel.loadingStatus.value == .onTop
+        section == .zero && viewModel.loadingStatus == .onTop
             ? SpinnerView.size
             : .zero
     }
@@ -95,7 +95,7 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
 
 private extension ChatLayoutManager {
     func textAlignment(for message: MessageType) -> NSTextAlignment {
-        message.sender.senderId == viewModel.sender.value.senderId
+        message.sender.senderId == viewModel.sender.senderId
             ? .right
             : .left
     }

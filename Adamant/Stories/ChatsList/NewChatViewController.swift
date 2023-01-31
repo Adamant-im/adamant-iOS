@@ -98,19 +98,13 @@ class NewChatViewController: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationItem.largeTitleDisplayMode = .always
+        navigationItem.largeTitleDisplayMode = .never
         tableView.keyboardDismissMode = .none
         
         navigationItem.title = String.adamantLocalized.newChat.title
         let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
         doneButton.isEnabled = false
         navigationItem.rightBarButtonItem = doneButton
-        
-        if self.splitViewController != nil {
-            navigationItem.largeTitleDisplayMode = .never
-        } else {
-            navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
-        }
         
         navigationOptions = .Disabled
         
@@ -247,10 +241,6 @@ class NewChatViewController: FormViewController {
         }
         
         startNewChat(with: address, message: nil)
-    }
-    
-    @IBAction func cancel(_ sender: Any) {
-        dismiss(animated: true)
     }
     
     // MARK: - Other

@@ -8,16 +8,18 @@
 
 import UIKit
 import SnapKit
+import Combine
 
 final class ChatTransactionContainerView: UIView {
     var model: Model = .default {
         didSet {
             guard model != oldValue else { return }
-            update()
+            update(old: oldValue)
         }
     }
     
     private let contentView = ChatTransactionContentView()
+    private var statusSubscription: AnyCancellable?
     
     private let statusView: UIImageView = {
         let view = UIImageView()
@@ -65,11 +67,26 @@ private extension ChatTransactionContainerView {
         }
     }
     
-    func update() {
+    func update(old: Model) {
         contentView.model = model.content
-        statusView.image = model.status.image
-        statusView.tintColor = model.status.imageTintColor
+        updateStatusSubscription(old: old.status)
         updateLayout()
+    }
+    
+    func updateStatusSubscription(old: Model.Status?) {
+        guard old != model.status else { return }
+        guard let status = model.status else { return updateStatus(.notInitiated) }
+        
+        updateStatus(status.status)
+        statusSubscription = status.$status
+            .receive(on: RunLoop.main)
+            .removeDuplicates()
+            .sink { [weak self] in self?.updateStatus($0) }
+    }
+    
+    func updateStatus(_ status: TransactionStatus) {
+        statusView.image = status.image
+        statusView.tintColor = status.imageTintColor
     }
     
     func updateLayout() {
