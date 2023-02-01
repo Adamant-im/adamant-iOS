@@ -520,20 +520,14 @@ extension ERC20WalletService {
 }
 
 extension ERC20WalletService {
-    func getTransactionsHistory(address: String, offset: Int = 0, limit: Int = 100, completion: @escaping (WalletServiceResult<[EthTransactionShort]>) -> Void) {
+    func getTransactionsHistory(address: String, offset: Int = 0, limit: Int = 100) async throws -> [EthTransactionShort] {
         guard let node = EthWalletService.nodes.randomElement(), let url = node.asURL() else {
             fatalError("Failed to build ETH endpoint URL")
         }
         
         guard let address = self.ethWallet?.address, let contract = self.token?.contractAddress else {
-            print("Can't get address")
-            return
+            throw WalletServiceError.internalError(message: "Can't get address", error: nil)
         }
-        
-        // Headers
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json"
-        ]
         
         // Request
         let request = "(txto.eq.\(contract),or(txfrom.eq.\(address.lowercased()),contract_to.eq.000000000000000000000000\(address.lowercased().replacingOccurrences(of: "0x", with: ""))))"
@@ -550,55 +544,14 @@ extension ERC20WalletService {
             txEndpoint = try buildUrl(url: url.appendingPathComponent(EthWalletService.transactionsListApiSubpath), queryItems: txQueryItems)
         } catch {
             let err = AdamantApiService.InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-            completion(.failure(error: WalletServiceError.apiError(err)))
-            return
+            throw WalletServiceError.apiError(err)
         }
         
         // MARK: Sending requests
         
-        let dispatchGroup = DispatchGroup()
-        var error: WalletServiceError?
-        
-        var transactions = [EthTransactionShort]()
-        let semaphore = DispatchSemaphore(value: 1)
-        
-        dispatchGroup.enter()
-        AF.request(txEndpoint, method: .get, headers: headers).responseData(queue: defaultDispatchQueue) { response in
-            defer {
-                dispatchGroup.leave()
-            }
-            
-            switch response.result {
-            case .success(let data):
-                do {
-                    let trs = try JSONDecoder().decode([EthTransactionShort].self, from: data)
-                    
-                    semaphore.wait()
-                    defer { semaphore.signal() }
-                    transactions.append(contentsOf: trs)
-                } catch let err {
-                    error = .internalError(message: "Failed to deserialize transactions", error: err)
-                }
-                
-            case .failure:
-                error = .networkError
-            }
-        }
-        
-        // MARK: Handle results
-        // Go background, so we won't block mainthread with .wait()
-        DispatchQueue.global(qos: .userInitiated).async {
-            dispatchGroup.wait()
-            
-            if let error = error {
-                completion(.failure(error: error))
-                return
-            }
-            
-            transactions.sort { $0.date.compare($1.date) == .orderedDescending }
-            
-            completion(.success(result: transactions))
-        }
+        var transactions: [EthTransactionShort] = try await apiService.sendRequest(url: txEndpoint, method: .get, parameters: nil)
+        transactions.sort { $0.date.compare($1.date) == .orderedDescending }
+        return transactions
     }
 }
 

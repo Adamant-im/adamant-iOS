@@ -65,7 +65,7 @@ class BtcTransactionDetailsViewController: TransactionDetailsViewControllerBase 
             
             tableView.reloadData()
             refreshControl.endRefreshing()
-        } catch let error as WalletServiceError {
+        } catch {
             dialogService.showRichError(error: error)
             refreshControl.endRefreshing()
         } catch {

@@ -67,7 +67,7 @@ extension LoginViewController {
             do {
                 let result = try await accountService.loginWithStoredAccount()
                 handleSavedAccountLoginResult(result)
-            } catch let error as AccountServiceError {
+            } catch {
                 dialogService.showRichError(error: error)
                 
                 if let pinpad = presentedViewController as? PinpadViewController {

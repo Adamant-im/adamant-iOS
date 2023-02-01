@@ -130,12 +130,9 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
                 vc.navigationController?.pushViewController(controller, animated: true)
                 
             } catch {
-                
                 self?.tableView.deselectRow(at: indexPath, animated: true)
                 self?.dialogService.dismissProgress()
-                if let error = error as? WalletServiceError {
-                    self?.dialogService.showRichError(error: error)
-                }
+                self?.dialogService.showRichError(error: error)
             }
         }
     }

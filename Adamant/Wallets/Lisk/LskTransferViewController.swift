@@ -67,9 +67,7 @@ class LskTransferViewController: TransferViewControllerBase {
                 )
             } catch {
                 dialogService.dismissProgress()
-                if let error = error as? ApiServiceError {
-                    dialogService.showRichError(error: error)
-                }
+                dialogService.showRichError(error: error)
             }
         }
     }

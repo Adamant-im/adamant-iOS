@@ -207,6 +207,35 @@ final class AdamantApiService: ApiService {
         }
     }
     
+    func sendRequest<Output: Decodable>(
+        url: URLConvertible,
+        method: HTTPMethod,
+        parameters: Parameters?
+    ) async throws -> Output {
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Output, Error>) in
+            AF.request(
+                url,
+                method: method,
+                parameters: parameters,
+              //  encoding: JSONEncoding.default,
+                headers: HTTPHeaders(["Content-Type": "application/json"])
+            ).responseData(queue: defaultResponseDispatchQueue) { response in
+                switch response.result {
+                case .success(let data):
+                    do {
+                        let model = try JSONDecoder().decode(Output.self, from: data)
+                        continuation.resume(returning: model)
+                    } catch {
+                        continuation.resume(throwing: InternalError.parsingFailed.apiServiceErrorWith(error: error))
+                    }
+                    
+                case .failure(let error):
+                    continuation.resume(throwing: ApiServiceError.init(error: error))
+                }
+            }
+        }
+    }
+    
     static func translateServerError(_ error: String?) -> ApiServiceError {
         guard let error = error else {
             return InternalError.unknownError.apiServiceErrorWith(error: nil)

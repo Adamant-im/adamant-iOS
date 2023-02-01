@@ -365,7 +365,7 @@ extension AdamantAccountService {
             self.passphrase = passphrase
             
             for case let wallet as InitiatedWithPassphraseService in wallets {
-                let _ = try? await wallet.initWallet(withPassphrase: passphrase)
+                _ = try? await wallet.initWallet(withPassphrase: passphrase)
             }
             
             return .success(account: account, alert: nil)

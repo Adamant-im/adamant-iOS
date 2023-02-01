@@ -31,27 +31,16 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
     }
     
     override func handleRefresh(_ refreshControl: UIRefreshControl) {
-        self.btcWalletService.getTransactions { (result) in
-            switch result {
-            case .success(let transactions):
-                self.transactions = transactions
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                }
-                break
-            case .failure(let error):
-                if case .internalError(let message, _ ) = error {
-                    let localizedErrorMessage = NSLocalizedString(message, comment: "TransactionList: 'Transactions not found' message.")
-                    self.dialogService.showWarning(withMessage: localizedErrorMessage)
-                } else {
-                    self.dialogService.showError(withMessage: String.adamantLocalized.transactionList.notFound, error: error)
-                }
-                break
+        refreshTask = Task {
+            do {
+                transactions = try await btcWalletService.getTransactions()
+            } catch {
+                dialogService.showError(withMessage: String.adamantLocalized.transactionList.notFound, error: error)
             }
-            DispatchQueue.main.async {
-                self.emptyLabel.isHidden = self.transactions.count > 0
-                self.refreshControl.endRefreshing()
-            }
+            
+            tableView.reloadData()
+            emptyLabel.isHidden = transactions.count > 0
+            refreshControl.endRefreshing()
         }
     }
     

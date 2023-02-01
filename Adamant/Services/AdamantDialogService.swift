@@ -187,6 +187,11 @@ extension AdamantDialogService {
         }
     }
     
+    func showRichError(error: Error) {
+        guard let error = error as? RichError else { return }
+        showRichError(error: error)
+    }
+    
     func showNoConnectionNotification() {
         DispatchQueue.onMainAsync { [weak popupManager] in
             popupManager?.showNotification(

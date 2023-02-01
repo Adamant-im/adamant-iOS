@@ -35,42 +35,32 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
         procedureQueue.cancelAllOperations()
     }
     
+    @MainActor
     override func handleRefresh(_ refreshControl: UIRefreshControl) {
         self.emptyLabel.isHidden = true
         procedureQueue.cancelAllOperations()
         
         loadedTo = 0
-        walletService.getTransactions(from: loadedTo) { [weak self] result in
-            guard let vc = self else {
+        refreshTask = Task {
+            do {
+                let tuple = try await walletService.getTransactions(from: loadedTo)
+                transactions = tuple.transactions
+                loadedTo = tuple.transactions.count
+                emptyLabel.isHidden = transactions.count > 0
                 refreshControl.endRefreshing()
-                return
-            }
-            
-            switch result {
-            case .success(let tuple):
-                vc.transactions = tuple.transactions
-                vc.loadedTo = tuple.transactions.count
+                tableView.reloadData()
                 
-                DispatchQueue.main.async {
-                    vc.emptyLabel.isHidden = vc.transactions.count > 0
-                    vc.tableView.reloadData()
-                    refreshControl.endRefreshing()
-                    
-                    // Update tableView, then call loadMore()
-                    if tuple.hasMore {
-                        vc.loadMoreTransactions(from: tuple.transactions.count)
-                    }
+                // Update tableView, then call loadMore()
+                if tuple.hasMore {
+                    loadMoreTransactions(from: tuple.transactions.count)
                 }
+            } catch {
+                transactions.removeAll()
+                dialogService.showRichError(error: error)
                 
-            case .failure(let error):
-                vc.transactions.removeAll()
-                vc.dialogService.showRichError(error: error)
-                
-                DispatchQueue.main.async {
-                    vc.emptyLabel.isHidden = vc.transactions.count > 0
-                    vc.tableView.reloadData()
-                    refreshControl.endRefreshing()
-                }
+                emptyLabel.isHidden = transactions.count > 0
+                refreshControl.endRefreshing()
+                tableView.reloadData()
             }
         }
     }
@@ -230,13 +220,12 @@ private class LoadMoreDogeTransactionsProcedure: Procedure {
     }
     
     override func execute() {
-        service.getTransactions(from: from) { result in
-            switch result {
-            case .success(let result):
+        Task {
+            do {
+                let result = try await service.getTransactions(from: from)
                 self.result = result
                 self.finish()
-                
-            case .failure(let error):
+            } catch {
                 self.result = nil
                 self.finish(with: error)
             }

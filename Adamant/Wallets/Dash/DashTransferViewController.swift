@@ -79,9 +79,7 @@ class DashTransferViewController: TransferViewControllerBase {
                 )
             } catch {
                 dialogService.dismissProgress()
-                if let error = error as? WalletServiceError {
-                    dialogService.showRichError(error: error)
-                }
+                dialogService.showRichError(error: error)
             }
         }
     }

@@ -398,9 +398,7 @@ extension LoginViewController {
                 }
             } catch {
                 dialogService.dismissProgress()
-                if let error = error as? AccountServiceError {
-                    dialogService.showRichError(error: error)
-                }
+                dialogService.showRichError(error: error)
             }
         }
     }

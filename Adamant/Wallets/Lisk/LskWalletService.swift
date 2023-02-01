@@ -532,21 +532,23 @@ extension LskWalletService {
 
 // MARK: - Transactions
 extension LskWalletService {
-    func getTransactions(_ completion: @escaping (ApiServiceResult<[Transactions.TransactionModel]>) -> Void) {
-        if let address = self.lskWallet?.address, let transactionApi = serviceApi {
-            defaultDispatchQueue.async {
-                transactionApi.transactions(senderIdOrRecipientId: address, limit: 100, offset: 0, sort: APIRequest.Sort("timestamp", direction: .descending)) { (response) in
-                    switch response {
-                    case .success(response: let result):
-                        completion(.success(result))
-                        
-                    case .error(response: let error):
-                        completion(.failure(.internalError(message: error.message, error: nil)))
-                    }
+    func getTransactions() async throws -> [Transactions.TransactionModel] {
+        guard let address = self.lskWallet?.address,
+              let transactionApi = serviceApi
+        else {
+            throw WalletServiceError.internalError(message: "LSK Wallet: not found", error: nil)
+        }
+        
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<[Transactions.TransactionModel], Error>) in
+            transactionApi.transactions(senderIdOrRecipientId: address, limit: 100, offset: 0, sort: APIRequest.Sort("timestamp", direction: .descending)) { (response) in
+                switch response {
+                case .success(response: let result):
+                    continuation.resume(returning: result)
+                    
+                case .error(response: let error):
+                    continuation.resume(throwing: WalletServiceError.internalError(message: error.message, error: nil))
                 }
             }
-        } else {
-            completion(.failure(.internalError(message: "LSK Wallet: not found", error: nil)))
         }
     }
     

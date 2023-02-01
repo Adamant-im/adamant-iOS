@@ -34,6 +34,8 @@ class TransactionsListViewControllerBase: UIViewController {
         return refreshControl
     }()
     
+    var refreshTask: Task<(), Error>?
+    
     // MARK: - IBOutlets
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var emptyLabel: UILabel!
@@ -82,6 +84,11 @@ class TransactionsListViewControllerBase: UIViewController {
         if tableView.isEditing {
             tableView.setEditing(false, animated: false)
         }
+    }
+    
+    deinit {
+        print("deinit")
+        refreshTask?.cancel()
     }
     
     // MARK: - Other

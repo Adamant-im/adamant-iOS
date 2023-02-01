@@ -428,36 +428,24 @@ extension DogeWalletService {
 
 // MARK: - Transactions
 extension DogeWalletService {
-    func getTransactions(from: Int, completion: @escaping (ApiServiceResult<(transactions: [DogeTransaction], hasMore: Bool)>) -> Void) {
+    func getTransactions(from: Int) async throws -> (transactions: [DogeTransaction], hasMore: Bool) {
         guard let address = self.wallet?.address else {
-            completion(.failure(.notLogged))
-            return
+            throw WalletServiceError.notLogged
         }
         
-        getTransactions(for: address, from: from, to: from + DogeWalletService.chunkSize) { response in
-            switch response {
-            case .success(let doge):
-                let hasMore = doge.to < doge.totalItems
-                
-                let transactions = doge.items.filter { !$0.isDoubleSpend }.map { $0.asBtcTransaction(DogeTransaction.self, for: address) }
-                
-                completion(.success((transactions: transactions, hasMore: hasMore)))
-                
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
+        let doge = try await getTransactions(for: address, from: from, to: from + DogeWalletService.chunkSize)
+        
+        let hasMore = doge.to < doge.totalItems
+        
+        let transactions = doge.items.filter { !$0.isDoubleSpend }.map { $0.asBtcTransaction(DogeTransaction.self, for: address) }
+        
+        return (transactions: transactions, hasMore: hasMore)
     }
     
-    private func getTransactions(for address: String, from: Int, to: Int, completion: @escaping (ApiServiceResult<DogeGetTransactionsResponse>) -> Void) {
+    private func getTransactions(for address: String, from: Int, to: Int) async throws -> DogeGetTransactionsResponse {
         guard let url = DogeWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DOGE endpoint URL")
         }
-        
-        // Headers
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json"
-        ]
         
         let parameters: Parameters = [
             "from": from,
@@ -468,22 +456,11 @@ extension DogeWalletService {
         let endpoint = url.appendingPathComponent(DogeApiCommands.getTransactions(for: address))
         
         // MARK: Sending request
-        AF.request(endpoint, method: .get, parameters: parameters, headers: headers).responseData(queue: defaultDispatchQueue) { response in
-            switch response.result {
-            case .success(let data):
-                do {
-                    let dogeResponse = try DogeWalletService.jsonDecoder.decode(DogeGetTransactionsResponse.self, from: data)
-                    completion(.success(dogeResponse))
-                } catch {
-                    completion(.failure(.internalError(message: "DOGE Wallet: not a valid response", error: error)))
-                }
-                
-//            case .failure(let error as URLError):
-//                completion(.failure(.networkError(error: error)))
-                
-            case .failure(let error):
-                completion(.failure(.serverError(error: error.localizedDescription)))
-            }
+        do {
+            let dogeResponse: DogeGetTransactionsResponse = try await apiService.sendRequest(url: endpoint, method: .get, parameters: parameters)
+            return dogeResponse
+        } catch {
+            throw WalletServiceError.internalError(message: "DOGE Wallet: not a valid response", error: error)
         }
     }
     

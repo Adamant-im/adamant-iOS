@@ -619,65 +619,35 @@ extension BtcWalletService {
 
 // MARK: - Transactions
 extension BtcWalletService {
-    func getTransactions(completion: @escaping (ApiServiceResult<[BtcTransaction]>) -> Void) {
+    func getTransactions() async throws -> [BtcTransaction] {
         guard let address = self.wallet?.address else {
-            completion(.failure(.notLogged))
-            return
+            throw WalletServiceError.notLogged
         }
         
-        getTransactions(for: address) { [weak self] response in
-            guard let self = self else { return }
-
-            switch response {
-            case .success(let items):
-                let transactions = items.map {
-                    $0.asBtcTransaction(
-                        BtcTransaction.self,
-                        for: address,
-                        height: self.currentHeight
-                    )
-                }
-                completion(.success(transactions))
-            case .failure(let error):
-                completion(.failure(error))
-            }
+        let items = try await getTransactions(for: address)
+        let transactions = items.map {
+            $0.asBtcTransaction(
+                BtcTransaction.self,
+                for: address,
+                height: self.currentHeight
+            )
         }
+        
+        return transactions
     }
 
-    private func getTransactions(for address: String, completion: @escaping (ApiServiceResult<[RawBtcTransactionResponse]>) -> Void) {
+    private func getTransactions(for address: String) async throws -> [RawBtcTransactionResponse] {
         guard let url = BtcWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get BTC endpoint URL")
         }
-        
-        // Headers
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json"
-        ]
         
         // Request url
         let endpoint = url.appendingPathComponent(BtcApiCommands.getTransactions(for: address))
         
         // MARK: Sending request
-        AF.request(
-            endpoint,
-            method: .get,
-            headers: headers
-        ).responseData(queue: defaultDispatchQueue) { response in
-            switch response.result {
-            case .success(let data):
-                do {
-                    let response = try Self.jsonDecoder.decode([RawBtcTransactionResponse].self,
-                                                               from: data)
-                    completion(.success(response))
-                } catch {
-                    print(error)
-                    completion(.failure(.internalError(message: "BTC Wallet: not a valid response",
-                                                       error: error)))
-                }
-            case .failure(let error):
-                completion(.failure(.serverError(error: error.localizedDescription)))
-            }
-        }
+        
+        var transactions: [RawBtcTransactionResponse] = try await apiService.sendRequest(url: endpoint, method: .get, parameters: nil)
+        return transactions
     }
 
     func getTransaction(by hash: String) async throws -> BtcTransaction {

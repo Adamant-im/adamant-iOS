@@ -28,6 +28,14 @@ protocol ApiService: AnyObject {
     
     var currentNodes: [Node] { get }
     
+    // MARK: - Async/Await
+    
+    func sendRequest<Output: Decodable>(
+        url: URLConvertible,
+        method: HTTPMethod,
+        parameters: Parameters?
+    ) async throws -> Output
+    
     // MARK: - Peers
     
     func getNodeVersion(url: URL, completion: @escaping (ApiServiceResult<NodeVersion>) -> Void)
