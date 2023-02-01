@@ -16,6 +16,7 @@ struct ChatFactory {
     let dialogService: DialogService
     let transferProvider: TransfersProvider
     let accountService: AccountService
+    let accountProvider: AccountsProvider
     let addressBookService: AddressBookService
     let visibleWalletService: VisibleWalletsService
     let router: Router
@@ -44,9 +45,10 @@ private extension ChatFactory {
         let layout: MessagesLayoutDelegate
         let display: MessagesDisplayDelegate
         let inputBar: InputBarAccessoryViewDelegate
+        let cell: ChatCellManager
         
         var asArray: [AnyObject] {
-            [dataSource, layout, display, inputBar]
+            [dataSource, layout, display, inputBar, cell]
         }
     }
     
@@ -59,6 +61,7 @@ private extension ChatFactory {
             addressBookService: addressBookService,
             visibleWalletService: visibleWalletService,
             accountService: accountService,
+            accountProvider: accountProvider,
             richMessageProviders: richMessageProviders
         )
     }
@@ -77,7 +80,8 @@ private extension ChatFactory {
             dataSource: ChatDataSourceManager(viewModel: viewModel),
             layout: ChatLayoutManager(viewModel: viewModel),
             display: ChatDisplayManager(viewModel: viewModel),
-            inputBar: ChatInputBarManager(sendMessageAction: viewModel.sendMessage)
+            inputBar: ChatInputBarManager(sendMessageAction: viewModel.sendMessage),
+            cell: ChatCellManager(viewModel: viewModel)
         )
     }
     
@@ -103,6 +107,7 @@ private extension ChatViewController {
         messagesCollectionView.messagesDataSource = delegates.dataSource
         messagesCollectionView.messagesLayoutDelegate = delegates.layout
         messagesCollectionView.messagesDisplayDelegate = delegates.display
+        messagesCollectionView.messageCellDelegate = delegates.cell
         messageInputBar.delegate = delegates.inputBar
     }
 }

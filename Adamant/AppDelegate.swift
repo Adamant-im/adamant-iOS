@@ -301,8 +301,7 @@ extension AppDelegate {
             let chatVC = chatVCNav.viewControllers.first as? ChatViewController,
             chatVC.viewModel.chatroom?.partner?.address == senderAddress
         {
-            // TODO: [Chats] Implement scroll down
-//            chatVC.scrollDown()
+            chatVC.messagesCollectionView.scrollToLastItem()
             return
         }
         

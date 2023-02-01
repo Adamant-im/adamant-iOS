@@ -55,6 +55,14 @@ private extension ChatDialogManager {
             showRemoveMessageAlert(id: id)
         case let .reportMessageAlert(id):
             showReportMessageAlert(id: id)
+        case let .admMenu(address, partnerAddress):
+            showAdmMenuAction(address, partnerAddress: partnerAddress)
+        case let .dummy(address):
+            showDummyAlert(for: address)
+        case let .url(url):
+            showUrl(url)
+        case let .progress(show):
+            setProgress(show)
         }
     }
     
@@ -282,6 +290,80 @@ private extension ChatDialogManager {
             safari.preferredControlTintColor = UIColor.adamant.primary
             safari.modalPresentationStyle = .overFullScreen
             self.dialogService.present(safari, animated: true, completion: nil)
+        }
+    }
+    
+    func showAdmMenuAction(_ adm: AdamantAddress, partnerAddress: String) {
+        let shareTypes: [AddressChatShareType] = adm.address == partnerAddress ? [.send] : [.chat, .send]
+        let name = adm.name ?? adm.address
+        
+        self.dialogService.presentShareAlertFor(
+            adm: adm.address,
+            name: name,
+            types: shareTypes,
+            animated: true,
+            from: nil,
+            completion: nil
+        ) { [weak self] action in
+            guard let self = self else { return }
+            DispatchQueue.onMainAsync {
+                if case .invalid = AdamantUtilities.validateAdamantAddress(address: adm.address) {
+                    self.dialogService.showToastMessage(String.adamantLocalized.newChat.specifyValidAddressMessage)
+                    return
+                }
+                
+                self.viewModel.process(adm: adm, action: action)
+            }
+        }
+    }
+    
+    func showDummyAlert(for address: String) {
+        let alert = UIAlertController(title: nil, message: AccountsProviderResult.notInitiated(address: address).localized, preferredStyle: .alert)
+        
+        let faq = UIAlertAction(title: String.adamantLocalized.newChat.whatDoesItMean, style: .default, handler: { [weak dialogService] _ in
+            guard let url = URL(string: NewChatViewController.faqUrl) else {
+                return
+            }
+            
+            let safari = SFSafariViewController(url: url)
+            safari.preferredControlTintColor = UIColor.adamant.primary
+            safari.modalPresentationStyle = .overFullScreen
+            dialogService?.present(safari, animated: true, completion: nil)
+        })
+        
+        alert.addAction(faq)
+        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
+        
+        alert.modalPresentationStyle = .overFullScreen
+        dialogService.present(alert, animated: true, completion: nil)
+    }
+    
+    func showUrl(_ url: URL) {
+        if url.absoluteString.starts(with: "http") {
+            let safari = SFSafariViewController(url: url)
+            safari.preferredControlTintColor = UIColor.adamant.primary
+            safari.modalPresentationStyle = .overFullScreen
+            dialogService.present(safari, animated: true, completion: nil)
+        } else if url.absoluteString.starts(with: "mailto") {
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url)
+            } else {
+                showAlert(message: String.adamantLocalized.chat.noMailAppWarning)
+            }
+        } else {
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url)
+            } else {
+                showAlert(message: String.adamantLocalized.chat.unsupportedUrlWarning)
+            }
+        }
+    }
+    
+    func setProgress(_ show: Bool) {
+        if show {
+            dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
+        } else {
+            dialogService.dismissProgress()
         }
     }
     

@@ -7,6 +7,7 @@
 //
 
 import MessageKit
+import MarkdownKit
 import UIKit
 
 struct ChatMessage: Identifiable, Equatable {
@@ -56,7 +57,8 @@ extension ChatMessage: MessageType {
     var kind: MessageKind {
         switch content {
         case let .message(text):
-            return .text(text)
+            let markdownText = Self.markdownParser.parse(text)
+            return .attributedText(markdownText)
         case let .transaction(model):
             return .custom(model)
         }
@@ -73,4 +75,28 @@ extension MessageType {
             return .default
         }
     }
+}
+
+private extension ChatMessage {
+    static let markdownParser = MarkdownParser(
+        font: .adamantChatDefault,
+        color: .adamant.primary,
+        enabledElements: [
+            .header,
+            .list,
+            .quote,
+            .bold,
+            .italic,
+            .code,
+            .strikethrough
+        ],
+        customElements: [
+            MarkdownSimpleAdm(),
+            MarkdownLinkAdm(),
+            MarkdownAdvancedAdm(
+                font: .adamantChatDefault,
+                color: .adamant.active
+            )
+        ]
+    )
 }

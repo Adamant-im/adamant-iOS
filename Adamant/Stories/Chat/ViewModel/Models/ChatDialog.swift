@@ -17,4 +17,8 @@ enum ChatDialog {
     case removeMessageAlert(id: String)
     case reportMessageAlert(id: String)
     case menu(sender: UIBarButtonItem)
+    case admMenu(AdamantAddress, partnerAddress: String)
+    case dummy(String)
+    case url(URL)
+    case progress(Bool)
 }

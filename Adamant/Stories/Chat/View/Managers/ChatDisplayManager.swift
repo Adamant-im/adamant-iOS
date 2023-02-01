@@ -61,6 +61,24 @@ final class ChatDisplayManager: MessagesDisplayDelegate {
         
         return header
     }
+    
+    func enabledDetectors(
+        for _: MessageType,
+        at _: IndexPath,
+        in _: MessagesCollectionView
+    ) -> [DetectorType] {
+        return [.url]
+    }
+    
+    func detectorAttributes(
+        for detector: DetectorType,
+        and _: MessageType,
+        at _: IndexPath
+    ) -> [NSAttributedString.Key: Any] {
+        return detector == .url
+            ? [.foregroundColor: UIColor.adamant.active]
+            : [:]
+    }
 }
 
 extension ChatMessage {

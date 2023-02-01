@@ -20,6 +20,7 @@ final class ChatViewModel: NSObject {
     private let addressBookService: AddressBookService
     private let visibleWalletService: VisibleWalletsService
     private let accountService: AccountService
+    private let accountProvider: AccountsProvider
     private let richMessageProviders: [String: RichMessageProvider]
     
     // MARK: Properties
@@ -35,6 +36,8 @@ final class ChatViewModel: NSObject {
     
     let didTapTransfer = ObservableSender<String>()
     let dialog = ObservableSender<ChatDialog>()
+    let didTapAdmChat = ObservableSender<(Chatroom, String?)>()
+    let didTapAdmSend = ObservableSender<AdamantAddress>()
     
     private let _closeScreen = ObservableSender<Void>()
     var closeScreen: some Observable<Void> { _closeScreen }
@@ -80,6 +83,7 @@ final class ChatViewModel: NSObject {
         addressBookService: AddressBookService,
         visibleWalletService: VisibleWalletsService,
         accountService: AccountService,
+        accountProvider: AccountsProvider,
         richMessageProviders: [String: RichMessageProvider]
     ) {
         self.chatsProvider = chatsProvider
@@ -90,6 +94,7 @@ final class ChatViewModel: NSObject {
         self.richMessageProviders = richMessageProviders
         self.visibleWalletService = visibleWalletService
         self.accountService = accountService
+        self.accountProvider = accountProvider
         super.init()
         setupObservers()
         updateAttachmentButtonAvailability()
@@ -235,6 +240,35 @@ final class ChatViewModel: NSObject {
         
         chatroom?.updateLastTransaction()
         transaction.transactionId.map { chatsProvider.removeMessage(with: $0) }
+    }
+    
+    func didSelectURL(_ url: URL) {
+        if url.scheme == "adm" {
+            guard let adm = url.absoluteString.getLegacyAdamantAddress(),
+                  let partnerAddress = chatroom?.partner?.address
+            else {
+                return
+            }
+            
+            dialog.send(.admMenu(adm, partnerAddress: partnerAddress))
+            return
+        }
+        
+        dialog.send(.url(url))
+    }
+    
+    func process(adm: AdamantAddress, action: AddressChatShareType) {
+        if action == .send {
+            didTapAdmSend.send(adm)
+            return
+        }
+        
+        guard let room = self.chatsProvider.getChatroom(for: adm.address) else {
+            self.findAccount(with: adm.address, name: adm.name, message: adm.message)
+            return
+        }
+        
+        self.startNewChat(with: room, name: adm.name, message: adm.message)
     }
 }
 
@@ -427,6 +461,55 @@ private extension ChatViewModel {
             .contains(false)
         
         isAttachmentButtonAvailable = isAnyWalletVisible
+    }
+    
+    func findAccount(with address: String, name: String?, message: String?) {
+        dialog.send(.progress(true))
+        accountProvider.getAccount(byAddress: address) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let account):
+                DispatchQueue.main.async {
+                    self.dialog.send(.progress(false))
+                    guard let chatroom = account.chatroom else { return }
+                    self.setNameIfNeeded(for: account, chatroom: account.chatroom, name: name)
+                    account.chatroom?.isForcedVisible = true
+                    self.startNewChat(with: chatroom, message: message)
+                }
+            case .dummy:
+                self.dialog.send(.progress(false))
+                self.dialog.send(.dummy(address))
+            case .notFound, .invalidAddress, .notInitiated, .networkError:
+                self.dialog.send(.progress(false))
+                self.dialog.send(.alert(result.localized))
+            case .serverError(let error):
+                self.dialog.send(.progress(false))
+                if let apiError = error as? ApiServiceError, case .internalError(let message, _) = apiError, message == String.adamantLocalized.sharedErrors.unknownError {
+                    self.dialog.send(.alert(AccountsProviderResult.notFound(address: address).localized))
+                    return
+                }
+                
+                self.dialog.send(.error(result.localized))
+            }
+        }
+    }
+    
+    func setNameIfNeeded(for account: CoreDataAccount?, chatroom: Chatroom?, name: String?) {
+        guard let name = name,
+              let account = account,
+              account.name == nil
+        else {
+            return
+        }
+        account.name = name
+        if let chatroom = chatroom, chatroom.title == nil {
+            chatroom.title = name
+        }
+    }
+    
+    func startNewChat(with chatroom: Chatroom, name: String? = nil, message: String? = nil) {
+        setNameIfNeeded(for: chatroom.partner, chatroom: chatroom, name: name)
+        didTapAdmChat.send((chatroom, message))
     }
 }
 

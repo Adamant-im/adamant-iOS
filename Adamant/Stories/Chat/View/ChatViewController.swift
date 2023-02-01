@@ -130,20 +130,34 @@ final class ChatViewController: MessagesViewController {
     }
 }
 
+// MARK: Delegate Protocols
+
 extension ChatViewController: ComplexTransferViewControllerDelegate {
     func complexTransferViewController(
         _: ComplexTransferViewController,
-        didFinishWithTransfer: TransactionDetails?,
+        didFinishWithTransfer transfer: TransactionDetails?,
         detailsViewController: UIViewController?
     ) {
-        DispatchQueue.onMainAsync { [weak self] in
-            if didFinishWithTransfer != nil {
-                self?.messagesCollectionView.scrollToLastItem()
-            }
-            
-            self?.dismiss(animated: true)
-            guard let detailsViewController = detailsViewController else { return }
-            self?.navigationController?.pushViewController(detailsViewController, animated: true)
+        DispatchQueue.onMainAsync { [self] in
+            dismissTransferViewController(
+                andPresent: detailsViewController,
+                didFinishWithTransfer: transfer
+            )
+        }
+    }
+}
+
+extension ChatViewController: TransferViewControllerDelegate {
+    func transferViewController(
+        _: TransferViewControllerBase,
+        didFinishWithTransfer transfer: TransactionDetails?,
+        detailsViewController: UIViewController?
+    ) {
+        DispatchQueue.onMainAsync { [self] in
+            dismissTransferViewController(
+                andPresent: detailsViewController,
+                didFinishWithTransfer: transfer
+            )
         }
     }
 }
@@ -349,6 +363,19 @@ private extension ChatViewController {
 // MARK: Other
 
 private extension ChatViewController {
+    func dismissTransferViewController(
+        andPresent viewController: UIViewController?,
+        didFinishWithTransfer: TransactionDetails?
+    ) {
+        if didFinishWithTransfer != nil {
+            messagesCollectionView.scrollToLastItem()
+        }
+
+        dismiss(animated: true)
+        guard let detailsViewController = viewController else { return }
+        navigationController?.pushViewController(detailsViewController, animated: true)
+    }
+    
     func checkIsChatWasRead() {
         guard isScrollPositionNearlyTheBottom, messagesLoaded else { return }
         viewModel.entireChatWasRead()
@@ -468,6 +495,41 @@ private extension ChatViewController {
         } else {
             navigationController?.popViewController(animated: true)
         }
+    }
+}
+
+// MARK: Markdown
+
+private extension ChatViewController {
+    func didTapAdmChat(with chatroom: Chatroom, message: String?) {
+        guard let chatlistVC = navigationController?.viewControllers.first as? ChatListViewController
+        else {
+            return
+        }
+        
+        let vc = chatlistVC.chatViewController(for: chatroom)
+        if let message = message {
+            vc.messageInputBar.inputTextView.text = message
+            vc.viewModel.inputText = message
+        }
+        
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    func didTapAdmSend(to adm: AdamantAddress) {
+        guard let accountService = storedObjects.first(where: { $0 is AccountService }) as? AccountService else { return }
+        let service = accountService.wallets.first { wallet in
+            return wallet is AdmWalletService
+        }
+        
+        guard let service = service as? WalletServiceWithSend else { return }
+        let vc = service.transferViewController()
+        if let v = vc as? TransferViewControllerBase {
+            v.recipientAddress = adm.address
+            v.recipientName = adm.name
+            v.delegate = self
+        }
+        self.navigationController?.pushViewController(vc, animated: true)
     }
 }
 

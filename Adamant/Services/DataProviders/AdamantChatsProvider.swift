@@ -1024,6 +1024,25 @@ extension AdamantChatsProvider {
         return controller
     }
     
+    func getChatroom(for adm: String) -> Chatroom? {
+        let request: NSFetchRequest<Chatroom> = NSFetchRequest(entityName: Chatroom.entityName)
+        request.sortDescriptors = [NSSortDescriptor(key: "updatedAt", ascending: false),
+                                   NSSortDescriptor(key: "title", ascending: true)]
+        request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "partner!=nil"),
+            NSPredicate(format: "partner.address CONTAINS[cd] %@", adm),
+            NSPredicate(format: "isForcedVisible = true OR isHidden = false"),
+            NSPredicate(format: "isForcedVisible = true OR ANY transactions.showsChatroom = true")
+        ])
+        
+        do {
+            let result = try stack.container.viewContext.fetch(request)
+            return result.first
+        } catch {
+            return nil
+        }
+    }
+    
     func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction> {
         guard let context = chatroom.managedObjectContext else {
             fatalError()

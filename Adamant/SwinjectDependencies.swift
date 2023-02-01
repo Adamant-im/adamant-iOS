@@ -198,6 +198,7 @@ extension Container {
                 dialogService: r.resolve(DialogService.self)!,
                 transferProvider: r.resolve(TransfersProvider.self)!,
                 accountService: r.resolve(AccountService.self)!,
+                accountProvider: r.resolve(AccountsProvider.self)!,
                 addressBookService: r.resolve(AddressBookService.self)!,
                 visibleWalletService: r.resolve(VisibleWalletsService.self)!,
                 router: r.resolve(Router.self)!
