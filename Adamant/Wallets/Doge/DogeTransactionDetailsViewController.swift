@@ -23,6 +23,7 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
     
     private lazy var refreshControl: UIRefreshControl = {
         let control = UIRefreshControl()
+        control.tintColor = .adamant.primary
         control.addTarget(self, action: #selector(refresh), for: UIControl.Event.valueChanged)
         return control
     }()
@@ -52,7 +53,7 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
         let id = transaction.txId
         
-        return URL(string: "\(AdamantResources.dogeExplorerAddress)\(id)")
+        return URL(string: "\(DogeWalletService.explorerAddress)\(id)")
     }
     
     @objc func refresh() {

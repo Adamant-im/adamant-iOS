@@ -50,6 +50,13 @@ class Node: Equatable, Codable {
         self.port = port
     }
     
+    init(url: URL) {
+        let schemeRaw = url.scheme ?? "https"
+        self.scheme = URLScheme(rawValue: schemeRaw) ?? .https
+        self.host = url.host ?? ""
+        self.port = url.port
+    }
+    
     var scheme: URLScheme
     var host: String
     var port: Int?

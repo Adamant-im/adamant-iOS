@@ -198,6 +198,7 @@ class ERC20TransferViewController: TransferViewControllerBase {
                         }
                     }
                 }
+                self?.updateToolbar(for: row)
         }.onCellSelection { [weak self] (cell, _) in
             self?.shareValue(self?.recipientAddress, from: cell)
         }
@@ -258,12 +259,13 @@ class ERC20TransferViewController: TransferViewControllerBase {
         }
         
         guard let service = service,
-              let balance = service.wallet?.balance,
-              let minAmount = service.wallet?.minAmount
+              let balance = service.wallet?.balance
         else {
             return false
         }
         
+        let minAmount = service.minAmount
+
         guard minAmount <= amount else {
             return false
         }

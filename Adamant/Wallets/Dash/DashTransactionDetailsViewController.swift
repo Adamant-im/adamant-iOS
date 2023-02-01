@@ -23,6 +23,7 @@ class DashTransactionDetailsViewController: TransactionDetailsViewControllerBase
     
     private lazy var refreshControl: UIRefreshControl = {
         let control = UIRefreshControl()
+        control.tintColor = .adamant.primary
         control.addTarget(self, action: #selector(refresh), for: UIControl.Event.valueChanged)
         return control
     }()
@@ -52,7 +53,7 @@ class DashTransactionDetailsViewController: TransactionDetailsViewControllerBase
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
         let id = transaction.txId
         
-        return URL(string: "\(AdamantResources.dashExplorerAddress)\(id)")
+        return URL(string: "\(DashWalletService.explorerAddress)\(id)")
     }
     
     @objc func refresh() {

@@ -20,6 +20,7 @@ extension AdamantScene {
             c.localAuth = r.resolve(LocalAuthentication.self)
             c.avatarService = r.resolve(AvatarService.self)
             c.currencyInfoService = r.resolve(CurrencyInfoService.self)
+            c.visibleWalletsService = r.resolve(VisibleWalletsService.self)
             return c
         }
         

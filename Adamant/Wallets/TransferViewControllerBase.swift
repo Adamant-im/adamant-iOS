@@ -132,6 +132,8 @@ class TransferViewControllerBase: FormViewController {
     
     // MARK: - Properties
     
+    private var previousIsReadyToSend: Bool?
+    
     var commentsEnabled: Bool = false
     var rootCoinBalance: Decimal?
     
@@ -204,24 +206,22 @@ class TransferViewControllerBase: FormViewController {
         guard
             let service = service,
             let balance = service.wallet?.balance,
-            let minBalance = service.wallet?.minBalance,
-            balance > minBalance else {
+            balance > service.minBalance else {
             return 0
         }
         
-        let max = balance - service.transactionFee - minBalance
+        let max = balance - service.transactionFee - service.minBalance
         
         return max >= 0 ? max : 0
     }
     
     var minToTransfer: Decimal {
         guard
-            let service = service,
-            let minBalance = service.wallet?.minAmount else {
+            let service = service else {
             return 0
         }
         
-        return minBalance
+        return service.minAmount
     }
     
     override var customNavigationAccessoryView: (UIView & NavigationAccessory)? {
@@ -301,6 +301,58 @@ class TransferViewControllerBase: FormViewController {
     }
     
     // MARK: - Other
+    
+    private func isReadyToSend() -> Bool {
+        validateAddress()
+        guard recipientAddress != nil,
+              recipientAddressIsValid,
+              amount != nil
+        else {
+            return false
+        }
+        if commentsEnabled {
+            if let row: TextAreaRow = form.rowBy(tag: BaseRows.comments.tag) {
+                return !(row.value?.isEmpty ?? true)
+            }
+            return false
+        }
+        return true
+    }
+    
+    private func navigationKeybordDone() {
+        tableView?.endEditing(true)
+        if isReadyToSend() {
+            confirmSendFunds()
+        }
+    }
+
+    func updateToolbar(for row: BaseRow) {
+        _ = inputAccessoryView(for: row)
+    }
+    
+    override func inputAccessoryView(for row: BaseRow) -> UIView? {
+        let view = super.inputAccessoryView(for: row)
+        guard var view = view as? NavigationAccessoryView else { return view }
+        
+        view.doneClosure = { [weak self] in
+            self?.navigationKeybordDone()
+        }
+        
+        if let previousIsReadyToSend = previousIsReadyToSend,
+           previousIsReadyToSend == isReadyToSend() {
+            return view
+        }
+        previousIsReadyToSend = isReadyToSend()
+        
+        let doneBtn = UIBarButtonItem(barButtonSystemItem: .done, target: view, action: view.doneButton.action)
+        let sendBtn = UIBarButtonItem(title: String.adamantLocalized.transfer.send, style: .done, target: view, action: view.doneButton.action)
+        view.doneButton = isReadyToSend() ? sendBtn : doneBtn
+        if (view.items?.count ?? 0) > 4 {
+            view.items?.remove(at: 4)
+            view.items?.append(view.doneButton)
+        }
+        return view
+    }
     
     private func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
@@ -629,11 +681,12 @@ class TransferViewControllerBase: FormViewController {
         }
         
         guard let service = service,
-              let balance = service.wallet?.balance,
-              let minAmount = service.wallet?.minAmount
+              let balance = service.wallet?.balance
         else {
             return false
         }
+        
+        let minAmount = service.minAmount
         
         guard minAmount <= amount else {
             return false
@@ -816,6 +869,7 @@ extension TransferViewControllerBase {
                 }
                 
                 self?.validateForm()
+                self?.updateToolbar(for: row)
             }.cellUpdate { [weak self] _, _ in
                 self?.validateForm()
             }
@@ -870,6 +924,8 @@ extension TransferViewControllerBase {
             let row = TextAreaRow {
                 $0.tag = BaseRows.comments.tag
                 $0.textAreaHeight = .dynamic(initialTextViewHeight: 44)
+            }.onChange { [weak self] row in
+                self?.updateToolbar(for: row)
             }.cellUpdate { (cell, _) in
                 cell.textView?.backgroundColor = UIColor.clear
             }

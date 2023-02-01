@@ -1150,6 +1150,19 @@ extension AdamantChatsProvider {
                          context: NSManagedObjectContext,
                          contextMutatingSemaphore: DispatchSemaphore,
                          completion: (() -> Void)? = nil) {
+        
+        let blockOperation = BlockOperation { [weak self] in
+            self?.processSynced(messageTransactions: messageTransactions, senderId: senderId, privateKey: privateKey, context: context, contextMutatingSemaphore: contextMutatingSemaphore, completion: completion)
+        }
+        transactionService.addOperations(blockOperation)
+    }
+    
+    private func processSynced(messageTransactions: [Transaction],
+                         senderId: String,
+                         privateKey: String,
+                         context: NSManagedObjectContext,
+                         contextMutatingSemaphore: DispatchSemaphore,
+                         completion: (() -> Void)? = nil) {
         struct DirectionedTransaction {
             let transaction: Transaction
             let isOut: Bool
@@ -1368,7 +1381,6 @@ extension AdamantChatsProvider {
                 
                 DispatchQueue.main.async {
                     viewContextChatrooms.forEach { $0.updateLastTransaction() }
-                    self.transactionService.processingComplete(transactionInProgress)
                 }
             } catch {
                 print(error)
