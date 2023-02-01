@@ -230,7 +230,7 @@ extension AdamantDialogService {
 // MAKR: - Activity controllers
 extension AdamantDialogService {
     func presentShareAlertFor(adm: String, name: String, types: [AddressChatShareType], animated: Bool, from: UIView?, completion: (() -> Void)?, didSelect: ((AddressChatShareType) -> Void)?) {
-        let alert = UIAlertController(title: adm, message: nil, preferredStyle: .actionSheet)
+        let alert = UIAlertController(title: adm, message: nil, preferredStyle: shareAlertStyle(source: from))
         
         for type in types {
             alert.addAction(UIAlertAction(title: type.localized + name, style: .default) { _ in
@@ -324,6 +324,15 @@ extension AdamantDialogService {
     private enum ViewSource {
         case view(UIView)
         case barButtonItem(UIBarButtonItem)
+        
+        var entity: Any {
+            switch self {
+            case let .view(view):
+                return view
+            case let .barButtonItem(item):
+                return item
+            }
+        }
     }
     
     private func createShareAlertFor(
@@ -336,7 +345,7 @@ extension AdamantDialogService {
         from: ViewSource?,
         completion: (() -> Void)?
     ) -> UIAlertController {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: shareAlertStyle(source: from?.entity))
         addActions(to: alert, stringForPasteboard: stringForPasteboard, stringForShare: stringForShare, stringForQR: stringForQR, types: types, excludedActivityTypes: excludedActivityTypes, from: from, completion: completion)
         
         return alert
@@ -565,6 +574,12 @@ extension AdamantDialogService {
         DispatchQueue.onMainAsync { [weak self] in
             self?.present(alertVC, animated: true, completion: nil)
         }
+    }
+    
+    private func shareAlertStyle(source: Any?) -> UIAlertController.Style {
+        source == nil
+            ? .alert
+            : .actionSheet
     }
 }
 
