@@ -320,21 +320,12 @@ extension LskWalletService {
 
 // MARK: - WalletInitiatedWithPassphrase
 extension LskWalletService: InitiatedWithPassphraseService {
-    func initWallet(withPassphrase passphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) {
-        DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
-            self.initWalletInternal(withPassphrase: passphrase, completion: completion)
-        }
-    }
-    
-    private func initWalletInternal(withPassphrase passphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) {
+    func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
         guard let adamant = accountService.account else {
-            completion(.failure(error: .notLogged))
-            return
+            throw WalletServiceError.notLogged
         }
         
         // MARK: 1. Prepare
-        stateSemaphore.wait()
-        
         setState(.notInitiated)
         
         if enabled {
@@ -352,9 +343,7 @@ extension LskWalletService: InitiatedWithPassphraseService {
             self.lskWallet = wallet
         } catch {
             print("\(error)")
-            completion(.failure(error: .accountNotFound))
-            stateSemaphore.signal()
-            return
+            throw WalletServiceError.accountNotFound
         }
         
         if !enabled {
@@ -365,47 +354,40 @@ extension LskWalletService: InitiatedWithPassphraseService {
         stateSemaphore.signal()
         
         guard let eWallet = self.lskWallet else {
-            completion(.failure(error: .accountNotFound))
-            return
+            throw WalletServiceError.accountNotFound
         }
         
         // MARK: 4. Save into KVS
-        getWalletAddress(byAdamantAddress: adamant.address) { [weak self] result in
-            guard let service = self else {
-                return
+        let service = self
+        do {
+            let address = try await getWalletAddress(byAdamantAddress: adamant.address)
+            
+            if address != eWallet.address {
+                service.save(lskAddress: eWallet.address) { result in
+                    service.kvsSaveCompletionRecursion(lskAddress: eWallet.address, result: result)
+                }
             }
             
-            switch result {
-            case .success(let address):
-                // LSK already saved
-                if address != eWallet.address {
-                    service.save(lskAddress: eWallet.address) { result in
-                        service.kvsSaveCompletionRecursion(lskAddress: eWallet.address, result: result)
-                    }
+            service.initialBalanceCheck = true
+            service.setState(.upToDate, silent: true)
+            service.update()
+            return eWallet
+        } catch let error as WalletServiceError {
+            switch error {
+            case .walletNotInitiated:
+                // Show '0' without waiting for balance update
+                if let wallet = service.lskWallet {
+                    NotificationCenter.default.post(name: service.walletUpdatedNotification, object: service, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
                 }
                 
-                service.initialBalanceCheck = true
-                service.setState(.upToDate, silent: true)
-                service.update()
-                completion(.success(result: eWallet))
-                
-            case .failure(let error):
-                switch error {
-                case .walletNotInitiated:
-                    // Show '0' without waiting for balance update
-                    if let wallet = service.lskWallet {
-                        NotificationCenter.default.post(name: service.walletUpdatedNotification, object: service, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
-                    }
-                    
-                    service.save(lskAddress: eWallet.address) { result in
-                        service.kvsSaveCompletionRecursion(lskAddress: eWallet.address, result: result)
-                    }
-                    service.setState(.upToDate)
-                    completion(.success(result: eWallet))
-                default:
-                    service.setState(.upToDate)
-                    completion(.failure(error: error))
+                service.save(lskAddress: eWallet.address) { result in
+                    service.kvsSaveCompletionRecursion(lskAddress: eWallet.address, result: result)
                 }
+                service.setState(.upToDate)
+                return eWallet
+            default:
+                service.setState(.upToDate)
+                throw error
             }
         }
     }
@@ -500,18 +482,20 @@ extension LskWalletService {
         apiService.get(key: LskWalletService.kvsAddress, sender: address, completion: completion)
     }
     
-    func getWalletAddress(byAdamantAddress address: String, completion: @escaping (WalletServiceResult<String>) -> Void) {
-        apiService.get(key: LskWalletService.kvsAddress, sender: address) { (result) in
-            switch result {
-            case .success(let value):
-                if let address = value {
-                    completion(.success(result: address))
-                } else {
-                    completion(.failure(error: .walletNotInitiated))
+    func getWalletAddress(byAdamantAddress address: String) async throws -> String {
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<String, Error>) in
+            apiService.get(key: LskWalletService.kvsAddress, sender: address) { (result) in
+                switch result {
+                case .success(let value):
+                    if let address = value {
+                        continuation.resume(returning: address)
+                    } else {
+                        continuation.resume(throwing: WalletServiceError.walletNotInitiated)
+                    }
+                    
+                case .failure(let error):
+                    continuation.resume(throwing: WalletServiceError.internalError(message: "LSK Wallet: fail to get address from KVS", error: error))
                 }
-
-            case .failure(let error):
-                completion(.failure(error: .internalError(message: "LSK Wallet: fail to get address from KVS", error: error)))
             }
         }
     }
@@ -566,25 +550,23 @@ extension LskWalletService {
         }
     }
     
-    func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<Transactions.TransactionModel>) -> Void) {
+    func getTransaction(by hash: String) async throws -> Transactions.TransactionModel {
         guard let api = serviceApi else {
-            completion(ApiServiceResult.failure(ApiServiceError.networkError(error: AdamantError(message: "Problem with accessing LSK nodes, try later"))))
-            return
+            throw WalletServiceError.internalError(message: "Problem with accessing LSK nodes, try later", error: nil)
         }
-        
-        defaultDispatchQueue.async {
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Transactions.TransactionModel, Error>) in
             api.transactions(id: hash, limit: 1, offset: 0) { (response) in
                 switch response {
                 case .success(response: let result):
                     if let transaction = result.first {
-                        completion(.success(transaction))
+                        continuation.resume(returning: transaction)
                     } else {
-                        completion(.failure(.internalError(message: "No transaction", error: nil)))
+                        continuation.resume(throwing: WalletServiceError.internalError(message: "No transaction", error: nil))
                     }
                     break
                 case .error(response: let error):
                     print("ERROR: " + error.message)
-                    completion(.failure(.internalError(message: error.message, error: nil)))
+                    continuation.resume(throwing: WalletServiceError.internalError(message: error.message, error: nil))
                     break
                 }
             }

@@ -240,7 +240,7 @@ protocol WalletService: AnyObject {
     
     // MARK: Tools
     func validate(address: String) -> AddressValidationResult
-    func getWalletAddress(byAdamantAddress address: String, completion: @escaping (WalletServiceResult<String>) -> Void)
+    func getWalletAddress(byAdamantAddress address: String) async throws -> String
 }
 
 protocol SwinjectDependentService: WalletService {
@@ -248,7 +248,7 @@ protocol SwinjectDependentService: WalletService {
 }
 
 protocol InitiatedWithPassphraseService: WalletService {
-    func initWallet(withPassphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void)
+    func initWallet(withPassphrase: String) async throws -> WalletAccount
     func setInitiationFailed(reason: String)
 }
 

@@ -337,108 +337,130 @@ extension AdamantAccountService {
 // MARK: - Log In
 extension AdamantAccountService {
     // MARK: Passphrase
-    func loginWith(passphrase: String, completion: @escaping (AccountServiceResult) -> Void) {
+    @MainActor
+    func loginWith(passphrase: String) async throws -> AccountServiceResult {
         guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
-            completion(.failure(.invalidPassphrase))
-            return
+            throw AccountServiceError.invalidPassphrase
         }
         
         guard let keypair = adamantCore.createKeypairFor(passphrase: passphrase) else {
-            completion(.failure(.internalError(message: "Failed to generate keypair for passphrase", error: nil)))
-            return
+            throw AccountServiceError.internalError(message: "Failed to generate keypair for passphrase", error: nil)
         }
         
-        loginWith(keypair: keypair) { [weak self] result in
-            guard case .success = result else {
-                completion(result)
-                return
-            }
+        do {
+            let account = try await loginWith(keypair: keypair)
             
             // MARK: Drop saved accs
-            if let storedPassphrase = self?.getSavedPassphrase(), storedPassphrase != passphrase {
-                self?.dropSavedAccount()
+            if let storedPassphrase = self.getSavedPassphrase(),
+               storedPassphrase != passphrase {
+                dropSavedAccount()
             }
             
-            if let storedKeypair = self?.getSavedKeypair(), storedKeypair != self?.keypair {
-                self?.dropSavedAccount()
+            if let storedKeypair = self.getSavedKeypair(),
+                storedKeypair != self.keypair {
+                dropSavedAccount()
             }
             
             // Update and initiate wallet services
-            self?.passphrase = passphrase
+            self.passphrase = passphrase
             
-            if let wallets = self?.wallets {
-                for case let wallet as InitiatedWithPassphraseService in wallets {
-                    wallet.initWallet(withPassphrase: passphrase, completion: { _ in })
-                }
+            for case let wallet as InitiatedWithPassphraseService in wallets {
+                let _ = try? await wallet.initWallet(withPassphrase: passphrase)
             }
             
-            completion(result)
+            return .success(account: account, alert: nil)
+        } catch {
+            throw error
         }
     }
     
     // MARK: Pincode
-    func loginWith(pincode: String, completion: @escaping (AccountServiceResult) -> Void) {
+    func loginWith(pincode: String) async throws -> AccountServiceResult {
         guard let storePin = securedStore.get(.pin) else {
-            completion(.failure(.invalidPassphrase))
-            return
+            throw AccountServiceError.invalidPassphrase
         }
         
         guard storePin == pincode else {
-            completion(.failure(.invalidPassphrase))
-            return
+            throw AccountServiceError.invalidPassphrase
         }
         
-        loginWithStoredAccount(completion: completion)
+        do {
+            return try await loginWithStoredAccount()
+        } catch {
+            throw error
+        }
     }
     
     // MARK: Biometry
-    func loginWithStoredAccount(completion: @escaping (AccountServiceResult) -> Void) {
-        if let passphrase = getSavedPassphrase() {
-            loginWith(passphrase: passphrase, completion: completion)
-            return
-        }
-        
-        if let keypair = getSavedKeypair() {
-            loginWith(keypair: keypair) { [weak self] result in
-                switch result {
-                case .success(let account, _):
-                    
-                    let alert: (title: String, message: String)?
-                    if self?.securedStore.get(.showedV12) != nil {
-                        alert = nil
-                    } else {
-                        self?.securedStore.set("1", for: .showedV12)
-                        alert = (title: String.adamantLocalized.accountService.updateAlertTitleV12,
-                                 message: String.adamantLocalized.accountService.updateAlertMessageV12)
-                    }
-                    
-                    completion(.success(account: account, alert: alert))
-                    
-                    if let wallets = self?.wallets {
-                        for case let wallet as InitiatedWithPassphraseService in wallets {
-                            wallet.setInitiationFailed(reason: String.adamantLocalized.accountService.reloginToInitiateWallets)
-                        }
-                    }
-                    
-                default:
-                    completion(result)
-                }
+    @MainActor
+    func loginWithStoredAccount() async throws -> AccountServiceResult {
+        do {
+            if let passphrase = getSavedPassphrase() {
+                let account = try await loginWith(passphrase: passphrase)
+                return account
             }
-            return
+            
+            if let keypair = getSavedKeypair() {
+                let account = try await loginWith(keypair: keypair)
+                
+                let alert: (title: String, message: String)?
+                if securedStore.get(.showedV12) != nil {
+                    alert = nil
+                } else {
+                    securedStore.set("1", for: .showedV12)
+                    alert = (title: String.adamantLocalized.accountService.updateAlertTitleV12,
+                             message: String.adamantLocalized.accountService.updateAlertMessageV12)
+                }
+                
+                for case let wallet as InitiatedWithPassphraseService in wallets {
+                    wallet.setInitiationFailed(reason: String.adamantLocalized.accountService.reloginToInitiateWallets)
+                }
+                
+                return .success(account: account, alert: alert)
+            }
+        } catch {
+            throw error
         }
         
-        completion(.failure(.invalidPassphrase))
+        throw AccountServiceError.invalidPassphrase
+        
+//        if let keypair = getSavedKeypair() {
+//            loginWith(keypair: keypair) { [weak self] result in
+//                switch result {
+//                case .success(let account, _):
+//
+//                    let alert: (title: String, message: String)?
+//                    if self?.securedStore.get(.showedV12) != nil {
+//                        alert = nil
+//                    } else {
+//                        self?.securedStore.set("1", for: .showedV12)
+//                        alert = (title: String.adamantLocalized.accountService.updateAlertTitleV12,
+//                                 message: String.adamantLocalized.accountService.updateAlertMessageV12)
+//                    }
+//
+//                    completion(.success(account: account, alert: alert))
+//
+//                    if let wallets = self?.wallets {
+//                        for case let wallet as InitiatedWithPassphraseService in wallets {
+//                            wallet.setInitiationFailed(reason: String.adamantLocalized.accountService.reloginToInitiateWallets)
+//                        }
+//                    }
+//
+//                default:
+//                    completion(result)
+//                }
+//            }
+//            return
+//        }
+//
+//        completion(.failure(.invalidPassphrase))
     }
     
     // MARK: Keypair
-    private func loginWith(keypair: Keypair, completion: @escaping (AccountServiceResult) -> Void) {
-        stateSemaphore.wait()
+    private func loginWith(keypair: Keypair) async throws -> AdamantAccount {
         switch state {
         case .isLoggingIn:
-            stateSemaphore.signal()
-            completion(.failure(.internalError(message: "Service is busy", error: nil)))
-            return
-            
+            throw AccountServiceError.internalError(message: "Service is busy", error: nil)
         case .updating:
             fallthrough
             
@@ -454,26 +476,27 @@ extension AdamantAccountService {
         state = .isLoggingIn
         stateSemaphore.signal()
         
-        apiService.getAccount(byPublicKey: keypair.publicKey) { result in
-            switch result {
-            case .success(let account):
-                self.account = account
-                self.keypair = keypair
-                
-                let userInfo = [AdamantUserInfoKey.AccountService.loggedAccountAddress:account.address]
-                NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.userLoggedIn, object: self, userInfo: userInfo)
-                self.setState(.loggedIn)
-                
-                completion(.success(account: account, alert: nil))
-                
-            case .failure(let error):
-                self.setState(.notLogged)
-                switch error {
-                case .accountNotFound:
-                    completion(.failure(.wrongPassphrase))
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<AdamantAccount, Error>) in
+            apiService.getAccount(byPublicKey: keypair.publicKey) { result in
+                switch result {
+                case .success(let account):
+                    self.account = account
+                    self.keypair = keypair
                     
-                default:
-                    completion(.failure(.apiError(error: error)))
+                    let userInfo = [AdamantUserInfoKey.AccountService.loggedAccountAddress:account.address]
+                    NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.userLoggedIn, object: self, userInfo: userInfo)
+                    self.setState(.loggedIn)
+                    
+                    continuation.resume(returning: account)
+                case .failure(let error):
+                    self.setState(.notLogged)
+                    switch error {
+                    case .accountNotFound:
+                        continuation.resume(throwing: AccountServiceError.wrongPassphrase)
+                        
+                    default:
+                        continuation.resume(throwing: AccountServiceError.apiError(error: error))
+                    }
                 }
             }
         }
@@ -484,8 +507,10 @@ extension AdamantAccountService {
             print("No passphrase found")
             return
         }
-        for case let wallet as InitiatedWithPassphraseService in wallets {
-            wallet.initWallet(withPassphrase: passphrase, completion: { _ in })
+        Task {
+            for case let wallet as InitiatedWithPassphraseService in wallets {
+                let _ = try? await wallet.initWallet(withPassphrase: passphrase)
+            }
         }
     }
 }

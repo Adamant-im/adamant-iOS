@@ -358,21 +358,12 @@ class EthWalletService: WalletService {
 
 // MARK: - WalletInitiatedWithPassphrase
 extension EthWalletService: InitiatedWithPassphraseService {
-    func initWallet(withPassphrase passphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) {
-        Task {
-            await initWallet(withPassphrase: passphrase, completion: completion)
-        }
-    }
-    
-    func initWallet(withPassphrase passphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) async {
+    func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
         guard let adamant = accountService?.account else {
-            completion(.failure(error: .notLogged))
-            return
+            throw WalletServiceError.notLogged
         }
         
         // MARK: 1. Prepare
-        stateSemaphore.wait()
-        
         setState(.notInitiated)
         
         if enabled {
@@ -382,25 +373,24 @@ extension EthWalletService: InitiatedWithPassphraseService {
         
         // MARK: 2. Create keys and addresses
         do {
-            guard let store = try BIP32Keystore(mnemonics: passphrase, password: EthWalletService.walletPassword, mnemonicsPassword: "", language: .english, prefixPath: EthWalletService.walletPath) else {
-                completion(.failure(error: .internalError(message: "ETH Wallet: failed to create Keystore", error: nil)))
-                stateSemaphore.signal()
-                return
+            guard let store = try BIP32Keystore(mnemonics: passphrase,
+                                                password: EthWalletService.walletPassword,
+                                                mnemonicsPassword: "",
+                                                language: .english,
+                                                prefixPath: EthWalletService.walletPath
+            ) else {
+                throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: nil)
             }
             
             waletStorage = .init(keystore: store)
         } catch {
-            completion(.failure(error: .internalError(message: "ETH Wallet: failed to create Keystore", error: error)))
-            stateSemaphore.signal()
-            return
+            throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: error)
         }
         
         guard let web3 = await web3,
               let eWallet = waletStorage?.getWalet(with: web3)
         else {
-            completion(.failure(error: .internalError(message: "ETH Wallet: failed to create Keystore", error: nil)))
-            stateSemaphore.signal()
-            return
+            throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: nil)
         }
         
         // MARK: 3. Update
@@ -411,46 +401,41 @@ extension EthWalletService: InitiatedWithPassphraseService {
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
         
-        stateSemaphore.signal()
-        
         // MARK: 4. Save into KVS
-        getWalletAddress(byAdamantAddress: adamant.address) { [weak self] result in
-            guard let service = self else {
-                return
+        let service = self
+        do {
+            let address = try await getWalletAddress(byAdamantAddress: adamant.address)
+            if eWallet.address.caseInsensitiveCompare(address) != .orderedSame {
+                service.save(ethAddress: eWallet.address) { result in
+                    service.kvsSaveCompletionRecursion(ethAddress: eWallet.address.lowercased(), result: result)
+                }
             }
             
-            switch result {
-            case .success(let address):
-                // ETH already saved
-                if eWallet.address.caseInsensitiveCompare(address) != .orderedSame {
-                    service.save(ethAddress: eWallet.address) { result in
-                        service.kvsSaveCompletionRecursion(ethAddress: eWallet.address.lowercased(), result: result)
-                    }
+            service.initialBalanceCheck = true
+            service.setState(.upToDate, silent: true)
+            
+            Task {
+                await service.update()
+            }
+            
+            return eWallet
+        } catch let error as WalletServiceError {
+            switch error {
+            case .walletNotInitiated:
+                // Show '0' without waiting for balance update
+                if let wallet = service.ethWallet {
+                    NotificationCenter.default.post(name: service.walletUpdatedNotification, object: service, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
                 }
                 
-                service.initialBalanceCheck = true
-                service.setState(.upToDate, silent: true)
-                service.update()
-                completion(.success(result: eWallet))
-                
-            case .failure(let error):
-                switch error {
-                case .walletNotInitiated:
-                    // Show '0' without waiting for balance update
-                    if let wallet = service.ethWallet {
-                        NotificationCenter.default.post(name: service.walletUpdatedNotification, object: service, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
-                    }
-                    
-                    service.save(ethAddress: eWallet.address) { result in
-                        service.kvsSaveCompletionRecursion(ethAddress: eWallet.address, result: result)
-                    }
-                    service.setState(.upToDate)
-                    completion(.success(result: eWallet))
-                    
-                default:
-                    service.setState(.upToDate)
-                    completion(.failure(error: error))
+                service.save(ethAddress: eWallet.address) { result in
+                    service.kvsSaveCompletionRecursion(ethAddress: eWallet.address, result: result)
                 }
+                service.setState(.upToDate)
+                return eWallet
+                
+            default:
+                service.setState(.upToDate)
+                throw error
             }
         }
     }
@@ -525,20 +510,22 @@ extension EthWalletService {
 		}
 	}
 	
-	func getWalletAddress(byAdamantAddress address: String, completion: @escaping (WalletServiceResult<String>) -> Void) {
-		apiService.get(key: EthWalletService.kvsAddress, sender: address) { (result) in
-			switch result {
-			case .success(let value):
-				if let address = value {
-					completion(.success(result: address))
-				} else {
-					completion(.failure(error: .walletNotInitiated))
-				}
-				
-			case .failure(let error):
-				completion(.failure(error: .internalError(message: "ETH Wallet: fail to get address from KVS", error: error)))
-			}
-		}
+	func getWalletAddress(byAdamantAddress address: String) async throws -> String {
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<String, Error>) in
+            apiService.get(key: EthWalletService.kvsAddress, sender: address) { (result) in
+                switch result {
+                case .success(let value):
+                    if let address = value {
+                        continuation.resume(returning: address)
+                    } else {
+                        continuation.resume(throwing: WalletServiceError.walletNotInitiated)
+                    }
+                    
+                case .failure(let error):
+                    continuation.resume(throwing: WalletServiceError.internalError(message: "ETH Wallet: fail to get address from KVS", error: error))
+                }
+            }
+        }
 	}
 }
 

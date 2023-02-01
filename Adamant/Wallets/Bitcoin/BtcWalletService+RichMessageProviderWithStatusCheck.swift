@@ -15,10 +15,9 @@ extension BtcWalletService: RichMessageProviderWithStatusCheck {
             return
         }
         
-        getTransaction(by: hash) { result in
-            switch result {
-            case .success(let btcTransaction):
-                // MARK: Check status
+        Task {
+            do {
+                let btcTransaction = try await getTransaction(by: hash)
                 guard let status = btcTransaction.transactionStatus else {
                     completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction", error: nil)))
                     return
@@ -66,8 +65,7 @@ extension BtcWalletService: RichMessageProviderWithStatusCheck {
                 }
                 
                 completion(.success(result: .success))
-                
-            case .failure(let error):
+            } catch let error as WalletServiceError {
                 if case let .internalError(message, _) = error, message == "No transaction" {
                     let timeAgo = -1 * date.timeIntervalSinceNow
                     
@@ -82,7 +80,7 @@ extension BtcWalletService: RichMessageProviderWithStatusCheck {
                     completion(.success(result: result))
                     
                 } else {
-                    completion(.failure(error: error.asWalletServiceError()))
+                    completion(.failure(error: error))
                 }
             }
         }

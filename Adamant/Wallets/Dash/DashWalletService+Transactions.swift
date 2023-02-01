@@ -86,7 +86,11 @@ extension DashWalletService {
         }
     }
 
-    func getBlockId(by hash: String, completion: @escaping (ApiServiceResult<String>) -> Void) {
+    func getBlockId(by hash: String?) async throws -> String {
+        guard let hash = hash else {
+            throw WalletServiceError.internalError(message: "Hash is empty", error: nil)
+        }
+        
         guard let endpoint = DashWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DASH endpoint URL")
         }
@@ -104,24 +108,26 @@ extension DashWalletService {
         ]
         
         // MARK: Sending request
-        AF.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseData(queue: defaultDispatchQueue) { response in
-            switch response.result {
-            case .success(let data):
-                do {
-                    let result = try DashWalletService.jsonDecoder.decode(BTCRPCServerResponce<BtcBlock>.self, from: data)
-                    if let block = result.result {
-                        completion(.success(String(block.height)))
-                    } else {
-                        completion(.failure(.internalError(message: "DASH: Parsing block error", error: nil)))
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<String, Error>) in
+            AF.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseData(queue: defaultDispatchQueue) { response in
+                switch response.result {
+                case .success(let data):
+                    do {
+                        let result = try DashWalletService.jsonDecoder.decode(BTCRPCServerResponce<BtcBlock>.self, from: data)
+                        if let block = result.result {
+                            continuation.resume(returning: String(block.height))
+                        } else {
+                            continuation.resume(throwing: WalletServiceError.internalError(message: "DASH: Parsing block error", error: nil))
+                        }
+                    } catch {
+                        continuation.resume(throwing: WalletServiceError.internalError(message: "DASH: Parsing bloc error", error: error))
                     }
-                } catch {
-                    completion(.failure(.internalError(message: "DASH: Parsing bloc error", error: error)))
+                    
+                case .failure(let error):
+                    continuation.resume(throwing: WalletServiceError.internalError(message: "No block", error: error))
                 }
                 
-            case .failure(let error):
-                completion(.failure(.internalError(message: "No block", error: error)))
             }
-            
         }
     }
 

@@ -15,10 +15,9 @@ extension LskWalletService: RichMessageProviderWithStatusCheck {
             return
         }
         
-        getTransaction(by: hash) { result in
-            switch result {
-            case .success(var lskTransaction):
-                // MARK: Check status
+        Task {
+            do {
+                var lskTransaction = try await getTransaction(by: hash)
                 lskTransaction.updateConfirmations(value: self.lastHeight)
                 
                 guard let status = lskTransaction.transactionStatus else {
@@ -66,8 +65,8 @@ extension LskWalletService: RichMessageProviderWithStatusCheck {
                 }
                 
                 completion(.success(result: .success))
-                
-            case .failure(let error):
+            } catch {
+                guard let error = error as? WalletServiceError else { return }
                 if error.message.contains("does not exist") {
                     let timeAgo = -1 * date.timeIntervalSinceNow
                     
@@ -82,7 +81,7 @@ extension LskWalletService: RichMessageProviderWithStatusCheck {
                     completion(.success(result: result))
                     
                 } else {
-                    completion(.failure(error: error.asWalletServiceError()))
+                    completion(.failure(error: error))
                 }
             }
         }

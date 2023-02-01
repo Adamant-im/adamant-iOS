@@ -53,29 +53,21 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
         return URL(string: "\(LskWalletService.explorerAddress)\(id)")
     }
     
-    @objc func refresh() {
+    @MainActor
+    @objc func refresh() async throws {
         guard let id = transaction?.txId, let service = service else {
             refreshControl.endRefreshing()
             return
         }
         
-        service.getTransaction(by: id) { [weak self] result in
-            switch result {
-            case .success(let trs):
-                self?.transaction = trs
-
-                DispatchQueue.main.async {
-                    self?.tableView.reloadData()
-                    self?.refreshControl.endRefreshing()
-                }
-
-            case .failure(let error):
-                self?.dialogService.showRichError(error: error)
-
-                DispatchQueue.main.async {
-                    self?.refreshControl.endRefreshing()
-                }
-            }
+        do {
+            transaction = try await service.getTransaction(by: id)
+            tableView.reloadData()
+            refreshControl.endRefreshing()
+        } catch {
+            refreshControl.endRefreshing()
+            guard let error = error as? WalletServiceError else { return }
+            dialogService.showRichError(error: error)
         }
     }
     
@@ -97,9 +89,9 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
         guard let id = self.transaction?.txId, let service = self.service else {
             return
         }
-        service.getTransaction(by: id) { result in
-            switch result {
-            case .success(var trs):
+        Task {
+            do {
+                var trs = try await service.getTransaction(by: id)
                 service.serviceApi.getFees { result in
                     switch result {
                     case .success(response: let value):
@@ -113,9 +105,6 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
                         break
                     }
                 }
-                
-            case .failure:
-                break
             }
         }
     }

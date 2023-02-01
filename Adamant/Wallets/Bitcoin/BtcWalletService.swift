@@ -285,18 +285,20 @@ class BtcWalletService: WalletService {
         return hashedSumHeader == checkSum
     }
     
-    func getWalletAddress(byAdamantAddress address: String, completion: @escaping (WalletServiceResult<String>) -> Void) {
-        apiService.get(key: BtcWalletService.kvsAddress, sender: address) { (result) in
-            switch result {
-            case .success(let value):
-                if let address = value {
-                    completion(.success(result: address))
-                } else {
-                    completion(.failure(error: .walletNotInitiated))
+    func getWalletAddress(byAdamantAddress address: String) async throws -> String {
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<String, Error>) in
+            apiService.get(key: BtcWalletService.kvsAddress, sender: address) { (result) in
+                switch result {
+                case .success(let value):
+                    if let address = value {
+                        continuation.resume(returning: address)
+                    } else {
+                        continuation.resume(throwing: WalletServiceError.walletNotInitiated)
+                    }
+                    
+                case .failure(let error):
+                    continuation.resume(throwing: WalletServiceError.internalError(message: "BTC Wallet: fail to get address from KVS", error: error))
                 }
-                
-            case .failure(let error):
-                completion(.failure(error: .internalError(message: "BTC Wallet: fail to get address from KVS", error: error)))
             }
         }
     }
@@ -329,13 +331,10 @@ extension BtcWalletService: InitiatedWithPassphraseService {
         stateSemaphore.signal()
     }
     
-    func initWallet(withPassphrase passphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) {
+    func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
         guard let adamant = accountService.account else {
-            completion(.failure(error: .notLogged))
-            return
+            throw WalletServiceError.notLogged
         }
-        
-        stateSemaphore.wait()
         
         setState(.notInitiated)
         
@@ -344,62 +343,56 @@ extension BtcWalletService: InitiatedWithPassphraseService {
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
         
-        defaultDispatchQueue.async { [unowned self] in
-            let privateKeyData = passphrase.data(using: .utf8)!.sha256()
-            let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
-            let eWallet = BtcWallet(privateKey: privateKey)
-            self.btcWallet = eWallet
-            
-            if !self.enabled {
-                self.enabled = true
-                NotificationCenter.default.post(name: self.serviceEnabledChanged, object: self)
+        let privateKeyData = passphrase.data(using: .utf8)!.sha256()
+        let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
+        let eWallet = BtcWallet(privateKey: privateKey)
+        self.btcWallet = eWallet
+        
+        if !self.enabled {
+            self.enabled = true
+            NotificationCenter.default.post(name: self.serviceEnabledChanged, object: self)
+        }
+        
+        self.stateSemaphore.signal()
+        
+        // MARK: 4. Save address into KVS
+        let service = self
+        do {
+            let address = try await getWalletAddress(byAdamantAddress: adamant.address)
+            if address != eWallet.address {
+                service.save(btcAddress: eWallet.address) { result in
+                    service.kvsSaveCompletionRecursion(btcAddress: eWallet.address, result: result)
+                }
+                throw WalletServiceError.accountNotFound
             }
             
-            self.stateSemaphore.signal()
+            service.initialBalanceCheck = true
+            service.setState(.upToDate, silent: true)
+            Task {
+                service.update()
+            }
             
-            // MARK: 4. Save address into KVS
-            self.getWalletAddress(byAdamantAddress: adamant.address) { [weak self] result in
-                guard let service = self else {
-                    return
+            return eWallet
+        } catch let error as WalletServiceError {
+            switch error {
+            case .walletNotInitiated:
+                // Show '0' without waiting for balance update
+                if let wallet = service.btcWallet {
+                    NotificationCenter.default.post(name: service.walletUpdatedNotification, object: service, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
                 }
                 
-                switch result {
-                case .success(let address):
-                    // BTC already saved
-                    if address != eWallet.address {
-                        service.save(btcAddress: eWallet.address) { result in
-                            service.kvsSaveCompletionRecursion(btcAddress: eWallet.address, result: result)
-                        }
-                        return
-                    }
-
-                    service.initialBalanceCheck = true
-                    service.setState(.upToDate, silent: true)
-                    service.update()
-                    
-                    completion(.success(result: eWallet))
-                    
-                case .failure(let error):
-                    switch error {
-                    case .walletNotInitiated:
-                        // Show '0' without waiting for balance update
-                        if let wallet = service.btcWallet {
-                            NotificationCenter.default.post(name: service.walletUpdatedNotification, object: service, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
-                        }
-
-                        service.save(btcAddress: eWallet.address) { result in
-                            service.kvsSaveCompletionRecursion(btcAddress: eWallet.address, result: result)
-                        }
-                        service.setState(.upToDate)
-                        completion(.success(result: eWallet))
-
-                    default:
-                        service.setState(.upToDate)
-                        completion(.failure(error: error))
-                    }
+                service.save(btcAddress: eWallet.address) { result in
+                    service.kvsSaveCompletionRecursion(btcAddress: eWallet.address, result: result)
                 }
+                service.setState(.upToDate)
+                return eWallet
+                
+            default:
+                service.setState(.upToDate)
+                throw error
             }
         }
+        
     }
 
 }

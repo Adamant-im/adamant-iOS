@@ -137,8 +137,8 @@ class AdmWalletService: NSObject, WalletService {
         NotificationCenter.default.post(name: walletUpdatedNotification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
     }
     
-    func getWalletAddress(byAdamantAddress address: String, completion: @escaping (WalletServiceResult<String>) -> Void) {
-        completion(.success(result: address))
+    func getWalletAddress(byAdamantAddress address: String) async throws -> String {
+        return address
     }
 }
 

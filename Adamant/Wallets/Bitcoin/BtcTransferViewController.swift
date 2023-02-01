@@ -76,11 +76,9 @@ class BtcTransferViewController: TransferViewControllerBase {
                     processFailureTransaction(self, service: service, comments: comments, transaction: transaction, error: error)
                 }
                 dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-            } catch {
+            } catch let error as WalletServiceError {
                 dialogService.dismissProgress()
-                if let error = error as? WalletServiceError {
-                    dialogService.showRichError(error: error)
-                }
+                dialogService.showRichError(error: error)
             }
         }
     }

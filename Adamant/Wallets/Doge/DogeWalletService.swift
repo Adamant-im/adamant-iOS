@@ -232,13 +232,10 @@ extension DogeWalletService: InitiatedWithPassphraseService {
         stateSemaphore.signal()
     }
     
-    func initWallet(withPassphrase passphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) {
+    func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
         guard let adamant = accountService.account else {
-            completion(.failure(error: .notLogged))
-            return
+            throw WalletServiceError.notLogged
         }
-        
-        stateSemaphore.wait()
         
         setState(.notInitiated)
         
@@ -247,60 +244,49 @@ extension DogeWalletService: InitiatedWithPassphraseService {
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
         
-        defaultDispatchQueue.async { [unowned self] in
-            let privateKeyData = passphrase.data(using: .utf8)!.sha256()
-            let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
-            
-            let eWallet = DogeWallet(privateKey: privateKey)
-            self.dogeWallet = eWallet
-            
-            if !self.enabled {
-                self.enabled = true
-                NotificationCenter.default.post(name: self.serviceEnabledChanged, object: self)
+        let privateKeyData = passphrase.data(using: .utf8)!.sha256()
+        let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
+        
+        let eWallet = DogeWallet(privateKey: privateKey)
+        self.dogeWallet = eWallet
+        
+        if !self.enabled {
+            self.enabled = true
+            NotificationCenter.default.post(name: self.serviceEnabledChanged, object: self)
+        }
+        
+        // MARK: 4. Save address into KVS
+        let service = self
+        do {
+            let address = try await getWalletAddress(byAdamantAddress: adamant.address)
+            if address != eWallet.address {
+                service.save(dogeAddress: eWallet.address) { result in
+                    service.kvsSaveCompletionRecursion(dogeAddress: eWallet.address, result: result)
+                }
             }
             
-            self.stateSemaphore.signal()
+            service.initialBalanceCheck = true
+            service.setState(.upToDate, silent: true)
+            service.update()
             
-            // MARK: 4. Save address into KVS
-            self.getWalletAddress(byAdamantAddress: adamant.address) { [weak self] result in
-                guard let service = self else {
-                    return
+            return eWallet
+        } catch let error as WalletServiceError {
+            switch error {
+            case .walletNotInitiated:
+                // Show '0' without waiting for balance update
+                if let wallet = service.dogeWallet {
+                    NotificationCenter.default.post(name: service.walletUpdatedNotification, object: service, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
                 }
                 
-                switch result {
-                case .success(let address):
-                    // DOGE already saved
-                    if address != eWallet.address {
-                        service.save(dogeAddress: eWallet.address) { result in
-                            service.kvsSaveCompletionRecursion(dogeAddress: eWallet.address, result: result)
-                        }
-                    }
-                    
-                    service.initialBalanceCheck = true
-                    service.setState(.upToDate, silent: true)
-                    service.update()
-                    
-                    completion(.success(result: eWallet))
-                    
-                case .failure(let error):
-                    switch error {
-                    case .walletNotInitiated:
-                        // Show '0' without waiting for balance update
-                        if let wallet = service.dogeWallet {
-                            NotificationCenter.default.post(name: service.walletUpdatedNotification, object: service, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
-                        }
-                        
-                        service.save(dogeAddress: eWallet.address) { result in
-                            service.kvsSaveCompletionRecursion(dogeAddress: eWallet.address, result: result)
-                        }
-                        service.setState(.upToDate)
-                        completion(.success(result: eWallet))
-                        
-                    default:
-                        service.setState(.upToDate)
-                        completion(.failure(error: error))
-                    }
+                service.save(dogeAddress: eWallet.address) { result in
+                    service.kvsSaveCompletionRecursion(dogeAddress: eWallet.address, result: result)
                 }
+                service.setState(.upToDate)
+                return eWallet
+                
+            default:
+                service.setState(.upToDate)
+                throw error
             }
         }
     }
@@ -358,18 +344,20 @@ extension DogeWalletService {
         apiService.get(key: DogeWalletService.kvsAddress, sender: address, completion: completion)
     }
     
-    func getWalletAddress(byAdamantAddress address: String, completion: @escaping (WalletServiceResult<String>) -> Void) {
-        apiService.get(key: DogeWalletService.kvsAddress, sender: address) { (result) in
-            switch result {
-            case .success(let value):
-                if let address = value {
-                    completion(.success(result: address))
-                } else {
-                    completion(.failure(error: .walletNotInitiated))
+    func getWalletAddress(byAdamantAddress address: String) async throws -> String {
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<String, Error>) in
+            apiService.get(key: DogeWalletService.kvsAddress, sender: address) { (result) in
+                switch result {
+                case .success(let value):
+                    if let address = value {
+                        continuation.resume(returning: address)
+                    } else {
+                        continuation.resume(throwing: WalletServiceError.walletNotInitiated)
+                    }
+                    
+                case .failure(let error):
+                    continuation.resume(throwing: WalletServiceError.internalError(message: "DOGE Wallet: fail to get address from KVS", error: error))
                 }
-                
-            case .failure(let error):
-                completion(.failure(error: .internalError(message: "DOGE Wallet: fail to get address from KVS", error: error)))
             }
         }
     }

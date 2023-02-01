@@ -52,29 +52,24 @@ class BtcTransactionDetailsViewController: TransactionDetailsViewControllerBase 
         return URL(string: "\(BtcWalletService.explorerAddress)\(id)")
     }
     
-    @objc func refresh() {
+    @MainActor
+    @objc func refresh() async {
         guard let id = transaction?.txId, let service = service else {
             refreshControl.endRefreshing()
             return
         }
         
-        service.getTransaction(by: id) { [weak self] result in
-            switch result {
-            case .success(let trs):
-                self?.transaction = trs
-                
-                DispatchQueue.main.async {
-                    self?.tableView.reloadData()
-                    self?.refreshControl.endRefreshing()
-                }
-                
-            case .failure(let error):
-                self?.dialogService.showRichError(error: error)
-                
-                DispatchQueue.main.async {
-                    self?.refreshControl.endRefreshing()
-                }
-            }
+        do {
+            let trs = try await service.getTransaction(by: id)
+            transaction = trs
+            
+            tableView.reloadData()
+            refreshControl.endRefreshing()
+        } catch let error as WalletServiceError {
+            dialogService.showRichError(error: error)
+            refreshControl.endRefreshing()
+        } catch {
+            refreshControl.endRefreshing()
         }
     }
     
@@ -83,22 +78,8 @@ class BtcTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     func startUpdate() {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            guard let id = self?.transaction?.txId, let service = self?.service else {
-                return
-            }
-            
-            service.getTransaction(by: id) { result in
-                switch result {
-                case .success(let trs):
-                    self?.transaction = trs
-                    
-                    DispatchQueue.main.async {
-                        self?.tableView.reloadData()
-                    }
-                    
-                case .failure:
-                    break
-                }
+            Task {
+                await self?.refresh()
             }
         }
     }
