@@ -199,6 +199,7 @@ extension Container {
                 transferProvider: r.resolve(TransfersProvider.self)!,
                 accountService: r.resolve(AccountService.self)!,
                 addressBookService: r.resolve(AddressBookService.self)!,
+                visibleWalletService: r.resolve(VisibleWalletsService.self)!,
                 router: r.resolve(Router.self)!
             )
         }

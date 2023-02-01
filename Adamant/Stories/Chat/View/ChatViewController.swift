@@ -207,6 +207,11 @@ private extension ChatViewController {
         viewModel.closeScreen
             .sink { [weak self] in self?.close() }
             .store(in: &subscriptions)
+        
+        viewModel.$isAttachmentButtonAvailable
+            .removeDuplicates()
+            .assign(to: \.isAttachmentButtonEnabled, on: inputBar)
+            .store(in: &subscriptions)
     }
 }
 

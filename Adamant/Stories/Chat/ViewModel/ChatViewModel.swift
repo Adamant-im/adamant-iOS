@@ -18,6 +18,8 @@ final class ChatViewModel: NSObject {
     private let transfersProvider: TransfersProvider
     private let chatMessageFactory: ChatMessageFactory
     private let addressBookService: AddressBookService
+    private let visibleWalletService: VisibleWalletsService
+    private let accountService: AccountService
     private let richMessageProviders: [String: RichMessageProvider]
     
     // MARK: Properties
@@ -40,6 +42,7 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var loadingStatus: ChatLoadingStatus?
     @ObservableValue private(set) var sender = ChatSender.default
     @ObservableValue private(set) var messages = [ChatMessage]()
+    @ObservableValue private(set) var isAttachmentButtonAvailable = false
     @ObservableValue private(set) var isSendingAvailable = false
     @ObservableValue private(set) var fee = ""
     @ObservableValue private(set) var partnerName: String?
@@ -75,6 +78,8 @@ final class ChatViewModel: NSObject {
         transfersProvider: TransfersProvider,
         chatMessageFactory: ChatMessageFactory,
         addressBookService: AddressBookService,
+        visibleWalletService: VisibleWalletsService,
+        accountService: AccountService,
         richMessageProviders: [String: RichMessageProvider]
     ) {
         self.chatsProvider = chatsProvider
@@ -83,8 +88,11 @@ final class ChatViewModel: NSObject {
         self.chatMessageFactory = chatMessageFactory
         self.addressBookService = addressBookService
         self.richMessageProviders = richMessageProviders
+        self.visibleWalletService = visibleWalletService
+        self.accountService = accountService
         super.init()
         setupObservers()
+        updateAttachmentButtonAvailability()
     }
     
     func setup(
@@ -256,6 +264,12 @@ private extension ChatViewModel {
             .removeDuplicates()
             .sink { [weak self] _ in self?.updateMessages() }
             .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantVisibleWalletsService.visibleWallets)
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in self?.updateAttachmentButtonAvailability() }
+            .store(in: &subscriptions)
     }
     
     func loadMessages(address: String, offset: Int, loadingStatus: ChatLoadingStatus) {
@@ -328,6 +342,7 @@ private extension ChatViewModel {
         messages = []
         loadingStatus = nil
         inputText = ""
+        isAttachmentButtonAvailable = false
         isSendingAvailable = false
         fee = ""
         transactionStatuses = .init()
@@ -404,6 +419,14 @@ private extension ChatViewModel {
         timerSubscription = Timer.publish(every: interval, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in self?.updateMessages() }
+    }
+    
+    func updateAttachmentButtonAvailability() {
+        let isAnyWalletVisible = accountService.wallets
+            .map { visibleWalletService.isInvisible($0) }
+            .contains(false)
+        
+        isAttachmentButtonAvailable = isAnyWalletVisible
     }
 }
 

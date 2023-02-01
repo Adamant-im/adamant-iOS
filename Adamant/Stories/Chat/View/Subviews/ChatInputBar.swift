@@ -21,6 +21,10 @@ final class ChatInputBar: InputBarAccessoryView {
         didSet { updateIsEnabled() }
     }
     
+    var isAttachmentButtonEnabled = true {
+        didSet { updateIsAttachmentButtonEnabled() }
+    }
+    
     var text: String {
         get { inputTextView.text }
         set { inputTextView.text = newValue }
@@ -64,16 +68,22 @@ private extension ChatInputBar {
         inputTextView.placeholder = isEnabled
             ? .adamantLocalized.chat.messageInputPlaceholder
             : ""
-        
-        attachmentButton.tintColor = isEnabled
-            ? .adamant.primary
-            : .adamant.disableBorderColor
             
         inputTextView.backgroundColor = isEnabled
             ? .adamant.chatInputFieldBarBackground
             : .adamant.chatInputBarBackground
         
         updateLayerColors()
+        updateIsAttachmentButtonEnabled()
+    }
+    
+    func updateIsAttachmentButtonEnabled() {
+        let isEnabled = isEnabled && isAttachmentButtonEnabled
+        
+        attachmentButton.isEnabled = isEnabled
+        attachmentButton.tintColor = isEnabled
+            ? .adamant.primary
+            : .adamant.disableBorderColor
     }
     
     func updateLayerColors() {
