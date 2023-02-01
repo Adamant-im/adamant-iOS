@@ -25,10 +25,16 @@ extension ChatTransactionContainerView {
 extension ChatTransactionContainerView.Model {
     final class Status: Equatable {
         let id: String
+        let forceUpdateAction: () -> Void
         @Published private(set) var status: TransactionStatus = .notInitiated
         
-        init(id: String, status: AnyObservable<TransactionStatus>) {
+        init(
+            id: String,
+            forceUpdateAction: @escaping () -> Void,
+            status: AnyObservable<TransactionStatus>
+        ) {
             self.id = id
+            self.forceUpdateAction = forceUpdateAction
             status.assign(to: &$status)
         }
         

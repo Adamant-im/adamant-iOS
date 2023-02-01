@@ -33,7 +33,8 @@ final class ChatTransactionCellSizeCalculator: CellSizeCalculator {
             .makeTransactionViewModel(
                 currentSender: getCurrentSender(),
                 status: nil,
-                onTap: {}
+                onTap: {},
+                forceUpdateStatusAction: {}
             )
             .height(for: messagesFlowLayout.itemWidth)
 

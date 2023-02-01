@@ -26,11 +26,13 @@ final class ChatMessagesCollectionView<
         safeAreaInsets + contentInset
     }
     
+    /// To avoid insets changing by MessageKit
     override var contentInset: UIEdgeInsets {
         get { super.contentInset }
         set {}
     }
     
+    /// To avoid insets changing by MessageKit
     override var verticalScrollIndicatorInsets: UIEdgeInsets {
         get { super.verticalScrollIndicatorInsets }
         set {}

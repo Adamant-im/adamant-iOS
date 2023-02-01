@@ -164,12 +164,17 @@ final class ChatViewModel: NSObject {
         }
     }
     
-    func loadTransactionStatusIfNeeded(id: String) {
+    func loadTransactionStatusIfNeeded(id: String, forceUpdate: Bool) {
         guard
             let transaction = chatTransactions.first(where: { $0.chatMessageId == id }),
-            let richMessageTransaction = transaction as? RichMessageTransaction,
-            !(richMessageTransaction.transactionStatus?.isFinal ?? false)
+            let richMessageTransaction = transaction as? RichMessageTransaction
         else { return }
+        
+        if forceUpdate {
+            transactionStatuses[id] = nil
+        } else if richMessageTransaction.transactionStatus?.isFinal == true {
+            return
+        }
         
         chatsProvider.updateStatus(for: richMessageTransaction)
     }

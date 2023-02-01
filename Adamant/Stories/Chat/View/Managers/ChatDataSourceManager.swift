@@ -79,8 +79,12 @@ final class ChatDataSourceManager: MessagesDataSource {
             ChatViewController.TransactionCell.self,
             for: indexPath
         )
+        
+        viewModel.loadTransactionStatusIfNeeded(
+            id: message.messageId,
+            forceUpdate: false
+        )
     
-        viewModel.loadTransactionStatusIfNeeded(id: message.messageId)
         cell.wrappedView.model = message.fullModel.makeTransactionViewModel(
             currentSender: currentSender,
             status: viewModel.$transactionStatuses
@@ -88,6 +92,12 @@ final class ChatDataSourceManager: MessagesDataSource {
                 .eraseToAnyPublisher(),
             onTap: { [didTapTransfer = viewModel.didTapTransfer] in
                 didTapTransfer.send(message.messageId)
+            },
+            forceUpdateStatusAction: { [weak viewModel] in
+                viewModel?.loadTransactionStatusIfNeeded(
+                    id: message.messageId,
+                    forceUpdate: true
+                )
             }
         )
         return cell
@@ -98,7 +108,8 @@ extension ChatMessage {
     func makeTransactionViewModel(
         currentSender: SenderType,
         status: AnyObservable<TransactionStatus>?,
-        onTap: @escaping () -> Void
+        onTap: @escaping () -> Void,
+        forceUpdateStatusAction: @escaping () -> Void
     ) -> ChatTransactionContainerView.Model {
         guard case let .transaction(model) = content else {
             assertionFailure("Incorrect content type")
@@ -120,7 +131,11 @@ extension ChatMessage {
                 action: .init(action: onTap)
             ),
             status: status.map {
-                .init(id: messageId, status: $0)
+                .init(
+                    id: messageId,
+                    forceUpdateAction: forceUpdateStatusAction,
+                    status: $0
+                )
             }
         )
     }

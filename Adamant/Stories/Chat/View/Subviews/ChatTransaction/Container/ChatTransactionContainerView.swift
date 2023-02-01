@@ -21,10 +21,10 @@ final class ChatTransactionContainerView: UIView {
     private let contentView = ChatTransactionContentView()
     private var statusSubscription: AnyCancellable?
     
-    private let statusView: UIImageView = {
-        let view = UIImageView()
-        view.contentMode = .scaleAspectFit
-        return view
+    private lazy var statusButton: UIButton = {
+        let button = UIButton()
+        button.addTarget(self, action: #selector(onStatusButtonTap), for: .touchUpInside)
+        return button
     }()
     
     private let spacingView: UIView = {
@@ -79,18 +79,18 @@ private extension ChatTransactionContainerView {
         
         updateStatus(status.status)
         statusSubscription = status.$status
-            .receive(on: RunLoop.main)
             .removeDuplicates()
+            .receive(on: RunLoop.main)
             .sink { [weak self] in self?.updateStatus($0) }
     }
     
     func updateStatus(_ status: TransactionStatus) {
-        statusView.image = status.image
-        statusView.tintColor = status.imageTintColor
+        statusButton.setImage(status.image, for: .normal)
+        statusButton.tintColor = status.imageTintColor
     }
     
     func updateLayout() {
-        var viewsList = [spacingView, statusView, contentView]
+        var viewsList = [spacingView, statusButton, contentView]
         
         viewsList = model.isFromCurrentSender
             ? viewsList
@@ -99,6 +99,10 @@ private extension ChatTransactionContainerView {
         guard horizontalStack.arrangedSubviews != viewsList else { return }
         horizontalStack.arrangedSubviews.forEach(horizontalStack.removeArrangedSubview)
         viewsList.forEach(horizontalStack.addArrangedSubview)
+    }
+    
+    @objc func onStatusButtonTap() {
+        model.status?.forceUpdateAction()
     }
 }
 
