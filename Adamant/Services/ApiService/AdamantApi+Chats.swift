@@ -47,6 +47,35 @@ extension AdamantApiService {
         }
     }
     
+    func getMessageTransactions(address: String, height: Int64?, offset: Int?) async throws -> [Transaction] {
+        // MARK: 1. Prepare params
+        var queryItems: [URLQueryItem] = [URLQueryItem(name: "isIn", value: address),
+                                          URLQueryItem(name: "orderBy", value: "timestamp:desc")]
+        if let height = height, height > 0 { queryItems.append(URLQueryItem(name: "fromHeight", value: String(height))) }
+        if let offset = offset { queryItems.append(URLQueryItem(name: "offset", value: String(offset))) }
+        
+        // MARK: 2. Send
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<[Transaction], Error>) in
+            sendRequest(
+                path: ApiCommands.Chats.get,
+                queryItems: queryItems
+            ) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Transaction>>) in
+                switch serverResponse {
+                case .success(let response):
+                    if let collection = response.collection {
+                        continuation.resume(returning: collection)
+                    } else {
+                        let error = AdamantApiService.translateServerError(response.error)
+                        continuation.resume(throwing: error)
+                    }
+                    
+                case .failure(let error):
+                    continuation.resume(throwing: ApiServiceError.networkError(error: error))
+                }
+            }
+        }
+    }
+    
     @discardableResult
     func sendMessage(
         senderId: String,

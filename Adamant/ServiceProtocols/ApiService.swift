@@ -58,6 +58,8 @@ protocol ApiService: AnyObject {
         completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void
     )
     
+    func getAccount(byAddress address: String) async throws -> AdamantAccount
+    
     // MARK: - Keys
     
     func getPublicKey(
@@ -130,6 +132,11 @@ protocol ApiService: AnyObject {
         offset: Int?,
         completion: @escaping (ApiServiceResult<[Transaction]>) -> Void
     )
+    
+    func getMessageTransactions(address: String,
+                                height: Int64?,
+                                offset: Int?
+    ) async throws -> [Transaction]
     
     /// Send text message
     ///   - completion: Contains processed transactionId, if success, or AdamantError, if fails.

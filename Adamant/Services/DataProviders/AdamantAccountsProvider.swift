@@ -331,12 +331,14 @@ extension AdamantAccountsProvider {
                 }
                 
             case .system:
-                let coreAccount = self.createCoreDataAccount(with: address, publicKey: "")
-                self.removeSafeFromRequests(address)
-                group.leave()
-                
-                completion(.success(coreAccount))
-                
+                DispatchQueue.main.async {
+                    let coreAccount = self.createCoreDataAccount(with: address, publicKey: "")
+                    self.removeSafeFromRequests(address)
+                    group.leave()
+                    
+                    completion(.success(coreAccount))
+                }
+               
             case .invalid:
                 self.removeSafeFromRequests(address)
                 group.leave()
@@ -428,12 +430,13 @@ extension AdamantAccountsProvider {
                 completion(.success(coreAccount))
                 
             case .system:
-                let coreAccount = self.createCoreDataAccount(with: address, publicKey: "")
-                self.removeSafeFromRequests(address)
-                group.leave()
-                
-                completion(.success(coreAccount))
-                
+                DispatchQueue.main.async {
+                    let coreAccount = self.createCoreDataAccount(with: address, publicKey: "")
+                    self.removeSafeFromRequests(address)
+                    group.leave()
+                    
+                    completion(.success(coreAccount))
+                }
             case .invalid:
                 self.removeSafeFromRequests(address)
                 group.leave()
@@ -441,6 +444,184 @@ extension AdamantAccountsProvider {
                 completion(.invalidAddress(address: address))
             }
         }
+    }
+    
+    /// Get account info from server.
+    ///
+    /// - Parameters:
+    ///   - address: address of an account
+    ///   - completion: returns Account created in viewContext
+    func getAccount(byAddress address: String) async throws -> CoreDataAccount {
+        let validation = AdamantUtilities.validateAdamantAddress(address: address)
+        if validation == .invalid {
+            throw AccountsProviderResult.invalidAddress(address: address)
+        }
+        
+        // Check if there is an account, that we are looking for
+        let dummy: DummyAccount?
+        switch self.getAccount(byPredicate: NSPredicate(format: "address == %@", address)) {
+        case .core(let account):
+            return account
+        case .dummy(let account):
+            dummy = account
+        case .notFound:
+            dummy = nil
+        }
+        
+        switch validation {
+        case .valid:
+            do {
+                let account = try await apiService.getAccount(byAddress: address)
+                guard account.publicKey != nil else {
+                    self.removeSafeFromRequests(address)
+                    
+                    if let dummy = dummy {
+                        throw AccountsProviderResult.dummy(dummy)
+                    } else {
+                        throw AccountsProviderResult.notInitiated(address: address)
+                    }
+                }
+                
+                let coreAccount = await createAndSaveCoreDataAccount(from: account, dummy: dummy, in: stack.container.viewContext)
+                
+                self.removeSafeFromRequests(address)
+                
+                return coreAccount
+            } catch {
+                self.removeSafeFromRequests(address)
+                guard let error = error as? ApiServiceError else {
+                    throw AccountServiceError.internalError(message: "Unknown Error", error: nil)
+                }
+                switch error {
+                case .accountNotFound:
+                    if let dummy = dummy {
+                        throw AccountsProviderResult.dummy(dummy)
+                    } else {
+                        throw AccountsProviderResult.notFound(address: address)
+                    }
+                    
+                case .networkError(let error):
+                    throw AccountsProviderResult.networkError(error)
+                    
+                default:
+                    throw AccountsProviderResult.serverError(error)
+                }
+            }
+        case .system:
+            let coreAccount = await self.createCoreDataAccount(with: address, publicKey: "")
+            self.removeSafeFromRequests(address)
+            return coreAccount
+        case .invalid:
+            self.removeSafeFromRequests(address)
+            
+            throw AccountsProviderResult.invalidAddress(address: address)
+        }
+    }
+    
+    /// Get account info from server or create instantly
+    ///
+    /// - Parameters:
+    ///   - address: address of an account
+    ///   - publicKey: publicKey of an account
+    ///   - completion: returns Account created in viewContext
+    func getAccount(byAddress address: String, publicKey: String) async throws -> CoreDataAccount {
+        let validation = AdamantUtilities.validateAdamantAddress(address: address)
+        if validation == .invalid {
+            throw AccountsProviderResult.invalidAddress(address: address)
+        }
+        
+        if publicKey.isEmpty {
+            return try await getAccount(byAddress: address)
+        }
+        
+        let context = stack.container.viewContext
+        
+        // Check if there is an account, that we are looking for
+        let dummy: DummyAccount?
+        switch self.getAccount(byPredicate: NSPredicate(format: "address == %@", address)) {
+        case .core(let account):
+            return account
+        case .dummy(let account):
+            dummy = account
+        case .notFound:
+            dummy = nil
+        }
+        
+        switch validation {
+        case .valid:
+            let coreAccount = await createAndSaveCoreDataAccount(for: address, publicKey: publicKey, dummy: dummy, in: context)
+            self.removeSafeFromRequests(address)
+            return coreAccount
+        case .system:
+            let coreAccount = await self.createCoreDataAccount(with: address, publicKey: "")
+            self.removeSafeFromRequests(address)
+            return coreAccount
+        case .invalid:
+            self.removeSafeFromRequests(address)
+            throw AccountsProviderResult.invalidAddress(address: address)
+        }
+    }
+    
+    @MainActor
+    private func createAndSaveCoreDataAccount(for address: String,
+                                              publicKey: String,
+                                              dummy: DummyAccount?,
+                                              in context: NSManagedObjectContext
+    ) -> CoreDataAccount {
+        let result = getAccount(byPredicate: NSPredicate(format: "address == %@", address))
+        if case .core(let account) = result {
+            return account
+        }
+        
+        let coreAccount = self.createCoreDataAccount(with: address, publicKey: publicKey, contextt: context)
+        if let dummy = dummy {
+            coreAccount.name = dummy.name
+            
+            if let transfers = dummy.transfers {
+                dummy.removeFromTransfers(transfers)
+                coreAccount.addToTransfers(transfers)
+                
+                if let chatroom = coreAccount.chatroom {
+                    chatroom.addToTransactions(transfers)
+                    chatroom.updateLastTransaction()
+                }
+            }
+            context.delete(dummy)
+        }
+        
+        try? context.save()
+        return coreAccount
+    }
+    
+    @MainActor
+    private func createAndSaveCoreDataAccount(from account: AdamantAccount,
+                                              dummy: DummyAccount?,
+                                              in context: NSManagedObjectContext
+    ) -> CoreDataAccount {
+        let result = getAccount(byPredicate: NSPredicate(format: "address == %@", account.address))
+        if case .core(let account) = result {
+            return account
+        }
+        
+        let coreAccount = self.createCoreDataAccount(from: account, context: context)
+        
+        if let dummy = dummy {
+            coreAccount.name = dummy.name
+            
+            if let transfers = dummy.transfers {
+                dummy.removeFromTransfers(transfers)
+                coreAccount.addToTransfers(transfers)
+                
+                if let chatroom = coreAccount.chatroom {
+                    chatroom.addToTransactions(transfers)
+                    chatroom.updateLastTransaction()
+                }
+            }
+            context.delete(dummy)
+        }
+        
+        try? context.save()
+        return coreAccount
     }
     
     /*
@@ -506,42 +687,52 @@ extension AdamantAccountsProvider {
 
     */
     
+    @MainActor
     private func createCoreDataAccount(with address: String, publicKey: String, contextt: NSManagedObjectContext) -> CoreDataAccount {
-        var coreAccount: CoreDataAccount!
-        
-        DispatchQueue.onMainSync {
-            coreAccount = createCoreDataAccount(
-                with: address,
-                publicKey: publicKey,
-                context: contextt
-            )
+        let result = getAccount(byPredicate: NSPredicate(format: "address == %@", address))
+        if case .core(let account) = result {
+            return account
         }
+        
+        let coreAccount = createCoreDataAccount(
+            with: address,
+            publicKey: publicKey,
+            context: contextt
+        )
         return coreAccount
     }
     
+    @MainActor
     private func createCoreDataAccount(with address: String, publicKey: String) -> CoreDataAccount {
-        var coreAccount: CoreDataAccount!
-        
-        DispatchQueue.onMainSync {
-            coreAccount = createCoreDataAccount(
-                with: address,
-                publicKey: publicKey,
-                context: stack.container.viewContext
-            )
+        let result = getAccount(byPredicate: NSPredicate(format: "address == %@", address))
+        if case .core(let account) = result {
+            return account
         }
+        
+        let coreAccount = createCoreDataAccount(
+            with: address,
+            publicKey: publicKey,
+            context: stack.container.viewContext
+        )
         return coreAccount
     }
     
     private func createCoreDataAccount(from account: AdamantAccount) -> CoreDataAccount {
         var coreAccount: CoreDataAccount!
         
-        DispatchQueue.onMainSync {
+        DispatchQueue.main.sync {
             coreAccount = createCoreDataAccount(from: account, context: stack.container.viewContext)
         }
         return coreAccount
     }
     
+    @MainActor
     private func createCoreDataAccount(from account: AdamantAccount, context: NSManagedObjectContext) -> CoreDataAccount {
+        let result = getAccount(byPredicate: NSPredicate(format: "address == %@", account.address))
+        if case .core(let account) = result {
+            return account
+        }
+        
         let coreAccount = CoreDataAccount(entity: CoreDataAccount.entity(), insertInto: context)
         coreAccount.address = account.address
         coreAccount.publicKey = account.publicKey

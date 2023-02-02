@@ -9,7 +9,7 @@
 import Foundation
 import CoreData
 
-enum AccountsProviderResult {
+enum AccountsProviderResult: Error {
     case success(CoreDataAccount)
     case dummy(DummyAccount)
     case notFound(address: String)
@@ -60,6 +60,11 @@ protocol AccountsProvider {
     ///
     /// - Returns: Account, if found, created in main viewContext
     func getAccount(byAddress address: String, publicKey: String, completion: @escaping (AccountsProviderResult) -> Void)
+    
+    /// Search for fetched account, if not found try to create or asks server for account.
+    ///
+    /// - Returns: Account, if found, created in main viewContext
+    func getAccount(byAddress address: String, publicKey: String) async throws -> CoreDataAccount
     
     /* That one bugged. Will be fixed later. Maybe. */
     /// Search for fetched account, if not found, asks server for account.
