@@ -39,11 +39,15 @@ enum ChatsProviderError: Error {
     case transactionNotFound(id: String)
     case internalError(Error)
     case requestCancelled
+    case invalidTransactionStatus
 }
 
 extension ChatsProviderError: RichError {
     var message: String {
         switch self {
+        case .invalidTransactionStatus:
+            return String.adamantLocalized.chat.cancelError
+            
         case .notLogged:
             return String.adamantLocalized.sharedErrors.userNotLogged
             
@@ -98,6 +102,7 @@ extension ChatsProviderError: RichError {
                  .notEnoughMoneyToSend,
                  .accountNotInitiated,
                  .requestCancelled,
+                 .invalidTransactionStatus,
                  .notLogged:
             return .warning
             
@@ -168,7 +173,7 @@ extension StoreKey {
 }
 
 // MARK: - Protocol
-protocol ChatsProvider: DataProvider {
+protocol ChatsProvider: DataProvider, Actor {
     // MARK: - Properties
     var receivedLastHeight: Int64? { get }
     var readedLastHeight: Int64? { get }
@@ -187,8 +192,8 @@ protocol ChatsProvider: DataProvider {
     // MARK: - Getting chats and messages
     func getChatroomsController() -> NSFetchedResultsController<Chatroom>
     func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction>
-    func getChatRooms(offset: Int?, completion: (() -> Void)?)
-    func getChatMessages(with addressRecipient: String, offset: Int?, completion: (() -> Void)?)
+    func getChatRooms(offset: Int?) async
+    func getChatMessages(with addressRecipient: String, offset: Int?) async
     func isChatLoading(with addressRecipient: String) -> Bool
     
     /// Unread messages controller. Sections by chatroom.
@@ -199,12 +204,12 @@ protocol ChatsProvider: DataProvider {
     func update(completion: ((ChatsProviderResult?) -> Void)?)
     
     // MARK: - Sending messages
-    func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResultWithTransaction) -> Void )
-    func sendMessage(_ message: AdamantMessage, recipientId: String, from chatroom: Chatroom?, completion: @escaping (ChatsProviderResultWithTransaction) -> Void )
-    func retrySendMessage(_ message: ChatTransaction, completion: @escaping (ChatsProviderRetryCancelResult) -> Void)
+    func sendMessage(_ message: AdamantMessage, recipientId: String) async throws -> ChatTransaction
+    func sendMessage(_ message: AdamantMessage, recipientId: String, from chatroom: Chatroom?) async throws -> ChatTransaction
+    func retrySendMessage(_ message: ChatTransaction) async throws -> ChatTransaction
     
     // MARK: - Delete local message
-    func cancelMessage(_ message: ChatTransaction, completion: @escaping (ChatsProviderRetryCancelResult) -> Void )
+    func cancelMessage(_ message: ChatTransaction) async throws
     
     // MARK: - Tools
     func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult

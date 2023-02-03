@@ -88,6 +88,11 @@ protocol ApiService: AnyObject {
         completion: @escaping (ApiServiceResult<ChatRooms>) -> Void
     )
     
+    func getChatRooms(
+        address: String,
+        offset: Int?
+    ) async throws -> ChatRooms
+    
     func getChatMessages(
         address: String,
         addressRecipient: String,
@@ -158,7 +163,21 @@ protocol ApiService: AnyObject {
         transaction: UnregisteredTransaction,
         completion: @escaping (ApiServiceResult<TransactionIdResponse>) -> Void
     )
+    
+    func createSendTransaction(
+        senderId: String,
+        recipientId: String,
+        keypair: Keypair,
+        message: String,
+        type: ChatType,
+        nonce: String,
+        amount: Decimal?
+    ) -> UnregisteredTransaction?
 
+    func sendTransaction(
+        transaction: UnregisteredTransaction
+    ) async throws -> UInt64
+    
     // MARK: - Delegates
     
     /// Get delegates

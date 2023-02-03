@@ -15,7 +15,7 @@ enum State {
     case failedToUpdate(Error)
 }
 
-protocol DataProvider: AnyObject {
+protocol DataProvider: AnyObject, Actor {
     var state: State { get }
     var isInitiallySynced: Bool { get }
     

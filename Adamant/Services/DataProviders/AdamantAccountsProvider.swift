@@ -563,10 +563,11 @@ extension AdamantAccountsProvider {
     }
     
     @MainActor
-    private func createAndSaveCoreDataAccount(for address: String,
-                                              publicKey: String,
-                                              dummy: DummyAccount?,
-                                              in context: NSManagedObjectContext
+    private func createAndSaveCoreDataAccount(
+        for address: String,
+        publicKey: String,
+        dummy: DummyAccount?,
+        in context: NSManagedObjectContext
     ) -> CoreDataAccount {
         let result = getAccount(byPredicate: NSPredicate(format: "address == %@", address))
         if case .core(let account) = result {
@@ -594,9 +595,10 @@ extension AdamantAccountsProvider {
     }
     
     @MainActor
-    private func createAndSaveCoreDataAccount(from account: AdamantAccount,
-                                              dummy: DummyAccount?,
-                                              in context: NSManagedObjectContext
+    private func createAndSaveCoreDataAccount(
+        from account: AdamantAccount,
+        dummy: DummyAccount?,
+        in context: NSManagedObjectContext
     ) -> CoreDataAccount {
         let result = getAccount(byPredicate: NSPredicate(format: "address == %@", account.address))
         if case .core(let account) = result {
@@ -727,7 +729,10 @@ extension AdamantAccountsProvider {
     }
     
     @MainActor
-    private func createCoreDataAccount(from account: AdamantAccount, context: NSManagedObjectContext) -> CoreDataAccount {
+    private func createCoreDataAccount(
+        from account: AdamantAccount,
+        context: NSManagedObjectContext
+    ) -> CoreDataAccount {
         let result = getAccount(byPredicate: NSPredicate(format: "address == %@", account.address))
         if case .core(let account) = result {
             return account

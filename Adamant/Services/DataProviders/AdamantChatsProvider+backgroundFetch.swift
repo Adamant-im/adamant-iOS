@@ -56,9 +56,4 @@ extension AdamantChatsProvider: BackgroundFetchService {
             }
         }
     }
-    
-    func dropStateData() {
-        securedStore.remove(StoreKey.chatProvider.notifiedLastHeight)
-        securedStore.remove(StoreKey.chatProvider.notifiedMessagesCount)
-    }
 }

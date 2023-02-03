@@ -333,31 +333,21 @@ extension ChatViewController: MessageCellDelegate {
             }
             
             let retry = UIAlertAction(title: String.adamantLocalized.alert.retry, style: .default, handler: { [weak self] _ in
-                self?.chatsProvider.retrySendMessage(message) { result in
-                    switch result {
-                    case .success: break
-                        
-                    case .failure(let error):
+                Task { [weak self] in
+                    do {
+                        _ = try await self?.chatsProvider.retrySendMessage(message)
+                    } catch {
                         self?.dialogService.showRichError(error: error)
-                        
-                    case .invalidTransactionStatus:
-                        break
                     }
                 }
             })
             
             let cancelMessage = UIAlertAction(title: String.adamantLocalized.alert.delete, style: .default, handler: { [weak self] _ in
-                self?.chatsProvider.cancelMessage(message) { result in
-                    switch result {
-                    case .success:
-                        DispatchQueue.main.async {
-                            self?.messagesCollectionView.reloadDataAndKeepOffset()
-                        }
-                        
-                    case .invalidTransactionStatus:
-                        self?.dialogService.showWarning(withMessage: String.adamantLocalized.chat.cancelError)
-                        
-                    case .failure(let error):
+                Task { [weak self] in
+                    do {
+                        _ = try await self?.chatsProvider.cancelMessage(message)
+                        self?.messagesCollectionView.reloadDataAndKeepOffset()
+                    } catch {
                         self?.dialogService.showRichError(error: error)
                     }
                 }
@@ -589,6 +579,7 @@ extension ChatViewController: MessagesLayoutDelegate {
 extension ChatViewController: MessageInputBarDelegate {
     private static let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
     
+    @MainActor
     func messageInputBar(_ inputBar: MessageInputBar, didPressSendButtonWith text: String) {
         let parsedText = ChatViewController.markdownParser.parse(text)
         
@@ -599,40 +590,51 @@ extension ChatViewController: MessageInputBarDelegate {
             message = .markdownText(text)
         }
         
-        let valid = chatsProvider.validateMessage(message)
-        switch valid {
-        case .isValid:
-            break
+        let sendMessageTask = Task {
+            let valid = await chatsProvider.validateMessage(message)
+            switch valid {
+            case .isValid:
+                break
+                
+            case .empty:
+                return
+                
+            case .tooLong:
+                dialogService.showToastMessage(valid.localized)
+                return
+            }
             
-        case .empty:
-            return
+            guard text.count > 0,
+                  let partner = chatroom?.partner?.address
+            else {
+                // TODO show warning
+                return
+            }
             
-        case .tooLong:
-            dialogService.showToastMessage(valid.localized)
-            return
-        }
-        
-        guard text.count > 0, let partner = chatroom?.partner?.address else {
-            // TODO show warning
-            return
-        }
-        
-        chatsProvider.sendMessage(message, recipientId: partner, from: chatroom, completion: { [weak self] result in
-            switch result {
-            case .success(let transaction):
+            do {
+                let transaction = try await chatsProvider.sendMessage(
+                    message,
+                    recipientId: partner,
+                    from: chatroom
+                )
+                
                 if transaction.statusEnum == .pending {
-                    DispatchQueue.main.async {
-                        self?.scrollDown()
-                    }
+                    scrollDown()
                 }
-            case .failure(let error):
+            } catch {
+                guard let error = error as? ChatsProviderError else {
+                    dialogService.showRichError(error: error)
+                    return
+                }
+                
                 var showFreeToken = false
                 switch error {
                 case .messageNotValid:
-                    self?.setText(text, to: inputBar)
+                    setText(text, to: inputBar)
                 case .notEnoughMoneyToSend:
-                    self?.setText(text, to: inputBar)
-                    if let transfersProvider = self?.transfersProvider, !transfersProvider.hasTransactions {
+                    setText(text, to: inputBar)
+                    if let transfersProvider = transfersProvider,
+                       await !transfersProvider.hasTransactions {
                         showFreeToken = true
                     }
                 default:
@@ -640,14 +642,14 @@ extension ChatViewController: MessageInputBarDelegate {
                 }
                 
                 if showFreeToken {
-                    self?.showFreeTokenAlert()
+                    showFreeTokenAlert()
                 } else {
-                    self?.dialogService.showRichError(error: error)
+                    dialogService.showRichError(error: error)
                 }
             }
-        })
-        
-        inputBar.inputTextView.text = String()
+            
+            inputBar.inputTextView.text = String()
+        }
     }
     
     func messageInputBar(_ inputBar: MessageInputBar, textViewTextDidChangeTo text: String) {
