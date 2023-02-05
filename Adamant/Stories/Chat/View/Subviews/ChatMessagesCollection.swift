@@ -46,14 +46,6 @@ final class ChatMessagesCollectionView<
         }
     }
     
-    /// Saves the distance to the bottom while usual reloadSections(_) saves the distance to the top
-    func reloadSectionsWithFixedBottom(_ sections: IndexSet) {
-        let bottomOffset = self.bottomOffset
-        reloadSections(sections)
-        layoutIfNeeded()
-        setBottomOffset(bottomOffset, safely: true)
-    }
-    
     func reloadData(newModels: [SectionModel]) {
         guard newModels.last == currentModels.last || currentModels.isEmpty else {
             return applyNewModels(newModels)

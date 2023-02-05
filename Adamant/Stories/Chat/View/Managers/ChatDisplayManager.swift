@@ -53,7 +53,7 @@ final class ChatDisplayManager: MessagesDisplayDelegate {
             for: indexPath
         )
         
-        if indexPath.section == .zero, viewModel.loadingStatus == .onTop {
+        if indexPath.section == .zero, viewModel.isNeedToLoadMoreMessages {
             header.wrappedView.startAnimating()
         } else {
             header.wrappedView.stopAnimating()
@@ -78,6 +78,25 @@ final class ChatDisplayManager: MessagesDisplayDelegate {
         return detector == .url
             ? [.foregroundColor: UIColor.adamant.active]
             : [:]
+    }
+    
+    func configureAccessoryView(
+        _ accessoryView: UIView,
+        for message: MessageType,
+        at _: IndexPath,
+        in _: MessagesCollectionView
+    ) {
+        switch message.fullModel.status {
+        case .failed:
+            guard accessoryView.subviews.isEmpty else { break }
+            let icon = UIImageView(frame: CGRect(x: -28, y: -10, width: 20, height: 20))
+            icon.contentMode = .scaleAspectFit
+            icon.tintColor = .adamant.secondary
+            icon.image = #imageLiteral(resourceName: "cross").withRenderingMode(.alwaysTemplate)
+            accessoryView.addSubview(icon)
+        case .delivered, .pending:
+            accessoryView.subviews.forEach { $0.removeFromSuperview() }
+        }
     }
 }
 

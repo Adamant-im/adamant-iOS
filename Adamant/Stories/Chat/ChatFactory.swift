@@ -35,6 +35,10 @@ struct ChatFactory {
         )
         
         viewController.setupDelegates(delegates)
+        delegates.cell.setupDelegate(
+            collection: viewController.messagesCollectionView,
+            dataSource: delegates.dataSource
+        )
         return viewController
     }
 }
@@ -109,5 +113,19 @@ private extension ChatViewController {
         messagesCollectionView.messagesDisplayDelegate = delegates.display
         messagesCollectionView.messageCellDelegate = delegates.cell
         messageInputBar.delegate = delegates.inputBar
+    }
+}
+
+private extension ChatCellManager {
+    func setupDelegate(collection: MessagesCollectionView, dataSource: MessagesDataSource) {
+        getMessageId = { [weak collection, weak dataSource] cell in
+            guard
+                let collection = collection,
+                let indexPath = collection.indexPath(for: cell),
+                let message = dataSource?.messageForItem(at: indexPath, in: collection)
+            else { return nil }
+            
+            return message.messageId
+        }
     }
 }

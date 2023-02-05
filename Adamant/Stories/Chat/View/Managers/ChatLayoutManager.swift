@@ -44,10 +44,14 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
     }
     
     func messageBottomLabelHeight(
-        for _: MessageType,
+        for message: MessageType,
         at _: IndexPath,
         in _: MessagesCollectionView
-    ) -> CGFloat { labelHeight }
+    ) -> CGFloat {
+        message.fullModel.bottomString == nil
+            ? .zero
+            : labelHeight
+    }
     
     func messageTopLabelAlignment(
         for message: MessageType,
@@ -87,7 +91,7 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
         for section: Int,
         in messagesCollectionView: MessagesCollectionView
     ) -> CGSize {
-        section == .zero && viewModel.loadingStatus == .onTop
+        section == .zero && viewModel.isNeedToLoadMoreMessages
             ? SpinnerView.size
             : .zero
     }

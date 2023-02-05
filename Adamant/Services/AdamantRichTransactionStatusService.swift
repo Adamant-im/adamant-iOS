@@ -8,27 +8,17 @@
 
 import CoreData
 
-final class AdamantRichTransactionStatusService: RichTransactionStatusService {
+actor AdamantRichTransactionStatusService: RichTransactionStatusService {
     private let richProviders: [String: RichMessageProviderWithStatusCheck]
     private var updatingTransactions = Set<RichMessageTransaction>()
-    private let updateQueue = DispatchQueue(label: "im.adamant.richTransactionsStatusUpdate")
     
     init(richProviders: [String: RichMessageProviderWithStatusCheck]) {
         self.richProviders = richProviders
     }
     
-    func update(_ transaction: RichMessageTransaction, parentContext: NSManagedObjectContext) {
+    func update(_ transaction: RichMessageTransaction, parentContext: NSManagedObjectContext) async throws {
         guard !updatingTransactions.contains(transaction) else { return }
         updatingTransactions.insert(transaction)
-        
-        let updateAction = { [weak self] in
-            self?.getStatus(for: transaction) { status in
-                self?.updateQueue.async {
-                    self?.setStatus(for: transaction, status: status, parentContext: parentContext)
-                    self?.updatingTransactions.remove(transaction)
-                }
-            }
-        }
         
 //        Сообщения-отчёты об отправленных средствах создаются раньше,
 //        чем на эфирных нодах появляется сама транзакция перевода (по ТЗ).
@@ -38,30 +28,31 @@ final class AdamantRichTransactionStatusService: RichTransactionStatusService {
 //        Решение - если сообщение появилось только что,
 //        обновим статус этой транзакции с 'некоторой' задержкой. 🤷🏻‍♂️
         
-        let delay: TimeInterval = transaction.isJustCreated
-            ? 5
-            : .zero
+        if transaction.isJustCreated {
+            try await Task.sleep(interval: 5)
+        }
         
-        updateQueue.asyncAfter(deadline: .now() + delay) { updateAction() }
+        guard let status = try await getStatus(for: transaction) else { return }
+        setStatus(for: transaction, status: status, parentContext: parentContext)
+        updatingTransactions.remove(transaction)
     }
 }
 
 private extension AdamantRichTransactionStatusService {
-    func getStatus(
-        for transaction: RichMessageTransaction,
-        completion: @escaping (TransactionStatus) -> Void
-    ) {
+    func getStatus(for transaction: RichMessageTransaction) async throws -> TransactionStatus? {
         guard
             let transfer = transaction.transfer,
             let provider = richProviders[transfer.type]
-        else { return }
+        else { return nil }
         
-        provider.statusFor(transaction: transaction) { result in
-            switch result {
-            case let .success(status):
-                completion(status)
-            case .failure:
-                completion(.failed)
+        return try await withUnsafeThrowingContinuation { completion in
+            provider.statusFor(transaction: transaction) { result in
+                switch result {
+                case let .success(status):
+                    completion.resume(returning: status)
+                case let .failure(error):
+                    completion.resume(throwing: error)
+                }
             }
         }
     }

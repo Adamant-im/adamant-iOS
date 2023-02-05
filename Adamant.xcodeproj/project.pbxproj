@@ -191,7 +191,6 @@
 		931A2955295BA5450022CAA3 /* Combine+Typealiases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931A2954295BA5450022CAA3 /* Combine+Typealiases.swift */; };
 		9322E875297042F000B8357C /* ChatSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9322E874297042F000B8357C /* ChatSender.swift */; };
 		9322E877297042FA00B8357C /* ChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9322E876297042FA00B8357C /* ChatMessage.swift */; };
-		9322E8792970430300B8357C /* ChatLoadingStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9322E8782970430300B8357C /* ChatLoadingStatus.swift */; };
 		9322E87B2970431200B8357C /* ChatMessageFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9322E87A2970431200B8357C /* ChatMessageFactory.swift */; };
 		9324C75E297170600022D7EA /* RichTransactionStatusService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9324C75D297170600022D7EA /* RichTransactionStatusService.swift */; };
 		9324C760297171040022D7EA /* AdamantRichTransactionStatusService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9324C75F297171040022D7EA /* AdamantRichTransactionStatusService.swift */; };
@@ -232,6 +231,7 @@
 		93CC8DC7296F00D6003772BF /* ChatTransactionContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CC8DC6296F00D6003772BF /* ChatTransactionContainerView.swift */; };
 		93CC8DC9296F01DE003772BF /* ChatTransactionContainerView+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CC8DC8296F01DE003772BF /* ChatTransactionContainerView+Model.swift */; };
 		93CD1C5829632EB300B7CACA /* ReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CD1C5729632EB300B7CACA /* ReusableView.swift */; };
+		93D4DB012990B5180083D415 /* Task+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93D4DB002990B5180083D415 /* Task+Extension.swift */; };
 		93E0C850296B08D900FF54D3 /* UIEdgeInsets+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93E0C84F296B08D900FF54D3 /* UIEdgeInsets+adamant.swift */; };
 		93E5D4DB293000BE00439298 /* UnregisteredTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93E5D4DA293000BE00439298 /* UnregisteredTransaction.swift */; };
 		93E5D4DC293000BE00439298 /* UnregisteredTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93E5D4DA293000BE00439298 /* UnregisteredTransaction.swift */; };
@@ -885,7 +885,6 @@
 		931A2954295BA5450022CAA3 /* Combine+Typealiases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Combine+Typealiases.swift"; sourceTree = "<group>"; };
 		9322E874297042F000B8357C /* ChatSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatSender.swift; sourceTree = "<group>"; };
 		9322E876297042FA00B8357C /* ChatMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessage.swift; sourceTree = "<group>"; };
-		9322E8782970430300B8357C /* ChatLoadingStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatLoadingStatus.swift; sourceTree = "<group>"; };
 		9322E87A2970431200B8357C /* ChatMessageFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessageFactory.swift; sourceTree = "<group>"; };
 		9324C75D297170600022D7EA /* RichTransactionStatusService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichTransactionStatusService.swift; sourceTree = "<group>"; };
 		9324C75F297171040022D7EA /* AdamantRichTransactionStatusService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantRichTransactionStatusService.swift; sourceTree = "<group>"; };
@@ -920,6 +919,7 @@
 		93CC8DC6296F00D6003772BF /* ChatTransactionContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTransactionContainerView.swift; sourceTree = "<group>"; };
 		93CC8DC8296F01DE003772BF /* ChatTransactionContainerView+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatTransactionContainerView+Model.swift"; sourceTree = "<group>"; };
 		93CD1C5729632EB300B7CACA /* ReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReusableView.swift; sourceTree = "<group>"; };
+		93D4DB002990B5180083D415 /* Task+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Task+Extension.swift"; sourceTree = "<group>"; };
 		93E0C84F296B08D900FF54D3 /* UIEdgeInsets+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIEdgeInsets+adamant.swift"; sourceTree = "<group>"; };
 		93E5D4DA293000BE00439298 /* UnregisteredTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnregisteredTransaction.swift; sourceTree = "<group>"; };
 		93E5D4DF2930029300439298 /* AdamantCore+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantCore+Extensions.swift"; sourceTree = "<group>"; };
@@ -1467,7 +1467,6 @@
 				9322E874297042F000B8357C /* ChatSender.swift */,
 				9322E876297042FA00B8357C /* ChatMessage.swift */,
 				9390C5042976B53000270CDF /* ChatDialog.swift */,
-				9322E8782970430300B8357C /* ChatLoadingStatus.swift */,
 				93A91FD229799298001DB1F8 /* ChatStartPosition.swift */,
 			);
 			path = Models;
@@ -2230,6 +2229,7 @@
 				930B57762934D44700F3E539 /* Encodable+Dictionary.swift */,
 				41CEE09529718A10005EF1D2 /* UIImage+adamant.swift */,
 				932F775A2989FE10006D8801 /* Markdown+Adamant.swift */,
+				93D4DB002990B5180083D415 /* Task+Extension.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -2955,7 +2955,6 @@
 				E9942B80203C058C00C163AF /* QRGeneratorViewController.swift in Sources */,
 				E921597520611A6A0000CA5C /* AdamantReachability.swift in Sources */,
 				E9960B3321F5154300C840A8 /* BaseAccount+CoreDataClass.swift in Sources */,
-				9322E8792970430300B8357C /* ChatLoadingStatus.swift in Sources */,
 				E9FCA1E6218334C00005E83D /* SimpleTransactionDetails.swift in Sources */,
 				932F77592989F999006D8801 /* ChatCellManager.swift in Sources */,
 				9377FBE2296C2ACA00C9211B /* ChatTransactionContentView+Model.swift in Sources */,
@@ -2981,6 +2980,7 @@
 				41047B74294C61D10039E956 /* VisibleWalletsService.swift in Sources */,
 				553B1284281C6EE100FFF24C /* GCDUtilites.swift in Sources */,
 				648CE3AC229AD2190070A2CC /* DashTransferViewController.swift in Sources */,
+				93D4DB012990B5180083D415 /* Task+Extension.swift in Sources */,
 				640EFA9C2558613200E9724B /* AdamantProvider.swift in Sources */,
 				A5E04227282A8BDC0076CD13 /* BtcBalanceResponse.swift in Sources */,
 				A50A41072822F8CE006BDFE1 /* BtcWalletRoutes.swift in Sources */,

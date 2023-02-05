@@ -1509,10 +1509,12 @@ extension AdamantChatsProvider {
     }
     
     func updateStatus(for transaction: RichMessageTransaction) {
-        richTransactionStatusService.update(
-            transaction,
-            parentContext: stack.container.viewContext
-        )
+        Task {
+            try await richTransactionStatusService.update(
+                transaction,
+                parentContext: stack.container.viewContext
+            )
+        }
     }
     
     func markChatAsRead(chatroom: Chatroom) {

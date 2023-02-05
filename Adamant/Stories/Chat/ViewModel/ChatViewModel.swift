@@ -30,6 +30,7 @@ final class ChatViewModel: NSObject {
     private var subscriptions = Set<AnyCancellable>()
     private var timerSubscription: AnyCancellable?
     private var messageIdToShow: String?
+    private var isLoading = false
     
     private(set) var chatroom: Chatroom?
     private(set) var chatTransactions: [ChatTransaction] = []
@@ -42,7 +43,7 @@ final class ChatViewModel: NSObject {
     private let _closeScreen = ObservableSender<Void>()
     var closeScreen: some Observable<Void> { _closeScreen }
     
-    @ObservableValue private(set) var loadingStatus: ChatLoadingStatus?
+    @ObservableValue private(set) var fullscreenLoading = false
     @ObservableValue private(set) var sender = ChatSender.default
     @ObservableValue private(set) var messages = [ChatMessage]()
     @ObservableValue private(set) var isAttachmentButtonAvailable = false
@@ -75,6 +76,12 @@ final class ChatViewModel: NSObject {
         return url
     }
     
+    var isNeedToLoadMoreMessages: Bool {
+        guard let address = chatroom?.partner?.address else { return false }
+
+        return chatsProvider.chatLoadedMessages[address] ?? .zero < chatsProvider.chatMaxMessages[address] ?? .zero
+    }
+    
     init(
         chatsProvider: ChatsProvider,
         markdownParser: MarkdownParser,
@@ -97,7 +104,6 @@ final class ChatViewModel: NSObject {
         self.accountProvider = accountProvider
         super.init()
         setupObservers()
-        updateAttachmentButtonAvailability()
     }
     
     func setup(
@@ -114,6 +120,7 @@ final class ChatViewModel: NSObject {
         isSendingAvailable = !chatroom.isReadonly
         messageIdToShow = messageToShow?.chatMessageId
         updateTitle()
+        updateAttachmentButtonAvailability()
         
         if let account = account {
             sender = .init(senderId: account.address, displayName: account.address)
@@ -133,17 +140,18 @@ final class ChatViewModel: NSObject {
         if address == AdamantContacts.adamantWelcomeWallet.name || chatsProvider.isChatLoaded[address] == true {
             updateTransactions(performFetch: true)
         } else {
-            loadMessages(address: address, offset: .zero, loadingStatus: .fullscreen)
+            loadMessages(address: address, offset: .zero, fullscreenLoading: true)
         }
     }
     
     func loadMoreMessagesIfNeeded() {
         guard
             let address = chatroom?.partner?.address,
-            chatsProvider.chatMaxMessages[address] ?? .zero > messages.count
+            isNeedToLoadMoreMessages
         else { return }
         
-        loadMessages(address: address, offset: messages.count, loadingStatus: .onTop)
+        let offset = chatsProvider.chatLoadedMessages[address] ?? .zero
+        loadMessages(address: address, offset: offset, fullscreenLoading: false)
     }
     
     func isNeedToDisplayDateHeader(sentDate: Date, index: Int) -> Bool {
@@ -270,6 +278,36 @@ final class ChatViewModel: NSObject {
         
         self.startNewChat(with: room, name: adm.name, message: adm.message)
     }
+    
+    func cancelMessage(id: String) {
+        guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
+        else { return }
+        
+        chatsProvider.cancelMessage(transaction) { [dialog] result in
+            switch result {
+            case let .failure(error):
+                dialog.send(.richError(error))
+            case .invalidTransactionStatus:
+                dialog.send(.warning(.adamantLocalized.chat.cancelError))
+            case .success:
+                break
+            }
+        }
+    }
+    
+    func retrySendMessage(id: String) {
+        guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
+        else { return }
+        
+        chatsProvider.retrySendMessage(transaction) { [dialog] result in
+            switch result {
+            case let .failure(error):
+                dialog.send(.richError(error))
+            case .success, .invalidTransactionStatus:
+                break
+            }
+        }
+    }
 }
 
 extension ChatViewModel: NSFetchedResultsControllerDelegate {
@@ -279,24 +317,10 @@ extension ChatViewModel: NSFetchedResultsControllerDelegate {
 }
 
 private extension ChatViewModel {
-    var isLoading: Bool {
-        switch loadingStatus {
-        case .fullscreen, .onTop:
-            return true
-        case .none:
-            return false
-        }
-    }
-    
     func setupObservers() {
         $inputText
             .removeDuplicates()
             .sink { [weak self] _ in self?.inputTextUpdated() }
-            .store(in: &subscriptions)
-        
-        $loadingStatus
-            .removeDuplicates()
-            .sink { [weak self] _ in self?.updateMessages() }
             .store(in: &subscriptions)
         
         NotificationCenter.default
@@ -306,17 +330,19 @@ private extension ChatViewModel {
             .store(in: &subscriptions)
     }
     
-    func loadMessages(address: String, offset: Int, loadingStatus: ChatLoadingStatus) {
+    func loadMessages(address: String, offset: Int, fullscreenLoading: Bool) {
         guard !isLoading else { return }
         
-        self.loadingStatus = loadingStatus
+        isLoading = true
+        self.fullscreenLoading = fullscreenLoading
         chatsProvider.getChatMessages(
             with: address,
             offset: offset
         ) { [weak self] in
             DispatchQueue.onMainAsync {
                 self?.updateTransactions(performFetch: true)
-                self?.loadingStatus = nil
+                self?.isLoading = false
+                self?.fullscreenLoading = false
             }
         }
     }
@@ -374,7 +400,8 @@ private extension ChatViewModel {
     func reset() {
         sender = .default
         messages = []
-        loadingStatus = nil
+        fullscreenLoading = false
+        isLoading = false
         inputText = ""
         isAttachmentButtonAvailable = false
         isSendingAvailable = false

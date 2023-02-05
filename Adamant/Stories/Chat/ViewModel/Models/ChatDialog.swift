@@ -12,6 +12,7 @@ enum ChatDialog {
     case toast(String)
     case alert(String)
     case error(String)
+    case warning(String)
     case richError(RichError)
     case freeTokenAlert
     case removeMessageAlert(id: String)
@@ -21,4 +22,5 @@ enum ChatDialog {
     case dummy(String)
     case url(URL)
     case progress(Bool)
+    case failedMessageAlert(id: String, sender: Any)
 }

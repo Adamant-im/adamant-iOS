@@ -9,5 +9,5 @@
 import CoreData
 
 protocol RichTransactionStatusService: AnyObject {
-    func update(_ transaction: RichMessageTransaction, parentContext: NSManagedObjectContext)
+    func update(_ transaction: RichMessageTransaction, parentContext: NSManagedObjectContext) async throws
 }

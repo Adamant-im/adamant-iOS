@@ -40,13 +40,15 @@ private extension ChatDialogManager {
     func showDialog(_ dialog: ChatDialog) {
         switch dialog {
         case let .toast(message):
-            showToast(message: message)
+            dialogService.showToastMessage(message)
         case let .alert(message):
             showAlert(message: message)
         case let .error(message):
-            showError(message: message)
+            dialogService.showError(withMessage: message, error: nil)
+        case let .warning(message):
+            dialogService.showWarning(withMessage: message)
         case let .richError(error):
-            showRichError(error: error)
+            dialogService.showRichError(error: error)
         case let .menu(sender):
             showMenu(sender: sender)
         case .freeTokenAlert:
@@ -63,11 +65,9 @@ private extension ChatDialogManager {
             showUrl(url)
         case let .progress(show):
             setProgress(show)
+        case let .failedMessageAlert(id, sender):
+            showFailedMessageAlert(id: id, sender: sender)
         }
-    }
-    
-    func showToast(message: String) {
-        dialogService.showToastMessage(message)
     }
     
     func showAlert(message: String) {
@@ -78,14 +78,6 @@ private extension ChatDialogManager {
             actions: nil,
             from: nil
         )
-    }
-    
-    func showError(message: String) {
-        dialogService.showError(withMessage: message, error: nil)
-    }
-    
-    func showRichError(error: RichError) {
-        dialogService.showRichError(error: error)
     }
     
     func showMenu(sender: UIBarButtonItem) {
@@ -168,12 +160,26 @@ private extension ChatDialogManager {
                     style: .destructive,
                     handler: { [weak self] in
                         self?.viewModel.hideMessage(id: id)
-                        self?.showToast(message: .adamantLocalized.chat.reportSent)
+                        self?.dialogService.showToastMessage(.adamantLocalized.chat.reportSent)
                     }
                 ),
                 makeCancelAction()
             ],
             from: nil
+        )
+    }
+    
+    func showFailedMessageAlert(id: String, sender: Any) {
+        dialogService.showAlert(
+            title: .adamantLocalized.alert.retryOrDeleteTitle,
+            message: .adamantLocalized.alert.retryOrDeleteBody,
+            style: .actionSheet,
+            actions: [
+                makeRetryAction(id: id),
+                makeCancelSendingAction(id: id),
+                makeCancelAction()
+            ],
+            from: sender
         )
     }
 }
@@ -356,6 +362,18 @@ private extension ChatDialogManager {
             } else {
                 showAlert(message: String.adamantLocalized.chat.unsupportedUrlWarning)
             }
+        }
+    }
+    
+    func makeRetryAction(id: String) -> UIAlertAction {
+        .init(title: .adamantLocalized.alert.retry, style: .default) { [weak viewModel] _ in
+            viewModel?.retrySendMessage(id: id)
+        }
+    }
+    
+    func makeCancelSendingAction(id: String) -> UIAlertAction {
+        .init(title: .adamantLocalized.alert.delete, style: .default) { [weak viewModel] _ in
+            viewModel?.cancelMessage(id: id)
         }
     }
     

@@ -74,7 +74,6 @@ final class ChatViewController: MessagesViewController {
         configureHeader()
         configureLayout()
         setupObservers()
-        viewModel.loadFirstMessagesIfNeeded()
     }
     
     override func viewWillLayoutSubviews() {
@@ -88,6 +87,12 @@ final class ChatViewController: MessagesViewController {
         chatMessagesCollectionView.setFullBottomInset(
             view.bounds.height - inputContainerView.frame.minY
         )
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        guard !messagesLoaded else { return }
+        viewModel.loadFirstMessagesIfNeeded()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -189,9 +194,9 @@ private extension ChatViewController {
             .sink { [weak self] _ in self?.updateMessages() }
             .store(in: &subscriptions)
         
-        viewModel.$loadingStatus
+        viewModel.$fullscreenLoading
             .removeDuplicates()
-            .sink { [weak self] _ in self?.updateLoadingViews() }
+            .sink { [weak self] _ in self?.updateFullscreenLoadingView() }
             .store(in: &subscriptions)
         
         viewModel.$inputText
@@ -292,32 +297,14 @@ private extension ChatViewController {
         messagesLoaded = true
     }
     
-    func updateLoadingViews() {
-        updateFullscreenLoadingView()
-        updateTopLoadingView()
-    }
-    
     func updateFullscreenLoadingView() {
-        let isLoading = viewModel.loadingStatus == .fullscreen
-        loadingView.isHidden = !isLoading
+        guard loadingView.isHidden == viewModel.fullscreenLoading else { return }
+        loadingView.isHidden = !viewModel.fullscreenLoading
         
-        if isLoading {
+        if viewModel.fullscreenLoading {
             loadingView.startAnimating()
         } else {
             loadingView.stopAnimating()
-        }
-    }
-    
-    func updateTopLoadingView() {
-        guard messagesCollectionView.numberOfSections > .zero else { return }
-        
-        UIView.performWithoutAnimation {
-            switch viewModel.loadingStatus {
-            case .onTop:
-                messagesCollectionView.reloadSections(.init(integer: .zero))
-            case .fullscreen, .none:
-                chatMessagesCollectionView.reloadSectionsWithFixedBottom(.init(integer: .zero))
-            }
         }
     }
     

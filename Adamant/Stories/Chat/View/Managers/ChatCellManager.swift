@@ -11,6 +11,7 @@ import MessageKit
 
 final class ChatCellManager: MessageCellDelegate {
     private let viewModel: ChatViewModel
+    var getMessageId: ((MessageCollectionViewCell) -> String?)?
     
     init(viewModel: ChatViewModel) {
         self.viewModel = viewModel
@@ -18,5 +19,15 @@ final class ChatCellManager: MessageCellDelegate {
     
     func didSelectURL(_ url: URL) {
         viewModel.didSelectURL(url)
+    }
+    
+    func didTapMessage(in cell: MessageCollectionViewCell) {
+        guard
+            let id = getMessageId?(cell),
+            let message = viewModel.messages.first(where: { $0.id == id }),
+            message.status == .failed
+        else { return }
+        
+        viewModel.dialog.send(.failedMessageAlert(id: id, sender: cell))
     }
 }

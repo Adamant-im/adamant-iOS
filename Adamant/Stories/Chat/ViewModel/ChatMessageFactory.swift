@@ -101,7 +101,9 @@ private extension ChatMessageFactory {
         sentDate: Date,
         blockchain: Bool,
         expireDate: inout Date?
-    ) -> NSAttributedString {
+    ) -> NSAttributedString? {
+        guard sentDate.timeIntervalSince1970 > .zero else { return nil }
+        
         let prefix = blockchain ? "⚭" : nil
         let humanizedTime = sentDate.humanizedTime()
         expireDate = humanizedTime.expireIn.map { .init().addingTimeInterval($0) }

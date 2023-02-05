@@ -230,7 +230,12 @@ extension AdamantDialogService {
 // MAKR: - Activity controllers
 extension AdamantDialogService {
     func presentShareAlertFor(adm: String, name: String, types: [AddressChatShareType], animated: Bool, from: UIView?, completion: (() -> Void)?, didSelect: ((AddressChatShareType) -> Void)?) {
-        let alert = UIAlertController(title: adm, message: nil, preferredStyle: shareAlertStyle(source: from))
+        let alert = makeSafeAlertController(
+            title: adm,
+            message: nil,
+            preferredStyle: .actionSheet,
+            source: from
+        )
         
         for type in types {
             alert.addAction(UIAlertAction(title: type.localized + name, style: .default) { _ in
@@ -345,7 +350,13 @@ extension AdamantDialogService {
         from: ViewSource?,
         completion: (() -> Void)?
     ) -> UIAlertController {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: shareAlertStyle(source: from?.entity))
+        let alert = makeSafeAlertController(
+            title: nil,
+            message: nil,
+            preferredStyle: .actionSheet,
+            source: from?.entity
+        )
+
         addActions(to: alert, stringForPasteboard: stringForPasteboard, stringForShare: stringForShare, stringForQR: stringForQR, types: types, excludedActivityTypes: excludedActivityTypes, from: from, completion: completion)
         
         return alert
@@ -430,7 +441,12 @@ extension AdamantDialogService {
     }
     
     func presentGoToSettingsAlert(title: String?, message: String?) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let alert = makeSafeAlertController(
+            title: title,
+            message: message,
+            preferredStyle: .alert,
+            source: nil
+        )
         
         alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
             DispatchQueue.main.async {
@@ -514,7 +530,12 @@ extension AdamantDialogService {
     }
     
     func showAlert(title: String?, message: String?, style: UIAlertController.Style, actions: [UIAlertAction]?, from: Any?) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: style)
+        let alert = makeSafeAlertController(
+            title: title,
+            message: message,
+            preferredStyle: style,
+            source: from
+        )
         
         if let actions = actions {
             for action in actions {
@@ -575,16 +596,24 @@ extension AdamantDialogService {
             self?.present(alertVC, animated: true, completion: nil)
         }
     }
-    
-    private func shareAlertStyle(source: Any?) -> UIAlertController.Style {
-        source == nil
-            ? .alert
-            : .actionSheet
-    }
 }
 
 private class MailDelegate: NSObject, MFMailComposeViewControllerDelegate {
     func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
         controller.dismiss(animated: true, completion: nil)
     }
+}
+
+/// Its needed to avoid crashes on `actionSheet` alert style on MacOS
+private func makeSafeAlertController(
+    title: String?,
+    message: String?,
+    preferredStyle: UIAlertController.Style,
+    source: Any?
+) -> UIAlertController {
+    let style = source == nil && UIScreen.main.traitCollection.userInterfaceIdiom == .pad
+        ? .alert
+        : preferredStyle
+    
+    return .init(title: title, message: message, preferredStyle: style)
 }
