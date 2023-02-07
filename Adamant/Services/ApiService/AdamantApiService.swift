@@ -121,6 +121,7 @@ final class AdamantApiService: ApiService {
         path: String,
         queryItems: [URLQueryItem]? = nil,
         method: HTTPMethod = .get,
+        waitsForConnectivity: Bool = false,
         completion: @escaping (ApiServiceResult<Output>) -> Void
     ) {
         sendRequest(
@@ -128,6 +129,7 @@ final class AdamantApiService: ApiService {
             queryItems: queryItems,
             method: method,
             body: Optional<Bool>.none,
+            waitsForConnectivity: waitsForConnectivity,
             completion: completion
         )
     }
@@ -137,6 +139,7 @@ final class AdamantApiService: ApiService {
         queryItems: [URLQueryItem]? = nil,
         method: HTTPMethod = .get,
         body: Body? = nil,
+        waitsForConnectivity: Bool = false,
         completion: @escaping (ApiServiceResult<Output>) -> Void
     ) {
         guard !currentNodes.isEmpty else {
@@ -153,6 +156,7 @@ final class AdamantApiService: ApiService {
             queryItems: queryItems,
             method: method,
             body: body,
+            waitsForConnectivity: waitsForConnectivity,
             onFailure: { [weak self] node in
                 node.connectionStatus = .offline
                 self?.nodesSource?.nodesUpdate()
@@ -167,9 +171,16 @@ final class AdamantApiService: ApiService {
     func sendRequest<Output: Decodable>(
         url: URLConvertible,
         method: HTTPMethod = .get,
+        waitsForConnectivity: Bool = false,
         completion: @escaping (ApiServiceResult<Output>) -> Void
     ) -> DataRequest {
-        sendRequest(url: url, method: method, body: Optional<Bool>.none, completion: completion)
+        sendRequest(
+            url: url,
+            method: method,
+            body: Optional<Bool>.none,
+            waitsForConnectivity: waitsForConnectivity,
+            completion: completion
+        )
     }
     
     @discardableResult
@@ -177,8 +188,28 @@ final class AdamantApiService: ApiService {
         url: URLConvertible,
         method: HTTPMethod = .get,
         body: Body? = nil,
+        waitsForConnectivity: Bool = false,
         completion: @escaping (ApiServiceResult<Output>) -> Void
     ) -> DataRequest {
+//        let sessionManager: Session = {
+//            let configuration = URLSessionConfiguration.af.default
+//            configuration.waitsForConnectivity = waitsForConnectivity
+//            return Session(configuration: configuration)
+//        }()
+//
+//        return sessionManager.request(
+        
+//        let APIManager: Session = {
+//             let configuration = URLSessionConfiguration.default
+//             configuration.waitsForConnectivity = waitsForConnectivity
+//             let delegate = Session.default.delegate
+//             let manager = Session.init(configuration: configuration,
+//                                        delegate: delegate,
+//                                        startRequestsImmediately: true,
+//                                        cachedResponseHandler: nil)
+//             return manager
+//         }()
+        
         AF.request(
             url,
             method: method,
@@ -217,7 +248,6 @@ final class AdamantApiService: ApiService {
                 url,
                 method: method,
                 parameters: parameters,
-              //  encoding: JSONEncoding.default,
                 headers: HTTPHeaders(["Content-Type": "application/json"])
             ).responseData(queue: defaultResponseDispatchQueue) { response in
                 switch response.result {
@@ -259,6 +289,7 @@ private extension AdamantApiService {
         queryItems: [URLQueryItem]?,
         method: HTTPMethod,
         body: Body?,
+        waitsForConnectivity: Bool = false,
         onFailure: @escaping (Node) -> Void,
         completion: @escaping (ApiServiceResult<Output>) -> Void
     ) {
@@ -280,12 +311,14 @@ private extension AdamantApiService {
             url: url,
             method: method,
             body: body,
+            waitsForConnectivity: waitsForConnectivity,
             completion: makeSafeRequestCompletion(
                 nodes: nodes,
                 path: path,
                 queryItems: queryItems,
                 method: method,
                 body: body,
+                waitsForConnectivity: waitsForConnectivity,
                 onFailure: onFailure,
                 completion: completion
             )
@@ -298,6 +331,7 @@ private extension AdamantApiService {
         queryItems: [URLQueryItem]?,
         method: HTTPMethod,
         body: Body?,
+        waitsForConnectivity: Bool = false,
         onFailure: @escaping (Node) -> Void,
         completion: @escaping (ApiServiceResult<Output>) -> Void
     ) -> (ApiServiceResult<Output>) -> Void {
@@ -316,6 +350,7 @@ private extension AdamantApiService {
                         queryItems: queryItems,
                         method: method,
                         body: body,
+                        waitsForConnectivity: waitsForConnectivity,
                         onFailure: onFailure,
                         completion: completion
                     )

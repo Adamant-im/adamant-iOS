@@ -96,9 +96,8 @@ protocol ApiService: AnyObject {
     func getChatMessages(
         address: String,
         addressRecipient: String,
-        offset: Int?,
-        completion: @escaping (ApiServiceResult<ChatRooms>) -> Void
-    )
+        offset: Int?
+    ) async throws -> ChatRooms
 
     // MARK: - Funds
     

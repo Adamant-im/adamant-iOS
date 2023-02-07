@@ -189,14 +189,16 @@ class AccountViewController: FormViewController {
         view.addSubview(statusBarView)
         
         // MARK: Transfers controller
-        let controller = transfersProvider.unreadTransfersController()
-        controller.delegate = self
-        transfersController = controller
-        
-        do {
-            try controller.performFetch()
-        } catch {
-            dialogService.showError(withMessage: "Error fetching transfers: report a bug", error: error)
+        Task {
+            let controller = await transfersProvider.unreadTransfersController()
+            controller.delegate = self
+            transfersController = controller
+            
+            do {
+                try controller.performFetch()
+            } catch {
+                dialogService.showError(withMessage: "Error fetching transfers: report a bug", error: error)
+            }
         }
         
         // MARK: Header&Footer

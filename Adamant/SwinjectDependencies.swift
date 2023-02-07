@@ -164,8 +164,12 @@ extension Container {
                 transactionService: r.resolve(ChatTransactionService.self)!
             )
         }.inObjectScope(.container).initCompleted { (r, c) in
-            guard let service = c as? AdamantTransfersProvider else { return }
-            service.chatsProvider = r.resolve(ChatsProvider.self)
+            Task {
+                guard let service = c as? AdamantTransfersProvider else { return }
+                // service.chatsProvider = r.resolve(ChatsProvider.self)
+                await service.setChatsProvider(r.resolve(ChatsProvider.self))
+            }
+            
         }
         
         // MARK: Chats

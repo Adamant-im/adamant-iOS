@@ -226,14 +226,17 @@ class BtcTransferViewController: TransferViewControllerBase {
         }
     }
     
+    @MainActor
     func reportTransferTo(admAddress: String, amount: Decimal, comments: String, hash: String) {
         let payload = RichMessageTransfer(type: BtcWalletService.richMessageType, amount: amount, hash: hash, comments: comments)
         
         let message = AdamantMessage.richMessage(payload: payload)
         
-        chatsProvider.sendMessage(message, recipientId: admAddress) { [weak self] result in
-            if case .failure(let error) = result {
-                self?.dialogService.showRichError(error: error)
+        Task {
+            do {
+                _ = try await chatsProvider.sendMessage(message, recipientId: admAddress)
+            } catch {
+                dialogService.showRichError(error: error)
             }
         }
     }

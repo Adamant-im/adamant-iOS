@@ -202,11 +202,12 @@ protocol ChatsProvider: DataProvider, Actor {
     // ForceUpdate chats
     func update()
     func update(completion: ((ChatsProviderResult?) -> Void)?)
+    func update() async -> ChatsProviderResult?
     
     // MARK: - Sending messages
     func sendMessage(_ message: AdamantMessage, recipientId: String) async throws -> ChatTransaction
     func sendMessage(_ message: AdamantMessage, recipientId: String, from chatroom: Chatroom?) async throws -> ChatTransaction
-    func retrySendMessage(_ message: ChatTransaction) async throws -> ChatTransaction
+    func retrySendMessage(_ message: ChatTransaction) async throws
     
     // MARK: - Delete local message
     func cancelMessage(_ message: ChatTransaction) async throws
@@ -215,6 +216,9 @@ protocol ChatsProvider: DataProvider, Actor {
     func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult
     func blockChat(with address: String)
     func removeMessage(with id: String)
+    func removeChatPositon(for address: String)
+    func setChatPositon(for address: String, position: Double)
+    func getChatPositon(for address: String) -> Double?
     
     // MARK: - Unconfirmed Transaction
     func addUnconfirmed(transactionId: UInt64, managedObjectId: NSManagedObjectID)

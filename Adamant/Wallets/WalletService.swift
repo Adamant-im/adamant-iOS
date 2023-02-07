@@ -167,6 +167,9 @@ extension ChatsProviderError {
             
         case .requestCancelled:
             return .requestCancelled
+            
+        case .invalidTransactionStatus:
+            return .internalError(message: "Invalid Transaction Status", error: nil)
         }
     }
 }

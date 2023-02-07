@@ -11,6 +11,7 @@ import CoreData
 import MarkdownKit
 
 actor AdamantChatsProvider: ChatsProvider {
+    
     // MARK: Dependencies
     let accountService: AccountService
     let apiService: ApiService
@@ -49,12 +50,6 @@ actor AdamantChatsProvider: ChatsProvider {
         }
     }
     
- //   private let processingQueue = DispatchQueue(label: "im.adamant.processing.chat", qos: .utility)
- //   private let sendingQueue = DispatchQueue(label: "im.adamant.sending.chat", qos: .utility, attributes: [.concurrent])
- //   private let unconfirmedsSemaphore = DispatchSemaphore(value: 1)
-//    private let highSemaphore = DispatchSemaphore(value: 1)
-//    private let stateSemaphore = DispatchSemaphore(value: 1)
-    
     private let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
     
     private var previousAppState: UIApplication.State?
@@ -88,107 +83,145 @@ actor AdamantChatsProvider: ChatsProvider {
         }
         self.richProviders = richProviders
         
-        setupSecuredStore()
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] notification in
-            guard let store = self?.securedStore else {
-                return
-            }
+        Task {
+            await setupSecuredStore()
             
-            guard let loggedAddress = notification.userInfo?[AdamantUserInfoKey.AccountService.loggedAccountAddress] as? String else {
-                store.remove(StoreKey.chatProvider.address)
-                store.remove(StoreKey.chatProvider.receivedLastHeight)
-                store.remove(StoreKey.chatProvider.readedLastHeight)
-                self?.dropStateData()
-                return
-            }
-            
-            if let savedAddress: String = store.get(StoreKey.chatProvider.address), savedAddress == loggedAddress {
-                if let raw: String = store.get(StoreKey.chatProvider.readedLastHeight), let h = Int64(raw) {
-                    self?.readedLastHeight = h
-                }
-            } else {
-                store.remove(StoreKey.chatProvider.receivedLastHeight)
-                store.remove(StoreKey.chatProvider.readedLastHeight)
-                self?.dropStateData()
-                store.set(loggedAddress, for: StoreKey.chatProvider.address)
-            }
-            
-            Task { [weak self] in
-                await self?.getChatRooms(offset: nil)
-            }
-            
-            self?.connectToSocket()
+            await addObservers()
+        }
+    }
+    
+    func addObservers() async {
+        for await notification in NotificationCenter.default.notifications(
+            named: .AdamantAccountService.userLoggedIn
+        ) {
+            print("userLoggedInAction")
+            userLoggedInAction(notification)
         }
         
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
-            // Drop everything
-            self?.reset()
-            
-            // BackgroundFetch
-            self?.dropStateData()
-            
-            self?.blockList = []
-            self?.removedMessages = []
-            
-            self?.disconnectFromSocket()
+        for await _ in NotificationCenter.default.notifications(
+            named: .AdamantAccountService.userLoggedOut
+        ) {
+            userLogOutAction()
         }
         
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.stayInChanged, object: nil, queue: nil) { [weak self] notification in
-            guard let state = notification.userInfo?[AdamantUserInfoKey.AccountService.newStayInState] as? Bool, state else {
-                return
-            }
-            
-            if state {
-                if let blockList = self?.blockList {
-                    self?.securedStore.set(blockList, for: StoreKey.accountService.blockList)
-                }
-                
-                if let removedMessages = self?.removedMessages {
-                    self?.securedStore.set(removedMessages, for: StoreKey.accountService.removedMessages)
-                }
-            }
+        for await notification in NotificationCenter.default.notifications(
+            named: .AdamantAccountService.stayInChanged
+        ) {
+            stayInChangedAction(notification)
         }
         
-        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            if let previousAppState = self?.previousAppState,
-               previousAppState == .background {
-                self?.previousAppState = .active
-                self?.update()
-            }
+        for await _ in await NotificationCenter.default.notifications(
+            named: UIApplication.didBecomeActiveNotification
+        ) {
+            didBecomeActiveAction()
         }
         
-        NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            if self?.isInitiallySynced ?? false {
-                self?.previousAppState = .background
-            }
+        for await _ in await NotificationCenter.default.notifications(
+            named: UIApplication.willResignActiveNotification
+        ) {
+            willResignActiveAction()
         }
         
-        NotificationCenter.default.addObserver(
-            forName: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged,
-            object: nil,
-            queue: nil
-        ) { [weak self] notification in
-            guard let connection = notification
-                .userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? Bool
-            else {
-                return
-            }
-            
-            guard connection == true else {
-                self?.isConnectedToTheInternet = false
-                return
-            }
-            
-            if self?.isConnectedToTheInternet == false {
-                self?.onConnectionToTheInternetRestored()
-            }
-            self?.isConnectedToTheInternet = true
+        for await notification in NotificationCenter.default.notifications(
+            named: .AdamantReachabilityMonitor.reachabilityChanged
+        ) {
+            reachabilityChangedAction(notification)
         }
     }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
+    }
+    
+    // MARK: - Notifications action
+    
+    private func userLoggedInAction(_ notification: Notification) {
+        let store = self.securedStore
+        
+        guard let loggedAddress = notification.userInfo?[AdamantUserInfoKey.AccountService.loggedAccountAddress] as? String else {
+            store.remove(StoreKey.chatProvider.address)
+            store.remove(StoreKey.chatProvider.receivedLastHeight)
+            store.remove(StoreKey.chatProvider.readedLastHeight)
+            self.dropStateData()
+            return
+        }
+        
+        if let savedAddress: String = store.get(StoreKey.chatProvider.address), savedAddress == loggedAddress {
+            if let raw: String = store.get(StoreKey.chatProvider.readedLastHeight),
+               let h = Int64(raw) {
+                self.readedLastHeight = h
+            }
+        } else {
+            store.remove(StoreKey.chatProvider.receivedLastHeight)
+            store.remove(StoreKey.chatProvider.readedLastHeight)
+            self.dropStateData()
+            store.set(loggedAddress, for: StoreKey.chatProvider.address)
+        }
+        
+        Task { [weak self] in
+            await self?.getChatRooms(offset: nil)
+        }
+        
+        self.connectToSocket()
+    }
+    
+    private func userLogOutAction() {
+        // Drop everything
+        reset()
+        
+        // BackgroundFetch
+        dropStateData()
+        
+        blockList = []
+        removedMessages = []
+        
+        disconnectFromSocket()
+    }
+    
+    private func stayInChangedAction(_ notification: Notification) {
+        guard let state = notification.userInfo?[AdamantUserInfoKey.AccountService.newStayInState] as? Bool,
+              state
+        else {
+            return
+        }
+        
+        if state {
+            securedStore.set(blockList, for: StoreKey.accountService.blockList)
+            securedStore.set(removedMessages, for: StoreKey.accountService.removedMessages)
+        }
+    }
+    
+    private func didBecomeActiveAction() {
+        if let previousAppState = previousAppState,
+           previousAppState == .background {
+            self.previousAppState = .active
+            update()
+        }
+    }
+    
+    private func willResignActiveAction() {
+        if isInitiallySynced {
+            previousAppState = .background
+        }
+    }
+    
+    private func reachabilityChangedAction(_ notification: Notification) {
+        guard let connection = notification
+            .userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? Bool
+        else {
+            return
+        }
+        
+        guard connection == true else {
+            isConnectedToTheInternet = false
+            return
+        }
+        
+        if isConnectedToTheInternet == false {
+            onConnectionToTheInternetRestored()
+        }
+        
+        isConnectedToTheInternet = true
     }
     
     // MARK: Tools
@@ -344,55 +377,18 @@ extension AdamantChatsProvider {
     func apiGetChatrooms(address: String, offset: Int?) async throws -> ChatRooms? {
         do {
             let chatrooms = try await apiService.getChatRooms(address: address, offset: offset)
+            return chatrooms
         } catch {
-            guard let error = error as? ApiServiceError else {
+            guard let error = error as? ApiServiceError,
+                  case .networkError = error
+            else {
                 return nil
             }
             
-            if case .networkError = error {
-                if isConnectedToTheInternet == true {
-                    try? await Task.sleep(nanoseconds: requestRepeatDelayNanoseconds)
-                    return try await apiGetChatrooms(address: address, offset: offset)
-                }
-                
-                waitUntilInternetConnectionRestore()
-                
-                try? await Task.sleep(nanoseconds: requestRepeatDelayNanoseconds)
-                return try await apiGetChatrooms(address: address, offset: offset)
-            }
-            return nil
+            try? await Task.sleep(nanoseconds: requestRepeatDelayNanoseconds)
+            return try await apiGetChatrooms(address: address, offset: offset)
         }
     }
-    
-//    func apiGetChatrooms(address: String, offset: Int?, completion: ((ChatRooms?) -> Void)?) {
-//        apiService.getChatRooms(address: address, offset: offset) { [weak self] result in
-//            switch result {
-//            case .success(let chatrooms):
-//                completion?(chatrooms)
-//            case .failure(let error):
-//                switch error {
-//                case .networkError:
-//                    let getChatrooms: () -> Void = {
-//                        self?.apiGetChatrooms(
-//                            address: address,
-//                            offset: offset,
-//                            completion: completion
-//                        )
-//                    }
-//                    if self?.isConnectedToTheInternet == true {
-//                        DispatchQueue.global().asyncAfter(
-//                            deadline: .now() + requestRepeatDelay,
-//                            execute: getChatrooms
-//                        )
-//                    } else {
-//                        self?.onConnectionToTheInternetRestoredTasks.append(getChatrooms)
-//                    }
-//                default:
-//                    completion?(nil)
-//                }
-//            }
-//        }
-//    }
     
     func getChatMessages(with addressRecipient: String, offset: Int?) async {
         guard let address = accountService.account?.address,
@@ -445,41 +441,22 @@ extension AdamantChatsProvider {
         addressRecipient: String,
         offset: Int?
     ) async throws -> ChatRooms? {
-        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<ChatRooms?, Error>) in
-            apiGetChatMessages(address: address, addressRecipient: addressRecipient, offset: offset) { room in
-                continuation.resume(returning: room)
+        do {
+            let chatrooms = try await apiService.getChatMessages(
+                address: address,
+                addressRecipient: addressRecipient,
+                offset: offset
+            )
+            return chatrooms
+        } catch {
+            guard let error = error as? ApiServiceError,
+                  case .networkError = error
+            else {
+                return nil
             }
-        }
-    }
-    
-    func apiGetChatMessages(address: String, addressRecipient: String, offset: Int?, completion: ((ChatRooms?) -> Void)?) {
-        apiService.getChatMessages(address: address, addressRecipient: addressRecipient, offset: offset) { [weak self] result in
-            switch result {
-            case .success(let chatroom):
-                completion?(chatroom)
-            case .failure(let error):
-                switch error {
-                case .networkError:
-                    let getChatMessages: () -> Void = {
-                        self?.apiGetChatMessages(
-                            address: address,
-                            addressRecipient: addressRecipient,
-                            offset: offset,
-                            completion: completion
-                        )
-                    }
-                    if self?.isConnectedToTheInternet == true {
-                        DispatchQueue.global().asyncAfter(
-                            deadline: .now() + requestRepeatDelay,
-                            execute: getChatMessages
-                        )
-                    } else {
-                        self?.onConnectionToTheInternetRestoredTasks.append(getChatMessages)
-                    }
-                default:
-                    completion?(nil)
-                }
-            }
+            
+            try? await Task.sleep(nanoseconds: requestRepeatDelayNanoseconds)
+            return try await apiGetChatrooms(address: address, offset: offset)
         }
     }
     
@@ -685,6 +662,18 @@ extension AdamantChatsProvider {
         )
         
         return transaction
+    }
+    
+    func removeChatPositon(for address: String) {
+        chatPositon.removeValue(forKey: address)
+    }
+    
+    func setChatPositon(for address: String, position: Double) {
+        chatPositon[address] = position
+    }
+    
+    func getChatPositon(for address: String) -> Double? {
+        return chatPositon[address]
     }
     
     /// Logic:
@@ -956,7 +945,7 @@ extension AdamantChatsProvider {
             case .networkError:
                 throw ChatsProviderError.networkError
             case .success:
-                break
+                throw ChatsProviderError.networkError
             }
         }
     }
@@ -1097,9 +1086,7 @@ extension AdamantChatsProvider {
                 unconfirmedTransactionsBySignature.remove(at: index)
             }
             
-            DispatchQueue.main.sync {
-                unconfirmedTransactions[id] = transaction.objectID
-            }
+            unconfirmedTransactions[id] = transaction.objectID
                         
             return transaction
         } catch {

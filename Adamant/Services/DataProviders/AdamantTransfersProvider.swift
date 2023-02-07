@@ -9,7 +9,7 @@
 import Foundation
 import CoreData
 
-class AdamantTransfersProvider: TransfersProvider {
+actor AdamantTransfersProvider: TransfersProvider {
     // MARK: Constants
     static let transferFee: Decimal = Decimal(sign: .plus, exponent: -1, significand: 5)
     
@@ -30,22 +30,13 @@ class AdamantTransfersProvider: TransfersProvider {
     private(set) var hasTransactions: Bool = false
     private let apiTransactions = 100
     
-    private let processingHeightSemaphore = DispatchSemaphore(value: 1)
-    
-    private let processingQueue = DispatchQueue(label: "im.adamant.processing.transfers", qos: .utility, attributes: [.concurrent])
-    private let sendingQueue = DispatchQueue(label: "im.adamant.sending.transfers", qos: .utility, attributes: [.concurrent])
-    private let stateSemaphore = DispatchSemaphore(value: 1)
-    
     private var unconfirmedTransactions: [UInt64:NSManagedObjectID] = [:]
-    private let unconfirmedsSemaphore = DispatchSemaphore(value: 1)
     
     // MARK: Tools
     
     /// Free stateSemaphore before calling this method, or you will deadlock.
     private func setState(_ state: State, previous prevState: State, notify: Bool = true) {
-        stateSemaphore.wait()
         self.state = state
-        stateSemaphore.signal()
         
         if notify {
             switch prevState {
@@ -119,6 +110,10 @@ class AdamantTransfersProvider: TransfersProvider {
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
+    
+    func setChatsProvider(_ chatsProvider: ChatsProvider?) {
+        self.chatsProvider = chatsProvider
+    }
 }
 
 // MARK: - DataProvider
@@ -133,21 +128,23 @@ extension AdamantTransfersProvider {
     }
     
     func update(completion: ((TransfersProviderResult?) -> Void)?) {
-        stateSemaphore.wait()
+        Task {
+            let result = await update()
+            completion?(result)
+        }
+    }
+    
+    func update() async -> TransfersProviderResult? {
         if state == .updating {
-            stateSemaphore.signal()
-            completion?(nil)
-            return
+            return nil
         }
         
         let prevState = state
         state = .updating
-        stateSemaphore.signal()
         
         guard let address = accountService.account?.address else {
             self.setState(.failedToUpdate(TransfersProviderError.notLogged), previous: prevState)
-            completion?(.failure(TransfersProviderError.notLogged))
-            return
+            return .failure(TransfersProviderError.notLogged)
         }
         
         // MARK: 3. Get transactions
@@ -160,96 +157,90 @@ extension AdamantTransfersProvider {
         getTransactions(forAccount: address, type: .send, fromHeight: prevHeight, offset: nil, dispatchGroup: processingGroup, context: privateContext, contextMutatingSemaphore: cms)
         
         // MARK: 4. Check
-        processingGroup.notify(queue: DispatchQueue.global(qos: .utility)) { [weak self] in
-            guard let state = self?.state else {
-                completion?(nil)
-                return
+        
+        switch state {
+        case .empty, .updating, .upToDate:
+            setState(.upToDate, previous: prevState)
+            
+            if prevHeight != receivedLastHeight,
+               let h = receivedLastHeight {
+                NotificationCenter.default.post(name: Notification.Name.AdamantChatsProvider.newUnreadMessages,
+                                                object: self,
+                                                userInfo: [AdamantUserInfoKey.TransfersProvider.lastTransactionHeight:h])
             }
             
-            switch state {
-            case .empty, .updating, .upToDate:
-                self?.setState(.upToDate, previous: prevState)
-                
-                if prevHeight != self?.receivedLastHeight, let h = self?.receivedLastHeight {
-                    NotificationCenter.default.post(name: Notification.Name.AdamantChatsProvider.newUnreadMessages,
-                                                    object: self,
-                                                    userInfo: [AdamantUserInfoKey.TransfersProvider.lastTransactionHeight:h])
-                }
-                
-                if let h = self?.receivedLastHeight {
-                    self?.readedLastHeight = h
-                } else {
-                    self?.readedLastHeight = 0
-                }
-                
-                if let store = self?.securedStore {
-                    // Received
-                    if let h = self?.receivedLastHeight {
-                        if
-                            let raw: String = store.get(StoreKey.transfersProvider.receivedLastHeight),
-                            let prev = Int64(raw)
-                        {
-                            if h > prev {
-                                store.set(String(h), for: StoreKey.transfersProvider.receivedLastHeight)
-                            }
-                        } else {
-                            store.set(String(h), for: StoreKey.transfersProvider.receivedLastHeight)
-                        }
-                    }
-                    
-                    // Readed
-                    if let h = self?.readedLastHeight {
-                        if
-                            let raw: String = store.get(StoreKey.transfersProvider.readedLastHeight),
-                            let prev = Int64(raw)
-                        {
-                            if h > prev {
-                                store.set(String(h), for: StoreKey.transfersProvider.readedLastHeight)
-                            }
-                        } else {
-                            store.set(String(h), for: StoreKey.transfersProvider.readedLastHeight)
-                        }
-                    }
-                }
-                
-                if let synced = self?.isInitiallySynced, !synced {
-                    self?.isInitiallySynced = true
-                    NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.initialSyncFinished, object: self)
-                }
-                
-                completion?(.success)
-                
-            case .failedToUpdate(let error): // Processing failed
-                let err: TransfersProviderError
-                
-                switch error {
-                case let error as ApiServiceError:
-                    switch error {
-                    case .notLogged:
-                        err = .notLogged
-                        
-                    case .accountNotFound:
-                        err = .accountNotFound(address: address)
-                        
-                    case .serverError:
-                        err = .serverError(error)
-                        
-                    case .internalError(let message, _):
-                        err = .dependencyError(message: message)
-                        
-                    case .networkError:
-                        err = .networkError
-                        
-                    case .requestCancelled:
-                        err = .requestCancelled
-                    }
-                    
-                default:
-                    err = TransfersProviderError.internalError(message: String.adamantLocalized.sharedErrors.internalError(message: error.localizedDescription), error: error)
-                }
-                
-                completion?(.failure(err))
+            if let h = receivedLastHeight {
+                readedLastHeight = h
+            } else {
+                readedLastHeight = 0
             }
+            
+            let store = securedStore
+            // Received
+            if let h = receivedLastHeight {
+                if
+                    let raw: String = store.get(StoreKey.transfersProvider.receivedLastHeight),
+                    let prev = Int64(raw)
+                {
+                    if h > prev {
+                        store.set(String(h), for: StoreKey.transfersProvider.receivedLastHeight)
+                    }
+                } else {
+                    store.set(String(h), for: StoreKey.transfersProvider.receivedLastHeight)
+                }
+            }
+            
+            // Readed
+            if let h = readedLastHeight {
+                if
+                    let raw: String = store.get(StoreKey.transfersProvider.readedLastHeight),
+                    let prev = Int64(raw)
+                {
+                    if h > prev {
+                        store.set(String(h), for: StoreKey.transfersProvider.readedLastHeight)
+                    }
+                } else {
+                    store.set(String(h), for: StoreKey.transfersProvider.readedLastHeight)
+                }
+            }
+            
+            if !isInitiallySynced {
+                isInitiallySynced = true
+                NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.initialSyncFinished, object: self)
+            }
+            
+            return .success
+            
+        case .failedToUpdate(let error): // Processing failed
+            let err: TransfersProviderError
+            
+            switch error {
+            case let error as ApiServiceError:
+                switch error {
+                case .notLogged:
+                    err = .notLogged
+                    
+                case .accountNotFound:
+                    err = .accountNotFound(address: address)
+                    
+                case .serverError:
+                    err = .serverError(error)
+                    
+                case .internalError(let message, _):
+                    err = .dependencyError(message: message)
+                    
+                case .networkError:
+                    err = .networkError
+                    
+                case .requestCancelled:
+                    err = .requestCancelled
+                }
+                
+            default:
+                err = TransfersProviderError.internalError(message: String.adamantLocalized.sharedErrors.internalError(message: error.localizedDescription), error: error)
+            }
+            
+            return .failure(err)
         }
     }
     
@@ -328,13 +319,9 @@ extension AdamantTransfersProvider {
     // Wrapper
     func transferFunds(toAddress recipient: String, amount: Decimal, comment: String?, completion: @escaping (TransfersProviderTransferResult) -> Void) {
         if let comment = comment, comment.count > 0 {
-            sendingQueue.async { [unowned self] in
-                self.transferFundsInternal(toAddress: recipient, amount: amount, comment: comment, completion: completion)
-            }
+            self.transferFundsInternal(toAddress: recipient, amount: amount, comment: comment, completion: completion)
         } else {
-            sendingQueue.async { [unowned self] in
-                self.transferFundsInternal(toAddress: recipient, amount: amount, completion: completion)
-            }
+            self.transferFundsInternal(toAddress: recipient, amount: amount, completion: completion)
         }
     }
     
@@ -445,7 +432,9 @@ extension AdamantTransfersProvider {
             case .success(let id):
                 transaction.transactionId = String(id)
                 
-                self?.chatsProvider?.addUnconfirmed(transactionId: id, managedObjectId: transaction.objectID)
+                Task { [weak self] in
+                    await self?.chatsProvider?.addUnconfirmed(transactionId: id, managedObjectId: transaction.objectID)
+                }
                 
                 do {
                     try context.save()
@@ -600,11 +589,7 @@ extension AdamantTransfersProvider {
                 // Update ID with recieved, add to unconfirmed transactions.
                 transaction.transactionId = String(id)
                 
-                self.unconfirmedsSemaphore.wait()
-                DispatchQueue.main.sync {
-                    self.unconfirmedTransactions[id] = transaction.objectID
-                }
-                self.unconfirmedsSemaphore.signal()
+                self.unconfirmedTransactions[id] = transaction.objectID
                 
                 do {
                     try context.save()
@@ -754,7 +739,6 @@ extension AdamantTransfersProvider {
                 // MARK: 2. Process transactions in background
                 // Enter 2
                 dispatchGroup.enter()
-                self.processingQueue.async {
                     defer {
                         // Leave 2
                         dispatchGroup.leave()
@@ -764,7 +748,6 @@ extension AdamantTransfersProvider {
                                                 currentAddress: account,
                                                 context: context,
                                                 contextMutatingSemaphore: cms)
-                }
                 
                 // MARK: 3. Get more transactions
                 if transactions.count == self.apiTransactions {
@@ -895,7 +878,6 @@ extension AdamantTransfersProvider {
             }
             
             transactionInProgress.append(t.id)
-            unconfirmedsSemaphore.wait()
             if let objectId = unconfirmedTransactions[t.id], let transaction = context.object(with: objectId) as? TransferTransaction {
                 transaction.isConfirmed = true
                 transaction.height = t.height
@@ -911,10 +893,7 @@ extension AdamantTransfersProvider {
                     height = h
                 }
                 
-                unconfirmedsSemaphore.signal()
                 continue
-            } else {
-                unconfirmedsSemaphore.signal()
             }
             
             let partner = partners[String(t.id)]
@@ -938,7 +917,6 @@ extension AdamantTransfersProvider {
         
         // MARK: 4. Check lastHeight
         // API returns transactions from lastHeight INCLUDING transaction with height == lastHeight, so +1
-        processingHeightSemaphore.wait()
         
         if height > 0 {
             let uH = Int64(height + 1)
@@ -960,9 +938,7 @@ extension AdamantTransfersProvider {
                 Set(unreadTransactions.compactMap { $0.chatroom }).forEach { $0.hasUnreadMessages = true }
             }
         }
-        
-        processingHeightSemaphore.signal()
-        
+                
         // MARK: 6. Dump transactions to viewContext
         if context.hasChanges {
             do {

@@ -567,11 +567,13 @@ extension ChatViewController: MessagesLayoutDelegate {
     }
     
     func headerViewSize(for section: Int, in messagesCollectionView: MessagesCollectionView) -> CGSize {
-        if (section == 0 && isNeedToLoadMoore()) {
+       // if (section == 0 && isNeedToLoadMoore()) {
+        if (section == 0 && true) {
             return CGSize(width: messagesCollectionView.bounds.width, height: HeaderReusableView.height)
         } else {
             return .zero
         }
+ //       return .zero
     }
 }
 

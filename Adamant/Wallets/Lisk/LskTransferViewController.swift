@@ -185,10 +185,12 @@ class LskTransferViewController: TransferViewControllerBase {
         let payload = RichMessageTransfer(type: LskWalletService.richMessageType, amount: amount, hash: hash, comments: comments)
         
         let message = AdamantMessage.richMessage(payload: payload)
-        chatsProvider.chatPositon.removeValue(forKey: admAddress)
-        chatsProvider.sendMessage(message, recipientId: admAddress) { [weak self] result in
-            if case .failure(let error) = result {
-                self?.dialogService.showRichError(error: error)
+        Task {
+            do {
+                await chatsProvider.removeChatPositon(for: admAddress)
+                _ = try await chatsProvider.sendMessage(message, recipientId: admAddress)
+            } catch {
+                dialogService.showRichError(error: error)
             }
         }
     }

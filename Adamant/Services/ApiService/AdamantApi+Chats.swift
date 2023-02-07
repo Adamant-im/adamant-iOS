@@ -216,7 +216,8 @@ extension AdamantApiService {
         return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<ChatRooms, Error>) in
             sendRequest(
                 path: ApiCommands.Chats.getChatRooms + "/\(address)",
-                queryItems: queryItems
+                queryItems: queryItems,
+                waitsForConnectivity: true
             ) { (serverResponse: ApiServiceResult<ChatRooms>) in
                 switch serverResponse {
                 case .success(let response):
@@ -228,17 +229,26 @@ extension AdamantApiService {
         }
     }
     
-    func getChatMessages(address: String, addressRecipient: String, offset: Int?, completion: @escaping (ApiServiceResult<ChatRooms>) -> Void) {
+    func getChatMessages(address: String, addressRecipient: String, offset: Int?) async throws -> ChatRooms {
         // MARK: 1. Prepare params
         var queryItems: [URLQueryItem] = []
         if let offset = offset { queryItems.append(URLQueryItem(name: "offset", value: String(offset))) }
         queryItems.append(URLQueryItem(name: "limit", value: "50"))
         
         // MARK: 2. Send
-        sendRequest(
-            path: ApiCommands.Chats.getChatRooms + "/\(address)/\(addressRecipient)",
-            queryItems: queryItems,
-            completion: completion
-        )
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<ChatRooms, Error>) in
+            sendRequest(
+                path: ApiCommands.Chats.getChatRooms + "/\(address)/\(addressRecipient)",
+                queryItems: queryItems,
+                waitsForConnectivity: true
+            ) { (serverResponse: ApiServiceResult<ChatRooms>) in
+                switch serverResponse {
+                case .success(let response):
+                    continuation.resume(returning: response)
+                case .failure(let error):
+                    continuation.resume(throwing: ApiServiceError.networkError(error: error))
+                }
+            }
+        }
     }
 }

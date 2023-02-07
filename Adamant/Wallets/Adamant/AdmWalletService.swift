@@ -170,15 +170,17 @@ extension AdmWalletService: SwinjectDependentService {
         transfersProvider = container.resolve(TransfersProvider.self)
         router = container.resolve(Router.self)
         
-        let controller = transfersProvider.unreadTransfersController()
-        
-        do {
-            try controller.performFetch()
-        } catch {
-            print("AdmWalletService: Error performing fetch: \(error)")
+        Task {
+            let controller = await transfersProvider.unreadTransfersController()
+            
+            do {
+                try controller.performFetch()
+            } catch {
+                print("AdmWalletService: Error performing fetch: \(error)")
+            }
+            
+            controller.delegate = self
+            transfersController = controller
         }
-        
-        controller.delegate = self
-        transfersController = controller
     }
 }

@@ -30,6 +30,7 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
         handleRefresh(self.refreshControl)
     }
     
+    @MainActor
     override func handleRefresh(_ refreshControl: UIRefreshControl) {
         refreshTask = Task {
             do {

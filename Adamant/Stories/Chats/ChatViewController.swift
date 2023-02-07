@@ -305,72 +305,75 @@ class ChatViewController: MessagesViewController {
         }
         
         // MARK: 3. Data
-        let controller = chatsProvider.getChatController(for: chatroom)
-        chatController = controller
-        controller.delegate = self
-        
-        do {
-            try controller.performFetch()
-        } catch {
-            print("There was an error performing fetch: \(error)")
-        }
-        
-        // MARK: Rich messages
-        if let fetched = controller.fetchedObjects {
-            for case let rich as RichMessageTransaction in fetched {
-                rich.kind = messageKind(for: rich)
+        Task {
+            let controller = await chatsProvider.getChatController(for: chatroom)
+            chatController = controller
+            controller.delegate = self
+            
+            do {
+                try controller.performFetch()
+            } catch {
+                print("There was an error performing fetch: \(error)")
             }
             
-            if let chatroom = self.chatroom, let message = chatroom.getFirstUnread() as? MessageTransaction {
-                messageToShow = message
-            }
-        }
-        
-        // MARK: RichMessage handlers
-        for handler in richMessageProviders.values {
-            if let source = handler.cellSource {
-                switch source {
-                case .class(let type):
-                    messagesCollectionView.register(type, forCellWithReuseIdentifier: handler.cellIdentifierSent)
-                    messagesCollectionView.register(type, forCellWithReuseIdentifier: handler.cellIdentifierReceived)
-                    
-                case .nib(let nib):
-                    messagesCollectionView.register(nib, forCellWithReuseIdentifier: handler.cellIdentifierSent)
-                    messagesCollectionView.register(nib, forCellWithReuseIdentifier: handler.cellIdentifierReceived)
+            // MARK: Rich messages
+            if let fetched = controller.fetchedObjects {
+                for case let rich as RichMessageTransaction in fetched {
+                    rich.kind = messageKind(for: rich)
+                }
+                
+                if let chatroom = self.chatroom, let message = chatroom.getFirstUnread() as? MessageTransaction {
+                    messageToShow = message
                 }
             }
+            
+            
+            // MARK: RichMessage handlers
+            for handler in richMessageProviders.values {
+                if let source = handler.cellSource {
+                    switch source {
+                    case .class(let type):
+                        messagesCollectionView.register(type, forCellWithReuseIdentifier: handler.cellIdentifierSent)
+                        messagesCollectionView.register(type, forCellWithReuseIdentifier: handler.cellIdentifierReceived)
+                        
+                    case .nib(let nib):
+                        messagesCollectionView.register(nib, forCellWithReuseIdentifier: handler.cellIdentifierSent)
+                        messagesCollectionView.register(nib, forCellWithReuseIdentifier: handler.cellIdentifierReceived)
+                    }
+                }
+            }
+            
+            scrollToBottomBtn.backgroundColor = .clear
+            scrollToBottomBtn.setImage(#imageLiteral(resourceName: "ScrollDown"), for: .normal)
+            scrollToBottomBtn.alpha = 0.5
+            scrollToBottomBtn.frame = CGRect.zero
+            scrollToBottomBtn.translatesAutoresizingMaskIntoConstraints = false
+            scrollToBottomBtn.addTarget(self, action: #selector(scrollDown), for: .touchUpInside)
+            scrollToBottomBtn.isHidden = true
+            self.view.addSubview(scrollToBottomBtn)
+            
+            if UIScreen.main.traitCollection.userInterfaceIdiom == .pad, !isMacOS {
+                setKeyboardObservers()
+            }
+            
+            scrollToBottomBtnOffsetConstraint = scrollToBottomBtn.bottomAnchor.constraint(
+                equalTo: messagesCollectionView.bottomAnchor,
+                constant: .zero
+            )
+            
+            NSLayoutConstraint.activate([
+                scrollToBottomBtn.heightAnchor.constraint(equalToConstant: scrollToBottomButtonSize),
+                scrollToBottomBtn.widthAnchor.constraint(equalToConstant: scrollToBottomButtonSize),
+                scrollToBottomBtn.rightAnchor.constraint(equalTo: messagesCollectionView.rightAnchor, constant: -scrollToBottomButtonRightInset),
+                scrollToBottomBtnOffsetConstraint!
+            ])
+            
+            UIMenuController.shared.menuItems = [
+                UIMenuItem(title: String.adamantLocalized.chat.remove, action: NSSelectorFromString("remove:")),
+                UIMenuItem(title: String.adamantLocalized.chat.report, action: NSSelectorFromString("report:"))]
+            
+        //    loadFirstMessagesIfNeeded()
         }
-        
-        scrollToBottomBtn.backgroundColor = .clear
-        scrollToBottomBtn.setImage(#imageLiteral(resourceName: "ScrollDown"), for: .normal)
-        scrollToBottomBtn.alpha = 0.5
-        scrollToBottomBtn.frame = CGRect.zero
-        scrollToBottomBtn.translatesAutoresizingMaskIntoConstraints = false
-        scrollToBottomBtn.addTarget(self, action: #selector(scrollDown), for: .touchUpInside)
-        scrollToBottomBtn.isHidden = true
-        self.view.addSubview(scrollToBottomBtn)
-        
-        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad, !isMacOS {
-            setKeyboardObservers()
-        }
-        
-        scrollToBottomBtnOffsetConstraint = scrollToBottomBtn.bottomAnchor.constraint(
-            equalTo: messagesCollectionView.bottomAnchor,
-            constant: .zero
-        )
-        
-        NSLayoutConstraint.activate([
-            scrollToBottomBtn.heightAnchor.constraint(equalToConstant: scrollToBottomButtonSize),
-            scrollToBottomBtn.widthAnchor.constraint(equalToConstant: scrollToBottomButtonSize),
-            scrollToBottomBtn.rightAnchor.constraint(equalTo: messagesCollectionView.rightAnchor, constant: -scrollToBottomButtonRightInset),
-            scrollToBottomBtnOffsetConstraint!
-        ])
-        
-        UIMenuController.shared.menuItems = [
-            UIMenuItem(title: String.adamantLocalized.chat.remove, action: NSSelectorFromString("remove:")),
-            UIMenuItem(title: String.adamantLocalized.chat.report, action: NSSelectorFromString("report:"))]
-        
-        loadFirstMessagesIfNeeded()
     }
     
     override func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
@@ -431,7 +434,9 @@ class ChatViewController: MessagesViewController {
             chatroom?.updateLastTransaction()
             
             if let transactionId = item.transactionId {
-                chatsProvider.removeMessage(with: transactionId)
+                Task {
+                    await chatsProvider.removeMessage(with: transactionId)
+                }
             }
             
             if show {
@@ -470,13 +475,16 @@ class ChatViewController: MessagesViewController {
         
         guard let address = chatroom?.partner?.address else { return }
         
-        if self.chatPositionOffset > 0 {
-            self.chatsProvider.chatPositon[address] = Double(self.chatPositionOffset)
-        } else {
-            self.chatsProvider.chatPositon.removeValue(forKey: address)
+        Task {
+            if self.chatPositionOffset > 0 {
+                await self.chatsProvider.setChatPositon(for: address, position: Double(self.chatPositionOffset))
+            } else {
+                await self.chatsProvider.removeChatPositon(for: address)
+            }
         }
     }
     
+    @MainActor
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         guard let address = chatroom?.partner?.address else { return }
@@ -492,7 +500,9 @@ class ChatViewController: MessagesViewController {
             if let indexPath = chatController?.indexPath(forObject: messageToShow) {
                 self.messagesCollectionView.scrollToItem(at: IndexPath(item: 0, section: indexPath.row), at: [.centeredVertically, .centeredHorizontally], animated: false)
                 isFirstLayout = false
-                self.chatsProvider.chatPositon.removeValue(forKey: address)
+                Task {
+                    await chatsProvider.removeChatPositon(for: address)
+                }
                 self.messageToShow = nil
 
                 didLoaded = true
@@ -508,18 +518,22 @@ class ChatViewController: MessagesViewController {
             isFirstLayout = false
             
             if self.messageToShow == nil {
-                if let offset = self.chatsProvider.chatPositon[address] {
-                    self.chatPositionOffset = CGFloat(offset)
-                    self.scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelta
-                    let collectionViewContentHeight = messagesCollectionView.collectionViewLayout.collectionViewContentSize.height - CGFloat(offset) - (messagesCollectionView.scrollIndicatorInsets.bottom + messagesCollectionView.contentInset.bottom) + headerHeight
+                Task {
+                    if let offset = await self.chatsProvider.getChatPositon(for: address) {
+                        self.chatPositionOffset = CGFloat(offset)
+                        self.scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelta
+                        let collectionViewContentHeight = messagesCollectionView.collectionViewLayout.collectionViewContentSize.height - CGFloat(offset) - (messagesCollectionView.scrollIndicatorInsets.bottom + messagesCollectionView.contentInset.bottom) + headerHeight
 
-                    messagesCollectionView.performBatchUpdates(nil) { _ in self.messagesCollectionView.scrollRectToVisible(CGRect(x: 0.0, y: collectionViewContentHeight - 1.0, width: 1.0, height: 1.0), animated: false)
+                        messagesCollectionView.performBatchUpdates(nil) { _ in self.messagesCollectionView.scrollRectToVisible(CGRect(x: 0.0, y: collectionViewContentHeight - 1.0, width: 1.0, height: 1.0), animated: false)
+                        }
+                    } else {
+                        messagesCollectionView.scrollToBottom(animated: false)
                     }
-                } else {
-                    messagesCollectionView.scrollToBottom(animated: false)
                 }
             } else {
-                self.chatsProvider.chatPositon.removeValue(forKey: address)
+                Task {
+                    await chatsProvider.removeChatPositon(for: address)
+                }
             }
         }
     }
@@ -1097,31 +1111,31 @@ extension ChatViewController {
        loadMooreMessagesIfNeeded(indexPath: indexPath)
     }
     
+    @MainActor
     func loadFirstMessagesIfNeeded() {
-        guard let address = chatroom?.partner?.address else { return }
-        
-        if let isLoaded = chatsProvider.isChatLoaded[address],
-           isLoaded {
-            setBusyIndicator(state: false)
-            return
-        }
-        
-        if address == AdamantContacts.adamantWelcomeWallet.name {
-            setBusyIndicator(state: false)
-            return
-        }
-        
-        setBusyIndicator(state: true)
-        
-        if chatsProvider.isChatLoading(with: address) {
-            addChatLoadObserver()
-            return
-        }
-        
-        chatsProvider.getChatMessages(with: address, offset: 0) { [weak self] in
-            DispatchQueue.main.async {
-                self?.updateChatMessages()
+        Task {
+            guard let address = chatroom?.partner?.address else { return }
+            
+            if let isLoaded = await chatsProvider.isChatLoaded[address],
+               isLoaded {
+                setBusyIndicator(state: false)
+                return
             }
+            
+            if address == AdamantContacts.adamantWelcomeWallet.name {
+                setBusyIndicator(state: false)
+                return
+            }
+            
+            setBusyIndicator(state: true)
+            
+            if await chatsProvider.isChatLoading(with: address) {
+                addChatLoadObserver()
+                return
+            }
+            
+            await chatsProvider.getChatMessages(with: address, offset: 0)
+            updateChatMessages()
         }
     }
     
@@ -1131,25 +1145,25 @@ extension ChatViewController {
         setBusyIndicator(state: false)
     }
     
+    @MainActor
     func loadMooreMessagesIfNeeded(indexPath: IndexPath) {
-        guard indexPath.section < 4,
-              let address = chatroom?.partner?.address,
-              !isBusy,
-              isNeedToLoadMoore(),
-              didLoaded
-        else {
-            return
-        }
-        
-        if address == AdamantContacts.adamantWelcomeWallet.name { return }
-        isBusy = true
-        let offset = chatsProvider.chatLoadedMessages[address] ?? 0
-        chatsProvider.getChatMessages(with: address, offset: offset) { [weak self] in
-            DispatchQueue.main.async {
-                self?.messagesCollectionView.reloadDataAndKeepOffset()
-                self?.isBusy = false
-                self?.reloadTopSectionIfNeeded()
+        Task {
+            guard indexPath.section < 4,
+                  let address = chatroom?.partner?.address,
+                  !isBusy,
+                  await isNeedToLoadMoore(),
+                  didLoaded
+            else {
+                return
             }
+
+            if address == AdamantContacts.adamantWelcomeWallet.name { return }
+            isBusy = true
+            let offset = await chatsProvider.chatLoadedMessages[address] ?? 0
+            await chatsProvider.getChatMessages(with: address, offset: offset)
+            messagesCollectionView.reloadDataAndKeepOffset()
+            isBusy = false
+            reloadTopSectionIfNeeded()
         }
     }
     
@@ -1161,9 +1175,9 @@ extension ChatViewController {
         }
     }
     
-    func isNeedToLoadMoore() -> Bool {
+    func isNeedToLoadMoore() async -> Bool {
         if let address = chatroom?.partner?.address,
-           chatsProvider.chatLoadedMessages[address] ?? 0 < chatsProvider.chatMaxMessages[address] ?? 0 {
+           await chatsProvider.chatLoadedMessages[address] ?? 0 <  chatsProvider.chatMaxMessages[address] ?? 0 {
             return true
         }
         return false
