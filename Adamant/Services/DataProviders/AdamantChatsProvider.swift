@@ -10,7 +10,7 @@ import UIKit
 import CoreData
 import MarkdownKit
 
-class AdamantChatsProvider: ChatsProvider {
+final class AdamantChatsProvider: ChatsProvider {
     // MARK: Dependencies
     let accountService: AccountService
     let apiService: ApiService
@@ -20,6 +20,7 @@ class AdamantChatsProvider: ChatsProvider {
     let accountsProvider: AccountsProvider
     let transactionService: ChatTransactionService
     let securedStore: SecuredStore
+    let richTransactionStatusService: RichTransactionStatusService
     
     private let richProviders: [String: RichMessageProviderWithStatusCheck]
     
@@ -31,13 +32,13 @@ class AdamantChatsProvider: ChatsProvider {
     private var unconfirmedTransactions: [UInt64:NSManagedObjectID] = [:]
     private var unconfirmedTransactionsBySignature: [String] = []
     
-    public var chatPositon: [String : Double] = [:]
+    var chatPositon: [String : Double] = [:]
     private(set) var blockList: [String] = []
     private(set) var removedMessages: [String] = []
     
-    public var isChatLoaded: [String : Bool] = [:]
-    public var chatMaxMessages: [String : Int] = [:]
-    public var chatLoadedMessages: [String : Int] = [:]
+    var isChatLoaded: [String : Bool] = [:]
+    var chatMaxMessages: [String : Int] = [:]
+    var chatLoadedMessages: [String : Int] = [:]
     private var chatsLoading: [String] = []
     private let preLoadChatsCount = 5
     private var isConnectedToTheInternet = true
@@ -71,7 +72,8 @@ class AdamantChatsProvider: ChatsProvider {
         adamantCore: AdamantCore,
         accountsProvider: AccountsProvider,
         transactionService: ChatTransactionService,
-        securedStore: SecuredStore
+        securedStore: SecuredStore,
+        richTransactionStatusService: RichTransactionStatusService
     ) {
         self.accountService = accountService
         self.apiService = apiService
@@ -81,6 +83,7 @@ class AdamantChatsProvider: ChatsProvider {
         self.accountsProvider = accountsProvider
         self.transactionService = transactionService
         self.securedStore = securedStore
+        self.richTransactionStatusService = richTransactionStatusService
         
         var richProviders = [String: RichMessageProviderWithStatusCheck]()
         for case let provider as RichMessageProviderWithStatusCheck in accountService.wallets {
@@ -1021,6 +1024,25 @@ extension AdamantChatsProvider {
         return controller
     }
     
+    func getChatroom(for adm: String) -> Chatroom? {
+        let request: NSFetchRequest<Chatroom> = NSFetchRequest(entityName: Chatroom.entityName)
+        request.sortDescriptors = [NSSortDescriptor(key: "updatedAt", ascending: false),
+                                   NSSortDescriptor(key: "title", ascending: true)]
+        request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "partner!=nil"),
+            NSPredicate(format: "partner.address CONTAINS[cd] %@", adm),
+            NSPredicate(format: "isForcedVisible = true OR isHidden = false"),
+            NSPredicate(format: "isForcedVisible = true OR ANY transactions.showsChatroom = true")
+        ])
+        
+        do {
+            let result = try stack.container.viewContext.fetch(request)
+            return result.first
+        } catch {
+            return nil
+        }
+    }
+    
     func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction> {
         guard let context = chatroom.managedObjectContext else {
             fatalError()
@@ -1466,7 +1488,7 @@ extension AdamantChatsProvider {
         }
     }
     
-    public func blockChat(with address: String) {
+    func blockChat(with address: String) {
         if !self.blockList.contains(address) {
             self.blockList.append(address)
             
@@ -1476,7 +1498,7 @@ extension AdamantChatsProvider {
         }
     }
     
-    public func removeMessage(with id: String) {
+    func removeMessage(with id: String) {
         if !self.removedMessages.contains(id) {
             self.removedMessages.append(id)
             
@@ -1484,6 +1506,22 @@ extension AdamantChatsProvider {
                 self.securedStore.set(removedMessages, for: StoreKey.accountService.removedMessages)
             }
         }
+    }
+    
+    func updateStatus(for transaction: RichMessageTransaction) {
+        Task {
+            try await richTransactionStatusService.update(
+                transaction,
+                parentContext: stack.container.viewContext
+            )
+        }
+    }
+    
+    func markChatAsRead(chatroom: Chatroom) {
+        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        privateContext.parent = self.stack.container.viewContext
+        chatroom.markAsReaded()
+        try? privateContext.save()
     }
     
     private func onConnectionToTheInternetRestored() {

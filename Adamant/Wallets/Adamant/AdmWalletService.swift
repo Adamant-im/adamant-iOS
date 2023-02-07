@@ -57,9 +57,6 @@ class AdmWalletService: NSObject, WalletService {
     
     // MARK: RichMessageProvider properties
     static let richMessageType = "adm_transaction" // not used
-    let cellIdentifierSent = "admTransferSent"
-    let cellIdentifierReceived = "admTransferReceived"
-    var cellSource: CellSource? = CellSource.nib(nib: UINib(nibName: "TransferCollectionViewCell", bundle: nil))
     
     // MARK: - Properties
     let enabled: Bool = true

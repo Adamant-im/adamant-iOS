@@ -232,10 +232,13 @@ class AboutViewController: FormViewController {
                                 return
                         }
                         
-                        chat.account = account
                         chat.hidesBottomBarWhenPushed = true
-                        chat.chatroom = chatroom
-                        chat.delegate = self
+                        chat.viewModel.setup(
+                            account: account,
+                            chatroom: chatroom,
+                            messageToShow: nil,
+                            preservationDelegate: self
+                        )
                         
                         nav.pushViewController(chat, animated: true)
                         
@@ -361,11 +364,12 @@ extension AboutViewController: MFMailComposeViewControllerDelegate {
 }
 
 // MARK: - ChatViewControllerDelegate
-extension AboutViewController: ChatViewControllerDelegate {
+
+extension AboutViewController: ChatPreservationDelegate {
     func preserveMessage(_ message: String, forAddress address: String) {
         storedIOSSupportMessage = message
     }
-    
+
     func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String? {
         if thenRemoveIt {
             let message = storedIOSSupportMessage
