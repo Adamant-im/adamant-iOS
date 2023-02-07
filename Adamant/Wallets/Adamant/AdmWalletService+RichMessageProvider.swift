@@ -18,12 +18,11 @@ extension AdmWalletService: RichMessageProvider {
     
     // MARK: Events
     
-    /// Not supported yet
-    func richMessageTapped(for transaction: RichMessageTransaction, at indexPath: IndexPath, in chat: ChatViewController) {
+    func richMessageTapped(for transaction: RichMessageTransaction, in chat: ChatViewController) {
         return
     }
     
-    func richMessageTapped(for transaction: TransferTransaction, at indexPath: IndexPath, in chat: ChatViewController) {
+    func richMessageTapped(for transaction: TransferTransaction, in chat: ChatViewController) {
         guard let controller = router.get(scene: AdamantScene.Wallets.Adamant.transactionDetails) as? TransactionDetailsViewControllerBase else {
             fatalError("Can't get TransactionDetails scene")
         }
@@ -51,47 +50,6 @@ extension AdmWalletService: RichMessageProvider {
             controller.modalPresentationStyle = .overFullScreen
             chat.present(controller, animated: true, completion: nil)
         }
-    }
-    
-    // MARK: Cells
-    
-    func cellSizeCalculator(for messagesCollectionViewFlowLayout: MessagesCollectionViewFlowLayout) -> CellSizeCalculator {
-        let calculator = TransferMessageSizeCalculator(layout: messagesCollectionViewFlowLayout)
-        calculator.font = UIFont.systemFont(ofSize: 24)
-        return calculator
-    }
-    
-    func cell(for message: MessageType, isFromCurrentSender: Bool, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell {
-        guard case .custom(let raw) = message.kind, let richMessage = raw as? RichMessageTransfer else {
-            fatalError("ADM service tried to render wrong message kind: \(message.kind)")
-        }
-        
-        let cellIdentifier = isFromCurrentSender ? cellIdentifierSent : cellIdentifierReceived
-        guard let cell = messagesCollectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as? TransferCollectionViewCell else {
-            fatalError("Can't dequeue \(cellIdentifier) cell")
-        }
-        
-        cell.currencyLogoImageView.image = AdmWalletService.currencyLogo
-        cell.currencySymbolLabel.text = AdmWalletService.currencySymbol
-        
-        cell.amountLabel.text = AdamantBalanceFormat.full.format(richMessage.amount)
-        cell.dateLabel.text = message.sentDate.humanizedDateTime(withWeekday: false)
-        
-        if let status = (message as? TransferTransaction)?.statusEnum {
-            cell.transactionStatus = status.toTransactionStatus()
-        } else {
-            cell.transactionStatus = nil
-        }
-        
-        cell.commentsLabel.text = richMessage.comments
-        
-        if cell.isAlignedRight != isFromCurrentSender {
-            cell.isAlignedRight = isFromCurrentSender
-        }
-        
-        cell.isFromCurrentSender = isFromCurrentSender
-        
-        return cell
     }
     
     // MARK: Short description

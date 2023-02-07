@@ -234,6 +234,47 @@ extension AdamantDialogService {
 
 // MAKR: - Activity controllers
 extension AdamantDialogService {
+    func presentShareAlertFor(adm: String, name: String, types: [AddressChatShareType], animated: Bool, from: UIView?, completion: (() -> Void)?, didSelect: ((AddressChatShareType) -> Void)?) {
+        let alert = makeSafeAlertController(
+            title: adm,
+            message: nil,
+            preferredStyle: .actionSheet,
+            source: from
+        )
+        
+        for type in types {
+            alert.addAction(UIAlertAction(title: type.localized + name, style: .default) { _ in
+                didSelect?(type)
+            })
+        }
+        let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: adm, params: nil))
+        addActions(to: alert,
+                   stringForPasteboard: adm,
+                   stringForShare: adm,
+                   stringForQR: adm,
+                   types: [
+                    .copyToPasteboard,
+                    .share,
+                    .generateQr(encodedContent: encodedAddress,
+                                sharingTip: adm,
+                                withLogo: true
+                               )
+                   ],
+                   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+                   from: nil,
+                   completion: nil
+        )
+        
+        if let sourceView = from {
+            alert.popoverPresentationController?.sourceView = sourceView
+            alert.popoverPresentationController?.sourceRect = sourceView.bounds
+            alert.popoverPresentationController?.canOverlapSourceViewRect = false
+        }
+        
+        alert.modalPresentationStyle = .overFullScreen
+        present(alert, animated: animated, completion: completion)
+    }
+    
     func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?) {
         let source: ViewSource?
         if let from = from {
@@ -293,11 +334,49 @@ extension AdamantDialogService {
     private enum ViewSource {
         case view(UIView)
         case barButtonItem(UIBarButtonItem)
+        
+        var entity: Any {
+            switch self {
+            case let .view(view):
+                return view
+            case let .barButtonItem(item):
+                return item
+            }
+        }
     }
     
-    private func createShareAlertFor(stringForPasteboard: String, stringForShare: String, stringForQR: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: ViewSource?, completion: (() -> Void)?) -> UIAlertController {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+    private func createShareAlertFor(
+        stringForPasteboard: String,
+        stringForShare: String,
+        stringForQR: String,
+        types: [ShareType],
+        excludedActivityTypes: [UIActivity.ActivityType]?,
+        animated: Bool,
+        from: ViewSource?,
+        completion: (() -> Void)?
+    ) -> UIAlertController {
+        let alert = makeSafeAlertController(
+            title: nil,
+            message: nil,
+            preferredStyle: .actionSheet,
+            source: from?.entity
+        )
+
+        addActions(to: alert, stringForPasteboard: stringForPasteboard, stringForShare: stringForShare, stringForQR: stringForQR, types: types, excludedActivityTypes: excludedActivityTypes, from: from, completion: completion)
         
+        return alert
+    }
+        
+    private func addActions(
+        to alert: UIAlertController,
+        stringForPasteboard: String,
+        stringForShare: String,
+        stringForQR: String,
+        types: [ShareType],
+        excludedActivityTypes: [UIActivity.ActivityType]?,
+        from: ViewSource?,
+        completion: (() -> Void)?
+    ) {
         for type in types {
             switch type {
             case .copyToPasteboard:
@@ -356,8 +435,6 @@ extension AdamantDialogService {
         }
         
         alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
-        
-        return alert
     }
     
     @objc private func image(_ image: UIImage, didFinishSavingWithError error: NSError?, contextInfo: UnsafeRawPointer) {
@@ -369,7 +446,12 @@ extension AdamantDialogService {
     }
     
     func presentGoToSettingsAlert(title: String?, message: String?) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let alert = makeSafeAlertController(
+            title: title,
+            message: message,
+            preferredStyle: .alert,
+            source: nil
+        )
         
         alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
             DispatchQueue.main.async {
@@ -453,7 +535,12 @@ extension AdamantDialogService {
     }
     
     func showAlert(title: String?, message: String?, style: UIAlertController.Style, actions: [UIAlertAction]?, from: Any?) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: style)
+        let alert = makeSafeAlertController(
+            title: title,
+            message: message,
+            preferredStyle: style,
+            source: from
+        )
         
         if let actions = actions {
             for action in actions {
@@ -520,4 +607,18 @@ private class MailDelegate: NSObject, MFMailComposeViewControllerDelegate {
     func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
         controller.dismiss(animated: true, completion: nil)
     }
+}
+
+/// Its needed to avoid crashes on `actionSheet` alert style on MacOS
+private func makeSafeAlertController(
+    title: String?,
+    message: String?,
+    preferredStyle: UIAlertController.Style,
+    source: Any?
+) -> UIAlertController {
+    let style = source == nil && UIScreen.main.traitCollection.userInterfaceIdiom == .pad
+        ? .alert
+        : preferredStyle
+    
+    return .init(title: title, message: message, preferredStyle: style)
 }

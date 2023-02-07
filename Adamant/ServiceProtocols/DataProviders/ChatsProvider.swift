@@ -190,6 +190,7 @@ protocol ChatsProvider: DataProvider, Actor {
     var chatLoadedMessages: [String: Int] { get }
     
     // MARK: - Getting chats and messages
+    func getChatroom(for adm: String) -> Chatroom?
     func getChatroomsController() -> NSFetchedResultsController<Chatroom>
     func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction>
     func getChatRooms(offset: Int?) async
@@ -216,6 +217,8 @@ protocol ChatsProvider: DataProvider, Actor {
     func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult
     func blockChat(with address: String)
     func removeMessage(with id: String)
+    func updateStatus(for transaction: RichMessageTransaction)
+    func markChatAsRead(chatroom: Chatroom)
     func removeChatPositon(for address: String)
     func setChatPositon(for address: String, position: Double)
     func getChatPositon(for address: String) -> Double?

@@ -18,7 +18,7 @@ extension DogeWalletService: RichMessageProvider {
     
     // MARK: Events
     
-    func richMessageTapped(for transaction: RichMessageTransaction, at indexPath: IndexPath, in chat: ChatViewController) {
+    func richMessageTapped(for transaction: RichMessageTransaction, in chat: ChatViewController) {
         // MARK: 0. Prepare
         guard let richContent = transaction.richContent,
             let hash = richContent[RichContentKeys.transfer.hash],
@@ -148,47 +148,7 @@ extension DogeWalletService: RichMessageProvider {
         }
     }
     
-    // MARK: Cells
-    
-    func cellSizeCalculator(for messagesCollectionViewFlowLayout: MessagesCollectionViewFlowLayout) -> CellSizeCalculator {
-        let calculator = TransferMessageSizeCalculator(layout: messagesCollectionViewFlowLayout)
-        calculator.font = UIFont.systemFont(ofSize: 24)
-        return calculator
-    }
-    
-    func cell(for message: MessageType, isFromCurrentSender: Bool, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell {
-        guard case .custom(let raw) = message.kind, let transfer = raw as? RichMessageTransfer else {
-            fatalError("DOGE service tried to render wrong message kind: \(message.kind)")
-        }
-        
-        let cellIdentifier = isFromCurrentSender ? cellIdentifierSent : cellIdentifierReceived
-        guard let cell = messagesCollectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as? TransferCollectionViewCell else {
-            fatalError("Can't dequeue \(cellIdentifier) cell")
-        }
-        
-        cell.currencyLogoImageView.image = DogeWalletService.currencyLogo
-        cell.currencySymbolLabel.text = DogeWalletService.currencySymbol
-        
-        cell.amountLabel.text = AdamantBalanceFormat.full.format(transfer.amount)
-        cell.dateLabel.text = message.sentDate.humanizedDateTime(withWeekday: false)
-        cell.transactionStatus = (message as? RichMessageTransaction)?.transactionStatus
-        
-        cell.commentsLabel.text = transfer.comments
-        
-        if cell.isAlignedRight != isFromCurrentSender {
-            cell.isAlignedRight = isFromCurrentSender
-        }
-        
-        cell.isFromCurrentSender = isFromCurrentSender
-        
-        return cell
-    }
-    
     // MARK: Short description
-    
-    private static var formatter: NumberFormatter = {
-        return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: currencySymbol)
-    }()
     
     func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString {
         let amount: String

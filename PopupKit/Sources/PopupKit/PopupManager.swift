@@ -14,7 +14,7 @@ public final class PopupManager {
         let rootVC = UIHostingController(rootView: rootView)
         rootVC.view.backgroundColor = .clear
         window.rootViewController = rootVC
-        window.makeKeyAndVisible()
+        window.isHidden = false
     }
     
     public init() {}
