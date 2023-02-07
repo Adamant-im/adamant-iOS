@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import MarkdownKit
 
 struct ChatMessageFactory {
     private let richMessageProviders: [String: RichMessageProvider]
@@ -41,6 +42,28 @@ struct ChatMessageFactory {
 }
 
 private extension ChatMessageFactory {
+    static let markdownParser = MarkdownParser(
+        font: .adamantChatDefault,
+        color: .adamant.primary,
+        enabledElements: [
+            .header,
+            .list,
+            .quote,
+            .bold,
+            .italic,
+            .code,
+            .strikethrough
+        ],
+        customElements: [
+            MarkdownSimpleAdm(),
+            MarkdownLinkAdm(),
+            MarkdownAdvancedAdm(
+                font: .adamantChatDefault,
+                color: .adamant.active
+            )
+        ]
+    )
+    
     func makeContent(_ transaction: ChatTransaction) -> ChatMessage.Content {
         switch transaction {
         case let transaction as MessageTransaction:
@@ -55,7 +78,9 @@ private extension ChatMessageFactory {
     }
     
     func makeContent(_ transaction: MessageTransaction) -> ChatMessage.Content {
-        transaction.message.map { .message($0) } ?? .default
+        transaction.message.map {
+            .message(.init(string: Self.markdownParser.parse($0)))
+        } ?? .default
     }
     
     func makeContent(_ transaction: RichMessageTransaction) -> ChatMessage.Content {

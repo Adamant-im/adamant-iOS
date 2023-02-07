@@ -20,7 +20,6 @@ final class ChatViewController: MessagesViewController {
     private let storedObjects: [AnyObject]
     private let richMessageProviders: [String: RichMessageProvider]
     private var subscriptions = Set<AnyCancellable>()
-    private var didScrollSender = ObservableSender<Void>()
     private var topMessageId: String?
     private var bottomMessageId: String?
     private var messagesLoaded = false
@@ -129,7 +128,6 @@ final class ChatViewController: MessagesViewController {
     
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         super.scrollViewDidScroll(scrollView)
-        didScrollSender.send()
         updateIsScrollPositionNearlyTheBottom()
         updateScrollDownButtonVisibility()
     }

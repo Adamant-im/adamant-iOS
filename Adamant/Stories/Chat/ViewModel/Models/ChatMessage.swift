@@ -7,7 +7,6 @@
 //
 
 import MessageKit
-import MarkdownKit
 import UIKit
 
 struct ChatMessage: Identifiable, Equatable {
@@ -36,10 +35,10 @@ extension ChatMessage {
     }
     
     enum Content: Equatable {
-        case message(String)
+        case message(ComparableAttributedString)
         case transaction(Transaction)
         
-        static let `default` = Self.message("")
+        static let `default` = Self.message(.init(string: .init()))
     }
     
     struct Transaction: Equatable {
@@ -57,8 +56,7 @@ extension ChatMessage: MessageType {
     var kind: MessageKind {
         switch content {
         case let .message(text):
-            let markdownText = Self.markdownParser.parse(text)
-            return .attributedText(markdownText)
+            return .attributedText(text.string)
         case let .transaction(model):
             return .custom(model)
         }
@@ -75,28 +73,4 @@ extension MessageType {
             return .default
         }
     }
-}
-
-private extension ChatMessage {
-    static let markdownParser = MarkdownParser(
-        font: .adamantChatDefault,
-        color: .adamant.primary,
-        enabledElements: [
-            .header,
-            .list,
-            .quote,
-            .bold,
-            .italic,
-            .code,
-            .strikethrough
-        ],
-        customElements: [
-            MarkdownSimpleAdm(),
-            MarkdownLinkAdm(),
-            MarkdownAdvancedAdm(
-                font: .adamantChatDefault,
-                color: .adamant.active
-            )
-        ]
-    )
 }
