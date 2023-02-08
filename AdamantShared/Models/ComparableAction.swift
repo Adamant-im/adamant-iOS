@@ -7,10 +7,10 @@
 //
 
 struct ComparableAction: Equatable {
-    let id: Int
+    let id: String
     let action: () -> Void
     
-    init(id: Int = .zero, action: @escaping () -> Void) {
+    init(id: String = "", action: @escaping () -> Void) {
         self.id = id
         self.action = action
     }

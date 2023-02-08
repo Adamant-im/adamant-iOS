@@ -129,7 +129,7 @@ private extension ChatTransactionContentView {
     }
     
     func update() {
-        backgroundColor = model.backgroundColor
+        backgroundColor = model.backgroundColor.uiColor
         titleLabel.text = model.title
         iconView.image = model.icon
         amountLabel.text = String(model.amount)

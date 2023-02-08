@@ -22,6 +22,7 @@ final class ChatViewModel: NSObject {
     private let accountService: AccountService
     private let accountProvider: AccountsProvider
     private let richMessageProviders: [String: RichMessageProvider]
+    private lazy var chatMessagesListService = makeChatMessagesListService()
     
     // MARK: Properties
     
@@ -52,9 +53,6 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var partnerName: String?
     @ObservableValue var inputText = ""
     
-    /// Its needed to avoid cells resizing during content update
-    @ObservableValue private(set) var transactionStatuses = [String: TransactionStatus]()
-    
     var startPosition: ChatStartPosition? {
         if let messageIdToShow = messageIdToShow {
             return .messageId(messageIdToShow)
@@ -74,12 +72,6 @@ final class ChatViewModel: NSObject {
         }
         
         return url
-    }
-    
-    var isNeedToLoadMoreMessages: Bool {
-        guard let address = chatroom?.partner?.address else { return false }
-
-        return chatsProvider.chatLoadedMessages[address] ?? .zero < chatsProvider.chatMaxMessages[address] ?? .zero
     }
     
     init(
@@ -154,16 +146,6 @@ final class ChatViewModel: NSObject {
         loadMessages(address: address, offset: offset, fullscreenLoading: false)
     }
     
-    func isNeedToDisplayDateHeader(sentDate: Date, index: Int) -> Bool {
-        guard sentDate != .adamantNullDate else { return false }
-        guard index > .zero else { return true }
-        
-        let timeIntervalFromLastMessage = messages[index].sentDate
-            .timeIntervalSince(messages[index - 1].sentDate)
-        
-        return timeIntervalFromLastMessage >= dateHeaderTimeInterval
-    }
-    
     func sendMessage(text: String) {
         let message: AdamantMessage = markdownParser.parse(text).length == text.count
             ? .text(text)
@@ -188,16 +170,11 @@ final class ChatViewModel: NSObject {
     func loadTransactionStatusIfNeeded(id: String, forceUpdate: Bool) {
         guard
             let transaction = chatTransactions.first(where: { $0.chatMessageId == id }),
-            let richMessageTransaction = transaction as? RichMessageTransaction
+            let richMessageTransaction = transaction as? RichMessageTransaction,
+            richMessageTransaction.transactionStatus?.isFinal != true || forceUpdate
         else { return }
         
-        if forceUpdate {
-            transactionStatuses[id] = nil
-        } else if richMessageTransaction.transactionStatus?.isFinal == true {
-            return
-        }
-        
-        chatsProvider.updateStatus(for: richMessageTransaction)
+        chatsProvider.updateStatus(for: richMessageTransaction, resetBeforeUpdate: forceUpdate)
     }
     
     func preserveMessage(_ message: String) {
@@ -317,6 +294,12 @@ extension ChatViewModel: NSFetchedResultsControllerDelegate {
 }
 
 private extension ChatViewModel {
+    var isNeedToLoadMoreMessages: Bool {
+        guard let address = chatroom?.partner?.address else { return false }
+
+        return chatsProvider.chatLoadedMessages[address] ?? .zero < chatsProvider.chatMaxMessages[address] ?? .zero
+    }
+    
     func setupObservers() {
         $inputText
             .removeDuplicates()
@@ -332,7 +315,7 @@ private extension ChatViewModel {
     
     func loadMessages(address: String, offset: Int, fullscreenLoading: Bool) {
         guard !isLoading else { return }
-        
+
         isLoading = true
         self.fullscreenLoading = fullscreenLoading
         chatsProvider.getChatMessages(
@@ -341,8 +324,6 @@ private extension ChatViewModel {
         ) { [weak self] in
             DispatchQueue.onMainAsync {
                 self?.updateTransactions(performFetch: true)
-                self?.isLoading = false
-                self?.fullscreenLoading = false
             }
         }
     }
@@ -353,52 +334,59 @@ private extension ChatViewModel {
         }
         
         chatTransactions = controller?.fetchedObjects ?? []
-        updateTransactionStatuses()
-        updateMessages()
+        updateMessages(resetLoadingProperty: true)
     }
     
-    func updateTransactionStatuses() {
-        let transactionStatuses: [(String, TransactionStatus)] = chatTransactions.compactMap {
-            guard let id = $0.chatMessageId else { return nil }
-            
-            if let transaction = $0 as? TransferTransaction {
-                return (id, transaction.statusEnum.toTransactionStatus())
-            }
-            
-            if let transaction = $0 as? RichMessageTransaction {
-                return (id, transaction.transactionStatus ?? .notInitiated)
-            }
-            
-            return nil
-        }
-        
-        self.transactionStatuses = Dictionary(uniqueKeysWithValues: transactionStatuses)
-    }
-    
-    func updateMessages() {
+    func updateMessages(resetLoadingProperty: Bool) {
         timerSubscription = nil
-        var minTimestamp: TimeInterval?
-        var expireDate: Date?
         
-        messages = chatTransactions.map {
-            let message = chatMessageFactory.makeMessage($0, expireDate: &expireDate)
-            let timestamp = expireDate?.timeIntervalSince1970
-            if let timestamp = timestamp, timestamp < minTimestamp ?? .greatestFiniteMagnitude {
-                minTimestamp = timestamp
-            }
+        Task(priority: .userInitiated) { [chatTransactions, sender, isNeedToLoadMoreMessages] in
+            var expirationTimestamp: TimeInterval?
             
-            expireDate = nil
-            return message
+            let messages = await chatMessagesListService.makeMessages(
+                transactions: chatTransactions,
+                sender: sender,
+                isNeedToLoadMoreMessages: isNeedToLoadMoreMessages,
+                expirationTimestamp: &expirationTimestamp
+            )
+            
+            await setupNewMessages(
+                newMessages: messages,
+                resetLoadingProperty: resetLoadingProperty,
+                expirationTimestamp: expirationTimestamp
+            )
+        }
+    }
+    
+    @MainActor func setupNewMessages(
+        newMessages: [ChatMessage],
+        resetLoadingProperty: Bool,
+        expirationTimestamp: TimeInterval?
+    ) async {
+        messages = newMessages
+        fullscreenLoading = false
+        
+        if resetLoadingProperty {
+            isLoading = false
         }
         
+        guard let expirationTimestamp = expirationTimestamp else { return }
+        await setupMessagesUpdateTimer(expirationTimestamp: expirationTimestamp)
+    }
+    
+    func setupMessagesUpdateTimer(expirationTimestamp: TimeInterval) async {
         let currentTimestamp = Date().timeIntervalSince1970
-        if let minTimestamp = minTimestamp, currentTimestamp < minTimestamp {
-            setupMessagesUpdateTimer(interval: minTimestamp - currentTimestamp)
-        }
+        guard currentTimestamp < expirationTimestamp else { return }
+        let interval = expirationTimestamp - currentTimestamp
+        
+        timerSubscription = Timer.publish(every: interval, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in self?.updateMessages(resetLoadingProperty: false) }
     }
     
     func reset() {
         sender = .default
+        chatTransactions = []
         messages = []
         fullscreenLoading = false
         isLoading = false
@@ -406,7 +394,6 @@ private extension ChatViewModel {
         isAttachmentButtonAvailable = false
         isSendingAvailable = false
         fee = ""
-        transactionStatuses = .init()
         partnerName = nil
         messageIdToShow = nil
         controller = nil
@@ -476,12 +463,6 @@ private extension ChatViewModel {
         }
     }
     
-    func setupMessagesUpdateTimer(interval: TimeInterval) {
-        timerSubscription = Timer.publish(every: interval, on: .main, in: .common)
-            .autoconnect()
-            .sink { [weak self] _ in self?.updateMessages() }
-    }
-    
     func updateAttachmentButtonAvailability() {
         let isAnyWalletVisible = accountService.wallets
             .map { visibleWalletService.isInvisible($0) }
@@ -538,6 +519,14 @@ private extension ChatViewModel {
         setNameIfNeeded(for: chatroom.partner, chatroom: chatroom, name: name)
         didTapAdmChat.send((chatroom, message))
     }
+    
+    func makeChatMessagesListService() -> ChatMessagesListService {
+        .init(
+            chatMessageFactory: chatMessageFactory,
+            didTapTransfer: { [didTapTransfer] in didTapTransfer.send($0) },
+            forceUpdateStatusAction: { [weak self] in
+                self?.loadTransactionStatusIfNeeded(id: $0, forceUpdate: true)
+            }
+        )
+    }
 }
-
-private let dateHeaderTimeInterval: TimeInterval = 3600

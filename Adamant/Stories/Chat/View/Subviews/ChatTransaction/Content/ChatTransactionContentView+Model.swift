@@ -16,7 +16,7 @@ extension ChatTransactionContentView {
         let currency: String
         let date: String
         let comment: String?
-        let backgroundColor: UIColor
+        let backgroundColor: ChatMessageBackgroundColor
         let action: ComparableAction
         
         static let `default` = Self(
@@ -26,8 +26,8 @@ extension ChatTransactionContentView {
             currency: "",
             date: .init(),
             comment: nil,
-            backgroundColor: .clear,
-            action: .init {}
+            backgroundColor: .failed,
+            action: .init(id: "") {}
         )
     }
 }

@@ -16,7 +16,15 @@ actor AdamantRichTransactionStatusService: RichTransactionStatusService {
         self.richProviders = richProviders
     }
     
-    func update(_ transaction: RichMessageTransaction, parentContext: NSManagedObjectContext) async throws {
+    func update(
+        _ transaction: RichMessageTransaction,
+        parentContext: NSManagedObjectContext,
+        resetBeforeUpdate: Bool
+    ) async throws {
+        if resetBeforeUpdate {
+            setStatus(for: transaction, status: .notInitiated, parentContext: parentContext)
+        }
+        
         guard !updatingTransactions.contains(transaction) else { return }
         updatingTransactions.insert(transaction)
         

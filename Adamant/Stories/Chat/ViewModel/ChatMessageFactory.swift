@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import MarkdownKit
+import MessageKit
 
 struct ChatMessageFactory {
     private let richMessageProviders: [String: RichMessageProvider]
@@ -17,64 +19,178 @@ struct ChatMessageFactory {
     
     func makeMessage(
         _ transaction: ChatTransaction,
-        expireDate: inout Date?
+        expireDate: inout Date?,
+        currentSender: SenderType,
+        dateHeaderOn: Bool,
+        topSpinnerOn: Bool,
+        didTapTransfer: @escaping (_ id: String) -> Void,
+        forceUpdateStatusAction: @escaping (_ id: String) -> Void
     ) -> ChatMessage {
-        let sentDate = transaction.date.map { $0 as Date } ?? .init()
+        let sentDate = transaction.sentDate
+        let senderModel = ChatSender(transaction: transaction)
+        let isFromCurrentSender = currentSender.senderId == senderModel.senderId
+
         let status = ChatMessage.Status(
             messageStatus: transaction.statusEnum,
             blockId: transaction.blockId
         )
         
+        let backgroundColor = getBackgroundColor(
+            isFromCurrentSender: isFromCurrentSender,
+            status: status
+        )
+        
         return .init(
             id: transaction.chatMessageId ?? "",
             sentDate: sentDate,
-            senderModel: .init(transaction: transaction),
+            senderModel: senderModel,
             status: status,
-            content: makeContent(transaction),
+            content: makeContent(
+                transaction,
+                isFromCurrentSender: currentSender.senderId == senderModel.senderId,
+                backgroundColor: backgroundColor,
+                didTapTransfer: didTapTransfer,
+                forceUpdateStatusAction: forceUpdateStatusAction
+            ),
+            backgroundColor: backgroundColor,
             bottomString: makeBottomString(
                 sentDate: sentDate,
                 status: status,
                 expireDate: &expireDate
-            ).map { .init(string: $0) }
+            ).map { .init(string: $0) },
+            dateHeader: dateHeaderOn
+                ? makeDateHeader(sentDate: sentDate)
+                : nil,
+            topSpinnerOn: topSpinnerOn
         )
     }
 }
 
 private extension ChatMessageFactory {
-    func makeContent(_ transaction: ChatTransaction) -> ChatMessage.Content {
+    static let markdownParser = MarkdownParser(
+        font: .adamantChatDefault,
+        color: .adamant.primary,
+        enabledElements: [
+            .header,
+            .list,
+            .quote,
+            .bold,
+            .italic,
+            .code,
+            .strikethrough
+        ],
+        customElements: [
+            MarkdownSimpleAdm(),
+            MarkdownLinkAdm(),
+            MarkdownAdvancedAdm(
+                font: .adamantChatDefault,
+                color: .adamant.active
+            )
+        ]
+    )
+    
+    func makeContent(
+        _ transaction: ChatTransaction,
+        isFromCurrentSender: Bool,
+        backgroundColor: ChatMessageBackgroundColor,
+        didTapTransfer: @escaping (_ id: String) -> Void,
+        forceUpdateStatusAction: @escaping (_ id: String) -> Void
+    ) -> ChatMessage.Content {
         switch transaction {
         case let transaction as MessageTransaction:
             return makeContent(transaction)
         case let transaction as RichMessageTransaction:
-            return makeContent(transaction)
+            return makeContent(
+                transaction,
+                isFromCurrentSender: isFromCurrentSender,
+                backgroundColor: backgroundColor,
+                didTapTransfer: didTapTransfer,
+                forceUpdateStatusAction: forceUpdateStatusAction
+            )
         case let transaction as TransferTransaction:
-            return makeContent(transaction)
+            return makeContent(
+                transaction,
+                isFromCurrentSender: isFromCurrentSender,
+                backgroundColor: backgroundColor,
+                didTapTransfer: didTapTransfer,
+                forceUpdateStatusAction: forceUpdateStatusAction
+            )
         default:
             return .default
         }
     }
     
     func makeContent(_ transaction: MessageTransaction) -> ChatMessage.Content {
-        transaction.message.map { .message($0) } ?? .default
+        transaction.message.map {
+            .message(.init(string: Self.markdownParser.parse($0)))
+        } ?? .default
     }
     
-    func makeContent(_ transaction: RichMessageTransaction) -> ChatMessage.Content {
+    func makeContent(
+        _ transaction: RichMessageTransaction,
+        isFromCurrentSender: Bool,
+        backgroundColor: ChatMessageBackgroundColor,
+        didTapTransfer: @escaping (_ id: String) -> Void,
+        forceUpdateStatusAction: @escaping (_ id: String) -> Void
+    ) -> ChatMessage.Content {
         guard let transfer = transaction.transfer else { return .default }
+        let id = transaction.chatMessageId ?? ""
         
         return .transaction(.init(
-            icon: richMessageProviders[transfer.type]?.tokenLogo ?? .init(),
-            amount: transfer.amount,
-            currency: richMessageProviders[transfer.type]?.tokenSymbol ?? "",
-            comment: transfer.comments
+            isFromCurrentSender: isFromCurrentSender,
+            content: .init(
+                title: isFromCurrentSender
+                    ? .adamantLocalized.chat.transactionSent
+                    : .adamantLocalized.chat.transactionReceived,
+                icon: richMessageProviders[transfer.type]?.tokenLogo ?? .init(),
+                amount: AdamantBalanceFormat.full.format(transfer.amount),
+                currency: richMessageProviders[transfer.type]?.tokenSymbol ?? "",
+                date: transaction.sentDate.humanizedDateTime(withWeekday: false),
+                comment: transfer.comments,
+                backgroundColor: backgroundColor,
+                action: .init(
+                    id: id,
+                    action: { didTapTransfer(id) }
+                )
+            ),
+            status: transaction.transactionStatus ?? .notInitiated,
+            updateStatusAction: .init(
+                id: id,
+                action: { forceUpdateStatusAction(id) }
+            )
         ))
     }
     
-    func makeContent(_ transaction: TransferTransaction) -> ChatMessage.Content {
-        .transaction(.init(
-            icon: AdmWalletService.currencyLogo,
-            amount: (transaction.amount ?? .zero) as Decimal,
-            currency: AdmWalletService.currencySymbol,
-            comment: transaction.comment
+    func makeContent(
+        _ transaction: TransferTransaction,
+        isFromCurrentSender: Bool,
+        backgroundColor: ChatMessageBackgroundColor,
+        didTapTransfer: @escaping (_ id: String) -> Void,
+        forceUpdateStatusAction: @escaping (_ id: String) -> Void
+    ) -> ChatMessage.Content {
+        let id = transaction.chatMessageId ?? ""
+        
+        return .transaction(.init(
+            isFromCurrentSender: isFromCurrentSender,
+            content: .init(
+                title: isFromCurrentSender
+                    ? .adamantLocalized.chat.transactionSent
+                    : .adamantLocalized.chat.transactionReceived,
+                icon: AdmWalletService.currencyLogo,
+                amount: AdamantBalanceFormat.full.format(
+                    (transaction.amount ?? .zero) as Decimal
+                ),
+                currency: AdmWalletService.currencySymbol,
+                date: transaction.sentDate.humanizedDateTime(withWeekday: false),
+                comment: transaction.comment,
+                backgroundColor: backgroundColor,
+                action: .init(
+                    id: id,
+                    action: { didTapTransfer(id) }
+                )
+            ),
+            status: transaction.statusEnum.toTransactionStatus(),
+            updateStatusAction: nil
         ))
     }
     
@@ -126,6 +242,34 @@ private extension ChatMessageFactory {
         attachment.image = UIImage(named: "status_pending")
         attachment.bounds = CGRect(x: .zero, y: -1, width: 7, height: 7)
         return NSAttributedString(attachment: attachment)
+    }
+    
+    func getBackgroundColor(
+        isFromCurrentSender: Bool,
+        status: ChatMessage.Status
+    ) -> ChatMessageBackgroundColor {
+        guard isFromCurrentSender else {
+            return .opponent
+        }
+        
+        switch status {
+        case .delivered:
+            return .delivered
+        case .pending:
+            return .pending
+        case .failed:
+            return .failed
+        }
+    }
+    
+    func makeDateHeader(sentDate: Date) -> ComparableAttributedString {
+        .init(string: .init(
+            string: sentDate.humanizedDay(),
+            attributes: [
+                .font: UIFont.boldSystemFont(ofSize: 10),
+                .foregroundColor: UIColor.adamant.secondary
+            ]
+        ))
     }
 }
 
