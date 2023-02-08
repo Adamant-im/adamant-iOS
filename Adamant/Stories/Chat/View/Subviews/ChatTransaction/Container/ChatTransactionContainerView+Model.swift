@@ -12,7 +12,7 @@ extension ChatTransactionContainerView {
     struct Model: Equatable {
         let isFromCurrentSender: Bool
         let content: ChatTransactionContentView.Model
-        let status: TransactionStatus
+        var status: TransactionStatus
         let updateStatusAction: ComparableAction?
         
         static let `default` = Self(

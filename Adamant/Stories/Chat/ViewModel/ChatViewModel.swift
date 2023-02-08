@@ -22,7 +22,7 @@ final class ChatViewModel: NSObject {
     private let accountService: AccountService
     private let accountProvider: AccountsProvider
     private let richMessageProviders: [String: RichMessageProvider]
-    private lazy var chatMessagesListService = makeChatMessagesListService()
+    private lazy var chatMessagesListFactory = makeChatMessagesListFactory()
     
     // MARK: Properties
     
@@ -173,6 +173,13 @@ final class ChatViewModel: NSObject {
             let richMessageTransaction = transaction as? RichMessageTransaction,
             richMessageTransaction.transactionStatus?.isFinal != true || forceUpdate
         else { return }
+        
+        if forceUpdate,
+           let index = messages.firstIndex(where: { id == $0.id }),
+           case var .transaction(model) = messages[index].content {
+            model.status = .notInitiated
+            messages[index].content = .transaction(model)
+        }
         
         chatsProvider.updateStatus(for: richMessageTransaction, resetBeforeUpdate: forceUpdate)
     }
@@ -343,7 +350,7 @@ private extension ChatViewModel {
         Task(priority: .userInitiated) { [chatTransactions, sender, isNeedToLoadMoreMessages] in
             var expirationTimestamp: TimeInterval?
             
-            let messages = await chatMessagesListService.makeMessages(
+            let messages = await chatMessagesListFactory.makeMessages(
                 transactions: chatTransactions,
                 sender: sender,
                 isNeedToLoadMoreMessages: isNeedToLoadMoreMessages,
@@ -371,10 +378,10 @@ private extension ChatViewModel {
         }
         
         guard let expirationTimestamp = expirationTimestamp else { return }
-        await setupMessagesUpdateTimer(expirationTimestamp: expirationTimestamp)
+        setupMessagesUpdateTimer(expirationTimestamp: expirationTimestamp)
     }
     
-    func setupMessagesUpdateTimer(expirationTimestamp: TimeInterval) async {
+    func setupMessagesUpdateTimer(expirationTimestamp: TimeInterval) {
         let currentTimestamp = Date().timeIntervalSince1970
         guard currentTimestamp < expirationTimestamp else { return }
         let interval = expirationTimestamp - currentTimestamp
@@ -520,7 +527,7 @@ private extension ChatViewModel {
         didTapAdmChat.send((chatroom, message))
     }
     
-    func makeChatMessagesListService() -> ChatMessagesListService {
+    func makeChatMessagesListFactory() -> ChatMessagesListFactory {
         .init(
             chatMessageFactory: chatMessageFactory,
             didTapTransfer: { [didTapTransfer] in didTapTransfer.send($0) },

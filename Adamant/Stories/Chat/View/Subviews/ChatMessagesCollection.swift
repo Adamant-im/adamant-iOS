@@ -24,10 +24,6 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
         safeAreaInsets + contentInset
     }
     
-    var minVerticalOffset: CGFloat {
-        -fullInsets.top
-    }
-    
     /// To avoid insets changing by MessageKit
     override var contentInset: UIEdgeInsets {
         get { super.contentInset }
@@ -59,7 +55,7 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
         
         let bottomOffset = self.bottomOffset
         applyNewModels(newModels)
-        setBottomOffset(bottomOffset, safely: true)
+        setBottomOffset(bottomOffset, safely: !isDragging && !isDecelerating)
     }
     
     func setFullBottomInset(_ inset: CGFloat) {
@@ -83,6 +79,10 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
 private extension ChatMessagesCollectionView {
     var maxVerticalOffset: CGFloat {
         contentHeightWithBottomInsets - bounds.height
+    }
+    
+    var minVerticalOffset: CGFloat {
+        -fullInsets.top
     }
     
     var contentHeightWithBottomInsets: CGFloat {
@@ -116,9 +116,16 @@ private extension ChatMessagesCollectionView {
     func setVerticalContentOffset(_ offset: CGFloat, safely: Bool) {
         guard maxVerticalOffset > .zero else { return }
         
-        contentOffset.y = safely && offset > maxVerticalOffset
-            ? maxVerticalOffset
-            : offset
+        var offset = offset
+        if safely {
+            if offset > maxVerticalOffset {
+                offset = maxVerticalOffset
+            } else if offset < minVerticalOffset {
+                offset = minVerticalOffset
+            }
+        }
+        
+        contentOffset.y = offset
     }
     
     func reloadTransactionCellsOnly(_ newModels: [ChatMessage]) {

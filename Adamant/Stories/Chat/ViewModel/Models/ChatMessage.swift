@@ -14,7 +14,7 @@ struct ChatMessage: Identifiable, Equatable {
     let sentDate: Date
     let senderModel: ChatSender
     let status: Status
-    let content: Content
+    var content: Content
     let backgroundColor: ChatMessageBackgroundColor
     let bottomString: ComparableAttributedString?
     let dateHeader: ComparableAttributedString?
