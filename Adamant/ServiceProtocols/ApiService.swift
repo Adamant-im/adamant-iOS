@@ -71,6 +71,8 @@ protocol ApiService: AnyObject {
     
     func getTransaction(id: UInt64, completion: @escaping (ApiServiceResult<Transaction>) -> Void)
     
+    func getTransaction(id: UInt64) async throws -> Transaction
+    
     func getTransactions(
         forAccount: String,
         type: TransactionType,
@@ -79,6 +81,14 @@ protocol ApiService: AnyObject {
         limit: Int?,
         completion: @escaping (ApiServiceResult<[Transaction]>) -> Void
     )
+    
+    func getTransactions(
+        forAccount: String,
+        type: TransactionType,
+        fromHeight: Int64?,
+        offset: Int?,
+        limit: Int?
+    ) async throws -> [Transaction]
     
     // MARK: - Chats Rooms
       
@@ -108,6 +118,13 @@ protocol ApiService: AnyObject {
         keypair: Keypair,
         completion: @escaping (ApiServiceResult<UInt64>) -> Void
     )
+    
+    func transferFunds(
+        sender: String,
+        recipient: String,
+        amount: Decimal,
+        keypair: Keypair
+    ) async throws -> UInt64
     
     // MARK: - States
     

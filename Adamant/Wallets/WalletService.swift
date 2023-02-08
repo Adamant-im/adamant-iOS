@@ -284,7 +284,11 @@ extension WalletServiceWithSend {
 }
 
 protocol WalletServiceSimpleSend: WalletServiceWithSend {
-    func sendMoney(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceResult<TransactionDetails>) -> Void)
+    func sendMoney(
+        recipient: String,
+        amount: Decimal,
+        comments: String
+    ) async throws -> TransactionDetails
 }
 
 protocol WalletServiceTwoStepSend: WalletServiceWithSend {

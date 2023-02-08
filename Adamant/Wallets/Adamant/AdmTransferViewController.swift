@@ -91,28 +91,26 @@ class AdmTransferViewController: TransferViewControllerBase {
         }
     }
     
+    @MainActor
     private func sendFundsInternal(service: AdmWalletService, recipient: String, amount: Decimal, comments: String) {
-        service.sendMoney(recipient: recipient, amount: amount, comments: comments) { [weak self] result in
-            switch result {
-            case .success(let result):
+        Task {
+            do {
+                let result = try await service.sendMoney(recipient: recipient, amount: amount, comments: comments)
+                
                 service.update()
-                
-                guard let vc = self else {
-                    break
-                }
-                
-                vc.dialogService?.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-                DispatchQueue.onMainAsync {
-                    self?.openDetailVC(result: result, vc: vc, recipient: recipient, comments: comments)
-                }
-                
-            case .failure(let error):
-                guard let dialogService = self?.dialogService else {
-                    break
-                }
-                
                 dialogService.dismissProgress()
-                dialogService.showRichError(error: error)
+                
+                dialogService?.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                
+                openDetailVC(
+                    result: result,
+                    vc: self,
+                    recipient: recipient,
+                    comments: comments
+                )
+            } catch {
+                dialogService?.dismissProgress()
+                dialogService?.showRichError(error: error)
             }
         }
     }

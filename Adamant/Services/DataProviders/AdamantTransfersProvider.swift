@@ -71,40 +71,58 @@ actor AdamantTransfersProvider: TransfersProvider {
         self.securedStore = securedStore
         self.transactionService = transactionService
         
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] notification in
-            guard let store = self?.securedStore else {
-                return
-            }
-            
-            guard let loggedAddress = notification.userInfo?[AdamantUserInfoKey.AccountService.loggedAccountAddress] as? String else {
-                store.remove(StoreKey.transfersProvider.address)
-                store.remove(StoreKey.transfersProvider.receivedLastHeight)
-                store.remove(StoreKey.transfersProvider.readedLastHeight)
-                self?.dropStateData()
-                return
-            }
-            
-            if let savedAddress: String = store.get(StoreKey.transfersProvider.address), savedAddress == loggedAddress {
-                if let raw: String = store.get(StoreKey.transfersProvider.readedLastHeight), let h = Int64(raw) {
-                    self?.readedLastHeight = h
-                }
-            } else {
-                store.remove(StoreKey.transfersProvider.receivedLastHeight)
-                store.remove(StoreKey.transfersProvider.readedLastHeight)
-                self?.dropStateData()
-                store.set(loggedAddress, for: StoreKey.transfersProvider.address)
-            }
-            
-            self?.update()
+        Task {
+            await addObservers()
+        }
+    }
+    
+    private func addObservers() async {
+        for await notification in NotificationCenter.default.notifications(
+            named: .AdamantAccountService.userLoggedIn
+        ) {
+            userLoggedInAction(notification)
         }
         
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
-            // Drop everything
-            self?.reset()
-            
-            // BackgroundFetch
-            self?.dropStateData()
+        for await _ in NotificationCenter.default.notifications(
+            named: .AdamantAccountService.userLoggedOut
+        ) {
+            userLogOutAction()
         }
+    }
+    
+    // MARK: - Notifications action
+    
+    private func userLoggedInAction(_ notification: Notification) {
+        let store = securedStore
+        
+        guard let loggedAddress = notification.userInfo?[AdamantUserInfoKey.AccountService.loggedAccountAddress] as? String else {
+            store.remove(StoreKey.transfersProvider.address)
+            store.remove(StoreKey.transfersProvider.receivedLastHeight)
+            store.remove(StoreKey.transfersProvider.readedLastHeight)
+            dropStateData()
+            return
+        }
+        
+        if let savedAddress: String = store.get(StoreKey.transfersProvider.address), savedAddress == loggedAddress {
+            if let raw: String = store.get(StoreKey.transfersProvider.readedLastHeight), let h = Int64(raw) {
+                readedLastHeight = h
+            }
+        } else {
+            store.remove(StoreKey.transfersProvider.receivedLastHeight)
+            store.remove(StoreKey.transfersProvider.readedLastHeight)
+            dropStateData()
+            store.set(loggedAddress, for: StoreKey.transfersProvider.address)
+        }
+        
+        update()
+    }
+    
+    private func userLogOutAction() {
+        // Drop everything
+        reset()
+        
+        // BackgroundFetch
+        dropStateData()
     }
     
     deinit {
@@ -150,11 +168,15 @@ extension AdamantTransfersProvider {
         // MARK: 3. Get transactions
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         privateContext.parent = stack.container.viewContext
-        let processingGroup = DispatchGroup()
-        let cms = DispatchSemaphore(value: 1)
         let prevHeight = receivedLastHeight
         
-        getTransactions(forAccount: address, type: .send, fromHeight: prevHeight, offset: nil, dispatchGroup: processingGroup, context: privateContext, contextMutatingSemaphore: cms)
+        await getTransactions(
+            forAccount: address,
+            type: .send,
+            fromHeight: prevHeight,
+            offset: nil,
+            context: privateContext
+        )
         
         // MARK: 4. Check
         
@@ -164,9 +186,11 @@ extension AdamantTransfersProvider {
             
             if prevHeight != receivedLastHeight,
                let h = receivedLastHeight {
-                NotificationCenter.default.post(name: Notification.Name.AdamantChatsProvider.newUnreadMessages,
-                                                object: self,
-                                                userInfo: [AdamantUserInfoKey.TransfersProvider.lastTransactionHeight:h])
+                NotificationCenter.default.post(
+                    name: Notification.Name.AdamantChatsProvider.newUnreadMessages,
+                    object: self,
+                    userInfo: [AdamantUserInfoKey.TransfersProvider.lastTransactionHeight:h]
+                )
             }
             
             if let h = receivedLastHeight {
@@ -317,59 +341,64 @@ extension AdamantTransfersProvider {
     // MARK: Sending Funds
     
     // Wrapper
-    func transferFunds(toAddress recipient: String, amount: Decimal, comment: String?, completion: @escaping (TransfersProviderTransferResult) -> Void) {
-        if let comment = comment, comment.count > 0 {
-            self.transferFundsInternal(toAddress: recipient, amount: amount, comment: comment, completion: completion)
-        } else {
-            self.transferFundsInternal(toAddress: recipient, amount: amount, completion: completion)
+    func transferFunds(
+        toAddress recipient: String,
+        amount: Decimal,
+        comment: String?
+    ) async throws -> TransactionDetails {
+        if let comment = comment,
+           comment.count > 0 {
+            return try await transferFundsInternal(
+                toAddress: recipient,
+                amount: amount,
+                comment: comment
+            )
         }
+        
+        return try await transferFundsInternal(
+            toAddress: recipient,
+            amount: amount
+        )
     }
     
-    private func transferFundsInternal(toAddress recipient: String, amount: Decimal, comment: String, completion: @escaping (TransfersProviderTransferResult) -> Void) {
+    private func transferFundsInternal(
+        toAddress recipient: String,
+        amount: Decimal,
+        comment: String
+    ) async throws -> TransactionDetails {
         // MARK: 0. Prepare
         guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
-            completion(.failure(.notLogged))
-            return
+            throw TransfersProviderError.notLogged
         }
         
         guard loggedAccount.balance > amount + Self.transferFee else {
-            completion(.failure(.notEnoughMoney))
-            return
+            throw TransfersProviderError.notEnoughMoney
         }
         
         // MARK: 1. Get recipient
-        let accountsGroup = DispatchGroup()
-        accountsGroup.enter()
-        
-        var result: AccountsProviderResult! = nil
-        accountsProvider.getAccount(byAddress: recipient) { r in
-            result = r
-            accountsGroup.leave()
-        }
-        
-        accountsGroup.wait()
-        
+
         let recipientAccount: CoreDataAccount
-        switch result! {
-        case .success(let account):
-            recipientAccount = account
-            
-        case .notFound, .invalidAddress, .notInitiated, .dummy:
-            completion(.failure(.accountNotFound(address: recipient)))
-            return
-            
-        case .serverError(let error):
-            completion(.failure(.serverError(error)))
-            return
-            
-        case .networkError:
-            completion(.failure(.networkError))
-            return
+        
+        do {
+            recipientAccount = try await accountsProvider.getAccount(byAddress: recipient)
+        } catch let error as AccountsProviderResult {
+            switch error {
+            case .success(let account):
+                recipientAccount = account
+                
+            case .notFound, .invalidAddress, .notInitiated, .dummy:
+                throw TransfersProviderError.accountNotFound(address: recipient)
+                
+            case .serverError(let error):
+                throw TransfersProviderError.serverError(error)
+                
+            case .networkError:
+                throw TransfersProviderError.networkError
+            }
         }
         
         guard let recipientPublicKey = recipientAccount.publicKey else {
-            completion(.failure(.accountNotFound(address: recipient)))
-            return
+            throw TransfersProviderError.accountNotFound(address: recipient)
         }
         
         // MARK: 2. Chatroom
@@ -377,10 +406,10 @@ extension AdamantTransfersProvider {
         context.parent = stack.container.viewContext
         
         guard let id = recipientAccount.chatroom?.objectID,
-            let chatroom = context.object(with: id) as? Chatroom,
-            let partner = context.object(with: recipientAccount.objectID) as? BaseAccount else {
-            completion(.failure(.accountNotFound(address: recipient)))
-            return
+              let chatroom = context.object(with: id) as? Chatroom,
+              let partner = context.object(with: recipientAccount.objectID) as? BaseAccount
+        else {
+            throw TransfersProviderError.accountNotFound(address: recipient)
         }
         
         // MARK: 3. Transaction
@@ -416,76 +445,90 @@ extension AdamantTransfersProvider {
         do {
             try context.save()
         } catch {
-            completion(.failure(.internalError(message: String.adamantLocalized.sharedErrors.unknownError, error: error)))
-            return
+            throw TransfersProviderError.internalError(message: String.adamantLocalized.sharedErrors.unknownError, error: error)
         }
         
         // MARK: 6. Encode
-        guard let encodedMessage = adamantCore.encodeMessage(comment, recipientPublicKey: recipientPublicKey, privateKey: keypair.privateKey) else {
-            completion(.failure(.internalError(message: "Failed to encode message", error: nil)))
-            return
+        guard let encodedMessage = adamantCore.encodeMessage(
+            comment,
+            recipientPublicKey: recipientPublicKey,
+            privateKey: keypair.privateKey)
+        else {
+            throw TransfersProviderError.internalError(message: "Failed to encode message", error: nil)
         }
         
         // MARK: 7. Send
-        apiService.sendMessage(senderId: loggedAccount.address, recipientId: recipient, keypair: keypair, message: encodedMessage.message, type: ChatType.message, nonce: encodedMessage.nonce, amount: amount) { [weak self] result in
-            switch result {
-            case .success(let id):
-                transaction.transactionId = String(id)
-                
-                Task { [weak self] in
-                    await self?.chatsProvider?.addUnconfirmed(transactionId: id, managedObjectId: transaction.objectID)
-                }
-                
-                do {
-                    try context.save()
-                } catch {
-                    completion(.failure(.internalError(message: String.adamantLocalized.sharedErrors.unknownError, error: error)))
-                    break
-                }
-                
-                if let trs = self?.stack.container.viewContext.object(with: transaction.objectID) as? TransferTransaction {
-                    completion(.success(transaction: trs))
-                } else {
-                    completion(.failure(.internalError(message: "Failed to get transaction in viewContext", error: nil)))
-                }
-                
-            case .failure(let error):
-                transaction.statusEnum = MessageStatus.failed
-                try? context.save()
-                
-                completion(.failure(.serverError(error)))
+        let signedTransaction = apiService.createSendTransaction(
+            senderId: loggedAccount.address,
+            recipientId: recipient,
+            keypair: keypair,
+            message: encodedMessage.message,
+            type: ChatType.message,
+            nonce: encodedMessage.nonce,
+            amount: amount
+        )
+        
+        guard let signedTransaction = signedTransaction else {
+            throw TransfersProviderError.internalError(
+                message: AdamantApiService.InternalError.signTransactionFailed.localized,
+                error: nil
+            )
+        }
+        
+        do {
+            let id = try await apiService.sendTransaction(transaction: signedTransaction)
+            transaction.transactionId = String(id)
+            await chatsProvider?.addUnconfirmed(transactionId: id, managedObjectId: transaction.objectID)
+            
+            do {
+                try context.save()
+            } catch {
+                throw TransfersProviderError.internalError(
+                    message: String.adamantLocalized.sharedErrors.unknownError,
+                    error: error
+                )
             }
+            
+            if let trs = stack.container.viewContext.object(with: transaction.objectID) as? TransferTransaction {
+                return trs
+            } else {
+                throw TransfersProviderError.internalError(
+                    message: "Failed to get transaction in viewContext",
+                    error: nil
+                )
+            }
+        } catch {
+            transaction.statusEnum = MessageStatus.failed
+            try? context.save()
+            
+            throw TransfersProviderError.serverError(error)
         }
     }
     
-    private func transferFundsInternal(toAddress recipient: String, amount: Decimal, completion: @escaping (TransfersProviderTransferResult) -> Void) {
+    private func transferFundsInternal(
+        toAddress recipient: String,
+        amount: Decimal
+    ) async throws -> TransactionDetails {
         // MARK: 0. Prepare
         guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
-            completion(.failure(.notLogged))
-            return
+            throw TransfersProviderError.notLogged
         }
         
         guard loggedAccount.balance > amount + Self.transferFee else {
-            completion(.failure(.notEnoughMoney))
-            return
+            throw TransfersProviderError.notEnoughMoney
         }
         
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.parent = stack.container.viewContext
         
         // MARK: 1. Get recipient
-        let accountsGroup = DispatchGroup()
-        accountsGroup.enter() // Enter 1
         
         var recipientAccount: BaseAccount?
-        var providerError: TransfersProviderError?
         
-        accountsProvider.getAccount(byAddress: recipient) { result in
-            defer {
-                accountsGroup.leave() // Exit 1
-            }
-            
-            switch result {
+        do {
+            recipientAccount = try await accountsProvider.getAccount(byAddress: recipient)
+        } catch let error as AccountsProviderResult {
+            switch error {
             case .success(let account):
                 recipientAccount = account
                 
@@ -493,13 +536,11 @@ extension AdamantTransfersProvider {
                 recipientAccount = account
                 
             case .notFound, .notInitiated:
-                accountsGroup.enter() // Enter 2, before exit 1
-                self.accountsProvider.getDummyAccount(for: recipient) { result in
-                    defer {
-                        accountsGroup.leave() // Exit 2
-                    }
-                    
-                    switch result {
+                
+                do {
+                    recipientAccount = try await accountsProvider.getDummyAccount(for: recipient)
+                } catch let error as AccountsProviderDummyAccountResult {
+                    switch error {
                     case .success(let dummy):
                         recipientAccount = dummy
                         
@@ -507,37 +548,35 @@ extension AdamantTransfersProvider {
                         recipientAccount = account
                         
                     case .invalidAddress(let address):
-                        providerError = .accountNotFound(address: address)
+                        throw TransfersProviderError.accountNotFound(address: address)
                         
                     case .internalError(let error):
-                        providerError = TransfersProviderError.internalError(message: error.localizedDescription, error: error)
+                        throw TransfersProviderError.internalError(
+                            message: error.localizedDescription,
+                            error: error
+                        )
                     }
                 }
                 
             case .invalidAddress:
-                providerError = .accountNotFound(address: recipient)
+                throw TransfersProviderError.accountNotFound(address: recipient)
                 
             case .serverError(let error):
-                providerError = .serverError(error)
+                throw TransfersProviderError.serverError(error)
                 
             case .networkError:
-                providerError = .networkError
+                throw TransfersProviderError.networkError
             }
+        } catch {
+            throw error
         }
         
-        accountsGroup.wait()
-        
         let backgroundAccount: BaseAccount
-        if let acc = recipientAccount, let obj = context.object(with: acc.objectID) as? BaseAccount {
+        if let acc = recipientAccount,
+            let obj = context.object(with: acc.objectID) as? BaseAccount {
             backgroundAccount = obj
         } else {
-            if let err = providerError {
-                completion(.failure(err))
-            } else {
-                completion(.failure(.accountNotFound(address: recipient)))
-            }
-            
-            return
+            throw TransfersProviderError.accountNotFound(address: recipient)
         }
         
         // MARK: 2. Create transaction
@@ -578,35 +617,44 @@ extension AdamantTransfersProvider {
         do {
             try context.save()
         } catch {
-            completion(.failure(.internalError(message: "Failed to save context", error: error)))
-            return
+            throw TransfersProviderError.internalError(
+                message: "Failed to save context",
+                error: error
+            )
         }
         
         // MARK: 5. Send
-        apiService.transferFunds(sender: loggedAccount.address, recipient: recipient, amount: amount, keypair: keypair) { result in
-            switch result {
-            case .success(let id):
-                // Update ID with recieved, add to unconfirmed transactions.
-                transaction.transactionId = String(id)
-                
-                self.unconfirmedTransactions[id] = transaction.objectID
-                
-                do {
-                    try context.save()
-                } catch {
-                    completion(.failure(.internalError(message: "Failed to save data context", error: error)))
-                    break
-                }
-                
-                if let trs = self.stack.container.viewContext.object(with: transaction.objectID) as? TransactionDetails {
-                    completion(.success(transaction: trs))
-                } else {
-                    completion(.failure(.internalError(message: "Failed to get transaction in viewContext", error: nil)))
-                }
-                
-            case .failure(let error):
-                completion(.failure(.serverError(error)))
+        do {
+            let id = try await apiService.transferFunds(
+                sender: loggedAccount.address,
+                recipient: recipient,
+                amount: amount,
+                keypair: keypair
+            )
+            
+            transaction.transactionId = String(id)
+            
+            self.unconfirmedTransactions[id] = transaction.objectID
+            
+            do {
+                try context.save()
+            } catch {
+                throw TransfersProviderError.internalError(
+                    message: "Failed to save data context",
+                    error: error
+                )
             }
+            
+            if let trs = self.stack.container.viewContext.object(with: transaction.objectID) as? TransactionDetails {
+                return trs
+            } else {
+                throw TransfersProviderError.internalError(
+                    message: "Failed to get transaction in viewContext",
+                    error: nil
+                )
+            }
+        } catch {
+            throw TransfersProviderError.serverError(error)
         }
     }
     
@@ -650,49 +698,50 @@ extension AdamantTransfersProvider {
     /// - Parameters:
     ///   - id: Transaction ID
     ///   - completion: callback
-    func refreshTransfer(id: String, completion: @escaping (TransfersProviderResult) -> Void) {
+    func refreshTransfer(id: String) async throws {
         guard let transfer = getTransfer(id: id) else {
-            completion(.failure(.transactionNotFound(id: id)))
-            return
+            throw TransfersProviderError.transactionNotFound(id: id)
         }
         
         guard let intId = UInt64(id) else {
-            completion(.failure(.internalError(message: "Can't parse transaction id: \(id)", error: nil)))
-            return
+            throw TransfersProviderError.internalError(
+                message: "Can't parse transaction id: \(id)",
+                error: nil
+            )
         }
         
-        apiService.getTransaction(id: intId) { result in
-            switch result {
-            case .success(let transaction):
-                guard transfer.confirmations != transaction.confirmations else {
-                    completion(.success)
-                    return
-                }
-                
-                // Update transaction
-                
-                let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-                context.parent = self.stack.container.viewContext
-                
-                guard let trsfr = context.object(with: transfer.objectID) as? TransferTransaction else {
-                    completion(.failure(.internalError(message: "Failed to update transaction: CoreData context changed", error: nil)))
-                    return
-                }
-                
-                trsfr.confirmations = transaction.confirmations
-                trsfr.blockId = transaction.blockId
-                trsfr.isConfirmed = transaction.confirmations > 0 ? true : false
-                
-                do {
-                    try context.save()
-                    completion(.success)
-                } catch {
-                    completion(.failure(.internalError(message: "Failed saving changes to CoreData: \(error.localizedDescription)", error: error)))
-                }
-                
-            case .failure(let error):
-                completion(.failure(.serverError(error)))
+        do {
+            let transaction = try await apiService.getTransaction(id: intId)
+            
+            guard transfer.confirmations != transaction.confirmations else {
+                return
             }
+            
+            let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+            context.parent = self.stack.container.viewContext
+            
+            guard let trsfr = context.object(with: transfer.objectID) as? TransferTransaction else {
+                throw TransfersProviderError.internalError(
+                    message: "Failed to update transaction: CoreData context changed",
+                    error: nil
+                )
+            }
+            
+            trsfr.confirmations = transaction.confirmations
+            trsfr.blockId = transaction.blockId
+            trsfr.isConfirmed = transaction.confirmations > 0 ? true : false
+            
+            do {
+                try context.save()
+                return
+            } catch {
+                throw TransfersProviderError.internalError(
+                    message: "Failed saving changes to CoreData: \(error.localizedDescription)",
+                    error: error
+                )
+            }
+        } catch {
+            throw TransfersProviderError.serverError(error)
         }
     }
 }
@@ -712,75 +761,63 @@ extension AdamantTransfersProvider {
     ///   - height: last transaction height.
     ///   - offset: offset, if greater than 100
     /// - Returns: ammount of new transactions was added
-    private func getTransactions(forAccount account: String,
-                                 type: TransactionType,
-                                 fromHeight: Int64?,
-                                 offset: Int?,
-                                 dispatchGroup: DispatchGroup,
-                                 context: NSManagedObjectContext,
-                                 contextMutatingSemaphore cms: DispatchSemaphore) {
-        // Enter 1
-        dispatchGroup.enter()
+    private func getTransactions(
+        forAccount account: String,
+        type: TransactionType,
+        fromHeight: Int64?,
+        offset: Int?,
+        context: NSManagedObjectContext
+    ) async {
         
-        // MARK: 1. Get new transactions
-        apiService.getTransactions(forAccount: account, type: type, fromHeight: fromHeight, offset: offset, limit: self.apiTransactions) { result in
+        do {
+            let transactions = try await apiService.getTransactions(
+                forAccount: account,
+                type: type,
+                fromHeight: fromHeight,
+                offset: offset,
+                limit: self.apiTransactions
+            )
             
-            defer {
-                // Leave 1
-                dispatchGroup.leave()
+            guard transactions.count > 0 else {
+                return
             }
             
-            switch result {
-            case .success(let transactions):
-                guard transactions.count > 0 else {
-                    return
+            // MARK: 2. Process transactions in background
+    
+            await processRawTransactions(
+                transactions,
+                currentAddress: account,
+                context: context
+            )
+            
+            // MARK: 3. Get more transactions
+            if transactions.count == self.apiTransactions {
+                let newOffset: Int
+                if let offset = offset {
+                    newOffset = offset + self.apiTransactions
+                } else {
+                    newOffset = self.apiTransactions
                 }
                 
-                // MARK: 2. Process transactions in background
-                // Enter 2
-                dispatchGroup.enter()
-                    defer {
-                        // Leave 2
-                        dispatchGroup.leave()
-                    }
-                    
-                    self.processRawTransactions(transactions,
-                                                currentAddress: account,
-                                                context: context,
-                                                contextMutatingSemaphore: cms)
-                
-                // MARK: 3. Get more transactions
-                if transactions.count == self.apiTransactions {
-                    let newOffset: Int
-                    if let offset = offset {
-                        newOffset = offset + self.apiTransactions
-                    } else {
-                        newOffset = self.apiTransactions
-                    }
-                    
-                    self.getTransactions(forAccount: account, type: type, fromHeight: fromHeight, offset: newOffset, dispatchGroup: dispatchGroup, context: context, contextMutatingSemaphore: cms)
-                }
-                
-            case .failure(let error):
-                self.setState(.failedToUpdate(error), previous: .updating)
+                await self.getTransactions(
+                    forAccount: account,
+                    type: type,
+                    fromHeight: fromHeight,
+                    offset: newOffset,
+                    context: context
+                )
             }
+        } catch {
+            setState(.failedToUpdate(error), previous: .updating)
         }
     }
     
-    private func processRawTransactions(_ transactions: [Transaction],
-                                        currentAddress address: String,
-                                        context: NSManagedObjectContext,
-                                        contextMutatingSemaphore cms: DispatchSemaphore) {
-        let blockOperation = BlockOperation { [weak self] in
-            self?.processRawTransactionsSynced(transactions, currentAddress: address, context: context, contextMutatingSemaphore: cms)
-        }
-        transactionService.addOperations(blockOperation)
-    }
-    
-    private func processRawTransactionsSynced(_ transactions: [Transaction],
-                                        currentAddress address: String,
-                                        context: NSManagedObjectContext,
-                                        contextMutatingSemaphore cms: DispatchSemaphore) {
+    private func processRawTransactions(
+        _ transactions: [Transaction],
+        currentAddress address: String,
+        context: NSManagedObjectContext
+    ) async {
+        
         // MARK: 0. Transactions?
         guard transactions.count > 0 else {
             return
@@ -803,45 +840,48 @@ extension AdamantTransfersProvider {
         }
         
         // MARK: 2. Let AccountProvider get all partners from server.
-        let partnersGroup = DispatchGroup()
         var errors: [ProcessingResult] = []
         
         var ignorList: Set<String> = []
         
         for id in partnerIds {
-            partnersGroup.enter() // Enter 1
             let publicKey = partnerPublicKey[id] ?? ""
-            accountsProvider.getAccount(byAddress: id, publicKey: publicKey) { result in
-                switch result {
+            
+            do {
+                _ = try await accountsProvider.getAccount(
+                    byAddress: id,
+                    publicKey: publicKey
+                )
+            } catch let error as AccountsProviderResult {
+                switch error {
                 case .success, .dummy:
-                    partnersGroup.leave() // Leave 1
+                    break
                     
                 case .notFound, .invalidAddress, .notInitiated:
-                    self.accountsProvider.getDummyAccount(for: id) { result in
-                        defer {
-                            partnersGroup.leave() // Leave 1
-                        }
-                        
-                        switch result {
+                    do {
+                        _ = try await accountsProvider.getDummyAccount(for: id)
+                    } catch let error as AccountsProviderDummyAccountResult {
+                        switch error {
                         case .success, .foundRealAccount:
                             break
-                        
+                            
                         case .invalidAddress(let address):
                             ignorList.insert(address)
-                        
+                            
                         case .internalError(let error):
                             errors.append(ProcessingResult.error(error))
                         }
+                    } catch {
+                        ignorList.insert(id)
                     }
                     
                 case .networkError(let error), .serverError(let error):
                     errors.append(ProcessingResult.error(error))
-                    partnersGroup.leave() // Leave 1
                 }
+            } catch {
+                ignorList.insert(id)
             }
         }
-        
-        partnersGroup.wait()
         
         // MARK: 2.5. If we have any errors - drop processing.
         if let error = errors.first {

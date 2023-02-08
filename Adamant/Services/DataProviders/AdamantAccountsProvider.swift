@@ -830,4 +830,33 @@ extension AdamantAccountsProvider {
             }
         }
     }
+    
+    func getDummyAccount(for address: String) async throws -> DummyAccount {
+        let validation = AdamantUtilities.validateAdamantAddress(address: address)
+        if validation == .invalid {
+            throw AccountsProviderDummyAccountResult.invalidAddress(address: address)
+        }
+        
+        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        context.parent = stack.container.viewContext
+        
+        switch self.getAccount(byPredicate: NSPredicate(format: "address == %@", address)) {
+        case .core(let account):
+            throw AccountsProviderDummyAccountResult.foundRealAccount(account)
+            
+        case .dummy(let account):
+            return account
+            
+        case .notFound:
+            let dummy = DummyAccount(entity: DummyAccount.entity(), insertInto: context)
+            dummy.address = address
+            
+            do {
+                try context.save()
+                return dummy
+            } catch {
+                throw AccountsProviderDummyAccountResult.internalError(error)
+            }
+        }
+    }
 }

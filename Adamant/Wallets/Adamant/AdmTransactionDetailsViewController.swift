@@ -116,22 +116,18 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     
     // MARK: - Autoupdate
     
+    @MainActor
     func startUpdate() {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            guard let id = self?.transaction?.txId else {
-                return
-            }
-            
-            self?.transfersProvider.refreshTransfer(id: id) { result in
-                switch result {
-                case .success:
-                    DispatchQueue.main.async {
-                        self?.tableView.reloadData()
-                    }
-                    
-                case .failure:
+            Task { [weak self] in
+                guard let id = await self?.transaction?.txId else {
                     return
+                }
+                
+                do {
+                    try await self?.transfersProvider.refreshTransfer(id: id)
+                    await self?.tableView.reloadData()
                 }
             }
         }

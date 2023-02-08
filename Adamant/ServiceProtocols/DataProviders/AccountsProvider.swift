@@ -42,7 +42,7 @@ enum AccountsProviderResult: Error {
     }
 }
 
-enum AccountsProviderDummyAccountResult {
+enum AccountsProviderDummyAccountResult: Error {
     case success(DummyAccount)
     case foundRealAccount(CoreDataAccount)
     case invalidAddress(address: String)
@@ -82,6 +82,9 @@ protocol AccountsProvider {
     
     /// Request Dummy account, if account wasn't found or initiated
     func getDummyAccount(for address: String, completion: @escaping (AccountsProviderDummyAccountResult) -> Void)
+    
+    /// Request Dummy account, if account wasn't found or initiated
+    func getDummyAccount(for address: String) async throws -> DummyAccount
 }
 
 // MARK: - Known contacts

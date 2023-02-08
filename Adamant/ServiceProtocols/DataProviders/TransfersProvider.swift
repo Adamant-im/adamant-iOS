@@ -150,9 +150,13 @@ protocol TransfersProvider: DataProvider, Actor {
     func update() async -> TransfersProviderResult?
     
     // MARK: - Sending funds
-    func transferFunds(toAddress recipient: String, amount: Decimal, comment: String?, completion: @escaping (TransfersProviderTransferResult) -> Void)
+    func transferFunds(
+        toAddress recipient: String,
+        amount: Decimal,
+        comment: String?
+    ) async throws -> TransactionDetails
     
     // MARK: - Transactions
     func getTransfer(id: String) -> TransferTransaction?
-    func refreshTransfer(id: String, completion: @escaping (TransfersProviderResult) -> Void)
+    func refreshTransfer(id: String) async throws
 }

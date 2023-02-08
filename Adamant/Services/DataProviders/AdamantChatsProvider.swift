@@ -93,7 +93,7 @@ actor AdamantChatsProvider: ChatsProvider {
         }
     }
     
-    func addObservers() async {
+    private func addObservers() async {
         for await notification in NotificationCenter.default.notifications(
             named: .AdamantAccountService.userLoggedIn
         ) {
