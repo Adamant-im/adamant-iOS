@@ -15,7 +15,10 @@ struct ChatMessage: Identifiable, Equatable {
     let senderModel: ChatSender
     let status: Status
     let content: Content
+    let backgroundColor: ChatMessageBackgroundColor
     let bottomString: ComparableAttributedString?
+    let dateHeader: ComparableAttributedString?
+    let topSpinnerOn: Bool
     
     static let `default` = Self(
         id: "",
@@ -23,7 +26,10 @@ struct ChatMessage: Identifiable, Equatable {
         senderModel: .default,
         status: .failed,
         content: .default,
-        bottomString: nil
+        backgroundColor: .failed,
+        bottomString: nil,
+        dateHeader: nil,
+        topSpinnerOn: false
     )
 }
 
@@ -36,16 +42,9 @@ extension ChatMessage {
     
     enum Content: Equatable {
         case message(ComparableAttributedString)
-        case transaction(Transaction)
+        case transaction(ChatTransactionContainerView.Model)
         
         static let `default` = Self.message(.init(string: .init()))
-    }
-    
-    struct Transaction: Equatable {
-        let icon: UIImage
-        let amount: Decimal
-        let currency: String
-        let comment: String?
     }
 }
 

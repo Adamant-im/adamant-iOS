@@ -58,16 +58,7 @@ final class ChatDataSourceManager: MessagesDataSource {
         for message: MessageType,
         at indexPath: IndexPath
     ) -> NSAttributedString? {
-        guard viewModel.isNeedToDisplayDateHeader(sentDate: message.sentDate, index: indexPath.section)
-        else { return nil }
-        
-        return .init(
-            string: message.sentDate.humanizedDay(),
-            attributes: [
-                .font: UIFont.boldSystemFont(ofSize: 10),
-                .foregroundColor: UIColor.adamant.secondary
-            ]
-        )
+        message.fullModel.dateHeader?.string
     }
     
     func customCell(
@@ -85,58 +76,10 @@ final class ChatDataSourceManager: MessagesDataSource {
             forceUpdate: false
         )
     
-        cell.wrappedView.model = message.fullModel.makeTransactionViewModel(
-            currentSender: currentSender,
-            status: viewModel.$transactionStatuses
-                .map { $0[message.messageId] ?? .notInitiated }
-                .eraseToAnyPublisher(),
-            onTap: { [didTapTransfer = viewModel.didTapTransfer] in
-                didTapTransfer.send(message.messageId)
-            },
-            forceUpdateStatusAction: { [weak viewModel] in
-                viewModel?.loadTransactionStatusIfNeeded(
-                    id: message.messageId,
-                    forceUpdate: true
-                )
-            }
-        )
-        return cell
-    }
-}
-
-extension ChatMessage {
-    func makeTransactionViewModel(
-        currentSender: SenderType,
-        status: AnyObservable<TransactionStatus>?,
-        onTap: @escaping () -> Void,
-        forceUpdateStatusAction: @escaping () -> Void
-    ) -> ChatTransactionContainerView.Model {
-        guard case let .transaction(model) = content else {
-            assertionFailure("Incorrect content type")
-            return .default
+        if case let .transaction(model) = message.fullModel.content {
+            cell.wrappedView.model = model
         }
         
-        return .init(
-            isFromCurrentSender: sender.senderId == currentSender.senderId,
-            content: .init(
-                title: sender.senderId == currentSender.senderId
-                    ? .adamantLocalized.chat.transactionSent
-                    : .adamantLocalized.chat.transactionReceived,
-                icon: model.icon,
-                amount: AdamantBalanceFormat.full.format(model.amount),
-                currency: model.currency,
-                date: sentDate.humanizedDateTime(withWeekday: false),
-                comment: model.comment,
-                backgroundColor: getBackgroundColor(currentSender: currentSender),
-                action: .init(action: onTap)
-            ),
-            status: status.map {
-                .init(
-                    id: messageId,
-                    forceUpdateAction: forceUpdateStatusAction,
-                    status: $0
-                )
-            }
-        )
+        return cell
     }
 }

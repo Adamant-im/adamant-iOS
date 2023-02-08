@@ -211,7 +211,7 @@ protocol ChatsProvider: DataProvider {
     func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult
     func blockChat(with address: String)
     func removeMessage(with id: String)
-    func updateStatus(for transaction: RichMessageTransaction)
+    func updateStatus(for transaction: RichMessageTransaction, resetBeforeUpdate: Bool)
     func markChatAsRead(chatroom: Chatroom)
     
     // MARK: - Unconfirmed Transaction

@@ -14,7 +14,7 @@ final class ChatTransactionContainerView: UIView {
     var model: Model = .default {
         didSet {
             guard model != oldValue else { return }
-            update(old: oldValue)
+            update()
         }
     }
     
@@ -67,21 +67,10 @@ private extension ChatTransactionContainerView {
         }
     }
     
-    func update(old: Model) {
+    func update() {
         contentView.model = model.content
-        updateStatusSubscription(old: old.status)
+        updateStatus(model.status)
         updateLayout()
-    }
-    
-    func updateStatusSubscription(old: Model.Status?) {
-        guard old != model.status else { return }
-        guard let status = model.status else { return updateStatus(.notInitiated) }
-        
-        updateStatus(status.status)
-        statusSubscription = status.$status
-            .removeDuplicates()
-            .receive(on: RunLoop.main)
-            .sink { [weak self] in self?.updateStatus($0) }
     }
     
     func updateStatus(_ status: TransactionStatus) {
@@ -102,7 +91,9 @@ private extension ChatTransactionContainerView {
     }
     
     @objc func onStatusButtonTap() {
-        model.status?.forceUpdateAction()
+        guard let action = model.updateStatusAction else { return }
+        updateStatus(.notInitiated)
+        action.action()
     }
 }
 

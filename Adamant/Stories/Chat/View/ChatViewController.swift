@@ -323,8 +323,8 @@ private extension ChatViewController {
         return button
     }
     
-    func makeChatMessagesCollectionView() -> ChatMessagesCollectionView<ChatMessage> {
-        let collection = ChatMessagesCollectionView<ChatMessage>()
+    func makeChatMessagesCollectionView() -> ChatMessagesCollectionView {
+        let collection = ChatMessagesCollectionView()
         collection.register(TransactionCell.self)
         collection.register(
             SpinnerCell.self,

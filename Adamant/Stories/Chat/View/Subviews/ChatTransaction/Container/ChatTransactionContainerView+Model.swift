@@ -12,34 +12,14 @@ extension ChatTransactionContainerView {
     struct Model: Equatable {
         let isFromCurrentSender: Bool
         let content: ChatTransactionContentView.Model
-        let status: Status?
+        let status: TransactionStatus
+        let updateStatusAction: ComparableAction?
         
         static let `default` = Self(
             isFromCurrentSender: true,
             content: .default,
-            status: nil
+            status: .notInitiated,
+            updateStatusAction: .init(action: {})
         )
-    }
-}
-
-extension ChatTransactionContainerView.Model {
-    final class Status: Equatable {
-        let id: String
-        let forceUpdateAction: () -> Void
-        @Published private(set) var status: TransactionStatus = .notInitiated
-        
-        init(
-            id: String,
-            forceUpdateAction: @escaping () -> Void,
-            status: AnyObservable<TransactionStatus>
-        ) {
-            self.id = id
-            self.forceUpdateAction = forceUpdateAction
-            status.assign(to: &$status)
-        }
-        
-        static func ==(lhs: Status, rhs: Status) -> Bool {
-            lhs.id == rhs.id
-        }
     }
 }
