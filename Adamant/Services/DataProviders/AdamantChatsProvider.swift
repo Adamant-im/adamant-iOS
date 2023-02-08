@@ -380,14 +380,12 @@ extension AdamantChatsProvider {
         do {
             let chatrooms = try await apiService.getChatRooms(address: address, offset: offset)
             return chatrooms
-        } catch {
-            guard let error = error as? ApiServiceError,
-                  case .networkError = error
-            else {
+        } catch let error as ApiServiceError {
+            guard case .networkError = error else {
                 return nil
             }
             
-            try? await Task.sleep(nanoseconds: requestRepeatDelayNanoseconds)
+            try? await Task.sleep(interval: requestRepeatDelay)
             return try await apiGetChatrooms(address: address, offset: offset)
         }
     }
@@ -450,14 +448,12 @@ extension AdamantChatsProvider {
                 offset: offset
             )
             return chatrooms
-        } catch {
-            guard let error = error as? ApiServiceError,
-                  case .networkError = error
-            else {
+        } catch let error as ApiServiceError {
+            guard case .networkError = error else {
                 return nil
             }
             
-            try? await Task.sleep(nanoseconds: requestRepeatDelayNanoseconds)
+            try? await Task.sleep(interval: requestRepeatDelay)
             return try await apiGetChatrooms(address: address, offset: offset)
         }
     }
@@ -944,11 +940,7 @@ extension AdamantChatsProvider {
             } catch {
                 throw ChatsProviderError.internalError(error)
             }
-        } catch {
-            guard let error = error as? AccountsProviderResult else {
-                throw ChatsProviderError.internalError(error)
-            }
-            
+        } catch let error as AccountsProviderResult {
             switch error {
             case .notFound, .invalidAddress:
                 throw ChatsProviderError.accountNotFound(recipientId)
@@ -961,6 +953,8 @@ extension AdamantChatsProvider {
             case .success:
                 throw ChatsProviderError.networkError
             }
+        } catch {
+            throw ChatsProviderError.internalError(error)
         }
     }
     
@@ -1102,11 +1096,7 @@ extension AdamantChatsProvider {
             unconfirmedTransactions[id] = transaction.objectID
                         
             return transaction
-        } catch {
-            guard let error = error as? ApiServiceError else {
-                throw ChatsProviderError.serverError(error)
-            }
-            
+        } catch let error as ApiServiceError {
             transaction.statusEnum = MessageStatus.failed
             
             let serviceError: ChatsProviderError
@@ -1131,6 +1121,8 @@ extension AdamantChatsProvider {
             }
             
             throw serviceError
+        } catch {
+            throw ChatsProviderError.serverError(error)
         }
     }
 }
@@ -1621,4 +1613,3 @@ extension AdamantChatsProvider {
 }
 
 private let requestRepeatDelay: TimeInterval = 2
-private let requestRepeatDelayNanoseconds: UInt64 = 2 * 1000000000

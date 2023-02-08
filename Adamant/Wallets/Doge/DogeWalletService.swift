@@ -337,10 +337,6 @@ extension DogeWalletService {
         }
     }
     
-    func getDogeAddress(byAdamandAddress address: String, completion: @escaping (ApiServiceResult<String?>) -> Void) {
-        apiService.get(key: DogeWalletService.kvsAddress, sender: address, completion: completion)
-    }
-    
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
         return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<String, Error>) in
             apiService.get(key: DogeWalletService.kvsAddress, sender: address) { (result) in
@@ -527,37 +523,27 @@ extension DogeWalletService {
         }
     }
     
-    func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<BTCRawTransaction>) -> Void) {
+    func getTransaction(by hash: String) async throws -> BTCRawTransaction {
         guard let url = DogeWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DOGE endpoint URL")
         }
         
-        // Headers
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json"
-        ]
-        
         // Request url
+        
         let endpoint = url.appendingPathComponent(DogeApiCommands.getTransaction(by: hash))
         
         // MARK: Sending request
-        AF.request(endpoint, method: .get, headers: headers).responseData(queue: defaultDispatchQueue) { response in
-            switch response.result {
-            case .success(let data):
-                do {
-                    let transfers = try DogeWalletService.jsonDecoder.decode(BTCRawTransaction.self, from: data)
-                    completion(.success(transfers))
-                } catch {
-                    completion(.failure(.internalError(message: "Unaviable transaction", error: error)))
-                }
-                
-            case .failure(let error):
-                completion(.failure(.internalError(message: "No transaction", error: error)))
-            }
-        }
+        
+        let transaction: BTCRawTransaction = try await apiService.sendRequest(
+            url: endpoint,
+            method: .get,
+            parameters: nil
+        )
+        
+        return transaction
     }
     
-    func getBlockId(by hash: String, completion: @escaping (ApiServiceResult<String>) -> Void) {
+    func getBlockId(by hash: String) async throws -> String {
         guard let url = DogeWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DOGE endpoint URL")
         }
@@ -568,21 +554,23 @@ extension DogeWalletService {
         ]
         
         // Request url
-        let endpoint = url.appendingPathComponent(DogeApiCommands.getBlock(by: hash))
-        AF.request(endpoint, method: .get, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
-            switch response.result {
-            case .success(let json as [String: Any]):
-                if let height = json["height"] as? NSNumber {
-                    completion(.success(height.stringValue))
-                } else {
-                    completion(.failure(.internalError(message: "Failed to parse block", error: nil)))
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<String, Error>) in
+            let endpoint = url.appendingPathComponent(DogeApiCommands.getBlock(by: hash))
+            AF.request(endpoint, method: .get, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
+                switch response.result {
+                case .success(let json as [String: Any]):
+                    if let height = json["height"] as? NSNumber {
+                        continuation.resume(returning: height.stringValue)
+                    } else {
+                        continuation.resume(throwing: ApiServiceError.internalError(message: "Failed to parse block", error: nil))
+                    }
+                    
+                case .failure(let error):
+                    continuation.resume(throwing: ApiServiceError.internalError(message: "No block", error: error))
+                    
+                default:
+                    continuation.resume(throwing: ApiServiceError.internalError(message: "No block", error: nil))
                 }
-                
-            case .failure(let error):
-                completion(.failure(.internalError(message: "No block", error: error)))
-                
-            default:
-                completion(.failure(.internalError(message: "No block", error: nil)))
             }
         }
     }

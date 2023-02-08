@@ -66,7 +66,6 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
             refreshControl.endRefreshing()
         } catch {
             refreshControl.endRefreshing()
-            guard let error = error as? WalletServiceError else { return }
             dialogService.showRichError(error: error)
         }
     }

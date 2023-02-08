@@ -121,12 +121,10 @@ class DashTransactionDetailsViewController: TransactionDetailsViewControllerBase
 
                     completion?(nil)
                 }
+            } catch let error as WalletServiceError {
+                completion?(error)
             } catch {
-                if let error = error as? WalletServiceError {
-                    completion?(error)
-                } else {
-                    completion?(nil)
-                }
+                completion?(nil)
             }
         }
         

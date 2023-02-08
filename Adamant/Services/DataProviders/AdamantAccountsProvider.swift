@@ -487,11 +487,9 @@ extension AdamantAccountsProvider {
                 self.removeSafeFromRequests(address)
                 
                 return coreAccount
-            } catch {
+            } catch let error as ApiServiceError {
                 self.removeSafeFromRequests(address)
-                guard let error = error as? ApiServiceError else {
-                    throw AccountServiceError.internalError(message: "Unknown Error", error: nil)
-                }
+                
                 switch error {
                 case .accountNotFound:
                     if let dummy = dummy {

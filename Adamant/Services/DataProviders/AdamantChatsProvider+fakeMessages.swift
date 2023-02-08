@@ -62,12 +62,10 @@ extension AdamantChatsProvider {
                         completion: completion
                     )
                 }
-            } catch {
-                guard let error = error as? ChatsProviderError else {
-                    completion(.failure(.networkError))
-                    return
-                }
+            } catch let error as ChatsProviderError {
                 completion(.failure(error))
+            } catch {
+                completion(.failure(.internalError(error)))
             }
         }
     }
@@ -127,12 +125,10 @@ extension AdamantChatsProvider {
                         completion: completion
                     )
                 }
-            } catch {
-                guard let error = error as? ChatsProviderError else {
-                    completion(.failure(.networkError))
-                    return
-                }
+            } catch let error as ChatsProviderError {
                 completion(.failure(error))
+            } catch {
+                completion(.failure(.internalError(error)))
             }
         }
     }
@@ -287,14 +283,10 @@ extension AdamantChatsProvider {
         do {
             let account = try await accountsProvider.getAccount(byAddress: partnerId)
             return (loggedAccount: loggedAddress, partner: account)
-        } catch {
-            guard let error = error as? AccountsProviderResult else {
-                throw ChatsProviderError.serverError(error)
-            }
-            
+        } catch let error as AccountsProviderResult {
             switch error {
             case .success(let account):
-                throw ChatsProviderError.serverError(error)
+                return (loggedAccount: loggedAddress, partner: account)
                 
             case .notFound, .invalidAddress, .notInitiated, .dummy:
                 throw ChatsProviderError.accountNotFound(partnerId)
@@ -305,6 +297,8 @@ extension AdamantChatsProvider {
             case .serverError(let error):
                 throw ChatsProviderError.serverError(error)
             }
+        } catch {
+            throw ChatsProviderError.serverError(error)
         }
     }
     

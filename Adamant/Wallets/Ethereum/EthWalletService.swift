@@ -557,70 +557,84 @@ extension EthWalletService {
 
 // MARK: - Transactions
 extension EthWalletService {
-    func getTransaction(by hash: String, completion: @escaping (WalletServiceResult<EthTransaction>) -> Void) {
-        Task {
-            let sender = wallet?.address
-            guard let eth = await web3?.eth else {
-                completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction", error: nil)))
-                return
+    func getTransaction(by hash: String) async throws -> EthTransaction {
+        let sender = wallet?.address
+        guard let eth = await web3?.eth else {
+            throw WalletServiceError.internalError(message: "Failed to get transaction", error: nil)
+        }
+        
+        let isOutgoing: Bool
+        let details: Web3Core.TransactionDetails
+        
+        // MARK: 1. Transaction details
+        do {
+            details = try await eth.transactionDetails(hash)
+            
+            if let sender = sender {
+                isOutgoing = details.transaction.to.address != sender
+            } else {
+                isOutgoing = false
+            }
+        } catch let error as Web3Error {
+            throw error.asWalletServiceError()
+        } catch {
+            throw WalletServiceError.internalError(message: "Failed to get transaction", error: error)
+        }
+        
+        // MARK: 2. Transaction receipt
+        do {
+            let receipt = try await eth.transactionReceipt(hash)
+            
+            // MARK: 3. Check if transaction is delivered
+            guard receipt.status == .ok,
+                  let blockNumber = details.blockNumber
+            else {
+                let transaction = details.transaction.asEthTransaction(
+                    date: nil,
+                    gasUsed: receipt.gasUsed,
+                    blockNumber: nil,
+                    confirmations: nil,
+                    receiptStatus: receipt.status,
+                    isOutgoing: isOutgoing
+                )
+                return transaction
             }
             
-            let isOutgoing: Bool
-            let details: Web3Core.TransactionDetails
+            // MARK: 4. Block timestamp & confirmations
+            let currentBlock = try await eth.blockNumber()
+            let block = try await eth.block(by: receipt.blockHash)
+            let confirmations = currentBlock - blockNumber
             
-            // MARK: 1. Transaction details
-            do {
-                details = try await eth.transactionDetails(hash)
-                
-                if let sender = sender {
-                    isOutgoing = details.transaction.to.address != sender
-                } else {
-                    isOutgoing = false
-                }
-            } catch let error as Web3Error {
-                completion(.failure(error: error.asWalletServiceError()))
-                return
-            } catch {
-                completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction", error: error)))
-                return
-            }
+            let transaction = details.transaction.asEthTransaction(
+                date: block.timestamp,
+                gasUsed: receipt.gasUsed,
+                blockNumber: String(blockNumber),
+                confirmations: String(confirmations),
+                receiptStatus: receipt.status,
+                isOutgoing: isOutgoing,
+                hash: details.transaction.txHash
+            )
             
-            // MARK: 2. Transaction receipt
-            do {
-                let receipt = try await eth.transactionReceipt(hash)
+            return transaction
+        } catch let error as Web3Error {
+            switch error {
+                // Transaction not delivired yet
+            case .inputError, .nodeError:
+                let transaction = details.transaction.asEthTransaction(
+                    date: nil,
+                    gasUsed: nil,
+                    blockNumber: nil,
+                    confirmations: nil,
+                    receiptStatus: TransactionReceipt.TXStatus.notYetProcessed,
+                    isOutgoing: isOutgoing
+                )
+                return transaction
                 
-                // MARK: 3. Check if transaction is delivered
-                guard receipt.status == .ok, let blockNumber = details.blockNumber else {
-                    let transaction = details.transaction.asEthTransaction(date: nil, gasUsed: receipt.gasUsed, blockNumber: nil, confirmations: nil, receiptStatus: receipt.status, isOutgoing: isOutgoing)
-                    completion(.success(result: transaction))
-                    return
-                }
-                
-                // MARK: 4. Block timestamp & confirmations
-                let currentBlock = try await eth.blockNumber()
-                let block = try await eth.block(by: receipt.blockHash)
-                let confirmations = currentBlock - blockNumber
-                
-                let transaction = details.transaction.asEthTransaction(date: block.timestamp, gasUsed: receipt.gasUsed, blockNumber: String(blockNumber), confirmations: String(confirmations), receiptStatus: receipt.status, isOutgoing: isOutgoing, hash: details.transaction.txHash)
-                
-                completion(.success(result: transaction))
-            } catch let error as Web3Error {
-                let result: WalletServiceResult<EthTransaction>
-                
-                switch error {
-                    // Transaction not delivired yet
-                case .inputError, .nodeError:
-                    let transaction = details.transaction.asEthTransaction(date: nil, gasUsed: nil, blockNumber: nil, confirmations: nil, receiptStatus: TransactionReceipt.TXStatus.notYetProcessed, isOutgoing: isOutgoing)
-                    result = .success(result: transaction)
-                    
-                default:
-                    result = .failure(error: error.asWalletServiceError())
-                }
-                
-                completion(result)
-            } catch {
-                completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction", error: error)))
+            default:
+                throw error.asWalletServiceError()
             }
+        } catch {
+            throw WalletServiceError.internalError(message: "Failed to get transaction", error: error)
         }
     }
     

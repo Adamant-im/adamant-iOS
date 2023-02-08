@@ -116,21 +116,37 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                 
                 Task {
                     do {
-                        let walletAddress = try await services[index].getWalletAddress(byAdamantAddress: address)
+                        let walletAddress = try await services[index]
+                            .getWalletAddress(
+                                byAdamantAddress:
+                                    address
+                            )
                         v.recipientAddress = walletAddress
                         v.recipientName = name
                         v.hideProgress(animated: true)
-                        if ERC20Token.supportedTokens.contains(where: { token in
-                            return token.symbol == self.services[index].tokenSymbol
-                        }) {
+                        
+                        if ERC20Token.supportedTokens.contains(
+                            where: { token in
+                                return token.symbol == self.services[index].tokenSymbol
+                            }
+                        ) {
                             let ethWallet = self.accountService.wallets.first { wallet in
                                 return wallet.tokenSymbol == "ETH"
                             }
                             v.rootCoinBalance = ethWallet?.wallet?.balance
                         }
+                    } catch let error as WalletServiceError {
+                        v.showAlertView(
+                            title: nil,
+                            message: error.message,
+                            animated: true
+                        )
                     } catch {
-                        guard let error = error as? WalletServiceError else { return }
-                        v.showAlertView(title: nil, message: error.message, animated: true)
+                        v.showAlertView(
+                            title: nil,
+                            message: String.adamantLocalized.sharedErrors.unknownError,
+                            animated: true
+                        )
                     }
                 }
 			}

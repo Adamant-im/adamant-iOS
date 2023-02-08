@@ -27,7 +27,7 @@ protocol RichMessageProvider: AnyObject {
 }
 
 protocol RichMessageProviderWithStatusCheck: RichMessageProvider {
-    func statusFor(transaction: RichMessageTransaction, completion: @escaping (WalletServiceResult<TransactionStatus>) -> Void)
+    func statusFor(transaction: RichMessageTransaction) async throws -> TransactionStatus
     
     var delayBetweenChecks: TimeInterval { get }
 }

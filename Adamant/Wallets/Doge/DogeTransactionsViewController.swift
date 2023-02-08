@@ -71,7 +71,7 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
         return transactions.count
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    @MainActor func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let controller = router.get(scene: AdamantScene.Wallets.Doge.transactionDetails) as? DogeTransactionDetailsViewController else {
             fatalError("Failed to get DogeTransactionDetailsViewController")
         }
@@ -85,13 +85,9 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
         dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
         let txId = transactions[indexPath.row].txId
         
-        walletService.getTransaction(by: txId) { [weak self] result in
-            guard let vc = self else {
-                return
-            }
-            
-            switch result {
-            case .success(let dogeTransaction):
+        detailTransactionTask = Task {
+            do {
+                let dogeTransaction = try await walletService.getTransaction(by: txId)
                 let transaction = dogeTransaction.asBtcTransaction(DogeTransaction.self, for: sender)
                 
                 // Sender name
@@ -106,36 +102,26 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
                 // Block Id
                 guard let blockHash = dogeTransaction.blockHash else {
                     controller.transaction = transaction
-                    DispatchQueue.main.async {
-                        vc.navigationController?.pushViewController(controller, animated: true)
-                        vc.tableView.deselectRow(at: indexPath, animated: true)
-                        vc.dialogService.dismissProgress()
-                    }
-                    break
+                    navigationController?.pushViewController(controller, animated: true)
+                    tableView.deselectRow(at: indexPath, animated: true)
+                    dialogService.dismissProgress()
+                    return
                 }
                 
-                vc.walletService.getBlockId(by: blockHash) { result in
-                    switch result {
-                    case .success(let id):
-                        controller.transaction = dogeTransaction.asBtcTransaction(DogeTransaction.self, for: sender, blockId: id)
-                        
-                    case .failure:
-                        controller.transaction = transaction
-                    }
-                    
-                    DispatchQueue.main.async {
-                        vc.tableView.deselectRow(at: indexPath, animated: true)
-                        vc.dialogService.dismissProgress()
-                        vc.navigationController?.pushViewController(controller, animated: true)
-                    }
+                do {
+                    let id = try await walletService.getBlockId(by: blockHash)
+                    controller.transaction = dogeTransaction.asBtcTransaction(DogeTransaction.self, for: sender, blockId: id)
+                } catch {
+                    controller.transaction = transaction
                 }
                 
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    vc.tableView.deselectRow(at: indexPath, animated: true)
-                    vc.dialogService.dismissProgress()
-                    vc.dialogService.showRichError(error: error)
-                }
+                tableView.deselectRow(at: indexPath, animated: true)
+                dialogService.dismissProgress()
+                navigationController?.pushViewController(controller, animated: true)
+            } catch {
+                tableView.deselectRow(at: indexPath, animated: true)
+                dialogService.dismissProgress()
+                dialogService.showRichError(error: error)
             }
         }
     }

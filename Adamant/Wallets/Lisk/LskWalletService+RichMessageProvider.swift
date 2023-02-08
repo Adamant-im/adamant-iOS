@@ -83,8 +83,7 @@ extension LskWalletService: RichMessageProvider {
                                            richTransaction: transaction,
                                            in: chat)
                 
-            } catch {
-                guard let error = error as? WalletServiceError else { return }
+            } catch let error as ApiServiceError {
                 guard case let .internalError(message, _) = error,
                       message == "No transaction"
                 else {
@@ -110,9 +109,11 @@ extension LskWalletService: RichMessageProvider {
                                                in: chat)
                 } catch {
                     dialogService.dismissProgress()
-                    guard let error = error as? WalletServiceError else { return }
                     dialogService.showRichError(error: error)
                 }
+            } catch {
+                dialogService.dismissProgress()
+                dialogService.showRichError(error: error)
             }
         }
     }

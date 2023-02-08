@@ -28,6 +28,8 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
         return control
     }()
     
+    private var updateTask: Task<(), Never>?
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -36,7 +38,9 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
         super.viewDidLoad()
         if service != nil { tableView.refreshControl = refreshControl }
         
-        updateTransaction()
+        updateTask = Task {
+            await refresh()
+        }
         
         // MARK: Start update
         if transaction != nil {
@@ -45,6 +49,7 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
     }
     
     deinit {
+        updateTask?.cancel()
         stopUpdate()
     }
     
@@ -56,15 +61,13 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
         return URL(string: "\(DogeWalletService.explorerAddress)\(id)")
     }
     
-    @objc func refresh() {
-        updateTransaction { [weak self] error in
-            DispatchQueue.main.async {
-                self?.refreshControl.endRefreshing()
-                
-                if let error = error {
-                    self?.dialogService.showRichError(error: error)
-                }
-            }
+    @MainActor
+    @objc func refresh() async {
+        do {
+            try await updateTransaction()
+            refreshControl.endRefreshing()
+        } catch {
+            dialogService.showRichError(error: error)
         }
     }
     
@@ -73,8 +76,11 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
     func startUpdate() {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            self?.updateTransaction() // Silent, without errors
+            Task { [weak self] in
+                try? await self?.updateTransaction() // Silent, without errors
+            }
         }
+        
     }
     
     func stopUpdate() {
@@ -83,56 +89,41 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
     
     // MARK: Updating methods
     
-    func updateTransaction(completion: ((RichError?) -> Void)? = nil) {
-        guard let service = service, let address = service.wallet?.address, let id = transaction?.txId else {
-            completion?(nil)
+    @MainActor
+    func updateTransaction() async throws {
+        guard let service = service,
+              let address = service.wallet?.address,
+              let id = transaction?.txId
+        else {
             return
         }
 
-        service.getTransaction(by: id) { [weak self] result in
-            switch result {
-            case .success(let trs):
-                if let blockInfo = self?.cachedBlockInfo, blockInfo.hash == trs.blockHash {
-                    self?.transaction = trs.asBtcTransaction(DogeTransaction.self, for: address, blockId: blockInfo.height)
-                    
-                    DispatchQueue.main.async { [weak self] in
-                        self?.tableView.reloadData()
-                    }
-                    
-                    completion?(nil)
-                } else if let blockHash = trs.blockHash {
-                    service.getBlockId(by: blockHash) { result in
-                        let blockInfo: (hash: String, height: String)?
-                        switch result {
-                        case .success(let height):
-                            blockInfo = (hash: blockHash, height: height)
-                            
-                        case .failure:
-                            blockInfo = nil
-                        }
-                        
-                        self?.transaction = trs.asBtcTransaction(DogeTransaction.self, for: address, blockId: blockInfo?.height)
-                        self?.cachedBlockInfo = blockInfo
-                        
-                        DispatchQueue.main.async { [weak self] in
-                            self?.tableView.reloadData()
-                        }
-                        
-                        completion?(nil)
-                    }
-                } else {
-                    self?.transaction = trs.asBtcTransaction(DogeTransaction.self, for: address)
-                    
-                    DispatchQueue.main.async { [weak self] in
-                        self?.tableView.reloadData()
-                    }
-                    
-                    completion?(nil)
-                }
-                
-            case .failure(let error):
-                completion?(error)
+        let trs = try await service.getTransaction(by: id)
+        
+        if let blockInfo = cachedBlockInfo,
+           blockInfo.hash == trs.blockHash {
+            transaction = trs.asBtcTransaction(DogeTransaction.self, for: address, blockId: blockInfo.height)
+            
+            tableView.reloadData()
+            
+        } else if let blockHash = trs.blockHash {
+            let blockInfo: (hash: String, height: String)?
+            
+            do {
+                let height = try await service.getBlockId(by: blockHash)
+                blockInfo = (hash: blockHash, height: height)
+            } catch {
+                blockInfo = nil
             }
+            
+            transaction = trs.asBtcTransaction(DogeTransaction.self, for: address, blockId: blockInfo?.height)
+            cachedBlockInfo = blockInfo
+            
+            tableView.reloadData()
+        } else {
+            transaction = trs.asBtcTransaction(DogeTransaction.self, for: address)
+            
+            tableView.reloadData()
         }
     }
 }

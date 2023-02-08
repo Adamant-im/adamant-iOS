@@ -551,8 +551,9 @@ extension LskWalletService {
     
     func getTransaction(by hash: String) async throws -> Transactions.TransactionModel {
         guard let api = serviceApi else {
-            throw WalletServiceError.internalError(message: "Problem with accessing LSK nodes, try later", error: nil)
+            throw ApiServiceError.internalError(message: "Problem with accessing LSK nodes, try later", error: nil)
         }
+        
         return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Transactions.TransactionModel, Error>) in
             api.transactions(id: hash, limit: 1, offset: 0) { (response) in
                 switch response {
@@ -560,13 +561,11 @@ extension LskWalletService {
                     if let transaction = result.first {
                         continuation.resume(returning: transaction)
                     } else {
-                        continuation.resume(throwing: WalletServiceError.internalError(message: "No transaction", error: nil))
+                        continuation.resume(throwing: ApiServiceError.internalError(message: "No transaction", error: nil))
                     }
-                    break
                 case .error(response: let error):
                     print("ERROR: " + error.message)
-                    continuation.resume(throwing: WalletServiceError.internalError(message: error.message, error: nil))
-                    break
+                    continuation.resume(throwing: ApiServiceError.internalError(message: error.message, error: nil))
                 }
             }
         }

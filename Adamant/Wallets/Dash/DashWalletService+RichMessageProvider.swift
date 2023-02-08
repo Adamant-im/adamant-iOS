@@ -72,6 +72,8 @@ extension DashWalletService: RichMessageProvider {
                 let detailTransaction = try await getTransaction(by: hash)
                 let blockId = try await getBlockId(by: detailTransaction.blockHash)
                 
+                dialogService.dismissProgress()
+                
                 presentDetailTransactionVC(hash: hash,
                                            senderName: senderName,
                                            recipientName: recipientName,
@@ -81,10 +83,9 @@ extension DashWalletService: RichMessageProvider {
                                            transaction: detailTransaction,
                                            richTransaction: transaction,
                                            in: chat)
-            } catch {
+            } catch let error as ApiServiceError {
                 dialogService.dismissProgress()
                 
-                guard let error = error as? WalletServiceError else { return }
                 guard case let .internalError(message, _) = error,
                       message == "No transaction"
                 else {
@@ -101,6 +102,9 @@ extension DashWalletService: RichMessageProvider {
                                            transaction: nil,
                                            richTransaction: transaction,
                                            in: chat)
+            } catch {
+                dialogService.dismissProgress()
+                dialogService.showRichError(error: error)
             }
         }
     }

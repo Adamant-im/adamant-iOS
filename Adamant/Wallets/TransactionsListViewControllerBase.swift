@@ -35,6 +35,7 @@ class TransactionsListViewControllerBase: UIViewController {
     }()
     
     var refreshTask: Task<(), Error>?
+    var detailTransactionTask: Task<(), Never>?
     
     // MARK: - IBOutlets
     @IBOutlet weak var tableView: UITableView!
@@ -87,7 +88,7 @@ class TransactionsListViewControllerBase: UIViewController {
     }
     
     deinit {
-        print("deinit")
+        detailTransactionTask?.cancel()
         refreshTask?.cancel()
     }
     

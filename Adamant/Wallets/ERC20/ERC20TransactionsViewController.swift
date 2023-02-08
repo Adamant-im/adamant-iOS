@@ -98,26 +98,23 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
         
         dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
         
-        walletService.getTransaction(by: hash) { [weak self] result in
-            dialogService.dismissProgress()
-            
-            switch result {
-            case .success(let ethTransaction):
-                DispatchQueue.main.async {
-                    vc.transaction = ethTransaction
-                    
-                    if let address = address {
-                        if ethTransaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
-                            vc.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                        } else if ethTransaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
-                            vc.recipientName = String.adamantLocalized.transactionDetails.yourAddress
-                        }
+        detailTransactionTask = Task {
+            do {
+                let ethTransaction = try await walletService.getTransaction(by: hash)
+                dialogService.dismissProgress()
+                vc.transaction = ethTransaction
+                
+                if let address = address {
+                    if ethTransaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
+                        vc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+                    } else if ethTransaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
+                        vc.recipientName = String.adamantLocalized.transactionDetails.yourAddress
                     }
-                    
-                    self?.navigationController?.pushViewController(vc, animated: true)
                 }
                 
-            case .failure(let error):
+                navigationController?.pushViewController(vc, animated: true)
+            } catch {
+                dialogService.dismissProgress()
                 dialogService.showRichError(error: error)
             }
         }

@@ -50,12 +50,12 @@ extension DashWalletService {
         guard let endpoint = DashWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DASH endpoint URL")
         }
-        
+
         // Headers
         let headers: HTTPHeaders = [
             "Content-Type": "application/json"
         ]
-        
+
         let parameters: Parameters = [
             "method": "getrawtransaction",
             "params": [
@@ -63,6 +63,20 @@ extension DashWalletService {
             ]
         ]
 
+//        // MARK: Sending request
+//
+//        let result: BTCRPCServerResponce<BTCRawTransaction> = try await apiService.sendRequest(
+//            url: endpoint,
+//            method: .post,
+//            parameters: parameters
+//        )
+//
+//        if let transaction = result.result {
+//            return transaction
+//        } else {
+//            throw ApiServiceError.internalError(message: "Unaviable transaction", error: nil)
+//        }
+        
         // MARK: Sending request
         return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<BTCRawTransaction, Error>) in
             AF.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseData(queue: defaultDispatchQueue) { response in
@@ -73,14 +87,14 @@ extension DashWalletService {
                         if let transaction = result.result {
                             continuation.resume(returning: transaction)
                         } else {
-                            continuation.resume(throwing: WalletServiceError.internalError(message: "Unaviable transaction", error: nil))
+                            continuation.resume(throwing: ApiServiceError.internalError(message: "Unaviable transaction", error: nil))
                         }
                     } catch {
-                        continuation.resume(throwing: WalletServiceError.internalError(message: "Unaviable transaction", error: error))
+                        continuation.resume(throwing: ApiServiceError.internalError(message: "Unaviable transaction", error: error))
                     }
-                    
+
                 case .failure(let error):
-                    continuation.resume(throwing: WalletServiceError.internalError(message: "No transaction", error: error))
+                    continuation.resume(throwing: ApiServiceError.internalError(message: "No transaction", error: error))
                 }
             }
         }

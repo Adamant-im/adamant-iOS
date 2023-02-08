@@ -196,15 +196,15 @@ final class ChatViewModel: NSObject {
     }
     
     func loadTransactionStatusIfNeeded(id: String, forceUpdate: Bool) {
-transactionStatusTask = Task {
-        guard
-            let transaction = chatTransactions.first(where: { $0.chatMessageId == id }),
-            let richMessageTransaction = transaction as? RichMessageTransaction,
-            richMessageTransaction.transactionStatus?.isFinal != true || forceUpdate
-        else { return }
-        
-        chatsProvider.updateStatus(for: richMessageTransaction, resetBeforeUpdate: forceUpdate)
-}
+        transactionStatusTask = Task {
+            guard
+                let transaction = chatTransactions.first(where: { $0.chatMessageId == id }),
+                let richMessageTransaction = transaction as? RichMessageTransaction,
+                richMessageTransaction.transactionStatus?.isFinal != true || forceUpdate
+            else { return }
+            
+            await chatsProvider.updateStatus(for: richMessageTransaction, resetBeforeUpdate: forceUpdate)
+        }
     }
     
     func preserveMessage(_ message: String) {
@@ -343,12 +343,6 @@ extension ChatViewModel: NSFetchedResultsControllerDelegate {
 }
 
 private extension ChatViewModel {
-    var isNeedToLoadMoreMessages: Bool {
-        guard let address = chatroom?.partner?.address else { return false }
-
-        return chatsProvider.chatLoadedMessages[address] ?? .zero < chatsProvider.chatMaxMessages[address] ?? .zero
-    }
-    
     func setupObservers() {
         $inputText
             .removeDuplicates()
