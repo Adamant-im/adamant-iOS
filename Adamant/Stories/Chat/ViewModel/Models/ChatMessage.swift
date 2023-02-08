@@ -7,7 +7,6 @@
 //
 
 import MessageKit
-import MarkdownKit
 import UIKit
 
 struct ChatMessage: Identifiable, Equatable {
@@ -16,7 +15,10 @@ struct ChatMessage: Identifiable, Equatable {
     let senderModel: ChatSender
     let status: Status
     let content: Content
+    let backgroundColor: ChatMessageBackgroundColor
     let bottomString: ComparableAttributedString?
+    let dateHeader: ComparableAttributedString?
+    let topSpinnerOn: Bool
     
     static let `default` = Self(
         id: "",
@@ -24,7 +26,10 @@ struct ChatMessage: Identifiable, Equatable {
         senderModel: .default,
         status: .failed,
         content: .default,
-        bottomString: nil
+        backgroundColor: .failed,
+        bottomString: nil,
+        dateHeader: nil,
+        topSpinnerOn: false
     )
 }
 
@@ -36,17 +41,10 @@ extension ChatMessage {
     }
     
     enum Content: Equatable {
-        case message(String)
-        case transaction(Transaction)
+        case message(ComparableAttributedString)
+        case transaction(ChatTransactionContainerView.Model)
         
-        static let `default` = Self.message("")
-    }
-    
-    struct Transaction: Equatable {
-        let icon: UIImage
-        let amount: Decimal
-        let currency: String
-        let comment: String?
+        static let `default` = Self.message(.init(string: .init()))
     }
 }
 
@@ -57,8 +55,7 @@ extension ChatMessage: MessageType {
     var kind: MessageKind {
         switch content {
         case let .message(text):
-            let markdownText = Self.markdownParser.parse(text)
-            return .attributedText(markdownText)
+            return .attributedText(text.string)
         case let .transaction(model):
             return .custom(model)
         }
@@ -75,28 +72,4 @@ extension MessageType {
             return .default
         }
     }
-}
-
-private extension ChatMessage {
-    static let markdownParser = MarkdownParser(
-        font: .adamantChatDefault,
-        color: .adamant.primary,
-        enabledElements: [
-            .header,
-            .list,
-            .quote,
-            .bold,
-            .italic,
-            .code,
-            .strikethrough
-        ],
-        customElements: [
-            MarkdownSimpleAdm(),
-            MarkdownLinkAdm(),
-            MarkdownAdvancedAdm(
-                font: .adamantChatDefault,
-                color: .adamant.active
-            )
-        ]
-    )
 }

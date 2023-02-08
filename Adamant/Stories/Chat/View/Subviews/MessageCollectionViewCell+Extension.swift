@@ -12,7 +12,7 @@ import Foundation
 extension MessageCollectionViewCell {
     @objc func remove() {
         guard
-            let collectionView = superview as? ChatMessagesCollectionView<ChatMessage>,
+            let collectionView = superview as? ChatMessagesCollectionView,
             let indexPath = collectionView.indexPath(for: self)
         else { return }
         
@@ -21,7 +21,7 @@ extension MessageCollectionViewCell {
 
     @objc func report() {
         guard
-            let collectionView = superview as? ChatMessagesCollectionView<ChatMessage>,
+            let collectionView = superview as? ChatMessagesCollectionView,
             let indexPath = collectionView.indexPath(for: self)
         else { return }
         

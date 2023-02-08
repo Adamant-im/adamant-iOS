@@ -218,7 +218,7 @@ protocol ChatsProvider: DataProvider, Actor {
     func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult
     func blockChat(with address: String)
     func removeMessage(with id: String)
-    func updateStatus(for transaction: RichMessageTransaction)
+    func updateStatus(for transaction: RichMessageTransaction, resetBeforeUpdate: Bool)
     func markChatAsRead(chatroom: Chatroom)
     func removeChatPositon(for address: String)
     func setChatPositon(for address: String, position: Double?)

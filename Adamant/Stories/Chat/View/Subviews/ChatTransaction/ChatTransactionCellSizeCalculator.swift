@@ -28,16 +28,13 @@ final class ChatTransactionCellSizeCalculator: CellSizeCalculator {
     }
     
     override func sizeForItem(at indexPath: IndexPath) -> CGSize {
-        let height = getMessages()[indexPath.section]
-            .fullModel
-            .makeTransactionViewModel(
-                currentSender: getCurrentSender(),
-                status: nil,
-                onTap: {},
-                forceUpdateStatusAction: {}
-            )
-            .height(for: messagesFlowLayout.itemWidth)
-
-        return .init(width: messagesFlowLayout.itemWidth, height: height)
+        guard
+            case let .transaction(model) = getMessages()[indexPath.section].fullModel.content
+        else { return .zero }
+        
+        return .init(
+            width: messagesFlowLayout.itemWidth,
+            height: model.height(for: messagesFlowLayout.itemWidth)
+        )
     }
 }

@@ -1597,11 +1597,12 @@ extension AdamantChatsProvider {
         }
     }
     
-    func updateStatus(for transaction: RichMessageTransaction) {
+    func updateStatus(for transaction: RichMessageTransaction, resetBeforeUpdate: Bool) {
         Task {
             try await richTransactionStatusService.update(
                 transaction,
-                parentContext: stack.container.viewContext
+                parentContext: stack.container.viewContext,
+                resetBeforeUpdate: resetBeforeUpdate
             )
         }
     }

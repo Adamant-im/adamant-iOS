@@ -28,9 +28,9 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
         at indexPath: IndexPath,
         in _: MessagesCollectionView
     ) -> CGFloat {
-        viewModel.isNeedToDisplayDateHeader(sentDate: message.sentDate, index: indexPath.section)
-            ? labelHeight
-            : .zero
+        message.fullModel.dateHeader == nil
+            ? .zero
+            : labelHeight
     }
     
     func messageTopLabelHeight(
@@ -91,7 +91,7 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
         for section: Int,
         in messagesCollectionView: MessagesCollectionView
     ) -> CGSize {
-        section == .zero && viewModel.isNeedToLoadMoreMessages
+        viewModel.messages[section].topSpinnerOn
             ? SpinnerView.size
             : .zero
     }

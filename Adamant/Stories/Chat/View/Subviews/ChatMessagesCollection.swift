@@ -9,10 +9,8 @@
 import MessageKit
 import UIKit
 
-final class ChatMessagesCollectionView<
-    SectionModel: Identifiable & Equatable
->: MessagesCollectionView {
-    private var currentModels = [SectionModel]()
+final class ChatMessagesCollectionView: MessagesCollectionView {
+    private var currentModels = [ChatMessage]()
     
     var reportMessageAction: ((IndexPath) -> Void)?
     var removeMessageAction: ((IndexPath) -> Void)?
@@ -24,6 +22,10 @@ final class ChatMessagesCollectionView<
     
     var fullInsets: UIEdgeInsets {
         safeAreaInsets + contentInset
+    }
+    
+    var minVerticalOffset: CGFloat {
+        -fullInsets.top
     }
     
     /// To avoid insets changing by MessageKit
@@ -47,7 +49,7 @@ final class ChatMessagesCollectionView<
     }
     
     @MainActor
-    func reloadData(newModels: [SectionModel]) {
+    func reloadData(newModels: [ChatMessage]) {
         guard newModels.last == currentModels.last || currentModels.isEmpty else {
             return applyNewModels(newModels)
         }
@@ -84,17 +86,27 @@ private extension ChatMessagesCollectionView {
         contentHeightWithBottomInsets - bounds.height
     }
     
-    var minVerticalOffset: CGFloat {
-        -fullInsets.top
-    }
-    
     var contentHeightWithBottomInsets: CGFloat {
         contentSize.height + fullInsets.bottom
     }
     
-    func applyNewModels(_ newModels: [SectionModel]) {
-        reloadData()
-        layoutIfNeeded()
+    func applyNewModels(_ newModels: [ChatMessage]) {
+        let fullUpdate = zip(newModels, currentModels).contains {
+            switch ($0.0.content, $0.1.content) {
+            case (.transaction, .transaction):
+                return false
+            default:
+                return $0.0 != $0.1
+            }
+        } || newModels.count != currentModels.count
+        
+        if fullUpdate {
+            reloadData()
+            layoutIfNeeded()
+        } else {
+            reloadTransactionCellsOnly(newModels)
+        }
+
         currentModels = newModels
     }
     
@@ -105,15 +117,19 @@ private extension ChatMessagesCollectionView {
     func setVerticalContentOffset(_ offset: CGFloat, safely: Bool) {
         guard maxVerticalOffset > .zero else { return }
         
-        var offset = offset
-        if safely {
-            if offset < .zero {
-                offset = minVerticalOffset
-            } else if offset > maxVerticalOffset {
-                offset = maxVerticalOffset
-            }
+        contentOffset.y = safely && offset > maxVerticalOffset
+            ? maxVerticalOffset
+            : offset
+    }
+    
+    func reloadTransactionCellsOnly(_ newModels: [ChatMessage]) {
+        zip(visibleCells, indexPathsForVisibleItems).forEach { cell, indexPath in
+            guard
+                let cell = cell as? ChatViewController.TransactionCell,
+                case let .transaction(model) = newModels[indexPath.section].content
+            else { return }
+            
+            cell.wrappedView.model = model
         }
-        
-        contentOffset.y = offset
     }
 }

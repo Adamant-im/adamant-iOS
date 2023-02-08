@@ -35,7 +35,7 @@ final class ChatDisplayManager: MessagesDisplayDelegate {
         at _: IndexPath,
         in _: MessagesCollectionView
     ) -> UIColor {
-        message.fullModel.getBackgroundColor(currentSender: viewModel.sender)
+        message.fullModel.backgroundColor.uiColor
     }
     
     func textColor(
@@ -53,7 +53,7 @@ final class ChatDisplayManager: MessagesDisplayDelegate {
             for: indexPath
         )
         
-        if indexPath.section == .zero, viewModel.isNeedToLoadMoreMessages {
+        if viewModel.messages[indexPath.section].topSpinnerOn {
             header.wrappedView.startAnimating()
         } else {
             header.wrappedView.stopAnimating()
@@ -96,23 +96,6 @@ final class ChatDisplayManager: MessagesDisplayDelegate {
             accessoryView.addSubview(icon)
         case .delivered, .pending:
             accessoryView.subviews.forEach { $0.removeFromSuperview() }
-        }
-    }
-}
-
-extension ChatMessage {
-    func getBackgroundColor(currentSender: SenderType) -> UIColor {
-        guard sender.senderId == currentSender.senderId else {
-            return .adamant.chatRecipientBackground
-        }
-        
-        switch status {
-        case .delivered:
-            return .adamant.chatSenderBackground
-        case .pending:
-            return .adamant.pendingChatBackground
-        case .failed:
-            return .adamant.failChatBackground
         }
     }
 }

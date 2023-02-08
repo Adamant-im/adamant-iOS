@@ -223,6 +223,8 @@
 		9390C5032976B42800270CDF /* ChatDialogManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9390C5022976B42800270CDF /* ChatDialogManager.swift */; };
 		9390C5052976B53000270CDF /* ChatDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9390C5042976B53000270CDF /* ChatDialog.swift */; };
 		93996A972968209C008D080B /* ChatMessagesCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93996A962968209C008D080B /* ChatMessagesCollection.swift */; };
+		93A118512993167500E144CC /* ChatMessageBackgroundColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A118502993167500E144CC /* ChatMessageBackgroundColor.swift */; };
+		93A118532993241D00E144CC /* ChatMessagesListService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A118522993241D00E144CC /* ChatMessagesListService.swift */; };
 		93A91FD1297972B7001DB1F8 /* ChatScrollDownButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A91FD0297972B7001DB1F8 /* ChatScrollDownButton.swift */; };
 		93A91FD329799298001DB1F8 /* ChatStartPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A91FD229799298001DB1F8 /* ChatStartPosition.swift */; };
 		93B19AF4296317FF005305C0 /* CGSize+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93F391472962EEDC00BFD6AE /* CGSize+adamant.swift */; };
@@ -915,6 +917,8 @@
 		9390C5022976B42800270CDF /* ChatDialogManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatDialogManager.swift; sourceTree = "<group>"; };
 		9390C5042976B53000270CDF /* ChatDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatDialog.swift; sourceTree = "<group>"; };
 		93996A962968209C008D080B /* ChatMessagesCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesCollection.swift; sourceTree = "<group>"; };
+		93A118502993167500E144CC /* ChatMessageBackgroundColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessageBackgroundColor.swift; sourceTree = "<group>"; };
+		93A118522993241D00E144CC /* ChatMessagesListService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesListService.swift; sourceTree = "<group>"; };
 		93A91FD0297972B7001DB1F8 /* ChatScrollDownButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatScrollDownButton.swift; sourceTree = "<group>"; };
 		93A91FD229799298001DB1F8 /* ChatStartPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatStartPosition.swift; sourceTree = "<group>"; };
 		93B9DBD129803179004F8BFF /* MessageCollectionViewCell+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "MessageCollectionViewCell+Extension.swift"; sourceTree = "<group>"; };
@@ -1469,6 +1473,7 @@
 				9322E874297042F000B8357C /* ChatSender.swift */,
 				9322E876297042FA00B8357C /* ChatMessage.swift */,
 				9390C5042976B53000270CDF /* ChatDialog.swift */,
+				93A118502993167500E144CC /* ChatMessageBackgroundColor.swift */,
 				93A91FD229799298001DB1F8 /* ChatStartPosition.swift */,
 			);
 			path = Models;
@@ -1513,8 +1518,9 @@
 			children = (
 				9322E87C2970435C00B8357C /* Models */,
 				938F7D682955C9EC001915CA /* ChatViewModel.swift */,
-				9322E87A2970431200B8357C /* ChatMessageFactory.swift */,
 				932B34E82974AA4A002A75BA /* ChatPreservationDelegate.swift */,
+				93A118522993241D00E144CC /* ChatMessagesListService.swift */,
+				9322E87A2970431200B8357C /* ChatMessageFactory.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -2913,6 +2919,7 @@
 				E9D664D322A00C8100733F8A /* AdamantLocalized.swift in Sources */,
 				E9256F5F2034C21100DE86E9 /* String+localized.swift in Sources */,
 				6414C18E217DF43100373FA6 /* String+adamant.swift in Sources */,
+				93A118532993241D00E144CC /* ChatMessagesListService.swift in Sources */,
 				E908472A2196FEA80095825D /* RichMessageTransaction+CoreDataClass.swift in Sources */,
 				4E9EE86F28CE793D008359F7 /* SafeDecimalRow.swift in Sources */,
 				64A223D620F760BB005157CB /* Localization.swift in Sources */,
@@ -2922,6 +2929,7 @@
 				9377FBDF296C2A2F00C9211B /* ChatTransactionContentView.swift in Sources */,
 				E9960B3621F5154300C840A8 /* DummyAccount+CoreDataProperties.swift in Sources */,
 				4186B332294200B4006594A3 /* BtcWalletService+DynamicConstants.swift in Sources */,
+				93A118512993167500E144CC /* ChatMessageBackgroundColor.swift in Sources */,
 				E9CAE8D22018AA7700345E76 /* AdamantApi+Accounts.swift in Sources */,
 				648CE3A6229AD1CD0070A2CC /* DashWalletService+Send.swift in Sources */,
 				E987024920C2B1F700E393F4 /* AdamantChatsProvider+fakeMessages.swift in Sources */,
