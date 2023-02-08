@@ -56,12 +56,14 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var transactionStatuses = [String: TransactionStatus]()
     
     var startPosition: ChatStartPosition? {
-        if let messageIdToShow = messageIdToShow {
-            return .messageId(messageIdToShow)
+        get async {
+            if let messageIdToShow = messageIdToShow {
+                return .messageId(messageIdToShow)
+            }
+            
+            guard let address = chatroom?.partner?.address else { return nil }
+            return await chatsProvider.getChatPositon(for: address).map { .offset(.init($0)) }
         }
-        
-        guard let address = chatroom?.partner?.address else { return nil }
-        return chatsProvider.chatPositon[address].map { .offset(.init($0)) }
     }
     
     var freeTokensURL: URL? {
@@ -76,11 +78,14 @@ final class ChatViewModel: NSObject {
         return url
     }
     
-    var isNeedToLoadMoreMessages: Bool {
-        guard let address = chatroom?.partner?.address else { return false }
-
-        return chatsProvider.chatLoadedMessages[address] ?? .zero < chatsProvider.chatMaxMessages[address] ?? .zero
-    }
+    var isNeedToLoadMoreMessages: Bool = false
+    
+    private var firstLoadTask: Task<(), Never>?
+    private var mooreLoadTask: Task<(), Never>?
+    private var transactionStatusTask: Task<(), Never>?
+    private var cancelMessageTask: Task<(), Never>?
+    private var retrySendMessageTask: Task<(), Never>?
+    private var sendMessageTask: Task<(), Never>?
     
     init(
         chatsProvider: ChatsProvider,
@@ -104,6 +109,15 @@ final class ChatViewModel: NSObject {
         self.accountProvider = accountProvider
         super.init()
         setupObservers()
+    }
+    
+    deinit {
+        firstLoadTask?.cancel()
+        mooreLoadTask?.cancel()
+        transactionStatusTask?.cancel()
+        cancelMessageTask?.cancel()
+        retrySendMessageTask?.cancel()
+        sendMessageTask?.cancel()
     }
     
     func setup(
@@ -135,23 +149,29 @@ final class ChatViewModel: NSObject {
     }
     
     func loadFirstMessagesIfNeeded() {
-        guard let address = chatroom?.partner?.address else { return }
-        
-        if address == AdamantContacts.adamantWelcomeWallet.name || chatsProvider.isChatLoaded[address] == true {
-            updateTransactions(performFetch: true)
-        } else {
-            loadMessages(address: address, offset: .zero, fullscreenLoading: true)
+        firstLoadTask = Task {
+            guard let address = chatroom?.partner?.address else { return }
+            
+            let isChatLoading = await chatsProvider.isChatLoaded(with: address)
+            
+            if address == AdamantContacts.adamantWelcomeWallet.name || isChatLoading {
+                await updateTransactions(performFetch: true)
+            } else {
+                await loadMessages(address: address, offset: .zero, fullscreenLoading: true)
+            }
         }
     }
     
     func loadMoreMessagesIfNeeded() {
-        guard
-            let address = chatroom?.partner?.address,
-            isNeedToLoadMoreMessages
-        else { return }
-        
-        let offset = chatsProvider.chatLoadedMessages[address] ?? .zero
-        loadMessages(address: address, offset: offset, fullscreenLoading: false)
+        mooreLoadTask = Task {
+            guard
+                let address = chatroom?.partner?.address,
+                isNeedToLoadMoreMessages
+            else { return }
+            
+            let offset = await chatsProvider.chatLoadedMessages[address] ?? .zero
+            await loadMessages(address: address, offset: offset, fullscreenLoading: false)
+        }
     }
     
     func isNeedToDisplayDateHeader(sentDate: Date, index: Int) -> Bool {
@@ -165,39 +185,43 @@ final class ChatViewModel: NSObject {
     }
     
     func sendMessage(text: String) {
-        let message: AdamantMessage = markdownParser.parse(text).length == text.count
+        sendMessageTask = Task {
+            let message: AdamantMessage = markdownParser.parse(text).length == text.count
             ? .text(text)
             : .markdownText(text)
-        
-        guard
-            let partnerAddress = chatroom?.partner?.address,
-            validateSendingMessage(message: message)
-        else { return }
-        
-        chatsProvider.sendMessage(
-            message,
-            recipientId: partnerAddress,
-            from: chatroom
-        ) { [weak self] result in
-            DispatchQueue.onMainAsync {
-                self?.handleMessageSendingResult(result: result, sentText: text)
+            
+            guard
+                let partnerAddress = chatroom?.partner?.address,
+                await validateSendingMessage(message: message)
+            else { return }
+            
+            do {
+                _ = try await chatsProvider.sendMessage(
+                    message,
+                    recipientId: partnerAddress,
+                    from: chatroom
+                )
+            } catch {
+                await handleMessageSendingError(error: error, sentText: text)
             }
         }
     }
     
     func loadTransactionStatusIfNeeded(id: String, forceUpdate: Bool) {
-        guard
-            let transaction = chatTransactions.first(where: { $0.chatMessageId == id }),
-            let richMessageTransaction = transaction as? RichMessageTransaction
-        else { return }
-        
-        if forceUpdate {
-            transactionStatuses[id] = nil
-        } else if richMessageTransaction.transactionStatus?.isFinal == true {
-            return
+        transactionStatusTask = Task {
+            guard
+                let transaction = chatTransactions.first(where: { $0.chatMessageId == id }),
+                let richMessageTransaction = transaction as? RichMessageTransaction
+            else { return }
+            
+            if forceUpdate {
+                transactionStatuses[id] = nil
+            } else if richMessageTransaction.transactionStatus?.isFinal == true {
+                return
+            }
+            
+            await chatsProvider.updateStatus(for: richMessageTransaction)
         }
-        
-        chatsProvider.updateStatus(for: richMessageTransaction)
     }
     
     func preserveMessage(_ message: String) {
@@ -205,15 +229,18 @@ final class ChatViewModel: NSObject {
         preservationDelegate?.preserveMessage(message, forAddress: partnerAddress)
     }
     
+    @MainActor
     func blockChat() {
-        guard let address = chatroom?.partner?.address else {
-            return assertionFailure("Can't block user without address")
+        Task {
+            guard let address = chatroom?.partner?.address else {
+                return assertionFailure("Can't block user without address")
+            }
+            
+            chatroom?.isHidden = true
+            try? chatroom?.managedObjectContext?.save()
+            await chatsProvider.blockChat(with: address)
+            _closeScreen.send()
         }
-        
-        chatroom?.isHidden = true
-        try? chatroom?.managedObjectContext?.save()
-        chatsProvider.blockChat(with: address)
-        _closeScreen.send()
     }
     
     func setNewName(_ newName: String) {
@@ -226,28 +253,35 @@ final class ChatViewModel: NSObject {
     }
     
     func saveChatOffset(_ offset: CGFloat?) {
-        guard let address = chatroom?.partner?.address else { return }
-        chatsProvider.chatPositon[address] = offset.map { .init($0) }
+        Task {
+            guard let address = chatroom?.partner?.address else { return }
+            await chatsProvider.setChatPositon(for: address, position: offset.map { Double.init($0) })
+        }
     }
     
     func entireChatWasRead() {
-        guard
-            let chatroom = chatroom,
-            chatroom.hasUnreadMessages == true
-        else { return }
-        
-        chatsProvider.markChatAsRead(chatroom: chatroom)
+        Task {
+            guard
+                let chatroom = chatroom,
+                chatroom.hasUnreadMessages == true
+            else { return }
+            
+            await chatsProvider.markChatAsRead(chatroom: chatroom)
+        }
     }
     
     func hideMessage(id: String) {
-        guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
-        else { return }
-        
-        transaction.isHidden = true
-        try? transaction.managedObjectContext?.save()
-        
-        chatroom?.updateLastTransaction()
-        transaction.transactionId.map { chatsProvider.removeMessage(with: $0) }
+        Task {
+            guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
+            else { return }
+            
+            transaction.isHidden = true
+            try? transaction.managedObjectContext?.save()
+            
+            chatroom?.updateLastTransaction()
+            guard let id = transaction.transactionId else { return }
+            await chatsProvider.removeMessage(with: id)
+        }
     }
     
     func didSelectURL(_ url: URL) {
@@ -266,51 +300,60 @@ final class ChatViewModel: NSObject {
     }
     
     func process(adm: AdamantAddress, action: AddressChatShareType) {
-        if action == .send {
-            didTapAdmSend.send(adm)
-            return
+        Task {
+            if action == .send {
+                didTapAdmSend.send(adm)
+                return
+            }
+            
+            guard let room = await self.chatsProvider.getChatroom(for: adm.address) else {
+                self.findAccount(with: adm.address, name: adm.name, message: adm.message)
+                return
+            }
+            
+            self.startNewChat(with: room, name: adm.name, message: adm.message)
         }
-        
-        guard let room = self.chatsProvider.getChatroom(for: adm.address) else {
-            self.findAccount(with: adm.address, name: adm.name, message: adm.message)
-            return
-        }
-        
-        self.startNewChat(with: room, name: adm.name, message: adm.message)
     }
     
     func cancelMessage(id: String) {
-        guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
-        else { return }
-        
-        chatsProvider.cancelMessage(transaction) { [dialog] result in
-            switch result {
-            case let .failure(error):
-                dialog.send(.richError(error))
-            case .invalidTransactionStatus:
-                dialog.send(.warning(.adamantLocalized.chat.cancelError))
-            case .success:
-                break
+        cancelMessageTask = Task {
+            guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
+            else { return }
+            
+            do {
+                try await chatsProvider.cancelMessage(transaction)
+            } catch {
+                switch error as? ChatsProviderError {
+                case .invalidTransactionStatus:
+                    dialog.send(.warning(.adamantLocalized.chat.cancelError))
+                default:
+                    dialog.send(.richError(error))
+                }
             }
         }
     }
     
     func retrySendMessage(id: String) {
-        guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
-        else { return }
-        
-        chatsProvider.retrySendMessage(transaction) { [dialog] result in
-            switch result {
-            case let .failure(error):
-                dialog.send(.richError(error))
-            case .success, .invalidTransactionStatus:
-                break
+        retrySendMessageTask = Task {
+            guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
+            else { return }
+            
+            do {
+                try await chatsProvider.retrySendMessage(transaction)
+            } catch {
+                switch error as? ChatsProviderError {
+                case .invalidTransactionStatus:
+                    break
+                default:
+                    dialog.send(.richError(error))
+                }
             }
         }
     }
 }
 
 extension ChatViewModel: NSFetchedResultsControllerDelegate {
+    @MainActor
     func controllerDidChangeContent(_: NSFetchedResultsController<NSFetchRequestResult>) {
         updateTransactions(performFetch: false)
     }
@@ -330,23 +373,24 @@ private extension ChatViewModel {
             .store(in: &subscriptions)
     }
     
-    func loadMessages(address: String, offset: Int, fullscreenLoading: Bool) {
+    @MainActor
+    func loadMessages(address: String, offset: Int, fullscreenLoading: Bool) async {
         guard !isLoading else { return }
         
         isLoading = true
         self.fullscreenLoading = fullscreenLoading
-        chatsProvider.getChatMessages(
+        
+        await chatsProvider.getChatMessages(
             with: address,
             offset: offset
-        ) { [weak self] in
-            DispatchQueue.onMainAsync {
-                self?.updateTransactions(performFetch: true)
-                self?.isLoading = false
-                self?.fullscreenLoading = false
-            }
-        }
+        )
+        
+        updateTransactions(performFetch: true)
+        isLoading = false
+        self.fullscreenLoading = false
     }
     
+    @MainActor
     func updateTransactions(performFetch: Bool) {
         if performFetch {
             try? controller?.performFetch()
@@ -380,6 +424,8 @@ private extension ChatViewModel {
         var minTimestamp: TimeInterval?
         var expireDate: Date?
         
+        checkIfNeedToLoadMooreMessages()
+        
         messages = chatTransactions.map {
             let message = chatMessageFactory.makeMessage($0, expireDate: &expireDate)
             let timestamp = expireDate?.timeIntervalSince1970
@@ -394,6 +440,16 @@ private extension ChatViewModel {
         let currentTimestamp = Date().timeIntervalSince1970
         if let minTimestamp = minTimestamp, currentTimestamp < minTimestamp {
             setupMessagesUpdateTimer(interval: minTimestamp - currentTimestamp)
+        }
+    }
+    
+    func checkIfNeedToLoadMooreMessages() {
+        Task {
+            guard let address = chatroom?.partner?.address else {
+                isNeedToLoadMoreMessages = false
+                return
+            }
+            isNeedToLoadMoreMessages = await chatsProvider.chatLoadedMessages[address] ?? .zero < chatsProvider.chatMaxMessages[address] ?? .zero
         }
     }
     
@@ -414,8 +470,8 @@ private extension ChatViewModel {
         preservationDelegate = nil
     }
     
-    func validateSendingMessage(message: AdamantMessage) -> Bool {
-        let validationStatus = chatsProvider.validateMessage(message)
+    func validateSendingMessage(message: AdamantMessage) async -> Bool {
+        let validationStatus = await chatsProvider.validateMessage(message)
         
         switch validationStatus {
         case .isValid:
@@ -428,26 +484,22 @@ private extension ChatViewModel {
         }
     }
     
-    func handleMessageSendingResult(result: ChatsProviderResultWithTransaction, sentText: String) {
-        switch result {
-        case .success:
-            break
-        case let .failure(error):
-            switch error {
-            case .messageNotValid:
-                inputText = sentText
-            case .notEnoughMoneyToSend:
-                inputText = sentText
-                guard transfersProvider.hasTransactions else {
-                    dialog.send(.freeTokenAlert)
-                    return
-                }
-            case .accountNotFound, .accountNotInitiated, .dependencyError, .internalError, .networkError, .notLogged, .requestCancelled, .serverError, .transactionNotFound:
-                break
+    @MainActor
+    func handleMessageSendingError(error: Error, sentText: String) async {
+        switch error as? ChatsProviderError {
+        case .messageNotValid:
+            inputText = sentText
+        case .notEnoughMoneyToSend:
+            inputText = sentText
+            guard await transfersProvider.hasTransactions else {
+                dialog.send(.freeTokenAlert)
+                return
             }
-            
-            dialog.send(.richError(error))
+        case .accountNotFound, .accountNotInitiated, .dependencyError, .internalError, .networkError, .notLogged, .requestCancelled, .serverError, .transactionNotFound, .invalidTransactionStatus, .none:
+            break
         }
+        
+        dialog.send(.richError(error))
     }
     
     func inputTextUpdated() {

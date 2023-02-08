@@ -97,7 +97,6 @@ actor AdamantChatsProvider: ChatsProvider {
         for await notification in NotificationCenter.default.notifications(
             named: .AdamantAccountService.userLoggedIn
         ) {
-            print("userLoggedInAction")
             userLoggedInAction(notification)
         }
         
@@ -603,6 +602,10 @@ extension AdamantChatsProvider {
     func isChatLoading(with addressRecipient: String) -> Bool {
         return chatsLoading.contains(addressRecipient)
     }
+    
+    func isChatLoaded(with addressRecipient: String) -> Bool {
+        return isChatLoaded[addressRecipient] ?? false
+    }
 }
 
 // MARK: - Sending messages {
@@ -626,6 +629,9 @@ extension AdamantChatsProvider {
             throw ChatsProviderError.messageNotValid(.tooLong)
         }
         
+        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        context.parent = stack.container.viewContext
+        
         let transactionLocaly: ChatTransaction
         
         switch message {
@@ -636,7 +642,8 @@ extension AdamantChatsProvider {
                 senderId: loggedAccount.address,
                 recipientId: recipientId,
                 keypair: keypair,
-                type: message.chatType
+                type: message.chatType,
+                context: context
             )
         case .markdownText(let text):
             transactionLocaly = try await sendTextMessageLocaly(
@@ -645,7 +652,8 @@ extension AdamantChatsProvider {
                 senderId: loggedAccount.address,
                 recipientId: recipientId,
                 keypair: keypair,
-                type: message.chatType
+                type: message.chatType,
+                context: context
             )
         case .richMessage(let payload):
             transactionLocaly = try await sendRichMessageLocaly(
@@ -653,7 +661,8 @@ extension AdamantChatsProvider {
                 richType: payload.type,
                 senderId: loggedAccount.address,
                 recipientId: recipientId,
-                keypair: keypair
+                keypair: keypair,
+                context: context
             )
         }
         
@@ -661,7 +670,8 @@ extension AdamantChatsProvider {
             senderId: loggedAccount.address,
             recipientId: recipientId,
             transaction: transactionLocaly,
-            keypair: keypair
+            keypair: keypair,
+            context: context
         )
         
         return transaction
@@ -671,7 +681,7 @@ extension AdamantChatsProvider {
         chatPositon.removeValue(forKey: address)
     }
     
-    func setChatPositon(for address: String, position: Double) {
+    func setChatPositon(for address: String, position: Double?) {
         chatPositon[address] = position
     }
     
@@ -700,6 +710,9 @@ extension AdamantChatsProvider {
             throw ChatsProviderError.messageNotValid(.tooLong)
         }
         
+        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        context.parent = stack.container.viewContext
+        
         let transactionLocaly: ChatTransaction
         
         switch message {
@@ -711,6 +724,7 @@ extension AdamantChatsProvider {
                 recipientId: recipientId,
                 keypair: keypair,
                 type: message.chatType,
+                context: context,
                 from: chatroom
             )
         case .markdownText(let text):
@@ -721,6 +735,7 @@ extension AdamantChatsProvider {
                 recipientId: recipientId,
                 keypair: keypair,
                 type: message.chatType,
+                context: context,
                 from: chatroom
             )
         case .richMessage(let payload):
@@ -730,6 +745,7 @@ extension AdamantChatsProvider {
                 senderId: loggedAccount.address,
                 recipientId: recipientId,
                 keypair: keypair,
+                context: context,
                 from: chatroom
             )
         }
@@ -739,6 +755,7 @@ extension AdamantChatsProvider {
             recipientId: recipientId,
             transaction: transactionLocaly,
             keypair: keypair,
+            context: context,
             from: chatroom
         )
         
@@ -752,11 +769,9 @@ extension AdamantChatsProvider {
         recipientId: String,
         keypair: Keypair,
         type: ChatType,
+        context: NSManagedObjectContext,
         from chatroom: Chatroom? = nil
     ) async throws -> ChatTransaction {
-        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        context.parent = stack.container.viewContext
-        
         let transaction = MessageTransaction(context: context)
         transaction.date = Date() as NSDate
         transaction.recipientId = recipientId
@@ -795,11 +810,9 @@ extension AdamantChatsProvider {
         senderId: String,
         recipientId: String,
         keypair: Keypair,
+        context: NSManagedObjectContext,
         from chatroom: Chatroom? = nil
     ) async throws -> ChatTransaction {
-        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        context.parent = stack.container.viewContext
-        
         let type = ChatType.richMessage
         
         let transaction = RichMessageTransaction(context: context)
@@ -841,11 +854,9 @@ extension AdamantChatsProvider {
         recipientId: String,
         transaction: ChatTransaction,
         keypair: Keypair,
+        context: NSManagedObjectContext,
         from chatroom: Chatroom? = nil
     ) async throws -> ChatTransaction {
-        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        context.parent = stack.container.viewContext
-       
         let type = ChatType.richMessage
         
         let sendTransaction = try await prepareAndSendChatTransaction(
@@ -1058,7 +1069,7 @@ extension AdamantChatsProvider {
         }
         
         // MARK: 2. Create
-        var signedTransaction = apiService.createSendTransaction(
+        let signedTransaction = apiService.createSendTransaction(
             senderId: senderId,
             recipientId: recipientId,
             keypair: keypair,
@@ -1084,8 +1095,7 @@ extension AdamantChatsProvider {
             
             if let index = unconfirmedTransactionsBySignature.firstIndex(
                 of: signedTransaction.signature
-               )
-            {
+            ) {
                 unconfirmedTransactionsBySignature.remove(at: index)
             }
             
@@ -1160,7 +1170,7 @@ extension AdamantChatsProvider {
         }
     }
     
-    func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction> {
+    nonisolated func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction> {
         guard let context = chatroom.managedObjectContext else {
             fatalError()
         }
@@ -1350,8 +1360,15 @@ extension AdamantChatsProvider {
             
             for trs in transactions {
                 transactionInProgress.append(trs.transaction.id)
-                if let objectId = unconfirmedTransactions[trs.transaction.id], let unconfirmed = context.object(with: objectId) as? ChatTransaction {
-                    confirmTransaction(unconfirmed, id: trs.transaction.id, height: Int64(trs.transaction.height), blockId: trs.transaction.blockId, confirmations: trs.transaction.confirmations)
+                if let objectId = unconfirmedTransactions[trs.transaction.id],
+                   let unconfirmed = context.object(with: objectId) as? ChatTransaction {
+                    confirmTransaction(
+                        unconfirmed,
+                        id: trs.transaction.id,
+                        height: Int64(trs.transaction.height),
+                        blockId: trs.transaction.blockId,
+                        confirmations: trs.transaction.confirmations
+                    )
                     
                     let h = Int64(trs.transaction.height)
                     if height < h {
@@ -1373,13 +1390,14 @@ extension AdamantChatsProvider {
                 }
                 
                 if let partner = privateContext.object(with: account.objectID) as? BaseAccount,
-                   let chatTransaction = transactionService.chatTransaction(from: trs.transaction,
-                                                                            isOutgoing: trs.isOut,
-                                                                            publicKey: publicKey,
-                                                                            privateKey: privateKey,
-                                                                            partner: partner,
-                                                                            removedMessages: self.removedMessages,
-                                                                            context: privateContext
+                   let chatTransaction = transactionService.chatTransaction(
+                    from: trs.transaction,
+                    isOutgoing: trs.isOut,
+                    publicKey: publicKey,
+                    privateKey: privateKey,
+                    partner: partner,
+                    removedMessages: self.removedMessages,
+                    context: privateContext
                    ) {
                     if height < chatTransaction.height {
                         height = chatTransaction.height
@@ -1474,9 +1492,7 @@ extension AdamantChatsProvider {
                 // MARK: 6. Update lastTransaction
                 let viewContextChatrooms = Set<Chatroom>(partners.keys.compactMap { $0.chatroom }).compactMap { self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom }
                 
-                DispatchQueue.main.async {
-                    viewContextChatrooms.forEach { $0.updateLastTransaction() }
-                }
+                viewContextChatrooms.forEach { $0.updateLastTransaction() }
             } catch {
                 print(error)
             }
@@ -1485,12 +1501,16 @@ extension AdamantChatsProvider {
         // MARK: 7. Last message height
         if let lastHeight = receivedLastHeight {
             if lastHeight < height {
-                self.receivedLastHeight = height
+                updateLastHeight(height: height)
             }
         } else {
-            receivedLastHeight = height
+            updateLastHeight(height: height)
         }
         
+    }
+    
+    func updateLastHeight(height: Int64) {
+        receivedLastHeight = height
     }
 }
 

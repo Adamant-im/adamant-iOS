@@ -112,8 +112,8 @@ final class ChatViewController: MessagesViewController {
         viewModel.preserveMessage(inputBar.text)
         viewModel.saveChatOffset(
             isScrollPositionNearlyTheBottom
-                ? nil
-                : chatMessagesCollectionView.bottomOffset
+            ? nil
+            : chatMessagesCollectionView.bottomOffset
         )
     }
     
@@ -231,6 +231,14 @@ private extension ChatViewController {
             .removeDuplicates()
             .assign(to: \.isAttachmentButtonEnabled, on: inputBar)
             .store(in: &subscriptions)
+        
+        viewModel.didTapAdmChat
+            .sink { [weak self] in self?.didTapAdmChat(with: $0, message: $1) }
+            .store(in: &subscriptions)
+        
+        viewModel.didTapAdmSend
+            .sink { [weak self] in self?.didTapAdmSend(to: $0) }
+            .store(in: &subscriptions)
     }
 }
 
@@ -293,7 +301,9 @@ private extension ChatViewController {
         bottomMessageId = viewModel.messages.last?.messageId
         
         guard !messagesLoaded, !viewModel.messages.isEmpty else { return }
-        viewModel.startPosition.map { setupStartPosition($0) }
+        Task {
+            await viewModel.startPosition.map { setupStartPosition($0) }
+        }
         messagesLoaded = true
     }
     
@@ -368,6 +378,7 @@ private extension ChatViewController {
         viewModel.entireChatWasRead()
     }
     
+    @MainActor
     func setupStartPosition(_ position: ChatStartPosition) {
         chatMessagesCollectionView.fixedBottomOffset = nil
         
@@ -489,34 +500,38 @@ private extension ChatViewController {
 
 private extension ChatViewController {
     func didTapAdmChat(with chatroom: Chatroom, message: String?) {
-        guard let chatlistVC = navigationController?.viewControllers.first as? ChatListViewController
-        else {
-            return
+        DispatchQueue.onMainAsync {
+            guard let chatlistVC = self.navigationController?.viewControllers.first as? ChatListViewController
+            else {
+                return
+            }
+            
+            let vc = chatlistVC.chatViewController(for: chatroom)
+            if let message = message {
+                vc.messageInputBar.inputTextView.text = message
+                vc.viewModel.inputText = message
+            }
+            
+            self.navigationController?.pushViewController(vc, animated: true)
         }
-        
-        let vc = chatlistVC.chatViewController(for: chatroom)
-        if let message = message {
-            vc.messageInputBar.inputTextView.text = message
-            vc.viewModel.inputText = message
-        }
-        
-        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     func didTapAdmSend(to adm: AdamantAddress) {
-        guard let accountService = storedObjects.first(where: { $0 is AccountService }) as? AccountService else { return }
-        let service = accountService.wallets.first { wallet in
-            return wallet is AdmWalletService
+        DispatchQueue.onMainAsync {
+            guard let accountService = self.storedObjects.first(where: { $0 is AccountService }) as? AccountService else { return }
+            let service = accountService.wallets.first { wallet in
+                return wallet is AdmWalletService
+            }
+            
+            guard let service = service as? WalletServiceWithSend else { return }
+            let vc = service.transferViewController()
+            if let v = vc as? TransferViewControllerBase {
+                v.recipientAddress = adm.address
+                v.recipientName = adm.name
+                v.delegate = self
+            }
+            self.navigationController?.pushViewController(vc, animated: true)
         }
-        
-        guard let service = service as? WalletServiceWithSend else { return }
-        let vc = service.transferViewController()
-        if let v = vc as? TransferViewControllerBase {
-            v.recipientAddress = adm.address
-            v.recipientName = adm.name
-            v.delegate = self
-        }
-        self.navigationController?.pushViewController(vc, animated: true)
     }
 }
 

@@ -192,10 +192,11 @@ protocol ChatsProvider: DataProvider, Actor {
     // MARK: - Getting chats and messages
     func getChatroom(for adm: String) -> Chatroom?
     func getChatroomsController() -> NSFetchedResultsController<Chatroom>
-    func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction>
+    nonisolated func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction>
     func getChatRooms(offset: Int?) async
     func getChatMessages(with addressRecipient: String, offset: Int?) async
     func isChatLoading(with addressRecipient: String) -> Bool
+    func isChatLoaded(with addressRecipient: String) -> Bool
     
     /// Unread messages controller. Sections by chatroom.
     func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction>
@@ -220,7 +221,7 @@ protocol ChatsProvider: DataProvider, Actor {
     func updateStatus(for transaction: RichMessageTransaction)
     func markChatAsRead(chatroom: Chatroom)
     func removeChatPositon(for address: String)
-    func setChatPositon(for address: String, position: Double)
+    func setChatPositon(for address: String, position: Double?)
     func getChatPositon(for address: String) -> Double?
     
     // MARK: - Unconfirmed Transaction

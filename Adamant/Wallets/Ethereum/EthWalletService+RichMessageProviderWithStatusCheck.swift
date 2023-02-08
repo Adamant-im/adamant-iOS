@@ -83,12 +83,17 @@ extension EthWalletService: RichMessageProviderWithStatusCheck {
             
             // MARK: Check addresses
             if transaction.isOutgoing {
-                guard let sender = eth.sender?.address, let id = self.ethWallet?.address, sender == id else {
+                guard let sender = eth.sender?.address,
+                      let id = self.ethWallet?.address,
+                      sender == id
+                else {
                     completion(.success(result: .warning))
                     return
                 }
             } else {
-                guard let id = self.ethWallet?.address, eth.to.address == id else {
+                guard let id = self.ethWallet?.address,
+                      eth.to.address == id
+                else {
                     completion(.success(result: .warning))
                     return
                 }

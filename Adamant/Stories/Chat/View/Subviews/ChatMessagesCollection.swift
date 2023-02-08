@@ -46,6 +46,7 @@ final class ChatMessagesCollectionView<
         }
     }
     
+    @MainActor
     func reloadData(newModels: [SectionModel]) {
         guard newModels.last == currentModels.last || currentModels.isEmpty else {
             return applyNewModels(newModels)
