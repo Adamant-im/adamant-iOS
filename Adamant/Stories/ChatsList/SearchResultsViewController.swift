@@ -29,6 +29,7 @@ class SearchResultsViewController: UITableViewController {
     // MARK: - Dependencies
     var router: Router!
     var avatarService: AvatarService!
+    var addressBookService: AddressBookService!
     
     // MARK: Properties
     private var contacts: [Chatroom] = [Chatroom]()
@@ -104,17 +105,7 @@ class SearchResultsViewController: UITableViewController {
     
     private func configureCell(_ cell: ChatTableViewCell, for chatroom: Chatroom) {
         if let partner = chatroom.partner {
-            if let title = chatroom.title {
-                cell.accountLabel.text = title
-                cell.lastMessageLabel.text = partner.address
-            } else if let name = partner.name {
-                cell.accountLabel.text = name
-                cell.lastMessageLabel.text = partner.address
-            } else {
-                cell.accountLabel.text = nil
-                cell.lastMessageLabel.text = partner.address
-            }
-            
+            cell.lastMessageLabel.text = partner.address
             cell.avatarImageView.tintColor = UIColor.adamant.primary
             cell.avatarImageView.roundingMode = .round
             cell.avatarImageView.clipsToBounds = true
@@ -129,9 +120,12 @@ class SearchResultsViewController: UITableViewController {
                 cell.avatarImage = nil
             }
         } else if let title = chatroom.title {
-            cell.accountLabel.text = nil
             cell.lastMessageLabel.text = title
         }
+        
+        cell.accountLabel.text = chatroom.getName(
+            addressBookService: addressBookService
+        )
         
         cell.hasUnreadMessages = false
         cell.dateLabel.text = nil
@@ -139,14 +133,6 @@ class SearchResultsViewController: UITableViewController {
     
     private func configureCell(_ cell: ChatTableViewCell, for message: MessageTransaction) {
         if let partner = message.chatroom?.partner {
-            if let title = message.chatroom?.title {
-                cell.accountLabel.text = title
-            } else if let name = partner.name {
-                cell.accountLabel.text = name
-            } else {
-                cell.accountLabel.text = partner.address
-            }
-            
             if let avatarName = partner.avatar, let avatar = UIImage.init(named: avatarName) {
                 cell.avatarImage = avatar
                 cell.avatarImageView.tintColor = UIColor.adamant.primary
@@ -165,9 +151,11 @@ class SearchResultsViewController: UITableViewController {
                 }
                 cell.borderWidth = 0
             }
-        } else if let title = message.chatroom?.title {
-            cell.accountLabel.text = title
         }
+        
+        cell.accountLabel.text = message.chatroom?.getName(
+            addressBookService: addressBookService
+        )
         
         cell.hasUnreadMessages = false
         

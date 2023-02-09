@@ -217,7 +217,7 @@ final class ChatViewModel: NSObject {
     func entireChatWasRead() {
         guard
             let chatroom = chatroom,
-            chatroom.hasUnreadMessages == true
+            chatroom.hasUnreadMessages || chatroom.lastTransaction?.isUnread == true
         else { return }
         
         chatsProvider.markChatAsRead(chatroom: chatroom)
@@ -459,15 +459,7 @@ private extension ChatViewModel {
     }
     
     func updateTitle() {
-        guard let partner = chatroom?.partner else { return }
-        
-        if let address = partner.address, let name = addressBookService.addressBook[address] {
-            partnerName = name.checkAndReplaceSystemWallets()
-        } else if let name = partner.name {
-            partnerName = name
-        } else {
-            partnerName = partner.address
-        }
+        partnerName = chatroom?.getName(addressBookService: addressBookService)
     }
     
     func updateAttachmentButtonAvailability() {
