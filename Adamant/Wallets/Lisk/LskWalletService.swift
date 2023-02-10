@@ -110,9 +110,7 @@ class LskWalletService: WalletService {
                                             userInfo: [AdamantUserInfoKey.WalletService.walletState: state])
         }
     }
-    
-    let stateSemaphore = DispatchSemaphore(value: 1)
-    
+        
     // MARK: - Delayed KVS save
     private var balanceObserver: NSObjectProtocol?
     
@@ -156,12 +154,15 @@ class LskWalletService: WalletService {
     }
     
     func update() {
+        Task {
+            await update()
+        }
+    }
+    
+    func update() async {
         guard let wallet = lskWallet else {
             return
         }
-        
-        defer { stateSemaphore.signal() }
-        stateSemaphore.wait()
         
         switch state {
         case .notInitiated, .updating, .initiationFailed:
@@ -188,39 +189,30 @@ class LskWalletService: WalletService {
             }
         }
         
-        getBalance { [weak self] result in
-            if let stateSemaphore = self?.stateSemaphore {
-                defer {
-                    stateSemaphore.signal()
-                }
-                stateSemaphore.wait()
+        do {
+            let balance = try await getBalance()
+            
+            let notification: Notification.Name?
+            
+            if wallet.balance != balance {
+                wallet.balance = balance
+                notification = walletUpdatedNotification
+                initialBalanceCheck = false
+            } else if initialBalanceCheck {
+                initialBalanceCheck = false
+                notification = walletUpdatedNotification
+            } else {
+                notification = nil
             }
             
-            switch result {
-            case .success(let balance):
-                let notification: Notification.Name?
-                
-                if wallet.balance != balance {
-                    wallet.balance = balance
-                    notification = self?.walletUpdatedNotification
-                    self?.initialBalanceCheck = false
-                } else if let initialBalanceCheck = self?.initialBalanceCheck, initialBalanceCheck {
-                    self?.initialBalanceCheck = false
-                    notification = self?.walletUpdatedNotification
-                } else {
-                    notification = nil
-                }
-                
-                if let notification = notification {
-                    NotificationCenter.default.post(name: notification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
-                }
-                
-            case .failure(let error):
-                print("\(error.localizedDescription)")
+            if let notification = notification {
+                NotificationCenter.default.post(name: notification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
             }
-            
-            self?.setState(.upToDate)
+        } catch {
+            dialogService.showRichError(error: error)
         }
+        
+        setState(.upToDate)
     }
     
     // MARK: - Tools
@@ -348,8 +340,6 @@ extension LskWalletService: InitiatedWithPassphraseService {
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
         
-        stateSemaphore.signal()
-        
         guard let eWallet = self.lskWallet else {
             throw WalletServiceError.accountNotFound
         }
@@ -367,7 +357,11 @@ extension LskWalletService: InitiatedWithPassphraseService {
             
             service.initialBalanceCheck = true
             service.setState(.upToDate, silent: true)
-            service.update()
+            
+            Task {
+                await service.update()
+            }
+            
             return eWallet
         } catch let error as WalletServiceError {
             switch error {
@@ -390,10 +384,8 @@ extension LskWalletService: InitiatedWithPassphraseService {
     }
     
     func setInitiationFailed(reason: String) {
-        stateSemaphore.wait()
         setState(.initiationFailed(reason: reason))
         lskWallet = nil
-        stateSemaphore.signal()
     }
     
     /// New accounts doesn't have enought money to save KVS. We need to wait for balance update, and then - retry save
@@ -443,21 +435,34 @@ extension LskWalletService: SwinjectDependentService {
 
 // MARK: - Balances & addresses
 extension LskWalletService {
-    func getBalance(_ completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
+    func getBalance() async throws -> Decimal {
         guard let wallet = self.lskWallet, let accountApi = accountApi else {
-            completion(.failure(error: .notLogged))
-            return
+            throw WalletServiceError.notLogged
         }
         
-        defaultDispatchQueue.async {
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Decimal, Error>) in
             accountApi.accounts(address: wallet.binaryAddress) { response in
                 switch response {
                 case .success(response: let response):
                     self.lskWallet?.nounce = response.data.nonce
-                    self.handleAccountSuccess(with: response.data.balance, completion: completion)
+                    let balance = BigUInt(response.data.balance ?? "0") ?? BigUInt(0)
+                    continuation.resume(
+                        returning: balance.asDecimal(
+                            exponent: LskWalletService.currencyExponent
+                        )
+                    )
                     
                 case .error(response: let error):
-                    self.handleAccountError(with: error, completion: completion)
+                    if error.message == "Unexpected Error" {
+                        continuation.resume(throwing: WalletServiceError.networkError)
+                    } else {
+                        continuation.resume(
+                            throwing: WalletServiceError.internalError(
+                                message: error.message,
+                                error: nil
+                            )
+                        )
+                    }
                 }
             }
         }

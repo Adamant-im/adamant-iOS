@@ -117,7 +117,7 @@ public struct LegacyAddress: Address {
         guard let raw = Base58.decode(base58) else {
             throw AddressError.invalid
         }
-        print("raw=", String(decoding: raw, as: UTF8.self))
+        
         let checksum = raw.suffix(4)
         let pubKeyHash = raw.dropLast(4)
         let checksumConfirm = Crypto.sha256sha256(pubKeyHash).prefix(4)

@@ -134,8 +134,6 @@ class EthWalletService: WalletService {
     let defaultDispatchQueue = DispatchQueue(label: "im.adamant.ethWalletService", qos: .utility, attributes: [.concurrent])
     private (set) var enabled = true
     
-    let stateSemaphore = DispatchSemaphore(value: 1)
-    
     var walletViewController: WalletViewController {
         guard let vc = router.get(scene: AdamantScene.Wallets.Ethereum.wallet) as? EthWalletViewController else {
             fatalError("Can't get EthWalletViewController")
@@ -239,9 +237,6 @@ class EthWalletService: WalletService {
             return
         }
         
-        defer { stateSemaphore.signal() }
-        stateSemaphore.wait()
-        
         switch state {
         case .notInitiated, .updating, .initiationFailed:
             return
@@ -252,56 +247,41 @@ class EthWalletService: WalletService {
         
         setState(.updating)
         
-        getBalance(forAddress: wallet.ethAddress) { [weak self] result in
-            defer { self?.stateSemaphore.signal() }
+        do {
+            let balance = try await getBalance(forAddress: wallet.ethAddress)
+            let notification: Notification.Name?
             
-            switch result {
-            case .success(let balance):
-                let notification: Notification.Name?
-                
-                if wallet.balance != balance {
-                    wallet.balance = balance
-                    notification = self?.walletUpdatedNotification
-                    self?.initialBalanceCheck = false
-                } else if let initialBalanceCheck = self?.initialBalanceCheck, initialBalanceCheck {
-                    self?.initialBalanceCheck = false
-                    notification = self?.walletUpdatedNotification
-                } else {
-                    notification = nil
-                }
-                
-                if let notification = notification {
-                    NotificationCenter.default.post(name: notification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
-                }
-                
-            case .failure(let error):
-                print("\(error.localizedDescription)")
+            if wallet.balance != balance {
+                wallet.balance = balance
+                notification = walletUpdatedNotification
+                initialBalanceCheck = false
+            } else if initialBalanceCheck {
+                initialBalanceCheck = false
+                notification = walletUpdatedNotification
+            } else {
+                notification = nil
             }
             
-            self?.setState(.upToDate)
-		}
+            if let notification = notification {
+                NotificationCenter.default.post(name: notification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
+            }
+        } catch {
+            dialogService.showRichError(error: error)
+        }
+        
+        setState(.upToDate)
 		
-		getGasPrices { [weak self] result in
-			switch result {
-			case .success(let price):
-				guard let fee = self?.transactionFee else {
-					return
-				}
-				
-				let newFee = price * EthWalletService.transferGas
-				
-				if fee != newFee {
-					self?.transactionFee = newFee
-					
-					if let notification = self?.transactionFeeUpdated {
-						NotificationCenter.default.post(name: notification, object: self, userInfo: nil)
-					}
-				}
-				
-			case .failure:
-				break
-			}
-		}
+        let price = try? await getGasPrices()
+        
+        if let price = price {
+            let newFee = price * EthWalletService.transferGas
+            
+            if transactionFee != newFee {
+                transactionFee = newFee
+                
+                NotificationCenter.default.post(name: transactionFeeUpdated, object: self, userInfo: nil)
+            }
+        }
 	}
 	
 	// MARK: - Tools
@@ -310,17 +290,19 @@ class EthWalletService: WalletService {
 		return addressRegex.perfectMatch(with: address) ? .valid : .invalid
 	}
 	
-	func getGasPrices(completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-        Task {
-            do {
-                guard let price = try await web3?.eth.gasPrice() else {
-                    completion(.failure(error: .internalError(message: "error.localizedDescription", error: nil)))
-                    return
-                }
-                completion(.success(result: price.asDecimal(exponent: EthWalletService.currencyExponent)))
-            } catch {
-                completion(.failure(error: .internalError(message: error.localizedDescription, error: error)))
-            }
+	func getGasPrices() async throws -> Decimal {
+        guard let web3 = await self.web3 else {
+            throw WalletServiceError.internalError(message: "Can't get web3 service", error: nil)
+        }
+        
+        do {
+            let price = try await web3.eth.gasPrice()
+            return price.asDecimal(exponent: EthWalletService.currencyExponent)
+        } catch {
+            throw WalletServiceError.internalError(
+                message: error.localizedDescription,
+                error: error
+            )
         }
 	}
 	
@@ -438,10 +420,8 @@ extension EthWalletService: InitiatedWithPassphraseService {
     }
     
     func setInitiationFailed(reason: String) {
-        stateSemaphore.wait()
         setState(.initiationFailed(reason: reason))
         ethWallet = nil
-        stateSemaphore.signal()
     }
     
     /// New accounts doesn't have enought money to save KVS. We need to wait for balance update, and then - retry save
@@ -491,20 +471,17 @@ extension EthWalletService: SwinjectDependentService {
 
 // MARK: - Balances & addresses
 extension EthWalletService {
-	func getBalance(forAddress address: EthereumAddress, completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-        Task {
-            guard let web3 = await self.web3 else {
-				print("Can't get web3 service")
-				return
-			}
-			
-            do {
-                let balance = try await web3.eth.getBalance(for: address)
-                completion(.success(result: balance.asDecimal(exponent: EthWalletService.currencyExponent)))
-            } catch {
-                completion(.failure(error: .internalError(message: error.localizedDescription, error: error)))
-            }
-		}
+	func getBalance(forAddress address: EthereumAddress) async throws -> Decimal {
+        guard let web3 = await self.web3 else {
+            throw WalletServiceError.internalError(message: "Can't get web3 service", error: nil)
+        }
+        
+        do {
+            let balance = try await web3.eth.getBalance(for: address)
+            return balance.asDecimal(exponent: EthWalletService.currencyExponent)
+        } catch {
+            throw WalletServiceError.internalError(message: error.localizedDescription, error: error)
+        }
 	}
 	
 	func getWalletAddress(byAdamantAddress address: String) async throws -> String {

@@ -127,7 +127,6 @@ class BtcWalletService: WalletService {
     static let jsonDecoder = JSONDecoder()
     
     let defaultDispatchQueue = DispatchQueue(label: "im.adamant.btcWalletService", qos: .userInteractive, attributes: [.concurrent])
-    let stateSemaphore = DispatchSemaphore(value: 1)
     
     // MARK: - State
     private (set) var state: WalletServiceState = .notInitiated
@@ -162,9 +161,6 @@ class BtcWalletService: WalletService {
             return
         }
         
-        defer { stateSemaphore.signal() }
-        stateSemaphore.wait()
-        
         switch state {
         case .notInitiated, .updating, .initiationFailed:
             return
@@ -175,59 +171,48 @@ class BtcWalletService: WalletService {
         
         setState(.updating)
         
-        getBalance { [weak self] result in
-            if let stateSemaphore = self?.stateSemaphore {
-                defer {
-                    stateSemaphore.signal()
-                }
-                stateSemaphore.wait()
-            }
-            
-            switch result {
-            case .success(let balance):
-                let notification: Notification.Name?
-                
-                if wallet.balance != balance {
-                    wallet.balance = balance
-                    notification = self?.walletUpdatedNotification
-                    self?.initialBalanceCheck = false
-                } else if let initialBalanceCheck = self?.initialBalanceCheck, initialBalanceCheck {
-                    self?.initialBalanceCheck = false
-                    notification = self?.walletUpdatedNotification
-                } else {
-                    notification = nil
-                }
-                
-                if let notification = notification {
-                    NotificationCenter.default.post(name: notification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
-                }
-                
-            case .failure(let error):
-                self?.dialogService.showRichError(error: error)
-            }
-            
-            self?.setState(.upToDate)
-            self?.stateSemaphore.signal()
-        }
-
-        getFeeRate { [weak self] result in
-            guard case .success(let rate) = result else { return }
-            self?.feeRate = rate
-        }
-
         do {
-            let transactions = try await getUnspentTransactions()
+            let balance = try await getBalance()
+            
+            let notification: Notification.Name?
+            
+            if wallet.balance != balance {
+                wallet.balance = balance
+                notification = walletUpdatedNotification
+                initialBalanceCheck = false
+            } else if initialBalanceCheck {
+                initialBalanceCheck = false
+                notification = walletUpdatedNotification
+            } else {
+                notification = nil
+            }
+            
+            if let notification = notification {
+                NotificationCenter.default.post(
+                    name: notification,
+                    object: self,
+                    userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
+                )
+            }
+        } catch {
+            dialogService.showRichError(error: error)
+        }
+        
+        setState(.upToDate)
+        
+        if let rate = try? await getFeeRate() {
+            feeRate = rate
+        }
+        
+        if let transactions = try? await getUnspentTransactions() {
             let feeRate = feeRate
             
             let fee = Decimal(transactions.count * 181 + 78) * feeRate
             transactionFee = fee / BtcWalletService.multiplier
-        } catch {
-            
         }
-
-        getCurrentHeight { [weak self] result in
-            guard case .success(let height) = result else { return }
-            self?.currentHeight = height
+        
+        if let height = try? await getCurrentHeight() {
+            currentHeight = height
         }
     }
     
@@ -322,10 +307,8 @@ class BtcWalletService: WalletService {
 // MARK: - WalletInitiatedWithPassphrase
 extension BtcWalletService: InitiatedWithPassphraseService {
     func setInitiationFailed(reason: String) {
-        stateSemaphore.wait()
         setState(.initiationFailed(reason: reason))
         btcWallet = nil
-        stateSemaphore.signal()
     }
     
     func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
@@ -349,8 +332,6 @@ extension BtcWalletService: InitiatedWithPassphraseService {
             self.enabled = true
             NotificationCenter.default.post(name: self.serviceEnabledChanged, object: self)
         }
-        
-        self.stateSemaphore.signal()
         
         // MARK: 4. Save address into KVS
         let service = self
@@ -407,84 +388,53 @@ extension BtcWalletService: SwinjectDependentService {
 // MARK: - Balances & addresses
 extension BtcWalletService {
 
-    func getBalance(_ completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
+    func getBalance() async throws -> Decimal {
         guard let url = BtcWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get BTC endpoint URL")
         }
         
         guard let address = self.btcWallet?.address else {
-            completion(.failure(error: .walletNotInitiated))
-            return
+            throw WalletServiceError.walletNotInitiated
         }
-        
-        // Headers
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json"
-        ]
         
         // Request url
         let endpoint = url.appendingPathComponent(BtcApiCommands.balance(for: address))
         
         // MARK: Sending request
-        AF.request(
-            endpoint,
+        
+        let response: BtcBalanceResponse = try await apiService.sendRequest(
+            url: endpoint,
             method: .get,
-            headers: headers
-        ).responseData(queue: defaultDispatchQueue) { response in
-            switch response.result {
-            case .success(let data):
-                do {
-                    let response = try BtcWalletService.jsonDecoder.decode(BtcBalanceResponse.self,
-                                                                           from: data)
-                    let balance = response.value / BtcWalletService.multiplier
-                    completion(.success(result: balance))
-                } catch {
-                    completion(.failure(error: .internalError(message: "BTC Wallet: not a valid response", error: error)))
-                }
-                
-            case .failure:
-                completion(.failure(error: .networkError))
-            }
-        }
+            parameters: nil
+        )
+        
+        let balance = response.value / BtcWalletService.multiplier
+        
+        return balance
     }
 
-    func getFeeRate(_ completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
+    func getFeeRate() async throws -> Decimal {
         guard let url = BtcWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get BTC endpoint URL")
         }
-        
-        // Headers
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json"
-        ]
         
         // Request url
         let endpoint = url.appendingPathComponent(BtcApiCommands.getFeeRate())
         
         // MARK: Sending request
-        AF.request(
-            endpoint,
+        
+        let response: [String: Decimal] = try await apiService.sendRequest(
+            url: endpoint,
             method: .get,
-            headers: headers
-        ).responseData(queue: defaultDispatchQueue) { response in
-            switch response.result {
-            case .success(let data):
-                do {
-                    let response = try Self.jsonDecoder.decode([String: Decimal].self,
-                                                               from: data)
-                    let value = response["2"] ?? 1
-                    completion(.success(result: value))
-                } catch {
-                    completion(.failure(error: .internalError(message: "BTC Wallet: not a valid response", error: error)))
-                }
-                
-            case .failure:
-                completion(.failure(error: .networkError))
-            }
-        }
+            parameters: nil
+        )
+        
+        let value = response["2"] ?? 1
+        
+        return value
     }
 
-    func getCurrentHeight(_ completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
+    func getCurrentHeight() async throws -> Decimal {
         guard let url = BtcWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get BTC endpoint URL")
         }
@@ -498,26 +448,24 @@ extension BtcWalletService {
         let endpoint = url.appendingPathComponent(BtcApiCommands.getHeight())
         
         // MARK: Sending request
-        AF.request(
-            endpoint,
+        
+        let data: Data = try await apiService.sendRequest(
+            url: endpoint,
             method: .get,
-            headers: headers
-        ).responseData(queue: defaultDispatchQueue) { response in
-            switch response.result {
-            case .success(let data):
-                guard
-                    let raw = String(data: data, encoding: .utf8),
-                    let value = Decimal(string: raw)
-                else {
-                    completion(.failure(error: .internalError(message: "BTC Wallet: not a valid response", error: nil)))
-                    return
-                }
-                completion(.success(result: value))
-                
-            case .failure:
-                completion(.failure(error: .networkError))
-            }
+            parameters: nil
+        )
+        
+        guard
+            let raw = String(data: data, encoding: .utf8),
+            let value = Decimal(string: raw)
+        else {
+            throw WalletServiceError.internalError(
+                message: "BTC Wallet: not a valid response",
+                error: nil
+            )
         }
+        
+        return value
     }
 
 }

@@ -70,11 +70,25 @@ class BtcTransferViewController: TransferViewControllerBase {
                 
                 do {
                     let detailTransaction = try await service.getTransaction(by: hash)
-                    processSuccessTransaction(self, localTransaction: detailTransaction, service: service, comments: comments, transaction: transaction)
+                    processSuccessTransaction(
+                        self,
+                        localTransaction: detailTransaction,
+                        service: service,
+                        comments: comments,
+                        transaction: transaction
+                    )
                 } catch {
                     let error = error as? ApiServiceError
-                    processFailureTransaction(self, service: service, comments: comments, transaction: transaction, error: error)
+                    processFailureTransaction(
+                        self,
+                        service: service,
+                        comments: comments,
+                        transaction: transaction,
+                        error: error
+                    )
                 }
+                
+                dialogService.dismissProgress()
                 dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
             } catch {
                 dialogService.dismissProgress()

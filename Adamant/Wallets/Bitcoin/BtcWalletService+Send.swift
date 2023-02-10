@@ -73,26 +73,29 @@ extension BtcWalletService: WalletServiceTwoStepSend {
         // MARK: Prepare params
         
         let txHex = transaction.serialized().hex
-        print("txHex=", txHex)
-        print("transaction=", transaction)
-        print("transaction.recipientAddress=", transaction.recipientAddress)
         
-        throw WalletServiceError.remoteServiceError(message: "error.localizedDescription")
         // MARK: Sending request
-//        AF.request(
-//            endpoint,
-//            method: .post,
-//            parameters: nil,
-//            encoding: BodyStringEncoding(body: txHex),
-//            headers: headers
-//        ).responseData(queue: defaultDispatchQueue) { response in
-//            switch response.result {
-//            case .success:
-//                completion(.success(result: transaction.txId))
-//            case .failure(let error):
-//                completion(.failure(error: .remoteServiceError(message: error.localizedDescription)))
-//            }
-//        }
+        
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<String, Error>) in
+            AF.request(
+                endpoint,
+                method: .post,
+                parameters: nil,
+                encoding: BodyStringEncoding(body: txHex),
+                headers: headers
+            ).responseData(queue: defaultDispatchQueue) { response in
+                switch response.result {
+                case .success:
+                    continuation.resume(returning: transaction.txId)
+                case .failure(let error):
+                    continuation.resume(
+                        throwing: WalletServiceError.remoteServiceError(
+                            message: error.localizedDescription
+                        )
+                    )
+                }
+            }
+        }
     }
     
     func getUnspentTransactions() async throws -> [UnspentTransaction] {

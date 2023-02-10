@@ -115,7 +115,6 @@ class ERC20WalletService: WalletService {
         }
     }
     private var baseUrl: String!
-    let stateSemaphore = DispatchSemaphore(value: 1)
     
     var walletViewController: WalletViewController {
         guard let vc = router.get(scene: AdamantScene.Wallets.ERC20.wallet) as? ERC20WalletViewController else {
@@ -210,12 +209,15 @@ class ERC20WalletService: WalletService {
     }
     
     func update() {
+        Task {
+            await update()
+        }
+    }
+    
+    func update() async {
         guard let wallet = ethWallet else {
             return
         }
-        
-        defer { stateSemaphore.signal() }
-        stateSemaphore.wait()
         
         switch state {
         case .notInitiated, .updating, .initiationFailed:
@@ -227,65 +229,38 @@ class ERC20WalletService: WalletService {
         
         setState(.updating)
         
-        getBalance(forAddress: wallet.ethAddress) { [weak self] result in
-            if let stateSemaphore = self?.stateSemaphore {
-                defer {
-                    stateSemaphore.signal()
-                }
-                stateSemaphore.wait()
+        do {
+            let balance = try await getBalance(forAddress: wallet.ethAddress)
+            
+            let notification: Notification.Name?
+            
+            if wallet.balance != balance {
+                wallet.balance = balance
+                notification = walletUpdatedNotification
+                initialBalanceCheck = false
+            } else if initialBalanceCheck {
+                initialBalanceCheck = false
+                notification = walletUpdatedNotification
+            } else {
+                notification = nil
             }
             
-            switch result {
-            case .success(let balance):
-                let notification: Notification.Name?
-                
-                if wallet.balance != balance {
-                    wallet.balance = balance
-                    notification = self?.walletUpdatedNotification
-                    self?.initialBalanceCheck = false
-                } else if let initialBalanceCheck = self?.initialBalanceCheck, initialBalanceCheck {
-                    self?.initialBalanceCheck = false
-                    notification = self?.walletUpdatedNotification
-                } else {
-                    notification = nil
-                }
-                
-                if let notification = notification {
-                    NotificationCenter.default.post(name: notification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
-                }
-                
-            case .failure(let error):
-                switch error {
-                case .networkError:
-                    break
-                    
-                default:
-                    print("\(error.localizedDescription)")
-                }
+            if let notification = notification {
+                NotificationCenter.default.post(name: notification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
             }
-            
-            self?.setState(.upToDate)
+        } catch {
+            print(error.localizedDescription)
         }
         
-        getGasPrices { [weak self] result in
-            switch result {
-            case .success(let price):
-                guard let fee = self?.diplayTransactionFee else {
-                    return
-                }
+        setState(.upToDate)
+        
+        if let price = try? await getGasPrices() {
+            let newFee = price * EthWalletService.transferGas
+            
+            if diplayTransactionFee != newFee {
+                diplayTransactionFee = newFee
                 
-                let newFee = price * EthWalletService.transferGas
-                
-                if fee != newFee {
-                    self?.diplayTransactionFee = newFee
-                    
-                    if let notification = self?.transactionFeeUpdated {
-                        NotificationCenter.default.post(name: notification, object: self, userInfo: nil)
-                    }
-                }
-                
-            case .failure:
-                break
+                NotificationCenter.default.post(name: transactionFeeUpdated, object: self, userInfo: nil)
             }
         }
     }
@@ -294,17 +269,19 @@ class ERC20WalletService: WalletService {
         return addressRegex.perfectMatch(with: address) ? .valid : .invalid
     }
     
-    func getGasPrices(completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-        Task {
-            do {
-                guard let price = try await web3?.eth.gasPrice() else {
-                    completion(.failure(error: .internalError(message: "error.localizedDescription", error: nil)))
-                    return
-                }
-                completion(.success(result: price.asDecimal(exponent: EthWalletService.currencyExponent)))
-            } catch {
-                completion(.failure(error: .internalError(message: error.localizedDescription, error: error)))
-            }
+    func getGasPrices() async throws -> Decimal {
+        guard let web3 = await self.web3 else {
+            throw WalletServiceError.internalError(message: "Can't get web3 service", error: nil)
+        }
+        
+        do {
+            let price = try await web3.eth.gasPrice()
+            return price.asDecimal(exponent: EthWalletService.currencyExponent)
+        } catch {
+            throw WalletServiceError.internalError(
+                message: error.localizedDescription,
+                error: error
+            )
         }
     }
     
@@ -378,15 +355,15 @@ extension ERC20WalletService: InitiatedWithPassphraseService {
         
         self.initialBalanceCheck = true
         self.setState(.upToDate, silent: true)
-        self.update()
+        Task {
+            await update()
+        }
         return eWallet
     }
     
     func setInitiationFailed(reason: String) {
-        stateSemaphore.wait()
         setState(.initiationFailed(reason: reason))
         ethWallet = nil
-        stateSemaphore.signal()
     }
 }
 
@@ -485,28 +462,28 @@ extension ERC20WalletService {
         }
     }
     
-    func getBalance(forAddress address: EthereumAddress, completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-        Task {
-            guard let address = self.ethWallet?.address,
-                  let walletAddress = EthereumAddress(address),
-                  let erc20 = self.erc20
-            else {
-                print("Can't get address")
-                return
-            }
-
-            var exponent = EthWalletService.currencyExponent
-            if let naturalUnits = self.token?.naturalUnits {
-                exponent = -1 * naturalUnits
-            }
-            
-            do {
-                let balance = try await erc20.getBalance(account: walletAddress)
-                let value = balance.asDecimal(exponent: exponent)
-                completion(.success(result:value))
-            } catch {
-                completion(.failure(error: WalletServiceError.internalError(message: "ERC 20 Service - Fail to get balance", error: error)))
-            }
+    func getBalance(forAddress address: EthereumAddress) async throws -> Decimal {
+        guard let address = self.ethWallet?.address,
+              let walletAddress = EthereumAddress(address),
+              let erc20 = self.erc20
+        else {
+            throw WalletServiceError.internalError(message: "Can't get address", error: nil)
+        }
+        
+        var exponent = EthWalletService.currencyExponent
+        if let naturalUnits = self.token?.naturalUnits {
+            exponent = -1 * naturalUnits
+        }
+        
+        do {
+            let balance = try await erc20.getBalance(account: walletAddress)
+            let value = balance.asDecimal(exponent: exponent)
+            return value
+        } catch {
+            throw WalletServiceError.internalError(
+                message: "ERC 20 Service - Fail to get balance",
+                error: error
+            )
         }
     }
     

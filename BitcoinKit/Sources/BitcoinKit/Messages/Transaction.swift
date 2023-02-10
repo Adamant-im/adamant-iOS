@@ -119,12 +119,7 @@ public struct Transaction {
     static public func createNewTransaction(toAddress: Address, amount: UInt64, fee: UInt64, changeAddress: Address, utxos: [UnspentTransaction], lockTime: UInt32 = 0, keys:  [PrivateKey]) -> Transaction {
         let unsignedTx = createUnsignedTx(toAddress: toAddress, amount: amount, fee: fee, changeAddress: changeAddress, utxos: utxos, lockTime: 0)
         
-        print("unsignedTx outputs=", unsignedTx.tx.outputs)
-        print("unsignedHEX=", unsignedTx.tx.serialized().hex)
-        print("unsignedHEX deser=", Transaction.deserialize(unsignedTx.tx.serialized()))
-        
         let signedTransaction = signTx(unsignedTx: unsignedTx, keys: keys)
-        print("signedTransactionTx outputs =", signedTransaction.outputs)
         return signedTransaction
     }
     
@@ -184,7 +179,6 @@ public struct Transaction {
                 print("No keys to this txout : \(utxo.output.value)")
                 continue
             }
-            print("Value of signing txout : \(utxo.output.value)")
             
             let sighash: Data = transactionToSign.signatureHash(for: utxo.output, inputIndex: i, hashType: SighashType.BTC.ALL)
             let signature: Data = try! BitcoinKit.Crypto.sign(sighash, privateKey: key)

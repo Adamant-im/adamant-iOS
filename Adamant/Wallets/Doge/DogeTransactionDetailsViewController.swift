@@ -102,10 +102,13 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
         
         if let blockInfo = cachedBlockInfo,
            blockInfo.hash == trs.blockHash {
-            transaction = trs.asBtcTransaction(DogeTransaction.self, for: address, blockId: blockInfo.height)
+            transaction = trs.asBtcTransaction(
+                DogeTransaction.self,
+                for: address,
+                blockId: blockInfo.height
+            )
             
             tableView.reloadData()
-            
         } else if let blockHash = trs.blockHash {
             let blockInfo: (hash: String, height: String)?
             
@@ -116,7 +119,12 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
                 blockInfo = nil
             }
             
-            transaction = trs.asBtcTransaction(DogeTransaction.self, for: address, blockId: blockInfo?.height)
+            transaction = trs.asBtcTransaction(
+                DogeTransaction.self,
+                for: address,
+                blockId: blockInfo?.height
+            )
+            
             cachedBlockInfo = blockInfo
             
             tableView.reloadData()
