@@ -23,6 +23,13 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     
     weak var timer: Timer?
     
+    private lazy var refreshControl: UIRefreshControl = {
+        let control = UIRefreshControl()
+        control.tintColor = .adamant.primary
+        control.addTarget(self, action: #selector(refresh), for: UIControl.Event.valueChanged)
+        return control
+    }()
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -62,6 +69,10 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
                 section.append(row)
             }
         }
+        
+        tableView.refreshControl = refreshControl
+        
+        refresh()
         
         startUpdate()
     }
@@ -114,22 +125,31 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
         }
     }
     
+    @MainActor
+    @objc func refresh(_ silent: Bool = false) {
+        refreshTask = Task {
+            guard let id = transaction?.txId else {
+                return
+            }
+            
+            do {
+                try await transfersProvider.refreshTransfer(id: id)
+                refreshControl.endRefreshing()
+                tableView.reloadData()
+            } catch {
+                refreshControl.endRefreshing()
+                guard !silent else { return }
+                dialogService.showRichError(error: error)
+            }
+        }
+    }
+    
     // MARK: - Autoupdate
     
-    @MainActor
     func startUpdate() {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            Task { [weak self] in
-                guard let id = await self?.transaction?.txId else {
-                    return
-                }
-                
-                do {
-                    try await self?.transfersProvider.refreshTransfer(id: id)
-                    await self?.tableView.reloadData()
-                }
-            }
+            self?.refresh(true)
         }
     }
     

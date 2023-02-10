@@ -28,8 +28,6 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
         return control
     }()
     
-    private var updateTask: Task<(), Never>?
-    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -38,9 +36,7 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
         super.viewDidLoad()
         if service != nil { tableView.refreshControl = refreshControl }
         
-        updateTask = Task {
-            await refresh()
-        }
+        refresh()
         
         // MARK: Start update
         if transaction != nil {
@@ -49,7 +45,6 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
     }
     
     deinit {
-        updateTask?.cancel()
         stopUpdate()
     }
     
@@ -62,12 +57,15 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
     }
     
     @MainActor
-    @objc func refresh() async {
-        do {
-            try await updateTransaction()
-            refreshControl.endRefreshing()
-        } catch {
-            dialogService.showRichError(error: error)
+    @objc func refresh(_ silent: Bool = false) {
+        refreshTask = Task {
+            do {
+                try await updateTransaction()
+                refreshControl.endRefreshing()
+            } catch {
+                guard !silent else { return }
+                dialogService.showRichError(error: error)
+            }
         }
     }
     
@@ -76,9 +74,7 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
     func startUpdate() {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            Task { [weak self] in
-                try? await self?.updateTransaction() // Silent, without errors
-            }
+            self?.refresh(true) // Silent, without errors
         }
         
     }

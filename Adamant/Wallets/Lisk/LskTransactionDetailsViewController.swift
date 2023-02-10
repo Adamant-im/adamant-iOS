@@ -36,6 +36,8 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
             tableView.refreshControl = refreshControl
         }
         
+        refresh()
+        
         if transaction != nil {
             startUpdate()
         }
@@ -54,19 +56,22 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     }
     
     @MainActor
-    @objc func refresh() async throws {
-        guard let id = transaction?.txId, let service = service else {
-            refreshControl.endRefreshing()
-            return
-        }
-        
-        do {
-            transaction = try await service.getTransaction(by: id)
-            tableView.reloadData()
-            refreshControl.endRefreshing()
-        } catch {
-            refreshControl.endRefreshing()
-            dialogService.showRichError(error: error)
+    @objc func refresh(_ silent: Bool = false) {
+        refreshTask = Task {
+            guard let id = transaction?.txId, let service = service else {
+                refreshControl.endRefreshing()
+                return
+            }
+            
+            do {
+                transaction = try await service.getTransaction(by: id)
+                tableView.reloadData()
+                refreshControl.endRefreshing()
+            } catch {
+                refreshControl.endRefreshing()
+                guard !silent else { return }
+                dialogService.showRichError(error: error)
+            }
         }
     }
     
@@ -76,7 +81,7 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
         timer?.invalidate()
         update()
         timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            self?.update()
+            self?.refresh(true)
         }
     }
     

@@ -53,23 +53,24 @@ class BtcTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     }
     
     @MainActor
-    @objc func refresh() async {
-        guard let id = transaction?.txId, let service = service else {
-            refreshControl.endRefreshing()
-            return
-        }
-        
-        do {
-            let trs = try await service.getTransaction(by: id)
-            transaction = trs
+    @objc func refresh(_ silent: Bool = false) {
+        refreshTask = Task {
+            guard let id = transaction?.txId, let service = service else {
+                refreshControl.endRefreshing()
+                return
+            }
             
-            tableView.reloadData()
-            refreshControl.endRefreshing()
-        } catch {
-            dialogService.showRichError(error: error)
-            refreshControl.endRefreshing()
-        } catch {
-            refreshControl.endRefreshing()
+            do {
+                let trs = try await service.getTransaction(by: id)
+                transaction = trs
+                
+                tableView.reloadData()
+                refreshControl.endRefreshing()
+            } catch {
+                refreshControl.endRefreshing()
+                guard !silent else { return }
+                dialogService.showRichError(error: error)
+            }
         }
     }
     
@@ -78,9 +79,7 @@ class BtcTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     func startUpdate() {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            Task {
-                await self?.refresh()
-            }
+            self?.refresh(true)
         }
     }
     

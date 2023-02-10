@@ -69,10 +69,10 @@ class ERC20TransactionDetailsViewController: TransactionDetailsViewControllerBas
                 tableView.reloadData()
                 refreshControl.endRefreshing()
             } catch {
-                if !silent {
-                    dialogService.showRichError(error: error)
-                }
                 refreshControl.endRefreshing()
+                
+                guard !silent else { return }
+                dialogService.showRichError(error: error)
             }
         }
     }
