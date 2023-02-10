@@ -325,6 +325,7 @@ private extension ChatViewController {
     
     func makeChatMessagesCollectionView() -> ChatMessagesCollectionView {
         let collection = ChatMessagesCollectionView()
+        collection.refreshControl = ChatRefreshMock()
         collection.register(TransactionCell.self)
         collection.register(
             SpinnerCell.self,
