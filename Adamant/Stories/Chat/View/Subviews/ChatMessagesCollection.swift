@@ -24,18 +24,6 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
         safeAreaInsets + contentInset
     }
     
-    /// To avoid insets changing by MessageKit
-    override var contentInset: UIEdgeInsets {
-        get { super.contentInset }
-        set {}
-    }
-    
-    /// To avoid insets changing by MessageKit
-    override var verticalScrollIndicatorInsets: UIEdgeInsets {
-        get { super.verticalScrollIndicatorInsets }
-        set {}
-    }
-    
     override func layoutSubviews() {
         super.layoutSubviews()
         
@@ -61,10 +49,10 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
     func setFullBottomInset(_ inset: CGFloat) {
         let inset = inset - safeAreaInsets.bottom
         let bottomOffset = self.bottomOffset
-        super.contentInset.bottom = inset
-        super.verticalScrollIndicatorInsets.bottom = inset
+        contentInset.bottom = inset
+        verticalScrollIndicatorInsets.bottom = inset
 
-        guard !isDragging || isDecelerating else { return }
+        guard !hasActiveScrollGestures else { return }
         setBottomOffset(bottomOffset, safely: false)
     }
     
@@ -87,6 +75,23 @@ private extension ChatMessagesCollectionView {
     
     var contentHeightWithBottomInsets: CGFloat {
         contentSize.height + fullInsets.bottom
+    }
+    
+    var scrollGestureRecognizers: [UIGestureRecognizer] {
+        [panGestureRecognizer, pinchGestureRecognizer].compactMap { $0 }
+    }
+    
+    var hasActiveScrollGestures: Bool {
+        scrollGestureRecognizers.contains {
+            switch $0.state {
+            case .began, .changed:
+                return true
+            case .ended, .cancelled, .possible, .failed:
+                return false
+            @unknown default:
+                return false
+            }
+        }
     }
     
     func applyNewModels(_ newModels: [ChatMessage]) {
