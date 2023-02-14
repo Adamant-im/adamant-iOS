@@ -58,13 +58,21 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     @MainActor
     @objc func refresh(_ silent: Bool = false) {
         refreshTask = Task {
-            guard let id = transaction?.txId, let service = service else {
+            guard let id = transaction?.txId,
+                  let service = service
+            else {
                 refreshControl.endRefreshing()
                 return
             }
             
             do {
-                transaction = try await service.getTransaction(by: id)
+                var trs = try await service.getTransaction(by: id)
+                let result = try await service.getFees()
+                
+                let lastHeight = result.lastHeight
+                trs.updateConfirmations(value: lastHeight)
+                transaction = trs
+                
                 tableView.reloadData()
                 refreshControl.endRefreshing()
             } catch {
@@ -79,7 +87,7 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     
     func startUpdate() {
         timer?.invalidate()
-        update()
+        refresh(true)
         timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
             self?.refresh(true)
         }
@@ -87,29 +95,5 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     
     func stopUpdate() {
         timer?.invalidate()
-    }
-    
-    func update() {
-        guard let id = self.transaction?.txId, let service = self.service else {
-            return
-        }
-        Task {
-            do {
-                var trs = try await service.getTransaction(by: id)
-                service.serviceApi.getFees { result in
-                    switch result {
-                    case .success(response: let value):
-                        let lastHeight = value.meta.lastBlockHeight
-                        trs.updateConfirmations(value: lastHeight)
-                        self.transaction = trs
-                        DispatchQueue.main.async {
-                            self.tableView.reloadData()
-                        }
-                    case .error:
-                        break
-                    }
-                }
-            }
-        }
     }
 }

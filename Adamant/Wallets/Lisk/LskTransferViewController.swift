@@ -42,19 +42,19 @@ class LskTransferViewController: TransferViewControllerBase {
                 // Create transaction
                 let transaction = try await service.createTransaction(recipient: recipient, amount: amount)
                 
+                // Send transaction
+                let transactionId = try await service.sendTransaction(transaction)
+                
                 // Send adm report
-                if let reportRecipient = admReportRecipient,
-                   let hash = transaction.txHash {
+                // in lisk we get the transaction ID after sending
+                if let reportRecipient = admReportRecipient {
                     try await reportTransferTo(
                         admAddress: reportRecipient,
                         amount: amount,
                         comments: comments,
-                        hash: hash
+                        hash: transactionId
                     )
                 }
-                
-                // Send transaction
-                let transactionId = try await service.sendTransaction(transaction)
                 
                 Task {
                     service.update()

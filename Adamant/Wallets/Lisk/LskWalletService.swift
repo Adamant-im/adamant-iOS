@@ -174,19 +174,11 @@ class LskWalletService: WalletService {
         
         setState(.updating)
         
-        serviceApi.getFees { result in
-            switch result {
-            case .success(response: let value):
-                self.lastHeight = value.meta.lastBlockHeight
-                
-                let tempTransaction = TransactionEntity(amount: 100000000.0, fee: 0.00141, nonce: wallet.nounce, senderPublicKey: wallet.keyPair.publicKeyString, recipientAddress: wallet.binaryAddress).signed(with: wallet.keyPair, for: self.netHash)
-                let value = tempTransaction.getFee(with: value.data.minFeePerByte)
-                let fee = BigUInt(value)
-                
-                self.transactionFeeRaw = fee > LskWalletService.defaultFee ? fee : LskWalletService.defaultFee
-            case .error:
-                break
-            }
+        if let result = try? await getFees() {
+            self.lastHeight = result.lastHeight
+            self.transactionFeeRaw = result.fee > LskWalletService.defaultFee
+            ? result.fee
+            : LskWalletService.defaultFee
         }
         
         if let balance = try? await getBalance() {
@@ -229,6 +221,42 @@ class LskWalletService: WalletService {
             return "\(formattedAmount)"
         } else {
             return "--"
+        }
+    }
+    
+    func getFees() async throws -> (fee: BigUInt, lastHeight: UInt64) {
+        guard let wallet = lskWallet else {
+            throw WalletServiceError.notLogged
+        }
+        
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<(fee: BigUInt, lastHeight: UInt64), Error>) in
+            serviceApi.getFees { result in
+                switch result {
+                case .success(response: let value):
+                    let tempTransaction = TransactionEntity(
+                        amount: 100000000.0,
+                        fee: 0.00141,
+                        nonce: wallet.nounce,
+                        senderPublicKey: wallet.keyPair.publicKeyString,
+                        recipientAddress: wallet.binaryAddress
+                    ).signed(
+                        with: wallet.keyPair,
+                        for: self.netHash
+                    )
+                    
+                    let feeValue = tempTransaction.getFee(with: value.data.minFeePerByte)
+                    let fee = BigUInt(feeValue)
+                    
+                    continuation.resume(returning: (fee: fee, lastHeight: value.meta.lastBlockHeight))
+                case .error(response: let error):
+                    continuation.resume(
+                        throwing: WalletServiceError.internalError(
+                            message: error.message,
+                            error: nil
+                        )
+                    )
+                }
+            }
         }
     }
 }
