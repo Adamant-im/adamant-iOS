@@ -55,10 +55,14 @@ class ERC20TransferViewController: TransferViewControllerBase {
                 let transaction = try await service.createTransaction(recipient: recipient, amount: amount)
                 
                 // Send adm report
-                // to do: make async and wait before send message
                 if let reportRecipient = admReportRecipient,
                    let hash = transaction.txHash {
-                    reportTransferTo(admAddress: reportRecipient, amount: amount, comments: comments, hash: hash)
+                    try await reportTransferTo(
+                        admAddress: reportRecipient,
+                        amount: amount,
+                        comments: comments,
+                        hash: hash
+                    )
                 }
                 
                 // Send transaction
@@ -249,7 +253,12 @@ class ERC20TransferViewController: TransferViewControllerBase {
         }
     }
     
-    func reportTransferTo(admAddress: String, amount: Decimal, comments: String, hash: String) {
+    func reportTransferTo(
+        admAddress: String,
+        amount: Decimal,
+        comments: String,
+        hash: String
+    ) async throws {
         guard let type = (self.service as? RichMessageProvider)?.dynamicRichMessageType else {
             return
         }
@@ -257,13 +266,7 @@ class ERC20TransferViewController: TransferViewControllerBase {
         
         let message = AdamantMessage.richMessage(payload: payload)
         
-        Task {
-            do {
-                _ = try await chatsProvider.sendMessage(message, recipientId: admAddress)
-            } catch {
-                dialogService.showRichError(error: error)
-            }
-        }
+        _ = try await chatsProvider.sendMessage(message, recipientId: admAddress)
     }
     
     override func defaultSceneTitle() -> String? {
