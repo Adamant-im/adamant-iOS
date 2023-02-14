@@ -189,9 +189,7 @@ class LskWalletService: WalletService {
             }
         }
         
-        do {
-            let balance = try await getBalance()
-            
+        if let balance = try? await getBalance() {
             let notification: Notification.Name?
             
             if wallet.balance != balance {
@@ -208,8 +206,6 @@ class LskWalletService: WalletService {
             if let notification = notification {
                 NotificationCenter.default.post(name: notification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
             }
-        } catch {
-            dialogService.showRichError(error: error)
         }
         
         setState(.upToDate)

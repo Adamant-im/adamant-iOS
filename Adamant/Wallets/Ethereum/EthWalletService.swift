@@ -247,8 +247,7 @@ class EthWalletService: WalletService {
         
         setState(.updating)
         
-        do {
-            let balance = try await getBalance(forAddress: wallet.ethAddress)
+        if let balance = try? await getBalance(forAddress: wallet.ethAddress) {
             let notification: Notification.Name?
             
             if wallet.balance != balance {
@@ -265,8 +264,6 @@ class EthWalletService: WalletService {
             if let notification = notification {
                 NotificationCenter.default.post(name: notification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
             }
-        } catch {
-            dialogService.showRichError(error: error)
         }
         
         setState(.upToDate)

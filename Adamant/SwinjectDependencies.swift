@@ -161,15 +161,9 @@ extension Container {
                 accountService: r.resolve(AccountService.self)!,
                 accountsProvider: r.resolve(AccountsProvider.self)!,
                 securedStore: r.resolve(SecuredStore.self)!,
-                transactionService: r.resolve(ChatTransactionService.self)!
+                transactionService: r.resolve(ChatTransactionService.self)!,
+                chatsProvider: r.resolve(ChatsProvider.self)!
             )
-        }.inObjectScope(.container).initCompleted { (r, c) in
-            Task {
-                guard let service = c as? AdamantTransfersProvider else { return }
-                // service.chatsProvider = r.resolve(ChatsProvider.self)
-                await service.setChatsProvider(r.resolve(ChatsProvider.self))
-            }
-            
         }
         
         // MARK: Chats

@@ -165,9 +165,7 @@ class DashWalletService: WalletService {
         
         setState(.updating)
         
-        do {
-            let balance = try await getBalance()
-            
+        if let balance = try? await getBalance() {
             let notification: Notification.Name?
             
             if wallet.balance != balance {
@@ -188,9 +186,6 @@ class DashWalletService: WalletService {
                     userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
                 )
             }
-            
-        } catch {
-            print(error.localizedDescription)
         }
         
         setState(.upToDate)

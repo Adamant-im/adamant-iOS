@@ -173,8 +173,7 @@ class DogeWalletService: WalletService {
         
         setState(.updating)
         
-        do {
-            let balance = try await getBalance()
+        if let balance = try? await getBalance() {
             
             let notification: Notification.Name?
             
@@ -193,8 +192,6 @@ class DogeWalletService: WalletService {
                 NotificationCenter.default.post(name: notification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
             }
             
-        } catch {
-            dialogService.showRichError(error: error)
         }
         
         setState(.upToDate)

@@ -229,9 +229,7 @@ class ERC20WalletService: WalletService {
         
         setState(.updating)
         
-        do {
-            let balance = try await getBalance(forAddress: wallet.ethAddress)
-            
+        if let balance = try? await getBalance(forAddress: wallet.ethAddress) {
             let notification: Notification.Name?
             
             if wallet.balance != balance {
@@ -248,8 +246,6 @@ class ERC20WalletService: WalletService {
             if let notification = notification {
                 NotificationCenter.default.post(name: notification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
             }
-        } catch {
-            print(error.localizedDescription)
         }
         
         setState(.upToDate)

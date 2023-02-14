@@ -61,7 +61,8 @@ actor AdamantTransfersProvider: TransfersProvider {
         accountService: AccountService,
         accountsProvider: AccountsProvider,
         securedStore: SecuredStore,
-        transactionService: ChatTransactionService
+        transactionService: ChatTransactionService,
+        chatsProvider: ChatsProvider
     ) {
         self.apiService = apiService
         self.stack = stack
@@ -70,6 +71,7 @@ actor AdamantTransfersProvider: TransfersProvider {
         self.accountsProvider = accountsProvider
         self.securedStore = securedStore
         self.transactionService = transactionService
+        self.chatsProvider = chatsProvider
         
         Task {
             await addObservers()
