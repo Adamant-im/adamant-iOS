@@ -73,6 +73,7 @@ final class ChatViewController: MessagesViewController {
         configureHeader()
         configureLayout()
         setupObservers()
+        viewModel.loadFirstMessagesIfNeeded()
     }
     
     override func viewWillLayoutSubviews() {
@@ -88,17 +89,14 @@ final class ChatViewController: MessagesViewController {
         )
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        guard !messagesLoaded else { return }
-        viewModel.loadFirstMessagesIfNeeded()
-    }
-    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        defer { viewAppeared = true }
         inputBar.isUserInteractionEnabled = true
         chatMessagesCollectionView.fixedBottomOffset = nil
-        viewAppeared = true
+        
+        guard isMacOS, !viewAppeared else { return }
+        focusInputBarWithoutAnimation()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -349,6 +347,14 @@ private extension ChatViewController {
 // MARK: Other
 
 private extension ChatViewController {
+    func focusInputBarWithoutAnimation() {
+        Task { @MainActor in
+            // "becomeFirstResponder()" causes content animation on start without this fix
+            await Task.sleep(interval: .zero)
+            messageInputBar.inputTextView.becomeFirstResponder()
+        }
+    }
+    
     func dismissTransferViewController(
         andPresent viewController: UIViewController?,
         didFinishWithTransfer: TransactionDetails?
