@@ -1382,7 +1382,7 @@ extension AdamantChatsProvider {
                 }
                 
                 if let partner = privateContext.object(with: account.objectID) as? BaseAccount,
-                   let chatTransaction = transactionService.chatTransaction(
+                   let chatTransaction = await transactionService.chatTransaction(
                     from: trs.transaction,
                     isOutgoing: trs.isOut,
                     publicKey: publicKey,

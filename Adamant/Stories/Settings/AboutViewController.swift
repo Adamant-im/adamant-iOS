@@ -214,44 +214,7 @@ class AboutViewController: FormViewController {
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
         }.onCellSelection { [weak self] (_, _) in
-            guard let accountsProvider = self?.accountsProvider, let router = self?.router else {
-                return
-            }
-            
-            let dialogService = self?.dialogService
-            dialogService?.showProgress(withMessage: nil, userInteractionEnable: false)
-            
-            accountsProvider.getAccount(byAddress: AdamantContacts.iosSupport.address) { result in
-                switch result {
-                case .success(let account):
-                    DispatchQueue.main.async {
-                        guard let chatroom = account.chatroom,
-                            let nav = self?.navigationController,
-                            let account = self?.accountService.account,
-                            let chat = router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
-                                return
-                        }
-                        
-                        chat.hidesBottomBarWhenPushed = true
-                        chat.viewModel.setup(
-                            account: account,
-                            chatroom: chatroom,
-                            messageToShow: nil,
-                            preservationDelegate: self
-                        )
-                        
-                        nav.pushViewController(chat, animated: true)
-                        
-                        dialogService?.dismissProgress()
-                    }
-                    
-                case .invalidAddress, .notFound, .notInitiated, .networkError, .dummy:
-                    dialogService?.showWarning(withMessage: String.adamantLocalized.sharedErrors.networkError)
-                    
-                case .serverError(let error):
-                    dialogService?.showError(withMessage: String.adamantLocalized.sharedErrors.remoteServerError(message: error.localizedDescription), error: error)
-                }
-            }
+            self?.contactUsAction()
         }
             
         // E-mail
@@ -326,6 +289,60 @@ class AboutViewController: FormViewController {
     private func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
+    }
+    
+    @MainActor
+    private func contactUsAction() {
+        Task {
+            dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
+
+            do {
+                let account = try await accountsProvider.getAccount(byAddress: AdamantContacts.iosSupport.address)
+
+                guard let chatroom = account.chatroom,
+                      let nav = self.navigationController,
+                      let account = self.accountService.account,
+                      let chat = router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
+                    return
+                }
+
+                chat.hidesBottomBarWhenPushed = true
+                chat.viewModel.setup(
+                    account: account,
+                    chatroom: chatroom,
+                    messageToShow: nil,
+                    preservationDelegate: self
+                )
+
+                nav.pushViewController(chat, animated: true)
+
+                dialogService.dismissProgress()
+            } catch let error as AccountsProviderResult {
+                switch error {
+                case .success:
+                    break
+                case .invalidAddress, .notFound, .notInitiated, .networkError, .dummy:
+                    dialogService.showWarning(withMessage: String.adamantLocalized.sharedErrors.networkError)
+
+                case .serverError(let error):
+                    dialogService.showError(
+                        withMessage:
+                            String.adamantLocalized.sharedErrors.remoteServerError(
+                                message: error.localizedDescription
+                            ),
+                        error: error
+                    )
+                }
+            } catch {
+                dialogService.showError(
+                    withMessage:
+                        String.adamantLocalized.sharedErrors.remoteServerError(
+                            message: error.localizedDescription
+                        ),
+                    error: error
+                )
+            }
+        }
     }
 }
 

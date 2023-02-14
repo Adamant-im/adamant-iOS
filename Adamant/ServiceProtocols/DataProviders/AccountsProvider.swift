@@ -49,22 +49,12 @@ enum AccountsProviderDummyAccountResult: Error {
     case internalError(Error)
 }
 
-protocol AccountsProvider {
-    
-    /// Search for fetched account, if not found, asks server for account.
-    ///
-    /// - Returns: Account, if found, created in main viewContext
-    func getAccount(byAddress address: String, completion: @escaping (AccountsProviderResult) -> Void)
+protocol AccountsProvider: Actor {
     
     /// Search for fetched account, if not found, asks server for account.
     ///
     /// - Returns: Account, if found, created in main viewContext
     func getAccount(byAddress address: String) async throws -> CoreDataAccount
-    
-    /// Search for fetched account, if not found try to create or asks server for account.
-    ///
-    /// - Returns: Account, if found, created in main viewContext
-    func getAccount(byAddress address: String, publicKey: String, completion: @escaping (AccountsProviderResult) -> Void)
     
     /// Search for fetched account, if not found try to create or asks server for account.
     ///
@@ -78,10 +68,7 @@ protocol AccountsProvider {
 //    func getAccount(byPublicKey publicKey: String, completion: @escaping (AccountsProviderResult) -> Void)
     
     /// Check locally if has account with specified address
-    func hasAccount(address: String, completion: @escaping (Bool) -> Void)
-    
-    /// Request Dummy account, if account wasn't found or initiated
-    func getDummyAccount(for address: String, completion: @escaping (AccountsProviderDummyAccountResult) -> Void)
+    func hasAccount(address: String) -> Bool
     
     /// Request Dummy account, if account wasn't found or initiated
     func getDummyAccount(for address: String) async throws -> DummyAccount

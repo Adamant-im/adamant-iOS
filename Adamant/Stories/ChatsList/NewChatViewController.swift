@@ -250,6 +250,7 @@ class NewChatViewController: FormViewController {
         tableView.backgroundColor = .clear
     }
     
+    @MainActor
     func startNewChat(with address: String, name: String? = nil, message: String?) {
         switch AdamantUtilities.validateAdamantAddress(address: address) {
         case .valid:
@@ -267,10 +268,23 @@ class NewChatViewController: FormViewController {
         
         dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
       
-        accountsProvider.getAccount(byAddress: address) { result in
-            switch result {
-            case .success(let account):
-                DispatchQueue.main.async {
+        Task {
+            do {
+                let account = try await accountsProvider.getAccount(byAddress: address)
+                if let name = name, account.name == nil {
+                    account.name = name
+                    
+                    if let chatroom = account.chatroom, chatroom.title == nil {
+                        chatroom.title = name
+                    }
+                }
+                
+                account.chatroom?.isForcedVisible = true
+                self.delegate?.newChatController(self, didSelectAccount: account, preMessage: message)
+                self.dialogService.dismissProgress()
+            } catch let error as AccountsProviderResult {
+                switch error {
+                case .success(let account):
                     if let name = name, account.name == nil {
                         account.name = name
                         
@@ -282,42 +296,44 @@ class NewChatViewController: FormViewController {
                     account.chatroom?.isForcedVisible = true
                     self.delegate?.newChatController(self, didSelectAccount: account, preMessage: message)
                     self.dialogService.dismissProgress()
-                }
-                
-            case .dummy:
-                self.dialogService.dismissProgress()
-                
-                let alert = UIAlertController(title: nil, message: AccountsProviderResult.notInitiated(address: address).localized, preferredStyle: .alert)
-                
-                let faq = UIAlertAction(title: String.adamantLocalized.newChat.whatDoesItMean, style: .default, handler: { [weak self] _ in
-                    guard let url = URL(string: NewChatViewController.faqUrl) else {
+                    
+                case .dummy:
+                    self.dialogService.dismissProgress()
+                    
+                    let alert = UIAlertController(title: nil, message: AccountsProviderResult.notInitiated(address: address).localized, preferredStyle: .alert)
+                    
+                    let faq = UIAlertAction(title: String.adamantLocalized.newChat.whatDoesItMean, style: .default, handler: { [weak self] _ in
+                        guard let url = URL(string: NewChatViewController.faqUrl) else {
+                            return
+                        }
+                        
+                        let safari = SFSafariViewController(url: url)
+                        safari.preferredControlTintColor = UIColor.adamant.primary
+                        safari.modalPresentationStyle = .overFullScreen
+                        self?.present(safari, animated: true, completion: nil)
+                    })
+                    
+                    alert.addAction(faq)
+                    alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
+                    
+                    alert.modalPresentationStyle = .overFullScreen
+                    self.present(alert, animated: true, completion: nil)
+                    
+                case .notFound, .invalidAddress, .notInitiated, .networkError:
+                    self.dialogService.showWarning(withMessage: error.localized)
+                    
+                case .serverError(let apiError):
+                    if let apiError = apiError as? ApiServiceError,
+                       case .internalError(let message, _) = apiError,
+                       message == String.adamantLocalized.sharedErrors.unknownError {
+                        self.dialogService.showWarning(withMessage: AccountsProviderResult.notFound(address: address).localized)
                         return
                     }
                     
-                    let safari = SFSafariViewController(url: url)
-                    safari.preferredControlTintColor = UIColor.adamant.primary
-                    safari.modalPresentationStyle = .overFullScreen
-                    self?.present(safari, animated: true, completion: nil)
-                })
-                
-                alert.addAction(faq)
-                alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
-                
-                DispatchQueue.main.async {
-                    alert.modalPresentationStyle = .overFullScreen
-                    self.present(alert, animated: true, completion: nil)
+                    self.dialogService.showError(withMessage: error.localized, error: error)
                 }
-                
-            case .notFound, .invalidAddress, .notInitiated, .networkError:
-                self.dialogService.showWarning(withMessage: result.localized)
-                
-            case .serverError(let error):
-                if let apiError = error as? ApiServiceError, case .internalError(let message, _) = apiError, message == String.adamantLocalized.sharedErrors.unknownError {
-                    self.dialogService.showWarning(withMessage: AccountsProviderResult.notFound(address: address).localized)
-                    return
-                }
-                
-                self.dialogService.showError(withMessage: result.localized, error: error)
+            } catch {
+                self.dialogService.showError(withMessage: error.localizedDescription, error: error)
             }
         }
     }

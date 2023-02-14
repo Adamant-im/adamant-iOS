@@ -261,7 +261,7 @@ final class ChatViewModel: NSObject {
             transaction.isHidden = true
             try? transaction.managedObjectContext?.save()
             
-            chatroom?.updateLastTransaction()
+            await chatroom?.updateLastTransaction()
             guard let id = transaction.transactionId else { return }
             await chatsProvider.removeMessage(with: id)
         }
@@ -290,7 +290,7 @@ final class ChatViewModel: NSObject {
             }
             
             guard let room = await self.chatsProvider.getChatroom(for: adm.address) else {
-                self.findAccount(with: adm.address, name: adm.name, message: adm.message)
+                await self.findAccount(with: adm.address, name: adm.name, message: adm.message)
                 return
             }
             
@@ -522,34 +522,44 @@ private extension ChatViewModel {
         isAttachmentButtonAvailable = isAnyWalletVisible
     }
     
-    func findAccount(with address: String, name: String?, message: String?) {
+    @MainActor
+    func findAccount(with address: String, name: String?, message: String?) async {
         dialog.send(.progress(true))
-        accountProvider.getAccount(byAddress: address) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
+        do {
+            let account = try await accountProvider.getAccount(byAddress: address)
+            
+            self.dialog.send(.progress(false))
+            guard let chatroom = account.chatroom else { return }
+            self.setNameIfNeeded(for: account, chatroom: account.chatroom, name: name)
+            account.chatroom?.isForcedVisible = true
+            self.startNewChat(with: chatroom, message: message)
+        } catch let error as AccountsProviderResult {
+            switch error {
             case .success(let account):
-                DispatchQueue.main.async {
-                    self.dialog.send(.progress(false))
-                    guard let chatroom = account.chatroom else { return }
-                    self.setNameIfNeeded(for: account, chatroom: account.chatroom, name: name)
-                    account.chatroom?.isForcedVisible = true
-                    self.startNewChat(with: chatroom, message: message)
-                }
+                self.dialog.send(.progress(false))
+                guard let chatroom = account.chatroom else { return }
+                self.setNameIfNeeded(for: account, chatroom: account.chatroom, name: name)
+                account.chatroom?.isForcedVisible = true
+                self.startNewChat(with: chatroom, message: message)
             case .dummy:
                 self.dialog.send(.progress(false))
                 self.dialog.send(.dummy(address))
             case .notFound, .invalidAddress, .notInitiated, .networkError:
                 self.dialog.send(.progress(false))
-                self.dialog.send(.alert(result.localized))
-            case .serverError(let error):
+                self.dialog.send(.alert(error.localized))
+            case .serverError(let apiError):
                 self.dialog.send(.progress(false))
-                if let apiError = error as? ApiServiceError, case .internalError(let message, _) = apiError, message == String.adamantLocalized.sharedErrors.unknownError {
+                if let apiError = apiError as? ApiServiceError,
+                   case .internalError(let message, _) = apiError,
+                   message == String.adamantLocalized.sharedErrors.unknownError {
                     self.dialog.send(.alert(AccountsProviderResult.notFound(address: address).localized))
                     return
                 }
                 
-                self.dialog.send(.error(result.localized))
+                self.dialog.send(.error(error.localized))
             }
+        } catch {
+            self.dialog.send(.error(error.localizedDescription))
         }
     }
     

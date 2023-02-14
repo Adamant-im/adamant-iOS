@@ -896,15 +896,15 @@ extension AdamantTransfersProvider {
         }
         
         // MARK: 3. Create private context, and process transactions
-        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        context.parent = self.stack.container.viewContext
+        let contextPrivate = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        contextPrivate.parent = context
         
         var partners: [String:BaseAccount] = [:]
         for id in partnerIds {
             let request = NSFetchRequest<BaseAccount>(entityName: BaseAccount.baseEntityName)
             request.predicate = NSPredicate(format: "address == %@", id)
             request.fetchLimit = 1
-            if let partner = (try? context.fetch(request))?.first {
+            if let partner = (try? contextPrivate.fetch(request))?.first {
                 partners[id] = partner
             }
         }
@@ -920,7 +920,8 @@ extension AdamantTransfersProvider {
             }
             
             transactionInProgress.append(t.id)
-            if let objectId = unconfirmedTransactions[t.id], let transaction = context.object(with: objectId) as? TransferTransaction {
+            if let objectId = unconfirmedTransactions[t.id],
+               let transaction = contextPrivate.object(with: objectId) as? TransferTransaction {
                 transaction.isConfirmed = true
                 transaction.height = t.height
                 transaction.blockId = t.blockId
@@ -941,7 +942,12 @@ extension AdamantTransfersProvider {
             let partner = partners[String(t.id)]
             let isOut = t.senderId == address
             
-            let transfer = transactionService.transferTransaction(from: t, isOut: isOut, partner: partner, context: context)
+            let transfer = await transactionService.transferTransaction(
+                from: t,
+                isOut: isOut,
+                partner: partner,
+                context: contextPrivate
+            )
            
             transfer.isOutgoing = t.senderId == address
             let partnerId = transfer.isOutgoing ? t.recipientId : t.senderId
@@ -982,14 +988,15 @@ extension AdamantTransfersProvider {
         }
                 
         // MARK: 6. Dump transactions to viewContext
-        if context.hasChanges {
+        if contextPrivate.hasChanges {
             do {
-                try context.save()
-
+                try contextPrivate.save()
+                
                 // MARK: 7. Update lastTransactions
-                let viewContextChatrooms = Set<Chatroom>(transfers.compactMap { $0.chatroom }).compactMap { self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom }
-                DispatchQueue.main.async {
-                    viewContextChatrooms.forEach { $0.updateLastTransaction() }
+                let viewContextChatrooms = Set<Chatroom>(transfers.compactMap { $0.chatroom }).compactMap { context.object(with: $0.objectID) as? Chatroom }
+                
+                for chatroom in viewContextChatrooms {
+                    await chatroom.updateLastTransaction()
                 }
             } catch {
                 print("TransferProvider: Failed to save changes to CoreData: \(error.localizedDescription)")
