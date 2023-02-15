@@ -5,8 +5,7 @@ public final class PopupManager {
     private let coordinatorModel = PopupCoordinatorModel()
     
     private lazy var autoDismissManager = AutoDismissManager(
-        popupCoordinatorModel: coordinatorModel,
-        calendar: Calendar.current
+        popupCoordinatorModel: coordinatorModel
     )
     
     public func setup() {
@@ -41,7 +40,7 @@ public extension PopupManager {
     }
     
     func showProgressAlert(message: String?, userInteractionEnabled: Bool) {
-        autoDismissManager.alertDismissTask?.cancel()
+        autoDismissManager.alertDismissSubscription?.cancel()
         coordinatorModel.alert = .init(
             icon: .loading,
             message: message,
@@ -88,7 +87,7 @@ public extension PopupManager {
         if autoDismiss {
             autoDismissManager.dismissNotification()
         } else {
-            autoDismissManager.notificationDismissTask?.cancel()
+            autoDismissManager.notificationDismissSubscription?.cancel()
         }
     }
     

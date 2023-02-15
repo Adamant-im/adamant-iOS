@@ -10,57 +10,43 @@ import Foundation
 
 final class AutoDismissManager {
     private let popupCoordinatorModel: PopupCoordinatorModel
-    private let calendar: Calendar
     
-    private(set) var notificationDismissTask: Cancellable?
-    private(set) var alertDismissTask: Cancellable?
-    private(set) var toastDismissTask: Cancellable?
+    private(set) var notificationDismissSubscription: AnyCancellable?
+    private(set) var alertDismissSubscription: AnyCancellable?
+    private(set) var toastDismissSubscription: AnyCancellable?
     
-    init(popupCoordinatorModel: PopupCoordinatorModel, calendar: Calendar) {
+    init(popupCoordinatorModel: PopupCoordinatorModel) {
         self.popupCoordinatorModel = popupCoordinatorModel
-        self.calendar = calendar
     }
     
     func dismissNotification() {
-        notificationDismissTask?.cancel()
-        notificationDismissTask = OperationQueue.main.schedule(
-            after: .init(makeDismissDate()),
-            interval: .zero
-        ) { [weak popupCoordinatorModel] in
-            popupCoordinatorModel?.notification = nil
+        notificationDismissSubscription = setTimer { [weak self] in
+            self?.notificationDismissSubscription = nil
+            self?.popupCoordinatorModel.notification = nil
         }
     }
     
     func dismissAlert() {
-        alertDismissTask?.cancel()
-        alertDismissTask = OperationQueue.main.schedule(
-            after: .init(makeDismissDate()),
-            interval: .zero
-        ) { [weak popupCoordinatorModel] in
-            popupCoordinatorModel?.alert = nil
+        alertDismissSubscription = setTimer { [weak self] in
+            self?.alertDismissSubscription = nil
+            self?.popupCoordinatorModel.alert = nil
         }
     }
     
     func dismissToast() {
-        toastDismissTask?.cancel()
-        toastDismissTask = OperationQueue.main.schedule(
-            after: .init(makeDismissDate()),
-            interval: .zero
-        ) { [weak popupCoordinatorModel] in
-            popupCoordinatorModel?.toastMessage = nil
+        toastDismissSubscription = setTimer { [weak self] in
+            self?.toastDismissSubscription = nil
+            self?.popupCoordinatorModel.toastMessage = nil
         }
     }
 }
 
 private extension AutoDismissManager {
-    func makeDismissDate() -> Date {
-        guard let date = calendar.date(byAdding: .second, value: autoDismissTimeInterval, to: Date()) else {
-            assertionFailure("Date is nil")
-            return Date()
-        }
-        
-        return date
+    func setTimer(handler: @escaping () -> Void) -> AnyCancellable {
+        Timer.publish(every: autoDismissTimeInterval, on: .main, in: .common)
+            .autoconnect()
+            .sink { _ in handler() }
     }
 }
 
-private let autoDismissTimeInterval: Int = 4
+private let autoDismissTimeInterval: TimeInterval = 4
