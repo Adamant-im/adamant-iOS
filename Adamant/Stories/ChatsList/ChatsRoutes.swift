@@ -56,6 +56,7 @@ extension AdamantScene {
             let c = SearchResultsViewController(nibName: "SearchResultsViewController", bundle: nil)
             c.router = r.resolve(Router.self)
             c.avatarService = r.resolve(AvatarService.self)
+            c.addressBookService = r.resolve(AddressBookService.self)
             return c
         })
         

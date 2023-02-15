@@ -1,5 +1,5 @@
 //
-//  ChatMessagesListService.swift
+//  ChatMessagesListFactory.swift
 //  Adamant
 //
 //  Created by Andrey Golubenko on 08.02.2023.
@@ -10,7 +10,7 @@ import Foundation
 import MessageKit
 import Combine
 
-actor ChatMessagesListService {
+actor ChatMessagesListFactory {
     typealias ProcessTransaction = (_ id: String) -> Void
     
     private let chatMessageFactory: ChatMessageFactory
@@ -39,7 +39,7 @@ actor ChatMessagesListService {
         
         return transactions.enumerated().map { index, transaction in
             var expTimestamp: TimeInterval?
-            let message = processTransaction(
+            let message = makeMessage(
                 transaction,
                 sender: sender,
                 dateHeaderOn: isNeedToDisplayDateHeader(index: index, transactions: transactions),
@@ -56,8 +56,8 @@ actor ChatMessagesListService {
     }
 }
 
-private extension ChatMessagesListService {
-    func processTransaction(
+private extension ChatMessagesListFactory {
+    func makeMessage(
         _ transaction: ChatTransaction,
         sender: SenderType,
         dateHeaderOn: Bool,

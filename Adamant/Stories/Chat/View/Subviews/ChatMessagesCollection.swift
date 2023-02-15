@@ -24,22 +24,6 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
         safeAreaInsets + contentInset
     }
     
-    var minVerticalOffset: CGFloat {
-        -fullInsets.top
-    }
-    
-    /// To avoid insets changing by MessageKit
-    override var contentInset: UIEdgeInsets {
-        get { super.contentInset }
-        set {}
-    }
-    
-    /// To avoid insets changing by MessageKit
-    override var verticalScrollIndicatorInsets: UIEdgeInsets {
-        get { super.verticalScrollIndicatorInsets }
-        set {}
-    }
-    
     override func layoutSubviews() {
         super.layoutSubviews()
         
@@ -60,16 +44,16 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
         
         let bottomOffset = self.bottomOffset
         applyNewModels(newModels)
-        setBottomOffset(bottomOffset, safely: true)
+        setBottomOffset(bottomOffset, safely: !isDragging && !isDecelerating)
     }
     
     func setFullBottomInset(_ inset: CGFloat) {
         let inset = inset - safeAreaInsets.bottom
         let bottomOffset = self.bottomOffset
-        super.contentInset.bottom = inset
-        super.verticalScrollIndicatorInsets.bottom = inset
+        contentInset.bottom = inset
+        verticalScrollIndicatorInsets.bottom = inset
 
-        guard !isDragging || isDecelerating else { return }
+        guard !hasActiveScrollGestures else { return }
         setBottomOffset(bottomOffset, safely: false)
     }
     
@@ -86,8 +70,29 @@ private extension ChatMessagesCollectionView {
         contentHeightWithBottomInsets - bounds.height
     }
     
+    var minVerticalOffset: CGFloat {
+        -fullInsets.top
+    }
+    
     var contentHeightWithBottomInsets: CGFloat {
         contentSize.height + fullInsets.bottom
+    }
+    
+    var scrollGestureRecognizers: [UIGestureRecognizer] {
+        [panGestureRecognizer, pinchGestureRecognizer].compactMap { $0 }
+    }
+    
+    var hasActiveScrollGestures: Bool {
+        scrollGestureRecognizers.contains {
+            switch $0.state {
+            case .began, .changed:
+                return true
+            case .ended, .cancelled, .possible, .failed:
+                return false
+            @unknown default:
+                return false
+            }
+        }
     }
     
     func applyNewModels(_ newModels: [ChatMessage]) {
@@ -117,9 +122,16 @@ private extension ChatMessagesCollectionView {
     func setVerticalContentOffset(_ offset: CGFloat, safely: Bool) {
         guard maxVerticalOffset > .zero else { return }
         
-        contentOffset.y = safely && offset > maxVerticalOffset
-            ? maxVerticalOffset
-            : offset
+        var offset = offset
+        if safely {
+            if offset > maxVerticalOffset {
+                offset = maxVerticalOffset
+            } else if offset < minVerticalOffset {
+                offset = minVerticalOffset
+            }
+        }
+        
+        contentOffset.y = offset
     }
     
     func reloadTransactionCellsOnly(_ newModels: [ChatMessage]) {

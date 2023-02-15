@@ -468,18 +468,6 @@ extension ChatListViewController {
     private func configureCell(_ cell: ChatTableViewCell, for chatroom: Chatroom) {
         cell.backgroundColor = .clear
         if let partner = chatroom.partner {
-            if let title = chatroom.title {
-                cell.accountLabel.text = title
-            } else if let name = partner.name {
-                cell.accountLabel.text = name
-            } else if let address = partner.address,
-                      let name = self.addressBook.addressBook[address] {
-                cell.accountLabel.text = name
-            } else {
-                cell.accountLabel.text = partner.address
-            }
-            cell.accountLabel.text = cell.accountLabel.text?.checkAndReplaceSystemWallets()
-            
             if let avatarName = partner.avatar, let avatar = UIImage.init(named: avatarName) {
                 cell.avatarImage = avatar
                 cell.avatarImageView.tintColor = UIColor.adamant.primary
@@ -499,10 +487,9 @@ extension ChatListViewController {
                 }
                 cell.borderWidth = 0
             }
-        } else if let title = chatroom.title {
-            cell.accountLabel.text = title
         }
         
+        cell.accountLabel.text = chatroom.getName(addressBookService: addressBook)
         cell.hasUnreadMessages = chatroom.hasUnreadMessages
 
         if let lastTransaction = chatroom.lastTransaction {

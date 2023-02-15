@@ -10,6 +10,7 @@
 import Foundation
 import CoreData
 
+// TODO: remove desynchronization between hasUnreadMessages and lastTransaction.isUnread
 extension Chatroom {
 
     @nonobjc public class func fetchRequest() -> NSFetchRequest<Chatroom> {

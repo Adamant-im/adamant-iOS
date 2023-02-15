@@ -198,7 +198,7 @@ extension AdamantTransfersProvider {
             if let h = receivedLastHeight {
                 readedLastHeight = h
             } else {
-                readedLastHeight = 0
+                readedLastHeight = nil
             }
             
             let store = securedStore

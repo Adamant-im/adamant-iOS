@@ -415,6 +415,14 @@ extension ERC20WalletService {
             // MARK: 4. Block timestamp & confirmations
             let currentBlock = try await eth.blockNumber()
             let block = try await eth.block(by: receipt.blockHash)
+            
+            guard currentBlock >= blockNumber else {
+                throw WalletServiceError.internalError(
+                    message: "ERC20 confirmations calculating error",
+                    error: nil
+                )
+            }
+            
             let confirmations = currentBlock - blockNumber
             
             let transaction = details.transaction
