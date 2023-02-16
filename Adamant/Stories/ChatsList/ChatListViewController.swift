@@ -268,25 +268,27 @@ class ChatListViewController: UIViewController {
     }
     
     @MainActor
-    @objc private func handleRefresh(_ refreshControl: UIRefreshControl) async {
-        let result = await chatsProvider.update()
-        
-        guard let result = result else {
-            DispatchQueue.main.async {
-                refreshControl.endRefreshing()
-            }
-            return
-        }
-        
-        switch result {
-        case .success:
-            tableView.reloadData()
+    @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
+        Task {
+            let result = await chatsProvider.update()
             
-        case .failure(let error):
-            dialogService.showRichError(error: error)
+            guard let result = result else {
+                DispatchQueue.main.async {
+                    refreshControl.endRefreshing()
+                }
+                return
+            }
+            
+            switch result {
+            case .success:
+                tableView.reloadData()
+                
+            case .failure(let error):
+                dialogService.showRichError(error: error)
+            }
+            
+            refreshControl.endRefreshing()
         }
-        
-        refreshControl.endRefreshing()
     }
     
     func setIsBusy(_ busy: Bool, animated: Bool = true) {
