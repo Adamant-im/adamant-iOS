@@ -58,7 +58,7 @@ class AdamantAvatarService {
             return image
         }
         
-        UIGraphicsBeginImageContextWithOptions(CGSize(width: size, height: size), false, 0)
+        UIGraphicsBeginImageContextWithOptions(CGSize(squareSize: size), false, 0)
         Hexa16(key: key, size: size)
         
         let image = UIGraphicsGetImageFromCurrentImageContext()

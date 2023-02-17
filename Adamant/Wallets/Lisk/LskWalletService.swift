@@ -35,9 +35,6 @@ class LskWalletService: WalletService {
     
     // MARK: RichMessageProvider properties
     static let richMessageType = "lsk_transaction"
-    let cellIdentifierSent = "lskTransferSent"
-    let cellIdentifierReceived = "lskTransferReceived"
-    let cellSource: CellSource? = CellSource.nib(nib: UINib(nibName: "TransferCollectionViewCell", bundle: nil))
     
     // MARK: - Dependencies
     var apiService: ApiService!

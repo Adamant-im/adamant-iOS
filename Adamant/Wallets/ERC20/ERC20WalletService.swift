@@ -92,10 +92,6 @@ class ERC20WalletService: WalletService {
         return "\(self.token?.symbol.lowercased() ?? "erc20")_transaction"
     }
     
-    let cellIdentifierSent = "erc20TransferSent"
-    let cellIdentifierReceived = "erc20TransferReceived"
-    let cellSource: CellSource? = CellSource.nib(nib: UINib(nibName: "TransferCollectionViewCell", bundle: nil))
-    
     // MARK: - Properties
     
     private (set) var token: ERC20Token?
@@ -447,6 +443,14 @@ extension ERC20WalletService {
                 // MARK: 4. Block timestamp & confirmations
                 let currentBlock = try eth.getBlockNumberPromise().wait()
                 let block = try eth.getBlockByNumberPromise(blockNumber).wait()
+                
+                guard currentBlock >= blockNumber else {
+                    return completion(.failure(error: .internalError(
+                        message: "ERC20 confirmations calculating error",
+                        error: nil
+                    )))
+                }
+                
                 let confirmations = currentBlock - blockNumber
                 
                 let transaction = details.transaction

@@ -178,7 +178,8 @@ extension Container {
                 adamantCore: r.resolve(AdamantCore.self)!,
                 accountsProvider: r.resolve(AccountsProvider.self)!,
                 transactionService: r.resolve(ChatTransactionService.self)!,
-                securedStore: r.resolve(SecuredStore.self)!
+                securedStore: r.resolve(SecuredStore.self)!,
+                richTransactionStatusService: r.resolve(RichTransactionStatusService.self)!
             )
         }.inObjectScope(.container)
         
@@ -189,5 +190,32 @@ extension Container {
                 accountService: r.resolve(AccountService.self)!
             )
         }.inObjectScope(.container)
+        
+        // MARK: Chat screen factory
+        self.register(ChatFactory.self) { r in
+            ChatFactory(
+                chatsProvider: r.resolve(ChatsProvider.self)!,
+                dialogService: r.resolve(DialogService.self)!,
+                transferProvider: r.resolve(TransfersProvider.self)!,
+                accountService: r.resolve(AccountService.self)!,
+                accountProvider: r.resolve(AccountsProvider.self)!,
+                addressBookService: r.resolve(AddressBookService.self)!,
+                visibleWalletService: r.resolve(VisibleWalletsService.self)!,
+                router: r.resolve(Router.self)!
+            )
+        }
+        
+        // MARK: Rich transaction status service
+        self.register(RichTransactionStatusService.self) { r in
+            let accountService = r.resolve(AccountService.self)!
+            
+            let richProviders = accountService.wallets
+                .compactMap { $0 as? RichMessageProviderWithStatusCheck }
+                .map { ($0.dynamicRichMessageType, $0) }
+            
+            return AdamantRichTransactionStatusService(
+                richProviders: Dictionary(uniqueKeysWithValues: richProviders)
+            )
+        }
     }
 }

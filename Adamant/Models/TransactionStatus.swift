@@ -31,4 +31,13 @@ enum TransactionStatus: Int16 {
             return NSLocalizedString("TransactionStatus.Warning", comment: "Transaction status: transaction warning")
         }
     }
+    
+    var isFinal: Bool {
+        switch self {
+        case .notInitiated, .updating, .pending:
+            return false
+        case .dublicate, .warning, .failed, .success:
+            return true
+        }
+    }
 }

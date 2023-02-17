@@ -83,6 +83,15 @@
         }
       },
       {
+        "package": "InputBarAccessoryView",
+        "repositoryURL": "https://github.com/nathantannar4/InputBarAccessoryView",
+        "state": {
+          "branch": null,
+          "revision": "039a9cb3ae8c5bc4d39242a6aa688b88023633d3",
+          "version": "6.2.0"
+        }
+      },
+      {
         "package": "KeychainAccess",
         "repositoryURL": "https://github.com/kishikawakatsumi/KeychainAccess.git",
         "state": {
@@ -98,6 +107,15 @@
           "branch": null,
           "revision": "5056f3305d3499f44d8815530d560b87082e0cf5",
           "version": "1.7.1"
+        }
+      },
+      {
+        "package": "MessageKit",
+        "repositoryURL": "https://github.com/MessageKit/MessageKit.git",
+        "state": {
+          "branch": null,
+          "revision": "14bfa7eb9f93267c3d7b8cdf58615bba27be672a",
+          "version": "4.1.1"
         }
       },
       {
@@ -201,7 +219,7 @@
       },
       {
         "package": "Starscream",
-        "repositoryURL": "https://github.com/daltoniam/Starscream.git",
+        "repositoryURL": "https://github.com/daltoniam/Starscream",
         "state": {
           "branch": null,
           "revision": "df8d82047f6654d8e4b655d1b1525c64e1059d21",
