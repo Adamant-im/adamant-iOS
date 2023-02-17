@@ -36,6 +36,26 @@ protocol ApiService: AnyObject {
         parameters: Parameters?
     ) async throws -> Output
     
+    func sendRequest<Output: Decodable>(
+        url: URLConvertible,
+        method: HTTPMethod,
+        parameters: Parameters?,
+        encoding: ParameterEncoding
+    ) async throws -> Output
+    
+    func sendRequest(
+        url: URLConvertible,
+        method: HTTPMethod,
+        parameters: Parameters?
+    ) async throws -> Data
+    
+    func sendRequest(
+        url: URLConvertible,
+        method: HTTPMethod,
+        parameters: Parameters?,
+        encoding: ParameterEncoding
+    ) async throws -> Data
+    
     // MARK: - Peers
     
     func getNodeVersion(url: URL, completion: @escaping (ApiServiceResult<NodeVersion>) -> Void)
@@ -139,6 +159,11 @@ protocol ApiService: AnyObject {
     )
     
     func get(key: String, sender: String, completion: @escaping (ApiServiceResult<String?>) -> Void)
+    
+    func get(
+        key: String,
+        sender: String
+    ) async throws -> String?
     
     // MARK: - Chats
     

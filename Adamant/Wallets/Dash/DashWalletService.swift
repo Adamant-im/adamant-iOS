@@ -61,7 +61,7 @@ class DashWalletService: WalletService {
     static let chunkSize = 20
     
     var transactionFee: Decimal {
-        return DogeWalletService.fixedFee
+        return DashWalletService.fixedFee
     }
     
     static let kvsAddress = "dash:address"
@@ -288,11 +288,6 @@ extension DashWalletService {
             throw WalletServiceError.walletNotInitiated
         }
 
-        // Headers
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json"
-        ]
-        
         // Parameters
         let parameters: Parameters = [
             "method": "getaddressbalance",
@@ -302,46 +297,51 @@ extension DashWalletService {
         ]
         
         // MARK: Sending request
-        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Decimal, Error>) in
-            AF.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
-                
-                switch response.result {
-                case .success(let data):
-                    if let object = data as? [String: Any] {
-                        let result = object["result"] as? [String: Any]
-                        let error = object["error"]
-                        
-                        if error is NSNull, let result = result, let raw = result["balance"] as? Int64 {
-                            let balance = Decimal(raw) / DashWalletService.multiplier
-                            continuation.resume(returning: balance)
-                        } else {
-                            continuation.resume(throwing: WalletServiceError.remoteServiceError(message: "DASH Wallet: \(data)"))
-                        }
-                    } else {
-                        continuation.resume(throwing: WalletServiceError.remoteServiceError(message: "DASH Wallet: \(data)"))
-                    }
-                    
-                case .failure:
-                    continuation.resume(throwing: WalletServiceError.networkError)
-                }
-            }
+        
+        let data = try await apiService.sendRequest(
+            url: endpoint,
+            method: .post,
+            parameters: parameters,
+            encoding: JSONEncoding.default
+        )
+        
+        let object = try? JSONSerialization.jsonObject(
+            with: data,
+            options: []
+        ) as? [String: Any]
+
+        guard let object = object else {
+            throw WalletServiceError.internalError(
+                message: "DASH Wallet: not valid response",
+                error: nil
+            )
+        }
+        
+        let result = object["result"] as? [String: Any]
+        let error = object["error"]
+        
+        if error is NSNull, let result = result, let raw = result["balance"] as? Int64 {
+            let balance = Decimal(raw) / DashWalletService.multiplier
+            return balance
+        } else {
+            throw WalletServiceError.remoteServiceError(message: "DASH Wallet: \(data)")
         }
     }
 
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
-        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<String, Error>) in
-            apiService.get(key: DashWalletService.kvsAddress, sender: address) { (result) in
-                switch result {
-                case .success(let value):
-                    if let address = value {
-                        continuation.resume(returning: address)
-                    } else {
-                        continuation.resume(throwing: WalletServiceError.walletNotInitiated)
-                    }
-                case .failure(let error):
-                    continuation.resume(throwing: WalletServiceError.internalError(message: "DASH Wallet: fail to get address from KVS", error: error))
-                }
+        do {
+            let result = try await apiService.get(key: DashWalletService.kvsAddress, sender: address)
+            
+            guard let result = result else {
+                throw WalletServiceError.walletNotInitiated
             }
+            
+            return result
+        } catch {
+            throw WalletServiceError.internalError(
+                message: "DASH Wallet: fail to get address from KVS",
+                error: error
+            )
         }
     }
 }

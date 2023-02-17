@@ -36,7 +36,7 @@ class DashTransactionDetailsViewController: TransactionDetailsViewControllerBase
         super.viewDidLoad()
         if service != nil { tableView.refreshControl = refreshControl }
         
-        updateTransaction()
+        refresh(true)
         
         // MARK: Start update
         if transaction != nil {
@@ -56,49 +56,23 @@ class DashTransactionDetailsViewController: TransactionDetailsViewControllerBase
         return URL(string: "\(DashWalletService.explorerAddress)\(id)")
     }
     
-    @objc func refresh() {
-        updateTransaction { [weak self] error in
-            DispatchQueue.main.async {
-                self?.refreshControl.endRefreshing()
-                
-                if let error = error {
-                    self?.dialogService.showRichError(error: error)
-                }
-            }
-        }
-    }
-    
-    // MARK: Autoupdate
-    
-    func startUpdate() {
-        timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            self?.updateTransaction() // Silent, without errors
-        }
-    }
-    
-    func stopUpdate() {
-        timer?.invalidate()
-    }
-    
-    // MARK: Updating methods
-    
     @MainActor
-    func updateTransaction(completion: ((RichError?) -> Void)? = nil) {
-        guard let service = service, let address = service.wallet?.address, let id = transaction?.txId else {
-            completion?(nil)
-            return
-        }
+    @objc func refresh(_ silent: Bool = false) {
+        refreshTask = Task { [weak self] in
+            guard let service = service,
+                    let address = service.wallet?.address,
+                    let id = transaction?.txId
+            else {
+                return
+            }
         
-        Task { [weak self] in
             do {
                 let trs = try await service.getTransaction(by: id)
-                if let blockInfo = self?.cachedBlockInfo, blockInfo.hash == trs.blockHash {
+                if let blockInfo = self?.cachedBlockInfo,
+                   blockInfo.hash == trs.blockHash {
                     self?.transaction = trs.asBtcTransaction(DashTransaction.self, for: address, blockId: blockInfo.height)
 
                     self?.tableView.reloadData()
-
-                    completion?(nil)
                 } else if let blockHash = trs.blockHash {
                     let blockInfo: (hash: String, height: String)?
                     do {
@@ -111,22 +85,30 @@ class DashTransactionDetailsViewController: TransactionDetailsViewControllerBase
                     self?.cachedBlockInfo = blockInfo
 
                     self?.tableView.reloadData()
-
-                    completion?(nil)
-                    
                 } else {
                     self?.transaction = trs.asBtcTransaction(DashTransaction.self, for: address)
 
                     self?.tableView.reloadData()
-
-                    completion?(nil)
                 }
-            } catch let error as WalletServiceError {
-                completion?(error)
+                self?.refreshControl.endRefreshing()
             } catch {
-                completion?(nil)
+                self?.refreshControl.endRefreshing()
+                guard !silent else { return }
+                self?.dialogService.showRichError(error: error)
             }
         }
-        
+    }
+    
+    // MARK: Autoupdate
+    
+    func startUpdate() {
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
+            self?.refresh(true) // Silent, without errors
+        }
+    }
+    
+    func stopUpdate() {
+        timer?.invalidate()
     }
 }

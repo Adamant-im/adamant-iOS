@@ -73,12 +73,14 @@ extension ERC20WalletService: RichMessageProviderWithStatusCheck {
             return .success
         } catch let error as WalletServiceError {
             guard transaction.transactionStatus == .notInitiated else {
-                throw error
+                // throw error
+                return .failed
             }
             
             return .pending
         } catch {
-            throw WalletServiceError.internalError(message: "Failed to get transaction", error: error)
+            // throw WalletServiceError.internalError(message: "Failed to get transaction", error: error)
+            return .failed
         }
     }
 }

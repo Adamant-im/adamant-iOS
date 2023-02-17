@@ -243,11 +243,26 @@ final class AdamantApiService: ApiService {
         method: HTTPMethod,
         parameters: Parameters?
     ) async throws -> Output {
+        try await sendRequest(
+            url: url,
+            method: method,
+            parameters: parameters,
+            encoding: URLEncoding.default
+        )
+    }
+    
+    func sendRequest<Output: Decodable>(
+        url: URLConvertible,
+        method: HTTPMethod,
+        parameters: Parameters?,
+        encoding: ParameterEncoding
+    ) async throws -> Output {
         return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Output, Error>) in
             AF.request(
                 url,
                 method: method,
                 parameters: parameters,
+                encoding: encoding,
                 headers: HTTPHeaders(["Content-Type": "application/json"])
             ).responseData(queue: defaultResponseDispatchQueue) { response in
                 switch response.result {
@@ -258,6 +273,44 @@ final class AdamantApiService: ApiService {
                     } catch {
                         continuation.resume(throwing: InternalError.parsingFailed.apiServiceErrorWith(error: error))
                     }
+                    
+                case .failure(let error):
+                    continuation.resume(throwing: ApiServiceError.init(error: error))
+                }
+            }
+        }
+    }
+    
+    func sendRequest(
+        url: URLConvertible,
+        method: HTTPMethod,
+        parameters: Parameters?
+    ) async throws -> Data {
+        try await sendRequest(
+            url: url,
+            method: method,
+            parameters: parameters,
+            encoding: URLEncoding.default
+        )
+    }
+    
+    func sendRequest(
+        url: URLConvertible,
+        method: HTTPMethod,
+        parameters: Parameters?,
+        encoding: ParameterEncoding
+    ) async throws -> Data {
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Data, Error>) in
+            AF.request(
+                url,
+                method: method,
+                parameters: parameters,
+                encoding: encoding,
+                headers: HTTPHeaders(["Content-Type": "application/json"])
+            ).responseData(queue: defaultResponseDispatchQueue) { response in
+                switch response.result {
+                case .success(let data):
+                    continuation.resume(returning: data)
                     
                 case .failure(let error):
                     continuation.resume(throwing: ApiServiceError.init(error: error))

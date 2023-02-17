@@ -40,21 +40,28 @@ extension BtcWalletService: WalletServiceTwoStepSend {
         let fee = NSDecimalNumber(decimal: self.transactionFee * BtcWalletService.multiplier).uint64Value
         
         // MARK: 2. Search for unspent transactions
-        do {
-            let utxos = try await getUnspentTransactions()
-            
-            // MARK: 3. Check if we have enought money
-            let totalAmount: UInt64 = UInt64(utxos.reduce(0) { $0 + $1.output.value })
-            guard totalAmount >= rawAmount + fee else { // This shit can crash BitcoinKit
-                throw WalletServiceError.notEnoughMoney
-            }
-            
-            // MARK: 4. Create local transaction
-            let transaction = BitcoinKit.Transaction.createNewTransaction(toAddress: toAddress, amount: rawAmount, fee: fee, changeAddress: changeAddress, utxos: utxos, keys: [key])
-            return transaction
-        } catch {
-            throw error
+
+        let utxos = try await getUnspentTransactions()
+        
+        // MARK: 3. Check if we have enought money
+        
+        let totalAmount: UInt64 = UInt64(utxos.reduce(0) { $0 + $1.output.value })
+        guard totalAmount >= rawAmount + fee else { // This shit can crash BitcoinKit
+            throw WalletServiceError.notEnoughMoney
         }
+        
+        // MARK: 4. Create local transaction
+        
+        let transaction = BitcoinKit.Transaction.createNewTransaction(
+            toAddress: toAddress,
+            amount: rawAmount,
+            fee: fee,
+            changeAddress: changeAddress,
+            utxos: utxos,
+            keys: [key]
+        )
+        
+        return transaction
     }
     
     func sendTransaction(_ transaction: BitcoinKit.Transaction) async throws -> String {
@@ -65,37 +72,20 @@ extension BtcWalletService: WalletServiceTwoStepSend {
         // Request url
         let endpoint = url.appendingPathComponent(BtcApiCommands.sendTransaction())
         
-        // Headers
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json"
-        ]
-        
         // MARK: Prepare params
         
         let txHex = transaction.serialized().hex
         
         // MARK: Sending request
         
-        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<String, Error>) in
-            AF.request(
-                endpoint,
-                method: .post,
-                parameters: nil,
-                encoding: BodyStringEncoding(body: txHex),
-                headers: headers
-            ).responseData(queue: defaultDispatchQueue) { response in
-                switch response.result {
-                case .success:
-                    continuation.resume(returning: transaction.txId)
-                case .failure(let error):
-                    continuation.resume(
-                        throwing: WalletServiceError.remoteServiceError(
-                            message: error.localizedDescription
-                        )
-                    )
-                }
-            }
-        }
+        _ = try await apiService.sendRequest(
+            url: endpoint,
+            method: .post,
+            parameters: nil,
+            encoding: BodyStringEncoding(body: txHex)
+        )
+        
+        return transaction.txId
     }
     
     func getUnspentTransactions() async throws -> [UnspentTransaction] {

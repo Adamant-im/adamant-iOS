@@ -264,20 +264,19 @@ class BtcWalletService: WalletService {
     }
     
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
-        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<String, Error>) in
-            apiService.get(key: BtcWalletService.kvsAddress, sender: address) { (result) in
-                switch result {
-                case .success(let value):
-                    if let address = value {
-                        continuation.resume(returning: address)
-                    } else {
-                        continuation.resume(throwing: WalletServiceError.walletNotInitiated)
-                    }
-                    
-                case .failure(let error):
-                    continuation.resume(throwing: WalletServiceError.internalError(message: "BTC Wallet: fail to get address from KVS", error: error))
-                }
+        do {
+            let result = try await apiService.get(key: BtcWalletService.kvsAddress, sender: address)
+            
+            guard let result = result else {
+                throw WalletServiceError.walletNotInitiated
             }
+            
+            return result
+        } catch {
+            throw WalletServiceError.internalError(
+                message: "BTC Wallet: fail to get address from KVS",
+                error: error
+            )
         }
     }
 
@@ -435,17 +434,11 @@ extension BtcWalletService {
             fatalError("Failed to get BTC endpoint URL")
         }
         
-        // Headers
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json"
-        ]
-        
         // Request url
         let endpoint = url.appendingPathComponent(BtcApiCommands.getHeight())
         
         // MARK: Sending request
-        
-        let data: Data = try await apiService.sendRequest(
+        let data = try await apiService.sendRequest(
             url: endpoint,
             method: .get,
             parameters: nil
@@ -587,7 +580,12 @@ extension BtcWalletService {
         
         // MARK: Sending request
         
-        var transactions: [RawBtcTransactionResponse] = try await apiService.sendRequest(url: endpoint, method: .get, parameters: nil)
+        let transactions: [RawBtcTransactionResponse] = try await apiService.sendRequest(
+            url: endpoint,
+            method: .get,
+            parameters: nil
+        )
+        
         return transactions
     }
 
@@ -600,44 +598,31 @@ extension BtcWalletService {
             fatalError("Failed to get BTC endpoint URL")
         }
         
-        // Headers
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json"
-        ]
-        
         // Request url
         let endpoint = url.appendingPathComponent(BtcApiCommands.getTransaction(by: hash))
         
         // MARK: Sending request
-        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<BtcTransaction, Error>) in
-            AF.request(
-                endpoint,
+        
+        do {
+            let rawTransaction: RawBtcTransactionResponse = try await apiService.sendRequest(
+                url: endpoint,
                 method: .get,
-                headers: headers
-            ).responseData(queue: defaultDispatchQueue) { [weak self] response in
-                guard let self = self else { return }
-                
-                switch response.result {
-                case .success(let data):
-                    do {
-                        let rawTransaction = try Self.jsonDecoder.decode(
-                            RawBtcTransactionResponse.self,
-                            from: data
-                        )
-                        let transaction = rawTransaction.asBtcTransaction(
-                            BtcTransaction.self,
-                            for: address,
-                            height: self.currentHeight
-                        )
-                        continuation.resume(returning: transaction)
-                    } catch {
-                        continuation.resume(throwing: WalletServiceError.internalError(message: "Unaviable transaction", error: error))
-                    }
-                    
-                case .failure(let error):
-                    continuation.resume(throwing: WalletServiceError.internalError(message: "No transaction", error: error))
-                }
+                parameters: nil
+            )
+            
+            let transaction = rawTransaction.asBtcTransaction(
+                BtcTransaction.self,
+                for: address,
+                height: self.currentHeight
+            )
+            
+            return transaction
+        } catch let error as ApiServiceError {
+            guard case .internalError = error else {
+                throw WalletServiceError.internalError(message: "No transaction", error: error)
             }
+            
+            throw WalletServiceError.internalError(message: "Unaviable transaction", error: error)
         }
     }
 

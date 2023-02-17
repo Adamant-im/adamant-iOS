@@ -317,35 +317,21 @@ extension DogeWalletService {
                 }
             }
         }
-//        let data: String = try await apiService.sendRequest(
-//            url: endpoint,
-//            method: .get,
-//            parameters: nil
-//        )
-//
-//        if let raw = Decimal(string: data) {
-//            let balance = raw / DogeWalletService.multiplier
-//            return balance
-//        } else {
-//            throw WalletServiceError.remoteServiceError(message: "DOGE Wallet: \(data)")
-//        }
     }
     
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
-        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<String, Error>) in
-            apiService.get(key: DogeWalletService.kvsAddress, sender: address) { (result) in
-                switch result {
-                case .success(let value):
-                    if let address = value {
-                        continuation.resume(returning: address)
-                    } else {
-                        continuation.resume(throwing: WalletServiceError.walletNotInitiated)
-                    }
-                    
-                case .failure(let error):
-                    continuation.resume(throwing: WalletServiceError.internalError(message: "DOGE Wallet: fail to get address from KVS", error: error))
-                }
+        do {
+            let result = try await apiService.get(key: DogeWalletService.kvsAddress, sender: address)
+            
+            guard let result = result else {
+                throw WalletServiceError.walletNotInitiated
             }
+            return result
+        } catch {
+            throw WalletServiceError.internalError(
+                message: "DOGE Wallet: fail to get address from KVS",
+                error: error
+            )
         }
     }
 }
@@ -444,7 +430,11 @@ extension DogeWalletService {
         
         // MARK: Sending request
         do {
-            let dogeResponse: DogeGetTransactionsResponse = try await apiService.sendRequest(url: endpoint, method: .get, parameters: parameters)
+            let dogeResponse: DogeGetTransactionsResponse = try await apiService.sendRequest(
+                url: endpoint,
+                method: .get,
+                parameters: parameters
+            )
             return dogeResponse
         } catch {
             throw WalletServiceError.internalError(message: "DOGE Wallet: not a valid response", error: error)
@@ -462,11 +452,6 @@ extension DogeWalletService {
         
         let address = wallet.address
         
-        // Headers
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json"
-        ]
-        
         // Request url
         let endpoint = url.appendingPathComponent(DogeApiCommands.getUnspentTransactions(for: address))
         
@@ -475,46 +460,50 @@ extension DogeWalletService {
         ]
         
         // MARK: Sending request
-        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<[UnspentTransaction], Error>) in
-            AF.request(endpoint, method: .get, parameters: parameters, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
-                switch response.result {
-                case .success(let data):
-                    guard let items = data as? [[String: Any]] else {
-                        continuation.resume(throwing: WalletServiceError.internalError(message: "DOGE Wallet: not valid response", error: nil))
-                        break
-                    }
-                    
-                    var utxos = [UnspentTransaction]()
-                    for item in items {
-                        guard
-                            let txid = item["txid"] as? String,
-                            let confirmations = item["confirmations"] as? NSNumber,
-                            confirmations.intValue > 0,
-                            let vout = item["vout"] as? NSNumber,
-                            let amount = item["amount"] as? NSNumber else {
-                            continue
-                        }
-                        
-                        let value = NSDecimalNumber(decimal: (amount.decimalValue * DogeWalletService.multiplier)).uint64Value
-                        
-                        let lockScript = Script.buildPublicKeyHashOut(pubKeyHash: wallet.publicKey.toCashaddr().data)
-                        let txHash = Data(hex: txid).map { Data($0.reversed()) } ?? Data()
-                        let txIndex = vout.uint32Value
-                        
-                        let unspentOutput = TransactionOutput(value: value, lockingScript: lockScript)
-                        let unspentOutpoint = TransactionOutPoint(hash: txHash, index: txIndex)
-                        let utxo = UnspentTransaction(output: unspentOutput, outpoint: unspentOutpoint)
-                        
-                        utxos.append(utxo)
-                    }
-                    
-                    continuation.resume(returning: utxos)
-                    
-                case .failure:
-                    continuation.resume(throwing: WalletServiceError.internalError(message: "DOGE Wallet: server not response", error: nil))
-                }
-            }
+        
+        let data = try await apiService.sendRequest(
+            url: endpoint,
+            method: .get,
+            parameters: parameters
+        )
+
+        let items = try? JSONSerialization.jsonObject(
+            with: data,
+            options: []
+        ) as? [[String: Any]]
+
+        guard let items = items else {
+            throw WalletServiceError.internalError(
+                message: "DOGE Wallet: not valid response",
+                error: nil
+            )
         }
+
+        var utxos = [UnspentTransaction]()
+        for item in items {
+            guard
+                let txid = item["txid"] as? String,
+                let confirmations = item["confirmations"] as? NSNumber,
+                confirmations.intValue > 0,
+                let vout = item["vout"] as? NSNumber,
+                let amount = item["amount"] as? NSNumber else {
+                continue
+            }
+
+            let value = NSDecimalNumber(decimal: (amount.decimalValue * DogeWalletService.multiplier)).uint64Value
+
+            let lockScript = Script.buildPublicKeyHashOut(pubKeyHash: wallet.publicKey.toCashaddr().data)
+            let txHash = Data(hex: txid).map { Data($0.reversed()) } ?? Data()
+            let txIndex = vout.uint32Value
+
+            let unspentOutput = TransactionOutput(value: value, lockingScript: lockScript)
+            let unspentOutpoint = TransactionOutPoint(hash: txHash, index: txIndex)
+            let utxo = UnspentTransaction(output: unspentOutput, outpoint: unspentOutpoint)
+
+            utxos.append(utxo)
+        }
+
+        return utxos
     }
     
     func getTransaction(by hash: String) async throws -> BTCRawTransaction {
@@ -542,30 +531,32 @@ extension DogeWalletService {
             fatalError("Failed to get DOGE endpoint URL")
         }
         
-        // Headers
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json"
-        ]
-        
         // Request url
-        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<String, Error>) in
-            let endpoint = url.appendingPathComponent(DogeApiCommands.getBlock(by: hash))
-            AF.request(endpoint, method: .get, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
-                switch response.result {
-                case .success(let json as [String: Any]):
-                    if let height = json["height"] as? NSNumber {
-                        continuation.resume(returning: height.stringValue)
-                    } else {
-                        continuation.resume(throwing: ApiServiceError.internalError(message: "Failed to parse block", error: nil))
-                    }
-                    
-                case .failure(let error):
-                    continuation.resume(throwing: ApiServiceError.internalError(message: "No block", error: error))
-                    
-                default:
-                    continuation.resume(throwing: ApiServiceError.internalError(message: "No block", error: nil))
-                }
-            }
+        
+        let endpoint = url.appendingPathComponent(DogeApiCommands.getBlock(by: hash))
+
+        let data = try await apiService.sendRequest(
+            url: endpoint,
+            method: .get,
+            parameters: nil
+        )
+        
+        let json = try? JSONSerialization.jsonObject(
+            with: data,
+            options: []
+        ) as? [String: Any]
+        
+        guard let json = json else {
+            throw ApiServiceError.internalError(
+                message: "DOGE Wallet: not valid response",
+                error: nil
+            )
+        }
+        
+        if let height = json["height"] as? NSNumber {
+            return height.stringValue
+        } else {
+            throw ApiServiceError.internalError(message: "Failed to parse block", error: nil)
         }
     }
 }

@@ -509,20 +509,18 @@ extension LskWalletService {
     }
     
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
-        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<String, Error>) in
-            apiService.get(key: LskWalletService.kvsAddress, sender: address) { (result) in
-                switch result {
-                case .success(let value):
-                    if let address = value {
-                        continuation.resume(returning: address)
-                    } else {
-                        continuation.resume(throwing: WalletServiceError.walletNotInitiated)
-                    }
-                    
-                case .failure(let error):
-                    continuation.resume(throwing: WalletServiceError.internalError(message: "LSK Wallet: fail to get address from KVS", error: error))
-                }
+        do {
+            let result = try await apiService.get(key: LskWalletService.kvsAddress, sender: address)
+            
+            guard let result = result else {
+                throw WalletServiceError.walletNotInitiated
             }
+            return result
+        } catch {
+            throw WalletServiceError.internalError(
+                message: "LSK Wallet: fail to get address from KVS",
+                error: error
+            )
         }
     }
 }

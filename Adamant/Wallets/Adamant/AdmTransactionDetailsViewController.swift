@@ -72,7 +72,7 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
         
         tableView.refreshControl = refreshControl
         
-        refresh()
+        refresh(true)
         
         startUpdate()
     }

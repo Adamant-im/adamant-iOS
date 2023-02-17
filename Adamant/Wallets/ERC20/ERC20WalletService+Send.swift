@@ -49,21 +49,24 @@ extension ERC20WalletService: WalletServiceTwoStepSend {
         // MARK: Create transaction
         
         do {
-            var tx = try await erc20.transfer(from: ethWallet.ethAddress,
-                                              to: ethRecipient,
-                                              amount: String(format: "%.18f", amount.doubleValue)
+            var tx = try await erc20.transfer(
+                from: ethWallet.ethAddress,
+                to: ethRecipient,
+                amount: "\(amount)"
             ).transaction
             
             try await resolver.resolveAll(for: &tx)
             
-            try Web3Signer.signTX(transaction: &tx,
-                                  keystore: keystoreManager,
-                                  account: ethWallet.ethAddress,
-                                  password: ERC20WalletService.walletPassword
+            try Web3Signer.signTX(
+                transaction: &tx,
+                keystore: keystoreManager,
+                account: ethWallet.ethAddress,
+                password: ERC20WalletService.walletPassword
             )
             
             return tx
         } catch {
+            print("error=", error)
             throw WalletServiceError.internalError(message: "Transaction sign error", error: error)
         }
     }

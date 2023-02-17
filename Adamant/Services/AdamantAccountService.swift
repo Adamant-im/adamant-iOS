@@ -423,37 +423,6 @@ extension AdamantAccountService {
         }
         
         throw AccountServiceError.invalidPassphrase
-        
-//        if let keypair = getSavedKeypair() {
-//            loginWith(keypair: keypair) { [weak self] result in
-//                switch result {
-//                case .success(let account, _):
-//
-//                    let alert: (title: String, message: String)?
-//                    if self?.securedStore.get(.showedV12) != nil {
-//                        alert = nil
-//                    } else {
-//                        self?.securedStore.set("1", for: .showedV12)
-//                        alert = (title: String.adamantLocalized.accountService.updateAlertTitleV12,
-//                                 message: String.adamantLocalized.accountService.updateAlertMessageV12)
-//                    }
-//
-//                    completion(.success(account: account, alert: alert))
-//
-//                    if let wallets = self?.wallets {
-//                        for case let wallet as InitiatedWithPassphraseService in wallets {
-//                            wallet.setInitiationFailed(reason: String.adamantLocalized.accountService.reloginToInitiateWallets)
-//                        }
-//                    }
-//
-//                default:
-//                    completion(result)
-//                }
-//            }
-//            return
-//        }
-//
-//        completion(.failure(.invalidPassphrase))
     }
     
     // MARK: Keypair

@@ -36,7 +36,7 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
         super.viewDidLoad()
         if service != nil { tableView.refreshControl = refreshControl }
         
-        refresh()
+        refresh(true)
         
         // MARK: Start update
         if transaction != nil {

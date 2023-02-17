@@ -72,25 +72,15 @@ class BtcTransferViewController: TransferViewControllerBase {
                     service.update()
                 }
                 
-                do {
-                    let detailTransaction = try await service.getTransaction(by: hash)
-                    processSuccessTransaction(
-                        self,
-                        localTransaction: detailTransaction,
-                        service: service,
-                        comments: comments,
-                        transaction: transaction
-                    )
-                } catch {
-                    let error = error as? ApiServiceError
-                    processFailureTransaction(
-                        self,
-                        service: service,
-                        comments: comments,
-                        transaction: transaction,
-                        error: error
-                    )
-                }
+                let detailTransaction = try? await service.getTransaction(by: hash)
+                
+                processTransaction(
+                    self,
+                    localTransaction: detailTransaction,
+                    service: service,
+                    comments: comments,
+                    transaction: transaction
+                )
                 
                 dialogService.dismissProgress()
                 dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
@@ -101,11 +91,17 @@ class BtcTransferViewController: TransferViewControllerBase {
         }
     }
     
-    private func processSuccessTransaction(_ vc: BtcTransferViewController, localTransaction: BtcTransaction, service: BtcWalletService, comments: String, transaction: TransactionDetails) {
+    private func processTransaction(
+        _ vc: BtcTransferViewController,
+        localTransaction: BtcTransaction?,
+        service: BtcWalletService,
+        comments: String,
+        transaction: TransactionDetails
+    ) {
         vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
         
         if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Bitcoin.transactionDetails) as? BtcTransactionDetailsViewController {
-            detailsVc.transaction = localTransaction
+            detailsVc.transaction = localTransaction ?? transaction
             detailsVc.service = service
             detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
             
@@ -122,37 +118,6 @@ class BtcTransferViewController: TransferViewControllerBase {
             vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
         } else {
             vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
-        }
-    }
-    
-    private func processFailureTransaction(_ vc: BtcTransferViewController, service: BtcWalletService, comments: String, transaction: TransactionDetails, error: ApiServiceError?) {
-        if case let .internalError(message, _) = error, message == "No transaction" {
-            vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-            
-            if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Bitcoin.transactionDetails) as? BtcTransactionDetailsViewController {
-                detailsVc.transaction = transaction
-                detailsVc.service = service
-                detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                
-                if recipientAddress == service.wallet?.address {
-                    detailsVc.recipientName = String.adamantLocalized.transactionDetails.yourAddress
-                } else {
-                    detailsVc.recipientName = self.recipientName
-                }
-                
-                if comments.count > 0 {
-                    detailsVc.comment = comments
-                }
-
-                vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
-            } else {
-                vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
-            }
-        } else {
-            if let error = error {
-                vc.dialogService.showRichError(error: error)
-            }
-            vc.delegate?.transferViewController(vc, didFinishWithTransfer: nil, detailsViewController: nil)
         }
     }
     

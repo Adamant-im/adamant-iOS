@@ -70,7 +70,7 @@ extension DashWalletService: RichMessageProvider {
         Task {
             do {
                 let detailTransaction = try await getTransaction(by: hash)
-                let blockId = try await getBlockId(by: detailTransaction.blockHash)
+                let blockId = try? await getBlockId(by: detailTransaction.blockHash)
                 
                 dialogService.dismissProgress()
                 
