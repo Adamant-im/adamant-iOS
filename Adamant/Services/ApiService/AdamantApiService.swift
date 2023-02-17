@@ -191,26 +191,9 @@ final class AdamantApiService: ApiService {
         waitsForConnectivity: Bool = false,
         completion: @escaping (ApiServiceResult<Output>) -> Void
     ) -> DataRequest {
-//        let sessionManager: Session = {
-//            let configuration = URLSessionConfiguration.af.default
-//            configuration.waitsForConnectivity = waitsForConnectivity
-//            return Session(configuration: configuration)
-//        }()
-//
-//        return sessionManager.request(
+        AF.sessionConfiguration.waitsForConnectivity = waitsForConnectivity
         
-//        let APIManager: Session = {
-//             let configuration = URLSessionConfiguration.default
-//             configuration.waitsForConnectivity = waitsForConnectivity
-//             let delegate = Session.default.delegate
-//             let manager = Session.init(configuration: configuration,
-//                                        delegate: delegate,
-//                                        startRequestsImmediately: true,
-//                                        cachedResponseHandler: nil)
-//             return manager
-//         }()
-        
-        AF.request(
+        return AF.request(
             url,
             method: method,
             parameters: body?.asDictionary,
