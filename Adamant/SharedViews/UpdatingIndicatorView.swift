@@ -9,7 +9,7 @@
 import UIKit
 import SnapKit
 
-class UpdatingIndicatorView: UIView {
+final class UpdatingIndicatorView: UIView {
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
