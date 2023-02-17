@@ -30,7 +30,7 @@ struct ChatFactory {
         let viewController = ChatViewController(
             viewModel: viewModel,
             richMessageProviders: richMessageProviders,
-            storedObjects: delegates.asArray + [dialogManager],
+            storedObjects: delegates.asArray + [dialogManager, accountService],
             sendTransaction: makeSendTransactionAction(viewModel: viewModel)
         )
         
