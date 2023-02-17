@@ -85,7 +85,7 @@ extension LskWalletService: RichMessageProvider {
                 
             } catch let error as ApiServiceError {
                 guard case let .internalError(message, _) = error,
-                      message == "No transaction"
+                      message.contains("does not exist")
                 else {
                     dialogService.dismissProgress()
                     dialogService.showRichError(error: error)
