@@ -110,7 +110,9 @@ public class Chatroom: NSManagedObject {
     
     @MainActor
     func updateLastTransaction() async {
-        if let transactions = transactions?.filtered(using: NSPredicate(format: "isHidden == false")) as? Set<ChatTransaction> {
+        if let transactions = transactions?.filtered(
+            using: NSPredicate(format: "isHidden == false")
+        ) as? Set<ChatTransaction> {
             if let newest = transactions.sorted(by: { (lhs: ChatTransaction, rhs: ChatTransaction) in
                 guard let l = lhs.date as Date? else {
                     return true
@@ -127,7 +129,7 @@ public class Chatroom: NSManagedObject {
                 case .orderedDescending:
                     return false
                     
-                /// Rare case of identical date, compare IDs
+                // Rare case of identical date, compare IDs
                 case .orderedSame:
                     guard let lid = lhs.transactionId else {
                         return true

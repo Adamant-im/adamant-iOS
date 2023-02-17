@@ -397,7 +397,7 @@ extension AdamantChatsProvider {
                 return nil
             }
             
-            try? await Task.sleep(interval: requestRepeatDelay)
+            await Task.sleep(interval: requestRepeatDelay)
             return try await apiGetChatrooms(address: address, offset: offset)
         }
     }
@@ -465,7 +465,7 @@ extension AdamantChatsProvider {
                 return nil
             }
             
-            try? await Task.sleep(interval: requestRepeatDelay)
+            await Task.sleep(interval: requestRepeatDelay)
             return try await apiGetChatrooms(address: address, offset: offset)
         }
     }
@@ -1328,16 +1328,25 @@ extension AdamantChatsProvider {
             for address in notFound {
                 let transaction = grouppedTransactions[address]?.first
                 let isOut = transaction?.isOut ?? false
-                let publicKey = isOut ? transaction?.transaction.recipientPublicKey : transaction?.transaction.senderPublicKey
+                
+                let publicKey = isOut
+                ? transaction?.transaction.recipientPublicKey
+                : transaction?.transaction.senderPublicKey
 
-                let account = try? await accountsProvider.getAccount(byAddress: address, publicKey: publicKey ?? "")
+                let account = try? await accountsProvider.getAccount(
+                    byAddress: address,
+                    publicKey: publicKey ?? ""
+                )
+                
                 guard let account = account else { break }
                 ids.append(account.objectID)
             }
             
             // Get in our context
             for id in ids {
-                if let account = context.object(with: id) as? CoreDataAccount, let address = account.address, let transactions = grouppedTransactions[address] {
+                if let account = context.object(with: id) as? CoreDataAccount,
+                   let address = account.address,
+                   let transactions = grouppedTransactions[address] {
                     partners[account] = transactions
                 }
             }
@@ -1497,7 +1506,9 @@ extension AdamantChatsProvider {
                 // MARK: 6. Update lastTransaction
                 let viewContextChatrooms = Set<Chatroom>(partners.keys.compactMap { $0.chatroom }).compactMap { self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom }
                 
-                viewContextChatrooms.forEach { $0.updateLastTransaction() }
+                for chatroom in viewContextChatrooms {
+                    await chatroom.updateLastTransaction()
+                }
             } catch {
                 print(error)
             }
