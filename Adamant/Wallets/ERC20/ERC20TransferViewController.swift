@@ -76,11 +76,12 @@ class ERC20TransferViewController: TransferViewControllerBase {
                 dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
                 
                 // Present detail VC
-                presentDetailTransactionVC(hash: hash,
-                                           transaction: transaction,
-                                           recipient: recipient,
-                                           comments: comments,
-                                           service: service
+                presentDetailTransactionVC(
+                    hash: hash,
+                    transaction: transaction,
+                    recipient: recipient,
+                    comments: comments,
+                    service: service
                 )
             } catch {
                 dialogService.dismissProgress()
@@ -89,16 +90,18 @@ class ERC20TransferViewController: TransferViewControllerBase {
         }
     }
     
-    private func presentDetailTransactionVC(hash: String,
-                                            transaction: CodableTransaction,
-                                            recipient: String,
-                                            comments: String,
-                                            service: ERC20WalletService
+    private func presentDetailTransactionVC(
+        hash: String,
+        transaction: CodableTransaction,
+        recipient: String,
+        comments: String,
+        service: ERC20WalletService
     ) {
-        let transaction = SimpleTransactionDetails(txId: hash,
-                                                   senderAddress: transaction.sender?.address ?? "",
-                                                   recipientAddress: recipient,
-                                                   isOutgoing: true
+        let transaction = SimpleTransactionDetails(
+            txId: hash,
+            senderAddress: transaction.sender?.address ?? "",
+            recipientAddress: recipient,
+            isOutgoing: true
         )
         if let detailsVc = router.get(scene: AdamantScene.Wallets.ERC20.transactionDetails) as? ERC20TransactionDetailsViewController {
             detailsVc.transaction = transaction

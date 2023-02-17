@@ -47,7 +47,11 @@ extension AdamantApiService {
         }
     }
     
-    func getMessageTransactions(address: String, height: Int64?, offset: Int?) async throws -> [Transaction] {
+    func getMessageTransactions(
+        address: String,
+        height: Int64?,
+        offset: Int?
+    ) async throws -> [Transaction] {
         // MARK: 1. Prepare params
         var queryItems: [URLQueryItem] = [URLQueryItem(name: "isIn", value: address),
                                           URLQueryItem(name: "orderBy", value: "timestamp:desc")]
@@ -206,7 +210,10 @@ extension AdamantApiService {
         }
     }
     
-    func getChatRooms(address: String, offset: Int?) async throws -> ChatRooms {
+    func getChatRooms(
+        address: String,
+        offset: Int?
+    ) async throws -> ChatRooms {
         // MARK: 1. Prepare params
         var queryItems: [URLQueryItem] = []
         if let offset = offset { queryItems.append(URLQueryItem(name: "offset", value: String(offset))) }

@@ -381,13 +381,6 @@ extension AdamantChatsProvider {
         }
     }
     
-    func waitUntilInternetConnectionRestore() {
-        while !isConnectedToTheInternet {
-            sleep(1)
-        }
-        return
-    }
-    
     func apiGetChatrooms(address: String, offset: Int?) async throws -> ChatRooms? {
         do {
             let chatrooms = try await apiService.getChatRooms(address: address, offset: offset)

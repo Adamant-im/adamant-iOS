@@ -39,6 +39,24 @@ extension AdamantApiService {
         )
     }
     
+    /// Get account by publicKey
+    func getAccount(byPublicKey publicKey: String) async throws -> AdamantAccount {
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<AdamantAccount, Error>) in
+            sendRequest(
+                path: ApiCommands.Accounts.root,
+                queryItems: [URLQueryItem(name: "publicKey", value: publicKey)],
+                completion: makeCompletionWrapper(publicKey: publicKey) { response in
+                    switch response {
+                    case .success(let t):
+                        continuation.resume(returning: t)
+                    case .failure(let apiServiceError):
+                        continuation.resume(throwing: apiServiceError)
+                    }
+                }
+            )
+        }
+    }
+
     func getAccount(byAddress address: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void) {
         sendRequest(
             path: ApiCommands.Accounts.root,

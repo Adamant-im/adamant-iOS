@@ -73,6 +73,8 @@ protocol ApiService: AnyObject {
     func getAccount(byPassphrase passphrase: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void)
     func getAccount(byPublicKey publicKey: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void)
     
+    func getAccount(byPublicKey publicKey: String) async throws -> AdamantAccount
+    
     func getAccount(
         byAddress address: String,
         completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void

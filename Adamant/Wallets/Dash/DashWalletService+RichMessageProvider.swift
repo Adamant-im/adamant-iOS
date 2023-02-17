@@ -74,15 +74,17 @@ extension DashWalletService: RichMessageProvider {
                 
                 dialogService.dismissProgress()
                 
-                presentDetailTransactionVC(hash: hash,
-                                           senderName: senderName,
-                                           recipientName: recipientName,
-                                           comment: comment,
-                                           address: address,
-                                           blockId: blockId,
-                                           transaction: detailTransaction,
-                                           richTransaction: transaction,
-                                           in: chat)
+                presentDetailTransactionVC(
+                    hash: hash,
+                    senderName: senderName,
+                    recipientName: recipientName,
+                    comment: comment,
+                    address: address,
+                    blockId: blockId,
+                    transaction: detailTransaction,
+                    richTransaction: transaction,
+                    in: chat
+                )
             } catch let error as ApiServiceError {
                 dialogService.dismissProgress()
                 
@@ -93,15 +95,17 @@ extension DashWalletService: RichMessageProvider {
                     return
                 }
                 
-                presentDetailTransactionVC(hash: hash,
-                                           senderName: senderName,
-                                           recipientName: recipientName,
-                                           comment: comment,
-                                           address: address,
-                                           blockId: nil,
-                                           transaction: nil,
-                                           richTransaction: transaction,
-                                           in: chat)
+                presentDetailTransactionVC(
+                    hash: hash,
+                    senderName: senderName,
+                    recipientName: recipientName,
+                    comment: comment,
+                    address: address,
+                    blockId: nil,
+                    transaction: nil,
+                    richTransaction: transaction,
+                    in: chat
+                )
             } catch {
                 dialogService.dismissProgress()
                 dialogService.showRichError(error: error)
@@ -109,15 +113,17 @@ extension DashWalletService: RichMessageProvider {
         }
     }
     
-    private func presentDetailTransactionVC(hash: String,
-                                            senderName: String?,
-                                            recipientName: String?,
-                                            comment: String?,
-                                            address: String,
-                                            blockId: String?,
-                                            transaction: BTCRawTransaction?,
-                                            richTransaction: RichMessageTransaction,
-                                            in chat: ChatViewController) {
+    private func presentDetailTransactionVC(
+        hash: String,
+        senderName: String?,
+        recipientName: String?,
+        comment: String?,
+        address: String,
+        blockId: String?,
+        transaction: BTCRawTransaction?,
+        richTransaction: RichMessageTransaction,
+        in chat: ChatViewController
+    ) {
         guard let vc = router.get(scene: AdamantScene.Wallets.Dash.transactionDetails) as? DashTransactionDetailsViewController else {
             return
         }
@@ -133,16 +139,18 @@ extension DashWalletService: RichMessageProvider {
         if let blockId = blockId {
             dashTransaction = transaction?.asBtcTransaction(DashTransaction.self, for: address, blockId: blockId)
         }
-        let failedTransaction = SimpleTransactionDetails(txId: hash,
-                                                         senderAddress: richTransaction.senderAddress,
-                                                         recipientAddress: richTransaction.recipientAddress,
-                                                         dateValue: nil,
-                                                         amountValue: amount,
-                                                         feeValue: nil,
-                                                         confirmationsValue: nil,
-                                                         blockValue: nil,
-                                                         isOutgoing: richTransaction.isOutgoing,
-                                                         transactionStatus: TransactionStatus.failed)
+        let failedTransaction = SimpleTransactionDetails(
+            txId: hash,
+            senderAddress: richTransaction.senderAddress,
+            recipientAddress: richTransaction.recipientAddress,
+            dateValue: nil,
+            amountValue: amount,
+            feeValue: nil,
+            confirmationsValue: nil,
+            blockValue: nil,
+            isOutgoing: richTransaction.isOutgoing,
+            transactionStatus: TransactionStatus.failed
+        )
         
         vc.service = self
         vc.senderName = senderName

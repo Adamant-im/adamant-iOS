@@ -77,9 +77,10 @@ class DashTransferViewController: TransferViewControllerBase {
                 dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
                 
                 // Present detail VC
-                presentDetailTransactionVC(transaction: transaction,
-                                           comments: comments,
-                                           service: service
+                presentDetailTransactionVC(
+                    transaction: transaction,
+                    comments: comments,
+                    service: service
                 )
             } catch {
                 dialogService.dismissProgress()
@@ -88,9 +89,10 @@ class DashTransferViewController: TransferViewControllerBase {
         }
     }
     
-    private func presentDetailTransactionVC(transaction: BitcoinKit.Transaction,
-                                            comments: String,
-                                            service: DashWalletService
+    private func presentDetailTransactionVC(
+        transaction: BitcoinKit.Transaction,
+        comments: String,
+        service: DashWalletService
     ) {
         guard let detailsVc = router.get(scene: AdamantScene.Wallets.Dash.transactionDetails) as? DashTransactionDetailsViewController else {
             delegate?.transferViewController(self, didFinishWithTransfer: transaction, detailsViewController: nil)
@@ -106,7 +108,11 @@ class DashTransferViewController: TransferViewControllerBase {
             detailsVc.comment = comments
         }
         
-        delegate?.transferViewController(self, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
+        delegate?.transferViewController(
+            self,
+            didFinishWithTransfer: transaction,
+            detailsViewController: detailsVc
+        )
     }
     
     // MARK: Overrides

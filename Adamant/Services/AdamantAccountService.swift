@@ -347,31 +347,27 @@ extension AdamantAccountService {
             throw AccountServiceError.internalError(message: "Failed to generate keypair for passphrase", error: nil)
         }
         
-        do {
-            let account = try await loginWith(keypair: keypair)
-            
-            // MARK: Drop saved accs
-            if let storedPassphrase = self.getSavedPassphrase(),
-               storedPassphrase != passphrase {
-                dropSavedAccount()
-            }
-            
-            if let storedKeypair = self.getSavedKeypair(),
-                storedKeypair != self.keypair {
-                dropSavedAccount()
-            }
-            
-            // Update and initiate wallet services
-            self.passphrase = passphrase
-            
-            for case let wallet as InitiatedWithPassphraseService in wallets {
-                _ = try? await wallet.initWallet(withPassphrase: passphrase)
-            }
-            
-            return .success(account: account, alert: nil)
-        } catch {
-            throw error
+        let account = try await loginWith(keypair: keypair)
+        
+        // MARK: Drop saved accs
+        if let storedPassphrase = self.getSavedPassphrase(),
+           storedPassphrase != passphrase {
+            dropSavedAccount()
         }
+        
+        if let storedKeypair = self.getSavedKeypair(),
+           storedKeypair != self.keypair {
+            dropSavedAccount()
+        }
+        
+        // Update and initiate wallet services
+        self.passphrase = passphrase
+        
+        for case let wallet as InitiatedWithPassphraseService in wallets {
+            _ = try? await wallet.initWallet(withPassphrase: passphrase)
+        }
+        
+        return .success(account: account, alert: nil)
     }
     
     // MARK: Pincode
@@ -384,42 +380,34 @@ extension AdamantAccountService {
             throw AccountServiceError.invalidPassphrase
         }
         
-        do {
-            return try await loginWithStoredAccount()
-        } catch {
-            throw error
-        }
+        return try await loginWithStoredAccount()
     }
     
     // MARK: Biometry
     @MainActor
     func loginWithStoredAccount() async throws -> AccountServiceResult {
-        do {
-            if let passphrase = getSavedPassphrase() {
-                let account = try await loginWith(passphrase: passphrase)
-                return account
+        if let passphrase = getSavedPassphrase() {
+            let account = try await loginWith(passphrase: passphrase)
+            return account
+        }
+        
+        if let keypair = getSavedKeypair() {
+            let account = try await loginWith(keypair: keypair)
+            
+            let alert: (title: String, message: String)?
+            if securedStore.get(.showedV12) != nil {
+                alert = nil
+            } else {
+                securedStore.set("1", for: .showedV12)
+                alert = (title: String.adamantLocalized.accountService.updateAlertTitleV12,
+                         message: String.adamantLocalized.accountService.updateAlertMessageV12)
             }
             
-            if let keypair = getSavedKeypair() {
-                let account = try await loginWith(keypair: keypair)
-                
-                let alert: (title: String, message: String)?
-                if securedStore.get(.showedV12) != nil {
-                    alert = nil
-                } else {
-                    securedStore.set("1", for: .showedV12)
-                    alert = (title: String.adamantLocalized.accountService.updateAlertTitleV12,
-                             message: String.adamantLocalized.accountService.updateAlertMessageV12)
-                }
-                
-                for case let wallet as InitiatedWithPassphraseService in wallets {
-                    wallet.setInitiationFailed(reason: String.adamantLocalized.accountService.reloginToInitiateWallets)
-                }
-                
-                return .success(account: account, alert: alert)
+            for case let wallet as InitiatedWithPassphraseService in wallets {
+                wallet.setInitiationFailed(reason: String.adamantLocalized.accountService.reloginToInitiateWallets)
             }
-        } catch {
-            throw error
+            
+            return .success(account: account, alert: alert)
         }
         
         throw AccountServiceError.invalidPassphrase
@@ -445,29 +433,34 @@ extension AdamantAccountService {
         state = .isLoggingIn
         stateSemaphore.signal()
         
-        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<AdamantAccount, Error>) in
-            apiService.getAccount(byPublicKey: keypair.publicKey) { result in
-                switch result {
-                case .success(let account):
-                    self.account = account
-                    self.keypair = keypair
-                    
-                    let userInfo = [AdamantUserInfoKey.AccountService.loggedAccountAddress:account.address]
-                    NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.userLoggedIn, object: self, userInfo: userInfo)
-                    self.setState(.loggedIn)
-                    
-                    continuation.resume(returning: account)
-                case .failure(let error):
-                    self.setState(.notLogged)
-                    switch error {
-                    case .accountNotFound:
-                        continuation.resume(throwing: AccountServiceError.wrongPassphrase)
-                        
-                    default:
-                        continuation.resume(throwing: AccountServiceError.apiError(error: error))
-                    }
-                }
+        do {
+            let account = try await apiService.getAccount(byPublicKey: keypair.publicKey)
+            self.account = account
+            self.keypair = keypair
+            
+            let userInfo = [AdamantUserInfoKey.AccountService.loggedAccountAddress: account.address]
+            
+            NotificationCenter.default.post(
+                name: Notification.Name.AdamantAccountService.userLoggedIn,
+                object: self,
+                userInfo: userInfo
+            )
+            
+            self.setState(.loggedIn)
+            
+            return account
+        } catch let error as ApiServiceError {
+            self.setState(.notLogged)
+            
+            switch error {
+            case .accountNotFound:
+                throw AccountServiceError.wrongPassphrase
+                
+            default:
+                throw AccountServiceError.apiError(error: error)
             }
+        } catch {
+            throw AccountServiceError.internalError(message: error.localizedDescription, error: error)
         }
     }
     

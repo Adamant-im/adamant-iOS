@@ -73,15 +73,17 @@ extension LskWalletService: RichMessageProvider {
                 let transactionLisk = try await getTransaction(by: hash)
                 dialogService.dismissProgress()
                 
-                presentDetailTransactionVC(hash: hash,
-                                           senderName: senderName,
-                                           recipientName: recipientName,
-                                           comment: comment,
-                                           senderAddress: transactionLisk.senderAddress,
-                                           recipientAddress: transactionLisk.recipientAddress,
-                                           transaction: transactionLisk,
-                                           richTransaction: transaction,
-                                           in: chat)
+                presentDetailTransactionVC(
+                    hash: hash,
+                    senderName: senderName,
+                    recipientName: recipientName,
+                    comment: comment,
+                    senderAddress: transactionLisk.senderAddress,
+                    recipientAddress: transactionLisk.recipientAddress,
+                    transaction: transactionLisk,
+                    richTransaction: transaction,
+                    in: chat
+                )
                 
             } catch let error as ApiServiceError {
                 guard case let .internalError(message, _) = error,
@@ -98,15 +100,17 @@ extension LskWalletService: RichMessageProvider {
                     
                     dialogService.dismissProgress()
                     
-                    presentDetailTransactionVC(hash: hash,
-                                               senderName: senderName,
-                                               recipientName: recipientName,
-                                               comment: comment,
-                                               senderAddress: senderAddress,
-                                               recipientAddress: recipientAddress,
-                                               transaction: nil,
-                                               richTransaction: transaction,
-                                               in: chat)
+                    presentDetailTransactionVC(
+                        hash: hash,
+                        senderName: senderName,
+                        recipientName: recipientName,
+                        comment: comment,
+                        senderAddress: senderAddress,
+                        recipientAddress: recipientAddress,
+                        transaction: nil,
+                        richTransaction: transaction,
+                        in: chat
+                    )
                 } catch {
                     dialogService.dismissProgress()
                     dialogService.showRichError(error: error)
@@ -118,15 +122,17 @@ extension LskWalletService: RichMessageProvider {
         }
     }
     
-    private func presentDetailTransactionVC(hash: String,
-                                            senderName: String?,
-                                            recipientName: String?,
-                                            comment: String?,
-                                            senderAddress: String,
-                                            recipientAddress: String,
-                                            transaction: Transactions.TransactionModel?,
-                                            richTransaction: RichMessageTransaction,
-                                            in chat: ChatViewController) {
+    private func presentDetailTransactionVC(
+        hash: String,
+        senderName: String?,
+        recipientName: String?,
+        comment: String?,
+        senderAddress: String,
+        recipientAddress: String,
+        transaction: Transactions.TransactionModel?,
+        richTransaction: RichMessageTransaction,
+        in chat: ChatViewController
+    ) {
         guard let vc = router.get(scene: AdamantScene.Wallets.Lisk.transactionDetails) as? LskTransactionDetailsViewController else {
             dialogService.dismissProgress()
             return
@@ -144,16 +150,17 @@ extension LskWalletService: RichMessageProvider {
             amount = 0
         }
         
-        let failedTransaction = SimpleTransactionDetails(txId: hash,
-                                                         senderAddress: senderAddress,
-                                                         recipientAddress: recipientAddress,
-                                                         dateValue: nil,
-                                                         amountValue: amount,
-                                                         feeValue: nil,
-                                                         confirmationsValue: nil,
-                                                         blockValue: nil,
-                                                         isOutgoing: richTransaction.isOutgoing,
-                                                         transactionStatus: TransactionStatus.pending)
+        let failedTransaction = SimpleTransactionDetails(
+            txId: hash,
+            senderAddress: senderAddress,
+            recipientAddress: recipientAddress,
+            dateValue: nil,
+            amountValue: amount,
+            feeValue: nil,
+            confirmationsValue: nil,
+            blockValue: nil,
+            isOutgoing: richTransaction.isOutgoing,
+            transactionStatus: TransactionStatus.pending)
 
         vc.transaction = transaction ?? failedTransaction
         chat.navigationController?.pushViewController(vc, animated: true)

@@ -73,13 +73,15 @@ extension BtcWalletService: RichMessageProvider {
                 let detailTransaction = try await getTransaction(by: hash)
                 
                 dialogService.dismissProgress()
-                presentDetailTransactionVC(hash: hash,
-                                           senderName: senderName,
-                                           recipientName: recipientName,
-                                           comment: comment,
-                                           transaction: detailTransaction,
-                                           richTransaction: transaction,
-                                           in: chat)
+                presentDetailTransactionVC(
+                    hash: hash,
+                    senderName: senderName,
+                    recipientName: recipientName,
+                    comment: comment,
+                    transaction: detailTransaction,
+                    richTransaction: transaction,
+                    in: chat
+                )
             } catch let error as WalletServiceError {
                 dialogService.dismissProgress()
                 guard case let .internalError(message, _) = error,
@@ -89,24 +91,28 @@ extension BtcWalletService: RichMessageProvider {
                     return
                 }
                 
-                presentDetailTransactionVC(hash: hash,
-                                           senderName: senderName,
-                                           recipientName: recipientName,
-                                           comment: comment,
-                                           transaction: nil,
-                                           richTransaction: transaction,
-                                           in: chat)
+                presentDetailTransactionVC(
+                    hash: hash,
+                    senderName: senderName,
+                    recipientName: recipientName,
+                    comment: comment,
+                    transaction: nil,
+                    richTransaction: transaction,
+                    in: chat
+                )
             }
         }
     }
     
-    private func presentDetailTransactionVC(hash: String,
-                                           senderName: String?,
-                                           recipientName: String?,
-                                           comment: String?,
-                                           transaction: BtcTransaction?,
-                                           richTransaction: RichMessageTransaction,
-                                           in chat: ChatViewController) {
+    private func presentDetailTransactionVC(
+        hash: String,
+        senderName: String?,
+        recipientName: String?,
+        comment: String?,
+        transaction: BtcTransaction?,
+        richTransaction: RichMessageTransaction,
+        in chat: ChatViewController
+    ) {
         guard let vc = router.get(scene: AdamantScene.Wallets.Bitcoin.transactionDetails) as? BtcTransactionDetailsViewController else {
             return
         }
@@ -118,16 +124,18 @@ extension BtcWalletService: RichMessageProvider {
             amount = 0
         }
         
-        let failedTransaction = SimpleTransactionDetails(txId: hash,
-                                                         senderAddress: richTransaction.senderAddress,
-                                                         recipientAddress: richTransaction.recipientAddress,
-                                                         dateValue: nil,
-                                                         amountValue: amount,
-                                                         feeValue: nil,
-                                                         confirmationsValue: nil,
-                                                         blockValue: nil,
-                                                         isOutgoing: richTransaction.isOutgoing,
-                                                         transactionStatus: TransactionStatus.failed)
+        let failedTransaction = SimpleTransactionDetails(
+            txId: hash,
+            senderAddress: richTransaction.senderAddress,
+            recipientAddress: richTransaction.recipientAddress,
+            dateValue: nil,
+            amountValue: amount,
+            feeValue: nil,
+            confirmationsValue: nil,
+            blockValue: nil,
+            isOutgoing: richTransaction.isOutgoing,
+            transactionStatus: TransactionStatus.failed
+        )
         
         vc.service = self
         vc.senderName = senderName

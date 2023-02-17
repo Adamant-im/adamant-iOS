@@ -64,10 +64,11 @@ class LskTransferViewController: TransferViewControllerBase {
                 dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
                 
                 // Present detail VC
-                presentDetailTransactionVC(transactionId: transactionId,
-                                           transaction: transaction,
-                                           service: service,
-                                           comments: comments
+                presentDetailTransactionVC(
+                    transactionId: transactionId,
+                    transaction: transaction,
+                    service: service,
+                    comments: comments
                 )
             } catch {
                 dialogService.dismissProgress()
@@ -76,10 +77,11 @@ class LskTransferViewController: TransferViewControllerBase {
         }
     }
     
-    private func presentDetailTransactionVC(transactionId: String,
-                                            transaction: TransactionEntity,
-                                            service: LskWalletService,
-                                            comments: String
+    private func presentDetailTransactionVC(
+        transactionId: String,
+        transaction: TransactionEntity,
+        service: LskWalletService,
+        comments: String
     ) {
         if let detailsVc = router.get(scene: AdamantScene.Wallets.Lisk.transactionDetails) as? LskTransactionDetailsViewController {
             var transaction: TransactionEntity = transaction
@@ -93,9 +95,17 @@ class LskTransferViewController: TransferViewControllerBase {
                 detailsVc.comment = comments
             }
             
-            delegate?.transferViewController(self, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
+            delegate?.transferViewController(
+                self,
+                didFinishWithTransfer: transaction,
+                detailsViewController: detailsVc
+            )
         } else {
-            delegate?.transferViewController(self, didFinishWithTransfer: transaction, detailsViewController: nil)
+            delegate?.transferViewController(
+                self,
+                didFinishWithTransfer: transaction,
+                detailsViewController: nil
+            )
         }
     }
     

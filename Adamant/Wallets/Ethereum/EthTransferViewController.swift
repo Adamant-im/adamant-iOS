@@ -72,11 +72,12 @@ class EthTransferViewController: TransferViewControllerBase {
                 dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
                 
                 // Present detail VC
-                presentDetailTransactionVC(hash: hash,
-                                           transaction: transaction,
-                                           recipient: recipient,
-                                           comments: comments,
-                                           service: service
+                presentDetailTransactionVC(
+                    hash: hash,
+                    transaction: transaction,
+                    recipient: recipient,
+                    comments: comments,
+                    service: service
                 )
             } catch {
                 dialogService.dismissProgress()
@@ -85,16 +86,18 @@ class EthTransferViewController: TransferViewControllerBase {
         }
     }
     
-    private func presentDetailTransactionVC(hash: String,
-                                            transaction: CodableTransaction,
-                                            recipient: String,
-                                            comments: String,
-                                            service: EthWalletService
+    private func presentDetailTransactionVC(
+        hash: String,
+        transaction: CodableTransaction,
+        recipient: String,
+        comments: String,
+        service: EthWalletService
     ) {
-        let transaction = SimpleTransactionDetails(txId: hash,
-                                                   senderAddress: transaction.sender?.address ?? "",
-                                                   recipientAddress: recipient,
-                                                   isOutgoing: true
+        let transaction = SimpleTransactionDetails(
+            txId: hash,
+            senderAddress: transaction.sender?.address ?? "",
+            recipientAddress: recipient,
+            isOutgoing: true
         )
         if let detailsVc = router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? EthTransactionDetailsViewController {
             detailsVc.transaction = transaction
