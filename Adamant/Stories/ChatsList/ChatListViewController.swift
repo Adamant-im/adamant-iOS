@@ -9,6 +9,7 @@
 import UIKit
 import CoreData
 import MarkdownKit
+import MessageKit
 
 extension String.adamantLocalized {
     struct chatList {
@@ -50,6 +51,7 @@ class ChatListViewController: UIViewController {
     var chatsController: NSFetchedResultsController<Chatroom>?
     var unreadController: NSFetchedResultsController<ChatTransaction>?
     
+    private lazy var keyboardManager = KeyboardManager()
     var searchController: UISearchController!
     
     private var preservedMessagess = [String:String]()
@@ -83,11 +85,6 @@ class ChatListViewController: UIViewController {
     
     private(set) var isBusy: Bool = true
     private var lastSystemChatPositionRow: Int?
-    
-    // MARK: Keyboard
-    // SplitView sends double notifications about keyboard.
-    private var originalInsets: UIEdgeInsets?
-    private var didShow: Bool = false
     
     private var onMessagesLoadedActions = [() -> Void]()
     private var areMessagesLoaded = false
@@ -166,9 +163,9 @@ class ChatListViewController: UIViewController {
             }
         }
         
-        // Keyboard
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+        keyboardManager.on(event: .didChangeFrame) { [weak self] notification in
+            self?.additionalSafeAreaInsets.bottom = notification.endFrame.height
+        }
         
         setColors()
     }
@@ -438,7 +435,7 @@ extension ChatListViewController {
               roomsLoadedCount < roomsMaxCount,
               roomsMaxCount > 0,
               !isBusy,
-              tableView.numberOfRows(inSection: 0) >= roomsLoadedCount,
+              tableView.numberOfRows(inSection: .zero) - indexPath.row < 3,
               let lastVisibleIndexPath = tableView.indexPathsForVisibleRows,
               lastVisibleIndexPath.contains(IndexPath(row: tableView.numberOfRows(inSection: 0) - 3, section: 0))
         else {
@@ -498,14 +495,7 @@ extension ChatListViewController {
     
     private func insertReloadRow() {
         lastSystemChatPositionRow = getBottomSystemChatIndex()
-        DispatchQueue.main.async { [weak self] in
-            self?.tableView.performBatchUpdates {
-                self?.tableView.insertRows(at: [
-                    IndexPath(row: self?.lastSystemChatPositionRow ?? 0, section: 0)
-                ], with: .none)
-                self?.tableView.reloadRows(at: [IndexPath(row: (self?.lastSystemChatPositionRow ?? 0) - 1, section: 0)], with: .none)
-            }
-        }
+        tableView.reloadData()
     }
     
     private func loadNewChats(offset: Int) {
@@ -1058,46 +1048,6 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
             }
             
             presenter.presentChatroom(chatroom)
-        }
-    }
-}
-
-// MARK: Keyboard
-extension ChatListViewController {
-    @objc private func keyboardWillShow(notification: Notification) {
-        guard !didShow else { return }
-        didShow = true
-        
-        guard let frame = notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue else {
-            return
-        }
-        
-        originalInsets = tableView.contentInset
-        
-        var contentInsets = tableView.contentInset
-        
-        if let tabBarHeight = tabBarController?.tabBar.bounds.height {
-            contentInsets.bottom = frame.cgRectValue.size.height - tabBarHeight
-        } else {
-            contentInsets.bottom = frame.cgRectValue.size.height
-        }
-        
-        tableView.contentInset = contentInsets
-        tableView.scrollIndicatorInsets = contentInsets
-    }
-    
-    @objc private func keyboardWillHide(notification: Notification) {
-        guard didShow else { return }
-        didShow = false
-        
-        if let insets = originalInsets {
-            tableView.contentInset = insets
-            tableView.scrollIndicatorInsets = insets
-        } else {
-            var contentInsets = tableView.contentInset
-            contentInsets.bottom = 0.0
-            tableView.contentInset = contentInsets
-            tableView.scrollIndicatorInsets = contentInsets
         }
     }
 }
