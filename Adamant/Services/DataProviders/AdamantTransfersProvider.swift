@@ -78,17 +78,21 @@ actor AdamantTransfersProvider: TransfersProvider {
         }
     }
     
-    private func addObservers() async {
-        for await notification in NotificationCenter.default.notifications(
-            named: .AdamantAccountService.userLoggedIn
-        ) {
-            userLoggedInAction(notification)
+    private func addObservers() {
+        Task {
+            for await notification in NotificationCenter.default.notifications(
+                named: .AdamantAccountService.userLoggedIn
+            ) {
+                userLoggedInAction(notification)
+            }
         }
         
-        for await _ in NotificationCenter.default.notifications(
-            named: .AdamantAccountService.userLoggedOut
-        ) {
-            userLogOutAction()
+        Task {
+            for await _ in NotificationCenter.default.notifications(
+                named: .AdamantAccountService.userLoggedOut
+            ) {
+                userLogOutAction()
+            }
         }
     }
     

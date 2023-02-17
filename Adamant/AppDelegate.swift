@@ -254,12 +254,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         // MARK: 8. Welcome messages
-        NotificationCenter.default.addObserver(
-            forName: Notification.Name.AdamantChatsProvider.initiallySyncedChanged,
-            object: nil,
-            queue: OperationQueue.main
-        ) { notification in
-            Task {
+        Task {
+            for await notification in NotificationCenter.default.notifications(
+                named: .AdamantChatsProvider.initiallySyncedChanged
+            ) {
                 await self.handleWelcomeMessages(notification: notification)
             }
         }

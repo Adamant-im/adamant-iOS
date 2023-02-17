@@ -93,41 +93,53 @@ actor AdamantChatsProvider: ChatsProvider {
         }
     }
     
-    private func addObservers() async {
-        for await notification in NotificationCenter.default.notifications(
-            named: .AdamantAccountService.userLoggedIn
-        ) {
-            userLoggedInAction(notification)
+    private func addObservers() {
+        Task {
+            for await notification in NotificationCenter.default.notifications(
+                named: .AdamantAccountService.userLoggedIn
+            ) {
+                userLoggedInAction(notification)
+            }
         }
         
-        for await _ in NotificationCenter.default.notifications(
-            named: .AdamantAccountService.userLoggedOut
-        ) {
-            userLogOutAction()
+        Task {
+            for await _ in NotificationCenter.default.notifications(
+                named: .AdamantAccountService.userLoggedOut
+            ) {
+                userLogOutAction()
+            }
         }
         
-        for await notification in NotificationCenter.default.notifications(
-            named: .AdamantAccountService.stayInChanged
-        ) {
-            stayInChangedAction(notification)
+        Task {
+            for await notification in NotificationCenter.default.notifications(
+                named: .AdamantAccountService.stayInChanged
+            ) {
+                stayInChangedAction(notification)
+            }
         }
         
-        for await _ in await NotificationCenter.default.notifications(
-            named: UIApplication.didBecomeActiveNotification
-        ) {
-            didBecomeActiveAction()
+        Task {
+            for await _ in await NotificationCenter.default.notifications(
+                named: UIApplication.didBecomeActiveNotification
+            ) {
+                didBecomeActiveAction()
+            }
         }
         
-        for await _ in await NotificationCenter.default.notifications(
-            named: UIApplication.willResignActiveNotification
-        ) {
-            willResignActiveAction()
+        Task {
+            for await _ in await NotificationCenter.default.notifications(
+                named: UIApplication.willResignActiveNotification
+            ) {
+                willResignActiveAction()
+            }
         }
         
-        for await notification in NotificationCenter.default.notifications(
-            named: .AdamantReachabilityMonitor.reachabilityChanged
-        ) {
-            reachabilityChangedAction(notification)
+        Task {
+            for await notification in NotificationCenter.default.notifications(
+                named: .AdamantReachabilityMonitor.reachabilityChanged
+            ) {
+                reachabilityChangedAction(notification)
+            }
         }
     }
     
