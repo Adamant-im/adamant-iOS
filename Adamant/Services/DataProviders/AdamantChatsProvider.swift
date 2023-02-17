@@ -365,10 +365,10 @@ extension AdamantChatsProvider {
         
         if !isInitiallySynced {
             isInitiallySynced = true
+            preLoadChats(array, address: address)
         }
         
         setState(.upToDate, previous: prevState)
-        preLoadChats(array, address: address)
     }
     
     func preLoadChats(_ array: [Transaction], address: String) {
