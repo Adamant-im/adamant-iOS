@@ -66,7 +66,6 @@ extension ERC20WalletService: WalletServiceTwoStepSend {
             
             return tx
         } catch {
-            print("error=", error)
             throw WalletServiceError.internalError(message: "Transaction sign error", error: error)
         }
     }

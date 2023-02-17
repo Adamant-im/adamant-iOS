@@ -229,7 +229,16 @@ protocol ChatsProvider: DataProvider, Actor {
     
     // MARK: - Fake messages
     func fakeSent(message: AdamantMessage, recipientId: String, date: Date, status: MessageStatus, showsChatroom: Bool, completion: @escaping (ChatsProviderResultWithTransaction) -> Void)
-    func fakeReceived(message: AdamantMessage, senderId: String, date: Date, unread: Bool, silent: Bool, showsChatroom: Bool, completion: @escaping (ChatsProviderResultWithTransaction) -> Void)
+    
+    func fakeReceived(
+        message: AdamantMessage,
+        senderId: String,
+        date: Date,
+        unread: Bool,
+        silent: Bool,
+        showsChatroom: Bool
+    ) async throws -> ChatTransaction
+    
     func fakeUpdate(status: MessageStatus, forTransactionId id: String, completion: @escaping (ChatsProviderResult) -> Void)
     
     // MARK: - Search

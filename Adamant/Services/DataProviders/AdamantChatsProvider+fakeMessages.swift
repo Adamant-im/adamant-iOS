@@ -76,60 +76,54 @@ extension AdamantChatsProvider {
         date: Date,
         unread: Bool,
         silent: Bool,
-        showsChatroom: Bool,
-        completion: @escaping (ChatsProviderResultWithTransaction) -> Void
-    ) {
-        Task {
-            do {
-                let result = try await validate(message: message, partnerId: senderId)
-                let loggedAccount = result.loggedAccount
-                let partner = result.partner
+        showsChatroom: Bool
+    )  async throws -> ChatTransaction {
+        do {
+            let result = try await validate(message: message, partnerId: senderId)
+            let loggedAccount = result.loggedAccount
+            let partner = result.partner
+            
+            switch message {
+            case .text(let text):
+                return try await fakeReceived(
+                    text: text,
+                    loggedAddress: loggedAccount,
+                    sender: partner,
+                    date: date,
+                    unread: unread,
+                    silent: silent,
+                    markdown: false,
+                    showsChatroom: showsChatroom
+                )
                 
-                switch message {
-                case .text(let text):
-                    fakeReceived(
-                        text: text,
-                        loggedAddress: loggedAccount,
-                        sender: partner,
-                        date: date,
-                        unread: unread,
-                        silent: silent,
-                        markdown: false,
-                        showsChatroom: showsChatroom,
-                        completion: completion
-                    )
-                    
-                case .richMessage(let payload):
-                    fakeReceived(
-                        text: payload.serialized(),
-                        loggedAddress: loggedAccount,
-                        sender: partner,
-                        date: date,
-                        unread: unread,
-                        silent: silent,
-                        markdown: false,
-                        showsChatroom: showsChatroom,
-                        completion: completion
-                    )
-                    
-                case .markdownText(let text):
-                    fakeReceived(
-                        text: text,
-                        loggedAddress: loggedAccount,
-                        sender: partner,
-                        date: date,
-                        unread: unread,
-                        silent: silent,
-                        markdown: true,
-                        showsChatroom: showsChatroom,
-                        completion: completion
-                    )
-                }
-            } catch let error as ChatsProviderError {
-                completion(.failure(error))
-            } catch {
-                completion(.failure(.internalError(error)))
+            case .richMessage(let payload):
+                return try await fakeReceived(
+                    text: payload.serialized(),
+                    loggedAddress: loggedAccount,
+                    sender: partner,
+                    date: date,
+                    unread: unread,
+                    silent: silent,
+                    markdown: false,
+                    showsChatroom: showsChatroom
+                )
+                
+            case .markdownText(let text):
+                return try await fakeReceived(
+                    text: text,
+                    loggedAddress: loggedAccount,
+                    sender: partner,
+                    date: date,
+                    unread: unread,
+                    silent: silent,
+                    markdown: true,
+                    showsChatroom: showsChatroom
+                )
             }
+        } catch let error as ChatsProviderError {
+            throw error
+        } catch {
+            throw ChatsProviderError.internalError(error)
         }
     }
     
@@ -210,7 +204,16 @@ extension AdamantChatsProvider {
         }
     }
     
-    private func fakeReceived(text: String, loggedAddress: String, sender: CoreDataAccount, date: Date, unread: Bool, silent: Bool, markdown: Bool, showsChatroom: Bool, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {
+    private func fakeReceived(
+        text: String,
+        loggedAddress: String,
+        sender: CoreDataAccount,
+        date: Date,
+        unread: Bool,
+        silent: Bool,
+        markdown: Bool,
+        showsChatroom: Bool
+    ) async throws -> ChatTransaction {
         // MARK: 0. Prepare
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         privateContext.parent = stack.container.viewContext
@@ -235,22 +238,24 @@ extension AdamantChatsProvider {
         transaction.chatMessageId = transaction.transactionId
         
         // MARK: 2. Get Chatroom
-        guard let id = sender.chatroom?.objectID, let chatroom = privateContext.object(with: id) as? Chatroom else {
-            return
+        guard let id = sender.chatroom?.objectID,
+              let chatroom = privateContext.object(with: id) as? Chatroom
+        else {
+            throw ChatsProviderError.requestCancelled
         }
         
         if unread {
             chatroom.hasUnreadMessages = true
         }
-        
+            
         // MARK: 3. Save it
         do {
             chatroom.addToTransactions(transaction)
             recheckLastTransactionFor(chatroom: chatroom, with: transaction)
             try privateContext.save()
-            completion(.success(transaction: transaction))
+            return transaction
         } catch {
-            completion(.failure(.internalError(error)))
+            throw ChatsProviderError.internalError(error)
         }
     }
     
