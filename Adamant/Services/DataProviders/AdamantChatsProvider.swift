@@ -666,6 +666,7 @@ extension AdamantChatsProvider {
             senderId: loggedAccount.address,
             recipientId: recipientId,
             transaction: transactionLocaly,
+            type: message.chatType,
             keypair: keypair,
             context: context
         )
@@ -750,6 +751,7 @@ extension AdamantChatsProvider {
             senderId: loggedAccount.address,
             recipientId: recipientId,
             transaction: transactionLocaly,
+            type: message.chatType,
             keypair: keypair,
             context: context,
             from: chatroom
@@ -849,12 +851,11 @@ extension AdamantChatsProvider {
         senderId: String,
         recipientId: String,
         transaction: ChatTransaction,
+        type: ChatType,
         keypair: Keypair,
         context: NSManagedObjectContext,
         from chatroom: Chatroom? = nil
     ) async throws -> ChatTransaction {
-        let type = ChatType.richMessage
-        
         let sendTransaction = try await prepareAndSendChatTransaction(
             transaction,
             in: context,
