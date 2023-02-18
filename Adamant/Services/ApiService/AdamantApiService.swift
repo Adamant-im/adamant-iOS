@@ -183,6 +183,38 @@ final class AdamantApiService: ApiService {
         )
     }
     
+    private func createRequest(
+        url: URLConvertible,
+        method: HTTPMethod,
+        parameters: Parameters?,
+        encoding: ParameterEncoding,
+        waitsForConnectivity: Bool,
+        headers: HTTPHeaders?
+    ) -> DataRequest {
+        AF.sessionConfiguration.waitsForConnectivity = waitsForConnectivity
+        return AF.request(
+            url,
+            method: method,
+            parameters: parameters,
+            encoding: encoding,
+            headers: headers
+        )
+    }
+    
+    private func sendRequest(request: DataRequest) async throws -> Data {
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Data, Error>) in
+            request.responseData(queue: defaultResponseDispatchQueue) { response in
+                switch response.result {
+                case .success(let data):
+                    continuation.resume(returning: data)
+                    
+                case .failure(let error):
+                    continuation.resume(throwing: ApiServiceError.init(error: error))
+                }
+            }
+        }
+    }
+    
     @discardableResult
     func sendRequest<Body: Encodable, Output: Decodable>(
         url: URLConvertible,
@@ -191,34 +223,39 @@ final class AdamantApiService: ApiService {
         waitsForConnectivity: Bool = false,
         completion: @escaping (ApiServiceResult<Output>) -> Void
     ) -> DataRequest {
-        AF.sessionConfiguration.waitsForConnectivity = waitsForConnectivity
-        
-        return AF.request(
-            url,
+        let request = createRequest(
+            url: url,
             method: method,
             parameters: body?.asDictionary,
             encoding: JSONEncoding.default,
+            waitsForConnectivity: waitsForConnectivity,
             headers: HTTPHeaders(["Content-Type": "application/json"])
-        ).responseData(queue: defaultResponseDispatchQueue) { [weak self] response in
-            switch response.result {
-            case .success(let data):
+        )
+        
+        Task {
+            do {
+                let data = try await sendRequest(request: request)
+                
                 do {
                     let model = try JSONDecoder().decode(Output.self, from: data)
                     
                     if let timestampResponse = model as? ServerResponseWithTimestamp {
                         let nodeDate = AdamantUtilities.decodeAdamant(timestamp: timestampResponse.nodeTimestamp)
-                        self?.lastRequestTimeDelta = Date().timeIntervalSince(nodeDate)
+                        lastRequestTimeDelta = Date().timeIntervalSince(nodeDate)
                     }
                     
                     completion(.success(model))
                 } catch {
                     completion(.failure(InternalError.parsingFailed.apiServiceErrorWith(error: error)))
                 }
-                
-            case .failure(let error):
+            } catch let error as ApiServiceError {
+                completion(.failure(error))
+            } catch {
                 completion(.failure(.init(error: error)))
             }
         }
+        
+        return request
     }
     
     func sendRequest<Output: Decodable>(
@@ -274,23 +311,32 @@ final class AdamantApiService: ApiService {
         parameters: Parameters?,
         encoding: ParameterEncoding
     ) async throws -> Data {
-        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Data, Error>) in
-            AF.request(
-                url,
-                method: method,
-                parameters: parameters,
-                encoding: encoding,
-                headers: HTTPHeaders(["Content-Type": "application/json"])
-            ).responseData(queue: defaultResponseDispatchQueue) { response in
-                switch response.result {
-                case .success(let data):
-                    continuation.resume(returning: data)
-                    
-                case .failure(let error):
-                    continuation.resume(throwing: ApiServiceError.init(error: error))
-                }
-            }
-        }
+        return try await sendRequest(
+            url: url,
+            method: method,
+            parameters: parameters,
+            encoding: encoding,
+            waitsForConnectivity: false
+        )
+    }
+    
+    private func sendRequest(
+        url: URLConvertible,
+        method: HTTPMethod,
+        parameters: Parameters?,
+        encoding: ParameterEncoding,
+        waitsForConnectivity: Bool
+    ) async throws -> Data {
+        let request = createRequest(
+            url: url,
+            method: method,
+            parameters: parameters,
+            encoding: encoding,
+            waitsForConnectivity: waitsForConnectivity,
+            headers: HTTPHeaders(["Content-Type": "application/json"])
+        )
+        
+        return try await sendRequest(request: request)
     }
     
     static func translateServerError(_ error: String?) -> ApiServiceError {
