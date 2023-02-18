@@ -282,25 +282,16 @@ class NewChatViewController: FormViewController {
                 account.chatroom?.isForcedVisible = true
                 self.delegate?.newChatController(self, didSelectAccount: account, preMessage: message)
                 self.dialogService.dismissProgress()
-            } catch let error as AccountsProviderResult {
+            } catch let error as AccountsProviderError {
                 switch error {
-                case .success(let account):
-                    if let name = name, account.name == nil {
-                        account.name = name
-                        
-                        if let chatroom = account.chatroom, chatroom.title == nil {
-                            chatroom.title = name
-                        }
-                    }
-                    
-                    account.chatroom?.isForcedVisible = true
-                    self.delegate?.newChatController(self, didSelectAccount: account, preMessage: message)
-                    self.dialogService.dismissProgress()
-                    
                 case .dummy:
                     self.dialogService.dismissProgress()
                     
-                    let alert = UIAlertController(title: nil, message: AccountsProviderResult.notInitiated(address: address).localized, preferredStyle: .alert)
+                    let alert = UIAlertController(
+                        title: nil,
+                        message: AccountsProviderError.notInitiated(address: address).localized,
+                        preferredStyle: .alert
+                    )
                     
                     let faq = UIAlertAction(title: String.adamantLocalized.newChat.whatDoesItMean, style: .default, handler: { [weak self] _ in
                         guard let url = URL(string: NewChatViewController.faqUrl) else {
@@ -326,7 +317,7 @@ class NewChatViewController: FormViewController {
                     if let apiError = apiError as? ApiServiceError,
                        case .internalError(let message, _) = apiError,
                        message == String.adamantLocalized.sharedErrors.unknownError {
-                        self.dialogService.showWarning(withMessage: AccountsProviderResult.notFound(address: address).localized)
+                        self.dialogService.showWarning(withMessage: AccountsProviderError.notFound(address: address).localized)
                         return
                     }
                     

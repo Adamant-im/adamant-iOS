@@ -190,7 +190,7 @@ extension AdamantAccountsProvider {
     func getAccount(byAddress address: String) async throws -> CoreDataAccount {
         let validation = AdamantUtilities.validateAdamantAddress(address: address)
         if validation == .invalid {
-            throw AccountsProviderResult.invalidAddress(address: address)
+            throw AccountsProviderError.invalidAddress(address: address)
         }
         
         // Check if there is an account, that we are looking for
@@ -210,9 +210,9 @@ extension AdamantAccountsProvider {
                 let account = try await apiService.getAccount(byAddress: address)
                 guard account.publicKey != nil else {
                     if let dummy = dummy {
-                        throw AccountsProviderResult.dummy(dummy)
+                        throw AccountsProviderError.dummy(dummy)
                     } else {
-                        throw AccountsProviderResult.notInitiated(address: address)
+                        throw AccountsProviderError.notInitiated(address: address)
                     }
                 }
                 
@@ -227,23 +227,23 @@ extension AdamantAccountsProvider {
                 switch error {
                 case .accountNotFound:
                     if let dummy = dummy {
-                        throw AccountsProviderResult.dummy(dummy)
+                        throw AccountsProviderError.dummy(dummy)
                     } else {
-                        throw AccountsProviderResult.notFound(address: address)
+                        throw AccountsProviderError.notFound(address: address)
                     }
                     
                 case .networkError(let error):
-                    throw AccountsProviderResult.networkError(error)
+                    throw AccountsProviderError.networkError(error)
                     
                 default:
-                    throw AccountsProviderResult.serverError(error)
+                    throw AccountsProviderError.serverError(error)
                 }
             }
         case .system:
             let coreAccount = createCoreDataAccount(with: address, publicKey: "")
             return coreAccount
         case .invalid:
-            throw AccountsProviderResult.invalidAddress(address: address)
+            throw AccountsProviderError.invalidAddress(address: address)
         }
     }
     
@@ -259,7 +259,7 @@ extension AdamantAccountsProvider {
     ) async throws -> CoreDataAccount {
         let validation = AdamantUtilities.validateAdamantAddress(address: address)
         if validation == .invalid {
-            throw AccountsProviderResult.invalidAddress(address: address)
+            throw AccountsProviderError.invalidAddress(address: address)
         }
         
         if publicKey.isEmpty {
@@ -287,7 +287,7 @@ extension AdamantAccountsProvider {
             let coreAccount = createCoreDataAccount(with: address, publicKey: "")
             return coreAccount
         case .invalid:
-            throw AccountsProviderResult.invalidAddress(address: address)
+            throw AccountsProviderError.invalidAddress(address: address)
         }
     }
     
@@ -516,7 +516,7 @@ extension AdamantAccountsProvider {
     func getDummyAccount(for address: String) async throws -> DummyAccount {
         let validation = AdamantUtilities.validateAdamantAddress(address: address)
         if validation == .invalid {
-            throw AccountsProviderDummyAccountResult.invalidAddress(address: address)
+            throw AccountsProviderDummyAccountError.invalidAddress(address: address)
         }
         
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
@@ -524,7 +524,7 @@ extension AdamantAccountsProvider {
         
         switch await self.getAccount(byPredicate: NSPredicate(format: "address == %@", address)) {
         case .core(let account):
-            throw AccountsProviderDummyAccountResult.foundRealAccount(account)
+            throw AccountsProviderDummyAccountError.foundRealAccount(account)
             
         case .dummy(let account):
             return account
@@ -537,7 +537,7 @@ extension AdamantAccountsProvider {
                 try context.save()
                 return dummy
             } catch {
-                throw AccountsProviderDummyAccountResult.internalError(error)
+                throw AccountsProviderDummyAccountError.internalError(error)
             }
         }
     }

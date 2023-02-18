@@ -84,10 +84,4 @@ class ByteStream {
         offset += count
         return Data(value)
     }
-    
-    func read(_ type: VarString.Type, count: Int) -> VarString {
-        let value = data[offset..<(offset + count)].to(type: String.self)
-        offset += count
-        return VarString(value)
-    }
 }

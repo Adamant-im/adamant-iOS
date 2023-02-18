@@ -240,27 +240,18 @@ final class AdamantApiService: ApiService {
         parameters: Parameters?,
         encoding: ParameterEncoding
     ) async throws -> Output {
-        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Output, Error>) in
-            AF.request(
-                url,
-                method: method,
-                parameters: parameters,
-                encoding: encoding,
-                headers: HTTPHeaders(["Content-Type": "application/json"])
-            ).responseData(queue: defaultResponseDispatchQueue) { response in
-                switch response.result {
-                case .success(let data):
-                    do {
-                        let model = try JSONDecoder().decode(Output.self, from: data)
-                        continuation.resume(returning: model)
-                    } catch {
-                        continuation.resume(throwing: InternalError.parsingFailed.apiServiceErrorWith(error: error))
-                    }
-                    
-                case .failure(let error):
-                    continuation.resume(throwing: ApiServiceError.init(error: error))
-                }
-            }
+        let data = try await sendRequest(
+            url: url,
+            method: method,
+            parameters: parameters,
+            encoding: encoding
+        )
+        
+        do {
+            let model = try JSONDecoder().decode(Output.self, from: data)
+            return model
+        } catch {
+            throw InternalError.parsingFailed.apiServiceErrorWith(error: error)
         }
     }
     

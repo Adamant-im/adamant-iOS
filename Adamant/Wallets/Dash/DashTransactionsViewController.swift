@@ -78,7 +78,6 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
         return transactions.count
     }
     
-    @MainActor
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let controller = router.get(scene: AdamantScene.Wallets.Dash.transactionDetails) as? DashTransactionDetailsViewController else {
             fatalError("Failed to getDashTransactionDetailsViewController")

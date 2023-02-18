@@ -52,6 +52,7 @@
 		4198D57F28C8B834009337F2 /* short-success.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4198D57E28C8B834009337F2 /* short-success.mp3 */; };
 		4198D58128C8B8D1009337F2 /* default.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4198D58028C8B8D1009337F2 /* default.mp3 */; };
 		41BCB310295C6082004B12AB /* VisibleWalletsResetTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41BCB30F295C6082004B12AB /* VisibleWalletsResetTableViewCell.swift */; };
+		41CA598C29A0D84F002BFDE4 /* TaskManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CA598B29A0D84F002BFDE4 /* TaskManager.swift */; };
 		41CE153A297FF98200CC9254 /* Web3Swift+Adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CE1539297FF98200CC9254 /* Web3Swift+Adamant.swift */; };
 		41CEE09629718A10005EF1D2 /* UIImage+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CEE09529718A10005EF1D2 /* UIImage+adamant.swift */; };
 		41E142F2289E60EB002EE8D7 /* AdamantSecret.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E142F1289E60EB002EE8D7 /* AdamantSecret.swift */; };
@@ -768,6 +769,7 @@
 		4198D57E28C8B834009337F2 /* short-success.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "short-success.mp3"; sourceTree = "<group>"; };
 		4198D58028C8B8D1009337F2 /* default.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = default.mp3; sourceTree = "<group>"; };
 		41BCB30F295C6082004B12AB /* VisibleWalletsResetTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisibleWalletsResetTableViewCell.swift; sourceTree = "<group>"; };
+		41CA598B29A0D84F002BFDE4 /* TaskManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskManager.swift; sourceTree = "<group>"; };
 		41CE1539297FF98200CC9254 /* Web3Swift+Adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Web3Swift+Adamant.swift"; sourceTree = "<group>"; };
 		41CEE09529718A10005EF1D2 /* UIImage+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+adamant.swift"; sourceTree = "<group>"; };
 		41E142F1289E60EB002EE8D7 /* AdamantSecret.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantSecret.swift; sourceTree = "<group>"; };
@@ -1800,6 +1802,7 @@
 				4E9EE86E28CE793D008359F7 /* SafeDecimalRow.swift */,
 				9345769428FD0C34004E6C7A /* UIViewController+email.swift */,
 				41CE1539297FF98200CC9254 /* Web3Swift+Adamant.swift */,
+				41CA598B29A0D84F002BFDE4 /* TaskManager.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -2981,6 +2984,7 @@
 				6455E9F321075D8000B2E94C /* AdamantAddressBookService.swift in Sources */,
 				9324C75E297170600022D7EA /* RichTransactionStatusService.swift in Sources */,
 				9304F8BE292F88F900173F18 /* ANSPayload.swift in Sources */,
+				41CA598C29A0D84F002BFDE4 /* TaskManager.swift in Sources */,
 				E9204B5020C94C4A00F3B9AB /* Date+adamant.swift in Sources */,
 				E9E7CD9120026FA100DFC4DB /* SwinjectDependencies.swift in Sources */,
 				E96D64CA2295C4A800CA5587 /* WordList.swift in Sources */,

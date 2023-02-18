@@ -33,6 +33,8 @@ final class ChatViewController: MessagesViewController {
     private lazy var scrollDownButton = makeScrollDownButton()
     private lazy var chatMessagesCollectionView = makeChatMessagesCollectionView()
     
+    private var admService: WalletServiceWithSend?
+    
     // swiftlint:disable unused_setter_value
     override var messageInputBar: InputBarAccessoryView {
         get { inputBar }
@@ -49,11 +51,13 @@ final class ChatViewController: MessagesViewController {
         viewModel: ChatViewModel,
         richMessageProviders: [String: RichMessageProvider],
         storedObjects: [AnyObject],
-        sendTransaction: @escaping SendTransaction
+        sendTransaction: @escaping SendTransaction,
+        admService: WalletServiceWithSend?
     ) {
         self.viewModel = viewModel
         self.storedObjects = storedObjects
         self.richMessageProviders = richMessageProviders
+        self.admService = admService
         super.init(nibName: nil, bundle: nil)
         inputBar.onAttachmentButtonTap = { [weak self] in self.map { sendTransaction($0) } }
     }
@@ -505,38 +509,28 @@ private extension ChatViewController {
 
 private extension ChatViewController {
     func didTapAdmChat(with chatroom: Chatroom, message: String?) {
-        DispatchQueue.onMainAsync {
-            guard let chatlistVC = self.navigationController?.viewControllers.first as? ChatListViewController
-            else {
-                return
-            }
-            
-            let vc = chatlistVC.chatViewController(for: chatroom)
-            if let message = message {
-                vc.messageInputBar.inputTextView.text = message
-                vc.viewModel.inputText = message
-            }
-            
-            self.navigationController?.pushViewController(vc, animated: true)
+        guard let chatlistVC = self.navigationController?.viewControllers.first as? ChatListViewController
+        else {
+            return
         }
+        
+        let vc = chatlistVC.chatViewController(for: chatroom)
+        if let message = message {
+            vc.messageInputBar.inputTextView.text = message
+            vc.viewModel.inputText = message
+        }
+        
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     func didTapAdmSend(to adm: AdamantAddress) {
-        DispatchQueue.onMainAsync {
-            guard let accountService = self.storedObjects.first(where: { $0 is AccountService }) as? AccountService else { return }
-            let service = accountService.wallets.first { wallet in
-                return wallet is AdmWalletService
-            }
-            
-            guard let service = service as? WalletServiceWithSend else { return }
-            let vc = service.transferViewController()
-            if let v = vc as? TransferViewControllerBase {
-                v.recipientAddress = adm.address
-                v.recipientName = adm.name
-                v.delegate = self
-            }
-            self.navigationController?.pushViewController(vc, animated: true)
+        guard let vc = admService?.transferViewController() else { return }
+        if let v = vc as? TransferViewControllerBase {
+            v.recipientAddress = adm.address
+            v.recipientName = adm.name
+            v.delegate = self
         }
+        self.navigationController?.pushViewController(vc, animated: true)
     }
 }
 

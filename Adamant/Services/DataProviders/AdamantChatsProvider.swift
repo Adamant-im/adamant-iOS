@@ -946,7 +946,7 @@ extension AdamantChatsProvider {
             } catch {
                 throw ChatsProviderError.internalError(error)
             }
-        } catch let error as AccountsProviderResult {
+        } catch let error as AccountsProviderError {
             switch error {
             case .notFound, .invalidAddress:
                 throw ChatsProviderError.accountNotFound(recipientId)
@@ -955,8 +955,6 @@ extension AdamantChatsProvider {
             case .serverError(let error):
                 throw ChatsProviderError.serverError(error)
             case .networkError:
-                throw ChatsProviderError.networkError
-            case .success:
                 throw ChatsProviderError.networkError
             }
         } catch {

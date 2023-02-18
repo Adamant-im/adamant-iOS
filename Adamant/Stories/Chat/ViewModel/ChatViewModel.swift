@@ -78,12 +78,7 @@ final class ChatViewModel: NSObject {
     
     var isNeedToLoadMoreMessages: Bool = false
     
-    private var firstLoadTask: Task<(), Never>?
-    private var mooreLoadTask: Task<(), Never>?
-    private var transactionStatusTask: Task<(), Never>?
-    private var cancelMessageTask: Task<(), Never>?
-    private var retrySendMessageTask: Task<(), Never>?
-    private var sendMessageTask: Task<(), Never>?
+    private var tasksStorage = TaskManager()
     
     init(
         chatsProvider: ChatsProvider,
@@ -107,15 +102,6 @@ final class ChatViewModel: NSObject {
         self.accountProvider = accountProvider
         super.init()
         setupObservers()
-    }
-    
-    deinit {
-        firstLoadTask?.cancel()
-        mooreLoadTask?.cancel()
-        transactionStatusTask?.cancel()
-        cancelMessageTask?.cancel()
-        retrySendMessageTask?.cancel()
-        sendMessageTask?.cancel()
     }
     
     func setup(
@@ -147,21 +133,23 @@ final class ChatViewModel: NSObject {
     }
     
     func loadFirstMessagesIfNeeded() {
-        firstLoadTask = Task {
+        let task = Task { @MainActor in
             guard let address = chatroom?.partner?.address else { return }
             
             let isChatLoading = await chatsProvider.isChatLoaded(with: address)
             
             if address == AdamantContacts.adamantWelcomeWallet.name || isChatLoading {
-                await updateTransactions(performFetch: true)
+                updateTransactions(performFetch: true)
             } else {
                 await loadMessages(address: address, offset: .zero, fullscreenLoading: true)
             }
         }
+        
+        tasksStorage.insert(task)
     }
     
     func loadMoreMessagesIfNeeded() {
-        mooreLoadTask = Task {
+        let task = Task { @MainActor in
             guard
                 let address = chatroom?.partner?.address,
                 isNeedToLoadMoreMessages
@@ -170,10 +158,12 @@ final class ChatViewModel: NSObject {
             let offset = await chatsProvider.chatLoadedMessages[address] ?? .zero
             await loadMessages(address: address, offset: offset, fullscreenLoading: false)
         }
+        
+        tasksStorage.insert(task)
     }
     
     func sendMessage(text: String) {
-        sendMessageTask = Task {
+        let task = Task { @MainActor in
             let message: AdamantMessage = markdownParser.parse(text).length == text.count
             ? .text(text)
             : .markdownText(text)
@@ -193,10 +183,12 @@ final class ChatViewModel: NSObject {
                 await handleMessageSendingError(error: error, sentText: text)
             }
         }
+        
+        tasksStorage.insert(task)
     }
     
     func loadTransactionStatusIfNeeded(id: String, forceUpdate: Bool) {
-        transactionStatusTask = Task {
+        let task = Task {
             guard
                 let transaction = chatTransactions.first(where: { $0.chatMessageId == id }),
                 let richMessageTransaction = transaction as? RichMessageTransaction,
@@ -212,6 +204,8 @@ final class ChatViewModel: NSObject {
 
             await chatsProvider.updateStatus(for: richMessageTransaction, resetBeforeUpdate: forceUpdate)
         }
+        
+        tasksStorage.insert(task)
     }
     
     func preserveMessage(_ message: String) {
@@ -219,9 +213,8 @@ final class ChatViewModel: NSObject {
         preservationDelegate?.preserveMessage(message, forAddress: partnerAddress)
     }
     
-    @MainActor
     func blockChat() {
-        Task {
+        Task { @MainActor in
             guard let address = chatroom?.partner?.address else {
                 return assertionFailure("Can't block user without address")
             }
@@ -290,7 +283,7 @@ final class ChatViewModel: NSObject {
     }
     
     func process(adm: AdamantAddress, action: AddressChatShareType) {
-        Task {
+        Task { @MainActor in
             if action == .send {
                 didTapAdmSend.send(adm)
                 return
@@ -306,7 +299,7 @@ final class ChatViewModel: NSObject {
     }
     
     func cancelMessage(id: String) {
-        cancelMessageTask = Task {
+        let task = Task { @MainActor in
             guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
             else { return }
             
@@ -321,10 +314,12 @@ final class ChatViewModel: NSObject {
                 }
             }
         }
+        
+        tasksStorage.insert(task)
     }
     
     func retrySendMessage(id: String) {
-        retrySendMessageTask = Task {
+        let task = Task { @MainActor in
             guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
             else { return }
             
@@ -339,6 +334,8 @@ final class ChatViewModel: NSObject {
                 }
             }
         }
+        
+        tasksStorage.insert(task)
     }
 }
 
@@ -532,14 +529,8 @@ private extension ChatViewModel {
             self.setNameIfNeeded(for: account, chatroom: account.chatroom, name: name)
             account.chatroom?.isForcedVisible = true
             self.startNewChat(with: chatroom, message: message)
-        } catch let error as AccountsProviderResult {
+        } catch let error as AccountsProviderError {
             switch error {
-            case .success(let account):
-                self.dialog.send(.progress(false))
-                guard let chatroom = account.chatroom else { return }
-                self.setNameIfNeeded(for: account, chatroom: account.chatroom, name: name)
-                account.chatroom?.isForcedVisible = true
-                self.startNewChat(with: chatroom, message: message)
             case .dummy:
                 self.dialog.send(.progress(false))
                 self.dialog.send(.dummy(address))
@@ -551,7 +542,7 @@ private extension ChatViewModel {
                 if let apiError = apiError as? ApiServiceError,
                    case .internalError(let message, _) = apiError,
                    message == String.adamantLocalized.sharedErrors.unknownError {
-                    self.dialog.send(.alert(AccountsProviderResult.notFound(address: address).localized))
+                    self.dialog.send(.alert(AccountsProviderError.notFound(address: address).localized))
                     return
                 }
                 

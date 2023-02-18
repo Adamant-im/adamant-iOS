@@ -75,7 +75,6 @@ public struct Transaction {
     }
     
     public mutating func unpack(with network: Network) {
-        print("unpack")
         for index in 0..<inputs.count {
             inputs[index].unpack(with: network)
         }
@@ -85,11 +84,11 @@ public struct Transaction {
         }
     }
     
-//    public func isLinked(to address: Cashaddr) -> Bool {
-//        let hash = address.base58
-//        return inputs.filter { input -> Bool in input.address == hash }.count > 0
-//            || outputs.filter { output -> Bool in output.address == hash }.count > 0
-//    }
+    public func isLinked(to address: Cashaddr) -> Bool {
+        let hash = address.base58
+        return inputs.filter { input -> Bool in input.address == hash }.count > 0
+            || outputs.filter { output -> Bool in output.address == hash }.count > 0
+    }
 
     public func isCoinbase() -> Bool {
         return inputs.count == 1 && inputs[0].isCoinbase()
@@ -118,7 +117,6 @@ public struct Transaction {
     
     static public func createNewTransaction(toAddress: Address, amount: UInt64, fee: UInt64, changeAddress: Address, utxos: [UnspentTransaction], lockTime: UInt32 = 0, keys:  [PrivateKey]) -> Transaction {
         let unsignedTx = createUnsignedTx(toAddress: toAddress, amount: amount, fee: fee, changeAddress: changeAddress, utxos: utxos, lockTime: 0)
-        
         let signedTransaction = signTx(unsignedTx: unsignedTx, keys: keys)
         return signedTransaction
     }
@@ -153,9 +151,9 @@ public struct Transaction {
         let lockingScriptChange = Script.buildPublicKeyHashOut(pubKeyHash: changePubkeyHash)
         
         var outputs = [TransactionOutput]()
-        outputs.append(TransactionOutput(value: amount, lockingScript: lockingScriptTo, addresses: [toAddress.base58]))
+        outputs.append(TransactionOutput(value: amount, lockingScript: lockingScriptTo))
         if change > 0 {
-            outputs.append(TransactionOutput(value: change, lockingScript: lockingScriptChange, addresses: [changeAddress.base58]))
+            outputs.append(TransactionOutput(value: change, lockingScript: lockingScriptChange))
         }
         
         let unsignedInputs = utxos.map { TransactionInput(previousOutput: $0.outpoint, signatureScript: Data(), sequence: UInt32.max) }
@@ -179,6 +177,7 @@ public struct Transaction {
                 print("No keys to this txout : \(utxo.output.value)")
                 continue
             }
+            print("Value of signing txout : \(utxo.output.value)")
             
             let sighash: Data = transactionToSign.signatureHash(for: utxo.output, inputIndex: i, hashType: SighashType.BTC.ALL)
             let signature: Data = try! BitcoinKit.Crypto.sign(sighash, privateKey: key)

@@ -406,7 +406,11 @@ extension DogeWalletService {
             throw WalletServiceError.notLogged
         }
         
-        let doge = try await getTransactions(for: address, from: from, to: from + DogeWalletService.chunkSize)
+        let doge = try await getTransactions(
+            for: address,
+            from: from,
+            to: from + DogeWalletService.chunkSize
+        )
         
         let hasMore = doge.to < doge.totalItems
         

@@ -274,7 +274,7 @@ class BtcWalletService: WalletService {
             return result
         } catch {
             throw WalletServiceError.internalError(
-                message: "BTC Wallet: fail to get address from KVS",
+                message: "BTC Wallet: failed to get address from KVS",
                 error: error
             )
         }

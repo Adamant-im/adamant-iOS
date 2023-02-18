@@ -288,11 +288,8 @@ extension AdamantChatsProvider {
         do {
             let account = try await accountsProvider.getAccount(byAddress: partnerId)
             return (loggedAccount: loggedAddress, partner: account)
-        } catch let error as AccountsProviderResult {
+        } catch let error as AccountsProviderError {
             switch error {
-            case .success(let account):
-                return (loggedAccount: loggedAddress, partner: account)
-                
             case .notFound, .invalidAddress, .notInitiated, .dummy:
                 throw ChatsProviderError.accountNotFound(partnerId)
                 

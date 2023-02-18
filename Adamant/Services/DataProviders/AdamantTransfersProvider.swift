@@ -387,11 +387,8 @@ extension AdamantTransfersProvider {
         
         do {
             recipientAccount = try await accountsProvider.getAccount(byAddress: recipient)
-        } catch let error as AccountsProviderResult {
+        } catch let error as AccountsProviderError {
             switch error {
-            case .success(let account):
-                recipientAccount = account
-                
             case .notFound, .invalidAddress, .notInitiated, .dummy:
                 throw TransfersProviderError.accountNotFound(address: recipient)
                 
@@ -533,11 +530,8 @@ extension AdamantTransfersProvider {
         
         do {
             recipientAccount = try await accountsProvider.getAccount(byAddress: recipient)
-        } catch let error as AccountsProviderResult {
+        } catch let error as AccountsProviderError {
             switch error {
-            case .success(let account):
-                recipientAccount = account
-                
             case .dummy(let account):
                 recipientAccount = account
                 
@@ -545,11 +539,8 @@ extension AdamantTransfersProvider {
                 
                 do {
                     recipientAccount = try await accountsProvider.getDummyAccount(for: recipient)
-                } catch let error as AccountsProviderDummyAccountResult {
+                } catch let error as AccountsProviderDummyAccountError {
                     switch error {
-                    case .success(let dummy):
-                        recipientAccount = dummy
-                        
                     case .foundRealAccount(let account):
                         recipientAccount = account
                         
@@ -858,17 +849,17 @@ extension AdamantTransfersProvider {
                     byAddress: id,
                     publicKey: publicKey
                 )
-            } catch let error as AccountsProviderResult {
+            } catch let error as AccountsProviderError {
                 switch error {
-                case .success, .dummy:
+                case .dummy:
                     break
                     
                 case .notFound, .invalidAddress, .notInitiated:
                     do {
                         _ = try await accountsProvider.getDummyAccount(for: id)
-                    } catch let error as AccountsProviderDummyAccountResult {
+                    } catch let error as AccountsProviderDummyAccountError {
                         switch error {
-                        case .success, .foundRealAccount:
+                        case .foundRealAccount:
                             break
                             
                         case .invalidAddress(let address):

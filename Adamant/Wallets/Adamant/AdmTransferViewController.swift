@@ -58,11 +58,8 @@ class AdmTransferViewController: TransferViewControllerBase {
                     amount: amount,
                     comments: comments
                 )
-            } catch let error as AccountsProviderResult {
+            } catch let error as AccountsProviderError {
                 switch error {
-                case .success:
-                    self.sendFundsInternal(service: service, recipient: recipient, amount: amount, comments: comments)
-                    
                 case .notFound, .notInitiated, .dummy:
                     let alert = UIAlertController(title: String.adamantLocalized.transferAdm.accountNotFoundAlertTitle(for: recipient),
                                                   message: String.adamantLocalized.transferAdm.accountNotFoundAlertBody,

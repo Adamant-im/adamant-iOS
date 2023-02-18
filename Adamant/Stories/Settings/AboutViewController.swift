@@ -317,10 +317,8 @@ class AboutViewController: FormViewController {
                 nav.pushViewController(chat, animated: true)
 
                 dialogService.dismissProgress()
-            } catch let error as AccountsProviderResult {
+            } catch let error as AccountsProviderError {
                 switch error {
-                case .success:
-                    break
                 case .invalidAddress, .notFound, .notInitiated, .networkError, .dummy:
                     dialogService.showWarning(withMessage: String.adamantLocalized.sharedErrors.networkError)
 

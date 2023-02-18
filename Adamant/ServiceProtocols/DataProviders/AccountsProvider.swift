@@ -9,8 +9,7 @@
 import Foundation
 import CoreData
 
-enum AccountsProviderResult: Error {
-    case success(CoreDataAccount)
+enum AccountsProviderError: Error {
     case dummy(DummyAccount)
     case notFound(address: String)
     case invalidAddress(address: String)
@@ -20,7 +19,7 @@ enum AccountsProviderResult: Error {
     
     var localized: String {
         switch self {
-        case .success, .dummy:
+        case .dummy:
             return ""
             
         case .notFound(let address):
@@ -42,8 +41,7 @@ enum AccountsProviderResult: Error {
     }
 }
 
-enum AccountsProviderDummyAccountResult: Error {
-    case success(DummyAccount)
+enum AccountsProviderDummyAccountError: Error {
     case foundRealAccount(CoreDataAccount)
     case invalidAddress(address: String)
     case internalError(Error)

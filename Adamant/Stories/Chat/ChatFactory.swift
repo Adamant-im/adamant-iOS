@@ -27,11 +27,16 @@ struct ChatFactory {
         let delegates = makeDelegates(viewModel: viewModel)
         let dialogManager = ChatDialogManager(viewModel: viewModel, dialogService: dialogService)
         
+        let admService = accountService.wallets.first { wallet in
+            return wallet is AdmWalletService
+        }
+        
         let viewController = ChatViewController(
             viewModel: viewModel,
             richMessageProviders: richMessageProviders,
             storedObjects: delegates.asArray + [dialogManager, accountService],
-            sendTransaction: makeSendTransactionAction(viewModel: viewModel)
+            sendTransaction: makeSendTransactionAction(viewModel: viewModel),
+            admService: admService as? WalletServiceWithSend
         )
         
         viewController.setupDelegates(delegates)

@@ -363,9 +363,7 @@ extension AdamantAccountService {
         // Update and initiate wallet services
         self.passphrase = passphrase
         
-        for case let wallet as InitiatedWithPassphraseService in wallets {
-            _ = try? await wallet.initWallet(withPassphrase: passphrase)
-        }
+        _ = await initWallets()
         
         return .success(account: account, alert: nil)
     }
@@ -465,14 +463,32 @@ extension AdamantAccountService {
     }
     
     func reloadWallets() {
+        Task {
+            _ = await initWallets()
+        }
+    }
+    
+    func initWallets() async -> [WalletAccount?] {
         guard let passphrase = passphrase else {
             print("No passphrase found")
-            return
+            return []
         }
-        Task {
+        
+        return await withTaskGroup(of: WalletAccount?.self) { group in
             for case let wallet as InitiatedWithPassphraseService in wallets {
-                let _ = try? await wallet.initWallet(withPassphrase: passphrase)
+                group.addTask {
+                    let result = try? await wallet.initWallet(withPassphrase: passphrase)
+                    return result
+                }
             }
+            
+            var wallets: [WalletAccount?] = []
+            
+            for await wallet in group {
+                wallets.append(wallet)
+            }
+
+            return wallets
         }
     }
 }
