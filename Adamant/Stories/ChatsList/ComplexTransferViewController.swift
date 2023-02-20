@@ -19,6 +19,7 @@ class ComplexTransferViewController: UIViewController {
     
     var accountService: AccountService!
     var visibleWalletsService: VisibleWalletsService!
+    var addressBookService: AddressBookService!
     
     // MARK: - Properties
     var pagingViewController: PagingViewController!
@@ -27,18 +28,13 @@ class ComplexTransferViewController: UIViewController {
     var services: [WalletServiceWithSend] = []
     var partner: CoreDataAccount? {
         didSet {
-            if let partner = partner {
-                navigationItem.title = partner.name ?? partner.address
-            }
+            navigationItem.title = partner?.chatroom?.getName(addressBookService: addressBookService)
         }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        if let partner = partner {
-            navigationItem.title = partner.name?.checkAndReplaceSystemWallets() ?? partner.address
-        }
-        
+        navigationItem.title = partner?.chatroom?.getName(addressBookService: addressBookService)
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
         
         // MARK: Services
