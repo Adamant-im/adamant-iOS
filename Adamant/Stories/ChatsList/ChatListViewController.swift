@@ -229,10 +229,6 @@ class ChatListViewController: UIViewController {
             }
         }
         
-        // Keyboard
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
-        
         // Control Active
         NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
             if let previousAppState = self?.previousAppState,
@@ -499,9 +495,7 @@ extension ChatListViewController {
                   roomsLoadedCount < roomsMaxCount,
                   roomsMaxCount > 0,
                   !isBusy,
-                  tableView.numberOfRows(inSection: .zero) - indexPath.row < 3,
-                  let lastVisibleIndexPath = tableView.indexPathsForVisibleRows,
-                  lastVisibleIndexPath.contains(IndexPath(row: tableView.numberOfRows(inSection: 0) - 3, section: 0))
+                  tableView.numberOfRows(inSection: .zero) - indexPath.row < 3
             else {
                 return
             }

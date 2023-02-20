@@ -65,7 +65,7 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
     }
 }
 
-extension ChatMessagesCollectionView {
+private extension ChatMessagesCollectionView {
     var maxVerticalOffset: CGFloat {
         contentSize.height + fullInsets.bottom - bounds.height
     }
