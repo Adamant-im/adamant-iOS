@@ -156,6 +156,7 @@ extension TransactionsListViewControllerBase: UITableViewDataSource, UITableView
         if let partnerName = partnerName {
             cell.accountLabel.text = partnerName
             cell.addressLabel.text = partnerId
+            cell.addressLabel.lineBreakMode = .byTruncatingMiddle
             
             if cell.addressLabel.isHidden {
                 cell.addressLabel.isHidden = false
