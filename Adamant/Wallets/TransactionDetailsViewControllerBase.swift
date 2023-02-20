@@ -176,6 +176,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             } else {
                 $0.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
+            
+            $0.cell.detailTextLabel?.lineBreakMode = .byTruncatingMiddle
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
             cell.textLabel?.textColor = UIColor.adamant.textColor
@@ -214,6 +216,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             
             let height = self?.senderName != nil ? DoubleDetailsTableViewCell.fullHeight : DoubleDetailsTableViewCell.compactHeight
             $0.cell.height = { height }
+            $0.cell.secondDetailsLabel?.lineBreakMode = .byTruncatingMiddle
+            $0.cell.detailsLabel?.lineBreakMode = .byTruncatingMiddle
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
             cell.textLabel?.textColor = UIColor.adamant.textColor
@@ -268,6 +272,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             
             let height = self?.recipientName != nil ? DoubleDetailsTableViewCell.fullHeight : DoubleDetailsTableViewCell.compactHeight
             $0.cell.height = { height }
+            $0.cell.secondDetailsLabel?.lineBreakMode = .byTruncatingMiddle
+            $0.cell.detailsLabel?.lineBreakMode = .byTruncatingMiddle
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
             cell.textLabel?.textColor = UIColor.adamant.textColor
@@ -432,6 +438,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             } else {
                 $0.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
+            $0.cell.detailTextLabel?.lineBreakMode = .byTruncatingMiddle
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
             cell.textLabel?.textColor = UIColor.adamant.textColor

@@ -179,6 +179,7 @@ class EthTransferViewController: TransferViewControllerBase {
             view.frame = prefix.frame
             $0.cell.textField.leftView = view
             $0.cell.textField.leftViewMode = .always
+            $0.cell.textField.setLineBreakMode()
             
             if recipientIsReadonly {
                 $0.disabled = true

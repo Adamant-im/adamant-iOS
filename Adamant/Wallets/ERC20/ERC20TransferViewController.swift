@@ -168,6 +168,7 @@ class ERC20TransferViewController: TransferViewControllerBase {
             $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
             $0.cell.textField.keyboardType = UIKeyboardType.namePhonePad
             $0.cell.textField.autocorrectionType = .no
+            $0.cell.textField.setLineBreakMode()
             
             if let recipient = recipientAddress {
                 let trimmed = recipient.components(separatedBy: EthTransferViewController.invalidCharacters).joined()
