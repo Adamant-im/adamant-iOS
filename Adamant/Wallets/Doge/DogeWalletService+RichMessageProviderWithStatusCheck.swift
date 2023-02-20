@@ -9,110 +9,106 @@
 import Foundation
 
 extension DogeWalletService: RichMessageProviderWithStatusCheck {
-    func statusFor(transaction: RichMessageTransaction, completion: @escaping (WalletServiceResult<TransactionStatus>) -> Void) {
+    func statusFor(transaction: RichMessageTransaction) async throws -> TransactionStatus {
         guard let hash = transaction.richContent?[RichContentKeys.transfer.hash], let date = transaction.date as Date? else {
-            completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction hash", error: nil)))
-            return
+            throw WalletServiceError.internalError(message: "Failed to get transaction hash", error: nil)
         }
         
         guard let walletAddress = dogeWallet?.address else {
-            completion(.failure(error: .notLogged))
-            return
+            throw WalletServiceError.notLogged
         }
         
-        getTransaction(by: hash) { result in
-            switch result {
-            case .success(let dogeTransaction):
-                // MARK: Check confirmations
-                guard let confirmations = dogeTransaction.confirmations, let dogeDate = dogeTransaction.date, (confirmations > 0 || dogeDate.timeIntervalSinceNow > -60 * 15) else {
-                    completion(.success(result: .pending))
-                    return
-                }
+        do {
+            let dogeTransaction = try await getTransaction(by: hash)
+            // MARK: Check confirmations
+            guard let confirmations = dogeTransaction.confirmations,
+                  let dogeDate = dogeTransaction.date,
+                  (confirmations > 0 || dogeDate.timeIntervalSinceNow > -60 * 15)
+            else {
+                return .pending
+            }
+            
+            // MARK: Check date
+            guard let sentDate = dogeTransaction.date else {
+                let timeAgo = -1 * date.timeIntervalSinceNow
                 
-                // MARK: Check date
-                guard let sentDate = dogeTransaction.date else {
-                    let timeAgo = -1 * date.timeIntervalSinceNow
-                    
-                    let result: TransactionStatus
-                    if timeAgo > self.consistencyMaxTime {
-                        // max time waiting for pending status
-                        result = .failed
-                    } else {
-                        // Note: No info about processing transactions
-                        result = .pending
-                    }
-                    completion(.success(result: result))
-                    return
-                }
-                
-                // 1 day
-                let dayInterval = TimeInterval(60 * 60 * 24)
-                let start = date.addingTimeInterval(-dayInterval)
-                let end = date.addingTimeInterval(dayInterval)
-                let range = start...end
-                
-                guard range.contains(sentDate) else {
-                    completion(.success(result: .warning))
-                    return
-                }
-                
-                // MARK: Check amount & address
-                guard let raw = transaction.richContent?[RichContentKeys.transfer.amount], let reportedValue = AdamantBalanceFormat.deserializeBalance(from: raw) else {
-                    completion(.success(result: .warning))
-                    return
-                }
-                
-                let min = reportedValue - reportedValue*0.005
-                let max = reportedValue + reportedValue*0.005
-                
-                var result: TransactionStatus = .warning
-                if transaction.isOutgoing {
-                    var totalIncome: Decimal = 0
-                    for output in dogeTransaction.outputs {
-                        guard !output.addresses.contains(walletAddress) else {
-                            continue
-                        }
-                        
-                        totalIncome += output.value
-                    }
-                    
-                    if (min...max).contains(totalIncome) {
-                        result = .success
-                    }
+                let result: TransactionStatus
+                if timeAgo > self.consistencyMaxTime {
+                    // max time waiting for pending status
+                    result = .failed
                 } else {
-                    var totalOutcome: Decimal = 0
-                    for output in dogeTransaction.outputs {
-                        guard output.addresses.contains(walletAddress) else {
-                            continue
-                        }
-                        
-                        totalOutcome += output.value
+                    // Note: No info about processing transactions
+                    result = .pending
+                }
+                return result
+            }
+            
+            // 1 day
+            let dayInterval = TimeInterval(60 * 60 * 24)
+            let start = date.addingTimeInterval(-dayInterval)
+            let end = date.addingTimeInterval(dayInterval)
+            let range = start...end
+            
+            guard range.contains(sentDate) else {
+                return .warning
+            }
+            
+            // MARK: Check amount & address
+            guard let raw = transaction.richContent?[RichContentKeys.transfer.amount], let reportedValue = AdamantBalanceFormat.deserializeBalance(from: raw) else {
+                return .warning
+            }
+            
+            let min = reportedValue - reportedValue*0.005
+            let max = reportedValue + reportedValue*0.005
+            
+            var result: TransactionStatus = .warning
+            if transaction.isOutgoing {
+                var totalIncome: Decimal = 0
+                for output in dogeTransaction.outputs {
+                    guard !output.addresses.contains(walletAddress) else {
+                        continue
                     }
                     
-                    if (min...max).contains(totalOutcome) {
-                        result = .success
-                    }
+                    totalIncome += output.value
                 }
                 
-                completion(.success(result: result))
-                
-            case .failure(let error):
-                if case let .internalError(message, _) = error, message == "No transaction" {
-                    let timeAgo = -1 * date.timeIntervalSinceNow
-                    
-                    let result: TransactionStatus
-                    if timeAgo > self.consistencyMaxTime {
-                        // max time waiting for pending status
-                        result = .failed
-                    } else {
-                        // Note: No info about processing transactions
-                        result = .pending
+                if (min...max).contains(totalIncome) {
+                    result = .success
+                }
+            } else {
+                var totalOutcome: Decimal = 0
+                for output in dogeTransaction.outputs {
+                    guard output.addresses.contains(walletAddress) else {
+                        continue
                     }
-                    completion(.success(result: result))
-                } else {
-                    completion(.failure(error: error.asWalletServiceError()))
+                    
+                    totalOutcome += output.value
+                }
+                
+                if (min...max).contains(totalOutcome) {
+                    result = .success
                 }
             }
+            
+            return result
+        } catch is ApiServiceError {
+            let timeAgo = -1 * date.timeIntervalSinceNow
+            
+            let result: TransactionStatus
+            if timeAgo > self.consistencyMaxTime {
+                // max time waiting for pending status
+                result = .failed
+            } else {
+                // Note: No info about processing transactions
+                result = .pending
+            }
+            
+            return result
+        } catch {
+            throw WalletServiceError.internalError(
+                message: String.adamantLocalized.sharedErrors.unknownError,
+                error: nil
+            )
         }
     }
 }

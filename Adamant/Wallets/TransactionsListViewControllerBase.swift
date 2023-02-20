@@ -34,6 +34,9 @@ class TransactionsListViewControllerBase: UIViewController {
         return refreshControl
     }()
     
+    var refreshTask: Task<(), Error>?
+    var detailTransactionTask: Task<(), Never>?
+    
     // MARK: - IBOutlets
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var emptyLabel: UILabel!
@@ -82,6 +85,11 @@ class TransactionsListViewControllerBase: UIViewController {
         if tableView.isEditing {
             tableView.setEditing(false, animated: false)
         }
+    }
+    
+    deinit {
+        detailTransactionTask?.cancel()
+        refreshTask?.cancel()
     }
     
     // MARK: - Other
@@ -148,6 +156,7 @@ extension TransactionsListViewControllerBase: UITableViewDataSource, UITableView
         if let partnerName = partnerName {
             cell.accountLabel.text = partnerName
             cell.addressLabel.text = partnerId
+            cell.addressLabel.lineBreakMode = .byTruncatingMiddle
             
             if cell.addressLabel.isHidden {
                 cell.addressLabel.isHidden = false

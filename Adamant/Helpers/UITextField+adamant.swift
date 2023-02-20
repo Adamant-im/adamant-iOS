@@ -120,3 +120,20 @@ class Swizzle {
     }
     
 }
+
+// MARK: Set line break
+extension UITextField {
+    func setLineBreakMode() {
+        guard let oldStyle = self.defaultTextAttributes[
+            .paragraphStyle,
+            default: NSParagraphStyle()
+        ] as? NSParagraphStyle,
+              let style = oldStyle.mutableCopy() as? NSMutableParagraphStyle
+        else {
+            return
+        }
+        
+        style.lineBreakMode = .byTruncatingMiddle
+        self.defaultTextAttributes[.paragraphStyle] = style
+    }
+}

@@ -18,6 +18,7 @@ extension EthWalletService: RichMessageProvider {
     
     // MARK: Events
     
+    @MainActor
     func richMessageTapped(for transaction: RichMessageTransaction, in chat: ChatViewController) {
         // MARK: 0. Prepare
         guard let richContent = transaction.richContent,
@@ -65,11 +66,10 @@ extension EthWalletService: RichMessageProvider {
             recipientName = nil
         }
         
-        // MARK: 2. Go go transaction
+        // MARK: 2. Go to transaction
         
-        getTransaction(by: hash) { [weak self] result in
-            dialogService.dismissProgress()
-            guard let vc = self?.router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? EthTransactionDetailsViewController else {
+        Task {
+            guard let vc = router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? EthTransactionDetailsViewController else {
                 return
             }
             
@@ -78,11 +78,10 @@ extension EthWalletService: RichMessageProvider {
             vc.recipientName = recipientName
             vc.comment = comment
             
-            switch result {
-            case .success(let ethTransaction):
+            do {
+                let ethTransaction = try await getTransaction(by: hash)
                 vc.transaction = ethTransaction
-                
-            case .failure(let error):
+            } catch let error as WalletServiceError {
                 switch error {
                 case .remoteServiceError:
                     let amount: Decimal
@@ -106,14 +105,15 @@ extension EthWalletService: RichMessageProvider {
                     vc.transaction = failedTransaction
                     
                 default:
-                    self?.dialogService.showRichError(error: error)
-                    return
+                    dialogService.showRichError(error: error)
                 }
+            } catch {
+                dialogService.showRichError(error: error)
             }
             
-            DispatchQueue.main.async {
-                chat.navigationController?.pushViewController(vc, animated: true)
-            }
+            dialogService.dismissProgress()
+            
+            chat.navigationController?.pushViewController(vc, animated: true)
         }
     }
     

@@ -148,6 +148,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     private var isFiatSet = false
     
+    var refreshTask: Task<(), Never>?
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -174,6 +176,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             } else {
                 $0.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
+            
+            $0.cell.detailTextLabel?.lineBreakMode = .byTruncatingMiddle
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
             cell.textLabel?.textColor = UIColor.adamant.textColor
@@ -212,6 +216,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             
             let height = self?.senderName != nil ? DoubleDetailsTableViewCell.fullHeight : DoubleDetailsTableViewCell.compactHeight
             $0.cell.height = { height }
+            $0.cell.secondDetailsLabel?.lineBreakMode = .byTruncatingMiddle
+            $0.cell.detailsLabel?.lineBreakMode = .byTruncatingMiddle
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
             cell.textLabel?.textColor = UIColor.adamant.textColor
@@ -266,6 +272,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             
             let height = self?.recipientName != nil ? DoubleDetailsTableViewCell.fullHeight : DoubleDetailsTableViewCell.compactHeight
             $0.cell.height = { height }
+            $0.cell.secondDetailsLabel?.lineBreakMode = .byTruncatingMiddle
+            $0.cell.detailsLabel?.lineBreakMode = .byTruncatingMiddle
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
             cell.textLabel?.textColor = UIColor.adamant.textColor
@@ -430,6 +438,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             } else {
                 $0.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
+            $0.cell.detailTextLabel?.lineBreakMode = .byTruncatingMiddle
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
             cell.textLabel?.textColor = UIColor.adamant.textColor
@@ -601,6 +610,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
         self.updateFiat()
         
         setColors()
+    }
+    
+    deinit {
+        refreshTask?.cancel()
     }
     
     func updateFiat() {

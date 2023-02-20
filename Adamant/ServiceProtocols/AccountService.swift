@@ -162,10 +162,10 @@ protocol AccountService: AnyObject {
     func update(_ completion: ((AccountServiceResult) -> Void)?)
     
     /// Login into Adamant using passphrase.
-    func loginWith(passphrase: String, completion: @escaping (AccountServiceResult) -> Void)
+    func loginWith(passphrase: String) async throws -> AccountServiceResult
     
     /// Login into Adamant using previously logged account
-    func loginWithStoredAccount(completion: @escaping (AccountServiceResult) -> Void)
+    func loginWithStoredAccount() async throws -> AccountServiceResult
     
     /// Logout
     func logout()

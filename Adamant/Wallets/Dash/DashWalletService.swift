@@ -61,7 +61,7 @@ class DashWalletService: WalletService {
     static let chunkSize = 20
     
     var transactionFee: Decimal {
-        return DogeWalletService.fixedFee
+        return DashWalletService.fixedFee
     }
     
     static let kvsAddress = "dash:address"
@@ -118,7 +118,6 @@ class DashWalletService: WalletService {
     private var initialBalanceCheck = false
     
     let defaultDispatchQueue = DispatchQueue(label: "im.adamant.dashWalletService", qos: .userInteractive, attributes: [.concurrent])
-    let stateSemaphore = DispatchSemaphore(value: 1)
     
     static let jsonDecoder = JSONDecoder()
     
@@ -146,12 +145,15 @@ class DashWalletService: WalletService {
     }
     
     func update() {
+        Task {
+            await update()
+        }
+    }
+    
+    func update() async {
         guard let wallet = dashWallet else {
             return
         }
-        
-        defer { stateSemaphore.signal() }
-        stateSemaphore.wait()
         
         switch state {
         case .notInitiated, .updating, .initiationFailed:
@@ -163,48 +165,30 @@ class DashWalletService: WalletService {
         
         setState(.updating)
         
-        getBalance { [weak self] result in
-            if let stateSemaphore = self?.stateSemaphore {
-                defer {
-                    stateSemaphore.signal()
-                }
-                stateSemaphore.wait()
+        if let balance = try? await getBalance() {
+            let notification: Notification.Name?
+            
+            if wallet.balance != balance {
+                wallet.balance = balance
+                notification = walletUpdatedNotification
+                initialBalanceCheck = false
+            } else if initialBalanceCheck {
+                initialBalanceCheck = false
+                notification = walletUpdatedNotification
+            } else {
+                notification = nil
             }
             
-            switch result {
-            case .success(let balance):
-                let notification: Notification.Name?
-                
-                if wallet.balance != balance {
-                    wallet.balance = balance
-                    notification = self?.walletUpdatedNotification
-                    self?.initialBalanceCheck = false
-                } else if let initialBalanceCheck = self?.initialBalanceCheck, initialBalanceCheck {
-                    self?.initialBalanceCheck = false
-                    notification = self?.walletUpdatedNotification
-                } else {
-                    notification = nil
-                }
-                
-                if let notification = notification {
-                    NotificationCenter.default.post(name: notification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
-                }
-                
-            case .failure(let error):
-                switch error {
-                case .networkError:
-                    break
-                    
-                case .remoteServiceError(let message) where message.contains("Server not yet ready"):
-                    break
-                    
-                default:
-                    print("\(error.localizedDescription)")
-                }
+            if let notification = notification {
+                NotificationCenter.default.post(
+                    name: notification,
+                    object: self,
+                    userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
+                )
             }
-            
-            self?.setState(.upToDate)
         }
+        
+        setState(.upToDate)
     }
     
     func validate(address: String) -> AddressValidationResult {
@@ -215,19 +199,15 @@ class DashWalletService: WalletService {
 // MARK: - WalletInitiatedWithPassphrase
 extension DashWalletService: InitiatedWithPassphraseService {
     func setInitiationFailed(reason: String) {
-        stateSemaphore.wait()
         setState(.initiationFailed(reason: reason))
         dashWallet = nil
-        stateSemaphore.signal()
     }
     
-    func initWallet(withPassphrase passphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) {
+    @MainActor
+    func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
         guard let adamant = accountService.account else {
-            completion(.failure(error: .notLogged))
-            return
+            throw WalletServiceError.notLogged
         }
-        
-        stateSemaphore.wait()
         
         setState(.notInitiated)
         
@@ -236,59 +216,51 @@ extension DashWalletService: InitiatedWithPassphraseService {
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
         
-        defaultDispatchQueue.async { [unowned self] in
-            let privateKeyData = passphrase.data(using: .utf8)!.sha256()
-            let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
-            
-            let eWallet = DashWallet(privateKey: privateKey)
-            self.dashWallet = eWallet
-            
-            if !self.enabled {
-                self.enabled = true
-                NotificationCenter.default.post(name: self.serviceEnabledChanged, object: self)
+        let privateKeyData = passphrase.data(using: .utf8)!.sha256()
+        let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
+        
+        let eWallet = DashWallet(privateKey: privateKey)
+        self.dashWallet = eWallet
+        
+        if !self.enabled {
+            self.enabled = true
+            NotificationCenter.default.post(name: self.serviceEnabledChanged, object: self)
+        }
+        
+        // MARK: 4. Save address into KVS
+        do {
+            let address = try await getWalletAddress(byAdamantAddress: adamant.address)
+            let service = self
+            if address != eWallet.address {
+                service.save(dashAddress: eWallet.address) { result in
+                    service.kvsSaveCompletionRecursion(dashAddress: eWallet.address, result: result)
+                }
             }
             
-            self.stateSemaphore.signal()
-            
-            // MARK: 4. Save address into KVS
-            self.getWalletAddress(byAdamantAddress: adamant.address) { [weak self] result in
-                guard let service = self else {
-                    return
+            service.initialBalanceCheck = true
+            service.setState(.upToDate, silent: true)
+            Task {
+                service.update()
+            }
+            return eWallet
+        } catch let error as WalletServiceError {
+            let service = self
+            switch error {
+            case .walletNotInitiated:
+                // Show '0' without waiting for balance update
+                if let wallet = service.dashWallet {
+                    NotificationCenter.default.post(name: service.walletUpdatedNotification, object: service, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
                 }
                 
-                switch result {
-                case .success(let address):
-                    // Dash already saved
-                    if address != eWallet.address {
-                        service.save(dashAddress: eWallet.address) { result in
-                            service.kvsSaveCompletionRecursion(dashAddress: eWallet.address, result: result)
-                        }
-                    }
-                    
-                    service.initialBalanceCheck = true
-                    service.setState(.upToDate, silent: true)
-                    service.update()
-                    completion(.success(result: eWallet))
-                    
-                case .failure(let error):
-                    switch error {
-                    case .walletNotInitiated:
-                        // Show '0' without waiting for balance update
-                        if let wallet = service.dashWallet {
-                            NotificationCenter.default.post(name: service.walletUpdatedNotification, object: service, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
-                        }
-                        
-                        service.save(dashAddress: eWallet.address) { result in
-                            service.kvsSaveCompletionRecursion(dashAddress: eWallet.address, result: result)
-                        }
-                        service.setState(.upToDate)
-                        completion(.success(result: eWallet))
-                        
-                    default:
-                        service.setState(.upToDate)
-                        completion(.failure(error: error))
-                    }
+                service.save(dashAddress: eWallet.address) { result in
+                    service.kvsSaveCompletionRecursion(dashAddress: eWallet.address, result: result)
                 }
+                service.setState(.upToDate)
+                return eWallet
+                
+            default:
+                service.setState(.upToDate)
+                throw error
             }
         }
     }
@@ -307,21 +279,15 @@ extension DashWalletService: SwinjectDependentService {
 
 // MARK: - Balances & addresses
 extension DashWalletService {
-    func getBalance(_ completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
+    func getBalance() async throws -> Decimal {
         guard let endpoint = DashWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DASH endpoint URL")
         }
 
         guard let address = self.dashWallet?.address else {
-            completion(.failure(error: .walletNotInitiated))
-            return
+            throw WalletServiceError.walletNotInitiated
         }
 
-        // Headers
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json"
-        ]
-        
         // Parameters
         let parameters: Parameters = [
             "method": "getaddressbalance",
@@ -331,47 +297,51 @@ extension DashWalletService {
         ]
         
         // MARK: Sending request
-        AF.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
+        
+        let data = try await apiService.sendRequest(
+            url: endpoint,
+            method: .post,
+            parameters: parameters,
+            encoding: JSONEncoding.default
+        )
+        
+        let object = try? JSONSerialization.jsonObject(
+            with: data,
+            options: []
+        ) as? [String: Any]
 
-            switch response.result {
-            case .success(let data):
-                if let object = data as? [String: Any] {
-                    let result = object["result"] as? [String: Any]
-                    let error = object["error"]
-                    
-                    if error is NSNull, let result = result, let raw = result["balance"] as? Int64 {
-                        let balance = Decimal(raw) / DashWalletService.multiplier
-                        completion(.success(result: balance))
-                    } else {
-                        completion(.failure(error: .remoteServiceError(message: "DASH Wallet: \(data)")))
-                    }
-                } else {
-                    completion(.failure(error: .remoteServiceError(message: "DASH Wallet: \(data)")))
-                }
-
-            case .failure:
-                completion(.failure(error: .networkError))
-            }
+        guard let object = object else {
+            throw WalletServiceError.internalError(
+                message: "DASH Wallet: not valid response",
+                error: nil
+            )
+        }
+        
+        let result = object["result"] as? [String: Any]
+        let error = object["error"]
+        
+        if error is NSNull, let result = result, let raw = result["balance"] as? Int64 {
+            let balance = Decimal(raw) / DashWalletService.multiplier
+            return balance
+        } else {
+            throw WalletServiceError.remoteServiceError(message: "DASH Wallet: \(data)")
         }
     }
 
-    func getDashAddress(byAdamandAddress address: String, completion: @escaping (ApiServiceResult<String?>) -> Void) {
-        apiService.get(key: DashWalletService.kvsAddress, sender: address, completion: completion)
-    }
-    
-    func getWalletAddress(byAdamantAddress address: String, completion: @escaping (WalletServiceResult<String>) -> Void) {
-        apiService.get(key: DashWalletService.kvsAddress, sender: address) { (result) in
-            switch result {
-            case .success(let value):
-                if let address = value {
-                    completion(.success(result: address))
-                } else {
-                    completion(.failure(error: .walletNotInitiated))
-                }
-
-            case .failure(let error):
-                completion(.failure(error: .internalError(message: "DASH Wallet: fail to get address from KVS", error: error)))
+    func getWalletAddress(byAdamantAddress address: String) async throws -> String {
+        do {
+            let result = try await apiService.get(key: DashWalletService.kvsAddress, sender: address)
+            
+            guard let result = result else {
+                throw WalletServiceError.walletNotInitiated
             }
+            
+            return result
+        } catch {
+            throw WalletServiceError.internalError(
+                message: "DASH Wallet: fail to get address from KVS",
+                error: error
+            )
         }
     }
 }

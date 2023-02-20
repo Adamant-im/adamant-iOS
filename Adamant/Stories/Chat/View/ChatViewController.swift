@@ -33,6 +33,8 @@ final class ChatViewController: MessagesViewController {
     private lazy var scrollDownButton = makeScrollDownButton()
     private lazy var chatMessagesCollectionView = makeChatMessagesCollectionView()
     
+    private var admService: WalletServiceWithSend?
+    
     // swiftlint:disable unused_setter_value
     override var messageInputBar: InputBarAccessoryView {
         get { inputBar }
@@ -49,11 +51,13 @@ final class ChatViewController: MessagesViewController {
         viewModel: ChatViewModel,
         richMessageProviders: [String: RichMessageProvider],
         storedObjects: [AnyObject],
-        sendTransaction: @escaping SendTransaction
+        sendTransaction: @escaping SendTransaction,
+        admService: WalletServiceWithSend?
     ) {
         self.viewModel = viewModel
         self.storedObjects = storedObjects
         self.richMessageProviders = richMessageProviders
+        self.admService = admService
         super.init(nibName: nil, bundle: nil)
         inputBar.onAttachmentButtonTap = { [weak self] in self.map { sendTransaction($0) } }
     }
@@ -109,8 +113,8 @@ final class ChatViewController: MessagesViewController {
         viewModel.preserveMessage(inputBar.text)
         viewModel.saveChatOffset(
             isScrollPositionNearlyTheBottom
-                ? nil
-                : chatMessagesCollectionView.bottomOffset
+            ? nil
+            : chatMessagesCollectionView.bottomOffset
         )
     }
     
@@ -227,6 +231,14 @@ private extension ChatViewController {
             .removeDuplicates()
             .assign(to: \.isAttachmentButtonEnabled, on: inputBar)
             .store(in: &subscriptions)
+        
+        viewModel.didTapAdmChat
+            .sink { [weak self] in self?.didTapAdmChat(with: $0, message: $1) }
+            .store(in: &subscriptions)
+        
+        viewModel.didTapAdmSend
+            .sink { [weak self] in self?.didTapAdmSend(to: $0) }
+            .store(in: &subscriptions)
     }
 }
 
@@ -289,7 +301,9 @@ private extension ChatViewController {
         bottomMessageId = viewModel.messages.last?.messageId
         
         guard !messagesLoaded, !viewModel.messages.isEmpty else { return }
-        viewModel.startPosition.map { setupStartPosition($0) }
+        Task {
+            await viewModel.startPosition.map { setupStartPosition($0) }
+        }
         messagesLoaded = true
     }
     
@@ -373,6 +387,7 @@ private extension ChatViewController {
         viewModel.entireChatWasRead()
     }
     
+    @MainActor
     func setupStartPosition(_ position: ChatStartPosition) {
         chatMessagesCollectionView.fixedBottomOffset = nil
         
@@ -494,7 +509,7 @@ private extension ChatViewController {
 
 private extension ChatViewController {
     func didTapAdmChat(with chatroom: Chatroom, message: String?) {
-        guard let chatlistVC = navigationController?.viewControllers.first as? ChatListViewController
+        guard let chatlistVC = self.navigationController?.viewControllers.first as? ChatListViewController
         else {
             return
         }
@@ -509,13 +524,7 @@ private extension ChatViewController {
     }
     
     func didTapAdmSend(to adm: AdamantAddress) {
-        guard let accountService = storedObjects.first(where: { $0 is AccountService }) as? AccountService else { return }
-        let service = accountService.wallets.first { wallet in
-            return wallet is AdmWalletService
-        }
-        
-        guard let service = service as? WalletServiceWithSend else { return }
-        let vc = service.transferViewController()
+        guard let vc = admService?.transferViewController() else { return }
         if let v = vc as? TransferViewControllerBase {
             v.recipientAddress = adm.address
             v.recipientName = adm.name

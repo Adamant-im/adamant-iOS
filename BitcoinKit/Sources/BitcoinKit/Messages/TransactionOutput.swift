@@ -48,7 +48,7 @@ public struct TransactionOutput {
         self.value = value
         self.lockingScript = lockingScript
     }
-
+    
     public init() {
         self.init(value: 0, lockingScript: Data())
     }

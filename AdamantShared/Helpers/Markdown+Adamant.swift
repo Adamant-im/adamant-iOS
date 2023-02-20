@@ -146,7 +146,7 @@ final class MarkdownLinkAdm: MarkdownLink {
         let nsString = (attributedString.string as NSString)
         let urlString = nsString.substring(with: match.range)
         
-        guard let adm = urlString.string.getAdamantAddress(),
+        guard let adm = urlString.getAdamantAddress(),
               var urlComponents = URLComponents(string: "adm:\(adm.address)")
         else {
             return

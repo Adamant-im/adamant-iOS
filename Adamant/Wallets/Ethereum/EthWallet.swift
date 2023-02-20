@@ -8,6 +8,7 @@
 
 import Foundation
 import web3swift
+import Web3Core
 
 class EthWallet: WalletAccount {
     let address: String

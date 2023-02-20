@@ -302,6 +302,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
             $0.title = BaseRows.address.localized
             $0.cell.selectionStyle = .gray
             $0.cell.backgroundColor = UIColor.adamant.cellColor
+            $0.cell.detailTextLabel?.lineBreakMode = .byTruncatingMiddle
             if let wallet = service?.wallet {
                 $0.value = wallet.address
             }

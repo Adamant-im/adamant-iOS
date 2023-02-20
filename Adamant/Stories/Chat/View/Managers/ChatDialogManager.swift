@@ -324,7 +324,11 @@ private extension ChatDialogManager {
     }
     
     func showDummyAlert(for address: String) {
-        let alert = UIAlertController(title: nil, message: AccountsProviderResult.notInitiated(address: address).localized, preferredStyle: .alert)
+        let alert = UIAlertController(
+            title: nil,
+            message: AccountsProviderError.notInitiated(address: address).localized,
+            preferredStyle: .alert
+        )
         
         let faq = UIAlertAction(title: String.adamantLocalized.newChat.whatDoesItMean, style: .default, handler: { [weak dialogService] _ in
             guard let url = URL(string: NewChatViewController.faqUrl) else {

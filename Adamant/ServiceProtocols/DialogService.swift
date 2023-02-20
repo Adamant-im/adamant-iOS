@@ -124,6 +124,7 @@ protocol DialogService: AnyObject {
     func showWarning(withMessage: String)
     func showError(withMessage: String, error: Error?)
     func showRichError(error: RichError)
+    func showRichError(error: Error)
     func showNoConnectionNotification()
     func dissmisNoConnectionNotification()
     

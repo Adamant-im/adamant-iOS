@@ -121,6 +121,7 @@ final class AdamantApiService: ApiService {
         path: String,
         queryItems: [URLQueryItem]? = nil,
         method: HTTPMethod = .get,
+        waitsForConnectivity: Bool = false,
         completion: @escaping (ApiServiceResult<Output>) -> Void
     ) {
         sendRequest(
@@ -128,6 +129,7 @@ final class AdamantApiService: ApiService {
             queryItems: queryItems,
             method: method,
             body: Optional<Bool>.none,
+            waitsForConnectivity: waitsForConnectivity,
             completion: completion
         )
     }
@@ -137,6 +139,7 @@ final class AdamantApiService: ApiService {
         queryItems: [URLQueryItem]? = nil,
         method: HTTPMethod = .get,
         body: Body? = nil,
+        waitsForConnectivity: Bool = false,
         completion: @escaping (ApiServiceResult<Output>) -> Void
     ) {
         guard !currentNodes.isEmpty else {
@@ -153,6 +156,7 @@ final class AdamantApiService: ApiService {
             queryItems: queryItems,
             method: method,
             body: body,
+            waitsForConnectivity: waitsForConnectivity,
             onFailure: { [weak self] node in
                 node.connectionStatus = .offline
                 self?.nodesSource?.nodesUpdate()
@@ -167,9 +171,48 @@ final class AdamantApiService: ApiService {
     func sendRequest<Output: Decodable>(
         url: URLConvertible,
         method: HTTPMethod = .get,
+        waitsForConnectivity: Bool = false,
         completion: @escaping (ApiServiceResult<Output>) -> Void
     ) -> DataRequest {
-        sendRequest(url: url, method: method, body: Optional<Bool>.none, completion: completion)
+        sendRequest(
+            url: url,
+            method: method,
+            body: Optional<Bool>.none,
+            waitsForConnectivity: waitsForConnectivity,
+            completion: completion
+        )
+    }
+    
+    private func createRequest(
+        url: URLConvertible,
+        method: HTTPMethod,
+        parameters: Parameters?,
+        encoding: ParameterEncoding,
+        waitsForConnectivity: Bool,
+        headers: HTTPHeaders?
+    ) -> DataRequest {
+        AF.sessionConfiguration.waitsForConnectivity = waitsForConnectivity
+        return AF.request(
+            url,
+            method: method,
+            parameters: parameters,
+            encoding: encoding,
+            headers: headers
+        )
+    }
+    
+    private func sendRequest(request: DataRequest) async throws -> Data {
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Data, Error>) in
+            request.responseData(queue: defaultResponseDispatchQueue) { response in
+                switch response.result {
+                case .success(let data):
+                    continuation.resume(returning: data)
+                    
+                case .failure(let error):
+                    continuation.resume(throwing: ApiServiceError.init(error: error))
+                }
+            }
+        }
     }
     
     @discardableResult
@@ -177,34 +220,123 @@ final class AdamantApiService: ApiService {
         url: URLConvertible,
         method: HTTPMethod = .get,
         body: Body? = nil,
+        waitsForConnectivity: Bool = false,
         completion: @escaping (ApiServiceResult<Output>) -> Void
     ) -> DataRequest {
-        AF.request(
-            url,
+        let request = createRequest(
+            url: url,
             method: method,
             parameters: body?.asDictionary,
             encoding: JSONEncoding.default,
+            waitsForConnectivity: waitsForConnectivity,
             headers: HTTPHeaders(["Content-Type": "application/json"])
-        ).responseData(queue: defaultResponseDispatchQueue) { [weak self] response in
-            switch response.result {
-            case .success(let data):
+        )
+        
+        Task {
+            do {
+                let data = try await sendRequest(request: request)
+                
                 do {
                     let model = try JSONDecoder().decode(Output.self, from: data)
                     
                     if let timestampResponse = model as? ServerResponseWithTimestamp {
                         let nodeDate = AdamantUtilities.decodeAdamant(timestamp: timestampResponse.nodeTimestamp)
-                        self?.lastRequestTimeDelta = Date().timeIntervalSince(nodeDate)
+                        lastRequestTimeDelta = Date().timeIntervalSince(nodeDate)
                     }
                     
                     completion(.success(model))
                 } catch {
                     completion(.failure(InternalError.parsingFailed.apiServiceErrorWith(error: error)))
                 }
-                
-            case .failure(let error):
+            } catch let error as ApiServiceError {
+                completion(.failure(error))
+            } catch {
                 completion(.failure(.init(error: error)))
             }
         }
+        
+        return request
+    }
+    
+    func sendRequest<Output: Decodable>(
+        url: URLConvertible,
+        method: HTTPMethod,
+        parameters: Parameters?
+    ) async throws -> Output {
+        try await sendRequest(
+            url: url,
+            method: method,
+            parameters: parameters,
+            encoding: URLEncoding.default
+        )
+    }
+    
+    func sendRequest<Output: Decodable>(
+        url: URLConvertible,
+        method: HTTPMethod,
+        parameters: Parameters?,
+        encoding: ParameterEncoding
+    ) async throws -> Output {
+        let data = try await sendRequest(
+            url: url,
+            method: method,
+            parameters: parameters,
+            encoding: encoding
+        )
+        
+        do {
+            let model = try JSONDecoder().decode(Output.self, from: data)
+            return model
+        } catch {
+            throw InternalError.parsingFailed.apiServiceErrorWith(error: error)
+        }
+    }
+    
+    func sendRequest(
+        url: URLConvertible,
+        method: HTTPMethod,
+        parameters: Parameters?
+    ) async throws -> Data {
+        try await sendRequest(
+            url: url,
+            method: method,
+            parameters: parameters,
+            encoding: URLEncoding.default
+        )
+    }
+    
+    func sendRequest(
+        url: URLConvertible,
+        method: HTTPMethod,
+        parameters: Parameters?,
+        encoding: ParameterEncoding
+    ) async throws -> Data {
+        return try await sendRequest(
+            url: url,
+            method: method,
+            parameters: parameters,
+            encoding: encoding,
+            waitsForConnectivity: false
+        )
+    }
+    
+    private func sendRequest(
+        url: URLConvertible,
+        method: HTTPMethod,
+        parameters: Parameters?,
+        encoding: ParameterEncoding,
+        waitsForConnectivity: Bool
+    ) async throws -> Data {
+        let request = createRequest(
+            url: url,
+            method: method,
+            parameters: parameters,
+            encoding: encoding,
+            waitsForConnectivity: waitsForConnectivity,
+            headers: HTTPHeaders(["Content-Type": "application/json"])
+        )
+        
+        return try await sendRequest(request: request)
     }
     
     static func translateServerError(_ error: String?) -> ApiServiceError {
@@ -230,6 +362,7 @@ private extension AdamantApiService {
         queryItems: [URLQueryItem]?,
         method: HTTPMethod,
         body: Body?,
+        waitsForConnectivity: Bool = false,
         onFailure: @escaping (Node) -> Void,
         completion: @escaping (ApiServiceResult<Output>) -> Void
     ) {
@@ -251,12 +384,14 @@ private extension AdamantApiService {
             url: url,
             method: method,
             body: body,
+            waitsForConnectivity: waitsForConnectivity,
             completion: makeSafeRequestCompletion(
                 nodes: nodes,
                 path: path,
                 queryItems: queryItems,
                 method: method,
                 body: body,
+                waitsForConnectivity: waitsForConnectivity,
                 onFailure: onFailure,
                 completion: completion
             )
@@ -269,6 +404,7 @@ private extension AdamantApiService {
         queryItems: [URLQueryItem]?,
         method: HTTPMethod,
         body: Body?,
+        waitsForConnectivity: Bool = false,
         onFailure: @escaping (Node) -> Void,
         completion: @escaping (ApiServiceResult<Output>) -> Void
     ) -> (ApiServiceResult<Output>) -> Void {
@@ -287,6 +423,7 @@ private extension AdamantApiService {
                         queryItems: queryItems,
                         method: method,
                         body: body,
+                        waitsForConnectivity: waitsForConnectivity,
                         onFailure: onFailure,
                         completion: completion
                     )

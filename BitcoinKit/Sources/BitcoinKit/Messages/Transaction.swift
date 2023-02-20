@@ -118,7 +118,6 @@ public struct Transaction {
     static public func createNewTransaction(toAddress: Address, amount: UInt64, fee: UInt64, changeAddress: Address, utxos: [UnspentTransaction], lockTime: UInt32 = 0, keys:  [PrivateKey]) -> Transaction {
         let unsignedTx = createUnsignedTx(toAddress: toAddress, amount: amount, fee: fee, changeAddress: changeAddress, utxos: utxos, lockTime: 0)
         let signedTransaction = signTx(unsignedTx: unsignedTx, keys: keys)
-        
         return signedTransaction
     }
     

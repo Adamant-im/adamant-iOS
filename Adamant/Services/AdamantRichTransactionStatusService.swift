@@ -53,16 +53,7 @@ private extension AdamantRichTransactionStatusService {
             let provider = richProviders[transfer.type]
         else { return nil }
         
-        return try await withUnsafeThrowingContinuation { completion in
-            provider.statusFor(transaction: transaction) { result in
-                switch result {
-                case let .success(status):
-                    completion.resume(returning: status)
-                case let .failure(error):
-                    completion.resume(throwing: error)
-                }
-            }
-        }
+        return try await provider.statusFor(transaction: transaction)
     }
     
     func setStatus(

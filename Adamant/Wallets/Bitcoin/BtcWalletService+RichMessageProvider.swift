@@ -18,6 +18,7 @@ extension BtcWalletService: RichMessageProvider {
     
     // MARK: Events
     
+    @MainActor
     func richMessageTapped(for transaction: RichMessageTransaction, in chat: ChatViewController) {
         // MARK: 0. Prepare
         guard let richContent = transaction.richContent,
@@ -65,59 +66,86 @@ extension BtcWalletService: RichMessageProvider {
             recipientName = nil
         }
         
-        // MARK: 2. Go go transaction
+        // MARK: 2. Go to transaction
         
-        getTransaction(by: hash) { [weak self] result in
-            DispatchQueue.onMainAsync {
+        Task {
+            do {
+                let detailTransaction = try await getTransaction(by: hash)
+                
                 dialogService.dismissProgress()
-                guard let vc = self?.router.get(scene: AdamantScene.Wallets.Bitcoin.transactionDetails) as? BtcTransactionDetailsViewController else {
+                presentDetailTransactionVC(
+                    hash: hash,
+                    senderName: senderName,
+                    recipientName: recipientName,
+                    comment: comment,
+                    transaction: detailTransaction,
+                    richTransaction: transaction,
+                    in: chat
+                )
+            } catch let error as WalletServiceError {
+                dialogService.dismissProgress()
+                guard case let .internalError(message, _) = error,
+                      message == "No transaction"
+                else {
+                    dialogService.showRichError(error: error)
                     return
                 }
                 
-                vc.service = self
-                vc.senderName = senderName
-                vc.recipientName = recipientName
-                vc.comment = comment
-                
-                switch result {
-                case .success(let transaction):
-                    vc.transaction = transaction
-                    
-                case .failure(let error):
-                    switch error {
-                    case .internalError(let message, _) where message == "No transaction":
-                        let amount: Decimal
-                        if let amountRaw = transaction.richContent?[RichContentKeys.transfer.amount], let decimal = Decimal(string: amountRaw) {
-                            amount = decimal
-                        } else {
-                            amount = 0
-                        }
-                        
-                        let failedTransaction = SimpleTransactionDetails(txId: hash,
-                                                                         senderAddress: transaction.senderAddress,
-                                                                         recipientAddress: transaction.recipientAddress,
-                                                                         dateValue: nil,
-                                                                         amountValue: amount,
-                                                                         feeValue: nil,
-                                                                         confirmationsValue: nil,
-                                                                         blockValue: nil,
-                                                                         isOutgoing: transaction.isOutgoing,
-                                                                         transactionStatus: TransactionStatus.failed)
-                        
-                        vc.transaction = failedTransaction
-                        
-                    default:
-                        self?.dialogService.showRichError(error: error)
-                        return
-                    }
-                }
-                
-                chat.navigationController?.pushViewController(vc, animated: true)
+                presentDetailTransactionVC(
+                    hash: hash,
+                    senderName: senderName,
+                    recipientName: recipientName,
+                    comment: comment,
+                    transaction: nil,
+                    richTransaction: transaction,
+                    in: chat
+                )
             }
         }
     }
     
-    // MARK: Short description
+    private func presentDetailTransactionVC(
+        hash: String,
+        senderName: String?,
+        recipientName: String?,
+        comment: String?,
+        transaction: BtcTransaction?,
+        richTransaction: RichMessageTransaction,
+        in chat: ChatViewController
+    ) {
+        guard let vc = router.get(scene: AdamantScene.Wallets.Bitcoin.transactionDetails) as? BtcTransactionDetailsViewController else {
+            return
+        }
+        
+        let amount: Decimal
+        if let amountRaw = richTransaction.richContent?[RichContentKeys.transfer.amount], let decimal = Decimal(string: amountRaw) {
+            amount = decimal
+        } else {
+            amount = 0
+        }
+        
+        let failedTransaction = SimpleTransactionDetails(
+            txId: hash,
+            senderAddress: richTransaction.senderAddress,
+            recipientAddress: richTransaction.recipientAddress,
+            dateValue: nil,
+            amountValue: amount,
+            feeValue: nil,
+            confirmationsValue: nil,
+            blockValue: nil,
+            isOutgoing: richTransaction.isOutgoing,
+            transactionStatus: TransactionStatus.failed
+        )
+        
+        vc.service = self
+        vc.senderName = senderName
+        vc.recipientName = recipientName
+        vc.comment = comment
+        vc.transaction = transaction ?? failedTransaction
+        chat.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+        // MARK: Short description
     
     func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString {
         let amount: String

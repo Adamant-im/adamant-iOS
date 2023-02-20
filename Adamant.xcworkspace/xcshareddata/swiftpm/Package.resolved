@@ -20,24 +20,6 @@
         }
       },
       {
-        "package": "Bits",
-        "repositoryURL": "https://github.com/vapor/bits.git",
-        "state": {
-          "branch": null,
-          "revision": "03079476b04139a8b744ad96f975176df5ae12bc",
-          "version": "1.1.1"
-        }
-      },
-      {
-        "package": "Core",
-        "repositoryURL": "https://github.com/vapor/core.git",
-        "state": {
-          "branch": null,
-          "revision": "aa15871311b497a24a7f0e96b1ae6865dd600818",
-          "version": "2.2.1"
-        }
-      },
-      {
         "package": "CryptoSwift",
         "repositoryURL": "https://github.com/krzyzanowskim/CryptoSwift.git",
         "state": {
@@ -53,15 +35,6 @@
           "branch": "mani_swiftpm_5_3",
           "revision": "b7f0415ecb9a2b684fc53a2e4093fc09d368356a",
           "version": null
-        }
-      },
-      {
-        "package": "Debugging",
-        "repositoryURL": "https://github.com/vapor/debugging.git",
-        "state": {
-          "branch": null,
-          "revision": "fc5a27d6eb236141dc24e5f14eedaa2e035ae7b3",
-          "version": "1.1.1"
         }
       },
       {
@@ -123,8 +96,8 @@
         "repositoryURL": "https://github.com/krzyzanowskim/OpenSSL.git",
         "state": {
           "branch": null,
-          "revision": "4ae145c1446851cda62fa4b09c7b5e5c540d7b20",
-          "version": "1.1.1300"
+          "revision": "52db2ab9de7f78d1dea0d728fddd47fb133e25b7",
+          "version": "1.1.1900"
         }
       },
       {
@@ -132,7 +105,7 @@
         "repositoryURL": "https://github.com/rechsteiner/Parchment",
         "state": {
           "branch": "main",
-          "revision": "cad6924f8a292eecaedc1bdefb57006f7979b9eb",
+          "revision": "51eba77aa6761f27cc30631e2823f0304e4eedb4",
           "version": null
         }
       },
@@ -146,30 +119,12 @@
         }
       },
       {
-        "package": "PromiseKit",
-        "repositoryURL": "https://github.com/mxcl/PromiseKit.git",
-        "state": {
-          "branch": null,
-          "revision": "7b07b214dacecb22ca4b680531c7e981d52483f9",
-          "version": "6.16.3"
-        }
-      },
-      {
         "package": "QRCodeReader",
         "repositoryURL": "https://github.com/yannickl/QRCodeReader.swift.git",
         "state": {
           "branch": null,
           "revision": "5020b5a47199d8ba80c83a4b4fafd70e9dc9dc7f",
           "version": "10.1.1"
-        }
-      },
-      {
-        "package": "Random",
-        "repositoryURL": "https://github.com/vapor-community/random.git",
-        "state": {
-          "branch": null,
-          "revision": "d7c4397d125caba795d14d956efacfe2a27a63d0",
-          "version": "1.2.0"
         }
       },
       {
@@ -219,7 +174,7 @@
       },
       {
         "package": "Starscream",
-        "repositoryURL": "https://github.com/daltoniam/Starscream.git",
+        "repositoryURL": "https://github.com/daltoniam/Starscream",
         "state": {
           "branch": null,
           "revision": "df8d82047f6654d8e4b655d1b1525c64e1059d21",
@@ -258,8 +213,8 @@
         "repositoryURL": "https://github.com/skywinder/web3swift.git",
         "state": {
           "branch": null,
-          "revision": "4312a7178e1255c3ef65ac909657d29f6dd81bb6",
-          "version": "2.6.6"
+          "revision": "edfe6240efcc6710d88b370ab1a3375e51dbe62f",
+          "version": "3.1.0"
         }
       }
     ]

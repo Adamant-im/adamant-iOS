@@ -11,7 +11,7 @@ import CoreData
 
 // - MARK: SocketService
 
-protocol ChatTransactionService: AnyObject {
+protocol ChatTransactionService: AnyObject, Actor {
     
     /// Make operations serial
     func addOperations(_ op: Operation)
