@@ -17,7 +17,7 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
     var fixedBottomOffset: CGFloat?
     
     var bottomOffset: CGFloat {
-        contentHeightWithBottomInsets - bounds.maxY
+        contentSize.height + fullInsets.bottom - bounds.maxY
     }
     
     var fullInsets: UIEdgeInsets {
@@ -59,7 +59,7 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
     
     func setBottomOffset(_ newValue: CGFloat, safely: Bool) {
         setVerticalContentOffset(
-            contentHeightWithBottomInsets - bounds.height - newValue,
+            maxVerticalOffset - newValue,
             safely: safely
         )
     }
@@ -67,15 +67,11 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
 
 private extension ChatMessagesCollectionView {
     var maxVerticalOffset: CGFloat {
-        contentHeightWithBottomInsets - bounds.height
+        contentSize.height + fullInsets.bottom - bounds.height
     }
     
     var minVerticalOffset: CGFloat {
         -fullInsets.top
-    }
-    
-    var contentHeightWithBottomInsets: CGFloat {
-        contentSize.height + fullInsets.bottom
     }
     
     var scrollGestureRecognizers: [UIGestureRecognizer] {
@@ -120,7 +116,7 @@ private extension ChatMessagesCollectionView {
     }
     
     func setVerticalContentOffset(_ offset: CGFloat, safely: Bool) {
-        guard maxVerticalOffset > .zero else { return }
+        guard maxVerticalOffset > minVerticalOffset else { return }
         
         var offset = offset
         if safely {
