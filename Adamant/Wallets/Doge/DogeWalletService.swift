@@ -108,7 +108,6 @@ class DogeWalletService: WalletService {
     private var initialBalanceCheck = false
     
     let defaultDispatchQueue = DispatchQueue(label: "im.adamant.dogeWalletService", qos: .userInteractive, attributes: [.concurrent])
-    let stateSemaphore = DispatchSemaphore(value: 1)
     
     private static let jsonDecoder = JSONDecoder()
     
@@ -154,12 +153,15 @@ class DogeWalletService: WalletService {
     }
     
     func update() {
+        Task {
+            await update()
+        }
+    }
+    
+    func update() async {
         guard let wallet = dogeWallet else {
             return
         }
-        
-        defer { stateSemaphore.signal() }
-        stateSemaphore.wait()
         
         switch state {
         case .notInitiated, .updating, .initiationFailed:
@@ -171,48 +173,26 @@ class DogeWalletService: WalletService {
         
         setState(.updating)
         
-        getBalance { [weak self] result in
-            if let stateSemaphore = self?.stateSemaphore {
-                defer {
-                    stateSemaphore.signal()
-                }
-                stateSemaphore.wait()
+        if let balance = try? await getBalance() {
+            let notification: Notification.Name?
+            
+            if wallet.balance != balance {
+                wallet.balance = balance
+                notification = walletUpdatedNotification
+                initialBalanceCheck = false
+            } else if initialBalanceCheck {
+                initialBalanceCheck = false
+                notification = walletUpdatedNotification
+            } else {
+                notification = nil
             }
             
-            switch result {
-            case .success(let balance):
-                let notification: Notification.Name?
-                
-                if wallet.balance != balance {
-                    wallet.balance = balance
-                    notification = self?.walletUpdatedNotification
-                    self?.initialBalanceCheck = false
-                } else if let initialBalanceCheck = self?.initialBalanceCheck, initialBalanceCheck {
-                    self?.initialBalanceCheck = false
-                    notification = self?.walletUpdatedNotification
-                } else {
-                    notification = nil
-                }
-                
-                if let notification = notification {
-                    NotificationCenter.default.post(name: notification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
-                }
-                
-            case .failure(let error):
-                switch error {
-                case .networkError:
-                    break
-                    
-                case .remoteServiceError(let message) where message.contains("Server not yet ready"):
-                    break
-                    
-                default:
-                    print("\(error.localizedDescription)")
-                }
+            if let notification = notification {
+                NotificationCenter.default.post(name: notification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
             }
-            
-            self?.setState(.upToDate)
         }
+        
+        setState(.upToDate)
     }
     
     func validate(address: String) -> AddressValidationResult {
@@ -223,19 +203,14 @@ class DogeWalletService: WalletService {
 // MARK: - WalletInitiatedWithPassphrase
 extension DogeWalletService: InitiatedWithPassphraseService {
     func setInitiationFailed(reason: String) {
-        stateSemaphore.wait()
         setState(.initiationFailed(reason: reason))
         dogeWallet = nil
-        stateSemaphore.signal()
     }
     
-    func initWallet(withPassphrase passphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) {
+    func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
         guard let adamant = accountService.account else {
-            completion(.failure(error: .notLogged))
-            return
+            throw WalletServiceError.notLogged
         }
-        
-        stateSemaphore.wait()
         
         setState(.notInitiated)
         
@@ -244,60 +219,52 @@ extension DogeWalletService: InitiatedWithPassphraseService {
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
         
-        defaultDispatchQueue.async { [unowned self] in
-            let privateKeyData = passphrase.data(using: .utf8)!.sha256()
-            let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
-            
-            let eWallet = DogeWallet(privateKey: privateKey)
-            self.dogeWallet = eWallet
-            
-            if !self.enabled {
-                self.enabled = true
-                NotificationCenter.default.post(name: self.serviceEnabledChanged, object: self)
+        let privateKeyData = passphrase.data(using: .utf8)!.sha256()
+        let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
+        
+        let eWallet = DogeWallet(privateKey: privateKey)
+        self.dogeWallet = eWallet
+        
+        if !self.enabled {
+            self.enabled = true
+            NotificationCenter.default.post(name: self.serviceEnabledChanged, object: self)
+        }
+        
+        // MARK: 4. Save address into KVS
+        let service = self
+        do {
+            let address = try await getWalletAddress(byAdamantAddress: adamant.address)
+            if address != eWallet.address {
+                service.save(dogeAddress: eWallet.address) { result in
+                    service.kvsSaveCompletionRecursion(dogeAddress: eWallet.address, result: result)
+                }
             }
             
-            self.stateSemaphore.signal()
+            service.initialBalanceCheck = true
+            service.setState(.upToDate, silent: true)
             
-            // MARK: 4. Save address into KVS
-            self.getWalletAddress(byAdamantAddress: adamant.address) { [weak self] result in
-                guard let service = self else {
-                    return
+            Task {
+                await service.update()
+            }
+            
+            return eWallet
+        } catch let error as WalletServiceError {
+            switch error {
+            case .walletNotInitiated:
+                // Show '0' without waiting for balance update
+                if let wallet = service.dogeWallet {
+                    NotificationCenter.default.post(name: service.walletUpdatedNotification, object: service, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
                 }
                 
-                switch result {
-                case .success(let address):
-                    // DOGE already saved
-                    if address != eWallet.address {
-                        service.save(dogeAddress: eWallet.address) { result in
-                            service.kvsSaveCompletionRecursion(dogeAddress: eWallet.address, result: result)
-                        }
-                    }
-                    
-                    service.initialBalanceCheck = true
-                    service.setState(.upToDate, silent: true)
-                    service.update()
-                    
-                    completion(.success(result: eWallet))
-                    
-                case .failure(let error):
-                    switch error {
-                    case .walletNotInitiated:
-                        // Show '0' without waiting for balance update
-                        if let wallet = service.dogeWallet {
-                            NotificationCenter.default.post(name: service.walletUpdatedNotification, object: service, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
-                        }
-                        
-                        service.save(dogeAddress: eWallet.address) { result in
-                            service.kvsSaveCompletionRecursion(dogeAddress: eWallet.address, result: result)
-                        }
-                        service.setState(.upToDate)
-                        completion(.success(result: eWallet))
-                        
-                    default:
-                        service.setState(.upToDate)
-                        completion(.failure(error: error))
-                    }
+                service.save(dogeAddress: eWallet.address) { result in
+                    service.kvsSaveCompletionRecursion(dogeAddress: eWallet.address, result: result)
                 }
+                service.setState(.upToDate)
+                return eWallet
+                
+            default:
+                service.setState(.upToDate)
+                throw error
             }
         }
     }
@@ -315,14 +282,13 @@ extension DogeWalletService: SwinjectDependentService {
 
 // MARK: - Balances & addresses
 extension DogeWalletService {
-    func getBalance(_ completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
+    func getBalance() async throws -> Decimal {
         guard let url = DogeWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DOGE endpoint URL")
         }
         
         guard let address = self.dogeWallet?.address else {
-            completion(.failure(error: .walletNotInitiated))
-            return
+            throw WalletServiceError.walletNotInitiated
         }
         
         // Headers
@@ -334,40 +300,38 @@ extension DogeWalletService {
         let endpoint = url.appendingPathComponent(DogeApiCommands.balance(for: address))
         
         // MARK: Sending request
-        AF.request(endpoint, method: .get, headers: headers).responseString(queue: defaultDispatchQueue) { response in
-            
-            switch response.result {
-            case .success(let data):
-                if let raw = Decimal(string: data) {
-                    let balance = raw / DogeWalletService.multiplier
-                    completion(.success(result: balance))
-                } else {
-                    completion(.failure(error: .remoteServiceError(message: "DOGE Wallet: \(data)")))
+        
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Decimal, Error>) in
+            AF.request(endpoint, method: .get, headers: headers).responseString { response in
+                switch response.result {
+                case .success(let data):
+                    if let raw = Decimal(string: data) {
+                        let balance = raw / DogeWalletService.multiplier
+                        continuation.resume(returning: balance)
+                    } else {
+                        continuation.resume(throwing: WalletServiceError.remoteServiceError(message: "DOGE Wallet: \(data)"))
+                    }
+                    
+                case .failure:
+                    continuation.resume(throwing: WalletServiceError.networkError)
                 }
-                
-            case .failure:
-                completion(.failure(error: .networkError))
             }
         }
     }
     
-    func getDogeAddress(byAdamandAddress address: String, completion: @escaping (ApiServiceResult<String?>) -> Void) {
-        apiService.get(key: DogeWalletService.kvsAddress, sender: address, completion: completion)
-    }
-    
-    func getWalletAddress(byAdamantAddress address: String, completion: @escaping (WalletServiceResult<String>) -> Void) {
-        apiService.get(key: DogeWalletService.kvsAddress, sender: address) { (result) in
-            switch result {
-            case .success(let value):
-                if let address = value {
-                    completion(.success(result: address))
-                } else {
-                    completion(.failure(error: .walletNotInitiated))
-                }
-                
-            case .failure(let error):
-                completion(.failure(error: .internalError(message: "DOGE Wallet: fail to get address from KVS", error: error)))
+    func getWalletAddress(byAdamantAddress address: String) async throws -> String {
+        do {
+            let result = try await apiService.get(key: DogeWalletService.kvsAddress, sender: address)
+            
+            guard let result = result else {
+                throw WalletServiceError.walletNotInitiated
             }
+            return result
+        } catch {
+            throw WalletServiceError.internalError(
+                message: "DOGE Wallet: fail to get address from KVS",
+                error: error
+            )
         }
     }
 }
@@ -437,36 +401,28 @@ extension DogeWalletService {
 
 // MARK: - Transactions
 extension DogeWalletService {
-    func getTransactions(from: Int, completion: @escaping (ApiServiceResult<(transactions: [DogeTransaction], hasMore: Bool)>) -> Void) {
+    func getTransactions(from: Int) async throws -> (transactions: [DogeTransaction], hasMore: Bool) {
         guard let address = self.wallet?.address else {
-            completion(.failure(.notLogged))
-            return
+            throw WalletServiceError.notLogged
         }
         
-        getTransactions(for: address, from: from, to: from + DogeWalletService.chunkSize) { response in
-            switch response {
-            case .success(let doge):
-                let hasMore = doge.to < doge.totalItems
-                
-                let transactions = doge.items.filter { !$0.isDoubleSpend }.map { $0.asBtcTransaction(DogeTransaction.self, for: address) }
-                
-                completion(.success((transactions: transactions, hasMore: hasMore)))
-                
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
+        let doge = try await getTransactions(
+            for: address,
+            from: from,
+            to: from + DogeWalletService.chunkSize
+        )
+        
+        let hasMore = doge.to < doge.totalItems
+        
+        let transactions = doge.items.filter { !$0.isDoubleSpend }.map { $0.asBtcTransaction(DogeTransaction.self, for: address) }
+        
+        return (transactions: transactions, hasMore: hasMore)
     }
     
-    private func getTransactions(for address: String, from: Int, to: Int, completion: @escaping (ApiServiceResult<DogeGetTransactionsResponse>) -> Void) {
+    private func getTransactions(for address: String, from: Int, to: Int) async throws -> DogeGetTransactionsResponse {
         guard let url = DogeWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DOGE endpoint URL")
         }
-        
-        // Headers
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json"
-        ]
         
         let parameters: Parameters = [
             "from": from,
@@ -477,41 +433,28 @@ extension DogeWalletService {
         let endpoint = url.appendingPathComponent(DogeApiCommands.getTransactions(for: address))
         
         // MARK: Sending request
-        AF.request(endpoint, method: .get, parameters: parameters, headers: headers).responseData(queue: defaultDispatchQueue) { response in
-            switch response.result {
-            case .success(let data):
-                do {
-                    let dogeResponse = try DogeWalletService.jsonDecoder.decode(DogeGetTransactionsResponse.self, from: data)
-                    completion(.success(dogeResponse))
-                } catch {
-                    completion(.failure(.internalError(message: "DOGE Wallet: not a valid response", error: error)))
-                }
-                
-//            case .failure(let error as URLError):
-//                completion(.failure(.networkError(error: error)))
-                
-            case .failure(let error):
-                completion(.failure(.serverError(error: error.localizedDescription)))
-            }
+        do {
+            let dogeResponse: DogeGetTransactionsResponse = try await apiService.sendRequest(
+                url: endpoint,
+                method: .get,
+                parameters: parameters
+            )
+            return dogeResponse
+        } catch {
+            throw WalletServiceError.internalError(message: "DOGE Wallet: not a valid response", error: error)
         }
     }
     
-    func getUnspentTransactions(_ completion: @escaping (ApiServiceResult<[UnspentTransaction]>) -> Void) {
+    func getUnspentTransactions() async throws -> [UnspentTransaction] {
         guard let url = DogeWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DOGE endpoint URL")
         }
         
         guard let wallet = self.dogeWallet else {
-            completion(.failure(.notLogged))
-            return
+            throw WalletServiceError.notLogged
         }
         
         let address = wallet.address
-        
-        // Headers
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json"
-        ]
         
         // Request url
         let endpoint = url.appendingPathComponent(DogeApiCommands.getUnspentTransactions(for: address))
@@ -521,103 +464,103 @@ extension DogeWalletService {
         ]
         
         // MARK: Sending request
-        AF.request(endpoint, method: .get, parameters: parameters, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
-            switch response.result {
-            case .success(let data):
-                guard let items = data as? [[String: Any]] else {
-                    completion(.failure(.internalError(message: "DOGE Wallet: not valid response", error: nil)))
-                    break
-                }
-                
-                var utxos = [UnspentTransaction]()
-                for item in items {
-                    guard
-                        let txid = item["txid"] as? String,
-                        let confirmations = item["confirmations"] as? NSNumber,
-                        confirmations.intValue > 0,
-                        let vout = item["vout"] as? NSNumber,
-                        let amount = item["amount"] as? NSNumber else {
-                        continue
-                    }
-                        
-                    let value = NSDecimalNumber(decimal: (amount.decimalValue * DogeWalletService.multiplier)).uint64Value
-                    
-                    let lockScript = Script.buildPublicKeyHashOut(pubKeyHash: wallet.publicKey.toCashaddr().data)
-                    let txHash = Data(hex: txid).map { Data($0.reversed()) } ?? Data()
-                    let txIndex = vout.uint32Value
-                    
-                    let unspentOutput = TransactionOutput(value: value, lockingScript: lockScript)
-                    let unspentOutpoint = TransactionOutPoint(hash: txHash, index: txIndex)
-                    let utxo = UnspentTransaction(output: unspentOutput, outpoint: unspentOutpoint)
-                    
-                    utxos.append(utxo)
-                }
-                
-                completion(.success(utxos))
-                
-            case .failure:
-                completion(.failure(.internalError(message: "DOGE Wallet: server not response", error: nil)))
-            }
+        
+        let data = try await apiService.sendRequest(
+            url: endpoint,
+            method: .get,
+            parameters: parameters
+        )
+
+        let items = try? JSONSerialization.jsonObject(
+            with: data,
+            options: []
+        ) as? [[String: Any]]
+
+        guard let items = items else {
+            throw WalletServiceError.internalError(
+                message: "DOGE Wallet: not valid response",
+                error: nil
+            )
         }
+
+        var utxos = [UnspentTransaction]()
+        for item in items {
+            guard
+                let txid = item["txid"] as? String,
+                let confirmations = item["confirmations"] as? NSNumber,
+                confirmations.intValue > 0,
+                let vout = item["vout"] as? NSNumber,
+                let amount = item["amount"] as? NSNumber else {
+                continue
+            }
+
+            let value = NSDecimalNumber(decimal: (amount.decimalValue * DogeWalletService.multiplier)).uint64Value
+
+            let lockScript = Script.buildPublicKeyHashOut(pubKeyHash: wallet.publicKey.toCashaddr().data)
+            let txHash = Data(hex: txid).map { Data($0.reversed()) } ?? Data()
+            let txIndex = vout.uint32Value
+
+            let unspentOutput = TransactionOutput(value: value, lockingScript: lockScript)
+            let unspentOutpoint = TransactionOutPoint(hash: txHash, index: txIndex)
+            let utxo = UnspentTransaction(output: unspentOutput, outpoint: unspentOutpoint)
+
+            utxos.append(utxo)
+        }
+
+        return utxos
     }
     
-    func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<BTCRawTransaction>) -> Void) {
+    func getTransaction(by hash: String) async throws -> BTCRawTransaction {
         guard let url = DogeWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DOGE endpoint URL")
         }
         
-        // Headers
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json"
-        ]
-        
         // Request url
+        
         let endpoint = url.appendingPathComponent(DogeApiCommands.getTransaction(by: hash))
         
         // MARK: Sending request
-        AF.request(endpoint, method: .get, headers: headers).responseData(queue: defaultDispatchQueue) { response in
-            switch response.result {
-            case .success(let data):
-                do {
-                    let transfers = try DogeWalletService.jsonDecoder.decode(BTCRawTransaction.self, from: data)
-                    completion(.success(transfers))
-                } catch {
-                    completion(.failure(.internalError(message: "Unaviable transaction", error: error)))
-                }
-                
-            case .failure(let error):
-                completion(.failure(.internalError(message: "No transaction", error: error)))
-            }
-        }
+        
+        let transaction: BTCRawTransaction = try await apiService.sendRequest(
+            url: endpoint,
+            method: .get,
+            parameters: nil
+        )
+        
+        return transaction
     }
     
-    func getBlockId(by hash: String, completion: @escaping (ApiServiceResult<String>) -> Void) {
+    func getBlockId(by hash: String) async throws -> String {
         guard let url = DogeWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DOGE endpoint URL")
         }
         
-        // Headers
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json"
-        ]
-        
         // Request url
+        
         let endpoint = url.appendingPathComponent(DogeApiCommands.getBlock(by: hash))
-        AF.request(endpoint, method: .get, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
-            switch response.result {
-            case .success(let json as [String: Any]):
-                if let height = json["height"] as? NSNumber {
-                    completion(.success(height.stringValue))
-                } else {
-                    completion(.failure(.internalError(message: "Failed to parse block", error: nil)))
-                }
-                
-            case .failure(let error):
-                completion(.failure(.internalError(message: "No block", error: error)))
-                
-            default:
-                completion(.failure(.internalError(message: "No block", error: nil)))
-            }
+
+        let data = try await apiService.sendRequest(
+            url: endpoint,
+            method: .get,
+            parameters: nil
+        )
+        
+        let json = try? JSONSerialization.jsonObject(
+            with: data,
+            options: []
+        ) as? [String: Any]
+        
+        guard let json = json else {
+            throw ApiServiceError.internalError(
+                message: "DOGE Wallet: not valid response",
+                error: nil
+            )
+        }
+        
+        if let height = json["height"] as? NSNumber {
+            return height.stringValue
+        } else {
+            throw ApiServiceError.internalError(message: "Failed to parse block", error: nil)
         }
     }
 }

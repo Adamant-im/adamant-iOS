@@ -29,7 +29,11 @@ extension String {
         let name = queryItems.filter({$0.name == "label"}).first?.value?.replacingOccurrences(of: "+", with: " ").replacingOccurrences(of: "%20", with: " ")
         let amount = queryItems.filter({$0.name == "amount"}).first?.value
         let message = queryItems.filter({$0.name == "message"}).first?.value?.replacingOccurrences(of: "+", with: " ").replacingOccurrences(of: "%20", with: " ")
-        return AdamantAddress(address: address, name: name, amount: amount?.double, message: message)
+        var amountDouble: Double?
+        if let amount = amount {
+            amountDouble = Double(amount)
+        }
+        return AdamantAddress(address: address, name: name, amount: amountDouble, message: message)
     }
 
     func getLegacyAdamantAddress() -> AdamantAddress? {

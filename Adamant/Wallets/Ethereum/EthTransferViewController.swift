@@ -8,6 +8,7 @@
 
 import UIKit
 import Eureka
+import Web3Core
 
 class EthTransferViewController: TransferViewControllerBase {
     
@@ -25,6 +26,7 @@ class EthTransferViewController: TransferViewControllerBase {
     
     // MARK: Send
     
+    @MainActor
     override func sendFunds() {
         let comments: String
         if let row: TextAreaRow = form.rowBy(tag: BaseRows.comments.tag), let text = row.value {
@@ -43,50 +45,73 @@ class EthTransferViewController: TransferViewControllerBase {
         
         dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
         
-        service.createTransaction(recipient: recipient, amount: amount) { [weak self] result in
-            guard let vc = self else {
+        Task {
+            do {
+                // Create transaction
+                let transaction = try await service.createTransaction(recipient: recipient, amount: amount)
+                
+                // Send adm report
+                if let reportRecipient = admReportRecipient,
+                   let hash = transaction.txHash {
+                    try await reportTransferTo(
+                        admAddress: reportRecipient,
+                        amount: amount,
+                        comments: comments,
+                        hash: hash
+                    )
+                }
+                
+                // Send transaction
+                let hash = try await service.sendTransaction(transaction)
+                
+                Task {
+                    await service.update()
+                }
+                
                 dialogService.dismissProgress()
-                dialogService.showError(withMessage: String.adamantLocalized.sharedErrors.unknownError, error: nil)
-                return
-            }
-            
-            switch result {
-            case .success(let transaction):
-                // MARK: 1. Send adm report
-                if let reportRecipient = vc.admReportRecipient, let hash = transaction.txHash {
-                    self?.reportTransferTo(admAddress: reportRecipient, amount: amount, comments: comments, hash: hash)
-                }
+                dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
                 
-                // MARK: 2. Send eth transaction
-                service.sendTransaction(transaction) { result in
-                    switch result {
-                    case .success(let hash):
-                        service.update()
-                        vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-                        let transaction = SimpleTransactionDetails(txId: hash, senderAddress: transaction.sender?.address ?? "", recipientAddress: recipient, isOutgoing: true)
-                        if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? EthTransactionDetailsViewController {
-                            detailsVc.transaction = transaction
-                            detailsVc.service = service
-                            detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                            detailsVc.recipientName = self?.recipientName
-                            
-                            if comments.count > 0 {
-                                detailsVc.comment = comments
-                            }
-                            
-                            vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
-                        } else {
-                            vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
-                        }
-                    case .failure(let error):
-                        vc.dialogService.showRichError(error: error)
-                    }
-                }
-                
-            case .failure(let error):
+                // Present detail VC
+                presentDetailTransactionVC(
+                    hash: hash,
+                    transaction: transaction,
+                    recipient: recipient,
+                    comments: comments,
+                    service: service
+                )
+            } catch {
                 dialogService.dismissProgress()
                 dialogService.showRichError(error: error)
             }
+        }
+    }
+    
+    private func presentDetailTransactionVC(
+        hash: String,
+        transaction: CodableTransaction,
+        recipient: String,
+        comments: String,
+        service: EthWalletService
+    ) {
+        let transaction = SimpleTransactionDetails(
+            txId: hash,
+            senderAddress: transaction.sender?.address ?? "",
+            recipientAddress: recipient,
+            isOutgoing: true
+        )
+        if let detailsVc = router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? EthTransactionDetailsViewController {
+            detailsVc.transaction = transaction
+            detailsVc.service = service
+            detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+            detailsVc.recipientName = recipientName
+            
+            if comments.count > 0 {
+                detailsVc.comment = comments
+            }
+            
+            delegate?.transferViewController(self, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
+        } else {
+            delegate?.transferViewController(self, didFinishWithTransfer: transaction, detailsViewController: nil)
         }
     }
     
@@ -228,16 +253,18 @@ class EthTransferViewController: TransferViewControllerBase {
         }
     }
     
-    func reportTransferTo(admAddress: String, amount: Decimal, comments: String, hash: String) {
+    func reportTransferTo(
+        admAddress: String,
+        amount: Decimal,
+        comments: String,
+        hash: String
+    ) async throws {
         let payload = RichMessageTransfer(type: EthWalletService.richMessageType, amount: amount, hash: hash, comments: comments)
         
         let message = AdamantMessage.richMessage(payload: payload)
-        chatsProvider.chatPositon.removeValue(forKey: admAddress)
-        chatsProvider.sendMessage(message, recipientId: admAddress) { [weak self] result in
-            if case .failure(let error) = result {
-                self?.dialogService.showRichError(error: error)
-            }
-        }
+        
+        await chatsProvider.removeChatPositon(for: admAddress)
+        _ = try await chatsProvider.sendMessage(message, recipientId: admAddress)
     }
     
     override func defaultSceneTitle() -> String? {

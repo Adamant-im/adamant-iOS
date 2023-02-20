@@ -96,4 +96,21 @@ extension AdamantApiService {
             }
         }
     }
+    
+    func get(
+        key: String,
+        sender: String
+    ) async throws -> String? {
+        return try await withUnsafeThrowingContinuation {
+            (continuation: UnsafeContinuation<String?, Error>) in
+            get(key: key, sender: sender) { result in
+                switch result {
+                case .success(let data):
+                    continuation.resume(returning: data)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
 }

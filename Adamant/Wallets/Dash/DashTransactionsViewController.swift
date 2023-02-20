@@ -92,13 +92,13 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
         dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
         let txId = transactions[indexPath.row].txId
 
-        walletService.getTransaction(by: txId) { [weak self] result in
-            guard let vc = self else {
-                return
-            }
+        Task { [weak self] in
+            do {
+                let dashTransaction = try await walletService.getTransaction(by: txId)
+                guard let vc = self else {
+                    return
+                }
 
-            switch result {
-            case .success(let dashTransaction):
                 let transaction = dashTransaction.asBtcTransaction(DashTransaction.self, for: sender)
 
                 // Sender name
@@ -113,36 +113,25 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
                 // Block Id
                 guard let blockHash = dashTransaction.blockHash else {
                     controller.transaction = transaction
-                    DispatchQueue.main.async {
-                        vc.navigationController?.pushViewController(controller, animated: true)
-                        vc.tableView.deselectRow(at: indexPath, animated: true)
-                        vc.dialogService.dismissProgress()
-                    }
-                    break
-                }
-
-                vc.walletService.getBlockId(by: blockHash) { result in
-                    switch result {
-                    case .success(let id):
-                        controller.transaction = dashTransaction.asBtcTransaction(DashTransaction.self, for: sender, blockId: id)
-
-                    case .failure:
-                        controller.transaction = transaction
-                    }
-
-                    DispatchQueue.main.async {
-                        vc.tableView.deselectRow(at: indexPath, animated: true)
-                        vc.dialogService.dismissProgress()
-                        vc.navigationController?.pushViewController(controller, animated: true)
-                    }
-                }
-
-            case .failure(let error):
-                DispatchQueue.main.async {
+                    vc.navigationController?.pushViewController(controller, animated: true)
                     vc.tableView.deselectRow(at: indexPath, animated: true)
                     vc.dialogService.dismissProgress()
-                    vc.dialogService.showRichError(error: error)
+                    return
                 }
+                do {
+                    let id = try await vc.walletService.getBlockId(by: blockHash)
+                    controller.transaction = dashTransaction.asBtcTransaction(DashTransaction.self, for: sender, blockId: id)
+                } catch {
+                    controller.transaction = transaction
+                }
+                vc.tableView.deselectRow(at: indexPath, animated: true)
+                vc.dialogService.dismissProgress()
+                vc.navigationController?.pushViewController(controller, animated: true)
+                
+            } catch {
+                self?.tableView.deselectRow(at: indexPath, animated: true)
+                self?.dialogService.dismissProgress()
+                self?.dialogService.showRichError(error: error)
             }
         }
     }

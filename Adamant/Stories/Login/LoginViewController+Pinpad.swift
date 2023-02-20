@@ -59,12 +59,20 @@ extension LoginViewController {
         })
     }
     
+    @MainActor
     private func loginIntoSavedAccount() {
         dialogService.showProgress(withMessage: String.adamantLocalized.login.loggingInProgressMessage, userInteractionEnable: false)
         
-        accountService.loginWithStoredAccount { [weak self] result in
-            DispatchQueue.onMainAsync {
-                self?.handleSavedAccountLoginResult(result)
+        Task {
+            do {
+                let result = try await accountService.loginWithStoredAccount()
+                handleSavedAccountLoginResult(result)
+            } catch {
+                dialogService.showRichError(error: error)
+                
+                if let pinpad = presentedViewController as? PinpadViewController {
+                    pinpad.clearPin()
+                }
             }
         }
     }

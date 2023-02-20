@@ -378,28 +378,29 @@ extension LoginViewController {
         }
     }
     
+    @MainActor
     private func loginIntoExistingAccount(passphrase: String) {
-        accountService.loginWith(passphrase: passphrase, completion: { [weak self] result in
-            switch result {
-            case .success(_, let alert):
-                DispatchQueue.main.async {
-                    if let nav = self?.navigationController {
-                        nav.popViewController(animated: true)
-                    } else {
-                        self?.dismiss(animated: true, completion: nil)
-                    }
+        Task {
+            do {
+                let result = try await accountService.loginWith(passphrase: passphrase)
+                
+                if let nav = navigationController {
+                    nav.popViewController(animated: true)
+                } else {
+                    dismiss(animated: true, completion: nil)
                 }
+
+                dialogService.dismissProgress()
                 
-                self?.dialogService.dismissProgress()
-                
-                if let alert = alert {
-                    self?.dialogService?.showAlert(title: alert.title, message: alert.message, style: UIAlertController.Style.alert, actions: nil, from: nil)
+                if case .success(_, let alert) = result,
+                   let alert = alert {
+                    dialogService?.showAlert(title: alert.title, message: alert.message, style: UIAlertController.Style.alert, actions: nil, from: nil)
                 }
-                
-            case .failure(let error):
-                self?.dialogService.showRichError(error: error)
+            } catch {
+                dialogService.dismissProgress()
+                dialogService.showRichError(error: error)
             }
-        })
+        }
     }
 }
 

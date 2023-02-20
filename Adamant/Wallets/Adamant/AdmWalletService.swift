@@ -134,8 +134,8 @@ class AdmWalletService: NSObject, WalletService {
         NotificationCenter.default.post(name: walletUpdatedNotification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
     }
     
-    func getWalletAddress(byAdamantAddress address: String, completion: @escaping (WalletServiceResult<String>) -> Void) {
-        completion(.success(result: address))
+    func getWalletAddress(byAdamantAddress address: String) async throws -> String {
+        return address
     }
 }
 
@@ -167,15 +167,17 @@ extension AdmWalletService: SwinjectDependentService {
         transfersProvider = container.resolve(TransfersProvider.self)
         router = container.resolve(Router.self)
         
-        let controller = transfersProvider.unreadTransfersController()
-        
-        do {
-            try controller.performFetch()
-        } catch {
-            print("AdmWalletService: Error performing fetch: \(error)")
+        Task {
+            let controller = await transfersProvider.unreadTransfersController()
+            
+            do {
+                try controller.performFetch()
+            } catch {
+                print("AdmWalletService: Error performing fetch: \(error)")
+            }
+            
+            controller.delegate = self
+            transfersController = controller
         }
-        
-        controller.delegate = self
-        transfersController = controller
     }
 }

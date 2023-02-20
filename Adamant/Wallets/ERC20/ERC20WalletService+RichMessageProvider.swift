@@ -14,6 +14,7 @@ extension ERC20WalletService: RichMessageProvider {
     
     // MARK: Events
     
+    @MainActor
     func richMessageTapped(for transaction: RichMessageTransaction, in chat: ChatViewController) {
         // MARK: 0. Prepare
         guard let richContent = transaction.richContent,
@@ -61,11 +62,9 @@ extension ERC20WalletService: RichMessageProvider {
             recipientName = nil
         }
         
-        // MARK: 2. Go go transaction
-        
-        getTransaction(by: hash) { [weak self] result in
-            dialogService.dismissProgress()
-            guard let vc = self?.router.get(scene: AdamantScene.Wallets.ERC20.transactionDetails) as? ERC20TransactionDetailsViewController else {
+        // MARK: 2. Go to transaction
+        Task {
+            guard let vc = router.get(scene: AdamantScene.Wallets.ERC20.transactionDetails) as? ERC20TransactionDetailsViewController else {
                 return
             }
             
@@ -74,11 +73,11 @@ extension ERC20WalletService: RichMessageProvider {
             vc.recipientName = recipientName
             vc.comment = comment
             
-            switch result {
-            case .success(let ethTransaction):
+            do {
+                let ethTransaction = try await getTransaction(by: hash)
                 vc.transaction = ethTransaction
-                
-            case .failure(let error):
+            } catch let error as WalletServiceError {
+                dialogService.dismissProgress()
                 switch error {
                 case .remoteServiceError:
                     let amount: Decimal
@@ -88,28 +87,33 @@ extension ERC20WalletService: RichMessageProvider {
                         amount = 0
                     }
                     
-                    let failedTransaction = SimpleTransactionDetails(txId: hash,
-                                                                     senderAddress: transaction.senderAddress,
-                                                                     recipientAddress: transaction.recipientAddress,
-                                                                     dateValue: nil,
-                                                                     amountValue: amount,
-                                                                     feeValue: nil,
-                                                                     confirmationsValue: nil,
-                                                                     blockValue: nil,
-                                                                     isOutgoing: transaction.isOutgoing,
-                                                                     transactionStatus: TransactionStatus.failed)
+                    let failedTransaction = SimpleTransactionDetails(
+                        txId: hash,
+                        senderAddress: transaction.senderAddress,
+                        recipientAddress: transaction.recipientAddress,
+                        dateValue: nil,
+                        amountValue: amount,
+                        feeValue: nil,
+                        confirmationsValue: nil,
+                        blockValue: nil,
+                        isOutgoing: transaction.isOutgoing,
+                        transactionStatus: TransactionStatus.failed
+                    )
                     
                     vc.transaction = failedTransaction
                     
                 default:
-                    self?.dialogService.showRichError(error: error)
+                    dialogService.showRichError(error: error)
                     return
                 }
+            } catch {
+                dialogService.showRichError(error: error)
+                return
             }
             
-            DispatchQueue.main.async {
-                chat.navigationController?.pushViewController(vc, animated: true)
-            }
+            dialogService.dismissProgress()
+            
+            chat.navigationController?.pushViewController(vc, animated: true)
         }
     }
     

@@ -99,6 +99,10 @@ class ChatListViewController: UIViewController {
     private var onMessagesLoadedActions = [() -> Void]()
     private var areMessagesLoaded = false
     
+    // MARK: Tasks
+    
+    var loadNewChatTask: Task<(), Never>?
+    
     // MARK: Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -118,11 +122,6 @@ class ChatListViewController: UIViewController {
         
         busyIndicatorView.layer.cornerRadius = 14
         busyIndicatorView.clipsToBounds = true
-        
-        isBusy = !chatsProvider.isInitiallySynced
-        if !isBusy {
-            setIsBusy(false, animated: false)
-        }
         
         addObservers()
         
@@ -167,21 +166,30 @@ class ChatListViewController: UIViewController {
     // MARK: Search controller
     
     private func setupSearchController() {
-        guard let searchResultController = router.get(scene: AdamantScene.Chats.searchResults) as? SearchResultsViewController else {
-            fatalError("Can't get SearchResultsViewController")
+        Task {
+            isBusy = await !chatsProvider.isInitiallySynced
+            if !isBusy {
+                setIsBusy(false, animated: false)
+            }
+            
+            loadNewChatTask?.cancel()
+            
+            guard let searchResultController = router.get(scene: AdamantScene.Chats.searchResults) as? SearchResultsViewController else {
+                fatalError("Can't get SearchResultsViewController")
+            }
+            
+            searchResultController.delegate = self
+            
+            searchController = UISearchController(searchResultsController: searchResultController)
+            searchController.searchResultsUpdater = self
+            searchController.searchBar.delegate = self
+            searchController.searchBar.placeholder = String.adamantLocalized.chatList.searchPlaceholder
+            definesPresentationContext = true
+            
+            searchController.obscuresBackgroundDuringPresentation = false
+            searchController.hidesNavigationBarDuringPresentation = true
+            navigationItem.searchController = searchController
         }
-        
-        searchResultController.delegate = self
-        
-        searchController = UISearchController(searchResultsController: searchResultController)
-        searchController.searchResultsUpdater = self
-        searchController.searchBar.delegate = self
-        searchController.searchBar.placeholder = String.adamantLocalized.chatList.searchPlaceholder
-        definesPresentationContext = true
-        
-        searchController.obscuresBackgroundDuringPresentation = false
-        searchController.hidesNavigationBarDuringPresentation = true
-        navigationItem.searchController = searchController
     }
     
     // MARK: TableView
@@ -279,57 +287,57 @@ class ChatListViewController: UIViewController {
     }
     
     /// - Parameter provider: nil to drop controllers and reset table
+    @MainActor
     private func initFetchedRequestControllers(provider: ChatsProvider?) {
-        guard let provider = provider else {
-            chatsController = nil
-            unreadController = nil
+        Task {
+            guard let provider = provider else {
+                chatsController = nil
+                unreadController = nil
+                tableView.reloadData()
+                return
+            }
+            
+            chatsController = await provider.getChatroomsController()
+            unreadController = await provider.getUnreadMessagesController()
+            
+            chatsController?.delegate = self
+            unreadController?.delegate = self
+            
+            do {
+                try chatsController?.performFetch()
+                try unreadController?.performFetch()
+            } catch {
+                chatsController = nil
+                unreadController = nil
+                print("There was an error performing fetch: \(error)")
+            }
+            
             tableView.reloadData()
-            return
+            setBadgeValue(unreadController?.fetchedObjects?.count)
         }
-        
-        chatsController = provider.getChatroomsController()
-        unreadController = provider.getUnreadMessagesController()
-        
-        chatsController?.delegate = self
-        unreadController?.delegate = self
-        
-        do {
-            try chatsController?.performFetch()
-            try unreadController?.performFetch()
-        } catch {
-            chatsController = nil
-            unreadController = nil
-            print("There was an error performing fetch: \(error)")
-        }
-        
-        tableView.reloadData()
-        setBadgeValue(unreadController?.fetchedObjects?.count)
     }
     
+    @MainActor
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
-        chatsProvider.update { [weak self] (result) in
+        Task {
+            let result = await chatsProvider.update()
+            
             guard let result = result else {
-                DispatchQueue.main.async {
-                    refreshControl.endRefreshing()
-                    self?.updatingIndicatorView.stopAnimate()
-                }
+                refreshControl.endRefreshing()
+                updatingIndicatorView.stopAnimate()
                 return
             }
             
             switch result {
             case .success:
-                DispatchQueue.main.async {
-                    self?.tableView.reloadData()
-                }
+                tableView.reloadData()
                 
             case .failure(let error):
-                self?.dialogService.showRichError(error: error)
+                dialogService.showRichError(error: error)
             }
             
-            DispatchQueue.main.async {
-                refreshControl.endRefreshing()
-                self?.updatingIndicatorView.stopAnimate()
-            }
+            refreshControl.endRefreshing()
+			updatingIndicatorView.stopAnimate()
         }
     }
     
@@ -462,6 +470,7 @@ extension ChatListViewController {
         return cell
     }
     
+    @MainActor
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if isBusy,
            indexPath.row == lastSystemChatPositionRow,
@@ -484,21 +493,23 @@ extension ChatListViewController {
             }
         }
         
-        guard let roomsLoadedCount = chatsProvider.roomsLoadedCount,
-              let roomsMaxCount = chatsProvider.roomsMaxCount,
-              roomsLoadedCount < roomsMaxCount,
-              roomsMaxCount > 0,
-              !isBusy,
-              tableView.numberOfRows(inSection: 0) >= roomsLoadedCount,
-              let lastVisibleIndexPath = tableView.indexPathsForVisibleRows,
-              lastVisibleIndexPath.contains(IndexPath(row: tableView.numberOfRows(inSection: 0) - 3, section: 0))
-        else {
-            return
+        Task {
+            guard let roomsLoadedCount = await chatsProvider.roomsLoadedCount,
+                  let roomsMaxCount = await chatsProvider.roomsMaxCount,
+                  roomsLoadedCount < roomsMaxCount,
+                  roomsMaxCount > 0,
+                  !isBusy,
+                  tableView.numberOfRows(inSection: 0) >= roomsLoadedCount,
+                  let lastVisibleIndexPath = tableView.indexPathsForVisibleRows,
+                  lastVisibleIndexPath.contains(IndexPath(row: tableView.numberOfRows(inSection: 0) - 3, section: 0))
+            else {
+                return
+            }
+            
+            isBusy = true
+            insertReloadRow()
+            loadNewChats(offset: roomsLoadedCount)
         }
-        
-        isBusy = true
-        insertReloadRow()
-        loadNewChats(offset: roomsLoadedCount)
     }
     
     private func configureCell(_ cell: SpinnerCell) {
@@ -559,13 +570,13 @@ extension ChatListViewController {
         }
     }
     
+    @MainActor
     private func loadNewChats(offset: Int) {
-        chatsProvider.getChatRooms(offset: offset, completion: { [weak self] in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
-                self?.isBusy = false
-                self?.tableView.reloadData()
-            })
-        })
+        loadNewChatTask = Task {
+            await chatsProvider.getChatRooms(offset: offset)
+            isBusy = false
+            tableView.reloadData()
+        }
     }
 }
 
@@ -718,33 +729,35 @@ extension ChatListViewController: ChatPreservationDelegate {
 // MARK: - Working with in-app notifications
 extension ChatListViewController {
     private func showNotification(for transaction: ChatTransaction) {
-        // MARK: 0. Do not show notifications for initial sync
-        guard chatsProvider.isInitiallySynced else {
-            return
-        }
-        
-        // MARK: 1. Show notification only for incomming transactions
-        guard !transaction.silentNotification, !transaction.isOutgoing,
-            let chatroom = transaction.chatroom, chatroom != presentedChatroom(), !chatroom.isHidden,
-            let partner = chatroom.partner else {
-            return
-        }
-        
-        // MARK: 2. Prepare notification
-        let title = partner.name ?? partner.address
-        let text = shortDescription(for: transaction)
-        
-        let image: UIImage
-        if let ava = partner.avatar, let img = UIImage(named: ava) {
-            image = img
-        } else {
-            image = defaultAvatar
-        }
-        
-        // MARK: 4. Show notification with tap handler
-        dialogService.showNotification(title: title, message: text?.string, image: image) { [weak self] in
-            DispatchQueue.main.async {
-                self?.presentChatroom(chatroom)
+        Task {
+            // MARK: 0. Do not show notifications for initial sync
+            guard await chatsProvider.isInitiallySynced else {
+                return
+            }
+            
+            // MARK: 1. Show notification only for incomming transactions
+            guard !transaction.silentNotification, !transaction.isOutgoing,
+                  let chatroom = transaction.chatroom, chatroom != presentedChatroom(), !chatroom.isHidden,
+                  let partner = chatroom.partner else {
+                return
+            }
+            
+            // MARK: 2. Prepare notification
+            let title = partner.name ?? partner.address
+            let text = shortDescription(for: transaction)
+            
+            let image: UIImage
+            if let ava = partner.avatar, let img = UIImage(named: ava) {
+                image = img
+            } else {
+                image = defaultAvatar
+            }
+            
+            // MARK: 4. Show notification with tap handler
+            dialogService.showNotification(title: title, message: text?.string, image: image) { [weak self] in
+                DispatchQueue.main.async {
+                    self?.presentChatroom(chatroom)
+                }
             }
         }
     }
@@ -1045,6 +1058,7 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
         searchController.searchBar.becomeFirstResponder()
     }
     
+    @MainActor
     func updateSearchResults(for searchController: UISearchController) {
         guard let vc = searchController.searchResultsController as? SearchResultsViewController, let searchString = searchController.searchBar.text else {
             return
@@ -1065,9 +1079,11 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
             return false
         }
         
-        let messages = chatsProvider.getMessages(containing: searchString, in: nil)
-        
-        vc.updateResult(contacts: contacts, messages: messages, searchText: searchString)
+        Task {
+            let messages = await chatsProvider.getMessages(containing: searchString, in: nil)
+            
+            vc.updateResult(contacts: contacts, messages: messages, searchText: searchString)
+        }
     }
     
     func didSelected(_ message: MessageTransaction) {

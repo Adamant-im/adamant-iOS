@@ -13,7 +13,7 @@ enum ChatDialog {
     case alert(String)
     case error(String)
     case warning(String)
-    case richError(RichError)
+    case richError(Error)
     case freeTokenAlert
     case removeMessageAlert(id: String)
     case reportMessageAlert(id: String)

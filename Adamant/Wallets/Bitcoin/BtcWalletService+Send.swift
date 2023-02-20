@@ -23,46 +23,48 @@ extension BtcWalletService: WalletServiceTwoStepSend {
     }
     
     // MARK: Create & Send
-    func createTransaction(recipient: String, amount: Decimal, completion: @escaping (WalletServiceResult<BitcoinKit.Transaction>) -> Void) {
+    func createTransaction(recipient: String, amount: Decimal) async throws -> BitcoinKit.Transaction {
         // MARK: 1. Prepare
         guard let wallet = self.btcWallet else {
-            completion(.failure(error: .notLogged))
-            return
+            throw WalletServiceError.notLogged
         }
         
         let changeAddress = wallet.publicKey.toCashaddr()
         let key = wallet.privateKey
         
         guard let toAddress = try? LegacyAddress(recipient, for: self.network) else {
-            completion(.failure(error: .accountNotFound))
-            return
+            throw WalletServiceError.accountNotFound
         }
         
         let rawAmount = NSDecimalNumber(decimal: amount * BtcWalletService.multiplier).uint64Value
         let fee = NSDecimalNumber(decimal: self.transactionFee * BtcWalletService.multiplier).uint64Value
         
         // MARK: 2. Search for unspent transactions
-        getUnspentTransactions { result in
-            switch result {
-            case .success(let utxos):
-                // MARK: 3. Check if we have enought money
-                let totalAmount: UInt64 = UInt64(utxos.reduce(0) { $0 + $1.output.value })
-                guard totalAmount >= rawAmount + fee else { // This shit can crash BitcoinKit
-                    completion(.failure(error: .notEnoughMoney))
-                    break
-                }
-                
-                // MARK: 4. Create local transaction
-                let transaction = BitcoinKit.Transaction.createNewTransaction(toAddress: toAddress, amount: rawAmount, fee: fee, changeAddress: changeAddress, utxos: utxos, keys: [key])
-                completion(.success(result: transaction))
-                
-            case .failure:
-                completion(.failure(error: .notEnoughMoney))
-            }
+
+        let utxos = try await getUnspentTransactions()
+        
+        // MARK: 3. Check if we have enought money
+        
+        let totalAmount: UInt64 = UInt64(utxos.reduce(0) { $0 + $1.output.value })
+        guard totalAmount >= rawAmount + fee else { // This shit can crash BitcoinKit
+            throw WalletServiceError.notEnoughMoney
         }
+        
+        // MARK: 4. Create local transaction
+        
+        let transaction = BitcoinKit.Transaction.createNewTransaction(
+            toAddress: toAddress,
+            amount: rawAmount,
+            fee: fee,
+            changeAddress: changeAddress,
+            utxos: utxos,
+            keys: [key]
+        )
+        
+        return transaction
     }
     
-    func sendTransaction(_ transaction: BitcoinKit.Transaction, completion: @escaping (WalletServiceResult<String>) -> Void) {
+    func sendTransaction(_ transaction: BitcoinKit.Transaction) async throws -> String {
         guard let url = BtcWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get BTC endpoint URL")
         }
@@ -70,39 +72,29 @@ extension BtcWalletService: WalletServiceTwoStepSend {
         // Request url
         let endpoint = url.appendingPathComponent(BtcApiCommands.sendTransaction())
         
-        // Headers
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json"
-        ]
-        
         // MARK: Prepare params
+        
         let txHex = transaction.serialized().hex
-
+        
         // MARK: Sending request
-        AF.request(
-            endpoint,
+        
+        _ = try await apiService.sendRequest(
+            url: endpoint,
             method: .post,
             parameters: nil,
-            encoding: BodyStringEncoding(body: txHex),
-            headers: headers
-        ).responseData(queue: defaultDispatchQueue) { response in
-            switch response.result {
-            case .success:
-                completion(.success(result: transaction.txId))
-            case .failure(let error):
-                completion(.failure(error: .remoteServiceError(message: error.localizedDescription)))
-            }
-        }
+            encoding: BodyStringEncoding(body: txHex)
+        )
+        
+        return transaction.txId
     }
     
-    func getUnspentTransactions(_ completion: @escaping (ApiServiceResult<[UnspentTransaction]>) -> Void) {
+    func getUnspentTransactions() async throws -> [UnspentTransaction] {
         guard let url = BtcWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get BTC endpoint URL")
         }
         
         guard let wallet = self.btcWallet else {
-            completion(.failure(.notLogged))
-            return
+            throw WalletServiceError.notLogged
         }
         
         let address = wallet.address
@@ -120,40 +112,42 @@ extension BtcWalletService: WalletServiceTwoStepSend {
         ]
         
         // MARK: Sending request
-        AF.request(endpoint, method: .get, parameters: parameters, headers: headers).responseData(queue: defaultDispatchQueue) { response in
-            switch response.result {
-            case .success(let data):
-                guard
-                    let items = try? Self.jsonDecoder.decode([BtcUnspentTransactionResponse].self,
-                                                             from: data)
-                else {
-                    completion(.failure(.internalError(message: "BTC Wallet: not valid response", error: nil)))
-                    break
-                }
-                
-                var utxos = [UnspentTransaction]()
-                for item in items {
-                    guard item.status.confirmed else {
-                        continue
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<[UnspentTransaction], Error>) in
+            AF.request(endpoint, method: .get, parameters: parameters, headers: headers).responseData(queue: defaultDispatchQueue) { response in
+                switch response.result {
+                case .success(let data):
+                    guard
+                        let items = try? Self.jsonDecoder.decode([BtcUnspentTransactionResponse].self,
+                                                                 from: data)
+                    else {
+                        continuation.resume(throwing: WalletServiceError.internalError(message: "BTC Wallet: not valid response", error: nil))
+                        break
                     }
+                    
+                    var utxos = [UnspentTransaction]()
+                    for item in items {
+                        guard item.status.confirmed else {
+                            continue
+                        }
                         
-                    let value = NSDecimalNumber(decimal: item.value).uint64Value
-                    
-                    let lockScript = Script.buildPublicKeyHashOut(pubKeyHash: wallet.publicKey.toCashaddr().data)
-                    let txHash = Data(hex: item.txId).map { Data($0.reversed()) } ?? Data()
-                    let txIndex = item.vout
-                    
-                    let unspentOutput = TransactionOutput(value: value, lockingScript: lockScript)
-                    let unspentOutpoint = TransactionOutPoint(hash: txHash, index: txIndex)
-                    let utxo = UnspentTransaction(output: unspentOutput, outpoint: unspentOutpoint)
-                    
-                    utxos.append(utxo)
+                        let value = NSDecimalNumber(decimal: item.value).uint64Value
+                        
+                        let lockScript = Script.buildPublicKeyHashOut(pubKeyHash: wallet.publicKey.toCashaddr().data)
+                        let txHash = Data(hex: item.txId).map { Data($0.reversed()) } ?? Data()
+                        let txIndex = item.vout
+                        
+                        let unspentOutput = TransactionOutput(value: value, lockingScript: lockScript)
+                        let unspentOutpoint = TransactionOutPoint(hash: txHash, index: txIndex)
+                        let utxo = UnspentTransaction(output: unspentOutput, outpoint: unspentOutpoint)
+                        
+                        utxos.append(utxo)
+                    }
+                    continuation.resume(returning: utxos)
+                    return
+                case .failure:
+                    continuation.resume(throwing: WalletServiceError.internalError(message: "BTC Wallet: server not response", error: nil))
+                    return
                 }
-                
-                completion(.success(utxos))
-                
-            case .failure:
-                completion(.failure(.internalError(message: "BTC Wallet: server not response", error: nil)))
             }
         }
     }

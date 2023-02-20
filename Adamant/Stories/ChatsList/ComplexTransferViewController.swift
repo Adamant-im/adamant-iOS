@@ -94,6 +94,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
         return services.count
     }
     
+    @MainActor
     func pagingViewController(_ pagingViewController: PagingViewController, viewControllerAt index: Int) -> UIViewController {
         let service = services[index]
         
@@ -113,26 +114,41 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                 v.commentsEnabled = service.commentsEnabledForRichMessages
                 v.showProgressView(animated: false)
                 
-                services[index].getWalletAddress(byAdamantAddress: address) { result in
-                    switch result {
-                    case .success(let walletAddress):
-                        DispatchQueue.main.async {
-                            v.recipientAddress = walletAddress
-                            v.recipientName = name
-                            v.hideProgress(animated: true)
-                            if ERC20Token.supportedTokens.contains(where: { token in
+                Task {
+                    do {
+                        let walletAddress = try await services[index]
+                            .getWalletAddress(
+                                byAdamantAddress:
+                                    address
+                            )
+                        v.recipientAddress = walletAddress
+                        v.recipientName = name
+                        v.hideProgress(animated: true)
+                        
+                        if ERC20Token.supportedTokens.contains(
+                            where: { token in
                                 return token.symbol == self.services[index].tokenSymbol
-                            }) {
-                                let ethWallet = self.accountService.wallets.first { wallet in
-                                    return wallet.tokenSymbol == "ETH"
-                                }
-                                v.rootCoinBalance = ethWallet?.wallet?.balance
                             }
+                        ) {
+                            let ethWallet = self.accountService.wallets.first { wallet in
+                                return wallet.tokenSymbol == "ETH"
+                            }
+                            v.rootCoinBalance = ethWallet?.wallet?.balance
                         }
-                    case .failure(let error):
-                        v.showAlertView(title: nil, message: error.message, animated: true)
+                    } catch let error as WalletServiceError {
+                        v.showAlertView(
+                            title: nil,
+                            message: error.message,
+                            animated: true
+                        )
+                    } catch {
+                        v.showAlertView(
+                            title: nil,
+                            message: String.adamantLocalized.sharedErrors.unknownError,
+                            animated: true
+                        )
                     }
-				}
+                }
 			}
 			
 			v.delegate = self

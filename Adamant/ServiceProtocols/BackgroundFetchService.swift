@@ -14,7 +14,7 @@ enum FetchResult {
     case failed
 }
 
-protocol BackgroundFetchService {
+protocol BackgroundFetchService: Actor {
     func fetchBackgroundData(notificationsService: NotificationsService, completion: @escaping (FetchResult) -> Void)
     func dropStateData()
 }

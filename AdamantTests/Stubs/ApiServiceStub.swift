@@ -11,6 +11,14 @@ import Alamofire
 @testable import Adamant
 
 final class ApiServiceStub: ApiService {
+    func sendRequest<Output>(url: Alamofire.URLConvertible, method: Alamofire.HTTPMethod, parameters: Alamofire.Parameters?) async throws -> Output where Output : Decodable {
+        return Output.self as! Output
+    }
+    
+    func getAccount(byAddress address: String) async throws -> Adamant.AdamantAccount {
+        return Adamant.AdamantAccount(address: "", unconfirmedBalance: 1, balance: 1, publicKey: "", unconfirmedSignature: 1, secondSignature: 1, secondPublicKey: "", multisignatures: nil, uMultisignatures: nil)
+    }
+    
     let defaultResponseDispatchQueue: DispatchQueue = .default
     let lastRequestTimeDelta: TimeInterval? = nil
     let currentNodes: [Node] = []
@@ -42,6 +50,10 @@ final class ApiServiceStub: ApiService {
     func get(key: String, sender: String, completion: @escaping (ApiServiceResult<String?>) -> Void) {}
     
     func getMessageTransactions(address: String, height: Int64?, offset: Int?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void) {}
+    
+    func getMessageTransactions(address: String, height: Int64?, offset: Int?) async throws -> [Transaction] {
+        return []
+    }
     
     func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, type: ChatType, nonce: String, amount: Decimal?, completion: @escaping (ApiServiceResult<UInt64>) -> Void) -> UnregisteredTransaction? { nil }
     

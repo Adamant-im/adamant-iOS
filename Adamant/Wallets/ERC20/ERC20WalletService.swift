@@ -12,7 +12,7 @@ import Swinject
 import web3swift
 import Alamofire
 import struct BigInt.BigUInt
-import PromiseKit
+import Web3Core
 
 class ERC20WalletService: WalletService {
     // MARK: - Constants
@@ -101,18 +101,20 @@ class ERC20WalletService: WalletService {
     private (set) var enabled = true
     
     private var _ethNodeUrl: String?
-    private var _web3: web3?
-    var web3: web3? {
-        if _web3 != nil {
-            return _web3
+    private var _web3: Web3?
+    var web3: Web3? {
+        get async {
+            if _web3 != nil {
+                return _web3
+            }
+            guard let url = _ethNodeUrl else {
+                return nil
+            }
+            
+            return await setupEthNode(with: url)
         }
-        guard let url = _ethNodeUrl else {
-            return nil
-        }
-        return setupEthNode(with: url)
     }
     private var baseUrl: String!
-    let stateSemaphore = DispatchSemaphore(value: 1)
     
     var walletViewController: WalletViewController {
         guard let vc = router.get(scene: AdamantScene.Wallets.ERC20.wallet) as? ERC20WalletViewController else {
@@ -145,7 +147,7 @@ class ERC20WalletService: WalletService {
     private (set) var ethWallet: EthWallet?
     var wallet: WalletAccount? { return ethWallet }
     
-    private (set) var contract: web3.web3contract?
+    private (set) var contract: Web3.Contract?
     private var balanceObserver: NSObjectProtocol?
     
     init(token: ERC20Token) {
@@ -181,15 +183,15 @@ class ERC20WalletService: WalletService {
         }
         let apiUrl = node.asString()
         _ethNodeUrl = apiUrl
-        DispatchQueue.global(qos: .userInitiated).async {
-            _ = self.setupEthNode(with: apiUrl)
+        Task {
+            _ = await self.setupEthNode(with: apiUrl)
         }
     }
     
-    func setupEthNode(with apiUrl: String) -> web3? {
+    func setupEthNode(with apiUrl: String) async -> Web3? {
         guard
             let url = URL(string: apiUrl),
-            let web3 = try? Web3.new(url),
+            let web3 = try? await Web3.new(url),
             let token = self.token else {
             return nil
         }
@@ -207,12 +209,15 @@ class ERC20WalletService: WalletService {
     }
     
     func update() {
+        Task {
+            await update()
+        }
+    }
+    
+    func update() async {
         guard let wallet = ethWallet else {
             return
         }
-        
-        defer { stateSemaphore.signal() }
-        stateSemaphore.wait()
         
         switch state {
         case .notInitiated, .updating, .initiationFailed:
@@ -224,65 +229,34 @@ class ERC20WalletService: WalletService {
         
         setState(.updating)
         
-        getBalance(forAddress: wallet.ethAddress) { [weak self] result in
-            if let stateSemaphore = self?.stateSemaphore {
-                defer {
-                    stateSemaphore.signal()
-                }
-                stateSemaphore.wait()
+        if let balance = try? await getBalance(forAddress: wallet.ethAddress) {
+            let notification: Notification.Name?
+            
+            if wallet.balance != balance {
+                wallet.balance = balance
+                notification = walletUpdatedNotification
+                initialBalanceCheck = false
+            } else if initialBalanceCheck {
+                initialBalanceCheck = false
+                notification = walletUpdatedNotification
+            } else {
+                notification = nil
             }
             
-            switch result {
-            case .success(let balance):
-                let notification: Notification.Name?
-                
-                if wallet.balance != balance {
-                    wallet.balance = balance
-                    notification = self?.walletUpdatedNotification
-                    self?.initialBalanceCheck = false
-                } else if let initialBalanceCheck = self?.initialBalanceCheck, initialBalanceCheck {
-                    self?.initialBalanceCheck = false
-                    notification = self?.walletUpdatedNotification
-                } else {
-                    notification = nil
-                }
-                
-                if let notification = notification {
-                    NotificationCenter.default.post(name: notification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
-                }
-                
-            case .failure(let error):
-                switch error {
-                case .networkError:
-                    break
-                    
-                default:
-                    print("\(error.localizedDescription)")
-                }
+            if let notification = notification {
+                NotificationCenter.default.post(name: notification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
             }
-            
-            self?.setState(.upToDate)
         }
         
-        getGasPrices { [weak self] result in
-            switch result {
-            case .success(let price):
-                guard let fee = self?.diplayTransactionFee else {
-                    return
-                }
+        setState(.upToDate)
+        
+        if let price = try? await getGasPrices() {
+            let newFee = price * EthWalletService.transferGas
+            
+            if diplayTransactionFee != newFee {
+                diplayTransactionFee = newFee
                 
-                let newFee = price * EthWalletService.transferGas
-                
-                if fee != newFee {
-                    self?.diplayTransactionFee = newFee
-                    
-                    if let notification = self?.transactionFeeUpdated {
-                        NotificationCenter.default.post(name: notification, object: self, userInfo: nil)
-                    }
-                }
-                
-            case .failure:
-                break
+                NotificationCenter.default.post(name: transactionFeeUpdated, object: self, userInfo: nil)
             }
         }
     }
@@ -291,15 +265,19 @@ class ERC20WalletService: WalletService {
         return addressRegex.perfectMatch(with: address) ? .valid : .invalid
     }
     
-    func getGasPrices(completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-        guard let web3 = self.web3 else {
-            completion(.failure(error: WalletServiceError.internalError(message: "Failed to get Gas Price", error: nil)))
-            return
+    func getGasPrices() async throws -> Decimal {
+        guard let web3 = await self.web3 else {
+            throw WalletServiceError.internalError(message: "Can't get web3 service", error: nil)
         }
-        web3.eth.getGasPricePromise().done { price in
-            completion(.success(result: price.asDecimal(exponent: EthWalletService.currencyExponent)))
-        }.catch { error in
-            completion(.failure(error: .internalError(message: error.localizedDescription, error: error)))
+        
+        do {
+            let price = try await web3.eth.gasPrice()
+            return price.asDecimal(exponent: EthWalletService.currencyExponent)
+        } catch {
+            throw WalletServiceError.internalError(
+                message: error.localizedDescription,
+                error: error
+            )
         }
     }
     
@@ -334,11 +312,9 @@ class ERC20WalletService: WalletService {
 
 // MARK: - WalletInitiatedWithPassphrase
 extension ERC20WalletService: InitiatedWithPassphraseService {
-    func initWallet(withPassphrase passphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) {
+    func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
         
         // MARK: 1. Prepare
-        stateSemaphore.wait()
-        
         setState(.notInitiated)
         
         if enabled {
@@ -350,24 +326,18 @@ extension ERC20WalletService: InitiatedWithPassphraseService {
         let keystore: BIP32Keystore
         do {
             guard let store = try BIP32Keystore(mnemonics: passphrase, password: EthWalletService.walletPassword, mnemonicsPassword: "", language: .english, prefixPath: EthWalletService.walletPath) else {
-                completion(.failure(error: .internalError(message: "ETH Wallet: failed to create Keystore", error: nil)))
-                stateSemaphore.signal()
-                return
+                throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: nil)
             }
             
             keystore = store
         } catch {
-            completion(.failure(error: .internalError(message: "ETH Wallet: failed to create Keystore", error: error)))
-            stateSemaphore.signal()
-            return
+            throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: error)
         }
         
-        web3?.addKeystoreManager(KeystoreManager([keystore]))
+        await web3?.addKeystoreManager(KeystoreManager([keystore]))
         
         guard let ethAddress = keystore.addresses?.first else {
-            completion(.failure(error: .internalError(message: "ETH Wallet: failed to create Keystore", error: nil)))
-            stateSemaphore.signal()
-            return
+            throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: nil)
         }
         
         // MARK: 3. Update
@@ -379,19 +349,17 @@ extension ERC20WalletService: InitiatedWithPassphraseService {
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
         
-        stateSemaphore.signal()
-        
         self.initialBalanceCheck = true
         self.setState(.upToDate, silent: true)
-        self.update()
-        completion(.success(result: eWallet))
+        Task {
+            await update()
+        }
+        return eWallet
     }
     
     func setInitiationFailed(reason: String) {
-        stateSemaphore.wait()
         setState(.initiationFailed(reason: reason))
         ethWallet = nil
-        stateSemaphore.signal()
     }
 }
 
@@ -407,137 +375,150 @@ extension ERC20WalletService: SwinjectDependentService {
 
 // MARK: - Balances & addresses
 extension ERC20WalletService {
-    func getTransaction(by hash: String, completion: @escaping (WalletServiceResult<EthTransaction>) -> Void) {
+    func getTransaction(by hash: String) async throws -> EthTransaction {
         let sender = wallet?.address
-        guard let eth = web3?.eth else {
-            completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction", error: nil)))
-            return
+        guard let eth = await web3?.eth else {
+            throw WalletServiceError.internalError(message: "Failed to get transaction", error: nil)
         }
         
-        DispatchQueue.global(qos: .utility).async {
-            let isOutgoing: Bool
-            let details: web3swift.TransactionDetails
+        let isOutgoing: Bool
+        let details: Web3Core.TransactionDetails
+        
+        // MARK: 1. Transaction details
+        do {
+            details = try await eth.transactionDetails(hash)
+        } catch let error as Web3Error {
+            throw error.asWalletServiceError()
+        } catch {
+            throw WalletServiceError.internalError(message: "Failed to get transaction", error: error)
+        }
+        
+        // MARK: 2. Transaction receipt
+        do {
+            let receipt = try await eth.transactionReceipt(hash)
             
-            // MARK: 1. Transaction details
-            do {
-                details = try eth.getTransactionDetailsPromise(hash).wait()
-            } catch let error as Web3Error {
-                completion(.failure(error: error.asWalletServiceError()))
-                return
-            } catch {
-                completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction", error: error)))
-                return
+            // MARK: 3. Check if transaction is delivered
+            guard receipt.status == .ok,
+                  let blockNumber = details.blockNumber
+            else {
+                let transaction = details.transaction.asEthTransaction(
+                    date: nil,
+                    gasUsed: receipt.gasUsed,
+                    blockNumber: nil,
+                    confirmations: nil,
+                    receiptStatus: receipt.status,
+                    isOutgoing: false
+                )
+                return transaction
             }
             
-            // MARK: 2. Transaction receipt
-            do {
-                let receipt = try eth.getTransactionReceiptPromise(hash).wait()
-                
-                // MARK: 3. Check if transaction is delivered
-                guard receipt.status == .ok, let blockNumber = details.blockNumber else {
-                    let transaction = details.transaction.asEthTransaction(date: nil, gasUsed: receipt.gasUsed, blockNumber: nil, confirmations: nil, receiptStatus: receipt.status, isOutgoing: false)
-                    completion(.success(result: transaction))
-                    return
-                }
-                
-                // MARK: 4. Block timestamp & confirmations
-                let currentBlock = try eth.getBlockNumberPromise().wait()
-                let block = try eth.getBlockByNumberPromise(blockNumber).wait()
-                
-                guard currentBlock >= blockNumber else {
-                    return completion(.failure(error: .internalError(
-                        message: "ERC20 confirmations calculating error",
-                        error: nil
-                    )))
-                }
-                
-                let confirmations = currentBlock - blockNumber
-                
-                let transaction = details.transaction
-                
-                if let sender = sender {
-                    isOutgoing = transaction.sender?.address == sender
-                } else {
-                    isOutgoing = false
-                }
-                
-                let ethTransaction = transaction.asEthTransaction(date: block.timestamp, gasUsed: receipt.gasUsed, blockNumber: String(blockNumber), confirmations: String(confirmations), receiptStatus: receipt.status, isOutgoing: isOutgoing, for: self.token)
-                
-                completion(.success(result: ethTransaction))
-            } catch let error as Web3Error {
-                let result: WalletServiceResult<EthTransaction>
-                
-                switch error {
+            // MARK: 4. Block timestamp & confirmations
+            let currentBlock = try await eth.blockNumber()
+            let block = try await eth.block(by: receipt.blockHash)
+            
+            guard currentBlock >= blockNumber else {
+                throw WalletServiceError.internalError(
+                    message: "ERC20 confirmations calculating error",
+                    error: nil
+                )
+            }
+            
+            let confirmations = currentBlock - blockNumber
+            
+            let transaction = details.transaction
+            
+            if let sender = sender {
+                isOutgoing = transaction.sender?.address == sender
+            } else {
+                isOutgoing = false
+            }
+            
+            let ethTransaction = transaction.asEthTransaction(
+                date: block.timestamp,
+                gasUsed: receipt.gasUsed,
+                blockNumber: String(blockNumber),
+                confirmations: String(confirmations),
+                receiptStatus: receipt.status,
+                isOutgoing: isOutgoing,
+                for: self.token
+            )
+            
+            return ethTransaction
+        } catch let error as Web3Error {
+            switch error {
                 // Transaction not delivered yet
-                case .inputError, .nodeError:
-                    let transaction = details.transaction.asEthTransaction(date: nil, gasUsed: nil, blockNumber: nil, confirmations: nil, receiptStatus: TransactionReceipt.TXStatus.notYetProcessed, isOutgoing: false)
-                    result = .success(result: transaction)
-                    
-                default:
-                    result = .failure(error: error.asWalletServiceError())
-                }
+            case .inputError, .nodeError:
+                let transaction = details.transaction.asEthTransaction(
+                    date: nil,
+                    gasUsed: nil,
+                    blockNumber: nil,
+                    confirmations: nil,
+                    receiptStatus: TransactionReceipt.TXStatus.notYetProcessed,
+                    isOutgoing: false
+                )
+                return transaction
                 
-                completion(result)
-            } catch {
-                completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction", error: error)))
+            default:
+                throw error.asWalletServiceError()
             }
+        } catch {
+            throw WalletServiceError.internalError(message: "Failed to get transaction", error: error)
         }
     }
     
-    func getBalance(forAddress address: EthereumAddress, completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-        DispatchQueue.global(qos: .utility).async { [weak self] in
-            guard let address = self?.ethWallet?.address, let walletAddress = EthereumAddress(address), let erc20 = self?.erc20 else {
-                print("Can't get address")
-                return
-            }
-
-            var exponent = EthWalletService.currencyExponent
-            if let naturalUnits = self?.token?.naturalUnits {
-                exponent = -1 * naturalUnits
-            }
-            
-            do {
-                let balance = try erc20.getBalance(account: walletAddress)
-                let value = balance.asDecimal(exponent: exponent)
-                completion(.success(result:value))
-            } catch {
-                completion(.failure(error: WalletServiceError.internalError(message: "ERC 20 Service - Fail to get balance", error: error)))
-            }
+    func getBalance(forAddress address: EthereumAddress) async throws -> Decimal {
+        guard let address = self.ethWallet?.address,
+              let walletAddress = EthereumAddress(address),
+              let erc20 = self.erc20
+        else {
+            throw WalletServiceError.internalError(message: "Can't get address", error: nil)
+        }
+        
+        var exponent = EthWalletService.currencyExponent
+        if let naturalUnits = self.token?.naturalUnits {
+            exponent = -1 * naturalUnits
+        }
+        
+        do {
+            let balance = try await erc20.getBalance(account: walletAddress)
+            let value = balance.asDecimal(exponent: exponent)
+            return value
+        } catch {
+            throw WalletServiceError.internalError(
+                message: "ERC 20 Service - Fail to get balance",
+                error: error
+            )
         }
     }
     
-    func getWalletAddress(byAdamantAddress address: String, completion: @escaping (WalletServiceResult<String>) -> Void) {
-        apiService.get(key: EthWalletService.kvsAddress, sender: address) { (result) in
-            switch result {
-            case .success(let value):
-                if let address = value {
-                    completion(.success(result: address))
-                } else {
-                    completion(.failure(error: .walletNotInitiated))
+    func getWalletAddress(byAdamantAddress address: String) async throws -> String {
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<String, Error>) in
+            apiService.get(key: EthWalletService.kvsAddress, sender: address) { (result) in
+                switch result {
+                case .success(let value):
+                    if let address = value {
+                        continuation.resume(returning: address)
+                    } else {
+                        continuation.resume(throwing: WalletServiceError.walletNotInitiated)
+                    }
+                    
+                case .failure(let error):
+                    continuation.resume(throwing: WalletServiceError.internalError(message: "ETH Wallet: fail to get address from KVS", error: error))
                 }
-
-            case .failure(let error):
-                completion(.failure(error: .internalError(message: "ETH Wallet: fail to get address from KVS", error: error)))
             }
         }
     }
 }
 
 extension ERC20WalletService {
-    func getTransactionsHistory(address: String, offset: Int = 0, limit: Int = 100, completion: @escaping (WalletServiceResult<[EthTransactionShort]>) -> Void) {
+    func getTransactionsHistory(address: String, offset: Int = 0, limit: Int = 100) async throws -> [EthTransactionShort] {
         guard let node = EthWalletService.nodes.randomElement(), let url = node.asURL() else {
             fatalError("Failed to build ETH endpoint URL")
         }
         
         guard let address = self.ethWallet?.address, let contract = self.token?.contractAddress else {
-            print("Can't get address")
-            return
+            throw WalletServiceError.internalError(message: "Can't get address", error: nil)
         }
-        
-        // Headers
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json"
-        ]
         
         // Request
         let request = "(txto.eq.\(contract),or(txfrom.eq.\(address.lowercased()),contract_to.eq.000000000000000000000000\(address.lowercased().replacingOccurrences(of: "0x", with: ""))))"
@@ -554,55 +535,14 @@ extension ERC20WalletService {
             txEndpoint = try buildUrl(url: url.appendingPathComponent(EthWalletService.transactionsListApiSubpath), queryItems: txQueryItems)
         } catch {
             let err = AdamantApiService.InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-            completion(.failure(error: WalletServiceError.apiError(err)))
-            return
+            throw WalletServiceError.apiError(err)
         }
         
         // MARK: Sending requests
         
-        let dispatchGroup = DispatchGroup()
-        var error: WalletServiceError?
-        
-        var transactions = [EthTransactionShort]()
-        let semaphore = DispatchSemaphore(value: 1)
-        
-        dispatchGroup.enter()
-        AF.request(txEndpoint, method: .get, headers: headers).responseData(queue: defaultDispatchQueue) { response in
-            defer {
-                dispatchGroup.leave()
-            }
-            
-            switch response.result {
-            case .success(let data):
-                do {
-                    let trs = try JSONDecoder().decode([EthTransactionShort].self, from: data)
-                    
-                    semaphore.wait()
-                    defer { semaphore.signal() }
-                    transactions.append(contentsOf: trs)
-                } catch let err {
-                    error = .internalError(message: "Failed to deserialize transactions", error: err)
-                }
-                
-            case .failure:
-                error = .networkError
-            }
-        }
-        
-        // MARK: Handle results
-        // Go background, so we won't block mainthread with .wait()
-        DispatchQueue.global(qos: .userInitiated).async {
-            dispatchGroup.wait()
-            
-            if let error = error {
-                completion(.failure(error: error))
-                return
-            }
-            
-            transactions.sort { $0.date.compare($1.date) == .orderedDescending }
-            
-            completion(.success(result: transactions))
-        }
+        var transactions: [EthTransactionShort] = try await apiService.sendRequest(url: txEndpoint, method: .get, parameters: nil)
+        transactions.sort { $0.date.compare($1.date) == .orderedDescending }
+        return transactions
     }
 }
 

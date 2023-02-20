@@ -36,6 +36,8 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
             tableView.refreshControl = refreshControl
         }
         
+        refresh(true)
+        
         if transaction != nil {
             startUpdate()
         }
@@ -53,28 +55,30 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
         return URL(string: "\(LskWalletService.explorerAddress)\(id)")
     }
     
-    @objc func refresh() {
-        guard let id = transaction?.txId, let service = service else {
-            refreshControl.endRefreshing()
-            return
-        }
-        
-        service.getTransaction(by: id) { [weak self] result in
-            switch result {
-            case .success(let trs):
-                self?.transaction = trs
-
-                DispatchQueue.main.async {
-                    self?.tableView.reloadData()
-                    self?.refreshControl.endRefreshing()
-                }
-
-            case .failure(let error):
-                self?.dialogService.showRichError(error: error)
-
-                DispatchQueue.main.async {
-                    self?.refreshControl.endRefreshing()
-                }
+    @MainActor
+    @objc func refresh(_ silent: Bool = false) {
+        refreshTask = Task {
+            guard let id = transaction?.txId,
+                  let service = service
+            else {
+                refreshControl.endRefreshing()
+                return
+            }
+            
+            do {
+                var trs = try await service.getTransaction(by: id)
+                let result = try await service.getFees()
+                
+                let lastHeight = result.lastHeight
+                trs.updateConfirmations(value: lastHeight)
+                transaction = trs
+                
+                tableView.reloadData()
+                refreshControl.endRefreshing()
+            } catch {
+                refreshControl.endRefreshing()
+                guard !silent else { return }
+                dialogService.showRichError(error: error)
             }
         }
     }
@@ -83,40 +87,13 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     
     func startUpdate() {
         timer?.invalidate()
-        update()
+        refresh(true)
         timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            self?.update()
+            self?.refresh(true)
         }
     }
     
     func stopUpdate() {
         timer?.invalidate()
-    }
-    
-    func update() {
-        guard let id = self.transaction?.txId, let service = self.service else {
-            return
-        }
-        service.getTransaction(by: id) { result in
-            switch result {
-            case .success(var trs):
-                service.serviceApi.getFees { result in
-                    switch result {
-                    case .success(response: let value):
-                        let lastHeight = value.meta.lastBlockHeight
-                        trs.updateConfirmations(value: lastHeight)
-                        self.transaction = trs
-                        DispatchQueue.main.async {
-                            self.tableView.reloadData()
-                        }
-                    case .error:
-                        break
-                    }
-                }
-                
-            case .failure:
-                break
-            }
-        }
     }
 }

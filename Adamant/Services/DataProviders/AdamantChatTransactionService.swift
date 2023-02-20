@@ -11,7 +11,7 @@ import CoreData
 import UIKit
 import MarkdownKit
 
-class AdamantChatTransactionService: ChatTransactionService {
+actor AdamantChatTransactionService: ChatTransactionService {
     
     // MARK: Dependencies
     

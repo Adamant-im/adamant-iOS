@@ -28,6 +28,34 @@ protocol ApiService: AnyObject {
     
     var currentNodes: [Node] { get }
     
+    // MARK: - Async/Await
+    
+    func sendRequest<Output: Decodable>(
+        url: URLConvertible,
+        method: HTTPMethod,
+        parameters: Parameters?
+    ) async throws -> Output
+    
+    func sendRequest<Output: Decodable>(
+        url: URLConvertible,
+        method: HTTPMethod,
+        parameters: Parameters?,
+        encoding: ParameterEncoding
+    ) async throws -> Output
+    
+    func sendRequest(
+        url: URLConvertible,
+        method: HTTPMethod,
+        parameters: Parameters?
+    ) async throws -> Data
+    
+    func sendRequest(
+        url: URLConvertible,
+        method: HTTPMethod,
+        parameters: Parameters?,
+        encoding: ParameterEncoding
+    ) async throws -> Data
+    
     // MARK: - Peers
     
     func getNodeVersion(url: URL, completion: @escaping (ApiServiceResult<NodeVersion>) -> Void)
@@ -45,10 +73,14 @@ protocol ApiService: AnyObject {
     func getAccount(byPassphrase passphrase: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void)
     func getAccount(byPublicKey publicKey: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void)
     
+    func getAccount(byPublicKey publicKey: String) async throws -> AdamantAccount
+    
     func getAccount(
         byAddress address: String,
         completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void
     )
+    
+    func getAccount(byAddress address: String) async throws -> AdamantAccount
     
     // MARK: - Keys
     
@@ -61,6 +93,8 @@ protocol ApiService: AnyObject {
     
     func getTransaction(id: UInt64, completion: @escaping (ApiServiceResult<Transaction>) -> Void)
     
+    func getTransaction(id: UInt64) async throws -> Transaction
+    
     func getTransactions(
         forAccount: String,
         type: TransactionType,
@@ -70,6 +104,14 @@ protocol ApiService: AnyObject {
         completion: @escaping (ApiServiceResult<[Transaction]>) -> Void
     )
     
+    func getTransactions(
+        forAccount: String,
+        type: TransactionType,
+        fromHeight: Int64?,
+        offset: Int?,
+        limit: Int?
+    ) async throws -> [Transaction]
+    
     // MARK: - Chats Rooms
       
     func getChatRooms(
@@ -78,12 +120,16 @@ protocol ApiService: AnyObject {
         completion: @escaping (ApiServiceResult<ChatRooms>) -> Void
     )
     
+    func getChatRooms(
+        address: String,
+        offset: Int?
+    ) async throws -> ChatRooms
+    
     func getChatMessages(
         address: String,
         addressRecipient: String,
-        offset: Int?,
-        completion: @escaping (ApiServiceResult<ChatRooms>) -> Void
-    )
+        offset: Int?
+    ) async throws -> ChatRooms
 
     // MARK: - Funds
     
@@ -94,6 +140,13 @@ protocol ApiService: AnyObject {
         keypair: Keypair,
         completion: @escaping (ApiServiceResult<UInt64>) -> Void
     )
+    
+    func transferFunds(
+        sender: String,
+        recipient: String,
+        amount: Decimal,
+        keypair: Keypair
+    ) async throws -> UInt64
     
     // MARK: - States
     
@@ -109,6 +162,11 @@ protocol ApiService: AnyObject {
     
     func get(key: String, sender: String, completion: @escaping (ApiServiceResult<String?>) -> Void)
     
+    func get(
+        key: String,
+        sender: String
+    ) async throws -> String?
+    
     // MARK: - Chats
     
     /// Get chat transactions (type 8)
@@ -122,6 +180,11 @@ protocol ApiService: AnyObject {
         offset: Int?,
         completion: @escaping (ApiServiceResult<[Transaction]>) -> Void
     )
+    
+    func getMessageTransactions(address: String,
+                                height: Int64?,
+                                offset: Int?
+    ) async throws -> [Transaction]
     
     /// Send text message
     ///   - completion: Contains processed transactionId, if success, or AdamantError, if fails.
@@ -143,7 +206,21 @@ protocol ApiService: AnyObject {
         transaction: UnregisteredTransaction,
         completion: @escaping (ApiServiceResult<TransactionIdResponse>) -> Void
     )
+    
+    func createSendTransaction(
+        senderId: String,
+        recipientId: String,
+        keypair: Keypair,
+        message: String,
+        type: ChatType,
+        nonce: String,
+        amount: Decimal?
+    ) -> UnregisteredTransaction?
 
+    func sendTransaction(
+        transaction: UnregisteredTransaction
+    ) async throws -> UInt64
+    
     // MARK: - Delegates
     
     /// Get delegates

@@ -42,7 +42,7 @@ extension TransfersProviderError: RichError {
                 .localizedDescription
             
         case .accountNotFound(let address):
-            return AccountsProviderResult.notFound(address: address).localized
+            return AccountsProviderError.notFound(address: address).localized
             
         case .internalError(let message, _):
             return String.adamantLocalized.sharedErrors.internalError(message: message)
@@ -128,7 +128,7 @@ extension StoreKey {
     }
 }
 
-protocol TransfersProvider: DataProvider {
+protocol TransfersProvider: DataProvider, Actor {
     // MARK: - Constants
     static var transferFee: Decimal { get }
     
@@ -147,11 +147,16 @@ protocol TransfersProvider: DataProvider {
     // Force update transactions
     func update()
     func update(completion: ((TransfersProviderResult?) -> Void)?)
+    func update() async -> TransfersProviderResult?
     
     // MARK: - Sending funds
-    func transferFunds(toAddress recipient: String, amount: Decimal, comment: String?, completion: @escaping (TransfersProviderTransferResult) -> Void)
+    func transferFunds(
+        toAddress recipient: String,
+        amount: Decimal,
+        comment: String?
+    ) async throws -> TransactionDetails
     
     // MARK: - Transactions
     func getTransfer(id: String) -> TransferTransaction?
-    func refreshTransfer(id: String, completion: @escaping (TransfersProviderResult) -> Void)
+    func refreshTransfer(id: String) async throws
 }

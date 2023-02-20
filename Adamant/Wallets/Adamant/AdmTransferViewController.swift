@@ -32,6 +32,7 @@ class AdmTransferViewController: TransferViewControllerBase {
     
     // MARK: Sending
     
+    @MainActor
     override func sendFunds() {
         guard let service = service as? AdmWalletService, let recipient = recipientAddress, let amount = amount else {
             return
@@ -47,72 +48,78 @@ class AdmTransferViewController: TransferViewControllerBase {
         dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
         
         // Check recipient
-        accountsProvider.getAccount(byAddress: recipient) { result in
-            switch result {
-            case .success:
-                self.sendFundsInternal(service: service, recipient: recipient, amount: amount, comments: comments)
+        Task {
+            do {
+                _ = try await accountsProvider.getAccount(byAddress: recipient)
                 
-            case .notFound, .notInitiated, .dummy:
-                let alert = UIAlertController(title: String.adamantLocalized.transferAdm.accountNotFoundAlertTitle(for: recipient),
-                                              message: String.adamantLocalized.transferAdm.accountNotFoundAlertBody,
-                                              preferredStyle: .alert)
-                
-                if let url = URL(string: NewChatViewController.faqUrl) {
-                    let faq = UIAlertAction(title: String.adamantLocalized.newChat.whatDoesItMean,
-                                            style: UIAlertAction.Style.default) { [weak self] _ in
-                        let safari = SFSafariViewController(url: url)
-                        safari.preferredControlTintColor = UIColor.adamant.primary
-                        safari.modalPresentationStyle = .overFullScreen
-                        self?.present(safari, animated: true, completion: nil)
+                sendFundsInternal(
+                    service: service,
+                    recipient: recipient,
+                    amount: amount,
+                    comments: comments
+                )
+            } catch let error as AccountsProviderError {
+                switch error {
+                case .notFound, .notInitiated, .dummy:
+                    let alert = UIAlertController(title: String.adamantLocalized.transferAdm.accountNotFoundAlertTitle(for: recipient),
+                                                  message: String.adamantLocalized.transferAdm.accountNotFoundAlertBody,
+                                                  preferredStyle: .alert)
+                    
+                    if let url = URL(string: NewChatViewController.faqUrl) {
+                        let faq = UIAlertAction(title: String.adamantLocalized.newChat.whatDoesItMean,
+                                                style: UIAlertAction.Style.default) { [weak self] _ in
+                            let safari = SFSafariViewController(url: url)
+                            safari.preferredControlTintColor = UIColor.adamant.primary
+                            safari.modalPresentationStyle = .overFullScreen
+                            self?.present(safari, animated: true, completion: nil)
+                        }
+                        
+                        alert.addAction(faq)
                     }
                     
-                    alert.addAction(faq)
-                }
-                
-                let send = UIAlertAction(title: BaseRows.sendButton.localized,
-                                         style: .default) { _ in
-                    self.dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
-                    self.sendFundsInternal(service: service, recipient: recipient, amount: amount, comments: comments)
-                }
-                
-                let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil)
-                
-                alert.addAction(send)
-                alert.addAction(cancel)
-                alert.modalPresentationStyle = .overFullScreen
-                DispatchQueue.main.async {
+                    let send = UIAlertAction(title: BaseRows.sendButton.localized,
+                                             style: .default) { _ in
+                        self.dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
+                        self.sendFundsInternal(service: service, recipient: recipient, amount: amount, comments: comments)
+                    }
+                    
+                    let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil)
+                    
+                    alert.addAction(send)
+                    alert.addAction(cancel)
+                    alert.modalPresentationStyle = .overFullScreen
                     self.present(alert, animated: true, completion: nil)
                     self.dialogService.dismissProgress()
+                    
+                case .invalidAddress, .serverError, .networkError:
+                    self.dialogService.showWarning(withMessage: error.localized)
                 }
-                
-            case .invalidAddress, .serverError, .networkError:
-                self.dialogService.showWarning(withMessage: result.localized)
+            } catch {
+                self.dialogService.showWarning(withMessage: error.localizedDescription)
             }
         }
     }
     
+    @MainActor
     private func sendFundsInternal(service: AdmWalletService, recipient: String, amount: Decimal, comments: String) {
-        service.sendMoney(recipient: recipient, amount: amount, comments: comments) { [weak self] result in
-            switch result {
-            case .success(let result):
+        Task {
+            do {
+                let result = try await service.sendMoney(recipient: recipient, amount: amount, comments: comments)
+                
                 service.update()
-                
-                guard let vc = self else {
-                    break
-                }
-                
-                vc.dialogService?.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-                DispatchQueue.onMainAsync {
-                    self?.openDetailVC(result: result, vc: vc, recipient: recipient, comments: comments)
-                }
-                
-            case .failure(let error):
-                guard let dialogService = self?.dialogService else {
-                    break
-                }
-                
                 dialogService.dismissProgress()
-                dialogService.showRichError(error: error)
+                
+                dialogService?.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                
+                openDetailVC(
+                    result: result,
+                    vc: self,
+                    recipient: recipient,
+                    comments: comments
+                )
+            } catch {
+                dialogService?.dismissProgress()
+                dialogService?.showRichError(error: error)
             }
         }
     }
@@ -133,13 +140,12 @@ class AdmTransferViewController: TransferViewControllerBase {
             detailsVC?.recipientName = recipientName
             vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
         } else if let accountsProvider = accountsProvider {
-            accountsProvider.getAccount(byAddress: recipient) { accResult in
-                switch accResult {
-                case .success(let account):
+            Task {
+                do {
+                    let account = try await accountsProvider.getAccount(byAddress: recipient)
                     detailsVC?.recipientName = account.name
                     vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
-                    
-                default:
+                } catch {
                     vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
                 }
             }

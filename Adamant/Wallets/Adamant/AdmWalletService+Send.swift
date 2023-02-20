@@ -21,15 +21,26 @@ extension AdmWalletService: WalletServiceSimpleSend {
         return vc
     }
     
-    func sendMoney(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceResult<TransactionDetails>) -> Void) {
-        transfersProvider.transferFunds(toAddress: recipient, amount: amount, comment: comments) { result in
-            switch result {
-            case .success(let transaction):
-                completion(.success(result: transaction))
-                
-            case .failure(let error):
-                completion(.failure(error: error.asWalletServiceError()))
-            }
+    func sendMoney(
+        recipient: String,
+        amount: Decimal,
+        comments: String
+    ) async throws -> TransactionDetails {
+        do {
+            let transaction = try await transfersProvider.transferFunds(
+                toAddress: recipient,
+                amount: amount,
+                comment: comments
+            )
+            
+            return transaction
+        } catch let error as TransfersProviderError {
+            throw error.asWalletServiceError()
+        } catch {
+            throw WalletServiceError.internalError(
+                message: String.adamantLocalized.sharedErrors.unknownError,
+                error: nil
+            )
         }
     }
 }

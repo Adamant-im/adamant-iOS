@@ -148,6 +148,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     private var isFiatSet = false
     
+    var refreshTask: Task<(), Never>?
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -608,6 +610,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
         self.updateFiat()
         
         setColors()
+    }
+    
+    deinit {
+        refreshTask?.cancel()
     }
     
     func updateFiat() {
