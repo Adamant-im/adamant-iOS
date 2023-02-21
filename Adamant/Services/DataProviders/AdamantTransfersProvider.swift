@@ -148,13 +148,8 @@ extension AdamantTransfersProvider {
     }
     
     func update() {
-        self.update(completion: nil)
-    }
-    
-    func update(completion: ((TransfersProviderResult?) -> Void)?) {
         Task {
-            let result = await update()
-            completion?(result)
+            _ = await update()
         }
     }
     

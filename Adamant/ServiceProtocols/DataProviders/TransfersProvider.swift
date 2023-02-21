@@ -145,8 +145,6 @@ protocol TransfersProvider: DataProvider, Actor {
     func transfersController(for account: CoreDataAccount) -> NSFetchedResultsController<TransferTransaction>
 
     // Force update transactions
-    func update()
-    func update(completion: ((TransfersProviderResult?) -> Void)?)
     func update() async -> TransfersProviderResult?
     
     // MARK: - Sending funds

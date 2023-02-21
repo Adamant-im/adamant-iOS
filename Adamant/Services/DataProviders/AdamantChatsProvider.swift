@@ -464,7 +464,9 @@ extension AdamantChatsProvider {
     }
     
     func update() {
-        self.update(completion: nil)
+        Task {
+            _ = await update()
+        }
     }
     
     func connectToSocket() {
@@ -496,13 +498,6 @@ extension AdamantChatsProvider {
     
     func disconnectFromSocket() {
         self.socketService.disconnect()
-    }
-    
-    func update(completion: ((ChatsProviderResult?) -> Void)?) {
-        Task {
-            let result = await update()
-            completion?(result)
-        }
     }
     
     func update() async -> ChatsProviderResult? {
