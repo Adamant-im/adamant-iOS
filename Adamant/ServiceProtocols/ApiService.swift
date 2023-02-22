@@ -160,6 +160,15 @@ protocol ApiService: AnyObject {
         completion: @escaping (ApiServiceResult<UInt64>) -> Void
     )
     
+    /// - Returns: Transaction ID
+    func store(
+        key: String,
+        value: String,
+        type: StateType,
+        sender: String,
+        keypair: Keypair
+    ) async throws -> UInt64
+    
     func get(key: String, sender: String, completion: @escaping (ApiServiceResult<String?>) -> Void)
     
     func get(

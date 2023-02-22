@@ -67,6 +67,64 @@ extension AdamantApiService {
         }
     }
     
+    func store(
+        key: String,
+        value: String,
+        type: StateType,
+        sender: String,
+        keypair: Keypair
+    ) async throws -> UInt64 {
+        Task { @MainActor in
+            self.sendingMsgTaskId = UIApplication.shared.beginBackgroundTask {
+                UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
+                self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
+            }
+        }
+        
+        // MARK: Create and sign transaction
+        let transaction = NormalizedTransaction(
+            type: .state,
+            amount: .zero,
+            senderPublicKey: keypair.publicKey,
+            requesterPublicKey: nil,
+            date: Date(),
+            recipientId: nil,
+            asset: TransactionAsset(state: StateAsset(key: key, value: value, type: .keyValue))
+        )
+        
+        guard let transaction = adamantCore.makeSignedTransaction(
+            transaction: transaction,
+            senderId: sender,
+            keypair: keypair
+        ) else {
+            throw ApiServiceError.internalError(message: "Failed to sign transaction", error: nil)
+        }
+        
+        // MARK: Send
+        
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<UInt64, Error>) in
+            sendTransaction(path: ApiCommands.States.store, transaction: transaction) { [weak self] serverResponse in
+                switch serverResponse {
+                case .success(let response):
+                    if let id = response.transactionId {
+                        continuation.resume(returning: id)
+                    } else {
+                        continuation.resume(returning: 0)
+                    }
+                    
+                case .failure(let error):
+                    continuation.resume(throwing: ApiServiceError.networkError(error: error))
+                }
+                
+                guard let self = self else { return }
+                Task { @MainActor in
+                    UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
+                    self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
+                }
+            }
+        }
+    }
+    
     func get(key: String, sender: String, completion: @escaping (ApiServiceResult<String?>) -> Void) {
         // MARK: 1. Prepare
         let queryItems = [URLQueryItem(name: "senderId", value: sender),

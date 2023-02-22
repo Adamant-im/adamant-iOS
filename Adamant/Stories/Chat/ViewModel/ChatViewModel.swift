@@ -231,7 +231,12 @@ final class ChatViewModel: NSObject {
             return assertionFailure("Can't set name without address")
         }
         
-        addressBookService.set(name: newName, for: address)
+        let task = Task {
+            await addressBookService.set(name: newName, for: address)
+        }
+        
+        tasksStorage.insert(task)
+        
         updateTitle()
     }
     

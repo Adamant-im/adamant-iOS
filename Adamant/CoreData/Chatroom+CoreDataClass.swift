@@ -33,14 +33,13 @@ public class Chatroom: NSManagedObject {
     func getName(addressBookService: AddressBookService) -> String? {
         guard let partner = partner else { return nil }
         let result: String?
-        
         if let title = title {
             result = title
         } else if let name = partner.name {
             result = name
         } else if
             let address = partner.address,
-            let name = addressBookService.addressBook[address]
+            let name = addressBookService.getName(for: address)
         {
             result = name
         } else {

@@ -34,7 +34,6 @@ class ComplexTransferViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.title = partner?.chatroom?.getName(addressBookService: addressBookService)
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
         
         // MARK: Services

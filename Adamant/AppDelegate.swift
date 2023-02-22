@@ -232,7 +232,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         if let addressBookService = container.resolve(AddressBookService.self) {
-            repeater.registerForegroundCall(label: "addressBookService", interval: 15, queue: .global(qos: .utility), callback: addressBookService.update)
+            repeater.registerForegroundCall(label: "addressBookService", interval: 15, queue: .global(qos: .utility), callback: {
+                Task {
+                    await addressBookService.update()
+                }
+            })
         } else {
             dialogService.showError(withMessage: "Failed to register AddressBookService autoupdate. Please, report a bug", error: nil)
         }
@@ -277,7 +281,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func applicationDidEnterBackground(_ application: UIApplication) {
         repeater.pauseAll()
-        addressBookService.saveIfNeeded()
+        Task {
+            await addressBookService.saveIfNeeded()
+        }
     }
     
     // MARK: Notifications
