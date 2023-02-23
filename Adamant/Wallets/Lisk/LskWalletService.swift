@@ -556,7 +556,7 @@ extension LskWalletService {
 
 // MARK: - Transactions
 extension LskWalletService {
-    func getTransactions() async throws -> [Transactions.TransactionModel] {
+    func getTransactions(offset: UInt) async throws -> [Transactions.TransactionModel] {
         guard let address = self.lskWallet?.address,
               let transactionApi = serviceApi
         else {
@@ -564,7 +564,12 @@ extension LskWalletService {
         }
         
         return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<[Transactions.TransactionModel], Error>) in
-            transactionApi.transactions(senderIdOrRecipientId: address, limit: 100, offset: 0, sort: APIRequest.Sort("timestamp", direction: .descending)) { (response) in
+            transactionApi.transactions(
+                senderIdOrRecipientId: address,
+                limit: 100,
+                offset: offset,
+                sort: APIRequest.Sort("timestamp", direction: .descending)
+            ) { (response) in
                 switch response {
                 case .success(response: let result):
                     continuation.resume(returning: result)

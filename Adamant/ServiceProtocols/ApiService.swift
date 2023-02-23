@@ -56,6 +56,8 @@ protocol ApiService: AnyObject {
         encoding: ParameterEncoding
     ) async throws -> Data
     
+    func sendRequest(request: DataRequest) async throws -> Data
+    
     // MARK: - Peers
     
     func getNodeVersion(url: URL, completion: @escaping (ApiServiceResult<NodeVersion>) -> Void)

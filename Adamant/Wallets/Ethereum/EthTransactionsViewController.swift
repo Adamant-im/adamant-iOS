@@ -23,6 +23,7 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
     // MARK: - Properties
     var transactions: [EthTransactionShort] = []
     private var ethAddress: String = ""
+    private var offset = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,31 +32,53 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
         
         currencySymbol = EthWalletService.currencySymbol
         
-        handleRefresh(self.refreshControl)
+        handleRefresh()
     }
     
     // MARK: - Overrides
     
-    @MainActor
-    override func handleRefresh(_ refreshControl: UIRefreshControl) {
-        self.emptyLabel.isHidden = true
+    override func handleRefresh() {
+        offset = 0
+        transactions.removeAll()
+        tableView.reloadData()
+        loadData(false)
+    }
+    
+    override func loadData(_ silent: Bool) {
+        isBusy = true
+        emptyLabel.isHidden = true
+        
         guard let address = ethWalletService.wallet?.address else {
             transactions = []
             return
         }
         
-        refreshTask = Task {
+        let task = Task { @MainActor in
             do {
-                transactions = try await ethWalletService.getTransactionsHistory(address: address)
+                let trs = try await ethWalletService.getTransactionsHistory(
+                    address: address,
+                    offset: offset
+                )
+                
+                transactions.append(contentsOf: trs)
+                offset += trs.count
+                isNeedToLoadMoore = trs.count > 0
             } catch {
-                transactions = []
-                dialogService.showRichError(error: error)
+                isNeedToLoadMoore = false
+                
+                if !silent {
+                    dialogService.showRichError(error: error)
+                }
             }
             
+            isBusy = false
             emptyLabel.isHidden = transactions.count > 0
             refreshControl.endRefreshing()
+            stopBottomIndicator()
             tableView.reloadData()
         }
+        
+        taskManager.insert(task)
     }
     
     override func reloadData() {
@@ -63,7 +86,7 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
             self?.refreshControl.beginRefreshing()
         }
         
-        handleRefresh(refreshControl)
+        handleRefresh()
     }
     
     // MARK: - UITableView
@@ -90,7 +113,7 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
         
         dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
         
-        detailTransactionTask = Task {
+        let task = Task {
             do {
                 let ethTransaction = try await ethWalletService.getTransaction(by: hash)
                 dialogService.dismissProgress()
@@ -111,6 +134,8 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
                 dialogService.showRichError(error: error)
             }
         }
+        
+        taskManager.insert(task)
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

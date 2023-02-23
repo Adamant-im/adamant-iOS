@@ -18,51 +18,48 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
     
     // MARK: - Properties
     var transactions: [DogeTransaction] = []
-    
-    private let limit = 200 // Limit autoload, as some wallets can have thousands of transactions.
-    private(set) var loadedTo: Int = 0
-    private let procedureQueue = ProcedureQueue()
+    private var offset = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
         currencySymbol = DogeWalletService.currencySymbol
         
         refreshControl.beginRefreshing()
-        handleRefresh(refreshControl)
+        handleRefresh()
     }
     
-    deinit {
-        procedureQueue.cancelAllOperations()
+    override func handleRefresh() {
+        offset = 0
+        transactions.removeAll()
+        tableView.reloadData()
+        loadData(false)
     }
     
-    @MainActor
-    override func handleRefresh(_ refreshControl: UIRefreshControl) {
-        self.emptyLabel.isHidden = true
-        procedureQueue.cancelAllOperations()
+    override func loadData(_ silent: Bool) {
+        isBusy = true
         
-        loadedTo = 0
-        refreshTask = Task {
+        let task = Task {
             do {
-                let tuple = try await walletService.getTransactions(from: loadedTo)
-                transactions = tuple.transactions
-                loadedTo = tuple.transactions.count
-                emptyLabel.isHidden = transactions.count > 0
-                refreshControl.endRefreshing()
-                tableView.reloadData()
-                
-                // Update tableView, then call loadMore()
-                if tuple.hasMore {
-                    loadMoreTransactions(from: tuple.transactions.count)
-                }
+                let tuple = try await walletService.getTransactions(from: offset)
+                transactions.append(contentsOf: tuple.transactions)
+                offset += tuple.transactions.count
+                isNeedToLoadMoore = tuple.hasMore
             } catch {
-                transactions.removeAll()
-                dialogService.showRichError(error: error)
-                
-                emptyLabel.isHidden = transactions.count > 0
-                refreshControl.endRefreshing()
-                tableView.reloadData()
+                isNeedToLoadMoore = false
+
+                if !silent {
+                    dialogService.showRichError(error: error)
+                }
             }
+            
+            isBusy = false
+            emptyLabel.isHidden = transactions.count > 0
+            stopBottomIndicator()
+            refreshControl.endRefreshing()
+            tableView.reloadData()
         }
+        
+        taskManager.insert(task)
     }
     
     // MARK: - UITableView
@@ -71,7 +68,7 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
         return transactions.count
     }
     
-    @MainActor func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let controller = router.get(scene: AdamantScene.Wallets.Doge.transactionDetails) as? DogeTransactionDetailsViewController else {
             fatalError("Failed to get DogeTransactionDetailsViewController")
         }
@@ -85,7 +82,7 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
         dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
         let txId = transactions[indexPath.row].txId
         
-        detailTransactionTask = Task {
+        let task = Task { @MainActor in
             do {
                 let dogeTransaction = try await walletService.getTransaction(by: txId)
                 let transaction = dogeTransaction.asBtcTransaction(DogeTransaction.self, for: sender)
@@ -124,6 +121,8 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
                 dialogService.showRichError(error: error)
             }
         }
+        
+        taskManager.insert(task)
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -157,37 +156,6 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
                       partnerName: partnerName,
                       amount: transaction.amountValue ?? 0,
                       date: transaction.dateValue)
-    }
-    
-    // MARK: - Load more
-    private func loadMoreTransactions(from: Int) {
-        let procedure = LoadMoreDogeTransactionsProcedure(service: walletService, from: from)
-        
-        procedure.addDidFinishBlockObserver { [weak self] (procedure, _) in
-            guard let vc = self, let result = procedure.result else {
-                return
-            }
-            
-            let total = vc.loadedTo + result.transactions.count
-            
-            var indexPaths = [IndexPath]()
-            for index in from..<total {
-                indexPaths.append(IndexPath(row: index, section: 0))
-            }
-            
-            DispatchQueue.main.async {
-                vc.loadedTo = total
-                vc.transactions.append(contentsOf: result.transactions)
-                vc.tableView.insertRows(at: indexPaths, with: .fade)
-                
-                // Update everything, and then call loadMore()
-                if result.hasMore && total < vc.limit {
-                    vc.loadMoreTransactions(from: total)
-                }
-            }
-        }
-        
-        procedureQueue.addOperation(procedure)
     }
 }
 

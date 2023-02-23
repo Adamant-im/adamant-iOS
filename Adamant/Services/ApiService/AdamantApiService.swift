@@ -201,7 +201,7 @@ final class AdamantApiService: ApiService {
         )
     }
     
-    private func sendRequest(request: DataRequest) async throws -> Data {
+    func sendRequest(request: DataRequest) async throws -> Data {
         return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Data, Error>) in
             request.responseData(queue: defaultResponseDispatchQueue) { response in
                 switch response.result {

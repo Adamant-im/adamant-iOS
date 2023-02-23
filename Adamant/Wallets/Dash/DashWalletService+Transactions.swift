@@ -18,17 +18,6 @@ struct DashTransactionsPointer {
 
 extension DashWalletService {
 
-    func getTransactions(completion: @escaping (ApiServiceResult<DashTransactionsPointer>) -> Void) {
-        guard let address = wallet?.address else {
-            completion(.failure(.notLogged))
-            return
-        }
-
-        requestTransactionsIds(for: address) {
-            self.handleTransactionsResponse($0, completion)
-        }
-    }
-
     func getNextTransaction(completion: @escaping (ApiServiceResult<DashTransactionsPointer>) -> Void) {
         guard let id = transatrionsIds.last else {
             completion(.success(.init(total: transatrionsIds.count, transactions: [], hasMore: false)))
@@ -74,6 +63,60 @@ extension DashWalletService {
         }
     }
 
+    func getTransactions(by hashs: [String]) async throws -> [DashTransaction] {
+        guard let address = wallet?.address else {
+            throw ApiServiceError.notLogged
+        }
+        
+        guard let endpoint = DashWalletService.nodes.randomElement()?.asURL() else {
+            fatalError("Failed to get DASH endpoint URL")
+        }
+        
+        var parameters: [Parameters] = []
+        
+        hashs.forEach { hash in
+            let params: Parameters = [
+                "method": "getrawtransaction",
+                "params": [
+                    hash,
+                    true
+                ]
+            ]
+            
+            parameters.append(params)
+        }
+
+        // MARK: Sending request
+        
+        guard let dataParameters = try? JSONSerialization.data(withJSONObject: parameters) else {
+            throw ApiServiceError.internalError(message: "Failed to create request", error: nil)
+        }
+        
+        var request = URLRequest(url: endpoint)
+        request.httpMethod = "POST"
+        request.httpBody = dataParameters
+        
+        let data = try await apiService.sendRequest(request: AF.request(request))
+        
+        do {
+            let model = try JSONDecoder().decode(
+                [BTCRPCServerResponce<BTCRawTransaction>].self,
+                from: data
+            )
+            
+            var array: [DashTransaction] = []
+            model.forEach { trs in
+                if let transaction = trs.result {
+                    array.append(transaction.asBtcTransaction(DashTransaction.self, for: address))
+                }
+            }
+            
+            return array
+        } catch {
+            throw ApiServiceError.internalError(message: error.localizedDescription, error: error)
+        }
+    }
+    
     func getBlockId(by hash: String?) async throws -> String {
         guard let hash = hash else {
             throw ApiServiceError.internalError(message: "Hash is empty", error: nil)
@@ -183,23 +226,17 @@ private extension DashWalletService {
 
 // MARK: - Network Requests
 
-private extension DashWalletService {
+extension DashWalletService {
 
-    func requestTransactionsIds(for address: String, completion: @escaping (ApiServiceResult<[String]>) -> Void) {
+    func requestTransactionsIds(for address: String) async throws -> [String] {
         guard let endpoint = DashWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get DASH endpoint URL")
         }
         
         guard let address = self.dashWallet?.address else {
-            completion(.failure(.internalError(message: "DASH Wallet not found", error: nil)))
-            return
+            throw ApiServiceError.internalError(message: "DASH Wallet not found", error: nil)
         }
         
-        // Headers
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json"
-        ]
-
         let parameters: Parameters = [
             "method": "getaddresstxids",
             "params": [
@@ -208,26 +245,19 @@ private extension DashWalletService {
         ]
 
         // MARK: Sending request
-        AF.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseData(queue: defaultDispatchQueue) { response in
-            
-            switch response.result {
-            case .success(let data):
-                do {
-                    let response = try DashWalletService.jsonDecoder.decode(BTCRPCServerResponce<[String]>.self, from: data)
-                    
-                    if let result = response.result {
-                        completion(.success(result))
-                    } else if let error = response.error?.message {
-                        completion(.failure(.internalError(message: error, error: nil)))
-                    }
-                } catch {
-                    completion(.failure(.internalError(message: "DASH Wallet: not a valid response", error: error)))
-                }
-                
-            case .failure(let error):
-                completion(.failure(.internalError(message: "DASH Wallet: server not responding", error: error)))
-            }
+        
+        let response: BTCRPCServerResponce<[String]> = try await apiService.sendRequest(
+            url: endpoint,
+            method: .post,
+            parameters: parameters,
+            encoding: JSONEncoding.default
+        )
+        
+        if let result = response.result {
+            return result
         }
+        
+        throw ApiServiceError.internalError(message: "DASH Wallet: not a valid response", error: nil)
     }
 
 }
