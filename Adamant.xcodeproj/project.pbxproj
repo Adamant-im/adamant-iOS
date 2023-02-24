@@ -226,6 +226,7 @@
 		9390C5032976B42800270CDF /* ChatDialogManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9390C5022976B42800270CDF /* ChatDialogManager.swift */; };
 		9390C5052976B53000270CDF /* ChatDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9390C5042976B53000270CDF /* ChatDialog.swift */; };
 		93996A972968209C008D080B /* ChatMessagesCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93996A962968209C008D080B /* ChatMessagesCollection.swift */; };
+		9399F5ED29A85A48006C3E30 /* ChatCacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9399F5EC29A85A48006C3E30 /* ChatCacheService.swift */; };
 		93A118512993167500E144CC /* ChatMessageBackgroundColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A118502993167500E144CC /* ChatMessageBackgroundColor.swift */; };
 		93A118532993241D00E144CC /* ChatMessagesListFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A118522993241D00E144CC /* ChatMessagesListFactory.swift */; };
 		93A91FD1297972B7001DB1F8 /* ChatScrollDownButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A91FD0297972B7001DB1F8 /* ChatScrollDownButton.swift */; };
@@ -923,6 +924,7 @@
 		9390C5022976B42800270CDF /* ChatDialogManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatDialogManager.swift; sourceTree = "<group>"; };
 		9390C5042976B53000270CDF /* ChatDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatDialog.swift; sourceTree = "<group>"; };
 		93996A962968209C008D080B /* ChatMessagesCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesCollection.swift; sourceTree = "<group>"; };
+		9399F5EC29A85A48006C3E30 /* ChatCacheService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatCacheService.swift; sourceTree = "<group>"; };
 		93A118502993167500E144CC /* ChatMessageBackgroundColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessageBackgroundColor.swift; sourceTree = "<group>"; };
 		93A118522993241D00E144CC /* ChatMessagesListFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesListFactory.swift; sourceTree = "<group>"; };
 		93A91FD0297972B7001DB1F8 /* ChatScrollDownButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatScrollDownButton.swift; sourceTree = "<group>"; };
@@ -1527,6 +1529,7 @@
 				932B34E82974AA4A002A75BA /* ChatPreservationDelegate.swift */,
 				93A118522993241D00E144CC /* ChatMessagesListFactory.swift */,
 				9322E87A2970431200B8357C /* ChatMessageFactory.swift */,
+				9399F5EC29A85A48006C3E30 /* ChatCacheService.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -3036,6 +3039,7 @@
 				6449BA6A235CA0930033B936 /* ERC20Wallet.swift in Sources */,
 				E9147B612050599000145913 /* LoginViewController+QR.swift in Sources */,
 				6489794E24CE00C000C33A68 /* SwiftyOnboard.swift in Sources */,
+				9399F5ED29A85A48006C3E30 /* ChatCacheService.swift in Sources */,
 				6449BA6B235CA0930033B936 /* ERC20TransactionDetailsViewController.swift in Sources */,
 				E907350E2256779C00BF02CC /* DogeMainnet.swift in Sources */,
 				41CE153A297FF98200CC9254 /* Web3Swift+Adamant.swift in Sources */,

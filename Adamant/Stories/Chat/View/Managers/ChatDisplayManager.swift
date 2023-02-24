@@ -10,6 +10,7 @@ import MessageKit
 import UIKit
 import Combine
 
+@MainActor
 final class ChatDisplayManager: MessagesDisplayDelegate {
     private let viewModel: ChatViewModel
     

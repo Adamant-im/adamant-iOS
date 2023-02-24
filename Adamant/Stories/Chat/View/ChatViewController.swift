@@ -12,6 +12,7 @@ import Combine
 import UIKit
 import SnapKit
 
+@MainActor
 final class ChatViewController: MessagesViewController {
     typealias SpinnerCell = MessageCellWrapper<SpinnerView>
     typealias TransactionCell = CollectionCellWrapper<ChatTransactionContainerView>
@@ -190,7 +191,6 @@ private extension ChatViewController {
         
         viewModel.$messages
             .removeDuplicates()
-            .combineLatest(viewModel.$sender.removeDuplicates())
             .sink { [weak self] _ in self?.updateMessages() }
             .store(in: &subscriptions)
         
@@ -301,9 +301,7 @@ private extension ChatViewController {
         bottomMessageId = viewModel.messages.last?.messageId
         
         guard !messagesLoaded, !viewModel.messages.isEmpty else { return }
-        Task {
-            await viewModel.startPosition.map { setupStartPosition($0) }
-        }
+        viewModel.startPosition.map { setupStartPosition($0) }
         messagesLoaded = true
     }
     
@@ -362,8 +360,8 @@ private extension ChatViewController {
 
 private extension ChatViewController {
     func focusInputBarWithoutAnimation() {
+        // "becomeFirstResponder()" causes content animation on start without this fix
         Task { @MainActor in
-            // "becomeFirstResponder()" causes content animation on start without this fix
             await Task.sleep(interval: .zero)
             messageInputBar.inputTextView.becomeFirstResponder()
         }

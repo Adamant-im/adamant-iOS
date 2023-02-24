@@ -12,7 +12,7 @@ import Swinject
 class SwinjectedRouter: Router {
     weak var container: Container?
     
-    func get(scene: AdamantScene) -> UIViewController {
+    @MainActor func get(scene: AdamantScene) -> UIViewController {
         return scene.factory(container!)
     }
 }

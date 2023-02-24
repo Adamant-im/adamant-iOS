@@ -10,6 +10,7 @@ import MessageKit
 import UIKit
 import Combine
 
+@MainActor
 final class ChatDataSourceManager: MessagesDataSource {
     private let viewModel: ChatViewModel
     
