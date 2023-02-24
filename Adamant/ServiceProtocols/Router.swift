@@ -12,9 +12,9 @@ import Swinject
 // MARK: - Adamant Scene
 struct AdamantScene {
     let identifier: String
-    let factory: (Resolver) -> UIViewController
+    let factory: @MainActor (Resolver) -> UIViewController
     
-    init(identifier: String, factory: @escaping (Resolver) -> UIViewController) {
+    init(identifier: String, factory: @MainActor @escaping (Resolver) -> UIViewController) {
         self.identifier = identifier
         self.factory = factory
     }

@@ -33,9 +33,7 @@ actor ChatMessagesListFactory {
         isNeedToLoadMoreMessages: Bool,
         expirationTimestamp minExpTimestamp: inout TimeInterval?
     ) -> [ChatMessage] {
-        if Thread.isMainThread {
-            assertionFailure("Do not process messages on main thread")
-        }
+        assert(!Thread.isMainThread, "Do not process messages on main thread")
         
         return transactions.enumerated().map { index, transaction in
             var expTimestamp: TimeInterval?
