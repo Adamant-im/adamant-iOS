@@ -10,7 +10,7 @@ import Foundation
 import CoreData
 
 enum AccountsProviderError: Error {
-    case dummy(DummyAccount)
+    case dummy(BaseAccount)
     case notFound(address: String)
     case invalidAddress(address: String)
     case notInitiated(address: String)
@@ -20,7 +20,7 @@ enum AccountsProviderError: Error {
     var localized: String {
         switch self {
         case .dummy:
-            return ""
+            return "Dummy"
             
         case .notFound(let address):
             return String.adamantLocalized.sharedErrors.accountNotFound(address)

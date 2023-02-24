@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="20086" systemVersion="21F79" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21513" systemVersion="22C65" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="BaseAccount" representedClassName="BaseAccount" isAbstract="YES" syncable="YES">
         <attribute name="address" attributeType="String"/>
         <attribute name="avatar" optional="YES" attributeType="String"/>
+        <attribute name="isDummy" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="isSystem" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <relationship name="transfers" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="BaseTransaction" inverseName="partner" inverseEntity="BaseTransaction"/>
@@ -60,15 +61,4 @@
     <entity name="TransferTransaction" representedClassName="TransferTransaction" parentEntity="ChatTransaction" syncable="YES">
         <attribute name="comment" optional="YES" attributeType="String"/>
     </entity>
-    <elements>
-        <element name="BaseAccount" positionX="-27" positionY="171" width="128" height="120"/>
-        <element name="BaseTransaction" positionX="378" positionY="18" width="128" height="224"/>
-        <element name="Chatroom" positionX="-74" positionY="26" width="128" height="180"/>
-        <element name="ChatTransaction" positionX="142" positionY="137" width="128" height="165"/>
-        <element name="CoreDataAccount" positionX="-236" positionY="174" width="128" height="75"/>
-        <element name="DummyAccount" positionX="-18" positionY="180" width="128" height="45"/>
-        <element name="MessageTransaction" positionX="243" positionY="326" width="128" height="75"/>
-        <element name="RichMessageTransaction" positionX="-27" positionY="171" width="128" height="88"/>
-        <element name="TransferTransaction" positionX="97" positionY="342" width="128" height="60"/>
-    </elements>
 </model>

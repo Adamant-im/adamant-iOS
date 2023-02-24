@@ -50,7 +50,11 @@ class AdmTransferViewController: TransferViewControllerBase {
         // Check recipient
         Task {
             do {
-                _ = try await accountsProvider.getAccount(byAddress: recipient)
+                let account = try await accountsProvider.getAccount(byAddress: recipient)
+                
+                guard !account.isDummy else {
+                    throw AccountsProviderError.dummy(account)
+                }
                 
                 sendFundsInternal(
                     service: service,
@@ -61,36 +65,25 @@ class AdmTransferViewController: TransferViewControllerBase {
             } catch let error as AccountsProviderError {
                 switch error {
                 case .notFound, .notInitiated, .dummy:
-                    let alert = UIAlertController(title: String.adamantLocalized.transferAdm.accountNotFoundAlertTitle(for: recipient),
-                                                  message: String.adamantLocalized.transferAdm.accountNotFoundAlertBody,
-                                                  preferredStyle: .alert)
-                    
-                    if let url = URL(string: NewChatViewController.faqUrl) {
-                        let faq = UIAlertAction(title: String.adamantLocalized.newChat.whatDoesItMean,
-                                                style: UIAlertAction.Style.default) { [weak self] _ in
-                            let safari = SFSafariViewController(url: url)
-                            safari.preferredControlTintColor = UIColor.adamant.primary
-                            safari.modalPresentationStyle = .overFullScreen
-                            self?.present(safari, animated: true, completion: nil)
-                        }
-                        
-                        alert.addAction(faq)
-                    }
-                    
-                    let send = UIAlertAction(title: BaseRows.sendButton.localized,
-                                             style: .default) { _ in
-                        self.dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
-                        self.sendFundsInternal(service: service, recipient: recipient, amount: amount, comments: comments)
-                    }
-                    
-                    let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil)
-                    
-                    alert.addAction(send)
-                    alert.addAction(cancel)
-                    alert.modalPresentationStyle = .overFullScreen
-                    self.present(alert, animated: true, completion: nil)
                     self.dialogService.dismissProgress()
                     
+                    dialogService.presentDymmyAlert(
+                        for: recipient,
+                        from: view,
+                        canSend: true
+                    ) { [weak self] _ in
+                        self?.dialogService.showProgress(
+                            withMessage: String.adamantLocalized.transfer.transferProcessingMessage,
+                            userInteractionEnable: false
+                        )
+                        
+                        self?.sendFundsInternal(
+                            service: service,
+                            recipient: recipient,
+                            amount: amount,
+                            comments: comments
+                        )
+                    }
                 case .invalidAddress, .serverError, .networkError:
                     self.dialogService.showWarning(withMessage: error.localized)
                 }

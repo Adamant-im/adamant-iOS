@@ -10,6 +10,7 @@ import UIKit
 import PMAlertController
 import MessageUI
 import PopupKit
+import SafariServices
 
 class AdamantDialogService: DialogService {
     // MARK: Dependencies
@@ -435,6 +436,58 @@ extension AdamantDialogService {
         }
         
         alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+    }
+    
+    func presentDymmyAlert(
+        for adm: String,
+        from: UIView?,
+        canSend: Bool,
+        sendCompletion: ((UIAlertAction) -> Void)?
+    ) {
+        let alert = UIAlertController(
+            title: String.adamantLocalized.transferAdm.accountNotFoundAlertTitle(
+                for: adm
+            ),
+            message: String.adamantLocalized.transferAdm.accountNotFoundAlertBody,
+            preferredStyle: .alert
+        )
+        
+        if let url = URL(string: NewChatViewController.faqUrl) {
+            let faq = UIAlertAction(
+                title: String.adamantLocalized.newChat.whatDoesItMean,
+                style: UIAlertAction.Style.default) { [weak self] _ in
+                    let safari = SFSafariViewController(url: url)
+                    safari.preferredControlTintColor = UIColor.adamant.primary
+                    safari.modalPresentationStyle = .overFullScreen
+                    self?.present(safari, animated: true, completion: nil)
+                }
+            alert.addAction(faq)
+        }
+        
+        if canSend {
+            let send = UIAlertAction(
+                title: String.adamantLocalized.transfer.send,
+                style: .default,
+                handler: sendCompletion
+            )
+            alert.addAction(send)
+        }
+        
+        let cancel = UIAlertAction(
+            title: String.adamantLocalized.alert.cancel,
+            style: .cancel,
+            handler: nil
+        )
+        alert.addAction(cancel)
+        
+        if let sourceView = from {
+            alert.popoverPresentationController?.sourceView = sourceView
+            alert.popoverPresentationController?.sourceRect = sourceView.bounds
+            alert.popoverPresentationController?.canOverlapSourceViewRect = false
+        }
+        
+        alert.modalPresentationStyle = .overFullScreen
+        present(alert, animated: true, completion: nil)
     }
     
     @objc private func image(_ image: UIImage, didFinishSavingWithError error: NSError?, contextInfo: UnsafeRawPointer) {

@@ -207,10 +207,18 @@ extension AdamantAccountsProvider {
         switch validation {
         case .valid:
             do {
-                let account = try await apiService.getAccount(byAddress: address)
+                var account = try await apiService.getAccount(byAddress: address)
                 guard account.publicKey != nil else {
                     if let dummy = dummy {
-                        throw AccountsProviderError.dummy(dummy)
+                        account.publicKey = "dummy\(address)"
+                        account.isDummy = true
+                        let coreAccount = createAndSaveCoreDataAccount(
+                            from: account,
+                            dummy: dummy,
+                            in: stack.container.viewContext
+                        )
+                        
+                        return coreAccount
                     } else {
                         throw AccountsProviderError.notInitiated(address: address)
                     }
@@ -333,6 +341,8 @@ extension AdamantAccountsProvider {
         }
         
         let coreAccount = self.createCoreDataAccount(from: account, context: context)
+        
+        coreAccount.isDummy = account.isDummy
         
         if let dummy = dummy {
             coreAccount.name = dummy.name
