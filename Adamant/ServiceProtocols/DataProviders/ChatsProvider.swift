@@ -178,8 +178,6 @@ protocol ChatsProvider: DataProvider, Actor {
     var receivedLastHeight: Int64? { get }
     var readedLastHeight: Int64? { get }
     var isInitiallySynced: Bool { get }
-    
-    var chatPositon: [String: Double] { get set }
     var blockList: [String] { get }
     
     var roomsMaxCount: Int? { get }
@@ -218,9 +216,10 @@ protocol ChatsProvider: DataProvider, Actor {
     func removeMessage(with id: String)
     func updateStatus(for transaction: RichMessageTransaction, resetBeforeUpdate: Bool)
     func markChatAsRead(chatroom: Chatroom)
-    func removeChatPositon(for address: String)
-    func setChatPositon(for address: String, position: Double?)
-    func getChatPositon(for address: String) -> Double?
+    
+    @MainActor func removeChatPositon(for address: String)
+    @MainActor func setChatPositon(for address: String, position: Double?)
+    @MainActor func getChatPositon(for address: String) -> Double?
     
     // MARK: - Unconfirmed Transaction
     func addUnconfirmed(transactionId: UInt64, managedObjectId: NSManagedObjectID)

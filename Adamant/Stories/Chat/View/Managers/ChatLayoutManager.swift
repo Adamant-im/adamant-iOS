@@ -10,6 +10,7 @@ import MessageKit
 import UIKit
 import Combine
 
+@MainActor
 final class ChatLayoutManager: MessagesLayoutDelegate {
     private let viewModel: ChatViewModel
     

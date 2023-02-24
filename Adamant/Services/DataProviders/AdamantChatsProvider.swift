@@ -33,7 +33,7 @@ actor AdamantChatsProvider: ChatsProvider {
     private var unconfirmedTransactions: [UInt64:NSManagedObjectID] = [:]
     private var unconfirmedTransactionsBySignature: [String] = []
     
-    var chatPositon: [String : Double] = [:]
+    @MainActor private var chatPositon: [String : Double] = [:]
     private(set) var blockList: [String] = []
     private(set) var removedMessages: [String] = []
     
@@ -674,15 +674,15 @@ extension AdamantChatsProvider {
         return transaction
     }
     
-    func removeChatPositon(for address: String) {
+    @MainActor func removeChatPositon(for address: String) {
         chatPositon.removeValue(forKey: address)
     }
     
-    func setChatPositon(for address: String, position: Double?) {
+    @MainActor func setChatPositon(for address: String, position: Double?) {
         chatPositon[address] = position
     }
     
-    func getChatPositon(for address: String) -> Double? {
+    @MainActor func getChatPositon(for address: String) -> Double? {
         return chatPositon[address]
     }
     
