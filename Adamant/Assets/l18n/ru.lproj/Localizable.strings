@@ -367,6 +367,12 @@
 /* Delegates page: scene title */
 "Delegates.Title" = "Делегаты";
 
+/* Visible Wallets page: scene title */
+"VisibleWallets.Title" = "Кошельки";
+
+/* VisibleWallets: Reset wallets alert title */
+"VisibleWallets.ResetListAlert" = "Сбросить список кошельков к списку по умолчанию?";
+
 /* Delegates tab: Message about 50 ADM fee for vote */
 "Delegates.NotEnoughtTokensForVote" = "Недостаточно токенов для голосования. Нужно 50 ADM";
 
@@ -673,6 +679,9 @@
 /* Notifications: User has disabled notifications. Head him into settings */
 "NotificationsService.NotificationsDisabled" = "Уведомления отключены. Вы можете включить их в Настройках";
 
+/* Notifications: Not stayed logged in */
+"NotificationsService.NotStayedLoggedIn" = "Нельзя включить уведомления, не оставаясь в системе";
+
 /* Pinpad: Ask user to create new pin */
 "Pinpad.EnterNewPin" = "Введите новый PIN-код";
 
@@ -741,6 +750,12 @@
 
 /* Shared alert 'Copy' button. Used anywhere. Used for copy-paste info. */
 "Shared.CopyToPasteboard" = "Копировать";
+
+/* Shared alert 'Chat With' button. Used to chat with recipient */
+"Shared.ChatWith" = "Чат с ";
+
+/* Shared alert 'Send ADM To' button. Used to send ADM to recipient */
+"Shared.SendAdmTo" = "Отправить ADM для ";
 
 /* Shared alert Done message. Used anywhere */
 "Shared.Done" = "Готово";

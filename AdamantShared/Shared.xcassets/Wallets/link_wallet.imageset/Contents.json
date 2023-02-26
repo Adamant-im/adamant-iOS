@@ -1,0 +1,23 @@
+{
+ "images" : [
+  {
+   "idiom" : "universal",
+   "scale" : "1x",
+   "filename" : "link_wallet.png"
+  },
+  {
+   "idiom" : "universal",
+   "scale" : "2x",
+   "filename" : "link_wallet@2x.png"
+  },
+  {
+   "idiom" : "universal",
+   "scale" : "3x",
+   "filename" : "link_wallet@3x.png"
+  }
+ ],
+ "info" : {
+  "version" : 1,
+  "author" : "xcode"
+ }
+}

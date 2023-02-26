@@ -11,45 +11,119 @@ import CoreData
 
 extension AdamantChatsProvider {
     // MARK: - Public
-    func fakeSent(message: AdamantMessage, recipientId: String, date: Date, status: MessageStatus, showsChatroom: Bool, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {
-        validate(message: message, partnerId: recipientId) { [weak self] result in
-            switch result {
-            case .success(let loggedAddress, let partner):
+    func fakeSent(
+        message: AdamantMessage,
+        recipientId: String,
+        date: Date,
+        status: MessageStatus,
+        showsChatroom: Bool,
+        completion: @escaping (ChatsProviderResultWithTransaction) -> Void
+    ) {
+        Task {
+            do {
+                let result = try await validate(message: message, partnerId: recipientId)
+                let loggedAddress = result.loggedAccount
+                let partner = result.partner
+                
                 switch message {
                 case .text(let text):
-                    self?.fakeSent(text: text, loggedAddress: loggedAddress, recipient: partner, date: date, status: status, markdown: false, showsChatroom: showsChatroom, completion: completion)
+                    fakeSent(
+                        text: text,
+                        loggedAddress: loggedAddress,
+                        recipient: partner,
+                        date: date,
+                        status: status,
+                        markdown: false,
+                        showsChatroom: showsChatroom,
+                        completion: completion
+                    )
                     
                 case .richMessage(let payload):
-                    self?.fakeSent(text: payload.serialized(), loggedAddress: loggedAddress, recipient: partner, date: date, status: status, markdown: false, showsChatroom: showsChatroom, completion: completion)
+                    fakeSent(
+                        text: payload.serialized(),
+                        loggedAddress: loggedAddress,
+                        recipient: partner,
+                        date: date,
+                        status: status,
+                        markdown: false,
+                        showsChatroom: showsChatroom,
+                        completion: completion
+                    )
                     
                 case .markdownText(let text):
-                    self?.fakeSent(text: text, loggedAddress: loggedAddress, recipient: partner, date: date, status: status, markdown: true, showsChatroom: showsChatroom, completion: completion)
+                    fakeSent(
+                        text: text,
+                        loggedAddress: loggedAddress,
+                        recipient: partner,
+                        date: date,
+                        status: status,
+                        markdown: true,
+                        showsChatroom: showsChatroom,
+                        completion: completion
+                    )
                 }
-                
-            case .failure(let error):
+            } catch let error as ChatsProviderError {
                 completion(.failure(error))
+            } catch {
+                completion(.failure(.internalError(error)))
             }
         }
     }
     
-    func fakeReceived(message: AdamantMessage, senderId: String, date: Date, unread: Bool, silent: Bool, showsChatroom: Bool, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {
-        validate(message: message, partnerId: senderId) { [weak self] result in
-            switch result {
-            case .success(let loggedAccount, let partner):
-                switch message {
-                case .text(let text):
-                    self?.fakeReceived(text: text, loggedAddress: loggedAccount, sender: partner, date: date, unread: unread, silent: silent, markdown: false, showsChatroom: showsChatroom, completion: completion)
-                    
-                case .richMessage(let payload):
-                    self?.fakeReceived(text: payload.serialized(), loggedAddress: loggedAccount, sender: partner, date: date, unread: unread, silent: silent, markdown: false, showsChatroom: showsChatroom, completion: completion)
-                    
-                case .markdownText(let text):
-                    self?.fakeReceived(text: text, loggedAddress: loggedAccount, sender: partner, date: date, unread: unread, silent: silent, markdown: true, showsChatroom: showsChatroom, completion: completion)
-                }
+    func fakeReceived(
+        message: AdamantMessage,
+        senderId: String,
+        date: Date,
+        unread: Bool,
+        silent: Bool,
+        showsChatroom: Bool
+    )  async throws -> ChatTransaction {
+        do {
+            let result = try await validate(message: message, partnerId: senderId)
+            let loggedAccount = result.loggedAccount
+            let partner = result.partner
+            
+            switch message {
+            case .text(let text):
+                return try await fakeReceived(
+                    text: text,
+                    loggedAddress: loggedAccount,
+                    sender: partner,
+                    date: date,
+                    unread: unread,
+                    silent: silent,
+                    markdown: false,
+                    showsChatroom: showsChatroom
+                )
                 
-            case .failure(let error):
-                completion(.failure(error))
+            case .richMessage(let payload):
+                return try await fakeReceived(
+                    text: payload.serialized(),
+                    loggedAddress: loggedAccount,
+                    sender: partner,
+                    date: date,
+                    unread: unread,
+                    silent: silent,
+                    markdown: false,
+                    showsChatroom: showsChatroom
+                )
+                
+            case .markdownText(let text):
+                return try await fakeReceived(
+                    text: text,
+                    loggedAddress: loggedAccount,
+                    sender: partner,
+                    date: date,
+                    unread: unread,
+                    silent: silent,
+                    markdown: true,
+                    showsChatroom: showsChatroom
+                )
             }
+        } catch let error as ChatsProviderError {
+            throw error
+        } catch {
+            throw ChatsProviderError.internalError(error)
         }
     }
     
@@ -130,7 +204,16 @@ extension AdamantChatsProvider {
         }
     }
     
-    private func fakeReceived(text: String, loggedAddress: String, sender: CoreDataAccount, date: Date, unread: Bool, silent: Bool, markdown: Bool, showsChatroom: Bool, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {
+    private func fakeReceived(
+        text: String,
+        loggedAddress: String,
+        sender: CoreDataAccount,
+        date: Date,
+        unread: Bool,
+        silent: Bool,
+        markdown: Bool,
+        showsChatroom: Bool
+    ) async throws -> ChatTransaction {
         // MARK: 0. Prepare
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         privateContext.parent = stack.container.viewContext
@@ -155,22 +238,24 @@ extension AdamantChatsProvider {
         transaction.chatMessageId = transaction.transactionId
         
         // MARK: 2. Get Chatroom
-        guard let id = sender.chatroom?.objectID, let chatroom = privateContext.object(with: id) as? Chatroom else {
-            return
+        guard let id = sender.chatroom?.objectID,
+              let chatroom = privateContext.object(with: id) as? Chatroom
+        else {
+            throw ChatsProviderError.requestCancelled
         }
         
         if unread {
             chatroom.hasUnreadMessages = true
         }
-        
+            
         // MARK: 3. Save it
         do {
             chatroom.addToTransactions(transaction)
             recheckLastTransactionFor(chatroom: chatroom, with: transaction)
             try privateContext.save()
-            completion(.success(transaction: transaction))
+            return transaction
         } catch {
-            completion(.failure(.internalError(error)))
+            throw ChatsProviderError.internalError(error)
         }
     }
     
@@ -181,11 +266,10 @@ extension AdamantChatsProvider {
         case failure(ChatsProviderError)
     }
     
-    private func validate(message: AdamantMessage, partnerId: String, completion: @escaping (ValidateResult) -> Void) {
+    private func validate(message: AdamantMessage, partnerId: String) async throws -> (loggedAccount: String, partner: CoreDataAccount) {
         // MARK: 1. Logged account
         guard let loggedAddress = accountService.account?.address else {
-            completion(.failure(.notLogged))
-            return
+            throw ChatsProviderError.notLogged
         }
         
         // MARK: 2. Validate message
@@ -194,29 +278,29 @@ extension AdamantChatsProvider {
             break
             
         case .empty:
-            completion(.failure(.messageNotValid(.empty)))
-            return
+            throw ChatsProviderError.messageNotValid(.empty)
             
         case .tooLong:
-            completion(.failure(.messageNotValid(.tooLong)))
-            return
+            throw ChatsProviderError.messageNotValid(.tooLong)
         }
         
         // MARK: 3. Get recipient
-        accountsProvider.getAccount(byAddress: partnerId) { result in
-            switch result {
-            case .success(let account):
-                completion(.success(loggedAccount: loggedAddress, partner: account))
-                
+        do {
+            let account = try await accountsProvider.getAccount(byAddress: partnerId)
+            return (loggedAccount: loggedAddress, partner: account)
+        } catch let error as AccountsProviderError {
+            switch error {
             case .notFound, .invalidAddress, .notInitiated, .dummy:
-                completion(.failure(.accountNotFound(partnerId)))
+                throw ChatsProviderError.accountNotFound(partnerId)
                 
             case .networkError:
-                completion(.failure(.networkError))
+                throw ChatsProviderError.networkError
                 
             case .serverError(let error):
-                completion(.failure(.serverError(error)))
+                throw ChatsProviderError.serverError(error)
             }
+        } catch {
+            throw ChatsProviderError.serverError(error)
         }
     }
     

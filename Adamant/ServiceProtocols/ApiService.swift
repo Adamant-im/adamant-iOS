@@ -9,106 +9,6 @@
 import Foundation
 import Alamofire
 
-enum ApiServiceResult<T> {
-    case success(T)
-    case failure(ApiServiceError)
-}
-
-// MARK: - Error
-enum ApiServiceError: Error {
-    case notLogged
-    case accountNotFound
-    case serverError(error: String)
-    case internalError(message: String, error: Error?)
-    case networkError(error: Error)
-    case requestCancelled
-    
-    var localized: String {
-        switch self {
-        case .notLogged:
-            return String.adamantLocalized.sharedErrors.userNotLogged
-            
-        case .accountNotFound:
-            return String.adamantLocalized.sharedErrors.accountNotFound("")
-            
-        case .serverError(let error):
-            return String.adamantLocalized.sharedErrors.remoteServerError(message: error)
-            
-        case .internalError(let msg, let error):
-            let message: String
-            if let apiError = error as? ApiServiceError {
-                message = apiError.localized
-            } else if let error = error {
-                message = error.localizedDescription
-            } else {
-                message = msg
-            }
-            
-            return
-                String.adamantLocalized.sharedErrors.internalError(message: message)
-            
-        case .networkError(error: _):
-            return String.adamantLocalized.sharedErrors.networkError
-            
-        case .requestCancelled:
-            return String.adamantLocalized.sharedErrors.requestCancelled
-        }
-    }
-}
-
-extension ApiServiceError: RichError {
-    var message: String {
-        return localized
-    }
-    
-    var level: ErrorLevel {
-        switch self {
-        case .accountNotFound, .notLogged, .networkError, .requestCancelled:
-            return .warning
-            
-        case .internalError, .serverError:
-            return .error
-        }
-    }
-    
-    var internalError: Error? {
-        switch self {
-        case .accountNotFound, .notLogged, .serverError, .requestCancelled:
-            return nil
-            
-        case .internalError(_, let error):
-            return error
-            
-        case .networkError(let error):
-            return error
-        }
-    }
-}
-
-extension ApiServiceError: Equatable {
-    static func == (lhs: ApiServiceError, rhs: ApiServiceError) -> Bool {
-        switch (lhs, rhs) {
-        case (.notLogged, .notLogged):
-            return true
-            
-        case (.accountNotFound, .accountNotFound):
-            return true
-            
-        case (.serverError(let le), .serverError(let re)):
-            return le == re
-            
-        case (.internalError(let lm, _), .internalError(let rm, _)):
-            return lm == rm
-            
-        case (.networkError, .networkError):
-            return true
-            
-        default:
-            return false
-        }
-    }
-}
-
 // MARK: - Notifications
 extension Notification.Name {
     enum ApiService {
@@ -128,6 +28,34 @@ protocol ApiService: AnyObject {
     
     var currentNodes: [Node] { get }
     
+    // MARK: - Async/Await
+    
+    func sendRequest<Output: Decodable>(
+        url: URLConvertible,
+        method: HTTPMethod,
+        parameters: Parameters?
+    ) async throws -> Output
+    
+    func sendRequest<Output: Decodable>(
+        url: URLConvertible,
+        method: HTTPMethod,
+        parameters: Parameters?,
+        encoding: ParameterEncoding
+    ) async throws -> Output
+    
+    func sendRequest(
+        url: URLConvertible,
+        method: HTTPMethod,
+        parameters: Parameters?
+    ) async throws -> Data
+    
+    func sendRequest(
+        url: URLConvertible,
+        method: HTTPMethod,
+        parameters: Parameters?,
+        encoding: ParameterEncoding
+    ) async throws -> Data
+    
     // MARK: - Peers
     
     func getNodeVersion(url: URL, completion: @escaping (ApiServiceResult<NodeVersion>) -> Void)
@@ -144,31 +72,100 @@ protocol ApiService: AnyObject {
     
     func getAccount(byPassphrase passphrase: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void)
     func getAccount(byPublicKey publicKey: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void)
-    func getAccount(byAddress address: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void)
+    
+    func getAccount(byPublicKey publicKey: String) async throws -> AdamantAccount
+    
+    func getAccount(
+        byAddress address: String,
+        completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void
+    )
+    
+    func getAccount(byAddress address: String) async throws -> AdamantAccount
     
     // MARK: - Keys
     
-    func getPublicKey(byAddress address: String, completion: @escaping (ApiServiceResult<String>) -> Void)
+    func getPublicKey(
+        byAddress address: String,
+        completion: @escaping (ApiServiceResult<String>) -> Void
+    )
     
     // MARK: - Transactions
     
     func getTransaction(id: UInt64, completion: @escaping (ApiServiceResult<Transaction>) -> Void)
-    func getTransactions(forAccount: String, type: TransactionType, fromHeight: Int64?, offset: Int?, limit: Int?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void)
+    
+    func getTransaction(id: UInt64) async throws -> Transaction
+    
+    func getTransactions(
+        forAccount: String,
+        type: TransactionType,
+        fromHeight: Int64?,
+        offset: Int?,
+        limit: Int?,
+        completion: @escaping (ApiServiceResult<[Transaction]>) -> Void
+    )
+    
+    func getTransactions(
+        forAccount: String,
+        type: TransactionType,
+        fromHeight: Int64?,
+        offset: Int?,
+        limit: Int?
+    ) async throws -> [Transaction]
     
     // MARK: - Chats Rooms
       
-      func getChatRooms(address: String, offset: Int?, completion: @escaping (ApiServiceResult<ChatRooms>) -> Void)
-      func getChatMessages(address: String, addressRecipient: String, offset: Int?, completion: @escaping (ApiServiceResult<ChatRooms>) -> Void)
+    func getChatRooms(
+        address: String,
+        offset: Int?,
+        completion: @escaping (ApiServiceResult<ChatRooms>) -> Void
+    )
+    
+    func getChatRooms(
+        address: String,
+        offset: Int?
+    ) async throws -> ChatRooms
+    
+    func getChatMessages(
+        address: String,
+        addressRecipient: String,
+        offset: Int?
+    ) async throws -> ChatRooms
 
     // MARK: - Funds
     
-    func transferFunds(sender: String, recipient: String, amount: Decimal, keypair: Keypair, completion: @escaping (ApiServiceResult<UInt64>) -> Void)
+    func transferFunds(
+        sender: String,
+        recipient: String,
+        amount: Decimal,
+        keypair: Keypair,
+        completion: @escaping (ApiServiceResult<UInt64>) -> Void
+    )
+    
+    func transferFunds(
+        sender: String,
+        recipient: String,
+        amount: Decimal,
+        keypair: Keypair
+    ) async throws -> UInt64
     
     // MARK: - States
     
     /// - Returns: Transaction ID
-    func store(key: String, value: String, type: StateType, sender: String, keypair: Keypair, completion: @escaping (ApiServiceResult<UInt64>) -> Void)
+    func store(
+        key: String,
+        value: String,
+        type: StateType,
+        sender: String,
+        keypair: Keypair,
+        completion: @escaping (ApiServiceResult<UInt64>) -> Void
+    )
+    
     func get(key: String, sender: String, completion: @escaping (ApiServiceResult<String?>) -> Void)
+    
+    func get(
+        key: String,
+        sender: String
+    ) async throws -> String?
     
     // MARK: - Chats
     
@@ -177,23 +174,81 @@ protocol ApiService: AnyObject {
     /// - Parameters:
     ///   - address: Transactions for specified account
     ///   - height: From this height. Minimal value is 1.
-    func getMessageTransactions(address: String, height: Int64?, offset: Int?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void)
+    func getMessageTransactions(
+        address: String,
+        height: Int64?,
+        offset: Int?,
+        completion: @escaping (ApiServiceResult<[Transaction]>) -> Void
+    )
+    
+    func getMessageTransactions(address: String,
+                                height: Int64?,
+                                offset: Int?
+    ) async throws -> [Transaction]
     
     /// Send text message
     ///   - completion: Contains processed transactionId, if success, or AdamantError, if fails.
-    func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, type: ChatType, nonce: String, amount: Decimal?, completion: @escaping (ApiServiceResult<UInt64>) -> Void)
+    ///   - Returns: Signed unregistered transaction
+    @discardableResult
+    func sendMessage(
+        senderId: String,
+        recipientId: String,
+        keypair: Keypair,
+        message: String,
+        type: ChatType,
+        nonce: String,
+        amount: Decimal?,
+        completion: @escaping (ApiServiceResult<UInt64>) -> Void
+    ) -> UnregisteredTransaction?
+    
+    func sendTransaction(
+        path: String,
+        transaction: UnregisteredTransaction,
+        completion: @escaping (ApiServiceResult<TransactionIdResponse>) -> Void
+    )
+    
+    func createSendTransaction(
+        senderId: String,
+        recipientId: String,
+        keypair: Keypair,
+        message: String,
+        type: ChatType,
+        nonce: String,
+        amount: Decimal?
+    ) -> UnregisteredTransaction?
 
+    func sendTransaction(
+        transaction: UnregisteredTransaction
+    ) async throws -> UInt64
+    
     // MARK: - Delegates
     
     /// Get delegates
     func getDelegates(limit: Int, completion: @escaping (ApiServiceResult<[Delegate]>) -> Void)
-    func getDelegatesWithVotes(for address: String, limit: Int, completion: @escaping (ApiServiceResult<[Delegate]>) -> Void)
+    
+    func getDelegatesWithVotes(
+        for address: String,
+        limit: Int,
+        completion: @escaping (ApiServiceResult<[Delegate]>) -> Void
+    )
     
     /// Get delegate forge details
-    func getForgedByAccount(publicKey: String, completion: @escaping (ApiServiceResult<DelegateForgeDetails>) -> Void)
+    func getForgedByAccount(
+        publicKey: String,
+        completion: @escaping (ApiServiceResult<DelegateForgeDetails>) -> Void
+    )
+    
     /// Get delegate forgeing time
-    func getForgingTime(for delegate: Delegate, completion: @escaping (ApiServiceResult<Int>) -> Void)
+    func getForgingTime(
+        for delegate: Delegate,
+        completion: @escaping (ApiServiceResult<Int>) -> Void
+    )
     
     /// Send vote transaction for delegates
-    func voteForDelegates(from address: String, keypair: Keypair, votes: [DelegateVote], completion: @escaping (ApiServiceResult<UInt64>) -> Void)
+    func voteForDelegates(
+        from address: String,
+        keypair: Keypair,
+        votes: [DelegateVote],
+        completion: @escaping (ApiServiceResult<UInt64>) -> Void
+    )
 }

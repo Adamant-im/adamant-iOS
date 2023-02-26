@@ -27,51 +27,28 @@ extension AdamantApiService {
             self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
         }
         
-        // MARK: 1. Create and sign transaction
-        let asset = TransactionAsset(state: StateAsset(key: key, value: value, type: .keyValue))
-        let transaction = NormalizedTransaction(type: .state,
-                                                amount: 0,
-                                                senderPublicKey: keypair.publicKey,
-                                                requesterPublicKey: nil,
-                                                date: Date(),
-                                                recipientId: nil,
-                                                asset: asset)
-        guard let signature = adamantCore.sign(transaction: transaction, senderId: sender, keypair: keypair) else {
+        // MARK: Create and sign transaction
+        let transaction = NormalizedTransaction(
+            type: .state,
+            amount: .zero,
+            senderPublicKey: keypair.publicKey,
+            requesterPublicKey: nil,
+            date: Date(),
+            recipientId: nil,
+            asset: TransactionAsset(state: StateAsset(key: key, value: value, type: .keyValue))
+        )
+        
+        guard let transaction = adamantCore.makeSignedTransaction(
+            transaction: transaction,
+            senderId: sender,
+            keypair: keypair
+        ) else {
             completion(.failure(.internalError(message: "Failed to sign transaction", error: nil)))
             return
         }
         
-        let params: [String: Any] = [
-            "transaction": [
-                "type": transaction.type.rawValue,
-                "amount": transaction.amount,
-                "senderPublicKey": transaction.senderPublicKey,
-                "senderId": sender,
-                "timestamp": transaction.timestamp,
-                "signature": signature,
-                "recipientId": NSNull(),
-                "asset": [
-                    "state": [
-                        "key": key,
-                        "value": value,
-                        "type": type.rawValue
-                    ]
-                ]
-            ]
-        ]
-        
-        let headers = [
-            "Content-Type": "application/json"
-        ]
-        
-        // MARK: 2. Send
-        sendRequest(
-            path: ApiCommands.States.store,
-            method: .post,
-            parameters: params,
-            encoding: .json,
-            headers: headers
-        ) { (serverResponse: ApiServiceResult<TransactionIdResponse>) in
+        // MARK: Send
+        sendTransaction(path: ApiCommands.States.store, transaction: transaction) { [weak self] serverResponse in
             switch serverResponse {
             case .success(let response):
                 if let id = response.transactionId {
@@ -84,10 +61,9 @@ extension AdamantApiService {
                 completion(.failure(.networkError(error: error)))
             }
             
-            do {
-                UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
-                self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
-            }
+            guard let self = self else { return }
+            UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
+            self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
         }
     }
     
@@ -117,6 +93,23 @@ extension AdamantApiService {
                 
             case .failure(let error):
                 completion(.failure(.networkError(error: error)))
+            }
+        }
+    }
+    
+    func get(
+        key: String,
+        sender: String
+    ) async throws -> String? {
+        return try await withUnsafeThrowingContinuation {
+            (continuation: UnsafeContinuation<String?, Error>) in
+            get(key: key, sender: sender) { result in
+                switch result {
+                case .success(let data):
+                    continuation.resume(returning: data)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
             }
         }
     }

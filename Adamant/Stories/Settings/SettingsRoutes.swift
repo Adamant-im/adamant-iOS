@@ -49,6 +49,13 @@ extension AdamantScene {
             return c
         }
         
+        static let visibleWallets = AdamantScene(identifier: "VisibleWallets") { r in
+            VisibleWalletsViewController(
+                visibleWalletsService: r.resolve(VisibleWalletsService.self)!,
+                accountService: r.resolve(AccountService.self)!
+            )
+        }
+        
         private init() {}
     }
 }

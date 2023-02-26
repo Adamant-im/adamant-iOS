@@ -30,6 +30,26 @@ public class Chatroom: NSManagedObject {
         return nil
     }
     
+    func getName(addressBookService: AddressBookService) -> String? {
+        guard let partner = partner else { return nil }
+        let result: String?
+        
+        if let title = title {
+            result = title
+        } else if let name = partner.name {
+            result = name
+        } else if
+            let address = partner.address,
+            let name = addressBookService.addressBook[address]
+        {
+            result = name
+        } else {
+            result = partner.address
+        }
+        
+        return result?.checkAndReplaceSystemWallets()
+    }
+    
     private var semaphore: DispatchSemaphore?
     
     func updateLastTransaction() {
@@ -64,7 +84,52 @@ public class Chatroom: NSManagedObject {
                 case .orderedDescending:
                     return false
                     
-                /// Rare case of identical date, compare IDs
+                // Rare case of identical date, compare IDs
+                case .orderedSame:
+                    guard let lid = lhs.transactionId else {
+                        return true
+                    }
+                    
+                    guard let hid = rhs.transactionId else {
+                        return false
+                    }
+                    
+                    return lid < hid
+                }
+            }).last {
+                if newest != lastTransaction {
+                    lastTransaction = newest
+                    updatedAt = newest.date
+                }
+            } else if lastTransaction != nil {
+                lastTransaction = nil
+                updatedAt = nil
+            }
+        }
+    }
+    
+    @MainActor
+    func updateLastTransaction() async {
+        if let transactions = transactions?.filtered(
+            using: NSPredicate(format: "isHidden == false")
+        ) as? Set<ChatTransaction> {
+            if let newest = transactions.sorted(by: { (lhs: ChatTransaction, rhs: ChatTransaction) in
+                guard let l = lhs.date as Date? else {
+                    return true
+                }
+                
+                guard let r = rhs.date as Date? else {
+                    return false
+                }
+                
+                switch l.compare(r) {
+                case .orderedAscending:
+                    return true
+                    
+                case .orderedDescending:
+                    return false
+                    
+                // Rare case of identical date, compare IDs
                 case .orderedSame:
                     guard let lid = lhs.transactionId else {
                         return true

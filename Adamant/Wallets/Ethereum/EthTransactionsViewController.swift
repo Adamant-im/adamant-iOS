@@ -36,6 +36,7 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
     
     // MARK: - Overrides
     
+    @MainActor
     override func handleRefresh(_ refreshControl: UIRefreshControl) {
         self.emptyLabel.isHidden = true
         guard let address = ethWalletService.wallet?.address else {
@@ -43,25 +44,17 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
             return
         }
         
-        ethWalletService.getTransactionsHistory(address: address) { [weak self] result in
-            guard let vc = self else {
-                return
+        refreshTask = Task {
+            do {
+                transactions = try await ethWalletService.getTransactionsHistory(address: address)
+            } catch {
+                transactions = []
+                dialogService.showRichError(error: error)
             }
-
-            switch result {
-            case .success(let transactions):
-                vc.transactions = transactions
-
-            case .failure(let error):
-                vc.transactions = []
-                vc.dialogService.showRichError(error: error)
-            }
-
-            DispatchQueue.main.async {
-                vc.emptyLabel.isHidden = vc.transactions.count > 0
-                vc.tableView.reloadData()
-                vc.refreshControl.endRefreshing()
-            }
+            
+            emptyLabel.isHidden = transactions.count > 0
+            refreshControl.endRefreshing()
+            tableView.reloadData()
         }
     }
     
@@ -97,26 +90,24 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
         
         dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
         
-        ethWalletService.getTransaction(by: hash) { [weak self] result in
-            dialogService.dismissProgress()
-            
-            switch result {
-            case .success(let ethTransaction):
-                DispatchQueue.main.async {
-                    vc.transaction = ethTransaction
-                    
-                    if let address = address {
-                        if ethTransaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
-                            vc.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                        } else if ethTransaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
-                            vc.recipientName = String.adamantLocalized.transactionDetails.yourAddress
-                        }
+        detailTransactionTask = Task {
+            do {
+                let ethTransaction = try await ethWalletService.getTransaction(by: hash)
+                dialogService.dismissProgress()
+                
+                vc.transaction = ethTransaction
+                
+                if let address = address {
+                    if ethTransaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
+                        vc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+                    } else if ethTransaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
+                        vc.recipientName = String.adamantLocalized.transactionDetails.yourAddress
                     }
-                    
-                    self?.navigationController?.pushViewController(vc, animated: true)
                 }
                 
-            case .failure(let error):
+                navigationController?.pushViewController(vc, animated: true)
+            } catch {
+                dialogService.dismissProgress()
                 dialogService.showRichError(error: error)
             }
         }

@@ -148,15 +148,14 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     private var isFiatSet = false
     
+    var refreshTask: Task<(), Never>?
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .never // some glitches, again
-        }
-        
+        navigationItem.largeTitleDisplayMode = .never // some glitches, again
         navigationItem.title = String.adamantLocalized.transactionDetails.title
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(share))
         navigationOptions = RowNavigationOptions.Disabled
@@ -177,6 +176,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             } else {
                 $0.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
+            
+            $0.cell.detailTextLabel?.lineBreakMode = .byTruncatingMiddle
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
             cell.textLabel?.textColor = UIColor.adamant.textColor
@@ -215,6 +216,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             
             let height = self?.senderName != nil ? DoubleDetailsTableViewCell.fullHeight : DoubleDetailsTableViewCell.compactHeight
             $0.cell.height = { height }
+            $0.cell.secondDetailsLabel?.lineBreakMode = .byTruncatingMiddle
+            $0.cell.detailsLabel?.lineBreakMode = .byTruncatingMiddle
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
             cell.textLabel?.textColor = UIColor.adamant.textColor
@@ -269,6 +272,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             
             let height = self?.recipientName != nil ? DoubleDetailsTableViewCell.fullHeight : DoubleDetailsTableViewCell.compactHeight
             $0.cell.height = { height }
+            $0.cell.secondDetailsLabel?.lineBreakMode = .byTruncatingMiddle
+            $0.cell.detailsLabel?.lineBreakMode = .byTruncatingMiddle
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
             cell.textLabel?.textColor = UIColor.adamant.textColor
@@ -433,6 +438,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             } else {
                 $0.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
+            $0.cell.detailTextLabel?.lineBreakMode = .byTruncatingMiddle
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
             cell.textLabel?.textColor = UIColor.adamant.textColor
@@ -590,14 +596,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 return
             }
             
-            if #available(iOS 13.0, *) {
-                let safari = SFSafariViewController(url: url)
-                safari.preferredControlTintColor = UIColor.adamant.primary
-                safari.modalPresentationStyle = .overFullScreen
-                self?.present(safari, animated: true, completion: nil)
-            } else {
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
-            }
+            let safari = SFSafariViewController(url: url)
+            safari.preferredControlTintColor = UIColor.adamant.primary
+            safari.modalPresentationStyle = .overFullScreen
+            self?.present(safari, animated: true, completion: nil)
         }
         
         actionsSection.append(explorerRow)
@@ -608,6 +610,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
         self.updateFiat()
         
         setColors()
+    }
+    
+    deinit {
+        refreshTask?.cancel()
     }
     
     func updateFiat() {

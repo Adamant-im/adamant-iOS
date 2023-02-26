@@ -29,17 +29,7 @@ extension AdamantApiService {
             return nil
         }
         
-        let headers = [
-            "Content-Type": "application/json"
-        ]
-        
         // MARK: 2. Make request
-        return sendRequest(
-            url: endpoint,
-            method: .get,
-            encoding: .json,
-            headers: headers,
-            completion: completion
-        )
+        return sendRequest(url: endpoint, method: .get, completion: completion)
     }
 }

@@ -8,6 +8,8 @@
 
 import Foundation
 import MessageKit
+import UIKit
+import LiskKit
 
 extension LskWalletService: RichMessageProvider {
     
@@ -17,7 +19,8 @@ extension LskWalletService: RichMessageProvider {
     
     // MARK: Events
     
-    func richMessageTapped(for transaction: RichMessageTransaction, at indexPath: IndexPath, in chat: ChatViewController) {
+    @MainActor
+    func richMessageTapped(for transaction: RichMessageTransaction, in chat: ChatViewController) {
         // MARK: 0. Prepare
         guard let richContent = transaction.richContent,
             let hash = richContent[RichContentKeys.transfer.hash],
@@ -65,130 +68,105 @@ extension LskWalletService: RichMessageProvider {
         }
         
         // MARK: 2. Go go transaction
-        
-        getTransaction(by: hash) { [weak self] result in
-            guard let vc = self?.router.get(scene: AdamantScene.Wallets.Lisk.transactionDetails) as? LskTransactionDetailsViewController else {
+        Task {
+            do {
+                let transactionLisk = try await getTransaction(by: hash)
                 dialogService.dismissProgress()
-                return
-            }
-            
-            vc.service = self
-            vc.senderName = senderName
-            vc.recipientName = recipientName
-            vc.comment = comment
-            
-            switch result {
-            case .success(let transaction):
-                vc.transaction = transaction
-                DispatchQueue.main.async {
-                    dialogService.dismissProgress()
-                    chat.navigationController?.pushViewController(vc, animated: true)
-                }
                 
-            case .failure(let error):
-                switch error {
-                case .internalError(let message, _) where message.contains("does not exist"):
-                    var recipientAddress = ""
-                    var senderAddress = ""
-                    let group = DispatchGroup()
-                    group.enter()
-                    self?.getWalletAddress(byAdamantAddress: transaction.senderAddress) { result in
-                        guard case let .success(senderLskAddress) = result else {
-                            group.leave()
-                            return
-                        }
-                        senderAddress = senderLskAddress
-                        group.leave()
-                    }
-                    
-                    group.enter()
-                    self?.getWalletAddress(byAdamantAddress: transaction.recipientAddress) { result in
-                        guard case let .success(recipientLskAddress) = result else {
-                            group.leave()
-                            return
-                        }
-                        recipientAddress = recipientLskAddress
-                        group.leave()
-                    }
-                    
-                    group.notify(queue: .main) {
-                        dialogService.dismissProgress()
-                        self?.openEmptyTransactionDetail(hash: hash, vc: vc, senderAddress: senderAddress, recipientAddress: recipientAddress, transaction: transaction, in: chat)
-                    }
-
-                default:
-                    self?.dialogService.showRichError(error: error)
+                presentDetailTransactionVC(
+                    hash: hash,
+                    senderName: senderName,
+                    recipientName: recipientName,
+                    comment: comment,
+                    senderAddress: transactionLisk.senderAddress,
+                    recipientAddress: transactionLisk.recipientAddress,
+                    transaction: transactionLisk,
+                    richTransaction: transaction,
+                    in: chat
+                )
+                
+            } catch let error as ApiServiceError {
+                guard case let .internalError(message, _) = error,
+                      message.contains("does not exist")
+                else {
+                    dialogService.dismissProgress()
+                    dialogService.showRichError(error: error)
                     return
                 }
-                break
+                
+                do {
+                    let senderAddress = try await getWalletAddress(byAdamantAddress: transaction.senderAddress)
+                    let recipientAddress = try await getWalletAddress(byAdamantAddress: transaction.recipientAddress)
+                    
+                    dialogService.dismissProgress()
+                    
+                    presentDetailTransactionVC(
+                        hash: hash,
+                        senderName: senderName,
+                        recipientName: recipientName,
+                        comment: comment,
+                        senderAddress: senderAddress,
+                        recipientAddress: recipientAddress,
+                        transaction: nil,
+                        richTransaction: transaction,
+                        in: chat
+                    )
+                } catch {
+                    dialogService.dismissProgress()
+                    dialogService.showRichError(error: error)
+                }
+            } catch {
+                dialogService.dismissProgress()
+                dialogService.showRichError(error: error)
             }
         }
     }
     
-    func openEmptyTransactionDetail(hash: String, vc: LskTransactionDetailsViewController, senderAddress: String, recipientAddress: String, transaction: RichMessageTransaction, in chat: ChatViewController) {
+    private func presentDetailTransactionVC(
+        hash: String,
+        senderName: String?,
+        recipientName: String?,
+        comment: String?,
+        senderAddress: String,
+        recipientAddress: String,
+        transaction: Transactions.TransactionModel?,
+        richTransaction: RichMessageTransaction,
+        in chat: ChatViewController
+    ) {
+        guard let vc = router.get(scene: AdamantScene.Wallets.Lisk.transactionDetails) as? LskTransactionDetailsViewController else {
+            dialogService.dismissProgress()
+            return
+        }
+        
+        vc.service = self
+        vc.senderName = senderName
+        vc.recipientName = recipientName
+        vc.comment = comment
+        
         let amount: Decimal
-        if let amountRaw = transaction.richContent?[RichContentKeys.transfer.amount], let decimal = Decimal(string: amountRaw) {
+        if let amountRaw = richTransaction.richContent?[RichContentKeys.transfer.amount], let decimal = Decimal(string: amountRaw) {
             amount = decimal
         } else {
             amount = 0
         }
         
-        let failedTransaction = SimpleTransactionDetails(txId: hash,
-                                                         senderAddress: senderAddress,
-                                                         recipientAddress: recipientAddress,
-                                                         dateValue: nil,
-                                                         amountValue: amount,
-                                                         feeValue: nil,
-                                                         confirmationsValue: nil,
-                                                         blockValue: nil,
-                                                         isOutgoing: transaction.isOutgoing,
-                                                         transactionStatus: TransactionStatus.pending)
+        let failedTransaction = SimpleTransactionDetails(
+            txId: hash,
+            senderAddress: senderAddress,
+            recipientAddress: recipientAddress,
+            dateValue: nil,
+            amountValue: amount,
+            feeValue: nil,
+            confirmationsValue: nil,
+            blockValue: nil,
+            isOutgoing: richTransaction.isOutgoing,
+            transactionStatus: TransactionStatus.pending)
 
-        vc.transaction = failedTransaction
+        vc.transaction = transaction ?? failedTransaction
         chat.navigationController?.pushViewController(vc, animated: true)
     }
     
-    // MARK: Cells
-    
-    func cellSizeCalculator(for messagesCollectionViewFlowLayout: MessagesCollectionViewFlowLayout) -> CellSizeCalculator {
-        let calculator = TransferMessageSizeCalculator(layout: messagesCollectionViewFlowLayout)
-        calculator.font = UIFont.systemFont(ofSize: 24)
-        return calculator
-    }
-    
-    func cell(for message: MessageType, isFromCurrentSender: Bool, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell {
-        guard case .custom(let raw) = message.kind, let transfer = raw as? RichMessageTransfer else {
-            fatalError("LSK service tried to render wrong message kind: \(message.kind)")
-        }
-        
-        let cellIdentifier = isFromCurrentSender ? cellIdentifierSent : cellIdentifierReceived
-        guard let cell = messagesCollectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as? TransferCollectionViewCell else {
-            fatalError("Can't dequeue \(cellIdentifier) cell")
-        }
-        
-        cell.currencyLogoImageView.image = LskWalletService.currencyLogo
-        cell.currencySymbolLabel.text = LskWalletService.currencySymbol
-        
-        cell.amountLabel.text = AdamantBalanceFormat.full.format(transfer.amount)
-        cell.dateLabel.text = message.sentDate.humanizedDateTime(withWeekday: false)
-        cell.transactionStatus = (message as? RichMessageTransaction)?.transactionStatus
-        
-        cell.commentsLabel.text = transfer.comments
-        
-        if cell.isAlignedRight != isFromCurrentSender {
-            cell.isAlignedRight = isFromCurrentSender
-        }
-        
-        cell.isFromCurrentSender = isFromCurrentSender
-        
-        return cell
-    }
-    
     // MARK: Short description
-    
-    private static var formatter: NumberFormatter = {
-        return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: currencySymbol)
-    }()
     
     func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString {
         let amount: String

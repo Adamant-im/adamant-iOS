@@ -9,8 +9,7 @@
 import Foundation
 import CoreData
 
-enum AccountsProviderResult {
-    case success(CoreDataAccount)
+enum AccountsProviderError: Error {
     case dummy(DummyAccount)
     case notFound(address: String)
     case invalidAddress(address: String)
@@ -20,7 +19,7 @@ enum AccountsProviderResult {
     
     var localized: String {
         switch self {
-        case .success, .dummy:
+        case .dummy:
             return ""
             
         case .notFound(let address):
@@ -33,7 +32,8 @@ enum AccountsProviderResult {
             return String.adamantLocalized.sharedErrors.accountNotInitiated
             
         case .serverError(let error):
-            return ApiServiceError.serverError(error: error.localizedDescription).localized
+            return ApiServiceError.serverError(error: error.localizedDescription)
+                .localizedDescription
             
         case .networkError:
             return String.adamantLocalized.sharedErrors.networkError
@@ -41,24 +41,23 @@ enum AccountsProviderResult {
     }
 }
 
-enum AccountsProviderDummyAccountResult {
-    case success(DummyAccount)
+enum AccountsProviderDummyAccountError: Error {
     case foundRealAccount(CoreDataAccount)
     case invalidAddress(address: String)
     case internalError(Error)
 }
 
-protocol AccountsProvider {
+protocol AccountsProvider: Actor {
     
     /// Search for fetched account, if not found, asks server for account.
     ///
     /// - Returns: Account, if found, created in main viewContext
-    func getAccount(byAddress address: String, completion: @escaping (AccountsProviderResult) -> Void)
+    func getAccount(byAddress address: String) async throws -> CoreDataAccount
     
     /// Search for fetched account, if not found try to create or asks server for account.
     ///
     /// - Returns: Account, if found, created in main viewContext
-    func getAccount(byAddress address: String, publicKey: String, completion: @escaping (AccountsProviderResult) -> Void)
+    func getAccount(byAddress address: String, publicKey: String) async throws -> CoreDataAccount
     
     /* That one bugged. Will be fixed later. Maybe. */
     /// Search for fetched account, if not found, asks server for account.
@@ -67,10 +66,10 @@ protocol AccountsProvider {
 //    func getAccount(byPublicKey publicKey: String, completion: @escaping (AccountsProviderResult) -> Void)
     
     /// Check locally if has account with specified address
-    func hasAccount(address: String, completion: @escaping (Bool) -> Void)
+    func hasAccount(address: String) -> Bool
     
     /// Request Dummy account, if account wasn't found or initiated
-    func getDummyAccount(for address: String, completion: @escaping (AccountsProviderDummyAccountResult) -> Void)
+    func getDummyAccount(for address: String) async throws -> DummyAccount
 }
 
 // MARK: - Known contacts

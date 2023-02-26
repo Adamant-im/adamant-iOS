@@ -373,6 +373,12 @@
 /* Delegates page: scene title */
 "Delegates.Title" = "Delegierte";
 
+/* Visible Wallets page: scene title */
+"VisibleWallets.Title" = "Wallet-Liste";
+
+/* VisibleWallets: Reset wallets alert title */
+"VisibleWallets.ResetListAlert" = "Brieftaschenliste auf Standard zurücksetzen?";
+
 /* Delegates tab: Message about 50 ADM fee for vote */
 "Delegates.NotEnoughtTokensForVote" = "Nicht genug Tokens für die Abstimmung. Sie brauchen mindestens 50 ADM auf Ihrem Konto";
 
@@ -685,6 +691,9 @@
 /* Notifications: User has disabled notifications. Head him into settings */
 "NotificationsService.NotificationsDisabled" = "Benachrichtigungen deaktiviert. Sie können Benachrichtigungen in den Einstellungen aktivieren";
 
+/* Notifications: Not stayed logged in */
+"NotificationsService.NotStayedLoggedIn" = "Can't turn on notifications without staying logged in";
+
 /* Pinpad: Ask user to create new pin */
 "Pinpad.EnterNewPin" = "Neue PIN eingeben";
 
@@ -756,6 +765,12 @@
 
 /* Shared alert 'Copy' button. Used anywhere. Used for copy-paste info. */
 "Shared.CopyToPasteboard" = "Kopieren";
+
+/* Shared alert 'Chat With' button. Used to chat with recipient */
+"Shared.ChatWith" = "Plaudern mit ";
+
+/* Shared alert 'Send ADM To' button. Used to send ADM to recipient */
+"Shared.SendAdmTo" = "Senden Sie ADM an ";
 
 /* Shared alert Done message. Used anywhere */
 "Shared.Done" = "Fertig";

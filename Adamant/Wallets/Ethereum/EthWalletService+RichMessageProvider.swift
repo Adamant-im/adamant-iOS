@@ -8,6 +8,7 @@
 
 import Foundation
 import MessageKit
+import UIKit
 
 extension EthWalletService: RichMessageProvider {
     
@@ -17,7 +18,8 @@ extension EthWalletService: RichMessageProvider {
     
     // MARK: Events
     
-    func richMessageTapped(for transaction: RichMessageTransaction, at indexPath: IndexPath, in chat: ChatViewController) {
+    @MainActor
+    func richMessageTapped(for transaction: RichMessageTransaction, in chat: ChatViewController) {
         // MARK: 0. Prepare
         guard let richContent = transaction.richContent,
             let hash = richContent[RichContentKeys.transfer.hash],
@@ -39,7 +41,7 @@ extension EthWalletService: RichMessageProvider {
         let senderName: String?
         let recipientName: String?
         
-        if let address = accountService.account?.address {
+        if let address = accountService?.account?.address {
             if let senderId = transaction.senderId, senderId.caseInsensitiveCompare(address) == .orderedSame {
                 senderName = String.adamantLocalized.transactionDetails.yourAddress
             } else {
@@ -64,11 +66,10 @@ extension EthWalletService: RichMessageProvider {
             recipientName = nil
         }
         
-        // MARK: 2. Go go transaction
+        // MARK: 2. Go to transaction
         
-        getTransaction(by: hash) { [weak self] result in
-            dialogService.dismissProgress()
-            guard let vc = self?.router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? EthTransactionDetailsViewController else {
+        Task {
+            guard let vc = router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? EthTransactionDetailsViewController else {
                 return
             }
             
@@ -77,11 +78,10 @@ extension EthWalletService: RichMessageProvider {
             vc.recipientName = recipientName
             vc.comment = comment
             
-            switch result {
-            case .success(let ethTransaction):
+            do {
+                let ethTransaction = try await getTransaction(by: hash)
                 vc.transaction = ethTransaction
-                
-            case .failure(let error):
+            } catch let error as WalletServiceError {
                 switch error {
                 case .remoteServiceError:
                     let amount: Decimal
@@ -105,58 +105,19 @@ extension EthWalletService: RichMessageProvider {
                     vc.transaction = failedTransaction
                     
                 default:
-                    self?.dialogService.showRichError(error: error)
-                    return
+                    dialogService.showRichError(error: error)
                 }
+            } catch {
+                dialogService.showRichError(error: error)
             }
             
-            DispatchQueue.main.async {
-                chat.navigationController?.pushViewController(vc, animated: true)
-            }
+            dialogService.dismissProgress()
+            
+            chat.navigationController?.pushViewController(vc, animated: true)
         }
-    }
-    
-    // MARK: Cells
-    
-    func cellSizeCalculator(for messagesCollectionViewFlowLayout: MessagesCollectionViewFlowLayout) -> CellSizeCalculator {
-        let calculator = TransferMessageSizeCalculator(layout: messagesCollectionViewFlowLayout)
-        calculator.font = UIFont.systemFont(ofSize: 24)
-        return calculator
-    }
-    
-    func cell(for message: MessageType, isFromCurrentSender: Bool, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell {
-        guard case .custom(let raw) = message.kind, let transfer = raw as? RichMessageTransfer else {
-            fatalError("ETH service tried to render wrong message kind: \(message.kind)")
-        }
-        
-        let cellIdentifier = isFromCurrentSender ? cellIdentifierSent : cellIdentifierReceived
-        guard let cell = messagesCollectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as? TransferCollectionViewCell else {
-            fatalError("Can't dequeue \(cellIdentifier) cell")
-        }
-        
-        cell.currencyLogoImageView.image = EthWalletService.currencyLogo
-        cell.currencySymbolLabel.text = EthWalletService.currencySymbol
-        
-        cell.amountLabel.text = AdamantBalanceFormat.full.format(transfer.amount)
-        cell.dateLabel.text = message.sentDate.humanizedDateTime(withWeekday: false)
-        cell.transactionStatus = (message as? RichMessageTransaction)?.transactionStatus
-        
-        cell.commentsLabel.text = transfer.comments
-        
-        if cell.isAlignedRight != isFromCurrentSender {
-            cell.isAlignedRight = isFromCurrentSender
-        }
-        
-        cell.isFromCurrentSender = isFromCurrentSender
-        
-        return cell
     }
     
     // MARK: Short description
-    
-    private static var formatter: NumberFormatter = {
-        return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: currencySymbol)
-    }()
     
     func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString {
         let amount: String

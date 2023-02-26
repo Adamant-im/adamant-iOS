@@ -367,6 +367,12 @@
 /* Delegates page: scene title */
 "Delegates.Title" = "Delegates";
 
+/* Visible Wallets page: scene title */
+"VisibleWallets.Title" = "Wallet list";
+
+/* VisibleWallets: Reset wallets alert title */
+"VisibleWallets.ResetListAlert" = "Reset wallet list to default?";
+
 /* Delegates tab: Message about 50 ADM fee for vote */
 "Delegates.NotEnoughtTokensForVote" = "Not enought tokens to vote. You need 50 ADM";
 
@@ -542,7 +548,7 @@
 "NewChatScene.NotInitialized.HelpButton" = "What does it mean?";
 
 /* NodesList: Button label */
-"NodesList.NodesList" = "Nodes list";
+"NodesList.NodesList" = "Node list";
 
 /* NodesList: scene title */
 "NodesList.Title" = "List of nodes";
@@ -676,6 +682,9 @@
 /* Notifications: User has disabled notifications. Head him into settings */
 "NotificationsService.NotificationsDisabled" = "Notifications disabled. You can enable notifications in Settings";
 
+/* Notifications: Not stayed logged in */
+"NotificationsService.NotStayedLoggedIn" = "Can't turn on notifications without staying logged in";
+
 /* Pinpad: Ask user to create new pin */
 "Pinpad.EnterNewPin" = "Enter new PIN code";
 
@@ -744,6 +753,12 @@
 
 /* Shared alert 'Copy' button. Used anywhere. Used for copy-paste info. */
 "Shared.CopyToPasteboard" = "Copy to Pasteboard";
+
+/* Shared alert 'Chat With' button. Used to chat with recipient */
+"Shared.ChatWith" = "Chat with ";
+
+/* Shared alert 'Send ADM To' button. Used to send ADM to recipient */
+"Shared.SendAdmTo" = "Send ADM to ";
 
 /* Shared alert Done message. Used anywhere */
 "Shared.Done" = "Done";

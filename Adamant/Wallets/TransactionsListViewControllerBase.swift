@@ -27,11 +27,15 @@ class TransactionsListViewControllerBase: UIViewController {
     
     internal lazy var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
+        refreshControl.tintColor = .adamant.primary
         refreshControl.addTarget(self, action:
             #selector(self.handleRefresh(_:)),
                                  for: UIControl.Event.valueChanged)
         return refreshControl
     }()
+    
+    var refreshTask: Task<(), Error>?
+    var detailTransactionTask: Task<(), Never>?
     
     // MARK: - IBOutlets
     @IBOutlet weak var tableView: UITableView!
@@ -41,11 +45,8 @@ class TransactionsListViewControllerBase: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .never
-        }
-        
+
+        navigationItem.largeTitleDisplayMode = .never
         navigationItem.title = String.adamantLocalized.transactionList.title
         emptyLabel.text = String.adamantLocalized.transactionList.noTransactionYet
         
@@ -84,6 +85,11 @@ class TransactionsListViewControllerBase: UIViewController {
         if tableView.isEditing {
             tableView.setEditing(false, animated: false)
         }
+    }
+    
+    deinit {
+        detailTransactionTask?.cancel()
+        refreshTask?.cancel()
     }
     
     // MARK: - Other
@@ -150,6 +156,7 @@ extension TransactionsListViewControllerBase: UITableViewDataSource, UITableView
         if let partnerName = partnerName {
             cell.accountLabel.text = partnerName
             cell.addressLabel.text = partnerId
+            cell.addressLabel.lineBreakMode = .byTruncatingMiddle
             
             if cell.addressLabel.isHidden {
                 cell.addressLabel.isHidden = false

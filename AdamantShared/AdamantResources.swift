@@ -10,49 +10,7 @@ import Foundation
 
 struct AdamantResources {
     static let coreDataModel = Bundle.main.url(forResource: "Adamant", withExtension: "momd")!
-    
-    // MARK: Nodes
-    
-    static var nodes: [Node] {
-        [
-            Node(scheme: .https, host: "endless.adamant.im", port: nil),
-            Node(scheme: .https, host: "clown.adamant.im", port: nil),
-            Node(scheme: .https, host: "lake.adamant.im", port: nil),
-            Node(scheme: .https, host: "debate.adamant.im", port: nil),
-            Node(scheme: .https, host: "bid.adamant.im", port: nil),
-            Node(scheme: .https, host: "unusual.adamant.im", port: nil),
-            Node(scheme: .http, host: "23.226.231.225", port: 36666)
-//            Node(scheme: .http, host: "80.211.177.181", port: 36666),
-//            Node(scheme: .http, host: "80.211.177.181", port: nil), // Bugged one
-//            Node(scheme: .http, host: "163.172.132.38", port: 36667) // Testnet
-        ]
-    }
-    
-    static let ethServers = [
-        "https://ethnode1.adamant.im/"
-//        "https://ropsten.infura.io/"  // test network
-    ]
-    
-    static let lskServers = [
-        "https://lisknode3.adamant.im"
-    ]
-    
-    static let lskServiceServers = [
-        "https://liskservice3.adamant.im"
-    ]
-
-    static let btcServers: [URL] = [
-        URL(string: "https://btcnode2.adamant.im")!
-    ]
-    
-    static let dogeServers: [URL] = [
-        URL(string: "https://dogenode1.adamant.im/api")!
-    ]
-    
-    static let dashServers: [URL] = [
-        URL(string: "https://dashnode1.adamant.im/")!
-    ]
-    
+   
     static let coinsInfoSrvice = "https://info.adamant.im"
     
     // MARK: ADAMANT Addresses
@@ -89,22 +47,6 @@ struct AdamantResources {
         
         private init() {}
     }
-    
-    // MARK: Explorers
-    // MARK: ADM
-    static let adamantExplorerAddress = "https://explorer.adamant.im/tx/"
-    
-    // MARK: ETH
-    static let ethereumExplorerAddress = "https://etherscan.io/tx/"
-    //    static let ethereumExplorerAddress = "https://ropsten.etherscan.io/tx/" // Testnet
-    
-    // MARK: LSK
-    static let liskExplorerAddress = "https://liskscan.com/transaction/"
-    
-    static let dogeExplorerAddress = "https://dogechain.info/tx/"
-    static let dashExplorerAddress = "https://dashblockexplorer.com/tx/"
 
-    static let btcExplorerAddress = "https://btc.com/btc/transaction/"
-    
     private init() {}
 }

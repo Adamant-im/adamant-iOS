@@ -18,12 +18,7 @@ class AdamantAuthentication: LocalAuthentication {
         if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
             available = true
         } else if let errorCode = error?.code {
-            let lockoutCode: Int
-            if #available(iOS 11.0, *) {
-                lockoutCode = LAError.biometryLockout.rawValue
-            } else {
-                lockoutCode = LAError.touchIDLockout.rawValue
-            }
+            let lockoutCode = LAError.biometryLockout.rawValue
             
             if errorCode == lockoutCode {
                 available = true
@@ -35,21 +30,17 @@ class AdamantAuthentication: LocalAuthentication {
         }
         
         if available {
-            if #available(iOS 11.0, *) {
-                switch context.biometryType {
-                case .none:
-                    return .none
-                    
-                case .touchID:
-                    return .touchID
-                    
-                case .faceID:
-                    return .faceID
-                @unknown default:
-                    return .none
-                }
-            } else {
+            switch context.biometryType {
+            case .none:
+                return .none
+                
+            case .touchID:
                 return .touchID
+                
+            case .faceID:
+                return .faceID
+            @unknown default:
+                return .none
             }
         } else {
             return .none
@@ -79,13 +70,7 @@ class AdamantAuthentication: LocalAuthentication {
                 return
             }
             
-            let tryDeviceOwner: Bool
-            
-            if #available(iOS 11.0, *) {
-                tryDeviceOwner = error.code == LAError.biometryLockout
-            } else {
-                tryDeviceOwner = error.code == LAError.touchIDLockout
-            }
+            let tryDeviceOwner = error.code == LAError.biometryLockout
             
             if tryDeviceOwner {
                 context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { (success, error) in

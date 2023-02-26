@@ -53,45 +53,44 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
     
     // MARK: - Overrides
     
+    @MainActor
     override func reloadData() {
-        controller = transfersProvider.transfersController()
-        controller!.delegate = self
-        
-        do {
-            try controller?.performFetch()
-        } catch {
-            dialogService.showError(withMessage: "Failed to get transactions. Please, report a bug", error: error)
-            controller = nil
-        }
-        
-        DispatchQueue.onMainAsync {
+        Task {
+            controller = await transfersProvider.transfersController()
+            controller!.delegate = self
+            
+            do {
+                try controller?.performFetch()
+            } catch {
+                dialogService.showError(withMessage: "Failed to get transactions. Please, report a bug", error: error)
+                controller = nil
+            }
+            
             self.tableView.reloadData()
         }
     }
     
+    @MainActor
     override func handleRefresh(_ refreshControl: UIRefreshControl) {
-        self.emptyLabel.isHidden = true
-        self.transfersProvider.update { [weak self] (result) in
+        refreshTask = Task {
+            self.emptyLabel.isHidden = true
+            
+            let result = await self.transfersProvider.update()
+            
             guard let result = result else {
-                DispatchQueue.main.async {
-                    refreshControl.endRefreshing()
-                }
+                refreshControl.endRefreshing()
                 return
             }
             
             switch result {
             case .success:
-                DispatchQueue.main.async {
-                    refreshControl.endRefreshing()
-                    self?.tableView.reloadData()
-                }
+                refreshControl.endRefreshing()
+                tableView.reloadData()
                 
             case .failure(let error):
-                DispatchQueue.main.async {
-                    refreshControl.endRefreshing()
-                }
+                refreshControl.endRefreshing()
                 
-                self?.dialogService.showRichError(error: error)
+                dialogService.showRichError(error: error)
             }
         }
     }
@@ -222,9 +221,13 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
                 return
             }
             
-            vc.account = account
-            vc.chatroom = chatroom
             vc.hidesBottomBarWhenPushed = true
+            vc.viewModel.setup(
+                account: account,
+                chatroom: chatroom,
+                messageToShow: nil,
+                preservationDelegate: nil
+            )
             
             if let nav = self.navigationController {
                 nav.pushViewController(vc, animated: true)
@@ -269,9 +272,13 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
                 return
             }
             
-            vc.account = account
-            vc.chatroom = chatroom
             vc.hidesBottomBarWhenPushed = true
+            vc.viewModel.setup(
+                account: account,
+                chatroom: chatroom,
+                messageToShow: nil,
+                preservationDelegate: nil
+            )
             
             if let nav = self.navigationController {
                 nav.pushViewController(vc, animated: true)

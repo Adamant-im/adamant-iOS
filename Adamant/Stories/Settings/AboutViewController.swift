@@ -126,10 +126,7 @@ class AboutViewController: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .always
-        }
-        
+        navigationItem.largeTitleDisplayMode = .always
         navigationItem.title = String.adamantLocalized.about.title
         
         // MARK: Header & Footer
@@ -217,41 +214,7 @@ class AboutViewController: FormViewController {
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
         }.onCellSelection { [weak self] (_, _) in
-            guard let accountsProvider = self?.accountsProvider, let router = self?.router else {
-                return
-            }
-            
-            let dialogService = self?.dialogService
-            dialogService?.showProgress(withMessage: nil, userInteractionEnable: false)
-            
-            accountsProvider.getAccount(byAddress: AdamantContacts.iosSupport.address) { result in
-                switch result {
-                case .success(let account):
-                    DispatchQueue.main.async {
-                        guard let chatroom = account.chatroom,
-                            let nav = self?.navigationController,
-                            let account = self?.accountService.account,
-                            let chat = router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
-                                return
-                        }
-                        
-                        chat.account = account
-                        chat.hidesBottomBarWhenPushed = true
-                        chat.chatroom = chatroom
-                        chat.delegate = self
-                        
-                        nav.pushViewController(chat, animated: true)
-                        
-                        dialogService?.dismissProgress()
-                    }
-                    
-                case .invalidAddress, .notFound, .notInitiated, .networkError, .dummy:
-                    dialogService?.showWarning(withMessage: String.adamantLocalized.sharedErrors.networkError)
-                    
-                case .serverError(let error):
-                    dialogService?.showError(withMessage: String.adamantLocalized.sharedErrors.remoteServerError(message: error.localizedDescription), error: error)
-                }
-            }
+            self?.contactUsAction()
         }
             
         // E-mail
@@ -327,6 +290,58 @@ class AboutViewController: FormViewController {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
     }
+    
+    @MainActor
+    private func contactUsAction() {
+        Task {
+            dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
+
+            do {
+                let account = try await accountsProvider.getAccount(byAddress: AdamantContacts.iosSupport.address)
+
+                guard let chatroom = account.chatroom,
+                      let nav = self.navigationController,
+                      let account = self.accountService.account,
+                      let chat = router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
+                    return
+                }
+
+                chat.hidesBottomBarWhenPushed = true
+                chat.viewModel.setup(
+                    account: account,
+                    chatroom: chatroom,
+                    messageToShow: nil,
+                    preservationDelegate: self
+                )
+
+                nav.pushViewController(chat, animated: true)
+
+                dialogService.dismissProgress()
+            } catch let error as AccountsProviderError {
+                switch error {
+                case .invalidAddress, .notFound, .notInitiated, .networkError, .dummy:
+                    dialogService.showWarning(withMessage: String.adamantLocalized.sharedErrors.networkError)
+
+                case .serverError(let error):
+                    dialogService.showError(
+                        withMessage:
+                            String.adamantLocalized.sharedErrors.remoteServerError(
+                                message: error.localizedDescription
+                            ),
+                        error: error
+                    )
+                }
+            } catch {
+                dialogService.showError(
+                    withMessage:
+                        String.adamantLocalized.sharedErrors.remoteServerError(
+                            message: error.localizedDescription
+                        ),
+                    error: error
+                )
+            }
+        }
+    }
 }
 
 // MARK: - Tools
@@ -364,11 +379,12 @@ extension AboutViewController: MFMailComposeViewControllerDelegate {
 }
 
 // MARK: - ChatViewControllerDelegate
-extension AboutViewController: ChatViewControllerDelegate {
+
+extension AboutViewController: ChatPreservationDelegate {
     func preserveMessage(_ message: String, forAddress address: String) {
         storedIOSSupportMessage = message
     }
-    
+
     func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String? {
         if thenRemoveIt {
             let message = storedIOSSupportMessage

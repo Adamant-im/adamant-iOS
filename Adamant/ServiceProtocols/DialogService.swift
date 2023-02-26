@@ -15,6 +15,20 @@ extension String.adamantLocalized.alert {
     static let saveToPhotolibrary = NSLocalizedString("Shared.SaveToPhotolibrary", comment: "Shared alert 'Save to Photos'. Used with saving images to photolibrary")
 }
 
+enum AddressChatShareType {
+     case chat
+     case send
+
+     var localized: String {
+         switch self {
+         case .chat:
+             return NSLocalizedString("Shared.ChatWith", comment: "Shared alert 'Chat With' button. Used to chat with recipient")
+         case .send:
+             return NSLocalizedString("Shared.SendAdmTo", comment: "Shared alert 'Send ADM To' button. Used to send ADM to recipient")
+         }
+     }
+ }
+
 enum ShareType {
     case copyToPasteboard
     case share
@@ -59,7 +73,7 @@ enum ShareContentType {
                                                     .airDrop,
                                                     .openInIBooks]
             
-            if #available(iOS 11.0, *) { types.append(.markupAsPDF) }
+            types.append(.markupAsPDF)
             return types
             
         case .address:
@@ -91,6 +105,7 @@ struct AdamantAlertAction {
 }
 
 protocol DialogService: AnyObject {
+    func setup(window: UIWindow)
     
     func getTopmostViewController() -> UIViewController?
     
@@ -109,6 +124,7 @@ protocol DialogService: AnyObject {
     func showWarning(withMessage: String)
     func showError(withMessage: String, error: Error?)
     func showRichError(error: RichError)
+    func showRichError(error: Error)
     func showNoConnectionNotification()
     func dissmisNoConnectionNotification()
     
@@ -117,6 +133,7 @@ protocol DialogService: AnyObject {
     func dismissNotification()
     
     // MARK: - ActivityControllers
+    func presentShareAlertFor(adm: String, name: String, types: [AddressChatShareType], animated: Bool, from: UIView?, completion: (() -> Void)?, didSelect: ((AddressChatShareType) -> Void)?)
     func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?)
     func presentShareAlertFor(stringForPasteboard: String, stringForShare: String, stringForQR: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?)
     func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIBarButtonItem?, completion: (() -> Void)?)

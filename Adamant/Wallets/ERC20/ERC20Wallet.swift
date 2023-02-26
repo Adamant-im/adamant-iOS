@@ -8,6 +8,7 @@
 
 import Foundation
 import web3swift
+import Web3Core
 
 class ERC20Wallet: WalletAccount {
     let address: String

@@ -9,7 +9,6 @@
 
 import Foundation
 import CoreData
-import MessageKit
 
 @objc(RichMessageTransaction)
 public class RichMessageTransaction: ChatTransaction {
@@ -40,5 +39,8 @@ public class RichMessageTransaction: ChatTransaction {
         }
     }
     
-    public var kind: MessageKind = .text("?")
+    var transfer: RichMessageTransfer? {
+        guard let richContent = richContent else { return nil }
+        return .init(content: richContent)
+    }
 }

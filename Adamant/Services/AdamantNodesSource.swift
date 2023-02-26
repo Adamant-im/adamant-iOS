@@ -11,21 +11,9 @@ import Foundation
 class AdamantNodesSource: NodesSource {
     // MARK: - Dependencies
     
-    var apiService: ApiService!
-    
-    var healthCheckService: HealthCheckService! {
-        didSet {
-            healthCheckService.delegate = self
-            healthCheckService.nodes = nodes
-            setHealthCheckTimer()
-        }
-    }
-    
-    var securedStore: SecuredStore! {
-        didSet {
-            loadNodes()
-        }
-    }
+    private let apiService: ApiService
+    private let healthCheckService: HealthCheckService
+    private let securedStore: SecuredStore
     
     // MARK: - Properties
     
@@ -50,7 +38,15 @@ class AdamantNodesSource: NodesSource {
     
     // MARK: - Ctor
     
-    init(defaultNodesGetter: @escaping () -> [Node]) {
+    init(
+        apiService: ApiService,
+        healthCheckService: HealthCheckService,
+        securedStore: SecuredStore,
+        defaultNodesGetter: @escaping () -> [Node]
+    ) {
+        self.apiService = apiService
+        self.healthCheckService = healthCheckService
+        self.securedStore = securedStore
         self.defaultNodesGetter = defaultNodesGetter
         
         NotificationCenter.default.addObserver(
@@ -61,16 +57,21 @@ class AdamantNodesSource: NodesSource {
             self?.healthCheck()
         }
         
-        guard
-            let preferTheFastestNode = UserDefaults.standard.object(
-                forKey: UserDefaults.NodesSource.preferTheFastestNodeKey
-            ) as? Bool
-        else {
+        let savedPreferTheFastestNode = UserDefaults.standard.object(
+            forKey: UserDefaults.NodesSource.preferTheFastestNodeKey
+        ) as? Bool
+        
+        let preferTheFastestNode = savedPreferTheFastestNode ?? preferTheFastestNodeDefault
+        
+        if savedPreferTheFastestNode == nil {
             savePreferTheFastestNode(preferTheFastestNodeDefault)
-            return
         }
         
         self.preferTheFastestNode = preferTheFastestNode
+        healthCheckService.delegate = self
+        healthCheckService.nodes = nodes
+        setHealthCheckTimer()
+        loadNodes()
     }
     
     deinit {
@@ -115,30 +116,11 @@ class AdamantNodesSource: NodesSource {
     }
     
     private func saveNodes() {
-        do {
-            let data = try JSONEncoder().encode(nodes)
-            guard let raw = String(data: data, encoding: String.Encoding.utf8) else {
-                return
-            }
-            
-            securedStore.set(raw, for: StoreKey.NodesSource.nodes)
-        } catch {
-            print(error.localizedDescription)
-        }
+        securedStore.set(nodes, for: StoreKey.NodesSource.nodes)
     }
     
     private func loadNodes() {
-        guard let raw = securedStore.get(StoreKey.NodesSource.nodes), let data = raw.data(using: String.Encoding.utf8) else {
-            nodes = defaultNodesGetter()
-            return
-        }
-        
-        do {
-            nodes = try JSONDecoder().decode([Node].self, from: data)
-        } catch {
-            nodes = defaultNodesGetter()
-            print(error.localizedDescription)
-        }
+        nodes = securedStore.get(StoreKey.NodesSource.nodes) ?? defaultNodesGetter()
     }
     
     private func setHealthCheckTimer() {

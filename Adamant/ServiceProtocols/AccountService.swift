@@ -26,6 +26,9 @@ extension Notification.Name {
         /// Raised on account info (balance) updated.
         static let forceUpdateBalance = Notification.Name("adamant.accountService.forceUpdateBalance")
         
+        /// Raised on account info (balance) updated.
+        static let forceUpdateAllBalances = Notification.Name("adamant.accountService.forceUpdateAllBalances")
+        
         /// Raised when user changed Stay In option.
         ///
         /// UserInfo:
@@ -98,7 +101,7 @@ enum AccountServiceError: Error {
             return NSLocalizedString("AccountServiceError.WrongPassphrase", comment: "Login: user typed in wrong passphrase")
         
         case .apiError(let error):
-            return error.localized
+            return error.localizedDescription
         
         case .internalError(let message, _):
             return String.adamantLocalized.sharedErrors.internalError(message: message)
@@ -159,10 +162,10 @@ protocol AccountService: AnyObject {
     func update(_ completion: ((AccountServiceResult) -> Void)?)
     
     /// Login into Adamant using passphrase.
-    func loginWith(passphrase: String, completion: @escaping (AccountServiceResult) -> Void)
+    func loginWith(passphrase: String) async throws -> AccountServiceResult
     
     /// Login into Adamant using previously logged account
-    func loginWithStoredAccount(completion: @escaping (AccountServiceResult) -> Void)
+    func loginWithStoredAccount() async throws -> AccountServiceResult
     
     /// Logout
     func logout()

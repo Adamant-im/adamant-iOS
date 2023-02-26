@@ -8,12 +8,14 @@
 
 import Foundation
 import MessageKit
+import UIKit
 
 extension ERC20WalletService: RichMessageProvider {
     
     // MARK: Events
     
-    func richMessageTapped(for transaction: RichMessageTransaction, at indexPath: IndexPath, in chat: ChatViewController) {
+    @MainActor
+    func richMessageTapped(for transaction: RichMessageTransaction, in chat: ChatViewController) {
         // MARK: 0. Prepare
         guard let richContent = transaction.richContent,
             let hash = richContent[RichContentKeys.transfer.hash],
@@ -35,7 +37,7 @@ extension ERC20WalletService: RichMessageProvider {
         let senderName: String?
         let recipientName: String?
         
-        if let address = accountService.account?.address {
+        if let address = accountService?.account?.address {
             if let senderId = transaction.senderId, senderId.caseInsensitiveCompare(address) == .orderedSame {
                 senderName = String.adamantLocalized.transactionDetails.yourAddress
             } else {
@@ -60,11 +62,9 @@ extension ERC20WalletService: RichMessageProvider {
             recipientName = nil
         }
         
-        // MARK: 2. Go go transaction
-        
-        getTransaction(by: hash) { [weak self] result in
-            dialogService.dismissProgress()
-            guard let vc = self?.router.get(scene: AdamantScene.Wallets.ERC20.transactionDetails) as? ERC20TransactionDetailsViewController else {
+        // MARK: 2. Go to transaction
+        Task {
+            guard let vc = router.get(scene: AdamantScene.Wallets.ERC20.transactionDetails) as? ERC20TransactionDetailsViewController else {
                 return
             }
             
@@ -73,11 +73,11 @@ extension ERC20WalletService: RichMessageProvider {
             vc.recipientName = recipientName
             vc.comment = comment
             
-            switch result {
-            case .success(let ethTransaction):
+            do {
+                let ethTransaction = try await getTransaction(by: hash)
                 vc.transaction = ethTransaction
-                
-            case .failure(let error):
+            } catch let error as WalletServiceError {
+                dialogService.dismissProgress()
                 switch error {
                 case .remoteServiceError:
                     let amount: Decimal
@@ -87,81 +87,38 @@ extension ERC20WalletService: RichMessageProvider {
                         amount = 0
                     }
                     
-                    let failedTransaction = SimpleTransactionDetails(txId: hash,
-                                                                     senderAddress: transaction.senderAddress,
-                                                                     recipientAddress: transaction.recipientAddress,
-                                                                     dateValue: nil,
-                                                                     amountValue: amount,
-                                                                     feeValue: nil,
-                                                                     confirmationsValue: nil,
-                                                                     blockValue: nil,
-                                                                     isOutgoing: transaction.isOutgoing,
-                                                                     transactionStatus: TransactionStatus.failed)
+                    let failedTransaction = SimpleTransactionDetails(
+                        txId: hash,
+                        senderAddress: transaction.senderAddress,
+                        recipientAddress: transaction.recipientAddress,
+                        dateValue: nil,
+                        amountValue: amount,
+                        feeValue: nil,
+                        confirmationsValue: nil,
+                        blockValue: nil,
+                        isOutgoing: transaction.isOutgoing,
+                        transactionStatus: TransactionStatus.failed
+                    )
                     
                     vc.transaction = failedTransaction
                     
                 default:
-                    self?.dialogService.showRichError(error: error)
+                    dialogService.showRichError(error: error)
                     return
                 }
+            } catch {
+                dialogService.showRichError(error: error)
+                return
             }
             
-            DispatchQueue.main.async {
-                chat.navigationController?.pushViewController(vc, animated: true)
-            }
+            dialogService.dismissProgress()
+            
+            chat.navigationController?.pushViewController(vc, animated: true)
         }
-    }
-    
-    // MARK: Cells
-    
-    func cellSizeCalculator(for messagesCollectionViewFlowLayout: MessagesCollectionViewFlowLayout) -> CellSizeCalculator {
-        let calculator = TransferMessageSizeCalculator(layout: messagesCollectionViewFlowLayout)
-        calculator.font = UIFont.systemFont(ofSize: 24)
-        return calculator
-    }
-    
-    func cell(for message: MessageType, isFromCurrentSender: Bool, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell {
-        guard case .custom(let raw) = message.kind, let transfer = raw as? RichMessageTransfer else {
-            fatalError("ERC20 service tried to render wrong message kind: \(message.kind)")
-        }
-        
-        let cellIdentifier = isFromCurrentSender ? cellIdentifierSent : cellIdentifierReceived
-        guard let cell = messagesCollectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as? TransferCollectionViewCell else {
-            fatalError("Can't dequeue \(cellIdentifier) cell")
-        }
-        
-        cell.currencyLogoImageView.image = self.tokenLogo
-        let currencyFont = cell.currencySymbolLabel.font ?? .systemFont(ofSize: 12)
-        let networkFont = currencyFont.withSize(8)
-        let currencyAttributes: [NSAttributedString.Key: Any] = [.font: currencyFont]
-        let networkAttributes: [NSAttributedString.Key: Any] = [.font: networkFont]
-      
-        let defaultString = NSMutableAttributedString(string: self.tokenSymbol, attributes: currencyAttributes)
-        let underlineString = NSAttributedString(string: " \(self.tokenNetworkSymbol)", attributes: networkAttributes)
-        defaultString.append(underlineString)
-        cell.currencySymbolLabel.attributedText = defaultString
-        
-        cell.amountLabel.text = AdamantBalanceFormat.full.format(transfer.amount)
-        cell.dateLabel.text = message.sentDate.humanizedDateTime(withWeekday: false)
-        cell.transactionStatus = (message as? RichMessageTransaction)?.transactionStatus
-        
-        cell.commentsLabel.text = transfer.comments
-        
-        if cell.isAlignedRight != isFromCurrentSender {
-            cell.isAlignedRight = isFromCurrentSender
-        }
-        
-        cell.isFromCurrentSender = isFromCurrentSender
-        
-        return cell
     }
     
     // MARK: Short description
-    
-    private static var formatter: NumberFormatter = {
-        return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: currencySymbol)
-    }()
-    
+
     func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString {
         let amount: String
         

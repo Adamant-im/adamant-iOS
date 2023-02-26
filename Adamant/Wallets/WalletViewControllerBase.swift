@@ -149,13 +149,9 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
             
             let sendRow = LabelRow {
                 $0.tag = BaseRows.send.tag
-                if #available(iOS 14.0, *) {
-                    var content = $0.cell.defaultContentConfiguration()
-                    content.attributedText = label
-                    $0.cell.contentConfiguration = content
-                } else {
-                    $0.cell.textLabel?.attributedText = label
-                }
+                var content = $0.cell.defaultContentConfiguration()
+                content.attributedText = label
+                $0.cell.contentConfiguration = content
                 $0.cell.selectionStyle = .gray
                 $0.cell.backgroundColor = UIColor.adamant.cellColor
             }.cellUpdate { (cell, _) in
@@ -215,9 +211,9 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 }
                 
                 guard let service = self?.service,
-                    let wallet = service.wallet,
-                    let vc = self,
-                    let row: BalanceRow = vc.form.rowBy(tag: BaseRows.balance.tag) else {
+                      let wallet = service.wallet,
+                      let vc = self,
+                      let row: BalanceRow = vc.form.rowBy(tag: BaseRows.balance.tag) else {
                     return
                 }
                 
@@ -306,6 +302,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
             $0.title = BaseRows.address.localized
             $0.cell.selectionStyle = .gray
             $0.cell.backgroundColor = UIColor.adamant.cellColor
+            $0.cell.detailTextLabel?.lineBreakMode = .byTruncatingMiddle
             if let wallet = service?.wallet {
                 $0.value = wallet.address
             }
@@ -411,6 +408,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
+        initiatingActivityIndicator.color = .adamant.primary
     }
 }
 

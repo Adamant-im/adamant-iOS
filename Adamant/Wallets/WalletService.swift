@@ -63,7 +63,7 @@ extension WalletServiceError: RichError {
             return String.adamantLocalized.sharedErrors.remoteServerError(message: message)
             
         case .apiError(let error):
-            return error.localized
+            return error.localizedDescription
             
         case .internalError(let message, _):
             return String.adamantLocalized.sharedErrors.internalError(message: message)
@@ -167,6 +167,9 @@ extension ChatsProviderError {
             
         case .requestCancelled:
             return .requestCancelled
+            
+        case .invalidTransactionStatus:
+            return .internalError(message: "Invalid Transaction Status", error: nil)
         }
     }
 }
@@ -201,12 +204,19 @@ protocol WalletService: AnyObject {
 	// MARK: Currency
 	static var currencySymbol: String { get }
 	static var currencyLogo: UIImage { get }
+    static var qqPrefix: String { get }
     
     var tokenSymbol: String { get }
     var tokenName: String { get }
     var tokenLogo: UIImage { get }
+    var tokenUnicID: String { get }
     var tokenNetworkSymbol: String { get }
     var consistencyMaxTime: Double { get }
+    var tokenContract: String { get }
+    var minBalance: Decimal { get }
+    var minAmount: Decimal { get }
+    var defaultVisibility: Bool { get }
+    var defaultOrdinalLevel: Int? { get }
     
 	// MARK: Notifications
 	
@@ -233,7 +243,7 @@ protocol WalletService: AnyObject {
     
     // MARK: Tools
     func validate(address: String) -> AddressValidationResult
-    func getWalletAddress(byAdamantAddress address: String, completion: @escaping (WalletServiceResult<String>) -> Void)
+    func getWalletAddress(byAdamantAddress address: String) async throws -> String
 }
 
 protocol SwinjectDependentService: WalletService {
@@ -241,7 +251,7 @@ protocol SwinjectDependentService: WalletService {
 }
 
 protocol InitiatedWithPassphraseService: WalletService {
-    func initWallet(withPassphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void)
+    func initWallet(withPassphrase: String) async throws -> WalletAccount
     func setInitiationFailed(reason: String)
 }
 
@@ -274,14 +284,18 @@ extension WalletServiceWithSend {
 }
 
 protocol WalletServiceSimpleSend: WalletServiceWithSend {
-    func sendMoney(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceResult<TransactionDetails>) -> Void)
+    func sendMoney(
+        recipient: String,
+        amount: Decimal,
+        comments: String
+    ) async throws -> TransactionDetails
 }
 
 protocol WalletServiceTwoStepSend: WalletServiceWithSend {
     associatedtype T: RawTransaction
     
-    func createTransaction(recipient: String, amount: Decimal, completion: @escaping (WalletServiceResult<T>) -> Void)
-    func sendTransaction(_ transaction: T, completion: @escaping (WalletServiceResult<String>) -> Void)
+    func createTransaction(recipient: String, amount: Decimal) async throws -> T
+    func sendTransaction(_ transaction: T) async throws -> String
 }
 
 protocol RawTransaction {

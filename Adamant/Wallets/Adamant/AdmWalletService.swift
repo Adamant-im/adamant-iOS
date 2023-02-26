@@ -13,36 +13,38 @@ import CoreData
 import MessageKit
 
 class AdmWalletService: NSObject, WalletService {
+    
     // MARK: - Constants
     let addressRegex = try! NSRegularExpression(pattern: "^U([0-9]{6,20})$")
     
-    let transactionFee: Decimal = 0.5
-    static let currencySymbol = "ADM"
-    static let currencyLogo = #imageLiteral(resourceName: "wallet_adm")
-    static let currencyExponent: Int = AdamantUtilities.admCurrencyExponent
-    
+    static let currencyLogo = #imageLiteral(resourceName: "adamant_wallet")
+
     var tokenSymbol: String {
         return type(of: self).currencySymbol
-    }
-    
-    var tokenName: String {
-        return ""
     }
     
     var tokenLogo: UIImage {
         return type(of: self).currencyLogo
     }
     
+    var transactionFee: Decimal {
+        return AdmWalletService.fixedFee
+    }
+    
     var tokenNetworkSymbol: String {
         return "ADM"
     }
     
-    var consistencyMaxTime: Double {
-        return 0
+    var tokenContract: String {
+        return ""
+    }
+    
+    var tokenUnicID: String {
+        return tokenNetworkSymbol + tokenSymbol
     }
     
 	// MARK: - Dependencies
-	weak var accountService: AccountService!
+	weak var accountService: AccountService?
 	var apiService: ApiService!
 	var transfersProvider: TransfersProvider!
     var router: Router!
@@ -55,9 +57,6 @@ class AdmWalletService: NSObject, WalletService {
     
     // MARK: RichMessageProvider properties
     static let richMessageType = "adm_transaction" // not used
-    let cellIdentifierSent = "admTransferSent"
-    let cellIdentifierReceived = "admTransferReceived"
-    var cellSource: CellSource? = CellSource.nib(nib: UINib(nibName: "TransferCollectionViewCell", bundle: nil))
     
     // MARK: - Properties
     let enabled: Bool = true
@@ -135,8 +134,8 @@ class AdmWalletService: NSObject, WalletService {
         NotificationCenter.default.post(name: walletUpdatedNotification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
     }
     
-    func getWalletAddress(byAdamantAddress address: String, completion: @escaping (WalletServiceResult<String>) -> Void) {
-        completion(.success(result: address))
+    func getWalletAddress(byAdamantAddress address: String) async throws -> String {
+        return address
     }
 }
 
@@ -168,15 +167,17 @@ extension AdmWalletService: SwinjectDependentService {
         transfersProvider = container.resolve(TransfersProvider.self)
         router = container.resolve(Router.self)
         
-        let controller = transfersProvider.unreadTransfersController()
-        
-        do {
-            try controller.performFetch()
-        } catch {
-            print("AdmWalletService: Error performing fetch: \(error)")
+        Task {
+            let controller = await transfersProvider.unreadTransfersController()
+            
+            do {
+                try controller.performFetch()
+            } catch {
+                print("AdmWalletService: Error performing fetch: \(error)")
+            }
+            
+            controller.delegate = self
+            transfersController = controller
         }
-        
-        controller.delegate = self
-        transfersController = controller
     }
 }

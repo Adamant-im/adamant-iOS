@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct ChatAsset: Codable {
+struct ChatAsset: Codable, Hashable {
     enum CodingKeys: String, CodingKey {
         case message, ownMessage = "own_message", type
     }
