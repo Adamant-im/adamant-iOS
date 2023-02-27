@@ -164,7 +164,7 @@ extension Container {
                 transactionService: r.resolve(ChatTransactionService.self)!,
                 chatsProvider: r.resolve(ChatsProvider.self)!
             )
-        }
+        }.inObjectScope(.container)
         
         // MARK: Chats
         self.register(ChatsProvider.self) { r in
@@ -201,7 +201,7 @@ extension Container {
                 visibleWalletService: r.resolve(VisibleWalletsService.self)!,
                 router: r.resolve(Router.self)!
             )
-        }
+        }.inObjectScope(.container)
         
         // MARK: Rich transaction status service
         self.register(RichTransactionStatusService.self) { r in
@@ -214,6 +214,6 @@ extension Container {
             return AdamantRichTransactionStatusService(
                 richProviders: Dictionary(uniqueKeysWithValues: richProviders)
             )
-        }
+        }.inObjectScope(.container)
     }
 }

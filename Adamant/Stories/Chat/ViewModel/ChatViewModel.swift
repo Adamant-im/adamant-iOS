@@ -10,22 +10,24 @@ import Combine
 import CoreData
 import MarkdownKit
 
+@MainActor
 final class ChatViewModel: NSObject {
     // MARK: Dependencies
     
     private let chatsProvider: ChatsProvider
     private let markdownParser: MarkdownParser
     private let transfersProvider: TransfersProvider
-    private let chatMessageFactory: ChatMessageFactory
+    private let chatMessagesListFactory: ChatMessagesListFactory
     private let addressBookService: AddressBookService
     private let visibleWalletService: VisibleWalletsService
     private let accountService: AccountService
     private let accountProvider: AccountsProvider
+    private let chatCacheService: ChatCacheService
     private let richMessageProviders: [String: RichMessageProvider]
-    private lazy var chatMessagesListFactory = makeChatMessagesListFactory()
     
     // MARK: Properties
     
+    private var tasksStorage = TaskManager()
     private weak var preservationDelegate: ChatPreservationDelegate?
     private var controller: NSFetchedResultsController<ChatTransaction>?
     private var subscriptions = Set<AnyCancellable>()
@@ -33,19 +35,18 @@ final class ChatViewModel: NSObject {
     private var messageIdToShow: String?
     private var isLoading = false
     
+    private(set) var sender = ChatSender.default
     private(set) var chatroom: Chatroom?
     private(set) var chatTransactions: [ChatTransaction] = []
+    private(set) var isNeedToLoadMoreMessages = false
     
     let didTapTransfer = ObservableSender<String>()
     let dialog = ObservableSender<ChatDialog>()
     let didTapAdmChat = ObservableSender<(Chatroom, String?)>()
     let didTapAdmSend = ObservableSender<AdamantAddress>()
-    
-    private let _closeScreen = ObservableSender<Void>()
-    var closeScreen: some Observable<Void> { _closeScreen }
+    let closeScreen = ObservableSender<Void>()
     
     @ObservableValue private(set) var fullscreenLoading = false
-    @ObservableValue private(set) var sender = ChatSender.default
     @ObservableValue private(set) var messages = [ChatMessage]()
     @ObservableValue private(set) var isAttachmentButtonAvailable = false
     @ObservableValue private(set) var isSendingAvailable = false
@@ -54,14 +55,12 @@ final class ChatViewModel: NSObject {
     @ObservableValue var inputText = ""
     
     var startPosition: ChatStartPosition? {
-        get async {
-            if let messageIdToShow = messageIdToShow {
-                return .messageId(messageIdToShow)
-            }
-            
-            guard let address = chatroom?.partner?.address else { return nil }
-            return await chatsProvider.getChatPositon(for: address).map { .offset(.init($0)) }
+        if let messageIdToShow = messageIdToShow {
+            return .messageId(messageIdToShow)
         }
+        
+        guard let address = chatroom?.partner?.address else { return nil }
+        return chatsProvider.getChatPositon(for: address).map { .offset(.init($0)) }
     }
     
     var freeTokensURL: URL? {
@@ -76,30 +75,28 @@ final class ChatViewModel: NSObject {
         return url
     }
     
-    var isNeedToLoadMoreMessages: Bool = false
-    
-    private var tasksStorage = TaskManager()
-    
     init(
         chatsProvider: ChatsProvider,
         markdownParser: MarkdownParser,
         transfersProvider: TransfersProvider,
-        chatMessageFactory: ChatMessageFactory,
+        chatMessagesListFactory: ChatMessagesListFactory,
         addressBookService: AddressBookService,
         visibleWalletService: VisibleWalletsService,
         accountService: AccountService,
         accountProvider: AccountsProvider,
+        chatCacheService: ChatCacheService,
         richMessageProviders: [String: RichMessageProvider]
     ) {
         self.chatsProvider = chatsProvider
         self.markdownParser = markdownParser
         self.transfersProvider = transfersProvider
-        self.chatMessageFactory = chatMessageFactory
+        self.chatMessagesListFactory = chatMessagesListFactory
         self.addressBookService = addressBookService
         self.richMessageProviders = richMessageProviders
         self.visibleWalletService = visibleWalletService
         self.accountService = accountService
         self.accountProvider = accountProvider
+        self.chatCacheService = chatCacheService
         super.init()
         setupObservers()
     }
@@ -110,7 +107,7 @@ final class ChatViewModel: NSObject {
         messageToShow: MessageTransaction?,
         preservationDelegate: ChatPreservationDelegate?
     ) {
-        reset()
+        assert(self.chatroom == nil, "Can't setup several times")
         self.chatroom = chatroom
         self.preservationDelegate = preservationDelegate
         controller = chatsProvider.getChatController(for: chatroom)
@@ -129,27 +126,29 @@ final class ChatViewModel: NSObject {
                 address: partnerAddress,
                 thenRemoveIt: true
             ).map { inputText = $0 }
+            
+            messages = chatCacheService.getMessages(address: partnerAddress)
         }
     }
     
     func loadFirstMessagesIfNeeded() {
-        let task = Task { @MainActor in
+        Task {
             guard let address = chatroom?.partner?.address else { return }
             
-            let isChatLoading = await chatsProvider.isChatLoaded(with: address)
+            let isChatLoaded = await chatsProvider.isChatLoaded(with: address)
             
-            if address == AdamantContacts.adamantWelcomeWallet.name || isChatLoading {
+            if address == AdamantContacts.adamantWelcomeWallet.name || isChatLoaded {
                 updateTransactions(performFetch: true)
             } else {
                 await loadMessages(address: address, offset: .zero, fullscreenLoading: true)
             }
-        }
-        
-        tasksStorage.insert(task)
+        }.stored(in: tasksStorage)
     }
     
     func loadMoreMessagesIfNeeded() {
-        let task = Task { @MainActor in
+        guard !isLoading else { return }
+        
+        Task {
             guard
                 let address = chatroom?.partner?.address,
                 isNeedToLoadMoreMessages
@@ -157,9 +156,7 @@ final class ChatViewModel: NSObject {
             
             let offset = await chatsProvider.chatLoadedMessages[address] ?? .zero
             await loadMessages(address: address, offset: offset, fullscreenLoading: false)
-        }
-        
-        tasksStorage.insert(task)
+        }.stored(in: tasksStorage)
     }
     
     func sendMessage(text: String) {
@@ -170,7 +167,7 @@ final class ChatViewModel: NSObject {
             return
         }
         
-        let task = Task { @MainActor in
+        Task {
             let message: AdamantMessage = markdownParser.parse(text).length == text.count
             ? .text(text)
             : .markdownText(text)
@@ -186,30 +183,26 @@ final class ChatViewModel: NSObject {
             } catch {
                 await handleMessageSendingError(error: error, sentText: text)
             }
-        }
-        
-        tasksStorage.insert(task)
+        }.stored(in: tasksStorage)
     }
     
     func loadTransactionStatusIfNeeded(id: String, forceUpdate: Bool) {
-        let task = Task {
+        Task {
             guard
                 let transaction = chatTransactions.first(where: { $0.chatMessageId == id }),
                 let richMessageTransaction = transaction as? RichMessageTransaction,
                 richMessageTransaction.transactionStatus?.isFinal != true || forceUpdate
             else { return }
             
-        if forceUpdate,
-           let index = messages.firstIndex(where: { id == $0.id }),
-           case var .transaction(model) = messages[index].content {
-            model.status = .notInitiated
-            messages[index].content = .transaction(model)
-        }
+            if forceUpdate,
+               let index = messages.firstIndex(where: { id == $0.id }),
+               case var .transaction(model) = messages[index].content {
+                model.status = .notInitiated
+                messages[index].content = .transaction(model)
+            }
 
             await chatsProvider.updateStatus(for: richMessageTransaction, resetBeforeUpdate: forceUpdate)
-        }
-        
-        tasksStorage.insert(task)
+        }.stored(in: tasksStorage)
     }
     
     func preserveMessage(_ message: String) {
@@ -218,7 +211,7 @@ final class ChatViewModel: NSObject {
     }
     
     func blockChat() {
-        Task { @MainActor in
+        Task {
             guard let address = chatroom?.partner?.address else {
                 return assertionFailure("Can't block user without address")
             }
@@ -226,7 +219,7 @@ final class ChatViewModel: NSObject {
             chatroom?.isHidden = true
             try? chatroom?.managedObjectContext?.save()
             await chatsProvider.blockChat(with: address)
-            _closeScreen.send()
+            closeScreen.send()
         }
     }
     
@@ -240,10 +233,8 @@ final class ChatViewModel: NSObject {
     }
     
     func saveChatOffset(_ offset: CGFloat?) {
-        Task {
-            guard let address = chatroom?.partner?.address else { return }
-            await chatsProvider.setChatPositon(for: address, position: offset.map { Double.init($0) })
-        }
+        guard let address = chatroom?.partner?.address else { return }
+        chatsProvider.setChatPositon(for: address, position: offset.map { Double.init($0) })
     }
     
     func entireChatWasRead() {
@@ -287,7 +278,7 @@ final class ChatViewModel: NSObject {
     }
     
     func process(adm: AdamantAddress, action: AddressChatShareType) {
-        Task { @MainActor in
+        Task {
             if action == .send {
                 didTapAdmSend.send(adm)
                 return
@@ -303,7 +294,7 @@ final class ChatViewModel: NSObject {
     }
     
     func cancelMessage(id: String) {
-        let task = Task { @MainActor in
+        Task {
             guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
             else { return }
             
@@ -317,13 +308,11 @@ final class ChatViewModel: NSObject {
                     dialog.send(.richError(error))
                 }
             }
-        }
-        
-        tasksStorage.insert(task)
+        }.stored(in: tasksStorage)
     }
     
     func retrySendMessage(id: String) {
-        let task = Task { @MainActor in
+        Task {
             guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
             else { return }
             
@@ -337,14 +326,11 @@ final class ChatViewModel: NSObject {
                     dialog.send(.richError(error))
                 }
             }
-        }
-        
-        tasksStorage.insert(task)
+        }.stored(in: tasksStorage)
     }
 }
 
 extension ChatViewModel: NSFetchedResultsControllerDelegate {
-    @MainActor
     func controllerDidChangeContent(_: NSFetchedResultsController<NSFetchRequestResult>) {
         updateTransactions(performFetch: false)
     }
@@ -364,7 +350,6 @@ private extension ChatViewModel {
             .store(in: &subscriptions)
     }
     
-    @MainActor
     func loadMessages(address: String, offset: Int, fullscreenLoading: Bool) async {
         guard !isLoading else { return }
 
@@ -379,22 +364,21 @@ private extension ChatViewModel {
         updateTransactions(performFetch: true)
     }
     
-    @MainActor
     func updateTransactions(performFetch: Bool) {
         if performFetch {
             try? controller?.performFetch()
         }
         
         chatTransactions = controller?.fetchedObjects ?? []
-        updateMessages(resetLoadingProperty: true)
+        updateMessages(resetLoadingProperty: performFetch)
     }
     
     func updateMessages(resetLoadingProperty: Bool) {
         timerSubscription = nil
         
-        Task(priority: .userInitiated) { [chatTransactions, sender, isNeedToLoadMoreMessages] in
+        Task(priority: .userInitiated) { [chatTransactions, sender] in
             var expirationTimestamp: TimeInterval?
-            checkIfNeedToLoadMooreMessages()
+            let isNeedToLoadMoreMessages = await checkIfNeedToLoadMooreMessages()
 
             let messages = await chatMessagesListFactory.makeMessages(
                 transactions: chatTransactions,
@@ -411,16 +395,20 @@ private extension ChatViewModel {
         }
     }
     
-    @MainActor func setupNewMessages(
+    func setupNewMessages(
         newMessages: [ChatMessage],
         resetLoadingProperty: Bool,
         expirationTimestamp: TimeInterval?
     ) async {
         messages = newMessages
-        fullscreenLoading = false
+        
+        if let address = chatroom?.partner?.address {
+            chatCacheService.setMessages(address: address, messages: newMessages)
+        }
         
         if resetLoadingProperty {
             isLoading = false
+            fullscreenLoading = false
         }
         
         guard let expirationTimestamp = expirationTimestamp else { return }
@@ -437,31 +425,15 @@ private extension ChatViewModel {
             .sink { [weak self] _ in self?.updateMessages(resetLoadingProperty: false) }
     }
     
-    func checkIfNeedToLoadMooreMessages() {
-        Task {
-            guard let address = chatroom?.partner?.address else {
-                isNeedToLoadMoreMessages = false
-                return
-            }
-            isNeedToLoadMoreMessages = await chatsProvider.chatLoadedMessages[address] ?? .zero < chatsProvider.chatMaxMessages[address] ?? .zero
+    func checkIfNeedToLoadMooreMessages() async -> Bool {
+        guard let address = chatroom?.partner?.address else {
+            isNeedToLoadMoreMessages = false
+            return isNeedToLoadMoreMessages
         }
-    }
-    
-    func reset() {
-        sender = .default
-        chatTransactions = []
-        messages = []
-        fullscreenLoading = false
-        isLoading = false
-        inputText = ""
-        isAttachmentButtonAvailable = false
-        isSendingAvailable = false
-        fee = ""
-        partnerName = nil
-        messageIdToShow = nil
-        controller = nil
-        chatroom = nil
-        preservationDelegate = nil
+        
+        isNeedToLoadMoreMessages = await chatsProvider.chatLoadedMessages[address] ?? .zero < chatsProvider.chatMaxMessages[address] ?? .zero
+        
+        return isNeedToLoadMoreMessages
     }
     
     func validateSendingMessage(message: AdamantMessage) async -> Bool {
@@ -478,7 +450,6 @@ private extension ChatViewModel {
         }
     }
     
-    @MainActor
     func handleMessageSendingError(error: Error, sentText: String) async {
         switch error as? ChatsProviderError {
         case .messageNotValid:
@@ -522,7 +493,6 @@ private extension ChatViewModel {
         isAttachmentButtonAvailable = isAnyWalletVisible
     }
     
-    @MainActor
     func findAccount(with address: String, name: String?, message: String?) async {
         dialog.send(.progress(true))
         do {
@@ -573,15 +543,5 @@ private extension ChatViewModel {
     func startNewChat(with chatroom: Chatroom, name: String? = nil, message: String? = nil) {
         setNameIfNeeded(for: chatroom.partner, chatroom: chatroom, name: name)
         didTapAdmChat.send((chatroom, message))
-    }
-    
-    func makeChatMessagesListFactory() -> ChatMessagesListFactory {
-        .init(
-            chatMessageFactory: chatMessageFactory,
-            didTapTransfer: { [didTapTransfer] in didTapTransfer.send($0) },
-            forceUpdateStatusAction: { [weak self] in
-                self?.loadTransactionStatusIfNeeded(id: $0, forceUpdate: true)
-            }
-        )
     }
 }

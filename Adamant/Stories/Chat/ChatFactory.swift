@@ -11,7 +11,9 @@ import MessageKit
 import InputBarAccessoryView
 import Combine
 
+@MainActor
 struct ChatFactory {
+    let chatCacheService = ChatCacheService()
     let chatsProvider: ChatsProvider
     let dialogService: DialogService
     let transferProvider: TransfersProvider
@@ -66,11 +68,14 @@ private extension ChatFactory {
             chatsProvider: chatsProvider,
             markdownParser: .init(font: UIFont.systemFont(ofSize: UIFont.systemFontSize)),
             transfersProvider: transferProvider,
-            chatMessageFactory: .init(richMessageProviders: richMessageProviders),
+            chatMessagesListFactory: .init(chatMessageFactory: .init(
+                richMessageProviders: richMessageProviders
+            )),
             addressBookService: addressBookService,
             visibleWalletService: visibleWalletService,
             accountService: accountService,
             accountProvider: accountProvider,
+            chatCacheService: chatCacheService,
             richMessageProviders: richMessageProviders
         )
     }
@@ -89,7 +94,7 @@ private extension ChatFactory {
             dataSource: ChatDataSourceManager(viewModel: viewModel),
             layout: ChatLayoutManager(viewModel: viewModel),
             display: ChatDisplayManager(viewModel: viewModel),
-            inputBar: ChatInputBarManager(sendMessageAction: viewModel.sendMessage),
+            inputBar: ChatInputBarManager(viewModel: viewModel),
             cell: ChatCellManager(viewModel: viewModel)
         )
     }

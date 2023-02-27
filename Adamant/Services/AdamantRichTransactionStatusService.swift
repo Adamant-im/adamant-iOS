@@ -37,7 +37,7 @@ actor AdamantRichTransactionStatusService: RichTransactionStatusService {
 //        обновим статус этой транзакции с 'некоторой' задержкой. 🤷🏻‍♂️
         
         if transaction.isJustCreated {
-            try await Task.sleep(interval: 5)
+            await Task.sleep(interval: 5)
         }
         
         guard let status = try await getStatus(for: transaction) else { return }

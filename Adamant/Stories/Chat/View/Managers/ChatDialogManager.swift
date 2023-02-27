@@ -10,6 +10,7 @@ import UIKit
 import Combine
 import SafariServices
 
+@MainActor
 final class ChatDialogManager {
     private let viewModel: ChatViewModel
     private let dialogService: DialogService

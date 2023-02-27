@@ -9,15 +9,16 @@
 import InputBarAccessoryView
 import Foundation
 
+@MainActor
 final class ChatInputBarManager: InputBarAccessoryViewDelegate {
-    private let sendMessageAction: (String) -> Void
+    private let viewModel: ChatViewModel
     
-    init(sendMessageAction: @escaping (String) -> Void) {
-        self.sendMessageAction = sendMessageAction
+    init(viewModel: ChatViewModel) {
+        self.viewModel = viewModel
     }
     
     func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
         inputBar.inputTextView.text = ""
-        sendMessageAction(text)
+        viewModel.sendMessage(text: text)
     }
 }

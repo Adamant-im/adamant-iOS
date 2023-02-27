@@ -24,6 +24,18 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
         safeAreaInsets + contentInset
     }
     
+    // To prevent value changes by MessageKit. Insets can be set via `setFullBottomInset` only
+    override var contentInset: UIEdgeInsets {
+        get { super.contentInset }
+        set {}
+    }
+    
+    // To prevent value changes by MessageKit. Insets can be set via `setFullBottomInset` only
+    override var verticalScrollIndicatorInsets: UIEdgeInsets {
+        get { super.verticalScrollIndicatorInsets }
+        set {}
+    }
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         
@@ -32,7 +44,6 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
         }
     }
     
-    @MainActor
     func reloadData(newModels: [ChatMessage]) {
         guard newModels.last == currentModels.last || currentModels.isEmpty else {
             return applyNewModels(newModels)
@@ -50,8 +61,8 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
     func setFullBottomInset(_ inset: CGFloat) {
         let inset = inset - safeAreaInsets.bottom
         let bottomOffset = self.bottomOffset
-        contentInset.bottom = inset
-        verticalScrollIndicatorInsets.bottom = inset
+        super.contentInset.bottom = inset
+        super.verticalScrollIndicatorInsets.bottom = inset
 
         guard !hasActiveScrollGestures else { return }
         setBottomOffset(bottomOffset, safely: false)
