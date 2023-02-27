@@ -78,9 +78,21 @@ final class ChatDataSourceManager: MessagesDataSource {
         )
     
         if case let .transaction(model) = message.fullModel.content {
+            cell.wrappedView.actionHandler = { [weak self] in self?.handleAction($0) }
             cell.wrappedView.model = model
         }
         
         return cell
+    }
+}
+
+private extension ChatDataSourceManager {
+    func handleAction(_ action: ChatAction) {
+        switch action {
+        case let .openTransactionDetails(id):
+            viewModel.didTapTransfer.send(id)
+        case let .forceUpdateTransactionStatus(id):
+            viewModel.loadTransactionStatusIfNeeded(id: id, forceUpdate: true)
+        }
     }
 }

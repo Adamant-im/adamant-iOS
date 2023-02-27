@@ -68,7 +68,9 @@ private extension ChatFactory {
             chatsProvider: chatsProvider,
             markdownParser: .init(font: UIFont.systemFont(ofSize: UIFont.systemFontSize)),
             transfersProvider: transferProvider,
-            chatMessageFactory: .init(richMessageProviders: richMessageProviders),
+            chatMessagesListFactory: .init(chatMessageFactory: .init(
+                richMessageProviders: richMessageProviders
+            )),
             addressBookService: addressBookService,
             visibleWalletService: visibleWalletService,
             accountService: accountService,

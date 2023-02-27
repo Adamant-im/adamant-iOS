@@ -11,20 +11,10 @@ import MessageKit
 import Combine
 
 actor ChatMessagesListFactory {
-    typealias ProcessTransaction = (_ id: String) -> Void
-    
     private let chatMessageFactory: ChatMessageFactory
-    private let didTapTransfer: ProcessTransaction
-    private let forceUpdateStatusAction: ProcessTransaction
     
-    init(
-        chatMessageFactory: ChatMessageFactory,
-        didTapTransfer: @escaping ProcessTransaction,
-        forceUpdateStatusAction: @escaping ProcessTransaction
-    ) {
+    init(chatMessageFactory: ChatMessageFactory) {
         self.chatMessageFactory = chatMessageFactory
-        self.didTapTransfer = didTapTransfer
-        self.forceUpdateStatusAction = forceUpdateStatusAction
     }
     
     func makeMessages(
@@ -68,9 +58,7 @@ private extension ChatMessagesListFactory {
             expireDate: &expireDate,
             currentSender: sender,
             dateHeaderOn: dateHeaderOn,
-            topSpinnerOn: topSpinnerOn,
-            didTapTransfer: didTapTransfer,
-            forceUpdateStatusAction: forceUpdateStatusAction
+            topSpinnerOn: topSpinnerOn
         )
         
         willExpireAfter = expireDate?.timeIntervalSince1970

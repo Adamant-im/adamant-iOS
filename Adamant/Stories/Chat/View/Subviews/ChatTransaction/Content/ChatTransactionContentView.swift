@@ -17,6 +17,8 @@ final class ChatTransactionContentView: UIView {
         }
     }
     
+    var actionHandler: (ChatAction) -> Void = { _ in }
+    
     private let titleLabel = UILabel(font: titleFont, textColor: .adamant.textColor)
     private let amountLabel = UILabel(font: .systemFont(ofSize: 24), textColor: .adamant.textColor)
     private let currencyLabel = UILabel(font: .systemFont(ofSize: 20), textColor: .adamant.textColor)
@@ -140,7 +142,7 @@ private extension ChatTransactionContentView {
     }
     
     @objc func didTap() {
-        model.action.action()
+        actionHandler(.openTransactionDetails(id: model.id))
     }
 }
 
