@@ -82,7 +82,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let rootTabBarController = UITabBarController()
         window.rootViewController = rootTabBarController
-        window.rootViewController!.view.backgroundColor = .white
+        rootTabBarController.view.backgroundColor = .adamant.backgroundColor
         window.tintColor = UIColor.adamant.primary
         
         // MARK: 3. Prepare pages
