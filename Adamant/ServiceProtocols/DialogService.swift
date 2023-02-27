@@ -140,7 +140,7 @@ protocol DialogService: AnyObject {
     
     func presentGoToSettingsAlert(title: String?, message: String?)
     
-    func presentDymmyAlert(
+    func presentDummyAlert(
         for adm: String,
         from: UIView?,
         canSend: Bool,

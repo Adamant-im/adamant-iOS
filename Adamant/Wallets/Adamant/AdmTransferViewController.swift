@@ -67,7 +67,7 @@ class AdmTransferViewController: TransferViewControllerBase {
                 case .notFound, .notInitiated, .dummy:
                     self.dialogService.dismissProgress()
                     
-                    dialogService.presentDymmyAlert(
+                    dialogService.presentDummyAlert(
                         for: recipient,
                         from: view,
                         canSend: true

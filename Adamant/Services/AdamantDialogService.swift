@@ -438,18 +438,19 @@ extension AdamantDialogService {
         alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
     }
     
-    func presentDymmyAlert(
+    func presentDummyAlert(
         for adm: String,
         from: UIView?,
         canSend: Bool,
         sendCompletion: ((UIAlertAction) -> Void)?
     ) {
-        let alert = UIAlertController(
+        let alert = makeSafeAlertController(
             title: String.adamantLocalized.transferAdm.accountNotFoundAlertTitle(
                 for: adm
             ),
             message: String.adamantLocalized.transferAdm.accountNotFoundAlertBody,
-            preferredStyle: .alert
+            preferredStyle: .alert,
+            source: nil
         )
         
         if let url = URL(string: NewChatViewController.faqUrl) {
