@@ -17,14 +17,13 @@ final class ChatViewModel: NSObject {
     private let chatsProvider: ChatsProvider
     private let markdownParser: MarkdownParser
     private let transfersProvider: TransfersProvider
-    private let chatMessageFactory: ChatMessageFactory
+    private let chatMessagesListFactory: ChatMessagesListFactory
     private let addressBookService: AddressBookService
     private let visibleWalletService: VisibleWalletsService
     private let accountService: AccountService
     private let accountProvider: AccountsProvider
     private let chatCacheService: ChatCacheService
     private let richMessageProviders: [String: RichMessageProvider]
-    private lazy var chatMessagesListFactory = makeChatMessagesListFactory()
     
     // MARK: Properties
     
@@ -80,7 +79,7 @@ final class ChatViewModel: NSObject {
         chatsProvider: ChatsProvider,
         markdownParser: MarkdownParser,
         transfersProvider: TransfersProvider,
-        chatMessageFactory: ChatMessageFactory,
+        chatMessagesListFactory: ChatMessagesListFactory,
         addressBookService: AddressBookService,
         visibleWalletService: VisibleWalletsService,
         accountService: AccountService,
@@ -91,7 +90,7 @@ final class ChatViewModel: NSObject {
         self.chatsProvider = chatsProvider
         self.markdownParser = markdownParser
         self.transfersProvider = transfersProvider
-        self.chatMessageFactory = chatMessageFactory
+        self.chatMessagesListFactory = chatMessagesListFactory
         self.addressBookService = addressBookService
         self.richMessageProviders = richMessageProviders
         self.visibleWalletService = visibleWalletService
@@ -133,7 +132,7 @@ final class ChatViewModel: NSObject {
     }
     
     func loadFirstMessagesIfNeeded() {
-        let task = Task { @MainActor in
+        Task {
             guard let address = chatroom?.partner?.address else { return }
             
             let isChatLoaded = await chatsProvider.isChatLoaded(with: address)
@@ -143,13 +142,13 @@ final class ChatViewModel: NSObject {
             } else {
                 await loadMessages(address: address, offset: .zero, fullscreenLoading: true)
             }
-        }
-        
-        tasksStorage.insert(task)
+        }.stored(in: tasksStorage)
     }
     
     func loadMoreMessagesIfNeeded() {
-        let task = Task { @MainActor in
+        guard !isLoading else { return }
+        
+        Task {
             guard
                 let address = chatroom?.partner?.address,
                 isNeedToLoadMoreMessages
@@ -157,21 +156,23 @@ final class ChatViewModel: NSObject {
             
             let offset = await chatsProvider.chatLoadedMessages[address] ?? .zero
             await loadMessages(address: address, offset: offset, fullscreenLoading: false)
-        }
-        
-        tasksStorage.insert(task)
+        }.stored(in: tasksStorage)
     }
     
     func sendMessage(text: String) {
-        let task = Task { @MainActor in
+        guard let partnerAddress = chatroom?.partner?.address else { return }
+        
+        guard chatroom?.partner?.isDummy != true else {
+            dialog.send(.dummy(partnerAddress))
+            return
+        }
+        
+        Task {
             let message: AdamantMessage = markdownParser.parse(text).length == text.count
             ? .text(text)
             : .markdownText(text)
             
-            guard
-                let partnerAddress = chatroom?.partner?.address,
-                await validateSendingMessage(message: message)
-            else { return }
+            guard await validateSendingMessage(message: message) else { return }
             
             do {
                 _ = try await chatsProvider.sendMessage(
@@ -182,30 +183,26 @@ final class ChatViewModel: NSObject {
             } catch {
                 await handleMessageSendingError(error: error, sentText: text)
             }
-        }
-        
-        tasksStorage.insert(task)
+        }.stored(in: tasksStorage)
     }
     
     func loadTransactionStatusIfNeeded(id: String, forceUpdate: Bool) {
-        let task = Task {
+        Task {
             guard
                 let transaction = chatTransactions.first(where: { $0.chatMessageId == id }),
                 let richMessageTransaction = transaction as? RichMessageTransaction,
                 richMessageTransaction.transactionStatus?.isFinal != true || forceUpdate
             else { return }
             
-        if forceUpdate,
-           let index = messages.firstIndex(where: { id == $0.id }),
-           case var .transaction(model) = messages[index].content {
-            model.status = .notInitiated
-            messages[index].content = .transaction(model)
-        }
+            if forceUpdate,
+               let index = messages.firstIndex(where: { id == $0.id }),
+               case var .transaction(model) = messages[index].content {
+                model.status = .notInitiated
+                messages[index].content = .transaction(model)
+            }
 
             await chatsProvider.updateStatus(for: richMessageTransaction, resetBeforeUpdate: forceUpdate)
-        }
-        
-        tasksStorage.insert(task)
+        }.stored(in: tasksStorage)
     }
     
     func preserveMessage(_ message: String) {
@@ -302,7 +299,7 @@ final class ChatViewModel: NSObject {
     }
     
     func cancelMessage(id: String) {
-        let task = Task {
+        Task {
             guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
             else { return }
             
@@ -316,13 +313,11 @@ final class ChatViewModel: NSObject {
                     dialog.send(.richError(error))
                 }
             }
-        }
-        
-        tasksStorage.insert(task)
+        }.stored(in: tasksStorage)
     }
     
     func retrySendMessage(id: String) {
-        let task = Task {
+        Task {
             guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
             else { return }
             
@@ -336,9 +331,7 @@ final class ChatViewModel: NSObject {
                     dialog.send(.richError(error))
                 }
             }
-        }
-        
-        tasksStorage.insert(task)
+        }.stored(in: tasksStorage)
     }
 }
 
@@ -382,7 +375,7 @@ private extension ChatViewModel {
         }
         
         chatTransactions = controller?.fetchedObjects ?? []
-        updateMessages(resetLoadingProperty: true)
+        updateMessages(resetLoadingProperty: performFetch)
     }
     
     func updateMessages(resetLoadingProperty: Bool) {
@@ -413,7 +406,6 @@ private extension ChatViewModel {
         expirationTimestamp: TimeInterval?
     ) async {
         messages = newMessages
-        fullscreenLoading = false
         
         if let address = chatroom?.partner?.address {
             chatCacheService.setMessages(address: address, messages: newMessages)
@@ -421,6 +413,7 @@ private extension ChatViewModel {
         
         if resetLoadingProperty {
             isLoading = false
+            fullscreenLoading = false
         }
         
         guard let expirationTimestamp = expirationTimestamp else { return }
@@ -555,15 +548,5 @@ private extension ChatViewModel {
     func startNewChat(with chatroom: Chatroom, name: String? = nil, message: String? = nil) {
         setNameIfNeeded(for: chatroom.partner, chatroom: chatroom, name: name)
         didTapAdmChat.send((chatroom, message))
-    }
-    
-    func makeChatMessagesListFactory() -> ChatMessagesListFactory {
-        .init(
-            chatMessageFactory: chatMessageFactory,
-            didTapTransfer: { [didTapTransfer] in didTapTransfer.send($0) },
-            forceUpdateStatusAction: { [weak self] in
-                self?.loadTransactionStatusIfNeeded(id: $0, forceUpdate: true)
-            }
-        )
     }
 }

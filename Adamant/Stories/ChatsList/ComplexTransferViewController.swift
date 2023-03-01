@@ -106,7 +106,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
 
                 v.admReportRecipient = address
                 v.recipientIsReadonly = true
-                v.commentsEnabled = service.commentsEnabledForRichMessages
+                v.commentsEnabled = service.commentsEnabledForRichMessages && partner?.isDummy != true
                 v.showProgressView(animated: false)
                 
                 Task {

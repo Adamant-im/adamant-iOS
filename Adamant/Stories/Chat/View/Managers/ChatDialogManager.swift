@@ -325,28 +325,12 @@ private extension ChatDialogManager {
     }
     
     func showDummyAlert(for address: String) {
-        let alert = UIAlertController(
-            title: nil,
-            message: AccountsProviderError.notInitiated(address: address).localized,
-            preferredStyle: .alert
+        dialogService.presentDummyAlert(
+            for: address,
+            from: nil,
+            canSend: false,
+            sendCompletion: nil
         )
-        
-        let faq = UIAlertAction(title: String.adamantLocalized.newChat.whatDoesItMean, style: .default, handler: { [weak dialogService] _ in
-            guard let url = URL(string: NewChatViewController.faqUrl) else {
-                return
-            }
-            
-            let safari = SFSafariViewController(url: url)
-            safari.preferredControlTintColor = UIColor.adamant.primary
-            safari.modalPresentationStyle = .overFullScreen
-            dialogService?.present(safari, animated: true, completion: nil)
-        })
-        
-        alert.addAction(faq)
-        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
-        
-        alert.modalPresentationStyle = .overFullScreen
-        dialogService.present(alert, animated: true, completion: nil)
     }
     
     func showUrl(_ url: URL) {

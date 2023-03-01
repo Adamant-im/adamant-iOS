@@ -272,7 +272,7 @@ class BtcWalletService: WalletService {
             }
             
             return result
-        } catch {
+        } catch let error as ApiServiceError {
             throw WalletServiceError.internalError(
                 message: "BTC Wallet: failed to get address from KVS",
                 error: error

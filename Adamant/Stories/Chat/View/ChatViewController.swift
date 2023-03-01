@@ -18,8 +18,16 @@ final class ChatViewController: MessagesViewController {
     typealias TransactionCell = CollectionCellWrapper<ChatTransactionContainerView>
     typealias SendTransaction = (UIViewController & ComplexTransferViewControllerDelegate) -> Void
     
+    // MARK: Dependencies
+    
     private let storedObjects: [AnyObject]
     private let richMessageProviders: [String: RichMessageProvider]
+    private let admService: WalletServiceWithSend?
+    
+    let viewModel: ChatViewModel
+    
+    // MARK: Properties
+    
     private var subscriptions = Set<AnyCancellable>()
     private var topMessageId: String?
     private var bottomMessageId: String?
@@ -27,14 +35,10 @@ final class ChatViewController: MessagesViewController {
     private var isScrollPositionNearlyTheBottom = true
     private var viewAppeared = false
     
-    let viewModel: ChatViewModel
-    
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
     private lazy var scrollDownButton = makeScrollDownButton()
     private lazy var chatMessagesCollectionView = makeChatMessagesCollectionView()
-    
-    private var admService: WalletServiceWithSend?
     
     // swiftlint:disable unused_setter_value
     override var messageInputBar: InputBarAccessoryView {

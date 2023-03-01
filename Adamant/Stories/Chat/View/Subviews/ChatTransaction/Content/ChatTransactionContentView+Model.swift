@@ -10,6 +10,7 @@ import UIKit
 
 extension ChatTransactionContentView {
     struct Model: Equatable {
+        let id: String
         let title: String
         let icon: UIImage
         let amount: String
@@ -17,17 +18,16 @@ extension ChatTransactionContentView {
         let date: String
         let comment: String?
         let backgroundColor: ChatMessageBackgroundColor
-        let action: ComparableAction
         
         static let `default` = Self(
+            id: "",
             title: "",
             icon: .init(),
             amount: "",
             currency: "",
             date: .init(),
             comment: nil,
-            backgroundColor: .failed,
-            action: .init(id: "") {}
+            backgroundColor: .failed
         )
     }
 }

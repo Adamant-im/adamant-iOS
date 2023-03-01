@@ -132,7 +132,7 @@ extension BtcWalletService: WalletServiceTwoStepSend {
                         
                         let value = NSDecimalNumber(decimal: item.value).uint64Value
                         
-                        let lockScript = Script.buildPublicKeyHashOut(pubKeyHash: wallet.publicKey.toCashaddr().data)
+                        let lockScript = wallet.publicKey.toCashaddr().lockingScript
                         let txHash = Data(hex: item.txId).map { Data($0.reversed()) } ?? Data()
                         let txIndex = item.vout
                         

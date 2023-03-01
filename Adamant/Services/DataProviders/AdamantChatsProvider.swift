@@ -1306,6 +1306,7 @@ extension AdamantChatsProvider {
             let foundedKeys = partners.keys.compactMap {$0.address}
             let notFound = Set<String>(grouppedTransactions.keys).subtracting(foundedKeys)
             var ids = [NSManagedObjectID]()
+            
             for address in notFound {
                 let transaction = grouppedTransactions[address]?.first
                 let isOut = transaction?.isOut ?? false
@@ -1313,14 +1314,19 @@ extension AdamantChatsProvider {
                 let publicKey = isOut
                 ? transaction?.transaction.recipientPublicKey
                 : transaction?.transaction.senderPublicKey
-
-                let account = try? await accountsProvider.getAccount(
-                    byAddress: address,
-                    publicKey: publicKey ?? ""
-                )
                 
-                guard let account = account else { break }
-                ids.append(account.objectID)
+                do {
+                    let account = try await accountsProvider.getAccount(
+                        byAddress: address,
+                        publicKey: publicKey ?? ""
+                    )
+                    
+                    ids.append(account.objectID)
+                } catch AccountsProviderError.dummy(let dummyAccount) {
+                    ids.append(dummyAccount.objectID)
+                } catch {
+                    print(error)
+                }
             }
             
             // Get in our context

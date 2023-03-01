@@ -143,7 +143,8 @@ class EthTransferViewController: TransferViewControllerBase {
         }
         
         let fixedAddress: String
-        if let first = address.first, first != "0" {
+        let prefix = address.prefix(2)
+        if prefix != "0x" {
             fixedAddress = "0x\(address)"
         } else {
             fixedAddress = address

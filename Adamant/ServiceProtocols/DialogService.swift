@@ -140,6 +140,13 @@ protocol DialogService: AnyObject {
     
     func presentGoToSettingsAlert(title: String?, message: String?)
     
+    func presentDummyAlert(
+        for adm: String,
+        from: UIView?,
+        canSend: Bool,
+        sendCompletion: ((UIAlertAction) -> Void)?
+    )
+    
     // MARK: - Alerts
     func showAlert(title: String?, message: String?, style: UIAlertController.Style, actions: [UIAlertAction]?, from: Any?)
     func showAlert(title: String?, message: String?, style: AdamantAlertStyle, actions: [AdamantAlertAction]?, from: Any?)
