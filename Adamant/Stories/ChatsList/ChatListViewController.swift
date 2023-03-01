@@ -891,8 +891,11 @@ extension ChatListViewController {
                     }
                      
                     alert.addAction(UIAlertAction(title: String.adamantLocalized.chat.rename, style: .default) { [weak alert] (_) in
-                        if let textField = alert?.textFields?.first, let newName = textField.text {
-                            self?.addressBook.set(name: newName, for: address)
+                        if let textField = alert?.textFields?.first,
+                            let newName = textField.text {
+                            Task {
+                                await self?.addressBook.set(name: newName, for: address)
+                            }
                         }
                     })
                     

@@ -122,7 +122,7 @@ actor AdamantChatsProvider: ChatsProvider {
             for await _ in await NotificationCenter.default.notifications(
                 named: UIApplication.didBecomeActiveNotification
             ) {
-                didBecomeActiveAction()
+                await didBecomeActiveAction()
             }
         }
         
@@ -205,11 +205,11 @@ actor AdamantChatsProvider: ChatsProvider {
         }
     }
     
-    private func didBecomeActiveAction() {
+    private func didBecomeActiveAction() async {
         if let previousAppState = previousAppState,
            previousAppState == .background {
             self.previousAppState = .active
-            update()
+            _ = await update()
         }
     }
     
@@ -271,9 +271,9 @@ actor AdamantChatsProvider: ChatsProvider {
 
 // MARK: - DataProvider
 extension AdamantChatsProvider {
-    func reload() {
+    func reload() async {
         reset(notify: false)
-        update()
+        _ = await update()
     }
     
     func reset() {
@@ -454,12 +454,6 @@ extension AdamantChatsProvider {
             
             await Task.sleep(interval: requestRepeatDelay)
             return try await apiGetChatrooms(address: address, offset: offset)
-        }
-    }
-    
-    func update() {
-        Task {
-            _ = await update()
         }
     }
     

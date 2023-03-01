@@ -47,7 +47,7 @@ enum AccountsProviderDummyAccountError: Error {
     case internalError(Error)
 }
 
-protocol AccountsProvider: Actor {
+protocol AccountsProvider {
     
     /// Search for fetched account, if not found, asks server for account.
     ///

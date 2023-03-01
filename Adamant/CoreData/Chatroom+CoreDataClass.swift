@@ -30,7 +30,7 @@ public class Chatroom: NSManagedObject {
         return nil
     }
     
-    func getName(addressBookService: AddressBookService) -> String? {
+    @MainActor func getName(addressBookService: AddressBookService) -> String? {
         guard let partner = partner else { return nil }
         let result: String?
         if let title = title {

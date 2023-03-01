@@ -83,7 +83,7 @@ actor AdamantTransfersProvider: TransfersProvider {
             for await notification in NotificationCenter.default.notifications(
                 named: .AdamantAccountService.userLoggedIn
             ) {
-                userLoggedInAction(notification)
+                await userLoggedInAction(notification)
             }
         }
         
@@ -98,7 +98,7 @@ actor AdamantTransfersProvider: TransfersProvider {
     
     // MARK: - Notifications action
     
-    private func userLoggedInAction(_ notification: Notification) {
+    private func userLoggedInAction(_ notification: Notification) async {
         let store = securedStore
         
         guard let loggedAddress = notification.userInfo?[AdamantUserInfoKey.AccountService.loggedAccountAddress] as? String else {
@@ -120,7 +120,7 @@ actor AdamantTransfersProvider: TransfersProvider {
             store.set(loggedAddress, for: StoreKey.transfersProvider.address)
         }
         
-        update()
+        _ = await update()
     }
     
     private func userLogOutAction() {
@@ -142,15 +142,9 @@ actor AdamantTransfersProvider: TransfersProvider {
 
 // MARK: - DataProvider
 extension AdamantTransfersProvider {
-    func reload() {
+    func reload() async {
         reset(notify: false)
-        update()
-    }
-    
-    func update() {
-        Task {
-            _ = await update()
-        }
+        _ = await update()
     }
     
     func update() async -> TransfersProviderResult? {

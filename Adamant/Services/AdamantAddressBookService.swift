@@ -8,8 +8,10 @@
 
 import UIKit
 import Clibsodium
+import Combine
 
-actor AdamantAddressBookService: AddressBookService {
+@MainActor
+final class AdamantAddressBookService: AddressBookService {
     let addressBookKey = "contact_list"
     let waitTime: TimeInterval = 20.0 // in sec
     
@@ -22,26 +24,19 @@ actor AdamantAddressBookService: AddressBookService {
     
     // MARK: - Properties
     
-    var addressBook: [String: String] = [:] {
-        didSet {
-            addressBookUnsafe = addressBook
-        }
-    }
-    
-    nonisolated lazy var addressBookUnsafe: [String: String] = {
-        return [:]
-    }()
+    var addressBook: [String: String] = [:]
     
     private(set) var hasChanges = false
-    private var timer: Timer?
     
     private var removedNames = [String:String]()
     
     private var savingBookTaskId = UIBackgroundTaskIdentifier.invalid
     private var savingBookOnLogoutTaskId = UIBackgroundTaskIdentifier.invalid
     
+    private var notificationsSet: Set<AnyCancellable> = []
+    
     // MARK: - Lifecycle
-    init(
+    nonisolated init(
         apiService: ApiService,
         adamantCore: AdamantCore,
         accountService: AccountService,
@@ -57,39 +52,41 @@ actor AdamantAddressBookService: AddressBookService {
         }
     }
     
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
     // MARK: Observers
     
     private func addObservers() {
         // Update on login
-        Task {
-            for await _ in NotificationCenter.default.notifications(
-                named: .AdamantAccountService.userLoggedIn
-            ) {
-                _ = await update()
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedIn)
+            .sink { _ in
+                Task { [weak self] in
+                    _ = await self?.update()
+                }
             }
-        }
+            .store(in: &notificationsSet)
         
         // Save on logout
-        Task {
-            for await _ in NotificationCenter.default.notifications(
-                named: .AdamantAccountService.userWillLogOut
-            ) {
-                _ = await userWillLogOut()
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userWillLogOut)
+            .sink { _ in
+                Task { [weak self] in
+                    _ = await self?.userWillLogOut()
+                }
             }
-        }
+            .store(in: &notificationsSet)
         
         // Clean on logout
-        Task {
-            for await _ in NotificationCenter.default.notifications(
-                named: .AdamantAccountService.userLoggedOut
-            ) {
-                _ = await userLoggedOut()
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedOut)
+            .sink { _ in
+                Task { [weak self] in
+                    _ = await self?.userLoggedOut()
+                }
             }
-        }
+            .store(in: &notificationsSet)
     }
     
     // MARK: - Observer Actions
@@ -99,40 +96,27 @@ actor AdamantAddressBookService: AddressBookService {
             return
         }
         
-        savingBookOnLogoutTaskId = await UIApplication.shared.beginBackgroundTask { [unowned self] in
-            Task { @MainActor in
-                await UIApplication.shared.endBackgroundTask(self.savingBookOnLogoutTaskId)
-            }
+        savingBookOnLogoutTaskId = UIApplication.shared.beginBackgroundTask { [unowned self] in
+            UIApplication.shared.endBackgroundTask(self.savingBookOnLogoutTaskId)
             self.savingBookOnLogoutTaskId = .invalid
         }
         
         _ = try? await saveAddressBook(self.addressBook)
         
-        await UIApplication.shared.endBackgroundTask(savingBookOnLogoutTaskId)
+        UIApplication.shared.endBackgroundTask(savingBookOnLogoutTaskId)
         savingBookOnLogoutTaskId = .invalid
     }
     
     private func userLoggedOut() async {
         hasChanges = false
         
-        if let timer = self.timer {
-            timer.invalidate()
-            self.timer = nil
-        }
-        
         addressBook.removeAll()
     }
     
     // MARK: - Setting
     
-    nonisolated func getName(for key: String) -> String? {
-        return addressBookUnsafe[key]
-    }
-    
-    func set(name: String, for address: String) {
-        Task {
-            await set(name: name, for: address)
-        }
+    @MainActor func getName(for key: String) -> String? {
+        return addressBook[key]
     }
     
     func set(name: String, for address: String) async {
@@ -175,12 +159,6 @@ actor AdamantAddressBookService: AddressBookService {
     }
     
     // MARK: - Updating
-    
-    func update() {
-        Task {
-            _ = await update()
-        }
-    }
     
     func update() async -> AddressBookServiceResult? {
         guard !hasChanges else {
@@ -235,10 +213,8 @@ actor AdamantAddressBookService: AddressBookService {
         }
         
         // Background task
-        savingBookTaskId = await UIApplication.shared.beginBackgroundTask {
-            Task { @MainActor in
-                await UIApplication.shared.endBackgroundTask(self.savingBookTaskId)
-            }
+        savingBookTaskId = UIApplication.shared.beginBackgroundTask {
+            UIApplication.shared.endBackgroundTask(self.savingBookTaskId)
             self.savingBookTaskId = .invalid
         }
         
@@ -263,7 +239,7 @@ actor AdamantAddressBookService: AddressBookService {
             self.removedNames.removeAll()
         }
         
-        await UIApplication.shared.endBackgroundTask(self.savingBookTaskId)
+        UIApplication.shared.endBackgroundTask(self.savingBookTaskId)
         self.savingBookTaskId = .invalid
     }
     
