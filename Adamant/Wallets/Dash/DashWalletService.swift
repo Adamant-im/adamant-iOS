@@ -337,9 +337,9 @@ extension DashWalletService {
             }
             
             return result
-        } catch {
+        } catch let error as ApiServiceError {
             throw WalletServiceError.internalError(
-                message: "DASH Wallet: fail to get address from KVS",
+                message: "DASH Wallet: failed to get address from KVS",
                 error: error
             )
         }

@@ -12,13 +12,22 @@ import Combine
 import UIKit
 import SnapKit
 
+@MainActor
 final class ChatViewController: MessagesViewController {
     typealias SpinnerCell = MessageCellWrapper<SpinnerView>
     typealias TransactionCell = CollectionCellWrapper<ChatTransactionContainerView>
     typealias SendTransaction = (UIViewController & ComplexTransferViewControllerDelegate) -> Void
     
+    // MARK: Dependencies
+    
     private let storedObjects: [AnyObject]
     private let richMessageProviders: [String: RichMessageProvider]
+    private let admService: WalletServiceWithSend?
+    
+    let viewModel: ChatViewModel
+    
+    // MARK: Properties
+    
     private var subscriptions = Set<AnyCancellable>()
     private var topMessageId: String?
     private var bottomMessageId: String?
@@ -26,14 +35,10 @@ final class ChatViewController: MessagesViewController {
     private var isScrollPositionNearlyTheBottom = true
     private var viewAppeared = false
     
-    let viewModel: ChatViewModel
-    
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
     private lazy var scrollDownButton = makeScrollDownButton()
     private lazy var chatMessagesCollectionView = makeChatMessagesCollectionView()
-    
-    private var admService: WalletServiceWithSend?
     
     // swiftlint:disable unused_setter_value
     override var messageInputBar: InputBarAccessoryView {
@@ -190,7 +195,6 @@ private extension ChatViewController {
         
         viewModel.$messages
             .removeDuplicates()
-            .combineLatest(viewModel.$sender.removeDuplicates())
             .sink { [weak self] _ in self?.updateMessages() }
             .store(in: &subscriptions)
         
@@ -301,9 +305,7 @@ private extension ChatViewController {
         bottomMessageId = viewModel.messages.last?.messageId
         
         guard !messagesLoaded, !viewModel.messages.isEmpty else { return }
-        Task {
-            await viewModel.startPosition.map { setupStartPosition($0) }
-        }
+        viewModel.startPosition.map { setupStartPosition($0) }
         messagesLoaded = true
     }
     
@@ -362,8 +364,8 @@ private extension ChatViewController {
 
 private extension ChatViewController {
     func focusInputBarWithoutAnimation() {
+        // "becomeFirstResponder()" causes content animation on start without this fix
         Task { @MainActor in
-            // "becomeFirstResponder()" causes content animation on start without this fix
             await Task.sleep(interval: .zero)
             messageInputBar.inputTextView.becomeFirstResponder()
         }

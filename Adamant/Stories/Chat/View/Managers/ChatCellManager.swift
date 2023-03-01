@@ -9,6 +9,7 @@
 import Foundation
 import MessageKit
 
+@MainActor
 final class ChatCellManager: MessageCellDelegate {
     private let viewModel: ChatViewModel
     var getMessageId: ((MessageCollectionViewCell) -> String?)?

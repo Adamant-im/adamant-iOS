@@ -18,6 +18,10 @@ final class ChatTransactionContainerView: UIView {
         }
     }
     
+    var actionHandler: (ChatAction) -> Void = { _ in } {
+        didSet { contentView.actionHandler = actionHandler }
+    }
+    
     private let contentView = ChatTransactionContentView()
     private var statusSubscription: AnyCancellable?
     
@@ -55,6 +59,7 @@ final class ChatTransactionContainerView: UIView {
 extension ChatTransactionContainerView: ReusableView {
     func prepareForReuse() {
         model = .default
+        actionHandler = { _ in }
     }
 }
 
@@ -91,9 +96,7 @@ private extension ChatTransactionContainerView {
     }
     
     @objc func onStatusButtonTap() {
-        guard let action = model.updateStatusAction else { return }
-        updateStatus(.notInitiated)
-        action.action()
+        actionHandler(.forceUpdateTransactionStatus(id: model.id))
     }
 }
 

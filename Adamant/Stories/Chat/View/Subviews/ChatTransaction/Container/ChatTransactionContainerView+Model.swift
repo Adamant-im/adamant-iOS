@@ -10,16 +10,16 @@ import Foundation
 
 extension ChatTransactionContainerView {
     struct Model: Equatable {
+        let id: String
         let isFromCurrentSender: Bool
         let content: ChatTransactionContentView.Model
         var status: TransactionStatus
-        let updateStatusAction: ComparableAction?
         
         static let `default` = Self(
+            id: "",
             isFromCurrentSender: true,
             content: .default,
-            status: .notInitiated,
-            updateStatusAction: .init(action: {})
+            status: .notInitiated
         )
     }
 }
