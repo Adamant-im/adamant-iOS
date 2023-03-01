@@ -160,15 +160,19 @@ final class ChatViewModel: NSObject {
     }
     
     func sendMessage(text: String) {
+        guard let partnerAddress = chatroom?.partner?.address else { return }
+        
+        guard chatroom?.partner?.isDummy != true else {
+            dialog.send(.dummy(partnerAddress))
+            return
+        }
+        
         Task {
             let message: AdamantMessage = markdownParser.parse(text).length == text.count
             ? .text(text)
             : .markdownText(text)
             
-            guard
-                let partnerAddress = chatroom?.partner?.address,
-                await validateSendingMessage(message: message)
-            else { return }
+            guard await validateSendingMessage(message: message) else { return }
             
             do {
                 _ = try await chatsProvider.sendMessage(

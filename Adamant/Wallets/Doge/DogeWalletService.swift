@@ -327,9 +327,9 @@ extension DogeWalletService {
                 throw WalletServiceError.walletNotInitiated
             }
             return result
-        } catch {
+        } catch let error as ApiServiceError {
             throw WalletServiceError.internalError(
-                message: "DOGE Wallet: fail to get address from KVS",
+                message: "DOGE Wallet: failed to get address from KVS",
                 error: error
             )
         }

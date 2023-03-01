@@ -12,12 +12,13 @@ struct AdamantAccount {
     let address: String
     var unconfirmedBalance: Decimal
     var balance: Decimal
-    let publicKey: String?
+    var publicKey: String?
     let unconfirmedSignature: Int
     let secondSignature: Int
     let secondPublicKey: String?
     let multisignatures: [String]?
     let uMultisignatures: [String]?
+    var isDummy: Bool
 }
 
 extension AdamantAccount: Decodable {
@@ -48,6 +49,7 @@ extension AdamantAccount: Decodable {
         self.unconfirmedBalance = unconfirmedBalance.shiftedFromAdamant()
         let balance = Decimal(string: try container.decode(String.self, forKey: .balance))!
         self.balance = balance.shiftedFromAdamant()
+        self.isDummy = false
     }
 }
 
@@ -64,7 +66,8 @@ extension AdamantAccount: WrappableModel {
             secondSignature: .zero,
             secondPublicKey: nil,
             multisignatures: nil,
-            uMultisignatures: nil
+            uMultisignatures: nil,
+            isDummy: false
         )
     }
 }
