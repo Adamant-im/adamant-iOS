@@ -39,7 +39,7 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
     override func loadData(_ silent: Bool) {
         isBusy = true
         
-        let task = Task { @MainActor in
+        Task { @MainActor in
             do {
                 let trs = try await btcWalletService.getTransactions(fromTx: transactions.last?.txId)
                 transactions.append(contentsOf: trs)
@@ -56,9 +56,7 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
             emptyLabel.isHidden = transactions.count > 0
             stopBottomIndicator()
             refreshControl.endRefreshing()
-        }
-        
-        taskManager.insert(task)
+        }.stored(in: taskManager)
     }
     
     // MARK: - UITableView

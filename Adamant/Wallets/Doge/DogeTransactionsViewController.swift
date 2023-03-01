@@ -38,7 +38,7 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
     override func loadData(_ silent: Bool) {
         isBusy = true
         
-        let task = Task {
+        Task {
             do {
                 let tuple = try await walletService.getTransactions(from: offset)
                 transactions.append(contentsOf: tuple.transactions)
@@ -57,9 +57,7 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
             stopBottomIndicator()
             refreshControl.endRefreshing()
             tableView.reloadData()
-        }
-        
-        taskManager.insert(task)
+        }.stored(in: taskManager)
     }
     
     // MARK: - UITableView
@@ -82,7 +80,7 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
         dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
         let txId = transactions[indexPath.row].txId
         
-        let task = Task { @MainActor in
+        Task { @MainActor in
             do {
                 let dogeTransaction = try await walletService.getTransaction(by: txId)
                 let transaction = dogeTransaction.asBtcTransaction(DogeTransaction.self, for: sender)
@@ -120,9 +118,7 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
                 dialogService.dismissProgress()
                 dialogService.showRichError(error: error)
             }
-        }
-        
-        taskManager.insert(task)
+        }.stored(in: taskManager)
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

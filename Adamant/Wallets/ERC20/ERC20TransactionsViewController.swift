@@ -60,7 +60,7 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
             return
         }
         
-        let task = Task { @MainActor in
+        Task { @MainActor in
             do {
                 let trs = try await walletService.getTransactionsHistory(
                     address: address,
@@ -83,9 +83,7 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
             tableView.reloadData()
             stopBottomIndicator()
             refreshControl.endRefreshing()
-        }
-        
-        taskManager.insert(task)
+        }.stored(in: taskManager)
     }
     
     override func reloadData() {
@@ -120,7 +118,7 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
         
         dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
         
-        let task = Task {
+        Task {
             do {
                 let ethTransaction = try await walletService.getTransaction(by: hash)
                 dialogService.dismissProgress()
@@ -139,9 +137,7 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
                 dialogService.dismissProgress()
                 dialogService.showRichError(error: error)
             }
-        }
-        
-        taskManager.insert(task)
+        }.stored(in: taskManager)
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

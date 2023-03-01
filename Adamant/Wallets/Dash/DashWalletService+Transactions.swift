@@ -63,18 +63,18 @@ extension DashWalletService {
         }
     }
 
-    func getTransactions(by hashs: [String]) async throws -> [DashTransaction] {
+    func getTransactions(by hashes: [String]) async throws -> [DashTransaction] {
         guard let address = wallet?.address else {
             throw ApiServiceError.notLogged
         }
         
         guard let endpoint = DashWalletService.nodes.randomElement()?.asURL() else {
-            fatalError("Failed to get DASH endpoint URL")
+            throw ApiServiceError.internalError(message: "Failed to get DASH endpoint URL", error: nil)
         }
         
         var parameters: [Parameters] = []
         
-        hashs.forEach { hash in
+        hashes.forEach { hash in
             let params: Parameters = [
                 "method": "getrawtransaction",
                 "params": [
@@ -104,14 +104,7 @@ extension DashWalletService {
                 from: data
             )
             
-            var array: [DashTransaction] = []
-            model.forEach { trs in
-                if let transaction = trs.result {
-                    array.append(transaction.asBtcTransaction(DashTransaction.self, for: address))
-                }
-            }
-            
-            return array
+            return model.compactMap { $0.result?.asBtcTransaction(DashTransaction.self, for: address) }
         } catch {
             throw ApiServiceError.internalError(message: error.localizedDescription, error: error)
         }

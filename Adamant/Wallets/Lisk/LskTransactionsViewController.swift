@@ -44,7 +44,7 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
     
     override func loadData(_ silent: Bool) {
         isBusy = true
-        let task = Task { @MainActor in
+        Task { @MainActor in
             do {
                 let trs = try await lskWalletService.getTransactions(offset: offset)
                 transactions.append(contentsOf: trs)
@@ -63,9 +63,7 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
             emptyLabel.isHidden = self.transactions.count > 0
             stopBottomIndicator()
             refreshControl.endRefreshing()
-        }
-        
-        taskManager.insert(task)
+        }.stored(in: taskManager)
     }
     
     // MARK: - UITableView

@@ -72,7 +72,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
     
     @MainActor
     override func handleRefresh() {
-        let task = Task {
+        Task {
             self.emptyLabel.isHidden = true
             
             let result = await self.transfersProvider.update()
@@ -92,9 +92,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
                 
                 dialogService.showRichError(error: error)
             }
-        }
-        
-        taskManager.insert(task)
+        }.stored(in: taskManager)
     }
     
     private func markTransfersAsRead() {

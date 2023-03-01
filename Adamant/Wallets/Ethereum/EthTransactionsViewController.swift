@@ -53,7 +53,7 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
             return
         }
         
-        let task = Task { @MainActor in
+        Task { @MainActor in
             do {
                 let trs = try await ethWalletService.getTransactionsHistory(
                     address: address,
@@ -76,9 +76,7 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
             refreshControl.endRefreshing()
             stopBottomIndicator()
             tableView.reloadData()
-        }
-        
-        taskManager.insert(task)
+        }.stored(in: taskManager)
     }
     
     override func reloadData() {
@@ -113,7 +111,7 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
         
         dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
         
-        let task = Task {
+        Task {
             do {
                 let ethTransaction = try await ethWalletService.getTransaction(by: hash)
                 dialogService.dismissProgress()
@@ -133,9 +131,7 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
                 dialogService.dismissProgress()
                 dialogService.showRichError(error: error)
             }
-        }
-        
-        taskManager.insert(task)
+        }.stored(in: taskManager)
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

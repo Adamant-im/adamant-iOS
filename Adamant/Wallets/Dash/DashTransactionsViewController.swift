@@ -48,7 +48,7 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
         isBusy = true
         emptyLabel.isHidden = true
         
-        let task = Task { @MainActor in
+        Task { @MainActor in
             do {
                 if allTransactionsIds.isEmpty {
                     allTransactionsIds = try await walletService.requestTransactionsIds(for: address).reversed()
@@ -80,9 +80,7 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
             tableView.reloadData()
             stopBottomIndicator()
             refreshControl.endRefreshing()
-        }
-        
-        taskManager.insert(task)
+        }.stored(in: taskManager)
     }
     
     // MARK: - UITableView
