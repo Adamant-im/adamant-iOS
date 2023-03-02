@@ -19,8 +19,7 @@ protocol DataProvider: AnyObject, Actor {
     var state: State { get }
     var isInitiallySynced: Bool { get }
     
-    func reload()
-    func update()
+    func reload() async
     func reset()
 }
 

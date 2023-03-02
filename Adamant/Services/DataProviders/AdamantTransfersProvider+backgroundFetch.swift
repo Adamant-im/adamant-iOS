@@ -9,10 +9,9 @@
 import Foundation
 
 extension AdamantTransfersProvider: BackgroundFetchService {
-    func fetchBackgroundData(notificationsService: NotificationsService, completion: @escaping (FetchResult) -> Void) {
+    func fetchBackgroundData(notificationsService: NotificationsService) async -> FetchResult {
         guard let address: String = securedStore.get(StoreKey.transfersProvider.address) else {
-            completion(.failed)
-            return
+            return .failed
         }
         
         var lastHeight: Int64?
@@ -33,35 +32,44 @@ extension AdamantTransfersProvider: BackgroundFetchService {
             }
         }
         
-        apiService.getTransactions(
-            forAccount: address,
-            type: .send,
-            fromHeight: lastHeight,
-            offset: 0,
-            limit: 100
-        ) { [weak self] result in
-            switch result {
-            case .success(let transactions):
-                let total = transactions.filter({$0.recipientId == address}).count
-                
-                if total > 0 {
-                    self?.securedStore.set(String(total + notifiedCount), for: StoreKey.transfersProvider.notifiedTransfersCount)
-                    
-                    if var newLastHeight = transactions.map({$0.height}).sorted().last {
-                        newLastHeight += 1 // Server will return new transactions including this one
-                        self?.securedStore.set(String(newLastHeight), for: StoreKey.transfersProvider.notifiedLastHeight)
-                    }
-                    
-                    notificationsService.showNotification(title: String.adamantLocalized.notifications.newTransferTitle, body: String.localizedStringWithFormat(String.adamantLocalized.notifications.newTransferBody, total + notifiedCount), type: .newTransactions(count: total))
-                    
-                    completion(.newData)
-                } else {
-                    completion(.noData)
-                }
-                
-            case .failure:
-                completion(.failed)
+        do {
+            let transactions = try await apiService.getTransactions(
+                forAccount: address,
+                type: .send,
+                fromHeight: lastHeight,
+                offset: 0,
+                limit: 100
+            )
+            
+            let total = transactions.filter({$0.recipientId == address}).count
+            
+            guard total > 0 else { return .noData }
+            
+            securedStore.set(
+                String(total + notifiedCount),
+                for: StoreKey.transfersProvider.notifiedTransfersCount
+            )
+            
+            if var newLastHeight = transactions.map({$0.height}).sorted().last {
+                newLastHeight += 1 // Server will return new transactions including this one
+                securedStore.set(
+                    String(newLastHeight),
+                    for: StoreKey.transfersProvider.notifiedLastHeight
+                )
             }
+            
+            notificationsService.showNotification(
+                title: String.adamantLocalized.notifications.newTransferTitle,
+                body: String.localizedStringWithFormat(
+                    String.adamantLocalized.notifications.newTransferBody,
+                    total + notifiedCount
+                ),
+                type: .newTransactions(count: total)
+            )
+            
+            return .newData
+        } catch {
+            return .failed
         }
     }
     

@@ -466,7 +466,6 @@ extension ChatListViewController {
         return cell
     }
     
-    @MainActor
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if isBusy,
            indexPath.row == lastSystemChatPositionRow,
@@ -489,7 +488,7 @@ extension ChatListViewController {
             }
         }
         
-        Task {
+        Task { @MainActor in
             guard let roomsLoadedCount = await chatsProvider.roomsLoadedCount,
                   let roomsMaxCount = await chatsProvider.roomsMaxCount,
                   roomsLoadedCount < roomsMaxCount,
@@ -654,9 +653,11 @@ extension ChatListViewController: NewChatViewControllerDelegate {
         }
         
         if let name = account.name, let address = account.address {
-            let oldName = self.addressBook.addressBook[address]
-            if oldName == nil || oldName != name {
-                self.addressBook.set(name: name, for: address)
+            Task {
+                let oldName = addressBook.getName(for: address)
+                if oldName == nil || oldName != name {
+                    await self.addressBook.set(name: name, for: address)
+                }
             }
         }
         
@@ -890,8 +891,11 @@ extension ChatListViewController {
                     }
                      
                     alert.addAction(UIAlertAction(title: String.adamantLocalized.chat.rename, style: .default) { [weak alert] (_) in
-                        if let textField = alert?.textFields?.first, let newName = textField.text {
-                            self?.addressBook.set(name: newName, for: address)
+                        if let textField = alert?.textFields?.first,
+                            let newName = textField.text {
+                            Task {
+                                await self?.addressBook.set(name: newName, for: address)
+                            }
                         }
                     })
                     
@@ -1057,7 +1061,7 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
             }
             
             if let address = partner.address {
-                if let name = self.addressBook.addressBook[address] {
+                if let name = self.addressBook.getName(for: address) {
                     return name.localizedCaseInsensitiveContains(searchString) || address.localizedCaseInsensitiveContains(searchString)
                 }
                 return address.localizedCaseInsensitiveContains(searchString)

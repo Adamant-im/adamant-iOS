@@ -47,7 +47,7 @@ enum AccountsProviderDummyAccountError: Error {
     case internalError(Error)
 }
 
-protocol AccountsProvider: Actor {
+protocol AccountsProvider {
     
     /// Search for fetched account, if not found, asks server for account.
     ///
@@ -66,7 +66,7 @@ protocol AccountsProvider: Actor {
 //    func getAccount(byPublicKey publicKey: String, completion: @escaping (AccountsProviderResult) -> Void)
     
     /// Check locally if has account with specified address
-    func hasAccount(address: String) -> Bool
+    func hasAccount(address: String) async -> Bool
     
     /// Request Dummy account, if account wasn't found or initiated
     func getDummyAccount(for address: String) async throws -> DummyAccount

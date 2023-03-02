@@ -83,7 +83,7 @@ actor AdamantTransfersProvider: TransfersProvider {
             for await notification in NotificationCenter.default.notifications(
                 named: .AdamantAccountService.userLoggedIn
             ) {
-                userLoggedInAction(notification)
+                await userLoggedInAction(notification)
             }
         }
         
@@ -98,7 +98,7 @@ actor AdamantTransfersProvider: TransfersProvider {
     
     // MARK: - Notifications action
     
-    private func userLoggedInAction(_ notification: Notification) {
+    private func userLoggedInAction(_ notification: Notification) async {
         let store = securedStore
         
         guard let loggedAddress = notification.userInfo?[AdamantUserInfoKey.AccountService.loggedAccountAddress] as? String else {
@@ -120,7 +120,7 @@ actor AdamantTransfersProvider: TransfersProvider {
             store.set(loggedAddress, for: StoreKey.transfersProvider.address)
         }
         
-        update()
+        _ = await update()
     }
     
     private func userLogOutAction() {
@@ -142,20 +142,9 @@ actor AdamantTransfersProvider: TransfersProvider {
 
 // MARK: - DataProvider
 extension AdamantTransfersProvider {
-    func reload() {
+    func reload() async {
         reset(notify: false)
-        update()
-    }
-    
-    func update() {
-        self.update(completion: nil)
-    }
-    
-    func update(completion: ((TransfersProviderResult?) -> Void)?) {
-        Task {
-            let result = await update()
-            completion?(result)
-        }
+        _ = await update()
     }
     
     func update() async -> TransfersProviderResult? {
@@ -172,16 +161,14 @@ extension AdamantTransfersProvider {
         }
         
         // MARK: 3. Get transactions
-        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        privateContext.parent = stack.container.viewContext
+        
         let prevHeight = receivedLastHeight
         
         await getTransactions(
             forAccount: address,
             type: .send,
             fromHeight: prevHeight,
-            offset: nil,
-            context: privateContext
+            offset: nil
         )
         
         // MARK: 4. Check
@@ -762,8 +749,7 @@ extension AdamantTransfersProvider {
         forAccount account: String,
         type: TransactionType,
         fromHeight: Int64?,
-        offset: Int?,
-        context: NSManagedObjectContext
+        offset: Int?
     ) async {
         
         do {
@@ -783,8 +769,7 @@ extension AdamantTransfersProvider {
     
             await processRawTransactions(
                 transactions,
-                currentAddress: account,
-                context: context
+                currentAddress: account
             )
             
             // MARK: 3. Get more transactions
@@ -800,8 +785,7 @@ extension AdamantTransfersProvider {
                     forAccount: account,
                     type: type,
                     fromHeight: fromHeight,
-                    offset: newOffset,
-                    context: context
+                    offset: newOffset
                 )
             }
         } catch {
@@ -811,8 +795,7 @@ extension AdamantTransfersProvider {
     
     private func processRawTransactions(
         _ transactions: [Transaction],
-        currentAddress address: String,
-        context: NSManagedObjectContext
+        currentAddress address: String
     ) async {
         
         // MARK: 0. Transactions?
@@ -892,7 +875,7 @@ extension AdamantTransfersProvider {
         
         // MARK: 3. Create private context, and process transactions
         let contextPrivate = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        contextPrivate.parent = context
+        contextPrivate.parent = self.stack.container.viewContext
         
         var partners: [String:BaseAccount] = [:]
         for id in partnerIds {
@@ -983,20 +966,25 @@ extension AdamantTransfersProvider {
         }
                 
         // MARK: 6. Dump transactions to viewContext
-        if contextPrivate.hasChanges {
-            do {
+        do {
+            let rooms = transfers.compactMap { $0.chatroom }
+            
+            if contextPrivate.hasChanges {
                 try contextPrivate.save()
-                
-                // MARK: 7. Update lastTransactions
-                let viewContextChatrooms = Set<Chatroom>(transfers.compactMap { $0.chatroom }).compactMap { context.object(with: $0.objectID) as? Chatroom }
-                
-                for chatroom in viewContextChatrooms {
-                    await chatroom.updateLastTransaction()
-                }
-            } catch {
-                print("TransferProvider: Failed to save changes to CoreData: \(error.localizedDescription)")
+                await updateContext(rooms: rooms)
             }
+        } catch {
+            print(error)
         }
     }
     
+    @MainActor func updateContext(rooms: [Chatroom]) async {
+         let viewContextChatrooms = Set<Chatroom>(rooms).compactMap {
+             self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom
+         }
+
+         for chatroom in viewContextChatrooms {
+             await chatroom.updateLastTransaction()
+         }
+     }
 }

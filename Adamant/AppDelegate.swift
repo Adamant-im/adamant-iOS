@@ -232,7 +232,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         if let addressBookService = container.resolve(AddressBookService.self) {
-            repeater.registerForegroundCall(label: "addressBookService", interval: 15, queue: .global(qos: .utility), callback: addressBookService.update)
+            repeater.registerForegroundCall(label: "addressBookService", interval: 15, queue: .global(qos: .utility), callback: {
+                Task {
+                    await addressBookService.update()
+                }
+            })
         } else {
             dialogService.showError(withMessage: "Failed to register AddressBookService autoupdate. Please, report a bug", error: nil)
         }
@@ -277,7 +281,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func applicationDidEnterBackground(_ application: UIApplication) {
         repeater.pauseAll()
-        addressBookService.saveIfNeeded()
+        Task {
+            await addressBookService.saveIfNeeded()
+        }
     }
     
     // MARK: Notifications
@@ -388,31 +394,9 @@ extension AppDelegate {
         
         notificationsService.startBackgroundBatchNotifications()
         
-        let services: [BackgroundFetchService] = [
-            container.resolve(ChatsProvider.self) as! BackgroundFetchService,
-            container.resolve(TransfersProvider.self) as! BackgroundFetchService
-        ]
-        
-        let group = DispatchGroup()
-        let semaphore = DispatchSemaphore(value: 1)
-        var results = [FetchResult]()
-        
-        for service in services {
-            group.enter()
-            Task {
-                await service.fetchBackgroundData(notificationsService: notificationsService) { result in
-                    defer {
-                        group.leave()
-                    }
-                    
-                    semaphore.wait()
-                    results.append(result)
-                    semaphore.signal()
-                }
-            }
-        }
-        
-        group.notify(queue: DispatchQueue.global(qos: .utility)) {
+        Task {
+            let results = await fetchBackgroundData(notificationsService: notificationsService)
+            
             notificationsService.stopBackgroundBatchNotifications()
             
             for result in results {
@@ -431,6 +415,30 @@ extension AppDelegate {
             }
             
             completionHandler(.noData)
+        }
+    }
+    
+    func fetchBackgroundData(notificationsService: NotificationsService) async -> [FetchResult] {
+        let services: [BackgroundFetchService] = [
+            container.resolve(ChatsProvider.self) as! BackgroundFetchService,
+            container.resolve(TransfersProvider.self) as! BackgroundFetchService
+        ]
+        
+        return await withTaskGroup(of: FetchResult.self) { group in
+            for case let service in services {
+                group.addTask {
+                    let result = await service.fetchBackgroundData(notificationsService: notificationsService)
+                    return result
+                }
+            }
+            
+            var results: [FetchResult] = []
+            
+            for await result in group {
+                results.append(result)
+            }
+
+            return results
         }
     }
 }

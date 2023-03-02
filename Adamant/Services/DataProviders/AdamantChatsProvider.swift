@@ -16,7 +16,7 @@ actor AdamantChatsProvider: ChatsProvider {
     let accountService: AccountService
     let apiService: ApiService
     let socketService: SocketService
-    let stack: CoreDataStack
+    @MainActor let stack: CoreDataStack
     let adamantCore: AdamantCore
     let accountsProvider: AccountsProvider
     let transactionService: ChatTransactionService
@@ -122,7 +122,7 @@ actor AdamantChatsProvider: ChatsProvider {
             for await _ in await NotificationCenter.default.notifications(
                 named: UIApplication.didBecomeActiveNotification
             ) {
-                didBecomeActiveAction()
+                await didBecomeActiveAction()
             }
         }
         
@@ -205,11 +205,11 @@ actor AdamantChatsProvider: ChatsProvider {
         }
     }
     
-    private func didBecomeActiveAction() {
+    private func didBecomeActiveAction() async {
         if let previousAppState = previousAppState,
            previousAppState == .background {
             self.previousAppState = .active
-            update()
+            _ = await update()
         }
     }
     
@@ -271,9 +271,9 @@ actor AdamantChatsProvider: ChatsProvider {
 
 // MARK: - DataProvider
 extension AdamantChatsProvider {
-    func reload() {
+    func reload() async {
         reset(notify: false)
-        update()
+        _ = await update()
     }
     
     func reset() {
@@ -328,8 +328,6 @@ extension AdamantChatsProvider {
         state = .updating
         
         // MARK: 3. Get transactions
-        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        privateContext.parent = self.stack.container.viewContext
         
         let chatrooms = try? await apiGetChatrooms(address: address, offset: offset)
         
@@ -359,8 +357,7 @@ extension AdamantChatsProvider {
         await process(
             messageTransactions: array,
             senderId: address,
-            privateKey: privateKey,
-            context: privateContext
+            privateKey: privateKey
         )
         
         if !isInitiallySynced {
@@ -402,9 +399,7 @@ extension AdamantChatsProvider {
         }
         
         // MARK: 3. Get transactions
-        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        privateContext.parent = self.stack.container.viewContext
-      
+        
         if !isChatLoaded.keys.contains(addressRecipient) {
             chatsLoading.append(addressRecipient)
         }
@@ -434,8 +429,7 @@ extension AdamantChatsProvider {
         await process(
             messageTransactions: transactions,
             senderId: address,
-            privateKey: privateKey,
-            context: privateContext
+            privateKey: privateKey
         )
         
         NotificationCenter.default.post(name: .AdamantChatsProvider.initiallyLoadedMessages, object: addressRecipient)
@@ -463,10 +457,6 @@ extension AdamantChatsProvider {
         }
     }
     
-    func update() {
-        self.update(completion: nil)
-    }
-    
     func connectToSocket() {
         // MARK: 2. Prepare
         guard let address = accountService.account?.address,
@@ -475,18 +465,16 @@ extension AdamantChatsProvider {
         }
 
         // MARK: 3. Get transactions
-        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        privateContext.parent = self.stack.container.viewContext
         
         socketService.connect(address: address) { [weak self] result in
             switch result {
             case .success(let trans):
                 Task { [weak self] in
-                    await self?.process(messageTransactions: [trans],
-                                  senderId: address,
-                                  privateKey: privateKey,
-                                  context: privateContext)
-                    
+                    await self?.process(
+                        messageTransactions: [trans],
+                        senderId: address,
+                        privateKey: privateKey
+                    )
                 }
             case .failure:
                 break
@@ -496,13 +484,6 @@ extension AdamantChatsProvider {
     
     func disconnectFromSocket() {
         self.socketService.disconnect()
-    }
-    
-    func update(completion: ((ChatsProviderResult?) -> Void)?) {
-        Task {
-            let result = await update()
-            completion?(result)
-        }
     }
     
     func update() async -> ChatsProviderResult? {
@@ -528,11 +509,15 @@ extension AdamantChatsProvider {
         state = .updating
         
         // MARK: 3. Get transactions
-        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        privateContext.parent = self.stack.container.viewContext
+        
         let prevHeight = receivedLastHeight
         
-        try? await getTransactions(senderId: address, privateKey: privateKey, height: receivedLastHeight, offset: nil, context: privateContext)
+        try? await getTransactions(
+            senderId: address,
+            privateKey: privateKey,
+            height: receivedLastHeight,
+            offset: nil
+        )
         
         // MARK: 4. Check
         
@@ -1228,8 +1213,7 @@ extension AdamantChatsProvider {
         senderId: String,
         privateKey: String,
         height: Int64?,
-        offset: Int?,
-        context: NSManagedObjectContext
+        offset: Int?
     ) async throws {
         if self.accountService.account == nil {
             throw ApiServiceError.accountNotFound
@@ -1249,8 +1233,7 @@ extension AdamantChatsProvider {
             await process(
                 messageTransactions: transactions,
                 senderId: senderId,
-                privateKey: privateKey,
-                context: context
+                privateKey: privateKey
             )
             
             // MARK: 4. Get more transactions
@@ -1266,8 +1249,7 @@ extension AdamantChatsProvider {
                     senderId: senderId,
                     privateKey: privateKey,
                     height: height,
-                    offset: newOffset,
-                    context: context
+                    offset: newOffset
                 )
             }
         } catch {
@@ -1280,13 +1262,15 @@ extension AdamantChatsProvider {
     private func process(
         messageTransactions: [Transaction],
         senderId: String,
-        privateKey: String,
-        context: NSManagedObjectContext
+        privateKey: String
     ) async {
         struct DirectionedTransaction {
             let transaction: Transaction
             let isOut: Bool
         }
+        
+        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        context.parent = self.stack.container.viewContext
         
         // MARK: 1. Gather partner keys
         let mapped = messageTransactions.map({ DirectionedTransaction(transaction: $0, isOut: $0.senderId == senderId) })
@@ -1495,20 +1479,15 @@ extension AdamantChatsProvider {
         }
         
         // MARK: 6. Save to main!
-        if context.hasChanges {
-            do {
-                
+        do {
+            let rooms = partners.keys.compactMap { $0.chatroom }
+            
+            if context.hasChanges {
                 try context.save()
-                
-                // MARK: 6. Update lastTransaction
-                let viewContextChatrooms = Set<Chatroom>(partners.keys.compactMap { $0.chatroom }).compactMap { self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom }
-                
-                for chatroom in viewContextChatrooms {
-                    await chatroom.updateLastTransaction()
-                }
-            } catch {
-                print(error)
+                await updateContext(rooms: rooms)
             }
+        } catch {
+            print(error)
         }
         
         // MARK: 7. Last message height
@@ -1524,6 +1503,16 @@ extension AdamantChatsProvider {
     
     func updateLastHeight(height: Int64) {
         receivedLastHeight = height
+    }
+    
+    @MainActor func updateContext(rooms: [Chatroom]) async {
+        let viewContextChatrooms = Set<Chatroom>(rooms).compactMap {
+            self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom
+        }
+        
+        for chatroom in viewContextChatrooms {
+            await chatroom.updateLastTransaction()
+        }
     }
 }
 

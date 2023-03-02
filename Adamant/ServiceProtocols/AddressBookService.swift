@@ -83,13 +83,12 @@ extension AddressBookServiceError: RichError {
 // MARK: -
 protocol AddressBookService: AnyObject {
     // MARK: Work with Address book
-    func set(name: String, for: String)
-    var addressBook: [String:String] { get }
+    func set(name: String, for: String) async
+    @MainActor func getName(for key: String) -> String?
     
     // MARK: Updating & saving
-    func update()
-    func update(_ completion: ((AddressBookServiceResult) -> Void)?)
+    func update() async -> AddressBookServiceResult? 
     
     var hasChanges: Bool { get }
-    func saveIfNeeded()
+    func saveIfNeeded() async
 }
