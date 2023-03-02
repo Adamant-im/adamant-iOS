@@ -20,6 +20,8 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
     
     // MARK: - Properties
     var transactions: [Transactions.TransactionModel] = []
+    
+    private var offset: UInt = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,23 +30,40 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
         
         currencySymbol = LskWalletService.currencySymbol
         
-        handleRefresh(self.refreshControl)
+        loadData(true)
     }
     
-    @MainActor
-    override func handleRefresh(_ refreshControl: UIRefreshControl) {
+    override func handleRefresh() {
         self.emptyLabel.isHidden = true
-        refreshTask = Task {
+        tableView.reloadData()
+        transactions.removeAll()
+        tableView.reloadData()
+        offset = 0
+        loadData(false)
+    }
+    
+    override func loadData(_ silent: Bool) {
+        isBusy = true
+        Task { @MainActor in
             do {
-                transactions = try await lskWalletService.getTransactions()
+                let trs = try await lskWalletService.getTransactions(offset: offset)
+                transactions.append(contentsOf: trs)
+                offset += UInt(trs.count)
+                isNeedToLoadMoore = trs.count > 0
                 tableView.reloadData()
             } catch {
-                dialogService.showError(withMessage: String.adamantLocalized.transactionList.notFound, error: error)
+                isNeedToLoadMoore = false
+                
+                if !silent {
+                    dialogService.showRichError(error: error)
+                }
             }
             
+            isBusy = false
             emptyLabel.isHidden = self.transactions.count > 0
+            stopBottomIndicator()
             refreshControl.endRefreshing()
-        }
+        }.stored(in: taskManager)
     }
     
     // MARK: - UITableView

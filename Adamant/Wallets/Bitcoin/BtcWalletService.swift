@@ -31,10 +31,10 @@ struct BtcApiCommands {
         return "/address/\(address)"
     }
 
-    static func getTransactions(for address: String, toTx: String? = nil) -> String {
+    static func getTransactions(for address: String, fromTx: String? = nil) -> String {
         var url = "/address/\(address)/txs"
-        if let toTx = toTx {
-            url += "/chain/\(toTx)"
+        if let fromTx = fromTx {
+            url += "/chain/\(fromTx)"
         }
         return url
     }
@@ -553,12 +553,15 @@ extension BtcWalletService {
 
 // MARK: - Transactions
 extension BtcWalletService {
-    func getTransactions() async throws -> [BtcTransaction] {
+    func getTransactions(fromTx: String? = nil) async throws -> [BtcTransaction] {
         guard let address = self.wallet?.address else {
             throw WalletServiceError.notLogged
         }
         
-        let items = try await getTransactions(for: address)
+        let items = try await getTransactions(
+            for: address,
+            fromTx: fromTx
+        )
         let transactions = items.map {
             $0.asBtcTransaction(
                 BtcTransaction.self,
@@ -570,13 +573,16 @@ extension BtcWalletService {
         return transactions
     }
 
-    private func getTransactions(for address: String) async throws -> [RawBtcTransactionResponse] {
+    private func getTransactions(for address: String, fromTx: String? = nil) async throws -> [RawBtcTransactionResponse] {
         guard let url = BtcWalletService.nodes.randomElement()?.asURL() else {
             fatalError("Failed to get BTC endpoint URL")
         }
         
         // Request url
-        let endpoint = url.appendingPathComponent(BtcApiCommands.getTransactions(for: address))
+        let endpoint = url.appendingPathComponent(BtcApiCommands.getTransactions(
+            for: address,
+            fromTx: fromTx
+        ))
         
         // MARK: Sending request
         

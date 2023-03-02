@@ -28,14 +28,18 @@ class TransactionsListViewControllerBase: UIViewController {
     internal lazy var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
         refreshControl.tintColor = .adamant.primary
-        refreshControl.addTarget(self, action:
-            #selector(self.handleRefresh(_:)),
-                                 for: UIControl.Event.valueChanged)
+        refreshControl.addTarget(
+            self,
+            action: #selector(self.handleRefresh),
+            for: UIControl.Event.valueChanged
+        )
         return refreshControl
     }()
     
-    var refreshTask: Task<(), Error>?
-    var detailTransactionTask: Task<(), Never>?
+    var taskManager = TaskManager()
+    
+    var isNeedToLoadMoore = true
+    var isBusy = true
     
     // MARK: - IBOutlets
     @IBOutlet weak var tableView: UITableView!
@@ -87,11 +91,6 @@ class TransactionsListViewControllerBase: UIViewController {
         }
     }
     
-    deinit {
-        detailTransactionTask?.cancel()
-        refreshTask?.cancel()
-    }
-    
     // MARK: - Other
     
     private func setColors() {
@@ -117,7 +116,27 @@ class TransactionsListViewControllerBase: UIViewController {
         return 0
     }
     
-    @objc internal func handleRefresh(_ refreshControl: UIRefreshControl) {
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return TransactionTableViewCell.cellFooterLoadingCompact
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        guard !isBusy,
+              isNeedToLoadMoore,
+              tableView.numberOfRows(inSection: .zero) - indexPath.row < 3
+        else {
+            return
+        }
+
+        bottomIndicatorView().startAnimating()
+        loadData(true)
+    }
+    
+    @objc func handleRefresh() {
+        
+    }
+    
+    func loadData(_ silent: Bool) {
         
     }
     
@@ -176,5 +195,38 @@ extension TransactionsListViewControllerBase: UITableViewDataSource, UITableView
         } else {
             cell.dateLabel.text = nil
         }
+    }
+    
+    func bottomIndicatorView() -> UIActivityIndicatorView {
+        var activityIndicatorView = UIActivityIndicatorView()
+        
+        guard tableView.tableFooterView == nil else {
+            return activityIndicatorView
+        }
+        
+        let indicatorFrame = CGRect(
+            x: .zero,
+            y: .zero,
+            width: tableView.bounds.width,
+            height: TransactionTableViewCell.cellFooterLoadingCompact
+        )
+        activityIndicatorView = UIActivityIndicatorView(frame: indicatorFrame)
+        activityIndicatorView.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin]
+        activityIndicatorView.style = .medium
+        activityIndicatorView.color = .lightGray
+        activityIndicatorView.hidesWhenStopped = true
+        
+        tableView.tableFooterView = activityIndicatorView
+        
+        return activityIndicatorView
+    }
+    
+    func stopBottomIndicator() {
+        guard let activityIndicatorView = tableView.tableFooterView as? UIActivityIndicatorView else {
+            return
+        }
+        
+        activityIndicatorView.stopAnimating()
+        tableView.tableFooterView = nil
     }
 }

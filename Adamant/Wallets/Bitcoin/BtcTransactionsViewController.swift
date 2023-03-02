@@ -27,22 +27,36 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
         
         currencySymbol = BtcWalletService.currencySymbol
         
-        handleRefresh(self.refreshControl)
+        handleRefresh()
     }
     
-    @MainActor
-    override func handleRefresh(_ refreshControl: UIRefreshControl) {
-        refreshTask = Task {
+    override func handleRefresh() {
+        transactions.removeAll()
+        tableView.reloadData()
+        loadData(false)
+    }
+    
+    override func loadData(_ silent: Bool) {
+        isBusy = true
+        
+        Task { @MainActor in
             do {
-                transactions = try await btcWalletService.getTransactions()
+                let trs = try await btcWalletService.getTransactions(fromTx: transactions.last?.txId)
+                transactions.append(contentsOf: trs)
+                isNeedToLoadMoore = trs.count > 0
             } catch {
-                dialogService.showError(withMessage: String.adamantLocalized.transactionList.notFound, error: error)
+                isNeedToLoadMoore = false
+                if !silent {
+                    dialogService.showRichError(error: error)
+                }
             }
             
+            isBusy = false
             tableView.reloadData()
             emptyLabel.isHidden = transactions.count > 0
+            stopBottomIndicator()
             refreshControl.endRefreshing()
-        }
+        }.stored(in: taskManager)
     }
     
     // MARK: - UITableView
