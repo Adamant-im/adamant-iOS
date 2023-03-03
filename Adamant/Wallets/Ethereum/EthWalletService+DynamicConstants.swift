@@ -1,5 +1,6 @@
 import Foundation
-
+import BigInt
+    
 extension EthWalletService {
     // MARK: - Constants
     static let fixedFee: Decimal = 0.0
@@ -7,6 +8,26 @@ extension EthWalletService {
     static let currencyExponent: Int = -18
     static let qqPrefix: String = "ethereum"
     
+    var reliabilityGasPricePercent: BigUInt {
+        10
+    }
+        
+    var reliabilityGasLimitPercent: BigUInt {
+        10
+    }
+        
+    var defaultGasPriceGwei: BigUInt {
+        30
+    }
+        
+    var defaultGasLimit: BigUInt {
+        22000
+    }
+        
+    var warningGasPriceGwei: BigUInt {
+        70
+    }
+        
     var tokenName: String {
         "Ethereum"
     }
@@ -36,8 +57,7 @@ extension EthWalletService {
     static var nodes: [Node] {
         [
             Node(url: URL(string: "https://ethnode1.adamant.im")!),
-//Node(url: URL(string: "https://ethnode2.adamant.im")!),
-
+Node(url: URL(string: "https://ethnode2.adamant.im")!),
         ]
     }
     

@@ -89,6 +89,8 @@ class DogeWalletService: WalletService {
     
     static let kvsAddress = "doge:address"
     
+    private (set) var isWarningGasPrice = false
+    
     // MARK: - Notifications
     let walletUpdatedNotification = Notification.Name("adamant.dogeWallet.walletUpdated")
     let serviceEnabledChanged = Notification.Name("adamant.dogeWallet.enabledChanged")

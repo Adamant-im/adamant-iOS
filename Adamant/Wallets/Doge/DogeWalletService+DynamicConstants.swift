@@ -1,5 +1,6 @@
 import Foundation
-
+import BigInt
+    
 extension DogeWalletService {
     // MARK: - Constants
     static let fixedFee: Decimal = 1
@@ -37,7 +38,6 @@ extension DogeWalletService {
         [
             Node(url: URL(string: "https://dogenode1.adamant.im")!),
 Node(url: URL(string: "https://dogenode2.adamant.im")!),
-
         ]
     }
     

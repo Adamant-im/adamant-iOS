@@ -7,8 +7,19 @@ require "json"
 
 class Coins
     
+    def createDecimalSwiftVariable(name, value)
+        text = "    var #{name}: BigUInt {
+        #{value}
+    }
+        "
+        return text
+    end
+    
     # Update a swift file
     def writeToSwiftFile(name, json)
+        
+        # Read data from json
+        
         nodes = ""
         nodesArray = json["nodes"]
         if nodesArray != nil
@@ -62,8 +73,20 @@ class Coins
         
         defaultOrdinalLevel = json["defaultOrdinalLevel"]
         
+        # Gas for eth
+        reliabilityGasPricePercent = json["reliabilityGasPricePercent"]
+        reliabilityGasLimitPercent = json["reliabilityGasLimitPercent"]
+        defaultGasPriceGwei = json["defaultGasPriceGwei"]
+        defaultGasLimit = json["defaultGasLimit"]
+        warningGasPriceGwei = json["warningGasPriceGwei"]
+        
+        emptyText = ""
+        
+        # Create swift file
+        
         text = "import Foundation
-
+import BigInt
+    
 extension #{symbol.capitalize}WalletService {
     // MARK: - Constants
     static let fixedFee: Decimal = #{fixedFee}
@@ -71,6 +94,31 @@ extension #{symbol.capitalize}WalletService {
     static let currencyExponent: Int = -#{decimals}
     static let qqPrefix: String = \"#{qqPrefix}\"
     
+#{reliabilityGasPricePercent ?
+    createDecimalSwiftVariable("reliabilityGasPricePercent", reliabilityGasPricePercent) :
+    emptyText
+    }
+
+#{reliabilityGasLimitPercent ?
+    createDecimalSwiftVariable("reliabilityGasLimitPercent", reliabilityGasLimitPercent) :
+    emptyText
+    }
+
+#{defaultGasPriceGwei ?
+    createDecimalSwiftVariable("defaultGasPriceGwei", defaultGasPriceGwei) :
+    emptyText
+    }
+
+#{defaultGasLimit ?
+    createDecimalSwiftVariable("defaultGasLimit", defaultGasLimit) :
+    emptyText
+    }
+
+#{warningGasPriceGwei ?
+    createDecimalSwiftVariable("warningGasPriceGwei", warningGasPriceGwei) :
+    emptyText
+    }
+
     var tokenName: String {
         \"#{fullName}\"
     }
@@ -110,6 +158,8 @@ extension #{symbol.capitalize}WalletService {
     }
 }
 "
+        # remove empty lines
+        text = text.gsub!(/\n+/, "\n")
         
         # If is ADM write to share file
         if symbol == "ADM"
@@ -143,8 +193,8 @@ extension AdamantResources {
     end
     
     # Go over all wallets
-    def startUnpack
-        wallets = Dir[Dir.pwd + "/scripts/wallets/adamant-wallets-master/assets/general/*"]
+    def startUnpack(branch)
+        wallets = Dir[Dir.pwd + "/scripts/wallets/adamant-wallets-#{branch}/assets/general/*"]
         wallets.each do |wallet|
             readJson(wallet)
         end
@@ -152,4 +202,4 @@ extension AdamantResources {
     
 end
 
-Coins.new.startUnpack
+Coins.new.startUnpack("dev") #master #dev

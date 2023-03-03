@@ -16,6 +16,11 @@ struct ERC20Token {
     let naturalUnits: Int
     let defaultVisibility: Bool
     let defaultOrdinalLevel: Int?
+    let reliabilityGasPricePercent: Int
+    let reliabilityGasLimitPercent: Int
+    let defaultGasPriceGwei: Int
+    let defaultGasLimit: Int
+    let warningGasPriceGwei: Int
     var logo: UIImage {
         UIImage(named: "\(symbol.lowercased())_wallet") ?? UIImage(named: "ethereum_wallet") ?? UIImage()
     }

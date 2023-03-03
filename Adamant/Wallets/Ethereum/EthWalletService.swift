@@ -90,6 +90,9 @@ class EthWalletService: WalletService {
     }
     
 	private (set) var transactionFee: Decimal = 0.0
+    private (set) var gasPrice: BigUInt = 0
+    private (set) var gasLimit: BigUInt = 0
+    private (set) var isWarningGasPrice = false
 	
 	static let transferGas: Decimal = 21000
 	static let kvsAddress = "eth:address"
@@ -268,18 +271,38 @@ class EthWalletService: WalletService {
         
         setState(.upToDate)
 		
-        let price = try? await getGasPrices()
-        
-        if let price = price {
-            let newFee = price * EthWalletService.transferGas
-            
-            if transactionFee != newFee {
-                transactionFee = newFee
-                
-                NotificationCenter.default.post(name: transactionFeeUpdated, object: self, userInfo: nil)
-            }
-        }
+        await calculateFee()
 	}
+    
+    private func calculateFee() async {
+        let priceRaw = try? await getGasPrices()
+        let gasLimitRaw = try? await getGasLimit()
+        
+        var price = priceRaw ?? defaultGasPriceGwei.toWei()
+        var gasLimit = gasLimitRaw ?? defaultGasLimit
+        
+        let pricePercent = price * reliabilityGasPricePercent / 100
+        let gasLimitPercent = gasLimit * reliabilityGasLimitPercent / 100
+        
+        price = priceRaw == nil
+        ? price
+        : price + pricePercent
+        
+        gasLimit = gasLimitRaw == nil
+        ? gasLimit
+        : gasLimit + gasLimitPercent
+
+        let newFee = (price * gasLimit).asDecimal(exponent: EthWalletService.currencyExponent)
+        
+        if transactionFee != newFee {
+            transactionFee = newFee
+            gasPrice = price
+            isWarningGasPrice = price >= warningGasPriceGwei.toWei()
+            self.gasLimit = gasLimit
+            
+            NotificationCenter.default.post(name: transactionFeeUpdated, object: self, userInfo: nil)
+        }
+    }
 	
 	// MARK: - Tools
 	
@@ -287,14 +310,14 @@ class EthWalletService: WalletService {
 		return addressRegex.perfectMatch(with: address) ? .valid : .invalid
 	}
 	
-	func getGasPrices() async throws -> Decimal {
+	func getGasPrices() async throws -> BigUInt {
         guard let web3 = await self.web3 else {
             throw WalletServiceError.internalError(message: "Can't get web3 service", error: nil)
         }
         
         do {
             let price = try await web3.eth.gasPrice()
-            return price.asDecimal(exponent: EthWalletService.currencyExponent)
+            return price
         } catch {
             throw WalletServiceError.internalError(
                 message: error.localizedDescription,
@@ -302,6 +325,28 @@ class EthWalletService: WalletService {
             )
         }
 	}
+    
+    func getGasLimit() async throws -> BigUInt {
+        guard let web3 = await self.web3,
+              let ethWallet = ethWallet
+        else {
+            throw WalletServiceError.internalError(message: "Can't get web3 service", error: nil)
+        }
+        
+        do {
+            var transaction: CodableTransaction = .emptyTransaction
+            transaction.from = ethWallet.ethAddress
+            transaction.to = ethWallet.ethAddress
+            
+            let price = try await web3.eth.estimateGas(for: transaction)
+            return price
+        } catch {
+            throw WalletServiceError.internalError(
+                message: error.localizedDescription,
+                error: error
+            )
+        }
+    }
 	
 	private static func buildBaseUrl(for network: Networks?) -> String {
 		let suffix: String

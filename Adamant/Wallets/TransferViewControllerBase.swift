@@ -25,6 +25,7 @@ extension String.adamantLocalized {
         static let addressValidationError = NSLocalizedString("TransferScene.Error.InvalidAddress", comment: "Transfer: Address validation error")
         static let amountZeroError = NSLocalizedString("TransferScene.Error.TooLittleMoney", comment: "Transfer: Amount is zero, or even negative notification")
         static let notEnoughFeeError = NSLocalizedString("TransferScene.Error.TooLittleFee", comment: "Transfer: Not enough fee for send a transaction")
+        static let feeIsTooHigh = NSLocalizedString("TransferScene.Error.FeeIsTooHigh", comment: "Transfer: Fee is higher than usual")
         static let amountTooHigh = NSLocalizedString("TransferScene.Error.notEnoughMoney", comment: "Transfer: Amount is hiegher that user's total money notification")
         static let accountNotFound = NSLocalizedString("TransferScene.Error.AddressNotFound", comment: "Transfer: Address not found error")
         
@@ -146,12 +147,21 @@ class TransferViewControllerBase: FormViewController {
             
             if let new = service {
                 NotificationCenter.default.addObserver(forName: new.transactionFeeUpdated, object: new, queue: OperationQueue.main) { [weak self] _ in
-                    guard let fee = self?.service?.diplayTransactionFee, let form = self?.form else {
+                    guard let fee = self?.service?.diplayTransactionFee,
+                          let form = self?.form,
+                          let isWarningGasPrice = self?.service?.isWarningGasPrice,
+                          let feeBalanceFormatter = self?.feeBalanceFormatter
+                    else {
                         return
                     }
                     
-                    if let row: DecimalRow = form.rowBy(tag: BaseRows.fee.tag) {
-                        row.value = fee.doubleValue
+                    if let row: DoubleDetailsRow = form.rowBy(tag: BaseRows.fee.tag) {
+                        row.value = DoubleDetail(
+                            first: fee.doubleValue.format(with: feeBalanceFormatter),
+                            second: isWarningGasPrice
+                            ? String.adamantLocalized.transfer.feeIsTooHigh
+                            : nil
+                        )
                         row.updateCell()
                     }
                     
@@ -462,7 +472,7 @@ class TransferViewControllerBase: FormViewController {
             return
         }
         
-        if let row: DecimalRow = form.rowBy(tag: BaseRows.fee.tag) {
+        if let row: DoubleDetailsRow = form.rowBy(tag: BaseRows.fee.tag) {
             markRow(row, valid: isEnoughFee())
         }
         
@@ -553,8 +563,15 @@ class TransferViewControllerBase: FormViewController {
     }
 
     func reloadFormData() {
-        if let fee = service?.transactionFee, let row: DecimalRow = form.rowBy(tag: BaseRows.fee.tag) {
-            row.value = fee.doubleValue
+        if let fee = service?.transactionFee,
+           let isWarningGasPrice = service?.isWarningGasPrice,
+           let row: DoubleDetailsRow = form.rowBy(tag: BaseRows.fee.tag) {
+            row.value = DoubleDetail(
+                first: fee.doubleValue.format(with: feeBalanceFormatter),
+                second: isWarningGasPrice
+                ? String.adamantLocalized.transfer.feeIsTooHigh
+                : nil
+            )
             row.updateCell()
         }
         
@@ -894,17 +911,26 @@ extension TransferViewControllerBase {
             }
         
         case .fee:
-            return DecimalRow { [weak self] in
+            return DoubleDetailsRow { [weak self] in
                 $0.tag = BaseRows.fee.tag
-                $0.title = BaseRows.fee.localized
+                $0.cell.titleLabel.text = ""
                 $0.disabled = true
-                $0.formatter = self?.feeBalanceFormatter
-            
-                if let fee = self?.service?.diplayTransactionFee {
-                    $0.value = fee.doubleValue
-                } else {
-                    $0.value = 0
+                $0.title = BaseRows.fee.localized
+                $0.cell.titleLabel.textColor = .adamant.active
+                $0.cell.secondDetailsLabel.textColor = .adamant.alert
+                
+                guard let fee = self?.service?.diplayTransactionFee,
+                      let isWarningGasPrice = self?.service?.isWarningGasPrice
+                else {
+                    return $0.value = DoubleDetail(first: "0", second: nil)
                 }
+                
+                $0.value = DoubleDetail(
+                    first: fee.doubleValue.format(with: feeBalanceFormatter),
+                    second: isWarningGasPrice
+                    ? String.adamantLocalized.transfer.feeIsTooHigh
+                    : nil
+                )
             }
             
         case .total:

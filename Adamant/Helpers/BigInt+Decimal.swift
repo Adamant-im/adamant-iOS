@@ -31,4 +31,8 @@ extension BigUInt {
             return decim
         }
     }
+    
+    func toWei() -> BigUInt {
+        return BigUInt(self * 1000000000)
+    }
 }

@@ -49,6 +49,7 @@ class LskWalletService: WalletService {
     }
     var transactionFeeRaw: BigUInt = BigUInt(integerLiteral: 141000)
     private (set) var enabled = true
+    private (set) var isWarningGasPrice = false
     
     static var currencyLogo = #imageLiteral(resourceName: "lisk_wallet")
     

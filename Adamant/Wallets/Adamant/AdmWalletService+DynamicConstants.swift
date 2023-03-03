@@ -1,5 +1,6 @@
 import Foundation
-
+import BigInt
+    
 extension AdmWalletService {
     // MARK: - Constants
     static let fixedFee: Decimal = 0.5
@@ -44,7 +45,6 @@ Node(url: URL(string: "https://debate.adamant.im")!),
 Node(url: URL(string: "http://23.226.231.225:36666")!),
 Node(url: URL(string: "http://78.47.205.206:36666")!),
 Node(url: URL(string: "http://5.161.53.74:36666")!),
-
         ]
     }
     

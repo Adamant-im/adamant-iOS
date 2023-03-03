@@ -266,6 +266,7 @@ protocol WalletServiceWithSend: WalletService {
     
     var diplayTransactionFee : Decimal { get }
     var transactionFee : Decimal { get }
+    var isWarningGasPrice : Bool { get }
     var isTransactionFeeValid : Bool { get }
     var commentsEnabledForRichMessages: Bool { get }
     func transferViewController() -> UIViewController

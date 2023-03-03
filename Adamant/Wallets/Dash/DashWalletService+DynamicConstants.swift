@@ -1,5 +1,6 @@
 import Foundation
-
+import BigInt
+    
 extension DashWalletService {
     // MARK: - Constants
     static let fixedFee: Decimal = 0.0001
@@ -36,7 +37,6 @@ extension DashWalletService {
     static var nodes: [Node] {
         [
             Node(url: URL(string: "https://dashnode1.adamant.im")!),
-
         ]
     }
     
