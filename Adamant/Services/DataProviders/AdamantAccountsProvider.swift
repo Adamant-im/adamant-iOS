@@ -55,6 +55,7 @@ class AdamantAccountsProvider: AccountsProvider {
         
         let adamantExchange = KnownContact(contact: AdamantContacts.adamantExchange)
         let betOnBitcoin = KnownContact(contact: AdamantContacts.betOnBitcoin)
+        let adelina = KnownContact(contact: AdamantContacts.adelina)
         
         let donate = KnownContact(contact: AdamantContacts.donate)
         
@@ -75,7 +76,10 @@ class AdamantAccountsProvider: AccountsProvider {
             AdamantContacts.donate.address: donate,
             
             AdamantContacts.adamantWelcomeWallet.address: welcome,
-            AdamantContacts.adamantWelcomeWallet.name: welcome
+            AdamantContacts.adamantWelcomeWallet.name: welcome,
+            
+            AdamantContacts.adelina.address: adelina,
+            AdamantContacts.adelina.name: adelina
         ]
         
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAddressBookService.addressBookUpdated, object: nil, queue: nil) { [weak self] notification in
