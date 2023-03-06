@@ -264,6 +264,8 @@ protocol WalletServiceWithTransfers: WalletService {
 protocol WalletServiceWithSend: WalletService {
     var transactionFeeUpdated: Notification.Name { get }
     
+    var blockchainSymbol: String { get }
+    var isDynamicFee : Bool { get }
     var diplayTransactionFee : Decimal { get }
     var transactionFee : Decimal { get }
     var isWarningGasPrice : Bool { get }
@@ -281,6 +283,12 @@ extension WalletServiceWithSend {
     }
     var commentsEnabledForRichMessages: Bool {
         return true
+    }
+    var blockchainSymbol: String {
+        return tokenSymbol
+    }
+    var isDynamicFee: Bool {
+        return false
     }
 }
 

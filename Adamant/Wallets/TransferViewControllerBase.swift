@@ -147,21 +147,13 @@ class TransferViewControllerBase: FormViewController {
             
             if let new = service {
                 NotificationCenter.default.addObserver(forName: new.transactionFeeUpdated, object: new, queue: OperationQueue.main) { [weak self] _ in
-                    guard let fee = self?.service?.diplayTransactionFee,
-                          let form = self?.form,
-                          let isWarningGasPrice = self?.service?.isWarningGasPrice,
-                          let feeBalanceFormatter = self?.feeBalanceFormatter
+                    guard let form = self?.form
                     else {
                         return
                     }
                     
                     if let row: DoubleDetailsRow = form.rowBy(tag: BaseRows.fee.tag) {
-                        row.value = DoubleDetail(
-                            first: fee.doubleValue.format(with: feeBalanceFormatter),
-                            second: isWarningGasPrice
-                            ? String.adamantLocalized.transfer.feeIsTooHigh
-                            : nil
-                        )
+                        row.value = self?.getCellFeeValue()
                         row.updateCell()
                     }
                     
@@ -563,15 +555,8 @@ class TransferViewControllerBase: FormViewController {
     }
 
     func reloadFormData() {
-        if let fee = service?.transactionFee,
-           let isWarningGasPrice = service?.isWarningGasPrice,
-           let row: DoubleDetailsRow = form.rowBy(tag: BaseRows.fee.tag) {
-            row.value = DoubleDetail(
-                first: fee.doubleValue.format(with: feeBalanceFormatter),
-                second: isWarningGasPrice
-                ? String.adamantLocalized.transfer.feeIsTooHigh
-                : nil
-            )
+        if let row: DoubleDetailsRow = form.rowBy(tag: BaseRows.fee.tag) {
+            row.value = getCellFeeValue()
             row.updateCell()
         }
         
@@ -688,6 +673,10 @@ class TransferViewControllerBase: FormViewController {
 
     var feeBalanceFormatter: NumberFormatter {
         return balanceFormatter
+    }
+    
+    var fiatFormatter: NumberFormatter {
+        return AdamantBalanceFormat.fiatFormatter(for: currencyInfoService.currentCurrency)
     }
     
     /// Override this to provide custom validation logic
@@ -897,9 +886,7 @@ extension TransferViewControllerBase {
                 $0.tag = BaseRows.fiat.tag
                 $0.disabled = true
                 
-                let formatter = AdamantBalanceFormat.fiatFormatter(for: currencyInfoService.currentCurrency)
-                
-                $0.formatter = formatter
+                $0.formatter = fiatFormatter
                 
                 if let rate = self?.rate, let amount = self?.amount {
                     $0.value = amount.doubleValue * rate.doubleValue
@@ -912,25 +899,15 @@ extension TransferViewControllerBase {
         
         case .fee:
             return DoubleDetailsRow { [weak self] in
+                let estimateSymbol = service?.isDynamicFee == true ? " ~" : ""
+                
                 $0.tag = BaseRows.fee.tag
                 $0.cell.titleLabel.text = ""
                 $0.disabled = true
-                $0.title = BaseRows.fee.localized
+                $0.title = BaseRows.fee.localized + estimateSymbol
                 $0.cell.titleLabel.textColor = .adamant.active
                 $0.cell.secondDetailsLabel.textColor = .adamant.alert
-                
-                guard let fee = self?.service?.diplayTransactionFee,
-                      let isWarningGasPrice = self?.service?.isWarningGasPrice
-                else {
-                    return $0.value = DoubleDetail(first: "0", second: nil)
-                }
-                
-                $0.value = DoubleDetail(
-                    first: fee.doubleValue.format(with: feeBalanceFormatter),
-                    second: isWarningGasPrice
-                    ? String.adamantLocalized.transfer.feeIsTooHigh
-                    : nil
-                )
+                $0.value = self?.getCellFeeValue()
             }
             
         case .total:
@@ -966,6 +943,32 @@ extension TransferViewControllerBase {
                 self?.confirmSendFunds()
             }
         }
+    }
+    
+    private func getCellFeeValue() -> DoubleDetail {
+        guard let service = service else {
+            return DoubleDetail(first: "0", second: nil)
+        }
+        
+        let fee = service.diplayTransactionFee
+        let isWarningGasPrice = service.isWarningGasPrice
+        
+        var fiat: Double = 0.0
+        
+        let rate = currencyInfoService.getRate(for: service.blockchainSymbol)
+        if let rate = rate {
+            fiat = fee.doubleValue * rate.doubleValue
+        }
+        
+        let feeRaw = fee.doubleValue.format(with: feeBalanceFormatter)
+        let fiatRaw = fiat.format(with: fiatFormatter)
+        
+        return DoubleDetail(
+            first: "\(feeRaw) ~\(fiatRaw)",
+            second: isWarningGasPrice
+            ? String.adamantLocalized.transfer.feeIsTooHigh
+            : nil
+        )
     }
     
     // MARK: - Tools

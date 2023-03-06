@@ -89,6 +89,7 @@ class EthWalletService: WalletService {
         return tokenNetworkSymbol + tokenSymbol
     }
     
+    private (set) var isDynamicFee: Bool = true
 	private (set) var transactionFee: Decimal = 0.0
     private (set) var gasPrice: BigUInt = 0
     private (set) var gasLimit: BigUInt = 0
@@ -294,14 +295,14 @@ class EthWalletService: WalletService {
 
         let newFee = (price * gasLimit).asDecimal(exponent: EthWalletService.currencyExponent)
         
-        if transactionFee != newFee {
-            transactionFee = newFee
-            gasPrice = price
-            isWarningGasPrice = price >= warningGasPriceGwei.toWei()
-            self.gasLimit = gasLimit
-            
-            NotificationCenter.default.post(name: transactionFeeUpdated, object: self, userInfo: nil)
-        }
+        guard transactionFee != newFee else { return }
+        
+        transactionFee = newFee
+        gasPrice = price
+        isWarningGasPrice = price >= warningGasPriceGwei.toWei()
+        self.gasLimit = gasLimit
+        
+        NotificationCenter.default.post(name: transactionFeeUpdated, object: self, userInfo: nil)
     }
 	
 	// MARK: - Tools
