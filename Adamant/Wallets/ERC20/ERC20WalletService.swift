@@ -300,7 +300,7 @@ class ERC20WalletService: WalletService {
         
         do {
             let price = try await web3.eth.gasPrice()
-            return price // .asDecimal(exponent: EthWalletService.currencyExponent)
+            return price
         } catch {
             throw WalletServiceError.internalError(
                 message: error.localizedDescription,
