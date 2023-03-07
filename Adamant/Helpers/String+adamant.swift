@@ -116,6 +116,8 @@ extension String {
             return AdamantContacts.donate.name
         case "chats.virtual.exchange_bot_title":
             return AdamantContacts.adamantExchange.name
+        case "chats.virtual.adelina_title":
+            return AdamantContacts.adelina.name
         default:
             return self
         }

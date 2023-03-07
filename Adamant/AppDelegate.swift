@@ -479,68 +479,95 @@ extension AppDelegate {
         } else {
             unread = true
         }
+        
+        if let adelina = AdamantContacts.adelina.messages["chats.welcome_message"] {
+            chatProvider.fakeReceived(
+                message: adelina.message,
+                senderId: AdamantContacts.adelina.address,
+                date: Date.adamantNullDate,
+                unread: false,
+                silent: adelina.silentNotification,
+                showsChatroom: true,
+                completion: { result in
+                    guard case let .failure(error) = result else {
+                        return
+                    }
+                    
+                    print("ERROR showing exchenge message: \(error.message)")
+                }
+            )
+        }
+        
         if let exchenge = AdamantContacts.adamantExchange.messages["chats.welcome_message"] {
-            chatProvider.fakeReceived(message: exchenge.message,
-                                      senderId: AdamantContacts.adamantExchange.address,
-                                      date: Date.adamantNullDate,
-                                      unread: false,
-                                      silent: exchenge.silentNotification,
-                                      showsChatroom: true,
-                                      completion: { result in
-                                        guard case let .failure(error) = result else {
-                                            return
-                                        }
-                                        
-                                        print("ERROR showing exchenge message: \(error.message)")
-            })
+            chatProvider.fakeReceived(
+                message: exchenge.message,
+                senderId: AdamantContacts.adamantExchange.address,
+                date: Date.adamantNullDate,
+                unread: false,
+                silent: exchenge.silentNotification,
+                showsChatroom: true,
+                completion: { result in
+                    guard case let .failure(error) = result else {
+                        return
+                    }
+                    
+                    print("ERROR showing exchenge message: \(error.message)")
+                }
+            )
         }
         
         if let betOnBitcoin = AdamantContacts.betOnBitcoin.messages["chats.welcome_message"] {
-            chatProvider.fakeReceived(message: betOnBitcoin.message,
-                                      senderId: AdamantContacts.betOnBitcoin.address,
-                                      date: Date.adamantNullDate,
-                                      unread: false,
-                                      silent: betOnBitcoin.silentNotification,
-                                      showsChatroom: true,
-                                      completion: { result in
-                                        guard case let .failure(error) = result else {
-                                            return
-                                        }
-                                        
-                                        print("ERROR showing exchenge message: \(error.message)")
-            })
+            chatProvider.fakeReceived(
+                message: betOnBitcoin.message,
+                senderId: AdamantContacts.betOnBitcoin.address,
+                date: Date.adamantNullDate,
+                unread: false,
+                silent: betOnBitcoin.silentNotification,
+                showsChatroom: false,
+                completion: { result in
+                    guard case let .failure(error) = result else {
+                        return
+                    }
+                    
+                    print("ERROR showing exchenge message: \(error.message)")
+                }
+            )
         }
         
         if let welcome = AdamantContacts.donate.messages["chats.welcome_message"] {
-            chatProvider.fakeReceived(message: welcome.message,
-                                      senderId: AdamantContacts.donate.address,
-                                      date: Date.adamantNullDate,
-                                      unread: false,
-                                      silent: true,
-                                      showsChatroom: true,
-                                      completion: { result in
-                                        guard case let .failure(error) = result else {
-                                            return
-                                        }
-                                        
-                                        print("ERROR showing donate message: \(error.message)")
-            })
+            chatProvider.fakeReceived(
+                message: welcome.message,
+                senderId: AdamantContacts.donate.address,
+                date: Date.adamantNullDate,
+                unread: false,
+                silent: true,
+                showsChatroom: true,
+                completion: { result in
+                    guard case let .failure(error) = result else {
+                        return
+                    }
+                    
+                    print("ERROR showing donate message: \(error.message)")
+                }
+            )
         }
         
         if let welcome = AdamantContacts.adamantWelcomeWallet.messages["chats.welcome_message"] {
-            chatProvider.fakeReceived(message: welcome.message,
-                                      senderId: AdamantContacts.adamantWelcomeWallet.name,
-                                      date: Date.adamantNullDate,
-                                      unread: unread,
-                                      silent: welcome.silentNotification,
-                                      showsChatroom: true,
-                                      completion: { result in
-                                        guard case let .failure(error) = result else {
-                                            return
-                                        }
-                                        
-                                        print("ERROR showing welcome message: \(error.message)")
-            })
+            chatProvider.fakeReceived(
+                message: welcome.message,
+                senderId: AdamantContacts.adamantWelcomeWallet.name,
+                date: Date.adamantNullDate,
+                unread: unread,
+                silent: welcome.silentNotification,
+                showsChatroom: true,
+                completion: { result in
+                    guard case let .failure(error) = result else {
+                        return
+                    }
+                    
+                    print("ERROR showing welcome message: \(error.message)")
+                }
+            )
         }
         
         /*
