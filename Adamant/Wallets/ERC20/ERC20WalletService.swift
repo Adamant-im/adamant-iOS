@@ -404,6 +404,7 @@ extension ERC20WalletService {
                 let transaction = details.transaction.asEthTransaction(
                     date: nil,
                     gasUsed: receipt.gasUsed,
+                    gasPrice: receipt.effectiveGasPrice,
                     blockNumber: nil,
                     confirmations: nil,
                     receiptStatus: receipt.status,
@@ -436,6 +437,7 @@ extension ERC20WalletService {
             let ethTransaction = transaction.asEthTransaction(
                 date: block.timestamp,
                 gasUsed: receipt.gasUsed,
+                gasPrice: receipt.effectiveGasPrice,
                 blockNumber: String(blockNumber),
                 confirmations: String(confirmations),
                 receiptStatus: receipt.status,
@@ -451,6 +453,7 @@ extension ERC20WalletService {
                 let transaction = details.transaction.asEthTransaction(
                     date: nil,
                     gasUsed: nil,
+                    gasPrice: nil,
                     blockNumber: nil,
                     confirmations: nil,
                     receiptStatus: TransactionReceipt.TXStatus.notYetProcessed,
