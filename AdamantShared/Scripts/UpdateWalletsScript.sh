@@ -288,6 +288,26 @@ function getFeeValue ()
     echo "$VALUE"
 }
 
+# logic:
+# get value from general/$token/info.json
+# override value from blockchains/$token/info.json
+function getOverrideValue ()
+{
+    KEY=$1
+    WALLET_GENERAL_JSON=$2
+    WALLET_BLOCKCHAIN_JSON=$3
+    
+    VALUE=$(readIntValueFromJson "$KEY" $WALLET_GENERAL_JSON)
+    VALUE_BLOCKCHAIN=$(readIntValueFromJson "$KEY" $WALLET_BLOCKCHAIN_JSON)
+    
+    if [ ! -z "$VALUE_BLOCKCHAIN" ]
+    then
+    VALUE=$VALUE_BLOCKCHAIN
+    fi
+    
+    echo "$VALUE"
+}
+
 # set tokens
 function setTokens ()
 {
@@ -316,8 +336,8 @@ function setTokens ()
                 WALLET_GENERAL_BLOCKCHAIN_JSON=$WALLETS_NAME_DIR/$BLOCKCHAIN_NAME/info.json
                 WALLET_BLOCKCHAIN_JSON=$WALLETS_TOKENS_DIR/$BLOCKCHAIN_NAME/info.json
                 
-                DEFAULT_VISABILITY=$(readIntValueFromJson "defaultVisibility" $WALLET_GENERAL_JSON)
-                DEFAULT_ORDINAL_LEVEL=$(readIntValueFromJson "defaultOrdinalLevel" $WALLET_GENERAL_JSON)
+                DEFAULT_VISABILITY=$(getOverrideValue "defaultVisibility" $WALLET_GENERAL_JSON $WALLET_JSON)
+                DEFAULT_ORDINAL_LEVEL=$(getOverrideValue "defaultOrdinalLevel" $WALLET_GENERAL_JSON $WALLET_JSON)
                 
                 RELIABILITY_GAS_PRICE_PERCENT=$(getFeeValue "reliabilityGasPricePercent" $WALLET_GENERAL_JSON $WALLET_GENERAL_BLOCKCHAIN_JSON $WALLET_BLOCKCHAIN_JSON)
                 RELIABILITY_GAS_LIMIT_PERCENT=$(getFeeValue "reliabilityGasLimitPercent" $WALLET_GENERAL_JSON $WALLET_GENERAL_BLOCKCHAIN_JSON $WALLET_BLOCKCHAIN_JSON)
