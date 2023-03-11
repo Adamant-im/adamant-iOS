@@ -64,9 +64,12 @@ extension BtcWalletService: WalletServiceTwoStepSend {
         return transaction
     }
     
-    func sendTransaction(_ transaction: BitcoinKit.Transaction) async throws -> String {
+    func sendTransaction(_ transaction: BitcoinKit.Transaction) async throws {
         guard let url = BtcWalletService.nodes.randomElement()?.asURL() else {
-            fatalError("Failed to get BTC endpoint URL")
+            throw WalletServiceError.internalError(
+                message: "Failed to get BTC endpoint URL",
+                error: nil
+            )
         }
         
         // Request url
@@ -84,8 +87,6 @@ extension BtcWalletService: WalletServiceTwoStepSend {
             parameters: nil,
             encoding: BodyStringEncoding(body: txHex)
         )
-        
-        return transaction.txId
     }
     
     func getUnspentTransactions() async throws -> [UnspentTransaction] {

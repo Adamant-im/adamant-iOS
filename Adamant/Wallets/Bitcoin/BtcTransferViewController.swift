@@ -65,14 +65,15 @@ class BtcTransferViewController: TransferViewControllerBase {
                     )
                 }
                 
-                // Send transaction
-                let hash = try await service.sendTransaction(transaction)
-                
                 Task {
-                    service.update()
+                    try await service.sendTransaction(transaction)
+                    try await service.update()
                 }
                 
-                let detailTransaction = try? await service.getTransaction(by: hash)
+                var detailTransaction: BtcTransaction?
+                if let hash = transaction.txHash {
+                    detailTransaction = try? await service.getTransaction(by: hash)
+                }
                 
                 processTransaction(
                     self,

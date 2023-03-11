@@ -50,21 +50,25 @@ class EthTransferViewController: TransferViewControllerBase {
                 // Create transaction
                 let transaction = try await service.createTransaction(recipient: recipient, amount: amount)
                 
+                guard let txHash = transaction.txHash else {
+                    throw WalletServiceError.internalError(
+                        message: "Transaction making failure",
+                        error: nil
+                    )
+                }
+                
                 // Send adm report
-                if let reportRecipient = admReportRecipient,
-                   let hash = transaction.txHash {
+                if let reportRecipient = admReportRecipient {
                     try await reportTransferTo(
                         admAddress: reportRecipient,
                         amount: amount,
                         comments: comments,
-                        hash: hash
+                        hash: txHash
                     )
                 }
                 
-                // Send transaction
-                let hash = try await service.sendTransaction(transaction)
-                
                 Task {
+                    try await service.sendTransaction(transaction)
                     await service.update()
                 }
                 
@@ -73,7 +77,7 @@ class EthTransferViewController: TransferViewControllerBase {
                 
                 // Present detail VC
                 presentDetailTransactionVC(
-                    hash: hash,
+                    hash: txHash,
                     transaction: transaction,
                     recipient: recipient,
                     comments: comments,
@@ -264,7 +268,7 @@ class EthTransferViewController: TransferViewControllerBase {
         
         let message = AdamantMessage.richMessage(payload: payload)
         
-        await chatsProvider.removeChatPositon(for: admAddress)
+        chatsProvider.removeChatPositon(for: admAddress)
         _ = try await chatsProvider.sendMessage(message, recipientId: admAddress)
     }
     

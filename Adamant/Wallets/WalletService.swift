@@ -295,7 +295,7 @@ protocol WalletServiceTwoStepSend: WalletServiceWithSend {
     associatedtype T: RawTransaction
     
     func createTransaction(recipient: String, amount: Decimal) async throws -> T
-    func sendTransaction(_ transaction: T) async throws -> String
+    func sendTransaction(_ transaction: T) async throws
 }
 
 protocol RawTransaction {

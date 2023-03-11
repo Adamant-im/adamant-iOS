@@ -44,7 +44,7 @@ class DashTransferViewController: TransferViewControllerBase {
             return
         }
         
-        guard let sender = service.wallet?.address else {
+        guard service.wallet != nil else {
             return
         }
         
@@ -66,11 +66,9 @@ class DashTransferViewController: TransferViewControllerBase {
                     )
                 }
                 
-                // Send transaction
-                let hash = try await service.sendTransaction(transaction)
-                
                 Task {
-                    service.update()
+                    try await service.sendTransaction(transaction)
+                    await service.update()
                 }
                 
                 dialogService.dismissProgress()
@@ -211,7 +209,7 @@ class DashTransferViewController: TransferViewControllerBase {
         
         let message = AdamantMessage.richMessage(payload: payload)
         
-        await chatsProvider.removeChatPositon(for: admAddress)
+        chatsProvider.removeChatPositon(for: admAddress)
         _ = try await chatsProvider.sendMessage(message, recipientId: admAddress)
     }
     
