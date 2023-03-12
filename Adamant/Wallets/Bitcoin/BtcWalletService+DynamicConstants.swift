@@ -1,5 +1,4 @@
 import Foundation
-
 extension BtcWalletService {
     // MARK: - Constants
     static let fixedFee: Decimal = 3.153e-05
@@ -7,6 +6,30 @@ extension BtcWalletService {
     static let currencyExponent: Int = -8
     static let qqPrefix: String = "bitcoin"
     
+    static var txConsistencyMaxTime: Int {
+        10800000
+    }
+        
+    static var newPendingInterval: Int {
+        10000
+    }
+        
+    static var oldPendingInterval: Int {
+        3000
+    }
+        
+    static var registeredInterval: Int {
+        40000
+    }
+        
+    static var newPendingAttempts: Int {
+        20
+    }
+        
+    static var oldPendingAttempts: Int {
+        3
+    }
+        
     var tokenName: String {
         "Bitcoin"
     }
@@ -37,7 +60,6 @@ extension BtcWalletService {
         [
             Node(url: URL(string: "https://btcnode1.adamant.im")!),
 Node(url: URL(string: "https://btcnode2.adamant.im")!),
-
         ]
     }
     

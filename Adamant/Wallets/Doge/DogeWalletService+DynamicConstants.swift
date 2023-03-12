@@ -1,5 +1,4 @@
 import Foundation
-
 extension DogeWalletService {
     // MARK: - Constants
     static let fixedFee: Decimal = 1
@@ -7,6 +6,30 @@ extension DogeWalletService {
     static let currencyExponent: Int = -8
     static let qqPrefix: String = "doge"
     
+    static var txConsistencyMaxTime: Int {
+        900000
+    }
+        
+    static var newPendingInterval: Int {
+        5000
+    }
+        
+    static var oldPendingInterval: Int {
+        3000
+    }
+        
+    static var registeredInterval: Int {
+        20000
+    }
+        
+    static var newPendingAttempts: Int {
+        20
+    }
+        
+    static var oldPendingAttempts: Int {
+        3
+    }
+        
     var tokenName: String {
         "Dogecoin"
     }
@@ -37,7 +60,6 @@ extension DogeWalletService {
         [
             Node(url: URL(string: "https://dogenode1.adamant.im")!),
 Node(url: URL(string: "https://dogenode2.adamant.im")!),
-
         ]
     }
     

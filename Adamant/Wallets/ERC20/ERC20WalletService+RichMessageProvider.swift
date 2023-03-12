@@ -11,6 +11,29 @@ import MessageKit
 import UIKit
 
 extension ERC20WalletService: RichMessageProvider {
+    static var newPendingInterval: Int {
+        EthWalletService.newPendingInterval
+    }
+    
+    static var oldPendingInterval: Int {
+        EthWalletService.oldPendingInterval
+    }
+    
+    static var registeredInterval: Int {
+        EthWalletService.registeredInterval
+    }
+    
+    static var newPendingAttempts: Int {
+        EthWalletService.newPendingAttempts
+    }
+    
+    static var oldPendingAttempts: Int {
+        EthWalletService.oldPendingAttempts
+    }
+    
+    static var txConsistencyMaxTime: Int {
+        EthWalletService.txConsistencyMaxTime
+    }
     
     // MARK: Events
     

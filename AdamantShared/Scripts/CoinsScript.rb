@@ -7,8 +7,19 @@ require "json"
 
 class Coins
     
+    def createSwiftVariable(name, value, type)
+        text = "    static var #{name}: #{type} {
+        #{value}
+    }
+        "
+        return text
+    end
+    
     # Update a swift file
     def writeToSwiftFile(name, json)
+        
+        # Read data from json
+        
         nodes = ""
         nodesArray = json["nodes"]
         if nodesArray != nil
@@ -62,6 +73,19 @@ class Coins
         
         defaultOrdinalLevel = json["defaultOrdinalLevel"]
         
+        # txFetchInfo
+        txFetchInfo = json["txFetchInfo"]
+        txConsistencyMaxTime = json["txConsistencyMaxTime"]
+        newPendingInterval = txFetchInfo["newPendingInterval"]
+        oldPendingInterval = txFetchInfo["oldPendingInterval"]
+        registeredInterval = txFetchInfo["registeredInterval"]
+        newPendingAttempts = txFetchInfo["newPendingAttempts"]
+        oldPendingAttempts = txFetchInfo["oldPendingAttempts"]
+        
+        emptyText = ""
+        
+        # Create swift file
+        
         text = "import Foundation
 
 extension #{symbol.capitalize}WalletService {
@@ -71,6 +95,35 @@ extension #{symbol.capitalize}WalletService {
     static let currencyExponent: Int = -#{decimals}
     static let qqPrefix: String = \"#{qqPrefix}\"
     
+#{txConsistencyMaxTime ?
+    createSwiftVariable("txConsistencyMaxTime", txConsistencyMaxTime, "Int") :
+    emptyText
+    }
+
+#{newPendingInterval ?
+    createSwiftVariable("newPendingInterval", newPendingInterval, "Int") :
+    emptyText
+    }
+
+#{oldPendingInterval ?
+    createSwiftVariable("oldPendingInterval", oldPendingInterval, "Int") :
+    emptyText
+    }
+
+#{registeredInterval ?
+    createSwiftVariable("registeredInterval", registeredInterval, "Int") :
+    emptyText
+    }
+
+#{newPendingAttempts ?
+    createSwiftVariable("newPendingAttempts", newPendingAttempts, "Int") :
+    emptyText
+    }
+
+#{oldPendingAttempts ?
+    createSwiftVariable("oldPendingAttempts", oldPendingAttempts, "Int") :
+    emptyText
+    }
     var tokenName: String {
         \"#{fullName}\"
     }
@@ -110,6 +163,8 @@ extension #{symbol.capitalize}WalletService {
     }
 }
 "
+        # remove empty lines
+        text = text.gsub!(/\n+/, "\n")
         
         # If is ADM write to share file
         if symbol == "ADM"
@@ -143,8 +198,8 @@ extension AdamantResources {
     end
     
     # Go over all wallets
-    def startUnpack
-        wallets = Dir[Dir.pwd + "/scripts/wallets/adamant-wallets-master/assets/general/*"]
+    def startUnpack(branch)
+        wallets = Dir[Dir.pwd + "/scripts/wallets/adamant-wallets-#{branch}/assets/general/*"]
         wallets.each do |wallet|
             readJson(wallet)
         end
@@ -152,4 +207,4 @@ extension AdamantResources {
     
 end
 
-Coins.new.startUnpack
+Coins.new.startUnpack("dev") #master #dev

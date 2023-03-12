@@ -1,5 +1,4 @@
 import Foundation
-
 extension LskWalletService {
     // MARK: - Constants
     static let fixedFee: Decimal = 0.00142
@@ -7,6 +6,30 @@ extension LskWalletService {
     static let currencyExponent: Int = -8
     static let qqPrefix: String = "lisk"
     
+    static var txConsistencyMaxTime: Int {
+        60000
+    }
+        
+    static var newPendingInterval: Int {
+        3000
+    }
+        
+    static var oldPendingInterval: Int {
+        3000
+    }
+        
+    static var registeredInterval: Int {
+        5000
+    }
+        
+    static var newPendingAttempts: Int {
+        10
+    }
+        
+    static var oldPendingAttempts: Int {
+        3
+    }
+        
     var tokenName: String {
         "Lisk"
     }
@@ -37,7 +60,6 @@ extension LskWalletService {
         [
             Node(url: URL(string: "https://lisknode3.adamant.im")!),
 Node(url: URL(string: "https://lisknode4.adamant.im")!),
-
         ]
     }
     
@@ -45,7 +67,6 @@ Node(url: URL(string: "https://lisknode4.adamant.im")!),
         [
             Node(url: URL(string: "https://liskservice3.adamant.im")!),
 Node(url: URL(string: "https://liskservice4.adamant.im")!),
-
         ]
     }
 }
