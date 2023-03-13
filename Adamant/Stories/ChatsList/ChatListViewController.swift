@@ -10,6 +10,7 @@ import UIKit
 import CoreData
 import MarkdownKit
 import MessageKit
+import Combine
 
 extension String.adamantLocalized {
     struct chatList {
@@ -50,9 +51,7 @@ class ChatListViewController: UIViewController {
     // MARK: Properties
     var chatsController: NSFetchedResultsController<Chatroom>?
     var unreadController: NSFetchedResultsController<ChatTransaction>?
-    
-    private lazy var keyboardManager = KeyboardManager()
-    var searchController: UISearchController!
+    var searchController: UISearchController?
     
     private var preservedMessagess = [String:String]()
     
@@ -98,7 +97,8 @@ class ChatListViewController: UIViewController {
     
     // MARK: Tasks
     
-    var loadNewChatTask: Task<(), Never>?
+    private var loadNewChatTask: Task<(), Never>?
+    private var subscriptions = Set<AnyCancellable>()
     
     // MARK: Lifecycle
     override func viewDidLoad() {
@@ -119,17 +119,9 @@ class ChatListViewController: UIViewController {
         
         busyIndicatorView.layer.cornerRadius = 14
         busyIndicatorView.clipsToBounds = true
-
-        keyboardManager.on(event: .didChangeFrame) { [weak self] notification in
-            self?.additionalSafeAreaInsets.bottom = notification.endFrame.height
-        }
         
         addObservers()        
         setColors()
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -181,13 +173,13 @@ class ChatListViewController: UIViewController {
             searchResultController.delegate = self
             
             searchController = UISearchController(searchResultsController: searchResultController)
-            searchController.searchResultsUpdater = self
-            searchController.searchBar.delegate = self
-            searchController.searchBar.placeholder = String.adamantLocalized.chatList.searchPlaceholder
+            searchController?.searchResultsUpdater = self
+            searchController?.searchBar.delegate = self
+            searchController?.searchBar.placeholder = String.adamantLocalized.chatList.searchPlaceholder
             definesPresentationContext = true
             
-            searchController.obscuresBackgroundDuringPresentation = false
-            searchController.hidesNavigationBarDuringPresentation = true
+            searchController?.obscuresBackgroundDuringPresentation = false
+            searchController?.hidesNavigationBarDuringPresentation = true
             navigationItem.searchController = searchController
         }
     }
@@ -206,47 +198,73 @@ class ChatListViewController: UIViewController {
     // MARK: Add Observers
     
     private func addObservers() {
-        
         // Login/Logout
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            self?.initFetchedRequestControllers(provider: self?.chatsProvider)
-        }
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            self?.initFetchedRequestControllers(provider: nil)
-            self?.areMessagesLoaded = false
-        }
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantChatsProvider.initiallySyncedChanged, object: chatsProvider, queue: OperationQueue.main) { [weak self] notification in
-            if let synced = notification.userInfo?[AdamantUserInfoKey.ChatProvider.initiallySynced] as? Bool {
-                self?.areMessagesLoaded = true
-                self?.performOnMessagesLoadedActions()
-                self?.setIsBusy(!synced)
-                self?.tableView.reloadData()
-            } else if let synced = self?.chatsProvider.isInitiallySynced {
-                self?.setIsBusy(!synced)
-            } else {
-                self?.setIsBusy(true)
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.initFetchedRequestControllers(provider: self?.chatsProvider)
             }
-        }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.initFetchedRequestControllers(provider: nil)
+                self?.areMessagesLoaded = false
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantChatsProvider.initiallySyncedChanged, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { notification in
+                Task { [weak self] in
+                    await self?.handleInitiallySyncedNotification(notification)
+                }
+            }
+            .store(in: &subscriptions)
         
         // Control Active
-        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            if let previousAppState = self?.previousAppState,
-               previousAppState == .background {
+        NotificationCenter.default
+            .publisher(for: UIApplication.didBecomeActiveNotification, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                guard self?.previousAppState == .background else { return }
                 self?.previousAppState = .active
                 self?.updateChats()
             }
-        }
+            .store(in: &subscriptions)
         
-        NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            self?.previousAppState = .background
-        }
+        NotificationCenter.default
+            .publisher(for: UIApplication.willResignActiveNotification, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in self?.previousAppState = .background }
+            .store(in: &subscriptions)
         
+        subscriptions.insert(addKeyboardToSafeArea())
     }
     
     private func updateChats() {
         updatingIndicatorView.startAnimate()
         self.handleRefresh(self.refreshControl)
+    }
+    
+    @MainActor private func handleInitiallySyncedNotification(_ notification: Notification) async {
+        guard
+            let userInfo = notification.userInfo,
+            let synced = userInfo[AdamantUserInfoKey.ChatProvider.initiallySynced] as? Bool
+        else {
+            let synced = await chatsProvider.isInitiallySynced
+            setIsBusy(!synced)
+            return
+        }
+        
+        areMessagesLoaded = true
+        performOnMessagesLoadedActions()
+        setIsBusy(!synced)
+        tableView.reloadData()
     }
     
     // MARK: IB Actions
@@ -1046,7 +1064,7 @@ extension ChatListViewController {
 extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, SearchResultDelegate {
     @objc
     func beginSearch() {
-        searchController.searchBar.becomeFirstResponder()
+        searchController?.searchBar.becomeFirstResponder()
     }
     
     @MainActor
@@ -1080,11 +1098,11 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
     func didSelected(_ message: MessageTransaction) {
         guard let chatroom = message.chatroom else {
             dialogService.showError(withMessage: "Error getting chatroom in SearchController result. Please, report an error", error: nil)
-            searchController.dismiss(animated: true, completion: nil)
+            searchController?.dismiss(animated: true, completion: nil)
             return
         }
         
-        searchController.dismiss(animated: true) { [weak self] in
+        searchController?.dismiss(animated: true) { [weak self] in
             guard let presenter = self, let tableView = presenter.tableView else {
                 return
             }
@@ -1102,7 +1120,7 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
     }
     
     func didSelected(_ chatroom: Chatroom) {
-        searchController.dismiss(animated: true) { [weak self] in
+        searchController?.dismiss(animated: true) { [weak self] in
             guard let presenter = self, let tableView = presenter.tableView else {
                 return
             }
