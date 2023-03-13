@@ -917,18 +917,18 @@ extension AdamantTransfersProvider {
                 continue
             }
             
-            let partner = partners[String(t.id)]
-            let isOut = t.senderId == address
+            let isOutgoing = t.senderId == address
+            let partnerId = isOutgoing ? t.recipientId : t.senderId
+            let partner = partners[partnerId]
             
             let transfer = await transactionService.transferTransaction(
                 from: t,
-                isOut: isOut,
+                isOut: isOutgoing,
                 partner: partner,
                 context: contextPrivate
             )
            
-            transfer.isOutgoing = t.senderId == address
-            let partnerId = transfer.isOutgoing ? t.recipientId : t.senderId
+            transfer.isOutgoing = isOutgoing
             
             if let partner = partners[partnerId] {
                 transfer.partner = partner
