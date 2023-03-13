@@ -6,10 +6,6 @@ extension EthWalletService {
     static let currencySymbol = "ETH"
     static let currencyExponent: Int = -18
     static let qqPrefix: String = "ethereum"
-    
-    static var txConsistencyMaxTime: Int {
-        1200000
-    }
         
     static var newPendingInterval: Int {
         4000

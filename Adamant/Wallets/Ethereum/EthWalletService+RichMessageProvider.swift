@@ -11,6 +11,25 @@ import MessageKit
 import UIKit
 
 extension EthWalletService: RichMessageProvider {
+    var newPendingInterval: TimeInterval {
+        .init(milliseconds: type(of: self).newPendingInterval)
+    }
+    
+    var oldPendingInterval: TimeInterval {
+        .init(milliseconds: type(of: self).oldPendingInterval)
+    }
+    
+    var registeredInterval: TimeInterval {
+        .init(milliseconds: type(of: self).registeredInterval)
+    }
+    
+    var newPendingAttempts: Int {
+        type(of: self).newPendingAttempts
+    }
+    
+    var oldPendingAttempts: Int {
+        type(of: self).oldPendingAttempts
+    }
     
     var dynamicRichMessageType: String {
         return type(of: self).richMessageType

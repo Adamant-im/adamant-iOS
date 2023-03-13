@@ -75,7 +75,6 @@ class Coins
         
         # txFetchInfo
         txFetchInfo = json["txFetchInfo"]
-        txConsistencyMaxTime = json["txConsistencyMaxTime"]
         newPendingInterval = txFetchInfo["newPendingInterval"]
         oldPendingInterval = txFetchInfo["oldPendingInterval"]
         registeredInterval = txFetchInfo["registeredInterval"]
@@ -94,11 +93,6 @@ extension #{symbol.capitalize}WalletService {
     static let currencySymbol = \"#{symbol}\"
     static let currencyExponent: Int = -#{decimals}
     static let qqPrefix: String = \"#{qqPrefix}\"
-    
-#{txConsistencyMaxTime ?
-    createSwiftVariable("txConsistencyMaxTime", txConsistencyMaxTime, "Int") :
-    emptyText
-    }
 
 #{newPendingInterval ?
     createSwiftVariable("newPendingInterval", newPendingInterval, "Int") :

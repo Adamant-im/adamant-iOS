@@ -88,7 +88,6 @@ actor AdamantChatsProvider: ChatsProvider {
         
         Task {
             await setupSecuredStore()
-            
             await addObservers()
         }
     }
@@ -1151,7 +1150,7 @@ extension AdamantChatsProvider {
         }
     }
     
-    nonisolated func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction> {
+    @MainActor func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction> {
         guard let context = chatroom.managedObjectContext else {
             fatalError()
         }
@@ -1599,14 +1598,8 @@ extension AdamantChatsProvider {
         }
     }
     
-    func updateStatus(for transaction: RichMessageTransaction, resetBeforeUpdate: Bool) {
-        Task {
-            try await richTransactionStatusService.update(
-                transaction,
-                parentContext: stack.container.viewContext,
-                resetBeforeUpdate: resetBeforeUpdate
-            )
-        }
+    func forceUpdateStatus(for transaction: RichMessageTransaction) async {
+        await richTransactionStatusService.forceUpdate(transaction: transaction)
     }
     
     func markChatAsRead(chatroom: Chatroom) {

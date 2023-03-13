@@ -11,12 +11,25 @@ import MessageKit
 import UIKit
 
 extension AdmWalletService: RichMessageProvider {
-    static let newPendingInterval: Int = .zero
-    static let oldPendingInterval: Int = .zero
-    static let registeredInterval: Int = .zero
-    static let newPendingAttempts: Int = .zero
-    static let oldPendingAttempts: Int = .zero
-    static let txConsistencyMaxTime: Int = .zero
+    var newPendingInterval: TimeInterval {
+        .zero
+    }
+    
+    var oldPendingInterval: TimeInterval {
+        .zero
+    }
+    
+    var registeredInterval: TimeInterval {
+        .zero
+    }
+    
+    var newPendingAttempts: Int {
+        .zero
+    }
+    
+    var oldPendingAttempts: Int {
+        .zero
+    }
     
     var dynamicRichMessageType: String {
         return type(of: self).richMessageType

@@ -16,12 +16,11 @@ protocol RichMessageProvider: AnyObject {
     
     // MARK: Transactions fetch info
     
-    static var newPendingInterval: Int { get }
-    static var oldPendingInterval: Int { get }
-    static var registeredInterval: Int { get }
-    static var newPendingAttempts: Int { get }
-    static var oldPendingAttempts: Int { get }
-    static var txConsistencyMaxTime: Int { get }
+    var newPendingInterval: TimeInterval { get }
+    var oldPendingInterval: TimeInterval { get }
+    var registeredInterval: TimeInterval { get }
+    var newPendingAttempts: Int { get }
+    var oldPendingAttempts: Int { get }
     
     var dynamicRichMessageType: String { get }
     
