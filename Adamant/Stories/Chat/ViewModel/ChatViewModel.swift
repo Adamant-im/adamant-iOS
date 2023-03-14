@@ -186,22 +186,18 @@ final class ChatViewModel: NSObject {
         }.stored(in: tasksStorage)
     }
     
-    func loadTransactionStatusIfNeeded(id: String, forceUpdate: Bool) {
+    func forceUpdateTransactionStatus(id: String) {
         Task {
             guard
                 let transaction = chatTransactions.first(where: { $0.chatMessageId == id }),
                 let richMessageTransaction = transaction as? RichMessageTransaction,
-                richMessageTransaction.transactionStatus?.isFinal != true || forceUpdate
+                let index = messages.firstIndex(where: { id == $0.id }),
+                case var .transaction(model) = messages[index].content
             else { return }
             
-            if forceUpdate,
-               let index = messages.firstIndex(where: { id == $0.id }),
-               case var .transaction(model) = messages[index].content {
-                model.status = .notInitiated
-                messages[index].content = .transaction(model)
-            }
-
-            await chatsProvider.updateStatus(for: richMessageTransaction, resetBeforeUpdate: forceUpdate)
+            model.status = .notInitiated
+            messages[index].content = .transaction(model)
+            await chatsProvider.forceUpdateStatus(for: richMessageTransaction)
         }.stored(in: tasksStorage)
     }
     

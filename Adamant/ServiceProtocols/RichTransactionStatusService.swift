@@ -8,10 +8,6 @@
 
 import CoreData
 
-protocol RichTransactionStatusService: AnyObject {
-    func update(
-        _ transaction: RichMessageTransaction,
-        parentContext: NSManagedObjectContext,
-        resetBeforeUpdate: Bool
-    ) async throws
+protocol RichTransactionStatusService: Actor, AnyObject {
+    func forceUpdate(transaction: RichMessageTransaction) async
 }

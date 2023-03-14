@@ -8,6 +8,26 @@ extension BtcWalletService {
     static let currencyExponent: Int = -8
     static let qqPrefix: String = "bitcoin"
     
+    static var newPendingInterval: Int {
+        10000
+    }
+        
+    static var oldPendingInterval: Int {
+        3000
+    }
+        
+    static var registeredInterval: Int {
+        40000
+    }
+        
+    static var newPendingAttempts: Int {
+        20
+    }
+        
+    static var oldPendingAttempts: Int {
+        3
+    }
+        
     var tokenName: String {
         "Bitcoin"
     }

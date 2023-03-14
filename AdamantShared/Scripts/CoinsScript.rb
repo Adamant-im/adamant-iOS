@@ -7,8 +7,9 @@ require "json"
 
 class Coins
     
-    def createDecimalSwiftVariable(name, value)
-        text = "    var #{name}: BigUInt {
+    def createSwiftVariable(name, value, type, isStatic)
+        prefix = isStatic ? "static " : ""
+        text = "    #{prefix}var #{name}: #{type} {
         #{value}
     }
         "
@@ -73,6 +74,14 @@ class Coins
         
         defaultOrdinalLevel = json["defaultOrdinalLevel"]
         
+        # txFetchInfo
+        txFetchInfo = json["txFetchInfo"]
+        newPendingInterval = txFetchInfo["newPendingInterval"]
+        oldPendingInterval = txFetchInfo["oldPendingInterval"]
+        registeredInterval = txFetchInfo["registeredInterval"]
+        newPendingAttempts = txFetchInfo["newPendingAttempts"]
+        oldPendingAttempts = txFetchInfo["oldPendingAttempts"]
+
         # Gas for eth
         reliabilityGasPricePercent = json["reliabilityGasPricePercent"]
         reliabilityGasLimitPercent = json["reliabilityGasLimitPercent"]
@@ -94,28 +103,53 @@ extension #{symbol.capitalize}WalletService {
     static let currencyExponent: Int = -#{decimals}
     static let qqPrefix: String = \"#{qqPrefix}\"
     
+#{newPendingInterval ?
+    createSwiftVariable("newPendingInterval", newPendingInterval, "Int", true) :
+    emptyText
+    }
+
+#{oldPendingInterval ?
+    createSwiftVariable("oldPendingInterval", oldPendingInterval, "Int", true) :
+    emptyText
+    }
+
+#{registeredInterval ?
+    createSwiftVariable("registeredInterval", registeredInterval, "Int", true) :
+    emptyText
+    }
+
+#{newPendingAttempts ?
+    createSwiftVariable("newPendingAttempts", newPendingAttempts, "Int", true) :
+    emptyText
+    }
+
+#{oldPendingAttempts ?
+    createSwiftVariable("oldPendingAttempts", oldPendingAttempts, "Int", true) :
+    emptyText
+    }
+
 #{reliabilityGasPricePercent ?
-    createDecimalSwiftVariable("reliabilityGasPricePercent", reliabilityGasPricePercent) :
+    createDecimalSwiftVariable("reliabilityGasPricePercent", reliabilityGasPricePercent, "BigUInt", false) :
     emptyText
     }
 
 #{reliabilityGasLimitPercent ?
-    createDecimalSwiftVariable("reliabilityGasLimitPercent", reliabilityGasLimitPercent) :
+    createDecimalSwiftVariable("reliabilityGasLimitPercent", reliabilityGasLimitPercent, "BigUInt", false) :
     emptyText
     }
 
 #{defaultGasPriceGwei ?
-    createDecimalSwiftVariable("defaultGasPriceGwei", defaultGasPriceGwei) :
+    createDecimalSwiftVariable("defaultGasPriceGwei", defaultGasPriceGwei, "BigUInt", false) :
     emptyText
     }
 
 #{defaultGasLimit ?
-    createDecimalSwiftVariable("defaultGasLimit", defaultGasLimit) :
+    createDecimalSwiftVariable("defaultGasLimit", defaultGasLimit, "BigUInt", false) :
     emptyText
     }
 
 #{warningGasPriceGwei ?
-    createDecimalSwiftVariable("warningGasPriceGwei", warningGasPriceGwei) :
+    createDecimalSwiftVariable("warningGasPriceGwei", warningGasPriceGwei, "BigUInt", false) :
     emptyText
     }
 

@@ -14,6 +14,14 @@ protocol RichMessageProvider: AnyObject {
     /// Lowercased!!
     static var richMessageType: String { get }
     
+    // MARK: Transactions fetch info
+    
+    var newPendingInterval: TimeInterval { get }
+    var oldPendingInterval: TimeInterval { get }
+    var registeredInterval: TimeInterval { get }
+    var newPendingAttempts: Int { get }
+    var oldPendingAttempts: Int { get }
+    
     var dynamicRichMessageType: String { get }
     
     var tokenSymbol: String { get }

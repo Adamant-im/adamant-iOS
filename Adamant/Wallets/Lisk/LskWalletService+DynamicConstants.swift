@@ -8,6 +8,26 @@ extension LskWalletService {
     static let currencyExponent: Int = -8
     static let qqPrefix: String = "lisk"
     
+    static var newPendingInterval: Int {
+        3000
+    }
+        
+    static var oldPendingInterval: Int {
+        3000
+    }
+        
+    static var registeredInterval: Int {
+        5000
+    }
+        
+    static var newPendingAttempts: Int {
+        10
+    }
+        
+    static var oldPendingAttempts: Int {
+        3
+    }
+        
     var tokenName: String {
         "Lisk"
     }

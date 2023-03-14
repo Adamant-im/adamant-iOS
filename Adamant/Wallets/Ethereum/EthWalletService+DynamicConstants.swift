@@ -7,6 +7,26 @@ extension EthWalletService {
     static let currencySymbol = "ETH"
     static let currencyExponent: Int = -18
     static let qqPrefix: String = "ethereum"
+        
+    static var newPendingInterval: Int {
+        4000
+    }
+        
+    static var oldPendingInterval: Int {
+        3000
+    }
+        
+    static var registeredInterval: Int {
+        5000
+    }
+        
+    static var newPendingAttempts: Int {
+        15
+    }
+        
+    static var oldPendingAttempts: Int {
+        3
+    }
     
     var reliabilityGasPricePercent: BigUInt {
         10

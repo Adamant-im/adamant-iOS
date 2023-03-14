@@ -212,6 +212,7 @@ extension Container {
                 .map { ($0.dynamicRichMessageType, $0) }
             
             return AdamantRichTransactionStatusService(
+                coreDataStack: r.resolve(CoreDataStack.self)!,
                 richProviders: Dictionary(uniqueKeysWithValues: richProviders)
             )
         }.inObjectScope(.container)
