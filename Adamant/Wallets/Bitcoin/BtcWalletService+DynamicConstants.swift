@@ -1,5 +1,6 @@
 import Foundation
-
+import BigInt
+    
 extension BtcWalletService {
     // MARK: - Constants
     static let fixedFee: Decimal = 3.153e-05
@@ -37,7 +38,6 @@ extension BtcWalletService {
         [
             Node(url: URL(string: "https://btcnode1.adamant.im")!),
 Node(url: URL(string: "https://btcnode2.adamant.im")!),
-
         ]
     }
     

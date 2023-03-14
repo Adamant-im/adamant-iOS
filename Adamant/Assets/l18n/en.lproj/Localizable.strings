@@ -922,6 +922,9 @@
 /* Transfer: Not enough fee for send a transaction */
 "TransferScene.Error.TooLittleFee" = "Not enough fee";
 
+/* Transfer: Fee is higher than usual */
+"TransferScene.Error.FeeIsTooHigh" = "Note: tx fee is higher than regular";
+
 /* Transfer: Alert title: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address */
 "TransferScene.unsafeTransferAlert.title" = "Can't verify %@";
 

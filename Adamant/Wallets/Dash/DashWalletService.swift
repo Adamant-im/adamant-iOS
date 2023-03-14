@@ -64,6 +64,8 @@ class DashWalletService: WalletService {
         return DashWalletService.fixedFee
     }
     
+    private (set) var isWarningGasPrice = false
+    
     static let kvsAddress = "dash:address"
     
     internal var transatrionsIds = [String]()

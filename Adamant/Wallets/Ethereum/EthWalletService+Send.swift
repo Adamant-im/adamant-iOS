@@ -58,9 +58,13 @@ extension EthWalletService: WalletServiceTwoStepSend {
         tx.value = bigUIntAmount
         
         let resolver = PolicyResolver(provider: provider)
+        let policies: Policies = Policies(
+            gasLimitPolicy: .manual(gasLimit),
+            gasPricePolicy: .manual(gasPrice)
+        )
         
         do {
-            try await resolver.resolveAll(for: &tx)
+            try await resolver.resolveAll(for: &tx, with: policies)
             
             try Web3Signer.signTX(transaction: &tx,
                                   keystore: keystoreManager,

@@ -1,5 +1,6 @@
 import Foundation
-
+import BigInt
+    
 extension LskWalletService {
     // MARK: - Constants
     static let fixedFee: Decimal = 0.00142
@@ -37,7 +38,6 @@ extension LskWalletService {
         [
             Node(url: URL(string: "https://lisknode3.adamant.im")!),
 Node(url: URL(string: "https://lisknode4.adamant.im")!),
-
         ]
     }
     
@@ -45,7 +45,6 @@ Node(url: URL(string: "https://lisknode4.adamant.im")!),
         [
             Node(url: URL(string: "https://liskservice3.adamant.im")!),
 Node(url: URL(string: "https://liskservice4.adamant.im")!),
-
         ]
     }
 }
