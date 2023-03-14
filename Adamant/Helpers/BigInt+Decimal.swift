@@ -33,6 +33,6 @@ extension BigUInt {
     }
     
     func toWei() -> BigUInt {
-        return BigUInt(self * 1000000000)
+        return BigUInt(self * 1_000_000_000)
     }
 }
