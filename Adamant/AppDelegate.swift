@@ -463,6 +463,18 @@ extension AppDelegate {
         } else {
             unread = true
         }
+        
+        if let adelina = AdamantContacts.adelina.messages["chats.welcome_message"] {
+            _ = try? await chatProvider.fakeReceived(
+                message: adelina.message,
+                senderId: AdamantContacts.adelina.address,
+                date: Date.adamantNullDate,
+                unread: false,
+                silent: adelina.silentNotification,
+                showsChatroom: true
+            )
+        }
+        
         if let exchenge = AdamantContacts.adamantExchange.messages["chats.welcome_message"] {
             _ = try? await chatProvider.fakeReceived(
                 message: exchenge.message,
@@ -481,7 +493,7 @@ extension AppDelegate {
                 date: Date.adamantNullDate,
                 unread: false,
                 silent: betOnBitcoin.silentNotification,
-                showsChatroom: true
+                showsChatroom: false
             )
         }
         
@@ -506,24 +518,6 @@ extension AppDelegate {
                 showsChatroom: true
             )
         }
-        
-        /*
-        if let ico = AdamantContacts.adamantIco.messages["chats.ico_message"] {
-            chatProvider.fakeReceived(message: ico.message,
-                                      senderId: AdamantContacts.adamantIco.name,
-                                      date: Date.adamantNullDate,
-                                      unread: unread,
-                                      silent: ico.silentNotification,
-                                      showsChatroom: true,
-                                      completion: { result in
-                                        guard case let .failure(error) = result else {
-                                            return
-                                        }
-                                        
-                                        print("ERROR showing welcome message: \(error.message)")
-            })
-        }
-        */
     }
 }
 
