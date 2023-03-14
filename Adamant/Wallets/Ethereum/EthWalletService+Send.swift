@@ -87,14 +87,13 @@ extension EthWalletService: WalletServiceTwoStepSend {
 		return vc
 	}
     
-    func sendTransaction(_ transaction: CodableTransaction) async throws -> String {
+    func sendTransaction(_ transaction: CodableTransaction) async throws {
         guard let txEncoded = transaction.encode() else {
             throw WalletServiceError.internalError(message: String.adamantLocalized.sharedErrors.unknownError, error: nil)
         }
         
         do {
-            let result = try await web3?.eth.send(raw: txEncoded)
-            return result?.hash ?? ""
+            _ = try await web3?.eth.send(raw: txEncoded)
         } catch {
             throw WalletServiceError.internalError(message: "Error: \(error.localizedDescription)", error: nil)
         }

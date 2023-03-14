@@ -63,9 +63,12 @@ extension DogeWalletService: WalletServiceTwoStepSend {
         }
     }
     
-    func sendTransaction(_ transaction: BitcoinKit.Transaction) async throws -> String {
+    func sendTransaction(_ transaction: BitcoinKit.Transaction) async throws {
         guard let url = DogeWalletService.nodes.randomElement()?.asURL() else {
-            fatalError("Failed to get DOGE endpoint URL")
+            throw WalletServiceError.internalError(
+                message: "Failed to get DOGE endpoint URL",
+                error: nil
+            )
         }
         
         // Request url
@@ -84,16 +87,19 @@ extension DogeWalletService: WalletServiceTwoStepSend {
         ]
         
         // MARK: Sending request
-        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<String, Error>) in
-            AF.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
+        _ = try await withUnsafeThrowingContinuation { continuation in
+            AF.request(
+                endpoint,
+                method: .post,
+                parameters: parameters,
+                encoding: JSONEncoding.default,
+                headers: headers
+            )
+            .validate(statusCode: 200 ... 299)
+            .responseJSON(queue: defaultDispatchQueue) { response in
                 switch response.result {
-                case .success(let data):
-                    if let result = data as? [String: Any], let txid = result["txid"] as? String {
-                        continuation.resume(returning: txid)
-                    } else {
-                        continuation.resume(throwing: WalletServiceError.internalError(message: "DOGE Wallet: not valid response", error: nil))
-                    }
-                    
+                case .success:
+                    continuation.resume()
                 case .failure(let error):
                     guard let data = response.data else {
                         continuation.resume(throwing: WalletServiceError.remoteServiceError(message: error.localizedDescription))

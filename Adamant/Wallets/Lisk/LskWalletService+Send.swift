@@ -52,17 +52,17 @@ extension LskWalletService: WalletServiceTwoStepSend {
             recipientAddress: binaryAddress
         )
         
-        let signedTransaction = transaction.signed(with: keys, for: self.netHash)
-        
+        var signedTransaction = transaction.signed(with: keys, for: self.netHash)
+        signedTransaction.id = signedTransaction.bytes().sha256().hexString()
         return signedTransaction
     }
     
-    func sendTransaction(_ transaction: TransactionEntity) async throws -> String {
-        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<String, Error>) in
-            self.transactionApi.submit(signedTransaction: transaction.requestOptions) { response in
+    func sendTransaction(_ transaction: TransactionEntity) async throws {
+        _ = try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Void, Error>) in
+            transactionApi.submit(signedTransaction: transaction.requestOptions) { response in
                 switch response {
-                case .success(let result):
-                    continuation.resume(returning: result.data.transactionId)
+                case .success:
+                    continuation.resume()
                 case .error(let error):
                     continuation.resume(throwing: WalletServiceError.internalError(message: error.message, error: nil))
                 }

@@ -70,9 +70,12 @@ extension DashWalletService: WalletServiceTwoStepSend {
         return transaction
     }
     
-    func sendTransaction(_ transaction: BitcoinKit.Transaction) async throws -> String {
+    func sendTransaction(_ transaction: BitcoinKit.Transaction) async throws {
         guard let endpoint = DashWalletService.nodes.randomElement()?.asURL() else {
-            fatalError("Failed to get DASH endpoint URL")
+            throw WalletServiceError.internalError(
+                message: "Failed to get DASH endpoint URL",
+                error: nil
+            )
         }
         
         let txHex = transaction.serialized().hex
@@ -94,9 +97,8 @@ extension DashWalletService: WalletServiceTwoStepSend {
                 encoding: JSONEncoding.default
             )
             
-            if let result = response.result {
-                self.lastTransactionId = transaction.txID
-                return result
+            if response.result != nil {
+                lastTransactionId = transaction.txID
             } else if let error = response.error?.message {
                 if error.lowercased().contains("16: tx-txlock-conflict") {
                     throw WalletServiceError.internalError(

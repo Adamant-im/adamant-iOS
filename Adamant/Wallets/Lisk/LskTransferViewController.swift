@@ -42,22 +42,19 @@ class LskTransferViewController: TransferViewControllerBase {
                 // Create transaction
                 let transaction = try await service.createTransaction(recipient: recipient, amount: amount)
                 
-                // Send transaction
-                let transactionId = try await service.sendTransaction(transaction)
-                
                 // Send adm report
-                // in lisk we get the transaction ID after sending
                 if let reportRecipient = admReportRecipient {
                     try await reportTransferTo(
                         admAddress: reportRecipient,
                         amount: amount,
                         comments: comments,
-                        hash: transactionId
+                        hash: transaction.id
                     )
                 }
                 
                 Task {
-                    service.update()
+                    try await service.sendTransaction(transaction)
+                    await service.update()
                 }
                 
                 dialogService.dismissProgress()
@@ -65,7 +62,7 @@ class LskTransferViewController: TransferViewControllerBase {
                 
                 // Present detail VC
                 presentDetailTransactionVC(
-                    transactionId: transactionId,
+                    transactionId: transaction.id,
                     transaction: transaction,
                     service: service,
                     comments: comments
@@ -206,7 +203,7 @@ class LskTransferViewController: TransferViewControllerBase {
         
         let message = AdamantMessage.richMessage(payload: payload)
        
-        await chatsProvider.removeChatPositon(for: admAddress)
+        chatsProvider.removeChatPositon(for: admAddress)
         _ = try await chatsProvider.sendMessage(message, recipientId: admAddress)
     }
     
