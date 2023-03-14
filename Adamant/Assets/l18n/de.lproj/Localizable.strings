@@ -856,6 +856,9 @@
 /* Transaction status: transaction failed */
 "TransactionStatus.Failed" = "Abgelehnt";
 
+/* Transaction status: inconsistent */
+"TransactionStatus.Inconsistent" = "Inconsistent";
+
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "Details";
 
@@ -1038,9 +1041,6 @@
 
 /* Wallet Services: Transaction unavailable */
 "WalletServices.SharedErrors.transactionUnavailable" = "Transaktion nicht verfügbar";
-
-/* Wallet Services: Duplicated transaction */
-"WalletServices.SharedErrors.duplicatedTransaction" = "Doppelte transaktion";
 
 /* Wallet Services: Cannot verify transaction */
 "WalletServices.SharedErrors.inconsistentTransaction" = "Transaktion kann nicht verifiziert werden";

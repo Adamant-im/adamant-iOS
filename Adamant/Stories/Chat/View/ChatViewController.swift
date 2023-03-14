@@ -467,11 +467,9 @@ private extension ChatViewController {
         else { return }
         
         switch transaction.transactionStatus {
-        case .dublicate:
-            viewModel.dialog.send(.alert(.adamantLocalized.sharedErrors.duplicatedTransaction))
         case .failed:
             viewModel.dialog.send(.alert(.adamantLocalized.sharedErrors.inconsistentTransaction))
-        case .notInitiated, .pending, .success, .updating, .warning, .none:
+        case .notInitiated, .pending, .success, .updating, .warning, .none, .inconsistent, .registered:
             provider.richMessageTapped(for: transaction, in: self)
         }
     }

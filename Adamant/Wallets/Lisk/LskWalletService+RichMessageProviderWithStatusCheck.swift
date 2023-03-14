@@ -39,15 +39,6 @@ extension LskWalletService: RichMessageProviderWithStatusCheck {
                 }
             }
             
-            // MARK: Check date
-            let start = date.addingTimeInterval(-60 * 5)
-            let end = date.addingTimeInterval(self.consistencyMaxTime)
-            let range = start...end
-            
-            guard range.contains(lskTransaction.sentDate) else {
-                return .warning
-            }
-            
             // MARK: Check amount
             if let raw = transaction.richContent?[RichContentKeys.transfer.amount], let reported = AdamantBalanceFormat.deserializeBalance(from: raw) {
                 let min = reported - reported*0.005
@@ -58,7 +49,14 @@ extension LskWalletService: RichMessageProviderWithStatusCheck {
                 }
             }
             
-            return .success
+            // MARK: Check date
+            let start = date.addingTimeInterval(-60 * 5)
+            let end = date.addingTimeInterval(self.consistencyMaxTime)
+            let dateRange = start...end
+            
+            return dateRange.contains(lskTransaction.sentDate)
+                ? .success
+                : .inconsistent
         } catch let error as ApiServiceError {
             if error.message.contains("does not exist") {
                 let timeAgo = -1 * date.timeIntervalSinceNow

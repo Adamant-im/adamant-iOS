@@ -35,16 +35,7 @@ extension BtcWalletService: RichMessageProviderWithStatusCheck {
                 }
             }
             
-            // MARK: Check date
-            let start = date.addingTimeInterval(-60 * 5)
-            let end = date.addingTimeInterval(self.consistencyMaxTime)
-            let range = start...end
-            
             guard let sentDate = btcTransaction.dateValue else {
-                return .warning
-            }
-            
-            guard range.contains(sentDate) else {
                 return .warning
             }
             
@@ -55,7 +46,14 @@ extension BtcWalletService: RichMessageProviderWithStatusCheck {
                 }
             }
             
-            return .success
+            // MARK: Check date
+            let start = date.addingTimeInterval(-60 * 5)
+            let end = date.addingTimeInterval(self.consistencyMaxTime)
+            let dateRange = start...end
+            
+            return dateRange.contains(sentDate)
+                ? .success
+                : .inconsistent
         } catch let error as WalletServiceError {
             if case let .internalError(message, _) = error, message == "No transaction" {
                 let timeAgo = -1 * date.timeIntervalSinceNow

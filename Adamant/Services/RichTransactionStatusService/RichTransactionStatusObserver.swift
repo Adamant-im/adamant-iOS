@@ -26,36 +26,53 @@ actor RichTransactionStatusObserver {
 
 private extension RichTransactionStatusObserver {
     enum State {
-        case pending(isNew: Bool)
+        case new
+        case old
         case registered
+        case final
     }
     
     var state: State {
-        status?.isFinal == true
-            ? .registered
-            : .pending(
-                isNew: Date.now.timeIntervalSince1970 - transaction.sentDate.timeIntervalSince1970
-                    < .init(provider.newPendingInterval * .init(provider.newPendingAttempts))
+        switch status {
+        case .inconsistent, .failed, .success:
+            return .final
+        case .registered:
+            return .registered
+        case .warning, .pending, .notInitiated, .updating, .none:
+            let sentInterval = Date.now.timeIntervalSince1970
+                - transaction.sentDate.timeIntervalSince1970
+            
+            let oldTxInterval = TimeInterval(
+                provider.newPendingInterval * .init(provider.newPendingAttempts)
             )
+            
+            return sentInterval < oldTxInterval
+                ? .new
+                : .old
+        }
     }
     
     var nextUpdateInterval: TimeInterval? {
         switch state {
         case .registered:
             return provider.registeredInterval
-        case .pending(isNew: true):
+        case .new:
             return provider.newPendingInterval
-        case .pending(isNew: false):
+        case .old:
             guard oldPendingAttempts < provider.oldPendingAttempts else { return nil }
             return provider.oldPendingInterval
+        case .final:
+            return nil
         }
     }
     
     func update() async {
         switch state {
-        case .pending(isNew: false):
+        case .final:
+            return
+        case .old:
             oldPendingAttempts += 1
-        case .pending(isNew: true), .registered:
+        case .registered, .new:
             break
         }
         

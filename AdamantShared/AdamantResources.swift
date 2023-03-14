@@ -48,6 +48,4 @@ enum AdamantResources {
         static let adelinaWallet = "U11138426591213238985"
         static let adelinaWalletPK = "8e06eba03ebe4668148647fc00a64b3fae59a1911ce1fd1059baba39ceb705a4"
     }
-
-    static let btcExplorerAddress = "https://btc.com/btc/transaction/"
 }

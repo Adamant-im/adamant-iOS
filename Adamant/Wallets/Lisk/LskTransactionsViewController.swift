@@ -173,18 +173,18 @@ extension Transactions.TransactionModel: TransactionDetails {
     }
     
     var transactionStatus: TransactionStatus? {
-        guard let confirmations = confirmations else { return .pending }
-        if confirmations < self.height { return .pending }
+        guard let confirmations = confirmations else { return .registered }
+        if confirmations < self.height { return .registered }
         
         if confirmations > 0 && self.height > 0 {
             let conf = (confirmations - self.height) + 1
             if conf > 1 {
                 return .success
             } else {
-                return .pending
+                return .registered
             }
         }
-        return .pending
+        return .registered
     }
     
     var senderAddress: String {
