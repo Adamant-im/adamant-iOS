@@ -61,11 +61,15 @@ class ERC20WalletService: WalletService {
         return token?.defaultOrdinalLevel
     }
     
+    private (set) var blockchainSymbol: String = "ETH"
+    private (set) var isDynamicFee: Bool = true
     private (set) var transactionFee: Decimal = 0.0
-    private (set) var diplayTransactionFee: Decimal = 0.0
+    private (set) var gasPrice: BigUInt = 0
+    private (set) var gasLimit: BigUInt = 0
+    private (set) var isWarningGasPrice = false
     
     var isTransactionFeeValid: Bool {
-        return ethWallet?.balance ?? 0 > diplayTransactionFee
+        return ethWallet?.balance ?? 0 > transactionFee
     }
     
     static let transferGas: Decimal = 21000
@@ -250,29 +254,78 @@ class ERC20WalletService: WalletService {
         
         setState(.upToDate)
         
-        if let price = try? await getGasPrices() {
-            let newFee = price * EthWalletService.transferGas
-            
-            if diplayTransactionFee != newFee {
-                diplayTransactionFee = newFee
-                
-                NotificationCenter.default.post(name: transactionFeeUpdated, object: self, userInfo: nil)
-            }
-        }
+        await calculateFee()
+    }
+    
+    private func calculateFee() async {
+        guard let token = token else { return }
+
+        let priceRaw = try? await getGasPrices()
+        let gasLimitRaw = try? await getGasLimit()
+        
+        var price = priceRaw ?? BigUInt(token.defaultGasPriceGwei).toWei()
+        var gasLimit = gasLimitRaw ?? BigUInt(token.defaultGasLimit)
+        
+        let pricePercent = price * BigUInt(token.reliabilityGasPricePercent) / 100
+        let gasLimitPercent = gasLimit * BigUInt(token.reliabilityGasLimitPercent) / 100
+        
+        price = priceRaw == nil
+        ? price
+        : price + pricePercent
+        
+        gasLimit = gasLimitRaw == nil
+        ? gasLimit
+        : gasLimit + gasLimitPercent
+
+        let newFee = (price * gasLimit).asDecimal(exponent: EthWalletService.currencyExponent)
+
+        guard transactionFee != newFee else { return }
+        
+        transactionFee = newFee
+        gasPrice = price
+        isWarningGasPrice = price >= BigUInt(token.warningGasPriceGwei).toWei()
+        self.gasLimit = gasLimit
+        
+        NotificationCenter.default.post(name: transactionFeeUpdated, object: self, userInfo: nil)
     }
     
     func validate(address: String) -> AddressValidationResult {
         return addressRegex.perfectMatch(with: address) ? .valid : .invalid
     }
     
-    func getGasPrices() async throws -> Decimal {
+    func getGasPrices() async throws -> BigUInt {
         guard let web3 = await self.web3 else {
             throw WalletServiceError.internalError(message: "Can't get web3 service", error: nil)
         }
         
         do {
             let price = try await web3.eth.gasPrice()
-            return price.asDecimal(exponent: EthWalletService.currencyExponent)
+            return price
+        } catch {
+            throw WalletServiceError.internalError(
+                message: error.localizedDescription,
+                error: error
+            )
+        }
+    }
+    
+    func getGasLimit() async throws -> BigUInt {
+        guard let web3 = await self.web3,
+              let ethWallet = ethWallet,
+              let erc20 = erc20
+        else {
+            throw WalletServiceError.internalError(message: "Can't get web3 service", error: nil)
+        }
+        
+        do {
+            var transaction = try await erc20.transfer(
+                from: ethWallet.ethAddress,
+                to: ethWallet.ethAddress,
+                amount: "\(ethWallet.balance)"
+            ).transaction
+            
+            let price = try await web3.eth.estimateGas(for: transaction)
+            return price
         } catch {
             throw WalletServiceError.internalError(
                 message: error.localizedDescription,
@@ -404,6 +457,7 @@ extension ERC20WalletService {
                 let transaction = details.transaction.asEthTransaction(
                     date: nil,
                     gasUsed: receipt.gasUsed,
+                    gasPrice: receipt.effectiveGasPrice,
                     blockNumber: nil,
                     confirmations: nil,
                     receiptStatus: receipt.status,
@@ -436,6 +490,7 @@ extension ERC20WalletService {
             let ethTransaction = transaction.asEthTransaction(
                 date: block.timestamp,
                 gasUsed: receipt.gasUsed,
+                gasPrice: receipt.effectiveGasPrice,
                 blockNumber: String(blockNumber),
                 confirmations: String(confirmations),
                 receiptStatus: receipt.status,
@@ -451,6 +506,7 @@ extension ERC20WalletService {
                 let transaction = details.transaction.asEthTransaction(
                     date: nil,
                     gasUsed: nil,
+                    gasPrice: nil,
                     blockNumber: nil,
                     confirmations: nil,
                     receiptStatus: TransactionReceipt.TXStatus.notYetProcessed,

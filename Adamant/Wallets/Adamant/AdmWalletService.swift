@@ -71,6 +71,7 @@ class AdmWalletService: NSObject, WalletService {
     }
     
     private var transfersController: NSFetchedResultsController<TransferTransaction>?
+    private (set) var isWarningGasPrice = false
     
     // MARK: - State
     private (set) var state: WalletServiceState = .upToDate

@@ -1,4 +1,6 @@
 import Foundation
+import BigInt
+    
 extension DogeWalletService {
     // MARK: - Constants
     static let fixedFee: Decimal = 1

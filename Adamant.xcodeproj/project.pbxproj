@@ -19,6 +19,7 @@
 		41047B76294C62710039E956 /* AdamantVisibleWalletsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41047B75294C62710039E956 /* AdamantVisibleWalletsService.swift */; };
 		412C0ED929124A3400DE2C5E /* dash_notificationContent.png in Resources */ = {isa = PBXBuildFile; fileRef = 412C0ED829124A3400DE2C5E /* dash_notificationContent.png */; };
 		4133AED429769EEC00F3D017 /* UpdatingIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4133AED329769EEC00F3D017 /* UpdatingIndicatorView.swift */; };
+		4150136429B225CC0037F834 /* Double+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4150136329B225CC0037F834 /* Double+adamant.swift */; };
 		415441372923AB3700824478 /* BtcProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 415441362923AB3700824478 /* BtcProvider.swift */; };
 		415441382923AB3700824478 /* BtcProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 415441362923AB3700824478 /* BtcProvider.swift */; };
 		415441392923AB3700824478 /* BtcProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 415441362923AB3700824478 /* BtcProvider.swift */; };
@@ -752,6 +753,7 @@
 		41047B75294C62710039E956 /* AdamantVisibleWalletsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantVisibleWalletsService.swift; sourceTree = "<group>"; };
 		412C0ED829124A3400DE2C5E /* dash_notificationContent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dash_notificationContent.png; sourceTree = "<group>"; };
 		4133AED329769EEC00F3D017 /* UpdatingIndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatingIndicatorView.swift; sourceTree = "<group>"; };
+		4150136329B225CC0037F834 /* Double+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Double+adamant.swift"; sourceTree = "<group>"; };
 		415441362923AB3700824478 /* BtcProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcProvider.swift; sourceTree = "<group>"; };
 		4154413A2923AED000824478 /* bitcoin_notificationContent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bitcoin_notificationContent.png; sourceTree = "<group>"; };
 		415CFD38294310680008AEE8 /* AdamantDynamicResources.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantDynamicResources.swift; sourceTree = "<group>"; };
@@ -2254,6 +2256,7 @@
 				E9771D9F22997D320099AAC7 /* AdamantUtilities.swift */,
 				E9204B4F20C94C4A00F3B9AB /* Date+adamant.swift */,
 				E9393FA72055C92700EE6F30 /* Decimal+adamant.swift */,
+				4150136329B225CC0037F834 /* Double+adamant.swift */,
 				E96D64B02295A88400CA5587 /* String+utilites.swift */,
 				E935C84C22AC06E500A8CA2F /* RichMessageTools.swift */,
 				553B1283281C6EE100FFF24C /* GCDUtilites.swift */,
@@ -3153,6 +3156,7 @@
 				640EFA9E2558613700E9724B /* DashProvider.swift in Sources */,
 				E93B0D742028B21400126346 /* ChatsProvider.swift in Sources */,
 				E9CAE8D42018AC1800345E76 /* AdamantApi+Keys.swift in Sources */,
+				4150136429B225CC0037F834 /* Double+adamant.swift in Sources */,
 				E96D64B22295BED600CA5587 /* TransactionAsset.swift in Sources */,
 				E9C51EEF20139DC600385EB7 /* TransactionIdResponse.swift in Sources */,
 				931A2955295BA5450022CAA3 /* Combine+Typealiases.swift in Sources */,

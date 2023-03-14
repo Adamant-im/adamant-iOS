@@ -1,4 +1,6 @@
 import Foundation
+import BigInt
+    
 extension DashWalletService {
     // MARK: - Constants
     static let fixedFee: Decimal = 0.0001

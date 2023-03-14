@@ -916,6 +916,9 @@
 /* Transfer: Not enough fee for send a transaction */
 "TransferScene.Error.TooLittleFee" = "Недостаточно средств для комиссии";
 
+/* Transfer: Fee is higher than usual */
+"TransferScene.Error.FeeIsTooHigh" = "Комисссия выше обычной";
+
 /* Transfer: Minimal transaction amount is 0.00001 */
 "TransferScene.Error.MinAmount" = "Минимальная сумма перевода 0.00001";
 

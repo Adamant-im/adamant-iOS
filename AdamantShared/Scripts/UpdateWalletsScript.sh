@@ -135,8 +135,8 @@ function moveImage ()
     fi
 }
 
-# unpack
-function unpack ()
+# unpack icons
+function unpackIcons ()
 {
     cd "$WALLETS_NAME_DIR"
     for dir in $WALLETS_NAME_DIR/*/; do
@@ -183,8 +183,8 @@ function unpack ()
     done
 }
 
-# update swift files
-function updateSwiftFiles ()
+# append token to blockchain swift file
+function appendTokenToBlockchainFile ()
 {
     BLOCKCHAIN_NAME=$1
     WALLET_NAME=$2
@@ -193,46 +193,137 @@ function updateSwiftFiles ()
     WALLET_DECIMALS=$5
     DEFAULT_VISABILITY_RAW=$6
     DEFAULT_ORDINAL_LEVEL_RAW=$7
+    BLOCKCHAIN_TYPE=$8
+    RELIABILITY_GAS_PRICE_PERCENT=$9
+    RELIABILITY_GAS_LIMIT_PERCENT=${10}
+    DEFAULT_GAS_PRICE_GWEI=${11}
+    DEFAULT_GAS_LIMIT=${12}
+    WARNING_GAS_PRICE_GWEI=${13}
     
     DEFAULT_VISABILITY="${DEFAULT_VISABILITY_RAW:=false}"
     DEFAULT_ORDINAL_LEVEL="${DEFAULT_ORDINAL_LEVEL_RAW:=nil}"
-    echo "DEFAULT_VISABILITY"
-    echo $DEFAULT_VISABILITY
-    echo "DEFAULT_ORDINAL_LEVEL"
-    echo $DEFAULT_ORDINAL_LEVEL
-    
+          
 # to-do defaultVisibility & defaultOrdinalLevel from general info
     TARGET=$ROOT/AdamantShared/Models
      cat >> ${TARGET}/${BLOCKCHAIN_NAME}TokensList.swift << __EOF__
-        ERC20Token(symbol: "$WALLET_SYMBOL",
+        ${BLOCKCHAIN_TYPE}Token(symbol: "$WALLET_SYMBOL",
                    name: "$WALLET_NAME",
                    contractAddress: "$WALLET_CONTRACT",
                    decimals: $WALLET_DECIMALS,
                    naturalUnits: $WALLET_DECIMALS,
                    defaultVisibility: $DEFAULT_VISABILITY,
-                   defaultOrdinalLevel: $DEFAULT_ORDINAL_LEVEL),
+                   defaultOrdinalLevel: $DEFAULT_ORDINAL_LEVEL,
+                   reliabilityGasPricePercent: $RELIABILITY_GAS_PRICE_PERCENT,
+                   reliabilityGasLimitPercent: $RELIABILITY_GAS_LIMIT_PERCENT,
+                   defaultGasPriceGwei: $DEFAULT_GAS_PRICE_GWEI,
+                   defaultGasLimit: $DEFAULT_GAS_LIMIT,
+                   warningGasPriceGwei: $WARNING_GAS_PRICE_GWEI),
 __EOF__
+}
+
+# Write start file
+function writeStartFile ()
+{
+    TARGET=$1
+    BLOCKCHAIN_NAME=$2
+    BLOCKCHAIN_TYPE=$3
+        
+    cat > ${TARGET}/${BLOCKCHAIN_NAME}TokensList.swift << __EOF__
+    import Foundation
+    
+    extension ${BLOCKCHAIN_TYPE}Token {
+        static let supportedTokens: [${BLOCKCHAIN_TYPE}Token] = [
+        
+__EOF__
+}
+
+# Write end file
+function writeEndFile ()
+{
+    TARGET=$1
+    BLOCKCHAIN_NAME=$2
+        
+    cat >> ${TARGET}/${BLOCKCHAIN_NAME}TokensList.swift << __EOF__
+    ]
+    
+}
+__EOF__
+}
+
+# read value from JSON file
+function readIntValueFromJson ()
+{
+    KEY=$1
+    JSON=$2
+    
+    VALUE=$(perl -ne 'if (/"'"$KEY"'": (.*)/) { print $1 . "\n" }' $JSON)
+    echo "$VALUE" | sed -r 's/[,]+//g'
+}
+
+# get fee value
+# logic:
+# get value from general/$token/info.json
+# if value is empty then get value from general/$blockchain/info.json
+# override value from blockchains/$blockchain/info.json
+function getFeeValue ()
+{
+    KEY=$1
+    WALLET_GENERAL_JSON=$2
+    WALLET_GENERAL_BLOCKCHAIN_JSON=$3
+    WALLET_BLOCKCHAIN_JSON=$4
+    
+    VALUE=$(readIntValueFromJson "$KEY" $WALLET_GENERAL_JSON)
+    VALUE_BLOCKCHAIN=$(readIntValueFromJson "$KEY" $WALLET_BLOCKCHAIN_JSON)
+    
+    if [ -z "$VALUE" ]
+    then
+    VALUE=$(readIntValueFromJson "$KEY" $WALLET_GENERAL_BLOCKCHAIN_JSON)
+    fi
+    
+    if [ ! -z "$VALUE_BLOCKCHAIN" ]
+    then
+    VALUE=$VALUE_BLOCKCHAIN
+    fi
+    
+    echo "$VALUE"
+}
+
+# logic:
+# get value from general/$token/info.json
+# override value from blockchains/$token/info.json
+function getOverrideValue ()
+{
+    KEY=$1
+    WALLET_GENERAL_JSON=$2
+    WALLET_BLOCKCHAIN_JSON=$3
+    
+    VALUE=$(readIntValueFromJson "$KEY" $WALLET_GENERAL_JSON)
+    VALUE_BLOCKCHAIN=$(readIntValueFromJson "$KEY" $WALLET_BLOCKCHAIN_JSON)
+    
+    if [ ! -z "$VALUE_BLOCKCHAIN" ]
+    then
+    VALUE=$VALUE_BLOCKCHAIN
+    fi
+    
+    echo "$VALUE"
 }
 
 # set tokens
 function setTokens ()
 {
-    cd "$WALLETS_TOKENS_DIR"
+    # go over all blockchains
     for dir in $WALLETS_TOKENS_DIR/*/; do
         BLOCKCHAIN_NAME=$(basename $dir)
         TARGET=$ROOT/AdamantShared/Models
         BLOCKCHAIN_JSON=$WALLETS_TOKENS_DIR/$BLOCKCHAIN_NAME/info.json
         BLOCKCHAIN_TYPE=$(perl -ne 'if (/"type": "(.*)"/) { print $1 . "\n" }' $BLOCKCHAIN_JSON)
         
-        cat > ${TARGET}/${BLOCKCHAIN_NAME}TokensList.swift << __EOF__
-import Foundation
+        # Write start file
+        writeStartFile "$TARGET" "$BLOCKCHAIN_NAME" "$BLOCKCHAIN_TYPE"
 
-extension ${BLOCKCHAIN_TYPE}Token {
-    static let supportedTokens: [ERC20Token] = [
-
-__EOF__
-
+        # go over all tokens in blockchains
         for dir in $WALLETS_TOKENS_DIR/$BLOCKCHAIN_NAME/*/; do
+                # get data from blockchains dir
                 WALLET_NAME=$(basename $dir)
                 WALLET_JSON=$WALLETS_TOKENS_DIR/$BLOCKCHAIN_NAME/$WALLET_NAME/info.json
                 NAME=$(perl -ne 'if (/"name": "(.*)"/) { print $1 . "\n" }' $WALLET_JSON)
@@ -240,17 +331,26 @@ __EOF__
                 CONTRACT=$(perl -ne 'if (/"contractId": "(.*)"/) { print $1 . "\n" }' $WALLET_JSON)
                 DECIMALS=$(perl -ne 'if (/"decimals": (.*)/) { print $1 . "\n" }' $WALLET_JSON)
 
-                WALLET_GENERAL_JSON=$WALLETS_NAME_DIR/general/$WALLET_NAME/info.json
-                DEFAULT_VISABILITY=$(perl -ne 'if (/"defaultVisibility": "(.*)"/) { print $1 . "\n" }' $WALLET_GENERAL_JSON)
-                DEFAULT_ORDINAL_LEVEL=$(perl -ne 'if (/"defaultOrdinalLevel": "(.*)"/) { print $1 . "\n" }' $WALLET_GENERAL_JSON)
-                updateSwiftFiles "$BLOCKCHAIN_NAME" "$NAME" "$SYMBOL" "$CONTRACT" "$DECIMALS"  "$DEFAULT_VISABILITY" "$DEFAULT_ORDINAL_LEVEL"
+                # get data from general dir
+                WALLET_GENERAL_JSON=$WALLETS_NAME_DIR/$WALLET_NAME/info.json
+                WALLET_GENERAL_BLOCKCHAIN_JSON=$WALLETS_NAME_DIR/$BLOCKCHAIN_NAME/info.json
+                WALLET_BLOCKCHAIN_JSON=$WALLETS_TOKENS_DIR/$BLOCKCHAIN_NAME/info.json
+                
+                DEFAULT_VISABILITY=$(getOverrideValue "defaultVisibility" $WALLET_GENERAL_JSON $WALLET_JSON)
+                DEFAULT_ORDINAL_LEVEL=$(getOverrideValue "defaultOrdinalLevel" $WALLET_GENERAL_JSON $WALLET_JSON)
+                
+                RELIABILITY_GAS_PRICE_PERCENT=$(getFeeValue "reliabilityGasPricePercent" $WALLET_GENERAL_JSON $WALLET_GENERAL_BLOCKCHAIN_JSON $WALLET_BLOCKCHAIN_JSON)
+                RELIABILITY_GAS_LIMIT_PERCENT=$(getFeeValue "reliabilityGasLimitPercent" $WALLET_GENERAL_JSON $WALLET_GENERAL_BLOCKCHAIN_JSON $WALLET_BLOCKCHAIN_JSON)
+                DEFAULT_GAS_PRICE_GWEI=$(getFeeValue "defaultGasPriceGwei" $WALLET_GENERAL_JSON $WALLET_GENERAL_BLOCKCHAIN_JSON $WALLET_BLOCKCHAIN_JSON)
+                DEFAULT_GAS_LIMIT=$(getFeeValue "defaultGasLimit" $WALLET_GENERAL_JSON $WALLET_GENERAL_BLOCKCHAIN_JSON $WALLET_BLOCKCHAIN_JSON)
+                WARNING_GAS_PRICE_GWEI=$(getFeeValue "warningGasPriceGwei" $WALLET_GENERAL_JSON $WALLET_GENERAL_BLOCKCHAIN_JSON $WALLET_BLOCKCHAIN_JSON)
+                
+                # append token to blockchain file
+                appendTokenToBlockchainFile "$BLOCKCHAIN_NAME" "$NAME" "$SYMBOL" "$CONTRACT" "$DECIMALS"  "$DEFAULT_VISABILITY" "$DEFAULT_ORDINAL_LEVEL" "$BLOCKCHAIN_TYPE" "$RELIABILITY_GAS_PRICE_PERCENT" "$RELIABILITY_GAS_LIMIT_PERCENT" "$DEFAULT_GAS_PRICE_GWEI" "$DEFAULT_GAS_LIMIT" "$WARNING_GAS_PRICE_GWEI"
          done
 
-        cat >> ${TARGET}/${BLOCKCHAIN_NAME}TokensList.swift << __EOF__
-    ]
-    
-}
-__EOF__
+        # Write end file
+        writeEndFile "$TARGET" "$BLOCKCHAIN_NAME"
 
     done
 }
@@ -269,7 +369,7 @@ function remove_script_directory ()
 
 download
 
-unpack
+unpackIcons
 
 setTokens
 

@@ -81,13 +81,21 @@ class Coins
         registeredInterval = txFetchInfo["registeredInterval"]
         newPendingAttempts = txFetchInfo["newPendingAttempts"]
         oldPendingAttempts = txFetchInfo["oldPendingAttempts"]
+
+        # Gas for eth
+        reliabilityGasPricePercent = json["reliabilityGasPricePercent"]
+        reliabilityGasLimitPercent = json["reliabilityGasLimitPercent"]
+        defaultGasPriceGwei = json["defaultGasPriceGwei"]
+        defaultGasLimit = json["defaultGasLimit"]
+        warningGasPriceGwei = json["warningGasPriceGwei"]
         
         emptyText = ""
         
         # Create swift file
         
         text = "import Foundation
-
+import BigInt
+    
 extension #{symbol.capitalize}WalletService {
     // MARK: - Constants
     static let fixedFee: Decimal = #{fixedFee}
@@ -119,6 +127,32 @@ extension #{symbol.capitalize}WalletService {
     createSwiftVariable("oldPendingAttempts", oldPendingAttempts, "Int", true) :
     emptyText
     }
+
+#{reliabilityGasPricePercent ?
+    createDecimalSwiftVariable("reliabilityGasPricePercent", reliabilityGasPricePercent, "BigUInt", false) :
+    emptyText
+    }
+
+#{reliabilityGasLimitPercent ?
+    createDecimalSwiftVariable("reliabilityGasLimitPercent", reliabilityGasLimitPercent, "BigUInt", false) :
+    emptyText
+    }
+
+#{defaultGasPriceGwei ?
+    createDecimalSwiftVariable("defaultGasPriceGwei", defaultGasPriceGwei, "BigUInt", false) :
+    emptyText
+    }
+
+#{defaultGasLimit ?
+    createDecimalSwiftVariable("defaultGasLimit", defaultGasLimit, "BigUInt", false) :
+    emptyText
+    }
+
+#{warningGasPriceGwei ?
+    createDecimalSwiftVariable("warningGasPriceGwei", warningGasPriceGwei, "BigUInt", false) :
+    emptyText
+    }
+
     var tokenName: String {
         \"#{fullName}\"
     }

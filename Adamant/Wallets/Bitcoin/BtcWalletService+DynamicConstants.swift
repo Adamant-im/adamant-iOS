@@ -1,4 +1,6 @@
 import Foundation
+import BigInt
+    
 extension BtcWalletService {
     // MARK: - Constants
     static let fixedFee: Decimal = 3.153e-05

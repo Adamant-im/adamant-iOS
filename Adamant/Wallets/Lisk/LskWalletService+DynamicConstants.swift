@@ -1,4 +1,6 @@
 import Foundation
+import BigInt
+    
 extension LskWalletService {
     // MARK: - Constants
     static let fixedFee: Decimal = 0.00142

@@ -216,19 +216,15 @@ extension AdamantAccountsProvider {
             do {
                 var account = try await apiService.getAccount(byAddress: address)
                 guard account.publicKey != nil else {
-                    if let dummy = dummy {
-                        account.publicKey = "dummy\(address)"
-                        account.isDummy = true
-                        let coreAccount = await createAndSaveCoreDataAccount(
-                            from: account,
-                            dummy: dummy,
-                            in: stack.container.viewContext
-                        )
-                        
-                        return coreAccount
-                    } else {
-                        throw AccountsProviderError.notInitiated(address: address)
-                    }
+                    account.publicKey = "dummy\(address)"
+                    account.isDummy = true
+                    let coreAccount = await createAndSaveCoreDataAccount(
+                        from: account,
+                        dummy: dummy,
+                        in: stack.container.viewContext
+                    )
+                    
+                    return coreAccount
                 }
                 
                 let coreAccount = await createAndSaveCoreDataAccount(

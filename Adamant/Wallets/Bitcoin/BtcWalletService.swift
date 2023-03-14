@@ -102,6 +102,7 @@ class BtcWalletService: WalletService {
     private (set) var currentHeight: Decimal?
     private var feeRate: Decimal = 1
     private (set) var transactionFee: Decimal = DefaultBtcTransferFee.medium.rawValue / multiplier
+    private (set) var isWarningGasPrice = false
     
     static let kvsAddress = "btc:address"
     private let walletPath = "m/44'/0'/21'/0/0"

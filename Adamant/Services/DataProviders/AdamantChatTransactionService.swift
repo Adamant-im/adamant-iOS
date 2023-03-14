@@ -159,7 +159,12 @@ actor AdamantChatTransactionService: ChatTransactionService {
         return messageTransaction
     }
     
-    func transferTransaction(from transaction: Transaction, isOut: Bool, partner: BaseAccount?, context: NSManagedObjectContext) -> TransferTransaction {
+    func transferTransaction(
+        from transaction: Transaction,
+        isOut: Bool,
+        partner: BaseAccount?,
+        context: NSManagedObjectContext
+    ) -> TransferTransaction {
         let transfer: TransferTransaction
         if let trs = getTransfer(id: String(transaction.id), context: context) {
             transfer = trs
