@@ -7,8 +7,9 @@ require "json"
 
 class Coins
     
-    def createSwiftVariable(name, value, type)
-        text = "    static var #{name}: #{type} {
+    def createSwiftVariable(name, value, type, isStatic)
+        prefix = isStatic ? "static " : ""
+        text = "    #{prefix}var #{name}: #{type} {
         #{value}
     }
         "
@@ -93,29 +94,29 @@ extension #{symbol.capitalize}WalletService {
     static let currencySymbol = \"#{symbol}\"
     static let currencyExponent: Int = -#{decimals}
     static let qqPrefix: String = \"#{qqPrefix}\"
-
+    
 #{newPendingInterval ?
-    createSwiftVariable("newPendingInterval", newPendingInterval, "Int") :
+    createSwiftVariable("newPendingInterval", newPendingInterval, "Int", true) :
     emptyText
     }
 
 #{oldPendingInterval ?
-    createSwiftVariable("oldPendingInterval", oldPendingInterval, "Int") :
+    createSwiftVariable("oldPendingInterval", oldPendingInterval, "Int", true) :
     emptyText
     }
 
 #{registeredInterval ?
-    createSwiftVariable("registeredInterval", registeredInterval, "Int") :
+    createSwiftVariable("registeredInterval", registeredInterval, "Int", true) :
     emptyText
     }
 
 #{newPendingAttempts ?
-    createSwiftVariable("newPendingAttempts", newPendingAttempts, "Int") :
+    createSwiftVariable("newPendingAttempts", newPendingAttempts, "Int", true) :
     emptyText
     }
 
 #{oldPendingAttempts ?
-    createSwiftVariable("oldPendingAttempts", oldPendingAttempts, "Int") :
+    createSwiftVariable("oldPendingAttempts", oldPendingAttempts, "Int", true) :
     emptyText
     }
     var tokenName: String {

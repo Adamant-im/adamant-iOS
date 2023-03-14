@@ -6,10 +6,6 @@ extension BtcWalletService {
     static let currencyExponent: Int = -8
     static let qqPrefix: String = "bitcoin"
     
-    static var txConsistencyMaxTime: Int {
-        10800000
-    }
-        
     static var newPendingInterval: Int {
         10000
     }

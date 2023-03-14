@@ -6,10 +6,6 @@ extension LskWalletService {
     static let currencyExponent: Int = -8
     static let qqPrefix: String = "lisk"
     
-    static var txConsistencyMaxTime: Int {
-        60000
-    }
-        
     static var newPendingInterval: Int {
         3000
     }

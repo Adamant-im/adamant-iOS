@@ -6,10 +6,6 @@ extension DogeWalletService {
     static let currencyExponent: Int = -8
     static let qqPrefix: String = "doge"
     
-    static var txConsistencyMaxTime: Int {
-        900000
-    }
-        
     static var newPendingInterval: Int {
         5000
     }
