@@ -18,23 +18,16 @@ extension ERC20WalletService: RichMessageProviderWithStatusCheck {
         
         // MARK: Get transaction
         var status: TransactionStatus
-        var transactionDate: Date
         
         do {
             let tx = try await getTransaction(by: hash)
-            status = tx.transactionStatus ?? .pending
+            status = tx.receiptStatus.asTransactionStatus()
             
             guard status == .success,
                   let date = transaction.date as Date?
             else {
                 return status
             }
-            
-            transactionDate = date
-            
-            let start = transactionDate.addingTimeInterval(-60 * 5)
-            let end = transactionDate.addingTimeInterval(self.consistencyMaxTime)
-            let range = start...end
             
             // MARK: Check addresses
             if transaction.isOutgoing {
@@ -51,11 +44,6 @@ extension ERC20WalletService: RichMessageProviderWithStatusCheck {
                 }
             }
             
-            // MARK: Check dates
-            guard range.contains(transaction.dateValue ?? Date()) else {
-                return .warning
-            }
-            
             // MARK: Compare amounts
             guard let raw = transaction.richContent?[RichContentKeys.transfer.amount],
                     let reportedValue = AdamantBalanceFormat.deserializeBalance(from: raw)
@@ -66,21 +54,25 @@ extension ERC20WalletService: RichMessageProviderWithStatusCheck {
             let min = reportedValue - reportedValue*0.005
             let max = reportedValue + reportedValue*0.005
             
-            guard (min...max).contains(tx.value ?? 0) else {
+            guard
+                (min...max).contains(tx.value ?? 0),
+                let sentDate = tx.dateValue
+            else {
                 return .warning
             }
             
-            return .success
-        } catch let error as WalletServiceError {
-            guard transaction.transactionStatus == .notInitiated else {
-                // throw error
-                return .failed
-            }
+            // MARK: Check date
+            let start = date.addingTimeInterval(-60 * 5)
+            let end = date.addingTimeInterval(self.consistencyMaxTime)
+            let dateRange = start...end
             
+            return dateRange.contains(sentDate)
+                ? .success
+                : .inconsistent
+        } catch _ as WalletServiceError {
             return .pending
         } catch {
-            // throw WalletServiceError.internalError(message: "Failed to get transaction", error: error)
-            return .failed
+            return .warning
         }
     }
 }

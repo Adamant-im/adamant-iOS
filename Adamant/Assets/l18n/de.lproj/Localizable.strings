@@ -88,6 +88,9 @@
 /* System accounts: Bet on Bitcoin Price */
 "Accounts.BetOnBitcoin" = "Bet on Bitcoin price";
 
+/* System accounts: Adelina */
+"Accounts.Adelina" = "Adelina AI";
+
 /* System accounts: Donates ADAMANT Foundation */
 "Accounts.DonateADMFoundation" = "Spenden an ADAMANT Foundation";
 
@@ -287,7 +290,7 @@
 "Chats.Exchange.WelcomeMessage" = "Hi! 😊 I'm your exchange bot. I operate instantly and anonymously. Type **/help** to see what I can do. I ask for a higher fee than my fellow bots, so I recommend that you set up your own bot with a competitive fee. ℹ️ You can learn more on ADAMANT blog. I'm highly reliable but if you have any troubles, please leave a message here U6386412615727665758.";
 
 /* Known contacts: Adamant Bet On Bitcoin message. Markdown supported. */
-"Chats.BetOnBitcoin.WelcomeMessage" = "Hi! 😊 I'm anonymous and Blockchain-proved bet bot. I accept bets on BTC rate and pay rewards to winners. ℹ️ Learn more on ADAMANT’s blog or type **/help** to start betting. Support via U6386412615727665758.";
+"Chats.BetOnBitcoin.WelcomeMessage" = "Hello, I’m Adelina. Let's have a pleasure talk! I can do many things like:\n\n- Draft an email or other piece of writing\n- Write Python code\n- Answer questions about a set of documents\n- Support conversations\n- Tutor in a range of subjects\n- Translate languages\n- Compose a poem\n- Simulate characters for video games and much more";
 
 /* Known contacts: Adamant donate welcome message. Markdown supported. */
 "Chats.Donate.WelcomeMessage" = "We develop decentralized ADAMANT Messenger due to your support—transfer ADM, ETH and other tokens in this chat. Additional wallets for donations see on adamant.im.";
@@ -853,6 +856,9 @@
 /* Transaction status: transaction failed */
 "TransactionStatus.Failed" = "Abgelehnt";
 
+/* Transaction status: inconsistent */
+"TransactionStatus.Inconsistent" = "Inconsistent";
+
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "Details";
 
@@ -1035,9 +1041,6 @@
 
 /* Wallet Services: Transaction unavailable */
 "WalletServices.SharedErrors.transactionUnavailable" = "Transaktion nicht verfügbar";
-
-/* Wallet Services: Duplicated transaction */
-"WalletServices.SharedErrors.duplicatedTransaction" = "Doppelte transaktion";
 
 /* Wallet Services: Cannot verify transaction */
 "WalletServices.SharedErrors.inconsistentTransaction" = "Transaktion kann nicht verifiziert werden";

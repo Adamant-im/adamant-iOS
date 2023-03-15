@@ -15,29 +15,21 @@ enum TransactionStatus: Int16 {
     case success
     case failed
     case warning
-    case dublicate
+    case registered
+    case inconsistent
     
     var localized: String {
         switch self {
         case .notInitiated, .updating:
             return NSLocalizedString("TransactionStatus.Updating", comment: "Transaction status: updating in progress")
-        case .pending:
+        case .pending, .registered:
             return NSLocalizedString("TransactionStatus.Pending", comment: "Transaction status: transaction is pending")
         case .success:
             return NSLocalizedString("TransactionStatus.Success", comment: "Transaction status: success")
-        case .failed:
+        case .failed, .warning:
             return NSLocalizedString("TransactionStatus.Failed", comment: "Transaction status: transaction failed")
-        case .warning, .dublicate:
-            return NSLocalizedString("TransactionStatus.Warning", comment: "Transaction status: transaction warning")
-        }
-    }
-    
-    var isFinal: Bool {
-        switch self {
-        case .notInitiated, .updating, .pending:
-            return false
-        case .dublicate, .warning, .failed, .success:
-            return true
+        case .inconsistent:
+            return NSLocalizedString("TransactionStatus.Inconsistent", comment: "Transaction status: transaction warning")
         }
     }
 }

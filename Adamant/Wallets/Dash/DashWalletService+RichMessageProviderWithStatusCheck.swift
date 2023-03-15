@@ -24,7 +24,7 @@ extension DashWalletService: RichMessageProviderWithStatusCheck {
             // MARK: Check confirmations
             
             guard let confirmations = dashTransaction.confirmations, let dashDate = dashTransaction.date, (confirmations > 0 || dashDate.timeIntervalSinceNow > -60 * 15) else {
-                return .pending
+                return .registered
             }
             
             // MARK: Check date
@@ -40,16 +40,6 @@ extension DashWalletService: RichMessageProviderWithStatusCheck {
                     result = .pending
                 }
                 return result
-            }
-            
-            // 1 day
-            let dayInterval = TimeInterval(60 * 60 * 24)
-            let start = date.addingTimeInterval(-dayInterval)
-            let end = date.addingTimeInterval(dayInterval)
-            let range = start...end
-            
-            guard range.contains(sentDate) else {
-                return .warning
             }
             
             // MARK: Check amount & address
@@ -89,7 +79,16 @@ extension DashWalletService: RichMessageProviderWithStatusCheck {
                 }
             }
             
-            return result
+            guard result == .success else { return result }
+            
+            // MARK: Check date
+            let start = date.addingTimeInterval(-60 * 5)
+            let end = date.addingTimeInterval(self.consistencyMaxTime)
+            let dateRange = start...end
+            
+            return dateRange.contains(sentDate)
+                ? result
+                : .inconsistent
         } catch let error as ApiServiceError {
             if case let .internalError(message, _) = error,
                message == "No transaction" {

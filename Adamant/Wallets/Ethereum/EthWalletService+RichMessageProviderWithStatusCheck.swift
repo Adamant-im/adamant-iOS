@@ -11,7 +11,7 @@ import web3swift
 import Web3Core
 
 extension EthWalletService: RichMessageProviderWithStatusCheck {
-    func statusFor(transaction: RichMessageTransaction) async throws -> TransactionStatus{
+    func statusFor(transaction: RichMessageTransaction) async throws -> TransactionStatus {
         guard let web3 = await self.web3,
               let hash = transaction.richContent?[RichContentKeys.transfer.hash]
         else {
@@ -32,8 +32,11 @@ extension EthWalletService: RichMessageProviderWithStatusCheck {
             throw WalletServiceError.internalError(message: "Failed to get transaction", error: error)
         }
         
+        guard let messageDate = transaction.dateValue else { return .warning }
+        
         let status: TransactionStatus
-        let transactionDate: Date
+        let ethTxDate: Date
+        
         do {
             let receipt = try await web3.eth.transactionReceipt(hash)
             status = receipt.status.asTransactionStatus()
@@ -41,15 +44,12 @@ extension EthWalletService: RichMessageProviderWithStatusCheck {
                 return .pending
             }
             
-            guard status == .success,
-                  let blockHash = details.blockHash,
-                  let date = transaction.date as Date?
-            else {
-                return status
+            guard let blockHash = details.blockHash else {
+                return .warning
             }
             
-            transactionDate = date
-            _ = try await web3.eth.block(by: blockHash)
+            guard status == .success else { return status }
+            ethTxDate = try await web3.eth.block(by: blockHash).timestamp
         } catch let error as Web3Error {
             switch error {
                 // Transaction not delivired yet
@@ -62,10 +62,7 @@ extension EthWalletService: RichMessageProviderWithStatusCheck {
         } catch {
             throw WalletServiceError.internalError(message: "Failed to get transaction", error: error)
         }
-        
-        let start = transactionDate.addingTimeInterval(-60 * 5)
-        let end = transactionDate.addingTimeInterval(self.consistencyMaxTime)
-        let range = start...end
+    
         let eth = details.transaction
         
         // MARK: Check addresses
@@ -80,13 +77,8 @@ extension EthWalletService: RichMessageProviderWithStatusCheck {
             guard let id = self.ethWallet?.address,
                   eth.to.address == id
             else {
-                return.warning
+                return .warning
             }
-        }
-        
-        // MARK: Check dates
-        guard range.contains(transaction.dateValue ?? Date()) else {
-            return .warning
         }
         
         // MARK: Compare amounts
@@ -102,7 +94,14 @@ extension EthWalletService: RichMessageProviderWithStatusCheck {
             return .warning
         }
         
-        return .success
+        // MARK: Check date
+        let start = messageDate.addingTimeInterval(-60 * 5)
+        let end = messageDate.addingTimeInterval(self.consistencyMaxTime)
+        let dateRange = start...end
+        
+        return dateRange.contains(ethTxDate)
+            ? .success
+            : .inconsistent
     }
 }
 
@@ -116,7 +115,7 @@ extension TransactionReceipt.TXStatus {
             return .failed
             
         case .notYetProcessed:
-            return .pending
+            return .registered
         }
     }
 }

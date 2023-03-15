@@ -43,16 +43,6 @@ extension DogeWalletService: RichMessageProviderWithStatusCheck {
                 return result
             }
             
-            // 1 day
-            let dayInterval = TimeInterval(60 * 60 * 24)
-            let start = date.addingTimeInterval(-dayInterval)
-            let end = date.addingTimeInterval(dayInterval)
-            let range = start...end
-            
-            guard range.contains(sentDate) else {
-                return .warning
-            }
-            
             // MARK: Check amount & address
             guard let raw = transaction.richContent?[RichContentKeys.transfer.amount], let reportedValue = AdamantBalanceFormat.deserializeBalance(from: raw) else {
                 return .warning
@@ -90,7 +80,16 @@ extension DogeWalletService: RichMessageProviderWithStatusCheck {
                 }
             }
             
-            return result
+            guard result == .success else { return result }
+            
+            // MARK: Check date
+            let start = date.addingTimeInterval(-60 * 5)
+            let end = date.addingTimeInterval(self.consistencyMaxTime)
+            let dateRange = start...end
+            
+            return dateRange.contains(sentDate)
+                ? result
+                : .inconsistent
         } catch is ApiServiceError {
             let timeAgo = -1 * date.timeIntervalSinceNow
             
