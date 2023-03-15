@@ -242,19 +242,31 @@ actor AdamantChatsProvider: ChatsProvider {
     private func setState(_ state: State, previous prevState: State, notify: Bool = true) {
         self.state = state
         
-        if notify {
-            switch prevState {
-            case .failedToUpdate:
-                NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.stateChanged, object: self, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
-                                                                                                                    AdamantUserInfoKey.TransfersProvider.prevState: prevState])
-                
-            default:
-                if prevState != self.state {
-                    NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.stateChanged, object: self, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
-                                                                                                                        AdamantUserInfoKey.TransfersProvider.prevState: prevState])
-                }
-            }
+        guard notify else { return }
+        
+        if case .failedToUpdate = prevState {
+            NotificationCenter.default.post(
+                name: Notification.Name.AdamantTransfersProvider.stateChanged,
+                object: self,
+                userInfo: [
+                    AdamantUserInfoKey.TransfersProvider.newState: state,
+                    AdamantUserInfoKey.TransfersProvider.prevState: prevState
+                ]
+            )
+            
+            return
         }
+        
+        guard prevState != self.state else { return }
+        
+        NotificationCenter.default.post(
+            name: Notification.Name.AdamantTransfersProvider.stateChanged,
+            object: self,
+            userInfo: [
+                AdamantUserInfoKey.TransfersProvider.newState: state,
+                AdamantUserInfoKey.TransfersProvider.prevState: prevState
+            ]
+        )
     }
     
     private func setupSecuredStore() {
@@ -526,9 +538,11 @@ extension AdamantChatsProvider {
             
             if prevHeight != receivedLastHeight,
                let h = receivedLastHeight {
-                NotificationCenter.default.post(name: Notification.Name.AdamantChatsProvider.newUnreadMessages,
-                                                object: self,
-                                                userInfo: [AdamantUserInfoKey.ChatProvider.lastMessageHeight:h])
+                NotificationCenter.default.post(
+                    name: Notification.Name.AdamantChatsProvider.newUnreadMessages,
+                    object: self,
+                    userInfo: [AdamantUserInfoKey.ChatProvider.lastMessageHeight:h]
+                )
             }
             
             if let h = receivedLastHeight {
