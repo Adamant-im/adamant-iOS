@@ -174,7 +174,7 @@
       },
       {
         "package": "Starscream",
-        "repositoryURL": "https://github.com/daltoniam/Starscream.git",
+        "repositoryURL": "https://github.com/daltoniam/Starscream",
         "state": {
           "branch": null,
           "revision": "df8d82047f6654d8e4b655d1b1525c64e1059d21",

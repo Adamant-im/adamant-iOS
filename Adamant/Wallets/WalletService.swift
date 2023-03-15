@@ -271,6 +271,9 @@ protocol WalletServiceWithSend: WalletService {
     var isWarningGasPrice : Bool { get }
     var isTransactionFeeValid : Bool { get }
     var commentsEnabledForRichMessages: Bool { get }
+    var isSupportIncreaseFee: Bool { get }
+    var isIncreaseFeeEnabled: Bool { get }
+    var defaultIncreaseFee: Decimal { get }
     func transferViewController() -> UIViewController
 }
 
@@ -289,6 +292,15 @@ extension WalletServiceWithSend {
     }
     var isDynamicFee: Bool {
         return false
+    }
+    var isSupportIncreaseFee: Bool {
+        return false
+    }
+    var isIncreaseFeeEnabled: Bool {
+        return false
+    }
+    var defaultIncreaseFee: Decimal {
+        return 1.5
     }
 }
 

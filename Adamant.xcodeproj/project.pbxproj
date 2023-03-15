@@ -20,6 +20,8 @@
 		412C0ED929124A3400DE2C5E /* dash_notificationContent.png in Resources */ = {isa = PBXBuildFile; fileRef = 412C0ED829124A3400DE2C5E /* dash_notificationContent.png */; };
 		4133AED429769EEC00F3D017 /* UpdatingIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4133AED329769EEC00F3D017 /* UpdatingIndicatorView.swift */; };
 		4150136429B225CC0037F834 /* Double+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4150136329B225CC0037F834 /* Double+adamant.swift */; };
+		4153045929C09902000E4BEA /* AdamantIncreaseFeeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4153045829C09902000E4BEA /* AdamantIncreaseFeeService.swift */; };
+		4153045B29C09C6C000E4BEA /* IncreaseFeeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4153045A29C09C6C000E4BEA /* IncreaseFeeService.swift */; };
 		415441372923AB3700824478 /* BtcProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 415441362923AB3700824478 /* BtcProvider.swift */; };
 		415441382923AB3700824478 /* BtcProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 415441362923AB3700824478 /* BtcProvider.swift */; };
 		415441392923AB3700824478 /* BtcProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 415441362923AB3700824478 /* BtcProvider.swift */; };
@@ -755,6 +757,8 @@
 		412C0ED829124A3400DE2C5E /* dash_notificationContent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dash_notificationContent.png; sourceTree = "<group>"; };
 		4133AED329769EEC00F3D017 /* UpdatingIndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatingIndicatorView.swift; sourceTree = "<group>"; };
 		4150136329B225CC0037F834 /* Double+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Double+adamant.swift"; sourceTree = "<group>"; };
+		4153045829C09902000E4BEA /* AdamantIncreaseFeeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantIncreaseFeeService.swift; sourceTree = "<group>"; };
+		4153045A29C09C6C000E4BEA /* IncreaseFeeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncreaseFeeService.swift; sourceTree = "<group>"; };
 		415441362923AB3700824478 /* BtcProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcProvider.swift; sourceTree = "<group>"; };
 		4154413A2923AED000824478 /* bitcoin_notificationContent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bitcoin_notificationContent.png; sourceTree = "<group>"; };
 		415CFD38294310680008AEE8 /* AdamantDynamicResources.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantDynamicResources.swift; sourceTree = "<group>"; };
@@ -1748,6 +1752,7 @@
 				9304F8C1292F895C00173F18 /* PushNotificationsTokenService.swift */,
 				9324C75D297170600022D7EA /* RichTransactionStatusService.swift */,
 				41047B73294C61D10039E956 /* VisibleWalletsService.swift */,
+				4153045A29C09C6C000E4BEA /* IncreaseFeeService.swift */,
 			);
 			path = ServiceProtocols;
 			sourceTree = "<group>";
@@ -1768,6 +1773,7 @@
 				E9A03FD720DC0ABA007653A1 /* AdamantNodesSource.swift */,
 				E93D7ABF2052CF63005D19DC /* AdamantNotificationService.swift */,
 				41047B75294C62710039E956 /* AdamantVisibleWalletsService.swift */,
+				4153045829C09902000E4BEA /* AdamantIncreaseFeeService.swift */,
 				E921597420611A6A0000CA5C /* AdamantReachability.swift */,
 				E950273F202E257E002C1098 /* RepeaterService.swift */,
 				E9E7CDB42002BA6900DFC4DB /* SwinjectedRouter.swift */,
@@ -3080,6 +3086,7 @@
 				E9960B3421F5154300C840A8 /* BaseAccount+CoreDataProperties.swift in Sources */,
 				550066C7284D682D0044C0B1 /* AdamantHealthCheckService.swift in Sources */,
 				640EFAA62558613F00E9724B /* LskProvider.swift in Sources */,
+				4153045929C09902000E4BEA /* AdamantIncreaseFeeService.swift in Sources */,
 				E90A494B204D9EB8009F6A65 /* AdamantAuthentication.swift in Sources */,
 				E9215973206119FB0000CA5C /* ReachabilityMonitor.swift in Sources */,
 				E91947B420002809001362F8 /* AdamantAccount.swift in Sources */,
@@ -3267,6 +3274,7 @@
 				551F66E628959A5300DE5D69 /* LoadingView.swift in Sources */,
 				E98FC34420F920BD00032D65 /* UIFont+adamant.swift in Sources */,
 				644EC35720EFAAB700F40C73 /* DelegatesListViewController.swift in Sources */,
+				4153045B29C09C6C000E4BEA /* IncreaseFeeService.swift in Sources */,
 				E9C51EF12013F18000385EB7 /* NewChatViewController.swift in Sources */,
 				9324C760297171040022D7EA /* AdamantRichTransactionStatusService.swift in Sources */,
 				E9B4E1A8210F079E007E77FC /* DoubleDetailsTableViewCell.swift in Sources */,

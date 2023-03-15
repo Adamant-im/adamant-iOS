@@ -22,12 +22,14 @@ extension AdamantScene.Wallets {
         
         /// Send money
         static let transfer = AdamantScene(identifier: "AdmTransferViewController") { r in
-            let c = AdmTransferViewController()
-            c.dialogService = r.resolve(DialogService.self)
-            c.accountService = r.resolve(AccountService.self)
-            c.accountsProvider = r.resolve(AccountsProvider.self)
-            c.router = r.resolve(Router.self)
-            c.currencyInfoService = r.resolve(CurrencyInfoService.self)
+            let c = AdmTransferViewController(
+                accountService: r.resolve(AccountService.self)!,
+                accountsProvider: r.resolve(AccountsProvider.self)!,
+                dialogService: r.resolve(DialogService.self)!,
+                router: r.resolve(Router.self)!,
+                currencyInfoService: r.resolve(CurrencyInfoService.self)!,
+                increaseFeeService: r.resolve(IncreaseFeeService.self)!
+            )
             return c
         }
         

@@ -14,7 +14,7 @@ class ERC20TransferViewController: TransferViewControllerBase {
     
     // MARK: Dependencies
     
-    var chatsProvider: ChatsProvider!
+    var chatsProvider: ChatsProvider
     
     // MARK: Properties
     
@@ -26,6 +26,33 @@ class ERC20TransferViewController: TransferViewControllerBase {
 
     override var feeBalanceFormatter: NumberFormatter {
         return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: EthWalletService.currencySymbol)
+    }
+    
+    // MARK: - Init
+    
+    init(
+        accountService: AccountService,
+        accountsProvider: AccountsProvider,
+        dialogService: DialogService,
+        router: Router,
+        currencyInfoService: CurrencyInfoService,
+        increaseFeeService: IncreaseFeeService,
+        chatsProvider: ChatsProvider
+    ) {
+        self.chatsProvider = chatsProvider
+        
+        super.init(
+            accountService: accountService,
+            accountsProvider: accountsProvider,
+            dialogService: dialogService,
+            router: router,
+            currencyInfoService: currencyInfoService,
+            increaseFeeService: increaseFeeService
+        )
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     // MARK: Send
@@ -40,10 +67,6 @@ class ERC20TransferViewController: TransferViewControllerBase {
         }
         
         guard let service = service as? ERC20WalletService, let recipient = recipientAddress, let amount = amount else {
-            return
-        }
-        
-        guard let dialogService = dialogService else {
             return
         }
         

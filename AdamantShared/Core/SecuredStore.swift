@@ -38,6 +38,10 @@ extension StoreKey {
         static let useCustomIndexes = "visible.wallets.useCustomIndexes"
         static let useCustomVisibility = "visible.wallets.useCustomVisibility"
     }
+    
+    enum increaseFee {
+        static let increaseFee = "increaseFee"
+    }
 }
 
 protocol SecuredStore: AnyObject {

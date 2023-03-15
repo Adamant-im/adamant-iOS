@@ -61,6 +61,14 @@ class ERC20WalletService: WalletService {
         return token?.defaultOrdinalLevel
     }
     
+    var isSupportIncreaseFee: Bool {
+        return true
+    }
+    
+    var isIncreaseFeeEnabled: Bool {
+        return increaseFeeService.isIncreaseFeeEnabled(for: tokenUnicID)
+    }
+    
     private (set) var blockchainSymbol: String = "ETH"
     private (set) var isDynamicFee: Bool = true
     private (set) var transactionFee: Decimal = 0.0
@@ -83,6 +91,7 @@ class ERC20WalletService: WalletService {
     var apiService: ApiService!
     var dialogService: DialogService!
     var router: Router!
+    var increaseFeeService: IncreaseFeeService!
     
     // MARK: - Notifications
     var walletUpdatedNotification = Notification.Name("adamant.erc20Wallet.walletUpdated")
@@ -277,13 +286,20 @@ class ERC20WalletService: WalletService {
         ? gasLimit
         : gasLimit + gasLimitPercent
 
-        let newFee = (price * gasLimit).asDecimal(exponent: EthWalletService.currencyExponent)
+        var newFee = (price * gasLimit).asDecimal(exponent: EthWalletService.currencyExponent)
 
+        newFee = isIncreaseFeeEnabled
+        ? newFee * defaultIncreaseFee
+        : newFee
+        
         guard transactionFee != newFee else { return }
         
         transactionFee = newFee
-        gasPrice = price
-        isWarningGasPrice = price >= BigUInt(token.warningGasPriceGwei).toWei()
+        gasPrice = isIncreaseFeeEnabled
+        ? price * BigUInt(defaultIncreaseFee.doubleValue)
+        : price
+        
+        isWarningGasPrice = gasPrice >= BigUInt(token.warningGasPriceGwei).toWei()
         self.gasLimit = gasLimit
         
         NotificationCenter.default.post(name: transactionFeeUpdated, object: self, userInfo: nil)
@@ -318,7 +334,7 @@ class ERC20WalletService: WalletService {
         }
         
         do {
-            var transaction = try await erc20.transfer(
+            let transaction = try await erc20.transfer(
                 from: ethWallet.ethAddress,
                 to: ethWallet.ethAddress,
                 amount: "\(ethWallet.balance)"
@@ -423,6 +439,7 @@ extension ERC20WalletService: SwinjectDependentService {
         apiService = container.resolve(ApiService.self)
         dialogService = container.resolve(DialogService.self)
         router = container.resolve(Router.self)
+        increaseFeeService = container.resolve(IncreaseFeeService.self)
     }
 }
 

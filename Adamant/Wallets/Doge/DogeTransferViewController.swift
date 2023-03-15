@@ -14,7 +14,34 @@ class DogeTransferViewController: TransferViewControllerBase {
     
     // MARK: Dependencies
     
-    var chatsProvider: ChatsProvider!
+    var chatsProvider: ChatsProvider
+    
+    // MARK: - Init
+    
+    init(
+        accountService: AccountService,
+        accountsProvider: AccountsProvider,
+        dialogService: DialogService,
+        router: Router,
+        currencyInfoService: CurrencyInfoService,
+        increaseFeeService: IncreaseFeeService,
+        chatsProvider: ChatsProvider
+    ) {
+        self.chatsProvider = chatsProvider
+        
+        super.init(
+            accountService: accountService,
+            accountsProvider: accountsProvider,
+            dialogService: dialogService,
+            router: router,
+            currencyInfoService: currencyInfoService,
+            increaseFeeService: increaseFeeService
+        )
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: Properties
 
@@ -31,7 +58,10 @@ class DogeTransferViewController: TransferViewControllerBase {
             comments = ""
         }
         
-        guard let service = service as? DogeWalletService, let recipient = recipientAddress, let amount = amount, let dialogService = dialogService else {
+        guard let service = service as? DogeWalletService,
+              let recipient = recipientAddress,
+              let amount = amount
+        else {
             return
         }
         
