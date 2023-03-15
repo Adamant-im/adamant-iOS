@@ -247,6 +247,12 @@ class ChatListViewController: UIViewController {
     }
     
     private func updateChats() {
+        guard accountService.account?.address != nil,
+              accountService.keypair?.privateKey != nil
+        else {
+            return
+        }
+        
         updatingIndicatorView.startAnimate()
         self.handleRefresh(self.refreshControl)
     }
