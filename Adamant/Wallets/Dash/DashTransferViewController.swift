@@ -14,15 +14,38 @@ extension String.adamantLocalized.transfer {
         static let minAmountError = NSLocalizedString("TransferScene.Error.MinAmount", comment: "Transfer: Minimal transaction amount is 0.00001")
 }
 
-class DashTransferViewController: TransferViewControllerBase {
+final class DashTransferViewController: TransferViewControllerBase {
     
     // MARK: Dependencies
     
-    var chatsProvider: ChatsProvider!
+    private let chatsProvider: ChatsProvider
     
     // MARK: Properties
     
     static let invalidCharacters: CharacterSet = CharacterSet.decimalDigits.inverted
+    
+    init(
+        chatsProvider: ChatsProvider,
+        accountService: AccountService,
+        accountsProvider: AccountsProvider,
+        dialogService: DialogService,
+        router: Router,
+        currencyInfoService: CurrencyInfoService
+    ) {
+        self.chatsProvider = chatsProvider
+        
+        super.init(
+            accountService: accountService,
+            accountsProvider: accountsProvider,
+            dialogService: dialogService,
+            router: router,
+            currencyInfoService: currencyInfoService
+        )
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: Send
     
@@ -35,7 +58,7 @@ class DashTransferViewController: TransferViewControllerBase {
             comments = ""
         }
         
-        guard let service = service as? DashWalletService, let recipient = recipientAddress, let amount = amount, let dialogService = dialogService else {
+        guard let service = service as? DashWalletService, let recipient = recipientAddress, let amount = amount else {
             return
         }
         
@@ -67,7 +90,12 @@ class DashTransferViewController: TransferViewControllerBase {
                 }
                 
                 Task {
-                    try await service.sendTransaction(transaction)
+                    do {
+                        try await service.sendTransaction(transaction)
+                    } catch {
+                        dialogService.showRichError(error: error)
+                    }
+                    
                     await service.update()
                 }
                 

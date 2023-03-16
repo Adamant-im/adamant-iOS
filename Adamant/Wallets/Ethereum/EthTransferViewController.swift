@@ -10,11 +10,11 @@ import UIKit
 import Eureka
 import Web3Core
 
-class EthTransferViewController: TransferViewControllerBase {
+final class EthTransferViewController: TransferViewControllerBase {
     
     // MARK: Dependencies
     
-    var chatsProvider: ChatsProvider!
+    private let chatsProvider: ChatsProvider
     
     // MARK: Properties
     
@@ -23,6 +23,29 @@ class EthTransferViewController: TransferViewControllerBase {
     static let invalidCharacters: CharacterSet = {
         CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789").inverted
     }()
+    
+    init(
+        chatsProvider: ChatsProvider,
+        accountService: AccountService,
+        accountsProvider: AccountsProvider,
+        dialogService: DialogService,
+        router: Router,
+        currencyInfoService: CurrencyInfoService
+    ) {
+        self.chatsProvider = chatsProvider
+        
+        super.init(
+            accountService: accountService,
+            accountsProvider: accountsProvider,
+            dialogService: dialogService,
+            router: router,
+            currencyInfoService: currencyInfoService
+        )
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: Send
     
@@ -36,10 +59,6 @@ class EthTransferViewController: TransferViewControllerBase {
         }
         
         guard let service = service as? EthWalletService, let recipient = recipientAddress, let amount = amount else {
-            return
-        }
-        
-        guard let dialogService = dialogService else {
             return
         }
         
@@ -68,7 +87,12 @@ class EthTransferViewController: TransferViewControllerBase {
                 }
                 
                 Task {
-                    try await service.sendTransaction(transaction)
+                    do {
+                        try await service.sendTransaction(transaction)
+                    } catch {
+                        dialogService.showRichError(error: error)
+                    }
+                    
                     await service.update()
                 }
                 

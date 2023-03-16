@@ -21,14 +21,14 @@ extension AdamantScene.Wallets {
         
         /// Send LSK tokens
         static let transfer = AdamantScene(identifier: "LskTransferViewController") { r in
-            let c = LskTransferViewController()
-            c.dialogService = r.resolve(DialogService.self)
-            c.chatsProvider = r.resolve(ChatsProvider.self)
-            c.accountService = r.resolve(AccountService.self)
-            c.accountsProvider = r.resolve(AccountsProvider.self)
-            c.router = r.resolve(Router.self)
-            c.currencyInfoService = r.resolve(CurrencyInfoService.self)
-            return c
+            LskTransferViewController(
+                chatsProvider: r.resolve(ChatsProvider.self)!,
+                accountService: r.resolve(AccountService.self)!,
+                accountsProvider: r.resolve(AccountsProvider.self)!,
+                dialogService: r.resolve(DialogService.self)!,
+                router: r.resolve(Router.self)!,
+                currencyInfoService: r.resolve(CurrencyInfoService.self)!
+            )
         }
         
         /// List of Lisk transactions

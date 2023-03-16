@@ -1,30 +1,49 @@
 //
-//  RichTransactionStatusObserver.swift
+//  RichTransactionStatusSubscription.swift
 //  Adamant
 //
-//  Created by Andrey Golubenko on 13.03.2023.
+//  Created by Andrey Golubenko on 16.03.2023.
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import Foundation
 import Combine
+import Foundation
 
-actor RichTransactionStatusObserver {
+actor RichTransactionStatusSubscription<StatusSubscriber: Subscriber>: Subscription where
+    StatusSubscriber.Input == TransactionStatus,
+    StatusSubscriber.Failure == Never
+{
     private let provider: RichMessageProviderWithStatusCheck
+    private let transaction: RichMessageTransaction
+    private let taskManager = TaskManager()
+    
+    private var subscriber: StatusSubscriber?
     private var oldPendingAttempts: Int = .zero
-    private var transaction: RichMessageTransaction
     
-    @ObservableValue private(set) var status: TransactionStatus?
+    private var status: TransactionStatus {
+        didSet { _ = subscriber?.receive(status) }
+    }
     
-    init(provider: RichMessageProviderWithStatusCheck, transaction: RichMessageTransaction) {
+    init(
+        provider: RichMessageProviderWithStatusCheck,
+        transaction: RichMessageTransaction,
+        subscriber: StatusSubscriber
+    ) {
         self.provider = provider
         self.transaction = transaction
-        _status = .init(wrappedValue: transaction.transactionStatus)
+        self.subscriber = subscriber
+        status = transaction.transactionStatus ?? .notInitiated
         Task { await update() }
     }
+    
+    nonisolated func cancel() {
+        Task { await reset() }
+    }
+    
+    nonisolated func request(_: Subscribers.Demand) {}
 }
 
-private extension RichTransactionStatusObserver {
+private extension RichTransactionStatusSubscription {
     enum State {
         case new
         case old
@@ -38,7 +57,7 @@ private extension RichTransactionStatusObserver {
             return .final
         case .registered:
             return .registered
-        case .warning, .pending, .notInitiated, .updating, .none:
+        case .warning, .pending, .notInitiated, .updating:
             let sentInterval = Date.now.timeIntervalSince1970
                 - transaction.sentDate.timeIntervalSince1970
             
@@ -69,6 +88,7 @@ private extension RichTransactionStatusObserver {
     func update() async {
         switch state {
         case .final:
+            reset()
             return
         case .old:
             oldPendingAttempts += 1
@@ -86,6 +106,11 @@ private extension RichTransactionStatusObserver {
             guard let interval = nextUpdateInterval else { return }
             await Task.sleep(interval: interval)
             await update()
-        }
+        }.stored(in: taskManager)
+    }
+    
+    func reset() {
+        subscriber = nil
+        taskManager.clean()
     }
 }

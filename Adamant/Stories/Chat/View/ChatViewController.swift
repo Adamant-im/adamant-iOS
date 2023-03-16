@@ -148,12 +148,10 @@ extension ChatViewController: ComplexTransferViewControllerDelegate {
         didFinishWithTransfer transfer: TransactionDetails?,
         detailsViewController: UIViewController?
     ) {
-        DispatchQueue.onMainAsync { [self] in
-            dismissTransferViewController(
-                andPresent: detailsViewController,
-                didFinishWithTransfer: transfer
-            )
-        }
+        dismissTransferViewController(
+            andPresent: detailsViewController,
+            didFinishWithTransfer: transfer
+        )
     }
 }
 
@@ -163,12 +161,10 @@ extension ChatViewController: TransferViewControllerDelegate {
         didFinishWithTransfer transfer: TransactionDetails?,
         detailsViewController: UIViewController?
     ) {
-        DispatchQueue.onMainAsync { [self] in
-            dismissTransferViewController(
-                andPresent: detailsViewController,
-                didFinishWithTransfer: transfer
-            )
-        }
+        dismissTransferViewController(
+            andPresent: detailsViewController,
+            didFinishWithTransfer: transfer
+        )
     }
 }
 
@@ -365,7 +361,7 @@ private extension ChatViewController {
 private extension ChatViewController {
     func focusInputBarWithoutAnimation() {
         // "becomeFirstResponder()" causes content animation on start without this fix
-        Task { @MainActor in
+        Task {
             await Task.sleep(interval: .zero)
             messageInputBar.inputTextView.becomeFirstResponder()
         }

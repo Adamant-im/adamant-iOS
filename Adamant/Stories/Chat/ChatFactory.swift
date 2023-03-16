@@ -19,6 +19,7 @@ struct ChatFactory {
     let transferProvider: TransfersProvider
     let accountService: AccountService
     let accountProvider: AccountsProvider
+    let richTransactionStatusService: RichTransactionStatusService
     let addressBookService: AddressBookService
     let visibleWalletService: VisibleWalletsService
     let router: Router
@@ -75,6 +76,7 @@ private extension ChatFactory {
             visibleWalletService: visibleWalletService,
             accountService: accountService,
             accountProvider: accountProvider,
+            richTransactionStatusService: richTransactionStatusService,
             chatCacheService: chatCacheService,
             richMessageProviders: richMessageProviders
         )

@@ -21,7 +21,6 @@ actor AdamantChatsProvider: ChatsProvider {
     let accountsProvider: AccountsProvider
     let transactionService: ChatTransactionService
     let securedStore: SecuredStore
-    let richTransactionStatusService: RichTransactionStatusService
     
     private let richProviders: [String: RichMessageProviderWithStatusCheck]
     
@@ -67,8 +66,7 @@ actor AdamantChatsProvider: ChatsProvider {
         adamantCore: AdamantCore,
         accountsProvider: AccountsProvider,
         transactionService: ChatTransactionService,
-        securedStore: SecuredStore,
-        richTransactionStatusService: RichTransactionStatusService
+        securedStore: SecuredStore
     ) {
         self.accountService = accountService
         self.apiService = apiService
@@ -78,7 +76,6 @@ actor AdamantChatsProvider: ChatsProvider {
         self.accountsProvider = accountsProvider
         self.transactionService = transactionService
         self.securedStore = securedStore
-        self.richTransactionStatusService = richTransactionStatusService
         
         var richProviders = [String: RichMessageProviderWithStatusCheck]()
         for case let provider as RichMessageProviderWithStatusCheck in accountService.wallets {
@@ -1610,10 +1607,6 @@ extension AdamantChatsProvider {
                 self.securedStore.set(removedMessages, for: StoreKey.accountService.removedMessages)
             }
         }
-    }
-    
-    func forceUpdateStatus(for transaction: RichMessageTransaction) async {
-        await richTransactionStatusService.forceUpdate(transaction: transaction)
     }
     
     func markChatAsRead(chatroom: Chatroom) {

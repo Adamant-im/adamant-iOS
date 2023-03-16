@@ -15,8 +15,12 @@ final class TaskManager {
         tasks.insert(task)
     }
     
-    deinit {
+    func clean() {
         tasks.forEach { $0.cancel() }
+    }
+    
+    deinit {
+        clean()
     }
 }
 

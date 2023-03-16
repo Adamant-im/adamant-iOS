@@ -9,11 +9,11 @@
 import UIKit
 import Eureka
 
-class BtcTransferViewController: TransferViewControllerBase {
+final class BtcTransferViewController: TransferViewControllerBase {
     
     // MARK: Dependencies
     
-    var chatsProvider: ChatsProvider!
+    private let chatsProvider: ChatsProvider
     
     // MARK: Properties
     
@@ -29,6 +29,29 @@ class BtcTransferViewController: TransferViewControllerBase {
     
     static let invalidCharacters: CharacterSet = CharacterSet.decimalDigits.inverted
     
+    init(
+        chatsProvider: ChatsProvider,
+        accountService: AccountService,
+        accountsProvider: AccountsProvider,
+        dialogService: DialogService,
+        router: Router,
+        currencyInfoService: CurrencyInfoService
+    ) {
+        self.chatsProvider = chatsProvider
+        
+        super.init(
+            accountService: accountService,
+            accountsProvider: accountsProvider,
+            dialogService: dialogService,
+            router: router,
+            currencyInfoService: currencyInfoService
+        )
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     // MARK: Send
     
     @MainActor
@@ -41,10 +64,6 @@ class BtcTransferViewController: TransferViewControllerBase {
         }
         
         guard let service = service as? BtcWalletService, let recipient = recipientAddress, let amount = amount else {
-            return
-        }
-        
-        guard let dialogService = dialogService else {
             return
         }
         
@@ -66,7 +85,12 @@ class BtcTransferViewController: TransferViewControllerBase {
                 }
                 
                 Task {
-                    try await service.sendTransaction(transaction)
+                    do {
+                        try await service.sendTransaction(transaction)
+                    } catch {
+                        dialogService.showRichError(error: error)
+                    }
+                    
                     try await service.update()
                 }
                 
