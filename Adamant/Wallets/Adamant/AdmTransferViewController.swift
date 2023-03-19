@@ -23,7 +23,7 @@ extension String.adamantLocalized {
     }
 }
 
-class AdmTransferViewController: TransferViewControllerBase {
+final class AdmTransferViewController: TransferViewControllerBase {
     // MARK: Properties
     
     private var skipValueChange: Bool = false
@@ -102,7 +102,7 @@ class AdmTransferViewController: TransferViewControllerBase {
                 service.update()
                 dialogService.dismissProgress()
                 
-                dialogService?.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
                 
                 openDetailVC(
                     result: result,
@@ -111,8 +111,8 @@ class AdmTransferViewController: TransferViewControllerBase {
                     comments: comments
                 )
             } catch {
-                dialogService?.dismissProgress()
-                dialogService?.showRichError(error: error)
+                dialogService.dismissProgress()
+                dialogService.showRichError(error: error)
             }
         }
     }
@@ -132,7 +132,7 @@ class AdmTransferViewController: TransferViewControllerBase {
         if let recipientName = recipientName {
             detailsVC?.recipientName = recipientName
             vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
-        } else if let accountsProvider = accountsProvider {
+        } else {
             Task {
                 do {
                     let account = try await accountsProvider.getAccount(byAddress: recipient)
@@ -142,8 +142,6 @@ class AdmTransferViewController: TransferViewControllerBase {
                     vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
                 }
             }
-        } else {
-            vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
         }
     }
     

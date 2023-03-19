@@ -176,8 +176,7 @@ extension Container {
                 adamantCore: r.resolve(AdamantCore.self)!,
                 accountsProvider: r.resolve(AccountsProvider.self)!,
                 transactionService: r.resolve(ChatTransactionService.self)!,
-                securedStore: r.resolve(SecuredStore.self)!,
-                richTransactionStatusService: r.resolve(RichTransactionStatusService.self)!
+                securedStore: r.resolve(SecuredStore.self)!
             )
         }.inObjectScope(.container)
         
@@ -197,6 +196,7 @@ extension Container {
                 transferProvider: r.resolve(TransfersProvider.self)!,
                 accountService: r.resolve(AccountService.self)!,
                 accountProvider: r.resolve(AccountsProvider.self)!,
+                richTransactionStatusService: r.resolve(RichTransactionStatusService.self)!,
                 addressBookService: r.resolve(AddressBookService.self)!,
                 visibleWalletService: r.resolve(VisibleWalletsService.self)!,
                 router: r.resolve(Router.self)!

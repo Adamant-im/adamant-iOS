@@ -12,6 +12,7 @@ import QRCodeReader
 
 // MARK: - Transfer Delegate Protocol
 
+@MainActor
 protocol TransferViewControllerDelegate: AnyObject {
     func transferViewController(_ viewController: TransferViewControllerBase, didFinishWithTransfer transfer: TransactionDetails?, detailsViewController: UIViewController?)
 }
@@ -125,11 +126,11 @@ class TransferViewControllerBase: FormViewController {
     
     // MARK: - Dependencies
     
-    var accountService: AccountService!
-    var accountsProvider: AccountsProvider!
-    var dialogService: DialogService!
-    var router: Router!
-    var currencyInfoService: CurrencyInfoService!
+    let accountService: AccountService
+    let accountsProvider: AccountsProvider
+    let dialogService: DialogService
+    let router: Router
+    let currencyInfoService: CurrencyInfoService
     
     // MARK: - Properties
     
@@ -251,6 +252,25 @@ class TransferViewControllerBase: FormViewController {
     var alertView: UIView?
     
     // MARK: - Lifecycle
+    
+    init(
+        accountService: AccountService,
+        accountsProvider: AccountsProvider,
+        dialogService: DialogService,
+        router: Router,
+        currencyInfoService: CurrencyInfoService
+    ) {
+        self.accountService = accountService
+        self.accountsProvider = accountsProvider
+        self.dialogService = dialogService
+        self.router = router
+        self.currencyInfoService = currencyInfoService
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()

@@ -22,6 +22,7 @@ final class ChatViewModel: NSObject {
     private let visibleWalletService: VisibleWalletsService
     private let accountService: AccountService
     private let accountProvider: AccountsProvider
+    private let richTransactionStatusService: RichTransactionStatusService
     private let chatCacheService: ChatCacheService
     private let richMessageProviders: [String: RichMessageProvider]
     
@@ -84,6 +85,7 @@ final class ChatViewModel: NSObject {
         visibleWalletService: VisibleWalletsService,
         accountService: AccountService,
         accountProvider: AccountsProvider,
+        richTransactionStatusService: RichTransactionStatusService,
         chatCacheService: ChatCacheService,
         richMessageProviders: [String: RichMessageProvider]
     ) {
@@ -96,6 +98,7 @@ final class ChatViewModel: NSObject {
         self.visibleWalletService = visibleWalletService
         self.accountService = accountService
         self.accountProvider = accountProvider
+        self.richTransactionStatusService = richTransactionStatusService
         self.chatCacheService = chatCacheService
         super.init()
         setupObservers()
@@ -190,14 +193,10 @@ final class ChatViewModel: NSObject {
         Task {
             guard
                 let transaction = chatTransactions.first(where: { $0.chatMessageId == id }),
-                let richMessageTransaction = transaction as? RichMessageTransaction,
-                let index = messages.firstIndex(where: { id == $0.id }),
-                case var .transaction(model) = messages[index].content
+                let richMessageTransaction = transaction as? RichMessageTransaction
             else { return }
             
-            model.status = .notInitiated
-            messages[index].content = .transaction(model)
-            await chatsProvider.forceUpdateStatus(for: richMessageTransaction)
+            await richTransactionStatusService.forceUpdate(transaction: richMessageTransaction)
         }.stored(in: tasksStorage)
     }
     

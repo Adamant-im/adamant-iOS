@@ -10,6 +10,7 @@ import UIKit
 import Parchment
 import SnapKit
 
+@MainActor
 protocol ComplexTransferViewControllerDelegate: AnyObject {
     func complexTransferViewController(_ viewController: ComplexTransferViewController, didFinishWithTransfer: TransactionDetails?, detailsViewController: UIViewController?)
 }
