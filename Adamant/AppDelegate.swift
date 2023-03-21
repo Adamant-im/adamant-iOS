@@ -212,7 +212,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let chatsProvider = container.resolve(ChatsProvider.self) {
             repeater.registerForegroundCall(label: "chatsProvider", interval: 10, queue: .global(qos: .utility), callback: {
                 Task {
-                    await chatsProvider.update()
+                    await chatsProvider.update(notifyState: false)
                 }
             })
             

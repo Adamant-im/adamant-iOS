@@ -34,6 +34,7 @@ final class ChatViewController: MessagesViewController {
     private var messagesLoaded = false
     private var isScrollPositionNearlyTheBottom = true
     private var viewAppeared = false
+    private var previousAppState: UIApplication.State?
     
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
@@ -51,6 +52,11 @@ final class ChatViewController: MessagesViewController {
         get { chatMessagesCollectionView }
         set { assertionFailure("Do not set messagesCollectionView") }
     }
+    
+    private lazy var updatingIndicatorView: UpdatingIndicatorView = {
+        let view = UpdatingIndicatorView(title: "", titleType: .small)
+        return view
+    }()
     
     init(
         viewModel: ChatViewModel,
@@ -78,11 +84,12 @@ final class ChatViewController: MessagesViewController {
         messagesCollectionView.backgroundView?.backgroundColor = .adamant.backgroundColor
         chatMessagesCollectionView.fixedBottomOffset = .zero
         maintainPositionOnInputBarHeightChanged = true
+        navigationItem.titleView = updatingIndicatorView
         configureMessageActions()
         configureHeader()
         configureLayout()
         setupObservers()
-        viewModel.loadFirstMessagesIfNeeded()
+        viewModel.loadFirstMessagesIfNeeded(force: false)
     }
     
     override func viewWillLayoutSubviews() {
@@ -189,6 +196,22 @@ private extension ChatViewController {
             .sink { [weak self] _ in self?.inputTextUpdated() }
             .store(in: &subscriptions)
         
+        NotificationCenter.default
+            .publisher(for: UIApplication.didBecomeActiveNotification, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                guard self?.previousAppState == .background else { return }
+                self?.previousAppState = .active
+                self?.viewModel.loadFirstMessagesIfNeeded(force: true)
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: UIApplication.willResignActiveNotification, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in self?.previousAppState = .background }
+            .store(in: &subscriptions)
+        
         viewModel.$messages
             .removeDuplicates()
             .sink { [weak self] _ in self?.updateMessages() }
@@ -223,6 +246,10 @@ private extension ChatViewController {
             .assign(to: \.title, on: navigationItem)
             .store(in: &subscriptions)
         
+        viewModel.$partnerName
+            .sink { [weak self] in self?.updatingIndicatorView.updateTitle(title: $0) }
+            .store(in: &subscriptions)
+        
         viewModel.closeScreen
             .sink { [weak self] in self?.close() }
             .store(in: &subscriptions)
@@ -238,6 +265,11 @@ private extension ChatViewController {
         
         viewModel.didTapAdmSend
             .sink { [weak self] in self?.didTapAdmSend(to: $0) }
+            .store(in: &subscriptions)
+        
+        viewModel.$didBecomeActiveLoading
+            .removeDuplicates()
+            .sink { [weak self] _ in self?.updateNavigationBarLoadingView() }
             .store(in: &subscriptions)
     }
 }
@@ -318,6 +350,14 @@ private extension ChatViewController {
     
     func updateScrollDownButtonVisibility() {
         scrollDownButton.isHidden = isScrollPositionNearlyTheBottom
+    }
+    
+    func updateNavigationBarLoadingView() {
+        if viewModel.didBecomeActiveLoading {
+            updatingIndicatorView.startAnimate()
+        } else {
+            updatingIndicatorView.stopAnimate()
+        }
     }
 }
 
