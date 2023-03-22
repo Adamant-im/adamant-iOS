@@ -86,7 +86,7 @@ class NotificationService: UNNotificationServiceExtension {
         // MARK: 3. Working on transaction
         let partnerAddress: String
         let partnerPublicKey: String
-        let partnerName: String?
+        var partnerName: String?
         var decodedMessage: String?
         
         if transaction.senderId == pushRecipient {
@@ -103,7 +103,7 @@ class NotificationService: UNNotificationServiceExtension {
         // MARK: 4. Address book
         if let addressBook = api.getAddressBook(for: pushRecipient, core: core, keypair: keypair),
             let displayName = addressBook[partnerAddress]?.displayName {
-            partnerName = displayName
+            partnerName = displayName.checkAndReplaceSystemWallets()
             bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.partnerDisplayName] = displayName
         } else {
             partnerName = nil
@@ -192,7 +192,13 @@ class NotificationService: UNNotificationServiceExtension {
         }
     }
     
-    private func handleAdamantTransfer(notificationContent: UNMutableNotificationContent, partnerAddress address: String, partnerName name: String?, amount: Decimal, comment: String?) {
+    private func handleAdamantTransfer(
+        notificationContent: UNMutableNotificationContent,
+        partnerAddress address: String,
+        partnerName name: String?,
+        amount: Decimal,
+        comment: String?
+    ) {
         guard let content = adamantProvider.notificationContent(partnerAddress: address, partnerName: name, amount: amount, comment: comment) else {
             return
         }
