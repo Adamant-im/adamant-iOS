@@ -416,6 +416,7 @@ extension AdamantTransfersProvider {
         transaction.comment = comment
         transaction.fee = Self.transferFee as NSDecimalNumber
         transaction.partner = partner
+        transaction.transactionId = UUID().uuidString
         
         chatroom.addToTransactions(transaction)
         
@@ -574,7 +575,7 @@ extension AdamantTransfersProvider {
         transaction.showsChatroom = false
         transaction.fee = Self.transferFee as NSDecimalNumber
         
-        transaction.transactionId = nil
+        transaction.transactionId = UUID().uuidString
         transaction.blockId = nil
         transaction.chatMessageId = UUID().uuidString
         transaction.statusEnum = MessageStatus.pending
@@ -876,6 +877,7 @@ extension AdamantTransfersProvider {
         // MARK: 3. Create private context, and process transactions
         let contextPrivate = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         contextPrivate.parent = self.stack.container.viewContext
+        contextPrivate.mergePolicy = NSMergePolicy(merge: NSMergePolicyType.mergeByPropertyObjectTrumpMergePolicyType)
         
         var partners: [String:BaseAccount] = [:]
         for id in partnerIds {

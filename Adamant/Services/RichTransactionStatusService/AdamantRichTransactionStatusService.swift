@@ -57,8 +57,9 @@ extension AdamantRichTransactionStatusService: NSFetchedResultsControllerDelegat
 
 private extension AdamantRichTransactionStatusService {
     func add(transaction: RichMessageTransaction) {
+        let id = transaction.transactionId
+        
         guard
-            let id = transaction.transactionId,
             !subscriptions.keys.contains(id),
             let provider = getProvider(for: transaction)
         else { return }
@@ -72,12 +73,12 @@ private extension AdamantRichTransactionStatusService {
     }
 
     func remove(transaction: RichMessageTransaction) {
-        guard let id = transaction.transactionId else { return }
+        let id = transaction.transactionId
         subscriptions[id] = nil
     }
 
     func setupSubscription(publisher: RichTransactionStatusPublisher, transaction: RichMessageTransaction) {
-        guard let id = transaction.transactionId else { return }
+        let id = transaction.transactionId
         
         subscriptions[id] = publisher.removeDuplicates().sink { status in
             Task { [weak self] in

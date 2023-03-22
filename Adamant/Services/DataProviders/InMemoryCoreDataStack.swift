@@ -23,6 +23,7 @@ class InMemoryCoreDataStack: CoreDataStack {
         container = NSPersistentContainer(name: "Adamant", managedObjectModel: model)
         container.persistentStoreDescriptions = [description]
         container.loadPersistentStores { (_, _) in }
+        container.viewContext.mergePolicy = NSMergePolicy(merge: NSMergePolicyType.mergeByPropertyObjectTrumpMergePolicyType)
         
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
             guard let context = self?.container.viewContext else {

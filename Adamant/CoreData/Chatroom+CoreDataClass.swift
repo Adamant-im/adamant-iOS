@@ -85,15 +85,7 @@ public class Chatroom: NSManagedObject {
                     
                 // Rare case of identical date, compare IDs
                 case .orderedSame:
-                    guard let lid = lhs.transactionId else {
-                        return true
-                    }
-                    
-                    guard let hid = rhs.transactionId else {
-                        return false
-                    }
-                    
-                    return lid < hid
+                    return lhs.transactionId < rhs.transactionId
                 }
             }).last {
                 if newest != lastTransaction {
@@ -130,15 +122,7 @@ public class Chatroom: NSManagedObject {
                     
                 // Rare case of identical date, compare IDs
                 case .orderedSame:
-                    guard let lid = lhs.transactionId else {
-                        return true
-                    }
-                    
-                    guard let hid = rhs.transactionId else {
-                        return false
-                    }
-                    
-                    return lid < hid
+                    return lhs.transactionId < rhs.transactionId
                 }
             }).last {
                 if newest != lastTransaction {
