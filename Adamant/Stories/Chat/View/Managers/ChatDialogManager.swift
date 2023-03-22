@@ -304,9 +304,11 @@ private extension ChatDialogManager {
         let shareTypes: [AddressChatShareType] = adm.address == partnerAddress ? [.send] : [.chat, .send]
         let name = adm.name ?? adm.address
         
+        let kvsName = viewModel.getName(for: adm.address)
+        
         self.dialogService.presentShareAlertFor(
             adm: adm.address,
-            name: name,
+            name: kvsName ?? name,
             types: shareTypes,
             animated: true,
             from: nil,

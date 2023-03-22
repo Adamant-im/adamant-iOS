@@ -67,12 +67,27 @@ class ChatListViewController: UIViewController {
     }()
     
     private lazy var markdownParser: MarkdownParser = {
-        let parser = MarkdownParser(font: UIFont.systemFont(ofSize: ChatTableViewCell.shortDescriptionTextSize),
-                                    color: UIColor.adamant.primary,
-                                    enabledElements: .disabledAutomaticLink)
-        
-        parser.link.color = UIColor.adamant.active
-        
+        let parser = MarkdownParser(
+            font: UIFont.systemFont(ofSize: ChatTableViewCell.shortDescriptionTextSize),
+            color: .adamant.primary,
+            enabledElements: [
+                .header,
+                .list,
+                .quote,
+                .bold,
+                .italic,
+                .code,
+                .strikethrough
+            ],
+            customElements: [
+                MarkdownSimpleAdm(),
+                MarkdownLinkAdm(),
+                MarkdownAdvancedAdm(
+                    font: .adamantChatDefault,
+                    color: .adamant.active
+                )
+            ]
+        )
         return parser
     }()
     
