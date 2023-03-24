@@ -189,8 +189,11 @@ extension AdamantDialogService {
     }
     
     func showRichError(error: Error) {
-        guard let error = error as? RichError else { return }
-        showRichError(error: error)
+        if let error = error as? RichError {
+            showRichError(error: error)
+        } else {
+            showError(withMessage: error.localizedDescription, error: error)
+        }
     }
     
     func showNoConnectionNotification() {

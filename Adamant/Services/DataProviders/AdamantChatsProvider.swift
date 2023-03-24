@@ -920,27 +920,16 @@ extension AdamantChatsProvider {
                 chatroom.updatedAt = transaction.date
             }
             
-            // MARK: 5. Save unconfirmed transaction
-            do {
-                try context.save()
-            } catch {
-                throw ChatsProviderError.internalError(error)
+            defer {
+                try? context.save()
             }
             
-            let transaction = try await sendTransaction(
+            return try await sendTransaction(
                 transaction,
                 type: type,
                 keypair: keypair,
                 recipientPublicKey: recipientPublicKey
             )
-            
-            do {
-                transaction.statusEnum = MessageStatus.delivered
-                try context.save()
-                return transaction
-            } catch {
-                throw ChatsProviderError.internalError(error)
-            }
         } catch let error as AccountsProviderError {
             switch error {
             case .notFound, .invalidAddress:
@@ -953,7 +942,7 @@ extension AdamantChatsProvider {
                 throw ChatsProviderError.networkError
             }
         } catch {
-            throw ChatsProviderError.internalError(error)
+            throw error
         }
     }
     
@@ -999,18 +988,16 @@ extension AdamantChatsProvider {
             }
         }
         
-        try? privateContext.save()
-        
-        // MARK: 3. Send
-        
-        _ = try await sendTransaction(transaction, type: .message, keypair: keypair, recipientPublicKey: recipientPublicKey)
-        
-        do {
-            try privateContext.save()
-            return
-        } catch {
-            throw ChatsProviderError.internalError(error)
+        defer {
+            try? privateContext.save()
         }
+        
+        _ = try await sendTransaction(
+            transaction,
+            type: .message,
+            keypair: keypair,
+            recipientPublicKey: recipientPublicKey
+        )
     }
     
     // MARK: - Delete local message
@@ -1042,7 +1029,7 @@ extension AdamantChatsProvider {
     
     /// Send transaction.
     ///
-    /// If success - update transaction's id and add it to unconfirmed transactions.
+    /// If success - update transaction's id, status and add it to unconfirmed transactions.
     /// If fails - set transaction status to .failed
     private func sendTransaction(
         _ transaction: ChatTransaction,
@@ -1085,6 +1072,7 @@ extension AdamantChatsProvider {
             
             // Update ID with recieved, add to unconfirmed transactions.
             transaction.transactionId = String(id)
+            transaction.statusEnum = .delivered
             
             if let index = unconfirmedTransactionsBySignature.firstIndex(
                 of: signedTransaction.signature
@@ -1095,33 +1083,25 @@ extension AdamantChatsProvider {
             unconfirmedTransactions[id] = transaction.objectID
                         
             return transaction
-        } catch let error as ApiServiceError {
-            transaction.statusEnum = MessageStatus.failed
-            
-            let serviceError: ChatsProviderError
-            switch error {
-            case .networkError:
-                serviceError = .networkError
-                
-            case .accountNotFound:
-                serviceError = .accountNotFound(recipientId)
-                
-            case .notLogged:
-                serviceError = .notLogged
-                
-            case .serverError(let e):
-                serviceError = .serverError(AdamantError(message: e))
-                
-            case .internalError(let message, _):
-                serviceError = ChatsProviderError.internalError(AdamantError(message: message))
-                
-            case .requestCancelled:
-                serviceError = .requestCancelled
-            }
-            
-            throw serviceError
         } catch {
-            throw ChatsProviderError.serverError(error)
+            transaction.statusEnum = .failed
+            
+            switch error as? ApiServiceError {
+            case .networkError:
+                throw ChatsProviderError.networkError
+            case .accountNotFound:
+                throw ChatsProviderError.accountNotFound(recipientId)
+            case .notLogged:
+                throw ChatsProviderError.notLogged
+            case .serverError(let e):
+                throw ChatsProviderError.serverError(AdamantError(message: e))
+            case .internalError(let message, _):
+                throw ChatsProviderError.internalError(AdamantError(message: message))
+            case .requestCancelled:
+                throw ChatsProviderError.requestCancelled
+            case .none:
+                throw ChatsProviderError.serverError(error)
+            }
         }
     }
 }
