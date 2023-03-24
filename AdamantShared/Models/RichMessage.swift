@@ -33,6 +33,20 @@ struct RichContentKeys {
     private init() {}
 }
 
+// MARK: - RichMessageReply
+
+struct RichMessageReply: RichMessage {
+    var type: String = "reply"
+    
+    func content() -> [String : String] {
+        return [
+            "replyto_id": "9839400464901626037",
+            "reply_message": "123",
+            "message": "test reply test reply test reply test reply test reply\ntest replytest reply"
+        ]
+    }
+}
+
 // MARK: - RichMessageTransfer
 
 struct RichMessageTransfer: RichMessage {

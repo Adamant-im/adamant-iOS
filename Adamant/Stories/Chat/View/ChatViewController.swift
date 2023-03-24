@@ -16,6 +16,7 @@ import SnapKit
 final class ChatViewController: MessagesViewController {
     typealias SpinnerCell = MessageCellWrapper<SpinnerView>
     typealias TransactionCell = CollectionCellWrapper<ChatTransactionContainerView>
+    typealias ReplyCell = CollectionCellWrapper<ChatReplyContainerView>
     typealias SendTransaction = (UIViewController & ComplexTransferViewControllerDelegate) -> Void
     
     // MARK: Dependencies
@@ -337,6 +338,7 @@ private extension ChatViewController {
         let collection = ChatMessagesCollectionView()
         collection.refreshControl = ChatRefreshMock()
         collection.register(TransactionCell.self)
+        collection.register(ReplyCell.self)
         collection.register(
             SpinnerCell.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader

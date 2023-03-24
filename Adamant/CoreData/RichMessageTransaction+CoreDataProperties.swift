@@ -18,6 +18,7 @@ extension RichMessageTransaction {
 
     @NSManaged public var richContent: [String:String]?
     @NSManaged public var richType: String?
+    @NSManaged public var isReply: Bool
     @NSManaged public var transferStatusRaw: NSNumber?
 
 }

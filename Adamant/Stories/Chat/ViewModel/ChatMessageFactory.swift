@@ -94,6 +94,10 @@ private extension ChatMessageFactory {
         case let transaction as MessageTransaction:
             return makeContent(transaction)
         case let transaction as RichMessageTransaction:
+            if transaction.isReply {
+                return makeContent(transaction, backgroundColor: backgroundColor)
+            }
+            
             return makeContent(
                 transaction,
                 isFromCurrentSender: isFromCurrentSender,
@@ -114,6 +118,30 @@ private extension ChatMessageFactory {
         transaction.message.map {
             .message(.init(string: Self.markdownParser.parse($0)))
         } ?? .default
+    }
+    
+    func makeContent(
+        _ transaction: RichMessageTransaction,
+        backgroundColor: ChatMessageBackgroundColor
+    ) -> ChatMessage.Content {
+        guard let content = transaction.richContent,
+              let message = content["message"],
+              let replyId = content["replyto_id"],
+              let replyMessage = content["reply_message"]
+        else {
+            return .default
+        }
+        
+        return .reply(.init(
+            id: replyId,
+            isFromCurrentSender: true,
+            content: .init(
+                id: replyId,
+                message: message,
+                messageReply: replyMessage,
+                backgroundColor: backgroundColor
+            )
+        ))
     }
     
     func makeContent(

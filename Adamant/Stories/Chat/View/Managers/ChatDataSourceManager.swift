@@ -67,11 +67,25 @@ final class ChatDataSourceManager: MessagesDataSource {
         at indexPath: IndexPath,
         in messagesCollectionView: MessagesCollectionView
     ) -> UICollectionViewCell {
+        
+        if case let .custom(model) = message.kind,
+           let model = model as? ChatReplyContainerView.Model {
+            let cell = messagesCollectionView.dequeueReusableCell(
+                ChatViewController.ReplyCell.self,
+                for: indexPath
+            )
+            
+            cell.wrappedView.actionHandler = { [weak self] in self?.handleAction($0) }
+            cell.wrappedView.model = model
+            
+            return cell
+        }
+        
         let cell = messagesCollectionView.dequeueReusableCell(
             ChatViewController.TransactionCell.self,
             for: indexPath
         )
-    
+        
         if case let .transaction(model) = message.fullModel.content {
             cell.wrappedView.actionHandler = { [weak self] in self?.handleAction($0) }
             cell.wrappedView.model = model

@@ -171,9 +171,10 @@ final class ChatViewModel: NSObject {
         }
         
         Task {
-            let message: AdamantMessage = markdownParser.parse(text).length == text.count
-            ? .text(text)
-            : .markdownText(text)
+//            let message: AdamantMessage = markdownParser.parse(text).length == text.count
+//            ? .text(text)
+//            : .markdownText(text)
+            let message: AdamantMessage = .richMessage(payload: RichMessageReply(type: ""))
             
             guard await validateSendingMessage(message: message) else { return }
             

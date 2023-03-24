@@ -43,6 +43,7 @@ extension ChatMessage {
     enum Content: Equatable {
         case message(ComparableAttributedString)
         case transaction(ChatTransactionContainerView.Model)
+        case reply(ChatReplyContainerView.Model)
         
         static let `default` = Self.message(.init(string: .init()))
     }
@@ -57,6 +58,8 @@ extension ChatMessage: MessageType {
         case let .message(text):
             return .attributedText(text.string)
         case let .transaction(model):
+            return .custom(model)
+        case let .reply(model):
             return .custom(model)
         }
     }

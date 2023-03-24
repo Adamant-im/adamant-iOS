@@ -1,5 +1,5 @@
 //
-//  ChatTransactionCellSizeCalculator.swift
+//  ChatCellSizeCalculator.swift
 //  Adamant
 //
 //  Created by Andrey Golubenko on 10.01.2023.
@@ -9,8 +9,7 @@
 import MessageKit
 import UIKit
 
-final class ChatTransactionCellSizeCalculator: CellSizeCalculator {
-    private let measuredView = ChatTransactionContainerView()
+final class ChatCellSizeCalculator: CellSizeCalculator {
     private let getCurrentSender: () -> SenderType
     private let getMessages: () -> [ChatMessage]
     private let messagesFlowLayout: MessagesCollectionViewFlowLayout
@@ -28,13 +27,20 @@ final class ChatTransactionCellSizeCalculator: CellSizeCalculator {
     }
     
     override func sizeForItem(at indexPath: IndexPath) -> CGSize {
-        guard
-            case let .transaction(model) = getMessages()[indexPath.section].fullModel.content
-        else { return .zero }
+        if case let .transaction(model) = getMessages()[indexPath.section].fullModel.content {
+            return .init(
+                width: messagesFlowLayout.itemWidth,
+                height: model.height(for: messagesFlowLayout.itemWidth)
+            )
+        }
         
-        return .init(
-            width: messagesFlowLayout.itemWidth,
-            height: model.height(for: messagesFlowLayout.itemWidth)
-        )
+        if case let .reply(model) = getMessages()[indexPath.section].fullModel.content {
+            return .init(
+                width: messagesFlowLayout.itemWidth,
+                height: model.height(for: messagesFlowLayout.itemWidth)
+            )
+        }
+        
+        return .zero
     }
 }
