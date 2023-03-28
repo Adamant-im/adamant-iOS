@@ -57,9 +57,9 @@ private extension RichTransactionStatusSubscription {
             return .final
         case .registered:
             return .registered
-        case .warning, .pending, .notInitiated, .updating:
-            let sentInterval = Date.now.timeIntervalSince1970
-                - transaction.sentDate.timeIntervalSince1970
+        case .pending, .notInitiated:
+            guard let sentDate = transaction.sentDate else { return .final }
+            let sentInterval = Date.now.timeIntervalSince1970 - sentDate.timeIntervalSince1970
             
             let oldTxInterval = TimeInterval(
                 provider.newPendingInterval * .init(provider.newPendingAttempts)
@@ -96,11 +96,7 @@ private extension RichTransactionStatusSubscription {
             break
         }
         
-        do {
-            status = try await provider.statusFor(transaction: transaction)
-        } catch {
-            status = .pending
-        }
+        status = await provider.statusWithFilters(transaction: transaction)
         
         Task {
             guard let interval = nextUpdateInterval else { return }

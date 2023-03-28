@@ -24,7 +24,7 @@ struct ChatMessageFactory {
         dateHeaderOn: Bool,
         topSpinnerOn: Bool
     ) -> ChatMessage {
-        let sentDate = transaction.sentDate
+        let sentDate = transaction.sentDate ?? .now
         let senderModel = ChatSender(transaction: transaction)
         let isFromCurrentSender = currentSender.senderId == senderModel.senderId
 
@@ -135,7 +135,7 @@ private extension ChatMessageFactory {
                 icon: richMessageProviders[transfer.type]?.tokenLogo ?? .init(),
                 amount: AdamantBalanceFormat.full.format(transfer.amount),
                 currency: richMessageProviders[transfer.type]?.tokenSymbol ?? "",
-                date: transaction.sentDate.humanizedDateTime(withWeekday: false),
+                date: transaction.sentDate?.humanizedDateTime(withWeekday: false) ?? "",
                 comment: transfer.comments,
                 backgroundColor: backgroundColor
             ),
@@ -163,7 +163,7 @@ private extension ChatMessageFactory {
                     (transaction.amount ?? .zero) as Decimal
                 ),
                 currency: AdmWalletService.currencySymbol,
-                date: transaction.sentDate.humanizedDateTime(withWeekday: false),
+                date: transaction.sentDate?.humanizedDateTime(withWeekday: false) ?? "",
                 comment: transaction.comment,
                 backgroundColor: backgroundColor
             ),
