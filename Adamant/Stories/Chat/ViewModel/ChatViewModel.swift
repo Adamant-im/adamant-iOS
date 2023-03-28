@@ -36,10 +36,18 @@ final class ChatViewModel: NSObject {
     private var messageIdToShow: String?
     private var isLoading = false
     
+    private var isNeedToLoadMoreMessages: Bool {
+        get async {
+            guard let address = chatroom?.partner?.address else { return false }
+            
+            return await chatsProvider.chatLoadedMessages[address] ?? .zero
+                < chatsProvider.chatMaxMessages[address] ?? .zero
+        }
+    }
+    
     private(set) var sender = ChatSender.default
     private(set) var chatroom: Chatroom?
     private(set) var chatTransactions: [ChatTransaction] = []
-    private(set) var isNeedToLoadMoreMessages = false
     
     let didTapTransfer = ObservableSender<String>()
     let dialog = ObservableSender<ChatDialog>()
@@ -154,7 +162,7 @@ final class ChatViewModel: NSObject {
         Task {
             guard
                 let address = chatroom?.partner?.address,
-                isNeedToLoadMoreMessages
+                await isNeedToLoadMoreMessages
             else { return }
             
             let offset = await chatsProvider.chatLoadedMessages[address] ?? .zero
@@ -376,7 +384,6 @@ private extension ChatViewModel {
         
         Task(priority: .userInitiated) { [chatTransactions, sender] in
             var expirationTimestamp: TimeInterval?
-            let isNeedToLoadMoreMessages = await checkIfNeedToLoadMooreMessages()
 
             let messages = await chatMessagesListFactory.makeMessages(
                 transactions: chatTransactions,
@@ -421,17 +428,6 @@ private extension ChatViewModel {
         timerSubscription = Timer.publish(every: interval, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in self?.updateMessages(resetLoadingProperty: false) }
-    }
-    
-    func checkIfNeedToLoadMooreMessages() async -> Bool {
-        guard let address = chatroom?.partner?.address else {
-            isNeedToLoadMoreMessages = false
-            return isNeedToLoadMoreMessages
-        }
-        
-        isNeedToLoadMoreMessages = await chatsProvider.chatLoadedMessages[address] ?? .zero < chatsProvider.chatMaxMessages[address] ?? .zero
-        
-        return isNeedToLoadMoreMessages
     }
     
     func validateSendingMessage(message: AdamantMessage) async -> Bool {

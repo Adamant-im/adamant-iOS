@@ -21,7 +21,7 @@ enum URLScheme: String, Codable {
     }
 }
 
-class Node: Equatable, Codable {
+final class Node: Equatable, Codable {
     struct Status: Equatable, Codable {
         let ping: TimeInterval
         let wsEnabled: Bool

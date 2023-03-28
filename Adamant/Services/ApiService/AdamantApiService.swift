@@ -150,6 +150,8 @@ final class AdamantApiService: ApiService {
             return
         }
         
+        var needNodesUpdate = false
+        
         sendSafeRequest(
             nodes: currentNodes,
             path: path,
@@ -157,11 +159,15 @@ final class AdamantApiService: ApiService {
             method: method,
             body: body,
             waitsForConnectivity: waitsForConnectivity,
-            onFailure: { [weak self] node in
+            onFailure: { node in
                 node.connectionStatus = .offline
-                self?.nodesSource?.nodesUpdate()
+                needNodesUpdate = true
             },
-            completion: completion
+            completion: { [weak self] in
+                completion($0)
+                guard needNodesUpdate else { return }
+                self?.nodesSource?.nodesUpdate()
+            }
         )
         
         updateCurrentNodes()
