@@ -100,7 +100,7 @@ final class ChatDataSourceManager: MessagesDataSource {
         
         let panGestureRecognizer = UIPanGestureRecognizer(
             target: self,
-            action: #selector(swipeGestureCellAction(_ :))
+            action: #selector(swipeGestureCellAction(_:))
         )
         panGestureRecognizer.delegate = viewModel
         cell.contentView.addGestureRecognizer(panGestureRecognizer)

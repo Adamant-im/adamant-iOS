@@ -508,6 +508,7 @@ private extension ChatViewController {
 }
 
 // MARK: Swipe
+
 private extension ChatViewController {
     func swipeGestureCellAction(_ recognizer: UIPanGestureRecognizer) {
         guard let movingView = recognizer.view?.superview as? UIView else { return }
@@ -516,13 +517,21 @@ private extension ChatViewController {
         
         if movingView.frame.origin.x == messagePadding && translation.x > 0 { return }
         
+        if recognizer.state == .began {
+            oldContentOffset = messagesCollectionView.contentOffset
+        }
+        
         if movingView.frame.origin.x <= messagePadding {
-            print("movingView.center.x= \(movingView.center.x)")
             movingView.center = CGPoint(
-                x: movingView.center.x + translation.x,
+                x: movingView.center.x + translation.x / 2,
                 y: movingView.center.y
             )
             recognizer.setTranslation(CGPoint(x: 0, y: 0), in: view)
+            
+            if let oldContentOffset = oldContentOffset {
+                messagesCollectionView.setContentOffset(oldContentOffset, animated: false)
+            }
+            
             if abs(movingView.frame.origin.x) > UIScreen.main.bounds.size.width * 0.18 {
                 replyAction = true
                 if canReplyVibrate {
@@ -536,6 +545,10 @@ private extension ChatViewController {
         
         if recognizer.state == .ended {
             canReplyVibrate = true
+            
+            if let oldContentOffset = oldContentOffset {
+                messagesCollectionView.setContentOffset(oldContentOffset, animated: false)
+            }
             
             if replyAction {
                 print("reply!")
@@ -586,3 +599,4 @@ private let scrollDownButtonInset: CGFloat = 20
 private let messagePadding: CGFloat = 12
 private var replyAction: Bool = false
 private var canReplyVibrate: Bool = true
+private var oldContentOffset: CGPoint?

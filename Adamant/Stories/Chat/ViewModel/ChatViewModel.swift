@@ -337,24 +337,6 @@ extension ChatViewModel: NSFetchedResultsControllerDelegate {
     }
 }
 
-extension ChatViewModel: UIGestureRecognizerDelegate {
-    func gestureRecognizer(
-        _ gestureRecognizer: UIGestureRecognizer,
-        shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
-    ) -> Bool {
-        return true
-    }
-    
-//    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-//        guard let gesture = gestureRecognizer as? UIPanGestureRecognizer else {
-//            return true
-//        }
-//
-//        let translation = gesture.translation(in: messagesCollectionView)
-//        return scrollView.contentOffset.y == 0
-//    }
-}
-
 private extension ChatViewModel {
     func setupObservers() {
         $inputText
@@ -562,5 +544,14 @@ private extension ChatViewModel {
     func startNewChat(with chatroom: Chatroom, name: String? = nil, message: String? = nil) {
         setNameIfNeeded(for: chatroom.partner, chatroom: chatroom, name: name)
         didTapAdmChat.send((chatroom, message))
+    }
+}
+
+extension ChatViewModel: UIGestureRecognizerDelegate {
+    func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
+    ) -> Bool {
+        return true
     }
 }
