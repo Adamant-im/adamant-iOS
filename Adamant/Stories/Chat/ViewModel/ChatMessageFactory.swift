@@ -116,7 +116,7 @@ private extension ChatMessageFactory {
     
     func makeContent(_ transaction: MessageTransaction) -> ChatMessage.Content {
         transaction.message.map {
-            .message(.init(string: Self.markdownParser.parse($0)))
+            .message(.init(string: Self.markdownParser.parse($0), id: transaction.txId))
         } ?? .default
     }
     

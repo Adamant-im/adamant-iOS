@@ -62,6 +62,33 @@ final class ChatDataSourceManager: MessagesDataSource {
         message.fullModel.dateHeader?.string
     }
     
+    func textCell(
+        for message: MessageType,
+        at indexPath: IndexPath,
+        in messagesCollectionView: MessagesCollectionView
+    ) -> UICollectionViewCell? {
+        let cell = messagesCollectionView.dequeueReusableCell(
+            TextMessageCell.self,
+            for: indexPath
+        )
+        cell.configure(with: message, at: indexPath, and: messagesCollectionView)
+        
+        if case let .message(model) = message.fullModel.content {
+            let panGestureRecognizer = SwipePanGestureRecognizer(
+                target: self,
+                action: #selector(swipeGestureCellAction(_:)),
+                message: BaseMessageModel(
+                    id: model.id,
+                    isFromCurrentSender: true,
+                    text: model.string
+                )
+            )
+            cell.contentView.addGestureRecognizer(panGestureRecognizer)
+        }
+        
+        return cell
+    }
+    
     func customCell(
         for message: MessageType,
         at indexPath: IndexPath,
