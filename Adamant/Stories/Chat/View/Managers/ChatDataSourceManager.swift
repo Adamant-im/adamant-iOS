@@ -78,6 +78,13 @@ final class ChatDataSourceManager: MessagesDataSource {
             cell.wrappedView.actionHandler = { [weak self] in self?.handleAction($0) }
             cell.wrappedView.model = model
             
+            let panGestureRecognizer = UIPanGestureRecognizer(
+                target: self,
+                action: #selector(swipeGestureCellAction(_:))
+            )
+            panGestureRecognizer.delegate = viewModel
+            cell.contentView.addGestureRecognizer(panGestureRecognizer)
+            
             return cell
         }
         
@@ -91,6 +98,13 @@ final class ChatDataSourceManager: MessagesDataSource {
             cell.wrappedView.model = model
         }
         
+        let panGestureRecognizer = UIPanGestureRecognizer(
+            target: self,
+            action: #selector(swipeGestureCellAction(_ :))
+        )
+        panGestureRecognizer.delegate = viewModel
+        cell.contentView.addGestureRecognizer(panGestureRecognizer)
+        
         return cell
     }
 }
@@ -103,5 +117,9 @@ private extension ChatDataSourceManager {
         case let .forceUpdateTransactionStatus(id):
             viewModel.forceUpdateTransactionStatus(id: id)
         }
+    }
+    
+    @objc func swipeGestureCellAction(_ recognizer: UIPanGestureRecognizer) {
+        viewModel.swipeAction.send(recognizer)
     }
 }

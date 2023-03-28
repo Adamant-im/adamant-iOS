@@ -9,6 +9,7 @@
 import Combine
 import CoreData
 import MarkdownKit
+import UIKit
 
 @MainActor
 final class ChatViewModel: NSObject {
@@ -46,6 +47,7 @@ final class ChatViewModel: NSObject {
     let didTapAdmChat = ObservableSender<(Chatroom, String?)>()
     let didTapAdmSend = ObservableSender<AdamantAddress>()
     let closeScreen = ObservableSender<Void>()
+    let swipeAction = ObservableSender<UIPanGestureRecognizer>()
     
     @ObservableValue private(set) var fullscreenLoading = false
     @ObservableValue private(set) var messages = [ChatMessage]()
@@ -333,6 +335,24 @@ extension ChatViewModel: NSFetchedResultsControllerDelegate {
     func controllerDidChangeContent(_: NSFetchedResultsController<NSFetchRequestResult>) {
         updateTransactions(performFetch: false)
     }
+}
+
+extension ChatViewModel: UIGestureRecognizerDelegate {
+    func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
+    ) -> Bool {
+        return true
+    }
+    
+//    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+//        guard let gesture = gestureRecognizer as? UIPanGestureRecognizer else {
+//            return true
+//        }
+//
+//        let translation = gesture.translation(in: messagesCollectionView)
+//        return scrollView.contentOffset.y == 0
+//    }
 }
 
 private extension ChatViewModel {

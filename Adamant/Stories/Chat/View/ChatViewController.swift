@@ -240,6 +240,10 @@ private extension ChatViewController {
         viewModel.didTapAdmSend
             .sink { [weak self] in self?.didTapAdmSend(to: $0) }
             .store(in: &subscriptions)
+        
+        viewModel.swipeAction
+            .sink { [weak self] in self?.swipeGestureCellAction($0) }
+            .store(in: &subscriptions)
     }
 }
 
@@ -503,6 +507,52 @@ private extension ChatViewController {
     }
 }
 
+// MARK: Swipe
+private extension ChatViewController {
+    func swipeGestureCellAction(_ recognizer: UIPanGestureRecognizer) {
+        guard let movingView = recognizer.view?.superview as? UIView else { return }
+        
+        let translation = recognizer.translation(in: messagesCollectionView)
+        
+        if movingView.frame.origin.x == messagePadding && translation.x > 0 { return }
+        
+        if movingView.frame.origin.x <= messagePadding {
+            print("movingView.center.x= \(movingView.center.x)")
+            movingView.center = CGPoint(
+                x: movingView.center.x + translation.x,
+                y: movingView.center.y
+            )
+            recognizer.setTranslation(CGPoint(x: 0, y: 0), in: view)
+            if abs(movingView.frame.origin.x) > UIScreen.main.bounds.size.width * 0.18 {
+                replyAction = true
+                if canReplyVibrate {
+                    UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+                }
+                canReplyVibrate = false
+            } else {
+                replyAction = false
+            }
+        }
+        
+        if recognizer.state == .ended {
+            canReplyVibrate = true
+            
+            if replyAction {
+                print("reply!")
+            }
+            
+            UIView.animate(withDuration: 0.25, delay: 0, options: .curveEaseOut) {
+                movingView.frame = CGRect(
+                    x: messagePadding,
+                    y: movingView.frame.origin.y,
+                    width: movingView.frame.size.width,
+                    height: movingView.frame.size.height
+                )
+            }
+        }
+    }
+}
+
 // MARK: Markdown
 
 private extension ChatViewController {
@@ -533,3 +583,6 @@ private extension ChatViewController {
 }
 
 private let scrollDownButtonInset: CGFloat = 20
+private let messagePadding: CGFloat = 12
+private var replyAction: Bool = false
+private var canReplyVibrate: Bool = true
