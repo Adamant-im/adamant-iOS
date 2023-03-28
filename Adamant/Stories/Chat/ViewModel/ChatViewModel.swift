@@ -546,12 +546,3 @@ private extension ChatViewModel {
         didTapAdmChat.send((chatroom, message))
     }
 }
-
-extension ChatViewModel: UIGestureRecognizerDelegate {
-    func gestureRecognizer(
-        _ gestureRecognizer: UIGestureRecognizer,
-        shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
-    ) -> Bool {
-        return true
-    }
-}

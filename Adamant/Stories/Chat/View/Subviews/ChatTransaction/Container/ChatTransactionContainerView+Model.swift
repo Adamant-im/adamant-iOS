@@ -9,7 +9,7 @@
 import Foundation
 
 extension ChatTransactionContainerView {
-    struct Model: Equatable {
+    struct Model: Equatable, MessageModel {
         let id: String
         let isFromCurrentSender: Bool
         let content: ChatTransactionContentView.Model
@@ -21,5 +21,16 @@ extension ChatTransactionContainerView {
             content: .default,
             status: .notInitiated
         )
+        
+        func makeReplyContent() -> NSAttributedString {
+            let commentRaw = content.comment ?? ""
+            let comment = commentRaw.isEmpty
+            ? commentRaw
+            : ": \(commentRaw)"
+            
+            let content = "\(content.title) \(content.currency) \(content.amount)\(comment)"
+            
+            return NSAttributedString(string: content)
+        }
     }
 }

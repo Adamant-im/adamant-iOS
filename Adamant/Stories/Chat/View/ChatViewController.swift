@@ -511,7 +511,11 @@ private extension ChatViewController {
 
 private extension ChatViewController {
     func swipeGestureCellAction(_ recognizer: UIPanGestureRecognizer) {
-        guard let movingView = recognizer.view?.superview as? UIView else { return }
+        guard let movingView = recognizer.view?.superview as? UIView,
+              let panGesture = recognizer as? SwipePanGestureRecognizer
+        else {
+            return
+        }
         
         let translation = recognizer.translation(in: messagesCollectionView)
         
@@ -551,7 +555,7 @@ private extension ChatViewController {
             }
             
             if replyAction {
-                print("reply!")
+                print("reply id =\(panGesture.message.id), message = \(panGesture.message.makeReplyContent().string)")
             }
             
             UIView.animate(withDuration: 0.25, delay: 0, options: .curveEaseOut) {

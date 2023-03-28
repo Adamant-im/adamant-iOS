@@ -62,8 +62,8 @@ final class ChatReplyContentView: UIView {
 extension ChatReplyContentView.Model {
     func height(for width: CGFloat) -> CGFloat {
         let maxSize = CGSize(width: width, height: .infinity)
-        let titleString = NSAttributedString(string: message, attributes: [.font: messageFont])
-        let dateString = NSAttributedString(string: messageReply, attributes: [.font: replyFont])
+        let titleString = NSAttributedString(string: message.string, attributes: [.font: messageFont])
+        let dateString = NSAttributedString(string: messageReply.string, attributes: [.font: replyFont])
         
         let titleHeight = titleString.boundingRect(
             with: maxSize,
@@ -102,8 +102,8 @@ private extension ChatReplyContentView {
     
     func update() {
         backgroundColor = model.backgroundColor.uiColor
-        messageLabel.text = model.message
-        replyLabel.text = model.messageReply
+        messageLabel.attributedText = model.message
+        replyLabel.attributedText = model.messageReply
     }
     
     @objc func didTap() {

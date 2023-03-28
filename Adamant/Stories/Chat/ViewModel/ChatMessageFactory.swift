@@ -133,12 +133,13 @@ private extension ChatMessageFactory {
         }
         
         return .reply(.init(
-            id: replyId,
+            id: transaction.txId,
             isFromCurrentSender: true,
             content: .init(
-                id: replyId,
-                message: message,
-                messageReply: replyMessage,
+                id: transaction.txId,
+                replyId: replyId,
+                message: Self.markdownParser.parse(message),
+                messageReply: Self.markdownParser.parse(replyMessage),
                 backgroundColor: backgroundColor
             )
         ))

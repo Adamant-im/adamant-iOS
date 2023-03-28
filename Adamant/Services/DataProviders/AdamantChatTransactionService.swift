@@ -157,7 +157,7 @@ actor AdamantChatTransactionService: ChatTransactionService {
         messageTransaction.isOutgoing = isOutgoing
         messageTransaction.blockId = transaction.blockId
         messageTransaction.confirmations = transaction.confirmations
-        messageTransaction.chatMessageId = UUID().uuidString
+        messageTransaction.chatMessageId = String(transaction.id)
         messageTransaction.fee = transaction.fee as NSDecimalNumber
         messageTransaction.statusEnum = MessageStatus.delivered
         messageTransaction.partner = partner
@@ -195,7 +195,7 @@ actor AdamantChatTransactionService: ChatTransactionService {
             transfer.isOutgoing = isOut
             transfer.blockId = transaction.blockId
             transfer.confirmations = transaction.confirmations
-            transfer.chatMessageId = UUID().uuidString
+            transfer.chatMessageId = String(transaction.id)
             transfer.fee = transaction.fee as NSDecimalNumber
             transfer.statusEnum = MessageStatus.delivered
             transfer.partner = partner

@@ -11,14 +11,16 @@ import UIKit
 extension ChatReplyContentView {
     struct Model: Equatable {
         let id: String
-        let message: String
-        let messageReply: String
+        let replyId: String
+        let message: NSAttributedString
+        let messageReply: NSAttributedString
         let backgroundColor: ChatMessageBackgroundColor
         
         static let `default` = Self(
             id: "",
-            message: "",
-            messageReply: "",
+            replyId: "",
+            message: NSAttributedString(string: ""),
+            messageReply: NSAttributedString(string: ""),
             backgroundColor: .failed
         )
     }

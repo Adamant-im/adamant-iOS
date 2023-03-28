@@ -9,7 +9,7 @@
 import Foundation
 
 extension ChatReplyContainerView {
-    struct Model: Equatable {
+    struct Model: Equatable, MessageModel {
         let id: String
         let isFromCurrentSender: Bool
         let content: ChatReplyContentView.Model
@@ -19,5 +19,9 @@ extension ChatReplyContainerView {
             isFromCurrentSender: true,
             content: .default
         )
+        
+        func makeReplyContent() -> NSAttributedString {
+            return content.message
+        }
     }
 }

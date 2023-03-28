@@ -68,8 +68,7 @@ final class ChatDataSourceManager: MessagesDataSource {
         in messagesCollectionView: MessagesCollectionView
     ) -> UICollectionViewCell {
         
-        if case let .custom(model) = message.kind,
-           let model = model as? ChatReplyContainerView.Model {
+        if case let .reply(model) = message.fullModel.content {
             let cell = messagesCollectionView.dequeueReusableCell(
                 ChatViewController.ReplyCell.self,
                 for: indexPath
@@ -78,34 +77,36 @@ final class ChatDataSourceManager: MessagesDataSource {
             cell.wrappedView.actionHandler = { [weak self] in self?.handleAction($0) }
             cell.wrappedView.model = model
             
-            let panGestureRecognizer = UIPanGestureRecognizer(
+            let panGestureRecognizer = SwipePanGestureRecognizer(
                 target: self,
-                action: #selector(swipeGestureCellAction(_:))
+                action: #selector(swipeGestureCellAction(_:)),
+                message: model
             )
-            panGestureRecognizer.delegate = viewModel
             cell.contentView.addGestureRecognizer(panGestureRecognizer)
             
             return cell
         }
         
-        let cell = messagesCollectionView.dequeueReusableCell(
-            ChatViewController.TransactionCell.self,
-            for: indexPath
-        )
-        
         if case let .transaction(model) = message.fullModel.content {
+            let cell = messagesCollectionView.dequeueReusableCell(
+                ChatViewController.TransactionCell.self,
+                for: indexPath
+            )
+            
             cell.wrappedView.actionHandler = { [weak self] in self?.handleAction($0) }
             cell.wrappedView.model = model
+            
+            let panGestureRecognizer = SwipePanGestureRecognizer(
+                target: self,
+                action: #selector(swipeGestureCellAction(_:)),
+                message: model
+            )
+            cell.contentView.addGestureRecognizer(panGestureRecognizer)
+            
+            return cell
         }
         
-        let panGestureRecognizer = UIPanGestureRecognizer(
-            target: self,
-            action: #selector(swipeGestureCellAction(_:))
-        )
-        panGestureRecognizer.delegate = viewModel
-        cell.contentView.addGestureRecognizer(panGestureRecognizer)
-        
-        return cell
+        return UICollectionViewCell()
     }
 }
 

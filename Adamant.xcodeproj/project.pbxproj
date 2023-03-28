@@ -57,6 +57,8 @@
 		4198D57D28C8B7FA009337F2 /* relax-message-tone.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4198D57C28C8B7F9009337F2 /* relax-message-tone.mp3 */; };
 		4198D57F28C8B834009337F2 /* short-success.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4198D57E28C8B834009337F2 /* short-success.mp3 */; };
 		4198D58128C8B8D1009337F2 /* default.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4198D58028C8B8D1009337F2 /* default.mp3 */; };
+		41A1994229D2D3920031AD75 /* SwipePanGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41A1994129D2D3920031AD75 /* SwipePanGestureRecognizer.swift */; };
+		41A1994429D2D3CF0031AD75 /* MessageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41A1994329D2D3CF0031AD75 /* MessageModel.swift */; };
 		41BCB310295C6082004B12AB /* VisibleWalletsResetTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41BCB30F295C6082004B12AB /* VisibleWalletsResetTableViewCell.swift */; };
 		41CA598C29A0D84F002BFDE4 /* TaskManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CA598B29A0D84F002BFDE4 /* TaskManager.swift */; };
 		41CE153A297FF98200CC9254 /* Web3Swift+Adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CE1539297FF98200CC9254 /* Web3Swift+Adamant.swift */; };
@@ -785,6 +787,8 @@
 		4198D57C28C8B7F9009337F2 /* relax-message-tone.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "relax-message-tone.mp3"; sourceTree = "<group>"; };
 		4198D57E28C8B834009337F2 /* short-success.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "short-success.mp3"; sourceTree = "<group>"; };
 		4198D58028C8B8D1009337F2 /* default.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = default.mp3; sourceTree = "<group>"; };
+		41A1994129D2D3920031AD75 /* SwipePanGestureRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipePanGestureRecognizer.swift; sourceTree = "<group>"; };
+		41A1994329D2D3CF0031AD75 /* MessageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageModel.swift; sourceTree = "<group>"; };
 		41BCB30F295C6082004B12AB /* VisibleWalletsResetTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisibleWalletsResetTableViewCell.swift; sourceTree = "<group>"; };
 		41CA598B29A0D84F002BFDE4 /* TaskManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskManager.swift; sourceTree = "<group>"; };
 		41CE1539297FF98200CC9254 /* Web3Swift+Adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Web3Swift+Adamant.swift"; sourceTree = "<group>"; };
@@ -1840,6 +1844,7 @@
 				9304F8BD292F88F900173F18 /* ANSPayload.swift */,
 				9304F8C5292F971600173F18 /* ApiServiceResult.swift */,
 				9304F8C7292F972600173F18 /* ApiServiceError.swift */,
+				41A1994329D2D3CF0031AD75 /* MessageModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1866,6 +1871,7 @@
 				9345769428FD0C34004E6C7A /* UIViewController+email.swift */,
 				41CE1539297FF98200CC9254 /* Web3Swift+Adamant.swift */,
 				41CA598B29A0D84F002BFDE4 /* TaskManager.swift */,
+				41A1994129D2D3920031AD75 /* SwipePanGestureRecognizer.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -3006,6 +3012,7 @@
 				E987024920C2B1F700E393F4 /* AdamantChatsProvider+fakeMessages.swift in Sources */,
 				6403F5E222723F7500D58779 /* DashWallet.swift in Sources */,
 				648DD7A42237DB9E00B811FD /* DogeWalletService+Send.swift in Sources */,
+				41A1994229D2D3920031AD75 /* SwipePanGestureRecognizer.swift in Sources */,
 				E9942B84203CBFCE00C163AF /* AdamantQRTools.swift in Sources */,
 				6403F5E422723F8C00D58779 /* DashWalletService.swift in Sources */,
 				9371E561295CD53100438F2C /* ChatLocalization.swift in Sources */,
@@ -3180,6 +3187,7 @@
 				E91947B22000246A001362F8 /* AdamantError.swift in Sources */,
 				3AA2D5F7280EADE3000ED971 /* SocketService.swift in Sources */,
 				E95F85802008C8D70070534A /* ChatsRoutes.swift in Sources */,
+				41A1994429D2D3CF0031AD75 /* MessageModel.swift in Sources */,
 				6416B1A721B024B6006089AC /* LskWalletService+Send.swift in Sources */,
 				E9942B87203D9E5100C163AF /* EurekaQRRow.swift in Sources */,
 				E9AA8C02212C5BF500F9249F /* AdmWalletService+Send.swift in Sources */,
