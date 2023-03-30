@@ -100,8 +100,6 @@ class ERC20WalletService: WalletService {
     
     private (set) var token: ERC20Token?
     private (set) var erc20: ERC20?
-    
-    let defaultDispatchQueue = DispatchQueue(label: "im.adamant.erc20WalletService", qos: .utility, attributes: [.concurrent])
     private (set) var enabled = true
     
     private var _ethNodeUrl: String?
@@ -118,7 +116,6 @@ class ERC20WalletService: WalletService {
             return await setupEthNode(with: url)
         }
     }
-    private var baseUrl: String!
     
     var walletViewController: WalletViewController {
         guard let vc = router.get(scene: AdamantScene.Wallets.ERC20.wallet) as? ERC20WalletViewController else {
@@ -201,7 +198,6 @@ class ERC20WalletService: WalletService {
         }
         
         self._web3 = web3
-        self.baseUrl = ERC20WalletService.buildBaseUrl(for: web3.provider.network)
         
         if let address = EthereumAddress(token.contractAddress) {
             self.contract = web3.contract(Web3.Utils.erc20ABI, at: address, abiVersion: 2)
@@ -318,7 +314,7 @@ class ERC20WalletService: WalletService {
         }
         
         do {
-            var transaction = try await erc20.transfer(
+            let transaction = try await erc20.transfer(
                 from: ethWallet.ethAddress,
                 to: ethWallet.ethAddress,
                 amount: "\(ethWallet.balance)"
@@ -332,24 +328,6 @@ class ERC20WalletService: WalletService {
                 error: error
             )
         }
-    }
-    
-    private static func buildBaseUrl(for network: Networks?) -> String {
-        let suffix: String
-        
-        guard let network = network else {
-            return "https://api.etherscan.io/api"
-        }
-        
-        switch network {
-        case .Mainnet:
-            suffix = ""
-            
-        default:
-            suffix = "-\(network)"
-        }
-        
-        return "https://api\(suffix).etherscan.io/api"
     }
     
     private func buildUrl(url: URL, queryItems: [URLQueryItem]? = nil) throws -> URL {

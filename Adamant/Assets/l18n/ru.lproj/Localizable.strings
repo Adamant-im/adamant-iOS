@@ -22,9 +22,6 @@
 /* About scene: Our blog row */
 "About.Row.Blog" = "Наш блог";
 
-/* About scene: Bitcointalk.org row */
-"About.Row.Bitcointalk" = "Bitcointalk.org";
-
 /* About scene: Facebook row */
 "About.Row.Facebook" = "Facebook";
 
@@ -48,18 +45,6 @@
 
 /* "About scene: Our blog localized url" */
 "About.Row.Blog.Url" = "https://medium.com/adamant-im";
-
-/* "About scene: Bitcointalk.org localized url" */
-"About.Row.Bitcointalk.Url" = "https://bitcointalk.org/index.php?topic=2626754";
-
-/* "About scene: Facebook localized url" */
-"About.Row.Facebook.Url" = "https://www.facebook.com/adamant.im/";
-
-/* "About scene: Telegram localized url" */
-"About.Row.Telegram.Url" = "https://t.me/adamant_im";
-
-/* "About scene: VK localized url" */
-"About.Row.VK.Url" = "https://vk.com/adamant_im";
 
 /* "About scene: Twitter localized url" */
 "About.Row.Twitter.Url" = "https://twitter.com/adamant_im";
