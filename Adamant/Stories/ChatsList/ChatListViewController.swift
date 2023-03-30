@@ -258,7 +258,29 @@ class ChatListViewController: UIViewController {
             .sink { [weak self] _ in self?.previousAppState = .background }
             .store(in: &subscriptions)
         
+        NotificationCenter.default
+            .publisher(for: .AdamantTransfersProvider.stateChanged, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] notification in self?.animateUpdateIfNeeded(notification) }
+            .store(in: &subscriptions)
+        
         subscriptions.insert(addKeyboardToSafeArea())
+    }
+    
+    private func animateUpdateIfNeeded(_ notification: Notification) {
+        guard let prevState = notification.userInfo?[AdamantUserInfoKey.TransfersProvider.prevState] as? State,
+              let newState = notification.userInfo?[AdamantUserInfoKey.TransfersProvider.newState] as? State
+        else {
+            return
+        }
+        
+        if case .updating = prevState {
+            updatingIndicatorView.stopAnimate()
+        }
+        
+        if case .updating = newState {
+            updatingIndicatorView.startAnimate()
+        }
     }
     
     private func updateChats() {
@@ -268,7 +290,6 @@ class ChatListViewController: UIViewController {
             return
         }
         
-        updatingIndicatorView.startAnimate()
         self.handleRefresh(self.refreshControl)
     }
     
@@ -355,11 +376,10 @@ class ChatListViewController: UIViewController {
     @MainActor
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
         Task {
-            let result = await chatsProvider.update()
+            let result = await chatsProvider.update(notifyState: true)
             
             guard let result = result else {
                 refreshControl.endRefreshing()
-                updatingIndicatorView.stopAnimate()
                 return
             }
             
@@ -372,7 +392,6 @@ class ChatListViewController: UIViewController {
             }
             
             refreshControl.endRefreshing()
-			updatingIndicatorView.stopAnimate()
         }
     }
     
@@ -459,11 +478,11 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
         if isBusy,
            indexPath.row == lastSystemChatPositionRow,
            let cell = tableView.cellForRow(at: indexPath),
-           cell is SpinnerCell
-        {
+           cell is SpinnerCell {
             tableView.deselectRow(at: indexPath, animated: true)
             return
         }
+        
         let nIndexPath = chatControllerIndexPath(tableViewIndexPath: indexPath)
         if let chatroom = chatsController?.object(at: nIndexPath) {
             let vc = chatViewController(for: chatroom)
@@ -611,6 +630,7 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
         if isBusy { return }
         if controller == chatsController {
             tableView.beginUpdates()
+            updatingIndicatorView.startAnimate()
         }
     }
     
@@ -619,6 +639,7 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
         switch controller {
         case let c where c == chatsController:
             tableView.endUpdates()
+            updatingIndicatorView.stopAnimate()
             
         case let c where c == unreadController:
             setBadgeValue(controller.fetchedObjects?.count)

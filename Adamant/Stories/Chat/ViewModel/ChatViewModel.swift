@@ -55,6 +55,7 @@ final class ChatViewModel: NSObject {
     let didTapAdmSend = ObservableSender<AdamantAddress>()
     let closeScreen = ObservableSender<Void>()
     
+    @ObservableValue private(set) var didBecomeActiveLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
     @ObservableValue private(set) var messages = [ChatMessage]()
     @ObservableValue private(set) var isAttachmentButtonAvailable = false
@@ -142,17 +143,32 @@ final class ChatViewModel: NSObject {
         }
     }
     
-    func loadFirstMessagesIfNeeded() {
+    func loadFirstMessagesIfNeeded(force: Bool) {
         Task {
-            guard let address = chatroom?.partner?.address else { return }
+            guard let address = chatroom?.partner?.address,
+                  !isLoading
+            else { return }
             
-            let isChatLoaded = await chatsProvider.isChatLoaded(with: address)
+            didBecomeActiveLoading = true
             
-            if address == AdamantContacts.adamantWelcomeWallet.name || isChatLoaded {
+            var isChatLoaded = await chatsProvider.isChatLoaded(with: address)
+            isChatLoaded = force ? false : isChatLoaded
+            
+            guard address != AdamantContacts.adamantWelcomeWallet.name,
+                  !isChatLoaded
+            else {
                 updateTransactions(performFetch: true)
-            } else {
-                await loadMessages(address: address, offset: .zero, fullscreenLoading: true)
+                didBecomeActiveLoading = false
+                return
             }
+              
+            await loadMessages(
+                address: address,
+                offset: .zero,
+                fullscreenLoading: force ? false : true
+            )
+            
+            didBecomeActiveLoading = false
         }.stored(in: tasksStorage)
     }
     

@@ -205,7 +205,7 @@ actor AdamantChatsProvider: ChatsProvider {
         if let previousAppState = previousAppState,
            previousAppState == .background {
             self.previousAppState = .active
-            _ = await update()
+            _ = await update(notifyState: true)
         }
     }
     
@@ -254,7 +254,7 @@ actor AdamantChatsProvider: ChatsProvider {
             return
         }
         
-        guard prevState != self.state else { return }
+        guard prevState != state else { return }
         
         NotificationCenter.default.post(
             name: Notification.Name.AdamantTransfersProvider.stateChanged,
@@ -281,7 +281,7 @@ actor AdamantChatsProvider: ChatsProvider {
 extension AdamantChatsProvider {
     func reload() async {
         reset(notify: false)
-        _ = await update()
+        _ = await update(notifyState: false)
     }
     
     func reset() {
@@ -499,7 +499,7 @@ extension AdamantChatsProvider {
         self.socketService.disconnect()
     }
     
-    func update() async -> ChatsProviderResult? {
+    func update(notifyState: Bool) async -> ChatsProviderResult? {
         if state == .updating {
             return nil
         }
@@ -519,7 +519,7 @@ extension AdamantChatsProvider {
             return .failure(ChatsProviderError.notLogged)
         }
         
-        state = .updating
+        setState(.updating, previous: prevState, notify: notifyState)
         
         // MARK: 3. Get transactions
         
@@ -536,7 +536,7 @@ extension AdamantChatsProvider {
         
         switch state {
         case .upToDate, .empty, .updating:
-            setState(.upToDate, previous: prevState)
+            setState(.upToDate, previous: state, notify: notifyState)
             
             if prevHeight != receivedLastHeight,
                let h = receivedLastHeight {
@@ -596,6 +596,7 @@ extension AdamantChatsProvider {
                 err = .internalError(error)
             }
             
+            setState(.failedToUpdate(error), previous: state, notify: notifyState)
             return .failure(err)
         }
     }
