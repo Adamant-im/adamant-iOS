@@ -89,7 +89,7 @@ final class ChatViewController: MessagesViewController {
         configureHeader()
         configureLayout()
         setupObservers()
-        viewModel.loadFirstMessagesIfNeeded(force: false)
+        viewModel.loadFirstMessagesIfNeeded()
     }
     
     override func viewWillLayoutSubviews() {
@@ -202,7 +202,6 @@ private extension ChatViewController {
             .sink { [weak self] _ in
                 guard self?.previousAppState == .background else { return }
                 self?.previousAppState = .active
-                self?.viewModel.loadFirstMessagesIfNeeded(force: true)
             }
             .store(in: &subscriptions)
         
@@ -210,6 +209,12 @@ private extension ChatViewController {
             .publisher(for: UIApplication.willResignActiveNotification, object: nil)
             .receive(on: OperationQueue.main)
             .sink { [weak self] _ in self?.previousAppState = .background }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantTransfersProvider.stateChanged, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] notification in self?.animateUpdateIfNeeded(notification) }
             .store(in: &subscriptions)
         
         viewModel.$messages
@@ -265,11 +270,6 @@ private extension ChatViewController {
         
         viewModel.didTapAdmSend
             .sink { [weak self] in self?.didTapAdmSend(to: $0) }
-            .store(in: &subscriptions)
-        
-        viewModel.$didBecomeActiveLoading
-            .removeDuplicates()
-            .sink { [weak self] _ in self?.updateNavigationBarLoadingView() }
             .store(in: &subscriptions)
     }
 }
@@ -348,16 +348,24 @@ private extension ChatViewController {
         }
     }
     
-    func updateScrollDownButtonVisibility() {
-        scrollDownButton.isHidden = isScrollPositionNearlyTheBottom
-    }
-    
-    func updateNavigationBarLoadingView() {
-        if viewModel.didBecomeActiveLoading {
-            updatingIndicatorView.startAnimate()
-        } else {
+    func animateUpdateIfNeeded(_ notification: Notification) {
+        guard let prevState = notification.userInfo?[AdamantUserInfoKey.TransfersProvider.prevState] as? State,
+              let newState = notification.userInfo?[AdamantUserInfoKey.TransfersProvider.newState] as? State
+        else {
+            return
+        }
+        
+        if case .updating = prevState {
             updatingIndicatorView.stopAnimate()
         }
+        
+        if case .updating = newState {
+            updatingIndicatorView.startAnimate()
+        }
+    }
+    
+    func updateScrollDownButtonVisibility() {
+        scrollDownButton.isHidden = isScrollPositionNearlyTheBottom
     }
 }
 
