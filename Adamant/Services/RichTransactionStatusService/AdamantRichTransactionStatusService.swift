@@ -57,12 +57,7 @@ extension AdamantRichTransactionStatusService: NSFetchedResultsControllerDelegat
 
 private extension AdamantRichTransactionStatusService {
     func add(transaction: RichMessageTransaction) {
-        let id = transaction.transactionId
-        
-        guard
-            !subscriptions.keys.contains(id),
-            let provider = getProvider(for: transaction)
-        else { return }
+        guard let provider = getProvider(for: transaction) else { return }
 
         let publisher = RichTransactionStatusPublisher(
             provider: provider,
