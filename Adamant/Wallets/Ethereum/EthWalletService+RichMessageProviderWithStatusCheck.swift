@@ -19,10 +19,19 @@ extension EthWalletService: RichMessageProviderWithStatusCheck {
             return .init(sentDate: nil, status: .inconsistent)
         }
         
+        let transactionInfo: EthTransactionInfo
+        
+        do {
+            transactionInfo = try await getTransactionInfo(hash: hash, web3: web3)
+        } catch _ as URLError {
+            return .init(sentDate: nil, status: .noNetwork)
+        } catch {
+            return .init(sentDate: nil, status: .pending)
+        }
+        
         guard
-            let info = try? await getTransactionInfo(hash: hash, web3: web3),
-            let details = info.details,
-            let receipt = info.receipt
+            let details = transactionInfo.details,
+            let receipt = transactionInfo.receipt
         else {
             return .init(sentDate: nil, status: .pending)
         }

@@ -481,7 +481,7 @@ private extension ChatViewController {
         switch transaction.transactionStatus {
         case .failed:
             viewModel.dialog.send(.alert(.adamantLocalized.sharedErrors.inconsistentTransaction))
-        case .notInitiated, .pending, .success, .none, .inconsistent, .registered:
+        case .notInitiated, .pending, .success, .none, .inconsistent, .registered, .noNetwork:
             provider.richMessageTapped(for: transaction, in: self)
         }
     }

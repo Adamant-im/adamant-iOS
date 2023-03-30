@@ -21,7 +21,7 @@ extension RichMessageProviderWithStatusCheck {
             return timeFilter(transaction: transaction, statusInfo: info)
                 ? info.status
                 : .failed
-        case .failed, .inconsistent, .registered:
+        case .failed, .inconsistent, .registered, .noNetwork:
             return info.status
         }
     }

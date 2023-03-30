@@ -110,7 +110,7 @@ private extension TransactionStatus {
     var image: UIImage {
         switch self {
         case .notInitiated: return #imageLiteral(resourceName: "status_updating")
-        case .pending, .registered: return #imageLiteral(resourceName: "status_pending")
+        case .pending, .registered, .noNetwork: return #imageLiteral(resourceName: "status_pending")
         case .success: return #imageLiteral(resourceName: "status_success")
         case .failed: return #imageLiteral(resourceName: "status_failed")
         case .inconsistent: return #imageLiteral(resourceName: "status_warning")
@@ -120,7 +120,7 @@ private extension TransactionStatus {
     var imageTintColor: UIColor {
         switch self {
         case .notInitiated: return .adamant.secondary
-        case .pending, .registered: return .adamant.primary
+        case .pending, .registered, .noNetwork: return .adamant.primary
         case .success: return .adamant.active
         case .failed, .inconsistent: return .adamant.alert
         }

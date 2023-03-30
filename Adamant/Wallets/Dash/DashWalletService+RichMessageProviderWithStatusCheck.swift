@@ -14,8 +14,17 @@ extension DashWalletService: RichMessageProviderWithStatusCheck {
             return .init(sentDate: nil, status: .inconsistent)
         }
         
-        guard let dashTransaction = try? await getTransaction(by: hash) else {
-            return .init(sentDate: nil, status: .pending)
+        let dashTransaction: BTCRawTransaction
+        
+        do {
+            dashTransaction = try await getTransaction(by: hash)
+        } catch {
+            switch error {
+            case ApiServiceError.networkError(_):
+                return .init(sentDate: nil, status: .noNetwork)
+            default:
+                return .init(sentDate: nil, status: .pending)
+            }
         }
         
         return .init(

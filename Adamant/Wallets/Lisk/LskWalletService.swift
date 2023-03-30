@@ -601,8 +601,16 @@ extension LskWalletService {
                         continuation.resume(throwing: ApiServiceError.internalError(message: "No transaction", error: nil))
                     }
                 case .error(response: let error):
-                    print("ERROR: " + error.message)
-                    continuation.resume(throwing: ApiServiceError.internalError(message: error.message, error: nil))
+                    switch error.message {
+                    case APIError.unexpected.message:
+                        continuation.resume(
+                            throwing: ApiServiceError.networkError(error: error)
+                        )
+                    default:
+                        continuation.resume(
+                            throwing: ApiServiceError.internalError(message: error.message, error: error)
+                        )
+                    }
                 }
             }
         }
