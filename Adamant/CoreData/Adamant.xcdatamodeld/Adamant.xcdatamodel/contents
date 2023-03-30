@@ -19,9 +19,14 @@
         <attribute name="isOutgoing" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="recipientId" attributeType="String"/>
         <attribute name="senderId" attributeType="String"/>
-        <attribute name="transactionId" optional="YES" attributeType="String"/>
+        <attribute name="transactionId" attributeType="String"/>
         <attribute name="type" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="partner" maxCount="1" deletionRule="Nullify" destinationEntity="BaseAccount" inverseName="transfers" inverseEntity="BaseAccount"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="transactionId"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
     </entity>
     <entity name="Chatroom" representedClassName="Chatroom" syncable="YES">
         <attribute name="hasUnreadMessages" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>

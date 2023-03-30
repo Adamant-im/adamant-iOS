@@ -102,15 +102,6 @@ protocol ApiService: AnyObject {
         type: TransactionType,
         fromHeight: Int64?,
         offset: Int?,
-        limit: Int?,
-        completion: @escaping (ApiServiceResult<[Transaction]>) -> Void
-    )
-    
-    func getTransactions(
-        forAccount: String,
-        type: TransactionType,
-        fromHeight: Int64?,
-        offset: Int?,
         limit: Int?
     ) async throws -> [Transaction]
     

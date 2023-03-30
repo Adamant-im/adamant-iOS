@@ -263,8 +263,7 @@ final class ChatViewModel: NSObject {
             try? transaction.managedObjectContext?.save()
             
             await chatroom?.updateLastTransaction()
-            guard let id = transaction.transactionId else { return }
-            await chatsProvider.removeMessage(with: id)
+            await chatsProvider.removeMessage(with: transaction.transactionId)
         }
     }
     

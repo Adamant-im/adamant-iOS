@@ -781,7 +781,7 @@ extension ChatListViewController {
             }
             
             // MARK: 4. Show notification with tap handler
-            dialogService.showNotification(title: title, message: text?.string, image: image) { [weak self] in
+            dialogService.showNotification(title: title?.checkAndReplaceSystemWallets(), message: text?.string, image: image) { [weak self] in
                 DispatchQueue.main.async {
                     self?.presentChatroom(chatroom)
                 }

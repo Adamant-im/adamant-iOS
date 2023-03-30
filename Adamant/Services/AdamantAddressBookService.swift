@@ -116,7 +116,7 @@ final class AdamantAddressBookService: AddressBookService {
     // MARK: - Setting
     
     @MainActor func getName(for key: String) -> String? {
-        return addressBook[key]
+        return addressBook[key]?.checkAndReplaceSystemWallets()
     }
     
     func set(name: String, for address: String) async {
