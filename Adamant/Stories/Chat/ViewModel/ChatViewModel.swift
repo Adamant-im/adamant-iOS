@@ -283,6 +283,10 @@ final class ChatViewModel: NSObject {
         dialog.send(.url(url))
     }
     
+    func getName(for address: String) -> String? {
+        return addressBookService.getName(for: address)
+    }
+    
     func process(adm: AdamantAddress, action: AddressChatShareType) {
         Task {
             if action == .send {
@@ -499,10 +503,10 @@ private extension ChatViewModel {
             self.startNewChat(with: chatroom, message: message)
         } catch let error as AccountsProviderError {
             switch error {
-            case .dummy:
+            case .dummy, .notFound, .notInitiated:
                 self.dialog.send(.progress(false))
                 self.dialog.send(.dummy(address))
-            case .notFound, .invalidAddress, .notInitiated, .networkError:
+            case .invalidAddress, .networkError:
                 self.dialog.send(.progress(false))
                 self.dialog.send(.alert(error.localized))
             case .serverError(let apiError):
@@ -524,10 +528,17 @@ private extension ChatViewModel {
     func setNameIfNeeded(for account: CoreDataAccount?, chatroom: Chatroom?, name: String?) {
         guard let name = name,
               let account = account,
-              account.name == nil
+              let address = account.address,
+              account.name == nil,
+              getName(for: address) == nil
         else {
             return
         }
+        
+        Task {
+            await addressBookService.set(name: name, for: address)
+        }.stored(in: tasksStorage)
+        
         account.name = name
         if let chatroom = chatroom, chatroom.title == nil {
             chatroom.title = name
