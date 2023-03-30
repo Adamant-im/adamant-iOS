@@ -34,7 +34,6 @@ final class ChatViewController: MessagesViewController {
     private var messagesLoaded = false
     private var isScrollPositionNearlyTheBottom = true
     private var viewAppeared = false
-    private var previousAppState: UIApplication.State?
     
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
@@ -89,7 +88,7 @@ final class ChatViewController: MessagesViewController {
         configureHeader()
         configureLayout()
         setupObservers()
-        viewModel.loadFirstMessagesIfNeeded(force: false)
+        viewModel.loadFirstMessagesIfNeeded()
     }
     
     override func viewWillLayoutSubviews() {
@@ -196,22 +195,6 @@ private extension ChatViewController {
             .sink { [weak self] _ in self?.inputTextUpdated() }
             .store(in: &subscriptions)
         
-        NotificationCenter.default
-            .publisher(for: UIApplication.didBecomeActiveNotification, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
-                guard self?.previousAppState == .background else { return }
-                self?.previousAppState = .active
-                self?.viewModel.loadFirstMessagesIfNeeded(force: true)
-            }
-            .store(in: &subscriptions)
-        
-        NotificationCenter.default
-            .publisher(for: UIApplication.willResignActiveNotification, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in self?.previousAppState = .background }
-            .store(in: &subscriptions)
-        
         viewModel.$messages
             .removeDuplicates()
             .sink { [weak self] _ in self?.updateMessages() }
@@ -267,9 +250,15 @@ private extension ChatViewController {
             .sink { [weak self] in self?.didTapAdmSend(to: $0) }
             .store(in: &subscriptions)
         
-        viewModel.$didBecomeActiveLoading
+        viewModel.$isHeaderLoading
             .removeDuplicates()
-            .sink { [weak self] _ in self?.updateNavigationBarLoadingView() }
+            .sink { [weak self] in
+                if $0 {
+                    self?.updatingIndicatorView.startAnimate()
+                } else {
+                    self?.updatingIndicatorView.stopAnimate()
+                }
+            }
             .store(in: &subscriptions)
     }
 }
@@ -350,14 +339,6 @@ private extension ChatViewController {
     
     func updateScrollDownButtonVisibility() {
         scrollDownButton.isHidden = isScrollPositionNearlyTheBottom
-    }
-    
-    func updateNavigationBarLoadingView() {
-        if viewModel.didBecomeActiveLoading {
-            updatingIndicatorView.startAnimate()
-        } else {
-            updatingIndicatorView.stopAnimate()
-        }
     }
 }
 
