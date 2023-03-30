@@ -447,11 +447,42 @@ extension AdamantDialogService {
         canSend: Bool,
         sendCompletion: ((UIAlertAction) -> Void)?
     ) {
+        presentDummyAlert(
+            for: adm,
+            from: from,
+            canSend: canSend,
+            message: String.adamantLocalized.transferAdm.accountNotFoundAlertBody,
+            sendCompletion: sendCompletion
+        )
+    }
+    
+    func presentDummyChatAlert(
+        for adm: String,
+        from: UIView?,
+        canSend: Bool,
+        sendCompletion: ((UIAlertAction) -> Void)?
+    ) {
+        presentDummyAlert(
+            for: adm,
+            from: from,
+            canSend: canSend,
+            message: String.adamantLocalized.transferAdm.accountNotFoundChatAlertBody,
+            sendCompletion: sendCompletion
+        )
+    }
+    
+    func presentDummyAlert(
+        for adm: String,
+        from: UIView?,
+        canSend: Bool,
+        message: String,
+        sendCompletion: ((UIAlertAction) -> Void)?
+    ) {
         let alert = makeSafeAlertController(
             title: String.adamantLocalized.transferAdm.accountNotFoundAlertTitle(
                 for: adm
             ),
-            message: String.adamantLocalized.transferAdm.accountNotFoundAlertBody,
+            message: message,
             preferredStyle: .alert,
             source: nil
         )

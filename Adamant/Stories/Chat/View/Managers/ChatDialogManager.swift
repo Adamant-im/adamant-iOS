@@ -327,7 +327,7 @@ private extension ChatDialogManager {
     }
     
     func showDummyAlert(for address: String) {
-        dialogService.presentDummyAlert(
+        dialogService.presentDummyChatAlert(
             for: address,
             from: nil,
             canSend: false,
