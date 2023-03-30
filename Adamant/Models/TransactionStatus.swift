@@ -15,6 +15,7 @@ enum TransactionStatus: Int16 {
     case failed
     case registered
     case inconsistent
+    case noNetwork
     
     var localized: String {
         switch self {
@@ -28,6 +29,8 @@ enum TransactionStatus: Int16 {
             return NSLocalizedString("TransactionStatus.Failed", comment: "Transaction status: transaction failed")
         case .inconsistent:
             return NSLocalizedString("TransactionStatus.Inconsistent", comment: "Transaction status: transaction warning")
+        case .noNetwork:
+            return NSLocalizedString("Error.NoNetwork", comment: "Shared error: Network problems. In most cases - no connection")
         }
     }
 }

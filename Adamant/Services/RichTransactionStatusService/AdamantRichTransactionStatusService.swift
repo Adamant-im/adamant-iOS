@@ -14,6 +14,7 @@ actor AdamantRichTransactionStatusService: NSObject, RichTransactionStatusServic
     private let coreDataStack: CoreDataStack
 
     private lazy var controller = getRichTransactionsController()
+    private var networkSubscription: AnyCancellable?
     private var subscriptions = [String: AnyCancellable]()
 
     init(
@@ -23,6 +24,7 @@ actor AdamantRichTransactionStatusService: NSObject, RichTransactionStatusServic
         self.coreDataStack = coreDataStack
         self.richProviders = richProviders
         super.init()
+        Task { await setupNetworkSubscription() }
     }
 
     func forceUpdate(transaction: RichMessageTransaction) async {
@@ -56,6 +58,23 @@ extension AdamantRichTransactionStatusService: NSFetchedResultsControllerDelegat
 }
 
 private extension AdamantRichTransactionStatusService {
+    func setupNetworkSubscription() {
+        networkSubscription = NotificationCenter.default
+            .publisher(for: .AdamantReachabilityMonitor.reachabilityChanged)
+            .compactMap { $0.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? Bool }
+            .removeDuplicates()
+            .sink { connected in
+                guard connected else { return }
+                Task { [weak self] in await self?.reloadNoNetworkSubscriptions() }
+            }
+    }
+        
+    func reloadNoNetworkSubscriptions() {
+        controller.fetchedObjects?
+            .filter { $0.transactionStatus == .noNetwork || $0.transactionStatus == .notInitiated }
+            .forEach(add(transaction:))
+    }
+    
     func add(transaction: RichMessageTransaction) {
         guard
             let id = transaction.transactionId,

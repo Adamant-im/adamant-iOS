@@ -16,8 +16,17 @@ extension ERC20WalletService: RichMessageProviderWithStatusCheck {
             return .init(sentDate: nil, status: .inconsistent)
         }
         
-        guard let erc20Transaction = try? await getTransaction(by: hash) else {
-            return .init(sentDate: nil, status: .pending)
+        let erc20Transaction: EthTransaction
+        
+        do {
+            erc20Transaction = try await getTransaction(by: hash)
+        } catch {
+            switch error {
+            case WalletServiceError.networkError:
+                return .init(sentDate: nil, status: .noNetwork)
+            default:
+                return .init(sentDate: nil, status: .pending)
+            }
         }
         
         return .init(

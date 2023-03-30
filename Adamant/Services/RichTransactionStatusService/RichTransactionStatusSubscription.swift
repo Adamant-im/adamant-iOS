@@ -57,7 +57,7 @@ private extension RichTransactionStatusSubscription {
             return .final
         case .registered:
             return .registered
-        case .pending, .notInitiated:
+        case .pending, .notInitiated, .noNetwork:
             guard let sentDate = transaction.sentDate else { return .final }
             let sentInterval = Date.now.timeIntervalSince1970 - sentDate.timeIntervalSince1970
             
