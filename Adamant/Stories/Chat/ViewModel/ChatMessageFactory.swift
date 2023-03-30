@@ -134,14 +134,10 @@ private extension ChatMessageFactory {
         
         return .reply(.init(
             id: transaction.txId,
-            isFromCurrentSender: true,
-            content: .init(
-                id: transaction.txId,
-                replyId: replyId,
-                message: Self.markdownParser.parse(message),
-                messageReply: Self.markdownParser.parse(replyMessage),
-                backgroundColor: backgroundColor
-            )
+            replyId: replyId,
+            message: Self.markdownParser.parse(message),
+            messageReply: Self.markdownParser.parse(replyMessage),
+            backgroundColor: backgroundColor
         ))
     }
     

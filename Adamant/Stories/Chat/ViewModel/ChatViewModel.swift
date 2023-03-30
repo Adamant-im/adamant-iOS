@@ -47,7 +47,6 @@ final class ChatViewModel: NSObject {
     let didTapAdmChat = ObservableSender<(Chatroom, String?)>()
     let didTapAdmSend = ObservableSender<AdamantAddress>()
     let closeScreen = ObservableSender<Void>()
-    let swipeAction = ObservableSender<UIPanGestureRecognizer>()
     
     @ObservableValue private(set) var fullscreenLoading = false
     @ObservableValue private(set) var messages = [ChatMessage]()

@@ -35,10 +35,10 @@ class SwipePanGestureRecognizer: UIPanGestureRecognizer, UIGestureRecognizerDele
         }
     }
     
-//    func gestureRecognizer(
-//        _ gestureRecognizer: UIGestureRecognizer,
-//        shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
-//    ) -> Bool {
-//        return true
-//    }
+    func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
+    ) -> Bool {
+        return true
+    }
 }

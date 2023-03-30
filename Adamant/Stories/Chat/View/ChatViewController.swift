@@ -16,7 +16,6 @@ import SnapKit
 final class ChatViewController: MessagesViewController {
     typealias SpinnerCell = MessageCellWrapper<SpinnerView>
     typealias TransactionCell = CollectionCellWrapper<ChatTransactionContainerView>
-    typealias ReplyCell = CollectionCellWrapper<ChatReplyContainerView>
     typealias SendTransaction = (UIViewController & ComplexTransferViewControllerDelegate) -> Void
     
     // MARK: Dependencies
@@ -40,6 +39,7 @@ final class ChatViewController: MessagesViewController {
     private lazy var loadingView = LoadingView()
     private lazy var scrollDownButton = makeScrollDownButton()
     private lazy var chatMessagesCollectionView = makeChatMessagesCollectionView()
+    private lazy var replyView = ReplyView()
     
     // swiftlint:disable unused_setter_value
     override var messageInputBar: InputBarAccessoryView {
@@ -84,6 +84,11 @@ final class ChatViewController: MessagesViewController {
         configureLayout()
         setupObservers()
         viewModel.loadFirstMessagesIfNeeded()
+        
+        let panGesture = UIPanGestureRecognizer()
+        panGesture.delegate = self
+        messagesCollectionView.addGestureRecognizer(panGesture)
+        messagesCollectionView.clipsToBounds = false
     }
     
     override func viewWillLayoutSubviews() {
@@ -138,6 +143,18 @@ final class ChatViewController: MessagesViewController {
         super.scrollViewDidScroll(scrollView)
         updateIsScrollPositionNearlyTheBottom()
         updateScrollDownButtonVisibility()
+    }
+}
+
+extension ChatViewController {
+    override func gestureRecognizerShouldBegin(
+        _ gestureRecognizer: UIGestureRecognizer
+    ) -> Bool {
+        guard let panGesture = gestureRecognizer as? UIPanGestureRecognizer else {
+            return false
+        }
+        let velocity = panGesture.velocity(in: messagesCollectionView)
+        return abs(velocity.x) > abs(velocity.y)
     }
 }
 
@@ -240,10 +257,6 @@ private extension ChatViewController {
         viewModel.didTapAdmSend
             .sink { [weak self] in self?.didTapAdmSend(to: $0) }
             .store(in: &subscriptions)
-        
-        viewModel.swipeAction
-            .sink { [weak self] in self?.swipeGestureCellAction($0) }
-            .store(in: &subscriptions)
     }
 }
 
@@ -275,6 +288,13 @@ private extension ChatViewController {
         loadingView.snp.makeConstraints {
             $0.directionalEdges.equalToSuperview()
         }
+        
+//        view.addSubview(replyView)
+//        replyView.snp.makeConstraints { make in
+//            make.leading.trailing.equalToSuperview()
+//            make.bottom.equalTo(messageInputBar.snp.top)
+//            make.height.equalTo(40)
+//        }
     }
     
     func configureHeader() {
@@ -342,7 +362,8 @@ private extension ChatViewController {
         let collection = ChatMessagesCollectionView()
         collection.refreshControl = ChatRefreshMock()
         collection.register(TransactionCell.self)
-        collection.register(ReplyCell.self)
+        collection.register(ChatMessageCell.self)
+        collection.register(ChatMessageReplyCell.self)
         collection.register(
             SpinnerCell.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader
@@ -503,69 +524,6 @@ private extension ChatViewController {
             navVC.popToRootViewController(animated: true)
         } else {
             navigationController?.popViewController(animated: true)
-        }
-    }
-}
-
-// MARK: Swipe
-
-private extension ChatViewController {
-    func swipeGestureCellAction(_ recognizer: UIPanGestureRecognizer) {
-        guard let movingView = recognizer.view?.superview as? UIView,
-              let panGesture = recognizer as? SwipePanGestureRecognizer
-        else {
-            return
-        }
-        
-        let translation = recognizer.translation(in: messagesCollectionView)
-        
-        if movingView.frame.origin.x == messagePadding && translation.x > 0 { return }
-        
-        if recognizer.state == .began {
-            oldContentOffset = messagesCollectionView.contentOffset
-        }
-        
-        if movingView.frame.origin.x <= messagePadding {
-            movingView.center = CGPoint(
-                x: movingView.center.x + translation.x / 2,
-                y: movingView.center.y
-            )
-            recognizer.setTranslation(CGPoint(x: 0, y: 0), in: view)
-            
-            if let oldContentOffset = oldContentOffset {
-                messagesCollectionView.setContentOffset(oldContentOffset, animated: false)
-            }
-            
-            if abs(movingView.frame.origin.x) > UIScreen.main.bounds.size.width * 0.18 {
-                replyAction = true
-                if canReplyVibrate {
-                    UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
-                }
-                canReplyVibrate = false
-            } else {
-                replyAction = false
-            }
-        }
-        
-        if recognizer.state == .ended {
-            canReplyVibrate = true
-            
-            if let oldContentOffset = oldContentOffset {
-                messagesCollectionView.setContentOffset(oldContentOffset, animated: false)
-            }
-            
-            if replyAction {
-                print("reply id =\(panGesture.message.id), message = \(panGesture.message.makeReplyContent().string)")
-            }
-            
-            UIView.animate(withDuration: 0.25, delay: 0, options: .curveEaseOut) {
-                movingView.frame = CGRect(
-                    x: messagePadding,
-                    y: movingView.frame.origin.y,
-                    width: movingView.frame.size.width,
-                    height: movingView.frame.size.height
-                )
-            }
         }
     }
 }

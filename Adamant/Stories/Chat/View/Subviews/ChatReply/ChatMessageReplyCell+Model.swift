@@ -1,15 +1,15 @@
 //
-//  ChatReplyContentView+Model.swift
+//  ChatMessageReplyCell+Model.swift
 //  Adamant
 //
-//  Created by Stanislav Jelezoglo on 24.03.2023.
+//  Created by Stanislav Jelezoglo on 30.03.2023.
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
 import UIKit
 
-extension ChatReplyContentView {
-    struct Model: Equatable {
+extension ChatMessageReplyCell {
+    struct Model: Equatable, MessageModel {
         let id: String
         let replyId: String
         let message: NSAttributedString
@@ -23,5 +23,9 @@ extension ChatReplyContentView {
             messageReply: NSAttributedString(string: ""),
             backgroundColor: .failed
         )
+        
+        func makeReplyContent() -> NSAttributedString {
+            return message
+        }
     }
 }

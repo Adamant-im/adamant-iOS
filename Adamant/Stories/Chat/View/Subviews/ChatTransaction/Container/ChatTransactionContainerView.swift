@@ -45,6 +45,11 @@ final class ChatTransactionContainerView: UIView {
         return stack
     }()
     
+    private lazy var swipeView: SwipeableView = {
+        let view = SwipeableView(frame: .zero, view: self)
+        return view
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -70,9 +75,20 @@ private extension ChatTransactionContainerView {
             $0.top.bottom.equalToSuperview()
             $0.leading.trailing.equalToSuperview().inset(12)
         }
+        
+        addSubview(swipeView)
+        swipeView.snp.makeConstraints { make in
+            make.top.bottom.leading.trailing.equalToSuperview()
+        }
+        
+        swipeView.action = { [weak self] message in
+            print("message id \(message.id), text = \(message.makeReplyContent().string)")
+            // actionHandler(.scrollToMessage(id: model.id))
+        }
     }
     
     func update() {
+        swipeView.update(model)
         contentView.model = model.content
         updateStatus(model.status)
         updateLayout()

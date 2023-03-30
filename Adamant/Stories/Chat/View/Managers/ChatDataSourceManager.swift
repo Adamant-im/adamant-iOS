@@ -67,26 +67,35 @@ final class ChatDataSourceManager: MessagesDataSource {
         at indexPath: IndexPath,
         in messagesCollectionView: MessagesCollectionView
     ) -> UICollectionViewCell? {
-        let cell = messagesCollectionView.dequeueReusableCell(
-            TextMessageCell.self,
-            for: indexPath
-        )
-        cell.configure(with: message, at: indexPath, and: messagesCollectionView)
         
         if case let .message(model) = message.fullModel.content {
-            let panGestureRecognizer = SwipePanGestureRecognizer(
-                target: self,
-                action: #selector(swipeGestureCellAction(_:)),
-                message: BaseMessageModel(
-                    id: model.id,
-                    isFromCurrentSender: true,
-                    text: model.string
-                )
+            let cell = messagesCollectionView.dequeueReusableCell(
+                ChatMessageCell.self,
+                for: indexPath
             )
-            cell.contentView.addGestureRecognizer(panGestureRecognizer)
+            let model = ChatMessageCell.Model(id: model.id, text: model.string)
+            
+            cell.model = model
+            cell.configure(with: message, at: indexPath, and: messagesCollectionView)
+            cell.actionHandler = { [weak self] in self?.handleAction($0) }
+
+            return cell
         }
         
-        return cell
+        if case let .reply(model) = message.fullModel.content {
+            let cell = messagesCollectionView.dequeueReusableCell(
+                ChatMessageReplyCell.self,
+                for: indexPath
+            )
+            
+            cell.model = model
+            cell.configure(with: message, at: indexPath, and: messagesCollectionView)
+            cell.actionHandler = { [weak self] in self?.handleAction($0) }
+            
+            return cell
+        }
+        
+        return UICollectionViewCell()
     }
     
     func customCell(
@@ -94,25 +103,6 @@ final class ChatDataSourceManager: MessagesDataSource {
         at indexPath: IndexPath,
         in messagesCollectionView: MessagesCollectionView
     ) -> UICollectionViewCell {
-        
-        if case let .reply(model) = message.fullModel.content {
-            let cell = messagesCollectionView.dequeueReusableCell(
-                ChatViewController.ReplyCell.self,
-                for: indexPath
-            )
-            
-            cell.wrappedView.actionHandler = { [weak self] in self?.handleAction($0) }
-            cell.wrappedView.model = model
-            
-            let panGestureRecognizer = SwipePanGestureRecognizer(
-                target: self,
-                action: #selector(swipeGestureCellAction(_:)),
-                message: model
-            )
-            cell.contentView.addGestureRecognizer(panGestureRecognizer)
-            
-            return cell
-        }
         
         if case let .transaction(model) = message.fullModel.content {
             let cell = messagesCollectionView.dequeueReusableCell(
@@ -122,13 +112,6 @@ final class ChatDataSourceManager: MessagesDataSource {
             
             cell.wrappedView.actionHandler = { [weak self] in self?.handleAction($0) }
             cell.wrappedView.model = model
-            
-            let panGestureRecognizer = SwipePanGestureRecognizer(
-                target: self,
-                action: #selector(swipeGestureCellAction(_:)),
-                message: model
-            )
-            cell.contentView.addGestureRecognizer(panGestureRecognizer)
             
             return cell
         }
@@ -145,9 +128,5 @@ private extension ChatDataSourceManager {
         case let .forceUpdateTransactionStatus(id):
             viewModel.forceUpdateTransactionStatus(id: id)
         }
-    }
-    
-    @objc func swipeGestureCellAction(_ recognizer: UIPanGestureRecognizer) {
-        viewModel.swipeAction.send(recognizer)
     }
 }
