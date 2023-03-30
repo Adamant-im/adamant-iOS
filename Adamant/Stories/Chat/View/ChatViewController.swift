@@ -34,7 +34,6 @@ final class ChatViewController: MessagesViewController {
     private var messagesLoaded = false
     private var isScrollPositionNearlyTheBottom = true
     private var viewAppeared = false
-    private var previousAppState: UIApplication.State?
     
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
@@ -196,27 +195,6 @@ private extension ChatViewController {
             .sink { [weak self] _ in self?.inputTextUpdated() }
             .store(in: &subscriptions)
         
-        NotificationCenter.default
-            .publisher(for: UIApplication.didBecomeActiveNotification, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
-                guard self?.previousAppState == .background else { return }
-                self?.previousAppState = .active
-            }
-            .store(in: &subscriptions)
-        
-        NotificationCenter.default
-            .publisher(for: UIApplication.willResignActiveNotification, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in self?.previousAppState = .background }
-            .store(in: &subscriptions)
-        
-        NotificationCenter.default
-            .publisher(for: .AdamantTransfersProvider.stateChanged, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] notification in self?.animateUpdateIfNeeded(notification) }
-            .store(in: &subscriptions)
-        
         viewModel.$messages
             .removeDuplicates()
             .sink { [weak self] _ in self?.updateMessages() }
@@ -270,6 +248,17 @@ private extension ChatViewController {
         
         viewModel.didTapAdmSend
             .sink { [weak self] in self?.didTapAdmSend(to: $0) }
+            .store(in: &subscriptions)
+        
+        viewModel.$isHeaderLoading
+            .removeDuplicates()
+            .sink { [weak self] in
+                if $0 {
+                    self?.updatingIndicatorView.startAnimate()
+                } else {
+                    self?.updatingIndicatorView.stopAnimate()
+                }
+            }
             .store(in: &subscriptions)
     }
 }
@@ -345,22 +334,6 @@ private extension ChatViewController {
             loadingView.startAnimating()
         } else {
             loadingView.stopAnimating()
-        }
-    }
-    
-    func animateUpdateIfNeeded(_ notification: Notification) {
-        guard let prevState = notification.userInfo?[AdamantUserInfoKey.TransfersProvider.prevState] as? State,
-              let newState = notification.userInfo?[AdamantUserInfoKey.TransfersProvider.newState] as? State
-        else {
-            return
-        }
-        
-        if case .updating = prevState {
-            updatingIndicatorView.stopAnimate()
-        }
-        
-        if case .updating = newState {
-            updatingIndicatorView.startAnimate()
         }
     }
     
