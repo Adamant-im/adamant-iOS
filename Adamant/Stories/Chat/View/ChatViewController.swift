@@ -289,12 +289,13 @@ private extension ChatViewController {
             $0.directionalEdges.equalToSuperview()
         }
         
-//        view.addSubview(replyView)
-//        replyView.snp.makeConstraints { make in
-//            make.leading.trailing.equalToSuperview()
-//            make.bottom.equalTo(messageInputBar.snp.top)
-//            make.height.equalTo(40)
-//        }
+        messageInputBar.topStackView.addArrangedSubview(replyView)
+        
+        replyView.update(with: ChatMessageCell.Model.init(id: "1", text: NSAttributedString.init(string: "heelllooo")))
+
+        replyView.snp.makeConstraints { make in
+            make.height.equalTo(40)
+        }
     }
     
     func configureHeader() {

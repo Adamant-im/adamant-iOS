@@ -34,10 +34,18 @@ final class ChatCellSizeCalculator: CellSizeCalculator {
             )
         }
         
-        if case let .reply(model) = getMessages()[indexPath.section].fullModel.content {
+//        if case let .reply(model) = getMessages()[indexPath.section].fullModel.content {
+//            return .init(
+//                width: messagesFlowLayout.itemWidth,
+//                height: model.height(for: messagesFlowLayout.itemWidth)
+//            )
+//        }
+        
+        if case let .message(model) = getMessages()[indexPath.section].fullModel.content {
+            let newModel = ChatMessageCell.Model(id: "", text: model.string)
             return .init(
                 width: messagesFlowLayout.itemWidth,
-                height: model.height(for: messagesFlowLayout.itemWidth)
+                height: newModel.height(for: messagesFlowLayout.itemWidth)
             )
         }
         
