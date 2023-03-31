@@ -90,7 +90,7 @@ class ChatMessageReplyCell: MessageContentCell {
         
         swipeView.action = { [weak self] message in
             print("message id \(message.id), text = \(message.makeReplyContent().string)")
-            // actionHandler(.scrollToMessage(id: model.id))
+            self?.actionHandler(.reply(message: message))
         }
         
         messageContainerView.addSubview(verticalStack)

@@ -13,6 +13,28 @@ import MessageKit
 struct ChatMessageFactory {
     private let richMessageProviders: [String: RichMessageProvider]
     
+    static let markdownParser = MarkdownParser(
+        font: .adamantChatDefault,
+        color: .adamant.primary,
+        enabledElements: [
+            .header,
+            .list,
+            .quote,
+            .bold,
+            .italic,
+            .code,
+            .strikethrough
+        ],
+        customElements: [
+            MarkdownSimpleAdm(),
+            MarkdownLinkAdm(),
+            MarkdownAdvancedAdm(
+                font: .adamantChatDefault,
+                color: .adamant.active
+            )
+        ]
+    )
+    
     init(richMessageProviders: [String: RichMessageProvider]) {
         self.richMessageProviders = richMessageProviders
     }
@@ -63,27 +85,6 @@ struct ChatMessageFactory {
 }
 
 private extension ChatMessageFactory {
-    static let markdownParser = MarkdownParser(
-        font: .adamantChatDefault,
-        color: .adamant.primary,
-        enabledElements: [
-            .header,
-            .list,
-            .quote,
-            .bold,
-            .italic,
-            .code,
-            .strikethrough
-        ],
-        customElements: [
-            MarkdownSimpleAdm(),
-            MarkdownLinkAdm(),
-            MarkdownAdvancedAdm(
-                font: .adamantChatDefault,
-                color: .adamant.active
-            )
-        ]
-    )
     
     func makeContent(
         _ transaction: ChatTransaction,

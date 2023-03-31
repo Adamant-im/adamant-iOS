@@ -9,4 +9,5 @@
 enum ChatAction {
     case forceUpdateTransactionStatus(id: String)
     case openTransactionDetails(id: String)
+    case reply(message: MessageModel)
 }

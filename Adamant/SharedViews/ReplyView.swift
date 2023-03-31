@@ -89,7 +89,13 @@ final class ReplyView: UIView {
     // MARK: Actions
     
     @objc private func didTapCloseBtn() {
-        removeFromSuperview()
+        UIView.transition(
+            with: self,
+            duration: 0.25,
+            options: [.transitionCrossDissolve],
+            animations: {
+                self.removeFromSuperview()
+            })
     }
 }
     

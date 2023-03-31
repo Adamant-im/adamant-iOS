@@ -257,6 +257,10 @@ private extension ChatViewController {
         viewModel.didTapAdmSend
             .sink { [weak self] in self?.didTapAdmSend(to: $0) }
             .store(in: &subscriptions)
+        
+        viewModel.didSwipeMessage
+            .sink { [weak self] in self?.didSwipeMessage($0) }
+            .store(in: &subscriptions)
     }
 }
 
@@ -288,10 +292,6 @@ private extension ChatViewController {
         loadingView.snp.makeConstraints {
             $0.directionalEdges.equalToSuperview()
         }
-        
-        messageInputBar.topStackView.addArrangedSubview(replyView)
-        
-        replyView.update(with: ChatMessageCell.Model.init(id: "1", text: NSAttributedString.init(string: "heelllooo")))
 
         replyView.snp.makeConstraints { make in
             make.height.equalTo(40)
@@ -456,6 +456,21 @@ private extension ChatViewController {
     
     func inputTextUpdated() {
         viewModel.inputText = inputBar.text
+    }
+    
+    func didSwipeMessage(_ message: MessageModel) {
+        if !messageInputBar.topStackView.subviews.contains(replyView) {
+            UIView.transition(
+                with: messageInputBar.topStackView,
+                duration: 0.25,
+                options: [.transitionCrossDissolve],
+                animations: {
+                    self.messageInputBar.topStackView.addArrangedSubview(self.replyView)
+                })
+            messageInputBar.inputTextView.becomeFirstResponder()
+        }
+        
+        replyView.update(with: message)
     }
     
     func didTapTransfer(id: String) {

@@ -30,7 +30,7 @@ extension ChatTransactionContainerView {
             
             let content = "\(content.title) \(content.currency) \(content.amount)\(comment)"
             
-            return NSAttributedString(string: content)
+            return ChatMessageFactory.markdownParser.parse(content)
         }
     }
 }
