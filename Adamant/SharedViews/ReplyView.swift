@@ -66,6 +66,10 @@ final class ReplyView: UIView {
         return stack
     }()
     
+    // MARK: Proprieties
+    
+    var closeAction: (() -> Void)?
+    
     // MARK: Init
     
     override init(frame: CGRect) {
@@ -89,13 +93,7 @@ final class ReplyView: UIView {
     // MARK: Actions
     
     @objc private func didTapCloseBtn() {
-        UIView.transition(
-            with: self,
-            duration: 0.25,
-            options: [.transitionCrossDissolve],
-            animations: {
-                self.removeFromSuperview()
-            })
+        closeAction?()
     }
 }
     

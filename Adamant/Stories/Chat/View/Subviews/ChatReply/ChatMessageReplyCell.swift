@@ -126,6 +126,25 @@ class ChatMessageReplyCell: MessageContentCell {
         }
         
         replyMessageLabel.attributedText = model.messageReply
+        
+        updateFrames()
+    }
+    
+    func updateFrames() {
+        let size = messageContainerView.frame.size
+        messageContainerView.frame = CGRect(
+            origin: messageContainerView.frame.origin,
+            size: CGSize(
+                width: size.width,
+                height: model.contentHeight(for: size.width)
+            )
+        )
+        
+        let origin = CGPoint(
+          x: 0,
+          y: messageContainerView.frame.maxY
+        )
+        messageBottomLabel.frame = CGRect(origin: origin, size: messageBottomLabel.frame.size)
     }
     
     /// Used to handle the cell's contentView's tap gesture.

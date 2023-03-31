@@ -29,3 +29,32 @@ extension ChatMessageReplyCell {
         }
     }
 }
+
+extension ChatMessageReplyCell.Model {
+    func containerHeight(for width: CGFloat) -> CGFloat {
+        let height = contentHeight(for: width)
+        
+        return height
+        + otherLabelsHeight
+    }
+    
+    func contentHeight(for width: CGFloat) -> CGFloat {
+        let maxSize = CGSize(width: width, height: .infinity)
+        
+        let messageHeight = message.boundingRect(
+            with: maxSize,
+            options: [.usesLineFragmentOrigin, .usesFontLeading],
+            context: nil
+        ).height
+        
+        return verticalInsets * 2
+        + verticalStackSpacing
+        + messageHeight
+        + messageReplyHeight
+    }
+}
+
+private let verticalStackSpacing: CGFloat = 12
+private let verticalInsets: CGFloat = 8
+private let messageReplyHeight: CGFloat = 20
+private let otherLabelsHeight: CGFloat = 40

@@ -82,13 +82,10 @@ final class ChatViewController: MessagesViewController {
         configureMessageActions()
         configureHeader()
         configureLayout()
+        configureReplyView()
+        configureGesture()
         setupObservers()
         viewModel.loadFirstMessagesIfNeeded()
-        
-        let panGesture = UIPanGestureRecognizer()
-        panGesture.delegate = self
-        messagesCollectionView.addGestureRecognizer(panGesture)
-        messagesCollectionView.clipsToBounds = false
     }
     
     override func viewWillLayoutSubviews() {
@@ -258,8 +255,8 @@ private extension ChatViewController {
             .sink { [weak self] in self?.didTapAdmSend(to: $0) }
             .store(in: &subscriptions)
         
-        viewModel.didSwipeMessage
-            .sink { [weak self] in self?.didSwipeMessage($0) }
+        viewModel.$replyMessage
+            .sink { [weak self] in self?.processSwipeMessage($0) }
             .store(in: &subscriptions)
     }
 }
@@ -292,10 +289,6 @@ private extension ChatViewController {
         loadingView.snp.makeConstraints {
             $0.directionalEdges.equalToSuperview()
         }
-
-        replyView.snp.makeConstraints { make in
-            make.height.equalTo(40)
-        }
     }
     
     func configureHeader() {
@@ -306,6 +299,23 @@ private extension ChatViewController {
             target: self,
             action: #selector(showMenu)
         )
+    }
+    
+    func configureReplyView() {
+        replyView.snp.makeConstraints { make in
+            make.height.equalTo(40)
+        }
+        
+        replyView.closeAction = { [weak self] in
+            self?.viewModel.replyMessage = nil
+        }
+    }
+    
+    func configureGesture() {
+        let panGesture = UIPanGestureRecognizer()
+        panGesture.delegate = self
+        messagesCollectionView.addGestureRecognizer(panGesture)
+        messagesCollectionView.clipsToBounds = false
     }
 }
 
@@ -458,7 +468,12 @@ private extension ChatViewController {
         viewModel.inputText = inputBar.text
     }
     
-    func didSwipeMessage(_ message: MessageModel) {
+    func processSwipeMessage(_ message: MessageModel?) {
+        guard let message = message else {
+            closeReplyView()
+            return
+        }
+        
         if !messageInputBar.topStackView.subviews.contains(replyView) {
             UIView.transition(
                 with: messageInputBar.topStackView,
@@ -471,6 +486,16 @@ private extension ChatViewController {
         }
         
         replyView.update(with: message)
+    }
+    
+    func closeReplyView() {
+        UIView.transition(
+            with: messageInputBar.topStackView,
+            duration: 0.25,
+            options: [.transitionCrossDissolve],
+            animations: {
+                self.replyView.removeFromSuperview()
+            })
     }
     
     func didTapTransfer(id: String) {

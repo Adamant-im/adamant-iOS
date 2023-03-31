@@ -34,21 +34,35 @@ final class ChatCellSizeCalculator: CellSizeCalculator {
             )
         }
         
-//        if case let .reply(model) = getMessages()[indexPath.section].fullModel.content {
-//            return .init(
-//                width: messagesFlowLayout.itemWidth,
-//                height: model.height(for: messagesFlowLayout.itemWidth)
-//            )
-//        }
-        
-        if case let .message(model) = getMessages()[indexPath.section].fullModel.content {
-            let newModel = ChatMessageCell.Model(id: "", text: model.string)
+        return .zero
+    }
+}
+
+final class ChatTextCellSizeCalculator: TextMessageSizeCalculator {
+    private let getCurrentSender: () -> SenderType
+    private let getMessages: () -> [ChatMessage]
+    private let messagesFlowLayout: MessagesCollectionViewFlowLayout
+    
+    init(
+        layout: MessagesCollectionViewFlowLayout,
+        getCurrentSender: @escaping () -> SenderType,
+        getMessages: @escaping () -> [ChatMessage]
+    ) {
+        self.getMessages = getMessages
+        self.getCurrentSender = getCurrentSender
+        self.messagesFlowLayout = layout
+        super.init()
+        self.layout = layout
+    }
+    
+    override func sizeForItem(at indexPath: IndexPath) -> CGSize {
+        if case let .reply(model) = getMessages()[indexPath.section].fullModel.content {
             return .init(
                 width: messagesFlowLayout.itemWidth,
-                height: newModel.height(for: messagesFlowLayout.itemWidth)
+                height: model.containerHeight(for: messagesFlowLayout.itemWidth)
             )
         }
         
-        return .zero
+        return super.sizeForItem(at: indexPath)
     }
 }

@@ -47,7 +47,6 @@ final class ChatViewModel: NSObject {
     let didTapAdmChat = ObservableSender<(Chatroom, String?)>()
     let didTapAdmSend = ObservableSender<AdamantAddress>()
     let closeScreen = ObservableSender<Void>()
-    let didSwipeMessage = ObservableSender<MessageModel>()
     
     @ObservableValue private(set) var fullscreenLoading = false
     @ObservableValue private(set) var messages = [ChatMessage]()
@@ -56,6 +55,7 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var fee = ""
     @ObservableValue private(set) var partnerName: String?
     @ObservableValue var inputText = ""
+    @ObservableValue var replyMessage: MessageModel?
     
     var startPosition: ChatStartPosition? {
         if let messageIdToShow = messageIdToShow {
@@ -173,10 +173,23 @@ final class ChatViewModel: NSObject {
         }
         
         Task {
-//            let message: AdamantMessage = markdownParser.parse(text).length == text.count
-//            ? .text(text)
-//            : .markdownText(text)
-            let message: AdamantMessage = .richMessage(payload: RichMessageReply(type: ""))
+            let message: AdamantMessage
+            
+            if let replyMessage = replyMessage {
+                message = .richMessage(
+                    payload: RichMessageReply(
+                        replyto_id: replyMessage.id,
+                        reply_message: replyMessage.makeReplyContent().string,
+                        message: text
+                    )
+                )
+            } else {
+                message = markdownParser.parse(text).length == text.count
+                ? .text(text)
+                : .markdownText(text)
+            }
+            
+            self.replyMessage = nil
             
             guard await validateSendingMessage(message: message) else { return }
             

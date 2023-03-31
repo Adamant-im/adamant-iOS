@@ -36,13 +36,23 @@ struct RichContentKeys {
 // MARK: - RichMessageReply
 
 struct RichMessageReply: RichMessage {
-    var type: String = "reply"
+    var type: String
+    var replyto_id: String
+    var message: String
+    var reply_message: String
+    
+    init(replyto_id: String, reply_message: String, message: String) {
+        self.type = "reply"
+        self.replyto_id = replyto_id
+        self.message = message
+        self.reply_message = reply_message
+    }
     
     func content() -> [String : String] {
         return [
-            "replyto_id": "9839400464901626037",
-            "reply_message": "123",
-            "message": "test reply test reply test reply test reply test reply\ntest replytest reply"
+            "replyto_id": replyto_id,
+            "reply_message": reply_message,
+            "message": message
         ]
     }
 }

@@ -60,11 +60,10 @@ extension ChatMessage: MessageType {
         case let .transaction(model):
             return .custom(model)
         case let .reply(model):
-            let result = NSMutableAttributedString()
-            result.append(model.message)
-            result.append(NSAttributedString(string: "\n\n"))
-            result.append(model.messageReply)
-            return .attributedText(result)
+            let message = model.message.string.count > model.messageReply.string.count
+            ? model.message
+            : model.messageReply
+            return .attributedText(message)
         }
     }
 }

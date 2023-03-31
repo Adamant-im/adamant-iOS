@@ -96,6 +96,18 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
             ? SpinnerView.size
             : .zero
     }
+    
+    func attributedTextCellSizeCalculator(
+        for message: MessageType,
+        at indexPath: IndexPath,
+        in messagesCollectionView: MessagesCollectionView
+    ) -> CellSizeCalculator? {
+        ChatTextCellSizeCalculator(
+            layout: messagesCollectionView.messagesCollectionViewFlowLayout,
+            getCurrentSender: { [sender = viewModel.sender] in sender },
+            getMessages: { [messages = viewModel.messages] in messages }
+        )
+    }
 }
 
 private extension ChatLayoutManager {

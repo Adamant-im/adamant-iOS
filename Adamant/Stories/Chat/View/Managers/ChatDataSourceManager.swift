@@ -128,7 +128,7 @@ private extension ChatDataSourceManager {
         case let .forceUpdateTransactionStatus(id):
             viewModel.forceUpdateTransactionStatus(id: id)
         case let .reply(message):
-            viewModel.didSwipeMessage.send(message)
+            viewModel.replyMessage = message
         }
     }
 }
