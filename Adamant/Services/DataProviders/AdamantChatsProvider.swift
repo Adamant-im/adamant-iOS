@@ -655,6 +655,7 @@ extension AdamantChatsProvider {
             transactionLocaly = try await sendRichMessageLocaly(
                 richContent: payload.content(),
                 richType: payload.type,
+                isReply: payload.isReply,
                 senderId: loggedAccount.address,
                 recipientId: recipientId,
                 keypair: keypair,
@@ -739,6 +740,7 @@ extension AdamantChatsProvider {
             transactionLocaly = try await sendRichMessageLocaly(
                 richContent: payload.content(),
                 richType: payload.type,
+                isReply: payload.isReply,
                 senderId: loggedAccount.address,
                 recipientId: recipientId,
                 keypair: keypair,
@@ -805,6 +807,7 @@ extension AdamantChatsProvider {
     private func sendRichMessageLocaly(
         richContent: [String:String],
         richType: String,
+        isReply: Bool,
         senderId: String,
         recipientId: String,
         keypair: Keypair,
@@ -823,6 +826,7 @@ extension AdamantChatsProvider {
         
         transaction.richContent = richContent
         transaction.richType = richType
+        transaction.isReply = isReply
         
         transaction.transactionStatus = richProviders[richType] != nil ? .notInitiated : nil
         

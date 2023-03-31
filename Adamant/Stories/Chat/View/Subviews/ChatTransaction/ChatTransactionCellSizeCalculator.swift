@@ -57,9 +57,18 @@ final class ChatTextCellSizeCalculator: TextMessageSizeCalculator {
     
     override func sizeForItem(at indexPath: IndexPath) -> CGSize {
         if case let .reply(model) = getMessages()[indexPath.section].fullModel.content {
+            let dataSource = messagesLayout.messagesDataSource
+            let message = dataSource.messageForItem(at: indexPath, in: messagesLayout.messagesCollectionView)
+            
+            let contentViewHeight = model.contentHeight(for: messagesFlowLayout.itemWidth)
+            let messageBottomLabelHeight = messageBottomLabelSize(for: message, at: indexPath).height
+            let messageTopLabelHeight = messageTopLabelSize(for: message, at: indexPath).height
+            
             return .init(
                 width: messagesFlowLayout.itemWidth,
-                height: model.containerHeight(for: messagesFlowLayout.itemWidth)
+                height: contentViewHeight
+                + messageBottomLabelHeight
+                + messageTopLabelHeight
             )
         }
         

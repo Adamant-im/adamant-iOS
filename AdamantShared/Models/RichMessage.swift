@@ -12,6 +12,7 @@ import Foundation
 
 protocol RichMessage: Codable {
     var type: String { get }
+    var isReply: Bool { get }
     
     func content() -> [String:String]
     func serialized() -> String
@@ -37,6 +38,7 @@ struct RichContentKeys {
 
 struct RichMessageReply: RichMessage {
     var type: String
+    var isReply: Bool
     var replyto_id: String
     var message: String
     var reply_message: String
@@ -46,6 +48,7 @@ struct RichMessageReply: RichMessage {
         self.replyto_id = replyto_id
         self.message = message
         self.reply_message = reply_message
+        self.isReply = true
     }
     
     func content() -> [String : String] {
@@ -64,6 +67,7 @@ struct RichMessageTransfer: RichMessage {
     let amount: Decimal
     let hash: String
     let comments: String
+    var isReply: Bool
     
     func content() -> [String:String] {
         return [
@@ -79,6 +83,7 @@ struct RichMessageTransfer: RichMessage {
         self.amount = amount
         self.hash = hash
         self.comments = comments
+        self.isReply = false
     }
     
     init?(content: [String:String]) {
@@ -116,6 +121,8 @@ struct RichMessageTransfer: RichMessage {
         } else {
             self.comments = ""
         }
+        
+        self.isReply = false
     }
 }
 
@@ -159,6 +166,8 @@ extension RichMessageTransfer {
         } else {
             self.amount = 0
         }
+        
+        self.isReply = false
     }
 }
 

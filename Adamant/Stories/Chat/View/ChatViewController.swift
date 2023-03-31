@@ -495,6 +495,7 @@ private extension ChatViewController {
             options: [.transitionCrossDissolve],
             animations: {
                 self.replyView.removeFromSuperview()
+                self.messageInputBar.topStackViewPadding = .zero
             })
     }
     

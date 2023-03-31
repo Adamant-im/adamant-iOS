@@ -31,13 +31,6 @@ extension ChatMessageReplyCell {
 }
 
 extension ChatMessageReplyCell.Model {
-    func containerHeight(for width: CGFloat) -> CGFloat {
-        let height = contentHeight(for: width)
-        
-        return height
-        + otherLabelsHeight
-    }
-    
     func contentHeight(for width: CGFloat) -> CGFloat {
         let maxSize = CGSize(width: width, height: .infinity)
         
@@ -57,4 +50,3 @@ extension ChatMessageReplyCell.Model {
 private let verticalStackSpacing: CGFloat = 12
 private let verticalInsets: CGFloat = 8
 private let messageReplyHeight: CGFloat = 20
-private let otherLabelsHeight: CGFloat = 40

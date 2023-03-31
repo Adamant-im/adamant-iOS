@@ -189,9 +189,9 @@ final class ChatViewModel: NSObject {
                 : .markdownText(text)
             }
             
-            self.replyMessage = nil
-            
             guard await validateSendingMessage(message: message) else { return }
+            
+            replyMessage = nil
             
             do {
                 _ = try await chatsProvider.sendMessage(
