@@ -160,6 +160,14 @@ class AboutViewController: FormViewController {
                         url: Rows.blog.localizedUrl,
                         image: Rows.blog.image)
         
+        // Twitter
+        <<< buildUrlRow(
+            title: Rows.twitter.localized,
+            value: nil,
+            tag: Rows.twitter.tag,
+            url: Rows.twitter.localizedUrl,
+            image: Rows.twitter.image)
+        
         // Github
         <<< buildUrlRow(title: Rows.github.localized,
                         value: nil,
@@ -223,14 +231,6 @@ class AboutViewController: FormViewController {
                 delegate: self
             )
         }
-            
-        // Twitter
-        <<< buildUrlRow(
-            title: Rows.twitter.localized,
-            value: nil,
-            tag: Rows.twitter.tag,
-            url: Rows.twitter.localizedUrl,
-            image: Rows.twitter.image)
         
         setColors()
     }
@@ -315,7 +315,7 @@ extension AboutViewController {
             $0.cell.selectionStyle = .gray
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
-        }.onCellSelection { [weak self] (_, _) in
+        }.onCellSelection { [weak self] (_, row) in
             guard let url = URL(string: urlRaw) else {
                 fatalError("Failed to build page url: \(urlRaw)")
             }
@@ -324,6 +324,8 @@ extension AboutViewController {
             safari.preferredControlTintColor = UIColor.adamant.primary
             safari.modalPresentationStyle = .overFullScreen
             self?.present(safari, animated: true, completion: nil)
+            
+            row.deselect()
         }
         
         return row
