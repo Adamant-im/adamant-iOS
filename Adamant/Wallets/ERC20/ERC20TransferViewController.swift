@@ -28,6 +28,8 @@ final class ERC20TransferViewController: TransferViewControllerBase {
         return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: EthWalletService.currencySymbol)
     }
     
+    override var isNeedAddFeeToTotal: Bool { false }
+    
     init(
         chatsProvider: ChatsProvider,
         accountService: AccountService,
