@@ -170,17 +170,21 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         
         controller.showToChat = toShowChat(for: transaction)
         
-        if let address = accountService.account?.address {
+        if let address = accountService.account?.address,
+           let partenerAddress = transaction.partner?.address {
+            
+            let partnerName = addressBookService.getName(for: partenerAddress)
+            
             if address == transaction.senderId {
                 controller.senderName = String.adamantLocalized.transactionDetails.yourAddress
             } else {
-                controller.senderName = transaction.chatroom?.partner?.name
+                controller.senderName = partnerName
             }
             
             if address == transaction.recipientId {
                 controller.recipientName = String.adamantLocalized.transactionDetails.yourAddress
             } else {
-                controller.recipientName = transaction.chatroom?.partner?.name
+                controller.recipientName = partnerName
             }
         }
         

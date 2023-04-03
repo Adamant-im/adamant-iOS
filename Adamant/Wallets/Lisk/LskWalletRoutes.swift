@@ -41,9 +41,10 @@ extension AdamantScene.Wallets {
         
         /// Lisk transaction details
         static let transactionDetails = AdamantScene(identifier: "TransactionDetailsViewControllerBase") { r in
-            let c = LskTransactionDetailsViewController()
-            c.dialogService = r.resolve(DialogService.self)
-            c.currencyInfo = r.resolve(CurrencyInfoService.self)
+            let c = LskTransactionDetailsViewController(
+                dialogService: r.resolve(DialogService.self)!,
+                currencyInfo: r.resolve(CurrencyInfoService.self)!
+            )
             return c
         }
     }

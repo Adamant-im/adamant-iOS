@@ -49,12 +49,13 @@ extension AdamantScene.Wallets {
         
         /// Adamant transaction details
         static let transactionDetails = AdamantScene(identifier: "TransactionDetailsViewController", factory: { r in
-            let c = AdmTransactionDetailsViewController()
-            c.accountService = r.resolve(AccountService.self)
-            c.dialogService = r.resolve(DialogService.self)
-            c.transfersProvider = r.resolve(TransfersProvider.self)
-            c.router = r.resolve(Router.self)
-            c.currencyInfo = r.resolve(CurrencyInfoService.self)
+            let c = AdmTransactionDetailsViewController(
+                accountService: r.resolve(AccountService.self)!,
+                transfersProvider: r.resolve(TransfersProvider.self)!,
+                router: r.resolve(Router.self)!,
+                dialogService: r.resolve(DialogService.self)!,
+                currencyInfo: r.resolve(CurrencyInfoService.self)!
+            )
             return c
         })
         

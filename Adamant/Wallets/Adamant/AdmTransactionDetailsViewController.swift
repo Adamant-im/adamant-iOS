@@ -12,9 +12,10 @@ import Eureka
 class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     
     // MARK: - Dependencies
-    var accountService: AccountService!
-    var transfersProvider: TransfersProvider!
-    var router: Router!
+    
+    var accountService: AccountService
+    var transfersProvider: TransfersProvider
+    var router: Router
     
     // MARK: - Properties
     private let autoupdateInterval: TimeInterval = 5.0
@@ -31,6 +32,27 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     }()
     
     // MARK: - Lifecycle
+    
+    init(
+        accountService: AccountService,
+        transfersProvider: TransfersProvider,
+        router: Router,
+        dialogService: DialogService,
+        currencyInfo: CurrencyInfoService
+    ) {
+        self.accountService = accountService
+        self.transfersProvider = transfersProvider
+        self.router = router
+        
+        super.init(
+            dialogService: dialogService,
+            currencyInfo: currencyInfo
+        )
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         currencySymbol = AdmWalletService.currencySymbol
