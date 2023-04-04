@@ -90,6 +90,13 @@ final class AdamantApiService: ApiService {
         qos: .userInteractive
     )
     
+    static var manager: Session = {
+        let configuration = AF.sessionConfiguration
+        configuration.waitsForConnectivity = true
+        let manager = Alamofire.Session.init(configuration: configuration)
+        return manager
+    }()
+    
     // MARK: - Init
     
     init(adamantCore: AdamantCore) {
@@ -191,8 +198,7 @@ final class AdamantApiService: ApiService {
         waitsForConnectivity: Bool,
         headers: HTTPHeaders?
     ) -> DataRequest {
-        AF.sessionConfiguration.waitsForConnectivity = waitsForConnectivity
-        return AF.request(
+        return AdamantApiService.manager.request(
             url,
             method: method,
             parameters: parameters,
