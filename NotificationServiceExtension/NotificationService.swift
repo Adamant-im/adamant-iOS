@@ -101,13 +101,16 @@ class NotificationService: UNNotificationServiceExtension {
         guard !contactsBlockList.contains(partnerAddress) else { return }
         
         // MARK: 4. Address book
-        if let addressBook = api.getAddressBook(for: pushRecipient, core: core, keypair: keypair),
-            let displayName = addressBook[partnerAddress]?.displayName {
+        if
+            let addressBook = api.getAddressBook(for: pushRecipient, core: core, keypair: keypair),
+            let displayName = addressBook[partnerAddress]?.displayName
+        {
             partnerName = displayName.checkAndReplaceSystemWallets()
             bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.partnerDisplayName] = displayName
         } else {
-            partnerName = nil
-            bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.partnerNoDislpayNameKey] = AdamantNotificationUserInfoKeys.partnerNoDisplayNameValue
+            partnerName = partnerAddress.checkAndReplaceSystemWallets()
+            bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.partnerNoDislpayNameKey]
+                = AdamantNotificationUserInfoKeys.partnerNoDisplayNameValue
         }
         
         // MARK: 5. Content

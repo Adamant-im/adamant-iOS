@@ -41,17 +41,8 @@ extension String {
 
 extension String {
     func checkAndReplaceSystemWallets() -> String {
-        switch self {
-        case "chats.virtual.bounty_wallet_title":
-            return AdamantContacts.adamantNewBountyWallet.name
-        case "chats.virtual.bitcoin_bet_title":
-            return AdamantContacts.betOnBitcoin.name
-        case "chats.virtual.donate_bot_title":
-            return AdamantContacts.donate.name
-        case "chats.virtual.exchange_bot_title":
-            return AdamantContacts.adamantExchange.name
-        default:
-            return self
-        }
+        AdamantContacts(nodeNameKey: self)?.name
+            ?? AdamantContacts(address: self)?.name
+            ?? self
     }
 }
