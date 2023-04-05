@@ -105,6 +105,15 @@ protocol ApiService: AnyObject {
         limit: Int?
     ) async throws -> [Transaction]
     
+    func getTransactions(
+        forAccount account: String,
+        type: TransactionType,
+        fromHeight: Int64?,
+        offset: Int?,
+        limit: Int?,
+        orderByTime: Bool?
+    ) async throws -> [Transaction]
+    
     // MARK: - Chats Rooms
       
     func getChatRooms(

@@ -93,6 +93,24 @@ extension AdamantApiService {
         offset: Int?,
         limit: Int?
     ) async throws -> [Transaction] {
+        try await getTransactions(
+            forAccount: account,
+            type: type,
+            fromHeight: fromHeight,
+            offset: offset,
+            limit: limit,
+            orderByTime: false
+        )
+    }
+    
+    func getTransactions(
+        forAccount account: String,
+        type: TransactionType,
+        fromHeight: Int64?,
+        offset: Int?,
+        limit: Int?,
+        orderByTime: Bool?
+    ) async throws -> [Transaction] {
         
         var queryItems = [URLQueryItem(name: "inId", value: account)]
         
@@ -109,6 +127,10 @@ extension AdamantApiService {
         
         if let fromHeight = fromHeight, fromHeight > 0 {
             queryItems.append(URLQueryItem(name: "and:fromHeight", value: String(fromHeight)))
+        }
+        
+        if let orderByTime = orderByTime, orderByTime {
+            queryItems.append(URLQueryItem(name: "orderBy", value: "timestamp:desc"))
         }
         
         return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<[Transaction], Error>) in

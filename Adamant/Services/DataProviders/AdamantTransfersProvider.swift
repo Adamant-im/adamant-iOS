@@ -32,6 +32,8 @@ actor AdamantTransfersProvider: TransfersProvider {
     
     private var unconfirmedTransactions: [UInt64:NSManagedObjectID] = [:]
     
+    var offsetTransactions = 0
+    
     // MARK: Tools
     
     /// Free stateSemaphore before calling this method, or you will deadlock.
@@ -120,7 +122,23 @@ actor AdamantTransfersProvider: TransfersProvider {
             store.set(loggedAddress, for: StoreKey.transfersProvider.address)
         }
         
-        _ = await update()
+        do {
+            setState(.updating, previous: .empty, notify: false)
+            
+            _ = try await getTransactions(
+                forAccount: loggedAddress,
+                type: .send,
+                offset: offsetTransactions,
+                limit: apiTransactions,
+                orderByTime: true
+            )
+            
+            offsetTransactions += apiTransactions
+            
+            setState(.upToDate, previous: .updating, notify: false)
+        } catch {
+            setState(.failedToUpdate(error), previous: .updating, notify: false)
+        }
     }
     
     private func userLogOutAction() {
@@ -266,6 +284,7 @@ extension AdamantTransfersProvider {
     }
     
     private func reset(notify: Bool) {
+        offsetTransactions = 0
         hasTransactions = false
         isInitiallySynced = false
         let prevState = self.state
@@ -792,6 +811,40 @@ extension AdamantTransfersProvider {
         } catch {
             setState(.failedToUpdate(error), previous: .updating)
         }
+    }
+    
+    func getTransactions(
+        forAccount account: String,
+        type: TransactionType,
+        offset: Int,
+        limit: Int,
+        orderByTime: Bool
+    ) async throws -> Int {
+        let transactions = try await apiService.getTransactions(
+            forAccount: account,
+            type: type,
+            fromHeight: nil,
+            offset: offset,
+            limit: limit,
+            orderByTime: true
+        )
+        
+        guard transactions.count > 0 else {
+            return 0
+        }
+        
+        // MARK: 2. Process transactions in background
+        
+        await processRawTransactions(
+            transactions,
+            currentAddress: account
+        )
+        
+        return transactions.count
+    }
+    
+    func updateOffsetTransactions(_ value: Int) {
+        offsetTransactions = value
     }
     
     private func processRawTransactions(

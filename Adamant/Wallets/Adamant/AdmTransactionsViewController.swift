@@ -30,6 +30,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
      */
     /// ViewController currently is ontop of the screen.
     private var isOnTop = false
+    private let transactionsPerRequest = 100
     
     // MARK: - Lifecycle
     
@@ -95,6 +96,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
                 controller = nil
             }
             
+            isBusy = false
             self.tableView.reloadData()
         }
     }
@@ -102,6 +104,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
     @MainActor
     override func handleRefresh() {
         Task {
+            self.isBusy = true
             self.emptyLabel.isHidden = true
             
             let result = await self.transfersProvider.update()
@@ -121,6 +124,49 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
                 
                 dialogService.showRichError(error: error)
             }
+            
+            self.isBusy = false
+        }.stored(in: taskManager)
+    }
+    
+    override func loadData(_ silent: Bool) {
+        isBusy = true
+        emptyLabel.isHidden = true
+        
+        guard let address = accountService.account?.address else {
+            return
+        }
+        
+        Task { @MainActor in
+            do {
+                let count = try await transfersProvider.getTransactions(
+                    forAccount: address,
+                    type: .send,
+                    offset: transfersProvider.offsetTransactions,
+                    limit: transactionsPerRequest,
+                    orderByTime: true
+                )
+                
+                if count > 0 {
+                    await transfersProvider.updateOffsetTransactions(
+                        transfersProvider.offsetTransactions + transactionsPerRequest
+                    )
+                }
+                
+                isNeedToLoadMoore = count >= transactionsPerRequest
+            } catch {
+                isNeedToLoadMoore = false
+                
+                if !silent {
+                    dialogService.showRichError(error: error)
+                }
+            }
+            
+            isBusy = false
+            emptyLabel.isHidden = !isNeedToLoadMoore
+            refreshControl.endRefreshing()
+            stopBottomIndicator()
+            tableView.reloadData()
         }.stored(in: taskManager)
     }
     
@@ -332,14 +378,17 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
 // MARK: - NSFetchedResultsControllerDelegate
 extension AdmTransactionsViewController: NSFetchedResultsControllerDelegate {
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        if isBusy { return }
         tableView.beginUpdates()
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        if isBusy { return }
         tableView.endUpdates()
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        if isBusy { return }
         switch type {
         case .insert:
             if let newIndexPath = newIndexPath {
