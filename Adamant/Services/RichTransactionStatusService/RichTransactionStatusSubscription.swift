@@ -16,9 +16,9 @@ actor RichTransactionStatusSubscription<StatusSubscriber: Subscriber>: Subscript
     private let provider: RichMessageProviderWithStatusCheck
     private let transaction: RichMessageTransaction
     private let taskManager = TaskManager()
-    
     private var subscriber: StatusSubscriber?
-    private var oldPendingAttempts: Int = .zero
+    
+    @ObservableValue private var oldPendingAttempts: Int
     
     private var status: TransactionStatus {
         didSet { _ = subscriber?.receive(status) }
@@ -27,11 +27,13 @@ actor RichTransactionStatusSubscription<StatusSubscriber: Subscriber>: Subscript
     init(
         provider: RichMessageProviderWithStatusCheck,
         transaction: RichMessageTransaction,
+        oldPendingAttempts: ObservableValue<Int>,
         subscriber: StatusSubscriber
     ) {
         self.provider = provider
         self.transaction = transaction
         self.subscriber = subscriber
+        _oldPendingAttempts = oldPendingAttempts
         status = transaction.transactionStatus ?? .notInitiated
         Task { await update() }
     }
@@ -53,7 +55,7 @@ private extension RichTransactionStatusSubscription {
     
     var state: State {
         switch status {
-        case .inconsistent, .failed, .success:
+        case .inconsistent, .failed, .success, .noNetworkFinal:
             return .final
         case .registered:
             return .registered
@@ -78,7 +80,6 @@ private extension RichTransactionStatusSubscription {
         case .new:
             return provider.newPendingInterval
         case .old:
-            guard oldPendingAttempts < provider.oldPendingAttempts else { return nil }
             return provider.oldPendingInterval
         case .final:
             return nil
@@ -96,10 +97,13 @@ private extension RichTransactionStatusSubscription {
             break
         }
         
-        status = await provider.statusWithFilters(transaction: transaction)
+        status = await provider.statusWithFilters(
+            transaction: transaction,
+            oldPendingAttempts: oldPendingAttempts
+        )
         
         Task {
-            guard let interval = nextUpdateInterval else { return }
+            guard let interval = nextUpdateInterval else { return reset() }
             await Task.sleep(interval: interval)
             await update()
         }.stored(in: taskManager)

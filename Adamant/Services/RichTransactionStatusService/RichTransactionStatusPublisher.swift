@@ -15,6 +15,7 @@ struct RichTransactionStatusPublisher: Publisher {
     
     let provider: RichMessageProviderWithStatusCheck
     let transaction: RichMessageTransaction
+    let oldPendingAttempts: ObservableValue<Int>
     
     func receive<S>(
         subscriber: S
@@ -22,6 +23,7 @@ struct RichTransactionStatusPublisher: Publisher {
         let subscription = RichTransactionStatusSubscription(
             provider: provider,
             transaction: transaction,
+            oldPendingAttempts: oldPendingAttempts,
             subscriber: subscriber
         )
         

@@ -220,6 +220,7 @@
 		9371E561295CD53100438F2C /* ChatLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9371E560295CD53100438F2C /* ChatLocalization.swift */; };
 		9377FBDF296C2A2F00C9211B /* ChatTransactionContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9377FBDE296C2A2F00C9211B /* ChatTransactionContentView.swift */; };
 		9377FBE2296C2ACA00C9211B /* ChatTransactionContentView+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9377FBE1296C2ACA00C9211B /* ChatTransactionContentView+Model.swift */; };
+		9382F61329DEC0A3005E6216 /* ChatModelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9382F61229DEC0A3005E6216 /* ChatModelView.swift */; };
 		938F7D582955C1DA001915CA /* MessageKit in Frameworks */ = {isa = PBXBuildFile; productRef = 938F7D572955C1DA001915CA /* MessageKit */; };
 		938F7D5B2955C8DA001915CA /* ChatDisplayManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 938F7D5A2955C8DA001915CA /* ChatDisplayManager.swift */; };
 		938F7D5D2955C8F9001915CA /* ChatLayoutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 938F7D5C2955C8F9001915CA /* ChatLayoutManager.swift */; };
@@ -926,6 +927,7 @@
 		9371E560295CD53100438F2C /* ChatLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatLocalization.swift; sourceTree = "<group>"; };
 		9377FBDE296C2A2F00C9211B /* ChatTransactionContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTransactionContentView.swift; sourceTree = "<group>"; };
 		9377FBE1296C2ACA00C9211B /* ChatTransactionContentView+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatTransactionContentView+Model.swift"; sourceTree = "<group>"; };
+		9382F61229DEC0A3005E6216 /* ChatModelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatModelView.swift; sourceTree = "<group>"; };
 		938F7D5A2955C8DA001915CA /* ChatDisplayManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatDisplayManager.swift; sourceTree = "<group>"; };
 		938F7D5C2955C8F9001915CA /* ChatLayoutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatLayoutManager.swift; sourceTree = "<group>"; };
 		938F7D5E2955C90D001915CA /* ChatInputBarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatInputBarManager.swift; sourceTree = "<group>"; };
@@ -1586,6 +1588,7 @@
 				93A91FD0297972B7001DB1F8 /* ChatScrollDownButton.swift */,
 				9371130E2996EDA900F64CF9 /* ChatRefreshMock.swift */,
 				93996A962968209C008D080B /* ChatMessagesCollection.swift */,
+				9382F61229DEC0A3005E6216 /* ChatModelView.swift */,
 				93B9DBD129803179004F8BFF /* MessageCollectionViewCell+Extension.swift */,
 			);
 			path = Subviews;
@@ -3349,6 +3352,7 @@
 				E9AA8BF82129F13000F9249F /* ComplexTransferViewController.swift in Sources */,
 				640EFAA72558614300E9724B /* TransferBaseProvider.swift in Sources */,
 				E9A174B52057EDCE003667CD /* AdamantTransfersProvider+backgroundFetch.swift in Sources */,
+				9382F61329DEC0A3005E6216 /* ChatModelView.swift in Sources */,
 				E9147B5F20500E9300145913 /* MyLittlePinpad+adamant.swift in Sources */,
 				E9981896212095CA0018C84C /* EthWalletViewController.swift in Sources */,
 				648DD7A22237D9A000B811FD /* DogeTransaction.swift in Sources */,

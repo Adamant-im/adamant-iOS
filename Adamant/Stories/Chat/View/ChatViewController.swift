@@ -296,7 +296,7 @@ private extension ChatViewController {
     
     func updateMessages() {
         defer { checkIsChatWasRead() }
-        chatMessagesCollectionView.reloadData(newModels: viewModel.messages)
+        chatMessagesCollectionView.reloadData(newIds: viewModel.messages.map { $0.id })
         scrollDownOnNewMessageIfNeeded(previousBottomMessageId: bottomMessageId)
         bottomMessageId = viewModel.messages.last?.messageId
         
@@ -460,7 +460,7 @@ private extension ChatViewController {
         switch transaction.transactionStatus {
         case .failed:
             viewModel.dialog.send(.alert(.adamantLocalized.sharedErrors.inconsistentTransaction))
-        case .notInitiated, .pending, .success, .none, .inconsistent, .registered, .noNetwork:
+        case .notInitiated, .pending, .success, .none, .inconsistent, .registered, .noNetwork, .noNetworkFinal:
             provider.richMessageTapped(for: transaction, in: self)
         }
     }
