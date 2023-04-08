@@ -212,6 +212,7 @@
 		934B9BE5296C58210027A8D0 /* CollectionCellWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934B9BE4296C58210027A8D0 /* CollectionCellWrapper.swift */; };
 		934B9BE7296C620B0027A8D0 /* UILabel+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934B9BE6296C620B0027A8D0 /* UILabel+adamant.swift */; };
 		934B9BE9296C680D0027A8D0 /* ChatTransactionCellSizeCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934B9BE8296C680D0027A8D0 /* ChatTransactionCellSizeCalculator.swift */; };
+		93547BCA29E2262D00B0914B /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93547BC929E2262D00B0914B /* WelcomeViewController.swift */; };
 		935F53D629BE8F7400779492 /* RichTransactionStatusPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 935F53D529BE8F7400779492 /* RichTransactionStatusPublisher.swift */; };
 		935F53D829BEA7CA00779492 /* TimeInterval+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 935F53D729BEA7CA00779492 /* TimeInterval+Extension.swift */; };
 		9371130F2996EDA900F64CF9 /* ChatRefreshMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9371130E2996EDA900F64CF9 /* ChatRefreshMock.swift */; };
@@ -916,6 +917,7 @@
 		934B9BE4296C58210027A8D0 /* CollectionCellWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionCellWrapper.swift; sourceTree = "<group>"; };
 		934B9BE6296C620B0027A8D0 /* UILabel+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UILabel+adamant.swift"; sourceTree = "<group>"; };
 		934B9BE8296C680D0027A8D0 /* ChatTransactionCellSizeCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTransactionCellSizeCalculator.swift; sourceTree = "<group>"; };
+		93547BC929E2262D00B0914B /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
 		935F53D529BE8F7400779492 /* RichTransactionStatusPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichTransactionStatusPublisher.swift; sourceTree = "<group>"; };
 		935F53D729BEA7CA00779492 /* TimeInterval+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeInterval+Extension.swift"; sourceTree = "<group>"; };
 		9371130E2996EDA900F64CF9 /* ChatRefreshMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatRefreshMock.swift; sourceTree = "<group>"; };
@@ -2442,6 +2444,7 @@
 				E94E7B07205D4CB80042B639 /* SharedRoutes.swift */,
 				6458548A211B3AB1004C5909 /* WelcomeViewController.xib */,
 				E9FAE5E0203ED1AE008D3A6B /* ShareQrViewController.swift */,
+				93547BC929E2262D00B0914B /* WelcomeViewController.swift */,
 				E9FAE5E1203ED1AE008D3A6B /* ShareQrViewController.xib */,
 				E921597A206503000000CA5C /* ButtonsStripeView.swift */,
 				E921597C2065031D0000CA5C /* ButtonsStripe.xib */,
@@ -3026,6 +3029,7 @@
 				E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */,
 				640EFAA42558613A00E9724B /* EthProvider.swift in Sources */,
 				9371130F2996EDA900F64CF9 /* ChatRefreshMock.swift in Sources */,
+				93547BCA29E2262D00B0914B /* WelcomeViewController.swift in Sources */,
 				41047B74294C61D10039E956 /* VisibleWalletsService.swift in Sources */,
 				553B1284281C6EE100FFF24C /* GCDUtilites.swift in Sources */,
 				648CE3AC229AD2190070A2CC /* DashTransferViewController.swift in Sources */,
