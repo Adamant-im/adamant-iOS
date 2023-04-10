@@ -1,30 +1,30 @@
 //
-//  UIViewController+KeyboardSafeArea.swift
+//  KeyboardObservingViewController.swift
 //  Adamant
 //
-//  Created by Andrey Golubenko on 14.03.2023.
+//  Created by Andrey Golubenko on 10.04.2023.
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
 import UIKit
 import Combine
 
-extension UIViewController {
-    func addKeyboardToSafeArea() -> AnyCancellable {
-        NotificationCenter.default
-            .publisher(for: UIResponder.keyboardDidChangeFrameNotification, object: nil)
-            .sink { [weak self] in self?.onKeyboardFrameChange($0) }
+class KeyboardObservingViewController: UIViewController {
+    private var subscription: AnyCancellable?
+    private var keyboardFrame: CGRect = .zero
+    
+    override func viewDidLoad() {
+        subscription = makeKeyboardSubscription()
+    }
+    
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        additionalSafeAreaInsets.bottom = getAdditionalBottomInset(keyboardFrame: keyboardFrame)
     }
 }
 
-private extension UIViewController {
-    func onKeyboardFrameChange(_ notification: Notification) {
-        guard
-            let userInfo = notification.userInfo,
-            let keyboardFrameInfo = userInfo[UIResponder.keyboardFrameEndUserInfoKey],
-            let keyboardFrame = (keyboardFrameInfo as? NSValue)?.cgRectValue
-        else { return }
-        
+private extension KeyboardObservingViewController {
+    func getAdditionalBottomInset(keyboardFrame: CGRect) -> CGFloat {
         let keyboardFrameInView = view.convert(keyboardFrame, from: nil)
         
         let safeAreaFrame = view.safeAreaLayoutGuide.layoutFrame.insetBy(
@@ -32,7 +32,23 @@ private extension UIViewController {
             dy: -additionalSafeAreaInsets.bottom
         )
         
-        let intersection = safeAreaFrame.intersection(keyboardFrameInView)
+        return safeAreaFrame.intersection(keyboardFrameInView).height
+    }
+    
+    func makeKeyboardSubscription() -> AnyCancellable {
+        NotificationCenter.default
+            .publisher(for: UIResponder.keyboardDidChangeFrameNotification, object: nil)
+            .sink { [weak self] in self?.onKeyboardFrameChange($0) }
+    }
+    
+    func onKeyboardFrameChange(_ notification: Notification) {
+        guard
+            let userInfo = notification.userInfo,
+            let keyboardFrameInfo = userInfo[UIResponder.keyboardFrameEndUserInfoKey],
+            let keyboardFrame = (keyboardFrameInfo as? NSValue)?.cgRectValue
+        else { return }
+        
+        self.keyboardFrame = keyboardFrame
         
         let animationDuration: TimeInterval = (
             notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey]
@@ -52,7 +68,7 @@ private extension UIViewController {
             delay: .zero,
             options: animationCurve,
             animations: { [weak self] in
-                self?.additionalSafeAreaInsets.bottom = intersection.height
+                self?.view.setNeedsLayout()
                 self?.view.layoutIfNeeded()
             },
             completion: nil

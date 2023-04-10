@@ -25,7 +25,7 @@ extension String.adamantLocalized {
     }
 }
 
-class ChatListViewController: UIViewController {
+class ChatListViewController: KeyboardObservingViewController {
     typealias SpinnerCell = TableCellWrapper<SpinnerView>
     
     let cellIdentifier = "cell"
@@ -242,8 +242,6 @@ class ChatListViewController: UIViewController {
             .receive(on: OperationQueue.main)
             .sink { [weak self] _ in self?.previousAppState = .background }
             .store(in: &subscriptions)
-        
-        subscriptions.insert(addKeyboardToSafeArea())
     }
     
     private func updateChats() {
