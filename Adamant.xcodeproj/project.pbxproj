@@ -238,6 +238,7 @@
 		93B19AF529631800005305C0 /* CGSize+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93F391472962EEDC00BFD6AE /* CGSize+adamant.swift */; };
 		93B19AF629631800005305C0 /* CGSize+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93F391472962EEDC00BFD6AE /* CGSize+adamant.swift */; };
 		93B251B629E38E31008D6EA6 /* KeyboardObservingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B251B529E38E31008D6EA6 /* KeyboardObservingViewController.swift */; };
+		93B251B829E393A5008D6EA6 /* UIScrollView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B251B729E393A5008D6EA6 /* UIScrollView+Extension.swift */; };
 		93B9DBD229803179004F8BFF /* MessageCollectionViewCell+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B9DBD129803179004F8BFF /* MessageCollectionViewCell+Extension.swift */; };
 		93CC8DC7296F00D6003772BF /* ChatTransactionContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CC8DC6296F00D6003772BF /* ChatTransactionContainerView.swift */; };
 		93CC8DC9296F01DE003772BF /* ChatTransactionContainerView+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CC8DC8296F01DE003772BF /* ChatTransactionContainerView+Model.swift */; };
@@ -938,6 +939,7 @@
 		93A91FD0297972B7001DB1F8 /* ChatScrollDownButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatScrollDownButton.swift; sourceTree = "<group>"; };
 		93A91FD229799298001DB1F8 /* ChatStartPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatStartPosition.swift; sourceTree = "<group>"; };
 		93B251B529E38E31008D6EA6 /* KeyboardObservingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardObservingViewController.swift; sourceTree = "<group>"; };
+		93B251B729E393A5008D6EA6 /* UIScrollView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIScrollView+Extension.swift"; sourceTree = "<group>"; };
 		93B9DBD129803179004F8BFF /* MessageCollectionViewCell+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "MessageCollectionViewCell+Extension.swift"; sourceTree = "<group>"; };
 		93CC8DC6296F00D6003772BF /* ChatTransactionContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTransactionContainerView.swift; sourceTree = "<group>"; };
 		93CC8DC8296F01DE003772BF /* ChatTransactionContainerView+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatTransactionContainerView+Model.swift"; sourceTree = "<group>"; };
@@ -1617,6 +1619,7 @@
 				93F3914B2962F1F700BFD6AE /* MessageCellWrapper.swift */,
 				93E0C84F296B08D900FF54D3 /* UIEdgeInsets+adamant.swift */,
 				934B9BE6296C620B0027A8D0 /* UILabel+adamant.swift */,
+				93B251B729E393A5008D6EA6 /* UIScrollView+Extension.swift */,
 				93B251B529E38E31008D6EA6 /* KeyboardObservingViewController.swift */,
 			);
 			path = UIHelpers;
@@ -3109,6 +3112,7 @@
 				41047B70294B5EE10039E956 /* VisibleWalletsViewController.swift in Sources */,
 				A5BBD811262C657300B5C40C /* ByteBackpacker.swift in Sources */,
 				648BCA6D213D384F00875EB5 /* AvatarService.swift in Sources */,
+				93B251B829E393A5008D6EA6 /* UIScrollView+Extension.swift in Sources */,
 				E95F856F2007B61D0070534A /* GetPublicKeyResponse.swift in Sources */,
 				644EC34D20EFA60900F40C73 /* AdamantApi+Delegates.swift in Sources */,
 				E9E7CDAF2002B8A100DFC4DB /* Router.swift in Sources */,
