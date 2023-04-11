@@ -65,7 +65,7 @@ final class ChatViewModel: NSObject {
     }
     
     var freeTokensURL: URL? {
-        guard let address = chatroom?.partner?.address else { return nil }
+        guard let address = accountService.account?.address else { return nil }
         let urlString: String = .adamantLocalized.wallets.getFreeTokensUrl(for: address)
         
         guard let url = URL(string: urlString) else {
