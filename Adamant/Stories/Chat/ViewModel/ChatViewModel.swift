@@ -9,6 +9,7 @@
 import Combine
 import CoreData
 import MarkdownKit
+import UIKit
 
 @MainActor
 final class ChatViewModel: NSObject {
@@ -55,6 +56,7 @@ final class ChatViewModel: NSObject {
     let didTapAdmSend = ObservableSender<AdamantAddress>()
     let closeScreen = ObservableSender<Void>()
     
+    @ObservableValue private(set) var isHeaderLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
     @ObservableValue private(set) var messages = [ChatMessage]()
     @ObservableValue private(set) var isAttachmentButtonAvailable = false
@@ -354,6 +356,14 @@ private extension ChatViewModel {
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in self?.updateAttachmentButtonAvailability() }
             .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantTransfersProvider.stateChanged, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] notification in
+                self?.animateUpdateHeaderIfNeeded(notification)
+            }
+            .store(in: &subscriptions)
     }
     
     func loadMessages(address: String, offset: Int, fullscreenLoading: Bool) async {
@@ -544,5 +554,21 @@ private extension ChatViewModel {
     func startNewChat(with chatroom: Chatroom, name: String? = nil, message: String? = nil) {
         setNameIfNeeded(for: chatroom.partner, chatroom: chatroom, name: name)
         didTapAdmChat.send((chatroom, message))
+    }
+    
+    func animateUpdateHeaderIfNeeded(_ notification: Notification) {
+        guard let prevState = notification.userInfo?[AdamantUserInfoKey.TransfersProvider.prevState] as? State,
+              let newState = notification.userInfo?[AdamantUserInfoKey.TransfersProvider.newState] as? State
+        else {
+            return
+        }
+        
+        if case .updating = prevState {
+            isHeaderLoading = false
+        }
+        
+        if case .updating = newState {
+            isHeaderLoading = true
+        }
     }
 }

@@ -200,7 +200,7 @@ protocol ChatsProvider: DataProvider, Actor {
     func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction>
     
     // ForceUpdate chats
-    func update() async -> ChatsProviderResult?
+    func update(notifyState: Bool) async -> ChatsProviderResult?
     
     // MARK: - Sending messages
     func sendMessage(_ message: AdamantMessage, recipientId: String) async throws -> ChatTransaction

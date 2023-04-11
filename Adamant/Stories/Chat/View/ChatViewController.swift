@@ -52,6 +52,11 @@ final class ChatViewController: MessagesViewController {
         set { assertionFailure("Do not set messagesCollectionView") }
     }
     
+    private lazy var updatingIndicatorView: UpdatingIndicatorView = {
+        let view = UpdatingIndicatorView(title: "", titleType: .small)
+        return view
+    }()
+    
     init(
         viewModel: ChatViewModel,
         richMessageProviders: [String: RichMessageProvider],
@@ -78,6 +83,7 @@ final class ChatViewController: MessagesViewController {
         messagesCollectionView.backgroundView?.backgroundColor = .adamant.backgroundColor
         chatMessagesCollectionView.fixedBottomOffset = .zero
         maintainPositionOnInputBarHeightChanged = true
+        navigationItem.titleView = updatingIndicatorView
         configureMessageActions()
         configureHeader()
         configureLayout()
@@ -223,6 +229,10 @@ private extension ChatViewController {
             .assign(to: \.title, on: navigationItem)
             .store(in: &subscriptions)
         
+        viewModel.$partnerName
+            .sink { [weak self] in self?.updatingIndicatorView.updateTitle(title: $0) }
+            .store(in: &subscriptions)
+        
         viewModel.closeScreen
             .sink { [weak self] in self?.close() }
             .store(in: &subscriptions)
@@ -238,6 +248,17 @@ private extension ChatViewController {
         
         viewModel.didTapAdmSend
             .sink { [weak self] in self?.didTapAdmSend(to: $0) }
+            .store(in: &subscriptions)
+        
+        viewModel.$isHeaderLoading
+            .removeDuplicates()
+            .sink { [weak self] in
+                if $0 {
+                    self?.updatingIndicatorView.startAnimate()
+                } else {
+                    self?.updatingIndicatorView.stopAnimate()
+                }
+            }
             .store(in: &subscriptions)
     }
 }

@@ -62,7 +62,8 @@ extension AdamantApiService {
         return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<[Transaction], Error>) in
             sendRequest(
                 path: ApiCommands.Chats.get,
-                queryItems: queryItems
+                queryItems: queryItems,
+                waitsForConnectivity: true
             ) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Transaction>>) in
                 switch serverResponse {
                 case .success(let response):
