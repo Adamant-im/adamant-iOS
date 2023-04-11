@@ -275,10 +275,6 @@ final class ChatViewModel: NSObject {
         dialog.send(.url(url))
     }
     
-    func getName(for address: String) -> String? {
-        return addressBookService.getName(for: address)
-    }
-    
     func process(adm: AdamantAddress, action: AddressChatShareType) {
         Task {
             if action == .send {
@@ -534,7 +530,7 @@ private extension ChatViewModel {
               let account = account,
               let address = account.address,
               account.name == nil,
-              getName(for: address) == nil
+              addressBookService.getName(for: address) == nil
         else {
             return
         }

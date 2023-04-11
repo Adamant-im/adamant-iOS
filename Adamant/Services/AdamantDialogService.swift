@@ -251,12 +251,7 @@ extension AdamantDialogService {
             source: from
         )
         
-        let source: ViewSource?
-        if let from = from {
-            source = .view(from)
-        } else {
-            source = nil
-        }
+        let source: ViewSource? = from.map { .view($0) }
         
         for type in types {
             alert.addAction(
@@ -298,12 +293,7 @@ extension AdamantDialogService {
     }
     
     func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?) {
-        let source: ViewSource?
-        if let from = from {
-            source = .view(from)
-        } else {
-            source = nil
-        }
+        let source: ViewSource? = from.map { .view($0) }
         
         let alert = createShareAlertFor(stringForPasteboard: string, stringForShare: string, stringForQR: string, types: types, excludedActivityTypes: excludedActivityTypes, animated: animated, from: source, completion: completion)
         
@@ -334,12 +324,7 @@ extension AdamantDialogService {
     }
     
     func presentShareAlertFor(stringForPasteboard: String, stringForShare: String, stringForQR: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?) {
-        let source: ViewSource?
-        if let from = from {
-            source = .view(from)
-        } else {
-            source = nil
-        }
+        let source: ViewSource? = from.map { .view($0) }
         
         let alert = createShareAlertFor(stringForPasteboard: stringForPasteboard, stringForShare: stringForShare, stringForQR: stringForQR, types: types, excludedActivityTypes: excludedActivityTypes, animated: animated, from: source, completion: completion)
         
