@@ -15,4 +15,3 @@
 
 /* Privacy - Photo Library Usage Description */
 "NSPhotoLibraryUsageDescription" = "Read QR codes with passphrases and addresses";
-
