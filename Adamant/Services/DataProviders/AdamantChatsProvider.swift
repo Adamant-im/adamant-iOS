@@ -784,6 +784,7 @@ extension AdamantChatsProvider {
         transaction.isOutgoing = true
         transaction.chatMessageId = UUID().uuidString
         transaction.isMarkdown = isMarkdown
+        transaction.transactionId = UUID().uuidString
         
         transaction.message = text
         
@@ -826,7 +827,7 @@ extension AdamantChatsProvider {
         transaction.type = Int16(type.rawValue)
         transaction.isOutgoing = true
         transaction.chatMessageId = UUID().uuidString
-        
+        transaction.transactionId = UUID().uuidString
         transaction.richContent = richContent
         transaction.richType = richType
         
@@ -1050,7 +1051,13 @@ extension AdamantChatsProvider {
         }
         
         // MARK: 1. Encode
-        guard let text = transaction.serializedMessage(), let encodedMessage = adamantCore.encodeMessage(text, recipientPublicKey: recipientPublicKey, privateKey: keypair.privateKey) else {
+        guard let text = transaction.serializedMessage(),
+              let encodedMessage = adamantCore.encodeMessage(
+                text,
+                recipientPublicKey: recipientPublicKey,
+                privateKey: keypair.privateKey
+              )
+        else {
             throw ChatsProviderError.dependencyError("Failed to encode message")
         }
         
@@ -1267,6 +1274,7 @@ extension AdamantChatsProvider {
         
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.parent = self.stack.container.viewContext
+        context.mergePolicy = NSMergePolicy(merge: NSMergePolicyType.mergeByPropertyObjectTrumpMergePolicyType)
         
         // MARK: 1. Gather partner keys
         let mapped = messageTransactions.map({ DirectionedTransaction(transaction: $0, isOut: $0.senderId == senderId) })
@@ -1338,6 +1346,8 @@ extension AdamantChatsProvider {
         var height: Int64 = 0
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         privateContext.parent = context
+        privateContext.mergePolicy = NSMergePolicy(merge: NSMergePolicyType.mergeByPropertyObjectTrumpMergePolicyType)
+        
         var newMessageTransactions = [ChatTransaction]()
         var transactionInProgress: [UInt64] = []
         

@@ -228,6 +228,10 @@ final class ChatViewModel: NSObject {
         }
     }
     
+    func getKvsName(for address: String) -> String? {
+        return addressBookService.getName(for: address)
+    }
+    
     func setNewName(_ newName: String) {
         guard let address = chatroom?.partner?.address else {
             return assertionFailure("Can't set name without address")
@@ -265,8 +269,7 @@ final class ChatViewModel: NSObject {
             try? transaction.managedObjectContext?.save()
             
             await chatroom?.updateLastTransaction()
-            guard let id = transaction.transactionId else { return }
-            await chatsProvider.removeMessage(with: id)
+            await chatsProvider.removeMessage(with: transaction.transactionId)
         }
     }
     

@@ -110,22 +110,3 @@ public extension NSMutableAttributedString {
     }
 
 }
-
-extension String {
-    func checkAndReplaceSystemWallets() -> String {
-        switch self {
-        case "chats.virtual.bounty_wallet_title":
-            return AdamantContacts.adamantNewBountyWallet.name
-        case "chats.virtual.bitcoin_bet_title":
-            return AdamantContacts.betOnBitcoin.name
-        case "chats.virtual.donate_bot_title":
-            return AdamantContacts.donate.name
-        case "chats.virtual.exchange_bot_title":
-            return AdamantContacts.adamantExchange.name
-        case "chats.virtual.adelina_title":
-            return AdamantContacts.adelina.name
-        default:
-            return self
-        }
-    }
-}

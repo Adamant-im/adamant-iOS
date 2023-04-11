@@ -32,10 +32,11 @@ actor AdamantRichTransactionStatusService: NSObject, RichTransactionStatusServic
         setStatus(for: transaction, status: .notInitiated)
         
         guard
-            let provider = getProvider(for: transaction),
-            let id = transaction.transactionId
+            let provider = getProvider(for: transaction)
         else { return }
 
+        let id = transaction.transactionId
+        
         await setStatus(
             for: transaction,
             status: provider.statusWithFilters(
@@ -99,9 +100,10 @@ private extension AdamantRichTransactionStatusService {
     
     func add(transaction: RichMessageTransaction) {
         guard
-            let provider = getProvider(for: transaction),
-            let id = transaction.transactionId
+            let provider = getProvider(for: transaction)
         else { return }
+        
+        let id = transaction.transactionId
         
         let oldPendingAttempts = oldPendingAttempts[id] ?? .init(wrappedValue: .zero)
         self.oldPendingAttempts[id] = oldPendingAttempts
@@ -120,7 +122,7 @@ private extension AdamantRichTransactionStatusService {
     }
 
     func remove(transaction: RichMessageTransaction) {
-        guard let id = transaction.transactionId else { return }
+        let id = transaction.transactionId
         subscriptions[id] = nil
     }
 

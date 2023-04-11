@@ -113,8 +113,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
     }
     
     // MARK: - Dependencies
-    var dialogService: DialogService!
-    var currencyInfo: CurrencyInfoService!
+    
+    var dialogService: DialogService
+    var currencyInfo: CurrencyInfoService
     
     // MARK: - Properties
     
@@ -151,6 +152,20 @@ class TransactionDetailsViewControllerBase: FormViewController {
     var refreshTask: Task<(), Never>?
     
     // MARK: - Lifecycle
+    
+    init(
+        dialogService: DialogService,
+        currencyInfo: CurrencyInfoService
+    ) {
+        self.dialogService = dialogService
+        self.currencyInfo = currencyInfo
+        
+        super.init(style: .grouped)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()

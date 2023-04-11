@@ -26,7 +26,7 @@ extension BaseTransaction {
     @NSManaged public var isOutgoing: Bool
     @NSManaged public var recipientId: String?
     @NSManaged public var senderId: String?
-    @NSManaged public var transactionId: String?
+    @NSManaged public var transactionId: String
     @NSManaged public var type: Int16
     @NSManaged public var partner: BaseAccount?
 
