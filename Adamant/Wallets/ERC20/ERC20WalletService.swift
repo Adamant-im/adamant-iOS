@@ -318,7 +318,7 @@ class ERC20WalletService: WalletService {
         }
         
         do {
-            var transaction = try await erc20.transfer(
+            let transaction = try await erc20.transfer(
                 from: ethWallet.ethAddress,
                 to: ethWallet.ethAddress,
                 amount: "\(ethWallet.balance)"
@@ -442,6 +442,8 @@ extension ERC20WalletService {
             details = try await eth.transactionDetails(hash)
         } catch let error as Web3Error {
             throw error.asWalletServiceError()
+        } catch _ as URLError {
+            throw WalletServiceError.networkError
         } catch {
             throw WalletServiceError.internalError(message: "Failed to get transaction", error: error)
         }
@@ -517,8 +519,10 @@ extension ERC20WalletService {
             default:
                 throw error.asWalletServiceError()
             }
+        } catch _ as URLError {
+            throw WalletServiceError.networkError
         } catch {
-            throw WalletServiceError.internalError(message: "Failed to get transaction", error: error)
+            throw error
         }
     }
     

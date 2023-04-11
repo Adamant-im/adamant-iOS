@@ -37,10 +37,18 @@ final class ChatViewModel: NSObject {
     private var messageIdToShow: String?
     private var isLoading = false
     
+    private var isNeedToLoadMoreMessages: Bool {
+        get async {
+            guard let address = chatroom?.partner?.address else { return false }
+            
+            return await chatsProvider.chatLoadedMessages[address] ?? .zero
+                < chatsProvider.chatMaxMessages[address] ?? .zero
+        }
+    }
+    
     private(set) var sender = ChatSender.default
     private(set) var chatroom: Chatroom?
     private(set) var chatTransactions: [ChatTransaction] = []
-    private(set) var isNeedToLoadMoreMessages = false
     
     let didTapTransfer = ObservableSender<String>()
     let dialog = ObservableSender<ChatDialog>()
@@ -67,7 +75,7 @@ final class ChatViewModel: NSObject {
     }
     
     var freeTokensURL: URL? {
-        guard let address = chatroom?.partner?.address else { return nil }
+        guard let address = accountService.account?.address else { return nil }
         let urlString: String = .adamantLocalized.wallets.getFreeTokensUrl(for: address)
         
         guard let url = URL(string: urlString) else {
@@ -156,7 +164,7 @@ final class ChatViewModel: NSObject {
         Task {
             guard
                 let address = chatroom?.partner?.address,
-                isNeedToLoadMoreMessages
+                await isNeedToLoadMoreMessages
             else { return }
             
             let offset = await chatsProvider.chatLoadedMessages[address] ?? .zero
@@ -386,7 +394,6 @@ private extension ChatViewModel {
         
         Task(priority: .userInitiated) { [chatTransactions, sender] in
             var expirationTimestamp: TimeInterval?
-            let isNeedToLoadMoreMessages = await checkIfNeedToLoadMooreMessages()
 
             let messages = await chatMessagesListFactory.makeMessages(
                 transactions: chatTransactions,
@@ -431,17 +438,6 @@ private extension ChatViewModel {
         timerSubscription = Timer.publish(every: interval, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in self?.updateMessages(resetLoadingProperty: false) }
-    }
-    
-    func checkIfNeedToLoadMooreMessages() async -> Bool {
-        guard let address = chatroom?.partner?.address else {
-            isNeedToLoadMoreMessages = false
-            return isNeedToLoadMoreMessages
-        }
-        
-        isNeedToLoadMoreMessages = await chatsProvider.chatLoadedMessages[address] ?? .zero < chatsProvider.chatMaxMessages[address] ?? .zero
-        
-        return isNeedToLoadMoreMessages
     }
     
     func validateSendingMessage(message: AdamantMessage) async -> Bool {
@@ -513,10 +509,10 @@ private extension ChatViewModel {
             self.startNewChat(with: chatroom, message: message)
         } catch let error as AccountsProviderError {
             switch error {
-            case .dummy:
+            case .dummy, .notFound, .notInitiated:
                 self.dialog.send(.progress(false))
                 self.dialog.send(.dummy(address))
-            case .notFound, .invalidAddress, .notInitiated, .networkError:
+            case .invalidAddress, .networkError:
                 self.dialog.send(.progress(false))
                 self.dialog.send(.alert(error.localized))
             case .serverError(let apiError):
@@ -538,10 +534,17 @@ private extension ChatViewModel {
     func setNameIfNeeded(for account: CoreDataAccount?, chatroom: Chatroom?, name: String?) {
         guard let name = name,
               let account = account,
-              account.name == nil
+              let address = account.address,
+              account.name == nil,
+              addressBookService.getName(for: address) == nil
         else {
             return
         }
+        
+        Task {
+            await addressBookService.set(name: name, for: address)
+        }.stored(in: tasksStorage)
+        
         account.name = name
         if let chatroom = chatroom, chatroom.title == nil {
             chatroom.title = name

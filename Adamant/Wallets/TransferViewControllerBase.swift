@@ -138,6 +138,7 @@ class TransferViewControllerBase: FormViewController {
     
     var commentsEnabled: Bool = false
     var rootCoinBalance: Decimal?
+    var isNeedAddFeeToTotal: Bool { true }
     
     var service: WalletServiceWithSend? {
         didSet {
@@ -539,7 +540,9 @@ class TransferViewControllerBase: FormViewController {
         
         if let row: DecimalRow = form.rowBy(tag: BaseRows.total.tag) {
             if let amount = amount {
-                row.value = (amount + service.transactionFee).doubleValue
+                row.value = isNeedAddFeeToTotal
+                ? (amount + service.transactionFee).doubleValue
+                : amount.doubleValue
                 row.updateCell()
                 markRow(row, valid: validateAmount(amount))
             } else {

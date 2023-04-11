@@ -583,6 +583,10 @@ extension LskWalletService {
     }
     
     func getTransaction(by hash: String) async throws -> Transactions.TransactionModel {
+        guard !hash.isEmpty else {
+            throw ApiServiceError.internalError(message: "No hash", error: nil)
+        }
+        
         guard let api = serviceApi else {
             throw ApiServiceError.internalError(message: "Problem with accessing LSK nodes, try later", error: nil)
         }
@@ -597,8 +601,16 @@ extension LskWalletService {
                         continuation.resume(throwing: ApiServiceError.internalError(message: "No transaction", error: nil))
                     }
                 case .error(response: let error):
-                    print("ERROR: " + error.message)
-                    continuation.resume(throwing: ApiServiceError.internalError(message: error.message, error: nil))
+                    switch error.message {
+                    case APIError.unexpected.message:
+                        continuation.resume(
+                            throwing: ApiServiceError.networkError(error: error)
+                        )
+                    default:
+                        continuation.resume(
+                            throwing: ApiServiceError.internalError(message: error.message, error: error)
+                        )
+                    }
                 }
             }
         }

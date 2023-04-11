@@ -161,7 +161,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         navigationOptions = RowNavigationOptions.Disabled
         
         // MARK: - Transfer section
-        let detailsSection = Section(Sections.details.localized) {
+        let detailsSection = Section {
             $0.tag = Sections.details.tag
         }
             
