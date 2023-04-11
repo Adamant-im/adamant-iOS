@@ -114,14 +114,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         switch tabScreens {
         case let .splitControllers(leftController, rightController):
             resetScreensAction = {
-                let chatDetails = UIViewController(
-                    nibName: "WelcomeViewController",
-                    bundle: nil
-                )
-                let accountDetails = UIViewController(
-                    nibName: "WelcomeViewController",
-                    bundle: nil
-                )
+                let chatDetails = WelcomeViewController()
+                let accountDetails = WelcomeViewController()
                 leftController.viewControllers = [chatList, chatDetails]
                 rightController.viewControllers = [account, accountDetails]
             }

@@ -327,7 +327,7 @@ private extension ChatViewController {
     func makeScrollDownButton() -> ChatScrollDownButton {
         let button = ChatScrollDownButton()
         button.action = { [weak messagesCollectionView] in
-            messagesCollectionView?.scrollToLastItem()
+            messagesCollectionView?.scrollToBottom(animated: true)
         }
         
         return button
@@ -372,7 +372,7 @@ private extension ChatViewController {
         didFinishWithTransfer: TransactionDetails?
     ) {
         if didFinishWithTransfer != nil {
-            messagesCollectionView.scrollToLastItem()
+            messagesCollectionView.scrollToBottom(animated: true)
         }
 
         dismiss(animated: true)
@@ -419,7 +419,7 @@ private extension ChatViewController {
                 && messages.last?.status == .pending
         else { return }
         
-        messagesCollectionView.scrollToLastItem()
+        messagesCollectionView.scrollToBottom(animated: true)
     }
     
     @objc func showMenu(_ sender: UIBarButtonItem) {

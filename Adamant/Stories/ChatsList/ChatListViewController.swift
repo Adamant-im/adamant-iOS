@@ -25,7 +25,7 @@ extension String.adamantLocalized {
     }
 }
 
-class ChatListViewController: UIViewController {
+class ChatListViewController: KeyboardObservingViewController {
     typealias SpinnerCell = TableCellWrapper<SpinnerView>
     
     let cellIdentifier = "cell"
@@ -242,8 +242,6 @@ class ChatListViewController: UIViewController {
             .receive(on: OperationQueue.main)
             .sink { [weak self] _ in self?.previousAppState = .background }
             .store(in: &subscriptions)
-        
-        subscriptions.insert(addKeyboardToSafeArea())
     }
     
     private func updateChats() {
@@ -781,19 +779,11 @@ extension ChatListViewController {
         if let split = self.splitViewController, UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
             let chat = UINavigationController(rootViewController:vc)
             split.showDetailViewController(chat, sender: self)
+            tabBarController?.selectedIndex = .zero
         } else {
             // MARK: 2. Config TabBarController
-            let animated: Bool
-            if let tabVC = tabBarController, let selectedView = tabVC.selectedViewController {
-                if let navigator = self.splitViewController ?? self.navigationController, selectedView != navigator, let index = tabVC.viewControllers?.firstIndex(of: navigator) {
-                    animated = false
-                    tabVC.selectedIndex = index
-                } else {
-                    animated = true
-                }
-            } else {
-                animated = true
-            }
+            let animated = tabBarController?.selectedIndex == .zero
+            tabBarController?.selectedIndex = .zero
             
             // MARK: 3. Present ViewController
             if let nav = navigationController {
@@ -1063,6 +1053,10 @@ extension ChatListViewController {
         onMessagesLoadedActions.forEach { $0() }
         onMessagesLoadedActions = []
     }
+    
+    @objc private func showDefaultScreen() {
+        splitViewController?.showDetailViewController(WelcomeViewController(), sender: self)
+    }
 }
 
 // MARK: Search
@@ -1141,5 +1135,21 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
             
             presenter.presentChatroom(chatroom)
         }
+    }
+}
+
+// MARK: Mac OS HotKeys
+
+extension ChatListViewController {
+    override var keyCommands: [UIKeyCommand]? {
+        let commands = [
+            UIKeyCommand(
+                input: UIKeyCommand.inputEscape,
+                modifierFlags: [],
+                action: #selector(showDefaultScreen)
+            )
+        ]
+        commands.forEach { $0.wantsPriorityOverSystemBehavior = true }
+        return commands
     }
 }
