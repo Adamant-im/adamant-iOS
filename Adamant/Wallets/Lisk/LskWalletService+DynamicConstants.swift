@@ -49,7 +49,7 @@ extension LskWalletService {
     }
     
     var defaultOrdinalLevel: Int? {
-        30
+        60
     }
     
     static let explorerAddress = "https://liskscan.com/transaction/"
