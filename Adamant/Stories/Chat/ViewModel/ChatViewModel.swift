@@ -228,6 +228,10 @@ final class ChatViewModel: NSObject {
         }
     }
     
+    func getKvsName(for address: String) -> String? {
+        return addressBookService.getName(for: address)
+    }
+    
     func setNewName(_ newName: String) {
         guard let address = chatroom?.partner?.address else {
             return assertionFailure("Can't set name without address")
