@@ -583,6 +583,10 @@ extension LskWalletService {
     }
     
     func getTransaction(by hash: String) async throws -> Transactions.TransactionModel {
+        guard !hash.isEmpty else {
+            throw ApiServiceError.internalError(message: "No hash", error: nil)
+        }
+        
         guard let api = serviceApi else {
             throw ApiServiceError.internalError(message: "Problem with accessing LSK nodes, try later", error: nil)
         }

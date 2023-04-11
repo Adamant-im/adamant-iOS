@@ -21,6 +21,7 @@ protocol RichMessageProvider: AnyObject {
     var registeredInterval: TimeInterval { get }
     var newPendingAttempts: Int { get }
     var oldPendingAttempts: Int { get }
+    var consistencyMaxTime: Double { get }
     
     var dynamicRichMessageType: String { get }
     
@@ -32,16 +33,4 @@ protocol RichMessageProvider: AnyObject {
     
     // MARK: Chats list
     func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString
-}
-
-protocol RichMessageProviderWithStatusCheck: RichMessageProvider {
-    func statusFor(transaction: RichMessageTransaction) async throws -> TransactionStatus
-    
-    var delayBetweenChecks: TimeInterval { get }
-}
-
-extension RichMessageProviderWithStatusCheck {
-    var delayBetweenChecks: TimeInterval {
-        return 30.0
-    }
 }

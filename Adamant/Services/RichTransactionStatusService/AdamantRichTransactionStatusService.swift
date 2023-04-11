@@ -27,11 +27,11 @@ actor AdamantRichTransactionStatusService: NSObject, RichTransactionStatusServic
 
     func forceUpdate(transaction: RichMessageTransaction) async {
         setStatus(for: transaction, status: .notInitiated)
+        guard let provider = getProvider(for: transaction) else { return }
 
         await setStatus(
             for: transaction,
-            status: (try? getProvider(for: transaction)?.statusFor(transaction: transaction))
-                ?? .pending
+            status: provider.statusWithFilters(transaction: transaction)
         )
     }
     

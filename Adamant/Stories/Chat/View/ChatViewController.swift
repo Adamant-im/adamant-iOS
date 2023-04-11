@@ -22,7 +22,7 @@ final class ChatViewController: MessagesViewController {
     
     private let storedObjects: [AnyObject]
     private let richMessageProviders: [String: RichMessageProvider]
-    private let admService: WalletServiceWithSend?
+    private let admService: AdmWalletService?
     
     let viewModel: ChatViewModel
     
@@ -57,7 +57,7 @@ final class ChatViewController: MessagesViewController {
         richMessageProviders: [String: RichMessageProvider],
         storedObjects: [AnyObject],
         sendTransaction: @escaping SendTransaction,
-        admService: WalletServiceWithSend?
+        admService: AdmWalletService?
     ) {
         self.viewModel = viewModel
         self.storedObjects = storedObjects
@@ -448,12 +448,7 @@ private extension ChatViewController {
     }
     
     func didTapTransferTransaction(_ transaction: TransferTransaction) {
-        guard
-            let provider = richMessageProviders[AdmWalletService.richMessageType]
-                as? AdmWalletService
-        else { return }
-        
-        provider.richMessageTapped(for: transaction, in: self)
+        admService?.richMessageTapped(for: transaction, in: self)
     }
     
     func didTapRichMessageTransaction(_ transaction: RichMessageTransaction) {
@@ -465,7 +460,7 @@ private extension ChatViewController {
         switch transaction.transactionStatus {
         case .failed:
             viewModel.dialog.send(.alert(.adamantLocalized.sharedErrors.inconsistentTransaction))
-        case .notInitiated, .pending, .success, .updating, .warning, .none, .inconsistent, .registered:
+        case .notInitiated, .pending, .success, .none, .inconsistent, .registered:
             provider.richMessageTapped(for: transaction, in: self)
         }
     }
