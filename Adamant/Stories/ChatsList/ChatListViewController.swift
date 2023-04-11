@@ -1053,6 +1053,10 @@ extension ChatListViewController {
         onMessagesLoadedActions.forEach { $0() }
         onMessagesLoadedActions = []
     }
+    
+    @objc private func showDefaultScreen() {
+        splitViewController?.showDetailViewController(WelcomeViewController(), sender: self)
+    }
 }
 
 // MARK: Search
@@ -1131,5 +1135,21 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
             
             presenter.presentChatroom(chatroom)
         }
+    }
+}
+
+// MARK: Mac OS HotKeys
+
+extension ChatListViewController {
+    override var keyCommands: [UIKeyCommand]? {
+        let commands = [
+            UIKeyCommand(
+                input: UIKeyCommand.inputEscape,
+                modifierFlags: [],
+                action: #selector(showDefaultScreen)
+            )
+        ]
+        commands.forEach { $0.wantsPriorityOverSystemBehavior = true }
+        return commands
     }
 }
