@@ -419,7 +419,7 @@ extension AdamantChatsProvider {
         )
         
         isChatLoaded[addressRecipient] = true
-        chatMaxMessages[addressRecipient] = chatroom?.count ?? 0
+        chatMaxMessages[addressRecipient] = chatroom?.count
         
         let loadedCount = chatLoadedMessages[addressRecipient] ?? 0
         chatLoadedMessages[addressRecipient] = loadedCount + (chatroom?.messages?.count ?? 0)
@@ -461,7 +461,12 @@ extension AdamantChatsProvider {
             }
             
             await Task.sleep(interval: requestRepeatDelay)
-            return try await apiGetChatrooms(address: address, offset: offset)
+            
+            return try await apiGetChatMessages(
+                address: address,
+                addressRecipient: addressRecipient,
+                offset: offset
+            )
         }
     }
     
