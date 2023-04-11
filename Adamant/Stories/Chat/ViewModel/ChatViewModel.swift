@@ -36,7 +36,6 @@ final class ChatViewModel: NSObject {
     private var timerSubscription: AnyCancellable?
     private var messageIdToShow: String?
     private var isLoading = false
-    private var previousAppState: UIApplication.State?
     
     private(set) var sender = ChatSender.default
     private(set) var chatroom: Chatroom?
@@ -348,21 +347,6 @@ private extension ChatViewModel {
             .publisher(for: .AdamantVisibleWalletsService.visibleWallets)
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in self?.updateAttachmentButtonAvailability() }
-            .store(in: &subscriptions)
-        
-        NotificationCenter.default
-            .publisher(for: UIApplication.didBecomeActiveNotification, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
-                guard self?.previousAppState == .background else { return }
-                self?.previousAppState = .active
-            }
-            .store(in: &subscriptions)
-        
-        NotificationCenter.default
-            .publisher(for: UIApplication.willResignActiveNotification, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in self?.previousAppState = .background }
             .store(in: &subscriptions)
         
         NotificationCenter.default
