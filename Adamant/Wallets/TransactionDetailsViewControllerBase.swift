@@ -177,6 +177,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 $0.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
             
+            $0.cell.detailTextLabel?.textAlignment = .right
             $0.cell.detailTextLabel?.lineBreakMode = .byTruncatingMiddle
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
@@ -216,6 +217,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             
             let height = self?.senderName != nil ? DoubleDetailsTableViewCell.fullHeight : DoubleDetailsTableViewCell.compactHeight
             $0.cell.height = { height }
+            $0.cell.secondDetailsLabel?.textAlignment = .right
+            $0.cell.detailsLabel?.textAlignment = .right
             $0.cell.secondDetailsLabel?.lineBreakMode = .byTruncatingMiddle
             $0.cell.detailsLabel?.lineBreakMode = .byTruncatingMiddle
         }.cellSetup { (cell, _) in
@@ -272,6 +275,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             
             let height = self?.recipientName != nil ? DoubleDetailsTableViewCell.fullHeight : DoubleDetailsTableViewCell.compactHeight
             $0.cell.height = { height }
+            $0.cell.secondDetailsLabel?.textAlignment = .right
+            $0.cell.detailsLabel?.textAlignment = .right
             $0.cell.secondDetailsLabel?.lineBreakMode = .byTruncatingMiddle
             $0.cell.detailsLabel?.lineBreakMode = .byTruncatingMiddle
         }.cellSetup { (cell, _) in
