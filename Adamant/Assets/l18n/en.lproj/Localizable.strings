@@ -940,6 +940,9 @@
 /* Transfer: Alert body: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address */
 "TransferScene.unsafeTransferAlert.body" = "Account not found, or not initiated. Double check recipient address and confirm transaction";
 
+/* Transfer: Alert body: Account is not initiated. It's not possible to start a chat, as the Blockchain doesn't store the account's public key to encrypt messages. */
+"TransferScene.unsafeChatAlert.body" = "Account is not initiated. It's not possible to start a chat, as the Blockchain doesn't store the account's public key to encrypt messages.";
+
 /* Transfer: recipient address placeholder */
 "TransferScene.Recipient.Placeholder" = "of the recipient";
 

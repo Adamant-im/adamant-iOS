@@ -46,5 +46,9 @@ class FullscreenAlertView: UIView {
         alertBackgroundView.layer.cornerRadius = 14
         titleLabel.isHidden = true
         messageLabel.isHidden = true
+        alertBackgroundView.backgroundColor = .adamant.background
+        titleLabel.textColor = .adamant.primary
+        messageLabel.textColor = .adamant.primary
+        imageView.tintColor = .adamant.primary
     }
 }

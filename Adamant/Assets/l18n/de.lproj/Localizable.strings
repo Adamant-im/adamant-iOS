@@ -961,6 +961,9 @@
 /* Transfer: Alert body: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address */
 "TransferScene.unsafeTransferAlert.body" = "Adresse nicht gefunden oder nicht initialisiert. Stellen Sie sicher, dass diese richtig eingegeben wurde";
 
+/* Transfer: Alert body: Account is not initiated. It's not possible to start a chat, as the Blockchain doesn't store the account's public key to encrypt messages. */
+"TransferScene.unsafeChatAlert.body" = "Konto wird nicht initiiert. Es ist nicht möglich, einen Chat zu starten, da die Blockchain den öffentlichen Schlüssel des Kontos nicht speichert, um Nachrichten zu verschlüsseln.";
+
 /* Transfer: recipient address placeholder */
 "TransferScene.Recipient.Placeholder" = "Empfänger";
 

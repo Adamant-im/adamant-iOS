@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
-        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -18,10 +15,10 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="h5W-M9-PVa">
-                    <rect key="frame" x="112.5" y="278.5" width="150" height="131"/>
+                    <rect key="frame" x="112.5" y="267" width="150" height="133"/>
                     <subviews>
                         <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="LgA-I1-Aof">
-                            <rect key="frame" x="8" y="12" width="134" height="107"/>
+                            <rect key="frame" x="8" y="12" width="134" height="109"/>
                             <subviews>
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="8iX-De-yNr">
                                     <rect key="frame" x="35" y="0.0" width="64" height="66"/>
@@ -34,7 +31,7 @@
                                             </constraints>
                                         </imageView>
                                     </subviews>
-                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <constraints>
                                         <constraint firstItem="eDf-95-TwN" firstAttribute="top" secondItem="8iX-De-yNr" secondAttribute="top" id="RsX-Dz-OqA"/>
                                         <constraint firstItem="eDf-95-TwN" firstAttribute="centerX" secondItem="8iX-De-yNr" secondAttribute="centerX" id="eAx-yP-lcW"/>
@@ -42,14 +39,14 @@
                                         <constraint firstAttribute="width" secondItem="eDf-95-TwN" secondAttribute="width" constant="8" id="lS7-Mz-9Iv"/>
                                     </constraints>
                                 </view>
-                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QYY-Vx-gHQ">
-                                    <rect key="frame" x="49.5" y="66" width="35.5" height="20.5"/>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="Title" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QYY-Vx-gHQ">
+                                    <rect key="frame" x="49.5" y="66" width="35" height="22.5"/>
                                     <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
                                     <nil key="textColor"/>
                                     <nil key="highlightedColor"/>
                                 </label>
-                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Message" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0oz-CM-zVl">
-                                    <rect key="frame" x="32.5" y="86.5" width="69" height="20.5"/>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="Message" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0oz-CM-zVl">
+                                    <rect key="frame" x="32.5" y="88.5" width="69" height="20.5"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                     <nil key="textColor"/>
                                     <nil key="highlightedColor"/>
@@ -70,6 +67,7 @@
                     </constraints>
                 </view>
             </subviews>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <color key="backgroundColor" white="0.0" alpha="0.35423456671779141" colorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstItem="h5W-M9-PVa" firstAttribute="width" relation="lessThanOrEqual" secondItem="iN0-l3-epB" secondAttribute="width" constant="-32" id="Jya-gH-LIQ"/>
@@ -79,13 +77,13 @@
                 <constraint firstItem="h5W-M9-PVa" firstAttribute="centerX" secondItem="vUN-kp-3ea" secondAttribute="centerX" id="vVu-TZ-enY"/>
                 <constraint firstItem="h5W-M9-PVa" firstAttribute="height" relation="lessThanOrEqual" secondItem="vUN-kp-3ea" secondAttribute="height" constant="-32" id="y01-tY-IHy"/>
             </constraints>
-            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <connections>
                 <outlet property="alertBackgroundView" destination="h5W-M9-PVa" id="A3r-jU-i8d"/>
                 <outlet property="imageView" destination="eDf-95-TwN" id="bh0-zb-j3L"/>
                 <outlet property="messageLabel" destination="0oz-CM-zVl" id="zsq-BP-jG0"/>
                 <outlet property="titleLabel" destination="QYY-Vx-gHQ" id="Qcg-cd-k1D"/>
             </connections>
+            <point key="canvasLocation" x="38" y="21"/>
         </view>
     </objects>
     <resources>
