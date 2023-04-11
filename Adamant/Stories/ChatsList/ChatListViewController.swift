@@ -781,19 +781,11 @@ extension ChatListViewController {
         if let split = self.splitViewController, UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
             let chat = UINavigationController(rootViewController:vc)
             split.showDetailViewController(chat, sender: self)
+            tabBarController?.selectedIndex = .zero
         } else {
             // MARK: 2. Config TabBarController
-            let animated: Bool
-            if let tabVC = tabBarController, let selectedView = tabVC.selectedViewController {
-                if let navigator = self.splitViewController ?? self.navigationController, selectedView != navigator, let index = tabVC.viewControllers?.firstIndex(of: navigator) {
-                    animated = false
-                    tabVC.selectedIndex = index
-                } else {
-                    animated = true
-                }
-            } else {
-                animated = true
-            }
+            let animated = tabBarController?.selectedIndex == .zero
+            tabBarController?.selectedIndex = .zero
             
             // MARK: 3. Present ViewController
             if let nav = navigationController {
