@@ -38,14 +38,14 @@ final class DelegatesListViewController: KeyboardObservingViewController {
     
     // MARK: - Dependencies
     
-    var apiService: ApiService!
-    var accountService: AccountService!
-    var dialogService: DialogService!
-    var router: Router!
+    private let apiService: ApiService
+    private let accountService: AccountService
+    private let dialogService: DialogService
+    private let router: Router
     
     // MARK: - Constants
     
-    let votingCost: Decimal = Decimal(integerLiteral: 50)
+    let votingCost = 50
     let activeDelegates = 101
     let maxVotes = 33
     let maxTotalVotes = 101
@@ -93,6 +93,23 @@ final class DelegatesListViewController: KeyboardObservingViewController {
     private let possibleAddressRegEx = try! NSRegularExpression(pattern: "^[uU]{0,1}\\d{1,20}$", options: [])
     
     // MARK: - Lifecycle
+    
+    init(
+        apiService: ApiService,
+        accountService: AccountService,
+        dialogService: DialogService,
+        router: Router
+    ) {
+        self.apiService = apiService
+        self.accountService = accountService
+        self.dialogService = dialogService
+        self.router = router
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -276,7 +293,7 @@ private extension DelegatesListViewController {
             return
         }
         
-        guard account.balance > votingCost else {
+        guard account.balance > Decimal(votingCost) else {
             self.dialogService.showWarning(withMessage: String.adamantLocalized.delegates.notEnoughtTokensForVote)
             return
         }
