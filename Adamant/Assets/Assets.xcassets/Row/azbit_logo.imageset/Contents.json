@@ -1,0 +1,23 @@
+{
+  "images" : [
+    {
+      "filename" : "azbit-logo-3_21x21.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "azbit-logo-3_1_42x42.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "azbit-logo-3_2_63x63.png",
+      "idiom" : "universal",
+      "scale" : "3x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

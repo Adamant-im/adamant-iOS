@@ -21,7 +21,7 @@ public class ChatTransaction: BaseTransaction {
         fatalError("You must implement serializedMessage in ChatTransaction classes")
     }
     
-    var sentDate: Date {
-        date.map { $0 as Date } ?? .init()
+    var sentDate: Date? {
+        date.map { $0 as Date }
     }
 }

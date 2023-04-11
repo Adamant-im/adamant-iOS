@@ -14,7 +14,9 @@ actor AdamantRichTransactionStatusService: NSObject, RichTransactionStatusServic
     private let coreDataStack: CoreDataStack
 
     private lazy var controller = getRichTransactionsController()
+    private var networkSubscription: AnyCancellable?
     private var subscriptions = [String: AnyCancellable]()
+    private var oldPendingAttempts = [String: ObservableValue<Int>]()
 
     init(
         coreDataStack: CoreDataStack,
@@ -23,15 +25,24 @@ actor AdamantRichTransactionStatusService: NSObject, RichTransactionStatusServic
         self.coreDataStack = coreDataStack
         self.richProviders = richProviders
         super.init()
+        Task { await setupNetworkSubscription() }
     }
 
     func forceUpdate(transaction: RichMessageTransaction) async {
         setStatus(for: transaction, status: .notInitiated)
+        
+        guard
+            let provider = getProvider(for: transaction)
+        else { return }
 
+        let id = transaction.transactionId
+        
         await setStatus(
             for: transaction,
-            status: (try? getProvider(for: transaction)?.statusFor(transaction: transaction))
-                ?? .pending
+            status: provider.statusWithFilters(
+                transaction: transaction,
+                oldPendingAttempts: oldPendingAttempts[id]?.wrappedValue ?? .zero
+            )
         )
     }
     
@@ -56,30 +67,63 @@ extension AdamantRichTransactionStatusService: NSFetchedResultsControllerDelegat
 }
 
 private extension AdamantRichTransactionStatusService {
+    func setupNetworkSubscription() {
+        networkSubscription = NotificationCenter.default
+            .publisher(for: .AdamantReachabilityMonitor.reachabilityChanged)
+            .compactMap { $0.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? Bool }
+            .removeDuplicates()
+            .sink { connected in
+                guard connected else { return }
+                Task { [weak self] in await self?.reloadNoNetworkTransactions() }
+            }
+    }
+        
+    func reloadNoNetworkTransactions() {
+        let transactions = controller.fetchedObjects?.filter {
+            switch $0.transactionStatus {
+            case .noNetwork, .noNetworkFinal, .notInitiated:
+                return true
+            case .failed, .pending, .registered, .success, .inconsistent, .none:
+                return false
+            }
+        }
+        
+        transactions?.compactMap { $0.transactionId }.forEach {
+            oldPendingAttempts[$0] = .init(wrappedValue: .zero)
+        }
+        
+        transactions?.forEach { transaction in
+            setStatus(for: transaction, status: .noNetwork)
+            add(transaction: transaction)
+        }
+    }
+    
     func add(transaction: RichMessageTransaction) {
-        guard let provider = getProvider(for: transaction) else { return }
+        guard
+            let provider = getProvider(for: transaction)
+        else { return }
+        
+        let id = transaction.transactionId
+        
+        let oldPendingAttempts = oldPendingAttempts[id] ?? .init(wrappedValue: .zero)
+        self.oldPendingAttempts[id] = oldPendingAttempts
 
         let publisher = RichTransactionStatusPublisher(
             provider: provider,
-            transaction: transaction
+            transaction: transaction,
+            oldPendingAttempts: oldPendingAttempts
         )
-
-        setupSubscription(publisher: publisher, transaction: transaction)
-    }
-
-    func remove(transaction: RichMessageTransaction) {
-        let id = transaction.transactionId
-        subscriptions[id] = nil
-    }
-
-    func setupSubscription(publisher: RichTransactionStatusPublisher, transaction: RichMessageTransaction) {
-        let id = transaction.transactionId
         
         subscriptions[id] = publisher.removeDuplicates().sink { status in
             Task { [weak self] in
                 await self?.setStatus(for: transaction, status: status)
             }
         }
+    }
+
+    func remove(transaction: RichMessageTransaction) {
+        let id = transaction.transactionId
+        subscriptions[id] = nil
     }
 
     func getProvider(for transaction: RichMessageTransaction) -> RichMessageProviderWithStatusCheck? {

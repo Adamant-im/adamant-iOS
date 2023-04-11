@@ -147,6 +147,21 @@ protocol DialogService: AnyObject {
         sendCompletion: ((UIAlertAction) -> Void)?
     )
     
+    func presentDummyChatAlert(
+        for adm: String,
+        from: UIView?,
+        canSend: Bool,
+        sendCompletion: ((UIAlertAction) -> Void)?
+    )
+    
+    func presentDummyAlert(
+        for adm: String,
+        from: UIView?,
+        canSend: Bool,
+        message: String,
+        sendCompletion: ((UIAlertAction) -> Void)?
+    )
+    
     // MARK: - Alerts
     func showAlert(title: String?, message: String?, style: UIAlertController.Style, actions: [UIAlertAction]?, from: Any?)
     func showAlert(title: String?, message: String?, style: AdamantAlertStyle, actions: [AdamantAlertAction]?, from: Any?)

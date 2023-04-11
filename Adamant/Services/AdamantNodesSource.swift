@@ -8,7 +8,7 @@
 
 import Foundation
 
-class AdamantNodesSource: NodesSource {
+final class AdamantNodesSource: NodesSource {
     // MARK: - Dependencies
     
     private let apiService: ApiService
@@ -35,6 +35,7 @@ class AdamantNodesSource: NodesSource {
     
     private let defaultNodesGetter: () -> [Node]
     private var timer: Timer?
+    private var savedNodes: [Node] = []
     
     // MARK: - Ctor
     
@@ -116,10 +117,13 @@ class AdamantNodesSource: NodesSource {
     }
     
     private func saveNodes() {
+        guard nodes != savedNodes else { return }
         securedStore.set(nodes, for: StoreKey.NodesSource.nodes)
+        savedNodes = securedStore.get(StoreKey.NodesSource.nodes) ?? []
     }
     
     private func loadNodes() {
+        savedNodes = securedStore.get(StoreKey.NodesSource.nodes) ?? defaultNodesGetter()
         nodes = securedStore.get(StoreKey.NodesSource.nodes) ?? defaultNodesGetter()
     }
     

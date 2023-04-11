@@ -92,6 +92,7 @@ class ShareQrViewController: FormViewController {
             
             if let sharingTip = sharingTip {
                 $0.cell.tipLabel.text = sharingTip
+                $0.cell.tipLabel.lineBreakMode = .byTruncatingMiddle
             } else {
                 $0.cell.tipLabelIsHidden = true
             }

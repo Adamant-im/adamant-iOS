@@ -15,13 +15,13 @@ class BuyAndSellViewController: FormViewController {
     enum Rows {
         case adamantMessage
         case adamantSite
-        case coinDeal
+        case azbit
         
         var tag: String {
             switch self {
             case .adamantMessage: return "admChat"
             case .adamantSite: return "admSite"
-            case .coinDeal: return "cDeal"
+            case .azbit: return "cDeal"
             }
         }
         
@@ -29,7 +29,7 @@ class BuyAndSellViewController: FormViewController {
             switch self {
             case .adamantMessage: return #imageLiteral(resourceName: "row_logo")
             case .adamantSite: return #imageLiteral(resourceName: "row_logo")
-            case .coinDeal: return #imageLiteral(resourceName: "idcm_row_logo.png")
+            case .azbit: return #imageLiteral(resourceName: "azbit_logo")
             }
         }
         
@@ -37,7 +37,7 @@ class BuyAndSellViewController: FormViewController {
             switch self {
             case .adamantMessage: return String.adamantLocalized.wallets.exchangeInChatAdmTokens
             case .adamantSite: return String.adamantLocalized.wallets.buyAdmTokens
-            case .coinDeal: return "CoinDeal"
+            case .azbit: return "Azbit"
             }
         }
         
@@ -45,7 +45,7 @@ class BuyAndSellViewController: FormViewController {
             switch self {
             case .adamantMessage: return ""
             case .adamantSite: return "https://adamant.im/buy-tokens/"
-            case .coinDeal: return "https://coindeal.com/ref/9WZN"
+            case .azbit: return "https://azbit.com?referralCode=9YVWYAF"
             }
         }
     }
@@ -83,8 +83,8 @@ class BuyAndSellViewController: FormViewController {
         
         section.append(admRow)
         
-        // MARK: CoinDeal
-        let coinRow = buildUrlRow(for: .coinDeal)
+        // MARK: Azbit
+        let coinRow = buildUrlRow(for: .azbit)
         section.append(coinRow)
         
         form.append(section)
@@ -95,7 +95,13 @@ class BuyAndSellViewController: FormViewController {
     // MARK: - Tools
     
     private func buildUrlRow(for row: Rows) -> LabelRow {
-        return buildUrlRow(title: row.localized, value: nil, tag: row.tag, urlRaw: row.url, image: row.image)
+        return buildUrlRow(
+            title: row.localized,
+            value: nil,
+            tag: row.tag,
+            urlRaw: row.url,
+            image: row.image
+        )
     }
     
     private func buildUrlRow(title: String, value: String?, tag: String, urlRaw: String, image: UIImage?) -> LabelRow {
@@ -129,29 +135,48 @@ class BuyAndSellViewController: FormViewController {
     }
     
     private func openExchangeChat() {
-        if let tabbar = self.tabBarController,
-           let chats = tabbar.viewControllers?.first as? UISplitViewController,
-           let chatList = chats.viewControllers.first as? UINavigationController,
-           let chatlistVC = chatList.viewControllers.first as? ChatListViewController {
-            chatList.popToRootViewController(animated: false)
-            chatList.dismiss(animated: false, completion: nil)
-            tabbar.selectedIndex = 0
-            let chatroom = chatlistVC.chatsController?.fetchedObjects?.first(where: { room in
-                return room.partner?.address == AdamantContacts.adamantExchange.address
-            })
-            if let chatroom = chatroom {
-                let vc = chatlistVC.chatViewController(for: chatroom)
-                
-                if let split = chatlistVC.splitViewController {
-                    let chat = UINavigationController(rootViewController:vc)
-                    split.showDetailViewController(chat, sender: self)
-                } else if let nav = chatlistVC.navigationController {
-                    nav.pushViewController(vc, animated: true)
-                } else {
-                    vc.modalPresentationStyle = .overFullScreen
-                    chatlistVC.present(vc, animated: true)
-                }
-            }
+        var chatList: UINavigationController?
+        var chatDetail: ChatListViewController?
+        
+        guard let tabbar = self.tabBarController else { return }
+        
+        if let split = tabbar.viewControllers?.first as? UISplitViewController,
+           let navigation = split.viewControllers.first as? UINavigationController,
+           let vc = navigation.viewControllers.first as? ChatListViewController {
+            chatList = navigation
+            chatDetail = vc
+        }
+        
+        if let navigation = tabbar.viewControllers?.first as? UINavigationController,
+           let vc = navigation.viewControllers.first as? ChatListViewController {
+            chatList = navigation
+            chatDetail = vc
+        }
+
+        let chatroom = chatDetail?.chatsController?.fetchedObjects?.first(where: { room in
+            return room.partner?.address == AdamantContacts.adamantExchange.address
+        })
+        
+        guard let chatroom = chatroom,
+              let chatDetail = chatDetail
+        else {
+            return
+        }
+        
+        chatList?.popToRootViewController(animated: false)
+        chatList?.dismiss(animated: false, completion: nil)
+        tabbar.selectedIndex = 0
+        
+        let vc = chatDetail.chatViewController(for: chatroom)
+        
+        if let split = chatDetail.splitViewController {
+            let chat = UINavigationController(rootViewController: vc)
+            split.showDetailViewController(chat, sender: self)
+        } else if let nav = chatDetail.navigationController {
+            nav.pushViewController(vc, animated: true)
+        } else {
+            vc.modalPresentationStyle = .overFullScreen
+            chatDetail.present(vc, animated: true)
         }
     }
     

@@ -28,6 +28,8 @@ final class ERC20TransferViewController: TransferViewControllerBase {
         return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: EthWalletService.currencySymbol)
     }
     
+    override var isNeedAddFeeToTotal: Bool { false }
+    
     init(
         chatsProvider: ChatsProvider,
         accountService: AccountService,
@@ -175,7 +177,8 @@ final class ERC20TransferViewController: TransferViewControllerBase {
         }
         
         let fixedAddress: String
-        if let first = address.first, first != "0" {
+        let prefix = address.prefix(2)
+        if prefix != "0x" {
             fixedAddress = "0x\(address)"
         } else {
             fixedAddress = address

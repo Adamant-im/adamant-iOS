@@ -49,7 +49,7 @@ extension DogeWalletService {
     }
     
     var defaultOrdinalLevel: Int? {
-        40
+        70
     }
     
     static let explorerAddress = "https://dogechain.info/tx/"

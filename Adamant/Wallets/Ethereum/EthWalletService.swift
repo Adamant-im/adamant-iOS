@@ -134,8 +134,7 @@ class EthWalletService: WalletService {
             return await setupEthNode(with: url)
         }
     }
-    private var baseUrl: String!
-    let defaultDispatchQueue = DispatchQueue(label: "im.adamant.ethWalletService", qos: .utility, attributes: [.concurrent])
+    
     private (set) var enabled = true
     
     var walletViewController: WalletViewController {
@@ -212,7 +211,6 @@ class EthWalletService: WalletService {
         }
         
         self._web3 = web3
-        self.baseUrl = EthWalletService.buildBaseUrl(for: web3.provider.network)
         
         return web3
     }
@@ -348,24 +346,6 @@ class EthWalletService: WalletService {
             )
         }
     }
-	
-	private static func buildBaseUrl(for network: Networks?) -> String {
-		let suffix: String
-		
-		guard let network = network else {
-			return "https://api.etherscan.io/api"
-		}
-		
-		switch network {
-		case .Mainnet:
-			suffix = ""
-			
-		default:
-			suffix = "-\(network)"
-		}
-		
-		return "https://api\(suffix).etherscan.io/api"
-	}
 	
     private func buildUrl(url: URL, queryItems: [URLQueryItem]? = nil) throws -> URL {
         guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
@@ -715,54 +695,6 @@ extension EthWalletService {
         
         transactions.sort { $0.date.compare($1.date) == .orderedDescending }
         return transactions
-    }
-    
-    /// Transaction history for Ropsten testnet
-    func getTransactionsHistoryRopsten(address: String, page: Int = 1, size: Int = 50, completion: @escaping (WalletServiceResult<[EthTransaction]>) -> Void) {
-        let queryItems: [URLQueryItem] = [URLQueryItem(name: "module", value: "account"),
-                                          URLQueryItem(name: "action", value: "txlist"),
-                                          URLQueryItem(name: "address", value: address),
-                                          URLQueryItem(name: "page", value: "\(page)"),
-                                          URLQueryItem(name: "offset", value: "\(size)"),
-                                          URLQueryItem(name: "sort", value: "desc")
-            //                        ,URLQueryItem(name: "apikey", value: "YourApiKeyToken")
-        ]
-        
-        let endpoint: URL
-        do {
-            endpoint = try buildUrl(url: URL(string: baseUrl)!, queryItems: queryItems)
-        } catch {
-            let err = AdamantApiService.InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-            completion(.failure(error: WalletServiceError.apiError(err)))
-            return
-        }
-        
-        AF.request(endpoint).responseData(queue: defaultDispatchQueue) { response in
-            switch response.result {
-            case .success(let data):
-                do {
-                    let model: EthResponse = try JSONDecoder().decode(EthResponse.self, from: data)
-                    
-                    if model.status == 1 {
-                        var transactions = model.result
-                        
-                        for index in 0..<transactions.count {
-                            let from = transactions[index].from
-                            transactions[index].isOutgoing = from == address
-                        }
-                        
-                        completion(.success(result: transactions))
-                    } else {
-                        completion(.failure(error: .remoteServiceError(message: model.message)))
-                    }
-                } catch {
-                    completion(.failure(error: .internalError(message: "Failed to deserialize transactions", error: error)))
-                }
-                
-            case .failure:
-                completion(.failure(error: .networkError))
-            }
-        }
     }
 }
 
