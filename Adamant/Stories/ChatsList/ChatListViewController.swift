@@ -67,11 +67,28 @@ class ChatListViewController: KeyboardObservingViewController {
     }()
     
     private lazy var markdownParser: MarkdownParser = {
-        let parser = MarkdownParser(font: UIFont.systemFont(ofSize: ChatTableViewCell.shortDescriptionTextSize),
-                                    color: UIColor.adamant.primary,
-                                    enabledElements: .disabledAutomaticLink)
-        
-        parser.link.color = UIColor.adamant.active
+        let parser = MarkdownParser(
+            font: UIFont.systemFont(ofSize: ChatTableViewCell.shortDescriptionTextSize),
+            color: .adamant.primary,
+            enabledElements: [
+                .header,
+                .list,
+                .quote,
+                .bold,
+                .italic,
+                .code,
+                .strikethrough,
+                .automaticLink
+            ],
+            customElements: [
+                MarkdownSimpleAdm(),
+                MarkdownLinkAdm(),
+                MarkdownAdvancedAdm(
+                    font: .adamantChatDefault,
+                    color: .adamant.active
+                )
+            ]
+        )
         
         return parser
     }()
@@ -811,7 +828,25 @@ extension ChatListViewController {
                 raw = text
             }
             
-            return markdownParser.parse(raw)
+            let attributesText = markdownParser.parse(raw)
+            let mutableText = NSMutableAttributedString(attributedString: attributesText)
+            
+            mutableText.enumerateAttribute(
+                .link,
+                in: NSRange(location: 0, length: attributesText.length),
+                options: []
+            ) { (value, range, _) in
+                guard value != nil else { return }
+                
+                mutableText.removeAttribute(.link, range: range)
+                mutableText.addAttribute(
+                    .foregroundColor,
+                    value: UIColor.adamant.active,
+                    range: range
+                )
+            }
+
+            return mutableText
             
         case let transfer as TransferTransaction:
             if let admService = richMessageProviders[AdmWalletService.richMessageType] as? AdmWalletService {

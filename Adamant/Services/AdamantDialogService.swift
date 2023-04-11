@@ -238,7 +238,15 @@ extension AdamantDialogService {
 
 // MAKR: - Activity controllers
 extension AdamantDialogService {
-    func presentShareAlertFor(adm: String, name: String, types: [AddressChatShareType], animated: Bool, from: UIView?, completion: (() -> Void)?, didSelect: ((AddressChatShareType) -> Void)?) {
+    func presentShareAlertFor(
+        adm: String,
+        name: String,
+        types: [AddressChatShareType],
+        animated: Bool,
+        from: UIView?,
+        completion: (() -> Void)?,
+        didSelect: ((AddressChatShareType) -> Void)?
+    ) {
         let alert = makeSafeAlertController(
             title: adm,
             message: nil,
@@ -246,27 +254,35 @@ extension AdamantDialogService {
             source: from
         )
         
+        let source: ViewSource? = from.map { .view($0) }
+        
         for type in types {
-            alert.addAction(UIAlertAction(title: type.localized + name, style: .default) { _ in
+            alert.addAction(
+                UIAlertAction(title: type.localized + name, style: .default) { _ in
                 didSelect?(type)
             })
         }
-        let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: adm, params: nil))
-        addActions(to: alert,
-                   stringForPasteboard: adm,
-                   stringForShare: adm,
-                   stringForQR: adm,
-                   types: [
-                    .copyToPasteboard,
-                    .share,
-                    .generateQr(encodedContent: encodedAddress,
-                                sharingTip: adm,
-                                withLogo: true
-                               )
-                   ],
-                   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-                   from: nil,
-                   completion: nil
+        
+        let encodedAddress = AdamantUriTools.encode(
+            request: AdamantUri.address(address: adm, params: nil)
+        )
+        
+        addActions(
+            to: alert,
+            stringForPasteboard: adm,
+            stringForShare: adm,
+            stringForQR: adm,
+            types: [
+                .copyToPasteboard,
+                .share,
+                .generateQr(encodedContent: encodedAddress,
+                            sharingTip: adm,
+                            withLogo: true
+                           )
+            ],
+            excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+            from: source,
+            completion: nil
         )
         
         if let sourceView = from {
@@ -280,12 +296,7 @@ extension AdamantDialogService {
     }
     
     func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?) {
-        let source: ViewSource?
-        if let from = from {
-            source = .view(from)
-        } else {
-            source = nil
-        }
+        let source: ViewSource? = from.map { .view($0) }
         
         let alert = createShareAlertFor(stringForPasteboard: string, stringForShare: string, stringForQR: string, types: types, excludedActivityTypes: excludedActivityTypes, animated: animated, from: source, completion: completion)
         
@@ -316,12 +327,7 @@ extension AdamantDialogService {
     }
     
     func presentShareAlertFor(stringForPasteboard: String, stringForShare: String, stringForQR: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?) {
-        let source: ViewSource?
-        if let from = from {
-            source = .view(from)
-        } else {
-            source = nil
-        }
+        let source: ViewSource? = from.map { .view($0) }
         
         let alert = createShareAlertFor(stringForPasteboard: stringForPasteboard, stringForShare: stringForShare, stringForQR: stringForQR, types: types, excludedActivityTypes: excludedActivityTypes, animated: animated, from: source, completion: completion)
         
@@ -404,7 +410,11 @@ extension AdamantDialogService {
                         vc.popoverPresentationController?.barButtonItem = item
                         
                     default:
-                        break
+                        if UIDevice.current.userInterfaceIdiom == .pad {
+                            vc.popoverPresentationController?.sourceView = alert.view
+                            vc.popoverPresentationController?.sourceRect = alert.view.bounds
+                            vc.popoverPresentationController?.canOverlapSourceViewRect = false
+                        }
                     }
                     vc.modalPresentationStyle = .overFullScreen
                     self?.present(vc, animated: true, completion: completion)

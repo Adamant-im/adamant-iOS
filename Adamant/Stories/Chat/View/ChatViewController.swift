@@ -500,10 +500,18 @@ private extension ChatViewController {
 
 private extension ChatViewController {
     func didTapAdmChat(with chatroom: Chatroom, message: String?) {
-        guard let chatlistVC = self.navigationController?.viewControllers.first as? ChatListViewController
-        else {
-            return
+        var chatlistVC: ChatListViewController?
+        
+        if let nav = splitViewController?.viewControllers.first as? UINavigationController,
+           let vc = nav.viewControllers.first as? ChatListViewController {
+            chatlistVC = vc
         }
+        
+        if let vc = navigationController?.viewControllers.first as? ChatListViewController {
+            chatlistVC = vc
+        }
+        
+        guard let chatlistVC = chatlistVC else { return }
         
         let vc = chatlistVC.chatViewController(for: chatroom)
         if let message = message {
