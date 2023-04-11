@@ -11,7 +11,7 @@ import Foundation
 extension AdamantScene {
     struct Delegates {
         static let delegates = AdamantScene(identifier: "DelegatesListViewController", factory: { r in
-            let c = DelegatesListViewController(nibName: "DelegatesListViewController", bundle: nil)
+            let c = DelegatesListViewController()
             c.apiService = r.resolve(ApiService.self)
             c.accountService = r.resolve(AccountService.self)
             c.dialogService = r.resolve(DialogService.self)

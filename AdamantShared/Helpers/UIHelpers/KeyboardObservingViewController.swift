@@ -14,6 +14,7 @@ class KeyboardObservingViewController: UIViewController {
     private var keyboardFrame: CGRect = .zero
     
     override func viewDidLoad() {
+        super.viewDidLoad()
         subscription = makeKeyboardSubscription()
     }
     
@@ -37,7 +38,7 @@ private extension KeyboardObservingViewController {
     
     func makeKeyboardSubscription() -> AnyCancellable {
         NotificationCenter.default
-            .publisher(for: UIResponder.keyboardDidChangeFrameNotification, object: nil)
+            .publisher(for: UIResponder.keyboardWillChangeFrameNotification, object: nil)
             .sink { [weak self] in self?.onKeyboardFrameChange($0) }
     }
     

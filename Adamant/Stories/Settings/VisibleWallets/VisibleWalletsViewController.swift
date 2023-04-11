@@ -18,8 +18,7 @@ extension String.adamantLocalized {
     }
 }
 
-class VisibleWalletsViewController: UIViewController {
-    
+final class VisibleWalletsViewController: KeyboardObservingViewController {
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.register(VisibleWalletsTableViewCell.self, forCellReuseIdentifier: cellIdentifier)
