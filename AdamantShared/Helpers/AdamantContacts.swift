@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum AdamantContacts {
+enum AdamantContacts: CaseIterable {
     case adamantBountyWallet
     case adamantNewBountyWallet
     case adamantIco
@@ -19,16 +19,9 @@ enum AdamantContacts {
     case adamantWelcomeWallet
     case adelina
     
-    static let systemAddresses = [
-        AdamantContacts.adelina.name,
-        AdamantContacts.adamantExchange.name,
-        AdamantContacts.betOnBitcoin.name,
-        AdamantContacts.adamantIco.name,
-        AdamantContacts.adamantBountyWallet.name,
-        AdamantContacts.adamantNewBountyWallet.name,
-        AdamantContacts.donate.name,
-        AdamantContacts.adamantWelcomeWallet.name
-    ]
+    static var systemAddresses: [String] {
+        Self.allCases.map { $0.name }
+    }
     
     var name: String {
         switch self {
@@ -109,5 +102,40 @@ enum AdamantContacts {
         case .adamantIco, .iosSupport, .adamantWelcomeWallet:
             return "avatar_bots"
         }
+    }
+    
+    var nodeNameKey: String? {
+        switch self {
+        case .adamantBountyWallet, .adamantNewBountyWallet:
+            return "chats.virtual.bounty_wallet_title"
+        case .adamantExchange:
+            return "chats.virtual.exchange_bot_title"
+        case .betOnBitcoin:
+            return "chats.virtual.bitcoin_bet_title"
+        case .donate:
+            return "chats.virtual.donate_bot_title"
+        case .adelina:
+            return "chats.virtual.adelina_title"
+        case .adamantIco, .adamantWelcomeWallet, .iosSupport:
+            return nil
+        }
+    }
+}
+
+extension AdamantContacts {
+    init?(nodeNameKey: String) {
+        guard
+            let contact = Self.allCases
+                .first(where: { nodeNameKey == $0.nodeNameKey })
+        else { return nil }
+        self = contact
+    }
+    
+    init?(address: String) {
+        guard
+            let contact = Self.allCases
+                .first(where: { address == $0.address })
+        else { return nil }
+        self = contact
     }
 }
