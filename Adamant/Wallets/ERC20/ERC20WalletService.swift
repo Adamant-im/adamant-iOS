@@ -318,7 +318,7 @@ class ERC20WalletService: WalletService {
         }
         
         do {
-            var transaction = try await erc20.transfer(
+            let transaction = try await erc20.transfer(
                 from: ethWallet.ethAddress,
                 to: ethWallet.ethAddress,
                 amount: "\(ethWallet.balance)"
