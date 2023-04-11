@@ -27,9 +27,10 @@ public struct APIErrors: Decodable {
 }
 
 /// Protocol describing an error
-public struct APIError {
-
+public struct APIError: LocalizedError {
     public let message: String
+    
+    public var errorDescription: String? { message }
 
     public init(message: String) {
         self.message = message

@@ -10,12 +10,11 @@ import UIKit
 import SnapKit
 import Combine
 
-final class ChatTransactionContainerView: UIView {
+final class ChatTransactionContainerView: UIView, ChatModelView {
+    var subscription: AnyCancellable?
+    
     var model: Model = .default {
-        didSet {
-            guard model != oldValue else { return }
-            update()
-        }
+        didSet { update() }
     }
     
     var actionHandler: (ChatAction) -> Void = { _ in } {
@@ -23,7 +22,6 @@ final class ChatTransactionContainerView: UIView {
     }
     
     private let contentView = ChatTransactionContentView()
-    private var statusSubscription: AnyCancellable?
     
     private lazy var statusButton: UIButton = {
         let button = UIButton()
@@ -110,7 +108,7 @@ private extension TransactionStatus {
     var image: UIImage {
         switch self {
         case .notInitiated: return #imageLiteral(resourceName: "status_updating")
-        case .pending, .registered: return #imageLiteral(resourceName: "status_pending")
+        case .pending, .registered, .noNetwork, .noNetworkFinal: return #imageLiteral(resourceName: "status_pending")
         case .success: return #imageLiteral(resourceName: "status_success")
         case .failed: return #imageLiteral(resourceName: "status_failed")
         case .inconsistent: return #imageLiteral(resourceName: "status_warning")
@@ -120,7 +118,7 @@ private extension TransactionStatus {
     var imageTintColor: UIColor {
         switch self {
         case .notInitiated: return .adamant.secondary
-        case .pending, .registered: return .adamant.primary
+        case .pending, .registered, .noNetwork, .noNetworkFinal: return .adamant.primary
         case .success: return .adamant.active
         case .failed, .inconsistent: return .adamant.alert
         }

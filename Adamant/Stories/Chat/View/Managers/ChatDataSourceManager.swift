@@ -71,12 +71,15 @@ final class ChatDataSourceManager: MessagesDataSource {
             ChatViewController.TransactionCell.self,
             for: indexPath
         )
-    
-        if case let .transaction(model) = message.fullModel.content {
-            cell.wrappedView.actionHandler = { [weak self] in self?.handleAction($0) }
-            cell.wrappedView.model = model
+        
+        let publisher: any Observable<ChatTransactionContainerView.Model> = viewModel.$messages.compactMap {
+            let message = $0[safe: indexPath.section]
+            guard case let .transaction(model) = message?.fullModel.content else { return nil }
+            return model.value
         }
         
+        cell.wrappedView.actionHandler = { [weak self] in self?.handleAction($0) }
+        cell.wrappedView.setSubscription(publisher: publisher)
         return cell
     }
 }

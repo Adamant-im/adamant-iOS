@@ -14,8 +14,17 @@ extension DogeWalletService: RichMessageProviderWithStatusCheck {
             return .init(sentDate: nil, status: .inconsistent)
         }
         
-        guard let dogeTransaction = try? await getTransaction(by: hash) else {
-            return .init(sentDate: nil, status: .pending)
+        let dogeTransaction: BTCRawTransaction
+        
+        do {
+            dogeTransaction = try await getTransaction(by: hash)
+        } catch {
+            switch error {
+            case ApiServiceError.networkError(_):
+                return .init(sentDate: nil, status: .noNetwork)
+            default:
+                return .init(sentDate: nil, status: .pending)
+            }
         }
         
         return .init(

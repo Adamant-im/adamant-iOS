@@ -15,8 +15,17 @@ extension LskWalletService: RichMessageProviderWithStatusCheck {
             return .init(sentDate: nil, status: .inconsistent)
         }
         
-        guard var lskTransaction = try? await getTransaction(by: hash) else {
-            return .init(sentDate: nil, status: .pending)
+        var lskTransaction: Transactions.TransactionModel
+        
+        do {
+            lskTransaction = try await getTransaction(by: hash)
+        } catch {
+            switch error {
+            case ApiServiceError.networkError(_):
+                return .init(sentDate: nil, status: .noNetwork)
+            default:
+                return .init(sentDate: nil, status: .pending)
+            }
         }
         
         lskTransaction.updateConfirmations(value: lastHeight)

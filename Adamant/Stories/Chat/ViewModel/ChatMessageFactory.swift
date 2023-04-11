@@ -124,7 +124,7 @@ private extension ChatMessageFactory {
         guard let transfer = transaction.transfer else { return .default }
         let id = transaction.chatMessageId ?? ""
         
-        return .transaction(.init(
+        return .transaction(.init(value: .init(
             id: id,
             isFromCurrentSender: isFromCurrentSender,
             content: .init(
@@ -140,7 +140,7 @@ private extension ChatMessageFactory {
                 backgroundColor: backgroundColor
             ),
             status: transaction.transactionStatus ?? .notInitiated
-        ))
+        )))
     }
     
     func makeContent(
@@ -150,7 +150,7 @@ private extension ChatMessageFactory {
     ) -> ChatMessage.Content {
         let id = transaction.chatMessageId ?? ""
         
-        return .transaction(.init(
+        return .transaction(.init(value: .init(
             id: id,
             isFromCurrentSender: isFromCurrentSender,
             content: .init(
@@ -168,7 +168,7 @@ private extension ChatMessageFactory {
                 backgroundColor: backgroundColor
             ),
             status: transaction.statusEnum.toTransactionStatus()
-        ))
+        )))
     }
     
     func makeBottomString(

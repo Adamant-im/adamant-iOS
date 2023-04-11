@@ -9,7 +9,10 @@
 import Foundation
 
 extension RichMessageProviderWithStatusCheck {
-    func statusWithFilters(transaction: RichMessageTransaction) async -> TransactionStatus {
+    func statusWithFilters(
+        transaction: RichMessageTransaction,
+        oldPendingAttempts: Int
+    ) async -> TransactionStatus {
         let info = await statusInfoFor(transaction: transaction)
         
         switch info.status {
@@ -17,22 +20,23 @@ extension RichMessageProviderWithStatusCheck {
             return consistencyFilter(transaction: transaction, statusInfo: info)
                 ? info.status
                 : .inconsistent
-        case .notInitiated, .pending:
-            return timeFilter(transaction: transaction, statusInfo: info)
+        case .pending:
+            return pendingAttemptsCountFilter(oldPendingAttempts: oldPendingAttempts, status: info.status)
                 ? info.status
                 : .failed
-        case .failed, .inconsistent, .registered:
+        case .noNetwork:
+            return pendingAttemptsCountFilter(oldPendingAttempts: oldPendingAttempts, status: info.status)
+                ? info.status
+                : .noNetworkFinal
+        case .failed, .inconsistent, .registered, .notInitiated, .noNetworkFinal:
             return info.status
         }
     }
 }
 
 private extension RichMessageProviderWithStatusCheck {
-    func timeFilter(transaction: RichMessageTransaction, statusInfo: TransactionStatusInfo) -> Bool {
-        guard let date = statusInfo.sentDate ?? transaction.sentDate else { return false }
-        
-        let timeAgo = -1 * date.timeIntervalSinceNow
-        return timeAgo <= consistencyMaxTime
+    func pendingAttemptsCountFilter(oldPendingAttempts: Int, status: TransactionStatus) -> Bool {
+        oldPendingAttempts < self.oldPendingAttempts
     }
     
     func consistencyFilter(transaction: RichMessageTransaction, statusInfo: TransactionStatusInfo) -> Bool {
@@ -41,9 +45,8 @@ private extension RichMessageProviderWithStatusCheck {
             let messageDate = transaction.sentDate
         else { return false }
         
-        let start = messageDate.addingTimeInterval(-60 * 5)
         let end = messageDate.addingTimeInterval(consistencyMaxTime)
-        let dateRange = start...end
+        let dateRange = messageDate...end
         
         return dateRange.contains(transactionDate)
     }

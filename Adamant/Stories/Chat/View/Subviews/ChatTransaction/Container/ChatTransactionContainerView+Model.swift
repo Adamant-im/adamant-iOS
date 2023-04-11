@@ -9,11 +9,11 @@
 import Foundation
 
 extension ChatTransactionContainerView {
-    struct Model: Equatable {
+    struct Model: ChatReusableViewModelProtocol {
         let id: String
         let isFromCurrentSender: Bool
         let content: ChatTransactionContentView.Model
-        var status: TransactionStatus
+        let status: TransactionStatus
         
         static let `default` = Self(
             id: "",
