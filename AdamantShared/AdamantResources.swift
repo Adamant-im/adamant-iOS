@@ -29,8 +29,7 @@ enum AdamantResources {
     }
     
     static let ethServers = [
-        "https://ethnode1.adamant.im/"
-//        "https://ropsten.infura.io/"  // test network
+        "https://ethnode2.adamant.im/"
     ]
     
     static let lskServers = [
