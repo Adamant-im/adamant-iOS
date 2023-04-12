@@ -90,10 +90,10 @@ extension WalletServiceError: RichError {
     
     var level: ErrorLevel {
         switch self {
-        case .notLogged, .notEnoughMoney, .networkError, .accountNotFound, .invalidAmount, .walletNotInitiated, .transactionNotFound, .requestCancelled, .dustAmountError:
+        case .notLogged, .notEnoughMoney, .networkError, .accountNotFound, .invalidAmount, .walletNotInitiated, .transactionNotFound, .requestCancelled:
             return .warning
             
-        case .remoteServiceError, .internalError:
+        case .remoteServiceError, .internalError, .dustAmountError:
             return .error
             
         case .apiError(let error):

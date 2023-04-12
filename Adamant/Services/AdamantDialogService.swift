@@ -7,12 +7,11 @@
 //
 
 import UIKit
-import PMAlertController
 import MessageUI
 import PopupKit
 import SafariServices
 
-class AdamantDialogService: DialogService {
+final class AdamantDialogService: DialogService {
     // MARK: Dependencies
     private let router: Router
     private let popupManager = PopupManager()
@@ -109,73 +108,24 @@ extension AdamantDialogService {
     }
     
     private func internalShowError(withMessage message: String, error: Error? = nil) {
-        popupManager.dismissAlert()
-        
-        let alertVC = PMAlertController(title: String.adamantLocalized.alert.error, description: message, image: #imageLiteral(resourceName: "error"), style: .alert)
-        alertVC.alertView.backgroundColor = .adamant.backgroundColor
-        alertVC.headerView.backgroundColor = .adamant.backgroundColor
-        alertVC.gravityDismissAnimation = false
-        alertVC.alertTitle.textColor = UIColor.adamant.primary
-        alertVC.alertDescription.textColor = UIColor.adamant.secondary
-        alertVC.alertTitle.font = UIFont.systemFont(ofSize: 20)
-        alertVC.alertDescription.font = UIFont.systemFont(ofSize: 14, weight: .light)
-        alertVC.headerViewHeightConstraint.constant = 50
-        
-        let supportBtn = PMAlertAction(title: AdamantResources.supportEmail, style: .default) {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-                guard let dialogService = self, var presenter = dialogService.getTopmostViewController() else {
-                    print("Lost connecting with dialog service")
-                    return
+        popupManager.showAdvancedAlert(model: .init(
+            icon: #imageLiteral(resourceName: "error"),
+            title: .adamantLocalized.alert.error,
+            text: message,
+            secondaryButton: .init(
+                title: AdamantResources.supportEmail,
+                action: .init(id: .zero) { [weak self] in
+                    self?.sendErrorEmail(errorDescription: message)
+                    self?.popupManager.dismissAdvancedAlert()
                 }
-                
-                // Fix issue when PMAlertController is still top ViewController
-                if presenter is PMAlertController, let vc = presenter.presentingViewController {
-                    presenter = vc
+            ),
+            primaryButton: .init(
+                title: .adamantLocalized.alert.ok,
+                action: .init(id: .zero) { [weak popupManager] in
+                    popupManager?.dismissAdvancedAlert()
                 }
-                
-                let body: String
-                
-                if let error = error {
-                    let errorDescription = String(describing: error)
-                    body = String(format: String.adamantLocalized.alert.emailErrorMessageBodyWithDescription, message,
-                        errorDescription,
-                        AdamantUtilities.deviceInfo
-                    )
-                } else {
-                    body = String(
-                        format: String.adamantLocalized.alert.emailErrorMessageBody,
-                        message,
-                        AdamantUtilities.deviceInfo
-                    )
-                }
-                
-                presenter.openEmailScreen(
-                    recipient: AdamantResources.supportEmail,
-                    subject: .adamantLocalized.alert.emailErrorMessageTitle,
-                    body: body,
-                    delegate: dialogService.mailDelegate
-                )
-            }
-        }
-        
-        supportBtn.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        supportBtn.setTitleColor(UIColor(hex: "#00B6FF"), for: .normal)
-        supportBtn.separator.isHidden = true
-        
-        alertVC.addAction(supportBtn)
-        
-        let okBtn = PMAlertAction(title: String.adamantLocalized.alert.ok, style: .default)
-        
-        okBtn.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        okBtn.setTitleColor(UIColor.white, for: .normal)
-        okBtn.backgroundColor = UIColor.adamant.errorOkButton
-        alertVC.addAction(okBtn)
-        
-        alertVC.alertActionStackView.axis = .vertical
-        alertVC.alertActionStackView.spacing = 0
-        alertVC.alertActionStackViewHeightConstraint.constant = 100
-        alertVC.modalPresentationStyle = .overFullScreen
-        present(alertVC, animated: true, completion: nil)
+            )
+        ))
     }
     
     func showRichError(error: RichError) {
@@ -211,6 +161,29 @@ extension AdamantDialogService {
     func dissmisNoConnectionNotification() {
         DispatchQueue.onMainAsync { [weak popupManager] in
             popupManager?.dismissNotification()
+        }
+    }
+    
+    private func sendErrorEmail(errorDescription: String) {
+        let body = String(
+            format: .adamantLocalized.alert.emailErrorMessageBody,
+            errorDescription,
+            AdamantUtilities.deviceInfo
+        )
+        
+        if let vc = getTopmostViewController() {
+            vc.openEmailScreen(
+                recipient: AdamantResources.supportEmail,
+                subject: .adamantLocalized.alert.emailErrorMessageTitle,
+                body: body,
+                delegate: mailDelegate
+            )
+        } else {
+            AdamantUtilities.openEmailApp(
+                recipient: AdamantResources.supportEmail,
+                subject: .adamantLocalized.alert.emailErrorMessageTitle,
+                body: body
+            )
         }
     }
 }
@@ -568,29 +541,11 @@ extension AdamantDialogService {
     }
 }
 
-// MARK: - Alerts
-fileprivate extension UIAlertAction.Style {
-    func asPMAlertAction() -> PMAlertActionStyle {
-        switch self {
-        case .cancel:
-            return .cancel
-            
-        case .default,
-             .destructive:
-            return .default
-        @unknown default:
-            return .default
-        }
-    }
-}
-
 fileprivate extension AdamantAlertStyle {
     func asUIAlertControllerStyle() -> UIAlertController.Style {
         switch self {
-        case .alert,
-             .richNotification:
+        case .alert:
             return .alert
-            
         case .actionSheet:
             return .actionSheet
         }
@@ -601,11 +556,6 @@ fileprivate extension AdamantAlertAction {
     func asUIAlertAction() -> UIAlertAction {
         let handler = self.handler
         return UIAlertAction(title: self.title, style: self.style, handler: { _ in handler?() })
-    }
-    
-    func asPMAlertAction() -> PMAlertAction {
-        let handler = self.handler
-        return PMAlertAction(title: self.title, style: self.style.asPMAlertAction(), action: handler)
     }
 }
 
@@ -620,14 +570,6 @@ extension AdamantDialogService {
                 showAlert(title: title, message: message, style: uiStyle, actions: uiActions, from: from)
             } else {
                 showAlert(title: title, message: message, style: uiStyle, actions: nil, from: from)
-            }
-            
-        case .richNotification:
-            if let actions = actions {
-                let pmActions: [PMAlertAction] = actions.map { $0.asPMAlertAction() }
-                showAlert(title: title ?? "", message: message ?? "", actions: pmActions)
-            } else {
-                showAlert(title: title ?? "", message: message ?? "", actions: nil)
             }
         }
     }
@@ -657,47 +599,6 @@ extension AdamantDialogService {
         }
         
         present(alert, animated: true, completion: nil)
-    }
-    
-    func showAlert(title: String, message: String, actions: [PMAlertAction]?) {
-        let alertVC = PMAlertController(title: title, description: message, image: nil, style: .alert)
-        
-        alertVC.gravityDismissAnimation = false
-        alertVC.alertTitle.textColor = UIColor.adamant.primary
-        alertVC.alertDescription.textColor = UIColor.adamant.secondary
-        alertVC.alertTitle.font = UIFont.systemFont(ofSize: 20)
-        alertVC.alertDescription.font = UIFont.systemFont(ofSize: 14, weight: .light)
-        
-        if let actions = actions {
-            for action in actions {
-                action.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-                action.setTitleColor(UIColor.adamant.secondary, for: .normal)
-                alertVC.addAction(action)
-            }
-            
-            let cancelAction = PMAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel)
-            cancelAction.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-            cancelAction.setTitleColor(UIColor.white, for: .normal)
-            cancelAction.backgroundColor = UIColor.adamant.secondary
-
-            alertVC.addAction(cancelAction)
-            
-            alertVC.alertActionStackViewHeightConstraint.constant = CGFloat((actions.count + 1) * 50) + alertVC.alertActionStackView.spacing * CGFloat(actions.count)
-        } else {
-            let okBtn = PMAlertAction(title: String.adamantLocalized.alert.ok, style: .default)
-            
-            okBtn.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-            okBtn.setTitleColor(UIColor.white, for: .normal)
-            okBtn.backgroundColor = UIColor.adamant.secondary
-            alertVC.addAction(okBtn)
-            
-            alertVC.alertActionStackViewHeightConstraint.constant = 50
-        }
-        alertVC.modalPresentationStyle = .overFullScreen
-        
-        DispatchQueue.onMainAsync { [weak self] in
-            self?.present(alertVC, animated: true, completion: nil)
-        }
     }
 }
 

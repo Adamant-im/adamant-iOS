@@ -7,19 +7,24 @@
 
 import Foundation
 
-struct HashableAction {
-    let id: Int
-    let action: () -> Void
+public struct HashableAction {
+    public let id: Int
+    public let action: () -> Void
+    
+    public init(id: Int, action: @escaping () -> Void) {
+        self.id = id
+        self.action = action
+    }
 }
 
 extension HashableAction: Equatable {
-    static func == (lhs: HashableAction, rhs: HashableAction) -> Bool {
+    public static func == (lhs: HashableAction, rhs: HashableAction) -> Bool {
         lhs.id == rhs.id
     }
 }
 
 extension HashableAction: Hashable {
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
 }

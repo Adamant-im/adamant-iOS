@@ -1,28 +1,24 @@
 PODS:
   - FreakingSimpleRoundImageView (1.3)
   - MyLittlePinpad (0.3.1)
-  - PMAlertController (4.0.1)
   - SwiftLint (0.49.1)
 
 DEPENDENCIES:
   - FreakingSimpleRoundImageView
   - MyLittlePinpad
-  - PMAlertController
   - SwiftLint
 
 SPEC REPOS:
   trunk:
     - FreakingSimpleRoundImageView
     - MyLittlePinpad
-    - PMAlertController
     - SwiftLint
 
 SPEC CHECKSUMS:
   FreakingSimpleRoundImageView: 0d687cb05da8684e85c4c2ae9945bafcbe89d2a2
   MyLittlePinpad: d75682f2d817b490c49acc70a9ebd37da752281b
-  PMAlertController: ab5fcf4d085b7878c9451466d701449c4bf6efb8
   SwiftLint: 32ee33ded0636d0905ef6911b2b67bbaeeedafa5
 
-PODFILE CHECKSUM: 96c3f3259e1b04511cefe15d1b466483344d0ec2
+PODFILE CHECKSUM: df2a2cb6de1da3887504d2da3da1d90cfd15e8bb
 
 COCOAPODS: 1.11.3

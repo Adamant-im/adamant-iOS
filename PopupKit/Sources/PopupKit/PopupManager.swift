@@ -96,6 +96,18 @@ public extension PopupManager {
     }
 }
 
+// MARK: - Advanced alert
+
+public extension PopupManager {
+    func dismissAdvancedAlert() {
+        coordinatorModel.advancedAlert = nil
+    }
+    
+    func showAdvancedAlert(model: AdvancedAlertModel) {
+        coordinatorModel.advancedAlert = model
+    }
+}
+
 private let warningImage = UIImage(
     systemName: "multiply.circle",
     withConfiguration: UIImage.SymbolConfiguration(pointSize: 25, weight: .light)
