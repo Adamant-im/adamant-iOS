@@ -95,7 +95,7 @@ protocol RichError: Error {
 }
 
 enum AdamantAlertStyle {
-    case alert, actionSheet, richNotification
+    case alert, actionSheet
 }
 
 struct AdamantAlertAction {

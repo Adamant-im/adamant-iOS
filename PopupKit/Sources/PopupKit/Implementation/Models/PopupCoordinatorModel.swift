@@ -11,4 +11,5 @@ final class PopupCoordinatorModel: ObservableObject {
     @Published var notification: NotificationModel?
     @Published var alert: AlertModel?
     @Published var toastMessage: String?
+    @Published var advancedAlert: AdvancedAlertModel?
 }
