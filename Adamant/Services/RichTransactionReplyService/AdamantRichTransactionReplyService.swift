@@ -95,65 +95,64 @@ private extension AdamantRichTransactionReplyService {
         
         let transaction = try await apiService.getTransaction(id: id, withAsset: true)
         
-        if let chat = transaction.asset.chat {
-            let isOut = transaction.senderId == address
-            
-            let publicKey: String? = isOut
-            ? transaction.recipientPublicKey
-            : transaction.senderPublicKey
-            
-            let transactionStatus = isOut
-            ? String.adamantLocalized.chat.transactionSent
-            : String.adamantLocalized.chat.transactionReceived
-            
-            guard let publicKey = publicKey else { return unknownErrorMessage }
-            
-            let decodedMessage = adamantCore.decodeMessage(
-                rawMessage: chat.message,
-                rawNonce: chat.ownMessage,
-                senderPublicKey: publicKey,
-                privateKey: privateKey
-            )?.trimmingCharacters(in: .whitespacesAndNewlines)
-            
-            guard let decodedMessage = decodedMessage else { return unknownErrorMessage }
-            
-            var message: String
-            
-            switch chat.type {
-            case .message, .messageOld, .signal, .unknown:
-                let comment = !decodedMessage.isEmpty
-                ? ": \(decodedMessage)"
-                : ""
-                
-                message = transaction.amount > 0
-                ? "\(transactionStatus) \(transaction.amount) \(AdmWalletService.currencySymbol)\(comment)"
-                : decodedMessage
-                
-            case .richMessage:
-                if let data = decodedMessage.data(using: String.Encoding.utf8),
-                   let richContent = RichMessageTools.richContent(from: data),
-                   let type = richContent[RichContentKeys.type],
-                   let transfer = RichMessageTransfer(content: richContent) {
-                    let comment = !transfer.comments.isEmpty
-                    ? ": \(transfer.comments)"
-                    : ""
-                    let humanType = richMessageProvider[transfer.type]?.tokenSymbol ?? transfer.type
-                    
-                    message = "\(transactionStatus) \(transfer.amount) \(humanType)\(comment)"
-                } else if let data = decodedMessage.data(using: String.Encoding.utf8),
-                          let richContent = RichMessageTools.richContent(from: data),
-                          let replyMessage = richContent[RichContentKeys.reply.replyMessage] {
-                    
-                    message = replyMessage
-                } else {
-                    message = decodedMessage
-                }
-            }
-            
+        guard let chat = transaction.asset.chat else {
+            let message = "\(AdmWalletService.currencySymbol) \(transaction.amount)"
             return message
         }
+
+        let isOut = transaction.senderId == address
         
-        let message = "\(AdmWalletService.currencySymbol) \(transaction.amount)"
+        let publicKey: String? = isOut
+        ? transaction.recipientPublicKey
+        : transaction.senderPublicKey
+        
+        let transactionStatus = isOut
+        ? String.adamantLocalized.chat.transactionSent
+        : String.adamantLocalized.chat.transactionReceived
+        
+        guard let publicKey = publicKey else { return unknownErrorMessage }
+        
+        let decodedMessage = adamantCore.decodeMessage(
+            rawMessage: chat.message,
+            rawNonce: chat.ownMessage,
+            senderPublicKey: publicKey,
+            privateKey: privateKey
+        )?.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        guard let decodedMessage = decodedMessage else { return unknownErrorMessage }
+        
+        var message: String
+        
+        switch chat.type {
+        case .message, .messageOld, .signal, .unknown:
+            let comment = !decodedMessage.isEmpty
+            ? ": \(decodedMessage)"
+            : ""
+            
+            message = transaction.amount > 0
+            ? "\(transactionStatus) \(transaction.amount) \(AdmWalletService.currencySymbol)\(comment)"
+            : decodedMessage
+            
+        case .richMessage:
+            if let data = decodedMessage.data(using: String.Encoding.utf8),
+               let richContent = RichMessageTools.richContent(from: data),
+               let type = richContent[RichContentKeys.type],
+               let transfer = RichMessageTransfer(content: richContent) {
+                let comment = !transfer.comments.isEmpty
+                ? ": \(transfer.comments)"
+                : ""
+                let humanType = richMessageProvider[transfer.type]?.tokenSymbol ?? transfer.type
+                
+                message = "\(transactionStatus) \(transfer.amount) \(humanType)\(comment)"
+            } else if let data = decodedMessage.data(using: String.Encoding.utf8),
+                      let richContent = RichMessageTools.richContent(from: data),
+                      let replyMessage = richContent[RichContentKeys.reply.replyMessage] {
+                
+                message = replyMessage
+            } else {
+                message = decodedMessage
+            }
+        }
         
         return message
     }
