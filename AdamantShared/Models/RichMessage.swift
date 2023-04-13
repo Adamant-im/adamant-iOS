@@ -125,15 +125,15 @@ struct RichMessageTransfer: RichMessage {
 
 extension RichContentKeys {
     enum transfer {
-        case amount = "amount"
-        case hash = "hash"
-        case comments = "comments"
+        static let amount = "amount"
+        static let hash = "hash"
+        static let comments = "comments"
     }
     
     enum reply {
-        case replyToId = "replyto_id"
-        case replyMessage = "reply_message"
-        case decodedMessage = "decodedMessage"
+        static let replyToId = "replyto_id"
+        static let replyMessage = "reply_message"
+        static let decodedMessage = "decodedMessage"
     }
 }
 

@@ -179,8 +179,7 @@ final class ChatViewModel: NSObject {
                 message = .richMessage(
                     payload: RichMessageReply(
                         replyto_id: replyMessage.id,
-                        reply_message: replyMessage.makeReplyContent().string,
-                        message: text
+                        reply_message: text
                     )
                 )
             } else {

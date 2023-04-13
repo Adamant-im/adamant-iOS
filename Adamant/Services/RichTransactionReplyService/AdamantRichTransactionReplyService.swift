@@ -14,6 +14,7 @@ actor AdamantRichTransactionReplyService: NSObject, RichTransactionReplyService 
     private let apiService: ApiService
     private let adamantCore: AdamantCore
     private let accountService: AccountService
+    private var richMessageProvider: [String: RichMessageProvider] = [:]
     
     private lazy var controller = getRichTransactionsController()
     private let unknownErrorMessage = "UNKNOWN"
@@ -29,12 +30,23 @@ actor AdamantRichTransactionReplyService: NSObject, RichTransactionReplyService 
         self.adamantCore = adamantCore
         self.accountService = accountService
         super.init()
+        
+        self.richMessageProvider = self.makeRichMessageProviders()
     }
     
     func startObserving() {
         controller.delegate = self
         try? controller.performFetch()
         controller.fetchedObjects?.forEach( update(transaction:) )
+    }
+    
+    func makeRichMessageProviders() -> [String: RichMessageProvider] {
+        .init(
+            uniqueKeysWithValues: accountService
+                .wallets
+                .compactMap { $0 as? RichMessageProvider }
+                .map { ($0.dynamicRichMessageType, $0) }
+        )
     }
 }
 
@@ -65,7 +77,7 @@ private extension AdamantRichTransactionReplyService {
             
             do {
                 let message = try await getReplyMessage(by: UInt64(id) ?? 0)
-                print("reply message decoded = \(message)")
+                print("reply message decoded =\(message); id=\(id)")
                 
                 setReplyMessage(for: transaction, message: message)
             } catch {
@@ -90,6 +102,10 @@ private extension AdamantRichTransactionReplyService {
             ? transaction.recipientPublicKey
             : transaction.senderPublicKey
             
+            let transactionStatus = isOut
+            ? String.adamantLocalized.chat.transactionSent
+            : String.adamantLocalized.chat.transactionReceived
+            
             guard let publicKey = publicKey else { return unknownErrorMessage }
             
             let decodedMessage = adamantCore.decodeMessage(
@@ -105,14 +121,25 @@ private extension AdamantRichTransactionReplyService {
             
             switch chat.type {
             case .message, .messageOld, .signal, .unknown:
-                message = decodedMessage
+                let comment = !decodedMessage.isEmpty
+                ? ": \(decodedMessage)"
+                : ""
+                
+                message = transaction.amount > 0
+                ? "\(transactionStatus) \(transaction.amount) \(AdmWalletService.currencySymbol)\(comment)"
+                : decodedMessage
+                
             case .richMessage:
                 if let data = decodedMessage.data(using: String.Encoding.utf8),
                    let richContent = RichMessageTools.richContent(from: data),
                    let type = richContent[RichContentKeys.type],
                    let transfer = RichMessageTransfer(content: richContent) {
+                    let comment = !transfer.comments.isEmpty
+                    ? ": \(transfer.comments)"
+                    : ""
+                    let humanType = richMessageProvider[transfer.type]?.tokenSymbol ?? transfer.type
                     
-                    message = "\(transfer.type) \(transfer.amount) \(transfer.comments)"
+                    message = "\(transactionStatus) \(transfer.amount) \(humanType)\(comment)"
                 } else if let data = decodedMessage.data(using: String.Encoding.utf8),
                           let richContent = RichMessageTools.richContent(from: data),
                           let replyMessage = richContent[RichContentKeys.reply.replyMessage] {
@@ -126,7 +153,7 @@ private extension AdamantRichTransactionReplyService {
             return message
         }
         
-        let message = "ADM \(transaction.amount)"
+        let message = "\(AdmWalletService.currencySymbol) \(transaction.amount)"
         
         return message
     }
