@@ -65,10 +65,19 @@ extension AdamantApiService {
     }
     
     func getTransaction(id: UInt64) async throws -> Transaction {
+        try await getTransaction(id: id, withAsset: false)
+    }
+    
+    func getTransaction(id: UInt64, withAsset: Bool) async throws -> Transaction {
+        var queryItems = [
+            URLQueryItem(name: "id", value: String(id)),
+            URLQueryItem(name: "returnAsset", value: withAsset ? "1" : "0")
+        ]
+        
         return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Transaction, Error>) in
             sendRequest(
                 path: ApiCommands.Transactions.getTransaction,
-                queryItems: [URLQueryItem(name: "id", value: String(id))]
+                queryItems: queryItems
             ) { (serverResponse: ApiServiceResult<ServerModelResponse<Transaction>>) in
                 switch serverResponse {
                 case .success(let response):

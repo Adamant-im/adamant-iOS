@@ -97,6 +97,8 @@ protocol ApiService: AnyObject {
     
     func getTransaction(id: UInt64) async throws -> Transaction
     
+    func getTransaction(id: UInt64, withAsset: Bool) async throws -> Transaction
+    
     func getTransactions(
         forAccount: String,
         type: TransactionType,

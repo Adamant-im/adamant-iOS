@@ -126,18 +126,19 @@ private extension ChatMessageFactory {
         backgroundColor: ChatMessageBackgroundColor
     ) -> ChatMessage.Content {
         guard let content = transaction.richContent,
-              let message = content["message"],
-              let replyId = content["replyto_id"],
-              let replyMessage = content["reply_message"]
+              let replyId = content[RichContentKeys.reply.replyToId],
+              let replyMessage = content[RichContentKeys.reply.replyMessage]
         else {
             return .default
         }
         
+        let decodedMessage = content[RichContentKeys.reply.decodedMessage] ?? "..."
+        
         return .reply(.init(
             id: transaction.txId,
             replyId: replyId,
-            message: Self.markdownParser.parse(message),
-            messageReply: Self.markdownParser.parse(replyMessage),
+            message: Self.markdownParser.parse(replyMessage),
+            messageReply: Self.markdownParser.parse(decodedMessage),
             backgroundColor: backgroundColor
         ))
     }

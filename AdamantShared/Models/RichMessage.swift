@@ -40,22 +40,19 @@ struct RichMessageReply: RichMessage {
     var type: String
     var isReply: Bool
     var replyto_id: String
-    var message: String
     var reply_message: String
     
-    init(replyto_id: String, reply_message: String, message: String) {
+    init(replyto_id: String, reply_message: String) {
         self.type = "reply"
         self.replyto_id = replyto_id
-        self.message = message
         self.reply_message = reply_message
         self.isReply = true
     }
     
     func content() -> [String : String] {
         return [
-            "replyto_id": replyto_id,
-            "reply_message": reply_message,
-            "message": message
+            RichContentKeys.reply.replyToId: replyto_id,
+            RichContentKeys.reply.replyMessage: reply_message
         ]
     }
 }
@@ -127,12 +124,16 @@ struct RichMessageTransfer: RichMessage {
 }
 
 extension RichContentKeys {
-    struct transfer {
-        static let amount = "amount"
-        static let hash = "hash"
-        static let comments = "comments"
-        
-        private init() {}
+    enum transfer {
+        case amount = "amount"
+        case hash = "hash"
+        case comments = "comments"
+    }
+    
+    enum reply {
+        case replyToId = "replyto_id"
+        case replyMessage = "reply_message"
+        case decodedMessage = "decodedMessage"
     }
 }
 

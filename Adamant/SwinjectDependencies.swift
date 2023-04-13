@@ -216,5 +216,15 @@ extension Container {
                 richProviders: Dictionary(uniqueKeysWithValues: richProviders)
             )
         }.inObjectScope(.container)
+        
+        // MARK: Rich transaction reply service
+        self.register(RichTransactionReplyService.self) { r in
+            AdamantRichTransactionReplyService(
+                coreDataStack: r.resolve(CoreDataStack.self)!,
+                apiService: r.resolve(ApiService.self)!,
+                adamantCore: r.resolve(AdamantCore.self)!,
+                accountService: r.resolve(AccountService.self)!
+            )
+        }.inObjectScope(.container)
     }
 }
