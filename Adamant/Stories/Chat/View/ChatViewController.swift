@@ -489,14 +489,9 @@ private extension ChatViewController {
     }
     
     func closeReplyView() {
-        UIView.transition(
-            with: messageInputBar.topStackView,
-            duration: 0.25,
-            options: [.transitionCrossDissolve],
-            animations: {
-                self.replyView.removeFromSuperview()
-                self.messageInputBar.topStackViewPadding = .zero
-            })
+        replyView.removeFromSuperview()
+        messageInputBar.invalidateIntrinsicContentSize()
+        messageInputBar.layoutContainerViewIfNeeded()
     }
     
     func didTapTransfer(id: String) {
