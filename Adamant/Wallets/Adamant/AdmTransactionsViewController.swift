@@ -92,7 +92,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
             do {
                 try controller?.performFetch()
             } catch {
-                dialogService.showError(withMessage: "Failed to get transactions. Please, report a bug", error: error)
+                dialogService.showError(withMessage: "Failed to get transactions. Please, report a bug", supportEmail: true, error: error)
                 controller = nil
             }
             

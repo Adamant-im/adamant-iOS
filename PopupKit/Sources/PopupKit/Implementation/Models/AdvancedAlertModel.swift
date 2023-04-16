@@ -11,14 +11,14 @@ public struct AdvancedAlertModel: Equatable, Hashable {
     public let icon: UIImage
     public let title: String
     public let text: String
-    public let secondaryButton: Button
+    public let secondaryButton: Button?
     public let primaryButton: Button
     
     public init(
         icon: UIImage,
         title: String,
         text: String,
-        secondaryButton: Button,
+        secondaryButton: Button?,
         primaryButton: Button
     ) {
         self.icon = icon

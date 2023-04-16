@@ -11,7 +11,7 @@ import UIKit
 enum ChatDialog {
     case toast(String)
     case alert(String)
-    case error(String)
+    case error(String, supportEmail: Bool)
     case warning(String)
     case richError(Error)
     case freeTokenAlert

@@ -104,15 +104,8 @@ extension DashWalletService: RichMessageProvider {
                     richTransaction: transaction,
                     in: chat
                 )
-            } catch let error as ApiServiceError {
+            } catch {
                 dialogService.dismissProgress()
-                
-                guard case let .internalError(message, _) = error,
-                      message == "No transaction"
-                else {
-                    dialogService.showRichError(error: error)
-                    return
-                }
                 
                 presentDetailTransactionVC(
                     hash: hash,
@@ -125,9 +118,6 @@ extension DashWalletService: RichMessageProvider {
                     richTransaction: transaction,
                     in: chat
                 )
-            } catch {
-                dialogService.dismissProgress()
-                dialogService.showRichError(error: error)
             }
         }
     }

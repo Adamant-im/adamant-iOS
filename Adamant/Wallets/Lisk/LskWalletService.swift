@@ -251,9 +251,8 @@ class LskWalletService: WalletService {
                     continuation.resume(returning: (fee: fee, lastHeight: value.meta.lastBlockHeight))
                 case .error(response: let error):
                     continuation.resume(
-                        throwing: WalletServiceError.internalError(
-                            message: error.message,
-                            error: nil
+                        throwing: WalletServiceError.remoteServiceError(
+                            message: error.message
                         )
                     )
                 }
@@ -461,15 +460,29 @@ extension LskWalletService: SwinjectDependentService {
 // MARK: - Balances & addresses
 extension LskWalletService {
     func getBalance() async throws -> Decimal {
-        guard let wallet = self.lskWallet, let accountApi = accountApi else {
+        guard let address = lskWallet?.address else {
+            throw WalletServiceError.notLogged
+        }
+        
+        return try await getBalance(address: address)
+    }
+    
+    func getBalance(address: String) async throws -> Decimal {
+        guard
+            let accountApi = accountApi,
+            let address = LiskKit.Crypto.getBinaryAddressFromBase32(address)
+        else {
             throw WalletServiceError.notLogged
         }
         
         return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Decimal, Error>) in
-            accountApi.accounts(address: wallet.binaryAddress) { response in
+            accountApi.accounts(address: address) { [weak lskWallet] response in
                 switch response {
                 case .success(response: let response):
-                    self.lskWallet?.nounce = response.data.nonce
+                    if lskWallet?.binaryAddress == address {
+                        lskWallet?.nounce = response.data.nonce
+                    }
+                    
                     let balance = BigUInt(response.data.balance ?? "0") ?? BigUInt(0)
                     continuation.resume(
                         returning: balance.asDecimal(
@@ -478,13 +491,14 @@ extension LskWalletService {
                     )
                     
                 case .error(response: let error):
-                    if error.message == "Unexpected Error" {
+                    if error == .noNetwork {
                         continuation.resume(throwing: WalletServiceError.networkError)
+                    } else if error.code == 404 {
+                        continuation.resume(returning: .zero)
                     } else {
                         continuation.resume(
-                            throwing: WalletServiceError.internalError(
-                                message: error.message,
-                                error: nil
+                            throwing: WalletServiceError.remoteServiceError(
+                                message: error.message
                             )
                         )
                     }
@@ -498,10 +512,10 @@ extension LskWalletService {
         completion(.success(result: balance.asDecimal(exponent: LskWalletService.currencyExponent)))
     }
     func handleAccountError(with error: APIError, completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-        if error.message == "Unexpected Error" {
+        if error == .noNetwork {
             completion(.failure(error: .networkError))
         } else {
-            completion(.failure(error: .internalError(message: error.message, error: nil)))
+            completion(.failure(error: .remoteServiceError(message: error.message)))
         }
     }
     
@@ -517,10 +531,9 @@ extension LskWalletService {
                 throw WalletServiceError.walletNotInitiated
             }
             return result
-        } catch let error as ApiServiceError {
-            throw WalletServiceError.internalError(
-                message: "LSK Wallet: failed to get address from KVS",
-                error: error
+        } catch _ as ApiServiceError {
+            throw WalletServiceError.remoteServiceError(
+                message: "LSK Wallet: failed to get address from KVS"
             )
         }
     }
@@ -576,7 +589,7 @@ extension LskWalletService {
                     continuation.resume(returning: result)
                     
                 case .error(response: let error):
-                    continuation.resume(throwing: WalletServiceError.internalError(message: error.message, error: nil))
+                    continuation.resume(throwing: WalletServiceError.remoteServiceError(message: error.message))
                 }
             }
         }
@@ -598,17 +611,19 @@ extension LskWalletService {
                     if let transaction = result.first {
                         continuation.resume(returning: transaction)
                     } else {
-                        continuation.resume(throwing: ApiServiceError.internalError(message: "No transaction", error: nil))
+                        continuation.resume(throwing: WalletServiceError.remoteServiceError(message: "No transaction")
+                        )
                     }
                 case .error(response: let error):
-                    switch error.message {
-                    case APIError.unexpected.message:
+                    if error == .noNetwork {
                         continuation.resume(
                             throwing: ApiServiceError.networkError(error: error)
                         )
-                    default:
+                    } else {
                         continuation.resume(
-                            throwing: ApiServiceError.internalError(message: error.message, error: error)
+                            throwing: WalletServiceError.remoteServiceError(
+                                message: error.message
+                            )
                         )
                     }
                 }

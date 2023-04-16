@@ -78,9 +78,12 @@ extension TransfersProviderError: RichError {
         switch self {
         case .notLogged, .accountNotFound, .transactionNotFound, .networkError, .notEnoughMoney, .requestCancelled:
             return .warning
-            
-        case .serverError, .internalError, .dependencyError:
+        
+        case .serverError:
             return .error
+            
+        case .internalError, .dependencyError:
+            return .internalError
         }
     }
     

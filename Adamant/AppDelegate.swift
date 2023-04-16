@@ -211,7 +211,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             })
             
         } else {
-            dialogService.showError(withMessage: "Failed to register ChatsProvider autoupdate. Please, report a bug", error: nil)
+            dialogService.showError(withMessage: "Failed to register ChatsProvider autoupdate. Please, report a bug", supportEmail: true, error: nil)
         }
         
         if let transfersProvider = container.resolve(TransfersProvider.self) {
@@ -221,13 +221,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             })
         } else {
-            dialogService.showError(withMessage: "Failed to register TransfersProvider autoupdate. Please, report a bug", error: nil)
+            dialogService.showError(withMessage: "Failed to register TransfersProvider autoupdate. Please, report a bug", supportEmail: true, error: nil)
         }
         
         if let accountService = container.resolve(AccountService.self) {
             repeater.registerForegroundCall(label: "accountService", interval: 15, queue: .global(qos: .utility), callback: accountService.update)
         } else {
-            dialogService.showError(withMessage: "Failed to register AccountService autoupdate. Please, report a bug", error: nil)
+            dialogService.showError(withMessage: "Failed to register AccountService autoupdate. Please, report a bug", supportEmail: true, error: nil)
         }
         
         if let addressBookService = container.resolve(AddressBookService.self) {
@@ -237,14 +237,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             })
         } else {
-            dialogService.showError(withMessage: "Failed to register AddressBookService autoupdate. Please, report a bug", error: nil)
+            dialogService.showError(withMessage: "Failed to register AddressBookService autoupdate. Please, report a bug", supportEmail: true, error: nil)
         }
         
         if let currencyInfoService = container.resolve(CurrencyInfoService.self) {
             currencyInfoService.update() // Initial update
             repeater.registerForegroundCall(label: "currencyInfoService", interval: 60, queue: .global(qos: .utility), callback: currencyInfoService.update)
         } else {
-            dialogService.showError(withMessage: "Failed to register CurrencyInfoService autoupdate. Please, report a bug", error: nil)
+            dialogService.showError(withMessage: "Failed to register CurrencyInfoService autoupdate. Please, report a bug", supportEmail: true, error: nil)
         }
         
         // MARK: 7. Logout reset
@@ -310,7 +310,7 @@ extension AppDelegate {
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         if let service = container.resolve(DialogService.self) {
-            service.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.notifications.registerRemotesError, error.localizedDescription), error: error)
+            service.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.notifications.registerRemotesError, error.localizedDescription), supportEmail: true, error: error)
         }
     }
     

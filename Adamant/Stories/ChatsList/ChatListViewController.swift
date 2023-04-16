@@ -1154,7 +1154,7 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
     
     func didSelected(_ message: MessageTransaction) {
         guard let chatroom = message.chatroom else {
-            dialogService.showError(withMessage: "Error getting chatroom in SearchController result. Please, report an error", error: nil)
+            dialogService.showError(withMessage: "Error getting chatroom in SearchController result. Please, report an error", supportEmail: true, error: nil)
             searchController?.dismiss(animated: true, completion: nil)
             return
         }

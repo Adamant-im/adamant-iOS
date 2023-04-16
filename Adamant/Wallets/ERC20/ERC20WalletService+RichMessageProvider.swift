@@ -95,39 +95,28 @@ extension ERC20WalletService: RichMessageProvider {
             do {
                 let ethTransaction = try await getTransaction(by: hash)
                 vc.transaction = ethTransaction
-            } catch let error as WalletServiceError {
-                dialogService.dismissProgress()
-                switch error {
-                case .remoteServiceError:
-                    let amount: Decimal
-                    if let amountRaw = transaction.richContent?[RichContentKeys.transfer.amount], let decimal = Decimal(string: amountRaw) {
-                        amount = decimal
-                    } else {
-                        amount = 0
-                    }
-                    
-                    let failedTransaction = SimpleTransactionDetails(
-                        txId: hash,
-                        senderAddress: transaction.senderAddress,
-                        recipientAddress: transaction.recipientAddress,
-                        dateValue: nil,
-                        amountValue: amount,
-                        feeValue: nil,
-                        confirmationsValue: nil,
-                        blockValue: nil,
-                        isOutgoing: transaction.isOutgoing,
-                        transactionStatus: TransactionStatus.failed
-                    )
-                    
-                    vc.transaction = failedTransaction
-                    
-                default:
-                    dialogService.showRichError(error: error)
-                    return
-                }
             } catch {
-                dialogService.showRichError(error: error)
-                return
+                let amount: Decimal
+                if let amountRaw = transaction.richContent?[RichContentKeys.transfer.amount], let decimal = Decimal(string: amountRaw) {
+                    amount = decimal
+                } else {
+                    amount = 0
+                }
+                
+                let failedTransaction = SimpleTransactionDetails(
+                    txId: hash,
+                    senderAddress: transaction.senderAddress,
+                    recipientAddress: transaction.recipientAddress,
+                    dateValue: nil,
+                    amountValue: amount,
+                    feeValue: nil,
+                    confirmationsValue: nil,
+                    blockValue: nil,
+                    isOutgoing: transaction.isOutgoing,
+                    transactionStatus: TransactionStatus.failed
+                )
+                
+                vc.transaction = failedTransaction
             }
             
             dialogService.dismissProgress()
