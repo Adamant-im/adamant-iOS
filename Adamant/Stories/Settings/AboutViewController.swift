@@ -287,6 +287,7 @@ class AboutViewController: FormViewController {
                             String.adamantLocalized.sharedErrors.remoteServerError(
                                 message: error.localizedDescription
                             ),
+                        supportEmail: false,
                         error: error
                     )
                 }
@@ -296,6 +297,7 @@ class AboutViewController: FormViewController {
                         String.adamantLocalized.sharedErrors.remoteServerError(
                             message: error.localizedDescription
                         ),
+                    supportEmail: false,
                     error: error
                 )
             }

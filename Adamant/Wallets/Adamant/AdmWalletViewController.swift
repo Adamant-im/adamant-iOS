@@ -128,7 +128,11 @@ class AdmWalletViewController: WalletViewControllerBase {
             if let address = self?.service?.wallet?.address {
                 let urlRaw = String.adamantLocalized.wallets.getFreeTokensUrl(for: address)
                 guard let url = URL(string: urlRaw) else {
-                    self?.dialogService.showError(withMessage: "Failed to create URL with string: \(urlRaw)", error: nil)
+                    self?.dialogService.showError(
+                        withMessage: "Failed to create URL with string: \(urlRaw)",
+                        supportEmail: true,
+                        error: nil
+                    )
                     return
                 }
                 

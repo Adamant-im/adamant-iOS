@@ -104,15 +104,7 @@ extension LskWalletService: RichMessageProvider {
                     in: chat
                 )
                 
-            } catch let error as ApiServiceError {
-                guard case let .internalError(message, _) = error,
-                      message.contains("does not exist")
-                else {
-                    dialogService.dismissProgress()
-                    dialogService.showRichError(error: error)
-                    return
-                }
-                
+            } catch {
                 do {
                     let senderAddress = try await getWalletAddress(byAdamantAddress: transaction.senderAddress)
                     let recipientAddress = try await getWalletAddress(byAdamantAddress: transaction.recipientAddress)
@@ -134,9 +126,6 @@ extension LskWalletService: RichMessageProvider {
                     dialogService.dismissProgress()
                     dialogService.showRichError(error: error)
                 }
-            } catch {
-                dialogService.dismissProgress()
-                dialogService.showRichError(error: error)
             }
         }
     }

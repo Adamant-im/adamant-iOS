@@ -56,7 +56,7 @@ extension Web3Error {
         case .valueError(desc: let desc):
             return .internalError(message: "Unknown error \(String(describing: desc))", error: nil)
         case .serverError(code: let code):
-            return .internalError(message: "Unknown error \(code)", error: nil)
+            return .remoteServiceError(message: "Unknown error \(code)")
         case .clientError(code: let code):
             return .internalError(message: "Unknown error \(code)", error: nil)
         }
@@ -197,7 +197,7 @@ class EthWalletService: WalletService {
     func initiateNetwork(apiUrl: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
         Task {
             self._ethNodeUrl = apiUrl
-            guard let _ = await self.setupEthNode(with: apiUrl) else {
+            guard await self.setupEthNode(with: apiUrl) != nil else {
                 completion(.failure(error: WalletServiceError.networkError))
                 return
             }
@@ -318,9 +318,8 @@ class EthWalletService: WalletService {
             let price = try await web3.eth.gasPrice()
             return price
         } catch {
-            throw WalletServiceError.internalError(
-                message: error.localizedDescription,
-                error: error
+            throw WalletServiceError.remoteServiceError(
+                message: error.localizedDescription
             )
         }
 	}
@@ -340,9 +339,8 @@ class EthWalletService: WalletService {
             let price = try await web3.eth.estimateGas(for: transaction)
             return price
         } catch {
-            throw WalletServiceError.internalError(
-                message: error.localizedDescription,
-                error: error
+            throw WalletServiceError.remoteServiceError(
+                message: error.localizedDescription
             )
         }
     }
@@ -494,6 +492,14 @@ extension EthWalletService: SwinjectDependentService {
 
 // MARK: - Balances & addresses
 extension EthWalletService {
+    func getBalance(address: String) async throws -> Decimal {
+        guard let address = EthereumAddress(address) else {
+            throw WalletServiceError.internalError(message: "Incorrect address", error: nil)
+        }
+        
+        return try await getBalance(forAddress: address)
+    }
+    
 	func getBalance(forAddress address: EthereumAddress) async throws -> Decimal {
         guard let web3 = await self.web3 else {
             throw WalletServiceError.internalError(message: "Can't get web3 service", error: nil)
@@ -503,7 +509,7 @@ extension EthWalletService {
             let balance = try await web3.eth.getBalance(for: address)
             return balance.asDecimal(exponent: EthWalletService.currencyExponent)
         } catch {
-            throw WalletServiceError.internalError(message: error.localizedDescription, error: error)
+            throw WalletServiceError.remoteServiceError(message: error.localizedDescription)
         }
 	}
 	
@@ -516,10 +522,9 @@ extension EthWalletService {
             }
             
             return result
-        } catch let error as ApiServiceError {
-            throw WalletServiceError.internalError(
-                message: "ETH Wallet: failed to get address from KVS",
-                error: error
+        } catch _ as ApiServiceError {
+            throw WalletServiceError.remoteServiceError(
+                message: "ETH Wallet: failed to get address from KVS"
             )
         }
 	}
@@ -577,7 +582,7 @@ extension EthWalletService {
         } catch let error as Web3Error {
             throw error.asWalletServiceError()
         } catch {
-            throw WalletServiceError.internalError(message: "Failed to get transaction", error: error)
+            throw WalletServiceError.remoteServiceError(message: "Failed to get transaction")
         }
         
         // MARK: 2. Transaction receipt
@@ -636,7 +641,7 @@ extension EthWalletService {
                 throw error.asWalletServiceError()
             }
         } catch {
-            throw WalletServiceError.internalError(message: "Failed to get transaction", error: error)
+            throw WalletServiceError.remoteServiceError(message: "Failed to get transaction")
         }
     }
     

@@ -75,7 +75,7 @@ extension AddressBookServiceError: RichError {
         switch self {
         case .notLogged, .notEnoughMoney: return .warning
         case .apiServiceError(let error): return error.level
-        case .internalError: return .error
+        case .internalError: return .internalError
         }
     }
 }

@@ -117,17 +117,17 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
         }
         
         guard let vc = self.router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
-            dialogService.showError(withMessage: "AdmTransactionDetailsViewController: Failed to get ChatViewController", error: nil)
+            dialogService.showError(withMessage: "AdmTransactionDetailsViewController: Failed to get ChatViewController", supportEmail: true, error: nil)
             return
         }
 
         guard let chatroom = transfer.chatroom else {
-            dialogService.showError(withMessage: "AdmTransactionDetailsViewController: Failed to get chatroom for transaction.", error: nil)
+            dialogService.showError(withMessage: "AdmTransactionDetailsViewController: Failed to get chatroom for transaction.", supportEmail: true, error: nil)
             return
         }
 
         guard let account = accountService.account else {
-            dialogService.showError(withMessage: "AdmTransactionDetailsViewController: User not logged.", error: nil)
+            dialogService.showError(withMessage: "AdmTransactionDetailsViewController: User not logged.", supportEmail: true, error: nil)
             return
         }
 

@@ -200,7 +200,7 @@ class NewChatViewController: FormViewController {
                     self?.present(vc, animated: true, completion: nil)
                     
                 case .failure(error: let error):
-                    self?.dialogService.showError(withMessage: error.localizedDescription, error: error)
+                    self?.dialogService.showError(withMessage: error.localizedDescription, supportEmail: true, error: error)
                 }
             }
             
@@ -305,10 +305,10 @@ class NewChatViewController: FormViewController {
                         return
                     }
                     
-                    self.dialogService.showError(withMessage: error.localized, error: error)
+                    self.dialogService.showError(withMessage: error.localized, supportEmail: false, error: error)
                 }
             } catch {
-                self.dialogService.showError(withMessage: error.localizedDescription, error: error)
+                self.dialogService.showError(withMessage: error.localizedDescription, supportEmail: false, error: error)
             }
         }
     }

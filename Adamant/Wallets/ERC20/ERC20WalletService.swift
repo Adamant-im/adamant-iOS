@@ -298,9 +298,8 @@ class ERC20WalletService: WalletService {
             let price = try await web3.eth.gasPrice()
             return price
         } catch {
-            throw WalletServiceError.internalError(
-                message: error.localizedDescription,
-                error: error
+            throw WalletServiceError.remoteServiceError(
+                message: error.localizedDescription
             )
         }
     }
@@ -323,9 +322,8 @@ class ERC20WalletService: WalletService {
             let price = try await web3.eth.estimateGas(for: transaction)
             return price
         } catch {
-            throw WalletServiceError.internalError(
-                message: error.localizedDescription,
-                error: error
+            throw WalletServiceError.remoteServiceError(
+                message: error.localizedDescription
             )
         }
     }
@@ -423,7 +421,7 @@ extension ERC20WalletService {
         } catch _ as URLError {
             throw WalletServiceError.networkError
         } catch {
-            throw WalletServiceError.internalError(message: "Failed to get transaction", error: error)
+            throw WalletServiceError.remoteServiceError(message: "Failed to get transaction")
         }
         
         // MARK: 2. Transaction receipt
@@ -451,9 +449,8 @@ extension ERC20WalletService {
             let block = try await eth.block(by: receipt.blockHash)
             
             guard currentBlock >= blockNumber else {
-                throw WalletServiceError.internalError(
-                    message: "ERC20 confirmations calculating error",
-                    error: nil
+                throw WalletServiceError.remoteServiceError(
+                    message: "ERC20 confirmations calculating error"
                 )
             }
             
@@ -504,6 +501,14 @@ extension ERC20WalletService {
         }
     }
     
+    func getBalance(address: String) async throws -> Decimal {
+        guard let address = EthereumAddress(address) else {
+            throw WalletServiceError.internalError(message: "Incorrect address", error: nil)
+        }
+        
+        return try await getBalance(forAddress: address)
+    }
+    
     func getBalance(forAddress address: EthereumAddress) async throws -> Decimal {
         guard let address = self.ethWallet?.address,
               let walletAddress = EthereumAddress(address),
@@ -522,9 +527,8 @@ extension ERC20WalletService {
             let value = balance.asDecimal(exponent: exponent)
             return value
         } catch {
-            throw WalletServiceError.internalError(
-                message: "ERC 20 Service - Fail to get balance",
-                error: error
+            throw WalletServiceError.remoteServiceError(
+                message: "ERC 20 Service - Fail to get balance"
             )
         }
     }
@@ -539,9 +543,8 @@ extension ERC20WalletService {
             
             return result
         } catch let error as ApiServiceError {
-            throw WalletServiceError.internalError(
-                message: "ETH Wallet: failed to get address from KVS",
-                error: error
+            throw WalletServiceError.remoteServiceError(
+                message: "ETH Wallet: failed to get address from KVS"
             )
         }
     }

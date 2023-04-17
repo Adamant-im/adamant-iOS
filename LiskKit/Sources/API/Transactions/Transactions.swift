@@ -38,7 +38,7 @@ extension Transactions {
     /// Submit a signed transaction to the network
     public func submit(signedTransaction: LocalTransaction, completionHandler: @escaping (Response<TransactionBroadcastResponse>) -> Void) {
         guard signedTransaction.isSigned else {
-            let response = APIError(message: "Invalid Transaction - Transaction has not been signed")
+            let response = APIError(message: "Invalid Transaction - Transaction has not been signed", code: nil)
             return completionHandler(.error(response: response))
         }
 
@@ -61,7 +61,7 @@ extension Transactions {
             let signedTransaction = try transaction.signed(passphrase: passphrase, secondPassphrase: secondPassphrase)
             submit(signedTransaction: signedTransaction, completionHandler: completionHandler)
         } catch {
-            let response = APIError(message: error.localizedDescription)
+            let response = APIError(message: error.localizedDescription, code: nil)
             completionHandler(.error(response: response))
         }
     }
@@ -73,7 +73,7 @@ extension Transactions {
             let signedTransaction = try transaction.signed(keyPair: keyPair)
             submit(signedTransaction: signedTransaction, completionHandler: completionHandler)
         } catch {
-            let response = APIError(message: error.localizedDescription)
+            let response = APIError(message: error.localizedDescription, code: nil)
             completionHandler(.error(response: response))
         }
     }
@@ -92,7 +92,7 @@ extension Transactions {
             let signedTransaction = try transaction.signed(passphrase: passphrase, secondPassphrase: nil)
             submit(signedTransaction: signedTransaction, completionHandler: completionHandler)
         } catch {
-            let response = APIError(message: error.localizedDescription)
+            let response = APIError(message: error.localizedDescription, code: nil)
             completionHandler(.error(response: response))
         }
     }

@@ -101,24 +101,30 @@ extension AdamantDialogService {
         }
     }
     
-    func showError(withMessage message: String, error: Error? = nil) {
-        DispatchQueue.onMainAsync { [weak self] in
-            self?.internalShowError(withMessage: message, error: error)
+    func showError(withMessage message: String, supportEmail: Bool, error: Error? = nil) {
+        DispatchQueue.onMainAsync { [self] in
+            internalShowError(withMessage: message, supportEmail: supportEmail, error: error)
         }
     }
     
-    private func internalShowError(withMessage message: String, error: Error? = nil) {
+    private func internalShowError(
+        withMessage message: String,
+        supportEmail: Bool,
+        error: Error? = nil
+    ) {
         popupManager.showAdvancedAlert(model: .init(
             icon: #imageLiteral(resourceName: "error"),
             title: .adamantLocalized.alert.error,
             text: message,
-            secondaryButton: .init(
-                title: AdamantResources.supportEmail,
-                action: .init(id: .zero) { [weak self] in
-                    self?.sendErrorEmail(errorDescription: message)
-                    self?.popupManager.dismissAdvancedAlert()
-                }
-            ),
+            secondaryButton: supportEmail
+                ? .init(
+                    title: AdamantResources.supportEmail,
+                    action: .init(id: .zero) { [weak self] in
+                        self?.sendErrorEmail(errorDescription: message)
+                        self?.popupManager.dismissAdvancedAlert()
+                    }
+                )
+                : nil,
             primaryButton: .init(
                 title: .adamantLocalized.alert.ok,
                 action: .init(id: .zero) { [weak popupManager] in
@@ -132,9 +138,18 @@ extension AdamantDialogService {
         switch error.level {
         case .warning:
             showWarning(withMessage: error.message)
-            
         case .error:
-            showError(withMessage: error.message, error: error.internalError)
+            showError(
+                withMessage: error.message,
+                supportEmail: false,
+                error: error.internalError
+            )
+        case .internalError:
+            showError(
+                withMessage: error.message,
+                supportEmail: true,
+                error: error.internalError
+            )
         }
     }
     
@@ -142,7 +157,7 @@ extension AdamantDialogService {
         if let error = error as? RichError {
             showRichError(error: error)
         } else {
-            showError(withMessage: error.localizedDescription, error: error)
+            showError(withMessage: error.localizedDescription, supportEmail: true, error: error)
         }
     }
     
@@ -408,7 +423,11 @@ extension AdamantDialogService {
                         self?.present(vc, animated: true, completion: completion)
                         
                     case .failure(error: let error):
-                        self?.showError(withMessage: error.localizedDescription, error: error)
+                        self?.showError(
+                            withMessage: error.localizedDescription,
+                            supportEmail: true,
+                            error: error
+                        )
                     }
                 })
                 
@@ -510,7 +529,7 @@ extension AdamantDialogService {
     
     @objc private func image(_ image: UIImage, didFinishSavingWithError error: NSError?, contextInfo: UnsafeRawPointer) {
         if let error = error {
-            showError(withMessage: error.localizedDescription)
+            showError(withMessage: error.localizedDescription, supportEmail: true)
         } else {
             showSuccess(withMessage: String.adamantLocalized.alert.done)
         }

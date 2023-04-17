@@ -123,6 +123,11 @@ class AdmWalletService: NSObject, WalletService {
     }
     
     // MARK: - Tools
+    func getBalance(address: String) async throws -> Decimal {
+        let account = try await apiService.getAccount(byAddress: address)
+        return account.balance
+    }
+    
     func validate(address: String) -> AddressValidationResult {
         guard !AdamantContacts.systemAddresses.contains(address) else {
             return .system

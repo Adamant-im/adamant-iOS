@@ -27,12 +27,13 @@ public struct APIErrors: Decodable {
 }
 
 /// Protocol describing an error
-public struct APIError: LocalizedError {
+public struct APIError: LocalizedError, Equatable {
     public let message: String
+    public var code: Int?
     
     public var errorDescription: String? { message }
 
-    public init(message: String) {
+    public init(message: String, code: Int?) {
         self.message = message
     }
 }
@@ -55,10 +56,15 @@ extension APIError: Decodable {
 }
 
 extension APIError {
-
+    public static let noNetwork = Self.unexpected(code: nil)
+    
     /// Describes an unexpected error
-    public static let unexpected = APIError(message: "Unexpected Error")
+    public static func unexpected(code: Int?) -> Self {
+        .init(message: "Unexpected Error", code: code)
+    }
 
     /// Describes an unknown error response
-    public static let unknown = APIError(message: "Unknown Error")
+    public static func unknown(code: Int?) -> Self {
+        .init(message: "Unknown Error", code: code)
+    }
 }

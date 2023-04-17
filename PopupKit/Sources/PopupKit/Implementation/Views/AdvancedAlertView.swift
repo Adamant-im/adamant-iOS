@@ -21,8 +21,11 @@ struct AdvancedAlertView: View {
                     .padding(.bottom, smallSpacing)
                 textView
                     .padding(.bottom, bigSpacing)
-                secondaryButton
-                    .padding(.bottom, bigSpacing)
+                
+                if let secondaryButton = model.secondaryButton {
+                    makeSecondaryButton(model: secondaryButton)
+                        .padding(.bottom, bigSpacing)
+                }
             }.padding(.horizontal, bigSpacing)
             .background(widthReader)
             .onPreferenceChange(ViewPreferenceKey.self) { width = $0 }
@@ -49,8 +52,7 @@ private extension AdvancedAlertView {
     
     var iconView: some View {
         Image(uiImage: model.icon)
-            .renderingMode(.template)
-            .foregroundColor(.primary)
+            .renderingMode(.original)
             .frame(squareSize: 37)
     }
     
@@ -63,13 +65,6 @@ private extension AdvancedAlertView {
         Text(model.text)
             .multilineTextAlignment(.center)
             .font(.system(size: 13))
-    }
-    
-    var secondaryButton: some View {
-        Button(
-            model.secondaryButton.title,
-            action: model.secondaryButton.action.action
-        )
     }
     
     var primaryButton: some View {
@@ -87,6 +82,10 @@ private extension AdvancedAlertView {
                 value: $0.frame(in: .local).size.width
             )
         }
+    }
+    
+    func makeSecondaryButton(model: AdvancedAlertModel.Button) -> some View {
+        Button(model.title, action: model.action.action)
     }
 }
 

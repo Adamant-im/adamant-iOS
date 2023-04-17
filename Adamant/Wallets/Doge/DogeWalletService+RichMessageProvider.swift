@@ -103,38 +103,31 @@ extension DogeWalletService: RichMessageProvider {
                 dialogService.dismissProgress()
                 chat.navigationController?.pushViewController(vc, animated: true)
                 
-            } catch let error as ApiServiceError {
-                switch error {
-                case .internalError(let message, _) where message == "Unaviable transaction":
-                    dialogService.dismissProgress()
-                    dialogService.showAlert(title: nil, message: String.adamantLocalized.sharedErrors.transactionUnavailable, style: AdamantAlertStyle.alert, actions: nil, from: nil)
-                case .internalError(let message, _) where message == "No transaction":
-                    let amount: Decimal
-                    if let amountRaw = transaction.richContent?[RichContentKeys.transfer.amount], let decimal = Decimal(string: amountRaw) {
-                        amount = decimal
-                    } else {
-                        amount = 0
-                    }
-                    
-                    let failedTransaction = SimpleTransactionDetails(txId: hash,
-                                                                     senderAddress: transaction.senderAddress,
-                                                                     recipientAddress: transaction.recipientAddress,
-                                                                     dateValue: nil,
-                                                                     amountValue: amount,
-                                                                     feeValue: nil,
-                                                                     confirmationsValue: nil,
-                                                                     blockValue: nil,
-                                                                     isOutgoing: transaction.isOutgoing,
-                                                                     transactionStatus: TransactionStatus.failed)
-                    
-                    vc.transaction = failedTransaction
-                    
-                    dialogService.dismissProgress()
-                    chat.navigationController?.pushViewController(vc, animated: true)
-                default:
-                    dialogService.dismissProgress()
-                    dialogService.showRichError(error: error)
+            } catch {
+                let amount: Decimal
+                if let amountRaw = transaction.richContent?[RichContentKeys.transfer.amount], let decimal = Decimal(string: amountRaw) {
+                    amount = decimal
+                } else {
+                    amount = 0
                 }
+                
+                let failedTransaction = SimpleTransactionDetails(
+                    txId: hash,
+                    senderAddress: transaction.senderAddress,
+                    recipientAddress: transaction.recipientAddress,
+                    dateValue: nil,
+                    amountValue: amount,
+                    feeValue: nil,
+                    confirmationsValue: nil,
+                    blockValue: nil,
+                    isOutgoing: transaction.isOutgoing,
+                    transactionStatus: TransactionStatus.failed
+                )
+                
+                vc.transaction = failedTransaction
+                
+                dialogService.dismissProgress()
+                chat.navigationController?.pushViewController(vc, animated: true)
             }
         }
     }

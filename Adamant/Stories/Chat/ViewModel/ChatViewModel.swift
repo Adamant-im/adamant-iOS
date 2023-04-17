@@ -79,7 +79,10 @@ final class ChatViewModel: NSObject {
         let urlString: String = .adamantLocalized.wallets.getFreeTokensUrl(for: address)
         
         guard let url = URL(string: urlString) else {
-            dialog.send(.error("Failed to create URL with string: \(urlString)"))
+            dialog.send(.error(
+                "Failed to create URL with string: \(urlString)",
+                supportEmail: true
+            ))
             return nil
         }
         
@@ -527,10 +530,13 @@ private extension ChatViewModel {
                     return
                 }
                 
-                self.dialog.send(.error(error.localized))
+                self.dialog.send(.error(error.localized, supportEmail: false))
             }
         } catch {
-            self.dialog.send(.error(error.localizedDescription))
+            self.dialog.send(.error(
+                error.localizedDescription,
+                supportEmail: false
+            ))
         }
     }
     

@@ -130,16 +130,10 @@ extension AccountServiceError: RichError {
             return .warning
             
         case .apiError(let error):
-            switch error {
-            case .accountNotFound, .notLogged, .networkError, .requestCancelled:
-                return .warning
-                
-            case .serverError, .internalError:
-                return .error
-            }
+            return error.level
             
         case .internalError:
-            return .error
+            return .internalError
         }
     }
 }

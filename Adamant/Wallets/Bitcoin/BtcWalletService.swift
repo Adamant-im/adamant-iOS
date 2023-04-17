@@ -273,10 +273,9 @@ class BtcWalletService: WalletService {
             }
             
             return result
-        } catch let error as ApiServiceError {
-            throw WalletServiceError.internalError(
-                message: "BTC Wallet: failed to get address from KVS",
-                error: error
+        } catch _ as ApiServiceError {
+            throw WalletServiceError.remoteServiceError(
+                message: "BTC Wallet: failed to get address from KVS"
             )
         }
     }
@@ -383,14 +382,19 @@ extension BtcWalletService: SwinjectDependentService {
 
 // MARK: - Balances & addresses
 extension BtcWalletService {
-
     func getBalance() async throws -> Decimal {
-        guard let url = BtcWalletService.nodes.randomElement()?.asURL() else {
-            fatalError("Failed to get BTC endpoint URL")
+        guard let address = btcWallet?.address else {
+            throw WalletServiceError.walletNotInitiated
         }
         
-        guard let address = self.btcWallet?.address else {
-            throw WalletServiceError.walletNotInitiated
+        return try await getBalance(address: address)
+    }
+    
+    func getBalance(address: String) async throws -> Decimal {
+        guard let url = BtcWalletService.nodes.randomElement()?.asURL() else {
+            let message = "Failed to get BTC endpoint URL"
+            assertionFailure(message)
+            throw WalletServiceError.internalError(message: message, error: nil)
         }
         
         // Request url
@@ -449,9 +453,8 @@ extension BtcWalletService {
             let raw = String(data: data, encoding: .utf8),
             let value = Decimal(string: raw)
         else {
-            throw WalletServiceError.internalError(
-                message: "BTC Wallet: not a valid response",
-                error: nil
+            throw WalletServiceError.remoteServiceError(
+                message: "BTC Wallet: not a valid response"
             )
         }
         
@@ -625,11 +628,7 @@ extension BtcWalletService {
             
             return transaction
         } catch let error as ApiServiceError {
-            guard case .internalError = error else {
-                throw WalletServiceError.internalError(message: "No transaction", error: error)
-            }
-            
-            throw WalletServiceError.internalError(message: "Unaviable transaction", error: error)
+            throw WalletServiceError.remoteServiceError(message: error.message)
         }
     }
 
