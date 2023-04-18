@@ -708,17 +708,23 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
 
 // MARK: - NewChatViewControllerDelegate
 extension ChatListViewController: NewChatViewControllerDelegate {
-    func newChatController(_ controller: NewChatViewController, didSelectAccount account: CoreDataAccount, preMessage: String?) {
+    func newChatController(
+        _ controller: NewChatViewController,
+        didSelectAccount account: CoreDataAccount,
+        preMessage: String?,
+        name: String?
+    ) {
         guard let chatroom = account.chatroom else {
             fatalError("No chatroom?")
         }
         
-        if let name = account.name, let address = account.address {
+        if let name = name,
+           let address = account.address,
+           addressBook.getName(for: address) == nil {
+            account.name = name
+            chatroom.title = name
             Task {
-                let oldName = addressBook.getName(for: address)
-                if oldName == nil || oldName != name {
-                    await self.addressBook.set(name: name, for: address)
-                }
+                await self.addressBook.set(name: name, for: address)
             }
         }
         
@@ -742,7 +748,7 @@ extension ChatListViewController: NewChatViewControllerDelegate {
             }
             
             if let preMessage = preMessage {
-                vc.messageInputBar.inputTextView.text = preMessage
+                vc.viewModel.inputText = preMessage
             }
         }
         
