@@ -149,8 +149,9 @@ final class EthTransferViewController: TransferViewControllerBase {
     
     override var recipientAddress: String? {
         set {
-            if let recipient = newValue, let first = recipient.first, first != "0" {
-                _recipient = "0x\(recipient)"
+            if let recipient = newValue {
+                let prefix = recipient.prefix(2)
+                _recipient = prefix == "0x" ? recipient : "0x\(recipient)"
             } else {
                 _recipient = newValue
             }
