@@ -38,7 +38,8 @@ private extension NotificationView {
     func makeIcon(image: UIImage) -> some View {
         Image(uiImage: image)
             .resizable()
-            .renderingMode(.original)
+            .renderingMode(.template)
+            .foregroundColor(.secondary)
             .scaledToFit()
             .frame(squareSize: 30)
     }

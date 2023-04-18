@@ -45,7 +45,7 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
     }
     
     func reloadData(newIds: [String]) {
-        guard newIds.last == currentIds.last || currentIds.isEmpty else {
+        guard newIds.last == currentIds.last || newIds.first != currentIds.first else {
             return applyNewIds(newIds)
         }
         

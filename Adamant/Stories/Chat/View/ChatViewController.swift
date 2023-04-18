@@ -415,7 +415,7 @@ private extension ChatViewController {
             chatMessagesCollectionView.setBottomOffset(offset, safely: viewAppeared)
         case let .messageId(id):
             guard let index = viewModel.messages.firstIndex(where: { $0.messageId == id})
-            else { return }
+            else { break }
             
             messagesCollectionView.scrollToItem(
                 at: .init(item: .zero, section: index),
