@@ -23,7 +23,8 @@ actor AdamantTransfersProvider: TransfersProvider {
     private let transactionService: ChatTransactionService
     weak var chatsProvider: ChatsProvider?
     
-    private(set) var state: State = .empty
+    @Published private(set) var state: State = .empty
+    var stateObserver: Published<State>.Publisher { $state }
     private(set) var isInitiallySynced: Bool = false
     private(set) var receivedLastHeight: Int64?
     private(set) var readedLastHeight: Int64?

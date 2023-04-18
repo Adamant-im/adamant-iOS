@@ -363,13 +363,14 @@ private extension ChatViewModel {
             .sink { [weak self] _ in self?.updateAttachmentButtonAvailability() }
             .store(in: &subscriptions)
         
-        NotificationCenter.default
-            .publisher(for: .AdamantTransfersProvider.stateChanged, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] notification in
-                self?.animateUpdateHeaderIfNeeded(notification)
-            }
-            .store(in: &subscriptions)
+        Task {
+            await chatsProvider.stateObserver
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] state in
+                    self?.isHeaderLoading = state == .updating ? true : false
+                }
+                .store(in: &subscriptions)
+        }.stored(in: tasksStorage)
     }
     
     func loadMessages(address: String, offset: Int, fullscreenLoading: Bool) async {
@@ -563,21 +564,5 @@ private extension ChatViewModel {
     func startNewChat(with chatroom: Chatroom, name: String? = nil, message: String? = nil) {
         setNameIfNeeded(for: chatroom.partner, chatroom: chatroom, name: name)
         didTapAdmChat.send((chatroom, message))
-    }
-    
-    func animateUpdateHeaderIfNeeded(_ notification: Notification) {
-        guard let prevState = notification.userInfo?[AdamantUserInfoKey.TransfersProvider.prevState] as? State,
-              let newState = notification.userInfo?[AdamantUserInfoKey.TransfersProvider.newState] as? State
-        else {
-            return
-        }
-        
-        if case .updating = prevState {
-            isHeaderLoading = false
-        }
-        
-        if case .updating = newState {
-            isHeaderLoading = true
-        }
     }
 }
