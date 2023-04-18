@@ -34,7 +34,12 @@ extension String.adamantLocalized {
 
 // MARK: - Delegate
 protocol NewChatViewControllerDelegate: AnyObject {
-    func newChatController(_ controller: NewChatViewController, didSelectAccount account: CoreDataAccount, preMessage: String?)
+    func newChatController(
+        _ controller: NewChatViewController,
+        didSelectAccount account: CoreDataAccount,
+        preMessage: String?,
+        name: String?
+    )
 }
 
 // MARK: -
@@ -271,16 +276,15 @@ class NewChatViewController: FormViewController {
         Task {
             do {
                 let account = try await accountsProvider.getAccount(byAddress: address)
-                if let name = name, account.name == nil {
-                    account.name = name
-                    
-                    if let chatroom = account.chatroom, chatroom.title == nil {
-                        chatroom.title = name
-                    }
-                }
-                
                 account.chatroom?.isForcedVisible = true
-                self.delegate?.newChatController(self, didSelectAccount: account, preMessage: message)
+                
+                self.delegate?.newChatController(
+                    self,
+                    didSelectAccount: account,
+                    preMessage: message,
+                    name: name
+                )
+                
                 self.dialogService.dismissProgress()
             } catch let error as AccountsProviderError {
                 switch error {

@@ -80,6 +80,16 @@ extension String {
         }
     }
     
+    func validateEthAddress() -> String {
+        let address = self
+        let prefix = address.prefix(2)
+        
+        let fixedAddress = prefix != "0x"
+        ? "0x\(address)"
+        : address
+        
+        return fixedAddress
+    }
 }
 
 public extension NSMutableAttributedString {

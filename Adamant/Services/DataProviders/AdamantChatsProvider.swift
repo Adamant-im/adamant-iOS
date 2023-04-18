@@ -25,6 +25,9 @@ actor AdamantChatsProvider: ChatsProvider {
     private let richProviders: [String: RichMessageProviderWithStatusCheck]
     
     // MARK: Properties
+    @Published private var stateNotifier: State = .empty
+    var stateObserver: Published<State>.Publisher { $stateNotifier }
+    
     private(set) var state: State = .empty
     private(set) var receivedLastHeight: Int64?
     private(set) var readedLastHeight: Int64?
@@ -251,6 +254,7 @@ actor AdamantChatsProvider: ChatsProvider {
                 ]
             )
             
+            stateNotifier = state
             return
         }
         
@@ -264,6 +268,8 @@ actor AdamantChatsProvider: ChatsProvider {
                 AdamantUserInfoKey.TransfersProvider.prevState: prevState
             ]
         )
+        
+        stateNotifier = state
     }
     
     private func setupSecuredStore() {
