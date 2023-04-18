@@ -52,7 +52,8 @@ private extension AdvancedAlertView {
     
     var iconView: some View {
         Image(uiImage: model.icon)
-            .renderingMode(.original)
+            .renderingMode(.template)
+            .foregroundColor(.secondary)
             .frame(squareSize: 37)
     }
     

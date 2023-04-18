@@ -201,6 +201,7 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
         guard indexPath.section == 0 else {
             let cell = tableView.dequeueReusableCell(withIdentifier: cellResetIdentifier, for: indexPath) as! VisibleWalletsResetTableViewCell
             cell.selectionStyle = .default
+            cell.backgroundColor = UIColor.adamant.cellColor
             return cell
         }
         
