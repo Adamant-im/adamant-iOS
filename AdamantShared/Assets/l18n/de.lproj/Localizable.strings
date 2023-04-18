@@ -22,15 +22,6 @@
 /* About scene: Our blog row */
 "About.Row.Blog" = "Unser Blog";
 
-/* About scene: Facebook row */
-"About.Row.Facebook" = "Facebook";
-
-/* About scene: Telegram row */
-"About.Row.Telegram" = "Telegram";
-
-/* About scene: VK row */
-"About.Row.VK" = "VK";
-
 /* About scene: Twitter row */
 "About.Row.Twitter" = "Twitter";
 
