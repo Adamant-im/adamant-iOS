@@ -76,6 +76,22 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
         )
     }
     
+    func textCellSizeCalculator(
+        for _: MessageType,
+        at _: IndexPath,
+        in messagesCollectionView: MessagesCollectionView
+    ) -> CellSizeCalculator? {
+        FixedTextMessageSizeCalculator(layout: messagesCollectionView.messagesCollectionViewFlowLayout)
+    }
+    
+    func attributedTextCellSizeCalculator(
+        for _: MessageType,
+        at _: IndexPath,
+        in messagesCollectionView: MessagesCollectionView
+    ) -> CellSizeCalculator? {
+        FixedTextMessageSizeCalculator(layout: messagesCollectionView.messagesCollectionViewFlowLayout)
+    }
+    
     func customCellSizeCalculator(
         for _: MessageType,
         at _: IndexPath,
