@@ -70,15 +70,15 @@ extension ChatTransactionContainerView: ReusableView {
 
 private extension ChatTransactionContainerView {
     func configure() {
+        addSubview(swipeView)
+        swipeView.snp.makeConstraints { make in
+            make.top.bottom.leading.trailing.equalToSuperview()
+        }
+        
         addSubview(horizontalStack)
         horizontalStack.snp.makeConstraints {
             $0.top.bottom.equalToSuperview()
             $0.leading.trailing.equalToSuperview().inset(12)
-        }
-        
-        addSubview(swipeView)
-        swipeView.snp.makeConstraints { make in
-            make.top.bottom.leading.trailing.equalToSuperview()
         }
         
         swipeView.action = { [weak self] message in
