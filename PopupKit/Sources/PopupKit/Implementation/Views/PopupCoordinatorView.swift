@@ -19,6 +19,7 @@ struct PopupCoordinatorView: View {
                 
                 makeNotificationView(safeAreaInsets: geomerty.safeAreaInsets)
                 makeAlertView()
+                makeAdvancedAlertView()
                 makeToastView(safeAreaInsets: geomerty.safeAreaInsets)
             }
             .expanded()
@@ -48,13 +49,24 @@ private extension PopupCoordinatorView {
     
     func makeAlertView() -> some View {
         VStack {
-            if let alertModel = model.alert {
+            if let alertModel = model.alert, model.advancedAlert == nil {
                 AlertView(model: alertModel)
                     .id(model.alert?.hashValue)
                     .transition(.scale)
             }
         }
         .animation(.easeInOut(duration: animationDuration), value: model.alert?.hashValue)
+    }
+    
+    func makeAdvancedAlertView() -> some View {
+        VStack {
+            if let advancedAlertModel = model.advancedAlert {
+                AdvancedAlertView(model: advancedAlertModel)
+                    .id(model.advancedAlert?.hashValue)
+                    .transition(.scale)
+            }
+        }
+        .animation(.easeInOut(duration: animationDuration), value: model.advancedAlert?.hashValue)
     }
     
     func makeToastView(safeAreaInsets: EdgeInsets) -> some View {

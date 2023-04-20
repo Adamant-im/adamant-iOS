@@ -104,16 +104,16 @@ protocol ApiService: AnyObject {
         type: TransactionType,
         fromHeight: Int64?,
         offset: Int?,
-        limit: Int?,
-        completion: @escaping (ApiServiceResult<[Transaction]>) -> Void
-    )
+        limit: Int?
+    ) async throws -> [Transaction]
     
     func getTransactions(
-        forAccount: String,
+        forAccount account: String,
         type: TransactionType,
         fromHeight: Int64?,
         offset: Int?,
-        limit: Int?
+        limit: Int?,
+        orderByTime: Bool?
     ) async throws -> [Transaction]
     
     // MARK: - Chats Rooms

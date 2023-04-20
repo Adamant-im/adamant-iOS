@@ -5,6 +5,5 @@ target 'Adamant' do
   
   pod 'FreakingSimpleRoundImageView' # Round avatars
   pod 'MyLittlePinpad' # Pinpad
-  pod 'PMAlertController' # Custom alert controller
   pod 'SwiftLint'
 end

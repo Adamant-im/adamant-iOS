@@ -44,8 +44,12 @@ private extension ChatDialogManager {
             dialogService.showToastMessage(message)
         case let .alert(message):
             showAlert(message: message)
-        case let .error(message):
-            dialogService.showError(withMessage: message, error: nil)
+        case let .error(message, supportEmail):
+            dialogService.showError(
+                withMessage: message,
+                supportEmail: supportEmail,
+                error: nil
+            )
         case let .warning(message):
             dialogService.showWarning(withMessage: message)
         case let .richError(error):
@@ -304,9 +308,11 @@ private extension ChatDialogManager {
         let shareTypes: [AddressChatShareType] = adm.address == partnerAddress ? [.send] : [.chat, .send]
         let name = adm.name ?? adm.address
         
+        let kvsName = viewModel.getKvsName(for: adm.address)
+        
         self.dialogService.presentShareAlertFor(
             adm: adm.address,
-            name: name,
+            name: kvsName ?? name,
             types: shareTypes,
             animated: true,
             from: nil,
@@ -325,7 +331,7 @@ private extension ChatDialogManager {
     }
     
     func showDummyAlert(for address: String) {
-        dialogService.presentDummyAlert(
+        dialogService.presentDummyChatAlert(
             for: address,
             from: nil,
             canSend: false,

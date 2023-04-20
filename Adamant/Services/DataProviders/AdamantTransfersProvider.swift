@@ -23,7 +23,8 @@ actor AdamantTransfersProvider: TransfersProvider {
     private let transactionService: ChatTransactionService
     weak var chatsProvider: ChatsProvider?
     
-    private(set) var state: State = .empty
+    @Published private(set) var state: State = .empty
+    var stateObserver: Published<State>.Publisher { $state }
     private(set) var isInitiallySynced: Bool = false
     private(set) var receivedLastHeight: Int64?
     private(set) var readedLastHeight: Int64?
@@ -31,6 +32,8 @@ actor AdamantTransfersProvider: TransfersProvider {
     private let apiTransactions = 100
     
     private var unconfirmedTransactions: [UInt64:NSManagedObjectID] = [:]
+    
+    var offsetTransactions = 0
     
     // MARK: Tools
     
@@ -120,7 +123,23 @@ actor AdamantTransfersProvider: TransfersProvider {
             store.set(loggedAddress, for: StoreKey.transfersProvider.address)
         }
         
-        _ = await update()
+        do {
+            setState(.updating, previous: .empty, notify: false)
+            
+            _ = try await getTransactions(
+                forAccount: loggedAddress,
+                type: .send,
+                offset: offsetTransactions,
+                limit: apiTransactions,
+                orderByTime: true
+            )
+            
+            offsetTransactions += apiTransactions
+            
+            setState(.upToDate, previous: .updating, notify: false)
+        } catch {
+            setState(.failedToUpdate(error), previous: .updating, notify: false)
+        }
     }
     
     private func userLogOutAction() {
@@ -266,6 +285,7 @@ extension AdamantTransfersProvider {
     }
     
     private func reset(notify: Bool) {
+        offsetTransactions = 0
         hasTransactions = false
         isInitiallySynced = false
         let prevState = self.state
@@ -416,6 +436,7 @@ extension AdamantTransfersProvider {
         transaction.comment = comment
         transaction.fee = Self.transferFee as NSDecimalNumber
         transaction.partner = partner
+        transaction.transactionId = UUID().uuidString
         
         chatroom.addToTransactions(transaction)
         
@@ -574,7 +595,7 @@ extension AdamantTransfersProvider {
         transaction.showsChatroom = false
         transaction.fee = Self.transferFee as NSDecimalNumber
         
-        transaction.transactionId = nil
+        transaction.transactionId = UUID().uuidString
         transaction.blockId = nil
         transaction.chatMessageId = UUID().uuidString
         transaction.statusEnum = MessageStatus.pending
@@ -793,6 +814,40 @@ extension AdamantTransfersProvider {
         }
     }
     
+    func getTransactions(
+        forAccount account: String,
+        type: TransactionType,
+        offset: Int,
+        limit: Int,
+        orderByTime: Bool
+    ) async throws -> Int {
+        let transactions = try await apiService.getTransactions(
+            forAccount: account,
+            type: type,
+            fromHeight: nil,
+            offset: offset,
+            limit: limit,
+            orderByTime: true
+        )
+        
+        guard transactions.count > 0 else {
+            return 0
+        }
+        
+        // MARK: 2. Process transactions in background
+        
+        await processRawTransactions(
+            transactions,
+            currentAddress: account
+        )
+        
+        return transactions.count
+    }
+    
+    func updateOffsetTransactions(_ value: Int) {
+        offsetTransactions = value
+    }
+    
     private func processRawTransactions(
         _ transactions: [Transaction],
         currentAddress address: String
@@ -876,6 +931,7 @@ extension AdamantTransfersProvider {
         // MARK: 3. Create private context, and process transactions
         let contextPrivate = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         contextPrivate.parent = self.stack.container.viewContext
+        contextPrivate.mergePolicy = NSMergePolicy(merge: NSMergePolicyType.mergeByPropertyObjectTrumpMergePolicyType)
         
         var partners: [String:BaseAccount] = [:]
         for id in partnerIds {

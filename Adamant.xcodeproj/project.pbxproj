@@ -36,6 +36,10 @@
 		4164A9D728F17D4000EEF16D /* ChatTransactionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4164A9D628F17D4000EEF16D /* ChatTransactionService.swift */; };
 		4164A9D928F17DA700EEF16D /* AdamantChatTransactionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4164A9D828F17DA700EEF16D /* AdamantChatTransactionService.swift */; };
 		416F5EA4290162EB00EF0400 /* SocketIO in Frameworks */ = {isa = PBXBuildFile; productRef = 416F5EA3290162EB00EF0400 /* SocketIO */; };
+		41776FDD29CB17D100B74B4E /* AdamantContacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41776FDC29CB17D100B74B4E /* AdamantContacts.swift */; };
+		41776FDE29CB189500B74B4E /* AdamantContacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41776FDC29CB17D100B74B4E /* AdamantContacts.swift */; };
+		41776FDF29CB189600B74B4E /* AdamantContacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41776FDC29CB17D100B74B4E /* AdamantContacts.swift */; };
+		41776FE029CB189800B74B4E /* AdamantContacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41776FDC29CB17D100B74B4E /* AdamantContacts.swift */; };
 		417BA7F428BF894F00DF94C5 /* NotificationSoundsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417BA7F328BF894F00DF94C5 /* NotificationSoundsViewController.swift */; };
 		4186B32E2941C2A3006594A3 /* CoinsScript.rb in Resources */ = {isa = PBXBuildFile; fileRef = 4186B32D2941C2A3006594A3 /* CoinsScript.rb */; };
 		4186B3302941E642006594A3 /* AdmWalletService+DynamicConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4186B32F2941E642006594A3 /* AdmWalletService+DynamicConstants.swift */; };
@@ -92,7 +96,7 @@
 		55FBAAF728C54B2F0066E629 /* Nodes+Allowance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55FBAAF428C54B230066E629 /* Nodes+Allowance.swift */; };
 		55FBAAF828C54B300066E629 /* Nodes+Allowance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55FBAAF428C54B230066E629 /* Nodes+Allowance.swift */; };
 		55FBAAFB28C550920066E629 /* NodesAllowanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55FBAAFA28C550920066E629 /* NodesAllowanceTests.swift */; };
-		6403F5DB2272389800D58779 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		6403F5DB2272389800D58779 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		6403F5DE22723C6800D58779 /* DashMainnet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6403F5DD22723C6800D58779 /* DashMainnet.swift */; };
 		6403F5E022723F6400D58779 /* DashWalletRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6403F5DF22723F6400D58779 /* DashWalletRouter.swift */; };
 		6403F5E222723F7500D58779 /* DashWallet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6403F5E122723F7500D58779 /* DashWallet.swift */; };
@@ -119,7 +123,6 @@
 		6416B1A721B024B6006089AC /* LskWalletService+Send.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6416B1A621B024B6006089AC /* LskWalletService+Send.swift */; };
 		6423038324B26CAF004CF3FE /* ERC20Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646DF92322C29F6E00DCC864 /* ERC20Token.swift */; };
 		6423038424B26CAF004CF3FE /* ERC20Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646DF92322C29F6E00DCC864 /* ERC20Token.swift */; };
-		642361BE20E3869D0061559E /* eth_l18n.strings in Resources */ = {isa = PBXBuildFile; fileRef = 642361BD20E3869D0061559E /* eth_l18n.strings */; };
 		644793C32166314A00FC4CF5 /* OnboardPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644793C22166314A00FC4CF5 /* OnboardPage.swift */; };
 		644793C52166315900FC4CF5 /* OnboardPage.xib in Resources */ = {isa = PBXBuildFile; fileRef = 644793C42166315900FC4CF5 /* OnboardPage.xib */; };
 		6448C291235CA6E100F3F15B /* ERC20WalletService+RichMessageProviderWithStatusCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6449BA64235CA0930033B936 /* ERC20WalletService+RichMessageProviderWithStatusCheck.swift */; };
@@ -136,7 +139,6 @@
 		644EC34F20EFA77A00F40C73 /* Delegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EC34E20EFA77A00F40C73 /* Delegate.swift */; };
 		644EC35220EFA9A300F40C73 /* DelegateRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EC35120EFA9A300F40C73 /* DelegateRoutes.swift */; };
 		644EC35720EFAAB700F40C73 /* DelegatesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EC35520EFAAB700F40C73 /* DelegatesListViewController.swift */; };
-		644EC35820EFAAB700F40C73 /* DelegatesListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 644EC35620EFAAB700F40C73 /* DelegatesListViewController.xib */; };
 		644EC35B20EFB8E900F40C73 /* AdamantDelegateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EC35920EFB8E900F40C73 /* AdamantDelegateCell.swift */; };
 		644EC35E20F34F1E00F40C73 /* DelegateDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EC35D20F34F1E00F40C73 /* DelegateDetailsViewController.swift */; };
 		6455E9F121075D3600B2E94C /* AddressBookService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6455E9F021075D3600B2E94C /* AddressBookService.swift */; };
@@ -196,7 +198,7 @@
 		64F085D920E2D7600006DE68 /* AdmTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F085D820E2D7600006DE68 /* AdmTransactionsViewController.swift */; };
 		64FA53CD20E1300B006783C9 /* EthTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FA53CC20E1300A006783C9 /* EthTransactionsViewController.swift */; };
 		64FA53D120E24942006783C9 /* TransactionDetailsViewControllerBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FA53D020E24941006783C9 /* TransactionDetailsViewControllerBase.swift */; };
-		9304657E29BFB32F009B2E48 /* UIViewController+KeyboardSafeArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304657D29BFB32F009B2E48 /* UIViewController+KeyboardSafeArea.swift */; };
+		9300F94629D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9300F94529D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift */; };
 		9304F8BE292F88F900173F18 /* ANSPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304F8BD292F88F900173F18 /* ANSPayload.swift */; };
 		9304F8C2292F895C00173F18 /* PushNotificationsTokenService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304F8C1292F895C00173F18 /* PushNotificationsTokenService.swift */; };
 		9304F8C4292F8A3100173F18 /* AdamantPushNotificationsTokenService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304F8C3292F8A3100173F18 /* AdamantPushNotificationsTokenService.swift */; };
@@ -210,11 +212,21 @@
 		9324C75E297170600022D7EA /* RichTransactionStatusService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9324C75D297170600022D7EA /* RichTransactionStatusService.swift */; };
 		9324C760297171040022D7EA /* AdamantRichTransactionStatusService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9324C75F297171040022D7EA /* AdamantRichTransactionStatusService.swift */; };
 		932B34E92974AA4A002A75BA /* ChatPreservationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 932B34E82974AA4A002A75BA /* ChatPreservationDelegate.swift */; };
+		932BD15B29D2F75200AA1947 /* RichMessageProviderWithStatusCheck+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 932BD15A29D2F75200AA1947 /* RichMessageProviderWithStatusCheck+Extension.swift */; };
 		932F77592989F999006D8801 /* ChatCellManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 932F77582989F999006D8801 /* ChatCellManager.swift */; };
 		932F775B2989FE10006D8801 /* Markdown+Adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 932F775A2989FE10006D8801 /* Markdown+Adamant.swift */; };
 		933A59282980556A0068C36D /* ObservableValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 933A59272980556A0068C36D /* ObservableValue.swift */; };
 		933A592A298067910068C36D /* ComparableAttributedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 933A5929298067910068C36D /* ComparableAttributedString.swift */; };
 		9340078029AC341100A20622 /* ChatAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9340077F29AC341000A20622 /* ChatAction.swift */; };
+		9341023229DCD02F00E033E6 /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = E95CB460205D7F9600A7218E /* Localizable.stringsdict */; };
+		9341023329DCD02F00E033E6 /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = E95CB460205D7F9600A7218E /* Localizable.stringsdict */; };
+		9341023429DCD02F00E033E6 /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = E95CB460205D7F9600A7218E /* Localizable.stringsdict */; };
+		9341023529DCD03200E033E6 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = E95CB458205D77B500A7218E /* Localizable.strings */; };
+		9341023629DCD03200E033E6 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = E95CB458205D77B500A7218E /* Localizable.strings */; };
+		9341023729DCD03300E033E6 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = E95CB458205D77B500A7218E /* Localizable.strings */; };
+		9341023829DCD03500E033E6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E95CB453205D77B200A7218E /* InfoPlist.strings */; };
+		9341023929DCD03500E033E6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E95CB453205D77B200A7218E /* InfoPlist.strings */; };
+		9341023A29DCD03600E033E6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E95CB453205D77B200A7218E /* InfoPlist.strings */; };
 		93457407292B930E00F8F9D6 /* AccountServiceStoreKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93457406292B930E00F8F9D6 /* AccountServiceStoreKey.swift */; };
 		93457408292B930E00F8F9D6 /* AccountServiceStoreKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93457406292B930E00F8F9D6 /* AccountServiceStoreKey.swift */; };
 		93457409292B930E00F8F9D6 /* AccountServiceStoreKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93457406292B930E00F8F9D6 /* AccountServiceStoreKey.swift */; };
@@ -222,12 +234,14 @@
 		934B9BE5296C58210027A8D0 /* CollectionCellWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934B9BE4296C58210027A8D0 /* CollectionCellWrapper.swift */; };
 		934B9BE7296C620B0027A8D0 /* UILabel+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934B9BE6296C620B0027A8D0 /* UILabel+adamant.swift */; };
 		934B9BE9296C680D0027A8D0 /* ChatTransactionCellSizeCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934B9BE8296C680D0027A8D0 /* ChatTransactionCellSizeCalculator.swift */; };
+		93547BCA29E2262D00B0914B /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93547BC929E2262D00B0914B /* WelcomeViewController.swift */; };
 		935F53D629BE8F7400779492 /* RichTransactionStatusPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 935F53D529BE8F7400779492 /* RichTransactionStatusPublisher.swift */; };
 		935F53D829BEA7CA00779492 /* TimeInterval+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 935F53D729BEA7CA00779492 /* TimeInterval+Extension.swift */; };
 		9371130F2996EDA900F64CF9 /* ChatRefreshMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9371130E2996EDA900F64CF9 /* ChatRefreshMock.swift */; };
 		9371E561295CD53100438F2C /* ChatLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9371E560295CD53100438F2C /* ChatLocalization.swift */; };
 		9377FBDF296C2A2F00C9211B /* ChatTransactionContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9377FBDE296C2A2F00C9211B /* ChatTransactionContentView.swift */; };
 		9377FBE2296C2ACA00C9211B /* ChatTransactionContentView+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9377FBE1296C2ACA00C9211B /* ChatTransactionContentView+Model.swift */; };
+		9382F61329DEC0A3005E6216 /* ChatModelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9382F61229DEC0A3005E6216 /* ChatModelView.swift */; };
 		938F7D582955C1DA001915CA /* MessageKit in Frameworks */ = {isa = PBXBuildFile; productRef = 938F7D572955C1DA001915CA /* MessageKit */; };
 		938F7D5B2955C8DA001915CA /* ChatDisplayManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 938F7D5A2955C8DA001915CA /* ChatDisplayManager.swift */; };
 		938F7D5D2955C8F9001915CA /* ChatLayoutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 938F7D5C2955C8F9001915CA /* ChatLayoutManager.swift */; };
@@ -248,7 +262,11 @@
 		93B19AF4296317FF005305C0 /* CGSize+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93F391472962EEDC00BFD6AE /* CGSize+adamant.swift */; };
 		93B19AF529631800005305C0 /* CGSize+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93F391472962EEDC00BFD6AE /* CGSize+adamant.swift */; };
 		93B19AF629631800005305C0 /* CGSize+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93F391472962EEDC00BFD6AE /* CGSize+adamant.swift */; };
+		93B251B629E38E31008D6EA6 /* KeyboardObservingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B251B529E38E31008D6EA6 /* KeyboardObservingViewController.swift */; };
+		93B251B829E393A5008D6EA6 /* UIScrollView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B251B729E393A5008D6EA6 /* UIScrollView+Extension.swift */; };
 		93B9DBD229803179004F8BFF /* MessageCollectionViewCell+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B9DBD129803179004F8BFF /* MessageCollectionViewCell+Extension.swift */; };
+		93BF4A6629E4859900505CD0 /* DelegatesBottomPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93BF4A6529E4859900505CD0 /* DelegatesBottomPanel.swift */; };
+		93BF4A6C29E4B4BF00505CD0 /* DelegatesBottomPanel+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93BF4A6B29E4B4BF00505CD0 /* DelegatesBottomPanel+Model.swift */; };
 		93CC8DC7296F00D6003772BF /* ChatTransactionContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CC8DC6296F00D6003772BF /* ChatTransactionContainerView.swift */; };
 		93CC8DC9296F01DE003772BF /* ChatTransactionContainerView+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CC8DC8296F01DE003772BF /* ChatTransactionContainerView+Model.swift */; };
 		93CD1C5829632EB300B7CACA /* ReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CD1C5729632EB300B7CACA /* ReusableView.swift */; };
@@ -278,7 +296,7 @@
 		A5241B70262DEDE1009FA43E /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5241B6F262DEDE1009FA43E /* Clibsodium */; };
 		A5241B77262DEDEF009FA43E /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5241B76262DEDEF009FA43E /* Clibsodium */; };
 		A5241B7E262DEDFE009FA43E /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5241B7D262DEDFE009FA43E /* Clibsodium */; };
-		A530B0D82842110D003F0210 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
+		A530B0D82842110D003F0210 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
 		A544F0D4262C9878001F1A6D /* Eureka in Frameworks */ = {isa = PBXBuildFile; productRef = A544F0D3262C9878001F1A6D /* Eureka */; };
 		A57282CA262C94CD00C96FA8 /* DateToolsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A57282C9262C94CD00C96FA8 /* DateToolsSwift */; };
 		A57282D1262C94DA00C96FA8 /* DateToolsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A57282D0262C94DA00C96FA8 /* DateToolsSwift */; };
@@ -772,6 +790,7 @@
 		415CFD3E294319310008AEE8 /* UpdateWalletsScript.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = UpdateWalletsScript.sh; sourceTree = "<group>"; };
 		4164A9D628F17D4000EEF16D /* ChatTransactionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTransactionService.swift; sourceTree = "<group>"; };
 		4164A9D828F17DA700EEF16D /* AdamantChatTransactionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantChatTransactionService.swift; sourceTree = "<group>"; };
+		41776FDC29CB17D100B74B4E /* AdamantContacts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantContacts.swift; sourceTree = "<group>"; };
 		417BA7F328BF894F00DF94C5 /* NotificationSoundsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSoundsViewController.swift; sourceTree = "<group>"; };
 		4186B32D2941C2A3006594A3 /* CoinsScript.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = CoinsScript.rb; sourceTree = "<group>"; };
 		4186B32F2941E642006594A3 /* AdmWalletService+DynamicConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdmWalletService+DynamicConstants.swift"; sourceTree = "<group>"; };
@@ -832,7 +851,6 @@
 		6416B1A221AD7EA1006089AC /* LskTransactionDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LskTransactionDetailsViewController.swift; sourceTree = "<group>"; };
 		6416B1A421AEE157006089AC /* LskWalletService+Transfers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LskWalletService+Transfers.swift"; sourceTree = "<group>"; };
 		6416B1A621B024B6006089AC /* LskWalletService+Send.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LskWalletService+Send.swift"; sourceTree = "<group>"; };
-		642361BD20E3869D0061559E /* eth_l18n.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = eth_l18n.strings; sourceTree = "<group>"; };
 		644793C22166314A00FC4CF5 /* OnboardPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardPage.swift; sourceTree = "<group>"; };
 		644793C42166315900FC4CF5 /* OnboardPage.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OnboardPage.xib; sourceTree = "<group>"; };
 		6449BA5E235CA0930033B936 /* ERC20WalletService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ERC20WalletService.swift; sourceTree = "<group>"; };
@@ -849,7 +867,6 @@
 		644EC34E20EFA77A00F40C73 /* Delegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Delegate.swift; sourceTree = "<group>"; };
 		644EC35120EFA9A300F40C73 /* DelegateRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelegateRoutes.swift; sourceTree = "<group>"; };
 		644EC35520EFAAB700F40C73 /* DelegatesListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelegatesListViewController.swift; sourceTree = "<group>"; };
-		644EC35620EFAAB700F40C73 /* DelegatesListViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DelegatesListViewController.xib; sourceTree = "<group>"; };
 		644EC35920EFB8E900F40C73 /* AdamantDelegateCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantDelegateCell.swift; sourceTree = "<group>"; };
 		644EC35D20F34F1E00F40C73 /* DelegateDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelegateDetailsViewController.swift; sourceTree = "<group>"; };
 		6455E9F021075D3600B2E94C /* AddressBookService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBookService.swift; sourceTree = "<group>"; };
@@ -912,7 +929,7 @@
 		64FA53CC20E1300A006783C9 /* EthTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthTransactionsViewController.swift; sourceTree = "<group>"; };
 		64FA53D020E24941006783C9 /* TransactionDetailsViewControllerBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionDetailsViewControllerBase.swift; sourceTree = "<group>"; };
 		74D5744703A7ECC98E244B14 /* Pods-AdmCore.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdmCore.debug.xcconfig"; path = "Target Support Files/Pods-AdmCore/Pods-AdmCore.debug.xcconfig"; sourceTree = "<group>"; };
-		9304657D29BFB32F009B2E48 /* UIViewController+KeyboardSafeArea.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+KeyboardSafeArea.swift"; sourceTree = "<group>"; };
+		9300F94529D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichMessageProviderWithStatusCheck.swift; sourceTree = "<group>"; };
 		9304F8BD292F88F900173F18 /* ANSPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANSPayload.swift; sourceTree = "<group>"; };
 		9304F8C1292F895C00173F18 /* PushNotificationsTokenService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationsTokenService.swift; sourceTree = "<group>"; };
 		9304F8C3292F8A3100173F18 /* AdamantPushNotificationsTokenService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantPushNotificationsTokenService.swift; sourceTree = "<group>"; };
@@ -926,6 +943,7 @@
 		9324C75D297170600022D7EA /* RichTransactionStatusService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichTransactionStatusService.swift; sourceTree = "<group>"; };
 		9324C75F297171040022D7EA /* AdamantRichTransactionStatusService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantRichTransactionStatusService.swift; sourceTree = "<group>"; };
 		932B34E82974AA4A002A75BA /* ChatPreservationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatPreservationDelegate.swift; sourceTree = "<group>"; };
+		932BD15A29D2F75200AA1947 /* RichMessageProviderWithStatusCheck+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RichMessageProviderWithStatusCheck+Extension.swift"; sourceTree = "<group>"; };
 		932F77582989F999006D8801 /* ChatCellManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatCellManager.swift; sourceTree = "<group>"; };
 		932F775A2989FE10006D8801 /* Markdown+Adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Markdown+Adamant.swift"; sourceTree = "<group>"; };
 		933A59272980556A0068C36D /* ObservableValue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObservableValue.swift; sourceTree = "<group>"; };
@@ -936,12 +954,14 @@
 		934B9BE4296C58210027A8D0 /* CollectionCellWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionCellWrapper.swift; sourceTree = "<group>"; };
 		934B9BE6296C620B0027A8D0 /* UILabel+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UILabel+adamant.swift"; sourceTree = "<group>"; };
 		934B9BE8296C680D0027A8D0 /* ChatTransactionCellSizeCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTransactionCellSizeCalculator.swift; sourceTree = "<group>"; };
+		93547BC929E2262D00B0914B /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
 		935F53D529BE8F7400779492 /* RichTransactionStatusPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichTransactionStatusPublisher.swift; sourceTree = "<group>"; };
 		935F53D729BEA7CA00779492 /* TimeInterval+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeInterval+Extension.swift"; sourceTree = "<group>"; };
 		9371130E2996EDA900F64CF9 /* ChatRefreshMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatRefreshMock.swift; sourceTree = "<group>"; };
 		9371E560295CD53100438F2C /* ChatLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatLocalization.swift; sourceTree = "<group>"; };
 		9377FBDE296C2A2F00C9211B /* ChatTransactionContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTransactionContentView.swift; sourceTree = "<group>"; };
 		9377FBE1296C2ACA00C9211B /* ChatTransactionContentView+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatTransactionContentView+Model.swift"; sourceTree = "<group>"; };
+		9382F61229DEC0A3005E6216 /* ChatModelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatModelView.swift; sourceTree = "<group>"; };
 		938F7D5A2955C8DA001915CA /* ChatDisplayManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatDisplayManager.swift; sourceTree = "<group>"; };
 		938F7D5C2955C8F9001915CA /* ChatLayoutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatLayoutManager.swift; sourceTree = "<group>"; };
 		938F7D5E2955C90D001915CA /* ChatInputBarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatInputBarManager.swift; sourceTree = "<group>"; };
@@ -958,7 +978,11 @@
 		93A118522993241D00E144CC /* ChatMessagesListFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesListFactory.swift; sourceTree = "<group>"; };
 		93A91FD0297972B7001DB1F8 /* ChatScrollDownButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatScrollDownButton.swift; sourceTree = "<group>"; };
 		93A91FD229799298001DB1F8 /* ChatStartPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatStartPosition.swift; sourceTree = "<group>"; };
+		93B251B529E38E31008D6EA6 /* KeyboardObservingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardObservingViewController.swift; sourceTree = "<group>"; };
+		93B251B729E393A5008D6EA6 /* UIScrollView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIScrollView+Extension.swift"; sourceTree = "<group>"; };
 		93B9DBD129803179004F8BFF /* MessageCollectionViewCell+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "MessageCollectionViewCell+Extension.swift"; sourceTree = "<group>"; };
+		93BF4A6529E4859900505CD0 /* DelegatesBottomPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelegatesBottomPanel.swift; sourceTree = "<group>"; };
+		93BF4A6B29E4B4BF00505CD0 /* DelegatesBottomPanel+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DelegatesBottomPanel+Model.swift"; sourceTree = "<group>"; };
 		93CC8DC6296F00D6003772BF /* ChatTransactionContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTransactionContainerView.swift; sourceTree = "<group>"; };
 		93CC8DC8296F01DE003772BF /* ChatTransactionContainerView+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatTransactionContainerView+Model.swift"; sourceTree = "<group>"; };
 		93CD1C5729632EB300B7CACA /* ReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReusableView.swift; sourceTree = "<group>"; };
@@ -1319,7 +1343,7 @@
 				A5DBBABD262C7221004AC028 /* Clibsodium in Frameworks */,
 				A50AEB14262C837900B37C22 /* Alamofire in Frameworks */,
 				938F7D582955C1DA001915CA /* MessageKit in Frameworks */,
-				A530B0D82842110D003F0210 /* (null) in Frameworks */,
+				A530B0D82842110D003F0210 /* BuildFile in Frameworks */,
 				A5DBBADC262C729B004AC028 /* CryptoSwift in Frameworks */,
 				A5D87BA3262CA01D00DC28F0 /* ProcedureKit in Frameworks */,
 				A5C99E0E262C9E3A00F7B1B7 /* Reachability in Frameworks */,
@@ -1482,9 +1506,9 @@
 		644EC35020EFA96700F40C73 /* Delegates */ = {
 			isa = PBXGroup;
 			children = (
+				93BF4A6A29E4B4B600505CD0 /* DelegatesBottomPanel */,
 				644EC35120EFA9A300F40C73 /* DelegateRoutes.swift */,
 				644EC35520EFAAB700F40C73 /* DelegatesListViewController.swift */,
-				644EC35620EFAAB700F40C73 /* DelegatesListViewController.xib */,
 				644EC35920EFB8E900F40C73 /* AdamantDelegateCell.swift */,
 				644EC35D20F34F1E00F40C73 /* DelegateDetailsViewController.swift */,
 				E90EA5C221BA8BF400A2CE25 /* DelegateDetailsViewController.xib */,
@@ -1541,6 +1565,24 @@
 				93A91FD229799298001DB1F8 /* ChatStartPosition.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		932BD15929D2F74500AA1947 /* RichMessageProviderWithStatusCheck */ = {
+			isa = PBXGroup;
+			children = (
+				9300F94529D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift */,
+				932BD15A29D2F75200AA1947 /* RichMessageProviderWithStatusCheck+Extension.swift */,
+			);
+			path = RichMessageProviderWithStatusCheck;
+			sourceTree = "<group>";
+		};
+		9341023129DCD00300E033E6 /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				E95CB45B205D7DFD00A7218E /* l18n */,
+				E957E170229C56EE0019732A /* Shared.xcassets */,
+			);
+			path = Assets;
 			sourceTree = "<group>";
 		};
 		935F53D429BE8F4800779492 /* RichTransactionStatusService */ = {
@@ -1621,9 +1663,19 @@
 				93A91FD0297972B7001DB1F8 /* ChatScrollDownButton.swift */,
 				9371130E2996EDA900F64CF9 /* ChatRefreshMock.swift */,
 				93996A962968209C008D080B /* ChatMessagesCollection.swift */,
+				9382F61229DEC0A3005E6216 /* ChatModelView.swift */,
 				93B9DBD129803179004F8BFF /* MessageCollectionViewCell+Extension.swift */,
 			);
 			path = Subviews;
+			sourceTree = "<group>";
+		};
+		93BF4A6A29E4B4B600505CD0 /* DelegatesBottomPanel */ = {
+			isa = PBXGroup;
+			children = (
+				93BF4A6529E4859900505CD0 /* DelegatesBottomPanel.swift */,
+				93BF4A6B29E4B4BF00505CD0 /* DelegatesBottomPanel+Model.swift */,
+			);
+			path = DelegatesBottomPanel;
 			sourceTree = "<group>";
 		};
 		93CC8DC4296F00B7003772BF /* Content */ = {
@@ -1665,7 +1717,8 @@
 				93F3914B2962F1F700BFD6AE /* MessageCellWrapper.swift */,
 				93E0C84F296B08D900FF54D3 /* UIEdgeInsets+adamant.swift */,
 				934B9BE6296C620B0027A8D0 /* UILabel+adamant.swift */,
-				9304657D29BFB32F009B2E48 /* UIViewController+KeyboardSafeArea.swift */,
+				93B251B729E393A5008D6EA6 /* UIScrollView+Extension.swift */,
+				93B251B529E38E31008D6EA6 /* KeyboardObservingViewController.swift */,
 			);
 			path = UIHelpers;
 			sourceTree = "<group>";
@@ -1776,6 +1829,7 @@
 		E913C9041FFFA8FE001A83F7 /* ServiceProtocols */ = {
 			isa = PBXGroup;
 			children = (
+				932BD15929D2F74500AA1947 /* RichMessageProviderWithStatusCheck */,
 				93E5D4DE2930027F00439298 /* AdamantCore */,
 				E9B3D398201F90320019EB36 /* DataProviders */,
 				E9E7CD8A20026B0600DFC4DB /* AccountService.swift */,
@@ -1890,7 +1944,6 @@
 			isa = PBXGroup;
 			children = (
 				E96D64CD2295C54600CA5587 /* Mnemonic */,
-				E95CB45B205D7DFD00A7218E /* l18n */,
 				E9E7CDA42002A6EB00DFC4DB /* Fonts */,
 				E913C8F81FFFA51D001A83F7 /* Assets.xcassets */,
 				E9B994C322BFEFF9004CD645 /* Debug.xcassets */,
@@ -1900,7 +1953,7 @@
 				4198D57E28C8B834009337F2 /* short-success.mp3 */,
 				4198D58028C8B8D1009337F2 /* default.mp3 */,
 				E9256F752039A9A200DE86E9 /* LaunchScreen.storyboard */,
-				642361BD20E3869D0061559E /* eth_l18n.strings */,
+				E95CB453205D77B200A7218E /* InfoPlist.strings */,
 			);
 			path = Assets;
 			sourceTree = "<group>";
@@ -2143,7 +2196,6 @@
 			children = (
 				E95CB460205D7F9600A7218E /* Localizable.stringsdict */,
 				E95CB458205D77B500A7218E /* Localizable.strings */,
-				E95CB453205D77B200A7218E /* InfoPlist.strings */,
 			);
 			path = l18n;
 			sourceTree = "<group>";
@@ -2239,6 +2291,7 @@
 		E9771D7E22995D410099AAC7 /* AdamantShared */ = {
 			isa = PBXGroup;
 			children = (
+				9341023129DCD00300E033E6 /* Assets */,
 				4186B32A2940CBF9006594A3 /* Scripts */,
 				E9771D9B229979800099AAC7 /* Core */,
 				E957E154229C3F440019732A /* ExtensionsTools */,
@@ -2253,7 +2306,6 @@
 				E9771D802299602D0099AAC7 /* AdamantResources.swift */,
 				415CFD38294310680008AEE8 /* AdamantDynamicResources.swift */,
 				41E142F1289E60EB002EE8D7 /* AdamantSecret.swift */,
-				E957E170229C56EE0019732A /* Shared.xcassets */,
 			);
 			path = AdamantShared;
 			sourceTree = "<group>";
@@ -2325,6 +2377,7 @@
 				932F775A2989FE10006D8801 /* Markdown+Adamant.swift */,
 				93D4DB002990B5180083D415 /* Task+Extension.swift */,
 				935F53D729BEA7CA00779492 /* TimeInterval+Extension.swift */,
+				41776FDC29CB17D100B74B4E /* AdamantContacts.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -2496,6 +2549,7 @@
 				E94E7B07205D4CB80042B639 /* SharedRoutes.swift */,
 				6458548A211B3AB1004C5909 /* WelcomeViewController.xib */,
 				E9FAE5E0203ED1AE008D3A6B /* ShareQrViewController.swift */,
+				93547BC929E2262D00B0914B /* WelcomeViewController.swift */,
 				E9FAE5E1203ED1AE008D3A6B /* ShareQrViewController.xib */,
 				E921597A206503000000CA5C /* ButtonsStripeView.swift */,
 				E921597C2065031D0000CA5C /* ButtonsStripe.xib */,
@@ -2723,25 +2777,25 @@
 			);
 			mainGroup = E913C8E51FFFA51D001A83F7;
 			packageReferences = (
-				A5785ADD262C63580001BC66 /* XCRemoteSwiftPackageReference "web3swift" */,
-				A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */,
-				A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */,
-				A50AEB02262C815200B37C22 /* XCRemoteSwiftPackageReference "EFQRCode" */,
-				A50AEB0A262C81E300B37C22 /* XCRemoteSwiftPackageReference "QRCodeReader.swift" */,
-				A50AEB12262C837900B37C22 /* XCRemoteSwiftPackageReference "Alamofire" */,
-				A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit" */,
-				A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools" */,
-				A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
-				A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor" */,
-				A544F0D2262C9878001F1A6D /* XCRemoteSwiftPackageReference "Eureka" */,
-				A5F0A049262C9CA90009672A /* XCRemoteSwiftPackageReference "Swinject" */,
-				A5C99E0C262C9E3A00F7B1B7 /* XCRemoteSwiftPackageReference "Reachability" */,
-				A5D87BA1262CA01D00DC28F0 /* XCRemoteSwiftPackageReference "ProcedureKit" */,
+				A5785ADD262C63580001BC66 /* XCRemoteSwiftPackageReference "web3swift.git" */,
+				A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium.git" */,
+				A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift.git" */,
+				A50AEB02262C815200B37C22 /* XCRemoteSwiftPackageReference "EFQRCode.git" */,
+				A50AEB0A262C81E300B37C22 /* XCRemoteSwiftPackageReference "QRCodeReader.swift.git" */,
+				A50AEB12262C837900B37C22 /* XCRemoteSwiftPackageReference "Alamofire.git" */,
+				A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit.git" */,
+				A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools.git" */,
+				A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess.git" */,
+				A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor.git" */,
+				A544F0D2262C9878001F1A6D /* XCRemoteSwiftPackageReference "Eureka.git" */,
+				A5F0A049262C9CA90009672A /* XCRemoteSwiftPackageReference "Swinject.git" */,
+				A5C99E0C262C9E3A00F7B1B7 /* XCRemoteSwiftPackageReference "Reachability.swift" */,
+				A5D87BA1262CA01D00DC28F0 /* XCRemoteSwiftPackageReference "ProcedureKit.git" */,
 				A5AC8DFD262E0B030053A7E2 /* XCRemoteSwiftPackageReference "SipHash" */,
 				3A8875ED27BBF38D00436195 /* XCRemoteSwiftPackageReference "Parchment" */,
-				557AC304287B10D8004699D7 /* XCRemoteSwiftPackageReference "SnapKit" */,
-				416F5EA2290162EB00EF0400 /* XCRemoteSwiftPackageReference "socket" */,
-				938F7D562955C1DA001915CA /* XCRemoteSwiftPackageReference "MessageKit" */,
+				557AC304287B10D8004699D7 /* XCRemoteSwiftPackageReference "SnapKit.git" */,
+				416F5EA2290162EB00EF0400 /* XCRemoteSwiftPackageReference "socket.io-client-swift" */,
+				938F7D562955C1DA001915CA /* XCRemoteSwiftPackageReference "MessageKit.git" */,
 			);
 			productRefGroup = E913C8EF1FFFA51D001A83F7 /* Products */;
 			projectDirPath = "";
@@ -2762,10 +2816,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				E9D664BF229EDBB300733F8A /* Shared.xcassets in Resources */,
+				9341023A29DCD03600E033E6 /* InfoPlist.strings in Resources */,
 				415CFD42294319310008AEE8 /* UpdateWalletsScript.sh in Resources */,
 				E9D664D822A00E2800733F8A /* notificationContent.strings in Resources */,
+				9341023729DCD03300E033E6 /* Localizable.strings in Resources */,
 				E9079A83229DEF9C0022CA0D /* MainInterface.storyboard in Resources */,
 				E9D664CB22A003D900733F8A /* Warning.xib in Resources */,
+				9341023429DCD02F00E033E6 /* Localizable.stringsdict in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2792,7 +2849,6 @@
 				E9B994C422BFEFF9004CD645 /* Debug.xcassets in Resources */,
 				E90A4945204C6204009F6A65 /* PassphraseCell.xib in Resources */,
 				E941CCDF20E7B70200C96220 /* WalletCollectionViewCell.xib in Resources */,
-				642361BE20E3869D0061559E /* eth_l18n.strings in Resources */,
 				E9E7CDC82003F6D200DFC4DB /* TransactionTableViewCell.xib in Resources */,
 				E926E034213EC454005E536B /* FullscreenAlertView.xib in Resources */,
 				E9EC3417200524CA00C0E546 /* Exo+2_400_italic.ttf in Resources */,
@@ -2824,7 +2880,6 @@
 				E948E0482024F02700975D6B /* VersionFooter.xib in Resources */,
 				E9FAE5E3203ED1AE008D3A6B /* ShareQrViewController.xib in Resources */,
 				E921534F20EE1E8700C0843F /* AlertLabelCell.xib in Resources */,
-				644EC35820EFAAB700F40C73 /* DelegatesListViewController.xib in Resources */,
 				4198D57B28C8B7DA009337F2 /* so-proud-notification.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2838,7 +2893,10 @@
 				E9D664D722A00E2800733F8A /* notificationContent.strings in Resources */,
 				4154413C2923AED000824478 /* bitcoin_notificationContent.png in Resources */,
 				E957E172229C56EE0019732A /* Shared.xcassets in Resources */,
+				9341023629DCD03200E033E6 /* Localizable.strings in Resources */,
 				E9D664CA22A003D900733F8A /* Warning.xib in Resources */,
+				9341023929DCD03500E033E6 /* InfoPlist.strings in Resources */,
+				9341023329DCD02F00E033E6 /* Localizable.stringsdict in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2847,8 +2905,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				4154413B2923AED000824478 /* bitcoin_notificationContent.png in Resources */,
+				9341023829DCD03500E033E6 /* InfoPlist.strings in Resources */,
 				415CFD40294319310008AEE8 /* UpdateWalletsScript.sh in Resources */,
+				9341023529DCD03200E033E6 /* Localizable.strings in Resources */,
 				E957E107229AF7CB0019732A /* adamant_notificationContent.png in Resources */,
+				9341023229DCD02F00E033E6 /* Localizable.stringsdict in Resources */,
 				E957E108229AF7CB0019732A /* doge_notificationContent.png in Resources */,
 				E957E10A229AF7CB0019732A /* ethereum_notificationContent.png in Resources */,
 				E957E109229AF7CB0019732A /* lisk_notificationContent.png in Resources */,
@@ -2942,13 +3003,11 @@
 				"${PODS_ROOT}/Target Support Files/Pods-Adamant/Pods-Adamant-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/FreakingSimpleRoundImageView/FreakingSimpleRoundImageView.framework",
 				"${BUILT_PRODUCTS_DIR}/MyLittlePinpad/MyLittlePinpad.framework",
-				"${BUILT_PRODUCTS_DIR}/PMAlertController/PMAlertController.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FreakingSimpleRoundImageView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MyLittlePinpad.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PMAlertController.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -2971,6 +3030,7 @@
 				E9079A90229DF1A40022CA0D /* Mnemonic.swift in Sources */,
 				E9079AA0229DF2380022CA0D /* AdamantNotificationKeys.swift in Sources */,
 				E9079A95229DF1DA0022CA0D /* Keypair.swift in Sources */,
+				41776FE029CB189800B74B4E /* AdamantContacts.swift in Sources */,
 				E951467122A697F8007564D7 /* ContactDescription.swift in Sources */,
 				41E142F5289E60EB002EE8D7 /* AdamantSecret.swift in Sources */,
 				E9079A9F229DF1DA0022CA0D /* VotesAsset.swift in Sources */,
@@ -3028,6 +3088,7 @@
 				E9942B84203CBFCE00C163AF /* AdamantQRTools.swift in Sources */,
 				6403F5E422723F8C00D58779 /* DashWalletService.swift in Sources */,
 				9371E561295CD53100438F2C /* ChatLocalization.swift in Sources */,
+				93BF4A6629E4859900505CD0 /* DelegatesBottomPanel.swift in Sources */,
 				9322E877297042FA00B8357C /* ChatMessage.swift in Sources */,
 				E908472F2196FEA80095825D /* BaseTransaction+CoreDataProperties.swift in Sources */,
 				640EFA902558612100E9724B /* RichMessageNotificationProvider.swift in Sources */,
@@ -3084,6 +3145,7 @@
 				E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */,
 				640EFAA42558613A00E9724B /* EthProvider.swift in Sources */,
 				9371130F2996EDA900F64CF9 /* ChatRefreshMock.swift in Sources */,
+				93547BCA29E2262D00B0914B /* WelcomeViewController.swift in Sources */,
 				41047B74294C61D10039E956 /* VisibleWalletsService.swift in Sources */,
 				553B1284281C6EE100FFF24C /* GCDUtilites.swift in Sources */,
 				648CE3AC229AD2190070A2CC /* DashTransferViewController.swift in Sources */,
@@ -3136,7 +3198,7 @@
 				A50A41112822FC35006BDFE1 /* BtcWalletService+RichMessageProviderWithStatusCheck.swift in Sources */,
 				E926E032213EC43B005E536B /* FullscreenAlertView.swift in Sources */,
 				644EC35B20EFB8E900F40C73 /* AdamantDelegateCell.swift in Sources */,
-				6403F5DB2272389800D58779 /* (null) in Sources */,
+				6403F5DB2272389800D58779 /* BuildFile in Sources */,
 				6416B1A521AEE157006089AC /* LskWalletService+Transfers.swift in Sources */,
 				648DD7A62237DC4000B811FD /* DogeTransferViewController.swift in Sources */,
 				E9960B3421F5154300C840A8 /* BaseAccount+CoreDataProperties.swift in Sources */,
@@ -3168,6 +3230,7 @@
 				41047B70294B5EE10039E956 /* VisibleWalletsViewController.swift in Sources */,
 				A5BBD811262C657300B5C40C /* ByteBackpacker.swift in Sources */,
 				648BCA6D213D384F00875EB5 /* AvatarService.swift in Sources */,
+				93B251B829E393A5008D6EA6 /* UIScrollView+Extension.swift in Sources */,
 				E95F856F2007B61D0070534A /* GetPublicKeyResponse.swift in Sources */,
 				644EC34D20EFA60900F40C73 /* AdamantApi+Delegates.swift in Sources */,
 				E9E7CDAF2002B8A100DFC4DB /* Router.swift in Sources */,
@@ -3188,7 +3251,6 @@
 				64EAB37422463E020018D9B2 /* CurrencyInfoService.swift in Sources */,
 				93CC8DC7296F00D6003772BF /* ChatTransactionContainerView.swift in Sources */,
 				E9E7CDB32002B9FB00DFC4DB /* LoginRoutes.swift in Sources */,
-				9304657E29BFB32F009B2E48 /* UIViewController+KeyboardSafeArea.swift in Sources */,
 				E9771DA022997D320099AAC7 /* AdamantUtilities.swift in Sources */,
 				E941CCDE20E7B70200C96220 /* WalletCollectionViewCell.swift in Sources */,
 				4186B33A294200F4006594A3 /* DashWalletService+DynamicConstants.swift in Sources */,
@@ -3209,9 +3271,11 @@
 				E9AA8C02212C5BF500F9249F /* AdmWalletService+Send.swift in Sources */,
 				E90847332196FEA80095825D /* TransferTransaction+CoreDataProperties.swift in Sources */,
 				E927171E20C04614002BB9A6 /* UIColor+hex.swift in Sources */,
+				41776FDD29CB17D100B74B4E /* AdamantContacts.swift in Sources */,
 				41CEE09629718A10005EF1D2 /* UIImage+adamant.swift in Sources */,
 				E99818942120892F0018C84C /* WalletViewControllerBase.swift in Sources */,
 				E9B3D39E201F99F40019EB36 /* DataProvider.swift in Sources */,
+				93BF4A6C29E4B4BF00505CD0 /* DelegatesBottomPanel+Model.swift in Sources */,
 				648DD7A82239147800B811FD /* DogeWalletService+RichMessageProvider.swift in Sources */,
 				E93EB0A320DA4CCA001F9601 /* Node.swift in Sources */,
 				E9E7CDC02003AF6D00DFC4DB /* AdamantCellFactory.swift in Sources */,
@@ -3251,6 +3315,7 @@
 				41047B72294B5F210039E956 /* VisibleWalletsTableViewCell.swift in Sources */,
 				E90847392196FEF50095825D /* BaseTransaction+TransactionDetails.swift in Sources */,
 				649D6BF021BFF481009E727B /* AdamantChatsProvider+search.swift in Sources */,
+				932BD15B29D2F75200AA1947 /* RichMessageProviderWithStatusCheck+Extension.swift in Sources */,
 				E908473B219707200095825D /* AccountViewController+StayIn.swift in Sources */,
 				E9204B5220C9762400F3B9AB /* MessageStatus.swift in Sources */,
 				E993302421369B8A00CD5200 /* RichMessage.swift in Sources */,
@@ -3367,6 +3432,7 @@
 				415CFD39294310680008AEE8 /* AdamantDynamicResources.swift in Sources */,
 				E96D64B42295BED700CA5587 /* StateAsset.swift in Sources */,
 				9304F8C4292F8A3100173F18 /* AdamantPushNotificationsTokenService.swift in Sources */,
+				9300F94629D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift in Sources */,
 				93F3914C2962F1F700BFD6AE /* MessageCellWrapper.swift in Sources */,
 				933A592A298067910068C36D /* ComparableAttributedString.swift in Sources */,
 				E9771D9E22997A6F0099AAC7 /* NativeCore+AdamantCore.swift in Sources */,
@@ -3390,6 +3456,7 @@
 				E93EB09F20DA3FA4001F9601 /* NodesEditorRoutes.swift in Sources */,
 				6489794F24CE00C000C33A68 /* SwiftyOnboardOverlay.swift in Sources */,
 				E98FC34220F9209900032D65 /* UIColor+adamant.swift in Sources */,
+				93B251B629E38E31008D6EA6 /* KeyboardObservingViewController.swift in Sources */,
 				93B9DBD229803179004F8BFF /* MessageCollectionViewCell+Extension.swift in Sources */,
 				41BCB310295C6082004B12AB /* VisibleWalletsResetTableViewCell.swift in Sources */,
 				E96D64B32295BED700CA5587 /* Keypair.swift in Sources */,
@@ -3397,6 +3464,7 @@
 				E9AA8BF82129F13000F9249F /* ComplexTransferViewController.swift in Sources */,
 				640EFAA72558614300E9724B /* TransferBaseProvider.swift in Sources */,
 				E9A174B52057EDCE003667CD /* AdamantTransfersProvider+backgroundFetch.swift in Sources */,
+				9382F61329DEC0A3005E6216 /* ChatModelView.swift in Sources */,
 				E9147B5F20500E9300145913 /* MyLittlePinpad+adamant.swift in Sources */,
 				E9981896212095CA0018C84C /* EthWalletViewController.swift in Sources */,
 				648DD7A22237D9A000B811FD /* DogeTransaction.swift in Sources */,
@@ -3444,6 +3512,7 @@
 				E957E161229C4BEA0019732A /* Crypto.swift in Sources */,
 				64E3D52624B258F800660641 /* ERC20Provider.swift in Sources */,
 				E957E16A229C53980019732A /* DogeProvider.swift in Sources */,
+				41776FDF29CB189600B74B4E /* AdamantContacts.swift in Sources */,
 				93B19AF529631800005305C0 /* CGSize+adamant.swift in Sources */,
 				55FBAAF728C54B2F0066E629 /* Nodes+Allowance.swift in Sources */,
 				E957E15B229C42B20019732A /* KeychainStore.swift in Sources */,
@@ -3495,6 +3564,7 @@
 				E9771D992299726C0099AAC7 /* ServerResponse.swift in Sources */,
 				E957E0F9229AB7E90019732A /* RichMessage.swift in Sources */,
 				E96D64E72295CF4600CA5587 /* KeychainStore.swift in Sources */,
+				41776FDE29CB189500B74B4E /* AdamantContacts.swift in Sources */,
 				E9771D83229960700099AAC7 /* AdamantResources.swift in Sources */,
 				E9771D9822996FEB0099AAC7 /* VotesAsset.swift in Sources */,
 				E9771D9A229974EA0099AAC7 /* NativeAdamantCore.swift in Sources */,
@@ -4102,7 +4172,7 @@
 				kind = branch;
 			};
 		};
-		416F5EA2290162EB00EF0400 /* XCRemoteSwiftPackageReference "socket" */ = {
+		416F5EA2290162EB00EF0400 /* XCRemoteSwiftPackageReference "socket.io-client-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/socketio/socket.io-client-swift";
 			requirement = {
@@ -4110,7 +4180,7 @@
 				kind = branch;
 			};
 		};
-		557AC304287B10D8004699D7 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+		557AC304287B10D8004699D7 /* XCRemoteSwiftPackageReference "SnapKit.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
 			requirement = {
@@ -4118,7 +4188,7 @@
 				minimumVersion = 5.0.0;
 			};
 		};
-		938F7D562955C1DA001915CA /* XCRemoteSwiftPackageReference "MessageKit" */ = {
+		938F7D562955C1DA001915CA /* XCRemoteSwiftPackageReference "MessageKit.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/MessageKit/MessageKit.git";
 			requirement = {
@@ -4126,7 +4196,7 @@
 				minimumVersion = 4.0.0;
 			};
 		};
-		A50AEB02262C815200B37C22 /* XCRemoteSwiftPackageReference "EFQRCode" */ = {
+		A50AEB02262C815200B37C22 /* XCRemoteSwiftPackageReference "EFQRCode.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/EFPrefix/EFQRCode.git";
 			requirement = {
@@ -4134,7 +4204,7 @@
 				minimumVersion = 6.1.0;
 			};
 		};
-		A50AEB0A262C81E300B37C22 /* XCRemoteSwiftPackageReference "QRCodeReader.swift" */ = {
+		A50AEB0A262C81E300B37C22 /* XCRemoteSwiftPackageReference "QRCodeReader.swift.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/yannickl/QRCodeReader.swift.git";
 			requirement = {
@@ -4142,7 +4212,7 @@
 				minimumVersion = 10.1.1;
 			};
 		};
-		A50AEB12262C837900B37C22 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+		A50AEB12262C837900B37C22 /* XCRemoteSwiftPackageReference "Alamofire.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
 			requirement = {
@@ -4150,7 +4220,7 @@
 				minimumVersion = 5.4.2;
 			};
 		};
-		A544F0D2262C9878001F1A6D /* XCRemoteSwiftPackageReference "Eureka" */ = {
+		A544F0D2262C9878001F1A6D /* XCRemoteSwiftPackageReference "Eureka.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/xmartlabs/Eureka.git";
 			requirement = {
@@ -4158,7 +4228,7 @@
 				minimumVersion = 5.3.3;
 			};
 		};
-		A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools" */ = {
+		A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/maniramezan/DateTools.git";
 			requirement = {
@@ -4166,7 +4236,7 @@
 				kind = branch;
 			};
 		};
-		A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
+		A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess.git";
 			requirement = {
@@ -4174,7 +4244,7 @@
 				minimumVersion = 4.2.2;
 			};
 		};
-		A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor" */ = {
+		A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/RNCryptor/RNCryptor.git";
 			requirement = {
@@ -4182,7 +4252,7 @@
 				minimumVersion = 5.1.0;
 			};
 		};
-		A5785ADD262C63580001BC66 /* XCRemoteSwiftPackageReference "web3swift" */ = {
+		A5785ADD262C63580001BC66 /* XCRemoteSwiftPackageReference "web3swift.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/skywinder/web3swift.git";
 			requirement = {
@@ -4198,7 +4268,7 @@
 				minimumVersion = 1.2.2;
 			};
 		};
-		A5C99E0C262C9E3A00F7B1B7 /* XCRemoteSwiftPackageReference "Reachability" */ = {
+		A5C99E0C262C9E3A00F7B1B7 /* XCRemoteSwiftPackageReference "Reachability.swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ashleymills/Reachability.swift";
 			requirement = {
@@ -4206,7 +4276,7 @@
 				minimumVersion = 5.1.0;
 			};
 		};
-		A5D87BA1262CA01D00DC28F0 /* XCRemoteSwiftPackageReference "ProcedureKit" */ = {
+		A5D87BA1262CA01D00DC28F0 /* XCRemoteSwiftPackageReference "ProcedureKit.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ProcedureKit/ProcedureKit.git";
 			requirement = {
@@ -4214,7 +4284,7 @@
 				minimumVersion = 5.2.0;
 			};
 		};
-		A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */ = {
+		A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/jedisct1/swift-sodium.git";
 			requirement = {
@@ -4222,7 +4292,7 @@
 				minimumVersion = 0.9.1;
 			};
 		};
-		A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */ = {
+		A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/krzyzanowskim/CryptoSwift.git";
 			requirement = {
@@ -4230,7 +4300,7 @@
 				minimumVersion = 1.5.0;
 			};
 		};
-		A5F0A049262C9CA90009672A /* XCRemoteSwiftPackageReference "Swinject" */ = {
+		A5F0A049262C9CA90009672A /* XCRemoteSwiftPackageReference "Swinject.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Swinject/Swinject.git";
 			requirement = {
@@ -4238,7 +4308,7 @@
 				minimumVersion = 2.7.1;
 			};
 		};
-		A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit" */ = {
+		A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/bmoliveira/MarkdownKit.git";
 			requirement = {
@@ -4256,27 +4326,27 @@
 		};
 		416F5EA3290162EB00EF0400 /* SocketIO */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 416F5EA2290162EB00EF0400 /* XCRemoteSwiftPackageReference "socket" */;
+			package = 416F5EA2290162EB00EF0400 /* XCRemoteSwiftPackageReference "socket.io-client-swift" */;
 			productName = SocketIO;
 		};
 		557AC305287B10D8004699D7 /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 557AC304287B10D8004699D7 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			package = 557AC304287B10D8004699D7 /* XCRemoteSwiftPackageReference "SnapKit.git" */;
 			productName = SnapKit;
 		};
 		55D1D84E287B78F200F94A4E /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 557AC304287B10D8004699D7 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			package = 557AC304287B10D8004699D7 /* XCRemoteSwiftPackageReference "SnapKit.git" */;
 			productName = SnapKit;
 		};
 		55D1D850287B78FC00F94A4E /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 557AC304287B10D8004699D7 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			package = 557AC304287B10D8004699D7 /* XCRemoteSwiftPackageReference "SnapKit.git" */;
 			productName = SnapKit;
 		};
 		938F7D572955C1DA001915CA /* MessageKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 938F7D562955C1DA001915CA /* XCRemoteSwiftPackageReference "MessageKit" */;
+			package = 938F7D562955C1DA001915CA /* XCRemoteSwiftPackageReference "MessageKit.git" */;
 			productName = MessageKit;
 		};
 		93FA403529401BFC00D20DB6 /* PopupKit */ = {
@@ -4285,102 +4355,102 @@
 		};
 		A50AEB03262C815200B37C22 /* EFQRCode */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A50AEB02262C815200B37C22 /* XCRemoteSwiftPackageReference "EFQRCode" */;
+			package = A50AEB02262C815200B37C22 /* XCRemoteSwiftPackageReference "EFQRCode.git" */;
 			productName = EFQRCode;
 		};
 		A50AEB0B262C81E300B37C22 /* QRCodeReader */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A50AEB0A262C81E300B37C22 /* XCRemoteSwiftPackageReference "QRCodeReader.swift" */;
+			package = A50AEB0A262C81E300B37C22 /* XCRemoteSwiftPackageReference "QRCodeReader.swift.git" */;
 			productName = QRCodeReader;
 		};
 		A50AEB13262C837900B37C22 /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A50AEB12262C837900B37C22 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			package = A50AEB12262C837900B37C22 /* XCRemoteSwiftPackageReference "Alamofire.git" */;
 			productName = Alamofire;
 		};
 		A5241B6F262DEDE1009FA43E /* Clibsodium */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
+			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium.git" */;
 			productName = Clibsodium;
 		};
 		A5241B76262DEDEF009FA43E /* Clibsodium */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
+			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium.git" */;
 			productName = Clibsodium;
 		};
 		A5241B7D262DEDFE009FA43E /* Clibsodium */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
+			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium.git" */;
 			productName = Clibsodium;
 		};
 		A544F0D3262C9878001F1A6D /* Eureka */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A544F0D2262C9878001F1A6D /* XCRemoteSwiftPackageReference "Eureka" */;
+			package = A544F0D2262C9878001F1A6D /* XCRemoteSwiftPackageReference "Eureka.git" */;
 			productName = Eureka;
 		};
 		A57282C9262C94CD00C96FA8 /* DateToolsSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools" */;
+			package = A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools.git" */;
 			productName = DateToolsSwift;
 		};
 		A57282D0262C94DA00C96FA8 /* DateToolsSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools" */;
+			package = A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools.git" */;
 			productName = DateToolsSwift;
 		};
 		A57282D2262C94DF00C96FA8 /* DateToolsSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools" */;
+			package = A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools.git" */;
 			productName = DateToolsSwift;
 		};
 		A57282D4262C94E500C96FA8 /* DateToolsSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools" */;
+			package = A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools.git" */;
 			productName = DateToolsSwift;
 		};
 		A57839FA262C95BF00428183 /* KeychainAccess */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			package = A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess.git" */;
 			productName = KeychainAccess;
 		};
 		A5783A01262C95CA00428183 /* KeychainAccess */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			package = A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess.git" */;
 			productName = KeychainAccess;
 		};
 		A5783A08262C95D000428183 /* KeychainAccess */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			package = A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess.git" */;
 			productName = KeychainAccess;
 		};
 		A5783A0A262C95D500428183 /* KeychainAccess */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			package = A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess.git" */;
 			productName = KeychainAccess;
 		};
 		A5783A0D262C964500428183 /* RNCryptor */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor" */;
+			package = A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor.git" */;
 			productName = RNCryptor;
 		};
 		A5783A14262C965000428183 /* RNCryptor */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor" */;
+			package = A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor.git" */;
 			productName = RNCryptor;
 		};
 		A5783A1B262C965600428183 /* RNCryptor */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor" */;
+			package = A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor.git" */;
 			productName = RNCryptor;
 		};
 		A5783A1D262C965D00428183 /* RNCryptor */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor" */;
+			package = A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor.git" */;
 			productName = RNCryptor;
 		};
 		A5785ADE262C63580001BC66 /* web3swift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5785ADD262C63580001BC66 /* XCRemoteSwiftPackageReference "web3swift" */;
+			package = A5785ADD262C63580001BC66 /* XCRemoteSwiftPackageReference "web3swift.git" */;
 			productName = web3swift;
 		};
 		A5AC8DFE262E0B030053A7E2 /* SipHash */ = {
@@ -4390,37 +4460,37 @@
 		};
 		A5C99E0D262C9E3A00F7B1B7 /* Reachability */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5C99E0C262C9E3A00F7B1B7 /* XCRemoteSwiftPackageReference "Reachability" */;
+			package = A5C99E0C262C9E3A00F7B1B7 /* XCRemoteSwiftPackageReference "Reachability.swift" */;
 			productName = Reachability;
 		};
 		A5D87BA2262CA01D00DC28F0 /* ProcedureKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5D87BA1262CA01D00DC28F0 /* XCRemoteSwiftPackageReference "ProcedureKit" */;
+			package = A5D87BA1262CA01D00DC28F0 /* XCRemoteSwiftPackageReference "ProcedureKit.git" */;
 			productName = ProcedureKit;
 		};
 		A5DBBABC262C7221004AC028 /* Clibsodium */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
+			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium.git" */;
 			productName = Clibsodium;
 		};
 		A5DBBADB262C729B004AC028 /* CryptoSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
+			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift.git" */;
 			productName = CryptoSwift;
 		};
 		A5DBBAE2262C72B0004AC028 /* CryptoSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
+			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift.git" */;
 			productName = CryptoSwift;
 		};
 		A5DBBAE4262C72B7004AC028 /* CryptoSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
+			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift.git" */;
 			productName = CryptoSwift;
 		};
 		A5DBBAE6262C72BD004AC028 /* CryptoSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
+			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift.git" */;
 			productName = CryptoSwift;
 		};
 		A5DBBAED262C72EF004AC028 /* BitcoinKit */ = {
@@ -4433,27 +4503,27 @@
 		};
 		A5F0A04A262C9CA90009672A /* Swinject */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5F0A049262C9CA90009672A /* XCRemoteSwiftPackageReference "Swinject" */;
+			package = A5F0A049262C9CA90009672A /* XCRemoteSwiftPackageReference "Swinject.git" */;
 			productName = Swinject;
 		};
 		A5F92993262C855B00C3E60A /* MarkdownKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit" */;
+			package = A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit.git" */;
 			productName = MarkdownKit;
 		};
 		A5F929AE262C857D00C3E60A /* MarkdownKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit" */;
+			package = A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit.git" */;
 			productName = MarkdownKit;
 		};
 		A5F929B5262C858700C3E60A /* MarkdownKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit" */;
+			package = A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit.git" */;
 			productName = MarkdownKit;
 		};
 		A5F929B7262C858F00C3E60A /* MarkdownKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit" */;
+			package = A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit.git" */;
 			productName = MarkdownKit;
 		};
 /* End XCSwiftPackageProductDependency section */

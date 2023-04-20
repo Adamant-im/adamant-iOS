@@ -28,6 +28,8 @@ final class ERC20TransferViewController: TransferViewControllerBase {
         return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: EthWalletService.currencySymbol)
     }
     
+    override var isNeedAddFeeToTotal: Bool { false }
+    
     init(
         chatsProvider: ChatsProvider,
         accountService: AccountService,
@@ -153,11 +155,7 @@ final class ERC20TransferViewController: TransferViewControllerBase {
     
     override var recipientAddress: String? {
         set {
-            if let recipient = newValue, let first = recipient.first, first != "0" {
-                _recipient = "0x\(recipient)"
-            } else {
-                _recipient = newValue
-            }
+            _recipient = newValue?.validateEthAddress()
             
             if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = _recipient
@@ -174,12 +172,7 @@ final class ERC20TransferViewController: TransferViewControllerBase {
             return false
         }
         
-        let fixedAddress: String
-        if let first = address.first, first != "0" {
-            fixedAddress = "0x\(address)"
-        } else {
-            fixedAddress = address
-        }
+        let fixedAddress = address.validateEthAddress()
         
         switch service.validate(address: fixedAddress) {
         case .valid:

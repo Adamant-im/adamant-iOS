@@ -18,8 +18,7 @@ extension String.adamantLocalized {
     }
 }
 
-class VisibleWalletsViewController: UIViewController {
-    
+final class VisibleWalletsViewController: KeyboardObservingViewController {
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.register(VisibleWalletsTableViewCell.self, forCellReuseIdentifier: cellIdentifier)
@@ -166,7 +165,7 @@ class VisibleWalletsViewController: UIViewController {
 extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelegate {
 
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
+        sectionsCount
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -179,16 +178,22 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
         }
     }
     
-    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        return section == 0 ? nil : UIView()
-    }
-    
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         return UIView()
     }
     
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        return UIView()
+    }
+    
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 0
+        return .zero
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        section == sectionsCount - 1
+            ? UITableView.automaticDimension
+            : .zero
     }
     
     // MARK: Cells
@@ -196,6 +201,7 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
         guard indexPath.section == 0 else {
             let cell = tableView.dequeueReusableCell(withIdentifier: cellResetIdentifier, for: indexPath) as! VisibleWalletsResetTableViewCell
             cell.selectionStyle = .default
+            cell.backgroundColor = UIColor.adamant.cellColor
             return cell
         }
         
@@ -316,3 +322,5 @@ extension VisibleWalletsViewController: UISearchResultsUpdating {
         tableView.reloadData()
     }
 }
+
+private let sectionsCount = 2

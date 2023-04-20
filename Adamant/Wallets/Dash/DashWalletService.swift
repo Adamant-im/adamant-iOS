@@ -282,12 +282,18 @@ extension DashWalletService: SwinjectDependentService {
 // MARK: - Balances & addresses
 extension DashWalletService {
     func getBalance() async throws -> Decimal {
-        guard let endpoint = DashWalletService.nodes.randomElement()?.asURL() else {
-            fatalError("Failed to get DASH endpoint URL")
-        }
-
-        guard let address = self.dashWallet?.address else {
+        guard let address = dashWallet?.address else {
             throw WalletServiceError.walletNotInitiated
+        }
+        
+        return try await getBalance(address: address)
+    }
+    
+    func getBalance(address: String) async throws -> Decimal {
+        guard let endpoint = DashWalletService.nodes.randomElement()?.asURL() else {
+            let message = "Failed to get DASH endpoint URL"
+            assertionFailure(message)
+            throw WalletServiceError.internalError(message: message, error: nil)
         }
 
         // Parameters
@@ -313,9 +319,8 @@ extension DashWalletService {
         ) as? [String: Any]
 
         guard let object = object else {
-            throw WalletServiceError.internalError(
-                message: "DASH Wallet: not valid response",
-                error: nil
+            throw WalletServiceError.remoteServiceError(
+                message: "DASH Wallet: not valid response"
             )
         }
         
@@ -339,10 +344,9 @@ extension DashWalletService {
             }
             
             return result
-        } catch let error as ApiServiceError {
-            throw WalletServiceError.internalError(
-                message: "DASH Wallet: failed to get address from KVS",
-                error: error
+        } catch _ as ApiServiceError {
+            throw WalletServiceError.remoteServiceError(
+                message: "DASH Wallet: failed to get address from KVS"
             )
         }
     }

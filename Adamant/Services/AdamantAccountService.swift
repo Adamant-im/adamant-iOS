@@ -7,6 +7,8 @@
 //
 
 import Foundation
+import UIKit
+import Combine
 
 class AdamantAccountService: AccountService {
     
@@ -65,6 +67,9 @@ class AdamantAccountService: AccountService {
             }
         }
     }
+    
+    private var previousAppState: UIApplication.State?
+    private var subscriptions = Set<AnyCancellable>()
     
     // MARK: Wallets
     var wallets: [WalletService] = {
@@ -154,6 +159,22 @@ class AdamantAccountService: AccountService {
         NotificationCenter.default.addObserver(forName: .AdamantAccountService.forceUpdateAllBalances, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.updateAll()
         }
+        
+        NotificationCenter.default
+            .publisher(for: UIApplication.didBecomeActiveNotification, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                guard self?.previousAppState == .background else { return }
+                self?.previousAppState = .active
+                self?.update()
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: UIApplication.willResignActiveNotification, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in self?.previousAppState = .background }
+            .store(in: &subscriptions)
         
         setupSecuredStore()
     }

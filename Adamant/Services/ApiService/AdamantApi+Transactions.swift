@@ -95,39 +95,6 @@ extension AdamantApiService {
         }
     }
     
-    func getTransactions(forAccount account: String, type: TransactionType, fromHeight: Int64?, offset: Int?, limit: Int?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void) {
-        
-        var queryItems = [URLQueryItem(name: "inId", value: account),
-                          URLQueryItem(name: "and:type", value: String(type.rawValue))
-        ]
-        
-        if let limit = limit { queryItems.append(URLQueryItem(name: "limit", value: String(limit))) }
-        
-        if let offset = offset { queryItems.append(URLQueryItem(name: "offset", value: String(offset))) }
-        
-        if let fromHeight = fromHeight, fromHeight > 0 {
-            queryItems.append(URLQueryItem(name: "and:fromHeight", value: String(fromHeight)))
-        }
-        
-        sendRequest(
-            path: ApiCommands.Transactions.root,
-            queryItems: queryItems
-        ) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Transaction>>) in
-            switch serverResponse {
-            case .success(let response):
-                if let collection = response.collection {
-                    completion(.success(collection))
-                } else {
-                    let error = AdamantApiService.translateServerError(response.error)
-                    completion(.failure(error))
-                }
-                
-            case .failure(let error):
-                completion(.failure(.networkError(error: error)))
-            }
-        }
-    }
-    
     func getTransactions(
         forAccount account: String,
         type: TransactionType,
@@ -135,10 +102,33 @@ extension AdamantApiService {
         offset: Int?,
         limit: Int?
     ) async throws -> [Transaction] {
+        try await getTransactions(
+            forAccount: account,
+            type: type,
+            fromHeight: fromHeight,
+            offset: offset,
+            limit: limit,
+            orderByTime: false
+        )
+    }
+    
+    func getTransactions(
+        forAccount account: String,
+        type: TransactionType,
+        fromHeight: Int64?,
+        offset: Int?,
+        limit: Int?,
+        orderByTime: Bool?
+    ) async throws -> [Transaction] {
         
-        var queryItems = [URLQueryItem(name: "inId", value: account),
-                          URLQueryItem(name: "and:type", value: String(type.rawValue))
-        ]
+        var queryItems = [URLQueryItem(name: "inId", value: account)]
+        
+        if type == .send {
+            // transfers can be of type 0 and 8 so we can filter by min amount
+            queryItems.append(URLQueryItem(name: "and:minAmount", value: "1"))
+        } else {
+            queryItems.append(URLQueryItem(name: "and:type", value: String(type.rawValue)))
+        }
         
         if let limit = limit { queryItems.append(URLQueryItem(name: "limit", value: String(limit))) }
         
@@ -146,6 +136,10 @@ extension AdamantApiService {
         
         if let fromHeight = fromHeight, fromHeight > 0 {
             queryItems.append(URLQueryItem(name: "and:fromHeight", value: String(fromHeight)))
+        }
+        
+        if let orderByTime = orderByTime, orderByTime {
+            queryItems.append(URLQueryItem(name: "orderBy", value: "timestamp:desc"))
         }
         
         return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<[Transaction], Error>) in

@@ -30,7 +30,7 @@ final class ChatCellSizeCalculator: CellSizeCalculator {
         if case let .transaction(model) = getMessages()[indexPath.section].fullModel.content {
             return .init(
                 width: messagesFlowLayout.itemWidth,
-                height: model.height(for: messagesFlowLayout.itemWidth)
+                height: model.value.height(for: messagesFlowLayout.itemWidth)
             )
         }
         

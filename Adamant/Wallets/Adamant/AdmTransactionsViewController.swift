@@ -11,14 +11,17 @@ import CoreData
 
 class AdmTransactionsViewController: TransactionsListViewControllerBase {
     // MARK: - Dependencies
-    var accountService: AccountService!
-    var transfersProvider: TransfersProvider!
-    var chatsProvider: ChatsProvider!
-    var dialogService: DialogService!
-    var stack: CoreDataStack!
-    var router: Router!
+    
+    var accountService: AccountService
+    var transfersProvider: TransfersProvider
+    var chatsProvider: ChatsProvider
+    var dialogService: DialogService
+    var stack: CoreDataStack
+    var router: Router
+    var addressBookService: AddressBookService
     
     // MARK: - Properties
+    
     var controller: NSFetchedResultsController<TransferTransaction>?
     
     /*
@@ -27,8 +30,35 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
      */
     /// ViewController currently is ontop of the screen.
     private var isOnTop = false
+    private let transactionsPerRequest = 100
     
     // MARK: - Lifecycle
+    
+    init(
+        nibName nibNameOrNil: String?,
+        bundle nibBundleOrNil: Bundle?,
+        accountService: AccountService,
+        transfersProvider: TransfersProvider,
+        chatsProvider: ChatsProvider,
+        dialogService: DialogService,
+        stack: CoreDataStack,
+        router: Router,
+        addressBookService: AddressBookService
+    ) {
+        self.accountService = accountService
+        self.transfersProvider = transfersProvider
+        self.chatsProvider = chatsProvider
+        self.dialogService = dialogService
+        self.stack = stack
+        self.router = router
+        self.addressBookService = addressBookService
+        
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -62,10 +92,11 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
             do {
                 try controller?.performFetch()
             } catch {
-                dialogService.showError(withMessage: "Failed to get transactions. Please, report a bug", error: error)
+                dialogService.showError(withMessage: "Failed to get transactions. Please, report a bug", supportEmail: true, error: error)
                 controller = nil
             }
             
+            isBusy = false
             self.tableView.reloadData()
         }
     }
@@ -73,6 +104,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
     @MainActor
     override func handleRefresh() {
         Task {
+            self.isBusy = true
             self.emptyLabel.isHidden = true
             
             let result = await self.transfersProvider.update()
@@ -92,16 +124,56 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
                 
                 dialogService.showRichError(error: error)
             }
+            
+            self.isBusy = false
+        }.stored(in: taskManager)
+    }
+    
+    override func loadData(_ silent: Bool) {
+        isBusy = true
+        emptyLabel.isHidden = true
+        
+        guard let address = accountService.account?.address else {
+            return
+        }
+        
+        Task { @MainActor in
+            do {
+                let count = try await transfersProvider.getTransactions(
+                    forAccount: address,
+                    type: .send,
+                    offset: transfersProvider.offsetTransactions,
+                    limit: transactionsPerRequest,
+                    orderByTime: true
+                )
+                
+                if count > 0 {
+                    await transfersProvider.updateOffsetTransactions(
+                        transfersProvider.offsetTransactions + transactionsPerRequest
+                    )
+                }
+                
+                isNeedToLoadMoore = count >= transactionsPerRequest
+            } catch {
+                isNeedToLoadMoore = false
+                
+                if !silent {
+                    dialogService.showRichError(error: error)
+                }
+            }
+            
+            isBusy = false
+            emptyLabel.isHidden = !isNeedToLoadMoore
+            refreshControl.endRefreshing()
+            stopBottomIndicator()
+            tableView.reloadData()
         }.stored(in: taskManager)
     }
     
     private func markTransfersAsRead() {
-        guard let stack = stack else {
-            return
-        }
         DispatchQueue.global(qos: .utility).async {
             let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-            privateContext.parent = stack.container.viewContext
+            privateContext.parent = self.stack.container.viewContext
             
             let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
             request.predicate = NSPredicate(format: "isUnread == true")
@@ -144,17 +216,21 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         
         controller.showToChat = toShowChat(for: transaction)
         
-        if let address = accountService.account?.address {
+        if let address = accountService.account?.address,
+           let partenerAddress = transaction.partner?.address {
+            
+            let partnerName = addressBookService.getName(for: partenerAddress)
+            
             if address == transaction.senderId {
                 controller.senderName = String.adamantLocalized.transactionDetails.yourAddress
             } else {
-                controller.senderName = transaction.chatroom?.partner?.name
+                controller.senderName = partnerName
             }
             
             if address == transaction.recipientId {
                 controller.recipientName = String.adamantLocalized.transactionDetails.yourAddress
             } else {
-                controller.recipientName = transaction.chatroom?.partner?.name
+                controller.recipientName = partnerName
             }
         }
         
@@ -166,15 +242,12 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         
         let amount: Decimal = transaction.amount as Decimal? ?? 0
         
-        var partnerName = transaction.chatroom?.partner?.name
+        var partnerName = addressBookService.getName(for: partnerId)
+        
         if let address = accountService.account?.address, partnerId == address {
             partnerName = String.adamantLocalized.transactionDetails.yourAddress
         }
         
-        if partnerName == nil {
-            partnerName = transaction.partner?.name
-        }
-
         configureCell(cell,
                       isOutgoing: transaction.isOutgoing,
                       partnerId: partnerId,
@@ -305,14 +378,17 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
 // MARK: - NSFetchedResultsControllerDelegate
 extension AdmTransactionsViewController: NSFetchedResultsControllerDelegate {
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        if isBusy { return }
         tableView.beginUpdates()
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        if isBusy { return }
         tableView.endUpdates()
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        if isBusy { return }
         switch type {
         case .insert:
             if let newIndexPath = newIndexPath {

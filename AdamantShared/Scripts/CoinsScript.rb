@@ -236,4 +236,4 @@ extension AdamantResources {
     
 end
 
-Coins.new.startUnpack("dev") #master #dev
+Coins.new.startUnpack("master") #master #dev

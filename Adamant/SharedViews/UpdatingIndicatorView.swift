@@ -14,7 +14,7 @@ final class UpdatingIndicatorView: UIView {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = title
-        label.font = .preferredFont(forTextStyle: .title3)
+        label.font = titleType.font
         return label
     }()
     
@@ -27,12 +27,26 @@ final class UpdatingIndicatorView: UIView {
     
     // MARK: Proprieties
     
+    enum TitleType {
+        case small
+        case medium
+        
+        var font: UIFont {
+            switch self {
+            case .small: return .preferredFont(forTextStyle: .headline)
+            case .medium: return .preferredFont(forTextStyle: .title3)
+            }
+        }
+    }
+    
     private var title: String
+    private var titleType: TitleType
     
     // MARK: Init
     
-    init(title: String) {
+    init(title: String, titleType: TitleType = .medium) {
         self.title = title
+        self.titleType = titleType
         super.init(frame: .zero)
 
         setupView()
@@ -40,6 +54,7 @@ final class UpdatingIndicatorView: UIView {
     
     required init?(coder: NSCoder) {
         self.title = ""
+        self.titleType = .small
         super.init(coder: coder)
         setupView()
     }
@@ -67,4 +82,8 @@ final class UpdatingIndicatorView: UIView {
         spinner.stopAnimating()
     }
     
+    func updateTitle(title: String?) {
+        self.title = title ?? ""
+        titleLabel.text = title
+    }
 }

@@ -10,7 +10,7 @@ import MessageKit
 import UIKit
 
 final class ChatMessagesCollectionView: MessagesCollectionView {
-    private var currentModels = [ChatMessage]()
+    private var currentIds = [String]()
     
     var reportMessageAction: ((IndexPath) -> Void)?
     var removeMessageAction: ((IndexPath) -> Void)?
@@ -44,17 +44,17 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
         }
     }
     
-    func reloadData(newModels: [ChatMessage]) {
-        guard newModels.last == currentModels.last || currentModels.isEmpty else {
-            return applyNewModels(newModels)
+    func reloadData(newIds: [String]) {
+        guard newIds.last == currentIds.last || newIds.first != currentIds.first else {
+            return applyNewIds(newIds)
         }
         
-        if Set(newModels.map { $0.id }) != Set(currentModels.map { $0.id }) {
+        if Set(newIds) != Set(currentIds) {
             stopDecelerating()
         }
         
         let bottomOffset = self.bottomOffset
-        applyNewModels(newModels)
+        applyNewIds(newIds)
         setBottomOffset(bottomOffset, safely: !isDragging && !isDecelerating)
     }
     
@@ -102,24 +102,10 @@ private extension ChatMessagesCollectionView {
         }
     }
     
-    func applyNewModels(_ newModels: [ChatMessage]) {
-        let fullUpdate = zip(newModels, currentModels).contains {
-            switch ($0.0.content, $0.1.content) {
-            case (.transaction, .transaction):
-                return false
-            default:
-                return $0.0 != $0.1
-            }
-        } || newModels.count != currentModels.count
-        
-        if fullUpdate {
-            reloadData()
-            layoutIfNeeded()
-        } else {
-            reloadTransactionCellsOnly(newModels)
-        }
-
-        currentModels = newModels
+    func applyNewIds(_ newIds: [String]) {
+        reloadData()
+        layoutIfNeeded()
+        currentIds = newIds
     }
     
     func stopDecelerating() {
@@ -139,16 +125,5 @@ private extension ChatMessagesCollectionView {
         }
         
         contentOffset.y = offset
-    }
-    
-    func reloadTransactionCellsOnly(_ newModels: [ChatMessage]) {
-        zip(visibleCells, indexPathsForVisibleItems).forEach { cell, indexPath in
-            guard
-                let cell = cell as? ChatViewController.TransactionCell,
-                case let .transaction(model) = newModels[indexPath.section].content
-            else { return }
-            
-            cell.wrappedView.model = model
-        }
     }
 }

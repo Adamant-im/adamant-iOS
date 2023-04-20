@@ -22,7 +22,7 @@ final class ChatViewController: MessagesViewController {
     
     private let storedObjects: [AnyObject]
     private let richMessageProviders: [String: RichMessageProvider]
-    private let admService: WalletServiceWithSend?
+    private let admService: AdmWalletService?
     
     let viewModel: ChatViewModel
     
@@ -53,12 +53,17 @@ final class ChatViewController: MessagesViewController {
         set { assertionFailure("Do not set messagesCollectionView") }
     }
     
+    private lazy var updatingIndicatorView: UpdatingIndicatorView = {
+        let view = UpdatingIndicatorView(title: "", titleType: .small)
+        return view
+    }()
+    
     init(
         viewModel: ChatViewModel,
         richMessageProviders: [String: RichMessageProvider],
         storedObjects: [AnyObject],
         sendTransaction: @escaping SendTransaction,
-        admService: WalletServiceWithSend?
+        admService: AdmWalletService?
     ) {
         self.viewModel = viewModel
         self.storedObjects = storedObjects
@@ -79,6 +84,7 @@ final class ChatViewController: MessagesViewController {
         messagesCollectionView.backgroundView?.backgroundColor = .adamant.backgroundColor
         chatMessagesCollectionView.fixedBottomOffset = .zero
         maintainPositionOnInputBarHeightChanged = true
+        navigationItem.titleView = updatingIndicatorView
         configureMessageActions()
         configureHeader()
         configureLayout()
@@ -238,6 +244,10 @@ private extension ChatViewController {
             .assign(to: \.title, on: navigationItem)
             .store(in: &subscriptions)
         
+        viewModel.$partnerName
+            .sink { [weak self] in self?.updatingIndicatorView.updateTitle(title: $0) }
+            .store(in: &subscriptions)
+        
         viewModel.closeScreen
             .sink { [weak self] in self?.close() }
             .store(in: &subscriptions)
@@ -253,6 +263,17 @@ private extension ChatViewController {
         
         viewModel.didTapAdmSend
             .sink { [weak self] in self?.didTapAdmSend(to: $0) }
+            .store(in: &subscriptions)
+        
+        viewModel.$isHeaderLoading
+            .removeDuplicates()
+            .sink { [weak self] in
+                if $0 {
+                    self?.updatingIndicatorView.startAnimate()
+                } else {
+                    self?.updatingIndicatorView.stopAnimate()
+                }
+            }
             .store(in: &subscriptions)
         
         viewModel.$replyMessage
@@ -332,7 +353,7 @@ private extension ChatViewController {
     
     func updateMessages() {
         defer { checkIsChatWasRead() }
-        chatMessagesCollectionView.reloadData(newModels: viewModel.messages)
+        chatMessagesCollectionView.reloadData(newIds: viewModel.messages.map { $0.id })
         scrollDownOnNewMessageIfNeeded(previousBottomMessageId: bottomMessageId)
         bottomMessageId = viewModel.messages.last?.messageId
         
@@ -363,7 +384,7 @@ private extension ChatViewController {
     func makeScrollDownButton() -> ChatScrollDownButton {
         let button = ChatScrollDownButton()
         button.action = { [weak messagesCollectionView] in
-            messagesCollectionView?.scrollToLastItem()
+            messagesCollectionView?.scrollToBottom(animated: true)
         }
         
         return button
@@ -410,7 +431,7 @@ private extension ChatViewController {
         didFinishWithTransfer: TransactionDetails?
     ) {
         if didFinishWithTransfer != nil {
-            messagesCollectionView.scrollToLastItem()
+            messagesCollectionView.scrollToBottom(animated: true)
         }
 
         dismiss(animated: true)
@@ -432,7 +453,7 @@ private extension ChatViewController {
             chatMessagesCollectionView.setBottomOffset(offset, safely: viewAppeared)
         case let .messageId(id):
             guard let index = viewModel.messages.firstIndex(where: { $0.messageId == id})
-            else { return }
+            else { break }
             
             messagesCollectionView.scrollToItem(
                 at: .init(item: .zero, section: index),
@@ -457,7 +478,7 @@ private extension ChatViewController {
                 && messages.last?.status == .pending
         else { return }
         
-        messagesCollectionView.scrollToLastItem()
+        messagesCollectionView.scrollToBottom(animated: true)
     }
     
     @objc func showMenu(_ sender: UIBarButtonItem) {
@@ -512,12 +533,7 @@ private extension ChatViewController {
     }
     
     func didTapTransferTransaction(_ transaction: TransferTransaction) {
-        guard
-            let provider = richMessageProviders[AdmWalletService.richMessageType]
-                as? AdmWalletService
-        else { return }
-        
-        provider.richMessageTapped(for: transaction, in: self)
+        admService?.richMessageTapped(for: transaction, in: self)
     }
     
     func didTapRichMessageTransaction(_ transaction: RichMessageTransaction) {
@@ -529,7 +545,7 @@ private extension ChatViewController {
         switch transaction.transactionStatus {
         case .failed:
             viewModel.dialog.send(.alert(.adamantLocalized.sharedErrors.inconsistentTransaction))
-        case .notInitiated, .pending, .success, .updating, .warning, .none, .inconsistent, .registered:
+        case .notInitiated, .pending, .success, .none, .inconsistent, .registered, .noNetwork, .noNetworkFinal:
             provider.richMessageTapped(for: transaction, in: self)
         }
     }
@@ -569,10 +585,18 @@ private extension ChatViewController {
 
 private extension ChatViewController {
     func didTapAdmChat(with chatroom: Chatroom, message: String?) {
-        guard let chatlistVC = self.navigationController?.viewControllers.first as? ChatListViewController
-        else {
-            return
+        var chatlistVC: ChatListViewController?
+        
+        if let nav = splitViewController?.viewControllers.first as? UINavigationController,
+           let vc = nav.viewControllers.first as? ChatListViewController {
+            chatlistVC = vc
         }
+        
+        if let vc = navigationController?.viewControllers.first as? ChatListViewController {
+            chatlistVC = vc
+        }
+        
+        guard let chatlistVC = chatlistVC else { return }
         
         let vc = chatlistVC.chatViewController(for: chatroom)
         if let message = message {

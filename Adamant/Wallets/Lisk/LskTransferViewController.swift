@@ -16,6 +16,24 @@ final class LskTransferViewController: TransferViewControllerBase {
     
     private let chatsProvider: ChatsProvider
     
+    // MARK: Properties
+    
+    override var minToTransfer: Decimal {
+        get async throws {
+            guard let recipientAddress = recipientAddress else {
+                throw WalletServiceError.accountNotFound
+            }
+            
+            guard let service = service else {
+                throw WalletServiceError.walletNotInitiated
+            }
+            
+            let recepientBalance = try await service.getBalance(address: recipientAddress)
+            let minimumAmount = service.minBalance - recepientBalance
+            return try await max(super.minToTransfer, minimumAmount)
+        }
+    }
+    
     init(
         chatsProvider: ChatsProvider,
         accountService: AccountService,

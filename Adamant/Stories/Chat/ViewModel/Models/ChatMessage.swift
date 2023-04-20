@@ -34,6 +34,12 @@ struct ChatMessage: Identifiable, Equatable {
 }
 
 extension ChatMessage {
+    struct EqualWrapper<Value>: Equatable {
+        let value: Value
+        
+        static func == (lhs: Self, rhs: Self) -> Bool { true }
+    }
+    
     enum Status: Equatable {
         case delivered(blockchain: Bool)
         case pending
@@ -42,8 +48,8 @@ extension ChatMessage {
     
     enum Content: Equatable {
         case message(ComparableAttributedString)
-        case transaction(ChatTransactionContainerView.Model)
-        case reply(ChatMessageReplyCell.Model)
+        case transaction(EqualWrapper<ChatTransactionContainerView.Model>)
+		case reply(ChatMessageReplyCell.Model)
         
         static let `default` = Self.message(.init(string: .init()))
     }

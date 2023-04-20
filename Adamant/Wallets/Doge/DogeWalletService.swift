@@ -285,12 +285,18 @@ extension DogeWalletService: SwinjectDependentService {
 // MARK: - Balances & addresses
 extension DogeWalletService {
     func getBalance() async throws -> Decimal {
-        guard let url = DogeWalletService.nodes.randomElement()?.asURL() else {
-            fatalError("Failed to get DOGE endpoint URL")
+        guard let address = dogeWallet?.address else {
+            throw WalletServiceError.walletNotInitiated
         }
         
-        guard let address = self.dogeWallet?.address else {
-            throw WalletServiceError.walletNotInitiated
+        return try await getBalance(address: address)
+    }
+    
+    func getBalance(address: String) async throws -> Decimal {
+        guard let url = DogeWalletService.nodes.randomElement()?.asURL() else {
+            let message = "Failed to get DOGE endpoint URL"
+            assertionFailure(message)
+            throw WalletServiceError.internalError(message: message, error: nil)
         }
         
         // Headers
@@ -329,10 +335,9 @@ extension DogeWalletService {
                 throw WalletServiceError.walletNotInitiated
             }
             return result
-        } catch let error as ApiServiceError {
-            throw WalletServiceError.internalError(
-                message: "DOGE Wallet: failed to get address from KVS",
-                error: error
+        } catch _ as ApiServiceError {
+            throw WalletServiceError.remoteServiceError(
+                message: "DOGE Wallet: failed to get address from KVS"
             )
         }
     }
@@ -443,7 +448,7 @@ extension DogeWalletService {
             )
             return dogeResponse
         } catch {
-            throw WalletServiceError.internalError(message: "DOGE Wallet: not a valid response", error: error)
+            throw WalletServiceError.remoteServiceError(message: "DOGE Wallet: not a valid response")
         }
     }
     
@@ -479,9 +484,8 @@ extension DogeWalletService {
         ) as? [[String: Any]]
 
         guard let items = items else {
-            throw WalletServiceError.internalError(
-                message: "DOGE Wallet: not valid response",
-                error: nil
+            throw WalletServiceError.remoteServiceError(
+                message: "DOGE Wallet: not valid response"
             )
         }
 
@@ -553,16 +557,15 @@ extension DogeWalletService {
         ) as? [String: Any]
         
         guard let json = json else {
-            throw ApiServiceError.internalError(
-                message: "DOGE Wallet: not valid response",
-                error: nil
+            throw WalletServiceError.remoteServiceError(
+                message: "DOGE Wallet: not valid response"
             )
         }
         
         if let height = json["height"] as? NSNumber {
             return height.stringValue
         } else {
-            throw ApiServiceError.internalError(message: "Failed to parse block", error: nil)
+            throw WalletServiceError.remoteServiceError(message: "Failed to parse block")
         }
     }
 }

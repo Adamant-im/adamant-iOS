@@ -103,20 +103,20 @@ final class ChatDataSourceManager: MessagesDataSource {
         at indexPath: IndexPath,
         in messagesCollectionView: MessagesCollectionView
     ) -> UICollectionViewCell {
+        let cell = messagesCollectionView.dequeueReusableCell(
+            ChatViewController.TransactionCell.self,
+            for: indexPath
+        )
         
-        if case let .transaction(model) = message.fullModel.content {
-            let cell = messagesCollectionView.dequeueReusableCell(
-                ChatViewController.TransactionCell.self,
-                for: indexPath
-            )
-            
-            cell.wrappedView.actionHandler = { [weak self] in self?.handleAction($0) }
-            cell.wrappedView.model = model
-            
-            return cell
+        let publisher: any Observable<ChatTransactionContainerView.Model> = viewModel.$messages.compactMap {
+            let message = $0[safe: indexPath.section]
+            guard case let .transaction(model) = message?.fullModel.content else { return nil }
+            return model.value
         }
         
-        return UICollectionViewCell()
+        cell.wrappedView.actionHandler = { [weak self] in self?.handleAction($0) }
+        cell.wrappedView.setSubscription(publisher: publisher)
+        return cell
     }
 }
 

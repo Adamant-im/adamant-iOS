@@ -25,7 +25,7 @@ extension String.adamantLocalized {
     }
 }
 
-class ChatListViewController: UIViewController {
+class ChatListViewController: KeyboardObservingViewController {
     typealias SpinnerCell = TableCellWrapper<SpinnerView>
     
     let cellIdentifier = "cell"
@@ -67,11 +67,28 @@ class ChatListViewController: UIViewController {
     }()
     
     private lazy var markdownParser: MarkdownParser = {
-        let parser = MarkdownParser(font: UIFont.systemFont(ofSize: ChatTableViewCell.shortDescriptionTextSize),
-                                    color: UIColor.adamant.primary,
-                                    enabledElements: .disabledAutomaticLink)
-        
-        parser.link.color = UIColor.adamant.active
+        let parser = MarkdownParser(
+            font: UIFont.systemFont(ofSize: ChatTableViewCell.shortDescriptionTextSize),
+            color: .adamant.primary,
+            enabledElements: [
+                .header,
+                .list,
+                .quote,
+                .bold,
+                .italic,
+                .code,
+                .strikethrough,
+                .automaticLink
+            ],
+            customElements: [
+                MarkdownSimpleAdm(),
+                MarkdownLinkAdm(),
+                MarkdownAdvancedAdm(
+                    font: .adamantChatDefault,
+                    color: .adamant.active
+                )
+            ]
+        )
         
         return parser
     }()
@@ -243,7 +260,28 @@ class ChatListViewController: UIViewController {
             .sink { [weak self] _ in self?.previousAppState = .background }
             .store(in: &subscriptions)
         
-        subscriptions.insert(addKeyboardToSafeArea())
+        NotificationCenter.default
+            .publisher(for: .AdamantTransfersProvider.stateChanged, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] notification in self?.animateUpdateIfNeeded(notification) }
+            .store(in: &subscriptions)
+        
+    }
+    
+    private func animateUpdateIfNeeded(_ notification: Notification) {
+        guard let prevState = notification.userInfo?[AdamantUserInfoKey.TransfersProvider.prevState] as? State,
+              let newState = notification.userInfo?[AdamantUserInfoKey.TransfersProvider.newState] as? State
+        else {
+            return
+        }
+        
+        if case .updating = prevState {
+            updatingIndicatorView.stopAnimate()
+        }
+        
+        if case .updating = newState {
+            updatingIndicatorView.startAnimate()
+        }
     }
     
     private func updateChats() {
@@ -253,7 +291,6 @@ class ChatListViewController: UIViewController {
             return
         }
         
-        updatingIndicatorView.startAnimate()
         self.handleRefresh(self.refreshControl)
     }
     
@@ -340,11 +377,10 @@ class ChatListViewController: UIViewController {
     @MainActor
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
         Task {
-            let result = await chatsProvider.update()
+            let result = await chatsProvider.update(notifyState: true)
             
             guard let result = result else {
                 refreshControl.endRefreshing()
-                updatingIndicatorView.stopAnimate()
                 return
             }
             
@@ -357,7 +393,6 @@ class ChatListViewController: UIViewController {
             }
             
             refreshControl.endRefreshing()
-			updatingIndicatorView.stopAnimate()
         }
     }
     
@@ -444,11 +479,11 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
         if isBusy,
            indexPath.row == lastSystemChatPositionRow,
            let cell = tableView.cellForRow(at: indexPath),
-           cell is SpinnerCell
-        {
+           cell is SpinnerCell {
             tableView.deselectRow(at: indexPath, animated: true)
             return
         }
+        
         let nIndexPath = chatControllerIndexPath(tableViewIndexPath: indexPath)
         if let chatroom = chatsController?.object(at: nIndexPath) {
             let vc = chatViewController(for: chatroom)
@@ -596,6 +631,7 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
         if isBusy { return }
         if controller == chatsController {
             tableView.beginUpdates()
+            updatingIndicatorView.startAnimate()
         }
     }
     
@@ -604,6 +640,7 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
         switch controller {
         case let c where c == chatsController:
             tableView.endUpdates()
+            updatingIndicatorView.stopAnimate()
             
         case let c where c == unreadController:
             setBadgeValue(controller.fetchedObjects?.count)
@@ -671,17 +708,23 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
 
 // MARK: - NewChatViewControllerDelegate
 extension ChatListViewController: NewChatViewControllerDelegate {
-    func newChatController(_ controller: NewChatViewController, didSelectAccount account: CoreDataAccount, preMessage: String?) {
+    func newChatController(
+        _ controller: NewChatViewController,
+        didSelectAccount account: CoreDataAccount,
+        preMessage: String?,
+        name: String?
+    ) {
         guard let chatroom = account.chatroom else {
             fatalError("No chatroom?")
         }
         
-        if let name = account.name, let address = account.address {
+        if let name = name,
+           let address = account.address,
+           addressBook.getName(for: address) == nil {
+            account.name = name
+            chatroom.title = name
             Task {
-                let oldName = addressBook.getName(for: address)
-                if oldName == nil || oldName != name {
-                    await self.addressBook.set(name: name, for: address)
-                }
+                await self.addressBook.set(name: name, for: address)
             }
         }
         
@@ -705,7 +748,7 @@ extension ChatListViewController: NewChatViewControllerDelegate {
             }
             
             if let preMessage = preMessage {
-                vc.messageInputBar.inputTextView.text = preMessage
+                vc.viewModel.inputText = preMessage
             }
         }
         
@@ -766,7 +809,7 @@ extension ChatListViewController {
             }
             
             // MARK: 4. Show notification with tap handler
-            dialogService.showNotification(title: title, message: text?.string, image: image) { [weak self] in
+            dialogService.showNotification(title: title?.checkAndReplaceSystemWallets(), message: text?.string, image: image) { [weak self] in
                 DispatchQueue.main.async {
                     self?.presentChatroom(chatroom)
                 }
@@ -781,19 +824,11 @@ extension ChatListViewController {
         if let split = self.splitViewController, UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
             let chat = UINavigationController(rootViewController:vc)
             split.showDetailViewController(chat, sender: self)
+            tabBarController?.selectedIndex = .zero
         } else {
             // MARK: 2. Config TabBarController
-            let animated: Bool
-            if let tabVC = tabBarController, let selectedView = tabVC.selectedViewController {
-                if let navigator = self.splitViewController ?? self.navigationController, selectedView != navigator, let index = tabVC.viewControllers?.firstIndex(of: navigator) {
-                    animated = false
-                    tabVC.selectedIndex = index
-                } else {
-                    animated = true
-                }
-            } else {
-                animated = true
-            }
+            let animated = tabBarController?.selectedIndex == .zero
+            tabBarController?.selectedIndex = .zero
             
             // MARK: 3. Present ViewController
             if let nav = navigationController {
@@ -821,7 +856,25 @@ extension ChatListViewController {
                 raw = text
             }
             
-            return markdownParser.parse(raw)
+            let attributesText = markdownParser.parse(raw)
+            let mutableText = NSMutableAttributedString(attributedString: attributesText)
+            
+            mutableText.enumerateAttribute(
+                .link,
+                in: NSRange(location: 0, length: attributesText.length),
+                options: []
+            ) { (value, range, _) in
+                guard value != nil else { return }
+                
+                mutableText.removeAttribute(.link, range: range)
+                mutableText.addAttribute(
+                    .foregroundColor,
+                    value: UIColor.adamant.active,
+                    range: range
+                )
+            }
+
+            return mutableText
             
         case let transfer as TransferTransaction:
             if let admService = richMessageProviders[AdmWalletService.richMessageType] as? AdmWalletService {
@@ -1063,6 +1116,10 @@ extension ChatListViewController {
         onMessagesLoadedActions.forEach { $0() }
         onMessagesLoadedActions = []
     }
+    
+    @objc private func showDefaultScreen() {
+        splitViewController?.showDetailViewController(WelcomeViewController(), sender: self)
+    }
 }
 
 // MARK: Search
@@ -1103,7 +1160,7 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
     
     func didSelected(_ message: MessageTransaction) {
         guard let chatroom = message.chatroom else {
-            dialogService.showError(withMessage: "Error getting chatroom in SearchController result. Please, report an error", error: nil)
+            dialogService.showError(withMessage: "Error getting chatroom in SearchController result. Please, report an error", supportEmail: true, error: nil)
             searchController?.dismiss(animated: true, completion: nil)
             return
         }
@@ -1141,5 +1198,21 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
             
             presenter.presentChatroom(chatroom)
         }
+    }
+}
+
+// MARK: Mac OS HotKeys
+
+extension ChatListViewController {
+    override var keyCommands: [UIKeyCommand]? {
+        let commands = [
+            UIKeyCommand(
+                input: UIKeyCommand.inputEscape,
+                modifierFlags: [],
+                action: #selector(showDefaultScreen)
+            )
+        ]
+        commands.forEach { $0.wantsPriorityOverSystemBehavior = true }
+        return commands
     }
 }
