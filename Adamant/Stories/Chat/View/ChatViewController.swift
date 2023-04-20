@@ -279,6 +279,13 @@ private extension ChatViewController {
         viewModel.$replyMessage
             .sink { [weak self] in self?.processSwipeMessage($0) }
             .store(in: &subscriptions)
+        
+        viewModel.$scrollToMessage
+            .sink { [weak self] in
+                guard let id = $0 else { return }
+                self?.setupStartPosition(.messageId(id))
+            }
+            .store(in: &subscriptions)
     }
 }
 

@@ -237,11 +237,21 @@ extension AdamantApiService {
         }
     }
     
-    func getChatMessages(address: String, addressRecipient: String, offset: Int?) async throws -> ChatRooms {
+    func getChatMessages(
+        address: String,
+        addressRecipient: String,
+        offset: Int?,
+        limit: Int?
+    ) async throws -> ChatRooms {
         // MARK: 1. Prepare params
         var queryItems: [URLQueryItem] = []
-        if let offset = offset { queryItems.append(URLQueryItem(name: "offset", value: String(offset))) }
-        queryItems.append(URLQueryItem(name: "limit", value: "50"))
+        if let offset = offset {
+            queryItems.append(URLQueryItem(name: "offset", value: String(offset)))
+        }
+        
+        if let limit = limit {
+            queryItems.append(URLQueryItem(name: "limit", value: String(limit)))
+        }
         
         // MARK: 2. Send
         return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<ChatRooms, Error>) in

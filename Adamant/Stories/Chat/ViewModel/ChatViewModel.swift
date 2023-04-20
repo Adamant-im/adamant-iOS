@@ -65,6 +65,7 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var partnerName: String?
     @ObservableValue var inputText = ""
     @ObservableValue var replyMessage: MessageModel?
+    @ObservableValue var scrollToMessage: String?
     
     var startPosition: ChatStartPosition? {
         if let messageIdToShow = messageIdToShow {
@@ -353,6 +354,31 @@ final class ChatViewModel: NSObject {
                 default:
                     dialog.send(.richError(error))
                 }
+            }
+        }.stored(in: tasksStorage)
+    }
+    
+    func scroll(to message: ChatMessageReplyCell.Model) {
+        guard let partnerAddress = chatroom?.partner?.address else { return }
+        
+        Task {
+            do {
+                if !chatTransactions.contains(
+                    where: { $0.transactionId == message.replyId }
+                ) {
+                    dialog.send(.progress(true))
+                    try await chatsProvider.loadTransactionsUntilFind(
+                        message.replyId,
+                        recipient: partnerAddress
+                    )
+                }
+                
+                scrollToMessage = message.replyId
+                dialog.send(.progress(false))
+            } catch {
+                print(error)
+                dialog.send(.progress(false))
+                dialog.send(.richError(error))
             }
         }.stored(in: tasksStorage)
     }

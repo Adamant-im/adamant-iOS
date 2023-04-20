@@ -132,7 +132,8 @@ protocol ApiService: AnyObject {
     func getChatMessages(
         address: String,
         addressRecipient: String,
-        offset: Int?
+        offset: Int?,
+        limit: Int?
     ) async throws -> ChatRooms
 
     // MARK: - Funds

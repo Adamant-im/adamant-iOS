@@ -32,6 +32,7 @@ actor AdamantChatsProvider: ChatsProvider {
     private(set) var receivedLastHeight: Int64?
     private(set) var readedLastHeight: Int64?
     private let apiTransactions = 100
+    private let chatTransactionsLimit = 50
     private var unconfirmedTransactions: [UInt64:NSManagedObjectID] = [:]
     private var unconfirmedTransactionsBySignature: [String] = []
     
@@ -421,7 +422,8 @@ extension AdamantChatsProvider {
         let chatroom = try? await apiGetChatMessages(
             address: address,
             addressRecipient: addressRecipient,
-            offset: offset
+            offset: offset,
+            limit: chatTransactionsLimit
         )
         
         isChatLoaded[addressRecipient] = true
@@ -452,13 +454,15 @@ extension AdamantChatsProvider {
     func apiGetChatMessages(
         address: String,
         addressRecipient: String,
-        offset: Int?
+        offset: Int?,
+        limit: Int?
     ) async throws -> ChatRooms? {
         do {
             let chatrooms = try await apiService.getChatMessages(
                 address: address,
                 addressRecipient: addressRecipient,
-                offset: offset
+                offset: offset,
+                limit: limit
             )
             return chatrooms
         } catch let error as ApiServiceError {
@@ -471,7 +475,8 @@ extension AdamantChatsProvider {
             return try await apiGetChatMessages(
                 address: address,
                 addressRecipient: addressRecipient,
-                offset: offset
+                offset: offset,
+                limit: limit
             )
         }
     }
@@ -1269,6 +1274,77 @@ extension AdamantChatsProvider {
             self.setState(.failedToUpdate(error), previous: .updating)
             throw error
         }
+    }
+    
+    func loadTransactionsUntilFind(
+        _ transactionId: String,
+        recipient: String
+    ) async throws {
+        guard let address = accountService.account?.address,
+              let privateKey = accountService.keypair?.privateKey
+        else {
+            throw ApiServiceError.accountNotFound
+        }
+        
+        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        context.parent = self.stack.container.viewContext
+        
+        guard getTransfer(id: transactionId, context: context) == nil else { return }
+                
+        var transactions: [Transaction] = []
+        var offset = chatLoadedMessages[recipient] ?? 0
+        var needToRepeat = false
+        
+        repeat {
+            let messages = try await apiGetChatMessages(
+                address: address,
+                addressRecipient: recipient,
+                offset: offset,
+                limit: chatTransactionsLimit
+            )?.messages
+            
+            guard let messages = messages else {
+                needToRepeat = false
+                break
+            }
+            
+            offset += messages.count
+            transactions.append(contentsOf: messages)
+            
+            let findTransactionId = transactions.contains(where: { $0.id == UInt64(transactionId) })
+            needToRepeat = messages.count >= chatTransactionsLimit && !findTransactionId
+        } while needToRepeat
+        
+        if transactions.count == 0 {
+            return
+        }
+        
+        chatLoadedMessages[recipient] = offset
+        
+        await process(
+            messageTransactions: transactions,
+            senderId: address,
+            privateKey: privateKey
+        )
+        
+        // MARK: Get more transactions
+        
+        let messages = try await apiGetChatMessages(
+            address: address,
+            addressRecipient: recipient,
+            offset: offset,
+            limit: chatTransactionsLimit
+        )?.messages
+        
+        guard let messages = messages, messages.count > 0 else { return }
+
+        chatLoadedMessages[recipient] = offset + messages.count
+        
+        await process(
+            messageTransactions: messages,
+            senderId: address,
+            privateKey: privateKey
+        )
     }
     
     /// - New unread messagess ids

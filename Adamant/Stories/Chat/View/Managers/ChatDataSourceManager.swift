@@ -129,6 +129,8 @@ private extension ChatDataSourceManager {
             viewModel.forceUpdateTransactionStatus(id: id)
         case let .reply(message):
             viewModel.replyMessage = message
+        case let .scrollTo(message):
+            viewModel.scroll(to: message)
         }
     }
 }

@@ -75,25 +75,26 @@ private extension AdamantRichTransactionReplyService {
                   transaction.richContent?[RichContentKeys.reply.decodedMessage] == nil
             else { return }
             
-            do {
-                let message = try await getReplyMessage(by: UInt64(id) ?? 0)
-                print("reply message decoded =\(message); id=\(id)")
-                
-                setReplyMessage(for: transaction, message: message)
-            } catch {
-                print("error= \(error)")
-            }
+            let transactionReply = try await getReplyTransaction(by: UInt64(id) ?? 0)
+            let message = try getReplyMessage(by: transactionReply)
+            
+            setReplyMessage(
+                for: transaction,
+                message: message
+            )
         }
     }
     
-    func getReplyMessage(by id: UInt64) async throws -> String {
+    func getReplyTransaction(by id: UInt64) async throws -> Transaction {
+        try await apiService.getTransaction(id: id, withAsset: true)
+    }
+    
+    func getReplyMessage(by transaction: Transaction) throws -> String {
         guard let address = accountService.account?.address,
               let privateKey = accountService.keypair?.privateKey
         else {
             throw ApiServiceError.accountNotFound
         }
-        
-        let transaction = try await apiService.getTransaction(id: id, withAsset: true)
         
         guard let chat = transaction.asset.chat else {
             let message = "\(AdmWalletService.currencySymbol) \(transaction.amount)"

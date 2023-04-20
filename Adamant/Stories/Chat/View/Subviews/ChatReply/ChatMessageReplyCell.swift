@@ -152,4 +152,10 @@ class ChatMessageReplyCell: MessageContentCell {
     override func cellContentView(canHandle touchPoint: CGPoint) -> Bool {
         messageLabel.handleGesture(touchPoint)
     }
+    
+    override func handleTapGesture(_ gesture: UIGestureRecognizer) {
+        super.handleTapGesture(gesture)
+        
+        actionHandler(.scrollTo(message: model))
+    }
 }
