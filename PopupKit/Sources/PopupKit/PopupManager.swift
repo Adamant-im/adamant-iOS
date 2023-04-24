@@ -80,7 +80,7 @@ public extension PopupManager {
         coordinatorModel.notification = .init(
             icon: icon,
             title: title,
-            description: description,
+            description: description?.trunc(length: Constants.maxNDCount),
             tapHandler: tapHandler.map { .init(id: .zero, action: $0) }
         )
         
