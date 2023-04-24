@@ -13,7 +13,11 @@ final class ChatTransactionContentView: UIView {
     var model: Model = .default {
         didSet {
             guard oldValue != model else { return }
-            update()
+            let isSelected = oldValue.animationId != model.animationId
+            && !model.id.isEmpty
+            && model.id == oldValue.id
+            
+            update(isSelected: isSelected)
         }
     }
     
@@ -130,8 +134,11 @@ private extension ChatTransactionContentView {
         }
     }
     
-    func update() {
-        backgroundColor = model.backgroundColor.uiColor
+    func update(isSelected: Bool) {
+        if isSelected {
+            startBlinkAnimation()
+        }
+        
         titleLabel.text = model.title
         iconView.image = model.icon
         amountLabel.text = String(model.amount)

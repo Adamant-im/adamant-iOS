@@ -19,6 +19,7 @@ struct ChatMessage: Identifiable, Equatable {
     let bottomString: ComparableAttributedString?
     let dateHeader: ComparableAttributedString?
     let topSpinnerOn: Bool
+    var animationId: String
     
     static let `default` = Self(
         id: "",
@@ -29,7 +30,8 @@ struct ChatMessage: Identifiable, Equatable {
         backgroundColor: .failed,
         bottomString: nil,
         dateHeader: nil,
-        topSpinnerOn: false
+        topSpinnerOn: false,
+        animationId: ""
     )
 }
 

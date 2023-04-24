@@ -36,6 +36,15 @@ final class ChatViewModel: NSObject {
     private var timerSubscription: AnyCancellable?
     private var messageIdToShow: String?
     private var isLoading = false
+    private var animationIds: [String: String] = [:] {
+        didSet {
+            animationIds.forEach { (key, value) in
+                guard let index = messages.firstIndex(where: { $0.messageId == key })
+                else { return }
+                messages[index].animationId = value
+            }
+        }
+    }
     
     private var isNeedToLoadMoreMessages: Bool {
         get async {
@@ -360,7 +369,6 @@ final class ChatViewModel: NSObject {
     
     func scroll(to message: ChatMessageReplyCell.Model) {
         guard let partnerAddress = chatroom?.partner?.address else { return }
-        
         Task {
             do {
                 if !chatTransactions.contains(
@@ -374,6 +382,8 @@ final class ChatViewModel: NSObject {
                 }
                 
                 scrollToMessage = message.replyId
+                animationIds[message.replyId] = UUID().uuidString
+                
                 dialog.send(.progress(false))
             } catch {
                 print(error)
@@ -446,7 +456,8 @@ private extension ChatViewModel {
                 transactions: chatTransactions,
                 sender: sender,
                 isNeedToLoadMoreMessages: isNeedToLoadMoreMessages,
-                expirationTimestamp: &expirationTimestamp
+                expirationTimestamp: &expirationTimestamp,
+                animationIds: animationIds
             )
             
             await setupNewMessages(

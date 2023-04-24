@@ -57,6 +57,10 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
         super.init(coder: coder)
         configure()
     }
+    
+    func configureColor() {
+        contentView.backgroundColor = model.content.backgroundColor.uiColor
+    }
 }
 
 extension ChatTransactionContainerView: ReusableView {

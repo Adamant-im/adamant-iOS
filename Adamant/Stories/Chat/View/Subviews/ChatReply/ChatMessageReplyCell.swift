@@ -9,8 +9,9 @@
 import UIKit
 import MessageKit
 import SnapKit
+import Combine
 
-class ChatMessageReplyCell: MessageContentCell {
+final class ChatMessageReplyCell: MessageContentCell, ChatModelView {    
     /// The labels used to display the message's text.
     private var messageLabel = MessageLabel()
     private var replyMessageLabel = MessageLabel()
@@ -59,10 +60,19 @@ class ChatMessageReplyCell: MessageContentCell {
         didSet {
             guard model != oldValue else { return }
             swipeView.update(model)
+            let isSelected = oldValue.animationId != model.animationId
+            && !model.animationId.isEmpty
+            && oldValue.id == model.id
+            && !model.id.isEmpty
+            
+            if isSelected {
+                messageContainerView.startBlinkAnimation()
+            }
         }
     }
     
     var actionHandler: (ChatAction) -> Void = { _ in }
+    var subscription: AnyCancellable?
     
     // MARK: - Methods
     

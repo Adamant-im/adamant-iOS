@@ -9,13 +9,15 @@
 import UIKit
 
 extension ChatMessageCell {
-    struct Model: Equatable, MessageModel {
+    struct Model: ChatReusableViewModelProtocol, MessageModel {
         let id: String
         let text: NSAttributedString
-        
+        var animationId: String
+
         static let `default` = Self(
             id: "",
-            text: NSAttributedString(string: "")
+            text: NSAttributedString(string: ""),
+            animationId: ""
         )
         
         func makeReplyContent() -> NSAttributedString {

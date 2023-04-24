@@ -9,8 +9,9 @@
 import UIKit
 import SnapKit
 import MessageKit
+import Combine
 
-class ChatMessageCell: TextMessageCell {
+final class ChatMessageCell: TextMessageCell, ChatModelView {    
     private lazy var swipeView: SwipeableView = {
         let view = SwipeableView(frame: .zero, view: contentView, messagePadding: 8)
         return view
@@ -22,10 +23,19 @@ class ChatMessageCell: TextMessageCell {
         didSet {
             guard model != oldValue else { return }
             swipeView.update(model)
+            let isSelected = oldValue.animationId != model.animationId
+            && !model.animationId.isEmpty
+            && oldValue.id == model.id
+            && !model.id.isEmpty
+            
+            if isSelected {
+                messageContainerView.startBlinkAnimation()
+            }
         }
     }
     
     var actionHandler: (ChatAction) -> Void = { _ in }
+    var subscription: AnyCancellable?
     
     // MARK: - Methods
     

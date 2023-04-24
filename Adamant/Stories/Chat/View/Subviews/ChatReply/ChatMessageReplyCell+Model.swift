@@ -9,19 +9,21 @@
 import UIKit
 
 extension ChatMessageReplyCell {
-    struct Model: Equatable, MessageModel {
+    struct Model: ChatReusableViewModelProtocol, MessageModel {
         let id: String
         let replyId: String
         let message: NSAttributedString
         let messageReply: NSAttributedString
         let backgroundColor: ChatMessageBackgroundColor
+        var animationId: String
         
         static let `default` = Self(
             id: "",
             replyId: "",
             message: NSAttributedString(string: ""),
             messageReply: NSAttributedString(string: ""),
-            backgroundColor: .failed
+            backgroundColor: .failed,
+            animationId: ""
         )
         
         func makeReplyContent() -> NSAttributedString {

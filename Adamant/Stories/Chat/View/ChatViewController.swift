@@ -283,7 +283,7 @@ private extension ChatViewController {
         viewModel.$scrollToMessage
             .sink { [weak self] in
                 guard let id = $0 else { return }
-                self?.setupStartPosition(.messageId(id))
+                self?.setupStartPosition(.messageId(id), animated: true)
             }
             .store(in: &subscriptions)
     }
@@ -452,7 +452,7 @@ private extension ChatViewController {
     }
     
     @MainActor
-    func setupStartPosition(_ position: ChatStartPosition) {
+    func setupStartPosition(_ position: ChatStartPosition, animated: Bool = false) {
         chatMessagesCollectionView.fixedBottomOffset = nil
         
         switch position {
