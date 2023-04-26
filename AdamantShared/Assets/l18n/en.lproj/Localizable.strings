@@ -229,6 +229,9 @@
 /* SearchPage: Contacts header */
 "SearchPage.Contacts" = "Contacts";
 
+/* SearchPage: Contacts header */
+"SearchPage.Contact.New" = "New contact";
+
 /* SearchPage: Messages header */
 "SearchPage.Messages" = "Messages";
 
