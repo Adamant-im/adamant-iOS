@@ -7,21 +7,26 @@
 //
 
 import UIKit
+import MessageKit
 
 extension ChatMessageCell {
     struct Model: ChatReusableViewModelProtocol, MessageModel {
         let id: String
         let text: NSAttributedString
-        var animationId: String
+        var isSelected: Bool
 
         static let `default` = Self(
             id: "",
             text: NSAttributedString(string: ""),
-            animationId: ""
+            isSelected: false
         )
         
         func makeReplyContent() -> NSAttributedString {
             return text
+        }
+        
+        func height(for width: CGFloat, indexPath: IndexPath, calculator: TextMessageSizeCalculator) -> CGFloat {
+            calculator.sizeForItem(at: indexPath).height
         }
     }
 }

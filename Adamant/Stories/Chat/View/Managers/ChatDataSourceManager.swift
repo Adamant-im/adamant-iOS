@@ -78,21 +78,12 @@ final class ChatDataSourceManager: MessagesDataSource {
                 let message = $0[safe: indexPath.section]
                 guard case let .message(model) = message?.fullModel.content
                 else { return nil }
-                
-                let newModel = ChatMessageCell.Model(
-                    id: model.id,
-                    text: model.string,
-                    animationId: message?.animationId ?? ""
-                )
-                return newModel
+                return model.value
             }
             
-            let model = ChatMessageCell.Model(id: model.id, text: model.string, animationId: "")
-            
-            cell.model = model
             cell.configure(with: message, at: indexPath, and: messagesCollectionView)
             cell.actionHandler = { [weak self] in self?.handleAction($0) }
-            cell.setSubscription(publisher: publisher)
+            cell.setSubscription(publisher: publisher, collection: messagesCollectionView, indexPath: indexPath)
 
             return cell
         }
@@ -108,14 +99,12 @@ final class ChatDataSourceManager: MessagesDataSource {
                 guard case var .reply(model) = message?.fullModel.content
                 else { return nil }
                 
-                model.animationId = message?.animationId ?? ""
-                return model
+                return model.value
             }
             
-            cell.model = model
             cell.configure(with: message, at: indexPath, and: messagesCollectionView)
             cell.actionHandler = { [weak self] in self?.handleAction($0) }
-            cell.setSubscription(publisher: publisher)
+            cell.setSubscription(publisher: publisher, collection: messagesCollectionView, indexPath: indexPath)
             
             return cell
         }
@@ -141,28 +130,11 @@ final class ChatDataSourceManager: MessagesDataSource {
             guard case let .transaction(model) = message?.fullModel.content
             else { return nil }
             
-            var newModel = ChatTransactionContainerView.Model.init(
-                id: model.value.id,
-                isFromCurrentSender: model.value.isFromCurrentSender,
-                content: .init(
-                    id: model.value.content.id,
-                    title: model.value.content.title,
-                    icon: model.value.content.icon,
-                    amount: model.value.content.amount,
-                    currency: model.value.content.currency,
-                    date: model.value.content.date,
-                    comment: model.value.content.comment,
-                    backgroundColor: model.value.content.backgroundColor,
-                    animationId: message?.animationId ?? ""),
-                status: model.value.status)
-            return newModel
+            return model.value
         }
         
-        cell.wrappedView.model = model.value
-        cell.wrappedView.configureColor()
-        
         cell.wrappedView.actionHandler = { [weak self] in self?.handleAction($0) }
-        cell.wrappedView.setSubscription(publisher: publisher)
+        cell.wrappedView.setSubscription(publisher: publisher, collection: messagesCollectionView, indexPath: indexPath)
         return cell
     }
 }

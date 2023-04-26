@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import MessageKit
 
 extension ChatMessageReplyCell {
     struct Model: ChatReusableViewModelProtocol, MessageModel {
@@ -15,7 +16,7 @@ extension ChatMessageReplyCell {
         let message: NSAttributedString
         let messageReply: NSAttributedString
         let backgroundColor: ChatMessageBackgroundColor
-        var animationId: String
+        var isSelected: Bool
         
         static let `default` = Self(
             id: "",
@@ -23,11 +24,16 @@ extension ChatMessageReplyCell {
             message: NSAttributedString(string: ""),
             messageReply: NSAttributedString(string: ""),
             backgroundColor: .failed,
-            animationId: ""
+            isSelected: false
         )
         
         func makeReplyContent() -> NSAttributedString {
             return message
+        }
+        
+        // TODO: Implement
+        func height(for width: CGFloat, indexPath: IndexPath, calculator: TextMessageSizeCalculator) -> CGFloat {
+            .zero
         }
     }
 }

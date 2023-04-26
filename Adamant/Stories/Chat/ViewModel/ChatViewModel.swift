@@ -36,14 +36,9 @@ final class ChatViewModel: NSObject {
     private var timerSubscription: AnyCancellable?
     private var messageIdToShow: String?
     private var isLoading = false
-    private var animationIds: [String: String] = [:] {
-        didSet {
-            animationIds.forEach { (key, value) in
-                guard let index = messages.firstIndex(where: { $0.messageId == key })
-                else { return }
-                messages[index].animationId = value
-            }
-        }
+    
+    private var selectedCellsIds = Set<String>() {
+        didSet { applySelectedCells() }
     }
     
     private var isNeedToLoadMoreMessages: Bool {
@@ -382,7 +377,12 @@ final class ChatViewModel: NSObject {
                 }
                 
                 scrollToMessage = message.replyId
-                animationIds[message.replyId] = UUID().uuidString
+                selectedCellsIds.insert(message.replyId)
+                
+                Task {
+                    await Task.sleep(interval: 1)
+                    selectedCellsIds.remove(message.replyId)
+                }
                 
                 dialog.send(.progress(false))
             } catch {
@@ -456,8 +456,7 @@ private extension ChatViewModel {
                 transactions: chatTransactions,
                 sender: sender,
                 isNeedToLoadMoreMessages: isNeedToLoadMoreMessages,
-                expirationTimestamp: &expirationTimestamp,
-                animationIds: animationIds
+                expirationTimestamp: &expirationTimestamp
             )
             
             await setupNewMessages(
@@ -474,6 +473,7 @@ private extension ChatViewModel {
         expirationTimestamp: TimeInterval?
     ) async {
         messages = newMessages
+        applySelectedCells()
         
         if let address = chatroom?.partner?.address {
             chatCacheService.setMessages(address: address, messages: newMessages)
@@ -615,5 +615,43 @@ private extension ChatViewModel {
     func startNewChat(with chatroom: Chatroom, name: String? = nil, message: String? = nil) {
         setNameIfNeeded(for: chatroom.partner, chatroom: chatroom, name: name)
         didTapAdmChat.send((chatroom, message))
+    }
+    
+    func applySelectedCells() {
+        messages.indices.forEach {
+            messages[$0].isSelected = selectedCellsIds.contains(messages[$0].id)
+        }
+    }
+}
+
+private extension ChatMessage {
+    var isSelected: Bool {
+        get {
+            switch content {
+            case let .message(model):
+                return model.value.isSelected
+            case let .reply(model):
+                return model.value.isSelected
+            case let .transaction(model):
+                return model.value.content.isSelected
+            }
+        }
+        
+        set {
+            switch content {
+            case let .message(model):
+                var model = model.value
+                model.isSelected = newValue
+                content = .message(.init(value: model))
+            case let .reply(model):
+                var model = model.value
+                model.isSelected = newValue
+                content = .reply(.init(value: model))
+            case let .transaction(model):
+                var model = model.value
+                model.content.isSelected = newValue
+                content = .transaction(.init(value: model))
+            }
+        }
     }
 }

@@ -9,6 +9,7 @@
 import UIKit
 import SnapKit
 import Combine
+import MessageKit
 
 final class ChatTransactionContainerView: UIView, ChatModelView {
     var subscription: AnyCancellable?
@@ -56,10 +57,6 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         configure()
-    }
-    
-    func configureColor() {
-        contentView.backgroundColor = model.content.backgroundColor.uiColor
     }
 }
 
@@ -119,7 +116,11 @@ private extension ChatTransactionContainerView {
 }
 
 extension ChatTransactionContainerView.Model {
-    func height(for width: CGFloat) -> CGFloat {
+    func height(
+        for width: CGFloat,
+        indexPath _: IndexPath,
+        calculator _: TextMessageSizeCalculator
+    ) -> CGFloat {
         content.height(for: width)
     }
 }

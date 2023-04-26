@@ -60,14 +60,7 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         didSet {
             guard model != oldValue else { return }
             swipeView.update(model)
-            let isSelected = oldValue.animationId != model.animationId
-            && !model.animationId.isEmpty
-            && oldValue.id == model.id
-            && !model.id.isEmpty
-            
-            if isSelected {
-                messageContainerView.startBlinkAnimation()
-            }
+            updateIsSelected(oldValue: oldValue.isSelected)
         }
     }
     
@@ -137,25 +130,25 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         
         replyMessageLabel.attributedText = model.messageReply
         
-        updateFrames()
+//        updateFrames()
     }
     
-    func updateFrames() {
-        let size = messageContainerView.frame.size
-        messageContainerView.frame = CGRect(
-            origin: messageContainerView.frame.origin,
-            size: CGSize(
-                width: size.width,
-                height: model.contentHeight(for: size.width)
-            )
-        )
-        
-        let origin = CGPoint(
-          x: 0,
-          y: messageContainerView.frame.maxY
-        )
-        messageBottomLabel.frame = CGRect(origin: origin, size: messageBottomLabel.frame.size)
-    }
+//    func updateFrames() {
+//        let size = messageContainerView.frame.size
+//        messageContainerView.frame = CGRect(
+//            origin: messageContainerView.frame.origin,
+//            size: CGSize(
+//                width: size.width,
+//                height: model.contentHeight(for: size.width)
+//            )
+//        )
+//
+//        let origin = CGPoint(
+//          x: 0,
+//          y: messageContainerView.frame.maxY
+//        )
+//        messageBottomLabel.frame = CGRect(origin: origin, size: messageBottomLabel.frame.size)
+//    }
     
     /// Used to handle the cell's contentView's tap gesture.
     /// Return false when the contentView does not need to handle the gesture.
@@ -167,5 +160,17 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         super.handleTapGesture(gesture)
         
         actionHandler(.scrollTo(message: model))
+    }
+}
+
+private extension ChatMessageReplyCell {
+    func updateIsSelected(oldValue: Bool) {
+        guard model.isSelected != oldValue else { return }
+        
+        UIView.animate(withDuration: 1, delay: .zero) { [self] in
+            backgroundColor = model.isSelected
+                ? .gray
+                : .blue
+        }
     }
 }

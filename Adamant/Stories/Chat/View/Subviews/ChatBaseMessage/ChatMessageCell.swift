@@ -23,14 +23,7 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         didSet {
             guard model != oldValue else { return }
             swipeView.update(model)
-            let isSelected = oldValue.animationId != model.animationId
-            && !model.animationId.isEmpty
-            && oldValue.id == model.id
-            && !model.id.isEmpty
-            
-            if isSelected {
-                messageContainerView.startBlinkAnimation()
-            }
+            updateIsSelected(oldValue: oldValue.isSelected)
         }
     }
     
@@ -50,6 +43,18 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         swipeView.action = { [weak self] message in
             print("message id \(message.id), text = \(message.makeReplyContent().string)")
             self?.actionHandler(.reply(message: message))
+        }
+    }
+}
+
+private extension ChatMessageCell {
+    func updateIsSelected(oldValue: Bool) {
+        guard model.isSelected != oldValue else { return }
+        
+        UIView.animate(withDuration: 1, delay: .zero) { [self] in
+            backgroundColor = model.isSelected
+                ? .gray
+                : .blue
         }
     }
 }

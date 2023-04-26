@@ -12,7 +12,7 @@ extension ChatTransactionContainerView {
     struct Model: ChatReusableViewModelProtocol, MessageModel {
         let id: String
         let isFromCurrentSender: Bool
-        let content: ChatTransactionContentView.Model
+        var content: ChatTransactionContentView.Model
         let status: TransactionStatus
         
         static let `default` = Self(

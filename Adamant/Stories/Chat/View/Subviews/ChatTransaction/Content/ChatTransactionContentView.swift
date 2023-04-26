@@ -13,11 +13,7 @@ final class ChatTransactionContentView: UIView {
     var model: Model = .default {
         didSet {
             guard oldValue != model else { return }
-            let isSelected = oldValue.animationId != model.animationId
-            && !model.id.isEmpty
-            && model.id == oldValue.id
-            
-            update(isSelected: isSelected)
+            update(old: oldValue)
         }
     }
     
@@ -134,11 +130,7 @@ private extension ChatTransactionContentView {
         }
     }
     
-    func update(isSelected: Bool) {
-        if isSelected {
-            startBlinkAnimation()
-        }
-        
+    func update(old: Model) {
         titleLabel.text = model.title
         iconView.image = model.icon
         amountLabel.text = String(model.amount)
@@ -146,6 +138,17 @@ private extension ChatTransactionContentView {
         dateLabel.text = model.date
         commentLabel.text = model.comment
         commentLabel.isHidden = model.comment == nil
+        updateIsSelected(oldValue: old.isSelected)
+    }
+    
+    func updateIsSelected(oldValue: Bool) {
+        guard model.isSelected != oldValue else { return }
+        
+        UIView.animate(withDuration: 1, delay: .zero) { [self] in
+            backgroundColor = model.isSelected
+                ? .gray
+                : .blue
+        }
     }
     
     @objc func didTap() {
