@@ -282,8 +282,17 @@ private extension ChatViewController {
         
         viewModel.$scrollToMessage
             .sink { [weak self] in
-                guard let id = $0 else { return }
-                self?.setupStartPosition(.messageId(id), animated: true)
+                guard let toId = $0,
+                      let fromId = $1
+                else { return }
+                
+                if self?.isScrollPositionNearlyTheBottom != true {
+                    if let index = self?.viewModel.tempOffsets.firstIndex(of: fromId) {
+                        self?.viewModel.tempOffsets.remove(at: index)
+                    }
+                    self?.viewModel.tempOffsets.append(fromId)
+                }
+                self?.scrollToPosition(.messageId(toId), animated: true)
             }
             .store(in: &subscriptions)
     }
@@ -365,7 +374,7 @@ private extension ChatViewController {
         bottomMessageId = viewModel.messages.last?.messageId
         
         guard !messagesLoaded, !viewModel.messages.isEmpty else { return }
-        viewModel.startPosition.map { setupStartPosition($0) }
+        viewModel.startPosition.map { scrollToPosition($0) }
         messagesLoaded = true
     }
     
@@ -390,8 +399,12 @@ private extension ChatViewController {
 private extension ChatViewController {
     func makeScrollDownButton() -> ChatScrollDownButton {
         let button = ChatScrollDownButton()
-        button.action = { [weak messagesCollectionView] in
-            messagesCollectionView?.scrollToBottom(animated: true)
+        button.action = { [weak self] in
+            guard let id = self?.viewModel.tempOffsets.popLast() else {
+                self?.messagesCollectionView.scrollToBottom(animated: true)
+                return
+            }
+            self?.scrollToPosition(.messageId(id), animated: true)
         }
         
         return button
@@ -452,7 +465,7 @@ private extension ChatViewController {
     }
     
     @MainActor
-    func setupStartPosition(_ position: ChatStartPosition, animated: Bool = false) {
+    func scrollToPosition(_ position: ChatStartPosition, animated: Bool = false) {
         chatMessagesCollectionView.fixedBottomOffset = nil
         
         switch position {
@@ -465,7 +478,7 @@ private extension ChatViewController {
             messagesCollectionView.scrollToItem(
                 at: .init(item: .zero, section: index),
                 at: [.centeredVertically, .centeredHorizontally],
-                animated: false
+                animated: animated
             )
         }
         

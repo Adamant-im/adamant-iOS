@@ -59,6 +59,8 @@ final class ChatViewModel: NSObject {
     private(set) var chatroom: Chatroom?
     private(set) var chatTransactions: [ChatTransaction] = []
     
+    var tempOffsets: [String] = []
+
     let didTapTransfer = ObservableSender<String>()
     let dialog = ObservableSender<ChatDialog>()
     let didTapAdmChat = ObservableSender<(Chatroom, String?)>()
@@ -74,7 +76,7 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var partnerName: String?
     @ObservableValue var inputText = ""
     @ObservableValue var replyMessage: MessageModel?
-    @ObservableValue var scrollToMessage: String?
+    @ObservableValue var scrollToMessage: (String?, String?)
     
     var startPosition: ChatStartPosition? {
         if let messageIdToShow = messageIdToShow {
@@ -381,7 +383,7 @@ final class ChatViewModel: NSObject {
                     )
                 }
                 
-                scrollToMessage = message.replyId
+                scrollToMessage = (message.replyId, message.id)
                 animationIds[message.replyId] = UUID().uuidString
                 
                 dialog.send(.progress(false))
