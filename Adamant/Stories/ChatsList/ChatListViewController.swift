@@ -76,7 +76,6 @@ class ChatListViewController: KeyboardObservingViewController {
                 .quote,
                 .bold,
                 .italic,
-                .code,
                 .strikethrough,
                 .automaticLink
             ],
@@ -86,6 +85,11 @@ class ChatListViewController: KeyboardObservingViewController {
                 MarkdownAdvancedAdm(
                     font: .adamantChatDefault,
                     color: .adamant.active
+                ),
+                MarkdownCodeAdamant(
+                    font: .adamantCodeDefault,
+                    textHighlightColor: .adamant.codeBlockText,
+                    textBackgroundColor: .adamant.codeBlock
                 )
             ]
         )
