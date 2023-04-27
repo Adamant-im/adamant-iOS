@@ -102,7 +102,7 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
         at indexPath: IndexPath,
         in messagesCollectionView: MessagesCollectionView
     ) -> CellSizeCalculator? {
-        ChatCellSizeCalculator(
+        ChatTextCellSizeCalculator(
             layout: messagesCollectionView.messagesCollectionViewFlowLayout,
             getCurrentSender: { [sender = viewModel.sender] in sender },
             getMessages: { [messages = viewModel.messages] in messages }

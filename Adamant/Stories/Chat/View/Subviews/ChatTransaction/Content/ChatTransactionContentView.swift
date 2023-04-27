@@ -146,8 +146,8 @@ private extension ChatTransactionContentView {
         
         UIView.animate(withDuration: 1, delay: .zero) { [self] in
             backgroundColor = model.isSelected
-                ? .gray
-                : .blue
+            ? .gray
+            : model.backgroundColor.uiColor
         }
     }
     
