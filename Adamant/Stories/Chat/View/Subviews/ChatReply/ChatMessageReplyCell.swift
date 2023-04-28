@@ -14,16 +14,22 @@ import Combine
 final class ChatMessageReplyCell: MessageContentCell, ChatModelView {    
     /// The labels used to display the message's text.
     private var messageLabel = MessageLabel()
-    private var replyMessageLabel = MessageLabel()
+    private var replyMessageLabel = UILabel()
     
     private lazy var swipeView: SwipeableView = {
         let view = SwipeableView(frame: .zero, view: contentView, messagePadding: 8)
         return view
     }()
     
+    static let replyViewHeight: CGFloat = 25
+    
     private lazy var replyView: UIView = {
         let view = UIView()
+        view.backgroundColor = .lightGray.withAlphaComponent(0.15)
+        view.layer.cornerRadius = 5
+        
         let colorView = UIView()
+        colorView.layer.cornerRadius = 2
         colorView.backgroundColor = .adamant.active
         
         view.addSubview(colorView)
@@ -34,8 +40,12 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
             $0.width.equalTo(2)
         }
         replyMessageLabel.snp.makeConstraints {
-            $0.top.bottom.trailing.equalToSuperview()
+            $0.centerY.equalToSuperview()
+            $0.trailing.equalToSuperview().offset(-5)
             $0.leading.equalTo(colorView.snp.trailing).offset(3)
+        }
+        view.snp.makeConstraints { make in
+            make.height.equalTo(Self.replyViewHeight)
         }
         return view
     }()
@@ -108,7 +118,7 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         replyMessageLabel.numberOfLines = 1
         verticalStack.snp.makeConstraints {
             $0.top.bottom.equalToSuperview().inset(8)
-            $0.leading.trailing.equalToSuperview().inset(12)
+            $0.leading.trailing.equalToSuperview().inset(8)
         }
     }
     

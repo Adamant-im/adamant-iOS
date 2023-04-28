@@ -53,6 +53,7 @@
 		418BBB5A2938C45B00CAB719 /* EthereumTokensList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418BBB582938C45B00CAB719 /* EthereumTokensList.swift */; };
 		418BBB5B2938C45B00CAB719 /* EthereumTokensList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418BBB582938C45B00CAB719 /* EthereumTokensList.swift */; };
 		41935848287841E20083363B /* MacOSDeterminer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41935847287841E20083363B /* MacOSDeterminer.swift */; };
+		4193AE1629FBEFBF002F21BE /* NSAttributedText+Adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4193AE1529FBEFBF002F21BE /* NSAttributedText+Adamant.swift */; };
 		4197B9C92952FAFF004CAF64 /* VisibleWalletsCheckmarkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4197B9C82952FAFF004CAF64 /* VisibleWalletsCheckmarkView.swift */; };
 		4198D57B28C8B7DA009337F2 /* so-proud-notification.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4198D57A28C8B7DA009337F2 /* so-proud-notification.mp3 */; };
 		4198D57D28C8B7FA009337F2 /* relax-message-tone.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4198D57C28C8B7F9009337F2 /* relax-message-tone.mp3 */; };
@@ -803,6 +804,7 @@
 		4186B339294200F4006594A3 /* DashWalletService+DynamicConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DashWalletService+DynamicConstants.swift"; sourceTree = "<group>"; };
 		418BBB582938C45B00CAB719 /* EthereumTokensList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthereumTokensList.swift; sourceTree = "<group>"; };
 		41935847287841E20083363B /* MacOSDeterminer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacOSDeterminer.swift; sourceTree = "<group>"; };
+		4193AE1529FBEFBF002F21BE /* NSAttributedText+Adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSAttributedText+Adamant.swift"; sourceTree = "<group>"; };
 		4197B9C82952FAFF004CAF64 /* VisibleWalletsCheckmarkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisibleWalletsCheckmarkView.swift; sourceTree = "<group>"; };
 		4198D57A28C8B7DA009337F2 /* so-proud-notification.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "so-proud-notification.mp3"; sourceTree = "<group>"; };
 		4198D57C28C8B7F9009337F2 /* relax-message-tone.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "relax-message-tone.mp3"; sourceTree = "<group>"; };
@@ -1939,6 +1941,7 @@
 				41CA598B29A0D84F002BFDE4 /* TaskManager.swift */,
 				41A1994129D2D3920031AD75 /* SwipePanGestureRecognizer.swift */,
 				41330F7529F1509400CB587C /* AdamantCellAnimation.swift */,
+				4193AE1529FBEFBF002F21BE /* NSAttributedText+Adamant.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -3333,6 +3336,7 @@
 				E9FEECA62143C300007DD7C8 /* EthWalletService+RichMessageProvider.swift in Sources */,
 				6403F5E622723FDA00D58779 /* DashWalletViewController.swift in Sources */,
 				640EFAA52558613D00E9724B /* ERC20Provider.swift in Sources */,
+				4193AE1629FBEFBF002F21BE /* NSAttributedText+Adamant.swift in Sources */,
 				41A1994829D325800031AD75 /* SwipeableView.swift in Sources */,
 				5558A438282AB9390024DDD6 /* NodeStatus.swift in Sources */,
 				E91947AC20001A9A001362F8 /* ApiService.swift in Sources */,

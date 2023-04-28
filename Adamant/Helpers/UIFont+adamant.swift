@@ -37,4 +37,5 @@ extension UIFont {
     }
     
     static var adamantChatDefault = UIFont.systemFont(ofSize: 17)
+    static var adamantChatReplyDefault = UIFont.systemFont(ofSize: 15)
 }

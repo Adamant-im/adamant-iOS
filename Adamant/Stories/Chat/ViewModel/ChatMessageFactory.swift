@@ -35,6 +35,28 @@ struct ChatMessageFactory {
         ]
     )
     
+    static let markdownReplyParser = MarkdownParser(
+        font: .adamantChatReplyDefault,
+        color: .adamant.primary,
+        enabledElements: [
+            .header,
+            .list,
+            .quote,
+            .bold,
+            .italic,
+            .code,
+            .strikethrough
+        ],
+        customElements: [
+            MarkdownSimpleAdm(),
+            MarkdownLinkAdm(),
+            MarkdownAdvancedAdm(
+                font: .adamantChatDefault,
+                color: .adamant.active
+            )
+        ]
+    )
+    
     init(richMessageProviders: [String: RichMessageProvider]) {
         self.richMessageProviders = richMessageProviders
     }
@@ -144,12 +166,13 @@ private extension ChatMessageFactory {
         }
         
         let decodedMessage = content[RichContentKeys.reply.decodedMessage] ?? "..."
+        let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
         
         return .reply(.init(
             id: transaction.txId,
             replyId: replyId,
             message: Self.markdownParser.parse(replyMessage),
-            messageReply: Self.markdownParser.parse(decodedMessage),
+            messageReply: decodedMessageMarkDown,
             backgroundColor: backgroundColor,
             animationId: animationId
         ))

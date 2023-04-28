@@ -856,25 +856,9 @@ extension ChatListViewController {
                 raw = text
             }
             
-            let attributesText = markdownParser.parse(raw)
-            let mutableText = NSMutableAttributedString(attributedString: attributesText)
+            let attributesText = markdownParser.parse(raw).resolveLinkColor()
             
-            mutableText.enumerateAttribute(
-                .link,
-                in: NSRange(location: 0, length: attributesText.length),
-                options: []
-            ) { (value, range, _) in
-                guard value != nil else { return }
-                
-                mutableText.removeAttribute(.link, range: range)
-                mutableText.addAttribute(
-                    .foregroundColor,
-                    value: UIColor.adamant.active,
-                    range: range
-                )
-            }
-
-            return mutableText
+            return attributesText
             
         case let transfer as TransferTransaction:
             if let admService = richMessageProviders[AdmWalletService.richMessageType] as? AdmWalletService {

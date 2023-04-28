@@ -45,10 +45,9 @@ extension ChatMessageReplyCell.Model {
         return verticalInsets * 2
         + verticalStackSpacing
         + messageHeight
-        + messageReplyHeight
+        + ChatMessageReplyCell.replyViewHeight
     }
 }
 
 private let verticalStackSpacing: CGFloat = 12
 private let verticalInsets: CGFloat = 8
-private let messageReplyHeight: CGFloat = 20

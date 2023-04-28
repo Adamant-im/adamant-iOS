@@ -100,7 +100,7 @@ final class ReplyView: UIView {
 extension ReplyView {
     func update(with model: MessageModel) {
         backgroundColor = .clear
-        messageLabel.attributedText = model.makeReplyContent()
+        messageLabel.attributedText = model.makeReplyContent().resolveLinkColor()
     }
 }
 
