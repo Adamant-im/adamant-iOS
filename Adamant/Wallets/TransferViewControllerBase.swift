@@ -610,8 +610,7 @@ class TransferViewControllerBase: FormViewController {
 
         guard
             let recipientAddress = recipientAddress,
-            recipientAddressIsValid,
-            let amount = amount
+            recipientAddressIsValid
         else {
             dialogService.showWarning(withMessage: .adamantLocalized.transfer.addressValidationError)
             return
@@ -622,7 +621,9 @@ class TransferViewControllerBase: FormViewController {
             return
         }
         
-        guard amount > 0 else {
+        guard let amount = amount,
+              amount > 0
+        else {
             dialogService.showWarning(withMessage: String.adamantLocalized.transfer.amountZeroError)
             return
         }
