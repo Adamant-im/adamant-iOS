@@ -268,7 +268,7 @@
                    defaultGasLimit: 58000,
                    warningGasPriceGwei: 70),
         ERC20Token(symbol: "XCN",
-                   name: "Chain",
+                   name: "Onyxcoin",
                    contractAddress: "0xa2cd3d43c775978a96bdbf12d733d5a1ed94fb18",
                    decimals: 18,
                    naturalUnits: 18,

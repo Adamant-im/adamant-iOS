@@ -25,7 +25,7 @@ extension DogeWalletService {
     }
         
     static var oldPendingAttempts: Int {
-        3
+        4
     }
         
     var tokenName: String {
@@ -41,7 +41,7 @@ extension DogeWalletService {
     }
     
     var minAmount: Decimal {
-        0
+        1
     }
     
     var defaultVisibility: Bool {
