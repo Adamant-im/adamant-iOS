@@ -35,7 +35,6 @@ actor RichTransactionStatusSubscription<StatusSubscriber: Subscriber>: Subscript
         self.subscriber = subscriber
         _oldPendingAttempts = oldPendingAttempts
         status = transaction.transactionStatus ?? .notInitiated
-        Task { await update() }
     }
     
     nonisolated func cancel() {
@@ -43,6 +42,29 @@ actor RichTransactionStatusSubscription<StatusSubscriber: Subscriber>: Subscript
     }
     
     nonisolated func request(_: Subscribers.Demand) {}
+    
+    func update() async {
+        switch state {
+        case .final:
+            reset()
+            return
+        case .old:
+            oldPendingAttempts += 1
+        case .registered, .new:
+            break
+        }
+        
+        status = await provider.statusWithFilters(
+            transaction: transaction,
+            oldPendingAttempts: oldPendingAttempts
+        )
+        
+        Task {
+            guard let interval = nextUpdateInterval else { return reset() }
+            await Task.sleep(interval: interval)
+            await update()
+        }.stored(in: taskManager)
+    }
 }
 
 private extension RichTransactionStatusSubscription {
@@ -84,29 +106,6 @@ private extension RichTransactionStatusSubscription {
         case .final:
             return nil
         }
-    }
-    
-    func update() async {
-        switch state {
-        case .final:
-            reset()
-            return
-        case .old:
-            oldPendingAttempts += 1
-        case .registered, .new:
-            break
-        }
-        
-        status = await provider.statusWithFilters(
-            transaction: transaction,
-            oldPendingAttempts: oldPendingAttempts
-        )
-        
-        Task {
-            guard let interval = nextUpdateInterval else { return reset() }
-            await Task.sleep(interval: interval)
-            await update()
-        }.stored(in: taskManager)
     }
     
     func reset() {
