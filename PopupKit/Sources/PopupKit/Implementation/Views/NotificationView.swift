@@ -53,6 +53,7 @@ private extension NotificationView {
             if let description = model.description {
                 Text(description)
                     .font(.system(size: 13))
+                    .lineLimit(3)
             }
         }
     }

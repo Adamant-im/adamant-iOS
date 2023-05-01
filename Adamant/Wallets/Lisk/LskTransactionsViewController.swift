@@ -135,7 +135,7 @@ extension Transactions.TransactionModel: TransactionDetails {
     }
     
     var dateValue: Date? {
-        return Date(timeIntervalSince1970: TimeInterval(self.timestamp))
+        return timestamp.map { Date(timeIntervalSince1970: TimeInterval($0)) }
     }
     
     var amountValue: Decimal? {
@@ -151,10 +151,10 @@ extension Transactions.TransactionModel: TransactionDetails {
     }
     
     var confirmationsValue: String? {
-        guard let confirmations = confirmations else { return "0" }
-        if confirmations < self.height { return "0" }
+        guard let confirmations = confirmations, let height = height else { return "0" }
+        if confirmations < height { return "0" }
         if confirmations > 0 {
-            return "\(confirmations - self.height + 1)"
+            return "\(confirmations - height + 1)"
         }
         
         return "\(confirmations)"
@@ -173,11 +173,11 @@ extension Transactions.TransactionModel: TransactionDetails {
     }
     
     var transactionStatus: TransactionStatus? {
-        guard let confirmations = confirmations else { return .registered }
-        if confirmations < self.height { return .registered }
+        guard let confirmations = confirmations, let height = height else { return .registered }
+        if confirmations < height { return .registered }
         
-        if confirmations > 0 && self.height > 0 {
-            let conf = (confirmations - self.height) + 1
+        if confirmations > 0 && height > 0 {
+            let conf = (confirmations - height) + 1
             if conf > 1 {
                 return .success
             } else {
@@ -195,8 +195,8 @@ extension Transactions.TransactionModel: TransactionDetails {
         return self.recipientId ?? ""
     }
 
-    var sentDate: Date {
-        return Date(timeIntervalSince1970: TimeInterval(self.timestamp))
+    var sentDate: Date? {
+        timestamp.map { Date(timeIntervalSince1970: TimeInterval($0)) }
     }
 }
 
