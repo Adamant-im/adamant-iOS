@@ -21,11 +21,11 @@ extension LskWalletService {
     }
         
     static var newPendingAttempts: Int {
-        10
+        15
     }
         
     static var oldPendingAttempts: Int {
-        3
+        4
     }
         
     var tokenName: String {

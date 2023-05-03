@@ -150,7 +150,7 @@ function unpackIcons ()
             cp $WALLETS_NAME_DIR/$WALLET_NAME/Images/${WALLET_NAME}_wallet@3x.png ${Target_Notification_Content}/${WALLET_NAME}_notificationContent.png
         
             # move wallet images to assets
-            Target_Wallet_Image=$ROOT/AdamantShared/Shared.xcassets/Wallets/${WALLET_NAME}_wallet.imageset
+            Target_Wallet_Image=$ROOT/AdamantShared/Assets/Shared.xcassets/Wallets/${WALLET_NAME}_wallet.imageset
             mkdir -p ${Target_Wallet_Image}
             moveImage $WALLETS_NAME_DIR $WALLET_NAME ${Target_Wallet_Image} ${WALLET_NAME}_wallet ${WALLET_NAME}_wallet
         fi
@@ -158,7 +158,7 @@ function unpackIcons ()
         # move notification images to assets
         if [ -e $WALLETS_NAME_DIR/$WALLET_NAME/Images/${WALLET_NAME}_wallet.png ]
         then
-            Target_Notification_Image=$ROOT/AdamantShared/Shared.xcassets/Wallets/${WALLET_NAME}_notification.imageset
+            Target_Notification_Image=$ROOT/AdamantShared/Assets/Shared.xcassets/Wallets/${WALLET_NAME}_notification.imageset
             mkdir -p ${Target_Notification_Image}
             if [ -e $WALLETS_NAME_DIR/$WALLET_NAME/Images/${WALLET_NAME}_notification.png ]
             then
@@ -171,7 +171,7 @@ function unpackIcons ()
         # move row images to assets
         if [ -e $WALLETS_NAME_DIR/$WALLET_NAME/Images/${WALLET_NAME}_wallet.png ]
         then
-            Target_Row_Image=$ROOT/AdamantShared/Shared.xcassets/Wallets/${WALLET_NAME}_wallet_row.imageset
+            Target_Row_Image=$ROOT/AdamantShared/Assets/Shared.xcassets/Wallets/${WALLET_NAME}_wallet_row.imageset
             mkdir -p ${Target_Row_Image}
             if [ -e $WALLETS_NAME_DIR/$WALLET_NAME/Images/${WALLET_NAME}_wallet_row.png ]
             then
