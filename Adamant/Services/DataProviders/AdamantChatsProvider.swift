@@ -1253,23 +1253,6 @@ extension AdamantChatsProvider {
                 senderId: senderId,
                 privateKey: privateKey
             )
-            
-            // MARK: 4. Get more transactions
-            if transactions.count == self.apiTransactions {
-                let newOffset: Int
-                if let offset = offset {
-                    newOffset = offset + self.apiTransactions
-                } else {
-                    newOffset = self.apiTransactions
-                }
-                
-                try await getTransactions(
-                    senderId: senderId,
-                    privateKey: privateKey,
-                    height: height,
-                    offset: newOffset
-                )
-            }
         } catch {
             self.setState(.failedToUpdate(error), previous: .updating)
             throw error
