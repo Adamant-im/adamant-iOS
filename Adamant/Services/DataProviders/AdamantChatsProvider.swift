@@ -515,12 +515,10 @@ extension AdamantChatsProvider {
     }
     
     func update(notifyState: Bool) async -> ChatsProviderResult? {
-        if state == .updating {
-            return nil
-        }
-        
         // MARK: 1. Check state
-        if state == .updating {
+        guard isInitiallySynced,
+              state != .updating
+        else {
             return nil
         }
         
@@ -1253,6 +1251,23 @@ extension AdamantChatsProvider {
                 senderId: senderId,
                 privateKey: privateKey
             )
+            
+            // MARK: Get more transactions if needed
+            if transactions.count == self.apiTransactions {
+                let newOffset: Int
+                if let offset = offset {
+                    newOffset = offset + self.apiTransactions
+                } else {
+                    newOffset = self.apiTransactions
+                }
+                
+                try await getTransactions(
+                    senderId: senderId,
+                    privateKey: privateKey,
+                    height: height,
+                    offset: newOffset
+                )
+            }
         } catch {
             self.setState(.failedToUpdate(error), previous: .updating)
             throw error
