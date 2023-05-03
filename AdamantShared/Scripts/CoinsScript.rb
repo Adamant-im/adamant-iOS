@@ -76,11 +76,20 @@ class Coins
         
         # txFetchInfo
         txFetchInfo = json["txFetchInfo"]
+        
+        newPendingInterval = nil
+        oldPendingInterval = nil
+        registeredInterval = nil
+        newPendingAttempts = nil
+        oldPendingAttempts = nil
+        
+        if !txFetchInfo.nil?
         newPendingInterval = txFetchInfo["newPendingInterval"]
         oldPendingInterval = txFetchInfo["oldPendingInterval"]
         registeredInterval = txFetchInfo["registeredInterval"]
         newPendingAttempts = txFetchInfo["newPendingAttempts"]
         oldPendingAttempts = txFetchInfo["oldPendingAttempts"]
+        end
 
         # Gas for eth
         reliabilityGasPricePercent = json["reliabilityGasPricePercent"]
@@ -129,27 +138,27 @@ extension #{symbol.capitalize}WalletService {
     }
 
 #{reliabilityGasPricePercent ?
-    createDecimalSwiftVariable("reliabilityGasPricePercent", reliabilityGasPricePercent, "BigUInt", false) :
+    createSwiftVariable("reliabilityGasPricePercent", reliabilityGasPricePercent, "BigUInt", false) :
     emptyText
     }
 
 #{reliabilityGasLimitPercent ?
-    createDecimalSwiftVariable("reliabilityGasLimitPercent", reliabilityGasLimitPercent, "BigUInt", false) :
+    createSwiftVariable("reliabilityGasLimitPercent", reliabilityGasLimitPercent, "BigUInt", false) :
     emptyText
     }
 
 #{defaultGasPriceGwei ?
-    createDecimalSwiftVariable("defaultGasPriceGwei", defaultGasPriceGwei, "BigUInt", false) :
+    createSwiftVariable("defaultGasPriceGwei", defaultGasPriceGwei, "BigUInt", false) :
     emptyText
     }
 
 #{defaultGasLimit ?
-    createDecimalSwiftVariable("defaultGasLimit", defaultGasLimit, "BigUInt", false) :
+    createSwiftVariable("defaultGasLimit", defaultGasLimit, "BigUInt", false) :
     emptyText
     }
 
 #{warningGasPriceGwei ?
-    createDecimalSwiftVariable("warningGasPriceGwei", warningGasPriceGwei, "BigUInt", false) :
+    createSwiftVariable("warningGasPriceGwei", warningGasPriceGwei, "BigUInt", false) :
     emptyText
     }
 
