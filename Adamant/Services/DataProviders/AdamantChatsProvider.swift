@@ -678,6 +678,7 @@ extension AdamantChatsProvider {
         case .richMessage(let payload):
             transactionLocaly = try await sendRichMessageLocaly(
                 richContent: payload.content(),
+                richContentSerialized: payload.serialized(),
                 richType: payload.type,
                 isReply: payload.isReply,
                 senderId: loggedAccount.address,
@@ -763,6 +764,7 @@ extension AdamantChatsProvider {
         case .richMessage(let payload):
             transactionLocaly = try await sendRichMessageLocaly(
                 richContent: payload.content(),
+                richContentSerialized: payload.serialized(),
                 richType: payload.type,
                 isReply: payload.isReply,
                 senderId: loggedAccount.address,
@@ -830,7 +832,8 @@ extension AdamantChatsProvider {
     }
     
     private func sendRichMessageLocaly(
-        richContent: [String:String],
+        richContent: [String: Any],
+        richContentSerialized: String,
         richType: String,
         isReply: Bool,
         senderId: String,
@@ -852,6 +855,7 @@ extension AdamantChatsProvider {
         transaction.richContent = richContent
         transaction.richType = richType
         transaction.isReply = isReply
+        transaction.richContentSerialized = richContentSerialized
         
         transaction.transactionStatus = richProviders[richType] != nil ? .notInitiated : nil
         

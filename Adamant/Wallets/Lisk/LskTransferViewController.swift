@@ -241,10 +241,27 @@ final class LskTransferViewController: TransferViewControllerBase {
         comments: String,
         hash: String
     ) async throws {
-        let payload = RichMessageTransfer(type: LskWalletService.richMessageType, amount: amount, hash: hash, comments: comments)
+        let message: AdamantMessage
         
-        let message = AdamantMessage.richMessage(payload: payload)
-       
+        if let replyToMessageId = replyToMessageId {
+            let payload = RichTransferReply(
+                replyto_id: replyToMessageId,
+                type: LskWalletService.richMessageType,
+                amount: amount,
+                hash: hash,
+                comments: comments
+            )
+            message = AdamantMessage.richMessage(payload: payload)
+        } else {
+            let payload = RichMessageTransfer(
+                type: LskWalletService.richMessageType,
+                amount: amount,
+                hash: hash,
+                comments: comments
+            )
+            message = AdamantMessage.richMessage(payload: payload)
+        }
+        
         chatsProvider.removeChatPositon(for: admAddress)
         _ = try await chatsProvider.sendMessage(message, recipientId: admAddress)
     }

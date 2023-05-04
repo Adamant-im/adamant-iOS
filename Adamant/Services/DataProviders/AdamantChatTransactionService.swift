@@ -108,28 +108,45 @@ actor AdamantChatTransactionService: ChatTransactionService {
                 // MARK: Rich message
                 case .richMessage:
                     if let data = decodedMessage.data(using: String.Encoding.utf8),
-                        let richContent = RichMessageTools.richContent(from: data),
-                        let type = richContent[RichContentKeys.type] {
-                        let trs = RichMessageTransaction(entity: RichMessageTransaction.entity(), insertInto: context)
+                       let richContent = RichMessageTools.richContent(from: data),
+                       let type = richContent[RichContentKeys.type] as? String,
+                       type != RichContentKeys.reply.reply {
+                        let trs = RichMessageTransaction(
+                            entity: RichMessageTransaction.entity(),
+                            insertInto: context
+                        )
+                        
                         trs.richContent = richContent
                         trs.richType = type
                         trs.isReply = false
                         trs.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
                         messageTransaction = trs
-                    } else if let data = decodedMessage.data(using: String.Encoding.utf8),
-                              let richContent = RichMessageTools.richContent(from: data),
-                              richContent["replyto_id"] != nil {
-                        let trs = RichMessageTransaction(entity: RichMessageTransaction.entity(), insertInto: context)
-                        trs.richContent = richContent
-                        trs.richType = "reply"
-                        trs.isReply = true
-                        trs.transactionStatus = nil
-                        messageTransaction = trs
-                    } else {
-                        let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
-                        trs.message = decodedMessage
-                        messageTransaction = trs
+                        
+                        break
                     }
+                    
+                    if let data = decodedMessage.data(using: String.Encoding.utf8),
+                       let richContent = RichMessageTools.richContent(from: data),
+                       richContent[RichContentKeys.reply.replyToId] != nil {
+                        let trs = RichMessageTransaction(
+                            entity: RichMessageTransaction.entity(),
+                            insertInto: context
+                        )
+                        let transferContent = richContent[RichContentKeys.reply.replyMessage] as? [String: String]
+                        let type = (transferContent?[RichContentKeys.type] as? String) ?? RichContentKeys.reply.reply
+                        
+                        trs.richContent = richContent
+                        trs.richType = type
+                        trs.isReply = true
+                        trs.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
+                        messageTransaction = trs
+                        
+                        break
+                    }
+                    
+                    let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
+                    trs.message = decodedMessage
+                    messageTransaction = trs
                 }
             } else {
                 let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)

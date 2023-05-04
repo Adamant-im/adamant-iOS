@@ -875,7 +875,7 @@ extension ChatListViewController {
             
             if richMessage.isReply,
                let content = richMessage.richContent,
-               let text = content[RichContentKeys.reply.replyMessage] {
+               let text = content[RichContentKeys.reply.replyMessage] as? String {
                 
                 let prefix = richMessage.isOutgoing
                 ? "\(String.adamantLocalized.chatList.sentMessagePrefix)"

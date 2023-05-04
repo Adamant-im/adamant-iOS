@@ -71,8 +71,8 @@ extension AdamantRichTransactionReplyService: NSFetchedResultsControllerDelegate
 private extension AdamantRichTransactionReplyService {
     func update(transaction: RichMessageTransaction) {
         Task {
-            guard let id = transaction.richContent?[RichContentKeys.reply.replyToId],
-                  transaction.richContent?[RichContentKeys.reply.decodedMessage] == nil
+            guard let id = transaction.getRichValue(for: RichContentKeys.reply.replyToId),
+                  transaction.getRichValue(for:RichContentKeys.reply.decodedMessage) == nil
             else { return }
             
             let transactionReply = try await getReplyTransaction(by: UInt64(id) ?? 0)
@@ -137,7 +137,7 @@ private extension AdamantRichTransactionReplyService {
         case .richMessage:
             if let data = decodedMessage.data(using: String.Encoding.utf8),
                let richContent = RichMessageTools.richContent(from: data),
-               let type = richContent[RichContentKeys.type],
+               let type = richContent[RichContentKeys.type] as? String,
                let transfer = RichMessageTransfer(content: richContent) {
                 let comment = !transfer.comments.isEmpty
                 ? ": \(transfer.comments)"
@@ -147,7 +147,7 @@ private extension AdamantRichTransactionReplyService {
                 message = "\(transactionStatus) \(transfer.amount) \(humanType)\(comment)"
             } else if let data = decodedMessage.data(using: String.Encoding.utf8),
                       let richContent = RichMessageTools.richContent(from: data),
-                      let replyMessage = richContent[RichContentKeys.reply.replyMessage] {
+                      let replyMessage = richContent[RichContentKeys.reply.replyMessage] as? String {
                 
                 message = replyMessage
             } else {

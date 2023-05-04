@@ -139,6 +139,7 @@ class TransferViewControllerBase: FormViewController {
     var commentsEnabled: Bool = false
     var rootCoinBalance: Decimal?
     var isNeedAddFeeToTotal: Bool { true }
+    var replyToMessageId: String?
     
     var service: WalletServiceWithSend? {
         didSet {

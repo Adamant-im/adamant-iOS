@@ -121,7 +121,8 @@ private extension ChatMessageFactory {
         case let transaction as MessageTransaction:
             return makeContent(transaction)
         case let transaction as RichMessageTransaction:
-            if transaction.isReply {
+            if transaction.isReply,
+               !transaction.isTransferReply() {
                 return makeContent(
                     transaction,
                     backgroundColor: backgroundColor,
@@ -158,14 +159,13 @@ private extension ChatMessageFactory {
         backgroundColor: ChatMessageBackgroundColor,
         animationId: String
     ) -> ChatMessage.Content {
-        guard let content = transaction.richContent,
-              let replyId = content[RichContentKeys.reply.replyToId],
-              let replyMessage = content[RichContentKeys.reply.replyMessage]
+        guard let replyId = transaction.getRichValue(for: RichContentKeys.reply.replyToId),
+              let replyMessage = transaction.getRichValue(for: RichContentKeys.reply.replyMessage)
         else {
             return .default
         }
         
-        let decodedMessage = content[RichContentKeys.reply.decodedMessage] ?? "..."
+        let decodedMessage = transaction.getRichValue(for: RichContentKeys.reply.decodedMessage) ?? "..."
         let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
         
         return .reply(.init(
@@ -187,6 +187,10 @@ private extension ChatMessageFactory {
         guard let transfer = transaction.transfer else { return .default }
         let id = transaction.chatMessageId ?? ""
         
+        let decodedMessage = transaction.getRichValue(for: RichContentKeys.reply.decodedMessage) ?? "..."
+        let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
+        let replyId = transaction.getRichValue(for: RichContentKeys.reply.replyToId) ?? ""
+        
         return .transaction(.init(value: .init(
             id: id,
             isFromCurrentSender: isFromCurrentSender,
@@ -201,7 +205,10 @@ private extension ChatMessageFactory {
                 date: transaction.sentDate?.humanizedDateTime(withWeekday: false) ?? "",
                 comment: transfer.comments,
                 backgroundColor: backgroundColor,
-                animationId: animationId
+                animationId: animationId,
+                isReply: transaction.isTransferReply(),
+                replyMessage: decodedMessageMarkDown,
+                replyId: replyId
             ),
             status: transaction.transactionStatus ?? .notInitiated
         )))
@@ -231,7 +238,10 @@ private extension ChatMessageFactory {
                 date: transaction.sentDate?.humanizedDateTime(withWeekday: false) ?? "",
                 comment: transaction.comment,
                 backgroundColor: backgroundColor,
-                animationId: animationId
+                animationId: animationId,
+                isReply: false,
+                replyMessage: NSAttributedString(string: ""),
+                replyId: ""
             ),
             status: transaction.statusEnum.toTransactionStatus()
         )))

@@ -10,7 +10,8 @@ import Foundation
 
 extension DogeWalletService: RichMessageProviderWithStatusCheck {
     func statusInfoFor(transaction: RichMessageTransaction) async -> TransactionStatusInfo {
-        guard let hash = transaction.richContent?[RichContentKeys.transfer.hash] else {
+        guard let hash = transaction.getRichValue(for: RichContentKeys.transfer.hash)
+        else {
             return .init(sentDate: nil, status: .inconsistent)
         }
         
@@ -52,7 +53,7 @@ private extension DogeWalletService {
         
         // MARK: Check amount & address
         guard
-            let raw = transaction.richContent?[RichContentKeys.transfer.amount],
+            let raw = transaction.getRichValue(for: RichContentKeys.transfer.amount),
             let reportedValue = AdamantBalanceFormat.deserializeBalance(from: raw)
         else {
             return .inconsistent

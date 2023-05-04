@@ -241,9 +241,26 @@ final class BtcTransferViewController: TransferViewControllerBase {
         comments: String,
         hash: String
     ) async throws {
-        let payload = RichMessageTransfer(type: BtcWalletService.richMessageType, amount: amount, hash: hash, comments: comments)
+        let message: AdamantMessage
         
-        let message = AdamantMessage.richMessage(payload: payload)
+        if let replyToMessageId = replyToMessageId {
+            let payload = RichTransferReply(
+                replyto_id: replyToMessageId,
+                type: BtcWalletService.richMessageType,
+                amount: amount,
+                hash: hash,
+                comments: comments
+            )
+            message = AdamantMessage.richMessage(payload: payload)
+        } else {
+            let payload = RichMessageTransfer(
+                type: BtcWalletService.richMessageType,
+                amount: amount,
+                hash: hash,
+                comments: comments
+            )
+            message = AdamantMessage.richMessage(payload: payload)
+        }
         
         _ = try await chatsProvider.sendMessage(message, recipientId: admAddress)
     }

@@ -60,7 +60,8 @@
     </entity>
     <entity name="RichMessageTransaction" representedClassName="RichMessageTransaction" parentEntity="ChatTransaction" syncable="YES">
         <attribute name="isReply" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
-        <attribute name="richContent" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[String:String]"/>
+        <attribute name="richContent" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[String:Any]"/>
+        <attribute name="richContentSerialized" optional="YES" attributeType="String"/>
         <attribute name="richType" attributeType="String"/>
         <attribute name="transferStatusRaw" optional="YES" attributeType="Integer 16" usesScalarValueType="NO" customClassName="RichTransferStatus"/>
     </entity>

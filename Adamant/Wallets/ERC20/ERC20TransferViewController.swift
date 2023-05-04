@@ -287,9 +287,26 @@ final class ERC20TransferViewController: TransferViewControllerBase {
         guard let type = (self.service as? RichMessageProvider)?.dynamicRichMessageType else {
             return
         }
-        let payload = RichMessageTransfer(type: type, amount: amount, hash: hash, comments: comments)
+        let message: AdamantMessage
         
-        let message = AdamantMessage.richMessage(payload: payload)
+        if let replyToMessageId = replyToMessageId {
+            let payload = RichTransferReply(
+                replyto_id: replyToMessageId,
+                type: type,
+                amount: amount,
+                hash: hash,
+                comments: comments
+            )
+            message = AdamantMessage.richMessage(payload: payload)
+        } else {
+            let payload = RichMessageTransfer(
+                type: type,
+                amount: amount,
+                hash: hash,
+                comments: comments
+            )
+            message = AdamantMessage.richMessage(payload: payload)
+        }
         
         _ = try await chatsProvider.sendMessage(message, recipientId: admAddress)
     }

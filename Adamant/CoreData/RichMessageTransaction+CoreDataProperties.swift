@@ -16,9 +16,26 @@ extension RichMessageTransaction {
         return NSFetchRequest<RichMessageTransaction>(entityName: "RichMessageTransaction")
     }
 
-    @NSManaged public var richContent: [String:String]?
+    @NSManaged public var richContentSerialized: String?
+    @NSManaged public var richContent: [String: Any]?
     @NSManaged public var richType: String?
     @NSManaged public var isReply: Bool
     @NSManaged public var transferStatusRaw: NSNumber?
-
+    
+    func isTransferReply() -> Bool {
+        return richContent?[RichContentKeys.reply.replyMessage] is [String: String]
+    }
+    
+    func getRichValue(for key: String) -> String? {
+        if let value = richContent?[key] as? String {
+            return value
+        }
+        
+        if let content = richContent?[RichContentKeys.reply.replyMessage] as? [String: String],
+           let value = content[key] {
+            return value
+        }
+        
+        return nil
+    }
 }

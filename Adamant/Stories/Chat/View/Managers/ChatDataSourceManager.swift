@@ -141,7 +141,7 @@ final class ChatDataSourceManager: MessagesDataSource {
             guard case let .transaction(model) = message?.fullModel.content
             else { return nil }
             
-            var newModel = ChatTransactionContainerView.Model.init(
+            let newModel = ChatTransactionContainerView.Model.init(
                 id: model.value.id,
                 isFromCurrentSender: model.value.isFromCurrentSender,
                 content: .init(
@@ -153,7 +153,10 @@ final class ChatDataSourceManager: MessagesDataSource {
                     date: model.value.content.date,
                     comment: model.value.content.comment,
                     backgroundColor: model.value.content.backgroundColor,
-                    animationId: message?.animationId ?? ""),
+                    animationId: message?.animationId ?? "",
+                    isReply: model.value.content.isReply,
+                    replyMessage: model.value.content.replyMessage,
+                    replyId: model.value.content.replyId),
                 status: model.value.status)
             return newModel
         }

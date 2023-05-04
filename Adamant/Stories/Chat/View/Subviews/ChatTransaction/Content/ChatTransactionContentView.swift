@@ -34,6 +34,41 @@ final class ChatTransactionContentView: UIView {
         numberOfLines: .zero
     )
     
+    var replyViewDynamicHeight: CGFloat {
+        model.isReply ? replyViewHeight : 0
+    }
+    
+    private var replyMessageLabel = UILabel()
+    
+    private lazy var replyView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .lightGray.withAlphaComponent(0.15)
+        view.layer.cornerRadius = 5
+        
+        let colorView = UIView()
+        colorView.layer.cornerRadius = 2
+        colorView.backgroundColor = .adamant.active
+        
+        view.addSubview(colorView)
+        view.addSubview(replyMessageLabel)
+        
+        replyMessageLabel.numberOfLines = 1
+        
+        colorView.snp.makeConstraints {
+            $0.top.leading.bottom.equalToSuperview()
+            $0.width.equalTo(2)
+        }
+        replyMessageLabel.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.trailing.equalToSuperview().offset(-5)
+            $0.leading.equalTo(colorView.snp.trailing).offset(3)
+        }
+        view.snp.makeConstraints { make in
+            make.height.equalTo(replyViewDynamicHeight)
+        }
+        return view
+    }()
+    
     private let iconView: UIImageView = {
         let view = UIImageView()
         view.contentMode = .scaleAspectFit
@@ -65,7 +100,7 @@ final class ChatTransactionContentView: UIView {
     }()
     
     private lazy var verticalStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [titleLabel, moneyInfoView, dateLabel, commentLabel])
+        let stack = UIStackView(arrangedSubviews: [replyView, titleLabel, moneyInfoView, dateLabel, commentLabel])
         stack.axis = .vertical
         stack.spacing = verticalStackSpacing
         return stack
@@ -109,12 +144,16 @@ extension ChatTransactionContentView.Model {
             context: nil
         ).height ?? .zero
         
+        let replyViewDynamicHeight: CGFloat = isReply ? replyViewHeight : 0
+        let stackSpacingCount: CGFloat = isReply ? 4 : 3
+        
         return verticalInsets * 2
-            + verticalStackSpacing * 3
+            + verticalStackSpacing * stackSpacingCount
             + iconSize
             + titleHeight
             + dateHeight
             + commentHeight
+            + replyViewDynamicHeight
     }
 }
 
@@ -146,9 +185,33 @@ private extension ChatTransactionContentView {
         dateLabel.text = model.date
         commentLabel.text = model.comment
         commentLabel.isHidden = model.comment == nil
+        
+        if model.isReply {
+            replyMessageLabel.attributedText = model.replyMessage
+        } else {
+            replyMessageLabel.attributedText = nil
+        }
+        
+        replyView.snp.updateConstraints { make in
+            make.height.equalTo(replyViewDynamicHeight)
+        }
     }
     
-    @objc func didTap() {
+    @objc func didTap(_ gesture: UIGestureRecognizer) {
+        let touchLocation = gesture.location(in: self)
+        
+        if replyView.frame.contains(touchLocation) {
+            actionHandler(.scrollTo(message: .init(
+                id: model.id,
+                replyId: model.replyId,
+                message: NSAttributedString(string: ""),
+                messageReply: NSAttributedString(string: ""),
+                backgroundColor: .failed,
+                animationId: ""
+            )))
+            return
+        }
+        
         actionHandler(.openTransactionDetails(id: model.id))
     }
 }
@@ -159,3 +222,4 @@ private let commentFont = UIFont.systemFont(ofSize: 14)
 private let iconSize: CGFloat = 55
 private let verticalStackSpacing: CGFloat = 6
 private let verticalInsets: CGFloat = 8
+private let replyViewHeight: CGFloat = 25

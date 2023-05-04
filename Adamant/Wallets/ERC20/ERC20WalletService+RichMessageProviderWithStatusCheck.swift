@@ -12,7 +12,8 @@ import struct BigInt.BigUInt
 
 extension ERC20WalletService: RichMessageProviderWithStatusCheck {
     func statusInfoFor(transaction: RichMessageTransaction) async -> TransactionStatusInfo {
-        guard let hash = transaction.richContent?[RichContentKeys.transfer.hash] else {
+        guard let hash = transaction.getRichValue(for: RichContentKeys.transfer.hash)
+        else {
             return .init(sentDate: nil, status: .inconsistent)
         }
         
@@ -66,7 +67,7 @@ private extension ERC20WalletService {
         
         // MARK: Compare amounts
         guard
-            let raw = transaction.richContent?[RichContentKeys.transfer.amount],
+            let raw = transaction.getRichValue(for: RichContentKeys.transfer.amount),
             let reportedValue = AdamantBalanceFormat.deserializeBalance(from: raw)
         else {
             return .inconsistent

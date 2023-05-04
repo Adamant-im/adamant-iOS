@@ -14,7 +14,7 @@ extension EthWalletService: RichMessageProviderWithStatusCheck {
     func statusInfoFor(transaction: RichMessageTransaction) async -> TransactionStatusInfo {
         guard
             let web3 = await web3,
-            let hash = transaction.richContent?[RichContentKeys.transfer.hash]
+            let hash = transaction.getRichValue(for: RichContentKeys.transfer.hash)
         else {
             return .init(sentDate: nil, status: .inconsistent)
         }
@@ -112,7 +112,8 @@ private extension EthWalletService {
         // MARK: Compare amounts
         let realAmount = eth.value.asDecimal(exponent: EthWalletService.currencyExponent)
         
-        guard let raw = transaction.richContent?[RichContentKeys.transfer.amount], let reported = AdamantBalanceFormat.deserializeBalance(from: raw) else {
+        guard let raw = transaction.getRichValue(for: RichContentKeys.transfer.amount),
+              let reported = AdamantBalanceFormat.deserializeBalance(from: raw) else {
             return .inconsistent
         }
         let min = reported - reported*0.005

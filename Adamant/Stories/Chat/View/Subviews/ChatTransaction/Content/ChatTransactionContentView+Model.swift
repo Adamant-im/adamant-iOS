@@ -19,6 +19,9 @@ extension ChatTransactionContentView {
         let comment: String?
         let backgroundColor: ChatMessageBackgroundColor
         var animationId: String
+        var isReply: Bool
+        var replyMessage: NSAttributedString
+        var replyId: String
         
         static let `default` = Self(
             id: "",
@@ -29,7 +32,10 @@ extension ChatTransactionContentView {
             date: .init(),
             comment: nil,
             backgroundColor: .failed,
-            animationId: ""
+            animationId: "",
+            isReply: false,
+            replyMessage: NSAttributedString(string: ""),
+            replyId: ""
         )
     }
 }
