@@ -178,6 +178,8 @@ private extension ChatDataSourceManager {
             viewModel.replyMessage = message
         case let .scrollTo(message):
             viewModel.scroll(to: message)
+        case let .swipeState(state):
+            viewModel.swipeState = state
         }
     }
 }

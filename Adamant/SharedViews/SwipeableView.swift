@@ -22,6 +22,7 @@ class SwipeableView: UIView {
     private var oldContentOffset: CGPoint?
     
     var action: ((MessageModel) -> Void)?
+    var swipeStateAction: ((SwipeableView.State) -> Void)?
     
     // MARK: Init
     
@@ -77,6 +78,10 @@ private extension SwipeableView {
             return
         }
         
+        if recognizer.state == .began {
+            swipeStateAction?(.began)
+        }
+        
         let isOnStartPosition = movingView.frame.origin.x == 0 || movingView.frame.origin.x == messagePadding
         
         if isOnStartPosition && translation.x > 0 { return }
@@ -100,6 +105,7 @@ private extension SwipeableView {
         }
         
         if recognizer.state == .ended {
+            swipeStateAction?(.ended)
             canReplyVibrate = true
             
             if replyAction {
@@ -115,5 +121,13 @@ private extension SwipeableView {
                 )
             }
         }
+    }
+}
+
+// MARK: State
+extension SwipeableView {
+    enum State {
+        case began
+        case ended
     }
 }

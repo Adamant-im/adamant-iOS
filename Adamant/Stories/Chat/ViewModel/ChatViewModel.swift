@@ -74,6 +74,7 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var isSendingAvailable = false
     @ObservableValue private(set) var fee = ""
     @ObservableValue private(set) var partnerName: String?
+    @ObservableValue var swipeState: SwipeableView.State = .ended
     @ObservableValue var inputText = ""
     @ObservableValue var replyMessage: MessageModel?
     @ObservableValue var scrollToMessage: (String?, String?)

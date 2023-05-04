@@ -35,6 +35,18 @@ class SwipePanGestureRecognizer: UIPanGestureRecognizer, UIGestureRecognizerDele
         }
     }
     
+    func gestureRecognizerShouldBegin(
+        _ gestureRecognizer: UIGestureRecognizer
+    ) -> Bool {
+        guard let panGesture = gestureRecognizer as? UIPanGestureRecognizer else {
+            return false
+        }
+        
+        let velocity = panGesture.velocity(in: self.view)
+        let isHorizontal = abs(velocity.x) > abs(velocity.y)
+        return isHorizontal
+    }
+    
     func gestureRecognizer(
         _ gestureRecognizer: UIGestureRecognizer,
         shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer

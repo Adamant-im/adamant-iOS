@@ -51,5 +51,9 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
             print("message id \(message.id), text = \(message.makeReplyContent().string)")
             self?.actionHandler(.reply(message: message))
         }
+        
+        swipeView.swipeStateAction = { [weak self] state in
+            self?.actionHandler(.swipeState(state: state))
+        }
     }
 }

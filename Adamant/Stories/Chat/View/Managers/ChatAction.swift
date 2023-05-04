@@ -11,4 +11,5 @@ enum ChatAction {
     case openTransactionDetails(id: String)
     case reply(message: MessageModel)
     case scrollTo(message: ChatMessageReplyCell.Model)
+    case swipeState(state: SwipeableView.State)
 }

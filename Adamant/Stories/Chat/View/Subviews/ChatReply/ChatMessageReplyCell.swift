@@ -113,6 +113,10 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
             self?.actionHandler(.reply(message: message))
         }
         
+        swipeView.swipeStateAction = { [weak self] state in
+            self?.actionHandler(.swipeState(state: state))
+        }
+        
         messageContainerView.addSubview(verticalStack)
         messageLabel.numberOfLines = 0
         replyMessageLabel.numberOfLines = 1

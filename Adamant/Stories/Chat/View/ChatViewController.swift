@@ -159,6 +159,18 @@ extension ChatViewController {
         let velocity = panGesture.velocity(in: messagesCollectionView)
         return abs(velocity.x) > abs(velocity.y)
     }
+    
+    private func swipeStateAction(_ state: SwipeableView.State) {
+        if state == .began {
+            messagesCollectionView.setContentOffset(messagesCollectionView.contentOffset, animated: false)
+            messagesCollectionView.isScrollEnabled = false
+        }
+        
+        if state == .ended {
+            messagesCollectionView.isScrollEnabled = true
+            messagesCollectionView.keyboardDismissMode = .interactive
+        }
+    }
 }
 
 // MARK: Delegate Protocols
@@ -294,6 +306,10 @@ private extension ChatViewController {
                 }
                 self?.scrollToPosition(.messageId(toId), animated: true)
             }
+            .store(in: &subscriptions)
+        
+        viewModel.$swipeState
+            .sink { [weak self] in self?.swipeStateAction($0) }
             .store(in: &subscriptions)
     }
 }
