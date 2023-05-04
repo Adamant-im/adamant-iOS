@@ -45,6 +45,8 @@ private extension LskWalletService {
         lskTransaction: Transactions.TransactionModel,
         transaction: RichMessageTransaction
     ) -> TransactionStatus {
+        guard lskTransaction.blockId != nil else { return .registered }
+        
         guard let status = lskTransaction.transactionStatus else {
             return .inconsistent
         }

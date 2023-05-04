@@ -28,5 +28,6 @@ struct RichTransactionStatusPublisher: Publisher {
         )
         
         subscriber.receive(subscription: subscription)
+        Task { await subscription.update() }
     }
 }

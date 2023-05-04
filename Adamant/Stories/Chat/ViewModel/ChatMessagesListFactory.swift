@@ -74,10 +74,10 @@ private func isNeedToDisplayDateHeader(
     index: Int,
     transactions: [ChatTransaction]
 ) -> Bool {
+    guard transactions[index].sentDate != .adamantNullDate else { return false }
     guard index > .zero else { return true }
     
     guard
-        transactions[index].sentDate != .adamantNullDate,
         let previousDate = transactions[index - 1].sentDate,
         let currentDate = transactions[index].sentDate
     else { return false }

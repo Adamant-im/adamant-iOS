@@ -345,11 +345,7 @@ extension AppDelegate {
         
         let chatroom = chatListVC.chatsController?.fetchedObjects?.first(
             where: {
-                $0.transactions?.contains(
-                    where: {
-                        ($0 as? ChatTransaction)?.senderAddress == senderAddress
-                    }
-                ) ?? false
+                $0.partner?.address == senderAddress
             }
         )
         

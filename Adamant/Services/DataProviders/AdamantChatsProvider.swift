@@ -9,6 +9,7 @@
 import UIKit
 import CoreData
 import MarkdownKit
+import Combine
 
 actor AdamantChatsProvider: ChatsProvider {
     
@@ -60,6 +61,8 @@ actor AdamantChatsProvider: ChatsProvider {
     
     private(set) var roomsMaxCount: Int?
     private(set) var roomsLoadedCount: Int?
+    
+    private var subscriptions = Set<AnyCancellable>()
     
     // MARK: Lifecycle
     init(
@@ -141,6 +144,16 @@ actor AdamantChatsProvider: ChatsProvider {
                 reachabilityChangedAction(notification)
             }
         }
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantTransfersProvider.initialSyncFinished, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { _ in
+                Task { [weak self] in
+                    await self?.getChatRooms(offset: nil)
+                }
+            }
+            .store(in: &subscriptions)
     }
     
     deinit {
@@ -170,10 +183,6 @@ actor AdamantChatsProvider: ChatsProvider {
             store.remove(StoreKey.chatProvider.readedLastHeight)
             self.dropStateData()
             store.set(loggedAddress, for: StoreKey.chatProvider.address)
-        }
-        
-        Task { [weak self] in
-            await self?.getChatRooms(offset: nil)
         }
         
         self.connectToSocket()
@@ -511,12 +520,10 @@ extension AdamantChatsProvider {
     }
     
     func update(notifyState: Bool) async -> ChatsProviderResult? {
-        if state == .updating {
-            return nil
-        }
-        
         // MARK: 1. Check state
-        if state == .updating {
+        guard isInitiallySynced,
+              state != .updating
+        else {
             return nil
         }
         
@@ -1254,7 +1261,7 @@ extension AdamantChatsProvider {
                 privateKey: privateKey
             )
             
-            // MARK: 4. Get more transactions
+            // MARK: Get more transactions if needed
             if transactions.count == self.apiTransactions {
                 let newOffset: Int
                 if let offset = offset {

@@ -485,7 +485,7 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
         }
         
         let nIndexPath = chatControllerIndexPath(tableViewIndexPath: indexPath)
-        if let chatroom = chatsController?.object(at: nIndexPath) {
+        if let chatroom = chatsController?.fetchedObjects?[safe: nIndexPath.row] {
             let vc = chatViewController(for: chatroom)
             vc.hidesBottomBarWhenPushed = true
             
@@ -532,7 +532,7 @@ extension ChatListViewController {
             configureCell(cell)
         } else if let cell = cell as? ChatTableViewCell {
             let nIndexPath = chatControllerIndexPath(tableViewIndexPath: indexPath)
-            if let chat = chatsController?.object(at: nIndexPath) {
+            if let chat = chatsController?.fetchedObjects?[safe: nIndexPath.row] {
                 configureCell(cell, for: chat)
             }
             if isBusy,
@@ -922,7 +922,7 @@ extension ChatListViewController {
 extension ChatListViewController {
     @available(iOS 11.0, *)
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard let chatroom = chatsController?.object(at: indexPath) else {
+        guard let chatroom = chatsController?.fetchedObjects?[safe: indexPath.row] else {
             return nil
         }
         
@@ -1000,7 +1000,9 @@ extension ChatListViewController {
         // Mark as read
         if chatroom.hasUnreadMessages || (chatroom.lastTransaction?.isUnread ?? false) {
             let markAsRead = UIContextualAction(style: .normal, title: nil) { [weak self] (_, _, completionHandler: (Bool) -> Void) in
-                guard let chatroom = self?.chatsController?.object(at: indexPath) else {
+                guard
+                    let chatroom = self?.chatsController?.fetchedObjects?[safe: indexPath.row]
+                else {
                     completionHandler(false)
                     return
                 }
@@ -1019,7 +1021,9 @@ extension ChatListViewController {
         }
         
         let block = UIContextualAction(style: .destructive, title: "Block") { [weak self] (_, _, completionHandler) in
-            guard let chatroom = self?.chatsController?.object(at: indexPath), let address = chatroom.partner?.address else {
+            guard
+                let chatroom = self?.chatsController?.fetchedObjects?[safe: indexPath.row],
+                let address = chatroom.partner?.address else {
                 completionHandler(false)
                 return
             }

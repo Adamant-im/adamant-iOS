@@ -7,7 +7,7 @@ extension EthWalletService {
     static let currencySymbol = "ETH"
     static let currencyExponent: Int = -18
     static let qqPrefix: String = "ethereum"
-        
+    
     static var newPendingInterval: Int {
         4000
     }
@@ -21,13 +21,13 @@ extension EthWalletService {
     }
         
     static var newPendingAttempts: Int {
-        15
+        20
     }
         
     static var oldPendingAttempts: Int {
-        3
+        4
     }
-    
+        
     var reliabilityGasPricePercent: BigUInt {
         10
     }
@@ -77,7 +77,6 @@ extension EthWalletService {
     static var nodes: [Node] {
         [
             Node(url: URL(string: "https://ethnode1.adamant.im")!),
-Node(url: URL(string: "https://ethnode2.adamant.im")!),
         ]
     }
     

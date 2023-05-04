@@ -27,13 +27,13 @@ extension Transactions {
 
         public let id: String
 
-        public let height: UInt64
+        public let height: UInt64?
 
-        public let blockId: String
+        public let blockId: String?
 
         public let type: UInt8
 
-        public let timestamp: UInt32
+        public let timestamp: UInt32?
 
         public let senderPublicKey: String
 

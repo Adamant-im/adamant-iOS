@@ -157,20 +157,25 @@ final class ChatViewModel: NSObject {
                 thenRemoveIt: true
             ).map { inputText = $0 }
             
-            messages = chatCacheService.getMessages(address: partnerAddress)
+            let cachedMessages = chatCacheService.getMessages(address: partnerAddress)
+            messages = cachedMessages ?? []
+            fullscreenLoading = cachedMessages == nil
         }
     }
     
     func loadFirstMessagesIfNeeded() {
         Task {
-            guard let address = chatroom?.partner?.address else { return }
+            guard let address = chatroom?.partner?.address else {
+                fullscreenLoading = false
+                return
+            }
             
             let isChatLoaded = await chatsProvider.isChatLoaded(with: address)
             
             if address == AdamantContacts.adamantWelcomeWallet.name || isChatLoaded {
                 updateTransactions(performFetch: true)
             } else {
-                await loadMessages(address: address, offset: .zero, fullscreenLoading: true)
+                await loadMessages(address: address, offset: .zero)
             }
         }.stored(in: tasksStorage)
     }
@@ -185,7 +190,7 @@ final class ChatViewModel: NSObject {
             else { return }
             
             let offset = await chatsProvider.chatLoadedMessages[address] ?? .zero
-            await loadMessages(address: address, offset: offset, fullscreenLoading: false)
+            await loadMessages(address: address, offset: offset)
         }.stored(in: tasksStorage)
     }
     
@@ -426,11 +431,9 @@ private extension ChatViewModel {
         }.stored(in: tasksStorage)
     }
     
-    func loadMessages(address: String, offset: Int, fullscreenLoading: Bool) async {
+    func loadMessages(address: String, offset: Int) async {
         guard !isLoading else { return }
-
         isLoading = true
-        self.fullscreenLoading = fullscreenLoading
         
         await chatsProvider.getChatMessages(
             with: address,
