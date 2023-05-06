@@ -24,10 +24,9 @@ extension String.adamantLocalized {
     }
 }
 
-class DelegatesListViewController: UIViewController {
-    
+final class DelegatesListViewController: KeyboardObservingViewController {
     // MARK: - Wrapper
-    class CheckedDelegate {
+    final class CheckedDelegate {
         var delegate: Delegate
         var isChecked: Bool = false
         var isUpdating: Bool = false
@@ -39,14 +38,14 @@ class DelegatesListViewController: UIViewController {
     
     // MARK: - Dependencies
     
-    var apiService: ApiService!
-    var accountService: AccountService!
-    var dialogService: DialogService!
-    var router: Router!
+    private let apiService: ApiService
+    private let accountService: AccountService
+    private let dialogService: DialogService
+    private let router: Router
     
     // MARK: - Constants
     
-    let votingCost: Decimal = Decimal(integerLiteral: 50)
+    let votingCost = 50
     let activeDelegates = 101
     let maxVotes = 33
     let maxTotalVotes = 101
@@ -54,93 +53,71 @@ class DelegatesListViewController: UIViewController {
     
     // MARK: - Properties
     
-    private (set) var delegates: [CheckedDelegate] = [CheckedDelegate]()
-    private var filteredDelegates: [Int]?
+    private lazy var tableView: UITableView = {
+        let tableView = UITableView()
+        tableView.register(AdamantDelegateCell.self, forCellReuseIdentifier: cellIdentifier)
+        tableView.rowHeight = 50
+        tableView.backgroundColor = .clear
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.allowsSelectionDuringEditing = true
+        tableView.refreshControl = refreshControl
+        return tableView
+    }()
+    
+    private lazy var searchController: UISearchController = {
+        let controller = UISearchController(searchResultsController: nil)
+        controller.searchResultsUpdater = self
+        controller.obscuresBackgroundDuringPresentation = false
+        controller.hidesNavigationBarDuringPresentation = true
+        return controller
+    }()
     
     private lazy var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action: #selector(self.handleRefresh(_:)), for: UIControl.Event.valueChanged)
+        refreshControl.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
+        refreshControl.addTarget(self, action: #selector(handleRefresh(_:)), for: UIControl.Event.valueChanged)
         return refreshControl
     }()
     
-    private var forcedUpdateTimer: Timer?
+    private lazy var bottomPanel = DelegatesBottomPanel()
     
-    private var searchController: UISearchController?
+    private (set) var delegates: [CheckedDelegate] = [CheckedDelegate]()
+    private var filteredDelegates: [Int]?
+    private var forcedUpdateTimer: Timer?
     private var loadingView: LoadingView?
     private var originalInsets: UIEdgeInsets?
     private var didShow: Bool = false
-
-    // MARK: Tools
     
     // Can start with 'u' or 'U', then 1-20 digits
     private let possibleAddressRegEx = try! NSRegularExpression(pattern: "^[uU]{0,1}\\d{1,20}$", options: [])
     
-    // MARK: - IBOutlets
-    @IBOutlet weak var tableView: UITableView!
-    
-    @IBOutlet weak var upVotesLabel: UILabel!
-    @IBOutlet weak var downVotesLabel: UILabel!
-    @IBOutlet weak var newVotesLabel: UILabel!
-    @IBOutlet weak var totalVotesLabel: UILabel!
-    
-    @IBOutlet weak var voteBtn: UIButton!
-
-    @IBOutlet weak var infoViewBottomConstain: NSLayoutConstraint!
-    
     // MARK: - Lifecycle
+    
+    init(
+        apiService: ApiService,
+        accountService: AccountService,
+        dialogService: DialogService,
+        router: Router
+    ) {
+        self.apiService = apiService
+        self.accountService = accountService
+        self.dialogService = dialogService
+        self.router = router
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        // MARK: Initial
-        navigationItem.title = String.adamantLocalized.delegates.title
-        tableView.register(AdamantDelegateCell.self, forCellReuseIdentifier: cellIdentifier)
-        tableView.rowHeight = 50
-        tableView.addSubview(self.refreshControl)
-        
-        // MARK: Search controller
-        if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .never
-            
-            let controller = UISearchController(searchResultsController: nil)
-            controller.searchResultsUpdater = self
-            controller.obscuresBackgroundDuringPresentation = false
-            controller.hidesNavigationBarDuringPresentation = true
-            searchController = controller
-            
-            definesPresentationContext = true
-            navigationItem.rightBarButtonItem = UIBarButtonItem.init(barButtonSystemItem: .search, target: self, action: #selector(activateSearch))
-        }
-        
-        // MARK: Reset UI
-        upVotesLabel.text = ""
-        downVotesLabel.text = ""
-        newVotesLabel.text = ""
-        totalVotesLabel.text = ""
-        voteBtn.isEnabled = false
-        
-        // MARK: Load data
-//        refreshControl.beginRefreshing() // Nasty glitches
+        setupNavigationItem()
+        setupViews()
+        setColors()
         setupLoadingView()
         handleRefresh(refreshControl)
-        
-        // Keyboard
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
-        
-        setColors()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        // Fix for UISplitViewController with UINavigationController with UISearchController.
-        // UISplitView in collapsed mode can't figure out what navigation item is topmost, and in viewDidLoad method searchController gets assigned to a wrong navigation item.
-        if #available(iOS 11.0, *) {
-            if navigationItem.searchController == nil {
-                navigationItem.searchController = searchController
-            }
-        }
     }
     
     deinit {
@@ -149,27 +126,6 @@ class DelegatesListViewController: UIViewController {
         if let timer = forcedUpdateTimer {
             timer.invalidate()
             forcedUpdateTimer = nil
-        }
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        if let indexPath = tableView.indexPathForSelectedRow {
-            tableView.deselectRow(at: indexPath, animated: animated)
-        }
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
-            if #available(iOS 11.0, *) {
-            } else if infoViewBottomConstain.constant == 0.0, let height = tabBarController?.tabBar.bounds.height {
-                infoViewBottomConstain.constant = -height
-                tableView.contentInset.bottom = 0.0
-                tableView.scrollIndicatorInsets.bottom = 0.0
-            }
         }
     }
 
@@ -209,16 +165,38 @@ class DelegatesListViewController: UIViewController {
     }
     
     @objc private func activateSearch() {
-        if #available(iOS 11.0, *), let bar = navigationItem.searchController?.searchBar, !bar.isFirstResponder {
+        if let bar = navigationItem.searchController?.searchBar, !bar.isFirstResponder {
             bar.becomeFirstResponder()
         }
     }
     
-    // MARK: - Other
-    
     private func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
-        tableView.backgroundColor = .clear
+    }
+    
+    private func setupNavigationItem() {
+        navigationItem.title = String.adamantLocalized.visibleWallets.title
+        navigationItem.searchController = searchController
+        
+        navigationItem.rightBarButtonItem = .init(
+            barButtonSystemItem: .search,
+            target: self,
+            action: #selector(activateSearch)
+        )
+    }
+    
+    private func setupViews() {
+        view.addSubview(tableView)
+        view.addSubview(bottomPanel)
+        
+        tableView.snp.makeConstraints {
+            $0.top.leading.trailing.equalToSuperview()
+            $0.bottom.equalTo(bottomPanel.snp.top)
+        }
+        
+        bottomPanel.snp.makeConstraints {
+            $0.leading.trailing.bottom.equalTo(view.safeAreaLayoutGuide)
+        }
     }
 }
 
@@ -236,8 +214,20 @@ extension DelegatesListViewController: UITableViewDataSource, UITableViewDelegat
         }
     }
     
-    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        return UIView()
+    func tableView(_: UITableView, viewForHeaderInSection _: Int) -> UIView? {
+        UIView()
+    }
+    
+    func tableView(_: UITableView, viewForFooterInSection _: Int) -> UIView? {
+        UIView()
+    }
+    
+    func tableView(_: UITableView, heightForHeaderInSection _: Int) -> CGFloat {
+        .zero
+    }
+    
+    func tableView(_: UITableView, heightForFooterInSection _: Int) -> CGFloat {
+        .zero
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -285,8 +275,8 @@ extension DelegatesListViewController: AdamantDelegateCellDelegate {
 }
 
 // MARK: - Voting
-extension DelegatesListViewController {
-    @IBAction func vote(_ sender: Any) {
+private extension DelegatesListViewController {
+    func vote() {
         if forcedUpdateTimer != nil {
             self.dialogService.showWarning(withMessage: String.adamantLocalized.delegates.timeOutBeforeNewVote)
             return
@@ -303,7 +293,7 @@ extension DelegatesListViewController {
             return
         }
         
-        guard account.balance > votingCost else {
+        guard account.balance > Decimal(votingCost) else {
             self.dialogService.showWarning(withMessage: String.adamantLocalized.delegates.notEnoughtTokensForVote)
             return
         }
@@ -369,8 +359,8 @@ extension DelegatesListViewController: UISearchResultsUpdating {
 }
 
 // MARK: - Private
-extension DelegatesListViewController {
-    private func checkedDelegateFor(indexPath: IndexPath) -> CheckedDelegate {
+private extension DelegatesListViewController {
+    func checkedDelegateFor(indexPath: IndexPath) -> CheckedDelegate {
         if let filtered = filteredDelegates {
             return delegates[filtered[indexPath.row]]
         } else {
@@ -378,7 +368,7 @@ extension DelegatesListViewController {
         }
     }
     
-    private func scheduleUpdate() {
+    func scheduleUpdate() {
         if let timer = forcedUpdateTimer {
             timer.invalidate()
             forcedUpdateTimer = nil
@@ -388,12 +378,12 @@ extension DelegatesListViewController {
         forcedUpdateTimer = timer
     }
     
-    @objc private func updateTimerCallback(_ timer: Timer) {
+    @objc func updateTimerCallback(_ timer: Timer) {
         handleRefresh(refreshControl)
         forcedUpdateTimer = nil
     }
     
-    private func updateVotePanel() {
+    func updateVotePanel() {
         let changes = delegates.filter { $0.isChecked }.map { $0.delegate }
         
         var upvoted = 0
@@ -412,21 +402,22 @@ extension DelegatesListViewController {
         let newVotesColor = changes.count > maxVotes ? UIColor.adamant.alert : UIColor.adamant.primary
         let totalVotesColor = totalVoted > maxTotalVotes ? UIColor.adamant.alert : UIColor.adamant.primary
         
-        DispatchQueue.onMainAsync { [weak self] in
-            guard let self = self else { return }
-            
-            self.upVotesLabel.text = "\(upvoted)"
-            self.downVotesLabel.text = "\(downvoted)"
-            self.newVotesLabel.text = "\(changes.count)/\(self.maxVotes)"
-            self.totalVotesLabel.text = "\(totalVoted)/\(self.maxTotalVotes)"
-            
-            self.voteBtn.isEnabled = votingEnabled
-            self.newVotesLabel.textColor = newVotesColor
-            self.totalVotesLabel.textColor = totalVotesColor
+        DispatchQueue.onMainAsync { [self] in
+            bottomPanel.model = .init(
+                upvotes: upvoted,
+                downvotes: downvoted,
+                new: (changes.count, maxVotes),
+                total: (totalVoted, maxTotalVotes),
+                cost: "\(votingCost) \(AdmWalletService.currencySymbol)",
+                isSendingEnabled: votingEnabled,
+                newVotesColor: newVotesColor,
+                totalVotesColor: totalVotesColor,
+                sendAction: { [weak self] in self?.vote() }
+            )
         }
     }
     
-    private func setupLoadingView() {
+    func setupLoadingView() {
         let loadingView = LoadingView()
         view.addSubview(loadingView)
         loadingView.snp.makeConstraints {
@@ -437,7 +428,7 @@ extension DelegatesListViewController {
         self.loadingView = loadingView
     }
     
-    private func removeLoadingView() {
+    func removeLoadingView() {
         guard loadingView != nil else { return }
         
         UIView.animate(
@@ -448,44 +439,5 @@ extension DelegatesListViewController {
                 loadingView = nil
             }
         )
-    }
-}
-
-extension DelegatesListViewController {
-    // MARK: Keyboard
-    @objc private func keyboardWillShow(notification: Notification) {
-        // For some reason we will receive 2 notifications
-        guard !didShow else { return }
-        didShow = true
-        
-        guard let frame = notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue else {
-            return
-        }
-        
-        originalInsets = tableView.contentInset
-        
-        let gap = UIScreen.main.bounds.height - tableView.bounds.height + tableView.frame.origin.y
-        let bottom = frame.cgRectValue.size.height - gap
-        
-        var contentInsets = tableView.contentInset
-        contentInsets.bottom = bottom
-        
-        tableView.contentInset = contentInsets
-        tableView.scrollIndicatorInsets = contentInsets
-    }
-    
-    @objc private func keyboardWillHide(notification: Notification) {
-        guard didShow else { return }
-        didShow = false
-        
-        if let insets = originalInsets {
-            tableView.contentInset = insets
-            tableView.scrollIndicatorInsets = insets
-        } else {
-            var contentInsets = tableView.contentInset
-            contentInsets.bottom = 0.0
-            tableView.contentInset = contentInsets
-            tableView.scrollIndicatorInsets = contentInsets
-        }
     }
 }

@@ -12,18 +12,18 @@ import SafariServices
 
 // MARK: - Localization
 extension String.adamantLocalized {
-    struct transferAdm {
+    enum transferAdm {
         static func accountNotFoundAlertTitle(for address: String) -> String {
             return String.localizedStringWithFormat(NSLocalizedString("TransferScene.unsafeTransferAlert.title", comment: "Transfer: Alert title: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address"), address)
         }
             
         static let accountNotFoundAlertBody = NSLocalizedString("TransferScene.unsafeTransferAlert.body", comment: "Transfer: Alert body: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address")
         
-        private init() {}
+        static let accountNotFoundChatAlertBody = NSLocalizedString("TransferScene.unsafeChatAlert.body", comment: "Transfer: Alert body: Account is not initiated. It's not possible to start a chat, as the Blockchain doesn't store the account's public key to encrypt messages.")
     }
 }
 
-class AdmTransferViewController: TransferViewControllerBase {
+final class AdmTransferViewController: TransferViewControllerBase {
     // MARK: Properties
     
     private var skipValueChange: Bool = false
@@ -32,6 +32,7 @@ class AdmTransferViewController: TransferViewControllerBase {
     
     // MARK: Sending
     
+    @MainActor
     override func sendFunds() {
         guard let service = service as? AdmWalletService, let recipient = recipientAddress, let amount = amount else {
             return
@@ -47,70 +48,69 @@ class AdmTransferViewController: TransferViewControllerBase {
         dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
         
         // Check recipient
-        accountsProvider.getAccount(byAddress: recipient) { result in
-            switch result {
-            case .success:
-                self.sendFundsInternal(service: service, recipient: recipient, amount: amount, comments: comments)
+        Task {
+            do {
+                let account = try await accountsProvider.getAccount(byAddress: recipient)
                 
-            case .notFound, .notInitiated, .dummy:
-                let alert = UIAlertController(title: String.adamantLocalized.transferAdm.accountNotFoundAlertTitle(for: recipient),
-                                              message: String.adamantLocalized.transferAdm.accountNotFoundAlertBody,
-                                              preferredStyle: .alert)
-                
-                if let url = URL(string: NewChatViewController.faqUrl) {
-                    let faq = UIAlertAction(title: String.adamantLocalized.newChat.whatDoesItMean,
-                                            style: UIAlertAction.Style.default) { [weak self] _ in
-                        let safari = SFSafariViewController(url: url)
-                        safari.preferredControlTintColor = UIColor.adamant.primary
-                        safari.modalPresentationStyle = .overFullScreen
-                        self?.present(safari, animated: true, completion: nil)
-                    }
-                    
-                    alert.addAction(faq)
+                guard !account.isDummy else {
+                    throw AccountsProviderError.dummy(account)
                 }
                 
-                let send = UIAlertAction(title: BaseRows.sendButton.localized,
-                                         style: .default) { _ in
-                    self.dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
-                    self.sendFundsInternal(service: service, recipient: recipient, amount: amount, comments: comments)
-                }
-                
-                let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil)
-                
-                alert.addAction(send)
-                alert.addAction(cancel)
-                alert.modalPresentationStyle = .overFullScreen
-                DispatchQueue.main.async {
-                    self.present(alert, animated: true, completion: nil)
+                sendFundsInternal(
+                    service: service,
+                    recipient: recipient,
+                    amount: amount,
+                    comments: comments
+                )
+            } catch let error as AccountsProviderError {
+                switch error {
+                case .notFound, .notInitiated, .dummy:
                     self.dialogService.dismissProgress()
+                    
+                    dialogService.presentDummyAlert(
+                        for: recipient,
+                        from: view,
+                        canSend: true
+                    ) { [weak self] _ in
+                        self?.dialogService.showProgress(
+                            withMessage: String.adamantLocalized.transfer.transferProcessingMessage,
+                            userInteractionEnable: false
+                        )
+                        
+                        self?.sendFundsInternal(
+                            service: service,
+                            recipient: recipient,
+                            amount: amount,
+                            comments: comments
+                        )
+                    }
+                case .invalidAddress, .serverError, .networkError:
+                    self.dialogService.showWarning(withMessage: error.localized)
                 }
-                
-            case .invalidAddress, .serverError, .networkError:
-                self.dialogService.showWarning(withMessage: result.localized)
+            } catch {
+                self.dialogService.showWarning(withMessage: error.localizedDescription)
             }
         }
     }
     
+    @MainActor
     private func sendFundsInternal(service: AdmWalletService, recipient: String, amount: Decimal, comments: String) {
-        service.sendMoney(recipient: recipient, amount: amount, comments: comments) { [weak self] result in
-            switch result {
-            case .success(let result):
+        Task {
+            do {
+                let result = try await service.sendMoney(recipient: recipient, amount: amount, comments: comments)
+                
                 service.update()
+                dialogService.dismissProgress()
                 
-                guard let vc = self else {
-                    break
-                }
+                dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
                 
-                vc.dialogService?.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-                DispatchQueue.onMainAsync {
-                    self?.openDetailVC(result: result, vc: vc, recipient: recipient, comments: comments)
-                }
-                
-            case .failure(let error):
-                guard let dialogService = self?.dialogService else {
-                    break
-                }
-                
+                openDetailVC(
+                    result: result,
+                    vc: self,
+                    recipient: recipient,
+                    comments: comments
+                )
+            } catch {
                 dialogService.dismissProgress()
                 dialogService.showRichError(error: error)
             }
@@ -132,19 +132,16 @@ class AdmTransferViewController: TransferViewControllerBase {
         if let recipientName = recipientName {
             detailsVC?.recipientName = recipientName
             vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
-        } else if let accountsProvider = accountsProvider {
-            accountsProvider.getAccount(byAddress: recipient) { accResult in
-                switch accResult {
-                case .success(let account):
+        } else {
+            Task {
+                do {
+                    let account = try await accountsProvider.getAccount(byAddress: recipient)
                     detailsVC?.recipientName = account.name
                     vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
-                    
-                default:
+                } catch {
                     vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
                 }
             }
-        } else {
-            vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
         }
     }
     
@@ -175,6 +172,7 @@ class AdmTransferViewController: TransferViewControllerBase {
             $0.tag = BaseRows.address.tag
             $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
             $0.cell.textField.setPopupKeyboardType(.numberPad)
+            $0.cell.textField.setLineBreakMode()
             
             if let recipient = recipientAddress {
                 let trimmed = recipient.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
@@ -231,6 +229,7 @@ class AdmTransferViewController: TransferViewControllerBase {
                     }
                 }
             }
+            self?.updateToolbar(for: row)
         }.onCellSelection { [weak self] (cell, _) in
             self?.shareValue(self?.recipientAddress, from: cell)
         }

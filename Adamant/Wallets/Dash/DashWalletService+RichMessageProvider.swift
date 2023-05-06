@@ -8,8 +8,28 @@
 
 import Foundation
 import MessageKit
+import UIKit
 
 extension DashWalletService: RichMessageProvider {
+    var newPendingInterval: TimeInterval {
+        .init(milliseconds: type(of: self).newPendingInterval)
+    }
+    
+    var oldPendingInterval: TimeInterval {
+        .init(milliseconds: type(of: self).oldPendingInterval)
+    }
+    
+    var registeredInterval: TimeInterval {
+        .init(milliseconds: type(of: self).registeredInterval)
+    }
+    
+    var newPendingAttempts: Int {
+        type(of: self).newPendingAttempts
+    }
+    
+    var oldPendingAttempts: Int {
+        type(of: self).oldPendingAttempts
+    }
     
     var dynamicRichMessageType: String {
         return type(of: self).richMessageType
@@ -17,7 +37,8 @@ extension DashWalletService: RichMessageProvider {
     
     // MARK: Events
     
-    func richMessageTapped(for transaction: RichMessageTransaction, at indexPath: IndexPath, in chat: ChatViewController) {
+    @MainActor
+    func richMessageTapped(for transaction: RichMessageTransaction, in chat: ChatViewController) {
         // MARK: 0. Prepare
         guard let richContent = transaction.richContent,
             let hash = richContent[RichContentKeys.transfer.hash],
@@ -35,160 +56,120 @@ extension DashWalletService: RichMessageProvider {
             comment = nil
         }
         
+        let senderName: String?
+        let recipientName: String?
+        
+        if let address = accountService.account?.address {
+            if let senderId = transaction.senderId, senderId.caseInsensitiveCompare(address) == .orderedSame {
+                senderName = String.adamantLocalized.transactionDetails.yourAddress
+            } else {
+                senderName = transaction.chatroom?.partner?.name
+            }
+            
+            if let recipientId = transaction.recipientId, recipientId.caseInsensitiveCompare(address) == .orderedSame {
+                recipientName = String.adamantLocalized.transactionDetails.yourAddress
+            } else {
+                recipientName = transaction.chatroom?.partner?.name
+            }
+        } else if let partner = transaction.chatroom?.partner, let id = partner.address {
+            if transaction.senderId == id {
+                senderName = partner.name
+                recipientName = nil
+            } else {
+                recipientName = partner.name
+                senderName = nil
+            }
+        } else {
+            senderName = nil
+            recipientName = nil
+        }
+        
         // MARK: Get transaction
-        getTransaction(by: hash) { [weak self] result in
-            guard let vc = self?.router.get(scene: AdamantScene.Wallets.Dash.transactionDetails) as? DashTransactionDetailsViewController, let service = self else {
-                return
+        
+        Task {
+            do {
+                let detailTransaction = try await getTransaction(by: hash)
+                let blockId = try? await getBlockId(by: detailTransaction.blockHash)
+                
+                dialogService.dismissProgress()
+                
+                presentDetailTransactionVC(
+                    hash: hash,
+                    senderName: senderName,
+                    recipientName: recipientName,
+                    comment: comment,
+                    address: address,
+                    blockId: blockId,
+                    transaction: detailTransaction,
+                    richTransaction: transaction,
+                    in: chat
+                )
+            } catch {
+                dialogService.dismissProgress()
+                
+                presentDetailTransactionVC(
+                    hash: hash,
+                    senderName: senderName,
+                    recipientName: recipientName,
+                    comment: comment,
+                    address: address,
+                    blockId: nil,
+                    transaction: nil,
+                    richTransaction: transaction,
+                    in: chat
+                )
             }
-            
-            // MARK: 1. Prepare details view controller
-            vc.service = service
-            vc.comment = comment
-            
-            switch result {
-            case .success(let rawTransaction):
-                let dashTransaction = rawTransaction.asBtcTransaction(DashTransaction.self, for: address)
-                
-                // MARK: 2. Self name
-                if dashTransaction.senderAddress == address {
-                    vc.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                }
-                if dashTransaction.recipientAddress == address {
-                    vc.recipientName = String.adamantLocalized.transactionDetails.yourAddress
-                }
-                
-                vc.transaction = dashTransaction
-                
-                let group = DispatchGroup()
-                
-                // MARK: 3. Get partner name async
-                if let partner = transaction.partner, let partnerAddress = partner.address, let partnerName = partner.name {
-                    group.enter() // Enter 1
-                    service.getDashAddress(byAdamandAddress: partnerAddress) { result in
-                        switch result {
-                        case .success(let address):
-                            if dashTransaction.senderAddress == address {
-                                vc.senderName = partnerName
-                            }
-                            if dashTransaction.recipientAddress == address {
-                                vc.recipientName = partnerName
-                            }
-                            
-                        case .failure:
-                            break
-                        }
-                        
-                        group.leave() // Leave 1
-                    }
-                }
-                
-                // MARK: 4. Get block id async
-                if let blockHash = rawTransaction.blockHash {
-                    group.enter() // Enter 2
-                    service.getBlockId(by: blockHash) { result in
-                        switch result {
-                        case .success(let id):
-                            vc.transaction = rawTransaction.asBtcTransaction(DashTransaction.self, for: address, blockId: id)
-                            
-                        case .failure:
-                            break
-                        }
-                        
-                        group.leave() // Leave 2
-                    }
-                }
-                
-                // MARK: 5. Wait async operations
-                group.wait()
-                
-                // MARK: 6. Display details view controller
-                DispatchQueue.main.async {
-                    dialogService.dismissProgress()
-                    chat.navigationController?.pushViewController(vc, animated: true)
-                }
-                
-            case .failure(let error):
-                switch error {
-                case .internalError(let message, _) where message == "Unaviable transaction":
-                    dialogService.dismissProgress()
-                    dialogService.showAlert(title: nil, message: String.adamantLocalized.sharedErrors.transactionUnavailable, style: AdamantAlertStyle.alert, actions: nil, from: nil)
-                    break
-                case .internalError(let message, _) where message == "No transaction":
-                    let amount: Decimal
-                    if let amountRaw = transaction.richContent?[RichContentKeys.transfer.amount], let decimal = Decimal(string: amountRaw) {
-                        amount = decimal
-                    } else {
-                        amount = 0
-                    }
-                    
-                    let failedTransaction = SimpleTransactionDetails(txId: hash,
-                                                                     senderAddress: transaction.senderAddress,
-                                                                     recipientAddress: transaction.recipientAddress,
-                                                                     dateValue: nil,
-                                                                     amountValue: amount,
-                                                                     feeValue: nil,
-                                                                     confirmationsValue: nil,
-                                                                     blockValue: nil,
-                                                                     isOutgoing: transaction.isOutgoing,
-                                                                     transactionStatus: TransactionStatus.failed)
-                    
-                    vc.transaction = failedTransaction
-                    
-                    DispatchQueue.main.async {
-                        dialogService.dismissProgress()
-                        chat.navigationController?.pushViewController(vc, animated: true)
-                    }
-                    
-                default:
-                    dialogService.dismissProgress()
-                    dialogService.showRichError(error: error)
-                }
-            }
-            
         }
     }
     
-    // MARK: Cells
-    
-    func cellSizeCalculator(for messagesCollectionViewFlowLayout: MessagesCollectionViewFlowLayout) -> CellSizeCalculator {
-        let calculator = TransferMessageSizeCalculator(layout: messagesCollectionViewFlowLayout)
-        calculator.font = UIFont.systemFont(ofSize: 24)
-        return calculator
-    }
-    
-    func cell(for message: MessageType, isFromCurrentSender: Bool, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell {
-        guard case .custom(let raw) = message.kind, let transfer = raw as? RichMessageTransfer else {
-            fatalError("DASH service tried to render wrong message kind: \(message.kind)")
+    private func presentDetailTransactionVC(
+        hash: String,
+        senderName: String?,
+        recipientName: String?,
+        comment: String?,
+        address: String,
+        blockId: String?,
+        transaction: BTCRawTransaction?,
+        richTransaction: RichMessageTransaction,
+        in chat: ChatViewController
+    ) {
+        guard let vc = router.get(scene: AdamantScene.Wallets.Dash.transactionDetails) as? DashTransactionDetailsViewController else {
+            return
         }
         
-        let cellIdentifier = isFromCurrentSender ? cellIdentifierSent : cellIdentifierReceived
-        guard let cell = messagesCollectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as? TransferCollectionViewCell else {
-            fatalError("Can't dequeue \(cellIdentifier) cell")
+        let amount: Decimal
+        if let amountRaw = richTransaction.richContent?[RichContentKeys.transfer.amount], let decimal = Decimal(string: amountRaw) {
+            amount = decimal
+        } else {
+            amount = 0
         }
         
-        cell.currencyLogoImageView.image = DashWalletService.currencyLogo
-        cell.currencySymbolLabel.text = DashWalletService.currencySymbol
-        
-        cell.amountLabel.text = AdamantBalanceFormat.full.format(transfer.amount)
-        cell.dateLabel.text = message.sentDate.humanizedDateTime(withWeekday: false)
-        cell.transactionStatus = (message as? RichMessageTransaction)?.transactionStatus
-        
-        cell.commentsLabel.text = transfer.comments
-        
-        if cell.isAlignedRight != isFromCurrentSender {
-            cell.isAlignedRight = isFromCurrentSender
+        var dashTransaction = transaction?.asBtcTransaction(DashTransaction.self, for: address)
+        if let blockId = blockId {
+            dashTransaction = transaction?.asBtcTransaction(DashTransaction.self, for: address, blockId: blockId)
         }
+        let failedTransaction = SimpleTransactionDetails(
+            txId: hash,
+            senderAddress: richTransaction.senderAddress,
+            recipientAddress: richTransaction.recipientAddress,
+            dateValue: nil,
+            amountValue: amount,
+            feeValue: nil,
+            confirmationsValue: nil,
+            blockValue: nil,
+            isOutgoing: richTransaction.isOutgoing,
+            transactionStatus: TransactionStatus.failed
+        )
         
-        cell.isFromCurrentSender = isFromCurrentSender
-        
-        return cell
+        vc.service = self
+        vc.senderName = senderName
+        vc.recipientName = recipientName
+        vc.comment = comment
+        vc.transaction = dashTransaction ?? failedTransaction
+        chat.navigationController?.pushViewController(vc, animated: true)
     }
     
     // MARK: Short description
-    
-    private static var formatter: NumberFormatter = {
-        return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: currencySymbol)
-    }()
     
     func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString {
         let amount: String

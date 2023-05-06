@@ -16,53 +16,34 @@ class KeychainStore: SecuredStore {
     
     // MARK: - SecuredStore
     
-    func get(_ key: String) -> String? {
-        guard let encryptedValue = KeychainStore.keychain[key],
-            let decryptedValue = KeychainStore.decrypt(string: encryptedValue, password: AdamantSecret.keychainValuePassword) else {
-                return nil
-        }
-
-        return decryptedValue
-    }
-    
-    func getArray(_ key: String) -> [String]? {
-        guard let encryptedValue = KeychainStore.keychain[key],
-            let decryptedValue = KeychainStore.decrypt(string: encryptedValue, password: AdamantSecret.keychainValuePassword), let data = decryptedValue.data(using: .utf8) else {
-                return nil
-        }
+    func get<T: Decodable>(_ key: String) -> T? {
+        guard !(T.self == String.self) else { return getString(key) as? T }
+        
+        guard
+            let raw = getString(key),
+            let data = raw.data(using: .utf8)
+        else { return nil }
         
         do {
-            return try JSONDecoder().decode([String].self, from: data)
+            return try JSONDecoder().decode(T.self, from: data)
         } catch {
-            print("FAIL to decode array from keychain")
+            assertionFailure("Failed to decode data. Error: \(error.localizedDescription)")
+            return nil
         }
-
-        return nil
-    }
-
-    func set(_ value: String, for key: String) {
-        guard let encryptedValue = KeychainStore.encrypt(string: value, password: AdamantSecret.keychainValuePassword) else {
-            return
-        }
-
-        try? KeychainStore.keychain.set(encryptedValue, key: key)
     }
     
-    func set(_ value: [String], for key: String) {
-        var strValue = ""
+    func set<T: Encodable>(_ value: T, for key: String) {
+        if let string = value as? String {
+            setString(string, for: key)
+            return
+        }
+        
         do {
             let data = try JSONEncoder().encode(value)
-            strValue = String(data: data, encoding: .utf8) ?? ""
+            String(data: data, encoding: .utf8).map { setString($0, for: key) }
         } catch {
-            print("FAIL to encode array from keychain")
-            return
+            assertionFailure("Failed to encode data. Error: \(error.localizedDescription)")
         }
-        
-        guard let encryptedValue = KeychainStore.encrypt(string: strValue, password: AdamantSecret.keychainValuePassword) else {
-            return
-        }
-
-        try? KeychainStore.keychain.set(encryptedValue, key: key)
     }
     
     func remove(_ key: String) {
@@ -75,6 +56,23 @@ class KeychainStore: SecuredStore {
     }
     
     // MARK: - Tools
+    
+    private func getString(_ key: String) -> String? {
+        guard let encryptedValue = KeychainStore.keychain[key],
+            let decryptedValue = KeychainStore.decrypt(string: encryptedValue, password: AdamantSecret.keychainValuePassword) else {
+                return nil
+        }
+
+        return decryptedValue
+    }
+
+    private func setString(_ value: String, for key: String) {
+        guard let encryptedValue = KeychainStore.encrypt(string: value, password: AdamantSecret.keychainValuePassword) else {
+            return
+        }
+
+        try? KeychainStore.keychain.set(encryptedValue, key: key)
+    }
     
     private static func encrypt(string: String, password: String, encoding: String.Encoding = .utf8) -> String? {
         guard let data = string.data(using: encoding) else {

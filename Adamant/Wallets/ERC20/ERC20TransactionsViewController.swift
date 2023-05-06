@@ -30,6 +30,7 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
         }
         return exponent
     }()
+    private var offset = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,12 +39,20 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
         
         currencySymbol = walletService.tokenSymbol
         
-        handleRefresh(self.refreshControl)
+        handleRefresh()
     }
     
     // MARK: - Overrides
     
-    override func handleRefresh(_ refreshControl: UIRefreshControl) {
+    override func handleRefresh() {
+        offset = 0
+        transactions.removeAll()
+        tableView.reloadData()
+        loadData(false)
+    }
+    
+    override func loadData(_ silent: Bool) {
+        isBusy = true
         emptyLabel.isHidden = true
         
         guard let address = walletService.wallet?.address else {
@@ -51,24 +60,30 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
             return
         }
         
-        walletService.getTransactionsHistory(address: address) { [weak self] result in
-            guard let self = self else { return }
-            
-            switch result {
-            case .success(let transactions):
-                self.transactions = transactions
+        Task { @MainActor in
+            do {
+                let trs = try await walletService.getTransactionsHistory(
+                    address: address,
+                    offset: offset
+                )
                 
-            case .failure(let error):
-                self.transactions = []
-                self.dialogService.showRichError(error: error)
+                transactions.append(contentsOf: trs)
+                offset += trs.count
+                isNeedToLoadMoore = trs.count > 0
+            } catch {
+                isNeedToLoadMoore = false
+                
+                if !silent {
+                    dialogService.showRichError(error: error)
+                }
             }
             
-            DispatchQueue.main.async {
-                self.emptyLabel.isHidden = self.transactions.count > 0
-                self.tableView.reloadData()
-                self.refreshControl.endRefreshing()
-            }
-        }
+            isBusy = false
+            emptyLabel.isHidden = transactions.count > 0
+            tableView.reloadData()
+            stopBottomIndicator()
+            refreshControl.endRefreshing()
+        }.stored(in: taskManager)
     }
     
     override func reloadData() {
@@ -76,7 +91,7 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
             self?.refreshControl.beginRefreshing()
         }
         
-        handleRefresh(refreshControl)
+        handleRefresh()
     }
     
     // MARK: - UITableView
@@ -103,29 +118,26 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
         
         dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
         
-        walletService.getTransaction(by: hash) { [weak self] result in
-            dialogService.dismissProgress()
-            
-            switch result {
-            case .success(let ethTransaction):
-                DispatchQueue.main.async {
-                    vc.transaction = ethTransaction
-                    
-                    if let address = address {
-                        if ethTransaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
-                            vc.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                        } else if ethTransaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
-                            vc.recipientName = String.adamantLocalized.transactionDetails.yourAddress
-                        }
+        Task {
+            do {
+                let ethTransaction = try await walletService.getTransaction(by: hash)
+                dialogService.dismissProgress()
+                vc.transaction = ethTransaction
+                
+                if let address = address {
+                    if ethTransaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
+                        vc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+                    } else if ethTransaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
+                        vc.recipientName = String.adamantLocalized.transactionDetails.yourAddress
                     }
-                    
-                    self?.navigationController?.pushViewController(vc, animated: true)
                 }
                 
-            case .failure(let error):
+                navigationController?.pushViewController(vc, animated: true)
+            } catch {
+                dialogService.dismissProgress()
                 dialogService.showRichError(error: error)
             }
-        }
+        }.stored(in: taskManager)
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

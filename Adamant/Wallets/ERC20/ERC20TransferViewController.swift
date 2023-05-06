@@ -8,12 +8,13 @@
 
 import UIKit
 import Eureka
+import Web3Core
 
-class ERC20TransferViewController: TransferViewControllerBase {
+final class ERC20TransferViewController: TransferViewControllerBase {
     
     // MARK: Dependencies
     
-    var chatsProvider: ChatsProvider!
+    private let chatsProvider: ChatsProvider
     
     // MARK: Properties
     
@@ -27,8 +28,34 @@ class ERC20TransferViewController: TransferViewControllerBase {
         return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: EthWalletService.currencySymbol)
     }
     
+    override var isNeedAddFeeToTotal: Bool { false }
+    
+    init(
+        chatsProvider: ChatsProvider,
+        accountService: AccountService,
+        accountsProvider: AccountsProvider,
+        dialogService: DialogService,
+        router: Router,
+        currencyInfoService: CurrencyInfoService
+    ) {
+        self.chatsProvider = chatsProvider
+        
+        super.init(
+            accountService: accountService,
+            accountsProvider: accountsProvider,
+            dialogService: dialogService,
+            router: router,
+            currencyInfoService: currencyInfoService
+        )
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     // MARK: Send
     
+    @MainActor
     override func sendFunds() {
         let comments: String
         if let row: TextAreaRow = form.rowBy(tag: BaseRows.comments.tag), let text = row.value {
@@ -41,58 +68,84 @@ class ERC20TransferViewController: TransferViewControllerBase {
             return
         }
         
-        guard let dialogService = dialogService else {
-            return
-        }
-        
         dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
         
-        service.createTransaction(recipient: recipient, amount: amount) { [weak self] result in
-            guard let vc = self else {
-                dialogService.dismissProgress()
-                dialogService.showError(withMessage: String.adamantLocalized.sharedErrors.unknownError, error: nil)
-                return
-            }
-
-            switch result {
-            case .success(let transaction):
-                // MARK: 1. Send adm report
-                if let reportRecipient = vc.admReportRecipient, let hash = transaction.txHash {
-                    self?.reportTransferTo(admAddress: reportRecipient, amount: amount, comments: comments, hash: hash)
+        Task {
+            do {
+                // Create transaction
+                let transaction = try await service.createTransaction(recipient: recipient, amount: amount)
+                
+                guard let txHash = transaction.txHash else {
+                    throw WalletServiceError.internalError(
+                        message: "Transaction making failure",
+                        error: nil
+                    )
                 }
-
-                // MARK: 2. Send eth transaction
-                service.sendTransaction(transaction) { result in
-                    switch result {
-                    case .success(let hash):
-                        service.update()
-                        vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-                        let transaction = SimpleTransactionDetails(txId: hash, senderAddress: transaction.sender?.address ?? "", recipientAddress: recipient, isOutgoing: true)
-                        DispatchQueue.main.async {
-                            if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.ERC20.transactionDetails) as? ERC20TransactionDetailsViewController {
-                                detailsVc.transaction = transaction
-                                detailsVc.service = service
-                                detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                                detailsVc.recipientName = self?.recipientName
-
-                                if comments.count > 0 {
-                                    detailsVc.comment = comments
-                                }
-
-                                vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
-                            } else {
-                                vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
-                            }
-                        }
-                    case .failure(let error):
-                        vc.dialogService.showRichError(error: error)
+                
+                // Send adm report
+                if let reportRecipient = admReportRecipient {
+                    try await reportTransferTo(
+                        admAddress: reportRecipient,
+                        amount: amount,
+                        comments: comments,
+                        hash: txHash
+                    )
+                }
+                
+                Task {
+                    do {
+                        try await service.sendTransaction(transaction)
+                    } catch {
+                        dialogService.showRichError(error: error)
                     }
+                    
+                    await service.update()
                 }
-
-            case .failure(let error):
+                
+                dialogService.dismissProgress()
+                dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                
+                // Present detail VC
+                presentDetailTransactionVC(
+                    hash: txHash,
+                    transaction: transaction,
+                    recipient: recipient,
+                    comments: comments,
+                    service: service
+                )
+            } catch {
                 dialogService.dismissProgress()
                 dialogService.showRichError(error: error)
             }
+        }
+    }
+    
+    private func presentDetailTransactionVC(
+        hash: String,
+        transaction: CodableTransaction,
+        recipient: String,
+        comments: String,
+        service: ERC20WalletService
+    ) {
+        let transaction = SimpleTransactionDetails(
+            txId: hash,
+            senderAddress: transaction.sender?.address ?? "",
+            recipientAddress: recipient,
+            isOutgoing: true
+        )
+        if let detailsVc = router.get(scene: AdamantScene.Wallets.ERC20.transactionDetails) as? ERC20TransactionDetailsViewController {
+            detailsVc.transaction = transaction
+            detailsVc.service = service
+            detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+            detailsVc.recipientName = recipientName
+            
+            if comments.count > 0 {
+                detailsVc.comment = comments
+            }
+            
+            delegate?.transferViewController(self, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
+        } else {
+            delegate?.transferViewController(self, didFinishWithTransfer: transaction, detailsViewController: nil)
         }
     }
     
@@ -102,11 +155,7 @@ class ERC20TransferViewController: TransferViewControllerBase {
     
     override var recipientAddress: String? {
         set {
-            if let recipient = newValue, let first = recipient.first, first != "0" {
-                _recipient = "0x\(recipient)"
-            } else {
-                _recipient = newValue
-            }
+            _recipient = newValue?.validateEthAddress()
             
             if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = _recipient
@@ -123,12 +172,7 @@ class ERC20TransferViewController: TransferViewControllerBase {
             return false
         }
         
-        let fixedAddress: String
-        if let first = address.first, first != "0" {
-            fixedAddress = "0x\(address)"
-        } else {
-            fixedAddress = address
-        }
+        let fixedAddress = address.validateEthAddress()
         
         switch service.validate(address: fixedAddress) {
         case .valid:
@@ -145,6 +189,7 @@ class ERC20TransferViewController: TransferViewControllerBase {
             $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
             $0.cell.textField.keyboardType = UIKeyboardType.namePhonePad
             $0.cell.textField.autocorrectionType = .no
+            $0.cell.textField.setLineBreakMode()
             
             if let recipient = recipientAddress {
                 let trimmed = recipient.components(separatedBy: EthTransferViewController.invalidCharacters).joined()
@@ -198,6 +243,7 @@ class ERC20TransferViewController: TransferViewControllerBase {
                         }
                     }
                 }
+                self?.updateToolbar(for: row)
         }.onCellSelection { [weak self] (cell, _) in
             self?.shareValue(self?.recipientAddress, from: cell)
         }
@@ -232,7 +278,12 @@ class ERC20TransferViewController: TransferViewControllerBase {
         }
     }
     
-    func reportTransferTo(admAddress: String, amount: Decimal, comments: String, hash: String) {
+    func reportTransferTo(
+        admAddress: String,
+        amount: Decimal,
+        comments: String,
+        hash: String
+    ) async throws {
         guard let type = (self.service as? RichMessageProvider)?.dynamicRichMessageType else {
             return
         }
@@ -240,11 +291,7 @@ class ERC20TransferViewController: TransferViewControllerBase {
         
         let message = AdamantMessage.richMessage(payload: payload)
         
-        chatsProvider.sendMessage(message, recipientId: admAddress) { [weak self] result in
-            if case .failure(let error) = result {
-                self?.dialogService.showRichError(error: error)
-            }
-        }
+        _ = try await chatsProvider.sendMessage(message, recipientId: admAddress)
     }
     
     override func defaultSceneTitle() -> String? {
@@ -258,12 +305,13 @@ class ERC20TransferViewController: TransferViewControllerBase {
         }
         
         guard let service = service,
-              let balance = service.wallet?.balance,
-              let minAmount = service.wallet?.minAmount
+              let balance = service.wallet?.balance
         else {
             return false
         }
         
+        let minAmount = service.minAmount
+
         guard minAmount <= amount else {
             return false
         }

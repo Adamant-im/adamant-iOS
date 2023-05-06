@@ -62,22 +62,11 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        senderImageView.tintColor = UIColor.adamant.primary
-        recipientImageView.tintColor = UIColor.adamant.primary
-        currencyImageView.tintColor = UIColor.adamant.primary
-        
-        incomeArrowImageView.tintColor = UIColor.white
-        outcomeArrowImageView.tintColor = UIColor.white
-        
-        incomeArrowView.backgroundColor = UIColor(hex: "36C436")
+      
         incomeArrowView.layer.cornerRadius = incomeArrowView.frame.height/2
-        createBorder(for: incomeArrowView, width: 2.5, color: UIColor.white)
         incomeArrowView.isHidden = true
         
-        outcomeArrowView.backgroundColor = UIColor(hex: "F44444")
         outcomeArrowView.layer.cornerRadius = outcomeArrowView.frame.height/2
-        createBorder(for: outcomeArrowView, width: 2.5, color: UIColor.white)
         outcomeArrowView.isHidden = true
         
         senderAddressLabel.text = ""
@@ -88,6 +77,33 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         currencySymbolLabel.text = ""
         dateLabel.text = ""
         commentLabel.text = ""
+        
+        setColors()
+    }
+    
+    private func setColors() {
+        let color = UIColor.adamant.textColor.resolvedColor(with: .current)
+        senderAddressLabel.textColor = color
+        senderNameLabel.textColor = color
+        recipientAddressLabel.textColor = color
+        recipientNameLabel.textColor = color
+        amountLabel.textColor = color
+        currencySymbolLabel.textColor = color
+        dateLabel.textColor = color
+        commentLabel.textColor = color
+        
+        senderImageView.tintColor = UIColor.adamant.primary
+        recipientImageView.tintColor = UIColor.adamant.primary
+        currencyImageView.tintColor = UIColor.adamant.primary
+        
+        incomeArrowImageView.tintColor = UIColor.white
+        outcomeArrowImageView.tintColor = UIColor.white
+        
+        incomeArrowView.backgroundColor = UIColor.adamant.incomeArrowBackgroundColor
+        createBorder(for: incomeArrowView, width: 2.5, color: UIColor.white)
+        
+        outcomeArrowView.backgroundColor = UIColor.adamant.outcomeArrowBackgroundColor
+        createBorder(for: outcomeArrowView, width: 2.5, color: UIColor.white)
     }
     
     private func createBorder(for view: UIView, width: CGFloat, color: UIColor) {
@@ -107,7 +123,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         let avatarService = AdamantAvatarService()
         var api: ExtensionsApi?
         
-        guard let passphrase = keychain.get(passphraseStoreKey), let keypair = core.createKeypairFor(passphrase: passphrase) else {
+        guard let passphrase: String = keychain.get(passphraseStoreKey), let keypair = core.createKeypairFor(passphrase: passphrase) else {
             showError()
             return
         }

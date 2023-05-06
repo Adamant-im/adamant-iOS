@@ -5,53 +5,11 @@
 //  Created by Anokhov Pavel on 25/05/2019.
 //  Copyright © 2019 Adamant. All rights reserved.
 //
-
 import Foundation
 
 enum AdamantResources {
     static let coreDataModel = Bundle.main.url(forResource: "Adamant", withExtension: "momd")!
-    
-    // MARK: Nodes
-    
-    static var nodes: [Node] {
-        [
-            Node(scheme: .https, host: "endless.adamant.im", port: nil),
-            Node(scheme: .https, host: "clown.adamant.im", port: nil),
-            Node(scheme: .https, host: "lake.adamant.im", port: nil),
-            Node(scheme: .https, host: "debate.adamant.im", port: nil),
-            Node(scheme: .https, host: "bid.adamant.im", port: nil),
-            Node(scheme: .https, host: "unusual.adamant.im", port: nil),
-            Node(scheme: .http, host: "23.226.231.225", port: 36666)
-//            Node(scheme: .http, host: "80.211.177.181", port: 36666),
-//            Node(scheme: .http, host: "80.211.177.181", port: nil), // Bugged one
-//            Node(scheme: .http, host: "163.172.132.38", port: 36667) // Testnet
-        ]
-    }
-    
-    static let ethServers = [
-        "https://ethnode2.adamant.im/"
-    ]
-    
-    static let lskServers = [
-        "https://lisknode3.adamant.im"
-    ]
-    
-    static let lskServiceServers = [
-        "https://liskservice3.adamant.im"
-    ]
-
-    static let btcServers: [URL] = [
-        URL(string: "https://btcnode2.adamant.im")!
-    ]
-    
-    static let dogeServers: [URL] = [
-        URL(string: "https://dogenode1.adamant.im/api")!
-    ]
-    
-    static let dashServers: [URL] = [
-        URL(string: "https://dashnode1.adamant.im/")!
-    ]
-    
+   
     static let coinsInfoSrvice = "https://info.adamant.im"
     
     // MARK: ADAMANT Addresses
@@ -89,20 +47,4 @@ enum AdamantResources {
         static let adelinaWallet = "U11138426591213238985"
         static let adelinaWalletPK = "8e06eba03ebe4668148647fc00a64b3fae59a1911ce1fd1059baba39ceb705a4"
     }
-    
-    // MARK: Explorers
-    // MARK: ADM
-    static let adamantExplorerAddress = "https://explorer.adamant.im/tx/"
-    
-    // MARK: ETH
-    static let ethereumExplorerAddress = "https://etherscan.io/tx/"
-    //    static let ethereumExplorerAddress = "https://ropsten.etherscan.io/tx/" // Testnet
-    
-    // MARK: LSK
-    static let liskExplorerAddress = "https://liskscan.com/transaction/"
-    
-    static let dogeExplorerAddress = "https://dogechain.info/tx/"
-    static let dashExplorerAddress = "https://dashblockexplorer.com/tx/"
-
-    static let btcExplorerAddress = "https://btc.com/btc/transaction/"
 }

@@ -18,58 +18,69 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
     
     // MARK: - Properties
     var transactions: [DashTransaction] = []
-    
-    private let procedureQueue = ProcedureQueue()
+    private var allTransactionsIds: [String] = []
+    private var offset = 0
+    private var maxPerRequest = 25
     
     override func viewDidLoad() {
         super.viewDidLoad()
         currencySymbol = DashWalletService.currencySymbol
         
         refreshControl.beginRefreshing()
-        handleRefresh(refreshControl)
+        handleRefresh()
     }
     
-    deinit {
-        procedureQueue.cancelAllOperations()
-    }
-    
-    override func handleRefresh(_ refreshControl: UIRefreshControl) {
-        emptyLabel.isHidden = true
-        procedureQueue.cancelAllOperations()
+    override func handleRefresh() {
         transactions.removeAll()
-
-        walletService.getTransactions { [weak self] result in
-            guard let vc = self else {
-                refreshControl.endRefreshing()
-                return
+        tableView.reloadData()
+        allTransactionsIds.removeAll()
+        offset = 0
+        
+        loadData(true)
+    }
+    
+    override func loadData(_ silent: Bool) {
+        guard let address = walletService.wallet?.address else {
+            transactions = []
+            return
+        }
+        
+        isBusy = true
+        emptyLabel.isHidden = true
+        
+        Task { @MainActor in
+            do {
+                if allTransactionsIds.isEmpty {
+                    allTransactionsIds = try await walletService.requestTransactionsIds(for: address).reversed()
+                }
+                
+                let availableToLoad = allTransactionsIds.count - offset
+                
+                let maxPerRequest = availableToLoad > maxPerRequest
+                ? maxPerRequest
+                : availableToLoad
+                
+                let ids = Array(allTransactionsIds[offset..<(offset + maxPerRequest)])
+                
+                let trs = try await walletService.getTransactions(by: ids)
+                
+                transactions.append(contentsOf: trs)
+                offset += trs.count
+                isNeedToLoadMoore = allTransactionsIds.count - offset > 0
+            } catch {
+                isNeedToLoadMoore = false
+                
+                if !silent {
+                    dialogService.showRichError(error: error)
+                }
             }
             
-            switch result {
-            case .success(let tuple):
-                vc.transactions += tuple.transactions
-                
-                DispatchQueue.main.async {
-                    vc.emptyLabel.isHidden = vc.transactions.count > 0
-                    vc.tableView.reloadData()
-                    refreshControl.endRefreshing()
-                    
-                    // Update tableView, then call loadMore()
-                    if tuple.hasMore {
-                        vc.loadMoreTransactions()
-                    }
-                }
-                
-            case .failure(let error):
-                vc.transactions.removeAll()
-                vc.dialogService.showRichError(error: error)
-                
-                DispatchQueue.main.async {
-                    vc.emptyLabel.isHidden = vc.transactions.count > 0
-                    vc.tableView.reloadData()
-                    refreshControl.endRefreshing()
-                }
-            }
-        }
+            isBusy = false
+            emptyLabel.isHidden = transactions.count > 0
+            tableView.reloadData()
+            stopBottomIndicator()
+            refreshControl.endRefreshing()
+        }.stored(in: taskManager)
     }
     
     // MARK: - UITableView
@@ -92,13 +103,13 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
         dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
         let txId = transactions[indexPath.row].txId
 
-        walletService.getTransaction(by: txId) { [weak self] result in
-            guard let vc = self else {
-                return
-            }
+        Task { [weak self] in
+            do {
+                let dashTransaction = try await walletService.getTransaction(by: txId)
+                guard let vc = self else {
+                    return
+                }
 
-            switch result {
-            case .success(let dashTransaction):
                 let transaction = dashTransaction.asBtcTransaction(DashTransaction.self, for: sender)
 
                 // Sender name
@@ -113,36 +124,25 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
                 // Block Id
                 guard let blockHash = dashTransaction.blockHash else {
                     controller.transaction = transaction
-                    DispatchQueue.main.async {
-                        vc.navigationController?.pushViewController(controller, animated: true)
-                        vc.tableView.deselectRow(at: indexPath, animated: true)
-                        vc.dialogService.dismissProgress()
-                    }
-                    break
-                }
-
-                vc.walletService.getBlockId(by: blockHash) { result in
-                    switch result {
-                    case .success(let id):
-                        controller.transaction = dashTransaction.asBtcTransaction(DashTransaction.self, for: sender, blockId: id)
-
-                    case .failure:
-                        controller.transaction = transaction
-                    }
-
-                    DispatchQueue.main.async {
-                        vc.tableView.deselectRow(at: indexPath, animated: true)
-                        vc.dialogService.dismissProgress()
-                        vc.navigationController?.pushViewController(controller, animated: true)
-                    }
-                }
-
-            case .failure(let error):
-                DispatchQueue.main.async {
+                    vc.navigationController?.pushViewController(controller, animated: true)
                     vc.tableView.deselectRow(at: indexPath, animated: true)
                     vc.dialogService.dismissProgress()
-                    vc.dialogService.showRichError(error: error)
+                    return
                 }
+                do {
+                    let id = try await vc.walletService.getBlockId(by: blockHash)
+                    controller.transaction = dashTransaction.asBtcTransaction(DashTransaction.self, for: sender, blockId: id)
+                } catch {
+                    controller.transaction = transaction
+                }
+                vc.tableView.deselectRow(at: indexPath, animated: true)
+                vc.dialogService.dismissProgress()
+                vc.navigationController?.pushViewController(controller, animated: true)
+                
+            } catch {
+                self?.tableView.deselectRow(at: indexPath, animated: true)
+                self?.dialogService.dismissProgress()
+                self?.dialogService.showRichError(error: error)
             }
         }
     }
@@ -178,39 +178,6 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
                       partnerName: partnerName,
                       amount: transaction.amountValue ?? 0,
                       date: transaction.dateValue)
-    }
-    
-    // MARK: - Load more
-    private func loadMoreTransactions() {
-        let procedure = LoadMoreDashTransactionsProcedure(service: walletService)
-
-        procedure.addDidFinishBlockObserver { [weak self] (procedure, _) in
-            guard let vc = self, let result = procedure.result else {
-                return
-            }
-            
-            DispatchQueue.main.async {
-                vc.transactions.append(contentsOf: result.transactions)
-                vc.transactions.sort(by: { (t1, t2) -> Bool in
-                    return t1.dateValue ?? Date() > t2.dateValue ?? Date()
-                })
-                
-                for transaction in result.transactions {
-                    if let index = vc.transactions.firstIndex(where: { (tr) -> Bool in
-                        return tr.txId == transaction.txId
-                    }) {
-                        let indexPath = IndexPath(row: index, section: 0)
-                        vc.tableView.insertRows(at: [indexPath], with: .fade)
-                    }
-                }
-                
-                if result.hasMore {
-                    vc.loadMoreTransactions()
-                }
-            }
-        }
-        
-        procedureQueue.addOperation(procedure)
     }
 }
 

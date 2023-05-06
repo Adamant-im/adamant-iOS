@@ -29,7 +29,11 @@ extension String {
         let name = queryItems.filter({$0.name == "label"}).first?.value?.replacingOccurrences(of: "+", with: " ").replacingOccurrences(of: "%20", with: " ")
         let amount = queryItems.filter({$0.name == "amount"}).first?.value
         let message = queryItems.filter({$0.name == "message"}).first?.value?.replacingOccurrences(of: "+", with: " ").replacingOccurrences(of: "%20", with: " ")
-        return AdamantAddress(address: address, name: name, amount: amount?.double, message: message)
+        var amountDouble: Double?
+        if let amount = amount {
+            amountDouble = Double(amount)
+        }
+        return AdamantAddress(address: address, name: name, amount: amountDouble, message: message)
     }
 
     func getLegacyAdamantAddress() -> AdamantAddress? {
@@ -37,7 +41,9 @@ extension String {
         var name: String?
         var message: String?
         
-        if let uri = AdamantUriTools.decode(uri: self) {
+        let newUrl = self.replacingOccurrences(of: "//", with: "")
+        
+        if let uri = AdamantUriTools.decode(uri: newUrl) {
             switch uri {
             case .address(address: let addr, params: let params):
                 address = addr
@@ -74,6 +80,16 @@ extension String {
         }
     }
     
+    func validateEthAddress() -> String {
+        let address = self
+        let prefix = address.prefix(2)
+        
+        let fixedAddress = prefix != "0x"
+        ? "0x\(address)"
+        : address
+        
+        return fixedAddress
+    }
 }
 
 public extension NSMutableAttributedString {
@@ -103,23 +119,4 @@ public extension NSMutableAttributedString {
         endEditing()
     }
 
-}
-
-extension String {
-    func checkAndReplaceSystemWallets() -> String {
-        switch self {
-        case "chats.virtual.bounty_wallet_title":
-            return AdamantContacts.adamantNewBountyWallet.name
-        case "chats.virtual.bitcoin_bet_title":
-            return AdamantContacts.betOnBitcoin.name
-        case "chats.virtual.donate_bot_title":
-            return AdamantContacts.donate.name
-        case "chats.virtual.exchange_bot_title":
-            return AdamantContacts.adamantExchange.name
-        case "chats.virtual.adelina_title":
-            return AdamantContacts.adelina.name
-        default:
-            return self
-        }
-    }
 }

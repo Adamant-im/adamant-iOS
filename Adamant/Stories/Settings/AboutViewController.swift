@@ -45,7 +45,7 @@ class AboutViewController: FormViewController {
     
     enum Rows {
         case website, whitepaper, blog, github, welcomeScreens
-        case adm, email, bitcointalk, facebook, telegram, vk, twitter
+        case adm, email, twitter
         
         var tag: String {
             switch self {
@@ -56,10 +56,6 @@ class AboutViewController: FormViewController {
             case .adm: return "amd"
             case .email: return "email"
             case .blog: return "blog"
-            case .bitcointalk: return "bittlk"
-            case .facebook: return "fcbook"
-            case .telegram: return "telegram"
-            case .vk: return "vk"
             case .twitter: return "twttr"
             }
         }
@@ -73,10 +69,6 @@ class AboutViewController: FormViewController {
             case .welcomeScreens: return NSLocalizedString("About.Row.Welcome", comment: "About scene: Show Welcome screens")
             case .email: return NSLocalizedString("About.Row.WriteUs", comment: "About scene: Write us row")
             case .blog: return NSLocalizedString("About.Row.Blog", comment: "About scene: Our blog row")
-            case .bitcointalk: return NSLocalizedString("About.Row.Bitcointalk", comment: "About scene: Bitcointalk.org row")
-            case .facebook: return NSLocalizedString("About.Row.Facebook", comment: "About scene: Facebook row")
-            case .telegram: return NSLocalizedString("About.Row.Telegram", comment: "About scene: Telegram row")
-            case .vk: return NSLocalizedString("About.Row.VK", comment: "About scene: VK row")
             case .twitter: return NSLocalizedString("About.Row.Twitter", comment: "About scene: Twitter row")
             }
         }
@@ -87,10 +79,6 @@ class AboutViewController: FormViewController {
             case .whitepaper: return NSLocalizedString("About.Row.Whitepaper.Url", comment: "About scene: The Whitepaper localized url")
             case .github: return NSLocalizedString("About.Row.GitHub.Url", comment: "About scene: Project's GitHub page localized url")
             case .blog: return NSLocalizedString("About.Row.Blog.Url", comment: "About scene: Our blog localized url")
-            case .bitcointalk: return NSLocalizedString("About.Row.Bitcointalk.Url", comment: "About scene: Bitcointalk.org localized url")
-            case .facebook: return NSLocalizedString("About.Row.Facebook.Url", comment: "About scene: Facebook localized url")
-            case .telegram: return NSLocalizedString("About.Row.Telegram.Url", comment: "About scene: Telegram localized url")
-            case .vk: return NSLocalizedString("About.Row.VK.Url", comment: "About scene: VK localized url")
             case .twitter: return NSLocalizedString("About.Row.Twitter.Url", comment: "About scene: Twitter localized url")
                 
             // No urls
@@ -107,7 +95,7 @@ class AboutViewController: FormViewController {
             case .adm: return #imageLiteral(resourceName: "row_chat_adamant")
             case .website: return #imageLiteral(resourceName: "row_website")
             case .welcomeScreens: return #imageLiteral(resourceName: "row_logo")
-            default: return #imageLiteral(resourceName: "row_icon_placeholder")
+            case .twitter: return #imageLiteral(resourceName: "row_twitter")
             }
         }
     }
@@ -126,10 +114,7 @@ class AboutViewController: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .always
-        }
-        
+        navigationItem.largeTitleDisplayMode = .always
         navigationItem.title = String.adamantLocalized.about.title
         
         // MARK: Header & Footer
@@ -175,6 +160,14 @@ class AboutViewController: FormViewController {
                         url: Rows.blog.localizedUrl,
                         image: Rows.blog.image)
         
+        // Twitter
+        <<< buildUrlRow(
+            title: Rows.twitter.localized,
+            value: nil,
+            tag: Rows.twitter.tag,
+            url: Rows.twitter.localizedUrl,
+            image: Rows.twitter.image)
+        
         // Github
         <<< buildUrlRow(title: Rows.github.localized,
                         value: nil,
@@ -217,41 +210,7 @@ class AboutViewController: FormViewController {
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
         }.onCellSelection { [weak self] (_, _) in
-            guard let accountsProvider = self?.accountsProvider, let router = self?.router else {
-                return
-            }
-            
-            let dialogService = self?.dialogService
-            dialogService?.showProgress(withMessage: nil, userInteractionEnable: false)
-            
-            accountsProvider.getAccount(byAddress: AdamantContacts.iosSupport.address) { result in
-                switch result {
-                case .success(let account):
-                    DispatchQueue.main.async {
-                        guard let chatroom = account.chatroom,
-                            let nav = self?.navigationController,
-                            let account = self?.accountService.account,
-                            let chat = router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
-                                return
-                        }
-                        
-                        chat.account = account
-                        chat.hidesBottomBarWhenPushed = true
-                        chat.chatroom = chatroom
-                        chat.delegate = self
-                        
-                        nav.pushViewController(chat, animated: true)
-                        
-                        dialogService?.dismissProgress()
-                    }
-                    
-                case .invalidAddress, .notFound, .notInitiated, .networkError, .dummy:
-                    dialogService?.showWarning(withMessage: String.adamantLocalized.sharedErrors.networkError)
-                    
-                case .serverError(let error):
-                    dialogService?.showError(withMessage: String.adamantLocalized.sharedErrors.remoteServerError(message: error.localizedDescription), error: error)
-                }
-            }
+            self?.contactUsAction()
         }
             
         // E-mail
@@ -272,43 +231,6 @@ class AboutViewController: FormViewController {
                 delegate: self
             )
         }
-            
-        /*
-        // Bitcointalk
-        <<< buildUrlRow(title: Rows.bitcointalk.localized,
-                        value: nil,
-                        tag: Rows.bitcointalk.tag,
-                        url: Rows.bitcointalk.localizedUrl,
-                        image: Rows.bitcointalk.image)
-        
-        // Facebook
-        <<< buildUrlRow(title: Rows.facebook.localized,
-                        value: nil,
-                        tag: Rows.facebook.tag,
-                        url: Rows.facebook.localizedUrl,
-                        image: Rows.facebook.image)
-        
-        // Telegram
-        <<< buildUrlRow(title: Rows.telegram.localized,
-                        value: nil,
-                        tag: Rows.telegram.tag,
-                        url: Rows.telegram.localizedUrl,
-                        image: Rows.telegram.image)
-        
-        // VK
-        <<< buildUrlRow(title: Rows.vk.localized,
-                        value: nil,
-                        tag: Rows.vk.tag,
-                        url: Rows.vk.localizedUrl,
-                        image: Rows.vk.image)
-        
-        // Twitter
-        <<< buildUrlRow(title: Rows.twitter.localized,
-                        value: nil,
-                        tag: Rows.twitter.tag,
-                        url: Rows.twitter.localizedUrl,
-                        image: Rows.twitter.image)
-        */
         
         setColors()
     }
@@ -327,6 +249,60 @@ class AboutViewController: FormViewController {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
     }
+    
+    @MainActor
+    private func contactUsAction() {
+        Task {
+            dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
+
+            do {
+                let account = try await accountsProvider.getAccount(byAddress: AdamantContacts.iosSupport.address)
+
+                guard let chatroom = account.chatroom,
+                      let nav = self.navigationController,
+                      let account = self.accountService.account,
+                      let chat = router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
+                    return
+                }
+
+                chat.hidesBottomBarWhenPushed = true
+                chat.viewModel.setup(
+                    account: account,
+                    chatroom: chatroom,
+                    messageToShow: nil,
+                    preservationDelegate: self
+                )
+
+                nav.pushViewController(chat, animated: true)
+
+                dialogService.dismissProgress()
+            } catch let error as AccountsProviderError {
+                switch error {
+                case .invalidAddress, .notFound, .notInitiated, .networkError, .dummy:
+                    dialogService.showWarning(withMessage: String.adamantLocalized.sharedErrors.networkError)
+
+                case .serverError(let error):
+                    dialogService.showError(
+                        withMessage:
+                            String.adamantLocalized.sharedErrors.remoteServerError(
+                                message: error.localizedDescription
+                            ),
+                        supportEmail: false,
+                        error: error
+                    )
+                }
+            } catch {
+                dialogService.showError(
+                    withMessage:
+                        String.adamantLocalized.sharedErrors.remoteServerError(
+                            message: error.localizedDescription
+                        ),
+                    supportEmail: false,
+                    error: error
+                )
+            }
+        }
+    }
 }
 
 // MARK: - Tools
@@ -341,7 +317,7 @@ extension AboutViewController {
             $0.cell.selectionStyle = .gray
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
-        }.onCellSelection { [weak self] (_, _) in
+        }.onCellSelection { [weak self] (_, row) in
             guard let url = URL(string: urlRaw) else {
                 fatalError("Failed to build page url: \(urlRaw)")
             }
@@ -350,6 +326,8 @@ extension AboutViewController {
             safari.preferredControlTintColor = UIColor.adamant.primary
             safari.modalPresentationStyle = .overFullScreen
             self?.present(safari, animated: true, completion: nil)
+            
+            row.deselect()
         }
         
         return row
@@ -364,11 +342,12 @@ extension AboutViewController: MFMailComposeViewControllerDelegate {
 }
 
 // MARK: - ChatViewControllerDelegate
-extension AboutViewController: ChatViewControllerDelegate {
+
+extension AboutViewController: ChatPreservationDelegate {
     func preserveMessage(_ message: String, forAddress address: String) {
         storedIOSSupportMessage = message
     }
-    
+
     func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String? {
         if thenRemoveIt {
             let message = storedIOSSupportMessage

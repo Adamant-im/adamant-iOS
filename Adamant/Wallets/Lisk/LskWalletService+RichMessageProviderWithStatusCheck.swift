@@ -7,84 +7,75 @@
 //
 
 import Foundation
+import LiskKit
 
 extension LskWalletService: RichMessageProviderWithStatusCheck {
-    func statusFor(transaction: RichMessageTransaction, completion: @escaping (WalletServiceResult<TransactionStatus>) -> Void) {
-        guard let hash = transaction.richContent?[RichContentKeys.transfer.hash], let date = transaction.date as Date? else {
-            completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction hash", error: nil)))
-            return
+    func statusInfoFor(transaction: RichMessageTransaction) async -> TransactionStatusInfo {
+        guard let hash = transaction.richContent?[RichContentKeys.transfer.hash] else {
+            return .init(sentDate: nil, status: .inconsistent)
         }
         
-        getTransaction(by: hash) { result in
-            switch result {
-            case .success(var lskTransaction):
-                // MARK: Check status
-                lskTransaction.updateConfirmations(value: self.lastHeight)
-                
-                guard let status = lskTransaction.transactionStatus else {
-                    completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction", error: nil)))
-                    return
-                }
-                
-                guard status == .success else {
-                    completion(.success(result: status))
-                    return
-                }
-                
-                // MARK: Check address
-                if transaction.isOutgoing {
-                    guard lskTransaction.senderAddress == self.lskWallet?.address else {
-                        completion(.success(result: .warning))
-                        return
-                    }
-                } else {
-                    guard lskTransaction.recipientAddress == self.lskWallet?.address else {
-                        completion(.success(result: .warning))
-                        return
-                    }
-                }
-                
-                // MARK: Check date
-                let start = date.addingTimeInterval(-60 * 5)
-                let end = date.addingTimeInterval(self.consistencyMaxTime)
-                let range = start...end
-                
-                guard range.contains(lskTransaction.sentDate) else {
-                    completion(.success(result: .warning))
-                    return
-                }
-                    
-                // MARK: Check amount
-                if let raw = transaction.richContent?[RichContentKeys.transfer.amount], let reported = AdamantBalanceFormat.deserializeBalance(from: raw) {
-                    let min = reported - reported*0.005
-                    let max = reported + reported*0.005
-                    
-                    guard (min...max).contains(lskTransaction.amountValue ?? 0) else {
-                        completion(.success(result: .warning))
-                        return
-                    }
-                }
-                
-                completion(.success(result: .success))
-                
-            case .failure(let error):
-                if error.message.contains("does not exist") {
-                    let timeAgo = -1 * date.timeIntervalSinceNow
-                    
-                    let result: TransactionStatus
-                    if timeAgo > self.consistencyMaxTime {
-                        // max time waiting for pending status
-                        result = .failed
-                    } else {
-                        // Note: No info about processing transactions
-                        result = .pending
-                    }
-                    completion(.success(result: result))
-                    
-                } else {
-                    completion(.failure(error: error.asWalletServiceError()))
-                }
+        var lskTransaction: Transactions.TransactionModel
+        
+        do {
+            lskTransaction = try await getTransaction(by: hash)
+        } catch {
+            switch error {
+            case ApiServiceError.networkError(_):
+                return .init(sentDate: nil, status: .noNetwork)
+            default:
+                return .init(sentDate: nil, status: .pending)
             }
         }
+        
+        lskTransaction.updateConfirmations(value: lastHeight)
+        
+        return .init(
+            sentDate: lskTransaction.sentDate,
+            status: getStatus(
+                lskTransaction: lskTransaction,
+                transaction: transaction
+            )
+        )
+    }
+}
+
+private extension LskWalletService {
+    func getStatus(
+        lskTransaction: Transactions.TransactionModel,
+        transaction: RichMessageTransaction
+    ) -> TransactionStatus {
+        guard lskTransaction.blockId != nil else { return .registered }
+        
+        guard let status = lskTransaction.transactionStatus else {
+            return .inconsistent
+        }
+        
+        guard status == .success else {
+            return status
+        }
+        
+        // MARK: Check address
+        if transaction.isOutgoing {
+            guard lskTransaction.senderAddress == lskWallet?.address else {
+                return .inconsistent
+            }
+        } else {
+            guard lskTransaction.recipientAddress == lskWallet?.address else {
+                return .inconsistent
+            }
+        }
+        
+        // MARK: Check amount
+        if let raw = transaction.richContent?[RichContentKeys.transfer.amount], let reported = AdamantBalanceFormat.deserializeBalance(from: raw) {
+            let min = reported - reported*0.005
+            let max = reported + reported*0.005
+            
+            guard (min...max).contains(lskTransaction.amountValue ?? 0) else {
+                return .inconsistent
+            }
+        }
+        
+        return .success
     }
 }

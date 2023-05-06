@@ -21,7 +21,7 @@ extension BaseAccount {
     @NSManaged public var isSystem: Bool
     @NSManaged public var name: String?
     @NSManaged public var transfers: NSSet?
-
+    @NSManaged public var isDummy: Bool
 }
 
 // MARK: Generated accessors for transfers

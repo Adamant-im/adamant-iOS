@@ -12,9 +12,10 @@ import Eureka
 class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     
     // MARK: - Dependencies
-    var accountService: AccountService!
-    var transfersProvider: TransfersProvider!
-    var router: Router!
+    
+    var accountService: AccountService
+    var transfersProvider: TransfersProvider
+    var router: Router
     
     // MARK: - Properties
     private let autoupdateInterval: TimeInterval = 5.0
@@ -23,7 +24,35 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     
     weak var timer: Timer?
     
+    private lazy var refreshControl: UIRefreshControl = {
+        let control = UIRefreshControl()
+        control.tintColor = .adamant.primary
+        control.addTarget(self, action: #selector(refresh), for: UIControl.Event.valueChanged)
+        return control
+    }()
+    
     // MARK: - Lifecycle
+    
+    init(
+        accountService: AccountService,
+        transfersProvider: TransfersProvider,
+        router: Router,
+        dialogService: DialogService,
+        currencyInfo: CurrencyInfoService
+    ) {
+        self.accountService = accountService
+        self.transfersProvider = transfersProvider
+        self.router = router
+        
+        super.init(
+            dialogService: dialogService,
+            currencyInfo: currencyInfo
+        )
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         currencySymbol = AdmWalletService.currencySymbol
@@ -63,6 +92,10 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
             }
         }
         
+        tableView.refreshControl = refreshControl
+        
+        refresh(true)
+        
         startUpdate()
     }
     
@@ -75,7 +108,7 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
         let id = transaction.txId
         
-        return URL(string: "\(AdamantResources.adamantExplorerAddress)\(id)")
+        return URL(string: "\(AdmWalletService.explorerAddress)\(id)")
     }
     
     func goToChat() {
@@ -84,23 +117,27 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
         }
         
         guard let vc = self.router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
-            dialogService.showError(withMessage: "AdmTransactionDetailsViewController: Failed to get ChatViewController", error: nil)
+            dialogService.showError(withMessage: "AdmTransactionDetailsViewController: Failed to get ChatViewController", supportEmail: true, error: nil)
             return
         }
 
         guard let chatroom = transfer.chatroom else {
-            dialogService.showError(withMessage: "AdmTransactionDetailsViewController: Failed to get chatroom for transaction.", error: nil)
+            dialogService.showError(withMessage: "AdmTransactionDetailsViewController: Failed to get chatroom for transaction.", supportEmail: true, error: nil)
             return
         }
 
         guard let account = accountService.account else {
-            dialogService.showError(withMessage: "AdmTransactionDetailsViewController: User not logged.", error: nil)
+            dialogService.showError(withMessage: "AdmTransactionDetailsViewController: User not logged.", supportEmail: true, error: nil)
             return
         }
 
-        vc.account = account
-        vc.chatroom = chatroom
         vc.hidesBottomBarWhenPushed = true
+        vc.viewModel.setup(
+            account: account,
+            chatroom: chatroom,
+            messageToShow: nil,
+            preservationDelegate: nil
+        )
 
         if let nav = self.navigationController {
             nav.pushViewController(vc, animated: true)
@@ -110,26 +147,31 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
         }
     }
     
+    @MainActor
+    @objc func refresh(_ silent: Bool = false) {
+        refreshTask = Task {
+            guard let id = transaction?.txId else {
+                return
+            }
+            
+            do {
+                try await transfersProvider.refreshTransfer(id: id)
+                refreshControl.endRefreshing()
+                tableView.reloadData()
+            } catch {
+                refreshControl.endRefreshing()
+                guard !silent else { return }
+                dialogService.showRichError(error: error)
+            }
+        }
+    }
+    
     // MARK: - Autoupdate
     
     func startUpdate() {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            guard let id = self?.transaction?.txId else {
-                return
-            }
-            
-            self?.transfersProvider.refreshTransfer(id: id) { result in
-                switch result {
-                case .success:
-                    DispatchQueue.main.async {
-                        self?.tableView.reloadData()
-                    }
-                    
-                case .failure:
-                    return
-                }
-            }
+            self?.refresh(true)
         }
     }
     

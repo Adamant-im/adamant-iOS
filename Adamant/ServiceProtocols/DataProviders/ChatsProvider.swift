@@ -39,11 +39,15 @@ enum ChatsProviderError: Error {
     case transactionNotFound(id: String)
     case internalError(Error)
     case requestCancelled
+    case invalidTransactionStatus
 }
 
 extension ChatsProviderError: RichError {
     var message: String {
         switch self {
+        case .invalidTransactionStatus:
+            return String.adamantLocalized.chat.cancelError
+            
         case .notLogged:
             return String.adamantLocalized.sharedErrors.userNotLogged
             
@@ -57,10 +61,11 @@ extension ChatsProviderError: RichError {
             return String.adamantLocalized.sharedErrors.networkError
             
         case .serverError(let error):
-            return ApiServiceError.serverError(error: error.localizedDescription).localized
+            return ApiServiceError.serverError(error: error.localizedDescription)
+                .localizedDescription
             
         case .accountNotFound(let address):
-            return AccountsProviderResult.notFound(address: address).localized
+            return AccountsProviderError.notFound(address: address).localized
             
         case .dependencyError(let message):
             return String.adamantLocalized.sharedErrors.internalError(message: message)
@@ -91,20 +96,22 @@ extension ChatsProviderError: RichError {
     
     var level: ErrorLevel {
         switch self {
-            case .accountNotFound,
-                 .messageNotValid,
-                 .networkError,
-                 .notEnoughMoneyToSend,
-                 .accountNotInitiated,
-                 .requestCancelled,
-                 .notLogged:
+        case .accountNotFound,
+                .messageNotValid,
+                .networkError,
+                .notEnoughMoneyToSend,
+                .accountNotInitiated,
+                .requestCancelled,
+                .invalidTransactionStatus,
+                .notLogged:
             return .warning
             
-        case .dependencyError,
-             .internalError,
-             .serverError,
-             .transactionNotFound:
+        case .serverError, .transactionNotFound:
             return .error
+            
+        case .dependencyError,
+             .internalError:
+            return .internalError
         }
     }
 }
@@ -167,14 +174,12 @@ extension StoreKey {
 }
 
 // MARK: - Protocol
-protocol ChatsProvider: DataProvider {
+protocol ChatsProvider: DataProvider, Actor {
     // MARK: - Properties
     var receivedLastHeight: Int64? { get }
     var readedLastHeight: Int64? { get }
     var isInitiallySynced: Bool { get }
-    
-    var chatPositon: [String: Double] { get set }
-    var blackList: [String] { get }
+    var blockList: [String] { get }
     
     var roomsMaxCount: Int? { get }
     var roomsLoadedCount: Int? { get }
@@ -184,38 +189,53 @@ protocol ChatsProvider: DataProvider {
     var chatLoadedMessages: [String: Int] { get }
     
     // MARK: - Getting chats and messages
+    func getChatroom(for adm: String) -> Chatroom?
     func getChatroomsController() -> NSFetchedResultsController<Chatroom>
-    func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction>
-    func getChatRooms(offset: Int?, completion: (() -> Void)?)
-    func getChatMessages(with addressRecipient: String, offset: Int?, completion: (() -> Void)?)
+    @MainActor func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction>
+    func getChatRooms(offset: Int?) async
+    func getChatMessages(with addressRecipient: String, offset: Int?) async
     func isChatLoading(with addressRecipient: String) -> Bool
+    func isChatLoaded(with addressRecipient: String) -> Bool
     
     /// Unread messages controller. Sections by chatroom.
     func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction>
     
     // ForceUpdate chats
-    func update()
-    func update(completion: ((ChatsProviderResult?) -> Void)?)
+    func update(notifyState: Bool) async -> ChatsProviderResult?
     
     // MARK: - Sending messages
-    func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResultWithTransaction) -> Void )
-    func sendMessage(_ message: AdamantMessage, recipientId: String, from chatroom: Chatroom?, completion: @escaping (ChatsProviderResultWithTransaction) -> Void )
-    func retrySendMessage(_ message: ChatTransaction, completion: @escaping (ChatsProviderRetryCancelResult) -> Void)
+    func sendMessage(_ message: AdamantMessage, recipientId: String) async throws -> ChatTransaction
+    func sendMessage(_ message: AdamantMessage, recipientId: String, from chatroom: Chatroom?) async throws -> ChatTransaction
+    func retrySendMessage(_ message: ChatTransaction) async throws
     
     // MARK: - Delete local message
-    func cancelMessage(_ message: ChatTransaction, completion: @escaping (ChatsProviderRetryCancelResult) -> Void )
+    func cancelMessage(_ message: ChatTransaction) async throws
     
     // MARK: - Tools
     func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult
     func blockChat(with address: String)
     func removeMessage(with id: String)
+    func markChatAsRead(chatroom: Chatroom)
+    
+    @MainActor func removeChatPositon(for address: String)
+    @MainActor func setChatPositon(for address: String, position: Double?)
+    @MainActor func getChatPositon(for address: String) -> Double?
     
     // MARK: - Unconfirmed Transaction
     func addUnconfirmed(transactionId: UInt64, managedObjectId: NSManagedObjectID)
     
     // MARK: - Fake messages
     func fakeSent(message: AdamantMessage, recipientId: String, date: Date, status: MessageStatus, showsChatroom: Bool, completion: @escaping (ChatsProviderResultWithTransaction) -> Void)
-    func fakeReceived(message: AdamantMessage, senderId: String, date: Date, unread: Bool, silent: Bool, showsChatroom: Bool, completion: @escaping (ChatsProviderResultWithTransaction) -> Void)
+    
+    func fakeReceived(
+        message: AdamantMessage,
+        senderId: String,
+        date: Date,
+        unread: Bool,
+        silent: Bool,
+        showsChatroom: Bool
+    ) async throws -> ChatTransaction
+    
     func fakeUpdate(status: MessageStatus, forTransactionId id: String, completion: @escaping (ChatsProviderResult) -> Void)
     
     // MARK: - Search

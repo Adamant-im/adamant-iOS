@@ -26,7 +26,6 @@ extension String.adamantLocalized {
 
 extension StoreKey {
     struct application {
-        static let deviceTokenHash = "app.deviceTokenHash"
         static let welcomeScreensIsShown = "app.welcomeScreensIsShown"
         static let eulaAccepted = "app.eulaAccepted"
         static let firstRun = "app.firstRun"
@@ -47,7 +46,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var notificationService: NotificationsService!
     var dialogService: DialogService!
     var addressBookService: AddressBookService!
-
+    var pushNotificationsTokenService: PushNotificationsTokenService!
+    var visibleWalletsService: VisibleWalletsService!
+    
     // MARK: - Lifecycle
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -61,6 +62,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         notificationService = container.resolve(NotificationsService.self)
         dialogService = container.resolve(DialogService.self)
         addressBookService = container.resolve(AddressBookService.self)
+        pushNotificationsTokenService = container.resolve(PushNotificationsTokenService.self)
+        visibleWalletsService = container.resolve(VisibleWalletsService.self)
         
         // MARK: 1.1. First run flag
         let firstRun = UserDefaults.standard.bool(forKey: StoreKey.application.firstRun)
@@ -74,73 +77,84 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         // MARK: 2. Init UI
-        window = UIWindow(frame: UIScreen.main.bounds)
-        window!.rootViewController = UITabBarController()
-        window!.rootViewController!.view.backgroundColor = .white
-        window!.tintColor = UIColor.adamant.primary
+        let window = UIWindow(frame: UIScreen.main.bounds)
+        self.window = window
+        
+        let rootTabBarController = UITabBarController()
+        window.rootViewController = rootTabBarController
+        rootTabBarController.view.backgroundColor = .adamant.backgroundColor
+        window.tintColor = UIColor.adamant.primary
         
         // MARK: 3. Prepare pages
         guard let router = container.resolve(Router.self) else {
             fatalError("Failed to get Router")
         }
         
-        if let tabbar = window?.rootViewController as? UITabBarController {
-            // MARK: Chats
-            let chats = UISplitViewController()
-            chats.tabBarItem.title = String.adamantLocalized.tabItems.chats
-            chats.tabBarItem.image = #imageLiteral(resourceName: "chats_tab")
-            chats.preferredDisplayMode = .allVisible
-            chats.tabBarItem.badgeColor = UIColor.adamant.primary
-            
-            let chatList = UINavigationController(rootViewController: router.get(scene: AdamantScene.Chats.chatList))
-            
-            // MARK: Accounts
-            let accounts = UISplitViewController()
-            accounts.tabBarItem.title = String.adamantLocalized.tabItems.account
-            accounts.tabBarItem.image = #imageLiteral(resourceName: "account-tab")
-            accounts.preferredDisplayMode = .allVisible
-            accounts.tabBarItem.badgeColor = UIColor.adamant.primary
-            
-            let account = UINavigationController(rootViewController: router.get(scene: AdamantScene.Account.account))
-            
-            if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
-                let chatDetails = UIViewController(nibName: "WelcomeViewController", bundle: nil)
-                let accountDetails = UIViewController(nibName: "WelcomeViewController", bundle: nil)
-                
-                chats.viewControllers = [chatList, chatDetails]
-                accounts.viewControllers = [account, accountDetails]
-            } else {
-                chats.viewControllers = [chatList]
-                accounts.viewControllers = [account]
+        let chatList = UINavigationController(
+            rootViewController: router.get(scene: AdamantScene.Chats.chatList)
+        )
+        
+        let account = UINavigationController(
+            rootViewController: router.get(scene: AdamantScene.Account.account)
+        )
+        
+        let tabScreens: TabScreens = UIScreen.main.traitCollection.userInterfaceIdiom == .pad
+            ? .splitControllers(makeSplitController(), makeSplitController())
+            : .navigationControllers(chatList, account)
+        
+        tabScreens.viewControllers.0.tabBarItem.title = .adamantLocalized.tabItems.chats
+        tabScreens.viewControllers.0.tabBarItem.image = #imageLiteral(resourceName: "chats_tab")
+        tabScreens.viewControllers.0.tabBarItem.badgeColor = .adamant.primary
+        
+        tabScreens.viewControllers.1.tabBarItem.title = .adamantLocalized.tabItems.account
+        tabScreens.viewControllers.1.tabBarItem.image = #imageLiteral(resourceName: "account-tab")
+        tabScreens.viewControllers.1.tabBarItem.badgeColor = .adamant.primary
+        
+        let resetScreensAction: () -> Void
+        switch tabScreens {
+        case let .splitControllers(leftController, rightController):
+            resetScreensAction = {
+                let chatDetails = WelcomeViewController()
+                let accountDetails = WelcomeViewController()
+                leftController.viewControllers = [chatList, chatDetails]
+                rightController.viewControllers = [account, accountDetails]
             }
-            
-            if #available(iOS 13.0, *) {
-                let tabBarAppearance: UITabBarAppearance = UITabBarAppearance()
-                tabBarAppearance.configureWithDefaultBackground()
-                UITabBar.appearance().standardAppearance = tabBarAppearance
-
-                let navigationBarAppearance = UINavigationBarAppearance()
-                navigationBarAppearance.configureWithDefaultBackground()
-                UINavigationBar.appearance().standardAppearance = navigationBarAppearance
-                        
-                if #available(iOS 15.0, *) {
-                    UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
-                    UINavigationBar.appearance().scrollEdgeAppearance = navigationBarAppearance
-                }
+        case let .navigationControllers(leftController, rightController):
+            resetScreensAction = {
+                leftController.popToRootViewController(animated: false)
+                rightController.popToRootViewController(animated: false)
             }
-            
-            tabbar.setViewControllers([chats, accounts], animated: false)
         }
         
-        window!.makeKeyAndVisible()
+        resetScreensAction()
         
-        // MARK: 4. Show login
+        let tabBarAppearance: UITabBarAppearance = UITabBarAppearance()
+        tabBarAppearance.configureWithDefaultBackground()
+        UITabBar.appearance().standardAppearance = tabBarAppearance
+
+        let navigationBarAppearance = UINavigationBarAppearance()
+        navigationBarAppearance.configureWithDefaultBackground()
+        UINavigationBar.appearance().standardAppearance = navigationBarAppearance
+        UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
+        UINavigationBar.appearance().scrollEdgeAppearance = navigationBarAppearance
+        
+        rootTabBarController.setViewControllers(
+            tabScreens.arrayOfViewControllers,
+            animated: false
+        )
+        
+        window.makeKeyAndVisible()
+        
+        // MARK: 4. Setup dialog service
+        dialogService.setup(window: window)
+        
+        // MARK: 5. Show login
         let login = router.get(scene: AdamantScene.Login.login) as! LoginViewController
         let welcomeIsShown = UserDefaults.standard.bool(forKey: StoreKey.application.welcomeScreensIsShown)
         
         login.requestBiometryOnFirstTimeActive = welcomeIsShown
         login.modalPresentationStyle = .overFullScreen
-        window!.rootViewController?.present(login, animated: false, completion: nil)
+        window.rootViewController?.present(login, animated: false, completion: nil)
         
         if !welcomeIsShown {
             let welcome = router.get(scene: AdamantScene.Onboard.welcome)
@@ -149,7 +163,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             UserDefaults.standard.set(true, forKey: StoreKey.application.welcomeScreensIsShown)
         }
     
-        // MARK: 5 Reachability & Autoupdate
+        // MARK: 6 Reachability & Autoupdate
         repeater = RepeaterService()
         
         // Configure reachability
@@ -183,53 +197,77 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
         
+        // Setup transactions statuses observing
+        if let service = container.resolve(RichTransactionStatusService.self) {
+            Task { await service.startObserving() }
+        }
+        
         // Register repeater services
         if let chatsProvider = container.resolve(ChatsProvider.self) {
-            repeater.registerForegroundCall(label: "chatsProvider", interval: 10, queue: .global(qos: .utility), callback: chatsProvider.update)
+            repeater.registerForegroundCall(label: "chatsProvider", interval: 10, queue: .global(qos: .utility), callback: {
+                Task {
+                    await chatsProvider.update(notifyState: false)
+                }
+            })
             
         } else {
-            dialogService.showError(withMessage: "Failed to register ChatsProvider autoupdate. Please, report a bug", error: nil)
+            dialogService.showError(withMessage: "Failed to register ChatsProvider autoupdate. Please, report a bug", supportEmail: true, error: nil)
         }
         
         if let transfersProvider = container.resolve(TransfersProvider.self) {
-            repeater.registerForegroundCall(label: "transfersProvider", interval: 15, queue: .global(qos: .utility), callback: transfersProvider.update)
+            repeater.registerForegroundCall(label: "transfersProvider", interval: 15, queue: .global(qos: .utility), callback: {
+                Task {
+                    await transfersProvider.update()
+                }
+            })
         } else {
-            dialogService.showError(withMessage: "Failed to register TransfersProvider autoupdate. Please, report a bug", error: nil)
+            dialogService.showError(withMessage: "Failed to register TransfersProvider autoupdate. Please, report a bug", supportEmail: true, error: nil)
         }
         
         if let accountService = container.resolve(AccountService.self) {
             repeater.registerForegroundCall(label: "accountService", interval: 15, queue: .global(qos: .utility), callback: accountService.update)
         } else {
-            dialogService.showError(withMessage: "Failed to register AccountService autoupdate. Please, report a bug", error: nil)
+            dialogService.showError(withMessage: "Failed to register AccountService autoupdate. Please, report a bug", supportEmail: true, error: nil)
         }
         
         if let addressBookService = container.resolve(AddressBookService.self) {
-            repeater.registerForegroundCall(label: "addressBookService", interval: 15, queue: .global(qos: .utility), callback: addressBookService.update)
+            repeater.registerForegroundCall(label: "addressBookService", interval: 15, queue: .global(qos: .utility), callback: {
+                Task {
+                    await addressBookService.update()
+                }
+            })
         } else {
-            dialogService.showError(withMessage: "Failed to register AddressBookService autoupdate. Please, report a bug", error: nil)
+            dialogService.showError(withMessage: "Failed to register AddressBookService autoupdate. Please, report a bug", supportEmail: true, error: nil)
         }
         
         if let currencyInfoService = container.resolve(CurrencyInfoService.self) {
             currencyInfoService.update() // Initial update
             repeater.registerForegroundCall(label: "currencyInfoService", interval: 60, queue: .global(qos: .utility), callback: currencyInfoService.update)
         } else {
-            dialogService.showError(withMessage: "Failed to register CurrencyInfoService autoupdate. Please, report a bug", error: nil)
+            dialogService.showError(withMessage: "Failed to register CurrencyInfoService autoupdate. Please, report a bug", supportEmail: true, error: nil)
         }
         
-        // MARK: 6. Logout reset
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            // On logout, pop all navigators to root.
-            guard let tbc = self?.window?.rootViewController as? UITabBarController, let vcs = tbc.viewControllers else {
-                return
-            }
-            
-            for case let nav as UINavigationController in vcs {
-                nav.popToRootViewController(animated: false)
+        // MARK: 7. Logout reset
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name.AdamantAccountService.userLoggedOut,
+            object: nil,
+            queue: OperationQueue.main
+        ) { _ in
+            resetScreensAction()
+        }
+        
+        // MARK: 8. Welcome messages
+        Task {
+            for await notification in NotificationCenter.default.notifications(
+                named: .AdamantChatsProvider.initiallySyncedChanged
+            ) {
+                await self.handleWelcomeMessages(notification: notification)
             }
         }
         
-        // MARK: 7. Welcome messages
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantChatsProvider.initiallySyncedChanged, object: nil, queue: OperationQueue.main, using: handleWelcomeMessages)
+        // MARK: 9. Notifications
+        pushNotificationsTokenService.sendTokenDeletionTransactions()
+        UNUserNotificationCenter.current().delegate = self
         
         return true
     }
@@ -242,7 +280,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func applicationDidEnterBackground(_ application: UIApplication) {
         repeater.pauseAll()
-        addressBookService.saveIfNeeded()
+        Task {
+            await addressBookService.saveIfNeeded()
+        }
     }
     
     // MARK: Notifications
@@ -260,144 +300,126 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 
 // MARK: - Remote notifications
-extension AppDelegate: UNUserNotificationCenterDelegate {
-    private struct RegistrationPayload: Codable {
-        let token: String
-        
-        #if DEBUG
-            var provider: String = "apns-sandbox"
-        #else
-            var provider: String = "apns"
-        #endif
-    }
-    
-    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        guard let address = accountService.account?.address, let keypair = accountService.keypair else {
-            print("Trying to register with no user logged")
-            UIApplication.shared.unregisterForRemoteNotifications()
-            return
-        }
-        
-        let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-        // MARK: 1. Checking, if device token had not changed
-        guard let securedStore = container.resolve(SecuredStore.self) else {
-            fatalError("can't get secured store to get device token hash")
-        }
-        
-        let tokenHash = token.md5()
-        
-        if let savedHash = securedStore.get(StoreKey.application.deviceTokenHash), tokenHash == savedHash {
-            return
-        } else {
-            securedStore.set(tokenHash, for: StoreKey.application.deviceTokenHash)
-        }
-        
-        // MARK: 2. Preparing message
-        guard let adamantCore = container.resolve(AdamantCore.self) else {
-            fatalError("Can't get AdamantCore to register device token")
-        }
-        
-        let payload: String
-        do {
-            let data = try JSONEncoder().encode(RegistrationPayload(token: token))
-            payload = String(data: data, encoding: String.Encoding.utf8)!
-        } catch {
-            dialogService.showError(withMessage: "Failed to prepare ANS signal payload", error: error)
-            return
-        }
-        
-        guard let encodedPayload = adamantCore.encodeMessage(payload, recipientPublicKey: AdamantResources.contacts.ansPublicKey, privateKey: keypair.privateKey) else {
-            dialogService.showError(withMessage: "Failed to encode ANS signal. Payload: \(payload)", error: nil)
-            return
-        }
-        
-        // MARK: 3. Send signal to ANS
-        guard let apiService = container.resolve(ApiService.self) else {
-            fatalError("can't get api service to register device token")
-        }
-        
-        apiService.sendMessage(senderId: address, recipientId: AdamantResources.contacts.ansAddress, keypair: keypair, message: encodedPayload.message, type: ChatType.signal, nonce: encodedPayload.nonce, amount: nil) { [unowned self] result in
-            switch result {
-            case .success:
-                return
-                
-            case .failure(let error):
-                self.notificationService?.setNotificationsMode(.disabled, completion: nil)
-                self.dialogService.showRichError(error: error)
-            }
-        }
+extension AppDelegate {
+    func application(
+        _ application: UIApplication,
+        didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
+    ) {
+        pushNotificationsTokenService.setToken(deviceToken)
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         if let service = container.resolve(DialogService.self) {
-            service.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.notifications.registerRemotesError, error.localizedDescription), error: error)
+            service.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.notifications.registerRemotesError, error.localizedDescription), supportEmail: true, error: error)
         }
     }
     
-    // MARK: Open Chat From Notification
-    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+    func openDialog(
+        chatListNav: UINavigationController,
+        tabbar: UITabBarController,
+        chatListVC: ChatListViewController,
+        transactionID: String,
+        senderAddress: String
+    ) {
+        if
+            let chatVCNav = chatListNav.viewControllers.last as? UINavigationController,
+            let chatVC = chatVCNav.viewControllers.first as? ChatViewController,
+            chatVC.viewModel.chatroom?.partner?.address == senderAddress
+        {
+            chatVC.messagesCollectionView.scrollToLastItem()
+            return
+        }
+        
+        if
+            let chatVC = chatListNav.viewControllers.last as? ChatViewController,
+            chatVC.viewModel.chatroom?.partner?.address == senderAddress
+        {
+            chatVC.messagesCollectionView.scrollToLastItem()
+            return
+        }
+        
+        let chatroom = chatListVC.chatsController?.fetchedObjects?.first(
+            where: {
+                $0.partner?.address == senderAddress
+            }
+        )
+        
+        guard let chatroom = chatroom else { return }
+        
+        chatListNav.popToRootViewController(animated: true)
+        chatListNav.dismiss(animated: true, completion: nil)
+        tabbar.selectedIndex = 0
+        
+        let vc = chatListVC.chatViewController(for: chatroom)
+                                               
+        vc.hidesBottomBarWhenPushed = true
+        
+        if let split = chatListVC.splitViewController {
+            let chat = UINavigationController(rootViewController: vc)
+            split.showDetailViewController(chat, sender: chatListVC)
+        } else {
+            chatListNav.pushViewController(vc, animated: true)
+        }
+        
+        chatListVC.selectChatroomRow(chatroom: chatroom)
+    }
+}
+
+extension AppDelegate: UNUserNotificationCenterDelegate {
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse,
+        withCompletionHandler completionHandler: @escaping () -> Void
+    ) {
+        var chatListNav: UINavigationController?
+        var chatListVC: ChatListViewController?
+        
+        let userInfo = response.notification.request.content.userInfo
+        
         guard let transactionID = userInfo[AdamantNotificationUserInfoKeys.transactionId] as? String,
               let transactionRaw = userInfo[AdamantNotificationUserInfoKeys.transaction] as? String,
               let data = transactionRaw.data(using: .utf8),
               let trs = try? JSONDecoder().decode(Transaction.self, from: data),
-              let tabbar = window?.rootViewController as? UITabBarController,
-              let chats = tabbar.viewControllers?.first as? UISplitViewController,
-              let chatList = chats.viewControllers.first as? UINavigationController,
-              let list = chatList.viewControllers.first as? ChatListViewController,
-              (application.applicationState != .active)
+              let tabbar = window?.rootViewController as? UITabBarController
         else {
-            completionHandler(.noData)
+            completionHandler()
             return
         }
         
-        if case .loggedIn = list.accountService.state {
-            self.openDialog(chatList: chatList, tabbar: tabbar, list: list, transactionID: transactionID, senderAddress: trs.senderId)
+        if let split = tabbar.viewControllers?.first as? UISplitViewController,
+           let navigation = split.viewControllers.first as? UINavigationController,
+           let vc = navigation.viewControllers.first as? ChatListViewController {
+            chatListNav = navigation
+            chatListVC = vc
         }
-
-        // if not logged in
-        list.didLoadedMessages = { [weak self] in
-            var timeout = 2.0
-            if #available(iOS 13.0, *) { timeout = 0.5 }
-            DispatchQueue.main.asyncAfter(deadline: .now() + timeout) {
+        
+        if let navigation = tabbar.viewControllers?.first as? UINavigationController,
+           let vc = navigation.viewControllers.first as? ChatListViewController {
+            chatListNav = navigation
+            chatListVC = vc
+        }
+        
+        guard let chatListVC = chatListVC,
+              let chatListNav = chatListNav
+        else {
+            completionHandler()
+            return
+        }
+        
+        chatListVC.performOnMessagesLoaded { [weak self] in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self?.dialogService.dismissProgress()
-                self?.openDialog(chatList: chatList, tabbar: tabbar, list: list, transactionID: transactionID, senderAddress: trs.senderId)
+                self?.openDialog(
+                    chatListNav: chatListNav,
+                    tabbar: tabbar,
+                    chatListVC: chatListVC,
+                    transactionID: transactionID,
+                    senderAddress: trs.senderId
+                )
             }
         }
         
-        completionHandler(.newData)
-    }
-    
-    func openDialog(chatList: UINavigationController, tabbar: UITabBarController, list: ChatListViewController, transactionID: String, senderAddress: String) {
-        if let chatVCNav = chatList.viewControllers.last as? UINavigationController,
-           let chatVC = chatVCNav.viewControllers.first as? ChatViewController,
-           chatVC.chatroom?.partner?.address == senderAddress {
-            chatVC.forceScrollToBottom = true
-            chatVC.scrollDown()
-            return
-        }
-        
-        guard let chatroom = list.chatsController?.fetchedObjects?.first(where: { room in
-            let transactionExist = room.transactions?.first(where: { message in
-                return (message as? ChatTransaction)?.senderAddress == senderAddress
-            })
-            return transactionExist != nil
-        }) else { return }
-        
-        chatList.popToRootViewController(animated: false)
-        chatList.dismiss(animated: false, completion: nil)
-        tabbar.selectedIndex = 0
-        
-        let vc = list.chatViewController(for: chatroom, forceScrollToBottom: true)
-        if let split = list.splitViewController {
-            var timeout = 0.25
-            if #available(iOS 13.0, *) { timeout = 0 }
-            DispatchQueue.main.asyncAfter(deadline: .now() + timeout) {
-                let chat = UINavigationController(rootViewController: vc)
-                split.showDetailViewController(chat, sender: list)
-            }
-        } else {
-            chatList.pushViewController(vc, animated: false)
-        }
+        completionHandler()
     }
 }
 
@@ -405,7 +427,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 extension AppDelegate {
     func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         let container = Container()
-        container.registerAdamantBackgroundFetchServices()
+        container.registerAdamantServices()
         
         guard let notificationsService = container.resolve(NotificationsService.self) else {
                 UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplication.backgroundFetchIntervalNever)
@@ -415,29 +437,9 @@ extension AppDelegate {
         
         notificationsService.startBackgroundBatchNotifications()
         
-        let services: [BackgroundFetchService] = [
-            container.resolve(ChatsProvider.self) as! BackgroundFetchService,
-            container.resolve(TransfersProvider.self) as! BackgroundFetchService
-        ]
-        
-        let group = DispatchGroup()
-        let semaphore = DispatchSemaphore(value: 1)
-        var results = [FetchResult]()
-        
-        for service in services {
-            group.enter()
-            service.fetchBackgroundData(notificationsService: notificationsService) { result in
-                defer {
-                    group.leave()
-                }
-                
-                semaphore.wait()
-                results.append(result)
-                semaphore.signal()
-            }
-        }
-        
-        group.notify(queue: DispatchQueue.global(qos: .utility)) {
+        Task {
+            let results = await fetchBackgroundData(notificationsService: notificationsService)
+            
             notificationsService.stopBackgroundBatchNotifications()
             
             for result in results {
@@ -458,11 +460,36 @@ extension AppDelegate {
             completionHandler(.noData)
         }
     }
+    
+    func fetchBackgroundData(notificationsService: NotificationsService) async -> [FetchResult] {
+        let services: [BackgroundFetchService] = [
+            container.resolve(ChatsProvider.self) as! BackgroundFetchService,
+            container.resolve(TransfersProvider.self) as! BackgroundFetchService
+        ]
+        
+        return await withTaskGroup(of: FetchResult.self) { group in
+            for case let service in services {
+                group.addTask {
+                    let result = await service.fetchBackgroundData(notificationsService: notificationsService)
+                    return result
+                }
+            }
+            
+            var results: [FetchResult] = []
+            
+            for await result in group {
+                results.append(result)
+            }
+
+            return results
+        }
+    }
 }
 
 // MARK: - Welcome messages
 extension AppDelegate {
-    private func handleWelcomeMessages(notification: Notification) {
+    @MainActor
+    private func handleWelcomeMessages(notification: Notification) async {
         guard let synced = notification.userInfo?[AdamantUserInfoKey.ChatProvider.initiallySynced] as? Bool, synced else {
             return
         }
@@ -481,162 +508,197 @@ extension AppDelegate {
         }
         
         if let adelina = AdamantContacts.adelina.messages["chats.welcome_message"] {
-            chatProvider.fakeReceived(
+            _ = try? await chatProvider.fakeReceived(
                 message: adelina.message,
                 senderId: AdamantContacts.adelina.address,
                 date: Date.adamantNullDate,
                 unread: false,
                 silent: adelina.silentNotification,
-                showsChatroom: true,
-                completion: { result in
-                    guard case let .failure(error) = result else {
-                        return
-                    }
-                    
-                    print("ERROR showing exchenge message: \(error.message)")
-                }
+                showsChatroom: true
             )
         }
         
         if let exchenge = AdamantContacts.adamantExchange.messages["chats.welcome_message"] {
-            chatProvider.fakeReceived(
+            _ = try? await chatProvider.fakeReceived(
                 message: exchenge.message,
                 senderId: AdamantContacts.adamantExchange.address,
                 date: Date.adamantNullDate,
                 unread: false,
                 silent: exchenge.silentNotification,
-                showsChatroom: true,
-                completion: { result in
-                    guard case let .failure(error) = result else {
-                        return
-                    }
-                    
-                    print("ERROR showing exchenge message: \(error.message)")
-                }
+                showsChatroom: true
             )
         }
         
         if let betOnBitcoin = AdamantContacts.betOnBitcoin.messages["chats.welcome_message"] {
-            chatProvider.fakeReceived(
+            _ = try? await chatProvider.fakeReceived(
                 message: betOnBitcoin.message,
                 senderId: AdamantContacts.betOnBitcoin.address,
                 date: Date.adamantNullDate,
                 unread: false,
                 silent: betOnBitcoin.silentNotification,
-                showsChatroom: false,
-                completion: { result in
-                    guard case let .failure(error) = result else {
-                        return
-                    }
-                    
-                    print("ERROR showing exchenge message: \(error.message)")
-                }
+                showsChatroom: false
             )
         }
         
         if let welcome = AdamantContacts.donate.messages["chats.welcome_message"] {
-            chatProvider.fakeReceived(
+            _ = try? await chatProvider.fakeReceived(
                 message: welcome.message,
                 senderId: AdamantContacts.donate.address,
                 date: Date.adamantNullDate,
                 unread: false,
                 silent: true,
-                showsChatroom: true,
-                completion: { result in
-                    guard case let .failure(error) = result else {
-                        return
-                    }
-                    
-                    print("ERROR showing donate message: \(error.message)")
-                }
+                showsChatroom: true
             )
         }
         
         if let welcome = AdamantContacts.adamantWelcomeWallet.messages["chats.welcome_message"] {
-            chatProvider.fakeReceived(
+            _ = try? await chatProvider.fakeReceived(
                 message: welcome.message,
                 senderId: AdamantContacts.adamantWelcomeWallet.name,
                 date: Date.adamantNullDate,
                 unread: unread,
                 silent: welcome.silentNotification,
-                showsChatroom: true,
-                completion: { result in
-                    guard case let .failure(error) = result else {
-                        return
-                    }
-                    
-                    print("ERROR showing welcome message: \(error.message)")
-                }
+                showsChatroom: true
             )
         }
-        
-        /*
-        if let ico = AdamantContacts.adamantIco.messages["chats.ico_message"] {
-            chatProvider.fakeReceived(message: ico.message,
-                                      senderId: AdamantContacts.adamantIco.name,
-                                      date: Date.adamantNullDate,
-                                      unread: unread,
-                                      silent: ico.silentNotification,
-                                      showsChatroom: true,
-                                      completion: { result in
-                                        guard case let .failure(error) = result else {
-                                            return
-                                        }
-                                        
-                                        print("ERROR showing welcome message: \(error.message)")
-            })
-        }
-        */
     }
 }
 
 // MARK: - Universal Links
 extension AppDelegate {
-    func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
-        if userActivity.activityType == NSUserActivityTypeBrowsingWeb {
-            let url = userActivity.webpageURL
-            if let adamantAdr = url?.absoluteString.getAdamantAddress() {
-                if let tabbar = window?.rootViewController as? UITabBarController,
-                   let chats = tabbar.viewControllers?.first as? UISplitViewController,
-                   let chatList = chats.viewControllers.first as? UINavigationController,
-                   let router = container.resolve(Router.self),
-                   let list = chatList.viewControllers.first as? ChatListViewController {
-                 
-                    if case .loggedIn = list.accountService.state {
-                        self.openDialog(chatList: chatList, tabbar: tabbar, router: router, list: list, adamantAdr: adamantAdr)
-                    }
-                    
-                    // if not logged in
-                    list.didLoadedMessages = { [weak self] in
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                            self?.openDialog(chatList: chatList, tabbar: tabbar, router: router, list: list, adamantAdr: adamantAdr)
-                        }
-                    }
-                }
-                
-            }
-        }
+    func application(
+        _ app: UIApplication,
+        open url: URL,
+        options: [UIApplication.OpenURLOptionsKey: Any]
+    ) -> Bool {
+        processDeepLink(url)
         return true
     }
     
-    func openDialog(chatList: UINavigationController, tabbar: UITabBarController, router: Router, list: ChatListViewController, adamantAdr: AdamantAddress) {
+    func application(
+        _ application: UIApplication,
+        continue userActivity: NSUserActivity,
+        restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void
+    ) -> Bool {
+        guard userActivity.activityType == NSUserActivityTypeBrowsingWeb,
+              let url = userActivity.webpageURL
+        else {
+            return true
+        }
+        
+        processDeepLink(url)
+        return true
+    }
+    
+    func processDeepLink(_ url: URL) {
+        var adamantAdr: AdamantAddress? = url.absoluteString.getAdamantAddress()
+        
+        if adamantAdr == nil {
+            adamantAdr = url.absoluteString.getLegacyAdamantAddress()
+        }
+        
+        guard let adamantAdr = adamantAdr else {
+            return
+        }
+        
+        var chatList: UINavigationController?
+        var chatDetail: ChatListViewController?
+        
+        guard let tabbar = window?.rootViewController as? UITabBarController,
+              let router = container.resolve(Router.self)
+        else {
+            return
+        }
+        
+        if let split = tabbar.viewControllers?.first as? UISplitViewController,
+           let navigation = split.viewControllers.first as? UINavigationController,
+           let vc = navigation.viewControllers.first as? ChatListViewController {
+            chatList = navigation
+            chatDetail = vc
+        }
+        
+        if let navigation = tabbar.viewControllers?.first as? UINavigationController,
+           let vc = navigation.viewControllers.first as? ChatListViewController {
+            chatList = navigation
+            chatDetail = vc
+        }
+        
+        guard let chatList = chatList,
+              let chatDetail = chatDetail
+        else {
+            return
+        }
+        
+        chatDetail.performOnMessagesLoaded { [weak self] in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                self?.startNewDialog(
+                    with: adamantAdr,
+                    chatList: chatList,
+                    tabbar: tabbar,
+                    router: router,
+                    chatDetail: chatDetail
+                )
+            }
+        }
+    }
+    
+    func startNewDialog(
+        with adamantAdr: AdamantAddress,
+        chatList: UINavigationController,
+        tabbar: UITabBarController,
+        router: Router,
+        chatDetail: ChatListViewController
+    ) {
         chatList.popToRootViewController(animated: false)
         chatList.dismiss(animated: false, completion: nil)
         tabbar.selectedIndex = 0
         
-        let controller = router.get(scene: AdamantScene.Chats.newChat)
-        guard let nav = controller as? UINavigationController,
-              let c = nav.viewControllers.last as? NewChatViewController else {
-                  return
-              }
+        let newChat = router.get(scene: AdamantScene.Chats.newChat) as? NewChatViewController
+
+        guard let newChat = newChat else { return }
+
+        newChat.delegate = chatDetail.self
         
-        c.delegate = list.self
+        if let split = chatDetail.splitViewController {
+            split.showDetailViewController(newChat, sender: chatDetail.self)
+        } else if let nav = chatDetail.navigationController {
+            nav.pushViewController(newChat, animated: true)
+        } else {
+            newChat.modalPresentationStyle = .overFullScreen
+            chatDetail.present(newChat, animated: true)
+        }
         
-        if let split = list.splitViewController {
-            split.showDetailViewController(controller, sender: list.self)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                c.startNewChat(with: adamantAdr.address, name: adamantAdr.name, message: adamantAdr.message)
-            }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            newChat.startNewChat(with: adamantAdr.address, name: adamantAdr.name, message: adamantAdr.message)
         }
     }
+}
+
+private enum TabScreens {
+    case splitControllers(UISplitViewController, UISplitViewController)
+    case navigationControllers(UINavigationController, UINavigationController)
+    
+    var viewControllers: (UIViewController, UIViewController) {
+        switch self {
+        case let .splitControllers(leftController, rightController):
+            return (leftController, rightController)
+        case let .navigationControllers(leftController, rightController):
+            return (leftController, rightController)
+        }
+    }
+    
+    var arrayOfViewControllers: [UIViewController] {
+        switch self {
+        case let .splitControllers(leftController, rightController):
+            return [leftController, rightController]
+        case let .navigationControllers(leftController, rightController):
+            return [leftController, rightController]
+        }
+    }
+}
+
+private func makeSplitController() -> UISplitViewController {
+    let controller = UISplitViewController()
+    controller.preferredDisplayMode = .oneBesideSecondary
+    return controller
 }

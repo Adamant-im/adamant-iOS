@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct TransactionAsset: Codable {
+struct TransactionAsset: Codable, Hashable {
     let chat: ChatAsset?
     let state: StateAsset?
     let votes: VotesAsset?

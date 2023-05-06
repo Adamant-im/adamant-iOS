@@ -27,32 +27,36 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
         
         currencySymbol = BtcWalletService.currencySymbol
         
-        handleRefresh(self.refreshControl)
+        handleRefresh()
     }
     
-    override func handleRefresh(_ refreshControl: UIRefreshControl) {
-        self.btcWalletService.getTransactions { (result) in
-            switch result {
-            case .success(let transactions):
-                self.transactions = transactions
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
+    override func handleRefresh() {
+        transactions.removeAll()
+        tableView.reloadData()
+        loadData(false)
+    }
+    
+    override func loadData(_ silent: Bool) {
+        isBusy = true
+        
+        Task { @MainActor in
+            do {
+                let trs = try await btcWalletService.getTransactions(fromTx: transactions.last?.txId)
+                transactions.append(contentsOf: trs)
+                isNeedToLoadMoore = trs.count > 0
+            } catch {
+                isNeedToLoadMoore = false
+                if !silent {
+                    dialogService.showRichError(error: error)
                 }
-                break
-            case .failure(let error):
-                if case .internalError(let message, _ ) = error {
-                    let localizedErrorMessage = NSLocalizedString(message, comment: "TransactionList: 'Transactions not found' message.")
-                    self.dialogService.showWarning(withMessage: localizedErrorMessage)
-                } else {
-                    self.dialogService.showError(withMessage: String.adamantLocalized.transactionList.notFound, error: error)
-                }
-                break
             }
-            DispatchQueue.main.async {
-                self.emptyLabel.isHidden = self.transactions.count > 0
-                self.refreshControl.endRefreshing()
-            }
-        }
+            
+            isBusy = false
+            tableView.reloadData()
+            emptyLabel.isHidden = transactions.count > 0
+            stopBottomIndicator()
+            refreshControl.endRefreshing()
+        }.stored(in: taskManager)
     }
     
     // MARK: - UITableView
@@ -108,7 +112,7 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
             if partnerId == address {
                 partnerName = String.adamantLocalized.transactionDetails.yourAddress
             } else {
-                partnerName = addressBook.addressBook[address]
+                partnerName = addressBook.getName(for: address)
             }
         }
         

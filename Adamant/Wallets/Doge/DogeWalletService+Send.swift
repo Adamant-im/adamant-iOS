@@ -29,48 +29,46 @@ extension DogeWalletService: WalletServiceTwoStepSend {
     }
     
     // MARK: Create & Send
-    func createTransaction(recipient: String, amount: Decimal, completion: @escaping (WalletServiceResult<BitcoinKit.Transaction>) -> Void) {
-        // MARK: 1. Prepare
+    func createTransaction(recipient: String, amount: Decimal) async throws -> BitcoinKit.Transaction {
+        // Prepare
         guard let wallet = self.dogeWallet else {
-            completion(.failure(error: .notLogged))
-            return
+            throw WalletServiceError.notLogged
         }
         
         let changeAddress = wallet.publicKey.toCashaddr()
         let key = wallet.privateKey
         
         guard let toAddress = try? LegacyAddress(recipient, for: self.network) else {
-            completion(.failure(error: .accountNotFound))
-            return
+            throw WalletServiceError.accountNotFound
         }
         
         let rawAmount = NSDecimalNumber(decimal: amount * DogeWalletService.multiplier).uint64Value
         let fee = NSDecimalNumber(decimal: self.transactionFee * DogeWalletService.multiplier).uint64Value
         
-        // MARK: 2. Search for unspent transactions
-        getUnspentTransactions { result in
-            switch result {
-            case .success(let utxos):
-                // MARK: 3. Check if we have enought money
-                let totalAmount: UInt64 = UInt64(utxos.reduce(0) { $0 + $1.output.value })
-                guard totalAmount >= rawAmount + fee else { // This shit can crash BitcoinKit
-                    completion(.failure(error: .notEnoughMoney))
-                    break
-                }
-                
-                // MARK: 4. Create local transaction
-                let transaction = BitcoinKit.Transaction.createNewTransaction(toAddress: toAddress, amount: rawAmount, fee: fee, changeAddress: changeAddress, utxos: utxos, keys: [key])
-                completion(.success(result: transaction))
-                
-            case .failure:
-                completion(.failure(error: .notEnoughMoney))
+        // Search for unspent transactions
+        do {
+            let utxos = try await getUnspentTransactions()
+            
+            // Check if we have enought money
+            let totalAmount: UInt64 = UInt64(utxos.reduce(0) { $0 + $1.output.value })
+            guard totalAmount >= rawAmount + fee else { // This shit can crash BitcoinKit
+                throw WalletServiceError.notEnoughMoney
             }
+            
+            // Create local transaction
+            let transaction = BitcoinKit.Transaction.createNewTransaction(toAddress: toAddress, amount: rawAmount, fee: fee, changeAddress: changeAddress, utxos: utxos, keys: [key])
+            return transaction
+        } catch {
+            throw WalletServiceError.notEnoughMoney
         }
     }
     
-    func sendTransaction(_ transaction: BitcoinKit.Transaction, completion: @escaping (WalletServiceResult<String>) -> Void) {
-        guard let url = AdamantResources.dogeServers.randomElement() else {
-            fatalError("Failed to get DOGE endpoint URL")
+    func sendTransaction(_ transaction: BitcoinKit.Transaction) async throws {
+        guard let url = DogeWalletService.nodes.randomElement()?.asURL() else {
+            throw WalletServiceError.internalError(
+                message: "Failed to get DOGE endpoint URL",
+                error: nil
+            )
         }
         
         // Request url
@@ -89,26 +87,31 @@ extension DogeWalletService: WalletServiceTwoStepSend {
         ]
         
         // MARK: Sending request
-        AF.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
-            switch response.result {
-            case .success(let data):
-                if let result = data as? [String: Any], let txid = result["txid"] as? String {
-                    completion(.success(result: txid))
-                } else {
-                    completion(.failure(error: .internalError(message: "DOGE Wallet: not valid response", error: nil)))
+        _ = try await withUnsafeThrowingContinuation { continuation in
+            AF.request(
+                endpoint,
+                method: .post,
+                parameters: parameters,
+                encoding: JSONEncoding.default,
+                headers: headers
+            )
+            .validate(statusCode: 200 ... 299)
+            .responseJSON(queue: defaultDispatchQueue) { response in
+                switch response.result {
+                case .success:
+                    continuation.resume()
+                case .failure(let error):
+                    guard let data = response.data else {
+                        continuation.resume(throwing: WalletServiceError.remoteServiceError(message: error.localizedDescription))
+                        return
+                    }
+                    let result = String(decoding: data, as: UTF8.self)
+                    if result.contains("dust") && result.contains("-26") {
+                        continuation.resume(throwing: WalletServiceError.dustAmountError)
+                        return
+                    }
+                    continuation.resume(throwing: WalletServiceError.remoteServiceError(message: error.localizedDescription))
                 }
-                
-            case .failure(let error):
-                guard let data = response.data else {
-                    completion(.failure(error: .remoteServiceError(message: error.localizedDescription)))
-                    return
-                }
-                let result = String(decoding: data, as: UTF8.self)
-                if result.contains("dust") && result.contains("-26") {
-                    completion(.failure(error: .dustAmountError))
-                    return
-                }
-                completion(.failure(error: .remoteServiceError(message: error.localizedDescription)))
             }
         }
     }

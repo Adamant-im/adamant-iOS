@@ -22,34 +22,40 @@ extension AdamantScene.Wallets {
         
         /// Send money
         static let transfer = AdamantScene(identifier: "AdmTransferViewController") { r in
-            let c = AdmTransferViewController()
-            c.dialogService = r.resolve(DialogService.self)
-            c.accountService = r.resolve(AccountService.self)
-            c.accountsProvider = r.resolve(AccountsProvider.self)
-            c.router = r.resolve(Router.self)
-            c.currencyInfoService = r.resolve(CurrencyInfoService.self)
-            return c
+            AdmTransferViewController(
+                accountService: r.resolve(AccountService.self)!,
+                accountsProvider: r.resolve(AccountsProvider.self)!,
+                dialogService: r.resolve(DialogService.self)!,
+                router: r.resolve(Router.self)!,
+                currencyInfoService: r.resolve(CurrencyInfoService.self)!
+            )
         }
         
         /// Transactions list
         static let transactionsList = AdamantScene(identifier: "AdmTransactionsViewController", factory: { r in
-            let c = AdmTransactionsViewController(nibName: "TransactionsListViewControllerBase", bundle: nil)
-            c.accountService = r.resolve(AccountService.self)
-            c.transfersProvider = r.resolve(TransfersProvider.self)
-            c.dialogService = r.resolve(DialogService.self)
-            c.router = r.resolve(Router.self)
-            c.stack = r.resolve(CoreDataStack.self)
+            let c = AdmTransactionsViewController(
+                nibName: "TransactionsListViewControllerBase",
+                bundle: nil,
+                accountService: r.resolve(AccountService.self)!,
+                transfersProvider: r.resolve(TransfersProvider.self)!,
+                chatsProvider: r.resolve(ChatsProvider.self)!,
+                dialogService: r.resolve(DialogService.self)!,
+                stack: r.resolve(CoreDataStack.self)!,
+                router: r.resolve(Router.self)!,
+                addressBookService: r.resolve(AddressBookService.self)!
+            )
             return c
         })
         
         /// Adamant transaction details
         static let transactionDetails = AdamantScene(identifier: "TransactionDetailsViewController", factory: { r in
-            let c = AdmTransactionDetailsViewController()
-            c.accountService = r.resolve(AccountService.self)
-            c.dialogService = r.resolve(DialogService.self)
-            c.transfersProvider = r.resolve(TransfersProvider.self)
-            c.router = r.resolve(Router.self)
-            c.currencyInfo = r.resolve(CurrencyInfoService.self)
+            let c = AdmTransactionDetailsViewController(
+                accountService: r.resolve(AccountService.self)!,
+                transfersProvider: r.resolve(TransfersProvider.self)!,
+                router: r.resolve(Router.self)!,
+                dialogService: r.resolve(DialogService.self)!,
+                currencyInfo: r.resolve(CurrencyInfoService.self)!
+            )
             return c
         })
         

@@ -18,61 +18,46 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
     
     // MARK: - Properties
     var transactions: [DogeTransaction] = []
-    
-    private let limit = 200 // Limit autoload, as some wallets can have thousands of transactions.
-    private(set) var loadedTo: Int = 0
-    private let procedureQueue = ProcedureQueue()
+    private var offset = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
         currencySymbol = DogeWalletService.currencySymbol
         
         refreshControl.beginRefreshing()
-        handleRefresh(refreshControl)
+        handleRefresh()
     }
     
-    deinit {
-        procedureQueue.cancelAllOperations()
+    override func handleRefresh() {
+        offset = 0
+        transactions.removeAll()
+        tableView.reloadData()
+        loadData(false)
     }
     
-    override func handleRefresh(_ refreshControl: UIRefreshControl) {
-        self.emptyLabel.isHidden = true
-        procedureQueue.cancelAllOperations()
+    override func loadData(_ silent: Bool) {
+        isBusy = true
         
-        loadedTo = 0
-        walletService.getTransactions(from: loadedTo) { [weak self] result in
-            guard let vc = self else {
-                refreshControl.endRefreshing()
-                return
+        Task {
+            do {
+                let tuple = try await walletService.getTransactions(from: offset)
+                transactions.append(contentsOf: tuple.transactions)
+                offset += tuple.transactions.count
+                isNeedToLoadMoore = tuple.hasMore
+            } catch {
+                isNeedToLoadMoore = false
+
+                if !silent {
+                    dialogService.showRichError(error: error)
+                }
             }
             
-            switch result {
-            case .success(let tuple):
-                vc.transactions = tuple.transactions
-                vc.loadedTo = tuple.transactions.count
-                
-                DispatchQueue.main.async {
-                    vc.emptyLabel.isHidden = vc.transactions.count > 0
-                    vc.tableView.reloadData()
-                    refreshControl.endRefreshing()
-                    
-                    // Update tableView, then call loadMore()
-                    if tuple.hasMore {
-                        vc.loadMoreTransactions(from: tuple.transactions.count)
-                    }
-                }
-                
-            case .failure(let error):
-                vc.transactions.removeAll()
-                vc.dialogService.showRichError(error: error)
-                
-                DispatchQueue.main.async {
-                    vc.emptyLabel.isHidden = vc.transactions.count > 0
-                    vc.tableView.reloadData()
-                    refreshControl.endRefreshing()
-                }
-            }
-        }
+            isBusy = false
+            emptyLabel.isHidden = transactions.count > 0
+            stopBottomIndicator()
+            refreshControl.endRefreshing()
+            tableView.reloadData()
+        }.stored(in: taskManager)
     }
     
     // MARK: - UITableView
@@ -95,13 +80,9 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
         dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
         let txId = transactions[indexPath.row].txId
         
-        walletService.getTransaction(by: txId) { [weak self] result in
-            guard let vc = self else {
-                return
-            }
-            
-            switch result {
-            case .success(let dogeTransaction):
+        Task { @MainActor in
+            do {
+                let dogeTransaction = try await walletService.getTransaction(by: txId)
                 let transaction = dogeTransaction.asBtcTransaction(DogeTransaction.self, for: sender)
                 
                 // Sender name
@@ -116,38 +97,28 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
                 // Block Id
                 guard let blockHash = dogeTransaction.blockHash else {
                     controller.transaction = transaction
-                    DispatchQueue.main.async {
-                        vc.navigationController?.pushViewController(controller, animated: true)
-                        vc.tableView.deselectRow(at: indexPath, animated: true)
-                        vc.dialogService.dismissProgress()
-                    }
-                    break
+                    navigationController?.pushViewController(controller, animated: true)
+                    tableView.deselectRow(at: indexPath, animated: true)
+                    dialogService.dismissProgress()
+                    return
                 }
                 
-                vc.walletService.getBlockId(by: blockHash) { result in
-                    switch result {
-                    case .success(let id):
-                        controller.transaction = dogeTransaction.asBtcTransaction(DogeTransaction.self, for: sender, blockId: id)
-                        
-                    case .failure:
-                        controller.transaction = transaction
-                    }
-                    
-                    DispatchQueue.main.async {
-                        vc.tableView.deselectRow(at: indexPath, animated: true)
-                        vc.dialogService.dismissProgress()
-                        vc.navigationController?.pushViewController(controller, animated: true)
-                    }
+                do {
+                    let id = try await walletService.getBlockId(by: blockHash)
+                    controller.transaction = dogeTransaction.asBtcTransaction(DogeTransaction.self, for: sender, blockId: id)
+                } catch {
+                    controller.transaction = transaction
                 }
                 
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    vc.tableView.deselectRow(at: indexPath, animated: true)
-                    vc.dialogService.dismissProgress()
-                    vc.dialogService.showRichError(error: error)
-                }
+                tableView.deselectRow(at: indexPath, animated: true)
+                dialogService.dismissProgress()
+                navigationController?.pushViewController(controller, animated: true)
+            } catch {
+                tableView.deselectRow(at: indexPath, animated: true)
+                dialogService.dismissProgress()
+                dialogService.showRichError(error: error)
             }
-        }
+        }.stored(in: taskManager)
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -182,37 +153,6 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
                       amount: transaction.amountValue ?? 0,
                       date: transaction.dateValue)
     }
-    
-    // MARK: - Load more
-    private func loadMoreTransactions(from: Int) {
-        let procedure = LoadMoreDogeTransactionsProcedure(service: walletService, from: from)
-        
-        procedure.addDidFinishBlockObserver { [weak self] (procedure, _) in
-            guard let vc = self, let result = procedure.result else {
-                return
-            }
-            
-            let total = vc.loadedTo + result.transactions.count
-            
-            var indexPaths = [IndexPath]()
-            for index in from..<total {
-                indexPaths.append(IndexPath(row: index, section: 0))
-            }
-            
-            DispatchQueue.main.async {
-                vc.loadedTo = total
-                vc.transactions.append(contentsOf: result.transactions)
-                vc.tableView.insertRows(at: indexPaths, with: .fade)
-                
-                // Update everything, and then call loadMore()
-                if result.hasMore && total < vc.limit {
-                    vc.loadMoreTransactions(from: total)
-                }
-            }
-        }
-        
-        procedureQueue.addOperation(procedure)
-    }
 }
 
 private class LoadMoreDogeTransactionsProcedure: Procedure {
@@ -230,13 +170,12 @@ private class LoadMoreDogeTransactionsProcedure: Procedure {
     }
     
     override func execute() {
-        service.getTransactions(from: from) { result in
-            switch result {
-            case .success(let result):
+        Task {
+            do {
+                let result = try await service.getTransactions(from: from)
                 self.result = result
                 self.finish()
-                
-            case .failure(let error):
+            } catch {
                 self.result = nil
                 self.finish(with: error)
             }

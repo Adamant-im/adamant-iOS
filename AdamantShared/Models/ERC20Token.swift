@@ -14,22 +14,14 @@ struct ERC20Token {
     let contractAddress: String
     let decimals: Int
     let naturalUnits: Int
+    let defaultVisibility: Bool
+    let defaultOrdinalLevel: Int?
+    let reliabilityGasPricePercent: Int
+    let reliabilityGasLimitPercent: Int
+    let defaultGasPriceGwei: Int
+    let defaultGasLimit: Int
+    let warningGasPriceGwei: Int
     var logo: UIImage {
-        UIImage(named: "wallet_\(symbol.lowercased())") ?? UIImage()
+        UIImage(named: "\(symbol.lowercased())_wallet") ?? UIImage(named: "ethereum_wallet") ?? UIImage()
     }
-}
-
-extension ERC20Token {
-    static let supportedTokens: [ERC20Token] = [
-        ERC20Token(symbol: "BNB",
-                   name: "Binance Coin",
-                   contractAddress: "0xB8c77482e45F1F44dE1745F52C74426C631bDD52",
-                   decimals: 18,
-                   naturalUnits: 18),
-        ERC20Token(symbol: "USDS",
-                   name: "Stably Dollar",
-                   contractAddress: "0xa4bdb11dc0a2bec88d24a3aa1e6bb17201112ebe",
-                   decimals: 6,
-                   naturalUnits: 6)
-    ]
 }

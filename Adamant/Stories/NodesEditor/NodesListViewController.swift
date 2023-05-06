@@ -151,10 +151,7 @@ class NodesListViewController: FormViewController {
         super.viewDidLoad()
         navigationItem.title = String.adamantLocalized.nodesList.title
         navigationOptions = .Disabled
-        
-        if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .always
-        }
+        navigationItem.largeTitleDisplayMode = .always
         
         if splitViewController == nil, navigationController?.viewControllers.count == 1 {
             let done = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(NodesListViewController.close))
@@ -362,10 +359,7 @@ extension NodesListViewController {
             }
             
             $0.trailingSwipe.actions = [deleteAction]
-            
-            if #available(iOS 11,*) {
-                $0.trailingSwipe.performsFirstActionWithFullSwipe = true
-            }
+            $0.trailingSwipe.performsFirstActionWithFullSwipe = true
         }.cellUpdate { (cell, _) in
             if let label = cell.textLabel {
                 label.textColor = UIColor.adamant.primary

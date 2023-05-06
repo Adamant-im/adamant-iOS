@@ -38,10 +38,11 @@ extension TransfersProviderError: RichError {
             return String.adamantLocalized.sharedErrors.userNotLogged
             
         case .serverError(let error):
-            return ApiServiceError.serverError(error: error.localizedDescription).localized
+            return ApiServiceError.serverError(error: error.localizedDescription)
+                .localizedDescription
             
         case .accountNotFound(let address):
-            return AccountsProviderResult.notFound(address: address).localized
+            return AccountsProviderError.notFound(address: address).localized
             
         case .internalError(let message, _):
             return String.adamantLocalized.sharedErrors.internalError(message: message)
@@ -77,9 +78,12 @@ extension TransfersProviderError: RichError {
         switch self {
         case .notLogged, .accountNotFound, .transactionNotFound, .networkError, .notEnoughMoney, .requestCancelled:
             return .warning
-            
-        case .serverError, .internalError, .dependencyError:
+        
+        case .serverError:
             return .error
+            
+        case .internalError, .dependencyError:
+            return .internalError
         }
     }
     
@@ -127,15 +131,16 @@ extension StoreKey {
     }
 }
 
-protocol TransfersProvider: DataProvider {
+protocol TransfersProvider: DataProvider, Actor {
+    // MARK: - Constants
+    static var transferFee: Decimal { get }
+    
     // MARK: - Properties
     var receivedLastHeight: Int64? { get }
     var readedLastHeight: Int64? { get }
     var isInitiallySynced: Bool { get }
-    
-    var transferFee: Decimal { get }
-    
     var hasTransactions: Bool { get }
+    var offsetTransactions: Int { get set }
     
     // MARK: Controller
     func transfersController() -> NSFetchedResultsController<TransferTransaction>
@@ -144,13 +149,27 @@ protocol TransfersProvider: DataProvider {
     func transfersController(for account: CoreDataAccount) -> NSFetchedResultsController<TransferTransaction>
 
     // Force update transactions
-    func update()
-    func update(completion: ((TransfersProviderResult?) -> Void)?)
+    func update() async -> TransfersProviderResult?
     
     // MARK: - Sending funds
-    func transferFunds(toAddress recipient: String, amount: Decimal, comment: String?, completion: @escaping (TransfersProviderTransferResult) -> Void)
+    func transferFunds(
+        toAddress recipient: String,
+        amount: Decimal,
+        comment: String?
+    ) async throws -> TransactionDetails
     
     // MARK: - Transactions
     func getTransfer(id: String) -> TransferTransaction?
-    func refreshTransfer(id: String, completion: @escaping (TransfersProviderResult) -> Void)
+    func refreshTransfer(id: String) async throws
+    
+    /// Load moore transactions
+    func getTransactions(
+        forAccount account: String,
+        type: TransactionType,
+        offset: Int,
+        limit: Int,
+        orderByTime: Bool
+    ) async throws -> Int
+    
+    func updateOffsetTransactions(_ value: Int)
 }

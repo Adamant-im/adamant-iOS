@@ -21,6 +21,7 @@ public final class DoubleDetailsTableViewCell: Cell<DoubleDetail>, CellType {
     static let fullHeight: CGFloat = 65.0
     
     // MARK: IBOutlets
+    @IBOutlet weak var stackView: UIStackView!
     @IBOutlet var titleLabel: UILabel!
     @IBOutlet var detailsLabel: UILabel!
     @IBOutlet var secondDetailsLabel: UILabel!
@@ -44,6 +45,8 @@ public final class DoubleDetailsTableViewCell: Cell<DoubleDetail>, CellType {
         if let value = row.value {
             detailsLabel.text = value.first
             secondDetailsLabel.text = value.second
+            
+            stackView.spacing = value.second == nil ? 0 : 6
         } else {
             detailsLabel.text = nil
             secondDetailsLabel.text = nil

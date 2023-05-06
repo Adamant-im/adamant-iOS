@@ -9,11 +9,11 @@
 import UIKit
 import Eureka
 
-class BtcTransferViewController: TransferViewControllerBase {
+final class BtcTransferViewController: TransferViewControllerBase {
     
     // MARK: Dependencies
     
-    var chatsProvider: ChatsProvider!
+    private let chatsProvider: ChatsProvider
     
     // MARK: Properties
     
@@ -29,8 +29,32 @@ class BtcTransferViewController: TransferViewControllerBase {
     
     static let invalidCharacters: CharacterSet = CharacterSet.decimalDigits.inverted
     
+    init(
+        chatsProvider: ChatsProvider,
+        accountService: AccountService,
+        accountsProvider: AccountsProvider,
+        dialogService: DialogService,
+        router: Router,
+        currencyInfoService: CurrencyInfoService
+    ) {
+        self.chatsProvider = chatsProvider
+        
+        super.init(
+            accountService: accountService,
+            accountsProvider: accountsProvider,
+            dialogService: dialogService,
+            router: router,
+            currencyInfoService: currencyInfoService
+        )
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     // MARK: Send
     
+    @MainActor
     override func sendFunds() {
         let comments: String
         if let row: TextAreaRow = form.rowBy(tag: BaseRows.comments.tag), let text = row.value {
@@ -43,63 +67,66 @@ class BtcTransferViewController: TransferViewControllerBase {
             return
         }
         
-        guard let dialogService = dialogService else {
-            return
-        }
-        
         dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
         
-        service.createTransaction(recipient: recipient, amount: amount) { [weak self] result in
-            guard let vc = self else {
-                dialogService.dismissProgress()
-                dialogService.showError(withMessage: String.adamantLocalized.sharedErrors.unknownError, error: nil)
-                return
-            }
-
-            switch result {
-            case .success(let transaction):
-                // MARK: 1. Send adm report
-                if let reportRecipient = vc.admReportRecipient {
-                    let hash = transaction.txID
-                    self?.reportTransferTo(admAddress: reportRecipient, amount: amount, comments: comments, hash: hash)
+        Task {
+            do {
+                let transaction = try await service.createTransaction(recipient: recipient, amount: amount)
+                
+                // Send adm report
+                if let reportRecipient = admReportRecipient,
+                   let hash = transaction.txHash {
+                    try await reportTransferTo(
+                        admAddress: reportRecipient,
+                        amount: amount,
+                        comments: comments,
+                        hash: hash
+                    )
                 }
-
-                // MARK: 2. Send BTC transaction
-                service.sendTransaction(transaction) { result in
-                    switch result {
-                    case .success(let hash):
-                        service.update()
-
-                        service.getTransaction(by: hash) { result in
-                            switch result {
-                            case .success(let localTransaction):
-                                DispatchQueue.onMainAsync {
-                                    self?.processSuccessTransaction(vc, localTransaction: localTransaction, service: service, comments: comments, transaction: transaction)
-                                }
-                            case .failure(let error):
-                                DispatchQueue.onMainAsync {
-                                    self?.processFailureTransaction(vc, service: service, comments: comments, transaction: transaction, error: error)
-                                }
-                            }
-                        }
-
-                    case .failure(let error):
-                        vc.dialogService.showRichError(error: error)
+                
+                Task {
+                    do {
+                        try await service.sendTransaction(transaction)
+                    } catch {
+                        dialogService.showRichError(error: error)
                     }
+                    
+                    try await service.update()
                 }
-
-            case .failure(let error):
+                
+                var detailTransaction: BtcTransaction?
+                if let hash = transaction.txHash {
+                    detailTransaction = try? await service.getTransaction(by: hash)
+                }
+                
+                processTransaction(
+                    self,
+                    localTransaction: detailTransaction,
+                    service: service,
+                    comments: comments,
+                    transaction: transaction
+                )
+                
+                dialogService.dismissProgress()
+                dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+            } catch {
                 dialogService.dismissProgress()
                 dialogService.showRichError(error: error)
             }
         }
     }
     
-    private func processSuccessTransaction(_ vc: BtcTransferViewController, localTransaction: BtcTransaction, service: BtcWalletService, comments: String, transaction: TransactionDetails) {
+    private func processTransaction(
+        _ vc: BtcTransferViewController,
+        localTransaction: BtcTransaction?,
+        service: BtcWalletService,
+        comments: String,
+        transaction: TransactionDetails
+    ) {
         vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
         
         if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Bitcoin.transactionDetails) as? BtcTransactionDetailsViewController {
-            detailsVc.transaction = localTransaction
+            detailsVc.transaction = localTransaction ?? transaction
             detailsVc.service = service
             detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
             
@@ -116,35 +143,6 @@ class BtcTransferViewController: TransferViewControllerBase {
             vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
         } else {
             vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
-        }
-    }
-    
-    private func processFailureTransaction(_ vc: BtcTransferViewController, service: BtcWalletService, comments: String, transaction: TransactionDetails, error: ApiServiceError) {
-        if case let .internalError(message, _) = error, message == "No transaction" {
-            vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-            
-            if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Bitcoin.transactionDetails) as? BtcTransactionDetailsViewController {
-                detailsVc.transaction = transaction
-                detailsVc.service = service
-                detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                
-                if recipientAddress == service.wallet?.address {
-                    detailsVc.recipientName = String.adamantLocalized.transactionDetails.yourAddress
-                } else {
-                    detailsVc.recipientName = self.recipientName
-                }
-                
-                if comments.count > 0 {
-                    detailsVc.comment = comments
-                }
-
-                vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
-            } else {
-                vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
-            }
-        } else {
-            vc.dialogService.showRichError(error: error)
-            vc.delegate?.transferViewController(vc, didFinishWithTransfer: nil, detailsViewController: nil)
         }
     }
     
@@ -184,6 +182,7 @@ class BtcTransferViewController: TransferViewControllerBase {
         let row = TextRow {
             $0.tag = BaseRows.address.tag
             $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
+            $0.cell.textField.setLineBreakMode()
             
             if let recipient = recipientAddress {
                 $0.value = recipient
@@ -201,6 +200,7 @@ class BtcTransferViewController: TransferViewControllerBase {
                 self?.skipValueChange = false
                 return
             }
+            self?.updateToolbar(for: row)
         }.onCellSelection { [weak self] (cell, _) in
             self?.shareValue(self?.recipientAddress, from: cell)
         }
@@ -235,16 +235,17 @@ class BtcTransferViewController: TransferViewControllerBase {
         }
     }
     
-    func reportTransferTo(admAddress: String, amount: Decimal, comments: String, hash: String) {
+    func reportTransferTo(
+        admAddress: String,
+        amount: Decimal,
+        comments: String,
+        hash: String
+    ) async throws {
         let payload = RichMessageTransfer(type: BtcWalletService.richMessageType, amount: amount, hash: hash, comments: comments)
         
         let message = AdamantMessage.richMessage(payload: payload)
         
-        chatsProvider.sendMessage(message, recipientId: admAddress) { [weak self] result in
-            if case .failure(let error) = result {
-                self?.dialogService.showRichError(error: error)
-            }
-        }
+        _ = try await chatsProvider.sendMessage(message, recipientId: admAddress)
     }
     
     override func defaultSceneTitle() -> String? {

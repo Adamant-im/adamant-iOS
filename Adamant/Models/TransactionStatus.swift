@@ -10,25 +10,28 @@ import Foundation
 
 enum TransactionStatus: Int16 {
     case notInitiated
-    case updating
     case pending
     case success
     case failed
-    case warning
-    case dublicate
+    case registered
+    case inconsistent
+    case noNetwork
+    case noNetworkFinal
     
     var localized: String {
         switch self {
-        case .notInitiated, .updating:
+        case .notInitiated:
             return NSLocalizedString("TransactionStatus.Updating", comment: "Transaction status: updating in progress")
-        case .pending:
+        case .pending, .registered:
             return NSLocalizedString("TransactionStatus.Pending", comment: "Transaction status: transaction is pending")
         case .success:
             return NSLocalizedString("TransactionStatus.Success", comment: "Transaction status: success")
         case .failed:
             return NSLocalizedString("TransactionStatus.Failed", comment: "Transaction status: transaction failed")
-        case .warning, .dublicate:
-            return NSLocalizedString("TransactionStatus.Warning", comment: "Transaction status: transaction warning")
+        case .inconsistent:
+            return NSLocalizedString("TransactionStatus.Inconsistent", comment: "Transaction status: transaction warning")
+        case .noNetwork, .noNetworkFinal:
+            return NSLocalizedString("Error.NoNetwork", comment: "Shared error: Network problems. In most cases - no connection")
         }
     }
 }

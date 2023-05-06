@@ -20,4 +20,8 @@ public class ChatTransaction: BaseTransaction {
     func serializedMessage() -> String? {
         fatalError("You must implement serializedMessage in ChatTransaction classes")
     }
+    
+    var sentDate: Date? {
+        date.map { $0 as Date }
+    }
 }

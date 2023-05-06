@@ -9,9 +9,8 @@
 import Foundation
 import CoreData
 
-enum AccountsProviderResult {
-    case success(CoreDataAccount)
-    case dummy(DummyAccount)
+enum AccountsProviderError: Error {
+    case dummy(BaseAccount)
     case notFound(address: String)
     case invalidAddress(address: String)
     case notInitiated(address: String)
@@ -20,8 +19,8 @@ enum AccountsProviderResult {
     
     var localized: String {
         switch self {
-        case .success, .dummy:
-            return ""
+        case .dummy:
+            return "Dummy"
             
         case .notFound(let address):
             return String.adamantLocalized.sharedErrors.accountNotFound(address)
@@ -33,7 +32,8 @@ enum AccountsProviderResult {
             return String.adamantLocalized.sharedErrors.accountNotInitiated
             
         case .serverError(let error):
-            return ApiServiceError.serverError(error: error.localizedDescription).localized
+            return ApiServiceError.serverError(error: error.localizedDescription)
+                .localizedDescription
             
         case .networkError:
             return String.adamantLocalized.sharedErrors.networkError
@@ -41,8 +41,7 @@ enum AccountsProviderResult {
     }
 }
 
-enum AccountsProviderDummyAccountResult {
-    case success(DummyAccount)
+enum AccountsProviderDummyAccountError: Error {
     case foundRealAccount(CoreDataAccount)
     case invalidAddress(address: String)
     case internalError(Error)
@@ -53,12 +52,12 @@ protocol AccountsProvider {
     /// Search for fetched account, if not found, asks server for account.
     ///
     /// - Returns: Account, if found, created in main viewContext
-    func getAccount(byAddress address: String, completion: @escaping (AccountsProviderResult) -> Void)
+    func getAccount(byAddress address: String) async throws -> CoreDataAccount
     
     /// Search for fetched account, if not found try to create or asks server for account.
     ///
     /// - Returns: Account, if found, created in main viewContext
-    func getAccount(byAddress address: String, publicKey: String, completion: @escaping (AccountsProviderResult) -> Void)
+    func getAccount(byAddress address: String, publicKey: String) async throws -> CoreDataAccount
     
     /* That one bugged. Will be fixed later. Maybe. */
     /// Search for fetched account, if not found, asks server for account.
@@ -67,10 +66,10 @@ protocol AccountsProvider {
 //    func getAccount(byPublicKey publicKey: String, completion: @escaping (AccountsProviderResult) -> Void)
     
     /// Check locally if has account with specified address
-    func hasAccount(address: String, completion: @escaping (Bool) -> Void)
+    func hasAccount(address: String) async -> Bool
     
     /// Request Dummy account, if account wasn't found or initiated
-    func getDummyAccount(for address: String, completion: @escaping (AccountsProviderDummyAccountResult) -> Void)
+    func getDummyAccount(for address: String) async throws -> DummyAccount
 }
 
 // MARK: - Known contacts
@@ -79,28 +78,7 @@ struct SystemMessage {
     let silentNotification: Bool
 }
 
-enum AdamantContacts {
-    case adamantBountyWallet
-    case adamantNewBountyWallet
-    case adamantIco
-    case iosSupport
-    case adamantExchange
-    case betOnBitcoin
-    case donate
-    case adamantWelcomeWallet
-    case adelina
-    
-    static let systemAddresses = [
-        AdamantContacts.adelina.name,
-        AdamantContacts.adamantExchange.name,
-        AdamantContacts.betOnBitcoin.name,
-        AdamantContacts.adamantIco.name,
-        AdamantContacts.adamantBountyWallet.name,
-        AdamantContacts.adamantNewBountyWallet.name,
-        AdamantContacts.donate.name,
-        AdamantContacts.adamantWelcomeWallet.name
-    ]
-    
+extension AdamantContacts {
     static func messagesFor(address: String) -> [String:SystemMessage]? {
         switch address {
         case AdamantContacts.adamantBountyWallet.address,
@@ -123,87 +101,6 @@ enum AdamantContacts {
             
         default:
             return nil
-        }
-    }
-    
-    var name: String {
-        switch self {
-        case .adamantWelcomeWallet:
-            return NSLocalizedString("Accounts.AdamantTokens", comment: "System accounts: ADAMANT Tokens")
-        case .adamantBountyWallet, .adamantNewBountyWallet:
-            return NSLocalizedString("Accounts.AdamantBounty", comment: "System accounts: ADAMANT Bounty")
-        case .adamantIco:
-            return "Adamant ICO"
-        case .iosSupport:
-            return NSLocalizedString("Accounts.iOSSupport", comment: "System accounts: ADAMANT iOS Support")
-        case .adamantExchange:
-            return NSLocalizedString("Accounts.AdamantExchange", comment: "System accounts: ADAMANT Exchange")
-        case .betOnBitcoin:
-            return NSLocalizedString("Accounts.BetOnBitcoin", comment: "System accounts: Bet on Bitcoin Price")
-        case .donate:
-            return NSLocalizedString("Accounts.DonateADMFoundation", comment: "System accounts: Donates ADAMANT Foundation")
-        case .adelina:
-            return NSLocalizedString("Accounts.Adelina", comment: "System accounts: Adelina")
-        }
-    }
-    
-    var isSystem: Bool {
-        switch self {
-        case .adamantExchange, .betOnBitcoin, .adelina:
-            return false
-        case .adamantWelcomeWallet, .iosSupport, .adamantIco, .adamantBountyWallet, .adamantNewBountyWallet, .donate:
-            return true
-        }
-    }
-    
-    var address: String {
-        switch self {
-        case .adamantBountyWallet: return AdamantResources.contacts.adamantBountyWallet
-        case .adamantNewBountyWallet: return AdamantResources.contacts.adamantNewBountyWallet
-        case .adamantIco: return AdamantResources.contacts.adamantIco
-        case .iosSupport: return AdamantResources.contacts.iosSupport
-        case .adamantExchange: return AdamantResources.contacts.adamantExchange
-        case .betOnBitcoin: return AdamantResources.contacts.betOnBitcoin
-        case .donate: return AdamantResources.contacts.donateWallet
-        case .adamantWelcomeWallet: return AdamantResources.contacts.adamantWelcomeWallet
-        case .adelina: return AdamantResources.contacts.adelinaWallet
-        }
-    }
-    
-    var publicKey: String? {
-        switch self {
-        case .adamantExchange: return AdamantResources.contacts.adamantExchangePK
-        case .betOnBitcoin: return AdamantResources.contacts.betOnBitcoinPK
-        case .adamantBountyWallet: return AdamantResources.contacts.adamantBountyWalletPK
-        case .adamantNewBountyWallet: return AdamantResources.contacts.adamantNewBountyWalletPK
-        case .iosSupport: return AdamantResources.contacts.iosSupportPK
-        case .adamantIco: return AdamantResources.contacts.adamantIcoPK
-        case .donate: return AdamantResources.contacts.donateWalletPK
-        case .adamantWelcomeWallet: return AdamantResources.contacts.adamantBountyWalletPK
-        case .adelina: return AdamantResources.contacts.adelinaWalletPK
-        }
-    }
-    
-    var isReadonly: Bool {
-        switch self {
-        case .adamantBountyWallet, .adamantNewBountyWallet, .adamantIco, .adamantWelcomeWallet: return true
-        case .iosSupport, .adamantExchange, .betOnBitcoin, .donate, .adelina: return false
-        }
-    }
-    
-    var isHidden: Bool {
-        switch self {
-        case .adamantBountyWallet, .adamantNewBountyWallet: return true
-        case .adamantIco, .iosSupport, .adamantExchange, .betOnBitcoin, .donate, .adamantWelcomeWallet, .adelina: return false
-        }
-    }
-    
-    var avatar: String {
-        switch self {
-        case .adamantExchange, .betOnBitcoin, .donate, .adamantBountyWallet, .adamantNewBountyWallet, .adelina:
-            return ""
-        case .adamantIco, .iosSupport, .adamantWelcomeWallet:
-            return "avatar_bots"
         }
     }
     

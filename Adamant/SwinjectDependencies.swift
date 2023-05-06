@@ -40,70 +40,80 @@ extension Container {
         // MARK: - Services with dependencies
         // MARK: DialogService
         self.register(DialogService.self) { r in
-            let service = AdamantDialogService()
-            service.router = r.resolve(Router.self)
-            return service
+            AdamantDialogService(router: r.resolve(Router.self)!)
         }.inObjectScope(.container)
         
         // MARK: Notifications
         self.register(NotificationsService.self) { r in
-            let service = AdamantNotificationsService()
-            service.securedStore = r.resolve(SecuredStore.self)
-            return service
+            AdamantNotificationsService(securedStore: r.resolve(SecuredStore.self)!)
         }.initCompleted { (r, c) in    // Weak reference
-            let service = c as! AdamantNotificationsService
+            guard let service = c as? AdamantNotificationsService else { return }
             service.accountService = r.resolve(AccountService.self)
+        }.inObjectScope(.container)
+        
+        // MARK: VisibleWalletsService
+        self.register(VisibleWalletsService.self) { r in
+            AdamantVisibleWalletsService(
+                securedStore: r.resolve(SecuredStore.self)!,
+                accountService: r.resolve(AccountService.self)!
+            )
+        }.inObjectScope(.container)
+        
+        // MARK: PushNotificationsTokenService
+        self.register(PushNotificationsTokenService.self) { r in
+            AdamantPushNotificationsTokenService(
+                securedStore: r.resolve(SecuredStore.self)!,
+                apiService: r.resolve(ApiService.self)!,
+                adamantCore: r.resolve(AdamantCore.self)!,
+                accountService: r.resolve(AccountService.self)!
+            )
         }.inObjectScope(.container)
         
         // MARK: NodesSource
         self.register(NodesSource.self) { r in
-            let service = AdamantNodesSource(defaultNodesGetter: { AdamantResources.nodes })
-            service.apiService = r.resolve(ApiService.self)!
-            service.healthCheckService = r.resolve(HealthCheckService.self)!
-            service.securedStore = r.resolve(SecuredStore.self)
-            return service
+            AdamantNodesSource(
+                apiService: r.resolve(ApiService.self)!,
+                healthCheckService: r.resolve(HealthCheckService.self)!,
+                securedStore: r.resolve(SecuredStore.self)!,
+                defaultNodesGetter: { AdamantResources.nodes }
+            )
         }.inObjectScope(.container)
         
         // MARK: ApiService
         self.register(ApiService.self) { r in
-            let service = AdamantApiService()
-            service.adamantCore = r.resolve(AdamantCore.self)
-            return service
+            AdamantApiService(adamantCore: r.resolve(AdamantCore.self)!)
         }.initCompleted { (r, c) in    // Weak reference
-            let service = c as! AdamantApiService
+            guard let service = c as? AdamantApiService else { return }
             service.nodesSource = r.resolve(NodesSource.self)
         }.inObjectScope(.container)
         
         // MARK: HealthCheckService
         self.register(HealthCheckService.self) { r in
-            let service = AdamantHealthCheckService()
-            service.apiService = r.resolve(ApiService.self)!
-            return service
+            AdamantHealthCheckService(apiService: r.resolve(ApiService.self)!)
         }.inObjectScope(.container)
         
         // MARK: SocketService
         self.register(SocketService.self) { _ in
-            let service = AdamantSocketService()
-            return service
+            AdamantSocketService()
         }.initCompleted { (r, c) in    // Weak reference
-            let service = c as! AdamantSocketService
+            guard let service = c as? AdamantSocketService else { return }
             service.nodesSource = r.resolve(NodesSource.self)
         }.inObjectScope(.container)
         
         // MARK: AccountService
         self.register(AccountService.self) { r in
-            let service = AdamantAccountService()
-            service.apiService = r.resolve(ApiService.self)!
-            service.adamantCore = r.resolve(AdamantCore.self)!
-            service.securedStore = r.resolve(SecuredStore.self)!
-            service.dialogService = r.resolve(DialogService.self)!
-            service.currencyInfoService = r.resolve(CurrencyInfoService.self)!
-            
-            return service
+            AdamantAccountService(
+                apiService: r.resolve(ApiService.self)!,
+                adamantCore: r.resolve(AdamantCore.self)!,
+                dialogService: r.resolve(DialogService.self)!,
+                securedStore: r.resolve(SecuredStore.self)!
+            )
         }.inObjectScope(.container).initCompleted { (r, c) in
-            let service = c as! AdamantAccountService
+            guard let service = c as? AdamantAccountService else { return }
             service.notificationsService = r.resolve(NotificationsService.self)!
-            
+            service.pushNotificationsTokenService = r.resolve(PushNotificationsTokenService.self)!
+            service.currencyInfoService = r.resolve(CurrencyInfoService.self)!
+            service.visibleWalletService = r.resolve(VisibleWalletsService.self)!
             for case let wallet as SwinjectDependentService in service.wallets {
                 wallet.injectDependencies(from: self)
             }
@@ -111,25 +121,22 @@ extension Container {
         
         // MARK: AddressBookServeice
         self.register(AddressBookService.self) { r in
-            let service = AdamantAddressBookService()
-            service.apiService = r.resolve(ApiService.self)!
-            service.adamantCore = r.resolve(AdamantCore.self)!
-            service.accountService = r.resolve(AccountService.self)!
-            service.dialogService = r.resolve(DialogService.self)!
-            return service
+            AdamantAddressBookService(
+                apiService: r.resolve(ApiService.self)!,
+                adamantCore: r.resolve(AdamantCore.self)!,
+                accountService: r.resolve(AccountService.self)!,
+                dialogService: r.resolve(DialogService.self)!
+            )
         }.inObjectScope(.container)
         
         // MARK: CurrencyInfoService
         self.register(CurrencyInfoService.self) { r in
-            let service = AdamantCurrencyInfoService()
-            service.securedStore = r.resolve(SecuredStore.self)
-            return service
+            AdamantCurrencyInfoService(securedStore: r.resolve(SecuredStore.self)!)
         }.inObjectScope(.container).initCompleted { (r, c) in
-            if let service = c as? AdamantCurrencyInfoService {
-                service.accountService = r.resolve(AccountService.self)
-            }
+            guard let service = c as? AdamantCurrencyInfoService else { return }
+            service.accountService = r.resolve(AccountService.self)
         }
-
+        
         // MARK: - Data Providers
         // MARK: CoreData Stack
         self.register(CoreDataStack.self) { _ in
@@ -138,113 +145,76 @@ extension Container {
         
         // MARK: Accounts
         self.register(AccountsProvider.self) { r in
-            let provider = AdamantAccountsProvider()
-            provider.stack = r.resolve(CoreDataStack.self)
-            provider.apiService = r.resolve(ApiService.self)
-            provider.addressBookService = r.resolve(AddressBookService.self)
-            return provider
+            AdamantAccountsProvider(
+                stack: r.resolve(CoreDataStack.self)!,
+                apiService: r.resolve(ApiService.self)!,
+                addressBookService: r.resolve(AddressBookService.self)!
+            )
         }.inObjectScope(.container)
         
         // MARK: Transfers
         self.register(TransfersProvider.self) { r in
-            let provider = AdamantTransfersProvider()
-            provider.apiService = r.resolve(ApiService.self)
-            provider.stack = r.resolve(CoreDataStack.self)
-            provider.accountService = r.resolve(AccountService.self)
-            provider.accountsProvider = r.resolve(AccountsProvider.self)
-            provider.securedStore = r.resolve(SecuredStore.self)
-            provider.adamantCore = r.resolve(AdamantCore.self)
-            provider.transactionService = r.resolve(ChatTransactionService.self)
-            return provider
-        }.inObjectScope(.container).initCompleted { (r, c) in
-            let provider = c as! AdamantTransfersProvider
-            provider.chatsProvider = r.resolve(ChatsProvider.self)
-        }
+            AdamantTransfersProvider(
+                apiService: r.resolve(ApiService.self)!,
+                stack: r.resolve(CoreDataStack.self)!,
+                adamantCore: r.resolve(AdamantCore.self)!,
+                accountService: r.resolve(AccountService.self)!,
+                accountsProvider: r.resolve(AccountsProvider.self)!,
+                securedStore: r.resolve(SecuredStore.self)!,
+                transactionService: r.resolve(ChatTransactionService.self)!,
+                chatsProvider: r.resolve(ChatsProvider.self)!
+            )
+        }.inObjectScope(.container)
         
         // MARK: Chats
         self.register(ChatsProvider.self) { r in
-            let provider = AdamantChatsProvider()
-            provider.apiService = r.resolve(ApiService.self)
-            provider.socketService = r.resolve(SocketService.self)
-            provider.stack = r.resolve(CoreDataStack.self)
-            provider.adamantCore = r.resolve(AdamantCore.self)
-            provider.securedStore = r.resolve(SecuredStore.self)
-            provider.accountsProvider = r.resolve(AccountsProvider.self)
-            provider.transactionService = r.resolve(ChatTransactionService.self)
-            
-            let accountService = r.resolve(AccountService.self)!
-            provider.accountService = accountService
-            var richProviders = [String: RichMessageProviderWithStatusCheck]()
-            for case let provider as RichMessageProviderWithStatusCheck in accountService.wallets {
-                richProviders[provider.dynamicRichMessageType] = provider
-            }
-            provider.richProviders = richProviders
-            return provider
+            AdamantChatsProvider(
+                accountService: r.resolve(AccountService.self)!,
+                apiService: r.resolve(ApiService.self)!,
+                socketService: r.resolve(SocketService.self)!,
+                stack: r.resolve(CoreDataStack.self)!,
+                adamantCore: r.resolve(AdamantCore.self)!,
+                accountsProvider: r.resolve(AccountsProvider.self)!,
+                transactionService: r.resolve(ChatTransactionService.self)!,
+                securedStore: r.resolve(SecuredStore.self)!
+            )
         }.inObjectScope(.container)
         
         // MARK: Chat Transaction Service
         self.register(ChatTransactionService.self) { r in
-            let provider = AdamantChatTransactionService()
-            provider.adamantCore = r.resolve(AdamantCore.self)
-            
+            AdamantChatTransactionService(
+                adamantCore: r.resolve(AdamantCore.self)!,
+                accountService: r.resolve(AccountService.self)!
+            )
+        }.inObjectScope(.container)
+        
+        // MARK: Chat screen factory
+        self.register(ChatFactory.self) { r in
+            ChatFactory(
+                chatsProvider: r.resolve(ChatsProvider.self)!,
+                dialogService: r.resolve(DialogService.self)!,
+                transferProvider: r.resolve(TransfersProvider.self)!,
+                accountService: r.resolve(AccountService.self)!,
+                accountProvider: r.resolve(AccountsProvider.self)!,
+                richTransactionStatusService: r.resolve(RichTransactionStatusService.self)!,
+                addressBookService: r.resolve(AddressBookService.self)!,
+                visibleWalletService: r.resolve(VisibleWalletsService.self)!,
+                router: r.resolve(Router.self)!
+            )
+        }.inObjectScope(.container)
+        
+        // MARK: Rich transaction status service
+        self.register(RichTransactionStatusService.self) { r in
             let accountService = r.resolve(AccountService.self)!
-            var richProviders = [String: RichMessageProviderWithStatusCheck]()
-            for case let provider as RichMessageProviderWithStatusCheck in accountService.wallets {
-                richProviders[provider.dynamicRichMessageType] = provider
-            }
-            provider.richProviders = richProviders
-            return provider
-        }.inObjectScope(.container)
-    }
-    
-    func registerAdamantBackgroundFetchServices() {
-        // MARK: Secured store
-        self.register(SecuredStore.self) { _ in KeychainStore() }.inObjectScope(.container)
-        
-        // MARK: NodesSource
-        self.register(NodesSource.self) { r in
-            let service = AdamantNodesSource(defaultNodesGetter: { AdamantResources.nodes })
-            service.securedStore = r.resolve(SecuredStore.self)
-            return service
-        }.inObjectScope(.container)
-        
-        // MARK: ApiService
-        // No need to init AdamantCore
-        self.register(ApiService.self) { r in
-            let service = AdamantApiService()
-            service.nodesSource = r.resolve(NodesSource.self)
-            return service
-        }.inObjectScope(.container)
-        
-        // MARK: SocketService
-        // No need to init AdamantCore
-        self.register(SocketService.self) { r in
-            let service = AdamantSocketService()
-            service.nodesSource = r.resolve(NodesSource.self)
-            return service
-        }.inObjectScope(.container)
-        
-        // MARK: Notifications
-        self.register(NotificationsService.self) { r in
-            let service = AdamantNotificationsService()
-            service.securedStore = r.resolve(SecuredStore.self)
-            return service
-        }.inObjectScope(.container)
-        
-        // MARK: Fetch Services
-        self.register(ChatsProvider.self) { r in
-            let provider = AdamantChatsProvider()
-            provider.apiService = r.resolve(ApiService.self)
-            provider.socketService = r.resolve(SocketService.self)
-            provider.securedStore = r.resolve(SecuredStore.self)
-            return provider
-        }.inObjectScope(.container)
-        
-        self.register(TransfersProvider.self) { r in
-            let provider = AdamantTransfersProvider()
-            provider.apiService = r.resolve(ApiService.self)
-            provider.securedStore = r.resolve(SecuredStore.self)
-            return provider
+            
+            let richProviders = accountService.wallets
+                .compactMap { $0 as? RichMessageProviderWithStatusCheck }
+                .map { ($0.dynamicRichMessageType, $0) }
+            
+            return AdamantRichTransactionStatusService(
+                coreDataStack: r.resolve(CoreDataStack.self)!,
+                richProviders: Dictionary(uniqueKeysWithValues: richProviders)
+            )
         }.inObjectScope(.container)
     }
 }

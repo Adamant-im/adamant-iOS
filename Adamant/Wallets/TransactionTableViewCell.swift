@@ -37,6 +37,7 @@ class TransactionTableViewCell: UITableViewCell {
     // MARK: - Constants
     
     static let cellHeightCompact: CGFloat = 90.0
+    static let cellFooterLoadingCompact: CGFloat = 30.0
     static let cellHeightFull: CGFloat = 100.0
     
     // MARK: - IBOutlets

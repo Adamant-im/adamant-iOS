@@ -20,6 +20,8 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
     
     // MARK: - Properties
     var transactions: [Transactions.TransactionModel] = []
+    
+    private var offset: UInt = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,33 +30,40 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
         
         currencySymbol = LskWalletService.currencySymbol
         
-        handleRefresh(self.refreshControl)
+        loadData(true)
     }
     
-    override func handleRefresh(_ refreshControl: UIRefreshControl) {
+    override func handleRefresh() {
         self.emptyLabel.isHidden = true
-        self.lskWalletService.getTransactions({ (result) in
-            switch result {
-            case .success(let transactions):
-                self.transactions = transactions
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
+        tableView.reloadData()
+        transactions.removeAll()
+        tableView.reloadData()
+        offset = 0
+        loadData(false)
+    }
+    
+    override func loadData(_ silent: Bool) {
+        isBusy = true
+        Task { @MainActor in
+            do {
+                let trs = try await lskWalletService.getTransactions(offset: offset)
+                transactions.append(contentsOf: trs)
+                offset += UInt(trs.count)
+                isNeedToLoadMoore = trs.count > 0
+                tableView.reloadData()
+            } catch {
+                isNeedToLoadMoore = false
+                
+                if !silent {
+                    dialogService.showRichError(error: error)
                 }
-                break
-            case .failure(let error):
-                if case .internalError(let message, _ ) = error {
-                    let localizedErrorMessage = NSLocalizedString(message, comment: "TransactionList: 'Transactions not found' message.")
-                    self.dialogService.showWarning(withMessage: localizedErrorMessage)
-                } else {
-                    self.dialogService.showError(withMessage: String.adamantLocalized.transactionList.notFound, error: error)
-                }
-                break
             }
-            DispatchQueue.main.async {
-                self.emptyLabel.isHidden = self.transactions.count > 0
-                self.refreshControl.endRefreshing()
-            }
-        })
+            
+            isBusy = false
+            emptyLabel.isHidden = self.transactions.count > 0
+            stopBottomIndicator()
+            refreshControl.endRefreshing()
+        }.stored(in: taskManager)
     }
     
     // MARK: - UITableView
@@ -126,7 +135,7 @@ extension Transactions.TransactionModel: TransactionDetails {
     }
     
     var dateValue: Date? {
-        return Date(timeIntervalSince1970: TimeInterval(self.timestamp))
+        return timestamp.map { Date(timeIntervalSince1970: TimeInterval($0)) }
     }
     
     var amountValue: Decimal? {
@@ -142,10 +151,10 @@ extension Transactions.TransactionModel: TransactionDetails {
     }
     
     var confirmationsValue: String? {
-        guard let confirmations = confirmations else { return "0" }
-        if confirmations < self.height { return "0" }
+        guard let confirmations = confirmations, let height = height else { return "0" }
+        if confirmations < height { return "0" }
         if confirmations > 0 {
-            return "\(confirmations - self.height + 1)"
+            return "\(confirmations - height + 1)"
         }
         
         return "\(confirmations)"
@@ -164,18 +173,18 @@ extension Transactions.TransactionModel: TransactionDetails {
     }
     
     var transactionStatus: TransactionStatus? {
-        guard let confirmations = confirmations else { return .pending }
-        if confirmations < self.height { return .pending }
+        guard let confirmations = confirmations, let height = height else { return .registered }
+        if confirmations < height { return .registered }
         
-        if confirmations > 0 && self.height > 0 {
-            let conf = (confirmations - self.height) + 1
+        if confirmations > 0 && height > 0 {
+            let conf = (confirmations - height) + 1
             if conf > 1 {
                 return .success
             } else {
-                return .pending
+                return .registered
             }
         }
-        return .pending
+        return .registered
     }
     
     var senderAddress: String {
@@ -186,8 +195,8 @@ extension Transactions.TransactionModel: TransactionDetails {
         return self.recipientId ?? ""
     }
 
-    var sentDate: Date {
-        return Date(timeIntervalSince1970: TimeInterval(self.timestamp))
+    var sentDate: Date? {
+        timestamp.map { Date(timeIntervalSince1970: TimeInterval($0)) }
     }
 }
 

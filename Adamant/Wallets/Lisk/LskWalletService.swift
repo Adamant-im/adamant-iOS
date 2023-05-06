@@ -13,6 +13,7 @@ import LiskKit
 import web3swift
 import Alamofire
 import struct BigInt.BigUInt
+import Web3Core
 
 class LskWalletService: WalletService {
     
@@ -35,9 +36,6 @@ class LskWalletService: WalletService {
     
     // MARK: RichMessageProvider properties
     static let richMessageType = "lsk_transaction"
-    let cellIdentifierSent = "lskTransferSent"
-    let cellIdentifierReceived = "lskTransferReceived"
-    let cellSource: CellSource? = CellSource.nib(nib: UINib(nibName: "TransferCollectionViewCell", bundle: nil))
     
     // MARK: - Dependencies
     var apiService: ApiService!
@@ -51,22 +49,17 @@ class LskWalletService: WalletService {
     }
     var transactionFeeRaw: BigUInt = BigUInt(integerLiteral: 141000)
     private (set) var enabled = true
+    private (set) var isWarningGasPrice = false
     
-    static var currencySymbol = "LSK"
-    static var currencyLogo = #imageLiteral(resourceName: "wallet_lsk")
-    static let currencyExponent = -8
+    static var currencyLogo = #imageLiteral(resourceName: "lisk_wallet")
     
     static let kvsAddress = "lsk:address"
     static let defaultFee: BigUInt = 141000
     
     var lastHeight: UInt64 = 0
-	
+    
     var tokenSymbol: String {
         return type(of: self).currencySymbol
-    }
-    
-    var tokenName: String {
-        return ""
     }
     
     var tokenLogo: UIImage {
@@ -77,10 +70,14 @@ class LskWalletService: WalletService {
         return "LSK"
     }
     
-    var consistencyMaxTime: Double {
-        return 60
+    var tokenContract: String {
+        return ""
     }
-   
+    
+    var tokenUnicID: String {
+        return tokenNetworkSymbol + tokenSymbol
+    }
+    
 	// MARK: - Properties
 	let transferAvailable: Bool = true
     private var initialBalanceCheck = false
@@ -114,9 +111,7 @@ class LskWalletService: WalletService {
                                             userInfo: [AdamantUserInfoKey.WalletService.walletState: state])
         }
     }
-    
-    let stateSemaphore = DispatchSemaphore(value: 1)
-    
+        
     // MARK: - Delayed KVS save
     private var balanceObserver: NSObjectProtocol?
     
@@ -127,8 +122,8 @@ class LskWalletService: WalletService {
         self.init(mainnet: mainnet, nodes: nodes, serviceNode: serviceNode)
     }
     
-    convenience init(mainnet: Bool, nodes: [String], services: [String]) {
-        self.init(mainnet: mainnet, nodes: nodes.map { APINode(origin: $0) }, serviceNode: services.map { APINode(origin: $0) })
+    convenience init(mainnet: Bool, nodes: [Node], services: [Node]) {
+        self.init(mainnet: mainnet, nodes: nodes.map { APINode(origin: $0.asString()) }, serviceNode: services.map { APINode(origin: $0.asString()) })
     }
     
     init(mainnet: Bool, nodes: [APINode], serviceNode: [APINode]) {
@@ -160,12 +155,15 @@ class LskWalletService: WalletService {
     }
     
     func update() {
+        Task {
+            await update()
+        }
+    }
+    
+    func update() async {
         guard let wallet = lskWallet else {
             return
         }
-        
-        defer { stateSemaphore.signal() }
-        stateSemaphore.wait()
         
         switch state {
         case .notInitiated, .updating, .initiationFailed:
@@ -177,54 +175,33 @@ class LskWalletService: WalletService {
         
         setState(.updating)
         
-        serviceApi.getFees { result in
-            switch result {
-            case .success(response: let value):
-                self.lastHeight = value.meta.lastBlockHeight
-                
-                let tempTransaction = TransactionEntity(amount: 100000000.0, fee: 0.00141, nonce: wallet.nounce, senderPublicKey: wallet.keyPair.publicKeyString, recipientAddress: wallet.binaryAddress).signed(with: wallet.keyPair, for: self.netHash)
-                let value = tempTransaction.getFee(with: value.data.minFeePerByte)
-                let fee = BigUInt(value)
-                
-                self.transactionFeeRaw = fee > LskWalletService.defaultFee ? fee : LskWalletService.defaultFee
-            case .error:
-                break
+        if let result = try? await getFees() {
+            self.lastHeight = result.lastHeight
+            self.transactionFeeRaw = result.fee > LskWalletService.defaultFee
+            ? result.fee
+            : LskWalletService.defaultFee
+        }
+        
+        if let balance = try? await getBalance() {
+            let notification: Notification.Name?
+            
+            if wallet.balance != balance {
+                wallet.balance = balance
+                notification = walletUpdatedNotification
+                initialBalanceCheck = false
+            } else if initialBalanceCheck {
+                initialBalanceCheck = false
+                notification = walletUpdatedNotification
+            } else {
+                notification = nil
+            }
+            
+            if let notification = notification {
+                NotificationCenter.default.post(name: notification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
             }
         }
         
-        getBalance { [weak self] result in
-            if let stateSemaphore = self?.stateSemaphore {
-                defer {
-                    stateSemaphore.signal()
-                }
-                stateSemaphore.wait()
-            }
-            
-            switch result {
-            case .success(let balance):
-                let notification: Notification.Name?
-                
-                if wallet.balance != balance {
-                    wallet.balance = balance
-                    notification = self?.walletUpdatedNotification
-                    self?.initialBalanceCheck = false
-                } else if let initialBalanceCheck = self?.initialBalanceCheck, initialBalanceCheck {
-                    self?.initialBalanceCheck = false
-                    notification = self?.walletUpdatedNotification
-                } else {
-                    notification = nil
-                }
-                
-                if let notification = notification {
-                    NotificationCenter.default.post(name: notification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
-                }
-                
-            case .failure(let error):
-                print("\(error.localizedDescription)")
-            }
-            
-            self?.setState(.upToDate)
-        }
+        setState(.upToDate)
     }
     
     // MARK: - Tools
@@ -237,18 +214,49 @@ class LskWalletService: WalletService {
     }
     
     func fromRawLsk(value: BigInt.BigUInt) -> String {
-        if let formattedAmount = Web3.Utils.formatToPrecision(value, numberDecimals: 8, formattingDecimals: 8, decimalSeparator: ".", fallbackToScientific: false) {
-            return formattedAmount
+        return Utilities.formatToPrecision(value, units: .custom(8), formattingDecimals: 8, decimalSeparator: ".", fallbackToScientific: false)
+    }
+    
+    func toRawLsk(value: Double) -> String {
+        if let formattedAmount = Utilities.parseToBigUInt("\(value)", decimals: 8) {
+            return "\(formattedAmount)"
         } else {
             return "--"
         }
     }
     
-    func toRawLsk(value: Double) -> String {
-        if let formattedAmount = Web3.Utils.parseToBigUInt("\(value)", decimals: 8) {
-            return "\(formattedAmount)"
-        } else {
-            return "--"
+    func getFees() async throws -> (fee: BigUInt, lastHeight: UInt64) {
+        guard let wallet = lskWallet else {
+            throw WalletServiceError.notLogged
+        }
+        
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<(fee: BigUInt, lastHeight: UInt64), Error>) in
+            serviceApi.getFees { result in
+                switch result {
+                case .success(response: let value):
+                    let tempTransaction = TransactionEntity(
+                        amount: 100000000.0,
+                        fee: 0.00141,
+                        nonce: wallet.nounce,
+                        senderPublicKey: wallet.keyPair.publicKeyString,
+                        recipientAddress: wallet.binaryAddress
+                    ).signed(
+                        with: wallet.keyPair,
+                        for: self.netHash
+                    )
+                    
+                    let feeValue = tempTransaction.getFee(with: value.data.minFeePerByte)
+                    let fee = BigUInt(feeValue)
+                    
+                    continuation.resume(returning: (fee: fee, lastHeight: value.meta.lastBlockHeight))
+                case .error(response: let error):
+                    continuation.resume(
+                        throwing: WalletServiceError.remoteServiceError(
+                            message: error.message
+                        )
+                    )
+                }
+            }
         }
     }
 }
@@ -325,21 +333,12 @@ extension LskWalletService {
 
 // MARK: - WalletInitiatedWithPassphrase
 extension LskWalletService: InitiatedWithPassphraseService {
-    func initWallet(withPassphrase passphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) {
-        DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
-            self.initWalletInternal(withPassphrase: passphrase, completion: completion)
-        }
-    }
-    
-    private func initWalletInternal(withPassphrase passphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) {
+    func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
         guard let adamant = accountService.account else {
-            completion(.failure(error: .notLogged))
-            return
+            throw WalletServiceError.notLogged
         }
         
         // MARK: 1. Prepare
-        stateSemaphore.wait()
-        
         setState(.notInitiated)
         
         if enabled {
@@ -357,9 +356,7 @@ extension LskWalletService: InitiatedWithPassphraseService {
             self.lskWallet = wallet
         } catch {
             print("\(error)")
-            completion(.failure(error: .accountNotFound))
-            stateSemaphore.signal()
-            return
+            throw WalletServiceError.accountNotFound
         }
         
         if !enabled {
@@ -367,59 +364,52 @@ extension LskWalletService: InitiatedWithPassphraseService {
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
         
-        stateSemaphore.signal()
-        
         guard let eWallet = self.lskWallet else {
-            completion(.failure(error: .accountNotFound))
-            return
+            throw WalletServiceError.accountNotFound
         }
         
         // MARK: 4. Save into KVS
-        getWalletAddress(byAdamantAddress: adamant.address) { [weak self] result in
-            guard let service = self else {
-                return
+        let service = self
+        do {
+            let address = try await getWalletAddress(byAdamantAddress: adamant.address)
+            
+            if address != eWallet.address {
+                service.save(lskAddress: eWallet.address) { result in
+                    service.kvsSaveCompletionRecursion(lskAddress: eWallet.address, result: result)
+                }
             }
             
-            switch result {
-            case .success(let address):
-                // LSK already saved
-                if address != eWallet.address {
-                    service.save(lskAddress: eWallet.address) { result in
-                        service.kvsSaveCompletionRecursion(lskAddress: eWallet.address, result: result)
-                    }
+            service.initialBalanceCheck = true
+            service.setState(.upToDate, silent: true)
+            
+            Task {
+                await service.update()
+            }
+            
+            return eWallet
+        } catch let error as WalletServiceError {
+            switch error {
+            case .walletNotInitiated:
+                // Show '0' without waiting for balance update
+                if let wallet = service.lskWallet {
+                    NotificationCenter.default.post(name: service.walletUpdatedNotification, object: service, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
                 }
                 
-                service.initialBalanceCheck = true
-                service.setState(.upToDate, silent: true)
-                service.update()
-                completion(.success(result: eWallet))
-                
-            case .failure(let error):
-                switch error {
-                case .walletNotInitiated:
-                    // Show '0' without waiting for balance update
-                    if let wallet = service.lskWallet {
-                        NotificationCenter.default.post(name: service.walletUpdatedNotification, object: service, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
-                    }
-                    
-                    service.save(lskAddress: eWallet.address) { result in
-                        service.kvsSaveCompletionRecursion(lskAddress: eWallet.address, result: result)
-                    }
-                    service.setState(.upToDate)
-                    completion(.success(result: eWallet))
-                default:
-                    service.setState(.upToDate)
-                    completion(.failure(error: error))
+                service.save(lskAddress: eWallet.address) { result in
+                    service.kvsSaveCompletionRecursion(lskAddress: eWallet.address, result: result)
                 }
+                service.setState(.upToDate)
+                return eWallet
+            default:
+                service.setState(.upToDate)
+                throw error
             }
         }
     }
     
     func setInitiationFailed(reason: String) {
-        stateSemaphore.wait()
         setState(.initiationFailed(reason: reason))
         lskWallet = nil
-        stateSemaphore.signal()
     }
     
     /// New accounts doesn't have enought money to save KVS. We need to wait for balance update, and then - retry save
@@ -469,21 +459,49 @@ extension LskWalletService: SwinjectDependentService {
 
 // MARK: - Balances & addresses
 extension LskWalletService {
-    func getBalance(_ completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-        guard let wallet = self.lskWallet, let accountApi = accountApi else {
-            completion(.failure(error: .notLogged))
-            return
+    func getBalance() async throws -> Decimal {
+        guard let address = lskWallet?.address else {
+            throw WalletServiceError.notLogged
         }
         
-        defaultDispatchQueue.async {
-            accountApi.accounts(address: wallet.binaryAddress) { response in
+        return try await getBalance(address: address)
+    }
+    
+    func getBalance(address: String) async throws -> Decimal {
+        guard
+            let accountApi = accountApi,
+            let address = LiskKit.Crypto.getBinaryAddressFromBase32(address)
+        else {
+            throw WalletServiceError.notLogged
+        }
+        
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Decimal, Error>) in
+            accountApi.accounts(address: address) { [weak lskWallet] response in
                 switch response {
                 case .success(response: let response):
-                    self.lskWallet?.nounce = response.data.nonce
-                    self.handleAccountSuccess(with: response.data.balance, completion: completion)
+                    if lskWallet?.binaryAddress == address {
+                        lskWallet?.nounce = response.data.nonce
+                    }
+                    
+                    let balance = BigUInt(response.data.balance ?? "0") ?? BigUInt(0)
+                    continuation.resume(
+                        returning: balance.asDecimal(
+                            exponent: LskWalletService.currencyExponent
+                        )
+                    )
                     
                 case .error(response: let error):
-                    self.handleAccountError(with: error, completion: completion)
+                    if error == .noNetwork {
+                        continuation.resume(throwing: WalletServiceError.networkError)
+                    } else if error.code == 404 {
+                        continuation.resume(returning: .zero)
+                    } else {
+                        continuation.resume(
+                            throwing: WalletServiceError.remoteServiceError(
+                                message: error.message
+                            )
+                        )
+                    }
                 }
             }
         }
@@ -494,10 +512,10 @@ extension LskWalletService {
         completion(.success(result: balance.asDecimal(exponent: LskWalletService.currencyExponent)))
     }
     func handleAccountError(with error: APIError, completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-        if error.message == "Unexpected Error" {
+        if error == .noNetwork {
             completion(.failure(error: .networkError))
         } else {
-            completion(.failure(error: .internalError(message: error.message, error: nil)))
+            completion(.failure(error: .remoteServiceError(message: error.message)))
         }
     }
     
@@ -505,19 +523,18 @@ extension LskWalletService {
         apiService.get(key: LskWalletService.kvsAddress, sender: address, completion: completion)
     }
     
-    func getWalletAddress(byAdamantAddress address: String, completion: @escaping (WalletServiceResult<String>) -> Void) {
-        apiService.get(key: LskWalletService.kvsAddress, sender: address) { (result) in
-            switch result {
-            case .success(let value):
-                if let address = value {
-                    completion(.success(result: address))
-                } else {
-                    completion(.failure(error: .walletNotInitiated))
-                }
-
-            case .failure(let error):
-                completion(.failure(error: .internalError(message: "LSK Wallet: fail to get address from KVS", error: error)))
+    func getWalletAddress(byAdamantAddress address: String) async throws -> String {
+        do {
+            let result = try await apiService.get(key: LskWalletService.kvsAddress, sender: address)
+            
+            guard let result = result else {
+                throw WalletServiceError.walletNotInitiated
             }
+            return result
+        } catch _ as ApiServiceError {
+            throw WalletServiceError.remoteServiceError(
+                message: "LSK Wallet: failed to get address from KVS"
+            )
         }
     }
 }
@@ -553,44 +570,62 @@ extension LskWalletService {
 
 // MARK: - Transactions
 extension LskWalletService {
-    func getTransactions(_ completion: @escaping (ApiServiceResult<[Transactions.TransactionModel]>) -> Void) {
-        if let address = self.lskWallet?.address, let transactionApi = serviceApi {
-            defaultDispatchQueue.async {
-                transactionApi.transactions(senderIdOrRecipientId: address, limit: 100, offset: 0, sort: APIRequest.Sort("timestamp", direction: .descending)) { (response) in
-                    switch response {
-                    case .success(response: let result):
-                        completion(.success(result))
-                        
-                    case .error(response: let error):
-                        completion(.failure(.internalError(message: error.message, error: nil)))
-                    }
+    func getTransactions(offset: UInt) async throws -> [Transactions.TransactionModel] {
+        guard let address = self.lskWallet?.address,
+              let transactionApi = serviceApi
+        else {
+            throw WalletServiceError.internalError(message: "LSK Wallet: not found", error: nil)
+        }
+        
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<[Transactions.TransactionModel], Error>) in
+            transactionApi.transactions(
+                senderIdOrRecipientId: address,
+                limit: 100,
+                offset: offset,
+                sort: APIRequest.Sort("timestamp", direction: .descending)
+            ) { (response) in
+                switch response {
+                case .success(response: let result):
+                    continuation.resume(returning: result)
+                    
+                case .error(response: let error):
+                    continuation.resume(throwing: WalletServiceError.remoteServiceError(message: error.message))
                 }
             }
-        } else {
-            completion(.failure(.internalError(message: "LSK Wallet: not found", error: nil)))
         }
     }
     
-    func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<Transactions.TransactionModel>) -> Void) {
-        guard let api = serviceApi else {
-            completion(ApiServiceResult.failure(ApiServiceError.networkError(error: AdamantError(message: "Problem with accessing LSK nodes, try later"))))
-            return
+    func getTransaction(by hash: String) async throws -> Transactions.TransactionModel {
+        guard !hash.isEmpty else {
+            throw ApiServiceError.internalError(message: "No hash", error: nil)
         }
         
-        defaultDispatchQueue.async {
+        guard let api = serviceApi else {
+            throw ApiServiceError.internalError(message: "Problem with accessing LSK nodes, try later", error: nil)
+        }
+        
+        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Transactions.TransactionModel, Error>) in
             api.transactions(id: hash, limit: 1, offset: 0) { (response) in
                 switch response {
                 case .success(response: let result):
                     if let transaction = result.first {
-                        completion(.success(transaction))
+                        continuation.resume(returning: transaction)
                     } else {
-                        completion(.failure(.internalError(message: "No transaction", error: nil)))
+                        continuation.resume(throwing: WalletServiceError.remoteServiceError(message: "No transaction")
+                        )
                     }
-                    break
                 case .error(response: let error):
-                    print("ERROR: " + error.message)
-                    completion(.failure(.internalError(message: error.message, error: nil)))
-                    break
+                    if error == .noNetwork {
+                        continuation.resume(
+                            throwing: ApiServiceError.networkError(error: error)
+                        )
+                    } else {
+                        continuation.resume(
+                            throwing: WalletServiceError.remoteServiceError(
+                                message: error.message
+                            )
+                        )
+                    }
                 }
             }
         }
@@ -604,7 +639,7 @@ extension LskWalletService: PrivateKeyGenerator {
     }
     
     var rowImage: UIImage? {
-        return #imageLiteral(resourceName: "wallet_lsk_row")
+        return #imageLiteral(resourceName: "lisk_wallet_row")
     }
     
     func generatePrivateKeyFor(passphrase: String) -> String? {

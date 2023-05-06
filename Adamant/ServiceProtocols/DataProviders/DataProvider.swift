@@ -15,12 +15,12 @@ enum State {
     case failedToUpdate(Error)
 }
 
-protocol DataProvider: AnyObject {
+protocol DataProvider: AnyObject, Actor {
     var state: State { get }
+    var stateObserver: Published<State>.Publisher { get }
     var isInitiallySynced: Bool { get }
     
-    func reload()
-    func update()
+    func reload() async
     func reset()
 }
 

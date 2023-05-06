@@ -21,7 +21,7 @@ enum URLScheme: String, Codable {
     }
 }
 
-class Node: Equatable, Codable {
+final class Node: Equatable, Codable {
     struct Status: Equatable, Codable {
         let ping: TimeInterval
         let wsEnabled: Bool
@@ -48,6 +48,13 @@ class Node: Equatable, Codable {
         self.scheme = scheme
         self.host = host
         self.port = port
+    }
+    
+    init(url: URL) {
+        let schemeRaw = url.scheme ?? "https"
+        self.scheme = URLScheme(rawValue: schemeRaw) ?? .https
+        self.host = url.host ?? ""
+        self.port = url.port
     }
     
     var scheme: URLScheme

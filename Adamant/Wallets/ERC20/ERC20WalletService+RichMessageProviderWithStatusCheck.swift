@@ -11,74 +11,74 @@ import web3swift
 import struct BigInt.BigUInt
 
 extension ERC20WalletService: RichMessageProviderWithStatusCheck {
-    func statusFor(transaction: RichMessageTransaction, completion: @escaping (WalletServiceResult<TransactionStatus>) -> Void) {
+    func statusInfoFor(transaction: RichMessageTransaction) async -> TransactionStatusInfo {
         guard let hash = transaction.richContent?[RichContentKeys.transfer.hash] else {
-            completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction hash", error: nil)))
-            return
+            return .init(sentDate: nil, status: .inconsistent)
         }
         
-        // MARK: Get transaction
-        self.getTransaction(by: hash) { result in
-            var status: TransactionStatus
-            var transactionDate: Date
-            
-            switch result {
-            case .success(result: let tx):
-                status = tx.transactionStatus ?? .pending
-                
-                guard status == .success, let date = transaction.date as Date? else {
-                    completion(.success(result: status))
-                    return
-                }
-                
-                transactionDate = date
-                
-                let start = transactionDate.addingTimeInterval(-60 * 5)
-                let end = transactionDate.addingTimeInterval(self.consistencyMaxTime)
-                let range = start...end
-                
-                // MARK: Check addresses
-                if transaction.isOutgoing {
-                    guard let id = self.ethWallet?.address, tx.senderAddress == id else {
-                        completion(.success(result: .warning))
-                        return
-                    }
-                } else {
-                    guard let id = self.ethWallet?.address, tx.to == id else {
-                        completion(.success(result: .warning))
-                        return
-                    }
-                }
-                
-                // MARK: Check dates
-                guard range.contains(transaction.dateValue ?? Date()) else {
-                    completion(.success(result: .warning))
-                    return
-                }
-                
-                // MARK: Compare amounts
-                guard let raw = transaction.richContent?[RichContentKeys.transfer.amount], let reportedValue = AdamantBalanceFormat.deserializeBalance(from: raw) else {
-                    completion(.success(result: .warning))
-                    return
-                }
-                
-                let min = reportedValue - reportedValue*0.005
-                let max = reportedValue + reportedValue*0.005
-                
-                guard (min...max).contains(tx.value ?? 0) else {
-                    completion(.success(result: .warning))
-                    return
-                }
-                
-                completion(.success(result: .success))
-                
-            case .failure(error: let error):
-                guard transaction.transactionStatus == .notInitiated else {
-                    completion(.failure(error: error))
-                    return
-                }
-                completion(.success(result: .pending))
+        let erc20Transaction: EthTransaction
+        
+        do {
+            erc20Transaction = try await getTransaction(by: hash)
+        } catch {
+            switch error {
+            case WalletServiceError.networkError:
+                return .init(sentDate: nil, status: .noNetwork)
+            default:
+                return .init(sentDate: nil, status: .pending)
             }
         }
+        
+        return .init(
+            sentDate: erc20Transaction.date,
+            status: getStatus(
+                erc20Transaction: erc20Transaction,
+                transaction: transaction
+            )
+        )
+    }
+}
+
+private extension ERC20WalletService {
+    func getStatus(
+        erc20Transaction: EthTransaction,
+        transaction: RichMessageTransaction
+    ) -> TransactionStatus {
+        let status = erc20Transaction.receiptStatus.asTransactionStatus()
+        guard status == .success else { return status }
+        
+        // MARK: Check addresses
+        if transaction.isOutgoing {
+            guard
+                let id = ethWallet?.address,
+                erc20Transaction.senderAddress == id
+            else {
+                return .inconsistent
+            }
+        } else {
+            guard
+                let id = ethWallet?.address,
+                erc20Transaction.to == id
+            else {
+                return .inconsistent
+            }
+        }
+        
+        // MARK: Compare amounts
+        guard
+            let raw = transaction.richContent?[RichContentKeys.transfer.amount],
+            let reportedValue = AdamantBalanceFormat.deserializeBalance(from: raw)
+        else {
+            return .inconsistent
+        }
+        
+        let min = reportedValue - reportedValue*0.005
+        let max = reportedValue + reportedValue*0.005
+        
+        guard (min...max).contains(erc20Transaction.value ?? 0) else {
+            return .inconsistent
+        }
+        
+        return .success
     }
 }

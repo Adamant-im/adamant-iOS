@@ -8,41 +8,29 @@
 
 import Foundation
 import MessageKit
-
-enum CellSource {
-    case `class`(type: UICollectionViewCell.Type)
-    case nib(nib: UINib)
-}
+import UIKit
 
 protocol RichMessageProvider: AnyObject {
     /// Lowercased!!
     static var richMessageType: String { get }
     
+    // MARK: Transactions fetch info
+    
+    var newPendingInterval: TimeInterval { get }
+    var oldPendingInterval: TimeInterval { get }
+    var registeredInterval: TimeInterval { get }
+    var newPendingAttempts: Int { get }
+    var oldPendingAttempts: Int { get }
+    var consistencyMaxTime: Double { get }
+    
     var dynamicRichMessageType: String { get }
     
-    var cellIdentifierSent: String { get }
-    var cellIdentifierReceived: String { get }
-    var cellSource: CellSource? { get }
+    var tokenSymbol: String { get }
+    var tokenLogo: UIImage { get }
     
     // MARK: Events
-    func richMessageTapped(for transaction: RichMessageTransaction, at indexPath: IndexPath, in chat: ChatViewController)
+    func richMessageTapped(for transaction: RichMessageTransaction, in chat: ChatViewController)
     
     // MARK: Chats list
     func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString
-    
-    // MARK: MessageKit
-    func cellSizeCalculator(for messagesCollectionViewFlowLayout: MessagesCollectionViewFlowLayout) -> CellSizeCalculator
-    func cell(for message: MessageType, isFromCurrentSender: Bool, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell
-}
-
-protocol RichMessageProviderWithStatusCheck: RichMessageProvider {
-    func statusFor(transaction: RichMessageTransaction, completion: @escaping (WalletServiceResult<TransactionStatus>) -> Void)
-    
-    var delayBetweenChecks: TimeInterval { get }
-}
-
-extension RichMessageProviderWithStatusCheck {
-    var delayBetweenChecks: TimeInterval {
-        return 30.0
-    }
 }

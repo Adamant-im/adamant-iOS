@@ -9,6 +9,7 @@
 import Foundation
 import web3swift
 import struct BigInt.BigUInt
+import Web3Core
 
 struct EthResponse {
     let status: Int
@@ -159,8 +160,18 @@ extension EthTransaction: TransactionDetails {
 }
 
 // MARK: - From EthereumTransaction
-extension EthereumTransaction {
-    func asEthTransaction(date: Date?, gasUsed: BigUInt?, blockNumber: String?, confirmations: String?, receiptStatus: TransactionReceipt.TXStatus, isOutgoing: Bool, hash: String? = nil, for token: ERC20Token? = nil) -> EthTransaction {
+extension CodableTransaction {
+    func asEthTransaction(
+        date: Date?,
+        gasUsed: BigUInt?,
+        gasPrice: BigUInt?,
+        blockNumber: String?,
+        confirmations: String?,
+        receiptStatus: TransactionReceipt.TXStatus,
+        isOutgoing: Bool,
+        hash: String? = nil,
+        for token: ERC20Token? = nil
+    ) -> EthTransaction {
         
         var recipient = to
         var txValue: BigUInt? = value
@@ -186,23 +197,27 @@ extension EthereumTransaction {
         
         let feePrice: BigUInt
         if type == .eip1559 {
-            feePrice = (parameters.maxFeePerGas ?? BigUInt(0)) + (parameters.maxPriorityFeePerGas ?? BigUInt(0))
+            feePrice = (maxFeePerGas ?? BigUInt(0)) + (maxPriorityFeePerGas ?? BigUInt(0))
         } else {
-            feePrice = parameters.gasPrice ?? BigUInt(0)
+            feePrice = gasPrice ?? BigUInt(0)
         }
-
-        return EthTransaction(date: date,
-                              hash: hash ?? txHash ?? "",
-                              value: txValue?.asDecimal(exponent: exponent),
-                              from: sender?.address ?? "",
-                              to: recipient.address,
-                              gasUsed: gasUsed?.asDecimal(exponent: 0),
-                              gasPrice: feePrice.asDecimal(exponent: EthWalletService.currencyExponent),
-                              confirmations: confirmations,
-                              isError: receiptStatus != .failed,
-                              receiptStatus: receiptStatus,
-                              blockNumber: blockNumber,
-                              isOutgoing: isOutgoing)
+        
+        let gasPrice = gasPrice ?? feePrice
+        
+        return EthTransaction(
+            date: date,
+            hash: hash ?? txHash ?? "",
+            value: txValue?.asDecimal(exponent: exponent),
+            from: sender?.address ?? "",
+            to: recipient.address,
+            gasUsed: gasUsed?.asDecimal(exponent: 0),
+            gasPrice: gasPrice.asDecimal(exponent: EthWalletService.currencyExponent),
+            confirmations: confirmations,
+            isError: receiptStatus != .failed,
+            receiptStatus: receiptStatus,
+            blockNumber: blockNumber,
+            isOutgoing: isOutgoing
+        )
     }
 }
 

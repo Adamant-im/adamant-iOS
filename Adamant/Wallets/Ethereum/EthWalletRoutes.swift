@@ -21,14 +21,14 @@ extension AdamantScene.Wallets {
         
         /// Send money
         static let transfer = AdamantScene(identifier: "EthTransferViewController") { r in
-            let c = EthTransferViewController()
-            c.dialogService = r.resolve(DialogService.self)
-            c.chatsProvider = r.resolve(ChatsProvider.self)
-            c.accountService = r.resolve(AccountService.self)
-            c.accountsProvider = r.resolve(AccountsProvider.self)
-            c.router = r.resolve(Router.self)
-            c.currencyInfoService = r.resolve(CurrencyInfoService.self)
-            return c
+            EthTransferViewController(
+                chatsProvider: r.resolve(ChatsProvider.self)!,
+                accountService: r.resolve(AccountService.self)!,
+                accountsProvider: r.resolve(AccountsProvider.self)!,
+                dialogService: r.resolve(DialogService.self)!,
+                router: r.resolve(Router.self)!,
+                currencyInfoService: r.resolve(CurrencyInfoService.self)!
+            )
         }
         
         /// List of Ethereum transactions
@@ -41,9 +41,10 @@ extension AdamantScene.Wallets {
         
         /// Ethereum transaction details
         static let transactionDetails = AdamantScene(identifier: "TransactionDetailsViewControllerBase") { r in
-            let c = EthTransactionDetailsViewController()
-            c.dialogService = r.resolve(DialogService.self)
-            c.currencyInfo = r.resolve(CurrencyInfoService.self)
+            let c = EthTransactionDetailsViewController(
+                dialogService: r.resolve(DialogService.self)!,
+                currencyInfo: r.resolve(CurrencyInfoService.self)!
+            )
             return c
         }
     }

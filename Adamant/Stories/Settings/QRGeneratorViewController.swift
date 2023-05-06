@@ -62,10 +62,7 @@ class QRGeneratorViewController: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .always
-        }
-        
+        navigationItem.largeTitleDisplayMode = .always
         navigationItem.title = String.adamantLocalized.qrGenerator.title
         navigationOptions = .Disabled
         
@@ -191,7 +188,7 @@ extension QRGeneratorViewController {
             setQr(image: qr)
             
         case .failure(let error):
-            dialogService.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.qrGenerator.internalError, error.localizedDescription), error: error)
+            dialogService.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.qrGenerator.internalError, error.localizedDescription), supportEmail: true, error: error)
         }
     }
     
