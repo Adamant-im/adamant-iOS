@@ -40,14 +40,18 @@ final class ChatTransactionContentView: UIView {
     
     private var replyMessageLabel = UILabel()
     
+    private lazy var colorView: UIView = {
+        let view = UIView()
+        view.clipsToBounds = true
+        view.backgroundColor = .adamant.active
+        return view
+    }()
+    
     private lazy var replyView: UIView = {
         let view = UIView()
         view.backgroundColor = .lightGray.withAlphaComponent(0.15)
         view.layer.cornerRadius = 5
-        
-        let colorView = UIView()
-        colorView.layer.cornerRadius = 2
-        colorView.backgroundColor = .adamant.active
+        view.clipsToBounds = true
         
         view.addSubview(colorView)
         view.addSubview(replyMessageLabel)
@@ -61,7 +65,7 @@ final class ChatTransactionContentView: UIView {
         replyMessageLabel.snp.makeConstraints {
             $0.centerY.equalToSuperview()
             $0.trailing.equalToSuperview().offset(-5)
-            $0.leading.equalTo(colorView.snp.trailing).offset(3)
+            $0.leading.equalTo(colorView.snp.trailing).offset(6)
         }
         view.snp.makeConstraints { make in
             make.height.equalTo(replyViewDynamicHeight)

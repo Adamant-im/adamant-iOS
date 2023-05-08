@@ -23,14 +23,18 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     
     static let replyViewHeight: CGFloat = 25
     
+    private lazy var colorView: UIView = {
+        let view = UIView()
+        view.clipsToBounds = true
+        view.backgroundColor = .adamant.active
+        return view
+    }()
+    
     private lazy var replyView: UIView = {
         let view = UIView()
         view.backgroundColor = .lightGray.withAlphaComponent(0.15)
-        view.layer.cornerRadius = 5
-        
-        let colorView = UIView()
-        colorView.layer.cornerRadius = 2
-        colorView.backgroundColor = .adamant.active
+        view.layer.cornerRadius = 8
+        view.clipsToBounds = true
         
         view.addSubview(colorView)
         view.addSubview(replyMessageLabel)
@@ -42,7 +46,7 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         replyMessageLabel.snp.makeConstraints {
             $0.centerY.equalToSuperview()
             $0.trailing.equalToSuperview().offset(-5)
-            $0.leading.equalTo(colorView.snp.trailing).offset(3)
+            $0.leading.equalTo(colorView.snp.trailing).offset(6)
         }
         view.snp.makeConstraints { make in
             make.height.equalTo(Self.replyViewHeight)
@@ -53,7 +57,7 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     private lazy var verticalStack: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [replyView, messageLabel])
         stack.axis = .vertical
-        stack.spacing = 10
+        stack.spacing = 6
         return stack
     }()
     
@@ -83,6 +87,8 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     
     var actionHandler: (ChatAction) -> Void = { _ in }
     var subscription: AnyCancellable?
+    
+    private var trailingReplyViewOffset: CGFloat = 4
     
     // MARK: - Methods
     
@@ -122,7 +128,8 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         replyMessageLabel.numberOfLines = 1
         verticalStack.snp.makeConstraints {
             $0.top.bottom.equalToSuperview().inset(8)
-            $0.leading.trailing.equalToSuperview().inset(8)
+            $0.leading.equalToSuperview().inset(8)
+            $0.trailing.equalToSuperview().offset(-14)
         }
     }
     
@@ -157,11 +164,10 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     func updateFrames() {
         let size = messageContainerView.frame.size
         messageContainerView.frame = CGRect(
-            origin: messageContainerView.frame.origin,
-            size: CGSize(
-                width: size.width,
-                height: model.contentHeight(for: size.width)
-            )
+            x: messageContainerView.frame.origin.x - trailingReplyViewOffset,
+            y: messageContainerView.frame.origin.y,
+            width: size.width + trailingReplyViewOffset,
+            height: model.contentHeight(for: size.width)
         )
         
         let origin = CGPoint(
