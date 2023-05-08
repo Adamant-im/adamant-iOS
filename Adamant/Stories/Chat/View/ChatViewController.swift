@@ -16,7 +16,7 @@ import SnapKit
 final class ChatViewController: MessagesViewController {
     typealias SpinnerCell = MessageCellWrapper<SpinnerView>
     typealias TransactionCell = CollectionCellWrapper<ChatTransactionContainerView>
-    typealias SendTransaction = (UIViewController & ComplexTransferViewControllerDelegate) -> Void
+    typealias SendTransaction = ( _ parentVC: UIViewController & ComplexTransferViewControllerDelegate, _ replyToMessageId: String?) -> Void
     
     // MARK: Dependencies
     
@@ -70,7 +70,10 @@ final class ChatViewController: MessagesViewController {
         self.richMessageProviders = richMessageProviders
         self.admService = admService
         super.init(nibName: nil, bundle: nil)
-        inputBar.onAttachmentButtonTap = { [weak self] in self.map { sendTransaction($0) } }
+        inputBar.onAttachmentButtonTap = { [weak self] in
+            self.map { sendTransaction($0, viewModel.replyMessage?.id) }
+            self?.processSwipeMessage(nil)
+        }
     }
     
     required init?(coder: NSCoder) {

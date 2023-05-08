@@ -32,7 +32,7 @@ class ComplexTransferViewController: UIViewController {
             navigationItem.title = partner?.chatroom?.getName(addressBookService: addressBookService)
         }
     }
-    var replyToMessageId: String? = "1199913720300790117"
+    var replyToMessageId: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
