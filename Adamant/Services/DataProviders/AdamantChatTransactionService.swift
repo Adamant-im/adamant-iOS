@@ -110,7 +110,8 @@ actor AdamantChatTransactionService: ChatTransactionService {
                     if let data = decodedMessage.data(using: String.Encoding.utf8),
                        let richContent = RichMessageTools.richContent(from: data),
                        let type = richContent[RichContentKeys.type] as? String,
-                       type != RichContentKeys.reply.reply {
+                       type != RichContentKeys.reply.reply,
+                       richContent[RichContentKeys.reply.replyToId] == nil {
                         let trs = RichMessageTransaction(
                             entity: RichMessageTransaction.entity(),
                             insertInto: context
@@ -127,7 +128,35 @@ actor AdamantChatTransactionService: ChatTransactionService {
                     
                     if let data = decodedMessage.data(using: String.Encoding.utf8),
                        let richContent = RichMessageTools.richContent(from: data),
-                       richContent[RichContentKeys.reply.replyToId] != nil {
+                       richContent[RichContentKeys.reply.replyToId] != nil,
+                       transaction.amount > 0 {
+                        
+                        let trs: TransferTransaction
+                        
+                        if let trsDB = getTransfer(
+                            id: String(transaction.id),
+                            context: context
+                        ) {
+                            trs = trsDB
+                        } else {
+                            trs = TransferTransaction(
+                                entity: TransferTransaction.entity(),
+                                insertInto: context
+                            )
+                        }
+                        
+                        trs.comment = richContent[RichContentKeys.reply.replyMessage] as? String
+                        trs.replyToId = richContent[RichContentKeys.reply.replyToId] as? String
+                        
+                        messageTransaction = trs
+                        print("find adm rich, id=\(trs.replyToId), com = \(trs.comment)")
+                        break
+                    }
+                        
+                    if let data = decodedMessage.data(using: String.Encoding.utf8),
+                       let richContent = RichMessageTools.richContent(from: data),
+                       richContent[RichContentKeys.reply.replyToId] != nil,
+                       transaction.amount <= 0 {
                         let trs = RichMessageTransaction(
                             entity: RichMessageTransaction.entity(),
                             insertInto: context

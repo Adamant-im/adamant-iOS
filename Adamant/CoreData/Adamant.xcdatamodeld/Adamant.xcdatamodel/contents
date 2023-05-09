@@ -67,5 +67,7 @@
     </entity>
     <entity name="TransferTransaction" representedClassName="TransferTransaction" parentEntity="ChatTransaction" syncable="YES">
         <attribute name="comment" optional="YES" attributeType="String"/>
+        <attribute name="decodedReplyMessage" optional="YES" attributeType="String"/>
+        <attribute name="replyToId" optional="YES" attributeType="String"/>
     </entity>
 </model>

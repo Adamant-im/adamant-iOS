@@ -294,7 +294,8 @@ protocol WalletServiceSimpleSend: WalletServiceWithSend {
     func sendMoney(
         recipient: String,
         amount: Decimal,
-        comments: String
+        comments: String,
+        replyToMessageId: String?
     ) async throws -> TransactionDetails
 }
 

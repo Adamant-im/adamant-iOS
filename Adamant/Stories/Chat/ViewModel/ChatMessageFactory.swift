@@ -165,7 +165,7 @@ private extension ChatMessageFactory {
             return .default
         }
         
-        let decodedMessage = transaction.getRichValue(for: RichContentKeys.reply.decodedMessage) ?? "..."
+        let decodedMessage = transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) ?? "..."
         let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
         
         return .reply(.init(
@@ -187,7 +187,7 @@ private extension ChatMessageFactory {
         guard let transfer = transaction.transfer else { return .default }
         let id = transaction.chatMessageId ?? ""
         
-        let decodedMessage = transaction.getRichValue(for: RichContentKeys.reply.decodedMessage) ?? "..."
+        let decodedMessage = transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) ?? "..."
         let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
         let replyId = transaction.getRichValue(for: RichContentKeys.reply.replyToId) ?? ""
         
@@ -222,6 +222,10 @@ private extension ChatMessageFactory {
     ) -> ChatMessage.Content {
         let id = transaction.chatMessageId ?? ""
         
+        let decodedMessage = transaction.decodedReplyMessage ?? "..."
+        let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
+        let replyId = transaction.replyToId ?? ""
+        
         return .transaction(.init(value: .init(
             id: id,
             isFromCurrentSender: isFromCurrentSender,
@@ -239,9 +243,9 @@ private extension ChatMessageFactory {
                 comment: transaction.comment,
                 backgroundColor: backgroundColor,
                 animationId: animationId,
-                isReply: false,
-                replyMessage: NSAttributedString(string: ""),
-                replyId: ""
+                isReply: !replyId.isEmpty,
+                replyMessage: decodedMessageMarkDown,
+                replyId: replyId
             ),
             status: transaction.statusEnum.toTransactionStatus()
         )))

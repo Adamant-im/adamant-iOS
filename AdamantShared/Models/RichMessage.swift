@@ -186,7 +186,7 @@ extension RichContentKeys {
         static let reply = "reply"
         static let replyToId = "replyto_id"
         static let replyMessage = "reply_message"
-        static let decodedMessage = "decodedMessage"
+        static let decodedReplyMessage = "decodedMessage"
     }
 }
 

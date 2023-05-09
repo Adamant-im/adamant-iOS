@@ -16,7 +16,8 @@ actor AdamantRichTransactionReplyService: NSObject, RichTransactionReplyService 
     private let accountService: AccountService
     private var richMessageProvider: [String: RichMessageProvider] = [:]
     
-    private lazy var controller = getRichTransactionsController()
+    private lazy var richController = getRichTransactionsController()
+    private lazy var transferController = getTransferController()
     private let unknownErrorMessage = "UNKNOWN"
 
     init(
@@ -35,9 +36,13 @@ actor AdamantRichTransactionReplyService: NSObject, RichTransactionReplyService 
     }
     
     func startObserving() {
-        controller.delegate = self
-        try? controller.performFetch()
-        controller.fetchedObjects?.forEach( update(transaction:) )
+        richController.delegate = self
+        try? richController.performFetch()
+        richController.fetchedObjects?.forEach( update(transaction:) )
+        
+        transferController.delegate = self
+        try? transferController.performFetch()
+        transferController.fetchedObjects?.forEach( update(transaction:) )
     }
     
     func makeRichMessageProviders() -> [String: RichMessageProvider] {
@@ -55,24 +60,42 @@ extension AdamantRichTransactionReplyService: NSFetchedResultsControllerDelegate
         _: NSFetchedResultsController<NSFetchRequestResult>,
         didChange object: Any,
         at _: IndexPath?,
-        for type: NSFetchedResultsChangeType,
+        for type_: NSFetchedResultsChangeType,
         newIndexPath _: IndexPath?
     ) {
-        guard let transaction = object as? RichMessageTransaction,
-              transaction.isReply
-        else {
-            return
+        if let transaction = object as? RichMessageTransaction,
+           transaction.isReply {
+            Task { await processCoreDataChange(type: type_, transaction: transaction) }
         }
         
-        Task { await processCoreDataChange(type: type, transaction: transaction) }
+        if let transaction = object as? TransferTransaction,
+           transaction.replyToId != nil {
+            Task { await processCoreDataChange(type: type_, transaction: transaction) }
+        }
     }
 }
 
 private extension AdamantRichTransactionReplyService {
+    func update(transaction: TransferTransaction) {
+        Task {
+            guard let id = transaction.replyToId,
+                  transaction.decodedReplyMessage == nil
+            else { return }
+            
+            let transactionReply = try await getReplyTransaction(by: UInt64(id) ?? 0)
+            let message = try getReplyMessage(by: transactionReply)
+            
+            setReplyMessage(
+                for: transaction,
+                message: message
+            )
+        }
+    }
+    
     func update(transaction: RichMessageTransaction) {
         Task {
             guard let id = transaction.getRichValue(for: RichContentKeys.reply.replyToId),
-                  transaction.getRichValue(for:RichContentKeys.reply.decodedMessage) == nil
+                  transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) == nil
             else { return }
             
             let transactionReply = try await getReplyTransaction(by: UInt64(id) ?? 0)
@@ -96,11 +119,6 @@ private extension AdamantRichTransactionReplyService {
             throw ApiServiceError.accountNotFound
         }
         
-        guard let chat = transaction.asset.chat else {
-            let message = "\(AdmWalletService.currencySymbol) \(transaction.amount)"
-            return message
-        }
-
         let isOut = transaction.senderId == address
         
         let publicKey: String? = isOut
@@ -110,6 +128,11 @@ private extension AdamantRichTransactionReplyService {
         let transactionStatus = isOut
         ? String.adamantLocalized.chat.transactionSent
         : String.adamantLocalized.chat.transactionReceived
+        
+        guard let chat = transaction.asset.chat else {
+            let message = "\(transactionStatus) \(AdmWalletService.currencySymbol) \(transaction.amount)"
+            return message
+        }
         
         guard let publicKey = publicKey else { return unknownErrorMessage }
         
@@ -137,7 +160,16 @@ private extension AdamantRichTransactionReplyService {
         case .richMessage:
             if let data = decodedMessage.data(using: String.Encoding.utf8),
                let richContent = RichMessageTools.richContent(from: data),
-               let type = richContent[RichContentKeys.type] as? String,
+               transaction.amount > 0 {
+                let comment = richContent[RichContentKeys.reply.replyMessage] as? String
+                let humanType = AdmWalletService.currencySymbol
+                
+                message = "\(transactionStatus) \(transaction.amount) \(humanType)\(comment ?? "")"
+                break
+            }
+            
+            if let data = decodedMessage.data(using: String.Encoding.utf8),
+               let richContent = RichMessageTools.richContent(from: data),
                let transfer = RichMessageTransfer(content: richContent) {
                 let comment = !transfer.comments.isEmpty
                 ? ": \(transfer.comments)"
@@ -145,14 +177,18 @@ private extension AdamantRichTransactionReplyService {
                 let humanType = richMessageProvider[transfer.type]?.tokenSymbol ?? transfer.type
                 
                 message = "\(transactionStatus) \(transfer.amount) \(humanType)\(comment)"
-            } else if let data = decodedMessage.data(using: String.Encoding.utf8),
+                break
+            }
+            
+            if let data = decodedMessage.data(using: String.Encoding.utf8),
                       let richContent = RichMessageTools.richContent(from: data),
                       let replyMessage = richContent[RichContentKeys.reply.replyMessage] as? String {
                 
                 message = replyMessage
-            } else {
-                message = decodedMessage
+                break
             }
+            
+            message = decodedMessage
         }
         
         return message
@@ -170,12 +206,41 @@ private extension AdamantRichTransactionReplyService {
         
         let transaction = privateContext.object(with: transaction.objectID)
             as? RichMessageTransaction
-        transaction?.richContent?[RichContentKeys.reply.decodedMessage] = message
+        transaction?.richContent?[RichContentKeys.reply.decodedReplyMessage] = message
+        try? privateContext.save()
+    }
+    
+    func setReplyMessage(
+        for transaction: TransferTransaction,
+        message: String
+    ) {
+        let privateContext = NSManagedObjectContext(
+            concurrencyType: .privateQueueConcurrencyType
+        )
+
+        privateContext.parent = coreDataStack.container.viewContext
+        
+        let transaction = privateContext.object(with: transaction.objectID)
+            as? TransferTransaction
+        transaction?.decodedReplyMessage = message
         try? privateContext.save()
     }
 
     // MARK: Core Data
 
+    func processCoreDataChange(type: NSFetchedResultsChangeType, transaction: TransferTransaction) {
+        switch type {
+        case .insert, .update:
+            update(transaction: transaction)
+        case .delete:
+            break
+        case .move:
+            break
+        @unknown default:
+            break
+        }
+    }
+    
     func processCoreDataChange(type: NSFetchedResultsChangeType, transaction: RichMessageTransaction) {
         switch type {
         case .insert, .update:
@@ -192,6 +257,20 @@ private extension AdamantRichTransactionReplyService {
     func getRichTransactionsController() -> NSFetchedResultsController<RichMessageTransaction> {
         let request: NSFetchRequest<RichMessageTransaction> = NSFetchRequest(
             entityName: RichMessageTransaction.entityName
+        )
+
+        request.sortDescriptors = []
+        return NSFetchedResultsController(
+            fetchRequest: request,
+            managedObjectContext: coreDataStack.container.viewContext,
+            sectionNameKeyPath: nil,
+            cacheName: nil
+        )
+    }
+    
+    func getTransferController() -> NSFetchedResultsController<TransferTransaction> {
+        let request: NSFetchRequest<TransferTransaction> = NSFetchRequest(
+            entityName: TransferTransaction.entityName
         )
 
         request.sortDescriptors = []

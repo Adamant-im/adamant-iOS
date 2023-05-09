@@ -17,5 +17,6 @@ extension TransferTransaction {
     }
 
     @NSManaged public var comment: String?
-
+    @NSManaged public var replyToId: String?
+    @NSManaged public var decodedReplyMessage: String?
 }
