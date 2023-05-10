@@ -58,7 +58,8 @@ final class ChatViewModel: NSObject {
     private(set) var sender = ChatSender.default
     private(set) var chatroom: Chatroom?
     private(set) var chatTransactions: [ChatTransaction] = []
-    
+    private var tempCancellables = Set<AnyCancellable>()
+
     var tempOffsets: [String] = []
 
     let didTapTransfer = ObservableSender<String>()
@@ -389,8 +390,10 @@ final class ChatViewModel: NSObject {
                     )
                 }
                 
+                await waitForMessage(withId: message.replyId)
+                
                 scrollToMessage = (message.replyId, message.id)
-                animationIds[message.replyId] = UUID().uuidString
+                // animationIds[message.replyId] = UUID().uuidString
                 
                 dialog.send(.progress(false))
             } catch {
@@ -399,6 +402,21 @@ final class ChatViewModel: NSObject {
                 dialog.send(.richError(error))
             }
         }.stored(in: tasksStorage)
+    }
+        
+    func waitForMessage(withId messageId: String) async {
+        guard !messages.contains(where: { $0.messageId == messageId }) else {
+            return
+        }
+        
+        await withUnsafeContinuation { continuation in
+            $messages
+                .filter { $0.contains(where: { $0.messageId == messageId }) }
+                .sink { [weak self] _ in
+                    self?.tempCancellables.removeAll()
+                    continuation.resume()
+                }.store(in: &tempCancellables)
+        }
     }
 }
 
