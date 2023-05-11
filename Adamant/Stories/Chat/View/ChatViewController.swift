@@ -302,10 +302,7 @@ private extension ChatViewController {
                 else { return }
                 
                 if self?.isScrollPositionNearlyTheBottom != true {
-                    if let index = self?.viewModel.tempOffsets.firstIndex(of: fromId) {
-                        self?.viewModel.tempOffsets.remove(at: index)
-                    }
-                    self?.viewModel.tempOffsets.append(fromId)
+                    self?.viewModel.appendTempOffset(fromId, toId: toId)
                 }
                 self?.scrollToPosition(.messageId(toId), animated: true)
             }
@@ -419,7 +416,8 @@ private extension ChatViewController {
     func makeScrollDownButton() -> ChatScrollDownButton {
         let button = ChatScrollDownButton()
         button.action = { [weak self] in
-            guard let id = self?.viewModel.tempOffsets.popLast() else {
+            guard let id = self?.viewModel.getTempOffset(visibleIndex: self?.messagesCollectionView.indexPathsForVisibleItems.last?.section)
+            else {
                 self?.messagesCollectionView.scrollToBottom(animated: true)
                 return
             }

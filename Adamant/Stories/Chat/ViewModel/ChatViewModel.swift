@@ -57,6 +57,7 @@ final class ChatViewModel: NSObject {
     private(set) var chatroom: Chatroom?
     private(set) var chatTransactions: [ChatTransaction] = []
     private var tempCancellables = Set<AnyCancellable>()
+    private var minDiffCountForOffset = 5
 
     var tempOffsets: [String] = []
     var needToAnimateCellIndex: Int?
@@ -416,6 +417,35 @@ final class ChatViewModel: NSObject {
                     continuation.resume()
                 }.store(in: &tempCancellables)
         }
+    }
+}
+
+extension ChatViewModel {
+    func getTempOffset(visibleIndex: Int?) -> String? {
+        let lastId = tempOffsets.popLast()
+        
+        guard let visibleIndex = visibleIndex,
+              let index = messages.firstIndex(where: { $0.messageId == lastId })
+        else {
+            return lastId
+        }
+        
+        return index > visibleIndex ? lastId : nil
+    }
+    
+    func appendTempOffset(_ id: String, toId: String) {
+        guard let indexFrom = messages.firstIndex(where: { $0.messageId == id }),
+              let indexTo = messages.firstIndex(where: { $0.messageId == toId }),
+              (indexFrom - indexTo) >= minDiffCountForOffset
+        else {
+            return
+        }
+        
+        if let index = tempOffsets.firstIndex(of: id) {
+            tempOffsets.remove(at: index)
+        }
+        
+        tempOffsets.append(id)
     }
 }
 
