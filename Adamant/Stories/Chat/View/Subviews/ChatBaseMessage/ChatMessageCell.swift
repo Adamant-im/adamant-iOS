@@ -23,11 +23,21 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         didSet {
             guard model != oldValue else { return }
             swipeView.update(model)
+            
             let isSelected = oldValue.animationId != model.animationId
             && !model.animationId.isEmpty
             && oldValue.id == model.id
             && !model.id.isEmpty
+            && !oldValue.id.isEmpty
             
+            if isSelected {
+                messageContainerView.startBlinkAnimation()
+            }
+        }
+    }
+    
+    override var isSelected: Bool {
+        didSet {
             if isSelected {
                 messageContainerView.startBlinkAnimation()
             }

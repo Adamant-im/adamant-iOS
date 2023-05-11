@@ -48,6 +48,12 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
         return view
     }()
     
+    var isSelected: Bool = false {
+        didSet {
+            contentView.isSelected = isSelected
+        }
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()

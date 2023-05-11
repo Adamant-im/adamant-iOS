@@ -78,7 +78,16 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
             && !model.animationId.isEmpty
             && oldValue.id == model.id
             && !model.id.isEmpty
+            && !oldValue.id.isEmpty
             
+            if isSelected {
+                messageContainerView.startBlinkAnimation()
+            }
+        }
+    }
+    
+    override var isSelected: Bool {
+        didSet {
             if isSelected {
                 messageContainerView.startBlinkAnimation()
             }

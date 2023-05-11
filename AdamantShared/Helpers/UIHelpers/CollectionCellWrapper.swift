@@ -25,6 +25,17 @@ final class CollectionCellWrapper<View: ReusableView>: UICollectionViewCell {
     override func prepareForReuse() {
         wrappedView.prepareForReuse()
     }
+    
+    override var isSelected: Bool {
+        didSet {
+            guard let view = wrappedView as? ChatTransactionContainerView else {
+                wrappedView.startBlinkAnimation()
+                return
+            }
+            
+            view.isSelected = isSelected
+        }
+    }
 }
 
 private extension CollectionCellWrapper {

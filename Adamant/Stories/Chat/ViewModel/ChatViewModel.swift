@@ -38,10 +38,8 @@ final class ChatViewModel: NSObject {
     private var isLoading = false
     private var animationIds: [String: String] = [:] {
         didSet {
-            animationIds.forEach { (key, value) in
-                guard let index = messages.firstIndex(where: { $0.messageId == key })
-                else { return }
-                messages[index].animationId = value
+            messages.indices.forEach {
+                messages[$0].animationId = animationIds[messages[$0].id] ?? ""
             }
         }
     }
@@ -61,6 +59,7 @@ final class ChatViewModel: NSObject {
     private var tempCancellables = Set<AnyCancellable>()
 
     var tempOffsets: [String] = []
+    var needToAnimateCellIndex: Int?
 
     let didTapTransfer = ObservableSender<String>()
     let dialog = ObservableSender<ChatDialog>()
@@ -393,7 +392,7 @@ final class ChatViewModel: NSObject {
                 await waitForMessage(withId: message.replyId)
                 
                 scrollToMessage = (message.replyId, message.id)
-                // animationIds[message.replyId] = UUID().uuidString
+               // animationIds[message.replyId] = UUID().uuidString
                 
                 dialog.send(.progress(false))
             } catch {

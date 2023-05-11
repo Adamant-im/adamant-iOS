@@ -14,12 +14,11 @@ struct ChatMessage: Identifiable, Equatable {
     let sentDate: Date
     let senderModel: ChatSender
     let status: Status
-    let content: Content
+    var content: Content
     let backgroundColor: ChatMessageBackgroundColor
     let bottomString: ComparableAttributedString?
     let dateHeader: ComparableAttributedString?
     let topSpinnerOn: Bool
-    var animationId: String
     
     static let `default` = Self(
         id: "",
@@ -30,8 +29,7 @@ struct ChatMessage: Identifiable, Equatable {
         backgroundColor: .failed,
         bottomString: nil,
         dateHeader: nil,
-        topSpinnerOn: false,
-        animationId: ""
+        topSpinnerOn: false
     )
 }
 
@@ -49,11 +47,11 @@ extension ChatMessage {
     }
     
     enum Content: Equatable {
-        case message(ComparableAttributedString)
+        case message(EqualWrapper<ChatMessageCell.Model>)
         case transaction(EqualWrapper<ChatTransactionContainerView.Model>)
-		case reply(ChatMessageReplyCell.Model)
+		case reply(EqualWrapper<ChatMessageReplyCell.Model>)
         
-        static let `default` = Self.message(.init(string: .init()))
+        static let `default` = Self.message(.init(value: .default))
     }
 }
 
@@ -63,14 +61,14 @@ extension ChatMessage: MessageType {
     
     var kind: MessageKind {
         switch content {
-        case let .message(text):
-            return .attributedText(text.string)
+        case let .message(model):
+            return .attributedText(model.value.text)
         case let .transaction(model):
             return .custom(model)
         case let .reply(model):
-            let message = model.message.string.count > model.messageReply.string.count
-            ? model.message
-            : model.messageReply
+            let message = model.value.message.string.count > model.value.messageReply.string.count
+            ? model.value.message
+            : model.value.messageReply
             return .attributedText(message)
         }
     }
@@ -84,6 +82,38 @@ extension MessageType {
         } else {
             assertionFailure("Incorrect type")
             return .default
+        }
+    }
+}
+
+extension ChatMessage {
+    var animationId: String {
+        get {
+            switch content {
+            case let .message(model):
+                return model.value.animationId
+            case let .reply(model):
+                return model.value.animationId
+            case let .transaction(model):
+                return model.value.content.animationId
+            }
+        }
+        
+        set {
+            switch content {
+            case let .message(model):
+                var model = model.value
+                model.animationId = newValue
+                content = .message(.init(value: model))
+            case let .reply(model):
+                var model = model.value
+                model.animationId = newValue
+                content = .reply(.init(value: model))
+            case let .transaction(model):
+                var model = model.value
+                model.content.animationId = newValue
+                content = .transaction(.init(value: model))
+            }
         }
     }
 }

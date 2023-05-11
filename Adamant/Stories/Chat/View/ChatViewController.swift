@@ -499,6 +499,8 @@ private extension ChatViewController {
                 at: [.centeredVertically, .centeredHorizontally],
                 animated: animated
             )
+            
+            viewModel.needToAnimateCellIndex = index
         }
         
         guard !viewAppeared else { return }
@@ -654,6 +656,24 @@ private extension ChatViewController {
             v.delegate = self
         }
         self.navigationController?.pushViewController(vc, animated: true)
+    }
+}
+
+// MARK: Animate cell
+
+extension ChatViewController {
+    internal override func scrollViewDidEndScrollingAnimation(_: UIScrollView) {
+        guard let index = viewModel.needToAnimateCellIndex else { return }
+        
+        let cell = messagesCollectionView.cellForItem(at: .init(item: .zero, section: index))
+        cell?.isSelected = true
+        
+        Task {
+            await Task.sleep(interval: 1.0)
+            cell?.isSelected = false
+        }
+        
+        viewModel.needToAnimateCellIndex = nil
     }
 }
 

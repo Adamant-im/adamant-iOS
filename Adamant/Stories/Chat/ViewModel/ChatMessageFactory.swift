@@ -103,8 +103,7 @@ struct ChatMessageFactory {
             dateHeader: dateHeaderOn
                 ? makeDateHeader(sentDate: sentDate)
                 : nil,
-            topSpinnerOn: topSpinnerOn,
-            animationId: animationId
+            topSpinnerOn: topSpinnerOn
         )
     }
 }
@@ -119,7 +118,7 @@ private extension ChatMessageFactory {
     ) -> ChatMessage.Content {
         switch transaction {
         case let transaction as MessageTransaction:
-            return makeContent(transaction)
+            return makeContent(transaction, animationId: animationId)
         case let transaction as RichMessageTransaction:
             if transaction.isReply,
                !transaction.isTransferReply() {
@@ -148,9 +147,14 @@ private extension ChatMessageFactory {
         }
     }
     
-    func makeContent(_ transaction: MessageTransaction) -> ChatMessage.Content {
+    func makeContent(_ transaction: MessageTransaction, animationId: String) -> ChatMessage.Content {
         transaction.message.map {
-            .message(.init(string: Self.markdownParser.parse($0), id: transaction.txId))
+            .message(.init(
+                value: .init(
+                    id: transaction.txId,
+                    text: Self.markdownParser.parse($0),
+                    animationId: animationId)
+            ))
         } ?? .default
     }
     
@@ -169,12 +173,13 @@ private extension ChatMessageFactory {
         let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
         
         return .reply(.init(
+            value: .init(
             id: transaction.txId,
             replyId: replyId,
             message: Self.markdownParser.parse(replyMessage),
             messageReply: decodedMessageMarkDown,
             backgroundColor: backgroundColor,
-            animationId: animationId
+            animationId: animationId)
         ))
     }
     

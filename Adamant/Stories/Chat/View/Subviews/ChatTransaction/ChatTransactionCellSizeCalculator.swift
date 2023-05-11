@@ -60,7 +60,7 @@ final class ChatTextCellSizeCalculator: TextMessageSizeCalculator {
             let dataSource = messagesLayout.messagesDataSource
             let message = dataSource.messageForItem(at: indexPath, in: messagesLayout.messagesCollectionView)
             
-            let contentViewHeight = model.contentHeight(for: messagesFlowLayout.itemWidth)
+            let contentViewHeight = model.value.contentHeight(for: messagesFlowLayout.itemWidth)
             let messageBottomLabelHeight = messageBottomLabelSize(for: message, at: indexPath).height
             let messageTopLabelHeight = messageTopLabelSize(for: message, at: indexPath).height
             let messageVerticalPadding = messageContainerPadding(for: message)

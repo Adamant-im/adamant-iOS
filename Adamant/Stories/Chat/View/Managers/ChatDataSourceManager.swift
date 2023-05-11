@@ -79,17 +79,10 @@ final class ChatDataSourceManager: MessagesDataSource {
                 guard case let .message(model) = message?.fullModel.content
                 else { return nil }
                 
-                let newModel = ChatMessageCell.Model(
-                    id: model.id,
-                    text: model.string,
-                    animationId: message?.animationId ?? ""
-                )
-                return newModel
+                return model.value
             }
             
-            let model = ChatMessageCell.Model(id: model.id, text: model.string, animationId: "")
-            
-            cell.model = model
+            cell.model = model.value
             cell.configure(with: message, at: indexPath, and: messagesCollectionView)
             cell.actionHandler = { [weak self] in self?.handleAction($0) }
             cell.setSubscription(publisher: publisher)
@@ -105,14 +98,13 @@ final class ChatDataSourceManager: MessagesDataSource {
             
             let publisher: any Observable<ChatMessageReplyCell.Model> = viewModel.$messages.compactMap {
                 let message = $0[safe: indexPath.section]
-                guard case var .reply(model) = message?.fullModel.content
+                guard case let .reply(model) = message?.fullModel.content
                 else { return nil }
                 
-                model.animationId = message?.animationId ?? ""
-                return model
+                return model.value
             }
             
-            cell.model = model
+            cell.model = model.value
             cell.configure(with: message, at: indexPath, and: messagesCollectionView)
             cell.actionHandler = { [weak self] in self?.handleAction($0) }
             cell.setSubscription(publisher: publisher)
@@ -141,24 +133,7 @@ final class ChatDataSourceManager: MessagesDataSource {
             guard case let .transaction(model) = message?.fullModel.content
             else { return nil }
             
-            let newModel = ChatTransactionContainerView.Model.init(
-                id: model.value.id,
-                isFromCurrentSender: model.value.isFromCurrentSender,
-                content: .init(
-                    id: model.value.content.id,
-                    title: model.value.content.title,
-                    icon: model.value.content.icon,
-                    amount: model.value.content.amount,
-                    currency: model.value.content.currency,
-                    date: model.value.content.date,
-                    comment: model.value.content.comment,
-                    backgroundColor: model.value.content.backgroundColor,
-                    animationId: message?.animationId ?? "",
-                    isReply: model.value.content.isReply,
-                    replyMessage: model.value.content.replyMessage,
-                    replyId: model.value.content.replyId),
-                status: model.value.status)
-            return newModel
+            return model.value
         }
         
         cell.wrappedView.model = model.value

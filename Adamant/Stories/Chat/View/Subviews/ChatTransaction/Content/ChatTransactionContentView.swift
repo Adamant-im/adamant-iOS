@@ -14,10 +14,20 @@ final class ChatTransactionContentView: UIView {
         didSet {
             guard oldValue != model else { return }
             let isSelected = oldValue.animationId != model.animationId
+            && !model.animationId.isEmpty
+            && oldValue.id == model.id
             && !model.id.isEmpty
-            && model.id == oldValue.id
+            && !oldValue.id.isEmpty
             
             update(isSelected: isSelected)
+        }
+    }
+    
+    var isSelected: Bool = false {
+        didSet {
+            if isSelected {
+                startBlinkAnimation()
+            }
         }
     }
     
@@ -178,10 +188,6 @@ private extension ChatTransactionContentView {
     }
     
     func update(isSelected: Bool) {
-        if isSelected {
-            startBlinkAnimation()
-        }
-        
         titleLabel.text = model.title
         iconView.image = model.icon
         amountLabel.text = String(model.amount)
