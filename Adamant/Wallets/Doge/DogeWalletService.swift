@@ -87,6 +87,10 @@ class DogeWalletService: WalletService {
         return DogeWalletService.fixedFee
     }
     
+    var qqPrefix: String {
+        return Self.qqPrefix
+    }
+    
     static let kvsAddress = "doge:address"
     
     private (set) var isWarningGasPrice = false

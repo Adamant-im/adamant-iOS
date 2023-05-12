@@ -89,6 +89,10 @@ class EthWalletService: WalletService {
         return tokenNetworkSymbol + tokenSymbol
     }
     
+    var qqPrefix: String {
+        return Self.qqPrefix
+    }
+    
     private (set) var isDynamicFee: Bool = true
 	private (set) var transactionFee: Decimal = 0.0
     private (set) var gasPrice: BigUInt = 0

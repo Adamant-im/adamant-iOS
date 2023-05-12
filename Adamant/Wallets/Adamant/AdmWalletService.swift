@@ -32,7 +32,7 @@ class AdmWalletService: NSObject, WalletService {
     }
     
     var tokenNetworkSymbol: String {
-        return "ADM"
+        return Self.currencySymbol
     }
     
     var tokenContract: String {
@@ -41,6 +41,10 @@ class AdmWalletService: NSObject, WalletService {
     
     var tokenUnicID: String {
         return tokenNetworkSymbol + tokenSymbol
+    }
+    
+    var qqPrefix: String {
+        return Self.qqPrefix
     }
     
 	// MARK: - Dependencies

@@ -74,6 +74,10 @@ class BtcWalletService: WalletService {
         return tokenNetworkSymbol + tokenSymbol
     }
     
+    var qqPrefix: String {
+        return Self.qqPrefix
+    }
+    
     var wallet: WalletAccount? { return btcWallet }
     
     var walletViewController: WalletViewController {

@@ -78,6 +78,10 @@ class LskWalletService: WalletService {
         return tokenNetworkSymbol + tokenSymbol
     }
     
+    var qqPrefix: String {
+        return Self.qqPrefix
+    }
+    
 	// MARK: - Properties
 	let transferAvailable: Bool = true
     private var initialBalanceCheck = false

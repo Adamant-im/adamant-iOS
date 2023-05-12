@@ -33,6 +33,10 @@ class DashWalletService: WalletService {
         return tokenNetworkSymbol + tokenSymbol
     }
     
+    var qqPrefix: String {
+        return Self.qqPrefix
+    }
+    
     var wallet: WalletAccount? { return dashWallet }
     
     var walletViewController: WalletViewController {
