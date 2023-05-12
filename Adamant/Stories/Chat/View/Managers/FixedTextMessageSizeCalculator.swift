@@ -10,6 +10,22 @@
  import MessageKit
 
  final class FixedTextMessageSizeCalculator: MessageSizeCalculator {
+     private let getCurrentSender: () -> SenderType
+     private let getMessages: () -> [ChatMessage]
+     private let messagesFlowLayout: MessagesCollectionViewFlowLayout
+     
+     init(
+         layout: MessagesCollectionViewFlowLayout,
+         getCurrentSender: @escaping () -> SenderType,
+         getMessages: @escaping () -> [ChatMessage]
+     ) {
+         self.getMessages = getMessages
+         self.getCurrentSender = getCurrentSender
+         self.messagesFlowLayout = layout
+         super.init()
+         self.layout = layout
+     }
+     
      override func messageContainerMaxWidth(
          for message: MessageType,
          at indexPath: IndexPath
@@ -41,7 +57,17 @@
          let messageInsets = messageLabelInsets(for: message)
          messageContainerSize.width += messageInsets.horizontal
          messageContainerSize.height += messageInsets.vertical
-
+         
+         if case let .reply(model) = getMessages()[indexPath.section].fullModel.content {
+             let contentViewHeight = model.value.contentHeight(for: messageContainerSize.width)
+             messageContainerSize.height = contentViewHeight
+         }
+         
+         if case let .transaction(model) = getMessages()[indexPath.section].fullModel.content {
+             let contentViewHeight = model.value.height(for: messagesFlowLayout.itemWidth)
+             messageContainerSize.height = contentViewHeight
+         }
+         
          return messageContainerSize
      }
 

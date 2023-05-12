@@ -217,7 +217,8 @@ private extension ChatTransactionContentView {
                 message: NSAttributedString(string: ""),
                 messageReply: NSAttributedString(string: ""),
                 backgroundColor: .failed,
-                animationId: ""
+                animationId: "",
+                isFromCurrentSender: true
             )))
             return
         }

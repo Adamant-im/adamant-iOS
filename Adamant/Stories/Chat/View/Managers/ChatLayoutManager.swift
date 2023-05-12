@@ -81,7 +81,11 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
         at _: IndexPath,
         in messagesCollectionView: MessagesCollectionView
     ) -> CellSizeCalculator? {
-        FixedTextMessageSizeCalculator(layout: messagesCollectionView.messagesCollectionViewFlowLayout)
+        FixedTextMessageSizeCalculator(
+            layout: messagesCollectionView.messagesCollectionViewFlowLayout,
+            getCurrentSender: { [sender = viewModel.sender] in sender },
+            getMessages: { [messages = viewModel.messages] in messages }
+        )
     }
     
     func customCellSizeCalculator(
@@ -89,7 +93,7 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
         at _: IndexPath,
         in messagesCollectionView: MessagesCollectionView
     ) -> CellSizeCalculator {
-        ChatCellSizeCalculator(
+        FixedTextMessageSizeCalculator(
             layout: messagesCollectionView.messagesCollectionViewFlowLayout,
             getCurrentSender: { [sender = viewModel.sender] in sender },
             getMessages: { [messages = viewModel.messages] in messages }
@@ -110,7 +114,7 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
         at indexPath: IndexPath,
         in messagesCollectionView: MessagesCollectionView
     ) -> CellSizeCalculator? {
-        ChatTextCellSizeCalculator(
+        FixedTextMessageSizeCalculator(
             layout: messagesCollectionView.messagesCollectionViewFlowLayout,
             getCurrentSender: { [sender = viewModel.sender] in sender },
             getMessages: { [messages = viewModel.messages] in messages }

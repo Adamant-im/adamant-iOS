@@ -83,6 +83,13 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
             if isSelected {
                 messageContainerView.startBlinkAnimation()
             }
+            
+            let leading = model.isFromCurrentSender ? smallHInset : longHInset
+            let trailing = model.isFromCurrentSender ? longHInset : smallHInset
+            verticalStack.snp.updateConstraints {
+                $0.leading.equalToSuperview().inset(leading)
+                $0.trailing.equalToSuperview().inset(trailing)
+            }
         }
     }
     
@@ -98,6 +105,8 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     var subscription: AnyCancellable?
     
     private var trailingReplyViewOffset: CGFloat = 4
+    private let smallHInset: CGFloat = 8
+    private let longHInset: CGFloat = 14
     
     // MARK: - Methods
     
@@ -135,10 +144,13 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         messageContainerView.addSubview(verticalStack)
         messageLabel.numberOfLines = 0
         replyMessageLabel.numberOfLines = 1
+        
+        let leading = model.isFromCurrentSender ? smallHInset : longHInset
+        let trailing = model.isFromCurrentSender ? longHInset : smallHInset
         verticalStack.snp.makeConstraints {
             $0.top.bottom.equalToSuperview().inset(8)
-            $0.leading.equalToSuperview().inset(8)
-            $0.trailing.equalToSuperview().offset(-14)
+            $0.leading.equalToSuperview().inset(leading)
+            $0.trailing.equalToSuperview().inset(trailing)
         }
     }
     
@@ -166,25 +178,8 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         }
         
         replyMessageLabel.attributedText = model.messageReply
-        
-        updateFrames()
     }
     
-    func updateFrames() {
-        let size = messageContainerView.frame.size
-        messageContainerView.frame = CGRect(
-            x: messageContainerView.frame.origin.x - trailingReplyViewOffset,
-            y: messageContainerView.frame.origin.y,
-            width: size.width + trailingReplyViewOffset,
-            height: model.contentHeight(for: size.width)
-        )
-        
-        let origin = CGPoint(
-          x: 0,
-          y: messageContainerView.frame.maxY
-        )
-        messageBottomLabel.frame = CGRect(origin: origin, size: messageBottomLabel.frame.size)
-    }
     
     /// Used to handle the cell's contentView's tap gesture.
     /// Return false when the contentView does not need to handle the gesture.

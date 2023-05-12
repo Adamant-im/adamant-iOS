@@ -122,8 +122,9 @@ private extension ChatMessageFactory {
         case let transaction as RichMessageTransaction:
             if transaction.isReply,
                !transaction.isTransferReply() {
-                return makeContent(
+                return makeReplyContent(
                     transaction,
+                    isFromCurrentSender: isFromCurrentSender,
                     backgroundColor: backgroundColor,
                     animationId: animationId
                 )
@@ -158,8 +159,9 @@ private extension ChatMessageFactory {
         } ?? .default
     }
     
-    func makeContent(
+    func makeReplyContent(
         _ transaction: RichMessageTransaction,
+        isFromCurrentSender: Bool,
         backgroundColor: ChatMessageBackgroundColor,
         animationId: String
     ) -> ChatMessage.Content {
@@ -179,7 +181,8 @@ private extension ChatMessageFactory {
             message: Self.markdownParser.parse(replyMessage),
             messageReply: decodedMessageMarkDown,
             backgroundColor: backgroundColor,
-            animationId: animationId)
+            animationId: animationId,
+            isFromCurrentSender: isFromCurrentSender)
         ))
     }
     
