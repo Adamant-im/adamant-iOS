@@ -18,7 +18,7 @@ actor AdamantRichTransactionReplyService: NSObject, RichTransactionReplyService 
     
     private lazy var richController = getRichTransactionsController()
     private lazy var transferController = getTransferController()
-    private let unknownErrorMessage = "UNKNOWN"
+    private let unknownErrorMessage = String.adamantLocalized.reply.shortUnknownMessageError
 
     init(
         coreDataStack: CoreDataStack,
@@ -78,33 +78,47 @@ extension AdamantRichTransactionReplyService: NSFetchedResultsControllerDelegate
 private extension AdamantRichTransactionReplyService {
     func update(transaction: TransferTransaction) {
         Task {
-            guard let id = transaction.replyToId,
-                  transaction.decodedReplyMessage == nil
-            else { return }
-            
-            let transactionReply = try await getReplyTransaction(by: UInt64(id) ?? 0)
-            let message = try getReplyMessage(by: transactionReply)
-            
-            setReplyMessage(
-                for: transaction,
-                message: message
-            )
+            do {
+                guard let id = transaction.replyToId,
+                      transaction.decodedReplyMessage == nil
+                else { return }
+                
+                let transactionReply = try await getReplyTransaction(by: UInt64(id) ?? 0)
+                let message = try getReplyMessage(by: transactionReply)
+                
+                setReplyMessage(
+                    for: transaction,
+                    message: message
+                )
+            } catch {
+                setReplyMessage(
+                    for: transaction,
+                    message: unknownErrorMessage
+                )
+            }
         }
     }
     
     func update(transaction: RichMessageTransaction) {
         Task {
-            guard let id = transaction.getRichValue(for: RichContentKeys.reply.replyToId),
-                  transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) == nil
-            else { return }
-            
-            let transactionReply = try await getReplyTransaction(by: UInt64(id) ?? 0)
-            let message = try getReplyMessage(by: transactionReply)
-            
-            setReplyMessage(
-                for: transaction,
-                message: message
-            )
+            do {
+                guard let id = transaction.getRichValue(for: RichContentKeys.reply.replyToId),
+                      transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) == nil
+                else { return }
+                
+                let transactionReply = try await getReplyTransaction(by: UInt64(id) ?? 0)
+                let message = try getReplyMessage(by: transactionReply)
+                
+                setReplyMessage(
+                    for: transaction,
+                    message: message
+                )
+            } catch {
+                setReplyMessage(
+                    for: transaction,
+                    message: unknownErrorMessage
+                )
+            }
         }
     }
     

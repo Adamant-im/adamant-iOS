@@ -1305,6 +1305,7 @@ extension AdamantChatsProvider {
         var transactions: [Transaction] = []
         var offset = chatLoadedMessages[recipient] ?? 0
         var needToRepeat = false
+        var isFind = false
         
         repeat {
             let messages = try await apiGetChatMessages(
@@ -1321,13 +1322,19 @@ extension AdamantChatsProvider {
             
             offset += messages.count
             transactions.append(contentsOf: messages)
-            
-            let findTransactionId = transactions.contains(where: { $0.id == UInt64(transactionId) })
-            needToRepeat = messages.count >= chatTransactionsLimit && !findTransactionId
+            isFind = transactions.contains(where: { $0.id == UInt64(transactionId) })
+            needToRepeat = messages.count >= chatTransactionsLimit && !isFind
         } while needToRepeat
         
         if transactions.count == 0 {
             return
+        }
+        
+        guard isFind else {
+            throw ApiServiceError.internalError(
+                message: String.adamantLocalized.reply.longUnknownMessageError,
+                error: nil
+            )
         }
         
         chatLoadedMessages[recipient] = offset

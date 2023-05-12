@@ -72,4 +72,9 @@ extension String.adamantLocalized {
             return String.localizedStringWithFormat(NSLocalizedString("Error.RemoteServerErrorFormat", comment: "Shared error: Remote error format, %@ for message"), message)
         }
     }
+    
+    enum reply {
+        static let shortUnknownMessageError = NSLocalizedString("Reply.ShortUnknownMessageError", comment: "Short unknown message error")
+        static let longUnknownMessageError = NSLocalizedString("Reply.LongUnknownMessageError", comment: "Long unknown message error")
+    }
 }
