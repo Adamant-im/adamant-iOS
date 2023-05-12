@@ -46,7 +46,7 @@ public final class DoubleDetailsTableViewCell: Cell<DoubleDetail>, CellType {
             detailsLabel.text = value.first
             secondDetailsLabel.text = value.second
             
-            stackView.spacing = value.second == nil ? 0 : 6
+            stackView.spacing = value.second == nil ? 0 : 1
         } else {
             detailsLabel.text = nil
             secondDetailsLabel.text = nil
