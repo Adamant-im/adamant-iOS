@@ -88,13 +88,22 @@ actor AdamantChatTransactionService: ChatTransactionService {
                 // MARK: Text message
                 case .message, .messageOld, .signal, .unknown:
                     if transaction.amount > 0 {
-                        if let trs = getTransfer(id: String(transaction.id), context: context) {
-                            messageTransaction = trs
+                        let trs: TransferTransaction
+                        
+                        if let trsDB = getTransfer(
+                            id: String(transaction.id),
+                            context: context
+                        ) {
+                            trs = trsDB
                         } else {
-                            let trs = TransferTransaction(entity: TransferTransaction.entity(), insertInto: context)
-                            trs.comment = decodedMessage
-                            messageTransaction = trs
+                            trs = TransferTransaction(
+                                entity: TransferTransaction.entity(),
+                                insertInto: context
+                            )
                         }
+                        
+                        trs.comment = decodedMessage
+                        messageTransaction = trs
                     } else {
                         let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
                         trs.message = decodedMessage
@@ -149,7 +158,6 @@ actor AdamantChatTransactionService: ChatTransactionService {
                         trs.replyToId = richContent[RichContentKeys.reply.replyToId] as? String
                         
                         messageTransaction = trs
-                        print("find adm rich, id=\(trs.replyToId), com = \(trs.comment)")
                         break
                     }
                         
