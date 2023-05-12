@@ -879,7 +879,7 @@ extension ChatListViewController {
                 
                 let prefix = richMessage.isOutgoing
                 ? "\(String.adamantLocalized.chatList.sentMessagePrefix)"
-                : text
+                : ""
                 
                 let replyImageAttachment = NSTextAttachment()
                 replyImageAttachment.image = UIImage(named: "reply")
