@@ -58,7 +58,6 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         }
         
         swipeView.action = { [weak self] message in
-            print("message id \(message.id), text = \(message.makeReplyContent().string)")
             self?.actionHandler(.reply(message: message))
         }
         

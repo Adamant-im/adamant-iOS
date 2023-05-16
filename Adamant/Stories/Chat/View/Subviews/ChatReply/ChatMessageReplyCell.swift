@@ -133,7 +133,6 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         }
         
         swipeView.action = { [weak self] message in
-            print("message id \(message.id), text = \(message.makeReplyContent().string)")
             self?.actionHandler(.reply(message: message))
         }
         
@@ -179,7 +178,6 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         
         replyMessageLabel.attributedText = model.messageReply
     }
-    
     
     /// Used to handle the cell's contentView's tap gesture.
     /// Return false when the contentView does not need to handle the gesture.

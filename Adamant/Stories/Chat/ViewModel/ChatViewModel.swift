@@ -418,6 +418,21 @@ final class ChatViewModel: NSObject {
                 }.store(in: &tempCancellables)
         }
     }
+    
+    func replyMessageIfNeeded(_ messageModel: MessageModel?) {
+        let message = messages.first(where: { $0.messageId == messageModel?.id })
+        guard message?.status != .failed else {
+            dialog.send(.warning(String.adamantLocalized.reply.failedMessageError))
+            return
+        }
+        
+        guard message?.status != .pending else {
+            dialog.send(.warning(String.adamantLocalized.reply.pendingMessageError))
+            return
+        }
+        
+        replyMessage = messageModel
+    }
 }
 
 extension ChatViewModel {

@@ -1041,3 +1041,9 @@
 
 /* Reply: Long unknown message error */
 "Reply.LongUnknownMessageError" = "We did not find this message";
+
+/* Reply: Failed message reply error */
+"Reply.failedMessageError" = "You can't reply to a failed message";
+
+/* Pending message reply error */
+"Reply.pendingMessageError" = "You can't reply to a pending message. Wait for confirmations (estimate 1-2 seconds)";

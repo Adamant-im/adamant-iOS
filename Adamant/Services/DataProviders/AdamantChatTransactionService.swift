@@ -254,6 +254,7 @@ actor AdamantChatTransactionService: ChatTransactionService {
             transfer.partner = partner
         }
         
+        transfer.chatMessageId = String(transaction.id)
         transfer.isOutgoing = isOut
         transfer.partner = partner
         return transfer

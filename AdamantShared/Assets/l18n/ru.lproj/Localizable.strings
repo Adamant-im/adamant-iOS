@@ -1038,3 +1038,9 @@
 
 /* Reply: Long unknown message error */
 "Reply.LongUnknownMessageError" = "Мы не нашли это сообщение";
+
+/* Reply: Failed message reply error */
+"Reply.failedMessageError" = "Вы не можете ответить на ошибочное сообщение";
+
+/* Pending message reply error */
+"Reply.pendingMessageError" = "Вы не можете ответить на ожидающее сообщение. Дождитесь подтверждения (оценка 1-2 секунды)";

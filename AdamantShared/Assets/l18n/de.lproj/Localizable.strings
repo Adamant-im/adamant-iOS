@@ -1062,3 +1062,9 @@
 
 /* Reply: Long unknown message error */
 "Reply.LongUnknownMessageError" = "Wir haben diese Nachricht nicht gefunden";
+
+/* Reply: Failed message reply error */
+"Reply.failedMessageError" = "Sie können nicht auf eine fehlgeschlagene Nachricht antworten";
+
+/* Pending message reply error */
+"Reply.pendingMessageError" = "Sie können nicht auf eine ausstehende Nachricht antworten. Auf Bestätigungen warten (schätzungsweise 1–2 Sekunden)";

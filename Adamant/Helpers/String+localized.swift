@@ -76,5 +76,7 @@ extension String.adamantLocalized {
     enum reply {
         static let shortUnknownMessageError = NSLocalizedString("Reply.ShortUnknownMessageError", comment: "Short unknown message error")
         static let longUnknownMessageError = NSLocalizedString("Reply.LongUnknownMessageError", comment: "Long unknown message error")
+        static let failedMessageError = NSLocalizedString("Reply.failedMessageError", comment: "Failed message reply error")
+        static let pendingMessageError = NSLocalizedString("Reply.pendingMessageError", comment: "Pending message reply error")
     }
 }

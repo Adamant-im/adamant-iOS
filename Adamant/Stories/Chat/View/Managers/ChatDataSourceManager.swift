@@ -153,7 +153,7 @@ private extension ChatDataSourceManager {
         case let .forceUpdateTransactionStatus(id):
             viewModel.forceUpdateTransactionStatus(id: id)
         case let .reply(message):
-            viewModel.replyMessage = message
+            viewModel.replyMessageIfNeeded(message)
         case let .scrollTo(message):
             viewModel.scroll(to: message)
         case let .swipeState(state):

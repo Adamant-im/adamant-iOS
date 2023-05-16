@@ -799,14 +799,15 @@ extension AdamantChatsProvider {
         from chatroom: Chatroom? = nil
     ) async throws -> ChatTransaction {
         let transaction = MessageTransaction(context: context)
+        let id = UUID().uuidString
         transaction.date = Date() as NSDate
         transaction.recipientId = recipientId
         transaction.senderId = senderId
         transaction.type = Int16(type.rawValue)
         transaction.isOutgoing = true
-        transaction.chatMessageId = UUID().uuidString
+        transaction.chatMessageId = id
         transaction.isMarkdown = isMarkdown
-        transaction.transactionId = UUID().uuidString
+        transaction.transactionId = id
         
         transaction.message = text
         
