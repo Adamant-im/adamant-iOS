@@ -84,7 +84,10 @@ private extension SwipeableView {
         
         let isOnStartPosition = movingView.frame.origin.x == 0 || movingView.frame.origin.x == messagePadding
         
-        if isOnStartPosition && translation.x > 0 { return }
+        if isOnStartPosition && translation.x > 0 {
+            swipeStateAction?(.ended)
+            return
+        }
         
         if movingView.frame.origin.x <= messagePadding {
             movingView.center = CGPoint(
@@ -120,6 +123,10 @@ private extension SwipeableView {
                     height: movingView.frame.size.height
                 )
             }
+        }
+        
+        if recognizer.state == .cancelled || recognizer.state == .failed {
+            swipeStateAction?(.ended)
         }
     }
 }
