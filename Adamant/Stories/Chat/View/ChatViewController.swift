@@ -58,6 +58,11 @@ final class ChatViewController: MessagesViewController {
         return view
     }()
     
+    private lazy var chatKeyboardManager: ChatKeyboardManager = {
+        let data = ChatKeyboardManager(scrollView: messagesCollectionView)
+        return data
+    }()
+    
     init(
         viewModel: ChatViewModel,
         richMessageProviders: [String: RichMessageProvider],
@@ -92,7 +97,7 @@ final class ChatViewController: MessagesViewController {
         configureHeader()
         configureLayout()
         configureReplyView()
-        configureGesture()
+        configureGestures()
         setupObservers()
         viewModel.loadFirstMessagesIfNeeded()
     }
@@ -171,7 +176,6 @@ extension ChatViewController {
         
         if state == .ended {
             messagesCollectionView.isScrollEnabled = true
-            messagesCollectionView.keyboardDismissMode = .interactive
         }
     }
 }
@@ -364,7 +368,12 @@ private extension ChatViewController {
         }
     }
     
-    func configureGesture() {
+    func configureGestures() {
+        if let gesture = messagesCollectionView.gestureRecognizers?[13] as? UIPanGestureRecognizer {
+            gesture.delegate = chatKeyboardManager
+            chatKeyboardManager.panGesture = gesture
+        }
+        
         let panGesture = UIPanGestureRecognizer()
         panGesture.delegate = self
         messagesCollectionView.addGestureRecognizer(panGesture)
