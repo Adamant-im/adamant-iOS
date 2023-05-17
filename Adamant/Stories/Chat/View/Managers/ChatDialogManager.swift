@@ -52,8 +52,8 @@ private extension ChatDialogManager {
             )
         case let .warning(message):
             dialogService.showWarning(withMessage: message)
-        case let .richError(error):
-            dialogService.showRichError(error: error)
+        case let .richError(error, supportEmail):
+            dialogService.showRichError(error: error, supportEmail: supportEmail)
         case let .menu(sender):
             showMenu(sender: sender)
         case .freeTokenAlert:

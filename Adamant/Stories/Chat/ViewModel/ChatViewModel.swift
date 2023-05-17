@@ -352,7 +352,7 @@ final class ChatViewModel: NSObject {
                 case .invalidTransactionStatus:
                     dialog.send(.warning(.adamantLocalized.chat.cancelError))
                 default:
-                    dialog.send(.richError(error))
+                    dialog.send(.richError(error, supportEmail: true))
                 }
             }
         }.stored(in: tasksStorage)
@@ -370,7 +370,7 @@ final class ChatViewModel: NSObject {
                 case .invalidTransactionStatus:
                     break
                 default:
-                    dialog.send(.richError(error))
+                    dialog.send(.richError(error, supportEmail: true))
                 }
             }
         }.stored(in: tasksStorage)
@@ -399,7 +399,7 @@ final class ChatViewModel: NSObject {
             } catch {
                 print(error)
                 dialog.send(.progress(false))
-                dialog.send(.richError(error))
+                dialog.send(.richError(error, supportEmail: false))
             }
         }.stored(in: tasksStorage)
     }
@@ -594,7 +594,7 @@ private extension ChatViewModel {
             break
         }
         
-        dialog.send(.richError(error))
+        dialog.send(.richError(error, supportEmail: true))
     }
     
     func inputTextUpdated() {
