@@ -1228,6 +1228,23 @@ extension AdamantChatsProvider {
             return nil
         }
     }
+    
+    /// Search transaction in local storage
+    ///
+    /// - Parameter id: Transacton ID
+    /// - Returns: Transaction, if found
+    func getBaseTransactionFromDB(id: String, context: NSManagedObjectContext) -> BaseTransaction? {
+        let request = NSFetchRequest<BaseTransaction>(entityName: "BaseTransaction")
+        request.predicate = NSPredicate(format: "transactionId == %@", String(id))
+        request.fetchLimit = 1
+        
+        do {
+            let result = try context.fetch(request)
+            return result.first
+        } catch {
+            return nil
+        }
+    }
 }
 
 // MARK: - Processing
@@ -1301,7 +1318,7 @@ extension AdamantChatsProvider {
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.parent = self.stack.container.viewContext
         
-        guard getTransfer(id: transactionId, context: context) == nil else { return }
+        guard getBaseTransactionFromDB(id: transactionId, context: context) == nil else { return }
                 
         var transactions: [Transaction] = []
         var offset = chatLoadedMessages[recipient] ?? 0

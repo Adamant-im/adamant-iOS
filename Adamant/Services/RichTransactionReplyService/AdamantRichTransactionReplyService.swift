@@ -83,8 +83,7 @@ private extension AdamantRichTransactionReplyService {
                       transaction.decodedReplyMessage == nil
                 else { return }
                 
-                let transactionReply = try await getReplyTransaction(by: UInt64(id) ?? 0)
-                let message = try getReplyMessage(by: transactionReply)
+                let message = try await getReplyMessage(from: id)
                 
                 setReplyMessage(
                     for: transaction,
@@ -106,8 +105,7 @@ private extension AdamantRichTransactionReplyService {
                       transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) == nil
                 else { return }
                 
-                let transactionReply = try await getReplyTransaction(by: UInt64(id) ?? 0)
-                let message = try getReplyMessage(by: transactionReply)
+                let message = try await getReplyMessage(from: id)
                 
                 setReplyMessage(
                     for: transaction,
@@ -122,11 +120,20 @@ private extension AdamantRichTransactionReplyService {
         }
     }
     
-    func getReplyTransaction(by id: UInt64) async throws -> Transaction {
+    func getReplyMessage(from id: String) async throws -> String {
+        if let baseTransaction = getTransactionFromDB(id: id) {
+            return try getReplyMessage(from: baseTransaction)
+        }
+        
+        let transactionReply = try await getTransactionFromAPI(by: UInt64(id) ?? 0)
+        return try getReplyMessage(from: transactionReply)
+    }
+    
+    func getTransactionFromAPI(by id: UInt64) async throws -> Transaction {
         try await apiService.getTransaction(id: id, withAsset: true)
     }
     
-    func getReplyMessage(by transaction: Transaction) throws -> String {
+    func getReplyMessage(from transaction: Transaction) throws -> String {
         guard let address = accountService.account?.address,
               let privateKey = accountService.keypair?.privateKey
         else {
@@ -175,10 +182,14 @@ private extension AdamantRichTransactionReplyService {
             if let data = decodedMessage.data(using: String.Encoding.utf8),
                let richContent = RichMessageTools.richContent(from: data),
                transaction.amount > 0 {
-                let comment = richContent[RichContentKeys.reply.replyMessage] as? String
+                let commentContent = (richContent[RichContentKeys.reply.replyMessage] as? String) ?? ""
+                let comment = !commentContent.isEmpty
+                ? ": \(commentContent)"
+                : ""
+                
                 let humanType = AdmWalletService.currencySymbol
                 
-                message = "\(transactionStatus) \(transaction.amount) \(humanType)\(comment ?? "")"
+                message = "\(transactionStatus) \(transaction.amount) \(humanType)\(comment)"
                 break
             }
             
@@ -207,7 +218,55 @@ private extension AdamantRichTransactionReplyService {
         
         return message
     }
-
+    
+    func getReplyMessage(from transaction: BaseTransaction) throws -> String {
+        guard let address = accountService.account?.address else {
+            throw ApiServiceError.accountNotFound
+        }
+        
+        let isOut = transaction.senderId == address
+        
+        let transactionStatus = isOut
+        ? String.adamantLocalized.chat.transactionSent
+        : String.adamantLocalized.chat.transactionReceived
+        
+        var message: String
+        
+        switch transaction {
+        case let trs as MessageTransaction:
+            message = trs.message ?? ""
+        case let trs as TransferTransaction:
+            let trsComment = trs.comment ?? ""
+            let comment = !trsComment.isEmpty
+            ? ": \(trsComment)"
+            : ""
+            
+            message = "\(transactionStatus) \(trs.amount ?? 0.0) \(AdmWalletService.currencySymbol)\(comment)"
+        case let trs as RichMessageTransaction:
+            if let replyMessage = trs.getRichValue(for: RichContentKeys.reply.replyMessage) {
+                message = replyMessage
+                break
+            }
+            
+            if let richContent = trs.richContent,
+               let transfer = RichMessageTransfer(content: richContent) {
+                let comment = !transfer.comments.isEmpty
+                ? ": \(transfer.comments)"
+                : ""
+                let humanType = richMessageProvider[transfer.type]?.tokenSymbol ?? transfer.type
+                
+                message = "\(transactionStatus) \(transfer.amount) \(humanType)\(comment)"
+                break
+            }
+            
+            message = unknownErrorMessage
+        default:
+            message = unknownErrorMessage
+        }
+        
+        return message
+    }
+    
     func setReplyMessage(
         for transaction: RichMessageTransaction,
         message: String
@@ -239,9 +298,34 @@ private extension AdamantRichTransactionReplyService {
         transaction?.decodedReplyMessage = message
         try? privateContext.save()
     }
+}
 
-    // MARK: Core Data
+// MARK: Core Data
 
+private extension AdamantRichTransactionReplyService {
+    /// Search transaction in local storage
+    ///
+    /// - Parameter id: Transacton ID
+    /// - Returns: Transaction, if found
+    func getTransactionFromDB(id: String) -> BaseTransaction? {
+        let privateContext = NSManagedObjectContext(
+            concurrencyType: .privateQueueConcurrencyType
+        )
+
+        privateContext.parent = coreDataStack.container.viewContext
+        
+        let request = NSFetchRequest<BaseTransaction>(entityName: "BaseTransaction")
+        request.predicate = NSPredicate(format: "transactionId == %@", String(id))
+        request.fetchLimit = 1
+        
+        do {
+            let result = try privateContext.fetch(request)
+            return result.first
+        } catch {
+            return nil
+        }
+    }
+    
     func processCoreDataChange(type: NSFetchedResultsChangeType, transaction: TransferTransaction) {
         switch type {
         case .insert, .update:
