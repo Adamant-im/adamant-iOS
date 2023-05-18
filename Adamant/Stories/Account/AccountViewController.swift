@@ -764,7 +764,7 @@ class AccountViewController: FormViewController {
     
     private func updatePagingItemHeight() {
         if walletViewControllers.count > 0 {
-            pagingViewController.menuItemSize = .fixed(width: 110, height: 110)
+            pagingViewController.menuItemSize = .fixed(width: 110, height: 114)
         } else {
             pagingViewController.menuItemSize = .fixed(width: 110, height: 0)
         }
