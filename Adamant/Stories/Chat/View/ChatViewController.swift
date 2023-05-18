@@ -145,6 +145,13 @@ final class ChatViewController: MessagesViewController {
         willDisplay cell: UICollectionViewCell,
         forItemAt indexPath: IndexPath
     ) {
+        if let index = viewModel.needToAnimateCellIndex,
+           indexPath.section == index {
+            cell.isSelected = true
+            cell.isSelected = false
+            viewModel.needToAnimateCellIndex = nil
+        }
+        
         super.collectionView(collectionView, willDisplay: cell, forItemAt: indexPath)
         guard indexPath.section < 4 else { return }
         viewModel.loadMoreMessagesIfNeeded()
@@ -672,13 +679,15 @@ extension ChatViewController {
     internal override func scrollViewDidEndScrollingAnimation(_: UIScrollView) {
         guard let index = viewModel.needToAnimateCellIndex else { return }
         
+        let isVisible = messagesCollectionView.indexPathsForVisibleItems.contains {
+            $0.section == index
+        }
+        
+        guard isVisible else { return }
+        
         let cell = messagesCollectionView.cellForItem(at: .init(item: .zero, section: index))
         cell?.isSelected = true
-        
-        Task {
-            await Task.sleep(interval: 1.0)
-            cell?.isSelected = false
-        }
+        cell?.isSelected = false
         
         viewModel.needToAnimateCellIndex = nil
     }
