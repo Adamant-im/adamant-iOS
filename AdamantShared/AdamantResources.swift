@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct AdamantResources {
+enum AdamantResources {
     static let coreDataModel = Bundle.main.url(forResource: "Adamant", withExtension: "momd")!
    
     static let coinsInfoSrvice = "https://info.adamant.im"
@@ -18,7 +18,7 @@ struct AdamantResources {
     static let ansReadmeUrl = "https://github.com/Adamant-im/adamant-notificationService"
     
     // MARK: Contacts
-    struct contacts {
+    enum contacts {
         static let adamantWelcomeWallet = "U00000000000000000001"
         
         static let adamantBountyWallet = "U15423595369615486571"
@@ -45,8 +45,7 @@ struct AdamantResources {
         static let donateWallet = "U380651761819723095"
         static let donateWalletPK = "3af27b283de3ce76bdcb0d4a341208b6bc1a375c46610dfa11ca20a106ed43a8"
         
-        private init() {}
+        static let adelinaWallet = "U11138426591213238985"
+        static let adelinaWalletPK = "8e06eba03ebe4668148647fc00a64b3fae59a1911ce1fd1059baba39ceb705a4"
     }
-
-    private init() {}
 }

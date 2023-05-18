@@ -10,22 +10,24 @@ import UIKit
 import Eureka
 import BitcoinKit
 
-class DogeTransferViewController: TransferViewControllerBase {
+final class DogeTransferViewController: TransferViewControllerBase {
     
     // MARK: Dependencies
     
-    var chatsProvider: ChatsProvider
+    private let chatsProvider: ChatsProvider
     
-    // MARK: - Init
+    // MARK: Properties
+
+    static let invalidCharacters: CharacterSet = CharacterSet.decimalDigits.inverted
     
     init(
+        chatsProvider: ChatsProvider,
         accountService: AccountService,
         accountsProvider: AccountsProvider,
         dialogService: DialogService,
         router: Router,
         currencyInfoService: CurrencyInfoService,
-        increaseFeeService: IncreaseFeeService,
-        chatsProvider: ChatsProvider
+		increaseFeeService: IncreaseFeeService
     ) {
         self.chatsProvider = chatsProvider
         
@@ -42,10 +44,6 @@ class DogeTransferViewController: TransferViewControllerBase {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    // MARK: Properties
-
-    static let invalidCharacters: CharacterSet = CharacterSet.decimalDigits.inverted
     
     // MARK: Send
     
@@ -88,7 +86,12 @@ class DogeTransferViewController: TransferViewControllerBase {
                 }
                 
                 Task {
-                    try await service.sendTransaction(transaction)
+                    do {
+                        try await service.sendTransaction(transaction)
+                    } catch {
+                        dialogService.showRichError(error: error)
+                    }
+                    
                     await service.update()
                 }
                 

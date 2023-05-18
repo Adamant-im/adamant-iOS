@@ -10,13 +10,29 @@ import UIKit
 import Eureka
 import LiskKit
 
-class LskTransferViewController: TransferViewControllerBase {
+final class LskTransferViewController: TransferViewControllerBase {
     
     // MARK: Dependencies
     
-    var chatsProvider: ChatsProvider
+    private let chatsProvider: ChatsProvider
     
-    // MARK: - Init
+    // MARK: Properties
+    
+    override var minToTransfer: Decimal {
+        get async throws {
+            guard let recipientAddress = recipientAddress else {
+                throw WalletServiceError.accountNotFound
+            }
+            
+            guard let service = service else {
+                throw WalletServiceError.walletNotInitiated
+            }
+            
+            let recepientBalance = try await service.getBalance(address: recipientAddress)
+            let minimumAmount = service.minBalance - recepientBalance
+            return try await max(super.minToTransfer, minimumAmount)
+        }
+    }
     
     init(
         accountService: AccountService,
@@ -76,7 +92,12 @@ class LskTransferViewController: TransferViewControllerBase {
                 }
                 
                 Task {
-                    try await service.sendTransaction(transaction)
+                    do {
+                        try await service.sendTransaction(transaction)
+                    } catch {
+                        dialogService.showRichError(error: error)
+                    }
+                    
                     await service.update()
                 }
                 

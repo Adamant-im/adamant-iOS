@@ -56,7 +56,7 @@ extension Web3Error {
         case .valueError(desc: let desc):
             return .internalError(message: "Unknown error \(String(describing: desc))", error: nil)
         case .serverError(code: let code):
-            return .internalError(message: "Unknown error \(code)", error: nil)
+            return .remoteServiceError(message: "Unknown error \(code)")
         case .clientError(code: let code):
             return .internalError(message: "Unknown error \(code)", error: nil)
         }
@@ -143,8 +143,7 @@ class EthWalletService: WalletService {
             return await setupEthNode(with: url)
         }
     }
-    private var baseUrl: String!
-    let defaultDispatchQueue = DispatchQueue(label: "im.adamant.ethWalletService", qos: .utility, attributes: [.concurrent])
+    
     private (set) var enabled = true
     
     var walletViewController: WalletViewController {
@@ -207,7 +206,7 @@ class EthWalletService: WalletService {
     func initiateNetwork(apiUrl: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
         Task {
             self._ethNodeUrl = apiUrl
-            guard let _ = await self.setupEthNode(with: apiUrl) else {
+            guard await self.setupEthNode(with: apiUrl) != nil else {
                 completion(.failure(error: WalletServiceError.networkError))
                 return
             }
@@ -221,7 +220,6 @@ class EthWalletService: WalletService {
         }
         
         self._web3 = web3
-        self.baseUrl = EthWalletService.buildBaseUrl(for: web3.provider.network)
         
         return web3
     }
@@ -336,9 +334,8 @@ class EthWalletService: WalletService {
             let price = try await web3.eth.gasPrice()
             return price
         } catch {
-            throw WalletServiceError.internalError(
-                message: error.localizedDescription,
-                error: error
+            throw WalletServiceError.remoteServiceError(
+                message: error.localizedDescription
             )
         }
 	}
@@ -358,30 +355,11 @@ class EthWalletService: WalletService {
             let price = try await web3.eth.estimateGas(for: transaction)
             return price
         } catch {
-            throw WalletServiceError.internalError(
-                message: error.localizedDescription,
-                error: error
+            throw WalletServiceError.remoteServiceError(
+                message: error.localizedDescription
             )
         }
     }
-	
-	private static func buildBaseUrl(for network: Networks?) -> String {
-		let suffix: String
-		
-		guard let network = network else {
-			return "https://api.etherscan.io/api"
-		}
-		
-		switch network {
-		case .Mainnet:
-			suffix = ""
-			
-		default:
-			suffix = "-\(network)"
-		}
-		
-		return "https://api\(suffix).etherscan.io/api"
-	}
 	
     private func buildUrl(url: URL, queryItems: [URLQueryItem]? = nil) throws -> URL {
         guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
@@ -531,6 +509,14 @@ extension EthWalletService: SwinjectDependentService {
 
 // MARK: - Balances & addresses
 extension EthWalletService {
+    func getBalance(address: String) async throws -> Decimal {
+        guard let address = EthereumAddress(address) else {
+            throw WalletServiceError.internalError(message: "Incorrect address", error: nil)
+        }
+        
+        return try await getBalance(forAddress: address)
+    }
+    
 	func getBalance(forAddress address: EthereumAddress) async throws -> Decimal {
         guard let web3 = await self.web3 else {
             throw WalletServiceError.internalError(message: "Can't get web3 service", error: nil)
@@ -540,7 +526,7 @@ extension EthWalletService {
             let balance = try await web3.eth.getBalance(for: address)
             return balance.asDecimal(exponent: EthWalletService.currencyExponent)
         } catch {
-            throw WalletServiceError.internalError(message: error.localizedDescription, error: error)
+            throw WalletServiceError.remoteServiceError(message: error.localizedDescription)
         }
 	}
 	
@@ -553,10 +539,9 @@ extension EthWalletService {
             }
             
             return result
-        } catch let error as ApiServiceError {
-            throw WalletServiceError.internalError(
-                message: "ETH Wallet: failed to get address from KVS",
-                error: error
+        } catch _ as ApiServiceError {
+            throw WalletServiceError.remoteServiceError(
+                message: "ETH Wallet: failed to get address from KVS"
             )
         }
 	}
@@ -614,7 +599,7 @@ extension EthWalletService {
         } catch let error as Web3Error {
             throw error.asWalletServiceError()
         } catch {
-            throw WalletServiceError.internalError(message: "Failed to get transaction", error: error)
+            throw WalletServiceError.remoteServiceError(message: "Failed to get transaction")
         }
         
         // MARK: 2. Transaction receipt
@@ -673,7 +658,7 @@ extension EthWalletService {
                 throw error.asWalletServiceError()
             }
         } catch {
-            throw WalletServiceError.internalError(message: "Failed to get transaction", error: error)
+            throw WalletServiceError.remoteServiceError(message: "Failed to get transaction")
         }
     }
     
@@ -732,54 +717,6 @@ extension EthWalletService {
         
         transactions.sort { $0.date.compare($1.date) == .orderedDescending }
         return transactions
-    }
-    
-    /// Transaction history for Ropsten testnet
-    func getTransactionsHistoryRopsten(address: String, page: Int = 1, size: Int = 50, completion: @escaping (WalletServiceResult<[EthTransaction]>) -> Void) {
-        let queryItems: [URLQueryItem] = [URLQueryItem(name: "module", value: "account"),
-                                          URLQueryItem(name: "action", value: "txlist"),
-                                          URLQueryItem(name: "address", value: address),
-                                          URLQueryItem(name: "page", value: "\(page)"),
-                                          URLQueryItem(name: "offset", value: "\(size)"),
-                                          URLQueryItem(name: "sort", value: "desc")
-            //                        ,URLQueryItem(name: "apikey", value: "YourApiKeyToken")
-        ]
-        
-        let endpoint: URL
-        do {
-            endpoint = try buildUrl(url: URL(string: baseUrl)!, queryItems: queryItems)
-        } catch {
-            let err = AdamantApiService.InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-            completion(.failure(error: WalletServiceError.apiError(err)))
-            return
-        }
-        
-        AF.request(endpoint).responseData(queue: defaultDispatchQueue) { response in
-            switch response.result {
-            case .success(let data):
-                do {
-                    let model: EthResponse = try JSONDecoder().decode(EthResponse.self, from: data)
-                    
-                    if model.status == 1 {
-                        var transactions = model.result
-                        
-                        for index in 0..<transactions.count {
-                            let from = transactions[index].from
-                            transactions[index].isOutgoing = from == address
-                        }
-                        
-                        completion(.success(result: transactions))
-                    } else {
-                        completion(.failure(error: .remoteServiceError(message: model.message)))
-                    }
-                } catch {
-                    completion(.failure(error: .internalError(message: "Failed to deserialize transactions", error: error)))
-                }
-                
-            case .failure:
-                completion(.failure(error: .networkError))
-            }
-        }
     }
 }
 

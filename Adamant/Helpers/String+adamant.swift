@@ -41,7 +41,9 @@ extension String {
         var name: String?
         var message: String?
         
-        if let uri = AdamantUriTools.decode(uri: self) {
+        let newUrl = self.replacingOccurrences(of: "//", with: "")
+        
+        if let uri = AdamantUriTools.decode(uri: newUrl) {
             switch uri {
             case .address(address: let addr, params: let params):
                 address = addr
@@ -78,6 +80,16 @@ extension String {
         }
     }
     
+    func validateEthAddress() -> String {
+        let address = self
+        let prefix = address.prefix(2)
+        
+        let fixedAddress = prefix != "0x"
+        ? "0x\(address)"
+        : address
+        
+        return fixedAddress
+    }
 }
 
 public extension NSMutableAttributedString {
@@ -107,21 +119,4 @@ public extension NSMutableAttributedString {
         endEditing()
     }
 
-}
-
-extension String {
-    func checkAndReplaceSystemWallets() -> String {
-        switch self {
-        case "chats.virtual.bounty_wallet_title":
-            return AdamantContacts.adamantNewBountyWallet.name
-        case "chats.virtual.bitcoin_bet_title":
-            return AdamantContacts.betOnBitcoin.name
-        case "chats.virtual.donate_bot_title":
-            return AdamantContacts.donate.name
-        case "chats.virtual.exchange_bot_title":
-            return AdamantContacts.adamantExchange.name
-        default:
-            return self
-        }
-    }
 }

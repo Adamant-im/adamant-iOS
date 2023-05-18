@@ -22,7 +22,7 @@ extension AdamantScene.Wallets {
         
         /// Send money
         static let transfer = AdamantScene(identifier: "AdmTransferViewController") { r in
-            let c = AdmTransferViewController(
+            AdmTransferViewController(
                 accountService: r.resolve(AccountService.self)!,
                 accountsProvider: r.resolve(AccountsProvider.self)!,
                 dialogService: r.resolve(DialogService.self)!,
@@ -30,29 +30,32 @@ extension AdamantScene.Wallets {
                 currencyInfoService: r.resolve(CurrencyInfoService.self)!,
                 increaseFeeService: r.resolve(IncreaseFeeService.self)!
             )
-            return c
         }
         
         /// Transactions list
         static let transactionsList = AdamantScene(identifier: "AdmTransactionsViewController", factory: { r in
-            let c = AdmTransactionsViewController(nibName: "TransactionsListViewControllerBase", bundle: nil)
-            c.accountService = r.resolve(AccountService.self)
-            c.transfersProvider = r.resolve(TransfersProvider.self)
-            c.dialogService = r.resolve(DialogService.self)
-            c.router = r.resolve(Router.self)
-            c.stack = r.resolve(CoreDataStack.self)
-            return c
+            AdmTransactionsViewController(
+                nibName: "TransactionsListViewControllerBase",
+                bundle: nil,
+                accountService: r.resolve(AccountService.self)!,
+                transfersProvider: r.resolve(TransfersProvider.self)!,
+                chatsProvider: r.resolve(ChatsProvider.self)!,
+                dialogService: r.resolve(DialogService.self)!,
+                stack: r.resolve(CoreDataStack.self)!,
+                router: r.resolve(Router.self)!,
+                addressBookService: r.resolve(AddressBookService.self)!
+            )
         })
         
         /// Adamant transaction details
         static let transactionDetails = AdamantScene(identifier: "TransactionDetailsViewController", factory: { r in
-            let c = AdmTransactionDetailsViewController()
-            c.accountService = r.resolve(AccountService.self)
-            c.dialogService = r.resolve(DialogService.self)
-            c.transfersProvider = r.resolve(TransfersProvider.self)
-            c.router = r.resolve(Router.self)
-            c.currencyInfo = r.resolve(CurrencyInfoService.self)
-            return c
+            AdmTransactionDetailsViewController(
+                accountService: r.resolve(AccountService.self)!,
+                transfersProvider: r.resolve(TransfersProvider.self)!,
+                router: r.resolve(Router.self)!,
+                dialogService: r.resolve(DialogService.self)!,
+                currencyInfo: r.resolve(CurrencyInfoService.self)!
+            )
         })
         
         /// Buy and Sell options

@@ -21,16 +21,15 @@ extension AdamantScene.Wallets {
         
         /// Send tokens
         static let transfer = AdamantScene(identifier: "DogeTransferViewController") { r in
-            let c = DogeTransferViewController(
+            DogeTransferViewController(
+                chatsProvider: r.resolve(ChatsProvider.self)!,
                 accountService: r.resolve(AccountService.self)!,
                 accountsProvider: r.resolve(AccountsProvider.self)!,
                 dialogService: r.resolve(DialogService.self)!,
                 router: r.resolve(Router.self)!,
                 currencyInfoService: r.resolve(CurrencyInfoService.self)!,
-                increaseFeeService: r.resolve(IncreaseFeeService.self)!,
-                chatsProvider: r.resolve(ChatsProvider.self)!
+                increaseFeeService: r.resolve(IncreaseFeeService.self)!
             )
-            return c
         }
         
         /// List of transactions
@@ -43,9 +42,10 @@ extension AdamantScene.Wallets {
         
         /// Transaction details
         static let transactionDetails = AdamantScene(identifier: "TransactionDetailsViewControllerBase") { r in
-            let c = DogeTransactionDetailsViewController()
-            c.dialogService = r.resolve(DialogService.self)
-            c.currencyInfo = r.resolve(CurrencyInfoService.self)
+            let c = DogeTransactionDetailsViewController(
+                dialogService: r.resolve(DialogService.self)!,
+                currencyInfo: r.resolve(CurrencyInfoService.self)!
+            )
             return c
         }
     }

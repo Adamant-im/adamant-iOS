@@ -17,6 +17,7 @@ enum State {
 
 protocol DataProvider: AnyObject, Actor {
     var state: State { get }
+    var stateObserver: Published<State>.Publisher { get }
     var isInitiallySynced: Bool { get }
     
     func reload() async

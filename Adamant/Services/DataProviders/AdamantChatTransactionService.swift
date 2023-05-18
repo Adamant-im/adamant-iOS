@@ -152,9 +152,8 @@ actor AdamantChatTransactionService: ChatTransactionService {
         messageTransaction.statusEnum = MessageStatus.delivered
         messageTransaction.partner = partner
         
-        if let transactionId = messageTransaction.transactionId {
-            messageTransaction.isHidden = removedMessages.contains(transactionId)
-        }
+        let transactionId = messageTransaction.transactionId
+        messageTransaction.isHidden = removedMessages.contains(transactionId)
         
         return messageTransaction
     }

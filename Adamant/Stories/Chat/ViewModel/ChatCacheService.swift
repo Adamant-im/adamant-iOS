@@ -7,16 +7,25 @@
 //
 
 import Foundation
+import Combine
 
 @MainActor
 final class ChatCacheService {
     private var messages: [String: [ChatMessage]] = [:]
+    private var subscriptions = Set<AnyCancellable>()
+    
+    init() {
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedOut)
+            .sink { [weak self] _ in self?.messages = .init() }
+            .store(in: &subscriptions)
+    }
     
     func setMessages(address: String, messages: [ChatMessage]) {
         self.messages[address] = messages
     }
     
-    func getMessages(address: String) -> [ChatMessage] {
-        messages[address] ?? []
+    func getMessages(address: String) -> [ChatMessage]? {
+        messages[address]
     }
 }

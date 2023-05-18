@@ -11,11 +11,13 @@ import Combine
 
 actor AdamantRichTransactionStatusService: NSObject, RichTransactionStatusService {
     private let richProviders: [String: RichMessageProviderWithStatusCheck]
+    private let coreDataStack: CoreDataStack
+
     private lazy var controller = getRichTransactionsController()
-    private var observers = [RichMessageTransaction: RichTransactionStatusObserver]()
-    private var subscriptions = [RichMessageTransaction: AnyCancellable]()
-    private var coreDataStack: CoreDataStack
-    
+    private var networkSubscription: AnyCancellable?
+    private var subscriptions = [String: AnyCancellable]()
+    private var oldPendingAttempts = [String: ObservableValue<Int>]()
+
     init(
         coreDataStack: CoreDataStack,
         richProviders: [String: RichMessageProviderWithStatusCheck]
@@ -23,21 +25,31 @@ actor AdamantRichTransactionStatusService: NSObject, RichTransactionStatusServic
         self.coreDataStack = coreDataStack
         self.richProviders = richProviders
         super.init()
-        
-        Task {
-            await controller.delegate = self
-            try await controller.performFetch()
-        }
+        Task { await setupNetworkSubscription() }
     }
-    
+
     func forceUpdate(transaction: RichMessageTransaction) async {
         setStatus(for: transaction, status: .notInitiated)
         
+        guard
+            let provider = getProvider(for: transaction)
+        else { return }
+
+        let id = transaction.transactionId
+        
         await setStatus(
             for: transaction,
-            status: (try? getProvider(for: transaction)?.statusFor(transaction: transaction))
-                ?? .pending
+            status: provider.statusWithFilters(
+                transaction: transaction,
+                oldPendingAttempts: oldPendingAttempts[id]?.wrappedValue ?? .zero
+            )
         )
+    }
+    
+    func startObserving() {
+        controller.delegate = self
+        try? controller.performFetch()
+        controller.fetchedObjects?.forEach(add(transaction:))
     }
 }
 
@@ -50,71 +62,75 @@ extension AdamantRichTransactionStatusService: NSFetchedResultsControllerDelegat
         newIndexPath _: IndexPath?
     ) {
         guard let transaction = object as? RichMessageTransaction else { return }
-        
-        Task {
-            switch type {
-            case .insert:
-                await add(transaction: transaction)
-            case .delete:
-                await remove(transaction: transaction)
-            case .update, .move:
-                break
-            @unknown default:
-                break
-            }
-        }
+        Task { await processCoreDataChange(type: type, transaction: transaction) }
     }
 }
 
 private extension AdamantRichTransactionStatusService {
-    func getRichTransactionsController() -> NSFetchedResultsController<RichMessageTransaction> {
-        let request: NSFetchRequest<RichMessageTransaction> = NSFetchRequest(
-            entityName: RichMessageTransaction.entityName
-        )
+    func setupNetworkSubscription() {
+        networkSubscription = NotificationCenter.default
+            .publisher(for: .AdamantReachabilityMonitor.reachabilityChanged)
+            .compactMap { $0.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? Bool }
+            .removeDuplicates()
+            .sink { connected in
+                guard connected else { return }
+                Task { [weak self] in await self?.reloadNoNetworkTransactions() }
+            }
+    }
         
-        request.sortDescriptors = []
-        return NSFetchedResultsController(
-            fetchRequest: request,
-            managedObjectContext: coreDataStack.container.viewContext,
-            sectionNameKeyPath: nil,
-            cacheName: nil
-        )
+    func reloadNoNetworkTransactions() {
+        let transactions = controller.fetchedObjects?.filter {
+            switch $0.transactionStatus {
+            case .noNetwork, .noNetworkFinal, .notInitiated:
+                return true
+            case .failed, .pending, .registered, .success, .inconsistent, .none:
+                return false
+            }
+        }
+        
+        transactions?.compactMap { $0.transactionId }.forEach {
+            oldPendingAttempts[$0] = .init(wrappedValue: .zero)
+        }
+        
+        transactions?.forEach { transaction in
+            setStatus(for: transaction, status: .noNetwork)
+            add(transaction: transaction)
+        }
     }
     
     func add(transaction: RichMessageTransaction) {
         guard
-            !observers.keys.contains(where: { $0.txId == transaction.txId }),
             let provider = getProvider(for: transaction)
         else { return }
         
-        let observer = RichTransactionStatusObserver(
+        let id = transaction.transactionId
+        
+        let oldPendingAttempts = oldPendingAttempts[id] ?? .init(wrappedValue: .zero)
+        self.oldPendingAttempts[id] = oldPendingAttempts
+
+        let publisher = RichTransactionStatusPublisher(
             provider: provider,
-            transaction: transaction
+            transaction: transaction,
+            oldPendingAttempts: oldPendingAttempts
         )
         
-        observers[transaction] = observer
-        Task { await setupSubscription(observer: observer, transaction: transaction) }
-    }
-    
-    func remove(transaction: RichMessageTransaction) {
-        observers[transaction] = nil
-        subscriptions[transaction] = nil
-    }
-    
-    func setupSubscription(
-        observer: RichTransactionStatusObserver,
-        transaction: RichMessageTransaction
-    ) async {
-        subscriptions[transaction] = await observer.$status
-            .removeDuplicates()
-            .sink { status in
-                Task { [weak self] in
-                    guard let status = status else { return }
-                    await self?.setStatus(for: transaction, status: status)
-                }
+        subscriptions[id] = publisher.removeDuplicates().sink { status in
+            Task { [weak self] in
+                await self?.setStatus(for: transaction, status: status)
             }
+        }
     }
-    
+
+    func remove(transaction: RichMessageTransaction) {
+        let id = transaction.transactionId
+        subscriptions[id] = nil
+    }
+
+    func getProvider(for transaction: RichMessageTransaction) -> RichMessageProviderWithStatusCheck? {
+        guard let transfer = transaction.transfer else { return nil }
+        return richProviders[transfer.type]
+    }
+
     func setStatus(
         for transaction: RichMessageTransaction,
         status: TransactionStatus
@@ -122,16 +138,42 @@ private extension AdamantRichTransactionStatusService {
         let privateContext = NSManagedObjectContext(
             concurrencyType: .privateQueueConcurrencyType
         )
-        
+
         privateContext.parent = coreDataStack.container.viewContext
-        transaction.transactionStatus = status
+        
+        let transaction = privateContext.object(with: transaction.objectID)
+            as? RichMessageTransaction
+        
+        transaction?.transactionStatus = status
         try? privateContext.save()
     }
+
+    // MARK: Core Data
+
+    func processCoreDataChange(type: NSFetchedResultsChangeType, transaction: RichMessageTransaction) {
+        switch type {
+        case .insert, .update:
+            add(transaction: transaction)
+        case .delete:
+            remove(transaction: transaction)
+        case .move:
+            break
+        @unknown default:
+            break
+        }
+    }
     
-    func getProvider(
-        for transaction: RichMessageTransaction
-    ) -> RichMessageProviderWithStatusCheck? {
-        guard let transfer = transaction.transfer else { return nil }
-        return richProviders[transfer.type]
+    func getRichTransactionsController() -> NSFetchedResultsController<RichMessageTransaction> {
+        let request: NSFetchRequest<RichMessageTransaction> = NSFetchRequest(
+            entityName: RichMessageTransaction.entityName
+        )
+
+        request.sortDescriptors = []
+        return NSFetchedResultsController(
+            fetchRequest: request,
+            managedObjectContext: coreDataStack.container.viewContext,
+            sectionNameKeyPath: nil,
+            cacheName: nil
+        )
     }
 }

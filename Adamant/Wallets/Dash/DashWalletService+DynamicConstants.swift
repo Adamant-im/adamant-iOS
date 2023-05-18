@@ -25,7 +25,7 @@ extension DashWalletService {
     }
         
     static var oldPendingAttempts: Int {
-        3
+        4
     }
         
     var tokenName: String {
@@ -49,7 +49,7 @@ extension DashWalletService {
     }
     
     var defaultOrdinalLevel: Int? {
-        50
+        80
     }
     
     static let explorerAddress = "https://dashblockexplorer.com/tx/"

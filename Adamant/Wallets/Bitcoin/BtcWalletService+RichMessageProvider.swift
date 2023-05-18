@@ -101,14 +101,8 @@ extension BtcWalletService: RichMessageProvider {
                     richTransaction: transaction,
                     in: chat
                 )
-            } catch let error as WalletServiceError {
+            } catch {
                 dialogService.dismissProgress()
-                guard case let .internalError(message, _) = error,
-                      message == "No transaction"
-                else {
-                    dialogService.showRichError(error: error)
-                    return
-                }
                 
                 presentDetailTransactionVC(
                     hash: hash,

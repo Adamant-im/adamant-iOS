@@ -9,11 +9,11 @@
 import UIKit
 import Eureka
 
-class BtcTransferViewController: TransferViewControllerBase {
+final class BtcTransferViewController: TransferViewControllerBase {
     
     // MARK: Dependencies
     
-    var chatsProvider: ChatsProvider
+    private let chatsProvider: ChatsProvider
     
     // MARK: Properties
     
@@ -89,7 +89,12 @@ class BtcTransferViewController: TransferViewControllerBase {
                 }
                 
                 Task {
-                    try await service.sendTransaction(transaction)
+                    do {
+                        try await service.sendTransaction(transaction)
+                    } catch {
+                        dialogService.showRichError(error: error)
+                    }
+                    
                     try await service.update()
                 }
                 

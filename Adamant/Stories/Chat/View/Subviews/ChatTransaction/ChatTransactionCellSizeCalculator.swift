@@ -34,7 +34,7 @@ final class ChatTransactionCellSizeCalculator: CellSizeCalculator {
         
         return .init(
             width: messagesFlowLayout.itemWidth,
-            height: model.height(for: messagesFlowLayout.itemWidth)
+            height: model.value.height(for: messagesFlowLayout.itemWidth)
         )
     }
 }

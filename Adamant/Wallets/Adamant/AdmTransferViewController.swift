@@ -12,18 +12,18 @@ import SafariServices
 
 // MARK: - Localization
 extension String.adamantLocalized {
-    struct transferAdm {
+    enum transferAdm {
         static func accountNotFoundAlertTitle(for address: String) -> String {
             return String.localizedStringWithFormat(NSLocalizedString("TransferScene.unsafeTransferAlert.title", comment: "Transfer: Alert title: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address"), address)
         }
             
         static let accountNotFoundAlertBody = NSLocalizedString("TransferScene.unsafeTransferAlert.body", comment: "Transfer: Alert body: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address")
         
-        private init() {}
+        static let accountNotFoundChatAlertBody = NSLocalizedString("TransferScene.unsafeChatAlert.body", comment: "Transfer: Alert body: Account is not initiated. It's not possible to start a chat, as the Blockchain doesn't store the account's public key to encrypt messages.")
     }
 }
 
-class AdmTransferViewController: TransferViewControllerBase {
+final class AdmTransferViewController: TransferViewControllerBase {
     // MARK: Properties
     
     private var skipValueChange: Bool = false

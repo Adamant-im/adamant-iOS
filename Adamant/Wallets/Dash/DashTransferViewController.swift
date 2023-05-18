@@ -14,11 +14,11 @@ extension String.adamantLocalized.transfer {
         static let minAmountError = NSLocalizedString("TransferScene.Error.MinAmount", comment: "Transfer: Minimal transaction amount is 0.00001")
 }
 
-class DashTransferViewController: TransferViewControllerBase {
+final class DashTransferViewController: TransferViewControllerBase {
     
     // MARK: Dependencies
     
-    var chatsProvider: ChatsProvider
+    private let chatsProvider: ChatsProvider
     
     // MARK: Properties
     
@@ -97,7 +97,12 @@ class DashTransferViewController: TransferViewControllerBase {
                 }
                 
                 Task {
-                    try await service.sendTransaction(transaction)
+                    do {
+                        try await service.sendTransaction(transaction)
+                    } catch {
+                        dialogService.showRichError(error: error)
+                    }
+                    
                     await service.update()
                 }
                 

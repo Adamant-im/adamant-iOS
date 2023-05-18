@@ -9,6 +9,7 @@
 import Combine
 import CoreData
 import MarkdownKit
+import UIKit
 
 @MainActor
 final class ChatViewModel: NSObject {
@@ -22,6 +23,7 @@ final class ChatViewModel: NSObject {
     private let visibleWalletService: VisibleWalletsService
     private let accountService: AccountService
     private let accountProvider: AccountsProvider
+    private let richTransactionStatusService: RichTransactionStatusService
     private let chatCacheService: ChatCacheService
     private let richMessageProviders: [String: RichMessageProvider]
     
@@ -35,10 +37,18 @@ final class ChatViewModel: NSObject {
     private var messageIdToShow: String?
     private var isLoading = false
     
+    private var isNeedToLoadMoreMessages: Bool {
+        get async {
+            guard let address = chatroom?.partner?.address else { return false }
+            
+            return await chatsProvider.chatLoadedMessages[address] ?? .zero
+                < chatsProvider.chatMaxMessages[address] ?? .zero
+        }
+    }
+    
     private(set) var sender = ChatSender.default
     private(set) var chatroom: Chatroom?
     private(set) var chatTransactions: [ChatTransaction] = []
-    private(set) var isNeedToLoadMoreMessages = false
     
     let didTapTransfer = ObservableSender<String>()
     let dialog = ObservableSender<ChatDialog>()
@@ -46,6 +56,7 @@ final class ChatViewModel: NSObject {
     let didTapAdmSend = ObservableSender<AdamantAddress>()
     let closeScreen = ObservableSender<Void>()
     
+    @ObservableValue private(set) var isHeaderLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
     @ObservableValue private(set) var messages = [ChatMessage]()
     @ObservableValue private(set) var isAttachmentButtonAvailable = false
@@ -64,11 +75,14 @@ final class ChatViewModel: NSObject {
     }
     
     var freeTokensURL: URL? {
-        guard let address = chatroom?.partner?.address else { return nil }
+        guard let address = accountService.account?.address else { return nil }
         let urlString: String = .adamantLocalized.wallets.getFreeTokensUrl(for: address)
         
         guard let url = URL(string: urlString) else {
-            dialog.send(.error("Failed to create URL with string: \(urlString)"))
+            dialog.send(.error(
+                "Failed to create URL with string: \(urlString)",
+                supportEmail: true
+            ))
             return nil
         }
         
@@ -84,6 +98,7 @@ final class ChatViewModel: NSObject {
         visibleWalletService: VisibleWalletsService,
         accountService: AccountService,
         accountProvider: AccountsProvider,
+        richTransactionStatusService: RichTransactionStatusService,
         chatCacheService: ChatCacheService,
         richMessageProviders: [String: RichMessageProvider]
     ) {
@@ -96,6 +111,7 @@ final class ChatViewModel: NSObject {
         self.visibleWalletService = visibleWalletService
         self.accountService = accountService
         self.accountProvider = accountProvider
+        self.richTransactionStatusService = richTransactionStatusService
         self.chatCacheService = chatCacheService
         super.init()
         setupObservers()
@@ -127,20 +143,25 @@ final class ChatViewModel: NSObject {
                 thenRemoveIt: true
             ).map { inputText = $0 }
             
-            messages = chatCacheService.getMessages(address: partnerAddress)
+            let cachedMessages = chatCacheService.getMessages(address: partnerAddress)
+            messages = cachedMessages ?? []
+            fullscreenLoading = cachedMessages == nil
         }
     }
     
     func loadFirstMessagesIfNeeded() {
         Task {
-            guard let address = chatroom?.partner?.address else { return }
+            guard let address = chatroom?.partner?.address else {
+                fullscreenLoading = false
+                return
+            }
             
             let isChatLoaded = await chatsProvider.isChatLoaded(with: address)
             
             if address == AdamantContacts.adamantWelcomeWallet.name || isChatLoaded {
                 updateTransactions(performFetch: true)
             } else {
-                await loadMessages(address: address, offset: .zero, fullscreenLoading: true)
+                await loadMessages(address: address, offset: .zero)
             }
         }.stored(in: tasksStorage)
     }
@@ -151,11 +172,11 @@ final class ChatViewModel: NSObject {
         Task {
             guard
                 let address = chatroom?.partner?.address,
-                isNeedToLoadMoreMessages
+                await isNeedToLoadMoreMessages
             else { return }
             
             let offset = await chatsProvider.chatLoadedMessages[address] ?? .zero
-            await loadMessages(address: address, offset: offset, fullscreenLoading: false)
+            await loadMessages(address: address, offset: offset)
         }.stored(in: tasksStorage)
     }
     
@@ -190,14 +211,10 @@ final class ChatViewModel: NSObject {
         Task {
             guard
                 let transaction = chatTransactions.first(where: { $0.chatMessageId == id }),
-                let richMessageTransaction = transaction as? RichMessageTransaction,
-                let index = messages.firstIndex(where: { id == $0.id }),
-                case var .transaction(model) = messages[index].content
+                let richMessageTransaction = transaction as? RichMessageTransaction
             else { return }
             
-            model.status = .notInitiated
-            messages[index].content = .transaction(model)
-            await chatsProvider.forceUpdateStatus(for: richMessageTransaction)
+            await richTransactionStatusService.forceUpdate(transaction: richMessageTransaction)
         }.stored(in: tasksStorage)
     }
     
@@ -217,6 +234,10 @@ final class ChatViewModel: NSObject {
             await chatsProvider.blockChat(with: address)
             closeScreen.send()
         }
+    }
+    
+    func getKvsName(for address: String) -> String? {
+        return addressBookService.getName(for: address)
     }
     
     func setNewName(_ newName: String) {
@@ -256,8 +277,7 @@ final class ChatViewModel: NSObject {
             try? transaction.managedObjectContext?.save()
             
             await chatroom?.updateLastTransaction()
-            guard let id = transaction.transactionId else { return }
-            await chatsProvider.removeMessage(with: id)
+            await chatsProvider.removeMessage(with: transaction.transactionId)
         }
     }
     
@@ -347,13 +367,20 @@ private extension ChatViewModel {
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in self?.updateAttachmentButtonAvailability() }
             .store(in: &subscriptions)
+        
+        Task {
+            await chatsProvider.stateObserver
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] state in
+                    self?.isHeaderLoading = state == .updating ? true : false
+                }
+                .store(in: &subscriptions)
+        }.stored(in: tasksStorage)
     }
     
-    func loadMessages(address: String, offset: Int, fullscreenLoading: Bool) async {
+    func loadMessages(address: String, offset: Int) async {
         guard !isLoading else { return }
-
         isLoading = true
-        self.fullscreenLoading = fullscreenLoading
         
         await chatsProvider.getChatMessages(
             with: address,
@@ -377,7 +404,6 @@ private extension ChatViewModel {
         
         Task(priority: .userInitiated) { [chatTransactions, sender] in
             var expirationTimestamp: TimeInterval?
-            let isNeedToLoadMoreMessages = await checkIfNeedToLoadMooreMessages()
 
             let messages = await chatMessagesListFactory.makeMessages(
                 transactions: chatTransactions,
@@ -422,17 +448,6 @@ private extension ChatViewModel {
         timerSubscription = Timer.publish(every: interval, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in self?.updateMessages(resetLoadingProperty: false) }
-    }
-    
-    func checkIfNeedToLoadMooreMessages() async -> Bool {
-        guard let address = chatroom?.partner?.address else {
-            isNeedToLoadMoreMessages = false
-            return isNeedToLoadMoreMessages
-        }
-        
-        isNeedToLoadMoreMessages = await chatsProvider.chatLoadedMessages[address] ?? .zero < chatsProvider.chatMaxMessages[address] ?? .zero
-        
-        return isNeedToLoadMoreMessages
     }
     
     func validateSendingMessage(message: AdamantMessage) async -> Bool {
@@ -504,10 +519,10 @@ private extension ChatViewModel {
             self.startNewChat(with: chatroom, message: message)
         } catch let error as AccountsProviderError {
             switch error {
-            case .dummy:
+            case .dummy, .notFound, .notInitiated:
                 self.dialog.send(.progress(false))
                 self.dialog.send(.dummy(address))
-            case .notFound, .invalidAddress, .notInitiated, .networkError:
+            case .invalidAddress, .networkError:
                 self.dialog.send(.progress(false))
                 self.dialog.send(.alert(error.localized))
             case .serverError(let apiError):
@@ -519,20 +534,30 @@ private extension ChatViewModel {
                     return
                 }
                 
-                self.dialog.send(.error(error.localized))
+                self.dialog.send(.error(error.localized, supportEmail: false))
             }
         } catch {
-            self.dialog.send(.error(error.localizedDescription))
+            self.dialog.send(.error(
+                error.localizedDescription,
+                supportEmail: false
+            ))
         }
     }
     
     func setNameIfNeeded(for account: CoreDataAccount?, chatroom: Chatroom?, name: String?) {
         guard let name = name,
               let account = account,
-              account.name == nil
+              let address = account.address,
+              account.name == nil,
+              addressBookService.getName(for: address) == nil
         else {
             return
         }
+        
+        Task {
+            await addressBookService.set(name: name, for: address)
+        }.stored(in: tasksStorage)
+        
         account.name = name
         if let chatroom = chatroom, chatroom.title == nil {
             chatroom.title = name

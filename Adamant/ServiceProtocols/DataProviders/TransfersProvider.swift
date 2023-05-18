@@ -78,9 +78,12 @@ extension TransfersProviderError: RichError {
         switch self {
         case .notLogged, .accountNotFound, .transactionNotFound, .networkError, .notEnoughMoney, .requestCancelled:
             return .warning
-            
-        case .serverError, .internalError, .dependencyError:
+        
+        case .serverError:
             return .error
+            
+        case .internalError, .dependencyError:
+            return .internalError
         }
     }
     
@@ -137,6 +140,7 @@ protocol TransfersProvider: DataProvider, Actor {
     var readedLastHeight: Int64? { get }
     var isInitiallySynced: Bool { get }
     var hasTransactions: Bool { get }
+    var offsetTransactions: Int { get set }
     
     // MARK: Controller
     func transfersController() -> NSFetchedResultsController<TransferTransaction>
@@ -157,4 +161,15 @@ protocol TransfersProvider: DataProvider, Actor {
     // MARK: - Transactions
     func getTransfer(id: String) -> TransferTransaction?
     func refreshTransfer(id: String) async throws
+    
+    /// Load moore transactions
+    func getTransactions(
+        forAccount account: String,
+        type: TransactionType,
+        offset: Int,
+        limit: Int,
+        orderByTime: Bool
+    ) async throws -> Int
+    
+    func updateOffsetTransactions(_ value: Int)
 }

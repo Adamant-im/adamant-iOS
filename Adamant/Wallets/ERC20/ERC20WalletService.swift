@@ -109,8 +109,6 @@ class ERC20WalletService: WalletService {
     
     private (set) var token: ERC20Token?
     private (set) var erc20: ERC20?
-    
-    let defaultDispatchQueue = DispatchQueue(label: "im.adamant.erc20WalletService", qos: .utility, attributes: [.concurrent])
     private (set) var enabled = true
     
     private var _ethNodeUrl: String?
@@ -127,7 +125,6 @@ class ERC20WalletService: WalletService {
             return await setupEthNode(with: url)
         }
     }
-    private var baseUrl: String!
     
     var walletViewController: WalletViewController {
         guard let vc = router.get(scene: AdamantScene.Wallets.ERC20.wallet) as? ERC20WalletViewController else {
@@ -210,7 +207,6 @@ class ERC20WalletService: WalletService {
         }
         
         self._web3 = web3
-        self.baseUrl = ERC20WalletService.buildBaseUrl(for: web3.provider.network)
         
         if let address = EthereumAddress(token.contractAddress) {
             self.contract = web3.contract(Web3.Utils.erc20ABI, at: address, abiVersion: 2)
@@ -318,9 +314,8 @@ class ERC20WalletService: WalletService {
             let price = try await web3.eth.gasPrice()
             return price
         } catch {
-            throw WalletServiceError.internalError(
-                message: error.localizedDescription,
-                error: error
+            throw WalletServiceError.remoteServiceError(
+                message: error.localizedDescription
             )
         }
     }
@@ -343,29 +338,10 @@ class ERC20WalletService: WalletService {
             let price = try await web3.eth.estimateGas(for: transaction)
             return price
         } catch {
-            throw WalletServiceError.internalError(
-                message: error.localizedDescription,
-                error: error
+            throw WalletServiceError.remoteServiceError(
+                message: error.localizedDescription
             )
         }
-    }
-    
-    private static func buildBaseUrl(for network: Networks?) -> String {
-        let suffix: String
-        
-        guard let network = network else {
-            return "https://api.etherscan.io/api"
-        }
-        
-        switch network {
-        case .Mainnet:
-            suffix = ""
-            
-        default:
-            suffix = "-\(network)"
-        }
-        
-        return "https://api\(suffix).etherscan.io/api"
     }
     
     private func buildUrl(url: URL, queryItems: [URLQueryItem]? = nil) throws -> URL {
@@ -459,8 +435,10 @@ extension ERC20WalletService {
             details = try await eth.transactionDetails(hash)
         } catch let error as Web3Error {
             throw error.asWalletServiceError()
+        } catch _ as URLError {
+            throw WalletServiceError.networkError
         } catch {
-            throw WalletServiceError.internalError(message: "Failed to get transaction", error: error)
+            throw WalletServiceError.remoteServiceError(message: "Failed to get transaction")
         }
         
         // MARK: 2. Transaction receipt
@@ -488,9 +466,8 @@ extension ERC20WalletService {
             let block = try await eth.block(by: receipt.blockHash)
             
             guard currentBlock >= blockNumber else {
-                throw WalletServiceError.internalError(
-                    message: "ERC20 confirmations calculating error",
-                    error: nil
+                throw WalletServiceError.remoteServiceError(
+                    message: "ERC20 confirmations calculating error"
                 )
             }
             
@@ -534,9 +511,19 @@ extension ERC20WalletService {
             default:
                 throw error.asWalletServiceError()
             }
+        } catch _ as URLError {
+            throw WalletServiceError.networkError
         } catch {
-            throw WalletServiceError.internalError(message: "Failed to get transaction", error: error)
+            throw error
         }
+    }
+    
+    func getBalance(address: String) async throws -> Decimal {
+        guard let address = EthereumAddress(address) else {
+            throw WalletServiceError.internalError(message: "Incorrect address", error: nil)
+        }
+        
+        return try await getBalance(forAddress: address)
     }
     
     func getBalance(forAddress address: EthereumAddress) async throws -> Decimal {
@@ -557,9 +544,8 @@ extension ERC20WalletService {
             let value = balance.asDecimal(exponent: exponent)
             return value
         } catch {
-            throw WalletServiceError.internalError(
-                message: "ERC 20 Service - Fail to get balance",
-                error: error
+            throw WalletServiceError.remoteServiceError(
+                message: "ERC 20 Service - Fail to get balance"
             )
         }
     }
@@ -574,9 +560,8 @@ extension ERC20WalletService {
             
             return result
         } catch let error as ApiServiceError {
-            throw WalletServiceError.internalError(
-                message: "ETH Wallet: failed to get address from KVS",
-                error: error
+            throw WalletServiceError.remoteServiceError(
+                message: "ETH Wallet: failed to get address from KVS"
             )
         }
     }

@@ -197,7 +197,7 @@ class AccountViewController: FormViewController {
             do {
                 try controller.performFetch()
             } catch {
-                dialogService.showError(withMessage: "Error fetching transfers: report a bug", error: error)
+                dialogService.showError(withMessage: "Error fetching transfers: report a bug", supportEmail: true, error: error)
             }
         }
         

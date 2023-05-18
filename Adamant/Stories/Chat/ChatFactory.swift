@@ -19,6 +19,7 @@ struct ChatFactory {
     let transferProvider: TransfersProvider
     let accountService: AccountService
     let accountProvider: AccountsProvider
+    let richTransactionStatusService: RichTransactionStatusService
     let addressBookService: AddressBookService
     let visibleWalletService: VisibleWalletsService
     let router: Router
@@ -31,14 +32,14 @@ struct ChatFactory {
         
         let admService = accountService.wallets.first { wallet in
             return wallet is AdmWalletService
-        }
+        } as? AdmWalletService
         
         let viewController = ChatViewController(
             viewModel: viewModel,
             richMessageProviders: richMessageProviders,
             storedObjects: delegates.asArray + [dialogManager],
             sendTransaction: makeSendTransactionAction(viewModel: viewModel),
-            admService: admService as? WalletServiceWithSend
+            admService: admService
         )
         
         viewController.setupDelegates(delegates)
@@ -75,6 +76,7 @@ private extension ChatFactory {
             visibleWalletService: visibleWalletService,
             accountService: accountService,
             accountProvider: accountProvider,
+            richTransactionStatusService: richTransactionStatusService,
             chatCacheService: chatCacheService,
             richMessageProviders: richMessageProviders
         )

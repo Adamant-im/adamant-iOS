@@ -9,16 +9,16 @@ import Foundation
 
 public struct ServiceTransactionModel: APIModel {
     
-    public var blockId: String {
-        return block.id
+    public var blockId: String? {
+        return block?.id
     }
     
     public var type: UInt8 {
         return 0
     }
     
-    public var timestamp: UInt32 {
-        return block.timestamp
+    public var timestamp: UInt32? {
+        return block?.timestamp
     }
     
     public var senderPublicKey: String {
@@ -71,8 +71,8 @@ public struct ServiceTransactionModel: APIModel {
 
     public let id: String
     public let fee: String
-    public let height: UInt64
-    public let block: Block
+    public let height: UInt64?
+    public let block: Block?
     public let sender: Sender
     public let asset: Asset
     public let isPending: Bool

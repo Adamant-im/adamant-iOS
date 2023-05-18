@@ -34,7 +34,12 @@ extension String.adamantLocalized {
 
 // MARK: - Delegate
 protocol NewChatViewControllerDelegate: AnyObject {
-    func newChatController(_ controller: NewChatViewController, didSelectAccount account: CoreDataAccount, preMessage: String?)
+    func newChatController(
+        _ controller: NewChatViewController,
+        didSelectAccount account: CoreDataAccount,
+        preMessage: String?,
+        name: String?
+    )
 }
 
 // MARK: -
@@ -200,7 +205,7 @@ class NewChatViewController: FormViewController {
                     self?.present(vc, animated: true, completion: nil)
                     
                 case .failure(error: let error):
-                    self?.dialogService.showError(withMessage: error.localizedDescription, error: error)
+                    self?.dialogService.showError(withMessage: error.localizedDescription, supportEmail: true, error: error)
                 }
             }
             
@@ -271,46 +276,29 @@ class NewChatViewController: FormViewController {
         Task {
             do {
                 let account = try await accountsProvider.getAccount(byAddress: address)
-                if let name = name, account.name == nil {
-                    account.name = name
-                    
-                    if let chatroom = account.chatroom, chatroom.title == nil {
-                        chatroom.title = name
-                    }
-                }
-                
                 account.chatroom?.isForcedVisible = true
-                self.delegate?.newChatController(self, didSelectAccount: account, preMessage: message)
+                
+                self.delegate?.newChatController(
+                    self,
+                    didSelectAccount: account,
+                    preMessage: message,
+                    name: name
+                )
+                
                 self.dialogService.dismissProgress()
             } catch let error as AccountsProviderError {
                 switch error {
-                case .dummy:
+                case .dummy, .notFound, .notInitiated:
                     self.dialogService.dismissProgress()
                     
-                    let alert = UIAlertController(
-                        title: nil,
-                        message: AccountsProviderError.notInitiated(address: address).localized,
-                        preferredStyle: .alert
+                    dialogService.presentDummyChatAlert(
+                        for: address,
+                        from: nil,
+                        canSend: false,
+                        sendCompletion: nil
                     )
                     
-                    let faq = UIAlertAction(title: String.adamantLocalized.newChat.whatDoesItMean, style: .default, handler: { [weak self] _ in
-                        guard let url = URL(string: NewChatViewController.faqUrl) else {
-                            return
-                        }
-                        
-                        let safari = SFSafariViewController(url: url)
-                        safari.preferredControlTintColor = UIColor.adamant.primary
-                        safari.modalPresentationStyle = .overFullScreen
-                        self?.present(safari, animated: true, completion: nil)
-                    })
-                    
-                    alert.addAction(faq)
-                    alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
-                    
-                    alert.modalPresentationStyle = .overFullScreen
-                    self.present(alert, animated: true, completion: nil)
-                    
-                case .notFound, .invalidAddress, .notInitiated, .networkError:
+                case .invalidAddress, .networkError:
                     self.dialogService.showWarning(withMessage: error.localized)
                     
                 case .serverError(let apiError):
@@ -321,10 +309,10 @@ class NewChatViewController: FormViewController {
                         return
                     }
                     
-                    self.dialogService.showError(withMessage: error.localized, error: error)
+                    self.dialogService.showError(withMessage: error.localized, supportEmail: false, error: error)
                 }
             } catch {
-                self.dialogService.showError(withMessage: error.localizedDescription, error: error)
+                self.dialogService.showError(withMessage: error.localizedDescription, supportEmail: false, error: error)
             }
         }
     }

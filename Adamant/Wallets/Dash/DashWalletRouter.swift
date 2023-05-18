@@ -21,7 +21,7 @@ extension AdamantScene.Wallets {
         
         /// Send tokens
         static let transfer = AdamantScene(identifier: "DashTransferViewController") { r in
-            let c = DashTransferViewController(
+            DashTransferViewController(
                 accountService: r.resolve(AccountService.self)!,
                 accountsProvider: r.resolve(AccountsProvider.self)!,
                 dialogService: r.resolve(DialogService.self)!,
@@ -30,7 +30,6 @@ extension AdamantScene.Wallets {
                 increaseFeeService: r.resolve(IncreaseFeeService.self)!,
                 chatsProvider: r.resolve(ChatsProvider.self)!
             )
-            return c
         }
         
         /// List of transactions
@@ -43,9 +42,10 @@ extension AdamantScene.Wallets {
         
         /// Transaction details
         static let transactionDetails = AdamantScene(identifier: "TransactionDetailsViewControllerBase") { r in
-            let c = DashTransactionDetailsViewController()
-            c.dialogService = r.resolve(DialogService.self)
-            c.currencyInfo = r.resolve(CurrencyInfoService.self)
+            let c = DashTransactionDetailsViewController(
+                dialogService: r.resolve(DialogService.self)!,
+                currencyInfo: r.resolve(CurrencyInfoService.self)!
+            )
             return c
         }
     }

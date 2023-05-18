@@ -21,11 +21,11 @@ extension LskWalletService {
     }
         
     static var newPendingAttempts: Int {
-        10
+        15
     }
         
     static var oldPendingAttempts: Int {
-        3
+        4
     }
         
     var tokenName: String {
@@ -49,7 +49,7 @@ extension LskWalletService {
     }
     
     var defaultOrdinalLevel: Int? {
-        30
+        60
     }
     
     static let explorerAddress = "https://liskscan.com/transaction/"

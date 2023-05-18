@@ -114,14 +114,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         switch tabScreens {
         case let .splitControllers(leftController, rightController):
             resetScreensAction = {
-                let chatDetails = UIViewController(
-                    nibName: "WelcomeViewController",
-                    bundle: nil
-                )
-                let accountDetails = UIViewController(
-                    nibName: "WelcomeViewController",
-                    bundle: nil
-                )
+                let chatDetails = WelcomeViewController()
+                let accountDetails = WelcomeViewController()
                 leftController.viewControllers = [chatList, chatDetails]
                 rightController.viewControllers = [account, accountDetails]
             }
@@ -203,16 +197,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
         
+        // Setup transactions statuses observing
+        if let service = container.resolve(RichTransactionStatusService.self) {
+            Task { await service.startObserving() }
+        }
+        
         // Register repeater services
         if let chatsProvider = container.resolve(ChatsProvider.self) {
             repeater.registerForegroundCall(label: "chatsProvider", interval: 10, queue: .global(qos: .utility), callback: {
                 Task {
-                    await chatsProvider.update()
+                    await chatsProvider.update(notifyState: false)
                 }
             })
             
         } else {
-            dialogService.showError(withMessage: "Failed to register ChatsProvider autoupdate. Please, report a bug", error: nil)
+            dialogService.showError(withMessage: "Failed to register ChatsProvider autoupdate. Please, report a bug", supportEmail: true, error: nil)
         }
         
         if let transfersProvider = container.resolve(TransfersProvider.self) {
@@ -222,13 +221,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             })
         } else {
-            dialogService.showError(withMessage: "Failed to register TransfersProvider autoupdate. Please, report a bug", error: nil)
+            dialogService.showError(withMessage: "Failed to register TransfersProvider autoupdate. Please, report a bug", supportEmail: true, error: nil)
         }
         
         if let accountService = container.resolve(AccountService.self) {
             repeater.registerForegroundCall(label: "accountService", interval: 15, queue: .global(qos: .utility), callback: accountService.update)
         } else {
-            dialogService.showError(withMessage: "Failed to register AccountService autoupdate. Please, report a bug", error: nil)
+            dialogService.showError(withMessage: "Failed to register AccountService autoupdate. Please, report a bug", supportEmail: true, error: nil)
         }
         
         if let addressBookService = container.resolve(AddressBookService.self) {
@@ -238,14 +237,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             })
         } else {
-            dialogService.showError(withMessage: "Failed to register AddressBookService autoupdate. Please, report a bug", error: nil)
+            dialogService.showError(withMessage: "Failed to register AddressBookService autoupdate. Please, report a bug", supportEmail: true, error: nil)
         }
         
         if let currencyInfoService = container.resolve(CurrencyInfoService.self) {
             currencyInfoService.update() // Initial update
             repeater.registerForegroundCall(label: "currencyInfoService", interval: 60, queue: .global(qos: .utility), callback: currencyInfoService.update)
         } else {
-            dialogService.showError(withMessage: "Failed to register CurrencyInfoService autoupdate. Please, report a bug", error: nil)
+            dialogService.showError(withMessage: "Failed to register CurrencyInfoService autoupdate. Please, report a bug", supportEmail: true, error: nil)
         }
         
         // MARK: 7. Logout reset
@@ -311,13 +310,19 @@ extension AppDelegate {
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         if let service = container.resolve(DialogService.self) {
-            service.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.notifications.registerRemotesError, error.localizedDescription), error: error)
+            service.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.notifications.registerRemotesError, error.localizedDescription), supportEmail: true, error: error)
         }
     }
     
-    func openDialog(chatList: UINavigationController, tabbar: UITabBarController, list: ChatListViewController, transactionID: String, senderAddress: String) {
+    func openDialog(
+        chatListNav: UINavigationController,
+        tabbar: UITabBarController,
+        chatListVC: ChatListViewController,
+        transactionID: String,
+        senderAddress: String
+    ) {
         if
-            let chatVCNav = chatList.viewControllers.last as? UINavigationController,
+            let chatVCNav = chatListNav.viewControllers.last as? UINavigationController,
             let chatVC = chatVCNav.viewControllers.first as? ChatViewController,
             chatVC.viewModel.chatroom?.partner?.address == senderAddress
         {
@@ -325,26 +330,38 @@ extension AppDelegate {
             return
         }
         
-        guard let chatroom = list.chatsController?.fetchedObjects?.first(where: { room in
-            let transactionExist = room.transactions?.first(where: { message in
-                return (message as? ChatTransaction)?.senderAddress == senderAddress
-            })
-            return transactionExist != nil
-        }) else { return }
-        
-        chatList.popToRootViewController(animated: false)
-        chatList.dismiss(animated: false, completion: nil)
-        tabbar.selectedIndex = 0
-        
-        let vc = list.chatViewController(for: chatroom)
-        if let split = list.splitViewController {
-            let chat = UINavigationController(rootViewController: vc)
-            split.showDetailViewController(chat, sender: list)
-        } else {
-            chatList.pushViewController(vc, animated: false)
+        if
+            let chatVC = chatListNav.viewControllers.last as? ChatViewController,
+            chatVC.viewModel.chatroom?.partner?.address == senderAddress
+        {
+            chatVC.messagesCollectionView.scrollToLastItem()
+            return
         }
         
-        list.selectChatroomRow(chatroom: chatroom)
+        let chatroom = chatListVC.chatsController?.fetchedObjects?.first(
+            where: {
+                $0.partner?.address == senderAddress
+            }
+        )
+        
+        guard let chatroom = chatroom else { return }
+        
+        chatListNav.popToRootViewController(animated: true)
+        chatListNav.dismiss(animated: true, completion: nil)
+        tabbar.selectedIndex = 0
+        
+        let vc = chatListVC.chatViewController(for: chatroom)
+                                               
+        vc.hidesBottomBarWhenPushed = true
+        
+        if let split = chatListVC.splitViewController {
+            let chat = UINavigationController(rootViewController: vc)
+            split.showDetailViewController(chat, sender: chatListVC)
+        } else {
+            chatListNav.pushViewController(vc, animated: true)
+        }
+        
+        chatListVC.selectChatroomRow(chatroom: chatroom)
     }
 }
 
@@ -354,25 +371,51 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
+        var chatListNav: UINavigationController?
+        var chatListVC: ChatListViewController?
+        
         let userInfo = response.notification.request.content.userInfo
+        
         guard let transactionID = userInfo[AdamantNotificationUserInfoKeys.transactionId] as? String,
               let transactionRaw = userInfo[AdamantNotificationUserInfoKeys.transaction] as? String,
               let data = transactionRaw.data(using: .utf8),
               let trs = try? JSONDecoder().decode(Transaction.self, from: data),
-              let tabbar = window?.rootViewController as? UITabBarController,
-              let chats = tabbar.viewControllers?.first as? UISplitViewController,
-              let chatList = chats.viewControllers.first as? UINavigationController,
-              let list = chatList.viewControllers.first as? ChatListViewController
+              let tabbar = window?.rootViewController as? UITabBarController
         else {
             completionHandler()
             return
         }
         
-        // if not logged in
-        list.performOnMessagesLoaded { [weak self] in
+        if let split = tabbar.viewControllers?.first as? UISplitViewController,
+           let navigation = split.viewControllers.first as? UINavigationController,
+           let vc = navigation.viewControllers.first as? ChatListViewController {
+            chatListNav = navigation
+            chatListVC = vc
+        }
+        
+        if let navigation = tabbar.viewControllers?.first as? UINavigationController,
+           let vc = navigation.viewControllers.first as? ChatListViewController {
+            chatListNav = navigation
+            chatListVC = vc
+        }
+        
+        guard let chatListVC = chatListVC,
+              let chatListNav = chatListNav
+        else {
+            completionHandler()
+            return
+        }
+        
+        chatListVC.performOnMessagesLoaded { [weak self] in
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self?.dialogService.dismissProgress()
-                self?.openDialog(chatList: chatList, tabbar: tabbar, list: list, transactionID: transactionID, senderAddress: trs.senderId)
+                self?.openDialog(
+                    chatListNav: chatListNav,
+                    tabbar: tabbar,
+                    chatListVC: chatListVC,
+                    transactionID: transactionID,
+                    senderAddress: trs.senderId
+                )
             }
         }
         
@@ -463,6 +506,18 @@ extension AppDelegate {
         } else {
             unread = true
         }
+        
+        if let adelina = AdamantContacts.adelina.messages["chats.welcome_message"] {
+            _ = try? await chatProvider.fakeReceived(
+                message: adelina.message,
+                senderId: AdamantContacts.adelina.address,
+                date: Date.adamantNullDate,
+                unread: false,
+                silent: adelina.silentNotification,
+                showsChatroom: true
+            )
+        }
+        
         if let exchenge = AdamantContacts.adamantExchange.messages["chats.welcome_message"] {
             _ = try? await chatProvider.fakeReceived(
                 message: exchenge.message,
@@ -481,7 +536,7 @@ extension AppDelegate {
                 date: Date.adamantNullDate,
                 unread: false,
                 silent: betOnBitcoin.silentNotification,
-                showsChatroom: true
+                showsChatroom: false
             )
         }
         
@@ -506,70 +561,115 @@ extension AppDelegate {
                 showsChatroom: true
             )
         }
-        
-        /*
-        if let ico = AdamantContacts.adamantIco.messages["chats.ico_message"] {
-            chatProvider.fakeReceived(message: ico.message,
-                                      senderId: AdamantContacts.adamantIco.name,
-                                      date: Date.adamantNullDate,
-                                      unread: unread,
-                                      silent: ico.silentNotification,
-                                      showsChatroom: true,
-                                      completion: { result in
-                                        guard case let .failure(error) = result else {
-                                            return
-                                        }
-                                        
-                                        print("ERROR showing welcome message: \(error.message)")
-            })
-        }
-        */
     }
 }
 
 // MARK: - Universal Links
 extension AppDelegate {
-    func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
-        if userActivity.activityType == NSUserActivityTypeBrowsingWeb {
-            let url = userActivity.webpageURL
-            if let adamantAdr = url?.absoluteString.getAdamantAddress() {
-                if let tabbar = window?.rootViewController as? UITabBarController,
-                   let chats = tabbar.viewControllers?.first as? UISplitViewController,
-                   let chatList = chats.viewControllers.first as? UINavigationController,
-                   let router = container.resolve(Router.self),
-                   let list = chatList.viewControllers.first as? ChatListViewController {
-                 
-                    // if not logged in
-                    list.performOnMessagesLoaded { [weak self] in
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                            self?.openDialog(chatList: chatList, tabbar: tabbar, router: router, list: list, adamantAdr: adamantAdr)
-                        }
-                    }
-                }
-                
-            }
-        }
+    func application(
+        _ app: UIApplication,
+        open url: URL,
+        options: [UIApplication.OpenURLOptionsKey: Any]
+    ) -> Bool {
+        processDeepLink(url)
         return true
     }
     
-    func openDialog(chatList: UINavigationController, tabbar: UITabBarController, router: Router, list: ChatListViewController, adamantAdr: AdamantAddress) {
+    func application(
+        _ application: UIApplication,
+        continue userActivity: NSUserActivity,
+        restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void
+    ) -> Bool {
+        guard userActivity.activityType == NSUserActivityTypeBrowsingWeb,
+              let url = userActivity.webpageURL
+        else {
+            return true
+        }
+        
+        processDeepLink(url)
+        return true
+    }
+    
+    func processDeepLink(_ url: URL) {
+        var adamantAdr: AdamantAddress? = url.absoluteString.getAdamantAddress()
+        
+        if adamantAdr == nil {
+            adamantAdr = url.absoluteString.getLegacyAdamantAddress()
+        }
+        
+        guard let adamantAdr = adamantAdr else {
+            return
+        }
+        
+        var chatList: UINavigationController?
+        var chatDetail: ChatListViewController?
+        
+        guard let tabbar = window?.rootViewController as? UITabBarController,
+              let router = container.resolve(Router.self)
+        else {
+            return
+        }
+        
+        if let split = tabbar.viewControllers?.first as? UISplitViewController,
+           let navigation = split.viewControllers.first as? UINavigationController,
+           let vc = navigation.viewControllers.first as? ChatListViewController {
+            chatList = navigation
+            chatDetail = vc
+        }
+        
+        if let navigation = tabbar.viewControllers?.first as? UINavigationController,
+           let vc = navigation.viewControllers.first as? ChatListViewController {
+            chatList = navigation
+            chatDetail = vc
+        }
+        
+        guard let chatList = chatList,
+              let chatDetail = chatDetail
+        else {
+            return
+        }
+        
+        chatDetail.performOnMessagesLoaded { [weak self] in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                self?.startNewDialog(
+                    with: adamantAdr,
+                    chatList: chatList,
+                    tabbar: tabbar,
+                    router: router,
+                    chatDetail: chatDetail
+                )
+            }
+        }
+    }
+    
+    func startNewDialog(
+        with adamantAdr: AdamantAddress,
+        chatList: UINavigationController,
+        tabbar: UITabBarController,
+        router: Router,
+        chatDetail: ChatListViewController
+    ) {
         chatList.popToRootViewController(animated: false)
         chatList.dismiss(animated: false, completion: nil)
         tabbar.selectedIndex = 0
         
-        let controller = router.get(scene: AdamantScene.Chats.newChat)
-        guard let nav = controller as? UINavigationController,
-              let c = nav.viewControllers.last as? NewChatViewController else {
-                  return
-              }
+        let newChat = router.get(scene: AdamantScene.Chats.newChat) as? NewChatViewController
+
+        guard let newChat = newChat else { return }
+
+        newChat.delegate = chatDetail.self
         
-        c.delegate = list.self
+        if let split = chatDetail.splitViewController {
+            split.showDetailViewController(newChat, sender: chatDetail.self)
+        } else if let nav = chatDetail.navigationController {
+            nav.pushViewController(newChat, animated: true)
+        } else {
+            newChat.modalPresentationStyle = .overFullScreen
+            chatDetail.present(newChat, animated: true)
+        }
         
-        if let split = list.splitViewController {
-            split.showDetailViewController(controller, sender: list.self)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                c.startNewChat(with: adamantAdr.address, name: adamantAdr.name, message: adamantAdr.message)
-            }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            newChat.startNewChat(with: adamantAdr.address, name: adamantAdr.name, message: adamantAdr.message)
         }
     }
 }

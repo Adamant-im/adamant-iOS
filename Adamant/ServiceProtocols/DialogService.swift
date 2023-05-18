@@ -85,17 +85,25 @@ enum ShareContentType {
 }
 
 enum ErrorLevel {
-    case warning, error
+    case warning
+    case error
+    case internalError
 }
 
-protocol RichError: Error {
+protocol RichError: LocalizedError {
     var message: String { get }
     var internalError: Error? { get }
     var level: ErrorLevel { get }
 }
 
+extension RichError {
+    var errorDescription: String? {
+        message
+    }
+}
+
 enum AdamantAlertStyle {
-    case alert, actionSheet, richNotification
+    case alert, actionSheet
 }
 
 struct AdamantAlertAction {
@@ -122,7 +130,7 @@ protocol DialogService: AnyObject {
     func dismissProgress()
     func showSuccess(withMessage: String)
     func showWarning(withMessage: String)
-    func showError(withMessage: String, error: Error?)
+    func showError(withMessage: String, supportEmail: Bool, error: Error?)
     func showRichError(error: RichError)
     func showRichError(error: Error)
     func showNoConnectionNotification()
@@ -144,6 +152,21 @@ protocol DialogService: AnyObject {
         for adm: String,
         from: UIView?,
         canSend: Bool,
+        sendCompletion: ((UIAlertAction) -> Void)?
+    )
+    
+    func presentDummyChatAlert(
+        for adm: String,
+        from: UIView?,
+        canSend: Bool,
+        sendCompletion: ((UIAlertAction) -> Void)?
+    )
+    
+    func presentDummyAlert(
+        for adm: String,
+        from: UIView?,
+        canSend: Bool,
+        message: String,
         sendCompletion: ((UIAlertAction) -> Void)?
     )
     

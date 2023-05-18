@@ -38,3 +38,11 @@ extension String {
         return self[index(startIndex, offsetBy:i)]
     }
 }
+
+extension String {
+    func checkAndReplaceSystemWallets() -> String {
+        AdamantContacts(nodeNameKey: self)?.name
+            ?? AdamantContacts(address: self)?.name
+            ?? self
+    }
+}

@@ -188,7 +188,7 @@ extension QRGeneratorViewController {
             setQr(image: qr)
             
         case .failure(let error):
-            dialogService.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.qrGenerator.internalError, error.localizedDescription), error: error)
+            dialogService.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.qrGenerator.internalError, error.localizedDescription), supportEmail: true, error: error)
         }
     }
     

@@ -9,6 +9,7 @@
 import UIKit
 import CoreData
 import MarkdownKit
+import Combine
 
 actor AdamantChatsProvider: ChatsProvider {
     
@@ -21,11 +22,13 @@ actor AdamantChatsProvider: ChatsProvider {
     let accountsProvider: AccountsProvider
     let transactionService: ChatTransactionService
     let securedStore: SecuredStore
-    let richTransactionStatusService: RichTransactionStatusService
     
     private let richProviders: [String: RichMessageProviderWithStatusCheck]
     
     // MARK: Properties
+    @Published private var stateNotifier: State = .empty
+    var stateObserver: Published<State>.Publisher { $stateNotifier }
+    
     private(set) var state: State = .empty
     private(set) var receivedLastHeight: Int64?
     private(set) var readedLastHeight: Int64?
@@ -58,6 +61,8 @@ actor AdamantChatsProvider: ChatsProvider {
     private(set) var roomsMaxCount: Int?
     private(set) var roomsLoadedCount: Int?
     
+    private var subscriptions = Set<AnyCancellable>()
+    
     // MARK: Lifecycle
     init(
         accountService: AccountService,
@@ -67,8 +72,7 @@ actor AdamantChatsProvider: ChatsProvider {
         adamantCore: AdamantCore,
         accountsProvider: AccountsProvider,
         transactionService: ChatTransactionService,
-        securedStore: SecuredStore,
-        richTransactionStatusService: RichTransactionStatusService
+        securedStore: SecuredStore
     ) {
         self.accountService = accountService
         self.apiService = apiService
@@ -78,7 +82,6 @@ actor AdamantChatsProvider: ChatsProvider {
         self.accountsProvider = accountsProvider
         self.transactionService = transactionService
         self.securedStore = securedStore
-        self.richTransactionStatusService = richTransactionStatusService
         
         var richProviders = [String: RichMessageProviderWithStatusCheck]()
         for case let provider as RichMessageProviderWithStatusCheck in accountService.wallets {
@@ -140,6 +143,16 @@ actor AdamantChatsProvider: ChatsProvider {
                 reachabilityChangedAction(notification)
             }
         }
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantTransfersProvider.initialSyncFinished, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { _ in
+                Task { [weak self] in
+                    await self?.getChatRooms(offset: nil)
+                }
+            }
+            .store(in: &subscriptions)
     }
     
     deinit {
@@ -169,10 +182,6 @@ actor AdamantChatsProvider: ChatsProvider {
             store.remove(StoreKey.chatProvider.readedLastHeight)
             self.dropStateData()
             store.set(loggedAddress, for: StoreKey.chatProvider.address)
-        }
-        
-        Task { [weak self] in
-            await self?.getChatRooms(offset: nil)
         }
         
         self.connectToSocket()
@@ -208,7 +217,7 @@ actor AdamantChatsProvider: ChatsProvider {
         if let previousAppState = previousAppState,
            previousAppState == .background {
             self.previousAppState = .active
-            _ = await update()
+            _ = await update(notifyState: true)
         }
     }
     
@@ -242,19 +251,34 @@ actor AdamantChatsProvider: ChatsProvider {
     private func setState(_ state: State, previous prevState: State, notify: Bool = true) {
         self.state = state
         
-        if notify {
-            switch prevState {
-            case .failedToUpdate:
-                NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.stateChanged, object: self, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
-                                                                                                                    AdamantUserInfoKey.TransfersProvider.prevState: prevState])
-                
-            default:
-                if prevState != self.state {
-                    NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.stateChanged, object: self, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
-                                                                                                                        AdamantUserInfoKey.TransfersProvider.prevState: prevState])
-                }
-            }
+        guard notify else { return }
+        
+        if case .failedToUpdate = prevState {
+            NotificationCenter.default.post(
+                name: Notification.Name.AdamantTransfersProvider.stateChanged,
+                object: self,
+                userInfo: [
+                    AdamantUserInfoKey.TransfersProvider.newState: state,
+                    AdamantUserInfoKey.TransfersProvider.prevState: prevState
+                ]
+            )
+            
+            stateNotifier = state
+            return
         }
+        
+        guard prevState != state else { return }
+        
+        NotificationCenter.default.post(
+            name: Notification.Name.AdamantTransfersProvider.stateChanged,
+            object: self,
+            userInfo: [
+                AdamantUserInfoKey.TransfersProvider.newState: state,
+                AdamantUserInfoKey.TransfersProvider.prevState: prevState
+            ]
+        )
+        
+        stateNotifier = state
     }
     
     private func setupSecuredStore() {
@@ -272,7 +296,7 @@ actor AdamantChatsProvider: ChatsProvider {
 extension AdamantChatsProvider {
     func reload() async {
         reset(notify: false)
-        _ = await update()
+        _ = await update(notifyState: false)
     }
     
     func reset() {
@@ -410,7 +434,7 @@ extension AdamantChatsProvider {
         )
         
         isChatLoaded[addressRecipient] = true
-        chatMaxMessages[addressRecipient] = chatroom?.count ?? 0
+        chatMaxMessages[addressRecipient] = chatroom?.count
         
         let loadedCount = chatLoadedMessages[addressRecipient] ?? 0
         chatLoadedMessages[addressRecipient] = loadedCount + (chatroom?.messages?.count ?? 0)
@@ -452,7 +476,12 @@ extension AdamantChatsProvider {
             }
             
             await Task.sleep(interval: requestRepeatDelay)
-            return try await apiGetChatrooms(address: address, offset: offset)
+            
+            return try await apiGetChatMessages(
+                address: address,
+                addressRecipient: addressRecipient,
+                offset: offset
+            )
         }
     }
     
@@ -485,13 +514,11 @@ extension AdamantChatsProvider {
         self.socketService.disconnect()
     }
     
-    func update() async -> ChatsProviderResult? {
-        if state == .updating {
-            return nil
-        }
-        
+    func update(notifyState: Bool) async -> ChatsProviderResult? {
         // MARK: 1. Check state
-        if state == .updating {
+        guard isInitiallySynced,
+              state != .updating
+        else {
             return nil
         }
         
@@ -505,7 +532,7 @@ extension AdamantChatsProvider {
             return .failure(ChatsProviderError.notLogged)
         }
         
-        state = .updating
+        setState(.updating, previous: prevState, notify: notifyState)
         
         // MARK: 3. Get transactions
         
@@ -522,13 +549,15 @@ extension AdamantChatsProvider {
         
         switch state {
         case .upToDate, .empty, .updating:
-            setState(.upToDate, previous: prevState)
+            setState(.upToDate, previous: state, notify: notifyState)
             
             if prevHeight != receivedLastHeight,
                let h = receivedLastHeight {
-                NotificationCenter.default.post(name: Notification.Name.AdamantChatsProvider.newUnreadMessages,
-                                                object: self,
-                                                userInfo: [AdamantUserInfoKey.ChatProvider.lastMessageHeight:h])
+                NotificationCenter.default.post(
+                    name: Notification.Name.AdamantChatsProvider.newUnreadMessages,
+                    object: self,
+                    userInfo: [AdamantUserInfoKey.ChatProvider.lastMessageHeight:h]
+                )
             }
             
             if let h = receivedLastHeight {
@@ -580,6 +609,7 @@ extension AdamantChatsProvider {
                 err = .internalError(error)
             }
             
+            setState(.failedToUpdate(error), previous: state, notify: notifyState)
             return .failure(err)
         }
     }
@@ -767,6 +797,7 @@ extension AdamantChatsProvider {
         transaction.isOutgoing = true
         transaction.chatMessageId = UUID().uuidString
         transaction.isMarkdown = isMarkdown
+        transaction.transactionId = UUID().uuidString
         
         transaction.message = text
         
@@ -809,7 +840,7 @@ extension AdamantChatsProvider {
         transaction.type = Int16(type.rawValue)
         transaction.isOutgoing = true
         transaction.chatMessageId = UUID().uuidString
-        
+        transaction.transactionId = UUID().uuidString
         transaction.richContent = richContent
         transaction.richType = richType
         
@@ -909,27 +940,16 @@ extension AdamantChatsProvider {
                 chatroom.updatedAt = transaction.date
             }
             
-            // MARK: 5. Save unconfirmed transaction
-            do {
-                try context.save()
-            } catch {
-                throw ChatsProviderError.internalError(error)
+            defer {
+                try? context.save()
             }
             
-            let transaction = try await sendTransaction(
+            return try await sendTransaction(
                 transaction,
                 type: type,
                 keypair: keypair,
                 recipientPublicKey: recipientPublicKey
             )
-            
-            do {
-                transaction.statusEnum = MessageStatus.delivered
-                try context.save()
-                return transaction
-            } catch {
-                throw ChatsProviderError.internalError(error)
-            }
         } catch let error as AccountsProviderError {
             switch error {
             case .notFound, .invalidAddress:
@@ -942,7 +962,7 @@ extension AdamantChatsProvider {
                 throw ChatsProviderError.networkError
             }
         } catch {
-            throw ChatsProviderError.internalError(error)
+            throw error
         }
     }
     
@@ -988,18 +1008,16 @@ extension AdamantChatsProvider {
             }
         }
         
-        try? privateContext.save()
-        
-        // MARK: 3. Send
-        
-        _ = try await sendTransaction(transaction, type: .message, keypair: keypair, recipientPublicKey: recipientPublicKey)
-        
-        do {
-            try privateContext.save()
-            return
-        } catch {
-            throw ChatsProviderError.internalError(error)
+        defer {
+            try? privateContext.save()
         }
+        
+        _ = try await sendTransaction(
+            transaction,
+            type: .message,
+            keypair: keypair,
+            recipientPublicKey: recipientPublicKey
+        )
     }
     
     // MARK: - Delete local message
@@ -1031,7 +1049,7 @@ extension AdamantChatsProvider {
     
     /// Send transaction.
     ///
-    /// If success - update transaction's id and add it to unconfirmed transactions.
+    /// If success - update transaction's id, status and add it to unconfirmed transactions.
     /// If fails - set transaction status to .failed
     private func sendTransaction(
         _ transaction: ChatTransaction,
@@ -1046,7 +1064,13 @@ extension AdamantChatsProvider {
         }
         
         // MARK: 1. Encode
-        guard let text = transaction.serializedMessage(), let encodedMessage = adamantCore.encodeMessage(text, recipientPublicKey: recipientPublicKey, privateKey: keypair.privateKey) else {
+        guard let text = transaction.serializedMessage(),
+              let encodedMessage = adamantCore.encodeMessage(
+                text,
+                recipientPublicKey: recipientPublicKey,
+                privateKey: keypair.privateKey
+              )
+        else {
             throw ChatsProviderError.dependencyError("Failed to encode message")
         }
         
@@ -1074,6 +1098,7 @@ extension AdamantChatsProvider {
             
             // Update ID with recieved, add to unconfirmed transactions.
             transaction.transactionId = String(id)
+            transaction.statusEnum = .delivered
             
             if let index = unconfirmedTransactionsBySignature.firstIndex(
                 of: signedTransaction.signature
@@ -1084,33 +1109,25 @@ extension AdamantChatsProvider {
             unconfirmedTransactions[id] = transaction.objectID
                         
             return transaction
-        } catch let error as ApiServiceError {
-            transaction.statusEnum = MessageStatus.failed
-            
-            let serviceError: ChatsProviderError
-            switch error {
-            case .networkError:
-                serviceError = .networkError
-                
-            case .accountNotFound:
-                serviceError = .accountNotFound(recipientId)
-                
-            case .notLogged:
-                serviceError = .notLogged
-                
-            case .serverError(let e):
-                serviceError = .serverError(AdamantError(message: e))
-                
-            case .internalError(let message, _):
-                serviceError = ChatsProviderError.internalError(AdamantError(message: message))
-                
-            case .requestCancelled:
-                serviceError = .requestCancelled
-            }
-            
-            throw serviceError
         } catch {
-            throw ChatsProviderError.serverError(error)
+            transaction.statusEnum = .failed
+            
+            switch error as? ApiServiceError {
+            case .networkError:
+                throw ChatsProviderError.networkError
+            case .accountNotFound:
+                throw ChatsProviderError.accountNotFound(recipientId)
+            case .notLogged:
+                throw ChatsProviderError.notLogged
+            case .serverError(let e):
+                throw ChatsProviderError.serverError(AdamantError(message: e))
+            case .internalError(let message, _):
+                throw ChatsProviderError.internalError(AdamantError(message: message))
+            case .requestCancelled:
+                throw ChatsProviderError.requestCancelled
+            case .none:
+                throw ChatsProviderError.serverError(error)
+            }
         }
     }
 }
@@ -1235,7 +1252,7 @@ extension AdamantChatsProvider {
                 privateKey: privateKey
             )
             
-            // MARK: 4. Get more transactions
+            // MARK: Get more transactions if needed
             if transactions.count == self.apiTransactions {
                 let newOffset: Int
                 if let offset = offset {
@@ -1270,6 +1287,7 @@ extension AdamantChatsProvider {
         
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.parent = self.stack.container.viewContext
+        context.mergePolicy = NSMergePolicy(merge: NSMergePolicyType.mergeByPropertyObjectTrumpMergePolicyType)
         
         // MARK: 1. Gather partner keys
         let mapped = messageTransactions.map({ DirectionedTransaction(transaction: $0, isOut: $0.senderId == senderId) })
@@ -1341,6 +1359,8 @@ extension AdamantChatsProvider {
         var height: Int64 = 0
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         privateContext.parent = context
+        privateContext.mergePolicy = NSMergePolicy(merge: NSMergePolicyType.mergeByPropertyObjectTrumpMergePolicyType)
+        
         var newMessageTransactions = [ChatTransaction]()
         var transactionInProgress: [UInt64] = []
         
@@ -1596,10 +1616,6 @@ extension AdamantChatsProvider {
                 self.securedStore.set(removedMessages, for: StoreKey.accountService.removedMessages)
             }
         }
-    }
-    
-    func forceUpdateStatus(for transaction: RichMessageTransaction) async {
-        await richTransactionStatusService.forceUpdate(transaction: transaction)
     }
     
     func markChatAsRead(chatroom: Chatroom) {

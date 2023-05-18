@@ -10,11 +10,11 @@ import UIKit
 import Eureka
 import Web3Core
 
-class EthTransferViewController: TransferViewControllerBase {
+final class EthTransferViewController: TransferViewControllerBase {
     
     // MARK: Dependencies
     
-    var chatsProvider: ChatsProvider
+    private let chatsProvider: ChatsProvider
     
     // MARK: Properties
     
@@ -91,7 +91,12 @@ class EthTransferViewController: TransferViewControllerBase {
                 }
                 
                 Task {
-                    try await service.sendTransaction(transaction)
+                    do {
+                        try await service.sendTransaction(transaction)
+                    } catch {
+                        dialogService.showRichError(error: error)
+                    }
+                    
                     await service.update()
                 }
                 
@@ -148,11 +153,7 @@ class EthTransferViewController: TransferViewControllerBase {
     
     override var recipientAddress: String? {
         set {
-            if let recipient = newValue, let first = recipient.first, first != "0" {
-                _recipient = "0x\(recipient)"
-            } else {
-                _recipient = newValue
-            }
+            _recipient = newValue?.validateEthAddress()
             
             if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = _recipient
@@ -169,13 +170,7 @@ class EthTransferViewController: TransferViewControllerBase {
             return false
         }
         
-        let fixedAddress: String
-        let prefix = address.prefix(2)
-        if prefix != "0x" {
-            fixedAddress = "0x\(address)"
-        } else {
-            fixedAddress = address
-        }
+        let fixedAddress = address.validateEthAddress()
         
         switch service.validate(address: fixedAddress) {
         case .valid:

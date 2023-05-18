@@ -115,8 +115,8 @@ public struct APIClient {
 
     /// Create a json data task
     private func dataTask<R>(_ request: URLRequest, completionHandler: @escaping (Response<R>) -> Void) -> URLSessionDataTask {
-        let task = urlSession.dataTask(with: request) { data, _, _ in
-            let response: Response<R> = self.processRequestCompletion(data)
+        let task = urlSession.dataTask(with: request) { data, response, _ in
+            let response: Response<R> = self.processRequestCompletion(data, response: response)
             DispatchQueue.main.async { completionHandler(response) }
         }
         task.resume()
@@ -170,19 +170,28 @@ public struct APIClient {
     }
 
     /// Process a response
-    private func processRequestCompletion<R>(_ data: Data?) -> Response<R> {
+    private func processRequestCompletion<R>(
+        _ data: Data?,
+        response: URLResponse?
+    ) -> Response<R> {
+        let code = (response as? HTTPURLResponse)?.statusCode
+        
         guard let data = data else {
-            return .error(response: .unexpected)
+            return .error(response: .unexpected(code: code))
         }
 
         guard let result = try? JSONDecoder().decode(R.self, from: data) else {
-            if let error = try? JSONDecoder().decode(APIError.self, from: data) {
+            if var error = try? JSONDecoder().decode(APIError.self, from: data) {
+                error.code = code
                 return .error(response: error)
-            } else if let error = try? JSONDecoder().decode(APIErrors.self, from: data),
-                     let first = error.errors.first {
+            } else if
+                let error = try? JSONDecoder().decode(APIErrors.self, from: data),
+                var first = error.errors.first
+            {
+                first.code = code
                 return .error(response: first)
             }
-            return .error(response: .unknown)
+            return .error(response: .unknown(code: code))
         }
 
         return .success(response: result)

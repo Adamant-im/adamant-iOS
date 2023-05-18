@@ -10,6 +10,7 @@ import UIKit
 import Parchment
 import SnapKit
 
+@MainActor
 protocol ComplexTransferViewControllerDelegate: AnyObject {
     func complexTransferViewController(_ viewController: ComplexTransferViewController, didFinishWithTransfer: TransactionDetails?, detailsViewController: UIViewController?)
 }
@@ -94,60 +95,55 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
         let service = services[index]
         
         let vc = service.transferViewController()
-        if let v = vc as? TransferViewControllerBase {
-            if let address = partner?.address {
-                var name: String?
-                if let title = partner?.chatroom?.title {
-                    name = title
-                } else if let partnerName = partner?.name {
-                    name = partnerName
-                }
-                name = name?.checkAndReplaceSystemWallets()
-
-                v.admReportRecipient = address
-                v.recipientIsReadonly = true
-                v.commentsEnabled = service.commentsEnabledForRichMessages && partner?.isDummy != true
-                v.showProgressView(animated: false)
+        
+        guard let v = vc as? TransferViewControllerBase else { return vc }
+        
+        v.delegate = self
+        
+        guard let address = partner?.address else { return vc }
+        
+        let name = partner?.chatroom?.getName(addressBookService: addressBookService)
+        
+        v.admReportRecipient = address
+        v.recipientIsReadonly = true
+        v.commentsEnabled = service.commentsEnabledForRichMessages && partner?.isDummy != true
+        v.showProgressView(animated: false)
+        
+        Task {
+            do {
+                let walletAddress = try await services[index]
+                    .getWalletAddress(
+                        byAdamantAddress:
+                            address
+                    )
+                v.recipientAddress = walletAddress
+                v.recipientName = name
+                v.hideProgress(animated: true)
                 
-                Task {
-                    do {
-                        let walletAddress = try await services[index]
-                            .getWalletAddress(
-                                byAdamantAddress:
-                                    address
-                            )
-                        v.recipientAddress = walletAddress
-                        v.recipientName = name
-                        v.hideProgress(animated: true)
-                        
-                        if ERC20Token.supportedTokens.contains(
-                            where: { token in
-                                return token.symbol == self.services[index].tokenSymbol
-                            }
-                        ) {
-                            let ethWallet = self.accountService.wallets.first { wallet in
-                                return wallet.tokenSymbol == "ETH"
-                            }
-                            v.rootCoinBalance = ethWallet?.wallet?.balance
-                        }
-                    } catch let error as WalletServiceError {
-                        v.showAlertView(
-                            title: nil,
-                            message: error.message,
-                            animated: true
-                        )
-                    } catch {
-                        v.showAlertView(
-                            title: nil,
-                            message: String.adamantLocalized.sharedErrors.unknownError,
-                            animated: true
-                        )
+                if ERC20Token.supportedTokens.contains(
+                    where: { token in
+                        return token.symbol == self.services[index].tokenSymbol
                     }
+                ) {
+                    let ethWallet = self.accountService.wallets.first { wallet in
+                        return wallet.tokenSymbol == "ETH"
+                    }
+                    v.rootCoinBalance = ethWallet?.wallet?.balance
                 }
-			}
-			
-			v.delegate = self
-		}
+            } catch let error as WalletServiceError {
+                v.showAlertView(
+                    title: nil,
+                    message: error.message,
+                    animated: true
+                )
+            } catch {
+                v.showAlertView(
+                    title: nil,
+                    message: String.adamantLocalized.sharedErrors.unknownError,
+                    animated: true
+                )
+            }
+        }
 		
 		return vc
 	}

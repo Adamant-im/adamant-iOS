@@ -92,18 +92,15 @@ extension WalletServiceError: RichError {
         switch self {
         case .notLogged, .notEnoughMoney, .networkError, .accountNotFound, .invalidAmount, .walletNotInitiated, .transactionNotFound, .requestCancelled:
             return .warning
-            
-        case .remoteServiceError, .internalError, .dustAmountError:
+        
+        case .dustAmountError, .remoteServiceError:
             return .error
             
+        case .internalError:
+            return .internalError
+            
         case .apiError(let error):
-            switch error {
-            case .accountNotFound, .notLogged, .networkError, .requestCancelled:
-                return .warning
-                
-            case .serverError, .internalError:
-                return .error
-            }
+            return error.level
         }
     }
 }
@@ -244,6 +241,7 @@ protocol WalletService: AnyObject {
     // MARK: Tools
     func validate(address: String) -> AddressValidationResult
     func getWalletAddress(byAdamantAddress address: String) async throws -> String
+    func getBalance(address: String) async throws -> Decimal
 }
 
 protocol SwinjectDependentService: WalletService {

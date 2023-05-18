@@ -38,7 +38,8 @@ private extension NotificationView {
     func makeIcon(image: UIImage) -> some View {
         Image(uiImage: image)
             .resizable()
-            .renderingMode(.original)
+            .renderingMode(.template)
+            .foregroundColor(.secondary)
             .scaledToFit()
             .frame(squareSize: 30)
     }
@@ -52,6 +53,7 @@ private extension NotificationView {
             if let description = model.description {
                 Text(description)
                     .font(.system(size: 13))
+                    .lineLimit(3)
             }
         }
     }

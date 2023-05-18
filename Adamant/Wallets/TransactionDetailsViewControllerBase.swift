@@ -113,8 +113,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
     }
     
     // MARK: - Dependencies
-    var dialogService: DialogService!
-    var currencyInfo: CurrencyInfoService!
+    
+    var dialogService: DialogService
+    var currencyInfo: CurrencyInfoService
     
     // MARK: - Properties
     
@@ -152,6 +153,20 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     // MARK: - Lifecycle
     
+    init(
+        dialogService: DialogService,
+        currencyInfo: CurrencyInfoService
+    ) {
+        self.dialogService = dialogService
+        self.currencyInfo = currencyInfo
+        
+        super.init(style: .grouped)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -161,7 +176,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         navigationOptions = RowNavigationOptions.Disabled
         
         // MARK: - Transfer section
-        let detailsSection = Section(Sections.details.localized) {
+        let detailsSection = Section {
             $0.tag = Sections.details.tag
         }
             
@@ -177,6 +192,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 $0.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
             
+            $0.cell.detailTextLabel?.textAlignment = .right
             $0.cell.detailTextLabel?.lineBreakMode = .byTruncatingMiddle
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
@@ -216,6 +232,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             
             let height = self?.senderName != nil ? DoubleDetailsTableViewCell.fullHeight : DoubleDetailsTableViewCell.compactHeight
             $0.cell.height = { height }
+            $0.cell.secondDetailsLabel?.textAlignment = .right
+            $0.cell.detailsLabel?.textAlignment = .right
             $0.cell.secondDetailsLabel?.lineBreakMode = .byTruncatingMiddle
             $0.cell.detailsLabel?.lineBreakMode = .byTruncatingMiddle
         }.cellSetup { (cell, _) in
@@ -272,6 +290,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             
             let height = self?.recipientName != nil ? DoubleDetailsTableViewCell.fullHeight : DoubleDetailsTableViewCell.compactHeight
             $0.cell.height = { height }
+            $0.cell.secondDetailsLabel?.textAlignment = .right
+            $0.cell.detailsLabel?.textAlignment = .right
             $0.cell.secondDetailsLabel?.lineBreakMode = .byTruncatingMiddle
             $0.cell.detailsLabel?.lineBreakMode = .byTruncatingMiddle
         }.cellSetup { (cell, _) in

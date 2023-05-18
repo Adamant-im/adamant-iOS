@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreData
+import Combine
 
 actor AdamantTransfersProvider: TransfersProvider {
     // MARK: Constants
@@ -23,7 +24,8 @@ actor AdamantTransfersProvider: TransfersProvider {
     private let transactionService: ChatTransactionService
     weak var chatsProvider: ChatsProvider?
     
-    private(set) var state: State = .empty
+    @Published private(set) var state: State = .empty
+    var stateObserver: Published<State>.Publisher { $state }
     private(set) var isInitiallySynced: Bool = false
     private(set) var receivedLastHeight: Int64?
     private(set) var readedLastHeight: Int64?
@@ -31,11 +33,14 @@ actor AdamantTransfersProvider: TransfersProvider {
     private let apiTransactions = 100
     
     private var unconfirmedTransactions: [UInt64:NSManagedObjectID] = [:]
+    private var subscriptions = Set<AnyCancellable>()
+    
+    var offsetTransactions = 0
     
     // MARK: Tools
     
     /// Free stateSemaphore before calling this method, or you will deadlock.
-    private func setState(_ state: State, previous prevState: State, notify: Bool = true) {
+    private func setState(_ state: State, previous prevState: State, notify: Bool = false) {
         self.state = state
         
         if notify {
@@ -79,29 +84,34 @@ actor AdamantTransfersProvider: TransfersProvider {
     }
     
     private func addObservers() {
-        Task {
-            for await notification in NotificationCenter.default.notifications(
-                named: .AdamantAccountService.userLoggedIn
-            ) {
-                await userLoggedInAction(notification)
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { notification in
+                let loggedAddress = notification.userInfo?[AdamantUserInfoKey.AccountService.loggedAccountAddress] as? String
+                Task { [weak self] in
+                    await self?.userLoggedInAction(loggedAddress)
+                }
             }
-        }
+            .store(in: &subscriptions)
         
-        Task {
-            for await _ in NotificationCenter.default.notifications(
-                named: .AdamantAccountService.userLoggedOut
-            ) {
-                userLogOutAction()
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { _ in
+                Task { [weak self] in
+                    await self?.userLogOutAction()
+                }
             }
-        }
+            .store(in: &subscriptions)
     }
     
     // MARK: - Notifications action
     
-    private func userLoggedInAction(_ notification: Notification) async {
+    private func userLoggedInAction(_ loggedAddress: String?) async {
         let store = securedStore
         
-        guard let loggedAddress = notification.userInfo?[AdamantUserInfoKey.AccountService.loggedAccountAddress] as? String else {
+        guard let loggedAddress = loggedAddress else {
             store.remove(StoreKey.transfersProvider.address)
             store.remove(StoreKey.transfersProvider.receivedLastHeight)
             store.remove(StoreKey.transfersProvider.readedLastHeight)
@@ -120,7 +130,34 @@ actor AdamantTransfersProvider: TransfersProvider {
             store.set(loggedAddress, for: StoreKey.transfersProvider.address)
         }
         
-        _ = await update()
+        await loadFirstTransactions()
+    }
+    
+    private func loadFirstTransactions() async {
+        guard let loggedAddress = accountService.account?.address else { return }
+        
+        do {
+            setState(.updating, previous: .empty, notify: false)
+            
+            _ = try await getTransactions(
+                forAccount: loggedAddress,
+                type: .send,
+                offset: offsetTransactions,
+                limit: apiTransactions,
+                orderByTime: true
+            )
+            
+            offsetTransactions += apiTransactions
+
+            if !isInitiallySynced {
+                isInitiallySynced = true
+                NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.initialSyncFinished, object: self)
+            }
+            
+            setState(.upToDate, previous: .updating, notify: false)
+        } catch {
+            setState(.failedToUpdate(error), previous: .updating, notify: false)
+        }
     }
     
     private func userLogOutAction() {
@@ -266,6 +303,7 @@ extension AdamantTransfersProvider {
     }
     
     private func reset(notify: Bool) {
+        offsetTransactions = 0
         hasTransactions = false
         isInitiallySynced = false
         let prevState = self.state
@@ -416,6 +454,7 @@ extension AdamantTransfersProvider {
         transaction.comment = comment
         transaction.fee = Self.transferFee as NSDecimalNumber
         transaction.partner = partner
+        transaction.transactionId = UUID().uuidString
         
         chatroom.addToTransactions(transaction)
         
@@ -574,7 +613,7 @@ extension AdamantTransfersProvider {
         transaction.showsChatroom = false
         transaction.fee = Self.transferFee as NSDecimalNumber
         
-        transaction.transactionId = nil
+        transaction.transactionId = UUID().uuidString
         transaction.blockId = nil
         transaction.chatMessageId = UUID().uuidString
         transaction.statusEnum = MessageStatus.pending
@@ -793,6 +832,40 @@ extension AdamantTransfersProvider {
         }
     }
     
+    func getTransactions(
+        forAccount account: String,
+        type: TransactionType,
+        offset: Int,
+        limit: Int,
+        orderByTime: Bool
+    ) async throws -> Int {
+        let transactions = try await apiService.getTransactions(
+            forAccount: account,
+            type: type,
+            fromHeight: nil,
+            offset: offset,
+            limit: limit,
+            orderByTime: orderByTime
+        )
+        
+        guard transactions.count > 0 else {
+            return 0
+        }
+        
+        // MARK: 2. Process transactions in background
+        
+        await processRawTransactions(
+            transactions,
+            currentAddress: account
+        )
+        
+        return transactions.count
+    }
+    
+    func updateOffsetTransactions(_ value: Int) {
+        offsetTransactions = value
+    }
+    
     private func processRawTransactions(
         _ transactions: [Transaction],
         currentAddress address: String
@@ -876,6 +949,7 @@ extension AdamantTransfersProvider {
         // MARK: 3. Create private context, and process transactions
         let contextPrivate = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         contextPrivate.parent = self.stack.container.viewContext
+        contextPrivate.mergePolicy = NSMergePolicy(merge: NSMergePolicyType.mergeByPropertyObjectTrumpMergePolicyType)
         
         var partners: [String:BaseAccount] = [:]
         for id in partnerIds {

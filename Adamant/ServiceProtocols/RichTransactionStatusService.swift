@@ -10,4 +10,5 @@ import CoreData
 
 protocol RichTransactionStatusService: Actor, AnyObject {
     func forceUpdate(transaction: RichMessageTransaction) async
+    func startObserving()
 }

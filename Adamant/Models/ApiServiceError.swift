@@ -50,8 +50,11 @@ extension ApiServiceError: RichError {
         case .accountNotFound, .notLogged, .networkError, .requestCancelled:
             return .warning
             
-        case .internalError, .serverError:
+        case .serverError:
             return .error
+            
+        case .internalError:
+            return .internalError
         }
     }
     

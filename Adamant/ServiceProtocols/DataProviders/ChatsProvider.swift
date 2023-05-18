@@ -96,21 +96,22 @@ extension ChatsProviderError: RichError {
     
     var level: ErrorLevel {
         switch self {
-            case .accountNotFound,
-                 .messageNotValid,
-                 .networkError,
-                 .notEnoughMoneyToSend,
-                 .accountNotInitiated,
-                 .requestCancelled,
-                 .invalidTransactionStatus,
-                 .notLogged:
+        case .accountNotFound,
+                .messageNotValid,
+                .networkError,
+                .notEnoughMoneyToSend,
+                .accountNotInitiated,
+                .requestCancelled,
+                .invalidTransactionStatus,
+                .notLogged:
             return .warning
             
-        case .dependencyError,
-             .internalError,
-             .serverError,
-             .transactionNotFound:
+        case .serverError, .transactionNotFound:
             return .error
+            
+        case .dependencyError,
+             .internalError:
+            return .internalError
         }
     }
 }
@@ -200,7 +201,7 @@ protocol ChatsProvider: DataProvider, Actor {
     func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction>
     
     // ForceUpdate chats
-    func update() async -> ChatsProviderResult?
+    func update(notifyState: Bool) async -> ChatsProviderResult?
     
     // MARK: - Sending messages
     func sendMessage(_ message: AdamantMessage, recipientId: String) async throws -> ChatTransaction
@@ -214,7 +215,6 @@ protocol ChatsProvider: DataProvider, Actor {
     func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult
     func blockChat(with address: String)
     func removeMessage(with id: String)
-    func forceUpdateStatus(for transaction: RichMessageTransaction) async
     func markChatAsRead(chatroom: Chatroom)
     
     @MainActor func removeChatPositon(for address: String)

@@ -21,7 +21,7 @@ extension AdamantScene.Wallets {
         
         /// Send money
         static let transfer = AdamantScene(identifier: "ERC20TransferViewController") { r in
-            let c = ERC20TransferViewController(
+            ERC20TransferViewController(
                 accountService: r.resolve(AccountService.self)!,
                 accountsProvider: r.resolve(AccountsProvider.self)!,
                 dialogService: r.resolve(DialogService.self)!,
@@ -30,7 +30,6 @@ extension AdamantScene.Wallets {
                 increaseFeeService: r.resolve(IncreaseFeeService.self)!,
                 chatsProvider: r.resolve(ChatsProvider.self)!
             )
-            return c
         }
         
         /// List of Ethereum transactions
@@ -43,10 +42,10 @@ extension AdamantScene.Wallets {
         
         /// Ethereum transaction details
         static let transactionDetails = AdamantScene(identifier: "TransactionDetailsViewControllerBase") { r in
-            let c = ERC20TransactionDetailsViewController()
-            c.dialogService = r.resolve(DialogService.self)
-            c.currencyInfo = r.resolve(CurrencyInfoService.self)
-            return c
+            ERC20TransactionDetailsViewController(
+                dialogService: r.resolve(DialogService.self)!,
+                currencyInfo: r.resolve(CurrencyInfoService.self)!
+            )
         }
     }
 }
