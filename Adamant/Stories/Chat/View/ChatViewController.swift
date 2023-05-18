@@ -376,11 +376,18 @@ private extension ChatViewController {
     }
     
     func configureGestures() {
+        /// Replaces the delegate of the pan gesture recognizer used in the input bar control of MessageKit.
+        /// This gesture controls the position of the input bar when the keyboard is open and the user swipes it to dismiss.
+        /// Due to incorrect checks in MessageKit, we manually set the delegate and assign it to our custom chatKeyboardManager object.
+        /// This ensures proper handling and control of the pan gesture for the input bar.
         if let gesture = messagesCollectionView.gestureRecognizers?[13] as? UIPanGestureRecognizer {
             gesture.delegate = chatKeyboardManager
             chatKeyboardManager.panGesture = gesture
         }
         
+        /// Resolves the conflict between horizontal swipe gestures and vertical scrolling in the MessageKit's UICollectionView.
+        /// The gestureRecognizerShouldBegin method checks the velocity of the pan gesture and allows it to begin only if the horizontal velocity is greater than the vertical velocity.
+        /// This ensures smooth and uninterrupted vertical scrolling while still allowing horizontal swipe gestures to be recognized.
         let panGesture = UIPanGestureRecognizer()
         panGesture.delegate = self
         messagesCollectionView.addGestureRecognizer(panGesture)
