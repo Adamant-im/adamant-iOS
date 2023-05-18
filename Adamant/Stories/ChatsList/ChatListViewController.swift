@@ -958,13 +958,10 @@ extension ChatListViewController {
                 let rename = UIAlertAction(title: String.adamantLocalized.chat.rename, style: .default) { [weak self] _ in
                     let alert = UIAlertController(title: String(format: String.adamantLocalized.chat.actionsBody, address), message: nil, preferredStyle: .alert)
                     
-                    alert.addTextField { (textField) in
+                    alert.addTextField { [weak self] textField in
                         textField.placeholder = String.adamantLocalized.chat.name
                         textField.autocapitalizationType = .words
-                        
-                        if let name = partner.name {
-                            textField.text = name
-                        }
+                        textField.text = self?.addressBook.getName(for: address)
                     }
                      
                     alert.addAction(UIAlertAction(title: String.adamantLocalized.chat.rename, style: .default) { [weak alert] (_) in
@@ -978,7 +975,9 @@ extension ChatListViewController {
                     
                     alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
                     alert.modalPresentationStyle = .overFullScreen
-                    self?.present(alert, animated: true, completion: nil)
+                    self?.present(alert, animated: true, completion: {
+                        alert.textFields?.forEach { $0.selectAll(nil) }
+                    })
                 }
                 
                 let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil)

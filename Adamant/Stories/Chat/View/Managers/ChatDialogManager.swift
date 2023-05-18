@@ -224,7 +224,9 @@ private extension ChatDialogManager {
             style: .default
         ) { [weak self] _ in
             guard let alert = self?.makeRenameAlert() else { return }
-            self?.dialogService.present(alert, animated: true, completion: nil)
+            self?.dialogService.present(alert, animated: true, completion: {
+                alert.textFields?.forEach { $0.selectAll(nil) }
+            })
         }
     }
     
