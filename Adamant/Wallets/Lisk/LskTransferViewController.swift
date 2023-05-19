@@ -12,10 +12,6 @@ import LiskKit
 
 final class LskTransferViewController: TransferViewControllerBase {
     
-    // MARK: Dependencies
-    
-    private let chatsProvider: ChatsProvider
-    
     // MARK: Properties
     
     override var minToTransfer: Decimal {
@@ -32,29 +28,6 @@ final class LskTransferViewController: TransferViewControllerBase {
             let minimumAmount = service.minBalance - recepientBalance
             return try await max(super.minToTransfer, minimumAmount)
         }
-    }
-    
-    init(
-        chatsProvider: ChatsProvider,
-        accountService: AccountService,
-        accountsProvider: AccountsProvider,
-        dialogService: DialogService,
-        router: Router,
-        currencyInfoService: CurrencyInfoService
-    ) {
-        self.chatsProvider = chatsProvider
-        
-        super.init(
-            accountService: accountService,
-            accountsProvider: accountsProvider,
-            dialogService: dialogService,
-            router: router,
-            currencyInfoService: currencyInfoService
-        )
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
     
     // MARK: Send
@@ -233,37 +206,6 @@ final class LskTransferViewController: TransferViewControllerBase {
         default:
             return false
         }
-    }
-    
-    func reportTransferTo(
-        admAddress: String,
-        amount: Decimal,
-        comments: String,
-        hash: String
-    ) async throws {
-        let message: AdamantMessage
-        
-        if let replyToMessageId = replyToMessageId {
-            let payload = RichTransferReply(
-                replyto_id: replyToMessageId,
-                type: LskWalletService.richMessageType,
-                amount: amount,
-                hash: hash,
-                comments: comments
-            )
-            message = AdamantMessage.richMessage(payload: payload)
-        } else {
-            let payload = RichMessageTransfer(
-                type: LskWalletService.richMessageType,
-                amount: amount,
-                hash: hash,
-                comments: comments
-            )
-            message = AdamantMessage.richMessage(payload: payload)
-        }
-        
-        chatsProvider.removeChatPositon(for: admAddress)
-        _ = try await chatsProvider.sendMessage(message, recipientId: admAddress)
     }
     
     override func defaultSceneTitle() -> String? {

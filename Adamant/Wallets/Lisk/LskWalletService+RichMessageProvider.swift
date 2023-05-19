@@ -41,11 +41,9 @@ extension LskWalletService: RichMessageProvider {
     @MainActor
     func richMessageTapped(for transaction: RichMessageTransaction, in chat: ChatViewController) {
         // MARK: 0. Prepare
-        print("tapped")
         guard let hash = transaction.getRichValue(for: RichContentKeys.transfer.hash),
               let dialogService = dialogService
         else {
-            print("tapped error")
             return
         }
         

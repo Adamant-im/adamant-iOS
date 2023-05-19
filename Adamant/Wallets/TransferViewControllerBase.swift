@@ -131,6 +131,7 @@ class TransferViewControllerBase: FormViewController {
     let dialogService: DialogService
     let router: Router
     let currencyInfoService: CurrencyInfoService
+    let chatsProvider: ChatsProvider
     
     // MARK: - Properties
     
@@ -257,6 +258,7 @@ class TransferViewControllerBase: FormViewController {
     // MARK: - Lifecycle
     
     init(
+        chatsProvider: ChatsProvider,
         accountService: AccountService,
         accountsProvider: AccountsProvider,
         dialogService: DialogService,
@@ -268,6 +270,7 @@ class TransferViewControllerBase: FormViewController {
         self.dialogService = dialogService
         self.router = router
         self.currencyInfoService = currencyInfoService
+        self.chatsProvider = chatsProvider
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -776,6 +779,40 @@ class TransferViewControllerBase: FormViewController {
     
     func defaultSceneTitle() -> String? {
         return WalletViewControllerBase.BaseRows.send.localized
+    }
+    
+    /// Report transfer
+    func reportTransferTo(
+        admAddress: String,
+        amount: Decimal,
+        comments: String,
+        hash: String
+    ) async throws {
+        guard let richMessageType = service?.richMessageType else { return }
+        
+        let message: AdamantMessage
+        
+        if let replyToMessageId = replyToMessageId {
+            let payload = RichTransferReply(
+                replyto_id: replyToMessageId,
+                type: richMessageType,
+                amount: amount,
+                hash: hash,
+                comments: comments
+            )
+            message = AdamantMessage.richMessage(payload: payload)
+        } else {
+            let payload = RichMessageTransfer(
+                type: richMessageType,
+                amount: amount,
+                hash: hash,
+                comments: comments
+            )
+            message = AdamantMessage.richMessage(payload: payload)
+        }
+        
+        chatsProvider.removeChatPositon(for: admAddress)
+        _ = try await chatsProvider.sendMessage(message, recipientId: admAddress)
     }
     
     // MARK: - Abstract
