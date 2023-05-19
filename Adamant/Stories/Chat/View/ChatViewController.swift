@@ -322,6 +322,10 @@ private extension ChatViewController {
         viewModel.$swipeState
             .sink { [weak self] in self?.swipeStateAction($0) }
             .store(in: &subscriptions)
+        
+        viewModel.$isNeedToAnimateScroll
+            .sink { [weak self] in self?.animateScroll(isStarted: $0) }
+            .store(in: &subscriptions)
     }
 }
 
@@ -521,6 +525,11 @@ private extension ChatViewController {
                 animated: animated
             )
             
+            viewModel.animateScrollIfNeeded(
+                to: index,
+                visibleIndex: messagesCollectionView.indexPathsForVisibleItems.last?.section
+            )
+            
             viewModel.needToAnimateCellIndex = index
         }
         
@@ -626,6 +635,12 @@ private extension ChatViewController {
             in: messagesCollectionView
         ).messageId
     }
+    
+    func animateScroll(isStarted: Bool) {
+        UIView.animate(withDuration: 0.1) {
+            self.messagesCollectionView.alpha = isStarted ? 0.2 : 1.0
+        }
+    }
  
     // TODO: Use coordinator
     
@@ -684,6 +699,8 @@ private extension ChatViewController {
 
 extension ChatViewController {
     internal override func scrollViewDidEndScrollingAnimation(_: UIScrollView) {
+        animateScroll(isStarted: false)
+        
         guard let index = viewModel.needToAnimateCellIndex else { return }
         
         let isVisible = messagesCollectionView.indexPathsForVisibleItems.contains {

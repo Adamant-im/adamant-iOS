@@ -58,6 +58,7 @@ final class ChatViewModel: NSObject {
     private(set) var chatTransactions: [ChatTransaction] = []
     private var tempCancellables = Set<AnyCancellable>()
     private var minDiffCountForOffset = 5
+    private var minDiffCountForAnimateScroll = 20
 
     var tempOffsets: [String] = []
     var needToAnimateCellIndex: Int?
@@ -75,6 +76,7 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var isSendingAvailable = false
     @ObservableValue private(set) var fee = ""
     @ObservableValue private(set) var partnerName: String?
+    @ObservableValue private(set) var isNeedToAnimateScroll = false
     @ObservableValue var swipeState: SwipeableView.State = .ended
     @ObservableValue var inputText = ""
     @ObservableValue var replyMessage: MessageModel?
@@ -432,6 +434,20 @@ final class ChatViewModel: NSObject {
         }
         
         replyMessage = messageModel
+    }
+    
+    func animateScrollIfNeeded(to messageIndex: Int, visibleIndex: Int?) {
+        guard let visibleIndex = visibleIndex else {  return }
+        
+        let max = max(visibleIndex, messageIndex)
+        let min = min(visibleIndex, messageIndex)
+        
+        guard (max - min) >= minDiffCountForAnimateScroll else {
+            isNeedToAnimateScroll = false
+            return
+        }
+        
+        isNeedToAnimateScroll = true
     }
 }
 
