@@ -97,22 +97,26 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
             $0.cell.backgroundColor = UIColor.adamant.cellColor
             let symbol = self?.service?.tokenSymbol ?? ""
             
-            if let service = self?.service, let wallet = service.wallet {
-                $0.value = self?.balanceRowValueFor(balance: wallet.balance, symbol: symbol, alert: wallet.notifications)
-            } else {
-                $0.value = self?.balanceRowValueFor(balance: 0, symbol: symbol, alert: 0)
-            }
+            $0.value = self?.balanceRowValueFor(
+                balance: self?.service?.wallet?.balance ?? 0,
+                symbol: symbol,
+                alert: self?.service?.wallet?.notifications,
+                isBalanceInitialized: self?.service?.wallet?.isBalanceInitialized ?? false
+            )
             
             let height = $0.value?.fiat != nil ? BalanceTableViewCell.fullHeight : BalanceTableViewCell.compactHeight
             
             $0.cell.height = { height }
         }.cellUpdate { [weak self] (cell, row) in
             let symbol = self?.service?.tokenSymbol ?? ""
-            if let service = self?.service, let wallet = service.wallet {
-                row.value = self?.balanceRowValueFor(balance: wallet.balance, symbol: symbol, alert: wallet.notifications)
-            } else {
-                row.value = self?.balanceRowValueFor(balance: 0, symbol: symbol, alert: 0)
-            }
+            
+            row.value = self?.balanceRowValueFor(
+                balance: self?.service?.wallet?.balance ?? 0,
+                symbol: symbol,
+                alert: self?.service?.wallet?.notifications,
+                isBalanceInitialized: self?.service?.wallet?.isBalanceInitialized ?? false
+            )
+            
             let height = row.value?.fiat != nil ? BalanceTableViewCell.fullHeight : BalanceTableViewCell.compactHeight
             
             cell.height = { height }
@@ -222,7 +226,12 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 }
                 
                 let symbol = service.tokenSymbol
-                row.value = vc.balanceRowValueFor(balance: wallet.balance, symbol: symbol, alert: wallet.notifications)
+                row.value = vc.balanceRowValueFor(
+                    balance: wallet.balance,
+                    symbol: symbol,
+                    alert: wallet.notifications,
+                    isBalanceInitialized: wallet.isBalanceInitialized
+                )
                 row.updateCell()
             }
             
@@ -372,8 +381,15 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         currentUiState = state
     }
     
-    private func balanceRowValueFor(balance: Decimal, symbol: String?, alert: Int?) -> BalanceRowValue {
-        let cryptoString = AdamantBalanceFormat.full.format(balance, withCurrencySymbol: symbol)
+    private func balanceRowValueFor(
+        balance: Decimal,
+        symbol: String?,
+        alert: Int?,
+        isBalanceInitialized: Bool
+    ) -> BalanceRowValue {
+        let cryptoString = isBalanceInitialized
+        ? AdamantBalanceFormat.full.format(balance, withCurrencySymbol: symbol)
+        : String.adamantLocalized.account.updatingBalance
         
         let fiatString: String?
         if balance > 0, let symbol = symbol, let rate = currencyInfoService.getRate(for: symbol) {

@@ -17,6 +17,7 @@ class DashWallet: WalletAccount {
     var notifications: Int = 0
     var minBalance: Decimal = 0.0001
     var minAmount: Decimal = 0.00002
+    var isBalanceInitialized: Bool = false
     
     init(privateKey: PrivateKey) {
         self.privateKey = privateKey

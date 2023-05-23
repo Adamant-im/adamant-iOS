@@ -13,6 +13,7 @@ protocol WalletAccount {
     // MARK: Account
     var address: String { get }
     var balance: Decimal { get }
+    var isBalanceInitialized: Bool { get }
     
     var notifications: Int { get }
 }

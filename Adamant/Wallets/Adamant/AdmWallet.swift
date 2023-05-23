@@ -14,6 +14,7 @@ class AdmWallet: WalletAccount {
     var notifications: Int = 0
     var minBalance: Decimal = 0
     var minAmount: Decimal = 0
+    var isBalanceInitialized: Bool = false
     
     init(address: String) {
         self.address = address
