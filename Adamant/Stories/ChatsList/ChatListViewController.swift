@@ -210,6 +210,7 @@ class ChatListViewController: KeyboardObservingViewController {
         tableView.register(SpinnerCell.self, forCellReuseIdentifier: loadingCellIdentifier)
         tableView.refreshControl = refreshControl
         tableView.backgroundColor = .clear
+        tableView.tableHeaderView = UIView()
     }
     
     // MARK: Add Observers
