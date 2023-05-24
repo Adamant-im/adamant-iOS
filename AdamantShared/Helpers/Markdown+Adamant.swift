@@ -190,10 +190,12 @@ final class MarkdownCodeAdamant: MarkdownCommonElement {
         return MarkdownCodeAdamant.regex
     }
     
-    init(font: MarkdownFont? = MarkdownCode.defaultFont,
-         color: MarkdownColor? = nil,
-         textHighlightColor: MarkdownColor? = MarkdownCode.defaultHighlightColor,
-         textBackgroundColor: MarkdownColor? = MarkdownCode.defaultBackgroundColor) {
+    init(
+        font: MarkdownFont? = MarkdownCode.defaultFont,
+        color: MarkdownColor? = nil,
+        textHighlightColor: MarkdownColor? = MarkdownCode.defaultHighlightColor,
+        textBackgroundColor: MarkdownColor? = MarkdownCode.defaultBackgroundColor
+    ) {
         self.font = font
         self.color = color
         self.textHighlightColor = textHighlightColor
