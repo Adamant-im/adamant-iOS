@@ -27,10 +27,10 @@ protocol SearchResultDelegate: AnyObject {
 class SearchResultsViewController: UITableViewController {
     
     // MARK: - Dependencies
-    var router: Router
-    var avatarService: AvatarService
-    var addressBookService: AddressBookService
-    var accountsProvider: AccountsProvider
+    let router: Router
+    let avatarService: AvatarService
+    let addressBookService: AddressBookService
+    let accountsProvider: AccountsProvider
     
     // MARK: Properties
     private var contacts: [Chatroom] = [Chatroom]()
@@ -54,7 +54,7 @@ class SearchResultsViewController: UITableViewController {
         self.avatarService = avatarService
         self.addressBookService = addressBookService
         self.accountsProvider = accountsProvider
-        super.init(nibName: "SearchResultsViewController", bundle: nil)
+        super.init(nibName: String(describing: Self.self), bundle: nil)
     }
     
     required init?(coder: NSCoder) {
@@ -173,10 +173,7 @@ class SearchResultsViewController: UITableViewController {
                 if let address = partner.publicKey {
                     let image = self.avatarService.avatar(for: address, size: 200)
                     
-                    DispatchQueue.onMainAsync {
-                        cell.avatarImage = image
-                    }
-                    
+                    cell.avatarImage = image
                     cell.avatarImageView.roundingMode = .round
                     cell.avatarImageView.clipsToBounds = true
                 } else {
@@ -211,10 +208,7 @@ class SearchResultsViewController: UITableViewController {
             if let address = partner.publicKey {
                 let image = self.avatarService.avatar(for: address, size: 200)
                 
-                DispatchQueue.onMainAsync {
-                    cell.avatarImage = image
-                }
-                
+                cell.avatarImage = image
                 cell.avatarImageView.roundingMode = .round
                 cell.avatarImageView.clipsToBounds = true
             } else {
