@@ -103,6 +103,7 @@ class DashTransactionDetailsViewController: TransactionDetailsViewControllerBase
     
     func startUpdate() {
         timer?.invalidate()
+        refresh(false)
         timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
             self?.refresh(true) // Silent, without errors
         }

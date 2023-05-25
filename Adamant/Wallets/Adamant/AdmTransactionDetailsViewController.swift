@@ -13,9 +13,8 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     
     // MARK: - Dependencies
     
-    var accountService: AccountService
-    var transfersProvider: TransfersProvider
-    var router: Router
+    let transfersProvider: TransfersProvider
+    let router: Router
     
     // MARK: - Properties
     private let autoupdateInterval: TimeInterval = 5.0
@@ -38,15 +37,17 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
         transfersProvider: TransfersProvider,
         router: Router,
         dialogService: DialogService,
-        currencyInfo: CurrencyInfoService
+        currencyInfo: CurrencyInfoService,
+        addressBookService: AddressBookService
     ) {
-        self.accountService = accountService
         self.transfersProvider = transfersProvider
         self.router = router
         
         super.init(
             dialogService: dialogService,
-            currencyInfo: currencyInfo
+            currencyInfo: currencyInfo,
+            addressBookService: addressBookService,
+            accountService:  accountService
         )
     }
     

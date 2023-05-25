@@ -114,8 +114,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     // MARK: - Dependencies
     
-    var dialogService: DialogService
-    var currencyInfo: CurrencyInfoService
+    let dialogService: DialogService
+    let currencyInfo: CurrencyInfoService
+    let addressBookService: AddressBookService
+    let accountService: AccountService
     
     // MARK: - Properties
     
@@ -151,14 +153,46 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     var refreshTask: Task<(), Never>?
     
+    var senderId: String? {
+        didSet {
+            guard let id = senderId,
+                  let address = accountService.account?.address
+            else { return }
+            
+            if id.caseInsensitiveCompare(address) == .orderedSame {
+                senderName = String.adamantLocalized.transactionDetails.yourAddress
+            } else {
+                senderName = addressBookService.getName(for: id)
+            }
+        }
+    }
+    
+    var recipientId: String? {
+        didSet {
+            guard let id = recipientId,
+                  let address = accountService.account?.address
+            else { return }
+            
+            if id.caseInsensitiveCompare(address) == .orderedSame {
+                recipientName = String.adamantLocalized.transactionDetails.yourAddress
+            } else {
+                recipientName = addressBookService.getName(for: id)
+            }
+        }
+    }
+    
     // MARK: - Lifecycle
     
     init(
         dialogService: DialogService,
-        currencyInfo: CurrencyInfoService
+        currencyInfo: CurrencyInfoService,
+        addressBookService: AddressBookService,
+        accountService: AccountService
     ) {
         self.dialogService = dialogService
         self.currencyInfo = currencyInfo
+        self.addressBookService = addressBookService
+        self.accountService = accountService
         
         super.init(style: .grouped)
     }
@@ -219,12 +253,12 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.cell.titleLabel.text = Rows.from.localized
             
             if let transaction = transaction {
-                if transaction.senderAddress.count == 0 {
-                    $0.value = DoubleDetail(first: TransactionDetailsViewControllerBase.awaitingValueString, second: nil)
-                } else if let senderName = self?.senderName?.checkAndReplaceSystemWallets() {
-                    $0.value = DoubleDetail(first: senderName, second: transaction.senderAddress)
+                if let name = self?.senderName {
+                    $0.value = DoubleDetail(first: name, second: transaction.senderAddress)
                 } else {
-                    $0.value = DoubleDetail(first: transaction.senderAddress, second: nil)
+                    $0.value = transaction.senderAddress.isEmpty
+                    ? DoubleDetail(first: Self.awaitingValueString, second: nil)
+                    : DoubleDetail(first: transaction.senderAddress, second: nil)
                 }
             } else {
                 $0.value = nil
@@ -255,12 +289,12 @@ class TransactionDetailsViewControllerBase: FormViewController {
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = UIColor.adamant.textColor
             if let transaction = self?.transaction {
-                if transaction.senderAddress.count == 0 {
-                    row.value = DoubleDetail(first: TransactionDetailsViewControllerBase.awaitingValueString, second: nil)
-                } else if let senderName = self?.senderName?.checkAndReplaceSystemWallets() {
-                    row.value = DoubleDetail(first: senderName, second: transaction.senderAddress)
+                if let name = self?.senderName {
+                    row.value = DoubleDetail(first: name, second: transaction.senderAddress)
                 } else {
-                    row.value = DoubleDetail(first: transaction.senderAddress, second: nil)
+                    row.value = transaction.senderAddress.isEmpty
+                    ? DoubleDetail(first: Self.awaitingValueString, second: nil)
+                    : DoubleDetail(first: transaction.senderAddress, second: nil)
                 }
             } else {
                 row.value = nil
@@ -483,10 +517,6 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.tag = Rows.status.tag
             $0.title = Rows.status.localized
             $0.value = transaction?.transactionStatus?.localized
-            
-            $0.hidden = Condition.function([], { [weak self] _ -> Bool in
-                return self?.transaction?.transactionStatus == nil
-            })
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
             cell.textLabel?.textColor = UIColor.adamant.textColor
@@ -496,7 +526,12 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = UIColor.adamant.textColor
-            row.value = self?.transaction?.transactionStatus?.localized
+            if let value = self?.transaction?.transactionStatus?.localized,
+               !value.isEmpty {
+                row.value = value
+            } else {
+                row.value = TransactionDetailsViewControllerBase.awaitingValueString
+            }
         }
         
         detailsSection.append(statusRow)
