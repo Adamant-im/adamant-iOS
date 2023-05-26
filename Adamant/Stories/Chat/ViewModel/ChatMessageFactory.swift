@@ -72,7 +72,6 @@ private extension ChatMessageFactory {
             .quote,
             .bold,
             .italic,
-            .code,
             .strikethrough
         ],
         customElements: [
@@ -81,6 +80,11 @@ private extension ChatMessageFactory {
             MarkdownAdvancedAdm(
                 font: .adamantChatDefault,
                 color: .adamant.active
+            ),
+            MarkdownCodeAdamant(
+                font: .adamantCodeDefault,
+                textHighlightColor: .adamant.codeBlockText,
+                textBackgroundColor: .adamant.codeBlock
             )
         ]
     )
