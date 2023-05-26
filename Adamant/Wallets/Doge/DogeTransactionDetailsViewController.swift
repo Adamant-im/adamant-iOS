@@ -28,8 +28,9 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
         return control
     }()
     
-    override var consistencyMaxTime: Double? {
-        return service?.consistencyMaxTime
+    override var richProvider: RichMessageProviderWithStatusCheck? {
+        guard let service = service else { return nil }
+        return self.richProviders[service.richMessageType]
     }
     
     // MARK: - Lifecycle

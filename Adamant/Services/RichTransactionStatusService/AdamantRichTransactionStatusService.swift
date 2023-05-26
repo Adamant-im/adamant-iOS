@@ -41,7 +41,8 @@ actor AdamantRichTransactionStatusService: NSObject, RichTransactionStatusServic
             for: transaction,
             status: provider.statusWithFilters(
                 transaction: transaction,
-                oldPendingAttempts: oldPendingAttempts[id]?.wrappedValue ?? .zero
+                oldPendingAttempts: oldPendingAttempts[id]?.wrappedValue ?? .zero,
+                info: await provider.statusInfoFor(transaction: transaction)
             )
         )
     }

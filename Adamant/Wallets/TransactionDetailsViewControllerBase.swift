@@ -10,6 +10,26 @@ import UIKit
 import Eureka
 import SafariServices
 
+// MARK: - TransactionStatus UI
+private extension TransactionStatus {
+    var color: UIColor {
+        switch self {
+        case .failed: return .adamant.danger
+        case .notInitiated, .inconsistent, .noNetwork, .noNetworkFinal, .pending, .registered: return .adamant.alert
+        case .success: return .adamant.good
+        }
+    }
+    
+    var descriptionLocalized: String? {
+        switch self {
+        case .inconsistent:
+            return NSLocalizedString("TransactionStatus.Inconsistent.WrongTimestamp", comment: "Transaction status: inconsistent wrong timestamp")
+        default:
+            return nil
+        }
+    }
+}
+
 // MARK: - Localization
 extension String.adamantLocalized {
     struct transactionDetails {
@@ -129,6 +149,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     // MARK: - Properties
     
+    let richProviders: [String: RichMessageProviderWithStatusCheck]
+    
     var transaction: TransactionDetails? {
         didSet {
             if !isFiatSet {
@@ -159,24 +181,24 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     private var isFiatSet = false
     
-    var consistencyMaxTime: Double? {
+    var richProvider: RichMessageProviderWithStatusCheck? {
         nil
     }
     
     var transactionStatus: TransactionStatus? {
-        guard let consistencyMaxTime = consistencyMaxTime else {
+        guard let richTransaction = richTransaction,
+              let status = transaction?.transactionStatus
+        else {
             return transaction?.transactionStatus
         }
         
-        let isInconsistent = !consistencyFilter(
-            richSentDate: richTransaction?.sentDate,
-            txSendDate: transaction?.dateValue,
-            consistencyMaxTime: consistencyMaxTime
-        )
-        
-        return statusWithIncostintentFilter(
-            transaction?.transactionStatus,
-            isInconsistent: isInconsistent
+        return richProvider?.statusWithFilters(
+            transaction: richTransaction,
+            oldPendingAttempts: 0,
+            info: .init(
+                sentDate: transaction?.dateValue,
+                status: status
+            )
         )
     }
     
@@ -224,6 +246,12 @@ class TransactionDetailsViewControllerBase: FormViewController {
         self.currencyInfo = currencyInfo
         self.addressBookService = addressBookService
         self.accountService = accountService
+        
+        var richProviders = [String: RichMessageProviderWithStatusCheck]()
+        for case let provider as RichMessageProviderWithStatusCheck in accountService.wallets {
+            richProviders[provider.dynamicRichMessageType] = provider
+        }
+        self.richProviders = richProviders
         
         super.init(style: .grouped)
     }
