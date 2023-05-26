@@ -916,7 +916,11 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
 
     func pagingViewController(_: PagingViewController, pagingItemAt index: Int) -> PagingItem {
         guard let service = walletViewControllers[index].service else {
-            return WalletPagingItem(index: index, currencySymbol: "", currencyImage: #imageLiteral(resourceName: "adamant_wallet"))
+            return WalletPagingItem(
+                index: index,
+                currencySymbol: "",
+                currencyImage: #imageLiteral(resourceName: "adamant_wallet"),
+                isBalanceInitialized: false)
         }
         
         var network = ""
@@ -926,7 +930,12 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
             network = service.tokenNetworkSymbol
         }
         
-        let item = WalletPagingItem(index: index, currencySymbol: service.tokenSymbol, currencyImage: service.tokenLogo, currencyNetwork: network)
+        let item = WalletPagingItem(
+            index: index,
+            currencySymbol: service.tokenSymbol,
+            currencyImage: service.tokenLogo,
+            isBalanceInitialized: service.wallet?.isBalanceInitialized,
+            currencyNetwork: network)
         
         if let wallet = service.wallet {
             item.balance = wallet.balance

@@ -19,6 +19,7 @@ class ERC20Wallet: WalletAccount {
     var notifications: Int = 0
     var minBalance: Decimal = 0
     var minAmount: Decimal = 0
+    var isBalanceInitialized: Bool = false
     
     init(address: String, ethAddress: EthereumAddress, keystore: BIP32Keystore) {
         self.address = address
