@@ -10,6 +10,7 @@ import UIKit
 import Swinject
 import Alamofire
 import BitcoinKit
+import Combine
 
 enum DefaultBtcTransferFee: Decimal {
     case high = 24000
@@ -74,6 +75,14 @@ class BtcWalletService: WalletService {
         return tokenNetworkSymbol + tokenSymbol
     }
     
+    var richMessageType: String {
+        return Self.richMessageType
+	}
+
+    var qqPrefix: String {
+        return Self.qqPrefix
+	}
+
     var isSupportIncreaseFee: Bool {
         return true
     }
@@ -138,6 +147,8 @@ class BtcWalletService: WalletService {
     
     let defaultDispatchQueue = DispatchQueue(label: "im.adamant.btcWalletService", qos: .userInteractive, attributes: [.concurrent])
     
+    private var subscriptions = Set<AnyCancellable>()
+    
     // MARK: - State
     private (set) var state: WalletServiceState = .notInitiated
     
@@ -158,6 +169,40 @@ class BtcWalletService: WalletService {
     init() {
         self.network = BTCMainnet()
         self.setState(.notInitiated)
+        
+        // Notifications
+        addObservers()
+    }
+    
+    func addObservers() {
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.update()
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.accountDataUpdated, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.update()
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.btcWallet = nil
+                self?.initialBalanceCheck = false
+                if let balanceObserver = self?.balanceObserver {
+                    NotificationCenter.default.removeObserver(balanceObserver)
+                    self?.balanceObserver = nil
+                }
+            }
+            .store(in: &subscriptions)
     }
     
     func update() {
@@ -182,6 +227,7 @@ class BtcWalletService: WalletService {
         setState(.updating)
         
         if let balance = try? await getBalance() {
+            wallet.isBalanceInitialized = true
             let notification: Notification.Name?
             
             if wallet.balance != balance {
@@ -370,6 +416,7 @@ extension BtcWalletService: InitiatedWithPassphraseService {
             case .walletNotInitiated:
                 // Show '0' without waiting for balance update
                 if let wallet = service.btcWallet {
+                    wallet.isBalanceInitialized = true
                     NotificationCenter.default.post(name: service.walletUpdatedNotification, object: service, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
                 }
                 

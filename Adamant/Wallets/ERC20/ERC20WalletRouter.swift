@@ -44,7 +44,9 @@ extension AdamantScene.Wallets {
         static let transactionDetails = AdamantScene(identifier: "TransactionDetailsViewControllerBase") { r in
             ERC20TransactionDetailsViewController(
                 dialogService: r.resolve(DialogService.self)!,
-                currencyInfo: r.resolve(CurrencyInfoService.self)!
+                currencyInfo: r.resolve(CurrencyInfoService.self)!,
+                addressBookService: r.resolve(AddressBookService.self)!,
+                accountService:  r.resolve(AccountService.self)!
             )
         }
     }

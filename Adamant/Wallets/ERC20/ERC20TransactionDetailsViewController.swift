@@ -28,6 +28,10 @@ class ERC20TransactionDetailsViewController: TransactionDetailsViewControllerBas
         return control
     }()
     
+    override var richProvider: RichMessageProviderWithStatusCheck? {
+        return service
+    }
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -65,7 +69,7 @@ class ERC20TransactionDetailsViewController: TransactionDetailsViewControllerBas
             do {
                 let trs = try await service.getTransaction(by: id)
                 transaction = trs
-                
+                updateIncosinstentRowIfNeeded()
                 tableView.reloadData()
                 refreshControl.endRefreshing()
             } catch {
@@ -81,6 +85,7 @@ class ERC20TransactionDetailsViewController: TransactionDetailsViewControllerBas
     
     func startUpdate() {
         timer?.invalidate()
+        refresh(silent: true)
         timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
             self?.refresh(silent: true)
         }

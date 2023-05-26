@@ -130,6 +130,9 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
         let transaction = transactions[indexPath.row]
         
         cell.accessoryType = .disclosureIndicator
+        cell.separatorInset = indexPath.row == transactions.count - 1
+        ? .zero
+        : UITableView.defaultTransactionsSeparatorInset
         
         configureCell(cell, for: transaction)
         return cell

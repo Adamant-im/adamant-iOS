@@ -214,6 +214,7 @@ protocol WalletService: AnyObject {
     var minAmount: Decimal { get }
     var defaultVisibility: Bool { get }
     var defaultOrdinalLevel: Int? { get }
+    var richMessageType: String { get }
     
 	// MARK: Notifications
 	
@@ -262,6 +263,7 @@ protocol WalletServiceWithTransfers: WalletService {
 protocol WalletServiceWithSend: WalletService {
     var transactionFeeUpdated: Notification.Name { get }
     
+    var qqPrefix: String { get }
     var blockchainSymbol: String { get }
     var isDynamicFee : Bool { get }
     var diplayTransactionFee : Decimal { get }

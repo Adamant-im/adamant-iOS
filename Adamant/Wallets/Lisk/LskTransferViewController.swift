@@ -210,33 +210,6 @@ final class LskTransferViewController: TransferViewControllerBase {
         return row
     }
     
-    override func handleRawAddress(_ address: String) -> Bool {
-        guard let service = service else {
-            return false
-        }
-        
-        let parsedAddress: String
-        if address.hasPrefix("lisk:") || address.hasPrefix("lsk:"), let firstIndex = address.firstIndex(of: ":") {
-            let index = address.index(firstIndex, offsetBy: 1)
-            parsedAddress = String(address[index...])
-        } else {
-            parsedAddress = address
-        }
-        
-        switch service.validate(address: parsedAddress) {
-        case .valid:
-            if let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) {
-                row.value = parsedAddress
-                row.updateCell()
-            }
-            
-            return true
-            
-        default:
-            return false
-        }
-    }
-    
     func reportTransferTo(
         admAddress: String,
         amount: Decimal,

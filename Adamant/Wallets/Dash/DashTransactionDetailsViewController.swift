@@ -28,6 +28,10 @@ class DashTransactionDetailsViewController: TransactionDetailsViewControllerBase
         return control
     }()
     
+    override var richProvider: RichMessageProviderWithStatusCheck? {
+        return service
+    }
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -36,7 +40,7 @@ class DashTransactionDetailsViewController: TransactionDetailsViewControllerBase
         super.viewDidLoad()
         if service != nil { tableView.refreshControl = refreshControl }
         
-        refresh(true)
+        refresh(silent: true)
         
         // MARK: Start update
         if transaction != nil {
@@ -57,7 +61,7 @@ class DashTransactionDetailsViewController: TransactionDetailsViewControllerBase
     }
     
     @MainActor
-    @objc func refresh(_ silent: Bool = false) {
+    @objc func refresh(silent: Bool = false) {
         refreshTask = Task { [weak self] in
             guard let service = service,
                     let address = service.wallet?.address,
@@ -81,15 +85,23 @@ class DashTransactionDetailsViewController: TransactionDetailsViewControllerBase
                     } catch {
                         blockInfo = nil
                     }
-                    self?.transaction = trs.asBtcTransaction(DashTransaction.self, for: address, blockId: blockInfo?.height)
+                    self?.transaction = trs.asBtcTransaction(
+                        DashTransaction.self,
+                        for: address,
+                        blockId: blockInfo?.height
+                    )
                     self?.cachedBlockInfo = blockInfo
 
                     self?.tableView.reloadData()
                 } else {
-                    self?.transaction = trs.asBtcTransaction(DashTransaction.self, for: address)
-
+                    self?.transaction = trs.asBtcTransaction(
+                        DashTransaction.self,
+                        for: address
+                    )
                     self?.tableView.reloadData()
                 }
+                
+                self?.updateIncosinstentRowIfNeeded()
                 self?.refreshControl.endRefreshing()
             } catch {
                 self?.refreshControl.endRefreshing()
@@ -103,8 +115,9 @@ class DashTransactionDetailsViewController: TransactionDetailsViewControllerBase
     
     func startUpdate() {
         timer?.invalidate()
+        refresh(silent: true)
         timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            self?.refresh(true) // Silent, without errors
+            self?.refresh(silent: true) // Silent, without errors
         }
     }
     

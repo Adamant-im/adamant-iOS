@@ -13,6 +13,7 @@ import web3swift
 import Alamofire
 import struct BigInt.BigUInt
 import Web3Core
+import Combine
 
 class ERC20WalletService: WalletService {
     // MARK: - Constants
@@ -61,6 +62,14 @@ class ERC20WalletService: WalletService {
         return token?.defaultOrdinalLevel
     }
     
+    var richMessageType: String {
+        return Self.richMessageType
+	}
+
+    var qqPrefix: String {
+        return EthWalletService.qqPrefix
+	}
+
     var isSupportIncreaseFee: Bool {
         return true
     }
@@ -111,6 +120,7 @@ class ERC20WalletService: WalletService {
     private (set) var erc20: ERC20?
     private (set) var enabled = true
     
+    private var subscriptions = Set<AnyCancellable>()
     private var _ethNodeUrl: String?
     private var _web3: Web3?
     var web3: Web3? {
@@ -171,22 +181,7 @@ class ERC20WalletService: WalletService {
         serviceStateChanged = Notification.Name("adamant.erc20Wallet.\(token.symbol).stateChanged")
         
         // Notifications
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] _ in
-            self?.update()
-        }
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: nil) { [weak self] _ in
-            self?.update()
-        }
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
-            self?.ethWallet = nil
-            self?.initialBalanceCheck = false
-            if let balanceObserver = self?.balanceObserver {
-                NotificationCenter.default.removeObserver(balanceObserver)
-                self?.balanceObserver = nil
-            }
-        }
+        addObservers()
         
         guard let node = EthWalletService.nodes.randomElement() else {
             fatalError("Failed to get ETH endpoint")
@@ -196,6 +191,37 @@ class ERC20WalletService: WalletService {
         Task {
             _ = await self.setupEthNode(with: apiUrl)
         }
+    }
+    
+    func addObservers() {
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.update()
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.accountDataUpdated, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.update()
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.ethWallet = nil
+                self?.initialBalanceCheck = false
+                if let balanceObserver = self?.balanceObserver {
+                    NotificationCenter.default.removeObserver(balanceObserver)
+                    self?.balanceObserver = nil
+                }
+            }
+            .store(in: &subscriptions)
     }
     
     func setupEthNode(with apiUrl: String) async -> Web3? {
@@ -239,6 +265,7 @@ class ERC20WalletService: WalletService {
         setState(.updating)
         
         if let balance = try? await getBalance(forAddress: wallet.ethAddress) {
+            wallet.isBalanceInitialized = true
             let notification: Notification.Name?
             
             if wallet.balance != balance {

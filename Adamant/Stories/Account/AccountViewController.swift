@@ -663,12 +663,21 @@ class AccountViewController: FormViewController {
     
     func addObservers() {
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            self?.updateAccountInfo()
-            self?.tableView.setContentOffset(CGPoint.zero, animated: false)
-            self?.pagingViewController.reloadData()
-            self?.tableView.reloadData()
-            if let vc = self?.pagingViewController.pageViewController.selectedViewController as? WalletViewController {
-                self?.updateHeaderSize(with: vc, animated: false)
+            guard let self = self else { return }
+            
+            self.updateAccountInfo()
+            self.tableView.setContentOffset(
+                CGPoint(
+                    x: .zero,
+                    y: -self.tableView.frame.size.height
+                ),
+                animated: false
+            )
+            
+            self.pagingViewController.reloadData()
+            self.tableView.reloadData()
+            if let vc = self.pagingViewController.pageViewController.selectedViewController as? WalletViewController {
+                self.updateHeaderSize(with: vc, animated: false)
             }
         }
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
@@ -764,7 +773,7 @@ class AccountViewController: FormViewController {
     
     private func updatePagingItemHeight() {
         if walletViewControllers.count > 0 {
-            pagingViewController.menuItemSize = .fixed(width: 110, height: 110)
+            pagingViewController.menuItemSize = .fixed(width: 110, height: 114)
         } else {
             pagingViewController.menuItemSize = .fixed(width: 110, height: 0)
         }
@@ -907,7 +916,11 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
 
     func pagingViewController(_: PagingViewController, pagingItemAt index: Int) -> PagingItem {
         guard let service = walletViewControllers[index].service else {
-            return WalletPagingItem(index: index, currencySymbol: "", currencyImage: #imageLiteral(resourceName: "adamant_wallet"))
+            return WalletPagingItem(
+                index: index,
+                currencySymbol: "",
+                currencyImage: #imageLiteral(resourceName: "adamant_wallet"),
+                isBalanceInitialized: false)
         }
         
         var network = ""
@@ -917,7 +930,12 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
             network = service.tokenNetworkSymbol
         }
         
-        let item = WalletPagingItem(index: index, currencySymbol: service.tokenSymbol, currencyImage: service.tokenLogo, currencyNetwork: network)
+        let item = WalletPagingItem(
+            index: index,
+            currencySymbol: service.tokenSymbol,
+            currencyImage: service.tokenLogo,
+            isBalanceInitialized: service.wallet?.isBalanceInitialized,
+            currencyNetwork: network)
         
         if let wallet = service.wallet {
             item.balance = wallet.balance

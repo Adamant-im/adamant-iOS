@@ -10,6 +10,7 @@ import UIKit
 import Swinject
 import Alamofire
 import BitcoinKit
+import Combine
 
 class DashWalletService: WalletService {
     
@@ -31,6 +32,14 @@ class DashWalletService: WalletService {
     
     var tokenUnicID: String {
         return tokenNetworkSymbol + tokenSymbol
+    }
+    
+    var richMessageType: String {
+        return Self.richMessageType
+	}
+
+    var qqPrefix: String {
+        return Self.qqPrefix
     }
     
     var wallet: WalletAccount? { return dashWallet }
@@ -122,7 +131,8 @@ class DashWalletService: WalletService {
     let defaultDispatchQueue = DispatchQueue(label: "im.adamant.dashWalletService", qos: .userInteractive, attributes: [.concurrent])
     
     static let jsonDecoder = JSONDecoder()
-    
+    private var subscriptions = Set<AnyCancellable>()
+
     // MARK: - State
     private (set) var state: WalletServiceState = .notInitiated
     
@@ -144,6 +154,40 @@ class DashWalletService: WalletService {
         self.network = DashMainnet()
         
         self.setState(.notInitiated)
+        
+        // Notifications
+        addObservers()
+    }
+    
+    func addObservers() {
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.update()
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.accountDataUpdated, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.update()
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.dashWallet = nil
+                self?.initialBalanceCheck = false
+                if let balanceObserver = self?.balanceObserver {
+                    NotificationCenter.default.removeObserver(balanceObserver)
+                    self?.balanceObserver = nil
+                }
+            }
+            .store(in: &subscriptions)
     }
     
     func update() {
@@ -168,6 +212,7 @@ class DashWalletService: WalletService {
         setState(.updating)
         
         if let balance = try? await getBalance() {
+            wallet.isBalanceInitialized = true
             let notification: Notification.Name?
             
             if wallet.balance != balance {
@@ -251,6 +296,7 @@ extension DashWalletService: InitiatedWithPassphraseService {
             case .walletNotInitiated:
                 // Show '0' without waiting for balance update
                 if let wallet = service.dashWallet {
+                    wallet.isBalanceInitialized = true
                     NotificationCenter.default.post(name: service.walletUpdatedNotification, object: service, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
                 }
                 

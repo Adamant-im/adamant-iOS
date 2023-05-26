@@ -55,6 +55,9 @@
 /* System accounts: ADAMANT Bounty */
 "Accounts.AdamantBounty" = "ADAMANT Bounty Wallet";
 
+/* System accounts: PWA ADM Bounty bot */
+"Accounts.AdamantBountyBot" = "ADM Bounty bot";
+
 /* System accounts: ADAMANT iOS Support */
 "Accounts.iOSSupport" = "ADAMANT iOS Support";
 
@@ -231,6 +234,9 @@
 
 /* SearchPage: Contacts header */
 "SearchPage.Contacts" = "Kontakte";
+
+/* SearchPage: Contacts header */
+"SearchPage.Contact.New" = "Neuer Kontakt";
 
 /* SearchPage: Messages header */
 "SearchPage.Messages" = "Mitteilungen";
@@ -834,6 +840,12 @@
 
 /* Transaction status: inconsistent */
 "TransactionStatus.Inconsistent" = "Inconsistent";
+
+/* Transaction status: inconsistent wrong timestamp */
+"TransactionStatus.Inconsistent.WrongTimestamp" = "Сообщение и транзакция имеют различное время. Это возможно, но лучше перепроверьте";
+
+/* Transaction status: inconsistent reason title */
+"TransactionStatus.Inconsistent.Reason.Title" = "Противоречивая причина";
 
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "Details";

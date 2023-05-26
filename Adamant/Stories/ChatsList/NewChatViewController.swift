@@ -35,7 +35,6 @@ extension String.adamantLocalized {
 // MARK: - Delegate
 protocol NewChatViewControllerDelegate: AnyObject {
     func newChatController(
-        _ controller: NewChatViewController,
         didSelectAccount account: CoreDataAccount,
         preMessage: String?,
         name: String?
@@ -279,7 +278,6 @@ class NewChatViewController: FormViewController {
                 account.chatroom?.isForcedVisible = true
                 
                 self.delegate?.newChatController(
-                    self,
                     didSelectAccount: account,
                     preMessage: message,
                     name: name

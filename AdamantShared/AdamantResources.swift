@@ -47,5 +47,8 @@ enum AdamantResources {
         
         static let adelinaWallet = "U11138426591213238985"
         static let adelinaWalletPK = "8e06eba03ebe4668148647fc00a64b3fae59a1911ce1fd1059baba39ceb705a4"
+        
+        static let pwaBountyBot = "U1644771796259136854"
+        static let pwaBountyBotPK = "7a5c55dec7a085f1c795a126b3f74ebdccf36b7abfa2f85145443e58fcdff80c"
     }
 }

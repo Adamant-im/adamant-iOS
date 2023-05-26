@@ -56,7 +56,8 @@ actor RichTransactionStatusSubscription<StatusSubscriber: Subscriber>: Subscript
         
         status = await provider.statusWithFilters(
             transaction: transaction,
-            oldPendingAttempts: oldPendingAttempts
+            oldPendingAttempts: oldPendingAttempts,
+            info: await provider.statusInfoFor(transaction: transaction)
         )
         
         Task {
