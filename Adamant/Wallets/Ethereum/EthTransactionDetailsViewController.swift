@@ -25,6 +25,10 @@ class EthTransactionDetailsViewController: TransactionDetailsViewControllerBase 
         return control
     }()
     
+    override var richProvider: RichMessageProviderWithStatusCheck? {
+        return service
+    }
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -64,7 +68,7 @@ class EthTransactionDetailsViewController: TransactionDetailsViewControllerBase 
             do {
                 let trs = try await service.getTransaction(by: id)
                 transaction = trs
-                
+                updateIncosinstentRowIfNeeded()
                 tableView.reloadData()
                 refreshControl.endRefreshing()
             } catch {
@@ -80,7 +84,7 @@ class EthTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     
     func startUpdate() {
         timer?.invalidate()
-        refresh(silent: false)
+        refresh(silent: true)
         timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
             self?.refresh(silent: true)
         }

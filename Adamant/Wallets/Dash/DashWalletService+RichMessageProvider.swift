@@ -117,6 +117,8 @@ extension DashWalletService: RichMessageProvider {
         vc.recipientId = recipientId
         vc.comment = comment
         vc.transaction = dashTransaction ?? failedTransaction
+        vc.richTransaction = richTransaction
+        
         chat.navigationController?.pushViewController(vc, animated: true)
     }
     

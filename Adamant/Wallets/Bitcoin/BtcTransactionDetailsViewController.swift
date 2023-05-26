@@ -25,6 +25,10 @@ class BtcTransactionDetailsViewController: TransactionDetailsViewControllerBase 
         return control
     }()
     
+    override var richProvider: RichMessageProviderWithStatusCheck? {
+        return service
+    }
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -53,7 +57,7 @@ class BtcTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     }
     
     @MainActor
-    @objc func refresh(_ silent: Bool = false) {
+    @objc func refresh(silent: Bool = false) {
         refreshTask = Task {
             guard let id = transaction?.txId, let service = service else {
                 refreshControl.endRefreshing()
@@ -64,6 +68,7 @@ class BtcTransactionDetailsViewController: TransactionDetailsViewControllerBase 
                 let trs = try await service.getTransaction(by: id)
                 transaction = trs
                 
+                updateIncosinstentRowIfNeeded()
                 tableView.reloadData()
                 refreshControl.endRefreshing()
             } catch {
@@ -78,9 +83,9 @@ class BtcTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     
     func startUpdate() {
         timer?.invalidate()
-        refresh(false)
+        refresh(silent: true)
         timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            self?.refresh(true)
+            self?.refresh(silent: true)
         }
     }
     

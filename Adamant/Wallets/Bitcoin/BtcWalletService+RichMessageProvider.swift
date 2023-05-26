@@ -108,6 +108,8 @@ extension BtcWalletService: RichMessageProvider {
         vc.recipientId = recipientId
         vc.comment = comment
         vc.transaction = transaction ?? failedTransaction
+        vc.richTransaction = richTransaction
+        
         chat.navigationController?.pushViewController(vc, animated: true)
     }
     

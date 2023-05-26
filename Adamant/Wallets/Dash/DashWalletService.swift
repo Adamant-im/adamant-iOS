@@ -33,6 +33,10 @@ class DashWalletService: WalletService {
         return tokenNetworkSymbol + tokenSymbol
     }
     
+    var richMessageType: String {
+        return Self.richMessageType
+    }
+    
     var wallet: WalletAccount? { return dashWallet }
     
     var walletViewController: WalletViewController {

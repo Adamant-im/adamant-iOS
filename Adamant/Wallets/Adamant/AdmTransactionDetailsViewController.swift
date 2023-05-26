@@ -95,7 +95,7 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
         
         tableView.refreshControl = refreshControl
         
-        refresh(true)
+        refresh(silent: true)
         
         startUpdate()
     }
@@ -149,7 +149,7 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     }
     
     @MainActor
-    @objc func refresh(_ silent: Bool = false) {
+    @objc func refresh(silent: Bool = false) {
         refreshTask = Task {
             guard let id = transaction?.txId else {
                 return
@@ -172,7 +172,7 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     func startUpdate() {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            self?.refresh(true)
+            self?.refresh(silent: true)
         }
     }
     

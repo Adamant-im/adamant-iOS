@@ -24,4 +24,10 @@ public class ChatTransaction: BaseTransaction {
     var sentDate: Date? {
         date.map { $0 as Date }
     }
+    
+    override var transactionStatus: TransactionStatus? {
+        return confirmations > 0
+        ? .success
+        : .pending
+    }
 }
