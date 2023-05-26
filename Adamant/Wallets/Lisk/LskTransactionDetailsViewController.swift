@@ -41,7 +41,7 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
             tableView.refreshControl = refreshControl
         }
         
-        refresh(true)
+        refresh(silent: true)
         
         if transaction != nil {
             startUpdate()
@@ -61,7 +61,7 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     }
     
     @MainActor
-    @objc func refresh(_ silent: Bool = false) {
+    @objc func refresh(silent: Bool = false) {
         refreshTask = Task {
             guard let id = transaction?.txId,
                   let service = service
@@ -92,9 +92,9 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     
     func startUpdate() {
         timer?.invalidate()
-        refresh(false)
+        refresh(silent: false)
         timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            self?.refresh(true)
+            self?.refresh(silent: true)
         }
     }
     

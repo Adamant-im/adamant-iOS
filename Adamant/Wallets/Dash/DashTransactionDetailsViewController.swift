@@ -41,7 +41,7 @@ class DashTransactionDetailsViewController: TransactionDetailsViewControllerBase
         super.viewDidLoad()
         if service != nil { tableView.refreshControl = refreshControl }
         
-        refresh(true)
+        refresh(silent: true)
         
         // MARK: Start update
         if transaction != nil {
@@ -62,7 +62,7 @@ class DashTransactionDetailsViewController: TransactionDetailsViewControllerBase
     }
     
     @MainActor
-    @objc func refresh(_ silent: Bool = false) {
+    @objc func refresh(silent: Bool = false) {
         refreshTask = Task { [weak self] in
             guard let service = service,
                     let address = service.wallet?.address,
@@ -116,9 +116,9 @@ class DashTransactionDetailsViewController: TransactionDetailsViewControllerBase
     
     func startUpdate() {
         timer?.invalidate()
-        refresh(false)
+        refresh(silent: false)
         timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            self?.refresh(true) // Silent, without errors
+            self?.refresh(silent: true) // Silent, without errors
         }
     }
     
