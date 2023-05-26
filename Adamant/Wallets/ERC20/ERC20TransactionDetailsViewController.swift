@@ -29,8 +29,7 @@ class ERC20TransactionDetailsViewController: TransactionDetailsViewControllerBas
     }()
     
     override var richProvider: RichMessageProviderWithStatusCheck? {
-        guard let service = service else { return nil }
-        return self.richProviders[service.richMessageType]
+        return service
     }
     
     // MARK: - Lifecycle
@@ -86,7 +85,7 @@ class ERC20TransactionDetailsViewController: TransactionDetailsViewControllerBas
     
     func startUpdate() {
         timer?.invalidate()
-        refresh(silent: false)
+        refresh(silent: true)
         timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
             self?.refresh(silent: true)
         }

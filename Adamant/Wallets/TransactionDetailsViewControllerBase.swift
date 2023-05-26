@@ -149,8 +149,6 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     // MARK: - Properties
     
-    let richProviders: [String: RichMessageProviderWithStatusCheck]
-    
     var transaction: TransactionDetails? {
         didSet {
             if !isFiatSet {
@@ -246,12 +244,6 @@ class TransactionDetailsViewControllerBase: FormViewController {
         self.currencyInfo = currencyInfo
         self.addressBookService = addressBookService
         self.accountService = accountService
-        
-        var richProviders = [String: RichMessageProviderWithStatusCheck]()
-        for case let provider as RichMessageProviderWithStatusCheck in accountService.wallets {
-            richProviders[provider.dynamicRichMessageType] = provider
-        }
-        self.richProviders = richProviders
         
         super.init(style: .grouped)
     }
@@ -804,31 +796,6 @@ class TransactionDetailsViewControllerBase: FormViewController {
     private func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
-    }
-    
-    func statusWithIncostintentFilter(
-        _ transactionStatus: TransactionStatus?,
-        isInconsistent: Bool
-    ) -> TransactionStatus? {
-        transactionStatus == .success && isInconsistent
-        ? .inconsistent
-        : transactionStatus
-    }
-    
-    func consistencyFilter(
-        richSentDate: Date?,
-        txSendDate: Date?,
-        consistencyMaxTime: Double
-    ) -> Bool {
-        guard
-            let transactionDate = txSendDate,
-            let messageDate = richSentDate
-        else { return false }
-        
-        let end = messageDate.addingTimeInterval(consistencyMaxTime)
-        let dateRange = messageDate...end
-        
-        return dateRange.contains(transactionDate)
     }
     
     // MARK: - Actions
