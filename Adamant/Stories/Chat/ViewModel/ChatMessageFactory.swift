@@ -111,8 +111,19 @@ private extension ChatMessageFactory {
     }
     
     func makeContent(_ transaction: MessageTransaction) -> ChatMessage.Content {
-        transaction.message.map {
-            .message(.init(string: Self.markdownParser.parse($0)))
+        return transaction.message.map {
+            let attributedString = Self.markdownParser.parse($0)
+            
+            let mutableAttributedString = NSMutableAttributedString(attributedString: attributedString)
+            let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.lineSpacing = 1.15
+            mutableAttributedString.addAttribute(
+                NSAttributedString.Key.paragraphStyle,
+                value: paragraphStyle,
+                range: NSRange(location: 0, length: attributedString.length)
+            )
+
+            return .message(.init(string: mutableAttributedString))
         } ?? .default
     }
     
