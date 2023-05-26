@@ -713,7 +713,6 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
 // MARK: - NewChatViewControllerDelegate
 extension ChatListViewController: NewChatViewControllerDelegate {
     func newChatController(
-        _ controller: NewChatViewController,
         didSelectAccount account: CoreDataAccount,
         preMessage: String?,
         name: String?
@@ -1319,6 +1318,11 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
             
             presenter.presentChatroom(chatroom)
         }
+    }
+    
+    func didSelected(_ account: CoreDataAccount) {
+        account.chatroom?.isForcedVisible = true
+        newChatController(didSelectAccount: account, preMessage: nil, name: nil)
     }
 }
 
