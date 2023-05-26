@@ -28,6 +28,10 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
         return control
     }()
     
+    override var consistencyMaxTime: Double? {
+        return service?.consistencyMaxTime
+    }
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -130,5 +134,7 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
             
             tableView.reloadData()
         }
+        
+        updateIncosinstentRowIfNeeded()
     }
 }

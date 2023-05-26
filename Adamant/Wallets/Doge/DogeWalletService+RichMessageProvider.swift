@@ -109,6 +109,8 @@ extension DogeWalletService: RichMessageProvider {
             transactionStatus: nil)
 
         vc.transaction = transaction ?? failedTransaction
+        vc.richTransaction = richTransaction
+        
         chat.navigationController?.pushViewController(vc, animated: true)
     }
     

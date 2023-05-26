@@ -25,6 +25,10 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
         return control
     }()
     
+    override var consistencyMaxTime: Double? {
+        return service?.consistencyMaxTime
+    }
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -72,7 +76,7 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
                 let lastHeight = result.lastHeight
                 trs.updateConfirmations(value: lastHeight)
                 transaction = trs
-                
+                updateIncosinstentRowIfNeeded()
                 tableView.reloadData()
                 refreshControl.endRefreshing()
             } catch {

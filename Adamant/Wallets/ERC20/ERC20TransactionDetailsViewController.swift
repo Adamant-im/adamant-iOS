@@ -28,6 +28,10 @@ class ERC20TransactionDetailsViewController: TransactionDetailsViewControllerBas
         return control
     }()
     
+    override var consistencyMaxTime: Double? {
+        return service?.consistencyMaxTime
+    }
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -65,7 +69,7 @@ class ERC20TransactionDetailsViewController: TransactionDetailsViewControllerBas
             do {
                 let trs = try await service.getTransaction(by: id)
                 transaction = trs
-                
+                updateIncosinstentRowIfNeeded()
                 tableView.reloadData()
                 refreshControl.endRefreshing()
             } catch {

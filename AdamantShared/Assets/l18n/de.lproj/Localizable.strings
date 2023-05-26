@@ -835,6 +835,12 @@
 /* Transaction status: inconsistent */
 "TransactionStatus.Inconsistent" = "Inconsistent";
 
+/* Transaction status: inconsistent wrong timestamp */
+"TransactionStatus.Inconsistent.WrongTimestamp" = "Сообщение и транзакция имеют различное время. Это возможно, но лучше перепроверьте";
+
+/* Transaction status: inconsistent reason title */
+"TransactionStatus.Inconsistent.Reason.Title" = "Противоречивая причина";
+
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "Details";
 

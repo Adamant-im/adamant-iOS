@@ -104,6 +104,8 @@ extension ERC20WalletService: RichMessageProvider {
         vc.recipientId = recipientId
         vc.comment = comment
         vc.transaction = transaction ?? failedTransaction
+        vc.richTransaction = richTransaction
+        
         chat.navigationController?.pushViewController(vc, animated: true)
     }
     

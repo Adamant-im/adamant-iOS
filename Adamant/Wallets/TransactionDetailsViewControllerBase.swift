@@ -41,6 +41,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         case comment
         case historyFiat
         case currentFiat
+        case inconsistentReason
         
         var tag: String {
             switch self {
@@ -58,6 +59,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             case .comment: return "comment"
             case .historyFiat: return "hfiat"
             case .currentFiat: return "cfiat"
+            case .inconsistentReason: return "incReason"
             }
         }
         
@@ -77,6 +79,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             case .comment: return ""
             case .historyFiat: return NSLocalizedString("TransactionDetailsScene.Row.HistoryFiat", comment: "Transaction details: fiat value at the time")
             case .currentFiat: return NSLocalizedString("TransactionDetailsScene.Row.CurrentFiat", comment: "Transaction details: current fiat value")
+            case .inconsistentReason:
+                return NSLocalizedString("TransactionStatus.Inconsistent.Reason.Title", comment: "Transaction status: inconsistent reason title")
             }
         }
         
@@ -94,12 +98,15 @@ class TransactionDetailsViewControllerBase: FormViewController {
         case details
         case comment
         case actions
+        case inconsistentReason
         
         var localized: String {
             switch self {
             case .details: return ""
             case .comment: return NSLocalizedString("TransactionDetailsScene.Section.Comment", comment: "Transaction details: 'Comments' section")
             case .actions: return NSLocalizedString("TransactionDetailsScene.Section.Actions", comment: "Transaction details: 'Actions' section")
+            case .inconsistentReason:
+                return NSLocalizedString("TransactionStatus.Inconsistent.Reason.Title", comment: "Transaction status: inconsistent reason title")
             }
         }
         
@@ -108,6 +115,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             case .details: return "details"
             case .comment: return "comment"
             case .actions: return "actions"
+            case .inconsistentReason: return "inconsistentReason"
             }
         }
     }
@@ -151,7 +159,30 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     private var isFiatSet = false
     
+    var consistencyMaxTime: Double? {
+        nil
+    }
+    
+    var transactionStatus: TransactionStatus? {
+        guard let consistencyMaxTime = consistencyMaxTime else {
+            return transaction?.transactionStatus
+        }
+        
+        let isInconsistent = !consistencyFilter(
+            richSentDate: richTransaction?.sentDate,
+            txSendDate: transaction?.dateValue,
+            consistencyMaxTime: consistencyMaxTime
+        )
+        
+        return statusWithIncostintentFilter(
+            transaction?.transactionStatus,
+            isInconsistent: isInconsistent
+        )
+    }
+    
     var refreshTask: Task<(), Never>?
+    
+    var richTransaction: RichMessageTransaction?
     
     var senderId: String? {
         didSet {
@@ -516,7 +547,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         let statusRow = LabelRow {
             $0.tag = Rows.status.tag
             $0.title = Rows.status.localized
-            $0.value = transaction?.transactionStatus?.localized
+            $0.value = transactionStatus?.localized
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
             cell.textLabel?.textColor = UIColor.adamant.textColor
@@ -526,7 +557,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = UIColor.adamant.textColor
-            if let value = self?.transaction?.transactionStatus?.localized,
+			cell.detailTextLabel?.textColor = self?.transactionStatus?.color ?? UIColor.adamant.textColor
+            
+            if let value = self?.transactionStatus?.localized,
                !value.isEmpty {
                 row.value = value
             } else {
@@ -618,7 +651,36 @@ class TransactionDetailsViewControllerBase: FormViewController {
             
             form.append(commentSection)
         }
-            
+        
+        // MARK: Inconsistent Reason
+        
+        let inconsistentReasonSection = Section(Sections.inconsistentReason.localized) {
+            $0.tag = Sections.inconsistentReason.tag
+            $0.hidden = Condition.function([], { [weak self] _ -> Bool in
+                return self?.transactionStatus != .inconsistent
+            })
+        }
+        
+        let inconsistentReasonRow = TextAreaRow(Rows.inconsistentReason.tag) {
+            $0.textAreaHeight = .dynamic(initialTextViewHeight: 44)
+            $0.value = transactionStatus?.descriptionLocalized
+        }.cellSetup { (cell, _) in
+            cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
+        }.cellUpdate { [weak self] (cell, row) in
+            cell.textView.backgroundColor = UIColor.clear
+            cell.textView.isSelectable = false
+            cell.textView.isEditable = false
+            row.value = self?.transactionStatus?.descriptionLocalized
+        }.onCellSelection { [weak self] (cell, row) in
+            if let text = row.value {
+                self?.shareValue(text, from: cell)
+            }
+        }
+        
+        inconsistentReasonSection.append(inconsistentReasonRow)
+        form.append(inconsistentReasonSection)
+        
         // MARK: Actions section
         
         let actionsSection = Section(Sections.actions.localized) {
@@ -701,11 +763,44 @@ class TransactionDetailsViewControllerBase: FormViewController {
         }
     }
     
+    func updateIncosinstentRowIfNeeded() {
+        guard transactionStatus == .inconsistent,
+              let section = form.sectionBy(tag: Sections.inconsistentReason.tag)
+        else { return }
+        
+        section.evaluateHidden()
+    }
+    
     // MARK: - Other
     
     private func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
+    }
+    
+    func statusWithIncostintentFilter(
+        _ transactionStatus: TransactionStatus?,
+        isInconsistent: Bool
+    ) -> TransactionStatus? {
+        transactionStatus == .success && isInconsistent
+        ? .inconsistent
+        : transactionStatus
+    }
+    
+    func consistencyFilter(
+        richSentDate: Date?,
+        txSendDate: Date?,
+        consistencyMaxTime: Double
+    ) -> Bool {
+        guard
+            let transactionDate = txSendDate,
+            let messageDate = richSentDate
+        else { return false }
+        
+        let end = messageDate.addingTimeInterval(consistencyMaxTime)
+        let dateRange = messageDate...end
+        
+        return dateRange.contains(transactionDate)
     }
     
     // MARK: - Actions

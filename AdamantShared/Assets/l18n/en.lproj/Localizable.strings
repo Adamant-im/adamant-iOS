@@ -826,6 +826,12 @@
 /* Transaction status: inconsistent */
 "TransactionStatus.Inconsistent" = "Inconsistent";
 
+/* Transaction status: inconsistent wrong timestamp */
+"TransactionStatus.Inconsistent.WrongTimestamp" = "Message and Tx has different timestamps. It is possible, but check twice";
+
+/* Transaction status: inconsistent reason title */
+"TransactionStatus.Inconsistent.Reason.Title" = "Inconsistent reason";
+
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "Details";
 

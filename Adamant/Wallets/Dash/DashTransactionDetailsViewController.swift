@@ -28,6 +28,10 @@ class DashTransactionDetailsViewController: TransactionDetailsViewControllerBase
         return control
     }()
     
+    override var consistencyMaxTime: Double? {
+        return service?.consistencyMaxTime
+    }
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -81,15 +85,23 @@ class DashTransactionDetailsViewController: TransactionDetailsViewControllerBase
                     } catch {
                         blockInfo = nil
                     }
-                    self?.transaction = trs.asBtcTransaction(DashTransaction.self, for: address, blockId: blockInfo?.height)
+                    self?.transaction = trs.asBtcTransaction(
+                        DashTransaction.self,
+                        for: address,
+                        blockId: blockInfo?.height
+                    )
                     self?.cachedBlockInfo = blockInfo
 
                     self?.tableView.reloadData()
                 } else {
-                    self?.transaction = trs.asBtcTransaction(DashTransaction.self, for: address)
-
+                    self?.transaction = trs.asBtcTransaction(
+                        DashTransaction.self,
+                        for: address
+                    )
                     self?.tableView.reloadData()
                 }
+                
+                self?.updateIncosinstentRowIfNeeded()
                 self?.refreshControl.endRefreshing()
             } catch {
                 self?.refreshControl.endRefreshing()
