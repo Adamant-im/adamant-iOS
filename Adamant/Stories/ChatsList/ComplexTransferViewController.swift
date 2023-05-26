@@ -43,7 +43,7 @@ class ComplexTransferViewController: UIViewController {
         // MARK: PagingViewController
         pagingViewController = PagingViewController()
         pagingViewController.register(UINib(nibName: "WalletCollectionViewCell", bundle: nil), for: WalletPagingItem.self)
-        pagingViewController.menuItemSize = .fixed(width: 110, height: 110)
+        pagingViewController.menuItemSize = .fixed(width: 110, height: 114)
         pagingViewController.indicatorColor = UIColor.adamant.primary
         pagingViewController.indicatorOptions = .visible(height: 2, zIndex: Int.max, spacing: UIEdgeInsets.zero, insets: UIEdgeInsets.zero)
         

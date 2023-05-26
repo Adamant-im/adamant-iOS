@@ -18,23 +18,23 @@
                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                 <subviews>
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="adamant_wallet" translatesAutoresizingMaskIntoConstraints="NO" id="xZc-UL-00v">
-                        <rect key="frame" x="27.5" y="6" width="55" height="55"/>
+                        <rect key="frame" x="27.5" y="10" width="55" height="55"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="55" id="BYW-hx-Hql"/>
                             <constraint firstAttribute="width" secondItem="xZc-UL-00v" secondAttribute="height" multiplier="1:1" id="CwR-kR-kjO"/>
                         </constraints>
                     </imageView>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1Vy-Ac-hig" customClass="AccessoryContainerView" customModule="FreakingSimpleRoundImageView">
-                        <rect key="frame" x="27.5" y="6" width="55" height="55"/>
+                        <rect key="frame" x="27.5" y="10" width="55" height="55"/>
                     </view>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ADM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Via-ei-IpM">
-                        <rect key="frame" x="36.5" y="85" width="37.5" height="20.5"/>
+                        <rect key="frame" x="36.5" y="89" width="37.5" height="20.5"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="100000000" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NTG-ad-tJQ">
-                        <rect key="frame" x="10" y="66" width="90" height="20.5"/>
+                        <rect key="frame" x="10" y="70" width="90" height="20.5"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
@@ -49,7 +49,7 @@
                 <constraint firstItem="Via-ei-IpM" firstAttribute="top" secondItem="NTG-ad-tJQ" secondAttribute="bottom" constant="-1.5" id="RwR-QC-WVd"/>
                 <constraint firstItem="1Vy-Ac-hig" firstAttribute="centerY" secondItem="xZc-UL-00v" secondAttribute="centerY" id="UwT-ig-FG9"/>
                 <constraint firstItem="1Vy-Ac-hig" firstAttribute="centerX" secondItem="xZc-UL-00v" secondAttribute="centerX" id="WH1-1C-whk"/>
-                <constraint firstItem="xZc-UL-00v" firstAttribute="top" secondItem="ZTg-uK-7eu" secondAttribute="top" constant="6" id="e2k-Wh-n8m"/>
+                <constraint firstItem="xZc-UL-00v" firstAttribute="top" secondItem="ZTg-uK-7eu" secondAttribute="top" constant="10" id="e2k-Wh-n8m"/>
                 <constraint firstItem="NTG-ad-tJQ" firstAttribute="centerX" secondItem="xZc-UL-00v" secondAttribute="centerX" id="fZP-wm-UD0"/>
                 <constraint firstItem="xZc-UL-00v" firstAttribute="centerX" secondItem="ZTg-uK-7eu" secondAttribute="centerX" id="kLt-9y-aHy"/>
                 <constraint firstItem="1Vy-Ac-hig" firstAttribute="height" secondItem="xZc-UL-00v" secondAttribute="height" id="rIy-ts-KAr"/>
