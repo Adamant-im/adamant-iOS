@@ -214,6 +214,7 @@ protocol WalletService: AnyObject {
     var minAmount: Decimal { get }
     var defaultVisibility: Bool { get }
     var defaultOrdinalLevel: Int? { get }
+    var richMessageType: String { get }
     
 	// MARK: Notifications
 	

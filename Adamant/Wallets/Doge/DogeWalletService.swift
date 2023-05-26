@@ -88,6 +88,10 @@ class DogeWalletService: WalletService {
         return DogeWalletService.fixedFee
     }
     
+    var richMessageType: String {
+        return Self.richMessageType
+    }
+    
     static let kvsAddress = "doge:address"
     
     private (set) var isWarningGasPrice = false

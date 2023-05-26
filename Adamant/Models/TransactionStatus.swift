@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 enum TransactionStatus: Int16 {
     case notInitiated

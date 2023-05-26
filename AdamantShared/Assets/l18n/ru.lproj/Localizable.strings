@@ -826,6 +826,12 @@
 /* Transaction status: inconsistent */
 "TransactionStatus.Inconsistent" = "Несогласованно";
 
+/* Transaction status: inconsistent wrong timestamp */
+"TransactionStatus.Inconsistent.WrongTimestamp" = "Nachricht und Tx haben unterschiedliche Zeitstempel. Es ist möglich, aber überprüfen Sie es zweimal";
+
+/* Transaction status: inconsistent reason title */
+"TransactionStatus.Inconsistent.Reason.Title" = "Inkonsistenter Grund";
+
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "Подробности";
 
@@ -857,7 +863,7 @@
 "TransactionDetailsScene.Row.From" = "Отправитель";
 
 /* Transaction details: fiat value at the time */
-"TransactionDetailsScene.Row.HistoryFiat" = "Ценность на момент";
+"TransactionDetailsScene.Row.HistoryFiat" = "Ценность при получении";
 
 /* Transaction details: fiat value at the time */
 "TransactionDetailsScene.Row.CurrentFiat" = "Текущая ценность";
