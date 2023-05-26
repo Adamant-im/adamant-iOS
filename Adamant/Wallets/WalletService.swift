@@ -263,6 +263,7 @@ protocol WalletServiceWithTransfers: WalletService {
 protocol WalletServiceWithSend: WalletService {
     var transactionFeeUpdated: Notification.Name { get }
     
+    var qqPrefix: String { get }
     var blockchainSymbol: String { get }
     var isDynamicFee : Bool { get }
     var diplayTransactionFee : Decimal { get }

@@ -81,6 +81,10 @@ class LskWalletService: WalletService {
     
     var richMessageType: String {
         return Self.richMessageType
+	}
+
+    var qqPrefix: String {
+        return Self.qqPrefix
     }
     
 	// MARK: - Properties

@@ -36,6 +36,10 @@ class DashWalletService: WalletService {
     
     var richMessageType: String {
         return Self.richMessageType
+	}
+
+    var qqPrefix: String {
+        return Self.qqPrefix
     }
     
     var wallet: WalletAccount? { return dashWallet }

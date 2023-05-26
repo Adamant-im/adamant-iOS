@@ -92,6 +92,10 @@ class EthWalletService: WalletService {
     
     var richMessageType: String {
         return Self.richMessageType
+	}
+
+    var qqPrefix: String {
+        return Self.qqPrefix
     }
     
     private (set) var isDynamicFee: Bool = true

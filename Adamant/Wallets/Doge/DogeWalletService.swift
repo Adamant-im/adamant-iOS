@@ -90,6 +90,10 @@ class DogeWalletService: WalletService {
     
     var richMessageType: String {
         return Self.richMessageType
+	}
+
+    var qqPrefix: String {
+        return Self.qqPrefix
     }
     
     static let kvsAddress = "doge:address"

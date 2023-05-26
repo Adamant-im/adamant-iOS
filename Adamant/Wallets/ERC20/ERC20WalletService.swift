@@ -64,6 +64,10 @@ class ERC20WalletService: WalletService {
     
     var richMessageType: String {
         return Self.richMessageType
+	}
+
+    var qqPrefix: String {
+        return EthWalletService.qqPrefix
     }
     
     private (set) var blockchainSymbol: String = "ETH"

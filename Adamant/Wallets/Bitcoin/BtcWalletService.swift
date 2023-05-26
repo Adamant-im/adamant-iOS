@@ -77,6 +77,10 @@ class BtcWalletService: WalletService {
     
     var richMessageType: String {
         return Self.richMessageType
+	}
+
+    var qqPrefix: String {
+        return Self.qqPrefix
     }
     
     var wallet: WalletAccount? { return btcWallet }

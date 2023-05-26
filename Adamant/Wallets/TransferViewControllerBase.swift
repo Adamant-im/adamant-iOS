@@ -777,6 +777,40 @@ class TransferViewControllerBase: FormViewController {
         return WalletViewControllerBase.BaseRows.send.localized
     }
     
+    /// User loaded address from QR (camera or library)
+    ///
+    /// - Parameter address: raw readed address
+    /// - Returns: string was successfully handled
+    func handleRawAddress(_ address: String) -> Bool {
+        //fatalError("You must implement raw address handling")
+        guard let service = service else {
+            return false
+        }
+        
+        let parsedAddress = AdamantCoinTools.decode(
+            uri: address,
+            qqPrefix: service.qqPrefix
+        )
+        
+        guard let parsedAddress = parsedAddress,
+              case .valid = service.validate(address: parsedAddress.address)
+        else { return false }
+        
+        form.rowBy(tag: BaseRows.address.tag)?.value = parsedAddress.address
+        form.rowBy(tag: BaseRows.address.tag)?.updateCell()
+        
+        parsedAddress.params?.forEach { param in
+            switch param {
+            case .amount(let amount):
+                let row: SafeDecimalRow? = form.rowBy(tag: BaseRows.amount.tag)
+                row?.value  = Double(amount)
+                row?.updateCell()
+            }
+        }
+        
+        return true
+    }
+    
     // MARK: - Abstract
     
     /// Send funds to recipient after validations
@@ -784,15 +818,6 @@ class TransferViewControllerBase: FormViewController {
     /// Don't forget to call delegate.transferViewControllerDidFinishTransfer(self) after successfull transfer
     func sendFunds() {
         fatalError("You must implement sending logic")
-    }
-    
-    /// User loaded address from QR (camera or library)
-    /// You must override this method
-    ///
-    /// - Parameter address: raw readed address
-    /// - Returns: string was successfully handled
-    func handleRawAddress(_ address: String) -> Bool {
-        fatalError("You must implement raw address handling")
     }
     
     /// Build recipient address row
