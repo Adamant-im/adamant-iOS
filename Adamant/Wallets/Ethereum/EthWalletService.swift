@@ -13,6 +13,7 @@ import Swinject
 import Alamofire
 import BigInt
 import Web3Core
+import Combine
 
 struct EthWalletStorage {
     let keystore: BIP32Keystore
@@ -89,6 +90,10 @@ class EthWalletService: WalletService {
         return tokenNetworkSymbol + tokenSymbol
     }
     
+    var richMessageType: String {
+        return Self.richMessageType
+	}
+
     var qqPrefix: String {
         return Self.qqPrefix
     }
@@ -151,7 +156,8 @@ class EthWalletService: WalletService {
     }
     
     private var initialBalanceCheck = false
-    
+    private var subscriptions = Set<AnyCancellable>()
+
     // MARK: - State
     private (set) var state: WalletServiceState = .notInitiated
     
@@ -180,22 +186,38 @@ class EthWalletService: WalletService {
     // MARK: - Logic
     init() {
         // Notifications
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] _ in
-            self?.update()
-        }
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: nil) { [weak self] _ in
-            self?.update()
-        }
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
-            self?.ethWallet = nil
-            self?.initialBalanceCheck = false
-            if let balanceObserver = self?.balanceObserver {
-                NotificationCenter.default.removeObserver(balanceObserver)
-                self?.balanceObserver = nil
+        addObservers()
+    }
+    
+    func addObservers() {
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.update()
             }
-        }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.accountDataUpdated, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.update()
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.ethWallet = nil
+                self?.initialBalanceCheck = false
+                if let balanceObserver = self?.balanceObserver {
+                    NotificationCenter.default.removeObserver(balanceObserver)
+                    self?.balanceObserver = nil
+                }
+            }
+            .store(in: &subscriptions)
     }
     
     func initiateNetwork(apiUrl: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
@@ -254,6 +276,8 @@ class EthWalletService: WalletService {
         setState(.updating)
         
         if let balance = try? await getBalance(forAddress: wallet.ethAddress) {
+            wallet.isBalanceInitialized = true
+            
             let notification: Notification.Name?
             
             if wallet.balance != balance {
@@ -428,6 +452,7 @@ extension EthWalletService: InitiatedWithPassphraseService {
             case .walletNotInitiated:
                 // Show '0' without waiting for balance update
                 if let wallet = service.ethWallet {
+                    wallet.isBalanceInitialized = true
                     NotificationCenter.default.post(name: service.walletUpdatedNotification, object: service, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
                 }
                 

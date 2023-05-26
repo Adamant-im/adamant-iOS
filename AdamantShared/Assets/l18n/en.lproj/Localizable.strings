@@ -52,6 +52,9 @@
 /* System accounts: ADAMANT Tokens */
 "Accounts.AdamantTokens" = "Welcome to ADAMANT";
 
+/* System accounts: PWA ADM Bounty bot */
+"Accounts.AdamantBountyBot" = "ADM Bounty bot";
+
 /* System accounts: ADAMANT Bounty */
 "Accounts.AdamantBounty" = "ADAMANT Bounty Wallet";
 
@@ -228,6 +231,9 @@
 
 /* SearchPage: Contacts header */
 "SearchPage.Contacts" = "Contacts";
+
+/* SearchPage: Contacts header */
+"SearchPage.Contact.New" = "New contact";
 
 /* SearchPage: Messages header */
 "SearchPage.Messages" = "Messages";
@@ -825,6 +831,12 @@
 
 /* Transaction status: inconsistent */
 "TransactionStatus.Inconsistent" = "Inconsistent";
+
+/* Transaction status: inconsistent wrong timestamp */
+"TransactionStatus.Inconsistent.WrongTimestamp" = "Message and Tx has different timestamps. It is possible, but check twice";
+
+/* Transaction status: inconsistent reason title */
+"TransactionStatus.Inconsistent.Reason.Title" = "Inconsistent reason";
 
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "Details";

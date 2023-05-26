@@ -11,35 +11,58 @@ import Swinject
 import MarkdownKit
 
 extension String.adamantLocalized {
-    struct search {
+    enum search {
         static let contacts = NSLocalizedString("SearchPage.Contacts", comment: "SearchPage: Contacts header")
         static let messages = NSLocalizedString("SearchPage.Messages", comment: "SearchPage: Messages header")
-        
-        private init() {}
+        static let newContact = NSLocalizedString("SearchPage.Contact.New", comment: "SearchPage: Contacts header")
     }
 }
 
 protocol SearchResultDelegate: AnyObject {
     func didSelected(_ message: MessageTransaction)
     func didSelected(_ chatroom: Chatroom)
+    func didSelected(_ account: CoreDataAccount)
 }
 
 class SearchResultsViewController: UITableViewController {
     
     // MARK: - Dependencies
-    var router: Router!
-    var avatarService: AvatarService!
-    var addressBookService: AddressBookService!
+    let router: Router
+    let avatarService: AvatarService
+    let addressBookService: AddressBookService
+    let accountsProvider: AccountsProvider
     
     // MARK: Properties
     private var contacts: [Chatroom] = [Chatroom]()
     private var messages: [MessageTransaction] = [MessageTransaction]()
     private var searchText: String = ""
+    private var newAccount: CoreDataAccount?
     
     private let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: ChatTableViewCell.shortDescriptionTextSize))
     
     weak var delegate: SearchResultDelegate?
 
+    // MARK: Init
+    
+    init(
+        router: Router,
+        avatarService: AvatarService,
+        addressBookService: AddressBookService,
+        accountsProvider: AccountsProvider
+    ) {
+        self.router = router
+        self.avatarService = avatarService
+        self.addressBookService = addressBookService
+        self.accountsProvider = accountsProvider
+        super.init(nibName: String(describing: Self.self), bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
@@ -57,6 +80,9 @@ class SearchResultsViewController: UITableViewController {
         self.contacts = contacts ?? [Chatroom]()
         self.messages = messages ?? [MessageTransaction]()
         self.searchText = searchText
+        self.newAccount = nil
+        
+        findAccountIfNeeded()
         
         tableView.reloadData()
     }
@@ -71,6 +97,9 @@ class SearchResultsViewController: UITableViewController {
         if self.messages.count > 0 {
             sections += 1
         }
+        if newAccount != nil {
+            sections += 1
+        }
         return sections
     }
 
@@ -78,6 +107,7 @@ class SearchResultsViewController: UITableViewController {
         switch defineSection(for: section) {
         case .contacts: return contacts.count
         case .messages: return messages.count
+        case .new: return 1
         case .none: return 0
         }
     }
@@ -95,6 +125,9 @@ class SearchResultsViewController: UITableViewController {
             let message = messages[indexPath.row]
             cell.lastMessageLabel.textColor = nil // Managed by NSAttributedText
             configureCell(cell, for: message)
+            
+        case .new:
+            configureCell(cell, for: newAccount)
             
         case .none:
             break
@@ -140,10 +173,7 @@ class SearchResultsViewController: UITableViewController {
                 if let address = partner.publicKey {
                     let image = self.avatarService.avatar(for: address, size: 200)
                     
-                    DispatchQueue.onMainAsync {
-                        cell.avatarImage = image
-                    }
-                    
+                    cell.avatarImage = image
                     cell.avatarImageView.roundingMode = .round
                     cell.avatarImageView.clipsToBounds = true
                 } else {
@@ -166,6 +196,31 @@ class SearchResultsViewController: UITableViewController {
         } else {
             cell.dateLabel.text = nil
         }
+    }
+    
+    private func configureCell(_ cell: ChatTableViewCell, for partner: CoreDataAccount?) {
+        guard let partner = partner else { return }
+        
+        if let avatarName = partner.avatar, let avatar = UIImage.init(named: avatarName) {
+            cell.avatarImage = avatar
+            cell.avatarImageView.tintColor = UIColor.adamant.primary
+        } else {
+            if let address = partner.publicKey {
+                let image = self.avatarService.avatar(for: address, size: 200)
+                
+                cell.avatarImage = image
+                cell.avatarImageView.roundingMode = .round
+                cell.avatarImageView.clipsToBounds = true
+            } else {
+                cell.avatarImage = nil
+            }
+            cell.borderWidth = 0
+        }
+        
+        cell.lastMessageLabel.text = partner.address
+        cell.accountLabel.text = partner.address
+        cell.hasUnreadMessages = false
+        cell.dateLabel.text = nil
     }
     
     private func shortDescription(for transaction: ChatTransaction) -> NSAttributedString? {
@@ -215,6 +270,10 @@ class SearchResultsViewController: UITableViewController {
             let message = messages[indexPath.row]
             delegate.didSelected(message)
             
+        case .new:
+            guard let account = newAccount else { return }
+            delegate.didSelected(account)
+            
         case .none:
             return
         }
@@ -224,15 +283,15 @@ class SearchResultsViewController: UITableViewController {
         switch defineSection(for: section) {
         case .contacts: return String.adamantLocalized.search.contacts
         case .messages: return String.adamantLocalized.search.messages
+        case .new: return String.adamantLocalized.search.newContact
         case .none: return nil
         }
     }
 
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         switch defineSection(for: indexPath) {
-        case .contacts: return 60
+        case .contacts, .new, .none: return 60
         case .messages: return 80
-        case .none: return 60
         }
     }
     
@@ -241,6 +300,7 @@ class SearchResultsViewController: UITableViewController {
         case contacts
         case messages
         case none
+        case new
     }
     
     private func defineSection(for indexPath: IndexPath) -> Section {
@@ -258,8 +318,26 @@ class SearchResultsViewController: UITableViewController {
             return .contacts
         } else if self.messages.count > 0 {
             return .messages
+        } else if newAccount != nil {
+            return .new
         } else {
             return .none
+        }
+    }
+    
+    // MARK: Other
+    
+    @MainActor private func findAccountIfNeeded() {
+        guard case .valid = AdamantUtilities.validateAdamantAddress(address: searchText),
+              contacts.count == 0,
+              messages.count == 0
+        else { return }
+        
+        Task {
+            let account = try await accountsProvider.getAccount(byAddress: searchText)
+            newAccount = account
+            
+            tableView.reloadData()
         }
     }
 }

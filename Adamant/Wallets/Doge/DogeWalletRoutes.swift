@@ -41,11 +41,12 @@ extension AdamantScene.Wallets {
         
         /// Transaction details
         static let transactionDetails = AdamantScene(identifier: "TransactionDetailsViewControllerBase") { r in
-            let c = DogeTransactionDetailsViewController(
+            DogeTransactionDetailsViewController(
                 dialogService: r.resolve(DialogService.self)!,
-                currencyInfo: r.resolve(CurrencyInfoService.self)!
+                currencyInfo: r.resolve(CurrencyInfoService.self)!,
+                addressBookService: r.resolve(AddressBookService.self)!,
+                accountService:  r.resolve(AccountService.self)!
             )
-            return c
         }
     }
 }
