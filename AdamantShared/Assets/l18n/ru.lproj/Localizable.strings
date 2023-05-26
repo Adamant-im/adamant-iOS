@@ -52,6 +52,9 @@
 /* System accounts: ADAMANT Bounty */
 "Accounts.AdamantBounty" = "ADAMANT Bounty Wallet";
 
+/* System accounts: PWA ADM Bounty bot */
+"Accounts.AdamantBountyBot" = "ADM Bounty bot";
+
 /* System accounts: ADAMANT iOS Support */
 "Accounts.iOSSupport" = "Техподдержка iOS ADAMANT";
 
@@ -228,6 +231,9 @@
 
 /* SearchPage: Contacts header */
 "SearchPage.Contacts" = "Контакты";
+
+/* SearchPage: Contacts header */
+"SearchPage.Contact.New" = "Новый контакт";
 
 /* SearchPage: Messages header */
 "SearchPage.Messages" = "Сообщения";
@@ -820,6 +826,12 @@
 /* Transaction status: inconsistent */
 "TransactionStatus.Inconsistent" = "Несогласованно";
 
+/* Transaction status: inconsistent wrong timestamp */
+"TransactionStatus.Inconsistent.WrongTimestamp" = "Nachricht und Tx haben unterschiedliche Zeitstempel. Es ist möglich, aber überprüfen Sie es zweimal";
+
+/* Transaction status: inconsistent reason title */
+"TransactionStatus.Inconsistent.Reason.Title" = "Inkonsistenter Grund";
+
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "Подробности";
 
@@ -851,7 +863,7 @@
 "TransactionDetailsScene.Row.From" = "Отправитель";
 
 /* Transaction details: fiat value at the time */
-"TransactionDetailsScene.Row.HistoryFiat" = "Ценность на момент";
+"TransactionDetailsScene.Row.HistoryFiat" = "Ценность при получении";
 
 /* Transaction details: fiat value at the time */
 "TransactionDetailsScene.Row.CurrentFiat" = "Текущая ценность";
@@ -948,6 +960,9 @@
 
 /* Transfer: comment for transfer in chat */
 "TransferScene.Row.Comments" = "Комментарии";
+
+/* Transfer: transfer increase fee */
+"TransferScene.Row.IncreaseFee" = "Увеличить комиссию";
 
 /* Transfer: 'Transfer info' section */
 "TransferScene.Section.TransferInfo" = "Перевод";

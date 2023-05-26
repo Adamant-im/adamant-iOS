@@ -27,7 +27,10 @@ final class DogeTransferViewController: TransferViewControllerBase {
             comments = ""
         }
         
-        guard let service = service as? DogeWalletService, let recipient = recipientAddress, let amount = amount else {
+        guard let service = service as? DogeWalletService,
+              let recipient = recipientAddress,
+              let amount = amount
+        else {
             return
         }
         
@@ -162,33 +165,6 @@ final class DogeTransferViewController: TransferViewControllerBase {
         }
         
         return row
-    }
-    
-    override func handleRawAddress(_ address: String) -> Bool {
-        guard let service = service else {
-            return false
-        }
-        
-        let parsedAddress: String
-        if address.hasPrefix("doge:"), let firstIndex = address.firstIndex(of: ":") {
-            let index = address.index(firstIndex, offsetBy: 1)
-            parsedAddress = String(address[index...])
-        } else {
-            parsedAddress = address
-        }
-        
-        switch service.validate(address: parsedAddress) {
-        case .valid:
-            if let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) {
-                row.value = parsedAddress
-                row.updateCell()
-            }
-            
-            return true
-            
-        default:
-            return false
-        }
     }
     
     override func defaultSceneTitle() -> String? {

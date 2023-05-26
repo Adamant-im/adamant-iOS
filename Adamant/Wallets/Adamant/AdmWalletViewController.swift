@@ -93,7 +93,7 @@ class AdmWalletViewController: WalletViewControllerBase {
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
             if self.hideFreeTokensRow {
-                cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+                cell.separatorInset = .zero
             }
         }.onCellSelection { [weak self] (_, row) in
             guard let vc = self?.router.get(scene: AdamantScene.Wallets.Adamant.buyAndSell) else {
@@ -122,7 +122,7 @@ class AdmWalletViewController: WalletViewControllerBase {
             $0.cell.backgroundColor = UIColor.adamant.cellColor
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
-            cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+            cell.separatorInset = .zero
         }.onCellSelection { [weak self] (_, row) in
             row.deselect()
             if let address = self?.service?.wallet?.address {

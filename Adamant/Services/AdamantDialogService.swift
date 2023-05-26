@@ -651,3 +651,11 @@ private func makeSafeAlertController(
     
     return .init(title: title, message: message, preferredStyle: style)
 }
+
+extension AdamantDialogService {
+    func selectAllTextFields(in alert: UIAlertController) {
+        alert.textFields?.forEach { textField in
+            textField.selectAll(nil)
+        }
+    }
+}

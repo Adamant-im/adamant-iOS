@@ -25,6 +25,10 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
         return control
     }()
     
+    override var richProvider: RichMessageProviderWithStatusCheck? {
+        return service
+    }
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -36,7 +40,7 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
             tableView.refreshControl = refreshControl
         }
         
-        refresh(true)
+        refresh(silent: true)
         
         if transaction != nil {
             startUpdate()
@@ -56,7 +60,7 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     }
     
     @MainActor
-    @objc func refresh(_ silent: Bool = false) {
+    @objc func refresh(silent: Bool = false) {
         refreshTask = Task {
             guard let id = transaction?.txId,
                   let service = service
@@ -72,7 +76,7 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
                 let lastHeight = result.lastHeight
                 trs.updateConfirmations(value: lastHeight)
                 transaction = trs
-                
+                updateIncosinstentRowIfNeeded()
                 tableView.reloadData()
                 refreshControl.endRefreshing()
             } catch {
@@ -87,9 +91,9 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     
     func startUpdate() {
         timer?.invalidate()
-        refresh(true)
+        refresh(silent: true)
         timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            self?.refresh(true)
+            self?.refresh(silent: true)
         }
     }
     

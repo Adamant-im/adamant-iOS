@@ -17,6 +17,7 @@ class DogeWallet: WalletAccount {
     var notifications: Int = 0
     var minBalance: Decimal = 0
     var minAmount: Decimal = 0
+    var isBalanceInitialized: Bool = false
     
     init(privateKey: PrivateKey) {
         self.privateKey = privateKey

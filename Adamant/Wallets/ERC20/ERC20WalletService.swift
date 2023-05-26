@@ -13,6 +13,7 @@ import web3swift
 import Alamofire
 import struct BigInt.BigUInt
 import Web3Core
+import Combine
 
 class ERC20WalletService: WalletService {
     // MARK: - Constants
@@ -63,6 +64,18 @@ class ERC20WalletService: WalletService {
     
     var richMessageType: String {
         return Self.richMessageType
+	}
+
+    var qqPrefix: String {
+        return EthWalletService.qqPrefix
+	}
+
+    var isSupportIncreaseFee: Bool {
+        return true
+    }
+    
+    var isIncreaseFeeEnabled: Bool {
+        return increaseFeeService.isIncreaseFeeEnabled(for: tokenUnicID)
     }
     
     private (set) var blockchainSymbol: String = "ETH"
@@ -87,6 +100,7 @@ class ERC20WalletService: WalletService {
     var apiService: ApiService!
     var dialogService: DialogService!
     var router: Router!
+    var increaseFeeService: IncreaseFeeService!
     
     // MARK: - Notifications
     var walletUpdatedNotification = Notification.Name("adamant.erc20Wallet.walletUpdated")
@@ -106,6 +120,7 @@ class ERC20WalletService: WalletService {
     private (set) var erc20: ERC20?
     private (set) var enabled = true
     
+    private var subscriptions = Set<AnyCancellable>()
     private var _ethNodeUrl: String?
     private var _web3: Web3?
     var web3: Web3? {
@@ -166,22 +181,7 @@ class ERC20WalletService: WalletService {
         serviceStateChanged = Notification.Name("adamant.erc20Wallet.\(token.symbol).stateChanged")
         
         // Notifications
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] _ in
-            self?.update()
-        }
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: nil) { [weak self] _ in
-            self?.update()
-        }
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
-            self?.ethWallet = nil
-            self?.initialBalanceCheck = false
-            if let balanceObserver = self?.balanceObserver {
-                NotificationCenter.default.removeObserver(balanceObserver)
-                self?.balanceObserver = nil
-            }
-        }
+        addObservers()
         
         guard let node = EthWalletService.nodes.randomElement() else {
             fatalError("Failed to get ETH endpoint")
@@ -191,6 +191,37 @@ class ERC20WalletService: WalletService {
         Task {
             _ = await self.setupEthNode(with: apiUrl)
         }
+    }
+    
+    func addObservers() {
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.update()
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.accountDataUpdated, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.update()
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.ethWallet = nil
+                self?.initialBalanceCheck = false
+                if let balanceObserver = self?.balanceObserver {
+                    NotificationCenter.default.removeObserver(balanceObserver)
+                    self?.balanceObserver = nil
+                }
+            }
+            .store(in: &subscriptions)
     }
     
     func setupEthNode(with apiUrl: String) async -> Web3? {
@@ -234,6 +265,7 @@ class ERC20WalletService: WalletService {
         setState(.updating)
         
         if let balance = try? await getBalance(forAddress: wallet.ethAddress) {
+            wallet.isBalanceInitialized = true
             let notification: Notification.Name?
             
             if wallet.balance != balance {
@@ -277,13 +309,20 @@ class ERC20WalletService: WalletService {
         ? gasLimit
         : gasLimit + gasLimitPercent
 
-        let newFee = (price * gasLimit).asDecimal(exponent: EthWalletService.currencyExponent)
+        var newFee = (price * gasLimit).asDecimal(exponent: EthWalletService.currencyExponent)
 
+        newFee = isIncreaseFeeEnabled
+        ? newFee * defaultIncreaseFee
+        : newFee
+        
         guard transactionFee != newFee else { return }
         
         transactionFee = newFee
-        gasPrice = price
-        isWarningGasPrice = price >= BigUInt(token.warningGasPriceGwei).toWei()
+        gasPrice = isIncreaseFeeEnabled
+        ? price * BigUInt(defaultIncreaseFee.doubleValue)
+        : price
+        
+        isWarningGasPrice = gasPrice >= BigUInt(token.warningGasPriceGwei).toWei()
         self.gasLimit = gasLimit
         
         NotificationCenter.default.post(name: transactionFeeUpdated, object: self, userInfo: nil)
@@ -403,6 +442,7 @@ extension ERC20WalletService: SwinjectDependentService {
         apiService = container.resolve(ApiService.self)
         dialogService = container.resolve(DialogService.self)
         router = container.resolve(Router.self)
+        increaseFeeService = container.resolve(IncreaseFeeService.self)
     }
 }
 

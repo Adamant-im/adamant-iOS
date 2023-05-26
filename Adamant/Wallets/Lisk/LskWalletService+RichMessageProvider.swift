@@ -41,13 +41,10 @@ extension LskWalletService: RichMessageProvider {
     @MainActor
     func richMessageTapped(for transaction: RichMessageTransaction, in chat: ChatViewController) {
         // MARK: 0. Prepare
-        guard let hash = transaction.getRichValue(for: RichContentKeys.transfer.hash),
-              let dialogService = dialogService
+        guard let hash = transaction.getRichValue(for: RichContentKeys.transfer.hash)
         else {
             return
         }
-        
-        dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
         
         let comment: String?
         if let raw = transaction.getRichValue(for: RichContentKeys.transfer.comments), raw.count > 0 {
@@ -56,84 +53,25 @@ extension LskWalletService: RichMessageProvider {
             comment = nil
         }
         
-        // MARK: 1. Sender & recipient names
+        // MARK: Go to transaction
         
-        let senderName: String?
-        let recipientName: String?
-        
-        if let address = accountService.account?.address {
-            if let senderId = transaction.senderId, senderId.caseInsensitiveCompare(address) == .orderedSame {
-                senderName = String.adamantLocalized.transactionDetails.yourAddress
-            } else {
-                senderName = transaction.chatroom?.partner?.name
-            }
-            
-            if let recipientId = transaction.recipientId, recipientId.caseInsensitiveCompare(address) == .orderedSame {
-                recipientName = String.adamantLocalized.transactionDetails.yourAddress
-            } else {
-                recipientName = transaction.chatroom?.partner?.name
-            }
-        } else if let partner = transaction.chatroom?.partner, let id = partner.address {
-            if transaction.senderId == id {
-                senderName = partner.name
-                recipientName = nil
-            } else {
-                recipientName = partner.name
-                senderName = nil
-            }
-        } else {
-            senderName = nil
-            recipientName = nil
-        }
-        
-        // MARK: 2. Go go transaction
-        Task {
-            do {
-                let transactionLisk = try await getTransaction(by: hash)
-                dialogService.dismissProgress()
-                
-                presentDetailTransactionVC(
-                    hash: hash,
-                    senderName: senderName,
-                    recipientName: recipientName,
-                    comment: comment,
-                    senderAddress: transactionLisk.senderAddress,
-                    recipientAddress: transactionLisk.recipientAddress,
-                    transaction: transactionLisk,
-                    richTransaction: transaction,
-                    in: chat
-                )
-                
-            } catch {
-                do {
-                    let senderAddress = try await getWalletAddress(byAdamantAddress: transaction.senderAddress)
-                    let recipientAddress = try await getWalletAddress(byAdamantAddress: transaction.recipientAddress)
-                    
-                    dialogService.dismissProgress()
-                    
-                    presentDetailTransactionVC(
-                        hash: hash,
-                        senderName: senderName,
-                        recipientName: recipientName,
-                        comment: comment,
-                        senderAddress: senderAddress,
-                        recipientAddress: recipientAddress,
-                        transaction: nil,
-                        richTransaction: transaction,
-                        in: chat
-                    )
-                } catch {
-                    dialogService.dismissProgress()
-                    dialogService.showRichError(error: error)
-                }
-            }
-        }
+        presentDetailTransactionVC(
+            hash: hash,
+            senderId: transaction.senderId,
+            recipientId: transaction.recipientId,
+            comment: comment,
+            senderAddress: "",
+            recipientAddress: "",
+            transaction: nil,
+            richTransaction: transaction,
+            in: chat
+        )
     }
     
     private func presentDetailTransactionVC(
         hash: String,
-        senderName: String?,
-        recipientName: String?,
+        senderId: String?,
+        recipientId: String?,
         comment: String?,
         senderAddress: String,
         recipientAddress: String,
@@ -147,8 +85,8 @@ extension LskWalletService: RichMessageProvider {
         }
         
         vc.service = self
-        vc.senderName = senderName
-        vc.recipientName = recipientName
+        vc.senderId = senderId
+        vc.recipientId = recipientId
         vc.comment = comment
         
         let amount: Decimal
@@ -169,9 +107,11 @@ extension LskWalletService: RichMessageProvider {
             confirmationsValue: nil,
             blockValue: nil,
             isOutgoing: richTransaction.isOutgoing,
-            transactionStatus: TransactionStatus.pending)
+            transactionStatus: nil)
 
         vc.transaction = transaction ?? failedTransaction
+        vc.richTransaction = richTransaction
+        
         chat.navigationController?.pushViewController(vc, animated: true)
     }
     

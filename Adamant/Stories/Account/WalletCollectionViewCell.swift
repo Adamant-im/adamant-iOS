@@ -36,7 +36,7 @@ class WalletCollectionViewCell: PagingCell {
             currencySymbolLabel.attributedText = defaultString
         }
         
-        if let balance = item.balance {
+        if let balance = item.balance, item.isBalanceInitialized {
             if balance < 1 {
                 balanceLabel.text = AdamantBalanceFormat.compact.format(balance)
             } else {

@@ -40,14 +40,11 @@ extension EthWalletService: RichMessageProvider {
     @MainActor
     func richMessageTapped(for transaction: RichMessageTransaction, in chat: ChatViewController) {
         // MARK: 0. Prepare
-        guard let hash = transaction.getRichValue(for: RichContentKeys.transfer.hash),
-              let dialogService = dialogService
+        guard let hash = transaction.getRichValue(for: RichContentKeys.transfer.hash)
         else {
             return
         }
-        
-        dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
-        
+                
         let comment: String?
         if let raw = transaction.getRichValue(for: RichContentKeys.transfer.comments), raw.count > 0 {
             comment = raw
@@ -55,81 +52,65 @@ extension EthWalletService: RichMessageProvider {
             comment = nil
         }
         
-        // MARK: 1. Sender & recipient names
+        // MARK: Go to transaction
         
-        let senderName: String?
-        let recipientName: String?
+        presentDetailTransactionVC(
+            hash: hash,
+            senderId: transaction.senderId,
+            recipientId: transaction.recipientId,
+            senderAddress: "",
+            recipientAddress: "",
+            comment: comment,
+            transaction: nil,
+            richTransaction: transaction,
+            in: chat
+        )
+    }
+    
+    private func presentDetailTransactionVC(
+        hash: String,
+        senderId: String?,
+        recipientId: String?,
+        senderAddress: String,
+        recipientAddress: String,
+        comment: String?,
+        transaction: EthTransaction?,
+        richTransaction: RichMessageTransaction,
+        in chat: ChatViewController
+    ) {
+        guard let vc = router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? EthTransactionDetailsViewController else {
+            return
+        }
         
-        if let address = accountService?.account?.address {
-            if let senderId = transaction.senderId, senderId.caseInsensitiveCompare(address) == .orderedSame {
-                senderName = String.adamantLocalized.transactionDetails.yourAddress
-            } else {
-                senderName = transaction.chatroom?.partner?.name
-            }
-            
-            if let recipientId = transaction.recipientId, recipientId.caseInsensitiveCompare(address) == .orderedSame {
-                recipientName = String.adamantLocalized.transactionDetails.yourAddress
-            } else {
-                recipientName = transaction.chatroom?.partner?.name
-            }
-        } else if let partner = transaction.chatroom?.partner, let id = partner.address {
-            if transaction.senderId == id {
-                senderName = partner.name
-                recipientName = nil
-            } else {
-                recipientName = partner.name
-                senderName = nil
-            }
+        let amount: Decimal
+        if let amountRaw = richTransaction.getRichValue(for: RichContentKeys.transfer.amount),
+           let decimal = Decimal(string: amountRaw) {
+            amount = decimal
         } else {
-            senderName = nil
-            recipientName = nil
+            amount = 0
         }
         
-        // MARK: 2. Go to transaction
+        let failedTransaction = SimpleTransactionDetails(
+            txId: hash,
+            senderAddress: senderAddress,
+            recipientAddress: recipientAddress,
+            dateValue: nil,
+            amountValue: amount,
+            feeValue: nil,
+            confirmationsValue: nil,
+            blockValue: nil,
+            isOutgoing: richTransaction.isOutgoing,
+            transactionStatus: nil
+        )
         
-        Task {
-            guard let vc = router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? EthTransactionDetailsViewController else {
-                return
-            }
-            
-            vc.service = self
-            vc.senderName = senderName
-            vc.recipientName = recipientName
-            vc.comment = comment
-            
-            do {
-                let ethTransaction = try await getTransaction(by: hash)
-                vc.transaction = ethTransaction
-            } catch {
-                var amount: Decimal = .zero
-                
-                if
-                    let amountRaw = transaction.getRichValue(for: RichContentKeys.transfer.amount),
-                    let decimal = Decimal(string: amountRaw)
-                {
-                    amount = decimal
-                }
-                
-                let failedTransaction = SimpleTransactionDetails(
-                    txId: hash,
-                    senderAddress: transaction.senderAddress,
-                    recipientAddress: transaction.recipientAddress,
-                    dateValue: nil,
-                    amountValue: amount,
-                    feeValue: nil,
-                    confirmationsValue: nil,
-                    blockValue: nil,
-                    isOutgoing: transaction.isOutgoing,
-                    transactionStatus: TransactionStatus.failed
-                )
-                
-                vc.transaction = failedTransaction
-            }
-            
-            dialogService.dismissProgress()
-            
-            chat.navigationController?.pushViewController(vc, animated: true)
-        }
+        vc.service = self
+        vc.senderId = senderId
+        vc.recipientId = recipientId
+        vc.comment = comment
+        vc.transaction = transaction ?? failedTransaction
+        vc.richTransaction = richTransaction
+        
+        chat.navigationController?.pushViewController(vc, animated: true)
     }
     
     // MARK: Short description

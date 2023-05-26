@@ -13,6 +13,10 @@ extension UIFont {
         return UIFont(name: "Exo 2", size: size)  ?? .systemFont(ofSize: size)
     }
     
+    static func adamantMono(ofSize size: CGFloat, weight: UIFont.Weight) -> UIFont {
+        return .monospacedSystemFont(ofSize: size, weight: weight)
+    }
+    
     static func adamantPrimary(ofSize size: CGFloat, weight: UIFont.Weight) -> UIFont {
         let name: String
         
@@ -37,5 +41,6 @@ extension UIFont {
     }
     
     static var adamantChatDefault = UIFont.systemFont(ofSize: 17)
+    static var adamantCodeDefault = UIFont.adamantMono(ofSize: 15, weight: .regular)
     static var adamantChatReplyDefault = UIFont.systemFont(ofSize: 14)
 }

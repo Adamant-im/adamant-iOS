@@ -28,13 +28,14 @@ extension AdamantScene.Wallets {
                 accountsProvider: r.resolve(AccountsProvider.self)!,
                 dialogService: r.resolve(DialogService.self)!,
                 router: r.resolve(Router.self)!,
-                currencyInfoService: r.resolve(CurrencyInfoService.self)!
+                currencyInfoService: r.resolve(CurrencyInfoService.self)!,
+                increaseFeeService: r.resolve(IncreaseFeeService.self)!
             )
         }
         
         /// Transactions list
         static let transactionsList = AdamantScene(identifier: "AdmTransactionsViewController", factory: { r in
-            let c = AdmTransactionsViewController(
+            AdmTransactionsViewController(
                 nibName: "TransactionsListViewControllerBase",
                 bundle: nil,
                 accountService: r.resolve(AccountService.self)!,
@@ -45,19 +46,18 @@ extension AdamantScene.Wallets {
                 router: r.resolve(Router.self)!,
                 addressBookService: r.resolve(AddressBookService.self)!
             )
-            return c
         })
         
         /// Adamant transaction details
         static let transactionDetails = AdamantScene(identifier: "TransactionDetailsViewController", factory: { r in
-            let c = AdmTransactionDetailsViewController(
+            AdmTransactionDetailsViewController(
                 accountService: r.resolve(AccountService.self)!,
                 transfersProvider: r.resolve(TransfersProvider.self)!,
                 router: r.resolve(Router.self)!,
                 dialogService: r.resolve(DialogService.self)!,
-                currencyInfo: r.resolve(CurrencyInfoService.self)!
+                currencyInfo: r.resolve(CurrencyInfoService.self)!,
+                addressBookService: r.resolve(AddressBookService.self)!
             )
-            return c
         })
         
         /// Buy and Sell options

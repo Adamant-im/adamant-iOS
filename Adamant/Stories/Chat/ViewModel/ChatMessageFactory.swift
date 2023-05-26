@@ -22,7 +22,6 @@ struct ChatMessageFactory {
             .quote,
             .bold,
             .italic,
-            .code,
             .strikethrough
         ],
         customElements: [
@@ -31,6 +30,11 @@ struct ChatMessageFactory {
             MarkdownAdvancedAdm(
                 font: .adamantChatDefault,
                 color: .adamant.active
+            ),
+            MarkdownCodeAdamant(
+                font: .adamantCodeDefault,
+                textHighlightColor: .adamant.codeBlockText,
+                textBackgroundColor: .adamant.codeBlock
             )
         ]
     )
@@ -109,7 +113,6 @@ struct ChatMessageFactory {
 }
 
 private extension ChatMessageFactory {
-    
     func makeContent(
         _ transaction: ChatTransaction,
         isFromCurrentSender: Bool,
@@ -150,10 +153,21 @@ private extension ChatMessageFactory {
     
     func makeContent(_ transaction: MessageTransaction, animationId: String) -> ChatMessage.Content {
         transaction.message.map {
-            .message(.init(
+			let attributedString = Self.markdownParser.parse($0)
+            
+            let mutableAttributedString = NSMutableAttributedString(attributedString: attributedString)
+            let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.lineSpacing = 1.15
+            mutableAttributedString.addAttribute(
+                NSAttributedString.Key.paragraphStyle,
+                value: paragraphStyle,
+                range: NSRange(location: 0, length: attributedString.length)
+            )
+            
+            return .message(.init(
                 value: .init(
                     id: transaction.txId,
-                    text: Self.markdownParser.parse($0),
+                    text: mutableAttributedString,
                     animationId: animationId)
             ))
         } ?? .default

@@ -11,10 +11,9 @@ import Foundation
 extension RichMessageProviderWithStatusCheck {
     func statusWithFilters(
         transaction: RichMessageTransaction,
-        oldPendingAttempts: Int
-    ) async -> TransactionStatus {
-        let info = await statusInfoFor(transaction: transaction)
-        
+        oldPendingAttempts: Int,
+        info: TransactionStatusInfo
+    ) -> TransactionStatus {
         switch info.status {
         case .success:
             return consistencyFilter(transaction: transaction, statusInfo: info)

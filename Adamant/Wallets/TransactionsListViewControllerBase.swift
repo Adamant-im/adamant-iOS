@@ -61,6 +61,7 @@ class TransactionsListViewControllerBase: UIViewController {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.refreshControl = refreshControl
+        tableView.tableHeaderView = UIView()
         
         // MARK: Notifications
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
@@ -155,12 +156,14 @@ extension TransactionsListViewControllerBase: UITableViewDataSource, UITableView
     
     // MARK: Cells
     
-    func configureCell(_ cell: TransactionTableViewCell,
-                       isOutgoing: Bool,
-                       partnerId: String,
-                       partnerName: String?,
-                       amount: Decimal,
-                       date: Date?) {
+    func configureCell(
+        _ cell: TransactionTableViewCell,
+        isOutgoing: Bool,
+        partnerId: String,
+        partnerName: String?,
+        amount: Decimal,
+        date: Date?
+    ) {
         cell.backgroundColor = .clear
         cell.accountLabel.tintColor = UIColor.adamant.primary
         cell.ammountLabel.tintColor = UIColor.adamant.primary

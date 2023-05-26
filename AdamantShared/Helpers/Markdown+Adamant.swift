@@ -175,3 +175,53 @@ final class MarkdownLinkAdm: MarkdownLink {
         attributedString.addAttributes(attributes, range: range)
     }
 }
+
+// MARK: Markdown Code
+final class MarkdownCodeAdamant: MarkdownCommonElement {
+    private static let regex = "\\`[^\\`]*(?:\\`\\`[^\\`]*)*\\`"
+    private let char = "`"
+    
+    var font: MarkdownFont?
+    var color: MarkdownColor?
+    var textHighlightColor: MarkdownColor?
+    var textBackgroundColor: MarkdownColor?
+    
+    var regex: String {
+        return MarkdownCodeAdamant.regex
+    }
+    
+    init(
+        font: MarkdownFont? = MarkdownCode.defaultFont,
+        color: MarkdownColor? = nil,
+        textHighlightColor: MarkdownColor? = MarkdownCode.defaultHighlightColor,
+        textBackgroundColor: MarkdownColor? = MarkdownCode.defaultBackgroundColor
+    ) {
+        self.font = font
+        self.color = color
+        self.textHighlightColor = textHighlightColor
+        self.textBackgroundColor = textBackgroundColor
+    }
+    
+    func addAttributes(_ attributedString: NSMutableAttributedString, range: NSRange) {
+        var matchString: String = attributedString.attributedSubstring(from: range).string
+        matchString = matchString.replacingOccurrences(of: char, with: "")
+        attributedString.replaceCharacters(in: range, with: matchString)
+        
+        var codeAttributes = attributes
+        
+        textHighlightColor.flatMap {
+            codeAttributes[NSAttributedString.Key.foregroundColor] = $0
+        }
+        textBackgroundColor.flatMap {
+            codeAttributes[NSAttributedString.Key.backgroundColor] = $0
+        }
+        font.flatMap { codeAttributes[NSAttributedString.Key.font] = $0 }
+        
+        let updatedRange = (attributedString.string as NSString).range(of: matchString)
+        attributedString.addAttributes(codeAttributes, range: NSRange(location: range.location, length: updatedRange.length))
+    }
+    
+    func match(_ match: NSTextCheckingResult, attributedString: NSMutableAttributedString) {
+        addAttributes(attributedString, range: match.range)
+    }
+}

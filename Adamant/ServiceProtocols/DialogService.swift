@@ -175,4 +175,6 @@ protocol DialogService: AnyObject {
     // MARK: - Alerts
     func showAlert(title: String?, message: String?, style: UIAlertController.Style, actions: [UIAlertAction]?, from: Any?)
     func showAlert(title: String?, message: String?, style: AdamantAlertStyle, actions: [AdamantAlertAction]?, from: Any?)
+    
+    func selectAllTextFields(in alert: UIAlertController)
 }
