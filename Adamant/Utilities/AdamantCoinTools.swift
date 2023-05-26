@@ -10,10 +10,10 @@ import Foundation
 
 struct QQAddressInformation {
     let address: String
-    let params: [QQAddressParams]?
+    let params: [QQAddressParam]?
 }
 
-enum QQAddressParams {
+enum QQAddressParam {
     case amount(String)
     
     init?(raw: String) {
@@ -33,32 +33,24 @@ enum QQAddressParams {
     }
 }
 
-class AdamantCoinTools {
+final class AdamantCoinTools {
     static func decode(uri: String, qqPrefix: String) -> QQAddressInformation? {
-        if uri.isEmpty {
+        let url = URLComponents(string: uri)
+        
+        guard !uri.isEmpty,
+              let url = url,
+              let prefix = uri.split(separator: ":").first,
+              prefix == qqPrefix
+        else {
             return nil
         }
         
-        let request = uri.split(separator: ":")
-        if request.count > 2 || request[0] != qqPrefix {
-            return nil
+        let addressRaw = url.path
+        
+        let params = url.queryItems?.compactMap {
+            QQAddressParam(raw: String($0.debugDescription))
         }
         
-        let addressAndParams = request[1].split(separator: "?")
-        guard let addressRaw = addressAndParams.first else {
-            return nil
-        }
-        
-        var params: [QQAddressParams]? = nil
-        if addressAndParams.count > 1 {
-            let p = addressAndParams[1].split(separator: "&").compactMap {
-                QQAddressParams(raw: String($0))
-            }
-            
-            params = p.count > 0 ? p : nil
-        }
-        
-        let address = QQAddressInformation(address: String(addressRaw), params: params)
-        return address
+        return QQAddressInformation(address: addressRaw, params: params)
     }
 }
