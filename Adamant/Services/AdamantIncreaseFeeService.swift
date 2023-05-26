@@ -17,7 +17,7 @@ final class AdamantIncreaseFeeService: IncreaseFeeService {
     
     // MARK: Proprieties
     
-    private var data: [String: Bool] = [:]
+    private var increaseFeeData: [String: Bool] = [:]
     private var notificationsSet: Set<AnyCancellable> = []
     
     // MARK: Lifecycle
@@ -43,23 +43,23 @@ final class AdamantIncreaseFeeService: IncreaseFeeService {
     // MARK: Notification actions
     
     private func userLoggedIn() {
-        data = getIncreaseFeeDictionary()
+        increaseFeeData = getIncreaseFeeDictionary()
     }
     
     private func userLoggedOut() {
         securedStore.remove(StoreKey.increaseFee.increaseFee)
-        data = [:]
+        increaseFeeData = [:]
     }
     
     // MARK: Check
     
-    func isIncreaseFeeEnabled(for id: String) -> Bool {
-        return data[id] ?? false
+    func isIncreaseFeeEnabled(for tokenUnicID: String) -> Bool {
+        return increaseFeeData[tokenUnicID] ?? false
     }
     
-    func setIncreaseFeeEnabled(for id: String, value: Bool) {
-        data[id] = value
-        securedStore.set(data, for: StoreKey.increaseFee.increaseFee)
+    func setIncreaseFeeEnabled(for tokenUnicID: String, value: Bool) {
+        increaseFeeData[tokenUnicID] = value
+        securedStore.set(increaseFeeData, for: StoreKey.increaseFee.increaseFee)
     }
     
     private func getIncreaseFeeDictionary() -> [String: Bool] {

@@ -9,6 +9,6 @@
 import Foundation
 
 protocol IncreaseFeeService: AnyObject {
-    func isIncreaseFeeEnabled(for id: String) -> Bool
-    func setIncreaseFeeEnabled(for id: String, value: Bool)
+    func isIncreaseFeeEnabled(for tokenUnicID: String) -> Bool
+    func setIncreaseFeeEnabled(for tokenUnicID: String, value: Bool)
 }
