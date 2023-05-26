@@ -24,13 +24,16 @@ final class EthTransferViewController: TransferViewControllerBase {
         CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789").inverted
     }()
     
+    // MARK: - Init
+    
     init(
-        chatsProvider: ChatsProvider,
         accountService: AccountService,
         accountsProvider: AccountsProvider,
         dialogService: DialogService,
         router: Router,
-        currencyInfoService: CurrencyInfoService
+        currencyInfoService: CurrencyInfoService,
+        increaseFeeService: IncreaseFeeService,
+        chatsProvider: ChatsProvider
     ) {
         self.chatsProvider = chatsProvider
         
@@ -39,7 +42,8 @@ final class EthTransferViewController: TransferViewControllerBase {
             accountsProvider: accountsProvider,
             dialogService: dialogService,
             router: router,
-            currencyInfoService: currencyInfoService
+            currencyInfoService: currencyInfoService,
+            increaseFeeService: increaseFeeService
         )
     }
     

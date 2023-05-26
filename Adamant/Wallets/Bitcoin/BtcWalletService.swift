@@ -81,6 +81,14 @@ class BtcWalletService: WalletService {
 
     var qqPrefix: String {
         return Self.qqPrefix
+	}
+
+    var isSupportIncreaseFee: Bool {
+        return true
+    }
+    
+    var isIncreaseFeeEnabled: Bool {
+        return increaseFeeService.isIncreaseFeeEnabled(for: tokenUnicID)
     }
     
     var wallet: WalletAccount? { return btcWallet }
@@ -102,6 +110,7 @@ class BtcWalletService: WalletService {
     var accountService: AccountService!
     var dialogService: DialogService!
     var router: Router!
+    var increaseFeeService: IncreaseFeeService!
     
     // MARK: - Constants
     static var currencyLogo = #imageLiteral(resourceName: "bitcoin_wallet")
@@ -247,15 +256,25 @@ class BtcWalletService: WalletService {
             feeRate = rate
         }
         
+        if let height = try? await getCurrentHeight() {
+            currentHeight = height
+        }
+        
         if let transactions = try? await getUnspentTransactions() {
             let feeRate = feeRate
             
             let fee = Decimal(transactions.count * 181 + 78) * feeRate
-            transactionFee = fee / BtcWalletService.multiplier
-        }
-        
-        if let height = try? await getCurrentHeight() {
-            currentHeight = height
+            var newTransactionFee = fee / BtcWalletService.multiplier
+            
+            newTransactionFee = isIncreaseFeeEnabled
+            ? newTransactionFee * defaultIncreaseFee
+            : newTransactionFee
+            
+            guard transactionFee != newTransactionFee else { return }
+            
+            transactionFee = newTransactionFee
+            
+            NotificationCenter.default.post(name: transactionFeeUpdated, object: self, userInfo: nil)
         }
     }
     
@@ -424,6 +443,7 @@ extension BtcWalletService: SwinjectDependentService {
         apiService = container.resolve(ApiService.self)
         dialogService = container.resolve(DialogService.self)
         router = container.resolve(Router.self)
+        increaseFeeService = container.resolve(IncreaseFeeService.self)
     }
 }
 

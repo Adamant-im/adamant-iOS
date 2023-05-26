@@ -26,7 +26,8 @@ final class DogeTransferViewController: TransferViewControllerBase {
         accountsProvider: AccountsProvider,
         dialogService: DialogService,
         router: Router,
-        currencyInfoService: CurrencyInfoService
+        currencyInfoService: CurrencyInfoService,
+		increaseFeeService: IncreaseFeeService
     ) {
         self.chatsProvider = chatsProvider
         
@@ -35,7 +36,8 @@ final class DogeTransferViewController: TransferViewControllerBase {
             accountsProvider: accountsProvider,
             dialogService: dialogService,
             router: router,
-            currencyInfoService: currencyInfoService
+            currencyInfoService: currencyInfoService,
+            increaseFeeService: increaseFeeService
         )
     }
     
@@ -54,7 +56,10 @@ final class DogeTransferViewController: TransferViewControllerBase {
             comments = ""
         }
         
-        guard let service = service as? DogeWalletService, let recipient = recipientAddress, let amount = amount else {
+        guard let service = service as? DogeWalletService,
+              let recipient = recipientAddress,
+              let amount = amount
+        else {
             return
         }
         

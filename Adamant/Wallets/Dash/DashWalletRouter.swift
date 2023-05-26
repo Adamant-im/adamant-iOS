@@ -22,12 +22,13 @@ extension AdamantScene.Wallets {
         /// Send tokens
         static let transfer = AdamantScene(identifier: "DashTransferViewController") { r in
             DashTransferViewController(
-                chatsProvider: r.resolve(ChatsProvider.self)!,
                 accountService: r.resolve(AccountService.self)!,
                 accountsProvider: r.resolve(AccountsProvider.self)!,
                 dialogService: r.resolve(DialogService.self)!,
                 router: r.resolve(Router.self)!,
-                currencyInfoService: r.resolve(CurrencyInfoService.self)!
+                currencyInfoService: r.resolve(CurrencyInfoService.self)!,
+                increaseFeeService: r.resolve(IncreaseFeeService.self)!,
+                chatsProvider: r.resolve(ChatsProvider.self)!
             )
         }
         

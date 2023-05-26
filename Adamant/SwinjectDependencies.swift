@@ -59,6 +59,13 @@ extension Container {
             )
         }.inObjectScope(.container)
         
+        // MARK: IncreaseFeeService
+        self.register(IncreaseFeeService.self) { r in
+            AdamantIncreaseFeeService(
+                securedStore: r.resolve(SecuredStore.self)!
+            )
+        }.inObjectScope(.container)
+        
         // MARK: PushNotificationsTokenService
         self.register(PushNotificationsTokenService.self) { r in
             AdamantPushNotificationsTokenService(

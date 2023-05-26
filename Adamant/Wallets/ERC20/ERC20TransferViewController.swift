@@ -31,12 +31,13 @@ final class ERC20TransferViewController: TransferViewControllerBase {
     override var isNeedAddFeeToTotal: Bool { false }
     
     init(
-        chatsProvider: ChatsProvider,
         accountService: AccountService,
         accountsProvider: AccountsProvider,
         dialogService: DialogService,
         router: Router,
-        currencyInfoService: CurrencyInfoService
+        currencyInfoService: CurrencyInfoService,
+        increaseFeeService: IncreaseFeeService,
+        chatsProvider: ChatsProvider
     ) {
         self.chatsProvider = chatsProvider
         
@@ -45,7 +46,8 @@ final class ERC20TransferViewController: TransferViewControllerBase {
             accountsProvider: accountsProvider,
             dialogService: dialogService,
             router: router,
-            currencyInfoService: currencyInfoService
+            currencyInfoService: currencyInfoService,
+            increaseFeeService: increaseFeeService
         )
     }
     

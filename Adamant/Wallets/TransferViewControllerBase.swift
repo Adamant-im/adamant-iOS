@@ -63,6 +63,7 @@ class TransferViewControllerBase: FormViewController {
         case maxToTransfer
         case name
         case address
+        case increaseFee
         case fee
         case total
         case comments
@@ -76,6 +77,7 @@ class TransferViewControllerBase: FormViewController {
             case .maxToTransfer: return "max"
             case .name: return "name"
             case .address: return "recipient"
+            case .increaseFee: return "increaseFee"
             case .fee: return "fee"
             case .total: return "total"
             case .comments: return "comments"
@@ -95,6 +97,7 @@ class TransferViewControllerBase: FormViewController {
             case .total: return NSLocalizedString("TransferScene.Row.Total", comment: "Transfer: total amount of transaction: money to transfer adding fee")
             case .comments: return NSLocalizedString("TransferScene.Row.Comments", comment: "Transfer: transfer comment")
             case .sendButton: return String.adamantLocalized.transfer.send
+            case .increaseFee: return NSLocalizedString("TransferScene.Row.IncreaseFee", comment: "Transfer: transfer increase fee")
             }
         }
     }
@@ -131,6 +134,7 @@ class TransferViewControllerBase: FormViewController {
     let dialogService: DialogService
     let router: Router
     let currencyInfoService: CurrencyInfoService
+    var increaseFeeService: IncreaseFeeService
     
     // MARK: - Properties
     
@@ -253,26 +257,31 @@ class TransferViewControllerBase: FormViewController {
     var progressView: UIView?
     var alertView: UIView?
     
-    // MARK: - Lifecycle
+    // MARK: - Init
     
     init(
         accountService: AccountService,
         accountsProvider: AccountsProvider,
         dialogService: DialogService,
         router: Router,
-        currencyInfoService: CurrencyInfoService
+        currencyInfoService: CurrencyInfoService,
+        increaseFeeService: IncreaseFeeService
     ) {
         self.accountService = accountService
         self.accountsProvider = accountsProvider
         self.dialogService = dialogService
         self.router = router
         self.currencyInfoService = currencyInfoService
-        super.init(nibName: nil, bundle: nil)
+        self.increaseFeeService = increaseFeeService
+        
+        super.init(style: .grouped)
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -442,6 +451,11 @@ class TransferViewControllerBase: FormViewController {
         
         section.append(defaultRowFor(baseRow: .amount))
         section.append(defaultRowFor(baseRow: .fiat))
+        
+        if service?.isSupportIncreaseFee == true {
+            section.append(defaultRowFor(baseRow: .increaseFee))
+        }
+        
         section.append(defaultRowFor(baseRow: .fee))
         section.append(defaultRowFor(baseRow: .total))
         
@@ -951,7 +965,20 @@ extension TransferViewControllerBase {
                     return self?.rate == nil
                 }
             }
-        
+        case .increaseFee:
+            return SwitchRow { [weak self] in
+                $0.tag = BaseRows.increaseFee.tag
+                $0.title = BaseRows.increaseFee.localized
+                $0.value = self?.service?.isIncreaseFeeEnabled ?? false
+            }.onChange { [weak self] row in
+                guard let id = self?.service?.tokenUnicID,
+                      let value = row.value
+                else {
+                    return
+                }
+                self?.increaseFeeService.setIncreaseFeeEnabled(for: id, value: value)
+                self?.service?.update()
+            }
         case .fee:
             return DoubleDetailsRow { [weak self] in
                 let estimateSymbol = service?.isDynamicFee == true ? " ~" : ""

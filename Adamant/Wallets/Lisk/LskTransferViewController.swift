@@ -35,12 +35,13 @@ final class LskTransferViewController: TransferViewControllerBase {
     }
     
     init(
-        chatsProvider: ChatsProvider,
         accountService: AccountService,
         accountsProvider: AccountsProvider,
         dialogService: DialogService,
         router: Router,
-        currencyInfoService: CurrencyInfoService
+        currencyInfoService: CurrencyInfoService,
+        increaseFeeService: IncreaseFeeService,
+        chatsProvider: ChatsProvider
     ) {
         self.chatsProvider = chatsProvider
         
@@ -49,7 +50,8 @@ final class LskTransferViewController: TransferViewControllerBase {
             accountsProvider: accountsProvider,
             dialogService: dialogService,
             router: router,
-            currencyInfoService: currencyInfoService
+            currencyInfoService: currencyInfoService,
+            increaseFeeService: increaseFeeService
         )
     }
     

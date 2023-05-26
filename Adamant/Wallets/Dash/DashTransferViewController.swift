@@ -24,13 +24,16 @@ final class DashTransferViewController: TransferViewControllerBase {
     
     static let invalidCharacters: CharacterSet = CharacterSet.decimalDigits.inverted
     
+    // MARK: - Init
+    
     init(
-        chatsProvider: ChatsProvider,
         accountService: AccountService,
         accountsProvider: AccountsProvider,
         dialogService: DialogService,
         router: Router,
-        currencyInfoService: CurrencyInfoService
+        currencyInfoService: CurrencyInfoService,
+        increaseFeeService: IncreaseFeeService,
+        chatsProvider: ChatsProvider
     ) {
         self.chatsProvider = chatsProvider
         
@@ -39,7 +42,8 @@ final class DashTransferViewController: TransferViewControllerBase {
             accountsProvider: accountsProvider,
             dialogService: dialogService,
             router: router,
-            currencyInfoService: currencyInfoService
+            currencyInfoService: currencyInfoService,
+            increaseFeeService: increaseFeeService
         )
     }
     
@@ -58,7 +62,10 @@ final class DashTransferViewController: TransferViewControllerBase {
             comments = ""
         }
         
-        guard let service = service as? DashWalletService, let recipient = recipientAddress, let amount = amount else {
+        guard let service = service as? DashWalletService,
+              let recipient = recipientAddress,
+              let amount = amount
+        else {
             return
         }
         

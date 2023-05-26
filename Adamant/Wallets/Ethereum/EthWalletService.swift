@@ -96,6 +96,14 @@ class EthWalletService: WalletService {
 
     var qqPrefix: String {
         return Self.qqPrefix
+	}
+
+    var isSupportIncreaseFee: Bool {
+        return true
+    }
+    
+    var isIncreaseFeeEnabled: Bool {
+        return increaseFeeService.isIncreaseFeeEnabled(for: tokenUnicID)
     }
     
     private (set) var isDynamicFee: Bool = true
@@ -115,6 +123,7 @@ class EthWalletService: WalletService {
     var apiService: ApiService!
     var dialogService: DialogService!
     var router: Router!
+    var increaseFeeService: IncreaseFeeService!
     
     // MARK: - Notifications
     let walletUpdatedNotification = Notification.Name("adamant.ethWallet.walletUpdated")
@@ -319,13 +328,20 @@ class EthWalletService: WalletService {
         ? gasLimit
         : gasLimit + gasLimitPercent
 
-        let newFee = (price * gasLimit).asDecimal(exponent: EthWalletService.currencyExponent)
+        var newFee = (price * gasLimit).asDecimal(exponent: EthWalletService.currencyExponent)
+        
+        newFee = isIncreaseFeeEnabled
+        ? newFee * defaultIncreaseFee
+        : newFee
         
         guard transactionFee != newFee else { return }
         
         transactionFee = newFee
-        gasPrice = price
-        isWarningGasPrice = price >= warningGasPriceGwei.toWei()
+        gasPrice = isIncreaseFeeEnabled
+        ? price * BigUInt(defaultIncreaseFee.doubleValue)
+        : price
+        
+        isWarningGasPrice = gasPrice >= warningGasPriceGwei.toWei()
         self.gasLimit = gasLimit
         
         NotificationCenter.default.post(name: transactionFeeUpdated, object: self, userInfo: nil)
@@ -516,6 +532,7 @@ extension EthWalletService: SwinjectDependentService {
         apiService = container.resolve(ApiService.self)
         dialogService = container.resolve(DialogService.self)
         router = container.resolve(Router.self)
+        increaseFeeService = container.resolve(IncreaseFeeService.self)
     }
 }
 

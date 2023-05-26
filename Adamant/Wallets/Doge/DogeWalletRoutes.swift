@@ -27,7 +27,8 @@ extension AdamantScene.Wallets {
                 accountsProvider: r.resolve(AccountsProvider.self)!,
                 dialogService: r.resolve(DialogService.self)!,
                 router: r.resolve(Router.self)!,
-                currencyInfoService: r.resolve(CurrencyInfoService.self)!
+                currencyInfoService: r.resolve(CurrencyInfoService.self)!,
+                increaseFeeService: r.resolve(IncreaseFeeService.self)!
             )
         }
         

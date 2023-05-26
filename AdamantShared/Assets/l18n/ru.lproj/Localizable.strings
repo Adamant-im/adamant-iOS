@@ -961,6 +961,9 @@
 /* Transfer: comment for transfer in chat */
 "TransferScene.Row.Comments" = "Комментарии";
 
+/* Transfer: transfer increase fee */
+"TransferScene.Row.IncreaseFee" = "Увеличить комиссию";
+
 /* Transfer: 'Transfer info' section */
 "TransferScene.Section.TransferInfo" = "Перевод";
 
