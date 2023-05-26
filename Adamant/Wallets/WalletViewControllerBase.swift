@@ -158,8 +158,13 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 $0.cell.contentConfiguration = content
                 $0.cell.selectionStyle = .gray
                 $0.cell.backgroundColor = UIColor.adamant.cellColor
-            }.cellUpdate { (cell, _) in
+            }.cellUpdate { [weak self] (cell, _) in
                 cell.accessoryType = .disclosureIndicator
+                
+                cell.separatorInset = self?.service is AdmWalletService
+                ? UITableView.defaultSeparatorInset
+                : .zero
+                
                 if #unavailable(iOS 14.0) {
                     cell.textLabel?.attributedText = label
                 }

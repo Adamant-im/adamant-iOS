@@ -270,6 +270,10 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         configureCell(cell, for: transaction)
         
         cell.accessoryType = .disclosureIndicator
+        cell.separatorInset = indexPath.row == (controller?.fetchedObjects?.count ?? 0) - 1
+        ? .zero
+        : UITableView.defaultTransactionsSeparatorInset
+        
         return cell
     }
     

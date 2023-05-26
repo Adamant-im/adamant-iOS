@@ -210,10 +210,10 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
         }
         cell.selectionStyle = .none
         
-        cell.separatorInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 0)
+        cell.separatorInset = UITableView.defaultSeparatorInset
         let maxCount = filteredWallets?.count ?? wallets.count
         if indexPath.row == maxCount - 1 {
-            cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+            cell.separatorInset = .zero
         }
         
         let wallet: WalletService
