@@ -663,12 +663,21 @@ class AccountViewController: FormViewController {
     
     func addObservers() {
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            self?.updateAccountInfo()
-            self?.tableView.setContentOffset(CGPoint.zero, animated: false)
-            self?.pagingViewController.reloadData()
-            self?.tableView.reloadData()
-            if let vc = self?.pagingViewController.pageViewController.selectedViewController as? WalletViewController {
-                self?.updateHeaderSize(with: vc, animated: false)
+            guard let self = self else { return }
+            
+            self.updateAccountInfo()
+            self.tableView.setContentOffset(
+                CGPoint(
+                    x: .zero,
+                    y: -self.tableView.frame.size.height
+                ),
+                animated: false
+            )
+            
+            self.pagingViewController.reloadData()
+            self.tableView.reloadData()
+            if let vc = self.pagingViewController.pageViewController.selectedViewController as? WalletViewController {
+                self.updateHeaderSize(with: vc, animated: false)
             }
         }
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
