@@ -29,6 +29,7 @@ extension String.adamantLocalized {
         static let remove = NSLocalizedString("Chats.Remove", comment: "Remove")
         static let removeMessage = NSLocalizedString("Chats.RemoveMessage", comment: "Delete this message?")
         static let report = NSLocalizedString("Chats.Report", comment: "Report")
+        static let reply = NSLocalizedString("Chats.Reply", comment: "Reply")
         static let reportMessage = NSLocalizedString("Chats.ReportMessage", comment: "Report as inappropriate?")
         static let reportSent = NSLocalizedString("Chats.ReportSent", comment: "Report has been sent")
 

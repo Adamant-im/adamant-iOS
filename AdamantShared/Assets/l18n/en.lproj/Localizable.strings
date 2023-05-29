@@ -298,6 +298,9 @@
 /* Button "Report" */
 "Chats.Report" = "Report";
 
+/* Button "Reply" */
+"Chats.Reply" = "Reply";
+
 /* Alert "Report as inappropriate?" */
 "Chats.ReportMessage" = "Report as inappropriate?";
 

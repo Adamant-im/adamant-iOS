@@ -341,6 +341,10 @@ private extension ChatViewController {
             .init(
                 title: .adamantLocalized.chat.report,
                 action: #selector(MessageCollectionViewCell.report)
+            ),
+            .init(
+                title: .adamantLocalized.chat.reply,
+                action: #selector(MessageCollectionViewCell.reply)
             )
         ]
     }
@@ -473,6 +477,20 @@ private extension ChatViewController {
         collection.reportMessageAction = { [weak self] indexPath in
             guard let id = self?.getMessageIdByIndexPath(indexPath) else { return }
             self?.viewModel.dialog.send(.reportMessageAlert(id: id))
+        }
+        
+        collection.replyMessageAction = { [weak self] indexPath in
+            guard let message = self?.getMessageByIndexPath(indexPath) else { return }
+            
+            if case let .message(model) = message.fullModel.content {
+                self?.viewModel.replyMessageIfNeeded(model.value)
+            }
+            if case let .reply(model) = message.fullModel.content {
+                self?.viewModel.replyMessageIfNeeded(model.value)
+            }
+            if case let .transaction(model) = message.fullModel.content {
+                self?.viewModel.replyMessageIfNeeded(model.value)
+            }
         }
         
         return collection
@@ -630,10 +648,14 @@ private extension ChatViewController {
     }
     
     func getMessageIdByIndexPath(_ indexPath: IndexPath) -> String? {
+        getMessageByIndexPath(indexPath)?.messageId
+    }
+    
+    func getMessageByIndexPath(_ indexPath: IndexPath) -> MessageType? {
         messagesCollectionView.messagesDataSource?.messageForItem(
             at: indexPath,
             in: messagesCollectionView
-        ).messageId
+        )
     }
     
     func animateScroll(isStarted: Bool) {

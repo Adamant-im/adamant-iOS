@@ -27,4 +27,13 @@ extension MessageCollectionViewCell {
         
         collectionView.reportMessageAction?(indexPath)
     }
+    
+    @objc func reply() {
+        guard
+            let collectionView = superview as? ChatMessagesCollectionView,
+            let indexPath = collectionView.indexPath(for: self)
+        else { return }
+        
+        collectionView.replyMessageAction?(indexPath)
+    }
 }
