@@ -836,7 +836,9 @@ class TransferViewControllerBase: FormViewController {
         comments: String,
         hash: String
     ) async throws {
-        guard let richMessageType = service?.richMessageType else { return }
+        guard let richMessageType = (service as? RichMessageProvider)?.dynamicRichMessageType else {
+            return
+        }
         
         let message: AdamantMessage
         
