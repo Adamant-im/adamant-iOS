@@ -301,6 +301,9 @@
 /* Button "Reply" */
 "Chats.Reply" = "Antwort";
 
+/* Button "Copy" */
+"Chats.Copy" = "Kopieren";
+
 /* Alert "Report as inappropriate?" */
 "Chats.ReportMessage" = "Als unangemessen melden?";
 

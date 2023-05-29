@@ -54,6 +54,8 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         return view
     }()
     
+    private var containerView: UIView = UIView()
+    
     private lazy var verticalStack: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [replyView, messageLabel])
         stack.axis = .vertical
@@ -151,6 +153,77 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
             $0.leading.equalToSuperview().inset(leading)
             $0.trailing.equalToSuperview().inset(trailing)
         }
+        
+        configureMenu()
+    }
+    
+    func configureMenu() {
+        messageContainerView.removeFromSuperview()
+        contentView.addSubview(containerView)
+        
+        let interaction = UIContextMenuInteraction(delegate: self)
+        containerView.addInteraction(interaction)
+        
+        containerView.addSubview(messageContainerView)
+        messageContainerView.snp.makeConstraints { make in
+            make.top.bottom.leading.trailing.equalToSuperview()
+        }
+    }
+    
+    override func layoutMessageContainerView(
+        with attributes: MessagesCollectionViewLayoutAttributes
+    ) {
+        var origin: CGPoint = .zero
+
+        switch attributes.avatarPosition.vertical {
+        case .messageBottom:
+          origin.y = attributes.size.height
+            - attributes.messageContainerPadding.bottom
+            - attributes.cellBottomLabelSize.height
+            - attributes.messageBottomLabelSize.height
+            - attributes.messageContainerSize.height
+            - attributes.messageContainerPadding.top
+        case .messageCenter:
+          if attributes.avatarSize.height > attributes.messageContainerSize.height {
+            let messageHeight = attributes.messageContainerSize.height
+              + attributes.messageContainerPadding.top
+              + attributes.messageContainerPadding.bottom
+            origin.y = (attributes.size.height / 2) - (messageHeight / 2)
+          } else {
+            fallthrough
+          }
+        default:
+          if attributes.accessoryViewSize.height > attributes.messageContainerSize.height {
+            let messageHeight = attributes.messageContainerSize.height
+              + attributes.messageContainerPadding.top
+              + attributes.messageContainerPadding.bottom
+            origin.y = (attributes.size.height / 2) - (messageHeight / 2)
+          } else {
+            origin.y = attributes.cellTopLabelSize.height
+              + attributes.messageTopLabelSize.height
+              + attributes.messageContainerPadding.top
+          }
+        }
+
+        let avatarPadding = attributes.avatarLeadingTrailingPadding
+        switch attributes.avatarPosition.horizontal {
+        case .cellLeading:
+          origin.x = attributes.avatarSize.width
+            + attributes.messageContainerPadding.left
+            + avatarPadding
+        case .cellTrailing:
+          origin.x = attributes.frame.width
+            - attributes.avatarSize.width
+            - attributes.messageContainerSize.width
+            - attributes.messageContainerPadding.right
+            - avatarPadding
+        case .natural:
+          break
+        }
+
+        containerView.frame = CGRect(origin: origin, size: attributes.messageContainerSize)
+        containerView.layoutIfNeeded()
+        messageContainerView.layoutIfNeeded()
     }
     
     override func configure(
@@ -189,5 +262,49 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         super.handleTapGesture(gesture)
         
         actionHandler(.scrollTo(message: model))
+    }
+}
+
+extension ChatMessageReplyCell: UIContextMenuInteractionDelegate {
+    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
+        return UIContextMenuConfiguration(actionProvider: { [weak self] _ in
+            guard let self = self else { return nil }
+            return self.makeContextMenu()
+        })
+    }
+    
+    func makeContextMenu() -> UIMenu {
+        let remove = UIAction(
+            title: .adamantLocalized.chat.remove,
+            image: UIImage(systemName: "trash"),
+            attributes: .destructive
+        ) { _ in
+            self.actionHandler(.remove(id: self.model.id))
+        }
+        
+        let report = UIAction(
+            title: .adamantLocalized.chat.report,
+            image: UIImage(systemName: "exclamationmark.bubble")
+        ) { _ in
+            self.actionHandler(.report(id: self.model.id))
+        }
+        
+        let reply = UIAction(
+            title: .adamantLocalized.chat.reply,
+            image: UIImage(systemName: "arrowshape.turn.up.left")
+        ) { [weak self] _ in
+            guard let self = self else { return }
+            Task { self.actionHandler(.reply(message: self.model)) }
+        }
+        
+        let copy = UIAction(
+            title: .adamantLocalized.chat.copy,
+            image: UIImage(systemName: "doc.on.doc")
+        ) { [weak self] _ in
+            guard let self = self else { return }
+            self.actionHandler(.copy(text: self.model.message.string))
+        }
+        
+        return UIMenu(title: "", children: [reply, copy, report, remove])
     }
 }

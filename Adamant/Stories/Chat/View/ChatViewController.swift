@@ -93,7 +93,6 @@ final class ChatViewController: MessagesViewController {
         chatMessagesCollectionView.fixedBottomOffset = .zero
         maintainPositionOnInputBarHeightChanged = true
         navigationItem.titleView = updatingIndicatorView
-        configureMessageActions()
         configureHeader()
         configureLayout()
         configureReplyView()
@@ -332,23 +331,6 @@ private extension ChatViewController {
 // MARK: Configuration
 
 private extension ChatViewController {
-    func configureMessageActions() {
-        UIMenuController.shared.menuItems = [
-            .init(
-                title: .adamantLocalized.chat.remove,
-                action: #selector(MessageCollectionViewCell.remove)
-            ),
-            .init(
-                title: .adamantLocalized.chat.report,
-                action: #selector(MessageCollectionViewCell.report)
-            ),
-            .init(
-                title: .adamantLocalized.chat.reply,
-                action: #selector(MessageCollectionViewCell.reply)
-            )
-        ]
-    }
-    
     func configureLayout() {
         view.addSubview(scrollDownButton)
         scrollDownButton.snp.makeConstraints { [unowned inputBar] in
@@ -468,30 +450,6 @@ private extension ChatViewController {
             SpinnerCell.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader
         )
-        
-        collection.removeMessageAction = { [weak self] indexPath in
-            guard let id = self?.getMessageIdByIndexPath(indexPath) else { return }
-            self?.viewModel.dialog.send(.removeMessageAlert(id: id))
-        }
-        
-        collection.reportMessageAction = { [weak self] indexPath in
-            guard let id = self?.getMessageIdByIndexPath(indexPath) else { return }
-            self?.viewModel.dialog.send(.reportMessageAlert(id: id))
-        }
-        
-        collection.replyMessageAction = { [weak self] indexPath in
-            guard let message = self?.getMessageByIndexPath(indexPath) else { return }
-            
-            if case let .message(model) = message.fullModel.content {
-                self?.viewModel.replyMessageIfNeeded(model.value)
-            }
-            if case let .reply(model) = message.fullModel.content {
-                self?.viewModel.replyMessageIfNeeded(model.value)
-            }
-            if case let .transaction(model) = message.fullModel.content {
-                self?.viewModel.replyMessageIfNeeded(model.value)
-            }
-        }
         
         return collection
     }

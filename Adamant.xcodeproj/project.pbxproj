@@ -270,7 +270,6 @@
 		93B19AF629631800005305C0 /* CGSize+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93F391472962EEDC00BFD6AE /* CGSize+adamant.swift */; };
 		93B251B629E38E31008D6EA6 /* KeyboardObservingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B251B529E38E31008D6EA6 /* KeyboardObservingViewController.swift */; };
 		93B251B829E393A5008D6EA6 /* UIScrollView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B251B729E393A5008D6EA6 /* UIScrollView+Extension.swift */; };
-		93B9DBD229803179004F8BFF /* MessageCollectionViewCell+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B9DBD129803179004F8BFF /* MessageCollectionViewCell+Extension.swift */; };
 		93BF4A6629E4859900505CD0 /* DelegatesBottomPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93BF4A6529E4859900505CD0 /* DelegatesBottomPanel.swift */; };
 		93BF4A6C29E4B4BF00505CD0 /* DelegatesBottomPanel+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93BF4A6B29E4B4BF00505CD0 /* DelegatesBottomPanel+Model.swift */; };
 		93CC8DC7296F00D6003772BF /* ChatTransactionContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CC8DC6296F00D6003772BF /* ChatTransactionContainerView.swift */; };
@@ -992,7 +991,6 @@
 		93A91FD229799298001DB1F8 /* ChatStartPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatStartPosition.swift; sourceTree = "<group>"; };
 		93B251B529E38E31008D6EA6 /* KeyboardObservingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardObservingViewController.swift; sourceTree = "<group>"; };
 		93B251B729E393A5008D6EA6 /* UIScrollView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIScrollView+Extension.swift"; sourceTree = "<group>"; };
-		93B9DBD129803179004F8BFF /* MessageCollectionViewCell+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "MessageCollectionViewCell+Extension.swift"; sourceTree = "<group>"; };
 		93BF4A6529E4859900505CD0 /* DelegatesBottomPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelegatesBottomPanel.swift; sourceTree = "<group>"; };
 		93BF4A6B29E4B4BF00505CD0 /* DelegatesBottomPanel+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DelegatesBottomPanel+Model.swift"; sourceTree = "<group>"; };
 		93CC8DC6296F00D6003772BF /* ChatTransactionContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTransactionContainerView.swift; sourceTree = "<group>"; };
@@ -1677,7 +1675,6 @@
 				9371130E2996EDA900F64CF9 /* ChatRefreshMock.swift */,
 				93996A962968209C008D080B /* ChatMessagesCollection.swift */,
 				9382F61229DEC0A3005E6216 /* ChatModelView.swift */,
-				93B9DBD129803179004F8BFF /* MessageCollectionViewCell+Extension.swift */,
 			);
 			path = Subviews;
 			sourceTree = "<group>";
@@ -3481,7 +3478,6 @@
 				6489794F24CE00C000C33A68 /* SwiftyOnboardOverlay.swift in Sources */,
 				E98FC34220F9209900032D65 /* UIColor+adamant.swift in Sources */,
 				93B251B629E38E31008D6EA6 /* KeyboardObservingViewController.swift in Sources */,
-				93B9DBD229803179004F8BFF /* MessageCollectionViewCell+Extension.swift in Sources */,
 				41BCB310295C6082004B12AB /* VisibleWalletsResetTableViewCell.swift in Sources */,
 				E96D64B32295BED700CA5587 /* Keypair.swift in Sources */,
 				E9E7CDB12002B97B00DFC4DB /* AccountRoutes.swift in Sources */,

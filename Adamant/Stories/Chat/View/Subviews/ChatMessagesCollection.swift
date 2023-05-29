@@ -12,9 +12,6 @@ import UIKit
 final class ChatMessagesCollectionView: MessagesCollectionView {
     private var currentIds = [String]()
     
-    var reportMessageAction: ((IndexPath) -> Void)?
-    var removeMessageAction: ((IndexPath) -> Void)?
-    var replyMessageAction: ((IndexPath) -> Void)?
     var fixedBottomOffset: CGFloat?
     
     var bottomOffset: CGFloat {

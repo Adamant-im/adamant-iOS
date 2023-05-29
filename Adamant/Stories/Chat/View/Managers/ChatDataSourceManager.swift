@@ -158,6 +158,12 @@ private extension ChatDataSourceManager {
             viewModel.scroll(to: message)
         case let .swipeState(state):
             viewModel.swipeState = state
+        case let .copy(text):
+            viewModel.copyMessageAction(text)
+        case let .remove(id):
+            viewModel.removeMessageAction(id)
+        case let .report(id):
+            viewModel.reportMessageAction(id)
         }
     }
 }

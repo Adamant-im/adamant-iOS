@@ -96,6 +96,9 @@ private extension ChatTransactionContainerView {
         swipeView.swipeStateAction = { [weak self] state in
             self?.actionHandler(.swipeState(state: state))
         }
+        
+        let interaction = UIContextMenuInteraction(delegate: self)
+        contentView.addInteraction(interaction)
     }
     
     func update() {
@@ -151,5 +154,41 @@ private extension TransactionStatus {
         case .success: return .adamant.active
         case .failed, .inconsistent: return .adamant.alert
         }
+    }
+}
+
+extension ChatTransactionContainerView: UIContextMenuInteractionDelegate {
+    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
+        return UIContextMenuConfiguration(actionProvider: { [weak self] _ in
+            guard let self = self else { return nil }
+            return self.makeContextMenu()
+        })
+    }
+    
+    func makeContextMenu() -> UIMenu {
+        let remove = UIAction(
+            title: .adamantLocalized.chat.remove,
+            image: UIImage(systemName: "trash"),
+            attributes: .destructive
+        ) { _ in
+            self.actionHandler(.remove(id: self.model.id))
+        }
+        
+        let report = UIAction(
+            title: .adamantLocalized.chat.report,
+            image: UIImage(systemName: "exclamationmark.bubble")
+        ) { _ in
+            self.actionHandler(.report(id: self.model.id))
+        }
+        
+        let reply = UIAction(
+            title: .adamantLocalized.chat.reply,
+            image: UIImage(systemName: "arrowshape.turn.up.left")
+        ) { [weak self] _ in
+            guard let self = self else { return }
+            Task { self.actionHandler(.reply(message: self.model)) }
+        }
+        
+        return UIMenu(title: "", children: [reply, report, remove])
     }
 }

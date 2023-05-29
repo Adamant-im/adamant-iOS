@@ -449,6 +449,19 @@ final class ChatViewModel: NSObject {
         
         isNeedToAnimateScroll = true
     }
+    
+    func copyMessageAction(_ text: String) {
+        UIPasteboard.general.string = text
+        dialog.send(.toast(.adamantLocalized.alert.copiedToPasteboardNotification))
+    }
+    
+    func reportMessageAction(_ id: String) {
+        dialog.send(.reportMessageAlert(id: id))
+    }
+    
+    func removeMessageAction(_ id: String) {
+        dialog.send(.removeMessageAlert(id: id))
+    }
 }
 
 extension ChatViewModel {
