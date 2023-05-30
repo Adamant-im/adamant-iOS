@@ -48,6 +48,14 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
         return view
     }()
     
+    private lazy var chatMenuManager: ChatMenuManager = {
+        let manager = ChatMenuManager(
+            menu: makeContextMenu(),
+            backgroundColor: nil
+        )
+        return manager
+    }()
+    
     var isSelected: Bool = false {
         didSet {
             contentView.isSelected = isSelected
@@ -97,7 +105,7 @@ private extension ChatTransactionContainerView {
             self?.actionHandler(.swipeState(state: state))
         }
         
-        let interaction = UIContextMenuInteraction(delegate: self)
+        let interaction = UIContextMenuInteraction(delegate: chatMenuManager)
         contentView.addInteraction(interaction)
     }
     
@@ -157,14 +165,7 @@ private extension TransactionStatus {
     }
 }
 
-extension ChatTransactionContainerView: UIContextMenuInteractionDelegate {
-    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
-        return UIContextMenuConfiguration(actionProvider: { [weak self] _ in
-            guard let self = self else { return nil }
-            return self.makeContextMenu()
-        })
-    }
-    
+extension ChatTransactionContainerView {
     func makeContextMenu() -> UIMenu {
         let remove = UIAction(
             title: .adamantLocalized.chat.remove,

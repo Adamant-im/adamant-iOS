@@ -63,6 +63,14 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         return stack
     }()
     
+    private lazy var chatMenuManager: ChatMenuManager = {
+        let manager = ChatMenuManager(
+            menu: makeContextMenu(),
+            backgroundColor: model.backgroundColor.uiColor
+        )
+        return manager
+    }()
+    
     // MARK: - Properties
     
     /// The `MessageCellDelegate` for the cell.
@@ -76,6 +84,8 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         didSet {
             guard model != oldValue else { return }
             swipeView.update(model)
+            chatMenuManager.backgroundColor = model.backgroundColor.uiColor
+            
             let isSelected = oldValue.animationId != model.animationId
             && !model.animationId.isEmpty
             && oldValue.id == model.id
@@ -158,10 +168,12 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     }
     
     func configureMenu() {
+        containerView.layer.cornerRadius = 10
+        
         messageContainerView.removeFromSuperview()
         contentView.addSubview(containerView)
         
-        let interaction = UIContextMenuInteraction(delegate: self)
+        let interaction = UIContextMenuInteraction(delegate: chatMenuManager)
         containerView.addInteraction(interaction)
         
         containerView.addSubview(messageContainerView)
@@ -265,14 +277,7 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     }
 }
 
-extension ChatMessageReplyCell: UIContextMenuInteractionDelegate {
-    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
-        return UIContextMenuConfiguration(actionProvider: { [weak self] _ in
-            guard let self = self else { return nil }
-            return self.makeContextMenu()
-        })
-    }
-    
+extension ChatMessageReplyCell {
     func makeContextMenu() -> UIMenu {
         let remove = UIAction(
             title: .adamantLocalized.chat.remove,

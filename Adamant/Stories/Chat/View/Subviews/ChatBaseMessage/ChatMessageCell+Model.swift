@@ -13,11 +13,13 @@ extension ChatMessageCell {
         let id: String
         let text: NSAttributedString
         var animationId: String
-
+        let backgroundColor: ChatMessageBackgroundColor
+        
         static let `default` = Self(
             id: "",
             text: NSAttributedString(string: ""),
-            animationId: ""
+            animationId: "",
+            backgroundColor: .failed
         )
         
         func makeReplyContent() -> NSAttributedString {

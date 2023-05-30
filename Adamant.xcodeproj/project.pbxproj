@@ -56,6 +56,7 @@
 		418BBB592938C45B00CAB719 /* EthereumTokensList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418BBB582938C45B00CAB719 /* EthereumTokensList.swift */; };
 		418BBB5A2938C45B00CAB719 /* EthereumTokensList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418BBB582938C45B00CAB719 /* EthereumTokensList.swift */; };
 		418BBB5B2938C45B00CAB719 /* EthereumTokensList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418BBB582938C45B00CAB719 /* EthereumTokensList.swift */; };
+		418FDE502A25CA340055E3CD /* ChatMenuManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418FDE4F2A25CA340055E3CD /* ChatMenuManager.swift */; };
 		41935848287841E20083363B /* MacOSDeterminer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41935847287841E20083363B /* MacOSDeterminer.swift */; };
 		4193AE1629FBEFBF002F21BE /* NSAttributedText+Adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4193AE1529FBEFBF002F21BE /* NSAttributedText+Adamant.swift */; };
 		4197B9C92952FAFF004CAF64 /* VisibleWalletsCheckmarkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4197B9C82952FAFF004CAF64 /* VisibleWalletsCheckmarkView.swift */; };
@@ -810,6 +811,7 @@
 		4186B337294200E8006594A3 /* DogeWalletService+DynamicConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DogeWalletService+DynamicConstants.swift"; sourceTree = "<group>"; };
 		4186B339294200F4006594A3 /* DashWalletService+DynamicConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DashWalletService+DynamicConstants.swift"; sourceTree = "<group>"; };
 		418BBB582938C45B00CAB719 /* EthereumTokensList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthereumTokensList.swift; sourceTree = "<group>"; };
+		418FDE4F2A25CA340055E3CD /* ChatMenuManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMenuManager.swift; sourceTree = "<group>"; };
 		41935847287841E20083363B /* MacOSDeterminer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacOSDeterminer.swift; sourceTree = "<group>"; };
 		4193AE1529FBEFBF002F21BE /* NSAttributedText+Adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSAttributedText+Adamant.swift"; sourceTree = "<group>"; };
 		4197B9C82952FAFF004CAF64 /* VisibleWalletsCheckmarkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisibleWalletsCheckmarkView.swift; sourceTree = "<group>"; };
@@ -1635,6 +1637,7 @@
 				9390C5022976B42800270CDF /* ChatDialogManager.swift */,
 				932F77582989F999006D8801 /* ChatCellManager.swift */,
 				411DB8322A14D01F006AB158 /* ChatKeyboardManager.swift */,
+				418FDE4F2A25CA340055E3CD /* ChatMenuManager.swift */,
 				9340077F29AC341000A20622 /* ChatAction.swift */,
 				93684A2929EFA28A00F9EFFE /* FixedTextMessageSizeCalculator.swift */,
 			);
@@ -3357,6 +3360,7 @@
 				4164A9D928F17DA700EEF16D /* AdamantChatTransactionService.swift in Sources */,
 				E993302221354BC300CD5200 /* EthWalletRoutes.swift in Sources */,
 				3AE89DD92837F5BF0051D3A9 /* ChatRooms.swift in Sources */,
+				418FDE502A25CA340055E3CD /* ChatMenuManager.swift in Sources */,
 				E90055F520EBF5DA00D0CB2D /* AboutViewController.swift in Sources */,
 				E965A53020B594120041A3EA /* AdamantApi+States.swift in Sources */,
 				E96D64BB2295BED700CA5587 /* VotesAsset.swift in Sources */,
