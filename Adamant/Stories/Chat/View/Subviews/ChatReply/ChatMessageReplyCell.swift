@@ -325,7 +325,11 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     override func handleTapGesture(_ gesture: UIGestureRecognizer) {
         super.handleTapGesture(gesture)
         
-        actionHandler(.scrollTo(message: model))
+        let touchLocation = gesture.location(in: self)
+        
+        if containerView.frame.contains(touchLocation) {
+            actionHandler(.scrollTo(message: model))
+        }
     }
 }
 
