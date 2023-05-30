@@ -94,6 +94,58 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         }
     }
     
+    /// Positions the message bubble's top label.
+    /// - attributes: The `MessagesCollectionViewLayoutAttributes` for the cell.
+    override func layoutMessageTopLabel(
+        with attributes: MessagesCollectionViewLayoutAttributes
+    ) {
+      messageTopLabel.textAlignment = attributes.messageTopLabelAlignment.textAlignment
+      messageTopLabel.textInsets = attributes.messageTopLabelAlignment.textInsets
+
+      let y = containerView.frame.minY - attributes.messageContainerPadding.top - attributes.messageTopLabelSize.height
+      let origin = CGPoint(x: 0, y: y)
+
+      messageTopLabel.frame = CGRect(origin: origin, size: attributes.messageTopLabelSize)
+    }
+
+    /// Positions the message bubble's bottom label.
+    /// - attributes: The `MessagesCollectionViewLayoutAttributes` for the cell.
+    override func layoutMessageBottomLabel(
+        with attributes: MessagesCollectionViewLayoutAttributes
+    ) {
+      messageBottomLabel.textAlignment = attributes.messageBottomLabelAlignment.textAlignment
+      messageBottomLabel.textInsets = attributes.messageBottomLabelAlignment.textInsets
+
+      let y = containerView.frame.maxY + attributes.messageContainerPadding.bottom
+      let origin = CGPoint(x: 0, y: y)
+
+      messageBottomLabel.frame = CGRect(origin: origin, size: attributes.messageBottomLabelSize)
+    }
+    
+    ///  Positions the message bubble's time label.
+    /// - attributes: The `MessagesCollectionViewLayoutAttributes` for the cell.
+    override func layoutTimeLabelView(
+        with attributes: MessagesCollectionViewLayoutAttributes
+    ) {
+        let paddingLeft: CGFloat = 10
+        let origin = CGPoint(
+          x: UIScreen.main.bounds.width + paddingLeft,
+          y: containerView.frame.minY
+          + containerView.frame.height
+          * 0.5
+          - messageTimestampLabel.font.ascender * 0.5
+        )
+        
+        let size = CGSize(
+            width: attributes.messageTimeLabelSize.width,
+            height: attributes.messageTimeLabelSize.height
+        )
+        
+        messageTimestampLabel.frame = CGRect(origin: origin, size: size)
+    }
+    
+    /// Positions the cell's `MessageContainerView`.
+    /// - attributes: The `MessagesCollectionViewLayoutAttributes` for the cell.
     override func layoutMessageContainerView(
         with attributes: MessagesCollectionViewLayoutAttributes
     ) {
