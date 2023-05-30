@@ -431,6 +431,11 @@ private extension ChatViewController {
         button.action = { [weak self] in
             guard let id = self?.viewModel.getTempOffset(visibleIndex: self?.messagesCollectionView.indexPathsForVisibleItems.last?.section)
             else {
+                self?.viewModel.animateScrollIfNeeded(
+                    to: self?.viewModel.messages.count ?? 0,
+                    visibleIndex: self?.messagesCollectionView.indexPathsForVisibleItems.last?.section
+                )
+                
                 self?.messagesCollectionView.scrollToBottom(animated: true)
                 return
             }
