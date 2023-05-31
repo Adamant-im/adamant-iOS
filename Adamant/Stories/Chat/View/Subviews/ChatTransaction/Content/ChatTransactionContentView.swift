@@ -161,8 +161,7 @@ extension ChatTransactionContentView.Model {
         let replyViewDynamicHeight: CGFloat = isReply ? replyViewHeight : 0
         let stackSpacingCount: CGFloat = isReply ? 4 : 3
         
-        return verticalInsets * 2
-            + verticalStackSpacing * stackSpacingCount
+        return verticalStackSpacing * stackSpacingCount
             + iconSize
             + titleHeight
             + dateHeight
