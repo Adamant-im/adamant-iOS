@@ -81,7 +81,20 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
             return
         }
         
-        controller.transaction = transaction
+        let emptyTransaction = SimpleTransactionDetails(
+            txId: transaction.txId,
+            senderAddress: transaction.senderAddress,
+            recipientAddress: transaction.recipientAddress,
+            dateValue: transaction.dateValue,
+            amountValue: transaction.amountValue,
+            feeValue: transaction.feeValue,
+            confirmationsValue: transaction.confirmationsValue,
+            blockValue: transaction.blockValue,
+            isOutgoing: transaction.isOutgoing,
+            transactionStatus: nil
+        )
+        
+        controller.transaction = emptyTransaction
         controller.service = lskWalletService
         
         if let address = lskWalletService.wallet?.address {

@@ -95,56 +95,40 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
         }
 
         // Hold reference
-        guard let sender = walletService.wallet?.address else {
+        guard let address = walletService.wallet?.address else {
             return
         }
 
         controller.service = self.walletService
-        dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
-        let txId = transactions[indexPath.row].txId
-
-        Task { [weak self] in
-            do {
-                let dashTransaction = try await walletService.getTransaction(by: txId)
-                guard let vc = self else {
-                    return
-                }
-
-                let transaction = dashTransaction.asBtcTransaction(DashTransaction.self, for: sender)
-
-                // Sender name
-                if transaction.senderAddress == sender {
-                    controller.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                }
-
-                if transaction.recipientAddress == sender {
-                    controller.recipientName = String.adamantLocalized.transactionDetails.yourAddress
-                }
-
-                // Block Id
-                guard let blockHash = dashTransaction.blockHash else {
-                    controller.transaction = transaction
-                    vc.navigationController?.pushViewController(controller, animated: true)
-                    vc.tableView.deselectRow(at: indexPath, animated: true)
-                    vc.dialogService.dismissProgress()
-                    return
-                }
-                do {
-                    let id = try await vc.walletService.getBlockId(by: blockHash)
-                    controller.transaction = dashTransaction.asBtcTransaction(DashTransaction.self, for: sender, blockId: id)
-                } catch {
-                    controller.transaction = transaction
-                }
-                vc.tableView.deselectRow(at: indexPath, animated: true)
-                vc.dialogService.dismissProgress()
-                vc.navigationController?.pushViewController(controller, animated: true)
-                
-            } catch {
-                self?.tableView.deselectRow(at: indexPath, animated: true)
-                self?.dialogService.dismissProgress()
-                self?.dialogService.showRichError(error: error)
-            }
+        
+        let transaction = transactions[indexPath.row]
+        
+        let isOutgoing: Bool = transaction.recipientAddress != address
+        
+        let emptyTransaction = SimpleTransactionDetails(
+            txId: transaction.txId,
+            senderAddress: transaction.senderAddress,
+            recipientAddress: transaction.recipientAddress,
+            dateValue: nil,
+            amountValue: transaction.amountValue,
+            feeValue: nil,
+            confirmationsValue: nil,
+            blockValue: nil,
+            isOutgoing: isOutgoing,
+            transactionStatus: nil
+        )
+        
+        controller.transaction = emptyTransaction
+        
+        if emptyTransaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
+            controller.senderName = String.adamantLocalized.transactionDetails.yourAddress
         }
+        
+        if emptyTransaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
+            controller.recipientName = String.adamantLocalized.transactionDetails.yourAddress
+        }
+        
+        navigationController?.pushViewController(controller, animated: true)
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
