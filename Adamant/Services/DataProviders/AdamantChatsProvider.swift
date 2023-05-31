@@ -1112,7 +1112,7 @@ extension AdamantChatsProvider {
             
             // Update ID with recieved, add to unconfirmed transactions.
             transaction.transactionId = String(id)
-            transaction.statusEnum = .delivered
+            transaction.statusEnum = .pending
             
             if let index = unconfirmedTransactionsBySignature.firstIndex(
                 of: signedTransaction.signature
