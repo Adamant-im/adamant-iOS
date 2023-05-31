@@ -34,9 +34,12 @@ final class ReplyView: UIView {
     
     private var replyIV: UIImageView = {
         let iv = UIImageView(
-            image: UIImage(named: "reply")?.withTintColor(.adamant.active)
+            image: UIImage(
+                systemName: "arrowshape.turn.up.left"
+            )?.withTintColor(.adamant.active)
         )
         
+        iv.tintColor = .adamant.active
         iv.snp.makeConstraints { make in
             make.height.equalTo(30)
             make.width.equalTo(24)
@@ -86,7 +89,7 @@ final class ReplyView: UIView {
         addSubview(horizontalStack)
         horizontalStack.snp.makeConstraints {
             $0.top.bottom.equalToSuperview().inset(verticalInsets)
-            $0.leading.trailing.equalToSuperview().inset(12)
+            $0.leading.trailing.equalToSuperview().inset(15)
         }
     }
     
@@ -105,5 +108,5 @@ extension ReplyView {
 }
 
 private let messageFont = UIFont.systemFont(ofSize: 14)
-private let horizontalStackSpacing: CGFloat = 20
+private let horizontalStackSpacing: CGFloat = 25
 private let verticalInsets: CGFloat = 8

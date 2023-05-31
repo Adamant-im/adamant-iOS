@@ -886,8 +886,18 @@ extension ChatListViewController {
                 : ""
                 
                 let replyImageAttachment = NSTextAttachment()
-                replyImageAttachment.image = UIImage(named: "reply")
-                replyImageAttachment.bounds = CGRect(x: .zero, y: -3, width: 20, height: 20)
+                
+                replyImageAttachment.image = UIImage(
+                    systemName: "arrowshape.turn.up.left"
+                )?.withTintColor(.adamant.primary)
+                
+                replyImageAttachment.bounds = CGRect(
+                    x: .zero,
+                    y: -3,
+                    width: 23,
+                    height: 20
+                )
+                
                 let imageString = NSAttributedString(attachment: replyImageAttachment)
                 
                 let markDownText = markdownParser.parse("  \(text)").resolveLinkColor()

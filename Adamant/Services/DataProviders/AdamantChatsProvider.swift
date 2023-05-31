@@ -844,15 +844,15 @@ extension AdamantChatsProvider {
         from chatroom: Chatroom? = nil
     ) async throws -> ChatTransaction {
         let type = ChatType.richMessage
-        
+        let id = UUID().uuidString
         let transaction = RichMessageTransaction(context: context)
         transaction.date = Date() as NSDate
         transaction.recipientId = recipientId
         transaction.senderId = senderId
         transaction.type = Int16(type.rawValue)
         transaction.isOutgoing = true
-        transaction.chatMessageId = UUID().uuidString
-        transaction.transactionId = UUID().uuidString
+        transaction.chatMessageId = id
+        transaction.transactionId = id
         transaction.richContent = richContent
         transaction.richType = richType
         transaction.isReply = isReply
