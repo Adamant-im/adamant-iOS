@@ -277,7 +277,7 @@ extension AdamantTransfersProvider {
                 case .accountNotFound:
                     err = .accountNotFound(address: address)
                     
-                case .serverError:
+                case .serverError, .baseError:
                     err = .serverError(error)
                     
                 case .internalError(let message, _):
@@ -487,7 +487,8 @@ extension AdamantTransfersProvider {
         ? comment
         : RichMessageReply(
             replyto_id: replyToMessageId ?? "",
-            reply_message: comment).serialized()
+            reply_message: comment
+        ).serialized()
         
         guard let encodedMessage = adamantCore.encodeMessage(
             asset,

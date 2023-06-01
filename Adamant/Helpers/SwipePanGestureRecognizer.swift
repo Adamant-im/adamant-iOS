@@ -8,7 +8,7 @@
 
 import UIKit
 
-class SwipePanGestureRecognizer: UIPanGestureRecognizer, UIGestureRecognizerDelegate {
+final class SwipePanGestureRecognizer: UIPanGestureRecognizer, UIGestureRecognizerDelegate {
 
     private var initialTouchLocation: CGPoint?
     private let minHorizontalOffset: CGFloat = 5

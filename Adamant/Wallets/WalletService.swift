@@ -120,7 +120,7 @@ extension ApiServiceError {
         case .requestCancelled:
             return .requestCancelled
             
-        case .serverError, .internalError:
+        case .serverError, .internalError, .baseError:
             return .apiError(self)
         }
     }

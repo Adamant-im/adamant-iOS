@@ -354,7 +354,7 @@ final class ChatViewModel: NSObject {
                 case .invalidTransactionStatus:
                     dialog.send(.warning(.adamantLocalized.chat.cancelError))
                 default:
-                    dialog.send(.richError(error, supportEmail: true))
+                    dialog.send(.richError(error))
                 }
             }
         }.stored(in: tasksStorage)
@@ -372,7 +372,7 @@ final class ChatViewModel: NSObject {
                 case .invalidTransactionStatus:
                     break
                 default:
-                    dialog.send(.richError(error, supportEmail: true))
+                    dialog.send(.richError(error))
                 }
             }
         }.stored(in: tasksStorage)
@@ -380,6 +380,7 @@ final class ChatViewModel: NSObject {
     
     func scroll(to message: ChatMessageReplyCell.Model) {
         guard let partnerAddress = chatroom?.partner?.address else { return }
+        
         Task {
             do {
                 if !chatTransactions.contains(
@@ -395,13 +396,12 @@ final class ChatViewModel: NSObject {
                 await waitForMessage(withId: message.replyId)
                 
                 scrollToMessage = (message.replyId, message.id)
-               // animationIds[message.replyId] = UUID().uuidString
                 
                 dialog.send(.progress(false))
             } catch {
                 print(error)
                 dialog.send(.progress(false))
-                dialog.send(.richError(error, supportEmail: false))
+                dialog.send(.richError(error))
             }
         }.stored(in: tasksStorage)
     }
@@ -623,7 +623,7 @@ private extension ChatViewModel {
             break
         }
         
-        dialog.send(.richError(error, supportEmail: true))
+        dialog.send(.richError(error))
     }
     
     func inputTextUpdated() {

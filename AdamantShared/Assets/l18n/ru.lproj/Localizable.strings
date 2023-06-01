@@ -433,6 +433,9 @@
 /* Shared error: Internal error format, %@ for message */
 "Error.InternalErrorFormat" = "Внутренняя ошибка: %@";
 
+/* Shared error: Base format, %@ for message */
+"Error.BaseErrorFormat" = "Ошибка: %@";
+
 /* Shared error: Account not initiated */
 "Error.AccountNotInitiated" = "Аккаунт не инициализирован";
 

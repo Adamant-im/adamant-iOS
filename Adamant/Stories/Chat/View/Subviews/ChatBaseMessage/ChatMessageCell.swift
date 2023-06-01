@@ -32,24 +32,15 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
             guard model != oldValue else { return }
             swipeView.update(model)
             chatMenuManager.backgroundColor = model.backgroundColor.uiColor
-            
-            let isSelected = oldValue.animationId != model.animationId
-            && !model.animationId.isEmpty
-            && oldValue.id == model.id
-            && !model.id.isEmpty
-            && !oldValue.id.isEmpty
-            
-            if isSelected {
-                messageContainerView.startBlinkAnimation()
-            }
         }
     }
     
     override var isSelected: Bool {
         didSet {
-            if isSelected {
-                messageContainerView.startBlinkAnimation()
-            }
+            messageContainerView.animateIsSelected(
+                isSelected,
+                originalColor: model.backgroundColor.uiColor
+            )
         }
     }
     

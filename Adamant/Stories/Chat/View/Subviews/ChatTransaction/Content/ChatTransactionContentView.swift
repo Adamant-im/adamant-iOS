@@ -25,9 +25,10 @@ final class ChatTransactionContentView: UIView {
     
     var isSelected: Bool = false {
         didSet {
-            if isSelected {
-                startBlinkAnimation()
-            }
+            animateIsSelected(
+                isSelected,
+                originalColor: model.backgroundColor.uiColor
+            )
         }
     }
     

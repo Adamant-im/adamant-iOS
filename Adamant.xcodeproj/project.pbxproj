@@ -1442,6 +1442,14 @@
 			path = Scripts;
 			sourceTree = "<group>";
 		};
+		418FDE552A28BBB70055E3CD /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				41330F7529F1509400CB587C /* AdamantCellAnimation.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
 		4197B9C72952FAA2004CAF64 /* VisibleWallets */ = {
 			isa = PBXGroup;
 			children = (
@@ -1575,6 +1583,7 @@
 				9390C5042976B53000270CDF /* ChatDialog.swift */,
 				93A118502993167500E144CC /* ChatMessageBackgroundColor.swift */,
 				93A91FD229799298001DB1F8 /* ChatStartPosition.swift */,
+				41A1994329D2D3CF0031AD75 /* MessageModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1660,6 +1669,7 @@
 		938F7D702955CBAF001915CA /* View */ = {
 			isa = PBXGroup;
 			children = (
+				418FDE552A28BBB70055E3CD /* Helpers */,
 				93996A9829682690008D080B /* Subviews */,
 				938F7D592955C8CB001915CA /* Managers */,
 				938F7D632955C94F001915CA /* ChatViewController.swift */,
@@ -1923,7 +1933,6 @@
 				9304F8BD292F88F900173F18 /* ANSPayload.swift */,
 				9304F8C5292F971600173F18 /* ApiServiceResult.swift */,
 				9304F8C7292F972600173F18 /* ApiServiceError.swift */,
-				41A1994329D2D3CF0031AD75 /* MessageModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1952,7 +1961,6 @@
 				41CA598B29A0D84F002BFDE4 /* TaskManager.swift */,
 				4133AF232A1CE1A3001A0A1E /* UITableView+Adamant.swift */,
 				41A1994129D2D3920031AD75 /* SwipePanGestureRecognizer.swift */,
-				41330F7529F1509400CB587C /* AdamantCellAnimation.swift */,
 				4193AE1529FBEFBF002F21BE /* NSAttributedText+Adamant.swift */,
 			);
 			path = Helpers;

@@ -135,40 +135,33 @@ extension AdamantDialogService {
     }
     
     func showRichError(error: RichError) {
-        showRichError(error: error, supportEmail: nil)
-    }
-    
-    func showRichError(error: RichError, supportEmail: Bool?) {
         switch error.level {
         case .warning:
             showWarning(withMessage: error.message)
         case .error:
             showError(
                 withMessage: error.message,
-                supportEmail: supportEmail ?? false,
+                supportEmail: false,
                 error: error.internalError
             )
         case .internalError:
             showError(
                 withMessage: error.message,
-                supportEmail: supportEmail ?? true,
+                supportEmail: true,
                 error: error.internalError
             )
         }
     }
     
     func showRichError(error: Error) {
-        showRichError(error: error, supportEmail: nil)
-    }
-    
-    func showRichError(error: Error, supportEmail: Bool?) {
         if let error = error as? RichError {
-            showRichError(error: error, supportEmail: supportEmail)
+            showRichError(error: error)
         } else {
             showError(
                 withMessage: error.localizedDescription,
-                supportEmail: supportEmail ?? true,
-                error: error)
+                supportEmail: true,
+                error: error
+            )
         }
     }
     

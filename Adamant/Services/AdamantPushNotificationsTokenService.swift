@@ -51,7 +51,7 @@ final class AdamantPushNotificationsTokenService: PushNotificationsTokenService 
                 switch result {
                 case .success, .failure(.accountNotFound), .failure(.notLogged):
                     self?.removeTokenDeletionTransaction(transaction)
-                case .failure(.internalError), .failure(.networkError), .failure(.requestCancelled), .failure(.serverError):
+                case .failure(.internalError), .failure(.networkError), .failure(.requestCancelled), .failure(.serverError), .failure(.baseError):
                     break
                 }
             }

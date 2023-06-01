@@ -29,7 +29,7 @@ final class CollectionCellWrapper<View: ReusableView>: UICollectionViewCell {
     override var isSelected: Bool {
         didSet {
             guard let view = wrappedView as? ChatTransactionContainerView else {
-                wrappedView.startBlinkAnimation()
+                wrappedView.animateIsSelected(isSelected, originalColor: wrappedView.backgroundColor)
                 return
             }
             

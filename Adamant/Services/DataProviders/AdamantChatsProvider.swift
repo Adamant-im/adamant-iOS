@@ -597,7 +597,7 @@ extension AdamantChatsProvider {
                 case .accountNotFound:
                     err = .accountNotFound(address)
                     
-                case .serverError:
+                case .serverError, .baseError:
                     err = .serverError(error)
                     
                 case .internalError(let message, _):
@@ -1133,7 +1133,7 @@ extension AdamantChatsProvider {
                 throw ChatsProviderError.accountNotFound(recipientId)
             case .notLogged:
                 throw ChatsProviderError.notLogged
-            case .serverError(let e):
+            case .serverError(let e), .baseError(let e):
                 throw ChatsProviderError.serverError(AdamantError(message: e))
             case .internalError(let message, _):
                 throw ChatsProviderError.internalError(AdamantError(message: message))
@@ -1323,7 +1323,7 @@ extension AdamantChatsProvider {
         var transactions: [Transaction] = []
         var offset = chatLoadedMessages[recipient] ?? 0
         var needToRepeat = false
-        var isFind = false
+        var isFound = false
         
         repeat {
             let messages = try await apiGetChatMessages(
@@ -1340,18 +1340,13 @@ extension AdamantChatsProvider {
             
             offset += messages.count
             transactions.append(contentsOf: messages)
-            isFind = transactions.contains(where: { $0.id == UInt64(transactionId) })
-            needToRepeat = messages.count >= chatTransactionsLimit && !isFind
+            isFound = transactions.contains(where: { $0.id == UInt64(transactionId) })
+            needToRepeat = messages.count >= chatTransactionsLimit && !isFound
         } while needToRepeat
         
-        if transactions.count == 0 {
-            return
-        }
-        
-        guard isFind else {
-            throw ApiServiceError.internalError(
-                message: String.adamantLocalized.reply.longUnknownMessageError,
-                error: nil
+        guard isFound else {
+            throw ApiServiceError.baseError(
+                message: String.adamantLocalized.reply.longUnknownMessageError
             )
         }
         

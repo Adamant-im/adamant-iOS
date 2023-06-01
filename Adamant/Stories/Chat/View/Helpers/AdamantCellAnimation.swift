@@ -9,12 +9,12 @@
 import UIKit
 
 extension UIView {
-    func startBlinkAnimation() {
-        let bgColor = backgroundColor
-        self.backgroundColor = .adamant.active.withAlphaComponent(0.2)
+    func animateIsSelected(_ value: Bool, originalColor: UIColor?) {
+        guard value else { return }
+        backgroundColor = .adamant.active.withAlphaComponent(0.2)
         
         UIView.animate(withDuration: 1.0) {
-            self.backgroundColor = bgColor
+            self.backgroundColor = originalColor
         }
     }
 }

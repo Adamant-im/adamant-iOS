@@ -439,6 +439,9 @@
 /* Shared error: Internal error format, %@ for message */
 "Error.InternalErrorFormat" = "Interner Fehler: %@";
 
+/* Shared error: Base format, %@ for message */
+"Error.BaseErrorFormat" = "Fehler: %@";
+
 /* Error messge title for support email */
 "Error.Mail.Title" = "Ich habe einen Fehler in meiner iOS-App";
 

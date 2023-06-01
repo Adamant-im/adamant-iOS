@@ -86,16 +86,6 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
             swipeView.update(model)
             chatMenuManager.backgroundColor = model.backgroundColor.uiColor
             
-            let isSelected = oldValue.animationId != model.animationId
-            && !model.animationId.isEmpty
-            && oldValue.id == model.id
-            && !model.id.isEmpty
-            && !oldValue.id.isEmpty
-            
-            if isSelected {
-                messageContainerView.startBlinkAnimation()
-            }
-            
             let leading = model.isFromCurrentSender ? smallHInset : longHInset
             let trailing = model.isFromCurrentSender ? longHInset : smallHInset
             verticalStack.snp.updateConstraints {
@@ -107,9 +97,10 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     
     override var isSelected: Bool {
         didSet {
-            if isSelected {
-                messageContainerView.startBlinkAnimation()
-            }
+            messageContainerView.animateIsSelected(
+                isSelected,
+                originalColor: model.backgroundColor.uiColor
+            )
         }
     }
     

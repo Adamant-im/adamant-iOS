@@ -105,7 +105,7 @@ final class AdamantHealthCheckService: HealthCheckService {
         switch error {
         case .requestCancelled:
             break
-        case .networkError, .serverError, .internalError, .notLogged, .accountNotFound:
+        case .networkError, .serverError, .internalError, .notLogged, .accountNotFound, .baseError:
             node.connectionStatus = .offline
             node.status = nil
             updateNodesAvailability()
