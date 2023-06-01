@@ -337,8 +337,10 @@ class EthWalletService: WalletService {
         guard transactionFee != newFee else { return }
         
         transactionFee = newFee
+        let incGasPrice = UInt64(price.asDouble() * defaultIncreaseFee.doubleValue)
+                
         gasPrice = isIncreaseFeeEnabled
-        ? price * BigUInt(defaultIncreaseFee.doubleValue)
+        ? BigUInt(integerLiteral: incGasPrice)
         : price
         
         isWarningGasPrice = gasPrice >= warningGasPriceGwei.toWei()
