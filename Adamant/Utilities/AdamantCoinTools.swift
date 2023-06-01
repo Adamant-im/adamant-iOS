@@ -39,16 +39,21 @@ final class AdamantCoinTools {
         
         guard !uri.isEmpty,
               let url = url,
-              let prefix = uri.split(separator: ":").first,
-              prefix == qqPrefix
+              let raw = url.string
         else {
             return nil
+        }
+        
+        guard let prefix = uri.split(separator: ":").first,
+              prefix == qqPrefix
+        else {
+            return QQAddressInformation(address: raw, params: nil)
         }
         
         let addressRaw = url.path
         
         let params = url.queryItems?.compactMap {
-            QQAddressParam(raw: String($0.debugDescription))
+            QQAddressParam(raw: String($0.description))
         }
         
         return QQAddressInformation(address: addressRaw, params: params)
