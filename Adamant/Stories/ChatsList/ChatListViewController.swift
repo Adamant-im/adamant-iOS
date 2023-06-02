@@ -860,25 +860,9 @@ extension ChatListViewController {
                 raw = text
             }
             
-            let attributesText = markdownParser.parse(raw)
-            let mutableText = NSMutableAttributedString(attributedString: attributesText)
+            let attributesText = markdownParser.parse(raw).resolveLinkColor()
             
-            mutableText.enumerateAttribute(
-                .link,
-                in: NSRange(location: 0, length: attributesText.length),
-                options: []
-            ) { (value, range, _) in
-                guard value != nil else { return }
-                
-                mutableText.removeAttribute(.link, range: range)
-                mutableText.addAttribute(
-                    .foregroundColor,
-                    value: UIColor.adamant.active,
-                    range: range
-                )
-            }
-
-            return mutableText
+            return attributesText
             
         case let transfer as TransferTransaction:
             if let admService = richMessageProviders[AdmWalletService.richMessageType] as? AdmWalletService {
@@ -888,17 +872,48 @@ extension ChatListViewController {
             }
             
         case let richMessage as RichMessageTransaction:
-            let description: NSAttributedString
-            
-            if let type = richMessage.richType, let provider = richMessageProviders[type] {
-                description = provider.shortDescription(for: richMessage)
-            } else if let serialized = richMessage.serializedMessage() {
-                description = NSAttributedString(string: serialized)
-            } else {
-                return nil
+            if let type = richMessage.richType,
+               let provider = richMessageProviders[type] {
+                return provider.shortDescription(for: richMessage)
             }
             
-            return description
+            if richMessage.isReply,
+               let content = richMessage.richContent,
+               let text = content[RichContentKeys.reply.replyMessage] as? String {
+                
+                let prefix = richMessage.isOutgoing
+                ? "\(String.adamantLocalized.chatList.sentMessagePrefix)"
+                : ""
+                
+                let replyImageAttachment = NSTextAttachment()
+                
+                replyImageAttachment.image = UIImage(
+                    systemName: "arrowshape.turn.up.left"
+                )?.withTintColor(.adamant.primary)
+                
+                replyImageAttachment.bounds = CGRect(
+                    x: .zero,
+                    y: -3,
+                    width: 23,
+                    height: 20
+                )
+                
+                let imageString = NSAttributedString(attachment: replyImageAttachment)
+                
+                let markDownText = markdownParser.parse("  \(text)").resolveLinkColor()
+                
+                let fullString = NSMutableAttributedString(string: prefix)
+                fullString.append(imageString)
+                fullString.append(markDownText)
+                
+                return fullString
+            }
+            
+            if let serialized = richMessage.serializedMessage() {
+                return NSAttributedString(string: serialized)
+            }
+            
+            return nil
             
             /*
             if richMessage.isOutgoing {

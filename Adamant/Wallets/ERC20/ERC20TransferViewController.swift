@@ -12,10 +12,6 @@ import Web3Core
 
 final class ERC20TransferViewController: TransferViewControllerBase {
     
-    // MARK: Dependencies
-    
-    private let chatsProvider: ChatsProvider
-    
     // MARK: Properties
     
     private var skipValueChange: Bool = false
@@ -29,31 +25,6 @@ final class ERC20TransferViewController: TransferViewControllerBase {
     }
     
     override var isNeedAddFeeToTotal: Bool { false }
-    
-    init(
-        accountService: AccountService,
-        accountsProvider: AccountsProvider,
-        dialogService: DialogService,
-        router: Router,
-        currencyInfoService: CurrencyInfoService,
-        increaseFeeService: IncreaseFeeService,
-        chatsProvider: ChatsProvider
-    ) {
-        self.chatsProvider = chatsProvider
-        
-        super.init(
-            accountService: accountService,
-            accountsProvider: accountsProvider,
-            dialogService: dialogService,
-            router: router,
-            currencyInfoService: currencyInfoService,
-            increaseFeeService: increaseFeeService
-        )
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
     
     // MARK: Send
     
@@ -251,22 +222,6 @@ final class ERC20TransferViewController: TransferViewControllerBase {
         }
         
         return row
-    }
-    
-    func reportTransferTo(
-        admAddress: String,
-        amount: Decimal,
-        comments: String,
-        hash: String
-    ) async throws {
-        guard let type = (self.service as? RichMessageProvider)?.dynamicRichMessageType else {
-            return
-        }
-        let payload = RichMessageTransfer(type: type, amount: amount, hash: hash, comments: comments)
-        
-        let message = AdamantMessage.richMessage(payload: payload)
-        
-        _ = try await chatsProvider.sendMessage(message, recipientId: admAddress)
     }
     
     override func defaultSceneTitle() -> String? {

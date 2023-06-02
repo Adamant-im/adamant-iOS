@@ -32,6 +32,7 @@ class ComplexTransferViewController: UIViewController {
             navigationItem.title = partner?.chatroom?.getName(addressBookService: addressBookService)
         }
     }
+    var replyToMessageId: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -104,6 +105,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
         
         let name = partner?.chatroom?.getName(addressBookService: addressBookService)
         
+        v.replyToMessageId = replyToMessageId
         v.admReportRecipient = address
         v.recipientIsReadonly = true
         v.commentsEnabled = service.commentsEnabledForRichMessages && partner?.isDummy != true

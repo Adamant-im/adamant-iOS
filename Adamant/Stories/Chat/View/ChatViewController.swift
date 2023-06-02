@@ -16,7 +16,7 @@ import SnapKit
 final class ChatViewController: MessagesViewController {
     typealias SpinnerCell = MessageCellWrapper<SpinnerView>
     typealias TransactionCell = CollectionCellWrapper<ChatTransactionContainerView>
-    typealias SendTransaction = (UIViewController & ComplexTransferViewControllerDelegate) -> Void
+    typealias SendTransaction = ( _ parentVC: UIViewController & ComplexTransferViewControllerDelegate, _ replyToMessageId: String?) -> Void
     
     // MARK: Dependencies
     
@@ -39,6 +39,7 @@ final class ChatViewController: MessagesViewController {
     private lazy var loadingView = LoadingView()
     private lazy var scrollDownButton = makeScrollDownButton()
     private lazy var chatMessagesCollectionView = makeChatMessagesCollectionView()
+    private lazy var replyView = ReplyView()
     
     // swiftlint:disable unused_setter_value
     override var messageInputBar: InputBarAccessoryView {
@@ -57,6 +58,11 @@ final class ChatViewController: MessagesViewController {
         return view
     }()
     
+    private lazy var chatKeyboardManager: ChatKeyboardManager = {
+        let data = ChatKeyboardManager(scrollView: messagesCollectionView)
+        return data
+    }()
+    
     init(
         viewModel: ChatViewModel,
         richMessageProviders: [String: RichMessageProvider],
@@ -69,7 +75,10 @@ final class ChatViewController: MessagesViewController {
         self.richMessageProviders = richMessageProviders
         self.admService = admService
         super.init(nibName: nil, bundle: nil)
-        inputBar.onAttachmentButtonTap = { [weak self] in self.map { sendTransaction($0) } }
+        inputBar.onAttachmentButtonTap = { [weak self] in
+            self.map { sendTransaction($0, viewModel.replyMessage?.id) }
+            self?.processSwipeMessage(nil)
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -84,9 +93,10 @@ final class ChatViewController: MessagesViewController {
         chatMessagesCollectionView.fixedBottomOffset = .zero
         maintainPositionOnInputBarHeightChanged = true
         navigationItem.titleView = updatingIndicatorView
-        configureMessageActions()
         configureHeader()
         configureLayout()
+        configureReplyView()
+        configureGestures()
         setupObservers()
         viewModel.loadFirstMessagesIfNeeded()
     }
@@ -134,6 +144,14 @@ final class ChatViewController: MessagesViewController {
         willDisplay cell: UICollectionViewCell,
         forItemAt indexPath: IndexPath
     ) {
+        // TODO: refactor for architecture
+        if let index = viewModel.needToAnimateCellIndex,
+           indexPath.section == index {
+            cell.isSelected = true
+            cell.isSelected = false
+            viewModel.needToAnimateCellIndex = nil
+        }
+        
         super.collectionView(collectionView, willDisplay: cell, forItemAt: indexPath)
         guard indexPath.section < 4 else { return }
         viewModel.loadMoreMessagesIfNeeded()
@@ -143,6 +161,29 @@ final class ChatViewController: MessagesViewController {
         super.scrollViewDidScroll(scrollView)
         updateIsScrollPositionNearlyTheBottom()
         updateScrollDownButtonVisibility()
+    }
+}
+
+extension ChatViewController {
+    override func gestureRecognizerShouldBegin(
+        _ gestureRecognizer: UIGestureRecognizer
+    ) -> Bool {
+        guard let panGesture = gestureRecognizer as? UIPanGestureRecognizer else {
+            return false
+        }
+        let velocity = panGesture.velocity(in: messagesCollectionView)
+        return abs(velocity.x) > abs(velocity.y)
+    }
+    
+    private func swipeStateAction(_ state: SwipeableView.State) {
+        if state == .began {
+            chatMessagesCollectionView.stopDecelerating()
+            messagesCollectionView.isScrollEnabled = false
+        }
+        
+        if state == .ended {
+            messagesCollectionView.isScrollEnabled = true
+        }
     }
 }
 
@@ -260,25 +301,37 @@ private extension ChatViewController {
                 }
             }
             .store(in: &subscriptions)
+        
+        viewModel.$replyMessage
+            .sink { [weak self] in self?.processSwipeMessage($0) }
+            .store(in: &subscriptions)
+        
+        viewModel.$scrollToMessage
+            .sink { [weak self] in
+                guard let toId = $0,
+                      let fromId = $1
+                else { return }
+                
+                if self?.isScrollPositionNearlyTheBottom != true {
+                    self?.viewModel.appendTempOffset(fromId, toId: toId)
+                }
+                self?.scrollToPosition(.messageId(toId), animated: true)
+            }
+            .store(in: &subscriptions)
+        
+        viewModel.$swipeState
+            .sink { [weak self] in self?.swipeStateAction($0) }
+            .store(in: &subscriptions)
+        
+        viewModel.$isNeedToAnimateScroll
+            .sink { [weak self] in self?.animateScroll(isStarted: $0) }
+            .store(in: &subscriptions)
     }
 }
 
 // MARK: Configuration
 
 private extension ChatViewController {
-    func configureMessageActions() {
-        UIMenuController.shared.menuItems = [
-            .init(
-                title: .adamantLocalized.chat.remove,
-                action: #selector(MessageCollectionViewCell.remove)
-            ),
-            .init(
-                title: .adamantLocalized.chat.report,
-                action: #selector(MessageCollectionViewCell.report)
-            )
-        ]
-    }
-    
     func configureLayout() {
         view.addSubview(scrollDownButton)
         scrollDownButton.snp.makeConstraints { [unowned inputBar] in
@@ -302,6 +355,35 @@ private extension ChatViewController {
             action: #selector(showMenu)
         )
     }
+    
+    func configureReplyView() {
+        replyView.snp.makeConstraints { make in
+            make.height.equalTo(40)
+        }
+        
+        replyView.closeAction = { [weak self] in
+            self?.viewModel.replyMessage = nil
+        }
+    }
+    
+    func configureGestures() {
+        /// Replaces the delegate of the pan gesture recognizer used in the input bar control of MessageKit.
+        /// This gesture controls the position of the input bar when the keyboard is open and the user swipes it to dismiss.
+        /// Due to incorrect checks in MessageKit, we manually set the delegate and assign it to our custom chatKeyboardManager object.
+        /// This ensures proper handling and control of the pan gesture for the input bar.
+        if let gesture = messagesCollectionView.gestureRecognizers?[13] as? UIPanGestureRecognizer {
+            gesture.delegate = chatKeyboardManager
+            chatKeyboardManager.panGesture = gesture
+        }
+        
+        /// Resolves the conflict between horizontal swipe gestures and vertical scrolling in the MessageKit's UICollectionView.
+        /// The gestureRecognizerShouldBegin method checks the velocity of the pan gesture and allows it to begin only if the horizontal velocity is greater than the vertical velocity.
+        /// This ensures smooth and uninterrupted vertical scrolling while still allowing horizontal swipe gestures to be recognized.
+        let panGesture = UIPanGestureRecognizer()
+        panGesture.delegate = self
+        messagesCollectionView.addGestureRecognizer(panGesture)
+        messagesCollectionView.clipsToBounds = false
+    }
 }
 
 // MARK: Content updating
@@ -322,7 +404,7 @@ private extension ChatViewController {
         bottomMessageId = viewModel.messages.last?.messageId
         
         guard !messagesLoaded, !viewModel.messages.isEmpty else { return }
-        viewModel.startPosition.map { setupStartPosition($0) }
+        viewModel.startPosition.map { scrollToPosition($0) }
         messagesLoaded = true
     }
     
@@ -347,8 +429,18 @@ private extension ChatViewController {
 private extension ChatViewController {
     func makeScrollDownButton() -> ChatScrollDownButton {
         let button = ChatScrollDownButton()
-        button.action = { [weak messagesCollectionView] in
-            messagesCollectionView?.scrollToBottom(animated: true)
+        button.action = { [weak self] in
+            guard let id = self?.viewModel.getTempOffset(visibleIndex: self?.messagesCollectionView.indexPathsForVisibleItems.last?.section)
+            else {
+                self?.viewModel.animateScrollIfNeeded(
+                    to: self?.viewModel.messages.count ?? 0,
+                    visibleIndex: self?.messagesCollectionView.indexPathsForVisibleItems.last?.section
+                )
+                
+                self?.messagesCollectionView.scrollToBottom(animated: true)
+                return
+            }
+            self?.scrollToPosition(.messageId(id), animated: true)
         }
         
         return button
@@ -358,20 +450,12 @@ private extension ChatViewController {
         let collection = ChatMessagesCollectionView()
         collection.refreshControl = ChatRefreshMock()
         collection.register(TransactionCell.self)
+        collection.register(ChatMessageCell.self)
+        collection.register(ChatMessageReplyCell.self)
         collection.register(
             SpinnerCell.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader
         )
-        
-        collection.removeMessageAction = { [weak self] indexPath in
-            guard let id = self?.getMessageIdByIndexPath(indexPath) else { return }
-            self?.viewModel.dialog.send(.removeMessageAlert(id: id))
-        }
-        
-        collection.reportMessageAction = { [weak self] indexPath in
-            guard let id = self?.getMessageIdByIndexPath(indexPath) else { return }
-            self?.viewModel.dialog.send(.reportMessageAlert(id: id))
-        }
         
         return collection
     }
@@ -407,7 +491,7 @@ private extension ChatViewController {
     }
     
     @MainActor
-    func setupStartPosition(_ position: ChatStartPosition) {
+    func scrollToPosition(_ position: ChatStartPosition, animated: Bool = false) {
         chatMessagesCollectionView.fixedBottomOffset = nil
         
         switch position {
@@ -420,8 +504,15 @@ private extension ChatViewController {
             messagesCollectionView.scrollToItem(
                 at: .init(item: .zero, section: index),
                 at: [.centeredVertically, .centeredHorizontally],
-                animated: false
+                animated: animated
             )
+            
+            viewModel.animateScrollIfNeeded(
+                to: index,
+                visibleIndex: messagesCollectionView.indexPathsForVisibleItems.last?.section
+            )
+            
+            viewModel.needToAnimateCellIndex = index
         }
         
         guard !viewAppeared else { return }
@@ -449,6 +540,32 @@ private extension ChatViewController {
     
     func inputTextUpdated() {
         viewModel.inputText = inputBar.text
+    }
+    
+    func processSwipeMessage(_ message: MessageModel?) {
+        guard let message = message else {
+            closeReplyView()
+            return
+        }
+        
+        if !messageInputBar.topStackView.subviews.contains(replyView) {
+            UIView.transition(
+                with: messageInputBar.topStackView,
+                duration: 0.25,
+                options: [.transitionCrossDissolve],
+                animations: {
+                    self.messageInputBar.topStackView.addArrangedSubview(self.replyView)
+                })
+            messageInputBar.inputTextView.becomeFirstResponder()
+        }
+        
+        replyView.update(with: message)
+    }
+    
+    func closeReplyView() {
+        replyView.removeFromSuperview()
+        messageInputBar.invalidateIntrinsicContentSize()
+        messageInputBar.layoutContainerViewIfNeeded()
     }
     
     func didTapTransfer(id: String) {
@@ -495,10 +612,20 @@ private extension ChatViewController {
     }
     
     func getMessageIdByIndexPath(_ indexPath: IndexPath) -> String? {
+        getMessageByIndexPath(indexPath)?.messageId
+    }
+    
+    func getMessageByIndexPath(_ indexPath: IndexPath) -> MessageType? {
         messagesCollectionView.messagesDataSource?.messageForItem(
             at: indexPath,
             in: messagesCollectionView
-        ).messageId
+        )
+    }
+    
+    func animateScroll(isStarted: Bool) {
+        UIView.animate(withDuration: 0.1) {
+            self.messagesCollectionView.alpha = isStarted ? 0.2 : 1.0
+        }
     }
  
     // TODO: Use coordinator
@@ -554,4 +681,31 @@ private extension ChatViewController {
     }
 }
 
+// MARK: Animate cell
+
+extension ChatViewController {
+    override func scrollViewDidEndScrollingAnimation(_: UIScrollView) {
+        animateScroll(isStarted: false)
+        
+        guard let index = viewModel.needToAnimateCellIndex else { return }
+        
+        let isVisible = messagesCollectionView.indexPathsForVisibleItems.contains {
+            $0.section == index
+        }
+        
+        guard isVisible else { return }
+        
+        // TODO: refactor for architecture
+        let cell = messagesCollectionView.cellForItem(at: .init(item: .zero, section: index))
+        cell?.isSelected = true
+        cell?.isSelected = false
+        
+        viewModel.needToAnimateCellIndex = nil
+    }
+}
+
 private let scrollDownButtonInset: CGFloat = 20
+private let messagePadding: CGFloat = 12
+private var replyAction: Bool = false
+private var canReplyVibrate: Bool = true
+private var oldContentOffset: CGPoint?

@@ -40,14 +40,13 @@ extension BtcWalletService: RichMessageProvider {
     @MainActor
     func richMessageTapped(for transaction: RichMessageTransaction, in chat: ChatViewController) {
         // MARK: 0. Prepare
-        guard let richContent = transaction.richContent,
-              let hash = richContent[RichContentKeys.transfer.hash]
+        guard let hash = transaction.getRichValue(for: RichContentKeys.transfer.hash)
         else {
             return
         }
                 
         let comment: String?
-        if let raw = transaction.richContent?[RichContentKeys.transfer.comments], raw.count > 0 {
+        if let raw = transaction.getRichValue(for: RichContentKeys.transfer.comments), raw.count > 0 {
             comment = raw
         } else {
             comment = nil
@@ -84,7 +83,8 @@ extension BtcWalletService: RichMessageProvider {
         }
         
         let amount: Decimal
-        if let amountRaw = richTransaction.richContent?[RichContentKeys.transfer.amount], let decimal = Decimal(string: amountRaw) {
+        if let amountRaw = richTransaction.getRichValue(for: RichContentKeys.transfer.amount),
+           let decimal = Decimal(string: amountRaw) {
             amount = decimal
         } else {
             amount = 0
@@ -118,7 +118,8 @@ extension BtcWalletService: RichMessageProvider {
     func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString {
         let amount: String
         
-        guard let raw = transaction.richContent?[RichContentKeys.transfer.amount] else {
+        guard let raw = transaction.getRichValue(for: RichContentKeys.transfer.amount)
+        else {
             return NSAttributedString(string: "⬅️  \(BtcWalletService.currencySymbol)")
         }
         

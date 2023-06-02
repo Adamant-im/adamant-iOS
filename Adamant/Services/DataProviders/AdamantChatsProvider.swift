@@ -33,6 +33,7 @@ actor AdamantChatsProvider: ChatsProvider {
     private(set) var receivedLastHeight: Int64?
     private(set) var readedLastHeight: Int64?
     private let apiTransactions = 100
+    private let chatTransactionsLimit = 50
     private var unconfirmedTransactions: [UInt64:NSManagedObjectID] = [:]
     private var unconfirmedTransactionsBySignature: [String] = []
     
@@ -430,7 +431,8 @@ extension AdamantChatsProvider {
         let chatroom = try? await apiGetChatMessages(
             address: address,
             addressRecipient: addressRecipient,
-            offset: offset
+            offset: offset,
+            limit: chatTransactionsLimit
         )
         
         isChatLoaded[addressRecipient] = true
@@ -461,13 +463,15 @@ extension AdamantChatsProvider {
     func apiGetChatMessages(
         address: String,
         addressRecipient: String,
-        offset: Int?
+        offset: Int?,
+        limit: Int?
     ) async throws -> ChatRooms? {
         do {
             let chatrooms = try await apiService.getChatMessages(
                 address: address,
                 addressRecipient: addressRecipient,
-                offset: offset
+                offset: offset,
+                limit: limit
             )
             return chatrooms
         } catch let error as ApiServiceError {
@@ -480,7 +484,8 @@ extension AdamantChatsProvider {
             return try await apiGetChatMessages(
                 address: address,
                 addressRecipient: addressRecipient,
-                offset: offset
+                offset: offset,
+                limit: limit
             )
         }
     }
@@ -592,7 +597,7 @@ extension AdamantChatsProvider {
                 case .accountNotFound:
                     err = .accountNotFound(address)
                     
-                case .serverError:
+                case .serverError, .commonError:
                     err = .serverError(error)
                     
                 case .internalError(let message, _):
@@ -673,7 +678,9 @@ extension AdamantChatsProvider {
         case .richMessage(let payload):
             transactionLocaly = try await sendRichMessageLocaly(
                 richContent: payload.content(),
+                richContentSerialized: payload.serialized(),
                 richType: payload.type,
+                isReply: payload.isReply,
                 senderId: loggedAccount.address,
                 recipientId: recipientId,
                 keypair: keypair,
@@ -757,7 +764,9 @@ extension AdamantChatsProvider {
         case .richMessage(let payload):
             transactionLocaly = try await sendRichMessageLocaly(
                 richContent: payload.content(),
+                richContentSerialized: payload.serialized(),
                 richType: payload.type,
+                isReply: payload.isReply,
                 senderId: loggedAccount.address,
                 recipientId: recipientId,
                 keypair: keypair,
@@ -790,14 +799,15 @@ extension AdamantChatsProvider {
         from chatroom: Chatroom? = nil
     ) async throws -> ChatTransaction {
         let transaction = MessageTransaction(context: context)
+        let id = UUID().uuidString
         transaction.date = Date() as NSDate
         transaction.recipientId = recipientId
         transaction.senderId = senderId
         transaction.type = Int16(type.rawValue)
         transaction.isOutgoing = true
-        transaction.chatMessageId = UUID().uuidString
+        transaction.chatMessageId = id
         transaction.isMarkdown = isMarkdown
-        transaction.transactionId = UUID().uuidString
+        transaction.transactionId = id
         
         transaction.message = text
         
@@ -823,8 +833,10 @@ extension AdamantChatsProvider {
     }
     
     private func sendRichMessageLocaly(
-        richContent: [String:String],
+        richContent: [String: Any],
+        richContentSerialized: String,
         richType: String,
+        isReply: Bool,
         senderId: String,
         recipientId: String,
         keypair: Keypair,
@@ -832,17 +844,19 @@ extension AdamantChatsProvider {
         from chatroom: Chatroom? = nil
     ) async throws -> ChatTransaction {
         let type = ChatType.richMessage
-        
+        let id = UUID().uuidString
         let transaction = RichMessageTransaction(context: context)
         transaction.date = Date() as NSDate
         transaction.recipientId = recipientId
         transaction.senderId = senderId
         transaction.type = Int16(type.rawValue)
         transaction.isOutgoing = true
-        transaction.chatMessageId = UUID().uuidString
-        transaction.transactionId = UUID().uuidString
+        transaction.chatMessageId = id
+        transaction.transactionId = id
         transaction.richContent = richContent
         transaction.richType = richType
+        transaction.isReply = isReply
+        transaction.richContentSerialized = richContentSerialized
         
         transaction.transactionStatus = richProviders[richType] != nil ? .notInitiated : nil
         
@@ -1098,7 +1112,7 @@ extension AdamantChatsProvider {
             
             // Update ID with recieved, add to unconfirmed transactions.
             transaction.transactionId = String(id)
-            transaction.statusEnum = .delivered
+            transaction.statusEnum = .pending
             
             if let index = unconfirmedTransactionsBySignature.firstIndex(
                 of: signedTransaction.signature
@@ -1119,7 +1133,7 @@ extension AdamantChatsProvider {
                 throw ChatsProviderError.accountNotFound(recipientId)
             case .notLogged:
                 throw ChatsProviderError.notLogged
-            case .serverError(let e):
+            case .serverError(let e), .commonError(let e):
                 throw ChatsProviderError.serverError(AdamantError(message: e))
             case .internalError(let message, _):
                 throw ChatsProviderError.internalError(AdamantError(message: message))
@@ -1214,6 +1228,23 @@ extension AdamantChatsProvider {
             return nil
         }
     }
+    
+    /// Search transaction in local storage
+    ///
+    /// - Parameter id: Transacton ID
+    /// - Returns: Transaction, if found
+    func getBaseTransactionFromDB(id: String, context: NSManagedObjectContext) -> BaseTransaction? {
+        let request = NSFetchRequest<BaseTransaction>(entityName: "BaseTransaction")
+        request.predicate = NSPredicate(format: "transactionId == %@", String(id))
+        request.fetchLimit = 1
+        
+        do {
+            let result = try context.fetch(request)
+            return result.first
+        } catch {
+            return nil
+        }
+    }
 }
 
 // MARK: - Processing
@@ -1272,6 +1303,79 @@ extension AdamantChatsProvider {
             self.setState(.failedToUpdate(error), previous: .updating)
             throw error
         }
+    }
+    
+    func loadTransactionsUntilFound(
+        _ transactionId: String,
+        recipient: String
+    ) async throws {
+        guard let address = accountService.account?.address,
+              let privateKey = accountService.keypair?.privateKey
+        else {
+            throw ApiServiceError.accountNotFound
+        }
+        
+        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        context.parent = self.stack.container.viewContext
+        
+        guard getBaseTransactionFromDB(id: transactionId, context: context) == nil else { return }
+                
+        var transactions: [Transaction] = []
+        var offset = chatLoadedMessages[recipient] ?? 0
+        var needToRepeat = false
+        var isFound = false
+        
+        repeat {
+            let messages = try await apiGetChatMessages(
+                address: address,
+                addressRecipient: recipient,
+                offset: offset,
+                limit: chatTransactionsLimit
+            )?.messages
+            
+            guard let messages = messages else {
+                needToRepeat = false
+                break
+            }
+            
+            offset += messages.count
+            transactions.append(contentsOf: messages)
+            isFound = transactions.contains(where: { $0.id == UInt64(transactionId) })
+            needToRepeat = messages.count >= chatTransactionsLimit && !isFound
+        } while needToRepeat
+        
+        guard isFound else {
+            throw ApiServiceError.commonError(
+                message: String.adamantLocalized.reply.longUnknownMessageError
+            )
+        }
+        
+        chatLoadedMessages[recipient] = offset
+        
+        await process(
+            messageTransactions: transactions,
+            senderId: address,
+            privateKey: privateKey
+        )
+        
+        // MARK: Get more transactions
+        
+        let messages = try await apiGetChatMessages(
+            address: address,
+            addressRecipient: recipient,
+            offset: offset,
+            limit: chatTransactionsLimit
+        )?.messages
+        
+        guard let messages = messages, messages.count > 0 else { return }
+
+        chatLoadedMessages[recipient] = offset + messages.count
+        
+        await process(
+            messageTransactions: messages,
+            senderId: address,
+            privateKey: privateKey
+        )
     }
     
     /// - New unread messagess ids

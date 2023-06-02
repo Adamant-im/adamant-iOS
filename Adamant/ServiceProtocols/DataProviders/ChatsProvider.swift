@@ -197,6 +197,11 @@ protocol ChatsProvider: DataProvider, Actor {
     func isChatLoading(with addressRecipient: String) -> Bool
     func isChatLoaded(with addressRecipient: String) -> Bool
     
+    func loadTransactionsUntilFound(
+        _ transactionId: String,
+        recipient: String
+    )  async throws
+    
     /// Unread messages controller. Sections by chatroom.
     func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction>
     

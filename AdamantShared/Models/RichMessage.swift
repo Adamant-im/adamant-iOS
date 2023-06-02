@@ -10,10 +10,11 @@ import Foundation
 
 // MARK: - RichMessage
 
-protocol RichMessage: Codable {
+protocol RichMessage: Encodable {
     var type: String { get }
+    var isReply: Bool { get }
     
-    func content() -> [String:String]
+    func content() -> [String: Any]
     func serialized() -> String
 }
 
@@ -33,6 +34,69 @@ struct RichContentKeys {
     private init() {}
 }
 
+// MARK: - RichMessageReply
+
+struct RichMessageReply: RichMessage {
+    var type: String
+    var isReply: Bool
+    var replyto_id: String
+    var reply_message: String
+    
+    enum CodingKeys: String, CodingKey {
+        case replyto_id, reply_message
+    }
+    
+    init(replyto_id: String, reply_message: String) {
+        self.type = RichContentKeys.reply.reply
+        self.replyto_id = replyto_id
+        self.reply_message = reply_message
+        self.isReply = true
+    }
+    
+    func content() -> [String: Any] {
+        return [
+            RichContentKeys.reply.replyToId: replyto_id,
+            RichContentKeys.reply.replyMessage: reply_message
+        ]
+    }
+}
+
+struct RichTransferReply: RichMessage {
+    var type: String
+    var isReply: Bool
+    var replyto_id: String
+    var reply_message: [String: String]
+    
+    enum CodingKeys: String, CodingKey {
+        case replyto_id, reply_message
+    }
+    
+    init(
+        replyto_id: String,
+        type: String,
+        amount: Decimal,
+        hash: String,
+        comments: String
+    ) {
+        self.type = type
+        self.replyto_id = replyto_id
+        self.reply_message = [
+            RichMessageTransfer.CodingKeys.type.stringValue: type,
+            RichMessageTransfer.CodingKeys.amount.stringValue: RichMessageTransfer.serialize(balance: amount),
+            RichMessageTransfer.CodingKeys.hash.stringValue: hash,
+            RichMessageTransfer.CodingKeys.comments.stringValue: comments
+        ]
+        self.isReply = true
+    }
+    
+    func content() -> [String: Any] {
+        return [
+            RichContentKeys.reply.replyToId: replyto_id,
+            RichContentKeys.reply.replyMessage: reply_message
+        ]
+    }
+}
+
 // MARK: - RichMessageTransfer
 
 struct RichMessageTransfer: RichMessage {
@@ -40,8 +104,9 @@ struct RichMessageTransfer: RichMessage {
     let amount: Decimal
     let hash: String
     let comments: String
+    var isReply: Bool
     
-    func content() -> [String:String] {
+    func content() -> [String: Any] {
         return [
             CodingKeys.type.stringValue: type,
             CodingKeys.amount.stringValue: RichMessageTransfer.serialize(balance: amount),
@@ -55,6 +120,19 @@ struct RichMessageTransfer: RichMessage {
         self.amount = amount
         self.hash = hash
         self.comments = comments
+        self.isReply = false
+    }
+    
+    init?(content: [String: Any]) {
+        if let content = content[RichContentKeys.reply.replyMessage] as? [String: String] {
+            self.init(content: content)
+        } else {
+            guard let content = content as? [String: String] else {
+                return nil
+            }
+            
+            self.init(content: content)
+        }
     }
     
     init?(content: [String:String]) {
@@ -92,16 +170,23 @@ struct RichMessageTransfer: RichMessage {
         } else {
             self.comments = ""
         }
+        
+        self.isReply = false
     }
 }
 
 extension RichContentKeys {
-    struct transfer {
+    enum transfer {
         static let amount = "amount"
         static let hash = "hash"
         static let comments = "comments"
-        
-        private init() {}
+    }
+    
+    enum reply {
+        static let reply = "reply"
+        static let replyToId = "replyto_id"
+        static let replyMessage = "reply_message"
+        static let decodedReplyMessage = "decodedMessage"
     }
 }
 
@@ -135,6 +220,8 @@ extension RichMessageTransfer {
         } else {
             self.amount = 0
         }
+        
+        self.isReply = false
     }
 }
 

@@ -189,7 +189,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
             case .richMessage:
                 guard let data = message.data(using: String.Encoding.utf8),
                     let richContent = RichMessageTools.richContent(from: data),
-                    let key = richContent[RichContentKeys.type]?.lowercased(),
+                      let key = (richContent[RichContentKeys.type] as? String)?.lowercased(),
                     let p = richMessageProviders[key] else {
                         showError()
                         return
@@ -197,13 +197,15 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
                 
                 provider = p
                 
-                if let raw = richContent[RichContentKeys.transfer.comments], raw.count > 0 {
+                if let raw = richContent[RichContentKeys.transfer.comments] as? String,
+                   raw.count > 0 {
                     comments = raw
                 } else {
                     comments = nil
                 }
                 
-                if let raw = richContent[RichContentKeys.transfer.amount], let decimal = Decimal(string: raw) {
+                if let raw = richContent[RichContentKeys.transfer.amount] as? String,
+                   let decimal = Decimal(string: raw) {
                     amount = decimal
                 } else {
                     amount = 0

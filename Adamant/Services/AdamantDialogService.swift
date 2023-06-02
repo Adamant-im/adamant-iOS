@@ -157,7 +157,11 @@ extension AdamantDialogService {
         if let error = error as? RichError {
             showRichError(error: error)
         } else {
-            showError(withMessage: error.localizedDescription, supportEmail: true, error: error)
+            showError(
+                withMessage: error.localizedDescription,
+                supportEmail: true,
+                error: error
+            )
         }
     }
     

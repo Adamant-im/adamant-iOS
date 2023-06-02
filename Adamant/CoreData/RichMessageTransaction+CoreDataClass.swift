@@ -15,11 +15,7 @@ public class RichMessageTransaction: ChatTransaction {
     static let entityName = "RichMessageTransaction"
     
     override func serializedMessage() -> String? {
-        if let richContent = richContent, let data = try? JSONEncoder().encode(richContent), let raw = String(data: data, encoding: String.Encoding.utf8) {
-            return raw
-        } else {
-            return nil
-        }
+        return richContentSerialized
     }
     
     override var transactionStatus: TransactionStatus? {

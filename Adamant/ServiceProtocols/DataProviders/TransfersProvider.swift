@@ -155,7 +155,8 @@ protocol TransfersProvider: DataProvider, Actor {
     func transferFunds(
         toAddress recipient: String,
         amount: Decimal,
-        comment: String?
+        comment: String?,
+        replyToMessageId: String?
     ) async throws -> TransactionDetails
     
     // MARK: - Transactions

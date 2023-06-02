@@ -49,7 +49,13 @@ final class ChatViewModel: NSObject {
     private(set) var sender = ChatSender.default
     private(set) var chatroom: Chatroom?
     private(set) var chatTransactions: [ChatTransaction] = []
-    
+    private var tempCancellables = Set<AnyCancellable>()
+    private let minDiffCountForOffset = 5
+    private let minDiffCountForAnimateScroll = 20
+
+    var tempOffsets: [String] = []
+    var needToAnimateCellIndex: Int?
+
     let didTapTransfer = ObservableSender<String>()
     let dialog = ObservableSender<ChatDialog>()
     let didTapAdmChat = ObservableSender<(Chatroom, String?)>()
@@ -63,7 +69,11 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var isSendingAvailable = false
     @ObservableValue private(set) var fee = ""
     @ObservableValue private(set) var partnerName: String?
+    @ObservableValue private(set) var isNeedToAnimateScroll = false
+    @ObservableValue var swipeState: SwipeableView.State = .ended
     @ObservableValue var inputText = ""
+    @ObservableValue var replyMessage: MessageModel?
+    @ObservableValue var scrollToMessage: (toId: String?, fromId: String?)
     
     var startPosition: ChatStartPosition? {
         if let messageIdToShow = messageIdToShow {
@@ -189,11 +199,24 @@ final class ChatViewModel: NSObject {
         }
         
         Task {
-            let message: AdamantMessage = markdownParser.parse(text).length == text.count
-            ? .text(text)
-            : .markdownText(text)
+            let message: AdamantMessage
+            
+            if let replyMessage = replyMessage {
+                message = .richMessage(
+                    payload: RichMessageReply(
+                        replyto_id: replyMessage.id,
+                        reply_message: text
+                    )
+                )
+            } else {
+                message = markdownParser.parse(text).length == text.count
+                ? .text(text)
+                : .markdownText(text)
+            }
             
             guard await validateSendingMessage(message: message) else { return }
+            
+            replyMessage = nil
             
             do {
                 _ = try await chatsProvider.sendMessage(
@@ -346,6 +369,120 @@ final class ChatViewModel: NSObject {
                 }
             }
         }.stored(in: tasksStorage)
+    }
+    
+    func scroll(to message: ChatMessageReplyCell.Model) {
+        guard let partnerAddress = chatroom?.partner?.address else { return }
+        
+        Task {
+            do {
+                if !chatTransactions.contains(
+                    where: { $0.transactionId == message.replyId }
+                ) {
+                    dialog.send(.progress(true))
+                    try await chatsProvider.loadTransactionsUntilFound(
+                        message.replyId,
+                        recipient: partnerAddress
+                    )
+                }
+                
+                await waitForMessage(withId: message.replyId)
+                
+                scrollToMessage = (toId: message.replyId, fromId: message.id)
+                
+                dialog.send(.progress(false))
+            } catch {
+                print(error)
+                dialog.send(.progress(false))
+                dialog.send(.richError(error))
+            }
+        }.stored(in: tasksStorage)
+    }
+        
+    func waitForMessage(withId messageId: String) async {
+        guard !messages.contains(where: { $0.messageId == messageId }) else {
+            return
+        }
+        
+        await withUnsafeContinuation { continuation in
+            $messages
+                .filter { $0.contains(where: { $0.messageId == messageId }) }
+                .sink { [weak self] _ in
+                    self?.tempCancellables.removeAll()
+                    continuation.resume()
+                }.store(in: &tempCancellables)
+        }
+    }
+    
+    func replyMessageIfNeeded(_ messageModel: MessageModel?) {
+        let message = messages.first(where: { $0.messageId == messageModel?.id })
+        guard message?.status != .failed else {
+            dialog.send(.warning(String.adamantLocalized.reply.failedMessageError))
+            return
+        }
+        
+        guard message?.status != .pending else {
+            dialog.send(.warning(String.adamantLocalized.reply.pendingMessageError))
+            return
+        }
+        
+        replyMessage = messageModel
+    }
+    
+    func animateScrollIfNeeded(to messageIndex: Int, visibleIndex: Int?) {
+        guard let visibleIndex = visibleIndex else {  return }
+        
+        let max = max(visibleIndex, messageIndex)
+        let min = min(visibleIndex, messageIndex)
+        
+        guard (max - min) >= minDiffCountForAnimateScroll else {
+            isNeedToAnimateScroll = false
+            return
+        }
+        
+        isNeedToAnimateScroll = true
+    }
+    
+    func copyMessageAction(_ text: String) {
+        UIPasteboard.general.string = text
+        dialog.send(.toast(.adamantLocalized.alert.copiedToPasteboardNotification))
+    }
+    
+    func reportMessageAction(_ id: String) {
+        dialog.send(.reportMessageAlert(id: id))
+    }
+    
+    func removeMessageAction(_ id: String) {
+        dialog.send(.removeMessageAlert(id: id))
+    }
+}
+
+extension ChatViewModel {
+    func getTempOffset(visibleIndex: Int?) -> String? {
+        let lastId = tempOffsets.popLast()
+        
+        guard let visibleIndex = visibleIndex,
+              let index = messages.firstIndex(where: { $0.messageId == lastId })
+        else {
+            return lastId
+        }
+        
+        return index > visibleIndex ? lastId : nil
+    }
+    
+    func appendTempOffset(_ id: String, toId: String) {
+        guard let indexFrom = messages.firstIndex(where: { $0.messageId == id }),
+              let indexTo = messages.firstIndex(where: { $0.messageId == toId }),
+              (indexFrom - indexTo) >= minDiffCountForOffset
+        else {
+            return
+        }
+        
+        if let index = tempOffsets.firstIndex(of: id) {
+            tempOffsets.remove(at: index)
+        }
+        
+        tempOffsets.append(id)
     }
 }
 

@@ -12,8 +12,6 @@ import UIKit
 final class ChatMessagesCollectionView: MessagesCollectionView {
     private var currentIds = [String]()
     
-    var reportMessageAction: ((IndexPath) -> Void)?
-    var removeMessageAction: ((IndexPath) -> Void)?
     var fixedBottomOffset: CGFloat?
     
     var bottomOffset: CGFloat {
@@ -74,6 +72,10 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
             safely: safely
         )
     }
+    
+    func stopDecelerating() {
+        setContentOffset(contentOffset, animated: false)
+    }
 }
 
 private extension ChatMessagesCollectionView {
@@ -106,10 +108,6 @@ private extension ChatMessagesCollectionView {
         reloadData()
         layoutIfNeeded()
         currentIds = newIds
-    }
-    
-    func stopDecelerating() {
-        setContentOffset(contentOffset, animated: false)
     }
     
     func setVerticalContentOffset(_ offset: CGFloat, safely: Bool) {

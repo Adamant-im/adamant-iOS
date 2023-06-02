@@ -12,10 +12,6 @@ import Web3Core
 
 final class EthTransferViewController: TransferViewControllerBase {
     
-    // MARK: Dependencies
-    
-    private let chatsProvider: ChatsProvider
-    
     // MARK: Properties
     
     private var skipValueChange: Bool = false
@@ -23,33 +19,6 @@ final class EthTransferViewController: TransferViewControllerBase {
     static let invalidCharacters: CharacterSet = {
         CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789").inverted
     }()
-    
-    // MARK: - Init
-    
-    init(
-        accountService: AccountService,
-        accountsProvider: AccountsProvider,
-        dialogService: DialogService,
-        router: Router,
-        currencyInfoService: CurrencyInfoService,
-        increaseFeeService: IncreaseFeeService,
-        chatsProvider: ChatsProvider
-    ) {
-        self.chatsProvider = chatsProvider
-        
-        super.init(
-            accountService: accountService,
-            accountsProvider: accountsProvider,
-            dialogService: dialogService,
-            router: router,
-            currencyInfoService: currencyInfoService,
-            increaseFeeService: increaseFeeService
-        )
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
     
     // MARK: Send
     
@@ -247,20 +216,6 @@ final class EthTransferViewController: TransferViewControllerBase {
         }
         
         return row
-    }
-    
-    func reportTransferTo(
-        admAddress: String,
-        amount: Decimal,
-        comments: String,
-        hash: String
-    ) async throws {
-        let payload = RichMessageTransfer(type: EthWalletService.richMessageType, amount: amount, hash: hash, comments: comments)
-        
-        let message = AdamantMessage.richMessage(payload: payload)
-        
-        chatsProvider.removeChatPositon(for: admAddress)
-        _ = try await chatsProvider.sendMessage(message, recipientId: admAddress)
     }
     
     override func defaultSceneTitle() -> String? {

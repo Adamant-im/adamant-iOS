@@ -135,6 +135,7 @@ class TransferViewControllerBase: FormViewController {
     let router: Router
     let currencyInfoService: CurrencyInfoService
     var increaseFeeService: IncreaseFeeService
+    var chatsProvider: ChatsProvider
     
     // MARK: - Properties
     
@@ -143,6 +144,7 @@ class TransferViewControllerBase: FormViewController {
     var commentsEnabled: Bool = false
     var rootCoinBalance: Decimal?
     var isNeedAddFeeToTotal: Bool { true }
+    var replyToMessageId: String?
     
     var service: WalletServiceWithSend? {
         didSet {
@@ -263,6 +265,7 @@ class TransferViewControllerBase: FormViewController {
     // MARK: - Init
     
     init(
+        chatsProvider: ChatsProvider,
         accountService: AccountService,
         accountsProvider: AccountsProvider,
         dialogService: DialogService,
@@ -276,8 +279,9 @@ class TransferViewControllerBase: FormViewController {
         self.router = router
         self.currencyInfoService = currencyInfoService
         self.increaseFeeService = increaseFeeService
-        
-        super.init(style: .grouped)
+        self.chatsProvider = chatsProvider
+		
+        super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -836,6 +840,42 @@ class TransferViewControllerBase: FormViewController {
         }
         
         return true
+	}
+
+    /// Report transfer
+    func reportTransferTo(
+        admAddress: String,
+        amount: Decimal,
+        comments: String,
+        hash: String
+    ) async throws {
+        guard let richMessageType = (service as? RichMessageProvider)?.dynamicRichMessageType else {
+            return
+        }
+        
+        let message: AdamantMessage
+        
+        if let replyToMessageId = replyToMessageId {
+            let payload = RichTransferReply(
+                replyto_id: replyToMessageId,
+                type: richMessageType,
+                amount: amount,
+                hash: hash,
+                comments: comments
+            )
+            message = AdamantMessage.richMessage(payload: payload)
+        } else {
+            let payload = RichMessageTransfer(
+                type: richMessageType,
+                amount: amount,
+                hash: hash,
+                comments: comments
+            )
+            message = AdamantMessage.richMessage(payload: payload)
+        }
+        
+        chatsProvider.removeChatPositon(for: admAddress)
+        _ = try await chatsProvider.sendMessage(message, recipientId: admAddress)
     }
     
     // MARK: - Abstract

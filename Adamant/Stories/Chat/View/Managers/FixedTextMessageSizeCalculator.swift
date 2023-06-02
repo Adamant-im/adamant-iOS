@@ -10,6 +10,22 @@
  import MessageKit
 
  final class FixedTextMessageSizeCalculator: MessageSizeCalculator {
+     private let getCurrentSender: () -> SenderType
+     private let getMessages: () -> [ChatMessage]
+     private let messagesFlowLayout: MessagesCollectionViewFlowLayout
+     
+     init(
+         layout: MessagesCollectionViewFlowLayout,
+         getCurrentSender: @escaping () -> SenderType,
+         getMessages: @escaping () -> [ChatMessage]
+     ) {
+         self.getMessages = getMessages
+         self.getCurrentSender = getCurrentSender
+         self.messagesFlowLayout = layout
+         super.init()
+         self.layout = layout
+     }
+     
      override func messageContainerMaxWidth(
          for message: MessageType,
          at indexPath: IndexPath
@@ -22,26 +38,42 @@
      override func messageContainerSize(for message: MessageType, at indexPath: IndexPath) -> CGSize {
          let maxWidth = messageContainerMaxWidth(for: message, at: indexPath)
 
-         var messageContainerSize: CGSize
-         let attributedText: NSAttributedString
-
-         let textMessageKind = message.kind.textMessageKind
-         switch textMessageKind {
-         case .attributedText(let text):
-             attributedText = text
-         case .text(let text), .emoji(let text):
-             attributedText = NSAttributedString(string: text, attributes: [.font: messageLabelFont])
-         default:
-             assertionFailure("messageContainerSize received unhandled MessageDataType: \(message.kind)")
-             return .zero
-         }
-
-         messageContainerSize = labelSize(for: attributedText, considering: maxWidth)
-
+         var messageContainerSize: CGSize = .zero
          let messageInsets = messageLabelInsets(for: message)
-         messageContainerSize.width += messageInsets.horizontal
-         messageContainerSize.height += messageInsets.vertical
 
+         if case let .message(model) = getMessages()[indexPath.section].fullModel.content {
+             messageContainerSize = labelSize(for: model.value.text, considering: maxWidth)
+             messageContainerSize.width += messageInsets.horizontal
+             messageContainerSize.height += messageInsets.vertical
+         }
+         
+         if case let .reply(model) = getMessages()[indexPath.section].fullModel.content {
+             let contentViewHeight = model.value.contentHeight(for: messageContainerSize.width)
+             
+             let attributedText: NSAttributedString
+
+             let textMessageKind = message.kind.textMessageKind
+             switch textMessageKind {
+             case .attributedText(let text):
+                 attributedText = text
+             case .text(let text), .emoji(let text):
+                 attributedText = NSAttributedString(string: text, attributes: [.font: messageLabelFont])
+             default:
+                 assertionFailure("messageContainerSize received unhandled MessageDataType: \(message.kind)")
+                 return .zero
+             }
+             
+             messageContainerSize = labelSize(for: attributedText, considering: maxWidth)
+             messageContainerSize.width += messageInsets.horizontal
+             messageContainerSize.height = contentViewHeight
+         }
+         
+         if case let .transaction(model) = getMessages()[indexPath.section].fullModel.content {
+             let contentViewHeight = model.value.height(for: maxWidth)
+             messageContainerSize.width += messageInsets.horizontal
+             messageContainerSize.height = contentViewHeight
+         }
+         
          return messageContainerSize
      }
 

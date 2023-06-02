@@ -439,7 +439,7 @@ private extension AdamantApiService {
                         onFailure: onFailure,
                         completion: completion
                     )
-                case .accountNotFound, .internalError, .notLogged, .serverError, .requestCancelled:
+                case .accountNotFound, .internalError, .notLogged, .serverError, .requestCancelled, .commonError:
                     completion(result)
                 }
             }

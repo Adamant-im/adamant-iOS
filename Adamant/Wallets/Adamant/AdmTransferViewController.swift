@@ -94,10 +94,20 @@ final class AdmTransferViewController: TransferViewControllerBase {
     }
     
     @MainActor
-    private func sendFundsInternal(service: AdmWalletService, recipient: String, amount: Decimal, comments: String) {
+    private func sendFundsInternal(
+        service: AdmWalletService,
+        recipient: String,
+        amount: Decimal,
+        comments: String
+    ) {
         Task {
             do {
-                let result = try await service.sendMoney(recipient: recipient, amount: amount, comments: comments)
+                let result = try await service.sendMoney(
+                    recipient: recipient,
+                    amount: amount,
+                    comments: comments,
+                    replyToMessageId: replyToMessageId
+                )
                 
                 service.update()
                 dialogService.dismissProgress()

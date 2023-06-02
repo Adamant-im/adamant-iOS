@@ -13,6 +13,54 @@ import MessageKit
 struct ChatMessageFactory {
     private let richMessageProviders: [String: RichMessageProvider]
     
+    static let markdownParser = MarkdownParser(
+        font: .adamantChatDefault,
+        color: .adamant.primary,
+        enabledElements: [
+            .header,
+            .list,
+            .quote,
+            .bold,
+            .italic,
+            .strikethrough
+        ],
+        customElements: [
+            MarkdownSimpleAdm(),
+            MarkdownLinkAdm(),
+            MarkdownAdvancedAdm(
+                font: .adamantChatDefault,
+                color: .adamant.active
+            ),
+            MarkdownCodeAdamant(
+                font: .adamantCodeDefault,
+                textHighlightColor: .adamant.codeBlockText,
+                textBackgroundColor: .adamant.codeBlock
+            )
+        ]
+    )
+    
+    static let markdownReplyParser = MarkdownParser(
+        font: .adamantChatReplyDefault,
+        color: .adamant.primary,
+        enabledElements: [
+            .header,
+            .list,
+            .quote,
+            .bold,
+            .italic,
+            .code,
+            .strikethrough
+        ],
+        customElements: [
+            MarkdownSimpleAdm(),
+            MarkdownLinkAdm(),
+            MarkdownAdvancedAdm(
+                font: .adamantChatDefault,
+                color: .adamant.active
+            )
+        ]
+    )
+    
     init(richMessageProviders: [String: RichMessageProvider]) {
         self.richMessageProviders = richMessageProviders
     }
@@ -63,32 +111,6 @@ struct ChatMessageFactory {
 }
 
 private extension ChatMessageFactory {
-    static let markdownParser = MarkdownParser(
-        font: .adamantChatDefault,
-        color: .adamant.primary,
-        enabledElements: [
-            .header,
-            .list,
-            .quote,
-            .bold,
-            .italic,
-            .strikethrough
-        ],
-        customElements: [
-            MarkdownSimpleAdm(),
-            MarkdownLinkAdm(),
-            MarkdownAdvancedAdm(
-                font: .adamantChatDefault,
-                color: .adamant.active
-            ),
-            MarkdownCodeAdamant(
-                font: .adamantCodeDefault,
-                textHighlightColor: .adamant.codeBlockText,
-                textBackgroundColor: .adamant.codeBlock
-            )
-        ]
-    )
-    
     func makeContent(
         _ transaction: ChatTransaction,
         isFromCurrentSender: Bool,
@@ -96,8 +118,20 @@ private extension ChatMessageFactory {
     ) -> ChatMessage.Content {
         switch transaction {
         case let transaction as MessageTransaction:
-            return makeContent(transaction)
+            return makeContent(
+                transaction,
+                backgroundColor: backgroundColor
+            )
         case let transaction as RichMessageTransaction:
+            if transaction.isReply,
+               !transaction.isTransferReply() {
+                return makeReplyContent(
+                    transaction,
+                    isFromCurrentSender: isFromCurrentSender,
+                    backgroundColor: backgroundColor
+                )
+            }
+            
             return makeContent(
                 transaction,
                 isFromCurrentSender: isFromCurrentSender,
@@ -114,9 +148,12 @@ private extension ChatMessageFactory {
         }
     }
     
-    func makeContent(_ transaction: MessageTransaction) -> ChatMessage.Content {
-        return transaction.message.map {
-            let attributedString = Self.markdownParser.parse($0)
+    func makeContent(
+        _ transaction: MessageTransaction,
+        backgroundColor: ChatMessageBackgroundColor
+    ) -> ChatMessage.Content {
+        transaction.message.map {
+			let attributedString = Self.markdownParser.parse($0)
             
             let mutableAttributedString = NSMutableAttributedString(attributedString: attributedString)
             let paragraphStyle = NSMutableParagraphStyle()
@@ -126,9 +163,39 @@ private extension ChatMessageFactory {
                 value: paragraphStyle,
                 range: NSRange(location: 0, length: attributedString.length)
             )
-
-            return .message(.init(string: mutableAttributedString))
+            
+            return .message(.init(
+                value: .init(
+                    id: transaction.txId,
+                    text: mutableAttributedString,
+                    backgroundColor: backgroundColor)
+            ))
         } ?? .default
+    }
+    
+    func makeReplyContent(
+        _ transaction: RichMessageTransaction,
+        isFromCurrentSender: Bool,
+        backgroundColor: ChatMessageBackgroundColor
+    ) -> ChatMessage.Content {
+        guard let replyId = transaction.getRichValue(for: RichContentKeys.reply.replyToId),
+              let replyMessage = transaction.getRichValue(for: RichContentKeys.reply.replyMessage)
+        else {
+            return .default
+        }
+        
+        let decodedMessage = transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) ?? "..."
+        let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
+        
+        return .reply(.init(
+            value: .init(
+            id: transaction.txId,
+            replyId: replyId,
+            message: Self.markdownParser.parse(replyMessage),
+            messageReply: decodedMessageMarkDown,
+            backgroundColor: backgroundColor,
+            isFromCurrentSender: isFromCurrentSender)
+        ))
     }
     
     func makeContent(
@@ -138,6 +205,10 @@ private extension ChatMessageFactory {
     ) -> ChatMessage.Content {
         guard let transfer = transaction.transfer else { return .default }
         let id = transaction.chatMessageId ?? ""
+        
+        let decodedMessage = transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) ?? "..."
+        let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
+        let replyId = transaction.getRichValue(for: RichContentKeys.reply.replyToId) ?? ""
         
         return .transaction(.init(value: .init(
             id: id,
@@ -152,7 +223,10 @@ private extension ChatMessageFactory {
                 currency: richMessageProviders[transfer.type]?.tokenSymbol ?? "",
                 date: transaction.sentDate?.humanizedDateTime(withWeekday: false) ?? "",
                 comment: transfer.comments,
-                backgroundColor: backgroundColor
+                backgroundColor: backgroundColor,
+                isReply: transaction.isTransferReply(),
+                replyMessage: decodedMessageMarkDown,
+                replyId: replyId
             ),
             status: transaction.transactionStatus ?? .notInitiated
         )))
@@ -164,6 +238,10 @@ private extension ChatMessageFactory {
         backgroundColor: ChatMessageBackgroundColor
     ) -> ChatMessage.Content {
         let id = transaction.chatMessageId ?? ""
+        
+        let decodedMessage = transaction.decodedReplyMessage ?? "..."
+        let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
+        let replyId = transaction.replyToId ?? ""
         
         return .transaction(.init(value: .init(
             id: id,
@@ -180,7 +258,10 @@ private extension ChatMessageFactory {
                 currency: AdmWalletService.currencySymbol,
                 date: transaction.sentDate?.humanizedDateTime(withWeekday: false) ?? "",
                 comment: transaction.comment,
-                backgroundColor: backgroundColor
+                backgroundColor: backgroundColor,
+                isReply: !replyId.isEmpty,
+                replyMessage: decodedMessageMarkDown,
+                replyId: replyId
             ),
             status: transaction.statusEnum.toTransactionStatus()
         )))

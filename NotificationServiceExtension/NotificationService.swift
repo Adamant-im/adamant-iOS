@@ -146,7 +146,7 @@ class NotificationService: UNNotificationServiceExtension {
             case .richMessage:
                 guard let data = message.data(using: String.Encoding.utf8),
                     let richContent = RichMessageTools.richContent(from: data),
-                    let key = richContent[RichContentKeys.type]?.lowercased(),
+                      let key = (richContent[RichContentKeys.type] as? String)?.lowercased(),
                     let provider = richMessageProviders[key],
                     let content = provider.notificationContent(for: transaction, partnerAddress: partnerAddress, partnerName: partnerName, richContent: richContent)
                 else {

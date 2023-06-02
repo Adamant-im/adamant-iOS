@@ -9,4 +9,10 @@
 enum ChatAction {
     case forceUpdateTransactionStatus(id: String)
     case openTransactionDetails(id: String)
+    case reply(message: MessageModel)
+    case scrollTo(message: ChatMessageReplyCell.Model)
+    case swipeState(state: SwipeableView.State)
+    case copy(text: String)
+    case report(id: String)
+    case remove(id: String)
 }

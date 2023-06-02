@@ -43,6 +43,25 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
         return stack
     }()
     
+    private lazy var swipeView: SwipeableView = {
+        let view = SwipeableView(frame: .zero, view: self)
+        return view
+    }()
+    
+    private lazy var chatMenuManager: ChatMenuManager = {
+        let manager = ChatMenuManager(
+            menu: makeContextMenu(),
+            backgroundColor: nil
+        )
+        return manager
+    }()
+    
+    var isSelected: Bool = false {
+        didSet {
+            contentView.isSelected = isSelected
+        }
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -63,11 +82,28 @@ extension ChatTransactionContainerView: ReusableView {
 
 private extension ChatTransactionContainerView {
     func configure() {
+        addSubview(swipeView)
+        swipeView.snp.makeConstraints { make in
+            make.directionalEdges.equalToSuperview()
+        }
+        
         addSubview(horizontalStack)
         horizontalStack.snp.makeConstraints {
             $0.top.bottom.equalToSuperview()
             $0.leading.trailing.equalToSuperview().inset(12)
         }
+        
+        swipeView.didSwipeAction = { [weak self] in
+            guard let self = self else { return }
+            self.actionHandler(.reply(message: self.model))
+        }
+        
+        swipeView.swipeStateAction = { [weak self] state in
+            self?.actionHandler(.swipeState(state: state))
+        }
+        
+        let interaction = UIContextMenuInteraction(delegate: chatMenuManager)
+        contentView.addInteraction(interaction)
     }
     
     func update() {
@@ -122,5 +158,34 @@ private extension TransactionStatus {
         case .success: return .adamant.active
         case .failed, .inconsistent: return .adamant.alert
         }
+    }
+}
+
+extension ChatTransactionContainerView {
+    func makeContextMenu() -> UIMenu {
+        let remove = UIAction(
+            title: .adamantLocalized.chat.remove,
+            image: UIImage(systemName: "trash"),
+            attributes: .destructive
+        ) { _ in
+            self.actionHandler(.remove(id: self.model.id))
+        }
+        
+        let report = UIAction(
+            title: .adamantLocalized.chat.report,
+            image: UIImage(systemName: "exclamationmark.bubble")
+        ) { _ in
+            self.actionHandler(.report(id: self.model.id))
+        }
+        
+        let reply = UIAction(
+            title: .adamantLocalized.chat.reply,
+            image: UIImage(systemName: "arrowshape.turn.up.left")
+        ) { [weak self] _ in
+            guard let self = self else { return }
+            Task { self.actionHandler(.reply(message: self.model)) }
+        }
+        
+        return UIMenu(title: "", children: [reply, report, remove])
     }
 }

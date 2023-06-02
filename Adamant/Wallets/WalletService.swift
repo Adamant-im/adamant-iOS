@@ -120,7 +120,7 @@ extension ApiServiceError {
         case .requestCancelled:
             return .requestCancelled
             
-        case .serverError, .internalError:
+        case .serverError, .internalError, .commonError:
             return .apiError(self)
         }
     }
@@ -264,6 +264,7 @@ protocol WalletServiceWithSend: WalletService {
     var transactionFeeUpdated: Notification.Name { get }
     
     var qqPrefix: String { get }
+    var richMessageType: String { get }
     var blockchainSymbol: String { get }
     var isDynamicFee : Bool { get }
     var diplayTransactionFee : Decimal { get }
@@ -308,7 +309,8 @@ protocol WalletServiceSimpleSend: WalletServiceWithSend {
     func sendMoney(
         recipient: String,
         amount: Decimal,
-        comments: String
+        comments: String,
+        replyToMessageId: String?
     ) async throws -> TransactionDetails
 }
 

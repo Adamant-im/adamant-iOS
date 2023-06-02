@@ -11,10 +11,6 @@ import Eureka
 
 final class BtcTransferViewController: TransferViewControllerBase {
     
-    // MARK: Dependencies
-    
-    private let chatsProvider: ChatsProvider
-    
     // MARK: Properties
     
     override var balanceFormatter: NumberFormatter {
@@ -28,33 +24,6 @@ final class BtcTransferViewController: TransferViewControllerBase {
     private var skipValueChange: Bool = false
     
     static let invalidCharacters: CharacterSet = CharacterSet.decimalDigits.inverted
-    
-    // MARK: - Init
-    
-    init(
-        accountService: AccountService,
-        accountsProvider: AccountsProvider,
-        dialogService: DialogService,
-        router: Router,
-        currencyInfoService: CurrencyInfoService,
-        increaseFeeService: IncreaseFeeService,
-        chatsProvider: ChatsProvider
-    ) {
-        self.chatsProvider = chatsProvider
-        
-        super.init(
-            accountService: accountService,
-            accountsProvider: accountsProvider,
-            dialogService: dialogService,
-            router: router,
-            currencyInfoService: currencyInfoService,
-            increaseFeeService: increaseFeeService
-        )
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
     
     // MARK: Send
     
@@ -212,18 +181,8 @@ final class BtcTransferViewController: TransferViewControllerBase {
         return row
     }
     
-    func reportTransferTo(
-        admAddress: String,
-        amount: Decimal,
-        comments: String,
-        hash: String
-    ) async throws {
-        let payload = RichMessageTransfer(type: BtcWalletService.richMessageType, amount: amount, hash: hash, comments: comments)
-        
-        let message = AdamantMessage.richMessage(payload: payload)
-        
-        _ = try await chatsProvider.sendMessage(message, recipientId: admAddress)
-    }
+    
+    
     
     override func defaultSceneTitle() -> String? {
         return String.adamantLocalized.sendBtc
