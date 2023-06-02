@@ -101,14 +101,11 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let address = walletService.wallet?.address
+        guard let address = walletService.wallet?.address else { return }
         
         tableView.deselectRow(at: indexPath, animated: true)
-        let hash = transactions[indexPath.row].hash
         
-        guard let dialogService = dialogService else {
-            return
-        }
+        let transaction = transactions[indexPath.row]
         
         guard let vc = router.get(scene: AdamantScene.Wallets.ERC20.transactionDetails) as? ERC20TransactionDetailsViewController else {
             fatalError("Failed to get ERC20TransactionDetailsViewController")
@@ -116,28 +113,32 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
         
         vc.service = walletService
         
-        dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
+        let isOutgoing: Bool = transaction.to != address
         
-        Task {
-            do {
-                let ethTransaction = try await walletService.getTransaction(by: hash)
-                dialogService.dismissProgress()
-                vc.transaction = ethTransaction
-                
-                if let address = address {
-                    if ethTransaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
-                        vc.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                    } else if ethTransaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
-                        vc.recipientName = String.adamantLocalized.transactionDetails.yourAddress
-                    }
-                }
-                
-                navigationController?.pushViewController(vc, animated: true)
-            } catch {
-                dialogService.dismissProgress()
-                dialogService.showRichError(error: error)
-            }
-        }.stored(in: taskManager)
+        let emptyTransaction = SimpleTransactionDetails(
+            txId: transaction.hash,
+            senderAddress: transaction.from,
+            recipientAddress: transaction.to,
+            dateValue: nil,
+            amountValue: transaction.value,
+            feeValue: nil,
+            confirmationsValue: nil,
+            blockValue: nil,
+            isOutgoing: isOutgoing,
+            transactionStatus: nil
+        )
+        
+        vc.transaction = emptyTransaction
+        
+        if emptyTransaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
+            vc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+        }
+        
+        if emptyTransaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
+            vc.recipientName = String.adamantLocalized.transactionDetails.yourAddress
+        }
+        
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
