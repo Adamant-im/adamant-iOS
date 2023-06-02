@@ -239,6 +239,9 @@ class TransferViewControllerBase: FormViewController {
         return accessory
     }
     
+    private let inactiveBaseColor = UIColor.gray.withAlphaComponent(0.5)
+    private let activeBaseColor = UIColor.adamant.primary
+    
     // MARK: - QR Reader
     
     lazy var qrReader: QRCodeReaderViewController = {
@@ -568,7 +571,17 @@ class TransferViewControllerBase: FormViewController {
     }
     
     func markRow(_ row: BaseRowType, valid: Bool) {
-        row.baseCell.textLabel?.textColor = valid ? UIColor.adamant.primary : UIColor.adamant.alert
+        row.baseCell.textLabel?.textColor = valid
+        ? getBaseColor(for: row.tag)
+        : UIColor.adamant.alert
+    }
+    
+    func getBaseColor(for tag: String?) -> UIColor {
+        guard let tag = tag,
+              tag == BaseRows.fee.tag
+        else { return activeBaseColor }
+        
+        return inactiveBaseColor
     }
 
     func markAddres(isValid: Bool) {
@@ -970,12 +983,22 @@ extension TransferViewControllerBase {
                 $0.tag = BaseRows.increaseFee.tag
                 $0.title = BaseRows.increaseFee.localized
                 $0.value = self?.service?.isIncreaseFeeEnabled ?? false
+            }.cellUpdate { [weak self] (cell, row) in
+                cell.switchControl.onTintColor = UIColor.adamant.active
+                cell.textLabel?.textColor = row.value == true
+                ? self?.activeBaseColor
+                : self?.inactiveBaseColor
             }.onChange { [weak self] row in
                 guard let id = self?.service?.tokenUnicID,
                       let value = row.value
                 else {
                     return
                 }
+                
+                row.cell.textLabel?.textColor = value
+                ? self?.activeBaseColor
+                : self?.inactiveBaseColor
+                
                 self?.increaseFeeService.setIncreaseFeeEnabled(for: id, value: value)
                 self?.service?.update()
             }

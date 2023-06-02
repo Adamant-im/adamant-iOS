@@ -32,6 +32,10 @@ extension BigUInt {
         }
     }
     
+    func asDouble() -> Double {
+        return Double(string: String(self)) ?? 0
+    }
+    
     func toWei() -> BigUInt {
         return BigUInt(self * 1_000_000_000)
     }
