@@ -69,7 +69,7 @@
          }
          
          if case let .transaction(model) = getMessages()[indexPath.section].fullModel.content {
-             let contentViewHeight = model.value.height(for: messagesFlowLayout.itemWidth)
+             let contentViewHeight = model.value.height(for: maxWidth)
              messageContainerSize.width += messageInsets.horizontal
              messageContainerSize.height = contentViewHeight
          }
