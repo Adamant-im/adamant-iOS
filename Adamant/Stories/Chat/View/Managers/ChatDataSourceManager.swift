@@ -137,7 +137,6 @@ final class ChatDataSourceManager: MessagesDataSource {
         }
         
         cell.wrappedView.model = model.value
-        cell.wrappedView.configureColor()
         
         cell.wrappedView.actionHandler = { [weak self] in self?.handleAction($0) }
         cell.wrappedView.setSubscription(publisher: publisher)

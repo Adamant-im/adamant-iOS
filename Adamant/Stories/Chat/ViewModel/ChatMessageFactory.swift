@@ -70,8 +70,7 @@ struct ChatMessageFactory {
         expireDate: inout Date?,
         currentSender: SenderType,
         dateHeaderOn: Bool,
-        topSpinnerOn: Bool,
-        animationId: String
+        topSpinnerOn: Bool
     ) -> ChatMessage {
         let sentDate = transaction.sentDate ?? .now
         let senderModel = ChatSender(transaction: transaction)
@@ -95,8 +94,7 @@ struct ChatMessageFactory {
             content: makeContent(
                 transaction,
                 isFromCurrentSender: currentSender.senderId == senderModel.senderId,
-                backgroundColor: backgroundColor,
-                animationId: animationId
+                backgroundColor: backgroundColor
             ),
             backgroundColor: backgroundColor,
             bottomString: makeBottomString(
@@ -116,15 +114,13 @@ private extension ChatMessageFactory {
     func makeContent(
         _ transaction: ChatTransaction,
         isFromCurrentSender: Bool,
-        backgroundColor: ChatMessageBackgroundColor,
-        animationId: String
+        backgroundColor: ChatMessageBackgroundColor
     ) -> ChatMessage.Content {
         switch transaction {
         case let transaction as MessageTransaction:
             return makeContent(
                 transaction,
-                backgroundColor: backgroundColor,
-                animationId: animationId
+                backgroundColor: backgroundColor
             )
         case let transaction as RichMessageTransaction:
             if transaction.isReply,
@@ -132,23 +128,20 @@ private extension ChatMessageFactory {
                 return makeReplyContent(
                     transaction,
                     isFromCurrentSender: isFromCurrentSender,
-                    backgroundColor: backgroundColor,
-                    animationId: animationId
+                    backgroundColor: backgroundColor
                 )
             }
             
             return makeContent(
                 transaction,
                 isFromCurrentSender: isFromCurrentSender,
-                backgroundColor: backgroundColor,
-                animationId: animationId
+                backgroundColor: backgroundColor
             )
         case let transaction as TransferTransaction:
             return makeContent(
                 transaction,
                 isFromCurrentSender: isFromCurrentSender,
-                backgroundColor: backgroundColor,
-                animationId: animationId
+                backgroundColor: backgroundColor
             )
         default:
             return .default
@@ -157,8 +150,7 @@ private extension ChatMessageFactory {
     
     func makeContent(
         _ transaction: MessageTransaction,
-        backgroundColor: ChatMessageBackgroundColor,
-        animationId: String
+        backgroundColor: ChatMessageBackgroundColor
     ) -> ChatMessage.Content {
         transaction.message.map {
 			let attributedString = Self.markdownParser.parse($0)
@@ -176,7 +168,6 @@ private extension ChatMessageFactory {
                 value: .init(
                     id: transaction.txId,
                     text: mutableAttributedString,
-                    animationId: animationId,
                     backgroundColor: backgroundColor)
             ))
         } ?? .default
@@ -185,8 +176,7 @@ private extension ChatMessageFactory {
     func makeReplyContent(
         _ transaction: RichMessageTransaction,
         isFromCurrentSender: Bool,
-        backgroundColor: ChatMessageBackgroundColor,
-        animationId: String
+        backgroundColor: ChatMessageBackgroundColor
     ) -> ChatMessage.Content {
         guard let replyId = transaction.getRichValue(for: RichContentKeys.reply.replyToId),
               let replyMessage = transaction.getRichValue(for: RichContentKeys.reply.replyMessage)
@@ -204,7 +194,6 @@ private extension ChatMessageFactory {
             message: Self.markdownParser.parse(replyMessage),
             messageReply: decodedMessageMarkDown,
             backgroundColor: backgroundColor,
-            animationId: animationId,
             isFromCurrentSender: isFromCurrentSender)
         ))
     }
@@ -212,8 +201,7 @@ private extension ChatMessageFactory {
     func makeContent(
         _ transaction: RichMessageTransaction,
         isFromCurrentSender: Bool,
-        backgroundColor: ChatMessageBackgroundColor,
-        animationId: String
+        backgroundColor: ChatMessageBackgroundColor
     ) -> ChatMessage.Content {
         guard let transfer = transaction.transfer else { return .default }
         let id = transaction.chatMessageId ?? ""
@@ -236,7 +224,6 @@ private extension ChatMessageFactory {
                 date: transaction.sentDate?.humanizedDateTime(withWeekday: false) ?? "",
                 comment: transfer.comments,
                 backgroundColor: backgroundColor,
-                animationId: animationId,
                 isReply: transaction.isTransferReply(),
                 replyMessage: decodedMessageMarkDown,
                 replyId: replyId
@@ -248,8 +235,7 @@ private extension ChatMessageFactory {
     func makeContent(
         _ transaction: TransferTransaction,
         isFromCurrentSender: Bool,
-        backgroundColor: ChatMessageBackgroundColor,
-        animationId: String
+        backgroundColor: ChatMessageBackgroundColor
     ) -> ChatMessage.Content {
         let id = transaction.chatMessageId ?? ""
         
@@ -273,7 +259,6 @@ private extension ChatMessageFactory {
                 date: transaction.sentDate?.humanizedDateTime(withWeekday: false) ?? "",
                 comment: transaction.comment,
                 backgroundColor: backgroundColor,
-                animationId: animationId,
                 isReply: !replyId.isEmpty,
                 replyMessage: decodedMessageMarkDown,
                 replyId: replyId

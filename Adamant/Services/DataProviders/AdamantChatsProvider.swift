@@ -597,7 +597,7 @@ extension AdamantChatsProvider {
                 case .accountNotFound:
                     err = .accountNotFound(address)
                     
-                case .serverError, .baseError:
+                case .serverError, .commonError:
                     err = .serverError(error)
                     
                 case .internalError(let message, _):
@@ -1133,7 +1133,7 @@ extension AdamantChatsProvider {
                 throw ChatsProviderError.accountNotFound(recipientId)
             case .notLogged:
                 throw ChatsProviderError.notLogged
-            case .serverError(let e), .baseError(let e):
+            case .serverError(let e), .commonError(let e):
                 throw ChatsProviderError.serverError(AdamantError(message: e))
             case .internalError(let message, _):
                 throw ChatsProviderError.internalError(AdamantError(message: message))
@@ -1305,7 +1305,7 @@ extension AdamantChatsProvider {
         }
     }
     
-    func loadTransactionsUntilFind(
+    func loadTransactionsUntilFound(
         _ transactionId: String,
         recipient: String
     ) async throws {
@@ -1345,7 +1345,7 @@ extension AdamantChatsProvider {
         } while needToRepeat
         
         guard isFound else {
-            throw ApiServiceError.baseError(
+            throw ApiServiceError.commonError(
                 message: String.adamantLocalized.reply.longUnknownMessageError
             )
         }

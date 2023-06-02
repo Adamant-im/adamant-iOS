@@ -46,7 +46,7 @@ extension String.adamantLocalized {
         static let networkError = NSLocalizedString("Error.NoNetwork", comment: "Shared error: Network problems. In most cases - no connection")
         static let requestCancelled = NSLocalizedString("Error.RequestCancelled", comment: "Shared error: Request cancelled")
         
-        static func baseError(_ text: String) -> String {
+        static func commonError(_ text: String) -> String {
             return String.localizedStringWithFormat(
                 NSLocalizedString(
                     "Error.BaseErrorFormat",

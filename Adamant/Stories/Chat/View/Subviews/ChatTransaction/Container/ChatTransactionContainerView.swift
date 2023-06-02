@@ -71,10 +71,6 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
         super.init(coder: coder)
         configure()
     }
-    
-    func configureColor() {
-        contentView.backgroundColor = model.content.backgroundColor.uiColor
-    }
 }
 
 extension ChatTransactionContainerView: ReusableView {
@@ -88,7 +84,7 @@ private extension ChatTransactionContainerView {
     func configure() {
         addSubview(swipeView)
         swipeView.snp.makeConstraints { make in
-            make.top.bottom.leading.trailing.equalToSuperview()
+            make.directionalEdges.equalToSuperview()
         }
         
         addSubview(horizontalStack)
@@ -97,8 +93,9 @@ private extension ChatTransactionContainerView {
             $0.leading.trailing.equalToSuperview().inset(12)
         }
         
-        swipeView.action = { [weak self] message in
-            self?.actionHandler(.reply(message: message))
+        swipeView.didSwipeAction = { [weak self] in
+            guard let self = self else { return }
+            self.actionHandler(.reply(message: self.model))
         }
         
         swipeView.swipeStateAction = { [weak self] state in
@@ -110,7 +107,6 @@ private extension ChatTransactionContainerView {
     }
     
     func update() {
-        swipeView.update(model)
         contentView.model = model.content
         updateStatus(model.status)
         updateLayout()

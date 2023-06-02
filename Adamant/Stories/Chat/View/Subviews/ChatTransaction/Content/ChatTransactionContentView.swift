@@ -13,13 +13,7 @@ final class ChatTransactionContentView: UIView {
     var model: Model = .default {
         didSet {
             guard oldValue != model else { return }
-            let isSelected = oldValue.animationId != model.animationId
-            && !model.animationId.isEmpty
-            && oldValue.id == model.id
-            && !model.id.isEmpty
-            && !oldValue.id.isEmpty
-            
-            update(isSelected: isSelected)
+            update()
         }
     }
     
@@ -187,7 +181,8 @@ private extension ChatTransactionContentView {
         }
     }
     
-    func update(isSelected: Bool) {
+    func update() {
+        backgroundColor = model.backgroundColor.uiColor
         titleLabel.text = model.title
         iconView.image = model.icon
         amountLabel.text = String(model.amount)
@@ -217,7 +212,6 @@ private extension ChatTransactionContentView {
                 message: NSAttributedString(string: ""),
                 messageReply: NSAttributedString(string: ""),
                 backgroundColor: .failed,
-                animationId: "",
                 isFromCurrentSender: true
             )))
             return

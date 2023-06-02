@@ -18,7 +18,6 @@ extension ChatTransactionContentView {
         let date: String
         let comment: String?
         let backgroundColor: ChatMessageBackgroundColor
-        var animationId: String
         var isReply: Bool
         var replyMessage: NSAttributedString
         var replyId: String
@@ -32,7 +31,6 @@ extension ChatTransactionContentView {
             date: .init(),
             comment: nil,
             backgroundColor: .failed,
-            animationId: "",
             isReply: false,
             replyMessage: NSAttributedString(string: ""),
             replyId: ""

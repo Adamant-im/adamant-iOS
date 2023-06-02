@@ -197,7 +197,7 @@ protocol ChatsProvider: DataProvider, Actor {
     func isChatLoading(with addressRecipient: String) -> Bool
     func isChatLoaded(with addressRecipient: String) -> Bool
     
-    func loadTransactionsUntilFind(
+    func loadTransactionsUntilFound(
         _ transactionId: String,
         recipient: String
     )  async throws

@@ -85,35 +85,3 @@ extension MessageType {
         }
     }
 }
-
-extension ChatMessage {
-    var animationId: String {
-        get {
-            switch content {
-            case let .message(model):
-                return model.value.animationId
-            case let .reply(model):
-                return model.value.animationId
-            case let .transaction(model):
-                return model.value.content.animationId
-            }
-        }
-        
-        set {
-            switch content {
-            case let .message(model):
-                var model = model.value
-                model.animationId = newValue
-                content = .message(.init(value: model))
-            case let .reply(model):
-                var model = model.value
-                model.animationId = newValue
-                content = .reply(.init(value: model))
-            case let .transaction(model):
-                var model = model.value
-                model.content.animationId = newValue
-                content = .transaction(.init(value: model))
-            }
-        }
-    }
-}

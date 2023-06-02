@@ -36,13 +36,6 @@ final class ChatViewModel: NSObject {
     private var timerSubscription: AnyCancellable?
     private var messageIdToShow: String?
     private var isLoading = false
-    private var animationIds: [String: String] = [:] {
-        didSet {
-            messages.indices.forEach {
-                messages[$0].animationId = animationIds[messages[$0].id] ?? ""
-            }
-        }
-    }
     
     private var isNeedToLoadMoreMessages: Bool {
         get async {
@@ -57,8 +50,8 @@ final class ChatViewModel: NSObject {
     private(set) var chatroom: Chatroom?
     private(set) var chatTransactions: [ChatTransaction] = []
     private var tempCancellables = Set<AnyCancellable>()
-    private var minDiffCountForOffset = 5
-    private var minDiffCountForAnimateScroll = 20
+    private let minDiffCountForOffset = 5
+    private let minDiffCountForAnimateScroll = 20
 
     var tempOffsets: [String] = []
     var needToAnimateCellIndex: Int?
@@ -80,7 +73,7 @@ final class ChatViewModel: NSObject {
     @ObservableValue var swipeState: SwipeableView.State = .ended
     @ObservableValue var inputText = ""
     @ObservableValue var replyMessage: MessageModel?
-    @ObservableValue var scrollToMessage: (String?, String?)
+    @ObservableValue var scrollToMessage: (toId: String?, fromId: String?)
     
     var startPosition: ChatStartPosition? {
         if let messageIdToShow = messageIdToShow {
@@ -387,7 +380,7 @@ final class ChatViewModel: NSObject {
                     where: { $0.transactionId == message.replyId }
                 ) {
                     dialog.send(.progress(true))
-                    try await chatsProvider.loadTransactionsUntilFind(
+                    try await chatsProvider.loadTransactionsUntilFound(
                         message.replyId,
                         recipient: partnerAddress
                     )
@@ -395,7 +388,7 @@ final class ChatViewModel: NSObject {
                 
                 await waitForMessage(withId: message.replyId)
                 
-                scrollToMessage = (message.replyId, message.id)
+                scrollToMessage = (toId: message.replyId, fromId: message.id)
                 
                 dialog.send(.progress(false))
             } catch {
@@ -553,8 +546,7 @@ private extension ChatViewModel {
                 transactions: chatTransactions,
                 sender: sender,
                 isNeedToLoadMoreMessages: isNeedToLoadMoreMessages,
-                expirationTimestamp: &expirationTimestamp,
-                animationIds: animationIds
+                expirationTimestamp: &expirationTimestamp
             )
             
             await setupNewMessages(

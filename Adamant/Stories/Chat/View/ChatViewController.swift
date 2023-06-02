@@ -144,6 +144,7 @@ final class ChatViewController: MessagesViewController {
         willDisplay cell: UICollectionViewCell,
         forItemAt indexPath: IndexPath
     ) {
+        // TODO: refactor for architecture
         if let index = viewModel.needToAnimateCellIndex,
            indexPath.section == index {
             cell.isSelected = true
@@ -683,7 +684,7 @@ private extension ChatViewController {
 // MARK: Animate cell
 
 extension ChatViewController {
-    internal override func scrollViewDidEndScrollingAnimation(_: UIScrollView) {
+    override func scrollViewDidEndScrollingAnimation(_: UIScrollView) {
         animateScroll(isStarted: false)
         
         guard let index = viewModel.needToAnimateCellIndex else { return }
@@ -694,6 +695,7 @@ extension ChatViewController {
         
         guard isVisible else { return }
         
+        // TODO: refactor for architecture
         let cell = messagesCollectionView.cellForItem(at: .init(item: .zero, section: index))
         cell?.isSelected = true
         cell?.isSelected = false

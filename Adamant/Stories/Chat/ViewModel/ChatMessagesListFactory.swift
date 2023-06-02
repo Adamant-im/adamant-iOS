@@ -21,8 +21,7 @@ actor ChatMessagesListFactory {
         transactions: [ChatTransaction],
         sender: ChatSender,
         isNeedToLoadMoreMessages: Bool,
-        expirationTimestamp minExpTimestamp: inout TimeInterval?,
-        animationIds: [String: String]
+        expirationTimestamp minExpTimestamp: inout TimeInterval?
     ) -> [ChatMessage] {
         assert(!Thread.isMainThread, "Do not process messages on main thread")
         
@@ -33,8 +32,7 @@ actor ChatMessagesListFactory {
                 sender: sender,
                 dateHeaderOn: isNeedToDisplayDateHeader(index: index, transactions: transactions),
                 topSpinnerOn: isNeedToLoadMoreMessages && index == .zero,
-                willExpireAfter: &expTimestamp,
-                animationId: animationIds[transaction.transactionId] ?? ""
+                willExpireAfter: &expTimestamp
             )
             
             if let timestamp = expTimestamp, timestamp < minExpTimestamp ?? .greatestFiniteMagnitude {
@@ -52,8 +50,7 @@ private extension ChatMessagesListFactory {
         sender: SenderType,
         dateHeaderOn: Bool,
         topSpinnerOn: Bool,
-        willExpireAfter: inout TimeInterval?,
-        animationId: String
+        willExpireAfter: inout TimeInterval?
     ) -> ChatMessage {
         var expireDate: Date?
         let message = chatMessageFactory.makeMessage(
@@ -61,8 +58,7 @@ private extension ChatMessagesListFactory {
             expireDate: &expireDate,
             currentSender: sender,
             dateHeaderOn: dateHeaderOn,
-            topSpinnerOn: topSpinnerOn,
-            animationId: animationId
+            topSpinnerOn: topSpinnerOn
         )
         
         willExpireAfter = expireDate?.timeIntervalSince1970

@@ -12,13 +12,11 @@ extension ChatMessageCell {
     struct Model: ChatReusableViewModelProtocol, MessageModel {
         let id: String
         let text: NSAttributedString
-        var animationId: String
         let backgroundColor: ChatMessageBackgroundColor
         
         static let `default` = Self(
             id: "",
             text: NSAttributedString(string: ""),
-            animationId: "",
             backgroundColor: .failed
         )
         

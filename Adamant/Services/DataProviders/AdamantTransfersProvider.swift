@@ -277,7 +277,7 @@ extension AdamantTransfersProvider {
                 case .accountNotFound:
                     err = .accountNotFound(address: address)
                     
-                case .serverError, .baseError:
+                case .serverError, .commonError:
                     err = .serverError(error)
                     
                 case .internalError(let message, _):

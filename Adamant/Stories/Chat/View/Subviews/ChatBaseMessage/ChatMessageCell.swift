@@ -13,7 +13,7 @@ import Combine
 
 final class ChatMessageCell: TextMessageCell, ChatModelView {    
     private lazy var swipeView: SwipeableView = {
-        let view = SwipeableView(frame: .zero, view: contentView, messagePadding: 8)
+        let view = SwipeableView(frame: .zero, view: contentView, xPadding: 8)
         return view
     }()
     
@@ -30,7 +30,6 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
     var model: Model = .default {
         didSet {
             guard model != oldValue else { return }
-            swipeView.update(model)
             chatMenuManager.backgroundColor = model.backgroundColor.uiColor
         }
     }
@@ -59,8 +58,9 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
             make.leading.trailing.bottom.top.equalToSuperview()
         }
         
-        swipeView.action = { [weak self] message in
-            self?.actionHandler(.reply(message: message))
+        swipeView.didSwipeAction = { [weak self] in
+            guard let self = self else { return }
+            self.actionHandler(.reply(message: self.model))
         }
         
         swipeView.swipeStateAction = { [weak self] state in
@@ -81,7 +81,7 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         
         containerView.addInteraction(interaction)
         messageContainerView.snp.makeConstraints { make in
-            make.top.bottom.leading.trailing.equalToSuperview()
+            make.directionalEdges.equalToSuperview()
         }
     }
     

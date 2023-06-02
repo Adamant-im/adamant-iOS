@@ -16,12 +16,12 @@ class SwipeableView: UIView {
     weak var viewForSwipe: UIView?
     
     private var panGestureRecognizer: SwipePanGestureRecognizer?
-    private var messagePadding: CGFloat = 0
-    private var replyAction: Bool = false
-    private var canReplyVibrate: Bool = true
+    private var xPadding: CGFloat = 0
+    private var isSwipedEnough: Bool = false
+    private var isNeedToVibrate: Bool = true
     private var oldContentOffset: CGPoint?
     
-    var action: ((MessageModel) -> Void)?
+    var didSwipeAction: (() -> Void)?
     var swipeStateAction: ((SwipeableView.State) -> Void)?
     
     // MARK: Init
@@ -32,9 +32,9 @@ class SwipeableView: UIView {
         setup()
     }
     
-    init(frame: CGRect, view: UIView, messagePadding: CGFloat = 0) {
+    init(frame: CGRect, view: UIView, xPadding: CGFloat = 0) {
         super.init(frame: frame)
-        self.messagePadding = messagePadding
+        self.xPadding = xPadding
         viewForSwipe = view
         setup()
     }
@@ -49,20 +49,9 @@ class SwipeableView: UIView {
     private func setup() {
         panGestureRecognizer = SwipePanGestureRecognizer(
             target: self,
-            action: #selector(swipeGestureCellAction(_:)),
-            message: ChatMessageCell.Model.default
+            action: #selector(swipeGestureCellAction(_:))
         )
         viewForSwipe?.addGestureRecognizer(panGestureRecognizer!)
-    }
-    
-    func update(_ model: MessageModel) {
-        panGestureRecognizer?.message = model
-    }
-    
-    // MARK: Actions
-    
-    func didSwipe(_ message: MessageModel) {
-        action?(message)
     }
 }
 
@@ -72,9 +61,7 @@ private extension SwipeableView {
     @objc func swipeGestureCellAction(_ recognizer: UIPanGestureRecognizer) {
         let translation = recognizer.translation(in: viewForSwipe)
         
-        guard let movingView = recognizer.view?.superview as? UIView,
-              let panGesture = recognizer as? SwipePanGestureRecognizer
-        else {
+        guard let movingView = recognizer.view?.superview as? UIView else {
             return
         }
         
@@ -82,14 +69,14 @@ private extension SwipeableView {
             swipeStateAction?(.began)
         }
         
-        let isOnStartPosition = movingView.frame.origin.x == 0 || movingView.frame.origin.x == messagePadding
+        let isOnStartPosition = movingView.frame.origin.x == 0 || movingView.frame.origin.x == xPadding
         
         if isOnStartPosition && translation.x > 0 {
             swipeStateAction?(.ended)
             return
         }
         
-        if movingView.frame.origin.x <= messagePadding {
+        if movingView.frame.origin.x <= xPadding {
             movingView.center = CGPoint(
                 x: movingView.center.x + translation.x / 2,
                 y: movingView.center.y
@@ -97,27 +84,27 @@ private extension SwipeableView {
             recognizer.setTranslation(CGPoint(x: 0, y: 0), in: viewForSwipe)
             
             if abs(movingView.frame.origin.x) > UIScreen.main.bounds.size.width * 0.18 {
-                replyAction = true
-                if canReplyVibrate {
+                isSwipedEnough = true
+                if isNeedToVibrate {
                     UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
                 }
-                canReplyVibrate = false
+                isNeedToVibrate = false
             } else {
-                replyAction = false
+                isSwipedEnough = false
             }
         }
         
         if recognizer.state == .ended {
             swipeStateAction?(.ended)
-            canReplyVibrate = true
+            isNeedToVibrate = true
             
-            if replyAction {
-                didSwipe(panGesture.message)
+            if isSwipedEnough {
+                didSwipeAction?()
             }
             
             UIView.animate(withDuration: 0.25, delay: 0, options: .curveEaseOut) {
                 movingView.frame = CGRect(
-                    x: self.messagePadding,
+                    x: self.xPadding,
                     y: movingView.frame.origin.y,
                     width: movingView.frame.size.width,
                     height: movingView.frame.size.height

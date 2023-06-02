@@ -10,29 +10,9 @@ import UIKit
 
 final class SwipePanGestureRecognizer: UIPanGestureRecognizer, UIGestureRecognizerDelegate {
 
-    private var initialTouchLocation: CGPoint?
-    private let minHorizontalOffset: CGFloat = 5
-
-    var message: MessageModel
-    
-    init(target: Any?, action: Selector?, message: MessageModel) {
-        self.message = message
+    override init(target: Any?, action: Selector?) {
         super.init(target: target, action: action)
         delegate = self
-    }
-    
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
-        super.touchesBegan(touches, with: event)
-        self.initialTouchLocation = touches.first?.location(in: self.view)
-    }
-
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent) {
-        super.touchesMoved(touches, with: event)
-
-        if self.state == .possible,
-           abs((touches.first?.location(in: self.view).x ?? 0) - (self.initialTouchLocation?.x ?? 0)) >= self.minHorizontalOffset {
-            self.state = .changed
-        }
     }
     
     func gestureRecognizerShouldBegin(
