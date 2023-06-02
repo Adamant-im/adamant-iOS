@@ -72,6 +72,10 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
             safely: safely
         )
     }
+    
+    func stopDecelerating() {
+        setContentOffset(contentOffset, animated: false)
+    }
 }
 
 private extension ChatMessagesCollectionView {
@@ -104,10 +108,6 @@ private extension ChatMessagesCollectionView {
         reloadData()
         layoutIfNeeded()
         currentIds = newIds
-    }
-    
-    func stopDecelerating() {
-        setContentOffset(contentOffset, animated: false)
     }
     
     func setVerticalContentOffset(_ offset: CGFloat, safely: Bool) {

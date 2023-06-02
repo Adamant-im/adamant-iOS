@@ -177,7 +177,7 @@ extension ChatViewController {
     
     private func swipeStateAction(_ state: SwipeableView.State) {
         if state == .began {
-            messagesCollectionView.setContentOffset(messagesCollectionView.contentOffset, animated: false)
+            chatMessagesCollectionView.stopDecelerating()
             messagesCollectionView.isScrollEnabled = false
         }
         
