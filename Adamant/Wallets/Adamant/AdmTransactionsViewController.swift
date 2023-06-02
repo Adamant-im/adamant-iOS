@@ -237,23 +237,27 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         navigationController?.pushViewController(controller, animated: true)
     }
     
-    func configureCell(_ cell: TransactionTableViewCell, for transaction: TransferTransaction) {
+    func configureCell(
+        _ cell: TransactionTableViewCell,
+        for transaction: TransferTransaction
+    ) {
         let partnerId = (transaction.isOutgoing ? transaction.recipientId : transaction.senderId) ?? ""
         
         let amount: Decimal = transaction.amount as Decimal? ?? 0
         
-        var partnerName = addressBookService.getName(for: partnerId)
+        var partnerName = transaction.partner?.name?.checkAndReplaceSystemWallets() ?? addressBookService.getName(for: partnerId)
         
         if let address = accountService.account?.address, partnerId == address {
             partnerName = String.adamantLocalized.transactionDetails.yourAddress
         }
         
-        configureCell(cell,
-                      isOutgoing: transaction.isOutgoing,
-                      partnerId: partnerId,
-                      partnerName: partnerName,
-                      amount: amount,
-                      date: transaction.date as Date?)
+        configureCell(
+            cell,
+            isOutgoing: transaction.isOutgoing,
+            partnerId: partnerId,
+            partnerName: partnerName,
+            amount: amount,
+            date: transaction.date as Date?)
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
