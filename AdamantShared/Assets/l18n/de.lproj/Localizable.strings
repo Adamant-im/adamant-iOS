@@ -238,6 +238,9 @@
 /* SearchPage: Contacts header */
 "SearchPage.Contact.New" = "Neuer Kontakt";
 
+/* SearchPage: Contact new header */
+"SearchPage.Contact.Add.New" = "[Fügen Sie einen neuen Kontakt hinzu]";
+
 /* SearchPage: Messages header */
 "SearchPage.Messages" = "Mitteilungen";
 

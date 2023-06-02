@@ -14,7 +14,8 @@ extension String.adamantLocalized {
     enum search {
         static let contacts = NSLocalizedString("SearchPage.Contacts", comment: "SearchPage: Contacts header")
         static let messages = NSLocalizedString("SearchPage.Messages", comment: "SearchPage: Messages header")
-        static let newContact = NSLocalizedString("SearchPage.Contact.New", comment: "SearchPage: Contacts header")
+        static let newContactHeader = NSLocalizedString("SearchPage.Contact.New", comment: "SearchPage: Contacts header")
+        static let newContact = NSLocalizedString("SearchPage.Contact.Add.New", comment: "SearchPage: Contact new header")
     }
 }
 
@@ -218,7 +219,7 @@ class SearchResultsViewController: UITableViewController {
         }
         
         cell.lastMessageLabel.text = partner.address
-        cell.accountLabel.text = partner.address
+        cell.accountLabel.text = .adamantLocalized.search.newContact
         cell.hasUnreadMessages = false
         cell.dateLabel.text = nil
     }
@@ -283,7 +284,7 @@ class SearchResultsViewController: UITableViewController {
         switch defineSection(for: section) {
         case .contacts: return String.adamantLocalized.search.contacts
         case .messages: return String.adamantLocalized.search.messages
-        case .new: return String.adamantLocalized.search.newContact
+        case .new: return String.adamantLocalized.search.newContactHeader
         case .none: return nil
         }
     }
