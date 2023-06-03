@@ -289,11 +289,11 @@ class ERC20WalletService: WalletService {
         await calculateFee()
     }
     
-    private func calculateFee() async {
+    func calculateFee(for address: EthereumAddress? = nil) async {
         guard let token = token else { return }
 
         let priceRaw = try? await getGasPrices()
-        let gasLimitRaw = try? await getGasLimit()
+        let gasLimitRaw = try? await getGasLimit(to: address)
         
         var price = priceRaw ?? BigUInt(token.defaultGasPriceGwei).toWei()
         var gasLimit = gasLimitRaw ?? BigUInt(token.defaultGasLimit)
@@ -349,7 +349,7 @@ class ERC20WalletService: WalletService {
         }
     }
     
-    func getGasLimit() async throws -> BigUInt {
+    func getGasLimit(to address: EthereumAddress?) async throws -> BigUInt {
         guard let web3 = await self.web3,
               let ethWallet = ethWallet,
               let erc20 = erc20
@@ -360,7 +360,7 @@ class ERC20WalletService: WalletService {
         do {
             let transaction = try await erc20.transfer(
                 from: ethWallet.ethAddress,
-                to: ethWallet.ethAddress,
+                to: address ?? ethWallet.ethAddress,
                 amount: "\(ethWallet.balance)"
             ).transaction
             
