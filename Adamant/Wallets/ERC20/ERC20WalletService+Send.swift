@@ -55,6 +55,8 @@ extension ERC20WalletService: WalletServiceTwoStepSend {
                 amount: "\(amount)"
             ).transaction
             
+            await calculateFee(for: ethRecipient)
+            
             let policies: Policies = Policies(
                 gasLimitPolicy: .manual(gasLimit),
                 gasPricePolicy: .manual(gasPrice)

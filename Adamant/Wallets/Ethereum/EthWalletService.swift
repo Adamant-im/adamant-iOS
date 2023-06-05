@@ -310,9 +310,9 @@ class EthWalletService: WalletService {
         await calculateFee()
 	}
     
-    private func calculateFee() async {
+    func calculateFee(for address: EthereumAddress? = nil) async {
         let priceRaw = try? await getGasPrices()
-        let gasLimitRaw = try? await getGasLimit()
+        let gasLimitRaw = try? await getGasLimit(to: address)
         
         var price = priceRaw ?? defaultGasPriceGwei.toWei()
         var gasLimit = gasLimitRaw ?? defaultGasLimit
@@ -370,7 +370,7 @@ class EthWalletService: WalletService {
         }
 	}
     
-    func getGasLimit() async throws -> BigUInt {
+    func getGasLimit(to address: EthereumAddress?) async throws -> BigUInt {
         guard let web3 = await self.web3,
               let ethWallet = ethWallet
         else {
@@ -380,7 +380,7 @@ class EthWalletService: WalletService {
         do {
             var transaction: CodableTransaction = .emptyTransaction
             transaction.from = ethWallet.ethAddress
-            transaction.to = ethWallet.ethAddress
+            transaction.to = address ?? ethWallet.ethAddress
             
             let price = try await web3.eth.estimateGas(for: transaction)
             return price
