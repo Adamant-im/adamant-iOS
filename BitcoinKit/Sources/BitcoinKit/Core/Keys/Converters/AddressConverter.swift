@@ -1,21 +1,20 @@
 //
 //  AddressConverter.swift
-//  BitcoinKit
+//  
 //
-//  Created by Anton Boyarkin on 12/02/2019.
+//  Created by Andrey Golubenko on 06.06.2023.
 //
 
 import Foundation
 
-class AddressConverter {
-    enum ConversionError: Error {
-        case invalidChecksum
-        case invalidAddressLength
-        case unknownAddressType
-        case wrongAddressPrefix
-    }
-    
-    public static func extract(from signatureScript: Data, with network: Network) -> Address? {
+public protocol AddressConverter {
+    func convert(address: String) throws -> Address
+    func convert(lockingScriptPayload: Data, type: ScriptType) throws -> Address
+    func convert(publicKey: PublicKey, type: ScriptType) throws -> Address
+}
+
+extension AddressConverter {
+    public func extract(from signatureScript: Data, with network: Network) -> Address? {
         var payload: Data?
         var validScriptType: ScriptType = ScriptType.unknown
         let sigScriptCount = signatureScript.count
@@ -60,7 +59,8 @@ class AddressConverter {
         }
         if let payload = payload {
             let keyHash = Crypto.sha256ripemd160(payload)
-            if let address = try? network.convert(keyHash: keyHash, type: validScriptType) {
+            let address = try? convert(lockingScriptPayload: payload, type: validScriptType)
+            if let address = address {
                 outputAddress = address
             }
         }

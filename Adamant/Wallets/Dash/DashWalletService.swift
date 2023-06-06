@@ -12,7 +12,7 @@ import Alamofire
 import BitcoinKit
 import Combine
 
-class DashWalletService: WalletService {
+final class DashWalletService: WalletService {
     
     var tokenSymbol: String {
         return type(of: self).currencySymbol
@@ -62,6 +62,7 @@ class DashWalletService: WalletService {
     var securedStore: SecuredStore!
     var dialogService: DialogService!
     var router: Router!
+    var addressConverter: AddressConverter!
     
     // MARK: - Constants
     static var currencyLogo = #imageLiteral(resourceName: "dash_wallet")
@@ -239,7 +240,9 @@ class DashWalletService: WalletService {
     }
     
     func validate(address: String) -> AddressValidationResult {
-        return AddressFactory.isValid(bitcoinAddress: address) ? .valid : .invalid
+        (try? addressConverter.convert(address: address)) != nil
+            ? .valid
+            : .invalid
     }
 }
 
@@ -266,7 +269,11 @@ extension DashWalletService: InitiatedWithPassphraseService {
         let privateKeyData = passphrase.data(using: .utf8)!.sha256()
         let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
         
-        let eWallet = DashWallet(privateKey: privateKey)
+        let eWallet = try DashWallet(
+            privateKey: privateKey,
+            addressConverter: addressConverter
+        )
+        
         self.dashWallet = eWallet
         
         if !self.enabled {
@@ -322,6 +329,8 @@ extension DashWalletService: SwinjectDependentService {
         securedStore = container.resolve(SecuredStore.self)
         dialogService = container.resolve(DialogService.self)
         router = container.resolve(Router.self)
+        addressConverter = container.resolve(AddressConverterFactory.self)?
+            .make(network: network)
     }
 }
 

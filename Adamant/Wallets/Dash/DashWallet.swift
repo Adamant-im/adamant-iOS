@@ -10,7 +10,7 @@ import Foundation
 import BitcoinKit
 
 class DashWallet: WalletAccount {
-    let address: String
+    let addressEntity: Address
     let privateKey: PrivateKey
     let publicKey: PublicKey
     var balance: Decimal = 0.0
@@ -19,9 +19,15 @@ class DashWallet: WalletAccount {
     var minAmount: Decimal = 0.00002
     var isBalanceInitialized: Bool = false
     
-    init(privateKey: PrivateKey) {
+    var address: String { addressEntity.stringValue }
+    
+    init(privateKey: PrivateKey, addressConverter: AddressConverter) throws {
         self.privateKey = privateKey
         self.publicKey = privateKey.publicKey()
-        self.address = publicKey.toCashaddr().base58
+        
+        self.addressEntity = try addressConverter.convert(
+            publicKey: publicKey,
+            type: .p2pkh
+        )
     }
 }

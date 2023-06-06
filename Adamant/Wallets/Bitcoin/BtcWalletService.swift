@@ -111,6 +111,7 @@ class BtcWalletService: WalletService {
     var dialogService: DialogService!
     var router: Router!
     var increaseFeeService: IncreaseFeeService!
+    var addressConverter: AddressConverter!
     
     // MARK: - Constants
     static var currencyLogo = #imageLiteral(resourceName: "bitcoin_wallet")
@@ -385,7 +386,7 @@ extension BtcWalletService: InitiatedWithPassphraseService {
         
         let privateKeyData = passphrase.data(using: .utf8)!.sha256()
         let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
-        let eWallet = BtcWallet(privateKey: privateKey)
+        let eWallet = try BtcWallet(privateKey: privateKey, addressConverter: addressConverter)
         self.btcWallet = eWallet
         
         if !self.enabled {
@@ -444,6 +445,7 @@ extension BtcWalletService: SwinjectDependentService {
         dialogService = container.resolve(DialogService.self)
         router = container.resolve(Router.self)
         increaseFeeService = container.resolve(IncreaseFeeService.self)
+        addressConverter = container.resolve(AddressConverterFactory.self)?.make(network: network)
     }
 }
 

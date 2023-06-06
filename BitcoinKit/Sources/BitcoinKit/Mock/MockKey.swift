@@ -38,7 +38,7 @@ public class MockKey {
         return privkey.publicKey()
     }
     public var pubkeyHash: Data {
-        return pubkey.pubkeyHash
+        return pubkey.hashP2pkh
     }
 
     private init(wif: String) {

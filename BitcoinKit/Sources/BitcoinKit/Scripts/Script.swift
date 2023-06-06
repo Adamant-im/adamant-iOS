@@ -54,18 +54,6 @@ public class Script {
         return data.hex
     }
 
-    public func toP2SH() -> Script {
-        return try! Script()
-            .append(.OP_HASH160)
-            .appendData(Crypto.sha256ripemd160(data))
-            .append(.OP_EQUAL)
-    }
-
-    public func standardP2SHAddress(network: Network) -> Address {
-        let scriptHash: Data = Crypto.sha256ripemd160(data)
-        return Cashaddr(data: scriptHash, type: .scriptHash, network: network)
-    }
-
     // Multisignature script attribute.
     // If multisig script is not detected, this is nil
     public typealias MultisigVariables = (nSigRequired: UInt, publickeys: [PublicKey])
@@ -96,34 +84,6 @@ public class Script {
             return nil
         }
         self.init(data: scriptData)
-    }
-
-    public convenience init?(address: Address) {
-        self.init()
-        switch address.type {
-        case .pubkeyHash:
-            // OP_DUP OP_HASH160 <hash> OP_EQUALVERIFY OP_CHECKSIG
-            do {
-                try self.append(.OP_DUP)
-                    .append(.OP_HASH160)
-                    .appendData(address.data)
-                    .append(.OP_EQUALVERIFY)
-                    .append(.OP_CHECKSIG)
-            } catch {
-                return nil
-            }
-        case .scriptHash:
-            // OP_HASH160 <hash> OP_EQUAL
-            do {
-                try self.append(.OP_HASH160)
-                    .appendData(address.data)
-                    .append(.OP_EQUAL)
-            } catch {
-                return nil
-            }
-        default:
-            return nil
-        }
     }
 
     // OP_<M> <pubkey1> ... <pubkeyN> OP_<N> OP_CHECKMULTISIG
@@ -304,21 +264,6 @@ public class Script {
 
     public var scriptChunks: [ScriptChunk] {
         return chunks
-    }
-
-    public func standardAddress(network: Network) -> Address? {
-        if isPayToPublicKeyHashScript {
-            guard let dataChunk = chunk(at: 2) as? DataChunk else {
-                return nil
-            }
-            return Cashaddr(data: dataChunk.pushedData, type: .pubkeyHash, network: network)
-        } else if isPayToScriptHashScript {
-            guard let dataChunk = chunk(at: 1) as? DataChunk else {
-                return nil
-            }
-            return Cashaddr(data: dataChunk.pushedData, type: .scriptHash, network: network)
-        }
-        return nil
     }
 
     // MARK: - Modification

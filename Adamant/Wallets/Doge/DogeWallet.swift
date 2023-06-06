@@ -9,8 +9,8 @@
 import Foundation
 import BitcoinKit
 
-class DogeWallet: WalletAccount {
-    let address: String
+final class DogeWallet: WalletAccount {
+    let addressEntity: Address
     let privateKey: PrivateKey
     let publicKey: PublicKey
     var balance: Decimal = 0.0
@@ -19,17 +19,24 @@ class DogeWallet: WalletAccount {
     var minAmount: Decimal = 0
     var isBalanceInitialized: Bool = false
     
-    init(privateKey: PrivateKey) {
+    var address: String { addressEntity.stringValue }
+    
+    init(privateKey: PrivateKey, addressConverter: AddressConverter) throws {
         self.privateKey = privateKey
         self.publicKey = privateKey.publicKey()
-        self.address = publicKey.toCashaddr().base58
+        self.addressEntity = try addressConverter.convert(publicKey: publicKey, type: .p2pkh)
     }
     
-    init(address: String, privateKey: PrivateKey, balance: Decimal, notifications: Int) {
+    init(
+        privateKey: PrivateKey,
+        balance: Decimal,
+        notifications: Int,
+        addressConverter: AddressConverter
+    ) throws {
         self.privateKey = privateKey
         self.balance = balance
         self.notifications = notifications
         self.publicKey = privateKey.publicKey()
-        self.address = publicKey.toCashaddr().base58
+        self.addressEntity = try addressConverter.convert(publicKey: publicKey, type: .p2pkh)
     }
 }

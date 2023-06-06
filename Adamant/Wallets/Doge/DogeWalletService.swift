@@ -58,6 +58,7 @@ class DogeWalletService: WalletService {
     var accountService: AccountService!
     var dialogService: DialogService!
     var router: Router!
+    var addressConverter: AddressConverter!
     
     // MARK: - Constants
     static var currencyLogo = #imageLiteral(resourceName: "doge_wallet")
@@ -225,7 +226,9 @@ class DogeWalletService: WalletService {
     }
     
     func validate(address: String) -> AddressValidationResult {
-        return AddressFactory.isValid(bitcoinAddress: address) ? .valid : .invalid
+        (try? addressConverter.convert(address: address)) != nil
+            ? .valid
+            : .invalid
     }
 }
 
@@ -251,7 +254,7 @@ extension DogeWalletService: InitiatedWithPassphraseService {
         let privateKeyData = passphrase.data(using: .utf8)!.sha256()
         let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
         
-        let eWallet = DogeWallet(privateKey: privateKey)
+        let eWallet = try DogeWallet(privateKey: privateKey, addressConverter: addressConverter)
         self.dogeWallet = eWallet
         
         if !self.enabled {
@@ -307,6 +310,8 @@ extension DogeWalletService: SwinjectDependentService {
         apiService = container.resolve(ApiService.self)
         dialogService = container.resolve(DialogService.self)
         router = container.resolve(Router.self)
+        addressConverter = container.resolve(AddressConverterFactory.self)?
+            .make(network: network)
     }
 }
 
@@ -529,8 +534,8 @@ extension DogeWalletService {
             }
 
             let value = NSDecimalNumber(decimal: (amount.decimalValue * DogeWalletService.multiplier)).uint64Value
-
-            let lockScript = Script.buildPublicKeyHashOut(pubKeyHash: wallet.publicKey.toCashaddr().data)
+            
+            let lockScript = wallet.addressEntity.lockingScript
             let txHash = Data(hex: txid).map { Data($0.reversed()) } ?? Data()
             let txIndex = vout.uint32Value
 

@@ -275,29 +275,3 @@ public class Testnet: Network {
         return Data(Data(hex: "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943")!.reversed())
     }
 }
-
-extension Network {
-    func convert(keyHash: Data, type: ScriptType) throws -> Address {
-        let version: UInt8
-        let addressType: AddressType
-        switch type {
-        case .p2pkh, .p2pk:
-            version = self.pubkeyhash
-            addressType = .pubkeyHash
-        case .p2sh, .p2wpkhSh:
-            version = self.scripthash
-            addressType = .scriptHash
-        default: throw AddressConverter.ConversionError.unknownAddressType
-        }
-        return try convertToLegacy(keyHash: keyHash, version: version, addressType: addressType)
-    }
-    
-    func convertToLegacy(keyHash: Data, version: UInt8, addressType: AddressType) throws -> LegacyAddress {
-        var withVersion = (Data([version])) + keyHash
-        let doubleSHA256 = Crypto.sha256sha256(withVersion)
-        let checksum = doubleSHA256.prefix(4)
-        withVersion += checksum
-        let base58 = Base58.encode(withVersion)
-        return try LegacyAddress(base58)
-    }
-}
