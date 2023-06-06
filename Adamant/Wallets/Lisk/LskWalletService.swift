@@ -417,16 +417,18 @@ extension LskWalletService: InitiatedWithPassphraseService {
         } catch let error as WalletServiceError {
             switch error {
             case .walletNotInitiated:
-                // Show '0' without waiting for balance update
-                if let wallet = service.lskWallet {
-                    wallet.isBalanceInitialized = true
-                    NotificationCenter.default.post(name: service.walletUpdatedNotification, object: service, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
+                /// The ADM Wallet is not initialized. Check the balance of the current wallet
+                /// and save the wallet address to kvs when dropshipping ADM
+                service.setState(.upToDate)
+                
+                Task {
+                    await service.update()
                 }
                 
                 service.save(lskAddress: eWallet.address) { result in
                     service.kvsSaveCompletionRecursion(lskAddress: eWallet.address, result: result)
                 }
-                service.setState(.upToDate)
+                
                 return eWallet
             default:
                 service.setState(.upToDate)

@@ -556,10 +556,7 @@ extension ERC20WalletService {
     }
     
     func getBalance(forAddress address: EthereumAddress) async throws -> Decimal {
-        guard let address = self.ethWallet?.address,
-              let walletAddress = EthereumAddress(address),
-              let erc20 = self.erc20
-        else {
+        guard let erc20 = self.erc20 else {
             throw WalletServiceError.internalError(message: "Can't get address", error: nil)
         }
         
@@ -569,7 +566,7 @@ extension ERC20WalletService {
         }
         
         do {
-            let balance = try await erc20.getBalance(account: walletAddress)
+            let balance = try await erc20.getBalance(account: address)
             let value = balance.asDecimal(exponent: exponent)
             return value
         } catch {
