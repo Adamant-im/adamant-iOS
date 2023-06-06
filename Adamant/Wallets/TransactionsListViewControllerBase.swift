@@ -41,6 +41,8 @@ class TransactionsListViewControllerBase: UIViewController {
     var isNeedToLoadMoore = true
     var isBusy = true
     
+    lazy var loadingView = LoadingView()
+    
     // MARK: - IBOutlets
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var emptyLabel: UILabel!
@@ -77,6 +79,7 @@ class TransactionsListViewControllerBase: UIViewController {
         }
         
         setColors()
+        configureLayout()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -97,6 +100,24 @@ class TransactionsListViewControllerBase: UIViewController {
     private func setColors() {
         view.backgroundColor = UIColor.adamant.backgroundColor
         tableView.backgroundColor = .clear
+    }
+    
+    func configureLayout() {
+        view.addSubview(loadingView)
+        loadingView.isHidden = true
+        
+        loadingView.snp.makeConstraints {
+            $0.directionalEdges.equalToSuperview()
+        }
+    }
+    
+    func updateLoadingView(isHidden: Bool) {
+        loadingView.isHidden = isHidden
+        if !isHidden {
+            loadingView.startAnimating()
+        } else {
+            loadingView.stopAnimating()
+        }
     }
     
     // MARK: - To override
@@ -130,14 +151,14 @@ class TransactionsListViewControllerBase: UIViewController {
         }
 
         bottomIndicatorView().startAnimating()
-        loadData(true)
+        loadData(silent: true)
     }
     
     @objc func handleRefresh() {
         
     }
     
-    func loadData(_ silent: Bool) {
+    func loadData(silent: Bool) {
         
     }
     

@@ -24,9 +24,8 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        updateLoadingView(isHidden: false)
         currencySymbol = DashWalletService.currencySymbol
-        
-        refreshControl.beginRefreshing()
         handleRefresh()
     }
     
@@ -36,10 +35,10 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
         allTransactionsIds.removeAll()
         offset = 0
         
-        loadData(true)
+        loadData(silent: true)
     }
     
-    override func loadData(_ silent: Bool) {
+    override func loadData(silent: Bool) {
         guard let address = walletService.wallet?.address else {
             transactions = []
             return
@@ -77,9 +76,10 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
             
             isBusy = false
             emptyLabel.isHidden = transactions.count > 0
-            tableView.reloadData()
             stopBottomIndicator()
             refreshControl.endRefreshing()
+            tableView.reloadData()
+            updateLoadingView(isHidden: true)
         }.stored(in: taskManager)
     }
     
