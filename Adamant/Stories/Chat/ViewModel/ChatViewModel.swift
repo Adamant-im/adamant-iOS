@@ -53,6 +53,7 @@ final class ChatViewModel: NSObject {
     private let minDiffCountForOffset = 5
     private let minDiffCountForAnimateScroll = 20
 
+    let minIndexForStartLoadNewMessages = 4
     var tempOffsets: [String] = []
     var needToAnimateCellIndex: Int?
 
