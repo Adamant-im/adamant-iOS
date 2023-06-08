@@ -306,7 +306,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
             vc.viewModel.setup(
                 account: account,
                 chatroom: chatroom,
-                messageToShow: nil,
+                messageIdToShow: nil,
                 preservationDelegate: nil
             )
             
@@ -357,7 +357,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
             vc.viewModel.setup(
                 account: account,
                 chatroom: chatroom,
-                messageToShow: nil,
+                messageIdToShow: nil,
                 preservationDelegate: nil
             )
             

@@ -57,8 +57,6 @@ class ChatListViewController: KeyboardObservingViewController {
     
     let defaultAvatar = #imageLiteral(resourceName: "avatar-chat-placeholder")
     
-    private var previousAppState: UIApplication.State?
-    
     private lazy var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(self.handleRefresh(_:)), for: UIControl.Event.valueChanged)
@@ -248,23 +246,6 @@ class ChatListViewController: KeyboardObservingViewController {
             }
             .store(in: &subscriptions)
         
-        // Control Active
-        NotificationCenter.default
-            .publisher(for: UIApplication.didBecomeActiveNotification, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
-                guard self?.previousAppState == .background else { return }
-                self?.previousAppState = .active
-                self?.updateChats()
-            }
-            .store(in: &subscriptions)
-        
-        NotificationCenter.default
-            .publisher(for: UIApplication.willResignActiveNotification, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in self?.previousAppState = .background }
-            .store(in: &subscriptions)
-        
         NotificationCenter.default
             .publisher(for: .AdamantTransfersProvider.stateChanged, object: nil)
             .receive(on: OperationQueue.main)
@@ -332,7 +313,7 @@ class ChatListViewController: KeyboardObservingViewController {
     }
     
     // MARK: Helpers
-    func chatViewController(for chatroom: Chatroom, with message: MessageTransaction? = nil) -> ChatViewController {
+    func chatViewController(for chatroom: Chatroom, with messageId: String? = nil) -> ChatViewController {
         guard let vc = router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
             fatalError("Can't get ChatViewController")
         }
@@ -341,7 +322,7 @@ class ChatListViewController: KeyboardObservingViewController {
         vc.viewModel.setup(
             account: accountService.account,
             chatroom: chatroom,
-            messageToShow: message,
+            messageIdToShow: messageId,
             preservationDelegate: self
         )
 
@@ -823,7 +804,7 @@ extension ChatListViewController {
     
     private func presentChatroom(_ chatroom: Chatroom, with message: MessageTransaction? = nil) {
         // MARK: 1. Create and config ViewController
-        let vc = chatViewController(for: chatroom, with: message)
+        let vc = chatViewController(for: chatroom, with: message?.transactionId)
         
         if let split = self.splitViewController, UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
             let chat = UINavigationController(rootViewController:vc)
@@ -1225,8 +1206,8 @@ extension ChatListViewController {
     func selectChatroomRow(chatroom: Chatroom) {
         guard let chatsControllerIndexPath = chatsController?.indexPath(forObject: chatroom) else { return }
         let tableViewIndexPath = tableViewIndexPath(chatControllerIndexPath: chatsControllerIndexPath)
-        tableView.selectRow(at: tableViewIndexPath, animated: false, scrollPosition: .none)
-        tableView.scrollToRow(at: tableViewIndexPath, at: .top, animated: false)
+        tableView.selectRow(at: tableViewIndexPath, animated: true, scrollPosition: .none)
+        tableView.scrollToRow(at: tableViewIndexPath, at: .top, animated: true)
     }
     
     func performOnMessagesLoaded(action: @escaping () -> Void) {

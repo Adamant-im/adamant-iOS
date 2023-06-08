@@ -269,7 +269,7 @@ class AboutViewController: FormViewController {
                 chat.viewModel.setup(
                     account: account,
                     chatroom: chatroom,
-                    messageToShow: nil,
+                    messageIdToShow: nil,
                     preservationDelegate: self
                 )
 

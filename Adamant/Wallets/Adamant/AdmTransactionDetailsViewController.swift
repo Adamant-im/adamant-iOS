@@ -136,7 +136,7 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
         vc.viewModel.setup(
             account: account,
             chatroom: chatroom,
-            messageToShow: nil,
+            messageIdToShow: nil,
             preservationDelegate: nil
         )
 

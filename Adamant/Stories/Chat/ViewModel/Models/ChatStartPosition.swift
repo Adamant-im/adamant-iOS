@@ -11,4 +11,5 @@ import CoreGraphics
 enum ChatStartPosition {
     case offset(CGFloat)
     case messageId(String)
+    case messageIdOrBottom(String)
 }

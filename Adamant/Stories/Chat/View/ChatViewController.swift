@@ -497,9 +497,17 @@ private extension ChatViewController {
         switch position {
         case let .offset(offset):
             chatMessagesCollectionView.setBottomOffset(offset, safely: viewAppeared)
-        case let .messageId(id):
-            guard let index = viewModel.messages.firstIndex(where: { $0.messageId == id})
-            else { break }
+        case let .messageId(id), let .messageIdOrBottom(id):
+            var index = viewModel.messages.firstIndex(where: { $0.messageId == id})
+            var needToAnimateCell = true
+            
+            if case .messageIdOrBottom = position,
+               index == nil {
+                index = viewModel.messages.count - 1
+                needToAnimateCell = false
+            }
+            
+            guard let index = index else { break }
             
             messagesCollectionView.scrollToItem(
                 at: .init(item: .zero, section: index),
@@ -507,12 +515,16 @@ private extension ChatViewController {
                 animated: animated
             )
             
+            viewModel.needToAnimateCellIndex = needToAnimateCell
+            ? index
+            : nil
+            
+            guard animated else { break }
+            
             viewModel.animateScrollIfNeeded(
                 to: index,
                 visibleIndex: messagesCollectionView.indexPathsForVisibleItems.last?.section
             )
-            
-            viewModel.needToAnimateCellIndex = index
         }
         
         guard !viewAppeared else { return }

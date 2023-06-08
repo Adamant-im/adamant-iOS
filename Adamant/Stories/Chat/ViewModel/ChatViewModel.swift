@@ -77,7 +77,7 @@ final class ChatViewModel: NSObject {
     
     var startPosition: ChatStartPosition? {
         if let messageIdToShow = messageIdToShow {
-            return .messageId(messageIdToShow)
+            return .messageIdOrBottom(messageIdToShow)
         }
         
         guard let address = chatroom?.partner?.address else { return nil }
@@ -130,16 +130,16 @@ final class ChatViewModel: NSObject {
     func setup(
         account: AdamantAccount?,
         chatroom: Chatroom,
-        messageToShow: MessageTransaction?,
+        messageIdToShow: String?,
         preservationDelegate: ChatPreservationDelegate?
     ) {
         assert(self.chatroom == nil, "Can't setup several times")
         self.chatroom = chatroom
         self.preservationDelegate = preservationDelegate
+        self.messageIdToShow = messageIdToShow
         controller = chatsProvider.getChatController(for: chatroom)
         controller?.delegate = self
         isSendingAvailable = !chatroom.isReadonly
-        messageIdToShow = messageToShow?.chatMessageId
         updateTitle()
         updateAttachmentButtonAvailability()
         
