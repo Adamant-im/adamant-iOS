@@ -66,6 +66,13 @@ extension Container {
             )
         }.inObjectScope(.container)
         
+        // MARK: CrashlysticsService
+        self.register(CrashlyticsService.self) { r in
+            AdamantCrashlyticsService(
+                securedStore: r.resolve(SecuredStore.self)!
+            )
+        }.inObjectScope(.container)
+        
         // MARK: PushNotificationsTokenService
         self.register(PushNotificationsTokenService.self) { r in
             AdamantPushNotificationsTokenService(

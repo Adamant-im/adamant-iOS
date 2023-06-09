@@ -46,6 +46,9 @@
 /* About scene: Show Welcome screens */
 "About.Row.Welcome" = "Willkommensbildschirm";
 
+/* Contribute scene: 'Crashlytics' section title. */
+"Contribute.Section.Crashlytics" = "Crashlytics";
+
 /* Account tab: 'Currency' row */
 "AccountTab.Row.Currency" = "Währung";
 
@@ -165,6 +168,9 @@
 
 /* Account tab: 'About' row */
 "AccountTab.Row.About" = "Über ADAMANT";
+
+/* Account tab: 'Contribute' row */
+"AccountTab.Row.Contribute" = "Beitragen";
 
 /* Account tab: 'Vote for delegates' button */
 "AccountTab.Row.VoteForDelegates" = "Delegierte wählen";

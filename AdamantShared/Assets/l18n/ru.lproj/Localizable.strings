@@ -46,6 +46,9 @@
 /* About scene: Show Welcome screens */
 "About.Row.Welcome" = "Экраны приветствия";
 
+/* Contribute scene: 'Crashlytics' section title. */
+"Contribute.Section.Crashlytics" = "Crashlytics";
+
 /* System accounts: ADAMANT Tokens */
 "Accounts.AdamantTokens" = "Приветствие АДАМАНТа";
 
@@ -150,6 +153,9 @@
 
 /* Account tab: 'About' row */
 "AccountTab.Row.About" = "Об АДАМАНТе";
+
+/* Account tab: 'Contribute' row */
+"AccountTab.Row.Contribute" = "Сделать вклад";
 
 /* Account tab: 'Theme' row */
 "AccountTab.Row.Theme" = "Тема";

@@ -46,6 +46,11 @@
 		41776FDF29CB189600B74B4E /* AdamantContacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41776FDC29CB17D100B74B4E /* AdamantContacts.swift */; };
 		41776FE029CB189800B74B4E /* AdamantContacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41776FDC29CB17D100B74B4E /* AdamantContacts.swift */; };
 		417BA7F428BF894F00DF94C5 /* NotificationSoundsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417BA7F328BF894F00DF94C5 /* NotificationSoundsViewController.swift */; };
+		4184F16E2A33023A00D7B8B9 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4184F16D2A33023A00D7B8B9 /* GoogleService-Info.plist */; };
+		4184F1712A33044E00D7B8B9 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 4184F1702A33044E00D7B8B9 /* FirebaseCrashlytics */; };
+		4184F1732A33102800D7B8B9 /* AdamantCrashlysticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4184F1722A33102800D7B8B9 /* AdamantCrashlysticsService.swift */; };
+		4184F1752A33106200D7B8B9 /* CrashlysticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4184F1742A33106200D7B8B9 /* CrashlysticsService.swift */; };
+		4184F1772A33173100D7B8B9 /* ContributeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4184F1762A33173100D7B8B9 /* ContributeViewController.swift */; };
 		4186B32E2941C2A3006594A3 /* CoinsScript.rb in Resources */ = {isa = PBXBuildFile; fileRef = 4186B32D2941C2A3006594A3 /* CoinsScript.rb */; };
 		4186B3302941E642006594A3 /* AdmWalletService+DynamicConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4186B32F2941E642006594A3 /* AdmWalletService+DynamicConstants.swift */; };
 		4186B332294200B4006594A3 /* BtcWalletService+DynamicConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4186B331294200B4006594A3 /* BtcWalletService+DynamicConstants.swift */; };
@@ -803,6 +808,10 @@
 		4164A9D828F17DA700EEF16D /* AdamantChatTransactionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantChatTransactionService.swift; sourceTree = "<group>"; };
 		41776FDC29CB17D100B74B4E /* AdamantContacts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantContacts.swift; sourceTree = "<group>"; };
 		417BA7F328BF894F00DF94C5 /* NotificationSoundsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSoundsViewController.swift; sourceTree = "<group>"; };
+		4184F16D2A33023A00D7B8B9 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		4184F1722A33102800D7B8B9 /* AdamantCrashlysticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantCrashlysticsService.swift; sourceTree = "<group>"; };
+		4184F1742A33106200D7B8B9 /* CrashlysticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashlysticsService.swift; sourceTree = "<group>"; };
+		4184F1762A33173100D7B8B9 /* ContributeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContributeViewController.swift; sourceTree = "<group>"; };
 		4186B32D2941C2A3006594A3 /* CoinsScript.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = CoinsScript.rb; sourceTree = "<group>"; };
 		4186B32F2941E642006594A3 /* AdmWalletService+DynamicConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdmWalletService+DynamicConstants.swift"; sourceTree = "<group>"; };
 		4186B331294200B4006594A3 /* BtcWalletService+DynamicConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BtcWalletService+DynamicConstants.swift"; sourceTree = "<group>"; };
@@ -1361,6 +1370,7 @@
 				A5C99E0E262C9E3A00F7B1B7 /* Reachability in Frameworks */,
 				A5DBBAF0262C72EF004AC028 /* LiskKit in Frameworks */,
 				93FA403629401BFC00D20DB6 /* PopupKit in Frameworks */,
+				4184F1712A33044E00D7B8B9 /* FirebaseCrashlytics in Frameworks */,
 				A5DBBAEE262C72EF004AC028 /* BitcoinKit in Frameworks */,
 				A57282CA262C94CD00C96FA8 /* DateToolsSwift in Frameworks */,
 			);
@@ -1877,6 +1887,7 @@
 				9324C75D297170600022D7EA /* RichTransactionStatusService.swift */,
 				41047B73294C61D10039E956 /* VisibleWalletsService.swift */,
 				4153045A29C09C6C000E4BEA /* IncreaseFeeService.swift */,
+				4184F1742A33106200D7B8B9 /* CrashlysticsService.swift */,
 				41C1698B29E7F34900FEB3CB /* RichTransactionReplyService.swift */,
 			);
 			path = ServiceProtocols;
@@ -1900,6 +1911,7 @@
 				E93D7ABF2052CF63005D19DC /* AdamantNotificationService.swift */,
 				41047B75294C62710039E956 /* AdamantVisibleWalletsService.swift */,
 				4153045829C09902000E4BEA /* AdamantIncreaseFeeService.swift */,
+				4184F1722A33102800D7B8B9 /* AdamantCrashlysticsService.swift */,
 				E921597420611A6A0000CA5C /* AdamantReachability.swift */,
 				E950273F202E257E002C1098 /* RepeaterService.swift */,
 				E9E7CDB42002BA6900DFC4DB /* SwinjectedRouter.swift */,
@@ -1979,6 +1991,7 @@
 				4198D57E28C8B834009337F2 /* short-success.mp3 */,
 				4198D58028C8B8D1009337F2 /* default.mp3 */,
 				E9256F752039A9A200DE86E9 /* LaunchScreen.storyboard */,
+				4184F16D2A33023A00D7B8B9 /* GoogleService-Info.plist */,
 				E95CB453205D77B200A7218E /* InfoPlist.strings */,
 			);
 			path = Assets;
@@ -2422,6 +2435,7 @@
 				E9484B7C2285BAD8008E10F0 /* PrivateKeyGenerator.swift */,
 				E908473C219713300095825D /* NotificationsViewController.swift */,
 				417BA7F328BF894F00DF94C5 /* NotificationSoundsViewController.swift */,
+				4184F1762A33173100D7B8B9 /* ContributeViewController.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -2657,6 +2671,7 @@
 				416F5EA3290162EB00EF0400 /* SocketIO */,
 				93FA403529401BFC00D20DB6 /* PopupKit */,
 				938F7D572955C1DA001915CA /* MessageKit */,
+				4184F1702A33044E00D7B8B9 /* FirebaseCrashlytics */,
 			);
 			productName = Adamant;
 			productReference = E913C8EE1FFFA51D001A83F7 /* Adamant.app */;
@@ -2822,6 +2837,7 @@
 				557AC304287B10D8004699D7 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				416F5EA2290162EB00EF0400 /* XCRemoteSwiftPackageReference "socket" */,
 				938F7D562955C1DA001915CA /* XCRemoteSwiftPackageReference "MessageKit" */,
+				4184F16F2A33044E00D7B8B9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			productRefGroup = E913C8EF1FFFA51D001A83F7 /* Products */;
 			projectDirPath = "";
@@ -2887,6 +2903,7 @@
 				4198D58128C8B8D1009337F2 /* default.mp3 in Resources */,
 				E9EC3416200524CA00C0E546 /* Exo+2_300_normal.ttf in Resources */,
 				4186B32E2941C2A3006594A3 /* CoinsScript.rb in Resources */,
+				4184F16E2A33023A00D7B8B9 /* GoogleService-Info.plist in Resources */,
 				E9EC341C200524CA00C0E546 /* Roboto_400_italic.ttf in Resources */,
 				E94E7B0C205D5E4A0042B639 /* TransactionsListViewControllerBase.xib in Resources */,
 				E9484B7A227CA93B008E10F0 /* BalanceTableViewCell.xib in Resources */,
@@ -3112,6 +3129,7 @@
 				648DD7A42237DB9E00B811FD /* DogeWalletService+Send.swift in Sources */,
 				41A1994229D2D3920031AD75 /* SwipePanGestureRecognizer.swift in Sources */,
 				E9942B84203CBFCE00C163AF /* AdamantQRTools.swift in Sources */,
+				4184F1732A33102800D7B8B9 /* AdamantCrashlysticsService.swift in Sources */,
 				6403F5E422723F8C00D58779 /* DashWalletService.swift in Sources */,
 				9371E561295CD53100438F2C /* ChatLocalization.swift in Sources */,
 				93BF4A6629E4859900505CD0 /* DelegatesBottomPanel.swift in Sources */,
@@ -3142,6 +3160,7 @@
 				644EC35E20F34F1E00F40C73 /* DelegateDetailsViewController.swift in Sources */,
 				E96D64B52295BED700CA5587 /* ChatAsset.swift in Sources */,
 				E9942B80203C058C00C163AF /* QRGeneratorViewController.swift in Sources */,
+				4184F1772A33173100D7B8B9 /* ContributeViewController.swift in Sources */,
 				E921597520611A6A0000CA5C /* AdamantReachability.swift in Sources */,
 				E9960B3321F5154300C840A8 /* BaseAccount+CoreDataClass.swift in Sources */,
 				E9FCA1E6218334C00005E83D /* SimpleTransactionDetails.swift in Sources */,
@@ -3202,6 +3221,7 @@
 				6449BA6D235CA0930033B936 /* ERC20TransactionsViewController.swift in Sources */,
 				E983AE2A20E65F3200497E1A /* AccountViewController.swift in Sources */,
 				6449BA70235CA0930033B936 /* ERC20WalletRouter.swift in Sources */,
+				4184F1752A33106200D7B8B9 /* CrashlysticsService.swift in Sources */,
 				4197B9C92952FAFF004CAF64 /* VisibleWalletsCheckmarkView.swift in Sources */,
 				E957E13F229BFEBB0019732A /* AdamantNotificationKeys.swift in Sources */,
 				640EFA9D2558613400E9724B /* DogeProvider.swift in Sources */,
@@ -3922,6 +3942,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				DISPLAY_NAME = ADM.Dev;
 				EXCLUDED_SOURCE_FILE_NAMES = "";
@@ -3951,6 +3972,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				DISPLAY_NAME = Adamant;
 				EXCLUDED_SOURCE_FILE_NAMES = Debug.xcassets;
@@ -4212,6 +4234,14 @@
 				kind = branch;
 			};
 		};
+		4184F16F2A33044E00D7B8B9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.0.0;
+			};
+		};
 		557AC304287B10D8004699D7 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
@@ -4360,6 +4390,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 416F5EA2290162EB00EF0400 /* XCRemoteSwiftPackageReference "socket" */;
 			productName = SocketIO;
+		};
+		4184F1702A33044E00D7B8B9 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4184F16F2A33044E00D7B8B9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
 		};
 		557AC305287B10D8004699D7 /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;

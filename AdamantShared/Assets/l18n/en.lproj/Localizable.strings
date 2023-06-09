@@ -7,6 +7,9 @@
 /* About scene: 'Contact us' section title. */
 "About.Section.ContactUs" = "Contact us";
 
+/* Contribute scene: 'Crashlytics' section title. */
+"Contribute.Section.Crashlytics" = "Crashlytics";
+
 /* About scene: Website row */
 "About.Row.Website" = "Website";
 
@@ -162,6 +165,9 @@
 
 /* Account tab: 'About' row */
 "AccountTab.Row.About" = "About";
+
+/* Account tab: 'Contribute' row */
+"AccountTab.Row.Contribute" = "Contribute";
 
 /* Account tab: 'Vote for delegates' button */
 "AccountTab.Row.VoteForDelegates" = "Vote for delegates";
