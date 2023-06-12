@@ -42,8 +42,8 @@
         "repositoryURL": "https://github.com/EFPrefix/EFQRCode.git",
         "state": {
           "branch": null,
-          "revision": "4a72d79f9cae6d2f189f768178cc8594b427c190",
-          "version": "6.1.0"
+          "revision": "2991c2f318ad9529d93b2a73a382a3f9c72c64ce",
+          "version": "6.2.2"
         }
       },
       {
@@ -96,8 +96,8 @@
         "repositoryURL": "https://github.com/krzyzanowskim/OpenSSL.git",
         "state": {
           "branch": null,
-          "revision": "52db2ab9de7f78d1dea0d728fddd47fb133e25b7",
-          "version": "1.1.1900"
+          "revision": "0c70e4b7d22411a7fe3ff59b913d5b760b735ce1",
+          "version": "1.1.2100"
         }
       },
       {
@@ -105,7 +105,7 @@
         "repositoryURL": "https://github.com/rechsteiner/Parchment",
         "state": {
           "branch": "main",
-          "revision": "ee81b508ab5926b7253779d029b0d9af2dd4ee2b",
+          "revision": "13aad3e9308e8a4e38cb579430dbf66465418777",
           "version": null
         }
       },
@@ -213,8 +213,8 @@
         "repositoryURL": "https://github.com/skywinder/web3swift.git",
         "state": {
           "branch": null,
-          "revision": "edfe6240efcc6710d88b370ab1a3375e51dbe62f",
-          "version": "3.1.0"
+          "revision": "16a2915ebd1a0fd33bf0a0ed5a9874909a6e187d",
+          "version": "3.1.2"
         }
       }
     ]
