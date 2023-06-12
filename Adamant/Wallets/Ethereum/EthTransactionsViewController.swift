@@ -27,11 +27,8 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        self.refreshControl.beginRefreshing()
-        
+        updateLoadingView(isHidden: false)
         currencySymbol = EthWalletService.currencySymbol
-        
         handleRefresh()
     }
     
@@ -41,10 +38,10 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
         offset = 0
         transactions.removeAll()
         tableView.reloadData()
-        loadData(false)
+        loadData(silent: false)
     }
     
-    override func loadData(_ silent: Bool) {
+    override func loadData(silent: Bool) {
         isBusy = true
         emptyLabel.isHidden = true
         
@@ -76,14 +73,11 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
             refreshControl.endRefreshing()
             stopBottomIndicator()
             tableView.reloadData()
+            updateLoadingView(isHidden: true)
         }.stored(in: taskManager)
     }
     
     override func reloadData() {
-        DispatchQueue.onMainAsync { [weak self] in
-            self?.refreshControl.beginRefreshing()
-        }
-        
         handleRefresh()
     }
     

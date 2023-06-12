@@ -25,24 +25,20 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        self.refreshControl.beginRefreshing()
-        
+        updateLoadingView(isHidden: false)
         currencySymbol = LskWalletService.currencySymbol
-        
-        loadData(true)
+        handleRefresh()
     }
     
     override func handleRefresh() {
-        self.emptyLabel.isHidden = true
-        tableView.reloadData()
+        emptyLabel.isHidden = true
         transactions.removeAll()
         tableView.reloadData()
         offset = 0
-        loadData(false)
+        loadData(silent: false)
     }
     
-    override func loadData(_ silent: Bool) {
+    override func loadData(silent: Bool) {
         isBusy = true
         Task { @MainActor in
             do {
@@ -50,7 +46,6 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
                 transactions.append(contentsOf: trs)
                 offset += UInt(trs.count)
                 isNeedToLoadMoore = trs.count > 0
-                tableView.reloadData()
             } catch {
                 isNeedToLoadMoore = false
                 
@@ -63,6 +58,8 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
             emptyLabel.isHidden = self.transactions.count > 0
             stopBottomIndicator()
             refreshControl.endRefreshing()
+            tableView.reloadData()
+            updateLoadingView(isHidden: true)
         }.stored(in: taskManager)
     }
     

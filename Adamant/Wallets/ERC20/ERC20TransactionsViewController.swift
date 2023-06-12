@@ -34,11 +34,8 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        self.refreshControl.beginRefreshing()
-        
+        updateLoadingView(isHidden: false)
         currencySymbol = walletService.tokenSymbol
-        
         handleRefresh()
     }
     
@@ -48,10 +45,10 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
         offset = 0
         transactions.removeAll()
         tableView.reloadData()
-        loadData(false)
+        loadData(silent: false)
     }
     
-    override func loadData(_ silent: Bool) {
+    override func loadData(silent: Bool) {
         isBusy = true
         emptyLabel.isHidden = true
         
@@ -80,17 +77,14 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
             
             isBusy = false
             emptyLabel.isHidden = transactions.count > 0
-            tableView.reloadData()
             stopBottomIndicator()
             refreshControl.endRefreshing()
+            tableView.reloadData()
+            updateLoadingView(isHidden: true)
         }.stored(in: taskManager)
     }
     
     override func reloadData() {
-        DispatchQueue.onMainAsync { [weak self] in
-            self?.refreshControl.beginRefreshing()
-        }
-        
         handleRefresh()
     }
     
