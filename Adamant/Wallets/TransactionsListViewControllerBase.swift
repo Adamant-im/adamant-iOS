@@ -41,7 +41,7 @@ class TransactionsListViewControllerBase: UIViewController {
     var isNeedToLoadMoore = true
     var isBusy = true
     
-    lazy var loadingView = LoadingView()
+    private(set) lazy var loadingView = LoadingView()
     
     // MARK: - IBOutlets
     @IBOutlet weak var tableView: UITableView!
