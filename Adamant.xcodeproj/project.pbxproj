@@ -4263,7 +4263,7 @@
 			repositoryURL = "https://github.com/EFPrefix/EFQRCode.git";
 			requirement = {
 				kind = upToNextMinorVersion;
-				minimumVersion = 6.1.0;
+				minimumVersion = 6.2.2;
 			};
 		};
 		A50AEB0A262C81E300B37C22 /* XCRemoteSwiftPackageReference "QRCodeReader.swift" */ = {

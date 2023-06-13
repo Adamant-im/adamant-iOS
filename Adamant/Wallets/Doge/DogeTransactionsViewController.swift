@@ -22,9 +22,8 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        updateLoadingView(isHidden: false)
         currencySymbol = DogeWalletService.currencySymbol
-        
-        refreshControl.beginRefreshing()
         handleRefresh()
     }
     
@@ -32,10 +31,10 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
         offset = 0
         transactions.removeAll()
         tableView.reloadData()
-        loadData(false)
+        loadData(silent: false)
     }
     
-    override func loadData(_ silent: Bool) {
+    override func loadData(silent: Bool) {
         isBusy = true
         
         Task {
@@ -57,6 +56,7 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
             stopBottomIndicator()
             refreshControl.endRefreshing()
             tableView.reloadData()
+            updateLoadingView(isHidden: true)
         }.stored(in: taskManager)
     }
     

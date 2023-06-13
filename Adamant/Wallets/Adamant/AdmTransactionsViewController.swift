@@ -129,7 +129,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         }.stored(in: taskManager)
     }
     
-    override func loadData(_ silent: Bool) {
+    override func loadData(silent: Bool) {
         isBusy = true
         emptyLabel.isHidden = true
         
@@ -306,7 +306,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
             vc.viewModel.setup(
                 account: account,
                 chatroom: chatroom,
-                messageToShow: nil,
+                messageIdToShow: nil,
                 preservationDelegate: nil
             )
             
@@ -357,7 +357,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
             vc.viewModel.setup(
                 account: account,
                 chatroom: chatroom,
-                messageToShow: nil,
+                messageIdToShow: nil,
                 preservationDelegate: nil
             )
             

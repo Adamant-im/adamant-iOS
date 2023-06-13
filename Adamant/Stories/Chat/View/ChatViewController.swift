@@ -153,7 +153,15 @@ final class ChatViewController: MessagesViewController {
         }
         
         super.collectionView(collectionView, willDisplay: cell, forItemAt: indexPath)
-        guard indexPath.section < 4 else { return }
+        
+        let isVisible = collectionView.indexPathsForVisibleItems.contains {
+            $0.section == viewModel.minIndexForStartLoadNewMessages
+        }
+        
+        guard indexPath.section < viewModel.minIndexForStartLoadNewMessages,
+              isVisible
+        else { return }
+        
         viewModel.loadMoreMessagesIfNeeded()
     }
     
@@ -371,7 +379,7 @@ private extension ChatViewController {
         /// This gesture controls the position of the input bar when the keyboard is open and the user swipes it to dismiss.
         /// Due to incorrect checks in MessageKit, we manually set the delegate and assign it to our custom chatKeyboardManager object.
         /// This ensures proper handling and control of the pan gesture for the input bar.
-        if let gesture = messagesCollectionView.gestureRecognizers?[13] as? UIPanGestureRecognizer {
+        if let gesture = messagesCollectionView.gestureRecognizers?[safe: 13] as? UIPanGestureRecognizer {
             gesture.delegate = chatKeyboardManager
             chatKeyboardManager.panGesture = gesture
         }
@@ -497,9 +505,17 @@ private extension ChatViewController {
         switch position {
         case let .offset(offset):
             chatMessagesCollectionView.setBottomOffset(offset, safely: viewAppeared)
-        case let .messageId(id):
-            guard let index = viewModel.messages.firstIndex(where: { $0.messageId == id})
-            else { break }
+        case let .messageId(id, scrollToBottomIfNotFound):
+            var index = viewModel.messages.firstIndex(where: { $0.messageId == id})
+            var needToAnimateCell = true
+            
+            if scrollToBottomIfNotFound,
+               index == nil {
+                index = viewModel.messages.count - 1
+                needToAnimateCell = false
+            }
+            
+            guard let index = index else { break }
             
             messagesCollectionView.scrollToItem(
                 at: .init(item: .zero, section: index),
@@ -507,12 +523,16 @@ private extension ChatViewController {
                 animated: animated
             )
             
+            viewModel.needToAnimateCellIndex = needToAnimateCell
+            ? index
+            : nil
+            
+            guard animated else { break }
+            
             viewModel.animateScrollIfNeeded(
                 to: index,
                 visibleIndex: messagesCollectionView.indexPathsForVisibleItems.last?.section
             )
-            
-            viewModel.needToAnimateCellIndex = index
         }
         
         guard !viewAppeared else { return }
