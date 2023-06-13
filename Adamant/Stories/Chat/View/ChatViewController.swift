@@ -379,7 +379,7 @@ private extension ChatViewController {
         /// This gesture controls the position of the input bar when the keyboard is open and the user swipes it to dismiss.
         /// Due to incorrect checks in MessageKit, we manually set the delegate and assign it to our custom chatKeyboardManager object.
         /// This ensures proper handling and control of the pan gesture for the input bar.
-        if let gesture = messagesCollectionView.gestureRecognizers?[13] as? UIPanGestureRecognizer {
+        if let gesture = messagesCollectionView.gestureRecognizers?[safe: 13] as? UIPanGestureRecognizer {
             gesture.delegate = chatKeyboardManager
             chatKeyboardManager.panGesture = gesture
         }

@@ -143,7 +143,7 @@ class TransferViewControllerBase: FormViewController {
     
     var commentsEnabled: Bool = false
     var rootCoinBalance: Decimal?
-    var isNeedAddFeeToTotal: Bool { true }
+    var isNeedAddFee: Bool { true }
     var replyToMessageId: String?
     
     var service: WalletServiceWithSend? {
@@ -216,11 +216,16 @@ class TransferViewControllerBase: FormViewController {
         guard
             let service = service,
             let balance = service.wallet?.balance,
-            balance > service.minBalance else {
+            balance > service.minBalance
+        else {
             return 0
         }
         
-        let max = balance - service.transactionFee - service.minBalance
+        let fee = isNeedAddFee
+        ? service.transactionFee
+        : 0
+        
+        let max = balance - fee - service.minBalance
         
         return max >= 0 ? max : 0
     }
@@ -561,7 +566,7 @@ class TransferViewControllerBase: FormViewController {
         
         if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.total.tag) {
             if let amount = amount {
-                row.value = isNeedAddFeeToTotal
+                row.value = isNeedAddFee
                 ? (amount + service.transactionFee).doubleValue
                 : amount.doubleValue
                 row.updateCell()

@@ -129,7 +129,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         }.stored(in: taskManager)
     }
     
-    override func loadData(_ silent: Bool) {
+    override func loadData(silent: Bool) {
         isBusy = true
         emptyLabel.isHidden = true
         

@@ -175,7 +175,7 @@ final class DelegatesListViewController: KeyboardObservingViewController {
     }
     
     private func setupNavigationItem() {
-        navigationItem.title = String.adamantLocalized.visibleWallets.title
+        navigationItem.title = String.adamantLocalized.delegates.title
         navigationItem.searchController = searchController
         
         navigationItem.rightBarButtonItem = .init(
