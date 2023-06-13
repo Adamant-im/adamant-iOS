@@ -54,11 +54,12 @@ class TransferBaseProvider: TransferNotificationContentProvider {
             attachments = nil
         }
         
-        return NotificationContent(title: partnerName ?? partnerAddress,
-                                   subtitle: String.adamantLocalized.notifications.newTransfer,
-                                   body: body,
-                                   attachments: attachments,
-                                   categoryIdentifier: AdamantNotificationCategories.transfer)
+        return NotificationContent(
+            title: partnerName ?? partnerAddress,
+            subtitle: .adamantLocalized.notifications.newTransfer,
+            body: body,
+            attachments: attachments,
+            categoryIdentifier: AdamantNotificationCategories.transfer)
     }
     
     // MARK: - To override
