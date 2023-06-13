@@ -78,7 +78,7 @@ final class ChatViewModel: NSObject {
     
     var startPosition: ChatStartPosition? {
         if let messageIdToShow = messageIdToShow {
-            return .messageIdOrBottom(messageIdToShow)
+            return .messageId(messageIdToShow, toBottomIfNotFound: true)
         }
         
         guard let address = chatroom?.partner?.address else { return nil }
