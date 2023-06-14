@@ -1,6 +1,7 @@
 //
-//  AddressType.swift
+//  LegacyAddress.swift
 //
+//  Copyright © 2018 Kishikawa Katsumi
 //  Copyright © 2018 BitcoinKit developers
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,31 +25,39 @@
 
 import Foundation
 
-public enum AddressType {
-    case pubkeyHash
-    case scriptHash
-    
-    var versionByte: UInt8 {
-        switch self {
-        case .pubkeyHash:
-            return .zero
-        case .scriptHash:
-            return 8
+public final class LegacyAddress: Address, Equatable {
+    public let type: AddressType
+    public let lockingScriptPayload: Data
+    public let stringValue: String
+
+    public var scriptType: ScriptType {
+        switch type {
+            case .pubkeyHash: return .p2pkh
+            case .scriptHash: return .p2sh
         }
     }
     
-    var versionByte160: UInt8 { return versionByte + 0 }
-    var versionByte192: UInt8 { return versionByte + 1 }
-    var versionByte224: UInt8 { return versionByte + 2 }
-    var versionByte256: UInt8 { return versionByte + 3 }
-    var versionByte320: UInt8 { return versionByte + 4 }
-    var versionByte384: UInt8 { return versionByte + 5 }
-    var versionByte448: UInt8 { return versionByte + 6 }
-    var versionByte512: UInt8 { return versionByte + 7 }
-}
+    public var qrcodeString: String {
+        stringValue
+    }
+    
+    public var lockingScript: Data {
+        switch type {
+        case .pubkeyHash: return OpCode.p2pkhStart + OpCode.push(lockingScriptPayload) + OpCode.p2pkhFinish
+        case .scriptHash: return OpCode.p2shStart + OpCode.push(lockingScriptPayload) + OpCode.p2shFinish
+        }
+    }
 
-extension AddressType: Equatable {
-    public static func == (lhs: AddressType, rhs: AddressType) -> Bool {
-        return lhs.versionByte == rhs.versionByte
+    public init(type: AddressType, payload: Data, base58: String) {
+        self.type = type
+        self.lockingScriptPayload = payload
+        self.stringValue = base58
+    }
+
+    public static func ==<T: Address>(lhs: LegacyAddress, rhs: T) -> Bool {
+        guard let rhs = rhs as? LegacyAddress else {
+            return false
+        }
+        return lhs.type == rhs.type && lhs.lockingScriptPayload == rhs.lockingScriptPayload
     }
 }

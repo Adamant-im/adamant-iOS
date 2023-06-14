@@ -50,8 +50,7 @@ struct DashUnspentTransaction: Decodable {
         case height
     }
     
-    func asUnspentTransaction(with publicKeyHash: Data) -> UnspentTransaction {
-        let lockScript = Script.buildPublicKeyHashOut(pubKeyHash: publicKeyHash)
+    func asUnspentTransaction(lockScript: Data) -> UnspentTransaction {
         let txHash = Data(hex: txid).map { Data($0.reversed()) } ?? Data()
         
         let unspentOutput = TransactionOutput(value: amount, lockingScript: lockScript)

@@ -42,6 +42,7 @@ public final class HDWallet {
 
     private let seed: Data
     private let keychain: HDKeychain
+    private let addressConverter: AddressConverter
 
     private let purpose: UInt32
     private let coinType: UInt32
@@ -85,6 +86,7 @@ public final class HDWallet {
         // Public derivation is used at this level.
         externalIndex = 0
         internalIndex = 0
+        addressConverter = AddressConverterFactory().make(network: network)
     }
 
     // MARK: - External Addresses & Keys (Receive Addresses & Keys)
@@ -94,7 +96,7 @@ public final class HDWallet {
 
     public func receiveAddress(index: UInt32) throws -> Address {
         let key = try publicKey(index: index)
-        return key.toCashaddr()
+        return try addressConverter.convert(publicKey: key, type: .p2pkh)
     }
 
     public func publicKey(index: UInt32) throws -> PublicKey {
@@ -121,7 +123,7 @@ public final class HDWallet {
 
     public func changeAddress(index: UInt32) throws -> Address {
         let key = try changePublicKey(index: index)
-        return key.toCashaddr()
+        return try addressConverter.convert(publicKey: key, type: .p2pkh)
     }
 
     public func changePublicKey(index: UInt32) throws -> PublicKey {

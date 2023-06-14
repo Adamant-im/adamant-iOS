@@ -7,6 +7,7 @@
 //
 
 import Swinject
+import BitcoinKit
 
 // MARK: - Services
 extension Container {
@@ -232,6 +233,11 @@ extension Container {
                 adamantCore: r.resolve(AdamantCore.self)!,
                 accountService: r.resolve(AccountService.self)!
             )
+        }.inObjectScope(.container)
+        
+        // MARK: Bitcoin AddressConverterFactory
+        self.register(AddressConverterFactory.self) { r in
+            AddressConverterFactory()
         }.inObjectScope(.container)
     }
 }

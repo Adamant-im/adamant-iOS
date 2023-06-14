@@ -29,10 +29,9 @@ extension BtcWalletService: WalletServiceTwoStepSend {
             throw WalletServiceError.notLogged
         }
         
-        let changeAddress = wallet.publicKey.toCashaddr()
         let key = wallet.privateKey
         
-        guard let toAddress = try? LegacyAddress(recipient, for: self.network) else {
+        guard let toAddress = try? addressConverter.convert(address: recipient) else {
             throw WalletServiceError.accountNotFound
         }
         
@@ -56,7 +55,7 @@ extension BtcWalletService: WalletServiceTwoStepSend {
             toAddress: toAddress,
             amount: rawAmount,
             fee: fee,
-            changeAddress: changeAddress,
+            changeAddress: wallet.addressEntity,
             utxos: utxos,
             keys: [key]
         )
@@ -133,7 +132,7 @@ extension BtcWalletService: WalletServiceTwoStepSend {
                         
                         let value = NSDecimalNumber(decimal: item.value).uint64Value
                         
-                        let lockScript = wallet.publicKey.toCashaddr().lockingScript
+                        let lockScript = wallet.addressEntity.lockingScript
                         let txHash = Data(hex: item.txId).map { Data($0.reversed()) } ?? Data()
                         let txIndex = item.vout
                         

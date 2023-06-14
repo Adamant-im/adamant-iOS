@@ -9,8 +9,8 @@
 import Foundation
 import BitcoinKit
 
-class BtcWallet: WalletAccount {
-    let address: String
+final class BtcWallet: WalletAccount {
+    let addressEntity: Address
     let privateKey: PrivateKey
     let publicKey: PublicKey
     var balance: Decimal = 0.0
@@ -19,10 +19,11 @@ class BtcWallet: WalletAccount {
     var minAmount: Decimal = 546e-8
     var isBalanceInitialized: Bool = false
     
-    init(privateKey: PrivateKey) {
+    var address: String { addressEntity.stringValue }
+    
+    init(privateKey: PrivateKey, addressConverter: AddressConverter) throws {
         self.privateKey = privateKey
         self.publicKey = privateKey.publicKey()
-        self.address = publicKey.toCashaddr().base58
+        self.addressEntity = try addressConverter.convert(publicKey: publicKey, type: .p2pkh)
     }
-
 }
