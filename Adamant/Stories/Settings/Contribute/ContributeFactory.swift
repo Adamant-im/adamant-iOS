@@ -15,7 +15,7 @@ struct ContributeFactory {
     
     func makeViewController() -> UIViewController {
         UIHostingController(
-            rootView: TestView(
+            rootView: ContributeView(
                 viewModel: .init(crashliticsService: crashliticsService)
             )
         )

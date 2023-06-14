@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct TestView: View {
+struct ContributeView: View {
     
     // MARK: Rows
     enum Rows {
