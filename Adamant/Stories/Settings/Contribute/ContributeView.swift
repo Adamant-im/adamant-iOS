@@ -53,7 +53,7 @@ struct ContributeView: View {
         }
         .padding(.top)
         .background(Color(.adamant.secondBackgroundColor))
-        .navigationTitle(viewModel.state.name)
+        .navigationTitle(Text(viewModel.state.name))
     }
     
     init(viewModel: ContributeViewModel) {

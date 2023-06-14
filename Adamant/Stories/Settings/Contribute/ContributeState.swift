@@ -9,8 +9,13 @@
 import SwiftUI
 
 struct ContributeState: Equatable {
-    var name: Text
+    var name: String
     var isOn: Bool
     
-    static let initial = Self(name: Text("AccountTab.Row.Contribute"), isOn: false)
+    static let initial = Self(
+        name: NSLocalizedString(
+            "AccountTab.Row.Contribute",
+            comment: "'Contribute' row"),
+        isOn: false
+    )
 }
