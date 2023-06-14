@@ -160,7 +160,7 @@ class NotificationService: UNNotificationServiceExtension {
                     content = notificationContent
                 }
                 
-                // adm transfer with reply
+                // adm transfer reply
                 if let data = message.data(using: String.Encoding.utf8),
                    let richContent = RichMessageTools.richContent(from: data),
                    richContent[RichContentKeys.reply.replyToId] != nil,
@@ -174,7 +174,7 @@ class NotificationService: UNNotificationServiceExtension {
                     content = notificationContent
                 }
                 
-                // message with reply
+                // message reply
                 if let data = message.data(using: String.Encoding.utf8),
                    let richContent = RichMessageTools.richContent(from: data),
                    let message = richContent[RichContentKeys.reply.replyMessage] as? String,
@@ -189,7 +189,7 @@ class NotificationService: UNNotificationServiceExtension {
                     )
                 }
                 
-                // transfer rich with reply
+                // rich transfer reply
                 if let data = message.data(using: String.Encoding.utf8),
                    let richContent = RichMessageTools.richContent(from: data),
                    let transferContent = richContent[RichContentKeys.reply.replyMessage] as? [String: String],
