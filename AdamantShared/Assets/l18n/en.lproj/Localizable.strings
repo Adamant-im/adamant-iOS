@@ -10,6 +10,33 @@
 /* Contribute scene: 'Crashlytics' section title. */
 "Contribute.Section.Crashlytics" = "Crashlytics";
 
+/* Contribute scene: 'Crashlytics' section description. */
+"Contribute.Section.CrashlyticsDescription" = "Send anonymous crash reports and make the app more reliable. We don't gather usage statistics.";
+
+/* Contribute scene: 'Run nodes' section title. */
+"Contribute.Section.RunNodes" = "Run the ADAMANT node";
+
+/* Contribute scene: 'Run nodes' section description. */
+"Contribute.Section.RunNodesDescription" = "Support decentralization and enhance privacy level";
+
+/* Contribute scene: 'Network delegate' section title. */
+"Contribute.Section.NetworkDelegate" = "Become a network delegate";
+
+/* Contribute scene: 'Network delegate' section description. */
+"Contribute.Section.NetworkDelegateDescription" = "To become a delegate, pay a registration fee and gain voters’ support";
+
+/* Contribute scene: 'Code contribute' section title. */
+"Contribute.Section.CodeContribute" = "Contribute to the code";
+
+/* Contribute scene: 'Code contribute' section description. */
+"Contribute.Section.CodeContributeDescription" = "If you are a developer, join our GitHub repository";
+
+/* Contribute scene: 'Donate' section title. */
+"Contribute.Section.Donate" = "Donate";
+
+/* Contribute scene: 'Donate' section description. */
+"Contribute.Section.DonateDescription" = "Every donation makes ADAMANT stronger";
+
 /* About scene: Website row */
 "About.Row.Website" = "Website";
 

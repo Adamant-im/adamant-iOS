@@ -23,4 +23,8 @@ final class ContributeViewModel: ObservableObject {
         state.isOn = value
         crashliticsService.setCrashlyticsEnabled(value)
     }
+    
+    func simulateCrash() {
+        fatalError("Test crash")
+    }
 }

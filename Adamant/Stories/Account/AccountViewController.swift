@@ -566,7 +566,6 @@ class AccountViewController: FormViewController {
                 case .faceID: $0.cell.imageView?.image = #imageLiteral(resourceName: "row_faceid.png")
                 }
             }
-            $0.cell.backgroundColor = UIColor.adamant.cellColor
             $0.hidden = Condition.function([], { [weak self] _ -> Bool in
                 guard let showBiometry = self?.showBiometryOptions else {
                     return true
