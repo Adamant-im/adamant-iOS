@@ -121,7 +121,7 @@ class AccountViewController: FormViewController {
             case .biometry: return nil // Determined by localAuth service
             case .notifications: return #imageLiteral(resourceName: "row_Notifications.png")
             case .visibleWallets: return #imageLiteral(resourceName: "row_balance")
-            case .contribute: return #imageLiteral(resourceName: "row_about")
+            case .contribute: return #imageLiteral(resourceName: "row_contribute")
             }
         }
     }

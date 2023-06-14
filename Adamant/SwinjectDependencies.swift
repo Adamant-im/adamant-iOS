@@ -217,6 +217,11 @@ extension Container {
             )
         }.inObjectScope(.container)
         
+        // MARK: Contribute screen factory
+        self.register(ContributeFactory.self) { r in
+            ContributeFactory(crashliticsService: r.resolve(CrashlyticsService.self)!)
+        }.inObjectScope(.container)
+        
         // MARK: Rich transaction status service
         self.register(RichTransactionStatusService.self) { r in
             let accountService = r.resolve(AccountService.self)!

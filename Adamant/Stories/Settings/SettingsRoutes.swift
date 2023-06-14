@@ -56,11 +56,9 @@ extension AdamantScene {
             )
         }
         
-        static let contribute = AdamantScene(identifier: "Contribute") { r in
-            ContributeViewController(
-                crashlyticsService: r.resolve(CrashlyticsService.self)!
-            )
-        }
+        static let contribute = AdamantScene(identifier: "Contribute", factory: { r in
+            r.resolve(ContributeFactory.self)!.makeViewController()
+        })
         
         private init() {}
     }
