@@ -401,29 +401,6 @@ public class Script {
 }
 
 extension Script {
-    // Standard Transaction to Bitcoin address (pay-to-pubkey-hash)
-    // scriptPubKey: OP_DUP OP_HASH160 <pubKeyHash> OP_EQUALVERIFY OP_CHECKSIG
-    public static func buildPublicKeyHashOut(pubKeyHash: Data) -> Data {
-        var tmp = Data()
-        tmp += OpCode.OP_DUP
-        tmp += OpCode.OP_HASH160
-        tmp += UInt8(pubKeyHash.count)
-        tmp += pubKeyHash
-        tmp += OpCode.OP_EQUALVERIFY
-        tmp += OpCode.OP_CHECKSIG
-        return tmp
-    }
-    
-    // Transaction to Bitcoin address (pay-to-script-hash)
-    public static func buildScriptHashOut(scriptHash: Data) -> Data {
-        var tmp = Data()
-        tmp += OpCode.OP_HASH160
-        tmp += UInt8(scriptHash.count)
-        tmp += scriptHash
-        tmp += OpCode.OP_EQUAL
-        return tmp
-    }
-
     public static func buildPublicKeyUnlockingScript(signature: Data, pubkey: PublicKey, hashType: SighashType) -> Data {
         var data: Data = Data([UInt8(signature.count + 1)]) + signature + UInt8(hashType)
         data += VarInt(pubkey.data.count).serialized()
