@@ -32,6 +32,13 @@ struct RichContentKeys {
     static let type = "type"
     
     private init() {}
+    
+    enum reply {
+        static let reply = "reply"
+        static let replyToId = "replyto_id"
+        static let replyMessage = "reply_message"
+        static let decodedReplyMessage = "decodedMessage"
+    }
 }
 
 // MARK: - RichMessageReply
@@ -180,13 +187,6 @@ extension RichContentKeys {
         static let amount = "amount"
         static let hash = "hash"
         static let comments = "comments"
-    }
-    
-    enum reply {
-        static let reply = "reply"
-        static let replyToId = "replyto_id"
-        static let replyMessage = "reply_message"
-        static let decodedReplyMessage = "decodedMessage"
     }
 }
 
