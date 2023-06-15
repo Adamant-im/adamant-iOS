@@ -10,7 +10,6 @@ import UIKit
 import Swinject
 import CryptoSwift
 import CoreData
-import Firebase
 
 // MARK: - Constants
 extension String.adamantLocalized {
@@ -274,9 +273,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // MARK: 9. Notifications
         pushNotificationsTokenService.sendTokenDeletionTransactions()
         UNUserNotificationCenter.current().delegate = self
-        
-        // MARK: Firebase
-        FirebaseApp.configure()
         
         return true
     }

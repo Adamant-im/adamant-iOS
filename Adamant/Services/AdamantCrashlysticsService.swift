@@ -19,6 +19,7 @@ final class AdamantCrashlyticsService: CrashlyticsService {
     // MARK: Proprieties
     
     private var notificationsSet: Set<AnyCancellable> = []
+    private var isConfigured = false
     
     // MARK: Lifecycle
     
@@ -59,7 +60,18 @@ final class AdamantCrashlyticsService: CrashlyticsService {
         return result
     }
     
+    @MainActor
+    private func configureIfNeeded() {
+        guard !isConfigured && isCrashlyticsEnabled() else { return }
+        
+        FirebaseApp.configure()
+        isConfigured = true
+    }
+    
     private func updateCrashlyticSDK(isEnabled: Bool) {
-        Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(isEnabled)
+        Task {
+            await self.configureIfNeeded()
+            Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(isEnabled)
+        }
     }
 }
