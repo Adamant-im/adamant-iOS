@@ -46,6 +46,36 @@
 /* About scene: Show Welcome screens */
 "About.Row.Welcome" = "Экраны приветствия";
 
+/* Contribute scene: 'Crashlytics' section title. */
+"Contribute.Section.Crashlytics" = "Crashlytics";
+
+/* Contribute scene: 'Crashlytics' section description. */
+"Contribute.Section.CrashlyticsDescription" = "Отправляйте анонимные отчеты об ошибках и сделайте приложение более надежным. Мы не собираем статистику.";
+
+/* Contribute scene: 'Run nodes' section title. */
+"Contribute.Section.RunNodes" = "Запустите узел сети АДАМАНТа";
+
+/* Contribute scene: 'Run nodes' section description. */
+"Contribute.Section.RunNodesDescription" = "Поддержите децентрализацию и повысьте уровень конфиденциальности";
+
+/* Contribute scene: 'Network delegate' section title. */
+"Contribute.Section.NetworkDelegate" = "Станьте делегатом сети";
+
+/* Contribute scene: 'Network delegate' section description. */
+"Contribute.Section.NetworkDelegateDescription" = "Чтобы стать делегатом, оплатите регистрационный сбор и получите голоса пользователей";
+
+/* Contribute scene: 'Code contribute' section title. */
+"Contribute.Section.CodeContribute" = "Пишите код";
+
+/* Contribute scene: 'Code contribute' section description. */
+"Contribute.Section.CodeContributeDescription" = "Если вы разработчик, присоединяйтесь к нашему репозиторию на GitHub";
+
+/* Contribute scene: 'Donate' section title. */
+"Contribute.Section.Donate" = "Внести крипту";
+
+/* Contribute scene: 'Donate' section description. */
+"Contribute.Section.DonateDescription" = "Каждое пожертвование делает АДАМАНТ сильнее";
+
 /* System accounts: ADAMANT Tokens */
 "Accounts.AdamantTokens" = "Приветствие АДАМАНТа";
 
@@ -150,6 +180,9 @@
 
 /* Account tab: 'About' row */
 "AccountTab.Row.About" = "Об АДАМАНТе";
+
+/* Account tab: 'Contribute' row */
+"AccountTab.Row.Contribute" = "Сделать вклад";
 
 /* Account tab: 'Theme' row */
 "AccountTab.Row.Theme" = "Тема";

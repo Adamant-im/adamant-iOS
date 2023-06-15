@@ -42,6 +42,10 @@ extension StoreKey {
     enum increaseFee {
         static let increaseFee = "increaseFee"
     }
+    
+    enum crashlytic {
+        static let crashlyticEnabled = "crashlyticEnabled"
+    }
 }
 
 protocol SecuredStore: AnyObject {

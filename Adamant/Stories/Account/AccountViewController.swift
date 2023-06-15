@@ -58,7 +58,7 @@ class AccountViewController: FormViewController {
     
     enum Rows {
         case balance, sendTokens // Wallet
-        case security, nodes, theme, currency, about, visibleWallets // Application
+        case security, nodes, theme, currency, about, visibleWallets, contribute // Application
         case voteForDelegates, generateQr, generatePk, logout // Actions
         case stayIn, biometry, notifications // Security
         
@@ -79,6 +79,7 @@ class AccountViewController: FormViewController {
             case .biometry: return "biometry"
             case .notifications: return "notifications"
             case .visibleWallets: return "visibleWallets"
+            case .contribute: return "contribute"
             }
         }
         
@@ -99,6 +100,7 @@ class AccountViewController: FormViewController {
             case .biometry: return SecurityViewController.Rows.biometry.localized
             case .notifications: return SecurityViewController.Rows.notificationsMode.localized
             case .visibleWallets: return NSLocalizedString("VisibleWallets.Title", comment: "Visible Wallets page: scene title")
+            case .contribute: return NSLocalizedString("AccountTab.Row.Contribute", comment: "Account tab: 'Contribute' row")
             }
         }
         
@@ -119,6 +121,7 @@ class AccountViewController: FormViewController {
             case .biometry: return nil // Determined by localAuth service
             case .notifications: return #imageLiteral(resourceName: "row_Notifications.png")
             case .visibleWallets: return #imageLiteral(resourceName: "row_balance")
+            case .contribute: return #imageLiteral(resourceName: "row_contribute")
             }
         }
     }
@@ -341,6 +344,35 @@ class AccountViewController: FormViewController {
         
         appSection.append(currencyRow)
         
+        // Contribute
+        let contributeRow = LabelRow {
+            $0.title = Rows.contribute.localized
+            $0.tag = Rows.contribute.tag
+            $0.cell.imageView?.image = Rows.contribute.image
+            $0.cell.selectionStyle = .gray
+        }.cellUpdate { (cell, _) in
+            cell.accessoryType = .disclosureIndicator
+        }.onCellSelection { [weak self] (_, _) in
+            guard let vc = self?.router.get(scene: AdamantScene.Settings.contribute)
+            else {
+                return
+            }
+            
+            if let split = self?.splitViewController {
+                let details = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(details, sender: self)
+            } else if let nav = self?.navigationController {
+                nav.pushViewController(vc, animated: true)
+            } else {
+                vc.modalPresentationStyle = .overFullScreen
+                self?.present(vc, animated: true, completion: nil)
+            }
+            
+            self?.deselectWalletViewControllers()
+        }
+        
+        appSection.append(contributeRow)
+        
         // About
         let aboutRow = LabelRow {
             $0.title = Rows.about.localized
@@ -534,7 +566,6 @@ class AccountViewController: FormViewController {
                 case .faceID: $0.cell.imageView?.image = #imageLiteral(resourceName: "row_faceid.png")
                 }
             }
-            $0.cell.backgroundColor = UIColor.adamant.cellColor
             $0.hidden = Condition.function([], { [weak self] _ -> Bool in
                 guard let showBiometry = self?.showBiometryOptions else {
                     return true

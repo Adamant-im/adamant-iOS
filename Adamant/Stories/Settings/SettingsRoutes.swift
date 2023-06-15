@@ -56,6 +56,10 @@ extension AdamantScene {
             )
         }
         
+        static let contribute = AdamantScene(identifier: "Contribute", factory: { r in
+            r.resolve(ContributeFactory.self)!.makeViewController()
+        })
+        
         private init() {}
     }
 }

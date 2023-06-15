@@ -118,12 +118,12 @@ class LoginViewController: FormViewController {
     
     // MARK: Dependencies
     
-    var accountService: AccountService!
-    var adamantCore: AdamantCore!
-    var dialogService: DialogService!
-    var localAuth: LocalAuthentication!
-    var router: Router!
-    var apiService: ApiService!
+    let accountService: AccountService
+    let adamantCore: AdamantCore
+    let localAuth: LocalAuthentication
+    let router: Router
+    let apiService: ApiService
+    let dialogService: DialogService
     
     // MARK: Properties
     private var hideNewPassphrase: Bool = true
@@ -132,6 +132,30 @@ class LoginViewController: FormViewController {
     
     /// On launch, request user biometry (TouchID/FaceID) if has an account with biometry active
     var requestBiometryOnFirstTimeActive: Bool = true
+    
+    // MARK: Init
+    
+    init(
+        accountService: AccountService,
+        adamantCore: AdamantCore,
+        dialogService: DialogService,
+        localAuth: LocalAuthentication,
+        router: Router,
+        apiService: ApiService
+    ) {
+        self.accountService = accountService
+        self.adamantCore = adamantCore
+        self.dialogService = dialogService
+        self.localAuth = localAuth
+        self.router = router
+        self.apiService = apiService
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: Lifecycle
     
@@ -394,7 +418,7 @@ extension LoginViewController {
                 
                 if case .success(_, let alert) = result,
                    let alert = alert {
-                    dialogService?.showAlert(title: alert.title, message: alert.message, style: UIAlertController.Style.alert, actions: nil, from: nil)
+                    dialogService.showAlert(title: alert.title, message: alert.message, style: UIAlertController.Style.alert, actions: nil, from: nil)
                 }
             } catch {
                 dialogService.dismissProgress()

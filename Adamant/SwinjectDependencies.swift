@@ -67,6 +67,13 @@ extension Container {
             )
         }.inObjectScope(.container)
         
+        // MARK: CrashlysticsService
+        self.register(CrashlyticsService.self) { r in
+            AdamantCrashlyticsService(
+                securedStore: r.resolve(SecuredStore.self)!
+            )
+        }.inObjectScope(.container)
+        
         // MARK: PushNotificationsTokenService
         self.register(PushNotificationsTokenService.self) { r in
             AdamantPushNotificationsTokenService(
@@ -209,6 +216,11 @@ extension Container {
                 visibleWalletService: r.resolve(VisibleWalletsService.self)!,
                 router: r.resolve(Router.self)!
             )
+        }.inObjectScope(.container)
+        
+        // MARK: Contribute screen factory
+        self.register(ContributeFactory.self) { r in
+            ContributeFactory(crashliticsService: r.resolve(CrashlyticsService.self)!)
         }.inObjectScope(.container)
         
         // MARK: Rich transaction status service
