@@ -58,8 +58,8 @@
 /* System accounts: ADAMANT Bounty */
 "Accounts.AdamantBounty" = "ADAMANT Bounty Wallet";
 
-/* System accounts: ADAMANT iOS Support */
-"Accounts.iOSSupport" = "ADAMANT iOS Support";
+/* System accounts: ADAMANT Support */
+"Accounts.Support" = "ADAMANT Support";
 
 /* System accounts: ADAMANT Exchange */
 "Accounts.AdamantExchange" = "ADAMANT Exchange";
