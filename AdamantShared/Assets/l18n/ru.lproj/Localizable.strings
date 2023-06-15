@@ -55,8 +55,8 @@
 /* System accounts: PWA ADM Bounty bot */
 "Accounts.AdamantBountyBot" = "ADAMANT Bounty Bot";
 
-/* System accounts: ADAMANT iOS Support */
-"Accounts.iOSSupport" = "Техподдержка iOS ADAMANT";
+/* System accounts: ADAMANT Support */
+"Accounts.Support" = "Техподдержка ADAMANT";
 
 /* System accounts: ADAMANT Exchange */
 "Accounts.AdamantExchange" = "Обменник АДАМАНТа";

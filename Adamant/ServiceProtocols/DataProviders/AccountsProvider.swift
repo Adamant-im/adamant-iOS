@@ -120,7 +120,7 @@ extension AdamantContacts {
                                                    silentNotification: true)
             ]
             
-        case .iosSupport, .pwaBountyBot:
+        case .adamantSupport, .pwaBountyBot:
             return [:]
             
         case .donate:
