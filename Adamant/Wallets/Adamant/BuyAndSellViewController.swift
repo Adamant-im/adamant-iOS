@@ -16,12 +16,14 @@ class BuyAndSellViewController: FormViewController {
         case adamantMessage
         case adamantSite
         case azbit
+        case stakecube
         
         var tag: String {
             switch self {
             case .adamantMessage: return "admChat"
             case .adamantSite: return "admSite"
             case .azbit: return "cDeal"
+            case .stakecube: return "stakecube"
             }
         }
         
@@ -30,6 +32,7 @@ class BuyAndSellViewController: FormViewController {
             case .adamantMessage: return #imageLiteral(resourceName: "row_logo")
             case .adamantSite: return #imageLiteral(resourceName: "row_logo")
             case .azbit: return #imageLiteral(resourceName: "azbit_logo")
+            case .stakecube: return #imageLiteral(resourceName: "row_stakecube")
             }
         }
         
@@ -38,6 +41,7 @@ class BuyAndSellViewController: FormViewController {
             case .adamantMessage: return String.adamantLocalized.wallets.exchangeInChatAdmTokens
             case .adamantSite: return String.adamantLocalized.wallets.buyAdmTokens
             case .azbit: return "Azbit"
+            case .stakecube: return "StakeCube"
             }
         }
         
@@ -46,6 +50,7 @@ class BuyAndSellViewController: FormViewController {
             case .adamantMessage: return ""
             case .adamantSite: return "https://adamant.im/buy-tokens/"
             case .azbit: return "https://azbit.com?referralCode=9YVWYAF"
+            case .stakecube: return "https://stakecube.net/app/exchange/adm_usdt?layout=pro&team=adm"
             }
         }
     }
@@ -86,6 +91,10 @@ class BuyAndSellViewController: FormViewController {
         // MARK: Azbit
         let coinRow = buildUrlRow(for: .azbit)
         section.append(coinRow)
+        
+        // MARK: StakeCube
+        let stakecubeCoinRow = buildUrlRow(for: .stakecube)
+        section.append(stakecubeCoinRow)
         
         form.append(section)
         
