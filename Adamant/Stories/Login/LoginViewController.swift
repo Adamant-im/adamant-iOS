@@ -123,7 +123,6 @@ class LoginViewController: FormViewController {
     let localAuth: LocalAuthentication
     let router: Router
     let apiService: ApiService
-    let crashliticsService: CrashlyticsService
     let dialogService: DialogService
     
     // MARK: Properties
@@ -142,8 +141,7 @@ class LoginViewController: FormViewController {
         dialogService: DialogService,
         localAuth: LocalAuthentication,
         router: Router,
-        apiService: ApiService,
-        crashliticsService: CrashlyticsService
+        apiService: ApiService
     ) {
         self.accountService = accountService
         self.adamantCore = adamantCore
@@ -151,7 +149,6 @@ class LoginViewController: FormViewController {
         self.localAuth = localAuth
         self.router = router
         self.apiService = apiService
-        self.crashliticsService = crashliticsService
         
         super.init(nibName: nil, bundle: nil)
     }

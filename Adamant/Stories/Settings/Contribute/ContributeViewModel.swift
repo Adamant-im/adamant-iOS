@@ -6,7 +6,7 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import Foundation
+import SwiftUI
 
 @MainActor
 final class ContributeViewModel: ObservableObject {
@@ -16,12 +16,18 @@ final class ContributeViewModel: ObservableObject {
     
     init(crashliticsService: CrashlyticsService) {
         self.crashliticsService = crashliticsService
-        state.isOn = crashliticsService.isCrashlyticsEnabled()
+        state.isCrashlyticsOn = crashliticsService.isCrashlyticsEnabled()
     }
     
     func setIsOn(_ value: Bool) {
-        state.isOn = value
+        state.isCrashlyticsOn = value
         crashliticsService.setCrashlyticsEnabled(value)
+    }
+    
+    func enableCrashButton() {
+        withAnimation {
+            state.isCrashButtonOn = true
+        }
     }
     
     func simulateCrash() {

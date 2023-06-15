@@ -9,6 +9,7 @@
 import Foundation
 
 protocol CrashlyticsService: AnyObject {
+    @MainActor func configureIfNeeded()
     func setCrashlyticsEnabled(_ value: Bool)
     func isCrashlyticsEnabled() -> Bool
 }

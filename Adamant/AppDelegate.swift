@@ -65,7 +65,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         pushNotificationsTokenService = container.resolve(PushNotificationsTokenService.self)
         visibleWalletsService = container.resolve(VisibleWalletsService.self)
         
-        // MARK: 1.1. First run flag
+        // MARK: 1.1 Configure Firebase if needed
+        
+        container
+            .resolve(CrashlyticsService.self)?
+            .configureIfNeeded()
+        
+        // MARK: 1.2 First run flag
         let firstRun = UserDefaults.standard.bool(forKey: StoreKey.application.firstRun)
 
         if !firstRun {

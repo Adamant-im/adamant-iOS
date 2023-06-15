@@ -17,8 +17,7 @@ extension AdamantScene {
                 dialogService: r.resolve(DialogService.self)!,
                 localAuth: r.resolve(LocalAuthentication.self)!,
                 router: r.resolve(Router.self)!,
-                apiService: r.resolve(ApiService.self)!,
-                crashliticsService: r.resolve(CrashlyticsService.self)!
+                apiService: r.resolve(ApiService.self)!
             )
         })
         

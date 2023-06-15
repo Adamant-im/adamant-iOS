@@ -26,8 +26,6 @@ final class AdamantCrashlyticsService: CrashlyticsService {
     init(securedStore: SecuredStore) {
         self.securedStore = securedStore
         
-        updateCrashlyticSDK(isEnabled: isCrashlyticsEnabled())
-        
         NotificationCenter.default
             .publisher(for: .AdamantAccountService.userLoggedOut)
             .sink { [weak self] _ in
@@ -61,7 +59,7 @@ final class AdamantCrashlyticsService: CrashlyticsService {
     }
     
     @MainActor
-    private func configureIfNeeded() {
+    func configureIfNeeded() {
         guard !isConfigured && isCrashlyticsEnabled() else { return }
         
         FirebaseApp.configure()

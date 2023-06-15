@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct ContributeView: View {
-    @SwiftUI.State private var isOn = false
+    @SwiftUI.State private var isCrashlyticsOn = false
     @SwiftUI.State private var url: IdentifiableURL?
     @StateObject private var viewModel: ContributeViewModel
     
@@ -18,7 +18,9 @@ struct ContributeView: View {
             Section(
                 content: {
                     crashliticsContent
-                    crashButton
+                    if viewModel.state.isCrashButtonOn {
+                        crashButton
+                    }
                 },
                 footer: { Row.crashlytics.description }
             )
@@ -30,11 +32,11 @@ struct ContributeView: View {
         .listStyle(.insetGrouped)
         .background(Color(.adamant.secondBackgroundColor))
         .navigationTitle(viewModel.state.name)
-        .onChange(of: isOn) {
+        .onChange(of: isCrashlyticsOn) {
             viewModel.setIsOn($0)
         }
-        .onReceive(viewModel.$state.map(\.isOn).removeDuplicates()) {
-            isOn = $0
+        .onReceive(viewModel.$state.map(\.isCrashlyticsOn).removeDuplicates()) {
+            isCrashlyticsOn = $0
         }
         .fullScreenCover(item: $url) {
             SafariWebView(url: $0.url).ignoresSafeArea()
@@ -116,10 +118,13 @@ private extension ContributeView {
     }
     
     var crashliticsContent: some View {
-        Toggle(isOn: $isOn) {
+        Toggle(isOn: $isCrashlyticsOn) {
             HStack {
                 Row.crashlytics.image
                 Row.crashlytics.name
+            }
+            .onLongPressGesture {
+                viewModel.enableCrashButton()
             }
         }
     }

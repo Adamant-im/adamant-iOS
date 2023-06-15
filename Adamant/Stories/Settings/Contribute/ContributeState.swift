@@ -10,12 +10,15 @@ import SwiftUI
 
 struct ContributeState: Equatable {
     var name: String
-    var isOn: Bool
+    var isCrashlyticsOn: Bool
+    var isCrashButtonOn: Bool
     
     static let initial = Self(
         name: NSLocalizedString(
             "AccountTab.Row.Contribute",
-            comment: "'Contribute' row"),
-        isOn: false
+            comment: "'Contribute' row"
+        ),
+        isCrashlyticsOn: false,
+        isCrashButtonOn: false
     )
 }
