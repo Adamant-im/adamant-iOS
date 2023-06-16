@@ -18,8 +18,10 @@ struct ContributeView: View {
             Section(
                 content: {
                     crashliticsContent
+                        .listRowBackground(Color(uiColor: .adamant.cellColor))
                     if viewModel.state.isCrashButtonOn {
                         crashButton
+                            .listRowBackground(Color(uiColor: .adamant.cellColor))
                     }
                 },
                 footer: { Row.crashlytics.description }
@@ -30,6 +32,7 @@ struct ContributeView: View {
             makeLinkSection(row: .donate)
         }
         .listStyle(.insetGrouped)
+        .withoutListBackground()
         .background(Color(.adamant.secondBackgroundColor))
         .navigationTitle(viewModel.state.name)
         .onChange(of: isCrashlyticsOn) {
@@ -127,6 +130,7 @@ private extension ContributeView {
                 viewModel.enableCrashButton()
             }
         }
+        .tint(.init(uiColor: .adamant.switchColor))
     }
     
     var crashButton: some View {
@@ -141,9 +145,9 @@ private extension ContributeView {
                         row.image
                         row.name
                         Spacer()
-                        NavigationLink(destination: { EmptyView() }, label: { EmptyView() })
+                        NavigationLink(destination: { EmptyView() }, label: { EmptyView() }).fixedSize()
                     }
-                }
+                }.listRowBackground(Color(uiColor: .adamant.cellColor))
             },
             footer: { row.description }
         )

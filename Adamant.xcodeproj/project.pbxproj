@@ -251,6 +251,7 @@
 		93547BCA29E2262D00B0914B /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93547BC929E2262D00B0914B /* WelcomeViewController.swift */; };
 		935F53D629BE8F7400779492 /* RichTransactionStatusPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 935F53D529BE8F7400779492 /* RichTransactionStatusPublisher.swift */; };
 		935F53D829BEA7CA00779492 /* TimeInterval+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 935F53D729BEA7CA00779492 /* TimeInterval+Extension.swift */; };
+		936723192A3BE3E600D36E20 /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 936723182A3BE3E600D36E20 /* View+Extension.swift */; };
 		93684A2A29EFA28A00F9EFFE /* FixedTextMessageSizeCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93684A2929EFA28A00F9EFFE /* FixedTextMessageSizeCalculator.swift */; };
 		9371130F2996EDA900F64CF9 /* ChatRefreshMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9371130E2996EDA900F64CF9 /* ChatRefreshMock.swift */; };
 		9371E561295CD53100438F2C /* ChatLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9371E560295CD53100438F2C /* ChatLocalization.swift */; };
@@ -985,6 +986,7 @@
 		93547BC929E2262D00B0914B /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
 		935F53D529BE8F7400779492 /* RichTransactionStatusPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichTransactionStatusPublisher.swift; sourceTree = "<group>"; };
 		935F53D729BEA7CA00779492 /* TimeInterval+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeInterval+Extension.swift"; sourceTree = "<group>"; };
+		936723182A3BE3E600D36E20 /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
 		93684A2929EFA28A00F9EFFE /* FixedTextMessageSizeCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedTextMessageSizeCalculator.swift; sourceTree = "<group>"; };
 		9371130E2996EDA900F64CF9 /* ChatRefreshMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatRefreshMock.swift; sourceTree = "<group>"; };
 		9371E560295CD53100438F2C /* ChatLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatLocalization.swift; sourceTree = "<group>"; };
@@ -1649,6 +1651,7 @@
 			isa = PBXGroup;
 			children = (
 				937684532A3A81DC00BAB210 /* SafariWebView.swift */,
+				936723182A3BE3E600D36E20 /* View+Extension.swift */,
 			);
 			path = SwiftUI;
 			sourceTree = "<group>";
@@ -3361,6 +3364,7 @@
 				E93EB0A320DA4CCA001F9601 /* Node.swift in Sources */,
 				E9E7CDC02003AF6D00DFC4DB /* AdamantCellFactory.swift in Sources */,
 				646DF92422C29F6E00DCC864 /* ERC20Token.swift in Sources */,
+				936723192A3BE3E600D36E20 /* View+Extension.swift in Sources */,
 				E9DFB71C21624C9200CF8C7C /* AdmTransactionDetailsViewController.swift in Sources */,
 				550698B628C00AED000E8A2B /* CollectionUtilites.swift in Sources */,
 				6403F5E022723F6400D58779 /* DashWalletRouter.swift in Sources */,
