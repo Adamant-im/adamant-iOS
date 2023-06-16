@@ -130,7 +130,7 @@ private extension ContributeView {
                 viewModel.enableCrashButton()
             }
         }
-        .tint(.init(uiColor: .adamant.switchColor))
+        .tint(.init(uiColor: .adamant.active))
     }
     
     var crashButton: some View {
