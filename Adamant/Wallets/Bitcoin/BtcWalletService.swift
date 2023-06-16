@@ -309,25 +309,7 @@ class BtcWalletService: WalletService {
     }
 
     public func isValid(bitcoinAddress address: String) -> Bool {
-        if isValid(bech32: address) {
-            return true
-        }
-
-        guard address.count >= 26 && address.count <= 35,
-              address.range(of: "[^a-zA-Z0-9]", options: .regularExpression) == nil,
-              let decodedAddress = getBase58DecodeAsBytes(address: address, length: 25),
-              decodedAddress.count >= 4
-        else {
-            return false
-        }
-
-        let decodedAddressNoCheckSum = Array(decodedAddress.prefix(decodedAddress.count - 4))
-        let hashedSum = decodedAddressNoCheckSum.sha256().sha256()
-
-        let checkSum = Array(decodedAddress.suffix(from: decodedAddress.count - 4))
-        let hashedSumHeader = Array(hashedSum.prefix(4))
-
-        return hashedSumHeader == checkSum
+        (try? addressConverter.convert(address: address)) != nil
     }
     
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
