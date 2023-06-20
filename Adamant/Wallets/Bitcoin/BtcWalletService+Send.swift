@@ -80,12 +80,16 @@ extension BtcWalletService: WalletServiceTwoStepSend {
         
         // MARK: Sending request
         
-        _ = try await apiService.sendRequest(
+        let responseData = try await apiService.sendRequest(
             url: endpoint,
             method: .post,
             parameters: nil,
             encoding: BodyStringEncoding(body: txHex)
         )
+        
+        let response = String(decoding: responseData, as: UTF8.self)
+        guard response != transaction.txId else { return }
+        throw WalletServiceError.remoteServiceError(message: response)
     }
     
     func getUnspentTransactions() async throws -> [UnspentTransaction] {
