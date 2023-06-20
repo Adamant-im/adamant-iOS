@@ -58,7 +58,10 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
     
     func setFullBottomInset(_ inset: CGFloat) {
         let inset = inset - safeAreaInsets.bottom
-        let bottomOffset = self.bottomOffset
+        let bottomOffset = contentSize.height < bounds.height
+        ? 0
+        : self.bottomOffset
+        
         super.contentInset.bottom = inset
         super.verticalScrollIndicatorInsets.bottom = inset
 
