@@ -193,6 +193,7 @@ private extension ChatTransactionContentView {
         dateLabel.text = model.date
         commentLabel.text = model.comment
         commentLabel.isHidden = model.comment == nil
+        replyView.isHidden = !model.isReply
         
         if model.isReply {
             replyMessageLabel.attributedText = model.replyMessage
