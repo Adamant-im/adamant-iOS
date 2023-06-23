@@ -872,10 +872,10 @@
 "TransactionStatus.Inconsistent" = "Несогласованно";
 
 /* Transaction status: inconsistent wrong timestamp */
-"TransactionStatus.Inconsistent.WrongTimestamp" = "Nachricht und Tx haben unterschiedliche Zeitstempel. Es ist möglich, aber überprüfen Sie es zweimal";
+"TransactionStatus.Inconsistent.WrongTimestamp" = "Сообщение и транзакция имеют различное время. Это возможно, но лучше перепроверьте";
 
 /* Transaction status: inconsistent reason title */
-"TransactionStatus.Inconsistent.Reason.Title" = "Inkonsistenter Grund";
+"TransactionStatus.Inconsistent.Reason.Title" = "Противоречивая причина";
 
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "Подробности";
