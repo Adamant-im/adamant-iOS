@@ -44,9 +44,8 @@ private extension RichMessageProviderWithStatusCheck {
             let messageDate = transaction.sentDate
         else { return false }
         
-        let end = messageDate.addingTimeInterval(consistencyMaxTime)
-        let dateRange = messageDate...end
+        let timeDifference = abs(transactionDate.timeIntervalSince(messageDate))
         
-        return dateRange.contains(transactionDate)
+        return timeDifference <= consistencyMaxTime
     }
 }
