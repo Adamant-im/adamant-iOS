@@ -121,7 +121,9 @@ enum AdamantContacts: CaseIterable {
             return "chats.virtual.donate_bot_title"
         case .adelina:
             return "chats.virtual.adelina_title"
-        case .adamantIco, .adamantWelcomeWallet, .adamantSupport, .pwaBountyBot:
+        case .pwaBountyBot:
+            return "chats.virtual.bounty_bot_title"
+        case .adamantIco, .adamantWelcomeWallet, .adamantSupport:
             return nil
         }
     }
