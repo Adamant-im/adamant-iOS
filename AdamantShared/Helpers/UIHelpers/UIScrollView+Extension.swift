@@ -10,16 +10,11 @@ import UIKit
 
 extension UIScrollView {
     func scrollToBottom(animated: Bool) {
-        guard contentSize.height >= bounds.size.height else { return }
+        let fullInsets = contentInset + safeAreaInsets
+        let visibleHeight = bounds.height - fullInsets.top - fullInsets.bottom
+        guard contentSize.height > visibleHeight else { return }
         
-        scrollRectToVisible(
-            .init(
-                x: contentSize.width - bounds.width,
-                y: contentSize.height - bounds.height,
-                width: bounds.width,
-                height: bounds.height
-            ),
-            animated: animated
-        )
+        let maxOffset = contentSize.height - bounds.height + contentInset.bottom + safeAreaInsets.bottom
+        setContentOffset(.init(x: .zero, y: maxOffset), animated: animated)
     }
 }
