@@ -273,6 +273,8 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
 
         containerView.frame = CGRect(origin: origin, size: attributes.messageContainerSize)
         containerView.layoutIfNeeded()
+        
+        messageContainerView.setNeedsLayout()
         messageContainerView.layoutIfNeeded()
     }
     
