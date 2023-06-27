@@ -60,6 +60,23 @@ actor AdamantChatTransactionService: ChatTransactionService {
         }
     }
     
+    /// Search transaction in local storage
+    ///
+    /// - Parameter id: Transacton ID
+    /// - Returns: Transaction, if found
+    func getChatTransactionFromDB(id: String, context: NSManagedObjectContext) -> ChatTransaction? {
+        let request = NSFetchRequest<ChatTransaction>(entityName: "ChatTransaction")
+        request.predicate = NSPredicate(format: "transactionId == %@", String(id))
+        request.fetchLimit = 1
+        
+        do {
+            let result = try context.fetch(request)
+            return result.first
+        } catch {
+            return nil
+        }
+    }
+    
     /// Parse raw transaction into CoreData chat transaction
     ///
     /// - Parameters:
@@ -82,7 +99,12 @@ actor AdamantChatTransactionService: ChatTransactionService {
         }
         
         // MARK: Decode message, message must contain data
-        if let decodedMessage = adamantCore.decodeMessage(rawMessage: chat.message, rawNonce: chat.ownMessage, senderPublicKey: publicKey, privateKey: privateKey)?.trimmingCharacters(in: .whitespacesAndNewlines) {
+        if let decodedMessage = adamantCore.decodeMessage(
+            rawMessage: chat.message,
+            rawNonce: chat.ownMessage,
+            senderPublicKey: publicKey,
+            privateKey: privateKey
+        )?.trimmingCharacters(in: .whitespacesAndNewlines) {
             if (decodedMessage.isEmpty && transaction.amount > 0) || !decodedMessage.isEmpty {
                 switch chat.type {
                 // MARK: Text message
@@ -165,6 +187,14 @@ actor AdamantChatTransactionService: ChatTransactionService {
                        let richContent = RichMessageTools.richContent(from: data),
                        richContent[RichContentKeys.reply.replyToId] != nil,
                        transaction.amount <= 0 {
+                        if let trs = getChatTransactionFromDB(
+                            id: String(transaction.id),
+                            context: context
+                        ) {
+                            messageTransaction = trs
+                            break
+                        }
+                        
                         let trs = RichMessageTransaction(
                             entity: RichMessageTransaction.entity(),
                             insertInto: context

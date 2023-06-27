@@ -83,6 +83,8 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     var model: Model = .default {
         didSet {
             guard model != oldValue else { return }
+            
+            replyMessageLabel.attributedText = model.messageReply
             chatMenuManager.backgroundColor = model.backgroundColor.uiColor
             
             let leading = model.isFromCurrentSender ? smallHInset : longHInset
