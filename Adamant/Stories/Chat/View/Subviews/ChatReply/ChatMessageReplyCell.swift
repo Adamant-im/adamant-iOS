@@ -163,9 +163,6 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         containerView.addInteraction(interaction)
         
         containerView.addSubview(messageContainerView)
-        messageContainerView.snp.makeConstraints { make in
-            make.directionalEdges.equalToSuperview()
-        }
     }
     
     /// Positions the message bubble's top label.
@@ -271,10 +268,15 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
           break
         }
 
-        containerView.frame = CGRect(origin: origin, size: attributes.messageContainerSize)
+        containerView.frame = CGRect(
+            origin: origin,
+            size: attributes.messageContainerSize
+        )
+        messageContainerView.frame = CGRect(
+            origin: .zero,
+            size: attributes.messageContainerSize
+        )
         containerView.layoutIfNeeded()
-        
-        messageContainerView.setNeedsLayout()
         messageContainerView.layoutIfNeeded()
     }
     
