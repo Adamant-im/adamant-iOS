@@ -10,6 +10,23 @@ import Foundation
 
 enum AddressValidationResult {
     case valid
-    case system
-    case invalid
+    case invalid(description: String?)
+    
+    var isValid: Bool {
+        switch self {
+        case .valid:
+            return true
+        case .invalid:
+            return false
+        }
+    }
+    
+    var errorDescription: String? {
+        switch self {
+        case .valid:
+            return nil
+        case let .invalid(description):
+            return description
+        }
+    }
 }

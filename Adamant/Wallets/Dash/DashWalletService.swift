@@ -240,9 +240,14 @@ final class DashWalletService: WalletService {
     }
     
     func validate(address: String) -> AddressValidationResult {
-        (try? addressConverter.convert(address: address)) != nil
-            ? .valid
-            : .invalid
+        let address = try? addressConverter.convert(address: address)
+        
+        switch address?.scriptType {
+        case .p2pk, .p2pkh, .p2sh:
+            return .valid
+        case .p2tr, .p2multi, .p2wpkh, .p2wpkhSh, .p2wsh, .unknown, .none:
+            return .invalid(description: nil)
+        }
     }
 }
 

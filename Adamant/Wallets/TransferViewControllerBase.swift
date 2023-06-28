@@ -191,8 +191,6 @@ class TransferViewControllerBase: FormViewController {
         }
     }
     
-    private var recipientAddressIsValid = false
-    
     var recipientName: String? {
         didSet {
             guard let row: RowOf<String> = form.rowBy(tag: BaseRows.name.tag) else {
@@ -350,7 +348,6 @@ class TransferViewControllerBase: FormViewController {
     private func isReadyToSend() -> Bool {
         validateAddress()
         guard recipientAddress != nil,
-              recipientAddressIsValid,
               amount != nil
         else {
             return false
@@ -490,18 +487,15 @@ class TransferViewControllerBase: FormViewController {
     func validateAddress() -> Bool {
         guard let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) else {
             recipientAddress = nil
-            recipientAddressIsValid = false
             return false
         }
 
-        if let address = row.value, validateRecipient(address) {
+        if let address = row.value, validateRecipient(address).isValid {
             recipientAddress = address
             markAddres(isValid: true)
-            recipientAddressIsValid = true
             return true
         } else {
             markAddres(isValid: false)
-            recipientAddressIsValid = false
             return false
         }
     }
@@ -644,16 +638,17 @@ class TransferViewControllerBase: FormViewController {
         validateAddress()
         validateForm(force: true)
 
-        guard
-            let recipientAddress = recipientAddress,
-            recipientAddressIsValid
-        else {
+        guard let recipientAddress = recipientAddress else {
             dialogService.showWarning(withMessage: .adamantLocalized.transfer.addressValidationError)
             return
         }
         
-        guard validateRecipient(recipientAddress) else {
-            dialogService.showWarning(withMessage: String.adamantLocalized.transfer.addressValidationError)
+        let validationResult = validateRecipient(recipientAddress)
+        guard validationResult.isValid else {
+            dialogService.showWarning(
+                withMessage: validationResult.errorDescription
+                    ?? .adamantLocalized.transfer.addressValidationError
+            )
             return
         }
         
@@ -779,9 +774,8 @@ class TransferViewControllerBase: FormViewController {
         }
 
         guard
-            let recipient = recipientAddress, validateRecipient(recipient),
+            let recipient = recipientAddress, validateRecipient(recipient).isValid,
             let amount = amount, validateAmount(amount),
-            recipientAddressIsValid,
             service.isTransactionFeeValid,
             isEnoughFee()
         else {
@@ -900,7 +894,7 @@ class TransferViewControllerBase: FormViewController {
     
     /// Validate recipient's address
     /// You must override this method
-    func validateRecipient(_ address: String) -> Bool {
+    func validateRecipient(_ address: String) -> AddressValidationResult {
         fatalError("You must implement recipient addres validation logic")
     }
 }

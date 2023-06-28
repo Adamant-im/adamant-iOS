@@ -126,18 +126,8 @@ final class DogeTransferViewController: TransferViewControllerBase {
         }
     }
     
-    override func validateRecipient(_ address: String) -> Bool {
-        guard let service = service else {
-            return false
-        }
-        
-        switch service.validate(address: address) {
-        case .valid:
-            return true
-            
-        case .invalid, .system:
-            return false
-        }
+    override func validateRecipient(_ address: String) -> AddressValidationResult {
+        service?.validate(address: address) ?? .invalid(description: nil)
     }
     
     override func recipientRow() -> BaseRow {

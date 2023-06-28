@@ -247,7 +247,7 @@ final class AdmTransferViewController: TransferViewControllerBase {
         return row
     }
     
-    override func validateRecipient(_ address: String) -> Bool {
+    override func validateRecipient(_ address: String) -> AddressValidationResult {
         let fixedAddress: String
         if let first = address.first, first != "U" {
             fixedAddress = "U\(address)"
@@ -257,10 +257,10 @@ final class AdmTransferViewController: TransferViewControllerBase {
         
         switch AdamantUtilities.validateAdamantAddress(address: fixedAddress) {
         case .valid:
-            return true
+            return .valid
             
         case .system, .invalid:
-            return false
+            return .invalid(description: nil)
         }
     }
     

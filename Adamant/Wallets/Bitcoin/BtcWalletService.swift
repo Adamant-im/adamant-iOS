@@ -53,7 +53,14 @@ struct BtcApiCommands {
     }
 }
 
-class BtcWalletService: WalletService {
+// MARK: - Localization
+extension String.adamantLocalized {
+    enum BtcWalletService {
+        static let taprootNotSupported = NSLocalizedString("WalletServices.SharedErrors.BtcTaproot", comment: "")
+    }
+}
+
+final class BtcWalletService: WalletService {
 
     var tokenSymbol: String {
         type(of: self).currencySymbol
@@ -280,7 +287,16 @@ class BtcWalletService: WalletService {
     }
     
     func validate(address: String) -> AddressValidationResult {
-        return isValid(bitcoinAddress: address) ? .valid : .invalid
+        let address = try? addressConverter.convert(address: address)
+        
+        switch address?.scriptType {
+        case .p2pk, .p2pkh, .p2sh, .p2multi, .p2wpkh, .p2wpkhSh, .p2wsh:
+            return .valid
+        case .p2tr:
+            return .invalid(description: .adamantLocalized.BtcWalletService.taprootNotSupported)
+        case .unknown, .none:
+            return .invalid(description: nil)
+        }
     }
 
     private func getBase58DecodeAsBytes(address: String, length: Int) -> [UTF8.CodeUnit]? {
