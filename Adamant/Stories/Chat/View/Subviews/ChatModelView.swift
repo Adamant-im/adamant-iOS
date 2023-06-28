@@ -56,3 +56,12 @@ extension ChatModelView {
         subscription = nil
     }
 }
+
+private extension ChatModelView {
+     func checkIsNeededToUpdateLayout(
+         oldModel: Model,
+         newModel: Model
+     ) -> Bool {
+         return oldModel != newModel
+     }
+ }
