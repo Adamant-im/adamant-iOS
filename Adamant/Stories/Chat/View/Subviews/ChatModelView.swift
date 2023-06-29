@@ -30,23 +30,8 @@ extension ChatModelView {
         subscription = publisher
             .removeDuplicates()
             .sink { [weak self, weak collection] newModel in
-                guard
-                    let self = self,
-                    let collection = collection
-                else { return }
-                                
-                guard
-                    self.checkIsNeededToUpdateLayout(
-                        oldModel: self.model,
-                        newModel: newModel
-                    )
-                else {
-                    self.model = newModel
-                    return
-                }
-                
-                self.model = newModel
-                collection.collectionViewLayout.invalidateLayout()
+                self?.model = newModel
+                collection?.collectionViewLayout.invalidateLayout()
             }
     }
     
@@ -56,12 +41,3 @@ extension ChatModelView {
         subscription = nil
     }
 }
-
-private extension ChatModelView {
-     func checkIsNeededToUpdateLayout(
-         oldModel: Model,
-         newModel: Model
-     ) -> Bool {
-         return oldModel != newModel
-     }
- }
