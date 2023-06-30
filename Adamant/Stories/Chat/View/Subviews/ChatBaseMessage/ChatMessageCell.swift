@@ -80,9 +80,6 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         containerView.addSubview(messageContainerView)
         
         containerView.addInteraction(interaction)
-        messageContainerView.snp.makeConstraints { make in
-            make.directionalEdges.equalToSuperview()
-        }
     }
     
     /// Positions the message bubble's top label.
@@ -190,6 +187,10 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
 
         containerView.frame = CGRect(
             origin: origin,
+            size: attributes.messageContainerSize
+        )
+        messageContainerView.frame = CGRect(
+            origin: .zero,
             size: attributes.messageContainerSize
         )
         containerView.layoutIfNeeded()

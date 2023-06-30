@@ -85,7 +85,7 @@ final class ChatDataSourceManager: MessagesDataSource {
             cell.model = model.value
             cell.configure(with: message, at: indexPath, and: messagesCollectionView)
             cell.actionHandler = { [weak self] in self?.handleAction($0) }
-            cell.setSubscription(publisher: publisher)
+            cell.setSubscription(publisher: publisher, collection: messagesCollectionView)
 
             return cell
         }
@@ -107,7 +107,7 @@ final class ChatDataSourceManager: MessagesDataSource {
             cell.model = model.value
             cell.configure(with: message, at: indexPath, and: messagesCollectionView)
             cell.actionHandler = { [weak self] in self?.handleAction($0) }
-            cell.setSubscription(publisher: publisher)
+            cell.setSubscription(publisher: publisher, collection: messagesCollectionView)
             
             return cell
         }
@@ -139,7 +139,7 @@ final class ChatDataSourceManager: MessagesDataSource {
         cell.wrappedView.model = model.value
         
         cell.wrappedView.actionHandler = { [weak self] in self?.handleAction($0) }
-        cell.wrappedView.setSubscription(publisher: publisher)
+        cell.wrappedView.setSubscription(publisher: publisher, collection: messagesCollectionView)
         return cell
     }
 }

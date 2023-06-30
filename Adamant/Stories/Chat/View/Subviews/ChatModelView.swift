@@ -8,6 +8,7 @@
 
 import UIKit
 import Combine
+import MessageKit
 
 protocol ChatReusableViewModelProtocol: Equatable {
     static var `default`: Self { get }
@@ -22,10 +23,16 @@ protocol ChatModelView: UIView, ReusableView {
 }
 
 extension ChatModelView {
-    func setSubscription<P: Observable<Model>>(publisher: P) {
+    func setSubscription<P: Observable<Model>>(
+        publisher: P,
+        collection: MessagesCollectionView
+    ) {
         subscription = publisher
             .removeDuplicates()
-            .sink { [weak self] in self?.model = $0 }
+            .sink { [weak self, weak collection] newModel in
+                self?.model = newModel
+                collection?.collectionViewLayout.invalidateLayout()
+            }
     }
     
     func prepareForReuse() {
