@@ -34,6 +34,7 @@ final class ChatViewController: MessagesViewController {
     private var messagesLoaded = false
     private var isScrollPositionNearlyTheBottom = true
     private var viewAppeared = false
+    private var isViewVisible = false
     
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
@@ -116,9 +117,11 @@ final class ChatViewController: MessagesViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        isViewVisible = true
         defer { viewAppeared = true }
         inputBar.isUserInteractionEnabled = true
         chatMessagesCollectionView.fixedBottomOffset = nil
+        checkIsChatWasRead()
         
         guard isMacOS, !viewAppeared else { return }
         focusInputBarWithoutAnimation()
@@ -131,6 +134,7 @@ final class ChatViewController: MessagesViewController {
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
+        isViewVisible = false
         viewModel.preserveMessage(inputBar.text)
         viewModel.saveChatOffset(
             isScrollPositionNearlyTheBottom
@@ -154,12 +158,12 @@ final class ChatViewController: MessagesViewController {
         
         super.collectionView(collectionView, willDisplay: cell, forItemAt: indexPath)
         
-        let isVisible = collectionView.indexPathsForVisibleItems.contains {
+        let isItemVisible = collectionView.indexPathsForVisibleItems.contains {
             $0.section == viewModel.minIndexForStartLoadNewMessages
         }
         
         guard indexPath.section < viewModel.minIndexForStartLoadNewMessages,
-              isVisible
+              isItemVisible
         else { return }
         
         viewModel.loadMoreMessagesIfNeeded()
@@ -494,7 +498,7 @@ private extension ChatViewController {
     }
     
     func checkIsChatWasRead() {
-        guard isScrollPositionNearlyTheBottom, messagesLoaded else { return }
+        guard isScrollPositionNearlyTheBottom, messagesLoaded, isViewVisible else { return }
         viewModel.entireChatWasRead()
     }
     
@@ -709,11 +713,11 @@ extension ChatViewController {
         
         guard let index = viewModel.needToAnimateCellIndex else { return }
         
-        let isVisible = messagesCollectionView.indexPathsForVisibleItems.contains {
+        let isItemVisible = messagesCollectionView.indexPathsForVisibleItems.contains {
             $0.section == index
         }
         
-        guard isVisible else { return }
+        guard isItemVisible else { return }
         
         // TODO: refactor for architecture
         let cell = messagesCollectionView.cellForItem(at: .init(item: .zero, section: index))
