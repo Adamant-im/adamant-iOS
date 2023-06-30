@@ -237,7 +237,7 @@ class LskWalletService: WalletService {
     }
 
     func validateAddress(_ address: String) -> AddressValidationResult {
-        return LiskKit.Crypto.isValidBase32(address: address) ? .valid : .invalid
+        return LiskKit.Crypto.isValidBase32(address: address) ? .valid : .invalid(description: nil)
     }
     
     func fromRawLsk(value: BigInt.BigUInt) -> String {

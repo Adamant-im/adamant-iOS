@@ -1054,6 +1054,9 @@
 /* Wallet Services: Shared error, transaction not found */
 "WalletServices.SharedErrors.TransactionNotFound" = "Transaction not found";
 
+/* Wallet Services: Shared error, BTC Taproot doesn't work */
+"WalletServices.SharedErrors.BtcTaproot" = "ADAMANT doesn’t support Taproot Bitcoin addresses";
+
 /* Wallet Services: Wait until other transactions approved */
 "WalletServices.SharedErrors.walletFrezzed" = "Wait until other transactions will be approved";
 

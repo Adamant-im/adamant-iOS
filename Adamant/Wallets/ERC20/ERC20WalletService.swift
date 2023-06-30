@@ -331,7 +331,7 @@ class ERC20WalletService: WalletService {
     }
     
     func validate(address: String) -> AddressValidationResult {
-        return addressRegex.perfectMatch(with: address) ? .valid : .invalid
+        return addressRegex.perfectMatch(with: address) ? .valid : .invalid(description: nil)
     }
     
     func getGasPrices() async throws -> BigUInt {

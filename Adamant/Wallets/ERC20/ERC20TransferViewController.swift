@@ -140,20 +140,9 @@ final class ERC20TransferViewController: TransferViewControllerBase {
         }
     }
     
-    override func validateRecipient(_ address: String) -> Bool {
-        guard let service = service else {
-            return false
-        }
-        
+    override func validateRecipient(_ address: String) -> AddressValidationResult {
         let fixedAddress = address.validateEthAddress()
-        
-        switch service.validate(address: fixedAddress) {
-        case .valid:
-            return true
-            
-        case .invalid, .system:
-            return false
-        }
+        return service?.validate(address: fixedAddress) ?? .invalid(description: nil)
     }
     
     override func recipientRow() -> BaseRow {

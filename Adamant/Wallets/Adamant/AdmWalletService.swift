@@ -157,11 +157,7 @@ class AdmWalletService: NSObject, WalletService {
     }
     
     func validate(address: String) -> AddressValidationResult {
-        guard !AdamantContacts.systemAddresses.contains(address) else {
-            return .system
-        }
-        
-        return addressRegex.perfectMatch(with: address) ? .valid : .invalid
+        addressRegex.perfectMatch(with: address) ? .valid : .invalid(description: nil)
     }
     
     private func postUpdateNotification(with wallet: WalletAccount) {
