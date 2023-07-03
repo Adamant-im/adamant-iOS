@@ -263,8 +263,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             forName: Notification.Name.AdamantAccountService.userLoggedOut,
             object: nil,
             queue: OperationQueue.main
-        ) { _ in
+        ) { [weak container] _ in
             resetScreensAction()
+            container?.resolve(CoreDataStack.self)?.deleteAccounts()
         }
         
         // MARK: 8. Welcome messages

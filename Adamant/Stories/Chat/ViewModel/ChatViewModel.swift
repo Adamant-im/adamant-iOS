@@ -261,7 +261,7 @@ final class ChatViewModel: NSObject {
     }
     
     func getKvsName(for address: String) -> String? {
-        return addressBookService.getName(for: address)
+        return addressBookService.getName(key: address)
     }
     
     func setNewName(_ newName: String) {
@@ -634,7 +634,7 @@ private extension ChatViewModel {
     }
     
     func updateTitle() {
-        partnerName = chatroom?.getName(addressBookService: addressBookService)
+        partnerName = chatroom.map { addressBookService.getName(chatroom: $0) } ?? nil
     }
     
     func updateAttachmentButtonAvailability() {
@@ -687,7 +687,7 @@ private extension ChatViewModel {
               let account = account,
               let address = account.address,
               account.name == nil,
-              addressBookService.getName(for: address) == nil
+              addressBookService.getName(key: address) == nil
         else {
             return
         }
