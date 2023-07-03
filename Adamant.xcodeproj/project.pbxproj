@@ -41,6 +41,8 @@
 		415CFD40294319310008AEE8 /* UpdateWalletsScript.sh in Resources */ = {isa = PBXBuildFile; fileRef = 415CFD3E294319310008AEE8 /* UpdateWalletsScript.sh */; };
 		415CFD41294319310008AEE8 /* UpdateWalletsScript.sh in Resources */ = {isa = PBXBuildFile; fileRef = 415CFD3E294319310008AEE8 /* UpdateWalletsScript.sh */; };
 		415CFD42294319310008AEE8 /* UpdateWalletsScript.sh in Resources */ = {isa = PBXBuildFile; fileRef = 415CFD3E294319310008AEE8 /* UpdateWalletsScript.sh */; };
+		416380E12A51765F00F90E6D /* ChatReactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 416380E02A51765F00F90E6D /* ChatReactionsView.swift */; };
+		416380E42A51823E00F90E6D /* ElegantEmojiPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 416380E32A51823E00F90E6D /* ElegantEmojiPicker */; };
 		4164A9D728F17D4000EEF16D /* ChatTransactionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4164A9D628F17D4000EEF16D /* ChatTransactionService.swift */; };
 		4164A9D928F17DA700EEF16D /* AdamantChatTransactionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4164A9D828F17DA700EEF16D /* AdamantChatTransactionService.swift */; };
 		416F5EA4290162EB00EF0400 /* SocketIO in Frameworks */ = {isa = PBXBuildFile; productRef = 416F5EA3290162EB00EF0400 /* SocketIO */; };
@@ -48,6 +50,7 @@
 		41776FDE29CB189500B74B4E /* AdamantContacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41776FDC29CB17D100B74B4E /* AdamantContacts.swift */; };
 		41776FDF29CB189600B74B4E /* AdamantContacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41776FDC29CB17D100B74B4E /* AdamantContacts.swift */; };
 		41776FE029CB189800B74B4E /* AdamantContacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41776FDC29CB17D100B74B4E /* AdamantContacts.swift */; };
+		4177E5E12A52DA7100C089FE /* AdvancedContextMenuKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4177E5E02A52DA7100C089FE /* AdvancedContextMenuKit */; };
 		417BA7F428BF894F00DF94C5 /* NotificationSoundsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417BA7F328BF894F00DF94C5 /* NotificationSoundsViewController.swift */; };
 		4184F16E2A33023A00D7B8B9 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4184F16D2A33023A00D7B8B9 /* GoogleService-Info.plist */; };
 		4184F1712A33044E00D7B8B9 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 4184F1702A33044E00D7B8B9 /* FirebaseCrashlytics */; };
@@ -812,6 +815,7 @@
 		4154413A2923AED000824478 /* bitcoin_notificationContent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bitcoin_notificationContent.png; sourceTree = "<group>"; };
 		415CFD38294310680008AEE8 /* AdamantDynamicResources.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantDynamicResources.swift; sourceTree = "<group>"; };
 		415CFD3E294319310008AEE8 /* UpdateWalletsScript.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = UpdateWalletsScript.sh; sourceTree = "<group>"; };
+		416380E02A51765F00F90E6D /* ChatReactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatReactionsView.swift; sourceTree = "<group>"; };
 		4164A9D628F17D4000EEF16D /* ChatTransactionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTransactionService.swift; sourceTree = "<group>"; };
 		4164A9D828F17DA700EEF16D /* AdamantChatTransactionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantChatTransactionService.swift; sourceTree = "<group>"; };
 		41776FDC29CB17D100B74B4E /* AdamantContacts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantContacts.swift; sourceTree = "<group>"; };
@@ -1366,6 +1370,7 @@
 				416F5EA4290162EB00EF0400 /* SocketIO in Frameworks */,
 				A5F92994262C855B00C3E60A /* MarkdownKit in Frameworks */,
 				A50AEB04262C815200B37C22 /* EFQRCode in Frameworks */,
+				416380E42A51823E00F90E6D /* ElegantEmojiPicker in Frameworks */,
 				A544F0D4262C9878001F1A6D /* Eureka in Frameworks */,
 				A5785ADF262C63580001BC66 /* web3swift in Frameworks */,
 				557AC306287B10D8004699D7 /* SnapKit in Frameworks */,
@@ -1376,6 +1381,7 @@
 				938F7D582955C1DA001915CA /* MessageKit in Frameworks */,
 				A530B0D82842110D003F0210 /* (null) in Frameworks */,
 				A5DBBADC262C729B004AC028 /* CryptoSwift in Frameworks */,
+				4177E5E12A52DA7100C089FE /* AdvancedContextMenuKit in Frameworks */,
 				A5D87BA3262CA01D00DC28F0 /* ProcedureKit in Frameworks */,
 				A5C99E0E262C9E3A00F7B1B7 /* Reachability in Frameworks */,
 				A5DBBAF0262C72EF004AC028 /* LiskKit in Frameworks */,
@@ -1455,6 +1461,13 @@
 			path = Contribute;
 			sourceTree = "<group>";
 		};
+		41330D2F2A46FBF90002B103 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
 		413AD21A29CDDD750025F255 /* ChatReply */ = {
 			isa = PBXGroup;
 			children = (
@@ -1477,6 +1490,7 @@
 			isa = PBXGroup;
 			children = (
 				41330F7529F1509400CB587C /* AdamantCellAnimation.swift */,
+				416380E02A51765F00F90E6D /* ChatReactionsView.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -1841,6 +1855,7 @@
 		E913C8E51FFFA51D001A83F7 = {
 			isa = PBXGroup;
 			children = (
+				41330D2F2A46FBF90002B103 /* Packages */,
 				E9771D7E22995D410099AAC7 /* AdamantShared */,
 				E913C8F01FFFA51D001A83F7 /* Adamant */,
 				E9EC344520066D4A00C0E546 /* AdamantTests */,
@@ -2703,6 +2718,8 @@
 				93FA403529401BFC00D20DB6 /* PopupKit */,
 				938F7D572955C1DA001915CA /* MessageKit */,
 				4184F1702A33044E00D7B8B9 /* FirebaseCrashlytics */,
+				416380E32A51823E00F90E6D /* ElegantEmojiPicker */,
+				4177E5E02A52DA7100C089FE /* AdvancedContextMenuKit */,
 			);
 			productName = Adamant;
 			productReference = E913C8EE1FFFA51D001A83F7 /* Adamant.app */;
@@ -2869,6 +2886,7 @@
 				416F5EA2290162EB00EF0400 /* XCRemoteSwiftPackageReference "socket" */,
 				938F7D562955C1DA001915CA /* XCRemoteSwiftPackageReference "MessageKit" */,
 				4184F16F2A33044E00D7B8B9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				416380E22A51823E00F90E6D /* XCRemoteSwiftPackageReference "Elegant-Emoji-Picker" */,
 			);
 			productRefGroup = E913C8EF1FFFA51D001A83F7 /* Products */;
 			projectDirPath = "";
@@ -3525,6 +3543,7 @@
 				93F3914C2962F1F700BFD6AE /* MessageCellWrapper.swift in Sources */,
 				933A592A298067910068C36D /* ComparableAttributedString.swift in Sources */,
 				E9771D9E22997A6F0099AAC7 /* NativeCore+AdamantCore.swift in Sources */,
+				416380E12A51765F00F90E6D /* ChatReactionsView.swift in Sources */,
 				5558A436282AAFCC0024DDD6 /* AdamantApi+Status.swift in Sources */,
 				E921534E20EE1E8700C0843F /* EurekaAlertLabelRow.swift in Sources */,
 				64C65F4523893C7600DC0425 /* OnboardOverlay.swift in Sources */,
@@ -4262,6 +4281,14 @@
 				kind = branch;
 			};
 		};
+		416380E22A51823E00F90E6D /* XCRemoteSwiftPackageReference "Elegant-Emoji-Picker" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Finalet/Elegant-Emoji-Picker";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		416F5EA2290162EB00EF0400 /* XCRemoteSwiftPackageReference "socket" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/socketio/socket.io-client-swift";
@@ -4422,10 +4449,19 @@
 			package = 3A8875ED27BBF38D00436195 /* XCRemoteSwiftPackageReference "Parchment" */;
 			productName = Parchment;
 		};
+		416380E32A51823E00F90E6D /* ElegantEmojiPicker */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 416380E22A51823E00F90E6D /* XCRemoteSwiftPackageReference "Elegant-Emoji-Picker" */;
+			productName = ElegantEmojiPicker;
+		};
 		416F5EA3290162EB00EF0400 /* SocketIO */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 416F5EA2290162EB00EF0400 /* XCRemoteSwiftPackageReference "socket" */;
 			productName = SocketIO;
+		};
+		4177E5E02A52DA7100C089FE /* AdvancedContextMenuKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AdvancedContextMenuKit;
 		};
 		4184F1702A33044E00D7B8B9 /* FirebaseCrashlytics */ = {
 			isa = XCSwiftPackageProductDependency;

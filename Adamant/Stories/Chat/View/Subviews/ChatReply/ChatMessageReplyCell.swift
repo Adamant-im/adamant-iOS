@@ -10,6 +10,9 @@ import UIKit
 import MessageKit
 import SnapKit
 import Combine
+import AdvancedContextMenuKit
+import SwiftUI
+import ElegantEmojiPicker
 
 final class ChatMessageReplyCell: MessageContentCell, ChatModelView {    
     /// The labels used to display the message's text.
@@ -111,6 +114,7 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     private var trailingReplyViewOffset: CGFloat = 4
     private let smallHInset: CGFloat = 8
     private let longHInset: CGFloat = 14
+    private lazy var contextMenu = AdvancedContextMenuManager(delegate: self)
     
     // MARK: - Methods
     
@@ -159,8 +163,9 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         messageContainerView.removeFromSuperview()
         contentView.addSubview(containerView)
         
-        let interaction = UIContextMenuInteraction(delegate: chatMenuManager)
-        containerView.addInteraction(interaction)
+//        let interaction = UIContextMenuInteraction(delegate: chatMenuManager)
+//        containerView.addInteraction(interaction)
+        contextMenu.setup(for: containerView)
         
         containerView.addSubview(messageContainerView)
     }
@@ -357,5 +362,56 @@ extension ChatMessageReplyCell {
         }
         
         return UIMenu(title: "", children: [reply, copy, report, remove])
+    }
+}
+
+extension ChatMessageReplyCell: AdvancedContextMenuManagerDelegate {
+    func configureContextMenu() -> UIMenu {
+        makeContextMenu()
+    }
+    
+    func configureContextMenuAlignment() -> Alignment {
+        model.isFromCurrentSender ? Alignment.trailing : Alignment.leading
+    }
+    
+    func getUpperContentView() -> AnyView? {
+        return AnyView(ChatReactionsView(delegate: self))
+    }
+}
+
+extension ChatMessageReplyCell: ChatReactionsViewDelegate, ElegantEmojiPickerDelegate {
+    func didSelectEmoji(_ emoji: String) {
+        print("didSelectEmoji=\(emoji)")
+        contextMenu.dismiss()
+    }
+    
+    func didTapMore() {
+        DispatchQueue.main.async {
+            let config = ElegantConfiguration(
+                showRandom: false,
+                showReset: false,
+                defaultSkinTone: .Light
+            )
+            let picker = ElegantEmojiPicker(delegate: self, configuration: config)
+            picker.definesPresentationContext = true
+            self.topMostController().present(picker, animated: true)
+        }
+    }
+    
+    func topMostController() -> UIViewController {
+        UIApplication.shared.windows.filter {$0.isKeyWindow}.first
+        var topController: UIViewController = UIApplication.shared.keyWindow!.rootViewController!
+        while (topController.presentedViewController != nil) {
+            topController = topController.presentedViewController!
+        }
+        return topController
+    }
+    
+    func emojiPicker (
+        _ picker: ElegantEmojiPicker,
+        didSelectEmoji emoji: Emoji?
+    ) {
+        print("emojiPicker=\(emoji?.emoji)")
+        contextMenu.dismiss()
     }
 }
