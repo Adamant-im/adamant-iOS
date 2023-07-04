@@ -30,25 +30,6 @@ public class Chatroom: NSManagedObject {
         return nil
     }
     
-    @MainActor func getName(addressBookService: AddressBookService) -> String? {
-        guard let partner = partner else { return nil }
-        let result: String?
-        if let title = title {
-            result = title
-        } else if let name = partner.name {
-            result = name
-        } else if
-            let address = partner.address,
-            let name = addressBookService.getName(for: address)
-        {
-            result = name
-        } else {
-            result = partner.address
-        }
-        
-        return result?.checkAndReplaceSystemWallets()
-    }
-    
     private var semaphore: DispatchSemaphore?
     
     func updateLastTransaction() {

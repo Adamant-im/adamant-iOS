@@ -213,7 +213,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             if id.caseInsensitiveCompare(address) == .orderedSame {
                 senderName = String.adamantLocalized.transactionDetails.yourAddress
             } else {
-                senderName = addressBookService.getName(for: id)
+                senderName = addressBookService.getName(key: id)
             }
         }
     }
@@ -227,7 +227,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             if id.caseInsensitiveCompare(address) == .orderedSame {
                 recipientName = String.adamantLocalized.transactionDetails.yourAddress
             } else {
-                recipientName = addressBookService.getName(for: id)
+                recipientName = addressBookService.getName(key: id)
             }
         }
     }
