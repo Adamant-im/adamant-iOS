@@ -30,6 +30,8 @@ extension ChatModelView {
         subscription = publisher
             .removeDuplicates()
             .sink { [weak self, weak collection] newModel in
+                guard newModel != self?.model else { return }
+                
                 self?.model = newModel
                 collection?.collectionViewLayout.invalidateLayout()
             }
