@@ -798,6 +798,28 @@ class TransactionDetailsViewControllerBase: FormViewController {
         tableView.backgroundColor = .clear
     }
     
+    func updateTransactionStatus() {
+        guard let transaction = transaction,
+              let richTransaction = richTransaction
+        else { return }
+                
+        let failedTransaction = SimpleTransactionDetails(
+            txId: transaction.txId,
+            senderAddress: transaction.senderAddress,
+            recipientAddress: transaction.recipientAddress,
+            dateValue: transaction.dateValue,
+            amountValue: transaction.amountValue,
+            feeValue: transaction.feeValue,
+            confirmationsValue: transaction.confirmationsValue,
+            blockValue: transaction.blockValue,
+            isOutgoing: transaction.isOutgoing,
+            transactionStatus: richTransaction.transactionStatus
+        )
+        
+        self.transaction = failedTransaction
+        tableView.reloadData()
+    }
+    
     // MARK: - Actions
     
     @objc func share(_ sender: Any) {

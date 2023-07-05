@@ -105,6 +105,8 @@ class DashTransactionDetailsViewController: TransactionDetailsViewControllerBase
                 self?.refreshControl.endRefreshing()
             } catch {
                 self?.refreshControl.endRefreshing()
+                self?.updateTransactionStatus()
+                
                 guard !silent else { return }
                 self?.dialogService.showRichError(error: error)
             }
