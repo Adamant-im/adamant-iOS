@@ -29,9 +29,7 @@ class ComplexTransferViewController: UIViewController {
     var services: [WalletServiceWithSend] = []
     var partner: CoreDataAccount? {
         didSet {
-            navigationItem.title = partner?.chatroom.map {
-                addressBookService.getName(chatroom: $0)
-            } ?? nil
+            navigationItem.title = partner?.chatroom?.getName(addressBookService: addressBookService)
         }
     }
     var replyToMessageId: String?
@@ -105,7 +103,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
         
         guard let address = partner?.address else { return vc }
         
-        let name = partner?.chatroom.map { addressBookService.getName(chatroom: $0) } ?? nil
+        let name = partner?.chatroom?.getName(addressBookService: addressBookService)
         
         v.replyToMessageId = replyToMessageId
         v.admReportRecipient = address

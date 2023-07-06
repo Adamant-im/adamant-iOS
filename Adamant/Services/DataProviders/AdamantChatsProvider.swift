@@ -1636,14 +1636,6 @@ extension AdamantChatsProvider {
         for chatroom in viewContextChatrooms {
             await chatroom.updateLastTransaction()
         }
-        
-        if stack.container.viewContext.hasChanges {
-            do {
-                try stack.container.viewContext.save()
-            } catch {
-                print(error)
-            }
-        }
     }
 }
 

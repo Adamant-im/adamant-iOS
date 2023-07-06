@@ -157,7 +157,10 @@ class SearchResultsViewController: UITableViewController {
             cell.lastMessageLabel.text = title
         }
         
-        cell.accountLabel.text = addressBookService.getName(chatroom: chatroom)
+        cell.accountLabel.text = chatroom.getName(
+            addressBookService: addressBookService
+        )
+        
         cell.hasUnreadMessages = false
         cell.dateLabel.text = nil
     }
@@ -181,9 +184,9 @@ class SearchResultsViewController: UITableViewController {
             }
         }
         
-        cell.accountLabel.text = message.chatroom.map {
-            addressBookService.getName(chatroom: $0)
-        } ?? nil
+        cell.accountLabel.text = message.chatroom?.getName(
+            addressBookService: addressBookService
+        )
         
         cell.hasUnreadMessages = false
         

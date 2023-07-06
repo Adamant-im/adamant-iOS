@@ -219,7 +219,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         if let address = accountService.account?.address,
            let partenerAddress = transaction.partner?.address {
             
-            let partnerName = addressBookService.getName(key: partenerAddress)
+            let partnerName = addressBookService.getName(for: partenerAddress)
             
             if address == transaction.senderId {
                 controller.senderName = String.adamantLocalized.transactionDetails.yourAddress
@@ -245,7 +245,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         
         let amount: Decimal = transaction.amount as Decimal? ?? 0
         
-        var partnerName = transaction.partner?.name?.checkAndReplaceSystemWallets() ?? addressBookService.getName(key: partnerId)
+        var partnerName = transaction.partner?.name?.checkAndReplaceSystemWallets() ?? addressBookService.getName(for: partnerId)
         
         if let address = accountService.account?.address, partnerId == address {
             partnerName = String.adamantLocalized.transactionDetails.yourAddress

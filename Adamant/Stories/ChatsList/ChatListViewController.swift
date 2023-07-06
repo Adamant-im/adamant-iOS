@@ -579,7 +579,7 @@ extension ChatListViewController {
             }
         }
         
-        cell.accountLabel.text = addressBook.getName(chatroom: chatroom)
+        cell.accountLabel.text = chatroom.getName(addressBookService: addressBook)
         cell.hasUnreadMessages = chatroom.hasUnreadMessages
 
         if let lastTransaction = chatroom.lastTransaction {
@@ -705,7 +705,7 @@ extension ChatListViewController: NewChatViewControllerDelegate {
         
         if let name = name,
            let address = account.address,
-           addressBook.getName(key: address) == nil {
+           addressBook.getName(for: address) == nil {
             account.name = name
             chatroom.title = name
             Task {
@@ -1129,7 +1129,7 @@ extension ChatListViewController {
         alert.addTextField { [weak self] textField in
             textField.placeholder = .adamantLocalized.chat.name
             textField.autocapitalizationType = .words
-            textField.text = self?.addressBook.getName(key: address)
+            textField.text = self?.addressBook.getName(for: address)
         }
         
         let renameAction = UIAlertAction(
@@ -1259,7 +1259,7 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
             }
             
             if let address = partner.address {
-                if let name = self.addressBook.getName(key: address) {
+                if let name = self.addressBook.getName(for: address) {
                     return name.localizedCaseInsensitiveContains(searchString) || address.localizedCaseInsensitiveContains(searchString)
                 }
                 return address.localizedCaseInsensitiveContains(searchString)
