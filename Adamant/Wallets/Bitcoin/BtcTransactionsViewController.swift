@@ -113,7 +113,7 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
             if partnerId == address {
                 partnerName = String.adamantLocalized.transactionDetails.yourAddress
             } else {
-                partnerName = addressBook.getName(key: address)
+                partnerName = addressBook.getName(for: address)
             }
         }
         

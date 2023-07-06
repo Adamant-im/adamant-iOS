@@ -9,14 +9,8 @@
 import Foundation
 
 enum AdamantResources {
-    static let coreDataModel = storeURL(appGroup: appGroup, databaseName: "Adamant")
-    
-#if DEBUG
-    static let appGroup = "group.adamant.adamant-messenger-dev"
-#else
-    static let appGroup = "group.adamant.adamant-messenger"
-#endif
-    
+    static let coreDataModel = Bundle.main.url(forResource: "Adamant", withExtension: "momd")!
+   
     static let coinsInfoSrvice = "https://info.adamant.im"
     
     // MARK: ADAMANT Addresses
@@ -56,14 +50,5 @@ enum AdamantResources {
         
         static let pwaBountyBot = "U1644771796259136854"
         static let pwaBountyBotPK = "7a5c55dec7a085f1c795a126b3f74ebdccf36b7abfa2f85145443e58fcdff80c"
-    }
-}
-
-private extension AdamantResources {
-    /// Returns a URL for the given app group and database pointing to the sqlite database.
-    static func storeURL(appGroup: String, databaseName: String) -> URL {
-        FileManager.default
-            .containerURL(forSecurityApplicationGroupIdentifier: appGroup)!
-            .appendingPathComponent("\(databaseName).sqlite")
     }
 }

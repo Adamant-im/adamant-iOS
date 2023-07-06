@@ -8,7 +8,6 @@
 
 import UserNotifications
 import MarkdownKit
-import CoreData
 
 class NotificationService: UNNotificationServiceExtension {
     private let passphraseStoreKey = "accountService.passphrase"
@@ -62,7 +61,6 @@ class NotificationService: UNNotificationServiceExtension {
         let securedStore = KeychainStore()
         let core = NativeAdamantCore()
         let api = ExtensionsApi(keychainStore: securedStore)
-        let stack = try? InMemoryCoreDataStack(modelUrl: AdamantResources.coreDataModel)
         
         if let sound: String = securedStore.get(StoreKey.notificationsService.notificationsSound) {
             if sound.isEmpty {
@@ -101,17 +99,6 @@ class NotificationService: UNNotificationServiceExtension {
         
         let contactsBlockList: [String] = securedStore.get(StoreKey.accountService.blockList) ?? []
         guard !contactsBlockList.contains(partnerAddress) else { return }
-        
-        // MARK: 3.1 Checking is transaction processed
-        
-        let fetchRequest = BaseTransaction.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "transactionId == %@", raw)
-        fetchRequest.fetchLimit = 1
-        let list = try? stack?.container.viewContext.fetch(fetchRequest)
-        
-        if list?.first != nil {
-            bestAttemptContent.badge = nil
-        }
         
         // MARK: 4. Address book
         if

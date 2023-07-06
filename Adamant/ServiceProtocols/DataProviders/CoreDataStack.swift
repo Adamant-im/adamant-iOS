@@ -11,6 +11,4 @@ import CoreData
 
 protocol CoreDataStack {
     var container: NSPersistentContainer { get }
-    
-    @MainActor func deleteAccounts()
 }
