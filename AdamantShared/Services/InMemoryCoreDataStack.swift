@@ -14,6 +14,8 @@ final class InMemoryCoreDataStack: CoreDataStack {
     
     init(modelUrl url: URL) throws {
         let description = NSPersistentStoreDescription(url: url)
+        description.type = NSInMemoryStoreType
+        
         container = NSPersistentContainer(name: "Adamant")
         container.persistentStoreDescriptions = [description]
         container.loadPersistentStores { (_, _) in }
