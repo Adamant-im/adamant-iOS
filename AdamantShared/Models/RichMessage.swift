@@ -41,8 +41,10 @@ struct RichContentKeys {
     }
     
     enum react {
+        static let react = "react"
         static let reactto_id = "reactto_id"
         static let react_message = "react_message"
+        static let lastReaction = "lastReaction"
     }
 }
 

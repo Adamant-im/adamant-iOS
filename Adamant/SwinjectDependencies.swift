@@ -247,6 +247,16 @@ extension Container {
             )
         }.inObjectScope(.container)
         
+        // MARK: Rich transaction react service
+        self.register(RichTransactionReactService.self) { r in
+            AdamantRichTransactionReactService(
+                coreDataStack: r.resolve(CoreDataStack.self)!,
+                apiService: r.resolve(ApiService.self)!,
+                adamantCore: r.resolve(AdamantCore.self)!,
+                accountService: r.resolve(AccountService.self)!
+            )
+        }.inObjectScope(.container)
+        
         // MARK: Bitcoin AddressConverterFactory
         self.register(AddressConverterFactory.self) { r in
             AddressConverterFactory()

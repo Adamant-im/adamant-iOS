@@ -66,6 +66,14 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         return stack
     }()
     
+    private lazy var reactionLabel: UILabel = {
+        let label = UILabel()
+        label.text = model.reaction
+        label.backgroundColor = .adamant.codeBlock
+        label.layer.cornerRadius = 2
+        return label
+    }()
+    
     private lazy var chatMenuManager: ChatMenuManager = {
         let manager = ChatMenuManager(
             menu: makeContextMenu(),
@@ -101,6 +109,8 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
                 $0.leading.equalToSuperview().inset(leading)
                 $0.trailing.equalToSuperview().inset(trailing)
             }
+            
+            reactionLabel.text = model.reaction
         }
     }
     
@@ -128,6 +138,7 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         messageLabel.attributedText = nil
         messageLabel.text = nil
         replyMessageLabel.attributedText = nil
+        reactionLabel.text = nil
     }
     
     override func setupSubviews() {
@@ -157,6 +168,12 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
             $0.top.bottom.equalToSuperview().inset(8)
             $0.leading.equalToSuperview().inset(leading)
             $0.trailing.equalToSuperview().inset(trailing)
+        }
+        
+        contentView.addSubview(reactionLabel)
+        reactionLabel.snp.makeConstraints { make in
+            make.trailing.equalTo(verticalStack.snp.trailing)
+            make.bottom.equalToSuperview().offset(5)
         }
         
         configureMenu()

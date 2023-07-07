@@ -16,6 +16,7 @@ extension ChatMessageReplyCell {
         let messageReply: NSAttributedString
         let backgroundColor: ChatMessageBackgroundColor
         let isFromCurrentSender: Bool
+        let reaction: String?
         
         static let `default` = Self(
             id: "",
@@ -23,7 +24,8 @@ extension ChatMessageReplyCell {
             message: NSAttributedString(string: ""),
             messageReply: NSAttributedString(string: ""),
             backgroundColor: .failed,
-            isFromCurrentSender: false
+            isFromCurrentSender: false,
+            reaction: nil
         )
         
         func makeReplyContent() -> NSAttributedString {

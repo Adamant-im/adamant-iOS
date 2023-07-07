@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3A41938F2A580C57006A6B22 /* AdamantRichTransactionReactService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A41938E2A580C57006A6B22 /* AdamantRichTransactionReactService.swift */; };
+		3A4193912A580C85006A6B22 /* RichTransactionReactService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4193902A580C85006A6B22 /* RichTransactionReactService.swift */; };
 		3A8875EF27BBF38D00436195 /* Parchment in Frameworks */ = {isa = PBXBuildFile; productRef = 3A8875EE27BBF38D00436195 /* Parchment */; };
 		3AA2D5F7280EADE3000ED971 /* SocketService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA2D5F6280EADE3000ED971 /* SocketService.swift */; };
 		3AA2D5FA280EAF5D000ED971 /* AdamantSocketService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA2D5F9280EAF5D000ED971 /* AdamantSocketService.swift */; };
@@ -792,6 +794,8 @@
 /* Begin PBXFileReference section */
 		33975C0D891698AA7E74EBCC /* Pods_Adamant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Adamant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		36AB8CE9537B3B873972548B /* Pods_AdmCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AdmCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3A41938E2A580C57006A6B22 /* AdamantRichTransactionReactService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantRichTransactionReactService.swift; sourceTree = "<group>"; };
+		3A4193902A580C85006A6B22 /* RichTransactionReactService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichTransactionReactService.swift; sourceTree = "<group>"; };
 		3AA2D5F6280EADE3000ED971 /* SocketService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocketService.swift; sourceTree = "<group>"; };
 		3AA2D5F9280EAF5D000ED971 /* AdamantSocketService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantSocketService.swift; sourceTree = "<group>"; };
 		3AE89DD82837F5BF0051D3A9 /* ChatRooms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatRooms.swift; sourceTree = "<group>"; };
@@ -1442,6 +1446,14 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
+		3A41938D2A580C3B006A6B22 /* RichTransactionReactService */ = {
+			isa = PBXGroup;
+			children = (
+				3A41938E2A580C57006A6B22 /* AdamantRichTransactionReactService.swift */,
+			);
+			path = RichTransactionReactService;
+			sourceTree = "<group>";
+		};
 		3AA2D5F8280EAF49000ED971 /* SocketService */ = {
 			isa = PBXGroup;
 			children = (
@@ -1934,6 +1946,7 @@
 				4153045A29C09C6C000E4BEA /* IncreaseFeeService.swift */,
 				4184F1742A33106200D7B8B9 /* CrashlysticsService.swift */,
 				41C1698B29E7F34900FEB3CB /* RichTransactionReplyService.swift */,
+				3A4193902A580C85006A6B22 /* RichTransactionReactService.swift */,
 			);
 			path = ServiceProtocols;
 			sourceTree = "<group>";
@@ -1941,6 +1954,7 @@
 		E913C9061FFFA92E001A83F7 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				3A41938D2A580C3B006A6B22 /* RichTransactionReactService */,
 				41C1698A29E7F2EE00FEB3CB /* RichTransactionReplyService */,
 				935F53D429BE8F4800779492 /* RichTransactionStatusService */,
 				3AA2D5F8280EAF49000ED971 /* SocketService */,
@@ -3264,6 +3278,7 @@
 				E950652320404C84008352E5 /* AdamantUriTools.swift in Sources */,
 				93E0C850296B08D900FF54D3 /* UIEdgeInsets+adamant.swift in Sources */,
 				415441372923AB3700824478 /* BtcProvider.swift in Sources */,
+				3A41938F2A580C57006A6B22 /* AdamantRichTransactionReactService.swift in Sources */,
 				E95F85C7200A9B070070534A /* ChatTableViewCell.swift in Sources */,
 				A50A41082822F8CE006BDFE1 /* BtcWalletService.swift in Sources */,
 				6455E9F121075D3600B2E94C /* AddressBookService.swift in Sources */,
@@ -3365,6 +3380,7 @@
 				3AE89DDB2837F5D30051D3A9 /* ChatRoomsChats.swift in Sources */,
 				64E1C831222E9617006C4DA7 /* DogeWalletService.swift in Sources */,
 				E91947B22000246A001362F8 /* AdamantError.swift in Sources */,
+				3A4193912A580C85006A6B22 /* RichTransactionReactService.swift in Sources */,
 				3AA2D5F7280EADE3000ED971 /* SocketService.swift in Sources */,
 				E95F85802008C8D70070534A /* ChatsRoutes.swift in Sources */,
 				41A1994429D2D3CF0031AD75 /* MessageModel.swift in Sources */,

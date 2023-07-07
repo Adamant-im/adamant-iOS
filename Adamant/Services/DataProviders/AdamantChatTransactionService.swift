@@ -211,6 +211,32 @@ actor AdamantChatTransactionService: ChatTransactionService {
                         break
                     }
                     
+                    if let data = decodedMessage.data(using: String.Encoding.utf8),
+                       let richContent = RichMessageTools.richContent(from: data),
+                       richContent[RichContentKeys.react.reactto_id] != nil {
+                        if let trs = getChatTransactionFromDB(
+                            id: String(transaction.id),
+                            context: context
+                        ) {
+                            messageTransaction = trs
+                            break
+                        }
+                        
+                        let trs = RichMessageTransaction(
+                            entity: RichMessageTransaction.entity(),
+                            insertInto: context
+                        )
+                        
+                        trs.richContent = richContent
+                        trs.richType = RichContentKeys.react.react
+                        trs.isReply = false
+                        trs.isReact = true
+                        trs.transactionStatus = nil
+                        messageTransaction = trs
+                        
+                        break
+                    }
+                    
                     let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
                     trs.message = decodedMessage
                     messageTransaction = trs

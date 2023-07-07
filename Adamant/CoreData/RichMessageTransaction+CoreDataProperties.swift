@@ -20,6 +20,7 @@ extension RichMessageTransaction {
     @NSManaged public var richContent: [String: Any]?
     @NSManaged public var richType: String?
     @NSManaged public var isReply: Bool
+    @NSManaged public var isReact: Bool
     @NSManaged public var transferStatusRaw: NSNumber?
     
     func isTransferReply() -> Bool {

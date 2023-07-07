@@ -189,6 +189,7 @@ private extension ChatMessageFactory {
         
         let decodedMessage = transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) ?? "..."
         let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
+        let reaction = transaction.getRichValue(for: RichContentKeys.react.lastReaction)
         
         return .reply(.init(
             value: .init(
@@ -197,7 +198,8 @@ private extension ChatMessageFactory {
             message: Self.markdownParser.parse(replyMessage),
             messageReply: decodedMessageMarkDown,
             backgroundColor: backgroundColor,
-            isFromCurrentSender: isFromCurrentSender)
+            isFromCurrentSender: isFromCurrentSender,
+            reaction: reaction)
         ))
     }
     
