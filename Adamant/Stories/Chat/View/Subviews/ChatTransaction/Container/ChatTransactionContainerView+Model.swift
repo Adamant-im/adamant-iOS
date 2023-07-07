@@ -14,12 +14,14 @@ extension ChatTransactionContainerView {
         let isFromCurrentSender: Bool
         var content: ChatTransactionContentView.Model
         let status: TransactionStatus
+        let reaction: String?
         
         static let `default` = Self(
             id: "",
             isFromCurrentSender: true,
             content: .default,
-            status: .notInitiated
+            status: .notInitiated,
+            reaction: nil
         )
         
         func makeReplyContent() -> NSAttributedString {

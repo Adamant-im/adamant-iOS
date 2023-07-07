@@ -100,7 +100,10 @@ private extension AdamantRichTransactionReactService {
             case let trs as MessageTransaction:
                 break
             case let trs as TransferTransaction:
-                break
+                setReact(
+                    to: transaction,
+                    reaction: reaction
+                )
             case let trs as RichMessageTransaction:
                 setReact(
                     to: trs,
@@ -124,9 +127,14 @@ private extension AdamantRichTransactionReactService {
     }
     
     func update(transaction: TransferTransaction) {
-        if let reaction = reactions[transaction.transactionId] {
-            print("to do add reactions to transfer")
-        }
+        guard let reaction = reactions[transaction.transactionId],
+              transaction.lastReaction != reaction
+        else { return }
+        
+        setReact(
+            to: transaction,
+            reaction: reaction
+        )
     }
     
     func update(transaction: MessageTransaction) {
@@ -148,6 +156,22 @@ private extension AdamantRichTransactionReactService {
         let transaction = privateContext.object(with: transaction.objectID)
             as? RichMessageTransaction
         transaction?.richContent?[RichContentKeys.react.lastReaction] = reaction
+        try? privateContext.save()
+    }
+    
+    func setReact(
+        to transaction: TransferTransaction,
+        reaction: String
+    ) {
+        let privateContext = NSManagedObjectContext(
+            concurrencyType: .privateQueueConcurrencyType
+        )
+
+        privateContext.parent = coreDataStack.container.viewContext
+        
+        let transaction = privateContext.object(with: transaction.objectID)
+            as? TransferTransaction
+        transaction?.lastReaction = reaction
         try? privateContext.save()
     }
 }

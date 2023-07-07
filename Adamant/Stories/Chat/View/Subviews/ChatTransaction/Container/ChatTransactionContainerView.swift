@@ -45,9 +45,34 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
         return stack
     }()
     
+    private lazy var vStack: UIStackView = {
+        let stack = UIStackView()
+        stack.alignment = .top
+        stack.axis = .vertical
+        stack.spacing = 12
+
+        stack.addArrangedSubview(statusButton)
+        stack.addArrangedSubview(reactionLabel)
+        return stack
+    }()
+    
     private lazy var swipeView: SwipeableView = {
         let view = SwipeableView(frame: .zero, view: self)
         return view
+    }()
+    
+    private lazy var reactionLabel: UILabel = {
+        let label = UILabel()
+        label.text = model.reaction
+        label.backgroundColor = .adamant.codeBlock
+        label.layer.cornerRadius = reactionSize / 2
+        label.textAlignment = .center
+        label.layer.masksToBounds = true
+        
+        label.snp.makeConstraints { make in
+            make.width.height.equalTo(reactionSize)
+        }
+        return label
     }()
     
     private lazy var chatMenuManager: ChatMenuManager = {
@@ -62,6 +87,8 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
     }()
     
     private lazy var contextMenu = AdvancedContextMenuManager(delegate: chatMenuManager)
+    
+    private let reactionSize: CGFloat = 30
     
     var isSelected: Bool = false {
         didSet {
@@ -119,6 +146,9 @@ private extension ChatTransactionContainerView {
         chatMenuManager.menuAlignment = model.isFromCurrentSender
         ? Alignment.trailing
         : Alignment.leading
+        
+        reactionLabel.text = model.reaction
+        reactionLabel.isHidden = model.reaction == nil
     }
     
     func updateStatus(_ status: TransactionStatus) {
@@ -127,7 +157,7 @@ private extension ChatTransactionContainerView {
     }
     
     func updateLayout() {
-        var viewsList = [spacingView, statusButton, contentView]
+        var viewsList = [spacingView, vStack, contentView]
         
         viewsList = model.isFromCurrentSender
             ? viewsList

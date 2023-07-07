@@ -214,6 +214,7 @@ private extension ChatMessageFactory {
         let decodedMessage = transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) ?? "..."
         let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
         let replyId = transaction.getRichValue(for: RichContentKeys.reply.replyToId) ?? ""
+        let reaction = transaction.getRichValue(for: RichContentKeys.react.lastReaction)
         
         return .transaction(.init(value: .init(
             id: id,
@@ -233,7 +234,8 @@ private extension ChatMessageFactory {
                 replyMessage: decodedMessageMarkDown,
                 replyId: replyId
             ),
-            status: transaction.transactionStatus ?? .notInitiated
+            status: transaction.transactionStatus ?? .notInitiated,
+            reaction: reaction
         )))
     }
     
@@ -247,6 +249,7 @@ private extension ChatMessageFactory {
         let decodedMessage = transaction.decodedReplyMessage ?? "..."
         let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
         let replyId = transaction.replyToId ?? ""
+        let reaction = transaction.lastReaction
         
         return .transaction(.init(value: .init(
             id: id,
@@ -268,7 +271,8 @@ private extension ChatMessageFactory {
                 replyMessage: decodedMessageMarkDown,
                 replyId: replyId
             ),
-            status: transaction.statusEnum.toTransactionStatus()
+            status: transaction.statusEnum.toTransactionStatus(),
+            reaction: reaction
         )))
     }
     
