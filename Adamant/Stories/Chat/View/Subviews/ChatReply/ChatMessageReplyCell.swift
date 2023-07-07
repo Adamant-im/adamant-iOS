@@ -70,7 +70,9 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         let label = UILabel()
         label.text = model.reaction
         label.backgroundColor = .adamant.codeBlock
-        label.layer.cornerRadius = 2
+        label.layer.cornerRadius = reactionSize.height / 2
+        label.textAlignment = .center
+        label.layer.masksToBounds = true
         return label
     }()
     
@@ -111,6 +113,8 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
             }
             
             reactionLabel.text = model.reaction
+            reactionLabel.isHidden = model.reaction == nil
+            layoutReactionLabel()
         }
     }
     
@@ -129,6 +133,7 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     private var trailingReplyViewOffset: CGFloat = 4
     private let smallHInset: CGFloat = 8
     private let longHInset: CGFloat = 14
+    private let reactionSize = CGSize(width: 30, height: 30)
     private lazy var contextMenu = AdvancedContextMenuManager(delegate: chatMenuManager)
     
     // MARK: - Methods
@@ -170,13 +175,9 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
             $0.trailing.equalToSuperview().inset(trailing)
         }
         
-        contentView.addSubview(reactionLabel)
-        reactionLabel.snp.makeConstraints { make in
-            make.trailing.equalTo(verticalStack.snp.trailing)
-            make.bottom.equalToSuperview().offset(5)
-        }
-        
         configureMenu()
+        
+        contentView.addSubview(reactionLabel)
     }
     
     func configureMenu() {
@@ -185,8 +186,6 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         messageContainerView.removeFromSuperview()
         contentView.addSubview(containerView)
         
-//        let interaction = UIContextMenuInteraction(delegate: chatMenuManager)
-//        containerView.addInteraction(interaction)
         contextMenu.setup(for: containerView)
         
         containerView.addSubview(messageContainerView)
@@ -305,6 +304,26 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         )
         containerView.layoutIfNeeded()
         messageContainerView.layoutIfNeeded()
+        layoutReactionLabel()
+    }
+    
+    func layoutReactionLabel() {
+        let additionalWidth: CGFloat = model.isFromCurrentSender
+        ? reactionSize.width
+        : containerView.frame.width
+        
+        reactionLabel.frame = CGRect(
+            origin: .init(
+                x: containerView.frame.origin.x
+                + additionalWidth
+                - reactionSize.width,
+                y: containerView.frame.origin.y
+                + containerView.frame.height
+                - 10
+            ),
+            size: reactionSize
+        )
+        reactionLabel.layoutIfNeeded()
     }
     
     override func configure(
