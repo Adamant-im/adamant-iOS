@@ -38,14 +38,15 @@ actor AdamantRichTransactionReactService: NSObject, RichTransactionReactService 
     func startObserving() {
         richController.delegate = self
         try? richController.performFetch()
-        richController.fetchedObjects?.forEach( processReaction(transaction:) )
+        richController.fetchedObjects?.forEach( update(transaction:) )
         
         transferController.delegate = self
         try? transferController.performFetch()
-//        transferController.fetchedObjects?.forEach( update(transaction:) )
+        transferController.fetchedObjects?.forEach( update(transaction:) )
         
         messageController.delegate = self
         try? messageController.performFetch()
+        messageController.fetchedObjects?.forEach( update(transaction:) )
     }
 }
 
@@ -112,12 +113,14 @@ private extension AdamantRichTransactionReactService {
     }
     
     func update(transaction: RichMessageTransaction) {
-        if let reaction = reactions[transaction.transactionId] {
-            setReact(
-                to: transaction,
-                reaction: reaction
-            )
-        }
+        guard let reaction = reactions[transaction.transactionId],
+              transaction.getRichValue(for: RichContentKeys.react.lastReaction) != reaction
+        else { return }
+        
+        setReact(
+            to: transaction,
+            reaction: reaction
+        )
     }
     
     func update(transaction: TransferTransaction) {

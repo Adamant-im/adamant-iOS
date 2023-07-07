@@ -331,6 +331,7 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         }
         
         replyMessageLabel.attributedText = model.messageReply
+        reactionLabel.text = model.reaction
     }
     
     /// Used to handle the cell's contentView's tap gesture.
