@@ -9,6 +9,8 @@
 import UIKit
 import SnapKit
 import Combine
+import SwiftUI
+import AdvancedContextMenuKit
 
 final class ChatTransactionContainerView: UIView, ChatModelView {
     var subscription: AnyCancellable?
@@ -51,10 +53,14 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
     private lazy var chatMenuManager: ChatMenuManager = {
         let manager = ChatMenuManager(
             menu: makeContextMenu(),
-            backgroundColor: nil
+            menuAlignment: model.isFromCurrentSender
+            ? Alignment.trailing
+            : Alignment.leading
         )
         return manager
     }()
+    
+    private lazy var contextMenu = AdvancedContextMenuManager(delegate: chatMenuManager)
     
     var isSelected: Bool = false {
         didSet {
@@ -102,14 +108,16 @@ private extension ChatTransactionContainerView {
             self?.actionHandler(.swipeState(state: state))
         }
         
-        let interaction = UIContextMenuInteraction(delegate: chatMenuManager)
-        contentView.addInteraction(interaction)
+        contextMenu.setup(for: contentView)
     }
     
     func update() {
         contentView.model = model.content
         updateStatus(model.status)
         updateLayout()
+        chatMenuManager.menuAlignment = model.isFromCurrentSender
+        ? Alignment.trailing
+        : Alignment.leading
     }
     
     func updateStatus(_ status: TransactionStatus) {

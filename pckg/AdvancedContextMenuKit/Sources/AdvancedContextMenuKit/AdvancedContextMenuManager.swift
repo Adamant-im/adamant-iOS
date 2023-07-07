@@ -60,7 +60,9 @@ public class AdvancedContextMenuManager: NSObject {
         let locationOnScreen = contentView.convert(locationInView, to: window)
 
         let x = contentView.frame.origin.x
-       // contentView.superview?.backgroundColor = .red.withAlphaComponent(0.4)
+        let superViewXOffset = 8 + (contentView.superview?.frame.origin.x ?? .zero)
+//        contentView.superview?.backgroundColor = .red.withAlphaComponent(0.4)
+
         UIView.animate(withDuration: 0.29) {
             contentView.transform = .init(scaleX: 0.9, y: 0.9)
         } completion: { _ in
@@ -74,10 +76,11 @@ public class AdvancedContextMenuManager: NSObject {
             self.show(
                 view: previewView,
                 location: locationOnScreen,
+                superViewXOffset: superViewXOffset,
                 menu: menu,
                 menuAlignment: menuAlignment
             ) { [weak self] in
-                self?.contentView?.isHidden = true
+                self?.contentView?.alpha = 0.0
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.29) {
                     contentView.transform = .identity
@@ -89,6 +92,7 @@ public class AdvancedContextMenuManager: NSObject {
     private func show(
         view: UIView,
         location: CGPoint,
+        superViewXOffset: CGFloat,
         menu: UIMenu,
         menuAlignment: Alignment,
         completion: (() -> Void)?
@@ -104,7 +108,8 @@ public class AdvancedContextMenuManager: NSObject {
             menu: menu,
             menuAlignment: menuAlignment,
             upperContentView: upperView,
-            upperContentHeight: 50
+            upperContentHeight: 50,
+            superViewXOffset: superViewXOffset
         )
         
         overlay.delegate = self
@@ -125,14 +130,12 @@ public class AdvancedContextMenuManager: NSObject {
 
 extension AdvancedContextMenuManager: OverlayViewDelegate {
     func didDissmis() {
-        contentView?.isHidden = false
+        contentView?.alpha = 1.0
         contentView = nil
         overlayVC?.dismiss(animated: false)
     }
     
     func didDisplay() {
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-        contentView?.isHidden = true
-        //contentView?.transform = .init(scaleX: 1.0, y: 1.0)
     }
 }

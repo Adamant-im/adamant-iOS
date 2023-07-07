@@ -22,6 +22,7 @@ struct ContextMenuOverlayView: View {
     let menuAlignment: Alignment
     let upperContentView: AnyView?
     let upperContentHeight: CGFloat
+    let superViewXOffset: CGFloat
     
     @State private var isPresented = true
     @State private var menuHeight: CGFloat = .zero
@@ -133,7 +134,7 @@ private extension ContextMenuOverlayView {
         UIViewWrapper(view: contentView)
             .frame(height: newContentHeight)
             .padding(.top, getTopPaddingForContentView())
-            .padding([.leading, .trailing], 8)
+            .padding([.leading, .trailing], superViewXOffset)
           //  .padding(.leading, 8)
            // .scaleEffect(0.9)
            // .transition(transition)

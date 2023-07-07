@@ -69,7 +69,9 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     private lazy var chatMenuManager: ChatMenuManager = {
         let manager = ChatMenuManager(
             menu: makeContextMenu(),
-            backgroundColor: model.backgroundColor.uiColor
+            menuAlignment: model.isFromCurrentSender
+            ? Alignment.trailing
+            : Alignment.leading
         )
         return manager
     }()
@@ -88,7 +90,9 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
             guard model != oldValue else { return }
             
             replyMessageLabel.attributedText = model.messageReply
-            chatMenuManager.backgroundColor = model.backgroundColor.uiColor
+            chatMenuManager.menuAlignment = model.isFromCurrentSender
+            ? Alignment.trailing
+            : Alignment.leading
             
             let leading = model.isFromCurrentSender ? smallHInset : longHInset
             let trailing = model.isFromCurrentSender ? longHInset : smallHInset
@@ -114,7 +118,7 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     private var trailingReplyViewOffset: CGFloat = 4
     private let smallHInset: CGFloat = 8
     private let longHInset: CGFloat = 14
-    private lazy var contextMenu = AdvancedContextMenuManager(delegate: self)
+    private lazy var contextMenu = AdvancedContextMenuManager(delegate: chatMenuManager)
     
     // MARK: - Methods
     
@@ -362,56 +366,5 @@ extension ChatMessageReplyCell {
         }
         
         return UIMenu(title: "", children: [reply, copy, report, remove])
-    }
-}
-
-extension ChatMessageReplyCell: AdvancedContextMenuManagerDelegate {
-    func configureContextMenu() -> UIMenu {
-        makeContextMenu()
-    }
-    
-    func configureContextMenuAlignment() -> Alignment {
-        model.isFromCurrentSender ? Alignment.trailing : Alignment.leading
-    }
-    
-    func getUpperContentView() -> AnyView? {
-        return AnyView(ChatReactionsView(delegate: self))
-    }
-}
-
-extension ChatMessageReplyCell: ChatReactionsViewDelegate, ElegantEmojiPickerDelegate {
-    func didSelectEmoji(_ emoji: String) {
-        print("didSelectEmoji=\(emoji)")
-        contextMenu.dismiss()
-    }
-    
-    func didTapMore() {
-        DispatchQueue.main.async {
-            let config = ElegantConfiguration(
-                showRandom: false,
-                showReset: false,
-                defaultSkinTone: .Light
-            )
-            let picker = ElegantEmojiPicker(delegate: self, configuration: config)
-            picker.definesPresentationContext = true
-            self.topMostController().present(picker, animated: true)
-        }
-    }
-    
-    func topMostController() -> UIViewController {
-        UIApplication.shared.windows.filter {$0.isKeyWindow}.first
-        var topController: UIViewController = UIApplication.shared.keyWindow!.rootViewController!
-        while (topController.presentedViewController != nil) {
-            topController = topController.presentedViewController!
-        }
-        return topController
-    }
-    
-    func emojiPicker (
-        _ picker: ElegantEmojiPicker,
-        didSelectEmoji emoji: Emoji?
-    ) {
-        print("emojiPicker=\(emoji?.emoji)")
-        contextMenu.dismiss()
     }
 }

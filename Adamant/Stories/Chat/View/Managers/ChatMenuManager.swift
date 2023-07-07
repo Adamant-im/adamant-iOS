@@ -7,8 +7,75 @@
 //
 
 import UIKit
+import SwiftUI
+import ElegantEmojiPicker
+import AdvancedContextMenuKit
 
-final class ChatMenuManager: NSObject, UIContextMenuInteractionDelegate {
+final class ChatMenuManager: NSObject, AdvancedContextMenuManagerDelegate {
+    private let menu: UIMenu
+    
+    var menuAlignment: Alignment
+    
+    // MARK: Init
+    
+    init(menu: UIMenu, menuAlignment: Alignment) {
+        self.menu = menu
+        self.menuAlignment = menuAlignment
+        
+        super.init()
+    }
+    
+    func configureContextMenu() -> UIMenu {
+        menu
+    }
+    
+    func configureContextMenuAlignment() -> Alignment {
+        menuAlignment
+    }
+    
+    func getUpperContentView() -> AnyView? {
+        return AnyView(ChatReactionsView(delegate: self))
+    }
+}
+
+extension ChatMenuManager: ChatReactionsViewDelegate, ElegantEmojiPickerDelegate {
+    func didSelectEmoji(_ emoji: String) {
+        print("didSelectEmoji=\(emoji)")
+    //    contextMenu.dismiss()
+    }
+    
+    func didTapMore() {
+        DispatchQueue.main.async {
+            let config = ElegantConfiguration(
+                showRandom: false,
+                showReset: false,
+                defaultSkinTone: .Light
+            )
+            let picker = ElegantEmojiPicker(delegate: self, configuration: config)
+            picker.definesPresentationContext = true
+            self.topMostController().present(picker, animated: true)
+        }
+    }
+    
+    func topMostController() -> UIViewController {
+        UIApplication.shared.windows.filter {$0.isKeyWindow}.first
+        var topController: UIViewController = UIApplication.shared.keyWindow!.rootViewController!
+        while (topController.presentedViewController != nil) {
+            topController = topController.presentedViewController!
+        }
+        return topController
+    }
+    
+    func emojiPicker (
+        _ picker: ElegantEmojiPicker,
+        didSelectEmoji emoji: Emoji?
+    ) {
+        print("emojiPicker=\(emoji?.emoji)")
+      //  contextMenu.dismiss()
+    }
+}
+
+final class ChatMenuManagerOld: NSObject, UIContextMenuInteractionDelegate {
     private let menu: UIMenu
     
     var backgroundColor: UIColor?

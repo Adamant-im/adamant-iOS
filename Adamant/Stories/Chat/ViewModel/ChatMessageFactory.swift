@@ -120,6 +120,7 @@ private extension ChatMessageFactory {
         case let transaction as MessageTransaction:
             return makeContent(
                 transaction,
+                isFromCurrentSender: isFromCurrentSender,
                 backgroundColor: backgroundColor
             )
         case let transaction as RichMessageTransaction:
@@ -150,6 +151,7 @@ private extension ChatMessageFactory {
     
     func makeContent(
         _ transaction: MessageTransaction,
+        isFromCurrentSender: Bool,
         backgroundColor: ChatMessageBackgroundColor
     ) -> ChatMessage.Content {
         transaction.message.map {
@@ -168,7 +170,8 @@ private extension ChatMessageFactory {
                 value: .init(
                     id: transaction.txId,
                     text: mutableAttributedString,
-                    backgroundColor: backgroundColor)
+                    backgroundColor: backgroundColor,
+                    isFromCurrentSender: isFromCurrentSender)
             ))
         } ?? .default
     }

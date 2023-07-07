@@ -10,6 +10,8 @@ import UIKit
 import SnapKit
 import MessageKit
 import Combine
+import SwiftUI
+import AdvancedContextMenuKit
 
 final class ChatMessageCell: TextMessageCell, ChatModelView {    
     private lazy var swipeView: SwipeableView = {
@@ -20,17 +22,23 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
     private lazy var chatMenuManager: ChatMenuManager = {
         let manager = ChatMenuManager(
             menu: makeContextMenu(),
-            backgroundColor: model.backgroundColor.uiColor
+            menuAlignment: model.isFromCurrentSender
+            ? Alignment.trailing
+            : Alignment.leading
         )
         return manager
     }()
+    
+    private lazy var contextMenu = AdvancedContextMenuManager(delegate: chatMenuManager)
     
     // MARK: - Properties
     
     var model: Model = .default {
         didSet {
             guard model != oldValue else { return }
-            chatMenuManager.backgroundColor = model.backgroundColor.uiColor
+            chatMenuManager.menuAlignment = model.isFromCurrentSender
+            ? Alignment.trailing
+            : Alignment.leading
         }
     }
     
@@ -76,10 +84,9 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         messageContainerView.removeFromSuperview()
         contentView.addSubview(containerView)
         
-        let interaction = UIContextMenuInteraction(delegate: chatMenuManager)
         containerView.addSubview(messageContainerView)
         
-        containerView.addInteraction(interaction)
+        contextMenu.setup(for: containerView)
     }
     
     /// Positions the message bubble's top label.
