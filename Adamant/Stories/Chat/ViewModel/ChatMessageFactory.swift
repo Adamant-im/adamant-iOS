@@ -166,12 +166,16 @@ private extension ChatMessageFactory {
                 range: NSRange(location: 0, length: attributedString.length)
             )
             
+            let reaction = transaction.lastReaction
+            
             return .message(.init(
                 value: .init(
                     id: transaction.txId,
                     text: mutableAttributedString,
                     backgroundColor: backgroundColor,
-                    isFromCurrentSender: isFromCurrentSender)
+                    isFromCurrentSender: isFromCurrentSender,
+                    reaction: reaction
+                )
             ))
         } ?? .default
     }

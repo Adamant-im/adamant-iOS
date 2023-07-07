@@ -19,6 +19,16 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         return view
     }()
     
+    private lazy var reactionLabel: UILabel = {
+        let label = UILabel()
+        label.text = model.reaction
+        label.backgroundColor = .adamant.codeBlock
+        label.layer.cornerRadius = reactionSize.height / 2
+        label.textAlignment = .center
+        label.layer.masksToBounds = true
+        return label
+    }()
+    
     private lazy var chatMenuManager: ChatMenuManager = {
         let manager = ChatMenuManager(
             menu: makeContextMenu(),
@@ -40,6 +50,10 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
             chatMenuManager.menuAlignment = model.isFromCurrentSender
             ? Alignment.trailing
             : Alignment.leading
+            
+            reactionLabel.text = model.reaction
+            reactionLabel.isHidden = model.reaction == nil
+            layoutReactionLabel()
         }
     }
     
@@ -56,8 +70,14 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
     var subscription: AnyCancellable?
     
     private var containerView: UIView = UIView()
+    private let reactionSize = CGSize(width: 30, height: 30)
     
     // MARK: - Methods
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        reactionLabel.text = nil
+    }
     
     override func setupSubviews() {
         super.setupSubviews()
@@ -77,6 +97,8 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         }
         
         configureMenu()
+        
+        contentView.addSubview(reactionLabel)
     }
     
     func configureMenu() {
@@ -203,6 +225,34 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         )
         containerView.layoutIfNeeded()
         messageContainerView.layoutIfNeeded()
+        layoutReactionLabel()
+    }
+    
+    func layoutReactionLabel() {
+        let additionalWidth: CGFloat = model.isFromCurrentSender
+        ? reactionSize.width
+        : containerView.frame.width
+        
+        reactionLabel.frame = CGRect(
+            origin: .init(
+                x: containerView.frame.origin.x
+                + additionalWidth
+                - reactionSize.width,
+                y: containerView.frame.origin.y
+                + containerView.frame.height
+                - 10
+            ),
+            size: reactionSize
+        )
+        reactionLabel.layoutIfNeeded()
+    }
+    
+    override func configure(with message: MessageType, at indexPath: IndexPath, and messagesCollectionView: MessagesCollectionView) {
+        super.configure(with: message, at: indexPath, and: messagesCollectionView)
+        if model.reaction != nil {
+            print("model.reaction=\(model.reaction)")
+        }
+        reactionLabel.text = model.reaction
     }
 }
 

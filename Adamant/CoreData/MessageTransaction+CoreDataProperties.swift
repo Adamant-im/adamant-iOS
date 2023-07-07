@@ -18,5 +18,5 @@ extension MessageTransaction {
 
     @NSManaged public var isMarkdown: Bool
     @NSManaged public var message: String?
-
+    @NSManaged public var lastReaction: String?
 }
