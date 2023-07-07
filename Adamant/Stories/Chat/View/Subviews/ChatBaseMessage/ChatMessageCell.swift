@@ -247,11 +247,17 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         reactionLabel.layoutIfNeeded()
     }
     
-    override func configure(with message: MessageType, at indexPath: IndexPath, and messagesCollectionView: MessagesCollectionView) {
-        super.configure(with: message, at: indexPath, and: messagesCollectionView)
-        if model.reaction != nil {
-            print("model.reaction=\(model.reaction)")
-        }
+    override func configure(
+        with message: MessageType,
+        at indexPath: IndexPath,
+        and messagesCollectionView: MessagesCollectionView
+    ) {
+        super.configure(
+            with: message,
+            at: indexPath,
+            and: messagesCollectionView
+        )
+        
         reactionLabel.text = model.reaction
     }
 }

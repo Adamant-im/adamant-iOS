@@ -681,6 +681,7 @@ extension AdamantChatsProvider {
                 richContentSerialized: payload.serialized(),
                 richType: payload.type,
                 isReply: payload.isReply,
+                isReact: payload.isReact,
                 senderId: loggedAccount.address,
                 recipientId: recipientId,
                 keypair: keypair,
@@ -767,6 +768,7 @@ extension AdamantChatsProvider {
                 richContentSerialized: payload.serialized(),
                 richType: payload.type,
                 isReply: payload.isReply,
+                isReact: payload.isReact,
                 senderId: loggedAccount.address,
                 recipientId: recipientId,
                 keypair: keypair,
@@ -837,6 +839,7 @@ extension AdamantChatsProvider {
         richContentSerialized: String,
         richType: String,
         isReply: Bool,
+        isReact: Bool,
         senderId: String,
         recipientId: String,
         keypair: Keypair,
@@ -856,6 +859,7 @@ extension AdamantChatsProvider {
         transaction.richContent = richContent
         transaction.richType = richType
         transaction.isReply = isReply
+        transaction.isReact = isReact
         transaction.richContentSerialized = richContentSerialized
         
         transaction.transactionStatus = richProviders[richType] != nil ? .notInitiated : nil

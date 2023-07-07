@@ -13,12 +13,15 @@ import Foundation
 protocol RichMessage: Encodable {
     var type: String { get }
     var isReply: Bool { get }
+    var isReact: Bool { get }
     
     func content() -> [String: Any]
     func serialized() -> String
 }
 
 extension RichMessage {
+    var isReact: Bool { false }
+    
     func serialized() -> String {
         if let data = try? JSONEncoder().encode(self), let raw = String(data: data, encoding: String.Encoding.utf8) {
             return raw
@@ -53,6 +56,7 @@ struct RichContentKeys {
 struct RichMessageReaction: RichMessage {
     var type: String
     var isReply: Bool
+    var isReact: Bool
     var reactto_id: String
     var react_message: String
     
@@ -65,6 +69,7 @@ struct RichMessageReaction: RichMessage {
         self.reactto_id = reactto_id
         self.react_message = react_message
         self.isReply = false
+        self.isReact = true
     }
     
     func content() -> [String: Any] {
