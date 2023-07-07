@@ -73,6 +73,7 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
             ? Alignment.trailing
             : Alignment.leading
         )
+        manager.delegate = self
         return manager
     }()
     
@@ -366,5 +367,11 @@ extension ChatMessageReplyCell {
         }
         
         return UIMenu(title: "", children: [reply, copy, report, remove])
+    }
+}
+
+extension ChatMessageReplyCell: ChatMenuManagerDelegate {
+    func didReact(_ emoji: String) {
+        actionHandler(.react(id: model.id, emoji: emoji))
     }
 }

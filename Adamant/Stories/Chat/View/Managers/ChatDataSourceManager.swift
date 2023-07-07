@@ -163,6 +163,8 @@ private extension ChatDataSourceManager {
             viewModel.removeMessageAction(id)
         case let .report(id):
             viewModel.reportMessageAction(id)
+        case let .react(id, emoji):
+            viewModel.reactAction(id, emoji: emoji)
         }
     }
 }

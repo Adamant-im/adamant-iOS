@@ -456,6 +456,36 @@ final class ChatViewModel: NSObject {
     func removeMessageAction(_ id: String) {
         dialog.send(.removeMessageAlert(id: id))
     }
+    
+    func reactAction(_ id: String, emoji: String) {
+        guard let partnerAddress = chatroom?.partner?.address else { return }
+        
+        guard chatroom?.partner?.isDummy != true else {
+            dialog.send(.dummy(partnerAddress))
+            return
+        }
+        
+        Task {
+            let message: AdamantMessage = .richMessage(
+                payload: RichMessageReaction(
+                    reactto_id: id,
+                    react_message: emoji
+                )
+            )
+            
+            guard await validateSendingMessage(message: message) else { return }
+            
+            do {
+                _ = try await chatsProvider.sendMessage(
+                    message,
+                    recipientId: partnerAddress,
+                    from: chatroom
+                )
+            } catch {
+                await handleMessageSendingError(error: error, sentText: emoji)
+            }
+        }.stored(in: tasksStorage)
+    }
 }
 
 extension ChatViewModel {

@@ -39,6 +39,38 @@ struct RichContentKeys {
         static let replyMessage = "reply_message"
         static let decodedReplyMessage = "decodedMessage"
     }
+    
+    enum react {
+        static let reactto_id = "reactto_id"
+        static let react_message = "react_message"
+    }
+}
+
+// MARK: - RichMessageReaction
+
+struct RichMessageReaction: RichMessage {
+    var type: String
+    var isReply: Bool
+    var reactto_id: String
+    var react_message: String
+    
+    enum CodingKeys: String, CodingKey {
+        case reactto_id, react_message
+    }
+    
+    init(reactto_id: String, react_message: String) {
+        self.type = RichContentKeys.reply.reply
+        self.reactto_id = reactto_id
+        self.react_message = react_message
+        self.isReply = false
+    }
+    
+    func content() -> [String: Any] {
+        return [
+            RichContentKeys.react.reactto_id: reactto_id,
+            RichContentKeys.react.react_message: react_message
+        ]
+    }
 }
 
 // MARK: - RichMessageReply

@@ -15,4 +15,5 @@ enum ChatAction {
     case copy(text: String)
     case report(id: String)
     case remove(id: String)
+    case react(id: String, emoji: String)
 }

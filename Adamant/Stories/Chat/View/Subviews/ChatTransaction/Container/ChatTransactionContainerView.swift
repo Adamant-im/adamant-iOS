@@ -57,6 +57,7 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
             ? Alignment.trailing
             : Alignment.leading
         )
+        manager.delegate = self
         return manager
     }()
     
@@ -195,5 +196,11 @@ extension ChatTransactionContainerView {
         }
         
         return UIMenu(title: "", children: [reply, report, remove])
+    }
+}
+
+extension ChatTransactionContainerView: ChatMenuManagerDelegate {
+    func didReact(_ emoji: String) {
+        actionHandler(.react(id: model.id, emoji: emoji))
     }
 }

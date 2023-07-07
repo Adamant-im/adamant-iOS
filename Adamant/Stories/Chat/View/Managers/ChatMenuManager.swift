@@ -11,9 +11,14 @@ import SwiftUI
 import ElegantEmojiPicker
 import AdvancedContextMenuKit
 
+protocol ChatMenuManagerDelegate: AnyObject {
+    func didReact(_ emoji: String)
+}
+
 final class ChatMenuManager: NSObject, AdvancedContextMenuManagerDelegate {
     private let menu: UIMenu
     
+    weak var delegate: ChatMenuManagerDelegate?
     var menuAlignment: Alignment
     
     // MARK: Init
@@ -41,6 +46,7 @@ final class ChatMenuManager: NSObject, AdvancedContextMenuManagerDelegate {
 extension ChatMenuManager: ChatReactionsViewDelegate, ElegantEmojiPickerDelegate {
     func didSelectEmoji(_ emoji: String) {
         print("didSelectEmoji=\(emoji)")
+        delegate?.didReact(emoji)
     //    contextMenu.dismiss()
     }
     
@@ -70,7 +76,9 @@ extension ChatMenuManager: ChatReactionsViewDelegate, ElegantEmojiPickerDelegate
         _ picker: ElegantEmojiPicker,
         didSelectEmoji emoji: Emoji?
     ) {
-        print("emojiPicker=\(emoji?.emoji)")
+        guard let emoji = emoji?.emoji else { return }
+        print("emojiPicker=\(emoji)")
+        delegate?.didReact(emoji)
       //  contextMenu.dismiss()
     }
 }
