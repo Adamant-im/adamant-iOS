@@ -28,7 +28,7 @@ public extension AdvancedContextMenuManagerDelegate {
 public class AdvancedContextMenuManager: NSObject {
     private var contentView: UIView?
     private var overlayVC: UIHostingController<ContextMenuOverlayView>?
-    
+    private var viewModel: ContextMenuOverlayViewModel?
     private weak var delegate: AdvancedContextMenuManagerDelegate?
     
     public init(delegate: AdvancedContextMenuManagerDelegate) {
@@ -45,7 +45,7 @@ public class AdvancedContextMenuManager: NSObject {
     }
     
     public func dismiss() {
-        didDissmis()
+        viewModel?.dismiss()
     }
     
     @objc func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
@@ -99,7 +99,7 @@ public class AdvancedContextMenuManager: NSObject {
     ) {
         let upperView = self.delegate?.getUpperContentView()
 
-        var overlay = ContextMenuOverlayView(
+        let viewModel = ContextMenuOverlayViewModel(
             contentView: view,
             topYOffset: location.y,
             newContentHeight: view.frame.height,
@@ -111,8 +111,11 @@ public class AdvancedContextMenuManager: NSObject {
             upperContentHeight: 50,
             superViewXOffset: superViewXOffset
         )
+        viewModel.delegate = self
         
-        overlay.delegate = self
+        let overlay = ContextMenuOverlayView(
+            viewModel: viewModel
+        )
         
         let overlayVC = UIHostingController(rootView: overlay)
         overlayVC.modalPresentationStyle = .overFullScreen
@@ -120,6 +123,7 @@ public class AdvancedContextMenuManager: NSObject {
         overlayVC.view.backgroundColor = .clear
         
         self.overlayVC = overlayVC
+        self.viewModel = viewModel
         print("location.y=\(location.y)")
         
         UIApplication.shared.windows.first?.rootViewController?.present(overlayVC, animated: false) {

@@ -231,6 +231,7 @@ extension ChatTransactionContainerView {
 
 extension ChatTransactionContainerView: ChatMenuManagerDelegate {
     func didReact(_ emoji: String) {
+        contextMenu.dismiss()
         actionHandler(.react(id: model.id, emoji: emoji))
     }
 }

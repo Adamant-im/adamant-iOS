@@ -409,6 +409,7 @@ extension ChatMessageReplyCell {
 
 extension ChatMessageReplyCell: ChatMenuManagerDelegate {
     func didReact(_ emoji: String) {
+        contextMenu.dismiss()
         actionHandler(.react(id: model.id, emoji: emoji))
     }
 }
