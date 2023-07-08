@@ -166,7 +166,10 @@ private extension ChatMessageFactory {
                 range: NSRange(location: 0, length: attributedString.length)
             )
             
-            let reaction = transaction.lastReaction
+            var reaction = transaction.lastReaction
+            if reaction == "" {
+                reaction = nil
+            }
             
             return .message(.init(
                 value: .init(
@@ -193,7 +196,10 @@ private extension ChatMessageFactory {
         
         let decodedMessage = transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) ?? "..."
         let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
-        let reaction = transaction.getRichValue(for: RichContentKeys.react.lastReaction)
+        var reaction = transaction.getRichValue(for: RichContentKeys.react.lastReaction)
+        if reaction == "" {
+            reaction = nil
+        }
         
         return .reply(.init(
             value: .init(
@@ -218,7 +224,10 @@ private extension ChatMessageFactory {
         let decodedMessage = transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) ?? "..."
         let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
         let replyId = transaction.getRichValue(for: RichContentKeys.reply.replyToId) ?? ""
-        let reaction = transaction.getRichValue(for: RichContentKeys.react.lastReaction)
+        var reaction = transaction.getRichValue(for: RichContentKeys.react.lastReaction)
+        if reaction == "" {
+            reaction = nil
+        }
         
         return .transaction(.init(value: .init(
             id: id,
@@ -253,7 +262,10 @@ private extension ChatMessageFactory {
         let decodedMessage = transaction.decodedReplyMessage ?? "..."
         let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
         let replyId = transaction.replyToId ?? ""
-        let reaction = transaction.lastReaction
+        var reaction = transaction.lastReaction
+        if reaction == "" {
+            reaction = nil
+        }
         
         return .transaction(.init(value: .init(
             id: id,

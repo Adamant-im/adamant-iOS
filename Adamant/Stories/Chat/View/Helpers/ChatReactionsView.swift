@@ -21,45 +21,40 @@ struct ChatReactionsView: View {
     
     init(delegate: ChatReactionsViewDelegate?) {
         self.delegate = delegate
-        self.emojies = emojiRanges.flatMap { range in
-            range.compactMap { i in
-                guard let scalar = UnicodeScalar(i) else { return nil }
-                return String(scalar)
-            }
-        }
+        self.emojies = ["😂", "🤔", "😁", "👍", "👌"]
     }
     
     var body: some View {
-        VStack(alignment: .center) {
-            Spacer()
-            HStack(spacing: 10) {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 10) {
-                        ForEach(emojies, id: \.self) { emoji in
-                            ChatReactionButton(emoji: emoji)
-                                .onTapGesture {
-                                    delegate?.didSelectEmoji(emoji)
-                                }
+        HStack(spacing: 10) {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ChatReactionEreaserButton()
+                        .onTapGesture {
+                            delegate?.didSelectEmoji("")
                         }
+                    ForEach(emojies, id: \.self) { emoji in
+                        ChatReactionButton(emoji: emoji)
+                            .onTapGesture {
+                                delegate?.didSelectEmoji(emoji)
+                            }
                     }
                 }
-                
-                Button {
-                    delegate?.didTapMore()
-                } label: {
-                    Image(systemName: "plus")
-                        .resizable()
-                        .frame(width: 20, height: 20)
-                        .padding(10)
-                        .background(Color.white)
-                        .clipShape(Circle())
-                        .shadow(radius: 3)
-                }
-                Spacer()
             }
+            
+            Button {
+                delegate?.didTapMore()
+            } label: {
+                Image(systemName: "plus")
+                    .resizable()
+                    .frame(width: 20, height: 20)
+                    .padding(10)
+                    .background(Color.white)
+                    .clipShape(Circle())
+            }
+            .padding(5)
             Spacer()
         }
-        .frame(alignment: .center)
+        .padding(.leading, 10)
         .background(Color.init(uiColor: .adamant.codeBlock))
         .cornerRadius(20)
     }
@@ -73,6 +68,14 @@ struct ChatReactionButton: View {
             .font(.title)
             .background(.clear)
             .clipShape(Circle())
-            .shadow(radius: 3)
+    }
+}
+
+struct ChatReactionEreaserButton: View {
+    var body: some View {
+        Image(systemName: "eraser")
+            .font(.title)
+            .background(.clear)
+            .clipShape(Circle())
     }
 }

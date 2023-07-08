@@ -38,6 +38,10 @@ final class ChatMenuManager: NSObject, AdvancedContextMenuManagerDelegate {
         menuAlignment
     }
     
+    func configureUpperContentViewSize() -> CGSize {
+        .init(width: 290, height: 50)
+    }
+    
     func getUpperContentView() -> AnyView? {
         return AnyView(ChatReactionsView(delegate: self))
     }

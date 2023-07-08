@@ -11,6 +11,7 @@ import UIKit
 public protocol AdvancedContextMenuManagerDelegate: NSObject {
     func getPreviewView(for contentView: UIView) -> UIView?
     func getUpperContentView() -> AnyView?
+    func configureUpperContentViewSize() -> CGSize
     func configureContextMenu() -> UIMenu
     func configureContextMenuAlignment() -> Alignment
 }
@@ -22,6 +23,10 @@ public extension AdvancedContextMenuManagerDelegate {
     
     func getUpperContentView() -> AnyView? {
         nil
+    }
+    
+    func configureUpperContentViewSize() -> CGSize {
+        .init(width: CGFloat.infinity, height: 50)
     }
 }
 
@@ -98,7 +103,8 @@ public class AdvancedContextMenuManager: NSObject {
         completion: (() -> Void)?
     ) {
         let upperView = self.delegate?.getUpperContentView()
-
+        let upperViewSize = self.delegate?.configureUpperContentViewSize() ?? .zero
+        
         let viewModel = ContextMenuOverlayViewModel(
             contentView: view,
             topYOffset: location.y,
@@ -108,7 +114,7 @@ public class AdvancedContextMenuManager: NSObject {
             menu: menu,
             menuAlignment: menuAlignment,
             upperContentView: upperView,
-            upperContentHeight: 50,
+            upperContentSize: upperViewSize,
             superViewXOffset: superViewXOffset
         )
         viewModel.delegate = self

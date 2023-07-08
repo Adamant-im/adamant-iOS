@@ -16,7 +16,7 @@ class ContextMenuOverlayViewModel: ObservableObject {
     let menu: UIMenu
     let menuAlignment: Alignment
     let upperContentView: AnyView?
-    let upperContentHeight: CGFloat
+    let upperContentSize: CGSize
     let superViewXOffset: CGFloat
     
     @Published var menuHeight: CGFloat = .zero
@@ -50,7 +50,7 @@ class ContextMenuOverlayViewModel: ObservableObject {
     private let minBottomOffset: CGFloat = 50
     private let minContentsSpace: CGFloat = 10
     
-    init(contentView: UIView, topYOffset: CGFloat, newContentHeight: CGFloat, oldContentHeight: CGFloat, newContentWidth: CGFloat, menu: UIMenu, menuAlignment: Alignment, upperContentView: AnyView?, upperContentHeight: CGFloat, superViewXOffset: CGFloat) {
+    init(contentView: UIView, topYOffset: CGFloat, newContentHeight: CGFloat, oldContentHeight: CGFloat, newContentWidth: CGFloat, menu: UIMenu, menuAlignment: Alignment, upperContentView: AnyView?, upperContentSize: CGSize, superViewXOffset: CGFloat) {
         self.contentView = contentView
         self.topYOffset = topYOffset
         self.newContentHeight = newContentHeight
@@ -59,17 +59,17 @@ class ContextMenuOverlayViewModel: ObservableObject {
         self.menu = menu
         self.menuAlignment = menuAlignment
         self.upperContentView = upperContentView
-        self.upperContentHeight = upperContentHeight
+        self.upperContentSize = upperContentSize
         self.superViewXOffset = superViewXOffset
     }
     
     func isNeedToMoveFromTop() -> Bool {
-        topOfContentViewOffset - minContentsSpace - upperContentHeight < minBottomOffset
+        topOfContentViewOffset - minContentsSpace - upperContentSize.height < minBottomOffset
     }
     
     func getOffsetToMoveFromTop() -> CGFloat {
         minContentsSpace
-            + upperContentHeight
+        + upperContentSize.height
             + minBottomOffset
     }
     
