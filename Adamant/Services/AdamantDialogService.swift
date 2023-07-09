@@ -157,7 +157,11 @@ extension AdamantDialogService {
         if let error = error as? RichError {
             showRichError(error: error)
         } else {
-            showError(withMessage: error.localizedDescription, supportEmail: true, error: error)
+            showError(
+                withMessage: error.localizedDescription,
+                supportEmail: true,
+                error: error
+            )
         }
     }
     
@@ -639,4 +643,12 @@ private func makeSafeAlertController(
         : preferredStyle
     
     return .init(title: title, message: message, preferredStyle: style)
+}
+
+extension AdamantDialogService {
+    func selectAllTextFields(in alert: UIAlertController) {
+        alert.textFields?.forEach { textField in
+            textField.selectAll(nil)
+        }
+    }
 }

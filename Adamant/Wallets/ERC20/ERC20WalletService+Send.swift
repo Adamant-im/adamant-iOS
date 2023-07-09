@@ -55,7 +55,14 @@ extension ERC20WalletService: WalletServiceTwoStepSend {
                 amount: "\(amount)"
             ).transaction
             
-            try await resolver.resolveAll(for: &tx)
+            await calculateFee(for: ethRecipient)
+            
+            let policies: Policies = Policies(
+                gasLimitPolicy: .manual(gasLimit),
+                gasPricePolicy: .manual(gasPrice)
+            )
+            
+            try await resolver.resolveAll(for: &tx, with: policies)
             
             try Web3Signer.signTX(
                 transaction: &tx,

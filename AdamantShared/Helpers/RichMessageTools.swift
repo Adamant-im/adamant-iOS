@@ -9,7 +9,7 @@
 import Foundation
 
 struct RichMessageTools {
-    static func richContent(from data: Data) -> [String:String]? {
+    static func richContent(from data: Data) -> [String: Any]? {
         guard let jsonRaw = try? JSONSerialization.jsonObject(with: data, options: []) else {
             return nil
         }
@@ -29,7 +29,7 @@ struct RichMessageTools {
                 json[RichContentKeys.type] = key.lowercased()
             }
             
-            var fixedJson = [String:String]()
+            var fixedJson: [String: Any] = [:]
             
             let formatter = AdamantBalanceFormat.rawNumberDotFormatter
             formatter.decimalSeparator = "."
@@ -39,8 +39,10 @@ struct RichMessageTools {
                     fixedJson[key] = value
                 } else if let value = raw as? NSNumber, let amount = formatter.string(from: value) {
                     fixedJson[key] = amount
+                } else if let value = raw as? [String: String] {
+                    fixedJson[key] = value
                 } else {
-                    fixedJson[key] = String(describing: raw)
+                    fixedJson[key] = raw
                 }
             }
             

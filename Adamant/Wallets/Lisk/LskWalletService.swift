@@ -14,6 +14,7 @@ import web3swift
 import Alamofire
 import struct BigInt.BigUInt
 import Web3Core
+import Combine
 
 class LskWalletService: WalletService {
     
@@ -78,6 +79,14 @@ class LskWalletService: WalletService {
         return tokenNetworkSymbol + tokenSymbol
     }
     
+    var richMessageType: String {
+        return Self.richMessageType
+	}
+
+    var qqPrefix: String {
+        return Self.qqPrefix
+    }
+    
 	// MARK: - Properties
 	let transferAvailable: Bool = true
     private var initialBalanceCheck = false
@@ -94,7 +103,8 @@ class LskWalletService: WalletService {
     
     private let mainnet: Bool
     private let nodes: [APINode]
-    
+    private var subscriptions = Set<AnyCancellable>()
+
     // MARK: - State
     private (set) var state: WalletServiceState = .notInitiated
     
@@ -136,22 +146,38 @@ class LskWalletService: WalletService {
         setupApi()
         
         // Notifications
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] _ in
-            self?.update()
-        }
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: nil) { [weak self] _ in
-            self?.update()
-        }
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
-            self?.lskWallet = nil
-            self?.initialBalanceCheck = false
-            if let balanceObserver = self?.balanceObserver {
-                NotificationCenter.default.removeObserver(balanceObserver)
-                self?.balanceObserver = nil
+        addObservers()
+    }
+    
+    func addObservers() {
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.update()
             }
-        }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.accountDataUpdated, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.update()
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.lskWallet = nil
+                self?.initialBalanceCheck = false
+                if let balanceObserver = self?.balanceObserver {
+                    NotificationCenter.default.removeObserver(balanceObserver)
+                    self?.balanceObserver = nil
+                }
+            }
+            .store(in: &subscriptions)
     }
     
     func update() {
@@ -183,6 +209,7 @@ class LskWalletService: WalletService {
         }
         
         if let balance = try? await getBalance() {
+            wallet.isBalanceInitialized = true
             let notification: Notification.Name?
             
             if wallet.balance != balance {
@@ -210,7 +237,7 @@ class LskWalletService: WalletService {
     }
 
     func validateAddress(_ address: String) -> AddressValidationResult {
-        return LiskKit.Crypto.isValidBase32(address: address) ? .valid : .invalid
+        return LiskKit.Crypto.isValidBase32(address: address) ? .valid : .invalid(description: nil)
     }
     
     func fromRawLsk(value: BigInt.BigUInt) -> String {
@@ -390,15 +417,18 @@ extension LskWalletService: InitiatedWithPassphraseService {
         } catch let error as WalletServiceError {
             switch error {
             case .walletNotInitiated:
-                // Show '0' without waiting for balance update
-                if let wallet = service.lskWallet {
-                    NotificationCenter.default.post(name: service.walletUpdatedNotification, object: service, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
+                /// The ADM Wallet is not initialized. Check the balance of the current wallet
+                /// and save the wallet address to kvs when dropshipping ADM
+                service.setState(.upToDate)
+                
+                Task {
+                    await service.update()
                 }
                 
                 service.save(lskAddress: eWallet.address) { result in
                     service.kvsSaveCompletionRecursion(lskAddress: eWallet.address, result: result)
                 }
-                service.setState(.upToDate)
+                
                 return eWallet
             default:
                 service.setState(.upToDate)

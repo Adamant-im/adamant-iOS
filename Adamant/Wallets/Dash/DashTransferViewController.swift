@@ -16,36 +16,9 @@ extension String.adamantLocalized.transfer {
 
 final class DashTransferViewController: TransferViewControllerBase {
     
-    // MARK: Dependencies
-    
-    private let chatsProvider: ChatsProvider
-    
     // MARK: Properties
     
     static let invalidCharacters: CharacterSet = CharacterSet.decimalDigits.inverted
-    
-    init(
-        chatsProvider: ChatsProvider,
-        accountService: AccountService,
-        accountsProvider: AccountsProvider,
-        dialogService: DialogService,
-        router: Router,
-        currencyInfoService: CurrencyInfoService
-    ) {
-        self.chatsProvider = chatsProvider
-        
-        super.init(
-            accountService: accountService,
-            accountsProvider: accountsProvider,
-            dialogService: dialogService,
-            router: router,
-            currencyInfoService: currencyInfoService
-        )
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
     
     // MARK: Send
     
@@ -58,7 +31,10 @@ final class DashTransferViewController: TransferViewControllerBase {
             comments = ""
         }
         
-        guard let service = service as? DashWalletService, let recipient = recipientAddress, let amount = amount else {
+        guard let service = service as? DashWalletService,
+              let recipient = recipientAddress,
+              let amount = amount
+        else {
             return
         }
         
@@ -159,18 +135,8 @@ final class DashTransferViewController: TransferViewControllerBase {
         }
     }
     
-    override func validateRecipient(_ address: String) -> Bool {
-        guard let service = service else {
-            return false
-        }
-        
-        switch service.validate(address: address) {
-        case .valid:
-            return true
-            
-        case .invalid, .system:
-            return false
-        }
+    override func validateRecipient(_ address: String) -> AddressValidationResult {
+        service?.validate(address: address) ?? .invalid(description: nil)
     }
     
     override func recipientRow() -> BaseRow {
@@ -198,47 +164,6 @@ final class DashTransferViewController: TransferViewControllerBase {
         }
         
         return row
-    }
-    
-    override func handleRawAddress(_ address: String) -> Bool {
-        guard let service = service else {
-            return false
-        }
-        
-        let parsedAddress: String
-        if address.hasPrefix("dash:"), let firstIndex = address.firstIndex(of: ":") {
-            let index = address.index(firstIndex, offsetBy: 1)
-            parsedAddress = String(address[index...])
-        } else {
-            parsedAddress = address
-        }
-        
-        switch service.validate(address: parsedAddress) {
-        case .valid:
-            if let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) {
-                row.value = parsedAddress
-                row.updateCell()
-            }
-            
-            return true
-            
-        default:
-            return false
-        }
-    }
-    
-    func reportTransferTo(
-        admAddress: String,
-        amount: Decimal,
-        comments: String,
-        hash: String
-    ) async throws {
-        let payload = RichMessageTransfer(type: DashWalletService.richMessageType, amount: amount, hash: hash, comments: comments)
-        
-        let message = AdamantMessage.richMessage(payload: payload)
-        
-        chatsProvider.removeChatPositon(for: admAddress)
-        _ = try await chatsProvider.sendMessage(message, recipientId: admAddress)
     }
     
     override func defaultSceneTitle() -> String? {

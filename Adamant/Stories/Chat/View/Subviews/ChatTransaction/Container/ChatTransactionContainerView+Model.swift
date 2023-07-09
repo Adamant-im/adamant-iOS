@@ -9,10 +9,10 @@
 import Foundation
 
 extension ChatTransactionContainerView {
-    struct Model: ChatReusableViewModelProtocol {
+    struct Model: ChatReusableViewModelProtocol, MessageModel {
         let id: String
         let isFromCurrentSender: Bool
-        let content: ChatTransactionContentView.Model
+        var content: ChatTransactionContentView.Model
         let status: TransactionStatus
         
         static let `default` = Self(
@@ -21,5 +21,16 @@ extension ChatTransactionContainerView {
             content: .default,
             status: .notInitiated
         )
+        
+        func makeReplyContent() -> NSAttributedString {
+            let commentRaw = content.comment ?? ""
+            let comment = commentRaw.isEmpty
+            ? commentRaw
+            : ": \(commentRaw)"
+            
+            let content = "\(content.title) \(content.currency) \(content.amount)\(comment)"
+            
+            return ChatMessageFactory.markdownParser.parse(content)
+        }
     }
 }

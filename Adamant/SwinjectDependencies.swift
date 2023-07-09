@@ -7,6 +7,7 @@
 //
 
 import Swinject
+import BitcoinKit
 
 // MARK: - Services
 extension Container {
@@ -56,6 +57,20 @@ extension Container {
             AdamantVisibleWalletsService(
                 securedStore: r.resolve(SecuredStore.self)!,
                 accountService: r.resolve(AccountService.self)!
+            )
+        }.inObjectScope(.container)
+        
+        // MARK: IncreaseFeeService
+        self.register(IncreaseFeeService.self) { r in
+            AdamantIncreaseFeeService(
+                securedStore: r.resolve(SecuredStore.self)!
+            )
+        }.inObjectScope(.container)
+        
+        // MARK: CrashlysticsService
+        self.register(CrashlyticsService.self) { r in
+            AdamantCrashlyticsService(
+                securedStore: r.resolve(SecuredStore.self)!
             )
         }.inObjectScope(.container)
         
@@ -203,6 +218,11 @@ extension Container {
             )
         }.inObjectScope(.container)
         
+        // MARK: Contribute screen factory
+        self.register(ContributeFactory.self) { r in
+            ContributeFactory(crashliticsService: r.resolve(CrashlyticsService.self)!)
+        }.inObjectScope(.container)
+        
         // MARK: Rich transaction status service
         self.register(RichTransactionStatusService.self) { r in
             let accountService = r.resolve(AccountService.self)!
@@ -215,6 +235,21 @@ extension Container {
                 coreDataStack: r.resolve(CoreDataStack.self)!,
                 richProviders: Dictionary(uniqueKeysWithValues: richProviders)
             )
+        }.inObjectScope(.container)
+        
+        // MARK: Rich transaction reply service
+        self.register(RichTransactionReplyService.self) { r in
+            AdamantRichTransactionReplyService(
+                coreDataStack: r.resolve(CoreDataStack.self)!,
+                apiService: r.resolve(ApiService.self)!,
+                adamantCore: r.resolve(AdamantCore.self)!,
+                accountService: r.resolve(AccountService.self)!
+            )
+        }.inObjectScope(.container)
+        
+        // MARK: Bitcoin AddressConverterFactory
+        self.register(AddressConverterFactory.self) { r in
+            AddressConverterFactory()
         }.inObjectScope(.container)
     }
 }

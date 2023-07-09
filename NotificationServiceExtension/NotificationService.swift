@@ -144,16 +144,68 @@ class NotificationService: UNNotificationServiceExtension {
             
             // MARK: Rich messages
             case .richMessage:
-                guard let data = message.data(using: String.Encoding.utf8),
-                    let richContent = RichMessageTools.richContent(from: data),
-                    let key = richContent[RichContentKeys.type]?.lowercased(),
-                    let provider = richMessageProviders[key],
-                    let content = provider.notificationContent(for: transaction, partnerAddress: partnerAddress, partnerName: partnerName, richContent: richContent)
-                else {
-                        bestAttemptContent.title = partnerName ?? partnerAddress
-                        bestAttemptContent.body = message
-                        bestAttemptContent.categoryIdentifier = AdamantNotificationCategories.message
-                        break
+                var content: NotificationContent?
+                
+                // base rich
+                if let data = message.data(using: String.Encoding.utf8),
+                   let richContent = RichMessageTools.richContent(from: data),
+                   let type = (richContent[RichContentKeys.type] as? String)?.lowercased(),
+                   let provider = richMessageProviders[type],
+                   let notificationContent = provider.notificationContent(
+                    for: transaction,
+                    partnerAddress: partnerAddress,
+                    partnerName: partnerName,
+                    richContent: richContent
+                   ) {
+                    content = notificationContent
+                }
+                
+                // adm transfer reply
+                if let data = message.data(using: String.Encoding.utf8),
+                   let richContent = RichMessageTools.richContent(from: data),
+                   richContent[RichContentKeys.reply.replyToId] != nil,
+                   transaction.amount > 0,
+                   let notificationContent = adamantProvider.notificationContent(
+                    partnerAddress: partnerAddress,
+                    partnerName: partnerName,
+                    amount: transaction.amount,
+                    comment: richContent[RichContentKeys.reply.replyMessage] as? String
+                   ) {
+                    content = notificationContent
+                }
+                
+                // message reply
+                if let data = message.data(using: String.Encoding.utf8),
+                   let richContent = RichMessageTools.richContent(from: data),
+                   let message = richContent[RichContentKeys.reply.replyMessage] as? String,
+                   richContent[RichContentKeys.reply.replyToId] != nil,
+                   transaction.amount <= 0 {
+                    content = NotificationContent(
+                        title: partnerName ?? partnerAddress,
+                        subtitle: nil,
+                        body: MarkdownParser().parse(message).string,
+                        attachments: nil,
+                        categoryIdentifier: AdamantNotificationCategories.message
+                    )
+                }
+                
+                // rich transfer reply
+                if let data = message.data(using: String.Encoding.utf8),
+                   let richContent = RichMessageTools.richContent(from: data),
+                   let transferContent = richContent[RichContentKeys.reply.replyMessage] as? [String: String],
+                   let type = transferContent[RichContentKeys.type]?.lowercased(),
+                   let provider = richMessageProviders[type],
+                   let notificationContent = provider.notificationContent(
+                    for: transaction,
+                    partnerAddress: partnerAddress,
+                    partnerName: partnerName,
+                    richContent: transferContent
+                   ) {
+                    content = notificationContent
+                }
+                
+                guard let content = content else {
+                    break
                 }
                 
                 bestAttemptContent.title = content.title

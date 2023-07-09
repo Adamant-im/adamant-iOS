@@ -12,8 +12,6 @@ import UIKit
 final class ChatMessagesCollectionView: MessagesCollectionView {
     private var currentIds = [String]()
     
-    var reportMessageAction: ((IndexPath) -> Void)?
-    var removeMessageAction: ((IndexPath) -> Void)?
     var fixedBottomOffset: CGFloat?
     
     var bottomOffset: CGFloat {
@@ -60,7 +58,10 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
     
     func setFullBottomInset(_ inset: CGFloat) {
         let inset = inset - safeAreaInsets.bottom
-        let bottomOffset = self.bottomOffset
+        let bottomOffset = contentSize.height < bounds.height
+        ? 0
+        : self.bottomOffset
+        
         super.contentInset.bottom = inset
         super.verticalScrollIndicatorInsets.bottom = inset
 
@@ -73,6 +74,10 @@ final class ChatMessagesCollectionView: MessagesCollectionView {
             maxVerticalOffset - newValue,
             safely: safely
         )
+    }
+    
+    func stopDecelerating() {
+        setContentOffset(contentOffset, animated: false)
     }
 }
 
@@ -106,10 +111,6 @@ private extension ChatMessagesCollectionView {
         reloadData()
         layoutIfNeeded()
         currentIds = newIds
-    }
-    
-    func stopDecelerating() {
-        setContentOffset(contentOffset, animated: false)
     }
     
     func setVerticalContentOffset(_ offset: CGFloat, safely: Bool) {

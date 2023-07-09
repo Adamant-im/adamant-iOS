@@ -45,10 +45,9 @@ extension DashWalletService: WalletServiceTwoStepSend {
             throw WalletServiceError.notLogged
         }
         
-        let changeAddress = wallet.publicKey.toCashaddr()
         let key = wallet.privateKey
         
-        guard let toAddress = try? LegacyAddress(recipient, for: self.network) else {
+        guard let toAddress = try? addressConverter.convert(address: recipient) else {
             throw WalletServiceError.accountNotFound
         }
         
@@ -66,7 +65,14 @@ extension DashWalletService: WalletServiceTwoStepSend {
         }
         
         // MARK: 4. Create local transaction
-        let transaction = BitcoinKit.Transaction.createNewTransaction(toAddress: toAddress, amount: rawAmount, fee: fee, changeAddress: changeAddress, utxos: utxos, keys: [key])
+        let transaction = BitcoinKit.Transaction.createNewTransaction(
+            toAddress: toAddress,
+            amount: rawAmount,
+            fee: fee,
+            changeAddress: wallet.addressEntity,
+            utxos: utxos,
+            keys: [key]
+        )
         return transaction
     }
     

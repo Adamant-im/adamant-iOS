@@ -10,6 +10,7 @@ import UIKit
 import Swinject
 import Alamofire
 import BitcoinKit
+import Combine
 
 struct DogeApiCommands {
     static func balance(for address: String) -> String {
@@ -57,6 +58,7 @@ class DogeWalletService: WalletService {
     var accountService: AccountService!
     var dialogService: DialogService!
     var router: Router!
+    var addressConverter: AddressConverter!
     
     // MARK: - Constants
     static var currencyLogo = #imageLiteral(resourceName: "doge_wallet")
@@ -87,6 +89,14 @@ class DogeWalletService: WalletService {
         return DogeWalletService.fixedFee
     }
     
+    var richMessageType: String {
+        return Self.richMessageType
+	}
+
+    var qqPrefix: String {
+        return Self.qqPrefix
+    }
+    
     static let kvsAddress = "doge:address"
     
     private (set) var isWarningGasPrice = false
@@ -112,7 +122,8 @@ class DogeWalletService: WalletService {
     let defaultDispatchQueue = DispatchQueue(label: "im.adamant.dogeWalletService", qos: .userInteractive, attributes: [.concurrent])
     
     private static let jsonDecoder = JSONDecoder()
-    
+    private var subscriptions = Set<AnyCancellable>()
+
     // MARK: - State
     private (set) var state: WalletServiceState = .notInitiated
     
@@ -135,23 +146,39 @@ class DogeWalletService: WalletService {
         
         self.setState(.notInitiated)
         
-        // MARK: Notifications
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] _ in
-            self?.update()
-        }
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: nil) { [weak self] _ in
-            self?.update()
-        }
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
-            self?.dogeWallet = nil
-            self?.initialBalanceCheck = false
-            if let balanceObserver = self?.balanceObserver {
-                NotificationCenter.default.removeObserver(balanceObserver)
-                self?.balanceObserver = nil
+        // Notifications
+        addObservers()
+    }
+    
+    func addObservers() {
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.update()
             }
-        }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.accountDataUpdated, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.update()
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.dogeWallet = nil
+                self?.initialBalanceCheck = false
+                if let balanceObserver = self?.balanceObserver {
+                    NotificationCenter.default.removeObserver(balanceObserver)
+                    self?.balanceObserver = nil
+                }
+            }
+            .store(in: &subscriptions)
     }
     
     func update() {
@@ -176,6 +203,7 @@ class DogeWalletService: WalletService {
         setState(.updating)
         
         if let balance = try? await getBalance() {
+            wallet.isBalanceInitialized = true
             let notification: Notification.Name?
             
             if wallet.balance != balance {
@@ -198,7 +226,14 @@ class DogeWalletService: WalletService {
     }
     
     func validate(address: String) -> AddressValidationResult {
-        return AddressFactory.isValid(bitcoinAddress: address) ? .valid : .invalid
+        let address = try? addressConverter.convert(address: address)
+        
+        switch address?.scriptType {
+        case .p2pk, .p2pkh, .p2sh:
+            return .valid
+        case .p2tr, .p2multi, .p2wpkh, .p2wpkhSh, .p2wsh, .unknown, .none:
+            return .invalid(description: nil)
+        }
     }
 }
 
@@ -224,7 +259,7 @@ extension DogeWalletService: InitiatedWithPassphraseService {
         let privateKeyData = passphrase.data(using: .utf8)!.sha256()
         let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
         
-        let eWallet = DogeWallet(privateKey: privateKey)
+        let eWallet = try DogeWallet(privateKey: privateKey, addressConverter: addressConverter)
         self.dogeWallet = eWallet
         
         if !self.enabled {
@@ -253,9 +288,12 @@ extension DogeWalletService: InitiatedWithPassphraseService {
         } catch let error as WalletServiceError {
             switch error {
             case .walletNotInitiated:
-                // Show '0' without waiting for balance update
-                if let wallet = service.dogeWallet {
-                    NotificationCenter.default.post(name: service.walletUpdatedNotification, object: service, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
+                /// The ADM Wallet is not initialized. Check the balance of the current wallet
+                /// and save the wallet address to kvs when dropshipping ADM
+                service.setState(.upToDate)
+                
+                Task {
+                    await service.update()
                 }
                 
                 service.save(dogeAddress: eWallet.address) { result in
@@ -279,6 +317,8 @@ extension DogeWalletService: SwinjectDependentService {
         apiService = container.resolve(ApiService.self)
         dialogService = container.resolve(DialogService.self)
         router = container.resolve(Router.self)
+        addressConverter = container.resolve(AddressConverterFactory.self)?
+            .make(network: network)
     }
 }
 
@@ -501,8 +541,8 @@ extension DogeWalletService {
             }
 
             let value = NSDecimalNumber(decimal: (amount.decimalValue * DogeWalletService.multiplier)).uint64Value
-
-            let lockScript = Script.buildPublicKeyHashOut(pubKeyHash: wallet.publicKey.toCashaddr().data)
+            
+            let lockScript = wallet.addressEntity.lockingScript
             let txHash = Data(hex: txid).map { Data($0.reversed()) } ?? Data()
             let txIndex = vout.uint32Value
 

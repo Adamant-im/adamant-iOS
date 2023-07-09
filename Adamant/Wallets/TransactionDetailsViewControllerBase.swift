@@ -10,6 +10,26 @@ import UIKit
 import Eureka
 import SafariServices
 
+// MARK: - TransactionStatus UI
+private extension TransactionStatus {
+    var color: UIColor {
+        switch self {
+        case .failed: return .adamant.danger
+        case .notInitiated, .inconsistent, .noNetwork, .noNetworkFinal, .pending, .registered: return .adamant.alert
+        case .success: return .adamant.good
+        }
+    }
+    
+    var descriptionLocalized: String? {
+        switch self {
+        case .inconsistent:
+            return NSLocalizedString("TransactionStatus.Inconsistent.WrongTimestamp", comment: "Transaction status: inconsistent wrong timestamp")
+        default:
+            return nil
+        }
+    }
+}
+
 // MARK: - Localization
 extension String.adamantLocalized {
     struct transactionDetails {
@@ -41,6 +61,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         case comment
         case historyFiat
         case currentFiat
+        case inconsistentReason
         
         var tag: String {
             switch self {
@@ -58,6 +79,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             case .comment: return "comment"
             case .historyFiat: return "hfiat"
             case .currentFiat: return "cfiat"
+            case .inconsistentReason: return "incReason"
             }
         }
         
@@ -77,6 +99,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             case .comment: return ""
             case .historyFiat: return NSLocalizedString("TransactionDetailsScene.Row.HistoryFiat", comment: "Transaction details: fiat value at the time")
             case .currentFiat: return NSLocalizedString("TransactionDetailsScene.Row.CurrentFiat", comment: "Transaction details: current fiat value")
+            case .inconsistentReason:
+                return NSLocalizedString("TransactionStatus.Inconsistent.Reason.Title", comment: "Transaction status: inconsistent reason title")
             }
         }
         
@@ -94,12 +118,15 @@ class TransactionDetailsViewControllerBase: FormViewController {
         case details
         case comment
         case actions
+        case inconsistentReason
         
         var localized: String {
             switch self {
             case .details: return ""
             case .comment: return NSLocalizedString("TransactionDetailsScene.Section.Comment", comment: "Transaction details: 'Comments' section")
             case .actions: return NSLocalizedString("TransactionDetailsScene.Section.Actions", comment: "Transaction details: 'Actions' section")
+            case .inconsistentReason:
+                return NSLocalizedString("TransactionStatus.Inconsistent.Reason.Title", comment: "Transaction status: inconsistent reason title")
             }
         }
         
@@ -108,14 +135,17 @@ class TransactionDetailsViewControllerBase: FormViewController {
             case .details: return "details"
             case .comment: return "comment"
             case .actions: return "actions"
+            case .inconsistentReason: return "inconsistentReason"
             }
         }
     }
     
     // MARK: - Dependencies
     
-    var dialogService: DialogService
-    var currencyInfo: CurrencyInfoService
+    let dialogService: DialogService
+    let currencyInfo: CurrencyInfoService
+    let addressBookService: AddressBookService
+    let accountService: AccountService
     
     // MARK: - Properties
     
@@ -149,16 +179,71 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     private var isFiatSet = false
     
+    var richProvider: RichMessageProviderWithStatusCheck? {
+        nil
+    }
+    
+    var transactionStatus: TransactionStatus? {
+        guard let richTransaction = richTransaction,
+              let status = transaction?.transactionStatus
+        else {
+            return transaction?.transactionStatus
+        }
+        
+        return richProvider?.statusWithFilters(
+            transaction: richTransaction,
+            oldPendingAttempts: 0,
+            info: .init(
+                sentDate: transaction?.dateValue,
+                status: status
+            )
+        )
+    }
+    
     var refreshTask: Task<(), Never>?
+    
+    var richTransaction: RichMessageTransaction?
+    
+    var senderId: String? {
+        didSet {
+            guard let id = senderId,
+                  let address = accountService.account?.address
+            else { return }
+            
+            if id.caseInsensitiveCompare(address) == .orderedSame {
+                senderName = String.adamantLocalized.transactionDetails.yourAddress
+            } else {
+                senderName = addressBookService.getName(for: id)
+            }
+        }
+    }
+    
+    var recipientId: String? {
+        didSet {
+            guard let id = recipientId,
+                  let address = accountService.account?.address
+            else { return }
+            
+            if id.caseInsensitiveCompare(address) == .orderedSame {
+                recipientName = String.adamantLocalized.transactionDetails.yourAddress
+            } else {
+                recipientName = addressBookService.getName(for: id)
+            }
+        }
+    }
     
     // MARK: - Lifecycle
     
     init(
         dialogService: DialogService,
-        currencyInfo: CurrencyInfoService
+        currencyInfo: CurrencyInfoService,
+        addressBookService: AddressBookService,
+        accountService: AccountService
     ) {
         self.dialogService = dialogService
         self.currencyInfo = currencyInfo
+        self.addressBookService = addressBookService
+        self.accountService = accountService
         
         super.init(style: .grouped)
     }
@@ -219,12 +304,12 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.cell.titleLabel.text = Rows.from.localized
             
             if let transaction = transaction {
-                if transaction.senderAddress.count == 0 {
-                    $0.value = DoubleDetail(first: TransactionDetailsViewControllerBase.awaitingValueString, second: nil)
-                } else if let senderName = self?.senderName?.checkAndReplaceSystemWallets() {
-                    $0.value = DoubleDetail(first: senderName, second: transaction.senderAddress)
+                if let name = self?.senderName {
+                    $0.value = DoubleDetail(first: name, second: transaction.senderAddress)
                 } else {
-                    $0.value = DoubleDetail(first: transaction.senderAddress, second: nil)
+                    $0.value = transaction.senderAddress.isEmpty
+                    ? DoubleDetail(first: Self.awaitingValueString, second: nil)
+                    : DoubleDetail(first: transaction.senderAddress, second: nil)
                 }
             } else {
                 $0.value = nil
@@ -255,12 +340,12 @@ class TransactionDetailsViewControllerBase: FormViewController {
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = UIColor.adamant.textColor
             if let transaction = self?.transaction {
-                if transaction.senderAddress.count == 0 {
-                    row.value = DoubleDetail(first: TransactionDetailsViewControllerBase.awaitingValueString, second: nil)
-                } else if let senderName = self?.senderName?.checkAndReplaceSystemWallets() {
-                    row.value = DoubleDetail(first: senderName, second: transaction.senderAddress)
+                if let name = self?.senderName {
+                    row.value = DoubleDetail(first: name, second: transaction.senderAddress)
                 } else {
-                    row.value = DoubleDetail(first: transaction.senderAddress, second: nil)
+                    row.value = transaction.senderAddress.isEmpty
+                    ? DoubleDetail(first: Self.awaitingValueString, second: nil)
+                    : DoubleDetail(first: transaction.senderAddress, second: nil)
                 }
             } else {
                 row.value = nil
@@ -482,11 +567,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         let statusRow = LabelRow {
             $0.tag = Rows.status.tag
             $0.title = Rows.status.localized
-            $0.value = transaction?.transactionStatus?.localized
-            
-            $0.hidden = Condition.function([], { [weak self] _ -> Bool in
-                return self?.transaction?.transactionStatus == nil
-            })
+            $0.value = transactionStatus?.localized
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
             cell.textLabel?.textColor = UIColor.adamant.textColor
@@ -496,7 +577,14 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = UIColor.adamant.textColor
-            row.value = self?.transaction?.transactionStatus?.localized
+			cell.detailTextLabel?.textColor = self?.transactionStatus?.color ?? UIColor.adamant.textColor
+            
+            if let value = self?.transactionStatus?.localized,
+               !value.isEmpty {
+                row.value = value
+            } else {
+                row.value = TransactionDetailsViewControllerBase.awaitingValueString
+            }
         }
         
         detailsSection.append(statusRow)
@@ -583,7 +671,36 @@ class TransactionDetailsViewControllerBase: FormViewController {
             
             form.append(commentSection)
         }
-            
+        
+        // MARK: Inconsistent Reason
+        
+        let inconsistentReasonSection = Section(Sections.inconsistentReason.localized) {
+            $0.tag = Sections.inconsistentReason.tag
+            $0.hidden = Condition.function([], { [weak self] _ -> Bool in
+                return self?.transactionStatus != .inconsistent
+            })
+        }
+        
+        let inconsistentReasonRow = TextAreaRow(Rows.inconsistentReason.tag) {
+            $0.textAreaHeight = .dynamic(initialTextViewHeight: 44)
+            $0.value = transactionStatus?.descriptionLocalized
+        }.cellSetup { (cell, _) in
+            cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
+        }.cellUpdate { [weak self] (cell, row) in
+            cell.textView.backgroundColor = UIColor.clear
+            cell.textView.isSelectable = false
+            cell.textView.isEditable = false
+            row.value = self?.transactionStatus?.descriptionLocalized
+        }.onCellSelection { [weak self] (cell, row) in
+            if let text = row.value {
+                self?.shareValue(text, from: cell)
+            }
+        }
+        
+        inconsistentReasonSection.append(inconsistentReasonRow)
+        form.append(inconsistentReasonSection)
+        
         // MARK: Actions section
         
         let actionsSection = Section(Sections.actions.localized) {
@@ -664,6 +781,14 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 }
             }
         }
+    }
+    
+    func updateIncosinstentRowIfNeeded() {
+        guard transactionStatus == .inconsistent,
+              let section = form.sectionBy(tag: Sections.inconsistentReason.tag)
+        else { return }
+        
+        section.evaluateHidden()
     }
     
     // MARK: - Other

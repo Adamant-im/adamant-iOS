@@ -13,9 +13,8 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     
     // MARK: - Dependencies
     
-    var accountService: AccountService
-    var transfersProvider: TransfersProvider
-    var router: Router
+    let transfersProvider: TransfersProvider
+    let router: Router
     
     // MARK: - Properties
     private let autoupdateInterval: TimeInterval = 5.0
@@ -38,15 +37,17 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
         transfersProvider: TransfersProvider,
         router: Router,
         dialogService: DialogService,
-        currencyInfo: CurrencyInfoService
+        currencyInfo: CurrencyInfoService,
+        addressBookService: AddressBookService
     ) {
-        self.accountService = accountService
         self.transfersProvider = transfersProvider
         self.router = router
         
         super.init(
             dialogService: dialogService,
-            currencyInfo: currencyInfo
+            currencyInfo: currencyInfo,
+            addressBookService: addressBookService,
+            accountService:  accountService
         )
     }
     
@@ -94,7 +95,7 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
         
         tableView.refreshControl = refreshControl
         
-        refresh(true)
+        refresh(silent: true)
         
         startUpdate()
     }
@@ -135,7 +136,7 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
         vc.viewModel.setup(
             account: account,
             chatroom: chatroom,
-            messageToShow: nil,
+            messageIdToShow: nil,
             preservationDelegate: nil
         )
 
@@ -148,7 +149,7 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     }
     
     @MainActor
-    @objc func refresh(_ silent: Bool = false) {
+    @objc func refresh(silent: Bool = false) {
         refreshTask = Task {
             guard let id = transaction?.txId else {
                 return
@@ -171,7 +172,7 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     func startUpdate() {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            self?.refresh(true)
+            self?.refresh(silent: true)
         }
     }
     

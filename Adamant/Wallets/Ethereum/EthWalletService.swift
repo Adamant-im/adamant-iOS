@@ -13,6 +13,7 @@ import Swinject
 import Alamofire
 import BigInt
 import Web3Core
+import Combine
 
 struct EthWalletStorage {
     let keystore: BIP32Keystore
@@ -89,6 +90,22 @@ class EthWalletService: WalletService {
         return tokenNetworkSymbol + tokenSymbol
     }
     
+    var richMessageType: String {
+        return Self.richMessageType
+	}
+
+    var qqPrefix: String {
+        return Self.qqPrefix
+	}
+
+    var isSupportIncreaseFee: Bool {
+        return true
+    }
+    
+    var isIncreaseFeeEnabled: Bool {
+        return increaseFeeService.isIncreaseFeeEnabled(for: tokenUnicID)
+    }
+    
     private (set) var isDynamicFee: Bool = true
 	private (set) var transactionFee: Decimal = 0.0
     private (set) var gasPrice: BigUInt = 0
@@ -106,6 +123,7 @@ class EthWalletService: WalletService {
     var apiService: ApiService!
     var dialogService: DialogService!
     var router: Router!
+    var increaseFeeService: IncreaseFeeService!
     
     // MARK: - Notifications
     let walletUpdatedNotification = Notification.Name("adamant.ethWallet.walletUpdated")
@@ -147,7 +165,8 @@ class EthWalletService: WalletService {
     }
     
     private var initialBalanceCheck = false
-    
+    private var subscriptions = Set<AnyCancellable>()
+
     // MARK: - State
     private (set) var state: WalletServiceState = .notInitiated
     
@@ -176,22 +195,38 @@ class EthWalletService: WalletService {
     // MARK: - Logic
     init() {
         // Notifications
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] _ in
-            self?.update()
-        }
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: nil) { [weak self] _ in
-            self?.update()
-        }
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
-            self?.ethWallet = nil
-            self?.initialBalanceCheck = false
-            if let balanceObserver = self?.balanceObserver {
-                NotificationCenter.default.removeObserver(balanceObserver)
-                self?.balanceObserver = nil
+        addObservers()
+    }
+    
+    func addObservers() {
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.update()
             }
-        }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.accountDataUpdated, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.update()
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.ethWallet = nil
+                self?.initialBalanceCheck = false
+                if let balanceObserver = self?.balanceObserver {
+                    NotificationCenter.default.removeObserver(balanceObserver)
+                    self?.balanceObserver = nil
+                }
+            }
+            .store(in: &subscriptions)
     }
     
     func initiateNetwork(apiUrl: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
@@ -250,6 +285,8 @@ class EthWalletService: WalletService {
         setState(.updating)
         
         if let balance = try? await getBalance(forAddress: wallet.ethAddress) {
+            wallet.isBalanceInitialized = true
+            
             let notification: Notification.Name?
             
             if wallet.balance != balance {
@@ -273,9 +310,9 @@ class EthWalletService: WalletService {
         await calculateFee()
 	}
     
-    private func calculateFee() async {
+    func calculateFee(for address: EthereumAddress? = nil) async {
         let priceRaw = try? await getGasPrices()
-        let gasLimitRaw = try? await getGasLimit()
+        let gasLimitRaw = try? await getGasLimit(to: address)
         
         var price = priceRaw ?? defaultGasPriceGwei.toWei()
         var gasLimit = gasLimitRaw ?? defaultGasLimit
@@ -291,13 +328,22 @@ class EthWalletService: WalletService {
         ? gasLimit
         : gasLimit + gasLimitPercent
 
-        let newFee = (price * gasLimit).asDecimal(exponent: EthWalletService.currencyExponent)
+        var newFee = (price * gasLimit).asDecimal(exponent: EthWalletService.currencyExponent)
+        
+        newFee = isIncreaseFeeEnabled
+        ? newFee * defaultIncreaseFee
+        : newFee
         
         guard transactionFee != newFee else { return }
         
         transactionFee = newFee
-        gasPrice = price
-        isWarningGasPrice = price >= warningGasPriceGwei.toWei()
+        let incGasPrice = UInt64(price.asDouble() * defaultIncreaseFee.doubleValue)
+                
+        gasPrice = isIncreaseFeeEnabled
+        ? BigUInt(integerLiteral: incGasPrice)
+        : price
+        
+        isWarningGasPrice = gasPrice >= warningGasPriceGwei.toWei()
         self.gasLimit = gasLimit
         
         NotificationCenter.default.post(name: transactionFeeUpdated, object: self, userInfo: nil)
@@ -306,7 +352,7 @@ class EthWalletService: WalletService {
 	// MARK: - Tools
 	
 	func validate(address: String) -> AddressValidationResult {
-		return addressRegex.perfectMatch(with: address) ? .valid : .invalid
+		return addressRegex.perfectMatch(with: address) ? .valid : .invalid(description: nil)
 	}
 	
 	func getGasPrices() async throws -> BigUInt {
@@ -324,7 +370,7 @@ class EthWalletService: WalletService {
         }
 	}
     
-    func getGasLimit() async throws -> BigUInt {
+    func getGasLimit(to address: EthereumAddress?) async throws -> BigUInt {
         guard let web3 = await self.web3,
               let ethWallet = ethWallet
         else {
@@ -334,7 +380,7 @@ class EthWalletService: WalletService {
         do {
             var transaction: CodableTransaction = .emptyTransaction
             transaction.from = ethWallet.ethAddress
-            transaction.to = ethWallet.ethAddress
+            transaction.to = address ?? ethWallet.ethAddress
             
             let price = try await web3.eth.estimateGas(for: transaction)
             return price
@@ -422,15 +468,18 @@ extension EthWalletService: InitiatedWithPassphraseService {
         } catch let error as WalletServiceError {
             switch error {
             case .walletNotInitiated:
-                // Show '0' without waiting for balance update
-                if let wallet = service.ethWallet {
-                    NotificationCenter.default.post(name: service.walletUpdatedNotification, object: service, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
+                /// The ADM Wallet is not initialized. Check the balance of the current wallet
+                /// and save the wallet address to kvs when dropshipping ADM
+                service.setState(.upToDate)
+                
+                Task {
+                    await service.update()
                 }
                 
                 service.save(ethAddress: eWallet.address) { result in
                     service.kvsSaveCompletionRecursion(ethAddress: eWallet.address, result: result)
                 }
-                service.setState(.upToDate)
+                
                 return eWallet
                 
             default:
@@ -487,6 +536,7 @@ extension EthWalletService: SwinjectDependentService {
         apiService = container.resolve(ApiService.self)
         dialogService = container.resolve(DialogService.self)
         router = container.resolve(Router.self)
+        increaseFeeService = container.resolve(IncreaseFeeService.self)
     }
 }
 

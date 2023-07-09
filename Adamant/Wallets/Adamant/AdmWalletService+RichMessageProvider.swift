@@ -48,20 +48,8 @@ extension AdmWalletService: RichMessageProvider {
         
         controller.transaction = transaction
         controller.comment = transaction.comment
-        
-        if let address = accountService?.account?.address {
-            if address == transaction.senderId {
-                controller.senderName = String.adamantLocalized.transactionDetails.yourAddress
-            } else {
-                controller.senderName = transaction.chatroom?.partner?.name
-            }
-            
-            if address == transaction.recipientId {
-                controller.recipientName = String.adamantLocalized.transactionDetails.yourAddress
-            } else {
-                controller.recipientName = transaction.chatroom?.partner?.name
-            }
-        }
+        controller.senderId = transaction.senderId
+        controller.recipientId = transaction.recipientId
         
         if let nav = chat.navigationController {
             nav.pushViewController(controller, animated: true)

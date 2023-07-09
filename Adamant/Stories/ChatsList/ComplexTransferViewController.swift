@@ -32,6 +32,7 @@ class ComplexTransferViewController: UIViewController {
             navigationItem.title = partner?.chatroom?.getName(addressBookService: addressBookService)
         }
     }
+    var replyToMessageId: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -43,7 +44,7 @@ class ComplexTransferViewController: UIViewController {
         // MARK: PagingViewController
         pagingViewController = PagingViewController()
         pagingViewController.register(UINib(nibName: "WalletCollectionViewCell", bundle: nil), for: WalletPagingItem.self)
-        pagingViewController.menuItemSize = .fixed(width: 110, height: 110)
+        pagingViewController.menuItemSize = .fixed(width: 110, height: 114)
         pagingViewController.indicatorColor = UIColor.adamant.primary
         pagingViewController.indicatorOptions = .visible(height: 2, zIndex: Int.max, spacing: UIEdgeInsets.zero, insets: UIEdgeInsets.zero)
         
@@ -104,6 +105,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
         
         let name = partner?.chatroom?.getName(addressBookService: addressBookService)
         
+        v.replyToMessageId = replyToMessageId
         v.admReportRecipient = address
         v.recipientIsReadonly = true
         v.commentsEnabled = service.commentsEnabledForRichMessages && partner?.isDummy != true
@@ -152,7 +154,11 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
 		let service = services[index]
 		
 		guard let wallet = service.wallet else {
-			return WalletPagingItem(index: index, currencySymbol: "", currencyImage: #imageLiteral(resourceName: "adamant_wallet"))
+            return WalletPagingItem(
+                index: index,
+                currencySymbol: "",
+                currencyImage: #imageLiteral(resourceName: "adamant_wallet"),
+                isBalanceInitialized: false)
 		}
         
         var network = ""
@@ -162,7 +168,13 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
             network = service.tokenNetworkSymbol
         }
 		
-		let item = WalletPagingItem(index: index, currencySymbol: service.tokenSymbol, currencyImage: service.tokenLogo, currencyNetwork: network)
+		let item = WalletPagingItem(
+            index: index,
+            currencySymbol: service.tokenSymbol,
+            currencyImage: service.tokenLogo,
+            isBalanceInitialized: wallet.isBalanceInitialized,
+            currencyNetwork: network)
+        
 		item.balance = wallet.balance
 		
 		return item

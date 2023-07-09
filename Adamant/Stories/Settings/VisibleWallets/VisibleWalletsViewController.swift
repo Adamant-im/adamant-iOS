@@ -210,10 +210,10 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
         }
         cell.selectionStyle = .none
         
-        cell.separatorInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 0)
+        cell.separatorInset = UITableView.defaultSeparatorInset
         let maxCount = filteredWallets?.count ?? wallets.count
         if indexPath.row == maxCount - 1 {
-            cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+            cell.separatorInset = .zero
         }
         
         let wallet: WalletService
@@ -234,6 +234,7 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
         cell.balance = wallet.wallet?.balance
         cell.delegate = self
         cell.isChecked = !isInvisible(wallet)
+        cell.unicId = wallet.tokenUnicID
         
         return cell
     }
@@ -292,11 +293,16 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
 
 // MARK: - AdamantVisibleWalletsCellDelegate
 extension VisibleWalletsViewController: AdamantVisibleWalletsCellDelegate {
-    func delegateCell(_ cell: VisibleWalletsTableViewCell, didChangeCheckedStateTo state: Bool) {
-        guard let indexPath = tableView.indexPath(for: cell) else {
-            return
-        }
-        let wallet = wallets[indexPath.row]
+    func delegateCell(
+        _ cell: VisibleWalletsTableViewCell,
+        didChangeCheckedStateTo state: Bool
+    ) {
+        let wallet = wallets.first(where: {
+            $0.tokenUnicID == cell.unicId
+        })
+        
+        guard let wallet = wallet else { return }
+        
         if !isInvisible(wallet) {
             visibleWalletsService.addToInvisibleWallets(wallet)
         } else {

@@ -65,7 +65,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         pushNotificationsTokenService = container.resolve(PushNotificationsTokenService.self)
         visibleWalletsService = container.resolve(VisibleWalletsService.self)
         
-        // MARK: 1.1. First run flag
+        // MARK: 1.1 Configure Firebase if needed
+        
+        container
+            .resolve(CrashlyticsService.self)?
+            .configureIfNeeded()
+        
+        // MARK: 1.2 First run flag
         let firstRun = UserDefaults.standard.bool(forKey: StoreKey.application.firstRun)
 
         if !firstRun {
@@ -199,6 +205,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Setup transactions statuses observing
         if let service = container.resolve(RichTransactionStatusService.self) {
+            Task { await service.startObserving() }
+        }
+        
+        // Setup transactions reply observing
+        if let service = container.resolve(RichTransactionReplyService.self) {
             Task { await service.startObserving() }
         }
         
@@ -350,7 +361,7 @@ extension AppDelegate {
         chatListNav.dismiss(animated: true, completion: nil)
         tabbar.selectedIndex = 0
         
-        let vc = chatListVC.chatViewController(for: chatroom)
+        let vc = chatListVC.chatViewController(for: chatroom, with: transactionID)
                                                
         vc.hidesBottomBarWhenPushed = true
         

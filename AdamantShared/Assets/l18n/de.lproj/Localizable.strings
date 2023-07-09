@@ -46,6 +46,36 @@
 /* About scene: Show Welcome screens */
 "About.Row.Welcome" = "Willkommensbildschirm";
 
+/* Contribute scene: 'Crashlytics' section title. */
+"Contribute.Section.Crashlytics" = "Crashlytics";
+
+/* Contribute scene: 'Crashlytics' section description. */
+"Contribute.Section.CrashlyticsDescription" = "Send anonymous crash reports and make the app more reliable. We don't gather usage statistics.";
+
+/* Contribute scene: 'Run nodes' section title. */
+"Contribute.Section.RunNodes" = "Run the ADAMANT node";
+
+/* Contribute scene: 'Run nodes' section description. */
+"Contribute.Section.RunNodesDescription" = "Support decentralization and enhance privacy level";
+
+/* Contribute scene: 'Network delegate' section title. */
+"Contribute.Section.NetworkDelegate" = "Become a network delegate";
+
+/* Contribute scene: 'Network delegate' section description. */
+"Contribute.Section.NetworkDelegateDescription" = "To become a delegate, pay a registration fee and gain voters’ support";
+
+/* Contribute scene: 'Code contribute' section title. */
+"Contribute.Section.CodeContribute" = "Contribute to the code";
+
+/* Contribute scene: 'Code contribute' section description. */
+"Contribute.Section.CodeContributeDescription" = "If you are a developer, join our GitHub repository";
+
+/* Contribute scene: 'Donate' section title. */
+"Contribute.Section.Donate" = "Donate";
+
+/* Contribute scene: 'Donate' section description. */
+"Contribute.Section.DonateDescription" = "Every donation makes ADAMANT stronger";
+
 /* Account tab: 'Currency' row */
 "AccountTab.Row.Currency" = "Währung";
 
@@ -55,8 +85,11 @@
 /* System accounts: ADAMANT Bounty */
 "Accounts.AdamantBounty" = "ADAMANT Bounty Wallet";
 
-/* System accounts: ADAMANT iOS Support */
-"Accounts.iOSSupport" = "ADAMANT iOS Support";
+/* System accounts: PWA ADM Bounty bot */
+"Accounts.AdamantBountyBot" = "ADAMANT Bounty Bot";
+
+/* System accounts: ADAMANT Support */
+"Accounts.Support" = "ADAMANT Support";
 
 /* System accounts: ADAMANT Exchange */
 "Accounts.AdamantExchange" = "ADAMANT Exchange";
@@ -163,6 +196,9 @@
 /* Account tab: 'About' row */
 "AccountTab.Row.About" = "Über ADAMANT";
 
+/* Account tab: 'Contribute' row */
+"AccountTab.Row.Contribute" = "Beitragen";
+
 /* Account tab: 'Vote for delegates' button */
 "AccountTab.Row.VoteForDelegates" = "Delegierte wählen";
 
@@ -232,6 +268,12 @@
 /* SearchPage: Contacts header */
 "SearchPage.Contacts" = "Kontakte";
 
+/* SearchPage: Contacts header */
+"SearchPage.Contact.New" = "Neuer Kontakt";
+
+/* SearchPage: Contact new header */
+"SearchPage.Contact.Add.New" = "[Fügen Sie einen neuen Kontakt hinzu]";
+
 /* SearchPage: Messages header */
 "SearchPage.Messages" = "Mitteilungen";
 
@@ -291,6 +333,12 @@
 
 /* Button "Report" */
 "Chats.Report" = "Bericht";
+
+/* Button "Reply" */
+"Chats.Reply" = "Antwort";
+
+/* Button "Copy" */
+"Chats.Copy" = "Kopieren";
 
 /* Alert "Report as inappropriate?" */
 "Chats.ReportMessage" = "Als unangemessen melden?";
@@ -426,6 +474,9 @@
 
 /* Shared error: Internal error format, %@ for message */
 "Error.InternalErrorFormat" = "Interner Fehler: %@";
+
+/* Shared error: Base format, %@ for message */
+"Error.BaseErrorFormat" = "Fehler: %@";
 
 /* Error messge title for support email */
 "Error.Mail.Title" = "Ich habe einen Fehler in meiner iOS-App";
@@ -835,6 +886,12 @@
 /* Transaction status: inconsistent */
 "TransactionStatus.Inconsistent" = "Inconsistent";
 
+/* Transaction status: inconsistent wrong timestamp */
+"TransactionStatus.Inconsistent.WrongTimestamp" = "Nachricht und Tx haben unterschiedliche Zeitstempel. Es ist möglich, aber überprüfen Sie es zweimal";
+
+/* Transaction status: inconsistent reason title */
+"TransactionStatus.Inconsistent.Reason.Title" = "Inkonsistenter Grund";
+
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "Details";
 
@@ -973,6 +1030,9 @@
 /* Transfer: comment for transfer in chat */
 "TransferScene.Row.Comments" = "Bemerkungen";
 
+/* Transfer: transfer increase fee */
+"TransferScene.Row.IncreaseFee" = "Gebühr erhöhen";
+
 /* Transfer: 'Transfer info' section */
 "TransferScene.Section.TransferInfo" = "Transaktionsinfo";
 
@@ -1015,6 +1075,9 @@
 /* Wallet Services: Shared error, transaction not found */
 "WalletServices.SharedErrors.TransactionNotFound" = "Transaktion nicht gefunden";
 
+/* Wallet Services: Shared error, BTC Taproot doesn't work */
+"WalletServices.SharedErrors.BtcTaproot" = "ADAMANT doesn’t support Taproot Bitcoin addresses";
+
 /* Wallet Services: Wait until other transactions approved */
 "WalletServices.SharedErrors.walletFrezzed" = "Warten Sie, bis andere Transaktionen genehmigt wurden";
 
@@ -1056,3 +1119,15 @@
 "EULA.Accept" = "Akzeptieren";
 "EULA.Decline" = "Ablehnen";
 "EULA.Text" = "ADAMANT Messenger basiert auf dezentralisierter Technologie und der Blockchain, infolgedessen:\n\n✓ ADAMANT Messenger ist ursprünglich auf die Sicherheit der Kommunikation und die Privatsphäre der Nutzer ausgerichtet.\n✓ Der Source Code vom ADAMANT Messenger ist im vollen Umfang unter der GPL-3.0-Lizenz verfügbar und ist auf GitHub verfügbar: github.com/adamant-im\n✓ ADAMANT Messenger wird \"as is\" ausgeliefert, ohne Gewährleistung.\n✓ Die Entwickler können nur der Entwicklung vom ADAMANT Messenger beitragen.\n✓ Die Entwickler haben keine Möglichkeit, die Handlungen von Nutzer zu kontrollieren.\n✓ Die Entwickler haben keine Privilegien in der Nutzung vom ADAMANT Messenger.\n✓ Die Entwickler haben keine Möglichkeit, Profile im ADAMANT Messenger einzuschränken oder zu blockieren.\n✓ Die Entwickler haben keine Möglichkeit, die Nachrichten zu entschlüsseln, sie zu lesen, oder auf andere Informationen von Nutzern vom ADAMANT Messenger zuzugreifen.\n✓ Entwickler können den Zugriff auf ein Benutzerkonto bei einem Verlust nicht wiederherstellen. Nur die Benutzer selbst sind für die Sicherheit und den Schutz der Daten ihrer Konten verantwortlich.\n✓ Die Entwickler tragen keine Haftung für den Inhalt, der von Nutzern erstellt wird, ihre Nachrichten, Medien oder Intentionen von Nutzern vom ADAMANT Messenger.\n✓ Die Entwickler haben keine Möglichkeit, die Information zu speichern, die zwischen den Nutzern ausgetauscht wird und tragen keine Haftung für die Aufbewahrung dieser auf der Blockchain.\n✓ Die Entwickler tragen keine Haftung für jegliche Vermögenswerte (einschließlich, aber nicht nur auf Kryptowährungen eingeschränkt), die in Verbindung mit oder mit Hilfe vom ADAMANT Messenger gesendet werden, und haben keinen Zugriff darauf.\n✓ ADAMANT Messenger speichert Metadaten wie Zeitstempel der gesendeten Nachrichten, die öffentlich auf der Blockchain verfügbar sind.\n✓ Die Entwickler kooperieren nicht mit Dritten oder anderen Services, die Daten verarbeiten oder speichern.\n✓ Die Infrastruktur vom ADAMANT Messenger (Blockchain Nodes) gehört den Nutzern und wird von ihnen betrieben.\n✓ Die Entwickler haben keine Möglichkeit, den ADAMANT Messenger zu deaktivieren, zu stoppen oder zu pausieren. Die Entwickler garantieren keinen stabilen Betrieb vom ADAMANT Messenger.\n✓ Die Entwickler tragen keine Haftung für mögliche Risiken, Kosten oder Probleme, die mit der Nutzung vom ADAMANT Messenger auftreten können.\n✓ Ab sofort tragen die Nutzer vom ADAMANT Messenger die volle Verantwortung für dessen Nutzung, einschließlich, aber nicht beschränkt auf: Legitimität der blockchain und anderer Technologien, die im ADAMANT Messenger verwendet werden, Nutzung der anonymen Nachrichtenservices, und andere Gesetze, die mit der Verwendung von solchen und ähnlichen Services verbunden sind.\n\nIndem Sie ADAMANT verwenden, nehmen sie die aktuellen Geschäftsbedingungen an und sind weiterhin mit diesen einverstanden.";
+
+/* Reply: Short unknown message error */
+"Reply.ShortUnknownMessageError" = "UNBEKANNTE NACHRICHT";
+
+/* Reply: Long unknown message error */
+"Reply.LongUnknownMessageError" = "Wir haben diese Nachricht nicht gefunden";
+
+/* Reply: Failed message reply error */
+"Reply.failedMessageError" = "Sie können nicht auf eine fehlgeschlagene Nachricht antworten";
+
+/* Pending message reply error */
+"Reply.pendingMessageError" = "Sie können nicht auf eine ausstehende Nachricht antworten. Auf Bestätigungen warten (schätzungsweise 1–2 Sekunden)";

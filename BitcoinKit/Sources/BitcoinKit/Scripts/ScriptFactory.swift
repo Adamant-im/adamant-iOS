@@ -44,14 +44,6 @@ public extension ScriptFactory.Standard {
             .append(.OP_CHECKSIG)
     }
 
-    static func buildP2PKH(address: Address) -> Script? {
-        return Script(address: address)
-    }
-
-    static func buildP2SH(script: Script) -> Script {
-        return script.toP2SH()
-    }
-
     static func buildMultiSig(publicKeys: [PublicKey]) -> Script? {
         return Script(publicKeys: publicKeys, signaturesRequired: UInt(publicKeys.count))
     }
@@ -74,22 +66,6 @@ public extension ScriptFactory.LockTime {
     static func build(script: Script, lockIntervalSinceNow: TimeInterval) -> Script? {
         let lockDate = Date(timeIntervalSinceNow: lockIntervalSinceNow)
         return build(script: script, lockDate: lockDate)
-    }
-
-    // P2PKH + LockTime
-    static func build(address: Address, lockIntervalSinceNow: TimeInterval) -> Script? {
-        guard let p2pkh = Script(address: address) else {
-            return nil
-        }
-        let lockDate = Date(timeIntervalSinceNow: lockIntervalSinceNow)
-        return build(script: p2pkh, lockDate: lockDate)
-    }
-
-    static func build(address: Address, lockDate: Date) -> Script? {
-        guard let p2pkh = Script(address: address) else {
-            return nil
-        }
-        return build(script: p2pkh, lockDate: lockDate)
     }
 }
 
@@ -172,14 +148,14 @@ public extension ScriptFactory.HashedTimeLockedContract {
                 .append(.OP_EQUALVERIFY)
                 .append(.OP_DUP)
                 .append(.OP_HASH160)
-                .appendData(recipient.data)
+                .appendData(recipient.lockingScriptPayload)
             .append(.OP_ELSE)
                 .appendData(lockDate.bigNumData)
                 .append(.OP_CHECKLOCKTIMEVERIFY)
                 .append(.OP_DROP)
                 .append(.OP_DUP)
                 .append(.OP_HASH160)
-                .appendData(sender.data)
+                .appendData(sender.lockingScriptPayload)
             .append(.OP_ENDIF)
             .append(.OP_EQUALVERIFY)
             .append(.OP_CHECKSIG)

@@ -34,11 +34,8 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        self.refreshControl.beginRefreshing()
-        
+        updateLoadingView(isHidden: false)
         currencySymbol = walletService.tokenSymbol
-        
         handleRefresh()
     }
     
@@ -48,10 +45,10 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
         offset = 0
         transactions.removeAll()
         tableView.reloadData()
-        loadData(false)
+        loadData(silent: false)
     }
     
-    override func loadData(_ silent: Bool) {
+    override func loadData(silent: Bool) {
         isBusy = true
         emptyLabel.isHidden = true
         
@@ -80,17 +77,14 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
             
             isBusy = false
             emptyLabel.isHidden = transactions.count > 0
-            tableView.reloadData()
             stopBottomIndicator()
             refreshControl.endRefreshing()
+            tableView.reloadData()
+            updateLoadingView(isHidden: true)
         }.stored(in: taskManager)
     }
     
     override func reloadData() {
-        DispatchQueue.onMainAsync { [weak self] in
-            self?.refreshControl.beginRefreshing()
-        }
-        
         handleRefresh()
     }
     
@@ -101,14 +95,11 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let address = walletService.wallet?.address
+        guard let address = walletService.wallet?.address else { return }
         
         tableView.deselectRow(at: indexPath, animated: true)
-        let hash = transactions[indexPath.row].hash
         
-        guard let dialogService = dialogService else {
-            return
-        }
+        let transaction = transactions[indexPath.row]
         
         guard let vc = router.get(scene: AdamantScene.Wallets.ERC20.transactionDetails) as? ERC20TransactionDetailsViewController else {
             fatalError("Failed to get ERC20TransactionDetailsViewController")
@@ -116,28 +107,32 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
         
         vc.service = walletService
         
-        dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
+        let isOutgoing: Bool = transaction.to != address
         
-        Task {
-            do {
-                let ethTransaction = try await walletService.getTransaction(by: hash)
-                dialogService.dismissProgress()
-                vc.transaction = ethTransaction
-                
-                if let address = address {
-                    if ethTransaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
-                        vc.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                    } else if ethTransaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
-                        vc.recipientName = String.adamantLocalized.transactionDetails.yourAddress
-                    }
-                }
-                
-                navigationController?.pushViewController(vc, animated: true)
-            } catch {
-                dialogService.dismissProgress()
-                dialogService.showRichError(error: error)
-            }
-        }.stored(in: taskManager)
+        let emptyTransaction = SimpleTransactionDetails(
+            txId: transaction.hash,
+            senderAddress: transaction.from,
+            recipientAddress: transaction.to,
+            dateValue: nil,
+            amountValue: transaction.value,
+            feeValue: nil,
+            confirmationsValue: nil,
+            blockValue: nil,
+            isOutgoing: isOutgoing,
+            transactionStatus: nil
+        )
+        
+        vc.transaction = emptyTransaction
+        
+        if emptyTransaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
+            vc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+        }
+        
+        if emptyTransaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
+            vc.recipientName = String.adamantLocalized.transactionDetails.yourAddress
+        }
+        
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -147,6 +142,10 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
         
         let transaction = transactions[indexPath.row]
         cell.accessoryType = .disclosureIndicator
+        cell.separatorInset = indexPath.row == transactions.count - 1
+        ? .zero
+        : UITableView.defaultTransactionsSeparatorInset
+        
         configureCell(cell, for: transaction)
         return cell
     }

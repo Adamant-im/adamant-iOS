@@ -13,13 +13,20 @@ import MarkdownKit
 class TransferBaseProvider: TransferNotificationContentProvider {
     
     /// Create notification content for Rich messages
-    func notificationContent(for transaction: Transaction, partnerAddress: String, partnerName: String?, richContent: [String:String]) -> NotificationContent? {
-        guard let amountRaw = richContent[RichContentKeys.transfer.amount], let amount = Decimal(string: amountRaw) else {
+    func notificationContent(
+        for transaction: Transaction,
+        partnerAddress: String,
+        partnerName: String?,
+        richContent: [String: Any]
+    ) -> NotificationContent? {
+        guard let amountRaw = richContent[RichContentKeys.transfer.amount] as? String,
+              let amount = Decimal(string: amountRaw) else {
             return nil
         }
         
         let comment: String?
-        if let raw = richContent[RichContentKeys.transfer.comments], raw.count > 0 {
+        if let raw = richContent[RichContentKeys.transfer.comments] as? String,
+           raw.count > 0 {
             comment = raw
         } else {
             comment = nil
@@ -47,11 +54,12 @@ class TransferBaseProvider: TransferNotificationContentProvider {
             attachments = nil
         }
         
-        return NotificationContent(title: partnerName ?? partnerAddress,
-                                   subtitle: String.adamantLocalized.notifications.newTransfer,
-                                   body: body,
-                                   attachments: attachments,
-                                   categoryIdentifier: AdamantNotificationCategories.transfer)
+        return NotificationContent(
+            title: partnerName ?? partnerAddress,
+            subtitle: .adamantLocalized.notifications.newTransfer,
+            body: body,
+            attachments: attachments,
+            categoryIdentifier: AdamantNotificationCategories.transfer)
     }
     
     // MARK: - To override

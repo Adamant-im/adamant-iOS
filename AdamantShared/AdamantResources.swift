@@ -13,7 +13,7 @@ enum AdamantResources {
     static let coinsInfoSrvice = "https://info.adamant.im"
     
     // MARK: ADAMANT Addresses
-    static let supportEmail = "pr@adamant.im"
+    static let supportEmail = "business@adamant.im"
     static let ansReadmeUrl = "https://github.com/Adamant-im/adamant-notificationService"
     
     // MARK: Contacts
@@ -29,8 +29,8 @@ enum AdamantResources {
         static let adamantIco = "U7047165086065693428"
         static let adamantIcoPK = "1e214309cc659646ecf1d90fa37be23fe76854a76e3b4da9e4d6b65a718baf8b"
         
-        static let iosSupport = "U6386412615727665758"
-        static let iosSupportPK = "5b7fc59f19aff48cb56a157c2d684bf4a6ac7dfb1c8916c8e13c1c75a421c15b"
+        static let adamantSupport = "U14077334060470162548"
+        static let adamantSupportPK = "824991512e52aa69885df8c79d64cddee9781737d10f36636bf2cf589b7e166a"
         
         static let adamantExchange = "U5149447931090026688"
         static let adamantExchangePK = "c61b50a5c72a1ee52a3060014478a5693ec69de15594a985a2b41d6f084caa9d"
@@ -46,5 +46,8 @@ enum AdamantResources {
         
         static let adelinaWallet = "U11138426591213238985"
         static let adelinaWalletPK = "8e06eba03ebe4668148647fc00a64b3fae59a1911ce1fd1059baba39ceb705a4"
+        
+        static let pwaBountyBot = "U1644771796259136854"
+        static let pwaBountyBotPK = "7a5c55dec7a085f1c795a126b3f74ebdccf36b7abfa2f85145443e58fcdff80c"
     }
 }

@@ -46,6 +46,16 @@ extension String.adamantLocalized {
         static let networkError = NSLocalizedString("Error.NoNetwork", comment: "Shared error: Network problems. In most cases - no connection")
         static let requestCancelled = NSLocalizedString("Error.RequestCancelled", comment: "Shared error: Request cancelled")
         
+        static func commonError(_ text: String) -> String {
+            return String.localizedStringWithFormat(
+                NSLocalizedString(
+                    "Error.BaseErrorFormat",
+                    comment: "Shared error: Base format, %@"
+                ),
+                text
+            )
+        }
+        
         static func accountNotFound(_ account: String) -> String {
             return String.localizedStringWithFormat(NSLocalizedString("Error.AccountNotFoundFormat", comment: "Shared error: Account not found error. Using %@ for address."), account)
         }
@@ -71,5 +81,12 @@ extension String.adamantLocalized {
         static func remoteServerError(message: String) -> String {
             return String.localizedStringWithFormat(NSLocalizedString("Error.RemoteServerErrorFormat", comment: "Shared error: Remote error format, %@ for message"), message)
         }
+    }
+    
+    enum reply {
+        static let shortUnknownMessageError = NSLocalizedString("Reply.ShortUnknownMessageError", comment: "Short unknown message error")
+        static let longUnknownMessageError = NSLocalizedString("Reply.LongUnknownMessageError", comment: "Long unknown message error")
+        static let failedMessageError = NSLocalizedString("Reply.failedMessageError", comment: "Failed message reply error")
+        static let pendingMessageError = NSLocalizedString("Reply.pendingMessageError", comment: "Pending message reply error")
     }
 }

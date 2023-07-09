@@ -97,6 +97,8 @@ protocol ApiService: AnyObject {
     
     func getTransaction(id: UInt64) async throws -> Transaction
     
+    func getTransaction(id: UInt64, withAsset: Bool) async throws -> Transaction
+    
     func getTransactions(
         forAccount: String,
         type: TransactionType,
@@ -130,7 +132,8 @@ protocol ApiService: AnyObject {
     func getChatMessages(
         address: String,
         addressRecipient: String,
-        offset: Int?
+        offset: Int?,
+        limit: Int?
     ) async throws -> ChatRooms
 
     // MARK: - Funds

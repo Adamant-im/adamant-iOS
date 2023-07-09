@@ -86,6 +86,20 @@ extension UIColor {
             return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
         }
         
+        /// Code block background color
+        static var codeBlock: UIColor {
+            let colorWhiteTheme = UIColor(red: 0.29, green: 0.29, blue: 0.29, alpha: 0.1)
+            let colorDarkTheme = UIColor(hex: "#2a2a2b")
+            return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
+        }
+        
+        /// Code block text color
+        static var codeBlockText: UIColor {
+            let colorWhiteTheme = UIColor(red: 0.32, green: 0.32, blue: 0.32, alpha: 1)
+            let colorDarkTheme = UIColor.white.withAlphaComponent(0.8)
+            return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
+        }
+        
         /// Main dark gray, ~70% gray
         static var primary: UIColor {
             let colorWhiteTheme = UIColor(red: 0.29, green: 0.29, blue: 0.29, alpha: 1)

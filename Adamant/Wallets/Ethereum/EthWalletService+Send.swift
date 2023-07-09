@@ -57,6 +57,8 @@ extension EthWalletService: WalletServiceTwoStepSend {
         tx.to = ethRecipient
         tx.value = bigUIntAmount
         
+        await calculateFee(for: ethRecipient)
+        
         let resolver = PolicyResolver(provider: provider)
         let policies: Policies = Policies(
             gasLimitPolicy: .manual(gasLimit),

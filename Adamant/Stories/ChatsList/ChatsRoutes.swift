@@ -54,10 +54,12 @@ extension AdamantScene {
         })
         
         static let searchResults = AdamantScene(identifier: "SearchResultsViewController", factory: { r in
-            let c = SearchResultsViewController(nibName: "SearchResultsViewController", bundle: nil)
-            c.router = r.resolve(Router.self)
-            c.avatarService = r.resolve(AvatarService.self)
-            c.addressBookService = r.resolve(AddressBookService.self)
+            let c = SearchResultsViewController(
+                router: r.resolve(Router.self)!,
+                avatarService: r.resolve(AvatarService.self)!,
+                addressBookService: r.resolve(AddressBookService.self)!,
+                accountsProvider: r.resolve(AccountsProvider.self)!
+            )
             return c
         })
         

@@ -11,7 +11,8 @@ import LiskKit
 
 extension LskWalletService: RichMessageProviderWithStatusCheck {
     func statusInfoFor(transaction: RichMessageTransaction) async -> TransactionStatusInfo {
-        guard let hash = transaction.richContent?[RichContentKeys.transfer.hash] else {
+        guard let hash = transaction.getRichValue(for: RichContentKeys.transfer.hash)
+        else {
             return .init(sentDate: nil, status: .inconsistent)
         }
         
@@ -67,7 +68,8 @@ private extension LskWalletService {
         }
         
         // MARK: Check amount
-        if let raw = transaction.richContent?[RichContentKeys.transfer.amount], let reported = AdamantBalanceFormat.deserializeBalance(from: raw) {
+        if let raw = transaction.getRichValue(for: RichContentKeys.transfer.amount),
+           let reported = AdamantBalanceFormat.deserializeBalance(from: raw) {
             let min = reported - reported*0.005
             let max = reported + reported*0.005
             

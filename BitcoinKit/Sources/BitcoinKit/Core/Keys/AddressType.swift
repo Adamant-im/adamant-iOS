@@ -24,11 +24,19 @@
 
 import Foundation
 
-public class AddressType {
-    static let pubkeyHash: AddressType = PubkeyHash()
-    static let scriptHash: AddressType = ScriptHash()
-
-    var versionByte: UInt8 { return 0 }
+public enum AddressType {
+    case pubkeyHash
+    case scriptHash
+    
+    var versionByte: UInt8 {
+        switch self {
+        case .pubkeyHash:
+            return .zero
+        case .scriptHash:
+            return 8
+        }
+    }
+    
     var versionByte160: UInt8 { return versionByte + 0 }
     var versionByte192: UInt8 { return versionByte + 1 }
     var versionByte224: UInt8 { return versionByte + 2 }
@@ -43,10 +51,4 @@ extension AddressType: Equatable {
     public static func == (lhs: AddressType, rhs: AddressType) -> Bool {
         return lhs.versionByte == rhs.versionByte
     }
-}
-public class PubkeyHash: AddressType {
-    public override var versionByte: UInt8 { return 0 }
-}
-public class ScriptHash: AddressType {
-    public override var versionByte: UInt8 { return 8 }
 }

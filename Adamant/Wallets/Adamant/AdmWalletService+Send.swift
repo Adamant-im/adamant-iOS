@@ -24,13 +24,15 @@ extension AdmWalletService: WalletServiceSimpleSend {
     func sendMoney(
         recipient: String,
         amount: Decimal,
-        comments: String
+        comments: String,
+        replyToMessageId: String?
     ) async throws -> TransactionDetails {
         do {
             let transaction = try await transfersProvider.transferFunds(
                 toAddress: recipient,
                 amount: amount,
-                comment: comments
+                comment: comments,
+                replyToMessageId: replyToMessageId
             )
             
             return transaction

@@ -277,7 +277,7 @@ extension AdamantTransfersProvider {
                 case .accountNotFound:
                     err = .accountNotFound(address: address)
                     
-                case .serverError:
+                case .serverError, .commonError:
                     err = .serverError(error)
                     
                 case .internalError(let message, _):
@@ -375,14 +375,16 @@ extension AdamantTransfersProvider {
     func transferFunds(
         toAddress recipient: String,
         amount: Decimal,
-        comment: String?
+        comment: String?,
+        replyToMessageId: String?
     ) async throws -> TransactionDetails {
-        if let comment = comment,
-           comment.count > 0 {
+        let comment = comment ?? ""
+        if !comment.isEmpty || replyToMessageId != nil {
             return try await transferFundsInternal(
                 toAddress: recipient,
                 amount: amount,
-                comment: comment
+                comment: comment,
+                replyToMessageId: replyToMessageId
             )
         }
         
@@ -395,7 +397,8 @@ extension AdamantTransfersProvider {
     private func transferFundsInternal(
         toAddress recipient: String,
         amount: Decimal,
-        comment: String
+        comment: String,
+        replyToMessageId: String?
     ) async throws -> TransactionDetails {
         // MARK: 0. Prepare
         guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
@@ -455,6 +458,7 @@ extension AdamantTransfersProvider {
         transaction.fee = Self.transferFee as NSDecimalNumber
         transaction.partner = partner
         transaction.transactionId = UUID().uuidString
+        transaction.replyToId = replyToMessageId
         
         chatroom.addToTransactions(transaction)
         
@@ -478,8 +482,16 @@ extension AdamantTransfersProvider {
         }
         
         // MARK: 6. Encode
+        
+        let asset = replyToMessageId == nil
+        ? comment
+        : RichMessageReply(
+            replyto_id: replyToMessageId ?? "",
+            reply_message: comment
+        ).serialized()
+        
         guard let encodedMessage = adamantCore.encodeMessage(
-            comment,
+            asset,
             recipientPublicKey: recipientPublicKey,
             privateKey: keypair.privateKey)
         else {
@@ -487,12 +499,17 @@ extension AdamantTransfersProvider {
         }
         
         // MARK: 7. Send
+        
+        let type: ChatType = replyToMessageId == nil
+        ? .message
+        : .richMessage
+        
         let signedTransaction = apiService.createSendTransaction(
             senderId: loggedAccount.address,
             recipientId: recipient,
             keypair: keypair,
             message: encodedMessage.message,
-            type: ChatType.message,
+            type: type,
             nonce: encodedMessage.nonce,
             amount: amount
         )

@@ -40,11 +40,11 @@ public struct PaymentURI {
         case amount
     }
 
-    public init(_ string: String) throws {
+    public init(_ string: String, addressConverter: AddressConverter) throws {
         guard let components = URLComponents(string: string), let scheme = components.scheme, scheme.lowercased() == "bitcoin" else {
             throw PaymentURIError.invalid
         }
-        guard let address = try? AddressFactory.create(components.path) else {
+        guard let address = try? addressConverter.convert(address: components.path) else {
             throw PaymentURIError.malformed(.address)
         }
         self.address = address

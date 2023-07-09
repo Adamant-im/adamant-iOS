@@ -62,11 +62,67 @@ final class ChatDataSourceManager: MessagesDataSource {
         message.fullModel.dateHeader?.string
     }
     
+    func textCell(
+        for message: MessageType,
+        at indexPath: IndexPath,
+        in messagesCollectionView: MessagesCollectionView
+    ) -> UICollectionViewCell? {
+        
+        if case let .message(model) = message.fullModel.content {
+            let cell = messagesCollectionView.dequeueReusableCell(
+                ChatMessageCell.self,
+                for: indexPath
+            )
+            
+            let publisher: any Observable<ChatMessageCell.Model> = viewModel.$messages.compactMap {
+                let message = $0[safe: indexPath.section]
+                guard case let .message(model) = message?.fullModel.content
+                else { return nil }
+                
+                return model.value
+            }
+            
+            cell.model = model.value
+            cell.configure(with: message, at: indexPath, and: messagesCollectionView)
+            cell.actionHandler = { [weak self] in self?.handleAction($0) }
+            cell.setSubscription(publisher: publisher, collection: messagesCollectionView)
+
+            return cell
+        }
+        
+        if case let .reply(model) = message.fullModel.content {
+            let cell = messagesCollectionView.dequeueReusableCell(
+                ChatMessageReplyCell.self,
+                for: indexPath
+            )
+            
+            let publisher: any Observable<ChatMessageReplyCell.Model> = viewModel.$messages.compactMap {
+                let message = $0[safe: indexPath.section]
+                guard case let .reply(model) = message?.fullModel.content
+                else { return nil }
+                
+                return model.value
+            }
+            
+            cell.model = model.value
+            cell.configure(with: message, at: indexPath, and: messagesCollectionView)
+            cell.actionHandler = { [weak self] in self?.handleAction($0) }
+            cell.setSubscription(publisher: publisher, collection: messagesCollectionView)
+            
+            return cell
+        }
+        
+        return UICollectionViewCell()
+    }
+    
     func customCell(
         for message: MessageType,
         at indexPath: IndexPath,
         in messagesCollectionView: MessagesCollectionView
     ) -> UICollectionViewCell {
+        guard case let .transaction(model) = message.fullModel.content
+        else { return UICollectionViewCell() }
+        
         let cell = messagesCollectionView.dequeueReusableCell(
             ChatViewController.TransactionCell.self,
             for: indexPath
@@ -74,12 +130,16 @@ final class ChatDataSourceManager: MessagesDataSource {
         
         let publisher: any Observable<ChatTransactionContainerView.Model> = viewModel.$messages.compactMap {
             let message = $0[safe: indexPath.section]
-            guard case let .transaction(model) = message?.fullModel.content else { return nil }
+            guard case let .transaction(model) = message?.fullModel.content
+            else { return nil }
+            
             return model.value
         }
         
+        cell.wrappedView.model = model.value
+        
         cell.wrappedView.actionHandler = { [weak self] in self?.handleAction($0) }
-        cell.wrappedView.setSubscription(publisher: publisher)
+        cell.wrappedView.setSubscription(publisher: publisher, collection: messagesCollectionView)
         return cell
     }
 }
@@ -91,6 +151,18 @@ private extension ChatDataSourceManager {
             viewModel.didTapTransfer.send(id)
         case let .forceUpdateTransactionStatus(id):
             viewModel.forceUpdateTransactionStatus(id: id)
+        case let .reply(message):
+            viewModel.replyMessageIfNeeded(message)
+        case let .scrollTo(message):
+            viewModel.scroll(to: message)
+        case let .swipeState(state):
+            viewModel.swipeState = state
+        case let .copy(text):
+            viewModel.copyMessageAction(text)
+        case let .remove(id):
+            viewModel.removeMessageAction(id)
+        case let .report(id):
+            viewModel.reportMessageAction(id)
         }
     }
 }

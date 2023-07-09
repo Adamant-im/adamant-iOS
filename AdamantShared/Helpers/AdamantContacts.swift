@@ -9,10 +9,11 @@
 import Foundation
 
 enum AdamantContacts: CaseIterable {
+    case pwaBountyBot
     case adamantBountyWallet
     case adamantNewBountyWallet
     case adamantIco
-    case iosSupport
+    case adamantSupport
     case adamantExchange
     case betOnBitcoin
     case donate
@@ -31,8 +32,8 @@ enum AdamantContacts: CaseIterable {
             return NSLocalizedString("Accounts.AdamantBounty", comment: "System accounts: ADAMANT Bounty")
         case .adamantIco:
             return "Adamant ICO"
-        case .iosSupport:
-            return NSLocalizedString("Accounts.iOSSupport", comment: "System accounts: ADAMANT iOS Support")
+        case .adamantSupport:
+            return NSLocalizedString("Accounts.Support", comment: "System accounts: ADAMANT Support")
         case .adamantExchange:
             return NSLocalizedString("Accounts.AdamantExchange", comment: "System accounts: ADAMANT Exchange")
         case .betOnBitcoin:
@@ -41,6 +42,8 @@ enum AdamantContacts: CaseIterable {
             return NSLocalizedString("Accounts.DonateADMFoundation", comment: "System accounts: Donates ADAMANT Foundation")
         case .adelina:
             return NSLocalizedString("Accounts.Adelina", comment: "System accounts: Adelina")
+        case .pwaBountyBot:
+            return NSLocalizedString("Accounts.AdamantBountyBot", comment: "System accounts: PWA ADM Bounty bot")
         }
     }
     
@@ -48,7 +51,7 @@ enum AdamantContacts: CaseIterable {
         switch self {
         case .adamantExchange, .betOnBitcoin, .adelina:
             return false
-        case .adamantWelcomeWallet, .iosSupport, .adamantIco, .adamantBountyWallet, .adamantNewBountyWallet, .donate:
+        case .adamantWelcomeWallet, .adamantSupport, .adamantIco, .adamantBountyWallet, .adamantNewBountyWallet, .donate, .pwaBountyBot:
             return true
         }
     }
@@ -58,12 +61,13 @@ enum AdamantContacts: CaseIterable {
         case .adamantBountyWallet: return AdamantResources.contacts.adamantBountyWallet
         case .adamantNewBountyWallet: return AdamantResources.contacts.adamantNewBountyWallet
         case .adamantIco: return AdamantResources.contacts.adamantIco
-        case .iosSupport: return AdamantResources.contacts.iosSupport
+        case .adamantSupport: return AdamantResources.contacts.adamantSupport
         case .adamantExchange: return AdamantResources.contacts.adamantExchange
         case .betOnBitcoin: return AdamantResources.contacts.betOnBitcoin
         case .donate: return AdamantResources.contacts.donateWallet
         case .adamantWelcomeWallet: return AdamantResources.contacts.adamantWelcomeWallet
         case .adelina: return AdamantResources.contacts.adelinaWallet
+        case .pwaBountyBot: return AdamantResources.contacts.pwaBountyBot
         }
     }
     
@@ -73,33 +77,34 @@ enum AdamantContacts: CaseIterable {
         case .betOnBitcoin: return AdamantResources.contacts.betOnBitcoinPK
         case .adamantBountyWallet: return AdamantResources.contacts.adamantBountyWalletPK
         case .adamantNewBountyWallet: return AdamantResources.contacts.adamantNewBountyWalletPK
-        case .iosSupport: return AdamantResources.contacts.iosSupportPK
+        case .adamantSupport: return AdamantResources.contacts.adamantSupportPK
         case .adamantIco: return AdamantResources.contacts.adamantIcoPK
         case .donate: return AdamantResources.contacts.donateWalletPK
         case .adamantWelcomeWallet: return AdamantResources.contacts.adamantBountyWalletPK
         case .adelina: return AdamantResources.contacts.adelinaWalletPK
+        case .pwaBountyBot: return AdamantResources.contacts.pwaBountyBotPK
         }
     }
     
     var isReadonly: Bool {
         switch self {
         case .adamantBountyWallet, .adamantNewBountyWallet, .adamantIco, .adamantWelcomeWallet: return true
-        case .iosSupport, .adamantExchange, .betOnBitcoin, .donate, .adelina: return false
+        case .adamantSupport, .adamantExchange, .betOnBitcoin, .donate, .adelina, .pwaBountyBot: return false
         }
     }
     
     var isHidden: Bool {
         switch self {
-        case .adamantBountyWallet, .adamantNewBountyWallet: return true
-        case .adamantIco, .iosSupport, .adamantExchange, .betOnBitcoin, .donate, .adamantWelcomeWallet, .adelina: return false
+        case .adamantBountyWallet, .adamantNewBountyWallet, .pwaBountyBot: return true
+        case .adamantIco, .adamantSupport, .adamantExchange, .betOnBitcoin, .donate, .adamantWelcomeWallet, .adelina: return false
         }
     }
     
     var avatar: String {
         switch self {
-        case .adamantExchange, .betOnBitcoin, .donate, .adamantBountyWallet, .adamantNewBountyWallet, .adelina:
+        case .adamantExchange, .betOnBitcoin, .donate, .adamantBountyWallet, .adamantNewBountyWallet, .adelina, .pwaBountyBot:
             return ""
-        case .adamantIco, .iosSupport, .adamantWelcomeWallet:
+        case .adamantIco, .adamantSupport, .adamantWelcomeWallet:
             return "avatar_bots"
         }
     }
@@ -116,7 +121,9 @@ enum AdamantContacts: CaseIterable {
             return "chats.virtual.donate_bot_title"
         case .adelina:
             return "chats.virtual.adelina_title"
-        case .adamantIco, .adamantWelcomeWallet, .iosSupport:
+        case .pwaBountyBot:
+            return "chats.virtual.bounty_bot_title"
+        case .adamantIco, .adamantWelcomeWallet, .adamantSupport:
             return nil
         }
     }

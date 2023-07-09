@@ -57,8 +57,6 @@ class ChatListViewController: KeyboardObservingViewController {
     
     let defaultAvatar = #imageLiteral(resourceName: "avatar-chat-placeholder")
     
-    private var previousAppState: UIApplication.State?
-    
     private lazy var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(self.handleRefresh(_:)), for: UIControl.Event.valueChanged)
@@ -76,7 +74,6 @@ class ChatListViewController: KeyboardObservingViewController {
                 .quote,
                 .bold,
                 .italic,
-                .code,
                 .strikethrough,
                 .automaticLink
             ],
@@ -86,6 +83,11 @@ class ChatListViewController: KeyboardObservingViewController {
                 MarkdownAdvancedAdm(
                     font: .adamantChatDefault,
                     color: .adamant.active
+                ),
+                MarkdownCodeAdamant(
+                    font: .adamantCodeDefault,
+                    textHighlightColor: .adamant.codeBlockText,
+                    textBackgroundColor: .adamant.codeBlock
                 )
             ]
         )
@@ -210,6 +212,7 @@ class ChatListViewController: KeyboardObservingViewController {
         tableView.register(SpinnerCell.self, forCellReuseIdentifier: loadingCellIdentifier)
         tableView.refreshControl = refreshControl
         tableView.backgroundColor = .clear
+        tableView.tableHeaderView = UIView()
     }
     
     // MARK: Add Observers
@@ -241,23 +244,6 @@ class ChatListViewController: KeyboardObservingViewController {
                     await self?.handleInitiallySyncedNotification(notification)
                 }
             }
-            .store(in: &subscriptions)
-        
-        // Control Active
-        NotificationCenter.default
-            .publisher(for: UIApplication.didBecomeActiveNotification, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
-                guard self?.previousAppState == .background else { return }
-                self?.previousAppState = .active
-                self?.updateChats()
-            }
-            .store(in: &subscriptions)
-        
-        NotificationCenter.default
-            .publisher(for: UIApplication.willResignActiveNotification, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in self?.previousAppState = .background }
             .store(in: &subscriptions)
         
         NotificationCenter.default
@@ -327,7 +313,7 @@ class ChatListViewController: KeyboardObservingViewController {
     }
     
     // MARK: Helpers
-    func chatViewController(for chatroom: Chatroom, with message: MessageTransaction? = nil) -> ChatViewController {
+    func chatViewController(for chatroom: Chatroom, with messageId: String? = nil) -> ChatViewController {
         guard let vc = router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
             fatalError("Can't get ChatViewController")
         }
@@ -336,7 +322,7 @@ class ChatListViewController: KeyboardObservingViewController {
         vc.viewModel.setup(
             account: accountService.account,
             chatroom: chatroom,
-            messageToShow: message,
+            messageIdToShow: messageId,
             preservationDelegate: self
         )
 
@@ -709,7 +695,6 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
 // MARK: - NewChatViewControllerDelegate
 extension ChatListViewController: NewChatViewControllerDelegate {
     func newChatController(
-        _ controller: NewChatViewController,
         didSelectAccount account: CoreDataAccount,
         preMessage: String?,
         name: String?
@@ -819,7 +804,7 @@ extension ChatListViewController {
     
     private func presentChatroom(_ chatroom: Chatroom, with message: MessageTransaction? = nil) {
         // MARK: 1. Create and config ViewController
-        let vc = chatViewController(for: chatroom, with: message)
+        let vc = chatViewController(for: chatroom, with: message?.transactionId)
         
         if let split = self.splitViewController, UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
             let chat = UINavigationController(rootViewController:vc)
@@ -856,25 +841,9 @@ extension ChatListViewController {
                 raw = text
             }
             
-            let attributesText = markdownParser.parse(raw)
-            let mutableText = NSMutableAttributedString(attributedString: attributesText)
+            let attributesText = markdownParser.parse(raw).resolveLinkColor()
             
-            mutableText.enumerateAttribute(
-                .link,
-                in: NSRange(location: 0, length: attributesText.length),
-                options: []
-            ) { (value, range, _) in
-                guard value != nil else { return }
-                
-                mutableText.removeAttribute(.link, range: range)
-                mutableText.addAttribute(
-                    .foregroundColor,
-                    value: UIColor.adamant.active,
-                    range: range
-                )
-            }
-
-            return mutableText
+            return attributesText
             
         case let transfer as TransferTransaction:
             if let admService = richMessageProviders[AdmWalletService.richMessageType] as? AdmWalletService {
@@ -884,17 +853,48 @@ extension ChatListViewController {
             }
             
         case let richMessage as RichMessageTransaction:
-            let description: NSAttributedString
-            
-            if let type = richMessage.richType, let provider = richMessageProviders[type] {
-                description = provider.shortDescription(for: richMessage)
-            } else if let serialized = richMessage.serializedMessage() {
-                description = NSAttributedString(string: serialized)
-            } else {
-                return nil
+            if let type = richMessage.richType,
+               let provider = richMessageProviders[type] {
+                return provider.shortDescription(for: richMessage)
             }
             
-            return description
+            if richMessage.isReply,
+               let content = richMessage.richContent,
+               let text = content[RichContentKeys.reply.replyMessage] as? String {
+                
+                let prefix = richMessage.isOutgoing
+                ? "\(String.adamantLocalized.chatList.sentMessagePrefix)"
+                : ""
+                
+                let replyImageAttachment = NSTextAttachment()
+                
+                replyImageAttachment.image = UIImage(
+                    systemName: "arrowshape.turn.up.left"
+                )?.withTintColor(.adamant.primary)
+                
+                replyImageAttachment.bounds = CGRect(
+                    x: .zero,
+                    y: -3,
+                    width: 23,
+                    height: 20
+                )
+                
+                let imageString = NSAttributedString(attachment: replyImageAttachment)
+                
+                let markDownText = markdownParser.parse("  \(text)").resolveLinkColor()
+                
+                let fullString = NSMutableAttributedString(string: prefix)
+                fullString.append(imageString)
+                fullString.append(markDownText)
+                
+                return fullString
+            }
+            
+            if let serialized = richMessage.serializedMessage() {
+                return NSAttributedString(string: serialized)
+            }
+            
+            return nil
             
             /*
             if richMessage.isOutgoing {
@@ -915,8 +915,10 @@ extension ChatListViewController {
 
 // MARK: - Swipe actions
 extension ChatListViewController {
-    @available(iOS 11.0, *)
-    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+    func tableView(
+        _ tableView: UITableView,
+        trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
+    ) -> UISwipeActionsConfiguration? {
         guard let chatroom = chatsController?.fetchedObjects?[safe: indexPath.row] else {
             return nil
         }
@@ -924,8 +926,92 @@ extension ChatListViewController {
         var actions: [UIContextualAction] = []
         
         // More
-        let more = UIContextualAction(style: .normal, title: nil) { [weak self] (_, view, completionHandler: (Bool) -> Void) in
-            guard let partner = chatroom.partner, let address = partner.address else {
+        let more = makeMooreContextualAction(for: chatroom)
+        actions.append(more)
+        
+        // Mark as read
+        if chatroom.hasUnreadMessages || (chatroom.lastTransaction?.isUnread ?? false) {
+            let markAsRead = makeMarkAsReadContextualAction(for: chatroom)
+            actions.append(markAsRead)
+        }
+        
+        // Block
+        let block = makeBlockContextualAction(for: chatroom)
+        actions.append(block)
+        
+        return UISwipeActionsConfiguration(actions: actions)
+    }
+    
+    private func blockChat(with address: String, for chatroom: Chatroom?) {
+        Task {
+            chatroom?.isHidden = true
+            try? chatroom?.managedObjectContext?.save()
+            await chatsProvider.blockChat(with: address)
+        }
+    }
+    
+    private func makeBlockContextualAction(for chatroom: Chatroom) -> UIContextualAction {
+        let block = UIContextualAction(
+            style: .destructive,
+            title: .adamantLocalized.chat.block
+        ) { [weak self] (_, _, completionHandler) in
+            guard let address = chatroom.partner?.address else {
+                completionHandler(false)
+                return
+            }
+            
+            self?.dialogService.showAlert(
+                title: String.adamantLocalized.chatList.blockUser,
+                message: nil,
+                style: .alert,
+                actions: [
+                    .init(
+                        title: .adamantLocalized.alert.ok,
+                        style: .destructive,
+                        handler: {
+                            self?.blockChat(with: address, for: chatroom)
+                            completionHandler(true)
+                        }
+                    ),
+                    .init(
+                        title: .adamantLocalized.alert.cancel,
+                        style: .default,
+                        handler: { completionHandler(false) }
+                    )
+                ],
+                from: nil
+            )
+        }
+        
+        block.image = #imageLiteral(resourceName: "swipe_block")
+        
+        return block
+    }
+    
+    private func makeMarkAsReadContextualAction(for chatroom: Chatroom) -> UIContextualAction {
+        let markAsRead = UIContextualAction(
+            style: .normal,
+            title: nil
+        ) { (_, _, completionHandler) in
+            chatroom.markAsReaded()
+            try? chatroom.managedObjectContext?.save()
+            completionHandler(true)
+        }
+        
+        markAsRead.image = #imageLiteral(resourceName: "swipe_mark-as-read")
+        markAsRead.backgroundColor = UIColor.adamant.primary
+        return markAsRead
+    }
+    
+    private func makeMooreContextualAction(for chatroom: Chatroom) -> UIContextualAction {
+        let more = UIContextualAction(
+            style: .normal,
+            title: nil
+        ) { [weak self] (_, view, completionHandler) in
+            guard let self = self,
+                  let partner = chatroom.partner,
+                  let address = partner.address
+            else {
                 completionHandler(false)
                 return
             }
@@ -937,110 +1023,137 @@ extension ChatListViewController {
                 params = nil
             }
 
-            let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: params))
+            let encodedAddress = AdamantUriTools.encode(
+                request: AdamantUri.address(
+                    address: address,
+                    params: params
+                )
+            )
             
-            if partner.isSystem {
-                self?.dialogService.presentShareAlertFor(string: address,
-                                                         types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)],
-                                                         excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-                                                         animated: true,
-                                                         from: view,
-                                                         completion: nil)
-            } else {
-                let share = UIAlertAction(title: ShareType.share.localized, style: .default) { [weak self] _ in
-                    self?.dialogService.presentShareAlertFor(string: address,
-                                                             types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)],
-                                                             excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-                                                             animated: true, from: view,
-                                                             completion: nil)
-                }
+            guard !partner.isSystem else {
+                self.dialogService.presentShareAlertFor(
+                    string: address,
+                    types: [
+                        .copyToPasteboard,
+                        .share,
+                            .generateQr(
+                                encodedContent: encodedAddress,
+                                sharingTip: address,
+                                withLogo: true
+                            )
+                    ],
+                    excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+                    animated: true,
+                    from: view,
+                    completion: nil
+                )
                 
-                let rename = UIAlertAction(title: String.adamantLocalized.chat.rename, style: .default) { [weak self] _ in
-                    let alert = UIAlertController(title: String(format: String.adamantLocalized.chat.actionsBody, address), message: nil, preferredStyle: .alert)
-                    
-                    alert.addTextField { (textField) in
-                        textField.placeholder = String.adamantLocalized.chat.name
-                        textField.autocapitalizationType = .words
-                        
-                        if let name = partner.name {
-                            textField.text = name
-                        }
-                    }
-                     
-                    alert.addAction(UIAlertAction(title: String.adamantLocalized.chat.rename, style: .default) { [weak alert] (_) in
-                        if let textField = alert?.textFields?.first,
-                            let newName = textField.text {
-                            Task {
-                                await self?.addressBook.set(name: newName, for: address)
-                            }
-                        }
-                    })
-                    
-                    alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
-                    alert.modalPresentationStyle = .overFullScreen
-                    self?.present(alert, animated: true, completion: nil)
-                }
-                
-                let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil)
-                
-                self?.dialogService?.showAlert(title: nil, message: nil, style: UIAlertController.Style.actionSheet, actions: [share, rename, cancel], from: view)
+                completionHandler(true)
+                return
             }
+            
+            let share = self.makeShareAction(
+                for: address,
+                encodedAddress: encodedAddress,
+                sender: view
+            )
+            
+            let rename = self.makeRenameAction(for: address)
+            let cancel = self.makeCancelAction()
+            
+            self.dialogService?.showAlert(
+                title: nil,
+                message: nil,
+                style: UIAlertController.Style.actionSheet,
+                actions: [share, rename, cancel],
+                from: view
+            )
             
             completionHandler(true)
         }
         
         more.image = #imageLiteral(resourceName: "swipe_more")
         more.backgroundColor = .adamant.secondary
-        
-        // Mark as read
-        if chatroom.hasUnreadMessages || (chatroom.lastTransaction?.isUnread ?? false) {
-            let markAsRead = UIContextualAction(style: .normal, title: nil) { [weak self] (_, _, completionHandler: (Bool) -> Void) in
-                guard
-                    let chatroom = self?.chatsController?.fetchedObjects?[safe: indexPath.row]
-                else {
-                    completionHandler(false)
-                    return
-                }
-                
-                chatroom.markAsReaded()
-                try? chatroom.managedObjectContext?.save()
-                completionHandler(true)
+        return more
+    }
+    
+    private func makeShareAction(
+        for address: String,
+        encodedAddress: String,
+        sender: UIView
+    ) -> UIAlertAction {
+        .init(
+            title: ShareType.share.localized,
+            style: .default
+        ) { [weak self] _ in
+            guard let self = self else { return }
+            
+            self.dialogService.presentShareAlertFor(
+                string: address,
+                types: [
+                    .copyToPasteboard,
+                    .share,
+                    .generateQr(
+                        encodedContent: encodedAddress,
+                        sharingTip: address,
+                        withLogo: true
+                    )
+                ],
+                excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+                animated: true,
+                from: sender,
+                completion: nil
+            )
+        }
+    }
+    
+    private func makeRenameAction(for address: String) -> UIAlertAction {
+        .init(
+            title: .adamantLocalized.chat.rename,
+            style: .default
+        ) { [weak self] _ in
+            guard let alert = self?.makeRenameAlert(for: address) else { return }
+            self?.dialogService.present(alert, animated: true) {
+                self?.dialogService.selectAllTextFields(in: alert)
             }
-            
-            markAsRead.image = #imageLiteral(resourceName: "swipe_mark-as-read")
-            markAsRead.backgroundColor = UIColor.adamant.primary
-            
-            actions = [markAsRead, more]
-        } else {
-            actions = [more]
+        }
+    }
+    
+    private func makeRenameAlert(for address: String) -> UIAlertController? {
+        let alert = UIAlertController(
+            title: .init(format: .adamantLocalized.chat.actionsBody, address),
+            message: nil,
+            preferredStyle: .alert
+        )
+        
+        alert.addTextField { [weak self] textField in
+            textField.placeholder = .adamantLocalized.chat.name
+            textField.autocapitalizationType = .words
+            textField.text = self?.addressBook.getName(for: address)
         }
         
-        let block = UIContextualAction(style: .destructive, title: "Block") { [weak self] (_, _, completionHandler) in
+        let renameAction = UIAlertAction(
+            title: .adamantLocalized.chat.rename,
+            style: .default
+        ) { [weak self] _ in
             guard
-                let chatroom = self?.chatsController?.fetchedObjects?[safe: indexPath.row],
-                let address = chatroom.partner?.address else {
-                completionHandler(false)
-                return
-            }
+                let textField = alert.textFields?.first,
+                let newName = textField.text
+            else { return }
             
-            self?.dialogService.showAlert(title: String.adamantLocalized.chatList.blockUser, message: nil, style: .alert, actions: [
-                    AdamantAlertAction(title: String.adamantLocalized.alert.ok, style: .destructive, handler: {
-                    self?.chatsProvider.blockChat(with: address)
-                    
-                    chatroom.isHidden = true
-                    try? chatroom.managedObjectContext?.save()
-                    
-                    completionHandler(true)
-                }),
-                AdamantAlertAction(title: String.adamantLocalized.alert.cancel, style: .default, handler: {
-                    completionHandler(false)
-                })], from: nil)
+            Task {
+                await self?.addressBook.set(name: newName, for: address)
+            }
         }
-        block.image = #imageLiteral(resourceName: "swipe_block")
         
-        actions.append(block)
-        
-        return UISwipeActionsConfiguration(actions: actions)
+        alert.addAction(renameAction)
+        alert.addAction(makeCancelAction())
+        alert.modalPresentationStyle = .overFullScreen
+        return alert
+    }
+    
+    private func makeCancelAction() -> UIAlertAction {
+        .init(title: .adamantLocalized.alert.cancel, style: .cancel, handler: nil)
     }
 }
 
@@ -1093,8 +1206,8 @@ extension ChatListViewController {
     func selectChatroomRow(chatroom: Chatroom) {
         guard let chatsControllerIndexPath = chatsController?.indexPath(forObject: chatroom) else { return }
         let tableViewIndexPath = tableViewIndexPath(chatControllerIndexPath: chatsControllerIndexPath)
-        tableView.selectRow(at: tableViewIndexPath, animated: false, scrollPosition: .none)
-        tableView.scrollToRow(at: tableViewIndexPath, at: .top, animated: false)
+        tableView.selectRow(at: tableViewIndexPath, animated: true, scrollPosition: .none)
+        tableView.scrollToRow(at: tableViewIndexPath, at: .top, animated: true)
     }
     
     func performOnMessagesLoaded(action: @escaping () -> Void) {
@@ -1202,6 +1315,11 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
             
             presenter.presentChatroom(chatroom)
         }
+    }
+    
+    func didSelected(_ account: CoreDataAccount) {
+        account.chatroom?.isForcedVisible = true
+        newChatController(didSelectAccount: account, preMessage: nil, name: nil)
     }
 }
 

@@ -46,14 +46,47 @@
 /* About scene: Show Welcome screens */
 "About.Row.Welcome" = "Экраны приветствия";
 
+/* Contribute scene: 'Crashlytics' section title. */
+"Contribute.Section.Crashlytics" = "Crashlytics";
+
+/* Contribute scene: 'Crashlytics' section description. */
+"Contribute.Section.CrashlyticsDescription" = "Отправляйте анонимные отчеты об ошибках и сделайте приложение более надежным. Мы не собираем статистику.";
+
+/* Contribute scene: 'Run nodes' section title. */
+"Contribute.Section.RunNodes" = "Запустите узел сети АДАМАНТа";
+
+/* Contribute scene: 'Run nodes' section description. */
+"Contribute.Section.RunNodesDescription" = "Поддержите децентрализацию и повысьте уровень конфиденциальности";
+
+/* Contribute scene: 'Network delegate' section title. */
+"Contribute.Section.NetworkDelegate" = "Станьте делегатом сети";
+
+/* Contribute scene: 'Network delegate' section description. */
+"Contribute.Section.NetworkDelegateDescription" = "Чтобы стать делегатом, оплатите регистрационный сбор и получите голоса пользователей";
+
+/* Contribute scene: 'Code contribute' section title. */
+"Contribute.Section.CodeContribute" = "Пишите код";
+
+/* Contribute scene: 'Code contribute' section description. */
+"Contribute.Section.CodeContributeDescription" = "Если вы разработчик, присоединяйтесь к нашему репозиторию на GitHub";
+
+/* Contribute scene: 'Donate' section title. */
+"Contribute.Section.Donate" = "Внести крипту";
+
+/* Contribute scene: 'Donate' section description. */
+"Contribute.Section.DonateDescription" = "Каждое пожертвование делает АДАМАНТ сильнее";
+
 /* System accounts: ADAMANT Tokens */
 "Accounts.AdamantTokens" = "Приветствие АДАМАНТа";
 
 /* System accounts: ADAMANT Bounty */
 "Accounts.AdamantBounty" = "ADAMANT Bounty Wallet";
 
-/* System accounts: ADAMANT iOS Support */
-"Accounts.iOSSupport" = "Техподдержка iOS ADAMANT";
+/* System accounts: PWA ADM Bounty bot */
+"Accounts.AdamantBountyBot" = "ADAMANT Bounty Bot";
+
+/* System accounts: ADAMANT Support */
+"Accounts.Support" = "Техподдержка ADAMANT";
 
 /* System accounts: ADAMANT Exchange */
 "Accounts.AdamantExchange" = "Обменник АДАМАНТа";
@@ -148,6 +181,9 @@
 /* Account tab: 'About' row */
 "AccountTab.Row.About" = "Об АДАМАНТе";
 
+/* Account tab: 'Contribute' row */
+"AccountTab.Row.Contribute" = "Сделать вклад";
+
 /* Account tab: 'Theme' row */
 "AccountTab.Row.Theme" = "Тема";
 
@@ -229,6 +265,12 @@
 /* SearchPage: Contacts header */
 "SearchPage.Contacts" = "Контакты";
 
+/* SearchPage: Contacts header */
+"SearchPage.Contact.New" = "Новый контакт";
+
+/* SearchPage: Contact new header */
+"SearchPage.Contact.Add.New" = "[Добавить новый контакт]";
+
 /* SearchPage: Messages header */
 "SearchPage.Messages" = "Сообщения";
 
@@ -291,6 +333,12 @@
 
 /* Button "Report" */
 "Chats.Report" = "Пожаловаться";
+
+/* Button "Reply" */
+"Chats.Reply" = "Ответить";
+
+/* Button "Copy" */
+"Chats.Copy" = "Скопировать";
 
 /* Alert "Report as inappropriate?" */
 "Chats.ReportMessage" = "Пожаловаться на сообщение?";
@@ -420,6 +468,9 @@
 
 /* Shared error: Internal error format, %@ for message */
 "Error.InternalErrorFormat" = "Внутренняя ошибка: %@";
+
+/* Shared error: Base format, %@ for message */
+"Error.BaseErrorFormat" = "Ошибка: %@";
 
 /* Shared error: Account not initiated */
 "Error.AccountNotInitiated" = "Аккаунт не инициализирован";
@@ -820,6 +871,12 @@
 /* Transaction status: inconsistent */
 "TransactionStatus.Inconsistent" = "Несогласованно";
 
+/* Transaction status: inconsistent wrong timestamp */
+"TransactionStatus.Inconsistent.WrongTimestamp" = "Сообщение и транзакция имеют различное время. Это возможно, но лучше перепроверьте";
+
+/* Transaction status: inconsistent reason title */
+"TransactionStatus.Inconsistent.Reason.Title" = "Противоречивая причина";
+
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "Подробности";
 
@@ -851,7 +908,7 @@
 "TransactionDetailsScene.Row.From" = "Отправитель";
 
 /* Transaction details: fiat value at the time */
-"TransactionDetailsScene.Row.HistoryFiat" = "Ценность на момент";
+"TransactionDetailsScene.Row.HistoryFiat" = "Ценность при получении";
 
 /* Transaction details: fiat value at the time */
 "TransactionDetailsScene.Row.CurrentFiat" = "Текущая ценность";
@@ -949,6 +1006,9 @@
 /* Transfer: comment for transfer in chat */
 "TransferScene.Row.Comments" = "Комментарии";
 
+/* Transfer: transfer increase fee */
+"TransferScene.Row.IncreaseFee" = "Увеличить комиссию";
+
 /* Transfer: 'Transfer info' section */
 "TransferScene.Section.TransferInfo" = "Перевод";
 
@@ -991,6 +1051,9 @@
 /* Wallet Services: Shared error, transaction not found */
 "WalletServices.SharedErrors.TransactionNotFound" = "Транзакция не найдена";
 
+/* Wallet Services: Shared error, BTC Taproot doesn't work */
+"WalletServices.SharedErrors.BtcTaproot" = "АДАМАНТ не поддерживает адреса биткоина типа Taproot";
+
 /* Wallet Services: Wait until other transactions approved */
 "WalletServices.SharedErrors.walletFrezzed" = "Подождите, пока не будут одобрены другие транзакции";
 
@@ -1032,3 +1095,15 @@
 "EULA.Accept" = "Принять";
 "EULA.Decline" = "Отказаться";
 "EULA.Text" = "ADAMANT Messenger основан на децентрализованных технологиях и блокчейне, вследствие чего:\n\n✓ ADAMANT Messenger не допускает незаконный контент или оскорбляющих пользователей\n✓ ADAMANT Messenger изначально сосредоточен на безопасности обмена сообщениями и конфиденциальности своих пользователей.\n✓ Исходный код ADAMANT Messenger всегда в полном объеме доступен под лицензией GPL-3.0. Исходный код доступен в GitHub: github.com/adamant-im\n✓ Использование ADAMANT Messenger предполагается без гарантии, по модели «как есть».\n✓ Разработчики лишь вносят вклад в развитие ADAMANT Messenger.\n✓ Разработчики не имеют возможности контролировать действия пользователей ADAMANT Messenger.\n✓ Разработчики не имеют никаких привилегий в использовании ADAMANT Messenger.\n✓ Разработчики не имеют возможности ограничивать, отключать или блокировать какие-либо учетные записи в ADAMANT Messenger.\n✓ Разработчики не имеют возможности получить ключи шифрования или читать сообщения, или другую информацию пользователей ADAMANT Messenger.\n✓ Разработчики не имеют возможности восстановить доступ к любой учетной записи пользователя в случае ее утери. Только сами пользователи несут ответственность за безопасность и защиту данных своих учетных записей.\n✓ Разработчики не несут ответственности за контент, вносимый пользователем, его сообщения, данные мультимедиа, а также за цели и намерения пользователей при использовании ADAMANT Messenger.\n✓ Разработчики не имеют возможности хранить информацию, передаваемую между пользователями (сообщения, мультимедиа) и не несут ответственности за ее хранение в блокчейне.\n✓ Разработчики не несут ответственности за какие-либо ценные активы (включая, но не ограничиваясь криптовалютами), связанные с или отправленные посредством ADAMANT Messenger, и не имеют возможности доступа к ним.\n✓ ADAMANT Messenger сохраняет метаданные, как факты отправки сообщений, записи о которых доступны публично в блокчейне.\n✓ Разработчики не сотрудничают ни с третьими сторонами, ни с внешними сервисами и компаниями с точки зрения предоставления данных об использовании ADAMANT Messenger.\n✓ Инфраструктура ADAMANT Messenger (узлы блокчейна) принадлежит пользователям и управляется пользователями.\n✓ Разработчики не имеют возможности деактивировать, остановить или приостановить работу ADAMANT Messenger. Разработчики не предоставляют никаких гарантий на безошибочную работу и запуск ADAMANT Messenger и не несут ответственность за стабильную работу ADAMANT Messenger.\n✓ Разработчики не несут ответственности за возможные риски, издержки и проблемы, связанные с ADAMANT Messenger.\n✓ Пользователи ADAMANT Messenger впредь берут на себя всю ответственность за его использование, включая, но не ограничиваясь перечисленным: легитимность блокчейна и других технологий, применяемых в ADAMANT Messenger, использование анонимных сервисов обмена сообщениями, и другие законы, связанные с использованием подобных сервисов.\n\nИспользуя ADAMANT Messenger, вы принимаете настоящие Условия использования и согласны с ними в дальнейшем.";
+
+/* Reply: Short unknown message error */
+"Reply.ShortUnknownMessageError" = "СООБЩЕНИЕ НЕ НАЙДЕНО";
+
+/* Reply: Long unknown message error */
+"Reply.LongUnknownMessageError" = "Мы не нашли это сообщение";
+
+/* Reply: Failed message reply error */
+"Reply.failedMessageError" = "Вы не можете ответить на ошибочное сообщение";
+
+/* Pending message reply error */
+"Reply.pendingMessageError" = "Вы не можете ответить на ожидающее сообщение. Дождитесь подтверждения (оценка 1-2 секунды)";

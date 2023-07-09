@@ -60,6 +60,23 @@ actor AdamantChatTransactionService: ChatTransactionService {
         }
     }
     
+    /// Search transaction in local storage
+    ///
+    /// - Parameter id: Transacton ID
+    /// - Returns: Transaction, if found
+    func getChatTransactionFromDB(id: String, context: NSManagedObjectContext) -> ChatTransaction? {
+        let request = NSFetchRequest<ChatTransaction>(entityName: "ChatTransaction")
+        request.predicate = NSPredicate(format: "transactionId == %@", String(id))
+        request.fetchLimit = 1
+        
+        do {
+            let result = try context.fetch(request)
+            return result.first
+        } catch {
+            return nil
+        }
+    }
+    
     /// Parse raw transaction into CoreData chat transaction
     ///
     /// - Parameters:
@@ -82,19 +99,33 @@ actor AdamantChatTransactionService: ChatTransactionService {
         }
         
         // MARK: Decode message, message must contain data
-        if let decodedMessage = adamantCore.decodeMessage(rawMessage: chat.message, rawNonce: chat.ownMessage, senderPublicKey: publicKey, privateKey: privateKey)?.trimmingCharacters(in: .whitespacesAndNewlines) {
+        if let decodedMessage = adamantCore.decodeMessage(
+            rawMessage: chat.message,
+            rawNonce: chat.ownMessage,
+            senderPublicKey: publicKey,
+            privateKey: privateKey
+        )?.trimmingCharacters(in: .whitespacesAndNewlines) {
             if (decodedMessage.isEmpty && transaction.amount > 0) || !decodedMessage.isEmpty {
                 switch chat.type {
                 // MARK: Text message
                 case .message, .messageOld, .signal, .unknown:
                     if transaction.amount > 0 {
-                        if let trs = getTransfer(id: String(transaction.id), context: context) {
-                            messageTransaction = trs
+                        let trs: TransferTransaction
+                        
+                        if let trsDB = getTransfer(
+                            id: String(transaction.id),
+                            context: context
+                        ) {
+                            trs = trsDB
                         } else {
-                            let trs = TransferTransaction(entity: TransferTransaction.entity(), insertInto: context)
-                            trs.comment = decodedMessage
-                            messageTransaction = trs
+                            trs = TransferTransaction(
+                                entity: TransferTransaction.entity(),
+                                insertInto: context
+                            )
                         }
+                        
+                        trs.comment = decodedMessage
+                        messageTransaction = trs
                     } else {
                         let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
                         trs.message = decodedMessage
@@ -108,18 +139,81 @@ actor AdamantChatTransactionService: ChatTransactionService {
                 // MARK: Rich message
                 case .richMessage:
                     if let data = decodedMessage.data(using: String.Encoding.utf8),
-                        let richContent = RichMessageTools.richContent(from: data),
-                        let type = richContent[RichContentKeys.type] {
-                        let trs = RichMessageTransaction(entity: RichMessageTransaction.entity(), insertInto: context)
+                       let richContent = RichMessageTools.richContent(from: data),
+                       let type = richContent[RichContentKeys.type] as? String,
+                       type != RichContentKeys.reply.reply,
+                       richContent[RichContentKeys.reply.replyToId] == nil {
+                        let trs = RichMessageTransaction(
+                            entity: RichMessageTransaction.entity(),
+                            insertInto: context
+                        )
+                        
                         trs.richContent = richContent
                         trs.richType = type
+                        trs.isReply = false
                         trs.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
                         messageTransaction = trs
-                    } else {
-                        let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
-                        trs.message = decodedMessage
-                        messageTransaction = trs
+                        
+                        break
                     }
+                    
+                    if let data = decodedMessage.data(using: String.Encoding.utf8),
+                       let richContent = RichMessageTools.richContent(from: data),
+                       richContent[RichContentKeys.reply.replyToId] != nil,
+                       transaction.amount > 0 {
+                        
+                        let trs: TransferTransaction
+                        
+                        if let trsDB = getTransfer(
+                            id: String(transaction.id),
+                            context: context
+                        ) {
+                            trs = trsDB
+                        } else {
+                            trs = TransferTransaction(
+                                entity: TransferTransaction.entity(),
+                                insertInto: context
+                            )
+                        }
+                        
+                        trs.comment = richContent[RichContentKeys.reply.replyMessage] as? String
+                        trs.replyToId = richContent[RichContentKeys.reply.replyToId] as? String
+                        
+                        messageTransaction = trs
+                        break
+                    }
+                        
+                    if let data = decodedMessage.data(using: String.Encoding.utf8),
+                       let richContent = RichMessageTools.richContent(from: data),
+                       richContent[RichContentKeys.reply.replyToId] != nil,
+                       transaction.amount <= 0 {
+                        if let trs = getChatTransactionFromDB(
+                            id: String(transaction.id),
+                            context: context
+                        ) {
+                            messageTransaction = trs
+                            break
+                        }
+                        
+                        let trs = RichMessageTransaction(
+                            entity: RichMessageTransaction.entity(),
+                            insertInto: context
+                        )
+                        let transferContent = richContent[RichContentKeys.reply.replyMessage] as? [String: String]
+                        let type = (transferContent?[RichContentKeys.type] as? String) ?? RichContentKeys.reply.reply
+                        
+                        trs.richContent = richContent
+                        trs.richType = type
+                        trs.isReply = true
+                        trs.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
+                        messageTransaction = trs
+                        
+                        break
+                    }
+                    
+                    let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
+                    trs.message = decodedMessage
+                    messageTransaction = trs
                 }
             } else {
                 let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
@@ -147,7 +241,7 @@ actor AdamantChatTransactionService: ChatTransactionService {
         messageTransaction.isOutgoing = isOutgoing
         messageTransaction.blockId = transaction.blockId
         messageTransaction.confirmations = transaction.confirmations
-        messageTransaction.chatMessageId = UUID().uuidString
+        messageTransaction.chatMessageId = String(transaction.id)
         messageTransaction.fee = transaction.fee as NSDecimalNumber
         messageTransaction.statusEnum = MessageStatus.delivered
         messageTransaction.partner = partner
@@ -184,12 +278,13 @@ actor AdamantChatTransactionService: ChatTransactionService {
             transfer.isOutgoing = isOut
             transfer.blockId = transaction.blockId
             transfer.confirmations = transaction.confirmations
-            transfer.chatMessageId = UUID().uuidString
+            transfer.chatMessageId = String(transaction.id)
             transfer.fee = transaction.fee as NSDecimalNumber
             transfer.statusEnum = MessageStatus.delivered
             transfer.partner = partner
         }
         
+        transfer.chatMessageId = String(transaction.id)
         transfer.isOutgoing = isOut
         transfer.partner = partner
         return transfer

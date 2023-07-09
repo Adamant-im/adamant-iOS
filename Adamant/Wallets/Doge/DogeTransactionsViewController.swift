@@ -22,9 +22,8 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        updateLoadingView(isHidden: false)
         currencySymbol = DogeWalletService.currencySymbol
-        
-        refreshControl.beginRefreshing()
         handleRefresh()
     }
     
@@ -32,10 +31,10 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
         offset = 0
         transactions.removeAll()
         tableView.reloadData()
-        loadData(false)
+        loadData(silent: false)
     }
     
-    override func loadData(_ silent: Bool) {
+    override func loadData(silent: Bool) {
         isBusy = true
         
         Task {
@@ -57,6 +56,7 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
             stopBottomIndicator()
             refreshControl.endRefreshing()
             tableView.reloadData()
+            updateLoadingView(isHidden: true)
         }.stored(in: taskManager)
     }
     
@@ -72,53 +72,40 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
         }
         
         // Hold reference
-        guard let sender = walletService.wallet?.address else {
+        guard let address = walletService.wallet?.address else {
             return
         }
         
         controller.service = self.walletService
-        dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
-        let txId = transactions[indexPath.row].txId
+
+        let transaction = transactions[indexPath.row]
         
-        Task { @MainActor in
-            do {
-                let dogeTransaction = try await walletService.getTransaction(by: txId)
-                let transaction = dogeTransaction.asBtcTransaction(DogeTransaction.self, for: sender)
-                
-                // Sender name
-                if transaction.senderAddress == sender {
-                    controller.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                }
-                
-                if transaction.recipientAddress == sender {
-                    controller.recipientName = String.adamantLocalized.transactionDetails.yourAddress
-                }
-                
-                // Block Id
-                guard let blockHash = dogeTransaction.blockHash else {
-                    controller.transaction = transaction
-                    navigationController?.pushViewController(controller, animated: true)
-                    tableView.deselectRow(at: indexPath, animated: true)
-                    dialogService.dismissProgress()
-                    return
-                }
-                
-                do {
-                    let id = try await walletService.getBlockId(by: blockHash)
-                    controller.transaction = dogeTransaction.asBtcTransaction(DogeTransaction.self, for: sender, blockId: id)
-                } catch {
-                    controller.transaction = transaction
-                }
-                
-                tableView.deselectRow(at: indexPath, animated: true)
-                dialogService.dismissProgress()
-                navigationController?.pushViewController(controller, animated: true)
-            } catch {
-                tableView.deselectRow(at: indexPath, animated: true)
-                dialogService.dismissProgress()
-                dialogService.showRichError(error: error)
-            }
-        }.stored(in: taskManager)
+        let isOutgoing: Bool = transaction.recipientAddress != address
+        
+        let emptyTransaction = SimpleTransactionDetails(
+            txId: transaction.txId,
+            senderAddress: transaction.senderAddress,
+            recipientAddress: transaction.recipientAddress,
+            dateValue: nil,
+            amountValue: transaction.amountValue,
+            feeValue: nil,
+            confirmationsValue: nil,
+            blockValue: nil,
+            isOutgoing: isOutgoing,
+            transactionStatus: nil
+        )
+        
+        controller.transaction = emptyTransaction
+        
+        if emptyTransaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
+            controller.senderName = String.adamantLocalized.transactionDetails.yourAddress
+        }
+        
+        if emptyTransaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
+            controller.recipientName = String.adamantLocalized.transactionDetails.yourAddress
+        }
+        
+        navigationController?.pushViewController(controller, animated: true)
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -130,6 +117,9 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
         let transaction = transactions[indexPath.row]
         
         cell.accessoryType = .disclosureIndicator
+        cell.separatorInset = indexPath.row == transactions.count - 1
+        ? .zero
+        : UITableView.defaultTransactionsSeparatorInset
         
         configureCell(cell, for: transaction)
         return cell

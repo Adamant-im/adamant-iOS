@@ -22,21 +22,18 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        self.refreshControl.beginRefreshing()
-        
+        updateLoadingView(isHidden: false)
         currencySymbol = BtcWalletService.currencySymbol
-        
         handleRefresh()
     }
     
     override func handleRefresh() {
         transactions.removeAll()
         tableView.reloadData()
-        loadData(false)
+        loadData(silent: false)
     }
     
-    override func loadData(_ silent: Bool) {
+    override func loadData(silent: Bool) {
         isBusy = true
         
         Task { @MainActor in
@@ -52,10 +49,11 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
             }
             
             isBusy = false
-            tableView.reloadData()
             emptyLabel.isHidden = transactions.count > 0
             stopBottomIndicator()
             refreshControl.endRefreshing()
+            tableView.reloadData()
+            updateLoadingView(isHidden: true)
         }.stored(in: taskManager)
     }
     
@@ -98,6 +96,9 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
         let transaction = transactions[indexPath.row]
         
         cell.accessoryType = .disclosureIndicator
+        cell.separatorInset = indexPath.row == transactions.count - 1
+        ? .zero
+        : UITableView.defaultTransactionsSeparatorInset
         
         configureCell(cell, for: transaction)
         return cell

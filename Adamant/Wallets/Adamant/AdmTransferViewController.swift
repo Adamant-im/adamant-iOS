@@ -94,10 +94,20 @@ final class AdmTransferViewController: TransferViewControllerBase {
     }
     
     @MainActor
-    private func sendFundsInternal(service: AdmWalletService, recipient: String, amount: Decimal, comments: String) {
+    private func sendFundsInternal(
+        service: AdmWalletService,
+        recipient: String,
+        amount: Decimal,
+        comments: String
+    ) {
         Task {
             do {
-                let result = try await service.sendMoney(recipient: recipient, amount: amount, comments: comments)
+                let result = try await service.sendMoney(
+                    recipient: recipient,
+                    amount: amount,
+                    comments: comments,
+                    replyToMessageId: replyToMessageId
+                )
                 
                 service.update()
                 dialogService.dismissProgress()
@@ -237,7 +247,7 @@ final class AdmTransferViewController: TransferViewControllerBase {
         return row
     }
     
-    override func validateRecipient(_ address: String) -> Bool {
+    override func validateRecipient(_ address: String) -> AddressValidationResult {
         let fixedAddress: String
         if let first = address.first, first != "U" {
             fixedAddress = "U\(address)"
@@ -247,10 +257,10 @@ final class AdmTransferViewController: TransferViewControllerBase {
         
         switch AdamantUtilities.validateAdamantAddress(address: fixedAddress) {
         case .valid:
-            return true
+            return .valid
             
         case .system, .invalid:
-            return false
+            return .invalid(description: nil)
         }
     }
     

@@ -120,7 +120,7 @@ extension ApiServiceError {
         case .requestCancelled:
             return .requestCancelled
             
-        case .serverError, .internalError:
+        case .serverError, .internalError, .commonError:
             return .apiError(self)
         }
     }
@@ -214,6 +214,7 @@ protocol WalletService: AnyObject {
     var minAmount: Decimal { get }
     var defaultVisibility: Bool { get }
     var defaultOrdinalLevel: Int? { get }
+    var richMessageType: String { get }
     
 	// MARK: Notifications
 	
@@ -262,6 +263,8 @@ protocol WalletServiceWithTransfers: WalletService {
 protocol WalletServiceWithSend: WalletService {
     var transactionFeeUpdated: Notification.Name { get }
     
+    var qqPrefix: String { get }
+    var richMessageType: String { get }
     var blockchainSymbol: String { get }
     var isDynamicFee : Bool { get }
     var diplayTransactionFee : Decimal { get }
@@ -269,6 +272,9 @@ protocol WalletServiceWithSend: WalletService {
     var isWarningGasPrice : Bool { get }
     var isTransactionFeeValid : Bool { get }
     var commentsEnabledForRichMessages: Bool { get }
+    var isSupportIncreaseFee: Bool { get }
+    var isIncreaseFeeEnabled: Bool { get }
+    var defaultIncreaseFee: Decimal { get }
     func transferViewController() -> UIViewController
 }
 
@@ -288,13 +294,23 @@ extension WalletServiceWithSend {
     var isDynamicFee: Bool {
         return false
     }
+    var isSupportIncreaseFee: Bool {
+        return false
+    }
+    var isIncreaseFeeEnabled: Bool {
+        return false
+    }
+    var defaultIncreaseFee: Decimal {
+        return 1.5
+    }
 }
 
 protocol WalletServiceSimpleSend: WalletServiceWithSend {
     func sendMoney(
         recipient: String,
         amount: Decimal,
-        comments: String
+        comments: String,
+        replyToMessageId: String?
     ) async throws -> TransactionDetails
 }
 

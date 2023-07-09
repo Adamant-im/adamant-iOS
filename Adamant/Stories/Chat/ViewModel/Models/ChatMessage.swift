@@ -14,7 +14,7 @@ struct ChatMessage: Identifiable, Equatable {
     let sentDate: Date
     let senderModel: ChatSender
     let status: Status
-    let content: Content
+    var content: Content
     let backgroundColor: ChatMessageBackgroundColor
     let bottomString: ComparableAttributedString?
     let dateHeader: ComparableAttributedString?
@@ -47,10 +47,11 @@ extension ChatMessage {
     }
     
     enum Content: Equatable {
-        case message(ComparableAttributedString)
+        case message(EqualWrapper<ChatMessageCell.Model>)
         case transaction(EqualWrapper<ChatTransactionContainerView.Model>)
+		case reply(EqualWrapper<ChatMessageReplyCell.Model>)
         
-        static let `default` = Self.message(.init(string: .init()))
+        static let `default` = Self.message(.init(value: .default))
     }
 }
 
@@ -60,10 +61,15 @@ extension ChatMessage: MessageType {
     
     var kind: MessageKind {
         switch content {
-        case let .message(text):
-            return .attributedText(text.string)
+        case let .message(model):
+            return .attributedText(model.value.text)
         case let .transaction(model):
             return .custom(model)
+        case let .reply(model):
+            let message = model.value.message.string.count > model.value.messageReply.string.count
+            ? model.value.message
+            : model.value.messageReply
+            return .attributedText(message)
         }
     }
 }

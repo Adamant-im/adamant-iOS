@@ -15,6 +15,7 @@ enum ApiServiceError: LocalizedError, Error {
     case internalError(message: String, error: Error?)
     case networkError(error: Error)
     case requestCancelled
+    case commonError(message: String)
     
     var errorDescription: String? {
         switch self {
@@ -36,6 +37,9 @@ enum ApiServiceError: LocalizedError, Error {
             
         case .requestCancelled:
             return String.adamantLocalized.sharedErrors.requestCancelled
+            
+        case let .commonError(message):
+            return String.adamantLocalized.sharedErrors.commonError(message)
         }
     }
 }
@@ -50,7 +54,7 @@ extension ApiServiceError: RichError {
         case .accountNotFound, .notLogged, .networkError, .requestCancelled:
             return .warning
             
-        case .serverError:
+        case .serverError, .commonError:
             return .error
             
         case .internalError:
@@ -60,7 +64,7 @@ extension ApiServiceError: RichError {
     
     var internalError: Error? {
         switch self {
-        case .accountNotFound, .notLogged, .serverError, .requestCancelled:
+        case .accountNotFound, .notLogged, .serverError, .requestCancelled, .commonError:
             return nil
             
         case .internalError(_, let error):

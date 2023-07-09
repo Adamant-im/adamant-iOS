@@ -104,12 +104,13 @@ private extension ChatFactory {
     func makeSendTransactionAction(
         viewModel: ChatViewModel
     ) -> ChatViewController.SendTransaction {
-        { [router, viewModel] parentVC in
+        { [router, viewModel] parentVC, messageId in
             guard let vc = router.get(scene: AdamantScene.Chats.complexTransfer) as? ComplexTransferViewController
             else { return }
             
             vc.partner = viewModel.chatroom?.partner
             vc.transferDelegate = parentVC
+            vc.replyToMessageId = messageId
             
             let navigator = UINavigationController(rootViewController: vc)
             navigator.modalPresentationStyle = .overFullScreen

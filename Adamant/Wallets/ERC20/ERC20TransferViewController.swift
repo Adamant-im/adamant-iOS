@@ -12,10 +12,6 @@ import Web3Core
 
 final class ERC20TransferViewController: TransferViewControllerBase {
     
-    // MARK: Dependencies
-    
-    private let chatsProvider: ChatsProvider
-    
     // MARK: Properties
     
     private var skipValueChange: Bool = false
@@ -28,30 +24,7 @@ final class ERC20TransferViewController: TransferViewControllerBase {
         return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: EthWalletService.currencySymbol)
     }
     
-    override var isNeedAddFeeToTotal: Bool { false }
-    
-    init(
-        chatsProvider: ChatsProvider,
-        accountService: AccountService,
-        accountsProvider: AccountsProvider,
-        dialogService: DialogService,
-        router: Router,
-        currencyInfoService: CurrencyInfoService
-    ) {
-        self.chatsProvider = chatsProvider
-        
-        super.init(
-            accountService: accountService,
-            accountsProvider: accountsProvider,
-            dialogService: dialogService,
-            router: router,
-            currencyInfoService: currencyInfoService
-        )
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    override var isNeedAddFee: Bool { false }
     
     // MARK: Send
     
@@ -167,20 +140,9 @@ final class ERC20TransferViewController: TransferViewControllerBase {
         }
     }
     
-    override func validateRecipient(_ address: String) -> Bool {
-        guard let service = service else {
-            return false
-        }
-        
+    override func validateRecipient(_ address: String) -> AddressValidationResult {
         let fixedAddress = address.validateEthAddress()
-        
-        switch service.validate(address: fixedAddress) {
-        case .valid:
-            return true
-            
-        case .invalid, .system:
-            return false
-        }
+        return service?.validate(address: fixedAddress) ?? .invalid(description: nil)
     }
     
     override func recipientRow() -> BaseRow {
@@ -249,49 +211,6 @@ final class ERC20TransferViewController: TransferViewControllerBase {
         }
         
         return row
-    }
-    
-    override func handleRawAddress(_ address: String) -> Bool {
-        guard let service = service else {
-            return false
-        }
-        
-        let parsedAddress: String
-        if address.hasPrefix("ethereum:"), let firstIndex = address.firstIndex(of: ":") {
-            let index = address.index(firstIndex, offsetBy: 1)
-            parsedAddress = String(address[index...])
-        } else {
-            parsedAddress = address
-        }
-        
-        switch service.validate(address: parsedAddress) {
-        case .valid:
-            if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
-                row.value = parsedAddress
-                row.updateCell()
-            }
-            
-            return true
-            
-        default:
-            return false
-        }
-    }
-    
-    func reportTransferTo(
-        admAddress: String,
-        amount: Decimal,
-        comments: String,
-        hash: String
-    ) async throws {
-        guard let type = (self.service as? RichMessageProvider)?.dynamicRichMessageType else {
-            return
-        }
-        let payload = RichMessageTransfer(type: type, amount: amount, hash: hash, comments: comments)
-        
-        let message = AdamantMessage.richMessage(payload: payload)
-        
-        _ = try await chatsProvider.sendMessage(message, recipientId: admAddress)
     }
     
     override func defaultSceneTitle() -> String? {

@@ -223,13 +223,15 @@ class AboutViewController: FormViewController {
             $0.cell.selectionStyle = .gray
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
-        }.onCellSelection { [weak self] (_, _) in
+        }.onCellSelection { [weak self] (_, row) in
             self?.openEmailScreen(
                 recipient: AdamantResources.supportEmail,
                 subject: "ADAMANT Support",
                 body: "\n\n\n" + AdamantUtilities.deviceInfo,
                 delegate: self
             )
+            
+            row.deselect()
         }
         
         setColors()
@@ -256,7 +258,7 @@ class AboutViewController: FormViewController {
             dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
 
             do {
-                let account = try await accountsProvider.getAccount(byAddress: AdamantContacts.iosSupport.address)
+                let account = try await accountsProvider.getAccount(byAddress: AdamantContacts.adamantSupport.address)
 
                 guard let chatroom = account.chatroom,
                       let nav = self.navigationController,
@@ -269,7 +271,7 @@ class AboutViewController: FormViewController {
                 chat.viewModel.setup(
                     account: account,
                     chatroom: chatroom,
-                    messageToShow: nil,
+                    messageIdToShow: nil,
                     preservationDelegate: self
                 )
 

@@ -59,8 +59,8 @@ public struct TransactionInput {
         return data
     }
     
-    public mutating func unpack(with network: Network) {
-        address = AddressConverter.extract(from: self.signatureScript, with: network)?.base58
+    public mutating func unpack(with network: Network, addressConverter: AddressConverter) {
+        address = addressConverter.extract(from: signatureScript, with: network)?.stringValue
     }
 
     static func deserialize(_ byteStream: ByteStream) -> TransactionInput {

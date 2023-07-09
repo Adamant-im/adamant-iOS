@@ -42,7 +42,7 @@ extension AdamantChatsProvider {
     func isTransactionUnique(_ transaction: RichMessageTransaction) -> Bool {
         guard
             let type = transaction.richType,
-            let hash = transaction.richContent?[RichContentKeys.transfer.hash]
+            let hash = transaction.getRichValue(for: RichContentKeys.transfer.hash)
         else {
             return false
         }

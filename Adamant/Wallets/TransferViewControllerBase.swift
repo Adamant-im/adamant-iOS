@@ -63,6 +63,7 @@ class TransferViewControllerBase: FormViewController {
         case maxToTransfer
         case name
         case address
+        case increaseFee
         case fee
         case total
         case comments
@@ -76,6 +77,7 @@ class TransferViewControllerBase: FormViewController {
             case .maxToTransfer: return "max"
             case .name: return "name"
             case .address: return "recipient"
+            case .increaseFee: return "increaseFee"
             case .fee: return "fee"
             case .total: return "total"
             case .comments: return "comments"
@@ -95,6 +97,7 @@ class TransferViewControllerBase: FormViewController {
             case .total: return NSLocalizedString("TransferScene.Row.Total", comment: "Transfer: total amount of transaction: money to transfer adding fee")
             case .comments: return NSLocalizedString("TransferScene.Row.Comments", comment: "Transfer: transfer comment")
             case .sendButton: return String.adamantLocalized.transfer.send
+            case .increaseFee: return NSLocalizedString("TransferScene.Row.IncreaseFee", comment: "Transfer: transfer increase fee")
             }
         }
     }
@@ -131,6 +134,8 @@ class TransferViewControllerBase: FormViewController {
     let dialogService: DialogService
     let router: Router
     let currencyInfoService: CurrencyInfoService
+    var increaseFeeService: IncreaseFeeService
+    var chatsProvider: ChatsProvider
     
     // MARK: - Properties
     
@@ -138,7 +143,8 @@ class TransferViewControllerBase: FormViewController {
     
     var commentsEnabled: Bool = false
     var rootCoinBalance: Decimal?
-    var isNeedAddFeeToTotal: Bool { true }
+    var isNeedAddFee: Bool { true }
+    var replyToMessageId: String?
     
     var service: WalletServiceWithSend? {
         didSet {
@@ -185,8 +191,6 @@ class TransferViewControllerBase: FormViewController {
         }
     }
     
-    private var recipientAddressIsValid = false
-    
     var recipientName: String? {
         didSet {
             guard let row: RowOf<String> = form.rowBy(tag: BaseRows.name.tag) else {
@@ -210,11 +214,16 @@ class TransferViewControllerBase: FormViewController {
         guard
             let service = service,
             let balance = service.wallet?.balance,
-            balance > service.minBalance else {
+            balance > service.minBalance
+        else {
             return 0
         }
         
-        let max = balance - service.transactionFee - service.minBalance
+        let fee = isNeedAddFee
+        ? service.transactionFee
+        : 0
+        
+        let max = balance - fee - service.minBalance
         
         return max >= 0 ? max : 0
     }
@@ -235,6 +244,9 @@ class TransferViewControllerBase: FormViewController {
         return accessory
     }
     
+    private let inactiveBaseColor = UIColor.gray.withAlphaComponent(0.5)
+    private let activeBaseColor = UIColor.adamant.primary
+    
     // MARK: - QR Reader
     
     lazy var qrReader: QRCodeReaderViewController = {
@@ -253,26 +265,33 @@ class TransferViewControllerBase: FormViewController {
     var progressView: UIView?
     var alertView: UIView?
     
-    // MARK: - Lifecycle
+    // MARK: - Init
     
     init(
+        chatsProvider: ChatsProvider,
         accountService: AccountService,
         accountsProvider: AccountsProvider,
         dialogService: DialogService,
         router: Router,
-        currencyInfoService: CurrencyInfoService
+        currencyInfoService: CurrencyInfoService,
+        increaseFeeService: IncreaseFeeService
     ) {
         self.accountService = accountService
         self.accountsProvider = accountsProvider
         self.dialogService = dialogService
         self.router = router
         self.currencyInfoService = currencyInfoService
+        self.increaseFeeService = increaseFeeService
+        self.chatsProvider = chatsProvider
+		
         super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -329,7 +348,6 @@ class TransferViewControllerBase: FormViewController {
     private func isReadyToSend() -> Bool {
         validateAddress()
         guard recipientAddress != nil,
-              recipientAddressIsValid,
               amount != nil
         else {
             return false
@@ -442,6 +460,11 @@ class TransferViewControllerBase: FormViewController {
         
         section.append(defaultRowFor(baseRow: .amount))
         section.append(defaultRowFor(baseRow: .fiat))
+        
+        if service?.isSupportIncreaseFee == true {
+            section.append(defaultRowFor(baseRow: .increaseFee))
+        }
+        
         section.append(defaultRowFor(baseRow: .fee))
         section.append(defaultRowFor(baseRow: .total))
         
@@ -464,18 +487,15 @@ class TransferViewControllerBase: FormViewController {
     func validateAddress() -> Bool {
         guard let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) else {
             recipientAddress = nil
-            recipientAddressIsValid = false
             return false
         }
 
-        if let address = row.value, validateRecipient(address) {
+        if let address = row.value, validateRecipient(address).isValid {
             recipientAddress = address
             markAddres(isValid: true)
-            recipientAddressIsValid = true
             return true
         } else {
             markAddres(isValid: false)
-            recipientAddressIsValid = false
             return false
         }
     }
@@ -540,7 +560,7 @@ class TransferViewControllerBase: FormViewController {
         
         if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.total.tag) {
             if let amount = amount {
-                row.value = isNeedAddFeeToTotal
+                row.value = isNeedAddFee
                 ? (amount + service.transactionFee).doubleValue
                 : amount.doubleValue
                 row.updateCell()
@@ -554,7 +574,17 @@ class TransferViewControllerBase: FormViewController {
     }
     
     func markRow(_ row: BaseRowType, valid: Bool) {
-        row.baseCell.textLabel?.textColor = valid ? UIColor.adamant.primary : UIColor.adamant.alert
+        row.baseCell.textLabel?.textColor = valid
+        ? getBaseColor(for: row.tag)
+        : UIColor.adamant.alert
+    }
+    
+    func getBaseColor(for tag: String?) -> UIColor {
+        guard let tag = tag,
+              tag == BaseRows.fee.tag
+        else { return activeBaseColor }
+        
+        return inactiveBaseColor
     }
 
     func markAddres(isValid: Bool) {
@@ -608,16 +638,17 @@ class TransferViewControllerBase: FormViewController {
         validateAddress()
         validateForm(force: true)
 
-        guard
-            let recipientAddress = recipientAddress,
-            recipientAddressIsValid
-        else {
+        guard let recipientAddress = recipientAddress else {
             dialogService.showWarning(withMessage: .adamantLocalized.transfer.addressValidationError)
             return
         }
         
-        guard validateRecipient(recipientAddress) else {
-            dialogService.showWarning(withMessage: String.adamantLocalized.transfer.addressValidationError)
+        let validationResult = validateRecipient(recipientAddress)
+        guard validationResult.isValid else {
+            dialogService.showWarning(
+                withMessage: validationResult.errorDescription
+                    ?? .adamantLocalized.transfer.addressValidationError
+            )
             return
         }
         
@@ -743,9 +774,8 @@ class TransferViewControllerBase: FormViewController {
         }
 
         guard
-            let recipient = recipientAddress, validateRecipient(recipient),
+            let recipient = recipientAddress, validateRecipient(recipient).isValid,
             let amount = amount, validateAmount(amount),
-            recipientAddressIsValid,
             service.isTransactionFeeValid,
             isEnoughFee()
         else {
@@ -777,6 +807,76 @@ class TransferViewControllerBase: FormViewController {
         return WalletViewControllerBase.BaseRows.send.localized
     }
     
+    /// User loaded address from QR (camera or library)
+    ///
+    /// - Parameter address: raw readed address
+    /// - Returns: string was successfully handled
+    func handleRawAddress(_ address: String) -> Bool {
+        //fatalError("You must implement raw address handling")
+        guard let service = service else {
+            return false
+        }
+        
+        let parsedAddress = AdamantCoinTools.decode(
+            uri: address,
+            qqPrefix: service.qqPrefix
+        )
+        
+        guard let parsedAddress = parsedAddress,
+              case .valid = service.validate(address: parsedAddress.address)
+        else { return false }
+        
+        form.rowBy(tag: BaseRows.address.tag)?.value = parsedAddress.address
+        form.rowBy(tag: BaseRows.address.tag)?.updateCell()
+        
+        parsedAddress.params?.forEach { param in
+            switch param {
+            case .amount(let amount):
+                let row: SafeDecimalRow? = form.rowBy(tag: BaseRows.amount.tag)
+                row?.value  = Double(amount)
+                row?.updateCell()
+            }
+        }
+        
+        return true
+	}
+
+    /// Report transfer
+    func reportTransferTo(
+        admAddress: String,
+        amount: Decimal,
+        comments: String,
+        hash: String
+    ) async throws {
+        guard let richMessageType = (service as? RichMessageProvider)?.dynamicRichMessageType else {
+            return
+        }
+        
+        let message: AdamantMessage
+        
+        if let replyToMessageId = replyToMessageId {
+            let payload = RichTransferReply(
+                replyto_id: replyToMessageId,
+                type: richMessageType,
+                amount: amount,
+                hash: hash,
+                comments: comments
+            )
+            message = AdamantMessage.richMessage(payload: payload)
+        } else {
+            let payload = RichMessageTransfer(
+                type: richMessageType,
+                amount: amount,
+                hash: hash,
+                comments: comments
+            )
+            message = AdamantMessage.richMessage(payload: payload)
+        }
+        
+        chatsProvider.removeChatPositon(for: admAddress)
+        _ = try await chatsProvider.sendMessage(message, recipientId: admAddress)
+    }
+    
     // MARK: - Abstract
     
     /// Send funds to recipient after validations
@@ -784,15 +884,6 @@ class TransferViewControllerBase: FormViewController {
     /// Don't forget to call delegate.transferViewControllerDidFinishTransfer(self) after successfull transfer
     func sendFunds() {
         fatalError("You must implement sending logic")
-    }
-    
-    /// User loaded address from QR (camera or library)
-    /// You must override this method
-    ///
-    /// - Parameter address: raw readed address
-    /// - Returns: string was successfully handled
-    func handleRawAddress(_ address: String) -> Bool {
-        fatalError("You must implement raw address handling")
     }
     
     /// Build recipient address row
@@ -803,7 +894,7 @@ class TransferViewControllerBase: FormViewController {
     
     /// Validate recipient's address
     /// You must override this method
-    func validateRecipient(_ address: String) -> Bool {
+    func validateRecipient(_ address: String) -> AddressValidationResult {
         fatalError("You must implement recipient addres validation logic")
     }
 }
@@ -926,7 +1017,30 @@ extension TransferViewControllerBase {
                     return self?.rate == nil
                 }
             }
-        
+        case .increaseFee:
+            return SwitchRow { [weak self] in
+                $0.tag = BaseRows.increaseFee.tag
+                $0.title = BaseRows.increaseFee.localized
+                $0.value = self?.service?.isIncreaseFeeEnabled ?? false
+            }.cellUpdate { [weak self] (cell, row) in
+                cell.switchControl.onTintColor = UIColor.adamant.active
+                cell.textLabel?.textColor = row.value == true
+                ? self?.activeBaseColor
+                : self?.inactiveBaseColor
+            }.onChange { [weak self] row in
+                guard let id = self?.service?.tokenUnicID,
+                      let value = row.value
+                else {
+                    return
+                }
+                
+                row.cell.textLabel?.textColor = value
+                ? self?.activeBaseColor
+                : self?.inactiveBaseColor
+                
+                self?.increaseFeeService.setIncreaseFeeEnabled(for: id, value: value)
+                self?.service?.update()
+            }
         case .fee:
             return DoubleDetailsRow { [weak self] in
                 let estimateSymbol = service?.isDynamicFee == true ? " ~" : ""

@@ -28,6 +28,7 @@ class LskWallet: WalletAccount {
     var nounce: String
     var minBalance: Decimal = 0.05
     var minAmount: Decimal = 0
+    var isBalanceInitialized: Bool = false
     
     init(address: String, keyPair: KeyPair, nounce: String, isNewApi: Bool) {
         self.legacyAddress = address

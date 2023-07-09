@@ -169,8 +169,9 @@ extension DashWalletService {
         )
         
         if let result = response.result {
-            let transactions = result.map { $0.asUnspentTransaction(with: wallet.publicKey.toCashaddr().data) }
-            return transactions
+            return result.map {
+                $0.asUnspentTransaction(lockScript: wallet.addressEntity.lockingScript)
+            }
         } else if let error = response.error?.message {
             throw WalletServiceError.internalError(message: error, error: nil)
         }

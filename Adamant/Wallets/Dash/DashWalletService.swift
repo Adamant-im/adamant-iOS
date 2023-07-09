@@ -10,8 +10,9 @@ import UIKit
 import Swinject
 import Alamofire
 import BitcoinKit
+import Combine
 
-class DashWalletService: WalletService {
+final class DashWalletService: WalletService {
     
     var tokenSymbol: String {
         return type(of: self).currencySymbol
@@ -31,6 +32,14 @@ class DashWalletService: WalletService {
     
     var tokenUnicID: String {
         return tokenNetworkSymbol + tokenSymbol
+    }
+    
+    var richMessageType: String {
+        return Self.richMessageType
+	}
+
+    var qqPrefix: String {
+        return Self.qqPrefix
     }
     
     var wallet: WalletAccount? { return dashWallet }
@@ -53,6 +62,7 @@ class DashWalletService: WalletService {
     var securedStore: SecuredStore!
     var dialogService: DialogService!
     var router: Router!
+    var addressConverter: AddressConverter!
     
     // MARK: - Constants
     static var currencyLogo = #imageLiteral(resourceName: "dash_wallet")
@@ -122,7 +132,8 @@ class DashWalletService: WalletService {
     let defaultDispatchQueue = DispatchQueue(label: "im.adamant.dashWalletService", qos: .userInteractive, attributes: [.concurrent])
     
     static let jsonDecoder = JSONDecoder()
-    
+    private var subscriptions = Set<AnyCancellable>()
+
     // MARK: - State
     private (set) var state: WalletServiceState = .notInitiated
     
@@ -144,6 +155,40 @@ class DashWalletService: WalletService {
         self.network = DashMainnet()
         
         self.setState(.notInitiated)
+        
+        // Notifications
+        addObservers()
+    }
+    
+    func addObservers() {
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.update()
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.accountDataUpdated, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.update()
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.dashWallet = nil
+                self?.initialBalanceCheck = false
+                if let balanceObserver = self?.balanceObserver {
+                    NotificationCenter.default.removeObserver(balanceObserver)
+                    self?.balanceObserver = nil
+                }
+            }
+            .store(in: &subscriptions)
     }
     
     func update() {
@@ -168,6 +213,7 @@ class DashWalletService: WalletService {
         setState(.updating)
         
         if let balance = try? await getBalance() {
+            wallet.isBalanceInitialized = true
             let notification: Notification.Name?
             
             if wallet.balance != balance {
@@ -194,7 +240,14 @@ class DashWalletService: WalletService {
     }
     
     func validate(address: String) -> AddressValidationResult {
-        return AddressFactory.isValid(bitcoinAddress: address) ? .valid : .invalid
+        let address = try? addressConverter.convert(address: address)
+        
+        switch address?.scriptType {
+        case .p2pk, .p2pkh, .p2sh:
+            return .valid
+        case .p2tr, .p2multi, .p2wpkh, .p2wpkhSh, .p2wsh, .unknown, .none:
+            return .invalid(description: nil)
+        }
     }
 }
 
@@ -221,7 +274,11 @@ extension DashWalletService: InitiatedWithPassphraseService {
         let privateKeyData = passphrase.data(using: .utf8)!.sha256()
         let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
         
-        let eWallet = DashWallet(privateKey: privateKey)
+        let eWallet = try DashWallet(
+            privateKey: privateKey,
+            addressConverter: addressConverter
+        )
+        
         self.dashWallet = eWallet
         
         if !self.enabled {
@@ -249,9 +306,12 @@ extension DashWalletService: InitiatedWithPassphraseService {
             let service = self
             switch error {
             case .walletNotInitiated:
-                // Show '0' without waiting for balance update
-                if let wallet = service.dashWallet {
-                    NotificationCenter.default.post(name: service.walletUpdatedNotification, object: service, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
+                /// The ADM Wallet is not initialized. Check the balance of the current wallet
+                /// and save the wallet address to kvs when dropshipping ADM
+                service.setState(.upToDate)
+                
+                Task {
+                    await service.update()
                 }
                 
                 service.save(dashAddress: eWallet.address) { result in
@@ -276,6 +336,8 @@ extension DashWalletService: SwinjectDependentService {
         securedStore = container.resolve(SecuredStore.self)
         dialogService = container.resolve(DialogService.self)
         router = container.resolve(Router.self)
+        addressConverter = container.resolve(AddressConverterFactory.self)?
+            .make(network: network)
     }
 }
 

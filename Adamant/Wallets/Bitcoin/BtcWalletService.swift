@@ -10,6 +10,7 @@ import UIKit
 import Swinject
 import Alamofire
 import BitcoinKit
+import Combine
 
 enum DefaultBtcTransferFee: Decimal {
     case high = 24000
@@ -52,7 +53,14 @@ struct BtcApiCommands {
     }
 }
 
-class BtcWalletService: WalletService {
+// MARK: - Localization
+extension String.adamantLocalized {
+    enum BtcWalletService {
+        static let taprootNotSupported = NSLocalizedString("WalletServices.SharedErrors.BtcTaproot", comment: "")
+    }
+}
+
+final class BtcWalletService: WalletService {
 
     var tokenSymbol: String {
         type(of: self).currencySymbol
@@ -74,6 +82,22 @@ class BtcWalletService: WalletService {
         return tokenNetworkSymbol + tokenSymbol
     }
     
+    var richMessageType: String {
+        return Self.richMessageType
+	}
+
+    var qqPrefix: String {
+        return Self.qqPrefix
+	}
+
+    var isSupportIncreaseFee: Bool {
+        return true
+    }
+    
+    var isIncreaseFeeEnabled: Bool {
+        return increaseFeeService.isIncreaseFeeEnabled(for: tokenUnicID)
+    }
+    
     var wallet: WalletAccount? { return btcWallet }
     
     var walletViewController: WalletViewController {
@@ -93,6 +117,8 @@ class BtcWalletService: WalletService {
     var accountService: AccountService!
     var dialogService: DialogService!
     var router: Router!
+    var increaseFeeService: IncreaseFeeService!
+    var addressConverter: AddressConverter!
     
     // MARK: - Constants
     static var currencyLogo = #imageLiteral(resourceName: "bitcoin_wallet")
@@ -129,6 +155,8 @@ class BtcWalletService: WalletService {
     
     let defaultDispatchQueue = DispatchQueue(label: "im.adamant.btcWalletService", qos: .userInteractive, attributes: [.concurrent])
     
+    private var subscriptions = Set<AnyCancellable>()
+    
     // MARK: - State
     private (set) var state: WalletServiceState = .notInitiated
     
@@ -149,15 +177,49 @@ class BtcWalletService: WalletService {
     init() {
         self.network = BTCMainnet()
         self.setState(.notInitiated)
+        
+        // Notifications
+        addObservers()
+    }
+    
+    func addObservers() {
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.update()
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.accountDataUpdated, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.update()
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.btcWallet = nil
+                self?.initialBalanceCheck = false
+                if let balanceObserver = self?.balanceObserver {
+                    NotificationCenter.default.removeObserver(balanceObserver)
+                    self?.balanceObserver = nil
+                }
+            }
+            .store(in: &subscriptions)
     }
     
     func update() {
         Task {
-            try? await update()
+            await update()
         }
     }
     
-    func update() async throws {
+    func update() async {
         guard let wallet = btcWallet else {
             return
         }
@@ -173,6 +235,7 @@ class BtcWalletService: WalletService {
         setState(.updating)
         
         if let balance = try? await getBalance() {
+            wallet.isBalanceInitialized = true
             let notification: Notification.Name?
             
             if wallet.balance != balance {
@@ -201,20 +264,39 @@ class BtcWalletService: WalletService {
             feeRate = rate
         }
         
+        if let height = try? await getCurrentHeight() {
+            currentHeight = height
+        }
+        
         if let transactions = try? await getUnspentTransactions() {
             let feeRate = feeRate
             
             let fee = Decimal(transactions.count * 181 + 78) * feeRate
-            transactionFee = fee / BtcWalletService.multiplier
-        }
-        
-        if let height = try? await getCurrentHeight() {
-            currentHeight = height
+            var newTransactionFee = fee / BtcWalletService.multiplier
+            
+            newTransactionFee = isIncreaseFeeEnabled
+            ? newTransactionFee * defaultIncreaseFee
+            : newTransactionFee
+            
+            guard transactionFee != newTransactionFee else { return }
+            
+            transactionFee = newTransactionFee
+            
+            NotificationCenter.default.post(name: transactionFeeUpdated, object: self, userInfo: nil)
         }
     }
     
     func validate(address: String) -> AddressValidationResult {
-        return isValid(bitcoinAddress: address) ? .valid : .invalid
+        let address = try? addressConverter.convert(address: address)
+        
+        switch address?.scriptType {
+        case .p2pk, .p2pkh, .p2sh, .p2multi, .p2wpkh, .p2wpkhSh, .p2wsh:
+            return .valid
+        case .p2tr:
+            return .invalid(description: .adamantLocalized.BtcWalletService.taprootNotSupported)
+        case .unknown, .none:
+            return .invalid(description: nil)
+        }
     }
 
     private func getBase58DecodeAsBytes(address: String, length: Int) -> [UTF8.CodeUnit]? {
@@ -243,25 +325,7 @@ class BtcWalletService: WalletService {
     }
 
     public func isValid(bitcoinAddress address: String) -> Bool {
-        if isValid(bech32: address) {
-            return true
-        }
-
-        guard address.count >= 26 && address.count <= 35,
-              address.range(of: "[^a-zA-Z0-9]", options: .regularExpression) == nil,
-              let decodedAddress = getBase58DecodeAsBytes(address: address, length: 25),
-              decodedAddress.count >= 4
-        else {
-            return false
-        }
-
-        let decodedAddressNoCheckSum = Array(decodedAddress.prefix(decodedAddress.count - 4))
-        let hashedSum = decodedAddressNoCheckSum.sha256().sha256()
-
-        let checkSum = Array(decodedAddress.suffix(from: decodedAddress.count - 4))
-        let hashedSumHeader = Array(hashedSum.prefix(4))
-
-        return hashedSumHeader == checkSum
+        (try? addressConverter.convert(address: address)) != nil
     }
     
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
@@ -320,7 +384,7 @@ extension BtcWalletService: InitiatedWithPassphraseService {
         
         let privateKeyData = passphrase.data(using: .utf8)!.sha256()
         let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
-        let eWallet = BtcWallet(privateKey: privateKey)
+        let eWallet = try BtcWallet(privateKey: privateKey, addressConverter: addressConverter)
         self.btcWallet = eWallet
         
         if !self.enabled {
@@ -349,15 +413,18 @@ extension BtcWalletService: InitiatedWithPassphraseService {
         } catch let error as WalletServiceError {
             switch error {
             case .walletNotInitiated:
-                // Show '0' without waiting for balance update
-                if let wallet = service.btcWallet {
-                    NotificationCenter.default.post(name: service.walletUpdatedNotification, object: service, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
+                /// The ADM Wallet is not initialized. Check the balance of the current wallet
+                /// and save the wallet address to kvs when dropshipping ADM
+                service.setState(.upToDate)
+                
+                Task {
+                    await service.update()
                 }
                 
                 service.save(btcAddress: eWallet.address) { result in
                     service.kvsSaveCompletionRecursion(btcAddress: eWallet.address, result: result)
                 }
-                service.setState(.upToDate)
+                
                 return eWallet
                 
             default:
@@ -377,6 +444,8 @@ extension BtcWalletService: SwinjectDependentService {
         apiService = container.resolve(ApiService.self)
         dialogService = container.resolve(DialogService.self)
         router = container.resolve(Router.self)
+        increaseFeeService = container.resolve(IncreaseFeeService.self)
+        addressConverter = container.resolve(AddressConverterFactory.self)?.make(network: network)
     }
 }
 

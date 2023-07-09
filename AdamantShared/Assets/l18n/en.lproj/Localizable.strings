@@ -7,6 +7,36 @@
 /* About scene: 'Contact us' section title. */
 "About.Section.ContactUs" = "Contact us";
 
+/* Contribute scene: 'Crashlytics' section title. */
+"Contribute.Section.Crashlytics" = "Crashlytics";
+
+/* Contribute scene: 'Crashlytics' section description. */
+"Contribute.Section.CrashlyticsDescription" = "Send anonymous crash reports and make the app more reliable. We don't gather usage statistics.";
+
+/* Contribute scene: 'Run nodes' section title. */
+"Contribute.Section.RunNodes" = "Run the ADAMANT node";
+
+/* Contribute scene: 'Run nodes' section description. */
+"Contribute.Section.RunNodesDescription" = "Support decentralization and enhance privacy level";
+
+/* Contribute scene: 'Network delegate' section title. */
+"Contribute.Section.NetworkDelegate" = "Become a network delegate";
+
+/* Contribute scene: 'Network delegate' section description. */
+"Contribute.Section.NetworkDelegateDescription" = "To become a delegate, pay a registration fee and gain voters’ support";
+
+/* Contribute scene: 'Code contribute' section title. */
+"Contribute.Section.CodeContribute" = "Contribute to the code";
+
+/* Contribute scene: 'Code contribute' section description. */
+"Contribute.Section.CodeContributeDescription" = "If you are a developer, join our GitHub repository";
+
+/* Contribute scene: 'Donate' section title. */
+"Contribute.Section.Donate" = "Donate";
+
+/* Contribute scene: 'Donate' section description. */
+"Contribute.Section.DonateDescription" = "Every donation makes ADAMANT stronger";
+
 /* About scene: Website row */
 "About.Row.Website" = "Website";
 
@@ -52,11 +82,14 @@
 /* System accounts: ADAMANT Tokens */
 "Accounts.AdamantTokens" = "Welcome to ADAMANT";
 
+/* System accounts: PWA ADM Bounty bot */
+"Accounts.AdamantBountyBot" = "ADAMANT Bounty Bot";
+
 /* System accounts: ADAMANT Bounty */
 "Accounts.AdamantBounty" = "ADAMANT Bounty Wallet";
 
-/* System accounts: ADAMANT iOS Support */
-"Accounts.iOSSupport" = "ADAMANT iOS Support";
+/* System accounts: ADAMANT Support */
+"Accounts.Support" = "ADAMANT Support";
 
 /* System accounts: ADAMANT Exchange */
 "Accounts.AdamantExchange" = "ADAMANT Exchange";
@@ -160,6 +193,9 @@
 /* Account tab: 'About' row */
 "AccountTab.Row.About" = "About";
 
+/* Account tab: 'Contribute' row */
+"AccountTab.Row.Contribute" = "Contribute";
+
 /* Account tab: 'Vote for delegates' button */
 "AccountTab.Row.VoteForDelegates" = "Vote for delegates";
 
@@ -229,6 +265,12 @@
 /* SearchPage: Contacts header */
 "SearchPage.Contacts" = "Contacts";
 
+/* SearchPage: Contacts header */
+"SearchPage.Contact.New" = "New contact";
+
+/* SearchPage: Contact new header */
+"SearchPage.Contact.Add.New" = "[Add a new contact]";
+
 /* SearchPage: Messages header */
 "SearchPage.Messages" = "Messages";
 
@@ -291,6 +333,12 @@
 
 /* Button "Report" */
 "Chats.Report" = "Report";
+
+/* Button "Reply" */
+"Chats.Reply" = "Reply";
+
+/* Button "Copy" */
+"Chats.Copy" = "Copy";
 
 /* Alert "Report as inappropriate?" */
 "Chats.ReportMessage" = "Report as inappropriate?";
@@ -423,6 +471,9 @@
 
 /* Shared error: Internal error format, %@ for message */
 "Error.InternalErrorFormat" = "Internal error: %@";
+
+/* Shared error: Base format, %@ for message */
+"Error.BaseErrorFormat" = "Error: %@";
 
 /* Error messge title for support email */
 "Error.Mail.Title" = "Error in iOS app";
@@ -826,6 +877,12 @@
 /* Transaction status: inconsistent */
 "TransactionStatus.Inconsistent" = "Inconsistent";
 
+/* Transaction status: inconsistent wrong timestamp */
+"TransactionStatus.Inconsistent.WrongTimestamp" = "Message and Tx has different timestamps. It is possible, but check twice";
+
+/* Transaction status: inconsistent reason title */
+"TransactionStatus.Inconsistent.Reason.Title" = "Inconsistent reason";
+
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "Details";
 
@@ -952,6 +1009,9 @@
 /* Transfer: comment for transfer in chat */
 "TransferScene.Row.Comments" = "Comments";
 
+/* Transfer: transfer increase fee */
+"TransferScene.Row.IncreaseFee" = "Increase fee";
+
 /* Transfer: 'Transfer info' section */
 "TransferScene.Section.TransferInfo" = "Transfer Info";
 
@@ -994,6 +1054,9 @@
 /* Wallet Services: Shared error, transaction not found */
 "WalletServices.SharedErrors.TransactionNotFound" = "Transaction not found";
 
+/* Wallet Services: Shared error, BTC Taproot doesn't work */
+"WalletServices.SharedErrors.BtcTaproot" = "ADAMANT doesn’t support Taproot Bitcoin addresses";
+
 /* Wallet Services: Wait until other transactions approved */
 "WalletServices.SharedErrors.walletFrezzed" = "Wait until other transactions will be approved";
 
@@ -1035,3 +1098,15 @@
 "EULA.Accept" = "Accept";
 "EULA.Decline" = "Decline";
 "EULA.Text" = "ADAMANT Messenger is based on decentralized Blockchain technologies, and therefore:\n\n✓ ADAMANT Messenger has no tolerance for objectionable content or abusive users\n✓ ADAMANT Messenger is initially focused on the security of correspondence, and the privacy of its users.\n✓ ADAMANT Messenger displays completely open-source code at all times, license GPL-3.0. The source code is available on GitHub: github.com/adamant-im.\n✓ ADAMANT Messenger is offered “AS IS”, with no warranties.\n✓ Developers are only contributors and users of the ADAMANT Messenger.\n✓ Developers do not control any actions on the part of users.\n✓ Developers do not have privileges in the ADAMANT Messenger.\n✓ Developers have no possibility to disable or block any accounts in the ADAMANT Messenger.\n✓ Developers have no possibility to obtain encryption keys or read correspondence or other information of any ADAMANT Messenger user.\n✓ Developers have no possibility to restore access to any user’s account if lost. Users are responsible for the safety and protection of their own accounts.\n✓ Developers are not responsible for user content, messages, media, and goals and intentions of using the ADAMANT Messenger.\n✓ Developers do not store any information transmitted between users (messages, multimedia) and are not responsible for its storage on/in the Blockchain.\n✓ Developers have no possibility to access, nor are responsible for any assets (including but not limited to: cryptocurrencies), connected to or sent via the ADAMANT Messenger.\n✓ ADAMANT Messenger utilizes metadata, as facts of communications between accounts, available publicly in its Blockchain.\n✓ Developers do not cooperate with any third party or external services in terms of providing any usage data.\n✓ ADAMANT Messenger infrastructure (Blockchain nodes) belong to its users and are run by users.\n✓ Developers have no possibility to deactivate, stop or pause the ADAMANT Messenger. Developers offer no warranty on running the ADAMANT Messenger.\n✓ Developers do not bear responsibility for the possible risks, costs, and faults associated with the ADAMANT Messenger.\n✓ Users of the ADAMANT Messenger henceforth take all responsibility for its use, including but not limited to: legitimacy of the blockchain and other technologies applied within the Messenger, using anonymous messaging services, and other jurisdiction laws.\n\nBy using the ADAMANT Messenger, you henceforth accept these Terms of Service.";
+
+/* Reply: Short unknown message error */
+"Reply.ShortUnknownMessageError" = "UNKNOWN MESSAGE";
+
+/* Reply: Long unknown message error */
+"Reply.LongUnknownMessageError" = "We did not find this message";
+
+/* Reply: Failed message reply error */
+"Reply.failedMessageError" = "You can't reply to a failed message";
+
+/* Pending message reply error */
+"Reply.pendingMessageError" = "You can't reply to a pending message. Wait for confirmations (estimate 1-2 seconds)";

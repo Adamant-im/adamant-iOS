@@ -11,6 +11,7 @@ import UIKit
 import Swinject
 import CoreData
 import MessageKit
+import Combine
 
 class AdmWalletService: NSObject, WalletService {
     
@@ -32,7 +33,7 @@ class AdmWalletService: NSObject, WalletService {
     }
     
     var tokenNetworkSymbol: String {
-        return "ADM"
+        return Self.currencySymbol
     }
     
     var tokenContract: String {
@@ -41,6 +42,14 @@ class AdmWalletService: NSObject, WalletService {
     
     var tokenUnicID: String {
         return tokenNetworkSymbol + tokenSymbol
+    }
+    
+    var richMessageType: String {
+        return Self.richMessageType
+	}
+
+    var qqPrefix: String {
+        return Self.qqPrefix
     }
     
 	// MARK: - Dependencies
@@ -72,7 +81,8 @@ class AdmWalletService: NSObject, WalletService {
     
     private var transfersController: NSFetchedResultsController<TransferTransaction>?
     private (set) var isWarningGasPrice = false
-    
+    private var subscriptions = Set<AnyCancellable>()
+
     // MARK: - State
     private (set) var state: WalletServiceState = .upToDate
     private (set) var wallet: WalletAccount?
@@ -81,18 +91,34 @@ class AdmWalletService: NSObject, WalletService {
     override init() {
         super.init()
         
-        // MARK: Notifications
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] _ in
-            self?.update()
-        }
+        // Notifications
+        addObservers()
+    }
+    
+    func addObservers() {
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.update()
+            }
+            .store(in: &subscriptions)
         
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: nil) { [weak self] _ in
-            self?.update()
-        }
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.accountDataUpdated, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.update()
+            }
+            .store(in: &subscriptions)
         
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
-            self?.wallet = nil
-        }
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.wallet = nil
+            }
+            .store(in: &subscriptions)
     }
     
     func update() {
@@ -100,9 +126,10 @@ class AdmWalletService: NSObject, WalletService {
             wallet = nil
             return
         }
-        
+                
         let notify: Bool
         if let wallet = wallet as? AdmWallet {
+            wallet.isBalanceInitialized = true
             if wallet.balance != account.balance {
                 wallet.balance = account.balance
                 notify = true
@@ -111,6 +138,7 @@ class AdmWalletService: NSObject, WalletService {
             }
         } else {
             let wallet = AdmWallet(address: account.address)
+            wallet.isBalanceInitialized = true
             wallet.balance = account.balance
             
             self.wallet = wallet
@@ -129,11 +157,7 @@ class AdmWalletService: NSObject, WalletService {
     }
     
     func validate(address: String) -> AddressValidationResult {
-        guard !AdamantContacts.systemAddresses.contains(address) else {
-            return .system
-        }
-        
-        return addressRegex.perfectMatch(with: address) ? .valid : .invalid
+        addressRegex.perfectMatch(with: address) ? .valid : .invalid(description: nil)
     }
     
     private func postUpdateNotification(with wallet: WalletAccount) {

@@ -74,20 +74,14 @@ public struct Transaction {
         return data
     }
     
-    public mutating func unpack(with network: Network) {
+    public mutating func unpack(with network: Network, addressConverter: AddressConverter) {
         for index in 0..<inputs.count {
-            inputs[index].unpack(with: network)
+            inputs[index].unpack(with: network, addressConverter: addressConverter)
         }
         
         for index in 0..<outputs.count {
             outputs[index].unpack(with: network)
         }
-    }
-    
-    public func isLinked(to address: Cashaddr) -> Bool {
-        let hash = address.base58
-        return inputs.filter { input -> Bool in input.address == hash }.count > 0
-            || outputs.filter { output -> Bool in output.address == hash }.count > 0
     }
 
     public func isCoinbase() -> Bool {
@@ -169,7 +163,7 @@ public struct Transaction {
         for (i, utxo) in unsignedTx.utxos.enumerated() {
             let pubkeyHash: Data = Script.getPublicKeyHash(from: utxo.output.lockingScript)
             
-            let keysOfUtxo: [PrivateKey] = keys.filter { $0.publicKey().pubkeyHash == pubkeyHash }
+            let keysOfUtxo: [PrivateKey] = keys.filter { $0.publicKey().hashP2pkh == pubkeyHash }
             guard let key = keysOfUtxo.first else {
                 print("No keys to this txout : \(utxo.output.value)")
                 continue
