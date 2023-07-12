@@ -166,10 +166,15 @@ private extension ChatMessageFactory {
                 range: NSRange(location: 0, length: attributedString.length)
             )
             
-            var reaction = transaction.lastReaction
-            if reaction == "" {
-                reaction = nil
-            }
+            let reactions = transaction.reactions
+            
+            let address = transaction.isOutgoing
+            ? transaction.senderAddress
+            : transaction.recipientAddress
+            
+            let opponentAddress = transaction.isOutgoing
+            ? transaction.recipientAddress
+            : transaction.senderAddress
             
             return .message(.init(
                 value: .init(
@@ -177,7 +182,9 @@ private extension ChatMessageFactory {
                     text: mutableAttributedString,
                     backgroundColor: backgroundColor,
                     isFromCurrentSender: isFromCurrentSender,
-                    reaction: reaction
+                    reactions: reactions,
+                    address: address,
+                    opponentAddress: opponentAddress
                 )
             ))
         } ?? .default
@@ -196,20 +203,28 @@ private extension ChatMessageFactory {
         
         let decodedMessage = transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) ?? "..."
         let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
-        var reaction = transaction.getRichValue(for: RichContentKeys.react.lastReaction)
-        if reaction == "" {
-            reaction = nil
-        }
+        let reactions = transaction.richContent?[RichContentKeys.react.reactions] as? Set<Reaction>
+        
+        let address = transaction.isOutgoing
+        ? transaction.senderAddress
+        : transaction.recipientAddress
+        
+        let opponentAddress = transaction.isOutgoing
+        ? transaction.recipientAddress
+        : transaction.senderAddress
         
         return .reply(.init(
             value: .init(
-            id: transaction.txId,
-            replyId: replyId,
-            message: Self.markdownParser.parse(replyMessage),
-            messageReply: decodedMessageMarkDown,
-            backgroundColor: backgroundColor,
-            isFromCurrentSender: isFromCurrentSender,
-            reaction: reaction)
+                id: transaction.txId,
+                replyId: replyId,
+                message: Self.markdownParser.parse(replyMessage),
+                messageReply: decodedMessageMarkDown,
+                backgroundColor: backgroundColor,
+                isFromCurrentSender: isFromCurrentSender,
+                reactions: reactions,
+                address: address,
+                opponentAddress: opponentAddress
+            )
         ))
     }
     
@@ -224,10 +239,15 @@ private extension ChatMessageFactory {
         let decodedMessage = transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) ?? "..."
         let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
         let replyId = transaction.getRichValue(for: RichContentKeys.reply.replyToId) ?? ""
-        var reaction = transaction.getRichValue(for: RichContentKeys.react.lastReaction)
-        if reaction == "" {
-            reaction = nil
-        }
+        let reactions = transaction.richContent?[RichContentKeys.react.reactions] as? Set<Reaction>
+        
+        let address = transaction.isOutgoing
+        ? transaction.senderAddress
+        : transaction.recipientAddress
+        
+        let opponentAddress = transaction.isOutgoing
+        ? transaction.recipientAddress
+        : transaction.senderAddress
         
         return .transaction(.init(value: .init(
             id: id,
@@ -248,7 +268,9 @@ private extension ChatMessageFactory {
                 replyId: replyId
             ),
             status: transaction.transactionStatus ?? .notInitiated,
-            reaction: reaction
+            reactions: reactions,
+            address: address,
+            opponentAddress: opponentAddress
         )))
     }
     
@@ -262,10 +284,15 @@ private extension ChatMessageFactory {
         let decodedMessage = transaction.decodedReplyMessage ?? "..."
         let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
         let replyId = transaction.replyToId ?? ""
-        var reaction = transaction.lastReaction
-        if reaction == "" {
-            reaction = nil
-        }
+        let reactions = transaction.reactions
+        
+        let address = transaction.isOutgoing
+        ? transaction.senderAddress
+        : transaction.recipientAddress
+        
+        let opponentAddress = transaction.isOutgoing
+        ? transaction.recipientAddress
+        : transaction.senderAddress
         
         return .transaction(.init(value: .init(
             id: id,
@@ -288,7 +315,9 @@ private extension ChatMessageFactory {
                 replyId: replyId
             ),
             status: transaction.statusEnum.toTransactionStatus(),
-            reaction: reaction
+            reactions: reactions,
+            address: address,
+            opponentAddress: opponentAddress
         )))
     }
     

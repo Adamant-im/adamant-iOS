@@ -19,13 +19,33 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         return view
     }()
     
-    private lazy var reactionLabel: UILabel = {
+    private lazy var reactionsContanerView: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [ownReactionLabel, opponentReactionLabel])
+        stack.distribution = .fillProportionally
+        stack.axis = .horizontal
+        stack.spacing = 6
+        return stack
+    }()
+    
+    private lazy var ownReactionLabel: UILabel = {
         let label = UILabel()
-        label.text = model.reaction
-        label.backgroundColor = .adamant.codeBlock
-        label.layer.cornerRadius = reactionSize.height / 2
+        label.text = getReaction(for: model.address)
+        label.backgroundColor = .adamant.active
+        label.layer.cornerRadius = ownReactionSize.height / 2
         label.textAlignment = .center
         label.layer.masksToBounds = true
+        label.frame.size = ownReactionSize
+        return label
+    }()
+    
+    private lazy var opponentReactionLabel: UILabel = {
+        let label = UILabel()
+        label.text = getReaction(for: model.opponentAddress)
+        label.textAlignment = .center
+        label.layer.masksToBounds = true
+        label.backgroundColor = .adamant.codeBlock
+        label.layer.cornerRadius = 15
+        label.frame.size = opponentReactionSize
         return label
     }()
     
@@ -51,10 +71,35 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
             ? Alignment.trailing
             : Alignment.leading
             
-            reactionLabel.text = model.reaction
-            reactionLabel.isHidden = model.reaction == nil
+            ownReactionLabel.text = getReaction(for: model.address)
+            reactionsContanerView.isHidden = model.reactions == nil
+            ownReactionLabel.isHidden = getReaction(for: model.address) == nil
+            opponentReactionLabel.isHidden = getReaction(for: model.opponentAddress) == nil
+            updateOpponentReaction()
             layoutReactionLabel()
         }
+    }
+    
+    var reactionsContanerViewWidth: CGFloat {
+        if getReaction(for: model.address) == nil &&
+            getReaction(for: model.opponentAddress) == nil {
+            return .zero
+        }
+        
+        if getReaction(for: model.address) != nil &&
+            getReaction(for: model.opponentAddress) != nil {
+            return ownReactionSize.width + opponentReactionSize.width + 6
+        }
+        
+        if getReaction(for: model.address) != nil {
+            return ownReactionSize.width
+        }
+        
+        if getReaction(for: model.opponentAddress) != nil {
+            return opponentReactionSize.width
+        }
+        
+        return .zero
     }
     
     override var isSelected: Bool {
@@ -70,13 +115,15 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
     var subscription: AnyCancellable?
     
     private var containerView: UIView = UIView()
-    private let reactionSize = CGSize(width: 30, height: 30)
+    private let ownReactionSize = CGSize(width: 40, height: 30)
+    private let opponentReactionSize = CGSize(width: 50, height: 30)
     
     // MARK: - Methods
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        reactionLabel.text = nil
+        ownReactionLabel.text = nil
+        opponentReactionLabel.attributedText = nil
     }
     
     override func setupSubviews() {
@@ -98,7 +145,7 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         
         configureMenu()
         
-        contentView.addSubview(reactionLabel)
+        contentView.addSubview(reactionsContanerView)
     }
     
     func configureMenu() {
@@ -110,6 +157,40 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         containerView.addSubview(messageContainerView)
         
         contextMenu.setup(for: containerView)
+    }
+    
+    func updateOpponentReaction() {
+        guard let reaction = getReaction(for: model.opponentAddress) else {
+            opponentReactionLabel.attributedText = nil
+            opponentReactionLabel.text = nil
+            return
+        }
+        
+        let replyImageAttachment = NSTextAttachment()
+        
+        replyImageAttachment.image = UIImage(
+            named: "avatar_bots"
+        )
+        
+        replyImageAttachment.bounds = CGRect(
+            x: .zero,
+            y: -3,
+            width: 15,
+            height: 15
+        )
+        
+        let imageString = NSAttributedString(attachment: replyImageAttachment)
+                
+        let fullString = NSMutableAttributedString(string: reaction)
+        fullString.append(imageString)
+        
+        opponentReactionLabel.attributedText = fullString
+    }
+    
+    func getReaction(for address: String) -> String? {
+        model.reactions?.first(
+            where: { $0.sender == address }
+        )?.reaction
     }
     
     /// Positions the message bubble's top label.
@@ -230,21 +311,21 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
     
     func layoutReactionLabel() {
         let additionalWidth: CGFloat = model.isFromCurrentSender
-        ? reactionSize.width
+        ? .zero
         : containerView.frame.width
         
-        reactionLabel.frame = CGRect(
+        reactionsContanerView.frame = CGRect(
             origin: .init(
                 x: containerView.frame.origin.x
                 + additionalWidth
-                - reactionSize.width,
+                - reactionsContanerViewWidth / 2,
                 y: containerView.frame.origin.y
                 + containerView.frame.height
                 - 10
             ),
-            size: reactionSize
+            size: .init(width: reactionsContanerViewWidth, height: ownReactionSize.height)
         )
-        reactionLabel.layoutIfNeeded()
+        reactionsContanerView.layoutIfNeeded()
     }
     
     override func configure(
@@ -258,7 +339,8 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
             and: messagesCollectionView
         )
         
-        reactionLabel.text = model.reaction
+        ownReactionLabel.text = getReaction(for: model.address)
+        updateOpponentReaction()
     }
 }
 

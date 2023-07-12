@@ -56,8 +56,8 @@
     <entity name="DummyAccount" representedClassName="DummyAccount" parentEntity="BaseAccount" syncable="YES"/>
     <entity name="MessageTransaction" representedClassName="MessageTransaction" parentEntity="ChatTransaction" syncable="YES">
         <attribute name="isMarkdown" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
-        <attribute name="lastReaction" optional="YES" attributeType="String"/>
         <attribute name="message" attributeType="String"/>
+        <attribute name="reactionsData" optional="YES" attributeType="Transformable"/>
     </entity>
     <entity name="RichMessageTransaction" representedClassName="RichMessageTransaction" parentEntity="ChatTransaction" syncable="YES">
         <attribute name="isReact" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
@@ -70,7 +70,7 @@
     <entity name="TransferTransaction" representedClassName="TransferTransaction" parentEntity="ChatTransaction" syncable="YES">
         <attribute name="comment" optional="YES" attributeType="String"/>
         <attribute name="decodedReplyMessage" optional="YES" attributeType="String"/>
-        <attribute name="lastReaction" optional="YES" attributeType="String"/>
+        <attribute name="reactionsData" optional="YES" attributeType="Transformable"/>
         <attribute name="replyToId" optional="YES" attributeType="String"/>
     </entity>
 </model>

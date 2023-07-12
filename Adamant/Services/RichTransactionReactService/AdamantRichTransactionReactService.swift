@@ -20,7 +20,7 @@ actor AdamantRichTransactionReactService: NSObject, RichTransactionReactService 
     private lazy var messageController = getMessageController()
     private let unknownErrorMessage = String.adamantLocalized.reply.shortUnknownMessageError
     
-    private var reactions: [String: String] = [:]
+    private var reactions: [String: Set<Reaction>] = [:]
 
     init(
         coreDataStack: CoreDataStack,
@@ -92,26 +92,43 @@ private extension AdamantRichTransactionReactService {
                 return
             }
             
-            reactions[id] = reaction
+            var reactions = reactions[id] ?? []
+            let lastReactionForSender = reactions.first(
+                where: { $0.sender == transaction.senderAddress }
+            )
+            
+            let lastReactionSentDate: Date = lastReactionForSender?.sentDate ?? .init(timeIntervalSince1970: .zero)
+            
+            let currentReactionSentDate = transaction.sentDate == nil
+            ? .now
+            : transaction.sentDate ?? .now
+            
+            guard lastReactionSentDate < currentReactionSentDate
+            else { return }
+            
+            if let index = reactions.firstIndex(where: { $0.sender == transaction.senderAddress }) {
+                reactions.remove(at: index)
+            }
+            
+            reactions.update(
+                with: .init(
+                    sender: transaction.senderAddress,
+                    reaction: reaction.isEmpty ? nil : reaction,
+                    sentDate: transaction.sentDate ?? .now
+                )
+            )
+            
+            self.reactions[id] = reactions
             
             let baseTransaction = getTransactionFromDB(id: id)
             
             switch baseTransaction {
             case let trs as MessageTransaction:
-                setReact(
-                    to: trs,
-                    reaction: reaction
-                )
+                update(transaction: trs)
             case let trs as TransferTransaction:
-                setReact(
-                    to: trs,
-                    reaction: reaction
-                )
+                update(transaction: trs)
             case let trs as RichMessageTransaction:
-                setReact(
-                    to: trs,
-                    reaction: reaction
-                )
+                update(transaction: trs)
             default:
                 break
             }
@@ -119,41 +136,44 @@ private extension AdamantRichTransactionReactService {
     }
     
     func update(transaction: RichMessageTransaction) {
-        guard let reaction = reactions[transaction.transactionId],
-              transaction.getRichValue(for: RichContentKeys.react.lastReaction) != reaction
-        else { return }
+        var reactions = reactions[transaction.transactionId] ?? []
+        let savedReactions = transaction.richContent?[RichContentKeys.react.reactions] as? Set<Reaction>
+        
+        guard savedReactions != reactions else { return }
         
         setReact(
             to: transaction,
-            reaction: reaction
+            reactions: reactions
         )
     }
     
     func update(transaction: TransferTransaction) {
-        guard let reaction = reactions[transaction.transactionId],
-              transaction.lastReaction != reaction
-        else { return }
+        var reactions = reactions[transaction.transactionId] ?? []
+        let savedReactions = transaction.reactions
+        
+        guard savedReactions != reactions else { return }
         
         setReact(
             to: transaction,
-            reaction: reaction
+            reactions: reactions
         )
     }
     
     func update(transaction: MessageTransaction) {
-        guard let reaction = reactions[transaction.transactionId],
-              transaction.lastReaction != reaction
-        else { return }
+        var reactions = reactions[transaction.transactionId] ?? []
+        let savedReactions = transaction.reactions
+        
+        guard savedReactions != reactions else { return }
         
         setReact(
             to: transaction,
-            reaction: reaction
+            reactions: reactions
         )
     }
     
     func setReact(
         to transaction: RichMessageTransaction,
-        reaction: String
+        reactions: Set<Reaction>
     ) {
         let privateContext = NSManagedObjectContext(
             concurrencyType: .privateQueueConcurrencyType
@@ -163,13 +183,14 @@ private extension AdamantRichTransactionReactService {
         
         let transaction = privateContext.object(with: transaction.objectID)
             as? RichMessageTransaction
-        transaction?.richContent?[RichContentKeys.react.lastReaction] = reaction
+        
+        transaction?.richContent?[RichContentKeys.react.reactions] = reactions
         try? privateContext.save()
     }
     
     func setReact(
         to transaction: TransferTransaction,
-        reaction: String
+        reactions: Set<Reaction>
     ) {
         let privateContext = NSManagedObjectContext(
             concurrencyType: .privateQueueConcurrencyType
@@ -179,13 +200,13 @@ private extension AdamantRichTransactionReactService {
         
         let transaction = privateContext.object(with: transaction.objectID)
             as? TransferTransaction
-        transaction?.lastReaction = reaction
+        transaction?.reactions = reactions
         try? privateContext.save()
     }
     
     func setReact(
         to transaction: MessageTransaction,
-        reaction: String
+        reactions: Set<Reaction>
     ) {
         let privateContext = NSManagedObjectContext(
             concurrencyType: .privateQueueConcurrencyType
@@ -195,7 +216,7 @@ private extension AdamantRichTransactionReactService {
         
         let transaction = privateContext.object(with: transaction.objectID)
             as? MessageTransaction
-        transaction?.lastReaction = reaction
+        transaction?.reactions = reactions
         try? privateContext.save()
     }
 }

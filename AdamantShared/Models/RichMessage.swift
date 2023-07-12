@@ -47,7 +47,7 @@ struct RichContentKeys {
         static let react = "react"
         static let reactto_id = "reactto_id"
         static let react_message = "react_message"
-        static let lastReaction = "lastReaction"
+        static let reactions = "reactions"
     }
 }
 
@@ -170,10 +170,14 @@ struct RichMessageTransfer: RichMessage {
     }
     
     init?(content: [String: Any]) {
+        var newContent = content
+        
         if let content = content[RichContentKeys.reply.replyMessage] as? [String: String] {
             self.init(content: content)
         } else {
-            guard let content = content as? [String: String] else {
+            newContent[RichContentKeys.react.reactions] = ""
+            
+            guard let content = newContent as? [String: String] else {
                 return nil
             }
             

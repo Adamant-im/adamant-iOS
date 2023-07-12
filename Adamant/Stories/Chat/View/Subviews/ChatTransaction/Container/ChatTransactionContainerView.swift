@@ -47,12 +47,13 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
     
     private lazy var vStack: UIStackView = {
         let stack = UIStackView()
-        stack.alignment = .top
+        stack.alignment = .center
         stack.axis = .vertical
         stack.spacing = 12
 
         stack.addArrangedSubview(statusButton)
-        stack.addArrangedSubview(reactionLabel)
+        stack.addArrangedSubview(ownReactionLabel)
+        stack.addArrangedSubview(opponentReactionLabel)
         return stack
     }()
     
@@ -61,16 +62,32 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
         return view
     }()
     
-    private lazy var reactionLabel: UILabel = {
+    private lazy var ownReactionLabel: UILabel = {
         let label = UILabel()
-        label.text = model.reaction
-        label.backgroundColor = .adamant.codeBlock
-        label.layer.cornerRadius = reactionSize / 2
+        label.text = getReaction(for: model.address)
+        label.backgroundColor = .adamant.active
+        label.layer.cornerRadius = ownReactionSize.height / 2
         label.textAlignment = .center
         label.layer.masksToBounds = true
         
         label.snp.makeConstraints { make in
-            make.width.height.equalTo(reactionSize)
+            make.width.equalTo(ownReactionSize.width)
+            make.height.equalTo(ownReactionSize.height)
+        }
+        return label
+    }()
+    
+    private lazy var opponentReactionLabel: UILabel = {
+        let label = UILabel()
+        label.text = getReaction(for: model.opponentAddress)
+        label.textAlignment = .center
+        label.layer.masksToBounds = true
+        label.backgroundColor = .adamant.codeBlock
+        label.layer.cornerRadius = 15
+        
+        label.snp.makeConstraints { make in
+            make.width.equalTo(opponentReactionSize.width)
+            make.height.equalTo(opponentReactionSize.height)
         }
         return label
     }()
@@ -88,7 +105,8 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
     
     private lazy var contextMenu = AdvancedContextMenuManager(delegate: chatMenuManager)
     
-    private let reactionSize: CGFloat = 30
+    private let ownReactionSize = CGSize(width: 40, height: 30)
+    private let opponentReactionSize = CGSize(width: 50, height: 30)
     
     var isSelected: Bool = false {
         didSet {
@@ -147,8 +165,10 @@ private extension ChatTransactionContainerView {
         ? Alignment.trailing
         : Alignment.leading
         
-        reactionLabel.text = model.reaction
-        reactionLabel.isHidden = model.reaction == nil
+        ownReactionLabel.text = getReaction(for: model.address)
+        ownReactionLabel.isHidden = getReaction(for: model.address) == nil
+        opponentReactionLabel.isHidden = getReaction(for: model.opponentAddress) == nil
+        updateOpponentReaction()
     }
     
     func updateStatus(_ status: TransactionStatus) {
@@ -170,6 +190,40 @@ private extension ChatTransactionContainerView {
     
     @objc func onStatusButtonTap() {
         actionHandler(.forceUpdateTransactionStatus(id: model.id))
+    }
+    
+    func updateOpponentReaction() {
+        guard let reaction = getReaction(for: model.opponentAddress) else {
+            opponentReactionLabel.attributedText = nil
+            opponentReactionLabel.text = nil
+            return
+        }
+        
+        let replyImageAttachment = NSTextAttachment()
+        
+        replyImageAttachment.image = UIImage(
+            named: "avatar_bots"
+        )
+        
+        replyImageAttachment.bounds = CGRect(
+            x: .zero,
+            y: -3,
+            width: 15,
+            height: 15
+        )
+        
+        let imageString = NSAttributedString(attachment: replyImageAttachment)
+                
+        let fullString = NSMutableAttributedString(string: reaction)
+        fullString.append(imageString)
+        
+        opponentReactionLabel.attributedText = fullString
+    }
+    
+    func getReaction(for address: String) -> String? {
+        model.reactions?.first(
+            where: { $0.sender == address }
+        )?.reaction
     }
 }
 
