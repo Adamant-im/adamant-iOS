@@ -35,6 +35,19 @@ public class AdvancedContextMenuManager: NSObject {
     private var overlayVC: UIHostingController<ContextMenuOverlayView>?
     private var viewModel: ContextMenuOverlayViewModel?
     private weak var delegate: AdvancedContextMenuManagerDelegate?
+    private var overlayVCMac: UIHostingController<ContextMenuOverlayViewMac>?
+    
+    var isiOSAppOnMac: Bool = {
+#if targetEnvironment(macCatalyst)
+        return true
+#else
+        if #available(iOS 14.0, *) {
+            return ProcessInfo.processInfo.isiOSAppOnMac
+        } else {
+            return false
+        }
+#endif
+    }()
     
     public init(delegate: AdvancedContextMenuManagerDelegate) {
         self.delegate = delegate
@@ -53,7 +66,26 @@ public class AdvancedContextMenuManager: NSObject {
         viewModel?.dismiss()
     }
     
+    @objc func handleLongPressMacOS(_ gesture: UILongPressGestureRecognizer) {
+        guard gesture.state == .began,
+              let menu = delegate?.configureContextMenu()
+        else { return }
+        
+        let location = gesture.location(in: nil)
+        
+        presentOverlayForMac(
+            location: location,
+            menu: menu,
+            completion: nil
+        )
+    }
+    
     @objc func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
+        if isiOSAppOnMac {
+            handleLongPressMacOS(gesture)
+            return
+        }
+        
         guard gesture.state == .began,
               let contentView = gesture.view,
               let menu = delegate?.configureContextMenu(),
@@ -136,6 +168,38 @@ public class AdvancedContextMenuManager: NSObject {
             completion?()
         }
     }
+    
+    private func presentOverlayForMac(
+        location: CGPoint,
+        menu: UIMenu,
+        completion: (() -> Void)?
+    ) {
+        let upperView = self.delegate?.getUpperContentView()
+        let upperViewSize = self.delegate?.configureUpperContentViewSize() ?? .zero
+        
+        let viewModel = ContextMenuOverlayViewModelMac(
+            menu: menu,
+            upperContentView: upperView,
+            upperContentSize: upperViewSize,
+            locationOnScreen: location,
+            delegate: self
+        )
+        
+        let overlay = ContextMenuOverlayViewMac(
+            viewModel: viewModel
+        )
+        
+        let overlayVC = UIHostingController(rootView: overlay)
+        overlayVC.modalPresentationStyle = .overFullScreen
+        overlayVC.modalPresentationCapturesStatusBarAppearance = true
+        overlayVC.view.backgroundColor = .clear
+        
+        overlayVCMac = overlayVC
+        
+        UIApplication.shared.windows.first?.rootViewController?.present(overlayVC, animated: false) {
+            completion?()
+        }
+    }
 }
 
 extension AdvancedContextMenuManager: OverlayViewDelegate {
@@ -143,6 +207,7 @@ extension AdvancedContextMenuManager: OverlayViewDelegate {
         contentView?.alpha = 1.0
         contentView = nil
         overlayVC?.dismiss(animated: false)
+        overlayVCMac?.dismiss(animated: false)
     }
     
     func didDisplay() {
