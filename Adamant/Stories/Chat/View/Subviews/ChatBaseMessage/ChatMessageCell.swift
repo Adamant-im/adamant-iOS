@@ -13,7 +13,13 @@ import Combine
 import SwiftUI
 import AdvancedContextMenuKit
 
-final class ChatMessageCell: TextMessageCell, ChatModelView {    
+final class ChatMessageCell: TextMessageCell, ChatModelView {
+    // MARK: Dependencies
+    
+    var chatMessagesListViewModel: ChatMessagesListViewModel?
+    
+    // MARK: Proprieties
+    
     private lazy var swipeView: SwipeableView = {
         let view = SwipeableView(frame: .zero, view: contentView, xPadding: 8)
         return view
@@ -54,7 +60,8 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
             menu: makeContextMenu(),
             menuAlignment: model.isFromCurrentSender
             ? Alignment.trailing
-            : Alignment.leading
+            : Alignment.leading,
+            emojiService: chatMessagesListViewModel?.emojiService
         )
         manager.delegate = self
         return manager
@@ -70,6 +77,7 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
             chatMenuManager.menuAlignment = model.isFromCurrentSender
             ? Alignment.trailing
             : Alignment.leading
+            chatMenuManager.selectedEmoji = getReaction(for: model.address)
             
             ownReactionLabel.text = getReaction(for: model.address)
             reactionsContanerView.isHidden = model.reactions == nil
@@ -166,23 +174,24 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
             return
         }
         
-        let replyImageAttachment = NSTextAttachment()
-        
-        replyImageAttachment.image = UIImage(
-            named: "avatar_bots"
-        )
-        
-        replyImageAttachment.bounds = CGRect(
-            x: .zero,
-            y: -3,
-            width: 15,
-            height: 15
-        )
-        
-        let imageString = NSAttributedString(attachment: replyImageAttachment)
-                
         let fullString = NSMutableAttributedString(string: reaction)
-        fullString.append(imageString)
+        
+        if let image = chatMessagesListViewModel?.avatarService.avatar(
+            for: model.opponentAddress, size: 15
+        ) {
+            let replyImageAttachment = NSTextAttachment()
+            replyImageAttachment.image = image
+            replyImageAttachment.bounds = CGRect(
+                x: .zero,
+                y: -3,
+                width: 15,
+                height: 15
+            )
+            
+            let imageString = NSAttributedString(attachment: replyImageAttachment)
+            
+            fullString.append(imageString)
+        }
         
         opponentReactionLabel.attributedText = fullString
     }

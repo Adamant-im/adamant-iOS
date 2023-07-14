@@ -22,6 +22,8 @@ struct ChatFactory {
     let richTransactionStatusService: RichTransactionStatusService
     let addressBookService: AddressBookService
     let visibleWalletService: VisibleWalletsService
+    let avatarService: AvatarService
+    let emojiService: EmojiService
     let router: Router
     
     func makeViewController() -> UIViewController {
@@ -78,7 +80,11 @@ private extension ChatFactory {
             accountProvider: accountProvider,
             richTransactionStatusService: richTransactionStatusService,
             chatCacheService: chatCacheService,
-            richMessageProviders: richMessageProviders
+            richMessageProviders: richMessageProviders,
+            chatMessagesListViewModel: .init(
+                avatarService: avatarService,
+                emojiService: emojiService
+            )
         )
     }
     

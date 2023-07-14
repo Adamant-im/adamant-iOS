@@ -17,15 +17,18 @@ protocol ChatMenuManagerDelegate: AnyObject {
 
 final class ChatMenuManager: NSObject, AdvancedContextMenuManagerDelegate {
     private let menu: UIMenu
+    private let emojiService: EmojiService?
     
     weak var delegate: ChatMenuManagerDelegate?
     var menuAlignment: Alignment
+    var selectedEmoji: String?
     
     // MARK: Init
     
-    init(menu: UIMenu, menuAlignment: Alignment) {
+    init(menu: UIMenu, menuAlignment: Alignment, emojiService: EmojiService?) {
         self.menu = menu
         self.menuAlignment = menuAlignment
+        self.emojiService = emojiService
         
         super.init()
     }
@@ -43,15 +46,19 @@ final class ChatMenuManager: NSObject, AdvancedContextMenuManagerDelegate {
     }
     
     func getUpperContentView() -> AnyView? {
-        return AnyView(ChatReactionsView(delegate: self))
+        AnyView(
+            ChatReactionsView(
+                delegate: self,
+                emojis: emojiService?.getFrequentlySelectedEmojis(),
+                selectedEmoji: selectedEmoji
+            )
+        )
     }
 }
 
 extension ChatMenuManager: ChatReactionsViewDelegate, ElegantEmojiPickerDelegate {
     func didSelectEmoji(_ emoji: String) {
-        print("didSelectEmoji=\(emoji)")
-        delegate?.didReact(emoji)
-    //    contextMenu.dismiss()
+        delegate?.didReact(emoji == selectedEmoji ? "" : emoji)
     }
     
     func didTapMore() {
@@ -83,7 +90,6 @@ extension ChatMenuManager: ChatReactionsViewDelegate, ElegantEmojiPickerDelegate
         guard let emoji = emoji?.emoji else { return }
         print("emojiPicker=\(emoji)")
         delegate?.didReact(emoji)
-      //  contextMenu.dismiss()
     }
 }
 

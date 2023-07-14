@@ -14,29 +14,38 @@ protocol ChatReactionsViewDelegate: AnyObject {
 }
 
 struct ChatReactionsView: View {
-    private let emojiRanges = [0x1F601...0x1F64F]
-    
-    private let emojies: [String]
+    private var emojis: [String]
     private weak var delegate: ChatReactionsViewDelegate?
+    private let defaultEmojis = ["😂", "🤔", "😁", "👍", "👌"]
+    private let selectedEmoji: String?
     
-    init(delegate: ChatReactionsViewDelegate?) {
+    init(
+        delegate: ChatReactionsViewDelegate?,
+        emojis: [String]?,
+        selectedEmoji: String?
+    ) {
         self.delegate = delegate
-        self.emojies = ["😂", "🤔", "😁", "👍", "👌"]
+        self.emojis = emojis ?? defaultEmojis
+        self.selectedEmoji = selectedEmoji
+        
+        if let selectedEmoji = selectedEmoji,
+           !self.emojis.contains(selectedEmoji) {
+            self.emojis.insert(selectedEmoji, at: 0)
+        }
     }
     
     var body: some View {
         HStack(spacing: 10) {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
-                    ChatReactionEreaserButton()
+                    ForEach(emojis, id: \.self) { emoji in
+                        ChatReactionButton(
+                            emoji: emoji,
+                            isSelected: selectedEmoji == emoji
+                        )
                         .onTapGesture {
-                            delegate?.didSelectEmoji("")
+                            delegate?.didSelectEmoji(emoji)
                         }
-                    ForEach(emojies, id: \.self) { emoji in
-                        ChatReactionButton(emoji: emoji)
-                            .onTapGesture {
-                                delegate?.didSelectEmoji(emoji)
-                            }
                     }
                 }
             }
@@ -62,20 +71,12 @@ struct ChatReactionsView: View {
 
 struct ChatReactionButton: View {
     let emoji: String
+    let isSelected: Bool
     
     var body: some View {
         Text(emoji)
             .font(.title)
-            .background(.clear)
-            .clipShape(Circle())
-    }
-}
-
-struct ChatReactionEreaserButton: View {
-    var body: some View {
-        Image(systemName: "eraser")
-            .font(.title)
-            .background(.clear)
+            .background(isSelected ? Color.gray : .clear)
             .clipShape(Circle())
     }
 }

@@ -27,6 +27,8 @@ final class ChatViewModel: NSObject {
     private let chatCacheService: ChatCacheService
     private let richMessageProviders: [String: RichMessageProvider]
     
+    let chatMessagesListViewModel: ChatMessagesListViewModel
+
     // MARK: Properties
     
     private var tasksStorage = TaskManager()
@@ -111,7 +113,8 @@ final class ChatViewModel: NSObject {
         accountProvider: AccountsProvider,
         richTransactionStatusService: RichTransactionStatusService,
         chatCacheService: ChatCacheService,
-        richMessageProviders: [String: RichMessageProvider]
+        richMessageProviders: [String: RichMessageProvider],
+        chatMessagesListViewModel: ChatMessagesListViewModel
     ) {
         self.chatsProvider = chatsProvider
         self.markdownParser = markdownParser
@@ -124,6 +127,7 @@ final class ChatViewModel: NSObject {
         self.accountProvider = accountProvider
         self.richTransactionStatusService = richTransactionStatusService
         self.chatCacheService = chatCacheService
+        self.chatMessagesListViewModel = chatMessagesListViewModel
         super.init()
         setupObservers()
     }

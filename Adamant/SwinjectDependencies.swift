@@ -67,6 +67,13 @@ extension Container {
             )
         }.inObjectScope(.container)
         
+        // MARK: EmojiService
+        self.register(EmojiService.self) { r in
+            AdamantEmojiService(
+                securedStore: r.resolve(SecuredStore.self)!
+            )
+        }.inObjectScope(.container)
+        
         // MARK: CrashlysticsService
         self.register(CrashlyticsService.self) { r in
             AdamantCrashlyticsService(
@@ -214,6 +221,8 @@ extension Container {
                 richTransactionStatusService: r.resolve(RichTransactionStatusService.self)!,
                 addressBookService: r.resolve(AddressBookService.self)!,
                 visibleWalletService: r.resolve(VisibleWalletsService.self)!,
+                avatarService: r.resolve(AvatarService.self)!,
+                emojiService: r.resolve(EmojiService.self)!,
                 router: r.resolve(Router.self)!
             )
         }.inObjectScope(.container)

@@ -13,6 +13,12 @@ import SwiftUI
 import AdvancedContextMenuKit
 
 final class ChatTransactionContainerView: UIView, ChatModelView {
+    // MARK: Dependencies
+    
+    var chatMessagesListViewModel: ChatMessagesListViewModel?
+    
+    // MARK: Proprieties
+    
     var subscription: AnyCancellable?
     
     var model: Model = .default {
@@ -97,7 +103,8 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
             menu: makeContextMenu(),
             menuAlignment: model.isFromCurrentSender
             ? Alignment.trailing
-            : Alignment.leading
+            : Alignment.leading,
+            emojiService: chatMessagesListViewModel?.emojiService
         )
         manager.delegate = self
         return manager
@@ -164,6 +171,7 @@ private extension ChatTransactionContainerView {
         chatMenuManager.menuAlignment = model.isFromCurrentSender
         ? Alignment.trailing
         : Alignment.leading
+        chatMenuManager.selectedEmoji = getReaction(for: model.address)
         
         ownReactionLabel.text = getReaction(for: model.address)
         ownReactionLabel.isHidden = getReaction(for: model.address) == nil
@@ -199,23 +207,24 @@ private extension ChatTransactionContainerView {
             return
         }
         
-        let replyImageAttachment = NSTextAttachment()
-        
-        replyImageAttachment.image = UIImage(
-            named: "avatar_bots"
-        )
-        
-        replyImageAttachment.bounds = CGRect(
-            x: .zero,
-            y: -3,
-            width: 15,
-            height: 15
-        )
-        
-        let imageString = NSAttributedString(attachment: replyImageAttachment)
-                
         let fullString = NSMutableAttributedString(string: reaction)
-        fullString.append(imageString)
+        
+        if let image = chatMessagesListViewModel?.avatarService.avatar(
+            for: model.opponentAddress, size: 15
+        ) {
+            let replyImageAttachment = NSTextAttachment()
+            replyImageAttachment.image = image
+            replyImageAttachment.bounds = CGRect(
+                x: .zero,
+                y: -3,
+                width: 15,
+                height: 15
+            )
+            
+            let imageString = NSAttributedString(attachment: replyImageAttachment)
+            
+            fullString.append(imageString)
+        }
         
         opponentReactionLabel.attributedText = fullString
     }

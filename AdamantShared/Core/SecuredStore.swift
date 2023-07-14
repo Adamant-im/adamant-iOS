@@ -46,6 +46,10 @@ extension StoreKey {
     enum crashlytic {
         static let crashlyticEnabled = "crashlyticEnabled"
     }
+    
+    enum emoji {
+        static let visibleEmojiis = "visibleEmojiis"
+    }
 }
 
 protocol SecuredStore: AnyObject {
