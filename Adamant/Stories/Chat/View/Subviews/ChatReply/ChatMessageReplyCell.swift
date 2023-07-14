@@ -187,7 +187,8 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     private let smallHInset: CGFloat = 8
     private let longHInset: CGFloat = 14
     private let ownReactionSize = CGSize(width: 40, height: 30)
-    private let opponentReactionSize = CGSize(width: 50, height: 30)
+    private let opponentReactionSize = CGSize(width: 55, height: 30)
+    private let opponentReactionImageSize = CGSize(width: 10, height: 12)
     private lazy var contextMenu = AdvancedContextMenuManager(delegate: chatMenuManager)
     
     // MARK: - Methods
@@ -256,19 +257,18 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         let fullString = NSMutableAttributedString(string: reaction)
         
         if let image = chatMessagesListViewModel?.avatarService.avatar(
-            for: model.address, size: 15
+            for: model.opponentAddress,
+            size: opponentReactionImageSize.width
         ) {
             let replyImageAttachment = NSTextAttachment()
             replyImageAttachment.image = image
-            replyImageAttachment.bounds = CGRect(
-                x: .zero,
-                y: -3,
-                width: 15,
-                height: 15
+            replyImageAttachment.bounds = .init(
+                origin: .init(x: .zero, y: -3),
+                size: opponentReactionImageSize
             )
             
             let imageString = NSAttributedString(attachment: replyImageAttachment)
-            
+            fullString.append(NSAttributedString(string: " "))
             fullString.append(imageString)
         }
         

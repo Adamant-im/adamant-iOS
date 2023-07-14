@@ -113,7 +113,8 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
     private lazy var contextMenu = AdvancedContextMenuManager(delegate: chatMenuManager)
     
     private let ownReactionSize = CGSize(width: 40, height: 30)
-    private let opponentReactionSize = CGSize(width: 50, height: 30)
+    private let opponentReactionSize = CGSize(width: 55, height: 30)
+    private let opponentReactionImageSize = CGSize(width: 10, height: 12)
     
     var isSelected: Bool = false {
         didSet {
@@ -210,19 +211,18 @@ private extension ChatTransactionContainerView {
         let fullString = NSMutableAttributedString(string: reaction)
         
         if let image = chatMessagesListViewModel?.avatarService.avatar(
-            for: model.opponentAddress, size: 15
+            for: model.opponentAddress,
+            size: opponentReactionImageSize.width
         ) {
             let replyImageAttachment = NSTextAttachment()
             replyImageAttachment.image = image
-            replyImageAttachment.bounds = CGRect(
-                x: .zero,
-                y: -3,
-                width: 15,
-                height: 15
+            replyImageAttachment.bounds = .init(
+                origin: .init(x: .zero, y: -3),
+                size: opponentReactionImageSize
             )
             
             let imageString = NSAttributedString(attachment: replyImageAttachment)
-            
+            fullString.append(NSAttributedString(string: " "))
             fullString.append(imageString)
         }
         

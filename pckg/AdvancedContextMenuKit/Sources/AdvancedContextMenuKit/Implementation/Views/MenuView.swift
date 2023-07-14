@@ -30,7 +30,6 @@ struct MenuView: View {
 
 struct MenuButtonView: View {
     @State private var isHovered = false
-    @GestureState private var isLongPressed = false
     
     var item: UIMenuElement
     
@@ -44,10 +43,6 @@ struct MenuButtonView: View {
                     .padding(.horizontal, 20)
                     .tint(.black)
                     .foregroundColor(.black)
-                    .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(isHovered ? Color.red.opacity(0.8) : Color.blue)
-                    )
                 if let image = item.image {
                     Image(uiImage: image)
                         .frame(maxWidth: .infinity, alignment: .trailing)
@@ -58,14 +53,6 @@ struct MenuButtonView: View {
         }
         .buttonStyle(MenuButtonStyle(isHovered: $isHovered))
         .contentShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-        .hoverEffect(.lift)
-        .gesture(
-            LongPressGesture(minimumDuration: 0)
-                .updating($isLongPressed) { value, state, _ in
-                    state = value
-                    isHovered = value
-                }
-        )
         .onHover { hovering in
             isHovered = hovering
         }

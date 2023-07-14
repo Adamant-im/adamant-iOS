@@ -82,11 +82,11 @@ final class ChatDataSourceManager: MessagesDataSource {
                 return model.value
             }
             
+            cell.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
             cell.model = model.value
             cell.configure(with: message, at: indexPath, and: messagesCollectionView)
             cell.actionHandler = { [weak self] in self?.handleAction($0) }
             cell.setSubscription(publisher: publisher, collection: messagesCollectionView)
-            cell.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
             return cell
         }
         
@@ -104,11 +104,11 @@ final class ChatDataSourceManager: MessagesDataSource {
                 return model.value
             }
             
+            cell.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
             cell.model = model.value
             cell.configure(with: message, at: indexPath, and: messagesCollectionView)
             cell.actionHandler = { [weak self] in self?.handleAction($0) }
             cell.setSubscription(publisher: publisher, collection: messagesCollectionView)
-            cell.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
             return cell
         }
         
@@ -136,11 +136,10 @@ final class ChatDataSourceManager: MessagesDataSource {
             return model.value
         }
         
+        cell.wrappedView.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
         cell.wrappedView.model = model.value
-        
         cell.wrappedView.actionHandler = { [weak self] in self?.handleAction($0) }
         cell.wrappedView.setSubscription(publisher: publisher, collection: messagesCollectionView)
-        cell.wrappedView.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
         return cell
     }
 }
