@@ -584,6 +584,10 @@ private extension ChatViewModel {
                 expirationTimestamp: &expirationTimestamp
             )
             
+            if messages.count <= chatTransactions.count / 2 {
+                loadMoreMessagesIfNeeded()
+            }
+            
             await setupNewMessages(
                 newMessages: messages,
                 resetLoadingProperty: resetLoadingProperty,
