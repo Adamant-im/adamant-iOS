@@ -42,7 +42,7 @@ final class ChatMenuManager: NSObject, AdvancedContextMenuManagerDelegate {
     }
     
     func configureUpperContentViewSize() -> CGSize {
-        .init(width: 290, height: 50)
+        .init(width: 310, height: 50)
     }
     
     func getUpperContentView() -> AnyView? {

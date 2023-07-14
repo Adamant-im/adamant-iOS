@@ -40,15 +40,23 @@ struct ChatReactionsView: View {
                 HStack(spacing: 10) {
                     ForEach(emojis, id: \.self) { emoji in
                         ChatReactionButton(
-                            emoji: emoji,
-                            isSelected: selectedEmoji == emoji
+                            emoji: emoji
                         )
+                        .padding([.leading], 1)
+                        .frame(width: 40, height: 40)
+                        .background(
+                            selectedEmoji == emoji
+                            ? Color.init(uiColor: .adamant.active)
+                            : .clear
+                        )
+                        .clipShape(Circle())
                         .onTapGesture {
                             delegate?.didSelectEmoji(emoji)
                         }
                     }
                 }
             }
+            .padding([.top, .bottom, .leading], 5)
             
             Button {
                 delegate?.didTapMore()
@@ -56,14 +64,14 @@ struct ChatReactionsView: View {
                 Image(systemName: "plus")
                     .resizable()
                     .frame(width: 20, height: 20)
-                    .padding(10)
+                    .padding(5)
                     .background(Color.white)
                     .clipShape(Circle())
             }
-            .padding(5)
+            .padding([.top, .bottom], 5)
             Spacer()
         }
-        .padding(.leading, 10)
+        .padding(.leading, 5)
         .background(Color.init(uiColor: .adamant.codeBlock))
         .cornerRadius(20)
     }
@@ -71,12 +79,10 @@ struct ChatReactionsView: View {
 
 struct ChatReactionButton: View {
     let emoji: String
-    let isSelected: Bool
     
     var body: some View {
         Text(emoji)
             .font(.title)
-            .background(isSelected ? Color.gray : .clear)
             .clipShape(Circle())
     }
 }
