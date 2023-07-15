@@ -140,10 +140,10 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
                 $0.trailing.equalToSuperview().inset(trailing)
             }
             
-            ownReactionLabel.text = getReaction(for: model.address)
             reactionsContanerView.isHidden = model.reactions == nil
             ownReactionLabel.isHidden = getReaction(for: model.address) == nil
             opponentReactionLabel.isHidden = getReaction(for: model.opponentAddress) == nil
+            updateOwnReaction()
             updateOpponentReaction()
             layoutReactionLabel()
         }
@@ -234,6 +234,13 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         configureMenu()
         
         contentView.addSubview(reactionsContanerView)
+        
+        let eraseTapGesture = UITapGestureRecognizer(
+            target: self,
+            action: #selector(eraseReactionAction)
+        )
+        ownReactionLabel.addGestureRecognizer(eraseTapGesture)
+        ownReactionLabel.isUserInteractionEnabled = true
     }
     
     func configureMenu() {
@@ -245,6 +252,12 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         contextMenu.setup(for: containerView)
         
         containerView.addSubview(messageContainerView)
+    }
+    
+    func updateOwnReaction() {
+        ownReactionLabel.text = getReaction(for: model.address)
+        ownReactionLabel.transform = .identity
+        ownReactionLabel.alpha = 1.0
     }
     
     func updateOpponentReaction() {
@@ -440,7 +453,7 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         }
         
         replyMessageLabel.attributedText = model.messageReply
-        ownReactionLabel.text = getReaction(for: model.address)
+        updateOwnReaction()
         updateOpponentReaction()
     }
     
@@ -495,6 +508,27 @@ extension ChatMessageReplyCell {
         }
         
         return UIMenu(title: "", children: [reply, copy, report, remove])
+    }
+    
+    @objc func eraseReactionAction() {
+        animateErase { [weak self] in
+            guard let self = self else { return }
+            self.actionHandler(.react(id: self.model.id, emoji: ""))
+        }
+    }
+    
+    func animateErase(_ completion: (() -> Void)? = nil) {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        UIView.animate(withDuration: 0.5) {
+            self.ownReactionLabel.transform = .init(scaleX: 1.3, y: 1.3)
+        } completion: { [weak self] _ in
+            UIView.animate(withDuration: 0.25) {
+                self?.ownReactionLabel.transform = .init(scaleX: 0.1, y: 0.1)
+                self?.ownReactionLabel.alpha = 0
+            } completion: { _ in
+                completion?()
+            }
+        }
     }
 }
 

@@ -58,6 +58,7 @@ final class ChatMenuManager: NSObject, AdvancedContextMenuManagerDelegate {
 
 extension ChatMenuManager: ChatReactionsViewDelegate, ElegantEmojiPickerDelegate {
     func didSelectEmoji(_ emoji: String) {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
         delegate?.didReact(emoji == selectedEmoji ? "" : emoji)
     }
     
@@ -88,7 +89,7 @@ extension ChatMenuManager: ChatReactionsViewDelegate, ElegantEmojiPickerDelegate
         didSelectEmoji emoji: Emoji?
     ) {
         guard let emoji = emoji?.emoji else { return }
-        print("emojiPicker=\(emoji)")
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
         delegate?.didReact(emoji)
     }
 }

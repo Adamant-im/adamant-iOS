@@ -80,6 +80,14 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
             make.width.equalTo(ownReactionSize.width)
             make.height.equalTo(ownReactionSize.height)
         }
+        
+        let eraseTapGesture = UITapGestureRecognizer(
+            target: self,
+            action: #selector(eraseReactionAction)
+        )
+        
+        label.addGestureRecognizer(eraseTapGesture)
+        label.isUserInteractionEnabled = true
         return label
     }()
     
@@ -174,9 +182,9 @@ private extension ChatTransactionContainerView {
         : Alignment.leading
         chatMenuManager.selectedEmoji = getReaction(for: model.address)
         
-        ownReactionLabel.text = getReaction(for: model.address)
         ownReactionLabel.isHidden = getReaction(for: model.address) == nil
         opponentReactionLabel.isHidden = getReaction(for: model.opponentAddress) == nil
+        updateOwnReaction()
         updateOpponentReaction()
     }
     
@@ -199,6 +207,12 @@ private extension ChatTransactionContainerView {
     
     @objc func onStatusButtonTap() {
         actionHandler(.forceUpdateTransactionStatus(id: model.id))
+    }
+    
+    func updateOwnReaction() {
+        ownReactionLabel.text = getReaction(for: model.address)
+        ownReactionLabel.transform = .identity
+        ownReactionLabel.alpha = 1.0
     }
     
     func updateOpponentReaction() {
@@ -233,6 +247,27 @@ private extension ChatTransactionContainerView {
         model.reactions?.first(
             where: { $0.sender == address }
         )?.reaction
+    }
+    
+    @objc func eraseReactionAction() {
+        animateErase { [weak self] in
+            guard let self = self else { return }
+            self.actionHandler(.react(id: self.model.id, emoji: ""))
+        }
+    }
+    
+    func animateErase(_ completion: (() -> Void)? = nil) {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        UIView.animate(withDuration: 0.5) {
+            self.ownReactionLabel.transform = .init(scaleX: 1.3, y: 1.3)
+        } completion: { [weak self] _ in
+            UIView.animate(withDuration: 0.25) {
+                self?.ownReactionLabel.transform = .init(scaleX: 0.1, y: 0.1)
+                self?.ownReactionLabel.alpha = 0
+            } completion: { _ in
+                completion?()
+            }
+        }
     }
 }
 
