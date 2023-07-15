@@ -397,6 +397,8 @@ extension AdamantChatsProvider {
         array.prefix(preLoadChatsCount).forEach { transaction in
             let recipientAddress = transaction.recipientId == address ? transaction.senderId : transaction.recipientId
             Task {
+                let isChatLoading = await isChatLoading(with: address)
+                guard !isChatLoading else { return }
                 await getChatMessages(with: recipientAddress, offset: nil)
             }
         }
@@ -435,29 +437,60 @@ extension AdamantChatsProvider {
             limit: chatTransactionsLimit
         )
         
-        isChatLoaded[addressRecipient] = true
-        chatMaxMessages[addressRecipient] = chatroom?.count
-        
-        let loadedCount = chatLoadedMessages[addressRecipient] ?? 0
-        chatLoadedMessages[addressRecipient] = loadedCount + (chatroom?.messages?.count ?? 0)
-        
-        if let index = chatsLoading.firstIndex(of: addressRecipient) {
-            chatsLoading.remove(at: index)
-        }
-        
         guard let transactions = chatroom?.messages,
               transactions.count > 0
         else {
+            setChatDoneStatus(
+                for: addressRecipient,
+                messageCount: 0,
+                maxCount: chatroom?.count
+            )
             return
         }
         
-        await process(
+        let result = await process(
             messageTransactions: transactions,
             senderId: address,
             privateKey: privateKey
         )
         
+        let messageCount = chatroom?.messages?.count ?? 0
+        
+        if result.reactionsCount >= result.totalCount / 2 {
+            let offset = (offset ?? 0) + messageCount
+
+            let loadedCount = chatLoadedMessages[addressRecipient] ?? 0
+            chatLoadedMessages[addressRecipient] = loadedCount + messageCount
+            
+            return await getChatMessages(
+                with: addressRecipient,
+                offset: offset
+            )
+        }
+        
+        setChatDoneStatus(
+            for: addressRecipient,
+            messageCount: messageCount,
+            maxCount: chatroom?.count
+        )
+        
         NotificationCenter.default.post(name: .AdamantChatsProvider.initiallyLoadedMessages, object: addressRecipient)
+    }
+    
+    func setChatDoneStatus(
+        for addressRecipient: String,
+        messageCount: Int,
+        maxCount: Int?
+    ) {
+        isChatLoaded[addressRecipient] = true
+        chatMaxMessages[addressRecipient] = maxCount
+        
+        let loadedCount = chatLoadedMessages[addressRecipient] ?? 0
+        chatLoadedMessages[addressRecipient] = loadedCount + messageCount
+        
+        if let index = chatsLoading.firstIndex(of: addressRecipient) {
+            chatsLoading.remove(at: index)
+        }
     }
     
     func apiGetChatMessages(
@@ -1387,7 +1420,7 @@ extension AdamantChatsProvider {
         messageTransactions: [Transaction],
         senderId: String,
         privateKey: String
-    ) async {
+    ) async -> (reactionsCount: Int, totalCount: Int) {
         struct DirectionedTransaction {
             let transaction: Transaction
             let isOut: Bool
@@ -1472,6 +1505,8 @@ extension AdamantChatsProvider {
         var newMessageTransactions = [ChatTransaction]()
         var transactionInProgress: [UInt64] = []
         
+        var reactions = 0
+        
         for (account, transactions) in partners {
             // We can't save whole context while we are mass creating MessageTransactions.
             guard let chatroom = account.chatroom else { continue }
@@ -1521,6 +1556,10 @@ extension AdamantChatsProvider {
                     removedMessages: self.removedMessages,
                     context: privateContext
                    ) {
+                    if let transaction = chatTransaction as? RichMessageTransaction,
+                       transaction.isReact {
+                        reactions += 1
+                    }
                     if height < chatTransaction.height {
                         height = chatTransaction.height
                     }
@@ -1626,6 +1665,7 @@ extension AdamantChatsProvider {
             updateLastHeight(height: height)
         }
         
+        return (reactionsCount: reactions, totalCount: messageTransactions.count)
     }
     
     func updateLastHeight(height: Int64) {

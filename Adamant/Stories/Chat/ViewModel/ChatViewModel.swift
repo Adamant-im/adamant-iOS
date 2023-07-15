@@ -173,6 +173,11 @@ final class ChatViewModel: NSObject {
             
             let isChatLoaded = await chatsProvider.isChatLoaded(with: address)
             
+            // TODO: Fix double loading of chat. The code below works, but need to remove the full screen loading at the end if another service loads the chat room
+            
+           // let isChatLoading = await chatsProvider.isChatLoading(with: address)
+          //  guard !isChatLoading else { return }
+            
             if address == AdamantContacts.adamantWelcomeWallet.name || isChatLoaded {
                 updateTransactions(performFetch: true)
             } else {
@@ -583,10 +588,6 @@ private extension ChatViewModel {
                 isNeedToLoadMoreMessages: isNeedToLoadMoreMessages,
                 expirationTimestamp: &expirationTimestamp
             )
-            
-            if messages.count <= chatTransactions.count / 2 {
-                loadMoreMessagesIfNeeded()
-            }
             
             await setupNewMessages(
                 newMessages: messages,
