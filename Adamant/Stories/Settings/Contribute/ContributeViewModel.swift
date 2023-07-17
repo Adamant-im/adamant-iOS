@@ -7,27 +7,33 @@
 //
 
 import SwiftUI
+import Combine
 
 @MainActor
 final class ContributeViewModel: ObservableObject {
     private let crashliticsService: CrashlyticsService
+    private var subscriptions = Set<AnyCancellable>()
     
-    @Published private(set) var state: ContributeState = .initial
+    @Published var state: ContributeState = .initial
     
     init(crashliticsService: CrashlyticsService) {
         self.crashliticsService = crashliticsService
         state.isCrashlyticsOn = crashliticsService.isCrashlyticsEnabled()
-    }
-    
-    func setIsOn(_ value: Bool) {
-        state.isCrashlyticsOn = value
-        crashliticsService.setCrashlyticsEnabled(value)
+        
+        $state.map(\.isCrashlyticsOn)
+            .removeDuplicates()
+            .sink { [weak crashliticsService] in crashliticsService?.setCrashlyticsEnabled($0) }
+            .store(in: &subscriptions)
     }
     
     func enableCrashButton() {
         withAnimation {
             state.isCrashButtonOn = true
         }
+    }
+    
+    func openLink(row: ContributeState.LinkRow) {
+        state.safariURL = row.link.map { .init(value: $0) }
     }
     
     func simulateCrash() {
