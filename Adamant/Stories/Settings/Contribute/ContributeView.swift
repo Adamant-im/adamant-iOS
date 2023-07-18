@@ -58,7 +58,7 @@ private extension ContributeView {
     }
     
     var crashButton: some View {
-        Button("Simulate crash") { viewModel.simulateCrash() }
+        Button(viewModel.state.crashButtonTitle) { viewModel.simulateCrash() }
     }
     
     func makeLinkSection(row: ContributeState.LinkRow) -> some View {

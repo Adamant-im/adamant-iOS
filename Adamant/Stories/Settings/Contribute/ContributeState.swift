@@ -17,6 +17,7 @@ struct ContributeState {
     let crashliticsRowImage: UIImage
     let crashliticsRowName: String
     let crashliticsRowDescription: String
+    let crashButtonTitle: String
     let linkRows: [LinkRow]
     
     static let initial = Self(
@@ -26,6 +27,7 @@ struct ContributeState {
         crashliticsRowImage: UIImage(imageLiteralResourceName: "row_crashlytics"),
         crashliticsRowName: NSLocalizedString(key: "Contribute.Section.Crashlytics"),
         crashliticsRowDescription: NSLocalizedString(key: "Contribute.Section.CrashlyticsDescription"),
+        crashButtonTitle: NSLocalizedString(key: "Contribute.Section.SimulateCrash"),
         linkRows: [
             .init(
                 image: UIImage(imageLiteralResourceName: "row_nodes"),
