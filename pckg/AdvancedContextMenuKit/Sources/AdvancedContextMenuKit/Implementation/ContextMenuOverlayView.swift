@@ -68,6 +68,39 @@ private extension ContextMenuOverlayView {
         .edgesIgnoringSafeArea(.all)
     }
     
+    func makeContentView() -> some View {
+        HStack {
+            UIViewWrapper(view: viewModel.contentView)
+                .frame(
+                    width: viewModel.contentViewSize.width,
+                    height: viewModel.contentViewSize.height
+                )
+                .padding(.top,
+                         viewModel.isContextMenuVisible
+                         ? viewModel.finalOffsetForContentView
+                         : viewModel.startOffsetForContentView
+                )
+                .padding(.leading, viewModel.locationOnScreen.x)
+            Spacer()
+        }
+        .frame(width: .infinity, height: .infinity)
+        .transition(.opacity)
+        .edgesIgnoringSafeArea(.all)
+    }
+    
+    func makeMenuView() -> some View {
+        HStack {
+            MenuView(menu: viewModel.menu)
+                .frame(width: viewModel.menuWidth)
+                .padding(.leading, viewModel.menuLocation.x)
+                .transition(viewModel.menuTransition)
+            Spacer()
+        }
+        .frame(width: .infinity, height: .infinity)
+        .transition(viewModel.menuTransition)
+        .edgesIgnoringSafeArea(.all)
+    }
+    
     func makeUpperOverlayView(upperContentView: some View) -> some View {
         VStack {
             makeUpperContentView(upperContentView: upperContentView)
@@ -87,52 +120,17 @@ private extension ContextMenuOverlayView {
             upperContentView
                 .frame(width: viewModel.upperContentSize.width, height: viewModel.upperContentSize.height)
                 .padding(.top,
-                         getTopPaddingForContentView()
-                         - (viewModel.upperContentSize.height + minContentsSpace)
+                         viewModel.isContextMenuVisible
+                         ? viewModel.finalOffsetForUpperContentView
+                         : viewModel.startOffsetForUpperContentView
                 )
-                .padding([.leading, .trailing], 16)
+                .padding(.leading, viewModel.upperContentViewLocation.x)
             if viewModel.menuAlignment == .leading {
                 Spacer()
             }
         }
     }
     
-    func makeContentView() -> some View {
-        UIViewWrapper(view: viewModel.contentView)
-            .frame(height: viewModel.newContentHeight)
-            .padding(.top, getTopPaddingForContentView())
-            .padding([.leading, .trailing], viewModel.superViewXOffset)
-    }
-    
-    func makeMenuView() -> some View {
-        MenuView(menu: viewModel.menu)
-            .padding([.leading, .trailing], 16)
-            .frame(maxWidth: .infinity, alignment: viewModel.menuAlignment)
-            .background(GeometryReader { menuGeometry in
-                Color.clear
-                    .onAppear {
-                        viewModel.menuHeight = menuGeometry.size.height
-                    }
-            })
-            .transition(viewModel.menuTransition)
-    }
-    
-    func getTopPaddingForContentView() -> CGFloat {
-        guard viewModel.isContextMenuVisible else {
-            return viewModel.topOfContentViewOffset
-        }
-        
-        if viewModel.isNeedToMoveFromBottom(for: viewModel.topYOffset + viewModel.newContentHeight) {
-            return viewModel.getOffsetToMoveFromBottom()
-        }
-        
-        if viewModel.isNeedToMoveFromTop() {
-            return viewModel.getOffsetToMoveFromTop()
-        }
-        
-        return viewModel.topOfContentViewOffset
-    }
 }
 
 private let animationDuration: TimeInterval = 0.2
-private let minContentsSpace: CGFloat = 10

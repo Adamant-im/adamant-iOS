@@ -9,21 +9,30 @@ import SwiftUI
 
 class ContextMenuOverlayViewModel: ObservableObject {
     let contentView: UIView
-    let topYOffset: CGFloat
-    let newContentHeight: CGFloat
-    let oldContentHeight: CGFloat
-    let newContentWidth: CGFloat
+    let contentViewSize: CGSize
+    let locationOnScreen: CGPoint
     let menu: UIMenu
     let menuAlignment: Alignment
     let upperContentView: AnyView?
     let upperContentSize: CGSize
-    let superViewXOffset: CGFloat
     
-    @Published var menuHeight: CGFloat = .zero
-    @Published var isContextMenuVisible = false
+    var upperContentViewLocation: CGPoint = .zero
+    var menuLocation: CGPoint = .zero
+    var menuWidth: CGFloat = 300
     
-    var topOfContentViewOffset: CGFloat {
-        topYOffset// - (newContentHeight - oldContentHeight) / 2
+    var finalOffsetForContentView: CGFloat = .zero
+    var finalOffsetForUpperContentView: CGFloat = .zero
+    
+    var startOffsetForContentView: CGFloat {
+        locationOnScreen.y
+    }
+    
+    var startOffsetForUpperContentView: CGFloat {
+        locationOnScreen.y - (upperContentSize.height + minContentsSpace)
+    }
+    
+    var menuHeight: CGFloat {
+        calculateEstimateMenuHeight()
     }
     
     let transition = AnyTransition.asymmetric(
@@ -47,41 +56,29 @@ class ContextMenuOverlayViewModel: ObservableObject {
     
     weak var delegate: OverlayViewDelegate?
     
-    private let minBottomOffset: CGFloat = 50
-    private let minContentsSpace: CGFloat = 10
+    @Published var isContextMenuVisible = false
     
-    init(contentView: UIView, topYOffset: CGFloat, newContentHeight: CGFloat, oldContentHeight: CGFloat, newContentWidth: CGFloat, menu: UIMenu, menuAlignment: Alignment, upperContentView: AnyView?, upperContentSize: CGSize, superViewXOffset: CGFloat) {
+    init(
+        contentView: UIView,
+        contentViewSize: CGSize,
+        locationOnScreen: CGPoint,
+        menu: UIMenu,
+        menuAlignment: Alignment,
+        upperContentView: AnyView?,
+        upperContentSize: CGSize
+    ) {
         self.contentView = contentView
-        self.topYOffset = topYOffset
-        self.newContentHeight = newContentHeight
-        self.oldContentHeight = oldContentHeight
-        self.newContentWidth = newContentWidth
+        self.contentViewSize = contentViewSize
+        self.locationOnScreen = locationOnScreen
         self.menu = menu
         self.menuAlignment = menuAlignment
         self.upperContentView = upperContentView
         self.upperContentSize = upperContentSize
-        self.superViewXOffset = superViewXOffset
-    }
-    
-    func isNeedToMoveFromTop() -> Bool {
-        topOfContentViewOffset - minContentsSpace - upperContentSize.height < minBottomOffset
-    }
-    
-    func getOffsetToMoveFromTop() -> CGFloat {
-        minContentsSpace
-        + upperContentSize.height
-            + minBottomOffset
-    }
-    
-    func isNeedToMoveFromBottom(for bottomPosition: CGFloat) -> Bool {
-        UIScreen.main.bounds.height - bottomPosition < (menuHeight + minBottomOffset)
-    }
-    
-    func getOffsetToMoveFromBottom() -> CGFloat {
-        UIScreen.main.bounds.height
-            - menuHeight
-            - newContentHeight
-            - minBottomOffset
+        
+        finalOffsetForContentView = calculateOffsetForContentView()
+        finalOffsetForUpperContentView = calculateOffsetForUpperContentView()
+        menuLocation = calculateMenuLocation()
+        upperContentViewLocation = calculateUpperContentViewLocation()
     }
     
     func dismiss() {
@@ -94,4 +91,80 @@ class ContextMenuOverlayViewModel: ObservableObject {
     }
 }
 
+private extension ContextMenuOverlayViewModel {
+    func calculateUpperContentViewLocation() -> CGPoint {
+        .init(
+            x: isNeedToMoveFromTrailing()
+            ? calculateLeadingOffset(for: upperContentSize.width)
+            : locationOnScreen.x,
+            y: .zero
+        )
+    }
+    
+    func calculateMenuLocation() -> CGPoint {
+        .init(
+            x: isNeedToMoveFromTrailing()
+            ? calculateLeadingOffset(for: menuWidth)
+            : locationOnScreen.x,
+            y: .zero
+        )
+    }
+    
+    func calculateLeadingOffset(for width: CGFloat) -> CGFloat {
+        (locationOnScreen.x + contentViewSize.width) - width
+    }
+    
+    func isNeedToMoveFromTrailing() -> Bool {
+        UIScreen.main.bounds.width < locationOnScreen.x + upperContentSize.width + minBottomOffset
+    }
+    
+    func calculateOffsetForUpperContentView() -> CGFloat {
+        calculateOffsetForContentView()
+        - (upperContentSize.height + minContentsSpace)
+    }
+    
+    func calculateOffsetForContentView() -> CGFloat {
+        if isNeedToMoveFromBottom(
+            for: locationOnScreen.y + contentViewSize.height
+        ) {
+            return getOffsetToMoveFromBottom()
+        }
+        
+        if isNeedToMoveFromTop() {
+            return getOffsetToMoveFromTop()
+        }
+        
+        return locationOnScreen.y
+    }
+    
+    func calculateEstimateMenuHeight() -> CGFloat {
+        CGFloat(menu.children.count) * estimateMenuRowHeight
+    }
+    
+    func isNeedToMoveFromTop() -> Bool {
+        locationOnScreen.y - minContentsSpace - upperContentSize.height < minBottomOffset
+    }
+    
+    func getOffsetToMoveFromTop() -> CGFloat {
+        minContentsSpace
+        + upperContentSize.height
+        + minBottomOffset
+    }
+    
+    func isNeedToMoveFromBottom(for bottomPosition: CGFloat) -> Bool {
+        UIScreen.main.bounds.height - bottomPosition < (menuHeight + minBottomOffset)
+    }
+    
+    func getOffsetToMoveFromBottom() -> CGFloat {
+        UIScreen.main.bounds.height
+        - menuHeight
+        - contentViewSize.height
+        - minBottomOffset
+    }
+    
+}
+
 private let animationDuration: TimeInterval = 0.2
+private let estimateMenuRowHeight: CGFloat = 50
+private let minBottomOffset: CGFloat = 50
+private let minContentsSpace: CGFloat = 10
