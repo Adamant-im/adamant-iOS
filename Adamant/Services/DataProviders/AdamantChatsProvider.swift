@@ -10,6 +10,7 @@ import UIKit
 import CoreData
 import MarkdownKit
 import Combine
+import CommonKit
 
 actor AdamantChatsProvider: ChatsProvider {
     
@@ -1346,7 +1347,7 @@ extension AdamantChatsProvider {
         
         guard isFound else {
             throw ApiServiceError.commonError(
-                message: String.adamantLocalized.reply.longUnknownMessageError
+                message: String.adamant.reply.longUnknownMessageError
             )
         }
         

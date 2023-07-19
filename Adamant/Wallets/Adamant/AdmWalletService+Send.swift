@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CommonKit
 
 extension AdmWalletService: WalletServiceSimpleSend {
     /// Transaction ID
@@ -40,7 +41,7 @@ extension AdmWalletService: WalletServiceSimpleSend {
             throw error.asWalletServiceError()
         } catch {
             throw WalletServiceError.internalError(
-                message: String.adamantLocalized.sharedErrors.unknownError,
+                message: String.adamant.sharedErrors.unknownError,
                 error: nil
             )
         }

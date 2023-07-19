@@ -22,17 +22,17 @@ enum TransactionStatus: Int16 {
     var localized: String {
         switch self {
         case .notInitiated:
-            return NSLocalizedString("TransactionStatus.Updating", comment: "Transaction status: updating in progress")
+            return .localized("TransactionStatus.Updating", comment: "Transaction status: updating in progress")
         case .pending, .registered:
-            return NSLocalizedString("TransactionStatus.Pending", comment: "Transaction status: transaction is pending")
+            return .localized("TransactionStatus.Pending", comment: "Transaction status: transaction is pending")
         case .success:
-            return NSLocalizedString("TransactionStatus.Success", comment: "Transaction status: success")
+            return .localized("TransactionStatus.Success", comment: "Transaction status: success")
         case .failed:
-            return NSLocalizedString("TransactionStatus.Failed", comment: "Transaction status: transaction failed")
+            return .localized("TransactionStatus.Failed", comment: "Transaction status: transaction failed")
         case .inconsistent:
-            return NSLocalizedString("TransactionStatus.Inconsistent", comment: "Transaction status: transaction warning")
+            return .localized("TransactionStatus.Inconsistent", comment: "Transaction status: transaction warning")
         case .noNetwork, .noNetworkFinal:
-            return NSLocalizedString("Error.NoNetwork", comment: "Shared error: Network problems. In most cases - no connection")
+            return .localized("Error.NoNetwork", comment: "Shared error: Network problems. In most cases - no connection")
         }
     }
 }

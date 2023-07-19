@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CommonKit
 
 struct NormalizedTransaction: SignableTransaction {
     let type: TransactionType

@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:CommonKit">
+   </FileRef>
+   <FileRef
       location = "group:PopupKit">
    </FileRef>
    <FileRef

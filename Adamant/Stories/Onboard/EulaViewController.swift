@@ -19,7 +19,7 @@ class EulaViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = NSLocalizedString("EULA.Title", comment: "")
+        title = .localized("EULA.Title", comment: "")
 
         setColors()
     }

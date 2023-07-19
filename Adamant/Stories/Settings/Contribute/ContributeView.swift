@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import CommonKit
 
 struct ContributeView: View {
     @StateObject private var viewModel: ContributeViewModel

@@ -9,11 +9,12 @@
 import UIKit
 import SafariServices
 import DateToolsSwift
+import CommonKit
 
 // MARK: - Localization
-extension String.adamantLocalized {
+extension String.adamant {
     struct delegateDetails {
-        static let title = NSLocalizedString("DelegateDetails.Title", comment: "Delegate details: scene title")
+        static let title = String.localized("DelegateDetails.Title", comment: "Delegate details: scene title")
     }
 }
 
@@ -40,19 +41,19 @@ class DelegateDetailsViewController: UIViewController {
         
         var localized: String {
             switch self {
-            case .username: return NSLocalizedString("DelegateDetails.Row.Username", comment: "Delegate Details Screen: Rows title for 'Username'")
-            case .address: return NSLocalizedString("DelegateDetails.Row.Address", comment: "Delegate Details Screen: Rows title for 'Address'")
-            case .publicKey: return NSLocalizedString("DelegateDetails.Row.PublicKey", comment: "Delegate Details Screen: Rows title for 'Public Key'")
-            case .vote: return NSLocalizedString("DelegateDetails.Row.VoteWeight", comment: "Delegate Details Screen: Rows title for 'Vote weight'")
-            case .producedblocks: return NSLocalizedString("DelegateDetails.Row.ProducedBlocks", comment: "Delegate Details Screen: Rows title for 'Produced blocks'")
-            case .missedblocks: return NSLocalizedString("DelegateDetails.Row.MissedBlocks", comment: "Delegate Details Screen: Rows title for 'Missed blocks'")
-            case .rank: return NSLocalizedString("DelegateDetails.Row.Rank", comment: "Delegate Details Screen: Rows title for 'Rank'")
-            case .approval: return NSLocalizedString("DelegateDetails.Row.Approval", comment: "Delegate Details Screen: Rows title for 'Approval'")
-            case .productivity: return NSLocalizedString("DelegateDetails.Row.Productivity", comment: "Delegate Details Screen: Rows title for 'Productivity'")
-            case .forgingTime: return NSLocalizedString("DelegateDetails.Row.ForgingTime", comment: "Delegate Details Screen: Rows title for 'Forging time'")
-            case .forged: return NSLocalizedString("DelegateDetails.Row.Forged", comment: "Delegate Details Screen: Rows title for 'Forged'")
-            case .openInExplorer: return NSLocalizedString("TransactionDetailsScene.Row.Explorer", comment: "Transaction details: 'Open transaction in explorer' row.")
-//            case .rate: return NSLocalizedString("DelegateDetails.Row.Rate", comment: "Delegate Details Screen: Rows title for 'Rate'")
+            case .username: return .localized("DelegateDetails.Row.Username", comment: "Delegate Details Screen: Rows title for 'Username'")
+            case .address: return .localized("DelegateDetails.Row.Address", comment: "Delegate Details Screen: Rows title for 'Address'")
+            case .publicKey: return .localized("DelegateDetails.Row.PublicKey", comment: "Delegate Details Screen: Rows title for 'Public Key'")
+            case .vote: return .localized("DelegateDetails.Row.VoteWeight", comment: "Delegate Details Screen: Rows title for 'Vote weight'")
+            case .producedblocks: return .localized("DelegateDetails.Row.ProducedBlocks", comment: "Delegate Details Screen: Rows title for 'Produced blocks'")
+            case .missedblocks: return .localized("DelegateDetails.Row.MissedBlocks", comment: "Delegate Details Screen: Rows title for 'Missed blocks'")
+            case .rank: return .localized("DelegateDetails.Row.Rank", comment: "Delegate Details Screen: Rows title for 'Rank'")
+            case .approval: return .localized("DelegateDetails.Row.Approval", comment: "Delegate Details Screen: Rows title for 'Approval'")
+            case .productivity: return .localized("DelegateDetails.Row.Productivity", comment: "Delegate Details Screen: Rows title for 'Productivity'")
+            case .forgingTime: return .localized("DelegateDetails.Row.ForgingTime", comment: "Delegate Details Screen: Rows title for 'Forging time'")
+            case .forged: return .localized("DelegateDetails.Row.Forged", comment: "Delegate Details Screen: Rows title for 'Forged'")
+            case .openInExplorer: return .localized("TransactionDetailsScene.Row.Explorer", comment: "Transaction details: 'Open transaction in explorer' row.")
+//            case .rate: return .localized("DelegateDetails.Row.Rate", comment: "Delegate Details Screen: Rows title for 'Rate'")
             }
         }
         
@@ -62,7 +63,7 @@ class DelegateDetailsViewController: UIViewController {
         
         var image: UIImage? {
             switch self {
-            case .openInExplorer: return #imageLiteral(resourceName: "row_explorer")
+            case .openInExplorer: return .asset(named: "row_explorer")
                 
             default: return nil
             }
@@ -119,7 +120,7 @@ class DelegateDetailsViewController: UIViewController {
             refreshData(with: delegate)
             navigationItem.title = delegate.username
         } else {
-            navigationItem.title = String.adamantLocalized.delegateDetails.title
+            navigationItem.title = String.adamant.delegateDetails.title
         }
         
         setColors()
@@ -256,7 +257,7 @@ extension DelegateDetailsViewController {
                 if forgingTime > 0 {
                     cell.detailTextLabel?.text = durationFormatter.string(from: forgingTime)
                 } else {
-                    cell.detailTextLabel?.text = NSLocalizedString("Just now", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), value: "", comment: "")
+                    cell.detailTextLabel?.text = Date.now.humanizedTime().string
                 }
                 
             } else {

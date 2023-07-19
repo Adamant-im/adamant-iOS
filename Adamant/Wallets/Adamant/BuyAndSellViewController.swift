@@ -9,6 +9,7 @@
 import UIKit
 import Eureka
 import SafariServices
+import CommonKit
 
 class BuyAndSellViewController: FormViewController {
     // MARK: Rows
@@ -29,17 +30,17 @@ class BuyAndSellViewController: FormViewController {
         
         var image: UIImage? {
             switch self {
-            case .adamantMessage: return #imageLiteral(resourceName: "row_logo")
-            case .adamantSite: return #imageLiteral(resourceName: "row_logo")
-            case .azbit: return #imageLiteral(resourceName: "azbit_logo")
-            case .stakecube: return #imageLiteral(resourceName: "row_stakecube")
+            case .adamantMessage: return .asset(named: "row_logo")
+            case .adamantSite: return .asset(named: "row_logo")
+            case .azbit: return .asset(named: "azbit_logo")
+            case .stakecube: return .asset(named: "row_stakecube")
             }
         }
         
         var localized: String {
             switch self {
-            case .adamantMessage: return String.adamantLocalized.wallets.exchangeInChatAdmTokens
-            case .adamantSite: return String.adamantLocalized.wallets.buyAdmTokens
+            case .adamantMessage: return String.adamant.wallets.exchangeInChatAdmTokens
+            case .adamantSite: return String.adamant.wallets.buyAdmTokens
             case .azbit: return "Azbit"
             case .stakecube: return "StakeCube"
             }
@@ -73,7 +74,7 @@ class BuyAndSellViewController: FormViewController {
         let admUrl: String
         
         if let account = accountService.account {
-            admUrl = String.adamantLocalized.wallets.buyTokensUrl(for: account.address)
+            admUrl = String.adamant.wallets.buyTokensUrl(for: account.address)
         } else {
             admUrl = Rows.adamantSite.url
         }

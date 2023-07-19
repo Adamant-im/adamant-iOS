@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CommonKit
 
 class EthTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies

@@ -8,16 +8,17 @@
 
 import UIKit
 import Eureka
+import CommonKit
 
 // MARK: - Localization
-extension String.adamantLocalized {
+extension String.adamant {
     struct nodesList {
-        static let title = NSLocalizedString("NodesList.Title", comment: "NodesList: scene title")
-        static let nodesListButton = NSLocalizedString("NodesList.NodesList", comment: "NodesList: Button label")
+        static let title = String.localized("NodesList.Title", comment: "NodesList: scene title")
+        static let nodesListButton = String.localized("NodesList.NodesList", comment: "NodesList: Button label")
         
-        static let defaultNodesWasLoaded = NSLocalizedString("NodeList.DefaultNodesLoaded", comment: "NodeList: Inform that default nodes was loaded, if user deleted all nodes")
+        static let defaultNodesWasLoaded = String.localized("NodeList.DefaultNodesLoaded", comment: "NodeList: Inform that default nodes was loaded, if user deleted all nodes")
         
-        static let resetAlertTitle = NSLocalizedString("NodesList.ResetNodeListAlert", comment: "NodesList: Reset nodes alert title")
+        static let resetAlertTitle = String.localized("NodesList.ResetNodeListAlert", comment: "NodesList: Reset nodes alert title")
         
         private init() {}
     }
@@ -50,16 +51,16 @@ class NodesListViewController: FormViewController {
         var localized: String {
             switch self {
             case .addNode:
-                return NSLocalizedString("NodesList.AddNewNode", comment: "NodesList: 'Add new node' button lable")
+                return .localized("NodesList.AddNewNode", comment: "NodesList: 'Add new node' button lable")
                 
             case .save:
-                return String.adamantLocalized.alert.save
+                return String.adamant.alert.save
                 
             case .reset:
-                return NSLocalizedString("NodesList.ResetButton", comment: "NodesList: 'Reset' button")
+                return .localized("NodesList.ResetButton", comment: "NodesList: 'Reset' button")
                 
             case .preferTheFastestNode:
-                return NSLocalizedString("NodesList.PreferTheFastestNode", comment: "NodesList: 'Prefer the fastest node' switch")
+                return .localized("NodesList.PreferTheFastestNode", comment: "NodesList: 'Prefer the fastest node' switch")
             }
         }
     }
@@ -149,7 +150,7 @@ class NodesListViewController: FormViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.title = String.adamantLocalized.nodesList.title
+        navigationItem.title = String.adamant.nodesList.title
         navigationOptions = .Disabled
         navigationItem.largeTitleDisplayMode = .always
         
@@ -274,8 +275,8 @@ extension NodesListViewController {
             return
         }
         
-        let alert = UIAlertController(title: String.adamantLocalized.nodesList.resetAlertTitle, message: nil, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+        let alert = UIAlertController(title: String.adamant.nodesList.resetAlertTitle, message: nil, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: String.adamant.alert.cancel, style: .cancel, handler: nil))
         alert.addAction(UIAlertAction(
             title: Rows.reset.localized,
             style: .destructive,
@@ -336,7 +337,7 @@ extension NodesListViewController {
         nodesSource.setDefaultNodes()
         
         if showAlert {
-            dialogService.showSuccess(withMessage: String.adamantLocalized.nodesList.defaultNodesWasLoaded)
+            dialogService.showSuccess(withMessage: String.adamant.nodesList.defaultNodesWasLoaded)
         }
     }
 }

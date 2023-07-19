@@ -8,15 +8,16 @@
 
 import Foundation
 import UIKit
+import CommonKit
 
-extension String.adamantLocalized.wallets {
+extension String.adamant.wallets {
     enum erc20 {
         static func tokenWallet(_ token: String) -> String {
-            return String(format: NSLocalizedString("AccountTab.Wallets.erc20_wallet", comment: "Account tab: Ethereum wallet"), token)
+            return String(format: .localized("AccountTab.Wallets.erc20_wallet", comment: "Account tab: Ethereum wallet"), token)
         }
         
         static func sendToken(_ token: String) -> String {
-            return String(format: NSLocalizedString("AccountTab.Row.SendToken", comment: "Account tab: 'Send ERC20 tokens' button"), token)
+            return String(format: .localized("AccountTab.Row.SendToken", comment: "Account tab: 'Send ERC20 tokens' button"), token)
         }
     }
 }
@@ -27,12 +28,12 @@ class ERC20WalletViewController: WalletViewControllerBase {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        walletTitleLabel.text = String.adamantLocalized.wallets.erc20.tokenWallet(service?.tokenName ?? "")
+        walletTitleLabel.text = String.adamant.wallets.erc20.tokenWallet(service?.tokenName ?? "")
     }
     
     override func sendRowLocalizedLabel() -> NSAttributedString {
         let networkSymbol = service?.tokenNetworkSymbol ?? "ERC20"
-        let tokenSymbol = String.adamantLocalized.wallets.erc20.sendToken(service?.tokenSymbol ?? "")
+        let tokenSymbol = String.adamant.wallets.erc20.sendToken(service?.tokenSymbol ?? "")
         let currencyFont = UIFont.systemFont(ofSize: 17)
         let networkFont = currencyFont.withSize(8)
         let currencyAttributes: [NSAttributedString.Key: Any] = [.font: currencyFont]

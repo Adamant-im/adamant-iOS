@@ -8,6 +8,7 @@
 
 import Foundation
 import SafariServices
+import CommonKit
 
 extension AdamantUtilities {
     // MARK: Application version

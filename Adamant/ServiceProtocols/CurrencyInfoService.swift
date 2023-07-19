@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CommonKit
 
 extension Notification.Name {
     struct AdamantCurrencyInfoService {

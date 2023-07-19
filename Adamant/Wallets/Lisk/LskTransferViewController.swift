@@ -9,6 +9,7 @@
 import UIKit
 import Eureka
 import LiskKit
+import CommonKit
 
 final class LskTransferViewController: TransferViewControllerBase {
     
@@ -45,7 +46,7 @@ final class LskTransferViewController: TransferViewControllerBase {
             return
         }
         
-        dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
+        dialogService.showProgress(withMessage: String.adamant.transfer.transferProcessingMessage, userInteractionEnable: false)
         
         Task {
             do {
@@ -73,7 +74,7 @@ final class LskTransferViewController: TransferViewControllerBase {
                 }
                 
                 dialogService.dismissProgress()
-                dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                dialogService.showSuccess(withMessage: String.adamant.transfer.transferSuccess)
                 
                 // Present detail VC
                 presentDetailTransactionVC(
@@ -100,7 +101,7 @@ final class LskTransferViewController: TransferViewControllerBase {
             transaction.id = transactionId
             detailsVc.transaction = transaction
             detailsVc.service = service
-            detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+            detailsVc.senderName = String.adamant.transactionDetails.yourAddress
             detailsVc.recipientName = recipientName
             
             if comments.count > 0 {
@@ -146,7 +147,7 @@ final class LskTransferViewController: TransferViewControllerBase {
     override func recipientRow() -> BaseRow {
         let row = TextRow {
             $0.tag = BaseRows.address.tag
-            $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
+            $0.cell.textField.placeholder = String.adamant.newChat.addressPlaceholder
             $0.cell.textField.keyboardType = UIKeyboardType.alphabet
             $0.cell.textField.autocorrectionType = .no
             $0.cell.textField.setLineBreakMode()
@@ -172,6 +173,6 @@ final class LskTransferViewController: TransferViewControllerBase {
     }
     
     override func defaultSceneTitle() -> String? {
-        return String.adamantLocalized.sendLsk
+        return String.adamant.sendLsk
     }
 }

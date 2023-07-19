@@ -9,13 +9,14 @@
 import UIKit
 import Swinject
 import MarkdownKit
+import CommonKit
 
-extension String.adamantLocalized {
+extension String.adamant {
     enum search {
-        static let contacts = NSLocalizedString("SearchPage.Contacts", comment: "SearchPage: Contacts header")
-        static let messages = NSLocalizedString("SearchPage.Messages", comment: "SearchPage: Messages header")
-        static let newContactHeader = NSLocalizedString("SearchPage.Contact.New", comment: "SearchPage: Contacts header")
-        static let newContact = NSLocalizedString("SearchPage.Contact.Add.New", comment: "SearchPage: Contact new header")
+        static let contacts = String.localized("SearchPage.Contacts", comment: "SearchPage: Contacts header")
+        static let messages = String.localized("SearchPage.Messages", comment: "SearchPage: Messages header")
+        static let newContactHeader = String.localized("SearchPage.Contact.New", comment: "SearchPage: Contacts header")
+        static let newContact = String.localized("SearchPage.Contact.Add.New", comment: "SearchPage: Contact new header")
     }
 }
 
@@ -145,7 +146,7 @@ class SearchResultsViewController: UITableViewController {
             cell.avatarImageView.clipsToBounds = true
             cell.borderWidth = 0
             
-            if let avatarName = partner.avatar, let avatar = UIImage.init(named: avatarName) {
+            if let avatarName = partner.avatar, let avatar = UIImage.asset(named: avatarName) {
                 cell.avatarImage = avatar
             } else if let publicKey = partner.publicKey {
                 let image = avatarService.avatar(for: publicKey, size: 200)
@@ -167,7 +168,7 @@ class SearchResultsViewController: UITableViewController {
     
     private func configureCell(_ cell: ChatTableViewCell, for message: MessageTransaction) {
         if let partner = message.chatroom?.partner {
-            if let avatarName = partner.avatar, let avatar = UIImage.init(named: avatarName) {
+            if let avatarName = partner.avatar, let avatar = UIImage.asset(named: avatarName) {
                 cell.avatarImage = avatar
                 cell.avatarImageView.tintColor = UIColor.adamant.primary
             } else {
@@ -202,7 +203,7 @@ class SearchResultsViewController: UITableViewController {
     private func configureCell(_ cell: ChatTableViewCell, for partner: CoreDataAccount?) {
         guard let partner = partner else { return }
         
-        if let avatarName = partner.avatar, let avatar = UIImage.init(named: avatarName) {
+        if let avatarName = partner.avatar, let avatar = UIImage.asset(named: avatarName) {
             cell.avatarImage = avatar
             cell.avatarImageView.tintColor = UIColor.adamant.primary
         } else {
@@ -219,7 +220,7 @@ class SearchResultsViewController: UITableViewController {
         }
         
         cell.lastMessageLabel.text = partner.address
-        cell.accountLabel.text = .adamantLocalized.search.newContact
+        cell.accountLabel.text = .adamant.search.newContact
         cell.hasUnreadMessages = false
         cell.dateLabel.text = nil
     }
@@ -233,7 +234,7 @@ class SearchResultsViewController: UITableViewController {
             
             let raw: String
             if message.isOutgoing {
-                raw = "\(String.adamantLocalized.chatList.sentMessagePrefix)\(text)"
+                raw = "\(String.adamant.chatList.sentMessagePrefix)\(text)"
             } else {
                 raw = text
             }
@@ -282,9 +283,9 @@ class SearchResultsViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch defineSection(for: section) {
-        case .contacts: return String.adamantLocalized.search.contacts
-        case .messages: return String.adamantLocalized.search.messages
-        case .new: return String.adamantLocalized.search.newContactHeader
+        case .contacts: return String.adamant.search.contacts
+        case .messages: return String.adamant.search.messages
+        case .new: return String.adamant.search.newContactHeader
         case .none: return nil
         }
     }

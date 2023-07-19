@@ -8,6 +8,7 @@
 
 import UIKit
 import SnapKit
+import CommonKit
 
 final class ChatTransactionContentView: UIView {
     var model: Model = .default {

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CommonKit
 
 extension UIView {
     func animateIsSelected(_ value: Bool, originalColor: UIColor?) {

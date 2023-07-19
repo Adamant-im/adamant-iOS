@@ -10,6 +10,7 @@ import Combine
 import CoreData
 import MarkdownKit
 import UIKit
+import CommonKit
 
 @MainActor
 final class ChatViewModel: NSObject {
@@ -87,7 +88,7 @@ final class ChatViewModel: NSObject {
     
     var freeTokensURL: URL? {
         guard let address = accountService.account?.address else { return nil }
-        let urlString: String = .adamantLocalized.wallets.getFreeTokensUrl(for: address)
+        let urlString: String = .adamant.wallets.getFreeTokensUrl(for: address)
         
         guard let url = URL(string: urlString) else {
             dialog.send(.error(
@@ -346,7 +347,7 @@ final class ChatViewModel: NSObject {
             } catch {
                 switch error as? ChatsProviderError {
                 case .invalidTransactionStatus:
-                    dialog.send(.warning(.adamantLocalized.chat.cancelError))
+                    dialog.send(.warning(.adamant.chat.cancelError))
                 default:
                     dialog.send(.richError(error))
                 }
@@ -418,12 +419,12 @@ final class ChatViewModel: NSObject {
     func replyMessageIfNeeded(_ messageModel: MessageModel?) {
         let message = messages.first(where: { $0.messageId == messageModel?.id })
         guard message?.status != .failed else {
-            dialog.send(.warning(String.adamantLocalized.reply.failedMessageError))
+            dialog.send(.warning(String.adamant.reply.failedMessageError))
             return
         }
         
         guard message?.status != .pending else {
-            dialog.send(.warning(String.adamantLocalized.reply.pendingMessageError))
+            dialog.send(.warning(String.adamant.reply.pendingMessageError))
             return
         }
         
@@ -446,7 +447,7 @@ final class ChatViewModel: NSObject {
     
     func copyMessageAction(_ text: String) {
         UIPasteboard.general.string = text
-        dialog.send(.toast(.adamantLocalized.alert.copiedToPasteboardNotification))
+        dialog.send(.toast(.adamant.alert.copiedToPasteboardNotification))
     }
     
     func reportMessageAction(_ id: String) {
@@ -667,7 +668,7 @@ private extension ChatViewModel {
                 self.dialog.send(.progress(false))
                 if let apiError = apiError as? ApiServiceError,
                    case .internalError(let message, _) = apiError,
-                   message == String.adamantLocalized.sharedErrors.unknownError {
+                   message == String.adamant.sharedErrors.unknownError {
                     self.dialog.send(.alert(AccountsProviderError.notFound(address: address).localized))
                     return
                 }

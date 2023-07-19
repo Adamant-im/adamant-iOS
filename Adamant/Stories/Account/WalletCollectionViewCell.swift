@@ -9,6 +9,7 @@
 import UIKit
 import FreakingSimpleRoundImageView
 import Parchment
+import CommonKit
 
 class WalletCollectionViewCell: PagingCell {
     @IBOutlet weak var currencyImageView: UIImageView!
@@ -43,7 +44,7 @@ class WalletCollectionViewCell: PagingCell {
                 balanceLabel.text = AdamantBalanceFormat.short.format(balance)
             }
         } else {
-            balanceLabel.text = String.adamantLocalized.account.updatingBalance
+            balanceLabel.text = String.adamant.account.updatingBalance
         }
         
         if item.notifications > 0 {

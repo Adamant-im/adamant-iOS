@@ -8,6 +8,7 @@
 
 import UIKit
 import Eureka
+import CommonKit
 
 class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     
@@ -73,7 +74,7 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
                 haveChatroom = false
             }
             
-            let chatLabel = haveChatroom ? String.adamantLocalized.transactionList.toChat : String.adamantLocalized.transactionList.startChat
+            let chatLabel = haveChatroom ? String.adamant.transactionList.toChat : String.adamant.transactionList.startChat
             
             // MARK: Open chat
             if let trs = transaction as? TransferTransaction, trs.chatroom != nil, let section = form.sectionBy(tag: Sections.actions.tag) {

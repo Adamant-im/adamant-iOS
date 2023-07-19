@@ -8,8 +8,9 @@
 
 import UIKit
 import Eureka
+import CommonKit
 
-extension String.adamantLocalized {
+extension String.adamant {
     struct wallets {
         
         private init() {}
@@ -35,9 +36,9 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         
         var localized: String {
             switch self {
-            case .address: return NSLocalizedString("AccountTab.Row.Address", comment: "Account tab: 'Address' row")
-            case .balance: return NSLocalizedString("AccountTab.Row.Balance", comment: "Account tab: Balance row title")
-            case .send: return NSLocalizedString("AccountTab.Row.SendTokens", comment: "Account tab: 'Send tokens' button")
+            case .address: return .localized("AccountTab.Row.Address", comment: "Account tab: 'Address' row")
+            case .balance: return .localized("AccountTab.Row.Balance", comment: "Account tab: Balance row title")
+            case .send: return .localized("AccountTab.Row.SendTokens", comment: "Account tab: 'Send tokens' button")
             }
         }
     }
@@ -394,7 +395,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     ) -> BalanceRowValue {
         let cryptoString = isBalanceInitialized
         ? AdamantBalanceFormat.full.format(balance, withCurrencySymbol: symbol)
-        : String.adamantLocalized.account.updatingBalance
+        : String.adamant.account.updatingBalance
         
         let fiatString: String?
         if balance > 0, let symbol = symbol, let rate = currencyInfoService.getRate(for: symbol) {

@@ -108,7 +108,7 @@ extension DashWalletService: WalletServiceTwoStepSend {
             } else if let error = response.error?.message {
                 if error.lowercased().contains("16: tx-txlock-conflict") {
                     throw WalletServiceError.internalError(
-                        message: String.adamantLocalized.sharedErrors.walletFrezzed,
+                        message: String.adamant.sharedErrors.walletFrezzed,
                         error: nil
                     )
                 } else {

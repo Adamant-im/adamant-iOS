@@ -7,11 +7,10 @@
 //
 
 import Foundation
+import CommonKit
 
 protocol ServerResponseWithTimestamp {
     var nodeTimestamp: TimeInterval { get }
 }
 
-extension ServerResponse: ServerResponseWithTimestamp {
-    
-}
+extension ServerResponse: ServerResponseWithTimestamp {}

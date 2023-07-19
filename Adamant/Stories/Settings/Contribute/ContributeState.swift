@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import CommonKit
 
 struct ContributeState {
     var isCrashlyticsOn: Bool
@@ -23,34 +24,34 @@ struct ContributeState {
     static let initial = Self(
         isCrashlyticsOn: false,
         isCrashButtonOn: false,
-        name: NSLocalizedString(key: "AccountTab.Row.Contribute"),
-        crashliticsRowImage: UIImage(imageLiteralResourceName: "row_crashlytics"),
-        crashliticsRowName: NSLocalizedString(key: "Contribute.Section.Crashlytics"),
-        crashliticsRowDescription: NSLocalizedString(key: "Contribute.Section.CrashlyticsDescription"),
-        crashButtonTitle: NSLocalizedString(key: "Contribute.Section.SimulateCrash"),
+        name: .localized("AccountTab.Row.Contribute", comment: .empty),
+        crashliticsRowImage: .asset(named: "row_crashlytics") ?? .init(),
+        crashliticsRowName: .localized("Contribute.Section.Crashlytics", comment: .empty),
+        crashliticsRowDescription: .localized("Contribute.Section.CrashlyticsDescription", comment: .empty),
+        crashButtonTitle: .localized("Contribute.Section.SimulateCrash", comment: .empty),
         linkRows: [
             .init(
-                image: UIImage(imageLiteralResourceName: "row_nodes"),
-                name: NSLocalizedString(key: "Contribute.Section.RunNodes"),
-                description: NSLocalizedString(key: "Contribute.Section.RunNodesDescription"),
+                image: .asset(named: "row_nodes") ?? .init(),
+                name: .localized("Contribute.Section.RunNodes", comment: .empty),
+                description: .localized("Contribute.Section.RunNodesDescription", comment: .empty),
                 link: URL(string: "https://news.adamant.im/how-to-run-your-adamant-node-on-ubuntu-990e391e8fcc")
             ),
             .init(
-                image: UIImage(imageLiteralResourceName: "row_vote-delegates"),
-                name: NSLocalizedString(key: "Contribute.Section.NetworkDelegate"),
-                description: NSLocalizedString(key: "Contribute.Section.NetworkDelegateDescription"),
+                image: .asset(named: "row_vote-delegates") ?? .init(),
+                name: .localized("Contribute.Section.NetworkDelegate", comment: .empty),
+                description: .localized("Contribute.Section.NetworkDelegateDescription", comment: .empty),
                 link: URL(string: "https://news.adamant.im/how-to-become-an-adamant-delegate-745f01d032f")
             ),
             .init(
-                image: UIImage(imageLiteralResourceName: "row_github"),
-                name: NSLocalizedString(key: "Contribute.Section.CodeContribute"),
-                description: NSLocalizedString(key: "Contribute.Section.CodeContributeDescription"),
+                image: .asset(named: "row_github") ?? .init(),
+                name: .localized("Contribute.Section.CodeContribute", comment: .empty),
+                description: .localized("Contribute.Section.CodeContributeDescription", comment: .empty),
                 link: URL(string: "https://github.com/Adamant-im")
             ),
             .init(
-                image: UIImage(imageLiteralResourceName: "row_buy-coins"),
-                name: NSLocalizedString(key: "Contribute.Section.Donate"),
-                description: NSLocalizedString(key: "Contribute.Section.DonateDescription"),
+                image: .asset(named: "row_buy-coins") ?? .init(),
+                name: .localized("Contribute.Section.Donate", comment: .empty),
+                description: .localized("Contribute.Section.DonateDescription", comment: .empty),
                 link: URL(string: "https://adamant.im/donate")
             ),
         ]

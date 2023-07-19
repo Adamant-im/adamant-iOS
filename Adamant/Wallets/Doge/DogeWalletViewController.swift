@@ -7,11 +7,12 @@
 //
 
 import UIKit
+import CommonKit
 
-extension String.adamantLocalized {
-    static let doge = NSLocalizedString("AccountTab.Wallets.doge_wallet", comment: "Account tab: Doge wallet")
+extension String.adamant {
+    static let doge = String.localized("AccountTab.Wallets.doge_wallet", comment: "Account tab: Doge wallet")
     
-    static let sendDoge = NSLocalizedString("AccountTab.Row.SendDoge", comment: "Account tab: 'Send DOGE tokens' button")
+    static let sendDoge = String.localized("AccountTab.Row.SendDoge", comment: "Account tab: 'Send DOGE tokens' button")
 }
 
 class DogeWalletViewController: WalletViewControllerBase {
@@ -20,11 +21,11 @@ class DogeWalletViewController: WalletViewControllerBase {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        walletTitleLabel.text = String.adamantLocalized.doge
+        walletTitleLabel.text = String.adamant.doge
     }
     
     override func sendRowLocalizedLabel() -> NSAttributedString {
-        return NSAttributedString(string: String.adamantLocalized.sendDoge)
+        return NSAttributedString(string: String.adamant.sendDoge)
     }
     
     override func encodeForQr(address: String) -> String? {

@@ -8,6 +8,7 @@
 
 import CoreData
 import Combine
+import CommonKit
 
 actor AdamantRichTransactionStatusService: NSObject, RichTransactionStatusService {
     private let richProviders: [String: RichMessageProviderWithStatusCheck]

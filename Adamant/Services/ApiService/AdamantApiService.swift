@@ -8,6 +8,7 @@
 
 import UIKit
 import Alamofire
+import CommonKit
 
 final class AdamantApiService: ApiService {
     // MARK: - Shared constants
@@ -30,19 +31,19 @@ final class AdamantApiService: ApiService {
         var localized: String {
             switch self {
             case .endpointBuildFailed:
-                return NSLocalizedString("ApiService.InternalError.EndpointBuildFailed", comment: "Serious internal error: Failed to build endpoint url")
+                return .localized("ApiService.InternalError.EndpointBuildFailed", comment: "Serious internal error: Failed to build endpoint url")
                 
             case .signTransactionFailed:
-                return NSLocalizedString("ApiService.InternalError.FailedTransactionSigning", comment: "Serious internal error: Failed to sign transaction")
+                return .localized("ApiService.InternalError.FailedTransactionSigning", comment: "Serious internal error: Failed to sign transaction")
                 
             case .parsingFailed:
-                return NSLocalizedString("ApiService.InternalError.ParsingFailed", comment: "Serious internal error: Error parsing response")
+                return .localized("ApiService.InternalError.ParsingFailed", comment: "Serious internal error: Error parsing response")
                 
             case .unknownError:
-                return String.adamantLocalized.sharedErrors.unknownError
+                return String.adamant.sharedErrors.unknownError
             
             case .noNodesAvailable:
-                return NSLocalizedString("ApiService.InternalError.NoNodesAvailable", comment: "Serious internal error: No nodes available")
+                return .localized("ApiService.InternalError.NoNodesAvailable", comment: "Serious internal error: No nodes available")
             }
         }
     }

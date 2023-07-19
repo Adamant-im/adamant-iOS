@@ -8,17 +8,18 @@
 
 import UIKit
 import SnapKit
+import CommonKit
 
 // MARK: - Localization
-extension String.adamantLocalized {
+extension String.adamant {
     struct delegates {
-        static let title = NSLocalizedString("Delegates.Title", comment: "Delegates page: scene title")
+        static let title = String.localized("Delegates.Title", comment: "Delegates page: scene title")
         
-        static let notEnoughtTokensForVote = NSLocalizedString("Delegates.NotEnoughtTokensForVote", comment: "Delegates tab: Message about 50 ADM fee for vote")
+        static let notEnoughtTokensForVote = String.localized("Delegates.NotEnoughtTokensForVote", comment: "Delegates tab: Message about 50 ADM fee for vote")
         
-        static let timeOutBeforeNewVote = NSLocalizedString("Delegates.timeOutBeforeNewVote", comment: "Delegates tab: Message about time out for new vote")
+        static let timeOutBeforeNewVote = String.localized("Delegates.timeOutBeforeNewVote", comment: "Delegates tab: Message about time out for new vote")
         
-        static let success = NSLocalizedString("Delegates.Vote.Success", comment: "Delegates: Message for Successfull voting")
+        static let success = String.localized("Delegates.Vote.Success", comment: "Delegates: Message for Successfull voting")
         
         private init() { }
     }
@@ -175,7 +176,7 @@ final class DelegatesListViewController: KeyboardObservingViewController {
     }
     
     private func setupNavigationItem() {
-        navigationItem.title = String.adamantLocalized.delegates.title
+        navigationItem.title = String.adamant.delegates.title
         navigationItem.searchController = searchController
         
         navigationItem.rightBarButtonItem = .init(
@@ -278,7 +279,7 @@ extension DelegatesListViewController: AdamantDelegateCellDelegate {
 private extension DelegatesListViewController {
     func vote() {
         if forcedUpdateTimer != nil {
-            self.dialogService.showWarning(withMessage: String.adamantLocalized.delegates.timeOutBeforeNewVote)
+            self.dialogService.showWarning(withMessage: String.adamant.delegates.timeOutBeforeNewVote)
             return
         }
         
@@ -294,7 +295,7 @@ private extension DelegatesListViewController {
         }
         
         guard account.balance > Decimal(votingCost) else {
-            self.dialogService.showWarning(withMessage: String.adamantLocalized.delegates.notEnoughtTokensForVote)
+            self.dialogService.showWarning(withMessage: String.adamant.delegates.notEnoughtTokensForVote)
             return
         }
         
@@ -315,7 +316,7 @@ private extension DelegatesListViewController {
         apiService.voteForDelegates(from: account.address, keypair: keypair, votes: votes) { result in
             switch result {
             case .success:
-                self.dialogService.showSuccess(withMessage: String.adamantLocalized.delegates.success)
+                self.dialogService.showSuccess(withMessage: String.adamant.delegates.success)
 
                 checkedDelegates.forEach {
                     $1.isChecked = false

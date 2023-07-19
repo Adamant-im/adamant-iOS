@@ -201,7 +201,7 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
 extension ChatMessageCell {
     func makeContextMenu() -> UIMenu {
         let remove = UIAction(
-            title: .adamantLocalized.chat.remove,
+            title: .adamant.chat.remove,
             image: UIImage(systemName: "trash"),
             attributes: .destructive
         ) { _ in
@@ -209,14 +209,14 @@ extension ChatMessageCell {
         }
         
         let report = UIAction(
-            title: .adamantLocalized.chat.report,
+            title: .adamant.chat.report,
             image: UIImage(systemName: "exclamationmark.bubble")
         ) { _ in
             self.actionHandler(.report(id: self.model.id))
         }
         
         let reply = UIAction(
-            title: .adamantLocalized.chat.reply,
+            title: .adamant.chat.reply,
             image: UIImage(systemName: "arrowshape.turn.up.left")
         ) { [weak self] _ in
             guard let self = self else { return }
@@ -224,7 +224,7 @@ extension ChatMessageCell {
         }
         
         let copy = UIAction(
-            title: .adamantLocalized.chat.copy,
+            title: .adamant.chat.copy,
             image: UIImage(systemName: "doc.on.doc")
         ) { [weak self] _ in
             guard let self = self else { return }

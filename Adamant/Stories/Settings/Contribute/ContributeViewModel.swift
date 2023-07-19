@@ -8,6 +8,7 @@
 
 import SwiftUI
 import Combine
+import CommonKit
 
 @MainActor
 final class ContributeViewModel: ObservableObject {

@@ -8,6 +8,7 @@
 
 import Foundation
 import SocketIO
+import CommonKit
 
 class AdamantSocketService: SocketService {
 

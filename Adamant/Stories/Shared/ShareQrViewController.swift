@@ -9,9 +9,10 @@
 import UIKit
 import Eureka
 import Photos
+import CommonKit
 
-extension String.adamantLocalized.shared {
-    static let photolibraryNotAuthorized = NSLocalizedString("ShareQR.photolibraryNotAuthorized", comment: "ShareQR scene: User had not authorized access to write images to photolibrary")
+extension String.adamant.shared {
+    static let photolibraryNotAuthorized = String.localized("ShareQR.photolibraryNotAuthorized", comment: "ShareQR scene: User had not authorized access to write images to photolibrary")
 }
 
 class ShareQrViewController: FormViewController {
@@ -40,13 +41,13 @@ class ShareQrViewController: FormViewController {
                 return ""
             
             case .saveToPhotos:
-                return String.adamantLocalized.alert.saveToPhotolibrary
+                return String.adamant.alert.saveToPhotolibrary
                 
             case .shareButton:
-                return String.adamantLocalized.alert.share
+                return String.adamant.alert.share
                 
             case .cancelButton:
-                return String.adamantLocalized.alert.cancel
+                return String.adamant.alert.cancel
             }
         }
     }
@@ -124,7 +125,7 @@ class ShareQrViewController: FormViewController {
                 UIImageWriteToSavedPhotosAlbum(qrCode, self, #selector(self?.image(_: didFinishSavingWithError: contextInfo:)), nil)
                 
             case .restricted, .denied:
-                self?.dialogService.presentGoToSettingsAlert(title: nil, message: String.adamantLocalized.shared.photolibraryNotAuthorized)
+                self?.dialogService.presentGoToSettingsAlert(title: nil, message: String.adamant.shared.photolibraryNotAuthorized)
             @unknown default:
                 break
             }
@@ -154,7 +155,7 @@ class ShareQrViewController: FormViewController {
                     if let error = error {
                         self?.dialogService.showWarning(withMessage: error.localizedDescription)
                     } else {
-                        self?.dialogService.showSuccess(withMessage: String.adamantLocalized.alert.done)
+                        self?.dialogService.showSuccess(withMessage: String.adamant.alert.done)
                     }
                     self?.close()
                 }
@@ -185,9 +186,9 @@ class ShareQrViewController: FormViewController {
     
     @objc private func image(_ image: UIImage, didFinishSavingWithError error: NSError?, contextInfo: UnsafeRawPointer) {
         if error != nil {
-            dialogService.presentGoToSettingsAlert(title: String.adamantLocalized.shared.photolibraryNotAuthorized, message: nil)
+            dialogService.presentGoToSettingsAlert(title: String.adamant.shared.photolibraryNotAuthorized, message: nil)
         } else {
-            dialogService.showSuccess(withMessage: String.adamantLocalized.alert.done)
+            dialogService.showSuccess(withMessage: String.adamant.alert.done)
             close()
         }
     }

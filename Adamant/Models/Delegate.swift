@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CommonKit
 
 class Delegate: Decodable {
     let username: String

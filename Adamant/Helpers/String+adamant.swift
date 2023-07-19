@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import CommonKit
 
 struct AdamantAddress {
     let address: String

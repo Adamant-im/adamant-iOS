@@ -9,6 +9,7 @@
 import UIKit
 import Eureka
 import QRCodeReader
+import CommonKit
 
 // MARK: - Transfer Delegate Protocol
 
@@ -18,37 +19,37 @@ protocol TransferViewControllerDelegate: AnyObject {
 }
 
 // MARK: - Localization
-extension String.adamantLocalized {
+extension String.adamant {
     struct transfer {
-        static let addressPlaceholder = NSLocalizedString("TransferScene.Recipient.Placeholder", comment: "Transfer: recipient address placeholder")
-        static let amountPlaceholder = NSLocalizedString("TransferScene.Amount.Placeholder", comment: "Transfer: transfer amount placeholder")
+        static let addressPlaceholder = String.localized("TransferScene.Recipient.Placeholder", comment: "Transfer: recipient address placeholder")
+        static let amountPlaceholder = String.localized("TransferScene.Amount.Placeholder", comment: "Transfer: transfer amount placeholder")
         
-        static let addressValidationError = NSLocalizedString("TransferScene.Error.InvalidAddress", comment: "Transfer: Address validation error")
-        static let amountZeroError = NSLocalizedString("TransferScene.Error.TooLittleMoney", comment: "Transfer: Amount is zero, or even negative notification")
-        static let notEnoughFeeError = NSLocalizedString("TransferScene.Error.TooLittleFee", comment: "Transfer: Not enough fee for send a transaction")
-        static let feeIsTooHigh = NSLocalizedString("TransferScene.Error.FeeIsTooHigh", comment: "Transfer: Fee is higher than usual")
-        static let amountTooHigh = NSLocalizedString("TransferScene.Error.notEnoughMoney", comment: "Transfer: Amount is hiegher that user's total money notification")
-        static let accountNotFound = NSLocalizedString("TransferScene.Error.AddressNotFound", comment: "Transfer: Address not found error")
+        static let addressValidationError = String.localized("TransferScene.Error.InvalidAddress", comment: "Transfer: Address validation error")
+        static let amountZeroError = String.localized("TransferScene.Error.TooLittleMoney", comment: "Transfer: Amount is zero, or even negative notification")
+        static let notEnoughFeeError = String.localized("TransferScene.Error.TooLittleFee", comment: "Transfer: Not enough fee for send a transaction")
+        static let feeIsTooHigh = String.localized("TransferScene.Error.FeeIsTooHigh", comment: "Transfer: Fee is higher than usual")
+        static let amountTooHigh = String.localized("TransferScene.Error.notEnoughMoney", comment: "Transfer: Amount is hiegher that user's total money notification")
+        static let accountNotFound = String.localized("TransferScene.Error.AddressNotFound", comment: "Transfer: Address not found error")
         
-        static let transferProcessingMessage = NSLocalizedString("TransferScene.SendingFundsProgress", comment: "Transfer: Processing message")
-        static let transferSuccess = NSLocalizedString("TransferScene.TransferSuccessMessage", comment: "Transfer: Tokens transfered successfully message")
+        static let transferProcessingMessage = String.localized("TransferScene.SendingFundsProgress", comment: "Transfer: Processing message")
+        static let transferSuccess = String.localized("TransferScene.TransferSuccessMessage", comment: "Transfer: Tokens transfered successfully message")
         
-        static let send = NSLocalizedString("TransferScene.Send", comment: "Transfer: Send button")
+        static let send = String.localized("TransferScene.Send", comment: "Transfer: Send button")
         
-        static let cantUndo = NSLocalizedString("TransferScene.CantUndo", comment: "Transfer: Send button")
+        static let cantUndo = String.localized("TransferScene.CantUndo", comment: "Transfer: Send button")
         
-        static let useMaxToTransfer = NSLocalizedString("TransferScene.UseMaxToTransfer", comment: "Tranfser: Confirm using maximum available for transfer tokens as amount to transfer.")
+        static let useMaxToTransfer = String.localized("TransferScene.UseMaxToTransfer", comment: "Tranfser: Confirm using maximum available for transfer tokens as amount to transfer.")
         
         private init() { }
     }
 }
 
-fileprivate extension String.adamantLocalized.alert {
-    static let confirmSendMessageFormat = NSLocalizedString("TransferScene.SendConfirmFormat", comment: "Transfer: Confirm transfer %1$@ tokens to %2$@ message. Note two variables: at runtime %1$@ will be amount (with ADM suffix), and %2$@ will be recipient address. You can use address before amount with this so called 'position tokens'.")
+fileprivate extension String.adamant.alert {
+    static let confirmSendMessageFormat = String.localized("TransferScene.SendConfirmFormat", comment: "Transfer: Confirm transfer %1$@ tokens to %2$@ message. Note two variables: at runtime %1$@ will be amount (with ADM suffix), and %2$@ will be recipient address. You can use address before amount with this so called 'position tokens'.")
     static func confirmSendMessage(formattedAmount amount: String, recipient: String) -> String {
-        return String.localizedStringWithFormat(String.adamantLocalized.alert.confirmSendMessageFormat, "\(amount)", recipient)
+        return String.localizedStringWithFormat(String.adamant.alert.confirmSendMessageFormat, "\(amount)", recipient)
     }
-    static let send = NSLocalizedString("TransferScene.Send", comment: "Transfer: Confirm transfer alert: Send tokens button")
+    static let send = String.localized("TransferScene.Send", comment: "Transfer: Confirm transfer alert: Send tokens button")
 }
 
 // MARK: -
@@ -87,17 +88,17 @@ class TransferViewControllerBase: FormViewController {
         
         var localized: String {
             switch self {
-            case .balance: return NSLocalizedString("TransferScene.Row.Balance", comment: "Transfer: logged user balance.")
-            case .amount: return NSLocalizedString("TransferScene.Row.Amount", comment: "Transfer: amount of adamant to transfer.")
-            case .fiat: return NSLocalizedString("TransferScene.Row.Fiat", comment: "Transfer: fiat value of crypto-amout")
-            case .maxToTransfer: return NSLocalizedString("TransferScene.Row.MaxToTransfer", comment: "Transfer: maximum amount to transfer: available account money substracting transfer fee")
-            case .name: return NSLocalizedString("TransferScene.Row.RecipientName", comment: "Transfer: recipient name")
-            case .address: return NSLocalizedString("TransferScene.Row.RecipientAddress", comment: "Transfer: recipient address")
-            case .fee: return NSLocalizedString("TransferScene.Row.TransactionFee", comment: "Transfer: transfer fee")
-            case .total: return NSLocalizedString("TransferScene.Row.Total", comment: "Transfer: total amount of transaction: money to transfer adding fee")
-            case .comments: return NSLocalizedString("TransferScene.Row.Comments", comment: "Transfer: transfer comment")
-            case .sendButton: return String.adamantLocalized.transfer.send
-            case .increaseFee: return NSLocalizedString("TransferScene.Row.IncreaseFee", comment: "Transfer: transfer increase fee")
+            case .balance: return .localized("TransferScene.Row.Balance", comment: "Transfer: logged user balance.")
+            case .amount: return .localized("TransferScene.Row.Amount", comment: "Transfer: amount of adamant to transfer.")
+            case .fiat: return .localized("TransferScene.Row.Fiat", comment: "Transfer: fiat value of crypto-amout")
+            case .maxToTransfer: return .localized("TransferScene.Row.MaxToTransfer", comment: "Transfer: maximum amount to transfer: available account money substracting transfer fee")
+            case .name: return .localized("TransferScene.Row.RecipientName", comment: "Transfer: recipient name")
+            case .address: return .localized("TransferScene.Row.RecipientAddress", comment: "Transfer: recipient address")
+            case .fee: return .localized("TransferScene.Row.TransactionFee", comment: "Transfer: transfer fee")
+            case .total: return .localized("TransferScene.Row.Total", comment: "Transfer: total amount of transaction: money to transfer adding fee")
+            case .comments: return .localized("TransferScene.Row.Comments", comment: "Transfer: transfer comment")
+            case .sendButton: return String.adamant.transfer.send
+            case .increaseFee: return .localized("TransferScene.Row.IncreaseFee", comment: "Transfer: transfer increase fee")
             }
         }
     }
@@ -119,10 +120,10 @@ class TransferViewControllerBase: FormViewController {
         
         var localized: String {
             switch self {
-            case .wallet: return NSLocalizedString("TransferScene.Section.YourWallet", comment: "Transfer: 'Your wallet' section")
-            case .recipient: return NSLocalizedString("TransferScene.Section.Recipient", comment: "Transfer: 'Recipient info' section")
-            case .transferInfo: return NSLocalizedString("TransferScene.Section.TransferInfo", comment: "Transfer: 'Transfer info' section")
-            case .comments: return NSLocalizedString("TransferScene.Row.Comments", comment: "Transfer: transfer comment")
+            case .wallet: return .localized("TransferScene.Section.YourWallet", comment: "Transfer: 'Your wallet' section")
+            case .recipient: return .localized("TransferScene.Section.Recipient", comment: "Transfer: 'Recipient info' section")
+            case .transferInfo: return .localized("TransferScene.Section.TransferInfo", comment: "Transfer: 'Transfer info' section")
+            case .comments: return .localized("TransferScene.Row.Comments", comment: "Transfer: transfer comment")
             }
         }
     }
@@ -252,7 +253,7 @@ class TransferViewControllerBase: FormViewController {
     lazy var qrReader: QRCodeReaderViewController = {
         let builder = QRCodeReaderViewControllerBuilder {
             $0.reader = QRCodeReader(metadataObjectTypes: [.qr ], captureDevicePosition: .back)
-            $0.cancelButtonTitle = String.adamantLocalized.alert.cancel
+            $0.cancelButtonTitle = String.adamant.alert.cancel
             $0.showSwitchCameraButton = false
         }
         
@@ -386,7 +387,7 @@ class TransferViewControllerBase: FormViewController {
         previousIsReadyToSend = isReadyToSend()
         
         let doneBtn = UIBarButtonItem(barButtonSystemItem: .done, target: view, action: view.doneButton.action)
-        let sendBtn = UIBarButtonItem(title: String.adamantLocalized.transfer.send, style: .done, target: view, action: view.doneButton.action)
+        let sendBtn = UIBarButtonItem(title: String.adamant.transfer.send, style: .done, target: view, action: view.doneButton.action)
         view.doneButton = isReadyToSend() ? sendBtn : doneBtn
         if (view.items?.count ?? 0) > 4 {
             view.items?.remove(at: 4)
@@ -639,7 +640,7 @@ class TransferViewControllerBase: FormViewController {
         validateForm(force: true)
 
         guard let recipientAddress = recipientAddress else {
-            dialogService.showWarning(withMessage: .adamantLocalized.transfer.addressValidationError)
+            dialogService.showWarning(withMessage: .adamant.transfer.addressValidationError)
             return
         }
         
@@ -647,7 +648,7 @@ class TransferViewControllerBase: FormViewController {
         guard validationResult.isValid else {
             dialogService.showWarning(
                 withMessage: validationResult.errorDescription
-                    ?? .adamantLocalized.transfer.addressValidationError
+                    ?? .adamant.transfer.addressValidationError
             )
             return
         }
@@ -655,18 +656,18 @@ class TransferViewControllerBase: FormViewController {
         guard let amount = amount,
               amount > 0
         else {
-            dialogService.showWarning(withMessage: String.adamantLocalized.transfer.amountZeroError)
+            dialogService.showWarning(withMessage: String.adamant.transfer.amountZeroError)
             return
         }
         
         guard amount <= maxToTransfer else {
-            dialogService.showWarning(withMessage: String.adamantLocalized.transfer.amountTooHigh)
+            dialogService.showWarning(withMessage: String.adamant.transfer.amountTooHigh)
             return
         }
         
         do {
             guard try await amount >= minToTransfer else {
-                dialogService.showWarning(withMessage: .adamantLocalized.transfer.amountZeroError)
+                dialogService.showWarning(withMessage: .adamant.transfer.amountZeroError)
                 return
             }
         } catch {
@@ -675,7 +676,7 @@ class TransferViewControllerBase: FormViewController {
         }
         
         guard isEnoughFee() else {
-            dialogService.showWarning(withMessage: String.adamantLocalized.transfer.notEnoughFeeError)
+            dialogService.showWarning(withMessage: String.adamant.transfer.notEnoughFeeError)
             return
         }
         
@@ -696,11 +697,11 @@ class TransferViewControllerBase: FormViewController {
         }
         
         let formattedAmount = balanceFormatter.string(from: amount as NSDecimalNumber)!
-        let title = String.adamantLocalized.alert.confirmSendMessage(formattedAmount: formattedAmount, recipient: recipient)
+        let title = String.adamant.alert.confirmSendMessage(formattedAmount: formattedAmount, recipient: recipient)
         
-        let alert = UIAlertController(title: title, message: String.adamantLocalized.transfer.cantUndo, preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: String.adamantLocalized.alert.cancel , style: .cancel, handler: nil)
-        let sendAction = UIAlertAction(title: String.adamantLocalized.alert.send, style: .default) { [weak self] _ in
+        let alert = UIAlertController(title: title, message: String.adamant.transfer.cantUndo, preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: String.adamant.alert.cancel , style: .cancel, handler: nil)
+        let sendAction = UIAlertAction(title: String.adamant.alert.send, style: .default) { [weak self] _ in
             self?.sendFunds()
         }
         
@@ -953,9 +954,9 @@ extension TransferViewControllerBase {
                     return
                 }
                 
-                let alert = UIAlertController(title: String.adamantLocalized.transfer.useMaxToTransfer, message: nil, preferredStyle: .alert)
-                let cancelAction = UIAlertAction(title: String.adamantLocalized.alert.cancel , style: .cancel, handler: nil)
-                let confirmAction = UIAlertAction(title: String.adamantLocalized.alert.ok, style: .default) { [weak self] _ in
+                let alert = UIAlertController(title: String.adamant.transfer.useMaxToTransfer, message: nil, preferredStyle: .alert)
+                let cancelAction = UIAlertAction(title: String.adamant.alert.cancel , style: .cancel, handler: nil)
+                let confirmAction = UIAlertAction(title: String.adamant.alert.ok, style: .default) { [weak self] _ in
                     guard let amountRow: SafeDecimalRow = self?.form.rowBy(tag: BaseRows.amount.tag) else {
                         return
                     }
@@ -977,7 +978,7 @@ extension TransferViewControllerBase {
         case .amount:
             return SafeDecimalRow { [weak self] row in
                 row.title = BaseRows.amount.localized
-                row.placeholder = String.adamantLocalized.transfer.amountPlaceholder
+                row.placeholder = String.adamant.transfer.amountPlaceholder
                 row.tag = BaseRows.amount.tag
                 row.formatter = self?.balanceFormatter
                 
@@ -1110,7 +1111,7 @@ extension TransferViewControllerBase {
         return DoubleDetail(
             first: "\(feeRaw) ~\(fiatRaw)",
             second: isWarningGasPrice
-            ? String.adamantLocalized.transfer.feeIsTooHigh
+            ? String.adamant.transfer.feeIsTooHigh
             : nil
         )
     }
