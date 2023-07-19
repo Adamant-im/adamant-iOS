@@ -114,21 +114,21 @@ private extension ContextMenuOverlayView {
     
     func makeUpperContentView(upperContentView: some View) -> some View {
         HStack {
-            if viewModel.menuAlignment == .trailing {
-                Spacer()
-            }
             upperContentView
-                .frame(width: viewModel.upperContentSize.width, height: viewModel.upperContentSize.height)
+                .frame(
+                    width: viewModel.upperContentSize.width,
+                    height: viewModel.upperContentSize.height
+                )
                 .padding(.top,
                          viewModel.isContextMenuVisible
                          ? viewModel.finalOffsetForUpperContentView
                          : viewModel.startOffsetForUpperContentView
                 )
                 .padding(.leading, viewModel.upperContentViewLocation.x)
-            if viewModel.menuAlignment == .leading {
-                Spacer()
-            }
+            Spacer()
         }
+        .frame(width: .infinity, height: .infinity)
+        .edgesIgnoringSafeArea(.all)
     }
     
 }

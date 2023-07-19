@@ -18,7 +18,7 @@ class ContextMenuOverlayViewModel: ObservableObject {
     
     var upperContentViewLocation: CGPoint = .zero
     var menuLocation: CGPoint = .zero
-    var menuWidth: CGFloat = 300
+    var menuWidth: CGFloat = 250
     
     var finalOffsetForContentView: CGFloat = .zero
     var finalOffsetForUpperContentView: CGFloat = .zero
