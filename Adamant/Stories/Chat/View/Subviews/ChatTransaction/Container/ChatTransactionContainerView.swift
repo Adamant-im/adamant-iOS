@@ -109,9 +109,6 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
     private lazy var chatMenuManager: ChatMenuManager = {
         let manager = ChatMenuManager(
             menu: makeContextMenu(),
-            menuAlignment: model.isFromCurrentSender
-            ? Alignment.trailing
-            : Alignment.leading,
             emojiService: chatMessagesListViewModel?.emojiService
         )
         manager.delegate = self
@@ -177,9 +174,6 @@ private extension ChatTransactionContainerView {
         contentView.model = model.content
         updateStatus(model.status)
         updateLayout()
-        chatMenuManager.menuAlignment = model.isFromCurrentSender
-        ? Alignment.trailing
-        : Alignment.leading
         chatMenuManager.selectedEmoji = getReaction(for: model.address)
         
         ownReactionLabel.isHidden = getReaction(for: model.address) == nil

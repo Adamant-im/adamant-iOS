@@ -12,17 +12,14 @@ class ContextMenuOverlayViewModel: ObservableObject {
     let contentViewSize: CGSize
     let locationOnScreen: CGPoint
     let menu: UIMenu
-    let menuAlignment: Alignment
     let upperContentView: AnyView?
     let upperContentSize: CGSize
     
     var upperContentViewLocation: CGPoint = .zero
+    var contentViewLocation: CGPoint = .zero
     var menuLocation: CGPoint = .zero
     var menuWidth: CGFloat = 250
-    
-    var finalOffsetForContentView: CGFloat = .zero
-    var finalOffsetForUpperContentView: CGFloat = .zero
-    
+        
     var startOffsetForContentView: CGFloat {
         locationOnScreen.y
     }
@@ -63,7 +60,6 @@ class ContextMenuOverlayViewModel: ObservableObject {
         contentViewSize: CGSize,
         locationOnScreen: CGPoint,
         menu: UIMenu,
-        menuAlignment: Alignment,
         upperContentView: AnyView?,
         upperContentSize: CGSize
     ) {
@@ -71,12 +67,10 @@ class ContextMenuOverlayViewModel: ObservableObject {
         self.contentViewSize = contentViewSize
         self.locationOnScreen = locationOnScreen
         self.menu = menu
-        self.menuAlignment = menuAlignment
         self.upperContentView = upperContentView
         self.upperContentSize = upperContentSize
         
-        finalOffsetForContentView = calculateOffsetForContentView()
-        finalOffsetForUpperContentView = calculateOffsetForUpperContentView()
+        contentViewLocation = calculateContentViewLocation()
         menuLocation = calculateMenuLocation()
         upperContentViewLocation = calculateUpperContentViewLocation()
     }
@@ -92,12 +86,19 @@ class ContextMenuOverlayViewModel: ObservableObject {
 }
 
 private extension ContextMenuOverlayViewModel {
+    func calculateContentViewLocation() -> CGPoint {
+        .init(
+            x: locationOnScreen.x,
+            y: calculateOffsetForContentView()
+        )
+    }
+    
     func calculateUpperContentViewLocation() -> CGPoint {
         .init(
             x: isNeedToMoveFromTrailing()
             ? calculateLeadingOffset(for: upperContentSize.width)
             : locationOnScreen.x,
-            y: .zero
+            y: calculateOffsetForUpperContentView()
         )
     }
     

@@ -35,10 +35,6 @@ struct ContextMenuOverlayViewMac: View {
             withAnimation(.easeInOut(duration: animationDuration)) {
                 viewModel.isContextMenuVisible.toggle()
             }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + animationDuration) {
-                viewModel.delegate?.didDisplay()
-            }
         }
     }
 }
@@ -60,14 +56,9 @@ private extension ContextMenuOverlayViewMac {
     func makeMenuView() -> some View {
         HStack {
             MenuView(menu: viewModel.menu)
-                .padding(.top, viewModel.locationOnScreen.y)
-                .padding(.leading, viewModel.locationOnScreen.x)
-                .background(GeometryReader { menuGeometry in
-                    Color.clear
-                        .onAppear {
-                            viewModel.menuHeight = menuGeometry.size.height
-                        }
-                })
+                .frame(width: viewModel.menuWidth)
+                .padding(.top, viewModel.menuLocation.y)
+                .padding(.leading, viewModel.menuLocation.x)
                 .transition(.opacity)
             Spacer()
         }
@@ -94,13 +85,8 @@ private extension ContextMenuOverlayViewMac {
                     width: viewModel.upperContentSize.width,
                     height: viewModel.upperContentSize.height
                 )
-                .padding(
-                    .top,
-                    viewModel.locationOnScreen.y
-                    - viewModel.upperContentSize.height
-                    - minContentsSpace
-                )
-                .padding(.leading, viewModel.locationOnScreen.x)
+                .padding(.top, viewModel.upperContentViewLocation.y)
+                .padding(.leading, viewModel.upperContentViewLocation.x)
             Spacer()
         }
         .frame(width: .infinity, height: .infinity)
@@ -110,4 +96,3 @@ private extension ContextMenuOverlayViewMac {
 }
 
 private let animationDuration: TimeInterval = 0.2
-private let minContentsSpace: CGFloat = 10

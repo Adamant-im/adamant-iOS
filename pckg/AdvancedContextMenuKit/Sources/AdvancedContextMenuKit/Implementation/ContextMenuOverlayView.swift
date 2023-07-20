@@ -9,7 +9,6 @@ import SwiftUI
 
 protocol OverlayViewDelegate: AnyObject {
     func didDissmis()
-    func didDisplay()
 }
 
 struct ContextMenuOverlayView: View {
@@ -44,10 +43,6 @@ struct ContextMenuOverlayView: View {
             withAnimation(.easeInOut(duration: animationDuration)) {
                 viewModel.isContextMenuVisible.toggle()
             }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + animationDuration) {
-                viewModel.delegate?.didDisplay()
-            }
         }
     }
 }
@@ -77,10 +72,10 @@ private extension ContextMenuOverlayView {
                 )
                 .padding(.top,
                          viewModel.isContextMenuVisible
-                         ? viewModel.finalOffsetForContentView
+                         ? viewModel.contentViewLocation.y
                          : viewModel.startOffsetForContentView
                 )
-                .padding(.leading, viewModel.locationOnScreen.x)
+                .padding(.leading, viewModel.contentViewLocation.x)
             Spacer()
         }
         .frame(width: .infinity, height: .infinity)
@@ -121,7 +116,7 @@ private extension ContextMenuOverlayView {
                 )
                 .padding(.top,
                          viewModel.isContextMenuVisible
-                         ? viewModel.finalOffsetForUpperContentView
+                         ? viewModel.upperContentViewLocation.y
                          : viewModel.startOffsetForUpperContentView
                 )
                 .padding(.leading, viewModel.upperContentViewLocation.x)

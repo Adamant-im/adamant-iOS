@@ -20,14 +20,12 @@ final class ChatMenuManager: NSObject, AdvancedContextMenuManagerDelegate {
     private let emojiService: EmojiService?
     
     weak var delegate: ChatMenuManagerDelegate?
-    var menuAlignment: Alignment
     var selectedEmoji: String?
     
     // MARK: Init
     
-    init(menu: UIMenu, menuAlignment: Alignment, emojiService: EmojiService?) {
+    init(menu: UIMenu, emojiService: EmojiService?) {
         self.menu = menu
-        self.menuAlignment = menuAlignment
         self.emojiService = emojiService
         
         super.init()
@@ -35,10 +33,6 @@ final class ChatMenuManager: NSObject, AdvancedContextMenuManagerDelegate {
     
     func configureContextMenu() -> UIMenu {
         menu
-    }
-    
-    func configureContextMenuAlignment() -> Alignment {
-        menuAlignment
     }
     
     func configureUpperContentViewSize() -> CGSize {
@@ -63,7 +57,7 @@ extension ChatMenuManager: ChatReactionsViewDelegate, ElegantEmojiPickerDelegate
     }
     
     func didTapMore() {
-        DispatchQueue.main.async {
+        DispatchQueue.onMainAsync {
             let config = ElegantConfiguration(
                 showRandom: false,
                 showReset: false,
@@ -71,17 +65,8 @@ extension ChatMenuManager: ChatReactionsViewDelegate, ElegantEmojiPickerDelegate
             )
             let picker = ElegantEmojiPicker(delegate: self, configuration: config)
             picker.definesPresentationContext = true
-            self.topMostController().present(picker, animated: true)
+            self.rootViewController()?.present(picker, animated: true)
         }
-    }
-    
-    func topMostController() -> UIViewController {
-        UIApplication.shared.windows.filter {$0.isKeyWindow}.first
-        var topController: UIViewController = UIApplication.shared.keyWindow!.rootViewController!
-        while (topController.presentedViewController != nil) {
-            topController = topController.presentedViewController!
-        }
-        return topController
     }
     
     func emojiPicker (
@@ -94,69 +79,15 @@ extension ChatMenuManager: ChatReactionsViewDelegate, ElegantEmojiPickerDelegate
     }
 }
 
-final class ChatMenuManagerOld: NSObject, UIContextMenuInteractionDelegate {
-    private let menu: UIMenu
-    
-    var backgroundColor: UIColor?
-    
-    // MARK: Init
-    
-    init(menu: UIMenu, backgroundColor: UIColor?) {
-        self.menu = menu
-        self.backgroundColor = backgroundColor
+private extension ChatMenuManager {
+    func rootViewController() -> UIViewController? {
+        let allScenes = UIApplication.shared.connectedScenes
+        let scene = allScenes.first { $0.activationState == .foregroundActive }
         
-        super.init()
-    }
-    
-    func contextMenuInteraction(
-        _ interaction: UIContextMenuInteraction,
-        configurationForMenuAtLocation location: CGPoint
-    ) -> UIContextMenuConfiguration? {
-        return UIContextMenuConfiguration(actionProvider: { [weak self] _ in
-            guard let self = self else { return nil }
-            return self.menu
-        })
-    }
-    
-    func contextMenuInteraction(
-        _ interaction: UIContextMenuInteraction,
-        configuration: UIContextMenuConfiguration,
-        highlightPreviewForItemWithIdentifier identifier: NSCopying
-    ) -> UITargetedPreview? {
-        guard let backgroundColor = backgroundColor else { return nil }
-        
-        return makeTargetedPreview(
-            for: configuration,
-            interaction: interaction,
-            backgroundColor: backgroundColor
-        )
-    }
-    
-    func contextMenuInteraction(
-        _ interaction: UIContextMenuInteraction,
-        configuration: UIContextMenuConfiguration,
-        dismissalPreviewForItemWithIdentifier identifier: NSCopying
-    ) -> UITargetedPreview? {
-        guard backgroundColor != nil else {
-            return makeTargetedPreview(
-                for: configuration,
-                interaction: interaction,
-                backgroundColor: .clear
-            )
+        guard let windowScene = scene as? UIWindowScene else {
+            return nil
         }
         
-        return nil
-    }
-    
-    private func makeTargetedPreview(
-        for configuration: UIContextMenuConfiguration,
-        interaction: UIContextMenuInteraction,
-        backgroundColor: UIColor
-    ) -> UITargetedPreview? {
-        guard let view = interaction.view else { return nil }
-        
-        let parameters = UIPreviewParameters()
-        parameters.backgroundColor = backgroundColor
-        return UITargetedPreview(view: view, parameters: parameters)
+        return windowScene.keyWindow?.rootViewController
     }
 }

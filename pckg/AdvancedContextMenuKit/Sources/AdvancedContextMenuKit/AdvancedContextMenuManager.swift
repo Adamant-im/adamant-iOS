@@ -8,19 +8,13 @@
 import SwiftUI
 import UIKit
 
-public protocol AdvancedContextMenuManagerDelegate: NSObject {
-    func getPreviewView(for contentView: UIView) -> UIView?
+public protocol AdvancedContextMenuManagerDelegate: AnyObject {
     func getUpperContentView() -> AnyView?
     func configureUpperContentViewSize() -> CGSize
     func configureContextMenu() -> UIMenu
-    func configureContextMenuAlignment() -> Alignment
 }
 
 public extension AdvancedContextMenuManagerDelegate {
-    func getPreviewView(for contentView: UIView) -> UIView? {
-        nil
-    }
-    
     func getUpperContentView() -> AnyView? {
         nil
     }
@@ -33,9 +27,10 @@ public extension AdvancedContextMenuManagerDelegate {
 public class AdvancedContextMenuManager: NSObject {
     private var contentView: UIView?
     private var overlayVC: UIHostingController<ContextMenuOverlayView>?
-    private var viewModel: ContextMenuOverlayViewModel?
-    private weak var delegate: AdvancedContextMenuManagerDelegate?
     private var overlayVCMac: UIHostingController<ContextMenuOverlayViewMac>?
+    private var viewModel: ContextMenuOverlayViewModel?
+    private var viewModelMac: ContextMenuOverlayViewModelMac?
+    private weak var delegate: AdvancedContextMenuManagerDelegate?
     
     var isiOSAppOnMac: Bool = {
 #if targetEnvironment(macCatalyst)
@@ -49,10 +44,14 @@ public class AdvancedContextMenuManager: NSObject {
 #endif
     }()
     
+    // MARK: Init
+    
     public init(delegate: AdvancedContextMenuManagerDelegate) {
         self.delegate = delegate
     }
-
+    
+    // MARK: Public
+    
     public func setup(for contentView: UIView ) {
         let longPressGesture = UILongPressGestureRecognizer(
             target: self,
@@ -64,8 +63,13 @@ public class AdvancedContextMenuManager: NSObject {
     
     public func dismiss() {
         viewModel?.dismiss()
+        viewModelMac?.dismiss()
     }
-    
+}
+
+// MARK: Private
+
+private extension AdvancedContextMenuManager {
     @objc func handleLongPressMacOS(_ gesture: UILongPressGestureRecognizer) {
         guard gesture.state == .began,
               let menu = delegate?.configureContextMenu()
@@ -75,41 +79,39 @@ public class AdvancedContextMenuManager: NSObject {
         
         presentOverlayForMac(
             location: location,
-            menu: menu,
-            completion: nil
+            menu: menu
         )
     }
     
     @objc func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
-//        if isiOSAppOnMac {
-//            handleLongPressMacOS(gesture)
-//            return
-//        }
+        if isiOSAppOnMac {
+            handleLongPressMacOS(gesture)
+            return
+        }
         
         guard gesture.state == .began,
               let contentView = gesture.view,
-              let menu = delegate?.configureContextMenu(),
-              let menuAlignment = delegate?.configureContextMenuAlignment()
+              let menu = delegate?.configureContextMenu()
         else { return }
             
-        let window = UIApplication.shared.keyWindow
-        let locationOnScreen = contentView.convert(CGPoint.zero, to: window)
+        let locationOnScreen = contentView.convert(CGPoint.zero, to: nil)
         
         let size = contentView.frame.size
         
         UIView.animate(withDuration: 0.29) {
             contentView.transform = .init(scaleX: 0.9, y: 0.9)
-        } completion: { _ in
+        } completion: { [weak self] _ in
+            guard let self = self else { return }
+            
             self.contentView = contentView
             
             let previewView = contentView.snapshotView(afterScreenUpdates: true) ?? contentView
 
-            self.show(
+            self.presentOverlay(
                 view: previewView,
                 location: locationOnScreen,
                 contentViewSize: size,
-                menu: menu,
-                menuAlignment: menuAlignment
+                menu: menu
             )
 
             UIView.animate(withDuration: 0.29) {
@@ -119,13 +121,11 @@ public class AdvancedContextMenuManager: NSObject {
         }
     }
     
-    private func show(
+    private func presentOverlay(
         view: UIView,
         location: CGPoint,
         contentViewSize: CGSize,
-        menu: UIMenu,
-        menuAlignment: Alignment,
-        completion: (() -> Void)? = nil
+        menu: UIMenu
     ) {
         let upperView = self.delegate?.getUpperContentView()
         let upperViewSize = self.delegate?.configureUpperContentViewSize() ?? .zero
@@ -135,7 +135,6 @@ public class AdvancedContextMenuManager: NSObject {
             contentViewSize: contentViewSize,
             locationOnScreen: location,
             menu: menu,
-            menuAlignment: menuAlignment,
             upperContentView: upperView,
             upperContentSize: upperViewSize
         )
@@ -153,15 +152,13 @@ public class AdvancedContextMenuManager: NSObject {
         self.overlayVC = overlayVC
         self.viewModel = viewModel
         
-        UIApplication.shared.windows.first?.rootViewController?.present(overlayVC, animated: false) {
-            completion?()
-        }
+        rootViewController()?.present(overlayVC, animated: false)
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
     }
     
     private func presentOverlayForMac(
         location: CGPoint,
-        menu: UIMenu,
-        completion: (() -> Void)?
+        menu: UIMenu
     ) {
         let upperView = self.delegate?.getUpperContentView()
         let upperViewSize = self.delegate?.configureUpperContentViewSize() ?? .zero
@@ -184,12 +181,25 @@ public class AdvancedContextMenuManager: NSObject {
         overlayVC.view.backgroundColor = .clear
         
         overlayVCMac = overlayVC
+        viewModelMac = viewModel
         
-        UIApplication.shared.windows.first?.rootViewController?.present(overlayVC, animated: false) {
-            completion?()
+        rootViewController()?.present(overlayVC, animated: false)
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+    }
+    
+    func rootViewController() -> UIViewController? {
+        let allScenes = UIApplication.shared.connectedScenes
+        let scene = allScenes.first { $0.activationState == .foregroundActive }
+        
+        guard let windowScene = scene as? UIWindowScene else {
+            return nil
         }
+        
+        return windowScene.keyWindow?.rootViewController
     }
 }
+
+// MARK: Delegate
 
 extension AdvancedContextMenuManager: OverlayViewDelegate {
     func didDissmis() {
@@ -197,9 +207,5 @@ extension AdvancedContextMenuManager: OverlayViewDelegate {
         contentView = nil
         overlayVC?.dismiss(animated: false)
         overlayVCMac?.dismiss(animated: false)
-    }
-    
-    func didDisplay() {
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
     }
 }

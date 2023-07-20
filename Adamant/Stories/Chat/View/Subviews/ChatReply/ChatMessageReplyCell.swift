@@ -105,9 +105,6 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     private lazy var chatMenuManager: ChatMenuManager = {
         let manager = ChatMenuManager(
             menu: makeContextMenu(),
-            menuAlignment: model.isFromCurrentSender
-            ? Alignment.trailing
-            : Alignment.leading,
             emojiService: chatMessagesListViewModel?.emojiService
         )
         manager.delegate = self
@@ -128,9 +125,6 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
             guard model != oldValue else { return }
             
             replyMessageLabel.attributedText = model.messageReply
-            chatMenuManager.menuAlignment = model.isFromCurrentSender
-            ? Alignment.trailing
-            : Alignment.leading
             chatMenuManager.selectedEmoji = getReaction(for: model.address)
             
             let leading = model.isFromCurrentSender ? smallHInset : longHInset

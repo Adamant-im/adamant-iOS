@@ -58,9 +58,6 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
     private lazy var chatMenuManager: ChatMenuManager = {
         let manager = ChatMenuManager(
             menu: makeContextMenu(),
-            menuAlignment: model.isFromCurrentSender
-            ? Alignment.trailing
-            : Alignment.leading,
             emojiService: chatMessagesListViewModel?.emojiService
         )
         manager.delegate = self
@@ -74,9 +71,6 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
     var model: Model = .default {
         didSet {
             guard model != oldValue else { return }
-            chatMenuManager.menuAlignment = model.isFromCurrentSender
-            ? Alignment.trailing
-            : Alignment.leading
             chatMenuManager.selectedEmoji = getReaction(for: model.address)
             
             reactionsContanerView.isHidden = model.reactions == nil

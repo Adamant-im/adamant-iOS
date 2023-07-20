@@ -14,13 +14,7 @@ class ContextMenuOverlayViewModelMac: ObservableObject {
     let upperContentSize: CGSize
     var locationOnScreen: CGPoint
     
-    @Published var menuHeight: CGFloat = .zero
     @Published var isContextMenuVisible = false
-    
-    let transition = AnyTransition.asymmetric(
-        insertion: .scale(scale: 0.9, anchor: .center),
-        removal: .identity
-    )
     
     let topContentTransition = AnyTransition.asymmetric(
         insertion: .scale(scale: 0, anchor: .bottom),
@@ -36,10 +30,17 @@ class ContextMenuOverlayViewModelMac: ObservableObject {
         )
     )
     
+    var menuHeight: CGFloat {
+        calculateEstimateMenuHeight()
+    }
+    
+    var upperContentViewLocation: CGPoint = .zero
+    var menuLocation: CGPoint = .zero
+    var menuWidth: CGFloat = 250
+    var finalOffsetForUpperContentView: CGFloat = .zero
+    
     weak var delegate: OverlayViewDelegate?
     
-    private let minBottomOffset: CGFloat = 100
-
     // MARK: Init
     
     init(
@@ -47,18 +48,72 @@ class ContextMenuOverlayViewModelMac: ObservableObject {
         upperContentView: AnyView? = nil,
         upperContentSize: CGSize,
         locationOnScreen: CGPoint,
-        menuHeight: CGFloat = .zero,
         delegate: OverlayViewDelegate?
     ) {
         self.menu = menu
         self.upperContentView = upperContentView
         self.upperContentSize = upperContentSize
         self.locationOnScreen = locationOnScreen
-        self.menuHeight = menuHeight
         self.isContextMenuVisible = isContextMenuVisible
         self.delegate = delegate
         
-        updateLocationIfNeeded()
+        menuLocation = calculateMenuLocation()
+        upperContentViewLocation = calculateUpperContentViewLocation()
+    }
+    
+    func dismiss() {
+        withAnimation(.easeInOut(duration: animationDuration)) {
+            isContextMenuVisible.toggle()
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + animationDuration) {
+            self.delegate?.didDissmis()
+        }
+    }
+}
+
+private extension ContextMenuOverlayViewModelMac {
+    func calculateUpperContentViewLocation() -> CGPoint {
+        .init(
+            x: calculateLeadingOffset(for: upperContentSize.width),
+            y: calculateUpperContentTopOffset()
+        )
+    }
+    
+    func calculateMenuLocation() -> CGPoint {
+        .init(
+            x: calculateLeadingOffset(for: menuWidth),
+            y: calculateMenuTopOffset()
+        )
+    }
+    
+    func calculateUpperContentTopOffset() -> CGFloat {
+        guard isNeedToMoveFromBottom() else {
+            return locationOnScreen.y
+            - upperContentSize.height
+            - minContentsSpace
+        }
+        
+        let location = UIScreen.main.bounds.height - menuHeight - minBottomOffset
+        
+        return location
+        - upperContentSize.height
+        - minContentsSpace
+    }
+    
+    func calculateMenuTopOffset() -> CGFloat {
+        guard isNeedToMoveFromBottom() else {
+            return locationOnScreen.y
+        }
+        
+        return UIScreen.main.bounds.height - menuHeight - minBottomOffset
+    }
+    
+    func calculateLeadingOffset(for width: CGFloat) -> CGFloat {
+        guard isNeedToMoveFromTrailing() else {
+            return locationOnScreen.x
+        }
+        
+        return locationOnScreen.x - width
     }
     
     func updateLocationIfNeeded() {
@@ -79,14 +134,12 @@ class ContextMenuOverlayViewModelMac: ObservableObject {
         UIScreen.main.bounds.height < locationOnScreen.y + menuHeight + minBottomOffset
     }
     
-    func dismiss() {
-        withAnimation(.easeInOut(duration: animationDuration)) {
-            isContextMenuVisible.toggle()
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + animationDuration) {
-            self.delegate?.didDissmis()
-        }
+    func calculateEstimateMenuHeight() -> CGFloat {
+        CGFloat(menu.children.count) * estimateMenuRowHeight
     }
 }
 
 private let animationDuration: TimeInterval = 0.2
+private let minBottomOffset: CGFloat = 10
+private let estimateMenuRowHeight: CGFloat = 50
+private let minContentsSpace: CGFloat = 10
