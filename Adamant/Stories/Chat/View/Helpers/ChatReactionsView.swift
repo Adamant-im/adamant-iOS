@@ -46,7 +46,7 @@ struct ChatReactionsView: View {
                         .frame(width: 40, height: 40)
                         .background(
                             selectedEmoji == emoji
-                            ? Color.init(uiColor: .adamant.active)
+                            ? Color.init(uiColor: .gray.withAlphaComponent(0.75))
                             : .clear
                         )
                         .clipShape(Circle())
