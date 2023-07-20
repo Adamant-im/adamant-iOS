@@ -61,6 +61,33 @@ public class AdvancedContextMenuManager: NSObject {
         contentView.addGestureRecognizer(longPressGesture)
     }
     
+    public func presentMenu(for view: UIView, with menu: UIMenu) {
+        let locationOnScreen = view.convert(CGPoint.zero, to: nil)
+                
+        self.contentView = view
+        
+        guard !isiOSAppOnMac else {
+            presentOverlayForMac(
+                location: locationOnScreen,
+                menu: menu
+            )
+            return
+        }
+        
+        let previewView = view.snapshotView(afterScreenUpdates: true) ?? view
+
+        self.presentOverlay(
+            view: previewView,
+            location: locationOnScreen,
+            contentViewSize: view.frame.size,
+            menu: menu
+        )
+
+        UIView.animate(withDuration: 0.29) {
+            view.alpha = 0
+        }
+    }
+    
     public func dismiss() {
         viewModel?.dismiss()
         viewModelMac?.dismiss()
@@ -84,7 +111,7 @@ private extension AdvancedContextMenuManager {
     }
     
     @objc func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
-        if isiOSAppOnMac {
+        guard !isiOSAppOnMac else {
             handleLongPressMacOS(gesture)
             return
         }

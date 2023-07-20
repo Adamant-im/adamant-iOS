@@ -88,6 +88,14 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         label.textAlignment = .center
         label.layer.masksToBounds = true
         label.frame.size = ownReactionSize
+        
+        let tapGesture = UITapGestureRecognizer(
+            target: self,
+            action: #selector(tapReactionAction)
+        )
+        
+        label.addGestureRecognizer(tapGesture)
+        label.isUserInteractionEnabled = true
         return label
     }()
     
@@ -99,6 +107,14 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         label.backgroundColor = .adamant.codeBlock
         label.layer.cornerRadius = 15
         label.frame.size = opponentReactionSize
+        
+        let tapGesture = UITapGestureRecognizer(
+            target: self,
+            action: #selector(tapReactionAction)
+        )
+        
+        label.addGestureRecognizer(tapGesture)
+        label.isUserInteractionEnabled = true
         return label
     }()
     
@@ -228,13 +244,6 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         configureMenu()
         
         contentView.addSubview(reactionsContanerView)
-        
-        let eraseTapGesture = UITapGestureRecognizer(
-            target: self,
-            action: #selector(eraseReactionAction)
-        )
-        ownReactionLabel.addGestureRecognizer(eraseTapGesture)
-        ownReactionLabel.isUserInteractionEnabled = true
     }
     
     func configureMenu() {
@@ -504,25 +513,8 @@ extension ChatMessageReplyCell {
         return UIMenu(title: "", children: [reply, copy, report, remove])
     }
     
-    @objc func eraseReactionAction() {
-        animateErase { [weak self] in
-            guard let self = self else { return }
-            self.actionHandler(.react(id: self.model.id, emoji: ""))
-        }
-    }
-    
-    func animateErase(_ completion: (() -> Void)? = nil) {
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-        UIView.animate(withDuration: 0.5) {
-            self.ownReactionLabel.transform = .init(scaleX: 1.3, y: 1.3)
-        } completion: { [weak self] _ in
-            UIView.animate(withDuration: 0.25) {
-                self?.ownReactionLabel.transform = .init(scaleX: 0.1, y: 0.1)
-                self?.ownReactionLabel.alpha = 0
-            } completion: { _ in
-                completion?()
-            }
-        }
+    @objc func tapReactionAction() {
+        contextMenu.presentMenu(for: containerView, with: makeContextMenu())
     }
 }
 
