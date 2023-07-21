@@ -26,13 +26,18 @@ struct ContextMenuOverlayView: View {
         ZStack {
             if viewModel.isContextMenuVisible {
                 backgroundBlur
+                    .zIndex(0)
                     .ignoresSafeArea(.all)
                 
                 if let upperContentView = viewModel.upperContentView {
                     makeUpperOverlayView(upperContentView: upperContentView)
+                        .zIndex(2)
                 }
+                makeMenuOverlayView()
+                    .zIndex(3)
             }
             makeOverlayView()
+                .zIndex(1)
             Spacer()
         }
         .ignoresSafeArea()
@@ -49,13 +54,15 @@ struct ContextMenuOverlayView: View {
 
 private extension ContextMenuOverlayView {
     func makeOverlayView() -> some View {
-        VStack(spacing: 10) {
-            makeContentView()
-                .onTapGesture { }
-            if viewModel.isContextMenuVisible {
-                makeMenuView()
+        ScrollView(.vertical) {
+            VStack(spacing: 10) {
+                makeContentView()
                     .onTapGesture { }
+                Spacer()
             }
+            .frame(width: .infinity, height: .infinity)
+            .transition(.opacity)
+            .edgesIgnoringSafeArea(.all)
             Spacer()
         }
         .frame(width: .infinity, height: .infinity)
@@ -83,16 +90,29 @@ private extension ContextMenuOverlayView {
         .edgesIgnoringSafeArea(.all)
     }
     
-    func makeMenuView() -> some View {
-        HStack {
-            MenuView(menu: viewModel.menu)
-                .frame(width: viewModel.menuWidth)
-                .padding(.leading, viewModel.menuLocation.x)
-                .transition(viewModel.menuTransition)
+    func makeMenuOverlayView() -> some View {
+        VStack {
+            makeMenuView()
+                .onTapGesture { }
             Spacer()
         }
         .frame(width: .infinity, height: .infinity)
-        .transition(viewModel.menuTransition)
+        .transition(.opacity)
+        .edgesIgnoringSafeArea(.all)
+    }
+    
+    func makeMenuView() -> some View {
+        HStack {
+            if viewModel.isContextMenuVisible {
+                MenuView(menu: viewModel.menu)
+                    .frame(width: viewModel.menuWidth)
+                    .padding(.top, viewModel.menuLocation.y)
+                    .padding(.leading, viewModel.menuLocation.x)
+                    .transition(viewModel.menuTransition)
+                Spacer()
+            }
+        }
+        .frame(width: .infinity, height: .infinity)
         .edgesIgnoringSafeArea(.all)
     }
     

@@ -107,8 +107,14 @@ private extension ContextMenuOverlayViewModel {
             x: isNeedToMoveFromTrailing()
             ? calculateLeadingOffset(for: menuWidth)
             : locationOnScreen.x,
-            y: .zero
+            y: calculateMenuTopOffset()
         )
+    }
+    
+    func calculateMenuTopOffset() -> CGFloat {
+        calculateOffsetForContentView()
+        + contentViewSize.height
+        + minContentsSpace
     }
     
     func calculateLeadingOffset(for width: CGFloat) -> CGFloat {
@@ -116,12 +122,16 @@ private extension ContextMenuOverlayViewModel {
     }
     
     func isNeedToMoveFromTrailing() -> Bool {
-        UIScreen.main.bounds.width < locationOnScreen.x + upperContentSize.width + minBottomOffset
+        return UIScreen.main.bounds.width < locationOnScreen.x + menuWidth + minBottomOffset
     }
     
     func calculateOffsetForUpperContentView() -> CGFloat {
-        calculateOffsetForContentView()
+        let offset = calculateOffsetForContentView()
         - (upperContentSize.height + minContentsSpace)
+        
+        return offset < .zero
+        ? minBottomOffset
+        : offset
     }
     
     func calculateOffsetForContentView() -> CGFloat {
@@ -132,6 +142,14 @@ private extension ContextMenuOverlayViewModel {
         }
         
         if isNeedToMoveFromTop() {
+            guard contentViewSize.height
+                    + menuHeight
+                    + minBottomOffset
+                    < UIScreen.main.bounds.height
+            else {
+                return locationOnScreen.y
+            }
+            
             return getOffsetToMoveFromTop()
         }
         

@@ -25,12 +25,16 @@ public extension AdvancedContextMenuManagerDelegate {
 }
 
 public class AdvancedContextMenuManager: NSObject {
+    private var superView: UIView?
     private var contentView: UIView?
+    private var contentViewIndex: Int = 0
+    private var contentViewFrame: CGRect?
     private var overlayVC: UIHostingController<ContextMenuOverlayView>?
     private var overlayVCMac: UIHostingController<ContextMenuOverlayViewMac>?
     private var viewModel: ContextMenuOverlayViewModel?
     private var viewModelMac: ContextMenuOverlayViewModelMac?
     private weak var delegate: AdvancedContextMenuManagerDelegate?
+    private let maxContentHeight: CGFloat = 500
     
     var isiOSAppOnMac: Bool = {
 #if targetEnvironment(macCatalyst)
@@ -111,10 +115,10 @@ private extension AdvancedContextMenuManager {
     }
     
     @objc func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
-        guard !isiOSAppOnMac else {
-            handleLongPressMacOS(gesture)
-            return
-        }
+//        guard !isiOSAppOnMac else {
+//            handleLongPressMacOS(gesture)
+//            return
+//        }
         
         guard gesture.state == .began,
               let contentView = gesture.view,
@@ -124,25 +128,31 @@ private extension AdvancedContextMenuManager {
         let locationOnScreen = contentView.convert(CGPoint.zero, to: nil)
         
         let size = contentView.frame.size
+        self.contentViewFrame = contentView.frame
+        self.contentView = contentView
+        self.superView = contentView.superview
+
+        if let superView = superView as? UIStackView {
+            contentViewIndex = superView.arrangedSubviews.firstIndex(of: contentView) ?? 0
+        }
+        
+        let scale: CGFloat = contentView.bounds.height > maxContentHeight
+        ? 0.99
+        : 0.9
         
         UIView.animate(withDuration: 0.29) {
-            contentView.transform = .init(scaleX: 0.9, y: 0.9)
+            contentView.transform = .init(scaleX: scale, y: scale)
         } completion: { [weak self] _ in
             guard let self = self else { return }
             
-            self.contentView = contentView
-            
-            let previewView = contentView.snapshotView(afterScreenUpdates: true) ?? contentView
-
             self.presentOverlay(
-                view: previewView,
+                view: contentView,
                 location: locationOnScreen,
                 contentViewSize: size,
                 menu: menu
             )
 
-            UIView.animate(withDuration: 0.29) {
-                contentView.alpha = 0
+            UIView.animate(withDuration: 0.35) {
                 contentView.transform = .identity
             }
         }
@@ -230,8 +240,24 @@ private extension AdvancedContextMenuManager {
 
 extension AdvancedContextMenuManager: OverlayViewDelegate {
     func didDissmis() {
+        if let contentView = contentView,
+           let contentViewFrame = contentViewFrame {
+            if let superView = superView as? UIStackView {
+                //superView.addArrangedSubview(contentView)
+                print("contentViewIndex=\(contentViewIndex)")
+                superView.insertArrangedSubview(contentView, at: contentViewIndex)
+               // superView.superview?.layoutIfNeeded()
+            } else {
+                superView?.addSubview(contentView)
+            }
+            contentView.frame = contentViewFrame
+//            contentViewConstraints.forEach { constraint in
+//                contentView.addConstraint(constraint)
+//            }
+        }
+        
         contentView?.alpha = 1.0
-        contentView = nil
+        // contentView = nil
         overlayVC?.dismiss(animated: false)
         overlayVCMac?.dismiss(animated: false)
     }
