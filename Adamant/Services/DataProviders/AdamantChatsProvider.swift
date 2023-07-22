@@ -63,6 +63,7 @@ actor AdamantChatsProvider: ChatsProvider {
     private(set) var roomsLoadedCount: Int?
     
     private var subscriptions = Set<AnyCancellable>()
+    private let minReactionsProcent = 30
     
     // MARK: Lifecycle
     init(
@@ -456,7 +457,8 @@ extension AdamantChatsProvider {
         
         let messageCount = chatroom?.messages?.count ?? 0
         
-        if result.reactionsCount >= result.totalCount / 2 {
+        let minRectionsCount = result.totalCount * minReactionsProcent / 100
+        if result.reactionsCount >= minRectionsCount {
             let offset = (offset ?? 0) + messageCount
 
             let loadedCount = chatLoadedMessages[addressRecipient] ?? 0
