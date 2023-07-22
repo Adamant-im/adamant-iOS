@@ -43,8 +43,10 @@ struct MenuButtonView: View {
                     .padding(.horizontal, 20)
                     .tint(.black)
                     .foregroundColor(.black)
+                    .font(.system(size: 16))
                 if let image = item.image {
                     Image(uiImage: image)
+                        .font(Font.title.weight(.ultraLight))
                         .frame(maxWidth: .infinity, alignment: .trailing)
                         .padding(.horizontal, 20)
                         .tint(.black)

@@ -33,8 +33,6 @@ struct ContextMenuOverlayView: View {
                     makeUpperOverlayView(upperContentView: upperContentView)
                         .zIndex(2)
                 }
-                makeMenuOverlayView()
-                    .zIndex(3)
             }
             makeOverlayView()
                 .zIndex(1)
@@ -55,14 +53,10 @@ struct ContextMenuOverlayView: View {
 private extension ContextMenuOverlayView {
     func makeOverlayView() -> some View {
         ScrollView(.vertical) {
-            VStack(spacing: 10) {
-                makeContentView()
-                    .onTapGesture { }
-                Spacer()
-            }
-            .frame(width: .infinity, height: .infinity)
-            .transition(.opacity)
-            .edgesIgnoringSafeArea(.all)
+            makeContentView()
+                .onTapGesture { }
+            makeMenuView()
+                .onTapGesture { }
             Spacer()
         }
         .frame(width: .infinity, height: .infinity)
@@ -106,7 +100,6 @@ private extension ContextMenuOverlayView {
             if viewModel.isContextMenuVisible {
                 MenuView(menu: viewModel.menu)
                     .frame(width: viewModel.menuWidth)
-                    .padding(.top, viewModel.menuLocation.y)
                     .padding(.leading, viewModel.menuLocation.x)
                     .transition(viewModel.menuTransition)
                 Spacer()

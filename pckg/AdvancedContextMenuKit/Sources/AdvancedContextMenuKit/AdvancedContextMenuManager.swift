@@ -78,6 +78,8 @@ public class AdvancedContextMenuManager: NSObject {
             return
         }
         
+        contentView.isUserInteractionEnabled = false
+        
         self.contentViewFrame = contentView.frame
         self.superView = contentView.superview
 
@@ -144,6 +146,8 @@ private extension AdvancedContextMenuManager {
         let scale: CGFloat = contentView.bounds.height > maxContentHeight
         ? 0.99
         : 0.9
+        
+        contentView.isUserInteractionEnabled = false
         
         UIView.animate(withDuration: 0.29) {
             contentView.transform = .init(scaleX: scale, y: scale)
@@ -254,7 +258,7 @@ extension AdvancedContextMenuManager: OverlayViewDelegate {
             }
             contentView.frame = contentViewFrame
         }
-        
+        contentView?.isUserInteractionEnabled = true
         contentView?.alpha = 1.0
         overlayVC?.dismiss(animated: false)
         overlayVCMac?.dismiss(animated: false)
