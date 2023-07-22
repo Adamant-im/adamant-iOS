@@ -88,6 +88,11 @@ private extension ChatMenuManager {
             return nil
         }
         
-        return windowScene.keyWindow?.rootViewController
+        var topController = windowScene.keyWindow?.rootViewController
+        
+        while (topController?.presentedViewController != nil) {
+            topController = topController?.presentedViewController
+        }
+        return topController
     }
 }

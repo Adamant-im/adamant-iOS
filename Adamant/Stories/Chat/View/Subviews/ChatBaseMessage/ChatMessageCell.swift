@@ -413,6 +413,9 @@ extension ChatMessageCell {
 extension ChatMessageCell: ChatMenuManagerDelegate {
     func didReact(_ emoji: String) {
         contextMenu.dismiss()
-        actionHandler(.react(id: model.id, emoji: emoji))
+        // TODO: Temp solution. Need to wait when original view will come back
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            self.actionHandler(.react(id: self.model.id, emoji: emoji))
+        }
     }
 }

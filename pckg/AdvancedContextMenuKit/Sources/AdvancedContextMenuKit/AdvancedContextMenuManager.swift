@@ -134,6 +134,8 @@ private extension AdvancedContextMenuManager {
 
         if let superView = superView as? UIStackView {
             contentViewIndex = superView.arrangedSubviews.firstIndex(of: contentView) ?? 0
+        } else {
+            contentViewIndex = superView?.subviews.firstIndex(of: contentView) ?? 0
         }
         
         let scale: CGFloat = contentView.bounds.height > maxContentHeight
@@ -243,21 +245,14 @@ extension AdvancedContextMenuManager: OverlayViewDelegate {
         if let contentView = contentView,
            let contentViewFrame = contentViewFrame {
             if let superView = superView as? UIStackView {
-                //superView.addArrangedSubview(contentView)
-                print("contentViewIndex=\(contentViewIndex)")
                 superView.insertArrangedSubview(contentView, at: contentViewIndex)
-               // superView.superview?.layoutIfNeeded()
             } else {
-                superView?.addSubview(contentView)
+                superView?.insertSubview(contentView, at: contentViewIndex)
             }
             contentView.frame = contentViewFrame
-//            contentViewConstraints.forEach { constraint in
-//                contentView.addConstraint(constraint)
-//            }
         }
         
         contentView?.alpha = 1.0
-        // contentView = nil
         overlayVC?.dismiss(animated: false)
         overlayVCMac?.dismiss(animated: false)
     }
