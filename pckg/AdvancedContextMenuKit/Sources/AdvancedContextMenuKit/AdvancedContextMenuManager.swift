@@ -65,10 +65,10 @@ public class AdvancedContextMenuManager: NSObject {
         contentView.addGestureRecognizer(longPressGesture)
     }
     
-    public func presentMenu(for view: UIView, with menu: UIMenu) {
-        let locationOnScreen = view.convert(CGPoint.zero, to: nil)
+    public func presentMenu(for contentView: UIView, with menu: UIMenu) {
+        let locationOnScreen = contentView.convert(CGPoint.zero, to: nil)
                 
-        self.contentView = view
+        self.contentView = contentView
         
         guard !isiOSAppOnMac else {
             presentOverlayForMac(
@@ -78,18 +78,21 @@ public class AdvancedContextMenuManager: NSObject {
             return
         }
         
-        let previewView = view.snapshotView(afterScreenUpdates: true) ?? view
+        self.contentViewFrame = contentView.frame
+        self.superView = contentView.superview
 
+        if let superView = superView as? UIStackView {
+            contentViewIndex = superView.arrangedSubviews.firstIndex(of: contentView) ?? 0
+        } else {
+            contentViewIndex = superView?.subviews.firstIndex(of: contentView) ?? 0
+        }
+        
         self.presentOverlay(
-            view: previewView,
+            view: contentView,
             location: locationOnScreen,
-            contentViewSize: view.frame.size,
+            contentViewSize: contentView.frame.size,
             menu: menu
         )
-
-        UIView.animate(withDuration: 0.29) {
-            view.alpha = 0
-        }
     }
     
     public func dismiss() {
