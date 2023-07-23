@@ -2481,8 +2481,8 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
-				"$(SRCROOT)/AdamantShared/Scripts/UpdateWalletsScript.sh",
-				"$(SRCROOT)/AdamantShared/Scripts/CoinsScript.rb",
+				"$(SRCROOT)/CommonKit/Scripts/UpdateWalletsScript.sh",
+				"$(SRCROOT)/CommonKit/Scripts/CoinsScript.rb",
 			);
 			name = "Run Script - Load wallets";
 			outputFileListPaths = (

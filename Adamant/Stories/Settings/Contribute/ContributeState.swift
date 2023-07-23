@@ -28,7 +28,7 @@ struct ContributeState {
         crashliticsRowImage: .asset(named: "row_crashlytics") ?? .init(),
         crashliticsRowName: .localized("Contribute.Section.Crashlytics", comment: .empty),
         crashliticsRowDescription: .localized("Contribute.Section.CrashlyticsDescription", comment: .empty),
-        crashButtonTitle: .localized("Contribute.Section.SimulateCrash", comment: .empty),
+        crashButtonTitle: "Simulate crash",
         linkRows: [
             .init(
                 image: .asset(named: "row_nodes") ?? .init(),

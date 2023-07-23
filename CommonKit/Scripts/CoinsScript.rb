@@ -216,7 +216,7 @@ extension AdamantResources {
         ]
     }
 }"
-            File.open(Dir.pwd + "/AdamantShared/AdamantDynamicResources.swift", 'w') { |file| file.write(textResources) }
+            File.open(Dir.pwd + "/CommonKit/Sources/CommonKit/AdamantDynamicResources.swift", 'w') { |file| file.write(textResources) }
             File.open(Dir.pwd + "/Adamant/Wallets/#{name}/#{symbol}WalletService+DynamicConstants.swift", 'w') { |file| file.write(text) }
         else
             File.open(Dir.pwd + "/Adamant/Wallets/#{name}/#{symbol}WalletService+DynamicConstants.swift", 'w') { |file| file.write(text) }
