@@ -60,11 +60,8 @@ extension AdamantTransfersProvider: BackgroundFetchService {
             }
             
             notificationsService.showNotification(
-                title: String.adamant.notifications.newTransferTitle,
-                body: String.localizedStringWithFormat(
-                    String.adamant.notifications.newTransferBody,
-                    total + notifiedCount
-                ),
+                title: NotificationStrings.newTransferTitle,
+                body: NotificationStrings.newTransferBody(total + notifiedCount),
                 type: .newTransactions(count: total)
             )
             

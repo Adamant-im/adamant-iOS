@@ -266,7 +266,11 @@ class NotificationsViewController: FormViewController {
     }
     
     private func presentNotificationsDeniedError() {
-        let alert = UIAlertController(title: nil, message: String.adamant.notifications.notificationsDisabled, preferredStyle: .alert)
+        let alert = UIAlertController(
+            title: nil,
+            message: NotificationStrings.notificationsDisabled,
+            preferredStyle: .alert
+        )
         
         alert.addAction(UIAlertAction(title: String.adamant.alert.settings, style: .default) { _ in
             DispatchQueue.main.async {

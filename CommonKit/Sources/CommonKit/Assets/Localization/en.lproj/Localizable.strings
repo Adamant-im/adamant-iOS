@@ -712,27 +712,6 @@
 /* Notifications: Alerts Cancel */
 "Notifications.Alert.Cancel" = "Cancel";
 
-/* Notifications: Something went wrong while registering remote notifications. %@ for description */
-"NotificationsService.Error.RegistrationRemotesFormat" = "Registration in ANS failed. Please, try again later. Reason %@";
-
-/* Notifications: New message notification title */
-"NotificationsService.NewMessage.Title" = "New Message";
-
-/* Notifications: New single message notification body */
-"NotificationsService.NewMessage.BodySingle" = "You have a new message";
-
-/* Notifications: New transfer transaction title */
-"NotificationsService.NewTransfer.Title" = "New Transfer";
-
-/* Notifications: New single transfer transaction body */
-"NotificationsService.NewTransfer.BodySingle" = "You have a new transfer";
-
-/* Notifications: User has disabled notifications. Head him into settings */
-"NotificationsService.NotificationsDisabled" = "Notifications disabled. You can enable notifications in Settings";
-
-/* Notifications: Not stayed logged in */
-"NotificationsService.NotStayedLoggedIn" = "Can't turn on notifications without staying logged in";
-
 /* Pinpad: Ask user to create new pin */
 "Pinpad.EnterNewPin" = "Enter new PIN code";
 

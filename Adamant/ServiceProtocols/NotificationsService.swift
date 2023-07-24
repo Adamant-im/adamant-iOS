@@ -9,19 +9,6 @@
 import Foundation
 import CommonKit
 
-extension String.adamant.notifications {
-    static let notificationsDisabled = String.localized("NotificationsService.NotificationsDisabled", comment: "Notifications: User has disabled notifications. Head him into settings")
-    static let notStayedLoggedIn = String.localized("NotificationsService.NotStayedLoggedIn", comment: "Notifications: Not stayed logged in")
-    
-    static let newMessageTitle = String.localized("NotificationsService.NewMessage.Title", comment: "Notifications: New message notification title")
-    static let newMessageBody = String.localized("NotificationsService.NewMessage.BodyFormat", comment: "Notifications: new messages notification body. Using %d for amount")
-    
-    static let newTransferTitle = String.localized("NotificationsService.NewTransfer.Title", comment: "Notifications: New transfer transaction title")
-    static let newTransferBody = String.localized("NotificationsService.NewTransfer.BodyFormat", comment: "Notifications: New transfer notification body. Using %d for amount")
-    
-    static let registerRemotesError = String.localized("NotificationsService.Error.RegistrationRemotesFormat", comment: "Notifications: while registering remote notifications. %@ for description")
-}
-
 enum NotificationsMode: Int {
     case disabled
     case backgroundFetch
@@ -166,8 +153,8 @@ extension NotificationsServiceError: RichError {
     var message: String {
         switch self {
         case .notEnoughMoney: return String.adamant.sharedErrors.notEnoughMoney
-        case .denied: return String.adamant.notifications.notificationsDisabled
-        case .notStayedLoggedIn: return String.adamant.notifications.notStayedLoggedIn
+        case .denied: return NotificationStrings.notificationsDisabled
+        case .notStayedLoggedIn: return NotificationStrings.notStayedLoggedIn
         }
     }
     

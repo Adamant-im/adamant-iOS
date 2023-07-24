@@ -56,11 +56,8 @@ extension AdamantChatsProvider: BackgroundFetchService {
             }
             
             notificationsService.showNotification(
-                title: String.adamant.notifications.newMessageTitle,
-                body: String.localizedStringWithFormat(
-                    String.adamant.notifications.newMessageBody,
-                    total + notifiedCount
-                ),
+                title: NotificationStrings.newMessageTitle,
+                body: NotificationStrings.newMessageBody(total + notifiedCount),
                 type: .newMessages(count: total)
             )
             

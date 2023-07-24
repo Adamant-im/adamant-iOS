@@ -322,7 +322,7 @@ extension AppDelegate {
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         if let service = container.resolve(DialogService.self) {
-            service.showError(withMessage: String.localizedStringWithFormat(String.adamant.notifications.registerRemotesError, error.localizedDescription), supportEmail: true, error: error)
+            service.showError(withMessage: String.localizedStringWithFormat(NotificationStrings.registrationRemotesFormat, error.localizedDescription), supportEmail: true, error: error)
         }
     }
     
