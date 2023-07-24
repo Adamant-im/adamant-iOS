@@ -8,12 +8,14 @@
 import SwiftUI
 
 /// Blocks interaction with background
-struct BlockingView: UIViewRepresentable {
-    func makeUIView(context _: Context) -> some UIView {
+public struct BlockingView: UIViewRepresentable {
+    public func makeUIView(context _: Context) -> some UIView {
         UIBlockingView()
     }
     
-    func updateUIView(_: UIViewType, context _: Context) {}
+    public func updateUIView(_: UIViewType, context _: Context) {}
+    
+    public init() {}
 }
 
 private final class UIBlockingView: UIView {
