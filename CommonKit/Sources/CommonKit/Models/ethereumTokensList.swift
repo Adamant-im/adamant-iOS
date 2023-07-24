@@ -1,6 +1,6 @@
     import Foundation
     
-public extension ERC20Token {
+    public extension ERC20Token {
         static let supportedTokens: [ERC20Token] = [
         
         ERC20Token(symbol: "BNB",

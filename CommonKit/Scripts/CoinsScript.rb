@@ -104,6 +104,7 @@ class Coins
         
         text = "import Foundation
 import BigInt
+import CommonKit
     
 extension #{symbol.capitalize}WalletService {
     // MARK: - Constants
@@ -208,7 +209,7 @@ extension #{symbol.capitalize}WalletService {
         if symbol == "ADM"
            textResources = "import Foundation
 
-extension AdamantResources {
+public extension AdamantResources {
     // MARK: Nodes
     static var nodes: [Node] {
         [
