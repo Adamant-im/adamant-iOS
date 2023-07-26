@@ -11,7 +11,7 @@ import UIKit
 public protocol AdvancedContextMenuManagerDelegate: AnyObject {
     func getUpperContentView() -> AnyView?
     func configureUpperContentViewSize() -> CGSize
-    func configureContextMenu() -> UIMenu
+    func configureContextMenu() -> AMenuSection
 }
 
 public extension AdvancedContextMenuManagerDelegate {
@@ -65,7 +65,7 @@ public class AdvancedContextMenuManager: NSObject {
         contentView.addGestureRecognizer(longPressGesture)
     }
     
-    public func presentMenu(for contentView: UIView, with menu: UIMenu) {
+    public func presentMenu(for contentView: UIView, with menu: AMenuSection) {
         let locationOnScreen = contentView.convert(CGPoint.zero, to: nil)
                 
         self.contentView = contentView
@@ -89,17 +89,23 @@ public class AdvancedContextMenuManager: NSObject {
             contentViewIndex = superView?.subviews.firstIndex(of: contentView) ?? 0
         }
         
+        let menuVC = getMenuVC(content: menu)
+        
         self.presentOverlay(
             view: contentView,
             location: locationOnScreen,
             contentViewSize: contentView.frame.size,
-            menu: menu
+            menu: menuVC
         )
     }
     
-    public func dismiss() {
+    public func dismiss(completion: (() -> Void)? = nil) {
         viewModel?.dismiss()
         viewModelMac?.dismiss()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            completion?()
+        }
     }
 }
 
@@ -120,10 +126,10 @@ private extension AdvancedContextMenuManager {
     }
     
     @objc func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
-//        guard !isiOSAppOnMac else {
-//            handleLongPressMacOS(gesture)
-//            return
-//        }
+        guard !isiOSAppOnMac else {
+            handleLongPressMacOS(gesture)
+            return
+        }
         
         guard gesture.state == .began,
               let contentView = gesture.view,
@@ -149,6 +155,8 @@ private extension AdvancedContextMenuManager {
         
         contentView.isUserInteractionEnabled = false
         
+        let menuVC = getMenuVC(content: menu)
+        
         UIView.animate(withDuration: 0.29) {
             contentView.transform = .init(scaleX: scale, y: scale)
         } completion: { [weak self] _ in
@@ -158,7 +166,7 @@ private extension AdvancedContextMenuManager {
                 view: contentView,
                 location: locationOnScreen,
                 contentViewSize: size,
-                menu: menu
+                menu: menuVC
             )
 
             UIView.animate(withDuration: 0.35) {
@@ -171,7 +179,7 @@ private extension AdvancedContextMenuManager {
         view: UIView,
         location: CGPoint,
         contentViewSize: CGSize,
-        menu: UIMenu
+        menu: AMenuViewController?
     ) {
         let upperView = self.delegate?.getUpperContentView()
         let upperViewSize = self.delegate?.configureUpperContentViewSize() ?? .zero
@@ -204,13 +212,15 @@ private extension AdvancedContextMenuManager {
     
     private func presentOverlayForMac(
         location: CGPoint,
-        menu: UIMenu
+        menu: AMenuSection
     ) {
         let upperView = self.delegate?.getUpperContentView()
         let upperViewSize = self.delegate?.configureUpperContentViewSize() ?? .zero
         
+        let menuVC = getMenuVC(content: menu)
+        
         let viewModel = ContextMenuOverlayViewModelMac(
-            menu: menu,
+            menu: menuVC,
             upperContentView: upperView,
             upperContentSize: upperViewSize,
             locationOnScreen: location,
@@ -242,6 +252,18 @@ private extension AdvancedContextMenuManager {
         }
         
         return windowScene.keyWindow?.rootViewController
+    }
+    
+    func getMenuVC(content: AMenuSection) -> AMenuViewController {
+        let menuViewController = AMenuViewController(menuContent: content)
+        
+        menuViewController.finished = { [weak self] action in
+            self?.dismiss {
+                action?()
+            }
+        }
+        
+        return menuViewController
     }
 }
 

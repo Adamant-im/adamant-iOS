@@ -55,11 +55,14 @@ private extension ContextMenuOverlayViewMac {
     
     func makeMenuView() -> some View {
         HStack {
-            MenuView(menu: viewModel.menu)
-                .frame(width: viewModel.menuWidth)
-                .padding(.top, viewModel.menuLocation.y)
-                .padding(.leading, viewModel.menuLocation.x)
-                .transition(.opacity)
+            if let menuVC = viewModel.menu {
+                AMenuWrapper(view: menuVC)
+                    .frame(width: menuVC.menuSize.width, height: menuVC.menuSize.height)
+                    .cornerRadius(15)
+                    .padding(.top, viewModel.menuLocation.y)
+                    .padding(.leading, viewModel.menuLocation.x)
+                    .transition(.opacity)
+            }
             Spacer()
         }
         .frame(width: .infinity, height: .infinity)

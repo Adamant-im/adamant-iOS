@@ -100,6 +100,20 @@ extension UIColor {
             return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
         }
         
+        /// Reactions background color
+        static var reactionsBackground: UIColor {
+            let colorWhiteTheme = UIColor(red: 0.29, green: 0.29, blue: 0.29, alpha: 0.1)
+            let colorDarkTheme = UIColor(red: 0.264, green: 0.264, blue: 0.264, alpha: 1)
+            return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
+        }
+        
+        /// More reactions background button color
+        static var moreReactionsBackground: UIColor {
+            let colorWhiteTheme = UIColor.white
+            let colorDarkTheme = UIColor(red: 0.22, green: 0.22, blue: 0.22, alpha: 1)
+            return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
+        }
+        
         /// Main dark gray, ~70% gray
         static var primary: UIColor {
             let colorWhiteTheme = UIColor(red: 0.29, green: 0.29, blue: 0.29, alpha: 1)

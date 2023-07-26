@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 class ContextMenuOverlayViewModelMac: ObservableObject {
-    let menu: UIMenu
+    let menu: AMenuViewController?
     let upperContentView: AnyView?
     let upperContentSize: CGSize
     var locationOnScreen: CGPoint
@@ -30,13 +30,12 @@ class ContextMenuOverlayViewModelMac: ObservableObject {
         )
     )
     
-    var menuHeight: CGFloat {
-        calculateEstimateMenuHeight()
+    var menuSize: CGSize {
+        menu?.menuSize ?? .init(width: 250, height: 300)
     }
     
     var upperContentViewLocation: CGPoint = .zero
     var menuLocation: CGPoint = .zero
-    var menuWidth: CGFloat = 250
     var finalOffsetForUpperContentView: CGFloat = .zero
     
     weak var delegate: OverlayViewDelegate?
@@ -44,7 +43,7 @@ class ContextMenuOverlayViewModelMac: ObservableObject {
     // MARK: Init
     
     init(
-        menu: UIMenu,
+        menu: AMenuViewController?,
         upperContentView: AnyView? = nil,
         upperContentSize: CGSize,
         locationOnScreen: CGPoint,
@@ -81,7 +80,7 @@ private extension ContextMenuOverlayViewModelMac {
     
     func calculateMenuLocation() -> CGPoint {
         .init(
-            x: calculateLeadingOffset(for: menuWidth),
+            x: calculateLeadingOffset(for: menuSize.width),
             y: calculateMenuTopOffset()
         )
     }
@@ -93,7 +92,7 @@ private extension ContextMenuOverlayViewModelMac {
             - minContentsSpace
         }
         
-        let location = UIScreen.main.bounds.height - menuHeight - minBottomOffset
+        let location = UIScreen.main.bounds.height - menuSize.height - minBottomOffset
         
         return location
         - upperContentSize.height
@@ -105,7 +104,7 @@ private extension ContextMenuOverlayViewModelMac {
             return locationOnScreen.y
         }
         
-        return UIScreen.main.bounds.height - menuHeight - minBottomOffset
+        return UIScreen.main.bounds.height - menuSize.height - minBottomOffset
     }
     
     func calculateLeadingOffset(for width: CGFloat) -> CGFloat {
@@ -118,7 +117,7 @@ private extension ContextMenuOverlayViewModelMac {
     
     func updateLocationIfNeeded() {
         if isNeedToMoveFromBottom() {
-            locationOnScreen.y = UIScreen.main.bounds.height - menuHeight - minBottomOffset
+            locationOnScreen.y = UIScreen.main.bounds.height - menuSize.height - minBottomOffset
         }
         
         if isNeedToMoveFromTrailing() {
@@ -131,11 +130,7 @@ private extension ContextMenuOverlayViewModelMac {
     }
 
     func isNeedToMoveFromBottom() -> Bool {
-        UIScreen.main.bounds.height < locationOnScreen.y + menuHeight + minBottomOffset
-    }
-    
-    func calculateEstimateMenuHeight() -> CGFloat {
-        CGFloat(menu.children.count) * estimateMenuRowHeight
+        UIScreen.main.bounds.height < locationOnScreen.y + menuSize.height + minBottomOffset
     }
 }
 

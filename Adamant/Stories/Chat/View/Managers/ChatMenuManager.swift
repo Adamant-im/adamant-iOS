@@ -16,7 +16,7 @@ protocol ChatMenuManagerDelegate: AnyObject {
 }
 
 final class ChatMenuManager: NSObject, AdvancedContextMenuManagerDelegate {
-    private let menu: UIMenu
+    private let menu: AMenuSection
     private let emojiService: EmojiService?
     
     weak var delegate: ChatMenuManagerDelegate?
@@ -24,14 +24,14 @@ final class ChatMenuManager: NSObject, AdvancedContextMenuManagerDelegate {
     
     // MARK: Init
     
-    init(menu: UIMenu, emojiService: EmojiService?) {
+    init(menu: AMenuSection, emojiService: EmojiService?) {
         self.menu = menu
         self.emojiService = emojiService
         
         super.init()
     }
     
-    func configureContextMenu() -> UIMenu {
+    func configureContextMenu() -> AMenuSection {
         menu
     }
     

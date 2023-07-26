@@ -478,39 +478,41 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
 }
 
 extension ChatMessageReplyCell {
-    func makeContextMenu() -> UIMenu {
-        let remove = UIAction(
+    func makeContextMenu() -> AMenuSection {
+        let remove = AMenuItem.action(
             title: .adamantLocalized.chat.remove,
-            image: UIImage(systemName: "trash"),
-            attributes: .destructive
-        ) { _ in
+            systemImageName: "trash",
+            style: .destructive
+        ) { [weak self] in
+            guard let self = self else { return }
             self.actionHandler(.remove(id: self.model.id))
         }
         
-        let report = UIAction(
+        let report = AMenuItem.action(
             title: .adamantLocalized.chat.report,
-            image: UIImage(systemName: "exclamationmark.bubble")
-        ) { _ in
+            systemImageName: "exclamationmark.bubble"
+        ) { [weak self] in
+            guard let self = self else { return }
             self.actionHandler(.report(id: self.model.id))
         }
         
-        let reply = UIAction(
+        let reply = AMenuItem.action(
             title: .adamantLocalized.chat.reply,
-            image: UIImage(systemName: "arrowshape.turn.up.left")
-        ) { [weak self] _ in
+            systemImageName: "arrowshape.turn.up.left"
+        ) { [weak self] in
             guard let self = self else { return }
             Task { self.actionHandler(.reply(message: self.model)) }
         }
         
-        let copy = UIAction(
+        let copy = AMenuItem.action(
             title: .adamantLocalized.chat.copy,
-            image: UIImage(systemName: "doc.on.doc")
-        ) { [weak self] _ in
+            systemImageName: "doc.on.doc"
+        ) { [weak self] in
             guard let self = self else { return }
             self.actionHandler(.copy(text: self.model.message.string))
         }
         
-        return UIMenu(title: "", children: [reply, copy, report, remove])
+        return AMenuSection([reply, copy, report, remove])
     }
     
     @objc func tapReactionAction() {

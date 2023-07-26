@@ -284,31 +284,33 @@ private extension TransactionStatus {
 }
 
 extension ChatTransactionContainerView {
-    func makeContextMenu() -> UIMenu {
-        let remove = UIAction(
+    func makeContextMenu() -> AMenuSection {
+        let remove = AMenuItem.action(
             title: .adamantLocalized.chat.remove,
-            image: UIImage(systemName: "trash"),
-            attributes: .destructive
-        ) { _ in
+            systemImageName: "trash",
+            style: .destructive
+        ) { [weak self] in
+            guard let self = self else { return }
             self.actionHandler(.remove(id: self.model.id))
         }
         
-        let report = UIAction(
+        let report = AMenuItem.action(
             title: .adamantLocalized.chat.report,
-            image: UIImage(systemName: "exclamationmark.bubble")
-        ) { _ in
+            systemImageName: "exclamationmark.bubble"
+        ) { [weak self] in
+            guard let self = self else { return }
             self.actionHandler(.report(id: self.model.id))
         }
         
-        let reply = UIAction(
+        let reply = AMenuItem.action(
             title: .adamantLocalized.chat.reply,
-            image: UIImage(systemName: "arrowshape.turn.up.left")
-        ) { [weak self] _ in
+            systemImageName: "arrowshape.turn.up.left"
+        ) { [weak self] in
             guard let self = self else { return }
             Task { self.actionHandler(.reply(message: self.model)) }
         }
         
-        return UIMenu(title: "", children: [reply, report, remove])
+        return AMenuSection([reply, report, remove])
     }
 }
 

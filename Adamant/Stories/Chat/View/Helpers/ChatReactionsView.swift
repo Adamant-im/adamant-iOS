@@ -63,16 +63,16 @@ struct ChatReactionsView: View {
             } label: {
                 Image(systemName: "plus")
                     .resizable()
-                    .frame(width: 20, height: 20)
-                    .padding(5)
-                    .background(Color.white)
-                    .clipShape(Circle())
+                    .padding(6)
             }
+            .frame(width: 30, height: 30)
+            .background(Color.init(uiColor: .adamant.moreReactionsBackground))
+            .clipShape(Circle())
             .padding([.top, .bottom], 5)
             Spacer()
         }
         .padding(.leading, 5)
-        .background(Color.init(uiColor: .adamant.codeBlock))
+        .background(Color.init(uiColor: .adamant.reactionsBackground))
         .cornerRadius(20)
     }
 }
