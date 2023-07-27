@@ -71,7 +71,7 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
     private lazy var ownReactionLabel: UILabel = {
         let label = UILabel()
         label.text = getReaction(for: model.address)
-        label.backgroundColor = .adamant.codeBlock
+        label.backgroundColor = .adamant.pickedReactionBackground
         label.layer.cornerRadius = ownReactionSize.height / 2
         label.textAlignment = .center
         label.layer.masksToBounds = true
@@ -96,7 +96,7 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
         label.text = getReaction(for: model.opponentAddress)
         label.textAlignment = .center
         label.layer.masksToBounds = true
-        label.backgroundColor = .adamant.codeBlock
+        label.backgroundColor = .adamant.pickedReactionBackground
         label.layer.cornerRadius = 15
         
         label.snp.makeConstraints { make in
