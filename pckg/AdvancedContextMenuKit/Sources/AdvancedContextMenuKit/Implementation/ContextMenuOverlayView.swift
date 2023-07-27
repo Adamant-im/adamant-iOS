@@ -22,6 +22,10 @@ struct ContextMenuOverlayView: View {
         Blur(style: .systemUltraThinMaterialDark, sensetivity: 0.5)
     }
     
+    var axes: Axis.Set {
+        return viewModel.shouldScroll ? .vertical : []
+    }
+    
     var body: some View {
         ZStack {
             if viewModel.isContextMenuVisible {
@@ -52,7 +56,7 @@ struct ContextMenuOverlayView: View {
 
 private extension ContextMenuOverlayView {
     func makeOverlayView() -> some View {
-        ScrollView(.vertical) {
+        ScrollView(axes, showsIndicators: false) {
             VStack(spacing: .zero) {
                 makeContentView()
                     .onTapGesture { }

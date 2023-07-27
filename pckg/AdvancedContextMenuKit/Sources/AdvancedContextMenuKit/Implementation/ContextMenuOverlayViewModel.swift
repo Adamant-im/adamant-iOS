@@ -53,6 +53,7 @@ class ContextMenuOverlayViewModel: ObservableObject {
     weak var delegate: OverlayViewDelegate?
     
     @Published var isContextMenuVisible = false
+    @Published var shouldScroll: Bool = false
     
     init(
         contentView: UIView,
@@ -72,6 +73,7 @@ class ContextMenuOverlayViewModel: ObservableObject {
         contentViewLocation = calculateContentViewLocation()
         menuLocation = calculateMenuLocation()
         upperContentViewLocation = calculateUpperContentViewLocation()
+        shouldScroll = isShoudScroll()
     }
     
     func dismiss() {
@@ -106,7 +108,7 @@ private extension ContextMenuOverlayViewModel {
             x: isNeedToMoveFromTrailing()
             ? calculateLeadingOffset(for: menuSize.width)
             : locationOnScreen.x,
-            y: minContentsSpace //calculateMenuTopOffset()
+            y: minContentsSpace
         )
     }
     
@@ -134,6 +136,10 @@ private extension ContextMenuOverlayViewModel {
     }
     
     func calculateOffsetForContentView() -> CGFloat {
+        guard !isShoudScroll() else {
+            return minBottomOffset
+        }
+        
         if isNeedToMoveFromBottom(
             for: locationOnScreen.y + contentViewSize.height
         ) {
@@ -141,18 +147,22 @@ private extension ContextMenuOverlayViewModel {
         }
         
         if isNeedToMoveFromTop() {
-            guard contentViewSize.height
-                    + menuSize.height
-                    + minBottomOffset
-                    < UIScreen.main.bounds.height
-            else {
-                return locationOnScreen.y
-            }
-            
             return getOffsetToMoveFromTop()
         }
         
         return locationOnScreen.y
+    }
+    
+    func isShoudScroll() -> Bool {
+        guard contentViewSize.height
+                + menuSize.height
+                + minBottomOffset
+                < UIScreen.main.bounds.height
+        else {
+            return true
+        }
+        
+        return false
     }
     
     func isNeedToMoveFromTop() -> Bool {
