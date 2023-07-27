@@ -277,6 +277,12 @@
 /* ChatList: First syncronization is in progress */
 "ChatListPage.SyncingChats" = "Загружаем чаты…";
 
+/* ChatList: Reacted */
+"ChatListPage.Reacted" = "Отреагировал";
+
+/* ChatList: Removed Reaction */
+"ChatListPage.RemovedReaction" = "Удалил реакцию";
+
 /* ChatList: scene title */
 "ChatListPage.Title" = "Чаты";
 

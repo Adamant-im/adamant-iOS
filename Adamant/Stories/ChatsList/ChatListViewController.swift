@@ -20,6 +20,8 @@ extension String.adamantLocalized {
         static let searchPlaceholder = NSLocalizedString("ChatListPage.SearchBar.Placeholder", comment: "ChatList: SearchBar placeholder text")
         
         static let blockUser = NSLocalizedString("Chats.BlockUser", comment: "Block this user?")
+        static let reacted = NSLocalizedString("ChatListPage.Reacted", comment: "ChatList: Reacted")
+        static let removedReaction = NSLocalizedString("ChatListPage.RemovedReaction", comment: "ChatList: Removed Reaction")
         
         private init() {}
     }
@@ -888,6 +890,20 @@ extension ChatListViewController {
                 fullString.append(markDownText)
                 
                 return fullString
+            }
+            
+            if richMessage.isReact,
+               let content = richMessage.richContent,
+               let reaction = content[RichContentKeys.react.react_message] as? String {
+                let prefix = richMessage.isOutgoing
+                ? "\(String.adamantLocalized.chatList.sentMessagePrefix)"
+                : ""
+                
+                let text = reaction.isEmpty
+                ? NSMutableAttributedString(string: "\(prefix)\(String.adamantLocalized.chatList.removedReaction) \(reaction)")
+                : NSMutableAttributedString(string: "\(prefix)\(String.adamantLocalized.chatList.reacted) \(reaction)")
+                
+                return text
             }
             
             if let serialized = richMessage.serializedMessage() {
