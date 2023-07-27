@@ -418,14 +418,24 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         ? .zero
         : containerView.frame.width
         
+        var x = containerView.frame.origin.x
+        + additionalWidth
+        - reactionsContanerViewWidth / 2
+        
+        let minSpace = model.isFromCurrentSender
+        ? minReactionsContanerHorizontalSpace + reactionsContanerViewWidth
+        : minReactionsContanerHorizontalSpace
+        
+        x = model.isFromCurrentSender
+        ? contentView.bounds.width - x > minSpace ? x : contentView.bounds.width - minSpace
+        : x > minSpace ? x : minSpace
+        
         reactionsContanerView.frame = CGRect(
             origin: .init(
-                x: containerView.frame.origin.x
-                + additionalWidth
-                - reactionsContanerViewWidth / 2,
+                x: x,
                 y: containerView.frame.origin.y
                 + containerView.frame.height
-                - 10
+                - reactionsContanerVerticalSpace
             ),
             size: .init(width: reactionsContanerViewWidth, height: ownReactionSize.height)
         )
@@ -529,3 +539,6 @@ extension ChatMessageReplyCell: ChatMenuManagerDelegate {
         }
     }
 }
+
+private let reactionsContanerVerticalSpace: CGFloat = 10
+private let minReactionsContanerHorizontalSpace: CGFloat = 60
