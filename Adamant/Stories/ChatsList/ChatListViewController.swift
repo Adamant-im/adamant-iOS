@@ -20,8 +20,6 @@ extension String.adamantLocalized {
         static let searchPlaceholder = NSLocalizedString("ChatListPage.SearchBar.Placeholder", comment: "ChatList: SearchBar placeholder text")
         
         static let blockUser = NSLocalizedString("Chats.BlockUser", comment: "Block this user?")
-        static let reacted = NSLocalizedString("ChatListPage.Reacted", comment: "ChatList: Reacted")
-        static let removedReaction = NSLocalizedString("ChatListPage.RemovedReaction", comment: "ChatList: Removed Reaction")
         
         private init() {}
     }
@@ -900,8 +898,8 @@ extension ChatListViewController {
                 : ""
                 
                 let text = reaction.isEmpty
-                ? NSMutableAttributedString(string: "\(prefix)\(String.adamantLocalized.chatList.removedReaction) \(reaction)")
-                : NSMutableAttributedString(string: "\(prefix)\(String.adamantLocalized.chatList.reacted) \(reaction)")
+                ? NSMutableAttributedString(string: "\(prefix)\(String.adamantLocalized.notifications.removedReaction) \(reaction)")
+                : NSMutableAttributedString(string: "\(prefix)\(String.adamantLocalized.notifications.reacted) \(reaction)")
                 
                 return text
             }

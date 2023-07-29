@@ -31,6 +31,9 @@ public extension String {
             
             static let yourAddress = NSLocalizedString("transfer.notificationBody.yourAddress", tableName: "notificationContent", comment: "Transfer notification: 'Your address'")
             
+            static let reacted = NSLocalizedString("ChatListPage.Reacted", comment: "ChatList: Reacted")
+            static let removedReaction = NSLocalizedString("ChatListPage.RemovedReaction", comment: "ChatList: Removed Reaction")
+
             private init() {}
         }
     }
