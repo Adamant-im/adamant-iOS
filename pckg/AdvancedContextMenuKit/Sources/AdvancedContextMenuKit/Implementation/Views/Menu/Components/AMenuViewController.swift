@@ -10,7 +10,7 @@ import SnapKit
 
 final class AMenuViewController: UIViewController {
         
-    lazy var tableView: UITableView = {
+    private lazy var tableView: UITableView = {
         let tableView = UITableView()
         
         if #available(iOS 15.0, *) {
@@ -22,7 +22,7 @@ final class AMenuViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.isScrollEnabled = false
-        tableView.register(AMenuRowCell.self, forCellReuseIdentifier: AMenuRowCell.cellIdentifier)
+        tableView.register(AMenuRowCell.self, forCellReuseIdentifier: String(describing: AMenuRowCell.self))
         
         return tableView
     }()
@@ -209,7 +209,7 @@ extension AMenuViewController: UITableViewDelegate, UITableViewDataSource {
         cellForRowAt indexPath: IndexPath
     ) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(
-            withIdentifier: AMenuRowCell.cellIdentifier,
+            withIdentifier: String(describing: AMenuRowCell.self),
             for: indexPath
         ) as! AMenuRowCell
         

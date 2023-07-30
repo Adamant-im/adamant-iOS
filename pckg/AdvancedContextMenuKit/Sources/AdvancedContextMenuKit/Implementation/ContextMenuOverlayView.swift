@@ -31,7 +31,7 @@ struct ContextMenuOverlayView: View {
             if viewModel.isContextMenuVisible {
                 backgroundBlur
                     .zIndex(0)
-                    .ignoresSafeArea(.all)
+                    .ignoresSafeArea()
                 
                 if let upperContentView = viewModel.upperContentView {
                     makeUpperOverlayView(upperContentView: upperContentView)
@@ -67,7 +67,7 @@ private extension ContextMenuOverlayView {
         }
         .frame(width: .infinity, height: .infinity)
         .transition(.opacity)
-        .edgesIgnoringSafeArea(.all)
+        .ignoresSafeArea()
     }
     
     func makeContentView() -> some View {
@@ -87,7 +87,7 @@ private extension ContextMenuOverlayView {
         }
         .frame(width: .infinity, height: .infinity)
         .transition(.opacity)
-        .edgesIgnoringSafeArea(.all)
+        .ignoresSafeArea()
     }
     
     func makeMenuOverlayView() -> some View {
@@ -98,14 +98,14 @@ private extension ContextMenuOverlayView {
         }
         .frame(width: .infinity, height: .infinity)
         .transition(.opacity)
-        .edgesIgnoringSafeArea(.all)
+        .ignoresSafeArea()
     }
     
     func makeMenuView() -> some View {
         HStack {
             if viewModel.isContextMenuVisible,
                let menuVC = viewModel.menu {
-                AMenuWrapper(view: menuVC)
+                UIViewControllerWrapper(menuVC)
                     .frame(width: menuVC.menuSize.width, height: menuVC.menuSize.height)
                     .cornerRadius(15)
                     .padding(.top, viewModel.menuLocation.y)
@@ -115,7 +115,7 @@ private extension ContextMenuOverlayView {
             }
         }
         .frame(width: .infinity, height: .infinity)
-        .edgesIgnoringSafeArea(.all)
+        .ignoresSafeArea()
     }
     
     func makeUpperOverlayView(upperContentView: some View) -> some View {
@@ -126,7 +126,7 @@ private extension ContextMenuOverlayView {
         }
         .frame(width: .infinity, height: .infinity)
         .transition(.opacity)
-        .edgesIgnoringSafeArea(.all)
+        .ignoresSafeArea()
     }
     
     func makeUpperContentView(upperContentView: some View) -> some View {
@@ -145,7 +145,7 @@ private extension ContextMenuOverlayView {
             Spacer()
         }
         .frame(width: .infinity, height: .infinity)
-        .edgesIgnoringSafeArea(.all)
+        .ignoresSafeArea()
     }
     
 }

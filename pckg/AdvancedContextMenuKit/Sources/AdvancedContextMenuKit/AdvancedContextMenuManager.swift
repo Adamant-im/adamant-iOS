@@ -24,7 +24,7 @@ public extension AdvancedContextMenuManagerDelegate {
     }
 }
 
-public class AdvancedContextMenuManager: NSObject {
+public final class AdvancedContextMenuManager: NSObject {
     private var superView: UIView?
     private var contentView: UIView?
     private var contentViewIndex: Int = 0

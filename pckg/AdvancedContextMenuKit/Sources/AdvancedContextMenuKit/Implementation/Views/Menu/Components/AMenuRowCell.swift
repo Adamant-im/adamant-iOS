@@ -8,9 +8,7 @@
 import UIKit
 import SnapKit
 
-final class AMenuRowCell: UITableViewCell {
-    static let cellIdentifier = "MenuRow"
-    
+final class AMenuRowCell: UITableViewCell {    
     lazy var titleLabel = UILabel()
     lazy var iconImage = UIImageView(image: nil)
     lazy var backgroundColorView = UIView()

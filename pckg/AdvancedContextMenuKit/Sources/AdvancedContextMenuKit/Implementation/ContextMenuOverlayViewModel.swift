@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-class ContextMenuOverlayViewModel: ObservableObject {
+final class ContextMenuOverlayViewModel: ObservableObject {
     let contentView: UIView
     let contentViewSize: CGSize
     let locationOnScreen: CGPoint
@@ -73,7 +73,7 @@ class ContextMenuOverlayViewModel: ObservableObject {
         contentViewLocation = calculateContentViewLocation()
         menuLocation = calculateMenuLocation()
         upperContentViewLocation = calculateUpperContentViewLocation()
-        shouldScroll = isShoudScroll()
+        shouldScroll = shoudScroll()
     }
     
     func dismiss() {
@@ -136,7 +136,7 @@ private extension ContextMenuOverlayViewModel {
     }
     
     func calculateOffsetForContentView() -> CGFloat {
-        guard !isShoudScroll() else {
+        guard !shoudScroll() else {
             return minBottomOffset
         }
         
@@ -153,7 +153,7 @@ private extension ContextMenuOverlayViewModel {
         return locationOnScreen.y
     }
     
-    func isShoudScroll() -> Bool {
+    func shoudScroll() -> Bool {
         guard contentViewSize.height
                 + menuSize.height
                 + minBottomOffset

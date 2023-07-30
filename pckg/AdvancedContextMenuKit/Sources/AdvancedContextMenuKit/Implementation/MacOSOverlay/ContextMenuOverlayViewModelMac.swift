@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-class ContextMenuOverlayViewModelMac: ObservableObject {
+final class ContextMenuOverlayViewModelMac: ObservableObject {
     let menu: AMenuViewController?
     let upperContentView: AnyView?
     let upperContentSize: CGSize

@@ -41,6 +41,7 @@ struct ContextMenuOverlayViewMac: View {
 
 private extension ContextMenuOverlayViewMac {
     func makeOverlayView() -> some View {
+        // TODO: CommonKit - expanded() (in all other cases)
         VStack(spacing: 10) {
             if viewModel.isContextMenuVisible {
                 makeMenuView()
@@ -50,13 +51,13 @@ private extension ContextMenuOverlayViewMac {
         }
         .frame(width: .infinity, height: .infinity)
         .transition(.opacity)
-        .edgesIgnoringSafeArea(.all)
+        .ignoresSafeArea()
     }
     
     func makeMenuView() -> some View {
         HStack {
             if let menuVC = viewModel.menu {
-                AMenuWrapper(view: menuVC)
+                UIViewControllerWrapper(menuVC)
                     .frame(width: menuVC.menuSize.width, height: menuVC.menuSize.height)
                     .cornerRadius(15)
                     .padding(.top, viewModel.menuLocation.y)
@@ -67,7 +68,7 @@ private extension ContextMenuOverlayViewMac {
         }
         .frame(width: .infinity, height: .infinity)
         .transition(.opacity)
-        .edgesIgnoringSafeArea(.all)
+        .ignoresSafeArea()
     }
     
     func makeUpperOverlayView(upperContentView: some View) -> some View {
@@ -78,7 +79,7 @@ private extension ContextMenuOverlayViewMac {
         }
         .frame(width: .infinity, height: .infinity)
         .transition(.opacity)
-        .edgesIgnoringSafeArea(.all)
+        .ignoresSafeArea()
     }
     
     func makeUpperContentView(upperContentView: some View) -> some View {
@@ -94,7 +95,7 @@ private extension ContextMenuOverlayViewMac {
         }
         .frame(width: .infinity, height: .infinity)
         .transition(.opacity)
-        .edgesIgnoringSafeArea(.all)
+        .ignoresSafeArea()
     }
 }
 
