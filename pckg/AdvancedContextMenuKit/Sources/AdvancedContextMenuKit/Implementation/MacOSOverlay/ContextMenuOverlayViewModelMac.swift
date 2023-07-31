@@ -16,20 +16,6 @@ final class ContextMenuOverlayViewModelMac: ObservableObject {
     
     @Published var isContextMenuVisible = false
     
-    let topContentTransition = AnyTransition.asymmetric(
-        insertion: .scale(scale: 0, anchor: .bottom),
-        removal: AnyTransition.opacity.combined(
-            with: .scale(scale: 0, anchor: .bottom)
-        )
-    )
-    
-    let menuTransition = AnyTransition.asymmetric(
-        insertion: .scale(scale: 0, anchor: .top),
-        removal: AnyTransition.opacity.combined(
-            with: .scale(scale: 0, anchor: .top)
-        )
-    )
-    
     var menuSize: CGSize {
         menu?.menuSize ?? .init(width: 250, height: 300)
     }

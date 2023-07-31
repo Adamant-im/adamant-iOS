@@ -26,6 +26,15 @@ struct ContextMenuOverlayView: View {
         return viewModel.shouldScroll ? .vertical : []
     }
     
+    var menuTransition: AnyTransition {
+        AnyTransition.asymmetric(
+            insertion: .scale(scale: 0, anchor: .top),
+            removal: AnyTransition.opacity.combined(
+                with: .scale(scale: 0, anchor: .top)
+            )
+        )
+    }
+    
     var body: some View {
         ZStack {
             if viewModel.isContextMenuVisible {
@@ -110,7 +119,7 @@ private extension ContextMenuOverlayView {
                     .cornerRadius(15)
                     .padding(.top, viewModel.menuLocation.y)
                     .padding(.leading, viewModel.menuLocation.x)
-                    .transition(viewModel.menuTransition)
+                    .transition(menuTransition)
                 Spacer()
             }
         }
