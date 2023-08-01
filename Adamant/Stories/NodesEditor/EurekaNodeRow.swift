@@ -27,7 +27,7 @@ class NodeCell: Cell<NodeCell.Model>, CellType {
         }
     }
     
-    private let checkmarkRowView = CheckmarkRowView()
+    private let checkmarkRowView = UICheckmarkRowView()
     private var model: NodeCell.Model? { row.value }
     
     required init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {

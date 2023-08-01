@@ -9,7 +9,7 @@
 import SnapKit
 import UIKit
 
-final class CheckmarkRowView: UIView {
+final class UICheckmarkRowView: UIView {
     private let checkmarkView = CheckmarkView()
     private let titleLabel = makeTitleLabel()
     private let subtitleLabel = makeSubtitleLabel()
@@ -59,11 +59,6 @@ final class CheckmarkRowView: UIView {
     
     var isUpdating: Bool {
         checkmarkView.isUpdating
-    }
-    
-    var checkmarkImageBorderColor: CGColor? {
-        get { checkmarkView.imageBorderColor }
-        set { checkmarkView.imageBorderColor = newValue }
     }
     
     var checkmarkImageTintColor: UIColor? {

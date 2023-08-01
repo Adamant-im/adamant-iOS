@@ -40,7 +40,7 @@ extension StoreKey {
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     var repeater: RepeaterService!
-    var container: Container!
+    var container: SharedContainer!
     
     // MARK: Dependencies
     var accountService: AccountService!
@@ -57,8 +57,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         KeychainStore.migrateIfNeeded()
         
         // MARK: 1. Initiating Swinject
-        container = Container()
-        container.registerAdamantServices()
+        container = SharedContainer()
         accountService = container.resolve(AccountService.self)
         notificationService = container.resolve(NotificationsService.self)
         dialogService = container.resolve(DialogService.self)
@@ -438,8 +437,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 // MARK: - Background Fetch
 extension AppDelegate {
     func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        let container = Container()
-        container.registerAdamantServices()
+        let container = SharedContainer()
         
         guard let notificationsService = container.resolve(NotificationsService.self) else {
                 UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplication.backgroundFetchIntervalNever)

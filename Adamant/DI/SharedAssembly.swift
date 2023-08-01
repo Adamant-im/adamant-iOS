@@ -1,5 +1,5 @@
 //
-//  SwinjectDependencies.swift
+//  SharedAssembly.swift
 //  Adamant
 //
 //  Created by Anokhov Pavel on 07.01.2018.
@@ -10,43 +10,42 @@ import Swinject
 import BitcoinKit
 import CommonKit
 
-// MARK: - Services
-extension Container {
-    func registerAdamantServices() {
+struct SharedAssembly: Assembly {
+    func assemble(container: Container) {
         // MARK: - Standalone services
         // MARK: AdamantCore
-        self.register(AdamantCore.self) { _ in NativeAdamantCore() }.inObjectScope(.container)
+        container.register(AdamantCore.self) { _ in NativeAdamantCore() }.inObjectScope(.container)
         
         // MARK: Router
-        self.register(Router.self) { _ in
+        container.register(Router.self) { _ in
             let router = SwinjectedRouter()
-            router.container = self
+            router.container = container
             return router
         }.inObjectScope(.container)
         
         // MARK: CellFactory
-        self.register(CellFactory.self) { _ in AdamantCellFactory() }.inObjectScope(.container)
+        container.register(CellFactory.self) { _ in AdamantCellFactory() }.inObjectScope(.container)
         
         // MARK: Secured Store
-        self.register(SecuredStore.self) { _ in KeychainStore() }.inObjectScope(.container)
+        container.register(SecuredStore.self) { _ in KeychainStore() }.inObjectScope(.container)
         
         // MARK: LocalAuthentication
-        self.register(LocalAuthentication.self) { _ in AdamantAuthentication() }.inObjectScope(.container)
+        container.register(LocalAuthentication.self) { _ in AdamantAuthentication() }.inObjectScope(.container)
         
         // MARK: Reachability
-        self.register(ReachabilityMonitor.self) { _ in AdamantReachability() }.inObjectScope(.container)
+        container.register(ReachabilityMonitor.self) { _ in AdamantReachability() }.inObjectScope(.container)
         
         // MARK: AdamantAvatarService
-        self.register(AvatarService.self) { _ in AdamantAvatarService() }.inObjectScope(.container)
+        container.register(AvatarService.self) { _ in AdamantAvatarService() }.inObjectScope(.container)
         
         // MARK: - Services with dependencies
         // MARK: DialogService
-        self.register(DialogService.self) { r in
+        container.register(DialogService.self) { r in
             AdamantDialogService(router: r.resolve(Router.self)!)
         }.inObjectScope(.container)
         
         // MARK: Notifications
-        self.register(NotificationsService.self) { r in
+        container.register(NotificationsService.self) { r in
             AdamantNotificationsService(securedStore: r.resolve(SecuredStore.self)!)
         }.initCompleted { (r, c) in    // Weak reference
             guard let service = c as? AdamantNotificationsService else { return }
@@ -54,7 +53,7 @@ extension Container {
         }.inObjectScope(.container)
         
         // MARK: VisibleWalletsService
-        self.register(VisibleWalletsService.self) { r in
+        container.register(VisibleWalletsService.self) { r in
             AdamantVisibleWalletsService(
                 securedStore: r.resolve(SecuredStore.self)!,
                 accountService: r.resolve(AccountService.self)!
@@ -62,21 +61,21 @@ extension Container {
         }.inObjectScope(.container)
         
         // MARK: IncreaseFeeService
-        self.register(IncreaseFeeService.self) { r in
+        container.register(IncreaseFeeService.self) { r in
             AdamantIncreaseFeeService(
                 securedStore: r.resolve(SecuredStore.self)!
             )
         }.inObjectScope(.container)
         
         // MARK: CrashlysticsService
-        self.register(CrashlyticsService.self) { r in
+        container.register(CrashlyticsService.self) { r in
             AdamantCrashlyticsService(
                 securedStore: r.resolve(SecuredStore.self)!
             )
         }.inObjectScope(.container)
         
         // MARK: PushNotificationsTokenService
-        self.register(PushNotificationsTokenService.self) { r in
+        container.register(PushNotificationsTokenService.self) { r in
             AdamantPushNotificationsTokenService(
                 securedStore: r.resolve(SecuredStore.self)!,
                 apiService: r.resolve(ApiService.self)!,
@@ -86,7 +85,7 @@ extension Container {
         }.inObjectScope(.container)
         
         // MARK: NodesSource
-        self.register(NodesSource.self) { r in
+        container.register(NodesSource.self) { r in
             AdamantNodesSource(
                 apiService: r.resolve(ApiService.self)!,
                 healthCheckService: r.resolve(HealthCheckService.self)!,
@@ -96,7 +95,7 @@ extension Container {
         }.inObjectScope(.container)
         
         // MARK: ApiService
-        self.register(ApiService.self) { r in
+        container.register(ApiService.self) { r in
             AdamantApiService(adamantCore: r.resolve(AdamantCore.self)!)
         }.initCompleted { (r, c) in    // Weak reference
             guard let service = c as? AdamantApiService else { return }
@@ -104,12 +103,12 @@ extension Container {
         }.inObjectScope(.container)
         
         // MARK: HealthCheckService
-        self.register(HealthCheckService.self) { r in
+        container.register(HealthCheckService.self) { r in
             AdamantHealthCheckService(apiService: r.resolve(ApiService.self)!)
         }.inObjectScope(.container)
         
         // MARK: SocketService
-        self.register(SocketService.self) { _ in
+        container.register(SocketService.self) { _ in
             AdamantSocketService()
         }.initCompleted { (r, c) in    // Weak reference
             guard let service = c as? AdamantSocketService else { return }
@@ -117,7 +116,7 @@ extension Container {
         }.inObjectScope(.container)
         
         // MARK: AccountService
-        self.register(AccountService.self) { r in
+        container.register(AccountService.self) { r in
             AdamantAccountService(
                 apiService: r.resolve(ApiService.self)!,
                 adamantCore: r.resolve(AdamantCore.self)!,
@@ -131,12 +130,12 @@ extension Container {
             service.currencyInfoService = r.resolve(CurrencyInfoService.self)!
             service.visibleWalletService = r.resolve(VisibleWalletsService.self)!
             for case let wallet as SwinjectDependentService in service.wallets {
-                wallet.injectDependencies(from: self)
+                wallet.injectDependencies(from: container)
             }
         }
         
         // MARK: AddressBookServeice
-        self.register(AddressBookService.self) { r in
+        container.register(AddressBookService.self) { r in
             AdamantAddressBookService(
                 apiService: r.resolve(ApiService.self)!,
                 adamantCore: r.resolve(AdamantCore.self)!,
@@ -146,7 +145,7 @@ extension Container {
         }.inObjectScope(.container)
         
         // MARK: CurrencyInfoService
-        self.register(CurrencyInfoService.self) { r in
+        container.register(CurrencyInfoService.self) { r in
             AdamantCurrencyInfoService(securedStore: r.resolve(SecuredStore.self)!)
         }.inObjectScope(.container).initCompleted { (r, c) in
             guard let service = c as? AdamantCurrencyInfoService else { return }
@@ -155,12 +154,12 @@ extension Container {
         
         // MARK: - Data Providers
         // MARK: CoreData Stack
-        self.register(CoreDataStack.self) { _ in
+        container.register(CoreDataStack.self) { _ in
             try! InMemoryCoreDataStack(modelUrl: AdamantResources.coreDataModel)
         }.inObjectScope(.container)
         
         // MARK: Accounts
-        self.register(AccountsProvider.self) { r in
+        container.register(AccountsProvider.self) { r in
             AdamantAccountsProvider(
                 stack: r.resolve(CoreDataStack.self)!,
                 apiService: r.resolve(ApiService.self)!,
@@ -169,7 +168,7 @@ extension Container {
         }.inObjectScope(.container)
         
         // MARK: Transfers
-        self.register(TransfersProvider.self) { r in
+        container.register(TransfersProvider.self) { r in
             AdamantTransfersProvider(
                 apiService: r.resolve(ApiService.self)!,
                 stack: r.resolve(CoreDataStack.self)!,
@@ -183,7 +182,7 @@ extension Container {
         }.inObjectScope(.container)
         
         // MARK: Chats
-        self.register(ChatsProvider.self) { r in
+        container.register(ChatsProvider.self) { r in
             AdamantChatsProvider(
                 accountService: r.resolve(AccountService.self)!,
                 apiService: r.resolve(ApiService.self)!,
@@ -197,7 +196,7 @@ extension Container {
         }.inObjectScope(.container)
         
         // MARK: Chat Transaction Service
-        self.register(ChatTransactionService.self) { r in
+        container.register(ChatTransactionService.self) { r in
             AdamantChatTransactionService(
                 adamantCore: r.resolve(AdamantCore.self)!,
                 accountService: r.resolve(AccountService.self)!
@@ -205,7 +204,7 @@ extension Container {
         }.inObjectScope(.container)
         
         // MARK: Chat screen factory
-        self.register(ChatFactory.self) { r in
+        container.register(ChatFactory.self) { r in
             ChatFactory(
                 chatsProvider: r.resolve(ChatsProvider.self)!,
                 dialogService: r.resolve(DialogService.self)!,
@@ -220,12 +219,12 @@ extension Container {
         }.inObjectScope(.container)
         
         // MARK: Contribute screen factory
-        self.register(ContributeFactory.self) { r in
+        container.register(ContributeFactory.self) { r in
             ContributeFactory(crashliticsService: r.resolve(CrashlyticsService.self)!)
         }.inObjectScope(.container)
         
         // MARK: Rich transaction status service
-        self.register(RichTransactionStatusService.self) { r in
+        container.register(RichTransactionStatusService.self) { r in
             let accountService = r.resolve(AccountService.self)!
             
             let richProviders = accountService.wallets
@@ -239,7 +238,7 @@ extension Container {
         }.inObjectScope(.container)
         
         // MARK: Rich transaction reply service
-        self.register(RichTransactionReplyService.self) { r in
+        container.register(RichTransactionReplyService.self) { r in
             AdamantRichTransactionReplyService(
                 coreDataStack: r.resolve(CoreDataStack.self)!,
                 apiService: r.resolve(ApiService.self)!,
@@ -249,7 +248,7 @@ extension Container {
         }.inObjectScope(.container)
         
         // MARK: Bitcoin AddressConverterFactory
-        self.register(AddressConverterFactory.self) { r in
+        container.register(AddressConverterFactory.self) { r in
             AddressConverterFactory()
         }.inObjectScope(.container)
     }

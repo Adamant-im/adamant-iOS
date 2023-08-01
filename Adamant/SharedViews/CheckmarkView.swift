@@ -31,7 +31,7 @@ final class CheckmarkView: UIView {
     }
     
     private lazy var spinner: UIActivityIndicatorView = {
-        let view = UIActivityIndicatorView(style: .gray)
+        let view = UIActivityIndicatorView(style: .medium)
         view.isHidden = true
         view.color = .adamant.textColor
         return view
@@ -41,7 +41,7 @@ final class CheckmarkView: UIView {
         let view = UIView()
         view.layer.borderWidth = 1
         view.layer.cornerRadius = checkmarkSize / 2
-        view.layer.borderColor = UIColor.adamant.secondary.cgColor
+        view.layer.borderColor = imageBackgroundBorderColor.cgColor
         return view
     }()
     
@@ -68,6 +68,11 @@ final class CheckmarkView: UIView {
         updateImage(animated: false)
     }
     
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        imageBackgroundView.layer.borderColor = imageBackgroundBorderColor.cgColor
+    }
+    
     func setIsChecked(_ isChecked: Bool, animated: Bool) {
         guard self.isChecked != isChecked else { return }
         
@@ -76,7 +81,9 @@ final class CheckmarkView: UIView {
     }
     
     func setIsUpdating(_ isUpdating: Bool, animated: Bool) {
+        guard self.isUpdating != isUpdating else { return }
         self.isUpdating = isUpdating
+        
         if isUpdating {
             imageBackgroundView.alpha = .zero
             spinner.isHidden = false
@@ -179,3 +186,4 @@ final class CheckmarkView: UIView {
 }
 
 private let checkmarkSize: CGFloat = 24
+private let imageBackgroundBorderColor = UIColor.adamant.secondary

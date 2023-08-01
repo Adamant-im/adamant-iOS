@@ -8,6 +8,7 @@
 
 import UIKit
 import SnapKit
+import CommonKit
 
 // MARK: Cell's Delegate
 protocol AdamantDelegateCellDelegate: AnyObject {
@@ -16,7 +17,7 @@ protocol AdamantDelegateCellDelegate: AnyObject {
 
 // MARK: -
 class AdamantDelegateCell: UITableViewCell {
-    private let checkmarkRowView = CheckmarkRowView()
+    private let checkmarkRowView = UICheckmarkRowView()
     
     weak var delegate: AdamantDelegateCellDelegate? {
         didSet {
@@ -58,7 +59,6 @@ class AdamantDelegateCell: UITableViewCell {
     var isUpvoted: Bool = false {
         didSet {
             checkmarkRowView.checkmarkImage = isUpvoted ? .asset(named: "Downvote") : .asset(named: "Upvote")
-            checkmarkRowView.checkmarkImageBorderColor = isUpvoted ? UIColor.adamant.good.cgColor : UIColor.adamant.secondary.cgColor
             checkmarkRowView.checkmarkImageTintColor = isUpvoted ? .adamant.danger : .adamant.good
         }
     }

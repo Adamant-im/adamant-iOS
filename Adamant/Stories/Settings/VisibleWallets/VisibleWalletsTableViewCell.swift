@@ -8,6 +8,7 @@
 
 import UIKit
 import SnapKit
+import CommonKit
 
 // MARK: Cell's Delegate
 protocol AdamantVisibleWalletsCellDelegate: AnyObject {
@@ -73,7 +74,6 @@ class VisibleWalletsTableViewCell: UITableViewCell {
     
     func setupView() {
         checkmarkRowView.checkmarkImage = .asset(named: "status_success")
-        checkmarkRowView.checkmarkImageBorderColor = UIColor.adamant.secondary
         
         contentView.addSubview(checkmarkRowView)
         checkmarkRowView.snp.makeConstraints {
