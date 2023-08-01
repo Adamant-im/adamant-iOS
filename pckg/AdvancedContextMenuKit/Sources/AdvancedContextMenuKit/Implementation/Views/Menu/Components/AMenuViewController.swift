@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import CommonKit
 
 final class AMenuViewController: UIViewController {
         
@@ -28,9 +29,7 @@ final class AMenuViewController: UIViewController {
     }()
     
     // MARK: Proprieties
-    
-    typealias Action = () -> Void
-    
+        
     let menuContent: AMenuSection
     var finished: ((Action?) -> Void)?
     
@@ -40,18 +39,6 @@ final class AMenuViewController: UIViewController {
     
     private let font = UIFont.systemFont(ofSize: 17)
     private let dragSensitivity: CGFloat = 250
-    
-    private var defaultBackgroundColor: UIColor {
-        let colorWhiteTheme  = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 1)
-        let colorDarkTheme   = UIColor(red: 0.264, green: 0.264, blue: 0.264, alpha: 1)
-        return .returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
-    }
-    
-    private var textColor: UIColor {
-        let colorWhiteTheme  = UIColor.black
-        let colorDarkTheme   = UIColor.white
-        return .returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
-    }
     
     var menuSize: CGSize {
         let items = menuContent.menuItems.count
@@ -227,8 +214,8 @@ extension AMenuViewController: UITableViewDelegate, UITableViewDataSource {
         
         cell.configure(
             with: menuItem,
-            accentColor: textColor,
-            backgroundColor: defaultBackgroundColor,
+            accentColor: .adamant.contextMenuTextColor,
+            backgroundColor: .adamant.contextMenuDefaultBackgroundColor,
             font: font,
             rowPosition: rowPosition
         )

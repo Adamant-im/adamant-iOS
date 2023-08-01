@@ -220,6 +220,36 @@ extension UIColor {
         /// Color of input bar placeholder
         public static let chatPlaceholderTextColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1)
         
+        // MARK: Context Menu
+        
+        public static var contextMenuLineColor: UIColor {
+            let colorWhiteTheme  = UIColor(red: 0.75, green: 0.75, blue: 0.75, alpha: 0.8)
+            let colorDarkTheme   = UIColor(red: 0.50, green: 0.50, blue: 0.50, alpha: 0.8)
+            return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
+        }
+        
+        public static var contextMenuSelectColor: UIColor {
+            let colorWhiteTheme  = UIColor.black.withAlphaComponent(0.10)
+            let colorDarkTheme   = UIColor.white.withAlphaComponent(0.13)
+            return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
+        }
+        
+        public static var contextMenuDefaultBackgroundColor: UIColor {
+            let colorWhiteTheme  = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 1)
+            let colorDarkTheme   = UIColor(red: 0.264, green: 0.264, blue: 0.264, alpha: 1)
+            return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
+        }
+        
+        public static var contextMenuTextColor: UIColor {
+            let colorWhiteTheme  = UIColor.black
+            let colorDarkTheme   = UIColor.white
+            return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
+        }
+        
+        public static var contextMenuDestructive: UIColor {
+            UIColor(red: 1, green: 0.2196078431, blue: 0.137254902, alpha: 1)
+        }
+        
         // MARK: Pinpad
         /// Pinpad highligh button background, 12% gray
         public static let pinpadHighlightButton = UIColor(red: 0.88, green: 0.88, blue: 0.88, alpha: 1)

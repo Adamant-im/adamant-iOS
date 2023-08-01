@@ -6,10 +6,7 @@
 //
 
 import SwiftUI
-
-protocol OverlayViewDelegate: AnyObject {
-    func didDissmis()
-}
+import CommonKit
 
 struct ContextMenuOverlayView: View {
     @StateObject private var viewModel: ContextMenuOverlayViewModel

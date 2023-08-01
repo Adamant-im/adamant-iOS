@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CommonKit
 
 extension AMenuItem {
     
@@ -51,7 +52,7 @@ extension AMenuItem.Style {
             icon?.tintColor = color
             
         case .destructive:
-            let color = UIColor.destructive
+            let color = UIColor.adamant.contextMenuDestructive
             titleLabel.font = menuFont
             titleLabel.textColor = color
             icon?.tintColor = color

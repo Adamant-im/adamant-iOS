@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CommonKit
 
 final class ContextMenuOverlayViewModel: ObservableObject {
     let contentView: UIView
@@ -58,11 +59,12 @@ final class ContextMenuOverlayViewModel: ObservableObject {
     }
     
     func dismiss() {
-        withAnimation(.easeInOut(duration: animationDuration)) {
-            isContextMenuVisible.toggle()
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + animationDuration) {
-            self.delegate?.didDissmis()
+        Task { @MainActor in
+            await animate(duration: animationDuration) {
+                self.isContextMenuVisible.toggle()
+            }
+            
+            delegate?.didDissmis()
         }
     }
 }

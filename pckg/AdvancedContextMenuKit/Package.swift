@@ -14,11 +14,13 @@ let package = Package(
             targets: ["AdvancedContextMenuKit"]
         )
     ],
-    dependencies: [],
+    dependencies: [
+        .package(path: "../CommonKit")
+    ],
     targets: [
         .target(
             name: "AdvancedContextMenuKit",
-            dependencies: []
+            dependencies: ["CommonKit"]
         )
     ]
 )

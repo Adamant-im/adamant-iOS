@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import CommonKit
 
 final class AMenuRowCell: UITableViewCell {    
     lazy var titleLabel = UILabel()
@@ -21,18 +22,6 @@ final class AMenuRowCell: UITableViewCell {
         case top
         case bottom
         case other
-    }
-    
-    private var lineColor: UIColor {
-        let colorWhiteTheme  = UIColor(red: 0.75, green: 0.75, blue: 0.75, alpha: 0.8)
-        let colorDarkTheme   = UIColor(red: 0.50, green: 0.50, blue: 0.50, alpha: 0.8)
-        return .returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
-    }
-    
-    private var selectColor: UIColor {
-        let colorWhiteTheme  = UIColor.black.withAlphaComponent(0.10)
-        let colorDarkTheme   = UIColor.white.withAlphaComponent(0.13)
-        return .returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
     }
     
     private var rowBackgroundColor: UIColor?
@@ -107,7 +96,7 @@ final class AMenuRowCell: UITableViewCell {
         
         switch rowPosition {
         case .top, .other:
-            lineView.backgroundColor = lineColor
+            lineView.backgroundColor = .adamant.contextMenuLineColor
         case .bottom:
             lineView.backgroundColor = .clear
         }
@@ -118,7 +107,7 @@ final class AMenuRowCell: UITableViewCell {
             return
         }
         
-        backgroundDarkeningView.backgroundColor = selectColor
+        backgroundDarkeningView.backgroundColor = .adamant.contextMenuSelectColor
         backgroundColorView.backgroundColor = rowBackgroundColor.withAlphaComponent(0.3)
     }
     

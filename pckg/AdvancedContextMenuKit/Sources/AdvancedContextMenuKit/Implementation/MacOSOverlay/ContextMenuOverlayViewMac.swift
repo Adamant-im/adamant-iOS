@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CommonKit
 
 struct ContextMenuOverlayViewMac: View {
     @StateObject private var viewModel: ContextMenuOverlayViewModelMac
