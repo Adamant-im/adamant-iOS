@@ -43,7 +43,6 @@ struct ChatReactionsView: View {
                         ChatReactionButton(
                             emoji: emoji
                         )
-                        .padding([.leading], 1)
                         .frame(width: 40, height: 40)
                         .background(
                             selectedEmoji == emoji

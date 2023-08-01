@@ -56,17 +56,16 @@ extension ChatMenuManager: ChatReactionsViewDelegate, ElegantEmojiPickerDelegate
         delegate?.didReact(emoji == selectedEmoji ? "" : emoji)
     }
     
+    @MainActor
     func didTapMore() {
-        DispatchQueue.onMainAsync {
-            let config = ElegantConfiguration(
-                showRandom: false,
-                showReset: false,
-                defaultSkinTone: .Light
-            )
-            let picker = ElegantEmojiPicker(delegate: self, configuration: config)
-            picker.definesPresentationContext = true
-            self.rootViewController()?.present(picker, animated: true)
-        }
+        let config = ElegantConfiguration(
+            showRandom: false,
+            showReset: false,
+            defaultSkinTone: .Light
+        )
+        let picker = ElegantEmojiPicker(delegate: self, configuration: config)
+        picker.definesPresentationContext = true
+        self.rootViewController()?.present(picker, animated: true)
     }
     
     func emojiPicker (

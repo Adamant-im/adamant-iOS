@@ -60,6 +60,7 @@
         <attribute name="reactionsData" optional="YES" attributeType="Transformable"/>
     </entity>
     <entity name="RichMessageTransaction" representedClassName="RichMessageTransaction" parentEntity="ChatTransaction" syncable="YES">
+        <attribute name="additionalType" optional="YES" attributeType="Integer 32" defaultValueString="2" usesScalarValueType="YES"/>
         <attribute name="isReact" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="isReply" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="richContent" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[String:Any]"/>

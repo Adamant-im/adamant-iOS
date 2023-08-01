@@ -60,12 +60,12 @@ extension AdamantRichTransactionReactService: NSFetchedResultsControllerDelegate
         newIndexPath _: IndexPath?
     ) {
         if let transaction = object as? RichMessageTransaction,
-           transaction.isReact {
+           transaction.additionalType == .reaction {
             Task { await processReactionCoreDataChange(type: type_, transaction: transaction) }
         }
         
         if let transaction = object as? RichMessageTransaction,
-           !transaction.isReact {
+           transaction.additionalType != .reaction {
             Task { await processCoreDataChange(type: type_, transaction: transaction) }
         }
         
@@ -81,63 +81,61 @@ extension AdamantRichTransactionReactService: NSFetchedResultsControllerDelegate
 
 private extension AdamantRichTransactionReactService {
     func processReaction(transaction: RichMessageTransaction) {
-        Task {
-            guard
-                let id = transaction.getRichValue(
-                    for: RichContentKeys.react.reactto_id
-                ),
-                let reaction = transaction.getRichValue(
-                    for: RichContentKeys.react.react_message
-                )
-            else {
-                return
-            }
-            
-            var reactions = reactions[id] ?? []
-            let lastReactionForSender = reactions.first(
-                where: { $0.sender == transaction.senderAddress }
+        guard
+            let id = transaction.getRichValue(
+                for: RichContentKeys.react.reactto_id
+            ),
+            let reaction = transaction.getRichValue(
+                for: RichContentKeys.react.react_message
             )
-            
-            let lastReactionSentDate: Date = lastReactionForSender?.sentDate ?? .init(timeIntervalSince1970: .zero)
-            
-            let currentReactionSentDate = transaction.sentDate == nil
-            ? .now
-            : transaction.sentDate ?? .now
-            
-            guard lastReactionSentDate < currentReactionSentDate
-            else { return }
-            
-            if let index = reactions.firstIndex(where: { $0.sender == transaction.senderAddress }) {
-                reactions.remove(at: index)
-            }
-            
-            reactions.update(
-                with: .init(
-                    sender: transaction.senderAddress,
-                    reaction: reaction.isEmpty ? nil : reaction,
-                    sentDate: transaction.sentDate ?? .now
-                )
+        else {
+            return
+        }
+        
+        var reactions = reactions[id] ?? []
+        let lastReactionForSender = reactions.first(
+            where: { $0.sender == transaction.senderAddress }
+        )
+        
+        let lastReactionSentDate: Date = lastReactionForSender?.sentDate ?? .init(timeIntervalSince1970: .zero)
+        
+        let currentReactionSentDate = transaction.sentDate == nil
+        ? .now
+        : transaction.sentDate ?? .now
+        
+        guard lastReactionSentDate < currentReactionSentDate
+        else { return }
+        
+        if let index = reactions.firstIndex(where: { $0.sender == transaction.senderAddress }) {
+            reactions.remove(at: index)
+        }
+        
+        reactions.update(
+            with: .init(
+                sender: transaction.senderAddress,
+                reaction: reaction.isEmpty ? nil : reaction,
+                sentDate: transaction.sentDate ?? .now
             )
-            
-            self.reactions[id] = reactions
-            
-            let baseTransaction = getTransactionFromDB(id: id)
-            
-            switch baseTransaction {
-            case let trs as MessageTransaction:
-                update(transaction: trs)
-            case let trs as TransferTransaction:
-                update(transaction: trs)
-            case let trs as RichMessageTransaction:
-                update(transaction: trs)
-            default:
-                break
-            }
+        )
+        
+        self.reactions[id] = reactions
+        
+        let baseTransaction = getTransactionFromDB(id: id)
+        
+        switch baseTransaction {
+        case let trs as MessageTransaction:
+            update(transaction: trs)
+        case let trs as TransferTransaction:
+            update(transaction: trs)
+        case let trs as RichMessageTransaction:
+            update(transaction: trs)
+        default:
+            break
         }
     }
     
     func update(transaction: RichMessageTransaction) {
-        var reactions = reactions[transaction.transactionId] ?? []
+        let reactions = reactions[transaction.transactionId] ?? []
         let savedReactions = transaction.richContent?[RichContentKeys.react.reactions] as? Set<Reaction>
         
         guard savedReactions != reactions else { return }
@@ -149,7 +147,7 @@ private extension AdamantRichTransactionReactService {
     }
     
     func update(transaction: TransferTransaction) {
-        var reactions = reactions[transaction.transactionId] ?? []
+        let reactions = reactions[transaction.transactionId] ?? []
         let savedReactions = transaction.reactions
         
         guard savedReactions != reactions else { return }
@@ -161,7 +159,7 @@ private extension AdamantRichTransactionReactService {
     }
     
     func update(transaction: MessageTransaction) {
-        var reactions = reactions[transaction.transactionId] ?? []
+        let reactions = reactions[transaction.transactionId] ?? []
         let savedReactions = transaction.reactions
         
         guard savedReactions != reactions else { return }

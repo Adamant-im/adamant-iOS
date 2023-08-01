@@ -456,6 +456,20 @@ extension AdamantChatsProvider {
             privateKey: privateKey
         )
         
+        await processChatMessages(
+            result: result,
+            chatroom: chatroom,
+            offset: offset,
+            addressRecipient: addressRecipient
+        )
+    }
+    
+    func processChatMessages(
+        result: (reactionsCount: Int, totalCount: Int),
+        chatroom: ChatRooms?,
+        offset: Int?,
+        addressRecipient: String
+    ) async {
         let messageCount = chatroom?.messages?.count ?? 0
         
         let minRectionsCount = result.totalCount * minReactionsProcent / 100
@@ -716,8 +730,7 @@ extension AdamantChatsProvider {
                 richContent: payload.content(),
                 richContentSerialized: payload.serialized(),
                 richType: payload.type,
-                isReply: payload.isReply,
-                isReact: payload.isReact,
+                additionalType: payload.additionalType,
                 senderId: loggedAccount.address,
                 recipientId: recipientId,
                 keypair: keypair,
@@ -803,8 +816,7 @@ extension AdamantChatsProvider {
                 richContent: payload.content(),
                 richContentSerialized: payload.serialized(),
                 richType: payload.type,
-                isReply: payload.isReply,
-                isReact: payload.isReact,
+                additionalType: payload.additionalType,
                 senderId: loggedAccount.address,
                 recipientId: recipientId,
                 keypair: keypair,
@@ -874,8 +886,7 @@ extension AdamantChatsProvider {
         richContent: [String: Any],
         richContentSerialized: String,
         richType: String,
-        isReply: Bool,
-        isReact: Bool,
+        additionalType: RichAdditionalType,
         senderId: String,
         recipientId: String,
         keypair: Keypair,
@@ -894,8 +905,7 @@ extension AdamantChatsProvider {
         transaction.transactionId = id
         transaction.richContent = richContent
         transaction.richType = richType
-        transaction.isReply = isReply
-        transaction.isReact = isReact
+        transaction.additionalType = additionalType
         transaction.richContentSerialized = richContentSerialized
         
         transaction.transactionStatus = richProviders[richType] != nil ? .notInitiated : nil
@@ -1560,7 +1570,7 @@ extension AdamantChatsProvider {
                     context: privateContext
                    ) {
                     if let transaction = chatTransaction as? RichMessageTransaction,
-                       transaction.isReact {
+                       transaction.additionalType == .reaction {
                         reactions += 1
                     }
                     if height < chatTransaction.height {

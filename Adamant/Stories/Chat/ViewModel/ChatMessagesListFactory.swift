@@ -28,7 +28,7 @@ actor ChatMessagesListFactory {
         
         let transactionsWithoutReact = transactions.filter { chatTransaction in
             guard let transaction = chatTransaction as? RichMessageTransaction,
-                  transaction.isReact
+                  transaction.additionalType == .reaction
             else { return true }
             
             return false

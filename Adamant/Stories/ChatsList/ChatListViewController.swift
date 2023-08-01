@@ -863,7 +863,7 @@ extension ChatListViewController {
                 return provider.shortDescription(for: richMessage)
             }
             
-            if richMessage.isReply,
+            if richMessage.additionalType == .reply,
                let content = richMessage.richContent,
                let text = content[RichContentKeys.reply.replyMessage] as? String {
                 
@@ -895,7 +895,7 @@ extension ChatListViewController {
                 return fullString
             }
             
-            if richMessage.isReact,
+            if richMessage.additionalType == .reaction,
                let content = richMessage.richContent,
                let reaction = content[RichContentKeys.react.react_message] as? String {
                 let prefix = richMessage.isOutgoing

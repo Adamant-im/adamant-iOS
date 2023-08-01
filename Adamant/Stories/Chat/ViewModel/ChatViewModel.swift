@@ -496,6 +496,10 @@ final class ChatViewModel: NSObject {
             }
         }.stored(in: tasksStorage)
     }
+    
+    func clearReplyMessage() {
+        replyMessage = nil
+    }
 }
 
 extension ChatViewModel {

@@ -125,7 +125,7 @@ private extension ChatMessageFactory {
                 backgroundColor: backgroundColor
             )
         case let transaction as RichMessageTransaction:
-            if transaction.isReply,
+            if transaction.additionalType == .reply,
                !transaction.isTransferReply() {
                 return makeReplyContent(
                     transaction,
