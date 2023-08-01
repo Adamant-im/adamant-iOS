@@ -28,7 +28,6 @@ final class ChatTransactionCell: UICollectionViewCell {
     
     override var isSelected: Bool {
         didSet {
-            transactionView.animateIsSelected(isSelected, originalColor: transactionView.backgroundColor)
             transactionView.isSelected = isSelected
         }
     }
