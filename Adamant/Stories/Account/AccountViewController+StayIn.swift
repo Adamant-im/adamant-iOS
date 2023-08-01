@@ -9,6 +9,7 @@
 import Foundation
 import Eureka
 import MyLittlePinpad
+import CommonKit
 
 extension AccountViewController {
     func setStayLoggedIn(enabled: Bool) {
@@ -19,7 +20,7 @@ extension AccountViewController {
         if enabled { // Create pin and turn on Stay In
             pinpadRequest = .createPin
             let pinpad = PinpadViewController.adamantPinpad(biometryButton: .hidden)
-            pinpad.commentLabel.text = String.adamantLocalized.pinpad.createPin
+            pinpad.commentLabel.text = String.adamant.pinpad.createPin
             pinpad.commentLabel.isHidden = false
             pinpad.delegate = self
             pinpad.modalPresentationStyle = .overFullScreen
@@ -30,7 +31,7 @@ extension AccountViewController {
             pinpadRequest = .turnOffPin
             let biometryButton: PinpadBiometryButtonType = accountService.useBiometry ? localAuth.biometryType.pinpadButtonType : .hidden
             let pinpad = PinpadViewController.adamantPinpad(biometryButton: biometryButton)
-            pinpad.commentLabel.text = String.adamantLocalized.security.stayInTurnOff
+            pinpad.commentLabel.text = String.adamant.security.stayInTurnOff
             pinpad.commentLabel.isHidden = false
             pinpad.delegate = self
             pinpad.modalPresentationStyle = .overFullScreen
@@ -45,11 +46,11 @@ extension AccountViewController {
             return
         }
         
-        let reason = enabled ? String.adamantLocalized.security.biometryOnReason : String.adamantLocalized.security.biometryOffReason
+        let reason = enabled ? String.adamant.security.biometryOnReason : String.adamant.security.biometryOffReason
         localAuth.authorizeUser(reason: reason) { [weak self] result in
             switch result {
             case .success:
-                self?.dialogService.showSuccess(withMessage: String.adamantLocalized.alert.done)
+                self?.dialogService.showSuccess(withMessage: String.adamant.alert.done)
                 self?.accountService.useBiometry = enabled
                 
             case .cancel:
@@ -65,10 +66,10 @@ extension AccountViewController {
                     let pinpad = PinpadViewController.adamantPinpad(biometryButton: .hidden)
                     
                     if enabled {
-                        pinpad.commentLabel.text = String.adamantLocalized.security.biometryOnReason
+                        pinpad.commentLabel.text = String.adamant.security.biometryOnReason
                         self?.pinpadRequest = .turnOnBiometry
                     } else {
-                        pinpad.commentLabel.text = String.adamantLocalized.security.biometryOffReason
+                        pinpad.commentLabel.text = String.adamant.security.biometryOffReason
                         self?.pinpadRequest = .turnOffBiometry
                     }
                     
@@ -122,7 +123,7 @@ extension AccountViewController: PinpadViewControllerDelegate {
         // MARK: User has entered new pin first time. Request re-enter pin
         case .createPin?:
             pinpadRequest = .reenterPin(pin: pin)
-            pinpad.commentLabel.text = String.adamantLocalized.pinpad.reenterPin
+            pinpad.commentLabel.text = String.adamant.pinpad.reenterPin
             pinpad.clearPin()
             return
             
@@ -201,7 +202,7 @@ extension AccountViewController: PinpadViewControllerDelegate {
             
         // MARK: User wants to turn of StayIn with his face. Or finger.
         case .turnOffPin?:
-            localAuth.authorizeUser(reason: String.adamantLocalized.security.stayInTurnOff, completion: { [weak self] result in
+            localAuth.authorizeUser(reason: String.adamant.security.stayInTurnOff, completion: { [weak self] result in
                 switch result {
                 case .success:
                     self?.accountService.dropSavedAccount()

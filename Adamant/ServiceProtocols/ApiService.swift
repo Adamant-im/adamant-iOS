@@ -8,6 +8,7 @@
 
 import Foundation
 import Alamofire
+import CommonKit
 
 // MARK: - Notifications
 extension Notification.Name {

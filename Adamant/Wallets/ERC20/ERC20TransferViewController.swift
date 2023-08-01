@@ -9,6 +9,7 @@
 import UIKit
 import Eureka
 import Web3Core
+import CommonKit
 
 final class ERC20TransferViewController: TransferViewControllerBase {
     
@@ -41,7 +42,7 @@ final class ERC20TransferViewController: TransferViewControllerBase {
             return
         }
         
-        dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
+        dialogService.showProgress(withMessage: String.adamant.transfer.transferProcessingMessage, userInteractionEnable: false)
         
         Task {
             do {
@@ -76,7 +77,7 @@ final class ERC20TransferViewController: TransferViewControllerBase {
                 }
                 
                 dialogService.dismissProgress()
-                dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                dialogService.showSuccess(withMessage: String.adamant.transfer.transferSuccess)
                 
                 // Present detail VC
                 presentDetailTransactionVC(
@@ -109,7 +110,7 @@ final class ERC20TransferViewController: TransferViewControllerBase {
         if let detailsVc = router.get(scene: AdamantScene.Wallets.ERC20.transactionDetails) as? ERC20TransactionDetailsViewController {
             detailsVc.transaction = transaction
             detailsVc.service = service
-            detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+            detailsVc.senderName = String.adamant.transactionDetails.yourAddress
             detailsVc.recipientName = recipientName
             
             if comments.count > 0 {
@@ -148,7 +149,7 @@ final class ERC20TransferViewController: TransferViewControllerBase {
     override func recipientRow() -> BaseRow {
         let row = TextRow {
             $0.tag = BaseRows.address.tag
-            $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
+            $0.cell.textField.placeholder = String.adamant.newChat.addressPlaceholder
             $0.cell.textField.keyboardType = UIKeyboardType.namePhonePad
             $0.cell.textField.autocorrectionType = .no
             $0.cell.textField.setLineBreakMode()
@@ -215,7 +216,7 @@ final class ERC20TransferViewController: TransferViewControllerBase {
     
     override func defaultSceneTitle() -> String? {
         let networkSymbol = service?.tokenNetworkSymbol ?? "ERC20"
-        return String.adamantLocalized.wallets.erc20.sendToken(service?.tokenSymbol ?? "ERC20") + " (\(networkSymbol))"
+        return String.adamant.wallets.erc20.sendToken(service?.tokenSymbol ?? "ERC20") + " (\(networkSymbol))"
     }
     
     override func validateAmount(_ amount: Decimal, withFee: Bool = true) -> Bool {

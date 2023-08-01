@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import CommonKit
 
 extension AdamantApiService.ApiCommands {
     static let Delegates = (

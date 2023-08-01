@@ -15,7 +15,7 @@ protocol Localizable {
 
 extension String: Localizable {
     var localized: String {
-        return NSLocalizedString(self, comment: "")
+        return .localized(self, comment: "")
     }
 }
 

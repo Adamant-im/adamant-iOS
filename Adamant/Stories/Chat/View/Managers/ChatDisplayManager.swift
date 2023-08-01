@@ -93,7 +93,7 @@ final class ChatDisplayManager: MessagesDisplayDelegate {
             let icon = UIImageView(frame: CGRect(x: -28, y: -10, width: 20, height: 20))
             icon.contentMode = .scaleAspectFit
             icon.tintColor = .adamant.secondary
-            icon.image = #imageLiteral(resourceName: "cross").withRenderingMode(.alwaysTemplate)
+            icon.image = .asset(named: "cross")?.withRenderingMode(.alwaysTemplate) ?? .init()
             accessoryView.addSubview(icon)
         case .delivered, .pending:
             accessoryView.subviews.forEach { $0.removeFromSuperview() }

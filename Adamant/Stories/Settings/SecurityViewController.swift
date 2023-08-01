@@ -10,15 +10,16 @@ import Foundation
 import Eureka
 import SafariServices
 import MarkdownKit
+import CommonKit
 
 // MARK: - Localization
-extension String.adamantLocalized {
+extension String.adamant {
     struct security {
-        static let title = NSLocalizedString("SecurityPage.Title", comment: "Security: scene title")
+        static let title = String.localized("SecurityPage.Title", comment: "Security: scene title")
         
-        static let stayInTurnOff = NSLocalizedString("SecurityPage.DoNotStayLoggedIn", comment: "Security: turn off 'Stay Logged In' confirmation")
-        static let biometryOnReason = NSLocalizedString("SecurityPage.UseBiometry", comment: "Security: Authorization reason for turning biometry on")
-        static let biometryOffReason = NSLocalizedString("SecurityPage.DoNotUseBiometry", comment: "Security: Authorization reason for turning biometry off")
+        static let stayInTurnOff = String.localized("SecurityPage.DoNotStayLoggedIn", comment: "Security: turn off 'Stay Logged In' confirmation")
+        static let biometryOnReason = String.localized("SecurityPage.UseBiometry", comment: "Security: Authorization reason for turning biometry on")
+        static let biometryOffReason = String.localized("SecurityPage.DoNotUseBiometry", comment: "Security: Authorization reason for turning biometry off")
         
         private init() {}
     }
@@ -59,9 +60,9 @@ class SecurityViewController: FormViewController {
         
         var localized: String {
             switch self {
-            case .security: return NSLocalizedString("SecurityPage.Section.Security", comment: "Security: Security section")
-            case .notifications: return NSLocalizedString("SecurityPage.Section.NotificationsType", comment: "Security: Selected notifications types")
-            case .aboutNotificationTypes: return NSLocalizedString("SecurityPage.Section.AboutNotificationTypes", comment: "Security: About Notification types")
+            case .security: return .localized("SecurityPage.Section.Security", comment: "Security: Security section")
+            case .notifications: return .localized("SecurityPage.Section.NotificationsType", comment: "Security: Selected notifications types")
+            case .aboutNotificationTypes: return .localized("SecurityPage.Section.AboutNotificationTypes", comment: "Security: About Notification types")
             }
         }
     }
@@ -84,12 +85,12 @@ class SecurityViewController: FormViewController {
         
         var localized: String {
             switch self {
-            case .generateQr: return NSLocalizedString("SecurityPage.Row.GenerateQr", comment: "Security: Generate QR with passphrase row")
-            case .stayIn: return NSLocalizedString("SecurityPage.Row.StayLoggedIn", comment: "Security: Stay logged option")
+            case .generateQr: return .localized("SecurityPage.Row.GenerateQr", comment: "Security: Generate QR with passphrase row")
+            case .stayIn: return .localized("SecurityPage.Row.StayLoggedIn", comment: "Security: Stay logged option")
             case .biometry: return "" // localAuth.biometryType.localized
-            case .notificationsMode: return NSLocalizedString("SecurityPage.Row.Notifications", comment: "Security: Show notifications")
-            case .description: return NSLocalizedString("SecurityPage.Row.Notifications.ModesDescription", comment: "Security: Notification modes description. Markdown supported.")
-            case .github: return NSLocalizedString("SecurityPage.Row.VisitGithub", comment: "Security: Visit Github")
+            case .notificationsMode: return .localized("SecurityPage.Row.Notifications", comment: "Security: Show notifications")
+            case .description: return .localized("SecurityPage.Row.Notifications.ModesDescription", comment: "Security: Notification modes description. Markdown supported.")
+            case .github: return .localized("SecurityPage.Row.VisitGithub", comment: "Security: Visit Github")
             }
         }
     }
@@ -124,7 +125,7 @@ class SecurityViewController: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationItem.title = String.adamantLocalized.security.title
+        navigationItem.title = String.adamant.security.title
         navigationOptions = .Disabled
         
         // MARK: StayIn
@@ -232,7 +233,7 @@ class SecurityViewController: FormViewController {
         let githubRow = LabelRow {
             $0.tag = Rows.github.tag
             $0.title = Rows.github.localized
-            $0.cell.imageView?.image = #imageLiteral(resourceName: "row_github")
+            $0.cell.imageView?.image = .asset(named: "row_github")
             $0.cell.imageView?.tintColor = UIColor.adamant.tableRowIcons
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray

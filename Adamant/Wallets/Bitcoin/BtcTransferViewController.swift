@@ -8,6 +8,7 @@
 
 import UIKit
 import Eureka
+import CommonKit
 
 final class BtcTransferViewController: TransferViewControllerBase {
     
@@ -40,7 +41,7 @@ final class BtcTransferViewController: TransferViewControllerBase {
             return
         }
         
-        dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
+        dialogService.showProgress(withMessage: String.adamant.transfer.transferProcessingMessage, userInteractionEnable: false)
         
         Task {
             do {
@@ -81,7 +82,7 @@ final class BtcTransferViewController: TransferViewControllerBase {
                 )
                 
                 dialogService.dismissProgress()
-                dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                dialogService.showSuccess(withMessage: String.adamant.transfer.transferSuccess)
             } catch {
                 dialogService.dismissProgress()
                 dialogService.showRichError(error: error)
@@ -96,15 +97,15 @@ final class BtcTransferViewController: TransferViewControllerBase {
         comments: String,
         transaction: TransactionDetails
     ) {
-        vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+        vc.dialogService.showSuccess(withMessage: String.adamant.transfer.transferSuccess)
         
         if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Bitcoin.transactionDetails) as? BtcTransactionDetailsViewController {
             detailsVc.transaction = localTransaction ?? transaction
             detailsVc.service = service
-            detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+            detailsVc.senderName = String.adamant.transactionDetails.yourAddress
             
             if recipientAddress == service.wallet?.address {
-                detailsVc.recipientName = String.adamantLocalized.transactionDetails.yourAddress
+                detailsVc.recipientName = String.adamant.transactionDetails.yourAddress
             } else {
                 detailsVc.recipientName = self.recipientName
             }
@@ -144,7 +145,7 @@ final class BtcTransferViewController: TransferViewControllerBase {
     override func recipientRow() -> BaseRow {
         let row = TextRow {
             $0.tag = BaseRows.address.tag
-            $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
+            $0.cell.textField.placeholder = String.adamant.newChat.addressPlaceholder
             $0.cell.textField.setLineBreakMode()
             
             if let recipient = recipientAddress {
@@ -175,6 +176,6 @@ final class BtcTransferViewController: TransferViewControllerBase {
     
     
     override func defaultSceneTitle() -> String? {
-        return String.adamantLocalized.sendBtc
+        return String.adamant.sendBtc
     }
 }

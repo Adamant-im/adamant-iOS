@@ -9,6 +9,7 @@
 
 import Foundation
 import CoreData
+import CommonKit
 
 @objc(RichMessageTransaction)
 public class RichMessageTransaction: ChatTransaction {

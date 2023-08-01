@@ -11,6 +11,7 @@ import AVFoundation
 import Photos
 import QRCodeReader
 import EFQRCode
+import CommonKit
 
 extension LoginViewController {
     func loginWithQrFromCamera() {
@@ -36,12 +37,12 @@ extension LoginViewController {
             }
             
         case .restricted:
-            let alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotSupported, preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
+            let alert = UIAlertController(title: nil, message: String.adamant.login.cameraNotSupported, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: String.adamant.alert.ok, style: .cancel, handler: nil))
             present(alert, animated: true, completion: nil)
             
         case .denied:
-            dialogService.presentGoToSettingsAlert(title: nil, message: String.adamantLocalized.login.cameraNotAuthorized)
+            dialogService.presentGoToSettingsAlert(title: nil, message: String.adamant.login.cameraNotAuthorized)
         @unknown default:
             break
         }
@@ -65,7 +66,7 @@ extension LoginViewController {
 extension LoginViewController: QRCodeReaderViewControllerDelegate {
     func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
         guard AdamantUtilities.validateAdamantPassphrase(passphrase: result.value) else {
-            dialogService.showWarning(withMessage: String.adamantLocalized.login.wrongQrError)
+            dialogService.showWarning(withMessage: String.adamant.login.wrongQrError)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 reader.startScanning()
             }
@@ -103,9 +104,9 @@ extension LoginViewController: UINavigationControllerDelegate, UIImagePickerCont
                 }
             }
             
-            dialogService.showWarning(withMessage: String.adamantLocalized.login.wrongQrError)
+            dialogService.showWarning(withMessage: String.adamant.login.wrongQrError)
         } else {
-            dialogService.showWarning(withMessage: String.adamantLocalized.login.noQrError)
+            dialogService.showWarning(withMessage: String.adamant.login.noQrError)
         }
     }
 }

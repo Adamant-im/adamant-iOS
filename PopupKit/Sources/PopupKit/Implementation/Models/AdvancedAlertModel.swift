@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CommonKit
 
 public struct AdvancedAlertModel: Equatable, Hashable {
     public let icon: UIImage

@@ -9,6 +9,7 @@
 import UIKit
 import SnapKit
 import Combine
+import CommonKit
 
 final class ChatTransactionContainerView: UIView, ChatModelView {
     var subscription: AnyCancellable?
@@ -143,11 +144,11 @@ extension ChatTransactionContainerView.Model {
 private extension TransactionStatus {
     var image: UIImage {
         switch self {
-        case .notInitiated: return #imageLiteral(resourceName: "status_updating")
-        case .pending, .registered, .noNetwork, .noNetworkFinal: return #imageLiteral(resourceName: "status_pending")
-        case .success: return #imageLiteral(resourceName: "status_success")
-        case .failed: return #imageLiteral(resourceName: "status_failed")
-        case .inconsistent: return #imageLiteral(resourceName: "status_warning")
+        case .notInitiated: return .asset(named: "status_updating") ?? .init()
+        case .pending, .registered, .noNetwork, .noNetworkFinal: return .asset(named: "status_pending") ?? .init()
+        case .success: return .asset(named: "status_success") ?? .init()
+        case .failed: return .asset(named: "status_failed") ?? .init()
+        case .inconsistent: return .asset(named: "status_warning") ?? .init()
         }
     }
     
@@ -164,7 +165,7 @@ private extension TransactionStatus {
 extension ChatTransactionContainerView {
     func makeContextMenu() -> UIMenu {
         let remove = UIAction(
-            title: .adamantLocalized.chat.remove,
+            title: .adamant.chat.remove,
             image: UIImage(systemName: "trash"),
             attributes: .destructive
         ) { _ in
@@ -172,14 +173,14 @@ extension ChatTransactionContainerView {
         }
         
         let report = UIAction(
-            title: .adamantLocalized.chat.report,
+            title: .adamant.chat.report,
             image: UIImage(systemName: "exclamationmark.bubble")
         ) { _ in
             self.actionHandler(.report(id: self.model.id))
         }
         
         let reply = UIAction(
-            title: .adamantLocalized.chat.reply,
+            title: .adamant.chat.reply,
             image: UIImage(systemName: "arrowshape.turn.up.left")
         ) { [weak self] _ in
             guard let self = self else { return }

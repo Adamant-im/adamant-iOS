@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CommonKit
 
 struct NodeVersion: Codable {
     let success: Bool

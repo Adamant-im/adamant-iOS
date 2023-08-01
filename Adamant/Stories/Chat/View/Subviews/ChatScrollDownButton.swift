@@ -12,7 +12,7 @@ import SnapKit
 final class ChatScrollDownButton: UIView {
     private lazy var button: UIButton = {
         let button = UIButton(type: .custom)
-        button.setImage(#imageLiteral(resourceName: "ScrollDown"), for: .normal)
+        button.setImage(.asset(named: "ScrollDown"), for: .normal)
         button.alpha = 0.5
         button.addTarget(self, action: #selector(onTap), for: .touchUpInside)
         return button

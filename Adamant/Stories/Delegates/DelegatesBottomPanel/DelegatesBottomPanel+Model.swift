@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CommonKit
 
 extension DelegatesBottomPanel {
     struct Model {

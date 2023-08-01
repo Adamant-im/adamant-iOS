@@ -8,6 +8,7 @@
 
 import UserNotifications
 import MarkdownKit
+import CommonKit
 
 class NotificationService: UNNotificationServiceExtension {
     private let passphraseStoreKey = "accountService.passphrase"

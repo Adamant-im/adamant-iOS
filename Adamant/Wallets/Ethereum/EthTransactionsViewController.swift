@@ -8,6 +8,7 @@
 
 import UIKit
 import web3swift
+import CommonKit
 
 class EthTransactionsViewController: TransactionsListViewControllerBase {
     
@@ -117,11 +118,11 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
         vc.transaction = emptyTransaction
         
         if emptyTransaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
-            vc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+            vc.senderName = String.adamant.transactionDetails.yourAddress
         }
         
         if emptyTransaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
-            vc.recipientName = String.adamantLocalized.transactionDetails.yourAddress
+            vc.recipientName = String.adamant.transactionDetails.yourAddress
         }
         
         navigationController?.pushViewController(vc, animated: true)

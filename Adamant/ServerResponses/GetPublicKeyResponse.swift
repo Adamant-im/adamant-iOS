@@ -7,8 +7,9 @@
 //
 
 import Foundation
+import CommonKit
 
-class GetPublicKeyResponse: ServerResponse {
+final class GetPublicKeyResponse: ServerResponse {
     let publicKey: String?
     
     required init(from decoder: Decoder) throws {

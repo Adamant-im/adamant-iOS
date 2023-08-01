@@ -9,6 +9,7 @@
 import UIKit
 import Combine
 import MessageKit
+import CommonKit
 
 protocol ChatReusableViewModelProtocol: Equatable {
     static var `default`: Self { get }

@@ -7,11 +7,12 @@
 //
 
 import UIKit
+import CommonKit
 
-extension String.adamantLocalized {
-    static let bitcoin = NSLocalizedString("AccountTab.Wallets.bitcoin_wallet", comment: "Account tab: Bitcoin wallet")
+extension String.adamant {
+    static let bitcoin = String.localized("AccountTab.Wallets.bitcoin_wallet", comment: "Account tab: Bitcoin wallet")
     
-    static let sendBtc = NSLocalizedString("AccountTab.Row.SendBtc", comment: "Account tab: 'Send BTC tokens' button")
+    static let sendBtc = String.localized("AccountTab.Row.SendBtc", comment: "Account tab: 'Send BTC tokens' button")
 }
 
 class BtcWalletViewController: WalletViewControllerBase {
@@ -20,11 +21,11 @@ class BtcWalletViewController: WalletViewControllerBase {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        walletTitleLabel.text = String.adamantLocalized.bitcoin
+        walletTitleLabel.text = String.adamant.bitcoin
     }
     
     override func sendRowLocalizedLabel() -> NSAttributedString {
-        return NSAttributedString(string: String.adamantLocalized.sendBtc)
+        return NSAttributedString(string: String.adamant.sendBtc)
     }
     
     override func encodeForQr(address: String) -> String? {

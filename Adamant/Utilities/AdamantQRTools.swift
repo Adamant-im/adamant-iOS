@@ -8,6 +8,7 @@
 
 import UIKit
 import EFQRCode
+import CommonKit
 
 enum QRToolGenerateResult {
     case success(UIImage)
@@ -30,7 +31,7 @@ class AdamantQRTools {
         if withLogo {
             let hasAdm = string.contains("\(AdmWalletService.qqPrefix):") || string.contains("msg.adamant.im")
             let logoSize = hasAdm ? EFIntSize(width: 156, height: 156) : EFIntSize(width: 138, height: 138)
-            generator.withIcon(UIImage(named: "logo")?.cgImage, size: logoSize)
+            generator.withIcon(UIImage.asset(named: "logo")?.cgImage, size: logoSize)
         }
         
         if let qr = generator.generate() {

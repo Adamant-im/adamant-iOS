@@ -10,6 +10,7 @@ import UIKit
 import MessageUI
 import PopupKit
 import SafariServices
+import CommonKit
 
 final class AdamantDialogService: DialogService {
     // MARK: Dependencies
@@ -113,8 +114,8 @@ extension AdamantDialogService {
         error: Error? = nil
     ) {
         popupManager.showAdvancedAlert(model: .init(
-            icon: #imageLiteral(resourceName: "error"),
-            title: .adamantLocalized.alert.error,
+            icon: .asset(named: "error") ?? .init(),
+            title: .adamant.alert.error,
             text: message,
             secondaryButton: supportEmail
                 ? .init(
@@ -126,7 +127,7 @@ extension AdamantDialogService {
                 )
                 : nil,
             primaryButton: .init(
-                title: .adamantLocalized.alert.ok,
+                title: .adamant.alert.ok,
                 action: .init(id: .zero) { [weak popupManager] in
                     popupManager?.dismissAdvancedAlert()
                 }
@@ -168,9 +169,9 @@ extension AdamantDialogService {
     func showNoConnectionNotification() {
         DispatchQueue.onMainAsync { [weak popupManager] in
             popupManager?.showNotification(
-                icon: #imageLiteral(resourceName: "error"),
-                title: .adamantLocalized.alert.noInternetNotificationTitle,
-                description: .adamantLocalized.alert.noInternetNotificationBoby,
+                icon: .asset(named: "error"),
+                title: .adamant.alert.noInternetNotificationTitle,
+                description: .adamant.alert.noInternetNotificationBoby,
                 autoDismiss: false,
                 tapHandler: nil
             )
@@ -185,7 +186,7 @@ extension AdamantDialogService {
     
     private func sendErrorEmail(errorDescription: String) {
         let body = String(
-            format: .adamantLocalized.alert.emailErrorMessageBody,
+            format: .adamant.alert.emailErrorMessageBody,
             errorDescription,
             AdamantUtilities.deviceInfo
         )
@@ -193,14 +194,14 @@ extension AdamantDialogService {
         if let vc = getTopmostViewController() {
             vc.openEmailScreen(
                 recipient: AdamantResources.supportEmail,
-                subject: .adamantLocalized.alert.emailErrorMessageTitle,
+                subject: .adamant.alert.emailErrorMessageTitle,
                 body: body,
                 delegate: mailDelegate
             )
         } else {
             AdamantUtilities.openEmailApp(
                 recipient: AdamantResources.supportEmail,
-                subject: .adamantLocalized.alert.emailErrorMessageTitle,
+                subject: .adamant.alert.emailErrorMessageTitle,
                 body: body
             )
         }
@@ -384,7 +385,7 @@ extension AdamantDialogService {
             case .copyToPasteboard:
                 alert.addAction(UIAlertAction(title: type.localized , style: .default) { [weak self] _ in
                     UIPasteboard.general.string = stringForPasteboard
-                    self?.showToastMessage(String.adamantLocalized.alert.copiedToPasteboardNotification)
+                    self?.showToastMessage(String.adamant.alert.copiedToPasteboardNotification)
                 })
                 
             case .share:
@@ -444,7 +445,7 @@ extension AdamantDialogService {
             }
         }
         
-        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: String.adamant.alert.cancel, style: .cancel, handler: nil))
     }
     
     func presentDummyAlert(
@@ -457,7 +458,7 @@ extension AdamantDialogService {
             for: adm,
             from: from,
             canSend: canSend,
-            message: String.adamantLocalized.transferAdm.accountNotFoundAlertBody,
+            message: String.adamant.transferAdm.accountNotFoundAlertBody,
             sendCompletion: sendCompletion
         )
     }
@@ -472,7 +473,7 @@ extension AdamantDialogService {
             for: adm,
             from: from,
             canSend: canSend,
-            message: String.adamantLocalized.transferAdm.accountNotFoundChatAlertBody,
+            message: String.adamant.transferAdm.accountNotFoundChatAlertBody,
             sendCompletion: sendCompletion
         )
     }
@@ -485,7 +486,7 @@ extension AdamantDialogService {
         sendCompletion: ((UIAlertAction) -> Void)?
     ) {
         let alert = makeSafeAlertController(
-            title: String.adamantLocalized.transferAdm.accountNotFoundAlertTitle(
+            title: String.adamant.transferAdm.accountNotFoundAlertTitle(
                 for: adm
             ),
             message: message,
@@ -495,7 +496,7 @@ extension AdamantDialogService {
         
         if let url = URL(string: NewChatViewController.faqUrl) {
             let faq = UIAlertAction(
-                title: String.adamantLocalized.newChat.whatDoesItMean,
+                title: String.adamant.newChat.whatDoesItMean,
                 style: UIAlertAction.Style.default) { [weak self] _ in
                     let safari = SFSafariViewController(url: url)
                     safari.preferredControlTintColor = UIColor.adamant.primary
@@ -507,7 +508,7 @@ extension AdamantDialogService {
         
         if canSend {
             let send = UIAlertAction(
-                title: String.adamantLocalized.transfer.send,
+                title: String.adamant.transfer.send,
                 style: .default,
                 handler: sendCompletion
             )
@@ -515,7 +516,7 @@ extension AdamantDialogService {
         }
         
         let cancel = UIAlertAction(
-            title: String.adamantLocalized.alert.cancel,
+            title: String.adamant.alert.cancel,
             style: .cancel,
             handler: nil
         )
@@ -535,7 +536,7 @@ extension AdamantDialogService {
         if let error = error {
             showError(withMessage: error.localizedDescription, supportEmail: true)
         } else {
-            showSuccess(withMessage: String.adamantLocalized.alert.done)
+            showSuccess(withMessage: String.adamant.alert.done)
         }
     }
     
@@ -547,7 +548,7 @@ extension AdamantDialogService {
             source: nil
         )
         
-        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
+        alert.addAction(UIAlertAction(title: String.adamant.alert.settings, style: .default) { _ in
             DispatchQueue.main.async {
                 if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
                     UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
@@ -555,7 +556,7 @@ extension AdamantDialogService {
             }
         })
         
-        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: String.adamant.alert.cancel, style: .cancel, handler: nil))
         alert.modalPresentationStyle = .overFullScreen
         
         DispatchQueue.onMainAsync { [weak self] in
@@ -610,7 +611,7 @@ extension AdamantDialogService {
                 alert.addAction(action)
             }
         } else {
-            alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .default))
+            alert.addAction(UIAlertAction(title: String.adamant.alert.ok, style: .default))
         }
         
         if let sourceView = from as? UIView {

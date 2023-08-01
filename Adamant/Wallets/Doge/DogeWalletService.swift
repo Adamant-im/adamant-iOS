@@ -11,6 +11,7 @@ import Swinject
 import Alamofire
 import BitcoinKit
 import Combine
+import CommonKit
 
 struct DogeApiCommands {
     static func balance(for address: String) -> String {
@@ -61,7 +62,7 @@ class DogeWalletService: WalletService {
     var addressConverter: AddressConverter!
     
     // MARK: - Constants
-    static var currencyLogo = #imageLiteral(resourceName: "doge_wallet")
+    static var currencyLogo = UIImage.asset(named: "doge_wallet") ?? .init()
     static let multiplier = Decimal(sign: .plus, exponent: 8, significand: 1)
     static let chunkSize = 20
  
@@ -629,7 +630,7 @@ extension DogeWalletService: PrivateKeyGenerator {
     }
     
     var rowImage: UIImage? {
-        return #imageLiteral(resourceName: "doge_wallet_row")
+        return .asset(named: "doge_wallet_row")
     }
     
     func generatePrivateKeyFor(passphrase: String) -> String? {

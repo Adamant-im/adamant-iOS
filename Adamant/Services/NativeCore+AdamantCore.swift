@@ -8,6 +8,7 @@
 
 import Foundation
 import CryptoSwift
+import CommonKit
 
 extension NativeAdamantCore: AdamantCore {
     // MARK: - Passphrases

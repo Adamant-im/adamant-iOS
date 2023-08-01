@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CommonKit
 
 extension AdamantApiService {
     func transferFunds(sender: String, recipient: String, amount: Decimal, keypair: Keypair, completion: @escaping (ApiServiceResult<UInt64>) -> Void) {

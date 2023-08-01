@@ -8,6 +8,7 @@
 
 import Foundation
 import CryptoSwift
+import CommonKit
 
 enum MnemonicError : Error {
     case randomBytesError

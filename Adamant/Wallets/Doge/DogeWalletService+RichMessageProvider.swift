@@ -9,6 +9,7 @@
 import Foundation
 import MessageKit
 import UIKit
+import CommonKit
 
 extension DogeWalletService: RichMessageProvider {
     var newPendingInterval: TimeInterval {

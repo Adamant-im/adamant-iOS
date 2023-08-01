@@ -8,11 +8,10 @@
 
 import Foundation
 import UIKit
+import CommonKit
 
 protocol AvatarService {
     func avatar(for key:String, size: Double) -> UIImage
 }
 
-extension AdamantAvatarService: AvatarService {
-    
-}
+extension AdamantAvatarService: AvatarService {}

@@ -9,17 +9,18 @@
 import UIKit
 import Eureka
 import SafariServices
+import CommonKit
 
 // MARK: - Localization
-extension String.adamantLocalized {
+extension String.adamant {
     enum transferAdm {
         static func accountNotFoundAlertTitle(for address: String) -> String {
-            return String.localizedStringWithFormat(NSLocalizedString("TransferScene.unsafeTransferAlert.title", comment: "Transfer: Alert title: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address"), address)
+            return String.localizedStringWithFormat(.localized("TransferScene.unsafeTransferAlert.title", comment: "Transfer: Alert title: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address"), address)
         }
             
-        static let accountNotFoundAlertBody = NSLocalizedString("TransferScene.unsafeTransferAlert.body", comment: "Transfer: Alert body: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address")
+        static let accountNotFoundAlertBody = String.localized("TransferScene.unsafeTransferAlert.body", comment: "Transfer: Alert body: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address")
         
-        static let accountNotFoundChatAlertBody = NSLocalizedString("TransferScene.unsafeChatAlert.body", comment: "Transfer: Alert body: Account is not initiated. It's not possible to start a chat, as the Blockchain doesn't store the account's public key to encrypt messages.")
+        static let accountNotFoundChatAlertBody = String.localized("TransferScene.unsafeChatAlert.body", comment: "Transfer: Alert body: Account is not initiated. It's not possible to start a chat, as the Blockchain doesn't store the account's public key to encrypt messages.")
     }
 }
 
@@ -45,7 +46,7 @@ final class AdmTransferViewController: TransferViewControllerBase {
             comments = ""
         }
         
-        dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
+        dialogService.showProgress(withMessage: String.adamant.transfer.transferProcessingMessage, userInteractionEnable: false)
         
         // Check recipient
         Task {
@@ -73,7 +74,7 @@ final class AdmTransferViewController: TransferViewControllerBase {
                         canSend: true
                     ) { [weak self] _ in
                         self?.dialogService.showProgress(
-                            withMessage: String.adamantLocalized.transfer.transferProcessingMessage,
+                            withMessage: String.adamant.transfer.transferProcessingMessage,
                             userInteractionEnable: false
                         )
                         
@@ -112,7 +113,7 @@ final class AdmTransferViewController: TransferViewControllerBase {
                 service.update()
                 dialogService.dismissProgress()
                 
-                dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                dialogService.showSuccess(withMessage: String.adamant.transfer.transferSuccess)
                 
                 openDetailVC(
                     result: result,
@@ -136,7 +137,7 @@ final class AdmTransferViewController: TransferViewControllerBase {
         }
         
         // MARK: Sender, you
-        detailsVC?.senderName = String.adamantLocalized.transactionDetails.yourAddress
+        detailsVC?.senderName = String.adamant.transactionDetails.yourAddress
         
         // MARK: Get recipient
         if let recipientName = recipientName {
@@ -180,7 +181,7 @@ final class AdmTransferViewController: TransferViewControllerBase {
     override func recipientRow() -> BaseRow {
         let row = TextRow {
             $0.tag = BaseRows.address.tag
-            $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
+            $0.cell.textField.placeholder = String.adamant.newChat.addressPlaceholder
             $0.cell.textField.setPopupKeyboardType(.numberPad)
             $0.cell.textField.setLineBreakMode()
             
@@ -289,7 +290,7 @@ final class AdmTransferViewController: TransferViewControllerBase {
     }
     
     override func defaultSceneTitle() -> String? {
-        return String.adamantLocalized.wallets.sendAdm
+        return String.adamant.wallets.sendAdm
     }
     
 }

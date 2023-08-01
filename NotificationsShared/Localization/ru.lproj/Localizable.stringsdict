@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NotificationsService.NewTransfer.BodyFormat</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>У вас %#@transfers@</string>
+		<key>transfers</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>few</key>
+			<string>%d новые транзакции</string>
+			<key>many</key>
+			<string>%d новых транзакций</string>
+			<key>one</key>
+			<string>%d новая транзакция</string>
+			<key>other</key>
+			<string>%d новые транзакции</string>
+		</dict>
+	</dict>
+	<key>NotificationsService.NewMessage.BodyFormat</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>У вас %#@messages@</string>
+		<key>messages</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>few</key>
+			<string>%d новых сообщения</string>
+			<key>many</key>
+			<string>%d новых сообщений</string>
+			<key>one</key>
+			<string>%d новое сообщение</string>
+			<key>other</key>
+			<string>%d новых сообщения</string>
+		</dict>
+	</dict>
+</dict>
+</plist>

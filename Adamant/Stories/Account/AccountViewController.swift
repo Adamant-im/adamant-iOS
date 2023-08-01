@@ -12,11 +12,12 @@ import FreakingSimpleRoundImageView
 import CoreData
 import Parchment
 import SnapKit
+import CommonKit
 
 // MARK: - Localization
-extension String.adamantLocalized {
+extension String.adamant {
     struct account {
-        static let title = NSLocalizedString("AccountTab.Title", comment: "Account page: scene title")
+        static let title = String.localized("AccountTab.Title", comment: "Account page: scene title")
         
         static let updatingBalance = "…"
         
@@ -24,9 +25,9 @@ extension String.adamantLocalized {
     }
 }
 
-extension String.adamantLocalized.alert {
-    static let logoutMessageFormat = NSLocalizedString("AccountTab.ConfirmLogout.MessageFormat", comment: "Account tab: Confirm logout alert")
-    static let logoutButton = NSLocalizedString("AccountTab.ConfirmLogout.Logout", comment: "Account tab: Confirm logout alert: Logout (Ok) button")
+extension String.adamant.alert {
+    static let logoutMessageFormat = String.localized("AccountTab.ConfirmLogout.MessageFormat", comment: "Account tab: Confirm logout alert")
+    static let logoutButton = String.localized("AccountTab.ConfirmLogout.Logout", comment: "Account tab: Confirm logout alert: Logout (Ok) button")
 }
 
 // MARK: AccountViewController
@@ -48,9 +49,9 @@ class AccountViewController: FormViewController {
         var localized: String {
             switch self {
             case .wallet: return "Wallet"    // Depends on selected wallet
-            case .application: return NSLocalizedString("AccountTab.Section.Application", comment: "Account tab: Application section title")
-            case .actions: return NSLocalizedString("AccountTab.Section.Actions", comment: "Account tab: Actions section title")
-            case .delegates: return NSLocalizedString("AccountTab.Section.Delegates", comment: "Account tab: Delegates section title")
+            case .application: return .localized("AccountTab.Section.Application", comment: "Account tab: Application section title")
+            case .actions: return .localized("AccountTab.Section.Actions", comment: "Account tab: Actions section title")
+            case .delegates: return .localized("AccountTab.Section.Delegates", comment: "Account tab: Delegates section title")
             case .security: return Rows.security.localized
             }
         }
@@ -85,43 +86,43 @@ class AccountViewController: FormViewController {
         
         var localized: String {
             switch self {
-            case .balance: return NSLocalizedString("AccountTab.Row.Balance", comment: "Account tab: Balance row title")
-            case .sendTokens: return NSLocalizedString("AccountTab.Row.SendTokens", comment: "Account tab: 'Send tokens' button")
-            case .security: return NSLocalizedString("AccountTab.Row.Security", comment: "Account tab: 'Security' row")
-            case .theme: return NSLocalizedString("AccountTab.Row.Theme", comment: "Account tab: 'Theme' row")
-            case .currency: return NSLocalizedString("AccountTab.Row.Currency", comment: "Account tab: 'Currency' row")
-            case .nodes: return String.adamantLocalized.nodesList.nodesListButton
-            case .about: return NSLocalizedString("AccountTab.Row.About", comment: "Account tab: 'About' row")
-            case .logout: return NSLocalizedString("AccountTab.Row.Logout", comment: "Account tab: 'Logout' button")
-            case .voteForDelegates: return NSLocalizedString("AccountTab.Row.VoteForDelegates", comment: "Account tab: 'Votes for delegates' button")
-            case .generateQr: return NSLocalizedString("SecurityPage.Row.GenerateQr", comment: "Security: Generate QR with passphrase row")
-            case .generatePk: return NSLocalizedString("SecurityPage.Row.GeneratePk", comment: "Security: Generate PrivateKey with passphrase row")
+            case .balance: return .localized("AccountTab.Row.Balance", comment: "Account tab: Balance row title")
+            case .sendTokens: return .localized("AccountTab.Row.SendTokens", comment: "Account tab: 'Send tokens' button")
+            case .security: return .localized("AccountTab.Row.Security", comment: "Account tab: 'Security' row")
+            case .theme: return .localized("AccountTab.Row.Theme", comment: "Account tab: 'Theme' row")
+            case .currency: return .localized("AccountTab.Row.Currency", comment: "Account tab: 'Currency' row")
+            case .nodes: return String.adamant.nodesList.nodesListButton
+            case .about: return .localized("AccountTab.Row.About", comment: "Account tab: 'About' row")
+            case .logout: return .localized("AccountTab.Row.Logout", comment: "Account tab: 'Logout' button")
+            case .voteForDelegates: return .localized("AccountTab.Row.VoteForDelegates", comment: "Account tab: 'Votes for delegates' button")
+            case .generateQr: return .localized("SecurityPage.Row.GenerateQr", comment: "Security: Generate QR with passphrase row")
+            case .generatePk: return .localized("SecurityPage.Row.GeneratePk", comment: "Security: Generate PrivateKey with passphrase row")
             case .stayIn: return SecurityViewController.Rows.stayIn.localized
             case .biometry: return SecurityViewController.Rows.biometry.localized
             case .notifications: return SecurityViewController.Rows.notificationsMode.localized
-            case .visibleWallets: return NSLocalizedString("VisibleWallets.Title", comment: "Visible Wallets page: scene title")
-            case .contribute: return NSLocalizedString("AccountTab.Row.Contribute", comment: "Account tab: 'Contribute' row")
+            case .visibleWallets: return .localized("VisibleWallets.Title", comment: "Visible Wallets page: scene title")
+            case .contribute: return .localized("AccountTab.Row.Contribute", comment: "Account tab: 'Contribute' row")
             }
         }
         
         var image: UIImage? {
             switch self {
-            case .security: return #imageLiteral(resourceName: "row_security")
-            case .about: return #imageLiteral(resourceName: "row_about")
-            case .theme: return #imageLiteral(resourceName: "row_themes.png")
-            case .currency: return #imageLiteral(resourceName: "row_currency")
-            case .nodes: return #imageLiteral(resourceName: "row_nodes")
-            case .balance: return #imageLiteral(resourceName: "row_balance")
-            case .voteForDelegates: return #imageLiteral(resourceName: "row_vote-delegates")
-            case .logout: return #imageLiteral(resourceName: "row_logout")
+            case .security: return .asset(named: "row_security")
+            case .about: return .asset(named: "row_about")
+            case .theme: return .asset(named: "row_themes.png")
+            case .currency: return .asset(named: "row_currency")
+            case .nodes: return .asset(named: "row_nodes")
+            case .balance: return .asset(named: "row_balance")
+            case .voteForDelegates: return .asset(named: "row_vote-delegates")
+            case .logout: return .asset(named: "row_logout")
             case .sendTokens: return nil
-            case .generateQr: return #imageLiteral(resourceName: "row_QR.png")
-            case .generatePk: return #imageLiteral(resourceName: "privateKey_row")
-            case .stayIn: return #imageLiteral(resourceName: "row_security")
+            case .generateQr: return .asset(named: "row_QR.png")
+            case .generatePk: return .asset(named: "privateKey_row")
+            case .stayIn: return .asset(named: "row_security")
             case .biometry: return nil // Determined by localAuth service
-            case .notifications: return #imageLiteral(resourceName: "row_Notifications.png")
-            case .visibleWallets: return #imageLiteral(resourceName: "row_balance")
-            case .contribute: return #imageLiteral(resourceName: "row_contribute")
+            case .notifications: return .asset(named: "row_Notifications.png")
+            case .visibleWallets: return .asset(named: "row_balance")
+            case .contribute: return .asset(named: "row_contribute")
             }
         }
     }
@@ -504,15 +505,15 @@ class AccountViewController: FormViewController {
                 return
             }
             
-            let alert = UIAlertController(title: String.localizedStringWithFormat(String.adamantLocalized.alert.logoutMessageFormat, address), message: nil, preferredStyle: .alert)
-            let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel) { _ in
+            let alert = UIAlertController(title: String.localizedStringWithFormat(String.adamant.alert.logoutMessageFormat, address), message: nil, preferredStyle: .alert)
+            let cancel = UIAlertAction(title: String.adamant.alert.cancel, style: .cancel) { _ in
                 guard let indexPath = row.indexPath else {
                     return
                 }
                 
                 self?.tableView.deselectRow(at: indexPath, animated: true)
             }
-            let logout = UIAlertAction(title: String.adamantLocalized.alert.logoutButton, style: .default) { [weak self] _ in
+            let logout = UIAlertAction(title: String.adamant.alert.logoutButton, style: .default) { [weak self] _ in
                 self?.accountService.logout()
                 if let vc = self?.router.get(scene: AdamantScene.Login.login) {
                     vc.modalPresentationStyle = .overFullScreen
@@ -562,8 +563,8 @@ class AccountViewController: FormViewController {
             if let auth = self?.localAuth {
                 switch auth.biometryType {
                 case .none: $0.cell.imageView?.image = nil
-                case .touchID: $0.cell.imageView?.image = #imageLiteral(resourceName: "row_touchid.png")
-                case .faceID: $0.cell.imageView?.image = #imageLiteral(resourceName: "row_faceid.png")
+                case .touchID: $0.cell.imageView?.image = .asset(named: "row_touchid.png")
+                case .faceID: $0.cell.imageView?.image = .asset(named: "row_faceid.png")
                 }
             }
             $0.hidden = Condition.function([], { [weak self] _ -> Bool in
@@ -950,7 +951,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
             return WalletPagingItem(
                 index: index,
                 currencySymbol: "",
-                currencyImage: #imageLiteral(resourceName: "adamant_wallet"),
+                currencyImage: .asset(named: "adamant_wallet") ?? .init(),
                 isBalanceInitialized: false)
         }
         

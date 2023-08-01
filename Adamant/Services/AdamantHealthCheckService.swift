@@ -8,6 +8,7 @@
 
 import Foundation
 import Alamofire
+import CommonKit
 
 final class AdamantHealthCheckService: HealthCheckService {
     // MARK: - Dependencies

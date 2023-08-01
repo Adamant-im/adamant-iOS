@@ -9,6 +9,7 @@
 import UIKit
 import Parchment
 import SnapKit
+import CommonKit
 
 @MainActor
 protocol ComplexTransferViewControllerDelegate: AnyObject {
@@ -141,7 +142,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
             } catch {
                 v.showAlertView(
                     title: nil,
-                    message: String.adamantLocalized.sharedErrors.unknownError,
+                    message: String.adamant.sharedErrors.unknownError,
                     animated: true
                 )
             }
@@ -157,7 +158,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
             return WalletPagingItem(
                 index: index,
                 currencySymbol: "",
-                currencyImage: #imageLiteral(resourceName: "adamant_wallet"),
+                currencyImage: .asset(named: "adamant_wallet") ?? .init(),
                 isBalanceInitialized: false)
 		}
         

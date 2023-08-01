@@ -8,14 +8,15 @@
 
 import UIKit
 import CoreData
+import CommonKit
 
-extension String.adamantLocalized {
+extension String.adamant {
     struct transactionList {
-        static let title = NSLocalizedString("TransactionListScene.Title", comment: "TransactionList: scene title")
-        static let toChat = NSLocalizedString("TransactionListScene.ToChat", comment: "TransactionList: To Chat button")
-        static let startChat = NSLocalizedString("TransactionListScene.StartChat", comment: "TransactionList: Start Chat button")
-        static let notFound = NSLocalizedString("TransactionListScene.Error.NotFound", comment: "TransactionList: 'Transactions not found' message.")
-        static let noTransactionYet = NSLocalizedString("TransactionListScene.NoTransactionYet", comment: "TransactionList: 'No Transaction Yet' message.")
+        static let title = String.localized("TransactionListScene.Title", comment: "TransactionList: scene title")
+        static let toChat = String.localized("TransactionListScene.ToChat", comment: "TransactionList: To Chat button")
+        static let startChat = String.localized("TransactionListScene.StartChat", comment: "TransactionList: Start Chat button")
+        static let notFound = String.localized("TransactionListScene.Error.NotFound", comment: "TransactionList: 'Transactions not found' message.")
+        static let noTransactionYet = String.localized("TransactionListScene.NoTransactionYet", comment: "TransactionList: 'No Transaction Yet' message.")
         
     }
 }
@@ -53,8 +54,8 @@ class TransactionsListViewControllerBase: UIViewController {
         super.viewDidLoad()
 
         navigationItem.largeTitleDisplayMode = .never
-        navigationItem.title = String.adamantLocalized.transactionList.title
-        emptyLabel.text = String.adamantLocalized.transactionList.noTransactionYet
+        navigationItem.title = String.adamant.transactionList.title
+        emptyLabel.text = String.adamant.transactionList.noTransactionYet
         
         // MARK: Configure tableView
         let nib = UINib.init(nibName: "TransactionTableViewCell", bundle: nil)

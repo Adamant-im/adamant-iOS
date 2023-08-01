@@ -11,6 +11,7 @@ import QRCodeReader
 import EFQRCode
 import AVFoundation
 import Photos
+import CommonKit
 
 // MARK: - QR
 extension TransferViewControllerBase {
@@ -33,8 +34,8 @@ extension TransferViewControllerBase {
                 }
             }
         case .restricted:
-            let alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotSupported, preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
+            let alert = UIAlertController(title: nil, message: String.adamant.login.cameraNotSupported, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: String.adamant.alert.ok, style: .cancel, handler: nil))
             alert.modalPresentationStyle = .overFullScreen
 
             DispatchQueue.onMainAsync {
@@ -42,9 +43,9 @@ extension TransferViewControllerBase {
             }
             
         case .denied:
-            let alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotAuthorized, preferredStyle: .alert)
+            let alert = UIAlertController(title: nil, message: String.adamant.login.cameraNotAuthorized, preferredStyle: .alert)
             
-            alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
+            alert.addAction(UIAlertAction(title: String.adamant.alert.settings, style: .default) { _ in
                 DispatchQueue.main.async {
                     if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
                         UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
@@ -52,7 +53,7 @@ extension TransferViewControllerBase {
                 }
             })
             
-            alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+            alert.addAction(UIAlertAction(title: String.adamant.alert.cancel, style: .cancel, handler: nil))
             alert.modalPresentationStyle = .overFullScreen
             
             DispatchQueue.onMainAsync {
@@ -111,9 +112,9 @@ extension TransferViewControllerBase: UINavigationControllerDelegate, UIImagePic
                 }
             }
             
-            dialogService.showWarning(withMessage: String.adamantLocalized.newChat.wrongQrError)
+            dialogService.showWarning(withMessage: String.adamant.newChat.wrongQrError)
         } else {
-            dialogService.showWarning(withMessage: String.adamantLocalized.login.noQrError)
+            dialogService.showWarning(withMessage: String.adamant.login.noQrError)
         }
     }
 }
@@ -124,7 +125,7 @@ extension TransferViewControllerBase: QRCodeReaderViewControllerDelegate {
         if handleRawAddress(result.value) {
             dismiss(animated: true, completion: nil)
         } else {
-            dialogService.showWarning(withMessage: String.adamantLocalized.newChat.wrongQrError)
+            dialogService.showWarning(withMessage: String.adamant.newChat.wrongQrError)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 reader.startScanning()
             }
