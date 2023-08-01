@@ -8,10 +8,11 @@
 
 import UIKit
 import FreakingSimpleRoundImageView
+import CommonKit
 
 class ChatTableViewCell: UITableViewCell {
     
-    static var defaultAvatar: UIImage = #imageLiteral(resourceName: "avatar-chat-placeholder")
+    static var defaultAvatar: UIImage = .asset(named: "avatar-chat-placeholder") ?? .init()
     static let shortDescriptionTextSize: CGFloat = 15.0
     
     // MARK: - IBOutlets

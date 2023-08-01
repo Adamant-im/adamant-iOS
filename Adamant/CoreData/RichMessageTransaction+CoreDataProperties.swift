@@ -9,6 +9,7 @@
 
 import Foundation
 import CoreData
+import CommonKit
 
 extension RichMessageTransaction {
 

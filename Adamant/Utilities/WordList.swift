@@ -9,15 +9,13 @@
 import Foundation
 
 /// Word dictionaries
-class WordList {
+enum WordList {
     /// English words dictionary
     static var english: [String.SubSequence] = {
-        let url = Bundle(for: Mnemonic.self).url(forResource: "english", withExtension: "txt")
+        let url = Bundle.main.url(forResource: "english", withExtension: "txt")
         let data = try! Data(contentsOf: url!)
         let raw = String(data: data, encoding: .utf8)!
         
         return raw.split(separator: "\n")
     }()
-    
-    private init() {}
 }

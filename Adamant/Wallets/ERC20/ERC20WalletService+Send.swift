@@ -10,6 +10,7 @@ import UIKit
 import web3swift
 import struct BigInt.BigUInt
 import Web3Core
+import CommonKit
 
 extension ERC20WalletService: WalletServiceTwoStepSend {
     typealias T = CodableTransaction
@@ -79,7 +80,7 @@ extension ERC20WalletService: WalletServiceTwoStepSend {
     
     func sendTransaction(_ transaction: CodableTransaction) async throws {
         guard let txEncoded = transaction.encode() else {
-            throw WalletServiceError.internalError(message: String.adamantLocalized.sharedErrors.unknownError, error: nil)
+            throw WalletServiceError.internalError(message: String.adamant.sharedErrors.unknownError, error: nil)
         }
         
         do {

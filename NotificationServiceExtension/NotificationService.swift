@@ -8,6 +8,7 @@
 
 import UserNotifications
 import MarkdownKit
+import CommonKit
 
 class NotificationService: UNNotificationServiceExtension {
     private let passphraseStoreKey = "accountService.passphrase"
@@ -210,8 +211,8 @@ class NotificationService: UNNotificationServiceExtension {
                    let reaction = richContent[RichContentKeys.react.react_message] as? String,
                    richContent[RichContentKeys.react.reactto_id] != nil {
                     let text = reaction.isEmpty
-                    ? String.adamantLocalized.notifications.removedReaction
-                    : "\(String.adamantLocalized.notifications.reacted) \(reaction)"
+                    ? NotificationStrings.removedReaction
+                    : "\(NotificationStrings.reacted) \(reaction)"
                     
                     content = NotificationContent(
                         title: partnerName ?? partnerAddress,

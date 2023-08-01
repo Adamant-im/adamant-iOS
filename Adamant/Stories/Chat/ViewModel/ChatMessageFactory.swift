@@ -9,6 +9,7 @@
 import UIKit
 import MarkdownKit
 import MessageKit
+import CommonKit
 
 struct ChatMessageFactory {
     private let richMessageProviders: [String: RichMessageProvider]
@@ -255,8 +256,8 @@ private extension ChatMessageFactory {
             content: .init(
                 id: id,
                 title: isFromCurrentSender
-                    ? .adamantLocalized.chat.transactionSent
-                    : .adamantLocalized.chat.transactionReceived,
+                    ? .adamant.chat.transactionSent
+                    : .adamant.chat.transactionReceived,
                 icon: richMessageProviders[transfer.type]?.tokenLogo ?? .init(),
                 amount: AdamantBalanceFormat.full.format(transfer.amount),
                 currency: richMessageProviders[transfer.type]?.tokenSymbol ?? "",
@@ -300,8 +301,8 @@ private extension ChatMessageFactory {
             content: .init(
                 id: id,
                 title: isFromCurrentSender
-                    ? .adamantLocalized.chat.transactionSent
-                    : .adamantLocalized.chat.transactionReceived,
+                    ? .adamant.chat.transactionSent
+                    : .adamant.chat.transactionReceived,
                 icon: AdmWalletService.currencyLogo,
                 amount: AdamantBalanceFormat.full.format(
                     (transaction.amount ?? .zero) as Decimal
@@ -366,7 +367,7 @@ private extension ChatMessageFactory {
     
     func makePendingMessageString() -> NSAttributedString {
         let attachment = NSTextAttachment()
-        attachment.image = UIImage(named: "status_pending")
+        attachment.image = .asset(named: "status_pending")
         attachment.bounds = CGRect(x: .zero, y: -1, width: 7, height: 7)
         return NSAttributedString(attachment: attachment)
     }

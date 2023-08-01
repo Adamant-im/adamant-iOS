@@ -10,6 +10,7 @@ import UIKit
 import LiskKit
 import web3swift
 import BigInt
+import CommonKit
 
 class LskTransactionsViewController: TransactionsListViewControllerBase {
     
@@ -96,9 +97,9 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
         
         if let address = lskWalletService.wallet?.address {
             if transaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
-                controller.senderName = String.adamantLocalized.transactionDetails.yourAddress
+                controller.senderName = String.adamant.transactionDetails.yourAddress
             } else if transaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
-                controller.recipientName = String.adamantLocalized.transactionDetails.yourAddress
+                controller.recipientName = String.adamant.transactionDetails.yourAddress
             }
         }
         

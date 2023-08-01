@@ -1,0 +1,17 @@
+/* Bundle display name */
+"CFBundleDisplayName" = "АДАМАНТ";
+
+/* Bundle name */
+"CFBundleName" = "Мессенджер АДАМАНТ";
+
+/* Privacy - Camera Usage Description */
+"NSCameraUsageDescription" = "Чтение QR-кодов с адресами и паролями";
+
+/* Privacy - Face ID Usage Description */
+"NSFaceIDUsageDescription" = "Вход в АДАМАНТ с помощью Face ID";
+
+/* Privacy - Photo Library Additions Usage Description */
+"NSPhotoLibraryAddUsageDescription" = "Сохранение созданных QR-кодов";
+
+/* Privacy - Photo Library Usage Description */
+"NSPhotoLibraryUsageDescription" = "Сканирование QR-кодов с адресами и паролями с сохраненных ранее изображений";

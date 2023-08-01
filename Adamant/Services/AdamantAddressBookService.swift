@@ -9,6 +9,7 @@
 import UIKit
 import Clibsodium
 import Combine
+import CommonKit
 
 @MainActor
 final class AdamantAddressBookService: AddressBookService {

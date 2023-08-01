@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import CommonKit
 
 protocol ChatReactionsViewDelegate: AnyObject {
     func didSelectEmoji(_ emoji: String)

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CommonKit
 
 final class AdamantPushNotificationsTokenService: PushNotificationsTokenService {
     private let securedStore: SecuredStore

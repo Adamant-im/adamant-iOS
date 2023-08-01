@@ -11,6 +11,7 @@ import Swinject
 import Alamofire
 import BitcoinKit
 import Combine
+import CommonKit
 
 enum DefaultBtcTransferFee: Decimal {
     case high = 24000
@@ -54,9 +55,9 @@ struct BtcApiCommands {
 }
 
 // MARK: - Localization
-extension String.adamantLocalized {
+extension String.adamant {
     enum BtcWalletService {
-        static let taprootNotSupported = NSLocalizedString("WalletServices.SharedErrors.BtcTaproot", comment: "")
+        static let taprootNotSupported = String.localized("WalletServices.SharedErrors.BtcTaproot", comment: "")
     }
 }
 
@@ -67,7 +68,7 @@ final class BtcWalletService: WalletService {
     }
     
     var tokenLogo: UIImage {
-        type(of: self).currencyLogo
+        type(of: self).currencyLogo ?? .init()
     }
     
     var tokenNetworkSymbol: String {
@@ -121,7 +122,7 @@ final class BtcWalletService: WalletService {
     var addressConverter: AddressConverter!
     
     // MARK: - Constants
-    static var currencyLogo = #imageLiteral(resourceName: "bitcoin_wallet")
+    static var currencyLogo = UIImage.asset(named: "bitcoin_wallet") ?? .init()
 
     static let multiplier = Decimal(sign: .plus, exponent: 8, significand: 1)
 
@@ -293,7 +294,7 @@ final class BtcWalletService: WalletService {
         case .p2pk, .p2pkh, .p2sh, .p2multi, .p2wpkh, .p2wpkhSh, .p2wsh:
             return .valid
         case .p2tr:
-            return .invalid(description: .adamantLocalized.BtcWalletService.taprootNotSupported)
+            return .invalid(description: .adamant.BtcWalletService.taprootNotSupported)
         case .unknown, .none:
             return .invalid(description: nil)
         }
@@ -721,7 +722,7 @@ extension BtcWalletService: PrivateKeyGenerator {
     }
     
     var rowImage: UIImage? {
-        return #imageLiteral(resourceName: "bitcoin_wallet_row")
+        return .asset(named: "bitcoin_wallet_row")
     }
     
     func generatePrivateKeyFor(passphrase: String) -> String? {

@@ -9,6 +9,7 @@
 import Foundation
 import MessageKit
 import Combine
+import CommonKit
 
 actor ChatMessagesListFactory {
     private let chatMessageFactory: ChatMessageFactory

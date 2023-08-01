@@ -10,6 +10,7 @@ import Foundation
 import web3swift
 import struct BigInt.BigUInt
 import Web3Core
+import CommonKit
 
 struct EthResponse {
     let status: Int

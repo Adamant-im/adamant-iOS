@@ -8,6 +8,7 @@
 
 import UIKit
 import SnapKit
+import CommonKit
 
 final class DelegatesBottomPanel: UIView {
     var model: Model = .default {
@@ -21,7 +22,7 @@ final class DelegatesBottomPanel: UIView {
     private let costLabel = UILabel(font: .systemFont(ofSize: 12), textColor: .adamant.textColor)
     
     private lazy var sendButton: UIButton = {
-        let view = UIButton.systemButton(with: #imageLiteral(resourceName: "Arrow"), target: self, action: #selector(send))
+        let view = UIButton.systemButton(with: .asset(named: "Arrow") ?? .init(), target: self, action: #selector(send))
         view.tintColor = .systemBlue
         return view
     }()
@@ -111,22 +112,22 @@ private extension DelegatesBottomPanel {
     }
 }
 
-private let upvotesPrefix = NSLocalizedString(
+private let upvotesPrefix = String.localized(
     "Delegates.VotePanel.Upvotes",
     comment: "Delegate vote panel: 'Upvotes' label"
 )
 
-private let downvotesPrefix = NSLocalizedString(
+private let downvotesPrefix = String.localized(
     "Delegates.VotePanel.Downvotes",
     comment: "Delegate vote panel: 'Downvotes' label"
 )
 
-private let newPrefix = NSLocalizedString(
+private let newPrefix = String.localized(
     "Delegates.VotePanel.New",
     comment: "Delegate vote panel: 'New' label"
 )
 
-private let totalPrefix = NSLocalizedString(
+private let totalPrefix = String.localized(
     "Delegates.VotePanel.Total",
     comment: "Delegate vote panel: 'Total' label"
 )

@@ -11,11 +11,11 @@ import InputBarAccessoryView
 import Combine
 import UIKit
 import SnapKit
+import CommonKit
 
 @MainActor
 final class ChatViewController: MessagesViewController {
     typealias SpinnerCell = MessageCellWrapper<SpinnerView>
-    typealias TransactionCell = CollectionCellWrapper<ChatTransactionContainerView>
     typealias SendTransaction = ( _ parentVC: UIViewController & ComplexTransferViewControllerDelegate, _ replyToMessageId: String?) -> Void
     
     // MARK: Dependencies
@@ -457,7 +457,7 @@ private extension ChatViewController {
     func makeChatMessagesCollectionView() -> ChatMessagesCollectionView {
         let collection = ChatMessagesCollectionView()
         collection.refreshControl = ChatRefreshMock()
-        collection.register(TransactionCell.self)
+        collection.register(ChatTransactionCell.self)
         collection.register(ChatMessageCell.self)
         collection.register(ChatMessageReplyCell.self)
         collection.register(
@@ -617,7 +617,7 @@ private extension ChatViewController {
         
         switch transaction.transactionStatus {
         case .failed:
-            viewModel.dialog.send(.alert(.adamantLocalized.sharedErrors.inconsistentTransaction))
+            viewModel.dialog.send(.alert(.adamant.sharedErrors.inconsistentTransaction))
         case .notInitiated, .pending, .success, .none, .inconsistent, .registered, .noNetwork, .noNetworkFinal:
             provider.richMessageTapped(for: transaction, in: self)
         }

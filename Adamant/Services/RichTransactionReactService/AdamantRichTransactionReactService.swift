@@ -8,6 +8,7 @@
 
 import CoreData
 import Combine
+import CommonKit
 
 actor AdamantRichTransactionReactService: NSObject, RichTransactionReactService {
     private let coreDataStack: CoreDataStack
@@ -18,7 +19,7 @@ actor AdamantRichTransactionReactService: NSObject, RichTransactionReactService 
     private lazy var richController = getRichTransactionsController()
     private lazy var transferController = getTransferController()
     private lazy var messageController = getMessageController()
-    private let unknownErrorMessage = String.adamantLocalized.reply.shortUnknownMessageError
+    private let unknownErrorMessage = String.adamant.reply.shortUnknownMessageError
     
     private var reactions: [String: Set<Reaction>] = [:]
 

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CommonKit
 
 open class SwiftyOnboardOverlay: UIView {
     

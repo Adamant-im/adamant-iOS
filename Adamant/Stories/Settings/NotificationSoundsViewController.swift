@@ -25,7 +25,7 @@ class NotificationSoundsViewController: FormViewController {
         
         var localized: String {
             switch self {
-            case .alerts: return NSLocalizedString("Notifications.Alert.Tones", comment: "Notifications: Select Alert Tones")
+            case .alerts: return .localized("Notifications.Alert.Tones", comment: "Notifications: Select Alert Tones")
             }
         }
     }
@@ -37,7 +37,7 @@ class NotificationSoundsViewController: FormViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.title = NSLocalizedString("Notifications.Sounds.Name", comment: "Notifications: Select Sounds")
+        self.title = .localized("Notifications.Sounds.Name", comment: "Notifications: Select Sounds")
         
         selectSound = notificationsService.notificationsSound
         
@@ -68,13 +68,13 @@ class NotificationSoundsViewController: FormViewController {
     
     private func addBtns() {
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(
-            title: NSLocalizedString("Notifications.Alert.Save", comment: "Notifications: Select Alert Save"),
+            title: .localized("Notifications.Alert.Save", comment: "Notifications: Select Alert Save"),
             style: .done,
             target: self,
             action: #selector(save)
         )
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(
-            title: NSLocalizedString("Notifications.Alert.Cancel", comment: "Notifications: Alerts Cancel"),
+            title: .localized("Notifications.Alert.Cancel", comment: "Notifications: Alerts Cancel"),
             style: .done,
             target: self,
             action: #selector(close)

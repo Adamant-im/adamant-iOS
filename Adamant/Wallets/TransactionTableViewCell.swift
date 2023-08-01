@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CommonKit
 
 class TransactionTableViewCell: UITableViewCell {
     enum TransactionType {
@@ -14,15 +15,15 @@ class TransactionTableViewCell: UITableViewCell {
         
         var imageTop: UIImage {
             switch self {
-            case .income: return #imageLiteral(resourceName: "transfer-in_top")
-            case .outcome: return #imageLiteral(resourceName: "transfer-out_top")
+            case .income: return .asset(named: "transfer-in_top") ?? .init()
+            case .outcome: return .asset(named: "transfer-out_top") ?? .init()
             }
         }
         
         var imageBottom: UIImage {
             switch self {
-            case .income: return #imageLiteral(resourceName: "transfer-in_bot")
-            case .outcome: return #imageLiteral(resourceName: "transfer-out_bot")
+            case .income: return .asset(named: "transfer-in_bot") ?? .init()
+            case .outcome: return .asset(named: "transfer-out_bot") ?? .init()
             }
         }
         

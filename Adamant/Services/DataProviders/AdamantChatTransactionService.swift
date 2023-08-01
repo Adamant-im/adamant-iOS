@@ -10,6 +10,7 @@ import Foundation
 import CoreData
 import UIKit
 import MarkdownKit
+import CommonKit
 
 actor AdamantChatTransactionService: ChatTransactionService {
     

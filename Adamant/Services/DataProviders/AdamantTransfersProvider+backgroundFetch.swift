@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CommonKit
 
 extension AdamantTransfersProvider: BackgroundFetchService {
     func fetchBackgroundData(notificationsService: NotificationsService) async -> FetchResult {
@@ -59,11 +60,8 @@ extension AdamantTransfersProvider: BackgroundFetchService {
             }
             
             notificationsService.showNotification(
-                title: String.adamantLocalized.notifications.newTransferTitle,
-                body: String.localizedStringWithFormat(
-                    String.adamantLocalized.notifications.newTransferBody,
-                    total + notifiedCount
-                ),
+                title: NotificationStrings.newTransferTitle,
+                body: NotificationStrings.newTransferBody(total + notifiedCount),
                 type: .newTransactions(count: total)
             )
             

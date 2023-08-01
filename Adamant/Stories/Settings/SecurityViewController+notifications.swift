@@ -8,6 +8,7 @@
 
 import UIKit
 import Eureka
+import CommonKit
 
 extension SecurityViewController {
     func setNotificationMode(_ mode: NotificationsMode) {
@@ -40,9 +41,13 @@ extension SecurityViewController {
     }
     
     private func presentNotificationsDeniedError() {
-        let alert = UIAlertController(title: nil, message: String.adamantLocalized.notifications.notificationsDisabled, preferredStyle: .alert)
+        let alert = UIAlertController(
+            title: nil,
+            message: NotificationStrings.notificationsDisabled,
+            preferredStyle: .alert
+        )
         
-        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
+        alert.addAction(UIAlertAction(title: String.adamant.alert.settings, style: .default) { _ in
             DispatchQueue.main.async {
                 if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
                     UIApplication.shared.open(settingsURL)
@@ -50,7 +55,7 @@ extension SecurityViewController {
             }
         })
         
-        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: String.adamant.alert.cancel, style: .cancel, handler: nil))
         alert.modalPresentationStyle = .overFullScreen
         present(alert, animated: true, completion: nil)
     }

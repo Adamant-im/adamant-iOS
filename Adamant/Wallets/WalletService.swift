@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import Swinject
+import CommonKit
 
 enum WalletServiceState: Equatable {
     case notInitiated, updating, upToDate, initiationFailed(reason: String)
@@ -45,39 +46,39 @@ extension WalletServiceError: RichError {
     var message: String {
         switch self {
         case .notLogged:
-            return String.adamantLocalized.sharedErrors.userNotLogged
+            return String.adamant.sharedErrors.userNotLogged
             
         case .notEnoughMoney:
-            return String.adamantLocalized.sharedErrors.notEnoughMoney
+            return String.adamant.sharedErrors.notEnoughMoney
             
         case .networkError:
-            return String.adamantLocalized.sharedErrors.networkError
+            return String.adamant.sharedErrors.networkError
             
         case .accountNotFound:
-            return String.adamantLocalized.transfer.accountNotFound
+            return String.adamant.transfer.accountNotFound
             
         case .walletNotInitiated:
-            return NSLocalizedString("WalletServices.SharedErrors.WalletNotInitiated", comment: "Wallet Services: Shared error, user has not yet initiated a specific wallet.")
+            return .localized("WalletServices.SharedErrors.WalletNotInitiated", comment: "Wallet Services: Shared error, user has not yet initiated a specific wallet.")
             
         case .remoteServiceError(let message):
-            return String.adamantLocalized.sharedErrors.remoteServerError(message: message)
+            return String.adamant.sharedErrors.remoteServerError(message: message)
             
         case .apiError(let error):
             return error.localizedDescription
             
         case .internalError(let message, _):
-            return String.adamantLocalized.sharedErrors.internalError(message: message)
+            return String.adamant.sharedErrors.internalError(message: message)
             
         case .invalidAmount(let amount):
-            return String.localizedStringWithFormat(NSLocalizedString("WalletServices.SharedErrors.InvalidAmountFormat", comment: "Wallet Services: Shared error, invalid amount format. %@ for amount"), AdamantBalanceFormat.full.format(amount))
+            return String.localizedStringWithFormat(.localized("WalletServices.SharedErrors.InvalidAmountFormat", comment: "Wallet Services: Shared error, invalid amount format. %@ for amount"), AdamantBalanceFormat.full.format(amount))
             
         case .transactionNotFound:
-            return NSLocalizedString("WalletServices.SharedErrors.TransactionNotFound", comment: "Wallet Services: Shared error, transaction not found")
+            return .localized("WalletServices.SharedErrors.TransactionNotFound", comment: "Wallet Services: Shared error, transaction not found")
             
         case .requestCancelled:
-            return String.adamantLocalized.sharedErrors.requestCancelled
+            return String.adamant.sharedErrors.requestCancelled
         case .dustAmountError:
-            return String.adamantLocalized.sharedErrors.dustError
+            return String.adamant.sharedErrors.dustError
         }
     }
     

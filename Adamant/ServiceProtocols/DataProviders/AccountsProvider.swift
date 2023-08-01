@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreData
+import CommonKit
 
 enum AccountsProviderError: Error {
     case dummy(BaseAccount)
@@ -23,20 +24,20 @@ enum AccountsProviderError: Error {
             return "Dummy"
             
         case .notFound(let address):
-            return String.adamantLocalized.sharedErrors.accountNotFound(address)
+            return String.adamant.sharedErrors.accountNotFound(address)
             
         case .invalidAddress(let address):
-            return String.localizedStringWithFormat(NSLocalizedString("AccountsProvider.Error.AddressNotValidFormat", comment: "AccountsProvider: Address not valid error, %@ for address"), address)
+            return String.localizedStringWithFormat(.localized("AccountsProvider.Error.AddressNotValidFormat", comment: "AccountsProvider: Address not valid error, %@ for address"), address)
             
         case .notInitiated:
-            return String.adamantLocalized.sharedErrors.accountNotInitiated
+            return String.adamant.sharedErrors.accountNotInitiated
             
         case .serverError(let error):
             return ApiServiceError.serverError(error: error.localizedDescription)
                 .localizedDescription
             
         case .networkError:
-            return String.adamantLocalized.sharedErrors.networkError
+            return String.adamant.sharedErrors.networkError
         }
     }
 }
@@ -107,16 +108,16 @@ extension AdamantContacts {
     var messages: [String: SystemMessage] {
         switch self {
         case .adamantBountyWallet, .adamantNewBountyWallet:
-            return ["chats.welcome_message": SystemMessage(message: AdamantMessage.markdownText(NSLocalizedString("Chats.WelcomeMessage", comment: "Known contacts: Adamant welcome message. Markdown supported.")),
+            return ["chats.welcome_message": SystemMessage(message: AdamantMessage.markdownText(.localized("Chats.WelcomeMessage", comment: "Known contacts: Adamant welcome message. Markdown supported.")),
                                                            silentNotification: true)]
         case .adamantWelcomeWallet:
-            return ["chats.welcome_message": SystemMessage(message: AdamantMessage.markdownText(NSLocalizedString("Chats.WelcomeMessage", comment: "Known contacts: Adamant welcome message. Markdown supported.")),
+            return ["chats.welcome_message": SystemMessage(message: AdamantMessage.markdownText(.localized("Chats.WelcomeMessage", comment: "Known contacts: Adamant welcome message. Markdown supported.")),
                                                            silentNotification: true)]
         case .adamantIco:
             return [
-                "chats.preico_message": SystemMessage(message: AdamantMessage.text(NSLocalizedString("Chats.PreIcoMessage", comment: "Known contacts: Adamant pre ICO message")),
+                "chats.preico_message": SystemMessage(message: AdamantMessage.text(.localized("Chats.PreIcoMessage", comment: "Known contacts: Adamant pre ICO message")),
                                                       silentNotification: true),
-                "chats.ico_message": SystemMessage(message: AdamantMessage.markdownText(NSLocalizedString("Chats.IcoMessage", comment: "Known contacts: Adamant ICO message. Markdown supported.")),
+                "chats.ico_message": SystemMessage(message: AdamantMessage.markdownText(.localized("Chats.IcoMessage", comment: "Known contacts: Adamant ICO message. Markdown supported.")),
                                                    silentNotification: true)
             ]
             
@@ -126,7 +127,7 @@ extension AdamantContacts {
         case .donate:
             return ["chats.welcome_message": SystemMessage(
                 message: AdamantMessage.markdownText(
-                    NSLocalizedString(
+                    .localized(
                         "Chats.Donate.WelcomeMessage",
                         comment: "Known contacts: Adamant donate welcome message. Markdown supported."
                     )
@@ -137,7 +138,7 @@ extension AdamantContacts {
         case .adamantExchange:
             return ["chats.welcome_message": SystemMessage(
                 message: AdamantMessage.markdownText(
-                    NSLocalizedString(
+                    .localized(
                         "Chats.Exchange.WelcomeMessage",
                         comment: "Known contacts: Adamant welcome message. Markdown supported."
                     )
@@ -148,7 +149,7 @@ extension AdamantContacts {
         case .betOnBitcoin:
             return ["chats.welcome_message": SystemMessage(
                 message: AdamantMessage.markdownText(
-                    NSLocalizedString(
+                    .localized(
                         "Chats.BetOnBitcoin.WelcomeMessage",
                         comment: "Known contacts: Adamant welcome message. Markdown supported."
                     )
@@ -158,7 +159,7 @@ extension AdamantContacts {
         case .adelina:
             return ["chats.welcome_message": SystemMessage(
                 message: AdamantMessage.markdownText(
-                    NSLocalizedString(
+                    .localized(
                         "Chats.Adelina.WelcomeMessage",
                         comment: "Known contacts: Adamant welcome message. Markdown supported."
                     )

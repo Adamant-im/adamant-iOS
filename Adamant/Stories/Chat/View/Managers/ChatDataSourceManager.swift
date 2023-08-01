@@ -9,6 +9,7 @@
 import MessageKit
 import UIKit
 import Combine
+import CommonKit
 
 @MainActor
 final class ChatDataSourceManager: MessagesDataSource {
@@ -40,7 +41,7 @@ final class ChatDataSourceManager: MessagesDataSource {
         guard message.fullModel.status == .failed else { return nil }
         
         return .init(
-            string: .adamantLocalized.chat.failToSend,
+            string: .adamant.chat.failToSend,
             attributes: [
                 .font: UIFont.boldSystemFont(ofSize: 10),
                 .foregroundColor: UIColor.adamant.primary
@@ -124,7 +125,7 @@ final class ChatDataSourceManager: MessagesDataSource {
         else { return UICollectionViewCell() }
         
         let cell = messagesCollectionView.dequeueReusableCell(
-            ChatViewController.TransactionCell.self,
+            ChatTransactionCell.self,
             for: indexPath
         )
         
@@ -135,11 +136,11 @@ final class ChatDataSourceManager: MessagesDataSource {
             
             return model.value
         }
-        
-        cell.wrappedView.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
-        cell.wrappedView.model = model.value
-        cell.wrappedView.actionHandler = { [weak self] in self?.handleAction($0) }
-        cell.wrappedView.setSubscription(publisher: publisher, collection: messagesCollectionView)
+
+        cell.transactionView.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
+        cell.transactionView.model = model.value
+        cell.transactionView.actionHandler = { [weak self] in self?.handleAction($0) }
+        cell.transactionView.setSubscription(publisher: publisher, collection: messagesCollectionView)
         return cell
     }
 }

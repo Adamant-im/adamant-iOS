@@ -13,20 +13,21 @@ import EFQRCode
 import AVFoundation
 import Photos
 import SafariServices
+import CommonKit
 
 // MARK: - Localization
-extension String.adamantLocalized {
+extension String.adamant {
     struct newChat {
-        static let title = NSLocalizedString("NewChatScene.Title", comment: "New chat: scene title")
+        static let title = String.localized("NewChatScene.Title", comment: "New chat: scene title")
         
-        static let addressPlaceholder = NSLocalizedString("NewChatScene.Address.Placeholder", comment: "New chat: Recipient address placeholder. Note that address text field always shows U letter, so you can left this line blank.")
+        static let addressPlaceholder = String.localized("NewChatScene.Address.Placeholder", comment: "New chat: Recipient address placeholder. Note that address text field always shows U letter, so you can left this line blank.")
         
-        static let specifyValidAddressMessage = NSLocalizedString("NewChatScene.Error.InvalidAddress", comment: "New chat: Notify user that he did enter invalid address")
-        static let loggedUserAddressMessage = NSLocalizedString("NewChatScene.Error.OwnAddress", comment: "New chat: Notify user that he can't start chat with himself")
+        static let specifyValidAddressMessage = String.localized("NewChatScene.Error.InvalidAddress", comment: "New chat: Notify user that he did enter invalid address")
+        static let loggedUserAddressMessage = String.localized("NewChatScene.Error.OwnAddress", comment: "New chat: Notify user that he can't start chat with himself")
         
-        static let wrongQrError = NSLocalizedString("NewChatScene.Error.WrongQr", comment: "New Chat: Notify user that scanned QR doesn't contains an address")
+        static let wrongQrError = String.localized("NewChatScene.Error.WrongQr", comment: "New Chat: Notify user that scanned QR doesn't contains an address")
         
-        static let whatDoesItMean = NSLocalizedString("NewChatScene.NotInitialized.HelpButton", comment: "New Chat: 'What does it mean?', a help button for info about uninitialized accounts.")
+        static let whatDoesItMean = String.localized("NewChatScene.NotInitialized.HelpButton", comment: "New Chat: 'What does it mean?', a help button for info about uninitialized accounts.")
         
         private init() { }
     }
@@ -66,8 +67,8 @@ class NewChatViewController: FormViewController {
         var localized: String? {
             switch self {
             case .addressField: return nil
-            case .scanQr: return NSLocalizedString("NewChatScene.ScanQr", comment: "New chat: Scan QR with address button")
-            case .myQr: return NSLocalizedString("NewChatScene.MyQr", comment: "New chat: Show QR for my address button")
+            case .scanQr: return .localized("NewChatScene.ScanQr", comment: "New chat: Scan QR with address button")
+            case .myQr: return .localized("NewChatScene.MyQr", comment: "New chat: Show QR for my address button")
             }
         }
     }
@@ -88,7 +89,7 @@ class NewChatViewController: FormViewController {
     lazy var qrReader: QRCodeReaderViewController = {
         let builder = QRCodeReaderViewControllerBuilder {
             $0.reader = QRCodeReader(metadataObjectTypes: [.qr ], captureDevicePosition: .back)
-            $0.cancelButtonTitle = String.adamantLocalized.alert.cancel
+            $0.cancelButtonTitle = String.adamant.alert.cancel
             $0.showSwitchCameraButton = false
         }
         
@@ -105,7 +106,7 @@ class NewChatViewController: FormViewController {
         navigationItem.largeTitleDisplayMode = .never
         tableView.keyboardDismissMode = .none
         
-        navigationItem.title = String.adamantLocalized.newChat.title
+        navigationItem.title = String.adamant.newChat.title
         let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
         doneButton.isEnabled = false
         navigationItem.rightBarButtonItem = doneButton
@@ -129,7 +130,7 @@ class NewChatViewController: FormViewController {
         
         <<< TextRow {
             $0.tag = Rows.addressField.tag
-            $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
+            $0.cell.textField.placeholder = String.adamant.newChat.addressPlaceholder
             $0.cell.textField.setPopupKeyboardType(.numberPad)
             
             let prefix = UILabel()
@@ -235,7 +236,7 @@ class NewChatViewController: FormViewController {
     
     @IBAction func done(_ sender: Any) {
         guard let row: TextRow = form.rowBy(tag: Rows.addressField.tag), let nums = row.value, nums.count > 0 else {
-            dialogService.showToastMessage(String.adamantLocalized.newChat.specifyValidAddressMessage)
+            dialogService.showToastMessage(String.adamant.newChat.specifyValidAddressMessage)
             return
         }
         
@@ -261,12 +262,12 @@ class NewChatViewController: FormViewController {
             break
             
         case .system, .invalid:
-            dialogService.showToastMessage(String.adamantLocalized.newChat.specifyValidAddressMessage)
+            dialogService.showToastMessage(String.adamant.newChat.specifyValidAddressMessage)
             return
         }
         
         if let loggedAccount = accountService.account, loggedAccount.address == address {
-            dialogService.showToastMessage(String.adamantLocalized.newChat.loggedUserAddressMessage)
+            dialogService.showToastMessage(String.adamant.newChat.loggedUserAddressMessage)
             return
         }
         
@@ -302,7 +303,7 @@ class NewChatViewController: FormViewController {
                 case .serverError(let apiError):
                     if let apiError = apiError as? ApiServiceError,
                        case .internalError(let message, _) = apiError,
-                       message == String.adamantLocalized.sharedErrors.unknownError {
+                       message == String.adamant.sharedErrors.unknownError {
                         self.dialogService.showWarning(withMessage: AccountsProviderError.notFound(address: address).localized)
                         return
                     }
@@ -356,15 +357,15 @@ extension NewChatViewController {
                 }
             }
         case .restricted:
-            let alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotSupported, preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
+            let alert = UIAlertController(title: nil, message: String.adamant.login.cameraNotSupported, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: String.adamant.alert.ok, style: .cancel, handler: nil))
             alert.modalPresentationStyle = .overFullScreen
             present(alert, animated: true, completion: nil)
             
         case .denied:
-            let alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotAuthorized, preferredStyle: .alert)
+            let alert = UIAlertController(title: nil, message: String.adamant.login.cameraNotAuthorized, preferredStyle: .alert)
             
-            alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
+            alert.addAction(UIAlertAction(title: String.adamant.alert.settings, style: .default) { _ in
                 DispatchQueue.main.async {
                     if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
                         UIApplication.shared.open(settingsURL)
@@ -372,7 +373,7 @@ extension NewChatViewController {
                 }
             })
             
-            alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+            alert.addAction(UIAlertAction(title: String.adamant.alert.cancel, style: .cancel, handler: nil))
             alert.modalPresentationStyle = .overFullScreen
             present(alert, animated: true, completion: nil)
         @unknown default:
@@ -406,7 +407,7 @@ extension NewChatViewController: QRCodeReaderViewControllerDelegate {
             startNewChat(with: admAddress.address, name: admAddress.name, message: admAddress.message)
             dismiss(animated: true, completion: nil)
         } else {
-            dialogService.showWarning(withMessage: String.adamantLocalized.newChat.wrongQrError)
+            dialogService.showWarning(withMessage: String.adamant.newChat.wrongQrError)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 reader.startScanning()
             }
@@ -440,9 +441,9 @@ extension NewChatViewController: UINavigationControllerDelegate, UIImagePickerCo
                 }
             }
             
-            dialogService.showWarning(withMessage: String.adamantLocalized.newChat.wrongQrError)
+            dialogService.showWarning(withMessage: String.adamant.newChat.wrongQrError)
         } else {
-            dialogService.showWarning(withMessage: String.adamantLocalized.login.noQrError)
+            dialogService.showWarning(withMessage: String.adamant.login.noQrError)
         }
     }
 }

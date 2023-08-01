@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreData
+import CommonKit
 
 // MARK: - Callbacks
 
@@ -46,19 +47,19 @@ extension ChatsProviderError: RichError {
     var message: String {
         switch self {
         case .invalidTransactionStatus:
-            return String.adamantLocalized.chat.cancelError
+            return String.adamant.chat.cancelError
             
         case .notLogged:
-            return String.adamantLocalized.sharedErrors.userNotLogged
+            return String.adamant.sharedErrors.userNotLogged
             
         case .messageNotValid(let result):
             return result.localized
             
         case .notEnoughMoneyToSend:
-            return NSLocalizedString("ChatsProvider.Error.notEnoughMoney", comment: "ChatsProvider: Notify user that he doesn't have money to pay a message fee")
+            return .localized("ChatsProvider.Error.notEnoughMoney", comment: "ChatsProvider: Notify user that he doesn't have money to pay a message fee")
             
         case .networkError:
-            return String.adamantLocalized.sharedErrors.networkError
+            return String.adamant.sharedErrors.networkError
             
         case .serverError(let error):
             return ApiServiceError.serverError(error: error.localizedDescription)
@@ -68,19 +69,19 @@ extension ChatsProviderError: RichError {
             return AccountsProviderError.notFound(address: address).localized
             
         case .dependencyError(let message):
-            return String.adamantLocalized.sharedErrors.internalError(message: message)
+            return String.adamant.sharedErrors.internalError(message: message)
             
         case .transactionNotFound(let id):
-            return String.localizedStringWithFormat(NSLocalizedString("ChatsProvider.Error.TransactionNotFoundFormat", comment: "ChatsProvider: Transaction not found error. %@ for transaction's ID"), id)
+            return String.localizedStringWithFormat(.localized("ChatsProvider.Error.TransactionNotFoundFormat", comment: "ChatsProvider: Transaction not found error. %@ for transaction's ID"), id)
             
         case .internalError(let error):
-            return String.adamantLocalized.sharedErrors.internalError(message: error.localizedDescription)
+            return String.adamant.sharedErrors.internalError(message: error.localizedDescription)
             
         case .accountNotInitiated:
-            return String.adamantLocalized.sharedErrors.accountNotInitiated
+            return String.adamant.sharedErrors.accountNotInitiated
         
         case .requestCancelled:
-            return String.adamantLocalized.sharedErrors.requestCancelled
+            return String.adamant.sharedErrors.requestCancelled
         }
     }
     
@@ -123,13 +124,13 @@ enum ValidateMessageResult {
     
     var localized: String {
         switch self {
-        case .isValid: return NSLocalizedString("ChatsProvider.Validation.Passed", comment: "ChatsProvider: Validation passed, message is valid")
+        case .isValid: return .localized("ChatsProvider.Validation.Passed", comment: "ChatsProvider: Validation passed, message is valid")
             
         case .empty:
-            return NSLocalizedString("ChatsProvider.Validation.MessageIsEmpty", comment: "ChatsProvider: Validation error: Message is empty")
+            return .localized("ChatsProvider.Validation.MessageIsEmpty", comment: "ChatsProvider: Validation error: Message is empty")
             
         case .tooLong:
-            return NSLocalizedString("ChatsProvider.Validation.MessageTooLong", comment: "ChatsProvider: Validation error: Message is too long")
+            return .localized("ChatsProvider.Validation.MessageTooLong", comment: "ChatsProvider: Validation error: Message is too long")
         }
     }
 }

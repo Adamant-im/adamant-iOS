@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CommonKit
 
 enum AdamantUri {
     case passphrase(passphrase: String)

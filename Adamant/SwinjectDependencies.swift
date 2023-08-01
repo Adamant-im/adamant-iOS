@@ -8,6 +8,7 @@
 
 import Swinject
 import BitcoinKit
+import CommonKit
 
 // MARK: - Services
 extension Container {

@@ -8,6 +8,7 @@
 
 import UIKit
 import Eureka
+import CommonKit
 
 class DashTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies

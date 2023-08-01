@@ -8,6 +8,7 @@
 
 import MessageUI
 import UIKit
+import CommonKit
 
 extension UIViewController {
     func openEmailScreen(

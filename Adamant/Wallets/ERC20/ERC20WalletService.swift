@@ -14,6 +14,7 @@ import Alamofire
 import struct BigInt.BigUInt
 import Web3Core
 import Combine
+import CommonKit
 
 class ERC20WalletService: WalletService {
     // MARK: - Constants

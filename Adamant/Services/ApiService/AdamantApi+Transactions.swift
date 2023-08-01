@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CommonKit
 
 extension AdamantApiService.ApiCommands {
     static let Transactions = (

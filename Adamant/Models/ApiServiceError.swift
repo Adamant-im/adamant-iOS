@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CommonKit
 
 enum ApiServiceError: LocalizedError, Error {
     case notLogged
@@ -20,26 +21,26 @@ enum ApiServiceError: LocalizedError, Error {
     var errorDescription: String? {
         switch self {
         case .notLogged:
-            return String.adamantLocalized.sharedErrors.userNotLogged
+            return String.adamant.sharedErrors.userNotLogged
             
         case .accountNotFound:
-            return String.adamantLocalized.sharedErrors.accountNotFound("")
+            return String.adamant.sharedErrors.accountNotFound("")
             
         case let .serverError(error):
-            return String.adamantLocalized.sharedErrors.remoteServerError(message: error)
+            return String.adamant.sharedErrors.remoteServerError(message: error)
             
         case let .internalError(msg, error):
             let message = error?.localizedDescription ?? msg
-            return String.adamantLocalized.sharedErrors.internalError(message: message)
+            return String.adamant.sharedErrors.internalError(message: message)
             
         case .networkError(error: _):
-            return String.adamantLocalized.sharedErrors.networkError
+            return String.adamant.sharedErrors.networkError
             
         case .requestCancelled:
-            return String.adamantLocalized.sharedErrors.requestCancelled
+            return String.adamant.sharedErrors.requestCancelled
             
         case let .commonError(message):
-            return String.adamantLocalized.sharedErrors.commonError(message)
+            return String.adamant.sharedErrors.commonError(message)
         }
     }
 }

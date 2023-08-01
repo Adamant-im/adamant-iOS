@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CommonKit
 
 final class AdamantNodesSource: NodesSource {
     // MARK: - Dependencies

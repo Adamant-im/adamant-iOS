@@ -8,6 +8,7 @@
 
 import Foundation
 import Combine
+import CommonKit
 
 final class AdamantIncreaseFeeService: IncreaseFeeService {
     

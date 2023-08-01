@@ -7,21 +7,7 @@
 //
 
 import Foundation
-
-extension String.adamantLocalized.notifications {
-    static let notificationsDisabled = NSLocalizedString("NotificationsService.NotificationsDisabled", comment: "Notifications: User has disabled notifications. Head him into settings")
-    static let notStayedLoggedIn = NSLocalizedString("NotificationsService.NotStayedLoggedIn", comment: "Notifications: Not stayed logged in")
-    
-    static let newMessageTitle = NSLocalizedString("NotificationsService.NewMessage.Title", comment: "Notifications: New message notification title")
-    static let newMessageBody = NSLocalizedString("NotificationsService.NewMessage.BodyFormat", comment: "Notifications: new messages notification body. Using %d for amount")
-    
-    static let newTransferTitle = NSLocalizedString("NotificationsService.NewTransfer.Title", comment: "Notifications: New transfer transaction title")
-    static let newTransferBody = NSLocalizedString("NotificationsService.NewTransfer.BodyFormat", comment: "Notifications: New transfer notification body. Using %d for amount")
-    
-    static let registerRemotesError = NSLocalizedString("NotificationsService.Error.RegistrationRemotesFormat", comment: "Notifications: while registering remote notifications. %@ for description")
-    
-    private init() {}
-}
+import CommonKit
 
 enum NotificationsMode: Int {
     case disabled
@@ -31,13 +17,13 @@ enum NotificationsMode: Int {
     var localized: String {
         switch self {
         case .disabled:
-            return NSLocalizedString("Notifications.Mode.NotificationsDisabled", comment: "Notifications: Disable notifications")
+            return .localized("Notifications.Mode.NotificationsDisabled", comment: "Notifications: Disable notifications")
             
         case .backgroundFetch:
-            return NSLocalizedString("Notifications.Mode.BackgroundFetch", comment: "Notifications: Use Background fetch notifications")
+            return .localized("Notifications.Mode.BackgroundFetch", comment: "Notifications: Use Background fetch notifications")
             
         case .push:
-            return NSLocalizedString("Notifications.Mode.ApplePush", comment: "Notifications: Use Apple Push notifications")
+            return .localized("Notifications.Mode.ApplePush", comment: "Notifications: Use Apple Push notifications")
         }
     }
 }
@@ -166,9 +152,9 @@ enum NotificationsServiceError: Error {
 extension NotificationsServiceError: RichError {
     var message: String {
         switch self {
-        case .notEnoughMoney: return String.adamantLocalized.sharedErrors.notEnoughMoney
-        case .denied: return String.adamantLocalized.notifications.notificationsDisabled
-        case .notStayedLoggedIn: return String.adamantLocalized.notifications.notStayedLoggedIn
+        case .notEnoughMoney: return String.adamant.sharedErrors.notEnoughMoney
+        case .denied: return NotificationStrings.notificationsDisabled
+        case .notStayedLoggedIn: return NotificationStrings.notStayedLoggedIn
         }
     }
     

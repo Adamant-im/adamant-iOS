@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CommonKit
 
 protocol HealthCheckDelegate: AnyObject {
     func healthCheckUpdate()

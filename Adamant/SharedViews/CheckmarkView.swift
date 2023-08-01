@@ -8,6 +8,7 @@
 
 import UIKit
 import SnapKit
+import CommonKit
 
 final class CheckmarkView: UIView {
     var image: UIImage? {

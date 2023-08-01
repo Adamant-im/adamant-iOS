@@ -8,6 +8,7 @@
 
 import Foundation
 import Combine
+import CommonKit
 
 struct RichTransactionStatusPublisher: Publisher {
     typealias Output = TransactionStatus

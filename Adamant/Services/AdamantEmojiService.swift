@@ -8,6 +8,7 @@
 
 import Foundation
 import Combine
+import CommonKit
 
 final class AdamantEmojiService: EmojiService {
     // MARK: Dependencies
@@ -36,14 +37,14 @@ final class AdamantEmojiService: EmojiService {
     // MARK: Notification actions
     
     private func userLoggedOut() {
-        securedStore.remove(StoreKey.increaseFee.increaseFee)
+        securedStore.remove(StoreKey.emojis.emojis)
     }
     
     // MARK: Update data
     
     func getFrequentlySelectedEmojis() -> [String] {
         guard let storedEmojis: [String: Int] = securedStore.get(
-            StoreKey.crashlytic.crashlyticEnabled
+            StoreKey.emojis.emojis
         ) else {
             return defaultEmojis
         }
@@ -63,7 +64,7 @@ final class AdamantEmojiService: EmojiService {
 
     func updateFrequentlySelectedEmojis(selectedEmoji: String) {
         var storedEmojis: [String: Int] = securedStore.get(
-            StoreKey.crashlytic.crashlyticEnabled
+            StoreKey.emojis.emojis
         ) ?? [:]
         
         if let count = storedEmojis[selectedEmoji] {
@@ -72,6 +73,6 @@ final class AdamantEmojiService: EmojiService {
             storedEmojis[selectedEmoji] = 1
         }
         
-        securedStore.set(storedEmojis, for: StoreKey.crashlytic.crashlyticEnabled)
+        securedStore.set(storedEmojis, for: StoreKey.emojis.emojis)
     }
 }

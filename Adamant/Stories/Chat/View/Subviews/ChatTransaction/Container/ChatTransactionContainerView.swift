@@ -11,6 +11,7 @@ import SnapKit
 import Combine
 import SwiftUI
 import AdvancedContextMenuKit
+import CommonKit
 
 final class ChatTransactionContainerView: UIView, ChatModelView {
     // MARK: Dependencies
@@ -265,11 +266,11 @@ extension ChatTransactionContainerView.Model {
 private extension TransactionStatus {
     var image: UIImage {
         switch self {
-        case .notInitiated: return #imageLiteral(resourceName: "status_updating")
-        case .pending, .registered, .noNetwork, .noNetworkFinal: return #imageLiteral(resourceName: "status_pending")
-        case .success: return #imageLiteral(resourceName: "status_success")
-        case .failed: return #imageLiteral(resourceName: "status_failed")
-        case .inconsistent: return #imageLiteral(resourceName: "status_warning")
+        case .notInitiated: return .asset(named: "status_updating") ?? .init()
+        case .pending, .registered, .noNetwork, .noNetworkFinal: return .asset(named: "status_pending") ?? .init()
+        case .success: return .asset(named: "status_success") ?? .init()
+        case .failed: return .asset(named: "status_failed") ?? .init()
+        case .inconsistent: return .asset(named: "status_warning") ?? .init()
         }
     }
     
@@ -286,7 +287,7 @@ private extension TransactionStatus {
 extension ChatTransactionContainerView {
     func makeContextMenu() -> AMenuSection {
         let remove = AMenuItem.action(
-            title: .adamantLocalized.chat.remove,
+            title: .adamant.chat.remove,
             systemImageName: "trash",
             style: .destructive
         ) { [weak self] in
@@ -295,7 +296,7 @@ extension ChatTransactionContainerView {
         }
         
         let report = AMenuItem.action(
-            title: .adamantLocalized.chat.report,
+            title: .adamant.chat.report,
             systemImageName: "exclamationmark.bubble"
         ) { [weak self] in
             guard let self = self else { return }
@@ -303,7 +304,7 @@ extension ChatTransactionContainerView {
         }
         
         let reply = AMenuItem.action(
-            title: .adamantLocalized.chat.reply,
+            title: .adamant.chat.reply,
             systemImageName: "arrowshape.turn.up.left"
         ) { [weak self] in
             guard let self = self else { return }

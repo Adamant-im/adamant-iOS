@@ -9,6 +9,7 @@
 import Foundation
 import Alamofire
 import UIKit
+import CommonKit
 
 extension StoreKey {
     struct CoinInfo {

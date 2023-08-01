@@ -50,20 +50,6 @@
 	<string>Saving generated QR codes with passphrases and addresses</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Reading QR codes with passphrases and addresses</string>
-	<key>UIAppFonts</key>
-	<array>
-		<string>Exo+2_100_normal.ttf</string>
-		<string>Exo+2_300_normal.ttf</string>
-		<string>Exo+2_400_normal.ttf</string>
-		<string>Exo+2_400_italic.ttf</string>
-		<string>Exo+2_500_normal.ttf</string>
-		<string>Exo+2_700_normal.ttf</string>
-		<string>Roboto_300_normal.ttf</string>
-		<string>Roboto_400_normal.ttf</string>
-		<string>Roboto_400_italic.ttf</string>
-		<string>Roboto_500_normal.ttf</string>
-		<string>Roboto_700_normal.ttf</string>
-	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

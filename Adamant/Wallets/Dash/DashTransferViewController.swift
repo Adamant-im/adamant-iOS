@@ -9,9 +9,10 @@
 import UIKit
 import Eureka
 import BitcoinKit
+import CommonKit
 
-extension String.adamantLocalized.transfer {
-        static let minAmountError = NSLocalizedString("TransferScene.Error.MinAmount", comment: "Transfer: Minimal transaction amount is 0.00001")
+extension String.adamant.transfer {
+        static let minAmountError = String.localized("TransferScene.Error.MinAmount", comment: "Transfer: Minimal transaction amount is 0.00001")
 }
 
 final class DashTransferViewController: TransferViewControllerBase {
@@ -39,7 +40,7 @@ final class DashTransferViewController: TransferViewControllerBase {
         }
         
         guard amount >= 0.00001 else {
-            dialogService.showAlert(title: nil, message: String.adamantLocalized.transfer.minAmountError, style: AdamantAlertStyle.alert, actions: nil, from: nil)
+            dialogService.showAlert(title: nil, message: String.adamant.transfer.minAmountError, style: AdamantAlertStyle.alert, actions: nil, from: nil)
             return
         }
         
@@ -47,7 +48,7 @@ final class DashTransferViewController: TransferViewControllerBase {
             return
         }
         
-        dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
+        dialogService.showProgress(withMessage: String.adamant.transfer.transferProcessingMessage, userInteractionEnable: false)
         
         Task {
             do {
@@ -76,7 +77,7 @@ final class DashTransferViewController: TransferViewControllerBase {
                 }
                 
                 dialogService.dismissProgress()
-                dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                dialogService.showSuccess(withMessage: String.adamant.transfer.transferSuccess)
                 
                 // Present detail VC
                 presentDetailTransactionVC(
@@ -103,7 +104,7 @@ final class DashTransferViewController: TransferViewControllerBase {
         
         detailsVc.transaction = transaction
         detailsVc.service = service
-        detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+        detailsVc.senderName = String.adamant.transactionDetails.yourAddress
         detailsVc.recipientName = recipientName
         
         if comments.count > 0 {
@@ -142,7 +143,7 @@ final class DashTransferViewController: TransferViewControllerBase {
     override func recipientRow() -> BaseRow {
         let row = TextRow {
             $0.tag = BaseRows.address.tag
-            $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
+            $0.cell.textField.placeholder = String.adamant.newChat.addressPlaceholder
             $0.cell.textField.autocorrectionType = .no
             $0.cell.textField.setLineBreakMode()
             
@@ -167,6 +168,6 @@ final class DashTransferViewController: TransferViewControllerBase {
     }
     
     override func defaultSceneTitle() -> String? {
-        return String.adamantLocalized.sendDash
+        return String.adamant.sendDash
     }
 }

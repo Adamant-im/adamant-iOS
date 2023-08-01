@@ -8,6 +8,7 @@
 
 import MessageKit
 import UIKit
+import CommonKit
 
 final class ChatMessagesCollectionView: MessagesCollectionView {
     private var currentIds = [String]()
