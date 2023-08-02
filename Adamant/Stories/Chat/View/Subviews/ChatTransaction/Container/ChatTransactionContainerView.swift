@@ -184,6 +184,7 @@ private extension ChatTransactionContainerView {
         updateStatus(model.status)
         updateLayout()
         chatMenuManager.selectedEmoji = getReaction(for: model.address)
+        chatMenuManager.emojiService = chatMessagesListViewModel?.emojiService
         
         ownReactionLabel.isHidden = getReaction(for: model.address) == nil
         opponentReactionLabel.isHidden = getReaction(for: model.opponentAddress) == nil

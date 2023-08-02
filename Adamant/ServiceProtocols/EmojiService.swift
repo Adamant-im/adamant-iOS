@@ -10,5 +10,8 @@ import Foundation
 
 protocol EmojiService: AnyObject {
     func getFrequentlySelectedEmojis() -> [String]
-    func updateFrequentlySelectedEmojis(selectedEmoji: String)
+    func updateFrequentlySelectedEmojis(
+        selectedEmoji: String,
+        type: EmojiUpdateType
+    )
 }

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3A33F9FA2A7A53DA002B8003 /* EmojiUpdateType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A33F9F92A7A53DA002B8003 /* EmojiUpdateType.swift */; };
 		3A41938F2A580C57006A6B22 /* AdamantRichTransactionReactService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A41938E2A580C57006A6B22 /* AdamantRichTransactionReactService.swift */; };
 		3A4193912A580C85006A6B22 /* RichTransactionReactService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4193902A580C85006A6B22 /* RichTransactionReactService.swift */; };
 		3A41939A2A5D554A006A6B22 /* Reaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4193992A5D554A006A6B22 /* Reaction.swift */; };
@@ -33,19 +34,12 @@
 		4153045B29C09C6C000E4BEA /* IncreaseFeeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4153045A29C09C6C000E4BEA /* IncreaseFeeService.swift */; };
 		4154413B2923AED000824478 /* bitcoin_notificationContent.png in Resources */ = {isa = PBXBuildFile; fileRef = 4154413A2923AED000824478 /* bitcoin_notificationContent.png */; };
 		4154413C2923AED000824478 /* bitcoin_notificationContent.png in Resources */ = {isa = PBXBuildFile; fileRef = 4154413A2923AED000824478 /* bitcoin_notificationContent.png */; };
+		416380E12A51765F00F90E6D /* ChatReactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 416380E02A51765F00F90E6D /* ChatReactionsView.swift */; };
+		416380E42A51823E00F90E6D /* ElegantEmojiPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 416380E32A51823E00F90E6D /* ElegantEmojiPicker */; };
 		4164A9D728F17D4000EEF16D /* ChatTransactionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4164A9D628F17D4000EEF16D /* ChatTransactionService.swift */; };
 		4164A9D928F17DA700EEF16D /* AdamantChatTransactionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4164A9D828F17DA700EEF16D /* AdamantChatTransactionService.swift */; };
 		416F5EA4290162EB00EF0400 /* SocketIO in Frameworks */ = {isa = PBXBuildFile; productRef = 416F5EA3290162EB00EF0400 /* SocketIO */; };
 		4177E5E12A52DA7100C089FE /* AdvancedContextMenuKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4177E5E02A52DA7100C089FE /* AdvancedContextMenuKit */; };
-		4164A9D728F17D4000EEF16D /* ChatTransactionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4164A9D628F17D4000EEF16D /* ChatTransactionService.swift */; };
-		4164A9D928F17DA700EEF16D /* AdamantChatTransactionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4164A9D828F17DA700EEF16D /* AdamantChatTransactionService.swift */; };
-		416380E12A51765F00F90E6D /* ChatReactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 416380E02A51765F00F90E6D /* ChatReactionsView.swift */; };
-		416380E42A51823E00F90E6D /* ElegantEmojiPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 416380E32A51823E00F90E6D /* ElegantEmojiPicker */; };
-
-
-
-
-
 		417BA7F428BF894F00DF94C5 /* NotificationSoundsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417BA7F328BF894F00DF94C5 /* NotificationSoundsViewController.swift */; };
 		4184F16E2A33023A00D7B8B9 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4184F16D2A33023A00D7B8B9 /* GoogleService-Info.plist */; };
 		4184F1712A33044E00D7B8B9 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 4184F1702A33044E00D7B8B9 /* FirebaseCrashlytics */; };
@@ -587,6 +581,7 @@
 /* Begin PBXFileReference section */
 		33975C0D891698AA7E74EBCC /* Pods_Adamant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Adamant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		36AB8CE9537B3B873972548B /* Pods_AdmCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AdmCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3A33F9F92A7A53DA002B8003 /* EmojiUpdateType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiUpdateType.swift; sourceTree = "<group>"; };
 		3A41938E2A580C57006A6B22 /* AdamantRichTransactionReactService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantRichTransactionReactService.swift; sourceTree = "<group>"; };
 		3A4193902A580C85006A6B22 /* RichTransactionReactService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichTransactionReactService.swift; sourceTree = "<group>"; };
 		3A4193992A5D554A006A6B22 /* Reaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reaction.swift; sourceTree = "<group>"; };
@@ -1165,7 +1160,6 @@
 		3A41938D2A580C3B006A6B22 /* RichTransactionReactService */ = {
 			isa = PBXGroup;
 			children = (
-				3A4193992A5D554A006A6B22 /* Reaction.swift */,
 				3A41938E2A580C57006A6B22 /* AdamantRichTransactionReactService.swift */,
 			);
 			path = RichTransactionReactService;
@@ -1188,13 +1182,6 @@
 				4184F1762A33173100D7B8B9 /* ContributeView.swift */,
 			);
 			path = Contribute;
-			sourceTree = "<group>";
-		};
-		41330D2F2A46FBF90002B103 /* Packages */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Packages;
 			sourceTree = "<group>";
 		};
 		413AD21A29CDDD750025F255 /* ChatReply */ = {
@@ -1707,6 +1694,8 @@
 				9304F8BD292F88F900173F18 /* ANSPayload.swift */,
 				9304F8C5292F971600173F18 /* ApiServiceResult.swift */,
 				9304F8C7292F972600173F18 /* ApiServiceError.swift */,
+				3A4193992A5D554A006A6B22 /* Reaction.swift */,
+				3A33F9F92A7A53DA002B8003 /* EmojiUpdateType.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -2956,6 +2945,7 @@
 				3AA2D5FA280EAF5D000ED971 /* AdamantSocketService.swift in Sources */,
 				649D6BEC21BD5A53009E727B /* UISuffixTextField.swift in Sources */,
 				E93B0D762028B28E00126346 /* AdamantChatsProvider.swift in Sources */,
+				3A33F9FA2A7A53DA002B8003 /* EmojiUpdateType.swift in Sources */,
 				E993302021354B1800CD5200 /* AdmWalletRoutes.swift in Sources */,
 				E9332B8921F1FA4400D56E72 /* OnboardRoutes.swift in Sources */,
 				938F7D722955CE72001915CA /* ChatFactory.swift in Sources */,

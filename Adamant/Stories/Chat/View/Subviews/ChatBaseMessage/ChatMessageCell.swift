@@ -88,6 +88,7 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         didSet {
             guard model != oldValue else { return }
             chatMenuManager.selectedEmoji = getReaction(for: model.address)
+            chatMenuManager.emojiService = chatMessagesListViewModel?.emojiService
             
             reactionsContanerView.isHidden = model.reactions == nil
             ownReactionLabel.isHidden = getReaction(for: model.address) == nil

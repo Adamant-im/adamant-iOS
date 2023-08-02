@@ -142,6 +142,7 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
             
             replyMessageLabel.attributedText = model.messageReply
             chatMenuManager.selectedEmoji = getReaction(for: model.address)
+            chatMenuManager.emojiService = chatMessagesListViewModel?.emojiService
             
             let leading = model.isFromCurrentSender ? smallHInset : longHInset
             let trailing = model.isFromCurrentSender ? longHInset : smallHInset

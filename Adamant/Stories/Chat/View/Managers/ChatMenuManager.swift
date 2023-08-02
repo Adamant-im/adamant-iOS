@@ -17,7 +17,7 @@ protocol ChatMenuManagerDelegate: AnyObject {
 
 final class ChatMenuManager: NSObject, AdvancedContextMenuManagerDelegate {
     private let menu: AMenuSection
-    private let emojiService: EmojiService?
+    var emojiService: EmojiService?
     
     weak var delegate: ChatMenuManagerDelegate?
     var selectedEmoji: String?
@@ -53,7 +53,23 @@ final class ChatMenuManager: NSObject, AdvancedContextMenuManagerDelegate {
 extension ChatMenuManager: ChatReactionsViewDelegate, ElegantEmojiPickerDelegate {
     func didSelectEmoji(_ emoji: String) {
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
-        delegate?.didReact(emoji == selectedEmoji ? "" : emoji)
+        let pickedEmoji = emoji == selectedEmoji ? "" : emoji
+        
+        delegate?.didReact(pickedEmoji)
+        
+        if !pickedEmoji.isEmpty {
+            emojiService?.updateFrequentlySelectedEmojis(
+                selectedEmoji: pickedEmoji,
+                type: .increment
+            )
+        }
+        
+        if let selectedEmoji = selectedEmoji {
+            emojiService?.updateFrequentlySelectedEmojis(
+                selectedEmoji: selectedEmoji,
+                type: .decrement
+            )
+        }
     }
     
     @MainActor
@@ -74,7 +90,24 @@ extension ChatMenuManager: ChatReactionsViewDelegate, ElegantEmojiPickerDelegate
     ) {
         guard let emoji = emoji?.emoji else { return }
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
-        delegate?.didReact(emoji)
+        
+        let pickedEmoji = emoji == selectedEmoji ? "" : emoji
+        
+        delegate?.didReact(pickedEmoji)
+        
+        if !pickedEmoji.isEmpty {
+            emojiService?.updateFrequentlySelectedEmojis(
+                selectedEmoji: pickedEmoji,
+                type: .increment
+            )
+        }
+        
+        if let selectedEmoji = selectedEmoji {
+            emojiService?.updateFrequentlySelectedEmojis(
+                selectedEmoji: selectedEmoji,
+                type: .decrement
+            )
+        }
     }
 }
 
