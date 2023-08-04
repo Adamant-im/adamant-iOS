@@ -11,11 +11,14 @@ import CommonKit
 
 final class ContextMenuOverlayViewModelMac: ObservableObject {
     let menu: AMenuViewController?
+    let contentView: UIView
+    let contentViewSize: CGSize
     let upperContentView: AnyView?
     let upperContentSize: CGSize
     var locationOnScreen: CGPoint
+    var contentLocation: CGPoint
     
-    @Published var isContextMenuVisible = false
+    @Published var additionalMenuVisible = false
     
     var menuSize: CGSize {
         menu?.menuSize ?? .init(width: 250, height: 300)
@@ -30,31 +33,34 @@ final class ContextMenuOverlayViewModelMac: ObservableObject {
     // MARK: Init
     
     init(
+        contentView: UIView,
+        contentViewSize: CGSize,
         menu: AMenuViewController?,
         upperContentView: AnyView? = nil,
         upperContentSize: CGSize,
         locationOnScreen: CGPoint,
+        contentLocation: CGPoint,
         delegate: OverlayViewDelegate?
     ) {
+        self.contentView = contentView
+        self.contentViewSize = contentViewSize
         self.menu = menu
         self.upperContentView = upperContentView
         self.upperContentSize = upperContentSize
         self.locationOnScreen = locationOnScreen
-        self.isContextMenuVisible = isContextMenuVisible
         self.delegate = delegate
+        self.contentLocation = contentLocation
         
         menuLocation = calculateMenuLocation()
         upperContentViewLocation = calculateUpperContentViewLocation()
     }
     
-    func dismiss() {
-        Task { @MainActor in
-            await animate(duration: animationDuration) {
-                self.isContextMenuVisible.toggle()
-            }
-            
-            delegate?.didDissmis()
+    @MainActor func dismiss() async {
+        await animate(duration: animationDuration) {
+            self.additionalMenuVisible.toggle()
         }
+        
+        delegate?.didDissmis()
     }
 }
 
@@ -101,16 +107,6 @@ private extension ContextMenuOverlayViewModelMac {
         }
         
         return locationOnScreen.x - width
-    }
-    
-    func updateLocationIfNeeded() {
-        if isNeedToMoveFromBottom() {
-            locationOnScreen.y = UIScreen.main.bounds.height - menuSize.height - minBottomOffset
-        }
-        
-        if isNeedToMoveFromTrailing() {
-            locationOnScreen.x = UIScreen.main.bounds.width - minBottomOffset - upperContentSize.width
-        }
     }
     
     func isNeedToMoveFromTrailing() -> Bool {

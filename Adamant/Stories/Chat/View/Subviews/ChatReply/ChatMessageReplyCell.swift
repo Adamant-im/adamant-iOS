@@ -201,6 +201,7 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     private let opponentReactionSize = CGSize(width: 55, height: 30)
     private let opponentReactionImageSize = CGSize(width: 10, height: 12)
     private lazy var contextMenu = AdvancedContextMenuManager(delegate: chatMenuManager)
+    private var layoutAttributes: MessagesCollectionViewLayoutAttributes?
     
     // MARK: - Methods
     
@@ -296,6 +297,14 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         model.reactions?.first(
             where: { $0.sender == address }
         )?.reaction
+    }
+    
+    override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
+        super.apply(layoutAttributes)
+        guard let attributes = layoutAttributes as? MessagesCollectionViewLayoutAttributes
+        else { return }
+        
+        self.layoutAttributes = attributes
     }
     
     /// Positions the message bubble's top label.
@@ -527,16 +536,55 @@ extension ChatMessageReplyCell {
     }
     
     @objc func tapReactionAction() {
-        contextMenu.presentMenu(for: containerView, with: makeContextMenu())
+        contextMenu.presentMenu(
+            for: containerView,
+            copyView: copy(with: model, attributes: layoutAttributes)?.containerView,
+            with: makeContextMenu()
+        )
     }
 }
 
 extension ChatMessageReplyCell: ChatMenuManagerDelegate {
     func didReact(_ emoji: String) {
-        contextMenu.dismiss { [weak self] in
-            guard let self = self else { return }
+        Task {
+            await contextMenu.dismiss()
             self.actionHandler(.react(id: self.model.id, emoji: emoji))
         }
+    }
+    
+    func getContentView() -> UIView? {
+        copy(with: model, attributes: layoutAttributes)?.containerView
+    }
+}
+
+extension ChatMessageReplyCell {
+    func copy(
+        with model: Model,
+        attributes: MessagesCollectionViewLayoutAttributes?
+    ) -> ChatMessageReplyCell? {
+        guard let attributes = attributes else { return nil }
+        
+        let cell = ChatMessageReplyCell(frame: frame)
+        cell.apply(attributes)
+
+        cell.replyMessageLabel.attributedText = model.messageReply
+        let leading = model.isFromCurrentSender ? cell.smallHInset : cell.longHInset
+        let trailing = model.isFromCurrentSender ? cell.longHInset : cell.smallHInset
+        
+        cell.verticalStack.snp.updateConstraints {
+            $0.leading.equalToSuperview().inset(leading)
+            $0.trailing.equalToSuperview().inset(trailing)
+        }
+        
+        cell.messageContainerView.backgroundColor = model.backgroundColor.uiColor
+        cell.messageLabel.attributedText = model.message
+        cell.messageContainerView.style = .bubbleTail(
+            model.isFromCurrentSender
+                ? .bottomRight
+                : .bottomLeft,
+            .curved
+        )
+        return cell
     }
 }
 

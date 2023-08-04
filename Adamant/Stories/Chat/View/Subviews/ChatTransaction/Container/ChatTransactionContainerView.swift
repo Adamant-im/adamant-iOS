@@ -254,7 +254,11 @@ private extension ChatTransactionContainerView {
     }
     
     @objc func tapReactionAction() {
-        contextMenu.presentMenu(for: contentView, with: makeContextMenu())
+        contextMenu.presentMenu(
+            for: contentView,
+            copyView: copy(with: model)?.contentView,
+            with: makeContextMenu()
+        )
     }
 }
 
@@ -318,9 +322,23 @@ extension ChatTransactionContainerView {
 
 extension ChatTransactionContainerView: ChatMenuManagerDelegate {
     func didReact(_ emoji: String) {
-        contextMenu.dismiss { [weak self] in
-            guard let self = self else { return }
+        Task {
+            await contextMenu.dismiss()
             self.actionHandler(.react(id: self.model.id, emoji: emoji))
         }
+    }
+    
+    func getContentView() -> UIView? {
+        copy(with: model)?.contentView
+    }
+}
+
+extension ChatTransactionContainerView {
+    func copy(with model: Model) -> ChatTransactionContainerView? {
+        let view = ChatTransactionContainerView(frame: frame)
+        view.contentView.model = model.content
+        view.updateStatus(model.status)
+        view.updateLayout()
+        return view
     }
 }

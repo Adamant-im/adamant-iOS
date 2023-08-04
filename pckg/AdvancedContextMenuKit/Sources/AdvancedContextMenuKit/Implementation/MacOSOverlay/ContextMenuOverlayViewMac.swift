@@ -18,23 +18,31 @@ struct ContextMenuOverlayViewMac: View {
     var body: some View {
         ZStack {
             Button(action: {
-                viewModel.dismiss()
+                Task {
+                    await viewModel.dismiss()
+                }
             }, label: {
-                Color.clear
+                if viewModel.additionalMenuVisible {
+                    Color.black
+                        .opacity(0.3)
+                } else {
+                    Color.clear
+                }
             })
             
-            if viewModel.isContextMenuVisible {
+            makeContentOverlayView()
+            
+            if viewModel.additionalMenuVisible {
                 if let upperContentView = viewModel.upperContentView {
                     makeUpperOverlayView(upperContentView: upperContentView)
                 }
             }
             makeOverlayView()
-            Spacer()
         }
         .ignoresSafeArea()
         .onAppear {
             withAnimation(.easeInOut(duration: animationDuration)) {
-                viewModel.isContextMenuVisible.toggle()
+                viewModel.additionalMenuVisible.toggle()
             }
         }
     }
@@ -44,10 +52,36 @@ private extension ContextMenuOverlayViewMac {
     func makeOverlayView() -> some View {
         // TODO: CommonKit - expanded() (in all other cases)
         VStack(spacing: 10) {
-            if viewModel.isContextMenuVisible {
+            if viewModel.additionalMenuVisible {
                 makeMenuView()
                     .onTapGesture { }
             }
+            Spacer()
+        }
+        .frame(width: .infinity, height: .infinity)
+        .transition(.opacity)
+        .ignoresSafeArea()
+    }
+    
+    func makeContentOverlayView() -> some View {
+        VStack(spacing: 10) {
+            makeContentView()
+            Spacer()
+        }
+        .frame(width: .infinity, height: .infinity)
+        .transition(.opacity)
+        .ignoresSafeArea()
+    }
+    
+    func makeContentView() -> some View {
+        HStack {
+            UIViewWrapper(view: viewModel.contentView)
+                .frame(
+                    width: viewModel.contentViewSize.width,
+                    height: viewModel.contentViewSize.height
+                )
+                .padding(.top, viewModel.contentLocation.y)
+                .padding(.leading, viewModel.contentLocation.x)
             Spacer()
         }
         .frame(width: .infinity, height: .infinity)

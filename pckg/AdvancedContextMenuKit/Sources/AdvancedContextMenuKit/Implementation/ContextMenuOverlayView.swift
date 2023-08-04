@@ -34,7 +34,7 @@ struct ContextMenuOverlayView: View {
     
     var body: some View {
         ZStack {
-            if viewModel.isContextMenuVisible {
+            if viewModel.additionalMenuVisible {
                 backgroundBlur
                     .zIndex(0)
                     .ignoresSafeArea()
@@ -50,11 +50,13 @@ struct ContextMenuOverlayView: View {
         }
         .ignoresSafeArea()
         .onTapGesture {
-            viewModel.dismiss()
+            Task {
+                await viewModel.dismiss()
+            }
         }
         .onAppear {
-            withAnimation(.easeInOut(duration: animationDuration)) {
-                viewModel.isContextMenuVisible.toggle()
+            withAnimation(.easeInOut(duration: viewModel.animationDuration)) {
+                viewModel.additionalMenuVisible.toggle()
             }
         }
     }
@@ -84,7 +86,7 @@ private extension ContextMenuOverlayView {
                     height: viewModel.contentViewSize.height
                 )
                 .padding(.top,
-                         viewModel.isContextMenuVisible
+                         viewModel.additionalMenuVisible
                          ? viewModel.contentViewLocation.y
                          : viewModel.startOffsetForContentView
                 )
@@ -109,7 +111,7 @@ private extension ContextMenuOverlayView {
     
     func makeMenuView() -> some View {
         HStack {
-            if viewModel.isContextMenuVisible,
+            if viewModel.additionalMenuVisible,
                let menuVC = viewModel.menu {
                 UIViewControllerWrapper(menuVC)
                     .frame(width: menuVC.menuSize.width, height: menuVC.menuSize.height)
@@ -143,7 +145,7 @@ private extension ContextMenuOverlayView {
                     height: viewModel.upperContentSize.height
                 )
                 .padding(.top,
-                         viewModel.isContextMenuVisible
+                         viewModel.additionalMenuVisible
                          ? viewModel.upperContentViewLocation.y
                          : viewModel.startOffsetForUpperContentView
                 )
@@ -155,5 +157,3 @@ private extension ContextMenuOverlayView {
     }
     
 }
-
-private let animationDuration: TimeInterval = 0.2

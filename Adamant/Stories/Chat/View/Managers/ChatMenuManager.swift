@@ -13,6 +13,11 @@ import AdvancedContextMenuKit
 
 protocol ChatMenuManagerDelegate: AnyObject {
     func didReact(_ emoji: String)
+    func getContentView() -> UIView?
+}
+
+extension ChatMenuManagerDelegate {
+    func getContentView() -> UIView? { return nil }
 }
 
 final class ChatMenuManager: NSObject, AdvancedContextMenuManagerDelegate {
@@ -47,6 +52,10 @@ final class ChatMenuManager: NSObject, AdvancedContextMenuManagerDelegate {
                 selectedEmoji: selectedEmoji
             )
         )
+    }
+    
+    func getContentView() -> UIView? {
+        delegate?.getContentView()
     }
 }
 
