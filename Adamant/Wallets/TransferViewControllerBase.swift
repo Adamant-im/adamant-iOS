@@ -998,8 +998,6 @@ extension TransferViewControllerBase {
                 
                 self?.validateForm()
                 self?.updateToolbar(for: row)
-            }.cellUpdate { [weak self] _, _ in
-                self?.validateForm()
             }
             
         case .fiat:
