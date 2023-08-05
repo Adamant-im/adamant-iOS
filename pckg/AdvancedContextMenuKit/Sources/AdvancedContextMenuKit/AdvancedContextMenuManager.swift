@@ -75,9 +75,16 @@ public final class AdvancedContextMenuManager: NSObject {
         let copyView = copyView ?? contentView.snapshotView(afterScreenUpdates: true)
         guard let copyView = copyView else { return }
         
+        let containerCopyView = ContanierPreviewView(
+            contentView: copyView,
+            scale: 1.0,
+            size: contentView.frame.size,
+            animationInDuration: animationOutDuration
+        )
+        
         guard !isiOSAppOnMac else {
             presentOverlayForMac(
-                contentView: copyView,
+                contentView: containerCopyView,
                 contentViewSize: contentView.frame.size,
                 location: locationOnScreen,
                 contentLocation: locationOnScreen,
@@ -91,7 +98,7 @@ public final class AdvancedContextMenuManager: NSObject {
         contentView.alpha = .zero
         
         self.presentOverlay(
-            view: copyView,
+            view: containerCopyView,
             location: locationOnScreen,
             contentViewSize: contentView.frame.size,
             menu: menuVC
