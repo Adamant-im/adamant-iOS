@@ -19,7 +19,6 @@ final class ContanierPreviewView: UIView {
     ) {
         self.animationInDuration = animationInDuration
         self.contentView = contentView
-        self.contentView.frame.origin.x = .zero
         
         super.init(
             frame: .init(
@@ -31,7 +30,11 @@ final class ContanierPreviewView: UIView {
             )
         )
         
+        self.contentView.frame.origin.x = .zero
         self.contentView.transform = .init(scaleX: scale, y: scale)
+        self.contentView.widthAnchor.constraint(
+            lessThanOrEqualToConstant: size.width
+        ).isActive = true
         
         backgroundColor = .clear
         addSubview(self.contentView)
