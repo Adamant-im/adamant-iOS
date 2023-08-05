@@ -439,7 +439,8 @@ extension ChatMessageCell {
             copyView: copy(
                 with: model,
                 attributes: layoutAttributes,
-                urlAttributes: messageLabel.urlAttributes
+                urlAttributes: messageLabel.urlAttributes,
+                enabledDetectors: messageLabel.enabledDetectors
             )?.containerView,
             with: makeContextMenu()
         )
@@ -458,7 +459,8 @@ extension ChatMessageCell: ChatMenuManagerDelegate {
         copy(
             with: model,
             attributes: layoutAttributes,
-            urlAttributes: messageLabel.urlAttributes
+            urlAttributes: messageLabel.urlAttributes,
+            enabledDetectors: messageLabel.enabledDetectors
         )?.containerView
     }
 }
@@ -467,7 +469,8 @@ extension ChatMessageCell {
     func copy(
         with model: Model,
         attributes: MessagesCollectionViewLayoutAttributes?,
-        urlAttributes: [NSAttributedString.Key : Any]
+        urlAttributes: [NSAttributedString.Key : Any],
+        enabledDetectors: [DetectorType]
     ) -> ChatMessageCell? {
         guard let attributes = attributes else { return nil }
         
@@ -475,9 +478,11 @@ extension ChatMessageCell {
         cell.apply(attributes)
         
         cell.messageContainerView.backgroundColor = model.backgroundColor.uiColor
-        cell.messageLabel.setAttributes(urlAttributes, detector: .url)
-        cell.messageLabel.attributedText = model.text
-
+        cell.messageLabel.configure {
+            cell.messageLabel.enabledDetectors = enabledDetectors
+            cell.messageLabel.setAttributes(urlAttributes, detector: .url)
+            cell.messageLabel.attributedText = model.text
+        }
         cell.messageContainerView.style = .bubbleTail(
             model.isFromCurrentSender
                 ? .bottomRight
