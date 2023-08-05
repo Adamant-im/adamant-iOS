@@ -538,7 +538,11 @@ extension ChatMessageReplyCell {
     @objc func tapReactionAction() {
         contextMenu.presentMenu(
             for: containerView,
-            copyView: copy(with: model, attributes: layoutAttributes)?.containerView,
+            copyView: copy(
+                with: model,
+                attributes: layoutAttributes,
+                urlAttributes: messageLabel.urlAttributes
+            )?.containerView,
             with: makeContextMenu()
         )
     }
@@ -553,14 +557,19 @@ extension ChatMessageReplyCell: ChatMenuManagerDelegate {
     }
     
     func getContentView() -> UIView? {
-        copy(with: model, attributes: layoutAttributes)?.containerView
+        copy(
+            with: model,
+            attributes: layoutAttributes,
+            urlAttributes: messageLabel.urlAttributes
+        )?.containerView
     }
 }
 
 extension ChatMessageReplyCell {
     func copy(
         with model: Model,
-        attributes: MessagesCollectionViewLayoutAttributes?
+        attributes: MessagesCollectionViewLayoutAttributes?,
+        urlAttributes: [NSAttributedString.Key : Any]
     ) -> ChatMessageReplyCell? {
         guard let attributes = attributes else { return nil }
         
@@ -578,6 +587,7 @@ extension ChatMessageReplyCell {
         
         cell.messageContainerView.backgroundColor = model.backgroundColor.uiColor
         cell.messageLabel.attributedText = model.message
+        cell.messageLabel.setAttributes(urlAttributes, detector: .url)
         cell.messageContainerView.style = .bubbleTail(
             model.isFromCurrentSender
                 ? .bottomRight
