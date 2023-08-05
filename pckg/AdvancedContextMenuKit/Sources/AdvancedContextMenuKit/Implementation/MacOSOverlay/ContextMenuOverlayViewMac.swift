@@ -23,8 +23,7 @@ struct ContextMenuOverlayViewMac: View {
                 }
             }, label: {
                 if viewModel.additionalMenuVisible {
-                    Color.black
-                        .opacity(0.3)
+                    Color.init(uiColor: .adamant.contextMenuOverlayMacColor)
                 } else {
                     Color.clear
                 }
