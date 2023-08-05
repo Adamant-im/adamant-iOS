@@ -120,7 +120,7 @@ extension UIColor {
         /// Picked reaction background color
         public static var pickedReactionBackground: UIColor {
             let colorWhiteTheme  = UIColor(red: 0.88, green: 0.88, blue: 0.88, alpha: 1.0)
-            let colorDarkTheme   = UIColor(red: 0.298, green: 0.298, blue: 0.298, alpha: 1.0)
+            let colorDarkTheme   = UIColor(red: 0.278, green: 0.278, blue: 0.278, alpha: 1.0)
             return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
         }
         

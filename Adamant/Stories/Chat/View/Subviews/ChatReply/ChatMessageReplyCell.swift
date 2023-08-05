@@ -261,8 +261,10 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     
     func updateOwnReaction() {
         ownReactionLabel.text = getReaction(for: model.address)
-        ownReactionLabel.transform = .identity
-        ownReactionLabel.alpha = 1.0
+        ownReactionLabel.backgroundColor = model.backgroundColor.uiColor.mixin(
+            infusion: .lightGray,
+            alpha: 0.15
+        )
     }
     
     func updateOpponentReaction() {
@@ -291,6 +293,10 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         }
         
         opponentReactionLabel.attributedText = fullString
+        opponentReactionLabel.backgroundColor = model.backgroundColor.uiColor.mixin(
+            infusion: .lightGray,
+            alpha: 0.15
+        )
     }
     
     func getReaction(for address: String) -> String? {
