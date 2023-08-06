@@ -42,7 +42,17 @@ public extension String {
             ?? self
     }
     
-    subscript (i: Int) -> Character {
-        return self[index(startIndex, offsetBy:i)]
+    subscript(i: Int) -> Character {
+        self[index(from: i)]
+    }
+    
+    func index(from int: Int) -> Index {
+        index(startIndex, offsetBy: int)
+    }
+    
+    func substring(range: Range<Int>) -> String {
+        let startIndex = index(from: range.lowerBound)
+        let endIndex = index(from: range.upperBound)
+        return String(self[startIndex ..< endIndex])
     }
 }
