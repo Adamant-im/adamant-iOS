@@ -105,7 +105,7 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         label.textAlignment = .center
         label.layer.masksToBounds = true
         label.backgroundColor = .adamant.pickedReactionBackground
-        label.layer.cornerRadius = 15
+        label.layer.cornerRadius = opponentReactionSize.height / 2
         label.frame.size = opponentReactionSize
         
         let tapGesture = UITapGestureRecognizer(
@@ -197,8 +197,8 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     private var trailingReplyViewOffset: CGFloat = 4
     private let smallHInset: CGFloat = 8
     private let longHInset: CGFloat = 14
-    private let ownReactionSize = CGSize(width: 40, height: 30)
-    private let opponentReactionSize = CGSize(width: 55, height: 30)
+    private let ownReactionSize = CGSize(width: 40, height: 27)
+    private let opponentReactionSize = CGSize(width: 55, height: 27)
     private let opponentReactionImageSize = CGSize(width: 10, height: 12)
     private lazy var contextMenu = AdvancedContextMenuManager(delegate: chatMenuManager)
     private var layoutAttributes: MessagesCollectionViewLayoutAttributes?

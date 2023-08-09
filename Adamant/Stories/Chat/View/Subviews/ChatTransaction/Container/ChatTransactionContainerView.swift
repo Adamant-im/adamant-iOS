@@ -98,7 +98,7 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
         label.textAlignment = .center
         label.layer.masksToBounds = true
         label.backgroundColor = .adamant.pickedReactionBackground
-        label.layer.cornerRadius = 15
+        label.layer.cornerRadius = opponentReactionSize.height / 2
         
         label.snp.makeConstraints { make in
             make.width.equalTo(opponentReactionSize.width)
@@ -126,8 +126,8 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
     
     private lazy var contextMenu = AdvancedContextMenuManager(delegate: chatMenuManager)
     
-    private let ownReactionSize = CGSize(width: 40, height: 30)
-    private let opponentReactionSize = CGSize(width: 55, height: 30)
+    private let ownReactionSize = CGSize(width: 40, height: 27)
+    private let opponentReactionSize = CGSize(width: 55, height: 27)
     private let opponentReactionImageSize = CGSize(width: 10, height: 12)
     
     var isSelected: Bool = false {
