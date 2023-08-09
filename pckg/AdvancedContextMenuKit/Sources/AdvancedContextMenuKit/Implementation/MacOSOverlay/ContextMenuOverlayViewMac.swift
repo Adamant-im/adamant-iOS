@@ -16,7 +16,17 @@ struct ContextMenuOverlayViewMac: View {
     }
     
     var body: some View {
+        GeometryReader { geometry in
+            makeStackView(geometry: geometry)
+        }
+    }
+}
+
+private extension ContextMenuOverlayViewMac {
+    func makeStackView(geometry: GeometryProxy) -> some View {
         ZStack {
+            viewModel.updateLocations(geometry: geometry)
+            
             Button(action: {
                 Task {
                     await viewModel.dismiss()
@@ -45,9 +55,7 @@ struct ContextMenuOverlayViewMac: View {
             }
         }
     }
-}
 
-private extension ContextMenuOverlayViewMac {
     func makeOverlayView() -> some View {
         // TODO: CommonKit - expanded() (in all other cases)
         VStack(spacing: 10) {

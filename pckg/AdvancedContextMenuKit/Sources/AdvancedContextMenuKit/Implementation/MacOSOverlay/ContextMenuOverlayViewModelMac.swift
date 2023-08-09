@@ -30,6 +30,8 @@ final class ContextMenuOverlayViewModelMac: ObservableObject {
     
     weak var delegate: OverlayViewDelegate?
     
+    private var screenSize: CGSize = UIScreen.main.bounds.size
+
     // MARK: Init
     
     init(
@@ -62,6 +64,13 @@ final class ContextMenuOverlayViewModelMac: ObservableObject {
         
         delegate?.didDissmis()
     }
+    
+    func updateLocations(geometry: GeometryProxy) -> EmptyView {
+        screenSize = geometry.size
+        menuLocation = calculateMenuLocation()
+        upperContentViewLocation = calculateUpperContentViewLocation()
+        return EmptyView()
+    }
 }
 
 private extension ContextMenuOverlayViewModelMac {
@@ -86,7 +95,7 @@ private extension ContextMenuOverlayViewModelMac {
             - minContentsSpace
         }
         
-        let location = UIScreen.main.bounds.height - menuSize.height - minBottomOffset
+        let location = screenSize.height - menuSize.height - minBottomOffset
         
         return location
         - upperContentSize.height
@@ -98,7 +107,7 @@ private extension ContextMenuOverlayViewModelMac {
             return locationOnScreen.y
         }
         
-        return UIScreen.main.bounds.height - menuSize.height - minBottomOffset
+        return screenSize.height - menuSize.height - minBottomOffset
     }
     
     func calculateLeadingOffset(for width: CGFloat) -> CGFloat {
@@ -110,11 +119,11 @@ private extension ContextMenuOverlayViewModelMac {
     }
     
     func isNeedToMoveFromTrailing() -> Bool {
-        UIScreen.main.bounds.width < locationOnScreen.x + upperContentSize.width + minBottomOffset
+        screenSize.width < locationOnScreen.x + upperContentSize.width + minBottomOffset
     }
 
     func isNeedToMoveFromBottom() -> Bool {
-        UIScreen.main.bounds.height < locationOnScreen.y + menuSize.height + minBottomOffset
+        screenSize.height < locationOnScreen.y + menuSize.height + minBottomOffset
     }
 }
 
