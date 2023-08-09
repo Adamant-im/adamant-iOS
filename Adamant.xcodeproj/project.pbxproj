@@ -194,6 +194,7 @@
 		93496BB72A6CAED100DD062F /* Roboto_500_normal.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 93496BAC2A6CAED100DD062F /* Roboto_500_normal.ttf */; };
 		93547BCA29E2262D00B0914B /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93547BC929E2262D00B0914B /* WelcomeViewController.swift */; };
 		935F53D629BE8F7400779492 /* RichTransactionStatusPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 935F53D529BE8F7400779492 /* RichTransactionStatusPublisher.swift */; };
+		935FE8EF2A83633E004EABB6 /* ListKit in Frameworks */ = {isa = PBXBuildFile; productRef = 935FE8EE2A83633E004EABB6 /* ListKit */; };
 		93684A2A29EFA28A00F9EFFE /* FixedTextMessageSizeCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93684A2929EFA28A00F9EFFE /* FixedTextMessageSizeCalculator.swift */; };
 		9371130F2996EDA900F64CF9 /* ChatRefreshMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9371130E2996EDA900F64CF9 /* ChatRefreshMock.swift */; };
 		9371E561295CD53100438F2C /* ChatLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9371E560295CD53100438F2C /* ChatLocalization.swift */; };
@@ -1084,6 +1085,7 @@
 				A5DBBAF0262C72EF004AC028 /* LiskKit in Frameworks */,
 				93FA403629401BFC00D20DB6 /* PopupKit in Frameworks */,
 				4184F1712A33044E00D7B8B9 /* FirebaseCrashlytics in Frameworks */,
+				935FE8EF2A83633E004EABB6 /* ListKit in Frameworks */,
 				A5DBBAEE262C72EF004AC028 /* BitcoinKit in Frameworks */,
 				A57282CA262C94CD00C96FA8 /* DateToolsSwift in Frameworks */,
 			);
@@ -2215,6 +2217,7 @@
 				938F7D572955C1DA001915CA /* MessageKit */,
 				4184F1702A33044E00D7B8B9 /* FirebaseCrashlytics */,
 				9342F6C12A6A35E300A9B39F /* CommonKit */,
+				935FE8EE2A83633E004EABB6 /* ListKit */,
 			);
 			productName = Adamant;
 			productReference = E913C8EE1FFFA51D001A83F7 /* Adamant.app */;
@@ -3726,6 +3729,10 @@
 		9342F6C12A6A35E300A9B39F /* CommonKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = CommonKit;
+		};
+		935FE8EE2A83633E004EABB6 /* ListKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ListKit;
 		};
 		937751A42A68B3320054BD65 /* CommonKit */ = {
 			isa = XCSwiftPackageProductDependency;

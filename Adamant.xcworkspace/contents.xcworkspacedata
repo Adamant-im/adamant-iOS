@@ -5,6 +5,9 @@
       location = "group:CommonKit">
    </FileRef>
    <FileRef
+      location = "group:ListKit">
+   </FileRef>
+   <FileRef
       location = "group:PopupKit">
    </FileRef>
    <FileRef
