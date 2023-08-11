@@ -20,6 +20,7 @@ final class AdamantHealthCheckService: HealthCheckService {
     private var _nodes = [Node]()
     private var currentRequests = Set<DataRequest>()
     private let semaphore = DispatchSemaphore(value: 1)
+    private let notifyingQueue = DispatchQueue(label: "com.adamant.health-check-notification")
     
     weak var delegate: HealthCheckDelegate?
     
@@ -70,7 +71,7 @@ final class AdamantHealthCheckService: HealthCheckService {
             } ?? .synchronizing
         }
         
-        DispatchQueue.main.async { [weak delegate] in
+        notifyingQueue.async { [weak delegate] in
             delegate?.healthCheckUpdate()
         }
     }
