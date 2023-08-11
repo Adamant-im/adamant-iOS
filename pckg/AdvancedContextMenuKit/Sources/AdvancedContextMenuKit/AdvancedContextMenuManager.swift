@@ -233,10 +233,7 @@ private extension AdvancedContextMenuManager {
         
         self.viewModel = viewModel
         
-        window.rootViewController = overlayVC
-        window.makeKeyAndVisible()
-        
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        present(vc: overlayVC)
     }
     
     private func presentOverlayForMac(
@@ -273,21 +270,14 @@ private extension AdvancedContextMenuManager {
         
         viewModelMac = viewModel
         
-        window.rootViewController = overlayVC
+        present(vc: overlayVC)
+    }
+    
+    func present(vc: UIViewController) {
+        window.rootViewController = vc
         window.makeKeyAndVisible()
         
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-    }
-    
-    func rootViewController() -> UIViewController? {
-        let allScenes = UIApplication.shared.connectedScenes
-        let scene = allScenes.first { $0.activationState == .foregroundActive }
-        
-        guard let windowScene = scene as? UIWindowScene else {
-            return nil
-        }
-        
-        return windowScene.keyWindow?.rootViewController
     }
     
     func getMenuVC(content: AMenuSection) -> AMenuViewController {

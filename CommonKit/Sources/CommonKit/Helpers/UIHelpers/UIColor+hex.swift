@@ -30,6 +30,7 @@ public extension UIColor {
 }
 
 public extension UIColor {
+    /// if alpha == 1 it will return new color, if alpha == 0 it will return old color
     func mixin(infusion:UIColor, alpha: CGFloat) -> UIColor {
         let alpha2 = min(1.0, max(0, alpha))
         let beta = 1.0 - alpha2

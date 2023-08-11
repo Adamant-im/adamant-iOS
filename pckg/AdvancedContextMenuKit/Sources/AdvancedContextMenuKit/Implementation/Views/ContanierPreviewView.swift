@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SnapKit
 
 final class ContanierPreviewView: UIView {
     private let contentView: UIView
@@ -23,10 +24,7 @@ final class ContanierPreviewView: UIView {
         super.init(
             frame: .init(
                 origin: .zero,
-                size: .init(
-                    width: size.width,
-                    height: size.height
-                )
+                size: size
             )
         )
         
@@ -49,6 +47,10 @@ final class ContanierPreviewView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         self.contentView.center.y = center.y
+    }
+    
+    override func didMoveToSuperview() {
+        super.didMoveToSuperview()
         
         UIView.animate(withDuration: animationInDuration) {
             self.contentView.transform = .identity
