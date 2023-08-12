@@ -44,14 +44,9 @@ enum NotificationStrings {
         comment: "Can't turn on notifications without staying logged in"
     )
     
-    static let removedReaction = NSLocalizedString(
-        "ChatListPage.RemovedReaction",
-        comment: "ChatList: Removed Reaction?"
-    )
-    
     static let reacted = NSLocalizedString(
-        "ChatListPage.Reacted",
-        comment: "ChatList: Reacted"
+        "NotificationsService.Reacted",
+        comment: "Notifications: Reacted"
     )
     
     static func newTransferBody(_ count: Int) -> String {
