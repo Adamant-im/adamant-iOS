@@ -55,8 +55,11 @@ struct ContextMenuOverlayView: View {
             }
         }
         .onAppear {
-            withAnimation(.easeInOut(duration: viewModel.animationDuration)) {
-                viewModel.additionalMenuVisible.toggle()
+            Task {
+                await animate(duration: viewModel.animationDuration) {
+                    viewModel.additionalMenuVisible.toggle()
+                }
+                viewModel.delegate?.didAppear()
             }
         }
     }

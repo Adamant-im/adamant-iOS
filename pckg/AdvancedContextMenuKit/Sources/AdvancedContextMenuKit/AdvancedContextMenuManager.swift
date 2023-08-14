@@ -33,6 +33,7 @@ public final class AdvancedContextMenuManager: NSObject {
     private weak var delegate: AdvancedContextMenuManagerDelegate?
     private let maxContentHeight: CGFloat = 500
     private let window = TransparentWindow(frame: UIScreen.main.bounds)
+    private var locationOnScreen: CGPoint = .zero
 
     var isiOSAppOnMac: Bool = {
 #if targetEnvironment(macCatalyst)
@@ -68,7 +69,7 @@ public final class AdvancedContextMenuManager: NSObject {
         copyView: UIView?,
         with menu: AMenuSection
     ) {
-        let locationOnScreen = contentView.convert(CGPoint.zero, to: nil)
+        locationOnScreen = contentView.convert(CGPoint.zero, to: nil)
                 
         self.contentView = contentView
         
@@ -103,12 +104,6 @@ public final class AdvancedContextMenuManager: NSObject {
             contentViewSize: contentView.frame.size,
             menu: menuVC
         )
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + animationInDuration) {
-            let newLocationOnScreen = contentView.convert(CGPoint.zero, to: nil)
-            guard newLocationOnScreen != locationOnScreen else { return }
-            self.viewModel?.update(locationOnScreen: newLocationOnScreen)
-        }
     }
     
     @MainActor
@@ -157,7 +152,7 @@ private extension AdvancedContextMenuManager {
               let menu = delegate?.configureContextMenu()
         else { return }
             
-        let locationOnScreen = contentView.convert(CGPoint.zero, to: nil)
+        locationOnScreen = contentView.convert(CGPoint.zero, to: nil)
         
         self.contentView = contentView
         
@@ -190,15 +185,6 @@ private extension AdvancedContextMenuManager {
                 contentViewSize: size,
                 menu: menuVC
             )
-            
-            UIView.animate(withDuration: animationOutDuration) {
-                contentView.transform = .identity
-            } completion: { [weak self] _ in
-                guard let self = self else { return }
-                let newLocationOnScreen = contentView.convert(CGPoint.zero, to: nil)
-                guard newLocationOnScreen != locationOnScreen else { return }
-                self.viewModel?.update(locationOnScreen: newLocationOnScreen)
-            }
         }
     }
     
@@ -256,6 +242,7 @@ private extension AdvancedContextMenuManager {
             upperContentSize: upperViewSize,
             locationOnScreen: location,
             contentLocation: contentLocation,
+            animationDuration: animationOutDuration,
             delegate: self
         )
         
@@ -305,6 +292,15 @@ extension AdvancedContextMenuManager: OverlayViewDelegate {
             window.rootViewController = nil
             window.isHidden = true
         }
+    }
+    
+    @MainActor func didAppear() {
+        contentView?.transform = .identity
+        let newLocationOnScreen = contentView?.convert(CGPoint.zero, to: nil) ?? locationOnScreen
+        guard newLocationOnScreen != locationOnScreen else { return }
+        
+        locationOnScreen = newLocationOnScreen
+        viewModel?.update(locationOnScreen: newLocationOnScreen)
     }
 }
 

@@ -50,8 +50,11 @@ private extension ContextMenuOverlayViewMac {
         }
         .ignoresSafeArea()
         .onAppear {
-            withAnimation(.easeInOut(duration: animationDuration)) {
-                viewModel.additionalMenuVisible.toggle()
+            Task {
+                await animate(duration: viewModel.animationDuration) {
+                    viewModel.additionalMenuVisible.toggle()
+                }
+                viewModel.delegate?.didAppear()
             }
         }
     }

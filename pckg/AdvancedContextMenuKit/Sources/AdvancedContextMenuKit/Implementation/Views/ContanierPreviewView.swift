@@ -11,6 +11,11 @@ import SnapKit
 final class ContanierPreviewView: UIView {
     private let contentView: UIView
     private let animationInDuration: TimeInterval
+    private let _size: CGSize
+    
+    override var intrinsicContentSize: CGSize {
+        _size
+    }
     
     init(
         contentView: UIView,
@@ -20,24 +25,12 @@ final class ContanierPreviewView: UIView {
     ) {
         self.animationInDuration = animationInDuration
         self.contentView = contentView
-        
-        super.init(
-            frame: .init(
-                origin: .zero,
-                size: size
-            )
-        )
-        
-        self.contentView.frame.origin.x = .zero
+        self._size = size
+        super.init(frame: .zero)
         self.contentView.transform = .init(scaleX: scale, y: scale)
-        self.contentView.widthAnchor.constraint(
-            lessThanOrEqualToConstant: size.width
-        ).isActive = true
         
         backgroundColor = .clear
         addSubview(self.contentView)
-        
-        self.contentView.center.y = center.y
     }
     
     required init?(coder: NSCoder) {
@@ -46,7 +39,7 @@ final class ContanierPreviewView: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        self.contentView.center.y = center.y
+        self.contentView.frame = .init(origin: .zero, size: intrinsicContentSize)
     }
     
     override func didMoveToSuperview() {
