@@ -21,6 +21,10 @@ class SwipeableView: UIView {
     private var isNeedToVibrate: Bool = true
     private var oldContentOffset: CGPoint?
     
+    private var maxSwipeValue: Double {
+        UIScreen.main.bounds.size.width * 0.05
+    }
+    
     var didSwipeAction: (() -> Void)?
     var swipeStateAction: ((SwipeableView.State) -> Void)?
     
@@ -83,7 +87,7 @@ private extension SwipeableView {
             )
             recognizer.setTranslation(CGPoint(x: 0, y: 0), in: viewForSwipe)
             
-            if abs(movingView.frame.origin.x) > UIScreen.main.bounds.size.width * 0.18 {
+            if abs(movingView.frame.origin.x) > maxSwipeValue {
                 isSwipedEnough = true
                 if isNeedToVibrate {
                     UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
