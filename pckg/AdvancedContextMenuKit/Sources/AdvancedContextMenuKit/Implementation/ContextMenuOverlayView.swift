@@ -76,9 +76,8 @@ private extension ContextMenuOverlayView {
                 Spacer()
             }
         }
-        .frame(width: .infinity, height: .infinity)
+        .fullScreen()
         .transition(.opacity)
-        .ignoresSafeArea()
     }
     
     func makeContentView() -> some View {
@@ -96,9 +95,8 @@ private extension ContextMenuOverlayView {
                 .padding(.leading, viewModel.contentViewLocation.x)
             Spacer()
         }
-        .frame(width: .infinity, height: .infinity)
+        .fullScreen()
         .transition(.opacity)
-        .ignoresSafeArea()
     }
     
     func makeMenuOverlayView() -> some View {
@@ -107,9 +105,8 @@ private extension ContextMenuOverlayView {
                 .onTapGesture { }
             Spacer()
         }
-        .frame(width: .infinity, height: .infinity)
+        .fullScreen()
         .transition(.opacity)
-        .ignoresSafeArea()
     }
     
     func makeMenuView() -> some View {
@@ -125,8 +122,7 @@ private extension ContextMenuOverlayView {
                 Spacer()
             }
         }
-        .frame(width: .infinity, height: .infinity)
-        .ignoresSafeArea()
+        .fullScreen()
     }
     
     func makeUpperOverlayView(upperContentView: some View) -> some View {
@@ -135,9 +131,8 @@ private extension ContextMenuOverlayView {
                 .onTapGesture { }
             Spacer()
         }
-        .frame(width: .infinity, height: .infinity)
+        .fullScreen()
         .transition(.opacity)
-        .ignoresSafeArea()
     }
     
     func makeUpperContentView(upperContentView: some View) -> some View {
@@ -155,8 +150,7 @@ private extension ContextMenuOverlayView {
                 .padding(.leading, viewModel.upperContentViewLocation.x)
             Spacer()
         }
-        .frame(width: .infinity, height: .infinity)
-        .ignoresSafeArea()
+        .fullScreen()
     }
     
 }

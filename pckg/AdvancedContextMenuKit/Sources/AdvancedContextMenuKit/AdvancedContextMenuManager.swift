@@ -287,7 +287,7 @@ private extension AdvancedContextMenuManager {
 extension AdvancedContextMenuManager: OverlayViewDelegate {
     @MainActor func didDissmis() {
         contentView?.alpha = 1.0
-        /// Postpone window dismissal to the next iteration to allow the contentView to become visible
+        // Postpone window dismissal to the next iteration to allow the contentView to become visible
         Task {
             window.rootViewController = nil
             window.isHidden = true

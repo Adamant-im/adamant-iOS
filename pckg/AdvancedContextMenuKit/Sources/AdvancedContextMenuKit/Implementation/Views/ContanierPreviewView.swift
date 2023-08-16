@@ -27,6 +27,7 @@ final class ContanierPreviewView: UIView {
         self.contentView = contentView
         self._size = size
         super.init(frame: .zero)
+        self.contentView.clipsToBounds = true
         self.contentView.transform = .init(scaleX: scale, y: scale)
         
         backgroundColor = .clear
