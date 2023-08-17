@@ -220,7 +220,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         if let address = accountService.account?.address,
            let partenerAddress = transaction.partner?.address {
             
-            let partnerName = addressBookService.getName(for: partenerAddress)
+            let partnerName = transaction.partner?.name?.checkAndReplaceSystemWallets() ?? addressBookService.getName(for: partenerAddress)
             
             if address == transaction.senderId {
                 controller.senderName = String.adamant.transactionDetails.yourAddress
