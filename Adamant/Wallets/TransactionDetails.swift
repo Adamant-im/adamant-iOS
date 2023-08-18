@@ -41,13 +41,26 @@ protocol TransactionDetails {
     
     var transactionStatus: TransactionStatus? { get }
     
-    static var defaultCurrencySymbol: String? { get }
-    func summary(with url: String?) -> String
+    var defaultCurrencySymbol: String? { get }
+    
+    var feeCurrencySymbol: String? { get }
+    
+    func summary(
+        with url: String?,
+        currentValue: String?,
+        valueAtTimeTxn: String?
+    ) -> String
 }
 
 extension TransactionDetails {
-    func summary(with url: String? = nil) -> String {
-        let symbol = type(of: self).defaultCurrencySymbol
+    var feeCurrencySymbol: String? { defaultCurrencySymbol }
+    
+    func summary(
+        with url: String? = nil,
+        currentValue: String? = nil,
+        valueAtTimeTxn: String? = nil
+    ) -> String {
+        let symbol = self.defaultCurrencySymbol
         
         var summary = """
         Transaction \(txId)
@@ -59,11 +72,12 @@ extension TransactionDetails {
         """
         
         if let fee = feeValue {
-            summary += "\nFee: \(AdamantBalanceFormat.full.format(fee, withCurrencySymbol: symbol))"
+            summary += "\nFee: \(AdamantBalanceFormat.full.format(fee, withCurrencySymbol: feeCurrencySymbol))"
         }
         
         if let date = dateValue {
-            summary += "\nDate: \(DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .medium))"
+            let dateString = DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .medium)
+            summary += "\nDate: \(dateString)"
         }
         
         if let confirmations = confirmationsValue {
@@ -76,6 +90,14 @@ extension TransactionDetails {
         
         if let status = transactionStatus {
             summary += "\nStatus: \(status.localized)"
+        }
+        
+        if let value = currentValue {
+            summary += "\nCurrent value: \(value)"
+        }
+        
+        if let value = valueAtTimeTxn {
+            summary += "\nValue at time of Txn: \(value)"
         }
         
         if let url = url {
