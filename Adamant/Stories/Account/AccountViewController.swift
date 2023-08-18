@@ -31,7 +31,8 @@ extension String.adamant.alert {
 }
 
 // MARK: AccountViewController
-class AccountViewController: FormViewController {
+@MainActor
+final class AccountViewController: FormViewController {
     // MARK: - Rows & Sections
     enum Sections {
         case wallet, application, delegates, actions, security
@@ -130,6 +131,7 @@ class AccountViewController: FormViewController {
     // MARK: - Dependencies
     var visibleWalletsService: VisibleWalletsService!
     var accountService: AccountService!
+    var walletsManager: WalletServicesManager!
     var dialogService: DialogService!
     var router: Router!
     var notificationsService: NotificationsService!
@@ -155,7 +157,7 @@ class AccountViewController: FormViewController {
     // MARK: StayIn
     
     var showLoggedInOptions: Bool {
-        return accountService.hasStayInAccount
+        accountService.hasStayInAccount
     }
     
     var showBiometryOptions: Bool {
@@ -248,12 +250,16 @@ class AccountViewController: FormViewController {
         
         pagingViewController.borderColor = UIColor.clear
         
-        let callback: ((Notification) -> Void) = { [weak self] _ in
-            self?.pagingViewController.reloadData()
-        }
-        
-        for walletService in accountService.wallets {
-            NotificationCenter.default.addObserver(forName: walletService.walletUpdatedNotification, object: nil, queue: OperationQueue.main, using: callback)
+        for walletService in walletsManager.wallets {
+            NotificationCenter.default.addObserver(
+                forName: walletService.walletUpdatedNotification,
+                object: nil,
+                queue: OperationQueue.main
+            ) { _ in
+                Task { @MainActor [weak self] in
+                    self?.pagingViewController.reloadData()
+                }
+            }
         }
         
         // MARK: Rows&Sections
@@ -557,8 +563,8 @@ class AccountViewController: FormViewController {
         // Biometry
         let biometryRow = SwitchRow { [weak self] in
             $0.tag = Rows.biometry.tag
-            $0.title = localAuth.biometryType.localized
-            $0.value = accountService.useBiometry
+            $0.title = self?.localAuth.biometryType.localized
+            $0.value = self?.accountService.useBiometry
             
             if let auth = self?.localAuth {
                 switch auth.biometryType {
@@ -835,11 +841,9 @@ class AccountViewController: FormViewController {
         accountHeaderView.addressButton.setTitle(address, for: .normal)
         
         if let publickey = accountService.keypair?.publicKey {
-            DispatchQueue.global().async {
+            Task { @MainActor in
                 let image = self.avatarService.avatar(for: publickey, size: 200)
-                DispatchQueue.main.async {
-                    self.accountHeaderView.avatarImageView.image = image
-                }
+                self.accountHeaderView.avatarImageView.image = image
             }
         }
     }
@@ -894,9 +898,7 @@ class AccountViewController: FormViewController {
     
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
         refreshControl.endRefreshing()
-        DispatchQueue.background.async {
-            self.accountService.reloadWallets()
-        }
+        Task { await accountService.reloadWallets() }
     }
 }
 

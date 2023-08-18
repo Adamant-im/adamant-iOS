@@ -406,7 +406,7 @@ class EthWalletService: WalletService {
 // MARK: - WalletInitiatedWithPassphrase
 extension EthWalletService: InitiatedWithPassphraseService {
     func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
-        guard let adamant = accountService?.account else {
+        guard let adamant = await accountService?.account else {
             throw WalletServiceError.notLogged
         }
         
@@ -510,7 +510,7 @@ extension EthWalletService: InitiatedWithPassphraseService {
             switch error {
             case .notEnoughMoney:  // Possibly new account, we need to wait for dropship
                 // Register observer
-                let observer = NotificationCenter.default.addObserver(forName: NSNotification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: nil) { [weak self] _ in
+                let observer = NotificationCenter.default.addObserver(forName: NSNotification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: OperationQueue.main) { [weak self] _ in
                     guard let balance = self?.accountService?.account?.balance, balance > AdamantApiService.KvsFee else {
                         return
                     }

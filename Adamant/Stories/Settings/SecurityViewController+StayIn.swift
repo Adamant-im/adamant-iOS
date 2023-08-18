@@ -119,30 +119,29 @@ extension SecurityViewController: PinpadViewControllerDelegate {
                 break
             }
             
-            accountService.setStayLoggedIn(pin: pin) { [weak self] result in
+            Task {
+                let result = await accountService.setStayLoggedIn(pin: pin)
                 switch result {
                 case .success:
-                    self?.pinpadRequest = nil
-                    DispatchQueue.main.async {
-                        if let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {
-                            row.value = false
-                            row.updateCell()
-                            row.evaluateHidden()
-                        }
-                        
-                        if let section = self?.form.sectionBy(tag: Sections.notifications.tag) {
-                            section.evaluateHidden()
-                        }
-                        
-                        if let section = self?.form.sectionBy(tag: Sections.aboutNotificationTypes.tag) {
-                            section.evaluateHidden()
-                        }
-                        
-                        pinpad.dismiss(animated: true, completion: nil)
+                    pinpadRequest = nil
+                    if let row: SwitchRow = form.rowBy(tag: Rows.biometry.tag) {
+                        row.value = false
+                        row.updateCell()
+                        row.evaluateHidden()
                     }
                     
+                    if let section = form.sectionBy(tag: Sections.notifications.tag) {
+                        section.evaluateHidden()
+                    }
+                    
+                    if let section = form.sectionBy(tag: Sections.aboutNotificationTypes.tag) {
+                        section.evaluateHidden()
+                    }
+                    
+                    pinpad.dismiss(animated: true, completion: nil)
+                    
                 case .failure(let error):
-                    self?.dialogService.showRichError(error: error)
+                    dialogService.showRichError(error: error)
                 }
             }
             
@@ -155,7 +154,6 @@ extension SecurityViewController: PinpadViewControllerDelegate {
             }
             
             accountService.dropSavedAccount()
-            
             pinpad.dismiss(animated: true, completion: nil)
             
         // MARK: User wants to turn on biometry

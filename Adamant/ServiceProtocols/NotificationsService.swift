@@ -173,6 +173,7 @@ extension NotificationsServiceError: RichError {
     }
 }
 
+@MainActor
 protocol NotificationsService: AnyObject {
     var notificationsMode: NotificationsMode { get }
     var notificationsSound: NotificationSound { get }

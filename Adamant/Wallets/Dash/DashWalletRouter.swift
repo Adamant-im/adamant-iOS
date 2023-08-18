@@ -15,7 +15,7 @@ extension AdamantScene.Wallets {
             let c = DashWalletViewController(nibName: "WalletViewControllerBase", bundle: nil)
             c.dialogService = r.resolve(DialogService.self)
             c.currencyInfoService = r.resolve(CurrencyInfoService.self)
-            c.accountService = r.resolve(AccountService.self)
+            c.walletsManager = r.resolve(WalletServicesManager.self)
             return c
         }
         

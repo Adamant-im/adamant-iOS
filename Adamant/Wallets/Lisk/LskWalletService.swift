@@ -362,7 +362,7 @@ extension LskWalletService {
 // MARK: - WalletInitiatedWithPassphrase
 extension LskWalletService: InitiatedWithPassphraseService {
     func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
-        guard let adamant = accountService.account else {
+        guard let adamant = await accountService.account else {
             throw WalletServiceError.notLogged
         }
         
@@ -402,9 +402,8 @@ extension LskWalletService: InitiatedWithPassphraseService {
             let address = try await getWalletAddress(byAdamantAddress: adamant.address)
             
             if address != eWallet.address {
-                service.save(lskAddress: eWallet.address) { result in
-                    service.kvsSaveCompletionRecursion(lskAddress: eWallet.address, result: result)
-                }
+                let result = await service.save(lskAddress: eWallet.address)
+                service.kvsSaveCompletionRecursion(lskAddress: eWallet.address, result: result)
             }
             
             service.initialBalanceCheck = true
@@ -426,10 +425,8 @@ extension LskWalletService: InitiatedWithPassphraseService {
                     await service.update()
                 }
                 
-                service.save(lskAddress: eWallet.address) { result in
-                    service.kvsSaveCompletionRecursion(lskAddress: eWallet.address, result: result)
-                }
-                
+                let result = await service.save(lskAddress: eWallet.address)
+                service.kvsSaveCompletionRecursion(lskAddress: eWallet.address, result: result)
                 return eWallet
             default:
                 service.setState(.upToDate)
@@ -458,13 +455,20 @@ extension LskWalletService: InitiatedWithPassphraseService {
             switch error {
             case .notEnoughMoney:  // Possibly new account, we need to wait for dropship
                 // Register observer
-                let observer = NotificationCenter.default.addObserver(forName: NSNotification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: nil) { [weak self] _ in
-                    guard let balance = self?.accountService.account?.balance, balance > AdamantApiService.KvsFee else {
-                        return
-                    }
-                    
-                    self?.save(lskAddress: lskAddress) { result in
-                        self?.kvsSaveCompletionRecursion(lskAddress: lskAddress, result: result)
+                let observer = NotificationCenter.default.addObserver(
+                    forName: .AdamantAccountService.accountDataUpdated,
+                    object: nil,
+                    queue: nil
+                ) { _ in
+                    Task { [weak self] in
+                        guard
+                            let self = self,
+                            let balance = await self.accountService.account?.balance,
+                            balance > AdamantApiService.KvsFee
+                        else { return }
+                        
+                        let result = await self.save(lskAddress: lskAddress)
+                        self.kvsSaveCompletionRecursion(lskAddress: lskAddress, result: result)
                     }
                 }
                 
@@ -576,25 +580,31 @@ extension LskWalletService {
     ///   - lskAddress: Lisk address to save into KVS
     ///   - adamantAddress: Owner of Lisk address
     ///   - completion: success
-    private func save(lskAddress: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
-        guard let adamant = accountService.account, let keypair = accountService.keypair else {
-            completion(.failure(error: .notLogged))
-            return
+    private func save(lskAddress: String) async -> WalletServiceSimpleResult {
+        guard
+            let adamant = await accountService.account,
+            let keypair = await accountService.keypair
+        else {
+            return .failure(error: .notLogged)
         }
         
         guard adamant.balance >= AdamantApiService.KvsFee else {
-            completion(.failure(error: .notEnoughMoney))
-            return
+            return .failure(error: .notEnoughMoney)
         }
         
-        apiService.store(key: LskWalletService.kvsAddress, value: lskAddress, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
-            switch result {
-            case .success:
-                completion(.success)
-                
-            case .failure(let error):
-                completion(.failure(error: .apiError(error)))
-            }
+        do {
+            _ = try await apiService.store(
+                key: LskWalletService.kvsAddress,
+                value: lskAddress,
+                type: .keyValue,
+                sender: adamant.address,
+                keypair: keypair
+            )
+            
+            return .success
+        } catch {
+            return (error as? ApiServiceError).map { .failure(error: .apiError($0)) }
+                ?? .failure(error: .internalError(message: "Unknown error", error: error))
         }
     }
 }

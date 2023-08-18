@@ -110,7 +110,7 @@ final class AdmTransferViewController: TransferViewControllerBase {
                     replyToMessageId: replyToMessageId
                 )
                 
-                service.update()
+                await service.update()
                 dialogService.dismissProgress()
                 
                 dialogService.showSuccess(withMessage: String.adamant.transfer.transferSuccess)

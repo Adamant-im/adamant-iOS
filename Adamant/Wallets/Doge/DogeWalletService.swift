@@ -246,7 +246,7 @@ extension DogeWalletService: InitiatedWithPassphraseService {
     }
     
     func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
-        guard let adamant = accountService.account else {
+        guard let adamant = await accountService.account else {
             throw WalletServiceError.notLogged
         }
         
@@ -273,9 +273,8 @@ extension DogeWalletService: InitiatedWithPassphraseService {
         do {
             let address = try await getWalletAddress(byAdamantAddress: adamant.address)
             if address != eWallet.address {
-                service.save(dogeAddress: eWallet.address) { result in
-                    service.kvsSaveCompletionRecursion(dogeAddress: eWallet.address, result: result)
-                }
+                let result = await service.save(dogeAddress: eWallet.address)
+                service.kvsSaveCompletionRecursion(dogeAddress: eWallet.address, result: result)
             }
             
             service.initialBalanceCheck = true
@@ -295,11 +294,10 @@ extension DogeWalletService: InitiatedWithPassphraseService {
                 
                 Task {
                     await service.update()
-                }
-                
-                service.save(dogeAddress: eWallet.address) { result in
+                    let result = await service.save(dogeAddress: eWallet.address)
                     service.kvsSaveCompletionRecursion(dogeAddress: eWallet.address, result: result)
                 }
+                
                 service.setState(.upToDate)
                 return eWallet
                 
@@ -390,25 +388,31 @@ extension DogeWalletService {
     ///   - dogeAddress: DOGE address to save into KVS
     ///   - adamantAddress: Owner of Doge address
     ///   - completion: success
-    private func save(dogeAddress: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
-        guard let adamant = accountService.account, let keypair = accountService.keypair else {
-            completion(.failure(error: .notLogged))
-            return
+    private func save(dogeAddress: String) async -> WalletServiceSimpleResult {
+        guard
+            let adamant = await accountService.account,
+            let keypair = await accountService.keypair
+        else {
+            return .failure(error: .notLogged)
         }
         
         guard adamant.balance >= AdamantApiService.KvsFee else {
-            completion(.failure(error: .notEnoughMoney))
-            return
+            return .failure(error: .notEnoughMoney)
         }
         
-        apiService.store(key: DogeWalletService.kvsAddress, value: dogeAddress, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
-            switch result {
-            case .success:
-                completion(.success)
-                
-            case .failure(let error):
-                completion(.failure(error: .apiError(error)))
-            }
+        do {
+            _ = try await apiService.store(
+                key: DogeWalletService.kvsAddress,
+                value: dogeAddress,
+                type: .keyValue,
+                sender: adamant.address,
+                keypair: keypair
+            )
+            
+            return .success
+        } catch {
+            return (error as? ApiServiceError).map { .failure(error: .apiError($0)) }
+                ?? .failure(error: .remoteServiceError(message: error.localizedDescription))
         }
     }
     
@@ -427,13 +431,20 @@ extension DogeWalletService {
             switch error {
             case .notEnoughMoney:  // Possibly new account, we need to wait for dropship
                 // Register observer
-                let observer = NotificationCenter.default.addObserver(forName: NSNotification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: nil) { [weak self] _ in
-                    guard let balance = self?.accountService.account?.balance, balance > AdamantApiService.KvsFee else {
-                        return
-                    }
-                    
-                    self?.save(dogeAddress: dogeAddress) { result in
-                        self?.kvsSaveCompletionRecursion(dogeAddress: dogeAddress, result: result)
+                let observer = NotificationCenter.default.addObserver(
+                    forName: .AdamantAccountService.accountDataUpdated,
+                    object: nil,
+                    queue: nil
+                ) { _ in
+                    Task { @MainActor [weak self] in
+                        guard
+                            let self = self,
+                            let balance = self.accountService.account?.balance,
+                            balance > AdamantApiService.KvsFee
+                        else { return }
+                        
+                        let result = await self.save(dogeAddress: dogeAddress)
+                        self.kvsSaveCompletionRecursion(dogeAddress: dogeAddress, result: result)
                     }
                 }
                 

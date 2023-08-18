@@ -11,9 +11,12 @@ import Reachability
 import Network
 
 // MARK: - AdamantReachability wrapper
-class AdamantReachability: ReachabilityMonitor {
+final class AdamantReachability: ReachabilityMonitor {
+    typealias NetworkRequest = @Sendable () -> Void
+    
     private let monitor = NWPathMonitor()
     private(set) var connection = true
+    private(set) var processedRequests = [NetworkRequest]()
     
     func start() {
         monitor.pathUpdateHandler = { [weak self] _ in
@@ -39,14 +42,25 @@ class AdamantReachability: ReachabilityMonitor {
         monitor.cancel()
     }
     
+    func performWhenConnectionEstablished(_ request: @escaping NetworkRequest) {
+        guard !connection else { return request() }
+        processedRequests.append(request)
+    }
+    
     private func updateConnection() {
         switch monitor.currentPath.status {
         case .satisfied:
             connection = true
+            processRequests()
         case .unsatisfied, .requiresConnection:
             connection = false
         @unknown default:
             connection = false
         }
+    }
+    
+    private func processRequests() {
+        processedRequests.forEach { $0() }
+        processedRequests = []
     }
 }

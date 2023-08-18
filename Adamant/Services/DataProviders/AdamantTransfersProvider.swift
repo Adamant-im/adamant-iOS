@@ -87,22 +87,20 @@ actor AdamantTransfersProvider: TransfersProvider {
     private func addObservers() {
         NotificationCenter.default
             .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { notification in
-                let loggedAddress = notification.userInfo?[AdamantUserInfoKey.AccountService.loggedAccountAddress] as? String
-                Task { [weak self] in
-                    await self?.userLoggedInAction(loggedAddress)
-                }
+            .asyncSink { [weak self] notification in
+                let loggedAddress = notification.userInfo?[
+                    AdamantUserInfoKey.AccountService.loggedAccountAddress
+                ] as? String
+                
+                await self?.userLoggedInAction(loggedAddress)
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
             .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
             .receive(on: OperationQueue.main)
-            .sink { _ in
-                Task { [weak self] in
-                    await self?.userLogOutAction()
-                }
+            .asyncSink { [weak self] _ in
+                await self?.userLogOutAction()
             }
             .store(in: &subscriptions)
     }

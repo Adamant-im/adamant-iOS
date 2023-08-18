@@ -16,6 +16,7 @@ extension StoreKey {
     }
 }
 
+@MainActor
 protocol PushNotificationsTokenService: AnyObject {
     func setToken(_ token: Data)
     func removeCurrentToken()

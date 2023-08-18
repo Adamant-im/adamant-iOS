@@ -119,7 +119,7 @@ final class DashWalletService: WalletService {
     let transactionFeeUpdated = Notification.Name("adamant.dashWallet.feeUpdated")
     
     // MARK: - Delayed KVS save
-    private var balanceObserver: NSObjectProtocol?
+    private var balanceSubscription: AnyCancellable?
     
     // MARK: - Properties
     private (set) var dashWallet: DashWallet?
@@ -165,16 +165,16 @@ final class DashWalletService: WalletService {
         NotificationCenter.default
             .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
             .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
-                self?.update()
+            .asyncSink { [weak self] _ in
+                await self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
             .publisher(for: .AdamantAccountService.accountDataUpdated, object: nil)
             .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
-                self?.update()
+            .asyncSink { [weak self] _ in
+                await self?.update()
             }
             .store(in: &subscriptions)
         
@@ -184,10 +184,7 @@ final class DashWalletService: WalletService {
             .sink { [weak self] _ in
                 self?.dashWallet = nil
                 self?.initialBalanceCheck = false
-                if let balanceObserver = self?.balanceObserver {
-                    NotificationCenter.default.removeObserver(balanceObserver)
-                    self?.balanceObserver = nil
-                }
+                self?.balanceSubscription = nil
             }
             .store(in: &subscriptions)
     }
@@ -261,7 +258,7 @@ extension DashWalletService: InitiatedWithPassphraseService {
     
     @MainActor
     func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
-        guard let adamant = accountService.account else {
+        guard let adamant = await accountService.account else {
             throw WalletServiceError.notLogged
         }
         
@@ -290,39 +287,34 @@ extension DashWalletService: InitiatedWithPassphraseService {
         // MARK: 4. Save address into KVS
         do {
             let address = try await getWalletAddress(byAdamantAddress: adamant.address)
-            let service = self
-            if address != eWallet.address {
-                service.save(dashAddress: eWallet.address) { result in
-                    service.kvsSaveCompletionRecursion(dashAddress: eWallet.address, result: result)
-                }
-            }
+            initialBalanceCheck = true
+            setState(.upToDate, silent: true)
             
-            service.initialBalanceCheck = true
-            service.setState(.upToDate, silent: true)
-            Task {
-                service.update()
+            Task { [weak self] in
+                if address != eWallet.address {
+                    guard let result = await self?.save(dashAddress: eWallet.address) else { return }
+                    self?.kvsSaveCompletionRecursion(dashAddress: eWallet.address, result: result)
+                }
+                
+                await self?.update()
             }
             return eWallet
         } catch let error as WalletServiceError {
-            let service = self
+            defer { setState(.upToDate) }
+            
             switch error {
             case .walletNotInitiated:
                 /// The ADM Wallet is not initialized. Check the balance of the current wallet
                 /// and save the wallet address to kvs when dropshipping ADM
-                service.setState(.upToDate)
                 
-                Task {
-                    await service.update()
+                Task { [weak self] in
+                    guard let result = await self?.save(dashAddress: eWallet.address) else { return }
+                    self?.kvsSaveCompletionRecursion(dashAddress: eWallet.address, result: result)
+                    await self?.update()
                 }
-                
-                service.save(dashAddress: eWallet.address) { result in
-                    service.kvsSaveCompletionRecursion(dashAddress: eWallet.address, result: result)
-                }
-                service.setState(.upToDate)
                 return eWallet
                 
             default:
-                service.setState(.upToDate)
                 throw error
             }
         }
@@ -421,34 +413,37 @@ extension DashWalletService {
     ///   - dashAddress: DASH address to save into KVS
     ///   - adamantAddress: Owner of Dash address
     ///   - completion: success
-    private func save(dashAddress: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
-        guard let adamant = accountService.account, let keypair = accountService.keypair else {
-            completion(.failure(error: .notLogged))
-            return
+    private func save(dashAddress: String) async -> WalletServiceSimpleResult {
+        guard
+            let adamant = await accountService.account,
+            let keypair = await accountService.keypair
+        else {
+            return .failure(error: .notLogged)
         }
 
         guard adamant.balance >= AdamantApiService.KvsFee else {
-            completion(.failure(error: .notEnoughMoney))
-            return
+            return .failure(error: .notEnoughMoney)
         }
-
-        apiService.store(key: DashWalletService.kvsAddress, value: dashAddress, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
-            switch result {
-            case .success:
-                completion(.success)
-
-            case .failure(let error):
-                completion(.failure(error: .apiError(error)))
-            }
+        
+        do {
+            _ = try await apiService.store(
+                key: DashWalletService.kvsAddress,
+                value: dashAddress,
+                type: .keyValue,
+                sender: adamant.address,
+                keypair: keypair
+            )
+            
+            return .success
+        } catch {
+            return (error as? ApiServiceError).map { .failure(error: .apiError($0)) }
+                ?? .failure(error: .internalError(message: "Unknown error", error: error))
         }
     }
     
     /// New accounts doesn't have enought money to save KVS. We need to wait for balance update, and then - retry save
     private func kvsSaveCompletionRecursion(dashAddress: String, result: WalletServiceSimpleResult) {
-        if let observer = balanceObserver {
-            NotificationCenter.default.removeObserver(observer)
-            balanceObserver = nil
-        }
+        balanceSubscription = nil
 
         switch result {
         case .success:
@@ -457,19 +452,17 @@ extension DashWalletService {
         case .failure(let error):
             switch error {
             case .notEnoughMoney:  // Possibly new account, we need to wait for dropship
-                // Register observer
-                let observer = NotificationCenter.default.addObserver(forName: NSNotification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: nil) { [weak self] _ in
-                    guard let balance = self?.accountService.account?.balance, balance > AdamantApiService.KvsFee else {
-                        return
-                    }
-
-                    self?.save(dashAddress: dashAddress) { result in
+                balanceSubscription = NotificationCenter.default
+                    .publisher(for: .AdamantAccountService.accountDataUpdated, object: nil)
+                    .asyncSink { [weak self] _ in
+                        guard
+                            let balance = await self?.accountService.account?.balance,
+                            balance > AdamantApiService.KvsFee
+                        else { return }
+                        
+                        guard let result = await self?.save(dashAddress: dashAddress) else { return }
                         self?.kvsSaveCompletionRecursion(dashAddress: dashAddress, result: result)
                     }
-                }
-
-                // Save referense to unregister it later
-                balanceObserver = observer
 
             default:
                 print("\(error.localizedDescription)")

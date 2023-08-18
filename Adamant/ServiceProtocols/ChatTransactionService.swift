@@ -28,7 +28,15 @@ protocol ChatTransactionService: AnyObject, Actor {
     ///   - privateKey: logged account private key
     ///   - context: context to insert parsed transaction to
     /// - Returns: New parsed transaction
-    func chatTransaction(from transaction: Transaction, isOutgoing: Bool, publicKey: String, privateKey: String, partner: BaseAccount, removedMessages: [String], context: NSManagedObjectContext) -> ChatTransaction?
+    func chatTransaction(
+        from transaction: Transaction,
+        isOutgoing: Bool,
+        publicKey: String,
+        privateKey: String,
+        partner: BaseAccount,
+        removedMessages: [String],
+        context: NSManagedObjectContext
+    ) async -> ChatTransaction?
     
     /// Search transaction in local storage
     ///

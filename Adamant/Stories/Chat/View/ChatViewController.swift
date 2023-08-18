@@ -16,13 +16,15 @@ import CommonKit
 @MainActor
 final class ChatViewController: MessagesViewController {
     typealias SpinnerCell = MessageCellWrapper<SpinnerView>
-    typealias SendTransaction = ( _ parentVC: UIViewController & ComplexTransferViewControllerDelegate, _ replyToMessageId: String?) -> Void
+    typealias SendTransaction = (
+        _ parentVC: UIViewController & ComplexTransferViewControllerDelegate,
+        _ replyToMessageId: String?
+    ) -> Void
     
     // MARK: Dependencies
     
     private let storedObjects: [AnyObject]
-    private let richMessageProviders: [String: RichMessageProvider]
-    private let admService: AdmWalletService?
+    private let walletsManager: WalletServicesManager
     
     let viewModel: ChatViewModel
     
@@ -65,15 +67,13 @@ final class ChatViewController: MessagesViewController {
     
     init(
         viewModel: ChatViewModel,
-        richMessageProviders: [String: RichMessageProvider],
+        walletsManager: WalletServicesManager,
         storedObjects: [AnyObject],
-        sendTransaction: @escaping SendTransaction,
-        admService: AdmWalletService?
+        sendTransaction: @escaping SendTransaction
     ) {
         self.viewModel = viewModel
         self.storedObjects = storedObjects
-        self.richMessageProviders = richMessageProviders
-        self.admService = admService
+        self.walletsManager = walletsManager
         super.init(nibName: nil, bundle: nil)
         inputBar.onAttachmentButtonTap = { [weak self] in
             self.map { sendTransaction($0, viewModel.replyMessage?.id) }
@@ -606,13 +606,13 @@ private extension ChatViewController {
     }
     
     func didTapTransferTransaction(_ transaction: TransferTransaction) {
-        admService?.richMessageTapped(for: transaction, in: self)
+        walletsManager.admWalletService.richMessageTapped(for: transaction, in: self)
     }
     
     func didTapRichMessageTransaction(_ transaction: RichMessageTransaction) {
         guard
             let type = transaction.richType,
-            let provider = richMessageProviders[type]
+            let provider = walletsManager.getProvider(richType: type)
         else { return }
         
         switch transaction.transactionStatus {
@@ -691,7 +691,8 @@ private extension ChatViewController {
     }
     
     func didTapAdmSend(to adm: AdamantAddress) {
-        guard let vc = admService?.transferViewController() else { return }
+        let vc = walletsManager.admWalletService.transferViewController()
+        
         if let v = vc as? TransferViewControllerBase {
             v.recipientAddress = adm.address
             v.recipientName = adm.name

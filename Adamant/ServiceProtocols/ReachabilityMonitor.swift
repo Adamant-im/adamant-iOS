@@ -30,4 +30,6 @@ protocol ReachabilityMonitor {
     
     func start()
     func stop()
+    
+    func performWhenConnectionEstablished(_ request: @Sendable @escaping () -> Void)
 }

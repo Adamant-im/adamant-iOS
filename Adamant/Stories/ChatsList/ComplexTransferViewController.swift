@@ -16,10 +16,10 @@ protocol ComplexTransferViewControllerDelegate: AnyObject {
     func complexTransferViewController(_ viewController: ComplexTransferViewController, didFinishWithTransfer: TransactionDetails?, detailsViewController: UIViewController?)
 }
 
-class ComplexTransferViewController: UIViewController {
+final class ComplexTransferViewController: UIViewController {
     // MARK: - Dependencies
     
-    var accountService: AccountService!
+    var walletsManager: WalletServicesManager!
     var visibleWalletsService: VisibleWalletsService!
     var addressBookService: AddressBookService!
     
@@ -128,10 +128,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                         return token.symbol == self.services[index].tokenSymbol
                     }
                 ) {
-                    let ethWallet = self.accountService.wallets.first { wallet in
-                        return wallet.tokenSymbol == "ETH"
-                    }
-                    v.rootCoinBalance = ethWallet?.wallet?.balance
+                    v.rootCoinBalance = walletsManager.ethWalletService.wallet?.balance
                 }
             } catch let error as WalletServiceError {
                 v.showAlertView(

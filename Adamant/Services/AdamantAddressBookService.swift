@@ -60,10 +60,8 @@ final class AdamantAddressBookService: AddressBookService {
         
         NotificationCenter.default
             .publisher(for: .AdamantAccountService.userLoggedIn)
-            .sink { _ in
-                Task { [weak self] in
-                    _ = await self?.update()
-                }
+            .asyncSink { [weak self] _ in
+                _ = await self?.update()
             }
             .store(in: &notificationsSet)
         
@@ -71,10 +69,8 @@ final class AdamantAddressBookService: AddressBookService {
         
         NotificationCenter.default
             .publisher(for: .AdamantAccountService.userWillLogOut)
-            .sink { _ in
-                Task { [weak self] in
-                    _ = await self?.userWillLogOut()
-                }
+            .asyncSink { [weak self] _ in
+                _ = await self?.userWillLogOut()
             }
             .store(in: &notificationsSet)
         
@@ -82,10 +78,8 @@ final class AdamantAddressBookService: AddressBookService {
         
         NotificationCenter.default
             .publisher(for: .AdamantAccountService.userLoggedOut)
-            .sink { _ in
-                Task { [weak self] in
-                    _ = await self?.userLoggedOut()
-                }
+            .asyncSink { [weak self] _ in
+                _ = await self?.userLoggedOut()
             }
             .store(in: &notificationsSet)
     }
@@ -245,7 +239,10 @@ final class AdamantAddressBookService: AddressBookService {
     }
     
     private func saveAddressBook(_ book: [String: String]) async throws -> UInt64 {
-        guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
+        guard
+            let loggedAccount = await accountService.account,
+            let keypair = await accountService.keypair
+        else {
             throw AddressBookServiceError.notLogged
         }
         
@@ -296,8 +293,9 @@ final class AdamantAddressBookService: AddressBookService {
     // MARK: - Getting address book
     
     private func getAddressBook() async throws -> [String: String] {
-        guard let loggedAccount = accountService.account,
-              let keypair = accountService.keypair
+        guard
+            let loggedAccount = await accountService.account,
+            let keypair = await accountService.keypair
         else {
             throw AddressBookServiceError.notLogged
         }

@@ -118,13 +118,15 @@ extension LoginViewController: PinpadViewControllerDelegate {
             return
         }
         
-        guard accountService.validatePin(pin) else {
-            pinpad.clearPin()
-            pinpad.playWrongPinAnimation()
-            return
+        Task {
+            guard await accountService.validatePin(pin) else {
+                pinpad.clearPin()
+                pinpad.playWrongPinAnimation()
+                return
+            }
+            
+            loginIntoSavedAccount()
         }
-        
-        loginIntoSavedAccount()
     }
     
     func pinpadDidTapBiometryButton(_ pinpad: PinpadViewController) {

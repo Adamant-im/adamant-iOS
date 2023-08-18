@@ -12,7 +12,7 @@ import MessageKit
 import CommonKit
 
 struct ChatMessageFactory {
-    private let richMessageProviders: [String: RichMessageProvider]
+    let walletsManager: WalletServicesManager
     
     static let markdownParser = MarkdownParser(
         font: .adamantChatDefault,
@@ -62,17 +62,13 @@ struct ChatMessageFactory {
         ]
     )
     
-    init(richMessageProviders: [String: RichMessageProvider]) {
-        self.richMessageProviders = richMessageProviders
-    }
-    
     func makeMessage(
         _ transaction: ChatTransaction,
         expireDate: inout Date?,
         currentSender: SenderType,
         dateHeaderOn: Bool,
         topSpinnerOn: Bool
-    ) -> ChatMessage {
+    ) async -> ChatMessage {
         let sentDate = transaction.sentDate ?? .now
         let senderModel = ChatSender(transaction: transaction)
         let isFromCurrentSender = currentSender.senderId == senderModel.senderId
@@ -87,7 +83,7 @@ struct ChatMessageFactory {
             status: status
         )
         
-        return .init(
+        return await .init(
             id: transaction.chatMessageId ?? "",
             sentDate: sentDate,
             senderModel: senderModel,
@@ -116,10 +112,10 @@ private extension ChatMessageFactory {
         _ transaction: ChatTransaction,
         isFromCurrentSender: Bool,
         backgroundColor: ChatMessageBackgroundColor
-    ) -> ChatMessage.Content {
+    ) async -> ChatMessage.Content {
         switch transaction {
         case let transaction as MessageTransaction:
-            return makeContent(
+            return makeMessageContent(
                 transaction,
                 backgroundColor: backgroundColor
             )
@@ -133,13 +129,13 @@ private extension ChatMessageFactory {
                 )
             }
             
-            return makeContent(
+            return await makeRichContent(
                 transaction,
                 isFromCurrentSender: isFromCurrentSender,
                 backgroundColor: backgroundColor
             )
         case let transaction as TransferTransaction:
-            return makeContent(
+            return makeTransferContent(
                 transaction,
                 isFromCurrentSender: isFromCurrentSender,
                 backgroundColor: backgroundColor
@@ -149,7 +145,7 @@ private extension ChatMessageFactory {
         }
     }
     
-    func makeContent(
+    func makeMessageContent(
         _ transaction: MessageTransaction,
         backgroundColor: ChatMessageBackgroundColor
     ) -> ChatMessage.Content {
@@ -199,11 +195,11 @@ private extension ChatMessageFactory {
         ))
     }
     
-    func makeContent(
+    func makeRichContent(
         _ transaction: RichMessageTransaction,
         isFromCurrentSender: Bool,
         backgroundColor: ChatMessageBackgroundColor
-    ) -> ChatMessage.Content {
+    ) async -> ChatMessage.Content {
         guard let transfer = transaction.transfer else { return .default }
         let id = transaction.chatMessageId ?? ""
         
@@ -211,7 +207,7 @@ private extension ChatMessageFactory {
         let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
         let replyId = transaction.getRichValue(for: RichContentKeys.reply.replyToId) ?? ""
         
-        return .transaction(.init(value: .init(
+        return await .transaction(.init(value: .init(
             id: id,
             isFromCurrentSender: isFromCurrentSender,
             content: .init(
@@ -219,9 +215,9 @@ private extension ChatMessageFactory {
                 title: isFromCurrentSender
                     ? .adamant.chat.transactionSent
                     : .adamant.chat.transactionReceived,
-                icon: richMessageProviders[transfer.type]?.tokenLogo ?? .init(),
+                icon: walletsManager.getProvider(richType: transfer.type)?.tokenLogo ?? .init(),
                 amount: AdamantBalanceFormat.full.format(transfer.amount),
-                currency: richMessageProviders[transfer.type]?.tokenSymbol ?? "",
+                currency: walletsManager.getProvider(richType: transfer.type)?.tokenSymbol ?? .empty,
                 date: transaction.sentDate?.humanizedDateTime(withWeekday: false) ?? "",
                 comment: transfer.comments,
                 backgroundColor: backgroundColor,
@@ -233,7 +229,7 @@ private extension ChatMessageFactory {
         )))
     }
     
-    func makeContent(
+    func makeTransferContent(
         _ transaction: TransferTransaction,
         isFromCurrentSender: Bool,
         backgroundColor: ChatMessageBackgroundColor

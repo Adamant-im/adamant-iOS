@@ -269,7 +269,7 @@ extension AdamantChatsProvider {
     
     private func validate(message: AdamantMessage, partnerId: String) async throws -> (loggedAccount: String, partner: CoreDataAccount) {
         // MARK: 1. Logged account
-        guard let loggedAddress = accountService.account?.address else {
+        guard let loggedAddress = await accountService.account?.address else {
             throw ChatsProviderError.notLogged
         }
         

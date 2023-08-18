@@ -14,8 +14,7 @@ import MessageKit
 import Combine
 import CommonKit
 
-class AdmWalletService: NSObject, WalletService {
-    
+final class AdmWalletService: NSObject, WalletService {
     // MARK: - Constants
     let addressRegex = try! NSRegularExpression(pattern: "^U([0-9]{6,20})$")
     
@@ -123,7 +122,11 @@ class AdmWalletService: NSObject, WalletService {
     }
     
     func update() {
-        guard let accountService = accountService, let account = accountService.account else {
+        Task { await update() }
+    }
+    
+    func update() async {
+        guard let accountService = accountService, let account = await accountService.account else {
             wallet = nil
             return
         }

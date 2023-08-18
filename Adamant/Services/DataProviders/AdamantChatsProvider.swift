@@ -23,8 +23,7 @@ actor AdamantChatsProvider: ChatsProvider {
     let accountsProvider: AccountsProvider
     let transactionService: ChatTransactionService
     let securedStore: SecuredStore
-    
-    private let richProviders: [String: RichMessageProviderWithStatusCheck]
+    let walletsManager: WalletServicesManager
     
     // MARK: Properties
     @Published private var stateNotifier: State = .empty
@@ -48,7 +47,6 @@ actor AdamantChatsProvider: ChatsProvider {
     private var chatsLoading: [String] = []
     private let preLoadChatsCount = 5
     private var isConnectedToTheInternet = true
-    private var onConnectionToTheInternetRestoredTasks = [() -> Void]()
     
     private(set) var isInitiallySynced: Bool = false {
         didSet {
@@ -74,7 +72,8 @@ actor AdamantChatsProvider: ChatsProvider {
         adamantCore: AdamantCore,
         accountsProvider: AccountsProvider,
         transactionService: ChatTransactionService,
-        securedStore: SecuredStore
+        securedStore: SecuredStore,
+        walletsManager: WalletServicesManager
     ) {
         self.accountService = accountService
         self.apiService = apiService
@@ -84,12 +83,7 @@ actor AdamantChatsProvider: ChatsProvider {
         self.accountsProvider = accountsProvider
         self.transactionService = transactionService
         self.securedStore = securedStore
-        
-        var richProviders = [String: RichMessageProviderWithStatusCheck]()
-        for case let provider as RichMessageProviderWithStatusCheck in accountService.wallets {
-            richProviders[provider.dynamicRichMessageType] = provider
-        }
-        self.richProviders = richProviders
+        self.walletsManager = walletsManager
         
         Task {
             await setupSecuredStore()
@@ -149,10 +143,8 @@ actor AdamantChatsProvider: ChatsProvider {
         NotificationCenter.default
             .publisher(for: .AdamantTransfersProvider.initialSyncFinished, object: nil)
             .receive(on: OperationQueue.main)
-            .sink { _ in
-                Task { [weak self] in
-                    await self?.getChatRooms(offset: nil)
-                }
+            .asyncSink { [weak self] _ in
+                await self?.getChatRooms(offset: nil)
             }
             .store(in: &subscriptions)
     }
@@ -186,7 +178,7 @@ actor AdamantChatsProvider: ChatsProvider {
             store.set(loggedAddress, for: StoreKey.chatProvider.address)
         }
         
-        self.connectToSocket()
+        Task { await connectToSocket() }
     }
     
     private func userLogOutAction() {
@@ -236,16 +228,7 @@ actor AdamantChatsProvider: ChatsProvider {
             return
         }
         
-        guard connection == true else {
-            isConnectedToTheInternet = false
-            return
-        }
-        
-        if isConnectedToTheInternet == false {
-            onConnectionToTheInternetRestored()
-        }
-        
-        isConnectedToTheInternet = true
+        isConnectedToTheInternet = connection
     }
     
     // MARK: Tools
@@ -343,8 +326,8 @@ extension AdamantChatsProvider {
     }
     
     func getChatRooms(offset: Int?) async {
-        guard let address = accountService.account?.address,
-              let privateKey = accountService.keypair?.privateKey
+        guard let address = await accountService.account?.address,
+              let privateKey = await accountService.keypair?.privateKey
         else {
             return
         }
@@ -418,8 +401,8 @@ extension AdamantChatsProvider {
     }
     
     func getChatMessages(with addressRecipient: String, offset: Int?) async {
-        guard let address = accountService.account?.address,
-              let privateKey = accountService.keypair?.privateKey else {
+        guard let address = await accountService.account?.address,
+              let privateKey = await accountService.keypair?.privateKey else {
             return
         }
         
@@ -491,10 +474,10 @@ extension AdamantChatsProvider {
         }
     }
     
-    func connectToSocket() {
+    func connectToSocket() async {
         // MARK: 2. Prepare
-        guard let address = accountService.account?.address,
-              let privateKey = accountService.keypair?.privateKey else {
+        guard let address = await accountService.account?.address,
+              let privateKey = await accountService.keypair?.privateKey else {
             return
         }
 
@@ -531,8 +514,8 @@ extension AdamantChatsProvider {
         // MARK: 2. Prepare
         let prevState = state
         
-        guard let address = accountService.account?.address,
-              let privateKey = accountService.keypair?.privateKey
+        guard let address = await accountService.account?.address,
+              let privateKey = await accountService.keypair?.privateKey
         else {
             setState(.failedToUpdate(ChatsProviderError.notLogged), previous: prevState)
             return .failure(ChatsProviderError.notLogged)
@@ -632,7 +615,10 @@ extension AdamantChatsProvider {
 // MARK: - Sending messages {
 extension AdamantChatsProvider {
     func sendMessage(_ message: AdamantMessage, recipientId: String) async throws -> ChatTransaction {
-        guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
+        guard
+            let loggedAccount = await accountService.account,
+            let keypair = await accountService.keypair
+        else {
             throw ChatsProviderError.notLogged
         }
         
@@ -717,7 +703,10 @@ extension AdamantChatsProvider {
     /// create and write transaction in local database
     /// send transaction to server
     func sendMessage(_ message: AdamantMessage, recipientId: String, from chatroom: Chatroom?) async throws -> ChatTransaction {
-        guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
+        guard
+            let loggedAccount = await accountService.account,
+            let keypair = await accountService.keypair
+        else {
             throw ChatsProviderError.notLogged
         }
         
@@ -859,7 +848,9 @@ extension AdamantChatsProvider {
         transaction.isReply = isReply
         transaction.richContentSerialized = richContentSerialized
         
-        transaction.transactionStatus = richProviders[richType] != nil ? .notInitiated : nil
+        transaction.transactionStatus = await walletsManager.getService(richType: richType) != nil
+            ? .notInitiated
+            : nil
         
         if
             let c = chatroom,
@@ -990,7 +981,7 @@ extension AdamantChatsProvider {
             break
         }
         
-        guard let keypair = accountService.keypair else {
+        guard let keypair = await accountService.keypair else {
             throw ChatsProviderError.notLogged
         }
         
@@ -1263,7 +1254,7 @@ extension AdamantChatsProvider {
         height: Int64?,
         offset: Int?
     ) async throws {
-        if self.accountService.account == nil {
+        if await accountService.account == nil {
             throw ApiServiceError.accountNotFound
         }
         
@@ -1310,8 +1301,8 @@ extension AdamantChatsProvider {
         _ transactionId: String,
         recipient: String
     ) async throws {
-        guard let address = accountService.account?.address,
-              let privateKey = accountService.keypair?.privateKey
+        guard let address = await accountService.account?.address,
+              let privateKey = await accountService.keypair?.privateKey
         else {
             throw ApiServiceError.accountNotFound
         }
@@ -1707,8 +1698,9 @@ extension AdamantChatsProvider {
         if !self.blockList.contains(address) {
             self.blockList.append(address)
             
-            if self.accountService.hasStayInAccount {
-                self.securedStore.set(blockList, for: StoreKey.accountService.blockList)
+            Task { @MainActor in
+                guard accountService.hasStayInAccount else { return }
+                await securedStore.set(blockList, for: StoreKey.accountService.blockList)
             }
         }
     }
@@ -1717,8 +1709,9 @@ extension AdamantChatsProvider {
         if !self.removedMessages.contains(id) {
             self.removedMessages.append(id)
             
-            if self.accountService.hasStayInAccount {
-                self.securedStore.set(removedMessages, for: StoreKey.accountService.removedMessages)
+            Task { @MainActor in
+                guard accountService.hasStayInAccount else { return }
+                await securedStore.set(removedMessages, for: StoreKey.accountService.removedMessages)
             }
         }
     }
@@ -1728,11 +1721,6 @@ extension AdamantChatsProvider {
         privateContext.parent = self.stack.container.viewContext
         chatroom.markAsReaded()
         try? privateContext.save()
-    }
-    
-    private func onConnectionToTheInternetRestored() {
-        onConnectionToTheInternetRestoredTasks.forEach { $0() }
-        onConnectionToTheInternetRestoredTasks = []
     }
 }
 

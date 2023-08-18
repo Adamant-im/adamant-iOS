@@ -140,21 +140,33 @@ extension AccountServiceError: RichError {
 }
 
 // MARK: - Protocol
-protocol AccountService: AnyObject {
+protocol AccountService: Actor {
     // MARK: State
     
     var state: AccountServiceState { get }
-    var account: AdamantAccount? { get }
-    var keypair: Keypair? { get }
-    
-    // MARK: Wallets
-    var wallets: [WalletService] { get }
+    @MainActor var account: AdamantAccount? { get }
+    @MainActor var keypair: Keypair? { get }
     
     // MARK: Account functions
     
+    /// There is a stored account information in secured store
+    @MainActor var hasStayInAccount: Bool { get }
+    
+    /// Use TouchID or FaceID to log in
+    @MainActor var useBiometry: Bool { get set }
+    
+    /// Remove stored data
+    @MainActor func dropSavedAccount()
+    
+    /// If we have stored data with pin, validate it. If no data saved, always returns false.
+    @MainActor func validatePin(_ pin: String) -> Bool
+    
+    /// Logout
+    @MainActor func logout()
+    
     /// Update logged account info
-    func update()
-    func update(_ completion: ((AccountServiceResult) -> Void)?)
+    @discardableResult
+    func update() async -> AccountServiceResult
     
     /// Login into Adamant using passphrase.
     func loginWith(passphrase: String) async throws -> AccountServiceResult
@@ -162,30 +174,13 @@ protocol AccountService: AnyObject {
     /// Login into Adamant using previously logged account
     func loginWithStoredAccount() async throws -> AccountServiceResult
     
-    /// Logout
-    func logout()
-    
     /// Reload current wallets state
     func reloadWallets()
-    
-    // MARK: Stay in functions
-    
-    /// There is a stored account information in secured store
-    var hasStayInAccount: Bool { get }
-    
-    /// Use TouchID or FaceID to log in
-    var useBiometry: Bool { get set }
     
     /// Save account data and use pincode to login
     ///
     /// - Parameters:
     ///   - pin: pincode to login
     ///   - completion: completion handler
-    func setStayLoggedIn(pin: String, completion: @escaping (AccountServiceResult) -> Void)
-    
-    /// Remove stored data
-    func dropSavedAccount()
-    
-    /// If we have stored data with pin, validate it. If no data saved, always returns false.
-    func validatePin(_ pin: String) -> Bool
+    func setStayLoggedIn(pin: String) async -> AccountServiceResult
 }

@@ -168,6 +168,8 @@
 		9304F8C4292F8A3100173F18 /* AdamantPushNotificationsTokenService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304F8C3292F8A3100173F18 /* AdamantPushNotificationsTokenService.swift */; };
 		9304F8C6292F971600173F18 /* ApiServiceResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304F8C5292F971600173F18 /* ApiServiceResult.swift */; };
 		9304F8C8292F972600173F18 /* ApiServiceError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9304F8C7292F972600173F18 /* ApiServiceError.swift */; };
+		93090FC52A8DA7600056A39A /* WalletServicesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93090FC42A8DA7600056A39A /* WalletServicesManager.swift */; };
+		93090FC72A8DA83D0056A39A /* AdamantWalletServicesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93090FC62A8DA83D0056A39A /* AdamantWalletServicesManager.swift */; };
 		9322E875297042F000B8357C /* ChatSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9322E874297042F000B8357C /* ChatSender.swift */; };
 		9322E877297042FA00B8357C /* ChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9322E876297042FA00B8357C /* ChatMessage.swift */; };
 		9322E87B2970431200B8357C /* ChatMessageFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9322E87A2970431200B8357C /* ChatMessageFactory.swift */; };
@@ -727,6 +729,8 @@
 		9304F8C3292F8A3100173F18 /* AdamantPushNotificationsTokenService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantPushNotificationsTokenService.swift; sourceTree = "<group>"; };
 		9304F8C5292F971600173F18 /* ApiServiceResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiServiceResult.swift; sourceTree = "<group>"; };
 		9304F8C7292F972600173F18 /* ApiServiceError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiServiceError.swift; sourceTree = "<group>"; };
+		93090FC42A8DA7600056A39A /* WalletServicesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletServicesManager.swift; sourceTree = "<group>"; };
+		93090FC62A8DA83D0056A39A /* AdamantWalletServicesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantWalletServicesManager.swift; sourceTree = "<group>"; };
 		9322E874297042F000B8357C /* ChatSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatSender.swift; sourceTree = "<group>"; };
 		9322E876297042FA00B8357C /* ChatMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessage.swift; sourceTree = "<group>"; };
 		9322E87A2970431200B8357C /* ChatMessageFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessageFactory.swift; sourceTree = "<group>"; };
@@ -1604,6 +1608,7 @@
 				4153045A29C09C6C000E4BEA /* IncreaseFeeService.swift */,
 				4184F1742A33106200D7B8B9 /* CrashlysticsService.swift */,
 				41C1698B29E7F34900FEB3CB /* RichTransactionReplyService.swift */,
+				93090FC42A8DA7600056A39A /* WalletServicesManager.swift */,
 			);
 			path = ServiceProtocols;
 			sourceTree = "<group>";
@@ -1633,6 +1638,7 @@
 				E9771D9D22997A6F0099AAC7 /* NativeCore+AdamantCore.swift */,
 				550066C6284D682D0044C0B1 /* AdamantHealthCheckService.swift */,
 				9304F8C3292F8A3100173F18 /* AdamantPushNotificationsTokenService.swift */,
+				93090FC62A8DA83D0056A39A /* AdamantWalletServicesManager.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -2622,6 +2628,7 @@
 				9322E877297042FA00B8357C /* ChatMessage.swift in Sources */,
 				E908472F2196FEA80095825D /* BaseTransaction+CoreDataProperties.swift in Sources */,
 				93496B832A6C85F400DD062F /* AdamantResources+CoreData.swift in Sources */,
+				93090FC52A8DA7600056A39A /* WalletServicesManager.swift in Sources */,
 				41A1995229D42C460031AD75 /* ChatMessageCell.swift in Sources */,
 				E94008872114F05B00CD2D67 /* AddressValidationResult.swift in Sources */,
 				64A223D820F7A08E005157CB /* LskApiService.swift in Sources */,
@@ -2639,6 +2646,7 @@
 				E9E7CDB72003994E00DFC4DB /* AdamantUtilities+extended.swift in Sources */,
 				E9147B6320505C7500145913 /* QRCodeReader+adamant.swift in Sources */,
 				E90055F720EC200900D0CB2D /* SecurityViewController.swift in Sources */,
+				93090FC72A8DA83D0056A39A /* AdamantWalletServicesManager.swift in Sources */,
 				644EC35E20F34F1E00F40C73 /* DelegateDetailsViewController.swift in Sources */,
 				E9942B80203C058C00C163AF /* QRGeneratorViewController.swift in Sources */,
 				4184F1772A33173100D7B8B9 /* ContributeView.swift in Sources */,

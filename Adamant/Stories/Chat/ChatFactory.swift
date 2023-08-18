@@ -22,24 +22,19 @@ struct ChatFactory {
     let richTransactionStatusService: RichTransactionStatusService
     let addressBookService: AddressBookService
     let visibleWalletService: VisibleWalletsService
+    let walletsManager: WalletServicesManager
     let router: Router
     
     func makeViewController() -> UIViewController {
-        let richMessageProviders = makeRichMessageProviders()
-        let viewModel = makeViewModel(richMessageProviders: richMessageProviders)
+        let viewModel = makeViewModel()
         let delegates = makeDelegates(viewModel: viewModel)
         let dialogManager = ChatDialogManager(viewModel: viewModel, dialogService: dialogService)
         
-        let admService = accountService.wallets.first { wallet in
-            return wallet is AdmWalletService
-        } as? AdmWalletService
-        
         let viewController = ChatViewController(
             viewModel: viewModel,
-            richMessageProviders: richMessageProviders,
+            walletsManager: walletsManager,
             storedObjects: delegates.asArray + [dialogManager],
-            sendTransaction: makeSendTransactionAction(viewModel: viewModel),
-            admService: admService
+            sendTransaction: makeSendTransactionAction(viewModel: viewModel)
         )
         
         viewController.setupDelegates(delegates)
@@ -64,13 +59,13 @@ private extension ChatFactory {
         }
     }
     
-    func makeViewModel(richMessageProviders: [String: RichMessageProvider]) -> ChatViewModel {
+    func makeViewModel() -> ChatViewModel {
         .init(
             chatsProvider: chatsProvider,
             markdownParser: .init(font: UIFont.systemFont(ofSize: UIFont.systemFontSize)),
             transfersProvider: transferProvider,
             chatMessagesListFactory: .init(chatMessageFactory: .init(
-                richMessageProviders: richMessageProviders
+                walletsManager: walletsManager
             )),
             addressBookService: addressBookService,
             visibleWalletService: visibleWalletService,
@@ -78,16 +73,7 @@ private extension ChatFactory {
             accountProvider: accountProvider,
             richTransactionStatusService: richTransactionStatusService,
             chatCacheService: chatCacheService,
-            richMessageProviders: richMessageProviders
-        )
-    }
-    
-    func makeRichMessageProviders() -> [String: RichMessageProvider] {
-        .init(
-            uniqueKeysWithValues: accountService
-                .wallets
-                .compactMap { $0 as? RichMessageProvider }
-                .map { ($0.dynamicRichMessageType, $0) }
+            walletsManager: walletsManager
         )
     }
     

@@ -11,7 +11,7 @@ import Combine
 import CommonKit
 
 actor AdamantRichTransactionStatusService: NSObject, RichTransactionStatusService {
-    private let richProviders: [String: RichMessageProviderWithStatusCheck]
+    private let walletsManager: WalletServicesManager
     private let coreDataStack: CoreDataStack
 
     private lazy var controller = getRichTransactionsController()
@@ -21,10 +21,10 @@ actor AdamantRichTransactionStatusService: NSObject, RichTransactionStatusServic
 
     init(
         coreDataStack: CoreDataStack,
-        richProviders: [String: RichMessageProviderWithStatusCheck]
+        walletsManager: WalletServicesManager
     ) {
         self.coreDataStack = coreDataStack
-        self.richProviders = richProviders
+        self.walletsManager = walletsManager
         super.init()
         Task { await setupNetworkSubscription() }
     }
@@ -33,12 +33,12 @@ actor AdamantRichTransactionStatusService: NSObject, RichTransactionStatusServic
         setStatus(for: transaction, status: .notInitiated)
         
         guard
-            let provider = getProvider(for: transaction)
+            let provider = await getProvider(for: transaction)
         else { return }
 
         let id = transaction.transactionId
         
-        await setStatus(
+        setStatus(
             for: transaction,
             status: provider.statusWithFilters(
                 transaction: transaction,
@@ -51,7 +51,9 @@ actor AdamantRichTransactionStatusService: NSObject, RichTransactionStatusServic
     func startObserving() {
         controller.delegate = self
         try? controller.performFetch()
-        controller.fetchedObjects?.forEach(add(transaction:))
+        controller.fetchedObjects?.forEach { tx in
+            Task { await add(transaction: tx) }
+        }
     }
 }
 
@@ -74,9 +76,9 @@ private extension AdamantRichTransactionStatusService {
             .publisher(for: .AdamantReachabilityMonitor.reachabilityChanged)
             .compactMap { $0.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? Bool }
             .removeDuplicates()
-            .sink { connected in
+            .asyncSink { [weak self] connected in
                 guard connected else { return }
-                Task { [weak self] in await self?.reloadNoNetworkTransactions() }
+                await self?.reloadNoNetworkTransactions()
             }
     }
         
@@ -96,13 +98,13 @@ private extension AdamantRichTransactionStatusService {
         
         transactions?.forEach { transaction in
             setStatus(for: transaction, status: .noNetwork)
-            add(transaction: transaction)
+            Task { await add(transaction: transaction) }
         }
     }
     
-    func add(transaction: RichMessageTransaction) {
+    func add(transaction: RichMessageTransaction) async {
         guard
-            let provider = getProvider(for: transaction)
+            let provider = await getProvider(for: transaction)
         else { return }
         
         let id = transaction.transactionId
@@ -116,10 +118,8 @@ private extension AdamantRichTransactionStatusService {
             oldPendingAttempts: oldPendingAttempts
         )
         
-        subscriptions[id] = publisher.removeDuplicates().sink { status in
-            Task { [weak self] in
-                await self?.setStatus(for: transaction, status: status)
-            }
+        subscriptions[id] = publisher.removeDuplicates().asyncSink { [weak self] status in
+            await self?.setStatus(for: transaction, status: status)
         }
     }
 
@@ -128,9 +128,10 @@ private extension AdamantRichTransactionStatusService {
         subscriptions[id] = nil
     }
 
-    func getProvider(for transaction: RichMessageTransaction) -> RichMessageProviderWithStatusCheck? {
+    func getProvider(for transaction: RichMessageTransaction) async -> RichMessageProviderWithStatusCheck? {
         guard let transfer = transaction.transfer else { return nil }
-        return richProviders[transfer.type]
+        
+        return await walletsManager.getService(richType: transfer.type) as? RichMessageProviderWithStatusCheck
     }
 
     func setStatus(
@@ -155,7 +156,7 @@ private extension AdamantRichTransactionStatusService {
     func processCoreDataChange(type: NSFetchedResultsChangeType, transaction: RichMessageTransaction) {
         switch type {
         case .insert, .update:
-            add(transaction: transaction)
+            Task { await add(transaction: transaction) }
         case .delete:
             remove(transaction: transaction)
         case .move:

@@ -12,12 +12,12 @@ import UIKit
 import MarkdownKit
 import CommonKit
 
-actor AdamantChatTransactionService: ChatTransactionService {
+actor AdamantChatTransactionService: ChatTransactionService {    
     
     // MARK: Dependencies
     
     private let adamantCore: AdamantCore
-    private let richProviders: [String: RichMessageProviderWithStatusCheck]
+    private let walletsManager: WalletServicesManager
     
     private let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
     
@@ -29,14 +29,9 @@ actor AdamantChatTransactionService: ChatTransactionService {
     
     // MARK: Lifecycle
     
-    init(adamantCore: AdamantCore, accountService: AccountService) {
+    init(adamantCore: AdamantCore, walletsManager: WalletServicesManager) {
         self.adamantCore = adamantCore
-        
-        var richProviders = [String: RichMessageProviderWithStatusCheck]()
-        for case let provider as RichMessageProviderWithStatusCheck in accountService.wallets {
-            richProviders[provider.dynamicRichMessageType] = provider
-        }
-        self.richProviders = richProviders
+        self.walletsManager = walletsManager
     }
     
     /// Make operations serial
@@ -89,7 +84,15 @@ actor AdamantChatTransactionService: ChatTransactionService {
     ///   - privateKey: logged account private key
     ///   - context: context to insert parsed transaction to
     /// - Returns: New parsed transaction
-    func chatTransaction(from transaction: Transaction, isOutgoing: Bool, publicKey: String, privateKey: String, partner: BaseAccount, removedMessages: [String], context: NSManagedObjectContext) -> ChatTransaction? {
+    func chatTransaction(
+        from transaction: Transaction,
+        isOutgoing: Bool,
+        publicKey: String,
+        privateKey: String,
+        partner: BaseAccount,
+        removedMessages: [String],
+        context: NSManagedObjectContext
+    ) async -> ChatTransaction? {
         let messageTransaction: ChatTransaction
         guard let chat = transaction.asset.chat else {
             if transaction.type == .send {
@@ -152,7 +155,9 @@ actor AdamantChatTransactionService: ChatTransactionService {
                         trs.richContent = richContent
                         trs.richType = type
                         trs.isReply = false
-                        trs.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
+                        trs.transactionStatus = await walletsManager.getService(richType: type) != nil
+                            ? .notInitiated
+                            : nil
                         messageTransaction = trs
                         
                         break
@@ -206,7 +211,9 @@ actor AdamantChatTransactionService: ChatTransactionService {
                         trs.richContent = richContent
                         trs.richType = type
                         trs.isReply = true
-                        trs.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
+                        trs.transactionStatus = await walletsManager.getService(richType: type) != nil
+                            ? .notInitiated
+                            : nil
                         messageTransaction = trs
                         
                         break

@@ -19,7 +19,7 @@ final class AdamantPushNotificationsTokenService: PushNotificationsTokenService 
     private let tokenProcessingSemaphore = DispatchSemaphore(value: 1)
     private let securedStoreSemaphore = DispatchSemaphore(value: 1)
     
-    init(
+    nonisolated init(
         securedStore: SecuredStore,
         apiService: ApiService,
         adamantCore: AdamantCore,

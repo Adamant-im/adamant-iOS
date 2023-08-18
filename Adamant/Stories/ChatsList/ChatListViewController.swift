@@ -26,7 +26,7 @@ extension String.adamant {
     }
 }
 
-class ChatListViewController: KeyboardObservingViewController {
+final class ChatListViewController: KeyboardObservingViewController {
     typealias SpinnerCell = TableCellWrapper<SpinnerView>
     
     let cellIdentifier = "cell"
@@ -42,8 +42,7 @@ class ChatListViewController: KeyboardObservingViewController {
     var dialogService: DialogService!
     var addressBook: AddressBookService!
     var avatarService: AvatarService!
-    
-    var richMessageProviders = [String:RichMessageProvider]()
+    var walletsManager: WalletServicesManager!
     
     // MARK: IBOutlet
     @IBOutlet weak var tableView: UITableView!
@@ -239,11 +238,8 @@ class ChatListViewController: KeyboardObservingViewController {
         
         NotificationCenter.default
             .publisher(for: .AdamantChatsProvider.initiallySyncedChanged, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { notification in
-                Task { [weak self] in
-                    await self?.handleInitiallySyncedNotification(notification)
-                }
+            .asyncSink { @MainActor [weak self] notification in
+                await self?.handleInitiallySyncedNotification(notification)
             }
             .store(in: &subscriptions)
         
@@ -272,13 +268,14 @@ class ChatListViewController: KeyboardObservingViewController {
     }
     
     private func updateChats() {
-        guard accountService.account?.address != nil,
-              accountService.keypair?.privateKey != nil
-        else {
-            return
+        Task {
+            guard
+                accountService.account?.address != nil,
+                await accountService.keypair?.privateKey != nil
+            else { return }
+            
+            handleRefresh(refreshControl)
         }
-        
-        self.handleRefresh(self.refreshControl)
     }
     
     @MainActor private func handleInitiallySyncedNotification(_ notification: Notification) async {
@@ -847,15 +844,13 @@ extension ChatListViewController {
             return attributesText
             
         case let transfer as TransferTransaction:
-            if let admService = richMessageProviders[AdmWalletService.richMessageType] as? AdmWalletService {
-                return markdownParser.parse(admService.shortDescription(for: transfer))
-            } else {
-                return nil
-            }
+            return markdownParser.parse(
+                walletsManager.admWalletService.shortDescription(for: transfer)
+            )
             
         case let richMessage as RichMessageTransaction:
             if let type = richMessage.richType,
-               let provider = richMessageProviders[type] {
+               let provider = walletsManager.getProvider(richType: type) {
                 return provider.shortDescription(for: richMessage)
             }
             

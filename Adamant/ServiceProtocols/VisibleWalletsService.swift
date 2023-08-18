@@ -16,10 +16,13 @@ extension Notification.Name {
         
     }
 }
+
+@MainActor
 protocol VisibleWalletsService: AnyObject {
     func addToInvisibleWallets(_ wallet: WalletService)
     func removeFromInvisibleWallets(_ wallet: WalletService)
-    func getInvisibleWallets() -> [String]
+    func getInvisibleWalletsID() -> [String]
+    func getInvisibleWallets() -> [WalletService]
     func isInvisible(_ wallet: WalletService) -> Bool
     
     func getSortedWallets(includeInvisible: Bool) -> [String]

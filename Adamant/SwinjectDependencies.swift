@@ -39,6 +39,11 @@ extension Container {
         // MARK: AdamantAvatarService
         self.register(AvatarService.self) { _ in AdamantAvatarService() }.inObjectScope(.container)
         
+        // MARK: Wallet services
+        self.register(WalletServicesManager.self) { _ in
+            AdamantWalletServicesManager()
+        }.inObjectScope(.container)
+        
         // MARK: - Services with dependencies
         // MARK: DialogService
         self.register(DialogService.self) { r in
@@ -49,15 +54,17 @@ extension Container {
         self.register(NotificationsService.self) { r in
             AdamantNotificationsService(securedStore: r.resolve(SecuredStore.self)!)
         }.initCompleted { (r, c) in    // Weak reference
-            guard let service = c as? AdamantNotificationsService else { return }
-            service.accountService = r.resolve(AccountService.self)
+            Task { @MainActor in
+                guard let service = c as? AdamantNotificationsService else { return }
+                service.accountService = r.resolve(AccountService.self)
+            }
         }.inObjectScope(.container)
         
         // MARK: VisibleWalletsService
         self.register(VisibleWalletsService.self) { r in
             AdamantVisibleWalletsService(
                 securedStore: r.resolve(SecuredStore.self)!,
-                accountService: r.resolve(AccountService.self)!
+                walletsManager: r.resolve(WalletServicesManager.self)!
             )
         }.inObjectScope(.container)
         
@@ -122,16 +129,20 @@ extension Container {
                 apiService: r.resolve(ApiService.self)!,
                 adamantCore: r.resolve(AdamantCore.self)!,
                 dialogService: r.resolve(DialogService.self)!,
-                securedStore: r.resolve(SecuredStore.self)!
+                securedStore: r.resolve(SecuredStore.self)!,
+                reachabilityMonitor: r.resolve(ReachabilityMonitor.self)!,
+                walletsManager: r.resolve(WalletServicesManager.self)!,
+                visibleWalletService: r.resolve(VisibleWalletsService.self)!
             )
         }.inObjectScope(.container).initCompleted { (r, c) in
-            guard let service = c as? AdamantAccountService else { return }
-            service.notificationsService = r.resolve(NotificationsService.self)!
-            service.pushNotificationsTokenService = r.resolve(PushNotificationsTokenService.self)!
-            service.currencyInfoService = r.resolve(CurrencyInfoService.self)!
-            service.visibleWalletService = r.resolve(VisibleWalletsService.self)!
-            for case let wallet as SwinjectDependentService in service.wallets {
-                wallet.injectDependencies(from: self)
+            Task { @MainActor in
+                guard let service = c as? AdamantAccountService else { return }
+                
+                await service.setupWeakDeps(
+                    notificationsService: r.resolve(NotificationsService.self),
+                    currencyInfoService: r.resolve(CurrencyInfoService.self),
+                    pushNotificationsTokenService: r.resolve(PushNotificationsTokenService.self)
+                )
             }
         }
         
@@ -147,11 +158,11 @@ extension Container {
         
         // MARK: CurrencyInfoService
         self.register(CurrencyInfoService.self) { r in
-            AdamantCurrencyInfoService(securedStore: r.resolve(SecuredStore.self)!)
-        }.inObjectScope(.container).initCompleted { (r, c) in
-            guard let service = c as? AdamantCurrencyInfoService else { return }
-            service.accountService = r.resolve(AccountService.self)
-        }
+            AdamantCurrencyInfoService(
+                securedStore: r.resolve(SecuredStore.self)!,
+                walletsManager: r.resolve(WalletServicesManager.self)!
+            )
+        }.inObjectScope(.container)
         
         // MARK: - Data Providers
         // MARK: CoreData Stack
@@ -192,7 +203,8 @@ extension Container {
                 adamantCore: r.resolve(AdamantCore.self)!,
                 accountsProvider: r.resolve(AccountsProvider.self)!,
                 transactionService: r.resolve(ChatTransactionService.self)!,
-                securedStore: r.resolve(SecuredStore.self)!
+                securedStore: r.resolve(SecuredStore.self)!,
+                walletsManager: r.resolve(WalletServicesManager.self)!
             )
         }.inObjectScope(.container)
         
@@ -200,7 +212,7 @@ extension Container {
         self.register(ChatTransactionService.self) { r in
             AdamantChatTransactionService(
                 adamantCore: r.resolve(AdamantCore.self)!,
-                accountService: r.resolve(AccountService.self)!
+                walletsManager: r.resolve(WalletServicesManager.self)!
             )
         }.inObjectScope(.container)
         
@@ -215,6 +227,7 @@ extension Container {
                 richTransactionStatusService: r.resolve(RichTransactionStatusService.self)!,
                 addressBookService: r.resolve(AddressBookService.self)!,
                 visibleWalletService: r.resolve(VisibleWalletsService.self)!,
+                walletsManager: r.resolve(WalletServicesManager.self)!,
                 router: r.resolve(Router.self)!
             )
         }.inObjectScope(.container)
@@ -228,13 +241,9 @@ extension Container {
         self.register(RichTransactionStatusService.self) { r in
             let accountService = r.resolve(AccountService.self)!
             
-            let richProviders = accountService.wallets
-                .compactMap { $0 as? RichMessageProviderWithStatusCheck }
-                .map { ($0.dynamicRichMessageType, $0) }
-            
             return AdamantRichTransactionStatusService(
                 coreDataStack: r.resolve(CoreDataStack.self)!,
-                richProviders: Dictionary(uniqueKeysWithValues: richProviders)
+                walletsManager: r.resolve(WalletServicesManager.self)!
             )
         }.inObjectScope(.container)
         
@@ -244,7 +253,8 @@ extension Container {
                 coreDataStack: r.resolve(CoreDataStack.self)!,
                 apiService: r.resolve(ApiService.self)!,
                 adamantCore: r.resolve(AdamantCore.self)!,
-                accountService: r.resolve(AccountService.self)!
+                accountService: r.resolve(AccountService.self)!,
+                walletsManager: r.resolve(WalletServicesManager.self)!
             )
         }.inObjectScope(.container)
         

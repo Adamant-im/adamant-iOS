@@ -15,7 +15,7 @@ actor AdamantRichTransactionReplyService: NSObject, RichTransactionReplyService 
     private let apiService: ApiService
     private let adamantCore: AdamantCore
     private let accountService: AccountService
-    private var richMessageProvider: [String: RichMessageProvider] = [:]
+    private let walletsManager: WalletServicesManager
     
     private lazy var richController = getRichTransactionsController()
     private lazy var transferController = getTransferController()
@@ -25,15 +25,15 @@ actor AdamantRichTransactionReplyService: NSObject, RichTransactionReplyService 
         coreDataStack: CoreDataStack,
         apiService: ApiService,
         adamantCore: AdamantCore,
-        accountService: AccountService
+        accountService: AccountService,
+        walletsManager: WalletServicesManager
     ) {
         self.coreDataStack = coreDataStack
         self.apiService = apiService
         self.adamantCore = adamantCore
         self.accountService = accountService
+        self.walletsManager = walletsManager
         super.init()
-        
-        self.richMessageProvider = self.makeRichMessageProviders()
     }
     
     func startObserving() {
@@ -44,15 +44,6 @@ actor AdamantRichTransactionReplyService: NSObject, RichTransactionReplyService 
         transferController.delegate = self
         try? transferController.performFetch()
         transferController.fetchedObjects?.forEach( update(transaction:) )
-    }
-    
-    func makeRichMessageProviders() -> [String: RichMessageProvider] {
-        .init(
-            uniqueKeysWithValues: accountService
-                .wallets
-                .compactMap { $0 as? RichMessageProvider }
-                .map { ($0.dynamicRichMessageType, $0) }
-        )
     }
 }
 
@@ -123,20 +114,20 @@ private extension AdamantRichTransactionReplyService {
     
     func getReplyMessage(from id: String) async throws -> String {
         if let baseTransaction = getTransactionFromDB(id: id) {
-            return try getReplyMessage(from: baseTransaction)
+            return try await getReplyMessage(from: baseTransaction)
         }
         
         let transactionReply = try await getTransactionFromAPI(by: UInt64(id) ?? 0)
-        return try getReplyMessage(from: transactionReply)
+        return try await getReplyMessage(from: transactionReply)
     }
     
     func getTransactionFromAPI(by id: UInt64) async throws -> Transaction {
         try await apiService.getTransaction(id: id, withAsset: true)
     }
     
-    func getReplyMessage(from transaction: Transaction) throws -> String {
-        guard let address = accountService.account?.address,
-              let privateKey = accountService.keypair?.privateKey
+    func getReplyMessage(from transaction: Transaction) async throws -> String {
+        guard let address = await accountService.account?.address,
+              let privateKey = await accountService.keypair?.privateKey
         else {
             throw ApiServiceError.accountNotFound
         }
@@ -200,7 +191,10 @@ private extension AdamantRichTransactionReplyService {
                 let comment = !transfer.comments.isEmpty
                 ? ": \(transfer.comments)"
                 : ""
-                let humanType = richMessageProvider[transfer.type]?.tokenSymbol ?? transfer.type
+                
+                let humanType = await walletsManager
+                    .getService(richType: transfer.type)?
+                    .tokenSymbol ?? transfer.type
                 
                 message = "\(transactionStatus) \(transfer.amount) \(humanType)\(comment)"
                 break
@@ -220,8 +214,8 @@ private extension AdamantRichTransactionReplyService {
         return message
     }
     
-    func getReplyMessage(from transaction: BaseTransaction) throws -> String {
-        guard let address = accountService.account?.address else {
+    func getReplyMessage(from transaction: BaseTransaction) async throws -> String {
+        guard let address = await accountService.account?.address else {
             throw ApiServiceError.accountNotFound
         }
         
@@ -254,7 +248,7 @@ private extension AdamantRichTransactionReplyService {
                 let comment = !transfer.comments.isEmpty
                 ? ": \(transfer.comments)"
                 : ""
-                let humanType = richMessageProvider[transfer.type]?.tokenSymbol ?? transfer.type
+                let humanType = await formatTransferType(transfer.type)
                 
                 message = "\(transactionStatus) \(transfer.amount) \(humanType)\(comment)"
                 break
@@ -298,6 +292,13 @@ private extension AdamantRichTransactionReplyService {
             as? TransferTransaction
         transaction?.decodedReplyMessage = message
         try? privateContext.save()
+    }
+    
+    @MainActor
+    private func formatTransferType(_ type: String) -> String {
+        walletsManager
+            .getService(richType: type)?
+            .tokenSymbol ?? type
     }
 }
 

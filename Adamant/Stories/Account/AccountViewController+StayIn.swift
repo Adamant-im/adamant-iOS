@@ -13,9 +13,7 @@ import CommonKit
 
 extension AccountViewController {
     func setStayLoggedIn(enabled: Bool) {
-        guard accountService.hasStayInAccount != enabled else {
-            return
-        }
+        guard accountService.hasStayInAccount != enabled else { return }
         
         if enabled { // Create pin and turn on Stay In
             pinpadRequest = .createPin
@@ -50,52 +48,46 @@ extension AccountViewController {
         localAuth.authorizeUser(reason: reason) { [weak self] result in
             switch result {
             case .success:
-                self?.dialogService.showSuccess(withMessage: String.adamant.alert.done)
                 self?.accountService.useBiometry = enabled
+                self?.dialogService.showSuccess(withMessage: .adamant.alert.done)
                 
             case .cancel:
-                DispatchQueue.main.async { [weak self] in
-                    if let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {
-                        row.value = self?.accountService.useBiometry
-                        row.updateCell()
-                    }
+                if let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {
+                    row.value = self?.accountService.useBiometry
+                    row.updateCell()
                 }
                 
             case .fallback:
-                DispatchQueue.main.async {
-                    let pinpad = PinpadViewController.adamantPinpad(biometryButton: .hidden)
-                    
-                    if enabled {
-                        pinpad.commentLabel.text = String.adamant.security.biometryOnReason
-                        self?.pinpadRequest = .turnOnBiometry
-                    } else {
-                        pinpad.commentLabel.text = String.adamant.security.biometryOffReason
-                        self?.pinpadRequest = .turnOffBiometry
-                    }
-                    
-                    pinpad.commentLabel.isHidden = false
-                    pinpad.delegate = self
-                    pinpad.modalPresentationStyle = .overFullScreen
-                    self?.setColors(for: pinpad)
-                    self?.present(pinpad, animated: true, completion: nil)
+                let pinpad = PinpadViewController.adamantPinpad(biometryButton: .hidden)
+                
+                if enabled {
+                    pinpad.commentLabel.text = String.adamant.security.biometryOnReason
+                    self?.pinpadRequest = .turnOnBiometry
+                } else {
+                    pinpad.commentLabel.text = String.adamant.security.biometryOffReason
+                    self?.pinpadRequest = .turnOffBiometry
                 }
                 
+                pinpad.commentLabel.isHidden = false
+                pinpad.delegate = self
+                pinpad.modalPresentationStyle = .overFullScreen
+                self?.setColors(for: pinpad)
+                self?.present(pinpad, animated: true, completion: nil)
+                
             case .failed:
-                DispatchQueue.main.async {
-                    if let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {
-                        if let value = self?.accountService.useBiometry {
-                            row.value = value
-                        } else {
-                            row.value = false
-                        }
-                        
-                        row.updateCell()
-                        row.evaluateHidden()
+                if let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {
+                    if let value = self?.accountService.useBiometry {
+                        row.value = value
+                    } else {
+                        row.value = false
                     }
                     
-                    if let row = self?.form.rowBy(tag: Rows.notifications.tag) {
-                        row.evaluateHidden()
-                    }
+                    row.updateCell()
+                    row.evaluateHidden()
+                }
+                
+                if let row = self?.form.rowBy(tag: Rows.notifications.tag) {
+                    row.evaluateHidden()
                 }
             }
         }
@@ -118,82 +110,80 @@ extension AccountViewController {
 // MARK: - PinpadViewControllerDelegate
 extension AccountViewController: PinpadViewControllerDelegate {
     func pinpad(_ pinpad: PinpadViewController, didEnterPin pin: String) {
-        switch pinpadRequest {
-            
-        // MARK: User has entered new pin first time. Request re-enter pin
-        case .createPin?:
-            pinpadRequest = .reenterPin(pin: pin)
-            pinpad.commentLabel.text = String.adamant.pinpad.reenterPin
-            pinpad.clearPin()
-            return
-            
-        // MARK: User has reentered pin. Save pin.
-        case .reenterPin(let pinToVerify)?:
-            guard pin == pinToVerify else {
-                pinpad.playWrongPinAnimation()
+        Task {
+            switch pinpadRequest {
+                
+            // MARK: User has entered new pin first time. Request re-enter pin
+            case .createPin?:
+                pinpadRequest = .reenterPin(pin: pin)
+                pinpad.commentLabel.text = String.adamant.pinpad.reenterPin
                 pinpad.clearPin()
-                break
-            }
-            
-            accountService.setStayLoggedIn(pin: pin) { [weak self] result in
-                switch result {
+                return
+                
+            // MARK: User has reentered pin. Save pin.
+            case .reenterPin(let pinToVerify)?:
+                guard pin == pinToVerify else {
+                    pinpad.playWrongPinAnimation()
+                    pinpad.clearPin()
+                    break
+                }
+                
+                switch await accountService.setStayLoggedIn(pin: pin) {
                 case .success:
-                    self?.pinpadRequest = nil
-                    DispatchQueue.main.async {
-                        if let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {
-                            row.value = false
-                            row.updateCell()
-                            row.evaluateHidden()
-                        }
-                        
-                        if let row = self?.form.rowBy(tag: Rows.notifications.tag) {
-                            row.evaluateHidden()
-                        }
-                        
-                        pinpad.dismiss(animated: true, completion: nil)
+                    pinpadRequest = nil
+                    if let row: SwitchRow = form.rowBy(tag: Rows.biometry.tag) {
+                        row.value = false
+                        row.updateCell()
+                        row.evaluateHidden()
                     }
                     
+                    if let row = form.rowBy(tag: Rows.notifications.tag) {
+                        row.evaluateHidden()
+                    }
+                    
+                    pinpad.dismiss(animated: true, completion: nil)
+                    
                 case .failure(let error):
-                    self?.dialogService.showRichError(error: error)
+                    dialogService.showRichError(error: error)
                 }
+                
+            // MARK: Users want to turn off the pin. Validate and turn off.
+            case .turnOffPin?:
+                guard accountService.validatePin(pin) else {
+                    pinpad.playWrongPinAnimation()
+                    pinpad.clearPin()
+                    break
+                }
+                
+                accountService.dropSavedAccount()
+                
+                pinpad.dismiss(animated: true, completion: nil)
+                
+            // MARK: User wants to turn on biometry
+            case .turnOnBiometry?:
+                guard accountService.validatePin(pin) else {
+                    pinpad.playWrongPinAnimation()
+                    pinpad.clearPin()
+                    break
+                }
+                
+                accountService.useBiometry = true
+                pinpad.dismiss(animated: true, completion: nil)
+                
+            // MARK: User wants to turn off biometry
+            case .turnOffBiometry?:
+                guard accountService.validatePin(pin) else {
+                    pinpad.playWrongPinAnimation()
+                    pinpad.clearPin()
+                    break
+                }
+                
+                accountService.useBiometry = false
+                pinpad.dismiss(animated: true, completion: nil)
+                
+            default:
+                pinpad.dismiss(animated: true, completion: nil)
             }
-            
-        // MARK: Users want to turn off the pin. Validate and turn off.
-        case .turnOffPin?:
-            guard accountService.validatePin(pin) else {
-                pinpad.playWrongPinAnimation()
-                pinpad.clearPin()
-                break
-            }
-            
-            accountService.dropSavedAccount()
-            
-            pinpad.dismiss(animated: true, completion: nil)
-            
-        // MARK: User wants to turn on biometry
-        case .turnOnBiometry?:
-            guard accountService.validatePin(pin) else {
-                pinpad.playWrongPinAnimation()
-                pinpad.clearPin()
-                break
-            }
-            
-            accountService.useBiometry = true
-            pinpad.dismiss(animated: true, completion: nil)
-            
-        // MARK: User wants to turn off biometry
-        case .turnOffBiometry?:
-            guard accountService.validatePin(pin) else {
-                pinpad.playWrongPinAnimation()
-                pinpad.clearPin()
-                break
-            }
-            
-            accountService.useBiometry = false
-            pinpad.dismiss(animated: true, completion: nil)
-            
-        default:
-            pinpad.dismiss(animated: true, completion: nil)
         }
     }
     

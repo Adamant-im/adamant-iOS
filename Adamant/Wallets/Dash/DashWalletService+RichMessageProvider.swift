@@ -40,37 +40,41 @@ extension DashWalletService: RichMessageProvider {
     
     @MainActor
     func richMessageTapped(for transaction: RichMessageTransaction, in chat: ChatViewController) {
-        // MARK: 0. Prepare
-        guard let hash = transaction.getRichValue(for: RichContentKeys.transfer.hash),
-              let address = accountService.account?.address
-        else {
-            return
+        Task {
+            // MARK: 0. Prepare
+            guard
+                let hash = transaction.getRichValue(for: RichContentKeys.transfer.hash),
+                let address = await accountService.account?.address
+            else {
+                return
+            }
+                    
+            let comment: String?
+            if let raw = transaction.getRichValue(for: RichContentKeys.transfer.comments), raw.count > 0 {
+                comment = raw
+            } else {
+                comment = nil
+            }
+            
+            // MARK: Go to transaction
+            
+            presentDetailTransactionVC(
+                hash: hash,
+                senderId: transaction.senderId,
+                recipientId: transaction.recipientId,
+                senderAddress: "",
+                recipientAddress: "",
+                comment: comment,
+                address: address,
+                blockId: nil,
+                transaction: nil,
+                richTransaction: transaction,
+                in: chat
+            )
         }
-                
-        let comment: String?
-        if let raw = transaction.getRichValue(for: RichContentKeys.transfer.comments), raw.count > 0 {
-            comment = raw
-        } else {
-            comment = nil
-        }
-        
-        // MARK: Go to transaction
-        
-        presentDetailTransactionVC(
-            hash: hash,
-            senderId: transaction.senderId,
-            recipientId: transaction.recipientId,
-            senderAddress: "",
-            recipientAddress: "",
-            comment: comment,
-            address: address,
-            blockId: nil,
-            transaction: nil,
-            richTransaction: transaction,
-            in: chat
-        )
     }
     
+    @MainActor
     private func presentDetailTransactionVC(
         hash: String,
         senderId: String?,

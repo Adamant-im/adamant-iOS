@@ -237,7 +237,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         if let accountService = container.resolve(AccountService.self) {
-            repeater.registerForegroundCall(label: "accountService", interval: 15, queue: .global(qos: .utility), callback: accountService.update)
+            repeater.registerForegroundCall(
+                label: "accountService",
+                interval: 15,
+                queue: .global(qos: .utility)
+            ) {
+                Task { await accountService.update() }
+            }
         } else {
             dialogService.showError(withMessage: "Failed to register AccountService autoupdate. Please, report a bug", supportEmail: true, error: nil)
         }

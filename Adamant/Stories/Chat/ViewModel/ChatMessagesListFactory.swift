@@ -23,12 +23,13 @@ actor ChatMessagesListFactory {
         sender: ChatSender,
         isNeedToLoadMoreMessages: Bool,
         expirationTimestamp minExpTimestamp: inout TimeInterval?
-    ) -> [ChatMessage] {
+    ) async -> [ChatMessage] {
         assert(!Thread.isMainThread, "Do not process messages on main thread")
+        var result = [ChatMessage]()
         
-        return transactions.enumerated().map { index, transaction in
+        for (index, transaction) in transactions.enumerated() {
             var expTimestamp: TimeInterval?
-            let message = makeMessage(
+            let message = await makeMessage(
                 transaction,
                 sender: sender,
                 dateHeaderOn: isNeedToDisplayDateHeader(index: index, transactions: transactions),
@@ -40,8 +41,10 @@ actor ChatMessagesListFactory {
                 minExpTimestamp = timestamp
             }
             
-            return message
+            result.append(message)
         }
+        
+        return result
     }
 }
 
@@ -52,9 +55,9 @@ private extension ChatMessagesListFactory {
         dateHeaderOn: Bool,
         topSpinnerOn: Bool,
         willExpireAfter: inout TimeInterval?
-    ) -> ChatMessage {
+    ) async -> ChatMessage {
         var expireDate: Date?
-        let message = chatMessageFactory.makeMessage(
+        let message = await chatMessageFactory.makeMessage(
             transaction,
             expireDate: &expireDate,
             currentSender: sender,

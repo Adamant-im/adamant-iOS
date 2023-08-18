@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdamantScene {
-    struct Account {
+    enum Account {
         static let account = AdamantScene(identifier: "AccountViewController") { r in
             let c = AccountViewController()
             c.accountService = r.resolve(AccountService.self)
@@ -21,9 +21,8 @@ extension AdamantScene {
             c.avatarService = r.resolve(AvatarService.self)
             c.currencyInfoService = r.resolve(CurrencyInfoService.self)
             c.visibleWalletsService = r.resolve(VisibleWalletsService.self)
+            c.walletsManager = r.resolve(WalletServicesManager.self)
             return c
         }
-        
-        private init() {}
     }
 }

@@ -18,7 +18,7 @@ extension StoreKey {
 }
 
 // MARK: - Service
-class AdamantCurrencyInfoService: CurrencyInfoService {
+final class AdamantCurrencyInfoService: CurrencyInfoService {
     // MARK: - API
     private lazy var infoServiceUrl: URL = {
         return URL(string: AdamantResources.coinsInfoSrvice)!
@@ -42,8 +42,6 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
     
     // MARK: - Properties
     private static let historyThreshold = Double(exactly: 60*60*24)!
-    
-    private var rateCoins: [String]?
     private var rates = [String: Decimal]()
     
     private let defaultResponseDispatchQueue = DispatchQueue(label: "com.adamant.info-coins-response-queue", qos: .utility, attributes: [.concurrent])
@@ -59,20 +57,12 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
     
     // MARK: - Dependencies
     private let securedStore: SecuredStore
-    
-    weak var accountService: AccountService? {
-        didSet {
-            if let accountService = accountService {
-                rateCoins = accountService.wallets.map { s -> String in s.tokenSymbol }
-            } else {
-                rateCoins = nil
-            }
-        }
-    }
+    private let walletsManager: WalletServicesManager
     
     // MARK: - Init
-    init(securedStore: SecuredStore) {
+    init(securedStore: SecuredStore, walletsManager: WalletServicesManager) {
         self.securedStore = securedStore
+        self.walletsManager = walletsManager
         addObservers()
         setupSecuredStore()
     }
@@ -83,8 +73,12 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
     
     // MARK: - Observers
     func addObservers() {
-        observerActive = NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            self?.update()
+        observerActive = NotificationCenter.default.addObserver(
+            forName: UIApplication.didBecomeActiveNotification,
+            object: nil,
+            queue: OperationQueue.main
+        ) { _ in
+            Task { [weak self] in await self?.update() }
         }
     }
     
@@ -94,13 +88,15 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
         }
     }
     
-    // MARK: - Info service
     func update() {
-        guard let coins = rateCoins else {
-            return
-        }
+        Task { await update() }
+    }
+    
+    // MARK: - Info service
+    func update() async {
+        let rateCoins = await walletsManager.wallets.map { $0.tokenSymbol }
         
-        loadRates(for: coins) { [weak self] result in
+        loadRates(for: rateCoins) { [weak self] result in
             switch result {
             case .success(let rates):
                 self?.rates = rates

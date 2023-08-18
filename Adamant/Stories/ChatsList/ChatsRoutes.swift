@@ -10,7 +10,7 @@ import UIKit
 import CommonKit
 
 extension AdamantScene {
-    struct Chats {
+    enum Chats {
         static let chatList = AdamantScene(identifier: "ChatListViewController", factory: { r in
             let c = ChatListViewController(nibName: "ChatListViewController", bundle: nil)
             c.accountService = r.resolve(AccountService.self)
@@ -21,15 +21,7 @@ extension AdamantScene {
             c.dialogService = r.resolve(DialogService.self)
             c.addressBook = r.resolve(AddressBookService.self)
             c.avatarService = r.resolve(AvatarService.self)
-            
-            // MARK: RichMessage handlers
-            // Transfer handlers from accountService' wallet services
-            if let accountService = r.resolve(AccountService.self) {
-                for case let provider as RichMessageProvider in accountService.wallets {
-                    c.richMessageProviders[provider.dynamicRichMessageType] = provider
-                }
-            }
-            
+            c.walletsManager = r.resolve(WalletServicesManager.self)
             return c
         })
         
@@ -48,7 +40,7 @@ extension AdamantScene {
         
         static let complexTransfer = AdamantScene(identifier: "ComplexTransferViewController", factory: { r in
             let c = ComplexTransferViewController()
-            c.accountService = r.resolve(AccountService.self)
+            c.walletsManager = r.resolve(WalletServicesManager.self)
             c.visibleWalletsService = r.resolve(VisibleWalletsService.self)
             c.addressBookService = r.resolve(AddressBookService.self)
             return c
@@ -63,7 +55,5 @@ extension AdamantScene {
             )
             return c
         })
-        
-        private init() {}
     }
 }

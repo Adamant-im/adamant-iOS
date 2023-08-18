@@ -59,7 +59,7 @@ extension AdamantTransfersProvider: BackgroundFetchService {
                 )
             }
             
-            notificationsService.showNotification(
+            await notificationsService.showNotification(
                 title: NotificationStrings.newTransferTitle,
                 body: NotificationStrings.newTransferBody(total + notifiedCount),
                 type: .newTransactions(count: total)

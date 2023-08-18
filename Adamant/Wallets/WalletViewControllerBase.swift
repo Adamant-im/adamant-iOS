@@ -49,7 +49,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     
     var dialogService: DialogService!
     var currencyInfoService: CurrencyInfoService!
-    var accountService: AccountService!
+    var walletsManager: WalletServicesManager!
     
     // MARK: - Properties, WalletViewController
     
@@ -180,10 +180,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                     if ERC20Token.supportedTokens.contains(where: { token in
                         return token.symbol == service.tokenSymbol
                     }) {
-                        let ethWallet = self?.accountService.wallets.first { wallet in
-                            return wallet.tokenSymbol == "ETH"
-                        }
-                        v.rootCoinBalance = ethWallet?.wallet?.balance
+                        v.rootCoinBalance = self?.walletsManager.ethWalletService.wallet?.balance
                     }
                 }
                 
