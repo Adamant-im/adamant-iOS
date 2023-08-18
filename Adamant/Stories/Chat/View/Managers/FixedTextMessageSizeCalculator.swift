@@ -48,22 +48,25 @@
          }
          
          if case let .reply(model) = getMessages()[indexPath.section].fullModel.content {
-             let contentViewHeight = model.value.contentHeight(for: messageContainerSize.width)
+             let messageSize = labelSize(
+                for: model.value.message,
+                considering: maxWidth
+             )
              
-             let attributedText: NSAttributedString
-
-             let textMessageKind = message.kind.textMessageKind
-             switch textMessageKind {
-             case .attributedText(let text):
-                 attributedText = text
-             case .text(let text), .emoji(let text):
-                 attributedText = NSAttributedString(string: text, attributes: [.font: messageLabelFont])
-             default:
-                 assertionFailure("messageContainerSize received unhandled MessageDataType: \(message.kind)")
-                 return .zero
-             }
+             let messageReplySize = labelSize(
+                for: model.value.messageReply,
+                considering: maxWidth
+             )
              
-             messageContainerSize = labelSize(for: attributedText, considering: maxWidth)
+             let size = messageSize.width > messageReplySize.width
+             ? messageSize
+             : messageReplySize
+             
+             let contentViewHeight = model.value.contentHeight(
+                for: size.width + messageInsets.horizontal / 2
+             )
+             
+             messageContainerSize = size
              messageContainerSize.width += messageInsets.horizontal
              messageContainerSize.height = contentViewHeight
          }
