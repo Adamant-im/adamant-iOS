@@ -51,8 +51,17 @@ final class AdamantHealthCheckService: HealthCheckService {
         updateNodesAvailability()
 
         _nodes.filter { $0.isEnabled }.forEach { node in
-            guard let request = updateNodeStatus(node: node) else { return }
+            guard !isRequestInProgress(for: node),
+                  let request = updateNodeStatus(node: node)
+            else { return }
+            
             currentRequests.insert(request)
+        }
+    }
+    
+    private func isRequestInProgress(for node: Node) -> Bool {
+        return currentRequests.contains { request in
+            request.request?.url?.absoluteString.contains(node.host) ?? false
         }
     }
     
@@ -115,8 +124,10 @@ final class AdamantHealthCheckService: HealthCheckService {
     }
     
     private func resetRequests() {
-        currentRequests.forEach { $0.cancel() }
-        currentRequests = []
+        currentRequests.filter { $0.isFinished }.forEach {
+            $0.cancel()
+            currentRequests.remove($0)
+        }
     }
 }
 
