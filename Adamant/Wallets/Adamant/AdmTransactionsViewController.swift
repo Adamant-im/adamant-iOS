@@ -217,10 +217,8 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         
         controller.showToChat = toShowChat(for: transaction)
         
-        if let address = accountService.account?.address,
-           let partenerAddress = transaction.partner?.address {
-            
-            let partnerName = transaction.partner?.name?.checkAndReplaceSystemWallets() ?? addressBookService.getName(for: partenerAddress)
+        if let address = accountService.account?.address {
+            let partnerName = addressBookService.getName(for: transaction.partner)
             
             if address == transaction.senderId {
                 controller.senderName = String.adamant.transactionDetails.yourAddress
@@ -246,7 +244,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         
         let amount: Decimal = transaction.amount as Decimal? ?? 0
         
-        var partnerName = transaction.partner?.name?.checkAndReplaceSystemWallets() ?? addressBookService.getName(for: partnerId)
+        var partnerName = addressBookService.getName(for: transaction.partner)
         
         if let address = accountService.account?.address, partnerId == address {
             partnerName = String.adamant.transactionDetails.yourAddress
