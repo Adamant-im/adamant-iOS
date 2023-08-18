@@ -173,11 +173,13 @@ final class ChatViewModel: NSObject {
             }
             
             let isChatLoaded = await chatsProvider.isChatLoaded(with: address)
+            let isChatLoading = await chatsProvider.isChatLoading(with: address)
             
-            // TODO: Fix double loading of chat. The code below works, but need to remove the full screen loading at the end if another service loads the chat room
-            
-           // let isChatLoading = await chatsProvider.isChatLoading(with: address)
-          //  guard !isChatLoading else { return }
+            guard !isChatLoading else {
+                await waitForChatLoading(with: address)
+                updateTransactions(performFetch: true)
+                return
+            }
             
             if address == AdamantContacts.adamantWelcomeWallet.name || isChatLoaded {
                 updateTransactions(performFetch: true)
@@ -749,5 +751,23 @@ private extension ChatViewModel {
     func startNewChat(with chatroom: Chatroom, name: String? = nil, message: String? = nil) {
         setNameIfNeeded(for: chatroom.partner, chatroom: chatroom, name: name)
         didTapAdmChat.send((chatroom, message))
+    }
+    
+    func waitForChatLoading(with address: String) async {
+        await withUnsafeContinuation { continuation in
+            Task {
+                await chatsProvider.chatLoadingStatusPublisher
+                    .filter { $0.contains(
+                        where: {
+                            $0.key == address && $0.value == .loaded
+                        })
+                    }
+                    .receive(on: DispatchQueue.main)
+                    .sink { [weak self] _ in
+                        self?.tempCancellables.removeAll()
+                        continuation.resume()
+                    }.store(in: &tempCancellables)
+            }
+        }
     }
 }
