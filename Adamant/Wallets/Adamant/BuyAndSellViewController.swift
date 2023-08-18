@@ -18,6 +18,7 @@ class BuyAndSellViewController: FormViewController {
         case adamantSite
         case azbit
         case stakecube
+        case coinstore
         
         var tag: String {
             switch self {
@@ -25,6 +26,7 @@ class BuyAndSellViewController: FormViewController {
             case .adamantSite: return "admSite"
             case .azbit: return "cDeal"
             case .stakecube: return "stakecube"
+            case .coinstore: return "coinstore"
             }
         }
         
@@ -34,6 +36,7 @@ class BuyAndSellViewController: FormViewController {
             case .adamantSite: return .asset(named: "row_logo")
             case .azbit: return .asset(named: "azbit_logo")
             case .stakecube: return .asset(named: "row_stakecube")
+            case .coinstore: return .asset(named: "row_coinstore")
             }
         }
         
@@ -43,6 +46,7 @@ class BuyAndSellViewController: FormViewController {
             case .adamantSite: return String.adamant.wallets.buyAdmTokens
             case .azbit: return "Azbit"
             case .stakecube: return "StakeCube"
+            case .coinstore: return "Coinstore"
             }
         }
         
@@ -52,6 +56,7 @@ class BuyAndSellViewController: FormViewController {
             case .adamantSite: return "https://adamant.im/buy-tokens/"
             case .azbit: return "https://azbit.com?referralCode=9YVWYAF"
             case .stakecube: return "https://stakecube.net/app/exchange/adm_usdt?layout=pro&team=adm"
+            case .coinstore: return "https://h5.coinstore.com/h5/signup?invitCode=o951vZ"
             }
         }
     }
@@ -96,6 +101,10 @@ class BuyAndSellViewController: FormViewController {
         // MARK: StakeCube
         let stakecubeCoinRow = buildUrlRow(for: .stakecube)
         section.append(stakecubeCoinRow)
+        
+        // MARK: Coinstore
+        let coinstoreCoinRow = buildUrlRow(for: .coinstore)
+        section.append(coinstoreCoinRow)
         
         form.append(section)
         
