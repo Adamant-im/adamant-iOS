@@ -46,6 +46,8 @@ struct ContextMenuOverlayView: View {
             }
             makeOverlayView()
                 .zIndex(1)
+            makeMenuOverlayView()
+                .zIndex(3)
             Spacer()
         }
         .ignoresSafeArea()
@@ -71,9 +73,12 @@ private extension ContextMenuOverlayView {
             VStack(spacing: .zero) {
                 makeContentView()
                     .onTapGesture { }
-                makeMenuView()
-                    .onTapGesture { }
                 Spacer()
+                    .frame(
+                        height: viewModel.menuSize.height
+                        + minBottomOffset
+                        + minContentsSpace
+                    )
             }
         }
         .fullScreen()
@@ -116,13 +121,17 @@ private extension ContextMenuOverlayView {
                 UIViewControllerWrapper(menuVC)
                     .frame(width: menuVC.menuSize.width, height: menuVC.menuSize.height)
                     .cornerRadius(15)
-                    .padding(.top, viewModel.menuLocation.y)
                     .padding(.leading, viewModel.menuLocation.x)
                     .transition(menuTransition)
                 Spacer()
             }
         }
-        .fullScreen()
+        .frame(
+            width: .infinity,
+            height: viewModel.menuSize.height
+        )
+        .offset(y: viewModel.menuLocation.y)
+        .ignoresSafeArea()
     }
     
     func makeUpperOverlayView(upperContentView: some View) -> some View {
@@ -154,3 +163,6 @@ private extension ContextMenuOverlayView {
     }
     
 }
+
+private let minBottomOffset: CGFloat = 50
+private let minContentsSpace: CGFloat = 15
