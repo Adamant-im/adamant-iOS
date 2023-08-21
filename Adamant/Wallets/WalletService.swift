@@ -247,6 +247,7 @@ protocol WalletService: AnyObject {
 }
 
 protocol SwinjectDependentService: WalletService {
+    @MainActor
     func injectDependencies(from container: Container)
 }
 

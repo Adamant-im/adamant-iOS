@@ -480,6 +480,7 @@ extension LskWalletService: InitiatedWithPassphraseService {
 
 // MARK: - Dependencies
 extension LskWalletService: SwinjectDependentService {
+    @MainActor
     func injectDependencies(from container: Container) {
         accountService = container.resolve(AccountService.self)
         apiService = container.resolve(ApiService.self)

@@ -440,6 +440,7 @@ extension BtcWalletService: InitiatedWithPassphraseService {
 
 // MARK: - Dependencies
 extension BtcWalletService: SwinjectDependentService {
+    @MainActor
     func injectDependencies(from container: Container) {
         accountService = container.resolve(AccountService.self)
         apiService = container.resolve(ApiService.self)

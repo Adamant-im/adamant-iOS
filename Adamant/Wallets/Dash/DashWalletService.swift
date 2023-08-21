@@ -331,6 +331,7 @@ extension DashWalletService: InitiatedWithPassphraseService {
 
 // MARK: - Dependencies
 extension DashWalletService: SwinjectDependentService {
+    @MainActor
     func injectDependencies(from container: Container) {
         accountService = container.resolve(AccountService.self)
         apiService = container.resolve(ApiService.self)

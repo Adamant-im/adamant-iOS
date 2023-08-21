@@ -101,7 +101,7 @@ extension Container {
         self.register(ApiService.self) { r in
             AdamantApiService(adamantCore: r.resolve(AdamantCore.self)!)
         }.initCompleted { (r, c) in    // Weak reference
-            Task {
+            Task { @MainActor in
                 guard let service = c as? AdamantApiService else { return }
                 await service.setupWeakDeps(nodesSource: r.resolve(NodesSource.self)!)
             }
@@ -129,13 +129,15 @@ extension Container {
                 securedStore: r.resolve(SecuredStore.self)!
             )
         }.inObjectScope(.container).initCompleted { (r, c) in
-            guard let service = c as? AdamantAccountService else { return }
-            service.notificationsService = r.resolve(NotificationsService.self)!
-            service.pushNotificationsTokenService = r.resolve(PushNotificationsTokenService.self)!
-            service.currencyInfoService = r.resolve(CurrencyInfoService.self)!
-            service.visibleWalletService = r.resolve(VisibleWalletsService.self)!
-            for case let wallet as SwinjectDependentService in service.wallets {
-                wallet.injectDependencies(from: self)
+            Task { @MainActor in
+                guard let service = c as? AdamantAccountService else { return }
+                service.notificationsService = r.resolve(NotificationsService.self)!
+                service.pushNotificationsTokenService = r.resolve(PushNotificationsTokenService.self)!
+                service.currencyInfoService = r.resolve(CurrencyInfoService.self)!
+                service.visibleWalletService = r.resolve(VisibleWalletsService.self)!
+                for case let wallet as SwinjectDependentService in service.wallets {
+                    wallet.injectDependencies(from: self)
+                }
             }
         }
         
@@ -253,7 +255,7 @@ extension Container {
         }.inObjectScope(.container)
         
         // MARK: Bitcoin AddressConverterFactory
-        self.register(AddressConverterFactory.self) { r in
+        self.register(AddressConverterFactory.self) { _ in
             AddressConverterFactory()
         }.inObjectScope(.container)
     }

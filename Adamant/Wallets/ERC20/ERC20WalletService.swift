@@ -440,6 +440,7 @@ extension ERC20WalletService: InitiatedWithPassphraseService {
 
 // MARK: - Dependencies
 extension ERC20WalletService: SwinjectDependentService {
+    @MainActor
     func injectDependencies(from container: Container) {
         accountService = container.resolve(AccountService.self)
         apiService = container.resolve(ApiService.self)

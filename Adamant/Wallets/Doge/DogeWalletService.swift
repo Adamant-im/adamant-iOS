@@ -313,6 +313,7 @@ extension DogeWalletService: InitiatedWithPassphraseService {
 
 // MARK: - Dependencies
 extension DogeWalletService: SwinjectDependentService {
+    @MainActor
     func injectDependencies(from container: Container) {
         accountService = container.resolve(AccountService.self)
         apiService = container.resolve(ApiService.self)
