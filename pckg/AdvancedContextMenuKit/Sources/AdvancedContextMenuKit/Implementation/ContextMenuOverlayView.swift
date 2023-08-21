@@ -57,8 +57,11 @@ struct ContextMenuOverlayView: View {
             }
         }
         .onAppear {
-            withAnimation(.easeInOut(duration: viewModel.animationDuration)) {
-                viewModel.additionalMenuVisible.toggle()
+            Task {
+                await animate(duration: viewModel.animationDuration) {
+                    viewModel.additionalMenuVisible.toggle()
+                }
+                viewModel.delegate?.didAppear()
             }
         }
     }
@@ -78,9 +81,8 @@ private extension ContextMenuOverlayView {
                     )
             }
         }
-        .frame(width: .infinity, height: .infinity)
+        .fullScreen()
         .transition(.opacity)
-        .ignoresSafeArea()
     }
     
     func makeContentView() -> some View {
@@ -98,9 +100,8 @@ private extension ContextMenuOverlayView {
                 .padding(.leading, viewModel.contentViewLocation.x)
             Spacer()
         }
-        .frame(width: .infinity, height: .infinity)
+        .fullScreen()
         .transition(.opacity)
-        .ignoresSafeArea()
     }
     
     func makeMenuOverlayView() -> some View {
@@ -109,9 +110,8 @@ private extension ContextMenuOverlayView {
                 .onTapGesture { }
             Spacer()
         }
-        .frame(width: .infinity, height: .infinity)
+        .fullScreen()
         .transition(.opacity)
-        .ignoresSafeArea()
     }
     
     func makeMenuView() -> some View {
@@ -140,9 +140,8 @@ private extension ContextMenuOverlayView {
                 .onTapGesture { }
             Spacer()
         }
-        .frame(width: .infinity, height: .infinity)
+        .fullScreen()
         .transition(.opacity)
-        .ignoresSafeArea()
     }
     
     func makeUpperContentView(upperContentView: some View) -> some View {
@@ -160,8 +159,7 @@ private extension ContextMenuOverlayView {
                 .padding(.leading, viewModel.upperContentViewLocation.x)
             Spacer()
         }
-        .frame(width: .infinity, height: .infinity)
-        .ignoresSafeArea()
+        .fullScreen()
     }
     
 }

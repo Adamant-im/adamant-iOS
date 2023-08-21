@@ -185,7 +185,10 @@ protocol ChatsProvider: DataProvider, Actor {
     var roomsMaxCount: Int? { get }
     var roomsLoadedCount: Int? { get }
     
-    var isChatLoaded: [String: Bool] { get }
+    var chatLoadingStatusPublisher: Published<[String : ChatRoomLoadingStatus]>.Publisher {
+        get
+    }
+    
     var chatMaxMessages: [String: Int] { get }
     var chatLoadedMessages: [String: Int] { get }
     

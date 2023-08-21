@@ -39,6 +39,11 @@ public extension View {
         return resultView
     }
     
+    func fullScreen() -> some View {
+        return frame(width: .infinity, height: .infinity)
+            .ignoresSafeArea()
+    }
+    
     @ViewBuilder
     func withoutListBackground() -> some View {
         if #available(iOS 16.0, *) {

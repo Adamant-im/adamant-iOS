@@ -42,10 +42,13 @@ actor AdamantChatsProvider: ChatsProvider {
     private(set) var blockList: [String] = []
     private(set) var removedMessages: [String] = []
     
-    var isChatLoaded: [String : Bool] = [:]
+    @Published private var chatLoadingStatusDictionary: [String: ChatRoomLoadingStatus] = [:]
+    var chatLoadingStatusPublisher: Published<[String: ChatRoomLoadingStatus]>.Publisher {
+        $chatLoadingStatusDictionary
+    }
+    
     var chatMaxMessages: [String : Int] = [:]
     var chatLoadedMessages: [String : Int] = [:]
-    private var chatsLoading: [String] = []
     private let preLoadChatsCount = 5
     private var isConnectedToTheInternet = true
     private var onConnectionToTheInternetRestoredTasks = [() -> Void]()
@@ -316,7 +319,7 @@ extension AdamantChatsProvider {
         readedLastHeight = nil
         roomsMaxCount = nil
         roomsLoadedCount = nil
-        isChatLoaded.removeAll()
+        chatLoadingStatusDictionary.removeAll()
         chatMaxMessages.removeAll()
         chatLoadedMessages.removeAll()
         
@@ -399,7 +402,7 @@ extension AdamantChatsProvider {
         array.prefix(preLoadChatsCount).forEach { transaction in
             let recipientAddress = transaction.recipientId == address ? transaction.senderId : transaction.recipientId
             Task {
-                let isChatLoading = await isChatLoading(with: address)
+                let isChatLoading = isChatLoading(with: address)
                 guard !isChatLoading else { return }
                 await getChatMessages(with: recipientAddress, offset: nil)
             }
@@ -428,8 +431,8 @@ extension AdamantChatsProvider {
         
         // MARK: 3. Get transactions
         
-        if !isChatLoaded.keys.contains(addressRecipient) {
-            chatsLoading.append(addressRecipient)
+        if getChatStatus(for: addressRecipient) == .none {
+            setChatStatus(for: addressRecipient, status: .loading)
         }
         
         let chatroom = try? await apiGetChatMessages(
@@ -499,15 +502,11 @@ extension AdamantChatsProvider {
         messageCount: Int,
         maxCount: Int?
     ) {
-        isChatLoaded[addressRecipient] = true
+        setChatStatus(for: addressRecipient, status: .loaded)
         chatMaxMessages[addressRecipient] = maxCount
         
         let loadedCount = chatLoadedMessages[addressRecipient] ?? 0
         chatLoadedMessages[addressRecipient] = loadedCount + messageCount
-        
-        if let index = chatsLoading.firstIndex(of: addressRecipient) {
-            chatsLoading.remove(at: index)
-        }
     }
     
     func apiGetChatMessages(
@@ -670,11 +669,19 @@ extension AdamantChatsProvider {
     }
     
     func isChatLoading(with addressRecipient: String) -> Bool {
-        return chatsLoading.contains(addressRecipient)
+        chatLoadingStatusDictionary[addressRecipient] == .loading
     }
     
     func isChatLoaded(with addressRecipient: String) -> Bool {
-        return isChatLoaded[addressRecipient] ?? false
+        chatLoadingStatusDictionary[addressRecipient] == .loaded
+    }
+    
+    func getChatStatus(for recipient: String) -> ChatRoomLoadingStatus {
+        chatLoadingStatusDictionary[recipient] ?? .none
+    }
+    
+    func setChatStatus(for recipient: String, status: ChatRoomLoadingStatus) {
+        chatLoadingStatusDictionary[recipient] = status
     }
 }
 
@@ -1429,7 +1436,7 @@ extension AdamantChatsProvider {
     }
     
     /// - New unread messagess ids
-    private func process(
+    @discardableResult private func process(
         messageTransactions: [Transaction],
         senderId: String,
         privateKey: String

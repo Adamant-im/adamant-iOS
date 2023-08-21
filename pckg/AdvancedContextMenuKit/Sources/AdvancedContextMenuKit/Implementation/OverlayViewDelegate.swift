@@ -9,4 +9,5 @@ import Foundation
 
 protocol OverlayViewDelegate: AnyObject {
     func didDissmis()
+    func didAppear()
 }

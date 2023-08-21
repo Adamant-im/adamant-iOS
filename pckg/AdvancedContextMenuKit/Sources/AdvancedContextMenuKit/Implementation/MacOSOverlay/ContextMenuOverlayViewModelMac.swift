@@ -17,6 +17,7 @@ final class ContextMenuOverlayViewModelMac: ObservableObject {
     let upperContentSize: CGSize
     var locationOnScreen: CGPoint
     var contentLocation: CGPoint
+    let animationDuration: TimeInterval
     
     @Published var additionalMenuVisible = false
     
@@ -42,6 +43,7 @@ final class ContextMenuOverlayViewModelMac: ObservableObject {
         upperContentSize: CGSize,
         locationOnScreen: CGPoint,
         contentLocation: CGPoint,
+        animationDuration: TimeInterval,
         delegate: OverlayViewDelegate?
     ) {
         self.contentView = contentView
@@ -52,6 +54,7 @@ final class ContextMenuOverlayViewModelMac: ObservableObject {
         self.locationOnScreen = locationOnScreen
         self.delegate = delegate
         self.contentLocation = contentLocation
+        self.animationDuration = animationDuration
         
         menuLocation = calculateMenuLocation()
         upperContentViewLocation = calculateUpperContentViewLocation()

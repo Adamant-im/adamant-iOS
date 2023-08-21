@@ -33,6 +33,7 @@ public final class AdvancedContextMenuManager: NSObject {
     private weak var delegate: AdvancedContextMenuManagerDelegate?
     private let maxContentHeight: CGFloat = 500
     private let window = TransparentWindow(frame: UIScreen.main.bounds)
+    private var locationOnScreen: CGPoint = .zero
 
     var isiOSAppOnMac: Bool = {
 #if targetEnvironment(macCatalyst)
@@ -55,6 +56,12 @@ public final class AdvancedContextMenuManager: NSObject {
     // MARK: Public
     
     public func setup(for contentView: UIView ) {
+        guard !isiOSAppOnMac else {
+            let interaction = UIContextMenuInteraction(delegate: self)
+            contentView.addInteraction(interaction)
+            return
+        }
+        
         let longPressGesture = UILongPressGestureRecognizer(
             target: self,
             action: #selector(handleLongPress(_:))
@@ -68,7 +75,7 @@ public final class AdvancedContextMenuManager: NSObject {
         copyView: UIView?,
         with menu: AMenuSection
     ) {
-        let locationOnScreen = contentView.convert(CGPoint.zero, to: nil)
+        locationOnScreen = contentView.convert(CGPoint.zero, to: nil)
                 
         self.contentView = contentView
         
@@ -103,12 +110,6 @@ public final class AdvancedContextMenuManager: NSObject {
             contentViewSize: contentView.frame.size,
             menu: menuVC
         )
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + animationInDuration) {
-            let newLocationOnScreen = contentView.convert(CGPoint.zero, to: nil)
-            guard newLocationOnScreen != locationOnScreen else { return }
-            self.viewModel?.update(locationOnScreen: newLocationOnScreen)
-        }
     }
     
     @MainActor
@@ -121,14 +122,19 @@ public final class AdvancedContextMenuManager: NSObject {
 // MARK: Private
 
 private extension AdvancedContextMenuManager {
-    @objc func handleLongPressMacOS(_ gesture: UILongPressGestureRecognizer) {
-        guard gesture.state == .began,
-              let contentView = gesture.view,
+    func presentMacOverlay(
+        _ interaction: UIContextMenuInteraction,
+        configurationForMenuAtLocation location: CGPoint
+    ) {
+        guard let contentView = interaction.view,
               let menu = delegate?.configureContextMenu()
         else { return }
         
         let contentLocation = contentView.convert(CGPoint.zero, to: nil)
-        let location = gesture.location(in: nil)
+        let location: CGPoint = .init(
+            x: contentLocation.x + location.x,
+            y: contentLocation.y + location.y
+        )
         let size = contentView.frame.size
         
         let copyView = delegate?.getContentView() ?? contentView.snapshotView(afterScreenUpdates: true)
@@ -147,17 +153,14 @@ private extension AdvancedContextMenuManager {
     }
     
     @objc func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
-        guard !isiOSAppOnMac else {
-            handleLongPressMacOS(gesture)
-            return
-        }
+        guard !isiOSAppOnMac else { return }
         
         guard gesture.state == .began,
               let contentView = gesture.view,
               let menu = delegate?.configureContextMenu()
         else { return }
             
-        let locationOnScreen = contentView.convert(CGPoint.zero, to: nil)
+        locationOnScreen = contentView.convert(CGPoint.zero, to: nil)
         
         self.contentView = contentView
         
@@ -190,15 +193,6 @@ private extension AdvancedContextMenuManager {
                 contentViewSize: size,
                 menu: menuVC
             )
-            
-            UIView.animate(withDuration: animationOutDuration) {
-                contentView.transform = .identity
-            } completion: { [weak self] _ in
-                guard let self = self else { return }
-                let newLocationOnScreen = contentView.convert(CGPoint.zero, to: nil)
-                guard newLocationOnScreen != locationOnScreen else { return }
-                self.viewModel?.update(locationOnScreen: newLocationOnScreen)
-            }
         }
     }
     
@@ -256,6 +250,7 @@ private extension AdvancedContextMenuManager {
             upperContentSize: upperViewSize,
             locationOnScreen: location,
             contentLocation: contentLocation,
+            animationDuration: animationOutDuration,
             delegate: self
         )
         
@@ -300,11 +295,30 @@ private extension AdvancedContextMenuManager {
 extension AdvancedContextMenuManager: OverlayViewDelegate {
     @MainActor func didDissmis() {
         contentView?.alpha = 1.0
-        /// Postpone window dismissal to the next iteration to allow the contentView to become visible
+        // Postpone window dismissal to the next iteration to allow the contentView to become visible
         Task {
             window.rootViewController = nil
             window.isHidden = true
         }
+    }
+    
+    @MainActor func didAppear() {
+        contentView?.transform = .identity
+        let newLocationOnScreen = contentView?.convert(CGPoint.zero, to: nil) ?? locationOnScreen
+        guard newLocationOnScreen != locationOnScreen else { return }
+        
+        locationOnScreen = newLocationOnScreen
+        viewModel?.update(locationOnScreen: newLocationOnScreen)
+    }
+}
+
+extension AdvancedContextMenuManager: UIContextMenuInteractionDelegate {
+    public func contextMenuInteraction(
+        _ interaction: UIContextMenuInteraction,
+        configurationForMenuAtLocation location: CGPoint
+    ) -> UIContextMenuConfiguration? {
+        presentMacOverlay(interaction, configurationForMenuAtLocation: location)
+        return nil
     }
 }
 

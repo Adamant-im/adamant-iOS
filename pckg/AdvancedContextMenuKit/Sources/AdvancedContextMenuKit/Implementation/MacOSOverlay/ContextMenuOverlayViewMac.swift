@@ -50,14 +50,16 @@ private extension ContextMenuOverlayViewMac {
         }
         .ignoresSafeArea()
         .onAppear {
-            withAnimation(.easeInOut(duration: animationDuration)) {
-                viewModel.additionalMenuVisible.toggle()
+            Task {
+                await animate(duration: viewModel.animationDuration) {
+                    viewModel.additionalMenuVisible.toggle()
+                }
+                viewModel.delegate?.didAppear()
             }
         }
     }
 
     func makeOverlayView() -> some View {
-        // TODO: CommonKit - expanded() (in all other cases)
         VStack(spacing: 10) {
             if viewModel.additionalMenuVisible {
                 makeMenuView()
@@ -65,9 +67,8 @@ private extension ContextMenuOverlayViewMac {
             }
             Spacer()
         }
-        .frame(width: .infinity, height: .infinity)
+        .fullScreen()
         .transition(.opacity)
-        .ignoresSafeArea()
     }
     
     func makeContentOverlayView() -> some View {
@@ -75,9 +76,8 @@ private extension ContextMenuOverlayViewMac {
             makeContentView()
             Spacer()
         }
-        .frame(width: .infinity, height: .infinity)
+        .fullScreen()
         .transition(.opacity)
-        .ignoresSafeArea()
     }
     
     func makeContentView() -> some View {
@@ -91,9 +91,8 @@ private extension ContextMenuOverlayViewMac {
                 .padding(.leading, viewModel.contentLocation.x)
             Spacer()
         }
-        .frame(width: .infinity, height: .infinity)
+        .fullScreen()
         .transition(.opacity)
-        .ignoresSafeArea()
     }
     
     func makeMenuView() -> some View {
@@ -108,9 +107,8 @@ private extension ContextMenuOverlayViewMac {
             }
             Spacer()
         }
-        .frame(width: .infinity, height: .infinity)
+        .fullScreen()
         .transition(.opacity)
-        .ignoresSafeArea()
     }
     
     func makeUpperOverlayView(upperContentView: some View) -> some View {
@@ -119,9 +117,8 @@ private extension ContextMenuOverlayViewMac {
                 .onTapGesture { }
             Spacer()
         }
-        .frame(width: .infinity, height: .infinity)
+        .fullScreen()
         .transition(.opacity)
-        .ignoresSafeArea()
     }
     
     func makeUpperContentView(upperContentView: some View) -> some View {
@@ -135,9 +132,8 @@ private extension ContextMenuOverlayViewMac {
                 .padding(.leading, viewModel.upperContentViewLocation.x)
             Spacer()
         }
-        .frame(width: .infinity, height: .infinity)
+        .fullScreen()
         .transition(.opacity)
-        .ignoresSafeArea()
     }
 }
 
