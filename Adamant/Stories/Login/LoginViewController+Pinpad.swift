@@ -43,21 +43,23 @@ extension LoginViewController {
             return
         }
         
-        localAuth.authorizeUser(reason: String.adamant.login.loginIntoPrevAccount, completion: { [weak self] result in
-            switch result {
-            case .success:
-                self?.loginIntoSavedAccount()
-                
-            case .fallback:
-                self?.loginWithPinpad()
-                
-            case .cancel:
-                break
-                
-            case .failed:
-                break
+        localAuth.authorizeUser(reason: .adamant.login.loginIntoPrevAccount) { result in
+            Task { @MainActor [weak self] in
+                switch result {
+                case .success:
+                    self?.loginIntoSavedAccount()
+                    
+                case .fallback:
+                    self?.loginWithPinpad()
+                    
+                case .cancel:
+                    break
+                    
+                case .failed:
+                    break
+                }
             }
-        })
+        }
     }
     
     @MainActor

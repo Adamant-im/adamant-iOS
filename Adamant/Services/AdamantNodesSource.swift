@@ -128,9 +128,11 @@ final class AdamantNodesSource: NodesSource {
     }
     
     private func saveNodes() {
-        guard nodes != savedNodes else { return }
-        securedStore.set(nodes, for: StoreKey.NodesSource.nodes)
-        savedNodes = securedStore.get(StoreKey.NodesSource.nodes) ?? []
+        $savedNodes.mutate {
+            guard nodes != $0 else { return }
+            securedStore.set(nodes, for: StoreKey.NodesSource.nodes)
+            $0 = securedStore.get(StoreKey.NodesSource.nodes) ?? []
+        }
     }
     
     private func loadNodes() {

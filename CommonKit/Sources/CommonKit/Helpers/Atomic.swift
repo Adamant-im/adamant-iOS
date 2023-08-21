@@ -19,11 +19,9 @@ import Foundation
 public final class Atomic<Value> {
     private var value: Value
     private let lock = NSLock()
-
-    public init(wrappedValue: Value) {
-        value = wrappedValue
-    }
-
+    
+    public var projectedValue: Atomic<Value> { self }
+    
     public var wrappedValue: Value {
         get {
             lock.lock()
@@ -35,6 +33,10 @@ public final class Atomic<Value> {
             defer { lock.unlock() }
             value = newValue
         }
+    }
+
+    public init(wrappedValue: Value) {
+        value = wrappedValue
     }
 
     /// Synchronises mutation to ensure the value doesn't get changed by another thread during this mutation.

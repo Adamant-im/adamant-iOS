@@ -59,8 +59,10 @@ final class AdamantIncreaseFeeService: IncreaseFeeService {
     }
     
     func setIncreaseFeeEnabled(for tokenUnicID: String, value: Bool) {
-        increaseFeeData[tokenUnicID] = value
-        securedStore.set(increaseFeeData, for: StoreKey.increaseFee.increaseFee)
+        $increaseFeeData.mutate {
+            $0[tokenUnicID] = value
+            securedStore.set($0, for: StoreKey.increaseFee.increaseFee)
+        }
     }
     
     private func getIncreaseFeeDictionary() -> [String: Bool] {

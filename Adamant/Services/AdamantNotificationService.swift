@@ -153,12 +153,23 @@ extension AdamantNotificationsService {
                     return
                 }
                 
-                AdamantNotificationsService.configureUIApplicationFor(mode: mode)
-                self?.securedStore.set(mode.toRaw(), for: StoreKey.notificationsService.notificationsMode)
+                Task { @MainActor in
+                    AdamantNotificationsService.configureUIApplicationFor(mode: mode)
+                }
+                
+                self?.securedStore.set(
+                    mode.toRaw(),
+                    for: StoreKey.notificationsService.notificationsMode
+                )
+                
                 self?.notificationsMode = mode
-                NotificationCenter.default.post(name: Notification.Name.AdamantNotificationService.notificationsModeChanged,
-                                                object: self,
-                                                userInfo: [AdamantUserInfoKey.NotificationsService.newNotificationsMode: mode])
+                
+                NotificationCenter.default.post(
+                    name: .AdamantNotificationService.notificationsModeChanged,
+                    object: self,
+                    userInfo: [AdamantUserInfoKey.NotificationsService.newNotificationsMode: mode]
+                )
+                
                 completion?(.success)
             }
         }
