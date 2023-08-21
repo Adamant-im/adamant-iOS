@@ -334,6 +334,10 @@ private extension ChatViewController {
         viewModel.$isNeedToAnimateScroll
             .sink { [weak self] in self?.animateScroll(isStarted: $0) }
             .store(in: &subscriptions)
+        
+        viewModel.updateChatRead
+            .sink { [weak self] in self?.checkIsChatWasRead() }
+            .store(in: &subscriptions)
     }
 }
 

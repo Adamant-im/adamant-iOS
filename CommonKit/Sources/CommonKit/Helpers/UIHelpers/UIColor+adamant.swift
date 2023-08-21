@@ -120,7 +120,7 @@ extension UIColor {
         /// Picked reaction background color
         public static var pickedReactionBackground: UIColor {
             let colorWhiteTheme  = UIColor(red: 0.88, green: 0.88, blue: 0.88, alpha: 1.0)
-            let colorDarkTheme   = UIColor(red: 0.298, green: 0.298, blue: 0.298, alpha: 1.0)
+            let colorDarkTheme   = UIColor(red: 0.278, green: 0.278, blue: 0.278, alpha: 1.0)
             return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
         }
         
@@ -230,7 +230,7 @@ extension UIColor {
         
         public static var contextMenuSelectColor: UIColor {
             let colorWhiteTheme  = UIColor.black.withAlphaComponent(0.10)
-            let colorDarkTheme   = UIColor.white.withAlphaComponent(0.13)
+            let colorDarkTheme   = UIColor(red: 0.214, green: 0.214, blue: 0.214, alpha: 1)
             return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
         }
         
@@ -243,6 +243,12 @@ extension UIColor {
         public static var contextMenuTextColor: UIColor {
             let colorWhiteTheme  = UIColor.black
             let colorDarkTheme   = UIColor.white
+            return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
+        }
+        
+        public static var contextMenuOverlayMacColor: UIColor {
+            let colorWhiteTheme  = UIColor.black.withAlphaComponent(0.3)
+            let colorDarkTheme   = UIColor.white.withAlphaComponent(0.3)
             return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
         }
         

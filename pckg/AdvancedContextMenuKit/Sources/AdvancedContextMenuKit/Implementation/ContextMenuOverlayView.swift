@@ -34,7 +34,7 @@ struct ContextMenuOverlayView: View {
     
     var body: some View {
         ZStack {
-            if viewModel.isContextMenuVisible {
+            if viewModel.additionalMenuVisible {
                 backgroundBlur
                     .zIndex(0)
                     .ignoresSafeArea()
@@ -46,15 +46,22 @@ struct ContextMenuOverlayView: View {
             }
             makeOverlayView()
                 .zIndex(1)
+            makeMenuOverlayView()
+                .zIndex(3)
             Spacer()
         }
         .ignoresSafeArea()
         .onTapGesture {
-            viewModel.dismiss()
+            Task {
+                await viewModel.dismiss()
+            }
         }
         .onAppear {
-            withAnimation(.easeInOut(duration: animationDuration)) {
-                viewModel.isContextMenuVisible.toggle()
+            Task {
+                await animate(duration: viewModel.animationDuration) {
+                    viewModel.additionalMenuVisible.toggle()
+                }
+                viewModel.delegate?.didAppear()
             }
         }
     }
@@ -66,14 +73,16 @@ private extension ContextMenuOverlayView {
             VStack(spacing: .zero) {
                 makeContentView()
                     .onTapGesture { }
-                makeMenuView()
-                    .onTapGesture { }
                 Spacer()
+                    .frame(
+                        height: viewModel.menuSize.height
+                        + minBottomOffset
+                        + minContentsSpace
+                    )
             }
         }
-        .frame(width: .infinity, height: .infinity)
+        .fullScreen()
         .transition(.opacity)
-        .ignoresSafeArea()
     }
     
     func makeContentView() -> some View {
@@ -84,16 +93,15 @@ private extension ContextMenuOverlayView {
                     height: viewModel.contentViewSize.height
                 )
                 .padding(.top,
-                         viewModel.isContextMenuVisible
+                         viewModel.additionalMenuVisible
                          ? viewModel.contentViewLocation.y
                          : viewModel.startOffsetForContentView
                 )
                 .padding(.leading, viewModel.contentViewLocation.x)
             Spacer()
         }
-        .frame(width: .infinity, height: .infinity)
+        .fullScreen()
         .transition(.opacity)
-        .ignoresSafeArea()
     }
     
     func makeMenuOverlayView() -> some View {
@@ -102,25 +110,27 @@ private extension ContextMenuOverlayView {
                 .onTapGesture { }
             Spacer()
         }
-        .frame(width: .infinity, height: .infinity)
+        .fullScreen()
         .transition(.opacity)
-        .ignoresSafeArea()
     }
     
     func makeMenuView() -> some View {
         HStack {
-            if viewModel.isContextMenuVisible,
+            if viewModel.additionalMenuVisible,
                let menuVC = viewModel.menu {
                 UIViewControllerWrapper(menuVC)
                     .frame(width: menuVC.menuSize.width, height: menuVC.menuSize.height)
                     .cornerRadius(15)
-                    .padding(.top, viewModel.menuLocation.y)
                     .padding(.leading, viewModel.menuLocation.x)
                     .transition(menuTransition)
                 Spacer()
             }
         }
-        .frame(width: .infinity, height: .infinity)
+        .frame(
+            width: .infinity,
+            height: viewModel.menuSize.height
+        )
+        .offset(y: viewModel.menuLocation.y)
         .ignoresSafeArea()
     }
     
@@ -130,9 +140,8 @@ private extension ContextMenuOverlayView {
                 .onTapGesture { }
             Spacer()
         }
-        .frame(width: .infinity, height: .infinity)
+        .fullScreen()
         .transition(.opacity)
-        .ignoresSafeArea()
     }
     
     func makeUpperContentView(upperContentView: some View) -> some View {
@@ -143,17 +152,17 @@ private extension ContextMenuOverlayView {
                     height: viewModel.upperContentSize.height
                 )
                 .padding(.top,
-                         viewModel.isContextMenuVisible
+                         viewModel.additionalMenuVisible
                          ? viewModel.upperContentViewLocation.y
                          : viewModel.startOffsetForUpperContentView
                 )
                 .padding(.leading, viewModel.upperContentViewLocation.x)
             Spacer()
         }
-        .frame(width: .infinity, height: .infinity)
-        .ignoresSafeArea()
+        .fullScreen()
     }
     
 }
 
-private let animationDuration: TimeInterval = 0.2
+private let minBottomOffset: CGFloat = 50
+private let minContentsSpace: CGFloat = 15

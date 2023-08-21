@@ -16,43 +16,83 @@ struct ContextMenuOverlayViewMac: View {
     }
     
     var body: some View {
-        ZStack {
-            Button(action: {
-                viewModel.dismiss()
-            }, label: {
-                Color.clear
-            })
-            
-            if viewModel.isContextMenuVisible {
-                if let upperContentView = viewModel.upperContentView {
-                    makeUpperOverlayView(upperContentView: upperContentView)
-                }
-            }
-            makeOverlayView()
-            Spacer()
-        }
-        .ignoresSafeArea()
-        .onAppear {
-            withAnimation(.easeInOut(duration: animationDuration)) {
-                viewModel.isContextMenuVisible.toggle()
-            }
+        GeometryReader { geometry in
+            makeStackView(geometry: geometry)
         }
     }
 }
 
 private extension ContextMenuOverlayViewMac {
+    func makeStackView(geometry: GeometryProxy) -> some View {
+        ZStack {
+            viewModel.updateLocations(geometry: geometry)
+            
+            Button(action: {
+                Task {
+                    await viewModel.dismiss()
+                }
+            }, label: {
+                if viewModel.additionalMenuVisible {
+                    Color.init(uiColor: .adamant.contextMenuOverlayMacColor)
+                } else {
+                    Color.clear
+                }
+            })
+            
+            makeContentOverlayView()
+            
+            if viewModel.additionalMenuVisible {
+                if let upperContentView = viewModel.upperContentView {
+                    makeUpperOverlayView(upperContentView: upperContentView)
+                }
+            }
+            makeOverlayView()
+        }
+        .ignoresSafeArea()
+        .onAppear {
+            Task {
+                await animate(duration: viewModel.animationDuration) {
+                    viewModel.additionalMenuVisible.toggle()
+                }
+                viewModel.delegate?.didAppear()
+            }
+        }
+    }
+
     func makeOverlayView() -> some View {
-        // TODO: CommonKit - expanded() (in all other cases)
         VStack(spacing: 10) {
-            if viewModel.isContextMenuVisible {
+            if viewModel.additionalMenuVisible {
                 makeMenuView()
                     .onTapGesture { }
             }
             Spacer()
         }
-        .frame(width: .infinity, height: .infinity)
+        .fullScreen()
         .transition(.opacity)
-        .ignoresSafeArea()
+    }
+    
+    func makeContentOverlayView() -> some View {
+        VStack(spacing: 10) {
+            makeContentView()
+            Spacer()
+        }
+        .fullScreen()
+        .transition(.opacity)
+    }
+    
+    func makeContentView() -> some View {
+        HStack {
+            UIViewWrapper(view: viewModel.contentView)
+                .frame(
+                    width: viewModel.contentViewSize.width,
+                    height: viewModel.contentViewSize.height
+                )
+                .padding(.top, viewModel.contentLocation.y)
+                .padding(.leading, viewModel.contentLocation.x)
+            Spacer()
+        }
+        .fullScreen()
+        .transition(.opacity)
     }
     
     func makeMenuView() -> some View {
@@ -67,9 +107,8 @@ private extension ContextMenuOverlayViewMac {
             }
             Spacer()
         }
-        .frame(width: .infinity, height: .infinity)
+        .fullScreen()
         .transition(.opacity)
-        .ignoresSafeArea()
     }
     
     func makeUpperOverlayView(upperContentView: some View) -> some View {
@@ -78,9 +117,8 @@ private extension ContextMenuOverlayViewMac {
                 .onTapGesture { }
             Spacer()
         }
-        .frame(width: .infinity, height: .infinity)
+        .fullScreen()
         .transition(.opacity)
-        .ignoresSafeArea()
     }
     
     func makeUpperContentView(upperContentView: some View) -> some View {
@@ -94,9 +132,8 @@ private extension ContextMenuOverlayViewMac {
                 .padding(.leading, viewModel.upperContentViewLocation.x)
             Spacer()
         }
-        .frame(width: .infinity, height: .infinity)
+        .fullScreen()
         .transition(.opacity)
-        .ignoresSafeArea()
     }
 }
 

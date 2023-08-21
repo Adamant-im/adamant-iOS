@@ -11,11 +11,15 @@ import CommonKit
 
 final class ContextMenuOverlayViewModelMac: ObservableObject {
     let menu: AMenuViewController?
+    let contentView: UIView
+    let contentViewSize: CGSize
     let upperContentView: AnyView?
     let upperContentSize: CGSize
     var locationOnScreen: CGPoint
+    var contentLocation: CGPoint
+    let animationDuration: TimeInterval
     
-    @Published var isContextMenuVisible = false
+    @Published var additionalMenuVisible = false
     
     var menuSize: CGSize {
         menu?.menuSize ?? .init(width: 250, height: 300)
@@ -27,34 +31,48 @@ final class ContextMenuOverlayViewModelMac: ObservableObject {
     
     weak var delegate: OverlayViewDelegate?
     
+    private var screenSize: CGSize = UIScreen.main.bounds.size
+
     // MARK: Init
     
     init(
+        contentView: UIView,
+        contentViewSize: CGSize,
         menu: AMenuViewController?,
         upperContentView: AnyView? = nil,
         upperContentSize: CGSize,
         locationOnScreen: CGPoint,
+        contentLocation: CGPoint,
+        animationDuration: TimeInterval,
         delegate: OverlayViewDelegate?
     ) {
+        self.contentView = contentView
+        self.contentViewSize = contentViewSize
         self.menu = menu
         self.upperContentView = upperContentView
         self.upperContentSize = upperContentSize
         self.locationOnScreen = locationOnScreen
-        self.isContextMenuVisible = isContextMenuVisible
         self.delegate = delegate
+        self.contentLocation = contentLocation
+        self.animationDuration = animationDuration
         
         menuLocation = calculateMenuLocation()
         upperContentViewLocation = calculateUpperContentViewLocation()
     }
     
-    func dismiss() {
-        Task { @MainActor in
-            await animate(duration: animationDuration) {
-                self.isContextMenuVisible.toggle()
-            }
-            
-            delegate?.didDissmis()
+    @MainActor func dismiss() async {
+        await animate(duration: animationDuration) {
+            self.additionalMenuVisible.toggle()
         }
+        
+        delegate?.didDissmis()
+    }
+    
+    func updateLocations(geometry: GeometryProxy) -> EmptyView {
+        screenSize = geometry.size
+        menuLocation = calculateMenuLocation()
+        upperContentViewLocation = calculateUpperContentViewLocation()
+        return EmptyView()
     }
 }
 
@@ -80,7 +98,7 @@ private extension ContextMenuOverlayViewModelMac {
             - minContentsSpace
         }
         
-        let location = UIScreen.main.bounds.height - menuSize.height - minBottomOffset
+        let location = screenSize.height - menuSize.height - minBottomOffset
         
         return location
         - upperContentSize.height
@@ -92,7 +110,7 @@ private extension ContextMenuOverlayViewModelMac {
             return locationOnScreen.y
         }
         
-        return UIScreen.main.bounds.height - menuSize.height - minBottomOffset
+        return screenSize.height - menuSize.height - minBottomOffset
     }
     
     func calculateLeadingOffset(for width: CGFloat) -> CGFloat {
@@ -103,22 +121,12 @@ private extension ContextMenuOverlayViewModelMac {
         return locationOnScreen.x - width
     }
     
-    func updateLocationIfNeeded() {
-        if isNeedToMoveFromBottom() {
-            locationOnScreen.y = UIScreen.main.bounds.height - menuSize.height - minBottomOffset
-        }
-        
-        if isNeedToMoveFromTrailing() {
-            locationOnScreen.x = UIScreen.main.bounds.width - minBottomOffset - upperContentSize.width
-        }
-    }
-    
     func isNeedToMoveFromTrailing() -> Bool {
-        UIScreen.main.bounds.width < locationOnScreen.x + upperContentSize.width + minBottomOffset
+        screenSize.width < locationOnScreen.x + upperContentSize.width + minBottomOffset
     }
 
     func isNeedToMoveFromBottom() -> Bool {
-        UIScreen.main.bounds.height < locationOnScreen.y + menuSize.height + minBottomOffset
+        screenSize.height < locationOnScreen.y + menuSize.height + minBottomOffset
     }
 }
 

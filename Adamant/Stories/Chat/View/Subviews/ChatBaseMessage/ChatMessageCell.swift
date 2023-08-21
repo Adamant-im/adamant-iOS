@@ -58,7 +58,7 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         label.textAlignment = .center
         label.layer.masksToBounds = true
         label.backgroundColor = .adamant.pickedReactionBackground
-        label.layer.cornerRadius = 15
+        label.layer.cornerRadius = opponentReactionSize.height / 2
         label.frame.size = opponentReactionSize
         
         let tapGesture = UITapGestureRecognizer(
@@ -134,9 +134,10 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
     var subscription: AnyCancellable?
     
     private var containerView: UIView = UIView()
-    private let ownReactionSize = CGSize(width: 40, height: 30)
-    private let opponentReactionSize = CGSize(width: 55, height: 30)
+    private let ownReactionSize = CGSize(width: 40, height: 27)
+    private let opponentReactionSize = CGSize(width: 55, height: 27)
     private let opponentReactionImageSize = CGSize(width: 10, height: 12)
+    private var layoutAttributes: MessagesCollectionViewLayoutAttributes?
     
     // MARK: - Methods
     
@@ -181,8 +182,10 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
     
     func updateOwnReaction() {
         ownReactionLabel.text = getReaction(for: model.address)
-        ownReactionLabel.transform = .identity
-        ownReactionLabel.alpha = 1.0
+        ownReactionLabel.backgroundColor = model.backgroundColor.uiColor.mixin(
+            infusion: .lightGray,
+            alpha: 0.15
+        )
     }
     
     func updateOpponentReaction() {
@@ -211,12 +214,24 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         }
         
         opponentReactionLabel.attributedText = fullString
+        opponentReactionLabel.backgroundColor = model.backgroundColor.uiColor.mixin(
+            infusion: .lightGray,
+            alpha: 0.15
+        )
     }
     
     func getReaction(for address: String) -> String? {
         model.reactions?.first(
             where: { $0.sender == address }
         )?.reaction
+    }
+    
+    override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
+        super.apply(layoutAttributes)
+        guard let attributes = layoutAttributes as? MessagesCollectionViewLayoutAttributes
+        else { return }
+        
+        self.layoutAttributes = attributes
     }
     
     /// Positions the message bubble's top label.
@@ -419,16 +434,62 @@ extension ChatMessageCell {
     }
     
     @objc func tapReactionAction() {
-        contextMenu.presentMenu(for: containerView, with: makeContextMenu())
+        contextMenu.presentMenu(
+            for: containerView,
+            copyView: copy(
+                with: model,
+                attributes: layoutAttributes,
+                urlAttributes: messageLabel.urlAttributes,
+                enabledDetectors: messageLabel.enabledDetectors
+            )?.containerView,
+            with: makeContextMenu()
+        )
     }
 }
 
 extension ChatMessageCell: ChatMenuManagerDelegate {
     func didReact(_ emoji: String) {
-        contextMenu.dismiss { [weak self] in
-            guard let self = self else { return }
+        Task {
+            await contextMenu.dismiss()
             self.actionHandler(.react(id: self.model.id, emoji: emoji))
         }
+    }
+    
+    func getContentView() -> UIView? {
+        copy(
+            with: model,
+            attributes: layoutAttributes,
+            urlAttributes: messageLabel.urlAttributes,
+            enabledDetectors: messageLabel.enabledDetectors
+        )?.containerView
+    }
+}
+
+extension ChatMessageCell {
+    func copy(
+        with model: Model,
+        attributes: MessagesCollectionViewLayoutAttributes?,
+        urlAttributes: [NSAttributedString.Key : Any],
+        enabledDetectors: [DetectorType]
+    ) -> ChatMessageCell? {
+        guard let attributes = attributes else { return nil }
+        
+        let cell = ChatMessageCell(frame: frame)
+        cell.apply(attributes)
+        
+        cell.messageContainerView.backgroundColor = model.backgroundColor.uiColor
+        cell.messageLabel.configure {
+            cell.messageLabel.enabledDetectors = enabledDetectors
+            cell.messageLabel.setAttributes(urlAttributes, detector: .url)
+            cell.messageLabel.attributedText = model.text
+        }
+        cell.messageContainerView.style = .bubbleTail(
+            model.isFromCurrentSender
+                ? .bottomRight
+                : .bottomLeft,
+            .curved
+        )
+        return cell
     }
 }
 

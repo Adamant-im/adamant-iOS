@@ -15,14 +15,12 @@ final class ContextMenuOverlayViewModel: ObservableObject {
     let menu: AMenuViewController?
     let upperContentView: AnyView?
     let upperContentSize: CGSize
+    let animationDuration: TimeInterval
     
     var upperContentViewLocation: CGPoint = .zero
     var contentViewLocation: CGPoint = .zero
     var menuLocation: CGPoint = .zero
-        
-    var startOffsetForContentView: CGFloat {
-        locationOnScreen.y
-    }
+    var startOffsetForContentView: CGFloat = .zero
     
     var startOffsetForUpperContentView: CGFloat {
         locationOnScreen.y - (upperContentSize.height + minContentsSpace)
@@ -34,7 +32,7 @@ final class ContextMenuOverlayViewModel: ObservableObject {
     
     weak var delegate: OverlayViewDelegate?
     
-    @Published var isContextMenuVisible = false
+    @Published var additionalMenuVisible = false
     @Published var shouldScroll: Bool = false
     
     init(
@@ -43,7 +41,8 @@ final class ContextMenuOverlayViewModel: ObservableObject {
         locationOnScreen: CGPoint,
         menu: AMenuViewController?,
         upperContentView: AnyView?,
-        upperContentSize: CGSize
+        upperContentSize: CGSize,
+        animationDuration: TimeInterval
     ) {
         self.contentView = contentView
         self.contentViewSize = contentViewSize
@@ -51,21 +50,25 @@ final class ContextMenuOverlayViewModel: ObservableObject {
         self.menu = menu
         self.upperContentView = upperContentView
         self.upperContentSize = upperContentSize
+        self.animationDuration = animationDuration
         
+        startOffsetForContentView = locationOnScreen.y
         contentViewLocation = calculateContentViewLocation()
         menuLocation = calculateMenuLocation()
         upperContentViewLocation = calculateUpperContentViewLocation()
         shouldScroll = shoudScroll()
     }
     
-    func dismiss() {
-        Task { @MainActor in
-            await animate(duration: animationDuration) {
-                self.isContextMenuVisible.toggle()
-            }
-            
-            delegate?.didDissmis()
+    @MainActor func dismiss() async {
+        await animate(duration: animationDuration) {
+            self.additionalMenuVisible.toggle()
         }
+        
+        delegate?.didDissmis()
+    }
+    
+    func update(locationOnScreen: CGPoint) {
+        startOffsetForContentView = locationOnScreen.y
     }
 }
 
@@ -91,14 +94,18 @@ private extension ContextMenuOverlayViewModel {
             x: isNeedToMoveFromTrailing()
             ? calculateLeadingOffset(for: menuSize.width)
             : locationOnScreen.x,
-            y: minContentsSpace
+            y: calculateMenuTopOffset()
         )
     }
     
     func calculateMenuTopOffset() -> CGFloat {
-        calculateOffsetForContentView()
+        let offset = calculateOffsetForContentView()
         + contentViewSize.height
         + minContentsSpace
+        
+        return offset > UIScreen.main.bounds.height
+        ? UIScreen.main.bounds.height - menuSize.height - minBottomOffset
+        : offset
     }
     
     func calculateLeadingOffset(for width: CGFloat) -> CGFloat {
@@ -106,7 +113,15 @@ private extension ContextMenuOverlayViewModel {
     }
     
     func isNeedToMoveFromTrailing() -> Bool {
-        return UIScreen.main.bounds.width < locationOnScreen.x + menuSize.width + minBottomOffset
+        let maxSize = menuSize.width > upperContentSize.width
+        ? menuSize
+        : upperContentSize
+        
+        guard calculateLeadingOffset(for: maxSize.width) > .zero else { return false }
+        
+        let sum = locationOnScreen.x + maxSize.width + minBottomOffset
+        
+        return UIScreen.main.bounds.width < sum
     }
     
     func calculateOffsetForUpperContentView() -> CGFloat {
@@ -171,7 +186,6 @@ private extension ContextMenuOverlayViewModel {
     
 }
 
-private let animationDuration: TimeInterval = 0.2
 private let estimateMenuRowHeight: CGFloat = 50
 private let minBottomOffset: CGFloat = 50
 private let minContentsSpace: CGFloat = 15

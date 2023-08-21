@@ -88,12 +88,43 @@ final class AMenuViewController: UIViewController {
             action: #selector(userTapped(_:))
         )
         view.addGestureRecognizer(tapGestureRecognizer)
+        
+        let hoverGestureRecognizer = UIHoverGestureRecognizer(
+            target: self,
+            action: #selector(self.hoverGesture(_:))
+        )
+        self.view.addGestureRecognizer(hoverGestureRecognizer)
     }
 }
 
 // MARK: - Private
 
 private extension AMenuViewController {
+    @objc private func hoverGesture(_ gestureRecognizer: UIHoverGestureRecognizer) {
+        let touchLocation = gestureRecognizer.location(in: self.view)
+        let indexPath = self.indexPath(forRowAtPoint: touchLocation)
+        
+        switch gestureRecognizer.state {
+        case .began:
+            guard let indexPath = indexPath else {
+                return
+            }
+            
+            selectRow(at: indexPath)
+        case .changed:
+            guard !done else {
+                selectRow(at: nil)
+                return
+            }
+            
+            selectRow(at: indexPath)
+        case .ended:
+            selectRow(at: nil)
+        default:
+            selectRow(at: nil)
+        }
+    }
+    
     @objc func userTapped(_ gestureRecognizer: UIPanGestureRecognizer) {
         let touchLocation = gestureRecognizer.location(in: view)
 
