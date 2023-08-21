@@ -880,12 +880,15 @@ extension ChatListViewController {
                     height: 20
                 )
                 
+                let extraSpace = richMessage.isOutgoing ? "  " : ""
                 let imageString = NSAttributedString(attachment: replyImageAttachment)
                 
-                let markDownText = markdownParser.parse("  \(text)").resolveLinkColor()
+                let markDownText = markdownParser.parse("\(extraSpace)\(text)").resolveLinkColor()
                 
                 let fullString = NSMutableAttributedString(string: prefix)
-                fullString.append(imageString)
+                if richMessage.isOutgoing {
+                    fullString.append(imageString)
+                }
                 fullString.append(markDownText)
                 
                 return fullString
