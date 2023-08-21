@@ -65,6 +65,7 @@ final class ChatViewModel: NSObject {
     let didTapAdmChat = ObservableSender<(Chatroom, String?)>()
     let didTapAdmSend = ObservableSender<AdamantAddress>()
     let closeScreen = ObservableSender<Void>()
+    let updateChatRead = ObservableSender<Void>()
     
     @ObservableValue private(set) var isHeaderLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
@@ -601,6 +602,12 @@ private extension ChatViewModel {
                 resetLoadingProperty: resetLoadingProperty,
                 expirationTimestamp: expirationTimestamp
             )
+            
+            // The 'makeMessages' method doesn't include reactions.
+            // If the message count is different from the number of transactions, update the chat read status if necessary.
+            if messages.count != chatTransactions.count {
+                updateChatRead.send()
+            }
         }
     }
     
