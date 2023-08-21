@@ -120,6 +120,14 @@ final class AdamantAddressBookService: AddressBookService {
         return addressBook[key]?.checkAndReplaceSystemWallets()
     }
     
+    @MainActor func getName(for partner: BaseAccount?) -> String? {
+        guard let partenerAddress = partner?.address else {
+            return nil
+        }
+        
+        return partner?.name?.checkAndReplaceSystemWallets() ?? getName(for: partenerAddress)
+    }
+    
     func set(name: String, for address: String) async {
         guard addressBook[address] == nil || addressBook[address] != name else {
             return
