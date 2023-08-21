@@ -551,7 +551,13 @@ extension LskWalletService {
     }
     
     func getLskAddress(byAdamandAddress address: String, completion: @escaping (ApiServiceResult<String?>) -> Void) {
-        apiService.get(key: LskWalletService.kvsAddress, sender: address, completion: completion)
+        Task {
+            await apiService.get(
+                key: LskWalletService.kvsAddress,
+                sender: address,
+                completion: completion
+            )
+        }
     }
     
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
@@ -587,13 +593,21 @@ extension LskWalletService {
             return
         }
         
-        apiService.store(key: LskWalletService.kvsAddress, value: lskAddress, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
-            switch result {
-            case .success:
-                completion(.success)
-                
-            case .failure(let error):
-                completion(.failure(error: .apiError(error)))
+        Task {
+            await apiService.store(
+                key: LskWalletService.kvsAddress,
+                value: lskAddress,
+                type: .keyValue,
+                sender: adamant.address,
+                keypair: keypair
+            ) { result in
+                switch result {
+                case .success:
+                    completion(.success)
+                    
+                case .failure(let error):
+                    completion(.failure(error: .apiError(error)))
+                }
             }
         }
     }

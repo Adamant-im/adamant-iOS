@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 import UserNotifications
 import CommonKit
+import Combine
 
 extension NotificationsMode {
     func toRaw() -> String {
@@ -25,7 +26,8 @@ extension NotificationsMode {
     }
 }
 
-class AdamantNotificationsService: NotificationsService {
+@MainActor
+final class AdamantNotificationsService: NotificationsService {
     // MARK: Dependencies
     private let securedStore: SecuredStore
     weak var accountService: AccountService?
@@ -36,57 +38,71 @@ class AdamantNotificationsService: NotificationsService {
     private(set) var notificationsSound: NotificationSound = .inputDefault
     private var isBackgroundSession = false
     private var backgroundNotifications = 0
+    private var subscriptions = Set<AnyCancellable>()
     
     private var preservedBadgeNumber: Int?
     
     // MARK: Lifecycle
-    init(securedStore: SecuredStore) {
+    nonisolated init(securedStore: SecuredStore) {
         self.securedStore = securedStore
         
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            UNUserNotificationCenter.current().removeAllDeliveredNotifications()
-            UIApplication.shared.applicationIconBadgeNumber = 0
+        Task { @MainActor in
+            NotificationCenter.default
+                .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] _ in
+                    UNUserNotificationCenter.current().removeAllDeliveredNotifications()
+                    UIApplication.shared.applicationIconBadgeNumber = 0
+                    
+                    if let securedStore = self?.securedStore,
+                        let raw: String = securedStore.get(StoreKey.notificationsService.notificationsMode),
+                        let mode = NotificationsMode(string: raw) {
+                        self?.setNotificationsMode(mode, completion: nil)
+                    } else {
+                        self?.setNotificationsMode(.disabled, completion: nil)
+                    }
+                    
+                    if let securedStore = self?.securedStore,
+                        let raw: String = securedStore.get(StoreKey.notificationsService.notificationsSound),
+                        let sound = NotificationSound(fileName: raw) {
+                        self?.setNotificationSound(sound)
+                    } else {
+                        self?.setNotificationsMode(.disabled, completion: nil)
+                    }
+                    
+                    self?.preservedBadgeNumber = nil
+                }
+                .store(in: &subscriptions)
             
-            if let securedStore = self?.securedStore,
-                let raw: String = securedStore.get(StoreKey.notificationsService.notificationsMode),
-                let mode = NotificationsMode(string: raw) {
-                self?.setNotificationsMode(mode, completion: nil)
-            } else {
-                self?.setNotificationsMode(.disabled, completion: nil)
-            }
+            NotificationCenter.default
+                .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] _ in
+                    self?.setNotificationsMode(.disabled, completion: nil)
+                    self?.setNotificationSound(.inputDefault)
+                    self?.securedStore.remove(StoreKey.notificationsService.notificationsMode)
+                    self?.securedStore.remove(StoreKey.notificationsService.notificationsSound)
+                    self?.preservedBadgeNumber = nil
+                }
+                .store(in: &subscriptions)
             
-            if let securedStore = self?.securedStore,
-                let raw: String = securedStore.get(StoreKey.notificationsService.notificationsSound),
-                let sound = NotificationSound(fileName: raw) {
-                self?.setNotificationSound(sound)
-            } else {
-                self?.setNotificationsMode(.disabled, completion: nil)
-            }
-            
-            self?.preservedBadgeNumber = nil
+            NotificationCenter.default
+                .publisher(for: .AdamantAccountService.stayInChanged, object: nil)
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] notification in
+                    guard
+                        let state = notification.userInfo?[AdamantUserInfoKey.AccountService.newStayInState] as? Bool,
+                        state
+                    else {
+                        self?.preservedBadgeNumber = nil
+                        self?.setBadge(number: nil, force: true)
+                        return
+                    }
+                    
+                    self?.setBadge(number: self?.preservedBadgeNumber, force: false)
+                }
+                .store(in: &subscriptions)
         }
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
-            self?.setNotificationsMode(.disabled, completion: nil)
-            self?.setNotificationSound(.inputDefault)
-            self?.securedStore.remove(StoreKey.notificationsService.notificationsMode)
-            self?.securedStore.remove(StoreKey.notificationsService.notificationsSound)
-            self?.preservedBadgeNumber = nil
-        }
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.stayInChanged, object: nil, queue: nil) { [weak self] notification in
-            guard let state = notification.userInfo?[AdamantUserInfoKey.AccountService.newStayInState] as? Bool, state else {
-                self?.preservedBadgeNumber = nil
-                self?.setBadge(number: nil, force: true)
-                return
-            }
-            
-            self?.setBadge(number: self?.preservedBadgeNumber, force: false)
-        }
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
     }
 }
 
@@ -168,23 +184,19 @@ extension AdamantNotificationsService {
     }
     
     private static func configureUIApplicationFor(mode: NotificationsMode) {
-        let callback = {
-            switch mode {
-            case .disabled:
-                UIApplication.shared.unregisterForRemoteNotifications()
-                UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplication.backgroundFetchIntervalNever)
-                
-            case .backgroundFetch:
-                UIApplication.shared.unregisterForRemoteNotifications()
-                UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplication.backgroundFetchIntervalMinimum)
-                
-            case .push:
-                UIApplication.shared.registerForRemoteNotifications()
-                UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplication.backgroundFetchIntervalNever)
-            }
+        switch mode {
+        case .disabled:
+            UIApplication.shared.unregisterForRemoteNotifications()
+            UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplication.backgroundFetchIntervalNever)
+            
+        case .backgroundFetch:
+            UIApplication.shared.unregisterForRemoteNotifications()
+            UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplication.backgroundFetchIntervalMinimum)
+            
+        case .push:
+            UIApplication.shared.registerForRemoteNotifications()
+            UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplication.backgroundFetchIntervalNever)
         }
-        
-        DispatchQueue.onMainSync(callback)
     }
 }
 

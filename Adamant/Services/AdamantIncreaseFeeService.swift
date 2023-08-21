@@ -18,8 +18,8 @@ final class AdamantIncreaseFeeService: IncreaseFeeService {
     
     // MARK: Proprieties
     
-    private var increaseFeeData: [String: Bool] = [:]
-    private var notificationsSet: Set<AnyCancellable> = []
+    @Atomic private var increaseFeeData: [String: Bool] = [:]
+    @Atomic private var notificationsSet: Set<AnyCancellable> = []
     
     // MARK: Lifecycle
     

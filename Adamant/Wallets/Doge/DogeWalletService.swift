@@ -401,13 +401,15 @@ extension DogeWalletService {
             return
         }
         
-        apiService.store(key: DogeWalletService.kvsAddress, value: dogeAddress, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
-            switch result {
-            case .success:
-                completion(.success)
-                
-            case .failure(let error):
-                completion(.failure(error: .apiError(error)))
+        Task {
+            await apiService.store(key: DogeWalletService.kvsAddress, value: dogeAddress, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
+                switch result {
+                case .success:
+                    completion(.success)
+                    
+                case .failure(let error):
+                    completion(.failure(error: .apiError(error)))
+                }
             }
         }
     }

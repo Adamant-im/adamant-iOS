@@ -49,8 +49,10 @@ extension Container {
         self.register(NotificationsService.self) { r in
             AdamantNotificationsService(securedStore: r.resolve(SecuredStore.self)!)
         }.initCompleted { (r, c) in    // Weak reference
-            guard let service = c as? AdamantNotificationsService else { return }
-            service.accountService = r.resolve(AccountService.self)
+            Task { @MainActor in
+                guard let service = c as? AdamantNotificationsService else { return }
+                service.accountService = r.resolve(AccountService.self)
+            }
         }.inObjectScope(.container)
         
         // MARK: VisibleWalletsService
@@ -99,8 +101,10 @@ extension Container {
         self.register(ApiService.self) { r in
             AdamantApiService(adamantCore: r.resolve(AdamantCore.self)!)
         }.initCompleted { (r, c) in    // Weak reference
-            guard let service = c as? AdamantApiService else { return }
-            service.nodesSource = r.resolve(NodesSource.self)
+            Task {
+                guard let service = c as? AdamantApiService else { return }
+                await service.setupWeakDeps(nodesSource: r.resolve(NodesSource.self)!)
+            }
         }.inObjectScope(.container)
         
         // MARK: HealthCheckService

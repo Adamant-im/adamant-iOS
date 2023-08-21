@@ -9,11 +9,13 @@
 import Foundation
 import Reachability
 import Network
+import CommonKit
 
 // MARK: - AdamantReachability wrapper
-class AdamantReachability: ReachabilityMonitor {
+final class AdamantReachability: ReachabilityMonitor {
     private let monitor = NWPathMonitor()
-    private(set) var connection = true
+    
+    @Atomic private(set) var connection = true
     
     func start() {
         monitor.pathUpdateHandler = { [weak self] _ in

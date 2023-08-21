@@ -21,7 +21,7 @@ public enum URLScheme: String, Codable {
     }
 }
 
-final public class Node: Equatable, Codable {
+final public class Node: Equatable {
     public struct Status: Equatable, Codable {
         public let ping: TimeInterval
         public let wsEnabled: Bool
@@ -51,10 +51,22 @@ final public class Node: Equatable, Codable {
             && lhs._connectionStatus == rhs._connectionStatus
     }
     
-    public init(scheme: URLScheme, host: String, port: Int?) {
+    public init(
+        scheme: URLScheme,
+        host: String,
+        port: Int? = nil,
+        wsPort: Int? = nil,
+        status: Status? = nil,
+        isEnabled: Bool = true,
+        connectionStatus: ConnectionStatus? = nil
+    ) {
         self.scheme = scheme
         self.host = host
         self.port = port
+        self.wsPort = wsPort
+        self.status = status
+        self.isEnabled = isEnabled
+        self._connectionStatus = connectionStatus
     }
     
     public init(url: URL) {
@@ -62,17 +74,17 @@ final public class Node: Equatable, Codable {
         self.scheme = URLScheme(rawValue: schemeRaw) ?? .https
         self.host = url.host ?? ""
         self.port = url.port
+        self.isEnabled = true
     }
     
-    public var scheme: URLScheme
-    public var host: String
-    public var port: Int?
-    public var wsPort: Int?
+    @Atomic public var scheme: URLScheme
+    @Atomic public var host: String
+    @Atomic public var port: Int?
+    @Atomic public var wsPort: Int?
+    @Atomic public var status: Status?
+    @Atomic public var isEnabled: Bool
     
-    public var status: Status?
-    public var isEnabled = true
-    
-    private var _connectionStatus: ConnectionStatus?
+    @Atomic private var _connectionStatus: ConnectionStatus?
     
     public var connectionStatus: ConnectionStatus? {
         get { isEnabled ? _connectionStatus : nil }
@@ -113,5 +125,50 @@ final public class Node: Equatable, Codable {
         }
         
         return components.url
+    }
+}
+
+extension Node: Encodable {
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        
+        try container.encode(scheme, forKey: .scheme)
+        try container.encode(host, forKey: .host)
+        try container.encode(port, forKey: .port)
+        try container.encode(wsPort, forKey: .wsPort)
+        try container.encode(status, forKey: .status)
+        try container.encode(isEnabled, forKey: .isEnabled)
+        try container.encode(_connectionStatus, forKey: ._connectionStatus)
+    }
+}
+
+extension Node: Decodable {
+    public convenience init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        self.init(
+            scheme: try container.decode(URLScheme.self, forKey: .scheme),
+            host: try container.decode(String.self, forKey: .host),
+            port: try? container.decode(Optional<Int>.self, forKey: .port),
+            wsPort: try? container.decode(Optional<Int>.self, forKey: .wsPort),
+            status: try? container.decode(Optional<Status>.self, forKey: .status),
+            isEnabled: try container.decode(Bool.self, forKey: .isEnabled),
+            connectionStatus: try? container.decode(
+                Optional<ConnectionStatus>.self,
+                forKey: ._connectionStatus
+            )
+        )
+    }
+}
+
+private extension Node {
+    enum CodingKeys: String, CodingKey {
+        case scheme
+        case host
+        case port
+        case wsPort
+        case status
+        case isEnabled
+        case _connectionStatus
     }
 }

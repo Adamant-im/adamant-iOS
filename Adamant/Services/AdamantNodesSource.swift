@@ -18,14 +18,14 @@ final class AdamantNodesSource: NodesSource {
     
     // MARK: - Properties
     
-    var nodes: [Node] = [] {
+    @Atomic private var _nodes: [Node] = [] {
         didSet {
             healthCheckService.nodes = nodes
             nodesUpdate()
         }
     }
     
-    var preferTheFastestNode = preferTheFastestNodeDefault {
+    @Atomic private var _preferTheFastestNode = preferTheFastestNodeDefault {
         didSet {
             savePreferTheFastestNode(preferTheFastestNode)
             
@@ -34,9 +34,19 @@ final class AdamantNodesSource: NodesSource {
         }
     }
     
+    var nodes: [Node] {
+        get { _nodes }
+        set { _nodes = newValue }
+    }
+    
+    var preferTheFastestNode: Bool {
+        get { _preferTheFastestNode }
+        set { _preferTheFastestNode = newValue }
+    }
+    
     private let defaultNodesGetter: () -> [Node]
-    private var timer: Timer?
-    private var savedNodes: [Node] = []
+    @Atomic private var timer: Timer?
+    @Atomic private var savedNodes: [Node] = []
     
     // MARK: - Ctor
     

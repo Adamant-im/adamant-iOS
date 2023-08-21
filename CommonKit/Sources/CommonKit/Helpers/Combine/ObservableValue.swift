@@ -10,7 +10,7 @@ import Combine
 
 /// `Published` changes its `wrappedValue` after calling `sink` or `assign`.
 /// But `ObservableValue` does it before.
-@propertyWrapper public  final class ObservableValue<Output>: Publisher {
+@propertyWrapper public final class ObservableValue<Output>: Publisher {
     public typealias Output = Output
     public typealias Failure = Never
     

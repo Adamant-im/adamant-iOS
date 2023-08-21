@@ -598,13 +598,15 @@ extension EthWalletService {
             return
         }
         
-        apiService.store(key: EthWalletService.kvsAddress, value: ethAddress, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
-            switch result {
-            case .success:
-                completion(.success)
-                
-            case .failure(let error):
-                completion(.failure(error: .apiError(error)))
+        Task {
+            await apiService.store(key: EthWalletService.kvsAddress, value: ethAddress, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
+                switch result {
+                case .success:
+                    completion(.success)
+                    
+                case .failure(let error):
+                    completion(.failure(error: .apiError(error)))
+                }
             }
         }
     }

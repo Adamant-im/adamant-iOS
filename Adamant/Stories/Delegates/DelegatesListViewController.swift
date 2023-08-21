@@ -137,30 +137,32 @@ final class DelegatesListViewController: KeyboardObservingViewController {
             return
         }
         
-        apiService.getDelegatesWithVotes(for: address, limit: activeDelegates) { (result) in
-            switch result {
-            case .success(let delegates):
-                let checkedNames = self.delegates.filter { $0.isChecked }.map { $0.delegate.username }
-                let checkedDelegates = delegates.map { CheckedDelegate(delegate: $0) }
-                for name in checkedNames {
-                    if let i = delegates.firstIndex(where: { $0.username == name }) {
-                        checkedDelegates[i].isChecked = true
+        Task {
+            await apiService.getDelegatesWithVotes(for: address, limit: activeDelegates) { (result) in
+                switch result {
+                case .success(let delegates):
+                    let checkedNames = self.delegates.filter { $0.isChecked }.map { $0.delegate.username }
+                    let checkedDelegates = delegates.map { CheckedDelegate(delegate: $0) }
+                    for name in checkedNames {
+                        if let i = delegates.firstIndex(where: { $0.username == name }) {
+                            checkedDelegates[i].isChecked = true
+                        }
                     }
+                    
+                    self.delegates = checkedDelegates
+                    
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                    }
+                case .failure(let error):
+                    self.dialogService.showRichError(error: error)
                 }
-                
-                self.delegates = checkedDelegates
                 
                 DispatchQueue.main.async {
-                    self.tableView.reloadData()
+                    refreshControl.endRefreshing()
+                    self.updateVotePanel()
+                    self.removeLoadingView()
                 }
-            case .failure(let error):
-                self.dialogService.showRichError(error: error)
-            }
-            
-            DispatchQueue.main.async {
-                refreshControl.endRefreshing()
-                self.updateVotePanel()
-                self.removeLoadingView()
             }
         }
     }
@@ -313,25 +315,33 @@ private extension DelegatesListViewController {
         
         dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
 
-        apiService.voteForDelegates(from: account.address, keypair: keypair, votes: votes) { result in
-            switch result {
-            case .success:
-                self.dialogService.showSuccess(withMessage: String.adamant.delegates.success)
+        Task {
+            await apiService.voteForDelegates(
+                from: account.address,
+                keypair: keypair,
+                votes: votes
+            ) { result in
+                Task { @MainActor [weak self] in
+                    self?.dialogService.dismissProgress()
+                    
+                    switch result {
+                    case .success:
+                        self?.dialogService.showSuccess(withMessage: String.adamant.delegates.success)
 
-                checkedDelegates.forEach {
-                    $1.isChecked = false
-                    $1.delegate.voted = !$1.delegate.voted
-                    $1.isUpdating = true
-                }
-                
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                    self.updateVotePanel()
-                    self.scheduleUpdate()
-                }
+                        checkedDelegates.forEach {
+                            $1.isChecked = false
+                            $1.delegate.voted = !$1.delegate.voted
+                            $1.isUpdating = true
+                        }
+                        
+                        self?.tableView.reloadData()
+                        self?.updateVotePanel()
+                        self?.scheduleUpdate()
 
-            case .failure(let error):
-                self.dialogService.showRichError(error: TransfersProviderError.serverError(error))
+                    case .failure(let error):
+                        self?.dialogService.showRichError(error: TransfersProviderError.serverError(error))
+                    }
+                }
             }
         }
     }

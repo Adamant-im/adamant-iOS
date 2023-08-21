@@ -68,6 +68,7 @@ extension DogeWalletService: RichMessageProvider {
         )
     }
     
+    @MainActor
     private func presentDetailTransactionVC(
         hash: String,
         senderId: String?,

@@ -9,13 +9,12 @@
 import UIKit
 import Alamofire
 import CommonKit
+import Combine
 
-final class AdamantApiService: ApiService {
+actor AdamantApiService: ApiService {
     // MARK: - Shared constants
     
-    struct ApiCommands {
-        private init() {}
-    }
+    enum ApiCommands {}
     
     enum InternalError: Error {
         case endpointBuildFailed
@@ -60,8 +59,11 @@ final class AdamantApiService: ApiService {
     
     // MARK: - Properties
     
-    private var _lastRequestTimeDelta: TimeInterval?
-    private var semaphore: DispatchSemaphore = DispatchSemaphore(value: 1)
+    @MainActor
+    var sendingMsgTaskId: UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier.invalid
+    
+    private(set) var lastRequestTimeDelta: TimeInterval?
+    private var subscriptions = Set<AnyCancellable>()
     
     private(set) var currentNodes: [Node] = [] {
         didSet {
@@ -70,23 +72,7 @@ final class AdamantApiService: ApiService {
         }
     }
     
-    private(set) var lastRequestTimeDelta: TimeInterval? {
-        get {
-            defer { semaphore.signal() }
-            semaphore.wait()
-            
-            return _lastRequestTimeDelta
-        }
-        set {
-            semaphore.wait()
-            _lastRequestTimeDelta = newValue
-            semaphore.signal()
-        }
-    }
-    
-    var sendingMsgTaskId: UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier.invalid
-    
-    let defaultResponseDispatchQueue = DispatchQueue(
+    private let defaultResponseDispatchQueue = DispatchQueue(
         label: "com.adamant.response-queue",
         qos: .userInteractive
     )
@@ -103,12 +89,12 @@ final class AdamantApiService: ApiService {
     init(adamantCore: AdamantCore) {
         self.adamantCore = adamantCore
         
-        NotificationCenter.default.addObserver(
-            forName: Notification.Name.NodesSource.nodesUpdate,
-            object: nil,
-            queue: nil
-        ) { [weak self] _ in
-            self?.updateCurrentNodes()
+        Task {
+            let subscription = NotificationCenter.default
+                .publisher(for: .NodesSource.nodesUpdate, object: nil)
+                .sink { _ in Task { [weak self] in await self?.updateCurrentNodes() } }
+            
+            await setupSubscription(subscription)
         }
     }
     
@@ -171,10 +157,10 @@ final class AdamantApiService: ApiService {
                 node.connectionStatus = .offline
                 needNodesUpdate = true
             },
-            completion: { [weak self] in
+            completion: { [weak nodesSource] in
                 completion($0)
                 guard needNodesUpdate else { return }
-                self?.nodesSource?.nodesUpdate()
+                nodesSource?.nodesUpdate()
             }
         )
         
@@ -365,11 +351,15 @@ final class AdamantApiService: ApiService {
             return .serverError(error: error)
         }
     }
+    
+    func setupWeakDeps(nodesSource: NodesSource) {
+        self.nodesSource = nodesSource
+    }
 }
 
 private extension AdamantApiService {
     /// On failure this method doesn't call completion, it just goes to next node. Completion called on success or on last node failure.
-    private func sendSafeRequest<Body: Encodable, Output: Decodable>(
+    func sendSafeRequest<Body: Encodable, Output: Decodable>(
         nodes: [Node],
         path: String,
         queryItems: [URLQueryItem]?,
@@ -411,7 +401,7 @@ private extension AdamantApiService {
         )
     }
     
-    private func makeSafeRequestCompletion<Body: Encodable, Output: Decodable>(
+    func makeSafeRequestCompletion<Body: Encodable, Output: Decodable>(
         nodes: [Node],
         path: String,
         queryItems: [URLQueryItem]?,
@@ -430,16 +420,18 @@ private extension AdamantApiService {
                 case .networkError:
                     var nodes = nodes
                     onFailure(nodes.removeFirst())
-                    self?.sendSafeRequest(
-                        nodes: nodes,
-                        path: path,
-                        queryItems: queryItems,
-                        method: method,
-                        body: body,
-                        waitsForConnectivity: waitsForConnectivity,
-                        onFailure: onFailure,
-                        completion: completion
-                    )
+                    Task { [weak self, nodes] in
+                        await self?.sendSafeRequest(
+                            nodes: nodes,
+                            path: path,
+                            queryItems: queryItems,
+                            method: method,
+                            body: body,
+                            waitsForConnectivity: waitsForConnectivity,
+                            onFailure: onFailure,
+                            completion: completion
+                        )
+                    }
                 case .accountNotFound, .internalError, .notLogged, .serverError, .requestCancelled, .commonError:
                     completion(result)
                 }
@@ -447,13 +439,11 @@ private extension AdamantApiService {
         }
     }
     
-    private func updateCurrentNodes() {
-        semaphore.wait()
+    func updateCurrentNodes() {
         currentNodes = nodesSource?.getAllowedNodes(needWS: false) ?? []
-        semaphore.signal()
     }
     
-    private func sendCurrentNodeUpdateNotification() {
+    func sendCurrentNodeUpdateNotification() {
         NotificationCenter.default.post(
             name: Notification.Name.ApiService.currentNodeUpdate,
             object: self,
@@ -461,9 +451,13 @@ private extension AdamantApiService {
         )
     }
     
-    private func buildUrl(node: Node, path: String, queryItems: [URLQueryItem]? = nil) throws -> URL {
+    func buildUrl(node: Node, path: String, queryItems: [URLQueryItem]? = nil) throws -> URL {
         guard let url = node.asURL() else { throw InternalError.endpointBuildFailed }
         return try buildUrl(url: url, path: path, queryItems: queryItems)
+    }
+    
+    func setupSubscription(_ subscription: AnyCancellable) {
+        subscriptions.insert(subscription)
     }
 }
 

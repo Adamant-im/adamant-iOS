@@ -38,7 +38,7 @@ actor AdamantRichTransactionStatusService: NSObject, RichTransactionStatusServic
 
         let id = transaction.transactionId
         
-        await setStatus(
+        setStatus(
             for: transaction,
             status: provider.statusWithFilters(
                 transaction: transaction,

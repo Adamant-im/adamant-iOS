@@ -74,7 +74,9 @@ class NodesListViewController: FormViewController {
     
     var apiService: ApiService! {
         didSet {
-            currentRestNode = apiService.currentNodes.first
+            Task {
+                currentRestNode = await apiService.currentNodes.first
+            }
         }
     }
     

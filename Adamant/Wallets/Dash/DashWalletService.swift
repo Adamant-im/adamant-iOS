@@ -432,13 +432,15 @@ extension DashWalletService {
             return
         }
 
-        apiService.store(key: DashWalletService.kvsAddress, value: dashAddress, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
-            switch result {
-            case .success:
-                completion(.success)
+        Task {
+            await apiService.store(key: DashWalletService.kvsAddress, value: dashAddress, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
+                switch result {
+                case .success:
+                    completion(.success)
 
-            case .failure(let error):
-                completion(.failure(error: .apiError(error)))
+                case .failure(let error):
+                    completion(.failure(error: .apiError(error)))
+                }
             }
         }
     }

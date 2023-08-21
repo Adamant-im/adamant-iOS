@@ -12,6 +12,7 @@ import PopupKit
 import SafariServices
 import CommonKit
 
+@MainActor
 final class AdamantDialogService: DialogService {
     // MARK: Dependencies
     private let router: Router
@@ -20,7 +21,7 @@ final class AdamantDialogService: DialogService {
     private weak var window: UIWindow?
     
     // Configure notifications
-    init(router: Router) {
+    nonisolated init(router: Router) {
         self.router = router
     }
     
@@ -34,10 +35,7 @@ final class AdamantDialogService: DialogService {
 extension AdamantDialogService {
     func present(_ viewController: UIViewController, animated: Bool, completion: (() -> Void)?) {
         viewController.modalPresentationStyle = .overFullScreen
-        
-        DispatchQueue.onMainAsync { [weak self] in
-            self?.getTopmostViewController()?.present(viewController, animated: animated, completion: completion)
-        }
+        getTopmostViewController()?.present(viewController, animated: animated, completion: completion)
     }
     
     func getTopmostViewController() -> UIViewController? {
@@ -79,33 +77,23 @@ extension AdamantDialogService {
 // MARK: - Indicators
 extension AdamantDialogService {
     func showProgress(withMessage message: String?, userInteractionEnable enabled: Bool) {
-        DispatchQueue.onMainAsync { [weak popupManager] in
-            popupManager?.showProgressAlert(message: message, userInteractionEnabled: enabled)
-        }
+        popupManager.showProgressAlert(message: message, userInteractionEnabled: enabled)
     }
     
     func dismissProgress() {
-        DispatchQueue.onMainAsync { [weak popupManager] in
-            popupManager?.dismissAlert()
-        }
+        popupManager.dismissAlert()
     }
     
     func showSuccess(withMessage message: String) {
-        DispatchQueue.onMainAsync { [weak popupManager] in
-            popupManager?.showSuccessAlert(message: message)
-        }
+        popupManager.showSuccessAlert(message: message)
     }
     
     func showWarning(withMessage message: String) {
-        DispatchQueue.onMainAsync { [weak popupManager] in
-            popupManager?.showWarningAlert(message: message)
-        }
+        popupManager.showWarningAlert(message: message)
     }
     
     func showError(withMessage message: String, supportEmail: Bool, error: Error? = nil) {
-        DispatchQueue.onMainAsync { [self] in
-            internalShowError(withMessage: message, supportEmail: supportEmail, error: error)
-        }
+        internalShowError(withMessage: message, supportEmail: supportEmail, error: error)
     }
     
     private func internalShowError(
@@ -167,21 +155,17 @@ extension AdamantDialogService {
     }
     
     func showNoConnectionNotification() {
-        DispatchQueue.onMainAsync { [weak popupManager] in
-            popupManager?.showNotification(
-                icon: .asset(named: "error"),
-                title: .adamant.alert.noInternetNotificationTitle,
-                description: .adamant.alert.noInternetNotificationBoby,
-                autoDismiss: false,
-                tapHandler: nil
-            )
-        }
+        popupManager.showNotification(
+            icon: .asset(named: "error"),
+            title: .adamant.alert.noInternetNotificationTitle,
+            description: .adamant.alert.noInternetNotificationBoby,
+            autoDismiss: false,
+            tapHandler: nil
+        )
     }
     
     func dissmisNoConnectionNotification() {
-        DispatchQueue.onMainAsync { [weak popupManager] in
-            popupManager?.dismissNotification()
-        }
+        popupManager.dismissNotification()
     }
     
     private func sendErrorEmail(errorDescription: String) {
@@ -211,21 +195,17 @@ extension AdamantDialogService {
 // MARK: - Notifications
 extension AdamantDialogService {
     func showNotification(title: String?, message: String?, image: UIImage?, tapHandler: (() -> Void)?) {
-        DispatchQueue.onMainAsync { [weak popupManager] in
-            popupManager?.showNotification(
-                icon: image,
-                title: title,
-                description: message,
-                autoDismiss: true,
-                tapHandler: tapHandler
-            )
-        }
+        popupManager.showNotification(
+            icon: image,
+            title: title,
+            description: message,
+            autoDismiss: true,
+            tapHandler: tapHandler
+        )
     }
     
     func dismissNotification() {
-        DispatchQueue.onMainAsync { [weak popupManager] in
-            popupManager?.dismissNotification()
-        }
+        popupManager.dismissNotification()
     }
 }
 
@@ -549,19 +529,15 @@ extension AdamantDialogService {
         )
         
         alert.addAction(UIAlertAction(title: String.adamant.alert.settings, style: .default) { _ in
-            DispatchQueue.main.async {
-                if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
-                    UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
-                }
+            if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
             }
         })
         
         alert.addAction(UIAlertAction(title: String.adamant.alert.cancel, style: .cancel, handler: nil))
         alert.modalPresentationStyle = .overFullScreen
         
-        DispatchQueue.onMainAsync { [weak self] in
-            self?.present(alert, animated: true, completion: nil)
-        }
+        present(alert, animated: true, completion: nil)
     }
 }
 

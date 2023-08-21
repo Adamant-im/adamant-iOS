@@ -1090,7 +1090,7 @@ extension AdamantChatsProvider {
         }
         
         // MARK: 2. Create
-        let signedTransaction = apiService.createSendTransaction(
+        let signedTransaction = await apiService.createSendTransaction(
             senderId: senderId,
             recipientId: recipientId,
             keypair: keypair,
