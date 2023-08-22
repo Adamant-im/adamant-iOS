@@ -20,6 +20,7 @@ extension ChatMenuManagerDelegate {
     func getContentView() -> UIView? { return nil }
 }
 
+@MainActor
 final class ChatMenuManager: NSObject, AdvancedContextMenuManagerDelegate {
     private let menu: AMenuSection
     var emojiService: EmojiService?

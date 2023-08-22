@@ -9,6 +9,7 @@ import SwiftUI
 import UIKit
 import CommonKit
 
+@MainActor
 public protocol AdvancedContextMenuManagerDelegate: AnyObject {
     func getUpperContentView() -> AnyView?
     func getContentView() -> UIView?
