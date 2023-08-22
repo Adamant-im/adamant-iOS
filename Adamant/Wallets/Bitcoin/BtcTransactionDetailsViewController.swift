@@ -74,6 +74,8 @@ class BtcTransactionDetailsViewController: TransactionDetailsViewControllerBase 
                 refreshControl.endRefreshing()
             } catch {
                 refreshControl.endRefreshing()
+                updateTransactionStatus()
+                
                 guard !silent else { return }
                 dialogService.showRichError(error: error)
             }
