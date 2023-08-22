@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21513" systemVersion="22C65" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21754" systemVersion="22E252" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="BaseAccount" representedClassName="BaseAccount" isAbstract="YES" syncable="YES">
         <attribute name="address" attributeType="String"/>
         <attribute name="avatar" optional="YES" attributeType="String"/>
@@ -57,8 +57,11 @@
     <entity name="MessageTransaction" representedClassName="MessageTransaction" parentEntity="ChatTransaction" syncable="YES">
         <attribute name="isMarkdown" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="message" attributeType="String"/>
+        <attribute name="reactionsData" optional="YES" attributeType="Transformable"/>
     </entity>
     <entity name="RichMessageTransaction" representedClassName="RichMessageTransaction" parentEntity="ChatTransaction" syncable="YES">
+        <attribute name="additionalType" optional="YES" attributeType="Integer 32" defaultValueString="2" usesScalarValueType="YES"/>
+        <attribute name="isReact" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="isReply" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="richContent" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[String:Any]"/>
         <attribute name="richContentSerialized" optional="YES" attributeType="String"/>
@@ -68,6 +71,7 @@
     <entity name="TransferTransaction" representedClassName="TransferTransaction" parentEntity="ChatTransaction" syncable="YES">
         <attribute name="comment" optional="YES" attributeType="String"/>
         <attribute name="decodedReplyMessage" optional="YES" attributeType="String"/>
+        <attribute name="reactionsData" optional="YES" attributeType="Transformable"/>
         <attribute name="replyToId" optional="YES" attributeType="String"/>
     </entity>
 </model>

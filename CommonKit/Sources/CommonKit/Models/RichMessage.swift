@@ -12,14 +12,14 @@ import Foundation
 
 public protocol RichMessage: Encodable {
     var type: String { get }
-    var isReply: Bool { get }
+    var additionalType: RichAdditionalType { get }
     
     func content() -> [String: Any]
     func serialized() -> String
 }
 
-public extension RichMessage {
-    func serialized() -> String {
+extension RichMessage {
+    public func serialized() -> String {
         if let data = try? JSONEncoder().encode(self), let raw = String(data: data, encoding: String.Encoding.utf8) {
             return raw
         } else {
@@ -37,13 +37,47 @@ public enum RichContentKeys {
         public static let replyMessage = "reply_message"
         public static let decodedReplyMessage = "decodedMessage"
     }
+    
+    public enum react {
+        public static let react = "react"
+        public static let reactto_id = "reactto_id"
+        public static let react_message = "react_message"
+        public static let reactions = "reactions"
+    }
+}
+
+// MARK: - RichMessageReaction
+
+public struct RichMessageReaction: RichMessage {
+    public var type: String
+    public var additionalType: RichAdditionalType
+    public var reactto_id: String
+    public var react_message: String
+    
+    public enum CodingKeys: String, CodingKey {
+        case reactto_id, react_message
+    }
+    
+    public init(reactto_id: String, react_message: String) {
+        self.type = RichContentKeys.reply.reply
+        self.reactto_id = reactto_id
+        self.react_message = react_message
+        self.additionalType = .reaction
+    }
+    
+    public func content() -> [String: Any] {
+        return [
+            RichContentKeys.react.reactto_id: reactto_id,
+            RichContentKeys.react.react_message: react_message
+        ]
+    }
 }
 
 // MARK: - RichMessageReply
 
 public struct RichMessageReply: RichMessage {
     public var type: String
-    public var isReply: Bool
+    public var additionalType: RichAdditionalType
     public var replyto_id: String
     public var reply_message: String
     
@@ -55,7 +89,7 @@ public struct RichMessageReply: RichMessage {
         self.type = RichContentKeys.reply.reply
         self.replyto_id = replyto_id
         self.reply_message = reply_message
-        self.isReply = true
+        self.additionalType = .reply
     }
     
     public func content() -> [String: Any] {
@@ -68,7 +102,7 @@ public struct RichMessageReply: RichMessage {
 
 public struct RichTransferReply: RichMessage {
     public var type: String
-    public var isReply: Bool
+    public var additionalType: RichAdditionalType
     public var replyto_id: String
     public var reply_message: [String: String]
     
@@ -91,7 +125,7 @@ public struct RichTransferReply: RichMessage {
             RichMessageTransfer.CodingKeys.hash.stringValue: hash,
             RichMessageTransfer.CodingKeys.comments.stringValue: comments
         ]
-        self.isReply = true
+        self.additionalType = .reply
     }
     
     public func content() -> [String: Any] {
@@ -109,7 +143,7 @@ public struct RichMessageTransfer: RichMessage {
     public let amount: Decimal
     public let hash: String
     public let comments: String
-    public var isReply: Bool
+    public var additionalType: RichAdditionalType
     
     public func content() -> [String: Any] {
         return [
@@ -125,14 +159,18 @@ public struct RichMessageTransfer: RichMessage {
         self.amount = amount
         self.hash = hash
         self.comments = comments
-        self.isReply = false
+        self.additionalType = .base
     }
     
     public init?(content: [String: Any]) {
+        var newContent = content
+        
         if let content = content[RichContentKeys.reply.replyMessage] as? [String: String] {
             self.init(content: content)
         } else {
-            guard let content = content as? [String: String] else {
+            newContent[RichContentKeys.react.reactions] = ""
+            
+            guard let content = newContent as? [String: String] else {
                 return nil
             }
             
@@ -176,7 +214,7 @@ public struct RichMessageTransfer: RichMessage {
             self.comments = ""
         }
         
-        self.isReply = false
+        self.additionalType = .base
     }
 }
 
@@ -219,7 +257,7 @@ public extension RichMessageTransfer {
             self.amount = 0
         }
         
-        self.isReply = false
+        self.additionalType = .base
     }
 }
 

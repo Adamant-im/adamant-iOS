@@ -9,9 +9,17 @@
 import UIKit
 import SnapKit
 import Combine
+import SwiftUI
+import AdvancedContextMenuKit
 import CommonKit
 
 final class ChatTransactionContainerView: UIView, ChatModelView {
+    // MARK: Dependencies
+    
+    var chatMessagesListViewModel: ChatMessagesListViewModel?
+    
+    // MARK: Proprieties
+    
     var subscription: AnyCancellable?
     
     var model: Model = .default {
@@ -44,18 +52,83 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
         return stack
     }()
     
+    private lazy var vStack: UIStackView = {
+        let stack = UIStackView()
+        stack.alignment = .center
+        stack.axis = .vertical
+        stack.spacing = 12
+
+        stack.addArrangedSubview(statusButton)
+        stack.addArrangedSubview(ownReactionLabel)
+        stack.addArrangedSubview(opponentReactionLabel)
+        return stack
+    }()
+    
     private lazy var swipeView: SwipeableView = {
         let view = SwipeableView(frame: .zero, view: self)
         return view
     }()
     
+    private lazy var ownReactionLabel: UILabel = {
+        let label = UILabel()
+        label.text = getReaction(for: model.address)
+        label.backgroundColor = .adamant.pickedReactionBackground
+        label.layer.cornerRadius = ownReactionSize.height / 2
+        label.textAlignment = .center
+        label.layer.masksToBounds = true
+        
+        label.snp.makeConstraints { make in
+            make.width.equalTo(ownReactionSize.width)
+            make.height.equalTo(ownReactionSize.height)
+        }
+        
+        let tapGesture = UITapGestureRecognizer(
+            target: self,
+            action: #selector(tapReactionAction)
+        )
+        
+        label.addGestureRecognizer(tapGesture)
+        label.isUserInteractionEnabled = true
+        return label
+    }()
+    
+    private lazy var opponentReactionLabel: UILabel = {
+        let label = UILabel()
+        label.text = getReaction(for: model.opponentAddress)
+        label.textAlignment = .center
+        label.layer.masksToBounds = true
+        label.backgroundColor = .adamant.pickedReactionBackground
+        label.layer.cornerRadius = opponentReactionSize.height / 2
+        
+        label.snp.makeConstraints { make in
+            make.width.equalTo(opponentReactionSize.width)
+            make.height.equalTo(opponentReactionSize.height)
+        }
+        
+        let tapGesture = UITapGestureRecognizer(
+            target: self,
+            action: #selector(tapReactionAction)
+        )
+        
+        label.addGestureRecognizer(tapGesture)
+        label.isUserInteractionEnabled = true
+        return label
+    }()
+    
     private lazy var chatMenuManager: ChatMenuManager = {
         let manager = ChatMenuManager(
             menu: makeContextMenu(),
-            backgroundColor: nil
+            emojiService: chatMessagesListViewModel?.emojiService
         )
+        manager.delegate = self
         return manager
     }()
+    
+    private lazy var contextMenu = AdvancedContextMenuManager(delegate: chatMenuManager)
+    
+    private let ownReactionSize = CGSize(width: 40, height: 27)
+    private let opponentReactionSize = CGSize(width: 55, height: 27)
+    private let opponentReactionImageSize = CGSize(width: 10, height: 12)
     
     var isSelected: Bool = false {
         didSet {
@@ -103,14 +176,20 @@ private extension ChatTransactionContainerView {
             self?.actionHandler(.swipeState(state: state))
         }
         
-        let interaction = UIContextMenuInteraction(delegate: chatMenuManager)
-        contentView.addInteraction(interaction)
+        contextMenu.setup(for: contentView)
     }
     
     func update() {
         contentView.model = model.content
         updateStatus(model.status)
         updateLayout()
+        chatMenuManager.selectedEmoji = getReaction(for: model.address)
+        chatMenuManager.emojiService = chatMessagesListViewModel?.emojiService
+        
+        ownReactionLabel.isHidden = getReaction(for: model.address) == nil
+        opponentReactionLabel.isHidden = getReaction(for: model.opponentAddress) == nil
+        updateOwnReaction()
+        updateOpponentReaction()
     }
     
     func updateStatus(_ status: TransactionStatus) {
@@ -119,7 +198,7 @@ private extension ChatTransactionContainerView {
     }
     
     func updateLayout() {
-        var viewsList = [spacingView, statusButton, contentView]
+        var viewsList = [spacingView, vStack, contentView]
         
         viewsList = model.isFromCurrentSender
             ? viewsList
@@ -132,6 +211,60 @@ private extension ChatTransactionContainerView {
     
     @objc func onStatusButtonTap() {
         actionHandler(.forceUpdateTransactionStatus(id: model.id))
+    }
+    
+    func updateOwnReaction() {
+        ownReactionLabel.text = getReaction(for: model.address)
+        ownReactionLabel.backgroundColor = model.content.backgroundColor.uiColor.mixin(
+            infusion: .lightGray,
+            alpha: 0.15
+        )
+    }
+    
+    func updateOpponentReaction() {
+        guard let reaction = getReaction(for: model.opponentAddress) else {
+            opponentReactionLabel.attributedText = nil
+            opponentReactionLabel.text = nil
+            return
+        }
+        
+        let fullString = NSMutableAttributedString(string: reaction)
+        
+        if let image = chatMessagesListViewModel?.avatarService.avatar(
+            for: model.opponentAddress,
+            size: opponentReactionImageSize.width
+        ) {
+            let replyImageAttachment = NSTextAttachment()
+            replyImageAttachment.image = image
+            replyImageAttachment.bounds = .init(
+                origin: .init(x: .zero, y: -3),
+                size: opponentReactionImageSize
+            )
+            
+            let imageString = NSAttributedString(attachment: replyImageAttachment)
+            fullString.append(NSAttributedString(string: " "))
+            fullString.append(imageString)
+        }
+        
+        opponentReactionLabel.attributedText = fullString
+        opponentReactionLabel.backgroundColor = model.content.backgroundColor.uiColor.mixin(
+            infusion: .lightGray,
+            alpha: 0.15
+        )
+    }
+    
+    func getReaction(for address: String) -> String? {
+        model.reactions?.first(
+            where: { $0.sender == address }
+        )?.reaction
+    }
+    
+    @objc func tapReactionAction() {
+        contextMenu.presentMenu(
+            for: contentView,
+            copyView: copy(with: model)?.contentView,
+            with: makeContextMenu()
+        )
     }
 }
 
@@ -163,30 +296,55 @@ private extension TransactionStatus {
 }
 
 extension ChatTransactionContainerView {
-    func makeContextMenu() -> UIMenu {
-        let remove = UIAction(
+    func makeContextMenu() -> AMenuSection {
+        let remove = AMenuItem.action(
             title: .adamant.chat.remove,
-            image: UIImage(systemName: "trash"),
-            attributes: .destructive
-        ) { _ in
+            systemImageName: "trash",
+            style: .destructive
+        ) { [weak self] in
+            guard let self = self else { return }
             self.actionHandler(.remove(id: self.model.id))
         }
         
-        let report = UIAction(
+        let report = AMenuItem.action(
             title: .adamant.chat.report,
-            image: UIImage(systemName: "exclamationmark.bubble")
-        ) { _ in
+            systemImageName: "exclamationmark.bubble"
+        ) { [weak self] in
+            guard let self = self else { return }
             self.actionHandler(.report(id: self.model.id))
         }
         
-        let reply = UIAction(
+        let reply = AMenuItem.action(
             title: .adamant.chat.reply,
-            image: UIImage(systemName: "arrowshape.turn.up.left")
-        ) { [weak self] _ in
+            systemImageName: "arrowshape.turn.up.left"
+        ) { [weak self] in
             guard let self = self else { return }
             Task { self.actionHandler(.reply(message: self.model)) }
         }
         
-        return UIMenu(title: "", children: [reply, report, remove])
+        return AMenuSection([reply, report, remove])
+    }
+}
+
+extension ChatTransactionContainerView: ChatMenuManagerDelegate {
+    func didReact(_ emoji: String) {
+        Task {
+            await contextMenu.dismiss()
+            self.actionHandler(.react(id: self.model.id, emoji: emoji))
+        }
+    }
+    
+    func getContentView() -> UIView? {
+        copy(with: model)?.contentView
+    }
+}
+
+extension ChatTransactionContainerView {
+    func copy(with model: Model) -> ChatTransactionContainerView? {
+        let view = ChatTransactionContainerView(frame: frame)
+        view.contentView.model = model.content
+        view.updateStatus(model.status)
+        view.updateLayout()
+        return view
     }
 }

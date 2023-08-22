@@ -11,3 +11,4 @@ import Combine
 public typealias ObservableSender<Output> = PassthroughSubject<Output, Never>
 public typealias AnyObservable<Output> = AnyPublisher<Output, Never>
 public typealias Observable<Output> = Publisher<Output, Never>
+public typealias Action = () -> Void

@@ -28,6 +28,8 @@ final class ChatViewModel: NSObject {
     private let chatCacheService: ChatCacheService
     private let richMessageProviders: [String: RichMessageProvider]
     
+    let chatMessagesListViewModel: ChatMessagesListViewModel
+
     // MARK: Properties
     
     private var tasksStorage = TaskManager()
@@ -63,6 +65,7 @@ final class ChatViewModel: NSObject {
     let didTapAdmChat = ObservableSender<(Chatroom, String?)>()
     let didTapAdmSend = ObservableSender<AdamantAddress>()
     let closeScreen = ObservableSender<Void>()
+    let updateChatRead = ObservableSender<Void>()
     
     @ObservableValue private(set) var isHeaderLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
@@ -112,7 +115,8 @@ final class ChatViewModel: NSObject {
         accountProvider: AccountsProvider,
         richTransactionStatusService: RichTransactionStatusService,
         chatCacheService: ChatCacheService,
-        richMessageProviders: [String: RichMessageProvider]
+        richMessageProviders: [String: RichMessageProvider],
+        chatMessagesListViewModel: ChatMessagesListViewModel
     ) {
         self.chatsProvider = chatsProvider
         self.markdownParser = markdownParser
@@ -125,6 +129,7 @@ final class ChatViewModel: NSObject {
         self.accountProvider = accountProvider
         self.richTransactionStatusService = richTransactionStatusService
         self.chatCacheService = chatCacheService
+        self.chatMessagesListViewModel = chatMessagesListViewModel
         super.init()
         setupObservers()
     }
@@ -169,6 +174,13 @@ final class ChatViewModel: NSObject {
             }
             
             let isChatLoaded = await chatsProvider.isChatLoaded(with: address)
+            let isChatLoading = await chatsProvider.isChatLoading(with: address)
+            
+            guard !isChatLoading else {
+                await waitForChatLoading(with: address)
+                updateTransactions(performFetch: true)
+                return
+            }
             
             if address == AdamantContacts.adamantWelcomeWallet.name || isChatLoaded {
                 updateTransactions(performFetch: true)
@@ -457,6 +469,40 @@ final class ChatViewModel: NSObject {
     func removeMessageAction(_ id: String) {
         dialog.send(.removeMessageAlert(id: id))
     }
+    
+    func reactAction(_ id: String, emoji: String) {
+        guard let partnerAddress = chatroom?.partner?.address else { return }
+        
+        guard chatroom?.partner?.isDummy != true else {
+            dialog.send(.dummy(partnerAddress))
+            return
+        }
+        
+        Task {
+            let message: AdamantMessage = .richMessage(
+                payload: RichMessageReaction(
+                    reactto_id: id,
+                    react_message: emoji
+                )
+            )
+            
+            guard await validateSendingMessage(message: message) else { return }
+            
+            do {
+                _ = try await chatsProvider.sendMessage(
+                    message,
+                    recipientId: partnerAddress,
+                    from: chatroom
+                )
+            } catch {
+                await handleMessageSendingError(error: error, sentText: emoji)
+            }
+        }.stored(in: tasksStorage)
+    }
+    
+    func clearReplyMessage() {
+        replyMessage = nil
+    }
 }
 
 extension ChatViewModel {
@@ -556,6 +602,12 @@ private extension ChatViewModel {
                 resetLoadingProperty: resetLoadingProperty,
                 expirationTimestamp: expirationTimestamp
             )
+            
+            // The 'makeMessages' method doesn't include reactions.
+            // If the message count is different from the number of transactions, update the chat read status if necessary.
+            if messages.count != chatTransactions.count {
+                updateChatRead.send()
+            }
         }
     }
     
@@ -706,5 +758,23 @@ private extension ChatViewModel {
     func startNewChat(with chatroom: Chatroom, name: String? = nil, message: String? = nil) {
         setNameIfNeeded(for: chatroom.partner, chatroom: chatroom, name: name)
         didTapAdmChat.send((chatroom, message))
+    }
+    
+    func waitForChatLoading(with address: String) async {
+        await withUnsafeContinuation { continuation in
+            Task {
+                await chatsProvider.chatLoadingStatusPublisher
+                    .filter { $0.contains(
+                        where: {
+                            $0.key == address && $0.value == .loaded
+                        })
+                    }
+                    .receive(on: DispatchQueue.main)
+                    .sink { [weak self] _ in
+                        self?.tempCancellables.removeAll()
+                        continuation.resume()
+                    }.store(in: &tempCancellables)
+            }
+        }
     }
 }

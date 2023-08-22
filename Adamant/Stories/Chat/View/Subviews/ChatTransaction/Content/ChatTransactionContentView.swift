@@ -217,7 +217,10 @@ private extension ChatTransactionContentView {
                 message: NSAttributedString(string: ""),
                 messageReply: NSAttributedString(string: ""),
                 backgroundColor: .failed,
-                isFromCurrentSender: true
+                isFromCurrentSender: true,
+                reactions: nil,
+                address: "",
+                opponentAddress: ""
             )))
             return
         }

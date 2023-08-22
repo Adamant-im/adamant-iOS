@@ -298,6 +298,12 @@
 /* ChatList: First syncronization is in progress */
 "ChatListPage.SyncingChats" = "Syncing chats…";
 
+/* ChatList: Reacted */
+"ChatListPage.Reacted" = "Reacted";
+
+/* ChatList: Removed Reaction */
+"ChatListPage.RemovedReaction" = "Removed reaction";
+
 /* ChatList: scene title */
 "ChatListPage.Title" = "Chats";
 
