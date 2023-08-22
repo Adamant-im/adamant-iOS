@@ -26,6 +26,7 @@ public extension AdvancedContextMenuManagerDelegate {
     }
 }
 
+@MainActor
 public final class AdvancedContextMenuManager: NSObject {
     private var contentView: UIView?
     private var viewModel: ContextMenuOverlayViewModel?

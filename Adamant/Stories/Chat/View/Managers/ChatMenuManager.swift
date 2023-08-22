@@ -48,7 +48,7 @@ final class ChatMenuManager: NSObject, AdvancedContextMenuManagerDelegate {
         AnyView(
             ChatReactionsView(
                 delegate: self,
-                emojis: emojiService?.getFrequentlySelectedEmojis(),
+                emojis: getFrequentlySelectedEmojis(selectedEmoji: selectedEmoji),
                 selectedEmoji: selectedEmoji
             )
         )
@@ -135,5 +135,17 @@ private extension ChatMenuManager {
             topController = topController?.presentedViewController
         }
         return topController
+    }
+    
+    func getFrequentlySelectedEmojis(selectedEmoji: String?) -> [String]? {
+        var emojis = emojiService?.getFrequentlySelectedEmojis()
+        guard let selectedEmoji = selectedEmoji else { return emojis }
+        
+        if let index = emojis?.firstIndex(of: selectedEmoji) {
+            emojis?.remove(at: index)
+        }
+        emojis?.insert(selectedEmoji, at: 0)
+        
+        return emojis
     }
 }

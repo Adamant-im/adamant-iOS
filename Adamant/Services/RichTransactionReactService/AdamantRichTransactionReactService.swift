@@ -39,15 +39,12 @@ actor AdamantRichTransactionReactService: NSObject, RichTransactionReactService 
     func startObserving() {
         richController.delegate = self
         try? richController.performFetch()
-        richController.fetchedObjects?.forEach( update(transaction:) )
         
         transferController.delegate = self
         try? transferController.performFetch()
-        transferController.fetchedObjects?.forEach( update(transaction:) )
         
         messageController.delegate = self
         try? messageController.performFetch()
-        messageController.fetchedObjects?.forEach( update(transaction:) )
     }
 }
 

@@ -15,7 +15,7 @@ protocol ChatReactionsViewDelegate: AnyObject {
 }
 
 struct ChatReactionsView: View {
-    private var emojis: [String]
+    private let emojis: [String]
     private weak var delegate: ChatReactionsViewDelegate?
     private let defaultEmojis = ["😂", "🤔", "😁", "👍", "👌"]
     private let selectedEmoji: String?
@@ -28,13 +28,6 @@ struct ChatReactionsView: View {
         self.delegate = delegate
         self.emojis = emojis ?? defaultEmojis
         self.selectedEmoji = selectedEmoji
-        
-        if let selectedEmoji = selectedEmoji {
-            if let index = self.emojis.firstIndex(of: selectedEmoji) {
-                self.emojis.remove(at: index)
-            }
-            self.emojis.insert(selectedEmoji, at: 0)
-        }
     }
     
     var body: some View {

@@ -34,7 +34,7 @@ public struct Blur: UIViewRepresentable {
     }
 }
 
-class BlurEffectView: UIVisualEffectView {
+final class BlurEffectView: UIVisualEffectView {
     // MARK: Proprieties
     
     private var animator: UIViewPropertyAnimator?
