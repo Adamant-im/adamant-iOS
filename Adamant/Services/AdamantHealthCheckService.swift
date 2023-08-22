@@ -18,7 +18,7 @@ final class AdamantHealthCheckService: HealthCheckService {
     // MARK: - Properties
     
     private var _nodes = [Node]()
-    private var currentRequests = Set<DataRequest>()
+    private var currentRequests = Set<URL>()
     private let semaphore = DispatchSemaphore(value: 1)
     private let notifyingQueue = DispatchQueue(label: "com.adamant.health-check-notification")
     
@@ -47,22 +47,20 @@ final class AdamantHealthCheckService: HealthCheckService {
         defer { semaphore.signal() }
         semaphore.wait()
         
-        resetRequests()
         updateNodesAvailability()
 
-        _nodes.filter { $0.isEnabled }.forEach { node in
-            guard !isRequestInProgress(for: node),
-                  let request = updateNodeStatus(node: node)
-            else { return }
-            
-            currentRequests.insert(request)
+        _nodes.filter { $0.isEnabled && !isRequestInProgress(for: $0) }
+            .forEach { node in
+            updateNodeStatus(node: node)
         }
     }
     
     private func isRequestInProgress(for node: Node) -> Bool {
-        return currentRequests.contains { request in
-            request.request?.url?.absoluteString.contains(node.host) ?? false
+        guard let nodeURL = node.asURL() else {
+            return false
         }
+        
+        return currentRequests.contains(nodeURL)
     }
     
     private func updateNodesAvailability() {
@@ -85,6 +83,7 @@ final class AdamantHealthCheckService: HealthCheckService {
         }
     }
     
+    @discardableResult
     private func updateNodeStatus(node: Node) -> DataRequest? {
         guard let nodeURL = node.asURL() else {
             node.connectionStatus = .offline
@@ -93,8 +92,11 @@ final class AdamantHealthCheckService: HealthCheckService {
         }
         
         let startTimestamp = Date().timeIntervalSince1970
+        currentRequests.insert(nodeURL)
         
         return apiService.getNodeStatus(url: nodeURL) { [weak self] result in
+            self?.currentRequests.remove(nodeURL)
+            
             switch result {
             case let .success(status):
                 node.status = Node.Status(
@@ -120,13 +122,6 @@ final class AdamantHealthCheckService: HealthCheckService {
             node.connectionStatus = .offline
             node.status = nil
             updateNodesAvailability()
-        }
-    }
-    
-    private func resetRequests() {
-        currentRequests.filter { $0.isFinished }.forEach {
-            $0.cancel()
-            currentRequests.remove($0)
         }
     }
 }
