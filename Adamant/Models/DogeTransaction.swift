@@ -7,15 +7,16 @@
 //
 
 import Foundation
+import CommonKit
 
-extension String.adamantLocalized {
+extension String.adamant {
     struct dogeTransaction {
         static func recipients(_ recipients: Int) -> String {
-            return String.localizedStringWithFormat(NSLocalizedString("Doge.TransactionDetails.RecipientsFormat", comment: "DogeTransaction: amount of recipients, if more than one."), recipients)
+            return String.localizedStringWithFormat(.localized("Doge.TransactionDetails.RecipientsFormat", comment: "DogeTransaction: amount of recipients, if more than one."), recipients)
         }
         
         static func senders(_ senders: Int) -> String {
-            return String.localizedStringWithFormat(NSLocalizedString("Doge.TransactionDetails.SendersFormat", comment: "DogeTransaction: amount of senders, if more than one."), senders)
+            return String.localizedStringWithFormat(.localized("Doge.TransactionDetails.SendersFormat", comment: "DogeTransaction: amount of senders, if more than one."), senders)
         }
         
         private init() {}
@@ -23,7 +24,7 @@ extension String.adamantLocalized {
 }
 
 class DogeTransaction: BaseBtcTransaction {
-    override class var defaultCurrencySymbol: String? { return DogeWalletService.currencySymbol }
+    override var defaultCurrencySymbol: String? { DogeWalletService.currencySymbol }
 }
 
 // MARK: - Sample Json

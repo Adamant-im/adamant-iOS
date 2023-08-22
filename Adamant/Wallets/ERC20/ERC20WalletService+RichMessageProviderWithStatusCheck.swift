@@ -9,6 +9,7 @@
 import Foundation
 import web3swift
 import struct BigInt.BigUInt
+import CommonKit
 
 extension ERC20WalletService: RichMessageProviderWithStatusCheck {
     func statusInfoFor(transaction: RichMessageTransaction) async -> TransactionStatusInfo {

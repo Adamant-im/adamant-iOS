@@ -9,6 +9,7 @@
 import UIKit
 import Eureka
 import SafariServices
+import CommonKit
 
 // MARK: - TransactionStatus UI
 private extension TransactionStatus {
@@ -23,7 +24,7 @@ private extension TransactionStatus {
     var descriptionLocalized: String? {
         switch self {
         case .inconsistent:
-            return NSLocalizedString("TransactionStatus.Inconsistent.WrongTimestamp", comment: "Transaction status: inconsistent wrong timestamp")
+            return .localized("TransactionStatus.Inconsistent.WrongTimestamp", comment: "Transaction status: inconsistent wrong timestamp")
         default:
             return nil
         }
@@ -31,17 +32,17 @@ private extension TransactionStatus {
 }
 
 // MARK: - Localization
-extension String.adamantLocalized {
+extension String.adamant {
     struct transactionDetails {
-        static let title = NSLocalizedString("TransactionDetailsScene.Title", comment: "Transaction details: scene title")
-        static let yourAddress = String.adamantLocalized.notifications.yourAddress
-        static let requestingDataProgressMessage = NSLocalizedString("TransactionDetailsScene.RequestingData", comment: "Transaction details: 'Requesting Data' progress message.")
+        static let title = String.localized("TransactionDetailsScene.Title", comment: "Transaction details: scene title")
+        static let yourAddress = String.adamant.notifications.yourAddress
+        static let requestingDataProgressMessage = String.localized("TransactionDetailsScene.RequestingData", comment: "Transaction details: 'Requesting Data' progress message.")
     }
 }
 
-extension String.adamantLocalized.alert {
-    static let exportUrlButton = NSLocalizedString("TransactionDetailsScene.Share.URL", comment: "Export transaction: 'Share transaction URL' button")
-    static let exportSummaryButton = NSLocalizedString("TransactionDetailsScene.Share.Summary", comment: "Export transaction: 'Share transaction summary' button")
+extension String.adamant.alert {
+    static let exportUrlButton = String.localized("TransactionDetailsScene.Share.URL", comment: "Export transaction: 'Share transaction URL' button")
+    static let exportSummaryButton = String.localized("TransactionDetailsScene.Share.Summary", comment: "Export transaction: 'Share transaction summary' button")
 }
 
 class TransactionDetailsViewControllerBase: FormViewController {
@@ -85,29 +86,29 @@ class TransactionDetailsViewControllerBase: FormViewController {
         
         var localized: String {
             switch self {
-            case .transactionNumber: return NSLocalizedString("TransactionDetailsScene.Row.Id", comment: "Transaction details: Id row.")
-            case .from: return NSLocalizedString("TransactionDetailsScene.Row.From", comment: "Transaction details: sender row.")
-            case .to: return NSLocalizedString("TransactionDetailsScene.Row.To", comment: "Transaction details: recipient row.")
-            case .date: return NSLocalizedString("TransactionDetailsScene.Row.Date", comment: "Transaction details: date row.")
-            case .amount: return NSLocalizedString("TransactionDetailsScene.Row.Amount", comment: "Transaction details: amount row.")
-            case .fee: return NSLocalizedString("TransactionDetailsScene.Row.Fee", comment: "Transaction details: fee row.")
-            case .confirmations: return NSLocalizedString("TransactionDetailsScene.Row.Confirmations", comment: "Transaction details: confirmations row.")
-            case .block: return NSLocalizedString("TransactionDetailsScene.Row.Block", comment: "Transaction details: Block id row.")
-            case .status: return NSLocalizedString("TransactionDetailsScene.Row.Status", comment: "Transaction details: Transaction delivery status.")
-            case .openInExplorer: return NSLocalizedString("TransactionDetailsScene.Row.Explorer", comment: "Transaction details: 'Open transaction in explorer' row.")
+            case .transactionNumber: return .localized("TransactionDetailsScene.Row.Id", comment: "Transaction details: Id row.")
+            case .from: return .localized("TransactionDetailsScene.Row.From", comment: "Transaction details: sender row.")
+            case .to: return .localized("TransactionDetailsScene.Row.To", comment: "Transaction details: recipient row.")
+            case .date: return .localized("TransactionDetailsScene.Row.Date", comment: "Transaction details: date row.")
+            case .amount: return .localized("TransactionDetailsScene.Row.Amount", comment: "Transaction details: amount row.")
+            case .fee: return .localized("TransactionDetailsScene.Row.Fee", comment: "Transaction details: fee row.")
+            case .confirmations: return .localized("TransactionDetailsScene.Row.Confirmations", comment: "Transaction details: confirmations row.")
+            case .block: return .localized("TransactionDetailsScene.Row.Block", comment: "Transaction details: Block id row.")
+            case .status: return .localized("TransactionDetailsScene.Row.Status", comment: "Transaction details: Transaction delivery status.")
+            case .openInExplorer: return .localized("TransactionDetailsScene.Row.Explorer", comment: "Transaction details: 'Open transaction in explorer' row.")
             case .openChat: return ""
             case .comment: return ""
-            case .historyFiat: return NSLocalizedString("TransactionDetailsScene.Row.HistoryFiat", comment: "Transaction details: fiat value at the time")
-            case .currentFiat: return NSLocalizedString("TransactionDetailsScene.Row.CurrentFiat", comment: "Transaction details: current fiat value")
+            case .historyFiat: return .localized("TransactionDetailsScene.Row.HistoryFiat", comment: "Transaction details: fiat value at the time")
+            case .currentFiat: return .localized("TransactionDetailsScene.Row.CurrentFiat", comment: "Transaction details: current fiat value")
             case .inconsistentReason:
-                return NSLocalizedString("TransactionStatus.Inconsistent.Reason.Title", comment: "Transaction status: inconsistent reason title")
+                return .localized("TransactionStatus.Inconsistent.Reason.Title", comment: "Transaction status: inconsistent reason title")
             }
         }
         
         var image: UIImage? {
             switch self {
-            case .openInExplorer: return #imageLiteral(resourceName: "row_explorer")
-            case .openChat: return #imageLiteral(resourceName: "row_chat")
+            case .openInExplorer: return .asset(named: "row_explorer")
+            case .openChat: return .asset(named: "row_chat")
                 
             default: return nil
             }
@@ -123,10 +124,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
         var localized: String {
             switch self {
             case .details: return ""
-            case .comment: return NSLocalizedString("TransactionDetailsScene.Section.Comment", comment: "Transaction details: 'Comments' section")
-            case .actions: return NSLocalizedString("TransactionDetailsScene.Section.Actions", comment: "Transaction details: 'Actions' section")
+            case .comment: return .localized("TransactionDetailsScene.Section.Comment", comment: "Transaction details: 'Comments' section")
+            case .actions: return .localized("TransactionDetailsScene.Section.Actions", comment: "Transaction details: 'Actions' section")
             case .inconsistentReason:
-                return NSLocalizedString("TransactionStatus.Inconsistent.Reason.Title", comment: "Transaction status: inconsistent reason title")
+                return .localized("TransactionStatus.Inconsistent.Reason.Title", comment: "Transaction status: inconsistent reason title")
             }
         }
         
@@ -211,9 +212,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             else { return }
             
             if id.caseInsensitiveCompare(address) == .orderedSame {
-                senderName = String.adamantLocalized.transactionDetails.yourAddress
+                senderName = String.adamant.transactionDetails.yourAddress
             } else {
-                senderName = addressBookService.getName(key: id)
+                senderName = addressBookService.getName(for: id)
             }
         }
     }
@@ -225,10 +226,16 @@ class TransactionDetailsViewControllerBase: FormViewController {
             else { return }
             
             if id.caseInsensitiveCompare(address) == .orderedSame {
-                recipientName = String.adamantLocalized.transactionDetails.yourAddress
+                recipientName = String.adamant.transactionDetails.yourAddress
             } else {
-                recipientName = addressBookService.getName(key: id)
+                recipientName = addressBookService.getName(for: id)
             }
+        }
+    }
+    
+    var valueAtTimeTxn: String? {
+        didSet {
+            updateValueAtTimeRowValue()
         }
     }
     
@@ -256,7 +263,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         super.viewDidLoad()
         
         navigationItem.largeTitleDisplayMode = .never // some glitches, again
-        navigationItem.title = String.adamantLocalized.transactionDetails.title
+        navigationItem.title = String.adamant.transactionDetails.title
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(share))
         navigationOptions = RowNavigationOptions.Disabled
         
@@ -754,32 +761,34 @@ class TransactionDetailsViewControllerBase: FormViewController {
     }
     
     func updateFiat() {
-        if let date = transaction?.dateValue, let currencySymbol = currencySymbol, let amount = transaction?.amountValue {
-            self.isFiatSet = true
-            let currentFiat = currencyInfo.currentCurrency.rawValue
-            currencyInfo.getHistory(for: currencySymbol, timestamp: date) { [weak self] (result) in
-                switch result {
-                case .success(let tickers):
-                    self?.isFiatSet = true
-                    guard let tickers = tickers, let ticker = tickers["\(currencySymbol)/\(currentFiat)"] else {
-                        break
-                    }
-                    
-                    let totalFiat = amount * ticker
-                    let fiatString = self?.fiatFormatter.string(from: totalFiat)
-                    
-                    if let row: LabelRow = self?.form.rowBy(tag: Rows.historyFiat.tag) {
-                        DispatchQueue.main.async {
-                            row.value = fiatString
-                            row.updateCell()
-                        }
-                    }
-                    
-                case .failure:
-                    self?.isFiatSet = false
-                    break
-                }
+        guard let date = transaction?.dateValue,
+              let currencySymbol = currencySymbol,
+              let amount = transaction?.amountValue
+        else { return }
+        
+        self.isFiatSet = true
+        let currentFiat = currencyInfo.currentCurrency.rawValue
+        
+        currencyInfo.getHistory(
+            for: currencySymbol,
+            timestamp: date
+        ) { [weak self] (result) in
+            guard case .success(let tickers) = result else {
+                self?.isFiatSet = false
+                return
             }
+            
+            self?.isFiatSet = true
+            
+            guard let tickers = tickers,
+                  let ticker = tickers["\(currencySymbol)/\(currentFiat)"]
+            else {
+                return
+            }
+            
+            let totalFiat = amount * ticker
+            
+            self?.valueAtTimeTxn = self?.fiatFormatter.string(from: totalFiat)
         }
     }
     
@@ -819,6 +828,15 @@ class TransactionDetailsViewControllerBase: FormViewController {
         self.transaction = failedTransaction
         tableView.reloadData()
     }
+
+    @MainActor
+    private func updateValueAtTimeRowValue() {
+        guard let row: LabelRow = form.rowBy(tag: Rows.historyFiat.tag)
+        else { return }
+        
+        row.value = valueAtTimeTxn
+        row.updateCell()
+    }
     
     // MARK: - Actions
     
@@ -828,11 +846,11 @@ class TransactionDetailsViewControllerBase: FormViewController {
         }
         
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: String.adamant.alert.cancel, style: .cancel, handler: nil))
         
         if let url = explorerUrl(for: transaction) {
             // URL
-            alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.exportUrlButton, style: .default) { [weak self] _ in
+            alert.addAction(UIAlertAction(title: String.adamant.alert.exportUrlButton, style: .default) { [weak self] _ in
                 let alert = UIActivityViewController(activityItems: [url], applicationActivities: nil)
                 alert.modalPresentationStyle = .overFullScreen
                 self?.present(alert, animated: true, completion: nil)
@@ -841,7 +859,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
 
         // Description
         if let summary = summary(for: transaction) {
-            alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.exportSummaryButton, style: .default) { [weak self] _ in
+            alert.addAction(UIAlertAction(title: String.adamant.alert.exportSummaryButton, style: .default) { [weak self] _ in
                 let text = summary
                 let alert = UIActivityViewController(activityItems: [text], applicationActivities: nil)
                 alert.modalPresentationStyle = .overFullScreen
@@ -880,6 +898,21 @@ class TransactionDetailsViewControllerBase: FormViewController {
     }
     
     func summary(for transaction: TransactionDetails) -> String? {
-        return transaction.summary(with: explorerUrl(for: transaction)?.absoluteString)
+        guard let amount = transaction.amountValue,
+              let symbol = currencySymbol,
+              let rate = currencyInfo.getRate(for: symbol),
+              !transaction.recipientAddress.isEmpty
+        else {
+            return nil
+        }
+        
+        let value = amount * rate
+        let currentValue = fiatFormatter.string(from: value)
+        
+        return transaction.summary(
+            with: explorerUrl(for: transaction)?.absoluteString,
+            currentValue: currentValue,
+            valueAtTimeTxn: valueAtTimeTxn
+        )
     }
 }

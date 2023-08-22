@@ -9,10 +9,10 @@
 import Foundation
 import MyLittlePinpad
 
-extension String.adamantLocalized {
+extension String.adamant {
     struct pinpad {
-        static let createPin = NSLocalizedString("Pinpad.EnterNewPin", comment: "Pinpad: Ask user to create new pin")
-        static let reenterPin = NSLocalizedString("Pinpad.ReenterPin", comment: "Pinpad: Ask user to repeat new pin")
+        static let createPin = String.localized("Pinpad.EnterNewPin", comment: "Pinpad: Ask user to create new pin")
+        static let reenterPin = String.localized("Pinpad.ReenterPin", comment: "Pinpad: Ask user to repeat new pin")
     }
 }
 
@@ -71,7 +71,7 @@ extension PinpadViewController {
         
         pinpad.placeholderActiveColor = UIColor.adamant.pinpadHighlightButton
         pinpad.biometryButtonType = biometryButton
-        pinpad.cancelButton.setTitle(String.adamantLocalized.alert.cancel, for: .normal)
+        pinpad.cancelButton.setTitle(String.adamant.alert.cancel, for: .normal)
         pinpad.pinDigits = 6
         
         return pinpad

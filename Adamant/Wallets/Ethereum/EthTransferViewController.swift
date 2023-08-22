@@ -9,6 +9,7 @@
 import UIKit
 import Eureka
 import Web3Core
+import CommonKit
 
 final class EthTransferViewController: TransferViewControllerBase {
     
@@ -35,7 +36,7 @@ final class EthTransferViewController: TransferViewControllerBase {
             return
         }
         
-        dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
+        dialogService.showProgress(withMessage: String.adamant.transfer.transferProcessingMessage, userInteractionEnable: false)
         
         Task {
             do {
@@ -70,7 +71,7 @@ final class EthTransferViewController: TransferViewControllerBase {
                 }
                 
                 dialogService.dismissProgress()
-                dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                dialogService.showSuccess(withMessage: String.adamant.transfer.transferSuccess)
                 
                 // Present detail VC
                 presentDetailTransactionVC(
@@ -103,7 +104,7 @@ final class EthTransferViewController: TransferViewControllerBase {
         if let detailsVc = router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? EthTransactionDetailsViewController {
             detailsVc.transaction = transaction
             detailsVc.service = service
-            detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+            detailsVc.senderName = String.adamant.transactionDetails.yourAddress
             detailsVc.recipientName = recipientName
             
             if comments.count > 0 {
@@ -142,7 +143,7 @@ final class EthTransferViewController: TransferViewControllerBase {
     override func recipientRow() -> BaseRow {
         let row = TextRow {
             $0.tag = BaseRows.address.tag
-            $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
+            $0.cell.textField.placeholder = String.adamant.newChat.addressPlaceholder
             $0.cell.textField.keyboardType = UIKeyboardType.namePhonePad
             $0.cell.textField.autocorrectionType = .no
             
@@ -208,6 +209,6 @@ final class EthTransferViewController: TransferViewControllerBase {
     }
     
     override func defaultSceneTitle() -> String? {
-        return String.adamantLocalized.wallets.sendEth
+        return String.adamant.wallets.sendEth
     }
 }

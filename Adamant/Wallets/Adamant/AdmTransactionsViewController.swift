@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreData
+import CommonKit
 
 class AdmTransactionsViewController: TransactionsListViewControllerBase {
     // MARK: - Dependencies
@@ -216,19 +217,17 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         
         controller.showToChat = toShowChat(for: transaction)
         
-        if let address = accountService.account?.address,
-           let partenerAddress = transaction.partner?.address {
-            
-            let partnerName = addressBookService.getName(key: partenerAddress)
+        if let address = accountService.account?.address {
+            let partnerName = addressBookService.getName(for: transaction.partner)
             
             if address == transaction.senderId {
-                controller.senderName = String.adamantLocalized.transactionDetails.yourAddress
+                controller.senderName = String.adamant.transactionDetails.yourAddress
             } else {
                 controller.senderName = partnerName
             }
             
             if address == transaction.recipientId {
-                controller.recipientName = String.adamantLocalized.transactionDetails.yourAddress
+                controller.recipientName = String.adamant.transactionDetails.yourAddress
             } else {
                 controller.recipientName = partnerName
             }
@@ -245,10 +244,10 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         
         let amount: Decimal = transaction.amount as Decimal? ?? 0
         
-        var partnerName = transaction.partner?.name?.checkAndReplaceSystemWallets() ?? addressBookService.getName(key: partnerId)
+        var partnerName = addressBookService.getName(for: transaction.partner)
         
         if let address = accountService.account?.address, partnerId == address {
-            partnerName = String.adamantLocalized.transactionDetails.yourAddress
+            partnerName = String.adamant.transactionDetails.yourAddress
         }
         
         configureCell(
@@ -290,7 +289,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
             return !(object is TransferTransaction)
         })
         
-        let title = (messeges != nil) ? String.adamantLocalized.transactionList.toChat : String.adamantLocalized.transactionList.startChat
+        let title = (messeges != nil) ? String.adamant.transactionList.toChat : String.adamant.transactionList.startChat
         
         let toChat = UITableViewRowAction(style: .normal, title: title) { _, _ in
             guard let vc = self.router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
@@ -341,7 +340,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
             return !(object is TransferTransaction)
         })
         
-        let title = (messeges != nil) ? String.adamantLocalized.transactionList.toChat : String.adamantLocalized.transactionList.startChat
+        let title = (messeges != nil) ? String.adamant.transactionList.toChat : String.adamant.transactionList.startChat
         
         let toChat = UIContextualAction(style: .normal, title:  title, handler: { (_, _, _) in
             guard let vc = self.router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
@@ -369,7 +368,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
             }
         })
         
-        toChat.image = #imageLiteral(resourceName: "chats_tab")
+        toChat.image = .asset(named: "chats_tab")
         toChat.backgroundColor = UIColor.adamant.primary
         return UISwipeActionsConfiguration(actions: [toChat])
     }

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CommonKit
 
 struct NotificationModel: Equatable, Hashable {
     let icon: UIImage?

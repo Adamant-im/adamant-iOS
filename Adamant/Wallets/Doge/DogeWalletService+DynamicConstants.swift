@@ -1,5 +1,6 @@
 import Foundation
 import BigInt
+import CommonKit
     
 extension DogeWalletService {
     // MARK: - Constants

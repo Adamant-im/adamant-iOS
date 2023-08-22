@@ -10,6 +10,7 @@ import UIKit
 import CoreData
 import MarkdownKit
 import Combine
+import CommonKit
 
 actor AdamantChatsProvider: ChatsProvider {
     
@@ -41,10 +42,13 @@ actor AdamantChatsProvider: ChatsProvider {
     private(set) var blockList: [String] = []
     private(set) var removedMessages: [String] = []
     
-    var isChatLoaded: [String : Bool] = [:]
+    @Published private var chatLoadingStatusDictionary: [String: ChatRoomLoadingStatus] = [:]
+    var chatLoadingStatusPublisher: Published<[String: ChatRoomLoadingStatus]>.Publisher {
+        $chatLoadingStatusDictionary
+    }
+    
     var chatMaxMessages: [String : Int] = [:]
     var chatLoadedMessages: [String : Int] = [:]
-    private var chatsLoading: [String] = []
     private let preLoadChatsCount = 5
     private var isConnectedToTheInternet = true
     private var onConnectionToTheInternetRestoredTasks = [() -> Void]()
@@ -63,6 +67,7 @@ actor AdamantChatsProvider: ChatsProvider {
     private(set) var roomsLoadedCount: Int?
     
     private var subscriptions = Set<AnyCancellable>()
+    private let minReactionsProcent = 30
     
     // MARK: Lifecycle
     init(
@@ -314,7 +319,7 @@ extension AdamantChatsProvider {
         readedLastHeight = nil
         roomsMaxCount = nil
         roomsLoadedCount = nil
-        isChatLoaded.removeAll()
+        chatLoadingStatusDictionary.removeAll()
         chatMaxMessages.removeAll()
         chatLoadedMessages.removeAll()
         
@@ -397,6 +402,8 @@ extension AdamantChatsProvider {
         array.prefix(preLoadChatsCount).forEach { transaction in
             let recipientAddress = transaction.recipientId == address ? transaction.senderId : transaction.recipientId
             Task {
+                let isChatLoading = isChatLoading(with: address)
+                guard !isChatLoading else { return }
                 await getChatMessages(with: recipientAddress, offset: nil)
             }
         }
@@ -424,8 +431,8 @@ extension AdamantChatsProvider {
         
         // MARK: 3. Get transactions
         
-        if !isChatLoaded.keys.contains(addressRecipient) {
-            chatsLoading.append(addressRecipient)
+        if getChatStatus(for: addressRecipient) == .none {
+            setChatStatus(for: addressRecipient, status: .loading)
         }
         
         let chatroom = try? await apiGetChatMessages(
@@ -435,29 +442,71 @@ extension AdamantChatsProvider {
             limit: chatTransactionsLimit
         )
         
-        isChatLoaded[addressRecipient] = true
-        chatMaxMessages[addressRecipient] = chatroom?.count
-        
-        let loadedCount = chatLoadedMessages[addressRecipient] ?? 0
-        chatLoadedMessages[addressRecipient] = loadedCount + (chatroom?.messages?.count ?? 0)
-        
-        if let index = chatsLoading.firstIndex(of: addressRecipient) {
-            chatsLoading.remove(at: index)
-        }
-        
         guard let transactions = chatroom?.messages,
               transactions.count > 0
         else {
+            setChatDoneStatus(
+                for: addressRecipient,
+                messageCount: 0,
+                maxCount: chatroom?.count
+            )
             return
         }
         
-        await process(
+        let result = await process(
             messageTransactions: transactions,
             senderId: address,
             privateKey: privateKey
         )
         
+        await processChatMessages(
+            result: result,
+            chatroom: chatroom,
+            offset: offset,
+            addressRecipient: addressRecipient
+        )
+    }
+    
+    func processChatMessages(
+        result: (reactionsCount: Int, totalCount: Int),
+        chatroom: ChatRooms?,
+        offset: Int?,
+        addressRecipient: String
+    ) async {
+        let messageCount = chatroom?.messages?.count ?? 0
+        
+        let minRectionsCount = result.totalCount * minReactionsProcent / 100
+        if result.reactionsCount >= minRectionsCount {
+            let offset = (offset ?? 0) + messageCount
+
+            let loadedCount = chatLoadedMessages[addressRecipient] ?? 0
+            chatLoadedMessages[addressRecipient] = loadedCount + messageCount
+            
+            return await getChatMessages(
+                with: addressRecipient,
+                offset: offset
+            )
+        }
+        
+        setChatDoneStatus(
+            for: addressRecipient,
+            messageCount: messageCount,
+            maxCount: chatroom?.count
+        )
+        
         NotificationCenter.default.post(name: .AdamantChatsProvider.initiallyLoadedMessages, object: addressRecipient)
+    }
+    
+    func setChatDoneStatus(
+        for addressRecipient: String,
+        messageCount: Int,
+        maxCount: Int?
+    ) {
+        setChatStatus(for: addressRecipient, status: .loaded)
+        chatMaxMessages[addressRecipient] = maxCount
+        
+        let loadedCount = chatLoadedMessages[addressRecipient] ?? 0
+        chatLoadedMessages[addressRecipient] = loadedCount + messageCount
     }
     
     func apiGetChatMessages(
@@ -620,11 +669,19 @@ extension AdamantChatsProvider {
     }
     
     func isChatLoading(with addressRecipient: String) -> Bool {
-        return chatsLoading.contains(addressRecipient)
+        chatLoadingStatusDictionary[addressRecipient] == .loading
     }
     
     func isChatLoaded(with addressRecipient: String) -> Bool {
-        return isChatLoaded[addressRecipient] ?? false
+        chatLoadingStatusDictionary[addressRecipient] == .loaded
+    }
+    
+    func getChatStatus(for recipient: String) -> ChatRoomLoadingStatus {
+        chatLoadingStatusDictionary[recipient] ?? .none
+    }
+    
+    func setChatStatus(for recipient: String, status: ChatRoomLoadingStatus) {
+        chatLoadingStatusDictionary[recipient] = status
     }
 }
 
@@ -680,7 +737,7 @@ extension AdamantChatsProvider {
                 richContent: payload.content(),
                 richContentSerialized: payload.serialized(),
                 richType: payload.type,
-                isReply: payload.isReply,
+                additionalType: payload.additionalType,
                 senderId: loggedAccount.address,
                 recipientId: recipientId,
                 keypair: keypair,
@@ -766,7 +823,7 @@ extension AdamantChatsProvider {
                 richContent: payload.content(),
                 richContentSerialized: payload.serialized(),
                 richType: payload.type,
-                isReply: payload.isReply,
+                additionalType: payload.additionalType,
                 senderId: loggedAccount.address,
                 recipientId: recipientId,
                 keypair: keypair,
@@ -836,7 +893,7 @@ extension AdamantChatsProvider {
         richContent: [String: Any],
         richContentSerialized: String,
         richType: String,
-        isReply: Bool,
+        additionalType: RichAdditionalType,
         senderId: String,
         recipientId: String,
         keypair: Keypair,
@@ -855,7 +912,7 @@ extension AdamantChatsProvider {
         transaction.transactionId = id
         transaction.richContent = richContent
         transaction.richType = richType
-        transaction.isReply = isReply
+        transaction.additionalType = additionalType
         transaction.richContentSerialized = richContentSerialized
         
         transaction.transactionStatus = richProviders[richType] != nil ? .notInitiated : nil
@@ -1112,6 +1169,7 @@ extension AdamantChatsProvider {
             
             // Update ID with recieved, add to unconfirmed transactions.
             transaction.transactionId = String(id)
+            transaction.chatMessageId = String(id)
             transaction.statusEnum = .pending
             
             if let index = unconfirmedTransactionsBySignature.firstIndex(
@@ -1346,7 +1404,7 @@ extension AdamantChatsProvider {
         
         guard isFound else {
             throw ApiServiceError.commonError(
-                message: String.adamantLocalized.reply.longUnknownMessageError
+                message: String.adamant.reply.longUnknownMessageError
             )
         }
         
@@ -1379,11 +1437,11 @@ extension AdamantChatsProvider {
     }
     
     /// - New unread messagess ids
-    private func process(
+    @discardableResult private func process(
         messageTransactions: [Transaction],
         senderId: String,
         privateKey: String
-    ) async {
+    ) async -> (reactionsCount: Int, totalCount: Int) {
         struct DirectionedTransaction {
             let transaction: Transaction
             let isOut: Bool
@@ -1468,6 +1526,8 @@ extension AdamantChatsProvider {
         var newMessageTransactions = [ChatTransaction]()
         var transactionInProgress: [UInt64] = []
         
+        var reactions = 0
+        
         for (account, transactions) in partners {
             // We can't save whole context while we are mass creating MessageTransactions.
             guard let chatroom = account.chatroom else { continue }
@@ -1517,6 +1577,10 @@ extension AdamantChatsProvider {
                     removedMessages: self.removedMessages,
                     context: privateContext
                    ) {
+                    if let transaction = chatTransaction as? RichMessageTransaction,
+                       transaction.additionalType == .reaction {
+                        reactions += 1
+                    }
                     if height < chatTransaction.height {
                         height = chatTransaction.height
                     }
@@ -1622,6 +1686,7 @@ extension AdamantChatsProvider {
             updateLastHeight(height: height)
         }
         
+        return (reactionsCount: reactions, totalCount: messageTransactions.count)
     }
     
     func updateLastHeight(height: Int64) {
@@ -1635,14 +1700,6 @@ extension AdamantChatsProvider {
         
         for chatroom in viewContextChatrooms {
             await chatroom.updateLastTransaction()
-        }
-        
-        if stack.container.viewContext.hasChanges {
-            do {
-                try stack.container.viewContext.save()
-            } catch {
-                print(error)
-            }
         }
     }
 }

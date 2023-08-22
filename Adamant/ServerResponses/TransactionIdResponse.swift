@@ -7,8 +7,9 @@
 //
 
 import Foundation
+import CommonKit
 
-class TransactionIdResponse: ServerResponse {
+final class TransactionIdResponse: ServerResponse {
     let transactionId: UInt64?
     
     required init(from decoder: Decoder) throws {

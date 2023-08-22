@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CommonKit
 
 struct NotificationView: View {
     @State private var dragTranslation: CGFloat = .zero
@@ -26,7 +27,7 @@ struct NotificationView: View {
         .padding(10)
         .background(GeometryReader(content: processGeometry))
         .padding(.top, safeAreaInsets.top)
-        .expanded(.horizontal)
+        .expanded(axes: .horizontal)
         .background(Blur(style: Constants.blurStyle))
         .offset(y: dragTranslation < .zero ? dragTranslation : .zero)
         .gesture(dragGesture)

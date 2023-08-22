@@ -10,11 +10,12 @@ import Foundation
 import Eureka
 import SafariServices
 import MessageUI
+import CommonKit
 
 // MARK: - Localization
-extension String.adamantLocalized {
+extension String.adamant {
     struct about {
-        static let title = NSLocalizedString("About.Title", comment: "About page: scene title")
+        static let title = String.localized("About.Title", comment: "About page: scene title")
         
         private init() { }
     }
@@ -37,8 +38,8 @@ class AboutViewController: FormViewController {
         
         var localized: String {
             switch self {
-            case .about: return NSLocalizedString("About.Section.About", comment: "About scene: 'Read about' section title.")
-            case .contactUs: return NSLocalizedString("About.Section.ContactUs", comment: "About scene: 'Contact us' section title.")
+            case .about: return .localized("About.Section.About", comment: "About scene: 'Read about' section title.")
+            case .contactUs: return .localized("About.Section.ContactUs", comment: "About scene: 'Contact us' section title.")
             }
         }
     }
@@ -62,24 +63,24 @@ class AboutViewController: FormViewController {
         
         var localized: String {
             switch self {
-            case .website: return NSLocalizedString("About.Row.Website", comment: "About scene: Website row")
-            case .whitepaper: return NSLocalizedString("About.Row.Whitepaper", comment: "About scene: The Whitepaper row")
-            case .github: return NSLocalizedString("About.Row.GitHub", comment: "About scene: Project's GitHub page row")
-            case .adm: return NSLocalizedString("About.Row.Adamant", comment: "About scene: Write to Adamant row")
-            case .welcomeScreens: return NSLocalizedString("About.Row.Welcome", comment: "About scene: Show Welcome screens")
-            case .email: return NSLocalizedString("About.Row.WriteUs", comment: "About scene: Write us row")
-            case .blog: return NSLocalizedString("About.Row.Blog", comment: "About scene: Our blog row")
-            case .twitter: return NSLocalizedString("About.Row.Twitter", comment: "About scene: Twitter row")
+            case .website: return .localized("About.Row.Website", comment: "About scene: Website row")
+            case .whitepaper: return .localized("About.Row.Whitepaper", comment: "About scene: The Whitepaper row")
+            case .github: return .localized("About.Row.GitHub", comment: "About scene: Project's GitHub page row")
+            case .adm: return .localized("About.Row.Adamant", comment: "About scene: Write to Adamant row")
+            case .welcomeScreens: return .localized("About.Row.Welcome", comment: "About scene: Show Welcome screens")
+            case .email: return .localized("About.Row.WriteUs", comment: "About scene: Write us row")
+            case .blog: return .localized("About.Row.Blog", comment: "About scene: Our blog row")
+            case .twitter: return .localized("About.Row.Twitter", comment: "About scene: Twitter row")
             }
         }
         
         var localizedUrl: String {
             switch self {
-            case .website: return NSLocalizedString("About.Row.Website.Url", comment: "About scene: Website localized url")
-            case .whitepaper: return NSLocalizedString("About.Row.Whitepaper.Url", comment: "About scene: The Whitepaper localized url")
-            case .github: return NSLocalizedString("About.Row.GitHub.Url", comment: "About scene: Project's GitHub page localized url")
-            case .blog: return NSLocalizedString("About.Row.Blog.Url", comment: "About scene: Our blog localized url")
-            case .twitter: return NSLocalizedString("About.Row.Twitter.Url", comment: "About scene: Twitter localized url")
+            case .website: return .localized("About.Row.Website.Url", comment: "About scene: Website localized url")
+            case .whitepaper: return .localized("About.Row.Whitepaper.Url", comment: "About scene: The Whitepaper localized url")
+            case .github: return .localized("About.Row.GitHub.Url", comment: "About scene: Project's GitHub page localized url")
+            case .blog: return .localized("About.Row.Blog.Url", comment: "About scene: Our blog localized url")
+            case .twitter: return .localized("About.Row.Twitter.Url", comment: "About scene: Twitter localized url")
                 
             // No urls
             case .adm, .email, .welcomeScreens: return ""
@@ -88,14 +89,14 @@ class AboutViewController: FormViewController {
         
         var image: UIImage? {
             switch self {
-            case .whitepaper: return #imageLiteral(resourceName: "row_whitepapper")
-            case .email: return #imageLiteral(resourceName: "row_email")
-            case .github: return #imageLiteral(resourceName: "row_github")
-            case .blog: return #imageLiteral(resourceName: "row_blog")
-            case .adm: return #imageLiteral(resourceName: "row_chat_adamant")
-            case .website: return #imageLiteral(resourceName: "row_website")
-            case .welcomeScreens: return #imageLiteral(resourceName: "row_logo")
-            case .twitter: return #imageLiteral(resourceName: "row_twitter")
+            case .whitepaper: return .asset(named: "row_whitepapper")
+            case .email: return .asset(named: "row_email")
+            case .github: return .asset(named: "row_github")
+            case .blog: return .asset(named: "row_blog")
+            case .adm: return .asset(named: "row_chat_adamant")
+            case .website: return .asset(named: "row_website")
+            case .welcomeScreens: return .asset(named: "row_logo")
+            case .twitter: return .asset(named: "row_twitter")
             }
         }
     }
@@ -115,14 +116,14 @@ class AboutViewController: FormViewController {
         super.viewDidLoad()
         
         navigationItem.largeTitleDisplayMode = .always
-        navigationItem.title = String.adamantLocalized.about.title
+        navigationItem.title = String.adamant.about.title
         
         // MARK: Header & Footer
         if let header = UINib(nibName: "LogoFullHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
             tableView.tableHeaderView = header
             
             if let label = header.viewWithTag(888) as? UILabel {
-                label.text = String.adamantLocalized.shared.productName
+                label.text = String.adamant.shared.productName
             }
         }
         
@@ -281,12 +282,12 @@ class AboutViewController: FormViewController {
             } catch let error as AccountsProviderError {
                 switch error {
                 case .invalidAddress, .notFound, .notInitiated, .networkError, .dummy:
-                    dialogService.showWarning(withMessage: String.adamantLocalized.sharedErrors.networkError)
+                    dialogService.showWarning(withMessage: String.adamant.sharedErrors.networkError)
 
                 case .serverError(let error):
                     dialogService.showError(
                         withMessage:
-                            String.adamantLocalized.sharedErrors.remoteServerError(
+                            String.adamant.sharedErrors.remoteServerError(
                                 message: error.localizedDescription
                             ),
                         supportEmail: false,
@@ -296,7 +297,7 @@ class AboutViewController: FormViewController {
             } catch {
                 dialogService.showError(
                     withMessage:
-                        String.adamantLocalized.sharedErrors.remoteServerError(
+                        String.adamant.sharedErrors.remoteServerError(
                             message: error.localizedDescription
                         ),
                     supportEmail: false,

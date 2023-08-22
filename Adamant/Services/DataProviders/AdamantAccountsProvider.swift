@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreData
+import CommonKit
 
 // MARK: - Provider
 @MainActor
@@ -512,7 +513,7 @@ extension AdamantAccountsProvider {
         }
         
         if let address = coreAccount.address,
-            let name = addressBookService.getName(key: address) {
+            let name = addressBookService.getName(for: address) {
             coreAccount.name = name
             chatroom.title = name.checkAndReplaceSystemWallets()
         }

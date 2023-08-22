@@ -129,7 +129,7 @@ extension RawBtcTransactionResponse {
             if filtered.count == 1 {
                 sender = filtered.first!
             } else {
-                sender = String.adamantLocalized.dogeTransaction.senders(senders.count)
+                sender = String.adamant.dogeTransaction.senders(senders.count)
             }
         }
         
@@ -141,7 +141,7 @@ extension RawBtcTransactionResponse {
             if filtered.count == 1 {
                 recipient = filtered.first!
             } else {
-                recipient = String.adamantLocalized.dogeTransaction.recipients(recipients.count)
+                recipient = String.adamant.dogeTransaction.recipients(recipients.count)
             }
         }
 

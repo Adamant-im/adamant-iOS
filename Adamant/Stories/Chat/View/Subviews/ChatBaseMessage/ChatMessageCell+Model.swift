@@ -13,11 +13,19 @@ extension ChatMessageCell {
         let id: String
         let text: NSAttributedString
         let backgroundColor: ChatMessageBackgroundColor
+        let isFromCurrentSender: Bool
+        let reactions: Set<Reaction>?
+        let address: String
+        let opponentAddress: String
         
         static let `default` = Self(
             id: "",
             text: NSAttributedString(string: ""),
-            backgroundColor: .failed
+            backgroundColor: .failed,
+            isFromCurrentSender: false,
+            reactions: nil,
+            address: "",
+            opponentAddress: ""
         )
         
         func makeReplyContent() -> NSAttributedString {

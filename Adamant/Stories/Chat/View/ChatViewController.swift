@@ -11,11 +11,11 @@ import InputBarAccessoryView
 import Combine
 import UIKit
 import SnapKit
+import CommonKit
 
 @MainActor
 final class ChatViewController: MessagesViewController {
     typealias SpinnerCell = MessageCellWrapper<SpinnerView>
-    typealias TransactionCell = CollectionCellWrapper<ChatTransactionContainerView>
     typealias SendTransaction = ( _ parentVC: UIViewController & ComplexTransferViewControllerDelegate, _ replyToMessageId: String?) -> Void
     
     // MARK: Dependencies
@@ -34,7 +34,6 @@ final class ChatViewController: MessagesViewController {
     private var messagesLoaded = false
     private var isScrollPositionNearlyTheBottom = true
     private var viewAppeared = false
-    private var isViewVisible = false
     
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
@@ -78,7 +77,7 @@ final class ChatViewController: MessagesViewController {
         super.init(nibName: nil, bundle: nil)
         inputBar.onAttachmentButtonTap = { [weak self] in
             self.map { sendTransaction($0, viewModel.replyMessage?.id) }
-            self?.processSwipeMessage(nil)
+            self?.viewModel.clearReplyMessage()
         }
     }
     
@@ -117,11 +116,9 @@ final class ChatViewController: MessagesViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        isViewVisible = true
         defer { viewAppeared = true }
         inputBar.isUserInteractionEnabled = true
         chatMessagesCollectionView.fixedBottomOffset = nil
-        checkIsChatWasRead()
         
         guard isMacOS, !viewAppeared else { return }
         focusInputBarWithoutAnimation()
@@ -134,7 +131,6 @@ final class ChatViewController: MessagesViewController {
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        isViewVisible = false
         viewModel.preserveMessage(inputBar.text)
         viewModel.saveChatOffset(
             isScrollPositionNearlyTheBottom
@@ -158,12 +154,12 @@ final class ChatViewController: MessagesViewController {
         
         super.collectionView(collectionView, willDisplay: cell, forItemAt: indexPath)
         
-        let isItemVisible = collectionView.indexPathsForVisibleItems.contains {
+        let isVisible = collectionView.indexPathsForVisibleItems.contains {
             $0.section == viewModel.minIndexForStartLoadNewMessages
         }
         
         guard indexPath.section < viewModel.minIndexForStartLoadNewMessages,
-              isItemVisible
+              isVisible
         else { return }
         
         viewModel.loadMoreMessagesIfNeeded()
@@ -338,6 +334,10 @@ private extension ChatViewController {
         viewModel.$isNeedToAnimateScroll
             .sink { [weak self] in self?.animateScroll(isStarted: $0) }
             .store(in: &subscriptions)
+        
+        viewModel.updateChatRead
+            .sink { [weak self] in self?.checkIsChatWasRead() }
+            .store(in: &subscriptions)
     }
 }
 
@@ -461,7 +461,7 @@ private extension ChatViewController {
     func makeChatMessagesCollectionView() -> ChatMessagesCollectionView {
         let collection = ChatMessagesCollectionView()
         collection.refreshControl = ChatRefreshMock()
-        collection.register(TransactionCell.self)
+        collection.register(ChatTransactionCell.self)
         collection.register(ChatMessageCell.self)
         collection.register(ChatMessageReplyCell.self)
         collection.register(
@@ -498,7 +498,7 @@ private extension ChatViewController {
     }
     
     func checkIsChatWasRead() {
-        guard isScrollPositionNearlyTheBottom, messagesLoaded, isViewVisible else { return }
+        guard isScrollPositionNearlyTheBottom, messagesLoaded else { return }
         viewModel.entireChatWasRead()
     }
     
@@ -719,11 +719,11 @@ extension ChatViewController {
         
         guard let index = viewModel.needToAnimateCellIndex else { return }
         
-        let isItemVisible = messagesCollectionView.indexPathsForVisibleItems.contains {
+        let isVisible = messagesCollectionView.indexPathsForVisibleItems.contains {
             $0.section == index
         }
         
-        guard isItemVisible else { return }
+        guard isVisible else { return }
         
         // TODO: refactor for architecture
         let cell = messagesCollectionView.cellForItem(at: .init(item: .zero, section: index))

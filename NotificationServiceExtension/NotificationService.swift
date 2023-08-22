@@ -8,7 +8,7 @@
 
 import UserNotifications
 import MarkdownKit
-import CoreData
+import CommonKit
 
 class NotificationService: UNNotificationServiceExtension {
     private let passphraseStoreKey = "accountService.passphrase"
@@ -62,7 +62,6 @@ class NotificationService: UNNotificationServiceExtension {
         let securedStore = KeychainStore()
         let core = NativeAdamantCore()
         let api = ExtensionsApi(keychainStore: securedStore)
-        let stack = try? InMemoryCoreDataStack(modelUrl: AdamantResources.coreDataModel)
         
         if let sound: String = securedStore.get(StoreKey.notificationsService.notificationsSound) {
             if sound.isEmpty {
@@ -101,17 +100,6 @@ class NotificationService: UNNotificationServiceExtension {
         
         let contactsBlockList: [String] = securedStore.get(StoreKey.accountService.blockList) ?? []
         guard !contactsBlockList.contains(partnerAddress) else { return }
-        
-        // MARK: 3.1 Checking is transaction processed
-        
-        let fetchRequest = BaseTransaction.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "transactionId == %@", raw)
-        fetchRequest.fetchLimit = 1
-        let list = try? stack?.container.viewContext.fetch(fetchRequest)
-        
-        if list?.first != nil {
-            bestAttemptContent.badge = nil
-        }
         
         // MARK: 4. Address book
         if
@@ -215,6 +203,24 @@ class NotificationService: UNNotificationServiceExtension {
                     richContent: transferContent
                    ) {
                     content = notificationContent
+                }
+                
+                // reaction
+                if let data = message.data(using: String.Encoding.utf8),
+                   let richContent = RichMessageTools.richContent(from: data),
+                   let reaction = richContent[RichContentKeys.react.react_message] as? String,
+                   richContent[RichContentKeys.react.reactto_id] != nil {
+                    let text = reaction.isEmpty
+                    ? NotificationStrings.removedReaction
+                    : "\(NotificationStrings.reacted) \(reaction)"
+                    
+                    content = NotificationContent(
+                        title: partnerName ?? partnerAddress,
+                        subtitle: nil,
+                        body: MarkdownParser().parse(text).string,
+                        attachments: nil,
+                        categoryIdentifier: AdamantNotificationCategories.message
+                    )
                 }
                 
                 guard let content = content else {

@@ -15,6 +15,7 @@ import Alamofire
 import struct BigInt.BigUInt
 import Web3Core
 import Combine
+import CommonKit
 
 class LskWalletService: WalletService {
     
@@ -52,7 +53,7 @@ class LskWalletService: WalletService {
     private (set) var enabled = true
     private (set) var isWarningGasPrice = false
     
-    static var currencyLogo = #imageLiteral(resourceName: "lisk_wallet")
+    static var currencyLogo = UIImage.asset(named: "lisk_wallet") ?? .init()
     
     static let kvsAddress = "lsk:address"
     static let defaultFee: BigUInt = 141000
@@ -132,7 +133,7 @@ class LskWalletService: WalletService {
         self.init(mainnet: mainnet, nodes: nodes, serviceNode: serviceNode)
     }
     
-    convenience init(mainnet: Bool, nodes: [Node], services: [Node]) {
+    convenience init(mainnet: Bool, nodes: [CommonKit.Node], services: [CommonKit.Node]) {
         self.init(mainnet: mainnet, nodes: nodes.map { APINode(origin: $0.asString()) }, serviceNode: services.map { APINode(origin: $0.asString()) })
     }
     
@@ -669,7 +670,7 @@ extension LskWalletService: PrivateKeyGenerator {
     }
     
     var rowImage: UIImage? {
-        return #imageLiteral(resourceName: "lisk_wallet_row")
+        return .asset(named: "lisk_wallet_row")
     }
     
     func generatePrivateKeyFor(passphrase: String) -> String? {

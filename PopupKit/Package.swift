@@ -14,11 +14,13 @@ let package = Package(
             targets: ["PopupKit"]
         )
     ],
-    dependencies: [],
+    dependencies: [
+        .package(path: "../CommonKit")
+    ],
     targets: [
         .target(
             name: "PopupKit",
-            dependencies: []
+            dependencies: ["CommonKit"]
         )
     ]
 )

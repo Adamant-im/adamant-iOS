@@ -7,70 +7,146 @@
 //
 
 import UIKit
+import SwiftUI
+import ElegantEmojiPicker
+import AdvancedContextMenuKit
 
-final class ChatMenuManager: NSObject, UIContextMenuInteractionDelegate {
-    private let menu: UIMenu
+protocol ChatMenuManagerDelegate: AnyObject {
+    func didReact(_ emoji: String)
+    func getContentView() -> UIView?
+}
+
+extension ChatMenuManagerDelegate {
+    func getContentView() -> UIView? { return nil }
+}
+
+@MainActor
+final class ChatMenuManager: NSObject, AdvancedContextMenuManagerDelegate {
+    private let menu: AMenuSection
+    var emojiService: EmojiService?
     
-    var backgroundColor: UIColor?
+    weak var delegate: ChatMenuManagerDelegate?
+    var selectedEmoji: String?
     
     // MARK: Init
     
-    init(menu: UIMenu, backgroundColor: UIColor?) {
+    init(menu: AMenuSection, emojiService: EmojiService?) {
         self.menu = menu
-        self.backgroundColor = backgroundColor
+        self.emojiService = emojiService
         
         super.init()
     }
     
-    func contextMenuInteraction(
-        _ interaction: UIContextMenuInteraction,
-        configurationForMenuAtLocation location: CGPoint
-    ) -> UIContextMenuConfiguration? {
-        return UIContextMenuConfiguration(actionProvider: { [weak self] _ in
-            guard let self = self else { return nil }
-            return self.menu
-        })
+    func configureContextMenu() -> AMenuSection {
+        menu
     }
     
-    func contextMenuInteraction(
-        _ interaction: UIContextMenuInteraction,
-        configuration: UIContextMenuConfiguration,
-        highlightPreviewForItemWithIdentifier identifier: NSCopying
-    ) -> UITargetedPreview? {
-        guard let backgroundColor = backgroundColor else { return nil }
-        
-        return makeTargetedPreview(
-            for: configuration,
-            interaction: interaction,
-            backgroundColor: backgroundColor
+    func configureUpperContentViewSize() -> CGSize {
+        .init(width: 310, height: 50)
+    }
+    
+    func getUpperContentView() -> AnyView? {
+        AnyView(
+            ChatReactionsView(
+                delegate: self,
+                emojis: getFrequentlySelectedEmojis(selectedEmoji: selectedEmoji),
+                selectedEmoji: selectedEmoji
+            )
         )
     }
     
-    func contextMenuInteraction(
-        _ interaction: UIContextMenuInteraction,
-        configuration: UIContextMenuConfiguration,
-        dismissalPreviewForItemWithIdentifier identifier: NSCopying
-    ) -> UITargetedPreview? {
-        guard backgroundColor != nil else {
-            return makeTargetedPreview(
-                for: configuration,
-                interaction: interaction,
-                backgroundColor: .clear
+    func getContentView() -> UIView? {
+        delegate?.getContentView()
+    }
+}
+
+extension ChatMenuManager: ChatReactionsViewDelegate, ElegantEmojiPickerDelegate {
+    func didSelectEmoji(_ emoji: String) {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        let pickedEmoji = emoji == selectedEmoji ? "" : emoji
+        
+        delegate?.didReact(pickedEmoji)
+        
+        if !pickedEmoji.isEmpty {
+            emojiService?.updateFrequentlySelectedEmojis(
+                selectedEmoji: pickedEmoji,
+                type: .increment
             )
         }
         
-        return nil
+        if let selectedEmoji = selectedEmoji {
+            emojiService?.updateFrequentlySelectedEmojis(
+                selectedEmoji: selectedEmoji,
+                type: .decrement
+            )
+        }
     }
     
-    private func makeTargetedPreview(
-        for configuration: UIContextMenuConfiguration,
-        interaction: UIContextMenuInteraction,
-        backgroundColor: UIColor
-    ) -> UITargetedPreview? {
-        guard let view = interaction.view else { return nil }
+    @MainActor
+    func didTapMore() {
+        let config = ElegantConfiguration(
+            showRandom: false,
+            showReset: false,
+            defaultSkinTone: .Light
+        )
+        let picker = ElegantEmojiPicker(delegate: self, configuration: config)
+        picker.definesPresentationContext = true
+        self.rootViewController()?.present(picker, animated: true)
+    }
+    
+    func emojiPicker (
+        _ picker: ElegantEmojiPicker,
+        didSelectEmoji emoji: Emoji?
+    ) {
+        guard let emoji = emoji?.emoji else { return }
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
         
-        let parameters = UIPreviewParameters()
-        parameters.backgroundColor = backgroundColor
-        return UITargetedPreview(view: view, parameters: parameters)
+        let pickedEmoji = emoji == selectedEmoji ? "" : emoji
+        
+        delegate?.didReact(pickedEmoji)
+        
+        if !pickedEmoji.isEmpty {
+            emojiService?.updateFrequentlySelectedEmojis(
+                selectedEmoji: pickedEmoji,
+                type: .increment
+            )
+        }
+        
+        if let selectedEmoji = selectedEmoji {
+            emojiService?.updateFrequentlySelectedEmojis(
+                selectedEmoji: selectedEmoji,
+                type: .decrement
+            )
+        }
+    }
+}
+
+private extension ChatMenuManager {
+    func rootViewController() -> UIViewController? {
+        let allScenes = UIApplication.shared.connectedScenes
+        let scene = allScenes.first { $0.activationState == .foregroundActive }
+        
+        guard let windowScene = scene as? UIWindowScene else {
+            return nil
+        }
+        
+        var topController = windowScene.keyWindow?.rootViewController
+        
+        while (topController?.presentedViewController != nil) {
+            topController = topController?.presentedViewController
+        }
+        return topController
+    }
+    
+    func getFrequentlySelectedEmojis(selectedEmoji: String?) -> [String]? {
+        var emojis = emojiService?.getFrequentlySelectedEmojis()
+        guard let selectedEmoji = selectedEmoji else { return emojis }
+        
+        if let index = emojis?.firstIndex(of: selectedEmoji) {
+            emojis?.remove(at: index)
+        }
+        emojis?.insert(selectedEmoji, at: 0)
+        
+        return emojis
     }
 }

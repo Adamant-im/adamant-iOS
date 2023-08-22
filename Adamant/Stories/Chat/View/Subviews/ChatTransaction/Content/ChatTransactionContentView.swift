@@ -8,6 +8,7 @@
 
 import UIKit
 import SnapKit
+import CommonKit
 
 final class ChatTransactionContentView: UIView {
     var model: Model = .default {
@@ -216,7 +217,10 @@ private extension ChatTransactionContentView {
                 message: NSAttributedString(string: ""),
                 messageReply: NSAttributedString(string: ""),
                 backgroundColor: .failed,
-                isFromCurrentSender: true
+                isFromCurrentSender: true,
+                reactions: nil,
+                address: "",
+                opponentAddress: ""
             )))
             return
         }

@@ -8,6 +8,7 @@
 
 import Swinject
 import BitcoinKit
+import CommonKit
 
 // MARK: - Services
 extension Container {
@@ -63,6 +64,13 @@ extension Container {
         // MARK: IncreaseFeeService
         self.register(IncreaseFeeService.self) { r in
             AdamantIncreaseFeeService(
+                securedStore: r.resolve(SecuredStore.self)!
+            )
+        }.inObjectScope(.container)
+        
+        // MARK: EmojiService
+        self.register(EmojiService.self) { r in
+            AdamantEmojiService(
                 securedStore: r.resolve(SecuredStore.self)!
             )
         }.inObjectScope(.container)
@@ -214,6 +222,8 @@ extension Container {
                 richTransactionStatusService: r.resolve(RichTransactionStatusService.self)!,
                 addressBookService: r.resolve(AddressBookService.self)!,
                 visibleWalletService: r.resolve(VisibleWalletsService.self)!,
+                avatarService: r.resolve(AvatarService.self)!,
+                emojiService: r.resolve(EmojiService.self)!,
                 router: r.resolve(Router.self)!
             )
         }.inObjectScope(.container)
@@ -240,6 +250,16 @@ extension Container {
         // MARK: Rich transaction reply service
         self.register(RichTransactionReplyService.self) { r in
             AdamantRichTransactionReplyService(
+                coreDataStack: r.resolve(CoreDataStack.self)!,
+                apiService: r.resolve(ApiService.self)!,
+                adamantCore: r.resolve(AdamantCore.self)!,
+                accountService: r.resolve(AccountService.self)!
+            )
+        }.inObjectScope(.container)
+        
+        // MARK: Rich transaction react service
+        self.register(RichTransactionReactService.self) { r in
+            AdamantRichTransactionReactService(
                 coreDataStack: r.resolve(CoreDataStack.self)!,
                 apiService: r.resolve(ApiService.self)!,
                 adamantCore: r.resolve(AdamantCore.self)!,

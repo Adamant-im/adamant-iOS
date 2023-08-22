@@ -8,6 +8,7 @@
 
 import UIKit
 import MyLittlePinpad
+import CommonKit
 
 // MARK: - Button types
 enum StripeButtonType: Int, Equatable {
@@ -20,19 +21,19 @@ enum StripeButtonType: Int, Equatable {
     var image: UIImage {
         switch self {
         case .pinpad:
-            return #imageLiteral(resourceName: "Stripe_Pinpad")
+            return .asset(named: "Stripe_Pinpad") ?? .init()
         
         case .touchID:
-            return #imageLiteral(resourceName: "Stripe_TouchID")
+            return .asset(named: "Stripe_TouchID") ?? .init()
             
         case .faceID:
-            return #imageLiteral(resourceName: "Stripe_FaceID")
+            return .asset(named: "Stripe_FaceID") ?? .init()
             
         case .qrCameraReader:
-            return #imageLiteral(resourceName: "Stripe_QRCamera")
+            return .asset(named: "Stripe_QRCamera") ?? .init()
             
         case .qrPhotoReader:
-            return #imageLiteral(resourceName: "Stripe_QRLibrary")
+            return .asset(named: "Stripe_QRLibrary") ?? .init()
         }
     }
 }

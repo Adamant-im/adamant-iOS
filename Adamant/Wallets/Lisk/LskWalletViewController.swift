@@ -7,11 +7,12 @@
 //
 
 import UIKit
+import CommonKit
 
-extension String.adamantLocalized {
-    static let lisk = NSLocalizedString("AccountTab.Wallets.lisk_wallet", comment: "Account tab: Lisk wallet")
+extension String.adamant {
+    static let lisk = String.localized("AccountTab.Wallets.lisk_wallet", comment: "Account tab: Lisk wallet")
     
-    static let sendLsk = NSLocalizedString("AccountTab.Row.SendLsk", comment: "Account tab: 'Send LSK tokens' button")
+    static let sendLsk = String.localized("AccountTab.Row.SendLsk", comment: "Account tab: 'Send LSK tokens' button")
 }
 
 class LskWalletViewController: WalletViewControllerBase {
@@ -20,11 +21,11 @@ class LskWalletViewController: WalletViewControllerBase {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        walletTitleLabel.text = String.adamantLocalized.lisk
+        walletTitleLabel.text = String.adamant.lisk
     }
     
     override func sendRowLocalizedLabel() -> NSAttributedString {
-        return NSAttributedString(string: String.adamantLocalized.sendLsk)
+        return NSAttributedString(string: String.adamant.sendLsk)
     }
     
     override func encodeForQr(address: String) -> String? {

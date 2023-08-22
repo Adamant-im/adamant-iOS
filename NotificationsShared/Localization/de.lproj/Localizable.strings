@@ -1,0 +1,20 @@
+/* Notifications: Something went wrong while registering remote notifications. %@ for description */
+"NotificationsService.Error.RegistrationRemotesFormat" = "Registrierung in ANS fehlgeschlagen. Bitte erneut versuchen. Ursache %@";
+
+/* Notifications: New message notification title */
+"NotificationsService.NewMessage.Title" = "Neue Nachricht";
+
+/* Notifications: New single message notification body */
+"NotificationsService.NewMessage.BodySingle" = "Sie haben eine neue Nachricht";
+
+/* Notifications: New transfer transaction title */
+"NotificationsService.NewTransfer.Title" = "Neue Transaktion";
+
+/* Notifications: New single transfer transaction body */
+"NotificationsService.NewTransfer.BodySingle" = "Sie haben eine neue Transaktion";
+
+/* Notifications: User has disabled notifications. Head him into settings */
+"NotificationsService.NotificationsDisabled" = "Benachrichtigungen deaktiviert. Sie können Benachrichtigungen in den Einstellungen aktivieren";
+
+/* Notifications: Not stayed logged in */
+"NotificationsService.NotStayedLoggedIn" = "Can't turn on notifications without staying logged in";

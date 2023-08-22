@@ -9,6 +9,7 @@
 import Foundation
 import Combine
 import Firebase
+import CommonKit
 
 final class AdamantCrashlyticsService: CrashlyticsService {
     

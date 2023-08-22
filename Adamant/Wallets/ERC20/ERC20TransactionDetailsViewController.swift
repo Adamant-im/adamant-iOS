@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CommonKit
 
 class ERC20TransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies

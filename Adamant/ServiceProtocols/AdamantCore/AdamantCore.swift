@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CommonKit
 
 protocol AdamantCore: AnyObject {
     // MARK: - Keys

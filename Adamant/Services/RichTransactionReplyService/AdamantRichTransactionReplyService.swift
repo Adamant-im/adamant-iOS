@@ -8,6 +8,7 @@
 
 import CoreData
 import Combine
+import CommonKit
 
 actor AdamantRichTransactionReplyService: NSObject, RichTransactionReplyService {
     private let coreDataStack: CoreDataStack
@@ -18,7 +19,7 @@ actor AdamantRichTransactionReplyService: NSObject, RichTransactionReplyService 
     
     private lazy var richController = getRichTransactionsController()
     private lazy var transferController = getTransferController()
-    private let unknownErrorMessage = String.adamantLocalized.reply.shortUnknownMessageError
+    private let unknownErrorMessage = String.adamant.reply.shortUnknownMessageError
 
     init(
         coreDataStack: CoreDataStack,
@@ -64,7 +65,7 @@ extension AdamantRichTransactionReplyService: NSFetchedResultsControllerDelegate
         newIndexPath _: IndexPath?
     ) {
         if let transaction = object as? RichMessageTransaction,
-           transaction.isReply {
+           transaction.additionalType == .reply {
             Task { await processCoreDataChange(type: type_, transaction: transaction) }
         }
         
@@ -147,8 +148,8 @@ private extension AdamantRichTransactionReplyService {
         : transaction.senderPublicKey
         
         let transactionStatus = isOut
-        ? String.adamantLocalized.chat.transactionSent
-        : String.adamantLocalized.chat.transactionReceived
+        ? String.adamant.chat.transactionSent
+        : String.adamant.chat.transactionReceived
         
         guard let chat = transaction.asset.chat else {
             let message = "\(transactionStatus) \(AdmWalletService.currencySymbol) \(transaction.amount)"
@@ -227,8 +228,8 @@ private extension AdamantRichTransactionReplyService {
         let isOut = transaction.senderId == address
         
         let transactionStatus = isOut
-        ? String.adamantLocalized.chat.transactionSent
-        : String.adamantLocalized.chat.transactionReceived
+        ? String.adamant.chat.transactionSent
+        : String.adamant.chat.transactionReceived
         
         var message: String
         

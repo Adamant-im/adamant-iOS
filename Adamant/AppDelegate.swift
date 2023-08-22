@@ -10,17 +10,18 @@ import UIKit
 import Swinject
 import CryptoSwift
 import CoreData
+import CommonKit
 
 // MARK: - Constants
-extension String.adamantLocalized {
+extension String.adamant {
     struct tabItems {
-        static let account = NSLocalizedString("Tabs.Account", comment: "Main tab bar: Account page")
-        static let chats = NSLocalizedString("Tabs.Chats", comment: "Main tab bar: Chats page")
-        static let settings = NSLocalizedString("Tabs.Settings", comment: "Main tab bar: Settings page")
+        static let account = String.localized("Tabs.Account", comment: "Main tab bar: Account page")
+        static let chats = String.localized("Tabs.Chats", comment: "Main tab bar: Chats page")
+        static let settings = String.localized("Tabs.Settings", comment: "Main tab bar: Settings page")
     }
     
     struct application {
-        static let deviceTokenSendFailed = NSLocalizedString("Application.deviceTokenErrorFormat", comment: "Application: Failed to send deviceToken to ANS error format. %@ for error description")
+        static let deviceTokenSendFailed = String.localized("Application.deviceTokenErrorFormat", comment: "Application: Failed to send deviceToken to ANS error format. %@ for error description")
     }
 }
 
@@ -108,12 +109,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             ? .splitControllers(makeSplitController(), makeSplitController())
             : .navigationControllers(chatList, account)
         
-        tabScreens.viewControllers.0.tabBarItem.title = .adamantLocalized.tabItems.chats
-        tabScreens.viewControllers.0.tabBarItem.image = #imageLiteral(resourceName: "chats_tab")
+        tabScreens.viewControllers.0.tabBarItem.title = .adamant.tabItems.chats
+        tabScreens.viewControllers.0.tabBarItem.image = .asset(named: "chats_tab")
         tabScreens.viewControllers.0.tabBarItem.badgeColor = .adamant.primary
         
-        tabScreens.viewControllers.1.tabBarItem.title = .adamantLocalized.tabItems.account
-        tabScreens.viewControllers.1.tabBarItem.image = #imageLiteral(resourceName: "account-tab")
+        tabScreens.viewControllers.1.tabBarItem.title = .adamant.tabItems.account
+        tabScreens.viewControllers.1.tabBarItem.image = .asset(named: "account-tab")
         tabScreens.viewControllers.1.tabBarItem.badgeColor = .adamant.primary
         
         let resetScreensAction: () -> Void
@@ -213,6 +214,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             Task { await service.startObserving() }
         }
         
+        // Setup transactions react observing
+        if let service = container.resolve(RichTransactionReactService.self) {
+            Task { await service.startObserving() }
+        }
+        
         // Register repeater services
         if let chatsProvider = container.resolve(ChatsProvider.self) {
             repeater.registerForegroundCall(label: "chatsProvider", interval: 10, queue: .global(qos: .utility), callback: {
@@ -263,9 +269,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             forName: Notification.Name.AdamantAccountService.userLoggedOut,
             object: nil,
             queue: OperationQueue.main
-        ) { [weak container] _ in
+        ) { _ in
             resetScreensAction()
-            container?.resolve(CoreDataStack.self)?.deleteAccounts()
         }
         
         // MARK: 8. Welcome messages
@@ -322,7 +327,7 @@ extension AppDelegate {
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         if let service = container.resolve(DialogService.self) {
-            service.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.notifications.registerRemotesError, error.localizedDescription), supportEmail: true, error: error)
+            service.showError(withMessage: String.localizedStringWithFormat(NotificationStrings.registrationRemotesFormat, error.localizedDescription), supportEmail: true, error: error)
         }
     }
     
@@ -523,7 +528,7 @@ extension AppDelegate {
             _ = try? await chatProvider.fakeReceived(
                 message: adelina.message,
                 senderId: AdamantContacts.adelina.address,
-                date: Date.adamantNullDate,
+                date: .adamantNullDate,
                 unread: false,
                 silent: adelina.silentNotification,
                 showsChatroom: true
@@ -534,7 +539,7 @@ extension AppDelegate {
             _ = try? await chatProvider.fakeReceived(
                 message: exchenge.message,
                 senderId: AdamantContacts.adamantExchange.address,
-                date: Date.adamantNullDate,
+                date: .adamantNullDate,
                 unread: false,
                 silent: exchenge.silentNotification,
                 showsChatroom: true
@@ -545,7 +550,7 @@ extension AppDelegate {
             _ = try? await chatProvider.fakeReceived(
                 message: betOnBitcoin.message,
                 senderId: AdamantContacts.betOnBitcoin.address,
-                date: Date.adamantNullDate,
+                date: .adamantNullDate,
                 unread: false,
                 silent: betOnBitcoin.silentNotification,
                 showsChatroom: false
@@ -556,7 +561,7 @@ extension AppDelegate {
             _ = try? await chatProvider.fakeReceived(
                 message: welcome.message,
                 senderId: AdamantContacts.donate.address,
-                date: Date.adamantNullDate,
+                date: .adamantNullDate,
                 unread: false,
                 silent: true,
                 showsChatroom: true
@@ -567,7 +572,7 @@ extension AppDelegate {
             _ = try? await chatProvider.fakeReceived(
                 message: welcome.message,
                 senderId: AdamantContacts.adamantWelcomeWallet.name,
-                date: Date.adamantNullDate,
+                date: .adamantNullDate,
                 unread: unread,
                 silent: welcome.silentNotification,
                 showsChatroom: true

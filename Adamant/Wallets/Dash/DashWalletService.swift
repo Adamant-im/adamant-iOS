@@ -11,6 +11,7 @@ import Swinject
 import Alamofire
 import BitcoinKit
 import Combine
+import CommonKit
 
 final class DashWalletService: WalletService {
     
@@ -65,7 +66,7 @@ final class DashWalletService: WalletService {
     var addressConverter: AddressConverter!
     
     // MARK: - Constants
-    static var currencyLogo = #imageLiteral(resourceName: "dash_wallet")
+    static var currencyLogo = UIImage.asset(named: "dash_wallet") ?? .init()
     
     static let multiplier = Decimal(sign: .plus, exponent: 8, significand: 1)
     static let chunkSize = 20
@@ -496,7 +497,7 @@ extension DashWalletService: PrivateKeyGenerator {
     }
     
     var rowImage: UIImage? {
-        return #imageLiteral(resourceName: "dash_wallet_row")
+        return .asset(named: "dash_wallet_row")
     }
     
     func generatePrivateKeyFor(passphrase: String) -> String? {

@@ -9,7 +9,7 @@
 import Foundation
 
 class BaseBtcTransaction: TransactionDetails {
-    class var defaultCurrencySymbol: String? { return "" }
+    var defaultCurrencySymbol: String? { return "" }
     
     let txId: String
     let dateValue: Date?

@@ -8,6 +8,7 @@
 
 import SnapKit
 import UIKit
+import CommonKit
 
 final class VisibleWalletsCheckmarkRowView: UIView {
     private let checkmarkView = CheckmarkView()

@@ -9,6 +9,7 @@
 import UIKit
 import Combine
 import SafariServices
+import CommonKit
 
 @MainActor
 final class ChatDialogManager {
@@ -127,7 +128,7 @@ private extension ChatDialogManager {
     func showFreeTokenAlert() {
         let alert = UIAlertController(
             title: "",
-            message: String.adamantLocalized.chat.freeTokensMessage,
+            message: String.adamant.chat.freeTokensMessage,
             preferredStyle: .alert
         )
         
@@ -139,12 +140,12 @@ private extension ChatDialogManager {
     
     func showRemoveMessageAlert(id: String) {
         dialogService.showAlert(
-            title: .adamantLocalized.chat.removeMessage,
+            title: .adamant.chat.removeMessage,
             message: nil,
             style: .alert,
             actions: [
                 .init(
-                    title: .adamantLocalized.alert.ok,
+                    title: .adamant.alert.ok,
                     style: .destructive,
                     handler: { [weak viewModel] in viewModel?.hideMessage(id: id) }
                 ),
@@ -156,16 +157,16 @@ private extension ChatDialogManager {
     
     func showReportMessageAlert(id: String) {
         dialogService.showAlert(
-            title: .adamantLocalized.chat.reportMessage,
+            title: .adamant.chat.reportMessage,
             message: nil,
             style: .alert,
             actions: [
                 .init(
-                    title: .adamantLocalized.alert.ok,
+                    title: .adamant.alert.ok,
                     style: .destructive,
                     handler: { [weak self] in
                         self?.viewModel.hideMessage(id: id)
-                        self?.dialogService.showToastMessage(.adamantLocalized.chat.reportSent)
+                        self?.dialogService.showToastMessage(.adamant.chat.reportSent)
                     }
                 ),
                 makeCancelAction()
@@ -176,8 +177,8 @@ private extension ChatDialogManager {
     
     func showFailedMessageAlert(id: String, sender: Any) {
         dialogService.showAlert(
-            title: .adamantLocalized.alert.retryOrDeleteTitle,
-            message: .adamantLocalized.alert.retryOrDeleteBody,
+            title: .adamant.alert.retryOrDeleteTitle,
+            message: .adamant.alert.retryOrDeleteBody,
             style: .actionSheet,
             actions: [
                 makeRetryAction(id: id),
@@ -194,21 +195,21 @@ private extension ChatDialogManager {
 private extension ChatDialogManager {
     func makeBlockAction() -> UIAlertAction {
         .init(
-            title: .adamantLocalized.chat.block,
+            title: .adamant.chat.block,
             style: .destructive
         ) { [weak dialogService, weak viewModel] _ in
             dialogService?.showAlert(
-                title: .adamantLocalized.chatList.blockUser,
+                title: .adamant.chatList.blockUser,
                 message: nil,
                 style: .alert,
                 actions: [
                     .init(
-                        title: .adamantLocalized.alert.ok,
+                        title: .adamant.alert.ok,
                         style: .destructive,
                         handler: { viewModel?.blockChat() }
                     ),
                     .init(
-                        title: .adamantLocalized.alert.cancel,
+                        title: .adamant.alert.cancel,
                         style: .default,
                         handler: nil
                     )
@@ -220,7 +221,7 @@ private extension ChatDialogManager {
     
     func makeRenameAction() -> UIAlertAction {
         .init(
-            title: .adamantLocalized.chat.rename,
+            title: .adamant.chat.rename,
             style: .default
         ) { [weak self] _ in
             guard let alert = self?.makeRenameAlert() else { return }
@@ -234,19 +235,19 @@ private extension ChatDialogManager {
         guard let address = address else { return nil }
         
         let alert = UIAlertController(
-            title: .init(format: .adamantLocalized.chat.actionsBody, address),
+            title: .init(format: .adamant.chat.actionsBody, address),
             message: nil,
             preferredStyle: .alert
         )
         
         alert.addTextField { [weak viewModel] textField in
-            textField.placeholder = .adamantLocalized.chat.name
+            textField.placeholder = .adamant.chat.name
             textField.autocapitalizationType = .words
             textField.text = viewModel?.partnerName
         }
         
         let renameAction = UIAlertAction(
-            title: .adamantLocalized.chat.rename,
+            title: .adamant.chat.rename,
             style: .default
         ) { [weak viewModel] _ in
             guard
@@ -295,7 +296,7 @@ private extension ChatDialogManager {
     
     func makeFreeTokensAlertAction() -> UIAlertAction {
         .init(
-            title: String.adamantLocalized.chat.freeTokens,
+            title: String.adamant.chat.freeTokens,
             style: .default
         ) { [weak self] _ in
             guard let self = self, let url = self.viewModel.freeTokensURL else { return }
@@ -323,7 +324,7 @@ private extension ChatDialogManager {
             guard let self = self else { return }
             DispatchQueue.onMainAsync {
                 if case .invalid = AdamantUtilities.validateAdamantAddress(address: adm.address) {
-                    self.dialogService.showToastMessage(String.adamantLocalized.newChat.specifyValidAddressMessage)
+                    self.dialogService.showToastMessage(String.adamant.newChat.specifyValidAddressMessage)
                     return
                 }
                 
@@ -351,25 +352,25 @@ private extension ChatDialogManager {
             if UIApplication.shared.canOpenURL(url) {
                 UIApplication.shared.open(url)
             } else {
-                showAlert(message: String.adamantLocalized.chat.noMailAppWarning)
+                showAlert(message: String.adamant.chat.noMailAppWarning)
             }
         } else {
             if UIApplication.shared.canOpenURL(url) {
                 UIApplication.shared.open(url)
             } else {
-                showAlert(message: String.adamantLocalized.chat.unsupportedUrlWarning)
+                showAlert(message: String.adamant.chat.unsupportedUrlWarning)
             }
         }
     }
     
     func makeRetryAction(id: String) -> UIAlertAction {
-        .init(title: .adamantLocalized.alert.retry, style: .default) { [weak viewModel] _ in
+        .init(title: .adamant.alert.retry, style: .default) { [weak viewModel] _ in
             viewModel?.retrySendMessage(id: id)
         }
     }
     
     func makeCancelSendingAction(id: String) -> UIAlertAction {
-        .init(title: .adamantLocalized.alert.delete, style: .default) { [weak viewModel] _ in
+        .init(title: .adamant.alert.delete, style: .default) { [weak viewModel] _ in
             viewModel?.cancelMessage(id: id)
         }
     }
@@ -383,10 +384,10 @@ private extension ChatDialogManager {
     }
     
     func makeCancelAction() -> UIAlertAction {
-        .init(title: .adamantLocalized.alert.cancel, style: .cancel, handler: nil)
+        .init(title: .adamant.alert.cancel, style: .cancel, handler: nil)
     }
     
     func makeCancelAction() -> AdamantAlertAction {
-        .init(title: .adamantLocalized.alert.cancel, style: .cancel, handler: nil)
+        .init(title: .adamant.alert.cancel, style: .cancel, handler: nil)
     }
 }

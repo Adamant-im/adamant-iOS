@@ -9,6 +9,7 @@
 import UIKit
 import SnapKit
 import Eureka
+import CommonKit
 
 class NodeCell: Cell<NodeCell.Model>, CellType {
     struct Model: Equatable {
@@ -40,7 +41,7 @@ class NodeCell: Cell<NodeCell.Model>, CellType {
     }
     
     public override func update() {
-        checkmarkRowView.checkmarkImage = #imageLiteral(resourceName: "status_success")
+        checkmarkRowView.checkmarkImage = .asset(named: "status_success")
         checkmarkRowView.setIsChecked(model?.node.isEnabled ?? false, animated: true)
         checkmarkRowView.onCheckmarkTap = { [weak self] in
             guard let newValue = (self?.checkmarkRowView.isChecked).map({ !$0 }) else {
@@ -114,27 +115,27 @@ private extension Node {
 
 private extension NodeCell {
     enum Strings {
-        static let ping = NSLocalizedString(
+        static let ping = String.localized(
             "NodesList.NodeCell.Ping",
             comment: "NodesList.NodeCell: Node ping"
         )
         
-        static let milliseconds = NSLocalizedString(
+        static let milliseconds = String.localized(
             "NodesList.NodeCell.Milliseconds",
             comment: "NodesList.NodeCell: Milliseconds"
         )
         
-        static let synchronizing = NSLocalizedString(
+        static let synchronizing = String.localized(
             "NodesList.NodeCell.Synchronizing",
             comment: "NodesList.NodeCell: Node is synchronizing"
         )
         
-        static let offline = NSLocalizedString(
+        static let offline = String.localized(
             "NodesList.NodeCell.Offline",
             comment: "NodesList.NodeCell: Node is offline"
         )
         
-        static let version = NSLocalizedString(
+        static let version = String.localized(
             "NodesList.NodeCell.Version",
             comment: "NodesList.NodeCell: Node version"
         )

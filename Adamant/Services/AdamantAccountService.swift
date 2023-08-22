@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import Combine
+import CommonKit
 
 class AdamantAccountService: AccountService {
     
@@ -418,12 +419,12 @@ extension AdamantAccountService {
                 alert = nil
             } else {
                 securedStore.set("1", for: .showedV12)
-                alert = (title: String.adamantLocalized.accountService.updateAlertTitleV12,
-                         message: String.adamantLocalized.accountService.updateAlertMessageV12)
+                alert = (title: String.adamant.accountService.updateAlertTitleV12,
+                         message: String.adamant.accountService.updateAlertMessageV12)
             }
             
             for case let wallet as InitiatedWithPassphraseService in wallets {
-                wallet.setInitiationFailed(reason: String.adamantLocalized.accountService.reloginToInitiateWallets)
+                wallet.setInitiationFailed(reason: String.adamant.accountService.reloginToInitiateWallets)
             }
             
             return .success(account: account, alert: alert)

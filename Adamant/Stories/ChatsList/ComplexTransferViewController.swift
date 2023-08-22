@@ -9,6 +9,7 @@
 import UIKit
 import Parchment
 import SnapKit
+import CommonKit
 
 @MainActor
 protocol ComplexTransferViewControllerDelegate: AnyObject {
@@ -29,9 +30,7 @@ class ComplexTransferViewController: UIViewController {
     var services: [WalletServiceWithSend] = []
     var partner: CoreDataAccount? {
         didSet {
-            navigationItem.title = partner?.chatroom.map {
-                addressBookService.getName(chatroom: $0)
-            } ?? nil
+            navigationItem.title = partner?.chatroom?.getName(addressBookService: addressBookService)
         }
     }
     var replyToMessageId: String?
@@ -105,7 +104,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
         
         guard let address = partner?.address else { return vc }
         
-        let name = partner?.chatroom.map { addressBookService.getName(chatroom: $0) } ?? nil
+        let name = partner?.chatroom?.getName(addressBookService: addressBookService)
         
         v.replyToMessageId = replyToMessageId
         v.admReportRecipient = address
@@ -143,7 +142,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
             } catch {
                 v.showAlertView(
                     title: nil,
-                    message: String.adamantLocalized.sharedErrors.unknownError,
+                    message: String.adamant.sharedErrors.unknownError,
                     animated: true
                 )
             }
@@ -159,7 +158,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
             return WalletPagingItem(
                 index: index,
                 currencySymbol: "",
-                currencyImage: #imageLiteral(resourceName: "adamant_wallet"),
+                currencyImage: .asset(named: "adamant_wallet") ?? .init(),
                 isBalanceInitialized: false)
 		}
         

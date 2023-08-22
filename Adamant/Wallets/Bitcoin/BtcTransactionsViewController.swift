@@ -8,6 +8,7 @@
 
 import UIKit
 import BitcoinKit
+import CommonKit
 
 class BtcTransactionsViewController: TransactionsListViewControllerBase {
     
@@ -77,10 +78,10 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
 
         if let address = btcWalletService.wallet?.address {
             if transaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
-                controller.senderName = String.adamantLocalized.transactionDetails.yourAddress
+                controller.senderName = String.adamant.transactionDetails.yourAddress
             }
             if transaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
-                controller.recipientName = String.adamantLocalized.transactionDetails.yourAddress
+                controller.recipientName = String.adamant.transactionDetails.yourAddress
             }
         }
 
@@ -111,9 +112,9 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
         var partnerName: String?
         if let address = btcWalletService.wallet?.address {
             if partnerId == address {
-                partnerName = String.adamantLocalized.transactionDetails.yourAddress
+                partnerName = String.adamant.transactionDetails.yourAddress
             } else {
-                partnerName = addressBook.getName(key: address)
+                partnerName = addressBook.getName(for: address)
             }
         }
         
