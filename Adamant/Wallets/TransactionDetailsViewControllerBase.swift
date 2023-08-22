@@ -235,13 +235,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     var valueAtTimeTxn: String? {
         didSet {
-            guard let row: LabelRow = form.rowBy(tag: Rows.historyFiat.tag)
-            else { return }
-            
-            DispatchQueue.onMainAsync { [weak self] in
-                row.value = self?.valueAtTimeTxn
-                row.updateCell()
-            }
+            updateValueAtTimeRowValue()
         }
     }
     
@@ -811,6 +805,15 @@ class TransactionDetailsViewControllerBase: FormViewController {
     private func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
+    }
+    
+    @MainActor
+    private func updateValueAtTimeRowValue() {
+        guard let row: LabelRow = form.rowBy(tag: Rows.historyFiat.tag)
+        else { return }
+        
+        row.value = valueAtTimeTxn
+        row.updateCell()
     }
     
     // MARK: - Actions
