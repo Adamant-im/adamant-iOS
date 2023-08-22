@@ -24,7 +24,7 @@ extension String.adamant {
 }
 
 class DogeTransaction: BaseBtcTransaction {
-    override class var defaultCurrencySymbol: String? { return DogeWalletService.currencySymbol }
+    override var defaultCurrencySymbol: String? { DogeWalletService.currencySymbol }
 }
 
 // MARK: - Sample Json

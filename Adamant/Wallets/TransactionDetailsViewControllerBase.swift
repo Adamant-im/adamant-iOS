@@ -233,6 +233,12 @@ class TransactionDetailsViewControllerBase: FormViewController {
         }
     }
     
+    var valueAtTimeTxn: String? {
+        didSet {
+            updateValueAtTimeRowValue()
+        }
+    }
+    
     // MARK: - Lifecycle
     
     init(
@@ -755,32 +761,34 @@ class TransactionDetailsViewControllerBase: FormViewController {
     }
     
     func updateFiat() {
-        if let date = transaction?.dateValue, let currencySymbol = currencySymbol, let amount = transaction?.amountValue {
-            self.isFiatSet = true
-            let currentFiat = currencyInfo.currentCurrency.rawValue
-            currencyInfo.getHistory(for: currencySymbol, timestamp: date) { [weak self] (result) in
-                switch result {
-                case .success(let tickers):
-                    self?.isFiatSet = true
-                    guard let tickers = tickers, let ticker = tickers["\(currencySymbol)/\(currentFiat)"] else {
-                        break
-                    }
-                    
-                    let totalFiat = amount * ticker
-                    let fiatString = self?.fiatFormatter.string(from: totalFiat)
-                    
-                    if let row: LabelRow = self?.form.rowBy(tag: Rows.historyFiat.tag) {
-                        DispatchQueue.main.async {
-                            row.value = fiatString
-                            row.updateCell()
-                        }
-                    }
-                    
-                case .failure:
-                    self?.isFiatSet = false
-                    break
-                }
+        guard let date = transaction?.dateValue,
+              let currencySymbol = currencySymbol,
+              let amount = transaction?.amountValue
+        else { return }
+        
+        self.isFiatSet = true
+        let currentFiat = currencyInfo.currentCurrency.rawValue
+        
+        currencyInfo.getHistory(
+            for: currencySymbol,
+            timestamp: date
+        ) { [weak self] (result) in
+            guard case .success(let tickers) = result else {
+                self?.isFiatSet = false
+                return
             }
+            
+            self?.isFiatSet = true
+            
+            guard let tickers = tickers,
+                  let ticker = tickers["\(currencySymbol)/\(currentFiat)"]
+            else {
+                return
+            }
+            
+            let totalFiat = amount * ticker
+            
+            self?.valueAtTimeTxn = self?.fiatFormatter.string(from: totalFiat)
         }
     }
     
@@ -797,6 +805,15 @@ class TransactionDetailsViewControllerBase: FormViewController {
     private func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
+    }
+    
+    @MainActor
+    private func updateValueAtTimeRowValue() {
+        guard let row: LabelRow = form.rowBy(tag: Rows.historyFiat.tag)
+        else { return }
+        
+        row.value = valueAtTimeTxn
+        row.updateCell()
     }
     
     // MARK: - Actions
@@ -859,6 +876,21 @@ class TransactionDetailsViewControllerBase: FormViewController {
     }
     
     func summary(for transaction: TransactionDetails) -> String? {
-        return transaction.summary(with: explorerUrl(for: transaction)?.absoluteString)
+        guard let amount = transaction.amountValue,
+              let symbol = currencySymbol,
+              let rate = currencyInfo.getRate(for: symbol),
+              !transaction.recipientAddress.isEmpty
+        else {
+            return nil
+        }
+        
+        let value = amount * rate
+        let currentValue = fiatFormatter.string(from: value)
+        
+        return transaction.summary(
+            with: explorerUrl(for: transaction)?.absoluteString,
+            currentValue: currentValue,
+            valueAtTimeTxn: valueAtTimeTxn
+        )
     }
 }
