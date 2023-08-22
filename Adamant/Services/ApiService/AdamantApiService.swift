@@ -62,6 +62,7 @@ final class AdamantApiService: ApiService {
     
     private var _lastRequestTimeDelta: TimeInterval?
     private var semaphore: DispatchSemaphore = DispatchSemaphore(value: 1)
+    private var timeOutInterval: TimeInterval = 15
     
     private(set) var currentNodes: [Node] = [] {
         didSet {
@@ -91,9 +92,11 @@ final class AdamantApiService: ApiService {
         qos: .userInteractive
     )
     
-    private let manager: Session = {
+    private lazy var manager: Session = {
         let configuration = AF.sessionConfiguration
         configuration.waitsForConnectivity = true
+        configuration.timeoutIntervalForRequest = timeOutInterval
+        configuration.timeoutIntervalForResource = timeOutInterval
         let manager = Alamofire.Session.init(configuration: configuration)
         return manager
     }()
