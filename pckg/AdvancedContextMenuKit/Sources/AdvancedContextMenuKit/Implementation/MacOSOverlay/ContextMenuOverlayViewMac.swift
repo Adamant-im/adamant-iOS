@@ -8,7 +8,6 @@
 import SwiftUI
 import CommonKit
 
-@MainActor
 struct ContextMenuOverlayViewMac: View {
     @StateObject private var viewModel: ContextMenuOverlayViewModelMac
     
