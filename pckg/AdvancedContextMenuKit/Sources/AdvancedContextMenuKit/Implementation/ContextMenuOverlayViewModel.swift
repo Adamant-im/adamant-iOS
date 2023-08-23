@@ -8,6 +8,7 @@
 import SwiftUI
 import CommonKit
 
+@MainActor
 final class ContextMenuOverlayViewModel: ObservableObject {
     let contentView: UIView
     let contentViewSize: CGSize
