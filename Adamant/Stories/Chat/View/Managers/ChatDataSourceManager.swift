@@ -83,11 +83,11 @@ final class ChatDataSourceManager: MessagesDataSource {
                 return model.value
             }
             
+            cell.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
             cell.model = model.value
             cell.configure(with: message, at: indexPath, and: messagesCollectionView)
             cell.actionHandler = { [weak self] in self?.handleAction($0) }
             cell.setSubscription(publisher: publisher, collection: messagesCollectionView)
-
             return cell
         }
         
@@ -105,11 +105,11 @@ final class ChatDataSourceManager: MessagesDataSource {
                 return model.value
             }
             
+            cell.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
             cell.model = model.value
             cell.configure(with: message, at: indexPath, and: messagesCollectionView)
             cell.actionHandler = { [weak self] in self?.handleAction($0) }
             cell.setSubscription(publisher: publisher, collection: messagesCollectionView)
-            
             return cell
         }
         
@@ -136,7 +136,8 @@ final class ChatDataSourceManager: MessagesDataSource {
             
             return model.value
         }
-        
+
+        cell.transactionView.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
         cell.transactionView.model = model.value
         cell.transactionView.actionHandler = { [weak self] in self?.handleAction($0) }
         cell.transactionView.setSubscription(publisher: publisher, collection: messagesCollectionView)
@@ -163,6 +164,8 @@ private extension ChatDataSourceManager {
             viewModel.removeMessageAction(id)
         case let .report(id):
             viewModel.reportMessageAction(id)
+        case let .react(id, emoji):
+            viewModel.reactAction(id, emoji: emoji)
         }
     }
 }

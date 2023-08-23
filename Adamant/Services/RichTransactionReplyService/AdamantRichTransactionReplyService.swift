@@ -65,7 +65,7 @@ extension AdamantRichTransactionReplyService: NSFetchedResultsControllerDelegate
         newIndexPath _: IndexPath?
     ) {
         if let transaction = object as? RichMessageTransaction,
-           transaction.isReply {
+           transaction.additionalType == .reply {
             Task { await processCoreDataChange(type: type_, transaction: transaction) }
         }
         

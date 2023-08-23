@@ -91,6 +91,12 @@
 /* Contribute scene: 'Donate' section description. */
 "Contribute.Section.DonateDescription" = "Каждое пожертвование делает АДАМАНТ сильнее";
 
+/* Contribute scene: 'Rate' section title. */
+"Contribute.Section.Rate" = "Оцените мессенджер в App Store";
+
+/* Contribute scene: 'Rate' section description. */
+"Contribute.Section.RateDescription" = "Чем больше отзывов, тем заметнее приложение. Подчеркните особенности, которые вам нравятся.";
+
 /* System accounts: ADAMANT Tokens */
 "Accounts.AdamantTokens" = "Приветствие АДАМАНТа";
 
@@ -291,6 +297,12 @@
 
 /* ChatList: First syncronization is in progress */
 "ChatListPage.SyncingChats" = "Загружаем чаты…";
+
+/* ChatList: Reacted */
+"ChatListPage.Reacted" = "Отреагировал";
+
+/* ChatList: Removed Reaction */
+"ChatListPage.RemovedReaction" = "Удалил реакцию";
 
 /* ChatList: scene title */
 "ChatListPage.Title" = "Чаты";

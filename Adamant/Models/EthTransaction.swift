@@ -54,6 +54,7 @@ struct EthTransaction {
     let isError: Bool
     let receiptStatus: TransactionReceipt.TXStatus
     let blockNumber: String?
+    let currencySymbol: String
     
     var isOutgoing: Bool = false
 }
@@ -82,6 +83,7 @@ extension EthTransaction: Decodable {
         to = try container.decode(String.self, forKey: .to)
         blockNumber = try? container.decode(String.self, forKey: .blockNumber)
         confirmations = try? container.decode(String.self, forKey: .confirmations)
+        currencySymbol = EthWalletService.currencySymbol
         
         // Status
         if let statusRaw = try? container.decode(String.self, forKey: .receiptStatus) {
@@ -133,7 +135,7 @@ extension EthTransaction: Decodable {
 
 // MARK: - TransactionDetails
 extension EthTransaction: TransactionDetails {
-    static var defaultCurrencySymbol: String? { return EthWalletService.currencySymbol }
+    var defaultCurrencySymbol: String? { return currencySymbol }
     
     var txId: String { return hash }
     var senderAddress: String { return from }
@@ -141,7 +143,8 @@ extension EthTransaction: TransactionDetails {
     var dateValue: Date? { return date }
     var amountValue: Decimal? { return value }
     var confirmationsValue: String? { return confirmations }
-    var blockValue: String? { return blockNumber}
+    var blockValue: String? { return blockNumber }
+    var feeCurrencySymbol: String? { EthWalletService.currencySymbol }
     
     var feeValue: Decimal? {
         guard let gasUsed = gasUsed else {
@@ -217,6 +220,7 @@ extension CodableTransaction {
             isError: receiptStatus != .failed,
             receiptStatus: receiptStatus,
             blockNumber: blockNumber,
+            currencySymbol: token?.symbol ?? EthWalletService.currencySymbol,
             isOutgoing: isOutgoing
         )
     }
@@ -263,35 +267,41 @@ struct EthTransactionShort {
     let contract_value: BigUInt
     
     func asEthTransaction(isOutgoing: Bool) -> EthTransaction {
-        return EthTransaction(date: date,
-                              hash: hash,
-                              value: value,
-                              from: from,
-                              to: to,
-                              gasUsed: gasUsed,
-                              gasPrice: gasPrice,
-                              confirmations: nil,
-                              isError: false,
-                              receiptStatus: .ok,
-                              blockNumber: blockNumber,
-                              isOutgoing: isOutgoing)
+        return EthTransaction(
+            date: date,
+            hash: hash,
+            value: value,
+            from: from,
+            to: to,
+            gasUsed: gasUsed,
+            gasPrice: gasPrice,
+            confirmations: nil,
+            isError: false,
+            receiptStatus: .ok,
+            blockNumber: blockNumber,
+            currencySymbol: EthWalletService.currencySymbol,
+            isOutgoing: isOutgoing
+        )
     }
     
     func asERCTransaction(isOutgoing: Bool, token: ERC20Token) -> EthTransaction {
         let exponent = -1 * token.naturalUnits
         
-        return EthTransaction(date: date,
-                              hash: hash,
-                              value: contract_value.asDecimal(exponent: exponent),
-                              from: from,
-                              to: contract_to,
-                              gasUsed: gasUsed,
-                              gasPrice: gasPrice,
-                              confirmations: nil,
-                              isError: false,
-                              receiptStatus: .ok,
-                              blockNumber: blockNumber,
-                              isOutgoing: isOutgoing)
+        return EthTransaction(
+            date: date,
+            hash: hash,
+            value: contract_value.asDecimal(exponent: exponent),
+            from: from,
+            to: contract_to,
+            gasUsed: gasUsed,
+            gasPrice: gasPrice,
+            confirmations: nil,
+            isError: false,
+            receiptStatus: .ok,
+            blockNumber: blockNumber,
+            currencySymbol: token.symbol,
+            isOutgoing: isOutgoing
+        )
     }
 }
 

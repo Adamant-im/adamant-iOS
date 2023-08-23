@@ -9,7 +9,7 @@
 import Foundation
 
 extension BaseTransaction: TransactionDetails {
-    static var defaultCurrencySymbol: String? { return AdmWalletService.currencySymbol }
+    var defaultCurrencySymbol: String? { AdmWalletService.currencySymbol }
     
     var txId: String { return transactionId }
     var senderAddress: String { return senderId ?? "" }

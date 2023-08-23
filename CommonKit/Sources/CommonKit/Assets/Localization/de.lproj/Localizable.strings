@@ -91,6 +91,12 @@
 /* Contribute scene: 'Donate' section description. */
 "Contribute.Section.DonateDescription" = "Every donation makes ADAMANT stronger";
 
+/* Contribute scene: 'Rate' section title. */
+"Contribute.Section.Rate" = "Bewerten Sie die App im App Store";
+
+/* Contribute scene: 'Rate' section description. */
+"Contribute.Section.RateDescription" = "Je mehr Feedback, desto besser ist die Sichtbarkeit der App. Markieren Sie die Funktionen, die Ihnen gefallen";
+
 /* Account tab: 'Currency' row */
 "AccountTab.Row.Currency" = "Währung";
 
@@ -294,6 +300,12 @@
 
 /* ChatList: First syncronization is in progress */
 "ChatListPage.SyncingChats" = "Chats werden synchronisiert…";
+
+/* ChatList: Reacted */
+"ChatListPage.Reacted" = "Reagiert";
+
+/* ChatList: Removed Reaction */
+"ChatListPage.RemovedReaction" = "Reaktion entfernt";
 
 /* ChatList: scene title */
 "ChatListPage.Title" = "Chats";

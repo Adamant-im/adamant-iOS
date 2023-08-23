@@ -214,6 +214,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             Task { await service.startObserving() }
         }
         
+        // Setup transactions react observing
+        if let service = container.resolve(RichTransactionReactService.self) {
+            Task { await service.startObserving() }
+        }
+        
         // Register repeater services
         if let chatsProvider = container.resolve(ChatsProvider.self) {
             repeater.registerForegroundCall(label: "chatsProvider", interval: 10, queue: .global(qos: .utility), callback: {

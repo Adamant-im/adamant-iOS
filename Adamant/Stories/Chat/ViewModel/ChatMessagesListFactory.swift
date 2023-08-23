@@ -26,7 +26,15 @@ actor ChatMessagesListFactory {
     ) -> [ChatMessage] {
         assert(!Thread.isMainThread, "Do not process messages on main thread")
         
-        return transactions.enumerated().map { index, transaction in
+        let transactionsWithoutReact = transactions.filter { chatTransaction in
+            guard let transaction = chatTransaction as? RichMessageTransaction,
+                  transaction.additionalType == .reaction
+            else { return true }
+            
+            return false
+        }
+        
+        return transactionsWithoutReact.enumerated().map { index, transaction in
             var expTimestamp: TimeInterval?
             let message = makeMessage(
                 transaction,

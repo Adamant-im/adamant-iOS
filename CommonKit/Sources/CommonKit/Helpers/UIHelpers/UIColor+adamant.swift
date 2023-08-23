@@ -103,6 +103,27 @@ extension UIColor {
             return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
         }
         
+        /// Reactions background color
+        public static var reactionsBackground: UIColor {
+            let colorWhiteTheme = UIColor(red: 0.29, green: 0.29, blue: 0.29, alpha: 0.1)
+            let colorDarkTheme = UIColor(red: 0.264, green: 0.264, blue: 0.264, alpha: 1)
+            return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
+        }
+        
+        /// More reactions background button color
+        public static var moreReactionsBackground: UIColor {
+            let colorWhiteTheme = UIColor.white
+            let colorDarkTheme = UIColor(red: 0.22, green: 0.22, blue: 0.22, alpha: 1)
+            return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
+        }
+        
+        /// Picked reaction background color
+        public static var pickedReactionBackground: UIColor {
+            let colorWhiteTheme  = UIColor(red: 0.88, green: 0.88, blue: 0.88, alpha: 1.0)
+            let colorDarkTheme   = UIColor(red: 0.278, green: 0.278, blue: 0.278, alpha: 1.0)
+            return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
+        }
+        
         /// Main dark gray, ~70% gray
         public static var primary: UIColor {
             let colorWhiteTheme = UIColor(red: 0.29, green: 0.29, blue: 0.29, alpha: 1)
@@ -198,6 +219,42 @@ extension UIColor {
         
         /// Color of input bar placeholder
         public static let chatPlaceholderTextColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1)
+        
+        // MARK: Context Menu
+        
+        public static var contextMenuLineColor: UIColor {
+            let colorWhiteTheme  = UIColor(red: 0.75, green: 0.75, blue: 0.75, alpha: 0.8)
+            let colorDarkTheme   = UIColor(red: 0.50, green: 0.50, blue: 0.50, alpha: 0.8)
+            return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
+        }
+        
+        public static var contextMenuSelectColor: UIColor {
+            let colorWhiteTheme  = UIColor.black.withAlphaComponent(0.10)
+            let colorDarkTheme   = UIColor(red: 0.214, green: 0.214, blue: 0.214, alpha: 1)
+            return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
+        }
+        
+        public static var contextMenuDefaultBackgroundColor: UIColor {
+            let colorWhiteTheme  = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 1)
+            let colorDarkTheme   = UIColor(red: 0.264, green: 0.264, blue: 0.264, alpha: 1)
+            return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
+        }
+        
+        public static var contextMenuTextColor: UIColor {
+            let colorWhiteTheme  = UIColor.black
+            let colorDarkTheme   = UIColor.white
+            return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
+        }
+        
+        public static var contextMenuOverlayMacColor: UIColor {
+            let colorWhiteTheme  = UIColor.black.withAlphaComponent(0.3)
+            let colorDarkTheme   = UIColor.white.withAlphaComponent(0.3)
+            return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
+        }
+        
+        public static var contextMenuDestructive: UIColor {
+            UIColor(red: 1, green: 0.2196078431, blue: 0.137254902, alpha: 1)
+        }
         
         // MARK: Pinpad
         /// Pinpad highligh button background, 12% gray

@@ -496,6 +496,7 @@ class TransferViewControllerBase: FormViewController {
             markAddres(isValid: true)
             return true
         } else {
+            recipientAddress = nil
             markAddres(isValid: false)
             return false
         }
@@ -998,8 +999,6 @@ extension TransferViewControllerBase {
                 
                 self?.validateForm()
                 self?.updateToolbar(for: row)
-            }.cellUpdate { [weak self] _, _ in
-                self?.validateForm()
             }
             
         case .fiat:

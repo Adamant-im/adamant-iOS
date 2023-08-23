@@ -86,6 +86,7 @@ protocol AddressBookService: AnyObject {
     // MARK: Work with Address book
     func set(name: String, for: String) async
     func getName(for key: String) -> String?
+    func getName(for partner: BaseAccount?) -> String?
     
     // MARK: Updating & saving
     func update() async -> AddressBookServiceResult? 

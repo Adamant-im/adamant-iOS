@@ -744,5 +744,5 @@ extension BtcWalletService: PrivateKeyGenerator {
 }
 
 class BtcTransaction: BaseBtcTransaction {
-    override class var defaultCurrencySymbol: String? { return BtcWalletService.currencySymbol }
+    override var defaultCurrencySymbol: String? { BtcWalletService.currencySymbol }
 }

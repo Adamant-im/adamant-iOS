@@ -18,7 +18,7 @@ final class AdamantHealthCheckService: HealthCheckService {
     // MARK: - Properties
     
     @Atomic private var _nodes = [Node]()
-    @Atomic private var currentRequests = Set<DataRequest>()
+    @Atomic private var currentRequests = Set<URL>()
     private let notifyingQueue = DispatchQueue(label: "com.adamant.health-check-notification")
     
     weak var delegate: HealthCheckDelegate?
@@ -35,19 +35,23 @@ final class AdamantHealthCheckService: HealthCheckService {
     // MARK: - Tools
     
     func healthCheck() {
-        resetRequests()
         updateNodesAvailability()
 
-        nodes.filter { $0.isEnabled }.forEach { node in
-            Task {
-                guard let request = await updateNodeStatus(node: node) else { return }
-                currentRequests.insert(request)
-            }
+        nodes.filter { $0.isEnabled && !isRequestInProgress(for: $0) }.forEach { node in
+            Task { await updateNodeStatus(node: node) }
         }
     }
     
+    private func isRequestInProgress(for node: Node) -> Bool {
+        guard let nodeURL = node.asURL() else {
+            return false
+        }
+        
+        return currentRequests.contains(nodeURL)
+    }
+    
     private func updateNodesAvailability() {
-        let workingNodes = _nodes.filter { $0.isWorking }
+        let workingNodes = nodes.filter { $0.isWorking }
         
         let actualHeightsRange = getActualNodeHeightsRange(
             heights: workingNodes.compactMap { $0.status?.height }
@@ -66,7 +70,7 @@ final class AdamantHealthCheckService: HealthCheckService {
         }
     }
     
-    private func updateNodeStatus(node: Node) async -> DataRequest? {
+    private func updateNodeStatus(node: Node) async {
         guard let nodeURL = node.asURL() else {
             node.connectionStatus = .offline
             node.status = nil
@@ -74,8 +78,11 @@ final class AdamantHealthCheckService: HealthCheckService {
         }
         
         let startTimestamp = Date().timeIntervalSince1970
+        currentRequests.insert(nodeURL)
         
-        return await apiService.getNodeStatus(url: nodeURL) { [weak self] result in
+        await apiService.getNodeStatus(url: nodeURL) { [weak self] result in
+            self?.currentRequests.remove(nodeURL)
+            
             switch result {
             case let .success(status):
                 node.status = Node.Status(
@@ -102,11 +109,6 @@ final class AdamantHealthCheckService: HealthCheckService {
             node.status = nil
             updateNodesAvailability()
         }
-    }
-    
-    private func resetRequests() {
-        currentRequests.forEach { $0.cancel() }
-        currentRequests = []
     }
 }
 

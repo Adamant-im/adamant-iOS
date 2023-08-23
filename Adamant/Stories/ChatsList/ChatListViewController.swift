@@ -22,6 +22,10 @@ extension String.adamant {
         
         static let blockUser = String.localized("Chats.BlockUser", comment: "Block this user?")
         
+        static let removedReaction = String.localized("ChatListPage.RemovedReaction", comment: "ChatList: Removed Reaction?")
+        
+        static let reacted = String.localized("ChatListPage.Reacted", comment: "ChatList: Reacted")
+        
         private init() {}
     }
 }
@@ -859,7 +863,7 @@ extension ChatListViewController {
                 return provider.shortDescription(for: richMessage)
             }
             
-            if richMessage.isReply,
+            if richMessage.additionalType == .reply,
                let content = richMessage.richContent,
                let text = content[RichContentKeys.reply.replyMessage] as? String {
                 
@@ -880,15 +884,32 @@ extension ChatListViewController {
                     height: 20
                 )
                 
+                let extraSpace = richMessage.isOutgoing ? "  " : ""
                 let imageString = NSAttributedString(attachment: replyImageAttachment)
                 
-                let markDownText = markdownParser.parse("  \(text)").resolveLinkColor()
+                let markDownText = markdownParser.parse("\(extraSpace)\(text)").resolveLinkColor()
                 
                 let fullString = NSMutableAttributedString(string: prefix)
-                fullString.append(imageString)
+                if richMessage.isOutgoing {
+                    fullString.append(imageString)
+                }
                 fullString.append(markDownText)
                 
                 return fullString
+            }
+            
+            if richMessage.additionalType == .reaction,
+               let content = richMessage.richContent,
+               let reaction = content[RichContentKeys.react.react_message] as? String {
+                let prefix = richMessage.isOutgoing
+                ? "\(String.adamant.chatList.sentMessagePrefix)"
+                : ""
+                
+                let text = reaction.isEmpty
+                ? NSMutableAttributedString(string: "\(prefix)\(String.adamant.chatList.removedReaction) \(reaction)")
+                : NSMutableAttributedString(string: "\(prefix)\(String.adamant.chatList.reacted) \(reaction)")
+                
+                return text
             }
             
             if let serialized = richMessage.serializedMessage() {

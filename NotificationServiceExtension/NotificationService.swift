@@ -205,6 +205,24 @@ class NotificationService: UNNotificationServiceExtension {
                     content = notificationContent
                 }
                 
+                // reaction
+                if let data = message.data(using: String.Encoding.utf8),
+                   let richContent = RichMessageTools.richContent(from: data),
+                   let reaction = richContent[RichContentKeys.react.react_message] as? String,
+                   richContent[RichContentKeys.react.reactto_id] != nil {
+                    let text = reaction.isEmpty
+                    ? NotificationStrings.removedReaction
+                    : "\(NotificationStrings.reacted) \(reaction)"
+                    
+                    content = NotificationContent(
+                        title: partnerName ?? partnerAddress,
+                        subtitle: nil,
+                        body: MarkdownParser().parse(text).string,
+                        attachments: nil,
+                        categoryIdentifier: AdamantNotificationCategories.message
+                    )
+                }
+                
                 guard let content = content else {
                     break
                 }

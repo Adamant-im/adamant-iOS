@@ -144,6 +144,7 @@ private extension ChatInputBar {
         inputTextView.layer.borderWidth = 1
         inputTextView.layer.cornerRadius = cornerRadius
         inputTextView.layer.masksToBounds = true
+        inputTextView.isImagePasteEnabled = false
         
         inputTextView.textContainerInset = .init(
             top: baseInsetSize + 2,

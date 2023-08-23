@@ -77,7 +77,7 @@ final class ChatViewController: MessagesViewController {
         super.init(nibName: nil, bundle: nil)
         inputBar.onAttachmentButtonTap = { [weak self] in
             self.map { sendTransaction($0, viewModel.replyMessage?.id) }
-            self?.processSwipeMessage(nil)
+            self?.viewModel.clearReplyMessage()
         }
     }
     
@@ -333,6 +333,10 @@ private extension ChatViewController {
         
         viewModel.$isNeedToAnimateScroll
             .sink { [weak self] in self?.animateScroll(isStarted: $0) }
+            .store(in: &subscriptions)
+        
+        viewModel.updateChatRead
+            .sink { [weak self] in self?.checkIsChatWasRead() }
             .store(in: &subscriptions)
     }
 }
@@ -617,7 +621,13 @@ private extension ChatViewController {
         
         switch transaction.transactionStatus {
         case .failed:
-            viewModel.dialog.send(.alert(.adamant.sharedErrors.inconsistentTransaction))
+            guard transaction.getRichValue(for: RichContentKeys.transfer.hash) != nil
+            else {
+                viewModel.dialog.send(.alert(.adamantLocalized.sharedErrors.inconsistentTransaction))
+                return
+            }
+            
+            provider.richMessageTapped(for: transaction, in: self)
         case .notInitiated, .pending, .success, .none, .inconsistent, .registered, .noNetwork, .noNetworkFinal:
             provider.richMessageTapped(for: transaction, in: self)
         }
