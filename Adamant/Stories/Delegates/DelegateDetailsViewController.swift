@@ -281,7 +281,7 @@ extension DelegateDetailsViewController {
                 case .success(let details):
                     self?.forged = details.forged
                     
-                    DispatchQueue.main.async {
+                    Task { @MainActor in
                         guard let tableView = self?.tableView else {
                             return
                         }
@@ -304,7 +304,7 @@ extension DelegateDetailsViewController {
                         self?.forgingTime = nil
                     }
                     
-                    DispatchQueue.main.async {
+                    Task { @MainActor in
                         guard let tableView = self?.tableView else {
                             return
                         }

@@ -91,14 +91,7 @@ actor AdamantApiService: ApiService {
     
     init(adamantCore: AdamantCore) {
         self.adamantCore = adamantCore
-        
-        Task {
-            let subscription = NotificationCenter.default
-                .publisher(for: .NodesSource.nodesUpdate, object: nil)
-                .sink { _ in Task { [weak self] in await self?.updateCurrentNodes() } }
-            
-            await setupSubscription(subscription)
-        }
+        Task { await setupSubscriptions() }
     }
     
     // MARK: - Tools
@@ -459,8 +452,11 @@ private extension AdamantApiService {
         return try buildUrl(url: url, path: path, queryItems: queryItems)
     }
     
-    func setupSubscription(_ subscription: AnyCancellable) {
-        subscriptions.insert(subscription)
+    func setupSubscriptions() {
+        NotificationCenter.default
+            .publisher(for: .NodesSource.nodesUpdate, object: nil)
+            .sink { _ in Task { [weak self] in await self?.updateCurrentNodes() } }
+            .store(in: &subscriptions)
     }
 }
 

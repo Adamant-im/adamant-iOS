@@ -17,8 +17,8 @@ final class AdamantEmojiService: EmojiService {
     
     // MARK: Proprieties
     
-    private var notificationsSet: Set<AnyCancellable> = []
-    private var defaultEmojis = ["😂": 3, "🔥": 3, "😁": 3, "👍": 2, "👌": 2, "❤️️️️️️️": 2, "🙂": 2, "🤔": 2, "👋": 2, "🙏": 2, "😳": 2, "🎉": 2]
+    @Atomic private var notificationsSet: Set<AnyCancellable> = []
+    @Atomic private var defaultEmojis = ["😂": 3, "🔥": 3, "😁": 3, "👍": 2, "👌": 2, "❤️️️️️️️": 2, "🙂": 2, "🤔": 2, "👋": 2, "🙏": 2, "😳": 2, "🎉": 2]
     private let maxEmojiCount = 12
     private let incCount = 4
     private let decCount = 2

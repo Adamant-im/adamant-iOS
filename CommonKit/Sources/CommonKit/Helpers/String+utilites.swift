@@ -9,7 +9,7 @@
 import Foundation
 
 public extension String {
-    static var empty: String = ""
+    static let empty: String = ""
     
     func toDictionary() -> [String: Any]? {
         if let data = self.data(using: .utf8) {

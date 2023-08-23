@@ -74,7 +74,7 @@ final class AdamantHealthCheckService: HealthCheckService {
         guard let nodeURL = node.asURL() else {
             node.connectionStatus = .offline
             node.status = nil
-            return nil
+            return
         }
         
         let startTimestamp = Date().timeIntervalSince1970

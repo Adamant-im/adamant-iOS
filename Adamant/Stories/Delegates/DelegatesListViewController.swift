@@ -138,27 +138,32 @@ final class DelegatesListViewController: KeyboardObservingViewController {
         }
         
         Task {
-            await apiService.getDelegatesWithVotes(for: address, limit: activeDelegates) { (result) in
-                switch result {
-                case .success(let delegates):
-                    let checkedNames = self.delegates.filter { $0.isChecked }.map { $0.delegate.username }
-                    let checkedDelegates = delegates.map { CheckedDelegate(delegate: $0) }
-                    for name in checkedNames {
-                        if let i = delegates.firstIndex(where: { $0.username == name }) {
-                            checkedDelegates[i].isChecked = true
+            await apiService.getDelegatesWithVotes(
+                for: address,
+                limit: activeDelegates
+            ) { result in
+                Task { @MainActor [weak self] in
+                    guard let self = self else { return }
+                    
+                    switch result {
+                    case .success(let delegates):
+                        let checkedNames = self.delegates
+                            .filter { $0.isChecked }
+                            .map { $0.delegate.username }
+                        
+                        let checkedDelegates = delegates.map { CheckedDelegate(delegate: $0) }
+                        for name in checkedNames {
+                            if let i = delegates.firstIndex(where: { $0.username == name }) {
+                                checkedDelegates[i].isChecked = true
+                            }
                         }
-                    }
-                    
-                    self.delegates = checkedDelegates
-                    
-                    DispatchQueue.main.async {
+                        
+                        self.delegates = checkedDelegates
                         self.tableView.reloadData()
+                    case .failure(let error):
+                        self.dialogService.showRichError(error: error)
                     }
-                case .failure(let error):
-                    self.dialogService.showRichError(error: error)
-                }
-                
-                DispatchQueue.main.async {
+                    
                     refreshControl.endRefreshing()
                     self.updateVotePanel()
                     self.removeLoadingView()

@@ -50,58 +50,59 @@ final class AdamantNotificationsService: NotificationsService {
             NotificationCenter.default
                 .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
                 .receive(on: DispatchQueue.main)
-                .sink { [weak self] _ in
-                    UNUserNotificationCenter.current().removeAllDeliveredNotifications()
-                    UIApplication.shared.applicationIconBadgeNumber = 0
-                    
-                    if let securedStore = self?.securedStore,
-                        let raw: String = securedStore.get(StoreKey.notificationsService.notificationsMode),
-                        let mode = NotificationsMode(string: raw) {
-                        self?.setNotificationsMode(mode, completion: nil)
-                    } else {
-                        self?.setNotificationsMode(.disabled, completion: nil)
-                    }
-                    
-                    if let securedStore = self?.securedStore,
-                        let raw: String = securedStore.get(StoreKey.notificationsService.notificationsSound),
-                        let sound = NotificationSound(fileName: raw) {
-                        self?.setNotificationSound(sound)
-                    } else {
-                        self?.setNotificationsMode(.disabled, completion: nil)
-                    }
-                    
-                    self?.preservedBadgeNumber = nil
-                }
+                .sink { [weak self] _ in self?.onUserLoggedIn() }
                 .store(in: &subscriptions)
             
             NotificationCenter.default
                 .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
                 .receive(on: DispatchQueue.main)
-                .sink { [weak self] _ in
-                    self?.setNotificationsMode(.disabled, completion: nil)
-                    self?.setNotificationSound(.inputDefault)
-                    self?.securedStore.remove(StoreKey.notificationsService.notificationsMode)
-                    self?.securedStore.remove(StoreKey.notificationsService.notificationsSound)
-                    self?.preservedBadgeNumber = nil
-                }
+                .sink { [weak self] _ in self?.onUserLoggedOut() }
                 .store(in: &subscriptions)
             
             NotificationCenter.default
                 .publisher(for: .AdamantAccountService.stayInChanged, object: nil)
                 .receive(on: DispatchQueue.main)
-                .sink { [weak self] notification in
-                    guard
-                        let state = notification.userInfo?[AdamantUserInfoKey.AccountService.newStayInState] as? Bool,
-                        state
-                    else {
-                        self?.preservedBadgeNumber = nil
-                        self?.setBadge(number: nil, force: true)
-                        return
-                    }
-                    
-                    self?.setBadge(number: self?.preservedBadgeNumber, force: false)
-                }
+                .compactMap { $0.userInfo?[AdamantUserInfoKey.AccountService.newStayInState] as? Bool }
+                .sink { [weak self] in self?.onStayInChanged($0) }
                 .store(in: &subscriptions)
+        }
+    }
+    
+    private func onUserLoggedIn() {
+        UNUserNotificationCenter.current().removeAllDeliveredNotifications()
+        UIApplication.shared.applicationIconBadgeNumber = 0
+        
+        if let raw: String = securedStore.get(StoreKey.notificationsService.notificationsMode),
+            let mode = NotificationsMode(string: raw) {
+            setNotificationsMode(mode, completion: nil)
+        } else {
+            setNotificationsMode(.disabled, completion: nil)
+        }
+        
+        if let raw: String = securedStore.get(StoreKey.notificationsService.notificationsSound),
+            let sound = NotificationSound(fileName: raw) {
+            setNotificationSound(sound)
+        } else {
+            setNotificationsMode(.disabled, completion: nil)
+        }
+        
+        preservedBadgeNumber = nil
+    }
+    
+    private func onUserLoggedOut() {
+        setNotificationsMode(.disabled, completion: nil)
+        setNotificationSound(.inputDefault)
+        securedStore.remove(StoreKey.notificationsService.notificationsMode)
+        securedStore.remove(StoreKey.notificationsService.notificationsSound)
+        preservedBadgeNumber = nil
+    }
+    
+    private func onStayInChanged(_ stayIn: Bool) {
+        if stayIn {
+            setBadge(number: preservedBadgeNumber, force: false)
+        } else {
+            preservedBadgeNumber = nil
+            setBadge(number: nil, force: true)
         }
     }
 }

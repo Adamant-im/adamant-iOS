@@ -20,7 +20,7 @@ final class AdamantCrashlyticsService: CrashlyticsService {
     // MARK: Proprieties
     
     @Atomic private var notificationsSet: Set<AnyCancellable> = []
-    @Atomic private var isConfigured = false
+    private var isConfigured = false
     
     // MARK: Lifecycle
     
