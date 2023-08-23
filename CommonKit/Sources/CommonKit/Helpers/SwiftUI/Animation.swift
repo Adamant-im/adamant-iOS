@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 public func animate(duration: CGFloat, _ execute: @escaping () -> Void) async {
     await withCheckedContinuation { continuation in
         withAnimation(.easeInOut(duration: duration)) {

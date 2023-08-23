@@ -9,6 +9,7 @@ import UIKit
 import SnapKit
 import CommonKit
 
+@MainActor
 final class AMenuViewController: UIViewController {
         
     private lazy var tableView: UITableView = {

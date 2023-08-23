@@ -8,6 +8,7 @@
 import UIKit
 import SnapKit
 
+@MainActor
 final class ContanierPreviewView: UIView {
     private let contentView: UIView
     private let animationInDuration: TimeInterval

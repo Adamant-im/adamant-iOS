@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import CommonKit
 
+@MainActor
 final class ContextMenuOverlayViewModelMac: ObservableObject {
     let menu: AMenuViewController?
     let contentView: UIView
