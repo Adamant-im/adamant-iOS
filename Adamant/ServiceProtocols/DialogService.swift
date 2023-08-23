@@ -113,6 +113,7 @@ struct AdamantAlertAction {
     let handler: (() -> Void)?
 }
 
+@MainActor
 protocol DialogService: AnyObject {
     func setup(window: UIWindow)
     

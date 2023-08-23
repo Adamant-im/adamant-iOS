@@ -9,7 +9,7 @@
 import UIKit
 import Swinject
 
-class SwinjectedRouter: Router {
+final class SwinjectedRouter: Router {
     weak var container: Container?
     
     @MainActor func get(scene: AdamantScene) -> UIViewController {

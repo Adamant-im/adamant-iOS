@@ -17,9 +17,8 @@ final class AdamantHealthCheckService: HealthCheckService {
     
     // MARK: - Properties
     
-    private var _nodes = [Node]()
-    private var currentRequests = Set<URL>()
-    private let semaphore = DispatchSemaphore(value: 1)
+    @Atomic private var _nodes = [Node]()
+    @Atomic private var currentRequests = Set<URL>()
     private let notifyingQueue = DispatchQueue(label: "com.adamant.health-check-notification")
     
     weak var delegate: HealthCheckDelegate?
@@ -29,29 +28,17 @@ final class AdamantHealthCheckService: HealthCheckService {
     }
     
     var nodes: [Node] {
-        get {
-            defer { semaphore.signal() }
-            semaphore.wait()
-            return _nodes
-        }
-        set {
-            defer { semaphore.signal() }
-            semaphore.wait()
-            _nodes = newValue
-        }
+        get { _nodes }
+        set { _nodes = newValue }
     }
     
     // MARK: - Tools
     
     func healthCheck() {
-        defer { semaphore.signal() }
-        semaphore.wait()
-        
         updateNodesAvailability()
 
-        _nodes.filter { $0.isEnabled && !isRequestInProgress(for: $0) }
-            .forEach { node in
-            updateNodeStatus(node: node)
+        nodes.filter { $0.isEnabled && !isRequestInProgress(for: $0) }.forEach { node in
+            Task { await updateNodeStatus(node: node) }
         }
     }
     
@@ -64,7 +51,7 @@ final class AdamantHealthCheckService: HealthCheckService {
     }
     
     private func updateNodesAvailability() {
-        let workingNodes = _nodes.filter { $0.isWorking }
+        let workingNodes = nodes.filter { $0.isWorking }
         
         let actualHeightsRange = getActualNodeHeightsRange(
             heights: workingNodes.compactMap { $0.status?.height }
@@ -83,18 +70,17 @@ final class AdamantHealthCheckService: HealthCheckService {
         }
     }
     
-    @discardableResult
-    private func updateNodeStatus(node: Node) -> DataRequest? {
+    private func updateNodeStatus(node: Node) async {
         guard let nodeURL = node.asURL() else {
             node.connectionStatus = .offline
             node.status = nil
-            return nil
+            return
         }
         
         let startTimestamp = Date().timeIntervalSince1970
         currentRequests.insert(nodeURL)
         
-        return apiService.getNodeStatus(url: nodeURL) { [weak self] result in
+        await apiService.getNodeStatus(url: nodeURL) { [weak self] result in
             self?.currentRequests.remove(nodeURL)
             
             switch result {

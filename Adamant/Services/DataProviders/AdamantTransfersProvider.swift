@@ -505,7 +505,7 @@ extension AdamantTransfersProvider {
         ? .message
         : .richMessage
         
-        let signedTransaction = apiService.createSendTransaction(
+        let signedTransaction = await apiService.createSendTransaction(
             senderId: loggedAccount.address,
             recipientId: recipient,
             keypair: keypair,

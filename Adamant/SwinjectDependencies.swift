@@ -49,8 +49,10 @@ extension Container {
         self.register(NotificationsService.self) { r in
             AdamantNotificationsService(securedStore: r.resolve(SecuredStore.self)!)
         }.initCompleted { (r, c) in    // Weak reference
-            guard let service = c as? AdamantNotificationsService else { return }
-            service.accountService = r.resolve(AccountService.self)
+            Task { @MainActor in
+                guard let service = c as? AdamantNotificationsService else { return }
+                service.accountService = r.resolve(AccountService.self)
+            }
         }.inObjectScope(.container)
         
         // MARK: VisibleWalletsService
@@ -106,8 +108,10 @@ extension Container {
         self.register(ApiService.self) { r in
             AdamantApiService(adamantCore: r.resolve(AdamantCore.self)!)
         }.initCompleted { (r, c) in    // Weak reference
-            guard let service = c as? AdamantApiService else { return }
-            service.nodesSource = r.resolve(NodesSource.self)
+            Task { @MainActor in
+                guard let service = c as? AdamantApiService else { return }
+                await service.setupWeakDeps(nodesSource: r.resolve(NodesSource.self)!)
+            }
         }.inObjectScope(.container)
         
         // MARK: HealthCheckService
@@ -132,13 +136,15 @@ extension Container {
                 securedStore: r.resolve(SecuredStore.self)!
             )
         }.inObjectScope(.container).initCompleted { (r, c) in
-            guard let service = c as? AdamantAccountService else { return }
-            service.notificationsService = r.resolve(NotificationsService.self)!
-            service.pushNotificationsTokenService = r.resolve(PushNotificationsTokenService.self)!
-            service.currencyInfoService = r.resolve(CurrencyInfoService.self)!
-            service.visibleWalletService = r.resolve(VisibleWalletsService.self)!
-            for case let wallet as SwinjectDependentService in service.wallets {
-                wallet.injectDependencies(from: self)
+            Task { @MainActor in
+                guard let service = c as? AdamantAccountService else { return }
+                service.notificationsService = r.resolve(NotificationsService.self)!
+                service.pushNotificationsTokenService = r.resolve(PushNotificationsTokenService.self)!
+                service.currencyInfoService = r.resolve(CurrencyInfoService.self)!
+                service.visibleWalletService = r.resolve(VisibleWalletsService.self)!
+                for case let wallet as SwinjectDependentService in service.wallets {
+                    wallet.injectDependencies(from: self)
+                }
             }
         }
         
@@ -268,7 +274,7 @@ extension Container {
         }.inObjectScope(.container)
         
         // MARK: Bitcoin AddressConverterFactory
-        self.register(AddressConverterFactory.self) { r in
+        self.register(AddressConverterFactory.self) { _ in
             AddressConverterFactory()
         }.inObjectScope(.container)
     }

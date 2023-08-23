@@ -152,10 +152,18 @@ extension AdamantApiService {
         }
     }
     
-    func voteForDelegates(from address: String, keypair: Keypair, votes: [DelegateVote], completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
-        self.sendingMsgTaskId = UIApplication.shared.beginBackgroundTask {
-            UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
-            self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
+    func voteForDelegates(
+        from address: String,
+        keypair: Keypair,
+        votes: [DelegateVote],
+        completion: @escaping (ApiServiceResult<UInt64>) -> Void
+    ) {
+        Task { @MainActor in
+            sendingMsgTaskId = UIApplication.shared.beginBackgroundTask { [weak self] in
+                guard let self = self else { return }
+                UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
+                self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
+            }
         }
         
         // MARK: 0. Prepare
@@ -189,7 +197,10 @@ extension AdamantApiService {
             return
         }
         
-        sendDelegateVoteTransaction(path: ApiCommands.Delegates.votes, transaction: transaction) { [weak self] serverResponse in
+        sendDelegateVoteTransaction(
+            path: ApiCommands.Delegates.votes,
+            transaction: transaction
+        ) { serverResponse in
             switch serverResponse {
             case .success(let response):
                 if response.success {
@@ -202,9 +213,11 @@ extension AdamantApiService {
                 completion(.failure(.networkError(error: error)))
             }
             
-            guard let self = self else { return }
-            UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
-            self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
+            Task { @MainActor [weak self] in
+                guard let self = self else { return }
+                UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
+                self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
+            }
         }
     }
     

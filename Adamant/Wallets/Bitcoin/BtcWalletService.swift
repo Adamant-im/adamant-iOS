@@ -68,7 +68,7 @@ final class BtcWalletService: WalletService {
     }
     
     var tokenLogo: UIImage {
-        type(of: self).currencyLogo ?? .init()
+        type(of: self).currencyLogo
     }
     
     var tokenNetworkSymbol: String {
@@ -440,6 +440,7 @@ extension BtcWalletService: InitiatedWithPassphraseService {
 
 // MARK: - Dependencies
 extension BtcWalletService: SwinjectDependentService {
+    @MainActor
     func injectDependencies(from container: Container) {
         accountService = container.resolve(AccountService.self)
         apiService = container.resolve(ApiService.self)
@@ -550,13 +551,15 @@ extension BtcWalletService {
             return
         }
         
-        apiService.store(key: BtcWalletService.kvsAddress, value: btcAddress, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
-            switch result {
-            case .success:
-                completion(.success)
-                
-            case .failure(let error):
-                completion(.failure(error: .apiError(error)))
+        Task {
+            await apiService.store(key: BtcWalletService.kvsAddress, value: btcAddress, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
+                switch result {
+                case .success:
+                    completion(.success)
+                    
+                case .failure(let error):
+                    completion(.failure(error: .apiError(error)))
+                }
             }
         }
     }
@@ -590,7 +593,7 @@ extension BtcWalletService {
                 balanceObserver = observer
                 
             default:
-                dialogService.showRichError(error: error)
+                Task { @MainActor in dialogService.showRichError(error: error) }
             }
         }
     }
@@ -619,7 +622,7 @@ extension BtcWalletService {
                 balanceObserver = observer
                 
             default:
-                dialogService.showRichError(error: error)
+                Task { @MainActor in dialogService.showRichError(error: error) }
             }
         }
     }

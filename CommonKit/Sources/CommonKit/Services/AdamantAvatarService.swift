@@ -44,15 +44,9 @@ public final class AdamantAvatarService {
         ]
     ]
     
-    private var cacheSemaphore = DispatchSemaphore(value: 1)
-    private var cache: [String: UIImage] = [String: UIImage]()
+    @Atomic private var cache: [String: UIImage] = [String: UIImage]()
     
     public func avatar(for key:String, size: Double = 200) -> UIImage {
-        cacheSemaphore.wait()
-        defer {
-            cacheSemaphore.signal()
-        }
-        
         if let image = cache[key] {
             return image
         }

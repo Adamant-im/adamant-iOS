@@ -772,23 +772,25 @@ class TransactionDetailsViewControllerBase: FormViewController {
         currencyInfo.getHistory(
             for: currencySymbol,
             timestamp: date
-        ) { [weak self] (result) in
-            guard case .success(let tickers) = result else {
-                self?.isFiatSet = false
-                return
+        ) { result in
+            Task { @MainActor [weak self] in
+                guard case .success(let tickers) = result else {
+                    self?.isFiatSet = false
+                    return
+                }
+                
+                self?.isFiatSet = true
+                
+                guard let tickers = tickers,
+                      let ticker = tickers["\(currencySymbol)/\(currentFiat)"]
+                else {
+                    return
+                }
+                
+                let totalFiat = amount * ticker
+                
+                self?.valueAtTimeTxn = self?.fiatFormatter.string(from: totalFiat)
             }
-            
-            self?.isFiatSet = true
-            
-            guard let tickers = tickers,
-                  let ticker = tickers["\(currencySymbol)/\(currentFiat)"]
-            else {
-                return
-            }
-            
-            let totalFiat = amount * ticker
-            
-            self?.valueAtTimeTxn = self?.fiatFormatter.string(from: totalFiat)
         }
     }
     

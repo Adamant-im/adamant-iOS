@@ -45,15 +45,17 @@ final class AdamantPushNotificationsTokenService: PushNotificationsTokenService 
     
     func sendTokenDeletionTransactions() {
         for transaction in getTokenDeletionTransactions() {
-            apiService.sendTransaction(
-                path: AdamantApiService.ApiCommands.Chats.processTransaction,
-                transaction: transaction
-            ) { [weak self] result in
-                switch result {
-                case .success, .failure(.accountNotFound), .failure(.notLogged):
-                    self?.removeTokenDeletionTransaction(transaction)
-                case .failure(.internalError), .failure(.networkError), .failure(.requestCancelled), .failure(.serverError), .failure(.commonError):
-                    break
+            Task {
+                await apiService.sendTransaction(
+                    path: AdamantApiService.ApiCommands.Chats.processTransaction,
+                    transaction: transaction
+                ) { [weak self] result in
+                    switch result {
+                    case .success, .failure(.accountNotFound), .failure(.notLogged):
+                        self?.removeTokenDeletionTransaction(transaction)
+                    case .failure(.internalError), .failure(.networkError), .failure(.requestCancelled), .failure(.serverError), .failure(.commonError):
+                        break
+                    }
                 }
             }
         }
@@ -114,11 +116,16 @@ private extension AdamantPushNotificationsTokenService {
             return completion()
         }
         
-        removeCurrentToken(keypair: keypair) { [weak self] in
-            self?.sendMessageToANS(keypair: keypair, encodedPayload: encodedPayload) { success in
-                defer { completion() }
-                guard success else { return }
-                self?.setTokenToStorage(newToken)
+        removeCurrentToken(keypair: keypair) {
+            Task { [weak self] in
+                await self?.sendMessageToANS(
+                    keypair: keypair,
+                    encodedPayload: encodedPayload
+                ) { success in
+                    defer { completion() }
+                    guard success else { return }
+                    self?.setTokenToStorage(newToken)
+                }
             }
         }
     }
@@ -134,11 +141,18 @@ private extension AdamantPushNotificationsTokenService {
         else { return completion() }
         
         setTokenToStorage(nil)
-        var transaction: UnregisteredTransaction?
-        transaction = sendMessageToANS(keypair: keypair, encodedPayload: encodedPayload) { [weak self] success in
-            defer { completion() }
-            guard !success, let self = self, let transaction = transaction else { return }
-            self.addTokenDeletionTransaction(transaction)
+        
+        Task {
+            var transaction: UnregisteredTransaction?
+            
+            transaction = await sendMessageToANS(
+                keypair: keypair,
+                encodedPayload: encodedPayload
+            ) { [weak self] success in
+                defer { completion() }
+                guard !success, let self = self, let transaction = transaction else { return }
+                self.addTokenDeletionTransaction(transaction)
+            }
         }
     }
     
@@ -167,8 +181,8 @@ private extension AdamantPushNotificationsTokenService {
         keypair: Keypair,
         encodedPayload: EncodedPayload,
         completion: @escaping (_ success: Bool) -> Void
-    ) -> UnregisteredTransaction? {
-        apiService.sendMessage(
+    ) async -> UnregisteredTransaction? {
+        await apiService.sendMessage(
             senderId: AdamantUtilities.generateAddress(publicKey: keypair.publicKey),
             recipientId: AdamantResources.contacts.ansAddress,
             keypair: keypair,

@@ -331,6 +331,7 @@ extension DashWalletService: InitiatedWithPassphraseService {
 
 // MARK: - Dependencies
 extension DashWalletService: SwinjectDependentService {
+    @MainActor
     func injectDependencies(from container: Container) {
         accountService = container.resolve(AccountService.self)
         apiService = container.resolve(ApiService.self)
@@ -432,13 +433,15 @@ extension DashWalletService {
             return
         }
 
-        apiService.store(key: DashWalletService.kvsAddress, value: dashAddress, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
-            switch result {
-            case .success:
-                completion(.success)
+        Task {
+            await apiService.store(key: DashWalletService.kvsAddress, value: dashAddress, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
+                switch result {
+                case .success:
+                    completion(.success)
 
-            case .failure(let error):
-                completion(.failure(error: .apiError(error)))
+                case .failure(let error):
+                    completion(.failure(error: .apiError(error)))
+                }
             }
         }
     }
