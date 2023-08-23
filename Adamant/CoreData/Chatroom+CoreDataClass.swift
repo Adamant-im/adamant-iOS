@@ -49,58 +49,12 @@ public class Chatroom: NSManagedObject {
         return result?.checkAndReplaceSystemWallets()
     }
     
-    private var semaphore: DispatchSemaphore?
+    private let semaphore = DispatchSemaphore(value: 1)
     
     func updateLastTransaction() {
-        var semaphore = self.semaphore
+        semaphore.wait()
+        defer { semaphore.signal() }
         
-        if let semaphore = semaphore {
-            semaphore.wait()
-        } else {
-            semaphore = DispatchSemaphore(value: 1)
-        }
-        
-        self.semaphore = semaphore
-        defer {
-            self.semaphore = nil
-            semaphore?.signal()
-        }
-        
-        if let transactions = transactions?.filtered(using: NSPredicate(format: "isHidden == false")) as? Set<ChatTransaction> {
-            if let newest = transactions.sorted(by: { (lhs: ChatTransaction, rhs: ChatTransaction) in
-                guard let l = lhs.date as Date? else {
-                    return true
-                }
-                
-                guard let r = rhs.date as Date? else {
-                    return false
-                }
-                
-                switch l.compare(r) {
-                case .orderedAscending:
-                    return true
-                    
-                case .orderedDescending:
-                    return false
-                    
-                // Rare case of identical date, compare IDs
-                case .orderedSame:
-                    return lhs.transactionId < rhs.transactionId
-                }
-            }).last {
-                if newest != lastTransaction {
-                    lastTransaction = newest
-                    updatedAt = newest.date
-                }
-            } else if lastTransaction != nil {
-                lastTransaction = nil
-                updatedAt = nil
-            }
-        }
-    }
-    
-    @MainActor
-    func updateLastTransaction() async {
         if let transactions = transactions?.filtered(
             using: NSPredicate(format: "isHidden == false")
         ) as? Set<ChatTransaction> {
