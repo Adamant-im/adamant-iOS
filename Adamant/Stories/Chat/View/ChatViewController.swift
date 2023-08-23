@@ -623,7 +623,7 @@ private extension ChatViewController {
         case .failed:
             guard transaction.getRichValue(for: RichContentKeys.transfer.hash) != nil
             else {
-                viewModel.dialog.send(.alert(.adamantLocalized.sharedErrors.inconsistentTransaction))
+                viewModel.dialog.send(.alert(.adamant.sharedErrors.inconsistentTransaction))
                 return
             }
             
