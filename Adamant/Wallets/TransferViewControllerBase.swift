@@ -496,7 +496,9 @@ class TransferViewControllerBase: FormViewController {
             markAddres(isValid: true)
             return true
         } else {
-            recipientAddress = nil
+            if row.value == nil {
+                recipientAddress = nil
+            }
             markAddres(isValid: false)
             return false
         }
