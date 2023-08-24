@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CommonKit
 
 enum ChatDialog {
     case toast(String)
@@ -22,5 +23,5 @@ enum ChatDialog {
     case dummy(String)
     case url(URL)
     case progress(Bool)
-    case failedMessageAlert(id: String, sender: Any)
+    case failedMessageAlert(id: String, sender: UIAlertController.SourceView)
 }

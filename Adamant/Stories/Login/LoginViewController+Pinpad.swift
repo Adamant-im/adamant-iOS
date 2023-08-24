@@ -87,7 +87,7 @@ extension LoginViewController {
             
             let alertVc: UIAlertController?
             if let alert = alert {
-                alertVc = UIAlertController(title: alert.title, message: alert.message, preferredStyle: .alert)
+                alertVc = UIAlertController(title: alert.title, message: alert.message, preferredStyleSafe: .alert, source: nil)
                 alertVc!.addAction(UIAlertAction(title: String.adamant.alert.ok, style: .default))
             } else {
                 alertVc = nil
