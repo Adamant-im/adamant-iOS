@@ -10,17 +10,30 @@ import UIKit
 import Combine
 import SafariServices
 import CommonKit
+import AdvancedContextMenuKit
+import SwiftUI
 
 @MainActor
 final class ChatDialogManager {
     private let viewModel: ChatViewModel
     private let dialogService: DialogService
+    private let emojiService: EmojiService?
     
     private var subscription: AnyCancellable?
+    private lazy var contextMenu = AdvancedContextMenuManager()
     
-    init(viewModel: ChatViewModel, dialogService: DialogService) {
+    typealias DidSelectEmojiAction = ((_ emoji: String, _ messageId: String) -> Void)?
+    typealias DidAppearMenuAction = ((_ messageId: String) -> Void)?
+    typealias DidDismissMenuAction = ((_ messageId: String) -> Void)?
+    
+    init(
+        viewModel: ChatViewModel,
+        dialogService: DialogService,
+        emojiService: EmojiService
+    ) {
         self.viewModel = viewModel
         self.dialogService = dialogService
+        self.emojiService = emojiService
         subscription = viewModel.dialog.sink { [weak self] in self?.showDialog($0) }
     }
 }
@@ -73,6 +86,20 @@ private extension ChatDialogManager {
             setProgress(show)
         case let .failedMessageAlert(id, sender):
             showFailedMessageAlert(id: id, sender: sender)
+        case let .presentMenu(
+            arg,
+            didSelectEmojiAction,
+            didAppearMenuAction,
+            didDismissMenuAction
+        ):
+            presentMenu(
+                arg: arg,
+                didSelectEmojiAction: didSelectEmojiAction,
+                didAppearMenuAction: didAppearMenuAction,
+                didDismissMenuAction: didDismissMenuAction
+            )
+        case .dismissMenu:
+            dismissMenu()
         }
     }
     
@@ -389,5 +416,65 @@ private extension ChatDialogManager {
     
     func makeCancelAction() -> AdamantAlertAction {
         .init(title: .adamant.alert.cancel, style: .cancel, handler: nil)
+    }
+}
+
+// MARK: Context Menu
+
+private extension ChatDialogManager {
+    func dismissMenu() {
+        Task {
+            await contextMenu.dismiss()
+        }
+    }
+    
+    func presentMenu(
+        arg: ChatContextMenuArguments,
+        didSelectEmojiAction: DidSelectEmojiAction,
+        didAppearMenuAction: DidAppearMenuAction,
+        didDismissMenuAction: DidDismissMenuAction
+    ) {
+        contextMenu.presentMenu(
+            arg: arg,
+            upperView: getUpperContentView(
+                messageId: arg.messageId,
+                selectedEmoji: arg.selectedEmoji,
+                didSelectEmojiAction: didSelectEmojiAction
+            ),
+            upperViewSize: getUpperContentViewSize()
+        )
+        contextMenu.didAppearMenuAction = didAppearMenuAction
+        contextMenu.didDismissMenuAction = didDismissMenuAction
+    }
+    
+    func getUpperContentViewSize() -> CGSize {
+        .init(width: 310, height: 50)
+    }
+    
+    func getUpperContentView(
+        messageId: String,
+        selectedEmoji: String?,
+        didSelectEmojiAction: DidSelectEmojiAction
+    ) -> AnyView? {
+        var view = ChatReactionsView(
+            delegate: nil,
+            emojis: getFrequentlySelectedEmojis(selectedEmoji: selectedEmoji),
+            selectedEmoji: selectedEmoji,
+            messageId: messageId
+        )
+        view.didSelectEmoji = didSelectEmojiAction
+        return AnyView(view)
+    }
+    
+    func getFrequentlySelectedEmojis(selectedEmoji: String?) -> [String]? {
+        var emojis = emojiService?.getFrequentlySelectedEmojis()
+        guard let selectedEmoji = selectedEmoji else { return emojis }
+        
+        if let index = emojis?.firstIndex(of: selectedEmoji) {
+            emojis?.remove(at: index)
+        }
+        emojis?.insert(selectedEmoji, at: 0)
+        
+        return emojis
     }
 }

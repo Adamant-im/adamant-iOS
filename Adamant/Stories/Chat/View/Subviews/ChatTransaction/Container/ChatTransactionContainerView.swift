@@ -115,16 +115,7 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
         return label
     }()
     
-    private lazy var chatMenuManager: ChatMenuManager = {
-        let manager = ChatMenuManager(
-            menu: makeContextMenu(),
-            emojiService: chatMessagesListViewModel?.emojiService
-        )
-        manager.delegate = self
-        return manager
-    }()
-    
-    private lazy var contextMenu = AdvancedContextMenuManager(delegate: chatMenuManager)
+    private lazy var chatMenuManager = ChatMenuManager(delegate: self)
     
     private let ownReactionSize = CGSize(width: 40, height: 27)
     private let opponentReactionSize = CGSize(width: 55, height: 27)
@@ -176,15 +167,13 @@ private extension ChatTransactionContainerView {
             self?.actionHandler(.swipeState(state: state))
         }
         
-        contextMenu.setup(for: contentView)
+        chatMenuManager.setup(for: contentView)
     }
     
     func update() {
         contentView.model = model.content
         updateStatus(model.status)
         updateLayout()
-        chatMenuManager.selectedEmoji = getReaction(for: model.address)
-        chatMenuManager.emojiService = chatMessagesListViewModel?.emojiService
         
         ownReactionLabel.isHidden = getReaction(for: model.address) == nil
         opponentReactionLabel.isHidden = getReaction(for: model.opponentAddress) == nil
@@ -260,11 +249,7 @@ private extension ChatTransactionContainerView {
     }
     
     @objc func tapReactionAction() {
-        contextMenu.presentMenu(
-            for: contentView,
-            copyView: copy(with: model)?.contentView,
-            with: makeContextMenu()
-        )
+        chatMenuManager.presentMenuProgrammatically(for: contentView)
     }
 }
 
@@ -327,15 +312,24 @@ extension ChatTransactionContainerView {
 }
 
 extension ChatTransactionContainerView: ChatMenuManagerDelegate {
-    func didReact(_ emoji: String) {
-        Task {
-            await contextMenu.dismiss()
-            self.actionHandler(.react(id: self.model.id, emoji: emoji))
-        }
+    func getCopyView() -> UIView? {
+        copy(with: model)?.contentView
     }
     
-    func getContentView() -> UIView? {
-        copy(with: model)?.contentView
+    func presentMenu(copyView: UIView, size: CGSize, location: CGPoint, tapLocation: CGPoint) {
+        actionHandler(
+            .presentMenu(
+                arg: .init(
+                    copyView: copyView,
+                    size: size,
+                    location: location,
+                    tapLocation: tapLocation,
+                    messageId: model.id,
+                    menu: makeContextMenu(),
+                    selectedEmoji: getReaction(for: model.address)
+                )
+            )
+        )
     }
 }
 

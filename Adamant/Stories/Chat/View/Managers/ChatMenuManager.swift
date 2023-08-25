@@ -10,143 +10,123 @@ import UIKit
 import SwiftUI
 import ElegantEmojiPicker
 import AdvancedContextMenuKit
+import CommonKit
 
 protocol ChatMenuManagerDelegate: AnyObject {
-    func didReact(_ emoji: String)
-    func getContentView() -> UIView?
-}
-
-extension ChatMenuManagerDelegate {
-    func getContentView() -> UIView? { return nil }
+    func getCopyView() -> UIView?
+    func presentMenu(
+        copyView: UIView,
+        size: CGSize,
+        location: CGPoint,
+        tapLocation: CGPoint
+    )
 }
 
 @MainActor
-final class ChatMenuManager: NSObject, AdvancedContextMenuManagerDelegate {
-    private let menu: AMenuSection
-    var emojiService: EmojiService?
-    
+final class ChatMenuManager: NSObject {
     weak var delegate: ChatMenuManagerDelegate?
-    var selectedEmoji: String?
+    
+    var isiOSAppOnMac: Bool = {
+#if targetEnvironment(macCatalyst)
+        return true
+#else
+        if #available(iOS 14.0, *) {
+            return ProcessInfo.processInfo.isiOSAppOnMac
+        } else {
+            return false
+        }
+#endif
+    }()
     
     // MARK: Init
     
-    init(menu: AMenuSection, emojiService: EmojiService?) {
-        self.menu = menu
-        self.emojiService = emojiService
+    init(delegate: ChatMenuManagerDelegate?) {
+        self.delegate = delegate
+    }
+    
+    func setup(for contentView: UIView ) {
+        guard !isiOSAppOnMac else {
+            let interaction = UIContextMenuInteraction(delegate: self)
+            contentView.addInteraction(interaction)
+            return
+        }
         
-        super.init()
+        let longPressGesture = UILongPressGestureRecognizer(
+            target: self,
+            action: #selector(handleLongPress(_:))
+        )
+        longPressGesture.minimumPressDuration = 0.17
+        contentView.addGestureRecognizer(longPressGesture)
     }
     
-    func configureContextMenu() -> AMenuSection {
-        menu
-    }
-    
-    func configureUpperContentViewSize() -> CGSize {
-        .init(width: 310, height: 50)
-    }
-    
-    func getUpperContentView() -> AnyView? {
-        AnyView(
-            ChatReactionsView(
-                delegate: self,
-                emojis: getFrequentlySelectedEmojis(selectedEmoji: selectedEmoji),
-                selectedEmoji: selectedEmoji
+    func presentMenuProgrammatically(for contentView: UIView) {
+        let locationOnScreen = contentView.convert(CGPoint.zero, to: nil)
+        
+        let size = contentView.frame.size
+        
+        let copyView = delegate?.getCopyView() ?? contentView
+        delegate?.presentMenu(
+            copyView: copyView,
+            size: size,
+            location: locationOnScreen,
+            tapLocation: .init(
+                x: locationOnScreen.x + size.width / 2,
+                y: locationOnScreen.y + size.height / 2
             )
         )
     }
     
-    func getContentView() -> UIView? {
-        delegate?.getContentView()
+    @objc func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
+        guard !isiOSAppOnMac else { return }
+        
+        guard gesture.state == .began,
+              let contentView = gesture.view
+        else { return }
+        
+        let locationOnScreen = contentView.convert(CGPoint.zero, to: nil)
+        
+        let size = contentView.frame.size
+        
+        let copyView = delegate?.getCopyView() ?? contentView
+        delegate?.presentMenu(
+            copyView: copyView,
+            size: size,
+            location: locationOnScreen,
+            tapLocation: .zero
+        )
     }
 }
 
-extension ChatMenuManager: ChatReactionsViewDelegate, ElegantEmojiPickerDelegate {
-    func didSelectEmoji(_ emoji: String) {
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-        let pickedEmoji = emoji == selectedEmoji ? "" : emoji
-        
-        delegate?.didReact(pickedEmoji)
-        
-        if !pickedEmoji.isEmpty {
-            emojiService?.updateFrequentlySelectedEmojis(
-                selectedEmoji: pickedEmoji,
-                type: .increment
-            )
-        }
-        
-        if let selectedEmoji = selectedEmoji {
-            emojiService?.updateFrequentlySelectedEmojis(
-                selectedEmoji: selectedEmoji,
-                type: .decrement
-            )
-        }
+extension ChatMenuManager: UIContextMenuInteractionDelegate {
+    public func contextMenuInteraction(
+        _ interaction: UIContextMenuInteraction,
+        configurationForMenuAtLocation location: CGPoint
+    ) -> UIContextMenuConfiguration? {
+        presentMacOverlay(interaction, configurationForMenuAtLocation: location)
+        return nil
     }
     
-    @MainActor
-    func didTapMore() {
-        let config = ElegantConfiguration(
-            showRandom: false,
-            showReset: false,
-            defaultSkinTone: .Light
-        )
-        let picker = ElegantEmojiPicker(delegate: self, configuration: config)
-        picker.definesPresentationContext = true
-        self.rootViewController()?.present(picker, animated: true)
-    }
-    
-    func emojiPicker (
-        _ picker: ElegantEmojiPicker,
-        didSelectEmoji emoji: Emoji?
+    func presentMacOverlay(
+        _ interaction: UIContextMenuInteraction,
+        configurationForMenuAtLocation location: CGPoint
     ) {
-        guard let emoji = emoji?.emoji else { return }
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        guard let contentView = interaction.view
+        else { return }
         
-        let pickedEmoji = emoji == selectedEmoji ? "" : emoji
+        let contentLocation = contentView.convert(CGPoint.zero, to: nil)
+        let tapLocation: CGPoint = .init(
+            x: contentLocation.x + location.x,
+            y: contentLocation.y + location.y
+        )
+        let size = contentView.frame.size
         
-        delegate?.didReact(pickedEmoji)
+        let copyView = delegate?.getCopyView() ?? contentView
         
-        if !pickedEmoji.isEmpty {
-            emojiService?.updateFrequentlySelectedEmojis(
-                selectedEmoji: pickedEmoji,
-                type: .increment
-            )
-        }
-        
-        if let selectedEmoji = selectedEmoji {
-            emojiService?.updateFrequentlySelectedEmojis(
-                selectedEmoji: selectedEmoji,
-                type: .decrement
-            )
-        }
-    }
-}
-
-private extension ChatMenuManager {
-    func rootViewController() -> UIViewController? {
-        let allScenes = UIApplication.shared.connectedScenes
-        let scene = allScenes.first { $0.activationState == .foregroundActive }
-        
-        guard let windowScene = scene as? UIWindowScene else {
-            return nil
-        }
-        
-        var topController = windowScene.keyWindow?.rootViewController
-        
-        while (topController?.presentedViewController != nil) {
-            topController = topController?.presentedViewController
-        }
-        return topController
-    }
-    
-    func getFrequentlySelectedEmojis(selectedEmoji: String?) -> [String]? {
-        var emojis = emojiService?.getFrequentlySelectedEmojis()
-        guard let selectedEmoji = selectedEmoji else { return emojis }
-        
-        if let index = emojis?.firstIndex(of: selectedEmoji) {
-            emojis?.remove(at: index)
-        }
-        emojis?.insert(selectedEmoji, at: 0)
-        
-        return emojis
+        delegate?.presentMenu(
+            copyView: copyView,
+            size: size,
+            location: contentLocation,
+            tapLocation: tapLocation
+        )
     }
 }

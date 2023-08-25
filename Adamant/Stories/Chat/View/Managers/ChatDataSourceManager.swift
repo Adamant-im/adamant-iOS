@@ -166,6 +166,8 @@ private extension ChatDataSourceManager {
             viewModel.reportMessageAction(id)
         case let .react(id, emoji):
             viewModel.reactAction(id, emoji: emoji)
+        case let .presentMenu(arg):
+            viewModel.presentMenu(arg: arg)
         }
     }
 }

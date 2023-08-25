@@ -12,6 +12,7 @@ import MessageKit
 import Combine
 import SwiftUI
 import AdvancedContextMenuKit
+import CommonKit
 
 final class ChatMessageCell: TextMessageCell, ChatModelView {
     // MARK: Dependencies
@@ -71,24 +72,13 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         return label
     }()
     
-    private lazy var chatMenuManager: ChatMenuManager = {
-        let manager = ChatMenuManager(
-            menu: makeContextMenu(),
-            emojiService: chatMessagesListViewModel?.emojiService
-        )
-        manager.delegate = self
-        return manager
-    }()
-    
-    private lazy var contextMenu = AdvancedContextMenuManager(delegate: chatMenuManager)
+    private lazy var chatMenuManager = ChatMenuManager(delegate: self)
     
     // MARK: - Properties
     
     var model: Model = .default {
         didSet {
             guard model != oldValue else { return }
-            chatMenuManager.selectedEmoji = getReaction(for: model.address)
-            chatMenuManager.emojiService = chatMessagesListViewModel?.emojiService
             
             reactionsContanerView.isHidden = model.reactions == nil
             ownReactionLabel.isHidden = getReaction(for: model.address) == nil
@@ -177,7 +167,7 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         
         containerView.addSubview(messageContainerView)
         
-        contextMenu.setup(for: containerView)
+        chatMenuManager.setup(for: containerView)
     }
     
     func updateOwnReaction() {
@@ -434,34 +424,39 @@ extension ChatMessageCell {
     }
     
     @objc func tapReactionAction() {
-        contextMenu.presentMenu(
-            for: containerView,
-            copyView: copy(
-                with: model,
-                attributes: layoutAttributes,
-                urlAttributes: messageLabel.urlAttributes,
-                enabledDetectors: messageLabel.enabledDetectors
-            )?.containerView,
-            with: makeContextMenu()
-        )
+        chatMenuManager.presentMenuProgrammatically(for: containerView)
     }
 }
 
 extension ChatMessageCell: ChatMenuManagerDelegate {
-    func didReact(_ emoji: String) {
-        Task {
-            await contextMenu.dismiss()
-            self.actionHandler(.react(id: self.model.id, emoji: emoji))
-        }
-    }
-    
-    func getContentView() -> UIView? {
+    func getCopyView() -> UIView? {
         copy(
             with: model,
             attributes: layoutAttributes,
             urlAttributes: messageLabel.urlAttributes,
             enabledDetectors: messageLabel.enabledDetectors
         )?.containerView
+    }
+    
+    func presentMenu(
+        copyView: UIView,
+        size: CGSize,
+        location: CGPoint,
+        tapLocation: CGPoint
+    ) {
+        actionHandler(
+            .presentMenu(
+                arg: .init(
+                    copyView: copyView,
+                    size: size,
+                    location: location,
+                    tapLocation: tapLocation,
+                    messageId: model.id,
+                    menu: makeContextMenu(),
+                    selectedEmoji: getReaction(for: model.address)
+                )
+            )
+        )
     }
 }
 

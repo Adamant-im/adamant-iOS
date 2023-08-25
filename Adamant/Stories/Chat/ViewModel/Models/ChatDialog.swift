@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CommonKit
 
 enum ChatDialog {
     case toast(String)
@@ -23,4 +24,11 @@ enum ChatDialog {
     case url(URL)
     case progress(Bool)
     case failedMessageAlert(id: String, sender: Any)
+    case presentMenu(
+        arg: ChatContextMenuArguments,
+        didSelectEmojiAction: ChatDialogManager.DidSelectEmojiAction,
+        didAppearMenuAction: ChatDialogManager.DidAppearMenuAction,
+        didDismissMenuAction: ChatDialogManager.DidDismissMenuAction
+    )
+    case dismissMenu
 }

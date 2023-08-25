@@ -71,7 +71,7 @@ public enum AMenuItem {
 
 // MARK: - Internal
 
-extension AMenuItem {
+public extension AMenuItem {
     var name: String {
         switch self {
         case .action(let name, _, _, _, _):

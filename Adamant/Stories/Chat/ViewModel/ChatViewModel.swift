@@ -11,6 +11,7 @@ import CoreData
 import MarkdownKit
 import UIKit
 import CommonKit
+import AdvancedContextMenuKit
 
 @MainActor
 final class ChatViewModel: NSObject {
@@ -502,6 +503,30 @@ final class ChatViewModel: NSObject {
     
     func clearReplyMessage() {
         replyMessage = nil
+    }
+    
+    func presentMenu(arg: ChatContextMenuArguments) {
+        let didSelectEmojiAction: ChatDialogManager.DidSelectEmojiAction = { [weak self] emoji, messageId in
+            self?.dialog.send(.dismissMenu)
+            self?.reactAction(messageId, emoji: emoji)
+        }
+        
+        let didAppearMenuAction: ChatDialogManager.DidAppearMenuAction = { [weak self] messageId in
+            print("didAppearMenuAction messageId=\(messageId)")
+        }
+        
+        let didDismissMenuAction: ChatDialogManager.DidDismissMenuAction = { [weak self] messageId in
+            print("didDismissMenuAction messageId=\(messageId)")
+        }
+        
+        dialog.send(
+            .presentMenu(
+                arg: arg,
+                didSelectEmojiAction: didSelectEmojiAction,
+                didAppearMenuAction: didAppearMenuAction,
+                didDismissMenuAction: didDismissMenuAction
+            )
+        )
     }
 }
 

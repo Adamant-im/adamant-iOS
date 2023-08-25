@@ -173,6 +173,15 @@
         }
       },
       {
+        "package": "MCEmojiPicker",
+        "repositoryURL": "https://github.com/izyumkin/MCEmojiPicker",
+        "state": {
+          "branch": null,
+          "revision": "d77f5c693cc1aa7c57c5bfb15ca01a76b84f1cc7",
+          "version": "1.2.1"
+        }
+      },
+      {
         "package": "MessageKit",
         "repositoryURL": "https://github.com/MessageKit/MessageKit.git",
         "state": {

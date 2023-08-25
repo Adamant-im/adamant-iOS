@@ -13,6 +13,7 @@ import Combine
 import AdvancedContextMenuKit
 import SwiftUI
 import ElegantEmojiPicker
+import CommonKit
 
 final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     // MARK: Dependencies
@@ -118,14 +119,7 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         return label
     }()
     
-    private lazy var chatMenuManager: ChatMenuManager = {
-        let manager = ChatMenuManager(
-            menu: makeContextMenu(),
-            emojiService: chatMessagesListViewModel?.emojiService
-        )
-        manager.delegate = self
-        return manager
-    }()
+    private lazy var chatMenuManager = ChatMenuManager(delegate: self)
     
     // MARK: - Properties
     
@@ -141,8 +135,6 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
             guard model != oldValue else { return }
             
             replyMessageLabel.attributedText = model.messageReply
-            chatMenuManager.selectedEmoji = getReaction(for: model.address)
-            chatMenuManager.emojiService = chatMessagesListViewModel?.emojiService
             
             let leading = model.isFromCurrentSender ? smallHInset : longHInset
             let trailing = model.isFromCurrentSender ? longHInset : smallHInset
@@ -200,7 +192,6 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     private let ownReactionSize = CGSize(width: 40, height: 27)
     private let opponentReactionSize = CGSize(width: 55, height: 27)
     private let opponentReactionImageSize = CGSize(width: 10, height: 12)
-    private lazy var contextMenu = AdvancedContextMenuManager(delegate: chatMenuManager)
     private var layoutAttributes: MessagesCollectionViewLayoutAttributes?
     
     // MARK: - Methods
@@ -254,9 +245,8 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         messageContainerView.removeFromSuperview()
         contentView.addSubview(containerView)
         
-        contextMenu.setup(for: containerView)
-        
         containerView.addSubview(messageContainerView)
+        chatMenuManager.setup(for: containerView)
     }
     
     func updateOwnReaction() {
@@ -542,34 +532,34 @@ extension ChatMessageReplyCell {
     }
     
     @objc func tapReactionAction() {
-        contextMenu.presentMenu(
-            for: containerView,
-            copyView: copy(
-                with: model,
-                attributes: layoutAttributes,
-                urlAttributes: messageLabel.urlAttributes,
-                enabledDetectors: messageLabel.enabledDetectors
-            )?.containerView,
-            with: makeContextMenu()
-        )
+        chatMenuManager.presentMenuProgrammatically(for: containerView)
     }
 }
 
 extension ChatMessageReplyCell: ChatMenuManagerDelegate {
-    func didReact(_ emoji: String) {
-        Task {
-            await contextMenu.dismiss()
-            self.actionHandler(.react(id: self.model.id, emoji: emoji))
-        }
-    }
-    
-    func getContentView() -> UIView? {
+    func getCopyView() -> UIView? {
         copy(
             with: model,
             attributes: layoutAttributes,
             urlAttributes: messageLabel.urlAttributes,
             enabledDetectors: messageLabel.enabledDetectors
         )?.containerView
+    }
+    
+    func presentMenu(copyView: UIView, size: CGSize, location: CGPoint, tapLocation: CGPoint) {
+        actionHandler(
+            .presentMenu(
+                arg: .init(
+                    copyView: copyView,
+                    size: size,
+                    location: location,
+                    tapLocation: tapLocation,
+                    messageId: model.id,
+                    menu: makeContextMenu(),
+                    selectedEmoji: getReaction(for: model.address)
+                )
+            )
+        )
     }
 }
 
