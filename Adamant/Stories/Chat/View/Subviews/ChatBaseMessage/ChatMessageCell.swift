@@ -80,6 +80,7 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         didSet {
             guard model != oldValue else { return }
             
+            containerView.isHidden = model.isHidden
             reactionsContanerView.isHidden = model.reactions == nil
             ownReactionLabel.isHidden = getReaction(for: model.address) == nil
             opponentReactionLabel.isHidden = getReaction(for: model.opponentAddress) == nil

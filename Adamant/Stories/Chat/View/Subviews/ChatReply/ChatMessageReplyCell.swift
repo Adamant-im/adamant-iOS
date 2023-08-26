@@ -134,6 +134,7 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         didSet {
             guard model != oldValue else { return }
             
+            containerView.isHidden = model.isHidden
             replyMessageLabel.attributedText = model.messageReply
             
             let leading = model.isFromCurrentSender ? smallHInset : longHInset

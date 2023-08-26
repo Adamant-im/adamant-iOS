@@ -21,6 +21,7 @@ extension ChatTransactionContentView {
         var isReply: Bool
         var replyMessage: NSAttributedString
         var replyId: String
+        var isHidden: Bool
         
         static let `default` = Self(
             id: "",
@@ -33,7 +34,8 @@ extension ChatTransactionContentView {
             backgroundColor: .failed,
             isReply: false,
             replyMessage: NSAttributedString(string: ""),
-            replyId: ""
+            replyId: "",
+            isHidden: false
         )
     }
 }

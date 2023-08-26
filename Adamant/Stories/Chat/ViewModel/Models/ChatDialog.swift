@@ -27,8 +27,8 @@ enum ChatDialog {
     case presentMenu(
         arg: ChatContextMenuArguments,
         didSelectEmojiAction: ChatDialogManager.DidSelectEmojiAction,
-        didAppearMenuAction: ChatDialogManager.DidAppearMenuAction,
-        didDismissMenuAction: ChatDialogManager.DidDismissMenuAction
+        didPresentMenuAction: ChatDialogManager.ContextMenuAction,
+        didDismissMenuAction: ChatDialogManager.ContextMenuAction
     )
     case dismissMenu
 }

@@ -23,8 +23,7 @@ final class ChatDialogManager {
     private lazy var contextMenu = AdvancedContextMenuManager()
     
     typealias DidSelectEmojiAction = ((_ emoji: String, _ messageId: String) -> Void)?
-    typealias DidAppearMenuAction = ((_ messageId: String) -> Void)?
-    typealias DidDismissMenuAction = ((_ messageId: String) -> Void)?
+    typealias ContextMenuAction = ((_ messageId: String) -> Void)?
     
     init(
         viewModel: ChatViewModel,
@@ -89,13 +88,13 @@ private extension ChatDialogManager {
         case let .presentMenu(
             arg,
             didSelectEmojiAction,
-            didAppearMenuAction,
+            didPresentMenuAction,
             didDismissMenuAction
         ):
             presentMenu(
                 arg: arg,
                 didSelectEmojiAction: didSelectEmojiAction,
-                didAppearMenuAction: didAppearMenuAction,
+                didPresentMenuAction: didPresentMenuAction,
                 didDismissMenuAction: didDismissMenuAction
             )
         case .dismissMenu:
@@ -431,8 +430,8 @@ private extension ChatDialogManager {
     func presentMenu(
         arg: ChatContextMenuArguments,
         didSelectEmojiAction: DidSelectEmojiAction,
-        didAppearMenuAction: DidAppearMenuAction,
-        didDismissMenuAction: DidDismissMenuAction
+        didPresentMenuAction: ContextMenuAction,
+        didDismissMenuAction: ContextMenuAction
     ) {
         contextMenu.presentMenu(
             arg: arg,
@@ -443,7 +442,7 @@ private extension ChatDialogManager {
             ),
             upperViewSize: getUpperContentViewSize()
         )
-        contextMenu.didAppearMenuAction = didAppearMenuAction
+        contextMenu.didPresentMenuAction = didPresentMenuAction
         contextMenu.didDismissMenuAction = didDismissMenuAction
     }
     

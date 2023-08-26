@@ -40,6 +40,7 @@ final class ChatViewModel: NSObject {
     private var timerSubscription: AnyCancellable?
     private var messageIdToShow: String?
     private var isLoading = false
+    private var menuMessageID: String?
     
     private var isNeedToLoadMoreMessages: Bool {
         get async {
@@ -511,19 +512,25 @@ final class ChatViewModel: NSObject {
             self?.reactAction(messageId, emoji: emoji)
         }
         
-        let didAppearMenuAction: ChatDialogManager.DidAppearMenuAction = { [weak self] messageId in
-            print("didAppearMenuAction messageId=\(messageId)")
+        let didPresentMenuAction: ChatDialogManager.ContextMenuAction = { [weak self] messageId in
+            self?.menuMessageID = messageId
+            guard let index = self?.messages.firstIndex(where: { $0.id == messageId })
+            else { return }
+            self?.messages[index].isHidden = true
         }
         
-        let didDismissMenuAction: ChatDialogManager.DidDismissMenuAction = { [weak self] messageId in
-            print("didDismissMenuAction messageId=\(messageId)")
+        let didDismissMenuAction: ChatDialogManager.ContextMenuAction = { [weak self] messageId in
+            self?.menuMessageID = nil
+            guard let index = self?.messages.firstIndex(where: { $0.id == messageId })
+            else { return }
+            self?.messages[index].isHidden = false
         }
         
         dialog.send(
             .presentMenu(
                 arg: arg,
                 didSelectEmojiAction: didSelectEmojiAction,
-                didAppearMenuAction: didAppearMenuAction,
+                didPresentMenuAction: didPresentMenuAction,
                 didDismissMenuAction: didDismissMenuAction
             )
         )
@@ -619,6 +626,7 @@ private extension ChatViewModel {
                 transactions: chatTransactions,
                 sender: sender,
                 isNeedToLoadMoreMessages: isNeedToLoadMoreMessages,
+                menuMessageID: menuMessageID,
                 expirationTimestamp: &expirationTimestamp
             )
             
@@ -799,6 +807,38 @@ private extension ChatViewModel {
                         self?.tempCancellables.removeAll()
                         continuation.resume()
                     }.store(in: &tempCancellables)
+            }
+        }
+    }
+}
+
+private extension ChatMessage {
+    var isHidden: Bool {
+        get {
+            switch content {
+            case let .message(model):
+                return model.value.isHidden
+            case let .reply(model):
+                return model.value.isHidden
+            case let .transaction(model):
+                return model.value.content.isHidden
+            }
+        }
+        
+        set {
+            switch content {
+            case let .message(model):
+                var model = model.value
+                model.isHidden = newValue
+                content = .message(.init(value: model))
+            case let .reply(model):
+                var model = model.value
+                model.isHidden = newValue
+                content = .reply(.init(value: model))
+            case let .transaction(model):
+                var model = model.value
+                model.content.isHidden = newValue
+                content = .transaction(.init(value: model))
             }
         }
     }

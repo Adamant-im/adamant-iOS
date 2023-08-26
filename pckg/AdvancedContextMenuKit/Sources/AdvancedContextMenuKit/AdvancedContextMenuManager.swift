@@ -19,6 +19,7 @@ public final class AdvancedContextMenuManager: NSObject {
     private var messageId: String = ""
     
     public var didAppearMenuAction: ((_ messageId: String) -> Void)?
+    public var didPresentMenuAction: ((_ messageId: String) -> Void)?
     public var didDismissMenuAction: ((_ messageId: String) -> Void)?
     
     var isiOSAppOnMac: Bool = {
@@ -160,6 +161,7 @@ private extension AdvancedContextMenuManager {
         window.makeKeyAndVisible()
         
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        didPresentMenuAction?(messageId)
     }
     
     func getMenuVC(content: AMenuSection) -> AMenuViewController {
