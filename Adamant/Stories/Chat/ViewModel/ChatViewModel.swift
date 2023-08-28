@@ -67,6 +67,7 @@ final class ChatViewModel: NSObject {
     let didTapAdmSend = ObservableSender<AdamantAddress>()
     let closeScreen = ObservableSender<Void>()
     let updateChatRead = ObservableSender<Void>()
+    let commitVibro = ObservableSender<Void>()
     
     @ObservableValue private(set) var isHeaderLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
@@ -318,7 +319,7 @@ final class ChatViewModel: NSObject {
             transaction.isHidden = true
             try? transaction.managedObjectContext?.save()
             
-            await chatroom?.updateLastTransaction()
+            chatroom?.updateLastTransaction()
             await chatsProvider.removeMessage(with: transaction.transactionId)
         }
     }
@@ -648,6 +649,8 @@ private extension ChatViewModel {
     ) async {
         var newMessages = newMessages
         updateHiddenMessage(&newMessages)
+        checkNewReactions(old: messages, new: newMessages)
+        
         messages = newMessages
         
         if let address = chatroom?.partner?.address {
@@ -815,6 +818,16 @@ private extension ChatViewModel {
             messages[$0].isHidden = messages[$0].id == hiddenMessageID
         }
     }
+    
+    func checkNewReactions(old: [ChatMessage], new: [ChatMessage]) {
+        guard
+            let processedDate = old.getMostRecentElementDate(),
+            let newLastReactionDate = new.getMostRecentReactionDate(),
+            newLastReactionDate > processedDate
+        else { return }
+        
+        commitVibro.send()
+    }
 }
 
 private extension ChatMessage {
@@ -845,6 +858,34 @@ private extension ChatMessage {
                 model.content.isHidden = newValue
                 content = .transaction(.init(value: model))
             }
+        }
+    }
+}
+
+private extension Sequence where Element == ChatMessage {
+    func getMostRecentElementDate() -> Date? {
+        flatMap { $0.getReactions().map { $0.sentDate } + [$0.sentDate] }.max()
+    }
+    
+    func getMostRecentReactionDate() -> Date? {
+        flatMap { $0.getReactions().map { $0.sentDate } }.max()
+    }
+    
+    func getReactions() -> [String: Set<Reaction>] {
+        let pairs = map { ($0.id, $0.getReactions()) }
+        return .init(uniqueKeysWithValues: pairs)
+    }
+}
+
+private extension ChatMessage {
+    func getReactions() -> Set<Reaction> {
+        switch content {
+        case let .message(value):
+            return value.value.reactions ?? .init()
+        case let .reply(value):
+            return value.value.reactions ?? .init()
+        case let .transaction(value):
+            return value.value.reactions ?? .init()
         }
     }
 }

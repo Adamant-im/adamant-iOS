@@ -338,6 +338,10 @@ private extension ChatViewController {
         viewModel.updateChatRead
             .sink { [weak self] in self?.checkIsChatWasRead() }
             .store(in: &subscriptions)
+        
+        viewModel.commitVibro
+            .sink { UIImpactFeedbackGenerator(style: .light).impactOccurred() }
+            .store(in: &subscriptions)
     }
 }
 
