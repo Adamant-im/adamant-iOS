@@ -40,7 +40,6 @@ final class ChatViewModel: NSObject {
     private var timerSubscription: AnyCancellable?
     private var messageIdToShow: String?
     private var isLoading = false
-    private var menuMessageID: String?
     
     private var isNeedToLoadMoreMessages: Bool {
         get async {
@@ -104,6 +103,10 @@ final class ChatViewModel: NSObject {
         }
         
         return url
+    }
+    
+    private var hiddenMessageID: String? {
+        didSet { updateHiddenMessage(&messages) }
     }
     
     init(
@@ -513,17 +516,11 @@ final class ChatViewModel: NSObject {
         }
         
         let didPresentMenuAction: ChatDialogManager.ContextMenuAction = { [weak self] messageId in
-            self?.menuMessageID = messageId
-            guard let index = self?.messages.firstIndex(where: { $0.id == messageId })
-            else { return }
-            self?.messages[index].isHidden = true
+            self?.hiddenMessageID = messageId
         }
         
         let didDismissMenuAction: ChatDialogManager.ContextMenuAction = { [weak self] messageId in
-            self?.menuMessageID = nil
-            guard let index = self?.messages.firstIndex(where: { $0.id == messageId })
-            else { return }
-            self?.messages[index].isHidden = false
+            self?.hiddenMessageID = nil
         }
         
         dialog.send(
@@ -626,7 +623,7 @@ private extension ChatViewModel {
                 transactions: chatTransactions,
                 sender: sender,
                 isNeedToLoadMoreMessages: isNeedToLoadMoreMessages,
-                menuMessageID: menuMessageID,
+                menuMessageID: hiddenMessageID,
                 expirationTimestamp: &expirationTimestamp
             )
             
@@ -649,6 +646,8 @@ private extension ChatViewModel {
         resetLoadingProperty: Bool,
         expirationTimestamp: TimeInterval?
     ) async {
+        var newMessages = newMessages
+        updateHiddenMessage(&newMessages)
         messages = newMessages
         
         if let address = chatroom?.partner?.address {
@@ -808,6 +807,12 @@ private extension ChatViewModel {
                         continuation.resume()
                     }.store(in: &tempCancellables)
             }
+        }
+    }
+    
+    func updateHiddenMessage(_ messages: inout [ChatMessage]) {
+        messages.indices.forEach {
+            messages[$0].isHidden = messages[$0].id == hiddenMessageID
         }
     }
 }
