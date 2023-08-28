@@ -49,6 +49,10 @@ final class ChatViewModel: NSObject {
         }
     }
     
+    private var hiddenMessageID: String? {
+        didSet { updateHiddenMessage(&messages) }
+    }
+    
     private(set) var sender = ChatSender.default
     private(set) var chatroom: Chatroom?
     private(set) var chatTransactions: [ChatTransaction] = []
@@ -616,6 +620,8 @@ private extension ChatViewModel {
         resetLoadingProperty: Bool,
         expirationTimestamp: TimeInterval?
     ) async {
+        var newMessages = newMessages
+        updateHiddenMessage(&newMessages)
         messages = newMessages
         
         if let address = chatroom?.partner?.address {
@@ -775,6 +781,12 @@ private extension ChatViewModel {
                         continuation.resume()
                     }.store(in: &tempCancellables)
             }
+        }
+    }
+    
+    func updateHiddenMessage(_ messages: inout [ChatMessage]) {
+        messages.indices.forEach {
+            messages[$0].isHidden = messages[$0].id == hiddenMessageID
         }
     }
 }
