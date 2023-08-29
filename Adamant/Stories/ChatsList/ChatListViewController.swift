@@ -1088,7 +1088,7 @@ extension ChatListViewController {
                 message: nil,
                 style: UIAlertController.Style.actionSheet,
                 actions: [share, rename, cancel],
-                from: view
+                from: .view(view)
             )
             
             completionHandler(true)
@@ -1145,7 +1145,8 @@ extension ChatListViewController {
         let alert = UIAlertController(
             title: .init(format: .adamant.chat.actionsBody, address),
             message: nil,
-            preferredStyle: .alert
+            preferredStyleSafe: .alert,
+            source: nil
         )
         
         alert.addTextField { [weak self] textField in

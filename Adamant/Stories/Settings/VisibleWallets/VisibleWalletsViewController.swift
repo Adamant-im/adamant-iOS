@@ -146,7 +146,7 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     }
     
     private func resetWalletsAction() {
-        let alert = UIAlertController(title: String.adamant.visibleWallets.resetAlertTitle, message: nil, preferredStyle: .alert)
+        let alert = UIAlertController(title: String.adamant.visibleWallets.resetAlertTitle, message: nil, preferredStyleSafe: .alert, source: nil)
         alert.addAction(UIAlertAction(title: String.adamant.alert.cancel, style: .cancel, handler: nil))
         alert.addAction(UIAlertAction(
             title: .adamant.visibleWallets.reset,

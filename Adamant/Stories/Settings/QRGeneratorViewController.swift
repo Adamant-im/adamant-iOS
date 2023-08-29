@@ -116,11 +116,16 @@ class QRGeneratorViewController: FormViewController {
             
             let cancel = UIAlertAction(title: String.adamant.alert.cancel, style: .cancel, handler: nil)
             
-            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+            let alert = UIAlertController(
+                title: nil,
+                message: nil,
+                preferredStyleSafe: .actionSheet,
+                source: .view(cell)
+            )
+            
             alert.addAction(save)
             alert.addAction(share)
             alert.addAction(cancel)
-            alert.popoverPresentationController?.sourceView = cell
             alert.modalPresentationStyle = .overFullScreen
             self?.present(alert, animated: true, completion: nil)
         }

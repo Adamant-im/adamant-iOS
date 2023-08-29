@@ -269,7 +269,8 @@ class NotificationsViewController: FormViewController {
         let alert = UIAlertController(
             title: nil,
             message: NotificationStrings.notificationsDisabled,
-            preferredStyle: .alert
+            preferredStyleSafe: .alert,
+            source: nil
         )
         
         alert.addAction(UIAlertAction(title: String.adamant.alert.settings, style: .default) { _ in

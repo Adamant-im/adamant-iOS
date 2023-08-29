@@ -253,7 +253,7 @@ extension NodeEditorViewController {
     }
     
     private func deleteNode() {
-        let alert = UIAlertController(title: String.adamant.nodesEditor.deleteNodeAlert, message: nil, preferredStyle: .alert)
+        let alert = UIAlertController(title: String.adamant.nodesEditor.deleteNodeAlert, message: nil, preferredStyleSafe: .alert, source: nil)
         alert.addAction(UIAlertAction(title: String.adamant.alert.cancel, style: .cancel, handler: nil))
         alert.addAction(UIAlertAction(title: String.adamant.alert.delete, style: .destructive, handler: { _ in
             self.didCallDelegate = true

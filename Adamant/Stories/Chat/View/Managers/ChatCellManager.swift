@@ -29,6 +29,6 @@ final class ChatCellManager: MessageCellDelegate {
             message.status == .failed
         else { return }
         
-        viewModel.dialog.send(.failedMessageAlert(id: id, sender: cell))
+        viewModel.dialog.send(.failedMessageAlert(id: id, sender: .view(cell)))
     }
 }

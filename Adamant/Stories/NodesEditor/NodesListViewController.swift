@@ -277,7 +277,7 @@ extension NodesListViewController {
             return
         }
         
-        let alert = UIAlertController(title: String.adamant.nodesList.resetAlertTitle, message: nil, preferredStyle: .alert)
+        let alert = UIAlertController(title: String.adamant.nodesList.resetAlertTitle, message: nil, preferredStyleSafe: .alert, source: nil)
         alert.addAction(UIAlertAction(title: String.adamant.alert.cancel, style: .cancel, handler: nil))
         alert.addAction(UIAlertAction(
             title: Rows.reset.localized,

@@ -842,12 +842,18 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     // MARK: - Actions
     
-    @objc func share(_ sender: Any) {
+    @objc func share(_ sender: UIBarButtonItem) {
         guard let transaction = transaction else {
             return
         }
         
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        let alert = UIAlertController(
+            title: nil,
+            message: nil,
+            preferredStyleSafe: .actionSheet,
+            source: .barButtonItem(sender)
+        )
+        
         alert.addAction(UIAlertAction(title: String.adamant.alert.cancel, style: .cancel, handler: nil))
         
         if let url = explorerUrl(for: transaction) {
