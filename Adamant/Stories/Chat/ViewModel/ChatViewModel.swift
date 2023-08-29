@@ -623,7 +623,6 @@ private extension ChatViewModel {
                 transactions: chatTransactions,
                 sender: sender,
                 isNeedToLoadMoreMessages: isNeedToLoadMoreMessages,
-                menuMessageID: hiddenMessageID,
                 expirationTimestamp: &expirationTimestamp
             )
             

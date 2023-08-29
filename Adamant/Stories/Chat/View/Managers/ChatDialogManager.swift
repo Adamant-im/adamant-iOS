@@ -433,6 +433,9 @@ private extension ChatDialogManager {
         didPresentMenuAction: ContextMenuAction,
         didDismissMenuAction: ContextMenuAction
     ) {
+        contextMenu.didPresentMenuAction = didPresentMenuAction
+        contextMenu.didDismissMenuAction = didDismissMenuAction
+        
         contextMenu.presentMenu(
             arg: arg,
             upperView: getUpperContentView(
@@ -442,8 +445,6 @@ private extension ChatDialogManager {
             ),
             upperViewSize: getUpperContentViewSize()
         )
-        contextMenu.didPresentMenuAction = didPresentMenuAction
-        contextMenu.didDismissMenuAction = didDismissMenuAction
     }
     
     func getUpperContentViewSize() -> CGSize {
