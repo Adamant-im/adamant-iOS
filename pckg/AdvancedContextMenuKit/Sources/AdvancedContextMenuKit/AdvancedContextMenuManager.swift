@@ -15,7 +15,7 @@ public final class AdvancedContextMenuManager: NSObject {
     private var viewModelMac: ContextMenuOverlayViewModelMac?
     private let window = TransparentWindow(frame: UIScreen.main.bounds)
     private var locationOnScreen: CGPoint = .zero
-    
+    private var getPositionOnScreen: (() -> CGPoint)?
     private var messageId: String = ""
     
     public var didAppearMenuAction: ((_ messageId: String) -> Void)?
@@ -43,6 +43,7 @@ public final class AdvancedContextMenuManager: NSObject {
     ) {
         self.messageId = arg.messageId
         self.locationOnScreen = arg.location
+        self.getPositionOnScreen = arg.getPositionOnScreen
         
         let containerCopyView = ContanierPreviewView(
             contentView: arg.copyView,
@@ -184,6 +185,7 @@ private extension AdvancedContextMenuManager {
 extension AdvancedContextMenuManager: OverlayViewDelegate {
     @MainActor func didDissmis() {
         didDismissMenuAction?(messageId)
+        getPositionOnScreen = nil
         // Postpone window dismissal to the next iteration to allow the contentView to become visible
         Task {
             window.rootViewController = nil
@@ -192,6 +194,11 @@ extension AdvancedContextMenuManager: OverlayViewDelegate {
     }
     
     @MainActor func didAppear() {
+        if let newPosition = getPositionOnScreen?(),
+           newPosition != locationOnScreen {
+            viewModel?.update(locationOnScreen: newPosition)
+        }
+        
         didAppearMenuAction?(messageId)
     }
 }

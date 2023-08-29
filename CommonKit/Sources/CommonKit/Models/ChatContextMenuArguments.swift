@@ -15,6 +15,7 @@ public struct ChatContextMenuArguments {
     public let messageId: String
     public let menu: AMenuSection
     public let selectedEmoji: String?
+    public let getPositionOnScreen: () -> CGPoint
     
     public init(
         copyView: UIView,
@@ -23,7 +24,8 @@ public struct ChatContextMenuArguments {
         tapLocation: CGPoint,
         messageId: String,
         menu: AMenuSection,
-        selectedEmoji: String?
+        selectedEmoji: String?,
+        getPositionOnScreen: @escaping () -> CGPoint
     ) {
         self.copyView = copyView
         self.size = size
@@ -32,6 +34,7 @@ public struct ChatContextMenuArguments {
         self.messageId = messageId
         self.menu = menu
         self.selectedEmoji = selectedEmoji
+        self.getPositionOnScreen = getPositionOnScreen
     }
     
 }

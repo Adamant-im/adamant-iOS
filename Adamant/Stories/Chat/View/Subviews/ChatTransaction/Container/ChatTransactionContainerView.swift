@@ -316,20 +316,24 @@ extension ChatTransactionContainerView: ChatMenuManagerDelegate {
         copy(with: model)?.contentView
     }
     
-    func presentMenu(copyView: UIView, size: CGSize, location: CGPoint, tapLocation: CGPoint) {
-        actionHandler(
-            .presentMenu(
-                arg: .init(
-                    copyView: copyView,
-                    size: size,
-                    location: location,
-                    tapLocation: tapLocation,
-                    messageId: model.id,
-                    menu: makeContextMenu(),
-                    selectedEmoji: getReaction(for: model.address)
-                )
-            )
+    func presentMenu(
+        copyView: UIView,
+        size: CGSize,
+        location: CGPoint,
+        tapLocation: CGPoint,
+        getPositionOnScreen: @escaping () -> CGPoint
+    ) {
+        let arguments = ChatContextMenuArguments.init(
+            copyView: copyView,
+            size: size,
+            location: location,
+            tapLocation: tapLocation,
+            messageId: model.id,
+            menu: makeContextMenu(),
+            selectedEmoji: getReaction(for: model.address),
+            getPositionOnScreen: getPositionOnScreen
         )
+        actionHandler(.presentMenu(arg: arguments))
     }
 }
 

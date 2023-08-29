@@ -519,7 +519,7 @@ final class ChatViewModel: NSObject {
             self?.hiddenMessageID = messageId
         }
         
-        let didDismissMenuAction: ChatDialogManager.ContextMenuAction = { [weak self] messageId in
+        let didDismissMenuAction: ChatDialogManager.ContextMenuAction = { [weak self] _ in
             self?.hiddenMessageID = nil
         }
         

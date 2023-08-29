@@ -18,7 +18,8 @@ protocol ChatMenuManagerDelegate: AnyObject {
         copyView: UIView,
         size: CGSize,
         location: CGPoint,
-        tapLocation: CGPoint
+        tapLocation: CGPoint,
+        getPositionOnScreen: @escaping () -> CGPoint
     )
 }
 
@@ -65,6 +66,11 @@ final class ChatMenuManager: NSObject {
         let size = contentView.frame.size
         
         let copyView = delegate?.getCopyView() ?? contentView
+        
+        let getPositionOnScreen: () -> CGPoint = { [weak contentView] in
+            contentView?.convert(CGPoint.zero, to: nil) ?? .zero
+        }
+        
         delegate?.presentMenu(
             copyView: copyView,
             size: size,
@@ -72,7 +78,8 @@ final class ChatMenuManager: NSObject {
             tapLocation: .init(
                 x: locationOnScreen.x + size.width / 2,
                 y: locationOnScreen.y + size.height / 2
-            )
+            ),
+            getPositionOnScreen: getPositionOnScreen
         )
     }
     
@@ -88,11 +95,17 @@ final class ChatMenuManager: NSObject {
         let size = contentView.frame.size
         
         let copyView = delegate?.getCopyView() ?? contentView
+        
+        let getPositionOnScreen: () -> CGPoint = {
+            contentView.convert(CGPoint.zero, to: nil)
+        }
+        
         delegate?.presentMenu(
             copyView: copyView,
             size: size,
             location: locationOnScreen,
-            tapLocation: .zero
+            tapLocation: .zero,
+            getPositionOnScreen: getPositionOnScreen
         )
     }
 }
@@ -122,11 +135,16 @@ extension ChatMenuManager: UIContextMenuInteractionDelegate {
         
         let copyView = delegate?.getCopyView() ?? contentView
         
+        let getPositionOnScreen: () -> CGPoint = {
+            contentView.convert(CGPoint.zero, to: nil)
+        }
+        
         delegate?.presentMenu(
             copyView: copyView,
             size: size,
             location: contentLocation,
-            tapLocation: tapLocation
+            tapLocation: tapLocation,
+            getPositionOnScreen: getPositionOnScreen
         )
     }
 }

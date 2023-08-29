@@ -443,21 +443,20 @@ extension ChatMessageCell: ChatMenuManagerDelegate {
         copyView: UIView,
         size: CGSize,
         location: CGPoint,
-        tapLocation: CGPoint
+        tapLocation: CGPoint,
+        getPositionOnScreen: @escaping () -> CGPoint
     ) {
-        actionHandler(
-            .presentMenu(
-                arg: .init(
-                    copyView: copyView,
-                    size: size,
-                    location: location,
-                    tapLocation: tapLocation,
-                    messageId: model.id,
-                    menu: makeContextMenu(),
-                    selectedEmoji: getReaction(for: model.address)
-                )
-            )
+        let arguments = ChatContextMenuArguments.init(
+            copyView: copyView,
+            size: size,
+            location: location,
+            tapLocation: tapLocation,
+            messageId: model.id,
+            menu: makeContextMenu(),
+            selectedEmoji: getReaction(for: model.address),
+            getPositionOnScreen: getPositionOnScreen
         )
+        actionHandler(.presentMenu(arg: arguments))
     }
 }
 
