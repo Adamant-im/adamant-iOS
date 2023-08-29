@@ -21,3 +21,6 @@
 
 /* Notifications: Reacted */
 "NotificationsService.Reacted" = "Отреагировал";
+
+/* Notifications: Modified Reaction */
+"ChatListPage.ModifiedReaction" = "Изменил реакцию";

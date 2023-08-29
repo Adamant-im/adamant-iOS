@@ -49,6 +49,11 @@ enum NotificationStrings {
         comment: "Notifications: Reacted"
     )
     
+    static let modifiedReaction = NSLocalizedString(
+        "NotificationsService.ModifiedReaction",
+        comment: "Notifications: Modified Reaction"
+    )
+    
     static func newTransferBody(_ count: Int) -> String {
         .localizedStringWithFormat(
             NSLocalizedString(

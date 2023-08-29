@@ -212,12 +212,17 @@ class NotificationService: UNNotificationServiceExtension {
                    let richContent = RichMessageTools.richContent(from: data),
                    let reaction = richContent[RichContentKeys.react.react_message] as? String,
                    richContent[RichContentKeys.react.reactto_id] != nil {
+                    
+                    /* Ignoring will be later
                     guard !reaction.isEmpty else {
                         shouldIgnoreNotification = true
                         break
                     }
+                     */
                     
-                    let text = "\(NotificationStrings.reacted) \(reaction)"
+                    let text = reaction.isEmpty
+                    ? NotificationStrings.modifiedReaction
+                    : "\(NotificationStrings.reacted) \(reaction)"
                     
                     content = NotificationContent(
                         title: partnerName ?? partnerAddress,
