@@ -33,7 +33,6 @@ extension ChatModelView {
             self?.model = newModel
             
             collection?.collectionViewLayout.invalidateLayout()
-            collection?.layoutIfNeeded()
         }
     }
     
