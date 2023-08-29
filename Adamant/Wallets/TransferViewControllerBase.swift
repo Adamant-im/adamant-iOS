@@ -702,7 +702,7 @@ class TransferViewControllerBase: FormViewController {
         let formattedAmount = balanceFormatter.string(from: amount as NSDecimalNumber)!
         let title = String.adamant.alert.confirmSendMessage(formattedAmount: formattedAmount, recipient: recipient)
         
-        let alert = UIAlertController(title: title, message: String.adamant.transfer.cantUndo, preferredStyle: .alert)
+        let alert = UIAlertController(title: title, message: String.adamant.transfer.cantUndo, preferredStyleSafe: .alert, source: nil)
         let cancelAction = UIAlertAction(title: String.adamant.alert.cancel , style: .cancel, handler: nil)
         let sendAction = UIAlertAction(title: String.adamant.alert.send, style: .default) { [weak self] _ in
             self?.sendFunds()
@@ -957,7 +957,7 @@ extension TransferViewControllerBase {
                     return
                 }
                 
-                let alert = UIAlertController(title: String.adamant.transfer.useMaxToTransfer, message: nil, preferredStyle: .alert)
+                let alert = UIAlertController(title: String.adamant.transfer.useMaxToTransfer, message: nil, preferredStyleSafe: .alert, source: nil)
                 let cancelAction = UIAlertAction(title: String.adamant.alert.cancel , style: .cancel, handler: nil)
                 let confirmAction = UIAlertAction(title: String.adamant.alert.ok, style: .default) { [weak self] _ in
                     guard let amountRow: SafeDecimalRow = self?.form.rowBy(tag: BaseRows.amount.tag) else {

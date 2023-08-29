@@ -220,14 +220,14 @@ extension AdamantDialogService {
         completion: (() -> Void)?,
         didSelect: ((AddressChatShareType) -> Void)?
     ) {
-        let alert = makeSafeAlertController(
+        let source: UIAlertController.SourceView? = from.map { .view($0) }
+        
+        let alert = UIAlertController(
             title: adm,
             message: nil,
-            preferredStyle: .actionSheet,
-            source: from
+            preferredStyleSafe: .actionSheet,
+            source: source
         )
-        
-        let source: ViewSource? = from.map { .view($0) }
         
         for type in types {
             alert.addAction(
@@ -258,74 +258,35 @@ extension AdamantDialogService {
             completion: nil
         )
         
-        if let sourceView = from {
-            alert.popoverPresentationController?.sourceView = sourceView
-            alert.popoverPresentationController?.sourceRect = sourceView.bounds
-            alert.popoverPresentationController?.canOverlapSourceViewRect = false
-        }
-        
         alert.modalPresentationStyle = .overFullScreen
         present(alert, animated: animated, completion: completion)
     }
     
     func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?) {
-        let source: ViewSource? = from.map { .view($0) }
+        let source: UIAlertController.SourceView? = from.map { .view($0) }
         
         let alert = createShareAlertFor(stringForPasteboard: string, stringForShare: string, stringForQR: string, types: types, excludedActivityTypes: excludedActivityTypes, animated: animated, from: source, completion: completion)
         
-        if let sourceView = from {
-            alert.popoverPresentationController?.sourceView = sourceView
-            alert.popoverPresentationController?.sourceRect = sourceView.bounds
-            alert.popoverPresentationController?.canOverlapSourceViewRect = false
-        }
         alert.modalPresentationStyle = .overFullScreen
         present(alert, animated: animated, completion: completion)
     }
     
     func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIBarButtonItem?, completion: (() -> Void)?) {
-        let source: ViewSource?
-        if let from = from {
-            source = .barButtonItem(from)
-        } else {
-            source = nil
-        }
+        let source: UIAlertController.SourceView? = from.map { .barButtonItem($0) }
         
         let alert = createShareAlertFor(stringForPasteboard: string, stringForShare: string, stringForQR: string, types: types, excludedActivityTypes: excludedActivityTypes, animated: animated, from: source, completion: completion)
         
-        if let sourceView = from {
-            alert.popoverPresentationController?.barButtonItem = sourceView
-        }
         alert.modalPresentationStyle = .overFullScreen
         present(alert, animated: animated, completion: completion)
     }
     
     func presentShareAlertFor(stringForPasteboard: String, stringForShare: String, stringForQR: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?) {
-        let source: ViewSource? = from.map { .view($0) }
+        let source: UIAlertController.SourceView? = from.map { .view($0) }
         
         let alert = createShareAlertFor(stringForPasteboard: stringForPasteboard, stringForShare: stringForShare, stringForQR: stringForQR, types: types, excludedActivityTypes: excludedActivityTypes, animated: animated, from: source, completion: completion)
         
-        if let sourceView = from {
-            alert.popoverPresentationController?.sourceView = sourceView
-            alert.popoverPresentationController?.sourceRect = sourceView.bounds
-            alert.popoverPresentationController?.canOverlapSourceViewRect = false
-        }
         alert.modalPresentationStyle = .overFullScreen
         present(alert, animated: animated, completion: completion)
-    }
-    
-    // Passing sender to second modal window
-    private enum ViewSource {
-        case view(UIView)
-        case barButtonItem(UIBarButtonItem)
-        
-        var entity: Any {
-            switch self {
-            case let .view(view):
-                return view
-            case let .barButtonItem(item):
-                return item
-            }
-        }
     }
     
     private func createShareAlertFor(
@@ -335,14 +296,14 @@ extension AdamantDialogService {
         types: [ShareType],
         excludedActivityTypes: [UIActivity.ActivityType]?,
         animated: Bool,
-        from: ViewSource?,
+        from: UIAlertController.SourceView?,
         completion: (() -> Void)?
     ) -> UIAlertController {
-        let alert = makeSafeAlertController(
+        let alert = UIAlertController(
             title: nil,
             message: nil,
-            preferredStyle: .actionSheet,
-            source: from?.entity
+            preferredStyleSafe: .actionSheet,
+            source: from
         )
 
         addActions(to: alert, stringForPasteboard: stringForPasteboard, stringForShare: stringForShare, stringForQR: stringForQR, types: types, excludedActivityTypes: excludedActivityTypes, from: from, completion: completion)
@@ -357,7 +318,7 @@ extension AdamantDialogService {
         stringForQR: String,
         types: [ShareType],
         excludedActivityTypes: [UIActivity.ActivityType]?,
-        from: ViewSource?,
+        from: UIAlertController.SourceView?,
         completion: (() -> Void)?
     ) {
         for type in types {
@@ -465,13 +426,13 @@ extension AdamantDialogService {
         message: String,
         sendCompletion: ((UIAlertAction) -> Void)?
     ) {
-        let alert = makeSafeAlertController(
+        let alert = UIAlertController(
             title: String.adamant.transferAdm.accountNotFoundAlertTitle(
                 for: adm
             ),
             message: message,
-            preferredStyle: .alert,
-            source: nil
+            preferredStyleSafe: .alert,
+            source: from.map { .view($0) }
         )
         
         if let url = URL(string: NewChatViewController.faqUrl) {
@@ -500,14 +461,8 @@ extension AdamantDialogService {
             style: .cancel,
             handler: nil
         )
+        
         alert.addAction(cancel)
-        
-        if let sourceView = from {
-            alert.popoverPresentationController?.sourceView = sourceView
-            alert.popoverPresentationController?.sourceRect = sourceView.bounds
-            alert.popoverPresentationController?.canOverlapSourceViewRect = false
-        }
-        
         alert.modalPresentationStyle = .overFullScreen
         present(alert, animated: true, completion: nil)
     }
@@ -521,10 +476,10 @@ extension AdamantDialogService {
     }
     
     func presentGoToSettingsAlert(title: String?, message: String?) {
-        let alert = makeSafeAlertController(
+        let alert = UIAlertController(
             title: title,
             message: message,
-            preferredStyle: .alert,
+            preferredStyleSafe: .alert,
             source: nil
         )
         
@@ -560,7 +515,7 @@ fileprivate extension AdamantAlertAction {
 }
 
 extension AdamantDialogService {
-    func showAlert(title: String?, message: String?, style: AdamantAlertStyle, actions: [AdamantAlertAction]?, from: Any?) {
+    func showAlert(title: String?, message: String?, style: AdamantAlertStyle, actions: [AdamantAlertAction]?, from: UIAlertController.SourceView?) {
         switch style {
         case .alert, .actionSheet:
             let uiStyle = style.asUIAlertControllerStyle()
@@ -574,11 +529,11 @@ extension AdamantDialogService {
         }
     }
     
-    func showAlert(title: String?, message: String?, style: UIAlertController.Style, actions: [UIAlertAction]?, from: Any?) {
-        let alert = makeSafeAlertController(
+    func showAlert(title: String?, message: String?, style: UIAlertController.Style, actions: [UIAlertAction]?, from: UIAlertController.SourceView?) {
+        let alert = UIAlertController(
             title: title,
             message: message,
-            preferredStyle: style,
+            preferredStyleSafe: style,
             source: from
         )
         
@@ -590,14 +545,6 @@ extension AdamantDialogService {
             alert.addAction(UIAlertAction(title: String.adamant.alert.ok, style: .default))
         }
         
-        if let sourceView = from as? UIView {
-            alert.popoverPresentationController?.sourceView = sourceView
-            alert.popoverPresentationController?.sourceRect = sourceView.bounds
-            alert.popoverPresentationController?.canOverlapSourceViewRect = false
-        } else if  let barButtonItem = from as? UIBarButtonItem {
-            alert.popoverPresentationController?.barButtonItem = barButtonItem
-        }
-        
         present(alert, animated: true, completion: nil)
     }
 }
@@ -606,20 +553,6 @@ private class MailDelegate: NSObject, MFMailComposeViewControllerDelegate {
     func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
         controller.dismiss(animated: true, completion: nil)
     }
-}
-
-/// Its needed to avoid crashes on `actionSheet` alert style on MacOS
-private func makeSafeAlertController(
-    title: String?,
-    message: String?,
-    preferredStyle: UIAlertController.Style,
-    source: Any?
-) -> UIAlertController {
-    let style = source == nil && UIScreen.main.traitCollection.userInterfaceIdiom == .pad
-        ? .alert
-        : preferredStyle
-    
-    return .init(title: title, message: message, preferredStyle: style)
 }
 
 extension AdamantDialogService {

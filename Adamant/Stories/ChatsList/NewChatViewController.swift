@@ -357,13 +357,13 @@ extension NewChatViewController {
                 }
             }
         case .restricted:
-            let alert = UIAlertController(title: nil, message: String.adamant.login.cameraNotSupported, preferredStyle: .alert)
+            let alert = UIAlertController(title: nil, message: String.adamant.login.cameraNotSupported, preferredStyleSafe: .alert, source: nil)
             alert.addAction(UIAlertAction(title: String.adamant.alert.ok, style: .cancel, handler: nil))
             alert.modalPresentationStyle = .overFullScreen
             present(alert, animated: true, completion: nil)
             
         case .denied:
-            let alert = UIAlertController(title: nil, message: String.adamant.login.cameraNotAuthorized, preferredStyle: .alert)
+            let alert = UIAlertController(title: nil, message: String.adamant.login.cameraNotAuthorized, preferredStyleSafe: .alert, source: nil)
             
             alert.addAction(UIAlertAction(title: String.adamant.alert.settings, style: .default) { _ in
                 DispatchQueue.main.async {

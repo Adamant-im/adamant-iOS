@@ -100,7 +100,7 @@ private extension ChatDialogManager {
                 makeRenameAction(),
                 makeCancelAction()
             ],
-            from: sender
+            from: .barButtonItem(sender)
         )
     }
     
@@ -129,7 +129,8 @@ private extension ChatDialogManager {
         let alert = UIAlertController(
             title: "",
             message: String.adamant.chat.freeTokensMessage,
-            preferredStyle: .alert
+            preferredStyleSafe: .alert,
+            source: nil
         )
         
         alert.addAction(makeFreeTokensAlertAction())
@@ -175,7 +176,7 @@ private extension ChatDialogManager {
         )
     }
     
-    func showFailedMessageAlert(id: String, sender: Any) {
+    func showFailedMessageAlert(id: String, sender: UIAlertController.SourceView) {
         dialogService.showAlert(
             title: .adamant.alert.retryOrDeleteTitle,
             message: .adamant.alert.retryOrDeleteBody,
@@ -237,7 +238,8 @@ private extension ChatDialogManager {
         let alert = UIAlertController(
             title: .init(format: .adamant.chat.actionsBody, address),
             message: nil,
-            preferredStyle: .alert
+            preferredStyleSafe: .alert,
+            source: nil
         )
         
         alert.addTextField { [weak viewModel] textField in

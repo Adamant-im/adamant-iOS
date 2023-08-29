@@ -505,7 +505,7 @@ class AccountViewController: FormViewController {
                 return
             }
             
-            let alert = UIAlertController(title: String.localizedStringWithFormat(String.adamant.alert.logoutMessageFormat, address), message: nil, preferredStyle: .alert)
+            let alert = UIAlertController(title: String.localizedStringWithFormat(String.adamant.alert.logoutMessageFormat, address), message: nil, preferredStyleSafe: .alert, source: nil)
             let cancel = UIAlertAction(title: String.adamant.alert.cancel, style: .cancel) { _ in
                 guard let indexPath = row.indexPath else {
                     return
