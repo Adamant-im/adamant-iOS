@@ -198,7 +198,7 @@ private extension AdvancedContextMenuManager {
         }
     }
     
-    private func presentOverlay(
+    func presentOverlay(
         view: UIView,
         location: CGPoint,
         contentViewSize: CGSize,
@@ -222,7 +222,11 @@ private extension AdvancedContextMenuManager {
             viewModel: viewModel
         )
         
-        let overlayVC = UIHostingController(rootView: overlay)
+        let overlayVC = OverlayHostingController(
+            rootView: overlay,
+            dismissAction: { [weak self] in self?.dismissSync() }
+        )
+            
         overlayVC.modalPresentationStyle = .overFullScreen
         overlayVC.modalPresentationCapturesStatusBarAppearance = true
         overlayVC.view.backgroundColor = .clear
@@ -232,7 +236,7 @@ private extension AdvancedContextMenuManager {
         present(vc: overlayVC)
     }
     
-    private func presentOverlayForMac(
+    func presentOverlayForMac(
         contentView: UIView,
         contentViewSize: CGSize,
         location: CGPoint,
@@ -260,7 +264,11 @@ private extension AdvancedContextMenuManager {
             viewModel: viewModel
         )
         
-        let overlayVC = UIHostingController(rootView: overlay)
+        let overlayVC = OverlayHostingController(
+            rootView: overlay,
+            dismissAction: { [weak self] in self?.dismissSync() }
+        )
+        
         overlayVC.modalPresentationStyle = .overFullScreen
         overlayVC.modalPresentationCapturesStatusBarAppearance = true
         overlayVC.view.backgroundColor = .clear
@@ -289,6 +297,10 @@ private extension AdvancedContextMenuManager {
         }
         
         return menuViewController
+    }
+    
+    func dismissSync() {
+        Task { await dismiss() }
     }
 }
 
