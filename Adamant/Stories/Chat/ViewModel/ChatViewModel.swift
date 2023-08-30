@@ -68,6 +68,7 @@ final class ChatViewModel: NSObject {
     let closeScreen = ObservableSender<Void>()
     let updateChatRead = ObservableSender<Void>()
     let commitVibro = ObservableSender<Void>()
+    let layoutIfNeeded = ObservableSender<Void>()
     
     @ObservableValue private(set) var isHeaderLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
@@ -527,6 +528,7 @@ final class ChatViewModel: NSObject {
         
         let didDismissMenuAction: ChatDialogManager.ContextMenuAction = { [weak self] _ in
             self?.hiddenMessageID = nil
+            self?.layoutIfNeeded.send()
         }
         
         dialog.send(

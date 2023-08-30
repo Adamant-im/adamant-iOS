@@ -342,6 +342,10 @@ private extension ChatViewController {
         viewModel.commitVibro
             .sink { UIImpactFeedbackGenerator(style: .light).impactOccurred() }
             .store(in: &subscriptions)
+        
+        viewModel.layoutIfNeeded
+            .sink { [weak self] in self?.view.layoutIfNeeded() }
+            .store(in: &subscriptions)
     }
 }
 
