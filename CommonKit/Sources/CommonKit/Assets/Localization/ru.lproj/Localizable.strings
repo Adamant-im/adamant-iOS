@@ -421,6 +421,9 @@
 /* Chat: warning message for opening unsupported url schemes */
 "ChatScene.Warning.UnsupportedUrl" = "Не поддерживаемый пролокол ссылок.";
 
+/* Chat: Error scrolling to message, this message has been deleted and is no longer accessible */
+"ChatScene.Error.messageWasDeleted" = "Извините, но это сообщение было удалено и больше недоступно";
+
 /* Delegates page: scene title */
 "Delegates.Title" = "Делегаты";
 

@@ -40,5 +40,6 @@ extension String.adamant {
         
         static let transactionSent = String.localized("ChatScene.Sent", comment: "Chat: 'Sent funds' bubble title")
         static let transactionReceived = String.localized("ChatScene.Received", comment: "Chat: 'Received funds' bubble title")
+        static let messageWasDeleted = String.localized("ChatScene.Error.messageWasDeleted", comment: "Chat: Error scrolling to message, this message has been deleted and is no longer accessible")
     }
 }
