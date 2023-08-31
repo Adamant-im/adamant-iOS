@@ -158,13 +158,12 @@ private extension ChatTransactionContainerView {
             $0.leading.trailing.equalToSuperview().inset(12)
         }
         
-        swipeView.didSwipeAction = { [weak self] in
-            guard let self = self else { return }
-            self.actionHandler(.reply(message: self.model))
+        swipeView.didSwipeAction = { [actionHandler, model] in
+            actionHandler(.reply(message: model))
         }
         
-        swipeView.swipeStateAction = { [weak self] state in
-            self?.actionHandler(.swipeState(state: state))
+        swipeView.swipeStateAction = { [actionHandler] state in
+            actionHandler(.swipeState(state: state))
         }
         
         chatMenuManager.setup(for: contentView)
@@ -286,25 +285,22 @@ extension ChatTransactionContainerView {
             title: .adamant.chat.remove,
             systemImageName: "trash",
             style: .destructive
-        ) { [weak self] in
-            guard let self = self else { return }
-            self.actionHandler(.remove(id: self.model.id))
+        ) { [actionHandler, model] in
+            actionHandler(.remove(id: model.id))
         }
         
         let report = AMenuItem.action(
             title: .adamant.chat.report,
             systemImageName: "exclamationmark.bubble"
-        ) { [weak self] in
-            guard let self = self else { return }
-            self.actionHandler(.report(id: self.model.id))
+        ) { [actionHandler, model] in
+            actionHandler(.report(id: model.id))
         }
         
         let reply = AMenuItem.action(
             title: .adamant.chat.reply,
             systemImageName: "arrowshape.turn.up.left"
-        ) { [weak self] in
-            guard let self = self else { return }
-            Task { self.actionHandler(.reply(message: self.model)) }
+        ) { [actionHandler, model] in
+            actionHandler(.reply(message: model))
         }
         
         return AMenuSection([reply, report, remove])
