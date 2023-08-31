@@ -58,6 +58,7 @@ final class ChatViewModel: NSObject {
     private let minDiffCountForAnimateScroll = 20
 
     let minIndexForStartLoadNewMessages = 4
+    let minOffsetForStartLoadNewMessages: CGFloat = 100
     var tempOffsets: [String] = []
     var needToAnimateCellIndex: Int?
 
@@ -199,7 +200,6 @@ final class ChatViewModel: NSObject {
     
     func loadMoreMessagesIfNeeded() {
         guard !isLoading else { return }
-        
         Task {
             guard
                 let address = chatroom?.partner?.address,

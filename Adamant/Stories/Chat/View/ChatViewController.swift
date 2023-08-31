@@ -153,22 +153,19 @@ final class ChatViewController: MessagesViewController {
         }
         
         super.collectionView(collectionView, willDisplay: cell, forItemAt: indexPath)
-        
-        let isVisible = collectionView.indexPathsForVisibleItems.contains {
-            $0.section == viewModel.minIndexForStartLoadNewMessages
-        }
-        
-        guard indexPath.section < viewModel.minIndexForStartLoadNewMessages,
-              isVisible
-        else { return }
-        
-        viewModel.loadMoreMessagesIfNeeded()
     }
     
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         super.scrollViewDidScroll(scrollView)
         updateIsScrollPositionNearlyTheBottom()
         updateScrollDownButtonVisibility()
+        
+        let isVisible = scrollView.contentOffset.y > .zero
+        && scrollView.contentOffset.y < viewModel.minOffsetForStartLoadNewMessages
+        
+        guard isVisible else { return }
+        
+        viewModel.loadMoreMessagesIfNeeded()
     }
 }
 
