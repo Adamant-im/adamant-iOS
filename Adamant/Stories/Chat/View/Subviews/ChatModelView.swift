@@ -38,7 +38,6 @@ extension ChatModelView {
     
     func prepareForReuse() {
         model = .default
-        actionHandler = { _ in }
         subscription = nil
     }
 }

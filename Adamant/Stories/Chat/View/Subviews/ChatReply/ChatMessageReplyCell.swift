@@ -12,7 +12,7 @@ import SnapKit
 import Combine
 import AdvancedContextMenuKit
 import SwiftUI
-import ElegantEmojiPicker
+import MCEmojiPicker
 import CommonKit
 
 final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
@@ -150,6 +150,10 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
             updateOwnReaction()
             updateOpponentReaction()
             layoutReactionLabel()
+            
+            swipeView.didSwipeAction = { [actionHandler, model] in
+                actionHandler(.reply(message: model))
+            }
         }
     }
     
@@ -214,13 +218,8 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
             make.leading.trailing.bottom.top.equalToSuperview()
         }
         
-        swipeView.didSwipeAction = { [weak self] in
-            guard let self = self else { return }
-            self.actionHandler(.reply(message: self.model))
-        }
-        
-        swipeView.swipeStateAction = { [weak self] state in
-            self?.actionHandler(.swipeState(state: state))
+        swipeView.swipeStateAction = { [actionHandler] state in
+            actionHandler(.swipeState(state: state))
         }
         
         messageContainerView.addSubview(verticalStack)
@@ -500,33 +499,29 @@ extension ChatMessageReplyCell {
             title: .adamant.chat.remove,
             systemImageName: "trash",
             style: .destructive
-        ) { [weak self] in
-            guard let self = self else { return }
-            self.actionHandler(.remove(id: self.model.id))
+        ) { [actionHandler, id = model.id] in
+            actionHandler(.remove(id: id))
         }
         
         let report = AMenuItem.action(
             title: .adamant.chat.report,
             systemImageName: "exclamationmark.bubble"
-        ) { [weak self] in
-            guard let self = self else { return }
-            self.actionHandler(.report(id: self.model.id))
+        ) { [actionHandler, id = model.id] in
+            actionHandler(.report(id: id))
         }
         
         let reply = AMenuItem.action(
             title: .adamant.chat.reply,
             systemImageName: "arrowshape.turn.up.left"
-        ) { [weak self] in
-            guard let self = self else { return }
-            Task { self.actionHandler(.reply(message: self.model)) }
+        ) { [actionHandler, model] in
+            actionHandler(.reply(message: model))
         }
         
         let copy = AMenuItem.action(
             title: .adamant.chat.copy,
             systemImageName: "doc.on.doc"
-        ) { [weak self] in
-            guard let self = self else { return }
-            self.actionHandler(.copy(text: self.model.message.string))
+        ) { [actionHandler, model] in
+            actionHandler(.copy(text: model.message.string))
         }
         
         return AMenuSection([reply, copy, report, remove])

@@ -8,7 +8,7 @@
 
 import UIKit
 import SwiftUI
-import ElegantEmojiPicker
+import MCEmojiPicker
 import AdvancedContextMenuKit
 import CommonKit
 

@@ -11,7 +11,7 @@ import UIKit
 import Combine
 import CommonKit
 
-class AdamantAccountService: AccountService {
+final class AdamantAccountService: AccountService {
     
     // MARK: Dependencies
     
@@ -27,46 +27,17 @@ class AdamantAccountService: AccountService {
     
     // MARK: Properties
     
-    private let securedStoreLock = NSLock()
-    
     @Atomic private(set) var state: AccountServiceState = .notLogged
     @Atomic private(set) var account: AdamantAccount?
     @Atomic private(set) var keypair: Keypair?
     @Atomic private var passphrase: String?
-    @Atomic private(set) var hasStayInAccount: Bool = false
-    
-    private var _useBiometry: Bool = false
-    
-    var useBiometry: Bool {
-        get {
-            securedStoreLock.lock()
-            defer { securedStoreLock.unlock() }
-            return _useBiometry
-        }
-        set {
-            securedStoreLock.lock()
-            defer { securedStoreLock.unlock() }
-            
-            guard hasStayInAccount else {
-                _useBiometry = false
-                return
-            }
-            
-            _useBiometry = newValue
-            
-            if newValue {
-                securedStore.set(String(useBiometry), for: .useBiometry)
-            } else {
-                securedStore.remove(.useBiometry)
-            }
-        }
-    }
-    
-    private var previousAppState: UIApplication.State?
-    private var subscriptions = Set<AnyCancellable>()
+    @Atomic private(set) var hasStayInAccount = false
+    @Atomic private(set) var useBiometry = false
+    @Atomic private var previousAppState: UIApplication.State?
+    @Atomic private var subscriptions = Set<AnyCancellable>()
     
     // MARK: Wallets
-    var wallets: [WalletService] = {
+    @Atomic var wallets: [WalletService] = {
         var wallets: [WalletService] = [
             AdmWalletService(),
             BtcWalletService(),
@@ -184,9 +155,6 @@ extension AdamantAccountService {
             return
         }
         
-        securedStoreLock.lock()
-        defer { securedStoreLock.unlock() }
-        
         if hasStayInAccount {
             completion(.failure(.internalError(message: "Already has account", error: nil)))
             return
@@ -227,10 +195,7 @@ extension AdamantAccountService {
     }
     
     func dropSavedAccount() {
-        securedStoreLock.lock()
-        defer { securedStoreLock.unlock() }
-        
-        _useBiometry = false
+        useBiometry = false
         pushNotificationsTokenService?.removeCurrentToken()
         Key.allCases.forEach(securedStore.remove)
         
@@ -241,21 +206,18 @@ extension AdamantAccountService {
     }
     
     private func setupSecuredStore() {
-        securedStoreLock.lock()
-        defer { securedStoreLock.unlock() }
-        
         if securedStore.get(.passphrase) != nil {
             hasStayInAccount = true
-            _useBiometry = securedStore.get(.useBiometry) != nil
+            useBiometry = securedStore.get(.useBiometry) != nil
         } else if securedStore.get(.publicKey) != nil,
             securedStore.get(.privateKey) != nil,
             securedStore.get(.pin) != nil {
             hasStayInAccount = true
             
-            _useBiometry = securedStore.get(.useBiometry) != nil
+            useBiometry = securedStore.get(.useBiometry) != nil
         } else {
             hasStayInAccount = false
-            _useBiometry = false
+            useBiometry = false
         }
         
         NotificationCenter.default.addObserver(forName: Notification.Name.SecuredStore.securedStorePurged, object: securedStore, queue: OperationQueue.main) { [weak self] notification in
@@ -265,10 +227,22 @@ extension AdamantAccountService {
             
             if store.get(.passphrase) != nil {
                 self?.hasStayInAccount = true
-                self?._useBiometry = store.get(.useBiometry) != nil
+                self?.useBiometry = store.get(.useBiometry) != nil
             } else {
                 self?.hasStayInAccount = false
-                self?._useBiometry = false
+                self?.useBiometry = false
+            }
+        }
+    }
+    
+    func updateUseBiometry(_ newValue: Bool) {
+        $useBiometry.mutate {
+            $0 = newValue && hasStayInAccount
+            
+            if $0 {
+                securedStore.set(String($0), for: .useBiometry)
+            } else {
+                securedStore.remove(.useBiometry)
             }
         }
     }
