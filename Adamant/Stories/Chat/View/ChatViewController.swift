@@ -154,12 +154,7 @@ final class ChatViewController: MessagesViewController {
         
         super.collectionView(collectionView, willDisplay: cell, forItemAt: indexPath)
         
-        let isVisible = collectionView.indexPathsForVisibleItems.contains {
-            $0.section == viewModel.minIndexForStartLoadNewMessages
-        }
-        
-        guard indexPath.section < viewModel.minIndexForStartLoadNewMessages,
-              isVisible
+        guard indexPath.section < viewModel.minIndexForStartLoadNewMessages
         else { return }
         
         viewModel.loadMoreMessagesIfNeeded()
