@@ -48,7 +48,7 @@ extension SecurityViewController {
             switch result {
             case .success:
                 self?.dialogService.showSuccess(withMessage: String.adamant.alert.done)
-                self?.accountService.useBiometry = enabled
+                self?.accountService.updateUseBiometry(enabled)
                 
             case .cancel:
                 DispatchQueue.main.async { [weak self] in
@@ -166,7 +166,7 @@ extension SecurityViewController: PinpadViewControllerDelegate {
                 break
             }
             
-            accountService.useBiometry = true
+            accountService.updateUseBiometry(true)
             pinpad.dismiss(animated: true, completion: nil)
             
         // MARK: User wants to turn off biometry
@@ -177,7 +177,7 @@ extension SecurityViewController: PinpadViewControllerDelegate {
                 break
             }
             
-            accountService.useBiometry = false
+            accountService.updateUseBiometry(false)
             pinpad.dismiss(animated: true, completion: nil)
             
         default:

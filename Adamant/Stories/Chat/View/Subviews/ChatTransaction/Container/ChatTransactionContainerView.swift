@@ -141,7 +141,6 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
 extension ChatTransactionContainerView: ReusableView {
     func prepareForReuse() {
         model = .default
-        actionHandler = { _ in }
     }
 }
 
@@ -156,10 +155,6 @@ private extension ChatTransactionContainerView {
         horizontalStack.snp.makeConstraints {
             $0.top.bottom.equalToSuperview()
             $0.leading.trailing.equalToSuperview().inset(12)
-        }
-        
-        swipeView.didSwipeAction = { [actionHandler, model] in
-            actionHandler(.reply(message: model))
         }
         
         swipeView.swipeStateAction = { [actionHandler] state in
@@ -178,6 +173,10 @@ private extension ChatTransactionContainerView {
         opponentReactionLabel.isHidden = getReaction(for: model.opponentAddress) == nil
         updateOwnReaction()
         updateOpponentReaction()
+        
+        swipeView.didSwipeAction = { [actionHandler, model] in
+            actionHandler(.reply(message: model))
+        }
     }
     
     func updateStatus(_ status: TransactionStatus) {

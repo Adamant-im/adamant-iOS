@@ -87,6 +87,10 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
             updateOwnReaction()
             updateOpponentReaction()
             layoutReactionLabel()
+            
+            swipeView.didSwipeAction = { [actionHandler, model] in
+                actionHandler(.reply(message: model))
+            }
         }
     }
     
@@ -144,10 +148,6 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         contentView.addSubview(swipeView)
         swipeView.snp.makeConstraints { make in
             make.leading.trailing.bottom.top.equalToSuperview()
-        }
-        
-        swipeView.didSwipeAction = { [actionHandler, model] in
-            actionHandler(.reply(message: model))
         }
         
         swipeView.swipeStateAction = { [actionHandler] state in

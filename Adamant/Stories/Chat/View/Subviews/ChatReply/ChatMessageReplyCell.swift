@@ -12,7 +12,7 @@ import SnapKit
 import Combine
 import AdvancedContextMenuKit
 import SwiftUI
-import ElegantEmojiPicker
+import MCEmojiPicker
 import CommonKit
 
 final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
@@ -150,6 +150,10 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
             updateOwnReaction()
             updateOpponentReaction()
             layoutReactionLabel()
+            
+            swipeView.didSwipeAction = { [actionHandler, model] in
+                actionHandler(.reply(message: model))
+            }
         }
     }
     
@@ -212,10 +216,6 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         contentView.addSubview(swipeView)
         swipeView.snp.makeConstraints { make in
             make.leading.trailing.bottom.top.equalToSuperview()
-        }
-        
-        swipeView.didSwipeAction = { [actionHandler, model] in
-            actionHandler(.reply(message: model))
         }
         
         swipeView.swipeStateAction = { [actionHandler] state in
