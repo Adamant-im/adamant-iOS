@@ -27,6 +27,7 @@ final class ChatViewModel: NSObject {
     private let richTransactionStatusService: RichTransactionStatusService
     private let chatCacheService: ChatCacheService
     private let richMessageProviders: [String: RichMessageProvider]
+    private let avatarService: AvatarService
     
     let chatMessagesListViewModel: ChatMessagesListViewModel
 
@@ -55,6 +56,7 @@ final class ChatViewModel: NSObject {
     private var tempCancellables = Set<AnyCancellable>()
     private let minDiffCountForOffset = 5
     private let minDiffCountForAnimateScroll = 20
+    private let partnerImageSize: CGFloat = 25
 
     let minIndexForStartLoadNewMessages = 4
     var tempOffsets: [String] = []
@@ -74,6 +76,7 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var isSendingAvailable = false
     @ObservableValue private(set) var fee = ""
     @ObservableValue private(set) var partnerName: String?
+    @ObservableValue private(set) var partnerImage: UIImage?
     @ObservableValue private(set) var isNeedToAnimateScroll = false
     @ObservableValue var swipeState: SwipeableView.State = .ended
     @ObservableValue var inputText = ""
@@ -116,6 +119,7 @@ final class ChatViewModel: NSObject {
         richTransactionStatusService: RichTransactionStatusService,
         chatCacheService: ChatCacheService,
         richMessageProviders: [String: RichMessageProvider],
+        avatarService: AvatarService,
         chatMessagesListViewModel: ChatMessagesListViewModel
     ) {
         self.chatsProvider = chatsProvider
@@ -129,6 +133,7 @@ final class ChatViewModel: NSObject {
         self.accountProvider = accountProvider
         self.richTransactionStatusService = richTransactionStatusService
         self.chatCacheService = chatCacheService
+        self.avatarService = avatarService
         self.chatMessagesListViewModel = chatMessagesListViewModel
         super.init()
         setupObservers()
@@ -147,7 +152,7 @@ final class ChatViewModel: NSObject {
         controller = chatsProvider.getChatController(for: chatroom)
         controller?.delegate = self
         isSendingAvailable = !chatroom.isReadonly
-        updateTitle()
+        updatePartnerInformation()
         updateAttachmentButtonAvailability()
         
         if let account = account {
@@ -686,8 +691,16 @@ private extension ChatViewModel {
         fee = "~\(feeString)"
     }
     
-    func updateTitle() {
+    func updatePartnerInformation() {
+        guard let publicKey = chatroom?.partner?.publicKey else {
+            return
+        }
+        
         partnerName = chatroom?.getName(addressBookService: addressBookService)
+        partnerImage = avatarService.avatar(
+            for: publicKey,
+            size: partnerImageSize
+        )
     }
     
     func updateAttachmentButtonAvailability() {

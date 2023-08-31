@@ -10,6 +10,7 @@ import Foundation
 
 struct Reaction: Equatable, Hashable, Codable {
     let sender: String
+    let senderPublicKey: String
     let reaction: String?
     let sentDate: Date
 }

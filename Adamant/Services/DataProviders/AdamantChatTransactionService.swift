@@ -217,6 +217,7 @@ actor AdamantChatTransactionService: ChatTransactionService {
         messageTransaction.fee = transaction.fee as NSDecimalNumber
         messageTransaction.statusEnum = MessageStatus.delivered
         messageTransaction.partner = partner
+        messageTransaction.senderPublicKey = transaction.senderPublicKey
         
         let transactionId = messageTransaction.transactionId
         messageTransaction.isHidden = removedMessages.contains(transactionId)
