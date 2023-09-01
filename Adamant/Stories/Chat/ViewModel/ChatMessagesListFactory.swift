@@ -39,7 +39,10 @@ actor ChatMessagesListFactory {
             let message = makeMessage(
                 transaction,
                 sender: sender,
-                dateHeaderOn: isNeedToDisplayDateHeader(index: index, transactions: transactions),
+                dateHeaderOn: isNeedToDisplayDateHeader(
+                    index: index,
+                    transactions: transactionsWithoutReact
+                ),
                 topSpinnerOn: isNeedToLoadMoreMessages && index == .zero,
                 willExpireAfter: &expTimestamp
             )
