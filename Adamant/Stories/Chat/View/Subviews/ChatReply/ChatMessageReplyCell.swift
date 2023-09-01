@@ -196,7 +196,7 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     private let longHInset: CGFloat = 14
     private let ownReactionSize = CGSize(width: 40, height: 27)
     private let opponentReactionSize = CGSize(width: 55, height: 27)
-    private let opponentReactionImageSize = CGSize(width: 10, height: 12)
+    private let opponentReactionImageSize = CGSize(width: 12, height: 12)
     private var layoutAttributes: MessagesCollectionViewLayoutAttributes?
     
     // MARK: - Methods
