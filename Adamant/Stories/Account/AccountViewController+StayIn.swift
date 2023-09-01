@@ -47,22 +47,20 @@ extension AccountViewController {
         }
         
         let reason = enabled ? String.adamant.security.biometryOnReason : String.adamant.security.biometryOffReason
-        localAuth.authorizeUser(reason: reason) { [weak self] result in
-            switch result {
-            case .success:
-                self?.dialogService.showSuccess(withMessage: String.adamant.alert.done)
-                self?.accountService.useBiometry = enabled
-                
-            case .cancel:
-                DispatchQueue.main.async { [weak self] in
+        localAuth.authorizeUser(reason: reason) { result in
+            Task { @MainActor [weak self] in
+                switch result {
+                case .success:
+                    self?.dialogService.showSuccess(withMessage: String.adamant.alert.done)
+                    self?.accountService.updateUseBiometry(enabled)
+                    
+                case .cancel:
                     if let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {
                         row.value = self?.accountService.useBiometry
                         row.updateCell()
                     }
-                }
-                
-            case .fallback:
-                DispatchQueue.main.async {
+                    
+                case .fallback:
                     let pinpad = PinpadViewController.adamantPinpad(biometryButton: .hidden)
                     
                     if enabled {
@@ -78,10 +76,8 @@ extension AccountViewController {
                     pinpad.modalPresentationStyle = .overFullScreen
                     self?.setColors(for: pinpad)
                     self?.present(pinpad, animated: true, completion: nil)
-                }
-                
-            case .failed:
-                DispatchQueue.main.async {
+                    
+                case .failed:
                     if let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {
                         if let value = self?.accountService.useBiometry {
                             row.value = value
@@ -178,7 +174,7 @@ extension AccountViewController: PinpadViewControllerDelegate {
                 break
             }
             
-            accountService.useBiometry = true
+            accountService.updateUseBiometry(true)
             pinpad.dismiss(animated: true, completion: nil)
             
         // MARK: User wants to turn off biometry
@@ -189,7 +185,7 @@ extension AccountViewController: PinpadViewControllerDelegate {
                 break
             }
             
-            accountService.useBiometry = false
+            accountService.updateUseBiometry(false)
             pinpad.dismiss(animated: true, completion: nil)
             
         default:

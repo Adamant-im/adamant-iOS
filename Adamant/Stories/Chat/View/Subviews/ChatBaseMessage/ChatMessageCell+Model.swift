@@ -17,6 +17,7 @@ extension ChatMessageCell {
         let reactions: Set<Reaction>?
         let address: String
         let opponentAddress: String
+        var isHidden: Bool
         
         static let `default` = Self(
             id: "",
@@ -25,7 +26,8 @@ extension ChatMessageCell {
             isFromCurrentSender: false,
             reactions: nil,
             address: "",
-            opponentAddress: ""
+            opponentAddress: "",
+            isHidden: false
         )
         
         func makeReplyContent() -> NSAttributedString {

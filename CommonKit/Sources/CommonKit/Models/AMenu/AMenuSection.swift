@@ -9,7 +9,7 @@ import Foundation
 
 public struct AMenuSection {
 
-    let menuItems: [AMenuItem]
+    public let menuItems: [AMenuItem]
     
     public init(_ menuItems: [AMenuItem]) {
         self.menuItems = menuItems

@@ -24,4 +24,11 @@ enum ChatDialog {
     case url(URL)
     case progress(Bool)
     case failedMessageAlert(id: String, sender: UIAlertController.SourceView)
+    case presentMenu(
+        arg: ChatContextMenuArguments,
+        didSelectEmojiAction: ChatDialogManager.DidSelectEmojiAction,
+        didPresentMenuAction: ChatDialogManager.ContextMenuAction,
+        didDismissMenuAction: ChatDialogManager.ContextMenuAction
+    )
+    case dismissMenu
 }

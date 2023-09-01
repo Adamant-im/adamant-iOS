@@ -30,7 +30,11 @@ struct ChatFactory {
         let richMessageProviders = makeRichMessageProviders()
         let viewModel = makeViewModel(richMessageProviders: richMessageProviders)
         let delegates = makeDelegates(viewModel: viewModel)
-        let dialogManager = ChatDialogManager(viewModel: viewModel, dialogService: dialogService)
+        let dialogManager = ChatDialogManager(
+            viewModel: viewModel,
+            dialogService: dialogService,
+            emojiService: emojiService
+        )
         
         let admService = accountService.wallets.first { wallet in
             return wallet is AdmWalletService

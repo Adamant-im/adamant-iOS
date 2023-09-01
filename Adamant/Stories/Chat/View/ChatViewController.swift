@@ -156,22 +156,19 @@ final class ChatViewController: MessagesViewController {
         }
         
         super.collectionView(collectionView, willDisplay: cell, forItemAt: indexPath)
-        
-        let isVisible = collectionView.indexPathsForVisibleItems.contains {
-            $0.section == viewModel.minIndexForStartLoadNewMessages
-        }
-        
-        guard indexPath.section < viewModel.minIndexForStartLoadNewMessages,
-              isVisible
-        else { return }
-        
-        viewModel.loadMoreMessagesIfNeeded()
     }
     
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         super.scrollViewDidScroll(scrollView)
         updateIsScrollPositionNearlyTheBottom()
         updateScrollDownButtonVisibility()
+        
+        let isVisible = scrollView.contentOffset.y > .zero
+        && scrollView.contentOffset.y < viewModel.minOffsetForStartLoadNewMessages
+        
+        guard isVisible else { return }
+        
+        viewModel.loadMoreMessagesIfNeeded()
     }
 }
 
@@ -339,6 +336,14 @@ private extension ChatViewController {
         
         viewModel.updateChatRead
             .sink { [weak self] in self?.checkIsChatWasRead() }
+            .store(in: &subscriptions)
+        
+        viewModel.commitVibro
+            .sink { UIImpactFeedbackGenerator(style: .light).impactOccurred() }
+            .store(in: &subscriptions)
+        
+        viewModel.layoutIfNeeded
+            .sink { [weak self] in self?.view.layoutIfNeeded() }
             .store(in: &subscriptions)
     }
 }

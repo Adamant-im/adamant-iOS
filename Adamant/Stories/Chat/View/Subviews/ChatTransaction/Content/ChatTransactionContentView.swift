@@ -186,6 +186,7 @@ private extension ChatTransactionContentView {
     }
     
     func update() {
+        isHidden = model.isHidden
         backgroundColor = model.backgroundColor.uiColor
         titleLabel.text = model.title
         iconView.image = model.icon
@@ -220,7 +221,8 @@ private extension ChatTransactionContentView {
                 isFromCurrentSender: true,
                 reactions: nil,
                 address: "",
-                opponentAddress: ""
+                opponentAddress: "",
+                isHidden: false
             )))
             return
         }

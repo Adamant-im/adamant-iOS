@@ -12,7 +12,8 @@ import SnapKit
 import Combine
 import AdvancedContextMenuKit
 import SwiftUI
-import ElegantEmojiPicker
+import MCEmojiPicker
+import CommonKit
 
 final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     // MARK: Dependencies
@@ -118,14 +119,7 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         return label
     }()
     
-    private lazy var chatMenuManager: ChatMenuManager = {
-        let manager = ChatMenuManager(
-            menu: makeContextMenu(),
-            emojiService: chatMessagesListViewModel?.emojiService
-        )
-        manager.delegate = self
-        return manager
-    }()
+    private lazy var chatMenuManager = ChatMenuManager(delegate: self)
     
     // MARK: - Properties
     
@@ -140,9 +134,8 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         didSet {
             guard model != oldValue else { return }
             
+            containerView.isHidden = model.isHidden
             replyMessageLabel.attributedText = model.messageReply
-            chatMenuManager.selectedEmoji = getReaction(for: model.address)
-            chatMenuManager.emojiService = chatMessagesListViewModel?.emojiService
             
             let leading = model.isFromCurrentSender ? smallHInset : longHInset
             let trailing = model.isFromCurrentSender ? longHInset : smallHInset
@@ -157,6 +150,10 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
             updateOwnReaction()
             updateOpponentReaction()
             layoutReactionLabel()
+            
+            swipeView.didSwipeAction = { [actionHandler, model] in
+                actionHandler(.reply(message: model))
+            }
         }
     }
     
@@ -200,7 +197,6 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
     private let ownReactionSize = CGSize(width: 40, height: 27)
     private let opponentReactionSize = CGSize(width: 55, height: 27)
     private let opponentReactionImageSize = CGSize(width: 10, height: 12)
-    private lazy var contextMenu = AdvancedContextMenuManager(delegate: chatMenuManager)
     private var layoutAttributes: MessagesCollectionViewLayoutAttributes?
     
     // MARK: - Methods
@@ -222,13 +218,8 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
             make.leading.trailing.bottom.top.equalToSuperview()
         }
         
-        swipeView.didSwipeAction = { [weak self] in
-            guard let self = self else { return }
-            self.actionHandler(.reply(message: self.model))
-        }
-        
-        swipeView.swipeStateAction = { [weak self] state in
-            self?.actionHandler(.swipeState(state: state))
+        swipeView.swipeStateAction = { [actionHandler] state in
+            actionHandler(.swipeState(state: state))
         }
         
         messageContainerView.addSubview(verticalStack)
@@ -254,9 +245,8 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         messageContainerView.removeFromSuperview()
         contentView.addSubview(containerView)
         
-        contextMenu.setup(for: containerView)
-        
         containerView.addSubview(messageContainerView)
+        chatMenuManager.setup(for: containerView)
     }
     
     func updateOwnReaction() {
@@ -517,67 +507,67 @@ extension ChatMessageReplyCell {
             title: .adamant.chat.remove,
             systemImageName: "trash",
             style: .destructive
-        ) { [weak self] in
-            guard let self = self else { return }
-            self.actionHandler(.remove(id: self.model.id))
+        ) { [actionHandler, id = model.id] in
+            actionHandler(.remove(id: id))
         }
         
         let report = AMenuItem.action(
             title: .adamant.chat.report,
             systemImageName: "exclamationmark.bubble"
-        ) { [weak self] in
-            guard let self = self else { return }
-            self.actionHandler(.report(id: self.model.id))
+        ) { [actionHandler, id = model.id] in
+            actionHandler(.report(id: id))
         }
         
         let reply = AMenuItem.action(
             title: .adamant.chat.reply,
             systemImageName: "arrowshape.turn.up.left"
-        ) { [weak self] in
-            guard let self = self else { return }
-            Task { self.actionHandler(.reply(message: self.model)) }
+        ) { [actionHandler, model] in
+            actionHandler(.reply(message: model))
         }
         
         let copy = AMenuItem.action(
             title: .adamant.chat.copy,
             systemImageName: "doc.on.doc"
-        ) { [weak self] in
-            guard let self = self else { return }
-            self.actionHandler(.copy(text: self.model.message.string))
+        ) { [actionHandler, model] in
+            actionHandler(.copy(text: model.message.string))
         }
         
         return AMenuSection([reply, copy, report, remove])
     }
     
     @objc func tapReactionAction() {
-        contextMenu.presentMenu(
-            for: containerView,
-            copyView: copy(
-                with: model,
-                attributes: layoutAttributes,
-                urlAttributes: messageLabel.urlAttributes,
-                enabledDetectors: messageLabel.enabledDetectors
-            )?.containerView,
-            with: makeContextMenu()
-        )
+        chatMenuManager.presentMenuProgrammatically(for: containerView)
     }
 }
 
 extension ChatMessageReplyCell: ChatMenuManagerDelegate {
-    func didReact(_ emoji: String) {
-        Task {
-            await contextMenu.dismiss()
-            self.actionHandler(.react(id: self.model.id, emoji: emoji))
-        }
-    }
-    
-    func getContentView() -> UIView? {
+    func getCopyView() -> UIView? {
         copy(
             with: model,
             attributes: layoutAttributes,
             urlAttributes: messageLabel.urlAttributes,
             enabledDetectors: messageLabel.enabledDetectors
         )?.containerView
+    }
+    
+    func presentMenu(
+        copyView: UIView,
+        size: CGSize,
+        location: CGPoint,
+        tapLocation: CGPoint,
+        getPositionOnScreen: @escaping () -> CGPoint
+    ) {
+        let arguments = ChatContextMenuArguments.init(
+            copyView: copyView,
+            size: size,
+            location: location,
+            tapLocation: tapLocation,
+            messageId: model.id,
+            menu: makeContextMenu(),
+            selectedEmoji: getReaction(for: model.address),
+            getPositionOnScreen: getPositionOnScreen
+        )
+        actionHandler(.presentMenu(arg: arguments))
     }
 }
 

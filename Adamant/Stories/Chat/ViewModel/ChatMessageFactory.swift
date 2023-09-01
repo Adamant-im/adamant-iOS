@@ -185,7 +185,8 @@ private extension ChatMessageFactory {
                     isFromCurrentSender: isFromCurrentSender,
                     reactions: reactions,
                     address: address,
-                    opponentAddress: opponentAddress
+                    opponentAddress: opponentAddress,
+                    isHidden: false
                 )
             ))
         } ?? .default
@@ -224,7 +225,8 @@ private extension ChatMessageFactory {
                 isFromCurrentSender: isFromCurrentSender,
                 reactions: reactions,
                 address: address,
-                opponentAddress: opponentAddress
+                opponentAddress: opponentAddress,
+                isHidden: false
             )
         ))
     }
@@ -266,7 +268,8 @@ private extension ChatMessageFactory {
                 backgroundColor: backgroundColor,
                 isReply: transaction.isTransferReply(),
                 replyMessage: decodedMessageMarkDown,
-                replyId: replyId
+                replyId: replyId,
+                isHidden: false
             ),
             status: transaction.transactionStatus ?? .notInitiated,
             reactions: reactions,
@@ -313,7 +316,8 @@ private extension ChatMessageFactory {
                 backgroundColor: backgroundColor,
                 isReply: !replyId.isEmpty,
                 replyMessage: decodedMessageMarkDown,
-                replyId: replyId
+                replyId: replyId,
+                isHidden: false
             ),
             status: transaction.statusEnum.toTransactionStatus(),
             reactions: reactions,
