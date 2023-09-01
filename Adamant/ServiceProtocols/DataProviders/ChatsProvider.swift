@@ -219,6 +219,7 @@ protocol ChatsProvider: DataProvider, Actor {
     
     // MARK: - Delete local message
     func cancelMessage(_ message: ChatTransaction) async throws
+    func isMessageDeleted(id: String) -> Bool
     
     // MARK: - Tools
     func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult
