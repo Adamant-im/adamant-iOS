@@ -163,10 +163,10 @@ final class ChatViewController: MessagesViewController {
         updateIsScrollPositionNearlyTheBottom()
         updateScrollDownButtonVisibility()
         
-        let isVisible = scrollView.contentOffset.y > .zero
-        && scrollView.contentOffset.y < viewModel.minOffsetForStartLoadNewMessages
-        
-        guard isVisible else { return }
+        guard
+            viewAppeared,
+            scrollView.contentOffset.y <= viewModel.minOffsetForStartLoadNewMessages
+        else { return }
         
         viewModel.loadMoreMessagesIfNeeded()
     }
