@@ -222,7 +222,9 @@ private extension ChatTransactionContainerView {
     }
     
     func updateOpponentReaction() {
-        guard let reaction = getReaction(for: model.opponentAddress) else {
+        guard let reaction = getReaction(for: model.opponentAddress),
+              let senderPublicKey = getSenderPublicKeyInReaction(for: model.address)
+        else {
             opponentReactionLabel.attributedText = nil
             opponentReactionLabel.text = nil
             return
@@ -231,7 +233,7 @@ private extension ChatTransactionContainerView {
         let fullString = NSMutableAttributedString(string: reaction)
         
         if let image = chatMessagesListViewModel?.avatarService.avatar(
-            for: model.opponentAddress,
+            for: senderPublicKey,
             size: opponentReactionImageSize.width
         ) {
             let replyImageAttachment = NSTextAttachment()
@@ -251,6 +253,12 @@ private extension ChatTransactionContainerView {
             infusion: .lightGray,
             alpha: 0.15
         )
+    }
+    
+    func getSenderPublicKeyInReaction(for senderAddress: String) -> String? {
+        model.reactions?.first(
+            where: { $0.sender == senderAddress }
+        )?.senderPublicKey
     }
     
     func getReaction(for address: String) -> String? {
