@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import CommonKit
 
 extension AMenuItem {
     
@@ -36,7 +35,7 @@ extension AMenuItem {
 
 // MARK: - Internal
 
-extension AMenuItem.Style {
+public extension AMenuItem.Style {
     func configure(
         titleLabel: UILabel,
         icon: UIImageView?,

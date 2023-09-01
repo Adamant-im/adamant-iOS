@@ -174,7 +174,7 @@ protocol AccountService: AnyObject {
     var hasStayInAccount: Bool { get }
     
     /// Use TouchID or FaceID to log in
-    var useBiometry: Bool { get set }
+    var useBiometry: Bool { get }
     
     /// Save account data and use pincode to login
     ///
@@ -188,4 +188,7 @@ protocol AccountService: AnyObject {
     
     /// If we have stored data with pin, validate it. If no data saved, always returns false.
     func validatePin(_ pin: String) -> Bool
+    
+    /// Update use TouchID or FaceID to log in
+    func updateUseBiometry(_ newValue: Bool)
 }

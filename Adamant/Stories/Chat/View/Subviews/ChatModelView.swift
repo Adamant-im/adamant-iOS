@@ -28,20 +28,16 @@ extension ChatModelView {
         publisher: P,
         collection: MessagesCollectionView
     ) {
-        // TODO: Figure out why 'removeDuplicates()' is not enough
-        subscription = publisher
-            .removeDuplicates()
-            .sink { [weak self, weak collection] newModel in
-                guard newModel != self?.model else { return }
-                
-                self?.model = newModel
-                collection?.collectionViewLayout.invalidateLayout()
-            }
+        subscription = publisher.sink { [weak self, weak collection] newModel in
+            guard newModel != self?.model else { return }
+            self?.model = newModel
+            
+            collection?.collectionViewLayout.invalidateLayout()
+        }
     }
     
     func prepareForReuse() {
         model = .default
-        actionHandler = { _ in }
         subscription = nil
     }
 }

@@ -11,6 +11,7 @@ import CoreData
 import MarkdownKit
 import UIKit
 import CommonKit
+import AdvancedContextMenuKit
 
 @MainActor
 final class ChatViewModel: NSObject {
@@ -59,6 +60,7 @@ final class ChatViewModel: NSObject {
     private let partnerImageSize: CGFloat = 25
 
     let minIndexForStartLoadNewMessages = 4
+    let minOffsetForStartLoadNewMessages: CGFloat = 100
     var tempOffsets: [String] = []
     var needToAnimateCellIndex: Int?
 
@@ -68,6 +70,8 @@ final class ChatViewModel: NSObject {
     let didTapAdmSend = ObservableSender<AdamantAddress>()
     let closeScreen = ObservableSender<Void>()
     let updateChatRead = ObservableSender<Void>()
+    let commitVibro = ObservableSender<Void>()
+    let layoutIfNeeded = ObservableSender<Void>()
     
     @ObservableValue private(set) var isHeaderLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
@@ -105,6 +109,10 @@ final class ChatViewModel: NSObject {
         }
         
         return url
+    }
+    
+    private var hiddenMessageID: String? {
+        didSet { updateHiddenMessage(&messages) }
     }
     
     init(
@@ -197,7 +205,6 @@ final class ChatViewModel: NSObject {
     
     func loadMoreMessagesIfNeeded() {
         guard !isLoading else { return }
-        
         Task {
             guard
                 let address = chatroom?.partner?.address,
@@ -318,7 +325,7 @@ final class ChatViewModel: NSObject {
             transaction.isHidden = true
             try? transaction.managedObjectContext?.save()
             
-            await chatroom?.updateLastTransaction()
+            chatroom?.updateLastTransaction()
             await chatsProvider.removeMessage(with: transaction.transactionId)
         }
     }
@@ -513,6 +520,36 @@ final class ChatViewModel: NSObject {
     func clearReplyMessage() {
         replyMessage = nil
     }
+    
+    func presentMenu(arg: ChatContextMenuArguments) {
+        let didSelectEmojiAction: ChatDialogManager.DidSelectEmojiAction = { [weak self] emoji, messageId in
+            self?.dialog.send(.dismissMenu)
+            
+            let emoji = emoji == arg.selectedEmoji
+            ? ""
+            : emoji
+            
+            self?.reactAction(messageId, emoji: emoji)
+        }
+        
+        let didPresentMenuAction: ChatDialogManager.ContextMenuAction = { [weak self] messageId in
+            self?.hiddenMessageID = messageId
+        }
+        
+        let didDismissMenuAction: ChatDialogManager.ContextMenuAction = { [weak self] _ in
+            self?.hiddenMessageID = nil
+            self?.layoutIfNeeded.send()
+        }
+        
+        dialog.send(
+            .presentMenu(
+                arg: arg,
+                didSelectEmojiAction: didSelectEmojiAction,
+                didPresentMenuAction: didPresentMenuAction,
+                didDismissMenuAction: didDismissMenuAction
+            )
+        )
+    }
 }
 
 extension ChatViewModel {
@@ -626,6 +663,10 @@ private extension ChatViewModel {
         resetLoadingProperty: Bool,
         expirationTimestamp: TimeInterval?
     ) async {
+        var newMessages = newMessages
+        updateHiddenMessage(&newMessages)
+        checkNewReactions(old: messages, new: newMessages)
+        
         messages = newMessages
         
         if let address = chatroom?.partner?.address {
@@ -793,6 +834,82 @@ private extension ChatViewModel {
                         continuation.resume()
                     }.store(in: &tempCancellables)
             }
+        }
+    }
+    
+    func updateHiddenMessage(_ messages: inout [ChatMessage]) {
+        messages.indices.forEach {
+            messages[$0].isHidden = messages[$0].id == hiddenMessageID
+        }
+    }
+    
+    func checkNewReactions(old: [ChatMessage], new: [ChatMessage]) {
+        guard
+            let processedDate = old.getMostRecentElementDate(),
+            let newLastReactionDate = new.getMostRecentReactionDate(),
+            newLastReactionDate > processedDate
+        else { return }
+        
+        commitVibro.send()
+    }
+}
+
+private extension ChatMessage {
+    var isHidden: Bool {
+        get {
+            switch content {
+            case let .message(model):
+                return model.value.isHidden
+            case let .reply(model):
+                return model.value.isHidden
+            case let .transaction(model):
+                return model.value.content.isHidden
+            }
+        }
+        
+        set {
+            switch content {
+            case let .message(model):
+                var model = model.value
+                model.isHidden = newValue
+                content = .message(.init(value: model))
+            case let .reply(model):
+                var model = model.value
+                model.isHidden = newValue
+                content = .reply(.init(value: model))
+            case let .transaction(model):
+                var model = model.value
+                model.content.isHidden = newValue
+                content = .transaction(.init(value: model))
+            }
+        }
+    }
+}
+
+private extension Sequence where Element == ChatMessage {
+    func getMostRecentElementDate() -> Date? {
+        flatMap { $0.getReactions().map { $0.sentDate } + [$0.sentDate] }.max()
+    }
+    
+    func getMostRecentReactionDate() -> Date? {
+        flatMap { $0.getReactions().map { $0.sentDate } }.max()
+    }
+    
+    func getReactions() -> [String: Set<Reaction>] {
+        let pairs = map { ($0.id, $0.getReactions()) }
+        return .init(uniqueKeysWithValues: pairs)
+    }
+}
+
+private extension ChatMessage {
+    func getReactions() -> Set<Reaction> {
+        switch content {
+        case let .message(value):
+            return value.value.reactions ?? .init()
+        case let .reply(value):
+            return value.value.reactions ?? .init()
+        case let .transaction(value):
+            return value.value.reactions ?? .init()
         }
     }
 }

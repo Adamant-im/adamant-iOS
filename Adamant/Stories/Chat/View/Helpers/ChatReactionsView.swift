@@ -8,6 +8,7 @@
 
 import SwiftUI
 import CommonKit
+import MCEmojiPicker
 
 protocol ChatReactionsViewDelegate: AnyObject {
     func didSelectEmoji(_ emoji: String)
@@ -19,15 +20,23 @@ struct ChatReactionsView: View {
     private weak var delegate: ChatReactionsViewDelegate?
     private let defaultEmojis = ["😂", "🤔", "😁", "👍", "👌"]
     private let selectedEmoji: String?
+    private let messageId: String
+    
+    @SwiftUI.State private var isPresentedMore: Bool = false
+    @SwiftUI.State private var selectedEmojiMore: String = ""
+    
+    var didSelectEmoji: ((_ emoji: String, _ messageId: String) -> Void)?
     
     init(
         delegate: ChatReactionsViewDelegate?,
         emojis: [String]?,
-        selectedEmoji: String?
+        selectedEmoji: String?,
+        messageId: String
     ) {
         self.delegate = delegate
         self.emojis = emojis ?? defaultEmojis
         self.selectedEmoji = selectedEmoji
+        self.messageId = messageId
     }
     
     var body: some View {
@@ -47,7 +56,7 @@ struct ChatReactionsView: View {
                         )
                         .clipShape(Circle())
                         .onTapGesture {
-                            delegate?.didSelectEmoji(emoji)
+                            didSelectEmoji?(emoji, messageId)
                         }
                     }
                 }
@@ -55,12 +64,19 @@ struct ChatReactionsView: View {
             .padding([.top, .bottom, .leading], 5)
             
             Button {
-                delegate?.didTapMore()
+                isPresentedMore.toggle()
             } label: {
                 Image(systemName: "plus")
                     .resizable()
                     .padding(6)
             }
+            .emojiPicker(
+                isPresented: $isPresentedMore,
+                selectedEmoji: $selectedEmojiMore
+            )
+            .onChange(of: selectedEmojiMore, perform: { newValue in
+                didSelectEmoji?(newValue, messageId)
+            })
             .frame(width: 30, height: 30)
             .background(Color.init(uiColor: .adamant.moreReactionsBackground))
             .clipShape(Circle())

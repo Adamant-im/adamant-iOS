@@ -19,6 +19,7 @@ extension ChatMessageReplyCell {
         let reactions: Set<Reaction>?
         let address: String
         let opponentAddress: String
+        var isHidden: Bool
         
         static let `default` = Self(
             id: "",
@@ -29,7 +30,8 @@ extension ChatMessageReplyCell {
             isFromCurrentSender: false,
             reactions: nil,
             address: "",
-            opponentAddress: ""
+            opponentAddress: "",
+            isHidden: false
         )
         
         func makeReplyContent() -> NSAttributedString {
