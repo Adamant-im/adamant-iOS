@@ -119,7 +119,7 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
     
     private let ownReactionSize = CGSize(width: 40, height: 27)
     private let opponentReactionSize = CGSize(width: 55, height: 27)
-    private let opponentReactionImageSize = CGSize(width: 10, height: 12)
+    private let opponentReactionImageSize = CGSize(width: 12, height: 12)
     
     var isSelected: Bool = false {
         didSet {
@@ -210,7 +210,7 @@ private extension ChatTransactionContainerView {
     
     func updateOpponentReaction() {
         guard let reaction = getReaction(for: model.opponentAddress),
-              let senderPublicKey = getSenderPublicKeyInReaction(for: model.address)
+              let senderPublicKey = getSenderPublicKeyInReaction(for: model.opponentAddress)
         else {
             opponentReactionLabel.attributedText = nil
             opponentReactionLabel.text = nil
