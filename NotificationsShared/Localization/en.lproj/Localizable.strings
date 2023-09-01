@@ -18,3 +18,9 @@
 
 /* Notifications: Not stayed logged in */
 "NotificationsService.NotStayedLoggedIn" = "Can't turn on notifications without staying logged in";
+
+/* Notifications: Reacted */
+"NotificationsService.Reacted" = "Reacted";
+
+/* Notifications: Modified Reaction */
+"ChatListPage.ModifiedReaction" = "Modified reaction";

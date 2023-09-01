@@ -18,3 +18,9 @@
 
 /* Notifications: Not stayed logged in */
 "NotificationsService.NotStayedLoggedIn" = "Нельзя включить уведомления, не оставаясь в системе";
+
+/* Notifications: Reacted */
+"NotificationsService.Reacted" = "Отреагировал";
+
+/* Notifications: Modified Reaction */
+"ChatListPage.ModifiedReaction" = "Изменил реакцию";

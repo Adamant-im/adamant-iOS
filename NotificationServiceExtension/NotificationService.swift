@@ -114,6 +114,8 @@ class NotificationService: UNNotificationServiceExtension {
                 = AdamantNotificationUserInfoKeys.partnerNoDisplayNameValue
         }
         
+        var shouldIgnoreNotification = false
+        
         // MARK: 5. Content
         switch transaction.type {
         // MARK: Messages
@@ -210,8 +212,16 @@ class NotificationService: UNNotificationServiceExtension {
                    let richContent = RichMessageTools.richContent(from: data),
                    let reaction = richContent[RichContentKeys.react.react_message] as? String,
                    richContent[RichContentKeys.react.reactto_id] != nil {
+                    
+                    /* Ignoring will be later
+                    guard !reaction.isEmpty else {
+                        shouldIgnoreNotification = true
+                        break
+                    }
+                     */
+                    
                     let text = reaction.isEmpty
-                    ? NotificationStrings.removedReaction
+                    ? NotificationStrings.modifiedReaction
                     : "\(NotificationStrings.reacted) \(reaction)"
                     
                     content = NotificationContent(
@@ -244,6 +254,11 @@ class NotificationService: UNNotificationServiceExtension {
             
         default:
             break
+        }
+        
+        guard !shouldIgnoreNotification else {
+            contentHandler(UNNotificationContent())
+            return
         }
         
         // MARK: 6. Other configurations
