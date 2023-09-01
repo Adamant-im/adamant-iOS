@@ -296,6 +296,10 @@ actor AdamantChatsProvider: ChatsProvider {
         securedStore.remove(StoreKey.chatProvider.notifiedLastHeight)
         securedStore.remove(StoreKey.chatProvider.notifiedMessagesCount)
     }
+    
+    func isMessageDeleted(id: String) -> Bool {
+        removedMessages.contains(id)
+    }
 }
 
 // MARK: - DataProvider

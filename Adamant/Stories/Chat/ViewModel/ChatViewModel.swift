@@ -395,6 +395,11 @@ final class ChatViewModel: NSObject {
         
         Task {
             do {
+                guard await !chatsProvider.isMessageDeleted(id: message.replyId) else {
+                    dialog.send(.alert(.adamant.chat.messageWasDeleted))
+                    return
+                }
+                
                 if !chatTransactions.contains(
                     where: { $0.transactionId == message.replyId }
                 ) {
