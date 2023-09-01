@@ -110,6 +110,7 @@ private extension AdamantRichTransactionReactService {
         reactions.update(
             with: .init(
                 sender: transaction.senderAddress,
+                senderPublicKey: transaction.senderPublicKey ?? "",
                 reaction: reaction.isEmpty ? nil : reaction,
                 sentDate: transaction.sentDate ?? .now
             )

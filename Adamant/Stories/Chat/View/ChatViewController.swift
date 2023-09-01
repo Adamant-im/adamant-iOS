@@ -55,6 +55,10 @@ final class ChatViewController: MessagesViewController {
     
     private lazy var updatingIndicatorView: UpdatingIndicatorView = {
         let view = UpdatingIndicatorView(title: "", titleType: .small)
+        view.snp.makeConstraints { make in
+            make.width.lessThanOrEqualTo(self.view.bounds.width - 150)
+            make.height.equalTo(45)
+        }
         return view
     }()
     
@@ -92,7 +96,6 @@ final class ChatViewController: MessagesViewController {
         messagesCollectionView.backgroundView?.backgroundColor = .adamant.backgroundColor
         chatMessagesCollectionView.fixedBottomOffset = .zero
         maintainPositionOnInputBarHeightChanged = true
-        navigationItem.titleView = updatingIndicatorView
         configureHeader()
         configureLayout()
         configureReplyView()
@@ -274,12 +277,11 @@ private extension ChatViewController {
             .store(in: &subscriptions)
         
         viewModel.$partnerName
-            .removeDuplicates()
-            .assign(to: \.title, on: navigationItem)
+            .sink { [weak self] in self?.updatingIndicatorView.updateTitle(title: $0) }
             .store(in: &subscriptions)
         
-        viewModel.$partnerName
-            .sink { [weak self] in self?.updatingIndicatorView.updateTitle(title: $0) }
+        viewModel.$partnerImage
+            .sink { [weak self] in self?.updatingIndicatorView.updateImage(image: $0) }
             .store(in: &subscriptions)
         
         viewModel.closeScreen
@@ -359,6 +361,7 @@ private extension ChatViewController {
     }
     
     func configureHeader() {
+        navigationItem.titleView = updatingIndicatorView
         navigationItem.largeTitleDisplayMode = .never
         navigationItem.rightBarButtonItem = .init(
             title: "•••",

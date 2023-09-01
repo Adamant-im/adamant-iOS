@@ -81,6 +81,7 @@ private extension ChatFactory {
             richTransactionStatusService: richTransactionStatusService,
             chatCacheService: chatCacheService,
             richMessageProviders: richMessageProviders,
+            avatarService: avatarService,
             chatMessagesListViewModel: .init(
                 avatarService: avatarService,
                 emojiService: emojiService

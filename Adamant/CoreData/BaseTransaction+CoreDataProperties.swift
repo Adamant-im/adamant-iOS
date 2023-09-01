@@ -29,5 +29,6 @@ extension BaseTransaction {
     @NSManaged public var transactionId: String
     @NSManaged public var type: Int16
     @NSManaged public var partner: BaseAccount?
+    @NSManaged public var senderPublicKey: String?
 
 }
