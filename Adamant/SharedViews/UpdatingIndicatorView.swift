@@ -17,6 +17,8 @@ final class UpdatingIndicatorView: UIView {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = title
+        label.minimumScaleFactor = 0.5
+        label.adjustsFontSizeToFitWidth = true
         label.font = titleType.font
         return label
     }()
