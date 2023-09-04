@@ -627,14 +627,26 @@ private extension ChatViewModel {
             try? controller?.performFetch()
         }
         
-        chatTransactions = controller?.fetchedObjects ?? []
-        updateMessages(resetLoadingProperty: performFetch)
+        let newTransactions = controller?.fetchedObjects ?? []
+        let isNewReaction = isNewReaction(old: chatTransactions, new: newTransactions)
+        chatTransactions = newTransactions
+        
+        updateMessages(
+            resetLoadingProperty: performFetch,
+            completion: isNewReaction
+                ? { [commitVibro] in commitVibro.send() }
+                : {}
+        )
     }
     
-    func updateMessages(resetLoadingProperty: Bool) {
+    func updateMessages(
+        resetLoadingProperty: Bool,
+        completion: @MainActor @escaping () -> Void = {}
+    ) {
         timerSubscription = nil
         
         Task(priority: .userInitiated) { [chatTransactions, sender] in
+            defer { completion() }
             var expirationTimestamp: TimeInterval?
 
             let messages = await chatMessagesListFactory.makeMessages(
@@ -665,7 +677,6 @@ private extension ChatViewModel {
     ) async {
         var newMessages = newMessages
         updateHiddenMessage(&newMessages)
-        checkNewReactions(old: messages, new: newMessages)
         
         messages = newMessages
         
@@ -843,14 +854,13 @@ private extension ChatViewModel {
         }
     }
     
-    func checkNewReactions(old: [ChatMessage], new: [ChatMessage]) {
+    func isNewReaction(old: [ChatTransaction], new: [ChatTransaction]) -> Bool {
         guard
             let processedDate = old.getMostRecentElementDate(),
-            let newLastReactionDate = new.getMostRecentReactionDate(),
-            newLastReactionDate > processedDate
-        else { return }
+            let newLastReactionDate = new.getMostRecentReactionDate()
+        else { return false }
         
-        commitVibro.send()
+        return newLastReactionDate > processedDate
     }
 }
 
@@ -886,30 +896,19 @@ private extension ChatMessage {
     }
 }
 
-private extension Sequence where Element == ChatMessage {
+private extension Sequence where Element == ChatTransaction {
     func getMostRecentElementDate() -> Date? {
-        flatMap { $0.getReactions().map { $0.sentDate } + [$0.sentDate] }.max()
+        map { $0.sentDate ?? .adamantNullDate }.max()
     }
     
     func getMostRecentReactionDate() -> Date? {
-        flatMap { $0.getReactions().map { $0.sentDate } }.max()
-    }
-    
-    func getReactions() -> [String: Set<Reaction>] {
-        let pairs = map { ($0.id, $0.getReactions()) }
-        return .init(uniqueKeysWithValues: pairs)
-    }
-}
-
-private extension ChatMessage {
-    func getReactions() -> Set<Reaction> {
-        switch content {
-        case let .message(value):
-            return value.value.reactions ?? .init()
-        case let .reply(value):
-            return value.value.reactions ?? .init()
-        case let .transaction(value):
-            return value.value.reactions ?? .init()
-        }
+        compactMap {
+            guard
+                let tx = $0 as? RichMessageTransaction,
+                tx.additionalType == .reaction
+            else { return nil }
+            
+            return $0.sentDate ?? .adamantNullDate
+        }.max()
     }
 }
