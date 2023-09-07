@@ -102,6 +102,7 @@ class ERC20WalletService: WalletService {
     var dialogService: DialogService!
     var router: Router!
     var increaseFeeService: IncreaseFeeService!
+    var vibroService: VibroService!
     
     // MARK: - Notifications
     var walletUpdatedNotification = Notification.Name("adamant.erc20Wallet.walletUpdated")
@@ -268,6 +269,7 @@ class ERC20WalletService: WalletService {
         if let balance = try? await getBalance(forAddress: wallet.ethAddress) {
             wallet.isBalanceInitialized = true
             let notification: Notification.Name?
+            let isRaised = (wallet.balance < balance) && !initialBalanceCheck
             
             if wallet.balance != balance {
                 wallet.balance = balance
@@ -278,6 +280,10 @@ class ERC20WalletService: WalletService {
                 notification = walletUpdatedNotification
             } else {
                 notification = nil
+            }
+            
+            if isRaised {
+                vibroService.applyVibration(.success)
             }
             
             if let notification = notification {
@@ -447,6 +453,7 @@ extension ERC20WalletService: SwinjectDependentService {
         dialogService = container.resolve(DialogService.self)
         router = container.resolve(Router.self)
         increaseFeeService = container.resolve(IncreaseFeeService.self)
+        vibroService = container.resolve(VibroService.self)
     }
 }
 

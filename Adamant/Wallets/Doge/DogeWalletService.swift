@@ -60,6 +60,7 @@ class DogeWalletService: WalletService {
     var dialogService: DialogService!
     var router: Router!
     var addressConverter: AddressConverter!
+    var vibroService: VibroService!
     
     // MARK: - Constants
     static var currencyLogo = UIImage.asset(named: "doge_wallet") ?? .init()
@@ -206,6 +207,7 @@ class DogeWalletService: WalletService {
         if let balance = try? await getBalance() {
             wallet.isBalanceInitialized = true
             let notification: Notification.Name?
+            let isRaised = (wallet.balance < balance) && !initialBalanceCheck
             
             if wallet.balance != balance {
                 wallet.balance = balance
@@ -216,6 +218,10 @@ class DogeWalletService: WalletService {
                 notification = walletUpdatedNotification
             } else {
                 notification = nil
+            }
+            
+            if isRaised {
+                vibroService.applyVibration(.success)
             }
             
             if let notification = notification {
@@ -321,6 +327,7 @@ extension DogeWalletService: SwinjectDependentService {
         router = container.resolve(Router.self)
         addressConverter = container.resolve(AddressConverterFactory.self)?
             .make(network: network)
+        vibroService = container.resolve(VibroService.self)
     }
 }
 

@@ -219,6 +219,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             Task { await service.startObserving() }
         }
         
+        // Setup notifications in app observing
+        if let service = container.resolve(NotificationInAppService.self) {
+            service.startObserving()
+        }
+        
         // Register repeater services
         if let chatsProvider = container.resolve(ChatsProvider.self) {
             repeater.registerForegroundCall(label: "chatsProvider", interval: 10, queue: .global(qos: .utility), callback: {

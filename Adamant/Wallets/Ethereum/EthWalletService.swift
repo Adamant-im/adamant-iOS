@@ -125,6 +125,7 @@ class EthWalletService: WalletService {
     var dialogService: DialogService!
     var router: Router!
     var increaseFeeService: IncreaseFeeService!
+    var vibroService: VibroService!
     
     // MARK: - Notifications
     let walletUpdatedNotification = Notification.Name("adamant.ethWallet.walletUpdated")
@@ -290,6 +291,8 @@ class EthWalletService: WalletService {
             
             let notification: Notification.Name?
             
+            let isRaised = (wallet.balance < balance) && !initialBalanceCheck
+            
             if wallet.balance != balance {
                 wallet.balance = balance
                 notification = walletUpdatedNotification
@@ -299,6 +302,10 @@ class EthWalletService: WalletService {
                 notification = walletUpdatedNotification
             } else {
                 notification = nil
+            }
+            
+            if isRaised {
+                vibroService.applyVibration(.success)
             }
             
             if let notification = notification {
@@ -539,6 +546,7 @@ extension EthWalletService: SwinjectDependentService {
         dialogService = container.resolve(DialogService.self)
         router = container.resolve(Router.self)
         increaseFeeService = container.resolve(IncreaseFeeService.self)
+        vibroService = container.resolve(VibroService.self)
     }
 }
 
