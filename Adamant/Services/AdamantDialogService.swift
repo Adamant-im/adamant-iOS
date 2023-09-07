@@ -16,13 +16,15 @@ import CommonKit
 final class AdamantDialogService: DialogService {
     // MARK: Dependencies
     private let router: Router
+    private let vibroService: VibroService
     private let popupManager = PopupManager()
     private let mailDelegate = MailDelegate()
     private weak var window: UIWindow?
     
     // Configure notifications
-    nonisolated init(router: Router) {
+    nonisolated init(router: Router, vibroService: VibroService) {
         self.router = router
+        self.vibroService = vibroService
     }
     
     func setup(window: UIWindow) {
@@ -85,10 +87,12 @@ extension AdamantDialogService {
     }
     
     func showSuccess(withMessage message: String) {
+        vibroService.applyVibration(.success)
         popupManager.showSuccessAlert(message: message)
     }
     
     func showWarning(withMessage message: String) {
+        vibroService.applyVibration(.error)
         popupManager.showWarningAlert(message: message)
     }
     
@@ -101,6 +105,7 @@ extension AdamantDialogService {
         supportEmail: Bool,
         error: Error? = nil
     ) {
+        vibroService.applyVibration(.error)
         popupManager.showAdvancedAlert(model: .init(
             icon: .asset(named: "error") ?? .init(),
             title: .adamant.alert.error,

@@ -137,6 +137,7 @@ class TransferViewControllerBase: FormViewController {
     let currencyInfoService: CurrencyInfoService
     var increaseFeeService: IncreaseFeeService
     var chatsProvider: ChatsProvider
+    let vibroService: VibroService
     
     // MARK: - Properties
     
@@ -275,7 +276,8 @@ class TransferViewControllerBase: FormViewController {
         dialogService: DialogService,
         router: Router,
         currencyInfoService: CurrencyInfoService,
-        increaseFeeService: IncreaseFeeService
+        increaseFeeService: IncreaseFeeService,
+        vibroService: VibroService
     ) {
         self.accountService = accountService
         self.accountsProvider = accountsProvider
@@ -284,6 +286,7 @@ class TransferViewControllerBase: FormViewController {
         self.currencyInfoService = currencyInfoService
         self.increaseFeeService = increaseFeeService
         self.chatsProvider = chatsProvider
+        self.vibroService = vibroService
 		
         super.init(nibName: nil, bundle: nil)
     }
