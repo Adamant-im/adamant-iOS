@@ -754,10 +754,18 @@ private extension ChatViewModel {
         }
         
         partnerName = chatroom?.getName(addressBookService: addressBookService)
-        partnerImage = avatarService.avatar(
-            for: publicKey,
-            size: partnerImageSize
-        )
+        
+        guard let avatarName = chatroom?.partner?.avatar,
+              let avatar = UIImage.asset(named: avatarName)
+        else {
+            partnerImage = avatarService.avatar(
+                for: publicKey,
+                size: partnerImageSize
+            )
+            return
+        }
+        
+        partnerImage = avatar
     }
     
     func updateAttachmentButtonAvailability() {
