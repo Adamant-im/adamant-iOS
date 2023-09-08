@@ -105,10 +105,10 @@ class PKGeneratorViewController: FormViewController {
             cell.textView.attributedText = mutableText
         }
         
-        let passphraseRow = TextAreaRow {
+        let passphraseRow = PasswordRow {
             $0.placeholder = String.adamant.qrGenerator.passphrasePlaceholder
             $0.tag = Rows.passphrase.tag
-            $0.textAreaHeight = .dynamic(initialTextViewHeight: 28.0) // 28 for textView and 8+8 for insets
+            $0.cell.textField.enablePasswordToggle()
         }
             
         let generateButton = ButtonRow {

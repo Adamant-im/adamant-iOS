@@ -137,3 +137,24 @@ extension UITextField {
         self.defaultTextAttributes[.paragraphStyle] = style
     }
 }
+
+extension UITextField {
+    func enablePasswordToggle() {
+        let button = UIButton(type: .custom)
+        updatePasswordToggleImage(button)
+        button.frame = CGRect(x: .zero, y: .zero, width: 25, height: 25)
+        button.addTarget(self, action: #selector(togglePasswordView(_:)), for: .touchUpInside)
+        rightView = button
+        rightViewMode = .always
+    }
+    
+    private func updatePasswordToggleImage(_ button: UIButton) {
+        let imageName = isSecureTextEntry ? "eye_close" : "eye_open"
+        button.setImage(.asset(named: imageName), for: .normal)
+    }
+    
+    @objc private func togglePasswordView(_ sender: UIButton) {
+        isSecureTextEntry.toggle()
+        updatePasswordToggleImage(sender)
+    }
+}
