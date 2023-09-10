@@ -8,7 +8,7 @@
 
 import UIKit
 
-class AdamantCellFactory: CellFactory {
+final class AdamantCellFactory: CellFactory {
     func nib(for sharedCell: SharedCell) -> UINib? {
         /* UINib.init actually can throw an exception
         do {
