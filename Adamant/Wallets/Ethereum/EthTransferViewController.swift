@@ -119,11 +119,9 @@ final class EthTransferViewController: TransferViewControllerBase {
     
     // MARK: Overrides
     
-    private var _recipient: String?
-    
     override var recipientAddress: String? {
         set {
-            _recipient = newValue?.validateEthAddress()
+            let _recipient = newValue?.validateEthAddress()
             
             if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = _recipient
@@ -131,7 +129,8 @@ final class EthTransferViewController: TransferViewControllerBase {
             }
         }
         get {
-            return _recipient
+            let row: RowOf<String>? = form.rowBy(tag: BaseRows.address.tag)
+            return row?.value?.validateEthAddress()
         }
     }
     

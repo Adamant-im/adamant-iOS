@@ -183,12 +183,16 @@ class TransferViewControllerBase: FormViewController {
     weak var delegate: TransferViewControllerDelegate?
     
     var recipientAddress: String? {
-        didSet {
+        set {
             if let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) {
-                row.value = recipientAddress
+                row.value = newValue
                 row.updateCell()
                 validateForm()
             }
+        }
+        get {
+            let row: RowOf<String>? = form.rowBy(tag: BaseRows.address.tag)
+            return row?.value
         }
     }
     
@@ -439,7 +443,7 @@ class TransferViewControllerBase: FormViewController {
         section.append(defaultRowFor(baseRow: BaseRows.address))
         
         if !recipientIsReadonly, let stripe = recipientStripe() {
-            var footer = HeaderFooterView<UIView>(.callback {
+            var footer = HeaderFooterView<UIView>(.callback { [weak self] in
                 let view = ButtonsStripeView.adamantConfigured()
                 view.stripe = stripe
                 view.delegate = self
@@ -486,22 +490,14 @@ class TransferViewControllerBase: FormViewController {
 
     @discardableResult
     func validateAddress() -> Bool {
-        guard let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) else {
-            recipientAddress = nil
-            return false
-        }
-
-        if let address = row.value, validateRecipient(address).isValid {
-            recipientAddress = address
-            markAddres(isValid: true)
-            return true
-        } else {
-            if row.value == nil {
-                recipientAddress = nil
-            }
+        guard let recipientAddress = recipientAddress else {
             markAddres(isValid: false)
             return false
         }
+        
+        let isValid = validateRecipient(recipientAddress).isValid
+        markAddres(isValid: isValid)
+        return isValid
     }
     
     func validateForm(force: Bool = false) {
@@ -575,6 +571,8 @@ class TransferViewControllerBase: FormViewController {
                 row.updateCell()
             }
         }
+        
+        validateAddress()
     }
     
     func markRow(_ row: BaseRowType, valid: Bool) {
@@ -830,8 +828,7 @@ class TransferViewControllerBase: FormViewController {
               case .valid = service.validate(address: parsedAddress.address)
         else { return false }
         
-        form.rowBy(tag: BaseRows.address.tag)?.value = parsedAddress.address
-        form.rowBy(tag: BaseRows.address.tag)?.updateCell()
+        recipientAddress = parsedAddress.address
         
         parsedAddress.params?.forEach { param in
             switch param {

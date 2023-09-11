@@ -81,7 +81,7 @@ extension TransferViewControllerBase {
 
 // MARK: - ButtonsStripeViewDelegate
 extension TransferViewControllerBase: ButtonsStripeViewDelegate {
-    func buttonsStripe(_ stripe: ButtonsStripeView, didTapButton button: StripeButtonType) {
+    func buttonsStripe(didTapButton button: StripeButtonType) {
         switch button {
         case .qrCameraReader:
             scanQr()

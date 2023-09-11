@@ -124,22 +124,6 @@ final class LskTransferViewController: TransferViewControllerBase {
     
     // MARK: Overrides
     
-    private var _recipient: String?
-    
-    override var recipientAddress: String? {
-        set {
-            _recipient = newValue
-            
-            if let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) {
-                row.value = _recipient
-                row.updateCell()
-            }
-        }
-        get {
-            return _recipient
-        }
-    }
-    
     override func validateRecipient(_ address: String) -> AddressValidationResult {
         service?.validate(address: address) ?? .invalid(description: nil)
     }
@@ -161,9 +145,6 @@ final class LskTransferViewController: TransferViewControllerBase {
                 $0.cell.textField.isEnabled = false
             }
         }.onChange { [weak self] row in
-            if let text = row.value {
-                self?._recipient = text
-            }
             self?.updateToolbar(for: row)
         }.onCellSelection { [weak self] (cell, _) in
             self?.shareValue(self?.recipientAddress, from: cell)

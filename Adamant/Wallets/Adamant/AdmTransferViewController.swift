@@ -158,10 +158,9 @@ final class AdmTransferViewController: TransferViewControllerBase {
     
     // MARK: Overrides
     
-    private var _recipient: String?
-    
     override var recipientAddress: String? {
         set {
+            let _recipient: String?
             if let recipient = newValue, let first = recipient.first, first != "U" {
                 _recipient = "U\(recipient)"
             } else {
@@ -174,7 +173,15 @@ final class AdmTransferViewController: TransferViewControllerBase {
             }
         }
         get {
-            return _recipient
+            let recipient: String? = form.rowBy(tag: BaseRows.address.tag)?.value
+            guard let recipient = recipient,
+                  let first = recipient.first,
+                  first != "U"
+            else {
+                return recipient
+            }
+            
+            return "U\(recipient)"
         }
     }
     
@@ -267,10 +274,7 @@ final class AdmTransferViewController: TransferViewControllerBase {
     
     override func handleRawAddress(_ address: String) -> Bool {
         if let admAddress = address.getAdamantAddress() {
-            if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
-                row.value = admAddress.address
-                row.updateCell()
-            }
+            recipientAddress = admAddress.address
             
             if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.amount.tag) {
                 row.value = admAddress.amount
@@ -279,10 +283,7 @@ final class AdmTransferViewController: TransferViewControllerBase {
             }
             return true
         } else if let admAddress = address.getLegacyAdamantAddress() {
-            if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
-                row.value = admAddress.address
-                row.updateCell()
-            }
+            recipientAddress = admAddress.address
             return true
         }
         
