@@ -16,6 +16,7 @@ final class EthTransferViewController: TransferViewControllerBase {
     // MARK: Properties
     
     private var skipValueChange: Bool = false
+    private let prefix = "0x"
     
     // MARK: Send
     
@@ -117,8 +118,7 @@ final class EthTransferViewController: TransferViewControllerBase {
     
     override var recipientAddress: String? {
         set {
-            let _recipient = newValue?.validateEthAddress()
-            
+            let _recipient = newValue?.addPrefixIfNeeded(prefix: prefix)
             if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = _recipient
                 row.updateCell()
@@ -126,12 +126,12 @@ final class EthTransferViewController: TransferViewControllerBase {
         }
         get {
             let row: RowOf<String>? = form.rowBy(tag: BaseRows.address.tag)
-            return row?.value?.validateEthAddress()
+            return row?.value?.addPrefixIfNeeded(prefix: prefix)
         }
     }
     
     override func validateRecipient(_ address: String) -> AddressValidationResult {
-        let fixedAddress = address.validateEthAddress()
+        let fixedAddress = address.addPrefixIfNeeded(prefix: prefix)
         return service?.validate(address: fixedAddress) ?? .invalid(description: nil)
     }
     
@@ -146,20 +146,20 @@ final class EthTransferViewController: TransferViewControllerBase {
                 separatedBy: TransferViewControllerBase.invalidCharacters
             ).joined()
             
-            let prefix = UILabel()
-            prefix.text = "0x"
-            prefix.sizeToFit()
+            let prefixLabel = UILabel()
+            prefixLabel.text = prefix
+            prefixLabel.sizeToFit()
             
             let view = UIView()
-            view.addSubview(prefix)
-            view.frame = prefix.frame
+            view.addSubview(prefixLabel)
+            view.frame = prefixLabel.frame
             $0.cell.textField.leftView = view
             $0.cell.textField.leftViewMode = .always
             $0.cell.textField.setLineBreakMode()
             
             if recipientIsReadonly {
                 $0.disabled = true
-                prefix.textColor = UIColor.lightGray
+                prefixLabel.textColor = UIColor.lightGray
             }
         }.cellUpdate { [weak self] (cell, _) in
             if let text = cell.textField.text {
@@ -179,9 +179,13 @@ final class EthTransferViewController: TransferViewControllerBase {
             }
             
             if let text = row.value {
-                var trimmed = text.components(separatedBy: TransferViewControllerBase.invalidCharacters).joined()
-                if trimmed.starts(with: "0x") {
-                    let i = trimmed.index(trimmed.startIndex, offsetBy: 2)
+                var trimmed = text.components(
+                    separatedBy: TransferViewControllerBase.invalidCharacters
+                ).joined()
+                
+                if let prefix = self?.prefix,
+                   trimmed.starts(with: prefix) {
+                    let i = trimmed.index(trimmed.startIndex, offsetBy: prefix.count)
                     trimmed = String(trimmed[i...])
                 }
                 

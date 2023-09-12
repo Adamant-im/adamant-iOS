@@ -31,6 +31,8 @@ final class LskTransferViewController: TransferViewControllerBase {
         }
     }
     
+    private let prefix = "lsk"
+    
     // MARK: Send
     
     @MainActor
@@ -124,8 +126,24 @@ final class LskTransferViewController: TransferViewControllerBase {
     
     // MARK: Overrides
     
+    override var recipientAddress: String? {
+        set {
+            let _recipient = newValue?.addPrefixIfNeeded(prefix: prefix)
+            
+            if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
+                row.value = _recipient
+                row.updateCell()
+            }
+        }
+        get {
+            let row: RowOf<String>? = form.rowBy(tag: BaseRows.address.tag)
+            return row?.value?.addPrefixIfNeeded(prefix: prefix)
+        }
+    }
+    
     override func validateRecipient(_ address: String) -> AddressValidationResult {
-        service?.validate(address: address) ?? .invalid(description: nil)
+        let fixedAddress = address.addPrefixIfNeeded(prefix: prefix)
+        return service?.validate(address: fixedAddress) ?? .invalid(description: nil)
     }
     
     override func recipientRow() -> BaseRow {
@@ -140,19 +158,44 @@ final class LskTransferViewController: TransferViewControllerBase {
                 separatedBy: TransferViewControllerBase.invalidCharacters
             ).joined()
 
+            let prefixLabel = UILabel()
+            prefixLabel.text = prefix
+            prefixLabel.sizeToFit()
+            
+            let view = UIView()
+            view.addSubview(prefixLabel)
+            view.frame = prefixLabel.frame
+            $0.cell.textField.leftView = view
+            $0.cell.textField.leftViewMode = .always
+            
             if recipientIsReadonly {
                 $0.disabled = true
                 $0.cell.textField.isEnabled = false
+                prefixLabel.textColor = .lightGray
             }
-        }.cellUpdate { cell, row in
+        }.cellUpdate { [weak self] cell, row in
             cell.textField.text = row.value?.components(
                 separatedBy: TransferViewControllerBase.invalidCharacters
             ).joined()
-        }.onChange { [weak self] row in
-            row.cell.textField.text = row.value?.components(
-                separatedBy: TransferViewControllerBase.invalidCharacters
-            ).joined()
             
+            guard self?.recipientIsReadonly == false else { return }
+    
+            cell.textField.leftView?.subviews.forEach { view in
+                guard let label = view as? UILabel else { return }
+                label.textColor = UIColor.adamant.primary
+            }
+        }.onChange { [weak self] row in
+            var trimmed = row.value?.components(
+                separatedBy: TransferViewControllerBase.invalidCharacters
+            ).joined() ?? ""
+            
+            if let prefix = self?.prefix,
+               trimmed.starts(with: prefix) {
+                let i = trimmed.index(trimmed.startIndex, offsetBy: prefix.count)
+                trimmed = String(trimmed[i...])
+            }
+            
+            row.value = trimmed
             self?.updateToolbar(for: row)
         }.onCellSelection { [weak self] (cell, _) in
             self?.shareValue(self?.recipientAddress, from: cell)
