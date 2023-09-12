@@ -147,6 +147,12 @@ class TransferViewControllerBase: FormViewController {
     var isNeedAddFee: Bool { true }
     var replyToMessageId: String?
     
+    static let invalidCharacters: CharacterSet = {
+        CharacterSet(
+            charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+        ).inverted
+    }()
+    
     var service: WalletServiceWithSend? {
         didSet {
             if let prev = oldValue {

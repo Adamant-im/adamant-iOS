@@ -24,8 +24,6 @@ final class BtcTransferViewController: TransferViewControllerBase {
     
     private var skipValueChange: Bool = false
     
-    static let invalidCharacters: CharacterSet = CharacterSet.decimalDigits.inverted
-    
     // MARK: Send
     
     @MainActor
@@ -131,19 +129,30 @@ final class BtcTransferViewController: TransferViewControllerBase {
             $0.tag = BaseRows.address.tag
             $0.cell.textField.placeholder = String.adamant.newChat.addressPlaceholder
             $0.cell.textField.setLineBreakMode()
+            $0.cell.textField.keyboardType = .namePhonePad
+            $0.cell.textField.autocorrectionType = .no
             
-            if let recipient = recipientAddress {
-                $0.value = recipient
-            }
+            $0.value = recipientAddress?.components(
+                separatedBy: TransferViewControllerBase.invalidCharacters
+            ).joined()
             
             if recipientIsReadonly {
                 $0.disabled = true
             }
+        }.cellUpdate { cell, row in
+            cell.textField.text = row.value?.components(
+                separatedBy: TransferViewControllerBase.invalidCharacters
+            ).joined()
         }.onChange { [weak self] row in
             if let skip = self?.skipValueChange, skip {
                 self?.skipValueChange = false
                 return
             }
+            
+            row.cell.textField.text = row.value?.components(
+                separatedBy: TransferViewControllerBase.invalidCharacters
+            ).joined()
+            
             self?.updateToolbar(for: row)
         }.onCellSelection { [weak self] (cell, _) in
             self?.shareValue(self?.recipientAddress, from: cell)

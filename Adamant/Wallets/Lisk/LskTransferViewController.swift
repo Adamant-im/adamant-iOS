@@ -132,19 +132,27 @@ final class LskTransferViewController: TransferViewControllerBase {
         let row = TextRow {
             $0.tag = BaseRows.address.tag
             $0.cell.textField.placeholder = String.adamant.newChat.addressPlaceholder
-            $0.cell.textField.keyboardType = UIKeyboardType.alphabet
+            $0.cell.textField.keyboardType = .namePhonePad
             $0.cell.textField.autocorrectionType = .no
             $0.cell.textField.setLineBreakMode()
             
-            if let recipient = recipientAddress {
-                $0.value = recipient
-            }
+            $0.value = recipientAddress?.components(
+                separatedBy: TransferViewControllerBase.invalidCharacters
+            ).joined()
 
             if recipientIsReadonly {
                 $0.disabled = true
                 $0.cell.textField.isEnabled = false
             }
+        }.cellUpdate { cell, row in
+            cell.textField.text = row.value?.components(
+                separatedBy: TransferViewControllerBase.invalidCharacters
+            ).joined()
         }.onChange { [weak self] row in
+            row.cell.textField.text = row.value?.components(
+                separatedBy: TransferViewControllerBase.invalidCharacters
+            ).joined()
+            
             self?.updateToolbar(for: row)
         }.onCellSelection { [weak self] (cell, _) in
             self?.shareValue(self?.recipientAddress, from: cell)
