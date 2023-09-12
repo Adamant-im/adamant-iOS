@@ -29,6 +29,7 @@ final class ChatViewModel: NSObject {
     private let chatCacheService: ChatCacheService
     private let richMessageProviders: [String: RichMessageProvider]
     private let avatarService: AvatarService
+    private let emojiService: EmojiService
     
     let chatMessagesListViewModel: ChatMessagesListViewModel
 
@@ -128,7 +129,8 @@ final class ChatViewModel: NSObject {
         chatCacheService: ChatCacheService,
         richMessageProviders: [String: RichMessageProvider],
         avatarService: AvatarService,
-        chatMessagesListViewModel: ChatMessagesListViewModel
+        chatMessagesListViewModel: ChatMessagesListViewModel,
+        emojiService: EmojiService
     ) {
         self.chatsProvider = chatsProvider
         self.markdownParser = markdownParser
@@ -143,6 +145,7 @@ final class ChatViewModel: NSObject {
         self.chatCacheService = chatCacheService
         self.avatarService = avatarService
         self.chatMessagesListViewModel = chatMessagesListViewModel
+        self.emojiService = emojiService
         super.init()
         setupObservers()
     }
@@ -528,6 +531,15 @@ final class ChatViewModel: NSObject {
             let emoji = emoji == arg.selectedEmoji
             ? ""
             : emoji
+            
+            let type: EmojiUpdateType = emoji.isEmpty
+            ? .decrement
+            : .increment
+            
+            self?.emojiService.updateFrequentlySelectedEmojis(
+                selectedEmoji: emoji,
+                type: type
+            )
             
             self?.reactAction(messageId, emoji: emoji)
         }
