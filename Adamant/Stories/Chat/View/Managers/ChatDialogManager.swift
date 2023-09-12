@@ -12,6 +12,7 @@ import SafariServices
 import CommonKit
 import AdvancedContextMenuKit
 import SwiftUI
+import ElegantEmojiPicker
 
 @MainActor
 final class ChatDialogManager {
@@ -87,12 +88,14 @@ private extension ChatDialogManager {
             showFailedMessageAlert(id: id, sender: sender)
         case let .presentMenu(
             arg,
+            didSelectEmojiDelegate,
             didSelectEmojiAction,
             didPresentMenuAction,
             didDismissMenuAction
         ):
             presentMenu(
                 arg: arg,
+                didSelectEmojiDelegate: didSelectEmojiDelegate,
                 didSelectEmojiAction: didSelectEmojiAction,
                 didPresentMenuAction: didPresentMenuAction,
                 didDismissMenuAction: didDismissMenuAction
@@ -431,6 +434,7 @@ private extension ChatDialogManager {
     
     func presentMenu(
         arg: ChatContextMenuArguments,
+        didSelectEmojiDelegate: ElegantEmojiPickerDelegate?,
         didSelectEmojiAction: DidSelectEmojiAction,
         didPresentMenuAction: ContextMenuAction,
         didDismissMenuAction: ContextMenuAction
@@ -443,7 +447,8 @@ private extension ChatDialogManager {
             upperView: getUpperContentView(
                 messageId: arg.messageId,
                 selectedEmoji: arg.selectedEmoji,
-                didSelectEmojiAction: didSelectEmojiAction
+                didSelectEmojiAction: didSelectEmojiAction,
+                didSelectEmojiDelegate: didSelectEmojiDelegate
             ),
             upperViewSize: getUpperContentViewSize()
         )
@@ -456,15 +461,27 @@ private extension ChatDialogManager {
     func getUpperContentView(
         messageId: String,
         selectedEmoji: String?,
-        didSelectEmojiAction: DidSelectEmojiAction
+        didSelectEmojiAction: DidSelectEmojiAction,
+        didSelectEmojiDelegate: ElegantEmojiPickerDelegate?
     ) -> AnyView? {
         var view = ChatReactionsView(
-            delegate: nil,
             emojis: getFrequentlySelectedEmojis(selectedEmoji: selectedEmoji),
             selectedEmoji: selectedEmoji,
             messageId: messageId
         )
         view.didSelectEmoji = didSelectEmojiAction
+        view.didSelectMore = { [weak self, didSelectEmojiDelegate] in
+            let config = ElegantConfiguration(
+                showRandom: false,
+                showReset: false,
+                defaultSkinTone: .Light
+            )
+            let picker = ElegantEmojiPicker(
+                delegate: didSelectEmojiDelegate,
+                configuration: config
+            )
+            self?.contextMenu.presentOver(picker, animated: true)
+        }
         return AnyView(view)
     }
     
