@@ -81,12 +81,12 @@ extension String {
         }
     }
     
-    func validateEthAddress() -> String {
+    func addPrefixIfNeeded(prefix: String) -> String {
         let address = self
-        let prefix = address.prefix(2)
+        let prefixLocal = address.prefix(prefix.count)
         
-        let fixedAddress = prefix != "0x"
-        ? "0x\(address)"
+        let fixedAddress = prefixLocal != prefix
+        ? "\(prefix)\(address)"
         : address
         
         return fixedAddress
