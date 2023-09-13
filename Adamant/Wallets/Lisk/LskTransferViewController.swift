@@ -196,6 +196,7 @@ final class LskTransferViewController: TransferViewControllerBase {
             }
             
             row.value = trimmed
+            row.updateCell()
             self?.updateToolbar(for: row)
         }.onCellSelection { [weak self] (cell, _) in
             self?.shareValue(self?.recipientAddress, from: cell)
