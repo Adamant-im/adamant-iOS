@@ -8,6 +8,7 @@
 
 import UIKit
 import CommonKit
+import ElegantEmojiPicker
 
 enum ChatDialog {
     case toast(String)
@@ -26,6 +27,7 @@ enum ChatDialog {
     case failedMessageAlert(id: String, sender: UIAlertController.SourceView)
     case presentMenu(
         arg: ChatContextMenuArguments,
+        didSelectEmojiDelegate: ElegantEmojiPickerDelegate?,
         didSelectEmojiAction: ChatDialogManager.DidSelectEmojiAction,
         didPresentMenuAction: ChatDialogManager.ContextMenuAction,
         didDismissMenuAction: ChatDialogManager.ContextMenuAction
