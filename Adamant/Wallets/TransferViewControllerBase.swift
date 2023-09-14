@@ -383,6 +383,8 @@ class TransferViewControllerBase: FormViewController {
     }
     
     override func inputAccessoryView(for row: BaseRow) -> UIView? {
+        guard !isMacOS else { return nil }
+        
         let view = super.inputAccessoryView(for: row)
         guard let view = view as? NavigationAccessoryView else { return view }
         
