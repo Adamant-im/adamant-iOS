@@ -450,7 +450,7 @@ extension NewChatViewController: UINavigationControllerDelegate, UIImagePickerCo
 
 // MARK: - ButtonsStripe
 extension NewChatViewController: ButtonsStripeViewDelegate {
-    func buttonsStripe(_ stripe: ButtonsStripeView, didTapButton button: StripeButtonType) {
+    func buttonsStripe(didTapButton button: StripeButtonType) {
         switch button {
         case .qrCameraReader:
             scanQr()
