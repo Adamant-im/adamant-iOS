@@ -12,7 +12,6 @@ import SnapKit
 import Combine
 import AdvancedContextMenuKit
 import SwiftUI
-import MCEmojiPicker
 import CommonKit
 
 final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
