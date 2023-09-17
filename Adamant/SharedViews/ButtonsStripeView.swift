@@ -57,7 +57,7 @@ typealias Stripe = [StripeButtonType]
 
 // MARK: - Delegate
 protocol ButtonsStripeViewDelegate: AnyObject {
-    func buttonsStripe(_ stripe: ButtonsStripeView, didTapButton button: StripeButtonType)
+    func buttonsStripe(didTapButton button: StripeButtonType)
 }
 
 // MARK: - View
@@ -161,7 +161,7 @@ final class ButtonsStripeView: UIView {
     // MARK: Delegate
     @objc private func buttonTapped(_ sender: UIButton) {
         if let button = StripeButtonType(rawValue: sender.tag) {
-            delegate?.buttonsStripe(self, didTapButton: button)
+            delegate?.buttonsStripe(didTapButton: button)
         }
     }
 }

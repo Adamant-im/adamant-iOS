@@ -65,6 +65,15 @@
         }
       },
       {
+        "package": "ElegantEmojiPicker",
+        "repositoryURL": "https://github.com/Finalet/Elegant-Emoji-Picker",
+        "state": {
+          "branch": "main",
+          "revision": "71d2d46092b4d550cc593614efc06438f845f6e6",
+          "version": null
+        }
+      },
+      {
         "package": "Eureka",
         "repositoryURL": "https://github.com/xmartlabs/Eureka.git",
         "state": {
@@ -161,15 +170,6 @@
           "branch": null,
           "revision": "5056f3305d3499f44d8815530d560b87082e0cf5",
           "version": "1.7.1"
-        }
-      },
-      {
-        "package": "MCEmojiPicker",
-        "repositoryURL": "https://github.com/izyumkin/MCEmojiPicker",
-        "state": {
-          "branch": null,
-          "revision": "f5d135454d7bb1908fc43ec730e2616f2c40e20b",
-          "version": "1.2.2"
         }
       },
       {

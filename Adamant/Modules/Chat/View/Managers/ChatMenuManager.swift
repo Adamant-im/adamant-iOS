@@ -8,7 +8,6 @@
 
 import UIKit
 import SwiftUI
-import MCEmojiPicker
 import AdvancedContextMenuKit
 import CommonKit
 

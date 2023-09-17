@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3A10957E2A98C8CD006B0592 /* MCEmojiPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 3A10957D2A98C8CD006B0592 /* MCEmojiPicker */; };
 		3A33F9FA2A7A53DA002B8003 /* EmojiUpdateType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A33F9F92A7A53DA002B8003 /* EmojiUpdateType.swift */; };
 		3A41938F2A580C57006A6B22 /* AdamantRichTransactionReactService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A41938E2A580C57006A6B22 /* AdamantRichTransactionReactService.swift */; };
 		3A4193912A580C85006A6B22 /* RichTransactionReactService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4193902A580C85006A6B22 /* RichTransactionReactService.swift */; };
@@ -18,6 +17,7 @@
 		3A9015A92A615893002A2464 /* ChatMessagesListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A9015A82A615893002A2464 /* ChatMessagesListViewModel.swift */; };
 		3AA2D5F7280EADE3000ED971 /* SocketService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA2D5F6280EADE3000ED971 /* SocketService.swift */; };
 		3AA2D5FA280EAF5D000ED971 /* AdamantSocketService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA2D5F9280EAF5D000ED971 /* AdamantSocketService.swift */; };
+		3AC76E3D2AB09118008042C4 /* ElegantEmojiPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 3AC76E3C2AB09118008042C4 /* ElegantEmojiPicker */; };
 		3C06931576393125C61FB8F6 /* Pods_Adamant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33975C0D891698AA7E74EBCC /* Pods_Adamant.framework */; };
 		41047B70294B5EE10039E956 /* VisibleWalletsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41047B6F294B5EE10039E956 /* VisibleWalletsViewController.swift */; };
 		41047B72294B5F210039E956 /* VisibleWalletsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41047B71294B5F210039E956 /* VisibleWalletsTableViewCell.swift */; };
@@ -1091,8 +1091,8 @@
 				416F5EA4290162EB00EF0400 /* SocketIO in Frameworks */,
 				A5F92994262C855B00C3E60A /* MarkdownKit in Frameworks */,
 				A50AEB04262C815200B37C22 /* EFQRCode in Frameworks */,
-				3A10957E2A98C8CD006B0592 /* MCEmojiPicker in Frameworks */,
 				A544F0D4262C9878001F1A6D /* Eureka in Frameworks */,
+				3AC76E3D2AB09118008042C4 /* ElegantEmojiPicker in Frameworks */,
 				A5785ADF262C63580001BC66 /* web3swift in Frameworks */,
 				557AC306287B10D8004699D7 /* SnapKit in Frameworks */,
 				9342F6C22A6A35E300A9B39F /* CommonKit in Frameworks */,
@@ -2297,7 +2297,7 @@
 				4184F1702A33044E00D7B8B9 /* FirebaseCrashlytics */,
 				4177E5E02A52DA7100C089FE /* AdvancedContextMenuKit */,
 				9342F6C12A6A35E300A9B39F /* CommonKit */,
-				3A10957D2A98C8CD006B0592 /* MCEmojiPicker */,
+				3AC76E3C2AB09118008042C4 /* ElegantEmojiPicker */,
 			);
 			productName = Adamant;
 			productReference = E913C8EE1FFFA51D001A83F7 /* Adamant.app */;
@@ -2460,7 +2460,7 @@
 				416F5EA2290162EB00EF0400 /* XCRemoteSwiftPackageReference "socket" */,
 				938F7D562955C1DA001915CA /* XCRemoteSwiftPackageReference "MessageKit" */,
 				4184F16F2A33044E00D7B8B9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
-				3A10957C2A98C8CD006B0592 /* XCRemoteSwiftPackageReference "MCEmojiPicker" */,
+				3AC76E3B2AB09118008042C4 /* XCRemoteSwiftPackageReference "Elegant-Emoji-Picker" */,
 			);
 			productRefGroup = E913C8EF1FFFA51D001A83F7 /* Products */;
 			projectDirPath = "";
@@ -3640,17 +3640,17 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		3A10957C2A98C8CD006B0592 /* XCRemoteSwiftPackageReference "MCEmojiPicker" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/izyumkin/MCEmojiPicker";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
-			};
-		};
 		3A8875ED27BBF38D00436195 /* XCRemoteSwiftPackageReference "Parchment" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/rechsteiner/Parchment";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		3AC76E3B2AB09118008042C4 /* XCRemoteSwiftPackageReference "Elegant-Emoji-Picker" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Finalet/Elegant-Emoji-Picker";
 			requirement = {
 				branch = main;
 				kind = branch;
@@ -3795,15 +3795,15 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		3A10957D2A98C8CD006B0592 /* MCEmojiPicker */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 3A10957C2A98C8CD006B0592 /* XCRemoteSwiftPackageReference "MCEmojiPicker" */;
-			productName = MCEmojiPicker;
-		};
 		3A8875EE27BBF38D00436195 /* Parchment */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 3A8875ED27BBF38D00436195 /* XCRemoteSwiftPackageReference "Parchment" */;
 			productName = Parchment;
+		};
+		3AC76E3C2AB09118008042C4 /* ElegantEmojiPicker */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3AC76E3B2AB09118008042C4 /* XCRemoteSwiftPackageReference "Elegant-Emoji-Picker" */;
+			productName = ElegantEmojiPicker;
 		};
 		416F5EA3290162EB00EF0400 /* SocketIO */ = {
 			isa = XCSwiftPackageProductDependency;

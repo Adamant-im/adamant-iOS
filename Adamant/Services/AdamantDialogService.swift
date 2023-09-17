@@ -557,7 +557,10 @@ private class MailDelegate: NSObject, MFMailComposeViewControllerDelegate {
 extension AdamantDialogService {
     func selectAllTextFields(in alert: UIAlertController) {
         alert.textFields?.forEach { textField in
-            textField.selectAll(nil)
+            textField.selectedTextRange = textField.textRange(
+                from: textField.beginningOfDocument,
+                to: textField.endOfDocument
+            )
         }
     }
 }

@@ -106,7 +106,8 @@ private extension ChatFactory {
             chatMessagesListViewModel: .init(
                 avatarService: avatarService,
                 emojiService: emojiService
-            )
+            ),
+            emojiService: emojiService
         )
     }
     

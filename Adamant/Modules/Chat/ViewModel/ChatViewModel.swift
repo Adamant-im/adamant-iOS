@@ -12,6 +12,7 @@ import MarkdownKit
 import UIKit
 import CommonKit
 import AdvancedContextMenuKit
+import ElegantEmojiPicker
 
 @MainActor
 final class ChatViewModel: NSObject {
@@ -29,6 +30,7 @@ final class ChatViewModel: NSObject {
     private let chatCacheService: ChatCacheService
     private let richMessageProviders: [String: RichMessageProvider]
     private let avatarService: AvatarService
+    private let emojiService: EmojiService
     
     let chatMessagesListViewModel: ChatMessagesListViewModel
 
@@ -58,6 +60,7 @@ final class ChatViewModel: NSObject {
     private let minDiffCountForOffset = 5
     private let minDiffCountForAnimateScroll = 20
     private let partnerImageSize: CGFloat = 25
+    private var previousArg: ChatContextMenuArguments?
 
     let minIndexForStartLoadNewMessages = 4
     let minOffsetForStartLoadNewMessages: CGFloat = 100
@@ -128,7 +131,8 @@ final class ChatViewModel: NSObject {
         chatCacheService: ChatCacheService,
         richMessageProviders: [String: RichMessageProvider],
         avatarService: AvatarService,
-        chatMessagesListViewModel: ChatMessagesListViewModel
+        chatMessagesListViewModel: ChatMessagesListViewModel,
+        emojiService: EmojiService
     ) {
         self.chatsProvider = chatsProvider
         self.markdownParser = markdownParser
@@ -143,6 +147,7 @@ final class ChatViewModel: NSObject {
         self.chatCacheService = chatCacheService
         self.avatarService = avatarService
         self.chatMessagesListViewModel = chatMessagesListViewModel
+        self.emojiService = emojiService
         super.init()
         setupObservers()
     }
@@ -529,7 +534,17 @@ final class ChatViewModel: NSObject {
             ? ""
             : emoji
             
+            let type: EmojiUpdateType = emoji.isEmpty
+            ? .decrement
+            : .increment
+            
+            self?.emojiService.updateFrequentlySelectedEmojis(
+                selectedEmoji: emoji,
+                type: type
+            )
+            
             self?.reactAction(messageId, emoji: emoji)
+            self?.previousArg = nil
         }
         
         let didPresentMenuAction: ChatDialogManager.ContextMenuAction = { [weak self] messageId in
@@ -539,11 +554,15 @@ final class ChatViewModel: NSObject {
         let didDismissMenuAction: ChatDialogManager.ContextMenuAction = { [weak self] _ in
             self?.hiddenMessageID = nil
             self?.layoutIfNeeded.send()
+            self?.previousArg = nil
         }
+        
+        previousArg = arg
         
         dialog.send(
             .presentMenu(
                 arg: arg,
+                didSelectEmojiDelegate: self,
                 didSelectEmojiAction: didSelectEmojiAction,
                 didPresentMenuAction: didPresentMenuAction,
                 didDismissMenuAction: didDismissMenuAction
@@ -754,10 +773,18 @@ private extension ChatViewModel {
         }
         
         partnerName = chatroom?.getName(addressBookService: addressBookService)
-        partnerImage = avatarService.avatar(
-            for: publicKey,
-            size: partnerImageSize
-        )
+        
+        guard let avatarName = chatroom?.partner?.avatar,
+              let avatar = UIImage.asset(named: avatarName)
+        else {
+            partnerImage = avatarService.avatar(
+                for: publicKey,
+                size: partnerImageSize
+            )
+            return
+        }
+        
+        partnerImage = avatar
     }
     
     func updateAttachmentButtonAvailability() {
@@ -910,5 +937,28 @@ private extension Sequence where Element == ChatTransaction {
             
             return $0.sentDate ?? .adamantNullDate
         }.max()
+    }
+}
+
+extension ChatViewModel: ElegantEmojiPickerDelegate {
+    func emojiPicker(_ picker: ElegantEmojiPicker, didSelectEmoji emoji: Emoji?) {
+        dialog.send(.dismissMenu)
+        
+        guard let previousArg = previousArg else { return }
+        
+        let emoji = emoji?.emoji == previousArg.selectedEmoji
+        ? ""
+        : (emoji?.emoji ?? "")
+        
+        let type: EmojiUpdateType = emoji.isEmpty
+        ? .decrement
+        : .increment
+        
+        emojiService.updateFrequentlySelectedEmojis(
+            selectedEmoji: emoji,
+            type: type
+        )
+        
+        reactAction(previousArg.messageId, emoji: emoji)
     }
 }

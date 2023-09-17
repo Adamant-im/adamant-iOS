@@ -8,7 +8,7 @@
 
 import SwiftUI
 import CommonKit
-import MCEmojiPicker
+import ElegantEmojiPicker
 
 protocol ChatReactionsViewDelegate: AnyObject {
     func didSelectEmoji(_ emoji: String)
@@ -17,23 +17,18 @@ protocol ChatReactionsViewDelegate: AnyObject {
 
 struct ChatReactionsView: View {
     private let emojis: [String]
-    private weak var delegate: ChatReactionsViewDelegate?
     private let defaultEmojis = ["😂", "🤔", "😁", "👍", "👌"]
     private let selectedEmoji: String?
     private let messageId: String
     
-    @SwiftUI.State private var isPresentedMore: Bool = false
-    @SwiftUI.State private var selectedEmojiMore: String = ""
-    
     var didSelectEmoji: ((_ emoji: String, _ messageId: String) -> Void)?
+    var didSelectMore: (() -> Void)?
     
     init(
-        delegate: ChatReactionsViewDelegate?,
         emojis: [String]?,
         selectedEmoji: String?,
         messageId: String
     ) {
-        self.delegate = delegate
         self.emojis = emojis ?? defaultEmojis
         self.selectedEmoji = selectedEmoji
         self.messageId = messageId
@@ -64,19 +59,12 @@ struct ChatReactionsView: View {
             .padding([.top, .bottom, .leading], 5)
             
             Button {
-                isPresentedMore.toggle()
+                didSelectMore?()
             } label: {
                 Image(systemName: "plus")
                     .resizable()
                     .padding(6)
             }
-            .emojiPicker(
-                isPresented: $isPresentedMore,
-                selectedEmoji: $selectedEmojiMore
-            )
-            .onChange(of: selectedEmojiMore, perform: { newValue in
-                didSelectEmoji?(newValue, messageId)
-            })
             .frame(width: 30, height: 30)
             .background(Color.init(uiColor: .adamant.moreReactionsBackground))
             .clipShape(Circle())

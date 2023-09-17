@@ -431,7 +431,7 @@ extension LoginViewController {
 
 // MARK: - Button stripe
 extension LoginViewController: ButtonsStripeViewDelegate {
-    func buttonsStripe(_ stripe: ButtonsStripeView, didTapButton button: StripeButtonType) {
+    func buttonsStripe(didTapButton button: StripeButtonType) {
         switch button {
         case .pinpad:
             loginWithPinpad()

@@ -16,11 +16,8 @@ final class ERC20TransferViewController: TransferViewControllerBase {
     // MARK: Properties
     
     private var skipValueChange: Bool = false
+    private let prefix = "0x"
     
-    static let invalidCharacters: CharacterSet = {
-        CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789").inverted
-    }()
-
     override var feeBalanceFormatter: NumberFormatter {
         return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: EthWalletService.currencySymbol)
     }
@@ -126,11 +123,9 @@ final class ERC20TransferViewController: TransferViewControllerBase {
     
     // MARK: Overrides
     
-    private var _recipient: String?
-    
     override var recipientAddress: String? {
         set {
-            _recipient = newValue?.validateEthAddress()
+            let _recipient = newValue?.addPrefixIfNeeded(prefix: prefix)
             
             if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = _recipient
@@ -138,12 +133,13 @@ final class ERC20TransferViewController: TransferViewControllerBase {
             }
         }
         get {
-            return _recipient
+            let row: RowOf<String>? = form.rowBy(tag: BaseRows.address.tag)
+            return row?.value?.addPrefixIfNeeded(prefix: prefix)
         }
     }
     
     override func validateRecipient(_ address: String) -> AddressValidationResult {
-        let fixedAddress = address.validateEthAddress()
+        let fixedAddress = address.addPrefixIfNeeded(prefix: prefix)
         return service?.validate(address: fixedAddress) ?? .invalid(description: nil)
     }
     
@@ -151,32 +147,32 @@ final class ERC20TransferViewController: TransferViewControllerBase {
         let row = TextRow {
             $0.tag = BaseRows.address.tag
             $0.cell.textField.placeholder = String.adamant.newChat.addressPlaceholder
-            $0.cell.textField.keyboardType = UIKeyboardType.namePhonePad
+            $0.cell.textField.keyboardType = .namePhonePad
             $0.cell.textField.autocorrectionType = .no
             $0.cell.textField.setLineBreakMode()
             
             if let recipient = recipientAddress {
-                let trimmed = recipient.components(separatedBy: EthTransferViewController.invalidCharacters).joined()
+                let trimmed = recipient.components(separatedBy: TransferViewControllerBase.invalidCharacters).joined()
                 $0.value = trimmed
             }
             
-            let prefix = UILabel()
-            prefix.text = "0x"
-            prefix.sizeToFit()
+            let prefixLabel = UILabel()
+            prefixLabel.text = prefix
+            prefixLabel.sizeToFit()
             
             let view = UIView()
-            view.addSubview(prefix)
-            view.frame = prefix.frame
+            view.addSubview(prefixLabel)
+            view.frame = prefixLabel.frame
             $0.cell.textField.leftView = view
             $0.cell.textField.leftViewMode = .always
             
             if recipientIsReadonly {
                 $0.disabled = true
-                prefix.textColor = UIColor.lightGray
+                prefixLabel.textColor = UIColor.lightGray
             }
             }.cellUpdate { [weak self] (cell, _) in
                 if let text = cell.textField.text {
-                    cell.textField.text = text.components(separatedBy: EthTransferViewController.invalidCharacters).joined()
+                    cell.textField.text = text.components(separatedBy: TransferViewControllerBase.invalidCharacters).joined()
                     
                     guard self?.recipientIsReadonly == false else { return }
                     
@@ -192,9 +188,10 @@ final class ERC20TransferViewController: TransferViewControllerBase {
                 }
                 
                 if let text = row.value {
-                    var trimmed = text.components(separatedBy: EthTransferViewController.invalidCharacters).joined()
-                    if trimmed.starts(with: "0x") {
-                        let i = trimmed.index(trimmed.startIndex, offsetBy: 2)
+                    var trimmed = text.components(separatedBy: TransferViewControllerBase.invalidCharacters).joined()
+                    if let prefix = self?.prefix,
+                       trimmed.starts(with: prefix) {
+                        let i = trimmed.index(trimmed.startIndex, offsetBy: prefix.count)
                         trimmed = String(trimmed[i...])
                     }
                     
