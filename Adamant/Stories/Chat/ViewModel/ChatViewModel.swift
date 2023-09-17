@@ -60,6 +60,7 @@ final class ChatViewModel: NSObject {
     private let minDiffCountForOffset = 5
     private let minDiffCountForAnimateScroll = 20
     private let partnerImageSize: CGFloat = 25
+    private let maxMessageLenght: Int = 10000
     private var previousArg: ChatContextMenuArguments?
 
     let minIndexForStartLoadNewMessages = 4
@@ -568,6 +569,15 @@ final class ChatViewModel: NSObject {
                 didDismissMenuAction: didDismissMenuAction
             )
         )
+    }
+    
+    func canSendMessage(withText text: String) -> Bool {
+        guard text.count <= maxMessageLenght else {
+            dialog.send(.alert(.adamant.chat.messageIsTooBig))
+            return false
+        }
+        
+        return true
     }
 }
 
