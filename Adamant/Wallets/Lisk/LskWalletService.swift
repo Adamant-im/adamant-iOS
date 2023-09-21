@@ -267,7 +267,8 @@ class LskWalletService: WalletService {
                         fee: 0.00141,
                         nonce: wallet.nounce,
                         senderPublicKey: wallet.keyPair.publicKeyString,
-                        recipientAddress: wallet.binaryAddress
+                        recipientAddressBase32: wallet.address,
+                        recipientAddressBinary: wallet.binaryAddress
                     ).signed(
                         with: wallet.keyPair,
                         for: self.netHash
