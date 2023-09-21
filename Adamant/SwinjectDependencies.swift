@@ -286,15 +286,6 @@ extension Container {
             )
         }.inObjectScope(.container)
         
-        // MARK: Notifications in app service
-        self.register(NotificationInAppService.self) { r in
-            AdamantNotificationInAppService(
-                chatsProvider: r.resolve(ChatsProvider.self)!,
-                dialogService: r.resolve(DialogService.self)!,
-                accountService: r.resolve(AccountService.self)!
-            )
-        }.inObjectScope(.container)
-        
         // MARK: Bitcoin AddressConverterFactory
         self.register(AddressConverterFactory.self) { _ in
             AddressConverterFactory()
