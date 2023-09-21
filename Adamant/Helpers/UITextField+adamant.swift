@@ -142,9 +142,18 @@ extension UITextField {
     func enablePasswordToggle() {
         let button = UIButton(type: .custom)
         updatePasswordToggleImage(button)
-        button.frame = CGRect(x: .zero, y: .zero, width: 25, height: 25)
         button.addTarget(self, action: #selector(togglePasswordView(_:)), for: .touchUpInside)
-        rightView = button
+        
+        let contanerView = UIView()
+        contanerView.addSubview(button)
+        button.snp.makeConstraints { make in
+            make.directionalEdges.equalToSuperview().inset(3)
+        }
+        contanerView.snp.makeConstraints { make in
+            make.size.equalTo(28)
+        }
+        
+        rightView = contanerView
         rightViewMode = .always
     }
     
