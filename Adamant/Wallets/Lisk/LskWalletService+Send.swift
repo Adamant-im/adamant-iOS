@@ -50,7 +50,7 @@ extension LskWalletService: WalletServiceTwoStepSend {
             fee: self.transactionFee,
             nonce: wallet.nounce,
             senderPublicKey: wallet.keyPair.publicKeyString,
-            recipientAddress: recipient,
+            recipientAddressBase32: recipient,
             recipientAddressBinary: binaryAddress
         )
         

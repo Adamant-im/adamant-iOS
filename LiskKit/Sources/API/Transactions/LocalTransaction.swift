@@ -64,7 +64,7 @@ public struct TransactionEntity {
 
     public struct Asset {
         public var amount: UInt64
-        public var recipientAddress: String
+        public var recipientAddressBase32: String
         public var recipientAddressBinary: String
         public var data: String = ""
         
@@ -117,7 +117,7 @@ public struct TransactionEntity {
         fee: Decimal,
         nonce: String,
         senderPublicKey: String,
-        recipientAddress: String,
+        recipientAddressBase32: String,
         recipientAddressBinary: String
     ) {
         let amount = Crypto.fixedPoint(amount: amount)
@@ -127,7 +127,7 @@ public struct TransactionEntity {
             fee: fee,
             nonce: nonce,
             senderPublicKey: senderPublicKey,
-            recipientAddress: recipientAddress,
+            recipientAddressBase32: recipientAddressBase32,
             recipientAddressBinary: recipientAddressBinary
         )
     }
@@ -137,7 +137,7 @@ public struct TransactionEntity {
         fee: UInt64,
         nonce: String,
         senderPublicKey: String,
-        recipientAddress: String,
+        recipientAddressBase32: String,
         recipientAddressBinary: String,
         signatures: [String] = []
     ) {
@@ -146,7 +146,7 @@ public struct TransactionEntity {
         self.senderPublicKey = senderPublicKey
         self.asset = .init(
             amount: amount,
-            recipientAddress: recipientAddress,
+            recipientAddressBase32: recipientAddressBase32,
             recipientAddressBinary: recipientAddressBinary
         )
         self.signatures = signatures
