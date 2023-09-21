@@ -24,5 +24,6 @@ extension ChatTransaction {
     @NSManaged public var status: Int16
     @NSManaged public var chatroom: Chatroom?
     @NSManaged public var lastIn: Chatroom?
+    @NSManaged public var isFake: Bool
 
 }

@@ -424,6 +424,10 @@ extension ChatMessageCell {
             actionHandler(.copy(text: model.text.string))
         }
         
+        guard !model.isFake else {
+            return AMenuSection([copy])
+        }
+        
         return AMenuSection([reply, copy, report, remove])
     }
     

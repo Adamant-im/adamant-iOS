@@ -26,6 +26,7 @@ enum ChatDialog {
     case progress(Bool)
     case failedMessageAlert(id: String, sender: UIAlertController.SourceView)
     case presentMenu(
+        presentReactions: Bool,
         arg: ChatContextMenuArguments,
         didSelectEmojiDelegate: ElegantEmojiPickerDelegate?,
         didSelectEmojiAction: ChatDialogManager.DidSelectEmojiAction,

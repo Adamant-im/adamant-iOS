@@ -42,6 +42,7 @@
     </entity>
     <entity name="ChatTransaction" representedClassName="ChatTransaction" isAbstract="YES" parentEntity="BaseTransaction" syncable="YES">
         <attribute name="chatMessageId" attributeType="String"/>
+        <attribute name="isFake" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="isHidden" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="isUnread" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="showsChatroom" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
