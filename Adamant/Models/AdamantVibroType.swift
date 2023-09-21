@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum AdamantVibroType {
+enum AdamantVibroType: CaseIterable {
     case light
     case rigid
     case heavy
@@ -18,8 +18,4 @@ enum AdamantVibroType {
     case success
     case warning
     case error
-    
-    static var allCases: [AdamantVibroType] {
-        return [.light, .rigid, .heavy, .medium, .soft, .selection, .success, .warning, .error]
-    }
 }
