@@ -42,7 +42,10 @@ extension Container {
         // MARK: - Services with dependencies
         // MARK: DialogService
         self.register(DialogService.self) { r in
-            AdamantDialogService(router: r.resolve(Router.self)!)
+            AdamantDialogService(
+                router: r.resolve(Router.self)!,
+                vibroService: r.resolve(VibroService.self)!
+            )
         }.inObjectScope(.container)
         
         // MARK: Notifications
@@ -75,6 +78,11 @@ extension Container {
             AdamantEmojiService(
                 securedStore: r.resolve(SecuredStore.self)!
             )
+        }.inObjectScope(.container)
+        
+        // MARK: VibroService
+        self.register(VibroService.self) { r in
+            AdamantVibroService()
         }.inObjectScope(.container)
         
         // MARK: CrashlysticsService
@@ -237,6 +245,11 @@ extension Container {
         // MARK: Contribute screen factory
         self.register(ContributeFactory.self) { r in
             ContributeFactory(crashliticsService: r.resolve(CrashlyticsService.self)!)
+        }.inObjectScope(.container)
+        
+        // MARK: Vibration screen factory
+        self.register(VibrationSelectionFactory.self) { r in
+            VibrationSelectionFactory(vibroService: r.resolve(VibroService.self)!)
         }.inObjectScope(.container)
         
         // MARK: Rich transaction status service

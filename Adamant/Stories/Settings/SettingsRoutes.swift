@@ -61,6 +61,10 @@ extension AdamantScene {
             r.resolve(ContributeFactory.self)!.makeViewController()
         })
         
+        static let vibration = AdamantScene(identifier: "Vibration", factory: { r in
+            r.resolve(VibrationSelectionFactory.self)!.makeViewController()
+        })
+        
         private init() {}
     }
 }
