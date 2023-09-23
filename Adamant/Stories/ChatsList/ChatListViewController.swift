@@ -794,6 +794,8 @@ extension ChatListViewController {
             let image: UIImage
             if let ava = partner.avatar, let img = UIImage.asset(named: ava) {
                 image = img
+            } else if let publicKey = partner.publicKey {
+                image = avatarService.avatar(for: publicKey, size: 30)
             } else {
                 image = defaultAvatar
             }
