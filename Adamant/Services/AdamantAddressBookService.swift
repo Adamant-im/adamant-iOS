@@ -9,6 +9,7 @@
 import UIKit
 import Clibsodium
 import Combine
+import CommonKit
 
 @MainActor
 final class AdamantAddressBookService: AddressBookService {
@@ -117,6 +118,14 @@ final class AdamantAddressBookService: AddressBookService {
     
     @MainActor func getName(for key: String) -> String? {
         return addressBook[key]?.checkAndReplaceSystemWallets()
+    }
+    
+    @MainActor func getName(for partner: BaseAccount?) -> String? {
+        guard let partenerAddress = partner?.address else {
+            return nil
+        }
+        
+        return partner?.name?.checkAndReplaceSystemWallets() ?? getName(for: partenerAddress)
     }
     
     func set(name: String, for address: String) async {

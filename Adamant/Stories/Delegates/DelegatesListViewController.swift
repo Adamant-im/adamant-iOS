@@ -8,17 +8,18 @@
 
 import UIKit
 import SnapKit
+import CommonKit
 
 // MARK: - Localization
-extension String.adamantLocalized {
+extension String.adamant {
     struct delegates {
-        static let title = NSLocalizedString("Delegates.Title", comment: "Delegates page: scene title")
+        static let title = String.localized("Delegates.Title", comment: "Delegates page: scene title")
         
-        static let notEnoughtTokensForVote = NSLocalizedString("Delegates.NotEnoughtTokensForVote", comment: "Delegates tab: Message about 50 ADM fee for vote")
+        static let notEnoughtTokensForVote = String.localized("Delegates.NotEnoughtTokensForVote", comment: "Delegates tab: Message about 50 ADM fee for vote")
         
-        static let timeOutBeforeNewVote = NSLocalizedString("Delegates.timeOutBeforeNewVote", comment: "Delegates tab: Message about time out for new vote")
+        static let timeOutBeforeNewVote = String.localized("Delegates.timeOutBeforeNewVote", comment: "Delegates tab: Message about time out for new vote")
         
-        static let success = NSLocalizedString("Delegates.Vote.Success", comment: "Delegates: Message for Successfull voting")
+        static let success = String.localized("Delegates.Vote.Success", comment: "Delegates: Message for Successfull voting")
         
         private init() { }
     }
@@ -136,30 +137,37 @@ final class DelegatesListViewController: KeyboardObservingViewController {
             return
         }
         
-        apiService.getDelegatesWithVotes(for: address, limit: activeDelegates) { (result) in
-            switch result {
-            case .success(let delegates):
-                let checkedNames = self.delegates.filter { $0.isChecked }.map { $0.delegate.username }
-                let checkedDelegates = delegates.map { CheckedDelegate(delegate: $0) }
-                for name in checkedNames {
-                    if let i = delegates.firstIndex(where: { $0.username == name }) {
-                        checkedDelegates[i].isChecked = true
+        Task {
+            await apiService.getDelegatesWithVotes(
+                for: address,
+                limit: activeDelegates
+            ) { result in
+                Task { @MainActor [weak self] in
+                    guard let self = self else { return }
+                    
+                    switch result {
+                    case .success(let delegates):
+                        let checkedNames = self.delegates
+                            .filter { $0.isChecked }
+                            .map { $0.delegate.username }
+                        
+                        let checkedDelegates = delegates.map { CheckedDelegate(delegate: $0) }
+                        for name in checkedNames {
+                            if let i = delegates.firstIndex(where: { $0.username == name }) {
+                                checkedDelegates[i].isChecked = true
+                            }
+                        }
+                        
+                        self.delegates = checkedDelegates
+                        self.tableView.reloadData()
+                    case .failure(let error):
+                        self.dialogService.showRichError(error: error)
                     }
+                    
+                    refreshControl.endRefreshing()
+                    self.updateVotePanel()
+                    self.removeLoadingView()
                 }
-                
-                self.delegates = checkedDelegates
-                
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                }
-            case .failure(let error):
-                self.dialogService.showRichError(error: error)
-            }
-            
-            DispatchQueue.main.async {
-                refreshControl.endRefreshing()
-                self.updateVotePanel()
-                self.removeLoadingView()
             }
         }
     }
@@ -175,7 +183,7 @@ final class DelegatesListViewController: KeyboardObservingViewController {
     }
     
     private func setupNavigationItem() {
-        navigationItem.title = String.adamantLocalized.delegates.title
+        navigationItem.title = String.adamant.delegates.title
         navigationItem.searchController = searchController
         
         navigationItem.rightBarButtonItem = .init(
@@ -278,7 +286,7 @@ extension DelegatesListViewController: AdamantDelegateCellDelegate {
 private extension DelegatesListViewController {
     func vote() {
         if forcedUpdateTimer != nil {
-            self.dialogService.showWarning(withMessage: String.adamantLocalized.delegates.timeOutBeforeNewVote)
+            self.dialogService.showWarning(withMessage: String.adamant.delegates.timeOutBeforeNewVote)
             return
         }
         
@@ -294,7 +302,7 @@ private extension DelegatesListViewController {
         }
         
         guard account.balance > Decimal(votingCost) else {
-            self.dialogService.showWarning(withMessage: String.adamantLocalized.delegates.notEnoughtTokensForVote)
+            self.dialogService.showWarning(withMessage: String.adamant.delegates.notEnoughtTokensForVote)
             return
         }
         
@@ -312,25 +320,33 @@ private extension DelegatesListViewController {
         
         dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
 
-        apiService.voteForDelegates(from: account.address, keypair: keypair, votes: votes) { result in
-            switch result {
-            case .success:
-                self.dialogService.showSuccess(withMessage: String.adamantLocalized.delegates.success)
+        Task {
+            await apiService.voteForDelegates(
+                from: account.address,
+                keypair: keypair,
+                votes: votes
+            ) { result in
+                Task { @MainActor [weak self] in
+                    self?.dialogService.dismissProgress()
+                    
+                    switch result {
+                    case .success:
+                        self?.dialogService.showSuccess(withMessage: String.adamant.delegates.success)
 
-                checkedDelegates.forEach {
-                    $1.isChecked = false
-                    $1.delegate.voted = !$1.delegate.voted
-                    $1.isUpdating = true
-                }
-                
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                    self.updateVotePanel()
-                    self.scheduleUpdate()
-                }
+                        checkedDelegates.forEach {
+                            $1.isChecked = false
+                            $1.delegate.voted = !$1.delegate.voted
+                            $1.isUpdating = true
+                        }
+                        
+                        self?.tableView.reloadData()
+                        self?.updateVotePanel()
+                        self?.scheduleUpdate()
 
-            case .failure(let error):
-                self.dialogService.showRichError(error: TransfersProviderError.serverError(error))
+                    case .failure(let error):
+                        self?.dialogService.showRichError(error: TransfersProviderError.serverError(error))
+                    }
+                }
             }
         }
     }

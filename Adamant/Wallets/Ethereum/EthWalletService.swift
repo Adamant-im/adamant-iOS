@@ -14,6 +14,7 @@ import Alamofire
 import BigInt
 import Web3Core
 import Combine
+import CommonKit
 
 struct EthWalletStorage {
     let keystore: BIP32Keystore
@@ -68,7 +69,7 @@ class EthWalletService: WalletService {
 	// MARK: - Constants
 	let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")
 	
-	static let currencyLogo = #imageLiteral(resourceName: "ethereum_wallet")
+	static let currencyLogo = UIImage.asset(named: "ethereum_wallet") ?? .init()
     
     var tokenSymbol: String {
         return type(of: self).currencySymbol
@@ -531,6 +532,7 @@ extension EthWalletService: InitiatedWithPassphraseService {
 
 // MARK: - Dependencies
 extension EthWalletService: SwinjectDependentService {
+    @MainActor
     func injectDependencies(from container: Container) {
         accountService = container.resolve(AccountService.self)
         apiService = container.resolve(ApiService.self)
@@ -597,13 +599,15 @@ extension EthWalletService {
             return
         }
         
-        apiService.store(key: EthWalletService.kvsAddress, value: ethAddress, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
-            switch result {
-            case .success:
-                completion(.success)
-                
-            case .failure(let error):
-                completion(.failure(error: .apiError(error)))
+        Task {
+            await apiService.store(key: EthWalletService.kvsAddress, value: ethAddress, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
+                switch result {
+                case .success:
+                    completion(.success)
+                    
+                case .failure(let error):
+                    completion(.failure(error: .apiError(error)))
+                }
             }
         }
     }
@@ -760,7 +764,7 @@ extension EthWalletService: PrivateKeyGenerator {
     }
     
     var rowImage: UIImage? {
-        return #imageLiteral(resourceName: "ethereum_wallet_row")
+        return .asset(named: "ethereum_wallet_row")
     }
     
     func generatePrivateKeyFor(passphrase: String) -> String? {

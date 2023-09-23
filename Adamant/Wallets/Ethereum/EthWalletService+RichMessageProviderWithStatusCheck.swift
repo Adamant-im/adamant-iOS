@@ -9,6 +9,7 @@
 import Foundation
 import web3swift
 import Web3Core
+import CommonKit
 
 extension EthWalletService: RichMessageProviderWithStatusCheck {
     func statusInfoFor(transaction: RichMessageTransaction) async -> TransactionStatusInfo {

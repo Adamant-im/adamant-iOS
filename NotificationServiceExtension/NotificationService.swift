@@ -8,6 +8,7 @@
 
 import UserNotifications
 import MarkdownKit
+import CommonKit
 
 class NotificationService: UNNotificationServiceExtension {
     private let passphraseStoreKey = "accountService.passphrase"
@@ -113,6 +114,8 @@ class NotificationService: UNNotificationServiceExtension {
                 = AdamantNotificationUserInfoKeys.partnerNoDisplayNameValue
         }
         
+        var shouldIgnoreNotification = false
+        
         // MARK: 5. Content
         switch transaction.type {
         // MARK: Messages
@@ -204,6 +207,32 @@ class NotificationService: UNNotificationServiceExtension {
                     content = notificationContent
                 }
                 
+                // reaction
+                if let data = message.data(using: String.Encoding.utf8),
+                   let richContent = RichMessageTools.richContent(from: data),
+                   let reaction = richContent[RichContentKeys.react.react_message] as? String,
+                   richContent[RichContentKeys.react.reactto_id] != nil {
+                    
+                    /* Ignoring will be later
+                    guard !reaction.isEmpty else {
+                        shouldIgnoreNotification = true
+                        break
+                    }
+                     */
+                    
+                    let text = reaction.isEmpty
+                    ? NotificationStrings.modifiedReaction
+                    : "\(NotificationStrings.reacted) \(reaction)"
+                    
+                    content = NotificationContent(
+                        title: partnerName ?? partnerAddress,
+                        subtitle: nil,
+                        body: MarkdownParser().parse(text).string,
+                        attachments: nil,
+                        categoryIdentifier: AdamantNotificationCategories.message
+                    )
+                }
+                
                 guard let content = content else {
                     break
                 }
@@ -225,6 +254,11 @@ class NotificationService: UNNotificationServiceExtension {
             
         default:
             break
+        }
+        
+        guard !shouldIgnoreNotification else {
+            contentHandler(UNNotificationContent())
+            return
         }
         
         // MARK: 6. Other configurations

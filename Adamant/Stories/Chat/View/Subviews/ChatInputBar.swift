@@ -9,6 +9,7 @@
 import UIKit
 import InputBarAccessoryView
 import SnapKit
+import CommonKit
 
 final class ChatInputBar: InputBarAccessoryView {
     var onAttachmentButtonTap: (() -> Void)?
@@ -66,7 +67,7 @@ private extension ChatInputBar {
         attachmentButton.isEnabled = isEnabled
         
         inputTextView.placeholder = isEnabled
-            ? .adamantLocalized.chat.messageInputPlaceholder
+            ? .adamant.chat.messageInputPlaceholder
             : ""
             
         inputTextView.backgroundColor = isEnabled
@@ -134,7 +135,7 @@ private extension ChatInputBar {
         sendButton.tintColor = .adamant.primary
         sendButton.setSize(.init(width: buttonWidth, height: buttonHeight), animated: false)
         sendButton.title = nil
-        sendButton.image = #imageLiteral(resourceName: "Arrow")
+        sendButton.image = .asset(named: "Arrow")
     }
     
     func configureTextView() {
@@ -143,6 +144,7 @@ private extension ChatInputBar {
         inputTextView.layer.borderWidth = 1
         inputTextView.layer.cornerRadius = cornerRadius
         inputTextView.layer.masksToBounds = true
+        inputTextView.isImagePasteEnabled = false
         
         inputTextView.textContainerInset = .init(
             top: baseInsetSize + 2,
@@ -171,7 +173,7 @@ private extension ChatInputBar {
             self?.onAttachmentButtonTap?()
         }
         
-        button.image = #imageLiteral(resourceName: "Attachment")
+        button.image = .asset(named: "Attachment")
         button.setSize(
             .init(width: attachmentButtonSize, height: attachmentButtonSize),
             animated: false

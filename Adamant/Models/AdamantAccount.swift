@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CommonKit
 
 struct AdamantAccount {
     let address: String

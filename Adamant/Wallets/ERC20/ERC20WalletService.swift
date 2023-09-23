@@ -14,6 +14,7 @@ import Alamofire
 import struct BigInt.BigUInt
 import Web3Core
 import Combine
+import CommonKit
 
 class ERC20WalletService: WalletService {
     // MARK: - Constants
@@ -439,6 +440,7 @@ extension ERC20WalletService: InitiatedWithPassphraseService {
 
 // MARK: - Dependencies
 extension ERC20WalletService: SwinjectDependentService {
+    @MainActor
     func injectDependencies(from container: Container) {
         accountService = container.resolve(AccountService.self)
         apiService = container.resolve(ApiService.self)

@@ -11,15 +11,20 @@ import CoreData
 import MarkdownKit
 import MessageKit
 import Combine
+import CommonKit
 
-extension String.adamantLocalized {
+extension String.adamant {
     struct chatList {
-        static let title = NSLocalizedString("ChatListPage.Title", comment: "ChatList: scene title")
-        static let sentMessagePrefix = NSLocalizedString("ChatListPage.SentMessagePrefix", comment: "ChatList: outgoing message prefix")
-        static let syncingChats = NSLocalizedString("ChatListPage.SyncingChats", comment: "ChatList: First syncronization is in progress")
-        static let searchPlaceholder = NSLocalizedString("ChatListPage.SearchBar.Placeholder", comment: "ChatList: SearchBar placeholder text")
+        static let title = String.localized("ChatListPage.Title", comment: "ChatList: scene title")
+        static let sentMessagePrefix = String.localized("ChatListPage.SentMessagePrefix", comment: "ChatList: outgoing message prefix")
+        static let syncingChats = String.localized("ChatListPage.SyncingChats", comment: "ChatList: First syncronization is in progress")
+        static let searchPlaceholder = String.localized("ChatListPage.SearchBar.Placeholder", comment: "ChatList: SearchBar placeholder text")
         
-        static let blockUser = NSLocalizedString("Chats.BlockUser", comment: "Block this user?")
+        static let blockUser = String.localized("Chats.BlockUser", comment: "Block this user?")
+        
+        static let removedReaction = String.localized("ChatListPage.RemovedReaction", comment: "ChatList: Removed Reaction?")
+        
+        static let reacted = String.localized("ChatListPage.Reacted", comment: "ChatList: Reacted")
         
         private init() {}
     }
@@ -55,7 +60,7 @@ class ChatListViewController: KeyboardObservingViewController {
     
     private var preservedMessagess = [String:String]()
     
-    let defaultAvatar = #imageLiteral(resourceName: "avatar-chat-placeholder")
+    let defaultAvatar = UIImage.asset(named: "avatar-chat-placeholder") ?? .init()
     
     private lazy var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
@@ -96,7 +101,7 @@ class ChatListViewController: KeyboardObservingViewController {
     }()
     
     private lazy var updatingIndicatorView: UpdatingIndicatorView = {
-        let view = UpdatingIndicatorView(title: String.adamantLocalized.chatList.title)
+        let view = UpdatingIndicatorView(title: String.adamant.chatList.title)
         return view
     }()
     
@@ -134,7 +139,7 @@ class ChatListViewController: KeyboardObservingViewController {
         setupSearchController()
         
         // MARK: Busy Indicator
-        busyIndicatorLabel.text = String.adamantLocalized.chatList.syncingChats
+        busyIndicatorLabel.text = String.adamant.chatList.syncingChats
         
         busyIndicatorView.layer.cornerRadius = 14
         busyIndicatorView.clipsToBounds = true
@@ -194,7 +199,7 @@ class ChatListViewController: KeyboardObservingViewController {
             searchController = UISearchController(searchResultsController: searchResultController)
             searchController?.searchResultsUpdater = self
             searchController?.searchBar.delegate = self
-            searchController?.searchBar.placeholder = String.adamantLocalized.chatList.searchPlaceholder
+            searchController?.searchBar.placeholder = String.adamant.chatList.searchPlaceholder
             definesPresentationContext = true
             
             searchController?.obscuresBackgroundDuringPresentation = false
@@ -558,7 +563,7 @@ extension ChatListViewController {
     private func configureCell(_ cell: ChatTableViewCell, for chatroom: Chatroom) {
         cell.backgroundColor = .clear
         if let partner = chatroom.partner {
-            if let avatarName = partner.avatar, let avatar = UIImage.init(named: avatarName) {
+            if let avatarName = partner.avatar, let avatar = UIImage.asset(named: avatarName) {
                 cell.avatarImage = avatar
                 cell.avatarImageView.tintColor = UIColor.adamant.primary
             } else {
@@ -589,7 +594,7 @@ extension ChatListViewController {
             cell.lastMessageLabel.text = nil
         }
                 
-        if let date = chatroom.updatedAt as Date?, date != Date.adamantNullDate {
+        if let date = chatroom.updatedAt as Date?, date != .adamantNullDate {
             cell.dateLabel.text = date.humanizedDay()
         } else {
             cell.dateLabel.text = nil
@@ -787,7 +792,7 @@ extension ChatListViewController {
             let text = shortDescription(for: transaction)
             
             let image: UIImage
-            if let ava = partner.avatar, let img = UIImage(named: ava) {
+            if let ava = partner.avatar, let img = UIImage.asset(named: ava) {
                 image = img
             } else {
                 image = defaultAvatar
@@ -836,7 +841,7 @@ extension ChatListViewController {
             
             let raw: String
             if message.isOutgoing {
-                raw = "\(String.adamantLocalized.chatList.sentMessagePrefix)\(text)"
+                raw = "\(String.adamant.chatList.sentMessagePrefix)\(text)"
             } else {
                 raw = text
             }
@@ -858,12 +863,12 @@ extension ChatListViewController {
                 return provider.shortDescription(for: richMessage)
             }
             
-            if richMessage.isReply,
+            if richMessage.additionalType == .reply,
                let content = richMessage.richContent,
                let text = content[RichContentKeys.reply.replyMessage] as? String {
                 
                 let prefix = richMessage.isOutgoing
-                ? "\(String.adamantLocalized.chatList.sentMessagePrefix)"
+                ? "\(String.adamant.chatList.sentMessagePrefix)"
                 : ""
                 
                 let replyImageAttachment = NSTextAttachment()
@@ -879,15 +884,32 @@ extension ChatListViewController {
                     height: 20
                 )
                 
+                let extraSpace = richMessage.isOutgoing ? "  " : ""
                 let imageString = NSAttributedString(attachment: replyImageAttachment)
                 
-                let markDownText = markdownParser.parse("  \(text)").resolveLinkColor()
+                let markDownText = markdownParser.parse("\(extraSpace)\(text)").resolveLinkColor()
                 
                 let fullString = NSMutableAttributedString(string: prefix)
-                fullString.append(imageString)
+                if richMessage.isOutgoing {
+                    fullString.append(imageString)
+                }
                 fullString.append(markDownText)
                 
                 return fullString
+            }
+            
+            if richMessage.additionalType == .reaction,
+               let content = richMessage.richContent,
+               let reaction = content[RichContentKeys.react.react_message] as? String {
+                let prefix = richMessage.isOutgoing
+                ? "\(String.adamant.chatList.sentMessagePrefix)"
+                : ""
+                
+                let text = reaction.isEmpty
+                ? NSMutableAttributedString(string: "\(prefix)\(String.adamant.chatList.removedReaction) \(reaction)")
+                : NSMutableAttributedString(string: "\(prefix)\(String.adamant.chatList.reacted) \(reaction)")
+                
+                return text
             }
             
             if let serialized = richMessage.serializedMessage() {
@@ -899,7 +921,7 @@ extension ChatListViewController {
             /*
             if richMessage.isOutgoing {
                 let mutable = NSMutableAttributedString(attributedString: description)
-                let prefix = NSAttributedString(string: String.adamantLocalized.chatList.sentMessagePrefix)
+                let prefix = NSAttributedString(string: String.adamant.chatList.sentMessagePrefix)
                 mutable.insert(prefix, at: 0)
                 return mutable.attributedSubstring(from: NSRange(location: 0, length: mutable.length))
             } else {
@@ -953,7 +975,7 @@ extension ChatListViewController {
     private func makeBlockContextualAction(for chatroom: Chatroom) -> UIContextualAction {
         let block = UIContextualAction(
             style: .destructive,
-            title: .adamantLocalized.chat.block
+            title: .adamant.chat.block
         ) { [weak self] (_, _, completionHandler) in
             guard let address = chatroom.partner?.address else {
                 completionHandler(false)
@@ -961,12 +983,12 @@ extension ChatListViewController {
             }
             
             self?.dialogService.showAlert(
-                title: String.adamantLocalized.chatList.blockUser,
+                title: String.adamant.chatList.blockUser,
                 message: nil,
                 style: .alert,
                 actions: [
                     .init(
-                        title: .adamantLocalized.alert.ok,
+                        title: .adamant.alert.ok,
                         style: .destructive,
                         handler: {
                             self?.blockChat(with: address, for: chatroom)
@@ -974,7 +996,7 @@ extension ChatListViewController {
                         }
                     ),
                     .init(
-                        title: .adamantLocalized.alert.cancel,
+                        title: .adamant.alert.cancel,
                         style: .default,
                         handler: { completionHandler(false) }
                     )
@@ -983,7 +1005,7 @@ extension ChatListViewController {
             )
         }
         
-        block.image = #imageLiteral(resourceName: "swipe_block")
+        block.image = .asset(named: "swipe_block")
         
         return block
     }
@@ -998,7 +1020,7 @@ extension ChatListViewController {
             completionHandler(true)
         }
         
-        markAsRead.image = #imageLiteral(resourceName: "swipe_mark-as-read")
+        markAsRead.image = .asset(named: "swipe_mark-as-read")
         markAsRead.backgroundColor = UIColor.adamant.primary
         return markAsRead
     }
@@ -1066,13 +1088,13 @@ extension ChatListViewController {
                 message: nil,
                 style: UIAlertController.Style.actionSheet,
                 actions: [share, rename, cancel],
-                from: view
+                from: .view(view)
             )
             
             completionHandler(true)
         }
         
-        more.image = #imageLiteral(resourceName: "swipe_more")
+        more.image = .asset(named: "swipe_more")
         more.backgroundColor = .adamant.secondary
         return more
     }
@@ -1109,7 +1131,7 @@ extension ChatListViewController {
     
     private func makeRenameAction(for address: String) -> UIAlertAction {
         .init(
-            title: .adamantLocalized.chat.rename,
+            title: .adamant.chat.rename,
             style: .default
         ) { [weak self] _ in
             guard let alert = self?.makeRenameAlert(for: address) else { return }
@@ -1121,19 +1143,20 @@ extension ChatListViewController {
     
     private func makeRenameAlert(for address: String) -> UIAlertController? {
         let alert = UIAlertController(
-            title: .init(format: .adamantLocalized.chat.actionsBody, address),
+            title: .init(format: .adamant.chat.actionsBody, address),
             message: nil,
-            preferredStyle: .alert
+            preferredStyleSafe: .alert,
+            source: nil
         )
         
         alert.addTextField { [weak self] textField in
-            textField.placeholder = .adamantLocalized.chat.name
+            textField.placeholder = .adamant.chat.name
             textField.autocapitalizationType = .words
             textField.text = self?.addressBook.getName(for: address)
         }
         
         let renameAction = UIAlertAction(
-            title: .adamantLocalized.chat.rename,
+            title: .adamant.chat.rename,
             style: .default
         ) { [weak self] _ in
             guard
@@ -1153,7 +1176,7 @@ extension ChatListViewController {
     }
     
     private func makeCancelAction() -> UIAlertAction {
-        .init(title: .adamantLocalized.alert.cancel, style: .cancel, handler: nil)
+        .init(title: .adamant.alert.cancel, style: .cancel, handler: nil)
     }
 }
 
@@ -1193,7 +1216,7 @@ extension ChatListViewController {
         chatsController?.fetchedObjects?.enumerated().forEach({ (i, room) in
             guard index == 0,
                   let date = room.updatedAt as? Date,
-                  date == Date.adamantNullDate
+                  date == .adamantNullDate
             else {
                 return
             }

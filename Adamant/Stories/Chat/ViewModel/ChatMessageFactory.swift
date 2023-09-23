@@ -9,6 +9,7 @@
 import UIKit
 import MarkdownKit
 import MessageKit
+import CommonKit
 
 struct ChatMessageFactory {
     private let richMessageProviders: [String: RichMessageProvider]
@@ -120,10 +121,11 @@ private extension ChatMessageFactory {
         case let transaction as MessageTransaction:
             return makeContent(
                 transaction,
+                isFromCurrentSender: isFromCurrentSender,
                 backgroundColor: backgroundColor
             )
         case let transaction as RichMessageTransaction:
-            if transaction.isReply,
+            if transaction.additionalType == .reply,
                !transaction.isTransferReply() {
                 return makeReplyContent(
                     transaction,
@@ -150,6 +152,7 @@ private extension ChatMessageFactory {
     
     func makeContent(
         _ transaction: MessageTransaction,
+        isFromCurrentSender: Bool,
         backgroundColor: ChatMessageBackgroundColor
     ) -> ChatMessage.Content {
         transaction.message.map {
@@ -164,11 +167,27 @@ private extension ChatMessageFactory {
                 range: NSRange(location: 0, length: attributedString.length)
             )
             
+            let reactions = transaction.reactions
+            
+            let address = transaction.isOutgoing
+            ? transaction.senderAddress
+            : transaction.recipientAddress
+            
+            let opponentAddress = transaction.isOutgoing
+            ? transaction.recipientAddress
+            : transaction.senderAddress
+            
             return .message(.init(
                 value: .init(
                     id: transaction.txId,
                     text: mutableAttributedString,
-                    backgroundColor: backgroundColor)
+                    backgroundColor: backgroundColor,
+                    isFromCurrentSender: isFromCurrentSender,
+                    reactions: reactions,
+                    address: address,
+                    opponentAddress: opponentAddress,
+                    isHidden: false
+                )
             ))
         } ?? .default
     }
@@ -186,15 +205,29 @@ private extension ChatMessageFactory {
         
         let decodedMessage = transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) ?? "..."
         let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
+        let reactions = transaction.richContent?[RichContentKeys.react.reactions] as? Set<Reaction>
+        
+        let address = transaction.isOutgoing
+        ? transaction.senderAddress
+        : transaction.recipientAddress
+        
+        let opponentAddress = transaction.isOutgoing
+        ? transaction.recipientAddress
+        : transaction.senderAddress
         
         return .reply(.init(
             value: .init(
-            id: transaction.txId,
-            replyId: replyId,
-            message: Self.markdownParser.parse(replyMessage),
-            messageReply: decodedMessageMarkDown,
-            backgroundColor: backgroundColor,
-            isFromCurrentSender: isFromCurrentSender)
+                id: transaction.txId,
+                replyId: replyId,
+                message: Self.markdownParser.parse(replyMessage),
+                messageReply: decodedMessageMarkDown,
+                backgroundColor: backgroundColor,
+                isFromCurrentSender: isFromCurrentSender,
+                reactions: reactions,
+                address: address,
+                opponentAddress: opponentAddress,
+                isHidden: false
+            )
         ))
     }
     
@@ -209,6 +242,15 @@ private extension ChatMessageFactory {
         let decodedMessage = transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) ?? "..."
         let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
         let replyId = transaction.getRichValue(for: RichContentKeys.reply.replyToId) ?? ""
+        let reactions = transaction.richContent?[RichContentKeys.react.reactions] as? Set<Reaction>
+        
+        let address = transaction.isOutgoing
+        ? transaction.senderAddress
+        : transaction.recipientAddress
+        
+        let opponentAddress = transaction.isOutgoing
+        ? transaction.recipientAddress
+        : transaction.senderAddress
         
         return .transaction(.init(value: .init(
             id: id,
@@ -216,8 +258,8 @@ private extension ChatMessageFactory {
             content: .init(
                 id: id,
                 title: isFromCurrentSender
-                    ? .adamantLocalized.chat.transactionSent
-                    : .adamantLocalized.chat.transactionReceived,
+                    ? .adamant.chat.transactionSent
+                    : .adamant.chat.transactionReceived,
                 icon: richMessageProviders[transfer.type]?.tokenLogo ?? .init(),
                 amount: AdamantBalanceFormat.full.format(transfer.amount),
                 currency: richMessageProviders[transfer.type]?.tokenSymbol ?? "",
@@ -226,9 +268,13 @@ private extension ChatMessageFactory {
                 backgroundColor: backgroundColor,
                 isReply: transaction.isTransferReply(),
                 replyMessage: decodedMessageMarkDown,
-                replyId: replyId
+                replyId: replyId,
+                isHidden: false
             ),
-            status: transaction.transactionStatus ?? .notInitiated
+            status: transaction.transactionStatus ?? .notInitiated,
+            reactions: reactions,
+            address: address,
+            opponentAddress: opponentAddress
         )))
     }
     
@@ -242,6 +288,15 @@ private extension ChatMessageFactory {
         let decodedMessage = transaction.decodedReplyMessage ?? "..."
         let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
         let replyId = transaction.replyToId ?? ""
+        let reactions = transaction.reactions
+        
+        let address = transaction.isOutgoing
+        ? transaction.senderAddress
+        : transaction.recipientAddress
+        
+        let opponentAddress = transaction.isOutgoing
+        ? transaction.recipientAddress
+        : transaction.senderAddress
         
         return .transaction(.init(value: .init(
             id: id,
@@ -249,8 +304,8 @@ private extension ChatMessageFactory {
             content: .init(
                 id: id,
                 title: isFromCurrentSender
-                    ? .adamantLocalized.chat.transactionSent
-                    : .adamantLocalized.chat.transactionReceived,
+                    ? .adamant.chat.transactionSent
+                    : .adamant.chat.transactionReceived,
                 icon: AdmWalletService.currencyLogo,
                 amount: AdamantBalanceFormat.full.format(
                     (transaction.amount ?? .zero) as Decimal
@@ -261,9 +316,13 @@ private extension ChatMessageFactory {
                 backgroundColor: backgroundColor,
                 isReply: !replyId.isEmpty,
                 replyMessage: decodedMessageMarkDown,
-                replyId: replyId
+                replyId: replyId,
+                isHidden: false
             ),
-            status: transaction.statusEnum.toTransactionStatus()
+            status: transaction.statusEnum.toTransactionStatus(),
+            reactions: reactions,
+            address: address,
+            opponentAddress: opponentAddress
         )))
     }
     
@@ -312,7 +371,7 @@ private extension ChatMessageFactory {
     
     func makePendingMessageString() -> NSAttributedString {
         let attachment = NSTextAttachment()
-        attachment.image = UIImage(named: "status_pending")
+        attachment.image = .asset(named: "status_pending")
         attachment.bounds = CGRect(x: .zero, y: -1, width: 7, height: 7)
         return NSAttributedString(attachment: attachment)
     }

@@ -11,6 +11,7 @@ import Eureka
 import SafariServices
 import MarkdownKit
 import ProcedureKit
+import CommonKit
 
 class NotificationsViewController: FormViewController {
 
@@ -32,10 +33,10 @@ class NotificationsViewController: FormViewController {
         
         var localized: String {
             switch self {
-            case .notifications: return NSLocalizedString("SecurityPage.Section.NotificationsType", comment: "Security: Selected notifications types")
-            case .aboutNotificationTypes: return NSLocalizedString("SecurityPage.Section.AboutNotificationTypes", comment: "Security: About Notification types")
-            case .messages: return NSLocalizedString("SecurityPage.Section.Messages", comment: "Security: Messages Notification sound")
-            case .settings: return NSLocalizedString("SecurityPage.Section.Settings", comment: "Security: Settings Notification")
+            case .notifications: return .localized("SecurityPage.Section.NotificationsType", comment: "Security: Selected notifications types")
+            case .aboutNotificationTypes: return .localized("SecurityPage.Section.AboutNotificationTypes", comment: "Security: About Notification types")
+            case .messages: return .localized("SecurityPage.Section.Messages", comment: "Security: Messages Notification sound")
+            case .settings: return .localized("SecurityPage.Section.Settings", comment: "Security: Settings Notification")
             }
         }
     }
@@ -58,11 +59,11 @@ class NotificationsViewController: FormViewController {
         
         var localized: String {
             switch self {
-            case .notificationsMode: return NSLocalizedString("SecurityPage.Row.Notifications", comment: "Security: Show notifications")
-            case .description: return NSLocalizedString("SecurityPage.Row.Notifications.ModesDescription", comment: "Security: Notification modes description. Markdown supported.")
-            case .github: return NSLocalizedString("SecurityPage.Row.VisitGithub", comment: "Security: Visit Github")
-            case .systemSettings: return NSLocalizedString("Notifications.Settings.System", comment: "Notifications: Open system Settings")
-            case .sound: return NSLocalizedString("Notifications.Sound.Name", comment: "Notifications: Select Sound")
+            case .notificationsMode: return .localized("SecurityPage.Row.Notifications", comment: "Security: Show notifications")
+            case .description: return .localized("SecurityPage.Row.Notifications.ModesDescription", comment: "Security: Notification modes description. Markdown supported.")
+            case .github: return .localized("SecurityPage.Row.VisitGithub", comment: "Security: Visit Github")
+            case .systemSettings: return .localized("Notifications.Settings.System", comment: "Notifications: Open system Settings")
+            case .sound: return .localized("Notifications.Sound.Name", comment: "Notifications: Select Sound")
             }
         }
     }
@@ -84,7 +85,7 @@ class NotificationsViewController: FormViewController {
         super.viewDidLoad()
 
         navigationItem.largeTitleDisplayMode = .always
-        navigationItem.title = String.adamantLocalized.security.title
+        navigationItem.title = String.adamant.security.title
         navigationOptions = .Disabled
         
         // MARK: Notifications
@@ -184,7 +185,7 @@ class NotificationsViewController: FormViewController {
         let githubRow = LabelRow {
             $0.tag = Rows.github.tag
             $0.title = Rows.github.localized
-            $0.cell.imageView?.image = #imageLiteral(resourceName: "row_github")
+            $0.cell.imageView?.image = .asset(named: "row_github")
             $0.cell.imageView?.tintColor = UIColor.adamant.tableRowIcons
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
@@ -265,9 +266,14 @@ class NotificationsViewController: FormViewController {
     }
     
     private func presentNotificationsDeniedError() {
-        let alert = UIAlertController(title: nil, message: String.adamantLocalized.notifications.notificationsDisabled, preferredStyle: .alert)
+        let alert = UIAlertController(
+            title: nil,
+            message: NotificationStrings.notificationsDisabled,
+            preferredStyleSafe: .alert,
+            source: nil
+        )
         
-        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
+        alert.addAction(UIAlertAction(title: String.adamant.alert.settings, style: .default) { _ in
             DispatchQueue.main.async {
                 if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
                     UIApplication.shared.open(settingsURL)
@@ -275,7 +281,7 @@ class NotificationsViewController: FormViewController {
             }
         })
         
-        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: String.adamant.alert.cancel, style: .cancel, handler: nil))
         alert.modalPresentationStyle = .overFullScreen
         present(alert, animated: true, completion: nil)
     }

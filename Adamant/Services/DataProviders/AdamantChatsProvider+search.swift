@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreData
+import CommonKit
 
 extension AdamantChatsProvider {
     func getMessages(containing text: String, in chatroom: Chatroom?) -> [MessageTransaction]? {

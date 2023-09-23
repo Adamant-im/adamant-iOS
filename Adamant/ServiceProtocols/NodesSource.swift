@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CommonKit
 
 // MARK: - Notifications
 extension Notification.Name {

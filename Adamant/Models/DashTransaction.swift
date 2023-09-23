@@ -10,7 +10,7 @@ import Foundation
 import BitcoinKit
 
 class DashTransaction: BaseBtcTransaction {
-    override class var defaultCurrencySymbol: String? { return DashWalletService.currencySymbol }
+    override var defaultCurrencySymbol: String? { DashWalletService.currencySymbol }
 }
 
 struct BtcBlock: Decodable {

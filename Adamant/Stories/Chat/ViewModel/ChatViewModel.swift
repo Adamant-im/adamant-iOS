@@ -10,6 +10,9 @@ import Combine
 import CoreData
 import MarkdownKit
 import UIKit
+import CommonKit
+import AdvancedContextMenuKit
+import ElegantEmojiPicker
 
 @MainActor
 final class ChatViewModel: NSObject {
@@ -26,7 +29,11 @@ final class ChatViewModel: NSObject {
     private let richTransactionStatusService: RichTransactionStatusService
     private let chatCacheService: ChatCacheService
     private let richMessageProviders: [String: RichMessageProvider]
+    private let avatarService: AvatarService
+    private let emojiService: EmojiService
     
+    let chatMessagesListViewModel: ChatMessagesListViewModel
+
     // MARK: Properties
     
     private var tasksStorage = TaskManager()
@@ -52,8 +59,11 @@ final class ChatViewModel: NSObject {
     private var tempCancellables = Set<AnyCancellable>()
     private let minDiffCountForOffset = 5
     private let minDiffCountForAnimateScroll = 20
+    private let partnerImageSize: CGFloat = 25
+    private var previousArg: ChatContextMenuArguments?
 
     let minIndexForStartLoadNewMessages = 4
+    let minOffsetForStartLoadNewMessages: CGFloat = 100
     var tempOffsets: [String] = []
     var needToAnimateCellIndex: Int?
 
@@ -62,6 +72,9 @@ final class ChatViewModel: NSObject {
     let didTapAdmChat = ObservableSender<(Chatroom, String?)>()
     let didTapAdmSend = ObservableSender<AdamantAddress>()
     let closeScreen = ObservableSender<Void>()
+    let updateChatRead = ObservableSender<Void>()
+    let commitVibro = ObservableSender<Void>()
+    let layoutIfNeeded = ObservableSender<Void>()
     
     @ObservableValue private(set) var isHeaderLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
@@ -70,6 +83,7 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var isSendingAvailable = false
     @ObservableValue private(set) var fee = ""
     @ObservableValue private(set) var partnerName: String?
+    @ObservableValue private(set) var partnerImage: UIImage?
     @ObservableValue private(set) var isNeedToAnimateScroll = false
     @ObservableValue var swipeState: SwipeableView.State = .ended
     @ObservableValue var inputText = ""
@@ -87,7 +101,7 @@ final class ChatViewModel: NSObject {
     
     var freeTokensURL: URL? {
         guard let address = accountService.account?.address else { return nil }
-        let urlString: String = .adamantLocalized.wallets.getFreeTokensUrl(for: address)
+        let urlString: String = .adamant.wallets.getFreeTokensUrl(for: address)
         
         guard let url = URL(string: urlString) else {
             dialog.send(.error(
@@ -98,6 +112,10 @@ final class ChatViewModel: NSObject {
         }
         
         return url
+    }
+    
+    private var hiddenMessageID: String? {
+        didSet { updateHiddenMessage(&messages) }
     }
     
     init(
@@ -111,7 +129,10 @@ final class ChatViewModel: NSObject {
         accountProvider: AccountsProvider,
         richTransactionStatusService: RichTransactionStatusService,
         chatCacheService: ChatCacheService,
-        richMessageProviders: [String: RichMessageProvider]
+        richMessageProviders: [String: RichMessageProvider],
+        avatarService: AvatarService,
+        chatMessagesListViewModel: ChatMessagesListViewModel,
+        emojiService: EmojiService
     ) {
         self.chatsProvider = chatsProvider
         self.markdownParser = markdownParser
@@ -124,6 +145,9 @@ final class ChatViewModel: NSObject {
         self.accountProvider = accountProvider
         self.richTransactionStatusService = richTransactionStatusService
         self.chatCacheService = chatCacheService
+        self.avatarService = avatarService
+        self.chatMessagesListViewModel = chatMessagesListViewModel
+        self.emojiService = emojiService
         super.init()
         setupObservers()
     }
@@ -141,7 +165,7 @@ final class ChatViewModel: NSObject {
         controller = chatsProvider.getChatController(for: chatroom)
         controller?.delegate = self
         isSendingAvailable = !chatroom.isReadonly
-        updateTitle()
+        updatePartnerInformation()
         updateAttachmentButtonAvailability()
         
         if let account = account {
@@ -168,6 +192,13 @@ final class ChatViewModel: NSObject {
             }
             
             let isChatLoaded = await chatsProvider.isChatLoaded(with: address)
+            let isChatLoading = await chatsProvider.isChatLoading(with: address)
+            
+            guard !isChatLoading else {
+                await waitForChatLoading(with: address)
+                updateTransactions(performFetch: true)
+                return
+            }
             
             if address == AdamantContacts.adamantWelcomeWallet.name || isChatLoaded {
                 updateTransactions(performFetch: true)
@@ -179,7 +210,6 @@ final class ChatViewModel: NSObject {
     
     func loadMoreMessagesIfNeeded() {
         guard !isLoading else { return }
-        
         Task {
             guard
                 let address = chatroom?.partner?.address,
@@ -300,7 +330,7 @@ final class ChatViewModel: NSObject {
             transaction.isHidden = true
             try? transaction.managedObjectContext?.save()
             
-            await chatroom?.updateLastTransaction()
+            chatroom?.updateLastTransaction()
             await chatsProvider.removeMessage(with: transaction.transactionId)
         }
     }
@@ -346,7 +376,7 @@ final class ChatViewModel: NSObject {
             } catch {
                 switch error as? ChatsProviderError {
                 case .invalidTransactionStatus:
-                    dialog.send(.warning(.adamantLocalized.chat.cancelError))
+                    dialog.send(.warning(.adamant.chat.cancelError))
                 default:
                     dialog.send(.richError(error))
                 }
@@ -377,6 +407,11 @@ final class ChatViewModel: NSObject {
         
         Task {
             do {
+                guard await !chatsProvider.isMessageDeleted(id: message.replyId) else {
+                    dialog.send(.alert(.adamant.chat.messageWasDeleted))
+                    return
+                }
+                
                 if !chatTransactions.contains(
                     where: { $0.transactionId == message.replyId }
                 ) {
@@ -418,12 +453,12 @@ final class ChatViewModel: NSObject {
     func replyMessageIfNeeded(_ messageModel: MessageModel?) {
         let message = messages.first(where: { $0.messageId == messageModel?.id })
         guard message?.status != .failed else {
-            dialog.send(.warning(String.adamantLocalized.reply.failedMessageError))
+            dialog.send(.warning(String.adamant.reply.failedMessageError))
             return
         }
         
         guard message?.status != .pending else {
-            dialog.send(.warning(String.adamantLocalized.reply.pendingMessageError))
+            dialog.send(.warning(String.adamant.reply.pendingMessageError))
             return
         }
         
@@ -446,7 +481,7 @@ final class ChatViewModel: NSObject {
     
     func copyMessageAction(_ text: String) {
         UIPasteboard.general.string = text
-        dialog.send(.toast(.adamantLocalized.alert.copiedToPasteboardNotification))
+        dialog.send(.toast(.adamant.alert.copiedToPasteboardNotification))
     }
     
     func reportMessageAction(_ id: String) {
@@ -455,6 +490,84 @@ final class ChatViewModel: NSObject {
     
     func removeMessageAction(_ id: String) {
         dialog.send(.removeMessageAlert(id: id))
+    }
+    
+    func reactAction(_ id: String, emoji: String) {
+        guard let partnerAddress = chatroom?.partner?.address else { return }
+        
+        guard chatroom?.partner?.isDummy != true else {
+            dialog.send(.dummy(partnerAddress))
+            return
+        }
+        
+        Task {
+            let message: AdamantMessage = .richMessage(
+                payload: RichMessageReaction(
+                    reactto_id: id,
+                    react_message: emoji
+                )
+            )
+            
+            guard await validateSendingMessage(message: message) else { return }
+            
+            do {
+                _ = try await chatsProvider.sendMessage(
+                    message,
+                    recipientId: partnerAddress,
+                    from: chatroom
+                )
+            } catch {
+                await handleMessageSendingError(error: error, sentText: emoji)
+            }
+        }.stored(in: tasksStorage)
+    }
+    
+    func clearReplyMessage() {
+        replyMessage = nil
+    }
+    
+    func presentMenu(arg: ChatContextMenuArguments) {
+        let didSelectEmojiAction: ChatDialogManager.DidSelectEmojiAction = { [weak self] emoji, messageId in
+            self?.dialog.send(.dismissMenu)
+            
+            let emoji = emoji == arg.selectedEmoji
+            ? ""
+            : emoji
+            
+            let type: EmojiUpdateType = emoji.isEmpty
+            ? .decrement
+            : .increment
+            
+            self?.emojiService.updateFrequentlySelectedEmojis(
+                selectedEmoji: emoji,
+                type: type
+            )
+            
+            self?.reactAction(messageId, emoji: emoji)
+            self?.previousArg = nil
+        }
+        
+        let didPresentMenuAction: ChatDialogManager.ContextMenuAction = { [weak self] messageId in
+            self?.hiddenMessageID = messageId
+        }
+        
+        let didDismissMenuAction: ChatDialogManager.ContextMenuAction = { [weak self] _ in
+            self?.hiddenMessageID = nil
+            self?.layoutIfNeeded.send()
+            self?.previousArg = nil
+        }
+        
+        previousArg = arg
+        
+        dialog.send(
+            .presentMenu(
+                arg: arg,
+                didSelectEmojiDelegate: self,
+                didSelectEmojiAction: didSelectEmojiAction,
+                didPresentMenuAction: didPresentMenuAction,
+                didDismissMenuAction: didDismissMenuAction
+            )
+        )
     }
 }
 
@@ -533,14 +646,26 @@ private extension ChatViewModel {
             try? controller?.performFetch()
         }
         
-        chatTransactions = controller?.fetchedObjects ?? []
-        updateMessages(resetLoadingProperty: performFetch)
+        let newTransactions = controller?.fetchedObjects ?? []
+        let isNewReaction = isNewReaction(old: chatTransactions, new: newTransactions)
+        chatTransactions = newTransactions
+        
+        updateMessages(
+            resetLoadingProperty: performFetch,
+            completion: isNewReaction
+                ? { [commitVibro] in commitVibro.send() }
+                : {}
+        )
     }
     
-    func updateMessages(resetLoadingProperty: Bool) {
+    func updateMessages(
+        resetLoadingProperty: Bool,
+        completion: @MainActor @escaping () -> Void = {}
+    ) {
         timerSubscription = nil
         
         Task(priority: .userInitiated) { [chatTransactions, sender] in
+            defer { completion() }
             var expirationTimestamp: TimeInterval?
 
             let messages = await chatMessagesListFactory.makeMessages(
@@ -555,6 +680,12 @@ private extension ChatViewModel {
                 resetLoadingProperty: resetLoadingProperty,
                 expirationTimestamp: expirationTimestamp
             )
+            
+            // The 'makeMessages' method doesn't include reactions.
+            // If the message count is different from the number of transactions, update the chat read status if necessary.
+            if messages.count != chatTransactions.count {
+                updateChatRead.send()
+            }
         }
     }
     
@@ -563,6 +694,9 @@ private extension ChatViewModel {
         resetLoadingProperty: Bool,
         expirationTimestamp: TimeInterval?
     ) async {
+        var newMessages = newMessages
+        updateHiddenMessage(&newMessages)
+        
         messages = newMessages
         
         if let address = chatroom?.partner?.address {
@@ -633,8 +767,24 @@ private extension ChatViewModel {
         fee = "~\(feeString)"
     }
     
-    func updateTitle() {
+    func updatePartnerInformation() {
+        guard let publicKey = chatroom?.partner?.publicKey else {
+            return
+        }
+        
         partnerName = chatroom?.getName(addressBookService: addressBookService)
+        
+        guard let avatarName = chatroom?.partner?.avatar,
+              let avatar = UIImage.asset(named: avatarName)
+        else {
+            partnerImage = avatarService.avatar(
+                for: publicKey,
+                size: partnerImageSize
+            )
+            return
+        }
+        
+        partnerImage = avatar
     }
     
     func updateAttachmentButtonAvailability() {
@@ -667,7 +817,7 @@ private extension ChatViewModel {
                 self.dialog.send(.progress(false))
                 if let apiError = apiError as? ApiServiceError,
                    case .internalError(let message, _) = apiError,
-                   message == String.adamantLocalized.sharedErrors.unknownError {
+                   message == String.adamant.sharedErrors.unknownError {
                     self.dialog.send(.alert(AccountsProviderError.notFound(address: address).localized))
                     return
                 }
@@ -705,5 +855,110 @@ private extension ChatViewModel {
     func startNewChat(with chatroom: Chatroom, name: String? = nil, message: String? = nil) {
         setNameIfNeeded(for: chatroom.partner, chatroom: chatroom, name: name)
         didTapAdmChat.send((chatroom, message))
+    }
+    
+    func waitForChatLoading(with address: String) async {
+        await withUnsafeContinuation { continuation in
+            Task {
+                await chatsProvider.chatLoadingStatusPublisher
+                    .filter { $0.contains(
+                        where: {
+                            $0.key == address && $0.value == .loaded
+                        })
+                    }
+                    .receive(on: DispatchQueue.main)
+                    .sink { [weak self] _ in
+                        self?.tempCancellables.removeAll()
+                        continuation.resume()
+                    }.store(in: &tempCancellables)
+            }
+        }
+    }
+    
+    func updateHiddenMessage(_ messages: inout [ChatMessage]) {
+        messages.indices.forEach {
+            messages[$0].isHidden = messages[$0].id == hiddenMessageID
+        }
+    }
+    
+    func isNewReaction(old: [ChatTransaction], new: [ChatTransaction]) -> Bool {
+        guard
+            let processedDate = old.getMostRecentElementDate(),
+            let newLastReactionDate = new.getMostRecentReactionDate()
+        else { return false }
+        
+        return newLastReactionDate > processedDate
+    }
+}
+
+private extension ChatMessage {
+    var isHidden: Bool {
+        get {
+            switch content {
+            case let .message(model):
+                return model.value.isHidden
+            case let .reply(model):
+                return model.value.isHidden
+            case let .transaction(model):
+                return model.value.content.isHidden
+            }
+        }
+        
+        set {
+            switch content {
+            case let .message(model):
+                var model = model.value
+                model.isHidden = newValue
+                content = .message(.init(value: model))
+            case let .reply(model):
+                var model = model.value
+                model.isHidden = newValue
+                content = .reply(.init(value: model))
+            case let .transaction(model):
+                var model = model.value
+                model.content.isHidden = newValue
+                content = .transaction(.init(value: model))
+            }
+        }
+    }
+}
+
+private extension Sequence where Element == ChatTransaction {
+    func getMostRecentElementDate() -> Date? {
+        map { $0.sentDate ?? .adamantNullDate }.max()
+    }
+    
+    func getMostRecentReactionDate() -> Date? {
+        compactMap {
+            guard
+                let tx = $0 as? RichMessageTransaction,
+                tx.additionalType == .reaction
+            else { return nil }
+            
+            return $0.sentDate ?? .adamantNullDate
+        }.max()
+    }
+}
+
+extension ChatViewModel: ElegantEmojiPickerDelegate {
+    func emojiPicker(_ picker: ElegantEmojiPicker, didSelectEmoji emoji: Emoji?) {
+        dialog.send(.dismissMenu)
+        
+        guard let previousArg = previousArg else { return }
+        
+        let emoji = emoji?.emoji == previousArg.selectedEmoji
+        ? ""
+        : (emoji?.emoji ?? "")
+        
+        let type: EmojiUpdateType = emoji.isEmpty
+        ? .decrement
+        : .increment
+        
+        emojiService.updateFrequentlySelectedEmojis(
+            selectedEmoji: emoji,
+            type: type
+        )
+        
+        reactAction(previousArg.messageId, emoji: emoji)
     }
 }

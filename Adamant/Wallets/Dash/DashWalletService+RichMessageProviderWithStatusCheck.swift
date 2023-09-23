@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CommonKit
 
 extension DashWalletService: RichMessageProviderWithStatusCheck {
     func statusInfoFor(transaction: RichMessageTransaction) async -> TransactionStatusInfo {

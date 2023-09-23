@@ -8,8 +8,9 @@
 
 import Foundation
 import Combine
+import CommonKit
 
-class AdamantVisibleWalletsService: VisibleWalletsService {
+final class AdamantVisibleWalletsService: VisibleWalletsService {
     
     // MARK: Dependencies
     let securedStore: SecuredStore
@@ -29,9 +30,9 @@ class AdamantVisibleWalletsService: VisibleWalletsService {
         }
     }
     
-    private var invisibleWallets: [String] = []
-    private var indexesWallets: [String] = []
-    private var notificationsSet: Set<AnyCancellable> = []
+    @Atomic private var invisibleWallets: [String] = []
+    @Atomic private var indexesWallets: [String] = []
+    @Atomic private var notificationsSet: Set<AnyCancellable> = []
     
     // MARK: Lifecycle
     init(securedStore: SecuredStore, accountService: AccountService) {

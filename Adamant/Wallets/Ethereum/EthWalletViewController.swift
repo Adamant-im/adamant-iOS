@@ -7,11 +7,12 @@
 //
 
 import UIKit
+import CommonKit
 
-extension String.adamantLocalized.wallets {
-    static let ethereum = NSLocalizedString("AccountTab.Wallets.ethereum_wallet", comment: "Account tab: Ethereum wallet")
+extension String.adamant.wallets {
+    static let ethereum = String.localized("AccountTab.Wallets.ethereum_wallet", comment: "Account tab: Ethereum wallet")
     
-    static let sendEth = NSLocalizedString("AccountTab.Row.SendEth", comment: "Account tab: 'Send ETH tokens' button")
+    static let sendEth = String.localized("AccountTab.Row.SendEth", comment: "Account tab: 'Send ETH tokens' button")
 }
 
 class EthWalletViewController: WalletViewControllerBase {
@@ -20,11 +21,11 @@ class EthWalletViewController: WalletViewControllerBase {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        walletTitleLabel.text = String.adamantLocalized.wallets.ethereum
+        walletTitleLabel.text = String.adamant.wallets.ethereum
     }
     
     override func sendRowLocalizedLabel() -> NSAttributedString {
-        return NSAttributedString(string: String.adamantLocalized.wallets.sendEth)
+        return NSAttributedString(string: String.adamant.wallets.sendEth)
     }
     
     override func encodeForQr(address: String) -> String? {

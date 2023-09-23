@@ -72,7 +72,7 @@ class VisibleWalletsTableViewCell: UITableViewCell {
     }
     
     func setupView() {
-        checkmarkRowView.checkmarkImage = #imageLiteral(resourceName: "status_success")
+        checkmarkRowView.checkmarkImage = .asset(named: "status_success")
         checkmarkRowView.checkmarkImageBorderColor = UIColor.adamant.secondary
         
         contentView.addSubview(checkmarkRowView)

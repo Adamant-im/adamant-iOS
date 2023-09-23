@@ -11,6 +11,7 @@ import Swinject
 import Alamofire
 import BitcoinKit
 import Combine
+import CommonKit
 
 enum DefaultBtcTransferFee: Decimal {
     case high = 24000
@@ -54,9 +55,9 @@ struct BtcApiCommands {
 }
 
 // MARK: - Localization
-extension String.adamantLocalized {
+extension String.adamant {
     enum BtcWalletService {
-        static let taprootNotSupported = NSLocalizedString("WalletServices.SharedErrors.BtcTaproot", comment: "")
+        static let taprootNotSupported = String.localized("WalletServices.SharedErrors.BtcTaproot", comment: "")
     }
 }
 
@@ -121,7 +122,7 @@ final class BtcWalletService: WalletService {
     var addressConverter: AddressConverter!
     
     // MARK: - Constants
-    static var currencyLogo = #imageLiteral(resourceName: "bitcoin_wallet")
+    static var currencyLogo = UIImage.asset(named: "bitcoin_wallet") ?? .init()
 
     static let multiplier = Decimal(sign: .plus, exponent: 8, significand: 1)
 
@@ -293,7 +294,7 @@ final class BtcWalletService: WalletService {
         case .p2pk, .p2pkh, .p2sh, .p2multi, .p2wpkh, .p2wpkhSh, .p2wsh:
             return .valid
         case .p2tr:
-            return .invalid(description: .adamantLocalized.BtcWalletService.taprootNotSupported)
+            return .invalid(description: .adamant.BtcWalletService.taprootNotSupported)
         case .unknown, .none:
             return .invalid(description: nil)
         }
@@ -439,6 +440,7 @@ extension BtcWalletService: InitiatedWithPassphraseService {
 
 // MARK: - Dependencies
 extension BtcWalletService: SwinjectDependentService {
+    @MainActor
     func injectDependencies(from container: Container) {
         accountService = container.resolve(AccountService.self)
         apiService = container.resolve(ApiService.self)
@@ -549,13 +551,15 @@ extension BtcWalletService {
             return
         }
         
-        apiService.store(key: BtcWalletService.kvsAddress, value: btcAddress, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
-            switch result {
-            case .success:
-                completion(.success)
-                
-            case .failure(let error):
-                completion(.failure(error: .apiError(error)))
+        Task {
+            await apiService.store(key: BtcWalletService.kvsAddress, value: btcAddress, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
+                switch result {
+                case .success:
+                    completion(.success)
+                    
+                case .failure(let error):
+                    completion(.failure(error: .apiError(error)))
+                }
             }
         }
     }
@@ -589,7 +593,7 @@ extension BtcWalletService {
                 balanceObserver = observer
                 
             default:
-                dialogService.showRichError(error: error)
+                Task { @MainActor in dialogService.showRichError(error: error) }
             }
         }
     }
@@ -618,7 +622,7 @@ extension BtcWalletService {
                 balanceObserver = observer
                 
             default:
-                dialogService.showRichError(error: error)
+                Task { @MainActor in dialogService.showRichError(error: error) }
             }
         }
     }
@@ -721,7 +725,7 @@ extension BtcWalletService: PrivateKeyGenerator {
     }
     
     var rowImage: UIImage? {
-        return #imageLiteral(resourceName: "bitcoin_wallet_row")
+        return .asset(named: "bitcoin_wallet_row")
     }
     
     func generatePrivateKeyFor(passphrase: String) -> String? {
@@ -740,5 +744,5 @@ extension BtcWalletService: PrivateKeyGenerator {
 }
 
 class BtcTransaction: BaseBtcTransaction {
-    override class var defaultCurrencySymbol: String? { return BtcWalletService.currencySymbol }
+    override var defaultCurrencySymbol: String? { BtcWalletService.currencySymbol }
 }

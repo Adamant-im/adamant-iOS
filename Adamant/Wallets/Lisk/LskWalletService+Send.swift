@@ -8,6 +8,7 @@
 
 import UIKit
 import LiskKit
+import CommonKit
 
 extension LocalTransaction: RawTransaction {
     var txHash: String? {

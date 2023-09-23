@@ -10,28 +10,110 @@ import UIKit
 import SnapKit
 import MessageKit
 import Combine
+import SwiftUI
+import AdvancedContextMenuKit
+import CommonKit
 
-final class ChatMessageCell: TextMessageCell, ChatModelView {    
+final class ChatMessageCell: TextMessageCell, ChatModelView {
+    // MARK: Dependencies
+    
+    var chatMessagesListViewModel: ChatMessagesListViewModel?
+    
+    // MARK: Proprieties
+    
     private lazy var swipeView: SwipeableView = {
         let view = SwipeableView(frame: .zero, view: contentView, xPadding: 8)
         return view
     }()
     
-    private lazy var chatMenuManager: ChatMenuManager = {
-        let manager = ChatMenuManager(
-            menu: makeContextMenu(),
-            backgroundColor: model.backgroundColor.uiColor
-        )
-        return manager
+    private lazy var reactionsContanerView: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [ownReactionLabel, opponentReactionLabel])
+        stack.distribution = .fillProportionally
+        stack.axis = .horizontal
+        stack.spacing = 6
+        return stack
     }()
+    
+    private lazy var ownReactionLabel: UILabel = {
+        let label = UILabel()
+        label.text = getReaction(for: model.address)
+        label.backgroundColor = .adamant.pickedReactionBackground
+        label.layer.cornerRadius = ownReactionSize.height / 2
+        label.textAlignment = .center
+        label.layer.masksToBounds = true
+        label.frame.size = ownReactionSize
+        
+        let tapGesture = UITapGestureRecognizer(
+            target: self,
+            action: #selector(tapReactionAction)
+        )
+        
+        label.addGestureRecognizer(tapGesture)
+        label.isUserInteractionEnabled = true
+        return label
+    }()
+    
+    private lazy var opponentReactionLabel: UILabel = {
+        let label = UILabel()
+        label.text = getReaction(for: model.opponentAddress)
+        label.textAlignment = .center
+        label.layer.masksToBounds = true
+        label.backgroundColor = .adamant.pickedReactionBackground
+        label.layer.cornerRadius = opponentReactionSize.height / 2
+        label.frame.size = opponentReactionSize
+        
+        let tapGesture = UITapGestureRecognizer(
+            target: self,
+            action: #selector(tapReactionAction)
+        )
+        
+        label.addGestureRecognizer(tapGesture)
+        label.isUserInteractionEnabled = true
+        return label
+    }()
+    
+    private lazy var chatMenuManager = ChatMenuManager(delegate: self)
     
     // MARK: - Properties
     
     var model: Model = .default {
         didSet {
             guard model != oldValue else { return }
-            chatMenuManager.backgroundColor = model.backgroundColor.uiColor
+            
+            containerView.isHidden = model.isHidden
+            reactionsContanerView.isHidden = model.reactions == nil
+            ownReactionLabel.isHidden = getReaction(for: model.address) == nil
+            opponentReactionLabel.isHidden = getReaction(for: model.opponentAddress) == nil
+            updateOwnReaction()
+            updateOpponentReaction()
+            layoutReactionLabel()
+            
+            swipeView.didSwipeAction = { [actionHandler, model] in
+                actionHandler(.reply(message: model))
+            }
         }
+    }
+    
+    var reactionsContanerViewWidth: CGFloat {
+        if getReaction(for: model.address) == nil &&
+            getReaction(for: model.opponentAddress) == nil {
+            return .zero
+        }
+        
+        if getReaction(for: model.address) != nil &&
+            getReaction(for: model.opponentAddress) != nil {
+            return ownReactionSize.width + opponentReactionSize.width + 6
+        }
+        
+        if getReaction(for: model.address) != nil {
+            return ownReactionSize.width
+        }
+        
+        if getReaction(for: model.opponentAddress) != nil {
+            return opponentReactionSize.width
+        }
+        
+        return .zero
     }
     
     override var isSelected: Bool {
@@ -47,8 +129,18 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
     var subscription: AnyCancellable?
     
     private var containerView: UIView = UIView()
+    private let ownReactionSize = CGSize(width: 40, height: 27)
+    private let opponentReactionSize = CGSize(width: 55, height: 27)
+    private let opponentReactionImageSize = CGSize(width: 12, height: 12)
+    private var layoutAttributes: MessagesCollectionViewLayoutAttributes?
     
     // MARK: - Methods
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        ownReactionLabel.text = nil
+        opponentReactionLabel.attributedText = nil
+    }
     
     override func setupSubviews() {
         super.setupSubviews()
@@ -58,16 +150,13 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
             make.leading.trailing.bottom.top.equalToSuperview()
         }
         
-        swipeView.didSwipeAction = { [weak self] in
-            guard let self = self else { return }
-            self.actionHandler(.reply(message: self.model))
-        }
-        
-        swipeView.swipeStateAction = { [weak self] state in
-            self?.actionHandler(.swipeState(state: state))
+        swipeView.swipeStateAction = { [actionHandler] state in
+            actionHandler(.swipeState(state: state))
         }
         
         configureMenu()
+        
+        contentView.addSubview(reactionsContanerView)
     }
     
     func configureMenu() {
@@ -76,10 +165,71 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         messageContainerView.removeFromSuperview()
         contentView.addSubview(containerView)
         
-        let interaction = UIContextMenuInteraction(delegate: chatMenuManager)
         containerView.addSubview(messageContainerView)
         
-        containerView.addInteraction(interaction)
+        chatMenuManager.setup(for: containerView)
+    }
+    
+    func updateOwnReaction() {
+        ownReactionLabel.text = getReaction(for: model.address)
+        ownReactionLabel.backgroundColor = model.backgroundColor.uiColor.mixin(
+            infusion: .lightGray,
+            alpha: 0.15
+        )
+    }
+    
+    func updateOpponentReaction() {
+        guard let reaction = getReaction(for: model.opponentAddress),
+              let senderPublicKey = getSenderPublicKeyInReaction(for: model.opponentAddress)
+        else {
+            opponentReactionLabel.attributedText = nil
+            opponentReactionLabel.text = nil
+            return
+        }
+        
+        let fullString = NSMutableAttributedString(string: reaction)
+        
+        if let image = chatMessagesListViewModel?.avatarService.avatar(
+            for: senderPublicKey,
+            size: opponentReactionImageSize.width
+        ) {
+            let replyImageAttachment = NSTextAttachment()
+            replyImageAttachment.image = image
+            replyImageAttachment.bounds = .init(
+                origin: .init(x: .zero, y: -3),
+                size: opponentReactionImageSize
+            )
+            
+            let imageString = NSAttributedString(attachment: replyImageAttachment)
+            fullString.append(NSAttributedString(string: " "))
+            fullString.append(imageString)
+        }
+        
+        opponentReactionLabel.attributedText = fullString
+        opponentReactionLabel.backgroundColor = model.backgroundColor.uiColor.mixin(
+            infusion: .lightGray,
+            alpha: 0.15
+        )
+    }
+    
+    func getSenderPublicKeyInReaction(for senderAddress: String) -> String? {
+        model.reactions?.first(
+            where: { $0.sender == senderAddress }
+        )?.senderPublicKey
+    }
+    
+    func getReaction(for address: String) -> String? {
+        model.reactions?.first(
+            where: { $0.sender == address }
+        )?.reaction
+    }
+    
+    override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
+        super.apply(layoutAttributes)
+        guard let attributes = layoutAttributes as? MessagesCollectionViewLayoutAttributes
+        else { return }
+        
+        self.layoutAttributes = attributes
     }
     
     /// Positions the message bubble's top label.
@@ -195,42 +345,151 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         )
         containerView.layoutIfNeeded()
         messageContainerView.layoutIfNeeded()
+        layoutReactionLabel()
+    }
+    
+    func layoutReactionLabel() {
+        let additionalWidth: CGFloat = model.isFromCurrentSender
+        ? .zero
+        : containerView.frame.width
+        
+        var x = containerView.frame.origin.x
+        + additionalWidth
+        - reactionsContanerViewWidth / 2
+        
+        let minSpace = model.isFromCurrentSender
+        ? minReactionsContanerHorizontalSpace + reactionsContanerViewWidth
+        : minReactionsContanerHorizontalSpace
+        
+        x = model.isFromCurrentSender
+        ? contentView.bounds.width - x > minSpace ? x : contentView.bounds.width - minSpace
+        : x > minSpace ? x : minSpace
+        
+        reactionsContanerView.frame = CGRect(
+            origin: .init(
+                x: x,
+                y: containerView.frame.origin.y
+                + containerView.frame.height
+                - reactionsContanerVerticalSpace
+            ),
+            size: .init(width: reactionsContanerViewWidth, height: ownReactionSize.height)
+        )
+        reactionsContanerView.layoutIfNeeded()
+    }
+    
+    override func configure(
+        with message: MessageType,
+        at indexPath: IndexPath,
+        and messagesCollectionView: MessagesCollectionView
+    ) {
+        super.configure(
+            with: message,
+            at: indexPath,
+            and: messagesCollectionView
+        )
+        
+        updateOwnReaction()
+        updateOpponentReaction()
     }
 }
 
 extension ChatMessageCell {
-    func makeContextMenu() -> UIMenu {
-        let remove = UIAction(
-            title: .adamantLocalized.chat.remove,
-            image: UIImage(systemName: "trash"),
-            attributes: .destructive
-        ) { _ in
-            self.actionHandler(.remove(id: self.model.id))
+    func makeContextMenu() -> AMenuSection {
+        let remove = AMenuItem.action(
+            title: .adamant.chat.remove,
+            systemImageName: "trash",
+            style: .destructive
+        ) { [actionHandler, model] in
+            actionHandler(.remove(id: model.id))
         }
         
-        let report = UIAction(
-            title: .adamantLocalized.chat.report,
-            image: UIImage(systemName: "exclamationmark.bubble")
-        ) { _ in
-            self.actionHandler(.report(id: self.model.id))
+        let report = AMenuItem.action(
+            title: .adamant.chat.report,
+            systemImageName: "exclamationmark.bubble"
+        ) { [actionHandler, model] in
+            actionHandler(.report(id: model.id))
         }
         
-        let reply = UIAction(
-            title: .adamantLocalized.chat.reply,
-            image: UIImage(systemName: "arrowshape.turn.up.left")
-        ) { [weak self] _ in
-            guard let self = self else { return }
-            Task { self.actionHandler(.reply(message: self.model)) }
+        let reply = AMenuItem.action(
+            title: .adamant.chat.reply,
+            systemImageName: "arrowshape.turn.up.left"
+        ) { [actionHandler, model] in
+            actionHandler(.reply(message: model))
         }
         
-        let copy = UIAction(
-            title: .adamantLocalized.chat.copy,
-            image: UIImage(systemName: "doc.on.doc")
-        ) { [weak self] _ in
-            guard let self = self else { return }
-            self.actionHandler(.copy(text: self.model.text.string))
+        let copy = AMenuItem.action(
+            title: .adamant.chat.copy,
+            systemImageName: "doc.on.doc"
+        ) { [actionHandler, model] in
+            actionHandler(.copy(text: model.text.string))
         }
         
-        return UIMenu(children: [reply, copy, report, remove])
+        return AMenuSection([reply, copy, report, remove])
+    }
+    
+    @objc func tapReactionAction() {
+        chatMenuManager.presentMenuProgrammatically(for: containerView)
     }
 }
+
+extension ChatMessageCell: ChatMenuManagerDelegate {
+    func getCopyView() -> UIView? {
+        copy(
+            with: model,
+            attributes: layoutAttributes,
+            urlAttributes: messageLabel.urlAttributes,
+            enabledDetectors: messageLabel.enabledDetectors
+        )?.containerView
+    }
+    
+    func presentMenu(
+        copyView: UIView,
+        size: CGSize,
+        location: CGPoint,
+        tapLocation: CGPoint,
+        getPositionOnScreen: @escaping () -> CGPoint
+    ) {
+        let arguments = ChatContextMenuArguments.init(
+            copyView: copyView,
+            size: size,
+            location: location,
+            tapLocation: tapLocation,
+            messageId: model.id,
+            menu: makeContextMenu(),
+            selectedEmoji: getReaction(for: model.address),
+            getPositionOnScreen: getPositionOnScreen
+        )
+        actionHandler(.presentMenu(arg: arguments))
+    }
+}
+
+extension ChatMessageCell {
+    func copy(
+        with model: Model,
+        attributes: MessagesCollectionViewLayoutAttributes?,
+        urlAttributes: [NSAttributedString.Key : Any],
+        enabledDetectors: [DetectorType]
+    ) -> ChatMessageCell? {
+        guard let attributes = attributes else { return nil }
+        
+        let cell = ChatMessageCell(frame: frame)
+        cell.apply(attributes)
+        
+        cell.messageContainerView.backgroundColor = model.backgroundColor.uiColor
+        cell.messageLabel.configure {
+            cell.messageLabel.enabledDetectors = enabledDetectors
+            cell.messageLabel.setAttributes(urlAttributes, detector: .url)
+            cell.messageLabel.attributedText = model.text
+        }
+        cell.messageContainerView.style = .bubbleTail(
+            model.isFromCurrentSender
+                ? .bottomRight
+                : .bottomLeft,
+            .curved
+        )
+        return cell
+    }
+}
+
+private let reactionsContanerVerticalSpace: CGFloat = 10
+private let minReactionsContanerHorizontalSpace: CGFloat = 60

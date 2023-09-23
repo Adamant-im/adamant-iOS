@@ -11,6 +11,7 @@ import Swinject
 import Alamofire
 import BitcoinKit
 import Combine
+import CommonKit
 
 struct DogeApiCommands {
     static func balance(for address: String) -> String {
@@ -61,7 +62,7 @@ class DogeWalletService: WalletService {
     var addressConverter: AddressConverter!
     
     // MARK: - Constants
-    static var currencyLogo = #imageLiteral(resourceName: "doge_wallet")
+    static var currencyLogo = UIImage.asset(named: "doge_wallet") ?? .init()
     static let multiplier = Decimal(sign: .plus, exponent: 8, significand: 1)
     static let chunkSize = 20
  
@@ -312,6 +313,7 @@ extension DogeWalletService: InitiatedWithPassphraseService {
 
 // MARK: - Dependencies
 extension DogeWalletService: SwinjectDependentService {
+    @MainActor
     func injectDependencies(from container: Container) {
         accountService = container.resolve(AccountService.self)
         apiService = container.resolve(ApiService.self)
@@ -400,13 +402,15 @@ extension DogeWalletService {
             return
         }
         
-        apiService.store(key: DogeWalletService.kvsAddress, value: dogeAddress, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
-            switch result {
-            case .success:
-                completion(.success)
-                
-            case .failure(let error):
-                completion(.failure(error: .apiError(error)))
+        Task {
+            await apiService.store(key: DogeWalletService.kvsAddress, value: dogeAddress, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
+                switch result {
+                case .success:
+                    completion(.success)
+                    
+                case .failure(let error):
+                    completion(.failure(error: .apiError(error)))
+                }
             }
         }
     }
@@ -629,7 +633,7 @@ extension DogeWalletService: PrivateKeyGenerator {
     }
     
     var rowImage: UIImage? {
-        return #imageLiteral(resourceName: "doge_wallet_row")
+        return .asset(named: "doge_wallet_row")
     }
     
     func generatePrivateKeyFor(passphrase: String) -> String? {

@@ -9,6 +9,7 @@
 import Foundation
 import Combine
 import Firebase
+import CommonKit
 
 final class AdamantCrashlyticsService: CrashlyticsService {
     
@@ -18,7 +19,7 @@ final class AdamantCrashlyticsService: CrashlyticsService {
     
     // MARK: Proprieties
     
-    private var notificationsSet: Set<AnyCancellable> = []
+    @Atomic private var notificationsSet: Set<AnyCancellable> = []
     private var isConfigured = false
     
     // MARK: Lifecycle

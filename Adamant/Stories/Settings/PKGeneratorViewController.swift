@@ -11,13 +11,14 @@ import EFQRCode
 import Eureka
 import Photos
 import MarkdownKit
+import CommonKit
 
 // MARK: - Localization
-extension String.adamantLocalized {
+extension String.adamant {
     struct pkGenerator {
-        static let title = NSLocalizedString("PkGeneratorScene.Title", comment: "PrivateKeyGenerator: scene title")
-        static let alert = NSLocalizedString("PkGeneratorScene.Alert", comment: "PrivateKeyGenerator: Security alert. Keep your passphrase safe")
-        static let generateButton = NSLocalizedString("PkGeneratorScene.GenerateButton", comment: "PrivateKeyGenerator: Generate button")
+        static let title = String.localized("PkGeneratorScene.Title", comment: "PrivateKeyGenerator: scene title")
+        static let alert = String.localized("PkGeneratorScene.Alert", comment: "PrivateKeyGenerator: Security alert. Keep your passphrase safe")
+        static let generateButton = String.localized("PkGeneratorScene.GenerateButton", comment: "PrivateKeyGenerator: Generate button")
         
         private init() {}
     }
@@ -64,7 +65,7 @@ class PKGeneratorViewController: FormViewController {
         super.viewDidLoad()
         
         navigationItem.largeTitleDisplayMode = .never
-        navigationItem.title = String.adamantLocalized.pkGenerator.title
+        navigationItem.title = String.adamant.pkGenerator.title
         navigationOptions = .Disabled
         
         tableView.showsVerticalScrollIndicator = false
@@ -98,20 +99,20 @@ class PKGeneratorViewController: FormViewController {
             let style = NSMutableParagraphStyle()
             style.alignment = NSTextAlignment.center
             
-            let mutableText = NSMutableAttributedString(attributedString: parser.parse(String.adamantLocalized.pkGenerator.alert))
+            let mutableText = NSMutableAttributedString(attributedString: parser.parse(String.adamant.pkGenerator.alert))
             mutableText.addAttribute(NSAttributedString.Key.paragraphStyle, value: style, range: NSRange(location: 0, length: mutableText.length))
             
             cell.textView.attributedText = mutableText
         }
         
         let passphraseRow = TextAreaRow {
-            $0.placeholder = String.adamantLocalized.qrGenerator.passphrasePlaceholder
+            $0.placeholder = String.adamant.qrGenerator.passphrasePlaceholder
             $0.tag = Rows.passphrase.tag
             $0.textAreaHeight = .dynamic(initialTextViewHeight: 28.0) // 28 for textView and 8+8 for insets
         }
             
         let generateButton = ButtonRow {
-            $0.title = String.adamantLocalized.pkGenerator.generateButton
+            $0.title = String.adamant.pkGenerator.generateButton
             $0.tag = Rows.generateButton.tag
         }.onCellSelection { [weak self] (_, row) in
             guard let row: TextAreaRow = self?.form.rowBy(tag: Rows.passphrase.tag), let passphrase = row.value else {
@@ -146,7 +147,7 @@ class PKGeneratorViewController: FormViewController {
         let passphraseLower = passphrase.lowercased()
         
         guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphraseLower) else {
-            dialogService.showToastMessage(String.adamantLocalized.qrGenerator.wrongPassphraseError)
+            dialogService.showToastMessage(String.adamant.qrGenerator.wrongPassphraseError)
             return
         }
         

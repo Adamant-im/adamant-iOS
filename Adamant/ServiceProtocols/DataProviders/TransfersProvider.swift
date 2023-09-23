@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreData
+import CommonKit
 
 enum TransfersProviderError: Error {
     case notLogged
@@ -35,7 +36,7 @@ extension TransfersProviderError: RichError {
     var message: String {
         switch self {
         case .notLogged:
-            return String.adamantLocalized.sharedErrors.userNotLogged
+            return String.adamant.sharedErrors.userNotLogged
             
         case .serverError(let error):
             return ApiServiceError.serverError(error: error.localizedDescription)
@@ -45,22 +46,22 @@ extension TransfersProviderError: RichError {
             return AccountsProviderError.notFound(address: address).localized
             
         case .internalError(let message, _):
-            return String.adamantLocalized.sharedErrors.internalError(message: message)
+            return String.adamant.sharedErrors.internalError(message: message)
             
         case .transactionNotFound(let id):
-            return String.localizedStringWithFormat(NSLocalizedString("TransfersProvider.Error.TransactionNotFoundFormat", comment: "TransfersProvider: Transaction not found error. %@ for transaction's ID"), id)
+            return String.localizedStringWithFormat(.localized("TransfersProvider.Error.TransactionNotFoundFormat", comment: "TransfersProvider: Transaction not found error. %@ for transaction's ID"), id)
             
         case .dependencyError(let message):
-            return String.adamantLocalized.sharedErrors.internalError(message: message)
+            return String.adamant.sharedErrors.internalError(message: message)
             
         case .networkError:
-            return String.adamantLocalized.sharedErrors.networkError
+            return String.adamant.sharedErrors.networkError
             
         case .notEnoughMoney:
-            return String.adamantLocalized.sharedErrors.notEnoughMoney
+            return String.adamant.sharedErrors.notEnoughMoney
             
         case .requestCancelled:
-            return String.adamantLocalized.sharedErrors.requestCancelled
+            return String.adamant.sharedErrors.requestCancelled
         }
     }
     

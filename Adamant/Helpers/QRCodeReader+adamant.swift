@@ -13,7 +13,7 @@ extension QRCodeReaderViewController {
     static func adamantQrCodeReader() -> QRCodeReaderViewController {
         let builder = QRCodeReaderViewControllerBuilder {
             $0.reader = QRCodeReader(metadataObjectTypes: [.qr ], captureDevicePosition: .back)
-            $0.cancelButtonTitle = String.adamantLocalized.alert.cancel
+            $0.cancelButtonTitle = String.adamant.alert.cancel
             $0.showSwitchCameraButton = false
         }
         

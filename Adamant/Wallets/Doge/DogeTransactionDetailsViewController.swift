@@ -8,6 +8,7 @@
 
 import UIKit
 import Eureka
+import CommonKit
 
 class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies
@@ -67,6 +68,9 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
                 try await updateTransaction()
                 refreshControl.endRefreshing()
             } catch {
+                refreshControl.endRefreshing()
+                updateTransactionStatus()
+                
                 guard !silent else { return }
                 dialogService.showRichError(error: error)
             }

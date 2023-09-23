@@ -8,13 +8,14 @@
 
 import UIKit
 import SnapKit
+import CommonKit
 
 // MARK: - Localization
-extension String.adamantLocalized {
+extension String.adamant {
     enum visibleWallets {
-        static let title = NSLocalizedString("VisibleWallets.Title", comment: "Visible Wallets page: scene title")
-        static let resetAlertTitle = NSLocalizedString("VisibleWallets.ResetListAlert", comment: "VisibleWallets: Reset wallets alert title")
-        static let reset = NSLocalizedString("NodesList.ResetButton", comment: "NodesList: 'Reset' button")
+        static let title = String.localized("VisibleWallets.Title", comment: "Visible Wallets page: scene title")
+        static let resetAlertTitle = String.localized("VisibleWallets.ResetListAlert", comment: "VisibleWallets: Reset wallets alert title")
+        static let reset = String.localized("NodesList.ResetButton", comment: "NodesList: 'Reset' button")
     }
 }
 
@@ -123,7 +124,7 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     }
     
     private func setupView() {
-        navigationItem.title = String.adamantLocalized.visibleWallets.title
+        navigationItem.title = String.adamant.visibleWallets.title
         navigationItem.searchController = searchController
         navigationItem.rightBarButtonItem = UIBarButtonItem.init(barButtonSystemItem: .search, target: self, action: #selector(activateSearch))
         
@@ -145,10 +146,10 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     }
     
     private func resetWalletsAction() {
-        let alert = UIAlertController(title: String.adamantLocalized.visibleWallets.resetAlertTitle, message: nil, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+        let alert = UIAlertController(title: String.adamant.visibleWallets.resetAlertTitle, message: nil, preferredStyleSafe: .alert, source: nil)
+        alert.addAction(UIAlertAction(title: String.adamant.alert.cancel, style: .cancel, handler: nil))
         alert.addAction(UIAlertAction(
-            title: .adamantLocalized.visibleWallets.reset,
+            title: .adamant.visibleWallets.reset,
             style: .destructive,
             handler: { [weak self] _ in
                 self?.visibleWalletsService.reset()

@@ -6,6 +6,9 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
+import UIKit
+import CommonKit
+
 enum ChatAction {
     case forceUpdateTransactionStatus(id: String)
     case openTransactionDetails(id: String)
@@ -15,4 +18,6 @@ enum ChatAction {
     case copy(text: String)
     case report(id: String)
     case remove(id: String)
+    case react(id: String, emoji: String)
+    case presentMenu(arg: ChatContextMenuArguments)
 }

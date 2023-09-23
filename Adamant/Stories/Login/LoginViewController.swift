@@ -9,24 +9,25 @@
 import UIKit
 import Eureka
 import MarkdownKit
+import CommonKit
 
 // MARK: - Localization
-extension String.adamantLocalized {
+extension String.adamant {
     struct login {
-        static let loggingInProgressMessage = NSLocalizedString("LoginScene.LoggingInProgress", comment: "Login: notify user that we are trying to log in")
+        static let loggingInProgressMessage = String.localized("LoginScene.LoggingInProgress", comment: "Login: notify user that we are trying to log in")
         
-        static let loginIntoPrevAccount = NSLocalizedString("LoginScene.LoginIntoAdamant", comment: "Login: Login into previous account with biometry or pincode")
+        static let loginIntoPrevAccount = String.localized("LoginScene.LoginIntoAdamant", comment: "Login: Login into previous account with biometry or pincode")
         
-        static let wrongQrError = NSLocalizedString("LoginScene.Error.WrongQr", comment: "Login: Notify user that scanned QR doesn't contains a passphrase.")
-        static let noQrError = NSLocalizedString("LoginScene.Error.NoQrOnPhoto", comment: "Login: Notify user that picked photo doesn't contains a valid qr code with passphrase")
-        static let noNetworkError = NSLocalizedString("LoginScene.Error.NoInternet", comment: "Login: No network error.")
+        static let wrongQrError = String.localized("LoginScene.Error.WrongQr", comment: "Login: Notify user that scanned QR doesn't contains a passphrase.")
+        static let noQrError = String.localized("LoginScene.Error.NoQrOnPhoto", comment: "Login: Notify user that picked photo doesn't contains a valid qr code with passphrase")
+        static let noNetworkError = String.localized("LoginScene.Error.NoInternet", comment: "Login: No network error.")
         
-        static let cameraNotAuthorized = NSLocalizedString("LoginScene.Error.AuthorizeCamera", comment: "Login: Notify user, that he disabled camera in settings, and need to authorize application.")
-        static let cameraNotSupported = NSLocalizedString("LoginScene.Error.QrNotSupported", comment: "Login: Notify user that device not supported by QR reader")
+        static let cameraNotAuthorized = String.localized("LoginScene.Error.AuthorizeCamera", comment: "Login: Notify user, that he disabled camera in settings, and need to authorize application.")
+        static let cameraNotSupported = String.localized("LoginScene.Error.QrNotSupported", comment: "Login: Notify user that device not supported by QR reader")
         
-        static let photolibraryNotAuthorized = NSLocalizedString("LoginScene.Error.AuthorizePhotolibrary", comment: "Login: User disabled access to photolibrary, he can authorize application in settings")
+        static let photolibraryNotAuthorized = String.localized("LoginScene.Error.AuthorizePhotolibrary", comment: "Login: User disabled access to photolibrary, he can authorize application in settings")
         
-        static let emptyPassphraseAlert = NSLocalizedString("LoginScene.Error.NoPassphrase", comment: "Login: notify user that he is trying to login without a passphrase")
+        static let emptyPassphraseAlert = String.localized("LoginScene.Error.NoPassphrase", comment: "Login: notify user that he is trying to login without a passphrase")
         
         private init() {}
     }
@@ -44,10 +45,10 @@ class LoginViewController: FormViewController {
         var localized: String {
             switch self {
             case .login:
-                return NSLocalizedString("LoginScene.Section.Login", comment: "Login: login with existing passphrase section")
+                return .localized("LoginScene.Section.Login", comment: "Login: login with existing passphrase section")
                 
             case .newAccount:
-                return NSLocalizedString("LoginScene.Section.NewAccount", comment: "Login: Create new account section")
+                return .localized("LoginScene.Section.NewAccount", comment: "Login: Create new account section")
             }
         }
         
@@ -73,31 +74,31 @@ class LoginViewController: FormViewController {
         var localized: String {
             switch self {
             case .passphrase:
-                return NSLocalizedString("LoginScene.Row.Passphrase.Placeholder", comment: "Login: Passphrase placeholder")
+                return .localized("LoginScene.Row.Passphrase.Placeholder", comment: "Login: Passphrase placeholder")
                 
             case .loginButton:
-                return NSLocalizedString("LoginScene.Row.Login", comment: "Login: Login button")
+                return .localized("LoginScene.Row.Login", comment: "Login: Login button")
                 
             case .loginWithQr:
-                return NSLocalizedString("LoginScene.Row.Qr", comment: "Login: Login with QR button.")
+                return .localized("LoginScene.Row.Qr", comment: "Login: Login with QR button.")
                 
             case .loginWithPin:
-                return NSLocalizedString("LoginScene.Row.Pincode", comment: "Login: Login with pincode button")
+                return .localized("LoginScene.Row.Pincode", comment: "Login: Login with pincode button")
                 
             case .saveYourPassphraseAlert:
-                return NSLocalizedString("LoginScene.Row.SavePassphraseAlert", comment: "Login: security alert, notify user that he must save his new passphrase. Markdown supported, center aligned.")
+                return .localized("LoginScene.Row.SavePassphraseAlert", comment: "Login: security alert, notify user that he must save his new passphrase. Markdown supported, center aligned.")
                 
             case .generateNewPassphraseButton:
-                return NSLocalizedString("LoginScene.Row.Generate", comment: "Login: generate new passphrase button")
+                return .localized("LoginScene.Row.Generate", comment: "Login: generate new passphrase button")
                 
             case .tapToSaveHint:
-                return NSLocalizedString("LoginScene.Row.TapToSave", comment: "Login: a small hint for a user, that he can tap on passphrase to save it")
+                return .localized("LoginScene.Row.TapToSave", comment: "Login: a small hint for a user, that he can tap on passphrase to save it")
                 
             case .newPassphrase:
                 return ""
                 
             case .nodes:
-                return String.adamantLocalized.nodesList.nodesListButton
+                return String.adamant.nodesList.nodesListButton
             }
         }
         
@@ -168,7 +169,7 @@ class LoginViewController: FormViewController {
             tableView.tableHeaderView = header
             
             if let label = header.viewWithTag(888) as? UILabel {
-                label.text = String.adamantLocalized.shared.productName
+                label.text = String.adamant.shared.productName
                 label.textColor = UIColor.adamant.primary
             }
         }
@@ -371,15 +372,17 @@ extension LoginViewController {
             return
         }
         
-        dialogService.showProgress(withMessage: String.adamantLocalized.login.loggingInProgressMessage, userInteractionEnable: false)
+        dialogService.showProgress(withMessage: String.adamant.login.loggingInProgressMessage, userInteractionEnable: false)
         
-        apiService.getAccount(byPassphrase: passphrase) { [weak self] result in
-            switch result {
-            case .success:
-                self?.loginIntoExistingAccount(passphrase: passphrase)
-                
-            case .failure(let error):
-                self?.dialogService.showRichError(error: error)
+        Task {
+            await apiService.getAccount(byPassphrase: passphrase) { [weak self] result in
+                switch result {
+                case .success:
+                    self?.loginIntoExistingAccount(passphrase: passphrase)
+                    
+                case .failure(let error):
+                    self?.dialogService.showRichError(error: error)
+                }
             }
         }
     }
@@ -430,7 +433,7 @@ extension LoginViewController {
 
 // MARK: - Button stripe
 extension LoginViewController: ButtonsStripeViewDelegate {
-    func buttonsStripe(_ stripe: ButtonsStripeView, didTapButton button: StripeButtonType) {
+    func buttonsStripe(didTapButton button: StripeButtonType) {
         switch button {
         case .pinpad:
             loginWithPinpad()

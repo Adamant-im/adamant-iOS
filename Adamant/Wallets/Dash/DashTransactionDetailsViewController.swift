@@ -8,6 +8,7 @@
 
 import UIKit
 import Eureka
+import CommonKit
 
 class DashTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies
@@ -105,6 +106,8 @@ class DashTransactionDetailsViewController: TransactionDetailsViewControllerBase
                 self?.refreshControl.endRefreshing()
             } catch {
                 self?.refreshControl.endRefreshing()
+                self?.updateTransactionStatus()
+                
                 guard !silent else { return }
                 self?.dialogService.showRichError(error: error)
             }

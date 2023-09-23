@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CommonKit
 
 class ERC20TransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies
@@ -74,6 +75,7 @@ class ERC20TransactionDetailsViewController: TransactionDetailsViewControllerBas
                 refreshControl.endRefreshing()
             } catch {
                 refreshControl.endRefreshing()
+                updateTransactionStatus()
                 
                 guard !silent else { return }
                 dialogService.showRichError(error: error)

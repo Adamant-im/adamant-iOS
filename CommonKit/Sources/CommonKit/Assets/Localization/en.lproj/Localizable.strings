@@ -1,0 +1,1121 @@
+/* Notification content: error working with transaction */
+"content.error" = "Something went wrong!";
+
+/* Notification content: error format */
+"content.error.format" = "Something went wrong: %@";
+
+/* New transfer notification title */
+"transfer.notificationTitle" = "New Transfer";
+
+/* Transfer notification body format */
+"transfer.notificationBody.format" = "User has transferred you %@";
+
+/* Transfer notification: 'Your address' */
+"transfer.notificationBody.yourAddress" = "You";
+
+/* About page: scene title */
+"About.Title" = "About";
+
+/* About scene: 'Read about' section title. */
+"About.Section.About" = "About ADAMANT";
+
+/* About scene: 'Contact us' section title. */
+"About.Section.ContactUs" = "Contact us";
+
+/* Contribute scene: 'Crashlytics' section title. */
+"Contribute.Section.Crashlytics" = "Crashlytics";
+
+/* Contribute scene: 'Crashlytics' section description. */
+"Contribute.Section.CrashlyticsDescription" = "Send anonymous crash reports and make the app more reliable. We don't gather usage statistics.";
+
+/* Contribute scene: 'Run nodes' section title. */
+"Contribute.Section.RunNodes" = "Run the ADAMANT node";
+
+/* Contribute scene: 'Run nodes' section description. */
+"Contribute.Section.RunNodesDescription" = "Support decentralization and enhance privacy level";
+
+/* Contribute scene: 'Network delegate' section title. */
+"Contribute.Section.NetworkDelegate" = "Become a network delegate";
+
+/* Contribute scene: 'Network delegate' section description. */
+"Contribute.Section.NetworkDelegateDescription" = "To become a delegate, pay a registration fee and gain voters’ support";
+
+/* Contribute scene: 'Code contribute' section title. */
+"Contribute.Section.CodeContribute" = "Contribute to the code";
+
+/* Contribute scene: 'Code contribute' section description. */
+"Contribute.Section.CodeContributeDescription" = "If you are a developer, join our GitHub repository";
+
+/* Contribute scene: 'Donate' section title. */
+"Contribute.Section.Donate" = "Donate";
+
+/* Contribute scene: 'Donate' section description. */
+"Contribute.Section.DonateDescription" = "Every donation makes ADAMANT stronger";
+
+/* Contribute scene: 'Rate' section title. */
+"Contribute.Section.Rate" = "Rate the app in App Store";
+
+/* Contribute scene: 'Rate' section description. */
+"Contribute.Section.RateDescription" = "The more feedback, the better app visibility. Highlight the features you like";
+
+/* About scene: Website row */
+"About.Row.Website" = "Website";
+
+/* About scene: The Whitepaper row */
+"About.Row.Whitepaper" = "The Whitepaper";
+
+/* About scene: Project's GitHub page row */
+"About.Row.GitHub" = "Project's GitHub page";
+
+/* About scene: Write us row */
+"About.Row.WriteUs" = "Email";
+
+/* About scene: Our blog row */
+"About.Row.Blog" = "Our blog";
+
+/* About scene: Twitter row */
+"About.Row.Twitter" = "Twitter";
+
+/* "About scene: Website localized url" */
+"About.Row.Website.Url" = "https://adamant.im";
+
+/* "About scene: The Whitepaper localized url" */
+"About.Row.Whitepaper.Url" = "https://adamant.im/whitepaper/adamant-whitepaper-en.pdf";
+
+/* "About scene: Project's GitHub page localized url" */
+"About.Row.GitHub.Url" = "https://github.com/Adamant-im";
+
+/* "About scene: Our blog localized url" */
+"About.Row.Blog.Url" = "https://medium.com/adamant-im";
+
+/* "About scene: Twitter localized url" */
+"About.Row.Twitter.Url" = "https://twitter.com/adamant_im";
+
+/* About scene: Write to Adamant row */
+"About.Row.Adamant" = "ADAMANT";
+
+/* About scene: Show Welcome screens */
+"About.Row.Welcome" = "Welcome screens";
+
+/* Account tab: 'Currency' row */
+"AccountTab.Row.Currency" = "Currency";
+
+/* System accounts: ADAMANT Tokens */
+"Accounts.AdamantTokens" = "Welcome to ADAMANT";
+
+/* System accounts: PWA ADM Bounty bot */
+"Accounts.AdamantBountyBot" = "ADAMANT Bounty Bot";
+
+/* System accounts: ADAMANT Bounty */
+"Accounts.AdamantBounty" = "ADAMANT Bounty Wallet";
+
+/* System accounts: ADAMANT Support */
+"Accounts.Support" = "ADAMANT Support";
+
+/* System accounts: ADAMANT Exchange */
+"Accounts.AdamantExchange" = "ADAMANT Exchange";
+
+/* System accounts: Bet on Bitcoin Price */
+"Accounts.BetOnBitcoin" = "Bet on Bitcoin price";
+
+/* System accounts: Adelina */
+"Accounts.Adelina" = "Adelina AI";
+
+/* System accounts: Donates ADAMANT Foundation */
+"Accounts.DonateADMFoundation" = "Donate to ADAMANT Foundation";
+
+/* AccountsProvider: Address not valid error, %@ for address */
+"AccountsProvider.Error.AddressNotValidFormat" = "Invalid address: %@";
+
+/* AccountService: Alert title. Changes in version 1.2 */
+"AccountService.update.v12.title" = "Version 1.2 update: Cryptowallets";
+
+/* AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth & lsk wallets */
+"AccountService.update.v12.message" = "You need to relogin to initiate Ethereum wallet";
+
+/* AccountService: User must relogin into app to initiate wallets */
+"AccountService.reloginToInitiateWallets" = "Relogin to initiate wallet";
+
+/* Login: user typed in invalid passphrase */
+"AccountServiceError.InvalidPassphrase" = "Wrong passphrase";
+
+/* Login: user typed in wrong passphrase */
+"AccountServiceError.WrongPassphrase" = "Wrong passphrase";
+
+/* Account tab: Confirm logout alert: Logout (Ok) button */
+"AccountTab.ConfirmLogout.Logout" = "Logout";
+
+/* Account tab: Confirm logout alert */
+"AccountTab.ConfirmLogout.MessageFormat" = "Logout from %@?";
+
+/* Account tab: A full 'Get free tokens' link, with %@ as address */
+"AccountTab.FreeTokens.UrlFormat" = "https://adamant.im/free-adm-tokens/?wallet=%@";
+
+/* Account tab: A full 'Buy tokens' link, with %@ as address */
+"AccountTab.BuyTokens.UrlFormat" = "https://adamant.im/buy-tokens/?wallet=%@";
+
+/* Account tab: Balance row title */
+"AccountTab.Row.Balance" = "Balance";
+
+/* Account tab: 'Buy tokens' button */
+"AccountTab.Row.BuyTokens" = "Exchange tokens";
+
+/* Account tab: 'Logout' button */
+"AccountTab.Row.Logout" = "Logout";
+
+/* Account tab: 'Security' row */
+"AccountTab.Row.Security" = "Security";
+
+/* Account tab: 'Send tokens' button */
+"AccountTab.Row.SendTokens" = "Send Tokens";
+
+/* Account tab: 'Send ADM tokens' button */
+"AccountTab.Row.SendAdm" = "Send ADM";
+
+/* Account tab: 'Send ETH tokens' button */
+"AccountTab.Row.SendEth" = "Send ETH";
+
+/* Account tab: 'Send LSK tokens' button */
+"AccountTab.Row.SendLsk" = "Send LSK";
+
+/* Account tab: 'Send BTC tokens' button */
+"AccountTab.Row.SendBtc" = "Send BTC";
+
+/* Account tab: 'Send DOGE tokens' button */
+"AccountTab.Row.SendDoge" = "Send DOGE";
+
+/* Account tab: 'Send DASH tokens' button */
+"AccountTab.Row.SendDash" = "Send DASH";
+
+/* Account tab: 'Send ERC20 tokens' button */
+"AccountTab.Row.SendToken" = "Send %@";
+
+/* Account tab: Anonymously buy ADM tokens */
+"AccountTab.Row.AnonymouslyBuyADM" = "Change ADM anonymously";
+
+/* Account tab: Exchange ADM tokens in chat */
+"AccountTab.Row.ExchangeADMInChat" = "In-chat Exchanger";
+
+/* Account tab: 'Address' row */
+"AccountTab.Row.Address" = "Address";
+
+/* Account tab: 'Get free tokens' button */
+"AccountTab.Row.FreeTokens" = "Free ADM tokens";
+
+/* Account tab: 'Theme' row */
+"AccountTab.Row.Theme" = "Theme";
+
+/* Account tab: 'Theme' row value 'Light' */
+"AccountTab.Row.Theme.Light" = "Light";
+
+/* Account tab: 'Theme' row value 'Dark' */
+"AccountTab.Row.Theme.Dark" = "Dark";
+
+/* Account tab: 'About' row */
+"AccountTab.Row.About" = "About";
+
+/* Account tab: 'Contribute' row */
+"AccountTab.Row.Contribute" = "Contribute";
+
+/* Account tab: 'Vote for delegates' button */
+"AccountTab.Row.VoteForDelegates" = "Vote for delegates";
+
+/* Account tab: Actions section title */
+"AccountTab.Section.Actions" = "Actions";
+
+/* Account tab: Application section title */
+"AccountTab.Section.Application" = "Application";
+
+/* Account tab: Adamant wallet */
+"AccountTab.Wallets.adamant_wallet" = "ADAMANT Wallet";
+
+/* Account tab: Ethereum wallet */
+"AccountTab.Wallets.ethereum_wallet" = "Ethereum Wallet";
+
+/* Account tab: Lisk wallet */
+"AccountTab.Wallets.lisk_wallet" = "Lisk Wallet";
+
+/* Account tab: Bitcoin wallet */
+"AccountTab.Wallets.bitcoin_wallet" = "Bitcoin Wallet";
+
+/* Account tab: Doge wallet */
+"AccountTab.Wallets.doge_wallet" = "Doge Wallet";
+
+/* Account tab: Dash wallet */
+"AccountTab.Wallets.dash_wallet" = "Dash Wallet";
+
+/* Account tab: ERC20 wallet */
+"AccountTab.Wallets.erc20_wallet" = "%@ Wallet";
+
+/* Account page: scene title */
+"AccountTab.Title" = "Account";
+
+/* Account tab: Delegates section title */
+"AccountTab.Section.Delegates" = "Delegates";
+
+/* Product name */
+"ADAMANT" = "ADAMANT";
+
+/* AddressBookService: Not enought money to save address into blockchain */
+"AddressBookService.Error.notEnoughMoney" = "Not enough tokens to store data in Blockchain";
+
+/* Application: Failed to send deviceToken to ANS error format. %@ for error description */
+"Application.deviceTokenErrorFormat" = "Failed to register in ANS: %@";
+
+/* Serious internal error: Failed to build endpoint url */
+"ApiService.InternalError.EndpointBuildFailed" = "Endpoint build failed. Report a bug";
+
+/* Serious internal error: Failed to sign transaction */
+"ApiService.InternalError.FailedTransactionSigning" = "Transaction failed";
+
+/* Serious internal error: Error parsing response */
+"ApiService.InternalError.ParsingFailed" = "Parsing failed. Report a bug";
+
+/* Serious internal error: No nodes available */
+"ApiService.InternalError.NoNodesAvailable" = "No nodes available. Report a bug";
+
+/* Eureka forms Cancel button */
+"Cancel" = "Cancel";
+
+/* ChatList: outgoing message prefix */
+"ChatListPage.SentMessagePrefix" = "You: ";
+
+/* ChatList: SearchBar placeholder text */
+"ChatListPage.SearchBar.Placeholder" = "Search for contacts or messages";
+
+/* SearchPage: Contacts header */
+"SearchPage.Contacts" = "Contacts";
+
+/* SearchPage: Contacts header */
+"SearchPage.Contact.New" = "New contact";
+
+/* SearchPage: Contact new header */
+"SearchPage.Contact.Add.New" = "[Add a new contact]";
+
+/* SearchPage: Messages header */
+"SearchPage.Messages" = "Messages";
+
+/* ChatList: First syncronization is in progress */
+"ChatListPage.SyncingChats" = "Syncing chats…";
+
+/* ChatList: Reacted */
+"ChatListPage.Reacted" = "Reacted";
+
+/* ChatList: Removed Reaction */
+"ChatListPage.RemovedReaction" = "Removed reaction";
+
+/* ChatList: scene title */
+"ChatListPage.Title" = "Chats";
+
+/* ChatsProvider: Notify user that he doesn't have money to pay a message fee */
+"ChatsProvider.Error.notEnoughMoney" = "Zero balance. Get free ADM tokens";
+
+/* ChatsProvider: Transaction not found error. %@ for transaction's ID */
+"ChatsProvider.Error.TransactionNotFoundFormat" = "Message with id %@ not found";
+
+/* ChatsProvider: Validation error: Message is empty */
+"ChatsProvider.Validation.MessageIsEmpty" = "Message is empty";
+
+/* ChatsProvider: Validation error: Message is too long */
+"ChatsProvider.Validation.MessageTooLong" = "Message is too long";
+
+/* Known contacts: Adamant ICO message. Markdown supported. */
+"Chats.IcoMessage" = "Null";
+
+/* Known contacts: Adamant pre ICO message */
+"Chats.PreIcoMessage" = "Null";
+
+/* Known contacts: Adamant welcome message. Markdown supported. */
+"Chats.WelcomeMessage" = "ADAMANT is a true Blockchain messenger, independent from governments, corporations and even developers. It is possible due to a decentralized network infrastructure, fully open source and run by users. That's why every action, including sending message or saving contact name, has its network fee of 0.001 ADM.\n\nBlockchain offers superior security and privacy, not available for typical P2P and centralized messengers. Also, Blockchain provides new possibilities. You can store and transfer cryptos In-Chat with full control of your private keys, use ADAMANT as 2FA and more.\n\nIn ADAMANT, nobody can control, block, deactivate, restrict or censor accounts. Users take full responsibility for content, messages, media, and goals and intentions of using the Messenger.\n\nRemember, your security and anonymity is up to you. Do not follow links you receive, otherwise your IP can be compromised. Set a password on your device. Learn more about security and anonymity at https://adamant.im/staysecured/.\n\nMake sure you've saved the passPhrase for this account — logout and login again. Write your passPhrase on a sheet of paper as well. Only **you are responsible for passPhrase safety**. It cannot be recovered. And if other person will get it, your tokens will be stolen and correspondence read. Treat this question with outmost importance, as if tokens in your wallet will cost a billion dollars some time.\n\nTo start messaging now, **get free welcome tokens** on Account tab. Then create new chat and put your friend's ADM address. It is recommended to share your ADM address personally, not using other messengers.";
+
+/* Known contacts: Adamant Exchenge message. Markdown supported. */
+"Chats.Exchange.WelcomeMessage" = "Hi! 😊 I'm your exchange bot. I operate instantly and anonymously. Type **/help** to see what I can do. I ask for a higher fee than my fellow bots, so I recommend that you set up your own bot with a competitive fee. ℹ️ You can learn more on ADAMANT blog. I'm highly reliable but if you have any troubles, please leave a message here U6386412615727665758.";
+
+/* Known contacts: Adamant Bet On Bitcoin message. Markdown supported. */
+"Chats.BetOnBitcoin.WelcomeMessage" = "Hi! 😊 I'm anonymous and Blockchain-proved bet bot. I accept bets on BTC rate and pay rewards to winners. ℹ️ Learn more on ADAMANT’s blog or type **/help** to start betting. Support via U6386412615727665758.";
+
+/* Known contacts: Adamant Adelina message. Markdown supported. */
+"Chats.Adelina.WelcomeMessage" = "Hello, I’m Adelina. Let's have a pleasure talk! I can do many things like:\n\n- Draft an email or other piece of writing\n- Write Python code\n- Answer questions about a set of documents\n- Support conversations\n- Tutor in a range of subjects\n- Translate languages\n- Compose a poem\n- Simulate characters for video games and much more";
+
+/* Known contacts: Adamant donate welcome message. Markdown supported. */
+"Chats.Donate.WelcomeMessage" = "We develop decentralized ADAMANT Messenger thanks to your support—transfer ADM, ETH and other tokens in this chat. For additional donation wallets, see adamant.im.";
+
+/* Alert 'Retry Or Delete' title. Used in caht for sending failed messages again or delete them */
+"Chats.RetryOrDelete.Title" = "Retry or delete?";
+
+/* Alert 'Retry Or Delete' body message. Used in chat for sending failed messages again or delete them */
+"Chats.RetryOrDelete.Body" = "Try to send message again, or delete it?";
+
+/* Button "Block" */
+"Chats.Block" = "Block";
+
+/* Alert "Block this user?" */
+"Chats.BlockUser" = "Block this user?";
+
+/* Button "Remove" */
+"Chats.Remove" = "Remove";
+
+/* Alert "Delete this message?" */
+"Chats.RemoveMessage" = "Delete this message?";
+
+/* Button "Report" */
+"Chats.Report" = "Report";
+
+/* Button "Reply" */
+"Chats.Reply" = "Reply";
+
+/* Button "Copy" */
+"Chats.Copy" = "Copy";
+
+/* Alert "Report as inappropriate?" */
+"Chats.ReportMessage" = "Report as inappropriate?";
+
+/* Alert "Report has been sent" */
+"Chats.ReportSent" = "Report has been sent";
+
+/* Chat: inform user that he can't cancel transaction, that was sent */
+"ChatScene.Error.cancelError" = "Message is already sent";
+
+/* Chat: message input placeholder */
+"ChatScene.NewMessage.Placeholder" = "New message";
+
+/* Chat: Send message button */
+"ChatScene.Send" = "Send";
+
+/* Chat: 'Sent funds' bubble title */
+"ChatScene.Sent" = "Sent";
+
+/* Chat: 'Received funds' bubble title */
+"ChatScene.Received" = "Received";
+
+/* Chat: 'Sent funds' buble 'Tap for details' tip */
+"ChatScene.tapForDetails" = "Tap for details";
+
+/* Chat: status message for failed to send chat transaction */
+"ChatScene.MessageStatus.FailToSend" = "Failed to send";
+
+/* Chat: status message for pending chat transaction */
+"ChatScene.MessageStatus.Pending" = "Pending";
+
+/* Chat: status message for warning chat transaction */
+"ChatScene.MessageStatus.Warning" = "Warning";
+
+/* Chat: Body for actions menu */
+"ChatScene.Actions.Body" = "New name for %@";
+
+/* Chat: 'Rename' action in actions menu */
+"ChatScene.Actions.Rename" = "Rename";
+
+/* Chat: 'Name' field in actions menu */
+"ChatScene.Actions.NamePlaceholder" = "Name";
+
+/* Chat: 'Free Tokens' button */
+"ChatScene.FreeTokensAlert.FreeTokens" = "🎁 Free tokens";
+
+/* Chat: 'Free Tokens' message */
+"ChatScene.FreeTokensAlert.Message" = "ADAMANT is a unique Blockchain messenger that is independent from government, corporations and even its developers. It is possible due to a decentralized network, fully open source and run by users. That's why every action, including messaging or saving new contacts, has a network fee of 0.001 ADM. To start messaging now, get your free welcoming tokens.";
+
+/* Chat: warning message for opening email link without mail app configurated on device */
+"ChatScene.Warning.NoMailApp" = "Can't send email. Check Mail app configurations.";
+
+/* Chat: warning message for opening unsupported url schemes */
+"ChatScene.Warning.UnsupportedUrl" = "Unsupported url protocol";
+
+/* Chat: Error scrolling to message, this message has been deleted and is no longer accessible */
+"ChatScene.Error.messageWasDeleted" = "Sorry, but this message has been deleted and is no longer accessible";
+
+/* Delegates page: scene title */
+"Delegates.Title" = "Delegates";
+
+/* Visible Wallets page: scene title */
+"VisibleWallets.Title" = "Wallet list";
+
+/* VisibleWallets: Reset wallets alert title */
+"VisibleWallets.ResetListAlert" = "Reset wallet list to default?";
+
+/* Delegates tab: Message about 50 ADM fee for vote */
+"Delegates.NotEnoughtTokensForVote" = "Not enought tokens to vote. You need 50 ADM";
+
+/* Delegates tab: Message about time out for new vote */
+"Delegates.timeOutBeforeNewVote" = "Please wait until previous vote will be processed";
+
+/* Delegate details: scene title */
+"DelegateDetails.Title" = "Details";
+
+/* Delegate Details Screen: Rows title for 'Username'" */
+"DelegateDetails.Row.Username" = "Username";
+
+/* Delegate Details Screen: Rows title for 'Address'" */
+"DelegateDetails.Row.Address" = "Address";
+
+/* Delegate Details Screen: Rows title for 'Public Key'" */
+"DelegateDetails.Row.PublicKey" = "Public Key";
+
+/* Delegate Details Screen: Rows title for 'Vote weight'" */
+"DelegateDetails.Row.VoteWeight" = "Vote weight";
+
+/* Delegate Details Screen: Rows title for 'Produced blocks'" */
+"DelegateDetails.Row.ProducedBlocks" = "Produced blocks";
+
+/* Delegate Details Screen: Rows title for 'Missed blocks'" */
+"DelegateDetails.Row.MissedBlocks" = "Missed blocks";
+
+/* Delegate Details Screen: Rows title for 'Rate'" */
+"DelegateDetails.Row.Rate" = "Rate";
+
+/* Delegate Details Screen: Rows title for 'Rank'" */
+"DelegateDetails.Row.Rank" = "Rank";
+
+/* Delegate Details Screen: Rows title for 'Approval'" */
+"DelegateDetails.Row.Approval" = "Approval";
+
+/* Delegate Details Screen: Rows title for 'Productivity'" */
+"DelegateDetails.Row.Productivity" = "Productivity";
+
+/* Delegate Details Screen: Rows title for 'Forging time'" */
+"DelegateDetails.Row.ForgingTime" = "Forging time";
+
+/* Delegate Details Screen: Rows title for 'Forged'" */
+"DelegateDetails.Row.Forged" = "Forged";
+
+/* Delegates: Message for Successfull voting */
+"Delegates.Vote.Success" = "Your vote has been sent";
+
+/* Storybard - Delegate vote panel: 'Upvotes' label */
+"Delegates.VotePanel.Upvotes" = "Upvotes:";
+
+/* Storybard - Delegate vote panel: 'Downvotes' label */
+"Delegates.VotePanel.Downvotes" = "Downvotes:";
+
+/* Storybard - Delegate vote panel: 'New' label */
+"Delegates.VotePanel.New" = "New:";
+
+/* Storybard - Delegate vote panel: 'Total' label */
+"Delegates.VotePanel.Total" = "Total:";
+
+/* Shared error: Account not found error. Using %@ for address. */
+"Error.AccountNotFoundFormat" = "Account not found: %@";
+
+/* Shared error: Account not initiated */
+"Error.AccountNotInitiated" = "Account not initiated";
+
+/* Shared error: Internal error format, %@ for message */
+"Error.InternalErrorFormat" = "Internal error: %@";
+
+/* Shared error: Base format, %@ for message */
+"Error.BaseErrorFormat" = "Error: %@";
+
+/* Error messge title for support email */
+"Error.Mail.Title" = "Error in iOS app";
+
+/* Error messge body for support email */
+"Error.Mail.Body" = "Hello,\n\nI have this error:\n\n%@\n\nMy device info:\n\n%@";
+
+/* Error messge body for support email, with detailed error description. Where first %@ - error's short message, second %@ - detailed description, third %@ - deviceInfo */
+"Error.Mail.Body.Detailed" = "Hello,\n\nI have this error:\n\n%@\n\n%@\n\nDevice:\n\n%@";
+
+/* Shared error: Network problems. In most cases - no connection */
+"Error.NoNetwork" = "No connection";
+
+/* Shared error: Request cancelled */
+"Error.RequestCancelled" = "Request cancelled";
+
+/* Shared error: Remote error format, %@ for message */
+"Error.RemoteServerErrorFormat" = "Blockchain node error: %@";
+
+/* Shared error: User not logged */
+"Error.UserNotLogged" = "User is not logged in";
+
+/* Shared unknown error */
+"Error.UnknownError" = "Unknown error. Report a bug";
+
+/* Login: Notify user, that he disabled camera in settings, and need to authorize application. */
+"LoginScene.Error.AuthorizeCamera" = "You need to authorize ADAMANT to use device's camera";
+
+/* Login: User disabled access to photolibrary, he can authorize application in settings */
+"LoginScene.Error.AuthorizePhotolibrary" = "You need to authorize ADAMANT to use your Photo library";
+
+/* Login: No network error. */
+"LoginScene.Error.NoInternet" = "No connection to the Internet";
+
+/* Login: notify user that he is trying to login without a passphrase */
+"LoginScene.Error.NoPassphrase" = "Enter a passphrase";
+
+/* Login: Notify user that picked photo doesn't contains a valid qr code with passphrase */
+"LoginScene.Error.NoQrOnPhoto" = "Selected image does not contain valid QR codes";
+
+/* Login: Notify user that device not supported by QR reader */
+"LoginScene.Error.QrNotSupported" = "QR code reading is not supported on the device";
+
+/* Login: Notify user that scanned QR doesn't contains a passphrase. */
+"LoginScene.Error.WrongQr" = "QR code does not contain a valid passphrase";
+
+/* Login: notify user that we are trying to log in */
+"LoginScene.LoggingInProgress" = "Logging in…";
+
+/* Login: Login into previous account with biometry or pincode */
+"LoginScene.LoginIntoAdamant" = "Login into ADAMANT";
+
+/* Login: generate new passphrase button */
+"LoginScene.Row.Generate" = "Generate new passphrase";
+
+/* Login: Login button */
+"LoginScene.Row.Login" = "Login";
+
+/* Login: Passphrase placeholder */
+"LoginScene.Row.Passphrase.Placeholder" = "Passphrase";
+
+/* Login: Login with pincode button */
+"LoginScene.Row.Pincode" = "Login with PIN code";
+
+/* Login: Login with QR button. */
+"LoginScene.Row.Qr" = "Login with QR code";
+
+/* Login: security alert, notify user that he must save his new passphrase. Markdown supported, center aligned. */
+"LoginScene.Row.SavePassphraseAlert" = "**Save the passphrase** for new Wallet and Messenger account. There is no login to enter Wallet, only the passphrase needed. **If lost, no way to recover it**.";
+
+/* Login: a small hint for a user, that he can tap on passphrase to save it */
+"LoginScene.Row.TapToSave" = "Tap to save";
+
+/* Login: login with existing passphrase section */
+"LoginScene.Section.Login" = "Login";
+
+/* Login: Create new account section */
+"LoginScene.Section.NewAccount" = "New account";
+
+/* New chat: Recipient address placeholder. Note that address text field always shows U letter, so you can left this line blank. */
+"NewChatScene.Address.Placeholder" = "";
+
+/* New chat: Notify user that specified address (%@) not found. Using %@ for address */
+"NewChatScene.Error.AddressNotFoundFormat" = "Address not found: %@";
+
+/* New chat: Notify user that he did enter invalid address */
+"NewChatScene.Error.InvalidAddress" = "Enter a valid address";
+
+/* New chat: Notify user that he can't start chat with himself */
+"NewChatScene.Error.OwnAddress" = "You don't need an encrypted anonymous chat to talk to yourself";
+
+/* New Chat: Notify user that scanned QR doesn't contains an address */
+"NewChatScene.Error.WrongQr" = "QR code does not contain a valid address";
+
+/* New chat: Scan QR with address button */
+"NewChatScene.ScanQr" = "Scan QR code";
+
+/* New chat: scene title */
+"NewChatScene.Title" = "New Chat";
+
+/* New chat: Show QR for my address button */
+"NewChatScene.MyQr" = "Show my QR";
+
+/* New Chat: 'What does it mean?', a help button for info about uninitialized accounts. */
+"NewChatScene.NotInitialized.HelpButton" = "What does it mean?";
+
+/* NodesList: Button label */
+"NodesList.NodesList" = "Node list";
+
+/* NodesList: scene title */
+"NodesList.Title" = "List of nodes";
+
+/* NodesList: 'Add new node' button lable */
+"NodesList.AddNewNode" = "Add new node";
+
+/* NodesList: Reset nodes alert title */
+"NodesList.ResetNodeListAlert" = "Reset nodes list to default?";
+
+/* NodesList: 'Reset' button */
+"NodesList.ResetButton" = "Reset";
+
+/* NodesList: 'Prefer the fastest node' switch */
+"NodesList.PreferTheFastestNode" = "Prefer the fastest node";
+
+/* NodesList.NodeCell: Node ping */
+"NodesList.NodeCell.Ping" = "Ping";
+
+/* NodesList.NodeCell: Milliseconds */
+"NodesList.NodeCell.Milliseconds" = "ms";
+
+/* NodesList.NodeCell: Node is synchronizing */
+"NodesList.NodeCell.Synchronizing" = "Synchronizing";
+
+/* NodesList.NodeCell: Node is offline */
+"NodesList.NodeCell.Offline" = "Offline";
+
+/* NodesList.NodeCell: Node version */
+"NodesList.NodeCell.Version" = "version";
+
+/* NodeList: Inform that default nodes was loaded, if user deleted all nodes */
+"NodeList.DefaultNodesLoaded" = "Default nodes list was loaded";
+
+/* NodesEditor: New node scene title */
+"NodesEditor.NewNodeTitle" = "New node";
+
+/* NodesEditor: Delete node confirmation message */
+"NodesEditor.DeleteNodeAlert" = "Delete this node?";
+
+/* NodesEditor: Testing in progress */
+"NodesEditor.TestingInProgressMessage" = "Checking connection…";
+
+/* NodesEditor: Scheme row */
+"NodesEditor.SchemeRow" = "Scheme";
+
+/* NodesEditor: Port row */
+"NodesEditor.PortRow" = "Port";
+
+/* NodesEditor: Host row */
+"NodesEditor.HostRow" = "Host";
+
+/* NodesEditor: Web sockets */
+"NodesEditor.WebSockets" = "Web sockets";
+
+/* NodesEditor: Web sockets are supported */
+"NodesEditor.WebSocketsSupported" = "Supported";
+
+/* NodesEditor: Web sockets aren't supported */
+"NodesEditor.WebSocketsNotSupported" = "Not supported";
+
+/* NodesEditor: Delete node button */
+"NodesEditor.DeleteNodeButton" = "Delete";
+
+/* NodesEditor: Host row placeholder */
+"NodesEditor.HostRow.Placeholder" = "IP or host name";
+
+/* NodesEditor: Failed to build URL alert */
+"NodesEditor.FailedToBuildURL" = "Invalid host";
+
+/* Security: Notification modes description. Markdown supported. */
+"SecurityPage.Row.Notifications.ModesDescription" = "#### Notification modes\n\n#### Disabled\nNo notifications.\n\n#### Background Fetch\nYour device fetchs for new messages by itself. No external calls. Fetch is initiated by iOS, the actual time determined by the operating system based on many factors like battery charge, cellular network, application usage patterns and cannot be predicted. It can be 20 minutes, or 6 hours, or maybe even a day. You still can open app and check for a new message though.\n\n#### Push\nNotifications sent to your device by ADAMANT Notification Service. You will receive notification almost instantly after a message was sent and approved by the Blockchain — a few seconds delay. But this mode requires your device to register it's Device Token in the Service's database. Device tokens are safe and secure, and this option is recommended in most cases.\n\nYou can read more about device registration on ADAMANT's Github page.\n\n";
+
+/* Security: Selected notifications types */
+"SecurityPage.Section.NotificationsType" = "Notifications";
+
+/* Security: About Notification types */
+"SecurityPage.Section.AboutNotificationTypes" = "About ANS";
+
+/* Security: Messages Notification sound */
+"SecurityPage.Section.Messages" = "Messages";
+
+/* Security: Settings Notification */
+"SecurityPage.Section.Settings" = "Settings";
+
+/* Notifications: Disable notifications */
+"Notifications.Mode.NotificationsDisabled" = "Disabled";
+
+/* Notifications: Use Background fetch notifications */
+"Notifications.Mode.BackgroundFetch" = "Background Fetch";
+
+/* Notifications: Use Apple Push notifications */
+"Notifications.Mode.ApplePush" = "Push";
+
+/* Security: Visit Github */
+"SecurityPage.Row.VisitGithub" = "Visit Github";
+
+/* Notifications: Open system Settings */
+"Notifications.Settings.System" = "System Settings";
+
+/* Notifications: Select Sound */
+"Notifications.Sound.Name" = "Sound";
+
+/* Notifications: Select Sounds */
+"Notifications.Sounds.Name" = "Sounds";
+
+/* Notifications: Select Alert Tones */
+"Notifications.Alert.Tones" = "ALERT TONES";
+
+/* Notifications: Select Alert Save */
+"Notifications.Alert.Save" = "Save";
+
+/* Notifications: Alerts Cancel */
+"Notifications.Alert.Cancel" = "Cancel";
+
+/* Pinpad: Ask user to create new pin */
+"Pinpad.EnterNewPin" = "Enter new PIN code";
+
+/* Pinpad: Ask user to repeat new pin */
+"Pinpad.ReenterPin" = "Re-enter your PIN code";
+
+/* QRGenerator: Bad Internal generator error message format. Using %@ for error description */
+"QrGeneratorScene.Error.InternalErrorFormat" = "Internal error: %@. Report a bug";
+
+/* QRGenerator: user typed in invalid passphrase */
+"QrGeneratorScene.Error.InvalidPassphrase" = "Enter a valid passphrase";
+
+/* QRGenerator: Passphrase textview placeholder */
+"QrGeneratorScene.Passphrase.Placeholder" = "Passphrase";
+
+/* QRGenerator: small 'Tap to save' tooltip under generated QR */
+"QrGeneratorScene.TapToSave" = "Tap to save";
+
+/* QRGenerator: scene title */
+"QrGeneratorScene.Title" = "QR Generator";
+
+/* PrivateKeyGenerator: scene title */
+"PkGeneratorScene.Title" = "PrivateKey Generator";
+
+/* PrivateKeyGenerator: Security alert. Keep your passphrase safe */
+"PkGeneratorScene.Alert" = "ADAMANT account includes crypto wallets. All of them are connected with your Passphrase, and only you have access to these wallets. You can export private key to use them in other applications. Store keys in secure place.";
+
+/* PrivateKeyGenerator: Generate button */
+"PkGeneratorScene.GenerateButton" = "Generate Keys";
+
+/* Security: scene title */
+"SecurityPage.Title" = "Security";
+
+/* Security: turn off 'Stay Logged In' confirmation */
+"SecurityPage.DoNotStayLoggedIn" = "Do not stay logged in";
+
+/* Config: Authorization reason for turning biometry off */
+"SecurityPage.DoNotUseBiometry" = "Do not use biometry to log in";
+
+/* Security: Generate QR with passphrase row */
+"SecurityPage.Row.GenerateQr" = "Generate QR with passphrase";
+
+/* Security: Generate PrivateKey with passphrase row */
+"SecurityPage.Row.GeneratePk" = "Export Private Keys";
+
+/* Security: Show notifications */
+"SecurityPage.Row.Notifications" = "Notifications";
+
+/* Security: Stay logged row */
+"SecurityPage.Row.StayLoggedIn" = "Stay logged in";
+
+/* Security: Security section */
+"SecurityPage.Section.Security" = "Security";
+
+/* Config: scene title */
+"SettingsPage.Title" = "Settings";
+
+/* Security: Authorization reason for turning biometry on */
+"SecurityPage.UseBiometry" = "Use biometry";
+
+/* Shared alert 'Cancel' button. Used anywhere */
+"Shared.Cancel" = "Cancel";
+
+/* Shared alert notification: message about item copied to pasteboard. */
+"Shared.CopiedToPasteboard" = "Copied to Pasteboard";
+
+/* Shared alert 'Copy' button. Used anywhere. Used for copy-paste info. */
+"Shared.CopyToPasteboard" = "Copy to Pasteboard";
+
+/* Shared alert 'Chat With' button. Used to chat with recipient */
+"Shared.ChatWith" = "Chat with ";
+
+/* Shared alert 'Send ADM To' button. Used to send ADM to recipient */
+"Shared.SendAdmTo" = "Send ADM to ";
+
+/* Shared alert Done message. Used anywhere */
+"Shared.Done" = "Done";
+
+/* Shared alert 'Error' title. Used anywhere */
+"Shared.Error" = "Error";
+
+/* Shared alert 'Generate QR' button. Used to generate QR codes with addresses and passphrases. Used with sharing and saving, anywhere. */
+"Shared.GenerateQRCode" = "Generate QR code";
+
+/* Shared alert notification: title for no internet connection message. */
+"Shared.NoInternet.Title" = "No internet connection";
+
+/* Shared alert notification: body message for no internet connection. */
+"Shared.NoInternet.Body" = "Please check your internet connection and try again";
+
+/* Shared alert 'Ok' button. Used anywhere */
+"Shared.Ok" = "OK";
+
+/* Shared alert 'Save' button. Used anywhere */
+"Shared.Save" = "Save";
+
+/* Shared alert 'Save to Photos'. Used with saving images to photolibrary */
+"Shared.SaveToPhotolibrary" = "Save to Photos";
+
+/* Shared alert 'Settings' button. Used to go to system Settings app, on application settings page. Should be same as Settings application title. */
+"Shared.Settings" = "Settings";
+
+/* Shared alert 'Share' button. Used anywhere for presenting standart iOS 'Share' menu. */
+"Shared.Share" = "Share";
+
+/* Shared alert 'Retry' button. Used anywhere. */
+"Shared.Retry" = "Retry";
+
+/* Shared alert 'Delete' button. Used anywhere. */
+"Shared.Delete" = "Delete";
+
+/* ShareQR scene: User had not authorized access to write images to photolibrary */
+"ShareQR.photolibraryNotAuthorized" = "You need to authorize ADAMANT to use your Photo library";
+
+/* Main tab bar: Account page */
+"Tabs.Account" = "Account";
+
+/* Main tab bar: Chats page */
+"Tabs.Chats" = "Chats";
+
+/* Main tab bar: Settings page */
+"Tabs.Settings" = "Settings";
+
+/* TransactionList: scene title */
+"TransactionListScene.Title" = "Transactions";
+
+/* TransactionList: To Chat button */
+"TransactionListScene.ToChat" = "To Chat";
+
+/* TransactionList: Start Chat button */
+"TransactionListScene.StartChat" = "Start Chat";
+
+/* TransactionList: 'Transactions not found' message. */
+"TransactionListScene.Error.NotFound" = "Transactions not found";
+
+/* TransactionList: 'No transactions yet' message. */
+"TransactionListScene.NoTransactionYet" = "No transactions yet";
+
+/* TransactionList: 'Transactions not found' localize error message from API. */
+"No transactions found" = "Transactions not found";
+
+/* Transaction send: recipient minimum remaining balance requirement */
+"TransactionSend.Minimum.Balance" = "Recipient must have at least 0.05 LSK—Send more tokens";
+
+/* Transaction status: updating in progress */
+"TransactionStatus.Updating" = "Updating…";
+
+/* Transaction status: transaction is pending */
+"TransactionStatus.Pending" = "Pending";
+
+/* Transaction status: success */
+"TransactionStatus.Success" = "Success";
+
+/* Transaction status: transaction failed */
+"TransactionStatus.Failed" = "Failed";
+
+/* Transaction status: inconsistent */
+"TransactionStatus.Inconsistent" = "Inconsistent";
+
+/* Transaction status: inconsistent wrong timestamp */
+"TransactionStatus.Inconsistent.WrongTimestamp" = "Message and Tx has different timestamps. It is possible, but check twice";
+
+/* Transaction status: inconsistent reason title */
+"TransactionStatus.Inconsistent.Reason.Title" = "Inconsistent reason";
+
+/* Transaction details: scene title */
+"TransactionDetailsScene.Title" = "Details";
+
+/* Transaction details: amount row. */
+"TransactionDetailsScene.Row.Amount" = "Amount";
+
+/* Transaction details: Block id row. */
+"TransactionDetailsScene.Row.Block" = "Block";
+
+/* Transaction details: Transaction delivery status. */
+"TransactionDetailsScene.Row.Status" = "Transaction status";
+
+/* Transaction details: confirmations row. */
+"TransactionDetailsScene.Row.Confirmations" = "Confirmations";
+
+/* Transaction details: date row. */
+"TransactionDetailsScene.Row.Date" = "Date";
+
+/* Transaction details: 'Open transaction in explorer' row. */
+"TransactionDetailsScene.Row.Explorer" = "Open in Explorer";
+
+/* Transaction details: fee row. */
+"TransactionDetailsScene.Row.Fee" = "Fee";
+
+/* Transaction details: sender row. */
+"TransactionDetailsScene.Row.From" = "From";
+
+/* Transaction details: fiat value at the time */
+"TransactionDetailsScene.Row.HistoryFiat" = "Value at time of Txn";
+
+/* Transaction details: fiat value at the time */
+"TransactionDetailsScene.Row.CurrentFiat" = "Current value";
+
+/* Transaction details: Id row. */
+"TransactionDetailsScene.Row.Id" = "Id";
+
+/* Transaction details: recipient row. */
+"TransactionDetailsScene.Row.To" = "To";
+
+/* Export transaction: 'Share transaction summary' button */
+"TransactionDetailsScene.Share.Summary" = "Summary";
+
+/* Export transaction: 'Share transaction URL' button */
+"TransactionDetailsScene.Share.URL" = "URL";
+
+/* "Transaction details: 'Comments' section" */
+"TransactionDetailsScene.Section.Comment" = "Comments";
+
+/* "Transaction details: 'Actions' section" */
+"TransactionDetailsScene.Section.Actions" = "Actions";
+
+/* Transaction details: 'Requesting Data' progress message. */
+"TransactionDetailsScene.RequestingData" = "Requesting Data…";
+
+/* Transaction details: 'Your address' flag. */
+"TransactionDetailsScene.YourAddress" = "You";
+
+/* TransfersProvider: Transaction not found error. %@ for transaction's ID */
+"TransfersProvider.Error.TransactionNotFoundFormat" = "Transaction with ID %@ not found";
+
+/* Transfer: Minimal transaction amount is 0.00001 */
+"TransferScene.Error.MinAmount" = "Minimum transaction amount is 0.00001";
+
+/* Transfer: transfer amount placeholder */
+"TransferScene.Amount.Placeholder" = "to send";
+
+/* Transfer: Address not found error */
+"TransferScene.Error.AddressNotFound" = "Address not found";
+
+/* Transfer: Address validation error */
+"TransferScene.Error.InvalidAddress" = "Enter a valid address";
+
+/* Transfer: Amount is hiegher that user's total money notification */
+"TransferScene.Error.notEnoughMoney" = "You don't have that tokens";
+
+/* Transfer: Amount is zero, or even negative notification */
+"TransferScene.Error.TooLittleMoney" = "You should send more tokens";
+
+/* Transfer: Not enough fee for send a transaction */
+"TransferScene.Error.TooLittleFee" = "Not enough fee";
+
+/* Transfer: Fee is higher than usual */
+"TransferScene.Error.FeeIsTooHigh" = "Note: tx fee is higher than regular";
+
+/* Transfer: Alert title: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address */
+"TransferScene.unsafeTransferAlert.title" = "Can't verify %@";
+
+/* Transfer: Alert body: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address */
+"TransferScene.unsafeTransferAlert.body" = "Account not found, or not initiated. Double check recipient address and confirm transaction";
+
+/* Transfer: Alert body: Account is not initiated. It's not possible to start a chat, as the Blockchain doesn't store the account's public key to encrypt messages. */
+"TransferScene.unsafeChatAlert.body" = "Account is not initiated. It's not possible to start a chat, as the Blockchain doesn't store the account's public key to encrypt messages.";
+
+/* Transfer: recipient address placeholder */
+"TransferScene.Recipient.Placeholder" = "of the recipient";
+
+/* Transfer: amount of adamant to transfer. */
+"TransferScene.Row.Amount" = "Amount";
+
+/* Transfer: fiat value of crypto-amout */
+"TransferScene.Row.Fiat" = "Value";
+
+/* Transfer: logged user balance. */
+"TransferScene.Row.Balance" = "Balance";
+
+/* Transfer: maximum amount to transfer: available account money substracting transfer fee */
+"TransferScene.Row.MaxToTransfer" = "Max to transfer";
+
+/* Transfer: recipient address */
+"TransferScene.Row.RecipientAddress" = "Address";
+
+/* Transfer: recipient name */
+"TransferScene.Row.RecipientName" = "Name";
+
+/* Transfer: Send button */
+"TransferScene.Row.Send" = "Send";
+
+/* Transfer: total amount of transaction: money to transfer adding fee */
+"TransferScene.Row.Total" = "Total";
+
+/* Transfer: transfer fee */
+"TransferScene.Row.TransactionFee" = "Fee";
+
+/* Transfer: comment for transfer in chat */
+"TransferScene.Row.Comments" = "Comments";
+
+/* Transfer: transfer increase fee */
+"TransferScene.Row.IncreaseFee" = "Increase fee";
+
+/* Transfer: 'Transfer info' section */
+"TransferScene.Section.TransferInfo" = "Transfer Info";
+
+/* Transfer: 'Your wallet' section */
+"TransferScene.Section.YourWallet" = "Your Wallet";
+
+/* Transfer: 'Recipient info' section */
+"TransferScene.Section.Recipient" = "Recipient";
+
+/* Transfer: Confirm transfer alert: Send tokens button */
+"TransferScene.Send" = "Send";
+
+/* Transfer: Confirm transfer alert: 'Can't Undo' message */
+"TransferScene.CantUndo" = "You'll unable to undo this action";
+
+/* Tranfser: Confirm using maximum available for transfer tokens as amount to transfer. */
+"TransferScene.UseMaxToTransfer" = "Use all available tokens as amount to transfer?";
+
+/* Tranfser: Dust error. */
+"TransferScene.Dust.Error" = "Dust amount — Send more tokens";
+
+/* Transfer: Confirm transfer %1$@ tokens to %2$@ message. Note two variables: at runtime %1$@ will be amount (with ADM suffix), and %2$@ will be recipient address. You can use address before amount with this so called 'position tokens'. */
+"TransferScene.SendConfirmFormat" = "Send %1$@ to %2$@?";
+
+/* Transfer: Processing message */
+"TransferScene.SendingFundsProgress" = "Sending tokens…";
+
+/* Transfer: Tokens transfered successfully message */
+"TransferScene.TransferSuccessMessage" = "Done!";
+
+/* Wallet Services: Shared error, user do not have enought money. */
+"WalletServices.SharedErrors.notEnoughMoney" = "Not enough tokens";
+
+/* Wallet Services: Shared error, user has not yet initiated a specific wallet. */
+"WalletServices.SharedErrors.WalletNotInitiated" = "Recepient's wallet is not initiated yet";
+
+/* Wallet Services: Shared error, invalid amount format. %@ for amount */
+"WalletServices.SharedErrors.InvalidAmountFormat" = "Invalid amount to send: %@";
+
+/* Wallet Services: Shared error, transaction not found */
+"WalletServices.SharedErrors.TransactionNotFound" = "Transaction not found";
+
+/* Wallet Services: Shared error, BTC Taproot doesn't work */
+"WalletServices.SharedErrors.BtcTaproot" = "ADAMANT doesn’t support Taproot Bitcoin addresses";
+
+/* Wallet Services: Wait until other transactions approved */
+"WalletServices.SharedErrors.walletFrezzed" = "Wait until other transactions will be approved";
+
+/* Wallet Services: Transaction unavailable */
+"WalletServices.SharedErrors.transactionUnavailable" = "Transaction unavailable";
+
+/* Wallet Services: Cannot verify transaction */
+"WalletServices.SharedErrors.inconsistentTransaction" = "Cannot verify transaction";
+
+/* Welcome: Skip button */
+"WelcomeScene.Skip" = "skip";
+
+/* Welcome: Slide 1 Description */
+"WelcomeScene.Description.Slide1" = "Welcome to ADAMANT, the genuine **blockchain** messenger.";
+
+/* Welcome: Slide 2 Description */
+"WelcomeScene.Description.Slide2" = "ADAMANT is **anonymity** and **security** of your messaging as well as in-chat cryptocurrency transferring tool.\n\n[Why are other messengers not secure?](https://medium.com/adamant-im/adamant-security-features-e7cc836ff52c)";
+
+/* Welcome: Slide 3 Description */
+"WelcomeScene.Description.Slide3" = "ADAMANT infrastracture doesn't belong to anyone and is **decentralized**.\n\nIt is maintained by messages paid in ADM tokens. New accounts may receive free tokens for testing purposes.";
+
+/* Welcome: Slide 4 Description */
+"WelcomeScene.Description.Slide4" = "Create an account in a single click **without any requirements** (no email/phone/anything) and invite your friends.\n\nShare your ADAMANT addresses **in-person** for true security.";
+
+/* Welcome: Slide 5 Description */
+"WelcomeScene.Description.Slide5" = "The project's source code is [completely open](https://github.com/Adamant-im/). The app is in development and we constantly add new features.\n\nIf you are a developer — join our team.";
+
+/* WelcomeScene.Description.BeginButton */
+"WelcomeScene.Description.BeginButton" = "Start secure messaging";
+
+/* Welcome: Next screen button */
+"WelcomeScene.Description.ContinueButton" = "Continue";
+
+/* Welcome: Skip button */
+"WelcomeScene.Description.SkipButton" = "Skip";
+
+/* EULA */
+"EULA.Title" = "Terms of Service";
+"EULA.Accept" = "Accept";
+"EULA.Decline" = "Decline";
+"EULA.Text" = "ADAMANT Messenger is based on decentralized Blockchain technologies, and therefore:\n\n✓ ADAMANT Messenger has no tolerance for objectionable content or abusive users\n✓ ADAMANT Messenger is initially focused on the security of correspondence, and the privacy of its users.\n✓ ADAMANT Messenger displays completely open-source code at all times, license GPL-3.0. The source code is available on GitHub: github.com/adamant-im.\n✓ ADAMANT Messenger is offered “AS IS”, with no warranties.\n✓ Developers are only contributors and users of the ADAMANT Messenger.\n✓ Developers do not control any actions on the part of users.\n✓ Developers do not have privileges in the ADAMANT Messenger.\n✓ Developers have no possibility to disable or block any accounts in the ADAMANT Messenger.\n✓ Developers have no possibility to obtain encryption keys or read correspondence or other information of any ADAMANT Messenger user.\n✓ Developers have no possibility to restore access to any user’s account if lost. Users are responsible for the safety and protection of their own accounts.\n✓ Developers are not responsible for user content, messages, media, and goals and intentions of using the ADAMANT Messenger.\n✓ Developers do not store any information transmitted between users (messages, multimedia) and are not responsible for its storage on/in the Blockchain.\n✓ Developers have no possibility to access, nor are responsible for any assets (including but not limited to: cryptocurrencies), connected to or sent via the ADAMANT Messenger.\n✓ ADAMANT Messenger utilizes metadata, as facts of communications between accounts, available publicly in its Blockchain.\n✓ Developers do not cooperate with any third party or external services in terms of providing any usage data.\n✓ ADAMANT Messenger infrastructure (Blockchain nodes) belong to its users and are run by users.\n✓ Developers have no possibility to deactivate, stop or pause the ADAMANT Messenger. Developers offer no warranty on running the ADAMANT Messenger.\n✓ Developers do not bear responsibility for the possible risks, costs, and faults associated with the ADAMANT Messenger.\n✓ Users of the ADAMANT Messenger henceforth take all responsibility for its use, including but not limited to: legitimacy of the blockchain and other technologies applied within the Messenger, using anonymous messaging services, and other jurisdiction laws.\n\nBy using the ADAMANT Messenger, you henceforth accept these Terms of Service.";
+
+/* Reply: Short unknown message error */
+"Reply.ShortUnknownMessageError" = "UNKNOWN MESSAGE";
+
+/* Reply: Long unknown message error */
+"Reply.LongUnknownMessageError" = "We did not find this message";
+
+/* Reply: Failed message reply error */
+"Reply.failedMessageError" = "You can't reply to a failed message";
+
+/* Pending message reply error */
+"Reply.pendingMessageError" = "You can't reply to a pending message. Wait for confirmations (estimate 1-2 seconds)";

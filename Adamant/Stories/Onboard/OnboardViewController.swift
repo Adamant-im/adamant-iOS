@@ -8,6 +8,7 @@
 
 import UIKit
 import SafariServices
+import CommonKit
 
 private class OnboardingPageItem {
     var image: UIImage
@@ -19,11 +20,11 @@ private class OnboardingPageItem {
     }
 }
 
-fileprivate extension String.adamantLocalized {
+fileprivate extension String.adamant {
     struct Onboard {
-        static let beginButton = NSLocalizedString("WelcomeScene.Description.BeginButton", comment: "Welcome: Last slide Begin button")
-        static let continueButton = NSLocalizedString("WelcomeScene.Description.ContinueButton", comment: "Welcome: Next screen button")
-        static let skipButton = NSLocalizedString("WelcomeScene.Description.SkipButton", comment: "Welcome: Skip button")
+        static let beginButton = String.localized("WelcomeScene.Description.BeginButton", comment: "Welcome: Last slide Begin button")
+        static let continueButton = String.localized("WelcomeScene.Description.ContinueButton", comment: "Welcome: Next screen button")
+        static let skipButton = String.localized("WelcomeScene.Description.SkipButton", comment: "Welcome: Skip button")
         
         private init() {}
     }
@@ -42,20 +43,20 @@ class OnboardViewController: UIViewController {
     
     // MARK: Properties
     fileprivate let items = [
-        OnboardingPageItem(image: #imageLiteral(resourceName: "SlideImage1"),
-                           text: NSLocalizedString("WelcomeScene.Description.Slide1", comment: "Welcome: Slide 1 Description")),
+        OnboardingPageItem(image: .asset(named: "SlideImage1") ?? .init(),
+                           text: .localized("WelcomeScene.Description.Slide1", comment: "Welcome: Slide 1 Description")),
 
-        OnboardingPageItem(image: #imageLiteral(resourceName: "SlideImage2"),
-                           text: NSLocalizedString("WelcomeScene.Description.Slide2", comment: "Welcome: Slide 2 Description")),
+        OnboardingPageItem(image: .asset(named: "SlideImage2") ?? .init(),
+                           text: .localized("WelcomeScene.Description.Slide2", comment: "Welcome: Slide 2 Description")),
 
-        OnboardingPageItem(image: #imageLiteral(resourceName: "SlideImage3"),
-                           text: NSLocalizedString("WelcomeScene.Description.Slide3", comment: "Welcome: Slide 3 Description")),
+        OnboardingPageItem(image: .asset(named: "SlideImage3") ?? .init(),
+                           text: .localized("WelcomeScene.Description.Slide3", comment: "Welcome: Slide 3 Description")),
 
-        OnboardingPageItem(image: #imageLiteral(resourceName: "SlideImage4"),
-                           text: NSLocalizedString("WelcomeScene.Description.Slide4", comment: "Welcome: Slide 4 Description")),
+        OnboardingPageItem(image: .asset(named: "SlideImage4") ?? .init(),
+                           text: .localized("WelcomeScene.Description.Slide4", comment: "Welcome: Slide 4 Description")),
 
-        OnboardingPageItem(image: #imageLiteral(resourceName: "SlideImage5"),
-                           text: NSLocalizedString("WelcomeScene.Description.Slide5", comment: "Welcome: Slide 5 Description"))
+        OnboardingPageItem(image: .asset(named: "SlideImage5") ?? .init(),
+                           text: .localized("WelcomeScene.Description.Slide5", comment: "Welcome: Slide 5 Description"))
         ]
 
     override func viewDidLoad() {
@@ -158,10 +159,10 @@ extension OnboardViewController: SwiftyOnboardDelegate, SwiftyOnboardDataSource 
         
         //Setup for the overlay buttons:
         overlay.continueButton.titleLabel?.font = OnboardViewController.buttonsFont
-        overlay.continueButton.setTitle(String.adamantLocalized.Onboard.continueButton, for: .normal)
+        overlay.continueButton.setTitle(String.adamant.Onboard.continueButton, for: .normal)
         
         overlay.skipButton.titleLabel?.font = OnboardViewController.buttonsFont
-        overlay.skipButton.setTitle(String.adamantLocalized.Onboard.skipButton, for: .normal)
+        overlay.skipButton.setTitle(String.adamant.Onboard.skipButton, for: .normal)
         
         overlay.eulaButton.addTarget(self, action: #selector(handleEula), for: .touchUpInside)
         
@@ -174,10 +175,10 @@ extension OnboardViewController: SwiftyOnboardDelegate, SwiftyOnboardDataSource 
         
         if currentPage == items.count - 1 {
             overlay.skipButton.isHidden = true
-            overlay.continueButton.setTitle(String.adamantLocalized.Onboard.beginButton, for: .normal)
+            overlay.continueButton.setTitle(String.adamant.Onboard.beginButton, for: .normal)
         } else {
             overlay.skipButton.isHidden = false
-            overlay.continueButton.setTitle(String.adamantLocalized.Onboard.continueButton, for: .normal)
+            overlay.continueButton.setTitle(String.adamant.Onboard.continueButton, for: .normal)
         }
     }
 }

@@ -15,6 +15,7 @@ import Alamofire
 import struct BigInt.BigUInt
 import Web3Core
 import Combine
+import CommonKit
 
 class LskWalletService: WalletService {
     
@@ -52,7 +53,7 @@ class LskWalletService: WalletService {
     private (set) var enabled = true
     private (set) var isWarningGasPrice = false
     
-    static var currencyLogo = #imageLiteral(resourceName: "lisk_wallet")
+    static var currencyLogo = UIImage.asset(named: "lisk_wallet") ?? .init()
     
     static let kvsAddress = "lsk:address"
     static let defaultFee: BigUInt = 141000
@@ -132,7 +133,7 @@ class LskWalletService: WalletService {
         self.init(mainnet: mainnet, nodes: nodes, serviceNode: serviceNode)
     }
     
-    convenience init(mainnet: Bool, nodes: [Node], services: [Node]) {
+    convenience init(mainnet: Bool, nodes: [CommonKit.Node], services: [CommonKit.Node]) {
         self.init(mainnet: mainnet, nodes: nodes.map { APINode(origin: $0.asString()) }, serviceNode: services.map { APINode(origin: $0.asString()) })
     }
     
@@ -479,6 +480,7 @@ extension LskWalletService: InitiatedWithPassphraseService {
 
 // MARK: - Dependencies
 extension LskWalletService: SwinjectDependentService {
+    @MainActor
     func injectDependencies(from container: Container) {
         accountService = container.resolve(AccountService.self)
         apiService = container.resolve(ApiService.self)
@@ -550,7 +552,13 @@ extension LskWalletService {
     }
     
     func getLskAddress(byAdamandAddress address: String, completion: @escaping (ApiServiceResult<String?>) -> Void) {
-        apiService.get(key: LskWalletService.kvsAddress, sender: address, completion: completion)
+        Task {
+            await apiService.get(
+                key: LskWalletService.kvsAddress,
+                sender: address,
+                completion: completion
+            )
+        }
     }
     
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
@@ -586,13 +594,21 @@ extension LskWalletService {
             return
         }
         
-        apiService.store(key: LskWalletService.kvsAddress, value: lskAddress, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
-            switch result {
-            case .success:
-                completion(.success)
-                
-            case .failure(let error):
-                completion(.failure(error: .apiError(error)))
+        Task {
+            await apiService.store(
+                key: LskWalletService.kvsAddress,
+                value: lskAddress,
+                type: .keyValue,
+                sender: adamant.address,
+                keypair: keypair
+            ) { result in
+                switch result {
+                case .success:
+                    completion(.success)
+                    
+                case .failure(let error):
+                    completion(.failure(error: .apiError(error)))
+                }
             }
         }
     }
@@ -669,7 +685,7 @@ extension LskWalletService: PrivateKeyGenerator {
     }
     
     var rowImage: UIImage? {
-        return #imageLiteral(resourceName: "lisk_wallet_row")
+        return .asset(named: "lisk_wallet_row")
     }
     
     func generatePrivateKeyFor(passphrase: String) -> String? {

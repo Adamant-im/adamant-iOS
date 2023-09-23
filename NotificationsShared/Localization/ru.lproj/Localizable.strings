@@ -1,0 +1,26 @@
+/* Notifications: Something went wrong while registering remote notifications. %@ for description */
+"NotificationsService.Error.RegistrationRemotesFormat" = "Произошла ошибка при регистрации в ANS, попробуйте позже. Причина: %@";
+
+/* Notifications: New message notification title */
+"NotificationsService.NewMessage.Title" = "Новое сообщение";
+
+/* Notifications: New single message notification body */
+"NotificationsService.NewMessage.BodySingle" = "У вас новое сообщение";
+
+/* Notifications: New transfer transaction title */
+"NotificationsService.NewTransfer.Title" = "Новый перевод";
+
+/* Notifications: New single transfer transaction body */
+"NotificationsService.NewTransfer.BodySingle" = "У вас новый перевод";
+
+/* Notifications: User has disabled notifications. Head him into settings */
+"NotificationsService.NotificationsDisabled" = "Уведомления отключены. Вы можете включить их в Настройках";
+
+/* Notifications: Not stayed logged in */
+"NotificationsService.NotStayedLoggedIn" = "Нельзя включить уведомления, не оставаясь в системе";
+
+/* Notifications: Reacted */
+"NotificationsService.Reacted" = "Отреагировал";
+
+/* Notifications: Modified Reaction */
+"NotificationsService.ModifiedReaction" = "Изменил реакцию";

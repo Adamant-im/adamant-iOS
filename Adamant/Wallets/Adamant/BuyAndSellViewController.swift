@@ -9,6 +9,7 @@
 import UIKit
 import Eureka
 import SafariServices
+import CommonKit
 
 class BuyAndSellViewController: FormViewController {
     // MARK: Rows
@@ -17,6 +18,7 @@ class BuyAndSellViewController: FormViewController {
         case adamantSite
         case azbit
         case stakecube
+        case coinstore
         
         var tag: String {
             switch self {
@@ -24,24 +26,27 @@ class BuyAndSellViewController: FormViewController {
             case .adamantSite: return "admSite"
             case .azbit: return "cDeal"
             case .stakecube: return "stakecube"
+            case .coinstore: return "coinstore"
             }
         }
         
         var image: UIImage? {
             switch self {
-            case .adamantMessage: return #imageLiteral(resourceName: "row_logo")
-            case .adamantSite: return #imageLiteral(resourceName: "row_logo")
-            case .azbit: return #imageLiteral(resourceName: "azbit_logo")
-            case .stakecube: return #imageLiteral(resourceName: "row_stakecube")
+            case .adamantMessage: return .asset(named: "row_logo")
+            case .adamantSite: return .asset(named: "row_logo")
+            case .azbit: return .asset(named: "azbit_logo")
+            case .stakecube: return .asset(named: "row_stakecube")
+            case .coinstore: return .asset(named: "row_coinstore")
             }
         }
         
         var localized: String {
             switch self {
-            case .adamantMessage: return String.adamantLocalized.wallets.exchangeInChatAdmTokens
-            case .adamantSite: return String.adamantLocalized.wallets.buyAdmTokens
+            case .adamantMessage: return String.adamant.wallets.exchangeInChatAdmTokens
+            case .adamantSite: return String.adamant.wallets.buyAdmTokens
             case .azbit: return "Azbit"
             case .stakecube: return "StakeCube"
+            case .coinstore: return "Coinstore"
             }
         }
         
@@ -51,6 +56,7 @@ class BuyAndSellViewController: FormViewController {
             case .adamantSite: return "https://adamant.im/buy-tokens/"
             case .azbit: return "https://azbit.com?referralCode=9YVWYAF"
             case .stakecube: return "https://stakecube.net/app/exchange/adm_usdt?layout=pro&team=adm"
+            case .coinstore: return "https://h5.coinstore.com/h5/signup?invitCode=o951vZ"
             }
         }
     }
@@ -73,7 +79,7 @@ class BuyAndSellViewController: FormViewController {
         let admUrl: String
         
         if let account = accountService.account {
-            admUrl = String.adamantLocalized.wallets.buyTokensUrl(for: account.address)
+            admUrl = String.adamant.wallets.buyTokensUrl(for: account.address)
         } else {
             admUrl = Rows.adamantSite.url
         }
@@ -95,6 +101,10 @@ class BuyAndSellViewController: FormViewController {
         // MARK: StakeCube
         let stakecubeCoinRow = buildUrlRow(for: .stakecube)
         section.append(stakecubeCoinRow)
+        
+        // MARK: Coinstore
+        let coinstoreCoinRow = buildUrlRow(for: .coinstore)
+        section.append(coinstoreCoinRow)
         
         form.append(section)
         

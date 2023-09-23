@@ -18,5 +18,25 @@ extension MessageTransaction {
 
     @NSManaged public var isMarkdown: Bool
     @NSManaged public var message: String?
+    @NSManaged public var reactionsData: Data?
+    
+    var reactions: Set<Reaction>? {
+        get {
+            guard let data = reactionsData else {
+                return nil
+            }
 
+            return try? PropertyListDecoder().decode(Set<Reaction>.self, from: data)
+        }
+        
+        set {
+            guard let value = newValue else {
+                reactionsData = nil
+                return
+            }
+
+            let data = try? PropertyListEncoder().encode(value)
+            reactionsData = data
+        }
+    }
 }

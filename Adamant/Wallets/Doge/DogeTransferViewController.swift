@@ -9,13 +9,10 @@
 import UIKit
 import Eureka
 import BitcoinKit
+import CommonKit
 
 final class DogeTransferViewController: TransferViewControllerBase {
-    
-    // MARK: Properties
 
-    static let invalidCharacters: CharacterSet = CharacterSet.decimalDigits.inverted
-    
     // MARK: Send
     
     @MainActor
@@ -38,7 +35,7 @@ final class DogeTransferViewController: TransferViewControllerBase {
             return
         }
         
-        dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
+        dialogService.showProgress(withMessage: String.adamant.transfer.transferProcessingMessage, userInteractionEnable: false)
         
         Task {
             do {
@@ -67,7 +64,7 @@ final class DogeTransferViewController: TransferViewControllerBase {
                 }
                 
                 dialogService.dismissProgress()
-                dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                dialogService.showSuccess(withMessage: String.adamant.transfer.transferSuccess)
                 
                 // Present detail VC
                 presentDetailTransactionVC(
@@ -94,7 +91,7 @@ final class DogeTransferViewController: TransferViewControllerBase {
         
         detailsVc.transaction = transaction
         detailsVc.service = service
-        detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+        detailsVc.senderName = String.adamant.transactionDetails.yourAddress
         detailsVc.recipientName = recipientName
         
         if comments.count > 0 {
@@ -110,22 +107,6 @@ final class DogeTransferViewController: TransferViewControllerBase {
     
     // MARK: Overrides
     
-    private var _recipient: String?
-    
-    override var recipientAddress: String? {
-        set {
-            _recipient = newValue
-            
-            if let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) {
-                row.value = _recipient
-                row.updateCell()
-            }
-        }
-        get {
-            return _recipient
-        }
-    }
-    
     override func validateRecipient(_ address: String) -> AddressValidationResult {
         service?.validate(address: address) ?? .invalid(description: nil)
     }
@@ -133,22 +114,28 @@ final class DogeTransferViewController: TransferViewControllerBase {
     override func recipientRow() -> BaseRow {
         let row = TextRow {
             $0.tag = BaseRows.address.tag
-            $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
+            $0.cell.textField.placeholder = String.adamant.newChat.addressPlaceholder
+            $0.cell.textField.keyboardType = .namePhonePad
             $0.cell.textField.autocorrectionType = .no
             $0.cell.textField.setLineBreakMode()
             
-            if let recipient = recipientAddress {
-                $0.value = recipient
-            }
+            $0.value = recipientAddress?.components(
+                separatedBy: TransferViewControllerBase.invalidCharacters
+            ).joined()
             
             if recipientIsReadonly {
                 $0.disabled = true
                 $0.cell.textField.isEnabled = false
             }
+        }.cellUpdate { cell, row in
+            cell.textField.text = row.value?.components(
+                separatedBy: TransferViewControllerBase.invalidCharacters
+            ).joined()
         }.onChange { [weak self] row in
-            if let text = row.value {
-                self?._recipient = text
-            }
+            row.cell.textField.text = row.value?.components(
+                separatedBy: TransferViewControllerBase.invalidCharacters
+            ).joined()
+            
             self?.updateToolbar(for: row)
         }.onCellSelection { [weak self] (cell, _) in
             self?.shareValue(self?.recipientAddress, from: cell)
@@ -158,6 +145,6 @@ final class DogeTransferViewController: TransferViewControllerBase {
     }
     
     override func defaultSceneTitle() -> String? {
-        return String.adamantLocalized.sendDoge
+        return String.adamant.sendDoge
     }
 }

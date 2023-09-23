@@ -8,6 +8,7 @@
 
 import Foundation
 import Alamofire
+import CommonKit
 
 // MARK: - Notifications
 extension Notification.Name {
@@ -17,11 +18,7 @@ extension Notification.Name {
 }
 
 // - MARK: ApiService
-protocol ApiService: AnyObject {
-    
-    /// Default is async queue with .utilities priority.
-    var defaultResponseDispatchQueue: DispatchQueue { get }
-    
+protocol ApiService: Actor {
     /// Time interval between node (lhs) and client (rhs)
     /// Substract this from client time to get server time
     var lastRequestTimeDelta: TimeInterval? { get }

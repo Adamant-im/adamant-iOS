@@ -8,8 +8,9 @@
 
 import Foundation
 import SocketIO
+import CommonKit
 
-class AdamantSocketService: SocketService {
+final class AdamantSocketService: SocketService {
 
     // MARK: - Dependencies
     
@@ -21,7 +22,7 @@ class AdamantSocketService: SocketService {
     
     // MARK: - Properties
     
-    private(set) var currentNode: Node? {
+    @Atomic private(set) var currentNode: Node? {
         didSet {
             currentUrl = currentNode?.asSocketURL()
             
@@ -30,7 +31,7 @@ class AdamantSocketService: SocketService {
         }
     }
     
-    private var currentUrl: URL? {
+    @Atomic private var currentUrl: URL? {
         didSet {
             guard
                 oldValue != currentUrl,
@@ -44,11 +45,10 @@ class AdamantSocketService: SocketService {
         }
     }
     
-    private var manager: SocketManager?
-    private var socket: SocketIOClient?
-    private var currentAddress: String?
-    private var currentHandler: ((ApiServiceResult<Transaction>) -> Void)?
-    private let semaphore = DispatchSemaphore(value: 1)
+    @Atomic private var manager: SocketManager?
+    @Atomic private var socket: SocketIOClient?
+    @Atomic private var currentAddress: String?
+    @Atomic private var currentHandler: ((ApiServiceResult<Transaction>) -> Void)?
     
     let defaultResponseDispatchQueue = DispatchQueue(
         label: "com.adamant.response-queue",
@@ -68,10 +68,7 @@ class AdamantSocketService: SocketService {
     // MARK: - Tools
     
     func connect(address: String, handler: @escaping (ApiServiceResult<Transaction>) -> Void) {
-        semaphore.wait()
-        defer { semaphore.signal() }
-        
-        _disconnect()
+        disconnect()
         currentAddress = address
         currentHandler = handler
         
@@ -95,12 +92,6 @@ class AdamantSocketService: SocketService {
     }
     
     func disconnect() {
-        semaphore.wait()
-        _disconnect()
-        semaphore.signal()
-    }
-    
-    private func _disconnect() {
         socket?.disconnect()
         socket = nil
         manager = nil

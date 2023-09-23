@@ -11,6 +11,7 @@ import SnapKit
 import UserNotifications
 import UserNotificationsUI
 import MarkdownKit
+import CommonKit
 
 class NotificationViewController: UIViewController, UNNotificationContentExtension {
     private let passphraseStoreKey = "accountService.passphrase"
@@ -247,7 +248,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
             senderAddressLabel.text = nil
         }
         
-        recipientNameLabel.text = String.adamantLocalized.notifications.yourAddress
+        recipientNameLabel.text = String.adamant.notifications.yourAddress
         recipientAddressLabel.text = transaction.recipientId
         
         dateLabel.text = date.humanizedDateTime()
@@ -291,15 +292,10 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
     
     // MARK: - UI
     private func showError(with message: String? = nil) {
-        guard let warningView = UINib(nibName: "Warning", bundle: nil).instantiate(withOwner: nil, options: nil).first as? WarningView else {
-            return
-        }
+        let warningView = NotificationWarningView()
         
-        if let message = message {
-            warningView.messageLabel.text = String.adamantLocalized.notifications.error(with: message)
-        } else {
-            warningView.messageLabel.text = String.adamantLocalized.notifications.error
-        }
+        warningView.message = message.map { .adamant.notifications.error(with: $0) }
+            ?? .adamant.notifications.error
         
         view.addSubview(warningView)
         warningView.snp.makeConstraints {

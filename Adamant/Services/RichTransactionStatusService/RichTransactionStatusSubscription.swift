@@ -8,6 +8,7 @@
 
 import Combine
 import Foundation
+import CommonKit
 
 actor RichTransactionStatusSubscription<StatusSubscriber: Subscriber>: Subscription where
     StatusSubscriber.Input == TransactionStatus,

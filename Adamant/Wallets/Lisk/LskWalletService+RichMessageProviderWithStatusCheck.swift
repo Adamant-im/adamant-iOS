@@ -8,6 +8,7 @@
 
 import Foundation
 import LiskKit
+import CommonKit
 
 extension LskWalletService: RichMessageProviderWithStatusCheck {
     func statusInfoFor(transaction: RichMessageTransaction) async -> TransactionStatusInfo {

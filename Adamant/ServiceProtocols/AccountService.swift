@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CommonKit
 
 // MARK: - Notifications
 extension Notification.Name {
@@ -47,11 +48,11 @@ extension Notification.Name {
 }
 
 // MARK: - Localization
-extension String.adamantLocalized {
+extension String.adamant {
     struct accountService {
-        static let updateAlertTitleV12 = NSLocalizedString("AccountService.update.v12.title", comment: "AccountService: Alert title. Changes in version 1.2")
-        static let updateAlertMessageV12 = NSLocalizedString("AccountService.update.v12.message", comment: "AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth & lsk wallets")
-        static let reloginToInitiateWallets = NSLocalizedString("AccountService.reloginToInitiateWallets", comment: "AccountService: User must relogin into app to initiate wallets")
+        static let updateAlertTitleV12 = String.localized("AccountService.update.v12.title", comment: "AccountService: Alert title. Changes in version 1.2")
+        static let updateAlertMessageV12 = String.localized("AccountService.update.v12.message", comment: "AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth & lsk wallets")
+        static let reloginToInitiateWallets = String.localized("AccountService.reloginToInitiateWallets", comment: "AccountService: User must relogin into app to initiate wallets")
     }
 }
 
@@ -92,19 +93,19 @@ enum AccountServiceError: Error {
     var localized: String {
         switch self {
         case .userNotLogged:
-            return String.adamantLocalized.sharedErrors.userNotLogged
+            return String.adamant.sharedErrors.userNotLogged
             
         case .invalidPassphrase:
-            return NSLocalizedString("AccountServiceError.InvalidPassphrase", comment: "Login: user typed in invalid passphrase")
+            return .localized("AccountServiceError.InvalidPassphrase", comment: "Login: user typed in invalid passphrase")
             
         case .wrongPassphrase:
-            return NSLocalizedString("AccountServiceError.WrongPassphrase", comment: "Login: user typed in wrong passphrase")
+            return .localized("AccountServiceError.WrongPassphrase", comment: "Login: user typed in wrong passphrase")
         
         case .apiError(let error):
             return error.localizedDescription
         
         case .internalError(let message, _):
-            return String.adamantLocalized.sharedErrors.internalError(message: message)
+            return String.adamant.sharedErrors.internalError(message: message)
         }
     }
 }
@@ -173,7 +174,7 @@ protocol AccountService: AnyObject {
     var hasStayInAccount: Bool { get }
     
     /// Use TouchID or FaceID to log in
-    var useBiometry: Bool { get set }
+    var useBiometry: Bool { get }
     
     /// Save account data and use pincode to login
     ///
@@ -187,4 +188,7 @@ protocol AccountService: AnyObject {
     
     /// If we have stored data with pin, validate it. If no data saved, always returns false.
     func validatePin(_ pin: String) -> Bool
+    
+    /// Update use TouchID or FaceID to log in
+    func updateUseBiometry(_ newValue: Bool)
 }

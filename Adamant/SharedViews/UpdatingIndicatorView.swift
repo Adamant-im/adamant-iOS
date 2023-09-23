@@ -8,12 +8,17 @@
 
 import UIKit
 import SnapKit
+import CommonKit
 
 final class UpdatingIndicatorView: UIView {
+    
+    private lazy var imageView = UIImageView(image: nil)
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = title
+        label.minimumScaleFactor = 0.5
+        label.adjustsFontSizeToFitWidth = true
         label.font = titleType.font
         return label
     }()
@@ -25,6 +30,22 @@ final class UpdatingIndicatorView: UIView {
         return view
     }()
     
+    private lazy var userDataStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 5
+        stackView.alignment = .center
+
+        stackView.addArrangedSubview(imageView)
+        stackView.addArrangedSubview(titleLabel)
+
+        imageView.snp.makeConstraints { make in
+            make.size.equalTo(imageSize)
+        }
+
+        return stackView
+    }()
+
     // MARK: Proprieties
     
     enum TitleType {
@@ -41,6 +62,15 @@ final class UpdatingIndicatorView: UIView {
     
     private var title: String
     private var titleType: TitleType
+    private var image: UIImage? {
+        didSet {
+            updateImageViewSize()
+        }
+    }
+    
+    private var imageSize: CGFloat {
+        image != nil ? 25 : .zero
+    }
     
     // MARK: Init
     
@@ -60,11 +90,11 @@ final class UpdatingIndicatorView: UIView {
     }
     
     private func setupView() {
-        addSubview(titleLabel)
+        addSubview(userDataStackView)
         addSubview(spinner)
         
-        titleLabel.snp.makeConstraints { make in
-            make.centerY.centerX.equalToSuperview()
+        userDataStackView.snp.makeConstraints { make in
+            make.centerY.leading.trailing.equalToSuperview()
         }
         spinner.snp.makeConstraints { make in
             make.trailing.equalTo(titleLabel.snp.leading).offset(-5)
@@ -72,18 +102,32 @@ final class UpdatingIndicatorView: UIView {
         }
     }
     
+    @MainActor
+    private func updateImageViewSize() {
+        imageView.snp.updateConstraints { make in
+            make.size.equalTo(imageSize)
+        }
+    }
+    
     // MARK: Actions
     
     func startAnimate() {
+        imageView.alpha = 0
         spinner.startAnimating()
     }
     
     func stopAnimate() {
         spinner.stopAnimating()
+        imageView.alpha = 1
     }
     
     func updateTitle(title: String?) {
         self.title = title ?? ""
         titleLabel.text = title
+    }
+    
+    func updateImage(image: UIImage?) {
+        self.image = image
+        imageView.image = image
     }
 }

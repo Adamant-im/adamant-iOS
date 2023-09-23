@@ -8,6 +8,7 @@
 
 import MessageKit
 import UIKit
+import CommonKit
 
 struct ChatMessage: Identifiable, Equatable {
     let id: String

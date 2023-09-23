@@ -9,22 +9,23 @@
 import UIKit
 import SafariServices
 import Eureka
+import CommonKit
 
-extension String.adamantLocalized.wallets {
-    static let adamant = NSLocalizedString("AccountTab.Wallets.adamant_wallet", comment: "Account tab: Adamant wallet")
+extension String.adamant.wallets {
+    static let adamant = String.localized("AccountTab.Wallets.adamant_wallet", comment: "Account tab: Adamant wallet")
     
-    static let sendAdm = NSLocalizedString("AccountTab.Row.SendAdm", comment: "Account tab: 'Send ADM tokens' button")
+    static let sendAdm = String.localized("AccountTab.Row.SendAdm", comment: "Account tab: 'Send ADM tokens' button")
     
-    static let buyAdmTokens = NSLocalizedString("AccountTab.Row.AnonymouslyBuyADM", comment: "Account tab: Anonymously buy ADM tokens")
+    static let buyAdmTokens = String.localized("AccountTab.Row.AnonymouslyBuyADM", comment: "Account tab: Anonymously buy ADM tokens")
 
-    static let exchangeInChatAdmTokens = NSLocalizedString("AccountTab.Row.ExchangeADMInChat", comment: "Account tab: Exchange ADM in chat")
+    static let exchangeInChatAdmTokens = String.localized("AccountTab.Row.ExchangeADMInChat", comment: "Account tab: Exchange ADM in chat")
     // URLs
     static func getFreeTokensUrl(for address: String) -> String {
-        return String.localizedStringWithFormat(NSLocalizedString("AccountTab.FreeTokens.UrlFormat", comment: "Account tab: A full 'Get free tokens' link, with %@ as address"), address)
+        return String.localizedStringWithFormat(.localized("AccountTab.FreeTokens.UrlFormat", comment: "Account tab: A full 'Get free tokens' link, with %@ as address"), address)
     }
     
     static func buyTokensUrl(for address: String) -> String {
-        return String.localizedStringWithFormat(NSLocalizedString("AccountTab.BuyTokens.UrlFormat", comment: "Account tab: A full 'Buy tokens' link, with %@ as address"), address)
+        return String.localizedStringWithFormat(.localized("AccountTab.BuyTokens.UrlFormat", comment: "Account tab: A full 'Buy tokens' link, with %@ as address"), address)
     }
     
     static let getFreeTokensUrlFormat = ""
@@ -45,15 +46,15 @@ class AdmWalletViewController: WalletViewControllerBase {
         
         var localized: String {
             switch self {
-            case .buyTokens: return NSLocalizedString("AccountTab.Row.BuyTokens", comment: "Account tab: 'Buy tokens' button")
-            case .freeTokens: return NSLocalizedString("AccountTab.Row.FreeTokens", comment: "Account tab: 'Get free tokens' button")
+            case .buyTokens: return .localized("AccountTab.Row.BuyTokens", comment: "Account tab: 'Buy tokens' button")
+            case .freeTokens: return .localized("AccountTab.Row.FreeTokens", comment: "Account tab: 'Get free tokens' button")
             }
         }
         
         var image: UIImage? {
             switch self {
-            case .buyTokens: return #imageLiteral(resourceName: "row_buy-coins")
-            case .freeTokens: return #imageLiteral(resourceName: "row_free-tokens")
+            case .buyTokens: return .asset(named: "row_buy-coins")
+            case .freeTokens: return .asset(named: "row_free-tokens")
             }
         }
     }
@@ -69,7 +70,7 @@ class AdmWalletViewController: WalletViewControllerBase {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        walletTitleLabel.text = String.adamantLocalized.wallets.adamant
+        walletTitleLabel.text = String.adamant.wallets.adamant
         
         if let balance = service?.wallet?.balance {
             hideFreeTokensRow = balance > 0
@@ -126,7 +127,7 @@ class AdmWalletViewController: WalletViewControllerBase {
         }.onCellSelection { [weak self] (_, row) in
             row.deselect()
             if let address = self?.service?.wallet?.address {
-                let urlRaw = String.adamantLocalized.wallets.getFreeTokensUrl(for: address)
+                let urlRaw = String.adamant.wallets.getFreeTokensUrl(for: address)
                 guard let url = URL(string: urlRaw) else {
                     self?.dialogService.showError(
                         withMessage: "Failed to create URL with string: \(urlRaw)",
@@ -163,7 +164,7 @@ class AdmWalletViewController: WalletViewControllerBase {
     }
     
     override func sendRowLocalizedLabel() -> NSAttributedString {
-        return NSAttributedString(string: String.adamantLocalized.wallets.sendAdm)
+        return NSAttributedString(string: String.adamant.wallets.sendAdm)
     }
     
     override func encodeForQr(address: String) -> String? {

@@ -9,16 +9,14 @@
 import UIKit
 import Eureka
 import Web3Core
+import CommonKit
 
 final class EthTransferViewController: TransferViewControllerBase {
     
     // MARK: Properties
     
     private var skipValueChange: Bool = false
-    
-    static let invalidCharacters: CharacterSet = {
-        CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789").inverted
-    }()
+    private let prefix = "0x"
     
     // MARK: Send
     
@@ -35,7 +33,7 @@ final class EthTransferViewController: TransferViewControllerBase {
             return
         }
         
-        dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
+        dialogService.showProgress(withMessage: String.adamant.transfer.transferProcessingMessage, userInteractionEnable: false)
         
         Task {
             do {
@@ -70,7 +68,7 @@ final class EthTransferViewController: TransferViewControllerBase {
                 }
                 
                 dialogService.dismissProgress()
-                dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                dialogService.showSuccess(withMessage: String.adamant.transfer.transferSuccess)
                 
                 // Present detail VC
                 presentDetailTransactionVC(
@@ -103,7 +101,7 @@ final class EthTransferViewController: TransferViewControllerBase {
         if let detailsVc = router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? EthTransactionDetailsViewController {
             detailsVc.transaction = transaction
             detailsVc.service = service
-            detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+            detailsVc.senderName = String.adamant.transactionDetails.yourAddress
             detailsVc.recipientName = recipientName
             
             if comments.count > 0 {
@@ -118,57 +116,54 @@ final class EthTransferViewController: TransferViewControllerBase {
     
     // MARK: Overrides
     
-    private var _recipient: String?
-    
     override var recipientAddress: String? {
         set {
-            _recipient = newValue?.validateEthAddress()
-            
+            let _recipient = newValue?.addPrefixIfNeeded(prefix: prefix)
             if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = _recipient
                 row.updateCell()
             }
         }
         get {
-            return _recipient
+            let row: RowOf<String>? = form.rowBy(tag: BaseRows.address.tag)
+            return row?.value?.addPrefixIfNeeded(prefix: prefix)
         }
     }
     
     override func validateRecipient(_ address: String) -> AddressValidationResult {
-        let fixedAddress = address.validateEthAddress()
+        let fixedAddress = address.addPrefixIfNeeded(prefix: prefix)
         return service?.validate(address: fixedAddress) ?? .invalid(description: nil)
     }
     
     override func recipientRow() -> BaseRow {
         let row = TextRow {
             $0.tag = BaseRows.address.tag
-            $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
-            $0.cell.textField.keyboardType = UIKeyboardType.namePhonePad
+            $0.cell.textField.placeholder = String.adamant.newChat.addressPlaceholder
+            $0.cell.textField.keyboardType = .namePhonePad
             $0.cell.textField.autocorrectionType = .no
             
-            if let recipient = recipientAddress {
-                let trimmed = recipient.components(separatedBy: EthTransferViewController.invalidCharacters).joined()
-                $0.value = trimmed
-            }
+            $0.value = recipientAddress?.components(
+                separatedBy: TransferViewControllerBase.invalidCharacters
+            ).joined()
             
-            let prefix = UILabel()
-            prefix.text = "0x"
-            prefix.sizeToFit()
+            let prefixLabel = UILabel()
+            prefixLabel.text = prefix
+            prefixLabel.sizeToFit()
             
             let view = UIView()
-            view.addSubview(prefix)
-            view.frame = prefix.frame
+            view.addSubview(prefixLabel)
+            view.frame = prefixLabel.frame
             $0.cell.textField.leftView = view
             $0.cell.textField.leftViewMode = .always
             $0.cell.textField.setLineBreakMode()
             
             if recipientIsReadonly {
                 $0.disabled = true
-                prefix.textColor = UIColor.lightGray
+                prefixLabel.textColor = UIColor.lightGray
             }
         }.cellUpdate { [weak self] (cell, _) in
             if let text = cell.textField.text {
-                cell.textField.text = text.components(separatedBy: EthTransferViewController.invalidCharacters).joined()
+                cell.textField.text = text.components(separatedBy: TransferViewControllerBase.invalidCharacters).joined()
 
                 guard self?.recipientIsReadonly == false else { return }
         
@@ -184,9 +179,13 @@ final class EthTransferViewController: TransferViewControllerBase {
             }
             
             if let text = row.value {
-                var trimmed = text.components(separatedBy: EthTransferViewController.invalidCharacters).joined()
-                if trimmed.starts(with: "0x") {
-                    let i = trimmed.index(trimmed.startIndex, offsetBy: 2)
+                var trimmed = text.components(
+                    separatedBy: TransferViewControllerBase.invalidCharacters
+                ).joined()
+                
+                if let prefix = self?.prefix,
+                   trimmed.starts(with: prefix) {
+                    let i = trimmed.index(trimmed.startIndex, offsetBy: prefix.count)
                     trimmed = String(trimmed[i...])
                 }
                 
@@ -208,6 +207,6 @@ final class EthTransferViewController: TransferViewControllerBase {
     }
     
     override func defaultSceneTitle() -> String? {
-        return String.adamantLocalized.wallets.sendEth
+        return String.adamant.wallets.sendEth
     }
 }

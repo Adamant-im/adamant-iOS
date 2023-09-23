@@ -7,70 +7,143 @@
 //
 
 import UIKit
+import SwiftUI
+import AdvancedContextMenuKit
+import CommonKit
 
-final class ChatMenuManager: NSObject, UIContextMenuInteractionDelegate {
-    private let menu: UIMenu
+protocol ChatMenuManagerDelegate: AnyObject {
+    func getCopyView() -> UIView?
+    func presentMenu(
+        copyView: UIView,
+        size: CGSize,
+        location: CGPoint,
+        tapLocation: CGPoint,
+        getPositionOnScreen: @escaping () -> CGPoint
+    )
+}
+
+@MainActor
+final class ChatMenuManager: NSObject {
+    weak var delegate: ChatMenuManagerDelegate?
     
-    var backgroundColor: UIColor?
+    var isiOSAppOnMac: Bool = {
+#if targetEnvironment(macCatalyst)
+        return true
+#else
+        if #available(iOS 14.0, *) {
+            return ProcessInfo.processInfo.isiOSAppOnMac
+        } else {
+            return false
+        }
+#endif
+    }()
     
     // MARK: Init
     
-    init(menu: UIMenu, backgroundColor: UIColor?) {
-        self.menu = menu
-        self.backgroundColor = backgroundColor
-        
-        super.init()
+    init(delegate: ChatMenuManagerDelegate?) {
+        self.delegate = delegate
     }
     
-    func contextMenuInteraction(
-        _ interaction: UIContextMenuInteraction,
-        configurationForMenuAtLocation location: CGPoint
-    ) -> UIContextMenuConfiguration? {
-        return UIContextMenuConfiguration(actionProvider: { [weak self] _ in
-            guard let self = self else { return nil }
-            return self.menu
-        })
+    func setup(for contentView: UIView ) {
+        guard !isiOSAppOnMac else {
+            let interaction = UIContextMenuInteraction(delegate: self)
+            contentView.addInteraction(interaction)
+            return
+        }
+        
+        let longPressGesture = UILongPressGestureRecognizer(
+            target: self,
+            action: #selector(handleLongPress(_:))
+        )
+        longPressGesture.minimumPressDuration = 0.17
+        contentView.addGestureRecognizer(longPressGesture)
     }
     
-    func contextMenuInteraction(
-        _ interaction: UIContextMenuInteraction,
-        configuration: UIContextMenuConfiguration,
-        highlightPreviewForItemWithIdentifier identifier: NSCopying
-    ) -> UITargetedPreview? {
-        guard let backgroundColor = backgroundColor else { return nil }
+    func presentMenuProgrammatically(for contentView: UIView) {
+        let locationOnScreen = contentView.convert(CGPoint.zero, to: nil)
         
-        return makeTargetedPreview(
-            for: configuration,
-            interaction: interaction,
-            backgroundColor: backgroundColor
+        let size = contentView.frame.size
+        
+        let copyView = delegate?.getCopyView() ?? contentView
+        
+        let getPositionOnScreen: () -> CGPoint = { [weak contentView] in
+            contentView?.convert(CGPoint.zero, to: nil) ?? .zero
+        }
+        
+        delegate?.presentMenu(
+            copyView: copyView,
+            size: size,
+            location: locationOnScreen,
+            tapLocation: .init(
+                x: locationOnScreen.x + size.width / 2,
+                y: locationOnScreen.y + size.height / 2
+            ),
+            getPositionOnScreen: getPositionOnScreen
         )
     }
     
-    func contextMenuInteraction(
-        _ interaction: UIContextMenuInteraction,
-        configuration: UIContextMenuConfiguration,
-        dismissalPreviewForItemWithIdentifier identifier: NSCopying
-    ) -> UITargetedPreview? {
-        guard backgroundColor != nil else {
-            return makeTargetedPreview(
-                for: configuration,
-                interaction: interaction,
-                backgroundColor: .clear
-            )
+    @objc func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
+        guard !isiOSAppOnMac else { return }
+        
+        guard gesture.state == .began,
+              let contentView = gesture.view
+        else { return }
+        
+        let locationOnScreen = contentView.convert(CGPoint.zero, to: nil)
+        
+        let size = contentView.frame.size
+        
+        let copyView = delegate?.getCopyView() ?? contentView
+        
+        let getPositionOnScreen: () -> CGPoint = {
+            contentView.convert(CGPoint.zero, to: nil)
         }
         
+        delegate?.presentMenu(
+            copyView: copyView,
+            size: size,
+            location: locationOnScreen,
+            tapLocation: .zero,
+            getPositionOnScreen: getPositionOnScreen
+        )
+    }
+}
+
+extension ChatMenuManager: UIContextMenuInteractionDelegate {
+    public func contextMenuInteraction(
+        _ interaction: UIContextMenuInteraction,
+        configurationForMenuAtLocation location: CGPoint
+    ) -> UIContextMenuConfiguration? {
+        presentMacOverlay(interaction, configurationForMenuAtLocation: location)
         return nil
     }
     
-    private func makeTargetedPreview(
-        for configuration: UIContextMenuConfiguration,
-        interaction: UIContextMenuInteraction,
-        backgroundColor: UIColor
-    ) -> UITargetedPreview? {
-        guard let view = interaction.view else { return nil }
+    func presentMacOverlay(
+        _ interaction: UIContextMenuInteraction,
+        configurationForMenuAtLocation location: CGPoint
+    ) {
+        guard let contentView = interaction.view
+        else { return }
         
-        let parameters = UIPreviewParameters()
-        parameters.backgroundColor = backgroundColor
-        return UITargetedPreview(view: view, parameters: parameters)
+        let contentLocation = contentView.convert(CGPoint.zero, to: nil)
+        let tapLocation: CGPoint = .init(
+            x: contentLocation.x + location.x,
+            y: contentLocation.y + location.y
+        )
+        let size = contentView.frame.size
+        
+        let copyView = delegate?.getCopyView() ?? contentView
+        
+        let getPositionOnScreen: () -> CGPoint = {
+            contentView.convert(CGPoint.zero, to: nil)
+        }
+        
+        delegate?.presentMenu(
+            copyView: copyView,
+            size: size,
+            location: contentLocation,
+            tapLocation: tapLocation,
+            getPositionOnScreen: getPositionOnScreen
+        )
     }
 }

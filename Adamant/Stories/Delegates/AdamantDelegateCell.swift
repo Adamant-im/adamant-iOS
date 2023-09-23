@@ -57,7 +57,7 @@ class AdamantDelegateCell: UITableViewCell {
     
     var isUpvoted: Bool = false {
         didSet {
-            checkmarkRowView.checkmarkImage = isUpvoted ? #imageLiteral(resourceName: "Downvote") : #imageLiteral(resourceName: "Upvote")
+            checkmarkRowView.checkmarkImage = isUpvoted ? .asset(named: "Downvote") : .asset(named: "Upvote")
             checkmarkRowView.checkmarkImageBorderColor = isUpvoted ? UIColor.adamant.good.cgColor : UIColor.adamant.secondary.cgColor
             checkmarkRowView.checkmarkImageTintColor = isUpvoted ? .adamant.danger : .adamant.good
         }

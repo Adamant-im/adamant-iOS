@@ -8,13 +8,14 @@
 
 import UIKit
 import Eureka
+import CommonKit
 
 // MARK: - Localization
-extension String.adamantLocalized {
+extension String.adamant {
     struct nodesEditor {
-        static let newNodeTitle = NSLocalizedString("NodesEditor.NewNodeTitle", comment: "NodesEditor: New node scene title")
-        static let deleteNodeAlert = NSLocalizedString("NodesEditor.DeleteNodeAlert", comment: "NodesEditor: Delete node confirmation message")
-        static let failedToBuildURL = NSLocalizedString("NodesEditor.FailedToBuildURL", comment: "NodesEditor: Failed to build URL alert")
+        static let newNodeTitle = String.localized("NodesEditor.NewNodeTitle", comment: "NodesEditor: New node scene title")
+        static let deleteNodeAlert = String.localized("NodesEditor.DeleteNodeAlert", comment: "NodesEditor: Delete node confirmation message")
+        static let failedToBuildURL = String.localized("NodesEditor.FailedToBuildURL", comment: "NodesEditor: Failed to build URL alert")
 
         private init() {}
     }
@@ -48,17 +49,17 @@ class NodeEditorViewController: FormViewController {
         
         var localized: String {
             switch self {
-            case .scheme: return NSLocalizedString("NodesEditor.SchemeRow", comment: "NodesEditor: Scheme row")
-            case .port: return NSLocalizedString("NodesEditor.PortRow", comment: "NodesEditor: Port row")
-            case .host: return NSLocalizedString("NodesEditor.HostRow", comment: "NodesEditor: Host row")
-            case .webSockets: return NSLocalizedString("NodesEditor.WebSockets", comment: "NodesEditor: Web sockets")
-            case .deleteButton: return NSLocalizedString("NodesEditor.DeleteNodeButton", comment: "NodesEditor: Delete node button")
+            case .scheme: return .localized("NodesEditor.SchemeRow", comment: "NodesEditor: Scheme row")
+            case .port: return .localized("NodesEditor.PortRow", comment: "NodesEditor: Port row")
+            case .host: return .localized("NodesEditor.HostRow", comment: "NodesEditor: Host row")
+            case .webSockets: return .localized("NodesEditor.WebSockets", comment: "NodesEditor: Web sockets")
+            case .deleteButton: return .localized("NodesEditor.DeleteNodeButton", comment: "NodesEditor: Delete node button")
             }
         }
         
         var placeholder: String? {
             switch self {
-            case .host: return NSLocalizedString("NodesEditor.HostRow.Placeholder", comment: "NodesEditor: Host row placeholder")
+            case .host: return .localized("NodesEditor.HostRow.Placeholder", comment: "NodesEditor: Host row placeholder")
             case .port, .scheme, .webSockets, .deleteButton: return nil
             }
         }
@@ -80,8 +81,8 @@ class NodeEditorViewController: FormViewController {
         
         var localized: String {
             switch self {
-            case .supported: return NSLocalizedString("NodesEditor.WebSocketsSupported", comment: "NodesEditor: Web sockets are supported")
-            case .notSupported: return NSLocalizedString("NodesEditor.WebSocketsNotSupported", comment: "NodesEditor: Web sockets aren't supported")
+            case .supported: return .localized("NodesEditor.WebSocketsSupported", comment: "NodesEditor: Web sockets are supported")
+            case .notSupported: return .localized("NodesEditor.WebSocketsNotSupported", comment: "NodesEditor: Web sockets aren't supported")
             }
         }
     }
@@ -110,7 +111,7 @@ class NodeEditorViewController: FormViewController {
         if let node = node {
             self.navigationItem.title = node.host
         } else {
-            self.navigationItem.title = String.adamantLocalized.nodesEditor.newNodeTitle
+            self.navigationItem.title = String.adamant.nodesEditor.newNodeTitle
         }
         
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(saveNode))
@@ -252,9 +253,9 @@ extension NodeEditorViewController {
     }
     
     private func deleteNode() {
-        let alert = UIAlertController(title: String.adamantLocalized.nodesEditor.deleteNodeAlert, message: nil, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
-        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.delete, style: .destructive, handler: { _ in
+        let alert = UIAlertController(title: String.adamant.nodesEditor.deleteNodeAlert, message: nil, preferredStyleSafe: .alert, source: nil)
+        alert.addAction(UIAlertAction(title: String.adamant.alert.cancel, style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: String.adamant.alert.delete, style: .destructive, handler: { _ in
             self.didCallDelegate = true
             
             if let node = self.node {

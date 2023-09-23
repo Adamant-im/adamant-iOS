@@ -8,6 +8,7 @@
 
 import UIKit
 import ProcedureKit
+import CommonKit
 
 class DogeTransactionsViewController: TransactionsListViewControllerBase {
     
@@ -98,11 +99,11 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
         controller.transaction = emptyTransaction
         
         if emptyTransaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
-            controller.senderName = String.adamantLocalized.transactionDetails.yourAddress
+            controller.senderName = String.adamant.transactionDetails.yourAddress
         }
         
         if emptyTransaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
-            controller.recipientName = String.adamantLocalized.transactionDetails.yourAddress
+            controller.recipientName = String.adamant.transactionDetails.yourAddress
         }
         
         navigationController?.pushViewController(controller, animated: true)
@@ -131,7 +132,7 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
         
         let partnerName: String?
         if let address = walletService.wallet?.address, partnerId == address {
-            partnerName = String.adamantLocalized.transactionDetails.yourAddress
+            partnerName = String.adamant.transactionDetails.yourAddress
         } else {
             partnerName = nil
         }

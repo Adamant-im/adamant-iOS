@@ -10,17 +10,18 @@ import UIKit
 import EFQRCode
 import Eureka
 import Photos
+import CommonKit
 
 // MARK: - Localization
-extension String.adamantLocalized {
+extension String.adamant {
     struct qrGenerator {
-        static let title = NSLocalizedString("QrGeneratorScene.Title", comment: "QRGenerator: scene title")
+        static let title = String.localized("QrGeneratorScene.Title", comment: "QRGenerator: scene title")
         
-        static let tapToSaveTip = NSLocalizedString("QrGeneratorScene.TapToSave", comment: "QRGenerator: small 'Tap to save' tooltip under generated QR")
-        static let passphrasePlaceholder = NSLocalizedString("QrGeneratorScene.Passphrase.Placeholder", comment: "QRGenerator: Passphrase textview placeholder")
+        static let tapToSaveTip = String.localized("QrGeneratorScene.TapToSave", comment: "QRGenerator: small 'Tap to save' tooltip under generated QR")
+        static let passphrasePlaceholder = String.localized("QrGeneratorScene.Passphrase.Placeholder", comment: "QRGenerator: Passphrase textview placeholder")
         
-        static let wrongPassphraseError = NSLocalizedString("QrGeneratorScene.Error.InvalidPassphrase", comment: "QRGenerator: user typed in invalid passphrase")
-        static let internalError = NSLocalizedString("QrGeneratorScene.Error.InternalErrorFormat", comment: "QRGenerator: Bad Internal generator error message format. Using %@ for error description")
+        static let wrongPassphraseError = String.localized("QrGeneratorScene.Error.InvalidPassphrase", comment: "QRGenerator: user typed in invalid passphrase")
+        static let internalError = String.localized("QrGeneratorScene.Error.InternalErrorFormat", comment: "QRGenerator: Bad Internal generator error message format. Using %@ for error description")
         
         private init() {}
     }
@@ -63,7 +64,7 @@ class QRGeneratorViewController: FormViewController {
         super.viewDidLoad()
         
         navigationItem.largeTitleDisplayMode = .always
-        navigationItem.title = String.adamantLocalized.qrGenerator.title
+        navigationItem.title = String.adamant.qrGenerator.title
         navigationOptions = .Disabled
         
         tableView.showsVerticalScrollIndicator = false
@@ -73,7 +74,7 @@ class QRGeneratorViewController: FormViewController {
         form +++ Section { $0.tag = Sections.qr.tag }
         <<< QrRow {
             $0.tag = Rows.qr.tag
-            $0.cell.tipLabel.text = String.adamantLocalized.qrGenerator.tapToSaveTip
+            $0.cell.tipLabel.text = String.adamant.qrGenerator.tapToSaveTip
         }.onCellSelection { [weak self] (cell, row) in
             if let tableView = self?.tableView, let indexPath = tableView.indexPathForSelectedRow {
                 tableView.deselectRow(at: indexPath, animated: true)
@@ -83,7 +84,7 @@ class QRGeneratorViewController: FormViewController {
                 return
             }
             
-            let save = UIAlertAction(title: String.adamantLocalized.alert.saveToPhotolibrary, style: .default, handler: { _ in
+            let save = UIAlertAction(title: String.adamant.alert.saveToPhotolibrary, style: .default, handler: { _ in
                 
                 switch PHPhotoLibrary.authorizationStatus() {
                 case .authorized, .limited:
@@ -93,18 +94,18 @@ class QRGeneratorViewController: FormViewController {
                     UIImageWriteToSavedPhotosAlbum(qr, self, #selector(self?.image(_: didFinishSavingWithError: contextInfo:)), nil)
                     
                 case .restricted, .denied:
-                    self?.dialogService.presentGoToSettingsAlert(title: nil, message: String.adamantLocalized.shared.photolibraryNotAuthorized)
+                    self?.dialogService.presentGoToSettingsAlert(title: nil, message: String.adamant.shared.photolibraryNotAuthorized)
                 @unknown default:
                     break
                 }
             })
             
-            let share = UIAlertAction(title: String.adamantLocalized.alert.share, style: .default, handler: { _ in
+            let share = UIAlertAction(title: String.adamant.alert.share, style: .default, handler: { _ in
                 let vc = UIActivityViewController(activityItems: [qr], applicationActivities: nil)
                 vc.excludedActivityTypes = ShareContentType.passphrase.excludedActivityTypes
                 vc.completionWithItemsHandler = { (_, completed: Bool, _, error: Error?) in
                     if completed {
-                        self?.dialogService.showToastMessage(String.adamantLocalized.alert.done)
+                        self?.dialogService.showToastMessage(String.adamant.alert.done)
                     } else if let error = error {
                         self?.dialogService.showToastMessage(error.localizedDescription)
                     }
@@ -113,13 +114,18 @@ class QRGeneratorViewController: FormViewController {
                 self?.present(vc, animated: true, completion: nil)
             })
             
-            let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil)
+            let cancel = UIAlertAction(title: String.adamant.alert.cancel, style: .cancel, handler: nil)
             
-            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+            let alert = UIAlertController(
+                title: nil,
+                message: nil,
+                preferredStyleSafe: .actionSheet,
+                source: .view(cell)
+            )
+            
             alert.addAction(save)
             alert.addAction(share)
             alert.addAction(cancel)
-            alert.popoverPresentationController?.sourceView = cell
             alert.modalPresentationStyle = .overFullScreen
             self?.present(alert, animated: true, completion: nil)
         }
@@ -132,13 +138,13 @@ class QRGeneratorViewController: FormViewController {
         // MARK: Passphrase section
         form +++ Section { $0.tag = Sections.passphrase.tag }
         <<< TextAreaRow {
-            $0.placeholder = String.adamantLocalized.qrGenerator.passphrasePlaceholder
+            $0.placeholder = String.adamant.qrGenerator.passphrasePlaceholder
             $0.tag = Rows.passphrase.tag
             $0.textAreaHeight = .dynamic(initialTextViewHeight: 28.0) // 28 for textView and 8+8 for insets
         }
         
         <<< ButtonRow {
-            $0.title = String.adamantLocalized.alert.generateQr
+            $0.title = String.adamant.alert.generateQr
             $0.tag = Rows.generateButton.tag
         }.onCellSelection { [weak self] (_, _) in
             self?.generateQr()
@@ -157,9 +163,9 @@ class QRGeneratorViewController: FormViewController {
     
     @objc private func image(_ image: UIImage, didFinishSavingWithError error: NSError?, contextInfo: UnsafeRawPointer) {
         if error != nil {
-            dialogService.presentGoToSettingsAlert(title: String.adamantLocalized.shared.photolibraryNotAuthorized, message: nil)
+            dialogService.presentGoToSettingsAlert(title: String.adamant.shared.photolibraryNotAuthorized, message: nil)
         } else {
-            dialogService.showSuccess(withMessage: String.adamantLocalized.alert.done)
+            dialogService.showSuccess(withMessage: String.adamant.alert.done)
         }
     }
     
@@ -177,7 +183,7 @@ extension QRGeneratorViewController {
         guard let row: TextAreaRow = form.rowBy(tag: Rows.passphrase.tag),
             let passphrase = row.value?.lowercased(), // Lowercased!
             AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
-                dialogService.showToastMessage(String.adamantLocalized.qrGenerator.wrongPassphraseError)
+                dialogService.showToastMessage(String.adamant.qrGenerator.wrongPassphraseError)
             return
         }
         
@@ -188,7 +194,7 @@ extension QRGeneratorViewController {
             setQr(image: qr)
             
         case .failure(let error):
-            dialogService.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.qrGenerator.internalError, error.localizedDescription), supportEmail: true, error: error)
+            dialogService.showError(withMessage: String.localizedStringWithFormat(String.adamant.qrGenerator.internalError, error.localizedDescription), supportEmail: true, error: error)
         }
     }
     

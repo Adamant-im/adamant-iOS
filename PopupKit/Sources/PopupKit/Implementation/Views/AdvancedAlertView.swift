@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CommonKit
 
 struct AdvancedAlertView: View {
     @State private var width: CGFloat = .zero
@@ -72,7 +73,7 @@ private extension AdvancedAlertView {
         Button(action: model.primaryButton.action.action) {
             Text(model.primaryButton.title)
                 .padding(.vertical, bigSpacing)
-                .expanded(.horizontal)
+                .expanded(axes: .horizontal)
         }
     }
     

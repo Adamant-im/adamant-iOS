@@ -8,6 +8,7 @@
 
 import CoreData
 import Combine
+import CommonKit
 
 actor AdamantRichTransactionStatusService: NSObject, RichTransactionStatusService {
     private let richProviders: [String: RichMessageProviderWithStatusCheck]
@@ -37,7 +38,7 @@ actor AdamantRichTransactionStatusService: NSObject, RichTransactionStatusServic
 
         let id = transaction.transactionId
         
-        await setStatus(
+        setStatus(
             for: transaction,
             status: provider.statusWithFilters(
                 transaction: transaction,

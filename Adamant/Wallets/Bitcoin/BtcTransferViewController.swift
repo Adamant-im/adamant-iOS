@@ -8,6 +8,7 @@
 
 import UIKit
 import Eureka
+import CommonKit
 
 final class BtcTransferViewController: TransferViewControllerBase {
     
@@ -22,8 +23,6 @@ final class BtcTransferViewController: TransferViewControllerBase {
     }
     
     private var skipValueChange: Bool = false
-    
-    static let invalidCharacters: CharacterSet = CharacterSet.decimalDigits.inverted
     
     // MARK: Send
     
@@ -40,7 +39,7 @@ final class BtcTransferViewController: TransferViewControllerBase {
             return
         }
         
-        dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
+        dialogService.showProgress(withMessage: String.adamant.transfer.transferProcessingMessage, userInteractionEnable: false)
         
         Task {
             do {
@@ -64,7 +63,7 @@ final class BtcTransferViewController: TransferViewControllerBase {
                         dialogService.showRichError(error: error)
                     }
                     
-                    try await service.update()
+                    await service.update()
                 }
                 
                 var detailTransaction: BtcTransaction?
@@ -81,7 +80,7 @@ final class BtcTransferViewController: TransferViewControllerBase {
                 )
                 
                 dialogService.dismissProgress()
-                dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                dialogService.showSuccess(withMessage: String.adamant.transfer.transferSuccess)
             } catch {
                 dialogService.dismissProgress()
                 dialogService.showRichError(error: error)
@@ -96,15 +95,15 @@ final class BtcTransferViewController: TransferViewControllerBase {
         comments: String,
         transaction: TransactionDetails
     ) {
-        vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+        vc.dialogService.showSuccess(withMessage: String.adamant.transfer.transferSuccess)
         
         if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Bitcoin.transactionDetails) as? BtcTransactionDetailsViewController {
             detailsVc.transaction = localTransaction ?? transaction
             detailsVc.service = service
-            detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+            detailsVc.senderName = String.adamant.transactionDetails.yourAddress
             
             if recipientAddress == service.wallet?.address {
-                detailsVc.recipientName = String.adamantLocalized.transactionDetails.yourAddress
+                detailsVc.recipientName = String.adamant.transactionDetails.yourAddress
             } else {
                 detailsVc.recipientName = self.recipientName
             }
@@ -121,22 +120,6 @@ final class BtcTransferViewController: TransferViewControllerBase {
     
     // MARK: Overrides
     
-    private var _recipient: String?
-    
-    override var recipientAddress: String? {
-        set {
-            _recipient = newValue
-            
-            if let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) {
-                row.value = _recipient
-                row.updateCell()
-            }
-        }
-        get {
-            return _recipient
-        }
-    }
-    
     override func validateRecipient(_ address: String) -> AddressValidationResult {
         service?.validate(address: address) ?? .invalid(description: nil)
     }
@@ -144,25 +127,32 @@ final class BtcTransferViewController: TransferViewControllerBase {
     override func recipientRow() -> BaseRow {
         let row = TextRow {
             $0.tag = BaseRows.address.tag
-            $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
+            $0.cell.textField.placeholder = String.adamant.newChat.addressPlaceholder
             $0.cell.textField.setLineBreakMode()
+            $0.cell.textField.keyboardType = .namePhonePad
+            $0.cell.textField.autocorrectionType = .no
             
-            if let recipient = recipientAddress {
-                $0.value = recipient
-            }
+            $0.value = recipientAddress?.components(
+                separatedBy: TransferViewControllerBase.invalidCharacters
+            ).joined()
             
             if recipientIsReadonly {
                 $0.disabled = true
             }
+        }.cellUpdate { cell, row in
+            cell.textField.text = row.value?.components(
+                separatedBy: TransferViewControllerBase.invalidCharacters
+            ).joined()
         }.onChange { [weak self] row in
-            if let text = row.value {
-                self?._recipient = text
-            }
-
             if let skip = self?.skipValueChange, skip {
                 self?.skipValueChange = false
                 return
             }
+            
+            row.cell.textField.text = row.value?.components(
+                separatedBy: TransferViewControllerBase.invalidCharacters
+            ).joined()
+            
             self?.updateToolbar(for: row)
         }.onCellSelection { [weak self] (cell, _) in
             self?.shareValue(self?.recipientAddress, from: cell)
@@ -171,10 +161,7 @@ final class BtcTransferViewController: TransferViewControllerBase {
         return row
     }
     
-    
-    
-    
     override func defaultSceneTitle() -> String? {
-        return String.adamantLocalized.sendBtc
+        return String.adamant.sendBtc
     }
 }

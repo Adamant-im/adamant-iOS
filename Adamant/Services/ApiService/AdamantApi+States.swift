@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import CommonKit
 
 extension AdamantApiService.ApiCommands {
     static let States = (
@@ -21,10 +22,20 @@ extension AdamantApiService {
     
     static let KvsFee: Decimal = 0.001
     
-    func store(key: String, value: String, type: StateType, sender: String, keypair: Keypair, completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
-        self.sendingMsgTaskId = UIApplication.shared.beginBackgroundTask {
-            UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
-            self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
+    func store(
+        key: String,
+        value: String,
+        type: StateType,
+        sender: String,
+        keypair: Keypair,
+        completion: @escaping (ApiServiceResult<UInt64>) -> Void
+    ) {
+        Task { @MainActor in
+            sendingMsgTaskId = UIApplication.shared.beginBackgroundTask { [weak self] in
+                guard let self = self else { return }
+                UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
+                self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
+            }
         }
         
         // MARK: Create and sign transaction
@@ -48,7 +59,7 @@ extension AdamantApiService {
         }
         
         // MARK: Send
-        sendTransaction(path: ApiCommands.States.store, transaction: transaction) { [weak self] serverResponse in
+        sendTransaction(path: ApiCommands.States.store, transaction: transaction) { serverResponse in
             switch serverResponse {
             case .success(let response):
                 if let id = response.transactionId {
@@ -61,9 +72,13 @@ extension AdamantApiService {
                 completion(.failure(.networkError(error: error)))
             }
             
-            guard let self = self else { return }
-            UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
-            self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
+            Task { @MainActor [weak self] in
+                self?.sendingMsgTaskId = UIApplication.shared.beginBackgroundTask {
+                    guard let self = self else { return }
+                    UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
+                    self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
+                }
+            }
         }
     }
     

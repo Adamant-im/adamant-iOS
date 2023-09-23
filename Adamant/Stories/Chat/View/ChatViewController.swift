@@ -11,11 +11,11 @@ import InputBarAccessoryView
 import Combine
 import UIKit
 import SnapKit
+import CommonKit
 
 @MainActor
 final class ChatViewController: MessagesViewController {
     typealias SpinnerCell = MessageCellWrapper<SpinnerView>
-    typealias TransactionCell = CollectionCellWrapper<ChatTransactionContainerView>
     typealias SendTransaction = ( _ parentVC: UIViewController & ComplexTransferViewControllerDelegate, _ replyToMessageId: String?) -> Void
     
     // MARK: Dependencies
@@ -55,6 +55,10 @@ final class ChatViewController: MessagesViewController {
     
     private lazy var updatingIndicatorView: UpdatingIndicatorView = {
         let view = UpdatingIndicatorView(title: "", titleType: .small)
+        view.snp.makeConstraints { make in
+            make.width.lessThanOrEqualTo(self.view.bounds.width - 150)
+            make.height.equalTo(45)
+        }
         return view
     }()
     
@@ -77,7 +81,7 @@ final class ChatViewController: MessagesViewController {
         super.init(nibName: nil, bundle: nil)
         inputBar.onAttachmentButtonTap = { [weak self] in
             self.map { sendTransaction($0, viewModel.replyMessage?.id) }
-            self?.processSwipeMessage(nil)
+            self?.viewModel.clearReplyMessage()
         }
     }
     
@@ -92,7 +96,6 @@ final class ChatViewController: MessagesViewController {
         messagesCollectionView.backgroundView?.backgroundColor = .adamant.backgroundColor
         chatMessagesCollectionView.fixedBottomOffset = .zero
         maintainPositionOnInputBarHeightChanged = true
-        navigationItem.titleView = updatingIndicatorView
         configureHeader()
         configureLayout()
         configureReplyView()
@@ -153,22 +156,19 @@ final class ChatViewController: MessagesViewController {
         }
         
         super.collectionView(collectionView, willDisplay: cell, forItemAt: indexPath)
-        
-        let isVisible = collectionView.indexPathsForVisibleItems.contains {
-            $0.section == viewModel.minIndexForStartLoadNewMessages
-        }
-        
-        guard indexPath.section < viewModel.minIndexForStartLoadNewMessages,
-              isVisible
-        else { return }
-        
-        viewModel.loadMoreMessagesIfNeeded()
     }
     
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         super.scrollViewDidScroll(scrollView)
         updateIsScrollPositionNearlyTheBottom()
         updateScrollDownButtonVisibility()
+        
+        guard
+            viewAppeared,
+            scrollView.contentOffset.y <= viewModel.minOffsetForStartLoadNewMessages
+        else { return }
+        
+        viewModel.loadMoreMessagesIfNeeded()
     }
 }
 
@@ -274,12 +274,11 @@ private extension ChatViewController {
             .store(in: &subscriptions)
         
         viewModel.$partnerName
-            .removeDuplicates()
-            .assign(to: \.title, on: navigationItem)
+            .sink { [weak self] in self?.updatingIndicatorView.updateTitle(title: $0) }
             .store(in: &subscriptions)
         
-        viewModel.$partnerName
-            .sink { [weak self] in self?.updatingIndicatorView.updateTitle(title: $0) }
+        viewModel.$partnerImage
+            .sink { [weak self] in self?.updatingIndicatorView.updateImage(image: $0) }
             .store(in: &subscriptions)
         
         viewModel.closeScreen
@@ -334,6 +333,18 @@ private extension ChatViewController {
         viewModel.$isNeedToAnimateScroll
             .sink { [weak self] in self?.animateScroll(isStarted: $0) }
             .store(in: &subscriptions)
+        
+        viewModel.updateChatRead
+            .sink { [weak self] in self?.checkIsChatWasRead() }
+            .store(in: &subscriptions)
+        
+        viewModel.commitVibro
+            .sink { UIImpactFeedbackGenerator(style: .light).impactOccurred() }
+            .store(in: &subscriptions)
+        
+        viewModel.layoutIfNeeded
+            .sink { [weak self] in self?.view.layoutIfNeeded() }
+            .store(in: &subscriptions)
     }
 }
 
@@ -355,6 +366,7 @@ private extension ChatViewController {
     }
     
     func configureHeader() {
+        navigationItem.titleView = updatingIndicatorView
         navigationItem.largeTitleDisplayMode = .never
         navigationItem.rightBarButtonItem = .init(
             title: "•••",
@@ -457,7 +469,7 @@ private extension ChatViewController {
     func makeChatMessagesCollectionView() -> ChatMessagesCollectionView {
         let collection = ChatMessagesCollectionView()
         collection.refreshControl = ChatRefreshMock()
-        collection.register(TransactionCell.self)
+        collection.register(ChatTransactionCell.self)
         collection.register(ChatMessageCell.self)
         collection.register(ChatMessageReplyCell.self)
         collection.register(
@@ -617,7 +629,13 @@ private extension ChatViewController {
         
         switch transaction.transactionStatus {
         case .failed:
-            viewModel.dialog.send(.alert(.adamantLocalized.sharedErrors.inconsistentTransaction))
+            guard transaction.getRichValue(for: RichContentKeys.transfer.hash) != nil
+            else {
+                viewModel.dialog.send(.alert(.adamant.sharedErrors.inconsistentTransaction))
+                return
+            }
+            
+            provider.richMessageTapped(for: transaction, in: self)
         case .notInitiated, .pending, .success, .none, .inconsistent, .registered, .noNetwork, .noNetworkFinal:
             provider.richMessageTapped(for: transaction, in: self)
         }

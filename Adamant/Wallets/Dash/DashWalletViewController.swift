@@ -8,11 +8,12 @@
 
 import Foundation
 import UIKit
+import CommonKit
 
-extension String.adamantLocalized {
-    static let dash = NSLocalizedString("AccountTab.Wallets.dash_wallet", comment: "Account tab: Dash wallet")
+extension String.adamant {
+    static let dash = String.localized("AccountTab.Wallets.dash_wallet", comment: "Account tab: Dash wallet")
     
-    static let sendDash = NSLocalizedString("AccountTab.Row.SendDash", comment: "Account tab: 'Send Dash tokens' button")
+    static let sendDash = String.localized("AccountTab.Row.SendDash", comment: "Account tab: 'Send Dash tokens' button")
 }
 
 class DashWalletViewController: WalletViewControllerBase {
@@ -21,11 +22,11 @@ class DashWalletViewController: WalletViewControllerBase {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        walletTitleLabel.text = String.adamantLocalized.dash
+        walletTitleLabel.text = String.adamant.dash
     }
     
     override func sendRowLocalizedLabel() -> NSAttributedString {
-        return NSAttributedString(string: String.adamantLocalized.sendDash)
+        return NSAttributedString(string: String.adamant.sendDash)
     }
     
     override func encodeForQr(address: String) -> String? {

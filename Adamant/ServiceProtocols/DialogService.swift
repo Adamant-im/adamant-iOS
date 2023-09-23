@@ -7,12 +7,13 @@
 //
 
 import UIKit
+import CommonKit
 
-extension String.adamantLocalized.alert {
-    static let copyToPasteboard = NSLocalizedString("Shared.CopyToPasteboard", comment: "Shared alert 'Copy' button. Used anywhere. Used for copy-paste info.")
-    static let share = NSLocalizedString("Shared.Share", comment: "Shared alert 'Share' button. Used anywhere for presenting standart iOS 'Share' menu.")
-    static let generateQr = NSLocalizedString("Shared.GenerateQRCode", comment: "Shared alert 'Generate QR' button. Used to generate QR codes with addresses and passphrases. Used with sharing and saving, anywhere.")
-    static let saveToPhotolibrary = NSLocalizedString("Shared.SaveToPhotolibrary", comment: "Shared alert 'Save to Photos'. Used with saving images to photolibrary")
+extension String.adamant.alert {
+    static let copyToPasteboard = String.localized("Shared.CopyToPasteboard", comment: "Shared alert 'Copy' button. Used anywhere. Used for copy-paste info.")
+    static let share = String.localized("Shared.Share", comment: "Shared alert 'Share' button. Used anywhere for presenting standart iOS 'Share' menu.")
+    static let generateQr = String.localized("Shared.GenerateQRCode", comment: "Shared alert 'Generate QR' button. Used to generate QR codes with addresses and passphrases. Used with sharing and saving, anywhere.")
+    static let saveToPhotolibrary = String.localized("Shared.SaveToPhotolibrary", comment: "Shared alert 'Save to Photos'. Used with saving images to photolibrary")
 }
 
 enum AddressChatShareType {
@@ -22,9 +23,9 @@ enum AddressChatShareType {
      var localized: String {
          switch self {
          case .chat:
-             return NSLocalizedString("Shared.ChatWith", comment: "Shared alert 'Chat With' button. Used to chat with recipient")
+             return .localized("Shared.ChatWith", comment: "Shared alert 'Chat With' button. Used to chat with recipient")
          case .send:
-             return NSLocalizedString("Shared.SendAdmTo", comment: "Shared alert 'Send ADM To' button. Used to send ADM to recipient")
+             return .localized("Shared.SendAdmTo", comment: "Shared alert 'Send ADM To' button. Used to send ADM to recipient")
          }
      }
  }
@@ -38,16 +39,16 @@ enum ShareType {
     var localized: String {
         switch self {
         case .copyToPasteboard:
-            return String.adamantLocalized.alert.copyToPasteboard
+            return String.adamant.alert.copyToPasteboard
             
         case .share:
-            return String.adamantLocalized.alert.share
+            return String.adamant.alert.share
             
         case .generateQr:
-            return String.adamantLocalized.alert.generateQr
+            return String.adamant.alert.generateQr
             
         case .saveToPhotolibrary:
-            return String.adamantLocalized.alert.saveToPhotolibrary
+            return String.adamant.alert.saveToPhotolibrary
         }
     }
 }
@@ -112,6 +113,7 @@ struct AdamantAlertAction {
     let handler: (() -> Void)?
 }
 
+@MainActor
 protocol DialogService: AnyObject {
     func setup(window: UIWindow)
     
@@ -171,8 +173,8 @@ protocol DialogService: AnyObject {
     )
     
     // MARK: - Alerts
-    func showAlert(title: String?, message: String?, style: UIAlertController.Style, actions: [UIAlertAction]?, from: Any?)
-    func showAlert(title: String?, message: String?, style: AdamantAlertStyle, actions: [AdamantAlertAction]?, from: Any?)
+    func showAlert(title: String?, message: String?, style: UIAlertController.Style, actions: [UIAlertAction]?, from: UIAlertController.SourceView?)
+    func showAlert(title: String?, message: String?, style: AdamantAlertStyle, actions: [AdamantAlertAction]?, from: UIAlertController.SourceView?)
     
     func selectAllTextFields(in alert: UIAlertController)
 }

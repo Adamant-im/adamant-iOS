@@ -7,8 +7,9 @@
 //
 
 import Foundation
+import CommonKit
 
-class RepeaterService {
+final class RepeaterService {
     private class Client {
         let interval: TimeInterval
         let queue: DispatchQueue?
@@ -23,9 +24,10 @@ class RepeaterService {
     }
     
     // MARK: Properties
-    private var foregroundTimers = [String:Client]()
-    private(set) var isPaused = false
-    private let pauseSemaphore = DispatchSemaphore(value: 1)
+    @Atomic private var foregroundTimers = [String:Client]()
+    @Atomic private(set) var isPaused = false
+    
+    private let pauseLock = NSLock()
     
     deinit {
 //        DispatchQueue.main.async {
@@ -52,10 +54,8 @@ class RepeaterService {
         foregroundTimers[label] = client
         
         // Start timer
-        pauseSemaphore.wait()
-        defer {
-            pauseSemaphore.signal()
-        }
+        pauseLock.lock()
+        defer { pauseLock.unlock() }
         
         if !isPaused {
             let timer = Timer(timeInterval: interval, target: self, selector: #selector(timerFired), userInfo: client, repeats: true)
@@ -73,11 +73,8 @@ class RepeaterService {
     }
     
     func pauseAll() {
-        pauseSemaphore.wait()
-        
-        defer {
-            pauseSemaphore.signal()
-        }
+        pauseLock.lock()
+        defer { pauseLock.unlock() }
         
         if isPaused {
             return
@@ -92,11 +89,8 @@ class RepeaterService {
     }
     
     func resumeAll() {
-        pauseSemaphore.wait()
-        
-        defer {
-            pauseSemaphore.signal()
-        }
+        pauseLock.lock()
+        defer { pauseLock.unlock() }
         
         if !isPaused {
             return

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CommonKit
 
 // MARK: - Notifications
 
@@ -53,10 +54,10 @@ extension AddressBookServiceError: RichError {
     var message: String {
         switch self {
         case .notLogged:
-            return String.adamantLocalized.sharedErrors.userNotLogged
+            return String.adamant.sharedErrors.userNotLogged
             
         case .notEnoughMoney:
-            return NSLocalizedString("AddressBookService.Error.notEnoughMoney", comment: "AddressBookService: Not enought money to save address into blockchain")
+            return .localized("AddressBookService.Error.notEnoughMoney", comment: "AddressBookService: Not enought money to save address into blockchain")
             
         case .apiServiceError(let error): return error.message
         case .internalError(let message, _): return message
@@ -80,11 +81,12 @@ extension AddressBookServiceError: RichError {
     }
 }
 
-// MARK: -
+@MainActor
 protocol AddressBookService: AnyObject {
     // MARK: Work with Address book
     func set(name: String, for: String) async
-    @MainActor func getName(for key: String) -> String?
+    func getName(for key: String) -> String?
+    func getName(for partner: BaseAccount?) -> String?
     
     // MARK: Updating & saving
     func update() async -> AddressBookServiceResult? 

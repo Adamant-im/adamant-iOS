@@ -9,8 +9,9 @@
 import Foundation
 import UIKit
 import Combine
+import CommonKit
 
-class AdamantAccountService: AccountService {
+final class AdamantAccountService: AccountService {
     
     // MARK: Dependencies
     
@@ -26,53 +27,17 @@ class AdamantAccountService: AccountService {
     
     // MARK: Properties
     
-    private(set) var state: AccountServiceState = .notLogged
-    private let stateSemaphore = DispatchSemaphore(value: 1)
-    private let securedStoreSemaphore = DispatchSemaphore(value: 1)
-    
-    private(set) var account: AdamantAccount?
-    private(set) var keypair: Keypair?
-    private var passphrase: String?
-    
-    private func setState(_ state: AccountServiceState) {
-        stateSemaphore.wait()
-        self.state = state
-        stateSemaphore.signal()
-    }
-    
-    private(set) var hasStayInAccount: Bool = false
-    
-    private var _useBiometry: Bool = false
-    var useBiometry: Bool {
-        get {
-            return _useBiometry
-        }
-        set {
-            securedStoreSemaphore.wait()
-            defer {
-                securedStoreSemaphore.signal()
-            }
-            
-            guard hasStayInAccount else {
-                _useBiometry = false
-                return
-            }
-            
-            _useBiometry = newValue
-            
-            if newValue {
-                securedStore.set(String(useBiometry), for: .useBiometry)
-            } else {
-                securedStore.remove(.useBiometry)
-            }
-        }
-    }
-    
-    private var previousAppState: UIApplication.State?
-    private var subscriptions = Set<AnyCancellable>()
+    @Atomic private(set) var state: AccountServiceState = .notLogged
+    @Atomic private(set) var account: AdamantAccount?
+    @Atomic private(set) var keypair: Keypair?
+    @Atomic private var passphrase: String?
+    @Atomic private(set) var hasStayInAccount = false
+    @Atomic private(set) var useBiometry = false
+    @Atomic private var previousAppState: UIApplication.State?
+    @Atomic private var subscriptions = Set<AnyCancellable>()
     
     // MARK: Wallets
-    var wallets: [WalletService] = {
+    @Atomic var wallets: [WalletService] = {
         var wallets: [WalletService] = [
             AdmWalletService(),
             BtcWalletService(),
@@ -146,7 +111,9 @@ class AdamantAccountService: AccountService {
                     break
                     
                 case .remoteServiceError, .apiError, .internalError:
-                    self.dialogService.showRichError(error: error)
+                    Task { @MainActor [dialogService] in
+                        dialogService.showRichError(error: error)
+                    }
                     self.wallets.remove(at: 1)
                 }
             }
@@ -186,11 +153,6 @@ extension AdamantAccountService {
         guard let account = account, let keypair = keypair else {
             completion(.failure(.userNotLogged))
             return
-        }
-        
-        securedStoreSemaphore.wait()
-        defer {
-            securedStoreSemaphore.signal()
         }
         
         if hasStayInAccount {
@@ -233,36 +195,29 @@ extension AdamantAccountService {
     }
     
     func dropSavedAccount() {
-        securedStoreSemaphore.wait()
-        defer {
-            securedStoreSemaphore.signal()
-        }
-        
-        _useBiometry = false
+        useBiometry = false
         pushNotificationsTokenService?.removeCurrentToken()
         Key.allCases.forEach(securedStore.remove)
         
         hasStayInAccount = false
         NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.stayInChanged, object: self, userInfo: [AdamantUserInfoKey.AccountService.newStayInState : false])
-        notificationsService?.setNotificationsMode(.disabled, completion: nil)
+        
+        Task { @MainActor in notificationsService?.setNotificationsMode(.disabled, completion: nil) }
     }
     
     private func setupSecuredStore() {
-        securedStoreSemaphore.wait()
-        defer { securedStoreSemaphore.signal() }
-        
         if securedStore.get(.passphrase) != nil {
             hasStayInAccount = true
-            _useBiometry = securedStore.get(.useBiometry) != nil
+            useBiometry = securedStore.get(.useBiometry) != nil
         } else if securedStore.get(.publicKey) != nil,
             securedStore.get(.privateKey) != nil,
             securedStore.get(.pin) != nil {
             hasStayInAccount = true
             
-            _useBiometry = securedStore.get(.useBiometry) != nil
+            useBiometry = securedStore.get(.useBiometry) != nil
         } else {
             hasStayInAccount = false
-            _useBiometry = false
+            useBiometry = false
         }
         
         NotificationCenter.default.addObserver(forName: Notification.Name.SecuredStore.securedStorePurged, object: securedStore, queue: OperationQueue.main) { [weak self] notification in
@@ -272,10 +227,22 @@ extension AdamantAccountService {
             
             if store.get(.passphrase) != nil {
                 self?.hasStayInAccount = true
-                self?._useBiometry = store.get(.useBiometry) != nil
+                self?.useBiometry = store.get(.useBiometry) != nil
             } else {
                 self?.hasStayInAccount = false
-                self?._useBiometry = false
+                self?.useBiometry = false
+            }
+        }
+    }
+    
+    func updateUseBiometry(_ newValue: Bool) {
+        $useBiometry.mutate {
+            $0 = newValue && hasStayInAccount
+            
+            if $0 {
+                securedStore.set(String($0), for: .useBiometry)
+            } else {
+                securedStore.remove(.useBiometry)
             }
         }
     }
@@ -297,11 +264,8 @@ extension AdamantAccountService {
     }
     
     func update(_ completion: ((AccountServiceResult) -> Void)?, updateOnlyVisible: Bool) {
-        stateSemaphore.wait()
-        
         switch state {
         case .notLogged, .isLoggingIn, .updating:
-            stateSemaphore.signal()
             return
             
         case .loggedIn:
@@ -310,36 +274,37 @@ extension AdamantAccountService {
         
         let prevState = state
         state = .updating
-        stateSemaphore.signal()
         
         guard let loggedAccount = account, let publicKey = loggedAccount.publicKey else {
             return
         }
         
-        apiService.getAccount(byPublicKey: publicKey) { [weak self] result in
-            switch result {
-            case .success(let account):
-                guard let acc = self?.account, acc.address == account.address else {
-                    // User has logged out, we not interested anymore
-                    self?.setState(.notLogged)
-                    return
+        Task {
+            await apiService.getAccount(byPublicKey: publicKey) { [weak self] result in
+                switch result {
+                case .success(let account):
+                    guard let acc = self?.account, acc.address == account.address else {
+                        // User has logged out, we not interested anymore
+                        self?.state = .notLogged
+                        return
+                    }
+                    
+                    if loggedAccount.balance != account.balance {
+                        self?.account = account
+                        NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.accountDataUpdated, object: self)
+                    }
+                    
+                    self?.state = .loggedIn
+                    completion?(.success(account: account, alert: nil))
+                    
+                    if let adm = self?.wallets.first(where: { $0 is AdmWalletService }) {
+                        adm.update()
+                    }
+                    
+                case .failure(let error):
+                    completion?(.failure(.apiError(error: error)))
+                    self?.state = prevState
                 }
-                
-                if loggedAccount.balance != account.balance {
-                    self?.account = account
-                    NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.accountDataUpdated, object: self)
-                }
-                
-                self?.setState(.loggedIn)
-                completion?(.success(account: account, alert: nil))
-                
-                if let adm = self?.wallets.first(where: { $0 is AdmWalletService }) {
-                    adm.update()
-                }
-                
-            case .failure(let error):
-                completion?(.failure(.apiError(error: error)))
-                self?.setState(prevState)
             }
         }
         
@@ -418,12 +383,12 @@ extension AdamantAccountService {
                 alert = nil
             } else {
                 securedStore.set("1", for: .showedV12)
-                alert = (title: String.adamantLocalized.accountService.updateAlertTitleV12,
-                         message: String.adamantLocalized.accountService.updateAlertMessageV12)
+                alert = (title: String.adamant.accountService.updateAlertTitleV12,
+                         message: String.adamant.accountService.updateAlertMessageV12)
             }
             
             for case let wallet as InitiatedWithPassphraseService in wallets {
-                wallet.setInitiationFailed(reason: String.adamantLocalized.accountService.reloginToInitiateWallets)
+                wallet.setInitiationFailed(reason: String.adamant.accountService.reloginToInitiateWallets)
             }
             
             return .success(account: account, alert: alert)
@@ -442,7 +407,7 @@ extension AdamantAccountService {
             
         // Logout first
         case .loggedIn:
-            logout(lockSemaphore: false)
+            logout()
             
         // Go login
         case .notLogged:
@@ -450,7 +415,6 @@ extension AdamantAccountService {
         }
         
         state = .isLoggingIn
-        stateSemaphore.signal()
         
         do {
             let account = try await apiService.getAccount(byPublicKey: keypair.publicKey)
@@ -465,11 +429,10 @@ extension AdamantAccountService {
                 userInfo: userInfo
             )
             
-            self.setState(.loggedIn)
-            
+            self.state = .loggedIn
             return account
         } catch let error as ApiServiceError {
-            self.setState(.notLogged)
+            self.state = .notLogged
             
             switch error {
             case .accountNotFound:
@@ -517,10 +480,6 @@ extension AdamantAccountService {
 // MARK: - Log Out
 extension AdamantAccountService {
     func logout() {
-        logout(lockSemaphore: true)
-    }
-    
-    private func logout(lockSemaphore: Bool) {
         if account != nil {
             NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.userWillLogOut, object: self)
         }
@@ -531,16 +490,10 @@ extension AdamantAccountService {
         account = nil
         keypair = nil
         passphrase = nil
+        state = .notLogged
         
-        if lockSemaphore {
-            setState(.notLogged)
-        } else {
-            state = .notLogged
-        }
-        
-        if wasLogged {
-            NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.userLoggedOut, object: self)
-        }
+        guard wasLogged else { return }
+        NotificationCenter.default.post(name: .AdamantAccountService.userLoggedOut, object: self)
     }
 }
 

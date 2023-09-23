@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreData
+import CommonKit
 
 // MARK: - Provider
 @MainActor
@@ -140,7 +141,10 @@ final class AdamantAccountsProvider: AccountsProvider {
         }
     }
     
-    private func getAccount(byPredicate predicate: NSPredicate, context: NSManagedObjectContext? = nil) async -> GetAccountResult {
+    private func getAccount(
+        byPredicate predicate: NSPredicate,
+        context: NSManagedObjectContext? = nil
+    ) -> GetAccountResult {
         let request = NSFetchRequest<BaseAccount>(entityName: BaseAccount.baseEntityName)
         request.fetchLimit = 1
         request.predicate = predicate
@@ -184,7 +188,7 @@ extension AdamantAccountsProvider {
     /// - Returns: do have acccount, or not
     
     func hasAccount(address: String) async -> Bool {
-        let account = await self.getAccount(byPredicate: NSPredicate(format: "address == %@", address))
+        let account = getAccount(byPredicate: NSPredicate(format: "address == %@", address))
         
         switch account {
         case .core, .dummy: return true
@@ -206,7 +210,7 @@ extension AdamantAccountsProvider {
         
         // Check if there is an account, that we are looking for
         let dummy: DummyAccount?
-        switch await self.getAccount(byPredicate: NSPredicate(format: "address == %@", address)) {
+        switch getAccount(byPredicate: NSPredicate(format: "address == %@", address)) {
         case .core(let account):
             return account
         case .dummy(let account):
@@ -222,7 +226,7 @@ extension AdamantAccountsProvider {
                 guard account.publicKey != nil else {
                     account.publicKey = "dummy\(address)"
                     account.isDummy = true
-                    let coreAccount = await createAndSaveCoreDataAccount(
+                    let coreAccount = createAndSaveCoreDataAccount(
                         from: account,
                         dummy: dummy,
                         in: stack.container.viewContext
@@ -231,7 +235,7 @@ extension AdamantAccountsProvider {
                     return coreAccount
                 }
                 
-                let coreAccount = await createAndSaveCoreDataAccount(
+                let coreAccount = createAndSaveCoreDataAccount(
                     from: account,
                     dummy: dummy,
                     in: stack.container.viewContext
@@ -255,7 +259,7 @@ extension AdamantAccountsProvider {
                 }
             }
         case .system:
-            let coreAccount = await createCoreDataAccount(with: address, publicKey: "")
+            let coreAccount = createCoreDataAccount(with: address, publicKey: "")
             return coreAccount
         case .invalid:
             throw AccountsProviderError.invalidAddress(address: address)
@@ -286,7 +290,7 @@ extension AdamantAccountsProvider {
         
         // Check if there is an account, that we are looking for
         let dummy: DummyAccount?
-        switch await self.getAccount(byPredicate: NSPredicate(format: "address == %@", address)) {
+        switch getAccount(byPredicate: NSPredicate(format: "address == %@", address)) {
         case .core(let account):
             return account
         case .dummy(let account):
@@ -297,15 +301,20 @@ extension AdamantAccountsProvider {
         
         switch validation {
         case .valid:
-            let coreAccount = await createAndSaveCoreDataAccount(
-                for: address,
-                publicKey: publicKey,
-                dummy: dummy, in: context
-            )
-            
-            return coreAccount
+            return await withUnsafeContinuation { contituation in
+                context.safeUpdate {
+                    let account = createAndSaveCoreDataAccount(
+                        for: address,
+                        publicKey: publicKey,
+                        dummy: dummy,
+                        in: $0
+                    )
+                    
+                    contituation.resume(returning: account)
+                }
+            }
         case .system:
-            let coreAccount = await createCoreDataAccount(with: address, publicKey: "")
+            let coreAccount = createCoreDataAccount(with: address, publicKey: "")
             return coreAccount
         case .invalid:
             throw AccountsProviderError.invalidAddress(address: address)
@@ -317,13 +326,13 @@ extension AdamantAccountsProvider {
         publicKey: String,
         dummy: DummyAccount?,
         in context: NSManagedObjectContext
-    ) async -> CoreDataAccount {
-        let result = await getAccount(byPredicate: NSPredicate(format: "address == %@", address))
+    ) -> CoreDataAccount {
+        let result = getAccount(byPredicate: NSPredicate(format: "address == %@", address))
         if case .core(let account) = result {
             return account
         }
         
-        let coreAccount = await self.createCoreDataAccountIfNeeded(
+        let coreAccount = createCoreDataAccountIfNeeded(
             with: address,
             publicKey: publicKey,
             context: context
@@ -338,7 +347,7 @@ extension AdamantAccountsProvider {
                 
                 if let chatroom = coreAccount.chatroom {
                     chatroom.addToTransactions(transfers)
-                    await chatroom.updateLastTransaction()
+                    chatroom.updateLastTransaction()
                 }
             }
             context.delete(dummy)
@@ -352,13 +361,13 @@ extension AdamantAccountsProvider {
         from account: AdamantAccount,
         dummy: DummyAccount?,
         in context: NSManagedObjectContext
-    ) async -> CoreDataAccount {
-        let result = await getAccount(byPredicate: NSPredicate(format: "address == %@", account.address))
+    ) -> CoreDataAccount {
+        let result = getAccount(byPredicate: NSPredicate(format: "address == %@", account.address))
         if case .core(let account) = result {
             return account
         }
         
-        let coreAccount = await self.createCoreDataAccount(from: account, context: context)
+        let coreAccount = createCoreDataAccount(from: account, context: context)
         
         coreAccount.isDummy = account.isDummy
         
@@ -371,7 +380,7 @@ extension AdamantAccountsProvider {
                 
                 if let chatroom = coreAccount.chatroom {
                     chatroom.addToTransactions(transfers)
-                    await chatroom.updateLastTransaction()
+                    chatroom.updateLastTransaction()
                 }
             }
             context.delete(dummy)
@@ -448,8 +457,8 @@ extension AdamantAccountsProvider {
         with address: String,
         publicKey: String,
         context: NSManagedObjectContext
-    ) async -> CoreDataAccount {
-        let result = await getAccount(byPredicate: NSPredicate(format: "address == %@", address))
+    ) -> CoreDataAccount {
+        let result = getAccount(byPredicate: NSPredicate(format: "address == %@", address))
         if case .core(let account) = result {
             return account
         }
@@ -465,8 +474,8 @@ extension AdamantAccountsProvider {
     private func createCoreDataAccount(
         with address: String,
         publicKey: String
-    ) async -> CoreDataAccount {
-        let result = await getAccount(byPredicate: NSPredicate(format: "address == %@", address))
+    ) -> CoreDataAccount {
+        let result = getAccount(byPredicate: NSPredicate(format: "address == %@", address))
         if case .core(let account) = result {
             return account
         }
@@ -479,15 +488,15 @@ extension AdamantAccountsProvider {
         return coreAccount
     }
     
-    private func createCoreDataAccount(from account: AdamantAccount) async -> CoreDataAccount {
-        return await createCoreDataAccount(from: account, context: stack.container.viewContext)
+    private func createCoreDataAccount(from account: AdamantAccount) -> CoreDataAccount {
+        createCoreDataAccount(from: account, context: stack.container.viewContext)
     }
     
     private func createCoreDataAccount(
         from account: AdamantAccount,
         context: NSManagedObjectContext
-    ) async -> CoreDataAccount {
-        let result = await getAccount(byPredicate: NSPredicate(format: "address == %@", account.address))
+    ) -> CoreDataAccount {
+        let result = getAccount(byPredicate: NSPredicate(format: "address == %@", account.address))
         if case .core(let account) = result {
             return account
         }
@@ -561,7 +570,7 @@ extension AdamantAccountsProvider {
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.parent = stack.container.viewContext
         
-        switch await self.getAccount(byPredicate: NSPredicate(format: "address == %@", address)) {
+        switch getAccount(byPredicate: NSPredicate(format: "address == %@", address)) {
         case .core(let account):
             throw AccountsProviderDummyAccountError.foundRealAccount(account)
             

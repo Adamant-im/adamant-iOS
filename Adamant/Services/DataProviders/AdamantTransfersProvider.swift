@@ -9,6 +9,7 @@
 import Foundation
 import CoreData
 import Combine
+import CommonKit
 
 actor AdamantTransfersProvider: TransfersProvider {
     // MARK: Constants
@@ -291,7 +292,7 @@ extension AdamantTransfersProvider {
                 }
                 
             default:
-                err = TransfersProviderError.internalError(message: String.adamantLocalized.sharedErrors.internalError(message: error.localizedDescription), error: error)
+                err = TransfersProviderError.internalError(message: String.adamant.sharedErrors.internalError(message: error.localizedDescription), error: error)
             }
             
             return .failure(err)
@@ -478,7 +479,7 @@ extension AdamantTransfersProvider {
         do {
             try context.save()
         } catch {
-            throw TransfersProviderError.internalError(message: String.adamantLocalized.sharedErrors.unknownError, error: error)
+            throw TransfersProviderError.internalError(message: String.adamant.sharedErrors.unknownError, error: error)
         }
         
         // MARK: 6. Encode
@@ -504,7 +505,7 @@ extension AdamantTransfersProvider {
         ? .message
         : .richMessage
         
-        let signedTransaction = apiService.createSendTransaction(
+        let signedTransaction = await apiService.createSendTransaction(
             senderId: loggedAccount.address,
             recipientId: recipient,
             keypair: keypair,
@@ -530,7 +531,7 @@ extension AdamantTransfersProvider {
                 try context.save()
             } catch {
                 throw TransfersProviderError.internalError(
-                    message: String.adamantLocalized.sharedErrors.unknownError,
+                    message: String.adamant.sharedErrors.unknownError,
                     error: error
                 )
             }

@@ -12,13 +12,14 @@ import Swinject
 import CoreData
 import MessageKit
 import Combine
+import CommonKit
 
 class AdmWalletService: NSObject, WalletService {
     
     // MARK: - Constants
     let addressRegex = try! NSRegularExpression(pattern: "^U([0-9]{6,20})$")
     
-    static let currencyLogo = #imageLiteral(resourceName: "adamant_wallet")
+    static let currencyLogo = UIImage.asset(named: "adamant_wallet") ?? .init()
 
     var tokenSymbol: String {
         return type(of: self).currencySymbol
@@ -191,6 +192,7 @@ extension AdmWalletService: NSFetchedResultsControllerDelegate {
 
 // MARK: - Dependencies
 extension AdmWalletService: SwinjectDependentService {
+    @MainActor
     func injectDependencies(from container: Container) {
         accountService = container.resolve(AccountService.self)
         apiService = container.resolve(ApiService.self)

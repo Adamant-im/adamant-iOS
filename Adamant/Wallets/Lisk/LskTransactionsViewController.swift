@@ -10,6 +10,7 @@ import UIKit
 import LiskKit
 import web3swift
 import BigInt
+import CommonKit
 
 class LskTransactionsViewController: TransactionsListViewControllerBase {
     
@@ -96,9 +97,9 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
         
         if let address = lskWalletService.wallet?.address {
             if transaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
-                controller.senderName = String.adamantLocalized.transactionDetails.yourAddress
+                controller.senderName = String.adamant.transactionDetails.yourAddress
             } else if transaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
-                controller.recipientName = String.adamantLocalized.transactionDetails.yourAddress
+                controller.recipientName = String.adamant.transactionDetails.yourAddress
             }
         }
         
@@ -141,7 +142,7 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
 
 extension Transactions.TransactionModel: TransactionDetails {
     
-    static var defaultCurrencySymbol: String? { return LskWalletService.currencySymbol }
+    var defaultCurrencySymbol: String? { LskWalletService.currencySymbol }
     
     var txId: String {
         return id
@@ -215,7 +216,7 @@ extension Transactions.TransactionModel: TransactionDetails {
 
 extension LocalTransaction: TransactionDetails {
 
-    static var defaultCurrencySymbol: String? { return LskWalletService.currencySymbol }
+    var defaultCurrencySymbol: String? { LskWalletService.currencySymbol }
     
     var txId: String {
         return id ?? ""
@@ -269,7 +270,7 @@ extension LocalTransaction: TransactionDetails {
 
 extension TransactionEntity: TransactionDetails {
     
-    static var defaultCurrencySymbol: String? { return LskWalletService.currencySymbol }
+    var defaultCurrencySymbol: String? { LskWalletService.currencySymbol }
     
     var txId: String {
         return id

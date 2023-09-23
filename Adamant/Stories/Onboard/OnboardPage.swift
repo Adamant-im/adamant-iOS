@@ -8,6 +8,7 @@
 
 import UIKit
 import MarkdownKit
+import CommonKit
 
 class OnboardPage: SwiftyOnboardPage {
 

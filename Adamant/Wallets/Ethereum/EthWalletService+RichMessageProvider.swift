@@ -9,6 +9,7 @@
 import Foundation
 import MessageKit
 import UIKit
+import CommonKit
 
 extension EthWalletService: RichMessageProvider {
     var newPendingInterval: TimeInterval {

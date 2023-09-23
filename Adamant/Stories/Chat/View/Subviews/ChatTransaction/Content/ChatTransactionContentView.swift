@@ -8,6 +8,7 @@
 
 import UIKit
 import SnapKit
+import CommonKit
 
 final class ChatTransactionContentView: UIView {
     var model: Model = .default {
@@ -185,6 +186,7 @@ private extension ChatTransactionContentView {
     }
     
     func update() {
+        isHidden = model.isHidden
         backgroundColor = model.backgroundColor.uiColor
         titleLabel.text = model.title
         iconView.image = model.icon
@@ -216,7 +218,11 @@ private extension ChatTransactionContentView {
                 message: NSAttributedString(string: ""),
                 messageReply: NSAttributedString(string: ""),
                 backgroundColor: .failed,
-                isFromCurrentSender: true
+                isFromCurrentSender: true,
+                reactions: nil,
+                address: "",
+                opponentAddress: "",
+                isHidden: false
             )))
             return
         }

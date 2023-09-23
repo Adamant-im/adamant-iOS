@@ -9,6 +9,7 @@
 
 import Foundation
 import CoreData
+import CommonKit
 
 extension RichMessageTransaction {
 
@@ -19,8 +20,8 @@ extension RichMessageTransaction {
     @NSManaged public var richContentSerialized: String?
     @NSManaged public var richContent: [String: Any]?
     @NSManaged public var richType: String?
-    @NSManaged public var isReply: Bool
     @NSManaged public var transferStatusRaw: NSNumber?
+    @NSManaged public var additionalType: RichAdditionalType
     
     func isTransferReply() -> Bool {
         return richContent?[RichContentKeys.reply.replyMessage] is [String: String]

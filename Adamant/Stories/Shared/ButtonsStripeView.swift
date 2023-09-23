@@ -8,6 +8,7 @@
 
 import UIKit
 import MyLittlePinpad
+import CommonKit
 
 // MARK: - Button types
 enum StripeButtonType: Int, Equatable {
@@ -20,19 +21,19 @@ enum StripeButtonType: Int, Equatable {
     var image: UIImage {
         switch self {
         case .pinpad:
-            return #imageLiteral(resourceName: "Stripe_Pinpad")
+            return .asset(named: "Stripe_Pinpad") ?? .init()
         
         case .touchID:
-            return #imageLiteral(resourceName: "Stripe_TouchID")
+            return .asset(named: "Stripe_TouchID") ?? .init()
             
         case .faceID:
-            return #imageLiteral(resourceName: "Stripe_FaceID")
+            return .asset(named: "Stripe_FaceID") ?? .init()
             
         case .qrCameraReader:
-            return #imageLiteral(resourceName: "Stripe_QRCamera")
+            return .asset(named: "Stripe_QRCamera") ?? .init()
             
         case .qrPhotoReader:
-            return #imageLiteral(resourceName: "Stripe_QRLibrary")
+            return .asset(named: "Stripe_QRLibrary") ?? .init()
         }
     }
 }
@@ -56,7 +57,7 @@ typealias Stripe = [StripeButtonType]
 
 // MARK: - Delegate
 protocol ButtonsStripeViewDelegate: AnyObject {
-    func buttonsStripe(_ stripe: ButtonsStripeView, didTapButton button: StripeButtonType)
+    func buttonsStripe(didTapButton button: StripeButtonType)
 }
 
 // MARK: - View
@@ -160,7 +161,7 @@ class ButtonsStripeView: UIView {
     // MARK: Delegate
     @objc private func buttonTapped(_ sender: UIButton) {
         if let button = StripeButtonType(rawValue: sender.tag) {
-            delegate?.buttonsStripe(self, didTapButton: button)
+            delegate?.buttonsStripe(didTapButton: button)
         }
     }
 }

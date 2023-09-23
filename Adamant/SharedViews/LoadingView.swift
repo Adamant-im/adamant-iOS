@@ -8,9 +8,10 @@
 
 import UIKit
 import SnapKit
+import CommonKit
 
 final class LoadingView: UIView {
-    private let logo = UIImageView(image: UIImage(named: "Adamant-logo"))
+    private let logo = UIImageView(image: .asset(named: "Adamant-logo"))
     private let spinner = UIActivityIndicatorView(style: .whiteLarge)
     
     init() {

@@ -9,6 +9,7 @@
 import Foundation
 import MessageKit
 import UIKit
+import CommonKit
 
 extension ERC20WalletService: RichMessageProvider {
     var newPendingInterval: TimeInterval {

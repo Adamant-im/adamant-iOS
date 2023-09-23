@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CommonKit
 
 extension AdamantScene {
     struct Delegates {

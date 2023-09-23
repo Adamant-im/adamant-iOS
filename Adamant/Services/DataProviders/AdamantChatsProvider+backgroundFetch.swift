@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CommonKit
 
 extension AdamantChatsProvider: BackgroundFetchService {
     func fetchBackgroundData(notificationsService: NotificationsService) async -> FetchResult {
@@ -54,12 +55,9 @@ extension AdamantChatsProvider: BackgroundFetchService {
                 )
             }
             
-            notificationsService.showNotification(
-                title: String.adamantLocalized.notifications.newMessageTitle,
-                body: String.localizedStringWithFormat(
-                    String.adamantLocalized.notifications.newMessageBody,
-                    total + notifiedCount
-                ),
+            await notificationsService.showNotification(
+                title: NotificationStrings.newMessageTitle,
+                body: NotificationStrings.newMessageBody(total + notifiedCount),
                 type: .newMessages(count: total)
             )
             

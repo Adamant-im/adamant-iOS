@@ -9,6 +9,7 @@
 import UIKit
 import Eureka
 import LiskKit
+import CommonKit
 
 final class LskTransferViewController: TransferViewControllerBase {
     
@@ -30,6 +31,8 @@ final class LskTransferViewController: TransferViewControllerBase {
         }
     }
     
+    private let prefix = "lsk"
+    
     // MARK: Send
     
     @MainActor
@@ -45,7 +48,7 @@ final class LskTransferViewController: TransferViewControllerBase {
             return
         }
         
-        dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
+        dialogService.showProgress(withMessage: String.adamant.transfer.transferProcessingMessage, userInteractionEnable: false)
         
         Task {
             do {
@@ -73,7 +76,7 @@ final class LskTransferViewController: TransferViewControllerBase {
                 }
                 
                 dialogService.dismissProgress()
-                dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                dialogService.showSuccess(withMessage: String.adamant.transfer.transferSuccess)
                 
                 // Present detail VC
                 presentDetailTransactionVC(
@@ -100,7 +103,7 @@ final class LskTransferViewController: TransferViewControllerBase {
             transaction.id = transactionId
             detailsVc.transaction = transaction
             detailsVc.service = service
-            detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+            detailsVc.senderName = String.adamant.transactionDetails.yourAddress
             detailsVc.recipientName = recipientName
             
             if comments.count > 0 {
@@ -123,46 +126,77 @@ final class LskTransferViewController: TransferViewControllerBase {
     
     // MARK: Overrides
     
-    private var _recipient: String?
-    
     override var recipientAddress: String? {
         set {
-            _recipient = newValue
+            let _recipient = newValue?.addPrefixIfNeeded(prefix: prefix)
             
-            if let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) {
+            if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = _recipient
                 row.updateCell()
             }
         }
         get {
-            return _recipient
+            let row: RowOf<String>? = form.rowBy(tag: BaseRows.address.tag)
+            return row?.value?.addPrefixIfNeeded(prefix: prefix)
         }
     }
     
     override func validateRecipient(_ address: String) -> AddressValidationResult {
-        service?.validate(address: address) ?? .invalid(description: nil)
+        let fixedAddress = address.addPrefixIfNeeded(prefix: prefix)
+        return service?.validate(address: fixedAddress) ?? .invalid(description: nil)
     }
     
     override func recipientRow() -> BaseRow {
         let row = TextRow {
             $0.tag = BaseRows.address.tag
-            $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
-            $0.cell.textField.keyboardType = UIKeyboardType.alphabet
+            $0.cell.textField.placeholder = String.adamant.newChat.addressPlaceholder
+            $0.cell.textField.keyboardType = .namePhonePad
             $0.cell.textField.autocorrectionType = .no
             $0.cell.textField.setLineBreakMode()
             
-            if let recipient = recipientAddress {
-                $0.value = recipient
-            }
+            $0.value = recipientAddress?.components(
+                separatedBy: TransferViewControllerBase.invalidCharacters
+            ).joined()
 
+            let prefixLabel = UILabel()
+            prefixLabel.text = prefix
+            prefixLabel.sizeToFit()
+            
+            let view = UIView()
+            view.addSubview(prefixLabel)
+            view.frame = prefixLabel.frame
+            $0.cell.textField.leftView = view
+            $0.cell.textField.leftViewMode = .always
+            
             if recipientIsReadonly {
                 $0.disabled = true
                 $0.cell.textField.isEnabled = false
+                prefixLabel.textColor = .lightGray
+            }
+        }.cellUpdate { [weak self] cell, row in
+            cell.textField.text = row.value?.components(
+                separatedBy: TransferViewControllerBase.invalidCharacters
+            ).joined()
+            
+            guard self?.recipientIsReadonly == false else { return }
+    
+            cell.textField.leftView?.subviews.forEach { view in
+                guard let label = view as? UILabel else { return }
+                label.textColor = UIColor.adamant.primary
             }
         }.onChange { [weak self] row in
-            if let text = row.value {
-                self?._recipient = text
+            var trimmed = row.value?.components(
+                separatedBy: TransferViewControllerBase.invalidCharacters
+            ).joined() ?? ""
+            
+            if let prefix = self?.prefix,
+               trimmed.starts(with: prefix) {
+                let i = trimmed.index(trimmed.startIndex, offsetBy: prefix.count)
+                trimmed = String(trimmed[i...])
             }
+            
+            row.value = trimmed
+            row.updateCell()
             self?.updateToolbar(for: row)
         }.onCellSelection { [weak self] (cell, _) in
             self?.shareValue(self?.recipientAddress, from: cell)
@@ -172,6 +206,6 @@ final class LskTransferViewController: TransferViewControllerBase {
     }
     
     override func defaultSceneTitle() -> String? {
-        return String.adamantLocalized.sendLsk
+        return String.adamant.sendLsk
     }
 }

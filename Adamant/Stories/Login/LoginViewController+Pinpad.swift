@@ -8,6 +8,7 @@
 
 import Foundation
 import MyLittlePinpad
+import CommonKit
 
 extension LoginViewController {
     /// Shows pinpad in main.async queue
@@ -16,7 +17,7 @@ extension LoginViewController {
         
         DispatchQueue.main.async { [weak self] in
             let pinpad = PinpadViewController.adamantPinpad(biometryButton: button)
-            pinpad.commentLabel.text = String.adamantLocalized.login.loginIntoPrevAccount
+            pinpad.commentLabel.text = String.adamant.login.loginIntoPrevAccount
             pinpad.commentLabel.isHidden = false
             pinpad.delegate = self
             pinpad.modalPresentationStyle = .overFullScreen
@@ -42,26 +43,28 @@ extension LoginViewController {
             return
         }
         
-        localAuth.authorizeUser(reason: String.adamantLocalized.login.loginIntoPrevAccount, completion: { [weak self] result in
-            switch result {
-            case .success:
-                self?.loginIntoSavedAccount()
-                
-            case .fallback:
-                self?.loginWithPinpad()
-                
-            case .cancel:
-                break
-                
-            case .failed:
-                break
+        localAuth.authorizeUser(reason: .adamant.login.loginIntoPrevAccount) { result in
+            Task { @MainActor [weak self] in
+                switch result {
+                case .success:
+                    self?.loginIntoSavedAccount()
+                    
+                case .fallback:
+                    self?.loginWithPinpad()
+                    
+                case .cancel:
+                    break
+                    
+                case .failed:
+                    break
+                }
             }
-        })
+        }
     }
     
     @MainActor
     private func loginIntoSavedAccount() {
-        dialogService.showProgress(withMessage: String.adamantLocalized.login.loggingInProgressMessage, userInteractionEnable: false)
+        dialogService.showProgress(withMessage: String.adamant.login.loggingInProgressMessage, userInteractionEnable: false)
         
         Task {
             do {
@@ -84,8 +87,8 @@ extension LoginViewController {
             
             let alertVc: UIAlertController?
             if let alert = alert {
-                alertVc = UIAlertController(title: alert.title, message: alert.message, preferredStyle: .alert)
-                alertVc!.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .default))
+                alertVc = UIAlertController(title: alert.title, message: alert.message, preferredStyleSafe: .alert, source: nil)
+                alertVc!.addAction(UIAlertAction(title: String.adamant.alert.ok, style: .default))
             } else {
                 alertVc = nil
             }
@@ -127,7 +130,7 @@ extension LoginViewController: PinpadViewControllerDelegate {
     }
     
     func pinpadDidTapBiometryButton(_ pinpad: PinpadViewController) {
-        localAuth.authorizeUser(reason: String.adamantLocalized.login.loginIntoPrevAccount, completion: { [weak self] result in
+        localAuth.authorizeUser(reason: String.adamant.login.loginIntoPrevAccount, completion: { [weak self] result in
             switch result {
             case .success:
                 self?.loginIntoSavedAccount()

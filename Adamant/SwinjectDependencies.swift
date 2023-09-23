@@ -8,6 +8,7 @@
 
 import Swinject
 import BitcoinKit
+import CommonKit
 
 // MARK: - Services
 extension Container {
@@ -48,8 +49,10 @@ extension Container {
         self.register(NotificationsService.self) { r in
             AdamantNotificationsService(securedStore: r.resolve(SecuredStore.self)!)
         }.initCompleted { (r, c) in    // Weak reference
-            guard let service = c as? AdamantNotificationsService else { return }
-            service.accountService = r.resolve(AccountService.self)
+            Task { @MainActor in
+                guard let service = c as? AdamantNotificationsService else { return }
+                service.accountService = r.resolve(AccountService.self)
+            }
         }.inObjectScope(.container)
         
         // MARK: VisibleWalletsService
@@ -63,6 +66,13 @@ extension Container {
         // MARK: IncreaseFeeService
         self.register(IncreaseFeeService.self) { r in
             AdamantIncreaseFeeService(
+                securedStore: r.resolve(SecuredStore.self)!
+            )
+        }.inObjectScope(.container)
+        
+        // MARK: EmojiService
+        self.register(EmojiService.self) { r in
+            AdamantEmojiService(
                 securedStore: r.resolve(SecuredStore.self)!
             )
         }.inObjectScope(.container)
@@ -98,8 +108,10 @@ extension Container {
         self.register(ApiService.self) { r in
             AdamantApiService(adamantCore: r.resolve(AdamantCore.self)!)
         }.initCompleted { (r, c) in    // Weak reference
-            guard let service = c as? AdamantApiService else { return }
-            service.nodesSource = r.resolve(NodesSource.self)
+            Task { @MainActor in
+                guard let service = c as? AdamantApiService else { return }
+                await service.setupWeakDeps(nodesSource: r.resolve(NodesSource.self)!)
+            }
         }.inObjectScope(.container)
         
         // MARK: HealthCheckService
@@ -124,13 +136,15 @@ extension Container {
                 securedStore: r.resolve(SecuredStore.self)!
             )
         }.inObjectScope(.container).initCompleted { (r, c) in
-            guard let service = c as? AdamantAccountService else { return }
-            service.notificationsService = r.resolve(NotificationsService.self)!
-            service.pushNotificationsTokenService = r.resolve(PushNotificationsTokenService.self)!
-            service.currencyInfoService = r.resolve(CurrencyInfoService.self)!
-            service.visibleWalletService = r.resolve(VisibleWalletsService.self)!
-            for case let wallet as SwinjectDependentService in service.wallets {
-                wallet.injectDependencies(from: self)
+            Task { @MainActor in
+                guard let service = c as? AdamantAccountService else { return }
+                service.notificationsService = r.resolve(NotificationsService.self)!
+                service.pushNotificationsTokenService = r.resolve(PushNotificationsTokenService.self)!
+                service.currencyInfoService = r.resolve(CurrencyInfoService.self)!
+                service.visibleWalletService = r.resolve(VisibleWalletsService.self)!
+                for case let wallet as SwinjectDependentService in service.wallets {
+                    wallet.injectDependencies(from: self)
+                }
             }
         }
         
@@ -214,6 +228,8 @@ extension Container {
                 richTransactionStatusService: r.resolve(RichTransactionStatusService.self)!,
                 addressBookService: r.resolve(AddressBookService.self)!,
                 visibleWalletService: r.resolve(VisibleWalletsService.self)!,
+                avatarService: r.resolve(AvatarService.self)!,
+                emojiService: r.resolve(EmojiService.self)!,
                 router: r.resolve(Router.self)!
             )
         }.inObjectScope(.container)
@@ -247,8 +263,18 @@ extension Container {
             )
         }.inObjectScope(.container)
         
+        // MARK: Rich transaction react service
+        self.register(RichTransactionReactService.self) { r in
+            AdamantRichTransactionReactService(
+                coreDataStack: r.resolve(CoreDataStack.self)!,
+                apiService: r.resolve(ApiService.self)!,
+                adamantCore: r.resolve(AdamantCore.self)!,
+                accountService: r.resolve(AccountService.self)!
+            )
+        }.inObjectScope(.container)
+        
         // MARK: Bitcoin AddressConverterFactory
-        self.register(AddressConverterFactory.self) { r in
+        self.register(AddressConverterFactory.self) { _ in
             AddressConverterFactory()
         }.inObjectScope(.container)
     }

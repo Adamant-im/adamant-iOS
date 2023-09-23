@@ -22,13 +22,19 @@ struct ChatFactory {
     let richTransactionStatusService: RichTransactionStatusService
     let addressBookService: AddressBookService
     let visibleWalletService: VisibleWalletsService
+    let avatarService: AvatarService
+    let emojiService: EmojiService
     let router: Router
     
     func makeViewController() -> UIViewController {
         let richMessageProviders = makeRichMessageProviders()
         let viewModel = makeViewModel(richMessageProviders: richMessageProviders)
         let delegates = makeDelegates(viewModel: viewModel)
-        let dialogManager = ChatDialogManager(viewModel: viewModel, dialogService: dialogService)
+        let dialogManager = ChatDialogManager(
+            viewModel: viewModel,
+            dialogService: dialogService,
+            emojiService: emojiService
+        )
         
         let admService = accountService.wallets.first { wallet in
             return wallet is AdmWalletService
@@ -78,7 +84,13 @@ private extension ChatFactory {
             accountProvider: accountProvider,
             richTransactionStatusService: richTransactionStatusService,
             chatCacheService: chatCacheService,
-            richMessageProviders: richMessageProviders
+            richMessageProviders: richMessageProviders,
+            avatarService: avatarService,
+            chatMessagesListViewModel: .init(
+                avatarService: avatarService,
+                emojiService: emojiService
+            ),
+            emojiService: emojiService
         )
     }
     

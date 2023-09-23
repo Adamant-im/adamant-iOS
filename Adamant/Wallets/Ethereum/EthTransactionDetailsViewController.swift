@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CommonKit
 
 class EthTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies
@@ -72,6 +73,7 @@ class EthTransactionDetailsViewController: TransactionDetailsViewControllerBase 
                 tableView.reloadData()
                 refreshControl.endRefreshing()
             } catch {
+                updateTransactionStatus()
                 if !silent {
                     dialogService.showRichError(error: error)
                 }

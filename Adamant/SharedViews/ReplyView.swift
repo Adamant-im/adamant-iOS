@@ -8,6 +8,7 @@
 
 import UIKit
 import SnapKit
+import CommonKit
 
 final class ReplyView: UIView {
     
@@ -103,7 +104,23 @@ final class ReplyView: UIView {
 extension ReplyView {
     func update(with model: MessageModel) {
         backgroundColor = .clear
-        messageLabel.attributedText = model.makeReplyContent().resolveLinkColor()
+        let text = model.makeReplyContent().resolveLinkColor()
+        text.mutableString.replaceOccurrences(
+            of: "\n",
+            with: " ",
+            range: .init(location: .zero, length: text.length)
+        )
+        
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineBreakMode = .byTruncatingTail
+        
+        text.addAttribute(
+            .paragraphStyle,
+            value: paragraphStyle,
+            range: .init(location: .zero, length: text.length)
+        )
+
+        messageLabel.attributedText = text
     }
 }
 

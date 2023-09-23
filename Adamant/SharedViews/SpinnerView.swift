@@ -8,6 +8,7 @@
 
 import UIKit
 import SnapKit
+import CommonKit
 
 final class SpinnerView: UIView {
     static let size = CGSize(squareSize: 50)
