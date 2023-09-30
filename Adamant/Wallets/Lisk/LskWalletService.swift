@@ -44,6 +44,7 @@ class LskWalletService: WalletService {
     var accountService: AccountService!
     var dialogService: DialogService!
     var router: Router!
+    var coreDataStack: CoreDataStack!
     
     // MARK: - Constants
     var transactionFee: Decimal {
@@ -106,6 +107,22 @@ class LskWalletService: WalletService {
     private let nodes: [APINode]
     private var subscriptions = Set<AnyCancellable>()
 
+    @Published private(set) var transactions: [CoinTransaction] = []
+    @Published private(set) var hasMoreOldTransactions: Bool = true
+
+    var transactionsPublisher: Published<[CoinTransaction]>.Publisher {
+        $transactions
+    }
+    
+    var hasMoreOldTransactionsPublisher: Published<Bool>.Publisher {
+        $hasMoreOldTransactions
+    }
+    
+    lazy var coinStorage = AdamantCoinStorageService(
+        coinId: tokenUnicID,
+        coreDataStack: coreDataStack
+    )
+    
     // MARK: - State
     private (set) var state: WalletServiceState = .notInitiated
     
@@ -177,6 +194,15 @@ class LskWalletService: WalletService {
                     NotificationCenter.default.removeObserver(balanceObserver)
                     self?.balanceObserver = nil
                 }
+            }
+            .store(in: &subscriptions)
+    }
+    
+    func addTransactionObserver() {
+        coinStorage.$transactions
+            .removeDuplicates()
+            .sink { [weak self] transactions in
+                self?.transactions = transactions
             }
             .store(in: &subscriptions)
     }
@@ -487,6 +513,9 @@ extension LskWalletService: SwinjectDependentService {
         apiService = container.resolve(ApiService.self)
         dialogService = container.resolve(DialogService.self)
         router = container.resolve(Router.self)
+        coreDataStack = container.resolve(CoreDataStack.self)
+        
+        addTransactionObserver()
     }
 }
 
@@ -576,6 +605,17 @@ extension LskWalletService {
             )
         }
     }
+    
+    func loadTransactions(offset: Int, limit: Int) async throws {
+        let trs = try await getTransactions(offset: UInt(offset), limit: UInt(limit))
+        
+        guard trs.count > 0 else {
+            hasMoreOldTransactions = false
+            return
+        }
+        
+        coinStorage.append(trs)
+    }
 }
 
 // MARK: - KVS
@@ -617,7 +657,7 @@ extension LskWalletService {
 
 // MARK: - Transactions
 extension LskWalletService {
-    func getTransactions(offset: UInt) async throws -> [Transactions.TransactionModel] {
+    func getTransactions(offset: UInt, limit: UInt = 100) async throws -> [Transactions.TransactionModel] {
         guard let address = self.lskWallet?.address,
               let transactionApi = serviceApi
         else {
@@ -627,7 +667,7 @@ extension LskWalletService {
         return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<[Transactions.TransactionModel], Error>) in
             transactionApi.transactions(
                 senderIdOrRecipientId: address,
-                limit: 100,
+                limit: limit,
                 offset: offset,
                 sort: APIRequest.Sort("timestamp", direction: .descending)
             ) { (response) in

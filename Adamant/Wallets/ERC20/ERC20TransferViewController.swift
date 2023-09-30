@@ -82,6 +82,7 @@ final class ERC20TransferViewController: TransferViewControllerBase {
                     transaction: transaction,
                     recipient: recipient,
                     comments: comments,
+                    amount: amount,
                     service: service
                 )
             } catch {
@@ -96,14 +97,23 @@ final class ERC20TransferViewController: TransferViewControllerBase {
         transaction: CodableTransaction,
         recipient: String,
         comments: String,
+        amount: Decimal,
         service: ERC20WalletService
     ) {
         let transaction = SimpleTransactionDetails(
             txId: hash,
             senderAddress: transaction.sender?.address ?? "",
             recipientAddress: recipient,
-            isOutgoing: true
+            amountValue: amount,
+            feeValue: nil,
+            confirmationsValue: nil,
+            blockValue: nil,
+            isOutgoing: true,
+            transactionStatus: nil
         )
+        
+        service.coinStorage.append(transaction)
+
         if let detailsVc = router.get(scene: AdamantScene.Wallets.ERC20.transactionDetails) as? ERC20TransactionDetailsViewController {
             detailsVc.transaction = transaction
             detailsVc.service = service

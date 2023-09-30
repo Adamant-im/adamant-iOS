@@ -14,6 +14,7 @@ extension LskWalletService: WalletServiceWithTransfers {
             fatalError("Can't get LskTransactionsViewController")
         }
         
+        vc.walletService = self
         vc.lskWalletService = self
         return vc
     }

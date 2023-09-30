@@ -11,7 +11,7 @@ import Foundation
 import CoreData
 
 @objc(BaseTransaction)
-public class BaseTransaction: NSManagedObject {
+public class BaseTransaction: CoinTransaction {
     var transactionStatus: TransactionStatus? {
         return nil
     }

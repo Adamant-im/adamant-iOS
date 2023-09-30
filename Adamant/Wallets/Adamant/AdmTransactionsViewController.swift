@@ -16,7 +16,6 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
     var accountService: AccountService
     var transfersProvider: TransfersProvider
     var chatsProvider: ChatsProvider
-    var dialogService: DialogService
     var stack: CoreDataStack
     var router: Router
     var addressBookService: AddressBookService
@@ -49,12 +48,12 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         self.accountService = accountService
         self.transfersProvider = transfersProvider
         self.chatsProvider = chatsProvider
-        self.dialogService = dialogService
         self.stack = stack
         self.router = router
         self.addressBookService = addressBookService
         
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        self.dialogService = dialogService
     }
     
     required init?(coder: NSCoder) {

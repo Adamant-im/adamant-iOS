@@ -11,64 +11,22 @@ import LiskKit
 import web3swift
 import BigInt
 import CommonKit
+import Combine
 
 class LskTransactionsViewController: TransactionsListViewControllerBase {
     
     // MARK: - Dependencies
     var lskWalletService: LskWalletService!
-    var dialogService: DialogService!
     var router: Router!
     
     // MARK: - Properties
-    var transactions: [Transactions.TransactionModel] = []
     
-    private var offset: UInt = 0
-
     override func viewDidLoad() {
         super.viewDidLoad()
-        updateLoadingView(isHidden: false)
         currencySymbol = LskWalletService.currencySymbol
-        handleRefresh()
-    }
-    
-    override func handleRefresh() {
-        emptyLabel.isHidden = true
-        transactions.removeAll()
-        tableView.reloadData()
-        offset = 0
-        loadData(silent: false)
-    }
-    
-    override func loadData(silent: Bool) {
-        isBusy = true
-        Task { @MainActor in
-            do {
-                let trs = try await lskWalletService.getTransactions(offset: offset)
-                transactions.append(contentsOf: trs)
-                offset += UInt(trs.count)
-                isNeedToLoadMoore = trs.count > 0
-            } catch {
-                isNeedToLoadMoore = false
-                
-                if !silent {
-                    dialogService.showRichError(error: error)
-                }
-            }
-            
-            isBusy = false
-            emptyLabel.isHidden = self.transactions.count > 0
-            stopBottomIndicator()
-            refreshControl.endRefreshing()
-            tableView.reloadData()
-            updateLoadingView(isHidden: true)
-        }.stored(in: taskManager)
     }
     
     // MARK: - UITableView
-    
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return transactions.count
-    }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
@@ -80,14 +38,14 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
         }
         
         let emptyTransaction = SimpleTransactionDetails(
-            txId: transaction.txId,
-            senderAddress: transaction.senderAddress,
-            recipientAddress: transaction.recipientAddress,
-            dateValue: transaction.dateValue,
-            amountValue: transaction.amountValue,
-            feeValue: transaction.feeValue,
-            confirmationsValue: transaction.confirmationsValue,
-            blockValue: transaction.blockValue,
+            txId: transaction.transactionId,
+            senderAddress: transaction.senderId ?? "",
+            recipientAddress: transaction.recipientId ?? "",
+            dateValue: transaction.date as? Date,
+            amountValue: transaction.amount?.decimalValue,
+            feeValue: nil,
+            confirmationsValue: nil,
+            blockValue: nil,
             isOutgoing: transaction.isOutgoing,
             transactionStatus: nil
         )
@@ -96,47 +54,14 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
         controller.service = lskWalletService
         
         if let address = lskWalletService.wallet?.address {
-            if transaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
+            if transaction.senderId?.caseInsensitiveCompare(address) == .orderedSame {
                 controller.senderName = String.adamant.transactionDetails.yourAddress
-            } else if transaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
+            } else if transaction.recipientId?.caseInsensitiveCompare(address) == .orderedSame {
                 controller.recipientName = String.adamant.transactionDetails.yourAddress
             }
         }
         
         navigationController?.pushViewController(controller, animated: true)
-    }
-    
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifierCompact, for: indexPath) as? TransactionTableViewCell else {
-            // TODO: Display & Log error
-            return UITableViewCell(style: .default, reuseIdentifier: "cell")
-        }
-        
-        let transaction = transactions[indexPath.row]
-        
-        cell.accessoryType = .disclosureIndicator
-        cell.separatorInset = indexPath.row == transactions.count - 1
-        ? .zero
-        : UITableView.defaultTransactionsSeparatorInset
-        
-        configureCell(cell, for: transaction)
-        return cell
-    }
-    
-    func configureCell(_ cell: TransactionTableViewCell, for transaction: Transactions.TransactionModel) {
-        let outgoing = isOutgoing(transaction)
-        let partnerId = outgoing ? transaction.recipientId : transaction.senderId
-        
-        configureCell(cell,
-                      isOutgoing: outgoing,
-                      partnerId: partnerId ?? "",
-                      partnerName: nil,
-                      amount: transaction.amountValue ?? 0,
-                      date: transaction.dateValue)
-    }
-    
-    private func isOutgoing(_ transaction: Transactions.TransactionModel) -> Bool {
-        return transaction.senderId.lowercased() == lskWalletService.wallet?.address.lowercased()
     }
 }
 

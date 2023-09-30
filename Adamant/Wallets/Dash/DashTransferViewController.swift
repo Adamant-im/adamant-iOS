@@ -64,6 +64,7 @@ final class DashTransferViewController: TransferViewControllerBase {
                 
                 Task {
                     do {
+                        service.coinStorage.append(transaction)
                         try await service.sendTransaction(transaction)
                     } catch {
                         dialogService.showRichError(error: error)

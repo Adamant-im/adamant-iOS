@@ -18,75 +18,17 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
             ethAddress = ethWalletService.wallet?.address ?? ""
         }
     }
-    var dialogService: DialogService!
     var router: Router!
     
     // MARK: - Properties
-    var transactions: [EthTransactionShort] = []
     private var ethAddress: String = ""
-    private var offset = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        updateLoadingView(isHidden: false)
         currencySymbol = EthWalletService.currencySymbol
-        handleRefresh()
-    }
-    
-    // MARK: - Overrides
-    
-    override func handleRefresh() {
-        offset = 0
-        transactions.removeAll()
-        tableView.reloadData()
-        loadData(silent: false)
-    }
-    
-    override func loadData(silent: Bool) {
-        isBusy = true
-        emptyLabel.isHidden = true
-        
-        guard let address = ethWalletService.wallet?.address else {
-            transactions = []
-            return
-        }
-        
-        Task { @MainActor in
-            do {
-                let trs = try await ethWalletService.getTransactionsHistory(
-                    address: address,
-                    offset: offset
-                )
-                
-                transactions.append(contentsOf: trs)
-                offset += trs.count
-                isNeedToLoadMoore = trs.count > 0
-            } catch {
-                isNeedToLoadMoore = false
-                
-                if !silent {
-                    dialogService.showRichError(error: error)
-                }
-            }
-            
-            isBusy = false
-            emptyLabel.isHidden = transactions.count > 0
-            refreshControl.endRefreshing()
-            stopBottomIndicator()
-            tableView.reloadData()
-            updateLoadingView(isHidden: true)
-        }.stored(in: taskManager)
-    }
-    
-    override func reloadData() {
-        handleRefresh()
     }
     
     // MARK: - UITableView
-    
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return transactions.count
-    }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let address = ethWalletService.wallet?.address else { return }
@@ -100,18 +42,16 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
         
         vc.service = ethWalletService
         
-        let isOutgoing: Bool = transaction.to != address
-        
         let emptyTransaction = SimpleTransactionDetails(
-            txId: transaction.hash,
-            senderAddress: transaction.from,
-            recipientAddress: transaction.to,
-            dateValue: nil,
-            amountValue: transaction.value,
+            txId: transaction.transactionId,
+            senderAddress: transaction.senderId ?? "",
+            recipientAddress: transaction.recipientId ?? "",
+            dateValue: transaction.date as? Date,
+            amountValue: transaction.amount?.decimalValue,
             feeValue: nil,
             confirmationsValue: nil,
             blockValue: nil,
-            isOutgoing: isOutgoing,
+            isOutgoing: transaction.isOutgoing,
             transactionStatus: nil
         )
         
@@ -126,39 +66,5 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
         }
         
         navigationController?.pushViewController(vc, animated: true)
-    }
-    
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifierCompact, for: indexPath) as? TransactionTableViewCell else {
-                return UITableViewCell(style: .default, reuseIdentifier: "cell")
-        }
-        
-        let transaction = transactions[indexPath.row]
-        cell.accessoryType = .disclosureIndicator
-        cell.separatorInset = indexPath.row == transactions.count - 1
-        ? .zero
-        : UITableView.defaultTransactionsSeparatorInset
-        
-        configureCell(cell, for: transaction)
-        return cell
-    }
-    
-    func configureCell(_ cell: TransactionTableViewCell, for transaction: EthTransactionShort) {
-        let outgoing = isOutgoing(transaction)
-        let partnerId = outgoing ? transaction.to : transaction.from
-        
-        configureCell(cell,
-                      isOutgoing: outgoing,
-                      partnerId: partnerId,
-                      partnerName: nil,
-                      amount: transaction.value,
-                      date: transaction.date)
-    }
-}
-
-// MARK: - Tools
-extension EthTransactionsViewController {
-    private func isOutgoing(_ transaction: EthTransactionShort) -> Bool {
-        return transaction.from.lowercased() == ethAddress.lowercased()
     }
 }

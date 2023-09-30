@@ -60,6 +60,7 @@ class DogeWalletService: WalletService {
     var dialogService: DialogService!
     var router: Router!
     var addressConverter: AddressConverter!
+    var coreDataStack: CoreDataStack!
     
     // MARK: - Constants
     static var currencyLogo = UIImage.asset(named: "doge_wallet") ?? .init()
@@ -125,6 +126,22 @@ class DogeWalletService: WalletService {
     private static let jsonDecoder = JSONDecoder()
     private var subscriptions = Set<AnyCancellable>()
 
+    @Published private(set) var historyTransactions: [CoinTransaction] = []
+    @Published private(set) var hasMoreOldTransactions: Bool = true
+
+    var transactionsPublisher: Published<[CoinTransaction]>.Publisher {
+        $historyTransactions
+    }
+    
+    var hasMoreOldTransactionsPublisher: Published<Bool>.Publisher {
+        $hasMoreOldTransactions
+    }
+    
+    lazy var coinStorage = AdamantCoinStorageService(
+        coinId: tokenUnicID,
+        coreDataStack: coreDataStack
+    )
+    
     // MARK: - State
     private (set) var state: WalletServiceState = .notInitiated
     
@@ -178,6 +195,15 @@ class DogeWalletService: WalletService {
                     NotificationCenter.default.removeObserver(balanceObserver)
                     self?.balanceObserver = nil
                 }
+            }
+            .store(in: &subscriptions)
+    }
+    
+    func addTransactionObserver() {
+        coinStorage.$transactions
+            .removeDuplicates()
+            .sink { [weak self] transactions in
+                self?.historyTransactions = transactions
             }
             .store(in: &subscriptions)
     }
@@ -321,6 +347,9 @@ extension DogeWalletService: SwinjectDependentService {
         router = container.resolve(Router.self)
         addressConverter = container.resolve(AddressConverterFactory.self)?
             .make(network: network)
+        coreDataStack = container.resolve(CoreDataStack.self)
+        
+        addTransactionObserver()
     }
 }
 
@@ -612,6 +641,20 @@ extension DogeWalletService {
             throw WalletServiceError.remoteServiceError(message: "Failed to parse block")
         }
     }
+    
+    func loadTransactions(offset: Int, limit: Int) async throws {
+        let tuple = try await getTransactions(from: offset)
+        
+        let trs = tuple.transactions
+        hasMoreOldTransactions = tuple.hasMore
+        
+        guard trs.count > 0 else {
+            hasMoreOldTransactions = false
+            return
+        }
+        
+        coinStorage.append(trs)
+    }
 }
 
 // MARK: - WalletServiceWithTransfers
@@ -622,6 +665,7 @@ extension DogeWalletService: WalletServiceWithTransfers {
         }
         
         vc.walletService = self
+        vc.dogeWalletService = self
         return vc
     }
 }

@@ -102,6 +102,7 @@ class ERC20WalletService: WalletService {
     var dialogService: DialogService!
     var router: Router!
     var increaseFeeService: IncreaseFeeService!
+    var coreDataStack: CoreDataStack!
     
     // MARK: - Notifications
     var walletUpdatedNotification = Notification.Name("adamant.erc20Wallet.walletUpdated")
@@ -171,6 +172,22 @@ class ERC20WalletService: WalletService {
     private (set) var contract: Web3.Contract?
     private var balanceObserver: NSObjectProtocol?
     
+    @Published private(set) var historyTransactions: [CoinTransaction] = []
+    @Published private(set) var hasMoreOldTransactions: Bool = true
+
+    var transactionsPublisher: Published<[CoinTransaction]>.Publisher {
+        $historyTransactions
+    }
+    
+    var hasMoreOldTransactionsPublisher: Published<Bool>.Publisher {
+        $hasMoreOldTransactions
+    }
+    
+    lazy var coinStorage = AdamantCoinStorageService(
+        coinId: tokenUnicID,
+        coreDataStack: coreDataStack
+    )
+    
     init(token: ERC20Token) {
         self.token = token
         
@@ -221,6 +238,15 @@ class ERC20WalletService: WalletService {
                     NotificationCenter.default.removeObserver(balanceObserver)
                     self?.balanceObserver = nil
                 }
+            }
+            .store(in: &subscriptions)
+    }
+    
+    func addTransactionObserver() {
+        coinStorage.$transactions
+            .removeDuplicates()
+            .sink { [weak self] transactions in
+                self?.historyTransactions = transactions
             }
             .store(in: &subscriptions)
     }
@@ -447,6 +473,9 @@ extension ERC20WalletService: SwinjectDependentService {
         dialogService = container.resolve(DialogService.self)
         router = container.resolve(Router.self)
         increaseFeeService = container.resolve(IncreaseFeeService.self)
+        coreDataStack = container.resolve(CoreDataStack.self)
+        
+        addTransactionObserver()
     }
 }
 
@@ -629,6 +658,47 @@ extension ERC20WalletService {
         transactions.sort { $0.date.compare($1.date) == .orderedDescending }
         return transactions
     }
+    
+    func loadTransactions(offset: Int, limit: Int) async throws {
+        guard let address = wallet?.address else {
+            return
+        }
+        
+        let trs = try await getTransactionsHistory(
+            address: address,
+            offset: offset,
+            limit: limit
+        )
+        
+        guard trs.count > 0 else {
+            hasMoreOldTransactions = false
+            return
+        }
+        
+        let newTrs = trs.map { transaction in
+            let isOutgoing: Bool = transaction.to != address
+            
+            var exponent = EthWalletService.currencyExponent
+            if let naturalUnits = token?.naturalUnits {
+                exponent = -1 * naturalUnits
+            }
+            
+            return SimpleTransactionDetails(
+                txId: transaction.hash,
+                senderAddress: transaction.from,
+                recipientAddress: transaction.to,
+                dateValue: transaction.date,
+                amountValue: transaction.contract_value.asDecimal(exponent: exponent),
+                feeValue: nil,
+                confirmationsValue: nil,
+                blockValue: nil,
+                isOutgoing: isOutgoing,
+                transactionStatus: nil
+            )
+        }
+        
+        coinStorage.append(newTrs)
+    }
 }
 
 extension ERC20WalletService: WalletServiceWithTransfers {
@@ -638,6 +708,7 @@ extension ERC20WalletService: WalletServiceWithTransfers {
         }
         
         vc.walletService = self
+        vc.ercWalletService = self
         return vc
     }
 }

@@ -76,6 +76,7 @@ final class EthTransferViewController: TransferViewControllerBase {
                     transaction: transaction,
                     recipient: recipient,
                     comments: comments,
+                    amount: amount,
                     service: service
                 )
             } catch {
@@ -90,14 +91,23 @@ final class EthTransferViewController: TransferViewControllerBase {
         transaction: CodableTransaction,
         recipient: String,
         comments: String,
+        amount: Decimal,
         service: EthWalletService
     ) {
         let transaction = SimpleTransactionDetails(
             txId: hash,
             senderAddress: transaction.sender?.address ?? "",
             recipientAddress: recipient,
-            isOutgoing: true
+            amountValue: amount,
+            feeValue: nil,
+            confirmationsValue: nil,
+            blockValue: nil,
+            isOutgoing: true,
+            transactionStatus: nil
         )
+        
+        service.coinStorage.append(transaction)
+        
         if let detailsVc = router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? EthTransactionDetailsViewController {
             detailsVc.transaction = transaction
             detailsVc.service = service

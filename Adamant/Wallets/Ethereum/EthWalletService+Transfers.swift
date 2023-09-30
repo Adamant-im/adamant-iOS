@@ -14,6 +14,7 @@ extension EthWalletService: WalletServiceWithTransfers {
             fatalError("Can't get EthTransactionsViewController")
         }
         
+        vc.walletService = self
         vc.ethWalletService = self
         return vc
     }

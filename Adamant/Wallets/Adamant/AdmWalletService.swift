@@ -58,6 +58,7 @@ class AdmWalletService: NSObject, WalletService {
 	var apiService: ApiService!
 	var transfersProvider: TransfersProvider!
     var router: Router!
+    var coreDataStack: CoreDataStack!
     
     // MARK: - Notifications
     let walletUpdatedNotification = Notification.Name("adamant.admWallet.updated")
@@ -84,6 +85,22 @@ class AdmWalletService: NSObject, WalletService {
     private (set) var isWarningGasPrice = false
     private var subscriptions = Set<AnyCancellable>()
 
+    @Published private(set) var transactions: [CoinTransaction] = []
+    @Published private(set) var hasMoreOldTransactions: Bool = true
+
+    var transactionsPublisher: Published<[CoinTransaction]>.Publisher {
+        $transactions
+    }
+    
+    var hasMoreOldTransactionsPublisher: Published<Bool>.Publisher {
+        $hasMoreOldTransactions
+    }
+    
+    lazy var coinStorage = AdamantCoinStorageService(
+        coinId: tokenUnicID,
+        coreDataStack: coreDataStack
+    )
+    
     // MARK: - State
     private (set) var state: WalletServiceState = .upToDate
     private (set) var wallet: WalletAccount?
@@ -118,6 +135,15 @@ class AdmWalletService: NSObject, WalletService {
             .receive(on: OperationQueue.main)
             .sink { [weak self] _ in
                 self?.wallet = nil
+            }
+            .store(in: &subscriptions)
+    }
+    
+    func addTransactionObserver() {
+        coinStorage.$transactions
+            .removeDuplicates()
+            .sink { [weak self] transactions in
+                self?.transactions = transactions
             }
             .store(in: &subscriptions)
     }
@@ -168,6 +194,9 @@ class AdmWalletService: NSObject, WalletService {
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
         return address
     }
+    
+    func loadTransactions(offset: Int, limit: Int) async throws {
+    }
 }
 
 extension AdmWalletService: WalletServiceWithTransfers {
@@ -198,7 +227,9 @@ extension AdmWalletService: SwinjectDependentService {
         apiService = container.resolve(ApiService.self)
         transfersProvider = container.resolve(TransfersProvider.self)
         router = container.resolve(Router.self)
+        coreDataStack = container.resolve(CoreDataStack.self)
         
+        addTransactionObserver()
         Task {
             let controller = await transfersProvider.unreadTransfersController()
             

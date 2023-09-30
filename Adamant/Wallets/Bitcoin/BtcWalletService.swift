@@ -120,6 +120,7 @@ final class BtcWalletService: WalletService {
     var router: Router!
     var increaseFeeService: IncreaseFeeService!
     var addressConverter: AddressConverter!
+    var coreDataStack: CoreDataStack!
     
     // MARK: - Constants
     static var currencyLogo = UIImage.asset(named: "bitcoin_wallet") ?? .init()
@@ -157,6 +158,22 @@ final class BtcWalletService: WalletService {
     let defaultDispatchQueue = DispatchQueue(label: "im.adamant.btcWalletService", qos: .userInteractive, attributes: [.concurrent])
     
     private var subscriptions = Set<AnyCancellable>()
+    
+    @Published private(set) var transactions: [CoinTransaction] = []
+    @Published private(set) var hasMoreOldTransactions: Bool = true
+
+    var transactionsPublisher: Published<[CoinTransaction]>.Publisher {
+        $transactions
+    }
+    
+    var hasMoreOldTransactionsPublisher: Published<Bool>.Publisher {
+        $hasMoreOldTransactions
+    }
+    
+    lazy var coinStorage = AdamantCoinStorageService(
+        coinId: tokenUnicID,
+        coreDataStack: coreDataStack
+    )
     
     // MARK: - State
     private (set) var state: WalletServiceState = .notInitiated
@@ -210,6 +227,15 @@ final class BtcWalletService: WalletService {
                     NotificationCenter.default.removeObserver(balanceObserver)
                     self?.balanceObserver = nil
                 }
+            }
+            .store(in: &subscriptions)
+    }
+    
+    func addTransactionObserver() {
+        coinStorage.$transactions
+            .removeDuplicates()
+            .sink { [weak self] transactions in
+                self?.transactions = transactions
             }
             .store(in: &subscriptions)
     }
@@ -448,6 +474,9 @@ extension BtcWalletService: SwinjectDependentService {
         router = container.resolve(Router.self)
         increaseFeeService = container.resolve(IncreaseFeeService.self)
         addressConverter = container.resolve(AddressConverterFactory.self)?.make(network: network)
+        coreDataStack = container.resolve(CoreDataStack.self)
+        
+        addTransactionObserver()
     }
 }
 
@@ -705,6 +734,20 @@ extension BtcWalletService {
         }
     }
 
+    func loadTransactions(offset: Int, limit: Int) async throws {
+        let txId = offset == .zero
+        ? transactions.first?.transactionId
+        : transactions.last?.transactionId
+        
+        let trs = try await getTransactions(fromTx: txId)
+        
+        guard trs.count > 0 else {
+            hasMoreOldTransactions = false
+            return
+        }
+        
+        coinStorage.append(trs)
+    }
 }
 
 extension BtcWalletService: WalletServiceWithTransfers {
@@ -713,6 +756,7 @@ extension BtcWalletService: WalletServiceWithTransfers {
             fatalError("Can't get BtcTransactionsViewController")
         }
         
+        vc.walletService = self
         vc.btcWalletService = self
         return vc
     }

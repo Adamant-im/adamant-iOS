@@ -9,6 +9,7 @@
 import UIKit
 import CoreData
 import CommonKit
+import Combine
 
 extension String.adamant {
     struct transactionList {
@@ -37,12 +38,23 @@ class TransactionsListViewControllerBase: UIViewController {
         return refreshControl
     }()
     
+    // MARK: - Dependencies
+    
+    var walletService: WalletService!
+    var dialogService: DialogService!
+    
+    // MARK: - Proprieties
+    
     var taskManager = TaskManager()
     
     var isNeedToLoadMoore = true
     var isBusy = true
     
+    var transactions: [CoinTransaction] = []
     private(set) lazy var loadingView = LoadingView()
+    
+    private var subscriptions = Set<AnyCancellable>()
+    private var limit = 25
     
     // MARK: - IBOutlets
     @IBOutlet weak var tableView: UITableView!
@@ -81,6 +93,9 @@ class TransactionsListViewControllerBase: UIViewController {
         
         setColors()
         configureLayout()
+        addObservers()
+        
+        handleRefresh()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -93,6 +108,29 @@ class TransactionsListViewControllerBase: UIViewController {
         
         if tableView.isEditing {
             tableView.setEditing(false, animated: false)
+        }
+    }
+    
+    func addObservers() {
+        walletService.transactionsPublisher
+            .sink { [weak self] transactions in
+                self?.update(transactions)
+            }
+            .store(in: &subscriptions)
+        
+        walletService.hasMoreOldTransactionsPublisher
+            .sink { [weak self] isNeedToLoadMoore in
+                self?.isNeedToLoadMoore = isNeedToLoadMoore
+            }
+            .store(in: &subscriptions)
+    }
+    
+    @MainActor
+    func update(_ transactions: [CoinTransaction]) {
+        DispatchQueue.main.async {
+            self.transactions = transactions
+            self.tableView.reloadData()
+            self.updateLoadingView(isHidden: true)
         }
     }
     
@@ -121,6 +159,36 @@ class TransactionsListViewControllerBase: UIViewController {
         }
     }
     
+    @MainActor
+    func loadData(silent: Bool) {
+        loadData(offset: transactions.count, silent: true)
+    }
+    
+    @MainActor
+    func loadData(offset: Int, silent: Bool) {
+        isBusy = true
+        print("loadData, ofs=\(offset)")
+        Task { @MainActor in
+            do {
+                try await walletService.loadTransactions(
+                    offset: offset,
+                    limit: limit
+                )
+            } catch {
+                if !silent {
+                    dialogService.showRichError(error: error)
+                }
+            }
+            
+            isBusy = false
+            emptyLabel.isHidden = self.transactions.count > 0
+            stopBottomIndicator()
+            refreshControl.endRefreshing()
+            tableView.reloadData()
+            updateLoadingView(isHidden: true)
+        }.stored(in: taskManager)
+    }
+    
     // MARK: - To override
     
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
@@ -132,11 +200,35 @@ class TransactionsListViewControllerBase: UIViewController {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        return UITableViewCell(style: .default, reuseIdentifier: "cell")
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifierCompact, for: indexPath) as? TransactionTableViewCell else {
+            return UITableViewCell(style: .default, reuseIdentifier: "cell")
+        }
+        
+        let transaction = transactions[indexPath.row]
+        
+        cell.accessoryType = .disclosureIndicator
+        cell.separatorInset = indexPath.row == transactions.count - 1
+        ? .zero
+        : UITableView.defaultTransactionsSeparatorInset
+        
+        let partnerId = transaction.isOutgoing
+        ? transaction.recipientId
+        : transaction.senderId
+        
+        configureCell(
+            cell,
+            isOutgoing: transaction.isOutgoing,
+            partnerId: partnerId ?? "",
+            partnerName: nil,
+            amount: (transaction.amount ?? 0).decimalValue,
+            date: transaction.date as? Date
+        )
+        
+        return cell
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 0
+        transactions.count
     }
     
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
@@ -156,11 +248,8 @@ class TransactionsListViewControllerBase: UIViewController {
     }
     
     @objc func handleRefresh() {
-        
-    }
-    
-    func loadData(silent: Bool) {
-        
+        emptyLabel.isHidden = true
+        loadData(offset: .zero, silent: true)
     }
     
     func reloadData() {

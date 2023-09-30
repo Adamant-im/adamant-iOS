@@ -13,59 +13,15 @@ import CommonKit
 class DogeTransactionsViewController: TransactionsListViewControllerBase {
     
     // MARK: - Dependencies
-    var walletService: DogeWalletService!
-    var dialogService: DialogService!
+    var dogeWalletService: DogeWalletService!
     var router: Router!
-    
-    // MARK: - Properties
-    var transactions: [DogeTransaction] = []
-    private var offset = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        updateLoadingView(isHidden: false)
         currencySymbol = DogeWalletService.currencySymbol
-        handleRefresh()
-    }
-    
-    override func handleRefresh() {
-        offset = 0
-        transactions.removeAll()
-        tableView.reloadData()
-        loadData(silent: false)
-    }
-    
-    override func loadData(silent: Bool) {
-        isBusy = true
-        
-        Task {
-            do {
-                let tuple = try await walletService.getTransactions(from: offset)
-                transactions.append(contentsOf: tuple.transactions)
-                offset += tuple.transactions.count
-                isNeedToLoadMoore = tuple.hasMore
-            } catch {
-                isNeedToLoadMoore = false
-
-                if !silent {
-                    dialogService.showRichError(error: error)
-                }
-            }
-            
-            isBusy = false
-            emptyLabel.isHidden = transactions.count > 0
-            stopBottomIndicator()
-            refreshControl.endRefreshing()
-            tableView.reloadData()
-            updateLoadingView(isHidden: true)
-        }.stored(in: taskManager)
     }
     
     // MARK: - UITableView
-    
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return transactions.count
-    }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let controller = router.get(scene: AdamantScene.Wallets.Doge.transactionDetails) as? DogeTransactionDetailsViewController else {
@@ -73,26 +29,24 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
         }
         
         // Hold reference
-        guard let address = walletService.wallet?.address else {
+        guard let address = dogeWalletService.wallet?.address else {
             return
         }
         
-        controller.service = self.walletService
+        controller.service = self.dogeWalletService
 
         let transaction = transactions[indexPath.row]
         
-        let isOutgoing: Bool = transaction.recipientAddress != address
-        
         let emptyTransaction = SimpleTransactionDetails(
-            txId: transaction.txId,
-            senderAddress: transaction.senderAddress,
-            recipientAddress: transaction.recipientAddress,
-            dateValue: nil,
-            amountValue: transaction.amountValue,
+            txId: transaction.transactionId,
+            senderAddress: transaction.senderId ?? "",
+            recipientAddress: transaction.recipientId ?? "",
+            dateValue: transaction.date as? Date,
+            amountValue: transaction.amount?.decimalValue,
             feeValue: nil,
             confirmationsValue: nil,
             blockValue: nil,
-            isOutgoing: isOutgoing,
+            isOutgoing: transaction.isOutgoing,
             transactionStatus: nil
         )
         
@@ -107,42 +61,6 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
         }
         
         navigationController?.pushViewController(controller, animated: true)
-    }
-    
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifierCompact, for: indexPath) as? TransactionTableViewCell else {
-            // TODO: Display & Log error
-            return UITableViewCell(style: .default, reuseIdentifier: "cell")
-        }
-        
-        let transaction = transactions[indexPath.row]
-        
-        cell.accessoryType = .disclosureIndicator
-        cell.separatorInset = indexPath.row == transactions.count - 1
-        ? .zero
-        : UITableView.defaultTransactionsSeparatorInset
-        
-        configureCell(cell, for: transaction)
-        return cell
-    }
-    
-    func configureCell(_ cell: TransactionTableViewCell, for transaction: DogeTransaction) {
-        let outgoing = transaction.isOutgoing
-        let partnerId = outgoing ? transaction.recipientAddress : transaction.senderAddress
-        
-        let partnerName: String?
-        if let address = walletService.wallet?.address, partnerId == address {
-            partnerName = String.adamant.transactionDetails.yourAddress
-        } else {
-            partnerName = nil
-        }
-        
-        configureCell(cell,
-                      isOutgoing: outgoing,
-                      partnerId: partnerId,
-                      partnerName: partnerName,
-                      amount: transaction.amountValue ?? 0,
-                      date: transaction.dateValue)
     }
 }
 

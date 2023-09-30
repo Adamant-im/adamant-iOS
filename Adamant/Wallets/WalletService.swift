@@ -217,6 +217,14 @@ protocol WalletService: AnyObject {
     var defaultOrdinalLevel: Int? { get }
     var richMessageType: String { get }
     
+    var transactionsPublisher: Published<[CoinTransaction]>.Publisher {
+        get
+    }
+    
+    var hasMoreOldTransactionsPublisher: Published<Bool>.Publisher {
+        get
+    }
+    
 	// MARK: Notifications
 	
 	/// Wallet updated.
@@ -244,6 +252,7 @@ protocol WalletService: AnyObject {
     func validate(address: String) -> AddressValidationResult
     func getWalletAddress(byAdamantAddress address: String) async throws -> String
     func getBalance(address: String) async throws -> Decimal
+    func loadTransactions(offset: Int, limit: Int) async throws
 }
 
 protocol SwinjectDependentService: WalletService {
