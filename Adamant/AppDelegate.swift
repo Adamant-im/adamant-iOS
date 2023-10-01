@@ -524,7 +524,7 @@ extension AppDelegate {
             unread = true
         }
         
-        if let adelina = AdamantContacts.adelina.messages["chats.welcome_message"] {
+        if let adelina = AdamantContacts.adelina.welcomeMessage {
             _ = try? await chatProvider.fakeReceived(
                 message: adelina.message,
                 senderId: AdamantContacts.adelina.address,
@@ -535,7 +535,7 @@ extension AppDelegate {
             )
         }
         
-        if let exchenge = AdamantContacts.adamantExchange.messages["chats.welcome_message"] {
+        if let exchenge = AdamantContacts.adamantExchange.welcomeMessage {
             _ = try? await chatProvider.fakeReceived(
                 message: exchenge.message,
                 senderId: AdamantContacts.adamantExchange.address,
@@ -546,7 +546,7 @@ extension AppDelegate {
             )
         }
         
-        if let betOnBitcoin = AdamantContacts.betOnBitcoin.messages["chats.welcome_message"] {
+        if let betOnBitcoin = AdamantContacts.betOnBitcoin.welcomeMessage {
             _ = try? await chatProvider.fakeReceived(
                 message: betOnBitcoin.message,
                 senderId: AdamantContacts.betOnBitcoin.address,
@@ -557,7 +557,7 @@ extension AppDelegate {
             )
         }
         
-        if let welcome = AdamantContacts.donate.messages["chats.welcome_message"] {
+        if let welcome = AdamantContacts.donate.welcomeMessage {
             _ = try? await chatProvider.fakeReceived(
                 message: welcome.message,
                 senderId: AdamantContacts.donate.address,
@@ -568,7 +568,7 @@ extension AppDelegate {
             )
         }
         
-        if let welcome = AdamantContacts.adamantWelcomeWallet.messages["chats.welcome_message"] {
+        if let welcome = AdamantContacts.adamantWelcomeWallet.welcomeMessage {
             _ = try? await chatProvider.fakeReceived(
                 message: welcome.message,
                 senderId: AdamantContacts.adamantWelcomeWallet.name,
