@@ -49,6 +49,12 @@ struct ContributeState {
                 link: URL(string: "https://github.com/Adamant-im")
             ),
             .init(
+                image: .asset(named: "row_buy-coins") ?? .init(),
+                name: .localized("Contribute.Section.Donate", comment: .empty),
+                description: .localized("Contribute.Section.DonateDescription", comment: .empty),
+                link: URL(string: "https://adamant.im/donate")
+            ),
+            .init(
                 image: .asset(named: "row_rate") ?? .init(),
                 name: .localized("Contribute.Section.Rate", comment: .empty),
                 description: .localized("Contribute.Section.RateDescription", comment: .empty),
