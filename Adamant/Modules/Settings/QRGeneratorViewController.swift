@@ -137,10 +137,10 @@ final class QRGeneratorViewController: FormViewController {
         
         // MARK: Passphrase section
         form +++ Section { $0.tag = Sections.passphrase.tag }
-        <<< TextAreaRow {
+        <<< PasswordRow {
             $0.placeholder = String.adamant.qrGenerator.passphrasePlaceholder
+            $0.cell.textField.enablePasswordToggle()
             $0.tag = Rows.passphrase.tag
-            $0.textAreaHeight = .dynamic(initialTextViewHeight: 28.0) // 28 for textView and 8+8 for insets
         }
         
         <<< ButtonRow {

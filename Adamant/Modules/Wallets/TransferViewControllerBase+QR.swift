@@ -105,16 +105,16 @@ extension TransferViewControllerBase: UINavigationControllerDelegate, UIImagePic
         }
         
         let codes = EFQRCode.recognize(cgImage)
-        if codes.count > 0 {
-            for aCode in codes {
-                if handleRawAddress(aCode) {
-                    return
-                }
-            }
-            
-            dialogService.showWarning(withMessage: String.adamant.newChat.wrongQrError)
-        } else {
+        
+        if codes.contains(where: handleRawAddress) {
+            vibroService.applyVibration(.medium)
+            return
+        }
+        
+        if codes.isEmpty {
             dialogService.showWarning(withMessage: String.adamant.login.noQrError)
+        } else {
+            dialogService.showWarning(withMessage: String.adamant.newChat.wrongQrError)
         }
     }
 }
@@ -123,6 +123,7 @@ extension TransferViewControllerBase: UINavigationControllerDelegate, UIImagePic
 extension TransferViewControllerBase: QRCodeReaderViewControllerDelegate {
     func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
         if handleRawAddress(result.value) {
+            vibroService.applyVibration(.medium)
             dismiss(animated: true, completion: nil)
         } else {
             dialogService.showWarning(withMessage: String.adamant.newChat.wrongQrError)

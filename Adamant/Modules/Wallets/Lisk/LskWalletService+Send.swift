@@ -41,7 +41,8 @@ extension LskWalletService: WalletServiceTwoStepSend {
             fee: self.transactionFee,
             nonce: wallet.nounce,
             senderPublicKey: wallet.keyPair.publicKeyString,
-            recipientAddress: binaryAddress
+            recipientAddressBase32: recipient,
+            recipientAddressBinary: binaryAddress
         )
         
         var signedTransaction = transaction.signed(with: keys, for: self.netHash)

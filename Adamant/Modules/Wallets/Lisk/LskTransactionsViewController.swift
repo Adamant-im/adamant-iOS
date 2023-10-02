@@ -277,7 +277,7 @@ extension TransactionEntity: TransactionDetails {
     }
     
     var recipientAddress: String {
-        return self.asset.recipientAddress
+        return self.asset.recipientAddressBase32
     }
     
     var dateValue: Date? {

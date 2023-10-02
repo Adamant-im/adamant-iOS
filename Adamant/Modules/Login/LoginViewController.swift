@@ -218,6 +218,7 @@ final class LoginViewController: FormViewController {
             $0.tag = Rows.passphrase.tag
             $0.placeholder = Rows.passphrase.localized
             $0.placeholderColor = UIColor.adamant.secondary
+            $0.cell.textField.enablePasswordToggle()
             $0.keyboardReturnType = KeyboardReturnTypeConfiguration(nextKeyboardType: .go, defaultKeyboardType: .go)
             }
             

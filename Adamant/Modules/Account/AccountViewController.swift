@@ -59,7 +59,7 @@ final class AccountViewController: FormViewController {
     
     enum Rows {
         case balance, sendTokens // Wallet
-        case security, nodes, theme, currency, about, visibleWallets, contribute // Application
+        case security, nodes, theme, currency, about, visibleWallets, contribute, vibration // Application
         case voteForDelegates, generateQr, generatePk, logout // Actions
         case stayIn, biometry, notifications // Security
         
@@ -81,6 +81,7 @@ final class AccountViewController: FormViewController {
             case .notifications: return "notifications"
             case .visibleWallets: return "visibleWallets"
             case .contribute: return "contribute"
+            case .vibration: return "vibration"
             }
         }
         
@@ -102,6 +103,7 @@ final class AccountViewController: FormViewController {
             case .notifications: return SecurityViewController.Rows.notificationsMode.localized
             case .visibleWallets: return .localized("VisibleWallets.Title", comment: "Visible Wallets page: scene title")
             case .contribute: return .localized("AccountTab.Row.Contribute", comment: "Account tab: 'Contribute' row")
+            case .vibration: return "Vibrations"
             }
         }
         
@@ -123,6 +125,7 @@ final class AccountViewController: FormViewController {
             case .notifications: return .asset(named: "row_Notifications.png")
             case .visibleWallets: return .asset(named: "row_balance")
             case .contribute: return .asset(named: "row_contribute")
+            case .vibration: return .asset(named: "row_contribute")
             }
         }
     }
@@ -369,6 +372,35 @@ final class AccountViewController: FormViewController {
         }
         
         appSection.append(contributeRow)
+        
+        // Contribute
+        let vibrationRow = LabelRow {
+            $0.title = Rows.vibration.localized
+            $0.tag = Rows.vibration.tag
+            $0.cell.imageView?.image = Rows.vibration.image
+            $0.cell.selectionStyle = .gray
+        }.cellUpdate { (cell, _) in
+            cell.accessoryType = .disclosureIndicator
+        }.onCellSelection { [weak self] (_, _) in
+            guard let vc = self?.router.get(scene: AdamantScene.Settings.vibration)
+            else {
+                return
+            }
+            
+            if let split = self?.splitViewController {
+                let details = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(details, sender: self)
+            } else if let nav = self?.navigationController {
+                nav.pushViewController(vc, animated: true)
+            } else {
+                vc.modalPresentationStyle = .overFullScreen
+                self?.present(vc, animated: true, completion: nil)
+            }
+            
+            self?.deselectWalletViewControllers()
+        }
+        
+        appSection.append(vibrationRow)
         
         // About
         let aboutRow = LabelRow {
