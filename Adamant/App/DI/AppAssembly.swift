@@ -70,7 +70,7 @@ struct AppAssembly: Assembly {
         }.inObjectScope(.container)
         
         // MARK: VibroService
-        self.register(VibroService.self) { r in
+        container.register(VibroService.self) { r in
             AdamantVibroService()
         }.inObjectScope(.container)
         

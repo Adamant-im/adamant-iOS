@@ -382,7 +382,7 @@ final class AccountViewController: FormViewController {
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
         }.onCellSelection { [weak self] (_, _) in
-            guard let vc = self?.router.get(scene: AdamantScene.Settings.vibration)
+            guard let vc = self?.screensFactory.makeVibrationSelection()
             else {
                 return
             }

@@ -47,7 +47,8 @@ struct AdmWalletFactory: WalletFactory {
             dialogService: assembler.resolve(DialogService.self)!,
             screensFactory: screensFactory,
             currencyInfoService: assembler.resolve(CurrencyInfoService.self)!,
-            increaseFeeService: assembler.resolve(IncreaseFeeService.self)!
+            increaseFeeService: assembler.resolve(IncreaseFeeService.self)!,
+            vibroService: assembler.resolve(VibroService.self)!
         )
         
         vc.service = service

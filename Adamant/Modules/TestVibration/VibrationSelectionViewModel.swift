@@ -17,14 +17,16 @@ final class VibrationSelectionViewModel: ObservableObject {
     
     @Published var type: AdamantVibroType?
     
-    init(vibroService: VibroService) {
+    nonisolated init(vibroService: VibroService) {
         self.vibroService = vibroService
-        
+    }
+}
+
+private extension VibrationSelectionViewModel {
+    func setup() {
         $type
-            .sink { [weak vibroService] in
-                guard let type = $0 else { return }
-                vibroService?.applyVibration(type)
-            }
+            .compactMap { $0 }
+            .sink { [weak vibroService] in vibroService?.applyVibration($0) }
             .store(in: &subscriptions)
     }
 }

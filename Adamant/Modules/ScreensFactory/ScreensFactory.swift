@@ -58,4 +58,5 @@ protocol ScreensFactory {
     func makeVisibleWallets() -> UIViewController
     func makeContribute() -> UIViewController
     func makeLogin() -> LoginViewController
+    func makeVibrationSelection() -> UIViewController
 }

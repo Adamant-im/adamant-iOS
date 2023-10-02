@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct VibrationSelectionView: View {
-    @ObservedObject var viewModel: VibrationSelectionViewModel
+    @StateObject var viewModel: VibrationSelectionViewModel
     
     init(viewModel: VibrationSelectionViewModel) {
         _viewModel = .init(wrappedValue: viewModel)
