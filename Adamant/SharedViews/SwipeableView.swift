@@ -9,7 +9,7 @@
 import UIKit
 import SnapKit
 
-class SwipeableView: UIView {
+final class SwipeableView: UIView {
     
     // MARK: Proprieties
     
