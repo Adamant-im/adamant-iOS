@@ -9,7 +9,7 @@
 import Foundation
 import LocalAuthentication
 
-class AdamantAuthentication: LocalAuthentication {
+final class AdamantAuthentication: LocalAuthentication {
     var biometryType: BiometryType {
         let context = LAContext()
         var error: NSError?
