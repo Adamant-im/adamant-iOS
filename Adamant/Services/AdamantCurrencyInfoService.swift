@@ -18,7 +18,7 @@ extension StoreKey {
 }
 
 // MARK: - Service
-class AdamantCurrencyInfoService: CurrencyInfoService {
+final class AdamantCurrencyInfoService: CurrencyInfoService {
     // MARK: - API
     private lazy var infoServiceUrl: URL = {
         return URL(string: AdamantResources.coinsInfoSrvice)!

@@ -9,7 +9,7 @@
 import UIKit
 import CommonKit
 
-class FullscreenAlertView: UIView {
+final class FullscreenAlertView: UIView {
     
     // MARK: IBOutlets
     
