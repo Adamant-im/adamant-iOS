@@ -9,6 +9,10 @@
 import Foundation
 
 protocol CoinStorageService: AnyObject {
+    var transactionsPublisher: Published<[CoinTransaction]>.Publisher {
+        get
+    }
+    
     func append(_ transaction: TransactionDetails)
     func append(_ transactions: [TransactionDetails])
 }

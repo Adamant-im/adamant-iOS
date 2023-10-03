@@ -249,7 +249,8 @@ protocol WalletService: AnyObject {
     func validate(address: String) -> AddressValidationResult
     func getWalletAddress(byAdamantAddress address: String) async throws -> String
     func getBalance(address: String) async throws -> Decimal
-    func loadTransactions(offset: Int, limit: Int) async throws
+    func loadTransactions(offset: Int, limit: Int) async throws -> Int
+    func getLocalTransactionHistory() -> [CoinTransaction]
 }
 
 protocol SwinjectDependentService: WalletService {

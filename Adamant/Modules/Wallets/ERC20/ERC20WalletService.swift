@@ -233,7 +233,7 @@ final class ERC20WalletService: WalletService {
     }
     
     func addTransactionObserver() {
-        coinStorage.$transactions
+        coinStorage.transactionsPublisher
             .removeDuplicates()
             .sink { [weak self] transactions in
                 self?.historyTransactions = transactions
@@ -648,9 +648,9 @@ extension ERC20WalletService {
         return transactions
     }
     
-    func loadTransactions(offset: Int, limit: Int) async throws {
+    func loadTransactions(offset: Int, limit: Int) async throws -> Int {
         guard let address = wallet?.address else {
-            return
+            return .zero
         }
         
         let trs = try await getTransactionsHistory(
@@ -661,7 +661,7 @@ extension ERC20WalletService {
         
         guard trs.count > 0 else {
             hasMoreOldTransactions = false
-            return
+            return .zero
         }
         
         let newTrs = trs.map { transaction in
@@ -687,5 +687,11 @@ extension ERC20WalletService {
         }
         
         coinStorage.append(newTrs)
+        
+        return trs.count
+    }
+    
+    func getLocalTransactionHistory() -> [CoinTransaction] {
+        historyTransactions
     }
 }

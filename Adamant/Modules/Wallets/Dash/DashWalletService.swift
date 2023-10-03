@@ -200,7 +200,7 @@ final class DashWalletService: WalletService {
     }
     
     func addTransactionObserver() {
-        coinStorage.$transactions
+        coinStorage.transactionsPublisher
             .removeDuplicates()
             .sink { [weak self] transactions in
                 self?.historyTransactions = transactions
@@ -433,9 +433,9 @@ extension DashWalletService {
         }
     }
     
-    func loadTransactions(offset: Int, limit: Int) async throws {
+    func loadTransactions(offset: Int, limit: Int) async throws -> Int {
         guard let address = wallet?.address else {
-            return
+            return .zero
         }
         
         let allTransactionsIds = try await requestTransactionsIds(for: address).reversed()
@@ -456,10 +456,16 @@ extension DashWalletService {
         
         guard trs.count > 0 else {
             hasMoreOldTransactions = false
-            return
+            return .zero
         }
         
         coinStorage.append(trs)
+        
+        return trs.count
+    }
+    
+    func getLocalTransactionHistory() -> [CoinTransaction] {
+        historyTransactions
     }
 }
 

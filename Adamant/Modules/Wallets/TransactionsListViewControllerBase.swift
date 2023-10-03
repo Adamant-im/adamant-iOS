@@ -48,13 +48,14 @@ class TransactionsListViewControllerBase: UIViewController {
     var taskManager = TaskManager()
     
     var isNeedToLoadMoore = true
-    var isBusy = true
+    var isBusy = false
     
     var transactions: [CoinTransaction] = []
     private(set) lazy var loadingView = LoadingView()
     
     private var subscriptions = Set<AnyCancellable>()
     private var limit = 25
+    private var offset = 0
     
     // MARK: - IBOutlets
     @IBOutlet weak var tableView: UITableView!
@@ -69,32 +70,11 @@ class TransactionsListViewControllerBase: UIViewController {
         navigationItem.title = String.adamant.transactionList.title
         emptyLabel.text = String.adamant.transactionList.noTransactionYet
         
-        // MARK: Configure tableView
-        let nib = UINib.init(nibName: "TransactionTableViewCell", bundle: nil)
-        tableView.register(nib, forCellReuseIdentifier: cellIdentifierFull)
-        tableView.register(nib, forCellReuseIdentifier: cellIdentifierCompact)
-        tableView.dataSource = self
-        tableView.delegate = self
-        tableView.refreshControl = refreshControl
-        tableView.tableHeaderView = UIView()
-        
-        // MARK: Notifications
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            self?.reloadData()
-        }
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            self?.reloadData()
-        }
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAddressBookService.addressBookUpdated, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            self?.reloadData()
-        }
-        
+        transactions = walletService.getLocalTransactionHistory()
+        configureTableView()
         setColors()
         configureLayout()
         addObservers()
-        
         handleRefresh()
     }
     
@@ -112,7 +92,32 @@ class TransactionsListViewControllerBase: UIViewController {
     }
     
     func addObservers() {
+        NotificationCenter.default
+            .publisher(for: .AdamantAddressBookService.addressBookUpdated, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.reloadData()
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.reloadData()
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.reloadData()
+            }
+            .store(in: &subscriptions)
+        
         walletService.transactionsPublisher
+            .receive(on: OperationQueue.main)
             .sink { [weak self] transactions in
                 self?.update(transactions)
             }
@@ -125,13 +130,25 @@ class TransactionsListViewControllerBase: UIViewController {
             .store(in: &subscriptions)
     }
     
+    func configureTableView() {
+        let nib = UINib.init(nibName: "TransactionTableViewCell", bundle: nil)
+        tableView.register(nib, forCellReuseIdentifier: cellIdentifierFull)
+        tableView.register(nib, forCellReuseIdentifier: cellIdentifierCompact)
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.refreshControl = refreshControl
+        tableView.tableHeaderView = UIView()
+    }
+    
     @MainActor
     func update(_ transactions: [CoinTransaction]) {
-        DispatchQueue.main.async {
-            self.transactions = transactions
-            self.tableView.reloadData()
-            self.updateLoadingView(isHidden: true)
-        }
+        self.transactions = transactions.sorted(by: {
+            (($0.date ?? NSDate()) as Date) > (($1.date ?? NSDate()) as Date)
+        })
+        self.tableView.reloadData()
+        
+        guard !isBusy else { return }
+        self.updateLoadingView(isHidden: true)
     }
     
     // MARK: - Other
@@ -150,6 +167,11 @@ class TransactionsListViewControllerBase: UIViewController {
         }
     }
     
+    func presentLoadingViewIfNeeded() {
+        guard transactions.count == 0 else { return }
+        updateLoadingView(isHidden: false)
+    }
+    
     func updateLoadingView(isHidden: Bool) {
         loadingView.isHidden = isHidden
         if !isHidden {
@@ -161,20 +183,23 @@ class TransactionsListViewControllerBase: UIViewController {
     
     @MainActor
     func loadData(silent: Bool) {
-        loadData(offset: transactions.count, silent: true)
+        loadData(offset: offset, silent: true)
     }
     
     @MainActor
     func loadData(offset: Int, silent: Bool) {
+        guard !isBusy else { return }
         isBusy = true
-        print("loadData, ofs=\(offset)")
-        Task { @MainActor in
+        Task {
             do {
-                try await walletService.loadTransactions(
+                let count = try await walletService.loadTransactions(
                     offset: offset,
                     limit: limit
                 )
+                self.offset += count
             } catch {
+                isNeedToLoadMoore = false
+                
                 if !silent {
                     dialogService.showRichError(error: error)
                 }
@@ -215,9 +240,18 @@ class TransactionsListViewControllerBase: UIViewController {
         ? transaction.recipientId
         : transaction.senderId
         
+        let transactionType: TransactionTableViewCell.TransactionType
+        if transaction.recipientId == transaction.senderId {
+            transactionType = .myself
+        } else if transaction.isOutgoing {
+            transactionType = .outcome
+        } else {
+            transactionType = .income
+        }
+        
         configureCell(
             cell,
-            isOutgoing: transaction.isOutgoing,
+            transactionType: transactionType,
             partnerId: partnerId ?? "",
             partnerName: nil,
             amount: (transaction.amount ?? 0).decimalValue,
@@ -248,6 +282,7 @@ class TransactionsListViewControllerBase: UIViewController {
     }
     
     @objc func handleRefresh() {
+        presentLoadingViewIfNeeded()
         emptyLabel.isHidden = true
         loadData(offset: .zero, silent: true)
     }
@@ -269,7 +304,7 @@ extension TransactionsListViewControllerBase: UITableViewDataSource, UITableView
     
     func configureCell(
         _ cell: TransactionTableViewCell,
-        isOutgoing: Bool,
+        transactionType: TransactionTableViewCell.TransactionType,
         partnerId: String,
         partnerName: String?,
         amount: Decimal,
@@ -280,11 +315,7 @@ extension TransactionsListViewControllerBase: UITableViewDataSource, UITableView
         cell.ammountLabel.tintColor = UIColor.adamant.primary
         cell.dateLabel.tintColor = UIColor.adamant.secondary
         
-        if isOutgoing {
-            cell.transactionType = .outcome
-        } else {
-            cell.transactionType = .income
-        }
+        cell.transactionType = transactionType
         
         if let partnerName = partnerName {
             cell.accountLabel.text = partnerName

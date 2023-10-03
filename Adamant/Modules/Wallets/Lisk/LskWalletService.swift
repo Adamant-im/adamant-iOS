@@ -188,7 +188,7 @@ final class LskWalletService: WalletService {
     }
     
     func addTransactionObserver() {
-        coinStorage.$transactions
+        coinStorage.transactionsPublisher
             .removeDuplicates()
             .sink { [weak self] transactions in
                 self?.transactions = transactions
@@ -594,15 +594,20 @@ extension LskWalletService {
         }
     }
     
-    func loadTransactions(offset: Int, limit: Int) async throws {
+    func loadTransactions(offset: Int, limit: Int) async throws -> Int {
         let trs = try await getTransactions(offset: UInt(offset), limit: UInt(limit))
         
         guard trs.count > 0 else {
             hasMoreOldTransactions = false
-            return
+            return .zero
         }
         
         coinStorage.append(trs)
+        return trs.count
+    }
+    
+    func getLocalTransactionHistory() -> [CoinTransaction] {
+        transactions
     }
 }
 
@@ -654,6 +659,7 @@ extension LskWalletService {
         
         return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<[Transactions.TransactionModel], Error>) in
             transactionApi.transactions(
+                ownerAddress: address,
                 senderIdOrRecipientId: address,
                 limit: limit,
                 offset: offset,
@@ -680,7 +686,12 @@ extension LskWalletService {
         }
         
         return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Transactions.TransactionModel, Error>) in
-            api.transactions(id: hash, limit: 1, offset: 0) { (response) in
+            api.transactions(
+                ownerAddress: wallet?.address,
+                id: hash,
+                limit: 1,
+                offset: 0
+            ) { (response) in
                 switch response {
                 case .success(response: let result):
                     if let transaction = result.first {

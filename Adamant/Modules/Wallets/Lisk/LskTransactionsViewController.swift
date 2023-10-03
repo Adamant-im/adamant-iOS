@@ -30,6 +30,7 @@ final class LskTransactionsViewController: TransactionsListViewControllerBase {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        guard let address = lskWalletService.wallet?.address else { return }
         
         let transaction = transactions[indexPath.row]
         let controller = screensFactory.makeDetailsVC(service: lskWalletService)
@@ -49,12 +50,12 @@ final class LskTransactionsViewController: TransactionsListViewControllerBase {
         
         controller.transaction = emptyTransaction
         
-        if let address = lskWalletService.wallet?.address {
-            if transaction.senderId?.caseInsensitiveCompare(address) == .orderedSame {
-                controller.senderName = String.adamant.transactionDetails.yourAddress
-            } else if transaction.recipientId?.caseInsensitiveCompare(address) == .orderedSame {
-                controller.recipientName = String.adamant.transactionDetails.yourAddress
-            }
+        if emptyTransaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
+            controller.senderName = String.adamant.transactionDetails.yourAddress
+        }
+        
+        if emptyTransaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
+            controller.recipientName = String.adamant.transactionDetails.yourAddress
         }
         
         navigationController?.pushViewController(controller, animated: true)
@@ -101,10 +102,6 @@ extension Transactions.TransactionModel: TransactionDetails {
     
     var blockValue: String? {
         return self.blockId
-    }
-    
-    var isOutgoing: Bool {
-        return false
     }
     
     var transactionStatus: TransactionStatus? {

@@ -222,7 +222,7 @@ final class BtcWalletService: WalletService {
     }
     
     func addTransactionObserver() {
-        coinStorage.$transactions
+        coinStorage.transactionsPublisher
             .removeDuplicates()
             .sink { [weak self] transactions in
                 self?.transactions = transactions
@@ -723,7 +723,7 @@ extension BtcWalletService {
         }
     }
 
-    func loadTransactions(offset: Int, limit: Int) async throws {
+    func loadTransactions(offset: Int, limit: Int) async throws -> Int {
         let txId = offset == .zero
         ? transactions.first?.transactionId
         : transactions.last?.transactionId
@@ -732,10 +732,16 @@ extension BtcWalletService {
         
         guard trs.count > 0 else {
             hasMoreOldTransactions = false
-            return
+            return .zero
         }
         
         coinStorage.append(trs)
+    
+        return trs.count
+    }
+    
+    func getLocalTransactionHistory() -> [CoinTransaction] {
+        transactions
     }
 }
 

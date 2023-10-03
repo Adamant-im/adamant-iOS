@@ -18,8 +18,12 @@ final class AdamantCoinStorageService: NSObject, CoinStorageService {
     private let coinId: String
     private let coreDataStack: CoreDataStack
     private lazy var transactionController = getTransactionController()
-    
-    @ObservableValue private(set) var transactions: [CoinTransaction] = []
+
+    @Published private var transactions: [CoinTransaction] = []
+
+    var transactionsPublisher: Published<[CoinTransaction]>.Publisher {
+        $transactions
+    }
     
     // MARK: Init
     
@@ -43,9 +47,17 @@ final class AdamantCoinStorageService: NSObject, CoinStorageService {
         var coinTransactions: [CoinTransaction] = []
         
         transactions.forEach { transaction in
+            let isExist = self.transactions.contains { tx in
+                tx.transactionId == transaction.txId
+            }
+            let isLocalExist = coinTransactions.contains { tx in
+                tx.transactionId == transaction.txId
+            }
+            guard !isExist, !isLocalExist else { return }
+            
             let coinTransaction = CoinTransaction(context: privateContext)
             coinTransaction.amount = NSDecimalNumber(decimal: transaction.amountValue ?? 0)
-            coinTransaction.date = transaction.dateValue as? NSDate
+            coinTransaction.date = (transaction.dateValue ?? Date()) as? NSDate
             coinTransaction.recipientId = transaction.recipientAddress
             coinTransaction.senderId = transaction.senderAddress
             coinTransaction.isOutgoing = transaction.isOutgoing

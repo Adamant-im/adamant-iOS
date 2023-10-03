@@ -26,6 +26,7 @@ final class BtcTransactionsViewController: TransactionsListViewControllerBase {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        guard let address = btcWalletService.wallet?.address else { return }
         
         let transaction = transactions[indexPath.row]
         
@@ -46,15 +47,14 @@ final class BtcTransactionsViewController: TransactionsListViewControllerBase {
         
         controller.transaction = emptyTransaction
 
-        if let address = btcWalletService.wallet?.address {
-            if transaction.senderId?.caseInsensitiveCompare(address) == .orderedSame {
-                controller.senderName = String.adamant.transactionDetails.yourAddress
-            }
-            if transaction.recipientId?.caseInsensitiveCompare(address) == .orderedSame {
-                controller.recipientName = String.adamant.transactionDetails.yourAddress
-            }
+        if emptyTransaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
+            controller.senderName = String.adamant.transactionDetails.yourAddress
         }
-
+        
+        if emptyTransaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
+            controller.recipientName = String.adamant.transactionDetails.yourAddress
+        }
+        
         navigationController?.pushViewController(controller, animated: true)
     }
 }

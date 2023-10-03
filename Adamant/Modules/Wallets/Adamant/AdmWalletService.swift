@@ -130,7 +130,7 @@ final class AdmWalletService: NSObject, WalletService {
     }
     
     func addTransactionObserver() {
-        coinStorage.$transactions
+        coinStorage.transactionsPublisher
             .removeDuplicates()
             .sink { [weak self] transactions in
                 self?.transactions = transactions
@@ -185,8 +185,9 @@ final class AdmWalletService: NSObject, WalletService {
         return address
     }
     
-    func loadTransactions(offset: Int, limit: Int) async throws {
-    }
+    func loadTransactions(offset: Int, limit: Int) async throws -> Int { .zero }
+    
+    func getLocalTransactionHistory() -> [CoinTransaction] { [] }
 }
 
 // MARK: - NSFetchedResultsControllerDelegate

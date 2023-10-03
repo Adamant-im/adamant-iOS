@@ -237,7 +237,7 @@ final class EthWalletService: WalletService {
     }
     
     func addTransactionObserver() {
-        coinStorage.$transactions
+        coinStorage.transactionsPublisher
             .removeDuplicates()
             .sink { [weak self] transactions in
                 self?.historyTransactions = transactions
@@ -773,9 +773,9 @@ extension EthWalletService {
         return transactions
     }
     
-    func loadTransactions(offset: Int, limit: Int) async throws {
+    func loadTransactions(offset: Int, limit: Int) async throws -> Int {
         guard let address = wallet?.address else {
-            return
+            return . zero
         }
         
         let trs = try await getTransactionsHistory(
@@ -786,7 +786,7 @@ extension EthWalletService {
         
         guard trs.count > 0 else {
             hasMoreOldTransactions = false
-            return
+            return .zero
         }
         
         let newTrs = trs.map { transaction in
@@ -806,6 +806,12 @@ extension EthWalletService {
         }
         
         coinStorage.append(newTrs)
+        
+        return trs.count
+    }
+    
+    func getLocalTransactionHistory() -> [CoinTransaction] {
+        historyTransactions
     }
 }
 

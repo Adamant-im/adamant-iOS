@@ -11,12 +11,13 @@ import CommonKit
 
 class TransactionTableViewCell: UITableViewCell {
     enum TransactionType {
-        case income, outcome
+        case income, outcome, myself
         
         var imageTop: UIImage {
             switch self {
             case .income: return .asset(named: "transfer-in_top") ?? .init()
             case .outcome: return .asset(named: "transfer-out_top") ?? .init()
+            case .myself: return .asset(named: "transfer-in_top")?.withTintColor(.lightGray) ?? .init()
             }
         }
         
@@ -24,6 +25,7 @@ class TransactionTableViewCell: UITableViewCell {
             switch self {
             case .income: return .asset(named: "transfer-in_bot") ?? .init()
             case .outcome: return .asset(named: "transfer-out_bot") ?? .init()
+            case .myself: return .asset(named: "transfer-self_bot") ?? .init()
             }
         }
         
@@ -31,6 +33,7 @@ class TransactionTableViewCell: UITableViewCell {
             switch self {
             case .income: return UIColor.adamant.transferIncomeIconBackground
             case .outcome: return UIColor.adamant.transferOutcomeIconBackground
+            case .myself: return UIColor.adamant.transferIncomeIconBackground
             }
         }
     }

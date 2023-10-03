@@ -57,6 +57,7 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
         
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         self.dialogService = dialogService
+        self.walletService = admService
     }
     
     required init?(coder: NSCoder) {
@@ -251,7 +252,7 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
         
         configureCell(
             cell,
-            isOutgoing: transaction.isOutgoing,
+            transactionType: transaction.isOutgoing ? .outcome : .income,
             partnerId: partnerId,
             partnerName: partnerName,
             amount: amount,

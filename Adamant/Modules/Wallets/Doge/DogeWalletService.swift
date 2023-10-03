@@ -190,7 +190,7 @@ final class DogeWalletService: WalletService {
     }
     
     func addTransactionObserver() {
-        coinStorage.$transactions
+        coinStorage.transactionsPublisher
             .removeDuplicates()
             .sink { [weak self] transactions in
                 self?.historyTransactions = transactions
@@ -630,7 +630,7 @@ extension DogeWalletService {
         }
     }
     
-    func loadTransactions(offset: Int, limit: Int) async throws {
+    func loadTransactions(offset: Int, limit: Int) async throws -> Int {
         let tuple = try await getTransactions(from: offset)
         
         let trs = tuple.transactions
@@ -638,10 +638,16 @@ extension DogeWalletService {
         
         guard trs.count > 0 else {
             hasMoreOldTransactions = false
-            return
+            return .zero
         }
         
         coinStorage.append(trs)
+        
+        return trs.count
+    }
+    
+    func getLocalTransactionHistory() -> [CoinTransaction] {
+        historyTransactions
     }
 }
 
