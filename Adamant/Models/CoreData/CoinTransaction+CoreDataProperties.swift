@@ -23,8 +23,6 @@ extension CoinTransaction {
     @NSManaged public var recipientId: String?
     @NSManaged public var date: NSDate?
     @NSManaged public var isOutgoing: Bool
-
-//    public var transactionStatus: TransactionStatus?
 }
 
 extension CoinTransaction : Identifiable {

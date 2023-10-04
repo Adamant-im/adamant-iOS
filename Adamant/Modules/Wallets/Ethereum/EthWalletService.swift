@@ -801,7 +801,7 @@ extension EthWalletService {
                 confirmationsValue: nil,
                 blockValue: nil,
                 isOutgoing: isOutgoing,
-                transactionStatus: nil
+                transactionStatus: TransactionStatus.registered
             )
         }
         

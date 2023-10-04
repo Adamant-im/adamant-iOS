@@ -252,6 +252,7 @@ class TransactionsListViewControllerBase: UIViewController {
         configureCell(
             cell,
             transactionType: transactionType,
+            transactionStatus: transaction.transactionStatus,
             partnerId: partnerId ?? "",
             partnerName: nil,
             amount: (transaction.amount ?? 0).decimalValue,
@@ -305,6 +306,7 @@ extension TransactionsListViewControllerBase: UITableViewDataSource, UITableView
     func configureCell(
         _ cell: TransactionTableViewCell,
         transactionType: TransactionTableViewCell.TransactionType,
+        transactionStatus: TransactionStatus?,
         partnerId: String,
         partnerName: String?,
         amount: Decimal,
@@ -313,7 +315,21 @@ extension TransactionsListViewControllerBase: UITableViewDataSource, UITableView
         cell.backgroundColor = .clear
         cell.accountLabel.tintColor = UIColor.adamant.primary
         cell.ammountLabel.tintColor = UIColor.adamant.primary
-        cell.dateLabel.tintColor = UIColor.adamant.secondary
+        
+        cell.dateLabel.textColor = transactionStatus?.color ?? .adamant.secondary
+        
+        switch transactionStatus {
+        case .success, .inconsistent, .registered:
+            if let date = date {
+                cell.dateLabel.text = date.humanizedDateTime()
+            } else {
+                cell.dateLabel.text = nil
+            }
+        case .failed:
+            cell.dateLabel.text = TransactionStatus.failed.localized
+        default:
+            cell.dateLabel.text = TransactionStatus.pending.localized
+        }
         
         cell.transactionType = transactionType
         
@@ -334,12 +350,6 @@ extension TransactionsListViewControllerBase: UITableViewDataSource, UITableView
         }
         
         cell.ammountLabel.text = AdamantBalanceFormat.full.format(amount, withCurrencySymbol: currencySymbol)
-        
-        if let date = date {
-            cell.dateLabel.text = date.humanizedDateTime()
-        } else {
-            cell.dateLabel.text = nil
-        }
     }
     
     func bottomIndicatorView() -> UIActivityIndicatorView {
@@ -373,5 +383,16 @@ extension TransactionsListViewControllerBase: UITableViewDataSource, UITableView
         
         activityIndicatorView.stopAnimating()
         tableView.tableFooterView = nil
+    }
+}
+
+// MARK: - TransactionStatus UI
+private extension TransactionStatus {
+    var color: UIColor {
+        switch self {
+        case .failed: return .adamant.danger
+        case .notInitiated, .inconsistent, .noNetwork, .noNetworkFinal, .pending: return .adamant.alert
+        case .success, .registered: return .adamant.secondary
+        }
     }
 }

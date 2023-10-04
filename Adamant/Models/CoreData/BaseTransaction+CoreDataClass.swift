@@ -12,7 +12,4 @@ import CoreData
 
 @objc(BaseTransaction)
 public class BaseTransaction: CoinTransaction {
-    var transactionStatus: TransactionStatus? {
-        return nil
-    }
 }

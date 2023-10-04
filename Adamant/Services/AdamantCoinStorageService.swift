@@ -57,12 +57,13 @@ final class AdamantCoinStorageService: NSObject, CoinStorageService {
             
             let coinTransaction = CoinTransaction(context: privateContext)
             coinTransaction.amount = NSDecimalNumber(decimal: transaction.amountValue ?? 0)
-            coinTransaction.date = (transaction.dateValue ?? Date()) as? NSDate
+            coinTransaction.date = (transaction.dateValue ?? Date()) as NSDate
             coinTransaction.recipientId = transaction.recipientAddress
             coinTransaction.senderId = transaction.senderAddress
             coinTransaction.isOutgoing = transaction.isOutgoing
             coinTransaction.coinId = coinId
             coinTransaction.transactionId = transaction.txId
+            coinTransaction.transactionStatus = transaction.transactionStatus
             
             coinTransactions.append(coinTransaction)
         }
@@ -70,6 +71,24 @@ final class AdamantCoinStorageService: NSObject, CoinStorageService {
         try? privateContext.save()
         
         self.transactions.append(contentsOf: coinTransactions)
+    }
+    
+    func updateStatus(for transactionId: String, status: TransactionStatus?) {
+        let privateContext = coreDataStack.container.viewContext
+        
+        guard let transaction = getTransactionFromDB(
+            id: transactionId,
+            context: privateContext
+        ) else { return }
+        
+        transaction.transactionStatus = status
+        try? privateContext.save()
+        
+        guard let index = transactions.firstIndex(where: {
+            $0.transactionId == transactionId
+        }) else { return }
+        
+        transactions[index].transactionStatus = status
     }
 }
 
@@ -92,5 +111,22 @@ private extension AdamantCoinStorageService {
             sectionNameKeyPath: nil,
             cacheName: nil
         )
+    }
+    
+    /// Search transaction in local storage
+    ///
+    /// - Parameter id: Transacton ID
+    /// - Returns: Transaction, if found
+    func getTransactionFromDB(id: String, context: NSManagedObjectContext) -> CoinTransaction? {
+        let request = NSFetchRequest<CoinTransaction>(entityName: CoinTransaction.entityCoinName)
+        request.predicate = NSPredicate(format: "transactionId == %@", String(id))
+        request.fetchLimit = 1
+        
+        do {
+            let result = try context.fetch(request)
+            return result.first
+        } catch {
+            return nil
+        }
     }
 }

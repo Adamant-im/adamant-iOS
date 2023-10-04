@@ -13,4 +13,6 @@ import CoreData
 @objc(CoinTransaction)
 public class CoinTransaction: NSManagedObject {
     static let entityCoinName = "CoinTransaction"
+    
+    var transactionStatus: TransactionStatus?
 }

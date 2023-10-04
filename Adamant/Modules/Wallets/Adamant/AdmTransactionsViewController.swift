@@ -253,6 +253,7 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
         configureCell(
             cell,
             transactionType: transaction.isOutgoing ? .outcome : .income,
+            transactionStatus: transaction.transactionStatus,
             partnerId: partnerId,
             partnerName: partnerName,
             amount: amount,
