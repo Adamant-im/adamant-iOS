@@ -12,6 +12,7 @@
 		3A2F55FC2AC6F885000A3F26 /* CoinStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A2F55FB2AC6F885000A3F26 /* CoinStorage.swift */; };
 		3A2F55FE2AC6F90E000A3F26 /* AdamantCoinStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A2F55FD2AC6F90E000A3F26 /* AdamantCoinStorageService.swift */; };
 		3A33F9FA2A7A53DA002B8003 /* EmojiUpdateType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A33F9F92A7A53DA002B8003 /* EmojiUpdateType.swift */; };
+		3A4068342ACD7C18007E87BD /* CoinTransaction+TransactionDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4068332ACD7C18007E87BD /* CoinTransaction+TransactionDetails.swift */; };
 		3A41938F2A580C57006A6B22 /* AdamantRichTransactionReactService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A41938E2A580C57006A6B22 /* AdamantRichTransactionReactService.swift */; };
 		3A4193912A580C85006A6B22 /* RichTransactionReactService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4193902A580C85006A6B22 /* RichTransactionReactService.swift */; };
 		3A41939A2A5D554A006A6B22 /* Reaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4193992A5D554A006A6B22 /* Reaction.swift */; };
@@ -598,6 +599,7 @@
 		3A2F55FB2AC6F885000A3F26 /* CoinStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinStorage.swift; sourceTree = "<group>"; };
 		3A2F55FD2AC6F90E000A3F26 /* AdamantCoinStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantCoinStorageService.swift; sourceTree = "<group>"; };
 		3A33F9F92A7A53DA002B8003 /* EmojiUpdateType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiUpdateType.swift; sourceTree = "<group>"; };
+		3A4068332ACD7C18007E87BD /* CoinTransaction+TransactionDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoinTransaction+TransactionDetails.swift"; sourceTree = "<group>"; };
 		3A41938E2A580C57006A6B22 /* AdamantRichTransactionReactService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantRichTransactionReactService.swift; sourceTree = "<group>"; };
 		3A4193902A580C85006A6B22 /* RichTransactionReactService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichTransactionReactService.swift; sourceTree = "<group>"; };
 		3A4193992A5D554A006A6B22 /* Reaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reaction.swift; sourceTree = "<group>"; };
@@ -2084,7 +2086,7 @@
 				E90847292196FEA80095825D /* Chatroom+CoreDataProperties.swift */,
 				3A2F55F72AC6F308000A3F26 /* CoinTransaction+CoreDataClass.swift */,
 				3A2F55F82AC6F308000A3F26 /* CoinTransaction+CoreDataProperties.swift */,
-				E90847192196FE590095825D /* Adamant.xcdatamodeld */,
+				3A4068332ACD7C18007E87BD /* CoinTransaction+TransactionDetails.swift */,
 			);
 			path = CoreData;
 			sourceTree = "<group>";
@@ -2756,6 +2758,7 @@
 				E9CAE8DA2018ACD300345E76 /* AdamantApi+Chats.swift in Sources */,
 				648CE3A42299A94D0070A2CC /* DashTransactionDetailsViewController.swift in Sources */,
 				E90847362196FEA80095825D /* Chatroom+CoreDataClass.swift in Sources */,
+				3A4068342ACD7C18007E87BD /* CoinTransaction+TransactionDetails.swift in Sources */,
 				E91947B020002393001362F8 /* AdamantApiService.swift in Sources */,
 				E921597B206503000000CA5C /* ButtonsStripeView.swift in Sources */,
 				93294B9A2AAD624100911109 /* WalletFactoryCompose.swift in Sources */,
@@ -2983,7 +2986,6 @@
 				E9FAE5DA203DBFEF008D3A6B /* Comparable+clamped.swift in Sources */,
 				93A91FD329799298001DB1F8 /* ChatStartPosition.swift in Sources */,
 				3A2F55F92AC6F308000A3F26 /* CoinTransaction+CoreDataClass.swift in Sources */,
-				E94008802114EE2000CD2D67 /* AdmWallet.swift in Sources */,
 				93A91FD1297972B7001DB1F8 /* ChatScrollDownButton.swift in Sources */,
 				41C1698C29E7F34900FEB3CB /* RichTransactionReplyService.swift in Sources */,
 				E9A03FDA20DC0B14007653A1 /* NodesSource.swift in Sources */,

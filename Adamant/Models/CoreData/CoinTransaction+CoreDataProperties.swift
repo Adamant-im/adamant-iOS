@@ -23,6 +23,11 @@ extension CoinTransaction {
     @NSManaged public var recipientId: String?
     @NSManaged public var date: NSDate?
     @NSManaged public var isOutgoing: Bool
+    @NSManaged public var confirmations: Int64
+    @NSManaged public var fee: NSDecimalNumber?
+    @NSManaged public var blockId: String?
+    @NSManaged public var height: Int64
+    @NSManaged public var isConfirmed: Bool
 }
 
 extension CoinTransaction : Identifiable {

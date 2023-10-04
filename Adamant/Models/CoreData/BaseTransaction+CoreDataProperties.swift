@@ -16,11 +16,6 @@ extension BaseTransaction {
         return NSFetchRequest<BaseTransaction>(entityName: "BaseTransaction")
     }
 
-    @NSManaged public var blockId: String?
-    @NSManaged public var confirmations: Int64
-    @NSManaged public var fee: NSDecimalNumber?
-    @NSManaged public var height: Int64
-    @NSManaged public var isConfirmed: Bool
     @NSManaged public var type: Int16
     @NSManaged public var partner: BaseAccount?
     @NSManaged public var senderPublicKey: String?
