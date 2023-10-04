@@ -250,9 +250,18 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
             partnerName = String.adamant.transactionDetails.yourAddress
         }
         
+        let transactionType: TransactionTableViewCell.TransactionType
+        if transaction.recipientId == transaction.senderId {
+            transactionType = .myself
+        } else if transaction.isOutgoing {
+            transactionType = .outcome
+        } else {
+            transactionType = .income
+        }
+        
         configureCell(
             cell,
-            transactionType: transaction.isOutgoing ? .outcome : .income,
+            transactionType: transactionType,
             transactionStatus: transaction.transactionStatus,
             partnerId: partnerId,
             partnerName: partnerName,
