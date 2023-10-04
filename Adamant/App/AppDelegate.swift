@@ -337,18 +337,18 @@ extension AppDelegate {
     ) {
         if
             let chatVCNav = chatListNav.viewControllers.last as? UINavigationController,
-            let chatVC = chatVCNav.viewControllers.first as? ChatViewController,
-            chatVC.viewModel.chatroom?.partner?.address == senderAddress
+            let chatVC = chatVCNav.viewControllers.first as? AdamantChatViewController,
+            chatVC.viewModel.chatroom.partner?.address == senderAddress
         {
-            chatVC.messagesCollectionView.scrollToLastItem()
+//            chatVC.messagesCollectionView.scrollToLastItem()
             return
         }
         
         if
-            let chatVC = chatListNav.viewControllers.last as? ChatViewController,
-            chatVC.viewModel.chatroom?.partner?.address == senderAddress
+            let chatVC = chatListNav.viewControllers.last as? AdamantChatViewController,
+            chatVC.viewModel.chatroom.partner?.address == senderAddress
         {
-            chatVC.messagesCollectionView.scrollToLastItem()
+//            chatVC.messagesCollectionView.scrollToLastItem()
             return
         }
         

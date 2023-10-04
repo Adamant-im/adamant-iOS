@@ -28,7 +28,7 @@ protocol ScreensFactory {
     
     // MARK: Chats
     
-    func makeChat() -> ChatViewController
+    func makeChat(chatroom: Chatroom) -> AdamantChatViewController
     func makeChatList() -> UIViewController
     func makeNewChat() -> NewChatViewController
     func makeComplexTransfer() -> UIViewController

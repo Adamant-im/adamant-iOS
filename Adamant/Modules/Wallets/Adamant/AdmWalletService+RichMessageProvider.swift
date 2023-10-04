@@ -38,7 +38,7 @@ extension AdmWalletService: RichMessageProvider {
     
     // MARK: Events
     
-    func richMessageTapped(for transaction: RichMessageTransaction, in chat: ChatViewController) {
+    func richMessageTapped(for transaction: RichMessageTransaction, in chat: AdamantChatViewController) {
         return
     }
     

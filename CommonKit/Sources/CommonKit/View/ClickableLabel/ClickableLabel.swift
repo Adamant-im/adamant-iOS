@@ -63,9 +63,9 @@ private extension ClickableLabel {
     }
     
     func updateAttributedText(_ attributedText: NSAttributedString) {
+        let attributedText = parsedText(attributedText)
         label.attributedText = attributedText
         textStorage.setAttributedString(attributedText)
-        parseText(attributedText)
         invalidateIntrinsicContentSize()
     }
     
@@ -85,12 +85,14 @@ private extension ClickableLabel {
         tapAction?(item)
     }
     
-    func parseText(_ text: NSAttributedString) {
+    func parsedText(_ text: NSAttributedString) -> NSAttributedString {
+        let text = NSMutableAttributedString(attributedString: text)
         var result = [NSTextCheckingResult]()
         defer { clickableItems = result }
         
         let range = NSRange(location: .zero, length: text.length)
         result = detector?.matches(in: text.string, options: [], range: range) ?? .init()
+        colorFoundMatches(checkingResults: result, string: text)
         
         // Enumerate NSAttributedString NSLinks and append ranges
         
@@ -98,6 +100,8 @@ private extension ClickableLabel {
             guard let url = value as? URL else { return }
             result.append(.linkCheckingResult(range: range, url: url))
         }
+        
+        return text
     }
     
     func stringIndex(at location: CGPoint) -> Int? {
@@ -109,6 +113,17 @@ private extension ClickableLabel {
         return lineRect.contains(location)
             ? layoutManager.characterIndexForGlyph(at: index)
             : nil
+    }
+    
+    func colorFoundMatches(checkingResults: [NSTextCheckingResult], string: NSMutableAttributedString) {
+        let colorAttributes: [NSAttributedString.Key: Any] = [
+            NSAttributedString.Key.foregroundColor: UIColor.adamant.active
+        ]
+        
+        checkingResults.forEach { result in
+            guard result.resultType == .link else { return }
+            string.addAttributes(colorAttributes, range: result.range)
+        }
     }
 }
 

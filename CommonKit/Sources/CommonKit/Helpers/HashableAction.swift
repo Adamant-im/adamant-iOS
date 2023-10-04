@@ -8,10 +8,12 @@
 import Foundation
 
 public struct HashableAction {
-    public let id: Int
+    public let id: String
     public let action: () -> Void
     
-    public init(id: Int, action: @escaping () -> Void) {
+    public static let `default` = Self(id: .empty, action: {})
+    
+    public init(id: String, action: @escaping () -> Void) {
         self.id = id
         self.action = action
     }

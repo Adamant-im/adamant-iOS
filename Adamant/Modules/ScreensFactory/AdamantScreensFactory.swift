@@ -28,7 +28,7 @@ struct AdamantScreensFactory: ScreensFactory {
     init(assembler: Assembler) {
         admWalletFactory = .init(assembler: assembler)
         chatListFactory = .init(assembler: assembler)
-        chatFactory = .init(assembler: assembler)
+        chatFactory = .init(parent: assembler)
         nodesEditorFactory = .init(assembler: assembler)
         delegatesFactory = .init(assembler: assembler)
         settingsFactory = .init(assembler: assembler)
@@ -86,8 +86,8 @@ struct AdamantScreensFactory: ScreensFactory {
         chatListFactory.makeChatListVC(screensFactory: self)
     }
     
-    func makeChat() -> ChatViewController {
-        chatFactory.makeViewController(screensFactory: self)
+    func makeChat(chatroom: Chatroom) -> AdamantChatViewController {
+        chatFactory.makeViewController(chatroom: chatroom, screensFactory: self)
     }
     
     func makeNewChat() -> NewChatViewController {

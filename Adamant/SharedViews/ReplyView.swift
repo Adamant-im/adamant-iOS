@@ -101,28 +101,28 @@ final class ReplyView: UIView {
     }
 }
     
-extension ReplyView {
-    func update(with model: MessageModel) {
-        backgroundColor = .clear
-        let text = model.makeReplyContent().resolveLinkColor()
-        text.mutableString.replaceOccurrences(
-            of: "\n",
-            with: " ",
-            range: .init(location: .zero, length: text.length)
-        )
-        
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineBreakMode = .byTruncatingTail
-        
-        text.addAttribute(
-            .paragraphStyle,
-            value: paragraphStyle,
-            range: .init(location: .zero, length: text.length)
-        )
-
-        messageLabel.attributedText = text
-    }
-}
+//extension ReplyView {
+//    func update(with model: MessageModel) {
+//        backgroundColor = .clear
+//        let text = model.makeReplyContent().resolveLinkColor()
+//        text.mutableString.replaceOccurrences(
+//            of: "\n",
+//            with: " ",
+//            range: .init(location: .zero, length: text.length)
+//        )
+//
+//        let paragraphStyle = NSMutableParagraphStyle()
+//        paragraphStyle.lineBreakMode = .byTruncatingTail
+//
+//        text.addAttribute(
+//            .paragraphStyle,
+//            value: paragraphStyle,
+//            range: .init(location: .zero, length: text.length)
+//        )
+//
+//        messageLabel.attributedText = text
+//    }
+//}
 
 private let messageFont = UIFont.systemFont(ofSize: 14)
 private let horizontalStackSpacing: CGFloat = 25

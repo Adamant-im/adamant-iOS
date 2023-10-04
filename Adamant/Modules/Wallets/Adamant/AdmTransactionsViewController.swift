@@ -297,14 +297,14 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
                 let account = accountService.account
             else { return }
             
-            let vc = screensFactory.makeChat()
+            let vc = screensFactory.makeChat(chatroom: chatroom)
             vc.hidesBottomBarWhenPushed = true
-            vc.viewModel.setup(
-                account: account,
-                chatroom: chatroom,
-                messageIdToShow: nil,
-                preservationDelegate: nil
-            )
+//            vc.viewModel.setup(
+//                account: account,
+//                chatroom: chatroom,
+//                messageIdToShow: nil,
+//                preservationDelegate: nil
+//            )
             
             if let nav = self.navigationController {
                 nav.pushViewController(vc, animated: true)
@@ -345,14 +345,14 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
                 let account = accountService.account
             else { return }
             
-            let vc = screensFactory.makeChat()
+            let vc = screensFactory.makeChat(chatroom: chatroom)
             vc.hidesBottomBarWhenPushed = true
-            vc.viewModel.setup(
-                account: account,
-                chatroom: chatroom,
-                messageIdToShow: nil,
-                preservationDelegate: nil
-            )
+//            vc.viewModel.setup(
+//                account: account,
+//                chatroom: chatroom,
+//                messageIdToShow: nil,
+//                preservationDelegate: nil
+//            )
             
             if let nav = self.navigationController {
                 nav.pushViewController(vc, animated: true)

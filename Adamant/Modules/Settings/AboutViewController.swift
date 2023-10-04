@@ -263,14 +263,14 @@ final class AboutViewController: FormViewController {
                     let account = accountService.account
                 else { return }
 
-                let chat = screensFactory.makeChat()
+                let chat = screensFactory.makeChat(chatroom: chatroom)
                 chat.hidesBottomBarWhenPushed = true
-                chat.viewModel.setup(
-                    account: account,
-                    chatroom: chatroom,
-                    messageIdToShow: nil,
-                    preservationDelegate: self
-                )
+//                chat.viewModel.setup(
+//                    account: account,
+//                    chatroom: chatroom,
+//                    messageIdToShow: nil,
+//                    preservationDelegate: self
+//                )
 
                 nav.pushViewController(chat, animated: true)
 
@@ -342,18 +342,18 @@ extension AboutViewController: MFMailComposeViewControllerDelegate {
 
 // MARK: - ChatViewControllerDelegate
 
-extension AboutViewController: ChatPreservationDelegate {
-    func preserveMessage(_ message: String, forAddress address: String) {
-        storedIOSSupportMessage = message
-    }
-
-    func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String? {
-        if thenRemoveIt {
-            let message = storedIOSSupportMessage
-            storedIOSSupportMessage = nil
-            return message
-        } else {
-            return storedIOSSupportMessage
-        }
-    }
-}
+//extension AboutViewController: ChatPreservationDelegate {
+//    func preserveMessage(_ message: String, forAddress address: String) {
+//        storedIOSSupportMessage = message
+//    }
+//
+//    func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String? {
+//        if thenRemoveIt {
+//            let message = storedIOSSupportMessage
+//            storedIOSSupportMessage = nil
+//            return message
+//        } else {
+//            return storedIOSSupportMessage
+//        }
+//    }
+//}

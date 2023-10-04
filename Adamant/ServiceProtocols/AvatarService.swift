@@ -11,7 +11,7 @@ import UIKit
 import CommonKit
 
 protocol AvatarService {
-    func avatar(for key:String, size: Double) -> UIImage
+    func avatar(for key: String, size: Double) -> UIImage
 }
 
 extension AdamantAvatarService: AvatarService {}

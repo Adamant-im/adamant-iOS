@@ -46,7 +46,7 @@ public final class AdamantAvatarService {
     
     @Atomic private var cache: [String: UIImage] = [String: UIImage]()
     
-    public func avatar(for key:String, size: Double = 200) -> UIImage {
+    public func avatar(for key: String, size: Double = 200) -> UIImage {
         if let image = cache[key] {
             return image
         }

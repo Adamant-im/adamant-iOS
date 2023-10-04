@@ -9,10 +9,16 @@
 import UIKit
 
 public extension UILabel {
-    convenience init(font: UIFont? = nil, textColor: UIColor? = nil, numberOfLines: Int? = nil) {
+    convenience init(
+        font: UIFont? = nil,
+        textColor: UIColor? = nil,
+        numberOfLines: Int? = nil,
+        textAlignment: NSTextAlignment? = nil
+    ) {
         self.init()
         font.map { self.font = $0 }
         textColor.map { self.textColor = $0 }
         numberOfLines.map { self.numberOfLines = $0 }
+        textAlignment.map { self.textAlignment = $0 }
     }
 }

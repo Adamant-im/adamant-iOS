@@ -314,15 +314,15 @@ final class ChatListViewController: KeyboardObservingViewController {
     func chatViewController(
         for chatroom: Chatroom,
         with messageId: String? = nil
-    ) -> ChatViewController {
-        let vc = screensFactory.makeChat()
+    ) -> AdamantChatViewController {
+        let vc = screensFactory.makeChat(chatroom: chatroom)
         vc.hidesBottomBarWhenPushed = true
-        vc.viewModel.setup(
-            account: accountService.account,
-            chatroom: chatroom,
-            messageIdToShow: messageId,
-            preservationDelegate: self
-        )
+//        vc.viewModel.setup(
+//            account: accountService.account,
+//            chatroom: chatroom,
+//            messageIdToShow: messageId,
+//            preservationDelegate: self
+//        )
 
         return vc
     }
@@ -719,20 +719,20 @@ extension ChatListViewController: NewChatViewControllerDelegate {
                 split.showDetailViewController(nav, sender: self)
                 vc.becomeFirstResponder()
                 
-                if let count = vc.viewModel.chatroom?.transactions?.count, count == 0 {
-                    vc.messageInputBar.inputTextView.becomeFirstResponder()
+                if let count = vc.viewModel.chatroom.transactions?.count, count == 0 {
+//                    vc.messageInputBar.inputTextView.becomeFirstResponder()
                 }
             } else {
                 navigationController?.setViewControllers([self, vc], animated: true)
             }
             
-            if let count = vc.viewModel.chatroom?.transactions?.count, count == 0 {
-                vc.messageInputBar.inputTextView.becomeFirstResponder()
+            if let count = vc.viewModel.chatroom.transactions?.count, count == 0 {
+//                vc.messageInputBar.inputTextView.becomeFirstResponder()
             }
             
-            if let preMessage = preMessage {
-                vc.viewModel.inputText = preMessage
-            }
+//            if let preMessage = preMessage {
+//                vc.viewModel.inputText = preMessage
+//            }
         }
         
         // Select row after awhile
@@ -746,23 +746,23 @@ extension ChatListViewController: NewChatViewControllerDelegate {
 
 // MARK: - ChatPreservationDelegate
 
-extension ChatListViewController: ChatPreservationDelegate {
-    func preserveMessage(_ message: String, forAddress address: String) {
-        preservedMessagess[address] = message
-    }
-
-    func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String? {
-        guard let message = preservedMessagess[address] else {
-            return nil
-        }
-
-        if thenRemoveIt {
-            preservedMessagess.removeValue(forKey: address)
-        }
-
-        return message
-    }
-}
+//extension ChatListViewController: ChatPreservationDelegate {
+//    func preserveMessage(_ message: String, forAddress address: String) {
+//        preservedMessagess[address] = message
+//    }
+//
+//    func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String? {
+//        guard let message = preservedMessagess[address] else {
+//            return nil
+//        }
+//
+//        if thenRemoveIt {
+//            preservedMessagess.removeValue(forKey: address)
+//        }
+//
+//        return message
+//    }
+//}
 
 // MARK: - Working with in-app notifications
 extension ChatListViewController {
@@ -1195,7 +1195,7 @@ extension ChatListViewController {
     
     /// Current chat
     func presentedChatroom() -> Chatroom? {
-        guard let vc = navigationController?.visibleViewController as? ChatViewController else {
+        guard let vc = navigationController?.visibleViewController as? AdamantChatViewController else {
             return nil
         }
         
