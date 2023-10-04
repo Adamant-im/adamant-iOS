@@ -682,7 +682,7 @@ extension ERC20WalletService {
                 confirmationsValue: nil,
                 blockValue: nil,
                 isOutgoing: isOutgoing,
-                transactionStatus: nil
+                transactionStatus: TransactionStatus.registered
             )
         }
         
