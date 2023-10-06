@@ -15,4 +15,6 @@ protocol CoinStorageService: AnyObject {
     
     func append(_ transaction: TransactionDetails)
     func append(_ transactions: [TransactionDetails])
+    func clear()
+    func updateStatus(for transactionId: String, status: TransactionStatus?)
 }

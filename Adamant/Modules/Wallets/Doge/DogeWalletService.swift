@@ -127,7 +127,7 @@ final class DogeWalletService: WalletService {
         $hasMoreOldTransactions
     }
     
-    lazy var coinStorage = AdamantCoinStorageService(
+    lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUnicID,
         coreDataStack: coreDataStack
     )
@@ -185,6 +185,7 @@ final class DogeWalletService: WalletService {
                     NotificationCenter.default.removeObserver(balanceObserver)
                     self?.balanceObserver = nil
                 }
+                self?.coinStorage.clear()
             }
             .store(in: &subscriptions)
     }

@@ -137,7 +137,7 @@ final class DashWalletService: WalletService {
         $hasMoreOldTransactions
     }
     
-    lazy var coinStorage = AdamantCoinStorageService(
+    lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUnicID,
         coreDataStack: coreDataStack
     )
@@ -195,6 +195,7 @@ final class DashWalletService: WalletService {
                     NotificationCenter.default.removeObserver(balanceObserver)
                     self?.balanceObserver = nil
                 }
+                self?.coinStorage.clear()
             }
             .store(in: &subscriptions)
     }

@@ -169,7 +169,7 @@ final class EthWalletService: WalletService {
         $hasMoreOldTransactions
     }
     
-    lazy var coinStorage = AdamantCoinStorageService(
+    lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUnicID,
         coreDataStack: coreDataStack
     )
@@ -232,6 +232,7 @@ final class EthWalletService: WalletService {
                     NotificationCenter.default.removeObserver(balanceObserver)
                     self?.balanceObserver = nil
                 }
+                self?.coinStorage.clear()
             }
             .store(in: &subscriptions)
     }

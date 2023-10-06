@@ -173,7 +173,7 @@ final class ERC20WalletService: WalletService {
         $hasMoreOldTransactions
     }
     
-    lazy var coinStorage = AdamantCoinStorageService(
+    lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUnicID,
         coreDataStack: coreDataStack
     )
@@ -228,6 +228,7 @@ final class ERC20WalletService: WalletService {
                     NotificationCenter.default.removeObserver(balanceObserver)
                     self?.balanceObserver = nil
                 }
+                self?.coinStorage.clear()
             }
             .store(in: &subscriptions)
     }

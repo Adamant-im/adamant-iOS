@@ -86,7 +86,7 @@ final class AdmWalletService: NSObject, WalletService {
         $hasMoreOldTransactions
     }
     
-    lazy var coinStorage = AdamantCoinStorageService(
+    lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUnicID,
         coreDataStack: coreDataStack
     )

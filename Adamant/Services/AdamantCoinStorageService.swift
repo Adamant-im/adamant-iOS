@@ -90,6 +90,10 @@ final class AdamantCoinStorageService: NSObject, CoinStorageService {
         
         transactions[index].transactionStatus = status
     }
+    
+    func clear() {
+        transactions = []
+    }
 }
 
 private extension AdamantCoinStorageService {
