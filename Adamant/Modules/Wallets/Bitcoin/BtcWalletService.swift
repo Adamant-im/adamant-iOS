@@ -149,10 +149,10 @@ final class BtcWalletService: WalletService {
     
     private var subscriptions = Set<AnyCancellable>()
     
-    @Published private(set) var transactions: [CoinTransaction] = []
+    @Published private(set) var transactions: [TransactionDetails] = []
     @Published private(set) var hasMoreOldTransactions: Bool = true
 
-    var transactionsPublisher: Published<[CoinTransaction]>.Publisher {
+    var transactionsPublisher: Published<[TransactionDetails]>.Publisher {
         $transactions
     }
     
@@ -162,7 +162,8 @@ final class BtcWalletService: WalletService {
     
     lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUnicID,
-        coreDataStack: coreDataStack
+        coreDataStack: coreDataStack,
+        blockchainType: richMessageType
     )
     
     // MARK: - State
@@ -224,7 +225,6 @@ final class BtcWalletService: WalletService {
     
     func addTransactionObserver() {
         coinStorage.transactionsPublisher
-            .removeDuplicates()
             .sink { [weak self] transactions in
                 self?.transactions = transactions
             }
@@ -726,8 +726,8 @@ extension BtcWalletService {
 
     func loadTransactions(offset: Int, limit: Int) async throws -> Int {
         let txId = offset == .zero
-        ? transactions.first?.transactionId
-        : transactions.last?.transactionId
+        ? transactions.first?.txId
+        : transactions.last?.txId
         
         let trs = try await getTransactions(fromTx: txId)
         
@@ -741,7 +741,7 @@ extension BtcWalletService {
         return trs.count
     }
     
-    func getLocalTransactionHistory() -> [CoinTransaction] {
+    func getLocalTransactionHistory() -> [TransactionDetails] {
         transactions
     }
 }

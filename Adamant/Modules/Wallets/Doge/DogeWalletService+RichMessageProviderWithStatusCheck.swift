@@ -10,9 +10,16 @@ import Foundation
 import CommonKit
 
 extension DogeWalletService: RichMessageProviderWithStatusCheck {
-    func statusInfoFor(transaction: RichMessageTransaction) async -> TransactionStatusInfo {
-        guard let hash = transaction.getRichValue(for: RichContentKeys.transfer.hash)
-        else {
+    func statusInfoFor(transaction: CoinTransaction) async -> TransactionStatusInfo {
+        let hash: String?
+        
+        if let transaction = transaction as? RichMessageTransaction {
+            hash = transaction.getRichValue(for: RichContentKeys.transfer.hash)
+        } else {
+            hash = transaction.txId
+        }
+        
+        guard let hash = hash else {
             return .init(sentDate: nil, status: .inconsistent)
         }
         
@@ -42,7 +49,7 @@ extension DogeWalletService: RichMessageProviderWithStatusCheck {
 private extension DogeWalletService {
     func getStatus(
         dogeTransaction: BTCRawTransaction,
-        transaction: RichMessageTransaction
+        transaction: CoinTransaction
     ) -> TransactionStatus {
         // MARK: Check confirmations
         guard let confirmations = dogeTransaction.confirmations,
@@ -53,10 +60,7 @@ private extension DogeWalletService {
         }
         
         // MARK: Check amount & address
-        guard
-            let raw = transaction.getRichValue(for: RichContentKeys.transfer.amount),
-            let reportedValue = AdamantBalanceFormat.deserializeBalance(from: raw)
-        else {
+        guard let reportedValue = reportedValue(for: transaction) else {
             return .inconsistent
         }
         
@@ -97,5 +101,21 @@ private extension DogeWalletService {
         }
         
         return result
+    }
+    
+    func reportedValue(for transaction: CoinTransaction) -> Decimal? {
+        guard let transaction = transaction as? RichMessageTransaction
+        else {
+            return transaction.amountValue
+        }
+        
+        guard
+            let raw = transaction.getRichValue(for: RichContentKeys.transfer.amount),
+            let reportedValue = AdamantBalanceFormat.deserializeBalance(from: raw)
+        else {
+            return nil
+        }
+        
+        return reportedValue
     }
 }

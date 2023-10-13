@@ -10,9 +10,16 @@ import Foundation
 import CommonKit
 
 extension BtcWalletService: RichMessageProviderWithStatusCheck {
-    func statusInfoFor(transaction: RichMessageTransaction) async -> TransactionStatusInfo {
-        guard let hash = transaction.getRichValue(for: RichContentKeys.transfer.hash)
-        else {
+    func statusInfoFor(transaction: CoinTransaction) async -> TransactionStatusInfo {
+        let hash: String?
+        
+        if let transaction = transaction as? RichMessageTransaction {
+            hash = transaction.getRichValue(for: RichContentKeys.transfer.hash)
+        } else {
+            hash = transaction.txId
+        }
+        
+        guard let hash = hash else {
             return .init(sentDate: nil, status: .inconsistent)
         }
         
@@ -36,7 +43,7 @@ extension BtcWalletService: RichMessageProviderWithStatusCheck {
 
 private extension BtcWalletService {
     func getStatus(
-        transaction: RichMessageTransaction,
+        transaction: CoinTransaction,
         btcTransaction: BtcTransaction
     ) -> TransactionStatus {
         guard let status = btcTransaction.transactionStatus else {
@@ -54,13 +61,28 @@ private extension BtcWalletService {
         else { return .inconsistent }
         
         // MARK: Check amount
-        if let raw = transaction.getRichValue(for: RichContentKeys.transfer.amount),
-           let reported = AdamantBalanceFormat.deserializeBalance(from: raw) {
+        if let reported = reportedValue(for: transaction) {
             guard reported == btcTransaction.amountValue else {
                 return .inconsistent
             }
         }
         
         return .success
+    }
+    
+    func reportedValue(for transaction: CoinTransaction) -> Decimal? {
+        guard let transaction = transaction as? RichMessageTransaction
+        else {
+            return transaction.amountValue
+        }
+        
+        guard
+            let raw = transaction.getRichValue(for: RichContentKeys.transfer.amount),
+            let reportedValue = AdamantBalanceFormat.deserializeBalance(from: raw)
+        else {
+            return nil
+        }
+        
+        return reportedValue
     }
 }

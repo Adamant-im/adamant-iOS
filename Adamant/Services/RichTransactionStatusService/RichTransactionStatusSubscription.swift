@@ -12,10 +12,9 @@ import CommonKit
 
 actor RichTransactionStatusSubscription<StatusSubscriber: Subscriber>: Subscription where
     StatusSubscriber.Input == TransactionStatus,
-    StatusSubscriber.Failure == Never
-{
+    StatusSubscriber.Failure == Never {
     private let provider: RichMessageProviderWithStatusCheck
-    private let transaction: RichMessageTransaction
+    private let transaction: CoinTransaction
     private let taskManager = TaskManager()
     private var subscriber: StatusSubscriber?
     
@@ -27,7 +26,7 @@ actor RichTransactionStatusSubscription<StatusSubscriber: Subscriber>: Subscript
     
     init(
         provider: RichMessageProviderWithStatusCheck,
-        transaction: RichMessageTransaction,
+        transaction: CoinTransaction,
         oldPendingAttempts: ObservableValue<Int>,
         subscriber: StatusSubscriber
     ) {
@@ -55,8 +54,8 @@ actor RichTransactionStatusSubscription<StatusSubscriber: Subscriber>: Subscript
             break
         }
         
-        status = await provider.statusWithFilters(
-            transaction: transaction,
+        status = provider.statusWithFilters(
+            transaction: transaction as? RichMessageTransaction,
             oldPendingAttempts: oldPendingAttempts,
             info: await provider.statusInfoFor(transaction: transaction)
         )
@@ -84,7 +83,7 @@ private extension RichTransactionStatusSubscription {
         case .registered:
             return .registered
         case .pending, .notInitiated, .noNetwork:
-            guard let sentDate = transaction.sentDate else { return .final }
+            guard let sentDate = transaction.dateValue else { return .final }
             let sentInterval = Date.now.timeIntervalSince1970 - sentDate.timeIntervalSince1970
             
             let oldTxInterval = TimeInterval(

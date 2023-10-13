@@ -96,10 +96,10 @@ final class LskWalletService: WalletService {
     private let nodes: [APINode]
     private var subscriptions = Set<AnyCancellable>()
 
-    @Published private(set) var transactions: [CoinTransaction] = []
+    @Published private(set) var transactions: [TransactionDetails] = []
     @Published private(set) var hasMoreOldTransactions: Bool = true
 
-    var transactionsPublisher: Published<[CoinTransaction]>.Publisher {
+    var transactionsPublisher: Published<[TransactionDetails]>.Publisher {
         $transactions
     }
     
@@ -109,7 +109,8 @@ final class LskWalletService: WalletService {
     
     lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUnicID,
-        coreDataStack: coreDataStack
+        coreDataStack: coreDataStack,
+        blockchainType: richMessageType
     )
     
     // MARK: - State
@@ -190,7 +191,6 @@ final class LskWalletService: WalletService {
     
     func addTransactionObserver() {
         coinStorage.transactionsPublisher
-            .removeDuplicates()
             .sink { [weak self] transactions in
                 self?.transactions = transactions
             }
@@ -607,7 +607,7 @@ extension LskWalletService {
         return trs.count
     }
     
-    func getLocalTransactionHistory() -> [CoinTransaction] {
+    func getLocalTransactionHistory() -> [TransactionDetails] {
         transactions
     }
 }

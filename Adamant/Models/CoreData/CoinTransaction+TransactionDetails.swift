@@ -8,7 +8,6 @@
 
 import Foundation
 
-
 extension CoinTransaction: TransactionDetails {
     var defaultCurrencySymbol: String? { AdmWalletService.currencySymbol }
 

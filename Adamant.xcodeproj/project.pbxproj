@@ -16,6 +16,7 @@
 		3A41938F2A580C57006A6B22 /* AdamantRichTransactionReactService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A41938E2A580C57006A6B22 /* AdamantRichTransactionReactService.swift */; };
 		3A4193912A580C85006A6B22 /* RichTransactionReactService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4193902A580C85006A6B22 /* RichTransactionReactService.swift */; };
 		3A41939A2A5D554A006A6B22 /* Reaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4193992A5D554A006A6B22 /* Reaction.swift */; };
+		3A5F89332AD81CAC00347B41 /* TransactionsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A5F89322AD81CAB00347B41 /* TransactionsListView.swift */; };
 		3A7BD00E2AA9BCE80045AAB0 /* VibroService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7BD00D2AA9BCE80045AAB0 /* VibroService.swift */; };
 		3A7BD0102AA9BD030045AAB0 /* AdamantVibroService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7BD00F2AA9BD030045AAB0 /* AdamantVibroService.swift */; };
 		3A7BD0122AA9BD5A0045AAB0 /* AdamantVibroType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7BD0112AA9BD5A0045AAB0 /* AdamantVibroType.swift */; };
@@ -603,6 +604,7 @@
 		3A41938E2A580C57006A6B22 /* AdamantRichTransactionReactService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantRichTransactionReactService.swift; sourceTree = "<group>"; };
 		3A4193902A580C85006A6B22 /* RichTransactionReactService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichTransactionReactService.swift; sourceTree = "<group>"; };
 		3A4193992A5D554A006A6B22 /* Reaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reaction.swift; sourceTree = "<group>"; };
+		3A5F89322AD81CAB00347B41 /* TransactionsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsListView.swift; sourceTree = "<group>"; };
 		3A7BD00D2AA9BCE80045AAB0 /* VibroService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VibroService.swift; sourceTree = "<group>"; };
 		3A7BD00F2AA9BD030045AAB0 /* AdamantVibroService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantVibroService.swift; sourceTree = "<group>"; };
 		3A7BD0112AA9BD5A0045AAB0 /* AdamantVibroType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantVibroType.swift; sourceTree = "<group>"; };
@@ -1945,6 +1947,7 @@
 				64BD2B7620E2820300E2CD36 /* TransactionDetails.swift */,
 				64FA53D020E24941006783C9 /* TransactionDetailsViewControllerBase.swift */,
 				E9E7CDC52003F6D200DFC4DB /* TransactionTableViewCell.swift */,
+				3A5F89322AD81CAB00347B41 /* TransactionsListView.swift */,
 				E9E7CDC62003F6D200DFC4DB /* TransactionTableViewCell.xib */,
 				E9484B77227C617D008E10F0 /* BalanceTableViewCell.swift */,
 				E9484B78227C617E008E10F0 /* BalanceTableViewCell.xib */,
@@ -2923,6 +2926,7 @@
 				E9DFB71C21624C9200CF8C7C /* AdmTransactionDetailsViewController.swift in Sources */,
 				6403F5E022723F6400D58779 /* DashWalletFactory.swift in Sources */,
 				E94008722114EACF00CD2D67 /* WalletAccount.swift in Sources */,
+				3A5F89332AD81CAC00347B41 /* TransactionsListView.swift in Sources */,
 				3A7BD00E2AA9BCE80045AAB0 /* VibroService.swift in Sources */,
 				E93B0D742028B21400126346 /* ChatsProvider.swift in Sources */,
 				E9CAE8D42018AC1800345E76 /* AdamantApi+Keys.swift in Sources */,

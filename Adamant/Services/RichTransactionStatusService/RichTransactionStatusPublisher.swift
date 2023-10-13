@@ -15,7 +15,7 @@ struct RichTransactionStatusPublisher: Publisher {
     typealias Failure = Never
     
     let provider: RichMessageProviderWithStatusCheck
-    let transaction: RichMessageTransaction
+    let transaction: CoinTransaction
     let oldPendingAttempts: ObservableValue<Int>
     
     func receive<S>(

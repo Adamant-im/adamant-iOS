@@ -9,7 +9,7 @@
 import Foundation
 
 protocol CoinStorageService: AnyObject {
-    var transactionsPublisher: Published<[CoinTransaction]>.Publisher {
+    var transactionsPublisher: Published<[TransactionDetails]>.Publisher {
         get
     }
     

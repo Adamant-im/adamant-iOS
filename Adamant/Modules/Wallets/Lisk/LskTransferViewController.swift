@@ -70,10 +70,6 @@ final class LskTransferViewController: TransferViewControllerBase {
                     do {
                         service.coinStorage.append(transaction)
                         try await service.sendTransaction(transaction)
-                        service.coinStorage.updateStatus(
-                            for: transaction.id,
-                            status: .registered
-                        )
                     } catch {
                         dialogService.showRichError(error: error)
                         service.coinStorage.updateStatus(

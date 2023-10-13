@@ -72,6 +72,7 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
         }
         
         currencySymbol = AdmWalletService.currencySymbol
+        setupObserver()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -91,17 +92,20 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
     override func reloadData() {
         Task {
             controller = await transfersProvider.transfersController()
-            controller!.delegate = self
             
             do {
                 try controller?.performFetch()
+                let transactions: [SimpleTransactionDetails] = controller?.fetchedObjects?.compactMap {
+                    getTransactionDetails(by: $0)
+                } ?? []
+                
+                update(transactions)
             } catch {
                 dialogService.showError(withMessage: "Failed to get transactions. Please, report a bug", supportEmail: true, error: error)
                 controller = nil
             }
             
             isBusy = false
-            self.tableView.reloadData()
         }
     }
     
@@ -170,7 +174,6 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
             emptyLabel.isHidden = !isNeedToLoadMoore
             refreshControl.endRefreshing()
             stopBottomIndicator()
-            tableView.reloadData()
         }.stored(in: taskManager)
     }
     
@@ -193,18 +196,31 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
         }
     }
     
-    // MARK: - UITableView
-
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if let f = controller?.fetchedObjects {
-            self.emptyLabel.isHidden = f.count > 0 && !refreshControl.isRefreshing
-            return f.count
-        } else {
-            self.emptyLabel.isHidden = false
-            return 0
-        }
+    func getTransactionDetails(by transaction: TransferTransaction) -> SimpleTransactionDetails {
+        let partnerId = (
+            transaction.isOutgoing
+            ? transaction.recipientId
+            : transaction.senderId
+        ) ?? ""
+        
+        var simple = SimpleTransactionDetails(transaction)
+        simple.partnerName = getPartnerName(for: partnerId)
+        return simple
     }
     
+    func getPartnerName(for partnerId: String) -> String? {
+        var partnerName = addressBookService.getName(for: partnerId)
+        
+        if let address = accountService.account?.address,
+           partnerId == address {
+            partnerName = String.adamant.transactionDetails.yourAddress
+        }
+        
+        return partnerName
+    }
+    
+    // MARK: - UITableView
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let transaction = controller?.object(at: indexPath) else {
             tableView.deselectRow(at: indexPath, animated: true)
@@ -234,60 +250,6 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
         }
         
         navigationController?.pushViewController(controller, animated: true)
-    }
-    
-    func configureCell(
-        _ cell: TransactionTableViewCell,
-        for transaction: TransferTransaction
-    ) {
-        let partnerId = (transaction.isOutgoing ? transaction.recipientId : transaction.senderId) ?? ""
-        
-        let amount: Decimal = transaction.amount as Decimal? ?? 0
-        
-        var partnerName = addressBookService.getName(for: transaction.partner)
-        
-        if let address = accountService.account?.address, partnerId == address {
-            partnerName = String.adamant.transactionDetails.yourAddress
-        }
-        
-        let transactionType: TransactionTableViewCell.TransactionType
-        if transaction.recipientId == transaction.senderId {
-            transactionType = .myself
-        } else if transaction.isOutgoing {
-            transactionType = .outcome
-        } else {
-            transactionType = .income
-        }
-        
-        configureCell(
-            cell,
-            transactionType: transactionType,
-            transactionStatus: transaction.transactionStatus,
-            partnerId: partnerId,
-            partnerName: partnerName,
-            amount: amount,
-            date: transaction.date as Date?)
-    }
-    
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let transaction = controller?.object(at: indexPath) else {
-            return UITableViewCell(style: .default, reuseIdentifier: "cell")
-        }
-        
-        let identifier = transaction.chatroom?.partner?.name != nil ? cellIdentifierFull : cellIdentifierCompact
-        
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath) as? TransactionTableViewCell else {
-            return UITableViewCell(style: .default, reuseIdentifier: "cell")
-        }
-        
-        configureCell(cell, for: transaction)
-        
-        cell.accessoryType = .disclosureIndicator
-        cell.separatorInset = indexPath.row == (controller?.fetchedObjects?.count ?? 0) - 1
-        ? .zero
-        : UITableView.defaultTransactionsSeparatorInset
-        
-        return cell
     }
     
     func tableView(_ tableView: UITableView, editActionsForRowAt: IndexPath) -> [UITableViewRowAction]? {
@@ -386,48 +348,40 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
     }
 }
 
-// MARK: - NSFetchedResultsControllerDelegate
-extension AdmTransactionsViewController: NSFetchedResultsControllerDelegate {
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        if isBusy { return }
-        tableView.beginUpdates()
-    }
-    
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        if isBusy { return }
-        tableView.endUpdates()
-    }
-    
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        if isBusy { return }
-        switch type {
-        case .insert:
-            if let newIndexPath = newIndexPath {
-                tableView.insertRows(at: [newIndexPath], with: .automatic)
+private extension AdmTransactionsViewController {
+    func setupObserver() {
+        NotificationCenter.default.publisher(
+            for: .NSManagedObjectContextObjectsDidChange,
+            object: stack.container.viewContext
+        )
+        .sink { [weak self] notification in
+            guard let self = self else { return }
+            
+            let changes = notification.managedObjectContextChanges(of: TransferTransaction.self)
+
+            if let inserted = changes.inserted, !inserted.isEmpty {
+                let maped: [SimpleTransactionDetails] = inserted.map {
+                    self.getTransactionDetails(by: $0)
+                }
                 
-                if isOnTop, let transaction = anObject as? TransferTransaction {
-                    transaction.isUnread = false
+                var transactions = self.transactions
+                transactions.append(contentsOf: maped)
+                self.update(transactions)
+            }
+            
+            if let updated = changes.updated, !updated.isEmpty {
+                updated.forEach { transaction in
+                    guard let index = self.transactions.firstIndex(where: {
+                        $0.txId == transaction.txId
+                    })
+                    else { return }
+                    
+                    var transactions: [SimpleTransactionDetails] = self.transactions
+                    transactions[index] = self.getTransactionDetails(by: transaction)
+                    self.update(transactions)
                 }
             }
-            
-        case .delete:
-            if let indexPath = indexPath {
-                tableView.deleteRows(at: [indexPath], with: .automatic)
-            }
-            
-        case .update:
-            if let indexPath = indexPath,
-                let cell = self.tableView.cellForRow(at: indexPath) as? TransactionTableViewCell,
-                let transaction = anObject as? TransferTransaction {
-                configureCell(cell, for: transaction)
-            }
-            
-        case .move:
-            if let at = indexPath, let to = newIndexPath {
-                tableView.moveRow(at: at, to: to)
-            }
-        @unknown default:
-            break
         }
+        .store(in: &subscriptions)
     }
 }

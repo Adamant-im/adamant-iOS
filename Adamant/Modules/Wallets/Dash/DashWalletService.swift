@@ -126,10 +126,10 @@ final class DashWalletService: WalletService {
     static let jsonDecoder = JSONDecoder()
     private var subscriptions = Set<AnyCancellable>()
 
-    @Published private(set) var historyTransactions: [CoinTransaction] = []
+    @Published private(set) var historyTransactions: [TransactionDetails] = []
     @Published private(set) var hasMoreOldTransactions: Bool = true
 
-    var transactionsPublisher: Published<[CoinTransaction]>.Publisher {
+    var transactionsPublisher: Published<[TransactionDetails]>.Publisher {
         $historyTransactions
     }
     
@@ -139,7 +139,8 @@ final class DashWalletService: WalletService {
     
     lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUnicID,
-        coreDataStack: coreDataStack
+        coreDataStack: coreDataStack,
+        blockchainType: richMessageType
     )
     
     // MARK: - State
@@ -202,7 +203,7 @@ final class DashWalletService: WalletService {
     
     func addTransactionObserver() {
         coinStorage.transactionsPublisher
-            .removeDuplicates()
+     //       .removeDuplicates()
             .sink { [weak self] transactions in
                 self?.historyTransactions = transactions
             }
@@ -465,7 +466,7 @@ extension DashWalletService {
         return trs.count
     }
     
-    func getLocalTransactionHistory() -> [CoinTransaction] {
+    func getLocalTransactionHistory() -> [TransactionDetails] {
         historyTransactions
     }
 }

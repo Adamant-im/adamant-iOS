@@ -36,17 +36,19 @@
     </entity>
     <entity name="CoinTransaction" representedClassName="CoinTransaction" isAbstract="YES" syncable="YES">
         <attribute name="amount" optional="YES" attributeType="Decimal" defaultValueString="0.0"/>
+        <attribute name="blockchainType" attributeType="String" defaultValueString=""/>
         <attribute name="blockId" optional="YES" attributeType="String"/>
         <attribute name="coinId" optional="YES" attributeType="String"/>
         <attribute name="confirmations" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="fee" optional="YES" attributeType="Decimal" defaultValueString="0.0"/>
         <attribute name="height" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="isConfirmed" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="isConfirmed" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="isOutgoing" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="recipientId" attributeType="String" defaultValueString=""/>
         <attribute name="senderId" attributeType="String" defaultValueString=""/>
         <attribute name="transactionId" attributeType="String" defaultValueString=""/>
+        <attribute name="transactionStatusRaw" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <uniquenessConstraints>
             <uniquenessConstraint>
                 <constraint value="transactionId"/>

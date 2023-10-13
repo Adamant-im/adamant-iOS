@@ -92,7 +92,10 @@ extension Transactions.TransactionModel: TransactionDetails {
     }
     
     var transactionStatus: TransactionStatus? {
-        guard let confirmations = confirmations, let height = height else { return .registered }
+        guard let confirmations = confirmations,
+              let height = height
+        else { return .notInitiated }
+        
         if confirmations < height { return .registered }
         
         if confirmations > 0 && height > 0 {
@@ -168,7 +171,7 @@ extension LocalTransaction: TransactionDetails {
     }
     
     var transactionStatus: TransactionStatus? {
-        return .pending
+        return .notInitiated
     }
     
 }
@@ -222,7 +225,7 @@ extension TransactionEntity: TransactionDetails {
     }
     
     var transactionStatus: TransactionStatus? {
-        return .pending
+        return .notInitiated
     }
     
 }

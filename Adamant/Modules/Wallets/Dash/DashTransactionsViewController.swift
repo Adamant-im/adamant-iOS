@@ -27,7 +27,7 @@ final class DashTransactionsViewController: TransactionsListViewControllerBase {
             return
         }
 
-        let controller = screensFactory.makeDetailsVC(service: dashWalletService)
+        let controller = screensFactory.makeDetailsVC(service: walletService)
         let transaction = transactions[indexPath.row]
         
         controller.transaction = transaction

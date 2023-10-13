@@ -284,6 +284,7 @@ private extension AdamantChatTransactionService {
         
         trs.richContent = richContent
         trs.richType = type
+        trs.blockchainType = type
         trs.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
         trs.additionalType = .base
         
@@ -348,6 +349,7 @@ private extension AdamantChatTransactionService {
         
         trs.richContent = richContent
         trs.richType = type
+        trs.blockchainType = type
         trs.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
         trs.additionalType = .reply
         
