@@ -17,7 +17,7 @@ public struct ChatTransactionContentModel: Equatable {
     public let date: String
     public let comment: String?
     public let status: ChatItemStatus
-    public var isHidden: Bool
+    public let onTap: HashableAction
     
     public static let `default` = Self(
         reply: nil,
@@ -28,7 +28,7 @@ public struct ChatTransactionContentModel: Equatable {
         date: .empty,
         comment: nil,
         status: .pending,
-        isHidden: false
+        onTap: .default
     )
     
     public init(
@@ -40,7 +40,7 @@ public struct ChatTransactionContentModel: Equatable {
         date: String,
         comment: String?,
         status: ChatItemStatus,
-        isHidden: Bool
+        onTap: HashableAction
     ) {
         self.reply = reply
         self.title = title
@@ -50,6 +50,6 @@ public struct ChatTransactionContentModel: Equatable {
         self.date = date
         self.comment = comment
         self.status = status
-        self.isHidden = isHidden
+        self.onTap = onTap
     }
 }

@@ -65,7 +65,7 @@ private extension ChatCollectionView {
         snapshot.appendSections([.zero])
         snapshot.appendItems(model)
         snapshot.reconfigureItems(model)
-        dataSource.apply(snapshot, animatingDifferences: true)
+        dataSource.apply(snapshot, animatingDifferences: false)
     }
 }
 
@@ -76,7 +76,9 @@ private func makeCell(
 ) -> UITableViewCell {
     switch model.value {
     case .loader:
-        return tableView.dequeueReusableCell(LoaderCell.self, for: indexPath)
+        let cell = tableView.dequeueReusableCell(LoaderCell.self, for: indexPath)
+        cell.wrappedView.startAnimating()
+        return cell
     case let .date(model):
         let cell = tableView.dequeueReusableCell(DateCell.self, for: indexPath)
         cell.wrappedView.model = model
@@ -97,7 +99,7 @@ private func makeTableView(delegate: UITableViewDelegate) -> UITableView {
     view.delegate = delegate
     view.transform = CGAffineTransform(scaleX: 1, y: -1)
     view.rowHeight = UITableView.automaticDimension
-    view.estimatedRowHeight = .leastNormalMagnitude
+    view.estimatedRowHeight = 50 // optimal estimated size for cells to make scroll work well
     view.contentInsetAdjustmentBehavior = .never
     view.showsHorizontalScrollIndicator = false
     view.showsVerticalScrollIndicator = false

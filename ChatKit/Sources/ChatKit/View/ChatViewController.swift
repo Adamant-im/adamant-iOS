@@ -33,6 +33,8 @@ private extension ChatViewController {
         chatCollectionView.snp.makeConstraints {
             $0.directionalEdges.equalToSuperview()
         }
+        
+        update()
     }
     
     func update() {

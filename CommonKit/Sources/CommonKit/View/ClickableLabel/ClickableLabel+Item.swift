@@ -22,19 +22,21 @@ public extension ClickableLabel {
 }
 
 public extension NSTextCheckingResult {
-    var clickableLabelItem: ClickableLabel.Item? {
-        switch resultType {
-        case .date:
-            guard let value = date else { return nil }
-            return .date(value)
-        case .link:
-            guard let value = url else { return nil }
-            return .link(value)
-        case .phoneNumber:
-            guard let value = phoneNumber else { return nil }
-            return .phoneNumber(value)
-        default:
-            return nil
+    var clickableLabelItems: [ClickableLabel.Item] {
+        resultType.reduce(.init()) { result, type in
+            switch type {
+            case .date:
+                guard let value = date else { break }
+                result.append(.date(value))
+            case .link:
+                guard let value = url else { break }
+                result.append(.link(value))
+            case .phoneNumber:
+                guard let value = phoneNumber else { break }
+                result.append(.phoneNumber(value))
+            default:
+                break
+            }
         }
     }
 }

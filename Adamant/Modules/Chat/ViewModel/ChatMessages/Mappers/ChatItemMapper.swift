@@ -6,7 +6,7 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import ChatKit
 import MarkdownKit
 import CommonKit
@@ -47,12 +47,14 @@ private extension ChatItemMapper {
         
         return .message(.init(
             id: messageTransaction.txId,
-            text: mutableString,
-            reply: nil,
-            status: messageTransaction.chatItemStatus,
-            isHidden: false,
-            firstReaction: reactions?.first,
-            secondReaction: reactions?.second
+            content: .init(
+                text: mutableString,
+                reply: nil,
+                status: messageTransaction.chatItemStatus
+            ),
+            topString: makeMessageTopString(chatTransaction: messageTransaction),
+            bottomString: .init(),
+            reactions: messageTransaction.reactions.map { map(reactions: $0) } ?? .default
         ))
     }
     
@@ -66,13 +68,12 @@ private extension ChatItemMapper {
     
     func map(richTransferTransaction transaction: RichMessageTransaction) -> ChatItemModel {
         let reactionsSet = transaction.richContent?[RichContentKeys.react.reactions] as? Set<Reaction>
-        let reactions = reactionsSet.map { map(reactions: $0) }
+        let reactions = reactionsSet.map { map(reactions: $0) } ?? .default
         
         return .transaction(.init(
             id: transaction.txId,
             transactionStatus: transaction.transactionStatus?.chatTransactionStatus ?? .none,
-            firstReaction: reactions?.first,
-            secondReaction: reactions?.second,
+            reactions: reactions,
             content: transaction.transfer.map { transfer in
                 .init(
                     reply: makeReplyModel(
@@ -85,42 +86,41 @@ private extension ChatItemMapper {
                     icon: richMessageProviders[transfer.type]?.tokenLogo ?? .init(),
                     amount: AdamantBalanceFormat.full.format(transfer.amount),
                     currency: richMessageProviders[transfer.type]?.tokenSymbol ?? .empty,
-                    date: transaction.sentDate?.humanizedDateTime(withWeekday: false) ?? .empty,
+                    date: .empty,
                     comment: transfer.comments,
                     status: transaction.chatItemStatus,
-                    isHidden: false
+                    onTap: .default
                 )
-            } ?? .default
+            } ?? .default,
+            statusUpdateAction: .default
         ))
     }
     
     func map(richReplyTransaction transaction: RichMessageTransaction) -> ChatItemModel {
         let message = transaction.getRichValue(for: RichContentKeys.reply.replyMessage) ?? .empty
         let reactionsSet = transaction.richContent?[RichContentKeys.react.reactions] as? Set<Reaction>
-        let reactions = reactionsSet.map { map(reactions: $0) }
         
         return .message(.init(
             id: transaction.txId,
-            text: markdownParser.parse(message),
-            reply: makeReplyModel(
-                id: transaction.getRichValue(for: RichContentKeys.reply.replyToId),
-                message: transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage)
+            content: .init(
+                text: markdownParser.parse(message),
+                reply: makeReplyModel(
+                    id: transaction.getRichValue(for: RichContentKeys.reply.replyToId),
+                    message: transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage)
+                ),
+                status: transaction.chatItemStatus
             ),
-            status: transaction.chatItemStatus,
-            isHidden: false,
-            firstReaction: reactions?.first,
-            secondReaction: reactions?.second
+            topString: makeMessageTopString(chatTransaction: transaction),
+            bottomString: .init(),
+            reactions: reactionsSet.map { map(reactions: $0) } ?? .default
         ))
     }
     
     func map(transferTransaction transaction: TransferTransaction) -> ChatItemModel {
-        let reactions = transaction.reactions.map { map(reactions: $0) }
-        
-        return .transaction(.init(
+        .transaction(.init(
             id: transaction.txId,
             transactionStatus: transaction.transactionStatus?.chatTransactionStatus ?? .none,
-            firstReaction: reactions?.first,
-            secondReaction: reactions?.second,
+            reactions: transaction.reactions.map { map(reactions: $0) } ?? .default,
             content: .init(
                 reply: makeReplyModel(
                     id: transaction.replyToId,
@@ -135,8 +135,9 @@ private extension ChatItemMapper {
                 date: transaction.sentDate?.humanizedDateTime(withWeekday: false) ?? .empty,
                 comment: transaction.comment,
                 status: transaction.chatItemStatus,
-                isHidden: false
-            )
+                onTap: .default
+            ),
+            statusUpdateAction: .default
         ))
     }
     
@@ -148,12 +149,12 @@ private extension ChatItemMapper {
         )
     }
     
-    func map(reactions: Set<Reaction>) -> (first: ChatReactionModel?, second: ChatReactionModel?) {
+    func map(reactions: Set<Reaction>) -> ChatReactionsStackModel {
         let reactions = reactions.sorted { $0.sender > $1.sender }
         let firstReaction = reactions.first
         let secondReaction = reactions.first == reactions.last ? nil : reactions.last
         
-        return (
+        return .init(
             first: firstReaction.map { map(reaction: $0) },
             second: secondReaction.map { map(reaction: $0) }
         )
@@ -171,15 +172,25 @@ private extension ChatItemMapper {
         )
     }
     
+    func makeMessageTopString(chatTransaction: ChatTransaction) -> NSAttributedString? {
+        guard chatTransaction.statusEnum == .failed else { return nil }
+        
+        return .init(
+            string: .adamant.chat.failToSend,
+            attributes: [
+                .font: UIFont.boldSystemFont(ofSize: 10),
+                .foregroundColor: UIColor.adamant.primary
+            ]
+        )
+    }
+    
     func mapUnknownTransaction(_ transaction: ChatTransaction) -> ChatItemModel {
         .message(.init(
             id: transaction.txId,
-            text: .init(),
-            reply: nil,
-            status: transaction.chatItemStatus,
-            isHidden: false,
-            firstReaction: nil,
-            secondReaction: nil
+            content: .default,
+            topString: nil,
+            bottomString: .init(),
+            reactions: .default
         ))
     }
 }
@@ -208,8 +219,8 @@ private extension ChatTransaction {
             return .pending
         case .delivered:
             return isOutgoing
-                ? .sent(blockchain: isConfirmed)
-                : .received(blockchain: isConfirmed)
+                ? .sent
+                : .received
         case .failed:
             return .failed
         }

@@ -10,30 +10,30 @@ import CommonKit
 public struct ChatTransactionModel: Equatable {
     public let id: String
     public let transactionStatus: Status
-    public let firstReaction: ChatReactionModel?
-    public let secondReaction: ChatReactionModel?
+    public let reactions: ChatReactionsStackModel
     public let content: ChatTransactionContentModel
+    public let statusUpdateAction: HashableAction
     
     public static let `default` = Self(
         id: .empty,
         transactionStatus: .warning,
-        firstReaction: nil,
-        secondReaction: nil,
-        content: .default
+        reactions: .default,
+        content: .default,
+        statusUpdateAction: .default
     )
     
     public init(
         id: String,
         transactionStatus: Status,
-        firstReaction: ChatReactionModel?,
-        secondReaction: ChatReactionModel?,
-        content: ChatTransactionContentModel
+        reactions: ChatReactionsStackModel,
+        content: ChatTransactionContentModel,
+        statusUpdateAction: HashableAction
     ) {
         self.id = id
         self.transactionStatus = transactionStatus
-        self.firstReaction = firstReaction
-        self.secondReaction = secondReaction
+        self.reactions = reactions
         self.content = content
+        self.statusUpdateAction = statusUpdateAction
     }
 }
 

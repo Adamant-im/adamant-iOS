@@ -29,7 +29,8 @@ private extension ChatCellWrapper {
         
         contentView.addSubview(wrappedView)
         wrappedView.snp.makeConstraints {
-            $0.directionalEdges.equalToSuperview()
+            $0.directionalHorizontalEdges.equalToSuperview().inset(12)
+            $0.directionalVerticalEdges.equalToSuperview().inset(2)
         }
     }
 }

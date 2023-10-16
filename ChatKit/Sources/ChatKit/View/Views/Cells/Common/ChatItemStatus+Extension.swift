@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CommonKit
 
 extension ChatItemStatus {
     var backgroundColor: UIColor {

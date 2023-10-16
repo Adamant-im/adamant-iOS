@@ -6,8 +6,8 @@
 //
 
 public enum ChatItemStatus: Equatable {
-    case sent(blockchain: Bool)
-    case received(blockchain: Bool)
+    case sent
+    case received
     case pending
     case failed
 

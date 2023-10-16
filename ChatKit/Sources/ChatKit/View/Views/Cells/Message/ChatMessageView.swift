@@ -10,10 +10,19 @@ import CommonKit
 
 final class ChatMessageView: UIView, Modelable {
     var modelStorage: ChatMessageModel = .default {
-        didSet { update() }
+        didSet { update(old: oldValue) }
     }
     
-    private let messageLabel = ClickableLabel(clickableTypes: [.link], numberOfLines: .zero)
+    private let topLabel = UILabel()
+    private let contentView = ChatMessageContentView()
+    private let bottomLabel = UILabel()
+    
+    private lazy var verticalStack: UIStackView = {
+        let view = UIStackView(arrangedSubviews: [topLabel, contentView, bottomLabel])
+        view.axis = .vertical
+        view.spacing = 2
+        return view
+    }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -26,24 +35,43 @@ final class ChatMessageView: UIView, Modelable {
     }
 }
 
-extension ChatMessageView: ReusableView {
-    func prepareForReuse() {}
-}
-
 private extension ChatMessageView {
     func configure() {
-        layer.cornerRadius = 8
-        
-        addSubview(messageLabel)
-        messageLabel.snp.makeConstraints {
-            $0.directionalEdges.equalToSuperview().inset(4)
-        }
-        
-        update()
+        addSubview(verticalStack)
+        updateLayout()
+        update(old: model)
     }
     
-    func update() {
-        backgroundColor = model.status.backgroundColor
-        messageLabel.attributedText = model.text
+    func update(old: ChatMessageModel) {
+        topLabel.attributedText = model.topString
+        topLabel.isHidden = model.topString == nil
+        contentView.model = model.content
+        bottomLabel.attributedText = model.bottomString
+        
+        guard old.isSentByPartner != model.isSentByPartner else { return }
+        updateLayout()
+    }
+    
+    func updateLayout() {
+        verticalStack.alignment = model.isSentByPartner
+            ? .leading
+            : .trailing
+        
+        verticalStack.snp.remakeConstraints {
+            $0.directionalVerticalEdges.equalToSuperview()
+            $0.width.lessThanOrEqualToSuperview().multipliedBy(0.9)
+            
+            if model.isSentByPartner {
+                $0.leading.lessThanOrEqualToSuperview()
+            } else {
+                $0.trailing.lessThanOrEqualToSuperview()
+            }
+        }
+    }
+}
+
+private extension ChatMessageModel {
+    var isSentByPartner: Bool {
+        content.status.isSentByPartner
     }
 }

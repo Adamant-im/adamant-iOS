@@ -31,15 +31,11 @@ final class ChatDateView: UIView, Modelable {
     }
 }
 
-extension ChatDateView: ReusableView {
-    func prepareForReuse() {}
-}
-
 private extension ChatDateView {
     func configure() {
         addSubview(label)
         label.snp.makeConstraints {
-            $0.directionalEdges.equalToSuperview().inset(8)
+            $0.directionalEdges.equalToSuperview()
         }
         
         update()

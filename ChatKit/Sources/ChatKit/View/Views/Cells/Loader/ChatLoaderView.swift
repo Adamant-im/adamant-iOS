@@ -20,10 +20,10 @@ final class ChatLoaderView: UIView {
         super.init(coder: coder)
         configure()
     }
-}
-
-extension ChatLoaderView: ReusableView {
-    func prepareForReuse() {}
+    
+    func startAnimating() {
+        loader.startAnimating()
+    }
 }
 
 private extension ChatLoaderView {
@@ -33,7 +33,5 @@ private extension ChatLoaderView {
             $0.directionalVerticalEdges.equalToSuperview().inset(8)
             $0.centerX.equalToSuperview()
         }
-        
-        loader.startAnimating()
     }
 }

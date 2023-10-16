@@ -6,20 +6,34 @@
 //
 
 import UIKit
+import SnapKit
 
 public final class ClickableLabel: UIView {
     public typealias TapAction = (Item) -> Void
     
-    public var tapAction: TapAction?
+    public var tapAction: TapAction = { _ in }
     
-    public var attributedText = NSAttributedString() {
-        didSet { updateAttributedText(attributedText) }
+    public var attributedText: NSAttributedString = .init() {
+        didSet {
+            guard oldValue != attributedText else { return }
+            updateAttributedText()
+        }
     }
     
     public var numberOfLines: Int = .zero {
-        didSet { updateNumberOfLines(numberOfLines) }
+        didSet {
+            guard oldValue != numberOfLines else { return }
+            updateNumberOfLines()
+        }
     }
-
+    
+    public var colors: [ItemType: UIColor] = .init() {
+        didSet {
+            guard oldValue != colors else { return }
+            updateColors()
+        }
+    }
+    
     private let detector: NSDataDetector?
     private var recognizer: UIGestureRecognizer?
     private var clickableItems = [NSTextCheckingResult]()
@@ -29,12 +43,8 @@ public final class ClickableLabel: UIView {
     private lazy var textStorage = makeTextStorage(layoutManager: layoutManager)
     
     private let label = UILabel()
-    
-    public override var intrinsicContentSize: CGSize {
-        label.intrinsicContentSize
-    }
 
-    public init(clickableTypes: Set<ItemType>, numberOfLines: Int) {
+    public init(clickableTypes: Set<ItemType>) {
         detector = try? .init(types: clickableTypes.textCheckingResultType.rawValue)
         assert(detector != nil, "NSDataDetector making error")
         super.init(frame: .zero)
@@ -49,59 +59,46 @@ public final class ClickableLabel: UIView {
     
     public override func layoutSubviews() {
         super.layoutSubviews()
-        label.frame = bounds
         textContainer.size = label.bounds.size
     }
 }
 
 private extension ClickableLabel {
     func configure() {
-        addSubview(label)
         addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTap)))
-        updateAttributedText(attributedText)
-        updateNumberOfLines(numberOfLines)
+        updateAttributedText()
+        updateNumberOfLines()
+        
+        addSubview(label)
+        label.snp.makeConstraints {
+            $0.directionalEdges.equalToSuperview()
+        }
     }
     
-    func updateAttributedText(_ attributedText: NSAttributedString) {
-        let attributedText = parsedText(attributedText)
-        label.attributedText = attributedText
-        textStorage.setAttributedString(attributedText)
-        invalidateIntrinsicContentSize()
+    func updateAttributedText() {
+        parseText(attributedText)
+        updateColors()
     }
     
-    func updateNumberOfLines(_ numberOfLines: Int) {
+    func updateColors() {
+        let string = NSMutableAttributedString(attributedString: attributedText)
+        colorText(string)
+        label.attributedText = string
+        textStorage.setAttributedString(string)
+    }
+    
+    func updateNumberOfLines() {
         label.numberOfLines = numberOfLines
         textContainer.maximumNumberOfLines = numberOfLines
-        invalidateIntrinsicContentSize()
     }
     
     @objc func onTap(recognizer: UIGestureRecognizer) {
         guard
             let index = stringIndex(at: recognizer.location(in: label)),
-            let textCheckingItem = clickableItems.first(where: { $0.range.contains(index) }),
-            let item = textCheckingItem.clickableLabelItem
+            let textCheckingItem = clickableItems.first(where: { $0.range.contains(index) })
         else { return }
         
-        tapAction?(item)
-    }
-    
-    func parsedText(_ text: NSAttributedString) -> NSAttributedString {
-        let text = NSMutableAttributedString(attributedString: text)
-        var result = [NSTextCheckingResult]()
-        defer { clickableItems = result }
-        
-        let range = NSRange(location: .zero, length: text.length)
-        result = detector?.matches(in: text.string, options: [], range: range) ?? .init()
-        colorFoundMatches(checkingResults: result, string: text)
-        
-        // Enumerate NSAttributedString NSLinks and append ranges
-        
-        text.enumerateAttribute(.link, in: range, options: []) { value, range, _ in
-            guard let url = value as? URL else { return }
-            result.append(.linkCheckingResult(range: range, url: url))
-        }
-        
-        return text
+        textCheckingItem.clickableLabelItems.forEach(tapAction)
     }
     
     func stringIndex(at location: CGPoint) -> Int? {
@@ -115,14 +112,29 @@ private extension ClickableLabel {
             : nil
     }
     
-    func colorFoundMatches(checkingResults: [NSTextCheckingResult], string: NSMutableAttributedString) {
-        let colorAttributes: [NSAttributedString.Key: Any] = [
-            NSAttributedString.Key.foregroundColor: UIColor.adamant.active
-        ]
+    func parseText(_ text: NSAttributedString) {
+        let range = NSRange(location: .zero, length: text.length)
+        clickableItems = detector?.matches(in: text.string, options: [], range: range) ?? .init()
         
-        checkingResults.forEach { result in
-            guard result.resultType == .link else { return }
-            string.addAttributes(colorAttributes, range: result.range)
+        // Enumerate NSAttributedString NSLinks and append ranges
+        
+        text.enumerateAttribute(.link, in: range, options: []) { value, range, _ in
+            guard let url = value as? URL else { return }
+            clickableItems.append(.linkCheckingResult(range: range, url: url))
+        }
+    }
+    
+    func colorText(_ text: NSMutableAttributedString) {
+        clickableItems.forEach { checkingResult in
+            guard
+                let itemType = checkingResult.clickableLabelItems.first?.type,
+                let color = colors[itemType]
+            else { return }
+            
+            text.addAttributes(
+                [.foregroundColor: color],
+                range: checkingResult.range
+            )
         }
     }
 }
