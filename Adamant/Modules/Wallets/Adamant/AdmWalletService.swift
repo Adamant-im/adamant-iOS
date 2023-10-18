@@ -130,14 +130,6 @@ final class AdmWalletService: NSObject, WalletService {
             .store(in: &subscriptions)
     }
     
-    func addTransactionObserver() {
-        coinStorage.transactionsPublisher
-            .sink { [weak self] transactions in
-                self?.transactions = transactions
-            }
-            .store(in: &subscriptions)
-    }
-    
     func update() {
         guard let accountService = accountService, let account = accountService.account else {
             wallet = nil
@@ -213,7 +205,6 @@ extension AdmWalletService: SwinjectDependentService {
         transfersProvider = container.resolve(TransfersProvider.self)
         coreDataStack = container.resolve(CoreDataStack.self)
         
-        addTransactionObserver()
         Task {
             let controller = await transfersProvider.unreadTransfersController()
             

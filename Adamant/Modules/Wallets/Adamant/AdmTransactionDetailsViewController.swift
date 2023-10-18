@@ -61,37 +61,26 @@ final class AdmTransactionDetailsViewController: TransactionDetailsViewControlle
         
         super.viewDidLoad()
         
-        if showToChat {
-            let haveChatroom: Bool
-            
-            if let transfer = transaction as? TransferTransaction, let partner = transfer.partner as? CoreDataAccount, let chatroom = partner.chatroom, let transactions = chatroom.transactions {
-                let messeges = transactions.first(where: { (object) -> Bool in
-                    return !(object is TransferTransaction)
-                })
-                
-                haveChatroom = messeges != nil
-            } else {
-                haveChatroom = false
-            }
-            
-            let chatLabel = haveChatroom ? String.adamant.transactionList.toChat : String.adamant.transactionList.startChat
+        if showToChat,
+           let trs = transaction as? SimpleTransactionDetails,
+           trs.chatRoom != nil,
+           let section = form.sectionBy(tag: Sections.actions.tag) {
+            let chatLabel = String.adamant.transactionList.toChat
             
             // MARK: Open chat
-            if let trs = transaction as? TransferTransaction, trs.chatroom != nil, let section = form.sectionBy(tag: Sections.actions.tag) {
-                let row = LabelRow {
-                    $0.tag = Rows.openChat.tag
-                    $0.title = chatLabel
-                    $0.cell.imageView?.image = Rows.openChat.image
-                }.cellSetup { (cell, _) in
-                    cell.selectionStyle = .gray
-                }.cellUpdate { (cell, _) in
-                    cell.accessoryType = .disclosureIndicator
-                }.onCellSelection { [weak self] (_, _) in
-                    self?.goToChat()
-                }
-                
-                section.append(row)
+            let row = LabelRow {
+                $0.tag = Rows.openChat.tag
+                $0.title = chatLabel
+                $0.cell.imageView?.image = Rows.openChat.image
+            }.cellSetup { (cell, _) in
+                cell.selectionStyle = .gray
+            }.cellUpdate { (cell, _) in
+                cell.accessoryType = .disclosureIndicator
+            }.onCellSelection { [weak self] (_, _) in
+                self?.goToChat()
             }
+            
+            section.append(row)
         }
         
         tableView.refreshControl = refreshControl
@@ -114,11 +103,18 @@ final class AdmTransactionDetailsViewController: TransactionDetailsViewControlle
     }
     
     func goToChat() {
-        guard let transfer = transaction as? TransferTransaction else {
-            return
+        var chatRoom: Chatroom?
+        
+        if let transfer = transaction as? SimpleTransactionDetails {
+            chatRoom = transfer.chatRoom
+        }
+        
+        if let transfer = transaction as? TransferTransaction {
+            let partner = transfer.partner as? CoreDataAccount
+            chatRoom = partner?.chatroom
         }
 
-        guard let chatroom = transfer.chatroom else {
+        guard let chatroom = chatRoom else {
             dialogService.showError(withMessage: "AdmTransactionDetailsViewController: Failed to get chatroom for transaction.", supportEmail: true, error: nil)
             return
         }
@@ -154,6 +150,7 @@ final class AdmTransactionDetailsViewController: TransactionDetailsViewControlle
             
             do {
                 try await transfersProvider.refreshTransfer(id: id)
+                transaction = await transfersProvider.getTransfer(id: id)
                 refreshControl.endRefreshing()
                 tableView.reloadData()
             } catch {

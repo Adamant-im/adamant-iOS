@@ -205,6 +205,12 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
         
         var simple = SimpleTransactionDetails(transaction)
         simple.partnerName = getPartnerName(for: partnerId)
+        simple.showToChat = toShowChat(for: transaction)
+        simple.comment = transaction.comment
+
+        let partner = transaction.partner as? CoreDataAccount
+        let chatroom = partner?.chatroom
+        simple.chatRoom = chatroom
         return simple
     }
     
@@ -222,27 +228,23 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
     // MARK: - UITableView
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let transaction = controller?.object(at: indexPath) else {
-            tableView.deselectRow(at: indexPath, animated: true)
-            return
-        }
+        let transaction = transactions[indexPath.row]
         
         let controller = screensFactory.makeAdmTransactionDetails()
         controller.transaction = transaction
         controller.comment = transaction.comment
-        
-        controller.showToChat = toShowChat(for: transaction)
-        
+        controller.showToChat = transaction.showToChat ?? false
+
         if let address = accountService.account?.address {
-            let partnerName = addressBookService.getName(for: transaction.partner)
+            let partnerName = transaction.partnerName
             
-            if address == transaction.senderId {
+            if address == transaction.senderAddress {
                 controller.senderName = String.adamant.transactionDetails.yourAddress
             } else {
                 controller.senderName = partnerName
             }
             
-            if address == transaction.recipientId {
+            if address == transaction.recipientAddress {
                 controller.recipientName = String.adamant.transactionDetails.yourAddress
             } else {
                 controller.recipientName = partnerName
@@ -252,66 +254,19 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
         navigationController?.pushViewController(controller, animated: true)
     }
     
-    func tableView(_ tableView: UITableView, editActionsForRowAt: IndexPath) -> [UITableViewRowAction]? {
-        guard let transaction = controller?.object(at: editActionsForRowAt), let partner = transaction.partner as? CoreDataAccount, let chatroom = partner.chatroom, let transactions = chatroom.transactions  else {
+    func tableView(
+        _ tableView: UITableView,
+        trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
+    ) -> UISwipeActionsConfiguration? {
+        let transaction = transactions[indexPath.row]
+        
+        guard transaction.showToChat == true,
+              let chatroom = transaction.chatRoom
+        else {
             return nil
         }
         
-        let messeges = transactions.first(where: { (object) -> Bool in
-            return !(object is TransferTransaction)
-        })
-        
-        let title = (messeges != nil) ? String.adamant.transactionList.toChat : String.adamant.transactionList.startChat
-        
-        let toChat = UITableViewRowAction(style: .normal, title: title) { [weak self] _, _ in
-            guard
-                let self = self,
-                let account = accountService.account
-            else { return }
-            
-            let vc = screensFactory.makeChat()
-            vc.hidesBottomBarWhenPushed = true
-            vc.viewModel.setup(
-                account: account,
-                chatroom: chatroom,
-                messageIdToShow: nil,
-                preservationDelegate: nil
-            )
-            
-            if let nav = self.navigationController {
-                nav.pushViewController(vc, animated: true)
-            } else {
-                vc.modalPresentationStyle = .overFullScreen
-                present(vc, animated: true)
-            }
-        }
-        
-        toChat.backgroundColor = UIColor.adamant.primary
-        
-        return [toChat]
-    }
-    
-    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        guard let transaction = controller?.object(at: indexPath) else {
-            return false
-        }
-        
-        return toShowChat(for: transaction)
-    }
-    
-    @available(iOS 11.0, *)
-    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard let transaction = controller?.object(at: indexPath), let partner = transaction.partner as? CoreDataAccount, let chatroom = partner.chatroom, let transactions = chatroom.transactions  else {
-            return nil
-        }
-        
-        let messeges = transactions.first(where: { (object) -> Bool in
-            return !(object is TransferTransaction)
-        })
-        
-        let title = (messeges != nil) ? String.adamant.transactionList.toChat : String.adamant.transactionList.startChat
-        
-        let toChat = UIContextualAction(style: .normal, title: title) { [weak self] (_, _, _) in
+        let toChat = UIContextualAction(style: .normal, title: "") { [weak self] (_, _, _) in
             guard
                 let self = self,
                 let account = accountService.account

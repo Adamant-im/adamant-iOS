@@ -36,6 +36,9 @@ struct SimpleTransactionDetails: TransactionDetails, Hashable {
     }
     
     var partnerName: String?
+    var comment: String?
+    var showToChat: Bool?
+    var chatRoom: Chatroom?
     
     init(defaultCurrencySymbol: String? = nil, txId: String, senderAddress: String, recipientAddress: String, dateValue: Date? = nil, amountValue: Decimal? = nil, feeValue: Decimal? = nil, confirmationsValue: String? = nil, blockValue: String? = nil, isOutgoing: Bool, transactionStatus: TransactionStatus? = nil, partnerName: String? = nil) {
         self.defaultCurrencySymbol = defaultCurrencySymbol
