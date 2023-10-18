@@ -69,4 +69,11 @@ struct SimpleTransactionDetails: TransactionDetails, Hashable {
         self.transactionStatus = transaction.transactionStatus
     }
     
+    func hash(into hasher: inout Hasher) {
+         hasher.combine(txId)
+     }
+
+     static func == (lhs: Self, rhs: Self) -> Bool {
+         lhs.txId == rhs.txId
+     }
 }

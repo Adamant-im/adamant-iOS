@@ -96,15 +96,15 @@ final class LskWalletService: WalletService {
     private let nodes: [APINode]
     private var subscriptions = Set<AnyCancellable>()
 
-    @Published private(set) var transactions: [TransactionDetails] = []
-    @Published private(set) var hasMoreOldTransactions: Bool = true
+    @ObservableValue private(set) var transactions: [TransactionDetails] = []
+    @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
 
-    var transactionsPublisher: Published<[TransactionDetails]>.Publisher {
-        $transactions
+    var transactionsPublisher: AnyObservable<[TransactionDetails]> {
+        $transactions.eraseToAnyPublisher()
     }
     
-    var hasMoreOldTransactionsPublisher: Published<Bool>.Publisher {
-        $hasMoreOldTransactions
+    var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
+        $hasMoreOldTransactions.eraseToAnyPublisher()
     }
     
     lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(

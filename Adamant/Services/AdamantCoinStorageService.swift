@@ -21,9 +21,9 @@ final class AdamantCoinStorageService: NSObject, CoinStorageService {
     private lazy var transactionController = getTransactionController()
     private var subscriptions = Set<AnyCancellable>()
     
-    @Published private var transactions: [TransactionDetails] = []
+    @ObservableValue private var transactions: [TransactionDetails] = []
 
-    var transactionsPublisher: Published<[TransactionDetails]>.Publisher {
+    var transactionsPublisher: any Observable<[TransactionDetails]> {
         $transactions
     }
     

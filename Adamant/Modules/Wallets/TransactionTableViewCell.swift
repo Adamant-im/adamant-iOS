@@ -77,7 +77,6 @@ final class TransactionTableViewCell: UITableViewCell {
         transactionType = .income
     }
     
-    @MainActor
     func updateUI() {
         guard let transaction = transaction else { return }
         
@@ -133,7 +132,7 @@ final class TransactionTableViewCell: UITableViewCell {
             }
         }
         
-        let amount = transaction.amountValue ?? .zero //(transaction.amount ?? 0).decimalValue
+        let amount = transaction.amountValue ?? .zero
         ammountLabel.text = AdamantBalanceFormat.full.format(amount, withCurrencySymbol: currencySymbol)
     }
 }

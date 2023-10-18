@@ -171,7 +171,7 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
             }
             
             isBusy = false
-            emptyLabel.isHidden = !isNeedToLoadMoore
+            emptyLabel.isHidden = !transactions.isEmpty
             refreshControl.endRefreshing()
             stopBottomIndicator()
         }.stored(in: taskManager)

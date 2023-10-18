@@ -217,11 +217,11 @@ protocol WalletService: AnyObject {
     var defaultOrdinalLevel: Int? { get }
     var richMessageType: String { get }
     
-    var transactionsPublisher: Published<[TransactionDetails]>.Publisher {
+    var transactionsPublisher: AnyObservable<[TransactionDetails]> {
         get
     }
     
-    var hasMoreOldTransactionsPublisher: Published<Bool>.Publisher {
+    var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
         get
     }
     
