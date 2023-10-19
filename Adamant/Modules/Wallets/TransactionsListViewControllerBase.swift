@@ -22,7 +22,7 @@ extension String.adamant {
     }
 }
 
-private typealias ChatDiffableDataSource = UITableViewDiffableDataSource<Int, SimpleTransactionDetails>
+private typealias TransactionsDiffableDataSource = UITableViewDiffableDataSource<Int, HashableIDWrapper<SimpleTransactionDetails>>
 
 // Extensions for a generic classes is limited, so delegates implemented right in class declaration
 class TransactionsListViewControllerBase: UIViewController {
@@ -59,7 +59,7 @@ class TransactionsListViewControllerBase: UIViewController {
     private var limit = 25
     private var offset = 0
     
-    private lazy var dataSource = ChatDiffableDataSource(tableView: tableView, cellProvider: makeCell)
+    private lazy var dataSource = TransactionsDiffableDataSource(tableView: tableView, cellProvider: makeCell)
 
     // MARK: - IBOutlets
     @IBOutlet weak var tableView: UITableView!
@@ -158,10 +158,11 @@ class TransactionsListViewControllerBase: UIViewController {
             by: { ($0.dateValue ?? Date()) > ($1.dateValue ?? Date()) }
         )
 
-        var snapshot = NSDiffableDataSourceSnapshot<Int, SimpleTransactionDetails>()
+        let list = self.transactions.wrappedByHashableId()
+        var snapshot = NSDiffableDataSourceSnapshot<Int, HashableIDWrapper<SimpleTransactionDetails>>()
         snapshot.appendSections([.zero])
-        snapshot.appendItems(self.transactions)
-        snapshot.reconfigureItems(self.transactions)
+        snapshot.appendItems(list)
+        snapshot.reconfigureItems(list)
         dataSource.apply(snapshot, animatingDifferences: false)
         
         guard !isBusy else { return }
@@ -243,7 +244,7 @@ class TransactionsListViewControllerBase: UIViewController {
     private func makeCell(
         tableView: UITableView,
         indexPath: IndexPath,
-        model: SimpleTransactionDetails
+        model: HashableIDWrapper<SimpleTransactionDetails>
     ) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifierCompact, for: indexPath) as! TransactionTableViewCell
         
@@ -252,7 +253,7 @@ class TransactionsListViewControllerBase: UIViewController {
         ? .zero
         : UITableView.defaultTransactionsSeparatorInset
         
-        cell.transaction = model
+        cell.transaction = model.value
         cell.currencySymbol = currencySymbol
         return cell
     }

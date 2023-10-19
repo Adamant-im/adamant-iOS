@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct SimpleTransactionDetails: TransactionDetails, Hashable {
+struct SimpleTransactionDetails: TransactionDetails {
     var defaultCurrencySymbol: String?
     
     var txId: String
@@ -68,12 +68,4 @@ struct SimpleTransactionDetails: TransactionDetails, Hashable {
         self.isOutgoing = transaction.isOutgoing
         self.transactionStatus = transaction.transactionStatus
     }
-    
-    func hash(into hasher: inout Hasher) {
-         hasher.combine(txId)
-     }
-
-     static func == (lhs: Self, rhs: Self) -> Bool {
-         lhs.txId == rhs.txId
-     }
 }
