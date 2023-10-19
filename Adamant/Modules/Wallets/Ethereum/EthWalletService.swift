@@ -158,20 +158,21 @@ final class EthWalletService: WalletService {
     private var initialBalanceCheck = false
     private var subscriptions = Set<AnyCancellable>()
     
-    @Published private(set) var historyTransactions: [CoinTransaction] = []
-    @Published private(set) var hasMoreOldTransactions: Bool = true
+    @ObservableValue private(set) var historyTransactions: [TransactionDetails] = []
+    @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
 
-    var transactionsPublisher: Published<[CoinTransaction]>.Publisher {
-        $historyTransactions
+    var transactionsPublisher: AnyObservable<[TransactionDetails]> {
+        $historyTransactions.eraseToAnyPublisher()
     }
     
-    var hasMoreOldTransactionsPublisher: Published<Bool>.Publisher {
-        $hasMoreOldTransactions
+    var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
+        $hasMoreOldTransactions.eraseToAnyPublisher()
     }
     
     lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUnicID,
-        coreDataStack: coreDataStack
+        coreDataStack: coreDataStack,
+        blockchainType: richMessageType
     )
     
     // MARK: - State
@@ -239,7 +240,6 @@ final class EthWalletService: WalletService {
     
     func addTransactionObserver() {
         coinStorage.transactionsPublisher
-            .removeDuplicates()
             .sink { [weak self] transactions in
                 self?.historyTransactions = transactions
             }
@@ -654,6 +654,7 @@ extension EthWalletService {
         } catch let error as Web3Error {
             throw error.asWalletServiceError()
         } catch {
+            print("error=\(error)")
             throw WalletServiceError.remoteServiceError(message: "Failed to get transaction")
         }
         
@@ -802,7 +803,7 @@ extension EthWalletService {
                 confirmationsValue: nil,
                 blockValue: nil,
                 isOutgoing: isOutgoing,
-                transactionStatus: TransactionStatus.registered
+                transactionStatus: TransactionStatus.notInitiated
             )
         }
         
@@ -811,7 +812,7 @@ extension EthWalletService {
         return trs.count
     }
     
-    func getLocalTransactionHistory() -> [CoinTransaction] {
+    func getLocalTransactionHistory() -> [TransactionDetails] {
         historyTransactions
     }
 }

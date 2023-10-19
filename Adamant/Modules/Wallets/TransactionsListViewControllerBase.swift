@@ -22,6 +22,8 @@ extension String.adamant {
     }
 }
 
+private typealias TransactionsDiffableDataSource = UITableViewDiffableDataSource<Int, HashableIDWrapper<SimpleTransactionDetails>>
+
 // Extensions for a generic classes is limited, so delegates implemented right in class declaration
 class TransactionsListViewControllerBase: UIViewController {
     let cellIdentifierFull = "cf"
@@ -50,12 +52,16 @@ class TransactionsListViewControllerBase: UIViewController {
     var isNeedToLoadMoore = true
     var isBusy = false
     
-    var transactions: [CoinTransaction] = []
+    var subscriptions = Set<AnyCancellable>()
+    var transactions: [SimpleTransactionDetails] = []
     private(set) lazy var loadingView = LoadingView()
     
-    private var subscriptions = Set<AnyCancellable>()
     private var limit = 25
     private var offset = 0
+    
+    private lazy var dataSource = TransactionsDiffableDataSource(tableView: tableView, cellProvider: makeCell)
+    
+    var currencySymbol: String { walletService.tokenSymbol }
     
     // MARK: - IBOutlets
     @IBOutlet weak var tableView: UITableView!
@@ -70,7 +76,7 @@ class TransactionsListViewControllerBase: UIViewController {
         navigationItem.title = String.adamant.transactionList.title
         emptyLabel.text = String.adamant.transactionList.noTransactionYet
         
-        transactions = walletService.getLocalTransactionHistory()
+        update(walletService.getLocalTransactionHistory())
         configureTableView()
         setColors()
         configureLayout()
@@ -134,18 +140,32 @@ class TransactionsListViewControllerBase: UIViewController {
         let nib = UINib.init(nibName: "TransactionTableViewCell", bundle: nil)
         tableView.register(nib, forCellReuseIdentifier: cellIdentifierFull)
         tableView.register(nib, forCellReuseIdentifier: cellIdentifierCompact)
-        tableView.dataSource = self
         tableView.delegate = self
         tableView.refreshControl = refreshControl
         tableView.tableHeaderView = UIView()
     }
     
     @MainActor
-    func update(_ transactions: [CoinTransaction]) {
-        self.transactions = transactions.sorted(by: {
-            (($0.date ?? NSDate()) as Date) > (($1.date ?? NSDate()) as Date)
-        })
-        self.tableView.reloadData()
+    func update(_ transactions: [TransactionDetails]) {
+        let transactions = transactions.map {
+            SimpleTransactionDetails($0)
+        }
+        
+        update(transactions)
+    }
+    
+    @MainActor
+    func update(_ transactions: [SimpleTransactionDetails]) {
+        self.transactions = transactions.sorted(
+            by: { ($0.dateValue ?? Date()) > ($1.dateValue ?? Date()) }
+        )
+
+        let list = self.transactions.wrappedByHashableId()
+        var snapshot = NSDiffableDataSourceSnapshot<Int, HashableIDWrapper<SimpleTransactionDetails>>()
+        snapshot.appendSections([.zero])
+        snapshot.appendItems(list)
+        snapshot.reconfigureItems(list)
+        dataSource.apply(snapshot, animatingDifferences: false)
         
         guard !isBusy else { return }
         self.updateLoadingView(isHidden: true)
@@ -209,7 +229,6 @@ class TransactionsListViewControllerBase: UIViewController {
             emptyLabel.isHidden = self.transactions.count > 0
             stopBottomIndicator()
             refreshControl.endRefreshing()
-            tableView.reloadData()
             updateLoadingView(isHidden: true)
         }.stored(in: taskManager)
     }
@@ -224,46 +243,21 @@ class TransactionsListViewControllerBase: UIViewController {
         return TransactionTableViewCell.cellHeightCompact
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifierCompact, for: indexPath) as? TransactionTableViewCell else {
-            return UITableViewCell(style: .default, reuseIdentifier: "cell")
-        }
-        
-        let transaction = transactions[indexPath.row]
+    private func makeCell(
+        tableView: UITableView,
+        indexPath: IndexPath,
+        model: HashableIDWrapper<SimpleTransactionDetails>
+    ) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifierCompact, for: indexPath) as! TransactionTableViewCell
         
         cell.accessoryType = .disclosureIndicator
         cell.separatorInset = indexPath.row == transactions.count - 1
         ? .zero
         : UITableView.defaultTransactionsSeparatorInset
         
-        let partnerId = transaction.isOutgoing
-        ? transaction.recipientId
-        : transaction.senderId
-        
-        let transactionType: TransactionTableViewCell.TransactionType
-        if transaction.recipientId == transaction.senderId {
-            transactionType = .myself
-        } else if transaction.isOutgoing {
-            transactionType = .outcome
-        } else {
-            transactionType = .income
-        }
-        
-        configureCell(
-            cell,
-            transactionType: transactionType,
-            transactionStatus: transaction.transactionStatus,
-            partnerId: partnerId ?? "",
-            partnerName: nil,
-            amount: (transaction.amount ?? 0).decimalValue,
-            date: transaction.date as? Date
-        )
-        
+        cell.currencySymbol = currencySymbol
+        cell.transaction = model.value
         return cell
-    }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        transactions.count
     }
     
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
@@ -291,67 +285,10 @@ class TransactionsListViewControllerBase: UIViewController {
     func reloadData() {
         
     }
-    
-    var currencySymbol: String?
 }
 
 // MARK: - UITableViewDataSource, UITableViewDelegate
-extension TransactionsListViewControllerBase: UITableViewDataSource, UITableViewDelegate {
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-    
-    // MARK: Cells
-    
-    func configureCell(
-        _ cell: TransactionTableViewCell,
-        transactionType: TransactionTableViewCell.TransactionType,
-        transactionStatus: TransactionStatus?,
-        partnerId: String,
-        partnerName: String?,
-        amount: Decimal,
-        date: Date?
-    ) {
-        cell.backgroundColor = .clear
-        cell.accountLabel.tintColor = UIColor.adamant.primary
-        cell.ammountLabel.tintColor = UIColor.adamant.primary
-        
-        cell.dateLabel.textColor = transactionStatus?.color ?? .adamant.secondary
-        
-        switch transactionStatus {
-        case .success, .inconsistent, .registered:
-            if let date = date {
-                cell.dateLabel.text = date.humanizedDateTime()
-            } else {
-                cell.dateLabel.text = nil
-            }
-        case .failed:
-            cell.dateLabel.text = TransactionStatus.failed.localized
-        default:
-            cell.dateLabel.text = TransactionStatus.pending.localized
-        }
-        
-        cell.transactionType = transactionType
-        
-        if let partnerName = partnerName {
-            cell.accountLabel.text = partnerName
-            cell.addressLabel.text = partnerId
-            cell.addressLabel.lineBreakMode = .byTruncatingMiddle
-            
-            if cell.addressLabel.isHidden {
-                cell.addressLabel.isHidden = false
-            }
-        } else {
-            cell.accountLabel.text = partnerId
-            
-            if !cell.addressLabel.isHidden {
-                cell.addressLabel.isHidden = true
-            }
-        }
-        
-        cell.ammountLabel.text = AdamantBalanceFormat.full.format(amount, withCurrencySymbol: currencySymbol)
-    }
-    
+extension TransactionsListViewControllerBase: UITableViewDelegate {
     func bottomIndicatorView() -> UIActivityIndicatorView {
         var activityIndicatorView = UIActivityIndicatorView()
         
@@ -391,8 +328,9 @@ private extension TransactionStatus {
     var color: UIColor {
         switch self {
         case .failed: return .adamant.danger
-        case .notInitiated, .inconsistent, .noNetwork, .noNetworkFinal, .pending: return .adamant.alert
-        case .success, .registered: return .adamant.secondary
+        case .notInitiated, .inconsistent, .noNetwork, .noNetworkFinal, .pending, .registered:
+            return .adamant.alert
+        case .success: return .adamant.secondary
         }
     }
 }

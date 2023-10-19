@@ -11,9 +11,16 @@ import LiskKit
 import CommonKit
 
 extension LskWalletService: RichMessageProviderWithStatusCheck {
-    func statusInfoFor(transaction: RichMessageTransaction) async -> TransactionStatusInfo {
-        guard let hash = transaction.getRichValue(for: RichContentKeys.transfer.hash)
-        else {
+    func statusInfoFor(transaction: CoinTransaction) async -> TransactionStatusInfo {
+        let hash: String?
+        
+        if let transaction = transaction as? RichMessageTransaction {
+            hash = transaction.getRichValue(for: RichContentKeys.transfer.hash)
+        } else {
+            hash = transaction.txId
+        }
+        
+        guard let hash = hash else {
             return .init(sentDate: nil, status: .inconsistent)
         }
         
@@ -45,7 +52,7 @@ extension LskWalletService: RichMessageProviderWithStatusCheck {
 private extension LskWalletService {
     func getStatus(
         lskTransaction: Transactions.TransactionModel,
-        transaction: RichMessageTransaction
+        transaction: CoinTransaction
     ) -> TransactionStatus {
         guard lskTransaction.blockId != nil else { return .registered }
         
@@ -69,16 +76,35 @@ private extension LskWalletService {
         }
         
         // MARK: Check amount
-        if let raw = transaction.getRichValue(for: RichContentKeys.transfer.amount),
+        guard isAmountCorrect(
+            transaction: transaction,
+            lskTransaction: lskTransaction
+        ) else { return .inconsistent }
+        
+        return .success
+    }
+    
+    func isAmountCorrect(
+        transaction: CoinTransaction,
+        lskTransaction: Transactions.TransactionModel
+    ) -> Bool {
+        if let transaction = transaction as? RichMessageTransaction,
+           let raw = transaction.getRichValue(for: RichContentKeys.transfer.amount),
            let reported = AdamantBalanceFormat.deserializeBalance(from: raw) {
             let min = reported - reported*0.005
             let max = reported + reported*0.005
             
             guard (min...max).contains(lskTransaction.amountValue ?? 0) else {
-                return .inconsistent
+                return false
             }
+            
+            return true
         }
         
-        return .success
+        guard transaction.amountValue == lskTransaction.amountValue else {
+            return false
+        }
+        
+        return true
     }
 }

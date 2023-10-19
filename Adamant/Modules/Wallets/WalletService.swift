@@ -217,11 +217,11 @@ protocol WalletService: AnyObject {
     var defaultOrdinalLevel: Int? { get }
     var richMessageType: String { get }
     
-    var transactionsPublisher: Published<[CoinTransaction]>.Publisher {
+    var transactionsPublisher: AnyObservable<[TransactionDetails]> {
         get
     }
     
-    var hasMoreOldTransactionsPublisher: Published<Bool>.Publisher {
+    var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
         get
     }
     
@@ -250,7 +250,7 @@ protocol WalletService: AnyObject {
     func getWalletAddress(byAdamantAddress address: String) async throws -> String
     func getBalance(address: String) async throws -> Decimal
     func loadTransactions(offset: Int, limit: Int) async throws -> Int
-    func getLocalTransactionHistory() -> [CoinTransaction]
+    func getLocalTransactionHistory() -> [TransactionDetails]
 }
 
 protocol SwinjectDependentService: WalletService {

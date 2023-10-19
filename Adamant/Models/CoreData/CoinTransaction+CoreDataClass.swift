@@ -14,5 +14,14 @@ import CoreData
 public class CoinTransaction: NSManagedObject {
     static let entityCoinName = "CoinTransaction"
     
-    var transactionStatus: TransactionStatus?
+    var transactionStatus: TransactionStatus? {
+        get {
+            TransactionStatus(rawValue: transactionStatusRaw)
+        }
+        set {
+            let raw = newValue?.rawValue ?? .zero
+            guard raw != transactionStatusRaw else { return }
+            transactionStatusRaw = newValue?.rawValue ?? .zero
+        }
+    }
 }

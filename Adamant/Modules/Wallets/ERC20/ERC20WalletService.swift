@@ -162,20 +162,21 @@ final class ERC20WalletService: WalletService {
     private (set) var contract: Web3.Contract?
     private var balanceObserver: NSObjectProtocol?
     
-    @Published private(set) var historyTransactions: [CoinTransaction] = []
-    @Published private(set) var hasMoreOldTransactions: Bool = true
+    @ObservableValue private(set) var historyTransactions: [TransactionDetails] = []
+    @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
 
-    var transactionsPublisher: Published<[CoinTransaction]>.Publisher {
-        $historyTransactions
+    var transactionsPublisher: AnyObservable<[TransactionDetails]> {
+        $historyTransactions.eraseToAnyPublisher()
     }
     
-    var hasMoreOldTransactionsPublisher: Published<Bool>.Publisher {
-        $hasMoreOldTransactions
+    var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
+        $hasMoreOldTransactions.eraseToAnyPublisher()
     }
     
     lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUnicID,
-        coreDataStack: coreDataStack
+        coreDataStack: coreDataStack,
+        blockchainType: dynamicRichMessageType
     )
     
     init(token: ERC20Token) {
@@ -235,7 +236,6 @@ final class ERC20WalletService: WalletService {
     
     func addTransactionObserver() {
         coinStorage.transactionsPublisher
-            .removeDuplicates()
             .sink { [weak self] transactions in
                 self?.historyTransactions = transactions
             }
@@ -683,7 +683,7 @@ extension ERC20WalletService {
                 confirmationsValue: nil,
                 blockValue: nil,
                 isOutgoing: isOutgoing,
-                transactionStatus: TransactionStatus.registered
+                transactionStatus: TransactionStatus.notInitiated
             )
         }
         
@@ -692,7 +692,7 @@ extension ERC20WalletService {
         return trs.count
     }
     
-    func getLocalTransactionHistory() -> [CoinTransaction] {
+    func getLocalTransactionHistory() -> [TransactionDetails] {
         historyTransactions
     }
 }

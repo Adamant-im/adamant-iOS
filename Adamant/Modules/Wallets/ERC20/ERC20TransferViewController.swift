@@ -66,10 +66,6 @@ final class ERC20TransferViewController: TransferViewControllerBase {
                 Task {
                     do {
                         try await service.sendTransaction(transaction)
-                        service.coinStorage.updateStatus(
-                            for: txHash,
-                            status: .registered
-                        )
                     } catch {
                         dialogService.showRichError(error: error)
                         service.coinStorage.updateStatus(

@@ -134,8 +134,7 @@ final class AdmTransferViewController: TransferViewControllerBase {
         recipient: String,
         comments: String
     ) {
-        guard let service = service else { return }
-        let detailsVC = screensFactory.makeDetailsVC(service: service)
+        let detailsVC = screensFactory.makeAdmTransactionDetails()
         detailsVC.transaction = result
         
         if comments.count > 0 {

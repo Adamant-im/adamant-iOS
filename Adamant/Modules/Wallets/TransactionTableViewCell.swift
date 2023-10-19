@@ -9,7 +9,7 @@
 import UIKit
 import CommonKit
 
-class TransactionTableViewCell: UITableViewCell {
+final class TransactionTableViewCell: UITableViewCell {
     enum TransactionType {
         case income, outcome, myself
         
@@ -63,9 +63,90 @@ class TransactionTableViewCell: UITableViewCell {
         }
     }
     
+    var currencySymbol: String?
+    
+    var transaction: SimpleTransactionDetails? {
+        didSet {
+            updateUI()
+        }
+    }
+    
     // MARK: - Initializers
     
     override func awakeFromNib() {
         transactionType = .income
+    }
+    
+    func updateUI() {
+        guard let transaction = transaction else { return }
+        
+        let partnerId = transaction.isOutgoing
+        ? transaction.recipientAddress
+        : transaction.senderAddress
+        
+        let transactionType: TransactionTableViewCell.TransactionType
+        if transaction.recipientAddress == transaction.senderAddress {
+            transactionType = .myself
+        } else if transaction.isOutgoing {
+            transactionType = .outcome
+        } else {
+            transactionType = .income
+        }
+        
+        self.transactionType = transactionType
+        
+        backgroundColor = .clear
+        accountLabel.tintColor = UIColor.adamant.primary
+        ammountLabel.tintColor = UIColor.adamant.primary
+        
+        dateLabel.textColor = transaction.transactionStatus?.color ?? .adamant.secondary
+        
+        switch transaction.transactionStatus {
+        case .success, .inconsistent:
+            if let date = transaction.dateValue {
+                dateLabel.text = date.humanizedDateTime()
+            } else {
+                dateLabel.text = nil
+            }
+        case .notInitiated:
+            dateLabel.text = TransactionDetailsViewControllerBase.awaitingValueString
+        case .failed:
+            dateLabel.text = TransactionStatus.failed.localized
+        default:
+            dateLabel.text = TransactionStatus.pending.localized
+        }
+        
+        if let partnerName = transaction.partnerName {
+            accountLabel.text = partnerName
+            addressLabel.text = partnerId
+            addressLabel.lineBreakMode = .byTruncatingMiddle
+            
+            if addressLabel.isHidden {
+                addressLabel.isHidden = false
+            }
+        } else {
+            accountLabel.text = partnerId
+            
+            if !addressLabel.isHidden {
+                addressLabel.isHidden = true
+            }
+        }
+        
+        let amount = transaction.amountValue ?? .zero
+        ammountLabel.text = AdamantBalanceFormat.full.format(amount, withCurrencySymbol: currencySymbol)
+    }
+}
+
+// MARK: - TransactionStatus UI
+private extension TransactionStatus {
+    var color: UIColor {
+        switch self {
+        case .failed:
+            return .adamant.danger
+        case .noNetwork, .noNetworkFinal, .pending, .registered:
+            return .adamant.alert
+        case .success, .inconsistent, .notInitiated:
+            return .adamant.secondary
+        }
     }
 }

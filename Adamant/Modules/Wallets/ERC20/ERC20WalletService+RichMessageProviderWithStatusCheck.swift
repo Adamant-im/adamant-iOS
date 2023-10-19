@@ -12,9 +12,16 @@ import struct BigInt.BigUInt
 import CommonKit
 
 extension ERC20WalletService: RichMessageProviderWithStatusCheck {
-    func statusInfoFor(transaction: RichMessageTransaction) async -> TransactionStatusInfo {
-        guard let hash = transaction.getRichValue(for: RichContentKeys.transfer.hash)
-        else {
+    func statusInfoFor(transaction: CoinTransaction) async -> TransactionStatusInfo {
+        let hash: String?
+        
+        if let transaction = transaction as? RichMessageTransaction {
+            hash = transaction.getRichValue(for: RichContentKeys.transfer.hash)
+        } else {
+            hash = transaction.txId
+        }
+        
+        guard let hash = hash else {
             return .init(sentDate: nil, status: .inconsistent)
         }
         
@@ -44,7 +51,7 @@ extension ERC20WalletService: RichMessageProviderWithStatusCheck {
 private extension ERC20WalletService {
     func getStatus(
         erc20Transaction: EthTransaction,
-        transaction: RichMessageTransaction
+        transaction: CoinTransaction
     ) -> TransactionStatus {
         let status = erc20Transaction.receiptStatus.asTransactionStatus()
         guard status == .success else { return status }
@@ -67,10 +74,7 @@ private extension ERC20WalletService {
         }
         
         // MARK: Compare amounts
-        guard
-            let raw = transaction.getRichValue(for: RichContentKeys.transfer.amount),
-            let reportedValue = AdamantBalanceFormat.deserializeBalance(from: raw)
-        else {
+        guard let reportedValue = reportedValue(for: transaction) else {
             return .inconsistent
         }
         
@@ -82,5 +86,21 @@ private extension ERC20WalletService {
         }
         
         return .success
+    }
+    
+    func reportedValue(for transaction: CoinTransaction) -> Decimal? {
+        guard let transaction = transaction as? RichMessageTransaction
+        else {
+            return transaction.amountValue
+        }
+        
+        guard
+            let raw = transaction.getRichValue(for: RichContentKeys.transfer.amount),
+            let reportedValue = AdamantBalanceFormat.deserializeBalance(from: raw)
+        else {
+            return nil
+        }
+        
+        return reportedValue
     }
 }

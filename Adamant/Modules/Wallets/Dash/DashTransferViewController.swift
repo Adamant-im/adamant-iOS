@@ -78,10 +78,6 @@ final class DashTransferViewController: TransferViewControllerBase {
                         
                         service.coinStorage.append(simpleTransaction)
                         try await service.sendTransaction(transaction)
-                        service.coinStorage.updateStatus(
-                            for: transaction.txId,
-                            status: .registered
-                        )
                     } catch {
                         dialogService.showRichError(error: error)
                         service.coinStorage.updateStatus(

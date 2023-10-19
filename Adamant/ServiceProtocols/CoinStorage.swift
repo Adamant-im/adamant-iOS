@@ -6,10 +6,11 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import Foundation
+import Combine
+import CommonKit
 
 protocol CoinStorageService: AnyObject {
-    var transactionsPublisher: Published<[CoinTransaction]>.Publisher {
+    var transactionsPublisher: any Observable<[TransactionDetails]> {
         get
     }
     

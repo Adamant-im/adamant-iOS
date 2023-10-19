@@ -15,11 +15,6 @@ final class DashTransactionsViewController: TransactionsListViewControllerBase {
     var screensFactory: ScreensFactory!
     var dashWalletService: DashWalletService!
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        currencySymbol = DashWalletService.currencySymbol
-    }
-    
     // MARK: - UITableView
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -27,7 +22,7 @@ final class DashTransactionsViewController: TransactionsListViewControllerBase {
             return
         }
 
-        let controller = screensFactory.makeDetailsVC(service: dashWalletService)
+        let controller = screensFactory.makeDetailsVC(service: walletService)
         let transaction = transactions[indexPath.row]
         
         controller.transaction = transaction

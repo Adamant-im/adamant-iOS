@@ -75,20 +75,21 @@ final class AdmWalletService: NSObject, WalletService {
     private (set) var isWarningGasPrice = false
     private var subscriptions = Set<AnyCancellable>()
 
-    @Published private(set) var transactions: [CoinTransaction] = []
-    @Published private(set) var hasMoreOldTransactions: Bool = true
+    @ObservableValue private(set) var transactions: [TransactionDetails] = []
+    @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
 
-    var transactionsPublisher: Published<[CoinTransaction]>.Publisher {
-        $transactions
+    var transactionsPublisher: AnyObservable<[TransactionDetails]> {
+        $transactions.eraseToAnyPublisher()
     }
     
-    var hasMoreOldTransactionsPublisher: Published<Bool>.Publisher {
-        $hasMoreOldTransactions
+    var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
+        $hasMoreOldTransactions.eraseToAnyPublisher()
     }
     
     lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUnicID,
-        coreDataStack: coreDataStack
+        coreDataStack: coreDataStack,
+        blockchainType: richMessageType
     )
     
     // MARK: - State
@@ -125,15 +126,6 @@ final class AdmWalletService: NSObject, WalletService {
             .receive(on: OperationQueue.main)
             .sink { [weak self] _ in
                 self?.wallet = nil
-            }
-            .store(in: &subscriptions)
-    }
-    
-    func addTransactionObserver() {
-        coinStorage.transactionsPublisher
-            .removeDuplicates()
-            .sink { [weak self] transactions in
-                self?.transactions = transactions
             }
             .store(in: &subscriptions)
     }
@@ -187,7 +179,7 @@ final class AdmWalletService: NSObject, WalletService {
     
     func loadTransactions(offset: Int, limit: Int) async throws -> Int { .zero }
     
-    func getLocalTransactionHistory() -> [CoinTransaction] { [] }
+    func getLocalTransactionHistory() -> [TransactionDetails] { [] }
 }
 
 // MARK: - NSFetchedResultsControllerDelegate
@@ -213,7 +205,6 @@ extension AdmWalletService: SwinjectDependentService {
         transfersProvider = container.resolve(TransfersProvider.self)
         coreDataStack = container.resolve(CoreDataStack.self)
         
-        addTransactionObserver()
         Task {
             let controller = await transfersProvider.unreadTransfersController()
             

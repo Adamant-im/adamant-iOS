@@ -116,20 +116,21 @@ final class DogeWalletService: WalletService {
     private static let jsonDecoder = JSONDecoder()
     private var subscriptions = Set<AnyCancellable>()
 
-    @Published private(set) var historyTransactions: [CoinTransaction] = []
-    @Published private(set) var hasMoreOldTransactions: Bool = true
+    @ObservableValue private(set) var historyTransactions: [TransactionDetails] = []
+    @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
 
-    var transactionsPublisher: Published<[CoinTransaction]>.Publisher {
-        $historyTransactions
+    var transactionsPublisher: AnyObservable<[TransactionDetails]> {
+        $historyTransactions.eraseToAnyPublisher()
     }
     
-    var hasMoreOldTransactionsPublisher: Published<Bool>.Publisher {
-        $hasMoreOldTransactions
+    var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
+        $hasMoreOldTransactions.eraseToAnyPublisher()
     }
     
     lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUnicID,
-        coreDataStack: coreDataStack
+        coreDataStack: coreDataStack,
+        blockchainType: richMessageType
     )
     
     // MARK: - State
@@ -192,7 +193,6 @@ final class DogeWalletService: WalletService {
     
     func addTransactionObserver() {
         coinStorage.transactionsPublisher
-            .removeDuplicates()
             .sink { [weak self] transactions in
                 self?.historyTransactions = transactions
             }
@@ -647,7 +647,7 @@ extension DogeWalletService {
         return trs.count
     }
     
-    func getLocalTransactionHistory() -> [CoinTransaction] {
+    func getLocalTransactionHistory() -> [TransactionDetails] {
         historyTransactions
     }
 }

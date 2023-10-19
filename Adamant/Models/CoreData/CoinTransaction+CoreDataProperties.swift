@@ -28,6 +28,8 @@ extension CoinTransaction {
     @NSManaged public var blockId: String?
     @NSManaged public var height: Int64
     @NSManaged public var isConfirmed: Bool
+    @NSManaged public var blockchainType: String
+    @NSManaged public var transactionStatusRaw: Int16
 }
 
 extension CoinTransaction : Identifiable {
