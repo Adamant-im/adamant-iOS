@@ -1,5 +1,5 @@
 //
-//  AdamantRichTransactionStatusService.swift
+//  AdamantTransactionStatusService.swift
 //  Adamant
 //
 //  Created by Andrey Golubenko on 13.01.2023.
@@ -10,7 +10,7 @@ import CoreData
 import Combine
 import CommonKit
 
-actor AdamantRichTransactionStatusService: NSObject, RichTransactionStatusService {
+actor AdamantTransactionStatusService: NSObject, TransactionStatusService {
     private let richProviders: [String: RichMessageProviderWithStatusCheck]
     private let coreDataStack: CoreDataStack
 
@@ -55,7 +55,7 @@ actor AdamantRichTransactionStatusService: NSObject, RichTransactionStatusServic
     }
 }
 
-extension AdamantRichTransactionStatusService: NSFetchedResultsControllerDelegate {
+extension AdamantTransactionStatusService: NSFetchedResultsControllerDelegate {
     nonisolated func controller(
         _: NSFetchedResultsController<NSFetchRequestResult>,
         didChange object: Any,
@@ -68,7 +68,7 @@ extension AdamantRichTransactionStatusService: NSFetchedResultsControllerDelegat
     }
 }
 
-private extension AdamantRichTransactionStatusService {
+private extension AdamantTransactionStatusService {
     func setupNetworkSubscription() {
         networkSubscription = NotificationCenter.default
             .publisher(for: .AdamantReachabilityMonitor.reachabilityChanged)
@@ -111,7 +111,7 @@ private extension AdamantRichTransactionStatusService {
         let oldPendingAttempts = oldPendingAttempts[id] ?? .init(wrappedValue: .zero)
         self.oldPendingAttempts[id] = oldPendingAttempts
 
-        let publisher = RichTransactionStatusPublisher(
+        let publisher = TransactionStatusPublisher(
             provider: provider,
             transaction: transaction,
             oldPendingAttempts: oldPendingAttempts

@@ -10,7 +10,7 @@ import Combine
 import Foundation
 import CommonKit
 
-actor RichTransactionStatusSubscription<StatusSubscriber: Subscriber>: Subscription where
+actor TransactionStatusSubscription<StatusSubscriber: Subscriber>: Subscription where
     StatusSubscriber.Input == TransactionStatus,
     StatusSubscriber.Failure == Never {
     private let provider: RichMessageProviderWithStatusCheck
@@ -68,7 +68,7 @@ actor RichTransactionStatusSubscription<StatusSubscriber: Subscriber>: Subscript
     }
 }
 
-private extension RichTransactionStatusSubscription {
+private extension TransactionStatusSubscription {
     enum State {
         case new
         case old

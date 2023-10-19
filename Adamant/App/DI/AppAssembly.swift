@@ -215,14 +215,14 @@ struct AppAssembly: Assembly {
         }.inObjectScope(.container)
         
         // MARK: Rich transaction status service
-        container.register(RichTransactionStatusService.self) { r in
+        container.register(TransactionStatusService.self) { r in
             let accountService = r.resolve(AccountService.self)!
             
             let richProviders = accountService.wallets
                 .compactMap { $0 as? RichMessageProviderWithStatusCheck }
                 .map { ($0.dynamicRichMessageType, $0) }
             
-            return AdamantRichTransactionStatusService(
+            return AdamantTransactionStatusService(
                 coreDataStack: r.resolve(CoreDataStack.self)!,
                 richProviders: Dictionary(uniqueKeysWithValues: richProviders)
             )

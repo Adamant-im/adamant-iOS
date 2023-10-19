@@ -10,7 +10,7 @@ import Foundation
 import Combine
 import CommonKit
 
-struct RichTransactionStatusPublisher: Publisher {
+struct TransactionStatusPublisher: Publisher {
     typealias Output = TransactionStatus
     typealias Failure = Never
     
@@ -21,7 +21,7 @@ struct RichTransactionStatusPublisher: Publisher {
     func receive<S>(
         subscriber: S
     ) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-        let subscription = RichTransactionStatusSubscription(
+        let subscription = TransactionStatusSubscription(
             provider: provider,
             transaction: transaction,
             oldPendingAttempts: oldPendingAttempts,
