@@ -53,12 +53,16 @@ extension BtcWalletService {
         10
     }
     
+    var minNodeVersion: String? {
+        nil
+    }
+    
     static let explorerAddress = "https://explorer.btc.com/btc/transaction/"
     
     static var nodes: [Node] {
         [
-            Node(url: URL(string: "https://btcnode1.adamant.im")!),
-Node(url: URL(string: "https://btcnode2.adamant.im")!),
+            Node(url: URL(string: "https://btcnode1.adamant.im")!, altUrl: URL(string: "http://176.9.38.204:44099")),
+Node(url: URL(string: "https://btcnode2.adamant.im")!, altUrl: URL(string: "http://176.9.32.126:44099")),
         ]
     }
     

@@ -73,11 +73,16 @@ extension EthWalletService {
         20
     }
     
+    var minNodeVersion: String? {
+        nil
+    }
+    
     static let explorerAddress = "https://etherscan.io/tx/"
     
     static var nodes: [Node] {
         [
-            Node(url: URL(string: "https://ethnode1.adamant.im")!),
+            Node(url: URL(string: "https://ethnode1.adamant.im")!, altUrl: URL(string: "http://95.216.41.106:44099")),
+Node(url: URL(string: "https://ethnode2.adamant.im")!, altUrl: URL(string: "http://95.216.114.252:44099")),
         ]
     }
     

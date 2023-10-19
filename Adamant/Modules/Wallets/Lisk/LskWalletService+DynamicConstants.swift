@@ -53,6 +53,10 @@ extension LskWalletService {
         60
     }
     
+    var minNodeVersion: String? {
+        nil
+    }
+    
     static let explorerAddress = "https://liskscan.com/transaction/"
     
     static var nodes: [Node] {

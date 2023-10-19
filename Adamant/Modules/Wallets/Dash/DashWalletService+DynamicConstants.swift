@@ -53,6 +53,10 @@ extension DashWalletService {
         80
     }
     
+    var minNodeVersion: String? {
+        nil
+    }
+    
     static let explorerAddress = "https://dashblockexplorer.com/tx/"
     
     static var nodes: [Node] {
