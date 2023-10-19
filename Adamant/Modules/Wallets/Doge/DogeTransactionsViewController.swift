@@ -16,11 +16,6 @@ final class DogeTransactionsViewController: TransactionsListViewControllerBase {
     var dogeWalletService: DogeWalletService!
     var screensFactory: ScreensFactory!
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        currencySymbol = DogeWalletService.currencySymbol
-    }
-    
     // MARK: - UITableView
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

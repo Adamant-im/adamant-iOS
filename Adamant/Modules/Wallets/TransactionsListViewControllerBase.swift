@@ -60,7 +60,9 @@ class TransactionsListViewControllerBase: UIViewController {
     private var offset = 0
     
     private lazy var dataSource = TransactionsDiffableDataSource(tableView: tableView, cellProvider: makeCell)
-
+    
+    var currencySymbol: String { walletService.tokenSymbol }
+    
     // MARK: - IBOutlets
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var emptyLabel: UILabel!
@@ -253,8 +255,8 @@ class TransactionsListViewControllerBase: UIViewController {
         ? .zero
         : UITableView.defaultTransactionsSeparatorInset
         
-        cell.transaction = model.value
         cell.currencySymbol = currencySymbol
+        cell.transaction = model.value
         return cell
     }
     
@@ -283,69 +285,10 @@ class TransactionsListViewControllerBase: UIViewController {
     func reloadData() {
         
     }
-    
-    var currencySymbol: String?
 }
 
 // MARK: - UITableViewDataSource, UITableViewDelegate
 extension TransactionsListViewControllerBase: UITableViewDelegate {
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-    
-    // MARK: Cells
-    
-    func configureCell(
-        _ cell: TransactionTableViewCell,
-        transactionType: TransactionTableViewCell.TransactionType,
-        transactionStatus: TransactionStatus?,
-        partnerId: String,
-        partnerName: String?,
-        amount: Decimal,
-        date: Date?
-    ) {
-        cell.backgroundColor = .clear
-        cell.accountLabel.tintColor = UIColor.adamant.primary
-        cell.ammountLabel.tintColor = UIColor.adamant.primary
-        
-        cell.dateLabel.textColor = transactionStatus?.color ?? .adamant.secondary
-        
-        switch transactionStatus {
-        case .success, .inconsistent:
-            if let date = date {
-                cell.dateLabel.text = date.humanizedDateTime()
-            } else {
-                cell.dateLabel.text = nil
-            }
-        case .notInitiated:
-            cell.dateLabel.text = TransactionDetailsViewControllerBase.awaitingValueString
-        case .failed:
-            cell.dateLabel.text = TransactionStatus.failed.localized
-        default:
-            cell.dateLabel.text = TransactionStatus.pending.localized
-        }
-        
-        cell.transactionType = transactionType
-        
-        if let partnerName = partnerName {
-            cell.accountLabel.text = partnerName
-            cell.addressLabel.text = partnerId
-            cell.addressLabel.lineBreakMode = .byTruncatingMiddle
-            
-            if cell.addressLabel.isHidden {
-                cell.addressLabel.isHidden = false
-            }
-        } else {
-            cell.accountLabel.text = partnerId
-            
-            if !cell.addressLabel.isHidden {
-                cell.addressLabel.isHidden = true
-            }
-        }
-        
-        cell.ammountLabel.text = AdamantBalanceFormat.full.format(amount, withCurrencySymbol: currencySymbol)
-    }
-    
     func bottomIndicatorView() -> UIActivityIndicatorView {
         var activityIndicatorView = UIActivityIndicatorView()
         

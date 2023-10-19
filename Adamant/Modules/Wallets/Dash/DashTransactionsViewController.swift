@@ -15,11 +15,6 @@ final class DashTransactionsViewController: TransactionsListViewControllerBase {
     var screensFactory: ScreensFactory!
     var dashWalletService: DashWalletService!
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        currencySymbol = DashWalletService.currencySymbol
-    }
-    
     // MARK: - UITableView
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

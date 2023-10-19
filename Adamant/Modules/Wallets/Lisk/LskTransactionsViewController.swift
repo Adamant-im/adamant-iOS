@@ -19,13 +19,6 @@ final class LskTransactionsViewController: TransactionsListViewControllerBase {
     var lskWalletService: LskWalletService!
     var screensFactory: ScreensFactory!
     
-    // MARK: - Properties
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        currencySymbol = LskWalletService.currencySymbol
-    }
-    
     // MARK: - UITableView
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

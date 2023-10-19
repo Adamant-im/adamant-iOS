@@ -24,11 +24,6 @@ final class ERC20TransactionsViewController: TransactionsListViewControllerBase 
 
     private var ethAddress: String = ""
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        currencySymbol = walletService.tokenSymbol
-    }
-    
     // MARK: - UITableView
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

@@ -17,11 +17,6 @@ final class BtcTransactionsViewController: TransactionsListViewControllerBase {
     var screensFactory: ScreensFactory!
     var addressBook: AddressBookService!
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        currencySymbol = BtcWalletService.currencySymbol
-    }
-    
     // MARK: - UITableView
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

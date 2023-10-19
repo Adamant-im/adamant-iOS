@@ -23,11 +23,6 @@ final class EthTransactionsViewController: TransactionsListViewControllerBase {
     // MARK: - Properties
     private var ethAddress: String = ""
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        currencySymbol = EthWalletService.currencySymbol
-    }
-    
     // MARK: - UITableView
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

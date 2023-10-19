@@ -71,7 +71,6 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
             reloadData()
         }
         
-        currencySymbol = AdmWalletService.currencySymbol
         setupObserver()
     }
     
