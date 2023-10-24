@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct SimpleTransactionDetails: TransactionDetails {
+struct SimpleTransactionDetails: AdamantTransactionDetails {
     var defaultCurrencySymbol: String?
     
     var txId: String
@@ -40,7 +40,20 @@ struct SimpleTransactionDetails: TransactionDetails {
     var showToChat: Bool?
     var chatRoom: Chatroom?
     
-    init(defaultCurrencySymbol: String? = nil, txId: String, senderAddress: String, recipientAddress: String, dateValue: Date? = nil, amountValue: Decimal? = nil, feeValue: Decimal? = nil, confirmationsValue: String? = nil, blockValue: String? = nil, isOutgoing: Bool, transactionStatus: TransactionStatus? = nil, partnerName: String? = nil) {
+    init(
+        defaultCurrencySymbol: String? = nil,
+        txId: String,
+        senderAddress: String,
+        recipientAddress: String,
+        dateValue: Date? = nil,
+        amountValue: Decimal? = nil,
+        feeValue: Decimal? = nil,
+        confirmationsValue: String? = nil,
+        blockValue: String? = nil,
+        isOutgoing: Bool,
+        transactionStatus: TransactionStatus? = nil,
+        partnerName: String? = nil
+    ) {
         self.defaultCurrencySymbol = defaultCurrencySymbol
         self.txId = txId
         self.senderAddress = senderAddress
@@ -66,6 +79,25 @@ struct SimpleTransactionDetails: TransactionDetails {
         self.confirmationsValue = transaction.confirmationsValue
         self.blockValue = transaction.blockValue
         self.isOutgoing = transaction.isOutgoing
+        self.transactionStatus = transaction.transactionStatus
+    }
+    
+    init(_ transaction: TransferTransaction) {
+        self.defaultCurrencySymbol = transaction.defaultCurrencySymbol
+        self.txId = transaction.txId
+        self.senderAddress = transaction.senderAddress
+        self.recipientAddress = transaction.recipientAddress
+        self.dateValue = transaction.dateValue
+        self.amountValue = transaction.amountValue
+        self.feeValue = transaction.feeValue
+        self.confirmationsValue = transaction.confirmationsValue
+        self.blockValue = transaction.blockValue
+        self.isOutgoing = transaction.isOutgoing
+        self.transactionStatus = transaction.transactionStatus
+        self.showToChat = transaction.showToChat
+        self.chatRoom = transaction.chatRoom
+        self.partnerName = transaction.partnerName
+        self.comment = transaction.comment
         self.transactionStatus = transaction.transactionStatus
     }
 }

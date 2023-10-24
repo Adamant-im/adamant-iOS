@@ -107,7 +107,7 @@ final class LskWalletService: WalletService {
         $hasMoreOldTransactions.eraseToAnyPublisher()
     }
     
-    lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
+    private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUnicID,
         coreDataStack: coreDataStack,
         blockchainType: richMessageType

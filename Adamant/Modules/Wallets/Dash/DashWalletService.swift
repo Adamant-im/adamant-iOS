@@ -137,7 +137,7 @@ final class DashWalletService: WalletService {
         $hasMoreOldTransactions.eraseToAnyPublisher()
     }
     
-    lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
+    private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUnicID,
         coreDataStack: coreDataStack,
         blockchainType: richMessageType
@@ -203,7 +203,6 @@ final class DashWalletService: WalletService {
     
     func addTransactionObserver() {
         coinStorage.transactionsPublisher
-     //       .removeDuplicates()
             .sink { [weak self] transactions in
                 self?.historyTransactions = transactions
             }
@@ -447,8 +446,6 @@ extension DashWalletService {
         let maxPerRequest = availableToLoad > limit
         ? limit
         : availableToLoad
-        
-        //let ids = Array(allTransactionsIds[offset..<(offset + maxPerRequest)])
         
         let startIndex = allTransactionsIds.index(allTransactionsIds.startIndex, offsetBy: offset)
         let endIndex = allTransactionsIds.index(startIndex, offsetBy: maxPerRequest)

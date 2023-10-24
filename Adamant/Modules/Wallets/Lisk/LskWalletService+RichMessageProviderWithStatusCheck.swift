@@ -94,17 +94,10 @@ private extension LskWalletService {
             let min = reported - reported*0.005
             let max = reported + reported*0.005
             
-            guard (min...max).contains(lskTransaction.amountValue ?? 0) else {
-                return false
-            }
-            
-            return true
+            let amount = lskTransaction.amountValue ?? 0
+            return amount <= max && amount >= min
         }
         
-        guard transaction.amountValue == lskTransaction.amountValue else {
-            return false
-        }
-        
-        return true
+        return transaction.amountValue == lskTransaction.amountValue
     }
 }

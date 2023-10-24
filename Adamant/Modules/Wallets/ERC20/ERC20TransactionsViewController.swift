@@ -27,12 +27,12 @@ final class ERC20TransactionsViewController: TransactionsListViewControllerBase 
     // MARK: - UITableView
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let address = walletService.wallet?.address else { return }
+        guard let address = walletService.wallet?.address,
+              let transaction = transactions[safe: indexPath.row]
+        else { return }
         
         tableView.deselectRow(at: indexPath, animated: true)
-        
-        let transaction = transactions[indexPath.row]
-        
+                
         let vc = screensFactory.makeDetailsVC(service: ercWalletService)
         
         vc.transaction = transaction

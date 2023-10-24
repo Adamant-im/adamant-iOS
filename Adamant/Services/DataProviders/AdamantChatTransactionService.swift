@@ -234,6 +234,7 @@ actor AdamantChatTransactionService: ChatTransactionService {
         let transfer: TransferTransaction
         if let trs = getTransfer(id: String(transaction.id), context: context) {
             transfer = trs
+            // TODO: Fix it later. (Server side)
             if transfer.confirmations < transaction.confirmations {
                 transfer.confirmations = transaction.confirmations
             }

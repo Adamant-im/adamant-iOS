@@ -86,7 +86,7 @@ final class AdmWalletService: NSObject, WalletService {
         $hasMoreOldTransactions.eraseToAnyPublisher()
     }
     
-    lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
+    private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUnicID,
         coreDataStack: coreDataStack,
         blockchainType: richMessageType

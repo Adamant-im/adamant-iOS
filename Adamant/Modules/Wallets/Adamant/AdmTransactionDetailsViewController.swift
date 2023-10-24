@@ -31,6 +31,16 @@ final class AdmTransactionDetailsViewController: TransactionDetailsViewControlle
         return control
     }()
     
+    override var transaction: TransactionDetails? {
+        get { super.transaction }
+        set { assertionFailure("Use adamant transaction") }
+    }
+    
+    var adamantTransaction: AdamantTransactionDetails? {
+        get { super.transaction as? AdamantTransactionDetails }
+        set { super.transaction = newValue }
+    }
+    
     // MARK: - Lifecycle
     
     init(
@@ -62,8 +72,7 @@ final class AdmTransactionDetailsViewController: TransactionDetailsViewControlle
         super.viewDidLoad()
         
         if showToChat,
-           let trs = transaction as? SimpleTransactionDetails,
-           trs.chatRoom != nil,
+           adamantTransaction?.chatRoom != nil,
            let section = form.sectionBy(tag: Sections.actions.tag) {
             let chatLabel = String.adamant.transactionList.toChat
             
@@ -103,18 +112,7 @@ final class AdmTransactionDetailsViewController: TransactionDetailsViewControlle
     }
     
     func goToChat() {
-        var chatRoom: Chatroom?
-        
-        if let transfer = transaction as? SimpleTransactionDetails {
-            chatRoom = transfer.chatRoom
-        }
-        
-        if let transfer = transaction as? TransferTransaction {
-            let partner = transfer.partner as? CoreDataAccount
-            chatRoom = partner?.chatroom
-        }
-
-        guard let chatroom = chatRoom else {
+        guard let chatroom = adamantTransaction?.chatRoom else {
             dialogService.showError(withMessage: "AdmTransactionDetailsViewController: Failed to get chatroom for transaction.", supportEmail: true, error: nil)
             return
         }
@@ -150,7 +148,7 @@ final class AdmTransactionDetailsViewController: TransactionDetailsViewControlle
             
             do {
                 try await transfersProvider.refreshTransfer(id: id)
-                transaction = await transfersProvider.getTransfer(id: id)
+                adamantTransaction = await transfersProvider.getTransfer(id: id)
                 refreshControl.endRefreshing()
                 tableView.reloadData()
             } catch {

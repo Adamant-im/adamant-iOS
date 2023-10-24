@@ -18,13 +18,11 @@ final class DashTransactionsViewController: TransactionsListViewControllerBase {
     // MARK: - UITableView
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let address = walletService.wallet?.address else {
-            return
-        }
+        guard let address = walletService.wallet?.address,
+              let transaction = transactions[safe: indexPath.row]
+        else { return }
 
-        let controller = screensFactory.makeDetailsVC(service: walletService)
-        let transaction = transactions[indexPath.row]
-        
+        let controller = screensFactory.makeDetailsVC(service: walletService)        
         controller.transaction = transaction
         
         if transaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {

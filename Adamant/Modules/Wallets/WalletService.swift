@@ -315,7 +315,7 @@ protocol WalletServiceSimpleSend: WalletServiceWithSend {
         amount: Decimal,
         comments: String,
         replyToMessageId: String?
-    ) async throws -> TransactionDetails
+    ) async throws -> AdamantTransactionDetails
 }
 
 protocol WalletServiceTwoStepSend: WalletServiceWithSend {

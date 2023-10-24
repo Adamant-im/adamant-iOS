@@ -21,9 +21,9 @@ final class BtcTransactionsViewController: TransactionsListViewControllerBase {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        guard let address = btcWalletService.wallet?.address else { return }
-        
-        let transaction = transactions[indexPath.row]
+        guard let address = btcWalletService.wallet?.address,
+              let transaction = transactions[safe: indexPath.row]
+        else { return }
         
         let controller = screensFactory.makeDetailsVC(service: btcWalletService)
         

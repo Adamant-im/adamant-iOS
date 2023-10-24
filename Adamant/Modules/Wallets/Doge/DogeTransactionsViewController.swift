@@ -19,13 +19,11 @@ final class DogeTransactionsViewController: TransactionsListViewControllerBase {
     // MARK: - UITableView
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let address = walletService.wallet?.address else {
-            return
-        }
+        guard let address = walletService.wallet?.address,
+              let transaction = transactions[safe: indexPath.row]
+        else { return }
         
         let controller = screensFactory.makeDetailsVC(service: dogeWalletService)
-        let transaction = transactions[indexPath.row]
-        
         controller.transaction = transaction
         
         if transaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {

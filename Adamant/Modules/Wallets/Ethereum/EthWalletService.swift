@@ -169,7 +169,7 @@ final class EthWalletService: WalletService {
         $hasMoreOldTransactions.eraseToAnyPublisher()
     }
     
-    lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
+    private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUnicID,
         coreDataStack: coreDataStack,
         blockchainType: richMessageType
@@ -654,7 +654,6 @@ extension EthWalletService {
         } catch let error as Web3Error {
             throw error.asWalletServiceError()
         } catch {
-            print("error=\(error)")
             throw WalletServiceError.remoteServiceError(message: "Failed to get transaction")
         }
         

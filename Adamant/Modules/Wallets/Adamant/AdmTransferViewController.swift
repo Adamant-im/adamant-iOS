@@ -129,13 +129,13 @@ final class AdmTransferViewController: TransferViewControllerBase {
     }
     
     private func openDetailVC(
-        result: TransactionDetails,
+        result: AdamantTransactionDetails,
         vc: AdmTransferViewController,
         recipient: String,
         comments: String
     ) {
         let detailsVC = screensFactory.makeAdmTransactionDetails()
-        detailsVC.transaction = result
+        detailsVC.adamantTransaction = result
         
         if comments.count > 0 {
             detailsVC.comment = comments

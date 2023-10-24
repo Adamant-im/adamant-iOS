@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3A20D93B2AE7F316005475A6 /* AdamantTransactionDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A20D93A2AE7F316005475A6 /* AdamantTransactionDetails.swift */; };
 		3A2F55F92AC6F308000A3F26 /* CoinTransaction+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A2F55F72AC6F308000A3F26 /* CoinTransaction+CoreDataClass.swift */; };
 		3A2F55FA2AC6F308000A3F26 /* CoinTransaction+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A2F55F82AC6F308000A3F26 /* CoinTransaction+CoreDataProperties.swift */; };
 		3A2F55FC2AC6F885000A3F26 /* CoinStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A2F55FB2AC6F885000A3F26 /* CoinStorage.swift */; };
@@ -595,6 +596,7 @@
 /* Begin PBXFileReference section */
 		33975C0D891698AA7E74EBCC /* Pods_Adamant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Adamant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		36AB8CE9537B3B873972548B /* Pods_AdmCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AdmCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3A20D93A2AE7F316005475A6 /* AdamantTransactionDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantTransactionDetails.swift; sourceTree = "<group>"; };
 		3A2F55F72AC6F308000A3F26 /* CoinTransaction+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoinTransaction+CoreDataClass.swift"; sourceTree = "<group>"; };
 		3A2F55F82AC6F308000A3F26 /* CoinTransaction+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoinTransaction+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		3A2F55FB2AC6F885000A3F26 /* CoinStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinStorage.swift; sourceTree = "<group>"; };
@@ -1183,6 +1185,15 @@
 				4A4D67BD3DC89C07D1351248 /* Pods-AdmCore.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		3A20D9392AE7F305005475A6 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				64BD2B7620E2820300E2CD36 /* TransactionDetails.swift */,
+				3A20D93A2AE7F316005475A6 /* AdamantTransactionDetails.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		3A41938D2A580C3B006A6B22 /* RichTransactionReactService */ = {
@@ -1935,6 +1946,7 @@
 		E940086C2114A8FD00CD2D67 /* Wallets */ = {
 			isa = PBXGroup;
 			children = (
+				3A20D9392AE7F305005475A6 /* Models */,
 				3A770E4A2AE14EFD0008D98F /* Mappers */,
 				93A18C872AAEAE5600D0AB98 /* DI */,
 				A50A41022822F8CE006BDFE1 /* Bitcoin */,
@@ -1953,7 +1965,6 @@
 				E926E02D213EAABF005E536B /* TransferViewControllerBase+Alert.swift */,
 				E9E7CDC12003F5A400DFC4DB /* TransactionsListViewControllerBase.swift */,
 				E94E7B0B205D5E4A0042B639 /* TransactionsListViewControllerBase.xib */,
-				64BD2B7620E2820300E2CD36 /* TransactionDetails.swift */,
 				64FA53D020E24941006783C9 /* TransactionDetailsViewControllerBase.swift */,
 				E9E7CDC52003F6D200DFC4DB /* TransactionTableViewCell.swift */,
 				E9E7CDC62003F6D200DFC4DB /* TransactionTableViewCell.xib */,
@@ -3021,6 +3032,7 @@
 				6416B1A121AD7D93006089AC /* LskTransferViewController.swift in Sources */,
 				A5E0422B282AB18B0076CD13 /* BtcUnspentTransactionResponse.swift in Sources */,
 				E972206B201F44CA004F2AAD /* TransfersProvider.swift in Sources */,
+				3A20D93B2AE7F316005475A6 /* AdamantTransactionDetails.swift in Sources */,
 				93294B962AAD320B00911109 /* ScreensFactory.swift in Sources */,
 				E9FEECA421413659007DD7C8 /* RichMessageProvider.swift in Sources */,
 				3A9015A72A614A62002A2464 /* AdamantEmojiService.swift in Sources */,

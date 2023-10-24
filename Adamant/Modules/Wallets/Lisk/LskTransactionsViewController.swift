@@ -23,9 +23,10 @@ final class LskTransactionsViewController: TransactionsListViewControllerBase {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        guard let address = lskWalletService.wallet?.address else { return }
+        guard let address = lskWalletService.wallet?.address,
+              let transaction = transactions[safe: indexPath.row]
+        else { return }
         
-        let transaction = transactions[indexPath.row]
         let controller = screensFactory.makeDetailsVC(service: lskWalletService)
         
         controller.transaction = transaction

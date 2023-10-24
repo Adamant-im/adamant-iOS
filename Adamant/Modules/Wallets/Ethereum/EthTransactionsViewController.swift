@@ -26,10 +26,11 @@ final class EthTransactionsViewController: TransactionsListViewControllerBase {
     // MARK: - UITableView
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let address = ethWalletService.wallet?.address else { return }
+        guard let address = ethWalletService.wallet?.address,
+              let transaction = transactions[safe: indexPath.row]
+        else { return }
         
         tableView.deselectRow(at: indexPath, animated: true)
-        let transaction = transactions[indexPath.row]
         let vc = screensFactory.makeDetailsVC(service: ethWalletService)
         
         vc.transaction = transaction

@@ -204,12 +204,6 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
         
         var simple = SimpleTransactionDetails(transaction)
         simple.partnerName = getPartnerName(for: partnerId)
-        simple.showToChat = toShowChat(for: transaction)
-        simple.comment = transaction.comment
-
-        let partner = transaction.partner as? CoreDataAccount
-        let chatroom = partner?.chatroom
-        simple.chatRoom = chatroom
         return simple
     }
     
@@ -227,10 +221,10 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
     // MARK: - UITableView
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let transaction = transactions[indexPath.row]
+        guard let transaction = transactions[safe: indexPath.row] else { return }
         
         let controller = screensFactory.makeAdmTransactionDetails()
-        controller.transaction = transaction
+        controller.adamantTransaction = transaction
         controller.comment = transaction.comment
         controller.showToChat = transaction.showToChat ?? false
 
@@ -256,10 +250,9 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
     func tableView(
         _ tableView: UITableView,
         trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
-    ) -> UISwipeActionsConfiguration? {
-        let transaction = transactions[indexPath.row]
-        
-        guard transaction.showToChat == true,
+    ) -> UISwipeActionsConfiguration? {        
+        guard let transaction = transactions[safe: indexPath.row],
+              transaction.showToChat == true,
               let chatroom = transaction.chatRoom
         else {
             return nil
@@ -329,7 +322,6 @@ private extension AdmTransactionsViewController {
                         $0.txId == transaction.txId
                     })
                     else { return }
-                    
                     var transactions: [SimpleTransactionDetails] = self.transactions
                     transactions[index] = self.getTransactionDetails(by: transaction)
                     self.update(transactions)
