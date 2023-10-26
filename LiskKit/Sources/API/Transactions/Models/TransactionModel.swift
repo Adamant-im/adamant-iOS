@@ -50,6 +50,8 @@ extension Transactions {
         public let signature: String
 
         public var confirmations: UInt64?
+        
+        public var isOutgoing: Bool = false
 
         // MARK: - Hashable
 

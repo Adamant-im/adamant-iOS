@@ -9,7 +9,7 @@
 import Foundation
 import BitcoinKit
 
-class DashTransaction: BaseBtcTransaction {
+final class DashTransaction: BaseBtcTransaction {
     override var defaultCurrencySymbol: String? { DashWalletService.currencySymbol }
 }
 

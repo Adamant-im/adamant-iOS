@@ -64,7 +64,8 @@ public struct TransactionEntity {
 
     public struct Asset {
         public var amount: UInt64
-        public var recipientAddress: String
+        public var recipientAddressBase32: String
+        public var recipientAddressBinary: String
         public var data: String = ""
         
         public func bytes() -> [UInt8] {
@@ -72,8 +73,8 @@ public struct TransactionEntity {
             value += generateKey(for: 1, with: 0)
             value += writeUInt64(amount)
             value += generateKey(for: 2, with: 2)
-            value += writeUInt32(UInt32(recipientAddress.allHexBytes().count))
-            value += recipientAddress.allHexBytes()
+            value += writeUInt32(UInt32(recipientAddressBinary.allHexBytes().count))
+            value += recipientAddressBinary.allHexBytes()
             value += generateKey(for: 3, with: 2)
             value += writeUInt32(UInt32(data.bytes.count))
             if data.count > 0 {
@@ -85,7 +86,7 @@ public struct TransactionEntity {
         public var requestOptions: RequestOptions {
             let options: RequestOptions = [
                 "amount": "\(amount)",
-                "recipientAddress": recipientAddress,
+                "recipientAddress": recipientAddressBinary,
                 "data": data
             ]
             
@@ -111,17 +112,43 @@ public struct TransactionEntity {
         self.signatures = signatures
     }
 
-    public init(amount: Decimal, fee: Decimal, nonce: String, senderPublicKey: String, recipientAddress: String) {
+    public init(
+        amount: Decimal,
+        fee: Decimal,
+        nonce: String,
+        senderPublicKey: String,
+        recipientAddressBase32: String,
+        recipientAddressBinary: String
+    ) {
         let amount = Crypto.fixedPoint(amount: amount)
         let fee = Crypto.fixedPoint(amount: fee)
-        self.init(amount: amount, fee: fee, nonce: nonce, senderPublicKey: senderPublicKey, recipientAddress: recipientAddress)
+        self.init(
+            amount: amount,
+            fee: fee,
+            nonce: nonce,
+            senderPublicKey: senderPublicKey,
+            recipientAddressBase32: recipientAddressBase32,
+            recipientAddressBinary: recipientAddressBinary
+        )
     }
 
-    public init(amount: UInt64, fee: UInt64, nonce: String, senderPublicKey: String, recipientAddress: String, signatures: [String] = []) {
+    public init(
+        amount: UInt64,
+        fee: UInt64,
+        nonce: String,
+        senderPublicKey: String,
+        recipientAddressBase32: String,
+        recipientAddressBinary: String,
+        signatures: [String] = []
+    ) {
         self.fee = fee
         self.nonce = UInt64(nonce) ?? 0
         self.senderPublicKey = senderPublicKey
-        self.asset = .init(amount: amount, recipientAddress: recipientAddress)
+        self.asset = .init(
+            amount: amount,
+            recipientAddressBase32: recipientAddressBase32,
+            recipientAddressBinary: recipientAddressBinary
+        )
         self.signatures = signatures
     }
     
