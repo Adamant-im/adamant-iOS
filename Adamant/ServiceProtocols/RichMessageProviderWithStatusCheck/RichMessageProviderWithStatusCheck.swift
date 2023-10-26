@@ -14,5 +14,5 @@ struct TransactionStatusInfo {
 }
 
 protocol RichMessageProviderWithStatusCheck: RichMessageProvider {
-    func statusInfoFor(transaction: RichMessageTransaction) async -> TransactionStatusInfo
+    func statusInfoFor(transaction: CoinTransaction) async -> TransactionStatusInfo
 }

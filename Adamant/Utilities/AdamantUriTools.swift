@@ -50,7 +50,7 @@ enum AdamantAddressParam {
     }
 }
 
-class AdamantUriTools {
+final class AdamantUriTools {
     static let AdamantProtocol = "adm"
     
     static func encode(request: AdamantUri) -> String {

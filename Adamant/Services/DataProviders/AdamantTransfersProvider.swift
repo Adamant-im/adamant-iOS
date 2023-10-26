@@ -378,7 +378,7 @@ extension AdamantTransfersProvider {
         amount: Decimal,
         comment: String?,
         replyToMessageId: String?
-    ) async throws -> TransactionDetails {
+    ) async throws -> AdamantTransactionDetails {
         let comment = comment ?? ""
         if !comment.isEmpty || replyToMessageId != nil {
             return try await transferFundsInternal(
@@ -400,7 +400,7 @@ extension AdamantTransfersProvider {
         amount: Decimal,
         comment: String,
         replyToMessageId: String?
-    ) async throws -> TransactionDetails {
+    ) async throws -> AdamantTransactionDetails {
         // MARK: 0. Prepare
         guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
             throw TransfersProviderError.notLogged
@@ -555,7 +555,7 @@ extension AdamantTransfersProvider {
     private func transferFundsInternal(
         toAddress recipient: String,
         amount: Decimal
-    ) async throws -> TransactionDetails {
+    ) async throws -> AdamantTransactionDetails {
         // MARK: 0. Prepare
         guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
             throw TransfersProviderError.notLogged
@@ -686,7 +686,7 @@ extension AdamantTransfersProvider {
                 )
             }
             
-            if let trs = self.stack.container.viewContext.object(with: transaction.objectID) as? TransactionDetails {
+            if let trs = self.stack.container.viewContext.object(with: transaction.objectID) as? AdamantTransactionDetails {
                 return trs
             } else {
                 throw TransfersProviderError.internalError(
@@ -1056,7 +1056,7 @@ extension AdamantTransfersProvider {
                 Set(unreadTransactions.compactMap { $0.chatroom }).forEach { $0.hasUnreadMessages = true }
             }
         }
-                
+        
         // MARK: 6. Dump transactions to viewContext
         do {
             let rooms = transfers.compactMap { $0.chatroom }
@@ -1071,12 +1071,12 @@ extension AdamantTransfersProvider {
     }
     
     @MainActor func updateContext(rooms: [Chatroom]) async {
-         let viewContextChatrooms = Set<Chatroom>(rooms).compactMap {
-             self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom
-         }
-
-         for chatroom in viewContextChatrooms {
-             await chatroom.updateLastTransaction()
-         }
-     }
+        let viewContextChatrooms = Set<Chatroom>(rooms).compactMap {
+            self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom
+        }
+        
+        for chatroom in viewContextChatrooms {
+            chatroom.updateLastTransaction()
+        }
+    }
 }

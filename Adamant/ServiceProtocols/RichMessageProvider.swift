@@ -10,7 +10,7 @@ import Foundation
 import MessageKit
 import UIKit
 
-protocol RichMessageProvider: AnyObject {
+protocol RichMessageProvider: WalletService {
     /// Lowercased!!
     static var richMessageType: String { get }
     
@@ -27,9 +27,6 @@ protocol RichMessageProvider: AnyObject {
     
     var tokenSymbol: String { get }
     var tokenLogo: UIImage { get }
-    
-    // MARK: Events
-    func richMessageTapped(for transaction: RichMessageTransaction, in chat: ChatViewController)
     
     // MARK: Chats list
     func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString
