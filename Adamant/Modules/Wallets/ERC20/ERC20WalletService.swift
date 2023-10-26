@@ -101,6 +101,7 @@ final class ERC20WalletService: WalletService {
     var apiService: ApiService!
     var dialogService: DialogService!
     var increaseFeeService: IncreaseFeeService!
+    var vibroService: VibroService!
     var coreDataStack: CoreDataStack!
     
     // MARK: - Notifications
@@ -285,6 +286,7 @@ final class ERC20WalletService: WalletService {
         if let balance = try? await getBalance(forAddress: wallet.ethAddress) {
             wallet.isBalanceInitialized = true
             let notification: Notification.Name?
+            let isRaised = (wallet.balance < balance) && !initialBalanceCheck
             
             if wallet.balance != balance {
                 wallet.balance = balance
@@ -295,6 +297,10 @@ final class ERC20WalletService: WalletService {
                 notification = walletUpdatedNotification
             } else {
                 notification = nil
+            }
+            
+            if isRaised {
+                vibroService.applyVibration(.success)
             }
             
             if let notification = notification {
@@ -463,6 +469,7 @@ extension ERC20WalletService: SwinjectDependentService {
         apiService = container.resolve(ApiService.self)
         dialogService = container.resolve(DialogService.self)
         increaseFeeService = container.resolve(IncreaseFeeService.self)
+        vibroService = container.resolve(VibroService.self)
         coreDataStack = container.resolve(CoreDataStack.self)
         
         addTransactionObserver()

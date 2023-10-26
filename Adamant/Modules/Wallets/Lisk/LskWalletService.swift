@@ -33,6 +33,7 @@ final class LskWalletService: WalletService {
     var apiService: ApiService!
     var accountService: AccountService!
     var dialogService: DialogService!
+    var vibroService: VibroService!
     var coreDataStack: CoreDataStack!
     
     // MARK: - Constants
@@ -226,6 +227,8 @@ final class LskWalletService: WalletService {
         }
         
         if let balance = try? await getBalance() {
+            let isRaised = (wallet.balance < balance) && !initialBalanceCheck
+            
             wallet.isBalanceInitialized = true
             let notification: Notification.Name?
             
@@ -238,6 +241,10 @@ final class LskWalletService: WalletService {
                 notification = walletUpdatedNotification
             } else {
                 notification = nil
+            }
+            
+            if isRaised {
+                vibroService.applyVibration(.success)
             }
             
             if let notification = notification {
@@ -502,6 +509,7 @@ extension LskWalletService: SwinjectDependentService {
         accountService = container.resolve(AccountService.self)
         apiService = container.resolve(ApiService.self)
         dialogService = container.resolve(DialogService.self)
+        vibroService = container.resolve(VibroService.self)
         coreDataStack = container.resolve(CoreDataStack.self)
         
         addTransactionObserver()

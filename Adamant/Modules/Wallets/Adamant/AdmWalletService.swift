@@ -58,6 +58,7 @@ final class AdmWalletService: NSObject, WalletService {
 	var apiService: ApiService!
 	var transfersProvider: TransfersProvider!
     var coreDataStack: CoreDataStack!
+    var vibroService: VibroService!
     
     // MARK: - Notifications
     let walletUpdatedNotification = Notification.Name("adamant.admWallet.updated")
@@ -137,8 +138,12 @@ final class AdmWalletService: NSObject, WalletService {
         }
                 
         let notify: Bool
+        
+        let isRaised: Bool
+        
         if let wallet = wallet as? AdmWallet {
             wallet.isBalanceInitialized = true
+            isRaised = (wallet.balance < account.balance) && wallet.isBalanceInitialized
             if wallet.balance != account.balance {
                 wallet.balance = account.balance
                 notify = true
@@ -152,8 +157,12 @@ final class AdmWalletService: NSObject, WalletService {
             
             self.wallet = wallet
             notify = true
+            isRaised = false
         }
         
+        if isRaised {
+            vibroService.applyVibration(.success)
+        }
         if notify, let wallet = wallet {
             postUpdateNotification(with: wallet)
         }
@@ -204,6 +213,7 @@ extension AdmWalletService: SwinjectDependentService {
         apiService = container.resolve(ApiService.self)
         transfersProvider = container.resolve(TransfersProvider.self)
         coreDataStack = container.resolve(CoreDataStack.self)
+        vibroService = container.resolve(VibroService.self)
         
         Task {
             let controller = await transfersProvider.unreadTransfersController()

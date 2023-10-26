@@ -111,6 +111,7 @@ final class BtcWalletService: WalletService {
     var increaseFeeService: IncreaseFeeService!
     var addressConverter: AddressConverter!
     var coreDataStack: CoreDataStack!
+    var vibroService: VibroService!
     
     // MARK: - Constants
     static var currencyLogo = UIImage.asset(named: "bitcoin_wallet") ?? .init()
@@ -256,6 +257,8 @@ final class BtcWalletService: WalletService {
             wallet.isBalanceInitialized = true
             let notification: Notification.Name?
             
+            let isRaised = (wallet.balance < balance) && !initialBalanceCheck
+            
             if wallet.balance != balance {
                 wallet.balance = balance
                 notification = walletUpdatedNotification
@@ -265,6 +268,10 @@ final class BtcWalletService: WalletService {
                 notification = walletUpdatedNotification
             } else {
                 notification = nil
+            }
+            
+            if isRaised {
+                vibroService.applyVibration(.success)
             }
             
             if let notification = notification {
@@ -464,6 +471,7 @@ extension BtcWalletService: SwinjectDependentService {
         dialogService = container.resolve(DialogService.self)
         increaseFeeService = container.resolve(IncreaseFeeService.self)
         addressConverter = container.resolve(AddressConverterFactory.self)?.make(network: network)
+        vibroService = container.resolve(VibroService.self)
         coreDataStack = container.resolve(CoreDataStack.self)
         
         addTransactionObserver()

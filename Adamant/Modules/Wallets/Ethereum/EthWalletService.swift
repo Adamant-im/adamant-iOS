@@ -124,6 +124,7 @@ final class EthWalletService: WalletService {
     var apiService: ApiService!
     var dialogService: DialogService!
     var increaseFeeService: IncreaseFeeService!
+    var vibroService: VibroService!
     var coreDataStack: CoreDataStack!
     
     // MARK: - Notifications
@@ -306,6 +307,8 @@ final class EthWalletService: WalletService {
             
             let notification: Notification.Name?
             
+            let isRaised = (wallet.balance < balance) && !initialBalanceCheck
+            
             if wallet.balance != balance {
                 wallet.balance = balance
                 notification = walletUpdatedNotification
@@ -315,6 +318,10 @@ final class EthWalletService: WalletService {
                 notification = walletUpdatedNotification
             } else {
                 notification = nil
+            }
+            
+            if isRaised {
+                vibroService.applyVibration(.success)
             }
             
             if let notification = notification {
@@ -554,6 +561,7 @@ extension EthWalletService: SwinjectDependentService {
         apiService = container.resolve(ApiService.self)
         dialogService = container.resolve(DialogService.self)
         increaseFeeService = container.resolve(IncreaseFeeService.self)
+        vibroService = container.resolve(VibroService.self)
         coreDataStack = container.resolve(CoreDataStack.self)
         
         addTransactionObserver()
