@@ -105,6 +105,15 @@ extension AdamantContacts {
         }
     }
     
+    var welcomeMessage: SystemMessage? {
+        if
+            let regionCode = Locale.current.regionCode,
+            prohibitedRegions.contains(regionCode)
+        { return nil }
+
+        return messages["chats.welcome_message"]
+    }
+    
     var messages: [String: SystemMessage] {
         switch self {
         case .adamantBountyWallet, .adamantNewBountyWallet:
@@ -166,6 +175,15 @@ extension AdamantContacts {
                 ),
                 silentNotification: true
             )]
+        }
+    }
+    
+    var prohibitedRegions: [String] {
+        switch self {
+        case .adelina:
+            return ["CN"]
+        case .adamantBountyWallet, .adamantNewBountyWallet, .adamantExchange, .betOnBitcoin, .donate, .pwaBountyBot, .adamantIco, .adamantWelcomeWallet, .adamantSupport:
+            return []
         }
     }
 }

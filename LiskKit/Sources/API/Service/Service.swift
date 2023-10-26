@@ -38,7 +38,18 @@ extension Service {
     }
 
     /// List transaction objects
-    public func transactions(id: String? = nil, block: String? = nil, sender: String? = nil, recipient: String? = nil, senderIdOrRecipientId: String? = nil, limit: UInt? = nil, offset: UInt? = nil, sort: APIRequest.Sort? = nil, completionHandler: @escaping (Result<[Transactions.TransactionModel]>) -> Void) {
+    public func transactions(
+        ownerAddress: String?,
+        id: String? = nil,
+        block: String? = nil,
+        sender: String? = nil,
+        recipient: String? = nil,
+        senderIdOrRecipientId: String? = nil,
+        limit: UInt? = nil,
+        offset: UInt? = nil,
+        sort: APIRequest.Sort? = nil,
+        completionHandler: @escaping (Result<[Transactions.TransactionModel]>) -> Void
+    ) {
         if version == .v1 {
             transactionsV1(id: id, block: block, sender: sender, recipient: recipient, senderIdOrRecipientId: senderIdOrRecipientId, limit: limit, offset: offset, sort: sort) { result in
                 switch result {
@@ -53,19 +64,22 @@ extension Service {
                 switch result {
                 case .success(response: let value):
                     let transaction = value.data.map {
-                        Transactions.TransactionModel(id: $0.id,
-                                                      height: $0.height,
-                                                      blockId: $0.blockId,
-                                                      type: $0.type,
-                                                      timestamp: $0.timestamp,
-                                                      senderPublicKey: $0.senderPublicKey,
-                                                      senderId: $0.senderId,
-                                                      recipientId: $0.recipientId,
-                                                      recipientPublicKey: $0.recipientPublicKey,
-                                                      amount: $0.amount,
-                                                      fee: $0.fee,
-                                                      signature: $0.signature,
-                                                      confirmations: $0.confirmations)
+                        Transactions.TransactionModel(
+                            id: $0.id,
+                            height: $0.height,
+                            blockId: $0.blockId,
+                            type: $0.type,
+                            timestamp: $0.timestamp,
+                            senderPublicKey: $0.senderPublicKey,
+                            senderId: $0.senderId,
+                            recipientId: $0.recipientId,
+                            recipientPublicKey: $0.recipientPublicKey,
+                            amount: $0.amount,
+                            fee: $0.fee,
+                            signature: $0.signature,
+                            confirmations: $0.confirmations,
+                            isOutgoing: $0.senderId.lowercased() == ownerAddress?.lowercased()
+                        )
                     }
                     completionHandler(.success(response: transaction))
                 case .error(response: let error):

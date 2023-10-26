@@ -77,12 +77,22 @@ final public class Node: Equatable {
         self.isEnabled = true
     }
     
+    public init(url: URL, altUrl: URL?) {
+        let schemeRaw = url.scheme ?? "https"
+        self.scheme = URLScheme(rawValue: schemeRaw) ?? .https
+        self.host = url.host ?? ""
+        self.port = url.port
+        self.isEnabled = true
+        self.altUrl = altUrl
+    }
+    
     @Atomic public var scheme: URLScheme
     @Atomic public var host: String
     @Atomic public var port: Int?
     @Atomic public var wsPort: Int?
     @Atomic public var status: Status?
     @Atomic public var isEnabled: Bool
+    @Atomic public var altUrl: URL?
     
     @Atomic private var _connectionStatus: ConnectionStatus?
     
