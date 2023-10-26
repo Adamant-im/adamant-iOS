@@ -13,6 +13,7 @@ import CommonKit
 public final class AdvancedContextMenuManager: NSObject {
     private var viewModel: ContextMenuOverlayViewModel?
     private var viewModelMac: ContextMenuOverlayViewModelMac?
+    private var vcOverlay: UIViewController?
     private let window = TransparentWindow(frame: UIScreen.main.bounds)
     private var locationOnScreen: CGPoint = .zero
     private var getPositionOnScreen: (() -> CGPoint)?
@@ -81,6 +82,11 @@ public final class AdvancedContextMenuManager: NSObject {
     public func dismiss() async {
         await viewModel?.dismiss()
         await viewModelMac?.dismiss()
+    }
+    
+    @MainActor
+    public func presentOver(_ vc: UIViewController, animated: Bool) {
+        vcOverlay?.present(vc, animated: animated)
     }
 }
 
@@ -171,6 +177,7 @@ private extension AdvancedContextMenuManager {
         
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         didPresentMenuAction?(messageId)
+        vcOverlay = vc
     }
     
     func getMenuVC(content: AMenuSection) -> AMenuViewController {

@@ -9,7 +9,7 @@
 import Foundation
 import CommonKit
 
-class Delegate: Decodable {
+final class Delegate: Decodable {
     let username: String
     let address: String
     let publicKey: String

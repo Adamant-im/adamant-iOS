@@ -15,15 +15,13 @@ import CommonKit
 @MainActor
 final class AdamantDialogService: DialogService {
     // MARK: Dependencies
-    private let router: Router
     private let vibroService: VibroService
     private let popupManager = PopupManager()
     private let mailDelegate = MailDelegate()
+    
     private weak var window: UIWindow?
     
-    // Configure notifications
-    nonisolated init(router: Router, vibroService: VibroService) {
-        self.router = router
+    nonisolated init(vibroService: VibroService) {
         self.vibroService = vibroService
     }
     
@@ -361,20 +359,22 @@ extension AdamantDialogService {
                 
             case .generateQr(let encodedContent, let sharingTip, let withLogo):
                 alert.addAction(UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
-                    switch AdamantQRTools.generateQrFrom(string: encodedContent ?? stringForQR, withLogo: withLogo) {
+                    guard let self = self else { return }
+                    
+                    switch AdamantQRTools.generateQrFrom(
+                        string: encodedContent ?? stringForQR,
+                        withLogo: withLogo
+                    ) {
                     case .success(let qr):
-                        guard let vc = self?.router.get(scene: AdamantScene.Shared.shareQr) as? ShareQrViewController else {
-                            fatalError("Can't find ShareQrViewController")
-                        }
-                        
+                        let vc = ShareQrViewController(dialogService: self)
                         vc.qrCode = qr
                         vc.sharingTip = sharingTip
                         vc.excludedActivityTypes = excludedActivityTypes
                         vc.modalPresentationStyle = .overFullScreen
-                        self?.present(vc, animated: true, completion: completion)
+                        present(vc, animated: true, completion: completion)
                         
                     case .failure(error: let error):
-                        self?.showError(
+                        showError(
                             withMessage: error.localizedDescription,
                             supportEmail: true,
                             error: error
@@ -563,7 +563,10 @@ private class MailDelegate: NSObject, MFMailComposeViewControllerDelegate {
 extension AdamantDialogService {
     func selectAllTextFields(in alert: UIAlertController) {
         alert.textFields?.forEach { textField in
-            textField.selectAll(nil)
+            textField.selectedTextRange = textField.textRange(
+                from: textField.beginningOfDocument,
+                to: textField.endOfDocument
+            )
         }
     }
 }

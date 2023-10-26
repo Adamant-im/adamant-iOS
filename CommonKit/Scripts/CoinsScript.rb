@@ -21,21 +21,34 @@ class Coins
         
         # Read data from json
         
+        fullName = json["name"]
+        symbol = json["symbol"]
+        decimals = json["decimals"]
+        explorerTx = json["explorerTx"]
+        
         nodes = ""
         nodesArray = json["nodes"]
         if nodesArray != nil
             nodesArray.each do |node|
                 url = node["url"]
-                nodes += "Node(url: URL(string: \"#{url}\")!),\n"
+                altUrl = node["alt_ip"]
+                if altUrl == nil
+                    nodes += "Node(url: URL(string: \"#{url}\")!),\n"
+                else
+                    nodes += "Node(url: URL(string: \"#{url}\")!, altUrl: URL(string: \"#{altUrl}\")),\n"
+                end
             end
         end
         
         serviceNodes = ""
-        serviceNodesArray = json["serviceNodes"]
-        if serviceNodesArray != nil
-            serviceNodesArray.each do |node|
-                url = node["url"]
-                serviceNodes += "Node(url: URL(string: \"#{url}\")!),\n"
+        services = json["services"]
+        if services != nil
+            serviceNodesArray = services["#{symbol.downcase}Service"]
+            if serviceNodesArray != nil
+                serviceNodesArray.each do |node|
+                    url = node["url"]
+                    serviceNodes += "Node(url: URL(string: \"#{url}\")!),\n"
+                end
             end
         end
         
@@ -47,10 +60,6 @@ class Coins
             fixedFee = 0.0
         end
         
-        fullName = json["name"]
-        symbol = json["symbol"]
-        decimals = json["decimals"]
-        explorerTx = json["explorerTx"]
         consistencyMaxTime = json["txConsistencyMaxTime"]
         if consistencyMaxTime == nil
             consistencyMaxTime = 0
@@ -73,6 +82,13 @@ class Coins
         end
         
         defaultOrdinalLevel = json["defaultOrdinalLevel"]
+        
+        minNodeVersion = json["minNodeVersion"]
+        if minNodeVersion == nil
+            minNodeVersion = "nil"
+        else
+            minNodeVersion = "\"#{minNodeVersion}\""
+        end
         
         # txFetchInfo
         txFetchInfo = json["txFetchInfo"]
@@ -187,6 +203,10 @@ extension #{symbol.capitalize}WalletService {
         #{defaultOrdinalLevel}
     }
     
+    var minNodeVersion: String? {
+        #{minNodeVersion}
+    }
+    
     static let explorerAddress = \"#{explorerTx.sub! '${ID}', ''}\"
     
     static var nodes: [Node] {
@@ -218,9 +238,9 @@ public extension AdamantResources {
     }
 }"
             File.open(Dir.pwd + "/CommonKit/Sources/CommonKit/AdamantDynamicResources.swift", 'w') { |file| file.write(textResources) }
-            File.open(Dir.pwd + "/Adamant/Wallets/#{name}/#{symbol}WalletService+DynamicConstants.swift", 'w') { |file| file.write(text) }
+            File.open(Dir.pwd + "/Adamant/Modules/Wallets/#{name}/#{symbol}WalletService+DynamicConstants.swift", 'w') { |file| file.write(text) }
         else
-            File.open(Dir.pwd + "/Adamant/Wallets/#{name}/#{symbol}WalletService+DynamicConstants.swift", 'w') { |file| file.write(text) }
+            File.open(Dir.pwd + "/Adamant/Modules/Wallets/#{name}/#{symbol}WalletService+DynamicConstants.swift", 'w') { |file| file.write(text) }
         end
     end
     
@@ -246,4 +266,4 @@ public extension AdamantResources {
     
 end
 
-Coins.new.startUnpack("master") #master #dev
+Coins.new.startUnpack("dev") #master #dev

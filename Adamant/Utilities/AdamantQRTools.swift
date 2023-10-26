@@ -21,7 +21,7 @@ enum QRToolDecodeResult {
     case failure(error: Error)
 }
 
-class AdamantQRTools {
+final class AdamantQRTools {
     static func generateQrFrom(string: String, withLogo: Bool = false ) -> QRToolGenerateResult {
         let generator = EFQRCodeGenerator(
             content: string,

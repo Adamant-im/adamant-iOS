@@ -424,6 +424,9 @@
 /* Chat: Error scrolling to message, this message has been deleted and is no longer accessible */
 "ChatScene.Error.messageWasDeleted" = "Извините, но это сообщение было удалено и больше недоступно";
 
+/* Chat: Error message is too big */
+"ChatScene.Error.messageIsTooBig" = "Сообщение слишком большое. Отправьте его частями.";
+
 /* Delegates page: scene title */
 "Delegates.Title" = "Делегаты";
 
