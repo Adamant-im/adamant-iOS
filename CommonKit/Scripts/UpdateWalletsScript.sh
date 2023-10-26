@@ -1,5 +1,5 @@
 ROOT="$PWD"
-BRANCH_NAME="master" #master #dev
+BRANCH_NAME="dev" #master #dev
 SCRIPTS_DIR="$ROOT/scripts"
 WALLETS_DIR="$ROOT/scripts/wallets"
 WALLETS_NAME_DIR="$ROOT/scripts/wallets/adamant-wallets-$BRANCH_NAME/assets/general"

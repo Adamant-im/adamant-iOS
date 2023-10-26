@@ -53,12 +53,16 @@ extension DogeWalletService {
         70
     }
     
+    var minNodeVersion: String? {
+        nil
+    }
+    
     static let explorerAddress = "https://dogechain.info/tx/"
     
     static var nodes: [Node] {
         [
             Node(url: URL(string: "https://dogenode1.adamant.im")!),
-Node(url: URL(string: "https://dogenode2.adamant.im")!),
+Node(url: URL(string: "https://dogenode2.adamant.im")!, altUrl: URL(string: "http://176.9.32.126:44098")),
         ]
     }
     
