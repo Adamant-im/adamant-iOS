@@ -186,6 +186,7 @@ private extension ChatMessageFactory {
                     reactions: reactions,
                     address: address,
                     opponentAddress: opponentAddress,
+                    isFake: transaction.isFake,
                     isHidden: false
                 )
             ))

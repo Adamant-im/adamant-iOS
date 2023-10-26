@@ -17,6 +17,7 @@ extension ChatMessageCell {
         let reactions: Set<Reaction>?
         let address: String
         let opponentAddress: String
+        let isFake: Bool
         var isHidden: Bool
         
         static let `default` = Self(
@@ -27,6 +28,7 @@ extension ChatMessageCell {
             reactions: nil,
             address: "",
             opponentAddress: "",
+            isFake: false,
             isHidden: false
         )
         

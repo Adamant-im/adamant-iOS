@@ -559,8 +559,12 @@ final class ChatViewModel: NSObject {
         
         previousArg = arg
         
+        let tx = chatTransactions.first(where: { $0.txId == arg.messageId })
+        guard tx?.statusEnum == .delivered else { return }
+        
         dialog.send(
             .presentMenu(
+                presentReactions: tx?.isFake == false,
                 arg: arg,
                 didSelectEmojiDelegate: self,
                 didSelectEmojiAction: didSelectEmojiAction,

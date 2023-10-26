@@ -87,6 +87,7 @@ private extension ChatDialogManager {
         case let .failedMessageAlert(id, sender):
             showFailedMessageAlert(id: id, sender: sender)
         case let .presentMenu(
+            presentReactions,
             arg,
             didSelectEmojiDelegate,
             didSelectEmojiAction,
@@ -94,6 +95,7 @@ private extension ChatDialogManager {
             didDismissMenuAction
         ):
             presentMenu(
+                presentReactions: presentReactions,
                 arg: arg,
                 didSelectEmojiDelegate: didSelectEmojiDelegate,
                 didSelectEmojiAction: didSelectEmojiAction,
@@ -215,7 +217,7 @@ private extension ChatDialogManager {
                 makeCancelSendingAction(id: id),
                 makeCancelAction()
             ],
-            from: sender
+            from: nil
         )
     }
 }
@@ -433,6 +435,7 @@ private extension ChatDialogManager {
     }
     
     func presentMenu(
+        presentReactions: Bool,
         arg: ChatContextMenuArguments,
         didSelectEmojiDelegate: ElegantEmojiPickerDelegate?,
         didSelectEmojiAction: DidSelectEmojiAction,
@@ -442,15 +445,23 @@ private extension ChatDialogManager {
         contextMenu.didPresentMenuAction = didPresentMenuAction
         contextMenu.didDismissMenuAction = didDismissMenuAction
         
+        let reactionsContentView = !presentReactions
+        ? nil
+        : getUpperContentView(
+            messageId: arg.messageId,
+            selectedEmoji: arg.selectedEmoji,
+            didSelectEmojiAction: didSelectEmojiAction,
+            didSelectEmojiDelegate: didSelectEmojiDelegate
+        )
+        
+        let reactionsContentViewSize: CGSize = !presentReactions
+        ? .zero
+        : getUpperContentViewSize()
+        
         contextMenu.presentMenu(
             arg: arg,
-            upperView: getUpperContentView(
-                messageId: arg.messageId,
-                selectedEmoji: arg.selectedEmoji,
-                didSelectEmojiAction: didSelectEmojiAction,
-                didSelectEmojiDelegate: didSelectEmojiDelegate
-            ),
-            upperViewSize: getUpperContentViewSize()
+            upperView: reactionsContentView,
+            upperViewSize: reactionsContentViewSize
         )
     }
     
