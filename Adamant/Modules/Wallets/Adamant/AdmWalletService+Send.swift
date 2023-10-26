@@ -18,7 +18,7 @@ extension AdmWalletService: WalletServiceSimpleSend {
         amount: Decimal,
         comments: String,
         replyToMessageId: String?
-    ) async throws -> TransactionDetails {
+    ) async throws -> AdamantTransactionDetails {
         do {
             let transaction = try await transfersProvider.transferFunds(
                 toAddress: recipient,

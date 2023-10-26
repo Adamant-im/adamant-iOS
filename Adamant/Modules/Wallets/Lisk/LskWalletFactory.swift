@@ -31,6 +31,7 @@ struct LskWalletFactory: WalletFactory {
         c.dialogService = assembler.resolve(DialogService.self)
         c.screensFactory = screensFactory
         c.lskWalletService = service
+        c.walletService = service
         return c
     }
     

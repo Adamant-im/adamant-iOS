@@ -30,6 +30,7 @@ struct DashWalletFactory: WalletFactory {
         c.dialogService = assembler.resolve(DialogService.self)
         c.screensFactory = screensFactory
         c.walletService = service
+        c.dashWalletService = service
         return c
     }
     

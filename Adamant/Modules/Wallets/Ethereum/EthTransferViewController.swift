@@ -62,6 +62,10 @@ final class EthTransferViewController: TransferViewControllerBase {
                         try await service.sendTransaction(transaction)
                     } catch {
                         dialogService.showRichError(error: error)
+                        service.coinStorage.updateStatus(
+                            for: txHash,
+                            status: .failed
+                        )
                     }
                     
                     await service.update()
@@ -76,6 +80,7 @@ final class EthTransferViewController: TransferViewControllerBase {
                     transaction: transaction,
                     recipient: recipient,
                     comments: comments,
+                    amount: amount,
                     service: service
                 )
             } catch {
@@ -90,16 +95,23 @@ final class EthTransferViewController: TransferViewControllerBase {
         transaction: CodableTransaction,
         recipient: String,
         comments: String,
+        amount: Decimal,
         service: EthWalletService
     ) {
         let transaction = SimpleTransactionDetails(
             txId: hash,
             senderAddress: transaction.sender?.address ?? "",
             recipientAddress: recipient,
-            isOutgoing: true
+            amountValue: amount,
+            feeValue: nil,
+            confirmationsValue: nil,
+            blockValue: nil,
+            isOutgoing: true,
+            transactionStatus: nil
         )
         
-        let detailsVc = screensFactory.makeDetailsVC(service: service)
+        service.coinStorage.append(transaction)
+		let detailsVc = screensFactory.makeDetailsVC(service: service)
         detailsVc.transaction = transaction
         detailsVc.senderName = String.adamant.transactionDetails.yourAddress
         detailsVc.recipientName = recipientName

@@ -33,6 +33,7 @@ final class LskWalletService: WalletService {
     var apiService: ApiService!
     var accountService: AccountService!
     var dialogService: DialogService!
+    var coreDataStack: CoreDataStack!
     
     // MARK: - Constants
     var transactionFee: Decimal {
@@ -95,6 +96,23 @@ final class LskWalletService: WalletService {
     private let nodes: [APINode]
     private var subscriptions = Set<AnyCancellable>()
 
+    @ObservableValue private(set) var transactions: [TransactionDetails] = []
+    @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
+
+    var transactionsPublisher: AnyObservable<[TransactionDetails]> {
+        $transactions.eraseToAnyPublisher()
+    }
+    
+    var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
+        $hasMoreOldTransactions.eraseToAnyPublisher()
+    }
+    
+    private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
+        coinId: tokenUnicID,
+        coreDataStack: coreDataStack,
+        blockchainType: richMessageType
+    )
+    
     // MARK: - State
     private (set) var state: WalletServiceState = .notInitiated
     
@@ -166,6 +184,15 @@ final class LskWalletService: WalletService {
                     NotificationCenter.default.removeObserver(balanceObserver)
                     self?.balanceObserver = nil
                 }
+                self?.coinStorage.clear()
+            }
+            .store(in: &subscriptions)
+    }
+    
+    func addTransactionObserver() {
+        coinStorage.transactionsPublisher
+            .sink { [weak self] transactions in
+                self?.transactions = transactions
             }
             .store(in: &subscriptions)
     }
@@ -475,6 +502,9 @@ extension LskWalletService: SwinjectDependentService {
         accountService = container.resolve(AccountService.self)
         apiService = container.resolve(ApiService.self)
         dialogService = container.resolve(DialogService.self)
+        coreDataStack = container.resolve(CoreDataStack.self)
+        
+        addTransactionObserver()
     }
 }
 
@@ -564,6 +594,22 @@ extension LskWalletService {
             )
         }
     }
+    
+    func loadTransactions(offset: Int, limit: Int) async throws -> Int {
+        let trs = try await getTransactions(offset: UInt(offset), limit: UInt(limit))
+        
+        guard trs.count > 0 else {
+            hasMoreOldTransactions = false
+            return .zero
+        }
+        
+        coinStorage.append(trs)
+        return trs.count
+    }
+    
+    func getLocalTransactionHistory() -> [TransactionDetails] {
+        transactions
+    }
 }
 
 // MARK: - KVS
@@ -605,7 +651,7 @@ extension LskWalletService {
 
 // MARK: - Transactions
 extension LskWalletService {
-    func getTransactions(offset: UInt) async throws -> [Transactions.TransactionModel] {
+    func getTransactions(offset: UInt, limit: UInt = 100) async throws -> [Transactions.TransactionModel] {
         guard let address = self.lskWallet?.address,
               let transactionApi = serviceApi
         else {
@@ -614,8 +660,9 @@ extension LskWalletService {
         
         return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<[Transactions.TransactionModel], Error>) in
             transactionApi.transactions(
+                ownerAddress: address,
                 senderIdOrRecipientId: address,
-                limit: 100,
+                limit: limit,
                 offset: offset,
                 sort: APIRequest.Sort("timestamp", direction: .descending)
             ) { (response) in
@@ -640,7 +687,12 @@ extension LskWalletService {
         }
         
         return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Transactions.TransactionModel, Error>) in
-            api.transactions(id: hash, limit: 1, offset: 0) { (response) in
+            api.transactions(
+                ownerAddress: wallet?.address,
+                id: hash,
+                limit: 1,
+                offset: 0
+            ) { (response) in
                 switch response {
                 case .success(response: let result):
                     if let transaction = result.first {

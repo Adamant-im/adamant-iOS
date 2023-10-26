@@ -30,6 +30,7 @@ struct EthWalletFactory: WalletFactory {
         c.dialogService = assembler.resolve(DialogService.self)
         c.ethWalletService = service
         c.screensFactory = screensFactory
+        c.walletService = service
         return c
     }
     

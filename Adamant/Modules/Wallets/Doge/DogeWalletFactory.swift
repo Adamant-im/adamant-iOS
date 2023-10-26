@@ -29,6 +29,7 @@ struct DogeWalletFactory: WalletFactory {
         let vc = DogeTransactionsViewController(nibName: "TransactionsListViewControllerBase", bundle: nil)
         vc.dialogService = assembler.resolve(DialogService.self)
         vc.screensFactory = screensFactory
+        vc.dogeWalletService = service
         vc.walletService = service
         return vc
     }

@@ -1,5 +1,5 @@
 //
-//  AdamantRichTransactionStatusService.swift
+//  AdamantTransactionStatusService.swift
 //  Adamant
 //
 //  Created by Andrey Golubenko on 13.01.2023.
@@ -10,7 +10,7 @@ import CoreData
 import Combine
 import CommonKit
 
-actor AdamantRichTransactionStatusService: NSObject, RichTransactionStatusService {
+actor AdamantTransactionStatusService: NSObject, TransactionStatusService {
     private let richProviders: [String: RichMessageProviderWithStatusCheck]
     private let coreDataStack: CoreDataStack
 
@@ -29,7 +29,7 @@ actor AdamantRichTransactionStatusService: NSObject, RichTransactionStatusServic
         Task { await setupNetworkSubscription() }
     }
 
-    func forceUpdate(transaction: RichMessageTransaction) async {
+    func forceUpdate(transaction: CoinTransaction) async {
         setStatus(for: transaction, status: .notInitiated)
         
         guard
@@ -41,7 +41,7 @@ actor AdamantRichTransactionStatusService: NSObject, RichTransactionStatusServic
         setStatus(
             for: transaction,
             status: provider.statusWithFilters(
-                transaction: transaction,
+                transaction: transaction as? RichMessageTransaction,
                 oldPendingAttempts: oldPendingAttempts[id]?.wrappedValue ?? .zero,
                 info: await provider.statusInfoFor(transaction: transaction)
             )
@@ -55,7 +55,7 @@ actor AdamantRichTransactionStatusService: NSObject, RichTransactionStatusServic
     }
 }
 
-extension AdamantRichTransactionStatusService: NSFetchedResultsControllerDelegate {
+extension AdamantTransactionStatusService: NSFetchedResultsControllerDelegate {
     nonisolated func controller(
         _: NSFetchedResultsController<NSFetchRequestResult>,
         didChange object: Any,
@@ -63,12 +63,12 @@ extension AdamantRichTransactionStatusService: NSFetchedResultsControllerDelegat
         for type: NSFetchedResultsChangeType,
         newIndexPath _: IndexPath?
     ) {
-        guard let transaction = object as? RichMessageTransaction else { return }
+        guard let transaction = object as? CoinTransaction else { return }
         Task { await processCoreDataChange(type: type, transaction: transaction) }
     }
 }
 
-private extension AdamantRichTransactionStatusService {
+private extension AdamantTransactionStatusService {
     func setupNetworkSubscription() {
         networkSubscription = NotificationCenter.default
             .publisher(for: .AdamantReachabilityMonitor.reachabilityChanged)
@@ -100,9 +100,10 @@ private extension AdamantRichTransactionStatusService {
         }
     }
     
-    func add(transaction: RichMessageTransaction) {
+    func add(transaction: CoinTransaction) {
         guard
-            let provider = getProvider(for: transaction)
+            let provider = getProvider(for: transaction),
+            transaction.transactionStatus != .success
         else { return }
         
         let id = transaction.transactionId
@@ -110,7 +111,7 @@ private extension AdamantRichTransactionStatusService {
         let oldPendingAttempts = oldPendingAttempts[id] ?? .init(wrappedValue: .zero)
         self.oldPendingAttempts[id] = oldPendingAttempts
 
-        let publisher = RichTransactionStatusPublisher(
+        let publisher = TransactionStatusPublisher(
             provider: provider,
             transaction: transaction,
             oldPendingAttempts: oldPendingAttempts
@@ -123,18 +124,17 @@ private extension AdamantRichTransactionStatusService {
         }
     }
 
-    func remove(transaction: RichMessageTransaction) {
+    func remove(transaction: CoinTransaction) {
         let id = transaction.transactionId
         subscriptions[id] = nil
     }
 
-    func getProvider(for transaction: RichMessageTransaction) -> RichMessageProviderWithStatusCheck? {
-        guard let transfer = transaction.transfer else { return nil }
-        return richProviders[transfer.type]
+    func getProvider(for transaction: CoinTransaction) -> RichMessageProviderWithStatusCheck? {
+        return richProviders[transaction.blockchainType]
     }
 
     func setStatus(
-        for transaction: RichMessageTransaction,
+        for transaction: CoinTransaction,
         status: TransactionStatus
     ) {
         let privateContext = NSManagedObjectContext(
@@ -144,15 +144,19 @@ private extension AdamantRichTransactionStatusService {
         privateContext.parent = coreDataStack.container.viewContext
         
         let transaction = privateContext.object(with: transaction.objectID)
-            as? RichMessageTransaction
+            as? CoinTransaction
         
-        transaction?.transactionStatus = status
+        guard let transaction = transaction else {
+            return
+        }
+        
+        transaction.transactionStatus = status
         try? privateContext.save()
     }
 
     // MARK: Core Data
 
-    func processCoreDataChange(type: NSFetchedResultsChangeType, transaction: RichMessageTransaction) {
+    func processCoreDataChange(type: NSFetchedResultsChangeType, transaction: CoinTransaction) {
         switch type {
         case .insert, .update:
             add(transaction: transaction)
@@ -165,9 +169,9 @@ private extension AdamantRichTransactionStatusService {
         }
     }
     
-    func getRichTransactionsController() -> NSFetchedResultsController<RichMessageTransaction> {
-        let request: NSFetchRequest<RichMessageTransaction> = NSFetchRequest(
-            entityName: RichMessageTransaction.entityName
+    func getRichTransactionsController() -> NSFetchedResultsController<CoinTransaction> {
+        let request: NSFetchRequest<CoinTransaction> = NSFetchRequest(
+            entityName: CoinTransaction.entityCoinName
         )
 
         request.sortDescriptors = []

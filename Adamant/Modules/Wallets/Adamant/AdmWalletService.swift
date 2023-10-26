@@ -57,6 +57,7 @@ final class AdmWalletService: NSObject, WalletService {
 	weak var accountService: AccountService?
 	var apiService: ApiService!
 	var transfersProvider: TransfersProvider!
+    var coreDataStack: CoreDataStack!
     
     // MARK: - Notifications
     let walletUpdatedNotification = Notification.Name("adamant.admWallet.updated")
@@ -74,6 +75,23 @@ final class AdmWalletService: NSObject, WalletService {
     private (set) var isWarningGasPrice = false
     private var subscriptions = Set<AnyCancellable>()
 
+    @ObservableValue private(set) var transactions: [TransactionDetails] = []
+    @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
+
+    var transactionsPublisher: AnyObservable<[TransactionDetails]> {
+        $transactions.eraseToAnyPublisher()
+    }
+    
+    var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
+        $hasMoreOldTransactions.eraseToAnyPublisher()
+    }
+    
+    private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
+        coinId: tokenUnicID,
+        coreDataStack: coreDataStack,
+        blockchainType: richMessageType
+    )
+    
     // MARK: - State
     private (set) var state: WalletServiceState = .upToDate
     private (set) var wallet: WalletAccount?
@@ -158,6 +176,10 @@ final class AdmWalletService: NSObject, WalletService {
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
         return address
     }
+    
+    func loadTransactions(offset: Int, limit: Int) async throws -> Int { .zero }
+    
+    func getLocalTransactionHistory() -> [TransactionDetails] { [] }
 }
 
 // MARK: - NSFetchedResultsControllerDelegate
@@ -181,6 +203,7 @@ extension AdmWalletService: SwinjectDependentService {
         accountService = container.resolve(AccountService.self)
         apiService = container.resolve(ApiService.self)
         transfersProvider = container.resolve(TransfersProvider.self)
+        coreDataStack = container.resolve(CoreDataStack.self)
         
         Task {
             let controller = await transfersProvider.unreadTransfersController()

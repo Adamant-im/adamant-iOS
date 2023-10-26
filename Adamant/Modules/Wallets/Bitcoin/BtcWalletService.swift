@@ -110,6 +110,7 @@ final class BtcWalletService: WalletService {
     var dialogService: DialogService!
     var increaseFeeService: IncreaseFeeService!
     var addressConverter: AddressConverter!
+    var coreDataStack: CoreDataStack!
     
     // MARK: - Constants
     static var currencyLogo = UIImage.asset(named: "bitcoin_wallet") ?? .init()
@@ -147,6 +148,23 @@ final class BtcWalletService: WalletService {
     let defaultDispatchQueue = DispatchQueue(label: "im.adamant.btcWalletService", qos: .userInteractive, attributes: [.concurrent])
     
     private var subscriptions = Set<AnyCancellable>()
+    
+    @ObservableValue private(set) var transactions: [TransactionDetails] = []
+    @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
+
+    var transactionsPublisher: AnyObservable<[TransactionDetails]> {
+        $transactions.eraseToAnyPublisher()
+    }
+    
+    var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
+        $hasMoreOldTransactions.eraseToAnyPublisher()
+    }
+    
+    private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
+        coinId: tokenUnicID,
+        coreDataStack: coreDataStack,
+        blockchainType: richMessageType
+    )
     
     // MARK: - State
     private (set) var state: WalletServiceState = .notInitiated
@@ -200,6 +218,15 @@ final class BtcWalletService: WalletService {
                     NotificationCenter.default.removeObserver(balanceObserver)
                     self?.balanceObserver = nil
                 }
+                self?.coinStorage.clear()
+            }
+            .store(in: &subscriptions)
+    }
+    
+    func addTransactionObserver() {
+        coinStorage.transactionsPublisher
+            .sink { [weak self] transactions in
+                self?.transactions = transactions
             }
             .store(in: &subscriptions)
     }
@@ -437,6 +464,9 @@ extension BtcWalletService: SwinjectDependentService {
         dialogService = container.resolve(DialogService.self)
         increaseFeeService = container.resolve(IncreaseFeeService.self)
         addressConverter = container.resolve(AddressConverterFactory.self)?.make(network: network)
+        coreDataStack = container.resolve(CoreDataStack.self)
+        
+        addTransactionObserver()
     }
 }
 
@@ -694,6 +724,26 @@ extension BtcWalletService {
         }
     }
 
+    func loadTransactions(offset: Int, limit: Int) async throws -> Int {
+        let txId = offset == .zero
+        ? transactions.first?.txId
+        : transactions.last?.txId
+        
+        let trs = try await getTransactions(fromTx: txId)
+        
+        guard trs.count > 0 else {
+            hasMoreOldTransactions = false
+            return .zero
+        }
+        
+        coinStorage.append(trs)
+    
+        return trs.count
+    }
+    
+    func getLocalTransactionHistory() -> [TransactionDetails] {
+        transactions
+    }
 }
 
 // MARK: - PrivateKey generator

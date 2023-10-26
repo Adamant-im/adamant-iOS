@@ -10,12 +10,15 @@ import Foundation
 
 extension RichMessageProviderWithStatusCheck {
     func statusWithFilters(
-        transaction: RichMessageTransaction,
+        transaction: RichMessageTransaction?,
         oldPendingAttempts: Int,
         info: TransactionStatusInfo
     ) -> TransactionStatus {
         switch info.status {
         case .success:
+            guard let transaction = transaction else {
+                return info.status
+            }
             return consistencyFilter(transaction: transaction, statusInfo: info)
                 ? info.status
                 : .inconsistent

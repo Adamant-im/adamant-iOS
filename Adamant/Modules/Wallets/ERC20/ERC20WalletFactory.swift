@@ -30,6 +30,7 @@ struct ERC20WalletFactory: WalletFactory {
         vc.dialogService = assembler.resolve(DialogService.self)
         vc.screensFactory = screensFactory
         vc.walletService = service
+        vc.ercWalletService = service
         return vc
     }
     

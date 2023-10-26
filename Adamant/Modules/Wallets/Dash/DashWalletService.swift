@@ -54,6 +54,7 @@ final class DashWalletService: WalletService {
     var securedStore: SecuredStore!
     var dialogService: DialogService!
     var addressConverter: AddressConverter!
+    var coreDataStack: CoreDataStack!
     
     // MARK: - Constants
     static var currencyLogo = UIImage.asset(named: "dash_wallet") ?? .init()
@@ -125,6 +126,23 @@ final class DashWalletService: WalletService {
     static let jsonDecoder = JSONDecoder()
     private var subscriptions = Set<AnyCancellable>()
 
+    @ObservableValue private(set) var historyTransactions: [TransactionDetails] = []
+    @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
+
+    var transactionsPublisher: AnyObservable<[TransactionDetails]> {
+        $historyTransactions.eraseToAnyPublisher()
+    }
+    
+    var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
+        $hasMoreOldTransactions.eraseToAnyPublisher()
+    }
+    
+    private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
+        coinId: tokenUnicID,
+        coreDataStack: coreDataStack,
+        blockchainType: richMessageType
+    )
+    
     // MARK: - State
     private (set) var state: WalletServiceState = .notInitiated
     
@@ -178,6 +196,15 @@ final class DashWalletService: WalletService {
                     NotificationCenter.default.removeObserver(balanceObserver)
                     self?.balanceObserver = nil
                 }
+                self?.coinStorage.clear()
+            }
+            .store(in: &subscriptions)
+    }
+    
+    func addTransactionObserver() {
+        coinStorage.transactionsPublisher
+            .sink { [weak self] transactions in
+                self?.historyTransactions = transactions
             }
             .store(in: &subscriptions)
     }
@@ -329,6 +356,9 @@ extension DashWalletService: SwinjectDependentService {
         dialogService = container.resolve(DialogService.self)
         addressConverter = container.resolve(AddressConverterFactory.self)?
             .make(network: network)
+        coreDataStack = container.resolve(CoreDataStack.self)
+        
+        addTransactionObserver()
     }
 }
 
@@ -402,6 +432,39 @@ extension DashWalletService {
                 message: "DASH Wallet: failed to get address from KVS"
             )
         }
+    }
+    
+    func loadTransactions(offset: Int, limit: Int) async throws -> Int {
+        guard let address = wallet?.address else {
+            return .zero
+        }
+        
+        let allTransactionsIds = try await requestTransactionsIds(for: address).reversed()
+        
+        let availableToLoad = allTransactionsIds.count - offset
+        
+        let maxPerRequest = availableToLoad > limit
+        ? limit
+        : availableToLoad
+        
+        let startIndex = allTransactionsIds.index(allTransactionsIds.startIndex, offsetBy: offset)
+        let endIndex = allTransactionsIds.index(startIndex, offsetBy: maxPerRequest)
+        let ids = Array(allTransactionsIds[startIndex..<endIndex])
+        
+        let trs = try await getTransactions(by: ids)
+        
+        guard trs.count > 0 else {
+            hasMoreOldTransactions = false
+            return .zero
+        }
+        
+        coinStorage.append(trs)
+        
+        return trs.count
+    }
+    
+    func getLocalTransactionHistory() -> [TransactionDetails] {
+        historyTransactions
     }
 }
 

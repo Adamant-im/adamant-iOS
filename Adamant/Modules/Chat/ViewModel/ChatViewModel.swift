@@ -26,7 +26,7 @@ final class ChatViewModel: NSObject {
     private let visibleWalletService: VisibleWalletsService
     private let accountService: AccountService
     private let accountProvider: AccountsProvider
-    private let richTransactionStatusService: RichTransactionStatusService
+    private let richTransactionStatusService: TransactionStatusService
     private let chatCacheService: ChatCacheService
     private let richMessageProviders: [String: RichMessageProvider]
     private let avatarService: AvatarService
@@ -127,7 +127,7 @@ final class ChatViewModel: NSObject {
         visibleWalletService: VisibleWalletsService,
         accountService: AccountService,
         accountProvider: AccountsProvider,
-        richTransactionStatusService: RichTransactionStatusService,
+        richTransactionStatusService: TransactionStatusService,
         chatCacheService: ChatCacheService,
         richMessageProviders: [String: RichMessageProvider],
         avatarService: AvatarService,

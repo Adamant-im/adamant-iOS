@@ -217,6 +217,14 @@ protocol WalletService: AnyObject {
     var defaultOrdinalLevel: Int? { get }
     var richMessageType: String { get }
     
+    var transactionsPublisher: AnyObservable<[TransactionDetails]> {
+        get
+    }
+    
+    var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
+        get
+    }
+    
 	// MARK: Notifications
 	
 	/// Wallet updated.
@@ -241,6 +249,8 @@ protocol WalletService: AnyObject {
     func validate(address: String) -> AddressValidationResult
     func getWalletAddress(byAdamantAddress address: String) async throws -> String
     func getBalance(address: String) async throws -> Decimal
+    func loadTransactions(offset: Int, limit: Int) async throws -> Int
+    func getLocalTransactionHistory() -> [TransactionDetails]
 }
 
 protocol SwinjectDependentService: WalletService {
@@ -305,7 +315,7 @@ protocol WalletServiceSimpleSend: WalletServiceWithSend {
         amount: Decimal,
         comments: String,
         replyToMessageId: String?
-    ) async throws -> TransactionDetails
+    ) async throws -> AdamantTransactionDetails
 }
 
 protocol WalletServiceTwoStepSend: WalletServiceWithSend {

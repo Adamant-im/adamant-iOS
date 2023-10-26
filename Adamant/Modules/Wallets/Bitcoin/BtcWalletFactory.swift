@@ -31,6 +31,7 @@ struct BtcWalletFactory: WalletFactory {
         c.btcWalletService = service
         c.addressBook = assembler.resolve(AddressBookService.self)
         c.screensFactory = screensFactory
+        c.walletService = service
         return c
     }
     
