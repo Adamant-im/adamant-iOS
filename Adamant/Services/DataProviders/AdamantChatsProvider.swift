@@ -918,6 +918,7 @@ extension AdamantChatsProvider {
         transaction.richType = richType
         transaction.additionalType = additionalType
         transaction.richContentSerialized = richContentSerialized
+        transaction.blockchainType = richType
         
         transaction.transactionStatus = richProviders[richType] != nil ? .notInitiated : nil
         

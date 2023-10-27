@@ -21,18 +21,12 @@ public class RichMessageTransaction: ChatTransaction {
     
     override var transactionStatus: TransactionStatus? {
         get {
-            if let raw = transferStatusRaw {
-                return TransactionStatus(rawValue: raw.int16Value)
-            } else {
-                return nil
-            }
+            TransactionStatus(rawValue: transactionStatusRaw)
         }
         set {
-            if let raw = newValue {
-                transferStatusRaw = raw.rawValue as NSNumber
-            } else {
-                transferStatusRaw = nil
-            }
+            let raw = newValue?.rawValue ?? .zero
+            guard raw != transactionStatusRaw else { return }
+            transactionStatusRaw = newValue?.rawValue ?? .zero
         }
     }
     
