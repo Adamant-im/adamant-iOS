@@ -22,7 +22,7 @@ extension String.adamant {
     }
 }
 
-private typealias TransactionsDiffableDataSource = UITableViewDiffableDataSource<Int, HashableIDWrapper<SimpleTransactionDetails>>
+private typealias TransactionsDiffableDataSource = UITableViewDiffableDataSource<Int, SimpleTransactionDetails>
 
 // Extensions for a generic classes is limited, so delegates implemented right in class declaration
 class TransactionsListViewControllerBase: UIViewController {
@@ -160,8 +160,8 @@ class TransactionsListViewControllerBase: UIViewController {
             by: { ($0.dateValue ?? Date()) > ($1.dateValue ?? Date()) }
         )
 
-        let list = self.transactions.wrappedByHashableId()
-        var snapshot = NSDiffableDataSourceSnapshot<Int, HashableIDWrapper<SimpleTransactionDetails>>()
+        let list = self.transactions
+        var snapshot = NSDiffableDataSourceSnapshot<Int, SimpleTransactionDetails>()
         snapshot.appendSections([.zero])
         snapshot.appendItems(list)
         snapshot.reconfigureItems(list)
@@ -246,7 +246,7 @@ class TransactionsListViewControllerBase: UIViewController {
     private func makeCell(
         tableView: UITableView,
         indexPath: IndexPath,
-        model: HashableIDWrapper<SimpleTransactionDetails>
+        model: SimpleTransactionDetails
     ) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifierCompact, for: indexPath) as! TransactionTableViewCell
         
@@ -256,7 +256,7 @@ class TransactionsListViewControllerBase: UIViewController {
         : UITableView.defaultTransactionsSeparatorInset
         
         cell.currencySymbol = currencySymbol
-        cell.transaction = model.value
+        cell.transaction = model
         return cell
     }
     
