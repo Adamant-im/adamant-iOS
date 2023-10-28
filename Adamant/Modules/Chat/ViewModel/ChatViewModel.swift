@@ -68,6 +68,7 @@ final class ChatViewModel: NSObject {
     var tempOffsets: [String] = []
     var needToAnimateCellIndex: Int?
 
+    let didTapPartnerQR = ObservableSender<CoreDataAccount>()
     let didTapTransfer = ObservableSender<String>()
     let dialog = ObservableSender<ChatDialog>()
     let didTapAdmChat = ObservableSender<(Chatroom, String?)>()

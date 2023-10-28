@@ -1143,3 +1143,9 @@
 
 /* Pending message reply error */
 "Reply.pendingMessageError" = "Sie können nicht auf eine ausstehende Nachricht antworten. Auf Bestätigungen warten (schätzungsweise 1–2 Sekunden)";
+
+/* Include partner name */
+"PartnerQR.includePartnerName" = "Neem contact op met";
+
+/* Include partner url */
+"PartnerQR.includePartnerURL" = "Koppeling naar webapp opnemen";

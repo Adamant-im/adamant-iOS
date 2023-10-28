@@ -46,6 +46,11 @@ public extension StoreKey {
     enum emojis {
         public static let emojis = "emojis"
     }
+    
+    enum partnerQR {
+        public static let includeNameEnabled = "includeNameEnabled"
+        public static let includeURLEnabled = "includeURLEnabled"
+    }
 }
 
 public protocol SecuredStore: AnyObject {

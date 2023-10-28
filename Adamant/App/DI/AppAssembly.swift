@@ -81,6 +81,13 @@ struct AppAssembly: Assembly {
             )
         }.inObjectScope(.container)
         
+        // MARK: PartnerQRService
+        container.register(PartnerQRService.self) { r in
+            AdamantPartnerQRService(
+                securedStore: r.resolve(SecuredStore.self)!
+            )
+        }.inObjectScope(.container)
+        
         // MARK: PushNotificationsTokenService
         container.register(PushNotificationsTokenService.self) { r in
             AdamantPushNotificationsTokenService(
