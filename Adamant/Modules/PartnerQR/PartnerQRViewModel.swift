@@ -13,12 +13,22 @@ import Photos
 
 @MainActor
 final class PartnerQRViewModel: NSObject, ObservableObject {
-    @Published var includeContactsName = false
-    @Published var includeWebAppLink = false
     @Published var includeContactsNameEnabled = true
     @Published var image: UIImage?
     @Published var partnerImage: UIImage?
     @Published var partnerName: String = ""
+    
+    @Published var includeWebAppLink = false {
+        didSet {
+            didToggle()
+        }
+    }
+
+    @Published var includeContactsName = false {
+        didSet {
+            didToggle()
+        }
+    }
     
     private var partner: CoreDataAccount?
     private let dialogService: DialogService
@@ -120,7 +130,9 @@ private extension PartnerQRViewModel {
             return
         }
         
-        if let name = addressBookService.getName(for: address) {
+        let name = partner?.name ?? addressBookService.getName(for: address)
+        
+        if let name = name {
             partnerName = name
             includeContactsNameEnabled = true
             includeContactsName = partnerQRService.isIncludeNameEnabled()
@@ -150,8 +162,10 @@ private extension PartnerQRViewModel {
         
         var params: [AdamantAddressParam] = []
         
+        let name = partner?.name ?? addressBookService.getName(for: address)
+        
         if includeContactsName,
-           let name = addressBookService.getName(for: address) {
+           let name = name {
             params.append(.label(name))
         }
         

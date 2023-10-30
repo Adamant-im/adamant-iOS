@@ -8,20 +8,23 @@
 
 import Swinject
 import SwiftUI
+import CommonKit
 
 struct PartnerQRFactory {
     private let assembler: Assembler
     
     init(parent: Assembler) {
-        assembler = .init([ContributeAssembly()], parent: parent)
+        assembler = .init([PartnerQRAssembly()], parent: parent)
     }
     
     @MainActor
     func makeViewController(partner: CoreDataAccount) -> UIViewController {
+        let viewModel = assembler.resolve(PartnerQRViewModel.self)!
+        viewModel.setup(partner: partner)
+        
         let view = PartnerQRView(
-            viewModel: assembler.resolve(PartnerQRViewModel.self)!
+            viewModel: viewModel
         )
-        view.viewModel.setup(partner: partner)
         
         return UIHostingController(
             rootView: view
@@ -29,8 +32,14 @@ struct PartnerQRFactory {
     }
 }
 
-private struct ContributeAssembly: Assembly {
+private struct PartnerQRAssembly: Assembly {
     func assemble(container: Container) {
+        container.register(PartnerQRService.self) { r in
+            AdamantPartnerQRService(
+                securedStore: r.resolve(SecuredStore.self)!
+            )
+        }.inObjectScope(.container)
+        
         container.register(PartnerQRViewModel.self) {
             PartnerQRViewModel(
                 dialogService: $0.resolve(DialogService.self)!,
