@@ -621,6 +621,13 @@ extension AdamantTransfersProvider {
         }
         
         // MARK: 2. Create transaction
+        let signedTransaction = try await apiService.createSendTransaction(
+            sender: loggedAccount.address,
+            recipient: recipient,
+            amount: amount,
+            keypair: keypair
+        )
+        
         let transaction = TransferTransaction(context: context)
         transaction.amount = amount as NSDecimalNumber
         transaction.date = Date() as NSDate
@@ -631,9 +638,9 @@ extension AdamantTransfersProvider {
         transaction.showsChatroom = false
         transaction.fee = Self.transferFee as NSDecimalNumber
         
-        transaction.transactionId = UUID().uuidString
+        transaction.transactionId = signedTransaction.id
         transaction.blockId = nil
-        transaction.chatMessageId = UUID().uuidString
+        transaction.chatMessageId = signedTransaction.id
         transaction.statusEnum = MessageStatus.pending
         
         // MARK: 3. Chatroom
@@ -667,10 +674,7 @@ extension AdamantTransfersProvider {
         // MARK: 5. Send
         do {
             let id = try await apiService.transferFunds(
-                sender: loggedAccount.address,
-                recipient: recipient,
-                amount: amount,
-                keypair: keypair
+                transaction: signedTransaction
             )
             
             transaction.transactionId = String(id)

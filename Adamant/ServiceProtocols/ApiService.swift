@@ -136,18 +136,7 @@ protocol ApiService: Actor {
     // MARK: - Funds
     
     func transferFunds(
-        sender: String,
-        recipient: String,
-        amount: Decimal,
-        keypair: Keypair,
-        completion: @escaping (ApiServiceResult<UInt64>) -> Void
-    )
-    
-    func transferFunds(
-        sender: String,
-        recipient: String,
-        amount: Decimal,
-        keypair: Keypair
+        transaction: UnregisteredTransaction
     ) async throws -> UInt64
     
     // MARK: - States
@@ -228,6 +217,13 @@ protocol ApiService: Actor {
         amount: Decimal?
     ) -> UnregisteredTransaction?
 
+    func createSendTransaction(
+        sender: String,
+        recipient: String,
+        amount: Decimal,
+        keypair: Keypair
+    ) throws -> UnregisteredTransaction
+    
     func sendTransaction(
         transaction: UnregisteredTransaction
     ) async throws -> UInt64
