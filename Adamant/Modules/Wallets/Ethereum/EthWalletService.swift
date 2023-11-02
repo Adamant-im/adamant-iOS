@@ -799,7 +799,7 @@ extension EthWalletService {
         }
         
         let newTrs = trs.map { transaction in
-            let isOutgoing: Bool = transaction.to != address
+            let isOutgoing: Bool = transaction.from == address
             return SimpleTransactionDetails(
                 txId: transaction.hash,
                 senderAddress: transaction.from,

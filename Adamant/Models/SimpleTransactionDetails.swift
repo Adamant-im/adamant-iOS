@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct SimpleTransactionDetails: AdamantTransactionDetails {
+struct SimpleTransactionDetails: AdamantTransactionDetails, Hashable {
     var defaultCurrencySymbol: String?
     
     var txId: String

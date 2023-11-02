@@ -673,7 +673,7 @@ extension ERC20WalletService {
         }
         
         let newTrs = trs.map { transaction in
-            let isOutgoing: Bool = transaction.to != address
+            let isOutgoing: Bool = transaction.from == address
             
             var exponent = EthWalletService.currencyExponent
             if let naturalUnits = token?.naturalUnits {
