@@ -168,6 +168,33 @@ extension AdamantApiService {
         return transaction
     }
     
+    func createSendTransaction(
+        sender: String,
+        recipient: String,
+        amount: Decimal,
+        keypair: Keypair
+    ) throws -> UnregisteredTransaction {
+        let normalizedTransaction = NormalizedTransaction(
+            type: .send,
+            amount: amount,
+            senderPublicKey: keypair.publicKey,
+            requesterPublicKey: nil,
+            date: lastRequestTimeDelta.map { Date().addingTimeInterval(-$0) } ?? Date(),
+            recipientId: recipient,
+            asset: .init()
+        )
+        
+        guard let transaction = adamantCore.makeSignedTransaction(
+            transaction: normalizedTransaction,
+            senderId: sender,
+            keypair: keypair
+        ) else {
+            throw InternalError.signTransactionFailed
+        }
+        
+        return transaction
+    }
+    
     func sendTransaction(
         transaction: UnregisteredTransaction
     ) async throws -> UInt64 {
