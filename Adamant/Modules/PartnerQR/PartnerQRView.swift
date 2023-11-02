@@ -65,9 +65,15 @@ private extension PartnerQRView {
             Toggle(String.adamant.partnerQR.includePartnerName, isOn: $viewModel.includeContactsName)
                 .disabled(!viewModel.includeContactsNameEnabled)
                 .tint(.init(uiColor: .adamant.active))
+                .onChange(of: viewModel.includeContactsName) { _ in
+                    viewModel.didToggle()
+                }
             
             Toggle(String.adamant.partnerQR.includePartnerURL, isOn: $viewModel.includeWebAppLink)
                 .tint(.init(uiColor: .adamant.active))
+                .onChange(of: viewModel.includeWebAppLink) { _ in
+                    viewModel.didToggle()
+                }
         }
     }
     

@@ -17,18 +17,8 @@ final class PartnerQRViewModel: NSObject, ObservableObject {
     @Published var image: UIImage?
     @Published var partnerImage: UIImage?
     @Published var partnerName: String = ""
-    
-    @Published var includeWebAppLink = false {
-        didSet {
-            didToggle()
-        }
-    }
-
-    @Published var includeContactsName = false {
-        didSet {
-            didToggle()
-        }
-    }
+    @Published var includeWebAppLink = false
+    @Published var includeContactsName = false
     
     private var partner: CoreDataAccount?
     private let dialogService: DialogService
