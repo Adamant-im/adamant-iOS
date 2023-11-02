@@ -138,21 +138,26 @@ private extension ChatDialogManager {
     func showSystemPartnerMenu(sender: UIBarButtonItem) {
         guard let address = address, let encodedAddress = encodedAddress else { return }
         
+        let didSelect: ((ShareType) -> Void)? = { [weak self] type in
+            guard case .partnerQR = type,
+                  let partner = self?.viewModel.chatroom?.partner
+            else { return }
+            
+            self?.viewModel.didTapPartnerQR.send(partner)
+        }
+        
         dialogService.presentShareAlertFor(
             string: address,
             types: [
                 .copyToPasteboard,
                 .share,
-                .generateQr(
-                    encodedContent: encodedAddress,
-                    sharingTip: address,
-                    withLogo: true
-                )
+                .partnerQR
             ],
             excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
             animated: true,
             from: sender,
-            completion: nil
+            completion: nil,
+            didSelect: didSelect
         )
     }
     
@@ -304,25 +309,29 @@ private extension ChatDialogManager {
         ) { [weak self] _ in
             guard
                 let self = self,
-                let address = self.address,
-                let encodedAddress = self.encodedAddress
+                let address = self.address
             else { return }
+            
+            let didSelect: ((ShareType) -> Void)? = { [weak self] type in
+                guard case .partnerQR = type,
+                      let partner = self?.viewModel.chatroom?.partner
+                else { return }
+                
+                self?.viewModel.didTapPartnerQR.send(partner)
+            }
             
             self.dialogService.presentShareAlertFor(
                 string: address,
                 types: [
                     .copyToPasteboard,
                     .share,
-                    .generateQr(
-                        encodedContent: encodedAddress,
-                        sharingTip: address,
-                        withLogo: true
-                    )
+                    .partnerQR
                 ],
                 excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
                 animated: true,
                 from: sender,
-                completion: nil
+                completion: nil,
+                didSelect: didSelect
             )
         }
     }

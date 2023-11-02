@@ -1119,3 +1119,9 @@
 
 /* Pending message reply error */
 "Reply.pendingMessageError" = "Вы не можете ответить на ожидающее сообщение. Дождитесь подтверждения (оценка 1-2 секунды)";
+
+/* Include partner name */
+"PartnerQR.includePartnerName" = "Добавить имя контакта";
+
+/* Include partner url */
+"PartnerQR.includePartnerURL" = "Добавить ссылку на веб-приложение";

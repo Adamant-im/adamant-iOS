@@ -60,7 +60,20 @@ extension String {
                         }
                     }
                 }
-                
+            case .addressLegacy(address: let addr, params: let params):
+                address = addr
+                if let params = params {
+                    for param in params {
+                        switch param {
+                        case .address:
+                            break
+                        case .label(let label):
+                            name = label
+                        case .message(let urlMessage):
+                            message = urlMessage
+                        }
+                    }
+                }
             case .passphrase:
                 address = nil
             }
