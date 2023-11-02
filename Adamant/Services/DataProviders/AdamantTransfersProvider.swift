@@ -628,7 +628,7 @@ extension AdamantTransfersProvider {
             keypair: keypair
         )
         
-        let locallyID = signedTransaction.generateId()
+        let locallyID = signedTransaction.generateId() ?? UUID().uuidString
         
         let transaction = TransferTransaction(context: context)
         transaction.amount = amount as NSDecimalNumber

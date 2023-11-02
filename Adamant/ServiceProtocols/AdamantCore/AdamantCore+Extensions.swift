@@ -37,10 +37,10 @@ extension AdamantCore {
 // MARK: - Bytes
 
 extension UnregisteredTransaction {
-    func generateId() -> String {
+    func generateId() -> String? {
         let hash = bytes.sha256()
         
-        guard hash.count > 7 else { return UUID().uuidString }
+        guard hash.count > 7 else { return nil }
         
         var temp: [UInt8] = []
         
@@ -49,7 +49,7 @@ extension UnregisteredTransaction {
         }
         
         guard let value = bigIntFromBuffer(temp, size: 1) else {
-            return UUID().uuidString
+            return nil
         }
         
         return String(value)
