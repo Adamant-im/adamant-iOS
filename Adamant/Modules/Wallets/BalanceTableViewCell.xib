@@ -1,37 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="49" id="KGk-i7-Jjw" customClass="BalanceTableViewCell" customModuleProvider="target">
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="49" id="KGk-i7-Jjw" customClass="BalanceTableViewCell" customModule="Adamant" customModuleProvider="target">
             <rect key="frame" x="0.0" y="0.0" width="320" height="58"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
-                <rect key="frame" x="0.0" y="0.0" width="320" height="57.5"/>
+                <rect key="frame" x="0.0" y="0.0" width="320" height="58"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yFY-BZ-kAh">
-                        <rect key="frame" x="16" y="18.5" width="33.5" height="20.5"/>
-                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                        <nil key="textColor"/>
-                        <nil key="highlightedColor"/>
-                    </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Alert" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TsC-Xx-jDk" customClass="RoundedLabel" customModule="FreakingSimpleRoundImageView">
-                        <rect key="frame" x="207" y="18.5" width="37" height="20.5"/>
+                        <rect key="frame" x="207.5" y="19" width="36.5" height="20.5"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="bottom" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="Dbe-dZ-Aox">
-                        <rect key="frame" x="252" y="8.5" width="52" height="40.5"/>
+                        <rect key="frame" x="252" y="9" width="52" height="40.5"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Crypto" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TfR-pp-P5j">
                                 <rect key="frame" x="0.0" y="0.0" width="52" height="20.5"/>
@@ -49,13 +42,9 @@
                     </stackView>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="yFY-BZ-kAh" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="27h-MU-nCp"/>
                     <constraint firstItem="Dbe-dZ-Aox" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="AD3-dw-uNv"/>
-                    <constraint firstItem="TsC-Xx-jDk" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="yFY-BZ-kAh" secondAttribute="trailing" constant="8" id="Dpn-7e-zuU"/>
-                    <constraint firstItem="Dbe-dZ-Aox" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="yFY-BZ-kAh" secondAttribute="trailing" constant="8" id="QjE-Lu-RL9"/>
                     <constraint firstAttribute="trailing" secondItem="Dbe-dZ-Aox" secondAttribute="trailing" constant="16" id="ShY-Ia-ysU"/>
-                    <constraint firstItem="TsC-Xx-jDk" firstAttribute="centerY" secondItem="yFY-BZ-kAh" secondAttribute="centerY" id="XKF-Ty-N7q"/>
-                    <constraint firstItem="yFY-BZ-kAh" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="mF3-5c-0Wf"/>
+                    <constraint firstItem="TsC-Xx-jDk" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="s5p-n6-bev"/>
                     <constraint firstItem="Dbe-dZ-Aox" firstAttribute="leading" secondItem="TsC-Xx-jDk" secondAttribute="trailing" constant="8" id="sXZ-wB-hiQ"/>
                 </constraints>
             </tableViewCellContentView>
@@ -64,7 +53,6 @@
                 <outlet property="alertLabel" destination="TsC-Xx-jDk" id="rdA-Js-oHB"/>
                 <outlet property="cryptoBalanceLabel" destination="TfR-pp-P5j" id="qOc-Yk-ULa"/>
                 <outlet property="fiatBalanceLabel" destination="z6P-f4-LGb" id="Mtn-3Y-cjX"/>
-                <outlet property="titleLabel" destination="yFY-BZ-kAh" id="N2n-5i-7GH"/>
             </connections>
             <point key="canvasLocation" x="36.799999999999997" y="109.74512743628186"/>
         </tableViewCell>

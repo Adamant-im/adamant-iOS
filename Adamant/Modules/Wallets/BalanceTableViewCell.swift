@@ -9,6 +9,7 @@
 import UIKit
 import Eureka
 import FreakingSimpleRoundImageView
+import SnapKit
 
 // MARK: - Value struct
 public struct BalanceRowValue: Equatable {
@@ -25,10 +26,17 @@ public final class BalanceTableViewCell: Cell<BalanceRowValue>, CellType {
     static let fullHeight: CGFloat = 58.0
     
     // MARK: IBOutlets
-    @IBOutlet var titleLabel: UILabel!
     @IBOutlet var cryptoBalanceLabel: UILabel!
     @IBOutlet var fiatBalanceLabel: UILabel!
     @IBOutlet var alertLabel: RoundedLabel!
+    
+    lazy var titleLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 17)
+        label.text = "Balance"
+        label.textColor = .black
+        return label
+    }()
     
     // MARK: Properties
     var cryptoValue: String? {
@@ -65,6 +73,24 @@ public final class BalanceTableViewCell: Cell<BalanceRowValue>, CellType {
             } else {
                 alertLabel.isHidden = true
             }
+        }
+    }
+    
+    public required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        setupView()
+    }
+    
+    required init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        setupView()
+    }
+    
+    private func setupView() {
+        addSubview(titleLabel)
+        titleLabel.snp.makeConstraints { make in
+            make.leading.equalTo(layoutMarginsGuide)
+            make.centerY.equalToSuperview()
         }
     }
     
