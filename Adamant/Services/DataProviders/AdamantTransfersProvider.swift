@@ -628,6 +628,8 @@ extension AdamantTransfersProvider {
             keypair: keypair
         )
         
+        let locallyID = signedTransaction.generateId()
+        
         let transaction = TransferTransaction(context: context)
         transaction.amount = amount as NSDecimalNumber
         transaction.date = Date() as NSDate
@@ -638,9 +640,9 @@ extension AdamantTransfersProvider {
         transaction.showsChatroom = false
         transaction.fee = Self.transferFee as NSDecimalNumber
         
-        transaction.transactionId = signedTransaction.id
+        transaction.transactionId = locallyID
         transaction.blockId = nil
-        transaction.chatMessageId = signedTransaction.id
+        transaction.chatMessageId = locallyID
         transaction.statusEnum = MessageStatus.pending
         
         // MARK: 3. Chatroom

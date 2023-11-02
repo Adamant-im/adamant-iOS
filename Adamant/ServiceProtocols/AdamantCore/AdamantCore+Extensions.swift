@@ -37,12 +37,6 @@ extension AdamantCore {
 // MARK: - Bytes
 
 extension UnregisteredTransaction {
-    var id: String {
-        generateId()
-    }
-}
-
-private extension UnregisteredTransaction {
     func generateId() -> String {
         let hash = bytes.sha256()
         
@@ -60,7 +54,9 @@ private extension UnregisteredTransaction {
         
         return String(value)
     }
-    
+}
+
+private extension UnregisteredTransaction {
     func bigIntFromBuffer(_ buffer: [UInt8], size: Int) -> BigInt? {
         if buffer.isEmpty || size <= 0 {
             return nil
