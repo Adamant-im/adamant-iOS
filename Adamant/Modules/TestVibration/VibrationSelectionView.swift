@@ -18,8 +18,10 @@ struct VibrationSelectionView: View {
     var body: some View {
         List {
             ForEach(AdamantVibroType.allCases, id: \.self) { type in
-                Button(vibrationTypeDescription(type)) {
+                Button {
                     viewModel.type = type
+                } label: {
+                    Text(vibrationTypeDescription(type))
                 }
             }
         }

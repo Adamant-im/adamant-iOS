@@ -19,6 +19,9 @@ final class VibrationSelectionViewModel: ObservableObject {
     
     nonisolated init(vibroService: VibroService) {
         self.vibroService = vibroService
+        Task {
+            await self.setup()
+        }
     }
 }
 
