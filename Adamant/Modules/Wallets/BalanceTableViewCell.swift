@@ -34,7 +34,7 @@ public final class BalanceTableViewCell: Cell<BalanceRowValue>, CellType {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17)
         label.text = "Balance"
-        label.textColor = .black
+        label.textColor = .adamant.textColor
         return label
     }()
     
