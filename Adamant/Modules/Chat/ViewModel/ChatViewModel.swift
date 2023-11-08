@@ -453,6 +453,9 @@ final class ChatViewModel: NSObject {
     }
     
     func replyMessageIfNeeded(_ messageModel: MessageModel?) {
+        let tx = chatTransactions.first(where: { $0.txId == messageModel?.id })
+        guard isSendingAvailable, tx?.isFake == false else { return }
+        
         let message = messages.first(where: { $0.messageId == messageModel?.id })
         guard message?.status != .failed else {
             dialog.send(.warning(String.adamant.reply.failedMessageError))
@@ -564,9 +567,11 @@ final class ChatViewModel: NSObject {
         let tx = chatTransactions.first(where: { $0.txId == arg.messageId })
         guard tx?.statusEnum == .delivered else { return }
         
+        let presentReactions = isSendingAvailable && tx?.isFake == false
+        
         dialog.send(
             .presentMenu(
-                presentReactions: tx?.isFake == false,
+                presentReactions: presentReactions,
                 arg: arg,
                 didSelectEmojiDelegate: self,
                 didSelectEmojiAction: didSelectEmojiAction,
