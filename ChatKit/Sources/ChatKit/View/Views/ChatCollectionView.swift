@@ -39,7 +39,7 @@ final class ChatCollectionView: UIView, Modelable {
         tableView.contentInset = .init(
             top: safeAreaInsets.bottom,
             left: safeAreaInsets.left,
-            bottom: safeAreaInsets.top,
+            bottom: safeAreaInsets.top + preloadSpaceSize,
             right: safeAreaInsets.right
         )
     }
@@ -53,7 +53,8 @@ private extension ChatCollectionView {
     func configure() {
         addSubview(tableView)
         tableView.snp.makeConstraints {
-            $0.directionalEdges.equalToSuperview()
+            $0.directionalHorizontalEdges.bottom.equalToSuperview()
+            $0.top.equalToSuperview().offset(-preloadSpaceSize)
         }
         
         update()
@@ -99,7 +100,6 @@ private func makeTableView(delegate: UITableViewDelegate) -> UITableView {
     view.delegate = delegate
     view.transform = CGAffineTransform(scaleX: 1, y: -1)
     view.rowHeight = UITableView.automaticDimension
-    view.estimatedRowHeight = 50 // optimal estimated size for cells to make scroll work well
     view.contentInsetAdjustmentBehavior = .never
     view.showsHorizontalScrollIndicator = false
     view.showsVerticalScrollIndicator = false
@@ -110,3 +110,5 @@ private func makeTableView(delegate: UITableViewDelegate) -> UITableView {
     view.register(TransactionCell.self)
     return view
 }
+
+private let preloadSpaceSize: CGFloat = 1000

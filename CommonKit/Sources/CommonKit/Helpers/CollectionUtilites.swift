@@ -9,9 +9,18 @@
 public extension Collection {
     /// Returns the element at the specified index if it is within bounds, otherwise nil.
     subscript(safe index: Index) -> Element? {
-        indices.contains(index)
-            ? self[index]
-            : nil
+        indices.contains(index) ? self[index] : nil
+    }
+}
+
+public extension Array {
+    subscript(safe index: Index) -> Element? {
+        get {
+            indices.contains(index) ? self[index] : nil
+        } set {
+            guard indices.contains(index), let newValue = newValue else { return }
+            self[index] = newValue
+        }
     }
 }
 
