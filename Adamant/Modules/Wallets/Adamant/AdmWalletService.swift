@@ -189,6 +189,8 @@ final class AdmWalletService: NSObject, WalletService {
     func loadTransactions(offset: Int, limit: Int) async throws -> Int { .zero }
     
     func getLocalTransactionHistory() -> [TransactionDetails] { [] }
+    
+    func updateStatus(for id: String, status: TransactionStatus?) { }
 }
 
 // MARK: - NSFetchedResultsControllerDelegate

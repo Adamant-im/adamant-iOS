@@ -702,4 +702,8 @@ extension ERC20WalletService {
     func getLocalTransactionHistory() -> [TransactionDetails] {
         historyTransactions
     }
+    
+    func updateStatus(for id: String, status: TransactionStatus?) {
+        coinStorage.updateStatus(for: id, status: status)
+    }
 }
