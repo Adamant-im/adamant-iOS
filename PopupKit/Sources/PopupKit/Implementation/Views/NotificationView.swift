@@ -44,6 +44,7 @@ private extension NotificationView {
             .foregroundColor(.secondary)
             .scaledToFit()
             .frame(squareSize: 30)
+            .padding(.top, 2)
     }
     
     var textStack: some View {
