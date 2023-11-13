@@ -180,10 +180,11 @@ final class QRGeneratorViewController: FormViewController {
 // MARK: - QR Tools
 extension QRGeneratorViewController {
     func generateQr() {
-        guard let row: TextAreaRow = form.rowBy(tag: Rows.passphrase.tag),
-            let passphrase = row.value?.lowercased(), // Lowercased!
-            AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
-                dialogService.showToastMessage(String.adamant.qrGenerator.wrongPassphraseError)
+        guard let row: PasswordRow = form.rowBy(tag: Rows.passphrase.tag),
+              let passphrase = row.value?.lowercased(),
+              AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase)
+        else {
+            dialogService.showToastMessage(String.adamant.qrGenerator.wrongPassphraseError)
             return
         }
         
