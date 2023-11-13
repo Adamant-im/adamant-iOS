@@ -8,6 +8,14 @@
 
 import Foundation
 
+// MARK: - Notifications
+extension Notification.Name {
+    struct AdamantVibroService {
+        static let presentVibrationRow = Notification.Name("adamant.vibroService.presentVibrationRow")
+        
+    }
+}
+
 protocol VibroService: AnyObject {
     func applyVibration(_ type: AdamantVibroType)
 }

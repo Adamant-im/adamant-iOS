@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import CommonKit
 
 struct VibrationSelectionView: View {
     @StateObject var viewModel: VibrationSelectionViewModel
@@ -25,28 +26,31 @@ struct VibrationSelectionView: View {
                 }
             }
         }
+        .withoutListBackground()
+        .background(Color(.adamant.secondBackgroundColor))
+        .navigationTitle("Vibrations")
     }
     
     private func vibrationTypeDescription(_ type: AdamantVibroType) -> String {
         switch type {
         case .light:
-            return "Light Vibration"
+            return "Single-Short-Light (1SL Vibartion)"
         case .rigid:
-            return "Rigid Vibration"
+            return "Single-Short-Rigid (1SR Vibartion)"
         case .heavy:
-            return "Heavy Vibration"
+            return "Single-Long-Rigid (1LR Vibartion)"
         case .medium:
-            return "Medium Vibration"
+            return "Single-Short-Medium (1SM Vibartion)"
         case .soft:
-            return "Soft Vibration"
+            return "Single-Long-Soft (1LS Vibartion)"
         case .selection:
-            return "Selection Vibration"
+            return "Single-Short-Soft (1SS Vibartion)"
         case .success:
-            return "Success Vibration"
+            return "Double-Short-Medium (2SM Vibartion)"
         case .warning:
-            return "Warning Vibration"
+            return "Double-Long-Medium (2LM Vibartion)"
         case .error:
-            return "Error Vibration"
+            return "Tripple-Long-Medium (3LM Vibartion)"
         }
     }
 }
