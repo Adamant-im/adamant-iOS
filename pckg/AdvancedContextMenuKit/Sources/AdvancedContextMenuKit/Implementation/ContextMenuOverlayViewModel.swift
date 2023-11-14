@@ -35,6 +35,7 @@ final class ContextMenuOverlayViewModel: ObservableObject {
     
     @Published var additionalMenuVisible = false
     @Published var shouldScroll: Bool = false
+    @Published var scrollToEnd = false
     
     init(
         contentView: UIView,
