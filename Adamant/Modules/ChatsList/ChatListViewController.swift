@@ -793,14 +793,21 @@ extension ChatListViewController {
             }
             
             // MARK: 1. Show notification only for incomming transactions
-            guard !transaction.silentNotification, !transaction.isOutgoing,
-                  let chatroom = transaction.chatroom, chatroom != presentedChatroom(), !chatroom.isHidden,
-                  let partner = chatroom.partner else {
+            guard !transaction.silentNotification,
+                  !transaction.isOutgoing,
+                  let chatroom = transaction.chatroom,
+                  chatroom != presentedChatroom(),
+                  !chatroom.isHidden,
+                  let partner = chatroom.partner,
+                  let address = partner.address
+            else {
                 return
             }
             
             // MARK: 2. Prepare notification
-            let title = partner.name ?? partner.address
+            
+            let name: String? = partner.name ?? addressBook.getName(for: address)
+            let title = name ?? partner.address
             let text = shortDescription(for: transaction)
             
             let image: UIImage
@@ -813,10 +820,12 @@ extension ChatListViewController {
             }
             
             // MARK: 4. Show notification with tap handler
-            dialogService.showNotification(title: title?.checkAndReplaceSystemWallets(), message: text?.string, image: image) { [weak self] in
-                DispatchQueue.main.async {
-                    self?.presentChatroom(chatroom)
-                }
+            dialogService.showNotification(
+                title: title?.checkAndReplaceSystemWallets(),
+                message: text?.string,
+                image: image
+            ) { [weak self] in
+                self?.presentChatroom(chatroom)
             }
         }
     }
