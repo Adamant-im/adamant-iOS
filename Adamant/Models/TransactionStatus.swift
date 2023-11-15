@@ -22,7 +22,7 @@ enum TransactionStatus: Int16 {
     var localized: String {
         switch self {
         case .notInitiated:
-            return .localized("TransactionStatus.Updating", comment: "Transaction status: updating in progress")
+            return "⏱"
         case .pending, .registered:
             return .localized("TransactionStatus.Pending", comment: "Transaction status: transaction is pending")
         case .success:

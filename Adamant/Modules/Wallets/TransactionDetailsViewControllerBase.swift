@@ -172,7 +172,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         return dateFormatter
     }()
     
-    static let awaitingValueString = "⏱"
+    static let awaitingValueString = TransactionStatus.notInitiated.localized
     
     private lazy var currencyFormatter: NumberFormatter = {
         return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: currencySymbol)
