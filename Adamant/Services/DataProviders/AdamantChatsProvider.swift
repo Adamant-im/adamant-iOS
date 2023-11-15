@@ -1127,14 +1127,18 @@ extension AdamantChatsProvider {
         }
         
         // MARK: 1. Find. Destroy. Save.
+        
+        let chatroom = message.chatroom
+        
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         privateContext.parent = stack.container.viewContext
         
         privateContext.delete(privateContext.object(with: message.objectID))
-        
         do {
             try privateContext.save()
-            return
+            if let chatroom = chatroom {
+                await updateLastTransactionForChatrooms([chatroom])
+            }
         } catch {
             throw ChatsProviderError.internalError(error)
         }
@@ -1695,7 +1699,7 @@ extension AdamantChatsProvider {
             
             if context.hasChanges {
                 try context.save()
-                await updateContext(rooms: rooms)
+                await updateLastTransactionForChatrooms(rooms)
             }
         } catch {
             print(error)
@@ -1717,13 +1721,14 @@ extension AdamantChatsProvider {
         receivedLastHeight = height
     }
     
-    @MainActor func updateContext(rooms: [Chatroom]) async {
+    @MainActor 
+    func updateLastTransactionForChatrooms(_ rooms: [Chatroom]) {
         let viewContextChatrooms = Set<Chatroom>(rooms).compactMap {
             self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom
         }
         
         for chatroom in viewContextChatrooms {
-            await chatroom.updateLastTransaction()
+            chatroom.updateLastTransaction()
         }
     }
 }

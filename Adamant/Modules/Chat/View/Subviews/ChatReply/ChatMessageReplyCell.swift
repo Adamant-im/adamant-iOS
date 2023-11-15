@@ -489,13 +489,33 @@ final class ChatMessageReplyCell: MessageContentCell, ChatModelView {
         messageLabel.handleGesture(touchPoint)
     }
     
+    /// Handle tap gesture on contentView and its subviews.
     override func handleTapGesture(_ gesture: UIGestureRecognizer) {
-        super.handleTapGesture(gesture)
-        
         let touchLocation = gesture.location(in: self)
         
-        if containerView.frame.contains(touchLocation) {
+        let containerViewContains = containerView.frame.contains(touchLocation)
+        let canHandle = !cellContentView(
+            canHandle: convert(touchLocation, to: containerView)
+        )
+        
+        switch true {
+        case containerViewContains && canHandle:
+            delegate?.didTapMessage(in: self)
             actionHandler(.scrollTo(message: model))
+        case avatarView.frame.contains(touchLocation):
+            delegate?.didTapAvatar(in: self)
+        case cellTopLabel.frame.contains(touchLocation):
+            delegate?.didTapCellTopLabel(in: self)
+        case cellBottomLabel.frame.contains(touchLocation):
+            delegate?.didTapCellBottomLabel(in: self)
+        case messageTopLabel.frame.contains(touchLocation):
+            delegate?.didTapMessageTopLabel(in: self)
+        case messageBottomLabel.frame.contains(touchLocation):
+            delegate?.didTapMessageBottomLabel(in: self)
+        case accessoryView.frame.contains(touchLocation):
+            delegate?.didTapAccessoryView(in: self)
+        default:
+            delegate?.didTapBackground(in: self)
         }
     }
 }
