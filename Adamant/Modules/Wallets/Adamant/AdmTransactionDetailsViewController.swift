@@ -58,7 +58,8 @@ final class AdmTransactionDetailsViewController: TransactionDetailsViewControlle
             dialogService: dialogService,
             currencyInfo: currencyInfo,
             addressBookService: addressBookService,
-            accountService:  accountService
+            accountService:  accountService,
+            walletService: nil
         )
     }
     

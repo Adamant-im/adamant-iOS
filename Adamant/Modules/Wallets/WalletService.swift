@@ -251,6 +251,7 @@ protocol WalletService: AnyObject {
     func getBalance(address: String) async throws -> Decimal
     func loadTransactions(offset: Int, limit: Int) async throws -> Int
     func getLocalTransactionHistory() -> [TransactionDetails]
+    func updateStatus(for id: String, status: TransactionStatus?)
 }
 
 protocol SwinjectDependentService: WalletService {

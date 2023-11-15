@@ -752,6 +752,10 @@ extension BtcWalletService {
     func getLocalTransactionHistory() -> [TransactionDetails] {
         transactions
     }
+    
+    func updateStatus(for id: String, status: TransactionStatus?) {
+        coinStorage.updateStatus(for: id, status: status)
+    }
 }
 
 // MARK: - PrivateKey generator
