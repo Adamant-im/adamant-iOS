@@ -85,7 +85,7 @@ final class AdamantUriTools {
             var components = URLComponents()
             components.scheme = AdmWalletService.qqPrefix
             components.host = address
-            components.queryItems = []
+            components.queryItems = (params?.count ?? .zero) > .zero ? [] : nil
             
             params?.forEach {
                 switch $0 {
@@ -98,7 +98,8 @@ final class AdamantUriTools {
                 }
             }
             
-            guard let uri = components.url?.absoluteString else { return "" }
+            guard let uri = components.url?.absoluteString.replacingOccurrences(of: "://", with: ":")
+            else { return "" }
 
             return uri
         }
