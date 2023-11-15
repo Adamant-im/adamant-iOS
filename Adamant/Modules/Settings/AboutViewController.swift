@@ -109,6 +109,8 @@ final class AboutViewController: FormViewController {
     
     // MARK: Properties
     private var storedIOSSupportMessage: String?
+    private var numerOfTap = 0
+    private let maxNumerOfTap = 10
     
     // MARK: Lifecycle
     
@@ -120,6 +122,13 @@ final class AboutViewController: FormViewController {
         
         // MARK: Header & Footer
         if let header = UINib(nibName: "LogoFullHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
+            
+            let tapGestureRecognizer = UITapGestureRecognizer(
+                target: self,
+                action: #selector(tapAction)
+            )
+            header.addGestureRecognizer(tapGestureRecognizer)
+            
             tableView.tableHeaderView = header
             
             if let label = header.viewWithTag(888) as? UILabel {
@@ -355,5 +364,20 @@ extension AboutViewController: ChatPreservationDelegate {
         } else {
             return storedIOSSupportMessage
         }
+    }
+}
+
+private extension AboutViewController {
+    @objc func tapAction() {
+        numerOfTap += 1
+        
+        guard numerOfTap == maxNumerOfTap else {
+            return
+        }
+        
+        NotificationCenter.default.post(
+            name: .AdamantVibroService.presentVibrationRow,
+            object: nil
+        )
     }
 }
