@@ -143,7 +143,7 @@ extension AdamantApiService {
         from address: String,
         keypair: Keypair,
         votes: [DelegateVote]
-    ) async -> ApiServiceResult<UInt64> {
+    ) async -> ApiServiceResult<Bool> {
         // MARK: 0. Prepare
         var votesOrdered = votes
         _ = votesOrdered.partition {

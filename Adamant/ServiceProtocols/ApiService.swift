@@ -130,5 +130,5 @@ protocol ApiService {
         from address: String,
         keypair: Keypair,
         votes: [DelegateVote]
-    ) async -> ApiServiceResult<UInt64>
+    ) async -> ApiServiceResult<Bool>
 }

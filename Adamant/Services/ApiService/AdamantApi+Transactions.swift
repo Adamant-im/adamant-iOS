@@ -39,8 +39,8 @@ extension AdamantApiService {
     func sendDelegateVoteTransaction(
         path: String,
         transaction: UnregisteredTransaction
-    ) async -> ApiServiceResult<UInt64> {
-        let response: ApiServiceResult<TransactionIdResponse> = await request { core, node in
+    ) async -> ApiServiceResult<Bool> {
+        let response: ApiServiceResult<ServerResponse> = await request { core, node in
             await core.sendRequestJson(
                 node: node,
                 path: path,
@@ -50,7 +50,10 @@ extension AdamantApiService {
             )
         }
         
-        return response.flatMap { $0.resolved() }
+        return response.flatMap {
+            guard let error = $0.error else { return .success($0.success) }
+            return .failure(.serverError(error: error))
+        }
     }
     
     func getTransaction(id: UInt64) async -> ApiServiceResult<Transaction> {
