@@ -82,7 +82,7 @@ public extension PopupManager {
             icon: icon,
             title: title,
             description: description,
-            tapHandler: tapHandler.map { .init(id: .zero, action: $0) }
+            tapHandler: tapHandler.map { .init(id: .empty, value: $0) }
         )
         
         if autoDismiss {

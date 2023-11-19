@@ -12,7 +12,7 @@ import CommonKit
 struct ContributeState {
     var isCrashlyticsOn: Bool
     var isCrashButtonOn: Bool
-    var safariURL: IdentifiableContainer<URL>?
+    var safariURL: IDWrapper<URL>?
     
     let name: String
     let crashliticsRowImage: UIImage
@@ -47,6 +47,12 @@ struct ContributeState {
                 name: .localized("Contribute.Section.CodeContribute", comment: .empty),
                 description: .localized("Contribute.Section.CodeContributeDescription", comment: .empty),
                 link: URL(string: "https://github.com/Adamant-im")
+            ),
+            .init(
+                image: .asset(named: "row_buy-coins") ?? .init(),
+                name: .localized("Contribute.Section.Donate", comment: .empty),
+                description: .localized("Contribute.Section.DonateDescription", comment: .empty),
+                link: URL(string: "https://adamant.im/donate")
             ),
             .init(
                 image: .asset(named: "row_rate") ?? .init(),

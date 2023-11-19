@@ -278,7 +278,7 @@ extension AdamantTransfersProvider {
                 case .accountNotFound:
                     err = .accountNotFound(address: address)
                     
-                case .serverError, .commonError:
+                case .serverError, .commonError, .noEndpointsAvailable:
                     err = .serverError(error)
                     
                 case .internalError(let message, _):
@@ -505,7 +505,7 @@ extension AdamantTransfersProvider {
         ? .message
         : .richMessage
         
-        let signedTransaction = await apiService.createSendTransaction(
+        let signedTransaction = try? adamantCore.makeSendMessageTransaction(
             senderId: loggedAccount.address,
             recipientId: recipient,
             keypair: keypair,
@@ -517,13 +517,13 @@ extension AdamantTransfersProvider {
         
         guard let signedTransaction = signedTransaction else {
             throw TransfersProviderError.internalError(
-                message: AdamantApiService.InternalError.signTransactionFailed.localized,
+                message: InternalAPIError.signTransactionFailed.localizedDescription,
                 error: nil
             )
         }
         
         do {
-            let id = try await apiService.sendTransaction(transaction: signedTransaction)
+            let id = try await apiService.sendMessageTransaction(transaction: signedTransaction).get()
             transaction.transactionId = String(id)
             await chatsProvider?.addUnconfirmed(transactionId: id, managedObjectId: transaction.objectID)
             
@@ -671,7 +671,7 @@ extension AdamantTransfersProvider {
                 recipient: recipient,
                 amount: amount,
                 keypair: keypair
-            )
+            ).get()
             
             transaction.transactionId = String(id)
             
@@ -752,7 +752,7 @@ extension AdamantTransfersProvider {
         }
         
         do {
-            let transaction = try await apiService.getTransaction(id: intId)
+            let transaction = try await apiService.getTransaction(id: intId).get()
             
             guard transfer.confirmations != transaction.confirmations else {
                 return
@@ -816,7 +816,7 @@ extension AdamantTransfersProvider {
                 fromHeight: fromHeight,
                 offset: offset,
                 limit: self.apiTransactions
-            )
+            ).get()
             
             guard transactions.count > 0 else {
                 return
@@ -864,7 +864,7 @@ extension AdamantTransfersProvider {
             offset: offset,
             limit: limit,
             orderByTime: orderByTime
-        )
+        ).get()
         
         guard transactions.count > 0 else {
             return 0
@@ -1076,7 +1076,7 @@ extension AdamantTransfersProvider {
          }
 
          for chatroom in viewContextChatrooms {
-             await chatroom.updateLastTransaction()
+             chatroom.updateLastTransaction()
          }
      }
 }

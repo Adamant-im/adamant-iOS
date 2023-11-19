@@ -13,17 +13,17 @@ import CommonKit
 
 extension EthWalletService: RichMessageProviderWithStatusCheck {
     func statusInfoFor(transaction: RichMessageTransaction) async -> TransactionStatusInfo {
-        guard
-            let web3 = await web3,
-            let hash = transaction.getRichValue(for: RichContentKeys.transfer.hash)
-        else {
+        guard let hash = transaction.getRichValue(for: RichContentKeys.transfer.hash) else {
             return .init(sentDate: nil, status: .inconsistent)
         }
         
         let transactionInfo: EthTransactionInfo
         
         do {
-            transactionInfo = try await getTransactionInfo(hash: hash, web3: web3)
+            transactionInfo = try await ethApiService.requestWeb3 { [weak self] web3 in
+                guard let self = self else { throw WalletServiceError.internalError(.unknownError) }
+                return try await getTransactionInfo(hash: hash, web3: web3)
+            }.get()
         } catch _ as URLError {
             return .init(sentDate: nil, status: .noNetwork)
         } catch {
@@ -39,7 +39,9 @@ extension EthWalletService: RichMessageProviderWithStatusCheck {
         
         var sentDate: Date?
         if let blockHash = details.blockHash {
-            sentDate = try? await web3.eth.block(by: blockHash).timestamp
+            sentDate = try? await ethApiService.requestWeb3 { web3 in
+                try await web3.eth.block(by: blockHash).timestamp
+            }.get()
         }
         
         return .init(

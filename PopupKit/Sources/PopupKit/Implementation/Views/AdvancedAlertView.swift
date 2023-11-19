@@ -70,7 +70,7 @@ private extension AdvancedAlertView {
     }
     
     var primaryButton: some View {
-        Button(action: model.primaryButton.action.action) {
+        Button(action: model.primaryButton.action.value) {
             Text(model.primaryButton.title)
                 .padding(.vertical, bigSpacing)
                 .expanded(axes: .horizontal)
@@ -87,7 +87,7 @@ private extension AdvancedAlertView {
     }
     
     func makeSecondaryButton(model: AdvancedAlertModel.Button) -> some View {
-        Button(model.title, action: model.action.action)
+        Button(model.title, action: model.action.value)
     }
 }
 

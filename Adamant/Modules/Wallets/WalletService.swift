@@ -20,10 +20,7 @@ enum WalletServiceSimpleResult {
     case failure(error: WalletServiceError)
 }
 
-enum WalletServiceResult<T> {
-    case success(result: T)
-    case failure(error: WalletServiceError)
-}
+typealias WalletServiceResult<T> = Result<T, WalletServiceError>
 
 // MARK: - Errors
 
@@ -34,7 +31,7 @@ enum WalletServiceError: Error {
     case accountNotFound
     case walletNotInitiated
     case invalidAmount(Decimal)
-    case remoteServiceError(message: String)
+    case remoteServiceError(message: String, error: Error?)
     case apiError(ApiServiceError)
     case internalError(message: String, error: Error?)
     case transactionNotFound(reason: String)
@@ -60,7 +57,7 @@ extension WalletServiceError: RichError {
         case .walletNotInitiated:
             return .localized("WalletServices.SharedErrors.WalletNotInitiated", comment: "Wallet Services: Shared error, user has not yet initiated a specific wallet.")
             
-        case .remoteServiceError(let message):
+        case .remoteServiceError(let message, let error):
             return String.adamant.sharedErrors.remoteServerError(message: message)
             
         case .apiError(let error):
@@ -104,6 +101,41 @@ extension WalletServiceError: RichError {
             return error.level
         }
     }
+    
+    static func internalError(_ error: InternalAPIError) -> Self {
+        .internalError(message: error.localizedDescription, error: error)
+    }
+    
+    static func remoteServiceError(message: String? = nil, error: Error? = nil) -> Self {
+        .remoteServiceError(
+            message: message ?? error?.localizedDescription ?? .empty,
+            error: error
+        )
+    }
+}
+
+extension WalletServiceError: HealthCheckableError {
+    var isNetworkError: Bool {
+        switch self {
+        case .networkError:
+            return true
+        default:
+            return false
+        }
+    }
+    
+    var isRequestCancelledError: Bool {
+        switch self {
+        case .requestCancelled:
+            return true
+        default:
+            return false
+        }
+    }
+    
+    static var noEndpointsError: WalletServiceError {
+        .apiError(.noEndpointsError)
+    }
 }
 
 extension ApiServiceError {
@@ -121,7 +153,7 @@ extension ApiServiceError {
         case .requestCancelled:
             return .requestCancelled
             
-        case .serverError, .internalError, .commonError:
+        case .serverError, .internalError, .commonError, .noEndpointsAvailable:
             return .apiError(self)
         }
     }

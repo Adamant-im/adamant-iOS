@@ -12,5 +12,5 @@ struct NotificationModel: Equatable, Hashable {
     let icon: UIImage?
     let title: String?
     let description: String?
-    let tapHandler: HashableAction?
+    let tapHandler: IDWrapper<Action>?
 }

@@ -25,11 +25,7 @@ final class ERC20TransactionsViewController: TransactionsListViewControllerBase 
     var transactions: [EthTransactionShort] = []
     private var ethAddress: String = ""
     private lazy var exponent: Int = {
-        var exponent = EthWalletService.currencyExponent
-        if let naturalUnits = walletService.token?.naturalUnits {
-            exponent = -1 * naturalUnits
-        }
-        return exponent
+        -walletService.token.naturalUnits
     }()
     private var offset = 0
     

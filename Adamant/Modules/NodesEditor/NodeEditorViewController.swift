@@ -12,12 +12,10 @@ import CommonKit
 
 // MARK: - Localization
 extension String.adamant {
-    struct nodesEditor {
+    enum nodesEditor {
         static let newNodeTitle = String.localized("NodesEditor.NewNodeTitle", comment: "NodesEditor: New node scene title")
         static let deleteNodeAlert = String.localized("NodesEditor.DeleteNodeAlert", comment: "NodesEditor: Delete node confirmation message")
         static let failedToBuildURL = String.localized("NodesEditor.FailedToBuildURL", comment: "NodesEditor: Failed to build URL alert")
-
-        private init() {}
     }
 }
 
@@ -90,6 +88,7 @@ final class NodeEditorViewController: FormViewController {
     // MARK: - Dependencies
     var dialogService: DialogService!
     var apiService: ApiService!
+    var nodesStorage: NodesStorageProtocol!
     
     // MARK: - Properties
     var node: Node?
@@ -138,15 +137,15 @@ final class NodeEditorViewController: FormViewController {
                 $0.value = node.port
                 $0.placeholder = String(node.scheme.defaultPort)
             } else {
-                $0.placeholder = String(URLScheme.default.defaultPort)
+                $0.placeholder = String(Node.URLScheme.default.defaultPort)
             }
         }
         
         // Scheme
-        <<< PickerInlineRow<URLScheme> {
+        <<< PickerInlineRow<Node.URLScheme> {
             $0.title = Rows.scheme.localized
             $0.tag = Rows.scheme.tag
-            $0.value = node?.scheme ?? URLScheme.default
+            $0.value = node?.scheme ?? Node.URLScheme.default
             $0.options = [.https, .http]
             $0.baseCell.detailTextLabel?.textColor = .adamant.textColor
         }.onExpandInlineRow { (cell, _, inlineRow) in
@@ -156,7 +155,7 @@ final class NodeEditorViewController: FormViewController {
                 if let scheme = row.value {
                     portRow.placeholder = String(scheme.defaultPort)
                 } else {
-                    portRow.placeholder = String(URLScheme.default.defaultPort)
+                    portRow.placeholder = String(Node.URLScheme.default.defaultPort)
                 }
                 
                 portRow.updateCell()
@@ -165,7 +164,7 @@ final class NodeEditorViewController: FormViewController {
         
         // MARK: - WebSockets
         
-        if let wsEnabled = node?.status?.wsEnabled {
+        if let wsEnabled = node?.wsEnabled {
             form +++ Section()
 
             <<< LabelRow {
@@ -218,12 +217,15 @@ extension NodeEditorViewController {
         }
         
         let host = rawUrl.trimmingCharacters(in: .whitespaces)
+        let scheme: Node.URLScheme
         
-        let scheme: URLScheme
-        if let row = form.rowBy(tag: Rows.scheme.tag), let value = row.baseValue as? URLScheme {
+        if
+            let row = form.rowBy(tag: Rows.scheme.tag),
+            let value = row.baseValue as? Node.URLScheme
+        {
             scheme = value
         } else {
-            scheme = URLScheme.default
+            scheme = .default
         }
         
         let port: Int?
@@ -235,12 +237,22 @@ extension NodeEditorViewController {
         
         let result: NodeEditorResult
         if let node = node {
-            node.scheme = scheme
-            node.host = host
-            node.port = port
+            nodesStorage.updateNodeParams(
+                id: node.id,
+                scheme: scheme,
+                host: host,
+                port: port
+            )
+            
             result = .nodeUpdated
         } else {
-            result = .new(node: Node(scheme: scheme, host: host, port: port))
+            result = .new(node: Node(
+                scheme: scheme,
+                host: host,
+                isEnabled: true,
+                wsEnabled: false,
+                port: port
+            ))
         }
         
         didCallDelegate = true

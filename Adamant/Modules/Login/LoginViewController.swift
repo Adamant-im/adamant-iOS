@@ -374,14 +374,14 @@ extension LoginViewController {
         dialogService.showProgress(withMessage: String.adamant.login.loggingInProgressMessage, userInteractionEnable: false)
         
         Task {
-            await apiService.getAccount(byPassphrase: passphrase) { [weak self] result in
-                switch result {
-                case .success:
-                    self?.loginIntoExistingAccount(passphrase: passphrase)
-                    
-                case .failure(let error):
-                    self?.dialogService.showRichError(error: error)
-                }
+            let result = await apiService.getAccount(byPassphrase: passphrase)
+            
+            switch result {
+            case .success:
+                loginIntoExistingAccount(passphrase: passphrase)
+                
+            case .failure(let error):
+                dialogService.showRichError(error: error)
             }
         }
     }

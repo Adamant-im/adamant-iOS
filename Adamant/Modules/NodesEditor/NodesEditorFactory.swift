@@ -14,20 +14,22 @@ struct NodesEditorFactory {
     let assembler: Assembler
     
     func makeNodesListVC(screensFactory: ScreensFactory) -> UIViewController {
-        let c = NodesListViewController()
-        c.screensFactory = screensFactory
-        c.dialogService = assembler.resolve(DialogService.self)
-        c.securedStore = assembler.resolve(SecuredStore.self)
-        c.apiService = assembler.resolve(ApiService.self)
-        c.socketService = assembler.resolve(SocketService.self)
-        c.nodesSource = assembler.resolve(NodesSource.self)
-        return c
+        NodesListViewController(
+            dialogService: assembler.resolve(DialogService.self)!,
+            securedStore: assembler.resolve(SecuredStore.self)!,
+            screensFactory: screensFactory,
+            nodesStorage: assembler.resolve(NodesStorageProtocol.self)!,
+            nodesAdditionalParamsStorage: assembler.resolve(NodesAdditionalParamsStorageProtocol.self)!,
+            apiService: assembler.resolve(ApiService.self)!,
+            socketService: assembler.resolve(SocketService.self)!
+        )
     }
     
     func makeNodeEditorVC() -> NodeEditorViewController {
         let c = NodeEditorViewController()
         c.dialogService = assembler.resolve(DialogService.self)
         c.apiService = assembler.resolve(ApiService.self)
+        c.nodesStorage = assembler.resolve(NodesStorageProtocol.self)
         return c
     }
 }

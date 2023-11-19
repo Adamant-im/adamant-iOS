@@ -68,48 +68,31 @@ extension DashWalletService: WalletServiceTwoStepSend {
     }
     
     func sendTransaction(_ transaction: BitcoinKit.Transaction) async throws {
-        guard let endpoint = DashWalletService.nodes.randomElement()?.asURL() else {
-            throw WalletServiceError.internalError(
-                message: "Failed to get DASH endpoint URL",
-                error: nil
-            )
-        }
-        
         let txHex = transaction.serialized().hex
         
-        let parameters: Parameters = [
-            "method": "sendrawtransaction",
-            "params": [
-                txHex
-            ]
-        ]
-        
-        // MARK: Sending request
-        
-        do {
-            let response: BTCRPCServerResponce<String> = try await apiService.sendRequest(
-                url: endpoint,
+        let response: BTCRPCServerResponce<String> = try await dashApiService.request { core, node in
+            await core.sendRequestJson(
+                node: node,
+                path: .empty,
                 method: .post,
-                parameters: parameters,
-                encoding: JSONEncoding.default
+                parameters: DashSendRawTransactionDTO(txHex: txHex),
+                encoding: .json
             )
-            
-            if response.result != nil {
-                lastTransactionId = transaction.txID
-            } else if let error = response.error?.message {
-                if error.lowercased().contains("16: tx-txlock-conflict") {
-                    throw WalletServiceError.internalError(
-                        message: String.adamant.sharedErrors.walletFrezzed,
-                        error: nil
-                    )
-                } else {
-                    throw WalletServiceError.internalError(message: error, error: nil)
-                }
+        }.get()
+        
+        if response.result != nil {
+            lastTransactionId = transaction.txID
+        } else if let error = response.error?.message {
+            if error.lowercased().contains("16: tx-txlock-conflict") {
+                throw WalletServiceError.internalError(
+                    message: String.adamant.sharedErrors.walletFrezzed,
+                    error: nil
+                )
             } else {
-                throw WalletServiceError.internalError(message: "DASH Wallet: not valid response", error: nil)
+                throw WalletServiceError.internalError(message: error, error: nil)
             }
-        } catch {
-            throw WalletServiceError.remoteServiceError(message: error.localizedDescription)
+        } else {
+            throw WalletServiceError.internalError(message: "DASH Wallet: not valid response", error: nil)
         }
     }
 }

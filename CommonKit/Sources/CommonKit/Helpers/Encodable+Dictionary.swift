@@ -9,7 +9,7 @@
 import Foundation
 
 public extension Encodable {
-    var asDictionary: [String: Any]? {
+    func asDictionary() -> [String: Any]? {
         guard
             let data = try? JSONEncoder().encode(self),
             let object = try? JSONSerialization.jsonObject(with: data, options: .allowFragments)

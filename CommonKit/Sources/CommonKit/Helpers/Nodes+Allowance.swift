@@ -6,11 +6,11 @@
 //  Copyright © 2022 Adamant. All rights reserved.
 //
 
-public extension Collection where Element: Node {
+public extension Collection where Element == Node {
     func getAllowedNodes(sortedBySpeedDescending: Bool, needWS: Bool) -> [Node] {
         var allowedNodes = filter {
             $0.connectionStatus == .allowed
-                && (!needWS || $0.status?.wsEnabled ?? false)
+                && (!needWS || $0.wsEnabled)
         }
         
         if allowedNodes.isEmpty && !needWS {
@@ -19,7 +19,7 @@ public extension Collection where Element: Node {
         
         return sortedBySpeedDescending
             ? allowedNodes.sorted {
-                $0.status?.ping ?? .greatestFiniteMagnitude < $1.status?.ping ?? .greatestFiniteMagnitude
+                $0.ping ?? .greatestFiniteMagnitude < $1.ping ?? .greatestFiniteMagnitude
             }
             : allowedNodes.shuffled()
     }

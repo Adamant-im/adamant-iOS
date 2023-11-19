@@ -81,7 +81,7 @@ private extension NotificationView {
     }
     
     func onTap() {
-        model.tapHandler?.action()
+        model.tapHandler?.value()
         dismissAction()
     }
 }

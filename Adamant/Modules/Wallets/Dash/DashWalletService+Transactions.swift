@@ -36,30 +36,21 @@ extension DashWalletService {
     }
 
     func getTransaction(by hash: String) async throws -> BTCRawTransaction {
-        guard let endpoint = DashWalletService.nodes.randomElement()?.asURL() else {
-            fatalError("Failed to get DASH endpoint URL")
-        }
-
-        let parameters: Parameters = [
-            "method": "getrawtransaction",
-            "params": [
-                hash, true
-            ]
-        ]
-
-        // MARK: Sending request
-
-        let result: BTCRPCServerResponce<BTCRawTransaction> = try await apiService.sendRequest(
-            url: endpoint,
-            method: .post,
-            parameters: parameters,
-            encoding: JSONEncoding.default
-        )
-
+        let result: BTCRPCServerResponce<BTCRawTransaction> = try await dashApiService.request {
+            core, node in
+            await core.sendRequestJson(
+                node: node,
+                path: .empty,
+                method: .post,
+                parameters: DashGetRawTransactionDTO(hash: hash),
+                encoding: .json
+            )
+        }.get()
+        
         if let transaction = result.result {
             return transaction
         } else {
-            throw ApiServiceError.internalError(message: "Unaviable transaction", error: nil)
+            throw ApiServiceError.serverError(error: "Unaviable transaction")
         }
     }
 
@@ -67,47 +58,21 @@ extension DashWalletService {
         guard let address = wallet?.address else {
             throw ApiServiceError.notLogged
         }
-        
-        guard let endpoint = DashWalletService.nodes.randomElement()?.asURL() else {
-            throw ApiServiceError.internalError(message: "Failed to get DASH endpoint URL", error: nil)
-        }
-        
-        var parameters: [Parameters] = []
-        
-        hashes.forEach { hash in
-            let params: Parameters = [
-                "method": "getrawtransaction",
-                "params": [
-                    hash,
-                    true
-                ]
-            ]
-            
-            parameters.append(params)
-        }
 
-        // MARK: Sending request
+        let parameters: [DashGetRawTransactionDTO] = hashes.map { .init(hash: $0) }
         
-        guard let dataParameters = try? JSONSerialization.data(withJSONObject: parameters) else {
-            throw ApiServiceError.internalError(message: "Failed to create request", error: nil)
-        }
-        
-        var request = URLRequest(url: endpoint)
-        request.httpMethod = "POST"
-        request.httpBody = dataParameters
-        
-        let data = try await apiService.sendRequest(request: AF.request(request))
-        
-        do {
-            let model = try JSONDecoder().decode(
-                [BTCRPCServerResponce<BTCRawTransaction>].self,
-                from: data
+        let result: [BTCRPCServerResponce<BTCRawTransaction>] = try await dashApiService.request {
+            core, node in
+            await core.sendRequestJson(
+                node: node,
+                path: .empty,
+                method: .post,
+                parameters: parameters,
+                encoding: .json
             )
-            
-            return model.compactMap { $0.result?.asBtcTransaction(DashTransaction.self, for: address) }
-        } catch {
-            throw ApiServiceError.internalError(message: error.localizedDescription, error: error)
-        }
+        }.get()
+        
+        return result.compactMap { $0.result?.asBtcTransaction(DashTransaction.self, for: address) }
     }
     
     func getBlockId(by hash: String?) async throws -> String {
@@ -115,25 +80,15 @@ extension DashWalletService {
             throw ApiServiceError.internalError(message: "Hash is empty", error: nil)
         }
         
-        guard let endpoint = DashWalletService.nodes.randomElement()?.asURL() else {
-            fatalError("Failed to get DASH endpoint URL")
-        }
-        
-        let parameters: Parameters = [
-            "method": "getblock",
-            "params": [
-                hash
-            ]
-        ]
-        
-        // MARK: Sending request
-
-        let result: BTCRPCServerResponce<BtcBlock> = try await apiService.sendRequest(
-            url: endpoint,
-            method: .post,
-            parameters: parameters,
-            encoding: JSONEncoding.default
-        )
+        let result: BTCRPCServerResponce<BtcBlock> = try await dashApiService.request { core, node in
+            await core.sendRequestJson(
+                node: node,
+                path: .empty,
+                method: .post,
+                parameters: DashGetBlockDTO(hash: hash),
+                encoding: .json
+            )
+        }.get()
         
         if let block = result.result {
             return String(block.height)
@@ -143,30 +98,20 @@ extension DashWalletService {
     }
 
     func getUnspentTransactions() async throws -> [UnspentTransaction] {
-        guard let endpoint = DashWalletService.nodes.randomElement()?.asURL() else {
-            fatalError("Failed to get DASH endpoint URL")
-        }
-        
-        guard let wallet = self.dashWallet else {
+        guard let wallet = dashWallet else {
             throw WalletServiceError.internalError(message: "DASH Wallet not found", error: nil)
         }
         
-        let parameters: Parameters = [
-            "method": "getaddressutxos",
-            "params": [
-                wallet.address
-            ]
-        ]
-        
-        // MARK: Sending request
-        
-        let response: BTCRPCServerResponce<[DashUnspentTransaction]> =
-        try await apiService.sendRequest(
-            url: endpoint,
-            method: .post,
-            parameters: parameters,
-            encoding: JSONEncoding.default
-        )
+        let response: BTCRPCServerResponce<[DashUnspentTransaction]> = try await dashApiService.request {
+            core, node in
+            await core.sendRequestJson(
+                node: node,
+                path: .empty,
+                method: .post,
+                parameters: DashGetUnspentTransactionDTO(address: wallet.address),
+                encoding: .json
+            )
+        }.get()
         
         if let result = response.result {
             return result.map {
@@ -175,7 +120,7 @@ extension DashWalletService {
         } else if let error = response.error?.message {
             throw WalletServiceError.internalError(message: error, error: nil)
         }
-        
+
         throw WalletServiceError.internalError(
             message: "DASH Wallet: not a valid response",
             error: nil
@@ -221,31 +166,17 @@ private extension DashWalletService {
 // MARK: - Network Requests
 
 extension DashWalletService {
-
     func requestTransactionsIds(for address: String) async throws -> [String] {
-        guard let endpoint = DashWalletService.nodes.randomElement()?.asURL() else {
-            fatalError("Failed to get DASH endpoint URL")
-        }
-        
-        guard let address = self.dashWallet?.address else {
-            throw ApiServiceError.internalError(message: "DASH Wallet not found", error: nil)
-        }
-        
-        let parameters: Parameters = [
-            "method": "getaddresstxids",
-            "params": [
-                address
-            ]
-        ]
-
-        // MARK: Sending request
-        
-        let response: BTCRPCServerResponce<[String]> = try await apiService.sendRequest(
-            url: endpoint,
-            method: .post,
-            parameters: parameters,
-            encoding: JSONEncoding.default
-        )
+        let response: BTCRPCServerResponce<[String]> = try await dashApiService.request {
+            core, node in
+            await core.sendRequestJson(
+                node: node,
+                path: .empty,
+                method: .post,
+                parameters: DashGetAddressTransactionIds(address: address),
+                encoding: .json
+            )
+        }.get()
         
         if let result = response.result {
             return result

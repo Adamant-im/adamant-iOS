@@ -38,7 +38,7 @@ extension AdamantChatsProvider: BackgroundFetchService {
                 address: address,
                 height: lastHeight,
                 offset: nil
-            )
+            ).get()
             
             guard transactions.count > 0 else { return .noData }
             

@@ -415,7 +415,7 @@ extension AdamantChatsProvider {
     
     func apiGetChatrooms(address: String, offset: Int?) async throws -> ChatRooms? {
         do {
-            let chatrooms = try await apiService.getChatRooms(address: address, offset: offset)
+            let chatrooms = try await apiService.getChatRooms(address: address, offset: offset).get()
             return chatrooms
         } catch let error as ApiServiceError {
             guard case .networkError = error else {
@@ -525,7 +525,7 @@ extension AdamantChatsProvider {
                 addressRecipient: addressRecipient,
                 offset: offset,
                 limit: limit
-            )
+            ).get()
             return chatrooms
         } catch let error as ApiServiceError {
             guard case .networkError = error else {
@@ -650,7 +650,7 @@ extension AdamantChatsProvider {
                 case .accountNotFound:
                     err = .accountNotFound(address)
                     
-                case .serverError, .commonError:
+                case .serverError, .commonError, .noEndpointsAvailable:
                     err = .serverError(error)
                     
                 case .internalError(let message, _):
@@ -1150,7 +1150,7 @@ extension AdamantChatsProvider {
         }
         
         // MARK: 2. Create
-        let signedTransaction = await apiService.createSendTransaction(
+        let signedTransaction = try? adamantCore.makeSendMessageTransaction(
             senderId: senderId,
             recipientId: recipientId,
             keypair: keypair,
@@ -1161,7 +1161,7 @@ extension AdamantChatsProvider {
         )
         
         guard let signedTransaction = signedTransaction else {
-            throw ChatsProviderError.internalError(AdamantError(message: AdamantApiService.InternalError.signTransactionFailed.localized))
+            throw ChatsProviderError.internalError(AdamantError(message: InternalAPIError.signTransactionFailed.localizedDescription))
         }
         
         unconfirmedTransactionsBySignature.append(signedTransaction.signature)
@@ -1169,7 +1169,7 @@ extension AdamantChatsProvider {
         // MARK: 3. Send
         
         do {
-            let id = try await apiService.sendTransaction(transaction: signedTransaction)
+            let id = try await apiService.sendMessageTransaction(transaction: signedTransaction).get()
             
             // Update ID with recieved, add to unconfirmed transactions.
             transaction.transactionId = String(id)
@@ -1197,6 +1197,10 @@ extension AdamantChatsProvider {
                 throw ChatsProviderError.notLogged
             case .serverError(let e), .commonError(let e):
                 throw ChatsProviderError.serverError(AdamantError(message: e))
+            case .noEndpointsAvailable:
+                throw ChatsProviderError.serverError(AdamantError(
+                    message: error.localizedDescription
+                ))
             case .internalError(let message, _):
                 throw ChatsProviderError.internalError(AdamantError(message: message))
             case .requestCancelled:
@@ -1333,7 +1337,7 @@ extension AdamantChatsProvider {
                 address: senderId,
                 height: height,
                 offset: offset
-            )
+            ).get()
             
             if transactions.count == 0 {
                 return
@@ -1703,7 +1707,7 @@ extension AdamantChatsProvider {
         }
         
         for chatroom in viewContextChatrooms {
-            await chatroom.updateLastTransaction()
+            chatroom.updateLastTransaction()
         }
     }
 }

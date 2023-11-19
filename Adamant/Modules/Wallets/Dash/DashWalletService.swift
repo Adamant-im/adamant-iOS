@@ -50,14 +50,14 @@ final class DashWalletService: WalletService {
     
     // MARK: - Dependencies
     var apiService: ApiService!
+    var dashApiService: DashApiService!
     var accountService: AccountService!
     var securedStore: SecuredStore!
     var dialogService: DialogService!
     var addressConverter: AddressConverter!
     
     // MARK: - Constants
-    static var currencyLogo = UIImage.asset(named: "dash_wallet") ?? .init()
-    
+    static let currencyLogo = UIImage.asset(named: "dash_wallet") ?? .init()
     static let multiplier = Decimal(sign: .plus, exponent: 8, significand: 1)
     static let chunkSize = 20
     
@@ -65,13 +65,13 @@ final class DashWalletService: WalletService {
         return DashWalletService.fixedFee
     }
     
-    private (set) var isWarningGasPrice = false
+    @Atomic private (set) var isWarningGasPrice = false
     
     static let kvsAddress = "dash:address"
     
-    internal var transatrionsIds = [String]()
+    @Atomic var transatrionsIds = [String]()
     
-    internal var lastTransactionId: String? {
+    var lastTransactionId: String? {
         get {
             guard
                 let hash: String = self.securedStore.get("lastDashTransactionId"),
@@ -109,24 +109,21 @@ final class DashWalletService: WalletService {
     let transactionFeeUpdated = Notification.Name("adamant.dashWallet.feeUpdated")
     
     // MARK: - Delayed KVS save
-    private var balanceObserver: NSObjectProtocol?
+    @Atomic private var balanceObserver: NSObjectProtocol?
     
     // MARK: - Properties
-    private (set) var dashWallet: DashWallet?
-    
-    private (set) var enabled = true
-    
-    public var network: Network
-    
-    private var initialBalanceCheck = false
+    @Atomic private (set) var dashWallet: DashWallet?
+    @Atomic private (set) var enabled = true
+    @Atomic public var network: Network
+    @Atomic private var initialBalanceCheck = false
     
     let defaultDispatchQueue = DispatchQueue(label: "im.adamant.dashWalletService", qos: .userInteractive, attributes: [.concurrent])
     
     static let jsonDecoder = JSONDecoder()
-    private var subscriptions = Set<AnyCancellable>()
+    @Atomic private var subscriptions = Set<AnyCancellable>()
 
     // MARK: - State
-    private (set) var state: WalletServiceState = .notInitiated
+    @Atomic private (set) var state: WalletServiceState = .notInitiated
     
     private func setState(_ newState: WalletServiceState, silent: Bool = false) {
         guard newState != state else {
@@ -136,9 +133,11 @@ final class DashWalletService: WalletService {
         state = newState
         
         if !silent {
-            NotificationCenter.default.post(name: serviceStateChanged,
-                                            object: self,
-                                            userInfo: [AdamantUserInfoKey.WalletService.walletState: state])
+            NotificationCenter.default.post(
+                name: serviceStateChanged,
+                object: self,
+                userInfo: [AdamantUserInfoKey.WalletService.walletState: state]
+            )
         }
     }
     
@@ -329,6 +328,7 @@ extension DashWalletService: SwinjectDependentService {
         dialogService = container.resolve(DialogService.self)
         addressConverter = container.resolve(AddressConverterFactory.self)?
             .make(network: network)
+        dashApiService = container.resolve(DashApiService.self)
     }
 }
 
@@ -343,28 +343,15 @@ extension DashWalletService {
     }
     
     func getBalance(address: String) async throws -> Decimal {
-        guard let endpoint = DashWalletService.nodes.randomElement()?.asURL() else {
-            let message = "Failed to get DASH endpoint URL"
-            assertionFailure(message)
-            throw WalletServiceError.internalError(message: message, error: nil)
-        }
-
-        // Parameters
-        let parameters: Parameters = [
-            "method": "getaddressbalance",
-            "params": [
-                address
-            ]
-        ]
-        
-        // MARK: Sending request
-        
-        let data = try await apiService.sendRequest(
-            url: endpoint,
-            method: .post,
-            parameters: parameters,
-            encoding: JSONEncoding.default
-        )
+        let data: Data = try await dashApiService.request { core, node in
+            await core.sendRequest(
+                node: node,
+                path: .empty,
+                method: .post,
+                parameters: DashGetAddressBalanceDTO(address: address),
+                encoding: .json
+            )
+        }.get()
         
         let object = try? JSONSerialization.jsonObject(
             with: data,
@@ -390,7 +377,7 @@ extension DashWalletService {
 
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
         do {
-            let result = try await apiService.get(key: DashWalletService.kvsAddress, sender: address)
+            let result = try await apiService.get(key: DashWalletService.kvsAddress, sender: address).get()
             
             guard let result = result else {
                 throw WalletServiceError.walletNotInitiated
@@ -423,14 +410,20 @@ extension DashWalletService {
         }
 
         Task {
-            await apiService.store(key: DashWalletService.kvsAddress, value: dashAddress, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
-                switch result {
-                case .success:
-                    completion(.success)
+            let result = await apiService.store(
+                key: DashWalletService.kvsAddress,
+                value: dashAddress,
+                type: .keyValue,
+                sender: adamant.address,
+                keypair: keypair
+            )
+            
+            switch result {
+            case .success:
+                completion(.success)
 
-                case .failure(let error):
-                    completion(.failure(error: .apiError(error)))
-                }
+            case .failure(let error):
+                completion(.failure(error: .apiError(error)))
             }
         }
     }

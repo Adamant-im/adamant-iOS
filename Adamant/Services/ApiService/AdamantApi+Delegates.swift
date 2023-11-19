@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import CommonKit
 
-extension AdamantApiService.ApiCommands {
+extension ApiCommands {
     static let Delegates = (
         root: "/api/delegates",
         getDelegates: "/api/delegates",
@@ -23,149 +23,127 @@ extension AdamantApiService.ApiCommands {
 }
 
 extension AdamantApiService {
-    func getDelegates(limit: Int, completion: @escaping (ApiServiceResult<[Delegate]>) -> Void) {
-        self.getDelegates(limit: limit, offset: 0, currentDelegates: [Delegate](), completion: completion)
+    func getDelegates(limit: Int) async -> ApiServiceResult<[Delegate]> {
+        await getDelegates(limit: limit, offset: .zero, currentDelegates: [Delegate]())
     }
     
-    func getDelegates(limit: Int, offset: Int, currentDelegates: [Delegate], completion: @escaping (ApiServiceResult<[Delegate]>) -> Void) {
-        sendRequest(
-            path: ApiCommands.Delegates.getDelegates,
-            queryItems: [
-                URLQueryItem(name: "limit", value: String(limit)),
-                URLQueryItem(name: "offset", value: String(offset))
-            ],
-            method: .get
-        ) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Delegate>>) in
-            switch serverResponse {
-            case .success(let delegates):
-                if let delegates = delegates.collection {
-                    var currentDelegates = currentDelegates
-                    currentDelegates.append(contentsOf: delegates)
-                    
-                    if delegates.count < limit {
-                        completion(.success(currentDelegates))
-                    } else {
-                        self.getDelegates(limit: limit, offset: offset+limit, currentDelegates: currentDelegates, completion: completion)
-                    }
-                } else {
-                    completion(.failure(.serverError(error: "No delegates")))
+    func getDelegates(
+        limit: Int,
+        offset: Int,
+        currentDelegates: [Delegate]
+    ) async -> ApiServiceResult<[Delegate]> {
+        let response: ApiServiceResult<ServerCollectionResponse<Delegate>>
+        response = await request { core, node in
+            await core.sendRequestJson(
+                node: node,
+                path: ApiCommands.Delegates.getDelegates,
+                method: .get,
+                parameters: ["limit": String(limit), "offset": String(offset)],
+                encoding: .url
+            )
+        }
+        
+        let result = response.flatMap { $0.resolved() }
+        guard let delegates = try? result.get() else { return result }
+        let currentDelegates = currentDelegates + delegates
+        
+        if delegates.count < limit {
+            return .success(currentDelegates)
+        } else {
+            return await getDelegates(
+                limit: limit,
+                offset: offset + limit,
+                currentDelegates: currentDelegates
+            )
+        }
+    }
+    
+    func getDelegatesWithVotes(for address: String, limit: Int) async -> ApiServiceResult<[Delegate]> {
+        let response = await getVotes(for: address)
+        
+        switch response {
+        case let .success(delegates):
+            let votes = delegates.map { $0.address }
+            let delegatesResponse = await getDelegates(limit: limit)
+            
+            return delegatesResponse.map { delegates in
+                var delegatesWithVotes = [Delegate]()
+                
+                delegates.forEach { delegate in
+                    delegate.voted = votes.contains(delegate.address)
+                    delegatesWithVotes.append(delegate)
                 }
                 
-            case .failure(let error):
-                completion(.failure(.networkError(error: error)))
+                return delegatesWithVotes
             }
+        case let .failure(error):
+            return .failure(error)
         }
     }
     
-    func getDelegatesWithVotes(for address: String, limit: Int, completion: @escaping (ApiServiceResult<[Delegate]>) -> Void) {
-        self.getVotes(for: address) { (result) in
-            switch result {
-            case .success(let delegates):
-                let votes = delegates.map({ (delegate) -> String in
-                    return delegate.address
-                })
-                
-                self.getDelegates(limit: limit, completion: { (result) in
-                    switch result {
-                    case .success(let delegates):
-                        var delegatesWithVotes = [Delegate]()
-                        delegates.forEach({ (delegate) in
-                            delegate.voted = votes.contains(delegate.address)
-                            delegatesWithVotes.append(delegate)
-                        })
-                        
-                        completion(.success(delegatesWithVotes))
-                    case .failure(let error):
-                        completion(.failure(.networkError(error: error)))
-                    }
-                })
-                
-            case .failure(let error):
-                completion(.failure(.networkError(error: error)))
+    func getForgedByAccount(publicKey: String) async -> ApiServiceResult<DelegateForgeDetails> {
+        await request { core, node in
+            await core.sendRequestJson(
+                node: node,
+                path: ApiCommands.Delegates.getForgedByAccount,
+                method: .get,
+                parameters: ["generatorPublicKey": publicKey],
+                encoding: .url
+            )
+        }
+    }
+    
+    func getForgingTime(for delegate: Delegate) async -> ApiServiceResult<Int> {
+        await getNextForgers().map { nextForgers in
+            var forgingTime = -1
+            if let fIndex = nextForgers.delegates.firstIndex(of: delegate.publicKey) {
+                forgingTime = fIndex * 10
             }
+            return forgingTime
         }
     }
     
-    func getForgedByAccount(publicKey: String, completion: @escaping (ApiServiceResult<DelegateForgeDetails>) -> Void) {
-        sendRequest(
-            path: ApiCommands.Delegates.getForgedByAccount,
-            queryItems: [URLQueryItem(name: "generatorPublicKey", value: publicKey)],
-            method: .get
-        ) { (serverResponse: ApiServiceResult<DelegateForgeDetails>) in
-            switch serverResponse {
-            case .success(let details):
-                completion(.success(details))
-                
-            case .failure(let error):
-                completion(.failure(.networkError(error: error)))
-            }
+    private func getDelegatesCount() async -> ApiServiceResult<DelegatesCountResult> {
+        await request { core, node in
+            await core.sendRequestJson(
+                node: node,
+                path: ApiCommands.Delegates.getDelegatesCount
+            )
         }
     }
     
-    func getForgingTime(for delegate: Delegate, completion: @escaping (ApiServiceResult<Int>) -> Void) {
-        getNextForgers { (result) in
-            switch result {
-            case .success(let nextForgers):
-                var forgingTime = -1
-                if let fIndex = nextForgers.delegates.firstIndex(of: delegate.publicKey) {
-                    forgingTime = fIndex * 10
-                }
-                completion(.success(forgingTime))
-                
-            case .failure(let error):
-                completion(.failure(.networkError(error: error)))
-            }
+    private func getNextForgers() async -> ApiServiceResult<NextForgersResult> {
+        await request { core, node in
+            await core.sendRequestJson(
+                node: node,
+                path: ApiCommands.Delegates.getNextForgers,
+                method: .get,
+                parameters: ["limit": "\(101)"],
+                encoding: .url
+            )
         }
     }
     
-    private func getDelegatesCount(completion: @escaping (ApiServiceResult<DelegatesCountResult>) -> Void) {
-        sendRequest(
-            path: ApiCommands.Delegates.getDelegatesCount,
-            method: .get
-        ) { (serverResponse: ApiServiceResult<DelegatesCountResult>) in
-            completion(serverResponse)
+    func getVotes(for address: String) async -> ApiServiceResult<[Delegate]> {
+        let response: ApiServiceResult<ServerCollectionResponse<Delegate>>
+        response = await request { core, node in
+            await core.sendRequestJson(
+                node: node,
+                path: ApiCommands.Delegates.votes,
+                method: .get,
+                parameters: ["address": address],
+                encoding: .url
+            )
         }
-    }
-    
-    private func getNextForgers(completion: @escaping (ApiServiceResult<NextForgersResult>) -> Void) {
-        sendRequest(
-            path: ApiCommands.Delegates.getNextForgers,
-            queryItems: [URLQueryItem(name: "limit", value: "\(101)")],
-            method: .get
-        ) { (serverResponse: ApiServiceResult<NextForgersResult>) in
-            completion(serverResponse)
-        }
-    }
-    
-    func getVotes(for address: String, completion: @escaping (ApiServiceResult<[Delegate]>) -> Void) {
-        sendRequest(
-            path: ApiCommands.Delegates.votes,
-            queryItems: [URLQueryItem(name: "address", value: address)],
-            method: .get
-        ) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Delegate>>) in
-            switch serverResponse {
-            case .success(let delegates):
-                completion(.success(delegates.collection ?? []))
-            case .failure(let error):
-                completion(.failure(.networkError(error: error)))
-            }
-        }
+        
+        return response.map { $0.collection ?? .init() }
     }
     
     func voteForDelegates(
         from address: String,
         keypair: Keypair,
-        votes: [DelegateVote],
-        completion: @escaping (ApiServiceResult<UInt64>) -> Void
-    ) {
-        Task { @MainActor in
-            sendingMsgTaskId = UIApplication.shared.beginBackgroundTask { [weak self] in
-                guard let self = self else { return }
-                UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
-                self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
-            }
-        }
-        
+        votes: [DelegateVote]
+    ) async -> ApiServiceResult<UInt64> {
         // MARK: 0. Prepare
         var votesOrdered = votes
         _ = votesOrdered.partition {
@@ -180,10 +158,10 @@ extension AdamantApiService {
         // MARK: 1. Create and sign transaction
         let transaction = NormalizedTransaction(
             type: .vote,
-            amount: 0,
+            amount: .zero,
             senderPublicKey: keypair.publicKey,
             requesterPublicKey: nil,
-            date: Date(),
+            date: .now,
             recipientId: address,
             asset: TransactionAsset(votes: votesAsset)
         )
@@ -193,57 +171,29 @@ extension AdamantApiService {
             senderId: address,
             keypair: keypair
         ) else {
-            completion(.failure(.internalError(message: "Failed to sign transaction", error: nil)))
-            return
+            return .failure(.internalError(error: InternalAPIError.signTransactionFailed))
         }
         
-        sendDelegateVoteTransaction(
+        return await sendDelegateVoteTransaction(
             path: ApiCommands.Delegates.votes,
             transaction: transaction
-        ) { serverResponse in
-            switch serverResponse {
-            case .success(let response):
-                if response.success {
-                    completion(.success(1))
-                } else {
-                    completion(.failure(.serverError(error: response.error ?? "")))
-                }
-                
-            case .failure(let error):
-                completion(.failure(.networkError(error: error)))
-            }
-            
-            Task { @MainActor [weak self] in
-                guard let self = self else { return }
-                UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
-                self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
-            }
-        }
+        )
     }
     
     // MARK: - Private methods
     
-    private func getBlocks(completion: @escaping (ApiServiceResult<[Block]>) -> Void) {
-        sendRequest(
-            path: ApiCommands.Delegates.getBlocks,
-            queryItems: [
-                URLQueryItem(name: "orderBy", value: "height:desc"),
-                URLQueryItem(name: "limit", value: "\(101)")
-            ],
-            method: .get
-        ) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Block>>) in
-            switch serverResponse {
-            case .success(let blocks):
-                if let blocks = blocks.collection {
-                    completion(.success(blocks))
-                } else {
-                    completion(.failure(.serverError(error: "No delegates")))
-                }
-                
-            case .failure(let error):
-                completion(.failure(.networkError(error: error)))
-            }
+    private func getBlocks() async -> ApiServiceResult<[Block]> {
+        let response: ApiServiceResult<ServerCollectionResponse<Block>> = await request { core, node in
+            await core.sendRequestJson(
+                node: node,
+                path: ApiCommands.Delegates.getBlocks,
+                method: .get,
+                parameters: ["orderBy": "height:desc", "limit": "\(101)"],
+                encoding: .url
+            )
         }
+        
+        return response.flatMap { $0.resolved() }
     }
     
     private func getRoundDelegates(delegates: [String], height: UInt64) -> [String] {

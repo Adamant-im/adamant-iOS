@@ -138,37 +138,33 @@ final class DelegatesListViewController: KeyboardObservingViewController {
         }
         
         Task {
-            await apiService.getDelegatesWithVotes(
+            let result = await apiService.getDelegatesWithVotes(
                 for: address,
                 limit: activeDelegates
-            ) { result in
-                Task { @MainActor [weak self] in
-                    guard let self = self else { return }
-                    
-                    switch result {
-                    case .success(let delegates):
-                        let checkedNames = self.delegates
-                            .filter { $0.isChecked }
-                            .map { $0.delegate.username }
-                        
-                        let checkedDelegates = delegates.map { CheckedDelegate(delegate: $0) }
-                        for name in checkedNames {
-                            if let i = delegates.firstIndex(where: { $0.username == name }) {
-                                checkedDelegates[i].isChecked = true
-                            }
-                        }
-                        
-                        self.delegates = checkedDelegates
-                        self.tableView.reloadData()
-                    case .failure(let error):
-                        self.dialogService.showRichError(error: error)
+            )
+            
+            switch result {
+            case .success(let delegates):
+                let checkedNames = self.delegates
+                    .filter { $0.isChecked }
+                    .map { $0.delegate.username }
+                
+                let checkedDelegates = delegates.map { CheckedDelegate(delegate: $0) }
+                for name in checkedNames {
+                    if let i = delegates.firstIndex(where: { $0.username == name }) {
+                        checkedDelegates[i].isChecked = true
                     }
-                    
-                    refreshControl.endRefreshing()
-                    self.updateVotePanel()
-                    self.removeLoadingView()
                 }
+                
+                self.delegates = checkedDelegates
+                self.tableView.reloadData()
+            case .failure(let error):
+                self.dialogService.showRichError(error: error)
             }
+            
+            refreshControl.endRefreshing()
+            self.updateVotePanel()
+            self.removeLoadingView()
         }
     }
     
@@ -318,32 +314,30 @@ private extension DelegatesListViewController {
         dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
 
         Task {
-            await apiService.voteForDelegates(
+            let result = await apiService.voteForDelegates(
                 from: account.address,
                 keypair: keypair,
                 votes: votes
-            ) { result in
-                Task { @MainActor [weak self] in
-                    self?.dialogService.dismissProgress()
-                    
-                    switch result {
-                    case .success:
-                        self?.dialogService.showSuccess(withMessage: String.adamant.delegates.success)
+            )
+            
+            dialogService.dismissProgress()
+            
+            switch result {
+            case .success:
+                dialogService.showSuccess(withMessage: String.adamant.delegates.success)
 
-                        checkedDelegates.forEach {
-                            $1.isChecked = false
-                            $1.delegate.voted = !$1.delegate.voted
-                            $1.isUpdating = true
-                        }
-                        
-                        self?.tableView.reloadData()
-                        self?.updateVotePanel()
-                        self?.scheduleUpdate()
-
-                    case .failure(let error):
-                        self?.dialogService.showRichError(error: TransfersProviderError.serverError(error))
-                    }
+                checkedDelegates.forEach {
+                    $1.isChecked = false
+                    $1.delegate.voted = !$1.delegate.voted
+                    $1.isUpdating = true
                 }
+                
+                tableView.reloadData()
+                updateVotePanel()
+                scheduleUpdate()
+
+            case .failure(let error):
+                dialogService.showRichError(error: TransfersProviderError.serverError(error))
             }
         }
     }

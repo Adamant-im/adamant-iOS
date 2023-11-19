@@ -55,126 +55,73 @@ extension BtcWalletService: WalletServiceTwoStepSend {
     }
     
     func sendTransaction(_ transaction: BitcoinKit.Transaction) async throws {
-        guard let url = BtcWalletService.nodes.randomElement()?.asURL() else {
-            throw WalletServiceError.internalError(
-                message: "Failed to get BTC endpoint URL",
-                error: nil
-            )
-        }
-        
-        // Request url
-        let endpoint = url.appendingPathComponent(BtcApiCommands.sendTransaction())
-        
         // MARK: Prepare params
         
         let txHex = transaction.serialized().hex
         
         // MARK: Sending request
-        
-        let responseData = try await apiService.sendRequest(
-            url: endpoint,
-            method: .post,
-            parameters: nil,
-            encoding: BodyStringEncoding(body: txHex)
-        )
-        
+        let responseData = try await btcApiService.request { core, node in
+            await core.sendRequest(
+                node: node,
+                path: BtcApiCommands.sendTransaction(),
+                method: .post,
+                parameters: [String.empty: txHex],
+                encoding: .bodyString
+            )
+        }.get()
+
         let response = String(decoding: responseData, as: UTF8.self)
         guard response != transaction.txId else { return }
         throw WalletServiceError.remoteServiceError(message: response)
     }
     
     func getUnspentTransactions() async throws -> [UnspentTransaction] {
-        guard let url = BtcWalletService.nodes.randomElement()?.asURL() else {
-            fatalError("Failed to get BTC endpoint URL")
-        }
-        
         guard let wallet = self.btcWallet else {
             throw WalletServiceError.notLogged
         }
         
         let address = wallet.address
+        let parameters = ["noCache": "1"]
         
-        // Headers
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json"
-        ]
+        let responseData = try await btcApiService.request { core, node in
+            await core.sendRequest(
+                node: node,
+                path: BtcApiCommands.getUnspentTransactions(for: address),
+                method: .get,
+                parameters: parameters,
+                encoding: .url
+            )
+        }.get()
         
-        // Request url
-        let endpoint = url.appendingPathComponent(BtcApiCommands.getUnspentTransactions(for: address))
+        guard
+            let items = try? Self.jsonDecoder.decode(
+                [BtcUnspentTransactionResponse].self,
+                from: responseData
+            )
+        else {
+            throw WalletServiceError.internalError(message: "BTC Wallet: not valid response", error: nil)
+        }
         
-        let parameters: Parameters = [
-            "noCache": "1"
-        ]
-        
-        // MARK: Sending request
-        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<[UnspentTransaction], Error>) in
-            AF.request(endpoint, method: .get, parameters: parameters, headers: headers).responseData(queue: defaultDispatchQueue) { response in
-                switch response.result {
-                case .success(let data):
-                    guard
-                        let items = try? Self.jsonDecoder.decode([BtcUnspentTransactionResponse].self,
-                                                                 from: data)
-                    else {
-                        continuation.resume(throwing: WalletServiceError.internalError(message: "BTC Wallet: not valid response", error: nil))
-                        break
-                    }
-                    
-                    var utxos = [UnspentTransaction]()
-                    for item in items {
-                        guard item.status.confirmed else {
-                            continue
-                        }
-                        
-                        let value = NSDecimalNumber(decimal: item.value).uint64Value
-                        
-                        let lockScript = wallet.addressEntity.lockingScript
-                        let txHash = Data(hex: item.txId).map { Data($0.reversed()) } ?? Data()
-                        let txIndex = item.vout
-                        
-                        let unspentOutput = TransactionOutput(value: value, lockingScript: lockScript)
-                        let unspentOutpoint = TransactionOutPoint(hash: txHash, index: txIndex)
-                        let utxo = UnspentTransaction(output: unspentOutput, outpoint: unspentOutpoint)
-                        
-                        utxos.append(utxo)
-                    }
-                    continuation.resume(returning: utxos)
-                    return
-                case .failure:
-                    continuation.resume(throwing: WalletServiceError.internalError(message: "BTC Wallet: server not response", error: nil))
-                    return
-                }
+        var utxos = [UnspentTransaction]()
+        for item in items {
+            guard item.status.confirmed else {
+                continue
             }
+            
+            let value = NSDecimalNumber(decimal: item.value).uint64Value
+            
+            let lockScript = wallet.addressEntity.lockingScript
+            let txHash = Data(hex: item.txId).map { Data($0.reversed()) } ?? Data()
+            let txIndex = item.vout
+            
+            let unspentOutput = TransactionOutput(value: value, lockingScript: lockScript)
+            let unspentOutpoint = TransactionOutPoint(hash: txHash, index: txIndex)
+            let utxo = UnspentTransaction(output: unspentOutput, outpoint: unspentOutpoint)
+            
+            utxos.append(utxo)
         }
+        
+        return utxos
     }
 
-}
-
-struct BodyStringEncoding: ParameterEncoding {
-
-    private let body: String
-
-    init(body: String) { self.body = body }
-
-    func encode(_ urlRequest: URLRequestConvertible, with parameters: Parameters?) throws -> URLRequest {
-        guard var urlRequest = urlRequest.urlRequest else { throw Errors.emptyURLRequest }
-        guard let data = body.data(using: .utf8) else { throw Errors.encodingProblem }
-        urlRequest.httpBody = data
-        return urlRequest
-    }
-}
-
-extension BodyStringEncoding {
-    enum Errors: Error {
-        case emptyURLRequest
-        case encodingProblem
-    }
-}
-
-extension BodyStringEncoding.Errors: LocalizedError {
-    var errorDescription: String? {
-        switch self {
-            case .emptyURLRequest: return "Empty url request"
-            case .encodingProblem: return "Encoding problem"
-        }
-    }
 }

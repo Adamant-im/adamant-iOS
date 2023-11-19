@@ -21,9 +21,20 @@ extension CodableTransaction: RawTransaction {
 
 extension EthWalletService: WalletServiceTwoStepSend {
 	typealias T = CodableTransaction
+    
+    func createTransaction(recipient: String, amount: Decimal) async throws -> CodableTransaction {
+        try await ethApiService.requestWeb3 { [weak self] web3 in
+            guard let self = self else { throw WalletServiceError.internalError(.unknownError) }
+            return try await createTransaction(recipient: recipient, amount: amount, web3: web3)
+        }.get()
+    }
 	
     // MARK: Create & Send
-    func createTransaction(recipient: String, amount: Decimal) async throws -> CodableTransaction {
+    private func createTransaction(
+        recipient: String,
+        amount: Decimal,
+        web3: Web3
+    ) async throws -> CodableTransaction {
         guard let ethWallet = ethWallet else {
             throw WalletServiceError.notLogged
         }
@@ -34,10 +45,6 @@ extension EthWalletService: WalletServiceTwoStepSend {
         
         guard let bigUIntAmount = Utilities.parseToBigUInt(String(format: "%.18f", amount.doubleValue), units: .ether) else {
             throw WalletServiceError.invalidAmount(amount)
-        }
-        
-        guard let web3 = await web3 else {
-            throw WalletServiceError.internalError(message: "Failed to get web3", error: nil)
         }
         
         guard let keystoreManager = web3.provider.attachedKeystoreManager else {
@@ -83,13 +90,11 @@ extension EthWalletService: WalletServiceTwoStepSend {
     
     func sendTransaction(_ transaction: CodableTransaction) async throws {
         guard let txEncoded = transaction.encode() else {
-            throw WalletServiceError.internalError(message: String.adamant.sharedErrors.unknownError, error: nil)
+            throw WalletServiceError.internalError(message: .adamant.sharedErrors.unknownError, error: nil)
         }
         
-        do {
-            _ = try await web3?.eth.send(raw: txEncoded)
-        } catch {
-            throw WalletServiceError.internalError(message: "Error: \(error.localizedDescription)", error: nil)
-        }
+        _ = try await ethApiService.requestWeb3 { web3 in
+            try await web3.eth.send(raw: txEncoded)
+        }.get()
     }
 }
