@@ -58,6 +58,7 @@ final class ChatListViewController: KeyboardObservingViewController {
     var unreadController: NSFetchedResultsController<ChatTransaction>?
     var searchController: UISearchController?
     
+    private var transactionsRequiringBalanceUpdate: [String] = []
     private var preservedMessagess = [String:String]()
     
     let defaultAvatar = UIImage.asset(named: "avatar-chat-placeholder") ?? .init()
@@ -669,21 +670,39 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
             }
             
         // MARK: Unread controller
+            
         case let c where c == unreadController:
-            guard type == .insert else {
+            guard let transaction = anObject as? ChatTransaction else { break }
+            
+            if self.view.window == nil,
+               type == .insert {
+                showNotification(for: transaction)
+            }
+            
+            let shouldForceUpdate = anObject is TransferTransaction
+            || anObject is RichMessageTransaction
+            
+            if shouldForceUpdate, type == .insert {
+                transactionsRequiringBalanceUpdate.append(transaction.txId)
+            }
+            
+            guard shouldForceUpdate,
+                  let blockId = transaction.blockId,
+                  !blockId.isEmpty,
+                  transactionsRequiringBalanceUpdate.contains(transaction.txId)
+            else {
                 break
             }
             
-            if let transaction = anObject as? ChatTransaction {
-                if self.view.window == nil {
-                    showNotification(for: transaction)
-                }
+            if let index = transactionsRequiringBalanceUpdate.firstIndex(of: transaction.txId) {
+                transactionsRequiringBalanceUpdate.remove(at: index)
             }
-            if let _ = anObject as? TransferTransaction {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-                    NotificationCenter.default.post(name: .AdamantAccountService.forceUpdateBalance, object: nil)
-                }
-            }
+            
+            NotificationCenter.default.post(
+                name: .AdamantAccountService.forceUpdateBalance,
+                object: nil
+            )
+            
         default:
             break
         }
@@ -774,33 +793,45 @@ extension ChatListViewController {
             }
             
             // MARK: 1. Show notification only for incomming transactions
-            guard !transaction.silentNotification, !transaction.isOutgoing,
-                  let chatroom = transaction.chatroom, chatroom != presentedChatroom(), !chatroom.isHidden,
-                  let partner = chatroom.partner else {
+            guard !transaction.silentNotification,
+                  !transaction.isOutgoing,
+                  let chatroom = transaction.chatroom,
+                  chatroom != presentedChatroom(),
+                  !chatroom.isHidden,
+                  let partner = chatroom.partner,
+                  let address = partner.address
+            else {
                 return
             }
             
             // MARK: 2. Prepare notification
-            let title = partner.name ?? partner.address
+            
+            let name: String? = partner.name ?? addressBook.getName(for: address)
+            let title = name ?? partner.address
             let text = shortDescription(for: transaction)
             
             let image: UIImage
             if let ava = partner.avatar, let img = UIImage.asset(named: ava) {
                 image = img
+            } else if let publicKey = partner.publicKey {
+                image = avatarService.avatar(for: publicKey, size: 30)
             } else {
                 image = defaultAvatar
             }
             
             // MARK: 4. Show notification with tap handler
-            dialogService.showNotification(title: title?.checkAndReplaceSystemWallets(), message: text?.string, image: image) { [weak self] in
-                DispatchQueue.main.async {
-                    self?.presentChatroom(chatroom)
-                }
+            dialogService.showNotification(
+                title: title?.checkAndReplaceSystemWallets(),
+                message: text?.string,
+                image: image
+            ) { [weak self] in
+                self?.presentChatroom(chatroom)
             }
         }
     }
     
-    private func presentChatroom(_ chatroom: Chatroom, with message: MessageTransaction? = nil) {
+    @MainActor
+    func presentChatroom(_ chatroom: Chatroom, with message: MessageTransaction? = nil) {
         // MARK: 1. Create and config ViewController
         let vc = chatViewController(for: chatroom, with: message?.transactionId)
         

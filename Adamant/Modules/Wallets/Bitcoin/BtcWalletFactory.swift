@@ -31,6 +31,7 @@ struct BtcWalletFactory: WalletFactory {
         c.btcWalletService = service
         c.addressBook = assembler.resolve(AddressBookService.self)
         c.screensFactory = screensFactory
+        c.walletService = service
         return c
     }
     
@@ -127,7 +128,8 @@ private extension BtcWalletFactory {
             dialogService: assembler.resolve(DialogService.self)!,
             currencyInfo: assembler.resolve(CurrencyInfoService.self)!,
             addressBookService: assembler.resolve(AddressBookService.self)!,
-            accountService: assembler.resolve(AccountService.self)!
+            accountService: assembler.resolve(AccountService.self)!,
+            walletService: service
         )
         
         vc.service = service

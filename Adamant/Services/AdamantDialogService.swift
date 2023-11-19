@@ -265,6 +265,33 @@ extension AdamantDialogService {
         present(alert, animated: animated, completion: completion)
     }
     
+    func presentShareAlertFor(
+        string: String,
+        types: [ShareType],
+        excludedActivityTypes: [UIActivity.ActivityType]?,
+        animated: Bool,
+        from: UIBarButtonItem?,
+        completion: (() -> Void)?,
+        didSelect: ((ShareType) -> Void)?
+    ) {
+        let source: UIAlertController.SourceView? = from.map { .barButtonItem($0) }
+
+        let alert = createShareAlertFor(
+            stringForPasteboard: string,
+            stringForShare: string,
+            stringForQR: string,
+            types: types,
+            excludedActivityTypes: excludedActivityTypes,
+            animated: animated,
+            from: source,
+            completion: completion,
+            didSelect: didSelect
+        )
+        
+        alert.modalPresentationStyle = .overFullScreen
+        present(alert, animated: animated, completion: completion)
+    }
+    
     func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?) {
         let source: UIAlertController.SourceView? = from.map { .view($0) }
         
@@ -300,7 +327,8 @@ extension AdamantDialogService {
         excludedActivityTypes: [UIActivity.ActivityType]?,
         animated: Bool,
         from: UIAlertController.SourceView?,
-        completion: (() -> Void)?
+        completion: (() -> Void)?,
+        didSelect: ((ShareType) -> Void)? = nil
     ) -> UIAlertController {
         let alert = UIAlertController(
             title: nil,
@@ -309,7 +337,17 @@ extension AdamantDialogService {
             source: from
         )
 
-        addActions(to: alert, stringForPasteboard: stringForPasteboard, stringForShare: stringForShare, stringForQR: stringForQR, types: types, excludedActivityTypes: excludedActivityTypes, from: from, completion: completion)
+        addActions(
+            to: alert,
+            stringForPasteboard: stringForPasteboard,
+            stringForShare: stringForShare,
+            stringForQR: stringForQR,
+            types: types,
+            excludedActivityTypes: excludedActivityTypes,
+            from: from,
+            completion: completion,
+            didSelect: didSelect
+        )
         
         return alert
     }
@@ -322,7 +360,8 @@ extension AdamantDialogService {
         types: [ShareType],
         excludedActivityTypes: [UIActivity.ActivityType]?,
         from: UIAlertController.SourceView?,
-        completion: (() -> Void)?
+        completion: (() -> Void)?,
+        didSelect: ((ShareType) -> Void)? = nil
     ) {
         for type in types {
             switch type {
@@ -330,10 +369,12 @@ extension AdamantDialogService {
                 alert.addAction(UIAlertAction(title: type.localized , style: .default) { [weak self] _ in
                     UIPasteboard.general.string = stringForPasteboard
                     self?.showToastMessage(String.adamant.alert.copiedToPasteboardNotification)
+                    didSelect?(.copyToPasteboard)
                 })
                 
             case .share:
                 alert.addAction(UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
+                    didSelect?(.share)
                     let vc = UIActivityViewController(activityItems: [stringForShare], applicationActivities: nil)
                     vc.excludedActivityTypes = excludedActivityTypes
                     
@@ -361,6 +402,8 @@ extension AdamantDialogService {
                 alert.addAction(UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
                     guard let self = self else { return }
                     
+                    didSelect?(.generateQr(encodedContent: encodedContent, sharingTip: sharingTip, withLogo: withLogo))
+                    
                     switch AdamantQRTools.generateQrFrom(
                         string: encodedContent ?? stringForQR,
                         withLogo: withLogo
@@ -384,7 +427,15 @@ extension AdamantDialogService {
                 
             case .saveToPhotolibrary(let image):
                 let action = UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
+                    didSelect?(.saveToPhotolibrary(image: image))
                     UIImageWriteToSavedPhotosAlbum(image, self, #selector(self?.image(_:didFinishSavingWithError:contextInfo:)), nil)
+                }
+                
+                alert.addAction(action)
+                
+            case .partnerQR:
+                let action = UIAlertAction(title: type.localized, style: .default) { [didSelect] _ in
+                    didSelect?(.partnerQR)
                 }
                 
                 alert.addAction(action)

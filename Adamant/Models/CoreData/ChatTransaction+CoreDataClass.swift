@@ -26,8 +26,11 @@ public class ChatTransaction: BaseTransaction {
     }
     
     override var transactionStatus: TransactionStatus? {
-        return confirmations > 0
-        ? .success
-        : .pending
+        get {
+            return confirmations > 0
+            ? .success
+            : .pending
+        }
+        set { }
     }
 }

@@ -123,6 +123,8 @@ final class EthWalletService: WalletService {
     var ethApiService: EthApiService!
     var dialogService: DialogService!
     var increaseFeeService: IncreaseFeeService!
+    var vibroService: VibroService!
+    var coreDataStack: CoreDataStack!
     
     // MARK: - Notifications
     let walletUpdatedNotification = Notification.Name("adamant.ethWallet.walletUpdated")
@@ -140,6 +142,23 @@ final class EthWalletService: WalletService {
     @Atomic private var initialBalanceCheck = false
     @Atomic private var subscriptions = Set<AnyCancellable>()
 
+    @ObservableValue private(set) var historyTransactions: [TransactionDetails] = []
+    @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
+
+    var transactionsPublisher: AnyObservable<[TransactionDetails]> {
+        $historyTransactions.eraseToAnyPublisher()
+    }
+    
+    var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
+        $hasMoreOldTransactions.eraseToAnyPublisher()
+    }
+    
+    private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
+        coinId: tokenUnicID,
+        coreDataStack: coreDataStack,
+        blockchainType: richMessageType
+    )
+    
     // MARK: - State
     @Atomic private(set) var state: WalletServiceState = .notInitiated
     
@@ -200,6 +219,15 @@ final class EthWalletService: WalletService {
                     NotificationCenter.default.removeObserver(balanceObserver)
                     self?.balanceObserver = nil
                 }
+                self?.coinStorage.clear()
+            }
+            .store(in: &subscriptions)
+    }
+    
+    func addTransactionObserver() {
+        coinStorage.transactionsPublisher
+            .sink { [weak self] transactions in
+                self?.historyTransactions = transactions
             }
             .store(in: &subscriptions)
     }
@@ -240,6 +268,8 @@ final class EthWalletService: WalletService {
             
             let notification: Notification.Name?
             
+            let isRaised = (wallet.balance < balance) && !initialBalanceCheck
+            
             if wallet.balance != balance {
                 wallet.balance = balance
                 notification = walletUpdatedNotification
@@ -249,6 +279,10 @@ final class EthWalletService: WalletService {
                 notification = walletUpdatedNotification
             } else {
                 notification = nil
+            }
+            
+            if isRaised {
+                vibroService.applyVibration(.success)
             }
             
             if let notification = notification {
@@ -461,6 +495,10 @@ extension EthWalletService: SwinjectDependentService {
         dialogService = container.resolve(DialogService.self)
         increaseFeeService = container.resolve(IncreaseFeeService.self)
         ethApiService = container.resolve(EthApiService.self)
+        vibroService = container.resolve(VibroService.self)
+        coreDataStack = container.resolve(CoreDataStack.self)
+        
+        addTransactionObserver()
     }
 }
 
@@ -673,6 +711,51 @@ extension EthWalletService {
         
         let transactions = transactionsFrom + transactionsTo
         return transactions.sorted { $0.date.compare($1.date) == .orderedDescending }
+    }
+    
+    func loadTransactions(offset: Int, limit: Int) async throws -> Int {
+        guard let address = wallet?.address else {
+            return . zero
+        }
+        
+        let trs = try await getTransactionsHistory(
+            address: address,
+            offset: offset,
+            limit: limit
+        )
+        
+        guard trs.count > 0 else {
+            hasMoreOldTransactions = false
+            return .zero
+        }
+        
+        let newTrs = trs.map { transaction in
+            let isOutgoing: Bool = transaction.from == address
+            return SimpleTransactionDetails(
+                txId: transaction.hash,
+                senderAddress: transaction.from,
+                recipientAddress: transaction.to,
+                dateValue: transaction.date,
+                amountValue: transaction.value,
+                feeValue: nil,
+                confirmationsValue: nil,
+                blockValue: nil,
+                isOutgoing: isOutgoing,
+                transactionStatus: TransactionStatus.notInitiated
+            )
+        }
+        
+        coinStorage.append(newTrs)
+        
+        return trs.count
+    }
+    
+    func getLocalTransactionHistory() -> [TransactionDetails] {
+        historyTransactions
+    }
+    
+    func updateStatus(for id: String, status: TransactionStatus?) {
+        coinStorage.updateStatus(for: id, status: status)
     }
 }
 

@@ -9,14 +9,15 @@
 import UIKit
 import CommonKit
 
-class TransactionTableViewCell: UITableViewCell {
+final class TransactionTableViewCell: UITableViewCell {
     enum TransactionType {
-        case income, outcome
+        case income, outcome, myself
         
         var imageTop: UIImage {
             switch self {
             case .income: return .asset(named: "transfer-in_top") ?? .init()
             case .outcome: return .asset(named: "transfer-out_top") ?? .init()
+            case .myself: return .asset(named: "transfer-in_top")?.withTintColor(.lightGray) ?? .init()
             }
         }
         
@@ -24,6 +25,7 @@ class TransactionTableViewCell: UITableViewCell {
             switch self {
             case .income: return .asset(named: "transfer-in_bot") ?? .init()
             case .outcome: return .asset(named: "transfer-out_bot") ?? .init()
+            case .myself: return .asset(named: "transfer-self_bot") ?? .init()
             }
         }
         
@@ -31,6 +33,7 @@ class TransactionTableViewCell: UITableViewCell {
             switch self {
             case .income: return UIColor.adamant.transferIncomeIconBackground
             case .outcome: return UIColor.adamant.transferOutcomeIconBackground
+            case .myself: return UIColor.adamant.transferIncomeIconBackground
             }
         }
     }
@@ -60,9 +63,92 @@ class TransactionTableViewCell: UITableViewCell {
         }
     }
     
+    var currencySymbol: String?
+    
+    var transaction: SimpleTransactionDetails? {
+        didSet {
+            updateUI()
+        }
+    }
+    
     // MARK: - Initializers
     
     override func awakeFromNib() {
         transactionType = .income
+    }
+    
+    func updateUI() {
+        guard let transaction = transaction else { return }
+        
+        let partnerId = transaction.isOutgoing
+        ? transaction.recipientAddress
+        : transaction.senderAddress
+        
+        let transactionType: TransactionTableViewCell.TransactionType
+        if transaction.recipientAddress == transaction.senderAddress {
+            transactionType = .myself
+        } else if transaction.isOutgoing {
+            transactionType = .outcome
+        } else {
+            transactionType = .income
+        }
+        
+        self.transactionType = transactionType
+        
+        backgroundColor = .clear
+        accountLabel.tintColor = UIColor.adamant.primary
+        ammountLabel.tintColor = UIColor.adamant.primary
+        
+        dateLabel.textColor = transaction.transactionStatus?.color ?? .adamant.secondary
+        
+        switch transaction.transactionStatus {
+        case .success, .inconsistent:
+            if let date = transaction.dateValue {
+                dateLabel.text = date.humanizedDateTime()
+            } else {
+                dateLabel.text = nil
+            }
+        case .notInitiated:
+            dateLabel.text = TransactionDetailsViewControllerBase.awaitingValueString
+        case .failed:
+            dateLabel.text = TransactionStatus.failed.localized
+        case .pending:
+            dateLabel.text = TransactionStatus.pending.localized
+        default:
+            dateLabel.text = TransactionDetailsViewControllerBase.awaitingValueString
+        }
+        
+        if let partnerName = transaction.partnerName {
+            accountLabel.text = partnerName
+            addressLabel.text = partnerId
+            addressLabel.lineBreakMode = .byTruncatingMiddle
+            
+            if addressLabel.isHidden {
+                addressLabel.isHidden = false
+            }
+        } else {
+            accountLabel.text = partnerId
+            
+            if !addressLabel.isHidden {
+                addressLabel.isHidden = true
+            }
+        }
+        
+        let amount = transaction.amountValue ?? .zero
+        ammountLabel.text = AdamantBalanceFormat.full.format(amount, withCurrencySymbol: currencySymbol)
+    }
+}
+
+// MARK: - TransactionStatus UI
+private extension TransactionStatus {
+    var color: UIColor {
+        switch self {
+        case .failed:
+            return .adamant.danger
+        case .pending:
+            return .adamant.alert
+        default:
+            return .adamant.secondary
+        }
     }
 }

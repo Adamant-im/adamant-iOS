@@ -8,35 +8,12 @@
 
 import Foundation
 
-extension BaseTransaction: TransactionDetails {
-    var defaultCurrencySymbol: String? { AdmWalletService.currencySymbol }
-    
-    var txId: String { return transactionId }
-    var senderAddress: String { return senderId ?? "" }
-    var recipientAddress: String { return recipientId ?? "" }
-    var dateValue: Date? { return date as Date? }
-    var feeValue: Decimal? { return fee?.decimalValue }
-    
-    var confirmationsValue: String? { return isConfirmed ? String(confirmations) : nil }
-    var blockValue: String? { return isConfirmed ? blockId : nil }
-    
-    var amountValue: Decimal? {
-        if let amount = self.amount {
-            return amount.decimalValue
-        } else {
-            return 0
-        }
-    }
-    
+extension BaseTransaction {
     var block: UInt {
         if let raw = blockId, let id = UInt(raw) {
             return id
         } else {
             return 0
         }
-    }
-    
-    var blockHeight: UInt64? {
-        return nil
     }
 }

@@ -115,7 +115,11 @@ final class PKGeneratorViewController: FormViewController {
             $0.title = String.adamant.pkGenerator.generateButton
             $0.tag = Rows.generateButton.tag
         }.onCellSelection { [weak self] (_, row) in
-            guard let row: TextAreaRow = self?.form.rowBy(tag: Rows.passphrase.tag), let passphrase = row.value else {
+            guard let row: PasswordRow = self?.form.rowBy(tag: Rows.passphrase.tag),
+                  let passphrase = row.value,
+                  AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase)
+            else {
+                self?.dialogService.showToastMessage(String.adamant.qrGenerator.wrongPassphraseError)
                 return
             }
             

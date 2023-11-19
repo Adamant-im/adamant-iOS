@@ -20,7 +20,7 @@ struct ChatFactory {
     let transferProvider: TransfersProvider
     let accountService: AccountService
     let accountProvider: AccountsProvider
-    let richTransactionStatusService: RichTransactionStatusService
+    let richTransactionStatusService: TransactionStatusService
     let addressBookService: AddressBookService
     let visibleWalletService: VisibleWalletsService
     let avatarService: AvatarService
@@ -32,7 +32,7 @@ struct ChatFactory {
         transferProvider = assembler.resolve(TransfersProvider.self)!
         accountService = assembler.resolve(AccountService.self)!
         accountProvider = assembler.resolve(AccountsProvider.self)!
-        richTransactionStatusService = assembler.resolve(RichTransactionStatusService.self)!
+        richTransactionStatusService = assembler.resolve(TransactionStatusService.self)!
         addressBookService = assembler.resolve(AddressBookService.self)!
         visibleWalletService = assembler.resolve(VisibleWalletsService.self)!
         avatarService = assembler.resolve(AvatarService.self)!

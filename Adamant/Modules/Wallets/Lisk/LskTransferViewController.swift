@@ -11,6 +11,7 @@ import Eureka
 import LiskKit
 import CommonKit
 
+@MainActor
 final class LskTransferViewController: TransferViewControllerBase {
     
     // MARK: Properties
@@ -67,9 +68,14 @@ final class LskTransferViewController: TransferViewControllerBase {
                 
                 Task {
                     do {
+                        service.coinStorage.append(transaction)
                         try await service.sendTransaction(transaction)
                     } catch {
                         dialogService.showRichError(error: error)
+                        service.coinStorage.updateStatus(
+                            for: transaction.id,
+                            status: .failed
+                        )
                     }
                     
                     await service.update()

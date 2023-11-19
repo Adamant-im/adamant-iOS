@@ -8,8 +8,17 @@
 
 import Foundation
 import CommonKit
+import CryptoSwift
+import BigInt
 
 extension AdamantApiService {
+    func transferFunds(transaction: UnregisteredTransaction) async -> ApiServiceResult<UInt64> {
+        return await sendTransaction(
+            path: ApiCommands.Transactions.processTransaction,
+            transaction: transaction
+        )
+    }
+
     func transferFunds(
         sender: String,
         recipient: String,
@@ -34,9 +43,6 @@ extension AdamantApiService {
             return .failure(.internalError(error: InternalAPIError.signTransactionFailed))
         }
         
-        return await sendTransaction(
-            path: ApiCommands.Transactions.processTransaction,
-            transaction: transaction
-        )
+        return await transferFunds(transaction: transaction)
     }
 }

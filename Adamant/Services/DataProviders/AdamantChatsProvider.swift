@@ -428,6 +428,14 @@ extension AdamantChatsProvider {
     }
     
     func getChatMessages(with addressRecipient: String, offset: Int?) async {
+        await getChatMessages(with: addressRecipient, offset: offset, loadedCount: .zero)
+    }
+    
+    func getChatMessages(
+        with addressRecipient: String,
+        offset: Int?,
+        loadedCount: Int
+    ) async {
         guard let address = accountService.account?.address,
               let privateKey = accountService.keypair?.privateKey else {
             return
@@ -467,7 +475,8 @@ extension AdamantChatsProvider {
             result: result,
             chatroom: chatroom,
             offset: offset,
-            addressRecipient: addressRecipient
+            addressRecipient: addressRecipient,
+            loadedCount: loadedCount
         )
     }
     
@@ -475,30 +484,40 @@ extension AdamantChatsProvider {
         result: (reactionsCount: Int, totalCount: Int),
         chatroom: ChatRooms?,
         offset: Int?,
-        addressRecipient: String
+        addressRecipient: String,
+        loadedCount: Int
     ) async {
         let messageCount = chatroom?.messages?.count ?? 0
         
         let minRectionsCount = result.totalCount * minReactionsProcent / 100
-        if result.reactionsCount >= minRectionsCount {
-            let offset = (offset ?? 0) + messageCount
-
-            let loadedCount = chatLoadedMessages[addressRecipient] ?? 0
-            chatLoadedMessages[addressRecipient] = loadedCount + messageCount
-            
-            return await getChatMessages(
-                with: addressRecipient,
-                offset: offset
+        let newLoadedCount = loadedCount + (result.totalCount - result.reactionsCount)
+        
+        guard result.reactionsCount > minRectionsCount,
+              newLoadedCount < chatTransactionsLimit
+        else {
+            setChatDoneStatus(
+                for: addressRecipient,
+                messageCount: messageCount,
+                maxCount: chatroom?.count
             )
+            
+            NotificationCenter.default.post(
+                name: .AdamantChatsProvider.initiallyLoadedMessages,
+                object: addressRecipient
+            )
+            return
         }
         
-        setChatDoneStatus(
-            for: addressRecipient,
-            messageCount: messageCount,
-            maxCount: chatroom?.count
-        )
+        let offset = (offset ?? 0) + messageCount
+
+        let loadedCount = chatLoadedMessages[addressRecipient] ?? 0
+        chatLoadedMessages[addressRecipient] = loadedCount + messageCount
         
-        NotificationCenter.default.post(name: .AdamantChatsProvider.initiallyLoadedMessages, object: addressRecipient)
+        return await getChatMessages(
+            with: addressRecipient,
+            offset: offset,
+            loadedCount: newLoadedCount
+        )
     }
     
     func setChatDoneStatus(
@@ -918,6 +937,7 @@ extension AdamantChatsProvider {
         transaction.richType = richType
         transaction.additionalType = additionalType
         transaction.richContentSerialized = richContentSerialized
+        transaction.blockchainType = richType
         
         transaction.transactionStatus = richProviders[richType] != nil ? .notInitiated : nil
         
@@ -1107,14 +1127,18 @@ extension AdamantChatsProvider {
         }
         
         // MARK: 1. Find. Destroy. Save.
+        
+        let chatroom = message.chatroom
+        
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         privateContext.parent = stack.container.viewContext
         
         privateContext.delete(privateContext.object(with: message.objectID))
-        
         do {
             try privateContext.save()
-            return
+            if let chatroom = chatroom {
+                await updateLastTransactionForChatrooms([chatroom])
+            }
         } catch {
             throw ChatsProviderError.internalError(error)
         }
@@ -1679,7 +1703,7 @@ extension AdamantChatsProvider {
             
             if context.hasChanges {
                 try context.save()
-                await updateContext(rooms: rooms)
+                await updateLastTransactionForChatrooms(rooms)
             }
         } catch {
             print(error)
@@ -1701,7 +1725,8 @@ extension AdamantChatsProvider {
         receivedLastHeight = height
     }
     
-    @MainActor func updateContext(rooms: [Chatroom]) async {
+    @MainActor 
+    func updateLastTransactionForChatrooms(_ rooms: [Chatroom]) {
         let viewContextChatrooms = Set<Chatroom>(rooms).compactMap {
             self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom
         }

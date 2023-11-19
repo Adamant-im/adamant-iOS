@@ -26,7 +26,7 @@ final class ChatViewModel: NSObject {
     private let visibleWalletService: VisibleWalletsService
     private let accountService: AccountService
     private let accountProvider: AccountsProvider
-    private let richTransactionStatusService: RichTransactionStatusService
+    private let richTransactionStatusService: TransactionStatusService
     private let chatCacheService: ChatCacheService
     private let richMessageProviders: [String: RichMessageProvider]
     private let avatarService: AvatarService
@@ -60,6 +60,7 @@ final class ChatViewModel: NSObject {
     private let minDiffCountForOffset = 5
     private let minDiffCountForAnimateScroll = 20
     private let partnerImageSize: CGFloat = 25
+    private let maxMessageLenght: Int = 10000
     private var previousArg: ChatContextMenuArguments?
 
     let minIndexForStartLoadNewMessages = 4
@@ -67,6 +68,7 @@ final class ChatViewModel: NSObject {
     var tempOffsets: [String] = []
     var needToAnimateCellIndex: Int?
 
+    let didTapPartnerQR = ObservableSender<CoreDataAccount>()
     let didTapTransfer = ObservableSender<String>()
     let dialog = ObservableSender<ChatDialog>()
     let didTapAdmChat = ObservableSender<(Chatroom, String?)>()
@@ -127,7 +129,7 @@ final class ChatViewModel: NSObject {
         visibleWalletService: VisibleWalletsService,
         accountService: AccountService,
         accountProvider: AccountsProvider,
-        richTransactionStatusService: RichTransactionStatusService,
+        richTransactionStatusService: TransactionStatusService,
         chatCacheService: ChatCacheService,
         richMessageProviders: [String: RichMessageProvider],
         avatarService: AvatarService,
@@ -451,6 +453,9 @@ final class ChatViewModel: NSObject {
     }
     
     func replyMessageIfNeeded(_ messageModel: MessageModel?) {
+        let tx = chatTransactions.first(where: { $0.txId == messageModel?.id })
+        guard isSendingAvailable, tx?.isFake == false else { return }
+        
         let message = messages.first(where: { $0.messageId == messageModel?.id })
         guard message?.status != .failed else {
             dialog.send(.warning(String.adamant.reply.failedMessageError))
@@ -559,8 +564,14 @@ final class ChatViewModel: NSObject {
         
         previousArg = arg
         
+        let tx = chatTransactions.first(where: { $0.txId == arg.messageId })
+        guard tx?.statusEnum == .delivered else { return }
+        
+        let presentReactions = isSendingAvailable && tx?.isFake == false
+        
         dialog.send(
             .presentMenu(
+                presentReactions: presentReactions,
                 arg: arg,
                 didSelectEmojiDelegate: self,
                 didSelectEmojiAction: didSelectEmojiAction,
@@ -568,6 +579,15 @@ final class ChatViewModel: NSObject {
                 didDismissMenuAction: didDismissMenuAction
             )
         )
+    }
+    
+    func canSendMessage(withText text: String) -> Bool {
+        guard text.count <= maxMessageLenght else {
+            dialog.send(.alert(.adamant.chat.messageIsTooBig))
+            return false
+        }
+        
+        return true
     }
 }
 

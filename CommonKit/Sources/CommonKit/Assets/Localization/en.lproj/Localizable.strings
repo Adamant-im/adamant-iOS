@@ -424,6 +424,9 @@
 /* Chat: Error scrolling to message, this message has been deleted and is no longer accessible */
 "ChatScene.Error.messageWasDeleted" = "Sorry, but this message has been deleted and is no longer accessible";
 
+/* Chat: Error message is too big */
+"ChatScene.Error.messageIsTooBig" = "The message is too big. Send it in parts.";
+
 /* Delegates page: scene title */
 "Delegates.Title" = "Delegates";
 
@@ -1119,3 +1122,9 @@
 
 /* Pending message reply error */
 "Reply.pendingMessageError" = "You can't reply to a pending message. Wait for confirmations (estimate 1-2 seconds)";
+
+/* Include partner name */
+"PartnerQR.includePartnerName" = "Include contact name";
+
+/* Include partner url */
+"PartnerQR.includePartnerURL" = "Include Web app link";

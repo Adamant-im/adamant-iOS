@@ -35,6 +35,8 @@ final class LskWalletService: WalletService {
     var lskServiceApiService: LskServiceApiService!
     var accountService: AccountService!
     var dialogService: DialogService!
+    var vibroService: VibroService!
+    var coreDataStack: CoreDataStack!
     
     // MARK: - Constants
     var transactionFee: Decimal {
@@ -93,6 +95,23 @@ final class LskWalletService: WalletService {
     
     @Atomic private var subscriptions = Set<AnyCancellable>()
 
+    @ObservableValue private(set) var transactions: [TransactionDetails] = []
+    @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
+
+    var transactionsPublisher: AnyObservable<[TransactionDetails]> {
+        $transactions.eraseToAnyPublisher()
+    }
+    
+    var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
+        $hasMoreOldTransactions.eraseToAnyPublisher()
+    }
+    
+    private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
+        coinId: tokenUnicID,
+        coreDataStack: coreDataStack,
+        blockchainType: richMessageType
+    )
+    
     // MARK: - State
     @Atomic private (set) var state: WalletServiceState = .notInitiated
     
@@ -146,6 +165,15 @@ final class LskWalletService: WalletService {
                     NotificationCenter.default.removeObserver(balanceObserver)
                     self?.balanceObserver = nil
                 }
+                self?.coinStorage.clear()
+            }
+            .store(in: &subscriptions)
+    }
+    
+    func addTransactionObserver() {
+        coinStorage.transactionsPublisher
+            .sink { [weak self] transactions in
+                self?.transactions = transactions
             }
             .store(in: &subscriptions)
     }
@@ -179,6 +207,8 @@ final class LskWalletService: WalletService {
         }
         
         if let balance = try? await getBalance() {
+            let isRaised = (wallet.balance < balance) && !initialBalanceCheck
+            
             wallet.isBalanceInitialized = true
             let notification: Notification.Name?
             
@@ -191,6 +221,10 @@ final class LskWalletService: WalletService {
                 notification = walletUpdatedNotification
             } else {
                 notification = nil
+            }
+            
+            if isRaised {
+                vibroService.applyVibration(.success)
             }
             
             if let notification = notification {
@@ -382,6 +416,10 @@ extension LskWalletService: SwinjectDependentService {
         dialogService = container.resolve(DialogService.self)
         lskServiceApiService = container.resolve(LskServiceApiService.self)
         lskNodeApiService = container.resolve(LskNodeApiService.self)
+        vibroService = container.resolve(VibroService.self)
+        coreDataStack = container.resolve(CoreDataStack.self)
+        
+        addTransactionObserver()
     }
 }
 
@@ -460,6 +498,22 @@ extension LskWalletService {
             )
         }
     }
+    
+    func loadTransactions(offset: Int, limit: Int) async throws -> Int {
+        let trs = try await getTransactions(offset: UInt(offset), limit: UInt(limit))
+        
+        guard trs.count > 0 else {
+            hasMoreOldTransactions = false
+            return .zero
+        }
+        
+        coinStorage.append(trs)
+        return trs.count
+    }
+    
+    func getLocalTransactionHistory() -> [TransactionDetails] {
+        transactions
+    }
 }
 
 // MARK: - KVS
@@ -501,15 +555,16 @@ extension LskWalletService {
 
 // MARK: - Transactions
 extension LskWalletService {
-    func getTransactions(offset: UInt) async throws -> [Transactions.TransactionModel] {
+    func getTransactions(offset: UInt, limit: UInt = 100) async throws -> [Transactions.TransactionModel] {
         guard let address = self.lskWallet?.address else {
             throw WalletServiceError.internalError(message: "LSK Wallet: not found", error: nil)
         }
         
         return try await lskServiceApiService.requestServiceApi { api, completion in
             api.transactions(
+                ownerAddress: address,
                 senderIdOrRecipientId: address,
-                limit: 100,
+                limit: limit,
                 offset: offset,
                 sort: APIRequest.Sort("timestamp", direction: .descending),
                 completionHandler: completion
@@ -522,8 +577,16 @@ extension LskWalletService {
             throw ApiServiceError.internalError(message: "No hash", error: nil)
         }
         
+        let ownerAddress = wallet?.address
+        
         let result = try await lskServiceApiService.requestServiceApi { api, completion in
-            api.transactions(id: hash, limit: 1, offset: 0, completionHandler: completion)
+            api.transactions(
+                ownerAddress: ownerAddress,
+                id: hash,
+                limit: 1,
+                offset: 0,
+                completionHandler: completion
+            )
         }.get()
         
         if let transaction = result.first {
@@ -531,6 +594,10 @@ extension LskWalletService {
         } else {
             throw WalletServiceError.remoteServiceError(message: "No transaction")
         }
+    }
+    
+    func updateStatus(for id: String, status: TransactionStatus?) {
+        coinStorage.updateStatus(for: id, status: status)
     }
 }
 

@@ -90,4 +90,9 @@ extension String.adamant {
         static let failedMessageError = String.localized("Reply.failedMessageError", comment: "Failed message reply error")
         static let pendingMessageError = String.localized("Reply.pendingMessageError", comment: "Pending message reply error")
     }
+    
+    enum partnerQR {
+        static let includePartnerName = String.localized("PartnerQR.includePartnerName", comment: "Include partner name")
+        static let includePartnerURL = String.localized("PartnerQR.includePartnerURL", comment: "Include partner url")
+    }
 }

@@ -147,6 +147,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
     let currencyInfo: CurrencyInfoService
     let addressBookService: AddressBookService
     let accountService: AccountService
+    let walletService: WalletService?
     
     // MARK: - Properties
     
@@ -155,6 +156,13 @@ class TransactionDetailsViewControllerBase: FormViewController {
             if !isFiatSet {
                 self.updateFiat()
             }
+            
+            guard let id = transaction?.txId else { return }
+            
+            walletService?.updateStatus(
+                for: id,
+                status: transaction?.transactionStatus
+            )
         }
     }
     private lazy var dateFormatter: DateFormatter = {
@@ -164,7 +172,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         return dateFormatter
     }()
     
-    static let awaitingValueString = "⏱"
+    static let awaitingValueString = TransactionStatus.notInitiated.localized
     
     private lazy var currencyFormatter: NumberFormatter = {
         return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: currencySymbol)
@@ -245,12 +253,14 @@ class TransactionDetailsViewControllerBase: FormViewController {
         dialogService: DialogService,
         currencyInfo: CurrencyInfoService,
         addressBookService: AddressBookService,
-        accountService: AccountService
+        accountService: AccountService,
+        walletService: WalletService?
     ) {
         self.dialogService = dialogService
         self.currencyInfo = currencyInfo
         self.addressBookService = addressBookService
         self.accountService = accountService
+        self.walletService = walletService
         
         super.init(style: .grouped)
     }

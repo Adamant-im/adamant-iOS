@@ -30,6 +30,7 @@ struct ERC20WalletFactory: WalletFactory {
         vc.dialogService = assembler.resolve(DialogService.self)
         vc.screensFactory = screensFactory
         vc.walletService = service
+        vc.ercWalletService = service
         return vc
     }
     
@@ -128,7 +129,8 @@ private extension ERC20WalletFactory {
             dialogService: assembler.resolve(DialogService.self)!,
             currencyInfo: assembler.resolve(CurrencyInfoService.self)!,
             addressBookService: assembler.resolve(AddressBookService.self)!,
-            accountService:  assembler.resolve(AccountService.self)!
+            accountService:  assembler.resolve(AccountService.self)!,
+            walletService: service
         )
         
         vc.service = service

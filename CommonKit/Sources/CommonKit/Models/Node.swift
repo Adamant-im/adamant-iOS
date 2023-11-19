@@ -68,7 +68,7 @@ public extension Node {
         }
     }
     
-    init(url: URL) {
+    init(url: URL, altUrl _: URL? = nil) {
         self.init(
             scheme: URLScheme(rawValue: url.scheme ?? .empty) ?? .https,
             host: url.host ?? .empty,

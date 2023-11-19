@@ -226,6 +226,7 @@ extension AdamantChatsProvider {
         transaction.senderId = sender.address
         transaction.type = Int16(ChatType.message.rawValue)
         transaction.isOutgoing = false
+        transaction.isFake = true
         transaction.message = text
         transaction.isUnread = unread
         transaction.silentNotification = silent

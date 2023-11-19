@@ -31,6 +31,7 @@ struct LskWalletFactory: WalletFactory {
         c.dialogService = assembler.resolve(DialogService.self)
         c.screensFactory = screensFactory
         c.lskWalletService = service
+        c.walletService = service
         return c
     }
     
@@ -126,7 +127,8 @@ private extension LskWalletFactory {
             dialogService: assembler.resolve(DialogService.self)!,
             currencyInfo: assembler.resolve(CurrencyInfoService.self)!,
             addressBookService: assembler.resolve(AddressBookService.self)!,
-            accountService:  assembler.resolve(AccountService.self)!
+            accountService:  assembler.resolve(AccountService.self)!,
+            walletService: service
         )
         
         vc.service = service

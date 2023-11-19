@@ -102,6 +102,8 @@ final class ERC20WalletService: WalletService {
     var erc20ApiService: ERC20ApiService!
     var dialogService: DialogService!
     var increaseFeeService: IncreaseFeeService!
+    var vibroService: VibroService!
+    var coreDataStack: CoreDataStack!
     
     // MARK: - Notifications
     let walletUpdatedNotification: Notification.Name
@@ -145,6 +147,23 @@ final class ERC20WalletService: WalletService {
     var wallet: WalletAccount? { return ethWallet }
     private var balanceObserver: NSObjectProtocol?
     
+    @ObservableValue private(set) var historyTransactions: [TransactionDetails] = []
+    @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
+
+    var transactionsPublisher: AnyObservable<[TransactionDetails]> {
+        $historyTransactions.eraseToAnyPublisher()
+    }
+    
+    var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
+        $hasMoreOldTransactions.eraseToAnyPublisher()
+    }
+    
+    private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
+        coinId: tokenUnicID,
+        coreDataStack: coreDataStack,
+        blockchainType: dynamicRichMessageType
+    )
+    
     init(token: ERC20Token) {
         self.token = token
         walletUpdatedNotification = Notification.Name("adamant.erc20Wallet.\(token.symbol).walletUpdated")
@@ -185,6 +204,15 @@ final class ERC20WalletService: WalletService {
                     NotificationCenter.default.removeObserver(balanceObserver)
                     self?.balanceObserver = nil
                 }
+                self?.coinStorage.clear()
+            }
+            .store(in: &subscriptions)
+    }
+    
+    func addTransactionObserver() {
+        coinStorage.transactionsPublisher
+            .sink { [weak self] transactions in
+                self?.historyTransactions = transactions
             }
             .store(in: &subscriptions)
     }
@@ -213,6 +241,7 @@ final class ERC20WalletService: WalletService {
         if let balance = try? await getBalance(forAddress: wallet.ethAddress) {
             wallet.isBalanceInitialized = true
             let notification: Notification.Name?
+            let isRaised = (wallet.balance < balance) && !initialBalanceCheck
             
             if wallet.balance != balance {
                 wallet.balance = balance
@@ -223,6 +252,10 @@ final class ERC20WalletService: WalletService {
                 notification = walletUpdatedNotification
             } else {
                 notification = nil
+            }
+            
+            if isRaised {
+                vibroService.applyVibration(.success)
             }
             
             if let notification = notification {
@@ -365,6 +398,10 @@ extension ERC20WalletService: SwinjectDependentService {
         dialogService = container.resolve(DialogService.self)
         increaseFeeService = container.resolve(IncreaseFeeService.self)
         erc20ApiService = container.resolve(ERC20ApiService.self)
+        vibroService = container.resolve(VibroService.self)
+        coreDataStack = container.resolve(CoreDataStack.self)
+        
+        addTransactionObserver()
     }
 }
 
@@ -537,5 +574,52 @@ extension ERC20WalletService {
         
         transactions.sort { $0.date.compare($1.date) == .orderedDescending }
         return transactions
+    }
+    
+    func loadTransactions(offset: Int, limit: Int) async throws -> Int {
+        guard let address = wallet?.address else {
+            return .zero
+        }
+        
+        let trs = try await getTransactionsHistory(
+            address: address,
+            offset: offset,
+            limit: limit
+        )
+        
+        guard trs.count > 0 else {
+            hasMoreOldTransactions = false
+            return .zero
+        }
+        
+        let newTrs = trs.map { transaction in
+            let isOutgoing = transaction.from == address
+            let exponent = -token.naturalUnits
+            
+            return SimpleTransactionDetails(
+                txId: transaction.hash,
+                senderAddress: transaction.from,
+                recipientAddress: transaction.to,
+                dateValue: transaction.date,
+                amountValue: transaction.contract_value.asDecimal(exponent: exponent),
+                feeValue: nil,
+                confirmationsValue: nil,
+                blockValue: nil,
+                isOutgoing: isOutgoing,
+                transactionStatus: TransactionStatus.notInitiated
+            )
+        }
+        
+        coinStorage.append(newTrs)
+        
+        return trs.count
+    }
+    
+    func getLocalTransactionHistory() -> [TransactionDetails] {
+        historyTransactions
+    }
+    
+    func updateStatus(for id: String, status: TransactionStatus?) {
+        coinStorage.updateStatus(for: id, status: status)
     }
 }

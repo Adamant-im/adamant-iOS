@@ -1,5 +1,5 @@
 //
-//  RichTransactionStatusService.swift
+//  TransactionStatusService.swift
 //  Adamant
 //
 //  Created by Andrey Golubenko on 13.01.2023.
@@ -8,7 +8,7 @@
 
 import CoreData
 
-protocol RichTransactionStatusService: Actor, AnyObject {
-    func forceUpdate(transaction: RichMessageTransaction) async
+protocol TransactionStatusService: Actor, AnyObject {
+    func forceUpdate(transaction: CoinTransaction) async
     func startObserving()
 }

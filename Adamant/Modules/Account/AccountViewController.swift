@@ -13,6 +13,7 @@ import CoreData
 import Parchment
 import SnapKit
 import CommonKit
+import Combine
 
 // MARK: - Localization
 extension String.adamant {
@@ -154,6 +155,7 @@ final class AccountViewController: FormViewController {
     private var initiated = false
     
     private var walletViewControllers = [WalletViewController]()
+    private var notificationsSet: Set<AnyCancellable> = []
     
     // MARK: StayIn
     
@@ -372,35 +374,6 @@ final class AccountViewController: FormViewController {
         }
         
         appSection.append(contributeRow)
-        
-        // Contribute
-        let vibrationRow = LabelRow {
-            $0.title = Rows.vibration.localized
-            $0.tag = Rows.vibration.tag
-            $0.cell.imageView?.image = Rows.vibration.image
-            $0.cell.selectionStyle = .gray
-        }.cellUpdate { (cell, _) in
-            cell.accessoryType = .disclosureIndicator
-        }.onCellSelection { [weak self] (_, _) in
-            guard let vc = self?.screensFactory.makeVibrationSelection()
-            else {
-                return
-            }
-            
-            if let split = self?.splitViewController {
-                let details = UINavigationController(rootViewController:vc)
-                split.showDetailViewController(details, sender: self)
-            } else if let nav = self?.navigationController {
-                nav.pushViewController(vc, animated: true)
-            } else {
-                vc.modalPresentationStyle = .overFullScreen
-                self?.present(vc, animated: true, completion: nil)
-            }
-            
-            self?.deselectWalletViewControllers()
-        }
-        
-        appSection.append(vibrationRow)
         
         // About
         let aboutRow = LabelRow {
@@ -820,6 +793,13 @@ final class AccountViewController: FormViewController {
                                                    queue: OperationQueue.main,
                                                    using: callback)
         }
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantVibroService.presentVibrationRow)
+            .sink { [weak self] _ in
+                self?.addVibrationRow()
+            }
+            .store(in: &notificationsSet)
     }
     
     private func setupWalletsVC() {
@@ -924,6 +904,39 @@ final class AccountViewController: FormViewController {
         DispatchQueue.background.async {
             self.accountService.reloadWallets()
         }
+    }
+    
+    private func addVibrationRow() {
+        guard let appSection = form.sectionBy(tag: Sections.application.tag)
+        else { return }
+        
+        let vibrationRow = LabelRow {
+            $0.title = Rows.vibration.localized
+            $0.tag = Rows.vibration.tag
+            $0.cell.imageView?.image = Rows.vibration.image
+            $0.cell.selectionStyle = .gray
+        }.cellUpdate { (cell, _) in
+            cell.accessoryType = .disclosureIndicator
+        }.onCellSelection { [weak self] (_, _) in
+            guard let vc = self?.screensFactory.makeVibrationSelection()
+            else {
+                return
+            }
+            
+            if let split = self?.splitViewController {
+                let details = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(details, sender: self)
+            } else if let nav = self?.navigationController {
+                nav.pushViewController(vc, animated: true)
+            } else {
+                vc.modalPresentationStyle = .overFullScreen
+                self?.present(vc, animated: true, completion: nil)
+            }
+            
+            self?.deselectWalletViewControllers()
+        }
+        
+        appSection.append(vibrationRow)
     }
 }
 

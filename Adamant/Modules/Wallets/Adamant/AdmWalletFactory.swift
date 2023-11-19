@@ -67,7 +67,7 @@ struct AdmWalletFactory: WalletFactory {
     
     func makeDetailsVC(transaction: TransferTransaction, screensFactory: ScreensFactory) -> UIViewController {
         let controller = makeTransactionDetailsVC(screensFactory: screensFactory)
-        controller.transaction = transaction
+        controller.adamantTransaction = transaction
         controller.comment = transaction.comment
         controller.senderId = transaction.senderId
         controller.recipientId = transaction.recipientId

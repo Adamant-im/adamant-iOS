@@ -31,7 +31,7 @@ final class DogeTransferViewController: TransferViewControllerBase {
             return
         }
         
-        guard service.wallet != nil else {
+        guard let wallet = service.wallet else {
             return
         }
         
@@ -55,9 +55,26 @@ final class DogeTransferViewController: TransferViewControllerBase {
                 
                 Task {
                     do {
+                        let simpleTransaction = SimpleTransactionDetails(
+                            txId: transaction.txID,
+                            senderAddress: wallet.address,
+                            recipientAddress: recipient,
+                            amountValue: amount,
+                            feeValue: nil,
+                            confirmationsValue: nil,
+                            blockValue: nil,
+                            isOutgoing: true,
+                            transactionStatus: nil
+                        )
+                        
+                        service.coinStorage.append(simpleTransaction)
                         try await service.sendTransaction(transaction)
                     } catch {
                         dialogService.showRichError(error: error)
+                        service.coinStorage.updateStatus(
+                            for: transaction.txId,
+                            status: .failed
+                        )
                     }
                     
                     await service.update()

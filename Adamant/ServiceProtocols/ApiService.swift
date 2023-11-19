@@ -67,6 +67,10 @@ protocol ApiService {
         amount: Decimal,
         keypair: Keypair
     ) async -> ApiServiceResult<UInt64>
+
+    func transferFunds(
+        transaction: UnregisteredTransaction
+    ) async -> ApiServiceResult<UInt64>
     
     // MARK: - States
     

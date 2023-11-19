@@ -55,6 +55,8 @@ final class DogeWalletService: WalletService {
     var accountService: AccountService!
     var dialogService: DialogService!
     var addressConverter: AddressConverter!
+    var vibroService: VibroService!
+    var coreDataStack: CoreDataStack!
     
     // MARK: - Constants
     static let currencyLogo = UIImage.asset(named: "doge_wallet") ?? .init()
@@ -121,6 +123,23 @@ final class DogeWalletService: WalletService {
     private static let jsonDecoder = JSONDecoder()
     @Atomic private var subscriptions = Set<AnyCancellable>()
 
+    @ObservableValue private(set) var historyTransactions: [TransactionDetails] = []
+    @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
+
+    var transactionsPublisher: AnyObservable<[TransactionDetails]> {
+        $historyTransactions.eraseToAnyPublisher()
+    }
+    
+    var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
+        $hasMoreOldTransactions.eraseToAnyPublisher()
+    }
+    
+    private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
+        coinId: tokenUnicID,
+        coreDataStack: coreDataStack,
+        blockchainType: richMessageType
+    )
+    
     // MARK: - State
     @Atomic private (set) var state: WalletServiceState = .notInitiated
     
@@ -175,6 +194,15 @@ final class DogeWalletService: WalletService {
                     NotificationCenter.default.removeObserver(balanceObserver)
                     self?.balanceObserver = nil
                 }
+                self?.coinStorage.clear()
+            }
+            .store(in: &subscriptions)
+    }
+    
+    func addTransactionObserver() {
+        coinStorage.transactionsPublisher
+            .sink { [weak self] transactions in
+                self?.historyTransactions = transactions
             }
             .store(in: &subscriptions)
     }
@@ -203,6 +231,7 @@ final class DogeWalletService: WalletService {
         if let balance = try? await getBalance() {
             wallet.isBalanceInitialized = true
             let notification: Notification.Name?
+            let isRaised = (wallet.balance < balance) && !initialBalanceCheck
             
             if wallet.balance != balance {
                 wallet.balance = balance
@@ -213,6 +242,10 @@ final class DogeWalletService: WalletService {
                 notification = walletUpdatedNotification
             } else {
                 notification = nil
+            }
+            
+            if isRaised {
+                vibroService.applyVibration(.success)
             }
             
             if let notification = notification {
@@ -317,6 +350,10 @@ extension DogeWalletService: SwinjectDependentService {
         addressConverter = container.resolve(AddressConverterFactory.self)?
             .make(network: network)
         dogeApiService = container.resolve(DogeApiService.self)
+        vibroService = container.resolve(VibroService.self)
+        coreDataStack = container.resolve(CoreDataStack.self)
+        
+        addTransactionObserver()
     }
 }
 
@@ -567,6 +604,30 @@ extension DogeWalletService {
         } else {
             throw WalletServiceError.remoteServiceError(message: "Failed to parse block")
         }
+    }
+    
+    func loadTransactions(offset: Int, limit: Int) async throws -> Int {
+        let tuple = try await getTransactions(from: offset)
+        
+        let trs = tuple.transactions
+        hasMoreOldTransactions = tuple.hasMore
+        
+        guard trs.count > 0 else {
+            hasMoreOldTransactions = false
+            return .zero
+        }
+        
+        coinStorage.append(trs)
+        
+        return trs.count
+    }
+    
+    func getLocalTransactionHistory() -> [TransactionDetails] {
+        historyTransactions
+    }
+    
+    func updateStatus(for id: String, status: TransactionStatus?) {
+        coinStorage.updateStatus(for: id, status: status)
     }
 }
 

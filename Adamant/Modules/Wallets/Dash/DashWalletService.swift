@@ -55,6 +55,8 @@ final class DashWalletService: WalletService {
     var securedStore: SecuredStore!
     var dialogService: DialogService!
     var addressConverter: AddressConverter!
+    var coreDataStack: CoreDataStack!
+    var vibroService: VibroService!
     
     // MARK: - Constants
     static let currencyLogo = UIImage.asset(named: "dash_wallet") ?? .init()
@@ -122,6 +124,23 @@ final class DashWalletService: WalletService {
     static let jsonDecoder = JSONDecoder()
     @Atomic private var subscriptions = Set<AnyCancellable>()
 
+    @ObservableValue private(set) var historyTransactions: [TransactionDetails] = []
+    @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
+
+    var transactionsPublisher: AnyObservable<[TransactionDetails]> {
+        $historyTransactions.eraseToAnyPublisher()
+    }
+    
+    var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
+        $hasMoreOldTransactions.eraseToAnyPublisher()
+    }
+    
+    private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
+        coinId: tokenUnicID,
+        coreDataStack: coreDataStack,
+        blockchainType: richMessageType
+    )
+    
     // MARK: - State
     @Atomic private (set) var state: WalletServiceState = .notInitiated
     
@@ -177,6 +196,15 @@ final class DashWalletService: WalletService {
                     NotificationCenter.default.removeObserver(balanceObserver)
                     self?.balanceObserver = nil
                 }
+                self?.coinStorage.clear()
+            }
+            .store(in: &subscriptions)
+    }
+    
+    func addTransactionObserver() {
+        coinStorage.transactionsPublisher
+            .sink { [weak self] transactions in
+                self?.historyTransactions = transactions
             }
             .store(in: &subscriptions)
     }
@@ -205,6 +233,7 @@ final class DashWalletService: WalletService {
         if let balance = try? await getBalance() {
             wallet.isBalanceInitialized = true
             let notification: Notification.Name?
+            let isRaised = (wallet.balance < balance) && !initialBalanceCheck
             
             if wallet.balance != balance {
                 wallet.balance = balance
@@ -215,6 +244,10 @@ final class DashWalletService: WalletService {
                 notification = walletUpdatedNotification
             } else {
                 notification = nil
+            }
+            
+            if isRaised {
+                vibroService.applyVibration(.success)
             }
             
             if let notification = notification {
@@ -329,6 +362,10 @@ extension DashWalletService: SwinjectDependentService {
         addressConverter = container.resolve(AddressConverterFactory.self)?
             .make(network: network)
         dashApiService = container.resolve(DashApiService.self)
+        vibroService = container.resolve(VibroService.self)
+        coreDataStack = container.resolve(CoreDataStack.self)
+        
+        addTransactionObserver()
     }
 }
 
@@ -389,6 +426,43 @@ extension DashWalletService {
                 message: "DASH Wallet: failed to get address from KVS"
             )
         }
+    }
+    
+    func loadTransactions(offset: Int, limit: Int) async throws -> Int {
+        guard let address = wallet?.address else {
+            return .zero
+        }
+        
+        let allTransactionsIds = try await requestTransactionsIds(for: address).reversed()
+        
+        let availableToLoad = allTransactionsIds.count - offset
+        
+        let maxPerRequest = availableToLoad > limit
+        ? limit
+        : availableToLoad
+        
+        let startIndex = allTransactionsIds.index(allTransactionsIds.startIndex, offsetBy: offset)
+        let endIndex = allTransactionsIds.index(startIndex, offsetBy: maxPerRequest)
+        let ids = Array(allTransactionsIds[startIndex..<endIndex])
+        
+        let trs = try await getTransactions(by: ids)
+        
+        guard trs.count > 0 else {
+            hasMoreOldTransactions = false
+            return .zero
+        }
+        
+        coinStorage.append(trs)
+        
+        return trs.count
+    }
+    
+    func getLocalTransactionHistory() -> [TransactionDetails] {
+        historyTransactions
+    }
+    
+    func updateStatus(for id: String, status: TransactionStatus?) {
+        coinStorage.updateStatus(for: id, status: status)
     }
 }
 

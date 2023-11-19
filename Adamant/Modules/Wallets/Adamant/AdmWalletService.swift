@@ -57,6 +57,8 @@ final class AdmWalletService: NSObject, WalletService {
 	weak var accountService: AccountService?
 	var apiService: ApiService!
 	var transfersProvider: TransfersProvider!
+    var coreDataStack: CoreDataStack!
+    var vibroService: VibroService!
     
     // MARK: - Notifications
     let walletUpdatedNotification = Notification.Name("adamant.admWallet.updated")
@@ -74,6 +76,23 @@ final class AdmWalletService: NSObject, WalletService {
     @Atomic private(set) var isWarningGasPrice = false
     @Atomic private var subscriptions = Set<AnyCancellable>()
 
+    @ObservableValue private(set) var transactions: [TransactionDetails] = []
+    @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
+
+    var transactionsPublisher: AnyObservable<[TransactionDetails]> {
+        $transactions.eraseToAnyPublisher()
+    }
+    
+    var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
+        $hasMoreOldTransactions.eraseToAnyPublisher()
+    }
+    
+    private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
+        coinId: tokenUnicID,
+        coreDataStack: coreDataStack,
+        blockchainType: richMessageType
+    )
+    
     // MARK: - State
     @Atomic private(set) var state: WalletServiceState = .upToDate
     @Atomic private(set) var wallet: WalletAccount?
@@ -119,8 +138,12 @@ final class AdmWalletService: NSObject, WalletService {
         }
                 
         let notify: Bool
+        
+        let isRaised: Bool
+        
         if let wallet = wallet as? AdmWallet {
             wallet.isBalanceInitialized = true
+            isRaised = (wallet.balance < account.balance) && wallet.isBalanceInitialized
             if wallet.balance != account.balance {
                 wallet.balance = account.balance
                 notify = true
@@ -134,8 +157,12 @@ final class AdmWalletService: NSObject, WalletService {
             
             self.wallet = wallet
             notify = true
+            isRaised = false
         }
         
+        if isRaised {
+            vibroService.applyVibration(.success)
+        }
         if notify, let wallet = wallet {
             postUpdateNotification(with: wallet)
         }
@@ -158,6 +185,12 @@ final class AdmWalletService: NSObject, WalletService {
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
         return address
     }
+    
+    func loadTransactions(offset: Int, limit: Int) async throws -> Int { .zero }
+    
+    func getLocalTransactionHistory() -> [TransactionDetails] { [] }
+    
+    func updateStatus(for id: String, status: TransactionStatus?) { }
 }
 
 // MARK: - NSFetchedResultsControllerDelegate
@@ -181,6 +214,8 @@ extension AdmWalletService: SwinjectDependentService {
         accountService = container.resolve(AccountService.self)
         apiService = container.resolve(ApiService.self)
         transfersProvider = container.resolve(TransfersProvider.self)
+        coreDataStack = container.resolve(CoreDataStack.self)
+        vibroService = container.resolve(VibroService.self)
         
         Task {
             let controller = await transfersProvider.unreadTransfersController()

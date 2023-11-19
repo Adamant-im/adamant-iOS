@@ -8,6 +8,7 @@
 
 import Foundation
 import CommonKit
+import BigInt
 
 struct UnregisteredTransaction: Hashable {
     let type: TransactionType
@@ -18,6 +19,7 @@ struct UnregisteredTransaction: Hashable {
     let amount: Decimal
     let signature: String
     let asset: TransactionAsset
+    let requesterPublicKey: String?
 }
 
 extension UnregisteredTransaction: Codable {
@@ -45,6 +47,7 @@ extension UnregisteredTransaction: Codable {
         
         let amount = try container.decode(Decimal.self, forKey: .amount)
         self.amount = amount.shiftedFromAdamant()
+        self.requesterPublicKey = ""
     }
     
     func encode(to encoder: Encoder) throws {

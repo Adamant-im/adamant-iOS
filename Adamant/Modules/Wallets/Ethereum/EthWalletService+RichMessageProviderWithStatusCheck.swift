@@ -12,8 +12,16 @@ import Web3Core
 import CommonKit
 
 extension EthWalletService: RichMessageProviderWithStatusCheck {
-    func statusInfoFor(transaction: RichMessageTransaction) async -> TransactionStatusInfo {
-        guard let hash = transaction.getRichValue(for: RichContentKeys.transfer.hash) else {
+    func statusInfoFor(transaction: CoinTransaction) async -> TransactionStatusInfo {
+        let hash: String?
+        
+        if let transaction = transaction as? RichMessageTransaction {
+            hash = transaction.getRichValue(for: RichContentKeys.transfer.hash)
+        } else {
+            hash = transaction.txId
+        }
+        
+        guard let hash = hash else {
             return .init(sentDate: nil, status: .inconsistent)
         }
         
@@ -88,7 +96,7 @@ private extension EthWalletService {
     
     func getStatus(
         details: Web3Core.TransactionDetails,
-        transaction: RichMessageTransaction,
+        transaction: CoinTransaction,
         receipt: TransactionReceipt
     ) -> TransactionStatus {
         let status = receipt.status.asTransactionStatus()
@@ -115,8 +123,7 @@ private extension EthWalletService {
         // MARK: Compare amounts
         let realAmount = eth.value.asDecimal(exponent: EthWalletService.currencyExponent)
         
-        guard let raw = transaction.getRichValue(for: RichContentKeys.transfer.amount),
-              let reported = AdamantBalanceFormat.deserializeBalance(from: raw) else {
+        guard let reported = reportedValue(for: transaction) else {
             return .inconsistent
         }
         let min = reported - reported*0.005
@@ -127,6 +134,22 @@ private extension EthWalletService {
         }
         
         return .success
+    }
+    
+    func reportedValue(for transaction: CoinTransaction) -> Decimal? {
+        guard let transaction = transaction as? RichMessageTransaction
+        else {
+            return transaction.amountValue
+        }
+        
+        guard
+            let raw = transaction.getRichValue(for: RichContentKeys.transfer.amount),
+            let reportedValue = AdamantBalanceFormat.deserializeBalance(from: raw)
+        else {
+            return nil
+        }
+        
+        return reportedValue
     }
 }
 

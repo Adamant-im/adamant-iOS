@@ -41,3 +41,25 @@ extension TransferTransaction {
         }
     }
 }
+
+extension TransferTransaction: AdamantTransactionDetails {
+    var partnerName: String? {
+        partner?.name
+    }
+    
+    var showToChat: Bool? {
+        guard let partner = partner as? CoreDataAccount,
+              let chatroom = partner.chatroom,
+              !chatroom.isReadonly
+        else {
+            return false
+        }
+        
+        return true
+    }
+    
+    var chatRoom: Chatroom? {
+        let partner = partner as? CoreDataAccount
+        return partner?.chatroom
+    }
+}

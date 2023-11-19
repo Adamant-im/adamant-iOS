@@ -351,6 +351,10 @@ private extension ChatViewController {
         viewModel.layoutIfNeeded
             .sink { [weak self] in self?.view.layoutIfNeeded() }
             .store(in: &subscriptions)
+        
+        viewModel.didTapPartnerQR
+            .sink { [weak self] in self?.didTapPartenerQR(partner: $0) }
+            .store(in: &subscriptions)
     }
 }
 
@@ -625,6 +629,11 @@ private extension ChatViewController {
     
     func didTapTransferTransaction(_ transaction: TransferTransaction) {
         let vc = screensFactory.makeAdmTransactionDetails(transaction: transaction)
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    func didTapPartenerQR(partner: CoreDataAccount) {
+        let vc = screensFactory.makePartnerQR(partner: partner)
         navigationController?.pushViewController(vc, animated: true)
     }
     

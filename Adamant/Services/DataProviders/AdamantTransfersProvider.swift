@@ -378,7 +378,7 @@ extension AdamantTransfersProvider {
         amount: Decimal,
         comment: String?,
         replyToMessageId: String?
-    ) async throws -> TransactionDetails {
+    ) async throws -> AdamantTransactionDetails {
         let comment = comment ?? ""
         if !comment.isEmpty || replyToMessageId != nil {
             return try await transferFundsInternal(
@@ -400,7 +400,7 @@ extension AdamantTransfersProvider {
         amount: Decimal,
         comment: String,
         replyToMessageId: String?
-    ) async throws -> TransactionDetails {
+    ) async throws -> AdamantTransactionDetails {
         // MARK: 0. Prepare
         guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
             throw TransfersProviderError.notLogged
@@ -555,7 +555,7 @@ extension AdamantTransfersProvider {
     private func transferFundsInternal(
         toAddress recipient: String,
         amount: Decimal
-    ) async throws -> TransactionDetails {
+    ) async throws -> AdamantTransactionDetails {
         // MARK: 0. Prepare
         guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
             throw TransfersProviderError.notLogged
@@ -621,6 +621,21 @@ extension AdamantTransfersProvider {
         }
         
         // MARK: 2. Create transaction
+        let signedTransaction = adamantCore.createTransferTransaction(
+            senderId: loggedAccount.address,
+            recipientId: recipient,
+            keypair: keypair,
+            amount: amount
+        )
+        
+        guard let signedTransaction = signedTransaction else {
+            throw TransfersProviderError.internalError(
+                message: InternalAPIError.signTransactionFailed.localizedDescription,
+                error: InternalAPIError.signTransactionFailed
+            )
+        }
+        
+        let locallyID = signedTransaction.generateId() ?? UUID().uuidString
         let transaction = TransferTransaction(context: context)
         transaction.amount = amount as NSDecimalNumber
         transaction.date = Date() as NSDate
@@ -631,9 +646,9 @@ extension AdamantTransfersProvider {
         transaction.showsChatroom = false
         transaction.fee = Self.transferFee as NSDecimalNumber
         
-        transaction.transactionId = UUID().uuidString
+        transaction.transactionId = locallyID
         transaction.blockId = nil
-        transaction.chatMessageId = UUID().uuidString
+        transaction.chatMessageId = locallyID
         transaction.statusEnum = MessageStatus.pending
         
         // MARK: 3. Chatroom
@@ -667,10 +682,7 @@ extension AdamantTransfersProvider {
         // MARK: 5. Send
         do {
             let id = try await apiService.transferFunds(
-                sender: loggedAccount.address,
-                recipient: recipient,
-                amount: amount,
-                keypair: keypair
+                transaction: signedTransaction
             ).get()
             
             transaction.transactionId = String(id)
@@ -686,7 +698,7 @@ extension AdamantTransfersProvider {
                 )
             }
             
-            if let trs = self.stack.container.viewContext.object(with: transaction.objectID) as? TransactionDetails {
+            if let trs = self.stack.container.viewContext.object(with: transaction.objectID) as? AdamantTransactionDetails {
                 return trs
             } else {
                 throw TransfersProviderError.internalError(
@@ -1056,7 +1068,7 @@ extension AdamantTransfersProvider {
                 Set(unreadTransactions.compactMap { $0.chatroom }).forEach { $0.hasUnreadMessages = true }
             }
         }
-                
+        
         // MARK: 6. Dump transactions to viewContext
         do {
             let rooms = transfers.compactMap { $0.chatroom }
@@ -1071,12 +1083,12 @@ extension AdamantTransfersProvider {
     }
     
     @MainActor func updateContext(rooms: [Chatroom]) async {
-         let viewContextChatrooms = Set<Chatroom>(rooms).compactMap {
-             self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom
-         }
-
-         for chatroom in viewContextChatrooms {
-             chatroom.updateLastTransaction()
-         }
-     }
+        let viewContextChatrooms = Set<Chatroom>(rooms).compactMap {
+            self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom
+        }
+        
+        for chatroom in viewContextChatrooms {
+            chatroom.updateLastTransaction()
+        }
+    }
 }
