@@ -65,6 +65,16 @@ class HealthCheckWrapper<Service, Error: HealthCheckableError> {
             .removeDuplicates()
             .sink { [weak self] _ in self?.updateHealthCheckTimerSubscription() }
             .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantReachabilityMonitor.reachabilityChanged, object: nil)
+            .compactMap {
+                $0.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? Bool
+            }
+            .removeDuplicates()
+            .filter { $0 == true }
+            .sink { [weak self] _ in self?.healthCheck() }
+            .store(in: &subscriptions)
     }
     
     func request<Output>(
