@@ -31,12 +31,7 @@ extension BtcWalletService: RichMessageProviderWithStatusCheck {
                 status: getStatus(transaction: transaction, btcTransaction: btcTransaction)
             )
         } catch {
-            switch error {
-            case ApiServiceError.networkError(_):
-                return .init(sentDate: nil, status: .noNetwork)
-            default:
-                return .init(sentDate: nil, status: .pending)
-            }
+            return .init(error: error)
         }
     }
 }

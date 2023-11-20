@@ -120,6 +120,8 @@ private func mapError(_ error: Error) -> WalletServiceError {
         return error.asWalletServiceError()
     } else if let error = error as? WalletServiceError {
         return error
+    } else if let _ = error as? URLError {
+        return .networkError
     } else {
         return .remoteServiceError(message: error.localizedDescription)
     }

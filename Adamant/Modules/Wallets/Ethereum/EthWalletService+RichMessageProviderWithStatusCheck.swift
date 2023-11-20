@@ -32,10 +32,8 @@ extension EthWalletService: RichMessageProviderWithStatusCheck {
                 guard let self = self else { throw WalletServiceError.internalError(.unknownError) }
                 return try await getTransactionInfo(hash: hash, web3: web3)
             }.get()
-        } catch _ as URLError {
-            return .init(sentDate: nil, status: .noNetwork)
         } catch {
-            return .init(sentDate: nil, status: .pending)
+            return .init(error: error)
         }
         
         guard

@@ -13,6 +13,7 @@ import CommonKit
 actor AdamantTransactionStatusService: NSObject, TransactionStatusService {
     private let richProviders: [String: RichMessageProviderWithStatusCheck]
     private let coreDataStack: CoreDataStack
+    private let nodesStorage: NodesStorageProtocol
 
     private lazy var controller = getRichTransactionsController()
     private var networkSubscription: AnyCancellable?
@@ -21,10 +22,12 @@ actor AdamantTransactionStatusService: NSObject, TransactionStatusService {
 
     init(
         coreDataStack: CoreDataStack,
-        richProviders: [String: RichMessageProviderWithStatusCheck]
+        richProviders: [String: RichMessageProviderWithStatusCheck],
+        nodesStorage: NodesStorageProtocol
     ) {
         self.coreDataStack = coreDataStack
         self.richProviders = richProviders
+        self.nodesStorage = nodesStorage
         super.init()
         Task { await setupNetworkSubscription() }
     }
@@ -73,11 +76,19 @@ private extension AdamantTransactionStatusService {
         networkSubscription = NotificationCenter.default
             .publisher(for: .AdamantReachabilityMonitor.reachabilityChanged)
             .compactMap { $0.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? Bool }
-            .removeDuplicates()
-            .sink { connected in
-                guard connected else { return }
+            .combineLatest(makeNodesAvailabilitySubscription())
+            .removeDuplicates { $0.0 == $1.0 && $0.1 == $1.1 }
+            .filter { $0.0 }
+            .sink { _ in
                 Task { [weak self] in await self?.reloadNoNetworkTransactions() }
             }
+    }
+    
+    func makeNodesAvailabilitySubscription() -> some Observable<[UUID]> {
+        nodesStorage
+            .nodesWithGroupsPublisher
+            .map { $0.compactMap { $0.node.isEnabled ? $0.node.id : nil } }
+            .removeDuplicates()
     }
         
     func reloadNoNetworkTransactions() {
@@ -96,6 +107,7 @@ private extension AdamantTransactionStatusService {
         
         transactions?.forEach { transaction in
             setStatus(for: transaction, status: .noNetwork)
+            Task { await forceUpdate(transaction: transaction) }
             add(transaction: transaction)
         }
     }

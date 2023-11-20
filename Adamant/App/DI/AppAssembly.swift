@@ -292,7 +292,8 @@ struct AppAssembly: Assembly {
             
             return AdamantTransactionStatusService(
                 coreDataStack: r.resolve(CoreDataStack.self)!,
-                richProviders: Dictionary(uniqueKeysWithValues: richProviders)
+                richProviders: Dictionary(uniqueKeysWithValues: richProviders),
+                nodesStorage: r.resolve(NodesStorageProtocol.self)!
             )
         }.inObjectScope(.container)
         

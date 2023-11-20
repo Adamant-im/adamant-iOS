@@ -410,103 +410,70 @@ extension ERC20WalletService {
     func getTransaction(by hash: String) async throws -> EthTransaction {
         let sender = wallet?.address
         let isOutgoing: Bool
-        let details: Web3Core.TransactionDetails
         
         // MARK: 1. Transaction details
-        do {
-            details = try await erc20ApiService.requestWeb3 { web3 in
-                try await web3.eth.transactionDetails(hash)
-            }.get()
-        } catch let error as Web3Error {
-            throw error.asWalletServiceError()
-        } catch _ as URLError {
-            throw WalletServiceError.networkError
-        } catch {
-            throw WalletServiceError.remoteServiceError(message: "Failed to get transaction")
-        }
+        let details: Web3Core.TransactionDetails = try await erc20ApiService.requestWeb3 {
+            web3 in
+            try await web3.eth.transactionDetails(hash)
+        }.get()
         
-        // MARK: 2. Transaction receipt
-        do {
-            let receipt = try await erc20ApiService.requestWeb3 { web3 in
-                try await web3.eth.transactionReceipt(hash)
-            }.get()
-            
-            // MARK: 3. Check if transaction is delivered
-            guard receipt.status == .ok,
-                  let blockNumber = details.blockNumber
-            else {
-                let transaction = details.transaction.asEthTransaction(
-                    date: nil,
-                    gasUsed: receipt.gasUsed,
-                    gasPrice: receipt.effectiveGasPrice,
-                    blockNumber: nil,
-                    confirmations: nil,
-                    receiptStatus: receipt.status,
-                    isOutgoing: false
-                )
-                return transaction
-            }
-            
-            // MARK: 4. Block timestamp & confirmations
-            let currentBlock = try await erc20ApiService.requestWeb3 { web3 in
-                try await web3.eth.blockNumber()
-            }.get()
-            
-            let block = try await erc20ApiService.requestWeb3 { web3 in
-                try await web3.eth.block(by: receipt.blockHash)
-            }.get()
-            
-            guard currentBlock >= blockNumber else {
-                throw WalletServiceError.remoteServiceError(
-                    message: "ERC20 confirmations calculating error"
-                )
-            }
-            
-            let confirmations = currentBlock - blockNumber
-            
-            let transaction = details.transaction
-            
-            if let sender = sender {
-                isOutgoing = transaction.sender?.address == sender
-            } else {
-                isOutgoing = false
-            }
-            
-            let ethTransaction = transaction.asEthTransaction(
-                date: block.timestamp,
+        let receipt = try await erc20ApiService.requestWeb3 { web3 in
+            try await web3.eth.transactionReceipt(hash)
+        }.get()
+        
+        // MARK: 3. Check if transaction is delivered
+        guard receipt.status == .ok,
+              let blockNumber = details.blockNumber
+        else {
+            let transaction = details.transaction.asEthTransaction(
+                date: nil,
                 gasUsed: receipt.gasUsed,
                 gasPrice: receipt.effectiveGasPrice,
-                blockNumber: String(blockNumber),
-                confirmations: String(confirmations),
+                blockNumber: nil,
+                confirmations: nil,
                 receiptStatus: receipt.status,
-                isOutgoing: isOutgoing,
-                for: self.token
+                isOutgoing: false
             )
-            
-            return ethTransaction
-        } catch let error as Web3Error {
-            switch error {
-                // Transaction not delivered yet
-            case .inputError, .nodeError:
-                let transaction = details.transaction.asEthTransaction(
-                    date: nil,
-                    gasUsed: nil,
-                    gasPrice: nil,
-                    blockNumber: nil,
-                    confirmations: nil,
-                    receiptStatus: TransactionReceipt.TXStatus.notYetProcessed,
-                    isOutgoing: false
-                )
-                return transaction
-                
-            default:
-                throw error
-            }
-        } catch _ as URLError {
-            throw WalletServiceError.networkError
-        } catch {
-            throw error
+            return transaction
         }
+        
+        // MARK: 4. Block timestamp & confirmations
+        let currentBlock = try await erc20ApiService.requestWeb3 { web3 in
+            try await web3.eth.blockNumber()
+        }.get()
+        
+        let block = try await erc20ApiService.requestWeb3 { web3 in
+            try await web3.eth.block(by: receipt.blockHash)
+        }.get()
+        
+        guard currentBlock >= blockNumber else {
+            throw WalletServiceError.remoteServiceError(
+                message: "ERC20 confirmations calculating error"
+            )
+        }
+        
+        let confirmations = currentBlock - blockNumber
+        
+        let transaction = details.transaction
+        
+        if let sender = sender {
+            isOutgoing = transaction.sender?.address == sender
+        } else {
+            isOutgoing = false
+        }
+        
+        let ethTransaction = transaction.asEthTransaction(
+            date: block.timestamp,
+            gasUsed: receipt.gasUsed,
+            gasPrice: receipt.effectiveGasPrice,
+            blockNumber: String(blockNumber),
+            confirmations: String(confirmations),
+            receiptStatus: receipt.status,
+            isOutgoing: isOutgoing,
+            for: self.token
+        )
+        
+        return ethTransaction
     }
     
     func getBalance(address: String) async throws -> Decimal {
