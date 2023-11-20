@@ -10,11 +10,8 @@ import Foundation
 import Alamofire
 import CommonKit
 
-protocol ApiService {
-    var preferredNodeIds: [UUID] { get }
-    
+protocol ApiService: WalletApiService {
     // MARK: - Accounts
-    func healthCheck()
     func getAccount(byPassphrase passphrase: String) async -> ApiServiceResult<AdamantAccount>
     func getAccount(byPublicKey publicKey: String) async -> ApiServiceResult<AdamantAccount>
     func getAccount(byAddress address: String) async -> ApiServiceResult<AdamantAccount>

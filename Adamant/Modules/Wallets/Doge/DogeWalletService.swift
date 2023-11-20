@@ -71,7 +71,7 @@ final class DogeWalletService: WalletService {
         return type(of: self).currencyLogo
     }
     
-    var tokenNetworkSymbol: String {
+    static var tokenNetworkSymbol: String {
         return "DOGE"
     }
    
@@ -80,7 +80,7 @@ final class DogeWalletService: WalletService {
     }
     
     var tokenUnicID: String {
-        return tokenNetworkSymbol + tokenSymbol
+        Self.tokenNetworkSymbol + tokenSymbol
     }
     
     var transactionFee: Decimal {

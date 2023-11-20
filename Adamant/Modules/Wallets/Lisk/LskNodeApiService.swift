@@ -7,12 +7,21 @@
 //
 
 import LiskKit
+import Foundation
 
-final class LskNodeApiService {
+final class LskNodeApiService: WalletApiService {
     let api: BlockchainHealthCheckWrapper<LskApiCore>
+    
+    var preferredNodeIds: [UUID] {
+        api.preferredNodeIds
+    }
     
     init(api: BlockchainHealthCheckWrapper<LskApiCore>) {
         self.api = api
+    }
+    
+    func healthCheck() {
+        api.healthCheck()
     }
     
     func requestNodeApi<Output>(

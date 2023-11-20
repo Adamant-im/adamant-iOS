@@ -77,7 +77,7 @@ final class EthWalletService: WalletService {
         return type(of: self).currencyLogo
     }
 	
-    var tokenNetworkSymbol: String {
+    static var tokenNetworkSymbol: String {
         return "ERC20"
     }
     
@@ -86,7 +86,7 @@ final class EthWalletService: WalletService {
     }
     
     var tokenUnicID: String {
-        return tokenNetworkSymbol + tokenSymbol
+        Self.tokenNetworkSymbol + tokenSymbol
     }
     
     var richMessageType: String {

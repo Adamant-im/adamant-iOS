@@ -60,7 +60,7 @@ final class AccountViewController: FormViewController {
     
     enum Rows {
         case balance, sendTokens // Wallet
-        case security, nodes, theme, currency, about, visibleWallets, contribute, vibration // Application
+        case security, nodes, coinsNodes, theme, currency, about, visibleWallets, contribute, vibration // Application
         case voteForDelegates, generateQr, generatePk, logout // Actions
         case stayIn, biometry, notifications // Security
         
@@ -83,6 +83,7 @@ final class AccountViewController: FormViewController {
             case .visibleWallets: return "visibleWallets"
             case .contribute: return "contribute"
             case .vibration: return "vibration"
+            case .coinsNodes: return "coinsNodes"
             }
         }
         
@@ -105,6 +106,7 @@ final class AccountViewController: FormViewController {
             case .visibleWallets: return .localized("VisibleWallets.Title", comment: "Visible Wallets page: scene title")
             case .contribute: return .localized("AccountTab.Row.Contribute", comment: "Account tab: 'Contribute' row")
             case .vibration: return "Vibrations"
+            case .coinsNodes: return .adamant.coinsNodesList.title
             }
         }
         
@@ -115,6 +117,7 @@ final class AccountViewController: FormViewController {
             case .theme: return .asset(named: "row_themes.png")
             case .currency: return .asset(named: "row_currency")
             case .nodes: return .asset(named: "row_nodes")
+            case .coinsNodes: return .init(systemName: "server.rack")
             case .balance: return .asset(named: "row_balance")
             case .voteForDelegates: return .asset(named: "row_vote-delegates")
             case .logout: return .asset(named: "row_logout")
@@ -322,6 +325,33 @@ final class AccountViewController: FormViewController {
         }
         
         appSection.append(nodesRow)
+        
+        // Coins nodes list
+        let coinsNodesRow = LabelRow {
+            $0.title = Rows.coinsNodes.localized
+            $0.tag = Rows.coinsNodes.tag
+            $0.cell.imageView?.image = Rows.coinsNodes.image
+            $0.cell.selectionStyle = .gray
+        }.cellUpdate { (cell, _) in
+            cell.accessoryType = .disclosureIndicator
+        }.onCellSelection { [weak self] (_, _) in
+            guard let self = self else { return }
+            let vc = screensFactory.makeCoinsNodesList()
+            
+            if let split = splitViewController {
+                let details = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(details, sender: self)
+            } else if let nav = navigationController {
+                nav.pushViewController(vc, animated: true)
+            } else {
+                vc.modalPresentationStyle = .overFullScreen
+                present(vc, animated: true, completion: nil)
+            }
+            
+            deselectWalletViewControllers()
+        }
+        
+        appSection.append(coinsNodesRow)
         
         // Currency select
         let currencyRow = ActionSheetRow<Currency> {
@@ -999,7 +1029,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
         if ERC20Token.supportedTokens.contains(where: { token in
             return token.symbol == service.tokenSymbol
         }) {
-            network = service.tokenNetworkSymbol
+            network = type(of: service).tokenNetworkSymbol
         }
         
         let item = WalletPagingItem(

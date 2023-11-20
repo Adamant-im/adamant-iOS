@@ -11,7 +11,11 @@ import Foundation
 import Combine
 
 final class NodesStorage: NodesStorageProtocol {
-    @Atomic private var items: ObservableValue<[NodeItem]>
+    @Atomic private var items: ObservableValue<[NodeWithGroup]>
+    
+    var nodesWithGroupsPublisher: AnyObservable<[NodeWithGroup]> {
+        items.removeDuplicates().eraseToAnyPublisher()
+    }
     
     private var subscription: AnyCancellable?
     private let securedStore: SecuredStore
@@ -100,12 +104,7 @@ final class NodesStorage: NodesStorageProtocol {
 }
 
 private extension NodesStorage {
-    struct NodeItem: Codable, Equatable {
-        let group: NodeGroup
-        var node: Node
-    }
-    
-    static func defaultItems(group: NodeGroup) -> [NodeItem] {
+    static func defaultItems(group: NodeGroup) -> [NodeWithGroup] {
         switch group {
         case .btc:
             return BtcWalletService.nodes.map { .init(group: .btc, node: $0) }
@@ -124,16 +123,16 @@ private extension NodesStorage {
         }
     }
     
-    static var defaultItems: [NodeItem] {
+    static var defaultItems: [NodeWithGroup] {
         NodeGroup.allCases.flatMap { Self.defaultItems(group: $0) }
     }
     
-    func saveNodes(nodes: [NodeItem]) {
+    func saveNodes(nodes: [NodeWithGroup]) {
         securedStore.set(nodes, for: StoreKey.NodesStorage.nodes)
     }
 }
 
-private extension Array where Element == NodesStorage.NodeItem {
+private extension Array where Element == NodeWithGroup {
     func getNode(id: UUID) -> Node? {
         first { $0.node.id == id }?.node
     }

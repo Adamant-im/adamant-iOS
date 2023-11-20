@@ -226,7 +226,7 @@ final class ERC20TransferViewController: TransferViewControllerBase {
     }
     
     override func defaultSceneTitle() -> String? {
-        let networkSymbol = service?.tokenNetworkSymbol ?? "ERC20"
+        let networkSymbol = ERC20WalletService.tokenNetworkSymbol
         return String.adamant.wallets.erc20.sendToken(service?.tokenSymbol ?? "ERC20") + " (\(networkSymbol))"
     }
     

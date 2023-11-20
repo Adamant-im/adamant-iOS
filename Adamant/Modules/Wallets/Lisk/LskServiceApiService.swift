@@ -30,11 +30,19 @@ final class LskServiceApiCore: LskApiCore {
     }
 }
 
-final class LskServiceApiService {
+final class LskServiceApiService: WalletApiService {
     let api: BlockchainHealthCheckWrapper<LskServiceApiCore>
+    
+    var preferredNodeIds: [UUID] {
+        api.preferredNodeIds
+    }
     
     init(api: BlockchainHealthCheckWrapper<LskServiceApiCore>) {
         self.api = api
+    }
+    
+    func healthCheck() {
+        api.healthCheck()
     }
     
     func requestServiceApi<Output>(

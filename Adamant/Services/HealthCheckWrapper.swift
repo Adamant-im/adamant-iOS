@@ -33,7 +33,7 @@ class HealthCheckWrapper<Service, Error: HealthCheckableError> {
     var preferredNodeIds: [UUID] {
         fastestNodeMode
             ? [allowedNodes.first?.id].compactMap { $0 }
-            : allowedNodes.map { $0.id }
+            : []
     }
     
     init(

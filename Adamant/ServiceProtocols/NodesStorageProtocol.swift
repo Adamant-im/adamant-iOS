@@ -17,6 +17,8 @@ extension StoreKey {
 }
 
 protocol NodesStorageProtocol {
+    var nodesWithGroupsPublisher: AnyObservable<[NodeWithGroup]> { get }
+    
     func getNodesPublisher(group: NodeGroup) -> AnyObservable<[Node]>
     func addNode(_ node: Node, group: NodeGroup)
     func resetNodes(group: NodeGroup)

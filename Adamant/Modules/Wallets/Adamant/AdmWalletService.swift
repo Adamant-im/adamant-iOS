@@ -33,7 +33,7 @@ final class AdmWalletService: NSObject, WalletService {
         return AdmWalletService.fixedFee
     }
     
-    var tokenNetworkSymbol: String {
+    static var tokenNetworkSymbol: String {
         return Self.currencySymbol
     }
     
@@ -42,7 +42,7 @@ final class AdmWalletService: NSObject, WalletService {
     }
     
     var tokenUnicID: String {
-        return tokenNetworkSymbol + tokenSymbol
+        Self.tokenNetworkSymbol + tokenSymbol
     }
     
     var richMessageType: String {

@@ -5,7 +5,7 @@
 //  Created by Andrew G on 30.10.2023.
 //
 
-public enum NodeGroup: Equatable, Codable, CaseIterable {
+public enum NodeGroup: Codable, CaseIterable, Hashable {
     case btc
     case eth
     case lskNode

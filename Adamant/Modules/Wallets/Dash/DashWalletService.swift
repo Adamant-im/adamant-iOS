@@ -23,7 +23,7 @@ final class DashWalletService: WalletService {
         return type(of: self).currencyLogo
     }
     
-    var tokenNetworkSymbol: String {
+    static var tokenNetworkSymbol: String {
         return "DASH"
     }
    
@@ -32,7 +32,7 @@ final class DashWalletService: WalletService {
     }
     
     var tokenUnicID: String {
-        return tokenNetworkSymbol + tokenSymbol
+        Self.tokenNetworkSymbol + tokenSymbol
     }
     
     var richMessageType: String {

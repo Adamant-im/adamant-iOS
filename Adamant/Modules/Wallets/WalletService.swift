@@ -240,7 +240,7 @@ protocol WalletService: AnyObject {
     var tokenName: String { get }
     var tokenLogo: UIImage { get }
     var tokenUnicID: String { get }
-    var tokenNetworkSymbol: String { get }
+    static var tokenNetworkSymbol: String { get }
     var consistencyMaxTime: Double { get }
     var tokenContract: String { get }
     var minBalance: Decimal { get }

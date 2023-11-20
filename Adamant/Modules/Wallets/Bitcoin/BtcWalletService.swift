@@ -71,7 +71,7 @@ final class BtcWalletService: WalletService {
         type(of: self).currencyLogo
     }
     
-    var tokenNetworkSymbol: String {
+    static var tokenNetworkSymbol: String {
         "BTC"
     }
     
@@ -80,7 +80,7 @@ final class BtcWalletService: WalletService {
     }
     
     var tokenUnicID: String {
-        return tokenNetworkSymbol + tokenSymbol
+        Self.tokenNetworkSymbol + tokenSymbol
     }
     
     var richMessageType: String {

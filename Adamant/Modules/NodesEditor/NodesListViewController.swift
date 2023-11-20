@@ -13,7 +13,7 @@ import Combine
 
 // MARK: - Localization
 extension String.adamant {
-    struct nodesList {
+    enum nodesList {
         static let title = String.localized("NodesList.Title", comment: "NodesList: scene title")
         static let nodesListButton = String.localized("NodesList.NodesList", comment: "NodesList: Button label")
         
@@ -21,7 +21,10 @@ extension String.adamant {
         
         static let resetAlertTitle = String.localized("NodesList.ResetNodeListAlert", comment: "NodesList: Reset nodes alert title")
         
-        private init() {}
+        static let fastestNodeModeTip = String.localized(
+            "NodesList.PreferTheFastestNode.Footer",
+            comment: .empty
+        )
     }
 }
 
@@ -151,6 +154,7 @@ final class NodesListViewController: FormViewController {
         
         +++ Section {
             $0.tag = Sections.preferTheFastestNode.tag
+            $0.footer = HeaderFooterView(stringLiteral: .adamant.nodesList.fastestNodeModeTip)
         }
         
         <<< SwitchRow { [nodesAdditionalParamsStorage] in
@@ -394,7 +398,7 @@ extension NodesListViewController {
     
     private func setHealthCheckTimer() {
         timerSubsctiption = Timer
-            .publish(every: nodeGroup.crucialUpdateInterval, on: .main, in: .default)
+            .publish(every: nodeGroup.onScreenUpdateInterval, on: .main, in: .default)
             .autoconnect()
             .sink { [apiService] _ in apiService.healthCheck() }
     }
@@ -439,55 +443,6 @@ extension NodesListViewController {
             
             return self.makeNodeCellModel(node: node)
         }
-    }
-}
-
-private extension Node {
-    func statusString(_ status: Node.ConnectionStatus?) -> String? {
-        switch status {
-        case .allowed:
-            let ping = ping.map { Int($0 * 1000) }
-            return ping.map { "\(NodeCell.Strings.ping): \($0) \(NodeCell.Strings.milliseconds)" }
-        case .synchronizing:
-            return NodeCell.Strings.synchronizing
-        case .offline:
-            return NodeCell.Strings.offline
-        case .none:
-            return nil
-        }
-    }
-    
-    var versionString: String? {
-        version.map { "(\(NodeCell.Strings.version): \($0))" }
-    }
-}
-
-private extension NodeCell {
-    enum Strings {
-        static let ping = String.localized(
-            "NodesList.NodeCell.Ping",
-            comment: "NodesList.NodeCell: Node ping"
-        )
-        
-        static let milliseconds = String.localized(
-            "NodesList.NodeCell.Milliseconds",
-            comment: "NodesList.NodeCell: Milliseconds"
-        )
-        
-        static let synchronizing = String.localized(
-            "NodesList.NodeCell.Synchronizing",
-            comment: "NodesList.NodeCell: Node is synchronizing"
-        )
-        
-        static let offline = String.localized(
-            "NodesList.NodeCell.Offline",
-            comment: "NodesList.NodeCell: Node is offline"
-        )
-        
-        static let version = String.localized(
-            "NodesList.NodeCell.Version",
-            comment: "NodesList.NodeCell: Node version"
-        )
     }
 }
 

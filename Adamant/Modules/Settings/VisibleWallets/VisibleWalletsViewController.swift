@@ -229,7 +229,7 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
         
         cell.backgroundColor = UIColor.adamant.cellColor
         cell.title = wallet.tokenName
-        cell.caption = !isToken ? "Blockchain" : wallet.tokenNetworkSymbol
+        cell.caption = !isToken ? "Blockchain" : type(of: wallet).tokenNetworkSymbol
         cell.subtitle = wallet.tokenSymbol
         cell.logoImage = wallet.tokenLogo
         cell.balance = wallet.wallet?.balance

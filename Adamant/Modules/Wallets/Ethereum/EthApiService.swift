@@ -70,7 +70,7 @@ final class EthApiCore: BlockchainHealthCheckableService {
     }
 }
 
-class EthApiService {
+class EthApiService: WalletApiService {
     let api: BlockchainHealthCheckWrapper<EthApiCore>
     
     var keystoreManager: KeystoreManager? {
@@ -78,8 +78,16 @@ class EthApiService {
         set { api.service.keystoreManager = newValue }
     }
     
+    var preferredNodeIds: [UUID] {
+        api.preferredNodeIds
+    }
+    
     init(api: BlockchainHealthCheckWrapper<EthApiCore>) {
         self.api = api
+    }
+    
+    func healthCheck() {
+        api.healthCheck()
     }
     
     func requestWeb3<Output>(

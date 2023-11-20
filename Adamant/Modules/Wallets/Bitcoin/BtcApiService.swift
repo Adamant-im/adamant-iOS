@@ -49,11 +49,19 @@ final class BtcApiCore: BlockchainHealthCheckableService {
     }
 }
 
-final class BtcApiService {
+final class BtcApiService: WalletApiService {
     let api: BlockchainHealthCheckWrapper<BtcApiCore>
+    
+    var preferredNodeIds: [UUID] {
+        api.preferredNodeIds
+    }
     
     init(api: BlockchainHealthCheckWrapper<BtcApiCore>) {
         self.api = api
+    }
+    
+    func healthCheck() {
+        api.healthCheck()
     }
     
     func request<Output>(

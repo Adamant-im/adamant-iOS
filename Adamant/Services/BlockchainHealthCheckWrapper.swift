@@ -80,6 +80,7 @@ private extension BlockchainHealthCheckWrapper {
         switch await service.getStatusInfo(node: node) {
         case let .success(statusInfo):
             nodesStorage.updateNodeStatus(id: node.id, statusInfo: statusInfo)
+            nodesStorage.updateNodeParams(id: node.id, connectionStatus: .none)
         case let .failure(error):
             guard !error.isRequestCancelledError else { return }
             nodesStorage.updateNodeParams(id: node.id, connectionStatus: .offline)

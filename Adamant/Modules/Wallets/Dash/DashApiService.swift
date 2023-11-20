@@ -56,11 +56,19 @@ final class DashApiCore: BlockchainHealthCheckableService {
     }
 }
 
-final class DashApiService {
+final class DashApiService: WalletApiService {
     let api: BlockchainHealthCheckWrapper<DashApiCore>
+    
+    var preferredNodeIds: [UUID] {
+        api.preferredNodeIds
+    }
     
     init(api: BlockchainHealthCheckWrapper<DashApiCore>) {
         self.api = api
+    }
+    
+    func healthCheck() {
+        api.healthCheck()
     }
     
     func request<Output>(

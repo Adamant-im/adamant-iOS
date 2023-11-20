@@ -48,11 +48,19 @@ final class DogeApiCore: BlockchainHealthCheckableService {
     }
 }
 
-final class DogeApiService {
+final class DogeApiService: WalletApiService {
     let api: BlockchainHealthCheckWrapper<DogeApiCore>
+    
+    var preferredNodeIds: [UUID] {
+        api.preferredNodeIds
+    }
     
     init(api: BlockchainHealthCheckWrapper<DogeApiCore>) {
         self.api = api
+    }
+    
+    func healthCheck() {
+        api.healthCheck()
     }
     
     func request<Output>(

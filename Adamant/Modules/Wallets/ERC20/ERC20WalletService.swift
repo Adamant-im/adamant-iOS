@@ -39,7 +39,7 @@ final class ERC20WalletService: WalletService {
         return token.logo
     }
     
-    var tokenNetworkSymbol: String {
+    static var tokenNetworkSymbol: String {
         return "ERC20"
     }
     
@@ -52,7 +52,7 @@ final class ERC20WalletService: WalletService {
     }
    
     var tokenUnicID: String {
-        return tokenNetworkSymbol + tokenSymbol + tokenContract
+        Self.tokenNetworkSymbol + tokenSymbol + tokenContract
     }
     
     var defaultVisibility: Bool {

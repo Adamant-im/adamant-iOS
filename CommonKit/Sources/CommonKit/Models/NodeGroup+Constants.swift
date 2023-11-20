@@ -8,6 +8,9 @@
 import Foundation
 
 public extension NodeGroup {
+    var crucialUpdateInterval: TimeInterval { 30 }
+    var onScreenUpdateInterval: TimeInterval { 10 }
+    
     var nodeHeightEpsilon: Int {
         switch self {
         case .adm:
@@ -42,10 +45,6 @@ public extension NodeGroup {
         case .dash:
             return 210000
         }
-    }
-    
-    var crucialUpdateInterval: TimeInterval {
-        30
     }
     
     var defaultFastestNodeMode: Bool {
