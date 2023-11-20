@@ -171,13 +171,8 @@ struct AppAssembly: Assembly {
         
         // MARK: EthApiService
         container.register(EthApiService.self) { r in
-            EthApiService(api: .init(
-                service: .init(apiCore: r.resolve(APICoreProtocol.self)!),
-                nodesStorage: r.resolve(NodesStorageProtocol.self)!,
-                nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
-                nodeGroup: .eth
-            ))
-        }.inObjectScope(.container)
+            r.resolve(ERC20ApiService.self)!
+        }.inObjectScope(.transient)
         
         // MARK: ERC20ApiService
         container.register(ERC20ApiService.self) { r in

@@ -83,8 +83,9 @@ final class LskWalletService: WalletService {
     
 	// MARK: - Properties
 	let transferAvailable: Bool = true
+    let netHash = Constants.Nethash.main
+    
     @Atomic private var initialBalanceCheck = false
-    @Atomic var netHash: String = ""
     @Atomic private(set) var lskWallet: LskWallet?
     
     let defaultDispatchQueue = DispatchQueue(
