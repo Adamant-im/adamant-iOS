@@ -272,7 +272,7 @@
 "ApiService.InternalError.ParsingFailed" = "Не удалось разобрать ответ узла блокчена. Сообщите разработчикам";
 
 /* Serious internal error: No nodes available */
-"ApiService.InternalError.NoNodesAvailable" = "Нет доступных нод. Сообщите разработчикам";
+"ApiService.InternalError.NoNodesAvailable" = "Нет доступных %@ нод. Просмотрите список узлов";
 
 /* Eureka forms Cancel button */
 "Cancel" = "Отмена";
@@ -632,7 +632,7 @@
 "NodesList.PreferTheFastestNode" = "Выбирать самую быструю ноду";
 
 /* NodesList: 'Prefer the fastest node' switch */
-"NodesList.PreferTheFastestNode.Footer" = "Если выключено, каждый HTTP/HTTPS запрос будет идти на случайную доступную (зелёную) ноду";
+"NodesList.PreferTheFastestNode.Footer" = "Обрабатывайте запросы быстрее, но это может привести к снижению конфиденциальности.";
 
 /* NodesList.NodeCell: Node ping */
 "NodesList.NodeCell.Ping" = "Пинг";
@@ -650,7 +650,10 @@
 "NodesList.NodeCell.Version" = "версия";
 
 /* CoinsNodesList: Title */
-"CoinsNodesList.Title" = "Список нод блокчейнов";
+"CoinsNodesList.Title" = "Список монет и сервисных нод";
+
+/* NodesList.NodeCell: Node is disabled */
+"NodesList.NodeCell.Disabled" = "Отключена";
 
 /* CoinsNodesList: ServiceNode */
 "CoinsNodesList.ServiceNode" = "Сервис";

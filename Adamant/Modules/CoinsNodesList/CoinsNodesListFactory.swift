@@ -51,4 +51,3 @@ private struct CoinsNodesListAssembly: Assembly {
         }.inObjectScope(.weak)
     }
 }
-

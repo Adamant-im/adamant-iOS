@@ -17,7 +17,7 @@ enum ApiServiceError: LocalizedError, Error {
     case networkError(error: Error)
     case requestCancelled
     case commonError(message: String)
-    case noEndpointsAvailable
+    case noEndpointsAvailable(coin: String)
     
     var errorDescription: String? {
         switch self {
@@ -43,11 +43,15 @@ enum ApiServiceError: LocalizedError, Error {
         case let .commonError(message):
             return String.adamant.sharedErrors.commonError(message)
             
-        case .noEndpointsAvailable:
-            return .localized(
-                "ApiService.InternalError.NoNodesAvailable",
-                comment: "Serious internal error: No nodes available"
-            )
+        case let .noEndpointsAvailable(coin):
+            return
+                .localizedStringWithFormat(
+                    .localized(
+                        "ApiService.InternalError.NoNodesAvailable",
+                        comment: "Serious internal error: No nodes available"
+                    ),
+                    coin
+                ).localized
         }
     }
     
@@ -131,7 +135,7 @@ extension ApiServiceError: HealthCheckableError {
         }
     }
     
-    static var noEndpointsError: ApiServiceError {
-        .noEndpointsAvailable
+    static func noEndpointsError(coin: String) -> ApiServiceError {
+        .noEndpointsAvailable(coin: coin)
     }
 }

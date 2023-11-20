@@ -59,7 +59,7 @@ private extension CoinsNodesListMapper {
             "●",
             restNodeIds.contains(node.id)
                 ? node.scheme.rawValue
-                : nil,
+                : nil
         ].compactMap { $0 }.joined(separator: " ")
         
         var connectionStatusAttrString = AttributedString(connectionStatusString)

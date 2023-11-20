@@ -35,7 +35,8 @@ final class BlockchainHealthCheckWrapper<
         super.init(
             service: service,
             normalUpdateInterval: nodeGroup.normalUpdateInterval,
-            crucialUpdateInterval: nodeGroup.crucialUpdateInterval
+            crucialUpdateInterval: nodeGroup.crucialUpdateInterval,
+            nodeGroup: nodeGroup
         )
         
         nodesStorage

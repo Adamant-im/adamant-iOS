@@ -19,7 +19,7 @@ extension Node {
         case .offline:
             return NodeCell.Strings.offline
         case .none:
-            return nil
+            return NodeCell.Strings.disabled
         }
     }
     
@@ -53,6 +53,11 @@ private extension NodeCell {
         static let version = String.localized(
             "NodesList.NodeCell.Version",
             comment: "NodesList.NodeCell: Node version"
+        )
+        
+        static let disabled = String.localized(
+            "NodesList.NodeCell.Disabled",
+            comment: "NodesList.NodeCell: Node is disabled"
         )
     }
 }

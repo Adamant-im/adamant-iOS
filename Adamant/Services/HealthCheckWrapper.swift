@@ -14,7 +14,7 @@ protocol HealthCheckableError: Error {
     var isNetworkError: Bool { get }
     var isRequestCancelledError: Bool { get }
     
-    static var noEndpointsError: Self { get }
+    static func noEndpointsError(coin: String) -> Self
 }
 
 class HealthCheckWrapper<Service, Error: HealthCheckableError> {
@@ -23,6 +23,8 @@ class HealthCheckWrapper<Service, Error: HealthCheckableError> {
     let service: Service
     let normalUpdateInterval: TimeInterval
     let crucialUpdateInterval: TimeInterval
+    
+    @Atomic private var nodeGroup: NodeGroup
     
     @Atomic var fastestNodeMode = true
     @Atomic var healthCheckTimerSubscription: AnyCancellable?
@@ -39,11 +41,13 @@ class HealthCheckWrapper<Service, Error: HealthCheckableError> {
     init(
         service: Service,
         normalUpdateInterval: TimeInterval,
-        crucialUpdateInterval: TimeInterval
+        crucialUpdateInterval: TimeInterval,
+        nodeGroup: NodeGroup
     ) {
         self.service = service
         self.normalUpdateInterval = normalUpdateInterval
         self.crucialUpdateInterval = crucialUpdateInterval
+        self.nodeGroup = nodeGroup
         
         $nodes
             .removeDuplicates { !$0.doesNeedHealthCheck($1) }
@@ -81,8 +85,8 @@ class HealthCheckWrapper<Service, Error: HealthCheckableError> {
         _ request: @Sendable (Service, Node) async -> Result<Output, Error>
     ) async -> Result<Output, Error> {
         var lastConnectionError = allowedNodes.isEmpty
-            ? Error.noEndpointsError
-            : nil
+        ? Error.noEndpointsError(coin: nodeGroup.name)
+        : nil
         
         let nodesList = allowedNodes.isEmpty
             ? nodes.filter { $0.isEnabled }.shuffled()
@@ -103,7 +107,7 @@ class HealthCheckWrapper<Service, Error: HealthCheckableError> {
         }
         
         if lastConnectionError != nil { healthCheck() }
-        return .failure(lastConnectionError ?? Error.noEndpointsError)
+        return .failure(lastConnectionError ?? Error.noEndpointsError(coin: nodeGroup.name))
     }
     
     func healthCheck() {

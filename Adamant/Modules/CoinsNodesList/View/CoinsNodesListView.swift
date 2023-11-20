@@ -57,7 +57,9 @@ private extension CoinsNodesListView {
                 Toggle(
                     String.adamant.coinsNodesList.preferTheFastestNode,
                     isOn: $viewModel.state.fastestNodeMode
-                ).listRowBackground(Color(uiColor: .adamant.cellColor))
+                )
+                .listRowBackground(Color(uiColor: .adamant.cellColor))
+                .tint(Color(uiColor: .adamant.active))
             },
             footer: { Text(String.adamant.coinsNodesList.fastestNodeTip) }
         )
