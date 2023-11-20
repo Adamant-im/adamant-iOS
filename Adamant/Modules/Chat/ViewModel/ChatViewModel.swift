@@ -620,11 +620,16 @@ extension ChatViewModel {
     }
     
     func openPartnerQR() {
-        guard let partner = chatroom?.partner else { return }
+        guard let partner = chatroom?.partner,
+              isSendingAvailable
+        else { return }
+        
         didTapPartnerQR.send(partner)
     }
     
     func renamePartner() {
+        guard isSendingAvailable else { return }
+        
         dialog.send(.renameAlert)
     }
 }
