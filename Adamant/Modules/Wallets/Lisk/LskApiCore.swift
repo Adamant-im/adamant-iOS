@@ -66,6 +66,6 @@ private func mapError(_ error: APIError) -> WalletServiceError {
     case .noNetwork:
         return .networkError
     default:
-        return .remoteServiceError(message: error.message)
+        return .remoteServiceError(message: error.message, error: error)
     }
 }

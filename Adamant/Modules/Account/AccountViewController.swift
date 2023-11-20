@@ -111,26 +111,31 @@ final class AccountViewController: FormViewController {
         }
         
         var image: UIImage? {
+            var image: UIImage?
             switch self {
-            case .security: return .asset(named: "row_security")
-            case .about: return .asset(named: "row_about")
-            case .theme: return .asset(named: "row_themes.png")
-            case .currency: return .asset(named: "row_currency")
-            case .nodes: return .asset(named: "row_nodes")
-            case .coinsNodes: return .init(systemName: "server.rack")
-            case .balance: return .asset(named: "row_balance")
-            case .voteForDelegates: return .asset(named: "row_vote-delegates")
-            case .logout: return .asset(named: "row_logout")
-            case .sendTokens: return nil
-            case .generateQr: return .asset(named: "row_QR.png")
-            case .generatePk: return .asset(named: "privateKey_row")
-            case .stayIn: return .asset(named: "row_security")
-            case .biometry: return nil // Determined by localAuth service
-            case .notifications: return .asset(named: "row_Notifications.png")
-            case .visibleWallets: return .asset(named: "row_balance")
-            case .contribute: return .asset(named: "row_contribute")
-            case .vibration: return .asset(named: "row_contribute")
+            case .security: image = .asset(named: "row_security")
+            case .about: image = .asset(named: "row_about")
+            case .theme: image = .asset(named: "row_themes.png")
+            case .currency: image = .asset(named: "row_currency")
+            case .nodes: image = .asset(named: "row_nodes")
+            case .coinsNodes: image = .init(systemName: "server.rack")
+            case .balance: image = .asset(named: "row_balance")
+            case .voteForDelegates: image = .asset(named: "row_vote-delegates")
+            case .logout: image = .asset(named: "row_logout")
+            case .sendTokens: image = nil
+            case .generateQr: image = .asset(named: "row_QR.png")
+            case .generatePk: image = .asset(named: "privateKey_row")
+            case .stayIn: image = .asset(named: "row_security")
+            case .biometry: image = nil // Determined by localAuth service
+            case .notifications: image = .asset(named: "row_Notifications.png")
+            case .visibleWallets: image = .asset(named: "row_balance")
+            case .contribute: image = .asset(named: "row_contribute")
+            case .vibration: image = .asset(named: "row_contribute")
             }
+            
+            return image?
+                .imageResized(to: .init(squareSize: 24))
+                .withTintColor(.adamant.tableRowIcons)
         }
     }
     
