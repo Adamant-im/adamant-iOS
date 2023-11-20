@@ -34,4 +34,5 @@ enum ChatDialog {
         didDismissMenuAction: ChatDialogManager.ContextMenuAction
     )
     case dismissMenu
+    case renameAlert
 }

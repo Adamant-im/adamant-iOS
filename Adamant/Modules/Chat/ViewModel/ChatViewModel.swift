@@ -618,6 +618,15 @@ extension ChatViewModel {
         
         tempOffsets.append(id)
     }
+    
+    func openPartnerQR() {
+        guard let partner = chatroom?.partner else { return }
+        didTapPartnerQR.send(partner)
+    }
+    
+    func renamePartner() {
+        dialog.send(.renameAlert)
+    }
 }
 
 extension ChatViewModel: NSFetchedResultsControllerDelegate {

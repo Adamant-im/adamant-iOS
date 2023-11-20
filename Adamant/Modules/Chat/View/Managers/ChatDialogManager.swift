@@ -104,6 +104,8 @@ private extension ChatDialogManager {
             )
         case .dismissMenu:
             dismissMenu()
+        case .renameAlert:
+            showRenameAlert()
         }
     }
     
@@ -136,7 +138,7 @@ private extension ChatDialogManager {
     }
     
     func showSystemPartnerMenu(sender: UIBarButtonItem) {
-        guard let address = address, let encodedAddress = encodedAddress else { return }
+        guard let address = address else { return }
         
         let didSelect: ((ShareType) -> Void)? = { [weak self] type in
             guard case .partnerQR = type,
@@ -225,6 +227,13 @@ private extension ChatDialogManager {
             from: nil
         )
     }
+    
+    func showRenameAlert() {
+        guard let alert = makeRenameAlert() else { return }
+        dialogService.present(alert, animated: true) { [weak self] in
+            self?.dialogService.selectAllTextFields(in: alert)
+        }
+    }
 }
 
 // MARK: Alert actions
@@ -261,10 +270,7 @@ private extension ChatDialogManager {
             title: .adamant.chat.rename,
             style: .default
         ) { [weak self] _ in
-            guard let alert = self?.makeRenameAlert() else { return }
-            self?.dialogService.present(alert, animated: true) {
-                self?.dialogService.selectAllTextFields(in: alert)
-            }
+            self?.showRenameAlert()
         }
     }
     

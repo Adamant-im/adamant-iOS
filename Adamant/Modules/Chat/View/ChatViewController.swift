@@ -267,7 +267,12 @@ private extension ChatViewController {
         
         viewModel.$isSendingAvailable
             .removeDuplicates()
-            .assign(to: \.isEnabled, on: inputBar)
+            .sink(receiveValue: { [weak self] value in
+                self?.inputBar.isEnabled = value
+                if !value {
+                    self?.navigationItem.rightBarButtonItem = nil
+                }
+            })
             .store(in: &subscriptions)
         
         viewModel.$fee
@@ -384,6 +389,19 @@ private extension ChatViewController {
             target: self,
             action: #selector(showMenu)
         )
+        
+        let tapGesture = UITapGestureRecognizer(
+            target: self,
+            action: #selector(shortTapAction)
+        )
+        
+        let longPressGesture = UILongPressGestureRecognizer(
+            target: self,
+            action: #selector(longTapAction(_:))
+        )
+        
+        navigationItem.titleView?.addGestureRecognizer(tapGesture)
+        navigationItem.titleView?.addGestureRecognizer(longPressGesture)
     }
     
     func configureReplyView() {
@@ -413,6 +431,19 @@ private extension ChatViewController {
         panGesture.delegate = self
         messagesCollectionView.addGestureRecognizer(panGesture)
         messagesCollectionView.clipsToBounds = false
+    }
+}
+
+// MARK: Tap on title view
+
+private extension ChatViewController {
+    @objc func shortTapAction() {
+        viewModel.openPartnerQR()
+    }
+    
+    @objc func longTapAction(_ gestureRecognizer: UILongPressGestureRecognizer) {
+        guard gestureRecognizer.state == .began else { return }
+        viewModel.renamePartner()
     }
 }
 
