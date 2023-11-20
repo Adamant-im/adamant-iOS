@@ -15,7 +15,7 @@ class SelfRemovableHostingController<T: View>: UIHostingController<T> {
         guard
             splitViewController == nil,
             let navigationController = navigationController,
-            navigationController.viewControllers.count > .zero
+            navigationController.viewControllers.count == 1
         else { return }
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(
