@@ -12,8 +12,13 @@ import CommonKit
 struct CoinsNodesListState: Equatable {
     var sections: [Section]
     var fastestNodeMode: Bool
+    var isAlertShown: Bool
     
-    static let `default` = Self(sections: .init(), fastestNodeMode: false)
+    static let `default` = Self(
+        sections: .init(),
+        fastestNodeMode: false,
+        isAlertShown: false
+    )
 }
 
 extension CoinsNodesListState {

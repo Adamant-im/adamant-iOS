@@ -16,10 +16,18 @@ struct CoinsNodesListView: View {
         List {
             ForEach(viewModel.state.sections, content: makeSection)
             makeFastestNodeModeSection()
+            makeResetSection()
         }
         .listStyle(.insetGrouped)
         .withoutListBackground()
         .background(Color(.adamant.secondBackgroundColor))
+        .alert(
+            String.adamant.coinsNodesList.resetAlert,
+            isPresented: $viewModel.state.isAlertShown
+        ) {
+            Button(String.adamant.alert.cancel, role: .cancel) {}
+            Button(String.adamant.coinsNodesList.reset) { viewModel.reset() }
+        }
         .navigationTitle(String.adamant.coinsNodesList.title)
     }
     
@@ -53,5 +61,18 @@ private extension CoinsNodesListView {
             },
             footer: { Text(String.adamant.coinsNodesList.fastestNodeTip) }
         )
+    }
+    
+    func makeResetSection() -> some View {
+        Section {
+            Button(action: showResetAlert) {
+                Text(String.adamant.coinsNodesList.reset)
+                    .expanded(axes: .horizontal)
+            }.listRowBackground(Color(uiColor: .adamant.cellColor))
+        }
+    }
+    
+    func showResetAlert() {
+        viewModel.state.isAlertShown = true
     }
 }
