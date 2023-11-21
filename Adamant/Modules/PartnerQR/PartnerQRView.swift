@@ -53,8 +53,12 @@ private extension PartnerQRView {
             
             HStack {
                 Spacer()
-                Text(viewModel.title)
-                    .padding()
+                Button(action: {
+                    viewModel.copyToPasteboard()
+                }, label: {
+                    Text(viewModel.title)
+                        .padding()
+                })
                 Spacer()
             }
         }

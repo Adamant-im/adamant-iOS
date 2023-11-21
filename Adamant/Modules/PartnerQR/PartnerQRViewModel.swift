@@ -107,6 +107,11 @@ final class PartnerQRViewModel: NSObject, ObservableObject {
         partnerQRService.setIncludeNameEnabled(includeContactsName)
         generateQR()
     }
+    
+    func copyToPasteboard() {
+        UIPasteboard.general.string = title
+        dialogService.showToastMessage(.adamant.alert.copiedToPasteboardNotification)
+    }
 }
 
 private extension PartnerQRViewModel {
