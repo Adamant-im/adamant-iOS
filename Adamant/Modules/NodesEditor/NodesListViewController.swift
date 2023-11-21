@@ -137,7 +137,7 @@ final class NodesListViewController: FormViewController {
         super.viewDidLoad()
         navigationItem.title = String.adamant.nodesList.title
         navigationOptions = .Disabled
-        navigationItem.largeTitleDisplayMode = .always
+        navigationItem.largeTitleDisplayMode = .never
         
         if splitViewController == nil, navigationController?.viewControllers.count == 1 {
             let done = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(NodesListViewController.close))
@@ -411,18 +411,13 @@ extension NodesListViewController {
         return .init(
             id: node.id,
             title: node.asString(),
-            connectionStatus: connectionStatus,
-            statusString: node.statusString(connectionStatus, isEnabled: node.isEnabled),
-            versionString: node.versionString,
+            indicatorString: node.indicatorString(
+                isRest: currentRestNodesIds.contains(node.id),
+                isWs: currentSocketsNodeId == node.id
+            ),
+            indicatorColor: node.indicatorColor,
+            statusString: node.statusString(showVersion: true) ?? .empty,
             isEnabled: node.isEnabled,
-            activities: .init([
-                currentRestNodesIds.contains(node.id)
-                    ? .rest(scheme: node.scheme)
-                    : nil,
-                currentSocketsNodeId == node.id
-                    ? .webSockets
-                    : nil
-            ].compactMap { $0 }),
             nodeUpdateAction: .init(id: node.id.uuidString) { [nodesStorage] isEnabled in
                 nodesStorage.updateNodeParams(id: node.id, isEnabled: isEnabled)
             }

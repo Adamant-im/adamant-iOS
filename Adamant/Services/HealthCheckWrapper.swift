@@ -115,17 +115,6 @@ class HealthCheckWrapper<Service, Error: HealthCheckableError> {
     }
 }
 
-extension Node {
-    var isWorking: Bool {
-        switch connectionStatus {
-        case .allowed, .synchronizing, .none:
-            return isEnabled
-        case .offline:
-            return false
-        }
-    }
-}
-
 private extension HealthCheckWrapper {
     func updateHealthCheckTimerSubscription() {
         healthCheckTimerSubscription = Timer.publish(

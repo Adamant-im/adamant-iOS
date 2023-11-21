@@ -340,7 +340,7 @@ final class LoginViewController: FormViewController {
             cell.textLabel?.textColor = UIColor.adamant.primary
         }.onCellSelection { [weak self] (_, _) in
             guard let self = self else { return }
-            let vc = screensFactory.makeCoinsNodesList()
+            let vc = screensFactory.makeCoinsNodesList(context: .login)
             let nav = UINavigationController(rootViewController: vc)
             nav.modalPresentationStyle = .overFullScreen
             present(nav, animated: true, completion: nil)

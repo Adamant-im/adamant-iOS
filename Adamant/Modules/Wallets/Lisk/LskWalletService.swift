@@ -455,7 +455,7 @@ extension LskWalletService {
             guard
                 case let .remoteServiceError(_, lskError) = error,
                 let lskError = lskError as? APIError,
-                lskError.code == 404
+                [404, 500].contains(lskError.code)
             else { throw error }
             
             return .zero

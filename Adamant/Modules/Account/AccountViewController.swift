@@ -341,7 +341,7 @@ final class AccountViewController: FormViewController {
             cell.accessoryType = .disclosureIndicator
         }.onCellSelection { [weak self] (_, _) in
             guard let self = self else { return }
-            let vc = screensFactory.makeCoinsNodesList()
+            let vc = screensFactory.makeCoinsNodesList(context: .menu)
             
             if let split = splitViewController {
                 let details = UINavigationController(rootViewController:vc)

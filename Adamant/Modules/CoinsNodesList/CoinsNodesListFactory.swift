@@ -10,6 +10,11 @@ import Swinject
 import SwiftUI
 import CommonKit
 
+enum CoinsNodesListContext {
+    case login
+    case menu
+}
+
 struct CoinsNodesListFactory {
     private let assembler: Assembler
     
@@ -17,12 +22,16 @@ struct CoinsNodesListFactory {
         assembler = .init([CoinsNodesListAssembly()], parent: parent)
     }
     
-    func makeViewController() -> UIViewController {
-        SelfRemovableHostingController(
-            rootView: CoinsNodesListView(
-                viewModel: assembler.resolve(CoinsNodesListViewModel.self)!
-            )
-        )
+    func makeViewController(context: CoinsNodesListContext) -> UIViewController {
+        let viewModel = assembler.resolve(CoinsNodesListViewModel.self)!
+        let view = CoinsNodesListView(viewModel: viewModel)
+        
+        switch context {
+        case .login:
+            return SelfRemovableHostingController(rootView: view)
+        case .menu:
+            return UIHostingController(rootView: view)
+        }
     }
 }
 

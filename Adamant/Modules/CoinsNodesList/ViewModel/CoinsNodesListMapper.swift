@@ -13,7 +13,7 @@ struct CoinsNodesListMapper {
     let processedGroups: Set<NodeGroup>
     
     func map(items: [NodeWithGroup], restNodeIds: [UUID]) -> [CoinsNodesListState.Section] {
-        var nodesDict = Dictionary<NodeGroup, [Node]>()
+        var nodesDict = [NodeGroup: [Node]]()
         
         items.forEach { item in
             guard processedGroups.contains(item.group) else { return }
@@ -51,41 +51,20 @@ private extension CoinsNodesListMapper {
     }
     
     func map(node: Node, restNodeIds: [UUID]) -> CoinsNodesListState.Section.Row {
-        let connectionStatus = node.isEnabled
-            ? node.connectionStatus
-            : nil
-        
-        let connectionStatusString = [
-            "●",
-            restNodeIds.contains(node.id)
-                ? node.scheme.rawValue
-                : nil
-        ].compactMap { $0 }.joined(separator: " ")
-        
-        var connectionStatusAttrString = AttributedString(connectionStatusString)
-        connectionStatusAttrString.foregroundColor = .init(
-            uiColor: getIndicatorColor(status: connectionStatus)
+        let indicatorString = node.indicatorString(
+            isRest: restNodeIds.contains(node.id),
+            isWs: false
         )
+        
+        var indicatorAttrString = AttributedString(stringLiteral: indicatorString)
+        indicatorAttrString.foregroundColor = .init(uiColor: node.indicatorColor)
         
         return .init(
             id: node.id,
             isEnabled: node.isEnabled,
             title: node.asString(),
-            connectionStatus: connectionStatusAttrString,
-            description: node.statusString(connectionStatus, isEnabled: node.isEnabled) ?? .empty
+            connectionStatus: indicatorAttrString,
+            description: node.statusString(showVersion: false) ?? .empty
         )
-    }
-}
-
-private func getIndicatorColor(status: Node.ConnectionStatus?) -> UIColor {
-    switch status {
-    case .allowed:
-        return .adamant.good
-    case .synchronizing:
-        return .adamant.alert
-    case .offline:
-        return .adamant.danger
-    case .none:
-        return .adamant.inactive
     }
 }

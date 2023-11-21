@@ -19,6 +19,7 @@ final class BlockchainHealthCheckWrapper<
     Service: BlockchainHealthCheckableService
 >: HealthCheckWrapper<Service, Service.Error> {
     private let nodesStorage: NodesStorageProtocol
+    private let updateNodesAvailabilityLock = NSLock()
     
     @Atomic private var currentRequests = Set<UUID>()
     
@@ -70,24 +71,26 @@ final class BlockchainHealthCheckWrapper<
 private extension BlockchainHealthCheckWrapper {
     func updateNodeStatusInfo(node: Node) async {
         currentRequests.insert(node.id)
-        
-        defer {
-            currentRequests.remove(node.id)
-            updateNodesAvailability()
-        }
+        defer { currentRequests.remove(node.id) }
         
         switch await service.getStatusInfo(node: node) {
         case let .success(statusInfo):
             nodesStorage.updateNodeStatus(id: node.id, statusInfo: statusInfo)
-            nodesStorage.updateNodeParams(id: node.id, connectionStatus: .some(.none))
+            updateNodesAvailability(forceInclude: node.id)
         case let .failure(error):
             guard !error.isRequestCancelledError else { return }
             nodesStorage.updateNodeParams(id: node.id, connectionStatus: .offline)
+            updateNodesAvailability()
         }
     }
     
-    func updateNodesAvailability() {
-        let workingNodes = nodes.filter { $0.isWorking }
+    func updateNodesAvailability(forceInclude: UUID? = nil) {
+        updateNodesAvailabilityLock.lock()
+        defer { updateNodesAvailabilityLock.unlock() }
+        
+        let workingNodes = nodes.filter {
+            $0.isEnabled && ($0.isWorkingStatus || $0.id == forceInclude)
+        }
         
         let actualHeightsRange = getActualNodeHeightsRange(
             heights: workingNodes.compactMap { $0.height },
@@ -109,29 +112,33 @@ private extension BlockchainHealthCheckWrapper {
     }
 }
 
+private extension Node {
+    var isWorkingStatus: Bool {
+        switch connectionStatus {
+        case .allowed, .synchronizing, .none:
+            return isEnabled
+        case .offline:
+            return false
+        }
+    }
+}
+
 private struct NodeHeightsInterval {
     let range: ClosedRange<Int>
     var count: Int
 }
 
 private func getActualNodeHeightsRange(heights: [Int], group: NodeGroup) -> ClosedRange<Int>? {
-    guard heights.count > 2 else { return heights.max().map { $0...$0 } }
-    
     let heights = heights.sorted()
     var bestInterval: NodeHeightsInterval?
     
     for i in heights.indices {
         var currentInterval = NodeHeightsInterval(
-            range: heights[i] - group.nodeHeightEpsilon ... heights[i] + group.nodeHeightEpsilon,
+            range: heights[i] ... heights[i] + group.nodeHeightEpsilon - 1,
             count: 1
         )
         
-        for j in stride(from: i + 1, to: heights.endIndex, by: 1) {
-            guard currentInterval.range.contains(heights[j]) else { break }
-            currentInterval.count += 1
-        }
-        
-        for j in stride(from: i - 1, through: .zero, by: -1) {
+        for j in i + 1 ..< heights.endIndex {
             guard currentInterval.range.contains(heights[j]) else { break }
             currentInterval.count += 1
         }
