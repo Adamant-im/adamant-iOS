@@ -9,7 +9,7 @@
 import Foundation
 import CommonKit
 
-extension AdamantApiService.ApiCommands {
+extension ApiCommands {
     static let Accounts = (
         root: "/api/accounts",
         getPublicKey: "/api/accounts/getPublicKey",
@@ -20,91 +20,52 @@ extension AdamantApiService.ApiCommands {
 // MARK: - Accounts
 extension AdamantApiService {
     /// Get account by passphrase.
-    func getAccount(byPassphrase passphrase: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void) {
-        // MARK: 1. Get keypair from passphrase
+    func getAccount(byPassphrase passphrase: String) async -> ApiServiceResult<AdamantAccount> {
         guard let keypair = adamantCore.createKeypairFor(passphrase: passphrase) else {
-            completion(.failure(.accountNotFound))
-            return
+            return .failure(.accountNotFound)
         }
         
-        // MARK: 2. Send
-        getAccount(byPublicKey: keypair.publicKey, completion: completion)
+        return await getAccount(byPublicKey: keypair.publicKey)
     }
     
     /// Get account by publicKey
-    func getAccount(byPublicKey publicKey: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void) {
-        sendRequest(
-            path: ApiCommands.Accounts.root,
-            queryItems: [URLQueryItem(name: "publicKey", value: publicKey)],
-            completion: makeCompletionWrapper(publicKey: publicKey, completion: completion)
-        )
-    }
-    
-    /// Get account by publicKey
-    func getAccount(byPublicKey publicKey: String) async throws -> AdamantAccount {
-        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<AdamantAccount, Error>) in
-            sendRequest(
+    func getAccount(byPublicKey publicKey: String) async -> ApiServiceResult<AdamantAccount> {
+        switch await request({ apiCore, node in
+            let response: ApiServiceResult<ServerModelResponse<AdamantAccount>> = await apiCore.sendRequestJson(
+                node: node,
                 path: ApiCommands.Accounts.root,
-                queryItems: [URLQueryItem(name: "publicKey", value: publicKey)],
-                completion: makeCompletionWrapper(publicKey: publicKey) { response in
-                    switch response {
-                    case .success(let t):
-                        continuation.resume(returning: t)
-                    case .failure(let apiServiceError):
-                        continuation.resume(throwing: apiServiceError)
-                    }
-                }
+                method: .get,
+                parameters: ["publicKey": publicKey],
+                encoding: .url
             )
+            
+            return response.flatMap { $0.resolved() }
+        }) {
+        case let .success(value):
+            return .success(value)
+        case let .failure(error):
+            switch error {
+            case .accountNotFound:
+                return .success(.makeEmptyAccount(publicKey: publicKey))
+            default:
+                return .failure(error)
+            }
         }
     }
 
-    func getAccount(byAddress address: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void) {
-        sendRequest(
-            path: ApiCommands.Accounts.root,
-            queryItems: [URLQueryItem(name: "address", value: address)],
-            completion: makeCompletionWrapper(publicKey: nil, completion: completion)
-        )
-    }
-    
-    func getAccount(byAddress address: String) async throws -> AdamantAccount {
-        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<AdamantAccount, Error>) in
-            sendRequest(
+    func getAccount(byAddress address: String) async -> ApiServiceResult<AdamantAccount> {
+        await request { apiCore, node in
+            let response: ApiServiceResult<
+                ServerModelResponse<AdamantAccount>
+            > = await apiCore.sendRequestJson(
+                node: node,
                 path: ApiCommands.Accounts.root,
-                queryItems: [URLQueryItem(name: "address", value: address)],
-                completion: makeCompletionWrapper(publicKey: nil) { response in
-                    switch response {
-                    case .success(let t):
-                        continuation.resume(returning: t)
-                    case .failure(let apiServiceError):
-                        continuation.resume(throwing: apiServiceError)
-                    }
-                }
+                method: .get,
+                parameters: ["address": address],
+                encoding: .url
             )
-        }
-    }
-}
-
-private func makeCompletionWrapper(
-    publicKey: String?,
-    completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void
-) -> (ApiServiceResult<ServerModelResponse<AdamantAccount>>) -> Void {
-    { serverResponse in
-        switch serverResponse {
-        case .success(let response):
-            if let model = response.model {
-                completion(.success(model))
-                return
-            }
             
-            let error = AdamantApiService.translateServerError(response.error)
-            guard let publicKey = publicKey, error == .accountNotFound else {
-                completion(.failure(error))
-                return
-            }
-            
-            completion(.success(.makeEmptyAccount(publicKey: publicKey)))
-        case .failure(let error):
-            completion(.failure(.networkError(error: error)))
+            return response.flatMap { $0.resolved() }
         }
     }
 }

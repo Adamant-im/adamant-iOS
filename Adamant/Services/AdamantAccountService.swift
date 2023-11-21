@@ -42,17 +42,12 @@ final class AdamantAccountService: AccountService {
             AdmWalletService(),
             BtcWalletService(),
             EthWalletService(),
-            LskWalletService(mainnet: true, nodes: LskWalletService.nodes, services: LskWalletService.serviceNodes),
+            LskWalletService(),
             DogeWalletService(),
             DashWalletService()
         ]
         let erc20WalletServices = ERC20Token.supportedTokens.map { ERC20WalletService(token: $0) }
         wallets.append(contentsOf: erc20WalletServices)
-        
-        //LskWalletService(mainnet: false)
-        // Testnet
-       // wallets.append(contentsOf: LskWalletService(mainnet: false))
-        
         return wallets
     }()
     
@@ -66,58 +61,6 @@ final class AdamantAccountService: AccountService {
         self.adamantCore = adamantCore
         self.dialogService = dialogService
         self.securedStore = securedStore
-        
-        guard let ethWallet = wallets[2] as? EthWalletService else {
-            fatalError("Failed to get EthWalletService")
-        }
-        
-        guard let node = EthWalletService.nodes.randomElement() else {
-            fatalError("Failed to get ETH endpoint")
-        }
-        
-        let url = node.asString()
-        
-        ethWallet.initiateNetwork(apiUrl: url) { result in
-            switch result {
-            case .success:
-                break
-                
-            case .failure(let error):
-                switch error {
-                case .networkError:
-                    NotificationCenter.default.addObserver(
-                        forName: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged,
-                        object: nil, queue: nil
-                    ) { notification in
-                        guard (notification.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? Bool) == true
-                        else { return }
-                        
-                        ethWallet.initiateNetwork(apiUrl: url) { result in
-                            switch result {
-                            case .success:
-                                NotificationCenter.default.removeObserver(
-                                    self,
-                                    name: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged,
-                                    object: nil
-                                )
-                                
-                            case .failure(let error):
-                                print(error)
-                            }
-                        }
-                    }
-                    
-                case .notLogged, .transactionNotFound, .notEnoughMoney, .accountNotFound, .walletNotInitiated, .invalidAmount, .requestCancelled, .dustAmountError:
-                    break
-                    
-                case .remoteServiceError, .apiError, .internalError:
-                    Task { @MainActor [dialogService] in
-                        dialogService.showRichError(error: error)
-                    }
-                    self.wallets.remove(at: 1)
-                }
-            }
-        }
         
         NotificationCenter.default.addObserver(forName: .AdamantAccountService.forceUpdateBalance, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.update()
@@ -280,31 +223,31 @@ extension AdamantAccountService {
         }
         
         Task {
-            await apiService.getAccount(byPublicKey: publicKey) { [weak self] result in
-                switch result {
-                case .success(let account):
-                    guard let acc = self?.account, acc.address == account.address else {
-                        // User has logged out, we not interested anymore
-                        self?.state = .notLogged
-                        return
-                    }
-                    
-                    if loggedAccount.balance != account.balance {
-                        self?.account = account
-                        NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.accountDataUpdated, object: self)
-                    }
-                    
-                    self?.state = .loggedIn
-                    completion?(.success(account: account, alert: nil))
-                    
-                    if let adm = self?.wallets.first(where: { $0 is AdmWalletService }) {
-                        adm.update()
-                    }
-                    
-                case .failure(let error):
-                    completion?(.failure(.apiError(error: error)))
-                    self?.state = prevState
+            let result = await apiService.getAccount(byPublicKey: publicKey)
+            
+            switch result {
+            case .success(let account):
+                guard let acc = self.account, acc.address == account.address else {
+                    // User has logged out, we not interested anymore
+                    state = .notLogged
+                    return
                 }
+                
+                if loggedAccount.balance != account.balance {
+                    self.account = account
+                    NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.accountDataUpdated, object: self)
+                }
+                
+                state = .loggedIn
+                completion?(.success(account: account, alert: nil))
+                
+                if let adm = wallets.first(where: { $0 is AdmWalletService }) {
+                    adm.update()
+                }
+                
+            case .failure(let error):
+                completion?(.failure(.apiError(error: error)))
+                state = prevState
             }
         }
         
@@ -417,7 +360,7 @@ extension AdamantAccountService {
         state = .isLoggingIn
         
         do {
-            let account = try await apiService.getAccount(byPublicKey: keypair.publicKey)
+            let account = try await apiService.getAccount(byPublicKey: keypair.publicKey).get()
             self.account = account
             self.keypair = keypair
             

@@ -614,10 +614,10 @@
 "NewChatScene.NotInitialized.HelpButton" = "Что это значит?";
 
 /* NodesList: Button label */
-"NodesList.NodesList" = "Список нод";
+"NodesList.NodesList" = "Список нод ADM";
 
 /* NodesList: scene title */
-"NodesList.Title" = "Список нод";
+"NodesList.Title" = "Список нод ADM";
 
 /* NodesList: 'Add new node' button lable */
 "NodesList.AddNewNode" = "Добавить новую ноду";
@@ -630,6 +630,9 @@
 
 /* NodesList: 'Prefer the fastest node' switch */
 "NodesList.PreferTheFastestNode" = "Выбирать самую быструю ноду";
+
+/* NodesList: 'Prefer the fastest node' switch */
+"NodesList.PreferTheFastestNode.Footer" = "Если выключено, каждый HTTP/HTTPS запрос будет идти на случайную доступную (зелёную) ноду";
 
 /* NodesList.NodeCell: Node ping */
 "NodesList.NodeCell.Ping" = "Пинг";
@@ -645,6 +648,12 @@
 
 /* NodesList.NodeCell: Node version */
 "NodesList.NodeCell.Version" = "версия";
+
+/* CoinsNodesList: Title */
+"CoinsNodesList.Title" = "Список нод блокчейнов";
+
+/* CoinsNodesList: ServiceNode */
+"CoinsNodesList.ServiceNode" = "Сервис";
 
 /* NodeList: Inform that default nodes was loaded, if user deleted all nodes */
 "NodeList.DefaultNodesLoaded" = "Был загружен список нод по умолчанию";

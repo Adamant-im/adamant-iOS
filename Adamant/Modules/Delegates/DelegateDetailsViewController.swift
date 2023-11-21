@@ -276,46 +276,42 @@ extension DelegateDetailsViewController {
 extension DelegateDetailsViewController {
     private func refreshData(with delegate: Delegate) {
         Task {
-            await apiService.getForgedByAccount(publicKey: delegate.publicKey) { [weak self] result in
-                switch result {
-                case .success(let details):
-                    self?.forged = details.forged
-                    
-                    Task { @MainActor in
-                        guard let tableView = self?.tableView else {
-                            return
-                        }
-                        
-                        let indexPath = Row.forged.indexPathFor(section: 0)
-                        tableView.reloadRows(at: [indexPath], with: .none)
-                    }
-                case .failure(let error):
-                    self?.apiServiceFailed(with: error)
+            let result = await apiService.getForgedByAccount(publicKey: delegate.publicKey)
+            
+            switch result {
+            case .success(let details):
+                forged = details.forged
+                
+                guard let tableView = tableView else {
+                    return
                 }
+                
+                let indexPath = Row.forged.indexPathFor(section: 0)
+                tableView.reloadRows(at: [indexPath], with: .none)
+            case .failure(let error):
+                apiServiceFailed(with: error)
             }
             
             // Get forging time
-            await apiService.getForgingTime(for: delegate) { [weak self] result in
-                switch result {
-                case .success(let seconds):
-                    if seconds >= 0 {
-                        self?.forgingTime = TimeInterval(exactly: seconds)
-                    } else {
-                        self?.forgingTime = nil
-                    }
-                    
-                    Task { @MainActor in
-                        guard let tableView = self?.tableView else {
-                            return
-                        }
-                        
-                        let indexPath = Row.forgingTime.indexPathFor(section: 0)
-                        tableView.reloadRows(at: [indexPath], with: .none)
-                    }
-                    
-                case .failure(let error):
-                    self?.apiServiceFailed(with: error)
+            let forgingTimeResult = await apiService.getForgingTime(for: delegate)
+            
+            switch forgingTimeResult {
+            case .success(let seconds):
+                if seconds >= 0 {
+                    forgingTime = TimeInterval(exactly: seconds)
+                } else {
+                    forgingTime = nil
                 }
+                
+                guard let tableView = tableView else {
+                    return
+                }
+                
+                let indexPath = Row.forgingTime.indexPathFor(section: 0)
+                tableView.reloadRows(at: [indexPath], with: .none)
+                
+            case .failure(let error):
+                apiServiceFailed(with: error)
             }
         }
     }

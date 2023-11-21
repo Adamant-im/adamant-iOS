@@ -21,21 +21,19 @@ extension EthWalletService: RichMessageProviderWithStatusCheck {
             hash = transaction.txId
         }
         
-        guard
-            let web3 = await web3,
-            let hash = hash
-        else {
+        guard let hash = hash else {
             return .init(sentDate: nil, status: .inconsistent)
         }
         
         let transactionInfo: EthTransactionInfo
         
         do {
-            transactionInfo = try await getTransactionInfo(hash: hash, web3: web3)
-        } catch _ as URLError {
-            return .init(sentDate: nil, status: .noNetwork)
+            transactionInfo = try await ethApiService.requestWeb3 { [weak self] web3 in
+                guard let self = self else { throw WalletServiceError.internalError(.unknownError) }
+                return try await getTransactionInfo(hash: hash, web3: web3)
+            }.get()
         } catch {
-            return .init(sentDate: nil, status: .pending)
+            return .init(error: error)
         }
         
         guard
@@ -47,7 +45,9 @@ extension EthWalletService: RichMessageProviderWithStatusCheck {
         
         var sentDate: Date?
         if let blockHash = details.blockHash {
-            sentDate = try? await web3.eth.block(by: blockHash).timestamp
+            sentDate = try? await ethApiService.requestWeb3 { web3 in
+                try await web3.eth.block(by: blockHash).timestamp
+            }.get()
         }
         
         return .init(

@@ -43,6 +43,7 @@ protocol ScreensFactory {
     
     func makeNodesList() -> UIViewController
     func makeNodeEditor() -> NodeEditorViewController
+    func makeCoinsNodesList() -> UIViewController
     
     // MARK: Other
     

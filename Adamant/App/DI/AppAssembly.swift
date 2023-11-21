@@ -70,7 +70,7 @@ struct AppAssembly: Assembly {
         }.inObjectScope(.container)
         
         // MARK: VibroService
-        container.register(VibroService.self) { r in
+        container.register(VibroService.self) { _ in
             AdamantVibroService()
         }.inObjectScope(.container)
         
@@ -91,37 +91,105 @@ struct AppAssembly: Assembly {
             )
         }.inObjectScope(.container)
         
-        // MARK: NodesSource
-        container.register(NodesSource.self) { r in
-            AdamantNodesSource(
-                apiService: r.resolve(ApiService.self)!,
-                healthCheckService: r.resolve(HealthCheckService.self)!,
-                securedStore: r.resolve(SecuredStore.self)!,
-                defaultNodesGetter: { AdamantResources.nodes }
-            )
+        // MARK: NodesStorage
+        container.register(NodesStorageProtocol.self) { r in
+            NodesStorage(securedStore: r.resolve(SecuredStore.self)!)
+        }.inObjectScope(.container)
+        
+        // MARK: NodesAdditionalParamsStorage
+        container.register(NodesAdditionalParamsStorageProtocol.self) { r in
+            NodesAdditionalParamsStorage(securedStore: r.resolve(SecuredStore.self)!)
+        }.inObjectScope(.container)
+        
+        // MARK: ApiCore
+        container.register(APICoreProtocol.self) { _ in
+            APICore()
         }.inObjectScope(.container)
         
         // MARK: ApiService
         container.register(ApiService.self) { r in
-            AdamantApiService(adamantCore: r.resolve(AdamantCore.self)!)
-        }.initCompleted { (r, c) in    // Weak reference
-            Task { @MainActor in
-                guard let service = c as? AdamantApiService else { return }
-                await service.setupWeakDeps(nodesSource: r.resolve(NodesSource.self)!)
-            }
+            AdamantApiService(
+                healthCheckWrapper: .init(
+                    service: .init(apiCore: r.resolve(APICoreProtocol.self)!),
+                    nodesStorage: r.resolve(NodesStorageProtocol.self)!,
+                    nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
+                    nodeGroup: .adm
+                ),
+                adamantCore: r.resolve(AdamantCore.self)!
+            )
         }.inObjectScope(.container)
         
-        // MARK: HealthCheckService
-        container.register(HealthCheckService.self) { r in
-            AdamantHealthCheckService(apiService: r.resolve(ApiService.self)!)
+        // MARK: BtcApiService
+        container.register(BtcApiService.self) { r in
+            BtcApiService(api: .init(
+                service: .init(apiCore: r.resolve(APICoreProtocol.self)!),
+                nodesStorage: r.resolve(NodesStorageProtocol.self)!,
+                nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
+                nodeGroup: .btc
+            ))
+        }.inObjectScope(.container)
+        
+        // MARK: DogeApiService
+        container.register(DogeApiService.self) { r in
+            DogeApiService(api: .init(
+                service: .init(apiCore: r.resolve(APICoreProtocol.self)!),
+                nodesStorage: r.resolve(NodesStorageProtocol.self)!,
+                nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
+                nodeGroup: .doge
+            ))
+        }.inObjectScope(.container)
+        
+        // MARK: DashApiService
+        container.register(DashApiService.self) { r in
+            DashApiService(api: .init(
+                service: .init(apiCore: r.resolve(APICoreProtocol.self)!),
+                nodesStorage: r.resolve(NodesStorageProtocol.self)!,
+                nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
+                nodeGroup: .dash
+            ))
+        }.inObjectScope(.container)
+        
+        // MARK: LskNodeApiService
+        container.register(LskNodeApiService.self) { r in
+            LskNodeApiService(api: .init(
+                service: .init(),
+                nodesStorage: r.resolve(NodesStorageProtocol.self)!,
+                nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
+                nodeGroup: .lskNode
+            ))
+        }.inObjectScope(.container)
+        
+        // MARK: LskServiceApiService
+        container.register(LskServiceApiService.self) { r in
+            LskServiceApiService(api: .init(
+                service: .init(),
+                nodesStorage: r.resolve(NodesStorageProtocol.self)!,
+                nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
+                nodeGroup: .lskService
+            ))
+        }.inObjectScope(.container)
+        
+        // MARK: EthApiService
+        container.register(EthApiService.self) { r in
+            r.resolve(ERC20ApiService.self)!
+        }.inObjectScope(.transient)
+        
+        // MARK: ERC20ApiService
+        container.register(ERC20ApiService.self) { r in
+            ERC20ApiService(api: .init(
+                service: .init(apiCore: r.resolve(APICoreProtocol.self)!),
+                nodesStorage: r.resolve(NodesStorageProtocol.self)!,
+                nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
+                nodeGroup: .eth
+            ))
         }.inObjectScope(.container)
         
         // MARK: SocketService
-        container.register(SocketService.self) { _ in
-            AdamantSocketService()
-        }.initCompleted { (r, c) in    // Weak reference
-            guard let service = c as? AdamantSocketService else { return }
-            service.nodesSource = r.resolve(NodesSource.self)
+        container.register(SocketService.self) { r in
+            AdamantSocketService(
+                nodesStorage: r.resolve(NodesStorageProtocol.self)!,
+                nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!
+            )
         }.inObjectScope(.container)
         
         // MARK: AccountService
@@ -224,7 +292,8 @@ struct AppAssembly: Assembly {
             
             return AdamantTransactionStatusService(
                 coreDataStack: r.resolve(CoreDataStack.self)!,
-                richProviders: Dictionary(uniqueKeysWithValues: richProviders)
+                richProviders: Dictionary(uniqueKeysWithValues: richProviders),
+                nodesStorage: r.resolve(NodesStorageProtocol.self)!
             )
         }.inObjectScope(.container)
         

@@ -12,31 +12,37 @@ import CryptoSwift
 import BigInt
 
 extension AdamantApiService {
+    func transferFunds(transaction: UnregisteredTransaction) async -> ApiServiceResult<UInt64> {
+        return await sendTransaction(
+            path: ApiCommands.Transactions.processTransaction,
+            transaction: transaction
+        )
+    }
+
     func transferFunds(
-        transaction: UnregisteredTransaction
-    ) async throws -> UInt64 {
-        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<UInt64, Error>) in
-            sendTransaction(
-                path: ApiCommands.Transactions.processTransaction,
-                transaction: transaction
-            ) { response in
-                switch response {
-                case .success(let result):
-                    if let id = result.transactionId {
-                        continuation.resume(returning: id)
-                    } else {
-                        continuation.resume(
-                            throwing: ApiServiceError.internalError(
-                                message: result.error ?? "Unknown Error",
-                                error: nil
-                            )
-                        )
-                    }
-                    
-                case .failure(let error):
-                    continuation.resume(throwing: error)
-                }
-            }
+        sender: String,
+        recipient: String,
+        amount: Decimal,
+        keypair: Keypair
+    ) async -> ApiServiceResult<UInt64> {
+        let normalizedTransaction = NormalizedTransaction(
+            type: .send,
+            amount: amount,
+            senderPublicKey: keypair.publicKey,
+            requesterPublicKey: nil,
+            date: .now,
+            recipientId: recipient,
+            asset: .init()
+        )
+        
+        guard let transaction = adamantCore.makeSignedTransaction(
+            transaction: normalizedTransaction,
+            senderId: sender,
+            keypair: keypair
+        ) else {
+            return .failure(.internalError(error: InternalAPIError.signTransactionFailed))
         }
+        
+        return await transferFunds(transaction: transaction)
     }
 }

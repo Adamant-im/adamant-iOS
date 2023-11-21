@@ -33,7 +33,7 @@ final class AdmWalletService: NSObject, WalletService {
         return AdmWalletService.fixedFee
     }
     
-    var tokenNetworkSymbol: String {
+    static var tokenNetworkSymbol: String {
         return Self.currencySymbol
     }
     
@@ -42,7 +42,7 @@ final class AdmWalletService: NSObject, WalletService {
     }
     
     var tokenUnicID: String {
-        return tokenNetworkSymbol + tokenSymbol
+        Self.tokenNetworkSymbol + tokenSymbol
     }
     
     var richMessageType: String {
@@ -73,8 +73,8 @@ final class AdmWalletService: NSObject, WalletService {
     let enabled: Bool = true
     
     private var transfersController: NSFetchedResultsController<TransferTransaction>?
-    private (set) var isWarningGasPrice = false
-    private var subscriptions = Set<AnyCancellable>()
+    @Atomic private(set) var isWarningGasPrice = false
+    @Atomic private var subscriptions = Set<AnyCancellable>()
 
     @ObservableValue private(set) var transactions: [TransactionDetails] = []
     @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
@@ -94,8 +94,8 @@ final class AdmWalletService: NSObject, WalletService {
     )
     
     // MARK: - State
-    private (set) var state: WalletServiceState = .upToDate
-    private (set) var wallet: WalletAccount?
+    @Atomic private(set) var state: WalletServiceState = .upToDate
+    @Atomic private(set) var wallet: WalletAccount?
     
     // MARK: - Logic
     override init() {
@@ -170,7 +170,7 @@ final class AdmWalletService: NSObject, WalletService {
     
     // MARK: - Tools
     func getBalance(address: String) async throws -> Decimal {
-        let account = try await apiService.getAccount(byAddress: address)
+        let account = try await apiService.getAccount(byAddress: address).get()
         return account.balance
     }
     

@@ -32,7 +32,7 @@ final class ERC20WalletViewController: WalletViewControllerBase {
     }
     
     override func sendRowLocalizedLabel() -> NSAttributedString {
-        let networkSymbol = service?.tokenNetworkSymbol ?? "ERC20"
+        let networkSymbol = ERC20WalletService.tokenNetworkSymbol
         let tokenSymbol = String.adamant.wallets.erc20.sendToken(service?.tokenSymbol ?? "")
         let currencyFont = UIFont.systemFont(ofSize: 17)
         let networkFont = currencyFont.withSize(8)

@@ -167,7 +167,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
         if ERC20Token.supportedTokens.contains(where: { token in
             return token.symbol == service.tokenSymbol
         }) {
-            network = service.tokenNetworkSymbol
+            network = type(of: service).tokenNetworkSymbol
         }
 		
 		let item = WalletPagingItem(

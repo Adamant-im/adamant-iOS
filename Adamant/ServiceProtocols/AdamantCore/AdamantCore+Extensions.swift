@@ -32,6 +32,67 @@ extension AdamantCore {
             requesterPublicKey: transaction.requesterPublicKey
         )
     }
+    
+    func makeSendMessageTransaction(
+        senderId: String,
+        recipientId: String,
+        keypair: Keypair,
+        message: String,
+        type: ChatType,
+        nonce: String,
+        amount: Decimal?
+    ) throws -> UnregisteredTransaction {
+        let normalizedTransaction = NormalizedTransaction(
+            type: .chatMessage,
+            amount: amount ?? .zero,
+            senderPublicKey: keypair.publicKey,
+            requesterPublicKey: nil,
+            date: Date(),
+            recipientId: recipientId,
+            asset: TransactionAsset(
+                chat: ChatAsset(message: message, ownMessage: nonce, type: type),
+                state: nil,
+                votes: nil
+            )
+        )
+        
+        guard let transaction = makeSignedTransaction(
+            transaction: normalizedTransaction,
+            senderId: senderId,
+            keypair: keypair
+        ) else {
+            throw InternalAPIError.signTransactionFailed
+        }
+        
+        return transaction
+    }
+    
+    func createTransferTransaction(
+        senderId: String,
+        recipientId: String,
+        keypair: Keypair,
+        amount: Decimal?
+    ) -> UnregisteredTransaction? {
+        let normalizedTransaction = NormalizedTransaction(
+            type: .send,
+            amount: amount ?? .zero,
+            senderPublicKey: keypair.publicKey,
+            requesterPublicKey: nil,
+            date: .now,
+            recipientId: recipientId,
+            asset: .init()
+        )
+        
+        guard let transaction = makeSignedTransaction(
+            transaction: normalizedTransaction,
+            senderId: senderId,
+            keypair: keypair
+        ) else {
+            return nil
+        }
+        
+        return transaction
+    }
 }
 
 // MARK: - Bytes

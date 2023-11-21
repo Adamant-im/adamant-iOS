@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import CommonKit
 
-extension AdamantApiService.ApiCommands {
+extension ApiCommands {
     static let States = (
         root: "/api/states",
         get: "/api/states/get",
@@ -19,7 +19,6 @@ extension AdamantApiService.ApiCommands {
 }
 
 extension AdamantApiService {
-    
     static let KvsFee: Decimal = 0.001
     
     func store(
@@ -27,82 +26,14 @@ extension AdamantApiService {
         value: String,
         type: StateType,
         sender: String,
-        keypair: Keypair,
-        completion: @escaping (ApiServiceResult<UInt64>) -> Void
-    ) {
-        Task { @MainActor in
-            sendingMsgTaskId = UIApplication.shared.beginBackgroundTask { [weak self] in
-                guard let self = self else { return }
-                UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
-                self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
-            }
-        }
-        
-        // MARK: Create and sign transaction
-        let transaction = NormalizedTransaction(
-            type: .state,
-            amount: .zero,
-            senderPublicKey: keypair.publicKey,
-            requesterPublicKey: nil,
-            date: Date(),
-            recipientId: nil,
-            asset: TransactionAsset(state: StateAsset(key: key, value: value, type: .keyValue))
-        )
-        
-        guard let transaction = adamantCore.makeSignedTransaction(
-            transaction: transaction,
-            senderId: sender,
-            keypair: keypair
-        ) else {
-            completion(.failure(.internalError(message: "Failed to sign transaction", error: nil)))
-            return
-        }
-        
-        // MARK: Send
-        sendTransaction(path: ApiCommands.States.store, transaction: transaction) { serverResponse in
-            switch serverResponse {
-            case .success(let response):
-                if let id = response.transactionId {
-                    completion(.success(id))
-                } else {
-                    completion(ApiServiceResult.success(0))
-                }
-                
-            case .failure(let error):
-                completion(.failure(.networkError(error: error)))
-            }
-            
-            Task { @MainActor [weak self] in
-                self?.sendingMsgTaskId = UIApplication.shared.beginBackgroundTask {
-                    guard let self = self else { return }
-                    UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
-                    self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
-                }
-            }
-        }
-    }
-    
-    func store(
-        key: String,
-        value: String,
-        type: StateType,
-        sender: String,
         keypair: Keypair
-    ) async throws -> UInt64 {
-        Task { @MainActor in
-            self.sendingMsgTaskId = UIApplication.shared.beginBackgroundTask {
-                UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
-                self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
-            }
-        }
-        
-        // MARK: Create and sign transaction
+    ) async -> ApiServiceResult<UInt64> {
         let transaction = NormalizedTransaction(
             type: .state,
             amount: .zero,
             senderPublicKey: keypair.publicKey,
             requesterPublicKey: nil,
-            date: Date(),
+            date: .now,
             recipientId: nil,
             asset: TransactionAsset(state: StateAsset(key: key, value: value, type: .keyValue))
         )
@@ -112,78 +43,38 @@ extension AdamantApiService {
             senderId: sender,
             keypair: keypair
         ) else {
-            throw ApiServiceError.internalError(message: "Failed to sign transaction", error: nil)
+            return .failure(.internalError(error: InternalAPIError.signTransactionFailed))
         }
         
         // MARK: Send
         
-        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<UInt64, Error>) in
-            sendTransaction(path: ApiCommands.States.store, transaction: transaction) { [weak self] serverResponse in
-                switch serverResponse {
-                case .success(let response):
-                    if let id = response.transactionId {
-                        continuation.resume(returning: id)
-                    } else {
-                        continuation.resume(returning: 0)
-                    }
-                    
-                case .failure(let error):
-                    continuation.resume(throwing: ApiServiceError.networkError(error: error))
-                }
-                
-                guard let self = self else { return }
-                Task { @MainActor in
-                    UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
-                    self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
-                }
-            }
-        }
+        return await sendTransaction(
+            path: ApiCommands.States.store,
+            transaction: transaction
+        )
     }
     
-    func get(key: String, sender: String, completion: @escaping (ApiServiceResult<String?>) -> Void) {
+    func get(key: String, sender: String) async -> ApiServiceResult<String?> {
         // MARK: 1. Prepare
-        let queryItems = [URLQueryItem(name: "senderId", value: sender),
-                          URLQueryItem(name: "orderBy", value: "timestamp:desc"),
-                          URLQueryItem(name: "key", value: key)]
+        let parameters = [
+            "senderId": sender,
+            "orderBy": "timestamp:desc",
+            "key": key
+        ]
         
-        // MARK: 2. Send
-        sendRequest(
-            path: ApiCommands.States.get,
-            queryItems: queryItems
-        ) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Transaction>>) in
-            switch serverResponse {
-            case .success(let response):
-                if let collection = response.collection {
-                    if collection.count > 0, let value = collection.first?.asset.state?.value {
-                        completion(.success(value))
-                    } else {
-                        completion(.success(nil))
-                    }
-                } else {
-                    let error = AdamantApiService.translateServerError(response.error)
-                    completion(.failure(error))
-                }
-                
-            case .failure(let error):
-                completion(.failure(.networkError(error: error)))
-            }
+        let response: ApiServiceResult<ServerCollectionResponse<Transaction>>
+        response = await request { [parameters] core, node in
+            await core.sendRequestJson(
+                node: node,
+                path: ApiCommands.States.get,
+                method: .get,
+                parameters: parameters,
+                encoding: .url
+            )
         }
-    }
-    
-    func get(
-        key: String,
-        sender: String
-    ) async throws -> String? {
-        return try await withUnsafeThrowingContinuation {
-            (continuation: UnsafeContinuation<String?, Error>) in
-            get(key: key, sender: sender) { result in
-                switch result {
-                case .success(let data):
-                    continuation.resume(returning: data)
-                case .failure(let error):
-                    continuation.resume(throwing: error)
-                }
-            }
-        }
+        
+        return response
+            .flatMap { $0.resolved() }
+            .map { $0.first?.asset.state?.value }
     }
 }

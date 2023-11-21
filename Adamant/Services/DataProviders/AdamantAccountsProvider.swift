@@ -222,7 +222,7 @@ extension AdamantAccountsProvider {
         switch validation {
         case .valid:
             do {
-                var account = try await apiService.getAccount(byAddress: address)
+                var account = try await apiService.getAccount(byAddress: address).get()
                 guard account.publicKey != nil else {
                     account.publicKey = "dummy\(address)"
                     account.isDummy = true

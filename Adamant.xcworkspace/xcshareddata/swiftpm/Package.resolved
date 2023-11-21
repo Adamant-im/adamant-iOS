@@ -141,8 +141,8 @@
         "repositoryURL": "https://github.com/nathantannar4/InputBarAccessoryView",
         "state": {
           "branch": null,
-          "revision": "039a9cb3ae8c5bc4d39242a6aa688b88023633d3",
-          "version": "6.2.0"
+          "revision": "17ced92a5dccb36512b408b6276353631d7cbe57",
+          "version": "6.3.0"
         }
       },
       {
@@ -330,8 +330,8 @@
         "repositoryURL": "https://github.com/skywinder/web3swift.git",
         "state": {
           "branch": null,
-          "revision": "74c24f4d3d5f1816616e9ebd16741ca5f7a57eb0",
-          "version": "3.2.0"
+          "revision": "16a2915ebd1a0fd33bf0a0ed5a9874909a6e187d",
+          "version": "3.1.2"
         }
       }
     ]

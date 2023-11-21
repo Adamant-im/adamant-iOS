@@ -9,6 +9,7 @@
 import UIKit
 import BitcoinKit
 import Alamofire
+import CommonKit
 
 extension BitcoinKit.Transaction: RawTransaction {
     var txHash: String? {
@@ -61,56 +62,26 @@ extension DogeWalletService: WalletServiceTwoStepSend {
     }
     
     func sendTransaction(_ transaction: BitcoinKit.Transaction) async throws {
-        guard let url = DogeWalletService.nodes.randomElement()?.asURL() else {
-            throw WalletServiceError.internalError(
-                message: "Failed to get DOGE endpoint URL",
-                error: nil
-            )
-        }
-        
-        // Request url
-        let endpoint = url.appendingPathComponent(DogeApiCommands.sendTransaction())
-        
-        // Headers
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json"
-        ]
-        
-        // MARK: Prepare params
         let txHex = transaction.serialized().hex
         
-        let parameters: Parameters = [
-            "rawtx": txHex
-        ]
-        
-        // MARK: Sending request
-        _ = try await withUnsafeThrowingContinuation { continuation in
-            AF.request(
-                endpoint,
+        _ = try await dogeApiService.api.request { core, node in
+            let response: APIResponseModel = await core.apiCore.sendRequestBasic(
+                node: node,
+                path: DogeApiCommands.sendTransaction(),
                 method: .post,
-                parameters: parameters,
-                encoding: JSONEncoding.default,
-                headers: headers
+                parameters: ["rawtx": txHex],
+                encoding: .json
             )
-            .validate(statusCode: 200 ... 299)
-            .responseJSON(queue: defaultDispatchQueue) { response in
-                switch response.result {
-                case .success:
-                    continuation.resume()
-                case .failure(let error):
-                    guard let data = response.data else {
-                        continuation.resume(throwing: WalletServiceError.remoteServiceError(message: error.localizedDescription))
-                        return
-                    }
-                    let result = String(decoding: data, as: UTF8.self)
-                    if result.contains("dust") && result.contains("-26") {
-                        continuation.resume(throwing: WalletServiceError.dustAmountError)
-                        return
-                    }
-                    continuation.resume(throwing: WalletServiceError.remoteServiceError(message: error.localizedDescription))
-                }
-            }
-        }
+            
+            guard
+                !(200 ... 299).contains(response.code ?? .zero),
+                let dataString = response.data.map({ String(decoding: $0, as: UTF8.self) }),
+                dataString.contains("dust"),
+                dataString.contains("-26")
+            else { return response.result.mapError { $0.asWalletServiceError() } }
+            
+            return .failure(.dustAmountError)
+        }.get()
     }
 }
 

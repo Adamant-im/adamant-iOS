@@ -17,9 +17,7 @@ extension ERC20WalletService: WalletServiceTwoStepSend {
     
     // MARK: Create & Send
     func createTransaction(recipient: String, amount: Decimal) async throws -> CodableTransaction {
-        guard let ethWallet = ethWallet,
-              let erc20 = erc20
-        else {
+        guard let ethWallet = ethWallet else {
             throw WalletServiceError.notLogged
         }
         
@@ -27,57 +25,49 @@ extension ERC20WalletService: WalletServiceTwoStepSend {
             throw WalletServiceError.accountNotFound
         }
         
-        guard let web3 = await web3 else {
-            throw WalletServiceError.internalError(message: "Failed to get web3", error: nil)
-        }
-        
-        guard let keystoreManager = web3.provider.attachedKeystoreManager else {
+        guard let keystoreManager = erc20ApiService.keystoreManager else {
             throw WalletServiceError.internalError(message: "Failed to get web3.provider.KeystoreManager", error: nil)
         }
         
-        let provider = web3.provider
+        let provider = try await erc20ApiService.requestWeb3 { web3 in web3.provider }.get()
         let resolver = PolicyResolver(provider: provider)
         
         // MARK: Create transaction
         
-        do {
-            var tx = try await erc20.transfer(
+        var tx = try await erc20ApiService.requestERC20(token: token) { erc20 in
+            try await erc20.transfer(
                 from: ethWallet.ethAddress,
                 to: ethRecipient,
                 amount: "\(amount)"
             ).transaction
-            
-            await calculateFee(for: ethRecipient)
-            
-            let policies: Policies = Policies(
-                gasLimitPolicy: .manual(gasLimit),
-                gasPricePolicy: .manual(gasPrice)
-            )
-            
-            try await resolver.resolveAll(for: &tx, with: policies)
-            
-            try Web3Signer.signTX(
-                transaction: &tx,
-                keystore: keystoreManager,
-                account: ethWallet.ethAddress,
-                password: ERC20WalletService.walletPassword
-            )
-            
-            return tx
-        } catch {
-            throw WalletServiceError.internalError(message: "Transaction sign error", error: error)
-        }
+        }.get()
+        
+        await calculateFee(for: ethRecipient)
+        
+        let policies: Policies = Policies(
+            gasLimitPolicy: .manual(gasLimit),
+            gasPricePolicy: .manual(gasPrice)
+        )
+        
+        try await resolver.resolveAll(for: &tx, with: policies)
+        
+        try Web3Signer.signTX(
+            transaction: &tx,
+            keystore: keystoreManager,
+            account: ethWallet.ethAddress,
+            password: ERC20WalletService.walletPassword
+        )
+        
+        return tx
     }
     
     func sendTransaction(_ transaction: CodableTransaction) async throws {
         guard let txEncoded = transaction.encode() else {
-            throw WalletServiceError.internalError(message: String.adamant.sharedErrors.unknownError, error: nil)
+            throw WalletServiceError.internalError(message: .adamant.sharedErrors.unknownError, error: nil)
         }
         
-        do {
-            _ = try await web3?.eth.send(raw: txEncoded)
-        } catch {
-            throw WalletServiceError.internalError(message: "Error: \(error.localizedDescription)", error: nil)
-        }
+        _ = try await erc20ApiService.requestWeb3 { web3 in
+            try await web3.eth.send(raw: txEncoded)
+        }.get()
     }
 }

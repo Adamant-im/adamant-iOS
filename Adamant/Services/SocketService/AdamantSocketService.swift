@@ -9,16 +9,11 @@
 import Foundation
 import SocketIO
 import CommonKit
+import Combine
 
 final class AdamantSocketService: SocketService {
-
-    // MARK: - Dependencies
-    
-    weak var nodesSource: NodesSource? {
-        didSet {
-            refreshNode()
-        }
-    }
+    private let nodesStorage: NodesStorageProtocol
+    private let nodesAdditionalParamsStorage: NodesAdditionalParamsStorageProtocol
     
     // MARK: - Properties
     
@@ -26,7 +21,7 @@ final class AdamantSocketService: SocketService {
         didSet {
             currentUrl = currentNode?.asSocketURL()
             
-            guard oldValue !== currentNode else { return }
+            guard oldValue?.id != currentNode?.id else { return }
             sendCurrentNodeUpdateNotification()
         }
     }
@@ -49,20 +44,25 @@ final class AdamantSocketService: SocketService {
     @Atomic private var socket: SocketIOClient?
     @Atomic private var currentAddress: String?
     @Atomic private var currentHandler: ((ApiServiceResult<Transaction>) -> Void)?
+    @Atomic private var subscriptions = Set<AnyCancellable>()
     
     let defaultResponseDispatchQueue = DispatchQueue(
         label: "com.adamant.response-queue",
         qos: .utility
     )
     
-    init() {
-        NotificationCenter.default.addObserver(
-            forName: Notification.Name.NodesSource.nodesUpdate,
-            object: nil,
-            queue: nil
-        ) { [weak self] _ in
-            self?.refreshNode()
-        }
+    init(
+        nodesStorage: NodesStorageProtocol,
+        nodesAdditionalParamsStorage: NodesAdditionalParamsStorageProtocol
+    ) {
+        self.nodesAdditionalParamsStorage = nodesAdditionalParamsStorage
+        self.nodesStorage = nodesStorage
+        
+        nodesStorage
+            .getNodesPublisher(group: .adm)
+            .combineLatest(nodesAdditionalParamsStorage.fastestNodeMode(group: .adm))
+            .sink { [weak self] in self?.updateCurrentNode(nodes: $0.0, fastestNode: $0.1) }
+            .store(in: &subscriptions)
     }
     
     // MARK: - Tools
@@ -97,10 +97,6 @@ final class AdamantSocketService: SocketService {
         manager = nil
     }
     
-    private func refreshNode() {
-        currentNode = nodesSource?.getAllowedNodes(needWS: true).first
-    }
-    
     private func handleTransaction(data: [Any]) {
         guard
             let data = data.first,
@@ -125,5 +121,20 @@ final class AdamantSocketService: SocketService {
             object: self,
             userInfo: nil
         )
+    }
+    
+    private func updateCurrentNode(nodes: [Node], fastestNode: Bool) {
+        let allowedNodes = nodes.getAllowedNodes(
+            sortedBySpeedDescending: fastestNode,
+            needWS: true
+        )
+        
+        guard !fastestNode else {
+            currentNode = allowedNodes.first
+            return
+        }
+        
+        guard currentNode.map({ !allowedNodes.contains($0) }) ?? true else { return }
+        currentNode = allowedNodes.randomElement()
     }
 }

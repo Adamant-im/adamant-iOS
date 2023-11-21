@@ -30,12 +30,7 @@ extension ERC20WalletService: RichMessageProviderWithStatusCheck {
         do {
             erc20Transaction = try await getTransaction(by: hash)
         } catch {
-            switch error {
-            case WalletServiceError.networkError:
-                return .init(sentDate: nil, status: .noNetwork)
-            default:
-                return .init(sentDate: nil, status: .pending)
-            }
+            return .init(error: error)
         }
         
         return .init(

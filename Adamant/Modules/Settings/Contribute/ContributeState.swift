@@ -12,7 +12,7 @@ import CommonKit
 struct ContributeState {
     var isCrashlyticsOn: Bool
     var isCrashButtonOn: Bool
-    var safariURL: IdentifiableContainer<URL>?
+    var safariURL: IDWrapper<URL>?
     
     let name: String
     let crashliticsRowImage: UIImage

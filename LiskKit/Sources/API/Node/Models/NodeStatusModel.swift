@@ -44,6 +44,8 @@ extension Node {
         public let version: String
 
         public let networkVersion: String
+        
+        public let height: Int?
     }
     
 }

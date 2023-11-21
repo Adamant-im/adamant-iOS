@@ -617,10 +617,10 @@
 "NewChatScene.NotInitialized.HelpButton" = "Was bedeutet das?";
 
 /* NodesList: Button label */
-"NodesList.NodesList" = "Node-Liste";
+"NodesList.NodesList" = "ADM Node-Liste";
 
 /* NodesList: scene title */
-"NodesList.Title" = "Liste der benutzten Nodes";
+"NodesList.Title" = "Liste der benutzten ADM Nodes";
 
 /* NodesList: 'Saved' message */
 "NodesList.Saved" = "Gespeichert";
@@ -640,6 +640,9 @@
 /* NodesList: 'Prefer the fastest node' switch */
 "NodesList.PreferTheFastestNode" = "Prefer the fastest node";
 
+/* NodesList: 'Prefer the fastest node' switch */
+"NodesList.PreferTheFastestNode.Footer" = "If it's turned off, every HTTP/HTTPS request will go to a random allowed (green) node";
+
 /* NodesList.NodeCell: Node ping */
 "NodesList.NodeCell.Ping" = "Ping";
 
@@ -657,6 +660,12 @@
 
 /* NodeList: Inform that default nodes was loaded, if user deleted all nodes */
 "NodeList.DefaultNodesLoaded" = "Default nodes list was loaded";
+
+/* CoinsNodesList: Title */
+"CoinsNodesList.Title" = "Coins node list";
+
+/* CoinsNodesList: ServiceNode */
+"CoinsNodesList.ServiceNode" = "Service";
 
 /* NodesEditor: New node scene title */
 "NodesEditor.NewNodeTitle" = "New node";

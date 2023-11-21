@@ -10,26 +10,17 @@ import Foundation
 import CommonKit
 
 extension AdamantApiService {
-    func getPublicKey(
-        byAddress address: String,
-        completion: @escaping (ApiServiceResult<String>) -> Void
-    ) {
-        sendRequest(
-            path: ApiCommands.Accounts.getPublicKey,
-            queryItems: [URLQueryItem(name: "address", value: address)]
-        ) { (serverResponse: ApiServiceResult<GetPublicKeyResponse>) in
-            switch serverResponse {
-            case .success(let response):
-                if let publicKey = response.publicKey {
-                    completion(.success(publicKey))
-                } else {
-                    let error = AdamantApiService.translateServerError(response.error)
-                    completion(.failure(error))
-                }
-                
-            case .failure(let error):
-                completion(.failure(.networkError(error: error)))
-            }
+    func getPublicKey(byAddress address: String) async -> ApiServiceResult<String> {
+        let response: ApiServiceResult<GetPublicKeyResponse> = await request { service, node in
+            await service.sendRequestJson(
+                node: node,
+                path: ApiCommands.Accounts.getPublicKey,
+                method: .get,
+                parameters: ["address": address],
+                encoding: .url
+            )
         }
+        
+        return response.flatMap { $0.resolved() }
     }
 }

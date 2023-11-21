@@ -71,7 +71,7 @@ final class BtcWalletService: WalletService {
         type(of: self).currencyLogo
     }
     
-    var tokenNetworkSymbol: String {
+    static var tokenNetworkSymbol: String {
         "BTC"
     }
     
@@ -80,7 +80,7 @@ final class BtcWalletService: WalletService {
     }
     
     var tokenUnicID: String {
-        return tokenNetworkSymbol + tokenSymbol
+        Self.tokenNetworkSymbol + tokenSymbol
     }
     
     var richMessageType: String {
@@ -106,6 +106,7 @@ final class BtcWalletService: WalletService {
     
     // MARK: - Dependencies
     var apiService: ApiService!
+    var btcApiService: BtcApiService!
     var accountService: AccountService!
     var dialogService: DialogService!
     var increaseFeeService: IncreaseFeeService!
@@ -114,14 +115,13 @@ final class BtcWalletService: WalletService {
     var vibroService: VibroService!
     
     // MARK: - Constants
-    static var currencyLogo = UIImage.asset(named: "bitcoin_wallet") ?? .init()
-
+    static let currencyLogo = UIImage.asset(named: "bitcoin_wallet") ?? .init()
     static let multiplier = Decimal(sign: .plus, exponent: 8, significand: 1)
 
-    private (set) var currentHeight: Decimal?
-    private var feeRate: Decimal = 1
-    private (set) var transactionFee: Decimal = DefaultBtcTransferFee.medium.rawValue / multiplier
-    private (set) var isWarningGasPrice = false
+    @Atomic private(set) var currentHeight: Decimal?
+    @Atomic private var feeRate: Decimal = 1
+    @Atomic private(set) var transactionFee: Decimal = DefaultBtcTransferFee.medium.rawValue / multiplier
+    @Atomic private(set) var isWarningGasPrice = false
     
     static let kvsAddress = "btc:address"
     private let walletPath = "m/44'/0'/21'/0/0"
@@ -133,22 +133,23 @@ final class BtcWalletService: WalletService {
     let transactionFeeUpdated = Notification.Name("adamant.btcWallet.feeUpdated")
     
     // MARK: - Delayed KVS save
-    private var balanceObserver: NSObjectProtocol?
+    @Atomic private var balanceObserver: NSObjectProtocol?
     
     // MARK: - Properties
-    private (set) var btcWallet: BtcWallet?
-    
-    private (set) var enabled = true
-    
-    public var network: Network
-    
-    private var initialBalanceCheck = false
+    @Atomic private(set) var btcWallet: BtcWallet?
+    @Atomic private(set) var enabled = true
+    @Atomic public var network: Network
+    @Atomic private var initialBalanceCheck = false
     
     static let jsonDecoder = JSONDecoder()
     
-    let defaultDispatchQueue = DispatchQueue(label: "im.adamant.btcWalletService", qos: .userInteractive, attributes: [.concurrent])
+    let defaultDispatchQueue = DispatchQueue(
+        label: "im.adamant.btcWalletService",
+        qos: .userInteractive,
+        attributes: [.concurrent]
+    )
     
-    private var subscriptions = Set<AnyCancellable>()
+    @Atomic private var subscriptions = Set<AnyCancellable>()
     
     @ObservableValue private(set) var transactions: [TransactionDetails] = []
     @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
@@ -168,7 +169,7 @@ final class BtcWalletService: WalletService {
     )
     
     // MARK: - State
-    private (set) var state: WalletServiceState = .notInitiated
+    @Atomic private(set) var state: WalletServiceState = .notInitiated
     
     private func setState(_ newState: WalletServiceState, silent: Bool = false) {
         guard newState != state else {
@@ -355,7 +356,7 @@ final class BtcWalletService: WalletService {
     
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
         do {
-            let result = try await apiService.get(key: BtcWalletService.kvsAddress, sender: address)
+            let result = try await apiService.get(key: BtcWalletService.kvsAddress, sender: address).get()
             
             guard let result = result else {
                 throw WalletServiceError.walletNotInitiated
@@ -471,6 +472,7 @@ extension BtcWalletService: SwinjectDependentService {
         dialogService = container.resolve(DialogService.self)
         increaseFeeService = container.resolve(IncreaseFeeService.self)
         addressConverter = container.resolve(AddressConverterFactory.self)?.make(network: network)
+        btcApiService = container.resolve(BtcApiService.self)
         vibroService = container.resolve(VibroService.self)
         coreDataStack = container.resolve(CoreDataStack.self)
         
@@ -489,74 +491,23 @@ extension BtcWalletService {
     }
     
     func getBalance(address: String) async throws -> Decimal {
-        guard let url = BtcWalletService.nodes.randomElement()?.asURL() else {
-            let message = "Failed to get BTC endpoint URL"
-            assertionFailure(message)
-            throw WalletServiceError.internalError(message: message, error: nil)
-        }
-        
-        // Request url
-        let endpoint = url.appendingPathComponent(BtcApiCommands.balance(for: address))
-        
-        // MARK: Sending request
-        
-        let response: BtcBalanceResponse = try await apiService.sendRequest(
-            url: endpoint,
-            method: .get,
-            parameters: nil
-        )
-        
-        let balance = response.value / BtcWalletService.multiplier
-        
-        return balance
+        let response: BtcBalanceResponse = try await btcApiService.request { api, node in
+            await api.sendRequestJson(node: node, path: BtcApiCommands.balance(for: address))
+        }.get()
+
+        return response.value / BtcWalletService.multiplier
     }
 
     func getFeeRate() async throws -> Decimal {
-        guard let url = BtcWalletService.nodes.randomElement()?.asURL() else {
-            fatalError("Failed to get BTC endpoint URL")
-        }
+        let response: [String: Decimal] = try await btcApiService.request { api, node in
+            await api.sendRequestJson(node: node, path: BtcApiCommands.getFeeRate())
+        }.get()
         
-        // Request url
-        let endpoint = url.appendingPathComponent(BtcApiCommands.getFeeRate())
-        
-        // MARK: Sending request
-        
-        let response: [String: Decimal] = try await apiService.sendRequest(
-            url: endpoint,
-            method: .get,
-            parameters: nil
-        )
-        
-        let value = response["2"] ?? 1
-        
-        return value
+        return response["2"] ?? 1
     }
 
     func getCurrentHeight() async throws -> Decimal {
-        guard let url = BtcWalletService.nodes.randomElement()?.asURL() else {
-            fatalError("Failed to get BTC endpoint URL")
-        }
-        
-        // Request url
-        let endpoint = url.appendingPathComponent(BtcApiCommands.getHeight())
-        
-        // MARK: Sending request
-        let data = try await apiService.sendRequest(
-            url: endpoint,
-            method: .get,
-            parameters: nil
-        )
-        
-        guard
-            let raw = String(data: data, encoding: .utf8),
-            let value = Decimal(string: raw)
-        else {
-            throw WalletServiceError.remoteServiceError(
-                message: "BTC Wallet: not a valid response"
-            )
-        }
-        
-        return value
+        try await .init(btcApiService.getStatusInfo().get().height)
     }
 
 }
@@ -579,14 +530,20 @@ extension BtcWalletService {
         }
         
         Task {
-            await apiService.store(key: BtcWalletService.kvsAddress, value: btcAddress, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
-                switch result {
-                case .success:
-                    completion(.success)
-                    
-                case .failure(let error):
-                    completion(.failure(error: .apiError(error)))
-                }
+            let result = await apiService.store(
+                key: BtcWalletService.kvsAddress,
+                value: btcAddress,
+                type: .keyValue,
+                sender: adamant.address,
+                keypair: keypair
+            )
+            
+            switch result {
+            case .success:
+                completion(.success)
+                
+            case .failure(let error):
+                completion(.failure(error: .apiError(error)))
             }
         }
     }
@@ -677,26 +634,19 @@ extension BtcWalletService {
         return transactions
     }
 
-    private func getTransactions(for address: String, fromTx: String? = nil) async throws -> [RawBtcTransactionResponse] {
-        guard let url = BtcWalletService.nodes.randomElement()?.asURL() else {
-            fatalError("Failed to get BTC endpoint URL")
-        }
-        
-        // Request url
-        let endpoint = url.appendingPathComponent(BtcApiCommands.getTransactions(
-            for: address,
-            fromTx: fromTx
-        ))
-        
-        // MARK: Sending request
-        
-        let transactions: [RawBtcTransactionResponse] = try await apiService.sendRequest(
-            url: endpoint,
-            method: .get,
-            parameters: nil
-        )
-        
-        return transactions
+    private func getTransactions(
+        for address: String,
+        fromTx: String? = nil
+    ) async throws -> [RawBtcTransactionResponse] {
+        return try await btcApiService.request { api, node in
+            await api.sendRequestJson(
+                node: node,
+                path: BtcApiCommands.getTransactions(
+                    for: address,
+                    fromTx: fromTx
+                )
+            )
+        }.get()
     }
 
     func getTransaction(by hash: String) async throws -> BtcTransaction {
@@ -704,32 +654,18 @@ extension BtcWalletService {
             throw WalletServiceError.notLogged
         }
         
-        guard let url = BtcWalletService.nodes.randomElement()?.asURL() else {
-            fatalError("Failed to get BTC endpoint URL")
-        }
-        
-        // Request url
-        let endpoint = url.appendingPathComponent(BtcApiCommands.getTransaction(by: hash))
-        
-        // MARK: Sending request
-        
-        do {
-            let rawTransaction: RawBtcTransactionResponse = try await apiService.sendRequest(
-                url: endpoint,
-                method: .get,
-                parameters: nil
+        let rawTransaction: RawBtcTransactionResponse = try await btcApiService.request { api, node in
+            await api.sendRequestJson(
+                node: node,
+                path: BtcApiCommands.getTransaction(by: hash)
             )
-            
-            let transaction = rawTransaction.asBtcTransaction(
-                BtcTransaction.self,
-                for: address,
-                height: self.currentHeight
-            )
-            
-            return transaction
-        } catch let error as ApiServiceError {
-            throw WalletServiceError.remoteServiceError(message: error.message)
-        }
+        }.get()
+        
+        return rawTransaction.asBtcTransaction(
+            BtcTransaction.self,
+            for: address,
+            height: self.currentHeight
+        )
     }
 
     func loadTransactions(offset: Int, limit: Int) async throws -> Int {

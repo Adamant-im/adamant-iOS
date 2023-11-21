@@ -30,6 +30,10 @@ struct DogeApiCommands {
         return "/api/block/\(hash)"
     }
     
+    static func getBlocks() -> String {
+        return "/api/blocks"
+    }
+    
     static func getUnspentTransactions(for address: String) -> String {
         return "/api/addr/\(address)/utxo"
     }
@@ -47,6 +51,7 @@ final class DogeWalletService: WalletService {
     
     // MARK: - Dependencies
     var apiService: ApiService!
+    var dogeApiService: DogeApiService!
     var accountService: AccountService!
     var dialogService: DialogService!
     var addressConverter: AddressConverter!
@@ -54,7 +59,7 @@ final class DogeWalletService: WalletService {
     var coreDataStack: CoreDataStack!
     
     // MARK: - Constants
-    static var currencyLogo = UIImage.asset(named: "doge_wallet") ?? .init()
+    static let currencyLogo = UIImage.asset(named: "doge_wallet") ?? .init()
     static let multiplier = Decimal(sign: .plus, exponent: 8, significand: 1)
     static let chunkSize = 20
  
@@ -66,7 +71,7 @@ final class DogeWalletService: WalletService {
         return type(of: self).currencyLogo
     }
     
-    var tokenNetworkSymbol: String {
+    static var tokenNetworkSymbol: String {
         return "DOGE"
     }
    
@@ -75,7 +80,7 @@ final class DogeWalletService: WalletService {
     }
     
     var tokenUnicID: String {
-        return tokenNetworkSymbol + tokenSymbol
+        Self.tokenNetworkSymbol + tokenSymbol
     }
     
     var transactionFee: Decimal {
@@ -92,7 +97,7 @@ final class DogeWalletService: WalletService {
     
     static let kvsAddress = "doge:address"
     
-    private (set) var isWarningGasPrice = false
+    @Atomic private(set) var isWarningGasPrice = false
     
     // MARK: - Notifications
     let walletUpdatedNotification = Notification.Name("adamant.dogeWallet.walletUpdated")
@@ -101,21 +106,22 @@ final class DogeWalletService: WalletService {
     let transactionFeeUpdated = Notification.Name("adamant.dogeWallet.feeUpdated")
     
     // MARK: - Delayed KVS save
-    private var balanceObserver: NSObjectProtocol?
+    @Atomic private var balanceObserver: NSObjectProtocol?
     
     // MARK: - Properties
-    private (set) var dogeWallet: DogeWallet?
+    @Atomic private(set) var dogeWallet: DogeWallet?
+    @Atomic private(set) var enabled = true
+    @Atomic public var network: Network
+    @Atomic private var initialBalanceCheck = false
     
-    private (set) var enabled = true
-    
-    public var network: Network
-    
-    private var initialBalanceCheck = false
-    
-    let defaultDispatchQueue = DispatchQueue(label: "im.adamant.dogeWalletService", qos: .userInteractive, attributes: [.concurrent])
+    let defaultDispatchQueue = DispatchQueue(
+        label: "im.adamant.dogeWalletService",
+        qos: .userInteractive,
+        attributes: [.concurrent]
+    )
     
     private static let jsonDecoder = JSONDecoder()
-    private var subscriptions = Set<AnyCancellable>()
+    @Atomic private var subscriptions = Set<AnyCancellable>()
 
     @ObservableValue private(set) var historyTransactions: [TransactionDetails] = []
     @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
@@ -135,7 +141,7 @@ final class DogeWalletService: WalletService {
     )
     
     // MARK: - State
-    private (set) var state: WalletServiceState = .notInitiated
+    @Atomic private (set) var state: WalletServiceState = .notInitiated
     
     private func setState(_ newState: WalletServiceState, silent: Bool = false) {
         guard newState != state else {
@@ -145,15 +151,16 @@ final class DogeWalletService: WalletService {
         state = newState
         
         if !silent {
-            NotificationCenter.default.post(name: serviceStateChanged,
-                                            object: self,
-                                            userInfo: [AdamantUserInfoKey.WalletService.walletState: state])
+            NotificationCenter.default.post(
+                name: serviceStateChanged,
+                object: self,
+                userInfo: [AdamantUserInfoKey.WalletService.walletState: state]
+            )
         }
     }
     
     init() {
         self.network = DogeMainnet()
-        
         self.setState(.notInitiated)
         
         // Notifications
@@ -342,6 +349,7 @@ extension DogeWalletService: SwinjectDependentService {
         dialogService = container.resolve(DialogService.self)
         addressConverter = container.resolve(AddressConverterFactory.self)?
             .make(network: network)
+        dogeApiService = container.resolve(DogeApiService.self)
         vibroService = container.resolve(VibroService.self)
         coreDataStack = container.resolve(CoreDataStack.self)
         
@@ -360,43 +368,27 @@ extension DogeWalletService {
     }
     
     func getBalance(address: String) async throws -> Decimal {
-        guard let url = DogeWalletService.nodes.randomElement()?.asURL() else {
-            let message = "Failed to get DOGE endpoint URL"
-            assertionFailure(message)
-            throw WalletServiceError.internalError(message: message, error: nil)
-        }
+        let data: Data = try await dogeApiService.request { core, node in
+            await core.sendRequest(
+                node: node,
+                path: DogeApiCommands.balance(for: address)
+            )
+        }.get()
         
-        // Headers
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json"
-        ]
-        
-        // Request url
-        let endpoint = url.appendingPathComponent(DogeApiCommands.balance(for: address))
-        
-        // MARK: Sending request
-        
-        return try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Decimal, Error>) in
-            AF.request(endpoint, method: .get, headers: headers).responseString { response in
-                switch response.result {
-                case .success(let data):
-                    if let raw = Decimal(string: data) {
-                        let balance = raw / DogeWalletService.multiplier
-                        continuation.resume(returning: balance)
-                    } else {
-                        continuation.resume(throwing: WalletServiceError.remoteServiceError(message: "DOGE Wallet: \(data)"))
-                    }
-                    
-                case .failure:
-                    continuation.resume(throwing: WalletServiceError.networkError)
-                }
-            }
+        if
+            let string = String(data: data, encoding: .utf8),
+            let raw = Decimal(string: string)
+        {
+            let balance = raw / DogeWalletService.multiplier
+            return balance
+        } else {
+            throw WalletServiceError.internalError(InternalAPIError.parsingFailed)
         }
     }
     
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
         do {
-            let result = try await apiService.get(key: DogeWalletService.kvsAddress, sender: address)
+            let result = try await apiService.get(key: DogeWalletService.kvsAddress, sender: address).get()
             
             guard let result = result else {
                 throw WalletServiceError.walletNotInitiated
@@ -428,14 +420,20 @@ extension DogeWalletService {
         }
         
         Task {
-            await apiService.store(key: DogeWalletService.kvsAddress, value: dogeAddress, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
-                switch result {
-                case .success:
-                    completion(.success)
-                    
-                case .failure(let error):
-                    completion(.failure(error: .apiError(error)))
-                }
+            let result = await apiService.store(
+                key: DogeWalletService.kvsAddress,
+                value: dogeAddress,
+                type: .keyValue,
+                sender: adamant.address,
+                keypair: keypair
+            )
+            
+            switch result {
+            case .success:
+                completion(.success)
+                
+            case .failure(let error):
+                completion(.failure(error: .apiError(error)))
             }
         }
     }
@@ -495,63 +493,54 @@ extension DogeWalletService {
         return (transactions: transactions, hasMore: hasMore)
     }
     
-    private func getTransactions(for address: String, from: Int, to: Int) async throws -> DogeGetTransactionsResponse {
-        guard let url = DogeWalletService.nodes.randomElement()?.asURL() else {
-            fatalError("Failed to get DOGE endpoint URL")
-        }
-        
-        let parameters: Parameters = [
+    private func getTransactions(
+        for address: String,
+        from: Int,
+        to: Int
+    ) async throws -> DogeGetTransactionsResponse {
+        let parameters = [
             "from": from,
             "to": to
         ]
         
-        // Request url
-        let endpoint = url.appendingPathComponent(DogeApiCommands.getTransactions(for: address))
-        
-        // MARK: Sending request
-        do {
-            let dogeResponse: DogeGetTransactionsResponse = try await apiService.sendRequest(
-                url: endpoint,
+        return try await dogeApiService.request { core, node in
+            await core.sendRequestJson(
+                node: node,
+                path: DogeApiCommands.getTransactions(for: address),
                 method: .get,
-                parameters: parameters
+                parameters: parameters,
+                encoding: .url
             )
-            return dogeResponse
-        } catch {
-            throw WalletServiceError.remoteServiceError(message: "DOGE Wallet: not a valid response")
-        }
+        }.get()
     }
     
     func getUnspentTransactions() async throws -> [UnspentTransaction] {
-        guard let url = DogeWalletService.nodes.randomElement()?.asURL() else {
-            fatalError("Failed to get DOGE endpoint URL")
-        }
-        
         guard let wallet = self.dogeWallet else {
             throw WalletServiceError.notLogged
         }
         
         let address = wallet.address
         
-        // Request url
-        let endpoint = url.appendingPathComponent(DogeApiCommands.getUnspentTransactions(for: address))
-        
-        let parameters: Parameters = [
+        let parameters = [
             "noCache": "1"
         ]
         
         // MARK: Sending request
+        let data = try await dogeApiService.request { core, node in
+            await core.sendRequest(
+                node: node,
+                path: DogeApiCommands.getUnspentTransactions(for: address),
+                method: .get,
+                parameters: parameters,
+                encoding: .url
+            )
+        }.get()
         
-        let data = try await apiService.sendRequest(
-            url: endpoint,
-            method: .get,
-            parameters: parameters
-        )
-
         let items = try? JSONSerialization.jsonObject(
             with: data,
             options: []
         ) as? [[String: Any]]
-
+        
         guard let items = items else {
             throw WalletServiceError.remoteServiceError(
                 message: "DOGE Wallet: not valid response"
@@ -586,39 +575,18 @@ extension DogeWalletService {
     }
     
     func getTransaction(by hash: String) async throws -> BTCRawTransaction {
-        guard let url = DogeWalletService.nodes.randomElement()?.asURL() else {
-            fatalError("Failed to get DOGE endpoint URL")
-        }
-        
-        // Request url
-        
-        let endpoint = url.appendingPathComponent(DogeApiCommands.getTransaction(by: hash))
-        
-        // MARK: Sending request
-        
-        let transaction: BTCRawTransaction = try await apiService.sendRequest(
-            url: endpoint,
-            method: .get,
-            parameters: nil
-        )
-        
-        return transaction
+        try await dogeApiService.request { core, node in
+            await core.sendRequestJson(
+                node: node,
+                path: DogeApiCommands.getTransaction(by: hash)
+            )
+        }.get()
     }
     
     func getBlockId(by hash: String) async throws -> String {
-        guard let url = DogeWalletService.nodes.randomElement()?.asURL() else {
-            fatalError("Failed to get DOGE endpoint URL")
-        }
-        
-        // Request url
-        
-        let endpoint = url.appendingPathComponent(DogeApiCommands.getBlock(by: hash))
-
-        let data = try await apiService.sendRequest(
-            url: endpoint,
-            method: .get,
-            parameters: nil
-        )
+        let data = try await dogeApiService.request { core, node in
+            await core.sendRequest(node: node, path: DogeApiCommands.getBlock(by: hash))
+        }.get()
         
         let json = try? JSONSerialization.jsonObject(
             with: data,

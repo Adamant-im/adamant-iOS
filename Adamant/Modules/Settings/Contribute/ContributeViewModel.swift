@@ -29,7 +29,7 @@ final class ContributeViewModel: ObservableObject {
     }
     
     func openLink(row: ContributeState.LinkRow) {
-        state.safariURL = row.link.map { .init(value: $0) }
+        state.safariURL = row.link.map { .init(id: $0.absoluteString, value: $0) }
     }
     
     func simulateCrash() {

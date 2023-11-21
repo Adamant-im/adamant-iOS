@@ -111,7 +111,7 @@ extension AdamantDialogService {
             secondaryButton: supportEmail
                 ? .init(
                     title: AdamantResources.supportEmail,
-                    action: .init(id: .zero) { [weak self] in
+                    action: .init(id: .empty) { [weak self] in
                         self?.sendErrorEmail(errorDescription: message)
                         self?.popupManager.dismissAdvancedAlert()
                     }
@@ -119,7 +119,7 @@ extension AdamantDialogService {
                 : nil,
             primaryButton: .init(
                 title: .adamant.alert.ok,
-                action: .init(id: .zero) { [weak popupManager] in
+                action: .init(id: .empty) { [weak popupManager] in
                     popupManager?.dismissAdvancedAlert()
                 }
             )

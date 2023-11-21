@@ -70,6 +70,7 @@ final class LoginViewController: FormViewController {
         case tapToSaveHint
         case generateNewPassphraseButton
         case nodes
+        case coinsNodes
         
         var localized: String {
             switch self {
@@ -98,11 +99,14 @@ final class LoginViewController: FormViewController {
                 return ""
                 
             case .nodes:
-                return String.adamant.nodesList.nodesListButton
+                return .adamant.nodesList.nodesListButton
+                
+            case .coinsNodes:
+                return .adamant.coinsNodesList.title
             }
         }
         
-        var tag:String {
+        var tag: String {
             switch self {
             case .passphrase: return "pass"
             case .loginButton: return "login"
@@ -113,6 +117,7 @@ final class LoginViewController: FormViewController {
             case .generateNewPassphraseButton: return "generate"
             case .tapToSaveHint: return "hint"
             case .nodes: return "nodes"
+            case .coinsNodes: return "coinsNodes"
             }
         }
     }
@@ -325,6 +330,22 @@ final class LoginViewController: FormViewController {
             present(nav, animated: true, completion: nil)
         }
         
+        // MARK: Coins nodes list settings
+        <<< ButtonRow {
+            $0.title = Rows.coinsNodes.localized
+            $0.tag = Rows.coinsNodes.tag
+        }.cellSetup { (cell, _) in
+            cell.selectionStyle = .gray
+        }.cellUpdate { (cell, _) in
+            cell.textLabel?.textColor = UIColor.adamant.primary
+        }.onCellSelection { [weak self] (_, _) in
+            guard let self = self else { return }
+            let vc = screensFactory.makeCoinsNodesList()
+            let nav = UINavigationController(rootViewController: vc)
+            nav.modalPresentationStyle = .overFullScreen
+            present(nav, animated: true, completion: nil)
+        }
+        
         // MARK: tableView position tuning
         if let row: PasswordRow = form.rowBy(tag: Rows.passphrase.tag) {
             NotificationCenter.default.addObserver(forName: UITextField.textDidBeginEditingNotification, object: row.cell.textField, queue: nil) { [weak self] _ in
@@ -374,14 +395,14 @@ extension LoginViewController {
         dialogService.showProgress(withMessage: String.adamant.login.loggingInProgressMessage, userInteractionEnable: false)
         
         Task {
-            await apiService.getAccount(byPassphrase: passphrase) { [weak self] result in
-                switch result {
-                case .success:
-                    self?.loginIntoExistingAccount(passphrase: passphrase)
-                    
-                case .failure(let error):
-                    self?.dialogService.showRichError(error: error)
-                }
+            let result = await apiService.getAccount(byPassphrase: passphrase)
+            
+            switch result {
+            case .success:
+                loginIntoExistingAccount(passphrase: passphrase)
+                
+            case .failure(let error):
+                dialogService.showRichError(error: error)
             }
         }
     }
