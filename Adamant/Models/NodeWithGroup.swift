@@ -12,3 +12,25 @@ struct NodeWithGroup: Codable, Equatable {
     let group: NodeGroup
     var node: Node
 }
+
+extension NodeGroup {
+    var name: String {
+        switch self {
+        case .btc:
+            return BtcWalletService.tokenNetworkSymbol
+        case .eth:
+            return EthWalletService.tokenNetworkSymbol
+        case .lskNode:
+            return LskWalletService.tokenNetworkSymbol
+        case .lskService:
+            return LskWalletService.tokenNetworkSymbol
+            + " " + .adamant.coinsNodesList.serviceNode
+        case .doge:
+            return DogeWalletService.tokenNetworkSymbol
+        case .dash:
+            return DashWalletService.tokenNetworkSymbol
+        case .adm:
+            return AdmWalletService.tokenNetworkSymbol
+        }
+    }
+}

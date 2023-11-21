@@ -412,7 +412,7 @@ extension NodesListViewController {
             id: node.id,
             title: node.asString(),
             connectionStatus: connectionStatus,
-            statusString: node.statusString(connectionStatus),
+            statusString: node.statusString(connectionStatus, isEnabled: node.isEnabled),
             versionString: node.versionString,
             isEnabled: node.isEnabled,
             activities: .init([

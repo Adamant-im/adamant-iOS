@@ -9,7 +9,11 @@
 import CommonKit
 
 extension Node {
-    func statusString(_ status: Node.ConnectionStatus?) -> String? {
+    func statusString(_ status: Node.ConnectionStatus?, isEnabled: Bool) -> String? {
+        guard isEnabled else {
+            return NodeCell.Strings.disabled
+        }
+        
         switch status {
         case .allowed:
             let ping = ping.map { Int($0 * 1000) }
@@ -19,7 +23,7 @@ extension Node {
         case .offline:
             return NodeCell.Strings.offline
         case .none:
-            return NodeCell.Strings.disabled
+            return nil
         }
     }
     
