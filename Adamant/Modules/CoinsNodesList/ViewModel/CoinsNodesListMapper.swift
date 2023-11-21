@@ -59,7 +59,7 @@ private extension CoinsNodesListMapper {
             "●",
             restNodeIds.contains(node.id)
                 ? node.scheme.rawValue
-                : nil,
+                : nil
         ].compactMap { $0 }.joined(separator: " ")
         
         var connectionStatusAttrString = AttributedString(connectionStatusString)
@@ -72,30 +72,8 @@ private extension CoinsNodesListMapper {
             isEnabled: node.isEnabled,
             title: node.asString(),
             connectionStatus: connectionStatusAttrString,
-            description: node.statusString(connectionStatus) ?? .empty
+            description: node.statusString(connectionStatus, isEnabled: node.isEnabled) ?? .empty
         )
-    }
-}
-
-private extension NodeGroup {
-    var name: String {
-        switch self {
-        case .btc:
-            return BtcWalletService.tokenNetworkSymbol
-        case .eth:
-            return EthWalletService.tokenNetworkSymbol
-        case .lskNode:
-            return LskWalletService.tokenNetworkSymbol
-        case .lskService:
-            return LskWalletService.tokenNetworkSymbol
-                + " " + .adamant.coinsNodesList.serviceNode
-        case .doge:
-            return DogeWalletService.tokenNetworkSymbol
-        case .dash:
-            return DashWalletService.tokenNetworkSymbol
-        case .adm:
-            return AdmWalletService.tokenNetworkSymbol
-        }
     }
 }
 

@@ -57,7 +57,7 @@ extension DogeWalletService: WalletServiceTwoStepSend {
             )
             return transaction
         } catch {
-            throw WalletServiceError.notEnoughMoney
+            throw error
         }
     }
     

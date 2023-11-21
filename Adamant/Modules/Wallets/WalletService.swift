@@ -133,8 +133,8 @@ extension WalletServiceError: HealthCheckableError {
         }
     }
     
-    static var noEndpointsError: WalletServiceError {
-        .apiError(.noEndpointsError)
+    static func noEndpointsError(coin: String) -> WalletServiceError {
+        .apiError(.noEndpointsError(coin: coin))
     }
 }
 

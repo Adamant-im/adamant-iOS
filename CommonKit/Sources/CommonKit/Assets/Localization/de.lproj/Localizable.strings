@@ -275,7 +275,7 @@
 "ApiService.InternalError.ParsingFailed" = "Parsing fehlgeschlagen. Bericht senden";
 
 /* Serious internal error: No nodes available */
-"ApiService.InternalError.NoNodesAvailable" = "No nodes available. Report a bug";
+"ApiService.InternalError.NoNodesAvailable" = "No active %@ nodes. Review the Coin node list";
 
 /* Eureka forms Cancel button */
 "Cancel" = "Abbrechen";
@@ -641,7 +641,7 @@
 "NodesList.PreferTheFastestNode" = "Prefer the fastest node";
 
 /* NodesList: 'Prefer the fastest node' switch */
-"NodesList.PreferTheFastestNode.Footer" = "If it's turned off, every HTTP/HTTPS request will go to a random allowed (green) node";
+"NodesList.PreferTheFastestNode.Footer" = "Verarbeiten Sie Anfragen schneller, aber es kann zu weniger Datenschutz führen";
 
 /* NodesList.NodeCell: Node ping */
 "NodesList.NodeCell.Ping" = "Ping";
@@ -655,6 +655,9 @@
 /* NodesList.NodeCell: Node is offline */
 "NodesList.NodeCell.Offline" = "Offline";
 
+/* NodesList.NodeCell: Node is disabled */
+"NodesList.NodeCell.Disabled" = "Deaktiviert";
+
 /* NodesList.NodeCell: Node version */
 "NodesList.NodeCell.Version" = "version";
 
@@ -662,7 +665,7 @@
 "NodeList.DefaultNodesLoaded" = "Default nodes list was loaded";
 
 /* CoinsNodesList: Title */
-"CoinsNodesList.Title" = "Coins node list";
+"CoinsNodesList.Title" = "Liste der Münz- und Serviceknoten";
 
 /* CoinsNodesList: ServiceNode */
 "CoinsNodesList.ServiceNode" = "Service";

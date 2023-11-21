@@ -9,7 +9,11 @@
 import CommonKit
 
 extension Node {
-    func statusString(_ status: Node.ConnectionStatus?) -> String? {
+    func statusString(_ status: Node.ConnectionStatus?, isEnabled: Bool) -> String? {
+        guard isEnabled else {
+            return NodeCell.Strings.disabled
+        }
+        
         switch status {
         case .allowed:
             let ping = ping.map { Int($0 * 1000) }
@@ -53,6 +57,11 @@ private extension NodeCell {
         static let version = String.localized(
             "NodesList.NodeCell.Version",
             comment: "NodesList.NodeCell: Node version"
+        )
+        
+        static let disabled = String.localized(
+            "NodesList.NodeCell.Disabled",
+            comment: "NodesList.NodeCell: Node is disabled"
         )
     }
 }

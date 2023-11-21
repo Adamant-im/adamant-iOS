@@ -19,7 +19,6 @@ final class BlockchainHealthCheckWrapper<
     Service: BlockchainHealthCheckableService
 >: HealthCheckWrapper<Service, Service.Error> {
     private let nodesStorage: NodesStorageProtocol
-    private let nodeGroup: NodeGroup
     
     @Atomic private var currentRequests = Set<UUID>()
     
@@ -30,12 +29,12 @@ final class BlockchainHealthCheckWrapper<
         nodeGroup: NodeGroup
     ) {
         self.nodesStorage = nodesStorage
-        self.nodeGroup = nodeGroup
         
         super.init(
             service: service,
             normalUpdateInterval: nodeGroup.normalUpdateInterval,
-            crucialUpdateInterval: nodeGroup.crucialUpdateInterval
+            crucialUpdateInterval: nodeGroup.crucialUpdateInterval,
+            nodeGroup: nodeGroup
         )
         
         nodesStorage
