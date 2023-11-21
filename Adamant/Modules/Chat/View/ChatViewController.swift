@@ -271,6 +271,8 @@ private extension ChatViewController {
                 self?.inputBar.isEnabled = value
                 if !value {
                     self?.navigationItem.rightBarButtonItem = nil
+                } else {
+                    self?.configureHeaderRightButton()
                 }
             })
             .store(in: &subscriptions)
@@ -383,12 +385,8 @@ private extension ChatViewController {
     func configureHeader() {
         navigationItem.titleView = updatingIndicatorView
         navigationItem.largeTitleDisplayMode = .never
-        navigationItem.rightBarButtonItem = .init(
-            title: "•••",
-            style: .plain,
-            target: self,
-            action: #selector(showMenu)
-        )
+        
+        configureHeaderRightButton()
         
         let tapGesture = UITapGestureRecognizer(
             target: self,
@@ -402,6 +400,15 @@ private extension ChatViewController {
         
         navigationItem.titleView?.addGestureRecognizer(tapGesture)
         navigationItem.titleView?.addGestureRecognizer(longPressGesture)
+    }
+    
+    func configureHeaderRightButton() {
+        navigationItem.rightBarButtonItem = .init(
+            title: "•••",
+            style: .plain,
+            target: self,
+            action: #selector(showMenu)
+        )
     }
     
     func configureReplyView() {
