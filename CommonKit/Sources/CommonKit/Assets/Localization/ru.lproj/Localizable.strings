@@ -649,6 +649,9 @@
 /* NodesList.NodeCell: Node version */
 "NodesList.NodeCell.Version" = "версия";
 
+/* NodesList.NodeCell: Node height */
+"NodesList.NodeCell.Height" = "Высота";
+
 /* CoinsNodesList: Title */
 "CoinsNodesList.Title" = "Список монет и сервисных нод";
 

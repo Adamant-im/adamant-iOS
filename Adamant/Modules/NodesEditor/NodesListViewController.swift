@@ -414,6 +414,7 @@ extension NodesListViewController {
             connectionStatus: connectionStatus,
             statusString: node.statusString(connectionStatus, isEnabled: node.isEnabled),
             versionString: node.versionString,
+            heightString: node.heightString,
             isEnabled: node.isEnabled,
             activities: .init([
                 currentRestNodesIds.contains(node.id)

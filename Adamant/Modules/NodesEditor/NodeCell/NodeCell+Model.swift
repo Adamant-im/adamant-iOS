@@ -18,6 +18,7 @@ extension NodeCell {
         let connectionStatus: Node.ConnectionStatus?
         let statusString: String?
         let versionString: String?
+        let heightString: String?
         let isEnabled: Bool
         let activities: Set<NodeActivity>
         let nodeUpdateAction: IDWrapper<NodeUpdateAction>
@@ -28,6 +29,7 @@ extension NodeCell {
             connectionStatus: nil,
             statusString: .empty,
             versionString: .empty,
+            heightString: .empty,
             isEnabled: false,
             activities: .init(),
             nodeUpdateAction: .init(id: .empty) { _ in }

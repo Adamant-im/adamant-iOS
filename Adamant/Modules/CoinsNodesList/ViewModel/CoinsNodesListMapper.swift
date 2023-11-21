@@ -67,12 +67,16 @@ private extension CoinsNodesListMapper {
             uiColor: getIndicatorColor(status: connectionStatus)
         )
         
+        let statusString = node.statusString(connectionStatus, isEnabled: node.isEnabled) ?? .empty
+        
+        let description = "\(statusString), \(node.heightString)"
+        
         return .init(
             id: node.id,
             isEnabled: node.isEnabled,
             title: node.asString(),
             connectionStatus: connectionStatusAttrString,
-            description: node.statusString(connectionStatus, isEnabled: node.isEnabled) ?? .empty
+            description: description
         )
     }
 }

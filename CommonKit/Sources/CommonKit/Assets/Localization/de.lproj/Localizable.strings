@@ -661,6 +661,9 @@
 /* NodesList.NodeCell: Node version */
 "NodesList.NodeCell.Version" = "version";
 
+/* NodesList.NodeCell: Node height */
+"NodesList.NodeCell.Height" = "Höhe";
+
 /* NodeList: Inform that default nodes was loaded, if user deleted all nodes */
 "NodeList.DefaultNodesLoaded" = "Default nodes list was loaded";
 

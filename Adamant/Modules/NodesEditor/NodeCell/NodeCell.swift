@@ -45,7 +45,8 @@ final class NodeCell: Cell<NodeCell.Model>, CellType {
         
         let descriptionStrings = [
             model.statusString,
-            model.versionString
+            model.versionString,
+            model.heightString
         ]
         
         checkmarkRowView.subtitle = descriptionStrings

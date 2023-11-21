@@ -30,6 +30,10 @@ extension Node {
     var versionString: String? {
         version.map { "(\(NodeCell.Strings.version): \($0))" }
     }
+    
+    var heightString: String {
+        "\(NodeCell.Strings.height): \(height ?? .zero)"
+    }
 }
 
 private extension NodeCell {
@@ -62,6 +66,11 @@ private extension NodeCell {
         static let disabled = String.localized(
             "NodesList.NodeCell.Disabled",
             comment: "NodesList.NodeCell: Node is disabled"
+        )
+        
+        static let height = String.localized(
+            "NodesList.NodeCell.Height",
+            comment: "NodesList.NodeCell: Node height"
         )
     }
 }
