@@ -92,6 +92,11 @@ private extension ContextMenuOverlayView {
     }
     
     func makeOverlayScrollToBottom(_ content: some View) -> some View {
+        if #available(iOS 17.0, *) {
+            return content
+                .defaultScrollAnchor(.bottom)
+        }
+        
         return ScrollViewReader { value in
             content
                 .onChange(of: viewModel.scrollToEnd) { scrollToBottom in
