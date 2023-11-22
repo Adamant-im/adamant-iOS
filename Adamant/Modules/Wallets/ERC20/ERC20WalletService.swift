@@ -530,7 +530,7 @@ extension ERC20WalletService {
         ]
         
         var transactions: [EthTransactionShort] = try await erc20ApiService.requestApiCore { core, node in
-            await core.sendRequestJson(
+            await core.sendRequestJsonResponse(
                 node: node,
                 path: EthWalletService.transactionsListApiSubpath,
                 method: .get,

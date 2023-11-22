@@ -24,7 +24,7 @@ extension AdamantApiService {
         transaction: UnregisteredTransaction
     ) async -> ApiServiceResult<UInt64> {
         let response: ApiServiceResult<TransactionIdResponse> = await request { core, node in
-            await core.sendRequestJson(
+            await core.sendRequestJsonResponse(
                 node: node,
                 path: path,
                 method: .post,
@@ -41,7 +41,7 @@ extension AdamantApiService {
         transaction: UnregisteredTransaction
     ) async -> ApiServiceResult<Bool> {
         let response: ApiServiceResult<ServerResponse> = await request { core, node in
-            await core.sendRequestJson(
+            await core.sendRequestJsonResponse(
                 node: node,
                 path: path,
                 method: .post,
@@ -63,7 +63,7 @@ extension AdamantApiService {
     func getTransaction(id: UInt64, withAsset: Bool) async -> ApiServiceResult<Transaction> {
         let response: ApiServiceResult<ServerModelResponse<Transaction>>
         response = await request { core, node in
-            await core.sendRequestJson(
+            await core.sendRequestJsonResponse(
                 node: node,
                 path: ApiCommands.Transactions.getTransaction,
                 method: .get,
@@ -130,11 +130,11 @@ extension AdamantApiService {
         
         let response: ApiServiceResult<ServerCollectionResponse<Transaction>>
         response = await request { [queryItems] core, node in
-            await core.sendRequestJson(
+            await core.sendRequestJsonResponse(
                 node: node,
                 path: ApiCommands.Transactions.root,
                 method: .get,
-                parameters: [Bool](),
+                parameters: core.emptyParameters,
                 encoding: .forceQueryItems(queryItems)
             )
         }

@@ -8,19 +8,32 @@
 
 import Foundation
 
-struct DashGetRawTransactionDTO: Codable {
+struct DashGetRawTransactionDTO: Encodable {
     let method: String
     let params: [Parameter]
     
     init(hash: String) {
         self.method = "getrawtransaction"
-        self.params = [.hash(hash), .bool(true)]
+        self.params = [.string(hash), .bool(true)]
     }
 }
 
 extension DashGetRawTransactionDTO {
-    enum Parameter: Codable {
-        case hash(String)
+    enum Parameter {
+        case string(String)
         case bool(Bool)
+    }
+}
+
+extension DashGetRawTransactionDTO.Parameter: Encodable {
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        
+        switch self {
+        case let .string(value):
+            try container.encode(value)
+        case let .bool(value):
+            try container.encode(value)
+        }
     }
 }

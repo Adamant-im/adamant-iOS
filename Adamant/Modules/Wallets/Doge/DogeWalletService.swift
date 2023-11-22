@@ -504,7 +504,7 @@ extension DogeWalletService {
         ]
         
         return try await dogeApiService.request { core, node in
-            await core.sendRequestJson(
+            await core.sendRequestJsonResponse(
                 node: node,
                 path: DogeApiCommands.getTransactions(for: address),
                 method: .get,
@@ -576,7 +576,7 @@ extension DogeWalletService {
     
     func getTransaction(by hash: String) async throws -> BTCRawTransaction {
         try await dogeApiService.request { core, node in
-            await core.sendRequestJson(
+            await core.sendRequestJsonResponse(
                 node: node,
                 path: DogeApiCommands.getTransaction(by: hash)
             )

@@ -12,7 +12,7 @@ import CommonKit
 extension AdamantApiService {
     func getPublicKey(byAddress address: String) async -> ApiServiceResult<String> {
         let response: ApiServiceResult<GetPublicKeyResponse> = await request { service, node in
-            await service.sendRequestJson(
+            await service.sendRequestJsonResponse(
                 node: node,
                 path: ApiCommands.Accounts.getPublicKey,
                 method: .get,

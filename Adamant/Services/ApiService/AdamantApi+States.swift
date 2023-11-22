@@ -64,7 +64,7 @@ extension AdamantApiService {
         
         let response: ApiServiceResult<ServerCollectionResponse<Transaction>>
         response = await request { [parameters] core, node in
-            await core.sendRequestJson(
+            await core.sendRequestJsonResponse(
                 node: node,
                 path: ApiCommands.States.get,
                 method: .get,

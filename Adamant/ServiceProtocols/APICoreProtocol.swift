@@ -21,9 +21,19 @@ protocol APICoreProtocol: Actor {
         parameters: Parameters,
         encoding: APIParametersEncoding
     ) async -> APIResponseModel
+    
+    /// jsonParameters - arrays and dictionaries are allowed only
+    func sendRequestBasic(
+        node: Node,
+        path: String,
+        method: HTTPMethod,
+        jsonParameters: Any
+    ) async -> APIResponseModel
 }
 
 extension APICoreProtocol {
+    var emptyParameters: [String: Bool] { [:] }
+    
     func sendRequest<Parameters: Encodable>(
         node: Node,
         path: String,
@@ -40,37 +50,27 @@ extension APICoreProtocol {
         ).result
     }
     
-    func sendRequestJson<Parameters: Encodable, JSONOutput: Decodable>(
+    func sendRequestJsonResponse<Parameters: Encodable, JSONOutput: Decodable>(
         node: Node,
         path: String,
         method: HTTPMethod,
         parameters: Parameters,
         encoding: APIParametersEncoding
     ) async -> ApiServiceResult<JSONOutput> {
-        switch await sendRequest(
+        await sendRequest(
             node: node,
             path: path,
             method: method,
             parameters: parameters,
             encoding: encoding
-        ) {
-        case let .success(data):
-            do {
-                let output = try JSONDecoder().decode(JSONOutput.self, from: data)
-                return .success(output)
-            } catch {
-                return .failure(.internalError(error: InternalAPIError.parsingFailed))
-            }
-        case let .failure(error):
-            return .failure(error)
-        }
+        ).flatMap { parseJSON(data: $0) }
     }
     
-    func sendRequestJson<JSONOutput: Decodable>(
+    func sendRequestJsonResponse<JSONOutput: Decodable>(
         node: Node,
         path: String
     ) async -> ApiServiceResult<JSONOutput> {
-        await sendRequestJson(
+        await sendRequestJsonResponse(
             node: node,
             path: path,
             method: .get,
@@ -91,6 +91,29 @@ extension APICoreProtocol {
             encoding: .url
         )
     }
+    
+    func sendRequestJsonResponse<JSONOutput: Decodable>(
+        node: Node,
+        path: String,
+        method: HTTPMethod,
+        jsonParameters: Any
+    ) async -> ApiServiceResult<JSONOutput> {
+        await sendRequestBasic(
+            node: node,
+            path: path,
+            method: method,
+            jsonParameters: jsonParameters
+        ).result.flatMap { parseJSON(data: $0) }
+    }
 }
 
-private let emptyParameters: [String: Bool] = [:]
+private extension APICoreProtocol {
+    func parseJSON<JSON: Decodable>(data: Data) -> ApiServiceResult<JSON> {
+        do {
+            let output = try JSONDecoder().decode(JSON.self, from: data)
+            return .success(output)
+        } catch {
+            return .failure(.internalError(error: InternalAPIError.parsingFailed))
+        }
+    }
+}

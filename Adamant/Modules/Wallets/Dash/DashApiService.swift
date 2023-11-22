@@ -27,7 +27,7 @@ final class DashApiCore: BlockchainHealthCheckableService {
         let startTimestamp = Date.now.timeIntervalSince1970
         
         let response: WalletServiceResult<DashBlockchainInfoDTO> = await request(node: node) { core, node in
-            let response: ApiServiceResult<DashResponseDTO<DashBlockchainInfoDTO>> = await core.sendRequestJson(
+            let response: ApiServiceResult<DashResponseDTO<DashBlockchainInfoDTO>> = await core.sendRequestJsonResponse(
                 node: node,
                 path: .empty,
                 method: .post,
