@@ -41,7 +41,7 @@ extension AdamantApiService {
         
         let response: ApiServiceResult<ServerCollectionResponse<Transaction>>
         response = await request { [parameters] service, node in
-            await service.sendRequestJson(
+            await service.sendRequestJsonResponse(
                 node: node,
                 path: ApiCommands.Chats.get,
                 method: .get,
@@ -73,7 +73,7 @@ extension AdamantApiService {
         }
         
         return await request { [parameters] service, node in
-            await service.sendRequestJson(
+            await service.sendRequestJsonResponse(
                 node: node,
                 path: ApiCommands.Chats.getChatRooms + "/\(address)",
                 method: .get,
@@ -100,7 +100,7 @@ extension AdamantApiService {
         }
         
         return await request { [parameters] service, node in
-            await service.sendRequestJson(
+            await service.sendRequestJsonResponse(
                 node: node,
                 path: ApiCommands.Chats.getChatRooms + "/\(address)/\(addressRecipient)",
                 method: .get,

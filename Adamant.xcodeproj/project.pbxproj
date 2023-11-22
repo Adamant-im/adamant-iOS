@@ -233,7 +233,7 @@
 		9366588F2B0AB97500BDB2D3 /* CoinsNodesListMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9366588E2B0AB97500BDB2D3 /* CoinsNodesListMapper.swift */; };
 		936658912B0AB9DC00BDB2D3 /* NodeWithGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 936658902B0AB9DC00BDB2D3 /* NodeWithGroup.swift */; };
 		936658932B0AC03700BDB2D3 /* CoinsNodesListStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 936658922B0AC03700BDB2D3 /* CoinsNodesListStrings.swift */; };
-		936658952B0AC15300BDB2D3 /* Node+Strings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 936658942B0AC15300BDB2D3 /* Node+Strings.swift */; };
+		936658952B0AC15300BDB2D3 /* Node+UI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 936658942B0AC15300BDB2D3 /* Node+UI.swift */; };
 		936658972B0ACB1500BDB2D3 /* CoinsNodesListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 936658962B0ACB1500BDB2D3 /* CoinsNodesListViewModel.swift */; };
 		936658992B0AD32600BDB2D3 /* CoinsNodesListViewModel+ApiServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 936658982B0AD32600BDB2D3 /* CoinsNodesListViewModel+ApiServices.swift */; };
 		9366589B2B0AD3E600BDB2D3 /* WalletApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9366589A2B0AD3E600BDB2D3 /* WalletApiService.swift */; };
@@ -268,6 +268,7 @@
 		9390C5052976B53000270CDF /* ChatDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9390C5042976B53000270CDF /* ChatDialog.swift */; };
 		93996A972968209C008D080B /* ChatMessagesCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93996A962968209C008D080B /* ChatMessagesCollection.swift */; };
 		9399F5ED29A85A48006C3E30 /* ChatCacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9399F5EC29A85A48006C3E30 /* ChatCacheService.swift */; };
+		939FA3422B0D6F0000710EC6 /* SelfRemovableHostingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 939FA3412B0D6F0000710EC6 /* SelfRemovableHostingController.swift */; };
 		93A118512993167500E144CC /* ChatMessageBackgroundColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A118502993167500E144CC /* ChatMessageBackgroundColor.swift */; };
 		93A118532993241D00E144CC /* ChatMessagesListFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A118522993241D00E144CC /* ChatMessagesListFactory.swift */; };
 		93A18C862AAEACC100D0AB98 /* AdamantWalletFactoryCompose.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A18C852AAEACC100D0AB98 /* AdamantWalletFactoryCompose.swift */; };
@@ -285,7 +286,6 @@
 		93B28EC52B076E2C007F268B /* DashBlockchainInfoDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B28EC42B076E2C007F268B /* DashBlockchainInfoDTO.swift */; };
 		93B28EC82B076E68007F268B /* DashResponseDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B28EC72B076E68007F268B /* DashResponseDTO.swift */; };
 		93B28ECA2B076E88007F268B /* DashErrorDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B28EC92B076E88007F268B /* DashErrorDTO.swift */; };
-		93BB4E6C2B0AF9EE00A537F2 /* SelfRemovableHostingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93BB4E6B2B0AF9EE00A537F2 /* SelfRemovableHostingController.swift */; };
 		93BF4A6629E4859900505CD0 /* DelegatesBottomPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93BF4A6529E4859900505CD0 /* DelegatesBottomPanel.swift */; };
 		93BF4A6C29E4B4BF00505CD0 /* DelegatesBottomPanel+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93BF4A6B29E4B4BF00505CD0 /* DelegatesBottomPanel+Model.swift */; };
 		93C794442B07725C00408826 /* DashGetAddressBalanceDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C794432B07725C00408826 /* DashGetAddressBalanceDTO.swift */; };
@@ -861,7 +861,7 @@
 		9366588E2B0AB97500BDB2D3 /* CoinsNodesListMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinsNodesListMapper.swift; sourceTree = "<group>"; };
 		936658902B0AB9DC00BDB2D3 /* NodeWithGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeWithGroup.swift; sourceTree = "<group>"; };
 		936658922B0AC03700BDB2D3 /* CoinsNodesListStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinsNodesListStrings.swift; sourceTree = "<group>"; };
-		936658942B0AC15300BDB2D3 /* Node+Strings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Node+Strings.swift"; sourceTree = "<group>"; };
+		936658942B0AC15300BDB2D3 /* Node+UI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Node+UI.swift"; sourceTree = "<group>"; };
 		936658962B0ACB1500BDB2D3 /* CoinsNodesListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinsNodesListViewModel.swift; sourceTree = "<group>"; };
 		936658982B0AD32600BDB2D3 /* CoinsNodesListViewModel+ApiServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoinsNodesListViewModel+ApiServices.swift"; sourceTree = "<group>"; };
 		9366589A2B0AD3E600BDB2D3 /* WalletApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletApiService.swift; sourceTree = "<group>"; };
@@ -892,6 +892,7 @@
 		9390C5042976B53000270CDF /* ChatDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatDialog.swift; sourceTree = "<group>"; };
 		93996A962968209C008D080B /* ChatMessagesCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesCollection.swift; sourceTree = "<group>"; };
 		9399F5EC29A85A48006C3E30 /* ChatCacheService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatCacheService.swift; sourceTree = "<group>"; };
+		939FA3412B0D6F0000710EC6 /* SelfRemovableHostingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelfRemovableHostingController.swift; sourceTree = "<group>"; };
 		93A118502993167500E144CC /* ChatMessageBackgroundColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessageBackgroundColor.swift; sourceTree = "<group>"; };
 		93A118522993241D00E144CC /* ChatMessagesListFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesListFactory.swift; sourceTree = "<group>"; };
 		93A18C852AAEACC100D0AB98 /* AdamantWalletFactoryCompose.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantWalletFactoryCompose.swift; sourceTree = "<group>"; };
@@ -909,7 +910,6 @@
 		93B28EC42B076E2C007F268B /* DashBlockchainInfoDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashBlockchainInfoDTO.swift; sourceTree = "<group>"; };
 		93B28EC72B076E68007F268B /* DashResponseDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashResponseDTO.swift; sourceTree = "<group>"; };
 		93B28EC92B076E88007F268B /* DashErrorDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashErrorDTO.swift; sourceTree = "<group>"; };
-		93BB4E6B2B0AF9EE00A537F2 /* SelfRemovableHostingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelfRemovableHostingController.swift; sourceTree = "<group>"; };
 		93BF4A6529E4859900505CD0 /* DelegatesBottomPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelegatesBottomPanel.swift; sourceTree = "<group>"; };
 		93BF4A6B29E4B4BF00505CD0 /* DelegatesBottomPanel+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DelegatesBottomPanel+Model.swift"; sourceTree = "<group>"; };
 		93C794432B07725C00408826 /* DashGetAddressBalanceDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashGetAddressBalanceDTO.swift; sourceTree = "<group>"; };
@@ -2031,7 +2031,8 @@
 				93294B832AAD0C8F00911109 /* Assembler+Extension.swift */,
 				93E8EDD02AF1DF8E003E163C /* ServerResponse+Resolver.swift */,
 				93CCAE7F2B06E2D100EA5B94 /* ApiServiceError+Extension.swift */,
-				936658942B0AC15300BDB2D3 /* Node+Strings.swift */,
+				939FA3412B0D6F0000710EC6 /* SelfRemovableHostingController.swift */,
+				936658942B0AC15300BDB2D3 /* Node+UI.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -2457,7 +2458,6 @@
 				4133AED329769EEC00F3D017 /* UpdatingIndicatorView.swift */,
 				41A1994529D2FCF80031AD75 /* ReplyView.swift */,
 				41A1994729D325800031AD75 /* SwipeableView.swift */,
-				93BB4E6B2B0AF9EE00A537F2 /* SelfRemovableHostingController.swift */,
 			);
 			path = SharedViews;
 			sourceTree = "<group>";
@@ -2991,7 +2991,7 @@
 				E9E7CDB72003994E00DFC4DB /* AdamantUtilities+extended.swift in Sources */,
 				E9147B6320505C7500145913 /* QRCodeReader+adamant.swift in Sources */,
 				E90055F720EC200900D0CB2D /* SecurityViewController.swift in Sources */,
-				93BB4E6C2B0AF9EE00A537F2 /* SelfRemovableHostingController.swift in Sources */,
+				939FA3422B0D6F0000710EC6 /* SelfRemovableHostingController.swift in Sources */,
 				644EC35E20F34F1E00F40C73 /* DelegateDetailsViewController.swift in Sources */,
 				E9942B80203C058C00C163AF /* QRGeneratorViewController.swift in Sources */,
 				4184F1772A33173100D7B8B9 /* ContributeView.swift in Sources */,
@@ -3064,7 +3064,7 @@
 				E9147B612050599000145913 /* LoginViewController+QR.swift in Sources */,
 				9399F5ED29A85A48006C3E30 /* ChatCacheService.swift in Sources */,
 				3A9015A92A615893002A2464 /* ChatMessagesListViewModel.swift in Sources */,
-				936658952B0AC15300BDB2D3 /* Node+Strings.swift in Sources */,
+				936658952B0AC15300BDB2D3 /* Node+UI.swift in Sources */,
 				41A1995429D56E340031AD75 /* ChatMessageReplyCell.swift in Sources */,
 				93294B872AAD0E0A00911109 /* AdmWallet.swift in Sources */,
 				6449BA6B235CA0930033B936 /* ERC20TransactionDetailsViewController.swift in Sources */,

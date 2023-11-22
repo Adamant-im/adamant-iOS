@@ -492,7 +492,7 @@ extension BtcWalletService {
     
     func getBalance(address: String) async throws -> Decimal {
         let response: BtcBalanceResponse = try await btcApiService.request { api, node in
-            await api.sendRequestJson(node: node, path: BtcApiCommands.balance(for: address))
+            await api.sendRequestJsonResponse(node: node, path: BtcApiCommands.balance(for: address))
         }.get()
 
         return response.value / BtcWalletService.multiplier
@@ -500,7 +500,7 @@ extension BtcWalletService {
 
     func getFeeRate() async throws -> Decimal {
         let response: [String: Decimal] = try await btcApiService.request { api, node in
-            await api.sendRequestJson(node: node, path: BtcApiCommands.getFeeRate())
+            await api.sendRequestJsonResponse(node: node, path: BtcApiCommands.getFeeRate())
         }.get()
         
         return response["2"] ?? 1
@@ -639,7 +639,7 @@ extension BtcWalletService {
         fromTx: String? = nil
     ) async throws -> [RawBtcTransactionResponse] {
         return try await btcApiService.request { api, node in
-            await api.sendRequestJson(
+            await api.sendRequestJsonResponse(
                 node: node,
                 path: BtcApiCommands.getTransactions(
                     for: address,
@@ -655,7 +655,7 @@ extension BtcWalletService {
         }
         
         let rawTransaction: RawBtcTransactionResponse = try await btcApiService.request { api, node in
-            await api.sendRequestJson(
+            await api.sendRequestJsonResponse(
                 node: node,
                 path: BtcApiCommands.getTransaction(by: hash)
             )

@@ -50,6 +50,34 @@ actor APICore: APICoreProtocol {
             )
         }
     }
+    
+    func sendRequestBasic(
+        node: Node,
+        path: String,
+        method: HTTPMethod,
+        jsonParameters: Any
+    ) async -> APIResponseModel {
+        do {
+            let data = try JSONSerialization.data(
+                withJSONObject: jsonParameters
+            )
+            
+            var request = try URLRequest(
+                url: try buildUrl(node: node, path: path),
+                method: method
+            )
+            
+            request.httpBody = data
+            request.headers.update(.contentType("application/json"))
+            return await sendRequest(request: AF.request(request))
+        } catch {
+            return .init(
+                result: .failure(.internalError(message: error.localizedDescription, error: error)),
+                data: nil,
+                code: nil
+            )
+        }
+    }
 }
 
 private extension APICore {

@@ -27,7 +27,7 @@ final class DogeApiCore: BlockchainHealthCheckableService {
         let startTimestamp = Date.now.timeIntervalSince1970
         
         let response: WalletServiceResult<DogeBlocksDTO> = await request(node: node) { core, node in
-            await core.sendRequestJson(
+            await core.sendRequestJsonResponse(
                 node: node,
                 path: DogeApiCommands.getBlocks(),
                 method: .get,

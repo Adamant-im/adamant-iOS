@@ -2,7 +2,7 @@
 //  SelfRemovableHostingController.swift
 //  Adamant
 //
-//  Created by Andrew G on 20.11.2023.
+//  Created by Andrew G on 22.11.2023.
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
@@ -11,12 +11,6 @@ import SwiftUI
 class SelfRemovableHostingController<T: View>: UIHostingController<T> {
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        guard
-            splitViewController == nil,
-            let navigationController = navigationController,
-            navigationController.viewControllers.count == 1
-        else { return }
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .done,
@@ -29,3 +23,4 @@ class SelfRemovableHostingController<T: View>: UIHostingController<T> {
         dismiss(animated: true)
     }
 }
+

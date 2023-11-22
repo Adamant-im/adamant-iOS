@@ -38,7 +38,7 @@ extension DashWalletService {
     func getTransaction(by hash: String) async throws -> BTCRawTransaction {
         let result: BTCRPCServerResponce<BTCRawTransaction> = try await dashApiService.request {
             core, node in
-            await core.sendRequestJson(
+            await core.sendRequestJsonResponse(
                 node: node,
                 path: .empty,
                 method: .post,
@@ -59,16 +59,17 @@ extension DashWalletService {
             throw ApiServiceError.notLogged
         }
 
-        let parameters: [DashGetRawTransactionDTO] = hashes.map { .init(hash: $0) }
+        let parameters: [Any] = hashes.compactMap {
+            DashGetRawTransactionDTO(hash: $0).asDictionary()
+        }
         
         let result: [BTCRPCServerResponce<BTCRawTransaction>] = try await dashApiService.request {
             core, node in
-            await core.sendRequestJson(
+            await core.sendRequestJsonResponse(
                 node: node,
                 path: .empty,
                 method: .post,
-                parameters: parameters,
-                encoding: .json
+                jsonParameters: parameters
             )
         }.get()
         
@@ -81,7 +82,7 @@ extension DashWalletService {
         }
         
         let result: BTCRPCServerResponce<BtcBlock> = try await dashApiService.request { core, node in
-            await core.sendRequestJson(
+            await core.sendRequestJsonResponse(
                 node: node,
                 path: .empty,
                 method: .post,
@@ -104,7 +105,7 @@ extension DashWalletService {
         
         let response: BTCRPCServerResponce<[DashUnspentTransaction]> = try await dashApiService.request {
             core, node in
-            await core.sendRequestJson(
+            await core.sendRequestJsonResponse(
                 node: node,
                 path: .empty,
                 method: .post,
@@ -169,7 +170,7 @@ extension DashWalletService {
     func requestTransactionsIds(for address: String) async throws -> [String] {
         let response: BTCRPCServerResponce<[String]> = try await dashApiService.request {
             core, node in
-            await core.sendRequestJson(
+            await core.sendRequestJsonResponse(
                 node: node,
                 path: .empty,
                 method: .post,

@@ -614,7 +614,7 @@
 "NewChatScene.NotInitialized.HelpButton" = "What does it mean?";
 
 /* NodesList: Button label */
-"NodesList.NodesList" = "ADM Node list";
+"NodesList.NodesList" = "ADM node list";
 
 /* NodesList: scene title */
 "NodesList.Title" = "List of ADM nodes";

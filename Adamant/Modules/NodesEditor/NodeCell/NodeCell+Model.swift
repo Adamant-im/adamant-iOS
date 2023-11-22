@@ -6,7 +6,7 @@
 //  Copyright © 2023 Adamant. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import CommonKit
 
 extension NodeCell {
@@ -15,29 +15,20 @@ extension NodeCell {
     struct Model: Equatable {
         let id: UUID
         let title: String
-        let connectionStatus: Node.ConnectionStatus?
-        let statusString: String?
-        let versionString: String?
+        let indicatorString: String
+        let indicatorColor: UIColor
+        let statusString: String
         let isEnabled: Bool
-        let activities: Set<NodeActivity>
         let nodeUpdateAction: IDWrapper<NodeUpdateAction>
         
         static let `default` = Self(
             id: .init(),
             title: .empty,
-            connectionStatus: nil,
+            indicatorString: .init(),
+            indicatorColor: .adamant.inactive,
             statusString: .empty,
-            versionString: .empty,
             isEnabled: false,
-            activities: .init(),
             nodeUpdateAction: .init(id: .empty) { _ in }
         )
-    }
-}
-
-extension NodeCell.Model {
-    enum NodeActivity: Equatable, Hashable {
-        case webSockets
-        case rest(scheme: Node.URLScheme)
     }
 }

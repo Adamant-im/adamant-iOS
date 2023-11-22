@@ -689,7 +689,7 @@ extension EthWalletService {
         
         let transactionsFrom: [EthTransactionShort] = try await ethApiService.requestApiCore {
             core, node in
-            await core.sendRequestJson(
+            await core.sendRequestJsonResponse(
                 node: node,
                 path: EthWalletService.transactionsListApiSubpath,
                 method: .get,
@@ -700,7 +700,7 @@ extension EthWalletService {
         
         let transactionsTo: [EthTransactionShort] = try await ethApiService.requestApiCore {
             core, node in
-            await core.sendRequestJson(
+            await core.sendRequestJsonResponse(
                 node: node,
                 path: EthWalletService.transactionsListApiSubpath,
                 method: .get,

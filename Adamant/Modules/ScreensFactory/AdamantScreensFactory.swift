@@ -178,7 +178,7 @@ struct AdamantScreensFactory: ScreensFactory {
         partnerQRFactory.makeViewController(partner: partner)
     }
     
-    func makeCoinsNodesList() -> UIViewController {
-        coinsNodesListFactory.makeViewController()
+    func makeCoinsNodesList(context: CoinsNodesListContext) -> UIViewController {
+        coinsNodesListFactory.makeViewController(context: context)
     }
 }

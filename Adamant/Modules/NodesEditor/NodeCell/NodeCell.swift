@@ -37,20 +37,9 @@ final class NodeCell: Cell<NodeCell.Model>, CellType {
     override func update() {
         checkmarkRowView.setIsChecked(model.isEnabled, animated: true)
         checkmarkRowView.title = model.title
-        checkmarkRowView.captionColor = getIndicatorColor(status: model.connectionStatus)
-        
-        checkmarkRowView.caption = ["●", makeActivitiesString()]
-            .compactMap { $0 }
-            .joined(separator: " ")
-        
-        let descriptionStrings = [
-            model.statusString,
-            model.versionString
-        ]
-        
-        checkmarkRowView.subtitle = descriptionStrings
-            .compactMap { $0 }
-            .joined(separator: " ")
+        checkmarkRowView.captionColor = model.indicatorColor
+        checkmarkRowView.caption = model.indicatorString
+        checkmarkRowView.subtitle = model.statusString
     }
     
     func subscribe<P: Observable<Model>>(_ publisher: P) {
@@ -68,22 +57,11 @@ private extension NodeCell {
         }
         
         checkmarkRowView.checkmarkImage = .asset(named: "status_success")
-        checkmarkRowView.onCheckmarkTap = { [weak self] in self?.onCheckmarkTap()}
+        checkmarkRowView.onCheckmarkTap = { [weak self] in self?.onCheckmarkTap() }
     }
     
     func onCheckmarkTap() {
         model.nodeUpdateAction.value(!checkmarkRowView.isChecked)
-    }
-    
-    func makeActivitiesString() -> String? {
-        model.activities.map { activity in
-            switch activity {
-            case .webSockets:
-                return "ws"
-            case let .rest(scheme):
-                return scheme.rawValue
-            }
-        }.sorted().joined(separator: ", ")
     }
 }
 
@@ -91,18 +69,5 @@ final class NodeRow: Row<NodeCell>, RowType {
     required public init(tag: String?) {
         super.init(tag: tag)
         cellProvider = .init()
-    }
-}
-
-private func getIndicatorColor(status: Node.ConnectionStatus?) -> UIColor {
-    switch status {
-    case .allowed:
-        return .adamant.good
-    case .synchronizing:
-        return .adamant.alert
-    case .offline:
-        return .adamant.danger
-    case .none:
-        return .adamant.inactive
     }
 }
