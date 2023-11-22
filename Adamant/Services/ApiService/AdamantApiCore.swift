@@ -23,7 +23,7 @@ final class AdamantApiCore {
     }
     
     func getNodeStatus(node: Node) async -> ApiServiceResult<NodeStatus> {
-        await apiCore.sendRequestJson(
+        await apiCore.sendRequestJsonResponse(
             node: node,
             path: ApiCommands.status
         )

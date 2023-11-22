@@ -71,7 +71,7 @@ extension DashWalletService: WalletServiceTwoStepSend {
         let txHex = transaction.serialized().hex
         
         let response: BTCRPCServerResponce<String> = try await dashApiService.request { core, node in
-            await core.sendRequestJson(
+            await core.sendRequestJsonResponse(
                 node: node,
                 path: .empty,
                 method: .post,

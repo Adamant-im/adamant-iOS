@@ -31,7 +31,7 @@ extension AdamantApiService {
     /// Get account by publicKey
     func getAccount(byPublicKey publicKey: String) async -> ApiServiceResult<AdamantAccount> {
         switch await request({ apiCore, node in
-            let response: ApiServiceResult<ServerModelResponse<AdamantAccount>> = await apiCore.sendRequestJson(
+            let response: ApiServiceResult<ServerModelResponse<AdamantAccount>> = await apiCore.sendRequestJsonResponse(
                 node: node,
                 path: ApiCommands.Accounts.root,
                 method: .get,
@@ -57,7 +57,7 @@ extension AdamantApiService {
         await request { apiCore, node in
             let response: ApiServiceResult<
                 ServerModelResponse<AdamantAccount>
-            > = await apiCore.sendRequestJson(
+            > = await apiCore.sendRequestJsonResponse(
                 node: node,
                 path: ApiCommands.Accounts.root,
                 method: .get,
