@@ -71,7 +71,7 @@
 "Contribute.Section.RunNodes" = "Запустите узел сети АДАМАНТа";
 
 /* Contribute scene: 'Run nodes' section description. */
-"Contribute.Section.RunNodesDescription" = "Поддержите децентрализацию и повысьте уровень конфиденциальности";
+"Contribute.Section.RunNodesDescription" = "Поддержите децентрализацию и повысьте уровень приватности";
 
 /* Contribute scene: 'Network delegate' section title. */
 "Contribute.Section.NetworkDelegate" = "Станьте делегатом сети";
@@ -632,7 +632,7 @@
 "NodesList.PreferTheFastestNode" = "Выбирать самую быструю ноду";
 
 /* NodesList: 'Prefer the fastest node' switch */
-"NodesList.PreferTheFastestNode.Footer" = "Обрабатывайте запросы быстрее, но это может привести к снижению конфиденциальности.";
+"NodesList.PreferTheFastestNode.Footer" = "Обрабатывайте запросы быстрее, но это может привести к снижению приватности.";
 
 /* NodesList.NodeCell: Node ping */
 "NodesList.NodeCell.Ping" = "Пинг";
@@ -650,7 +650,7 @@
 "NodesList.NodeCell.Version" = "версия";
 
 /* CoinsNodesList: Title */
-"CoinsNodesList.Title" = "Список монет и сервисных нод";
+"CoinsNodesList.Title" = "Ноды сервисов и монет";
 
 /* NodesList.NodeCell: Node is disabled */
 "NodesList.NodeCell.Disabled" = "Отключена";
