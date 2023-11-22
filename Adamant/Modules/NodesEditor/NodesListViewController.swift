@@ -108,29 +108,10 @@ final class NodesListViewController: FormViewController {
         self.apiService = apiService
         self.socketService = socketService
         super.init(nibName: nil, bundle: nil)
-        setup()
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("Isn't implemented")
-    }
-    
-    private func setup() {
-        nodesStorage.getNodesPublisher(group: nodeGroup)
-            .combineLatest(nodesAdditionalParamsStorage.fastestNodeMode(group: nodeGroup))
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] in self?.setNewNodesList($0.0) }
-            .store(in: &subscriptions)
-        
-        NotificationCenter.default
-            .publisher(for: .SocketService.currentNodeUpdate, object: nil)
-            .receive(on: DispatchQueue.main)
-            .map { [weak self] _ in self?.socketService.currentNode?.id }
-            .removeDuplicates()
-            .assign(to: _currentSocketsNodeId)
-            .store(in: &subscriptions)
-        
-        currentSocketsNodeId = socketService.currentNode?.id
     }
     
     override func viewDidLoad() {
@@ -194,6 +175,7 @@ final class NodesListViewController: FormViewController {
         }
         
         setColors()
+        setupObservers()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -207,6 +189,24 @@ final class NodesListViewController: FormViewController {
     private func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
+    }
+    
+    private func setupObservers() {
+        nodesStorage.getNodesPublisher(group: nodeGroup)
+            .combineLatest(nodesAdditionalParamsStorage.fastestNodeMode(group: nodeGroup))
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in self?.setNewNodesList($0.0) }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .SocketService.currentNodeUpdate, object: nil)
+            .receive(on: DispatchQueue.main)
+            .map { [weak self] _ in self?.socketService.currentNode?.id }
+            .removeDuplicates()
+            .assign(to: _currentSocketsNodeId)
+            .store(in: &subscriptions)
+        
+        currentSocketsNodeId = socketService.currentNode?.id
     }
     
     private func setNewNodesList(_ newNodes: [Node]) {
