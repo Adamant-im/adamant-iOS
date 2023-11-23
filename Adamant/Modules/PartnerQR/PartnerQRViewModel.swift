@@ -125,7 +125,7 @@ private extension PartnerQRViewModel {
             return
         }
         
-        let name = partner?.name ?? addressBookService.getName(for: address)
+        let name = addressBookService.getName(for: partner)
         
         if let name = name {
             partnerName = name
@@ -157,7 +157,7 @@ private extension PartnerQRViewModel {
         
         var params: [AdamantAddressParam] = []
         
-        let name = partner?.name ?? addressBookService.getName(for: address)
+        let name = addressBookService.getName(for: partner)
         
         if includeContactsName,
            let name = name {
