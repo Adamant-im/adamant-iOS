@@ -29,7 +29,7 @@ extension DashWalletService {
                 handleTransactionResponse(id: id, .success(transaction), completion)
             } catch {
                 let error = error as? WalletServiceError
-                let errorApi = ApiServiceError.internalError(message: error?.message ?? "", error: error)
+                let errorApi = ApiServiceError.serverError(error: error?.message ?? .empty)
                 handleTransactionResponse(id: id, .failure(errorApi), completion)
             }
         }
@@ -78,7 +78,7 @@ extension DashWalletService {
     
     func getBlockId(by hash: String?) async throws -> String {
         guard let hash = hash else {
-            throw ApiServiceError.internalError(message: "Hash is empty", error: nil)
+            throw WalletServiceError.internalError(message: "Hash is empty", error: nil)
         }
         
         let result: BTCRPCServerResponce<BtcBlock> = try await dashApiService.request { core, node in
@@ -94,7 +94,7 @@ extension DashWalletService {
         if let block = result.result {
             return String(block.height)
         } else {
-            throw ApiServiceError.internalError(message: "DASH: Parsing block error", error: nil)
+            throw WalletServiceError.internalError(message: "DASH: Parsing block error", error: nil)
         }
     }
 
@@ -119,7 +119,7 @@ extension DashWalletService {
                 $0.asUnspentTransaction(lockScript: wallet.addressEntity.lockingScript)
             }
         } else if let error = response.error?.message {
-            throw WalletServiceError.internalError(message: error, error: nil)
+            throw WalletServiceError.remoteServiceError(message: error, error: nil)
         }
 
         throw WalletServiceError.internalError(
@@ -183,7 +183,7 @@ extension DashWalletService {
             return result
         }
         
-        throw ApiServiceError.internalError(message: "DASH Wallet: not a valid response", error: nil)
+        throw WalletServiceError.internalError(message: "DASH Wallet: not a valid response", error: nil)
     }
 
 }

@@ -24,7 +24,7 @@ extension DashWalletService: WalletServiceTwoStepSend {
         guard let confirmations = transaction.confirmations,
               confirmations >= 1
         else {
-            throw WalletServiceError.internalError(message: "WAIT_FOR_COMPLETION", error: nil)
+            throw WalletServiceError.remoteServiceError(message: "WAIT_FOR_COMPLETION", error: nil)
         }
         
         return try await createTransaction(recipient: recipient, amount: amount)
@@ -84,12 +84,12 @@ extension DashWalletService: WalletServiceTwoStepSend {
             lastTransactionId = transaction.txID
         } else if let error = response.error?.message {
             if error.lowercased().contains("16: tx-txlock-conflict") {
-                throw WalletServiceError.internalError(
+                throw WalletServiceError.remoteServiceError(
                     message: String.adamant.sharedErrors.walletFrezzed,
                     error: nil
                 )
             } else {
-                throw WalletServiceError.internalError(message: error, error: nil)
+                throw WalletServiceError.remoteServiceError(message: error, error: nil)
             }
         } else {
             throw WalletServiceError.internalError(message: "DASH Wallet: not valid response", error: nil)
