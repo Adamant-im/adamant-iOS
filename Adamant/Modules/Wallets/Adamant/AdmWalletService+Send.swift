@@ -31,9 +31,9 @@ extension AdmWalletService: WalletServiceSimpleSend {
         } catch let error as TransfersProviderError {
             throw error.asWalletServiceError()
         } catch {
-            throw WalletServiceError.internalError(
-                message: String.adamant.sharedErrors.unknownError,
-                error: nil
+            throw WalletServiceError.remoteServiceError(
+                message: error.localizedDescription,
+                error: error
             )
         }
     }
