@@ -360,7 +360,7 @@ extension ERC20WalletService: InitiatedWithPassphraseService {
             throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: error)
         }
         
-        erc20ApiService.keystoreManager = .init([keystore])
+        await erc20ApiService.setKeystoreManager(.init([keystore]))
         
         guard let ethAddress = keystore.addresses?.first else {
             throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: nil)

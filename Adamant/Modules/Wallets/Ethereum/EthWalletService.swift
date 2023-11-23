@@ -385,7 +385,7 @@ extension EthWalletService: InitiatedWithPassphraseService {
             }
             
             walletStorage = .init(keystore: store)
-            ethApiService.keystoreManager = .init([store])
+            await ethApiService.setKeystoreManager(.init([store]))
         } catch {
             throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: error)
         }

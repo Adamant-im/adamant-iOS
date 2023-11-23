@@ -11,9 +11,9 @@ import Foundation
 import web3swift
 import Web3Core
 
-final class EthApiCore: BlockchainHealthCheckableService {
+actor EthApiCore: BlockchainHealthCheckableService {
     let apiCore: APICoreProtocol
-    var keystoreManager: KeystoreManager?
+    private(set) var keystoreManager: KeystoreManager?
 
     func makeWeb3(node: Node) async -> WalletServiceResult<Web3> {
         do {
@@ -65,6 +65,10 @@ final class EthApiCore: BlockchainHealthCheckableService {
         }
     }
     
+    func setKeystoreManager(_ keystoreManager: KeystoreManager) {
+        self.keystoreManager = keystoreManager
+    }
+    
     init(apiCore: APICoreProtocol) {
         self.apiCore = apiCore
     }
@@ -74,8 +78,7 @@ class EthApiService: WalletApiService {
     let api: BlockchainHealthCheckWrapper<EthApiCore>
     
     var keystoreManager: KeystoreManager? {
-        get { api.service.keystoreManager }
-        set { api.service.keystoreManager = newValue }
+        get async { await api.service.keystoreManager }
     }
     
     var preferredNodeIds: [UUID] {
@@ -110,6 +113,10 @@ class EthApiService: WalletApiService {
         await api.request { core, node in
             await core.getStatusInfo(node: node)
         }
+    }
+    
+    func setKeystoreManager(_ keystoreManager: KeystoreManager) async {
+        await api.service.setKeystoreManager(keystoreManager)
     }
 }
 

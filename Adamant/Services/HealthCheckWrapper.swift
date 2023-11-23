@@ -23,8 +23,7 @@ class HealthCheckWrapper<Service, Error: HealthCheckableError> {
     let service: Service
     let normalUpdateInterval: TimeInterval
     let crucialUpdateInterval: TimeInterval
-    
-    @Atomic var nodeGroup: NodeGroup
+    let nodeGroup: NodeGroup
     
     @Atomic var fastestNodeMode = true
     @Atomic var healthCheckTimerSubscription: AnyCancellable?
