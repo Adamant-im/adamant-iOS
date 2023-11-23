@@ -25,7 +25,7 @@ extension ERC20WalletService: WalletServiceTwoStepSend {
             throw WalletServiceError.accountNotFound
         }
         
-        guard let keystoreManager = erc20ApiService.keystoreManager else {
+        guard let keystoreManager = await erc20ApiService.keystoreManager else {
             throw WalletServiceError.internalError(message: "Failed to get web3.provider.KeystoreManager", error: nil)
         }
         
