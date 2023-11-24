@@ -942,7 +942,8 @@ final class AccountViewController: FormViewController {
     }
     
     private func addVibrationRow() {
-        guard let appSection = form.sectionBy(tag: Sections.application.tag)
+        guard let appSection = form.sectionBy(tag: Sections.application.tag),
+              form.rowBy(tag: Rows.vibration.tag) == nil
         else { return }
         
         let vibrationRow = LabelRow {
