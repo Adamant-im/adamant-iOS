@@ -28,15 +28,18 @@ actor EthApiCore: BlockchainHealthCheckableService {
     
     func performRequest<Success>(
         node: Node,
-        _ body: @escaping (_ web3: Web3) async throws -> Success
+        _ body: @escaping @Sendable (_ web3: Web3) async throws -> Success
     ) async -> WalletServiceResult<Success> {
-        await makeWeb3(node: node).asyncMap { web3 in
+        switch await makeWeb3(node: node) {
+        case let .success(web3):
             do {
                 return .success(try await body(web3))
             } catch {
                 return .failure(mapError(error))
             }
-        }.flatMap { $0 }
+        case let .failure(error):
+            return .failure(error)
+        }
     }
     
     func performRequest<Success>(
