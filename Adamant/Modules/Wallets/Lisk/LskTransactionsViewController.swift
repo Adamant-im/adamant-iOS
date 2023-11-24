@@ -87,7 +87,8 @@ extension Transactions.TransactionModel: TransactionDetails {
     
     var transactionStatus: TransactionStatus? {
         guard let confirmations = confirmations,
-              let height = height
+              let height = height,
+              confirmations > .zero
         else { return .notInitiated }
         
         if confirmations < height { return .registered }
@@ -97,10 +98,10 @@ extension Transactions.TransactionModel: TransactionDetails {
             if conf > 1 {
                 return .success
             } else {
-                return .registered
+                return .pending
             }
         }
-        return .registered
+        return .notInitiated
     }
     
     var senderAddress: String {

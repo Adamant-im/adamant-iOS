@@ -108,11 +108,14 @@ final class TransactionTableViewCell: UITableViewCell {
             } else {
                 dateLabel.text = nil
             }
+        case .notInitiated:
+            dateLabel.text = TransactionDetailsViewControllerBase.awaitingValueString
         case .failed:
             dateLabel.text = TransactionStatus.failed.localized
-        default:
+        case .pending, .registered:
             dateLabel.text = TransactionStatus.pending.localized
-            dateLabel.textColor = TransactionStatus.pending.color
+        default:
+            dateLabel.text = TransactionDetailsViewControllerBase.awaitingValueString
         }
         
         if let partnerName = transaction.partnerName {
@@ -142,7 +145,7 @@ private extension TransactionStatus {
         switch self {
         case .failed:
             return .adamant.danger
-        case .pending:
+        case .pending, .registered:
             return .adamant.alert
         default:
             return .adamant.secondary
