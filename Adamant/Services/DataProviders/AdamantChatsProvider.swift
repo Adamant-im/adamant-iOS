@@ -1823,8 +1823,10 @@ extension AdamantChatsProvider {
     func markChatAsRead(chatroom: Chatroom) {
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         privateContext.parent = self.stack.container.viewContext
-        chatroom.markAsReaded()
-        try? privateContext.save()
+        privateContext.perform {
+            chatroom.markAsReaded()
+            try? privateContext.save()
+        }
     }
     
     private func onConnectionToTheInternetRestored() {

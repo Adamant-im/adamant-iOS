@@ -272,7 +272,7 @@
 "ApiService.InternalError.ParsingFailed" = "Parsing failed. Report a bug";
 
 /* Serious internal error: No nodes available */
-"ApiService.InternalError.NoNodesAvailable" = "No active %@ nodes. Review the Coin node list";
+"ApiService.InternalError.NoNodesAvailable" = "No active %@ nodes. Review the node list";
 
 /* Eureka forms Cancel button */
 "Cancel" = "Cancel";
