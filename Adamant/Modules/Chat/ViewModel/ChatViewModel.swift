@@ -567,6 +567,11 @@ final class ChatViewModel: NSObject {
         let tx = chatTransactions.first(where: { $0.txId == arg.messageId })
         guard tx?.statusEnum == .delivered else { return }
         
+        let amount = tx?.amountValue ?? .zero
+        if !amount.isZero && !isSendingAvailable {
+            return
+        }
+        
         let presentReactions = isSendingAvailable && tx?.isFake == false
         
         dialog.send(
