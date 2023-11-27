@@ -73,9 +73,11 @@ private extension BlockchainHealthCheckWrapper {
         currentRequests.insert(node.id)
         defer { currentRequests.remove(node.id) }
         
-        switch await service.getStatusInfo(node: node) {
-        case let .success(statusInfo):
-            nodesStorage.updateNodeStatus(id: node.id, statusInfo: statusInfo)
+        let statusInfo = await service.getStatusInfo(node: node)
+        nodesStorage.updateNodeStatus(id: node.id, statusInfo: try? statusInfo.get())
+        
+        switch statusInfo {
+        case .success:
             updateNodesAvailability(forceInclude: node.id)
         case let .failure(error):
             guard !error.isRequestCancelledError else { return }

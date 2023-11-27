@@ -11,7 +11,8 @@ import Foundation
 import web3swift
 import Web3Core
 
-actor EthApiCore: BlockchainHealthCheckableService {
+@MainActor
+final class EthApiCore: BlockchainHealthCheckableService {
     let apiCore: APICoreProtocol
     private(set) var keystoreManager: KeystoreManager?
 
@@ -42,16 +43,6 @@ actor EthApiCore: BlockchainHealthCheckableService {
         }
     }
     
-    func performRequest<Success>(
-        _ body: @escaping () async throws -> Success
-    ) async -> WalletServiceResult<Success> {
-        do {
-            return .success(try await body())
-        } catch {
-            return .failure(mapError(error))
-        }
-    }
-    
     func getStatusInfo(node: Node) async -> WalletServiceResult<NodeStatusInfo> {
         await performRequest(node: node) { web3 in
             let startTimestamp = Date.now.timeIntervalSince1970
@@ -72,7 +63,7 @@ actor EthApiCore: BlockchainHealthCheckableService {
         self.keystoreManager = keystoreManager
     }
     
-    init(apiCore: APICoreProtocol) {
+    nonisolated init(apiCore: APICoreProtocol) {
         self.apiCore = apiCore
     }
 }
