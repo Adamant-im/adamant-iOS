@@ -687,8 +687,7 @@ extension EthWalletService {
             "contract_to": "eq."
         ]
         
-        let transactionsFrom: [EthTransactionShort] = try await ethApiService.requestApiCore {
-            core, node in
+        let transactionsFrom: [EthTransactionShort] = try await ethApiService.requestApiCore { core, node in
             await core.sendRequestJsonResponse(
                 node: node,
                 path: EthWalletService.transactionsListApiSubpath,
@@ -698,8 +697,7 @@ extension EthWalletService {
             )
         }.get()
         
-        let transactionsTo: [EthTransactionShort] = try await ethApiService.requestApiCore {
-            core, node in
+        let transactionsTo: [EthTransactionShort] = try await ethApiService.requestApiCore { core, node in
             await core.sendRequestJsonResponse(
                 node: node,
                 path: EthWalletService.transactionsListApiSubpath,
@@ -737,7 +735,7 @@ extension EthWalletService {
                 recipientAddress: transaction.to,
                 dateValue: transaction.date,
                 amountValue: transaction.value,
-                feeValue: nil,
+                feeValue: transaction.gasUsed * transaction.gasPrice,
                 confirmationsValue: nil,
                 blockValue: nil,
                 isOutgoing: isOutgoing,
