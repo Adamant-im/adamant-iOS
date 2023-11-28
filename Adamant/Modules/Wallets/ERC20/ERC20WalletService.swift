@@ -122,7 +122,6 @@ final class ERC20WalletService: WalletService {
     let token: ERC20Token
     @Atomic private(set) var enabled = true
     @Atomic private var subscriptions = Set<AnyCancellable>()
-    @Atomic private var initialBalanceCheck = false
     
     // MARK: - State
     @Atomic private (set) var state: WalletServiceState = .notInitiated
@@ -199,7 +198,6 @@ final class ERC20WalletService: WalletService {
             .receive(on: OperationQueue.main)
             .sink { [weak self] _ in
                 self?.ethWallet = nil
-                self?.initialBalanceCheck = false
                 if let balanceObserver = self?.balanceObserver {
                     NotificationCenter.default.removeObserver(balanceObserver)
                     self?.balanceObserver = nil
@@ -239,20 +237,19 @@ final class ERC20WalletService: WalletService {
         setState(.updating)
         
         if let balance = try? await getBalance(forAddress: wallet.ethAddress) {
-            wallet.isBalanceInitialized = true
             let notification: Notification.Name?
-            let isRaised = (wallet.balance < balance) && !initialBalanceCheck
+            let isRaised = (wallet.balance < balance) && wallet.isBalanceInitialized
             
             if wallet.balance != balance {
                 wallet.balance = balance
                 notification = walletUpdatedNotification
-                initialBalanceCheck = false
-            } else if initialBalanceCheck {
-                initialBalanceCheck = false
+            } else if !wallet.isBalanceInitialized {
                 notification = walletUpdatedNotification
             } else {
                 notification = nil
             }
+            
+            wallet.isBalanceInitialized = true
             
             if isRaised {
                 vibroService.applyVibration(.success)
@@ -375,7 +372,12 @@ extension ERC20WalletService: InitiatedWithPassphraseService {
             NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
         
-        self.initialBalanceCheck = true
+        NotificationCenter.default.post(
+            name: walletUpdatedNotification,
+            object: self,
+            userInfo: [AdamantUserInfoKey.WalletService.wallet: eWallet]
+        )
+        
         self.setState(.upToDate, silent: true)
         Task {
             await update()

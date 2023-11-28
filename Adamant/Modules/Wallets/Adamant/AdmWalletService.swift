@@ -142,14 +142,16 @@ final class AdmWalletService: NSObject, WalletService {
         let isRaised: Bool
         
         if let wallet = wallet as? AdmWallet {
-            wallet.isBalanceInitialized = true
             isRaised = (wallet.balance < account.balance) && wallet.isBalanceInitialized
             if wallet.balance != account.balance {
                 wallet.balance = account.balance
                 notify = true
+            } else if wallet.isBalanceInitialized {
+                notify = true
             } else {
                 notify = false
             }
+            wallet.isBalanceInitialized = true
         } else {
             let wallet = AdmWallet(address: account.address)
             wallet.isBalanceInitialized = true

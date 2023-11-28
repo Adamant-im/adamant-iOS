@@ -85,7 +85,6 @@ final class LskWalletService: WalletService {
 	let transferAvailable: Bool = true
     let netHash = Constants.Nethash.main
     
-    @Atomic private var initialBalanceCheck = false
     @Atomic private(set) var lskWallet: LskWallet?
     
     let defaultDispatchQueue = DispatchQueue(
@@ -161,7 +160,6 @@ final class LskWalletService: WalletService {
             .receive(on: OperationQueue.main)
             .sink { [weak self] _ in
                 self?.lskWallet = nil
-                self?.initialBalanceCheck = false
                 if let balanceObserver = self?.balanceObserver {
                     NotificationCenter.default.removeObserver(balanceObserver)
                     self?.balanceObserver = nil
@@ -208,21 +206,20 @@ final class LskWalletService: WalletService {
         }
         
         if let balance = try? await getBalance() {
-            let isRaised = (wallet.balance < balance) && !initialBalanceCheck
-            
-            wallet.isBalanceInitialized = true
             let notification: Notification.Name?
+            
+            let isRaised = (wallet.balance < balance) && wallet.isBalanceInitialized
             
             if wallet.balance != balance {
                 wallet.balance = balance
                 notification = walletUpdatedNotification
-                initialBalanceCheck = false
-            } else if initialBalanceCheck {
-                initialBalanceCheck = false
+            } else if !wallet.isBalanceInitialized {
                 notification = walletUpdatedNotification
             } else {
                 notification = nil
             }
+            
+            wallet.isBalanceInitialized = true
             
             if isRaised {
                 vibroService.applyVibration(.success)
@@ -312,6 +309,12 @@ extension LskWalletService: InitiatedWithPassphraseService {
             // MARK: 3. Update
             let wallet = LskWallet(address: address, keyPair: keyPair, nounce: "", isNewApi: true)
             self.lskWallet = wallet
+            
+            NotificationCenter.default.post(
+                name: walletUpdatedNotification,
+                object: self,
+                userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
+            )
         } catch {
             print("\(error)")
             throw WalletServiceError.accountNotFound
@@ -337,7 +340,6 @@ extension LskWalletService: InitiatedWithPassphraseService {
                 }
             }
             
-            service.initialBalanceCheck = true
             service.setState(.upToDate, silent: true)
             
             Task {
