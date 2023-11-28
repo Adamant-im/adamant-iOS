@@ -117,7 +117,6 @@ final class DashWalletService: WalletService {
     @Atomic private (set) var dashWallet: DashWallet?
     @Atomic private (set) var enabled = true
     @Atomic public var network: Network
-    @Atomic private var initialBalanceCheck = false
     
     let defaultDispatchQueue = DispatchQueue(label: "im.adamant.dashWalletService", qos: .userInteractive, attributes: [.concurrent])
     
@@ -191,7 +190,6 @@ final class DashWalletService: WalletService {
             .receive(on: OperationQueue.main)
             .sink { [weak self] _ in
                 self?.dashWallet = nil
-                self?.initialBalanceCheck = false
                 if let balanceObserver = self?.balanceObserver {
                     NotificationCenter.default.removeObserver(balanceObserver)
                     self?.balanceObserver = nil
@@ -231,20 +229,19 @@ final class DashWalletService: WalletService {
         setState(.updating)
         
         if let balance = try? await getBalance() {
-            wallet.isBalanceInitialized = true
             let notification: Notification.Name?
-            let isRaised = (wallet.balance < balance) && !initialBalanceCheck
+            let isRaised = (wallet.balance < balance) && wallet.isBalanceInitialized
             
             if wallet.balance != balance {
                 wallet.balance = balance
                 notification = walletUpdatedNotification
-                initialBalanceCheck = false
-            } else if initialBalanceCheck {
-                initialBalanceCheck = false
+            } else if !wallet.isBalanceInitialized {
                 notification = walletUpdatedNotification
             } else {
                 notification = nil
             }
+            
+            wallet.isBalanceInitialized = true
             
             if isRaised {
                 vibroService.applyVibration(.success)
@@ -304,6 +301,12 @@ extension DashWalletService: InitiatedWithPassphraseService {
         
         self.dashWallet = eWallet
         
+        NotificationCenter.default.post(
+            name: walletUpdatedNotification,
+            object: self,
+            userInfo: [AdamantUserInfoKey.WalletService.wallet: eWallet]
+        )
+        
         if !self.enabled {
             self.enabled = true
             NotificationCenter.default.post(name: self.serviceEnabledChanged, object: self)
@@ -319,7 +322,6 @@ extension DashWalletService: InitiatedWithPassphraseService {
                 }
             }
             
-            service.initialBalanceCheck = true
             service.setState(.upToDate, silent: true)
             Task {
                 service.update()
