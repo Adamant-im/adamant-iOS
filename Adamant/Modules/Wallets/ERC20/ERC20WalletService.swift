@@ -569,7 +569,7 @@ extension ERC20WalletService {
                 recipientAddress: transaction.to,
                 dateValue: transaction.date,
                 amountValue: transaction.contract_value.asDecimal(exponent: exponent),
-                feeValue: nil,
+                feeValue: transaction.gasUsed * transaction.gasPrice,
                 confirmationsValue: nil,
                 blockValue: nil,
                 isOutgoing: isOutgoing,

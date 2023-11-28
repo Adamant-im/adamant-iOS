@@ -70,6 +70,7 @@ final class AdamantCoinStorageService: NSObject, CoinStorageService {
             coinTransaction.transactionId = transaction.txId
             coinTransaction.transactionStatus = transaction.transactionStatus
             coinTransaction.blockchainType = blockchainType
+            coinTransaction.fee = NSDecimalNumber(decimal: transaction.feeValue ?? 0)
             
             coinTransactions.append(coinTransaction)
         }
