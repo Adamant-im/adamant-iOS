@@ -195,6 +195,8 @@ final class DashWalletService: WalletService {
                     self?.balanceObserver = nil
                 }
                 self?.coinStorage.clear()
+                self?.hasMoreOldTransactions = true
+                self?.historyTransactions = []
             }
             .store(in: &subscriptions)
     }
