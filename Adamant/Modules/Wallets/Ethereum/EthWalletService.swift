@@ -218,6 +218,8 @@ final class EthWalletService: WalletService {
                     self?.balanceObserver = nil
                 }
                 self?.coinStorage.clear()
+                self?.hasMoreOldTransactions = true
+                self?.historyTransactions = []
             }
             .store(in: &subscriptions)
     }

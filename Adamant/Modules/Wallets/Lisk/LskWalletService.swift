@@ -165,6 +165,8 @@ final class LskWalletService: WalletService {
                     self?.balanceObserver = nil
                 }
                 self?.coinStorage.clear()
+                self?.hasMoreOldTransactions = true
+                self?.transactions = []
             }
             .store(in: &subscriptions)
     }
