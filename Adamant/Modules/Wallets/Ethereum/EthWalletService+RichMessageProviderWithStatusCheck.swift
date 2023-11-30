@@ -71,7 +71,7 @@ private extension EthWalletService {
     func getTransactionInfo(hash: String, web3: Web3) async throws -> EthTransactionInfo {
         try await withThrowingTaskGroup(
             of: EthTransactionInfoElement.self,
-            returning: EthTransactionInfo.self
+            returning: Atomic<EthTransactionInfo>.self
         ) { group in
             group.addTask(priority: .userInitiated) {
                 .details(try await web3.eth.transactionDetails(hash))
@@ -81,15 +81,17 @@ private extension EthWalletService {
                 .receipt(try await web3.eth.transactionReceipt(hash))
             }
             
-            return try await group.reduce(into: .init()) { result, value in
+            return try await group.reduce(
+                into: .init(wrappedValue: .init())
+            ) { result, value in
                 switch value {
                 case let .receipt(receipt):
-                    result.receipt = receipt
+                    result.wrappedValue.receipt = receipt
                 case let .details(details):
-                    result.details = details
+                    result.wrappedValue.details = details
                 }
             }
-        }
+        }.wrappedValue
     }
     
     func getStatus(

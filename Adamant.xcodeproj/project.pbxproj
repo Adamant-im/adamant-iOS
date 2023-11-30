@@ -296,6 +296,7 @@
 		93C7944E2B077C1F00408826 /* DashSendRawTransactionDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C7944D2B077C1F00408826 /* DashSendRawTransactionDTO.swift */; };
 		93CC8DC7296F00D6003772BF /* ChatTransactionContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CC8DC6296F00D6003772BF /* ChatTransactionContainerView.swift */; };
 		93CC8DC9296F01DE003772BF /* ChatTransactionContainerView+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CC8DC8296F01DE003772BF /* ChatTransactionContainerView+Model.swift */; };
+		93CC94C12B17EE73004842AC /* EthApiCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CC94C02B17EE73004842AC /* EthApiCore.swift */; };
 		93CCAE752B06CC3600EA5B94 /* LskNodeApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CCAE742B06CC3600EA5B94 /* LskNodeApiService.swift */; };
 		93CCAE772B06D6CC00EA5B94 /* LskServiceApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CCAE762B06D6CC00EA5B94 /* LskServiceApiService.swift */; };
 		93CCAE792B06D81D00EA5B94 /* DogeApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CCAE782B06D81D00EA5B94 /* DogeApiService.swift */; };
@@ -920,6 +921,7 @@
 		93C7944D2B077C1F00408826 /* DashSendRawTransactionDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashSendRawTransactionDTO.swift; sourceTree = "<group>"; };
 		93CC8DC6296F00D6003772BF /* ChatTransactionContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTransactionContainerView.swift; sourceTree = "<group>"; };
 		93CC8DC8296F01DE003772BF /* ChatTransactionContainerView+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatTransactionContainerView+Model.swift"; sourceTree = "<group>"; };
+		93CC94C02B17EE73004842AC /* EthApiCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthApiCore.swift; sourceTree = "<group>"; };
 		93CCAE742B06CC3600EA5B94 /* LskNodeApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LskNodeApiService.swift; sourceTree = "<group>"; };
 		93CCAE762B06D6CC00EA5B94 /* LskServiceApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LskServiceApiService.swift; sourceTree = "<group>"; };
 		93CCAE782B06D81D00EA5B94 /* DogeApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeApiService.swift; sourceTree = "<group>"; };
@@ -2175,6 +2177,7 @@
 				E993302121354BC300CD5200 /* EthWalletFactory.swift */,
 				E940087A2114ED0600CD2D67 /* EthWalletService.swift */,
 				93FC169C2B019F440062B507 /* EthApiService.swift */,
+				93CC94C02B17EE73004842AC /* EthApiCore.swift */,
 				4186B333294200C5006594A3 /* EthWalletService+DynamicConstants.swift */,
 				E9AA8BF9212C166600F9249F /* EthWalletService+Send.swift */,
 				E9FEECA52143C300007DD7C8 /* EthWalletService+RichMessageProvider.swift */,
@@ -3025,6 +3028,7 @@
 				E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */,
 				41E3C9CC2A0E20F500AF0985 /* AdamantCoinTools.swift in Sources */,
 				93ADE0712ACA66AF008ED641 /* VibrationSelectionViewModel.swift in Sources */,
+				93CC94C12B17EE73004842AC /* EthApiCore.swift in Sources */,
 				93FC169D2B019F440062B507 /* EthApiService.swift in Sources */,
 				9371130F2996EDA900F64CF9 /* ChatRefreshMock.swift in Sources */,
 				93547BCA29E2262D00B0914B /* WelcomeViewController.swift in Sources */,
