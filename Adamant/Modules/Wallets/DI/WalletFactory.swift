@@ -10,7 +10,7 @@ import UIKit
 
 @MainActor
 protocol WalletFactory {
-    associatedtype Service = WalletService
+    associatedtype Service = WalletCoreProtocol
     
     func makeWalletVC(service: Service, screensFactory: ScreensFactory) -> WalletViewController
     func makeTransferListVC(service: Service, screensFactory: ScreensFactory) -> UIViewController

@@ -29,10 +29,6 @@ final class DashTransactionDetailsViewController: TransactionDetailsViewControll
         return control
     }()
     
-    override var richProvider: RichMessageProviderWithStatusCheck? {
-        return service
-    }
-    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {

@@ -11,7 +11,7 @@ import web3swift
 import struct BigInt.BigUInt
 import CommonKit
 
-extension ERC20WalletService: RichMessageProviderWithStatusCheck {
+extension ERC20WalletService {
     func statusInfoFor(transaction: CoinTransaction) async -> TransactionStatusInfo {
         let hash: String?
         

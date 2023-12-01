@@ -10,13 +10,13 @@ import UIKit
 
 @MainActor
 protocol WalletFactoryCompose {
-    func makeWalletVC(service: WalletService, screensFactory: ScreensFactory) -> WalletViewController
-    func makeTransferListVC(service: WalletService, screenFactory: ScreensFactory) -> UIViewController
-    func makeTransferVC(service: WalletService, screenFactory: ScreensFactory) -> TransferViewControllerBase
-    func makeDetailsVC(service: WalletService) -> TransactionDetailsViewControllerBase
+    func makeWalletVC(service: WalletCoreProtocol, screensFactory: ScreensFactory) -> WalletViewController
+    func makeTransferListVC(service: WalletCoreProtocol, screenFactory: ScreensFactory) -> UIViewController
+    func makeTransferVC(service: WalletCoreProtocol, screenFactory: ScreensFactory) -> TransferViewControllerBase
+    func makeDetailsVC(service: WalletCoreProtocol) -> TransactionDetailsViewControllerBase
     
     func makeDetailsVC(
-        service: WalletService,
+        service: WalletCoreProtocol,
         transaction: RichMessageTransaction
     ) -> UIViewController?
 }

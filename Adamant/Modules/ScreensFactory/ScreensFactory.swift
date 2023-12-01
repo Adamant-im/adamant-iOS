@@ -12,13 +12,13 @@ import UIKit
 protocol ScreensFactory {
     // MARK: Wallets
     
-    func makeWalletVC(service: WalletService) -> WalletViewController
-    func makeTransferListVC(service: WalletService) -> UIViewController
-    func makeTransferVC(service: WalletService) -> TransferViewControllerBase
-    func makeDetailsVC(service: WalletService) -> TransactionDetailsViewControllerBase
+    func makeWalletVC(service: WalletCoreProtocol) -> WalletViewController
+    func makeTransferListVC(service: WalletCoreProtocol) -> UIViewController
+    func makeTransferVC(service: WalletCoreProtocol) -> TransferViewControllerBase
+    func makeDetailsVC(service: WalletCoreProtocol) -> TransactionDetailsViewControllerBase
     
     func makeDetailsVC(
-        service: WalletService,
+        service: WalletCoreProtocol,
         transaction: RichMessageTransaction
     ) -> UIViewController?
     

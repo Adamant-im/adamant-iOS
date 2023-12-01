@@ -15,6 +15,7 @@ final class AdamantVisibleWalletsService: VisibleWalletsService {
     // MARK: Dependencies
     let securedStore: SecuredStore
     let accountService: AccountService
+    let walletsServiceCompose: WalletServiceCompose
     
     // MARK: Proprieties
     
@@ -35,9 +36,14 @@ final class AdamantVisibleWalletsService: VisibleWalletsService {
     @Atomic private var notificationsSet: Set<AnyCancellable> = []
     
     // MARK: Lifecycle
-    init(securedStore: SecuredStore, accountService: AccountService) {
+    init(
+        securedStore: SecuredStore,
+        accountService: AccountService,
+        walletsServiceCompose: WalletServiceCompose
+    ) {
         self.securedStore = securedStore
         self.accountService = accountService
+        self.walletsServiceCompose = walletsServiceCompose
         
         NotificationCenter.default
             .publisher(for: .AdamantAccountService.userLoggedOut)
@@ -82,13 +88,13 @@ final class AdamantVisibleWalletsService: VisibleWalletsService {
     
     // MARK: Visible
     
-    func addToInvisibleWallets(_ wallet: WalletService) {
+    func addToInvisibleWallets(_ wallet: WalletCoreProtocol) {
         var wallets = getInvisibleWallets()
         wallets.append(wallet.tokenUnicID)
         setInvisibleWallets(wallets)
     }
     
-    func removeFromInvisibleWallets(_ wallet: WalletService) {
+    func removeFromInvisibleWallets(_ wallet: WalletCoreProtocol) {
         var wallets = getInvisibleWallets()
         guard let index = wallets.firstIndex(of: wallet.tokenUnicID) else { return }
         wallets.remove(at: index)
@@ -97,9 +103,9 @@ final class AdamantVisibleWalletsService: VisibleWalletsService {
     
     func getInvisibleWallets() -> [String] {
         guard isUseCustomFilter(for: .visibility) else {
-            let wallets = accountService.wallets
-                .filter { $0.defaultVisibility != true }
-                .map { $0.tokenUnicID }
+            let wallets = walletsServiceCompose.getWallets()
+                .filter { $0.core.defaultVisibility != true }
+                .map { $0.core.tokenUnicID }
             return wallets
         }
         
@@ -109,7 +115,7 @@ final class AdamantVisibleWalletsService: VisibleWalletsService {
         return wallets
     }
     
-    func isInvisible(_ wallet: WalletService) -> Bool {
+    func isInvisible(_ wallet: WalletCoreProtocol) -> Bool {
         return invisibleWallets.contains(wallet.tokenUnicID)
     }
     
@@ -121,7 +127,7 @@ final class AdamantVisibleWalletsService: VisibleWalletsService {
     
     // MARK: Index Positions
     
-    func getIndexPosition(for wallet: WalletService) -> Int? {
+    func getIndexPosition(for wallet: WalletCoreProtocol) -> Int? {
         return indexesWallets.firstIndex(of: wallet.tokenUnicID)
     }
     
@@ -129,9 +135,10 @@ final class AdamantVisibleWalletsService: VisibleWalletsService {
         guard isUseCustomFilter(for: .indexes) else {
             // Sort by default ordinal number
             // Coins without an order are shown last, alphabetically
+            let wallets = walletsServiceCompose.getWallets().map { $0.core }
             let walletsIV = includeInvisible
-            ? accountService.wallets
-            : accountService.wallets.filter { $0.defaultVisibility == true }
+            ? wallets
+            : wallets.filter { $0.defaultVisibility == true }
             
             var walletsWithIndexes = walletsIV
                 .filter { $0.defaultOrdinalLevel != nil }
@@ -165,7 +172,7 @@ final class AdamantVisibleWalletsService: VisibleWalletsService {
         setUseCustomFilter(for: .indexes, value: true)
     }
     
-    func setIndexPositionWallets(_ wallets: [WalletService], includeInvisible: Bool) {
+    func setIndexPositionWallets(_ wallets: [WalletCoreProtocol], includeInvisible: Bool) {
         let wallets = includeInvisible
         ? wallets
         : wallets.filter { !isInvisible($0) }
@@ -202,9 +209,10 @@ final class AdamantVisibleWalletsService: VisibleWalletsService {
      We can't use only point 2, because in the future we can add new tokens that won't be in the database
      */
     func sorted<T>(includeInvisible: Bool) -> [T] {
+        let wallets = walletsServiceCompose.getWallets().map { $0.core }
         var availableServices = includeInvisible
-        ? accountService.wallets
-        : accountService.wallets.filter { !isInvisible($0) }
+        ? wallets
+        : wallets.filter { !isInvisible($0) }
         
         for (newIndex, tokenUnicID) in getSortedWallets(includeInvisible: includeInvisible).enumerated() {
             guard let index = availableServices.firstIndex(

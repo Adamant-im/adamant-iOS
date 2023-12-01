@@ -47,18 +47,19 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     
     // MARK: - Dependencies
     
-    var dialogService: DialogService!
-    var currencyInfoService: CurrencyInfoService!
-    var accountService: AccountService!
-    var screensFactory: ScreensFactory!
+    private let currencyInfoService: CurrencyInfoService
+    private let accountService: AccountService
+    private let walletServiceCompose: WalletServiceCompose
     
+    let dialogService: DialogService
+    let screensFactory: ScreensFactory
+    var service: WalletCoreProtocol?
+
     // MARK: - Properties, WalletViewController
     
     var viewController: UIViewController { return self }
     var height: CGFloat { return tableView.frame.origin.y + tableView.contentSize.height }
-    
-    var service: WalletService?
-    
+        
     weak var delegate: WalletViewControllerDelegate?
     
     private lazy var fiatFormatter: NumberFormatter = {
@@ -75,6 +76,29 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     @IBOutlet weak var errorView: UIView!
     @IBOutlet weak var errorImageView: UIImageView!
     @IBOutlet weak var errorLabel: UILabel!
+    
+    // MARK: Init
+    
+    init(
+        dialogService: DialogService,
+        currencyInfoService: CurrencyInfoService,
+        accountService: AccountService,
+        screensFactory: ScreensFactory,
+        walletServiceCompose: WalletServiceCompose,
+        service: WalletCoreProtocol?
+    ) {
+        self.dialogService = dialogService
+        self.currencyInfoService = currencyInfoService
+        self.accountService = accountService
+        self.screensFactory = screensFactory
+        self.walletServiceCompose = walletServiceCompose
+        self.service = service
+        super.init(nibName: "WalletViewControllerBase", bundle: nil)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - Lifecycle
     
@@ -178,9 +202,11 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 if ERC20Token.supportedTokens.contains(where: { token in
                     return token.symbol == service.tokenSymbol
                 }) {
-                    let ethWallet = accountService.wallets.first { wallet in
-                        return wallet.tokenSymbol == "ETH"
-                    }
+                    
+                    let ethWallet = walletServiceCompose.getWallet(
+                        by: EthWalletService.richMessageType
+                    )?.core
+                    
                     vc.rootCoinBalance = ethWallet?.wallet?.balance
                 }
                 

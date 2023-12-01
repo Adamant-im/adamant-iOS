@@ -147,7 +147,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
     let currencyInfo: CurrencyInfoService
     let addressBookService: AddressBookService
     let accountService: AccountService
-    let walletService: WalletService?
+    let walletService: WalletCoreProtocol?
     
     // MARK: - Properties
     
@@ -188,7 +188,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     private var isFiatSet = false
     
-    var richProvider: RichMessageProviderWithStatusCheck? {
+    var richProvider: WalletService? {
         nil
     }
     
@@ -254,7 +254,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         currencyInfo: CurrencyInfoService,
         addressBookService: AddressBookService,
         accountService: AccountService,
-        walletService: WalletService?
+        walletService: WalletCoreProtocol?
     ) {
         self.dialogService = dialogService
         self.currencyInfo = currencyInfo

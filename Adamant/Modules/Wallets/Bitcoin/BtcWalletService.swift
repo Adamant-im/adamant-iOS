@@ -61,7 +61,7 @@ extension String.adamant {
     }
 }
 
-final class BtcWalletService: WalletService {
+final class BtcWalletService: WalletCoreProtocol {
 
     var tokenSymbol: String {
         type(of: self).currencySymbol
@@ -389,7 +389,7 @@ final class BtcWalletService: WalletService {
 }
 
 // MARK: - WalletInitiatedWithPassphrase
-extension BtcWalletService: InitiatedWithPassphraseService {
+extension BtcWalletService {
     func setInitiationFailed(reason: String) {
         setState(.initiationFailed(reason: reason))
         btcWallet = nil

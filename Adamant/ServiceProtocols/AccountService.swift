@@ -147,9 +147,6 @@ protocol AccountService: AnyObject {
     var account: AdamantAccount? { get }
     var keypair: Keypair? { get }
     
-    // MARK: Wallets
-    var wallets: [WalletService] { get }
-    
     // MARK: Account functions
     
     /// Update logged account info

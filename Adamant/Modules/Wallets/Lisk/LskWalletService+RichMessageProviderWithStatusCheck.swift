@@ -10,7 +10,7 @@ import Foundation
 import LiskKit
 import CommonKit
 
-extension LskWalletService: RichMessageProviderWithStatusCheck {
+extension LskWalletService {
     func statusInfoFor(transaction: CoinTransaction) async -> TransactionStatusInfo {
         let hash: String?
         

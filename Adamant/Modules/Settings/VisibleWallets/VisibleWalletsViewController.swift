@@ -58,8 +58,8 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     
     private let cellIdentifier = "cell"
     private let cellResetIdentifier = "cellReset"
-    private var filteredWallets: [WalletService]?
-    private var wallets: [WalletService] = []
+    private var filteredWallets: [WalletCoreProtocol]?
+    private var wallets: [WalletCoreProtocol] = []
     private var previousAppState: UIApplication.State?
     
     // MARK: - Lifecycle
@@ -141,7 +141,7 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
         }
     }
     
-    private func isInvisible(_ wallet: WalletService) -> Bool {
+    private func isInvisible(_ wallet: WalletCoreProtocol) -> Bool {
         return visibleWalletsService.isInvisible(wallet)
     }
     
@@ -217,7 +217,7 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
             cell.separatorInset = .zero
         }
         
-        let wallet: WalletService
+        let wallet: WalletCoreProtocol
         if let filtered = filteredWallets {
             wallet = filtered[indexPath.row]
         } else {

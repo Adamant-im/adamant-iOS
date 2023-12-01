@@ -13,7 +13,7 @@ import BitcoinKit
 import Combine
 import CommonKit
 
-final class DashWalletService: WalletService {
+final class DashWalletService: WalletCoreProtocol {
     
     var tokenSymbol: String {
         return type(of: self).currencySymbol
@@ -274,7 +274,7 @@ final class DashWalletService: WalletService {
 }
 
 // MARK: - WalletInitiatedWithPassphrase
-extension DashWalletService: InitiatedWithPassphraseService {
+extension DashWalletService {
     func setInitiationFailed(reason: String) {
         setState(.initiationFailed(reason: reason))
         dashWallet = nil

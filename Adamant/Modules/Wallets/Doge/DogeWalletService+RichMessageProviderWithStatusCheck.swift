@@ -9,7 +9,7 @@
 import Foundation
 import CommonKit
 
-extension DogeWalletService: RichMessageProviderWithStatusCheck {
+extension DogeWalletService {
     func statusInfoFor(transaction: CoinTransaction) async -> TransactionStatusInfo {
         let hash: String?
         

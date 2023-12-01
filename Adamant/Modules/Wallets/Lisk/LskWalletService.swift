@@ -17,7 +17,7 @@ import Web3Core
 import Combine
 import CommonKit
 
-final class LskWalletService: WalletService {
+final class LskWalletService: WalletCoreProtocol {
     var wallet: WalletAccount? { return lskWallet }
     
     // MARK: - Notifications
@@ -289,7 +289,7 @@ final class LskWalletService: WalletService {
 }
 
 // MARK: - WalletInitiatedWithPassphrase
-extension LskWalletService: InitiatedWithPassphraseService {
+extension LskWalletService {
     func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
         guard let adamant = accountService.account else {
             throw WalletServiceError.notLogged

@@ -11,7 +11,7 @@ import web3swift
 import Web3Core
 import CommonKit
 
-extension EthWalletService: RichMessageProviderWithStatusCheck {
+extension EthWalletService {
     func statusInfoFor(transaction: CoinTransaction) async -> TransactionStatusInfo {
         let hash: String?
         

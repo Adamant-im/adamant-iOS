@@ -42,7 +42,7 @@ class TransactionsListViewControllerBase: UIViewController {
     
     // MARK: - Dependencies
     
-    var walletService: WalletService!
+    var walletService: WalletCoreProtocol!
     var dialogService: DialogService!
     
     // MARK: - Proprieties

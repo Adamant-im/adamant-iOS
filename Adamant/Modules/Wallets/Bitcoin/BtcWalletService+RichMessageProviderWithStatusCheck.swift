@@ -9,7 +9,7 @@
 import Foundation
 import CommonKit
 
-extension BtcWalletService: RichMessageProviderWithStatusCheck {
+extension BtcWalletService {
     func statusInfoFor(transaction: CoinTransaction) async -> TransactionStatusInfo {
         let hash: String?
         

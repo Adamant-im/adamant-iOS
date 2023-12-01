@@ -54,23 +54,23 @@ struct AdamantScreensFactory: ScreensFactory {
         )
     }
     
-    func makeWalletVC(service: WalletService) -> WalletViewController {
+    func makeWalletVC(service: WalletCoreProtocol) -> WalletViewController {
         walletFactoryCompose.makeWalletVC(service: service, screensFactory: self)
     }
     
-    func makeTransferListVC(service: WalletService) -> UIViewController {
+    func makeTransferListVC(service: WalletCoreProtocol) -> UIViewController {
         walletFactoryCompose.makeTransferListVC(service: service, screenFactory: self)
     }
     
-    func makeTransferVC(service: WalletService) -> TransferViewControllerBase {
+    func makeTransferVC(service: WalletCoreProtocol) -> TransferViewControllerBase {
         walletFactoryCompose.makeTransferVC(service: service, screenFactory: self)
     }
     
-    func makeDetailsVC(service: WalletService) -> TransactionDetailsViewControllerBase {
+    func makeDetailsVC(service: WalletCoreProtocol) -> TransactionDetailsViewControllerBase {
         walletFactoryCompose.makeDetailsVC(service: service)
     }
     
-    func makeDetailsVC(service: WalletService, transaction: RichMessageTransaction) -> UIViewController? {
+    func makeDetailsVC(service: WalletCoreProtocol, transaction: RichMessageTransaction) -> UIViewController? {
         walletFactoryCompose.makeDetailsVC(service: service, transaction: transaction)
     }
     

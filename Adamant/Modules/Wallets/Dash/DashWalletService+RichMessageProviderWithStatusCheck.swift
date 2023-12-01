@@ -9,7 +9,7 @@
 import Foundation
 import CommonKit
 
-extension DashWalletService: RichMessageProviderWithStatusCheck {
+extension DashWalletService {
     func statusInfoFor(transaction: CoinTransaction) async -> TransactionStatusInfo {
         let hash: String?
         

@@ -43,7 +43,7 @@ struct DogeApiCommands {
     }
 }
 
-final class DogeWalletService: WalletService {
+final class DogeWalletService: WalletCoreProtocol {
     var wallet: WalletAccount? { return dogeWallet }
     
     // MARK: RichMessageProvider properties
@@ -57,6 +57,7 @@ final class DogeWalletService: WalletService {
     var addressConverter: AddressConverter!
     var vibroService: VibroService!
     var coreDataStack: CoreDataStack!
+    var chatsProvider: ChatsProvider!
     
     // MARK: - Constants
     static let currencyLogo = UIImage.asset(named: "doge_wallet") ?? .init()
@@ -268,7 +269,7 @@ final class DogeWalletService: WalletService {
 }
 
 // MARK: - WalletInitiatedWithPassphrase
-extension DogeWalletService: InitiatedWithPassphraseService {
+extension DogeWalletService {
     func setInitiationFailed(reason: String) {
         setState(.initiationFailed(reason: reason))
         dogeWallet = nil
@@ -356,6 +357,7 @@ extension DogeWalletService: SwinjectDependentService {
         dogeApiService = container.resolve(DogeApiService.self)
         vibroService = container.resolve(VibroService.self)
         coreDataStack = container.resolve(CoreDataStack.self)
+        chatsProvider = container.resolve(ChatsProvider.self)
         
         addTransactionObserver()
     }
@@ -627,11 +629,15 @@ extension DogeWalletService {
     }
     
     func getLocalTransactionHistory() -> [TransactionDetails] {
-        historyTransactions
+        return historyTransactions
     }
     
     func updateStatus(for id: String, status: TransactionStatus?) {
         coinStorage.updateStatus(for: id, status: status)
+    }
+    
+    func getAllRichTransactions(with id: String) async -> [RichMessageTransaction] {
+        await chatsProvider.getAllRichTransaction(with: id)
     }
 }
 

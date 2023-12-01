@@ -24,7 +24,7 @@ final class ChatViewController: MessagesViewController {
     // MARK: Dependencies
     
     private let storedObjects: [AnyObject]
-    private let richMessageProviders: [String: RichMessageProvider]
+    private let walletServiceCompose: WalletServiceCompose
     private let admService: AdmWalletService
     private let screensFactory: ScreensFactory
     
@@ -73,7 +73,7 @@ final class ChatViewController: MessagesViewController {
     
     init(
         viewModel: ChatViewModel,
-        richMessageProviders: [String: RichMessageProvider],
+        walletServiceCompose: WalletServiceCompose,
         storedObjects: [AnyObject],
         admService: AdmWalletService,
         screensFactory: ScreensFactory,
@@ -81,7 +81,7 @@ final class ChatViewController: MessagesViewController {
     ) {
         self.viewModel = viewModel
         self.storedObjects = storedObjects
-        self.richMessageProviders = richMessageProviders
+        self.walletServiceCompose = walletServiceCompose
         self.admService = admService
         self.screensFactory = screensFactory
         super.init(nibName: nil, bundle: nil)
@@ -678,7 +678,7 @@ private extension ChatViewController {
     func didTapRichMessageTransaction(_ transaction: RichMessageTransaction) {
         guard
             let type = transaction.richType,
-            let provider = richMessageProviders[type],
+            let provider = walletServiceCompose.getWallet(by: type)?.core,
             let vc = screensFactory.makeDetailsVC(service: provider, transaction: transaction)
         else { return }
         

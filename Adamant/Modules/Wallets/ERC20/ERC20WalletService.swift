@@ -16,7 +16,7 @@ import Web3Core
 import Combine
 import CommonKit
 
-final class ERC20WalletService: WalletService {
+final class ERC20WalletService: WalletCoreProtocol {
     // MARK: - Constants
     let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")
     
@@ -336,7 +336,7 @@ final class ERC20WalletService: WalletService {
 }
 
 // MARK: - WalletInitiatedWithPassphrase
-extension ERC20WalletService: InitiatedWithPassphraseService {
+extension ERC20WalletService {
     func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
         
         // MARK: 1. Prepare

@@ -63,7 +63,7 @@ extension Web3Error {
     }
 }
 
-final class EthWalletService: WalletService {
+final class EthWalletService: WalletCoreProtocol {
 	// MARK: - Constants
 	let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")
 	
@@ -357,7 +357,7 @@ final class EthWalletService: WalletService {
 }
 
 // MARK: - WalletInitiatedWithPassphrase
-extension EthWalletService: InitiatedWithPassphraseService {
+extension EthWalletService {
     func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
         guard let adamant = accountService?.account else {
             throw WalletServiceError.notLogged

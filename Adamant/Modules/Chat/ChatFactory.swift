@@ -25,6 +25,7 @@ struct ChatFactory {
     let visibleWalletService: VisibleWalletsService
     let avatarService: AvatarService
     let emojiService: EmojiService
+    let walletServiceCompose: WalletServiceCompose
     
     nonisolated init(assembler: Assembler) {
         chatsProvider = assembler.resolve(ChatsProvider.self)!
@@ -37,11 +38,11 @@ struct ChatFactory {
         visibleWalletService = assembler.resolve(VisibleWalletsService.self)!
         avatarService = assembler.resolve(AvatarService.self)!
         emojiService = assembler.resolve(EmojiService.self)!
+        walletServiceCompose = assembler.resolve(WalletServiceCompose.self)!
     }
     
     func makeViewController(screensFactory: ScreensFactory) -> ChatViewController {
-        let richMessageProviders = makeRichMessageProviders()
-        let viewModel = makeViewModel(richMessageProviders: richMessageProviders)
+        let viewModel = makeViewModel()
         let delegates = makeDelegates(viewModel: viewModel)
         let dialogManager = ChatDialogManager(
             viewModel: viewModel,
@@ -49,13 +50,15 @@ struct ChatFactory {
             emojiService: emojiService
         )
         
-        let admService = accountService.wallets.first { wallet in
+        let wallets = walletServiceCompose.getWallets().map { $0.core }
+        
+        let admService = wallets.first { wallet in
             return wallet is AdmWalletService
         } as! AdmWalletService
         
         let viewController = ChatViewController(
             viewModel: viewModel,
-            richMessageProviders: richMessageProviders,
+            walletServiceCompose: walletServiceCompose,
             storedObjects: delegates.asArray + [dialogManager],
             admService: admService,
             screensFactory: screensFactory,
@@ -87,13 +90,13 @@ private extension ChatFactory {
         }
     }
     
-    func makeViewModel(richMessageProviders: [String: RichMessageProvider]) -> ChatViewModel {
+    func makeViewModel() -> ChatViewModel {
         .init(
             chatsProvider: chatsProvider,
             markdownParser: .init(font: UIFont.systemFont(ofSize: UIFont.systemFontSize)),
             transfersProvider: transferProvider,
             chatMessagesListFactory: .init(chatMessageFactory: .init(
-                richMessageProviders: richMessageProviders
+                walletServiceCompose: walletServiceCompose
             )),
             addressBookService: addressBookService,
             visibleWalletService: visibleWalletService,
@@ -101,22 +104,13 @@ private extension ChatFactory {
             accountProvider: accountProvider,
             richTransactionStatusService: richTransactionStatusService,
             chatCacheService: chatCacheService,
-            richMessageProviders: richMessageProviders,
+            walletServiceCompose: walletServiceCompose,
             avatarService: avatarService,
             chatMessagesListViewModel: .init(
                 avatarService: avatarService,
                 emojiService: emojiService
             ),
             emojiService: emojiService
-        )
-    }
-    
-    func makeRichMessageProviders() -> [String: RichMessageProvider] {
-        .init(
-            uniqueKeysWithValues: accountService
-                .wallets
-                .compactMap { $0 as? RichMessageProvider }
-                .map { ($0.dynamicRichMessageType, $0) }
         )
     }
     

@@ -17,15 +17,15 @@ extension Notification.Name {
     }
 }
 protocol VisibleWalletsService: AnyObject {
-    func addToInvisibleWallets(_ wallet: WalletService)
-    func removeFromInvisibleWallets(_ wallet: WalletService)
+    func addToInvisibleWallets(_ wallet: WalletCoreProtocol)
+    func removeFromInvisibleWallets(_ wallet: WalletCoreProtocol)
     func getInvisibleWallets() -> [String]
-    func isInvisible(_ wallet: WalletService) -> Bool
+    func isInvisible(_ wallet: WalletCoreProtocol) -> Bool
     
     func getSortedWallets(includeInvisible: Bool) -> [String]
     func setIndexPositionWallets(_ indexes: [String], includeInvisible: Bool)
-    func getIndexPosition(for wallet: WalletService) -> Int?
-    func setIndexPositionWallets(_ wallets: [WalletService], includeInvisible: Bool)
+    func getIndexPosition(for wallet: WalletCoreProtocol) -> Int?
+    func setIndexPositionWallets(_ wallets: [WalletCoreProtocol], includeInvisible: Bool)
     
     func reset()
     

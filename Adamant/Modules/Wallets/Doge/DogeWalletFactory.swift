@@ -16,13 +16,14 @@ struct DogeWalletFactory: WalletFactory {
     let assembler: Assembler
     
     func makeWalletVC(service: Service, screensFactory: ScreensFactory) -> WalletViewController {
-        let c = DogeWalletViewController(nibName: "WalletViewControllerBase", bundle: nil)
-        c.dialogService = assembler.resolve(DialogService.self)
-        c.currencyInfoService = assembler.resolve(CurrencyInfoService.self)
-        c.accountService = assembler.resolve(AccountService.self)
-        c.service = service
-        c.screensFactory = screensFactory
-        return c
+        DogeWalletViewController(
+            dialogService: assembler.resolve(DialogService.self)!,
+            currencyInfoService: assembler.resolve(CurrencyInfoService.self)!,
+            accountService: assembler.resolve(AccountService.self)!,
+            screensFactory: screensFactory,
+            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!,
+            service: service
+        )
     }
     
     func makeTransferListVC(service: Service, screensFactory: ScreensFactory) -> UIViewController {

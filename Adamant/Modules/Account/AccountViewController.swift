@@ -140,17 +140,18 @@ final class AccountViewController: FormViewController {
     }
     
     // MARK: - Dependencies
-    var visibleWalletsService: VisibleWalletsService!
-    var accountService: AccountService!
-    var dialogService: DialogService!
-    var screensFactory: ScreensFactory!
-    var notificationsService: NotificationsService!
-    var transfersProvider: TransfersProvider!
-    var localAuth: LocalAuthentication!
     
-    var avatarService: AvatarService!
+    private let visibleWalletsService: VisibleWalletsService
+    private let screensFactory: ScreensFactory
+    private let notificationsService: NotificationsService
+    private let transfersProvider: TransfersProvider
+    private let avatarService: AvatarService
+    private let currencyInfoService: CurrencyInfoService
+    private let walletServiceCompose: WalletServiceCompose
     
-    var currencyInfoService: CurrencyInfoService!
+    let accountService: AccountService
+    let dialogService: DialogService
+    let localAuth: LocalAuthentication
     
     // MARK: - Properties
     
@@ -189,6 +190,38 @@ final class AccountViewController: FormViewController {
         refreshControl.addTarget(self, action: #selector(self.handleRefresh(_:)), for: UIControl.Event.valueChanged)
         return refreshControl
     }()
+    
+    // MARK: - Init
+    
+    init(
+        visibleWalletsService: VisibleWalletsService,
+        accountService: AccountService,
+        dialogService: DialogService,
+        screensFactory: ScreensFactory,
+        notificationsService: NotificationsService,
+        transfersProvider: TransfersProvider,
+        localAuth: LocalAuthentication,
+        avatarService: AvatarService,
+        currencyInfoService: CurrencyInfoService,
+        walletServiceCompose: WalletServiceCompose
+    ) {
+        self.visibleWalletsService = visibleWalletsService
+        self.accountService = accountService
+        self.dialogService = dialogService
+        self.screensFactory = screensFactory
+        self.notificationsService = notificationsService
+        self.transfersProvider = transfersProvider
+        self.localAuth = localAuth
+        self.avatarService = avatarService
+        self.currencyInfoService = currencyInfoService
+        self.walletServiceCompose = walletServiceCompose
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - Lifecycle
     
@@ -265,8 +298,13 @@ final class AccountViewController: FormViewController {
             self?.pagingViewController.reloadData()
         }
         
-        for walletService in accountService.wallets {
-            NotificationCenter.default.addObserver(forName: walletService.walletUpdatedNotification, object: nil, queue: OperationQueue.main, using: callback)
+        for walletService in walletServiceCompose.getWallets() {
+            NotificationCenter.default.addObserver(
+                forName: walletService.core.walletUpdatedNotification,
+                object: nil,
+                queue: OperationQueue.main,
+                using: callback
+            )
         }
         
         // MARK: Rows&Sections
@@ -596,13 +634,12 @@ final class AccountViewController: FormViewController {
             $0.title = localAuth.biometryType.localized
             $0.value = accountService.useBiometry
             
-            if let auth = localAuth {
-                switch auth.biometryType {
-                case .none: $0.cell.imageView?.image = nil
-                case .touchID: $0.cell.imageView?.image = .asset(named: "row_touchid.png")
-                case .faceID: $0.cell.imageView?.image = .asset(named: "row_faceid.png")
-                }
+            switch localAuth.biometryType {
+            case .none: $0.cell.imageView?.image = nil
+            case .touchID: $0.cell.imageView?.image = .asset(named: "row_touchid.png")
+            case .faceID: $0.cell.imageView?.image = .asset(named: "row_faceid.png")
             }
+            
             $0.hidden = Condition.function([], { [weak self] _ -> Bool in
                 guard let showBiometry = self?.showBiometryOptions else {
                     return true
@@ -839,7 +876,7 @@ final class AccountViewController: FormViewController {
     
     private func setupWalletsVC() {
         walletViewControllers.removeAll()
-        let availableServices: [WalletService] = visibleWalletsService.sorted(includeInvisible: false)
+        let availableServices: [WalletCoreProtocol] = visibleWalletsService.sorted(includeInvisible: false)
         availableServices.forEach { walletService in
             walletViewControllers.append(screensFactory.makeWalletVC(service: walletService))
         }

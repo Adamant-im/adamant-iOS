@@ -19,10 +19,10 @@ protocol ComplexTransferViewControllerDelegate: AnyObject {
 final class ComplexTransferViewController: UIViewController {
     // MARK: - Dependencies
     
-    var accountService: AccountService!
-    var visibleWalletsService: VisibleWalletsService!
-    var addressBookService: AddressBookService!
-    var screensFactory: ScreensFactory!
+    private let visibleWalletsService: VisibleWalletsService
+    private let addressBookService: AddressBookService
+    private let screensFactory: ScreensFactory
+    private let walletServiceCompose: WalletServiceCompose
     
     // MARK: - Properties
     var pagingViewController: PagingViewController!
@@ -35,6 +35,26 @@ final class ComplexTransferViewController: UIViewController {
         }
     }
     var replyToMessageId: String?
+    
+    // MARK: Init
+    
+    init(
+        visibleWalletsService: VisibleWalletsService,
+        addressBookService: AddressBookService,
+        screensFactory: ScreensFactory,
+        walletServiceCompose: WalletServiceCompose
+    ) {
+        self.visibleWalletsService = visibleWalletsService
+        self.addressBookService = addressBookService
+        self.screensFactory = screensFactory
+        self.walletServiceCompose = walletServiceCompose
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -129,9 +149,10 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                         return token.symbol == self.services[index].tokenSymbol
                     }
                 ) {
-                    let ethWallet = self.accountService.wallets.first { wallet in
-                        return wallet.tokenSymbol == "ETH"
-                    }
+                    let ethWallet = walletServiceCompose.getWallet(
+                        by: EthWalletService.richMessageType
+                    )?.core
+                    
                     v.rootCoinBalance = ethWallet?.wallet?.balance
                 }
             } catch let error as WalletServiceError {
