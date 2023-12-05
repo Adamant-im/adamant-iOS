@@ -13,7 +13,9 @@ import CommonKit
 final class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies
     
-    weak var service: DogeWalletService?
+    weak var service: DogeWalletService? {
+        walletService?.core as? DogeWalletService
+    }
     
     // MARK: - Properties
     

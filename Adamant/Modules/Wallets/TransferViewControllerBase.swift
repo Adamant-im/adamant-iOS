@@ -138,6 +138,7 @@ class TransferViewControllerBase: FormViewController {
     var increaseFeeService: IncreaseFeeService
     var chatsProvider: ChatsProvider
     let vibroService: VibroService
+    let walletService: WalletService
     
     // MARK: - Properties
     
@@ -154,7 +155,7 @@ class TransferViewControllerBase: FormViewController {
         ).inverted
     }()
     
-    var service: WalletServiceWithSend? {
+    var service: WalletCoreProtocol? {
         didSet {
             if let prev = oldValue {
                 NotificationCenter.default.removeObserver(self, name: prev.transactionFeeUpdated, object: prev)
@@ -287,7 +288,8 @@ class TransferViewControllerBase: FormViewController {
         screensFactory: ScreensFactory,
         currencyInfoService: CurrencyInfoService,
         increaseFeeService: IncreaseFeeService,
-        vibroService: VibroService
+        vibroService: VibroService,
+        walletService: WalletService
     ) {
         self.accountService = accountService
         self.accountsProvider = accountsProvider
@@ -297,7 +299,9 @@ class TransferViewControllerBase: FormViewController {
         self.increaseFeeService = increaseFeeService
         self.chatsProvider = chatsProvider
         self.vibroService = vibroService
+        self.walletService = walletService
 		
+        self.service = walletService.core
         super.init(nibName: nil, bundle: nil)
     }
     

@@ -13,7 +13,9 @@ import CommonKit
 final class DashTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies
     
-    weak var service: DashWalletService?
+    weak var service: DashWalletService? {
+        walletService?.core as? DashWalletService
+    }
     
     // MARK: - Properties
     

@@ -12,8 +12,9 @@ import CommonKit
 import LiskKit
 
 struct LskWalletFactory: WalletFactory {
-    typealias Service = LskWalletService
+    typealias Service = WalletService
     
+    let typeSymbol: String = LskWalletService.richMessageType
     let assembler: Assembler
     
     func makeWalletVC(service: Service, screensFactory: ScreensFactory) -> WalletViewController {
@@ -31,13 +32,12 @@ struct LskWalletFactory: WalletFactory {
         let c = LskTransactionsViewController(nibName: "TransactionsListViewControllerBase", bundle: nil)
         c.dialogService = assembler.resolve(DialogService.self)
         c.screensFactory = screensFactory
-        c.lskWalletService = service
         c.walletService = service
         return c
     }
     
     func makeTransferVC(service: Service, screensFactory: ScreensFactory) -> TransferViewControllerBase {
-        let vc = LskTransferViewController(
+        LskTransferViewController(
             chatsProvider: assembler.resolve(ChatsProvider.self)!,
             accountService: assembler.resolve(AccountService.self)!,
             accountsProvider: assembler.resolve(AccountsProvider.self)!,
@@ -45,11 +45,9 @@ struct LskWalletFactory: WalletFactory {
             screensFactory: screensFactory,
             currencyInfoService: assembler.resolve(CurrencyInfoService.self)!,
             increaseFeeService: assembler.resolve(IncreaseFeeService.self)!,
-            vibroService: assembler.resolve(VibroService.self)!
+            vibroService: assembler.resolve(VibroService.self)!,
+            walletService: service
         )
-        
-        vc.service = service
-        return vc
     }
     
     func makeDetailsVC(service: Service, transaction: RichMessageTransaction) -> UIViewController? {
@@ -124,15 +122,12 @@ private extension LskWalletFactory {
     }
     
     func makeTransactionDetailsVC(service: Service) -> LskTransactionDetailsViewController {
-        let vc = LskTransactionDetailsViewController(
+        LskTransactionDetailsViewController(
             dialogService: assembler.resolve(DialogService.self)!,
             currencyInfo: assembler.resolve(CurrencyInfoService.self)!,
             addressBookService: assembler.resolve(AddressBookService.self)!,
             accountService:  assembler.resolve(AccountService.self)!,
             walletService: service
         )
-        
-        vc.service = service
-        return vc
     }
 }

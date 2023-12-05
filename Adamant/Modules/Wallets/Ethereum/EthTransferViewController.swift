@@ -81,7 +81,7 @@ final class EthTransferViewController: TransferViewControllerBase {
                     recipient: recipient,
                     comments: comments,
                     amount: amount,
-                    service: service
+                    service: walletService
                 )
             } catch {
                 dialogService.dismissProgress()
@@ -96,7 +96,7 @@ final class EthTransferViewController: TransferViewControllerBase {
         recipient: String,
         comments: String,
         amount: Decimal,
-        service: EthWalletService
+        service: WalletService
     ) {
         let transaction = SimpleTransactionDetails(
             txId: hash,
@@ -110,7 +110,7 @@ final class EthTransferViewController: TransferViewControllerBase {
             transactionStatus: nil
         )
         
-        service.coinStorage.append(transaction)
+        service.core.coinStorage.append(transaction)
 		let detailsVc = screensFactory.makeDetailsVC(service: service)
         detailsVc.transaction = transaction
         detailsVc.senderName = String.adamant.transactionDetails.yourAddress

@@ -11,8 +11,9 @@ import CommonKit
 import UIKit
 
 struct DogeWalletFactory: WalletFactory {
-    typealias Service = DogeWalletService
+    typealias Service = WalletService
     
+    let typeSymbol: String = DogeWalletService.richMessageType
     let assembler: Assembler
     
     func makeWalletVC(service: Service, screensFactory: ScreensFactory) -> WalletViewController {
@@ -30,13 +31,12 @@ struct DogeWalletFactory: WalletFactory {
         let vc = DogeTransactionsViewController(nibName: "TransactionsListViewControllerBase", bundle: nil)
         vc.dialogService = assembler.resolve(DialogService.self)
         vc.screensFactory = screensFactory
-        vc.dogeWalletService = service
         vc.walletService = service
         return vc
     }
     
     func makeTransferVC(service: Service, screensFactory: ScreensFactory) -> TransferViewControllerBase {
-        let vc = DogeTransferViewController(
+        DogeTransferViewController(
             chatsProvider: assembler.resolve(ChatsProvider.self)!,
             accountService: assembler.resolve(AccountService.self)!,
             accountsProvider: assembler.resolve(AccountsProvider.self)!,
@@ -44,11 +44,9 @@ struct DogeWalletFactory: WalletFactory {
             screensFactory: screensFactory,
             currencyInfoService: assembler.resolve(CurrencyInfoService.self)!,
             increaseFeeService: assembler.resolve(IncreaseFeeService.self)!,
-            vibroService: assembler.resolve(VibroService.self)!
+            vibroService: assembler.resolve(VibroService.self)!,
+            walletService: service
         )
-        
-        vc.service = service
-        return vc
     }
     
     func makeDetailsVC(service: Service, transaction: RichMessageTransaction) -> UIViewController? {
@@ -124,15 +122,12 @@ private extension DogeWalletFactory {
     }
     
     func makeTransactionDetailsVC(service: Service) -> DogeTransactionDetailsViewController {
-        let vc = DogeTransactionDetailsViewController(
+        DogeTransactionDetailsViewController(
             dialogService: assembler.resolve(DialogService.self)!,
             currencyInfo: assembler.resolve(CurrencyInfoService.self)!,
             addressBookService: assembler.resolve(AddressBookService.self)!,
             accountService: assembler.resolve(AccountService.self)!,
             walletService: service
         )
-        
-        vc.service = service
-        return vc
     }
 }

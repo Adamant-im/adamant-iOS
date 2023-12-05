@@ -50,17 +50,17 @@ struct ChatFactory {
             emojiService: emojiService
         )
         
-        let wallets = walletServiceCompose.getWallets().map { $0.core }
+        let wallets = walletServiceCompose.getWallets()
         
-        let admService = wallets.first { wallet in
-            return wallet is AdmWalletService
-        } as! AdmWalletService
+        let walletService = wallets.first { wallet in
+            return wallet.core is AdmWalletService
+        }
         
         let viewController = ChatViewController(
             viewModel: viewModel,
             walletServiceCompose: walletServiceCompose,
             storedObjects: delegates.asArray + [dialogManager],
-            admService: admService,
+            admWalletService: walletService,
             screensFactory: screensFactory,
             sendTransaction: makeSendTransactionAction(
                 viewModel: viewModel,

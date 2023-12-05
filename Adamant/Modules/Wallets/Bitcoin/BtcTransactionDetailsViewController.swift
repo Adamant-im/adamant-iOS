@@ -12,7 +12,9 @@ import CommonKit
 final class BtcTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies
     
-    weak var service: BtcWalletService?
+    weak var service: BtcWalletService? {
+        walletService?.core as? BtcWalletService
+    }
     
     // MARK: - Properties
     

@@ -11,8 +11,9 @@ import CommonKit
 import UIKit
 
 struct DashWalletFactory: WalletFactory {
-    typealias Service = DashWalletService
+    typealias Service = WalletService
     
+    let typeSymbol: String = DashWalletService.richMessageType
     let assembler: Assembler
     
     func makeWalletVC(service: Service, screensFactory: ScreensFactory) -> WalletViewController {
@@ -31,12 +32,11 @@ struct DashWalletFactory: WalletFactory {
         c.dialogService = assembler.resolve(DialogService.self)
         c.screensFactory = screensFactory
         c.walletService = service
-        c.dashWalletService = service
         return c
     }
     
     func makeTransferVC(service: Service, screensFactory: ScreensFactory) -> TransferViewControllerBase {
-        let vc = DashTransferViewController(
+        DashTransferViewController(
             chatsProvider: assembler.resolve(ChatsProvider.self)!,
             accountService: assembler.resolve(AccountService.self)!,
             accountsProvider: assembler.resolve(AccountsProvider.self)!,
@@ -44,11 +44,9 @@ struct DashWalletFactory: WalletFactory {
             screensFactory: screensFactory,
             currencyInfoService: assembler.resolve(CurrencyInfoService.self)!,
             increaseFeeService: assembler.resolve(IncreaseFeeService.self)!,
-            vibroService: assembler.resolve(VibroService.self)!
+            vibroService: assembler.resolve(VibroService.self)!, 
+            walletService: service
         )
-        
-        vc.service = service
-        return vc
     }
     
     func makeDetailsVC(service: Service, transaction: RichMessageTransaction) -> UIViewController? {
@@ -134,15 +132,12 @@ private extension DashWalletFactory {
     }
     
     func makeTransactionDetailsVC(service: Service) -> DashTransactionDetailsViewController {
-        let vc = DashTransactionDetailsViewController(
+        DashTransactionDetailsViewController(
             dialogService: assembler.resolve(DialogService.self)!,
             currencyInfo: assembler.resolve(CurrencyInfoService.self)!,
             addressBookService: assembler.resolve(AddressBookService.self)!,
             accountService: assembler.resolve(AccountService.self)!,
             walletService: service
         )
-        
-        vc.service = service
-        return vc
     }
 }

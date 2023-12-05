@@ -12,7 +12,9 @@ import CommonKit
 final class EthTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies
     
-    weak var service: EthWalletService?
+    weak var service: EthWalletService? {
+        walletService?.core as? EthWalletService
+    }
     
     // MARK: - Properties
     

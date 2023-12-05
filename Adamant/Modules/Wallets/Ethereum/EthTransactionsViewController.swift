@@ -13,25 +13,18 @@ import CommonKit
 final class EthTransactionsViewController: TransactionsListViewControllerBase {
     
     // MARK: - Dependencies
-    var ethWalletService: EthWalletService! {
-        didSet {
-            ethAddress = ethWalletService.wallet?.address ?? ""
-        }
-    }
-    var screensFactory: ScreensFactory!
     
-    // MARK: - Properties
-    private var ethAddress: String = ""
+    var screensFactory: ScreensFactory!
     
     // MARK: - UITableView
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let address = ethWalletService.wallet?.address,
+        guard let address = walletService.core.wallet?.address,
               let transaction = transactions[safe: indexPath.row]
         else { return }
         
         tableView.deselectRow(at: indexPath, animated: true)
-        let vc = screensFactory.makeDetailsVC(service: ethWalletService)
+        let vc = screensFactory.makeDetailsVC(service: walletService)
         
         vc.transaction = transaction
         

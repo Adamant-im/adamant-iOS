@@ -12,7 +12,9 @@ import CommonKit
 final class ERC20TransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies
     
-    weak var service: ERC20WalletService?
+    weak var service: ERC20WalletService? {
+        walletService?.core as? ERC20WalletService
+    }
     
     // MARK: - Properties
     

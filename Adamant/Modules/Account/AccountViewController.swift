@@ -852,7 +852,7 @@ final class AccountViewController: FormViewController {
         }
         
         for vc in walletViewControllers {
-            guard let service = vc.service else { return }
+            guard let service = vc.service?.core else { return }
             let notification = service.walletUpdatedNotification
             let callback: ((Notification) -> Void) = { [weak self] _ in
                 guard let self = self else { return }
@@ -876,7 +876,7 @@ final class AccountViewController: FormViewController {
     
     private func setupWalletsVC() {
         walletViewControllers.removeAll()
-        let availableServices: [WalletCoreProtocol] = visibleWalletsService.sorted(includeInvisible: false)
+        let availableServices = visibleWalletsService.sorted(includeInvisible: false)
         availableServices.forEach { walletService in
             walletViewControllers.append(screensFactory.makeWalletVC(service: walletService))
         }
@@ -1060,7 +1060,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
     }
 
     func pagingViewController(_: PagingViewController, pagingItemAt index: Int) -> PagingItem {
-        guard let service = walletViewControllers[index].service else {
+        guard let service = walletViewControllers[index].service?.core else {
             return WalletPagingItem(
                 index: index,
                 currencySymbol: "",

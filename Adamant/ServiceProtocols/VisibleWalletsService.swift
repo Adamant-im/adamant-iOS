@@ -29,5 +29,5 @@ protocol VisibleWalletsService: AnyObject {
     
     func reset()
     
-    func sorted<T>(includeInvisible: Bool) -> [T]
+    func sorted(includeInvisible: Bool) -> [WalletService]
 }

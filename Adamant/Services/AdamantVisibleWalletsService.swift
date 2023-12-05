@@ -208,15 +208,15 @@ final class AdamantVisibleWalletsService: VisibleWalletsService {
      3. Shuffle the unsorted wallets (by removing a wallet from the array and inserting it at a certain position).
      We can't use only point 2, because in the future we can add new tokens that won't be in the database
      */
-    func sorted<T>(includeInvisible: Bool) -> [T] {
-        let wallets = walletsServiceCompose.getWallets().map { $0.core }
+    func sorted(includeInvisible: Bool) -> [WalletService] {
+        let wallets = walletsServiceCompose.getWallets()
         var availableServices = includeInvisible
         ? wallets
-        : wallets.filter { !isInvisible($0) }
+        : wallets.filter { !isInvisible($0.core) }
         
         for (newIndex, tokenUnicID) in getSortedWallets(includeInvisible: includeInvisible).enumerated() {
             guard let index = availableServices.firstIndex(
-                where: { $0.tokenUnicID == tokenUnicID }
+                where: { $0.core.tokenUnicID == tokenUnicID }
             ) else {
                 continue
             }
@@ -225,6 +225,6 @@ final class AdamantVisibleWalletsService: VisibleWalletsService {
             availableServices.insert(wallet, at: newIndex)
         }
         
-        return availableServices.compactMap { $0 as? T }
+        return availableServices
     }
 }

@@ -95,7 +95,7 @@ final class BtcTransferViewController: TransferViewControllerBase {
                 processTransaction(
                     self,
                     localTransaction: detailTransaction,
-                    service: service,
+                    service: walletService,
                     comments: comments,
                     transaction: transaction
                 )
@@ -112,7 +112,7 @@ final class BtcTransferViewController: TransferViewControllerBase {
     private func processTransaction(
         _ vc: BtcTransferViewController,
         localTransaction: BtcTransaction?,
-        service: BtcWalletService,
+        service: WalletService,
         comments: String,
         transaction: TransactionDetails
     ) {
@@ -122,7 +122,7 @@ final class BtcTransferViewController: TransferViewControllerBase {
         detailsVc.transaction = localTransaction ?? transaction
         detailsVc.senderName = String.adamant.transactionDetails.yourAddress
         
-        if recipientAddress == service.wallet?.address {
+        if recipientAddress == service.core.wallet?.address {
             detailsVc.recipientName = String.adamant.transactionDetails.yourAddress
         } else {
             detailsVc.recipientName = self.recipientName

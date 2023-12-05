@@ -25,7 +25,7 @@ final class ChatViewController: MessagesViewController {
     
     private let storedObjects: [AnyObject]
     private let walletServiceCompose: WalletServiceCompose
-    private let admService: AdmWalletService
+    private let admWalletService: WalletService?
     private let screensFactory: ScreensFactory
     
     let viewModel: ChatViewModel
@@ -75,14 +75,14 @@ final class ChatViewController: MessagesViewController {
         viewModel: ChatViewModel,
         walletServiceCompose: WalletServiceCompose,
         storedObjects: [AnyObject],
-        admService: AdmWalletService,
+        admWalletService: WalletService?,
         screensFactory: ScreensFactory,
         sendTransaction: @escaping SendTransaction
     ) {
         self.viewModel = viewModel
         self.storedObjects = storedObjects
         self.walletServiceCompose = walletServiceCompose
-        self.admService = admService
+        self.admWalletService = admWalletService
         self.screensFactory = screensFactory
         super.init(nibName: nil, bundle: nil)
         inputBar.onAttachmentButtonTap = { [weak self] in
@@ -678,7 +678,7 @@ private extension ChatViewController {
     func didTapRichMessageTransaction(_ transaction: RichMessageTransaction) {
         guard
             let type = transaction.richType,
-            let provider = walletServiceCompose.getWallet(by: type)?.core,
+            let provider = walletServiceCompose.getWallet(by: type),
             let vc = screensFactory.makeDetailsVC(service: provider, transaction: transaction)
         else { return }
         
@@ -764,7 +764,8 @@ private extension ChatViewController {
     }
     
     func didTapAdmSend(to adm: AdamantAddress) {
-        let vc = screensFactory.makeTransferVC(service: admService)
+        guard let admWalletService = admWalletService else { return }
+        let vc = screensFactory.makeTransferVC(service: admWalletService)
         vc.recipientAddress = adm.address
         vc.recipientName = adm.name
         vc.delegate = self

@@ -12,7 +12,9 @@ import CommonKit
 final class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies
     
-    weak var service: LskWalletService?
+    weak var service: LskWalletService? {
+        walletService?.core as? LskWalletService
+    }
     
     // MARK: - Properties
     

@@ -115,7 +115,7 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     }
     
     private func loadWallets() {
-        wallets = visibleWalletsService.sorted(includeInvisible: true)
+        wallets = visibleWalletsService.sorted(includeInvisible: true).map { $0.core }
     }
     
     @objc private func updateBalances() {

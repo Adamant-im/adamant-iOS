@@ -28,7 +28,7 @@ final class ComplexTransferViewController: UIViewController {
     var pagingViewController: PagingViewController!
     
     weak var transferDelegate: ComplexTransferViewControllerDelegate?
-    var services: [WalletServiceWithSend] = []
+    var services: [WalletService] = []
     var partner: CoreDataAccount? {
         didSet {
             navigationItem.title = partner?.chatroom?.getName(addressBookService: addressBookService)
@@ -93,7 +93,7 @@ final class ComplexTransferViewController: UIViewController {
     
     private func setupServices() {
         services.removeAll()
-        let availableServices: [WalletServiceWithSend] = visibleWalletsService.sorted(includeInvisible: false)
+        let availableServices: [WalletService] = visibleWalletsService.sorted(includeInvisible: false)
         services = availableServices
     }
     
@@ -130,12 +130,12 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
         v.replyToMessageId = replyToMessageId
         v.admReportRecipient = address
         v.recipientIsReadonly = true
-        v.commentsEnabled = service.commentsEnabledForRichMessages && partner?.isDummy != true
+        v.commentsEnabled = service.core.commentsEnabledForRichMessages && partner?.isDummy != true
         v.showProgressView(animated: false)
         
         Task {
             do {
-                let walletAddress = try await services[index]
+                let walletAddress = try await service.core
                     .getWalletAddress(
                         byAdamantAddress:
                             address
@@ -146,7 +146,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                 
                 if ERC20Token.supportedTokens.contains(
                     where: { token in
-                        return token.symbol == self.services[index].tokenSymbol
+                        return token.symbol == service.core.tokenSymbol
                     }
                 ) {
                     let ethWallet = walletServiceCompose.getWallet(
@@ -174,7 +174,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
 	}
 	
     func pagingViewController(_: PagingViewController, pagingItemAt index: Int) -> PagingItem {
-		let service = services[index]
+        let service = services[index].core
 		
 		guard let wallet = service.wallet else {
             return WalletPagingItem(

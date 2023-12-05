@@ -147,7 +147,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
     let currencyInfo: CurrencyInfoService
     let addressBookService: AddressBookService
     let accountService: AccountService
-    let walletService: WalletCoreProtocol?
+    let walletService: WalletService?
     
     // MARK: - Properties
     
@@ -159,7 +159,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             
             guard let id = transaction?.txId else { return }
             
-            walletService?.updateStatus(
+            walletService?.core.updateStatus(
                 for: id,
                 status: transaction?.transactionStatus
             )
@@ -188,10 +188,6 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     private var isFiatSet = false
     
-    var richProvider: WalletService? {
-        nil
-    }
-    
     var transactionStatus: TransactionStatus? {
         guard let richTransaction = richTransaction,
               let status = transaction?.transactionStatus
@@ -199,7 +195,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             return transaction?.transactionStatus
         }
         
-        return richProvider?.statusWithFilters(
+        return walletService?.statusWithFilters(
             transaction: richTransaction,
             oldPendingAttempts: 0,
             info: .init(
@@ -254,7 +250,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         currencyInfo: CurrencyInfoService,
         addressBookService: AddressBookService,
         accountService: AccountService,
-        walletService: WalletCoreProtocol?
+        walletService: WalletService?
     ) {
         self.dialogService = dialogService
         self.currencyInfo = currencyInfo

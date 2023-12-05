@@ -226,7 +226,7 @@ extension Notification.Name {
 protocol WalletViewController {
     var viewController: UIViewController { get }
     var height: CGFloat { get }
-    var service: WalletCoreProtocol? { get }
+    var service: WalletService? { get }
 }
 
 // MARK: - Wallet Service
@@ -249,6 +249,8 @@ protocol WalletCoreProtocol: AnyObject {
     var defaultOrdinalLevel: Int? { get }
     var richMessageType: String { get }
     var dynamicRichMessageType: String { get }
+    
+    var coinStorage: CoinStorageService { get }
     
     var transactionsPublisher: AnyObservable<[TransactionDetails]> {
         get
@@ -300,20 +302,12 @@ protocol WalletCoreProtocol: AnyObject {
     func initWallet(withPassphrase: String) async throws -> WalletAccount
     func setInitiationFailed(reason: String)
     func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString
-}
-
-protocol SwinjectDependentService: WalletCoreProtocol {
-    @MainActor
-    func injectDependencies(from container: Container)
-}
-
-// MARK: Send
-
-protocol WalletServiceWithSend: WalletCoreProtocol {
+    
+    // MARK: Send
+    
     var transactionFeeUpdated: Notification.Name { get }
     
     var qqPrefix: String { get }
-    var richMessageType: String { get }
     var blockchainSymbol: String { get }
     var isDynamicFee : Bool { get }
     var diplayTransactionFee : Decimal { get }
@@ -326,7 +320,7 @@ protocol WalletServiceWithSend: WalletCoreProtocol {
     var defaultIncreaseFee: Decimal { get }
 }
 
-extension WalletServiceWithSend {
+extension WalletCoreProtocol {
     var isTransactionFeeValid: Bool {
         return true
     }
@@ -353,7 +347,14 @@ extension WalletServiceWithSend {
     }
 }
 
-protocol WalletServiceSimpleSend: WalletServiceWithSend {
+protocol SwinjectDependentService: WalletCoreProtocol {
+    @MainActor
+    func injectDependencies(from container: Container)
+}
+
+// MARK: Send
+
+protocol WalletServiceSimpleSend: WalletCoreProtocol {
     func sendMoney(
         recipient: String,
         amount: Decimal,
@@ -362,7 +363,7 @@ protocol WalletServiceSimpleSend: WalletServiceWithSend {
     ) async throws -> AdamantTransactionDetails
 }
 
-protocol WalletServiceTwoStepSend: WalletServiceWithSend {
+protocol WalletServiceTwoStepSend: WalletCoreProtocol {
     associatedtype T: RawTransaction
     
     func createTransaction(recipient: String, amount: Decimal) async throws -> T

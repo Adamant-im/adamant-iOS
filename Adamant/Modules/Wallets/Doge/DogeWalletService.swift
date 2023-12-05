@@ -635,10 +635,6 @@ extension DogeWalletService {
     func updateStatus(for id: String, status: TransactionStatus?) {
         coinStorage.updateStatus(for: id, status: status)
     }
-    
-    func getAllRichTransactions(with id: String) async -> [RichMessageTransaction] {
-        await chatsProvider.getAllRichTransaction(with: id)
-    }
 }
 
 // MARK: - PrivateKey generator
