@@ -35,6 +35,7 @@
 		3AC76E3D2AB09118008042C4 /* ElegantEmojiPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 3AC76E3C2AB09118008042C4 /* ElegantEmojiPicker */; };
 		3AFE7E412B18D88B00718739 /* WalletService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AFE7E402B18D88B00718739 /* WalletService.swift */; };
 		3AFE7E432B19E4D900718739 /* WalletServiceCompose.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AFE7E422B19E4D900718739 /* WalletServiceCompose.swift */; };
+		3AFE7E522B1F6B3400718739 /* WalletServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AFE7E512B1F6B3400718739 /* WalletServiceProtocol.swift */; };
 		3C06931576393125C61FB8F6 /* Pods_Adamant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33975C0D891698AA7E74EBCC /* Pods_Adamant.framework */; };
 		41047B70294B5EE10039E956 /* VisibleWalletsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41047B6F294B5EE10039E956 /* VisibleWalletsViewController.swift */; };
 		41047B72294B5F210039E956 /* VisibleWalletsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41047B71294B5F210039E956 /* VisibleWalletsTableViewCell.swift */; };
@@ -670,6 +671,7 @@
 		3AA50DF22AEBE67C00C58FC8 /* PartnerQRFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnerQRFactory.swift; sourceTree = "<group>"; };
 		3AFE7E402B18D88B00718739 /* WalletService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletService.swift; sourceTree = "<group>"; };
 		3AFE7E422B19E4D900718739 /* WalletServiceCompose.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletServiceCompose.swift; sourceTree = "<group>"; };
+		3AFE7E512B1F6B3400718739 /* WalletServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletServiceProtocol.swift; sourceTree = "<group>"; };
 		41047B6F294B5EE10039E956 /* VisibleWalletsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisibleWalletsViewController.swift; sourceTree = "<group>"; };
 		41047B71294B5F210039E956 /* VisibleWalletsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisibleWalletsTableViewCell.swift; sourceTree = "<group>"; };
 		41047B73294C61D10039E956 /* VisibleWalletsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisibleWalletsService.swift; sourceTree = "<group>"; };
@@ -1324,6 +1326,17 @@
 				3AA50DF02AEBE66A00C58FC8 /* PartnerQRViewModel.swift */,
 			);
 			path = PartnerQR;
+			sourceTree = "<group>";
+		};
+		3AFE7E502B1F6AFE00718739 /* WalletsService */ = {
+			isa = PBXGroup;
+			children = (
+				3AFE7E422B19E4D900718739 /* WalletServiceCompose.swift */,
+				E940086D2114AA2E00CD2D67 /* WalletCoreProtocol.swift */,
+				3AFE7E512B1F6B3400718739 /* WalletServiceProtocol.swift */,
+				3AFE7E402B18D88B00718739 /* WalletService.swift */,
+			);
+			path = WalletsService;
 			sourceTree = "<group>";
 		};
 		411742FE2A39B1B1008CD98A /* Contribute */ = {
@@ -2139,6 +2152,7 @@
 		E940086C2114A8FD00CD2D67 /* Wallets */ = {
 			isa = PBXGroup;
 			children = (
+				3AFE7E502B1F6AFE00718739 /* WalletsService */,
 				3A20D9392AE7F305005475A6 /* Models */,
 				3A770E4A2AE14EFD0008D98F /* Mappers */,
 				93A18C872AAEAE5600D0AB98 /* DI */,
@@ -2150,9 +2164,6 @@
 				6403F5DC22723C2800D58779 /* Dash */,
 				6449BA5D235CA0930033B936 /* ERC20 */,
 				E94008712114EACF00CD2D67 /* WalletAccount.swift */,
-				E940086D2114AA2E00CD2D67 /* WalletCoreProtocol.swift */,
-				3AFE7E402B18D88B00718739 /* WalletService.swift */,
-				3AFE7E422B19E4D900718739 /* WalletServiceCompose.swift */,
 				9366589A2B0AD3E600BDB2D3 /* WalletApiService.swift */,
 				E99818932120892F0018C84C /* WalletViewControllerBase.swift */,
 				E9981897212096ED0018C84C /* WalletViewControllerBase.xib */,
@@ -2950,6 +2961,7 @@
 				4E9EE86F28CE793D008359F7 /* SafeDecimalRow.swift in Sources */,
 				93ADE0732ACA66AF008ED641 /* VibrationSelectionFactory.swift in Sources */,
 				9366589B2B0AD3E600BDB2D3 /* WalletApiService.swift in Sources */,
+				3AFE7E522B1F6B3400718739 /* WalletServiceProtocol.swift in Sources */,
 				937751AB2A68BB390054BD65 /* ChatTransactionCell.swift in Sources */,
 				64A223D620F760BB005157CB /* Localization.swift in Sources */,
 				64E1C82F222E95F6006C4DA7 /* DogeWallet.swift in Sources */,
