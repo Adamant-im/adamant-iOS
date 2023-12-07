@@ -23,8 +23,8 @@ private extension TransactionStatus {
     
     var descriptionLocalized: String? {
         switch self {
-        case .inconsistent:
-            return .localized("TransactionStatus.Inconsistent.WrongTimestamp", comment: "Transaction status: inconsistent wrong timestamp")
+        case .inconsistent(let reason):
+            return reason.localized
         default:
             return nil
         }
@@ -690,7 +690,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
         let inconsistentReasonSection = Section(Sections.inconsistentReason.localized) {
             $0.tag = Sections.inconsistentReason.tag
             $0.hidden = Condition.function([], { [weak self] _ -> Bool in
-                return self?.transactionStatus != .inconsistent
+                if case .inconsistent = self?.transactionStatus {
+                    return false
+                }
+                return true
             })
         }
         
@@ -801,7 +804,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
     }
     
     func updateIncosinstentRowIfNeeded() {
-        guard transactionStatus == .inconsistent,
+        guard case .inconsistent = transactionStatus,
               let section = form.sectionBy(tag: Sections.inconsistentReason.tag)
         else { return }
         

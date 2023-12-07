@@ -29,8 +29,6 @@ final class WalletService: WalletServiceProtocol {
                 return info.status
             }
             return consistencyFilter(transaction: transaction, statusInfo: info)
-                ? info.status
-                : .inconsistent
         case .pending:
             return pendingAttemptsCountFilter(oldPendingAttempts: oldPendingAttempts, status: info.status)
                 ? info.status
@@ -54,11 +52,18 @@ private extension WalletService {
         oldPendingAttempts < core.oldPendingAttempts
     }
     
-    func consistencyFilter(transaction: RichMessageTransaction, statusInfo: TransactionStatusInfo) -> Bool {
+    func consistencyFilter(transaction: RichMessageTransaction, statusInfo: TransactionStatusInfo) -> TransactionStatus {
         let consistencyTimeFilter = consistencyTimeFilter(transaction: transaction, statusInfo: statusInfo)
         let consistencyDuplicateFilter = consistencyDuplicateFilter(transaction: transaction)
         
-        return consistencyTimeFilter && consistencyDuplicateFilter
+        if !consistencyTimeFilter {
+            return .inconsistent(.time)
+        }
+        
+        if !consistencyDuplicateFilter {
+            return .inconsistent(.duplicate)
+        }
+        return statusInfo.status
     }
     
     func consistencyTimeFilter(transaction: RichMessageTransaction, statusInfo: TransactionStatusInfo) -> Bool {

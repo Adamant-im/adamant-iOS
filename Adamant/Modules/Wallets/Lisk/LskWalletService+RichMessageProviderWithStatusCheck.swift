@@ -21,7 +21,7 @@ extension LskWalletService {
         }
         
         guard let hash = hash else {
-            return .init(sentDate: nil, status: .inconsistent)
+            return .init(sentDate: nil, status: .inconsistent(.wrongTxHash))
         }
         
         var lskTransaction: Transactions.TransactionModel
@@ -52,7 +52,7 @@ private extension LskWalletService {
         guard lskTransaction.blockId != nil else { return .registered }
         
         guard let status = lskTransaction.transactionStatus else {
-            return .inconsistent
+            return .inconsistent(.unknown)
         }
         
         guard status == .success else {
@@ -62,11 +62,11 @@ private extension LskWalletService {
         // MARK: Check address
         if transaction.isOutgoing {
             guard lskTransaction.senderAddress == lskWallet?.address else {
-                return .inconsistent
+                return .inconsistent(.senderCryptoAddressMismatch)
             }
         } else {
             guard lskTransaction.recipientAddress == lskWallet?.address else {
-                return .inconsistent
+                return .inconsistent(.recipientCryptoAddressMismatch)
             }
         }
         
@@ -74,7 +74,7 @@ private extension LskWalletService {
         guard isAmountCorrect(
             transaction: transaction,
             lskTransaction: lskTransaction
-        ) else { return .inconsistent }
+        ) else { return .inconsistent(.wrongAmount) }
         
         return .success
     }

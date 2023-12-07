@@ -20,7 +20,7 @@ extension DashWalletService {
         }
         
         guard let hash = hash else {
-            return .init(sentDate: nil, status: .inconsistent)
+            return .init(sentDate: nil, status: .inconsistent(.wrongTxHash))
         }
         
         let dashTransaction: BTCRawTransaction
@@ -51,17 +51,17 @@ private extension DashWalletService {
         
         // MARK: Check amount & address
         guard let reportedValue = reportedValue(for: transaction) else {
-            return .inconsistent
+            return .inconsistent(.wrongAmount)
         }
         
         let min = reportedValue - reportedValue*0.005
         let max = reportedValue + reportedValue*0.005
         
         guard let walletAddress = dashWallet?.address else {
-            return .inconsistent
+            return .inconsistent(.unknown)
         }
         
-        var result: TransactionStatus = .inconsistent
+        var result: TransactionStatus = .inconsistent(.wrongAmount)
         if transaction.isOutgoing {
             var totalIncome: Decimal = 0
             for output in dashTransaction.outputs {

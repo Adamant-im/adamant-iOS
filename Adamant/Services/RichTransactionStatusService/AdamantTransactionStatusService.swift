@@ -115,7 +115,7 @@ private extension AdamantTransactionStatusService {
     func add(transaction: CoinTransaction) {
         guard
             let provider = getProvider(for: transaction),
-            transaction.transactionStatus != .success
+            (transaction.transactionStatus ?? .notInitiated) != .success
         else { return }
         
         let id = transaction.transactionId

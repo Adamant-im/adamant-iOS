@@ -22,7 +22,7 @@ extension EthWalletService {
         }
         
         guard let hash = hash else {
-            return .init(sentDate: nil, status: .inconsistent)
+            return .init(sentDate: nil, status: .inconsistent(.wrongTxHash))
         }
         
         let transactionInfo: EthTransactionInfo
@@ -110,13 +110,13 @@ private extension EthWalletService {
                   let id = self.ethWallet?.address,
                   sender == id
             else {
-                return .inconsistent
+                return .inconsistent(.senderCryptoAddressMismatch)
             }
         } else {
             guard let id = self.ethWallet?.address,
                   eth.to.address == id
             else {
-                return .inconsistent
+                return .inconsistent(.recipientCryptoAddressMismatch)
             }
         }
         
@@ -124,13 +124,13 @@ private extension EthWalletService {
         let realAmount = eth.value.asDecimal(exponent: EthWalletService.currencyExponent)
         
         guard let reported = reportedValue(for: transaction) else {
-            return .inconsistent
+            return .inconsistent(.wrongAmount)
         }
         let min = reported - reported*0.005
         let max = reported + reported*0.005
         
         guard (min...max).contains(realAmount) else {
-            return .inconsistent
+            return .inconsistent(.wrongAmount)
         }
         
         return .success

@@ -20,7 +20,7 @@ extension BtcWalletService {
         }
         
         guard let hash = hash else {
-            return .init(sentDate: nil, status: .inconsistent)
+            return .init(sentDate: nil, status: .inconsistent(.wrongTxHash))
         }
         
         do {
@@ -42,7 +42,7 @@ private extension BtcWalletService {
         btcTransaction: BtcTransaction
     ) -> TransactionStatus {
         guard let status = btcTransaction.transactionStatus else {
-            return .inconsistent
+            return .inconsistent(.unknown)
         }
         
         guard status == .success else {
@@ -50,15 +50,19 @@ private extension BtcWalletService {
         }
         
         // MARK: Check address
-        guard
-            transaction.isOutgoing && btcTransaction.senderAddress == btcWallet?.address
-                || btcTransaction.recipientAddress == btcWallet?.address
-        else { return .inconsistent }
+        
+        if transaction.isOutgoing && btcTransaction.senderAddress != btcWallet?.address {
+            return .inconsistent(.senderCryptoAddressMismatch)
+        }
+        
+        if !transaction.isOutgoing && btcTransaction.recipientAddress != btcWallet?.address {
+            return .inconsistent(.recipientCryptoAddressMismatch)
+        }
         
         // MARK: Check amount
         if let reported = reportedValue(for: transaction) {
             guard reported == btcTransaction.amountValue else {
-                return .inconsistent
+                return .inconsistent(.wrongAmount)
             }
         }
         

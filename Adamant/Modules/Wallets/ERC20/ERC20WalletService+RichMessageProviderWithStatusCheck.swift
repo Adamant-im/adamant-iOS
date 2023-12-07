@@ -22,7 +22,7 @@ extension ERC20WalletService {
         }
         
         guard let hash = hash else {
-            return .init(sentDate: nil, status: .inconsistent)
+            return .init(sentDate: nil, status: .inconsistent(.wrongTxHash))
         }
         
         let erc20Transaction: EthTransaction
@@ -57,27 +57,27 @@ private extension ERC20WalletService {
                 let id = ethWallet?.address,
                 erc20Transaction.senderAddress == id
             else {
-                return .inconsistent
+                return .inconsistent(.senderCryptoAddressMismatch)
             }
         } else {
             guard
                 let id = ethWallet?.address,
                 erc20Transaction.to == id
             else {
-                return .inconsistent
+                return .inconsistent(.recipientCryptoAddressMismatch)
             }
         }
         
         // MARK: Compare amounts
         guard let reportedValue = reportedValue(for: transaction) else {
-            return .inconsistent
+            return .inconsistent(.wrongAmount)
         }
         
         let min = reportedValue - reportedValue*0.005
         let max = reportedValue + reportedValue*0.005
         
         guard (min...max).contains(erc20Transaction.value ?? 0) else {
-            return .inconsistent
+            return .inconsistent(.wrongAmount)
         }
         
         return .success
