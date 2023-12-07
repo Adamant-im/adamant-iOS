@@ -14,19 +14,19 @@ protocol WalletServiceCompose {
 }
 
 struct AdamantWalletServiceCompose: WalletServiceCompose {
-    private let wallets: [WalletService]
+    private var wallets: [String: WalletService] = [:]
     
     init(wallets: [WalletCoreProtocol], coreDataStack: CoreDataStack) {
-        self.wallets = wallets.map {
-            WalletService(core: $0, coreDataStack: coreDataStack)
-        }
+        self.wallets = Dictionary(uniqueKeysWithValues: wallets.map { wallet in
+            (wallet.dynamicRichMessageType, WalletService(core: wallet, coreDataStack: coreDataStack))
+        })
     }
     
     func getWallet(by type: String) -> WalletService? {
-        wallets.first(where: { $0.core.dynamicRichMessageType == type })
+        wallets[type]
     }
     
     func getWallets() -> [WalletService] {
-        wallets
+        Array(wallets.values)
     }
 }
