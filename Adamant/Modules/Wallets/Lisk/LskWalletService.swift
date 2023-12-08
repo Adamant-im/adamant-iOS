@@ -81,6 +81,10 @@ final class LskWalletService: WalletService {
         return Self.qqPrefix
     }
     
+    var nodeGroups: [NodeGroup] {
+        [.lskNode, .lskService]
+    }
+    
 	// MARK: - Properties
 	let transferAvailable: Bool = true
     let netHash = Constants.Nethash.main

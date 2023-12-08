@@ -105,6 +105,10 @@ final class EthWalletService: WalletService {
         return increaseFeeService.isIncreaseFeeEnabled(for: tokenUnicID)
     }
     
+    var nodeGroups: [NodeGroup] {
+        [.eth]
+    }
+    
     @Atomic private(set) var isDynamicFee: Bool = true
     @Atomic private(set) var transactionFee: Decimal = 0.0
     @Atomic private(set) var gasPrice: BigUInt = 0

@@ -248,6 +248,7 @@ protocol WalletService: AnyObject {
     var defaultVisibility: Bool { get }
     var defaultOrdinalLevel: Int? { get }
     var richMessageType: String { get }
+    var nodeGroups: [NodeGroup] { get }
     
     var transactionsPublisher: AnyObservable<[TransactionDetails]> {
         get

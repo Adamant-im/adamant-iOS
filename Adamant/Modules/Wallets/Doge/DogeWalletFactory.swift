@@ -43,7 +43,9 @@ struct DogeWalletFactory: WalletFactory {
             screensFactory: screensFactory,
             currencyInfoService: assembler.resolve(CurrencyInfoService.self)!,
             increaseFeeService: assembler.resolve(IncreaseFeeService.self)!,
-            vibroService: assembler.resolve(VibroService.self)!
+            vibroService: assembler.resolve(VibroService.self)!,
+            reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
+            nodesStorage: assembler.resolve(NodesStorageProtocol.self)!
         )
         
         vc.service = service

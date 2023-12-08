@@ -36,6 +36,7 @@ extension String.adamant {
         
         static let noInternetNotificationTitle = String.localized("Shared.NoInternet.Title", comment: "Shared alert notification: title for no internet connection message.")
         static let noInternetNotificationBoby = String.localized("Shared.NoInternet.Body", comment: "Shared alert notification: body message for no internet connection.")
+        static let noInternetTransferBody = String.localized("Shared.Transfer.NoInternet.Body", comment: "Shared alert notification: body message for no internet connection.")
         
         static let emailErrorMessageTitle = String.localized("Error.Mail.Title", comment: "Error messge title for support email")
         static let emailErrorMessageBody = String.localized("Error.Mail.Body", comment: "Error messge body for support email")

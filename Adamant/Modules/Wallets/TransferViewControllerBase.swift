@@ -138,6 +138,8 @@ class TransferViewControllerBase: FormViewController {
     var increaseFeeService: IncreaseFeeService
     var chatsProvider: ChatsProvider
     let vibroService: VibroService
+    let reachabilityMonitor: ReachabilityMonitor
+    let nodesStorage: NodesStorageProtocol
     
     // MARK: - Properties
     
@@ -287,7 +289,9 @@ class TransferViewControllerBase: FormViewController {
         screensFactory: ScreensFactory,
         currencyInfoService: CurrencyInfoService,
         increaseFeeService: IncreaseFeeService,
-        vibroService: VibroService
+        vibroService: VibroService,
+        reachabilityMonitor: ReachabilityMonitor,
+        nodesStorage: NodesStorageProtocol
     ) {
         self.accountService = accountService
         self.accountsProvider = accountsProvider
@@ -297,7 +301,9 @@ class TransferViewControllerBase: FormViewController {
         self.increaseFeeService = increaseFeeService
         self.chatsProvider = chatsProvider
         self.vibroService = vibroService
-		
+        self.reachabilityMonitor = reachabilityMonitor
+        self.nodesStorage = nodesStorage
+        
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -651,6 +657,11 @@ class TransferViewControllerBase: FormViewController {
         validateAddress()
         validateForm(force: true)
 
+        guard let service = service else {
+            dialogService.showWarning(withMessage: .adamant.transfer.accountNotFound)
+            return
+        }
+        
         guard let recipientAddress = recipientAddress else {
             dialogService.showWarning(withMessage: .adamant.transfer.addressValidationError)
             return
@@ -692,12 +703,40 @@ class TransferViewControllerBase: FormViewController {
             return
         }
         
-        guard service?.isTransactionFeeValid ?? true else {
+        guard service.isTransactionFeeValid else {
             return
         }
         
         if admReportRecipient != nil, let account = accountService.account, account.balance < 0.001 {
             dialogService.showWarning(withMessage: "Not enought money to send report")
+            return
+        }
+        
+        guard reachabilityMonitor.connection else {
+            dialogService.showWarning(withMessage: .adamant.alert.noInternetTransferBody)
+            return
+        }
+        
+        if admReportRecipient != nil,
+           !nodesStorage.isHaveActiveNode(in: .adm) {
+            dialogService.showWarning(
+                withMessage: ApiServiceError.noEndpointsAvailable(
+                    coin: NodeGroup.adm.name
+                ).localizedDescription
+            )
+            return
+        }
+        
+        let groupsWithoutActiveNode = service.nodeGroups.filter {
+            !nodesStorage.isHaveActiveNode(in: $0)
+        }
+
+        if let group = groupsWithoutActiveNode.first {
+            dialogService.showWarning(
+                withMessage: ApiServiceError.noEndpointsAvailable(
+                    coin: group.name
+                ).localizedDescription
+            )
             return
         }
         

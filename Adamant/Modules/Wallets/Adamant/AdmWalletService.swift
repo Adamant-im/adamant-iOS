@@ -53,6 +53,10 @@ final class AdmWalletService: NSObject, WalletService {
         return Self.qqPrefix
     }
     
+    var nodeGroups: [NodeGroup] {
+        [.adm]
+    }
+    
 	// MARK: - Dependencies
 	weak var accountService: AccountService?
 	var apiService: ApiService!
