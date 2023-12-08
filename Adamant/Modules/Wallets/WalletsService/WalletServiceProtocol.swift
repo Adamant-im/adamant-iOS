@@ -16,4 +16,5 @@ protocol WalletServiceProtocol {
     ) -> TransactionStatus
     
     func statusInfoFor(transaction: CoinTransaction) async -> TransactionStatusInfo
+    func getAllRichTransactionsFromDB(with id: String) -> [RichMessageTransaction]
 }

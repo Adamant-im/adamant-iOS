@@ -838,6 +838,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         
         self.transaction = failedTransaction
         tableView.reloadData()
+        updateIncosinstentRowIfNeeded()
     }
 
     @MainActor

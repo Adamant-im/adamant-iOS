@@ -80,7 +80,7 @@ private extension WalletService {
     func consistencyDuplicateFilter(transaction: RichMessageTransaction) -> Bool {
         guard let hash = transaction.transfer?.hash else { return false }
         
-        let allTransactions = getRichTransactionFromDB(id: hash).sorted(
+        let allTransactions = getAllRichTransactionsFromDB(with: hash).sorted(
             by: { ($0.dateValue ?? Date()) < ($1.dateValue ?? Date()) }
         )
         
@@ -90,12 +90,12 @@ private extension WalletService {
     }
 }
 
-private extension WalletService {
+extension WalletService {
     /// Search transaction in local storage
     ///
     /// - Parameter id: Transacton ID
     /// - Returns: Transaction, if found
-    func getRichTransactionFromDB(id: String) -> [RichMessageTransaction] {
+    func getAllRichTransactionsFromDB(with id: String) -> [RichMessageTransaction] {
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.parent = coreDataStack.container.viewContext
         

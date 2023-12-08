@@ -132,6 +132,7 @@ private extension AdamantTransactionStatusService {
         subscriptions[id] = publisher.removeDuplicates().sink { status in
             Task { [weak self] in
                 await self?.setStatus(for: transaction, status: status)
+                await self?.updateStatusForAllSameTransactions(transaction)
             }
         }
     }
@@ -164,6 +165,23 @@ private extension AdamantTransactionStatusService {
         
         transaction.transactionStatus = status
         try? privateContext.save()
+    }
+    
+    func updateStatusForAllSameTransactions(_ transaction: CoinTransaction) {
+        guard let provider = getProvider(for: transaction),
+              let richTransaction = transaction as? RichMessageTransaction,
+              let hash = richTransaction.transfer?.hash
+        else { return }
+        
+        let transactions = provider.getAllRichTransactionsFromDB(with: hash).sorted(
+            by: { ($0.dateValue ?? Date()) < ($1.dateValue ?? Date()) }
+        )
+        
+        guard transactions.count > 1 else { return }
+        
+        transactions.dropFirst().forEach {
+            setStatus(for: $0, status: .inconsistent(.duplicate))
+        }
     }
 
     // MARK: Core Data
