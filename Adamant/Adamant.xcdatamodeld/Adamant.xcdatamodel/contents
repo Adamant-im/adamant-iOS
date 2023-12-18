@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21754" systemVersion="22E252" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="BaseAccount" representedClassName="BaseAccount" isAbstract="YES" syncable="YES">
+        <attribute name="address" attributeType="String"/>
+        <attribute name="avatar" optional="YES" attributeType="String"/>
+        <attribute name="isDummy" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="isSystem" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="transfers" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="BaseTransaction" inverseName="partner" inverseEntity="BaseTransaction"/>
+    </entity>
+    <entity name="BaseTransaction" representedClassName="BaseTransaction" isAbstract="YES" parentEntity="CoinTransaction" syncable="YES">
+        <attribute name="senderPublicKey" optional="YES" attributeType="String"/>
+        <attribute name="type" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="partner" maxCount="1" deletionRule="Nullify" destinationEntity="BaseAccount" inverseName="transfers" inverseEntity="BaseAccount"/>
+    </entity>
+    <entity name="Chatroom" representedClassName="Chatroom" syncable="YES">
+        <attribute name="hasUnreadMessages" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="isForcedVisible" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="isHidden" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="isReadonly" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+        <attribute name="updatedAt" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="lastTransaction" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ChatTransaction" inverseName="lastIn" inverseEntity="ChatTransaction"/>
+        <relationship name="partner" maxCount="1" deletionRule="Nullify" destinationEntity="CoreDataAccount" inverseName="chatroom" inverseEntity="CoreDataAccount"/>
+        <relationship name="transactions" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ChatTransaction" inverseName="chatroom" inverseEntity="ChatTransaction"/>
+    </entity>
+    <entity name="ChatTransaction" representedClassName="ChatTransaction" isAbstract="YES" parentEntity="BaseTransaction" syncable="YES">
+        <attribute name="chatMessageId" attributeType="String"/>
+        <attribute name="isFake" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="isHidden" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="isUnread" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="showsChatroom" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
+        <attribute name="silentNotification" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="status" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="chatroom" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Chatroom" inverseName="transactions" inverseEntity="Chatroom"/>
+        <relationship name="lastIn" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Chatroom" inverseName="lastTransaction" inverseEntity="Chatroom"/>
+    </entity>
+    <entity name="CoinTransaction" representedClassName="CoinTransaction" isAbstract="YES" syncable="YES">
+        <attribute name="amount" optional="YES" attributeType="Decimal" defaultValueString="0.0"/>
+        <attribute name="blockchainType" attributeType="String" defaultValueString=""/>
+        <attribute name="blockId" optional="YES" attributeType="String"/>
+        <attribute name="coinId" optional="YES" attributeType="String"/>
+        <attribute name="confirmations" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="fee" optional="YES" attributeType="Decimal" defaultValueString="0.0"/>
+        <attribute name="height" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="isConfirmed" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="isOutgoing" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="recipientId" attributeType="String" defaultValueString=""/>
+        <attribute name="senderId" attributeType="String" defaultValueString=""/>
+        <attribute name="transactionId" attributeType="String" defaultValueString=""/>
+        <attribute name="transactionStatusRaw" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="transactionId"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="CoreDataAccount" representedClassName="CoreDataAccount" parentEntity="BaseAccount" syncable="YES">
+        <attribute name="publicKey" attributeType="String"/>
+        <relationship name="chatroom" maxCount="1" deletionRule="Cascade" destinationEntity="Chatroom" inverseName="partner" inverseEntity="Chatroom"/>
+    </entity>
+    <entity name="DummyAccount" representedClassName="DummyAccount" parentEntity="BaseAccount" syncable="YES"/>
+    <entity name="MessageTransaction" representedClassName="MessageTransaction" parentEntity="ChatTransaction" syncable="YES">
+        <attribute name="isMarkdown" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="message" attributeType="String"/>
+        <attribute name="reactionsData" optional="YES" attributeType="Transformable"/>
+    </entity>
+    <entity name="RichMessageTransaction" representedClassName="RichMessageTransaction" parentEntity="ChatTransaction" syncable="YES">
+        <attribute name="additionalType" optional="YES" attributeType="Integer 32" defaultValueString="2" usesScalarValueType="YES"/>
+        <attribute name="isReact" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="isReply" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="richContent" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[String:Any]"/>
+        <attribute name="richContentSerialized" optional="YES" attributeType="String"/>
+        <attribute name="richType" attributeType="String"/>
+        <attribute name="transferStatusRaw" optional="YES" attributeType="Integer 16" usesScalarValueType="NO" customClassName="RichTransferStatus"/>
+    </entity>
+    <entity name="TransferTransaction" representedClassName="TransferTransaction" parentEntity="ChatTransaction" syncable="YES">
+        <attribute name="comment" optional="YES" attributeType="String"/>
+        <attribute name="decodedReplyMessage" optional="YES" attributeType="String"/>
+        <attribute name="reactionsData" optional="YES" attributeType="Transformable"/>
+        <attribute name="replyToId" optional="YES" attributeType="String"/>
+    </entity>
+</model>

@@ -105,7 +105,7 @@ extension UIColor {
         
         /// Reactions background color
         public static var reactionsBackground: UIColor {
-            let colorWhiteTheme = UIColor(red: 0.29, green: 0.29, blue: 0.29, alpha: 0.1)
+            let colorWhiteTheme = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 1)
             let colorDarkTheme = UIColor(red: 0.264, green: 0.264, blue: 0.264, alpha: 1)
             return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
         }

@@ -288,7 +288,7 @@ final class AdamantAddressBookService: AddressBookService {
                 type: .keyValue,
                 sender: address,
                 keypair: keypair
-            )
+            ).get()
             
             return id
         } catch let error as ApiServiceError {
@@ -313,7 +313,7 @@ final class AdamantAddressBookService: AddressBookService {
         let address = loggedAccount.address
         
         do {
-            let rawValue = try await apiService.get(key: addressBookKey, sender: address)
+            let rawValue = try await apiService.get(key: addressBookKey, sender: address).get()
             guard let value = rawValue,
                   let object = value.toDictionary(),
                   let message = object["message"] as? String,

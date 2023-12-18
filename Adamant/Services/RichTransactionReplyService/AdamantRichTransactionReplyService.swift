@@ -131,7 +131,7 @@ private extension AdamantRichTransactionReplyService {
     }
     
     func getTransactionFromAPI(by id: UInt64) async throws -> Transaction {
-        try await apiService.getTransaction(id: id, withAsset: true)
+        try await apiService.getTransaction(id: id, withAsset: true).get()
     }
     
     func getReplyMessage(from transaction: Transaction) throws -> String {

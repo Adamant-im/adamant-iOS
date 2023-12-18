@@ -6,7 +6,4 @@
 //  Copyright © 2022 Adamant. All rights reserved.
 //
 
-enum ApiServiceResult<T> {
-    case success(T)
-    case failure(ApiServiceError)
-}
+typealias ApiServiceResult<Success> = Result<Success, ApiServiceError>

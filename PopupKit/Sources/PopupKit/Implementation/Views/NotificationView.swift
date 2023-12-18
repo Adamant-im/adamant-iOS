@@ -17,14 +17,15 @@ struct NotificationView: View {
     let dismissAction: () -> Void
     
     var body: some View {
-        HStack(alignment: .bottom, spacing: 7) {
+        HStack(alignment: .top, spacing: 8) {
             if let icon = model.icon {
                 makeIcon(image: icon)
             }
             textStack
             Spacer(minLength: .zero)
         }
-        .padding(10)
+        .padding([.leading, .trailing], 15)
+        .padding([.top, .bottom], 10)
         .background(GeometryReader(content: processGeometry))
         .padding(.top, safeAreaInsets.top)
         .expanded(axes: .horizontal)
@@ -39,10 +40,11 @@ private extension NotificationView {
     func makeIcon(image: UIImage) -> some View {
         Image(uiImage: image)
             .resizable()
-            .renderingMode(.template)
+            .renderingMode(.original)
             .foregroundColor(.secondary)
             .scaledToFit()
             .frame(squareSize: 30)
+            .padding(.top, 2)
     }
     
     var textStack: some View {
@@ -81,7 +83,7 @@ private extension NotificationView {
     }
     
     func onTap() {
-        model.tapHandler?.action()
+        model.tapHandler?.value()
         dismissAction()
     }
 }

@@ -158,7 +158,7 @@ protocol TransfersProvider: DataProvider, Actor {
         amount: Decimal,
         comment: String?,
         replyToMessageId: String?
-    ) async throws -> TransactionDetails
+    ) async throws -> AdamantTransactionDetails
     
     // MARK: - Transactions
     func getTransfer(id: String) -> TransferTransaction?

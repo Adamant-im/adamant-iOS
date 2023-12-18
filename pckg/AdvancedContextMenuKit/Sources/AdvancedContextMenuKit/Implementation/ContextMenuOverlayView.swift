@@ -62,6 +62,7 @@ struct ContextMenuOverlayView: View {
                     viewModel.additionalMenuVisible.toggle()
                 }
                 viewModel.delegate?.didAppear()
+                viewModel.scrollToEnd = true
             }
         }
     }
@@ -69,6 +70,10 @@ struct ContextMenuOverlayView: View {
 
 private extension ContextMenuOverlayView {
     func makeOverlayView() -> some View {
+        makeOverlayScrollToBottom(makeOverlayScrollView())
+    }
+    
+    func makeOverlayScrollView() -> some View {
         ScrollView(axes, showsIndicators: false) {
             VStack(spacing: .zero) {
                 makeContentView()
@@ -80,9 +85,28 @@ private extension ContextMenuOverlayView {
                         + minContentsSpace
                     )
             }
+            .id(1)
         }
         .fullScreen()
         .transition(.opacity)
+    }
+    
+    func makeOverlayScrollToBottom(_ content: some View) -> some View {
+        if #available(iOS 17.0, *) {
+            return content
+                .defaultScrollAnchor(.bottom)
+        }
+        
+        return ScrollViewReader { value in
+            content
+                .onChange(of: viewModel.scrollToEnd) { scrollToBottom in
+                    guard scrollToBottom else { return }
+                    
+                    withAnimation {
+                        value.scrollTo(1, anchor: .bottom)
+                    }
+                }
+        }
     }
     
     func makeContentView() -> some View {

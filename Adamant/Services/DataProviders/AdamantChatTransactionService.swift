@@ -234,7 +234,10 @@ actor AdamantChatTransactionService: ChatTransactionService {
         let transfer: TransferTransaction
         if let trs = getTransfer(id: String(transaction.id), context: context) {
             transfer = trs
-            transfer.confirmations = transaction.confirmations
+            // TODO: Fix it later. (Server side)
+            if transfer.confirmations < transaction.confirmations {
+                transfer.confirmations = transaction.confirmations
+            }
             transfer.statusEnum = .delivered
             transfer.blockId = transaction.blockId
         } else {
@@ -284,6 +287,7 @@ private extension AdamantChatTransactionService {
         
         trs.richContent = richContent
         trs.richType = type
+        trs.blockchainType = type
         trs.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
         trs.additionalType = .base
         
@@ -348,6 +352,7 @@ private extension AdamantChatTransactionService {
         
         trs.richContent = richContent
         trs.richType = type
+        trs.blockchainType = type
         trs.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
         trs.additionalType = .reply
         

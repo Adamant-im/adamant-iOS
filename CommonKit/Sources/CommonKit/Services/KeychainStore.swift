@@ -26,12 +26,7 @@ public final class KeychainStore: SecuredStore {
             let data = raw.data(using: .utf8)
         else { return nil }
         
-        do {
-            return try JSONDecoder().decode(T.self, from: data)
-        } catch {
-            assertionFailure("Failed to decode data. Error: \(error.localizedDescription)")
-            return nil
-        }
+        return try? JSONDecoder().decode(T.self, from: data)
     }
     
     public func set<T: Encodable>(_ value: T, for key: String) {
@@ -40,12 +35,8 @@ public final class KeychainStore: SecuredStore {
             return
         }
         
-        do {
-            let data = try JSONEncoder().encode(value)
-            String(data: data, encoding: .utf8).map { setString($0, for: key) }
-        } catch {
-            assertionFailure("Failed to encode data. Error: \(error.localizedDescription)")
-        }
+        guard let data = try? JSONEncoder().encode(value) else { return }
+        String(data: data, encoding: .utf8).map { setString($0, for: key) }
     }
     
     public func remove(_ key: String) {

@@ -8,10 +8,7 @@
 import Foundation
 
 /// Represents an HTTP response
-public enum Response<R: APIResponse> {
-    case success(response: R)
-    case error(response: APIError)
-}
+public typealias Response<R: APIResponse> = Result<R>
 
 public enum Result<R: Any> {
     case success(response: R)

@@ -46,16 +46,16 @@ final class AdamantPushNotificationsTokenService: PushNotificationsTokenService 
     func sendTokenDeletionTransactions() {
         for transaction in getTokenDeletionTransactions() {
             Task {
-                await apiService.sendTransaction(
-                    path: AdamantApiService.ApiCommands.Chats.processTransaction,
+                let result = await apiService.sendTransaction(
+                    path: ApiCommands.Chats.processTransaction,
                     transaction: transaction
-                ) { [weak self] result in
-                    switch result {
-                    case .success, .failure(.accountNotFound), .failure(.notLogged):
-                        self?.removeTokenDeletionTransaction(transaction)
-                    case .failure(.internalError), .failure(.networkError), .failure(.requestCancelled), .failure(.serverError), .failure(.commonError):
-                        break
-                    }
+                )
+                
+                switch result {
+                case .success, .failure(.accountNotFound), .failure(.notLogged):
+                    removeTokenDeletionTransaction(transaction)
+                case .failure(.internalError), .failure(.networkError), .failure(.requestCancelled), .failure(.serverError), .failure(.commonError), .failure(.noEndpointsAvailable):
+                    break
                 }
             }
         }
@@ -116,16 +116,14 @@ private extension AdamantPushNotificationsTokenService {
             return completion()
         }
         
-        removeCurrentToken(keypair: keypair) {
-            Task { [weak self] in
-                await self?.sendMessageToANS(
-                    keypair: keypair,
-                    encodedPayload: encodedPayload
-                ) { success in
-                    defer { completion() }
-                    guard success else { return }
-                    self?.setTokenToStorage(newToken)
-                }
+        removeCurrentToken(keypair: keypair) { [weak self] in
+            self?.sendMessageToANS(
+                keypair: keypair,
+                encodedPayload: encodedPayload
+            ) { success in
+                defer { completion() }
+                guard success else { return }
+                self?.setTokenToStorage(newToken)
             }
         }
     }
@@ -142,17 +140,15 @@ private extension AdamantPushNotificationsTokenService {
         
         setTokenToStorage(nil)
         
-        Task {
-            var transaction: UnregisteredTransaction?
-            
-            transaction = await sendMessageToANS(
-                keypair: keypair,
-                encodedPayload: encodedPayload
-            ) { [weak self] success in
-                defer { completion() }
-                guard !success, let self = self, let transaction = transaction else { return }
-                self.addTokenDeletionTransaction(transaction)
-            }
+        var transaction: UnregisteredTransaction?
+        
+        transaction = sendMessageToANS(
+            keypair: keypair,
+            encodedPayload: encodedPayload
+        ) { [weak self] success in
+            defer { completion() }
+            guard !success, let self = self, let transaction = transaction else { return }
+            self.addTokenDeletionTransaction(transaction)
         }
     }
     
@@ -181,8 +177,8 @@ private extension AdamantPushNotificationsTokenService {
         keypair: Keypair,
         encodedPayload: EncodedPayload,
         completion: @escaping (_ success: Bool) -> Void
-    ) async -> UnregisteredTransaction? {
-        await apiService.sendMessage(
+    ) -> UnregisteredTransaction? {
+        guard let messageTransaction = try? adamantCore.makeSendMessageTransaction(
             senderId: AdamantUtilities.generateAddress(publicKey: keypair.publicKey),
             recipientId: AdamantResources.contacts.ansAddress,
             keypair: keypair,
@@ -190,14 +186,18 @@ private extension AdamantPushNotificationsTokenService {
             type: ChatType.signal,
             nonce: encodedPayload.nonce,
             amount: nil
-        ) { result in
-            switch result {
+        ) else { return nil }
+        
+        Task {
+            switch await apiService.sendMessageTransaction(transaction: messageTransaction) {
             case .success:
                 completion(true)
             case .failure:
                 completion(false)
             }
         }
+        
+        return messageTransaction
     }
 }
 

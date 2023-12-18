@@ -13,6 +13,20 @@ struct TransactionStatusInfo {
     let status: TransactionStatus
 }
 
+extension TransactionStatusInfo {
+    init(error: Error) {
+        switch error {
+        case ApiServiceError.networkError,
+            ApiServiceError.noEndpointsAvailable,
+            WalletServiceError.networkError,
+            WalletServiceError.apiError(.noEndpointsAvailable):
+            self.init(sentDate: nil, status: .noNetwork)
+        default:
+            self.init(sentDate: nil, status: .pending)
+        }
+    }
+}
+
 protocol RichMessageProviderWithStatusCheck: RichMessageProvider {
-    func statusInfoFor(transaction: RichMessageTransaction) async -> TransactionStatusInfo
+    func statusInfoFor(transaction: CoinTransaction) async -> TransactionStatusInfo
 }

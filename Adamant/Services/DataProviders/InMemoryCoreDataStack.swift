@@ -9,7 +9,7 @@
 import Foundation
 import CoreData
 
-class InMemoryCoreDataStack: CoreDataStack {
+final class InMemoryCoreDataStack: CoreDataStack {
     let container: NSPersistentContainer
     
     init(modelUrl url: URL) throws {

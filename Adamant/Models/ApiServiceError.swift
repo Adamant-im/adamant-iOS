@@ -17,6 +17,7 @@ enum ApiServiceError: LocalizedError, Error {
     case networkError(error: Error)
     case requestCancelled
     case commonError(message: String)
+    case noEndpointsAvailable(coin: String)
     
     var errorDescription: String? {
         switch self {
@@ -41,7 +42,21 @@ enum ApiServiceError: LocalizedError, Error {
             
         case let .commonError(message):
             return String.adamant.sharedErrors.commonError(message)
+            
+        case let .noEndpointsAvailable(coin):
+            return
+                .localizedStringWithFormat(
+                    .localized(
+                        "ApiService.InternalError.NoNodesAvailable",
+                        comment: "Serious internal error: No nodes available"
+                    ),
+                    coin
+                ).localized
         }
+    }
+    
+    static func internalError(error: InternalAPIError) -> Self {
+        .internalError(message: error.localizedDescription, error: error)
     }
 }
 
@@ -52,7 +67,7 @@ extension ApiServiceError: RichError {
     
     var level: ErrorLevel {
         switch self {
-        case .accountNotFound, .notLogged, .networkError, .requestCancelled:
+        case .accountNotFound, .notLogged, .networkError, .requestCancelled, .noEndpointsAvailable:
             return .warning
             
         case .serverError, .commonError:
@@ -65,7 +80,7 @@ extension ApiServiceError: RichError {
     
     var internalError: Error? {
         switch self {
-        case .accountNotFound, .notLogged, .serverError, .requestCancelled, .commonError:
+        case .accountNotFound, .notLogged, .serverError, .requestCancelled, .commonError, .noEndpointsAvailable:
             return nil
             
         case .internalError(_, let error):
@@ -98,5 +113,29 @@ extension ApiServiceError: Equatable {
         default:
             return false
         }
+    }
+}
+
+extension ApiServiceError: HealthCheckableError {
+    var isNetworkError: Bool {
+        switch self {
+        case .networkError:
+            return true
+        default:
+            return false
+        }
+    }
+    
+    var isRequestCancelledError: Bool {
+        switch self {
+        case .requestCancelled:
+            return true
+        default:
+            return false
+        }
+    }
+    
+    static func noEndpointsError(coin: String) -> ApiServiceError {
+        .noEndpointsAvailable(coin: coin)
     }
 }

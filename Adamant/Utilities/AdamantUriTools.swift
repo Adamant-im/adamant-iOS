@@ -12,6 +12,7 @@ import CommonKit
 enum AdamantUri {
     case passphrase(passphrase: String)
     case address(address: String, params: [AdamantAddressParam]?)
+    case addressLegacy(address: String, params: [AdamantAddressParam]?)
 }
 
 enum AdamantAddressParam {
@@ -50,7 +51,7 @@ enum AdamantAddressParam {
     }
 }
 
-class AdamantUriTools {
+final class AdamantUriTools {
     static let AdamantProtocol = "adm"
     
     static func encode(request: AdamantUri) -> String {
@@ -65,7 +66,6 @@ class AdamantUriTools {
             components.queryItems = [
                 .init(name: "address", value: address)
             ]
-            guard let uri = components.url?.absoluteString else { return "" }
 
             params?.forEach {
                 switch $0 {
@@ -77,6 +77,29 @@ class AdamantUriTools {
                     components.queryItems?.append(.init(name: "message", value: value))
                 }
             }
+            
+            guard let uri = components.url?.absoluteString else { return "" }
+
+            return uri
+        case .addressLegacy(address: let address, params: let params):
+            var components = URLComponents()
+            components.scheme = AdmWalletService.qqPrefix
+            components.host = address
+            components.queryItems = (params?.count ?? .zero) > .zero ? [] : nil
+            
+            params?.forEach {
+                switch $0 {
+                case .address:
+                    break
+                case .label(let value):
+                    components.queryItems?.append(.init(name: "label", value: value))
+                case .message(let value):
+                    components.queryItems?.append(.init(name: "message", value: value))
+                }
+            }
+            
+            guard let uri = components.url?.absoluteString.replacingOccurrences(of: "://", with: ":")
+            else { return "" }
 
             return uri
         }

@@ -71,7 +71,7 @@
 "Contribute.Section.RunNodes" = "Запустите узел сети АДАМАНТа";
 
 /* Contribute scene: 'Run nodes' section description. */
-"Contribute.Section.RunNodesDescription" = "Поддержите децентрализацию и повысьте уровень конфиденциальности";
+"Contribute.Section.RunNodesDescription" = "Поддержите децентрализацию и повысьте уровень приватности";
 
 /* Contribute scene: 'Network delegate' section title. */
 "Contribute.Section.NetworkDelegate" = "Станьте делегатом сети";
@@ -272,7 +272,7 @@
 "ApiService.InternalError.ParsingFailed" = "Не удалось разобрать ответ узла блокчена. Сообщите разработчикам";
 
 /* Serious internal error: No nodes available */
-"ApiService.InternalError.NoNodesAvailable" = "Нет доступных нод. Сообщите разработчикам";
+"ApiService.InternalError.NoNodesAvailable" = "Нет доступных %@ нод. Просмотрите список узлов";
 
 /* Eureka forms Cancel button */
 "Cancel" = "Отмена";
@@ -423,6 +423,9 @@
 
 /* Chat: Error scrolling to message, this message has been deleted and is no longer accessible */
 "ChatScene.Error.messageWasDeleted" = "Извините, но это сообщение было удалено и больше недоступно";
+
+/* Chat: Error message is too big */
+"ChatScene.Error.messageIsTooBig" = "Сообщение слишком большое. Отправьте его частями.";
 
 /* Delegates page: scene title */
 "Delegates.Title" = "Делегаты";
@@ -611,10 +614,10 @@
 "NewChatScene.NotInitialized.HelpButton" = "Что это значит?";
 
 /* NodesList: Button label */
-"NodesList.NodesList" = "Список нод";
+"NodesList.NodesList" = "Список нод ADM";
 
 /* NodesList: scene title */
-"NodesList.Title" = "Список нод";
+"NodesList.Title" = "Список нод ADM";
 
 /* NodesList: 'Add new node' button lable */
 "NodesList.AddNewNode" = "Добавить новую ноду";
@@ -627,6 +630,9 @@
 
 /* NodesList: 'Prefer the fastest node' switch */
 "NodesList.PreferTheFastestNode" = "Выбирать самую быструю ноду";
+
+/* NodesList: 'Prefer the fastest node' switch */
+"NodesList.PreferTheFastestNode.Footer" = "Обрабатывайте запросы быстрее, но это может привести к снижению приватности.";
 
 /* NodesList.NodeCell: Node ping */
 "NodesList.NodeCell.Ping" = "Пинг";
@@ -642,6 +648,15 @@
 
 /* NodesList.NodeCell: Node version */
 "NodesList.NodeCell.Version" = "версия";
+
+/* CoinsNodesList: Title */
+"CoinsNodesList.Title" = "Ноды сервисов и монет";
+
+/* NodesList.NodeCell: Node is disabled */
+"NodesList.NodeCell.Disabled" = "Отключена";
+
+/* CoinsNodesList: ServiceNode */
+"CoinsNodesList.ServiceNode" = "Сервис";
 
 /* NodeList: Inform that default nodes was loaded, if user deleted all nodes */
 "NodeList.DefaultNodesLoaded" = "Был загружен список нод по умолчанию";
@@ -1116,3 +1131,9 @@
 
 /* Pending message reply error */
 "Reply.pendingMessageError" = "Вы не можете ответить на ожидающее сообщение. Дождитесь подтверждения (оценка 1-2 секунды)";
+
+/* Include partner name */
+"PartnerQR.includePartnerName" = "Добавить имя контакта";
+
+/* Include partner url */
+"PartnerQR.includePartnerURL" = "Добавить ссылку на веб-приложение";

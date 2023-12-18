@@ -33,9 +33,9 @@ public struct AdvancedAlertModel: Equatable, Hashable {
 public extension AdvancedAlertModel {
     struct Button: Equatable, Hashable {
         public let title: String
-        public let action: HashableAction
+        public let action: IDWrapper<Action>
         
-        public init(title: String, action: HashableAction) {
+        public init(title: String, action: IDWrapper<Action>) {
             self.title = title
             self.action = action
         }

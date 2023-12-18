@@ -272,7 +272,7 @@
 "ApiService.InternalError.ParsingFailed" = "Parsing failed. Report a bug";
 
 /* Serious internal error: No nodes available */
-"ApiService.InternalError.NoNodesAvailable" = "No nodes available. Report a bug";
+"ApiService.InternalError.NoNodesAvailable" = "No active %@ nodes. Review the node list";
 
 /* Eureka forms Cancel button */
 "Cancel" = "Cancel";
@@ -423,6 +423,9 @@
 
 /* Chat: Error scrolling to message, this message has been deleted and is no longer accessible */
 "ChatScene.Error.messageWasDeleted" = "Sorry, but this message has been deleted and is no longer accessible";
+
+/* Chat: Error message is too big */
+"ChatScene.Error.messageIsTooBig" = "The message is too big. Send it in parts.";
 
 /* Delegates page: scene title */
 "Delegates.Title" = "Delegates";
@@ -611,10 +614,10 @@
 "NewChatScene.NotInitialized.HelpButton" = "What does it mean?";
 
 /* NodesList: Button label */
-"NodesList.NodesList" = "Node list";
+"NodesList.NodesList" = "ADM node list";
 
 /* NodesList: scene title */
-"NodesList.Title" = "List of nodes";
+"NodesList.Title" = "List of ADM nodes";
 
 /* NodesList: 'Add new node' button lable */
 "NodesList.AddNewNode" = "Add new node";
@@ -628,6 +631,9 @@
 /* NodesList: 'Prefer the fastest node' switch */
 "NodesList.PreferTheFastestNode" = "Prefer the fastest node";
 
+/* NodesList: 'Prefer the fastest node' switch */
+"NodesList.PreferTheFastestNode.Footer" = "Process requests faster, but it may cause less privacy";
+
 /* NodesList.NodeCell: Node ping */
 "NodesList.NodeCell.Ping" = "Ping";
 
@@ -640,11 +646,20 @@
 /* NodesList.NodeCell: Node is offline */
 "NodesList.NodeCell.Offline" = "Offline";
 
+/* NodesList.NodeCell: Node is disabled */
+"NodesList.NodeCell.Disabled" = "Disabled";
+
 /* NodesList.NodeCell: Node version */
 "NodesList.NodeCell.Version" = "version";
 
 /* NodeList: Inform that default nodes was loaded, if user deleted all nodes */
 "NodeList.DefaultNodesLoaded" = "Default nodes list was loaded";
+
+/* CoinsNodesList: Title */
+"CoinsNodesList.Title" = "Coin and service node list";
+
+/* CoinsNodesList: ServiceNode */
+"CoinsNodesList.ServiceNode" = "Service";
 
 /* NodesEditor: New node scene title */
 "NodesEditor.NewNodeTitle" = "New node";
@@ -1119,3 +1134,9 @@
 
 /* Pending message reply error */
 "Reply.pendingMessageError" = "You can't reply to a pending message. Wait for confirmations (estimate 1-2 seconds)";
+
+/* Include partner name */
+"PartnerQR.includePartnerName" = "Include contact name";
+
+/* Include partner url */
+"PartnerQR.includePartnerURL" = "Include Web app link";

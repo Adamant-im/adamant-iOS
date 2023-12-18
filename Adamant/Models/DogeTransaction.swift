@@ -23,7 +23,7 @@ extension String.adamant {
     }
 }
 
-class DogeTransaction: BaseBtcTransaction {
+final class DogeTransaction: BaseBtcTransaction {
     override var defaultCurrencySymbol: String? { DogeWalletService.currencySymbol }
 }
 

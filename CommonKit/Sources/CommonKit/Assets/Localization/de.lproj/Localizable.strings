@@ -275,7 +275,7 @@
 "ApiService.InternalError.ParsingFailed" = "Parsing fehlgeschlagen. Bericht senden";
 
 /* Serious internal error: No nodes available */
-"ApiService.InternalError.NoNodesAvailable" = "No nodes available. Report a bug";
+"ApiService.InternalError.NoNodesAvailable" = "No active %@ nodes. Review the node list";
 
 /* Eureka forms Cancel button */
 "Cancel" = "Abbrechen";
@@ -426,6 +426,9 @@
 
 /* Chat: Error scrolling to message, this message has been deleted and is no longer accessible */
 "ChatScene.Error.messageWasDeleted" = "Entschuldigung, aber diese Nachricht wurde gelöscht und ist nicht mehr zugänglich";
+
+/* Chat: Error message is too big */
+"ChatScene.Error.messageIsTooBig" = "Die Botschaft ist zu groß. Senden Sie es in Teilen.";
 
 /* Delegates page: scene title */
 "Delegates.Title" = "Delegierte";
@@ -614,10 +617,10 @@
 "NewChatScene.NotInitialized.HelpButton" = "Was bedeutet das?";
 
 /* NodesList: Button label */
-"NodesList.NodesList" = "Node-Liste";
+"NodesList.NodesList" = "ADM Node-Liste";
 
 /* NodesList: scene title */
-"NodesList.Title" = "Liste der benutzten Nodes";
+"NodesList.Title" = "Liste der benutzten ADM Nodes";
 
 /* NodesList: 'Saved' message */
 "NodesList.Saved" = "Gespeichert";
@@ -637,6 +640,9 @@
 /* NodesList: 'Prefer the fastest node' switch */
 "NodesList.PreferTheFastestNode" = "Prefer the fastest node";
 
+/* NodesList: 'Prefer the fastest node' switch */
+"NodesList.PreferTheFastestNode.Footer" = "Verarbeiten Sie Anfragen schneller, aber es kann zu weniger Datenschutz führen";
+
 /* NodesList.NodeCell: Node ping */
 "NodesList.NodeCell.Ping" = "Ping";
 
@@ -649,11 +655,20 @@
 /* NodesList.NodeCell: Node is offline */
 "NodesList.NodeCell.Offline" = "Offline";
 
+/* NodesList.NodeCell: Node is disabled */
+"NodesList.NodeCell.Disabled" = "Deaktiviert";
+
 /* NodesList.NodeCell: Node version */
 "NodesList.NodeCell.Version" = "version";
 
 /* NodeList: Inform that default nodes was loaded, if user deleted all nodes */
 "NodeList.DefaultNodesLoaded" = "Default nodes list was loaded";
+
+/* CoinsNodesList: Title */
+"CoinsNodesList.Title" = "Liste der Münz- und Serviceknoten";
+
+/* CoinsNodesList: ServiceNode */
+"CoinsNodesList.ServiceNode" = "Service";
 
 /* NodesEditor: New node scene title */
 "NodesEditor.NewNodeTitle" = "New node";
@@ -1140,3 +1155,9 @@
 
 /* Pending message reply error */
 "Reply.pendingMessageError" = "Sie können nicht auf eine ausstehende Nachricht antworten. Auf Bestätigungen warten (schätzungsweise 1–2 Sekunden)";
+
+/* Include partner name */
+"PartnerQR.includePartnerName" = "Neem contact op met";
+
+/* Include partner url */
+"PartnerQR.includePartnerURL" = "Koppeling naar webapp opnemen";

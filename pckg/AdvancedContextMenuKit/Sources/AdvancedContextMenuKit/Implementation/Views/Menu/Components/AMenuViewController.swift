@@ -234,10 +234,10 @@ extension AMenuViewController: UITableViewDelegate, UITableViewDataSource {
         
         let rowPosition: AMenuRowCell.RowPosition
         
-        if indexPath.row == 0 {
-            rowPosition = .top
-        } else if indexPath.row == menuContent.menuItems.count - 1 {
+        if indexPath.row == menuContent.menuItems.count - 1 {
             rowPosition = .bottom
+        } else if indexPath.row == .zero {
+            rowPosition = .top
         } else {
             rowPosition = .other
         }

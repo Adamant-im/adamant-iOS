@@ -35,6 +35,7 @@ enum ShareType {
     case share
     case generateQr(encodedContent: String?, sharingTip: String?, withLogo: Bool)
     case saveToPhotolibrary(image: UIImage)
+    case partnerQR
     
     var localized: String {
         switch self {
@@ -44,7 +45,7 @@ enum ShareType {
         case .share:
             return String.adamant.alert.share
             
-        case .generateQr:
+        case .generateQr, .partnerQR:
             return String.adamant.alert.generateQr
             
         case .saveToPhotolibrary:
@@ -147,6 +148,15 @@ protocol DialogService: AnyObject {
     func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?)
     func presentShareAlertFor(stringForPasteboard: String, stringForShare: String, stringForQR: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?)
     func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIBarButtonItem?, completion: (() -> Void)?)
+    func presentShareAlertFor(
+        string: String,
+        types: [ShareType],
+        excludedActivityTypes: [UIActivity.ActivityType]?,
+        animated: Bool,
+        from: UIBarButtonItem?,
+        completion: (() -> Void)?,
+        didSelect: ((ShareType) -> Void)?
+    )
     
     func presentGoToSettingsAlert(title: String?, message: String?)
     
