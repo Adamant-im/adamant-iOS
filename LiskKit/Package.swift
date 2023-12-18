@@ -1,4 +1,4 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.5
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "LiskKit",
     platforms: [
-        .iOS(.v12),
+        .iOS(.v15),
         .macOS(.v10_12)
     ],
     products: [
@@ -16,14 +16,16 @@ let package = Package(
     ],
     dependencies: [
         .package(name: "Sodium", url: "https://github.com/jedisct1/swift-sodium.git", from: "0.9.1"),
-        .package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", from: "1.3.0")
+        .package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", from: "1.3.0"),
+        .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.6.0")
     ],
     targets: [
         .target(
             name: "LiskKit",
             dependencies: [
                 .product(name: "Clibsodium", package: "Sodium"),
-                "CryptoSwift"
+                "CryptoSwift",
+                .product(name: "SwiftProtobuf", package: "swift-protobuf")
             ],
             path: "Sources"
         ),

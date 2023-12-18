@@ -25,17 +25,17 @@ final class LskWallet: WalletAccount {
     var balance: Decimal = 0.0
     var notifications: Int = 0
     var isNewApi: Bool = true
-    var nounce: String
+    var nonce: UInt64
     var minBalance: Decimal = 0.05
     var minAmount: Decimal = 0
     var isBalanceInitialized: Bool = false
     
-    init(address: String, keyPair: KeyPair, nounce: String, isNewApi: Bool) {
+    init(address: String, keyPair: KeyPair, nonce: UInt64, isNewApi: Bool) {
         self.legacyAddress = address
         self.keyPair = keyPair
         self.lisk32Address = LiskKit.Crypto.getBase32Address(from: keyPair.publicKeyString)
         self.isNewApi = isNewApi
-        self.nounce = nounce
+        self.nonce = nonce
     }
 
 }

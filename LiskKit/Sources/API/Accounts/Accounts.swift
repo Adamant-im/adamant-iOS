@@ -42,4 +42,31 @@ extension Accounts {
     public func accounts(address: String, completionHandler: @escaping (Response<AccountsResponse>) -> Void) {
         client.get(path: "accounts/\(address)", options: nil, completionHandler: completionHandler)
     }
+    
+    public func balance(address: String) async throws -> Balance? {
+        let balances: BalancesResponse = try await client.request(
+            method: "token_getBalances",
+            params: ["address": address]
+        )
+        return balances.balances.first
+    }
+    
+    public func nonce(address: String) async throws -> String {
+        let data: AuthAccount = try await client.request(
+            method: "auth_getAuthAccount",
+            params: ["address": address]
+        )
+        return data.nonce
+    }
+    
+    public func lastBlock() async throws -> Block {
+        try await client.request(
+            method: "chain_getLastBlock",
+            params: [:]
+        )
+    }
+    
+    public func getFees() async throws -> ServiceFeeModel {
+        try await client.request(method: "fee_getMinFeePerByte", params: [:])
+    }
 }

@@ -105,8 +105,6 @@ final class LskTransferViewController: TransferViewControllerBase {
         comments: String
     ) {
         let detailsVc = screensFactory.makeDetailsVC(service: service)
-        var transaction: TransactionEntity = transaction
-        transaction.id = transactionId
         detailsVc.transaction = transaction
         detailsVc.senderName = String.adamant.transactionDetails.yourAddress
         detailsVc.recipientName = recipientName

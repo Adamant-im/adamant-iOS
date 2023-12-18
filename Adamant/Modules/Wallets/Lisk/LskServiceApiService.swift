@@ -52,7 +52,7 @@ final class LskServiceApiService: WalletApiService {
         ) -> Void
     ) async -> WalletServiceResult<Output> {
         await requestClient { client, completion in
-            body(.init(client: client, version: .v2), completion)
+            body(.init(client: client, version: .v3), completion)
         }
     }
 }

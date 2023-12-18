@@ -61,15 +61,13 @@ extension LskWalletService {
     
     static var nodes: [Node] {
         [
-            Node(url: URL(string: "https://lisknode3.adamant.im")!),
-Node(url: URL(string: "https://lisknode4.adamant.im")!),
+            Node(url: URL(string: "http://38.242.243.29:44099")!)
         ]
     }
     
     static var serviceNodes: [Node] {
         [
-            Node(url: URL(string: "https://liskservice3.adamant.im")!),
-Node(url: URL(string: "https://liskservice4.adamant.im")!),
+            Node(url: URL(string: "https://service.lisk.com")!)
         ]
     }
 }

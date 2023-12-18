@@ -36,23 +36,30 @@ extension LskWalletService: WalletServiceTwoStepSend {
         
         // MARK: 2. Create local transaction
         
-        let transaction = TransactionEntity(
+        let transaction = TransactionEntity().createTx(
             amount: amount,
             fee: self.transactionFee,
-            nonce: wallet.nounce,
+            nonce: wallet.nonce,
             senderPublicKey: wallet.keyPair.publicKeyString,
-            recipientAddressBase32: recipient,
             recipientAddressBinary: binaryAddress
         )
         
-        var signedTransaction = transaction.signed(with: keys, for: self.netHash)
-        signedTransaction.id = signedTransaction.bytes().sha256().hexString()
+        let signedTransaction = transaction.sign(with: keys, for: Constants.chainID)
         return signedTransaction
     }
     
     func sendTransaction(_ transaction: TransactionEntity) async throws {
         _ = try await lskNodeApiService.requestTransactionsApi { api, completion in
-            api.submit(signedTransaction: transaction.requestOptions, completionHandler: completion)
+            Task {
+                do {
+                    let id = try await api.submit(transaction: transaction)
+                    completion(.success(response: id))
+                } catch let error as APIError {
+                    completion(.error(response: error))
+                } catch {
+                    completion(.error(response: APIError.unknown(code: nil)))
+                }
+            }
         }.get()
     }
 }
