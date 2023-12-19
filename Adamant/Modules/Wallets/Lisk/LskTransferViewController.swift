@@ -44,8 +44,9 @@ final class LskTransferViewController: TransferViewControllerBase {
                 return
             }
             
-            let recepientBalance = try await service.getBalance(address: recipientAddress)
-            guard recepientBalance == .zero else {
+            let exist = try await service.isExist(address: recipientAddress)
+            
+            guard !exist else {
                 addAdditionalFee = false
                 return
             }

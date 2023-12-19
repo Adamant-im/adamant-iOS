@@ -284,6 +284,11 @@ protocol WalletService: AnyObject {
     func loadTransactions(offset: Int, limit: Int) async throws -> Int
     func getLocalTransactionHistory() -> [TransactionDetails]
     func updateStatus(for id: String, status: TransactionStatus?)
+    func isExist(address: String) async throws -> Bool
+}
+
+extension WalletService {
+    func isExist(address: String) async throws -> Bool { return true }
 }
 
 protocol SwinjectDependentService: WalletService {

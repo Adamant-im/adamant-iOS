@@ -313,6 +313,21 @@ final class LskWalletService: WalletService {
         
         return (fee: fee, lastHeight: height)
     }
+    
+    func isExist(address: String) async throws -> Bool {
+        let result = try await lskServiceApiService.requestServiceApi { api, completion in
+            api.exist(address: address) { result in
+                switch result {
+                case .success(let response):
+                    completion(.success(response: response.data.isExists))
+                case .error(let error):
+                    completion(.error(response: mapError(error)))
+                }
+            }
+        }.get()
+        
+        return result
+    }
 }
 
 // MARK: - WalletInitiatedWithPassphrase

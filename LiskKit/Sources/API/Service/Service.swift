@@ -38,6 +38,14 @@ extension Service {
         client.get(path: "\(Version.v2.rawValue)/fees", completionHandler: completionHandler)
     }
 
+    public func exist(address: String, completionHandler: @escaping (Response<ExistModel>) -> Void) {
+        client.get(
+            path: "\(Version.v3.rawValue)/token/account/exists",
+            options: ["address": address, "tokenID": Constants.tokenID],
+            completionHandler: completionHandler
+        )
+    }
+    
     /// List transaction objects
     public func transactions(
         ownerAddress: String?,
