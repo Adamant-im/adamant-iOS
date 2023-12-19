@@ -81,6 +81,10 @@ final class LskWalletService: WalletService {
         return Self.qqPrefix
     }
     
+    var additionalFee: Decimal {
+        0.05
+    }
+    
 	// MARK: - Properties
 	let transferAvailable: Bool = true
     let netHash = Constants.Nethash.main

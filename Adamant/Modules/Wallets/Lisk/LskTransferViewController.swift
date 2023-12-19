@@ -34,6 +34,26 @@ final class LskTransferViewController: TransferViewControllerBase {
     
     private let prefix = "lsk"
     
+    override func checkForAdditionalFee() {
+        Task {
+            guard let recipientAddress = recipientAddress,
+                  let service = service,
+                  validateRecipient(recipientAddress).isValid
+            else {
+                addAdditionalFee = false
+                return
+            }
+            
+            let recepientBalance = try await service.getBalance(address: recipientAddress)
+            guard recepientBalance == .zero else {
+                addAdditionalFee = false
+                return
+            }
+            
+            addAdditionalFee = true
+        }
+    }
+    
     // MARK: Send
     
     @MainActor
@@ -54,7 +74,11 @@ final class LskTransferViewController: TransferViewControllerBase {
         Task {
             do {
                 // Create transaction
-                let transaction = try await service.createTransaction(recipient: recipient, amount: amount)
+                let transaction = try await service.createTransaction(
+                    recipient: recipient,
+                    amount: amount,
+                    fee: transactionFee
+                )
                 
                 // Send adm report
                 if let reportRecipient = admReportRecipient {
@@ -173,6 +197,8 @@ final class LskTransferViewController: TransferViewControllerBase {
             cell.textField.text = row.value?.components(
                 separatedBy: TransferViewControllerBase.invalidCharacters
             ).joined()
+            
+            self?.checkForAdditionalFee()
             
             guard self?.recipientIsReadonly == false else { return }
     

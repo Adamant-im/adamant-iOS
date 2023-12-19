@@ -313,6 +313,7 @@ protocol WalletServiceWithSend: WalletService {
     var isSupportIncreaseFee: Bool { get }
     var isIncreaseFeeEnabled: Bool { get }
     var defaultIncreaseFee: Decimal { get }
+    var additionalFee : Decimal { get }
 }
 
 extension WalletServiceWithSend {
@@ -340,6 +341,9 @@ extension WalletServiceWithSend {
     var defaultIncreaseFee: Decimal {
         return 1.5
     }
+    var additionalFee: Decimal {
+        .zero
+    }
 }
 
 protocol WalletServiceSimpleSend: WalletServiceWithSend {
@@ -354,7 +358,12 @@ protocol WalletServiceSimpleSend: WalletServiceWithSend {
 protocol WalletServiceTwoStepSend: WalletServiceWithSend {
     associatedtype T: RawTransaction
     
-    func createTransaction(recipient: String, amount: Decimal) async throws -> T
+    func createTransaction(
+        recipient: String,
+        amount: Decimal,
+        fee: Decimal
+    ) async throws -> T
+    
     func sendTransaction(_ transaction: T) async throws
 }
 
