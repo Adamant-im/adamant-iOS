@@ -13,8 +13,15 @@ public extension TransactionEntity {
     }
     
     var recipientAddressBase32: String {
-        let binary = String(decoding: params.recipientAddressBinary, as: UTF8.self)
-        return Crypto.getBase32Address(from: binary)
+        let bytes = [UInt8](params.recipientAddressBinary)
+        let binary = bytes.hexString()
+        return Crypto.getBase32Address(binaryAddress: binary)
+    }
+    
+    var senderAddress: String {
+        let bytes = [UInt8](senderPublicKey)
+        let senderPublicKey = bytes.hexString()
+        return Crypto.getBase32Address(from: senderPublicKey)
     }
     
     func createTx(

@@ -179,12 +179,8 @@ extension TransactionEntity: TransactionDetails {
         return id
     }
     
-    var senderAddress: String {
-        return LiskKit.Crypto.getBase32Address(from: String(decoding: senderPublicKey, as: UTF8.self))
-    }
-    
     var recipientAddress: String {
-        return LiskKit.Crypto.getBase32Address(from: String(decoding: params.recipientAddressBinary, as: UTF8.self))
+        recipientAddressBase32
     }
     
     var dateValue: Date? {

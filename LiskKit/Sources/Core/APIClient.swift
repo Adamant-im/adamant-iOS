@@ -177,7 +177,6 @@ public struct APIClient {
         params: [String: Any]
     ) throws -> URLRequest {
         let url = baseURL.appendingPathComponent(rpcPath)
-        print("url=\(url)")
         var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData)
         
         request.httpMethod = "POST"

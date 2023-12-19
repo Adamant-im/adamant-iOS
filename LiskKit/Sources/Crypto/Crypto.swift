@@ -58,6 +58,14 @@ public struct Crypto {
         return "\(PREFIX_LISK)\(identifier)"
     }
 
+    public static func getBase32Address(binaryAddress: String) -> String {
+        let binaryAddress = binaryAddress.hexBytes()
+        let uint5Address = convertUIntArray(binaryAddress.map { UInt($0) }, 8, 5)
+        let uint5Checksum = createChecksum(uint5Address)
+        let identifier = convertUInt5ToBase32(uint5Address + uint5Checksum)
+        return "\(PREFIX_LISK)\(identifier)"
+    }
+    
     public static func getBinaryAddressFromBase32(_ base32Address: String) -> String? {
         guard isValidBase32(address: base32Address) else { return nil }
 
