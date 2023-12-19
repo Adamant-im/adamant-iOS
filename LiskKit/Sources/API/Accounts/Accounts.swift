@@ -48,7 +48,7 @@ extension Accounts {
             method: "token_getBalances",
             params: ["address": address]
         )
-        return balances.balances.first
+        return balances.balances.first(where: { $0.tokenID == Constants.tokenID })
     }
     
     public func nonce(address: String) async throws -> String {
