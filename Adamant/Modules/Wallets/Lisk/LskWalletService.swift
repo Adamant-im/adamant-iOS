@@ -274,10 +274,8 @@ final class LskWalletService: WalletService {
                 do {
                     let fee = try await api.getFees()
                     completion(.success(response: fee.minFeePerByte))
-                } catch let error as APIError {
-                    completion(.error(response: error))
                 } catch {
-                    completion(.error(response: APIError.unknown(code: nil)))
+                    completion(.error(response: mapError(error)))
                 }
             }
         }.get()
@@ -301,10 +299,8 @@ final class LskWalletService: WalletService {
                 do {
                     let lastBlock = try await api.lastBlock()
                     completion(.success(response: lastBlock))
-                } catch let error as APIError {
-                    completion(.error(response: error))
                 } catch {
-                    completion(.error(response: APIError.unknown(code: nil)))
+                    completion(.error(response: mapError(error)))
                 }
             }
         }.get()
@@ -477,10 +473,8 @@ extension LskWalletService {
                     let balanceRaw = try await api.balance(address: address)
                     let balance = BigUInt(balanceRaw?.availableBalance ?? "0") ?? .zero
                     completion(.success(response: balance))
-                } catch let error as APIError {
-                    completion(.error(response: error))
                 } catch {
-                    completion(.error(response: APIError.unknown(code: nil)))
+                    completion(.error(response: mapError(error)))
                 }
             }
         }
@@ -489,13 +483,7 @@ extension LskWalletService {
         case let .success(balance):
             return balance.asDecimal(exponent: LskWalletService.currencyExponent)
         case let .failure(error):
-            guard
-                case let .remoteServiceError(_, lskError) = error,
-                let lskError = lskError as? APIError,
-                [404, 500].contains(lskError.code)
-            else { throw error }
-            
-            return .zero
+            throw error
         }
     }
     
@@ -505,10 +493,8 @@ extension LskWalletService {
                 do {
                     let nonce = try await api.nonce(address: address)
                     completion(.success(response: UInt64(nonce) ?? .zero))
-                } catch let error as APIError {
-                    completion(.error(response: error))
                 } catch {
-                    completion(.error(response: APIError.unknown(code: nil)))
+                    completion(.error(response: mapError(error)))
                 }
             }
         }
@@ -517,13 +503,7 @@ extension LskWalletService {
         case let .success(nonce):
             return nonce
         case let .failure(error):
-            guard
-                case let .remoteServiceError(_, lskError) = error,
-                let lskError = lskError as? APIError,
-                [404, 500].contains(lskError.code)
-            else { throw error }
-            
-            return .zero
+            throw error
         }
     }
 
@@ -683,5 +663,16 @@ extension LskWalletService: PrivateKeyGenerator {
         }
         
         return keypair.privateKeyString
+    }
+}
+
+
+private func mapError(_ error: Error) -> APIError {
+    if let error = error as? APIError {
+        return error
+    } else if let _ = error as? URLError {
+        return APIError.noNetwork
+    } else {
+        return APIError.unknown(code: nil)
     }
 }
