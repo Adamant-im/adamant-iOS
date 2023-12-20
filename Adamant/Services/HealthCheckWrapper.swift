@@ -9,6 +9,7 @@
 import CommonKit
 import Foundation
 import Combine
+import UIKit
 
 protocol HealthCheckableError: Error {
     var isNetworkError: Bool { get }
@@ -28,6 +29,9 @@ class HealthCheckWrapper<Service, Error: HealthCheckableError> {
     @Atomic var fastestNodeMode = true
     @Atomic var healthCheckTimerSubscription: AnyCancellable?
     @Atomic var subscriptions: Set<AnyCancellable> = .init()
+    
+    @Atomic private var previousAppState: UIApplication.State?
+    @Atomic private var lastUpdateTime = Date()
     
     @ObservableValue private var allowedNodes: [Node] = .init()
     
@@ -78,6 +82,16 @@ class HealthCheckWrapper<Service, Error: HealthCheckableError> {
             .filter { $0 == true }
             .sink { [weak self] _ in self?.healthCheck() }
             .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: UIApplication.didBecomeActiveNotification, object: nil)
+            .sink { [weak self] _ in self?.didBecomeActiveAction() }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: UIApplication.willResignActiveNotification, object: nil)
+            .sink { [weak self] _ in self?.previousAppState = .background }
+            .store(in: &subscriptions)
     }
     
     func request<Output>(
@@ -124,7 +138,19 @@ private extension HealthCheckWrapper {
             in: .default
         ).autoconnect().sink { [weak self] _ in
             self?.healthCheck()
+            self?.lastUpdateTime = Date()
         }
+    }
+    
+    func didBecomeActiveAction() {
+        defer { previousAppState = .active }
+        
+        guard previousAppState == .background,
+              Date() > lastUpdateTime.addingTimeInterval(normalUpdateInterval / 3)
+        else { return }
+        
+        healthCheck()
+        lastUpdateTime = Date()
     }
 }
 
