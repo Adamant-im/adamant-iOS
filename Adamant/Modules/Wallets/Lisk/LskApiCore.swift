@@ -33,6 +33,19 @@ class LskApiCore: BlockchainHealthCheckableService {
         }
     }
     
+    func request<Output>(
+        node: CommonKit.Node,
+        _ body: @Sendable @escaping (APIClient) async throws -> Output
+    ) async -> WalletServiceResult<Output> {
+        let client = makeClient(node: node)
+        
+        do {
+            return .success(try await body(client))
+        } catch {
+            return .failure(mapError(error))
+        }
+    }
+    
     func getStatusInfo(node: CommonKit.Node) async -> WalletServiceResult<NodeStatusInfo> {
         let startTimestamp = Date.now.timeIntervalSince1970
         
@@ -68,4 +81,12 @@ private func mapError(_ error: APIError) -> WalletServiceError {
     default:
         return .remoteServiceError(message: error.message, error: error)
     }
+}
+
+private func mapError(_ error: Error) -> WalletServiceError {
+    if let error = error as? APIError {
+        return mapError(error)
+    }
+    
+    return .remoteServiceError(message: error.localizedDescription, error: error)
 }

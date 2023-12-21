@@ -273,15 +273,8 @@ final class LskWalletService: WalletService {
             throw WalletServiceError.notLogged
         }
         
-        let minFeePerByte = try await lskNodeApiService.requestAccountsApi { api, completion in
-            Task {
-                do {
-                    let fee = try await api.getFees()
-                    completion(.success(response: fee.minFeePerByte))
-                } catch {
-                    completion(.error(response: mapError(error)))
-                }
-            }
+        let minFeePerByte = try await lskNodeApiService.requestAccountsApi { api in
+            try await api.getFees().minFeePerByte
         }.get()
         
         let tempTransaction = TransactionEntity().createTx(
@@ -298,15 +291,8 @@ final class LskWalletService: WalletService {
         let feeValue = tempTransaction.getFee(with: minFeePerByte)
         let fee = BigUInt(feeValue)
         
-        let lastBlock = try await lskNodeApiService.requestAccountsApi { api, completion in
-            Task {
-                do {
-                    let lastBlock = try await api.lastBlock()
-                    completion(.success(response: lastBlock))
-                } catch {
-                    completion(.error(response: mapError(error)))
-                }
-            }
+        let lastBlock = try await lskNodeApiService.requestAccountsApi { api in
+            try await api.lastBlock()
         }.get()
         
         let height = UInt64(lastBlock.header.height)
@@ -315,18 +301,18 @@ final class LskWalletService: WalletService {
     }
     
     func isExist(address: String) async throws -> Bool {
-        let result = try await lskServiceApiService.requestServiceApi { api, completion in
-            api.exist(address: address) { result in
-                switch result {
-                case .success(let response):
-                    completion(.success(response: response.data.isExists))
-                case .error(let error):
-                    completion(.error(response: mapError(error)))
+        try await lskServiceApiService.requestServiceApi { api in
+            try await withUnsafeThrowingContinuation { continuation in
+                api.exist(address: address) { result in
+                    switch result {
+                    case .success(let response):
+                        continuation.resume(returning: response.data.isExists)
+                    case .error(let error):
+                        continuation.resume(throwing: error)
+                    }
                 }
             }
         }.get()
-        
-        return result
     }
 }
 
@@ -486,16 +472,10 @@ extension LskWalletService {
     }
     
     func getBalance(address: String) async throws -> Decimal {
-        let result = await lskNodeApiService.requestAccountsApi { api, completion in
-            Task {
-                do {
-                    let balanceRaw = try await api.balance(address: address)
-                    let balance = BigUInt(balanceRaw?.availableBalance ?? "0") ?? .zero
-                    completion(.success(response: balance))
-                } catch {
-                    completion(.error(response: mapError(error)))
-                }
-            }
+        let result = await lskNodeApiService.requestAccountsApi { api in
+            let balanceRaw = try await api.balance(address: address)
+            let balance = BigUInt(balanceRaw?.availableBalance ?? "0") ?? .zero
+            return balance
         }
         
         switch result {
@@ -507,23 +487,11 @@ extension LskWalletService {
     }
     
     func getNonce(address: String) async throws -> UInt64 {
-        let result = await lskNodeApiService.requestAccountsApi { api, completion in
-            Task {
-                do {
-                    let nonce = try await api.nonce(address: address)
-                    completion(.success(response: UInt64(nonce) ?? .zero))
-                } catch {
-                    completion(.error(response: mapError(error)))
-                }
-            }
-        }
+        let nonce = try await lskNodeApiService.requestAccountsApi { api in
+            try await api.nonce(address: address)
+        }.get()
         
-        switch result {
-        case let .success(nonce):
-            return nonce
-        case let .failure(error):
-            throw error
-        }
+        return UInt64(nonce) ?? .zero
     }
 
     func handleAccountSuccess(with balance: String?, completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
@@ -682,16 +650,5 @@ extension LskWalletService: PrivateKeyGenerator {
         }
         
         return keypair.privateKeyString
-    }
-}
-
-
-private func mapError(_ error: Error) -> APIError {
-    if let error = error as? APIError {
-        return error
-    } else if let _ = error as? URLError {
-        return APIError.noNetwork
-    } else {
-        return APIError.unknown(code: nil)
     }
 }

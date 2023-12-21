@@ -53,17 +53,8 @@ extension LskWalletService: WalletServiceTwoStepSend {
     }
     
     func sendTransaction(_ transaction: TransactionEntity) async throws {
-        _ = try await lskNodeApiService.requestTransactionsApi { api, completion in
-            Task {
-                do {
-                    let id = try await api.submit(transaction: transaction)
-                    completion(.success(response: id))
-                } catch let error as APIError {
-                    completion(.error(response: error))
-                } catch {
-                    completion(.error(response: APIError.unknown(code: nil)))
-                }
-            }
+        _ = try await lskNodeApiService.requestTransactionsApi { api in
+            try await api.submit(transaction: transaction)
         }.get()
     }
 }
