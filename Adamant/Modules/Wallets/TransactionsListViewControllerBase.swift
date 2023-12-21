@@ -269,6 +269,9 @@ class TransactionsListViewControllerBase: UIViewController {
               isNeedToLoadMoore,
               tableView.numberOfRows(inSection: .zero) - indexPath.row < 3
         else {
+            if tableView.tableFooterView == nil, isBusy {
+                bottomIndicatorView().startAnimating()
+            }
             return
         }
 
