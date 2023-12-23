@@ -49,16 +49,16 @@ class LskApiCore: BlockchainHealthCheckableService {
     func getStatusInfo(node: CommonKit.Node) async -> WalletServiceResult<NodeStatusInfo> {
         let startTimestamp = Date.now.timeIntervalSince1970
         
-        return await request(node: node) { client, completion in
-            LiskKit.Node(client: client).info { completion($0) }
+        return await request(node: node) { client in
+            try await LiskKit.Node(client: client).info()
         }.map { model in
-            .init(
-                ping: Date.now.timeIntervalSince1970 - startTimestamp,
-                height: model.data.height ?? .zero,
-                wsEnabled: false,
-                wsPort: nil,
-                version: nil
-            )
+                .init(
+                    ping: Date.now.timeIntervalSince1970 - startTimestamp,
+                    height: model.height ?? .zero,
+                    wsEnabled: false,
+                    wsPort: nil,
+                    version: nil
+                )
         }
     }
 }

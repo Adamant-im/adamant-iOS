@@ -35,7 +35,7 @@ public struct Service: APIService {
 extension Service {
 
     public func getFees(completionHandler: @escaping (Response<ServiceFeeResponse>) -> Void) {
-        client.get(path: "\(Version.v2.rawValue)/fees", completionHandler: completionHandler)
+        client.get(path: "\(Version.v3.rawValue)/fees", completionHandler: completionHandler)
     }
 
     public func exist(address: String, completionHandler: @escaping (Response<ExistModel>) -> Void) {
