@@ -124,9 +124,7 @@ extension TransactionEntity: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
         if !self.command.isEmpty {
             try visitor.visitSingularStringField(value: self.command, fieldNumber: 2)
         }
-        if self.nonce != 0 {
-            try visitor.visitSingularUInt64Field(value: self.nonce, fieldNumber: 3)
-        }
+        try visitor.visitSingularUInt64Field(value: self.nonce, fieldNumber: 3)
         if self.fee != 0 {
             try visitor.visitSingularUInt64Field(value: self.fee, fieldNumber: 4)
         }
