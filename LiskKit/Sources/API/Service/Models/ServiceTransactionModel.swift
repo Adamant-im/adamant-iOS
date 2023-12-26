@@ -7,6 +7,23 @@
 
 import Foundation
 
+public enum ExecutionStatus: String, Decodable {
+    case pending
+    case successful
+    case failed
+    case unknown
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let rawValue = try? container.decode(String.self),
+           let status = ExecutionStatus(rawValue: rawValue) {
+            self = status
+        } else {
+            self = .unknown
+        }
+    }
+}
+
 public struct ServiceTransactionModel: APIModel {
     
     public var blockId: String? {
@@ -29,8 +46,8 @@ public struct ServiceTransactionModel: APIModel {
         return sender.address
     }
     
-    public var recipientId: String? {
-        return asset.recipient.address
+    public var recipientId: String {
+        return params.recipientAddress
     }
     
     public var recipientPublicKey: String? {
@@ -38,7 +55,7 @@ public struct ServiceTransactionModel: APIModel {
     }
     
     public var amount: String {
-        return asset.amount
+        return params.amount
     }
     
     public var signature: String {
@@ -49,14 +66,14 @@ public struct ServiceTransactionModel: APIModel {
         return 0
     }
     
+    public var height: UInt64? {
+        block?.height
+    }
+    
     public struct Block: APIModel {
         public let id: String
         public let height: UInt64
         public let timestamp: UInt32
-    }
-    
-    public struct Recipient: APIModel {
-        public let address: String
     }
     
     public struct Sender: APIModel {
@@ -64,18 +81,17 @@ public struct ServiceTransactionModel: APIModel {
         public let publicKey: String
     }
     
-    public struct Asset: APIModel {
+    public struct Params: APIModel {
         public let amount: String
-        public let recipient: Recipient
+        public let recipientAddress: String
     }
 
     public let id: String
     public let fee: String
-    public let height: UInt64?
     public let block: Block?
     public let sender: Sender
-    public let asset: Asset
-    public let isPending: Bool
+    public let params: Params
+    public let executionStatus: ExecutionStatus
 
     // MARK: - Hashable
 

@@ -179,12 +179,8 @@ extension TransactionEntity: TransactionDetails {
         return id
     }
     
-    var senderAddress: String {
-        return LiskKit.Crypto.getBase32Address(from: senderPublicKey)
-    }
-    
     var recipientAddress: String {
-        return self.asset.recipientAddressBase32
+        recipientAddressBase32
     }
     
     var dateValue: Date? {
@@ -192,7 +188,7 @@ extension TransactionEntity: TransactionDetails {
     }
     
     var amountValue: Decimal? {
-        let value = BigUInt(self.asset.amount)
+        let value = BigUInt(self.params.amount)
         
         return value.asDecimal(exponent: LskWalletService.currencyExponent)
     }

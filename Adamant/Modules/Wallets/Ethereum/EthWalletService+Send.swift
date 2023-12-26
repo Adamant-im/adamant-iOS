@@ -22,7 +22,11 @@ extension CodableTransaction: RawTransaction {
 extension EthWalletService: WalletServiceTwoStepSend {
 	typealias T = CodableTransaction
     
-    func createTransaction(recipient: String, amount: Decimal) async throws -> CodableTransaction {
+    func createTransaction(
+        recipient: String,
+        amount: Decimal,
+        fee: Decimal
+    ) async throws -> CodableTransaction {
         try await ethApiService.requestWeb3 { [weak self] web3 in
             guard let self = self else { throw WalletServiceError.internalError(.unknownError) }
             return try await createTransaction(recipient: recipient, amount: amount, web3: web3)

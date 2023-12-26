@@ -34,6 +34,27 @@ final class LskTransferViewController: TransferViewControllerBase {
     
     private let prefix = "lsk"
     
+    override func checkForAdditionalFee() {
+        Task {
+            guard let recipientAddress = recipientAddress,
+                  let service = service,
+                  validateRecipient(recipientAddress).isValid
+            else {
+                addAdditionalFee = false
+                return
+            }
+            
+            let exist = try await service.isExist(address: recipientAddress)
+            
+            guard !exist else {
+                addAdditionalFee = false
+                return
+            }
+            
+            addAdditionalFee = true
+        }
+    }
+    
     // MARK: Send
     
     @MainActor
@@ -54,7 +75,11 @@ final class LskTransferViewController: TransferViewControllerBase {
         Task {
             do {
                 // Create transaction
-                let transaction = try await service.createTransaction(recipient: recipient, amount: amount)
+                let transaction = try await service.createTransaction(
+                    recipient: recipient,
+                    amount: amount,
+                    fee: transactionFee
+                )
                 
                 // Send adm report
                 if let reportRecipient = admReportRecipient {
@@ -105,8 +130,6 @@ final class LskTransferViewController: TransferViewControllerBase {
         comments: String
     ) {
         let detailsVc = screensFactory.makeDetailsVC(service: service)
-        var transaction: TransactionEntity = transaction
-        transaction.id = transactionId
         detailsVc.transaction = transaction
         detailsVc.senderName = String.adamant.transactionDetails.yourAddress
         detailsVc.recipientName = recipientName
@@ -175,6 +198,8 @@ final class LskTransferViewController: TransferViewControllerBase {
             cell.textField.text = row.value?.components(
                 separatedBy: TransferViewControllerBase.invalidCharacters
             ).joined()
+            
+            self?.checkForAdditionalFee()
             
             guard self?.recipientIsReadonly == false else { return }
     
