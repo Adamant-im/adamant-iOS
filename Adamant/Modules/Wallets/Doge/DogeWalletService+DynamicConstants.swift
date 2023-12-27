@@ -61,7 +61,7 @@ extension DogeWalletService {
     
     static var nodes: [Node] {
         [
-            Node(url: URL(string: "https://dogenode1.adamant.im")!),
+            Node(url: URL(string: "https://dogenode1.adamant.im")!, altUrl: URL(string: "http://5.9.99.62:44099")),
 Node(url: URL(string: "https://dogenode2.adamant.im")!, altUrl: URL(string: "http://176.9.32.126:44098")),
         ]
     }

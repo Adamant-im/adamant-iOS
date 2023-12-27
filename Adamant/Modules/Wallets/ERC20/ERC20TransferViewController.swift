@@ -44,7 +44,11 @@ final class ERC20TransferViewController: TransferViewControllerBase {
         Task {
             do {
                 // Create transaction
-                let transaction = try await service.createTransaction(recipient: recipient, amount: amount)
+                let transaction = try await service.createTransaction(
+                    recipient: recipient,
+                    amount: amount,
+                    fee: transactionFee
+                )
                 
                 guard let txHash = transaction.txHash else {
                     throw WalletServiceError.internalError(

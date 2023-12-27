@@ -189,6 +189,20 @@ class TransferViewControllerBase: FormViewController {
     
     weak var delegate: TransferViewControllerDelegate?
     
+    var addAdditionalFee = false {
+        didSet {
+            updateFeeCell()
+        }
+    }
+    
+    var transactionFee: Decimal {
+        let baseFee = service?.transactionFee ?? .zero
+        let additionalyFee = service?.additionalFee ?? .zero
+        return addAdditionalFee
+        ? baseFee + additionalyFee
+        : baseFee
+    }
+    
     var recipientAddress: String? {
         set {
             if let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) {
@@ -232,7 +246,7 @@ class TransferViewControllerBase: FormViewController {
         }
         
         let fee = isNeedAddFee
-        ? service.transactionFee
+        ? transactionFee
         : 0
         
         let max = balance - fee - service.minBalance
@@ -416,6 +430,12 @@ class TransferViewControllerBase: FormViewController {
         tableView.backgroundColor = .clear
     }
     
+    private func updateFeeCell() {
+        let row: DoubleDetailsRow? = form.rowBy(tag: BaseRows.fee.tag)
+        row?.value = getCellFeeValue()
+        row?.updateCell()
+    }
+    
     // MARK: - Form constructors
     
     func walletSection() -> Section {
@@ -521,7 +541,7 @@ class TransferViewControllerBase: FormViewController {
         }
         
         if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.maxToTransfer.tag) {
-            markRow(row, valid: wallet.balance > service.transactionFee)
+            markRow(row, valid: wallet.balance > transactionFee)
         }
         
         if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.amount.tag) {
@@ -572,7 +592,7 @@ class TransferViewControllerBase: FormViewController {
         if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.total.tag) {
             if let amount = amount {
                 row.value = isNeedAddFee
-                ? (amount + service.transactionFee).doubleValue
+                ? (amount + transactionFee).doubleValue
                 : amount.doubleValue
                 row.updateCell()
                 markRow(row, valid: validateAmount(amount))
@@ -772,7 +792,7 @@ class TransferViewControllerBase: FormViewController {
             return false
         }
         
-        let total = withFee ? amount + service.transactionFee : amount
+        let total = withFee ? amount + transactionFee : amount
         
         return balance >= total
     }
@@ -781,7 +801,7 @@ class TransferViewControllerBase: FormViewController {
         guard
             let service = service,
             let wallet = service.wallet,
-            wallet.balance > service.transactionFee
+            wallet.balance > transactionFee
         else {
             return false
         }
@@ -801,7 +821,7 @@ class TransferViewControllerBase: FormViewController {
     func isEnoughFee() -> Bool {
         guard let service = service,
               let wallet = service.wallet,
-              wallet.balance > service.transactionFee,
+              wallet.balance > transactionFee,
               service.isTransactionFeeValid
         else {
             return false
@@ -909,6 +929,8 @@ class TransferViewControllerBase: FormViewController {
     func validateRecipient(_ address: String) -> AddressValidationResult {
         fatalError("You must implement recipient addres validation logic")
     }
+    
+    func checkForAdditionalFee() { }
 }
 
 // MARK: - Default rows
@@ -1104,7 +1126,7 @@ extension TransferViewControllerBase {
             return DoubleDetail(first: "0", second: nil)
         }
         
-        let fee = service.diplayTransactionFee
+        let fee = transactionFee
         let isWarningGasPrice = service.isWarningGasPrice
         
         var fiat: Double = 0.0

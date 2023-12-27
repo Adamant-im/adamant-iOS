@@ -16,7 +16,11 @@ extension DashWalletService: WalletServiceTwoStepSend {
     // MARK: Create & Send
     func create(recipient: String, amount: Decimal) async throws -> BitcoinKit.Transaction {
         guard let lastTransaction = self.lastTransactionId else {
-            return try await  createTransaction(recipient: recipient, amount: amount)
+            return try await createTransaction(
+                recipient: recipient,
+                amount: amount,
+                fee: transactionFee
+            )
         }
         
         let transaction = try await getTransaction(by: lastTransaction)
@@ -27,10 +31,18 @@ extension DashWalletService: WalletServiceTwoStepSend {
             throw WalletServiceError.remoteServiceError(message: "WAIT_FOR_COMPLETION", error: nil)
         }
         
-        return try await createTransaction(recipient: recipient, amount: amount)
+        return try await createTransaction(
+            recipient: recipient,
+            amount: amount,
+            fee: transactionFee
+        )
     }
     
-    func createTransaction(recipient: String, amount: Decimal) async throws -> BitcoinKit.Transaction {
+    func createTransaction(
+        recipient: String,
+        amount: Decimal,
+        fee: Decimal
+    ) async throws -> BitcoinKit.Transaction {
         // MARK: 1. Prepare
         guard let wallet = self.dashWallet else {
             throw WalletServiceError.notLogged
@@ -43,7 +55,7 @@ extension DashWalletService: WalletServiceTwoStepSend {
         }
         
         let rawAmount = NSDecimalNumber(decimal: amount * DashWalletService.multiplier).uint64Value
-        let fee = NSDecimalNumber(decimal: self.transactionFee * DashWalletService.multiplier).uint64Value
+        let fee = NSDecimalNumber(decimal: fee * DashWalletService.multiplier).uint64Value
         
         // MARK: 2. Search for unspent transactions
 

@@ -21,7 +21,11 @@ extension DogeWalletService: WalletServiceTwoStepSend {
     typealias T = BitcoinKit.Transaction
     
     // MARK: Create & Send
-    func createTransaction(recipient: String, amount: Decimal) async throws -> BitcoinKit.Transaction {
+    func createTransaction(
+        recipient: String,
+        amount: Decimal,
+        fee: Decimal
+    ) async throws -> BitcoinKit.Transaction {
         // Prepare
         guard let wallet = self.dogeWallet else {
             throw WalletServiceError.notLogged
@@ -34,7 +38,7 @@ extension DogeWalletService: WalletServiceTwoStepSend {
         }
         
         let rawAmount = NSDecimalNumber(decimal: amount * DogeWalletService.multiplier).uint64Value
-        let fee = NSDecimalNumber(decimal: self.transactionFee * DogeWalletService.multiplier).uint64Value
+        let fee = NSDecimalNumber(decimal: fee * DogeWalletService.multiplier).uint64Value
         
         // Search for unspent transactions
         do {

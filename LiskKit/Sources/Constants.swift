@@ -39,4 +39,9 @@ public struct Constants {
         public static let test = "15f0dacc1060e91818224a94286b13aa04279c640bd5d6f193182031d133df7c"
         public static let beta = "ef3844327d1fd0fc5785291806150c937797bdb34a748c9cd932b7e859e9ca0c"
     }
+    
+    public static let chainID = "00000000"
+    public static let tokenID = "0000000000000000"
+    public static let command = "transfer"
+    public static let module = "token"
 }
