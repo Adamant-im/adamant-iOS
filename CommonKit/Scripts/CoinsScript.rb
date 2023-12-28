@@ -16,6 +16,55 @@ class Coins
         return text
     end
     
+    # Get Health Check file
+    def get_health_check_params_from(json)
+        symbol = json["symbol"]
+        
+        # node_additional_info
+        node_additional_info = json["nodeAdditionalInfo"]
+        
+        normal_update_interval = nil
+        crucial_update_interval = nil
+        on_screen_update_interval = nil
+        threshold =nil
+        normal_service_update_interval = nil
+        crucial_service_update_interval = nil
+        on_screen_service_update_interval = nil
+        
+        if !node_additional_info.nil?
+            normal_update_interval = node_additional_info["normalUpdateInterval"]
+            crucial_update_interval = node_additional_info["crucialUpdateInterval"]
+            on_screen_update_interval = node_additional_info["onScreenUpdateInterval"]
+            threshold = node_additional_info["threshold"]
+            normal_service_update_interval = node_additional_info["normalServiceUpdateInterval"]
+            crucial_service_update_interval = node_additional_info["crucialServiceUpdateInterval"]
+            on_screen_service_update_interval = node_additional_info["onScreenServiceUpdateInterval"]
+            
+            if normal_service_update_interval.nil?
+                normal_service_update_interval = normal_update_interval
+            end
+            if crucial_service_update_interval.nil?
+                crucial_service_update_interval = crucial_update_interval
+            end
+            if on_screen_service_update_interval.nil?
+                on_screen_service_update_interval = on_screen_update_interval
+            end
+            
+            text = "static let healthCheckParameters = CoinHealthCheckParameters(
+        normalUpdateInterval: #{normal_update_interval / 1000},
+        crucialUpdateInterval: #{crucial_update_interval / 1000},
+        onScreenUpdateInterval: #{on_screen_update_interval / 1000},
+        threshold: #{threshold},
+        normalServiceUpdateInterval: #{normal_service_update_interval / 1000},
+        crucialServiceUpdateInterval: #{crucial_service_update_interval / 1000},
+        onScreenServiceUpdateInterval: #{on_screen_service_update_interval / 1000}
+    )"
+            return text
+        end
+        
+        return nil
+    end
+    
     # Update a swift file
     def writeToSwiftFile(name, json)
         
@@ -43,7 +92,7 @@ class Coins
         serviceNodes = ""
         services = json["services"]
         if services != nil
-            serviceNodesArray = services["#{symbol.downcase}Service"]
+            serviceNodesArray = (symbol == "ADM") ? services["infoService"] : services["#{symbol.downcase}Service"]
             if serviceNodesArray != nil
                 serviceNodesArray.each do |node|
                     url = node["url"]
@@ -83,7 +132,7 @@ class Coins
         
         defaultOrdinalLevel = json["defaultOrdinalLevel"]
         
-        minNodeVersion = json["minNodeVersion"]
+        minNodeVersion = json["nodeAdditionalInfo"]["minVersion"]
         if minNodeVersion == nil
             minNodeVersion = "nil"
         else
@@ -114,6 +163,8 @@ class Coins
         defaultGasLimit = json["defaultGasLimit"]
         warningGasPriceGwei = json["warningGasPriceGwei"]
         
+        health_check_params = get_health_check_params_from(json)
+        
         emptyText = ""
         
         # Create swift file
@@ -128,7 +179,11 @@ extension #{symbol.capitalize}WalletService {
     static let currencySymbol = \"#{symbol}\"
     static let currencyExponent: Int = -#{decimals}
     static let qqPrefix: String = \"#{qqPrefix}\"
-    
+    #{health_check_params ?
+    health_check_params :
+    emptyText
+    }
+        
 #{newPendingInterval ?
     createSwiftVariable("newPendingInterval", newPendingInterval, "Int", true) :
     emptyText
