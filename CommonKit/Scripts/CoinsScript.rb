@@ -21,11 +21,11 @@ class Coins
         symbol = json["symbol"]
         
         # node_additional_info
-        node_additional_info = json["nodes"]["additionalInfo"]
+        node_additional_info = json["nodes"]["healthCheck"]
         services = json["services"]
         
         if !services.nil?
-            service_additional_info = services["additionalInfo"]
+            service_additional_info = services["healthCheck"]
         end
         
         normal_update_interval = nil
@@ -98,13 +98,16 @@ class Coins
         end
         
         serviceNodes = ""
-        services = json["services"]
-        if services != nil
-            serviceNodesArray = (symbol == "ADM") ? services["infoService"] : services["#{symbol.downcase}Service"]
-            if serviceNodesArray != nil
-                serviceNodesArray.each do |node|
-                    url = node["url"]
-                    serviceNodes += "Node(url: URL(string: \"#{url}\")!),\n"
+        servicesInfo = json["services"]
+        if servicesInfo != nil
+            services = servicesInfo["list"]
+            if services != nil
+                serviceNodesArray = (symbol == "ADM") ? services["infoService"] : services["#{symbol.downcase}Service"]
+                if serviceNodesArray != nil
+                    serviceNodesArray.each do |node|
+                        url = node["url"]
+                        serviceNodes += "Node(url: URL(string: \"#{url}\")!),\n"
+                    end
                 end
             end
         end
@@ -140,7 +143,13 @@ class Coins
         
         defaultOrdinalLevel = json["defaultOrdinalLevel"]
         
-        minNodeVersion = json["nodes"]["additionalInfo"]["minVersion"]
+        nodesInfo = json["nodes"]
+        minNodeVersion = "nil"
+        
+        if nodesInfo != nil
+            minNodeVersion = nodesInfo["minVersion"]
+        end
+        
         if minNodeVersion == nil
             minNodeVersion = "nil"
         else
