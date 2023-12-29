@@ -33,6 +33,7 @@
 		3AA50DF12AEBE66A00C58FC8 /* PartnerQRViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA50DF02AEBE66A00C58FC8 /* PartnerQRViewModel.swift */; };
 		3AA50DF32AEBE67C00C58FC8 /* PartnerQRFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA50DF22AEBE67C00C58FC8 /* PartnerQRFactory.swift */; };
 		3AC76E3D2AB09118008042C4 /* ElegantEmojiPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 3AC76E3C2AB09118008042C4 /* ElegantEmojiPicker */; };
+		3AF53F8F2B3EE0DA00B30312 /* DogeNodeInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF53F8E2B3EE0DA00B30312 /* DogeNodeInfo.swift */; };
 		3C06931576393125C61FB8F6 /* Pods_Adamant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33975C0D891698AA7E74EBCC /* Pods_Adamant.framework */; };
 		41047B70294B5EE10039E956 /* VisibleWalletsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41047B6F294B5EE10039E956 /* VisibleWalletsViewController.swift */; };
 		41047B72294B5F210039E956 /* VisibleWalletsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41047B71294B5F210039E956 /* VisibleWalletsTableViewCell.swift */; };
@@ -668,6 +669,7 @@
 		3AA50DEE2AEBE65D00C58FC8 /* PartnerQRView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnerQRView.swift; sourceTree = "<group>"; };
 		3AA50DF02AEBE66A00C58FC8 /* PartnerQRViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnerQRViewModel.swift; sourceTree = "<group>"; };
 		3AA50DF22AEBE67C00C58FC8 /* PartnerQRFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnerQRFactory.swift; sourceTree = "<group>"; };
+		3AF53F8E2B3EE0DA00B30312 /* DogeNodeInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeNodeInfo.swift; sourceTree = "<group>"; };
 		41047B6F294B5EE10039E956 /* VisibleWalletsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisibleWalletsViewController.swift; sourceTree = "<group>"; };
 		41047B71294B5F210039E956 /* VisibleWalletsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisibleWalletsTableViewCell.swift; sourceTree = "<group>"; };
 		41047B73294C61D10039E956 /* VisibleWalletsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisibleWalletsService.swift; sourceTree = "<group>"; };
@@ -1757,6 +1759,7 @@
 			children = (
 				93CCAE7A2B06D9B500EA5B94 /* DogeBlocksDTO.swift */,
 				93CCAE7D2B06DA6C00EA5B94 /* DogeBlockDTO.swift */,
+				3AF53F8E2B3EE0DA00B30312 /* DogeNodeInfo.swift */,
 			);
 			path = DTO;
 			sourceTree = "<group>";
@@ -3279,6 +3282,7 @@
 				3A9015A72A614A62002A2464 /* AdamantEmojiService.swift in Sources */,
 				93ADE0722ACA66AF008ED641 /* VibrationSelectionView.swift in Sources */,
 				648C696F22915A12006645F5 /* DashTransaction.swift in Sources */,
+				3AF53F8F2B3EE0DA00B30312 /* DogeNodeInfo.swift in Sources */,
 				3A41939A2A5D554A006A6B22 /* Reaction.swift in Sources */,
 				93CCAE752B06CC3600EA5B94 /* LskNodeApiService.swift in Sources */,
 				6416B1A321AD7EA1006089AC /* LskTransactionDetailsViewController.swift in Sources */,

@@ -41,6 +41,10 @@ struct DogeApiCommands {
     static func sendTransaction() -> String {
         return "/api/tx/send"
     }
+    
+    static func getInfo() -> String {
+        return "/api/status"
+    }
 }
 
 final class DogeWalletService: WalletService {
