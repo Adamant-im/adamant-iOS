@@ -21,24 +21,32 @@ class Coins
         symbol = json["symbol"]
         
         # node_additional_info
-        node_additional_info = json["nodeAdditionalInfo"]
+        node_additional_info = json["nodes"]["additionalInfo"]
+        services = json["services"]
+        
+        if !services.nil?
+            service_additional_info = services["additionalInfo"]
+        end
         
         normal_update_interval = nil
         crucial_update_interval = nil
         on_screen_update_interval = nil
-        threshold =nil
+        threshold = nil
         normal_service_update_interval = nil
         crucial_service_update_interval = nil
         on_screen_service_update_interval = nil
+        
+        if !service_additional_info.nil?
+            normal_service_update_interval = service_additional_info["normalUpdateInterval"]
+            crucial_service_update_interval = service_additional_info["crucialUpdateInterval"]
+            on_screen_service_update_interval = service_additional_info["onScreenUpdateInterval"]
+        end
         
         if !node_additional_info.nil?
             normal_update_interval = node_additional_info["normalUpdateInterval"]
             crucial_update_interval = node_additional_info["crucialUpdateInterval"]
             on_screen_update_interval = node_additional_info["onScreenUpdateInterval"]
             threshold = node_additional_info["threshold"]
-            normal_service_update_interval = node_additional_info["normalServiceUpdateInterval"]
-            crucial_service_update_interval = node_additional_info["crucialServiceUpdateInterval"]
-            on_screen_service_update_interval = node_additional_info["onScreenServiceUpdateInterval"]
             
             if normal_service_update_interval.nil?
                 normal_service_update_interval = normal_update_interval
@@ -76,7 +84,7 @@ class Coins
         explorerTx = json["explorerTx"]
         
         nodes = ""
-        nodesArray = json["nodes"]
+        nodesArray = json["nodes"]["list"]
         if nodesArray != nil
             nodesArray.each do |node|
                 url = node["url"]
@@ -132,7 +140,7 @@ class Coins
         
         defaultOrdinalLevel = json["defaultOrdinalLevel"]
         
-        minNodeVersion = json["nodeAdditionalInfo"]["minVersion"]
+        minNodeVersion = json["nodes"]["additionalInfo"]["minVersion"]
         if minNodeVersion == nil
             minNodeVersion = "nil"
         else
