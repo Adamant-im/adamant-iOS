@@ -46,7 +46,7 @@ final class AboutViewController: FormViewController {
     
     enum Rows {
         case website, whitepaper, blog, github, welcomeScreens
-        case adm, email, twitter
+        case adm, email, twitter, vibration
         
         var tag: String {
             switch self {
@@ -58,6 +58,7 @@ final class AboutViewController: FormViewController {
             case .email: return "email"
             case .blog: return "blog"
             case .twitter: return "twttr"
+            case .vibration: return "vibration"
             }
         }
         
@@ -71,6 +72,7 @@ final class AboutViewController: FormViewController {
             case .email: return .localized("About.Row.WriteUs", comment: "About scene: Write us row")
             case .blog: return .localized("About.Row.Blog", comment: "About scene: Our blog row")
             case .twitter: return .localized("About.Row.Twitter", comment: "About scene: Twitter row")
+            case .vibration: return "Vibrations"
             }
         }
         
@@ -83,7 +85,7 @@ final class AboutViewController: FormViewController {
             case .twitter: return .localized("About.Row.Twitter.Url", comment: "About scene: Twitter localized url")
                 
             // No urls
-            case .adm, .email, .welcomeScreens: return ""
+            case .adm, .email, .welcomeScreens, .vibration: return ""
             }
         }
         
@@ -97,20 +99,46 @@ final class AboutViewController: FormViewController {
             case .website: return .asset(named: "row_website")
             case .welcomeScreens: return .asset(named: "row_logo")
             case .twitter: return .asset(named: "row_twitter")
+            case .vibration: return .asset(named: "row_twitter")
             }
         }
     }
     
     // MARK: Dependencies
-    var accountService: AccountService!
-    var accountsProvider: AccountsProvider!
-    var dialogService: DialogService!
-    var screensFactory: ScreensFactory!
+    
+    private let accountService: AccountService
+    private let accountsProvider: AccountsProvider
+    private let dialogService: DialogService
+    private let screensFactory: ScreensFactory
+    private let vibroService: VibroService
     
     // MARK: Properties
+    
     private var storedIOSSupportMessage: String?
     private var numerOfTap = 0
     private let maxNumerOfTap = 10
+    
+    // MARK: Init
+    
+    init(
+        accountService: AccountService,
+        accountsProvider: AccountsProvider,
+        dialogService: DialogService,
+        screensFactory: ScreensFactory,
+        vibroService: VibroService
+    ) {
+        self.accountService = accountService
+        self.accountsProvider = accountsProvider
+        self.dialogService = dialogService
+        self.screensFactory = screensFactory
+        self.vibroService = vibroService
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: Lifecycle
     
@@ -375,9 +403,39 @@ private extension AboutViewController {
             return
         }
         
-        NotificationCenter.default.post(
-            name: .AdamantVibroService.presentVibrationRow,
-            object: nil
-        )
+        vibroService.applyVibration(.success)
+        addVibrationRow()
+    }
+    
+    func addVibrationRow() {
+        guard let appSection = form.sectionBy(tag: Sections.contactUs.tag),
+              form.rowBy(tag: Rows.vibration.tag) == nil
+        else { return }
+        
+        let vibrationRow = LabelRow {
+            $0.title = Rows.vibration.localized
+            $0.tag = Rows.vibration.tag
+            $0.cell.imageView?.image = Rows.vibration.image
+            $0.cell.selectionStyle = .gray
+        }.cellUpdate { (cell, _) in
+            cell.accessoryType = .disclosureIndicator
+        }.onCellSelection { [weak self] (_, _) in
+            guard let vc = self?.screensFactory.makeVibrationSelection()
+            else {
+                return
+            }
+            
+            if let split = self?.splitViewController {
+                let details = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(details, sender: self)
+            } else if let nav = self?.navigationController {
+                nav.pushViewController(vc, animated: true)
+            } else {
+                vc.modalPresentationStyle = .overFullScreen
+                self?.present(vc, animated: true, completion: nil)
+            }
+        }
+        
+        appSection.append(vibrationRow)
     }
 }
