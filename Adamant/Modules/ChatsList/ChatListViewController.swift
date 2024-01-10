@@ -498,7 +498,7 @@ extension ChatListViewController {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! ChatTableViewCell
         
-        cell.accessoryType = .disclosureIndicator
+        cell.accessoryType = .none
         cell.accountLabel.textColor = UIColor.adamant.primary
         cell.dateLabel.textColor = UIColor.adamant.secondary
         cell.avatarImageView.tintColor = UIColor.adamant.primary
