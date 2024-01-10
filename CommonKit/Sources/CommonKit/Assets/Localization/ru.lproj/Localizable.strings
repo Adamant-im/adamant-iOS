@@ -220,6 +220,12 @@
 /* Account tab: 'Vote for delegates' button */
 "AccountTab.Row.VoteForDelegates" = "Голосовать за делегатов";
 
+/* Account tab: 'Language' row */
+"AccountTab.Row.Language" = "Язык";
+
+/* Account tab: Language auto */
+"Language.Auto" = "Автоматически";
+
 /* Account tab: Actions section title */
 "AccountTab.Section.Actions" = "Действия";
 

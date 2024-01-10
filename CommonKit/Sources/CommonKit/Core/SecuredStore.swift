@@ -51,6 +51,10 @@ public extension StoreKey {
         public static let includeNameEnabled = "includeNameEnabled"
         public static let includeURLEnabled = "includeURLEnabled"
     }
+    
+    enum language {
+        public static let language = "language"
+    }
 }
 
 public protocol SecuredStore: AnyObject {

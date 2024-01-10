@@ -60,7 +60,7 @@ final class AccountViewController: FormViewController {
     
     enum Rows {
         case balance, sendTokens // Wallet
-        case security, nodes, coinsNodes, theme, currency, about, visibleWallets, contribute, vibration // Application
+        case security, nodes, coinsNodes, theme, currency, language, about, visibleWallets, contribute, vibration // Application
         case voteForDelegates, generateQr, generatePk, logout // Actions
         case stayIn, biometry, notifications // Security
         
@@ -84,6 +84,7 @@ final class AccountViewController: FormViewController {
             case .contribute: return "contribute"
             case .vibration: return "vibration"
             case .coinsNodes: return "coinsNodes"
+            case .language: return "language"
             }
         }
         
@@ -107,6 +108,7 @@ final class AccountViewController: FormViewController {
             case .contribute: return .localized("AccountTab.Row.Contribute", comment: "Account tab: 'Contribute' row")
             case .vibration: return "Vibrations"
             case .coinsNodes: return .adamant.coinsNodesList.title
+            case .language: return .localized("AccountTab.Row.Language", comment: "Account tab: 'Language' row")
             }
         }
         
@@ -131,6 +133,7 @@ final class AccountViewController: FormViewController {
             case .visibleWallets: image = .asset(named: "row_balance")
             case .contribute: image = .asset(named: "row_contribute")
             case .vibration: image = .asset(named: "row_contribute")
+            case .language: image = .asset(named: "row_language")
             }
             
             return image?
@@ -140,17 +143,17 @@ final class AccountViewController: FormViewController {
     }
     
     // MARK: - Dependencies
-    var visibleWalletsService: VisibleWalletsService!
-    var accountService: AccountService!
-    var dialogService: DialogService!
-    var screensFactory: ScreensFactory!
-    var notificationsService: NotificationsService!
-    var transfersProvider: TransfersProvider!
-    var localAuth: LocalAuthentication!
     
-    var avatarService: AvatarService!
-    
-    var currencyInfoService: CurrencyInfoService!
+    let visibleWalletsService: VisibleWalletsService
+    let accountService: AccountService
+    let dialogService: DialogService
+    let screensFactory: ScreensFactory
+    let notificationsService: NotificationsService
+    let transfersProvider: TransfersProvider
+    let localAuth: LocalAuthentication
+    let avatarService: AvatarService
+    let currencyInfoService: CurrencyInfoService
+    let languageService: LanguageStorageProtocol
     
     // MARK: - Properties
     
@@ -189,6 +192,38 @@ final class AccountViewController: FormViewController {
         refreshControl.addTarget(self, action: #selector(self.handleRefresh(_:)), for: UIControl.Event.valueChanged)
         return refreshControl
     }()
+    
+    // MARK: - Init
+    
+    init(
+        visibleWalletsService: VisibleWalletsService,
+        accountService: AccountService,
+        dialogService: DialogService,
+        screensFactory: ScreensFactory,
+        notificationsService: NotificationsService,
+        transfersProvider: TransfersProvider,
+        localAuth: LocalAuthentication,
+        avatarService: AvatarService,
+        currencyInfoService: CurrencyInfoService,
+        languageService: LanguageStorageProtocol
+    ) {
+        self.visibleWalletsService = visibleWalletsService
+        self.accountService = accountService
+        self.dialogService = dialogService
+        self.screensFactory = screensFactory
+        self.notificationsService = notificationsService
+        self.transfersProvider = transfersProvider
+        self.localAuth = localAuth
+        self.avatarService = avatarService
+        self.currencyInfoService = currencyInfoService
+        self.languageService = languageService
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - Lifecycle
     
@@ -375,13 +410,32 @@ final class AccountViewController: FormViewController {
             }
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
-        }.onChange { row in
-            if let value = row.value {
-                self.currencyInfoService.currentCurrency = value
-            }
+        }.onChange { [weak self] row in
+            guard let value = row.value else { return }
+            self?.currencyInfoService.currentCurrency = value
         }
         
         appSection.append(currencyRow)
+        
+        // Language select
+        let languageRow = ActionSheetRow<Language> {
+            $0.title = Rows.language.localized
+            $0.tag = Rows.language.tag
+            $0.cell.imageView?.image = Rows.language.image
+            $0.options = Language.all
+            $0.value = languageService.getLanguage()
+            
+            $0.displayValueFor = { language in
+                return language?.name
+            }
+        }.cellUpdate { (cell, _) in
+            cell.accessoryType = .disclosureIndicator
+        }.onChange { [weak self] row in
+            guard let value = row.value else { return }
+            self?.languageService.setLanguage(value)
+        }
+        
+        appSection.append(languageRow)
         
         // Contribute
         let contributeRow = LabelRow {
@@ -596,12 +650,10 @@ final class AccountViewController: FormViewController {
             $0.title = localAuth.biometryType.localized
             $0.value = accountService.useBiometry
             
-            if let auth = localAuth {
-                switch auth.biometryType {
-                case .none: $0.cell.imageView?.image = nil
-                case .touchID: $0.cell.imageView?.image = .asset(named: "row_touchid.png")
-                case .faceID: $0.cell.imageView?.image = .asset(named: "row_faceid.png")
-                }
+            switch localAuth.biometryType {
+            case .none: $0.cell.imageView?.image = nil
+            case .touchID: $0.cell.imageView?.image = .asset(named: "row_touchid.png")
+            case .faceID: $0.cell.imageView?.image = .asset(named: "row_faceid.png")
             }
             $0.hidden = Condition.function([], { [weak self] _ -> Bool in
                 guard let showBiometry = self?.showBiometryOptions else {

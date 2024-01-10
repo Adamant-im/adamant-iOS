@@ -100,6 +100,12 @@
 /* 帐户选项卡："货币"行 */
 "AccountTab.Row.Currency" = "货币";
 
+/* Account tab: 'Language' row */
+"AccountTab.Row.Language" = "语言";
+
+/* Account tab: Language auto */
+"Language.Auto" = "自动";
+
 /* 系统帐户：ADAMANT令牌 */
 "Accounts.AdamantTokens" = "欢迎使用ADAMANT";
 
