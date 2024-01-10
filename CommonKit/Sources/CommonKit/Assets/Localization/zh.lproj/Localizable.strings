@@ -1,0 +1,1145 @@
+/* 通知内容：处理事务时出错 */
+"content.error" = "出现问题！";
+
+/* 通知内容：错误格式 */
+"content.error.format" = "出现问题：%@";
+
+/* 新的转移通知标题 */
+"transfer.notificationTitle" = "新转让";
+
+/* 转移通知正文格式 */
+"transfer.notificationBody.format" = "用户已将您%@";
+
+/* 转账通知："您的地址" */
+"transfer.notificationBody.yourAddress" = "您";
+
+/* 关于页面：场景标题 */
+"About.Title" = "关于";
+
+/* 关于场景："阅读"部分标题 */
+"About.Section.About" = "关于ADAMANT";
+
+/* 关于场景："联系我们"部分标题 */
+"About.Section.ContactUs" = "联系我们";
+
+/* 贡献场景："Crashlytics"部分标题 */
+"Contribute.Section.Crashlytics" = "Crashlytics";
+
+/* 贡献场景："Crashlytics"部分描述 */
+"Contribute.Section.CrashlyticsDescription" = "发送匿名崩溃报告，使应用程序更加可靠。我们不收集使用统计信息。";
+
+/* 贡献场景："运行节点"部分标题 */
+"Contribute.Section.RunNodes" = "运行ADAMANT节点";
+
+/* 贡献场景："运行节点"部分描述 */
+"Contribute.Section.RunNodesDescription" = "支持去中心化，提高隐私级别";
+
+/* 贡献场景："网络代理"部分标题 */
+"Contribute.Section.NetworkDelegate" = "成为网络代表";
+
+/* 贡献场景："网络代理"部分描述 */
+"Contribute.Section.NetworkDelegateDescription" = "要成为代表，请支付注册费并获得选民的支持";
+
+/* 贡献场景："代码贡献"部分标题 */
+"Contribute.Section.CodeContribute" = "为代码贡献力量";
+
+/* 贡献场景："代码贡献"部分描述 */
+"Contribute.Section.CodeContributeDescription" = "如果您是开发人员，请加入我们的GitHub存储库";
+
+/* 贡献场景："捐赠"部分标题 */
+"Contribute.Section.Donate" = "捐赠";
+
+/* 贡献场景："捐赠"部分描述 */
+"Contribute.Section.DonateDescription" = "每一次捐赠都让ADAMANT变得更强大";
+
+/* 贡献场景："速率"部分标题 */
+"Contribute.Section.Rate" = "在app Store中对应用进行评分";
+
+/* 贡献场景："速率"部分描述 */
+"Contribute.Section.RateDescription" = "反馈越多，应用程序的可见性越好。突出显示您喜欢的功能";
+
+/* 关于场景：网站行 */
+"About.Row.Website" = "网站";
+
+/* 关于场景：白皮书行 */
+"About.Row.Whitepaper" = "白皮书";
+
+/* 关于场景：Project的GitHub页面行 */
+"About.Row.GitHub" = "项目的GitHub页面";
+
+/* 关于场景：给我们写一行 */
+"About.Row.WriteUs" = "电子邮件";
+
+/* 关于场景：我们的博客行 */
+"About.Row.Blog" = "我们的博客";
+
+/* 关于场景：推特排 */
+"About.Row.Twitter" = "推特";
+
+/* "关于场景：网站本地化url" */
+"About.Row.Website.Url" = "https://adamant.im";
+
+/* "关于场景：白皮书本地化url" */
+"About.Row.Whitepaper.Url" = "https://adamant.im/whitepaper/adamant-whitepaper-en.pdf";
+
+/* "关于场景：Project的GitHub页面本地化url" */
+"About.Row.GitHub.Url" = "https://github.com/Adamant-im";
+
+/* "关于场景：我们的博客本地化url" */
+"About.Row.Blog.Url" = "https://medium.com/adamant-im";
+
+/* "关于场景：Twitter本地化url" */
+"About.Row.Twitter.Url" = "https://twitter.com/adamant_im";
+
+/* 关于场景：写入Adamant行 */
+"About.Row.Adamant" = "Adamant";
+
+/* 关于场景：显示欢迎屏幕 */
+"About.Row.Welcome" = "欢迎屏幕";
+
+/* 帐户选项卡："货币"行 */
+"AccountTab.Row.Currency" = "货币";
+
+/* 系统帐户：ADAMANT令牌 */
+"Accounts.AdamantTokens" = "欢迎使用ADAMANT";
+
+/* 系统帐户：PWA ADM Bounty机器人 */
+"Accounts.AdamantBountyBot" = "ADAMANT Bounty Bot";
+
+/* 系统帐户：ADAMANT Bounty */
+"Accounts.AdamantBounty" = "ADAMANT Bounty钱包";
+
+/* 系统帐户：ADAMANT支持 */
+"Accounts.Support" = "ADAMANT Support";
+
+/* 系统帐户：ADAMANT Exchange */
+"Accounts.AdamantExchange" = "ADAMANT Exchange";
+
+/* 系统账户：押注比特币价格 */
+"Accounts.BetOnBitcoin" = "押注比特币价格";
+
+/* 系统帐户：Adeline */
+"Accounts.Adelina" = "Adelina AI";
+
+/* 系统账户：捐赠ADAMANT基金会 */
+"Accounts.DonateADMFoundation" = "向ADAMANT基金会捐款";
+
+/* AccountsProvider:地址无效错误，%@代表地址 */
+"AccountsProvider.Error.AddressNotValidFormat" = "无效地址：%@";
+
+/* AccountService:警报标题。1.2版中的更改 */
+"AccountService.update.v12.title" = "版本1.2更新：加密钱包";
+
+/* AccountService:警报消息。1.2版本中的更改，通知用户需要重新登录才能启动eth&lsk钱包 */
+"AccountService.update.v12.message" = "您需要重新登录才能启动以太坊钱包";
+
+/* AccountService:用户必须重新登录应用程序才能启动钱包 */
+"AccountService.reloginToInitializeWallets" = "重新登录以启动钱包";
+
+/* 登录：用户键入了无效的密码短语 */
+"AccountServiceError.InvalidPassphrase" = "错误的密码短语";
+
+/* 登录：用户键入了错误的密码短语 */
+"AccountServiceError.FrowngPassphrase" = "错误的密码短语";
+
+/* 帐户选项卡：确认注销警报：注销（确定）按钮 */
+"AccountTab.ConfirmLogout.Logout" = "注销";
+
+/* 帐户选项卡：确认注销警报 */
+"AccountTab.ConfirmLogout.MessageFormat" = "从%@注销？";
+
+/* 帐户选项卡：完整的"获取免费代币"链接，地址为%@ */
+"AccountTab.FreeTokens.UrlFormat" = "https://adamant.im/free-adm-tokens/?wallet=%@";
+
+/* 帐户选项卡：完整的"购买代币"链接，地址为%@ */
+"AccountTab.BuyTokens.UrlFormat" = "https://adamant.im/buy-tokens/?wallet=%@";
+
+/* "帐户"选项卡：余额行标题 */
+"AccountTab.Row.Balance" = "余额";
+
+/* 帐户选项卡："购买代币"按钮 */
+"AccountTab.Row.BuyTokens" = "交换代币";
+
+/* 帐户选项卡："注销"按钮 */
+"AccountTab.Row.Logout" = "注销";
+
+/* 帐户选项卡："安全"行 */
+"AccountTab.Row.Security" = "安全性";
+
+/* 账户选项卡："发送代币"按钮 */
+"AccountTab.Row.SendTokens" = "发送令牌";
+
+/* 帐户选项卡："发送ADM令牌"按钮 */
+"AccountTab.Row.SendAdm" = "发送ADM";
+
+/* 账户选项卡："发送ETH代币"按钮 */
+"AccountTab.Row.SendEth" = "发送ETH";
+
+/* 账户选项卡："发送LSK代币"按钮 */
+"AccountTab.Row.SendLsk" = "发送LSK";
+
+/* 账户选项卡："发送BTC代币"按钮 */
+"AccountTab.Row.SendBtc" = "发送BTC";
+
+/* 账户选项卡："发送DOGE代币"按钮 */
+"AccountTab.Row.SendDoge" = "发送DOGE";
+
+/* 帐户选项卡："发送DASH令牌"按钮 */
+"AccountTab.Row.SendDash" = "发送DASH";
+
+/* 账户选项卡："发送ERC20代币"按钮 */
+"AccountTab.Row.SendToken" = "发送%@";
+
+/* 账户选项卡：匿名购买ADM代币 */
+"AccountTab.Row.AnonymouslyBuyADM" = "匿名更改ADM";
+
+/* 帐户选项卡：在聊天中交换ADM令牌 */
+"AccountTab.Row.ExchangeADMInChat" = "聊天内交换器";
+
+/* 帐户选项卡："地址"行 */
+"AccountTab.Row.Address" = "地址";
+
+/* 帐户选项卡："获取免费代币"按钮 */
+"AccountTab.Row.FreeTokens" = "免费ADM令牌";
+
+/* 帐户选项卡："主题"行 */
+"AccountTab.Row.Theme" = "主题";
+
+/* 帐户选项卡："主题"行值"浅色" */
+"AccountTab.Row.Theme.Light" = "灯光";
+
+/* 帐户选项卡："主题"行值"深色" */
+"AccountTab.Row.Theme.Dark" = "黑暗";
+
+/* 帐户选项卡："关于"行 */
+"AccountTab.Row.About" = "关于";
+
+/* 帐户选项卡："贡献"行 */
+"AccountTab.Row.Contribute" = "投稿";
+
+/* 帐户选项卡："为代表投票"按钮 */
+"AccountTab.Row.VoteForDelegates" = "为代表投票";
+
+/* "帐户"选项卡："操作"部分标题 */
+"AccountTab.Section.Actions" = "行动";
+
+/* "帐户"选项卡："应用程序"部分标题 */
+"AccountTab.Section.Application" = "应用";
+
+/* 账户选项卡：阿达曼钱包 */
+"AccountTab.Wallets.adamant_wallet" = "adamant钱包";
+
+/* 账户选项卡：以太坊钱包 */
+"AccountTab.Wallets.ethereum_wallet" = "以太坊钱包";
+
+/* 账户选项卡：Lisk钱包 */
+"AccountTab.Wallets.lisk_vallet" = "lisk钱包";
+
+/* 账户选项卡：比特币钱包 */
+"AccountTab.Wallets.bitcoin_wallet" = "比特币钱包";
+
+/* 账户选项卡：狗狗钱包 */
+"AccountTab.Wallets.doge_ewallet" = "狗狗钱包";
+
+/* 账户选项卡：达世币钱包 */
+"AccountTab.Wallets.dash_wallet" = "达世币钱包";
+
+/* 账户选项卡：ERC20钱包 */
+"AccountTab.Wallets.erc20_wallet" = "%@钱包";
+
+/* 帐号页面：场景标题 */
+"AccountTab.Title" = "帐户";
+
+/* "帐户"选项卡："代理人"部分标题 */
+"AccountTab.Section.Delegates" = "代理人";
+
+/* 产品名称 */
+"ADAMANT" = "坚定不移";
+
+/* AddressBookService：没有足够的钱将地址保存到区块链中 */
+"AddressBookService.Error.notEnoughMoney" = "没有足够的令牌在区块链中存储数据";
+
+/* 应用程序：无法将deviceToken发送到ANS错误格式。%@用于错误描述 */
+"Application.deviceTokenErrorFormat" = "无法在ANS:%@中注册";
+
+/* 严重内部错误：无法生成终结点url */
+"ApiService.InternalError.EndpointBuildFailed" = "端点构建失败。报告错误";
+
+/* 严重内部错误：无法签署交易 */
+"ApiService.InternalError.FailedTransactionSigning" = "事务失败";
+
+/* 严重内部错误：分析响应时出错 */
+"ApiService.InternalError.PassingFailed" = "分析失败。报告错误";
+
+/* 严重的内部错误：没有可用的节点 */
+"ApiService.InternalError.NoNodesAvailable" = "没有活动的%@节点。查看节点列表";
+
+/* 尤里卡表格取消按钮 */
+"Cancel" = "取消";
+
+/* 聊天列表：传出消息前缀 */
+"ChatListPage.SentMessagePrefix" = "您：";
+
+/* 聊天列表：SearchBar占位符文本 */
+"ChatListPage.SearchBar.Placeholder" = "搜索联系人或消息";
+
+/* 搜索页面：联系人标题 */
+"SearchPage.Contacts" = "联系人";
+
+/* 搜索页面：联系人标题 */
+"SearchPage.Contact.New" = "新联系人";
+
+/* 搜索页面：联系人新标题 */
+"SearchPage.Contact.Add.New" = "[添加新联系人]";
+
+/* SearchPage:消息标题 */
+"SearchPage.Messages" = "信息";
+
+/* 聊天列表：第一次同步正在进行中 */
+"ChatListPage.SyncingChats" = "正在同步聊天…";
+
+/* 聊天列表：已反应 */
+"ChatListPage.Rreached" = "达到";
+
+/* 聊天列表：删除的反应 */
+"ChatListPage.RemotedReaction" = "已删除反应";
+
+/* 聊天列表：场景标题 */
+"ChatListPage.Title" = "聊天";
+
+/* 聊天提供商：通知用户他没有钱支付消息费 */
+"ChatsProvider.Error.notEnoughMoney" = "零余额。获得免费ADM代币";
+
+/* ChatsProvider:未找到事务错误。%@用于事务的ID */
+"ChatsProvider.Error.TransactionNotFoundFormat" = "找不到id为%@的消息";
+
+/* ChatsProvider:验证错误：消息为空 */
+"ChatsProvider.Validation.MessageIsEmpty" = "消息为空";
+
+/* ChatsProvider:验证错误：消息太长 */
+"ChatsProvider.Validation.MessageTooLong" = "消息太长";
+
+/* 已知联系人：Adamant ICO消息。支持降价 */
+"Chats.IcoMessage" = "Null";
+
+/* 已知联系人：Adamant预ICO消息 */
+"Chats.PreIcoMessage" = "Null";
+
+/* 已知联系人：Adamant欢迎信息。支持降价 */
+"Chats.WelcomeMessage" = "ADAMANT是一个真正的区块链信使，独立于政府、企业甚至开发商。这是由于去中心化的网络基础设施，完全开源，由用户运行。这就是为什么每一个动作，包括发送消息或保存联系人姓名，都有0.001 ADM的网络费用。\n\nBlockchain提供了卓越的安全性和隐私，这是典型的P2P和c集中的信使。此外，区块链提供了新的可能性。您可以在聊天中存储和传输密码，并完全控制您的私钥，使用ADAMANT作为2FA等。\\n\nADAMANT中，没有人可以控制、阻止、停用、限制或审查帐户。用户对内容、消息、媒体以及使用Messenger的目标和意图承担全部责任。\\n\n请注意，您的安全性和匿名性取决于您。不要关注你收到的链接，否则你的IP可能会被泄露。在设备上设置密码。了解有关安全性和匿名性的更多信息，请访问https://adamant.im/staysecured/.\\n\n请确保已保存此帐户的密码短语--注销并再次登录。把你的通行证短语也写在纸上。只有**您对通行证短语的安全负责**。它无法恢复。如果其他人得到了它，你的代币就会被盗，信件也会被读取。把这个问题看得最重要，就好像你钱包里的代币在一段时间内会花费10亿美元一样。\\n\n若要立即开始发送消息，请在\"帐户\"选项卡上**获得免费欢迎令牌**。然后创建新聊天并输入您朋友的ADM地址。建议您亲自分享ADM地址，不要使用其他信使。";
+
+/* 已知联系人：Adamant Exchenge消息。支持降价 */
+"Chats.Exchange.WellomeMessage" = "嗨！😊 我是你的交换机器人。我即时匿名操作。键入* */help**看看我能做些什么。我要求的费用比我的机器人同伴高，所以我建议你以有竞争力的费用建立自己的机器人。ℹ️ 你可以在ADAMANT博客上了解更多信息。我非常可靠，但如果您有任何问题，请在这里留言U6386412615727665758。";
+
+/* 已知联系人：Adamant押注比特币消息。支持降价 */
+"Chats.BetOnBitcoin.WelcomeMessage" = "嗨！😊 我是匿名的，区块链验证的投注机器人。我接受BTC费率的投注，并向中奖者支付奖励。ℹ️ 在ADAMANT的博客上了解更多信息，或键入* */help**开始下注。通过U63864126157276665758提供支持。";
+
+/* 已知联系人：Adamant Adelina消息。支持降价 */
+"Chats.Adelina.WelcomeMessage" = "你好，我是Adelina。让我们愉快地交谈一下！我可以做很多事情，比如：\n\n-起草电子邮件或其他文章\n-编写Python代码\n-回答关于一组文档的问题\n-支持对话\n-一系列主题的导师\n-翻译语言\n-写诗\n-模拟电子游戏中的角色等等";
+
+/* 已知联系人：阿达曼捐赠欢迎信息。支持降价 */
+"Chats.Donate.WellomeMessage" = "感谢您的支持，我们开发了去中心化的ADAMANT Messenger——在此聊天中转移ADM、ETH和其他代币。有关其他捐赠钱包，请参阅consided.im。";
+
+/* 警报"重试或删除"标题。在caht中用于再次发送或删除失败的消息 */
+"Chats.RetryOrDelete.Title" = "重试还是删除？";
+
+/* 警报"重试或删除"正文消息。用于聊天，用于再次发送或删除失败的消息 */
+"Chats.RetryOrDelete.Body" = "尝试再次发送消息，还是删除它？";
+
+/* 按钮"阻止" */
+"Chats.Block" = "区块链 区块";
+
+/* 警报"是否阻止此用户？" */
+"Chats.BlockUser" = "是否阻止此用户？";
+
+/* "删除"按钮 */
+"Chats.Remove" = "删除";
+
+/* 警报"是否删除此消息？" */
+"Chats.RemoveMessage" = "是否删除此消息？";
+
+/*  Button "Report"  */
+"Chats.Report" = "报告";
+
+/* "回复"按钮 */
+"Chats.Reply" = "回复";
+
+/* "复制"按钮 */
+"Chats.Copy" = "复制";
+
+/* 警报"报告为不合适？" */
+"Chats.ReportMessage" = "是否报告为不合适？";
+
+/* 警报"报告已发送" */
+"Chats.ReportSent" = "报告已发送";
+
+/* 聊天：通知用户他不能取消已发送的交易 */
+"ChatScene.Error.cancelError" = "消息已发送";
+
+/* 聊天：消息输入占位符 */
+"ChatScene.NewMessage.Placeholder" = "新消息";
+
+/* 聊天：发送信息按钮 */
+"ChatScene.Send" = "发送";
+
+/* 聊天："已发送资金"泡沫标题 */
+"ChatScene.Sent" = "已发送";
+
+/* 聊天："收到的资金"泡沫标题 */
+"ChatScene.Received" = "已接收";
+
+/* 聊天："已发送资金"buble"点击了解详细信息"提示 */
+"ChatScene.tapForDetails" = "点击获取详细信息";
+
+/* 聊天：发送聊天事务失败的状态消息 */
+"ChatScene.MessageStatus.FailToSend" = "发送失败";
+
+/* 聊天：挂起聊天事务的状态消息 */
+"ChatScene.MessageStatus.Pending" = "待定";
+
+/* 聊天：警告聊天事务的状态消息 */
+"ChatScene.MessageStatus.Warning" = "警告";
+
+/* 聊天：动作正文菜单 */
+"ChatScene.Actions.Body" = "%@的新名称";
+
+/* 聊天：操作菜单中的"重命名"操作 */
+"ChatScene.Actions.Rename" = "重命名";
+
+/* 聊天：操作菜单中的"姓名"字段 */
+"ChatScene.Actions.NamePlaceholder" = "名称";
+
+/* 聊天："免费代币"按钮 */
+"ChatScene.FreeTokensAlert.FreeTokens" = "🎁 免费代币";
+
+/* 聊天："免费代币"消息 */
+"ChatScene.FreeTokensAlert.Message" = "ADAMANT是一个独特的区块链信使，独立于政府、企业甚至其开发者。这是可能的，因为它是一个去中心化的网络，完全开源，由用户运行。这就是为什么每一个动作，包括发消息或保存新联系人，都要收取0.001 ADM.的网络费。要立即开始发消息，请获得免费的欢迎令牌。";
+
+/* 聊天：在设备上未配置邮件应用程序的情况下打开电子邮件链接的警告消息 */
+"ChatScene.Warning.NoMailApp" = "无法发送电子邮件。请检查邮件应用程序配置。";
+
+/* 聊天：打开不支持的url方案的警告消息 */
+"ChatScene.Warning.UnsupportedUrl" = "不支持的url协议";
+
+/* 聊天：滚动到消息时出错，此消息已被删除，无法再访问 */
+"ChatScene.Error.messageWasDeleted" = "很抱歉，此消息已被删除，无法再访问";
+
+/* 聊天：错误消息太大 */
+"ChatScene.Error.messageIsTooBig" = "消息太大。分部分发送。";
+
+/* 代理人页面：场景标题 */
+"Delegates.Title" = "Delegates";
+
+/* 可见钱包页面：场景标题 */
+"VisibleWallets.Title" = "钱包列表";
+
+/* VisibleWallets：重置钱包警报标题 */
+"VisibleWallets.ResetListAlert" = "是否将钱包列表重置为默认值？";
+
+/* 代理人选项卡：关于50 ADM投票费的信息 */
+"Delegates.NotEnoughtTokensForVote" = "没有足够的代币可以投票。您需要50个ADM";
+
+/* 代理人选项卡：关于新投票超时的消息 */
+"Delegates.timeOutBeforeNewVote" = "请等待上一次投票处理完毕";
+
+/* 代理详细信息：场景标题 */
+"DelegateDetails.Title" = "详细信息";
+
+/* 代理人详细信息屏幕："用户名"的行标题 */
+"DelegateDetails.Row.Username" = "用户名";
+
+/* 代理人详细信息屏幕："地址"的行标题 */
+"DelegateDetails.Row.Address" = "地址";
+
+/* 代理人详细信息屏幕："公钥"的行标题 */
+"DelegateDetails.Row.PublicKey" = "公钥";
+
+/* 代表详细信息屏幕："投票权重"的行标题" */
+"DelegateDetails.Row.VoteWeight" = "投票权重";
+
+/* 代理详细信息屏幕："生成的块"的行标题 */
+"DelegateDetails.Row.ProductedBlocks" = "生产的块";
+
+/* 代理详细信息屏幕："错过的块"的行标题" */
+"DelegateDetails.Row.MissedBlocks" = "错过的块";
+
+/* 代理人详细信息屏幕："费率"的行标题 */
+"DelegateDetails.Row.Rate" = "Rate";
+
+/* 代理人详细信息屏幕："排名"的行标题 */
+"DelegateDetails.Row.Rank" = "等级";
+
+/* 代理人详细信息屏幕："批准"的行标题" */
+"DelegateDetails.Row.Approval" = "审批";
+
+/* 代理人详细信息屏幕："生产力"的行标题" */
+"DelegateDetails.Row.Productivity" = "生产率";
+
+/* 代表详细信息屏幕："锻造时间"的行标题" */
+"DelegateDetails.Row.ForgingTime" = "锻造时间";
+
+/* 代表详细信息屏幕："伪造"的行标题 */
+"DelegateDetails.Row.Forged" = "伪造";
+
+/* 代表：成功投票的消息 */
+"Delegates.Vote.Success" = "您的投票已发送";
+
+/* Storybard-代表投票面板："支持票"标签 */
+"Delegates.VotePanel.Upvotes" = "向上投票:";
+
+/* Storybard-代表投票面板："否决票"标签 */
+"Delegates.VotePanel.Downvotes" = "反对票:";
+
+/* Storybard-代表投票面板："新"标签 */
+"Delegates.VotePanel.New" = "新:";
+
+/* Storybard-代表投票面板："总计"标签 */
+"Delegates.VotePanel.Total" = "总计：";
+
+/* 共享错误：找不到帐户错误。使用%@作为地址 */
+"Error.AccountNotFoundFormat" = "找不到帐户：%@";
+
+/* 共享错误：帐户未启动 */
+"Error.AccountNotInitiated" = "帐户未启动";
+
+/* 共享错误：消息的内部错误格式为%@ */
+"Error.InteralErrorFormat" = "内部错误：%@";
+
+/* 共享错误：消息的基本格式为%@ */
+"Error.BaseErrorFormat" = "错误：%@";
+
+/* 支持电子邮件的错误消息标题 */
+"Error.Mail.Title" = "iOS应用程序中的错误";
+
+/* 支持电子邮件的错误消息正文 */
+"Error.Mail.Body" = "你好，\n\n我有这个错误：\n\n%@\n\n我的设备信息：\n\n%@";
+
+/*支持电子邮件的错误消息正文，以及详细的错误描述。其中，第一个%@-错误的短消息，第二个%@–详细描述，第三个%@-设备信息 */
+"Error.Mail.Body.Detailed" = "你好，\n\n我有这个错误：\n\n%@\n\n%@\n\n设备：\n\n%@";
+
+/* 共享错误：网络问题。在大多数情况下-无连接 */
+"Error.NoNetwork" = "无连接";
+
+/* 共享错误：请求已取消 */
+"Error.RequestCancelled" = "请求已取消";
+
+/* 共享错误：消息的远程错误格式为%@ */
+"Error.RemoteServerErrorFormat" = "区块链节点错误：%@";
+
+/* 共享错误：用户未登录 */
+"Error.UserNotLogged" = "用户未登录";
+
+/* 共享未知错误 */
+"Error.UnnowError" = "未知错误。报告错误";
+
+/* 登录：通知用户，他在设置中禁用了摄像头，需要授权应用程序 */
+"LoginScene.Error.AuthorizeCamera" = "您需要授权ADAMANT才能使用设备的摄像头";
+
+/* 登录：用户禁用了对光库的访问，他可以在设置中授权应用程序 */
+"LoginScene.Error.AuthorizePhotolibrary" = "您需要授权ADAMANT才能使用您的照片库";
+
+/* 登录：没有网络错误 */
+"LoginScene.Error.NoInternet" = "没有连接到Internet";
+
+/* 登录：通知用户他正尝试在没有密码的情况下登录 */
+"LoginScene.Error.NoPassphrase" = "输入密码短语";
+
+/* 登录：通知用户所选照片不包含带密码的有效二维码 */
+"LoginScene.Error.NoQrOnPhoto" = "所选图像不包含有效的二维码";
+
+/* 登录：通知用户QR阅读器不支持该设备 */
+"LoginScene.Error.QrNotSupported" = "设备不支持读取二维码";
+
+/* 登录：通知用户扫描的QR不包含密码短语 */
+"LoginScene.Error.WrongQr" = "二维码不包含有效的密码短语";
+
+/* 登录：通知用户我们正在尝试登录 */
+"LoginScene.LoggingInProgress" = "正在登录…";
+
+/* 登录：使用biometry或pincode登录到以前的帐户 */
+"LoginScene.LoginIntoAdamant" = "登录到ADAMANT";
+
+/* 登录：生成新密码短语按钮 */
+"LoginScene.Row.Generate" = "生成新密码短语";
+
+/* 登录：登录按钮 */
+"LoginScene.Row.Login" = "登录";
+
+/* 登录：密码短语占位符 */
+"LoginScene.Row.Passphrase.Placeholder" = "密码短语";
+
+/* 登录：使用密码按钮登录 */
+"LoginScene.Row.Pincode" = "使用PIN码登录";
+
+/* 登录：使用二维码按钮登录 */
+"LoginScene.Row.Qr" = "使用二维码登录";
+
+/* 登录：安全警报，通知用户必须保存新密码。支持向下标记，居中对齐 */
+"LoginScene.Row.SavePassphraseAlert" = "**保存新钱包和Messenger帐户的密码短语**。没有登录信息可以进入钱包，只需要密码短语。**如果丢失，无法恢复**。";
+
+/* 登录：对用户的一个小提示，他可以点击密码短语来保存它 */
+"LoginScene.Row.TapToSave" = "点击保存";
+
+/* 登录：使用现有密码段登录 */
+"LoginScene.Section.Login" = "登录";
+
+/* 登录：创建新帐户部分 */
+"LoginScene.Section.NewAccount" = "新帐户";
+
+/* 新聊天：收件人地址占位符。请注意，地址文本字段总是显示U字母，所以您可以将这一行留空 */
+"NewChatScene.Address.Placeholder" = "";
+
+/* 新聊天：通知用户找不到指定的地址（%@）。使用%@作为地址 */
+"NewChatScene.Error.AddressNotFoundFormat" = "未找到地址：%@";
+
+/* 新聊天：通知用户他输入了无效地址 */
+"NewChatScene.Error.InvalidAddress" = "输入有效地址";
+
+/* 新聊天：通知用户他无法开始与自己聊天 */
+"NewChatScene.Error.OwnAddress" = "你不需要加密的匿名聊天来与自己交谈";
+
+/* 新聊天：通知用户扫描的二维码不包含地址 */
+"NewChatScene.Error.WrongQr" = "二维码不包含有效地址";
+
+/* 新聊天：使用地址按钮扫描二维码 */
+"NewChatScene.ScanQr" = "扫描二维码";
+
+/* 新聊天：场景标题 */
+"NewChatScene.Title" = "新聊天";
+
+/* 新聊天：显示我的地址按钮的二维码 */
+"NewChatScene.MyQr" = "显示我的二维码";
+
+/* 新聊天："这是什么意思？"，有关未初始化帐户的信息的帮助按钮 */
+"NewChatScene.NotInitialized.HelpButton" = "这是什么意思？";
+
+/* NodesList:按钮标签 */
+"NodesList.NodesList" = "ADM节点列表";
+
+/* 节点列表：场景标题 */
+"NodesList.Title" = "ADM节点列表";
+
+/* NodesList:"添加新节点"按钮标签 */
+"NodesList.AddNewNode" = "添加新节点";
+
+/* NodesList:重置节点警报标题 */
+"NodesList.ResetNodeListAlert" = "是否将节点列表重置为默认值？";
+
+/* NodesList:"重置"按钮 */
+"NodesList.ResetButton" = "重置";
+
+/* NodesList:"首选最快的节点"开关 */
+"NodesList.PreferTheFastestNode" = "首选最快的节点";
+
+/* NodesList:"首选最快的节点"开关 */
+"NodesList.PreferTheFastestNode.Footer" = "处理请求更快，但可能会减少隐私";
+
+/* 节点列表。NodeCell:节点ping */
+"NodesList.NodeCell.Ping" = "Ping";
+
+/* 节点列表。NodeCell：毫秒 */
+"NodesList.NodeCell.Milliseconds" = "ms";
+
+/* 节点列表。NodeCell:节点正在同步 */
+"NodesList.NodeCell.Synchronizing" = "正在同步";
+
+/* 节点列表。NodeCell：节点处于脱机状态 */
+"NodesList.NodeCell.Online" = "脱机";
+
+/* 节点列表。NodeCell:节点已禁用 */
+"NodesList.NodeCell.Disabled" = "已禁用";
+
+/* 节点列表。NodeCell：节点版本 */
+"NodesList.NodeCell.Version" = "版本";
+
+/* NodeList：如果用户删除了所有节点，则通知默认节点已加载 */
+"NodeList.DefaultNodesLoaded" = "已加载默认节点列表";
+
+/* 硬币节点列表：标题 */
+"CoinsNodesList.Title" = "Coin和服务节点列表";
+
+/* CoinsNodesList:ServiceNode */
+"CoinsNodesList.ServiceNode" = "服务";
+
+/* NodesEditor:新节点场景标题 */
+"NodesEditor.NewNodeTitle" = "新节点";
+
+/* NodesEditor:删除节点确认消息 */
+"NodesEditor.DeleteNodeAlert" = "是否删除此节点？";
+
+/* NodesEditor:测试正在进行中 */
+"NodesEditor.TestingInProgressMessage" = "正在检查连接…";
+
+/* NodesEditor:Scheme行 */
+"NodesEditor.SchemeRow" = "Scheme";
+
+/* NodesEditor:端口行 */
+"NodesEditor.PortRow" = "端口";
+
+/* NodesEditor:主机行 */
+"NodesEditor.HostRow" = "主机";
+
+/* NodesEditor:Web套接字 */
+"NodesEditor.Webockets" = "Web套接字";
+
+/* NodesEditor:支持Web套接字 */
+"NodesEditor.WebocketsSupported" = "支持";
+
+/* NodesEditor:不支持Web套接字 */
+"NodesEditor.WebocketsNotSupported" = "不支持";
+
+/* NodesEditor:删除节点按钮 */
+"NodesEditor.DeleteNodeButton" = "删除";
+
+/* NodesEditor:主机行占位符 */
+"NodesEditor.HostRow.Placeholder" = "IP或主机名";
+
+/* NodesEditor:无法生成URL警报 */
+"NodesEditor.FailedToBuildURL" = "无效主机";
+
+/* 安全性：通知模式说明。支持降价 */
+"SecurityPage.Row.Notifications.ModesDescription" = "####通知模式\n\n####禁用\n无通知。\n\n####后台提取\n您的设备会自动提取新消息。没有外部调用。提取由iOS启动，实际时间由操作系统根据电池电量、蜂窝网络、应用程序使用模式等许多因素确定，无法预测。可以是20分钟、6小时，甚至可能是一天。不过，您仍然可以打开应用程序并查看新消息。\n\n####推送\n ADAMANT通知服务发送到您的设备的通知。在消息发送并获得区块链批准后，您几乎会立即收到通知——延迟几秒钟。但此模式要求您的设备在服务的数据库中注册其设备令牌。设备令牌是安全的，在大多数情况下建议使用此选项。\\n\n您可以在ADAMANT的Github页面上阅读更多关于设备注册的信息。\n \n";
+
+/* 安全性：选定的通知类型 */
+"SecurityPage.Section.NotificationsType" = "Notifications";
+
+/* 安全性：关于通知类型 */
+"SecurityPage.Section.AboutNotificationTypes" = "关于ANS";
+
+/* 安全：消息通知声音 */
+"SecurityPage.Section.Messages" = "Messages";
+
+/* 安全：设置通知 */
+"SecurityPage.Section.Settings" = "Settings";
+
+/* 通知：禁用通知 */
+"Notifications.Mode.NotificationsDisabled" = "已禁用";
+
+/* 通知：使用后台提取通知 */
+"Notifications.Mode.BackgroundFetch" = "后台获取";
+
+/* 通知：使用Apple推送通知 */
+"Notifications.Mode.ApplePush" = "推送";
+
+/* 安全：访问Github */
+"SecurityPage.Row.VisitGithub" = "访问Github";
+
+/* 通知：打开系统设置 */
+"Notifications.Settings.System" = "系统设置";
+
+/* 通知：选择声音 */
+"Notifications.Sound.Name" = "声音";
+
+/* 通知：选择声音 */
+"Notifications.Sounds.Name" = "Sounds";
+
+/* 通知：选择提醒音调 */
+"Notifications.Alert.Tones" = "Alert Tones";
+
+/* 通知：选择警报保存 */
+"Notifications.Alert.Save" = "保存";
+
+/* 通知：警报取消 */
+"Notifications.Alert.Cancel" = "取消";
+
+/* Pinpad：要求用户创建新引脚 */
+"Pinpad.EnterNewPin" = "输入新的PIN码";
+
+/* Pinpad：要求用户重复新引脚 */
+"Pinpad.RenerPin" = "重新输入您的PIN码";
+
+/* QRGenerator：错误的内部生成器错误消息格式。使用%@作为错误描述 */
+"QrGeneratorScene.Error.InteralErrorFormat" = "内部错误：%@。报告错误";
+
+/* QRGenerator：用户键入了无效的密码短语 */
+"QrGeneratorScene.Error.InvalidPassphrase" = "输入有效的密码短语";
+
+/* QRGenerator:密码短语文本视图占位符 */
+"QrGeneratorScene.Passphrase.Placeholder" = "密码短语";
+
+/* QRGenerator：生成的QR下的小"点击保存"工具提示 */
+"QrGeneratorScene.TapToSave" = "点击保存";
+
+/* QRGenerator:场景标题 */
+"QrGeneratorScene.Title" = "QR生成器";
+
+/* PrivateKeyGenerator:场景标题 */
+"PkGeneratorScene.Title" = "私钥生成器";
+
+/* PrivateKeyGenerator:安全警报。确保密码的安全 */
+"PkGeneratorScene.Alert" = "ADAMANT帐户包括加密钱包。所有这些钱包都与您的密码连接，只有您可以访问这些钱包。您可以导出私钥以在其他应用程序中使用它们。将密钥存储在安全的地方。";
+
+/* PrivateKeyGenerator:"生成"按钮 */
+"PkGeneratorScene.GenerateButton" = "生成密钥";
+
+/* 安全：场景标题 */
+"SecurityPage.Title" = "安全性";
+
+/* 安全：关闭"保持登录"确认 */
+"SecurityPage.DoNotStayLoggedIn" = "不保持登录状态";
+
+/* 配置：关闭生物测量的授权原因 */
+"SecurityPage.DoNotUseBiometry" = "不使用biometry登录";
+
+/* 安全性：生成带有密码短语行的QR */
+"SecurityPage.Row.GenerateQr" = "生成带有密码短语的QR";
+
+/* 安全性：使用密码短语行生成PrivateKey */
+"SecurityPage.Row.GeneratePk" = "导出私钥";
+
+/* 安全性：显示通知 */
+"SecurityPage.Row.Notifications" = "通知";
+
+/* 安全：保持记录行 */
+"SecurityPage.Row.StayLoggedIn" = "保持登录状态";
+
+/* 安全：安全部分 */
+"SecurityPage.Section.Security" = "安全性";
+
+/* 配置：场景标题 */
+"SettingsPage.Title" = "设置";
+
+/* 安全：开启生物测量的授权原因 */
+"SecurityPage.UseBiometry" = "使用生物测量";
+
+/* 共享警报"取消"按钮。在任何地方使用 */
+"Shared.Cancel" = "取消";
+
+/* 共享警报通知：关于项目复制到粘贴板的消息 */
+"Shared.CopiedToPasteboard" = "已复制到粘贴板";
+
+/* 共享警报"复制"按钮。在任何地方使用。用于复制粘贴信息 */
+"Shared.CopyToPasteboard" = "复制到粘贴板";
+
+/* 共享警报"聊天"按钮。用于与收件人聊天 */
+"Shared.ChatWith" = "与聊天";
+
+/* 共享警报"发送ADM到"按钮。用于将ADM发送到收件人 */
+"Shared.SendAdmTo" = "将ADM发送到";
+
+/* 共享警报完成消息。在任何地方使用 */
+"Shared.Done" = "完成";
+
+/* 共享警报"错误"标题。在任何地方使用 */
+"Shared.Error" = "错误";
+
+/* 共享警报"生成QR"按钮。用于生成带有地址和密码短语的二维码。用于随时随地共享和保存 */
+"Shared.GenerateQRCode" = "生成二维码";
+
+/* 共享警报通知：无internet连接消息的标题 */
+"Shared.NoInternet.Title" = "无互联网连接";
+
+/* 共享警报通知：没有互联网连接的正文消息 */
+"Shared.NoInternet.Body" = "请检查您的互联网连接，然后重试";
+
+/* 共享警报"确定"按钮。在任何地方使用 */
+"Shared.Ok" = "Ok";
+
+/* 共享警报"保存"按钮。在任何地方使用 */
+"Shared.Save" = "保存";
+
+/* 共享警报"保存到照片"。用于将图像保存到光库 */
+"Shared.SaveToPhotolibrary" = "保存到照片";
+
+/* 共享警报"设置"按钮。用于转到应用程序设置页面上的系统设置应用程序。应与"设置"应用程序标题相同 */
+"Shared.Settings" = "设置";
+
+/* 共享警报"共享"按钮。用于任何地方展示标准的iOS"共享"菜单 */
+"Shared.Share" = "共享";
+
+/* 共享警报"重试"按钮。在任何地方使用 */
+"Shared.Retry" = "重试";
+
+/* 共享警报"删除"按钮。在任何地方使用 */
+"Shared.Delete" = "删除";
+
+/* ShareQR场景：用户未经授权将图像写入照片库 */
+"ShareQR.protorilibraryNotAuthorized" = "您需要授权ADAMANT才能使用您的照片库";
+
+/* 主选项卡栏：帐户页面 */
+"Tabs.Account" = "帐户";
+
+/* 主选项卡栏：聊天页面 */
+"Tabs.Chats" = "聊天";
+
+/* 主选项卡栏：设置页面 */
+"Tabs.Settings" = "设置";
+
+/* TransactionList:场景标题 */
+"TransactionListScene.Title" = "事务";
+
+/* TransactionList:To Chat按钮 */
+"TransactionListScene.ToChat" = "聊天";
+
+/* 事务列表：开始聊天按钮 */
+"TransactionListScene.StartChat" = "开始聊天";
+
+/* TransactionList:"未找到事务"消息 */
+"TransactionListScene.Error.NotFound" = "未找到事务";
+
+/* TransactionList:"尚未进行交易"消息 */
+"TransactionListScene.NoTransactionYet" = "还没有事务";
+
+/* TransactionList:"找不到事务"本地化来自API的错误消息 */
+"No transactions found" = "未找到交易";
+
+/* 交易发送：收件人最低剩余余额要求 */
+"TransactionSend.Minimum.Balance" = "收件人必须至少具有0.05 LSK--发送更多令牌";
+
+/* 事务状态：正在更新 */
+"TransactionStatus.Updateing" = "正在更新…";
+
+/* 交易状态：交易处于挂起状态 */
+"TransactionStatus.Pending" = "待定";
+
+/* 交易状态：成功 */
+"TransactionStatus.Success" = "成功";
+
+/* 交易状态：交易失败 */
+"TransactionStatus.Failed" = "失败";
+
+/* 交易状态：不一致 */
+"TransactionStatus.Inconsistent" = "不一致";
+
+/* 事务状态：时间戳不一致错误 */
+"TransactionStatus.Inconsistent.WrongTimestamp" = "消息和Tx有不同的时间戳。这是可能的，但要检查两次";
+
+/* 交易状态：原因标题不一致 */
+"TransactionStatus.Inconsistent.Reason.Title" = "不一致的原因";
+
+/* 事务细节：场景标题 */
+"TransactionDetailsScene.Title" = "详细信息";
+
+/* 交易明细：金额行 */
+"TransactionDetailsScene.Row.Amount" = "金额";
+
+/* 事务详细信息：块id行 */
+"TransactionDetailsScene.Row.Block" = "区块链 区块";
+
+/* 交易明细：交易交付状态 */
+"TransactionDetailsScene.Row.Status" = "事务状态";
+
+/* 交易明细：确认行 */
+"TransactionDetailsScene.Row.Confirmations" = "确认";
+
+/* 交易明细：日期行 */
+"TransactionDetailsScene.Row.Date" = "日期";
+
+/* 事务详细信息："在资源管理器中打开事务"行 */
+"TransactionDetailsScene.Row.Explorer" = "在资源管理器中打开";
+
+/* 交易明细：费用行 */
+"TransactionDetailsScene.Row.Fee" = "费用";
+
+/* 交易详细信息：发件人行 */
+"TransactionDetailsScene.Row.From" = "来自";
+
+/* 交易明细：当时的法定价值 */
+"TransactionDetailsScene.Row.HistoryFiat" = "Txn时的值";
+
+/* 交易明细：当时的法定价值 */
+"TransactionDetailsScene.Row.CurrentFiat" = "当前值";
+
+/* 事务详细信息：Id行 */
+"TransactionDetailsScene.Row.Id" = "同上";
+
+/* 交易明细：收单行 */
+"TransactionDetailsScene.Row.To" = "至";
+
+/* 导出交易："共享交易摘要"按钮 */
+"TransactionDetailsScene.Share.Summary" = "摘要";
+
+/* 导出交易："共享交易URL"按钮 */
+"TransactionDetailsScene.Share.URL" = "网址";
+
+/* "交易详细信息：‘评论’部分" */
+"TransactionDetailsScene.Section.Comment" = "评论";
+
+/* "事务详细信息："操作"部分" */
+"TransactionDetailsScene.Section.Actions" = "行动";
+
+/* 事务详细信息："请求数据"进度消息 */
+"TransactionDetailsScene.RequestingData" = "正在请求数据…";
+
+/* 交易详细信息："您的地址"标志 */
+"TransactionDetailsScene.YourAddress" = "您";
+
+/* TransfersProvider:找不到交易错误。%@信息%s（%s）用于事务的ID */
+"TransfersProvider.Error.TransactionNotFoundFormat" = "找不到ID为%@的事务";
+
+/* 转账：最低交易金额为0.00001 */
+"TransferScene.Error.MinAmount" = "最低交易金额为0.00001";
+
+/* 转账：转账金额占位符 */
+"TransferScene.Amount.Placeholder" = "发送";
+
+/* 传输：找不到地址错误 */
+"TransferScene.Error.AddressNotFound" = "找不到地址";
+
+/* 传输：地址验证错误 */
+"TransferScene.Error.InvalidAddress" = "输入有效地址";
+
+/* 转账：金额高于用户的总金额通知 */
+"TransferScene.Error.notEnoughMoney" = "你没有那个标志";
+
+/* 转账：金额为零，甚至是负面通知 */
+"TransferScene.Error.TooLittleMoney" = "你应该发送更多的标志";
+
+/* 转账：发送交易的费用不足 */
+"TransferScene.Error.TooLittleFee" = "费用不足";
+
+/* 转账：费用比平时高 */
+"TransferScene.Error.FeeIsTooHigh" = "注意：tx费用高于常规费用";
+
+/* 转账：警报标题：未找到帐户或未启动帐户。提醒用户他仍然可以汇款，但需要加倍确认地址 */
+"TransferScene.unsafeTransferAlert.title" = "无法验证%@";
+
+/* 转账：预警主体：未找到账户或未启动账户。提醒用户他仍然可以汇款，但需要加倍确认地址 */
+"TransferScene.unsafeTransferAlert.body" = "找不到帐户，或未启动帐户。请仔细检查收件人地址并确认交易";
+
+/* 转账：预警主体：未发起账户。无法启动聊天，因为区块链不存储帐户的公钥来加密消息 */
+"TransferScene.unsafeChatAlert.body" = "帐户未启动。由于区块链不存储帐户的公钥来加密消息，因此无法启动聊天。";
+
+/* 转移：收件人地址占位符 */
+"TransferScene.Receiver.Placeholder" = "收件人的";
+
+/* 转让：坚持转让的金额 */
+"TransferScene.Row.Amount" = "金额";
+
+/* 转账：加密货币的法定价值 */
+"TransferScene.Row.Fiat" = "价值";
+
+/* 转移：记录的用户余额 */
+"TransferScene.Row.Balance" = "余额";
+
+/* 转账：最高转账金额：可用账户资金减去转账费用 */
+"TransferScene.Row.MaxToTransfer" = "要传输的最大值";
+
+/* 转移：收件人地址 */
+"TransferScene.Row.ReceipientAddress" = "地址";
+
+/* 转移：收件人姓名 */
+"TransferScene.Row.ReceipientName" = "名称";
+
+/* 传输：发送按钮 */
+"TransferScene.Row.Send" = "发送";
+
+/* 转账：交易总金额：转账附加费 */
+"TransferScene.Row.Total" = "总计";
+
+/* 转让：转让费 */
+"TransferScene.Row.TransactionFee" = "费用";
+
+/* 转让：在聊天中转让的评论 */
+"TransferScene.Row.Comments" = "评论";
+
+/* 转让：转让增加费 */
+"TransferScene.Row.IncreaseFee" = "增加费用";
+
+/* 转移："转移信息"部分 */
+"TransferScene.Section.TransferInfo" = "传输信息";
+
+/* 转账："您的钱包"部分 */
+"TransferScene.Section.YourWallet" = "您的钱包";
+
+/* 传输："收件人信息"部分 */
+"TransferScene.Section.Recipient" = "收件人";
+
+/* 转移：确认转移警报：发送令牌按钮 */
+"TransferScene.Send" = "发送";
+
+/* 传输：确认传输警报："无法撤消"消息 */
+"TransferScene.CantUndo" = "您将无法撤消此操作";
+
+/* Tranfser：确认使用可用于转移代币的最大金额作为转移金额 */
+"TransferScene.UseMaxToTransfer" = "使用所有可用代币作为转账金额？";
+
+/* Tranfser：灰尘错误 */
+"TransferScene.Dust.Error" = "灰尘数量--发送更多代币";
+
+/*传输：确认将%1$@令牌传输到%2$@消息。注意两个变量：在运行时%1$@将是金额（带ADM后缀），%2$@将是收件人地址。您可以使用这个所谓的"仓位代币"在金额之前使用地址 */
+"TransferScene.SendConfirmFormat" = "将%1$@发送到%2$@？";
+
+/* 传输：正在处理消息 */
+"TransferScene.SendingFundsProgress" = "正在发送令牌…";
+
+/* 传输：令牌传输成功消息 */
+"TransferScene.TransferSuccessMessage" = "完成！";
+
+/* 钱包服务：共享错误，用户没有足够的钱 */
+"WalletServices.SharedErrors.notEnoughMoney" = "代币不足";
+
+/* 钱包服务：共享错误，用户尚未启动特定的钱包 */
+"WalletServices.SharedErrors.WalletNotInitiated" = "收款人的钱包尚未启动";
+
+/* 钱包服务：共享错误，金额格式无效。%@金额 */
+"WalletServices.SharedErrors.InvalidAmountFormat" = "要发送的金额无效：%@";
+
+/* 钱包服务：共享错误，找不到交易 */
+"WalletServices.SharedErrors.TransactionNotFound" = "未找到交易";
+
+/* 钱包服务：共享错误，BTC Taproot不工作 */
+"WalletServices.SharedErrors.BtcTaproot" = "ADAMANT不支持Taproot比特币地址";
+
+/* 钱包服务：等待其他交易获得批准 */
+"WalletServices.SharedErrors.walletFrezzed" = "等待其他交易获得批准";
+
+/* 钱包服务：交易不可用 */
+"WalletServices.SharedErrors.transactionUnavailable" = "交易不可用";
+
+/* 钱包服务：无法验证交易 */
+"WalletServices.SharedErrors.consistentTransaction" = "无法验证交易";
+
+/* 欢迎：跳过按钮 */
+"WelcomeScene.Skip" = "跳过";
+
+/* 欢迎：幻灯片1说明 */
+"WelcomeScene.Description.Slide1" = "欢迎来到ADAMANT，真正的**区块链**信使。";
+
+/* 欢迎：幻灯片2说明 */
+"WelcomeScene.Description.Slide2" = "ADAMANT是您的消息以及聊天加密货币传输工具的**匿名性**和**安全性**。\n\n[为什么其他消息不安全？](https://medium.com/adamant-im/adamant-security-features-e7cc836ff52c)";
+
+/* 欢迎：幻灯片3说明 */
+"WelcomeScene.Description.Slide3" = "ADAMANT基础设施不属于任何人，是**去中心化的**。\n\n它由ADM代币支付的消息维护。新帐户可能会收到免费代币用于测试。";
+
+/* 欢迎：幻灯片4说明 */
+"WelcomeScene.Description.Slide4" = "无需任何要求即可单击**创建帐户**（无需电子邮件/电话/任何内容）并邀请您的朋友。\n\n为了真正的安全起见，请亲自**共享您的ADAMANT地址。";
+
+/* 欢迎：幻灯片5说明 */
+"WelcomeScene.Description.Slide5" = "项目的源代码[完全开放](https://github.com/Adamant-im/).该应用程序正在开发中，我们不断添加新功能。\\n\n如果您是开发人员，请加入我们的团队。";
+
+/* 欢迎场景。描述开始按钮 */
+"WelcomeScene.Description.BeginButton" = "启动安全消息";
+
+/* 欢迎：下一屏幕按钮 */
+"WelcomeScene.Description.ContinueButton" = "继续";
+
+/* 欢迎：跳过按钮 */
+"WelcomeScene.Description.SkipButton" = "跳过";
+
+/* Welcome: Description accept */
+"WelcomeScene.Description.Accept" = "我接受";
+
+/* 欧拉 */
+"EULA.Title" = "服务条款";
+"EULA.Accept" = "接受";
+"EULA.Decline" = "拒绝";
+"EULA.Text" = "ADAMANT Messenger基于去中心化的区块链技术，因此：\n\n✓ ADAMANT Messenger不容忍令人反感的内容或辱骂用户\n✓ ADAMANT Messenger最初专注于通信的安全性和用户的隐私。\n✓ ADAMANT Messenger始终显示完全开源的代码，许可证为GPL-3.0。源代码可在GitHub:GitHub.com/stend-im上获得。\n✓ ADAMANT Messenger按\"原样\"提供，不提供任何担保。\n✓ 开发人员只是ADAMANT Messenger的贡献者和用户。\n✓ 开发人员不控制用户的任何操作。\n✓ 开发人员在ADAMANT Messenger中没有权限。\n✓ 开发人员不可能禁用或阻止ADAMANT Messenger中的任何帐户。\n✓ 开发人员不可能获得加密密钥或读取任何ADAMANT Messenger用户的通信或其他信息。\n✓ 如果丢失，开发人员不可能恢复对任何用户帐户的访问。用户有责任保护自己的帐户的安全。\n✓ 开发人员不对用户内容、消息、媒体以及使用ADAMANT Messenger的目标和意图负责。\n✓ 开发者不存储用户之间传输的任何信息（消息、多媒体），也不对其在区块链上/中的存储负责。\n✓ 开发者不可能访问，也不对连接到ADAMANT Messenger或通过ADAMANT信使发送的任何资产（包括但不限于：加密货币）负责。\n✓ ADAMANT Messenger利用元数据作为账户之间通信的事实，在其区块链中公开提供。\n✓ 开发者不与任何第三方或外部服务合作提供任何使用数据。\n✓ ADAMANT信使基础设施（区块链节点）属于其用户，由用户运行。\n✓ 开发人员不可能停用、停止或暂停ADAMANT Messenger。开发人员对ADAMANT Messenger的运行不提供任何保证。\n✓ 开发人员不承担与ADAMANT Messenger相关的可能风险、成本和故障。\n✓ ADAMANT Messenger的用户从此对其使用承担全部责任，包括但不限于：区块链和Messenger内应用的其他技术的合法性，使用匿名消息服务，以及其他管辖法律。\\n\n通过使用ADAMANT Messenger，您从此接受这些服务条款。";
+
+/* 回复：未知短信错误 */
+"Reply.ShortUnknownMessageError" = "未知消息";
+
+/* 回复：长未知消息错误 */
+"Reply.LongUnknownMessageError" = "我们没有找到此邮件";
+
+/* 回复：失败的消息回复错误 */
+"Reply.failedMessageError" = "无法回复失败的消息";
+
+/* 挂起的消息回复错误 */
+"Reply.pendingMessageError" = "您无法回复挂起的消息。请等待确认（估计1-2秒）";
+
+/* 包括合作伙伴名称 */
+"PartnerQR.includePartnerName" = "包括联系人姓名";
+
+/* 包括合作伙伴url */
+"PartnerQR.includePartnerURL" = "包括Web应用程序链接";

@@ -1114,6 +1114,9 @@
 /* Welcome: Skip button" */
 "WelcomeScene.Description.SkipButton" = "Пропустить";
 
+/* Welcome: Description accept */
+"WelcomeScene.Description.Accept" = "Я принимаю";
+
 /* EULA */
 "EULA.Title" = "Условия использования";
 "EULA.Accept" = "Принять";

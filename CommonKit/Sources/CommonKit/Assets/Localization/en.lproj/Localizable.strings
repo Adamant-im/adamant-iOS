@@ -1117,6 +1117,9 @@
 /* Welcome: Skip button */
 "WelcomeScene.Description.SkipButton" = "Skip";
 
+/* Welcome: Description accept */
+"WelcomeScene.Description.Accept" = "I accept";
+
 /* EULA */
 "EULA.Title" = "Terms of Service";
 "EULA.Accept" = "Accept";

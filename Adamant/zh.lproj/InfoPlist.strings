@@ -1,0 +1,17 @@
+/* Bundle display name */
+"CFBundleDisplayName" = "ADAMANT";
+
+/* Bundle name */
+"CFBundleName" = "ADAMANT信使";
+
+/* Privacy - Camera Usage Description */
+"NSCameraUsageDescription" = "需要摄像头扫描二维码以查找地址和密码短语";
+
+/* Privacy - Face ID Usage Description */
+"NSFaceIDUsageDescription" = "使用Face ID登录您的ADAMANT帐户";
+
+/* Privacy - Photo Library Additions Usage Description */
+"NSPhotoLibraryAddUsageDescription" = "保存带有密码短语和地址的二维码";
+
+/* Privacy - Photo Library Usage Description */
+"NSPhotoLibraryUsageDescription" = "读取带有密码短语和地址的二维码";

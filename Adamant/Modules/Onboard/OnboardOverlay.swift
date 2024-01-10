@@ -20,7 +20,7 @@ final class OnboardOverlay: SwiftyOnboardOverlay {
     
     lazy var agreeLabel: UILabel = {
         let view = UILabel()
-        view.text = "  I accept"
+        view.text = "  \(String.adamant.Onboard.agreeLabel)"
         view.font = UIFont.adamantPrimary(ofSize: 18)//UIFont(name: "Exo2-Regular", size: 18)
         view.textColor = UIColor.adamant.textColor
         return view
@@ -30,7 +30,7 @@ final class OnboardOverlay: SwiftyOnboardOverlay {
         let button = UIButton(type: .system)
         button.contentHorizontalAlignment = .center
         
-        let attrs = NSAttributedString(string: "Terms of Service",
+        let attrs = NSAttributedString(string: String.adamant.Onboard.eulaTitle,
                        attributes:
             [NSAttributedString.Key.foregroundColor: UIColor.adamant.textColor,
          NSAttributedString.Key.font: UIFont(name: "Exo2-Regular", size: 18) ?? UIFont.adamantPrimary(ofSize: 18),
@@ -56,4 +56,11 @@ final class OnboardOverlay: SwiftyOnboardOverlay {
         stack.centerXAnchor.constraint(equalTo: margin.centerXAnchor).isActive = true
     }
     
+}
+
+private extension String.adamant {
+    enum Onboard {
+        static let agreeLabel = String.localized("WelcomeScene.Description.Accept", comment: "Welcome: Description accept")
+        static let eulaTitle = String.localized("EULA.Title", comment: "")
+    }
 }
