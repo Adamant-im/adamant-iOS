@@ -71,7 +71,7 @@ final class BuyAndSellViewController: FormViewController {
             case .coinstore: return "https://h5.coinstore.com/h5/signup?invitCode=o951vZ"
             case .fameEX: return "https://www.fameex.com/en-US/trade/adm-usdt/commissiondispense?code=MKKAWV"
             case .xeggeX: return "https://xeggex.com/market/ADM_USDT?ref=656846d209bbed85b91aba4d"
-            case .nonKYC: return "https://nonkyc.io/market/ADM_USDT?ef=655b4df9eb13acde84677358"
+            case .nonKYC: return "https://nonkyc.io/market/ADM_USDT?ref=655b4df9eb13acde84677358"
             }
         }
     }
