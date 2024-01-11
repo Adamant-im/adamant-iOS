@@ -379,6 +379,18 @@
 /* Alert "Report has been sent" */
 "Chats.ReportSent" = "Запрос отправлен";
 
+/* Date "Today" */
+"Chats.Date.Today" = "Сегодня";
+
+/* Date "Just now" */
+"Chats.Date.JustNow" = "Только что";
+
+/* Date "A minute ago" */
+"Chats.Date.MinAgo" = "Минуту назад";
+
+/* Date "Yesterday" */
+"Chats.Date.Yesterday" = "Вчера";
+
 /* Chat: inform user that he can't cancel transaction, that was sent */
 "ChatScene.Error.cancelError" = "Сообщение уже отправлено";
 

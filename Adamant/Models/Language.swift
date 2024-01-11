@@ -8,6 +8,12 @@
 
 import Foundation
 
+extension Notification.Name {
+    struct LanguageStorageService {
+        static let languageUpdated = Notification.Name("adamant.language.languageUpdated")
+    }
+}
+
 enum Language: String {
     case ru
     case en
@@ -22,6 +28,16 @@ enum Language: String {
         case .de: return "Deutschland"
         case .zh: return "中文"
         case .auto: return .localized("Language.Auto", comment: "Account tab: Language auto")
+        }
+    }
+    
+    var locale: String {
+        switch self {
+        case .ru: return "ru_RU"
+        case .en: return "en_EN"
+        case .de: return "de_DE"
+        case .zh: return "zh_CN"
+        case .auto: return "en_EN"
         }
     }
     

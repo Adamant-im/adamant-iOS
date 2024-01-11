@@ -33,10 +33,16 @@ private extension TransactionStatus {
 
 // MARK: - Localization
 extension String.adamant {
-    struct transactionDetails {
-        static let title = String.localized("TransactionDetailsScene.Title", comment: "Transaction details: scene title")
-        static let yourAddress = String.adamant.notifications.yourAddress
-        static let requestingDataProgressMessage = String.localized("TransactionDetailsScene.RequestingData", comment: "Transaction details: 'Requesting Data' progress message.")
+    enum transactionDetails {
+        static var title: String {
+            String.localized("TransactionDetailsScene.Title", comment: "Transaction details: scene title")
+        }
+        static var yourAddress: String {
+            String.adamant.notifications.yourAddress
+        }
+        static var requestingDataProgressMessage: String {
+            String.localized("TransactionDetailsScene.RequestingData", comment: "Transaction details: 'Requesting Data' progress message.")
+        }
     }
 }
 
@@ -148,6 +154,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
     let addressBookService: AddressBookService
     let accountService: AccountService
     let walletService: WalletService?
+    let languageService: LanguageStorageProtocol
     
     // MARK: - Properties
     
@@ -169,6 +176,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .medium
         dateFormatter.timeStyle = .short
+        dateFormatter.locale = Locale(identifier: languageService.getLanguage().locale)
         return dateFormatter
     }()
     
@@ -254,13 +262,15 @@ class TransactionDetailsViewControllerBase: FormViewController {
         currencyInfo: CurrencyInfoService,
         addressBookService: AddressBookService,
         accountService: AccountService,
-        walletService: WalletService?
+        walletService: WalletService?,
+        languageService: LanguageStorageProtocol
     ) {
         self.dialogService = dialogService
         self.currencyInfo = currencyInfo
         self.addressBookService = addressBookService
         self.accountService = accountService
         self.walletService = walletService
+        self.languageService = languageService
         
         super.init(style: .grouped)
     }

@@ -54,6 +54,7 @@ public extension StoreKey {
     
     enum language {
         public static let language = "language"
+        public static let languageLocale = "language.locale"
     }
 }
 

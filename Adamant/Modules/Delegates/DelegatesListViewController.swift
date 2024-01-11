@@ -12,16 +12,19 @@ import CommonKit
 
 // MARK: - Localization
 extension String.adamant {
-    struct delegates {
-        static let title = String.localized("Delegates.Title", comment: "Delegates page: scene title")
-        
-        static let notEnoughtTokensForVote = String.localized("Delegates.NotEnoughtTokensForVote", comment: "Delegates tab: Message about 50 ADM fee for vote")
-        
-        static let timeOutBeforeNewVote = String.localized("Delegates.timeOutBeforeNewVote", comment: "Delegates tab: Message about time out for new vote")
-        
-        static let success = String.localized("Delegates.Vote.Success", comment: "Delegates: Message for Successfull voting")
-        
-        private init() { }
+    enum delegates {
+        static var title: String {
+            String.localized("Delegates.Title", comment: "Delegates page: scene title")
+        }
+        static var notEnoughtTokensForVote: String {
+            String.localized("Delegates.NotEnoughtTokensForVote", comment: "Delegates tab: Message about 50 ADM fee for vote")
+        }
+        static var timeOutBeforeNewVote: String {
+            String.localized("Delegates.timeOutBeforeNewVote", comment: "Delegates tab: Message about time out for new vote")
+        }
+        static var success: String {
+            String.localized("Delegates.Vote.Success", comment: "Delegates: Message for Successfull voting")
+        }
     }
 }
 

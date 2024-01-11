@@ -17,19 +17,25 @@ import CommonKit
 
 // MARK: - Localization
 extension String.adamant {
-    struct newChat {
-        static let title = String.localized("NewChatScene.Title", comment: "New chat: scene title")
-        
-        static let addressPlaceholder = String.localized("NewChatScene.Address.Placeholder", comment: "New chat: Recipient address placeholder. Note that address text field always shows U letter, so you can left this line blank.")
-        
-        static let specifyValidAddressMessage = String.localized("NewChatScene.Error.InvalidAddress", comment: "New chat: Notify user that he did enter invalid address")
-        static let loggedUserAddressMessage = String.localized("NewChatScene.Error.OwnAddress", comment: "New chat: Notify user that he can't start chat with himself")
-        
-        static let wrongQrError = String.localized("NewChatScene.Error.WrongQr", comment: "New Chat: Notify user that scanned QR doesn't contains an address")
-        
-        static let whatDoesItMean = String.localized("NewChatScene.NotInitialized.HelpButton", comment: "New Chat: 'What does it mean?', a help button for info about uninitialized accounts.")
-        
-        private init() { }
+    enum newChat {
+        static var title: String {
+            String.localized("NewChatScene.Title", comment: "New chat: scene title")
+        }
+        static var addressPlaceholder: String {
+            String.localized("NewChatScene.Address.Placeholder", comment: "New chat: Recipient address placeholder. Note that address text field always shows U letter, so you can left this line blank.")
+        }
+        static var specifyValidAddressMessage: String {
+            String.localized("NewChatScene.Error.InvalidAddress", comment: "New chat: Notify user that he did enter invalid address")
+        }
+        static var loggedUserAddressMessage: String {
+            String.localized("NewChatScene.Error.OwnAddress", comment: "New chat: Notify user that he can't start chat with himself")
+        }
+        static var wrongQrError: String {
+            String.localized("NewChatScene.Error.WrongQr", comment: "New Chat: Notify user that scanned QR doesn't contains an address")
+        }
+        static var whatDoesItMean: String {
+            String.localized("NewChatScene.NotInitialized.HelpButton", comment: "New Chat: 'What does it mean?', a help button for info about uninitialized accounts.")
+        }
     }
 }
 

@@ -14,17 +14,27 @@ import Combine
 // MARK: - Localization
 extension String.adamant {
     enum nodesList {
-        static let title = String.localized("NodesList.Title", comment: "NodesList: scene title")
-        static let nodesListButton = String.localized("NodesList.NodesList", comment: "NodesList: Button label")
+        static var title: String {
+            String.localized("NodesList.Title", comment: "NodesList: scene title")
+        }
+        static var nodesListButton: String {
+            String.localized("NodesList.NodesList", comment: "NodesList: Button label")
+        }
         
-        static let defaultNodesWasLoaded = String.localized("NodeList.DefaultNodesLoaded", comment: "NodeList: Inform that default nodes was loaded, if user deleted all nodes")
+        static var defaultNodesWasLoaded: String {
+            String.localized("NodeList.DefaultNodesLoaded", comment: "NodeList: Inform that default nodes was loaded, if user deleted all nodes")
+        }
         
-        static let resetAlertTitle = String.localized("NodesList.ResetNodeListAlert", comment: "NodesList: Reset nodes alert title")
+        static var resetAlertTitle: String {
+            String.localized("NodesList.ResetNodeListAlert", comment: "NodesList: Reset nodes alert title")
+        }
         
-        static let fastestNodeModeTip = String.localized(
-            "NodesList.PreferTheFastestNode.Footer",
-            comment: .empty
-        )
+        static var fastestNodeModeTip: String {
+            String.localized(
+                "NodesList.PreferTheFastestNode.Footer",
+                comment: .empty
+            )
+        }
     }
 }
 

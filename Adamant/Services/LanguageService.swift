@@ -18,5 +18,7 @@ final class LanguageStorageService: LanguageStorageProtocol {
     
     func setLanguage(_ language: Language) {
         UserDefaults.standard.set(language.rawValue, forKey: StoreKey.language.language)
+        UserDefaults.standard.set(language.locale, forKey: StoreKey.language.languageLocale)
+        NotificationCenter.default.post(name: .LanguageStorageService.languageUpdated, object: nil)
     }
 }

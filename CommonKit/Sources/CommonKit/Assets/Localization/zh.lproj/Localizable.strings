@@ -305,10 +305,10 @@
 "ChatListPage.SyncingChats" = "正在同步聊天…";
 
 /* 聊天列表：已反应 */
-"ChatListPage.Rreached" = "达到";
+"ChatListPage.Reacted" = "达到";
 
 /* 聊天列表：删除的反应 */
-"ChatListPage.RemotedReaction" = "已删除反应";
+"ChatListPage.RemovedReaction" = "已删除反应";
 
 /* 聊天列表：场景标题 */
 "ChatListPage.Title" = "聊天";
@@ -379,6 +379,18 @@
 /* 警报"报告已发送" */
 "Chats.ReportSent" = "报告已发送";
 
+/* Date "Today" */
+"Chats.Date.Today" = "今天";
+
+/* Date "Just now" */
+"Chats.Date.JustNow" = "现在";
+
+/* Date "A minute ago" */
+"Chats.Date.MinAgo" = "一分钟前";
+
+/* Date "Yesterday" */
+"Chats.Date.Yesterday" = "昨天";
+
 /* 聊天：通知用户他不能取消已发送的交易 */
 "ChatScene.Error.cancelError" = "消息已发送";
 
@@ -434,7 +446,7 @@
 "ChatScene.Error.messageIsTooBig" = "消息太大。分部分发送。";
 
 /* 代理人页面：场景标题 */
-"Delegates.Title" = "Delegates";
+"Delegates.Title" = "与会代表";
 
 /* 可见钱包页面：场景标题 */
 "VisibleWallets.Title" = "钱包列表";
@@ -677,7 +689,7 @@
 "NodesEditor.TestingInProgressMessage" = "正在检查连接…";
 
 /* NodesEditor:Scheme行 */
-"NodesEditor.SchemeRow" = "Scheme";
+"NodesEditor.SchemeRow" = "计划";
 
 /* NodesEditor:端口行 */
 "NodesEditor.PortRow" = "端口";
@@ -707,16 +719,16 @@
 "SecurityPage.Row.Notifications.ModesDescription" = "####通知模式\n\n####禁用\n无通知。\n\n####后台提取\n您的设备会自动提取新消息。没有外部调用。提取由iOS启动，实际时间由操作系统根据电池电量、蜂窝网络、应用程序使用模式等许多因素确定，无法预测。可以是20分钟、6小时，甚至可能是一天。不过，您仍然可以打开应用程序并查看新消息。\n\n####推送\n ADAMANT通知服务发送到您的设备的通知。在消息发送并获得区块链批准后，您几乎会立即收到通知——延迟几秒钟。但此模式要求您的设备在服务的数据库中注册其设备令牌。设备令牌是安全的，在大多数情况下建议使用此选项。\\n\n您可以在ADAMANT的Github页面上阅读更多关于设备注册的信息。\n \n";
 
 /* 安全性：选定的通知类型 */
-"SecurityPage.Section.NotificationsType" = "Notifications";
+"SecurityPage.Section.NotificationsType" = "通知";
 
 /* 安全性：关于通知类型 */
 "SecurityPage.Section.AboutNotificationTypes" = "关于ANS";
 
 /* 安全：消息通知声音 */
-"SecurityPage.Section.Messages" = "Messages";
+"SecurityPage.Section.Messages" = "信息";
 
 /* 安全：设置通知 */
-"SecurityPage.Section.Settings" = "Settings";
+"SecurityPage.Section.Settings" = "设置";
 
 /* 通知：禁用通知 */
 "Notifications.Mode.NotificationsDisabled" = "已禁用";
@@ -737,10 +749,10 @@
 "Notifications.Sound.Name" = "声音";
 
 /* 通知：选择声音 */
-"Notifications.Sounds.Name" = "Sounds";
+"Notifications.Sounds.Name" = "声音";
 
 /* 通知：选择提醒音调 */
-"Notifications.Alert.Tones" = "Alert Tones";
+"Notifications.Alert.Tones" = "警报音";
 
 /* 通知：选择警报保存 */
 "Notifications.Alert.Save" = "保存";
@@ -752,7 +764,7 @@
 "Pinpad.EnterNewPin" = "输入新的PIN码";
 
 /* Pinpad：要求用户重复新引脚 */
-"Pinpad.RenerPin" = "重新输入您的PIN码";
+"Pinpad.ReenterPin" = "重新输入您的PIN码";
 
 /* QRGenerator：错误的内部生成器错误消息格式。使用%@作为错误描述 */
 "QrGeneratorScene.Error.InteralErrorFormat" = "内部错误：%@。报告错误";

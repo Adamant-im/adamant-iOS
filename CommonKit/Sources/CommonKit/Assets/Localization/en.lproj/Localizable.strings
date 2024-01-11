@@ -379,6 +379,18 @@
 /* Alert "Report has been sent" */
 "Chats.ReportSent" = "Report has been sent";
 
+/* Date "Today" */
+"Chats.Date.Today" = "Today";
+
+/* Date "Just now" */
+"Chats.Date.JustNow" = "Just now";
+
+/* Date "A minute ago" */
+"Chats.Date.MinAgo" = "A minute ago";
+
+/* Date "Yesterday" */
+"Chats.Date.Yesterday" = "Yesterday";
+
 /* Chat: inform user that he can't cancel transaction, that was sent */
 "ChatScene.Error.cancelError" = "Message is already sent";
 

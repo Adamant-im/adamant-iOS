@@ -12,13 +12,22 @@ import CommonKit
 import Combine
 
 extension String.adamant {
-    struct transactionList {
-        static let title = String.localized("TransactionListScene.Title", comment: "TransactionList: scene title")
-        static let toChat = String.localized("TransactionListScene.ToChat", comment: "TransactionList: To Chat button")
-        static let startChat = String.localized("TransactionListScene.StartChat", comment: "TransactionList: Start Chat button")
-        static let notFound = String.localized("TransactionListScene.Error.NotFound", comment: "TransactionList: 'Transactions not found' message.")
-        static let noTransactionYet = String.localized("TransactionListScene.NoTransactionYet", comment: "TransactionList: 'No Transaction Yet' message.")
-        
+    enum transactionList {
+        static var title: String {
+            String.localized("TransactionListScene.Title", comment: "TransactionList: scene title")
+        }
+        static var toChat: String {
+            String.localized("TransactionListScene.ToChat", comment: "TransactionList: To Chat button")
+        }
+        static var startChat: String {
+            String.localized("TransactionListScene.StartChat", comment: "TransactionList: Start Chat button")
+        }
+        static var notFound: String {
+            String.localized("TransactionListScene.Error.NotFound", comment: "TransactionList: 'Transactions not found' message.")
+        }
+        static var noTransactionYet: String {
+            String.localized("TransactionListScene.NoTransactionYet", comment: "TransactionList: 'No Transaction Yet' message.")
+        }
     }
 }
 

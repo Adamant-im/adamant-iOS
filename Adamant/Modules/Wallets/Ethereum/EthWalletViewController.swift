@@ -16,19 +16,15 @@ extension String.adamant.wallets {
 }
 
 final class EthWalletViewController: WalletViewControllerBase {
-    // MARK: Lifecycle
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        walletTitleLabel.text = String.adamant.wallets.ethereum
-    }
-    
     override func sendRowLocalizedLabel() -> NSAttributedString {
         return NSAttributedString(string: String.adamant.wallets.sendEth)
     }
     
     override func encodeForQr(address: String) -> String? {
         return "ethereum:\(address)"
+    }
+    
+    override func setTitle() {
+        walletTitleLabel.text = String.adamant.wallets.ethereum
     }
 }

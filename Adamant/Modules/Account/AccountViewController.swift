@@ -17,12 +17,12 @@ import Combine
 
 // MARK: - Localization
 extension String.adamant {
-    struct account {
-        static let title = String.localized("AccountTab.Title", comment: "Account page: scene title")
+    enum account {
+        static var title: String {
+            String.localized("AccountTab.Title", comment: "Account page: scene title")
+        }
         
         static let updatingBalance = "…"
-        
-        private init() { }
     }
 }
 
@@ -317,8 +317,9 @@ final class AccountViewController: FormViewController {
             $0.title = Rows.visibleWallets.localized
             $0.cell.imageView?.image = Rows.visibleWallets.image
             $0.cell.selectionStyle = .gray
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { (cell, row) in
             cell.accessoryType = .disclosureIndicator
+            row.title = Rows.visibleWallets.localized
         }.onCellSelection { [weak self] (_, _) in
             guard let self = self else { return }
             let vc = screensFactory.makeVisibleWallets()
@@ -345,8 +346,9 @@ final class AccountViewController: FormViewController {
             $0.tag = Rows.nodes.tag
             $0.cell.imageView?.image = Rows.nodes.image
             $0.cell.selectionStyle = .gray
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { (cell, row) in
             cell.accessoryType = .disclosureIndicator
+            row.title = Rows.nodes.localized
         }.onCellSelection { [weak self] (_, _) in
             guard let self = self else { return }
             let vc = screensFactory.makeNodesList()
@@ -372,8 +374,9 @@ final class AccountViewController: FormViewController {
             $0.tag = Rows.coinsNodes.tag
             $0.cell.imageView?.image = Rows.coinsNodes.image
             $0.cell.selectionStyle = .gray
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { (cell, row) in
             cell.accessoryType = .disclosureIndicator
+            row.title = Rows.coinsNodes.localized
         }.onCellSelection { [weak self] (_, _) in
             guard let self = self else { return }
             let vc = screensFactory.makeCoinsNodesList(context: .menu)
@@ -393,6 +396,28 @@ final class AccountViewController: FormViewController {
         
         appSection.append(coinsNodesRow)
         
+        // Language select
+        let languageRow = ActionSheetRow<Language> {
+            $0.title = Rows.language.localized
+            $0.tag = Rows.language.tag
+            $0.cell.imageView?.image = Rows.language.image
+            $0.options = Language.all
+            $0.value = languageService.getLanguage()
+            
+            $0.displayValueFor = { language in
+                return language?.name
+            }
+        }.cellUpdate { (cell, row) in
+            cell.accessoryType = .disclosureIndicator
+            row.title = Rows.language.localized
+        }.onChange { [weak self] row in
+            guard let value = row.value else { return }
+            self?.languageService.setLanguage(value)
+            self?.updateUI()
+        }
+        
+        appSection.append(languageRow)
+        
         // Currency select
         let currencyRow = ActionSheetRow<Currency> {
             $0.title = Rows.currency.localized
@@ -408,8 +433,9 @@ final class AccountViewController: FormViewController {
                 
                 return "\(currency.rawValue) (\(currency.symbol))"
             }
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { (cell, row) in
             cell.accessoryType = .disclosureIndicator
+            row.title = Rows.currency.localized
         }.onChange { [weak self] row in
             guard let value = row.value else { return }
             self?.currencyInfoService.currentCurrency = value
@@ -417,34 +443,15 @@ final class AccountViewController: FormViewController {
         
         appSection.append(currencyRow)
         
-        // Language select
-        let languageRow = ActionSheetRow<Language> {
-            $0.title = Rows.language.localized
-            $0.tag = Rows.language.tag
-            $0.cell.imageView?.image = Rows.language.image
-            $0.options = Language.all
-            $0.value = languageService.getLanguage()
-            
-            $0.displayValueFor = { language in
-                return language?.name
-            }
-        }.cellUpdate { (cell, _) in
-            cell.accessoryType = .disclosureIndicator
-        }.onChange { [weak self] row in
-            guard let value = row.value else { return }
-            self?.languageService.setLanguage(value)
-        }
-        
-        appSection.append(languageRow)
-        
         // Contribute
         let contributeRow = LabelRow {
             $0.title = Rows.contribute.localized
             $0.tag = Rows.contribute.tag
             $0.cell.imageView?.image = Rows.contribute.image
             $0.cell.selectionStyle = .gray
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { (cell, row) in
             cell.accessoryType = .disclosureIndicator
+            row.title = Rows.contribute.localized
         }.onCellSelection { [weak self] (_, _) in
             guard let self = self else { return }
             let vc = screensFactory.makeContribute()
@@ -470,8 +477,9 @@ final class AccountViewController: FormViewController {
             $0.tag = Rows.about.tag
             $0.cell.imageView?.image = Rows.about.image
             $0.cell.selectionStyle = .gray
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { (cell, row) in
             cell.accessoryType = .disclosureIndicator
+            row.title = Rows.about.localized
         }.onCellSelection { [weak self] (_, _) in
             guard let self = self else { return }
             let vc = screensFactory.makeAbout()
@@ -502,8 +510,9 @@ final class AccountViewController: FormViewController {
             $0.title = Rows.voteForDelegates.localized
             $0.cell.imageView?.image = Rows.voteForDelegates.image
             $0.cell.selectionStyle = .gray
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { (cell, row) in
             cell.accessoryType = .disclosureIndicator
+            row.title = Rows.voteForDelegates.localized
         }.onCellSelection { [weak self] (_, _) in
             guard let self = self else { return }
             let vc = screensFactory.makeDelegatesList()
@@ -530,8 +539,9 @@ final class AccountViewController: FormViewController {
             $0.tag = Rows.generateQr.tag
             $0.cell.imageView?.image = Rows.generateQr.image
             $0.cell.selectionStyle = .gray
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { (cell, row) in
             cell.accessoryType = .disclosureIndicator
+            row.title = Rows.generateQr.localized
         }.onCellSelection { [weak self] (_, _) in
             guard let self = self else { return }
             let vc = screensFactory.makeQRGenerator()
@@ -557,8 +567,9 @@ final class AccountViewController: FormViewController {
             $0.tag = Rows.generatePk.tag
             $0.cell.imageView?.image = Rows.generatePk.image
             $0.cell.selectionStyle = .gray
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { (cell, row) in
             cell.accessoryType = .disclosureIndicator
+            row.title = Rows.generatePk.localized
         }.onCellSelection { [weak self] (_, _) in
             guard let self = self else { return }
             let vc = screensFactory.makePKGenerator()
@@ -584,8 +595,9 @@ final class AccountViewController: FormViewController {
             $0.tag = Rows.logout.tag
             $0.cell.imageView?.image = Rows.logout.image
             $0.cell.selectionStyle = .gray
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { (cell, row) in
             cell.accessoryType = .disclosureIndicator
+            row.title = Rows.logout.localized
         }.onCellSelection { [weak self] (_, row) in
             guard let address = self?.accountService.account?.address else {
                 return
@@ -631,8 +643,9 @@ final class AccountViewController: FormViewController {
             $0.title = Rows.stayIn.localized
             $0.cell.imageView?.image = Rows.stayIn.image
             $0.value = accountService.hasStayInAccount
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { (cell, row) in
             cell.switchControl.onTintColor = UIColor.adamant.active
+            row.title = Rows.stayIn.localized
         }.onChange { [weak self] row in
             guard let enabled = row.value else {
                 return
@@ -662,8 +675,9 @@ final class AccountViewController: FormViewController {
                 
                 return !showBiometry
             })
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { [weak self] (cell, row) in
             cell.switchControl.onTintColor = UIColor.adamant.active
+            row.title = self?.localAuth.biometryType.localized
         }.onChange { [weak self] row in
             let value = row.value ?? false
             self?.setBiometry(enabled: value)
@@ -686,8 +700,10 @@ final class AccountViewController: FormViewController {
                 
                 return !showNotifications
             })
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { [weak self] (cell, row) in
             cell.accessoryType = .disclosureIndicator
+            row.title = Rows.notifications.localized
+            row.value = self?.notificationsService.notificationsMode.localized
         }.onCellSelection { [weak self] (_, _) in
             guard let self = self else { return }
             let vc = screensFactory.makeNotifications()
@@ -887,6 +903,35 @@ final class AccountViewController: FormViewController {
                 self?.addVibrationRow()
             }
             .store(in: &notificationsSet)
+    }
+    
+    private func updateUI() {
+        let appSection = form.sectionBy(tag: Sections.application.tag)
+        appSection?.header?.title = Sections.application.localized
+
+        let walletSection = form.sectionBy(tag: Sections.wallet.tag)
+        walletSection?.header?.title = Sections.wallet.localized
+        
+        let securitySection = form.sectionBy(tag: Sections.security.tag)
+        securitySection?.header?.title = Sections.security.localized
+        
+        let actionsSection = form.sectionBy(tag: Sections.actions.tag)
+        actionsSection?.header?.title = Sections.actions.localized
+        
+        tableView.reloadData()
+
+        tabBarController?.viewControllers?.first?.tabBarItem.title = .adamant.tabItems.chats
+        tabBarController?.viewControllers?.last?.tabBarItem.title = .adamant.tabItems.account
+        
+        if let splitVC = tabBarController?.viewControllers?.first as? UISplitViewController,
+           !splitVC.isCollapsed {
+            splitVC.showDetailViewController(WelcomeViewController(), sender: nil)
+        }
+        
+        if let splitVC = tabBarController?.viewControllers?.last as? UISplitViewController,
+           !splitVC.isCollapsed {
+            splitVC.showDetailViewController(WelcomeViewController(), sender: nil)
+        }
     }
     
     private func setupWalletsVC() {

@@ -60,7 +60,11 @@ final class OnboardOverlay: SwiftyOnboardOverlay {
 
 private extension String.adamant {
     enum Onboard {
-        static let agreeLabel = String.localized("WelcomeScene.Description.Accept", comment: "Welcome: Description accept")
-        static let eulaTitle = String.localized("EULA.Title", comment: "")
+        static var agreeLabel: String {
+            String.localized("WelcomeScene.Description.Accept", comment: "Welcome: Description accept")
+        }
+        static var eulaTitle: String {
+            String.localized("EULA.Title", comment: "")
+        }
     }
 }
