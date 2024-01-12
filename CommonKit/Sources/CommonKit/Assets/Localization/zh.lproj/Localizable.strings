@@ -1106,7 +1106,7 @@
 "WelcomeScene.Description.Slide4" = "无需任何要求即可单击**创建帐户**（无需电子邮件/电话/任何内容）并邀请您的朋友。\n\n为了真正的安全起见，请亲自**共享您的ADAMANT地址。";
 
 /* 欢迎：幻灯片5说明 */
-"WelcomeScene.Description.Slide5" = "项目的源代码[完全开放](https://github.com/Adamant-im/).该应用程序正在开发中，我们不断添加新功能。\\n\n如果您是开发人员，请加入我们的团队。";
+"WelcomeScene.Description.Slide5" = "项目的源代码[完全开放](https://github.com/Adamant-im/).该应用程序正在开发中，我们不断添加新功能。\n\n如果您是开发人员，请加入我们的团队。";
 
 /* 欢迎场景。描述开始按钮 */
 "WelcomeScene.Description.BeginButton" = "启动安全消息";
