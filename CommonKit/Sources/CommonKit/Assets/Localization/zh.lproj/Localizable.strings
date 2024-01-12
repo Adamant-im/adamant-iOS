@@ -722,7 +722,7 @@
 "Notifications.Mode.ApplePush" = "推送";
 
 /* 安全：访问Github */
-"SecurityPage.Row.VisitGithub" = "访问Github";
+"SecurityPage.Row.VisitGithub" = "访问GitHub";
 
 /* 通知：打开系统设置 */
 "Notifications.Settings.System" = "系统设置";
