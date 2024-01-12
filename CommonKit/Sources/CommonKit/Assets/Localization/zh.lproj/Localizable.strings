@@ -80,7 +80,7 @@
 "About.Row.Website.Url" = "https://adamant.im";
 
 /* "关于场景：白皮书本地化url" */
-"About.Row.Whitepaper.Url" = "https://adamant.im/whitepaper/adamant-whitepaper-en.pdf";
+"About.Row.Whitepaper.Url" = "https://adamant.im/whitepaper/adamant-whitepaper-cn.pdf";
 
 /* "关于场景：Project的GitHub页面本地化url" */
 "About.Row.GitHub.Url" = "https://github.com/Adamant-im";
