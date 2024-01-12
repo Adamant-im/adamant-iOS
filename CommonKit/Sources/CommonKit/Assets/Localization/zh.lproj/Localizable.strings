@@ -233,7 +233,7 @@
 "AccountTab.Wallets.ethereum_wallet" = "以太坊钱包";
 
 /* 账户选项卡：Lisk钱包 */
-"AccountTab.Wallets.lisk_vallet" = "lisk钱包";
+"AccountTab.Wallets.lisk_vallet" = "Lisk钱包";
 
 /* 账户选项卡：比特币钱包 */
 "AccountTab.Wallets.bitcoin_wallet" = "比特币钱包";
