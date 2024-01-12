@@ -572,6 +572,7 @@ extension AppDelegate {
             )
         }
         
+        // TODO: Figireout why we cant use AdamantContacts.adamantWelcomeWallet.address for senderId (chat is not shown)
         if let welcome = AdamantContacts.adamantWelcomeWallet.welcomeMessage {
             _ = try? await chatProvider.fakeReceived(
                 message: welcome.message,
