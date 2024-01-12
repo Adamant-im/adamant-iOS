@@ -338,7 +338,7 @@
 "Chats.Adelina.WelcomeMessage" = "你好，我是Adelina。让我们愉快地交谈一下！我可以做很多事情，比如：\n\n-起草电子邮件或其他文章\n-编写Python代码\n-回答关于一组文档的问题\n-支持对话\n-一系列主题的导师\n-翻译语言\n-写诗\n-模拟电子游戏中的角色等等";
 
 /* 已知联系人：阿达曼捐赠欢迎信息。支持降价 */
-"Chats.Donate.WellomeMessage" = "感谢您的支持，我们开发了去中心化的ADAMANT Messenger——在此聊天中转移ADM、ETH和其他代币。有关其他捐赠钱包，请参阅consided.im。";
+"Chats.Donate.WelcomeMessage" = "感谢您的支持，我们开发了去中心化的ADAMANT Messenger——在此聊天中转移ADM、ETH和其他代币。有关其他捐赠钱包，请参阅adamant.im。";
 
 /* 警报"重试或删除"标题。在caht中用于再次发送或删除失败的消息 */
 "Chats.RetryOrDelete.Title" = "重试还是删除？";
