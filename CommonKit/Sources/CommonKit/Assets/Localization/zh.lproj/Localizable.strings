@@ -227,7 +227,7 @@
 "AccountTab.Section.Application" = "应用";
 
 /* 账户选项卡：阿达曼钱包 */
-"AccountTab.Wallets.adamant_wallet" = "adamant钱包";
+"AccountTab.Wallets.adamant_wallet" = "ADAMANT钱包";
 
 /* 账户选项卡：以太坊钱包 */
 "AccountTab.Wallets.ethereum_wallet" = "以太坊钱包";
