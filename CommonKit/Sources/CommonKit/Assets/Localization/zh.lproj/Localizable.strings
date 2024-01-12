@@ -92,7 +92,7 @@
 "About.Row.Twitter.Url" = "https://twitter.com/adamant_im";
 
 /* 关于场景：写入Adamant行 */
-"About.Row.Adamant" = "Adamant";
+"About.Row.Adamant" = "ADAMANT";
 
 /* 关于场景：显示欢迎屏幕 */
 "About.Row.Welcome" = "欢迎屏幕";
