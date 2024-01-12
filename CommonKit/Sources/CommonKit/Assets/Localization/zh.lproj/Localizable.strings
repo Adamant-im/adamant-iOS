@@ -53,7 +53,7 @@
 "Contribute.Section.DonateDescription" = "每一次捐赠都让ADAMANT变得更强大";
 
 /* 贡献场景："速率"部分标题 */
-"Contribute.Section.Rate" = "在app Store中对应用进行评分";
+"Contribute.Section.Rate" = "在App Store中对应用进行评分";
 
 /* 贡献场景："速率"部分描述 */
 "Contribute.Section.RateDescription" = "反馈越多，应用程序的可见性越好。突出显示您喜欢的功能";
