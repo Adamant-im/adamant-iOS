@@ -10,9 +10,13 @@ import UIKit
 import CommonKit
 
 extension String.adamant.wallets {
-    static let ethereum = String.localized("AccountTab.Wallets.ethereum_wallet", comment: "Account tab: Ethereum wallet")
+    static var ethereum: String {
+        String.localized("AccountTab.Wallets.ethereum_wallet", comment: "Account tab: Ethereum wallet")
+    }
     
-    static let sendEth = String.localized("AccountTab.Row.SendEth", comment: "Account tab: 'Send ETH tokens' button")
+    static var sendEth: String {
+        String.localized("AccountTab.Row.SendEth", comment: "Account tab: 'Send ETH tokens' button")
+    }
 }
 
 final class EthWalletViewController: WalletViewControllerBase {
