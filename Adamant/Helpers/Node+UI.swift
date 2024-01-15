@@ -124,6 +124,17 @@ private extension Node {
     }
     
     var heightString: String? {
-        height.map { "▱ \($0)" }
+        height.map { "▱ \(getFormattedHeight(from: $0))" }
+    }
+    
+    var numberFormatter: NumberFormatter {
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .decimal
+        numberFormatter.groupingSeparator = ","
+        return numberFormatter
+    }
+    
+    func getFormattedHeight(from height: Int) -> String {
+        numberFormatter.string(from: Decimal(height)) ?? String(height)
     }
 }
