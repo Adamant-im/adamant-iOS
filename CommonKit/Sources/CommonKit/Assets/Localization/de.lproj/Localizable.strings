@@ -100,6 +100,12 @@
 /* Account tab: 'Currency' row */
 "AccountTab.Row.Currency" = "Währung";
 
+/* Account tab: 'Language' row */
+"AccountTab.Row.Language" = "Sprache";
+
+/* Account tab: Language auto */
+"Language.Auto" = "Automatisch";
+
 /* System accounts: ADAMANT Tokens */
 "Accounts.AdamantTokens" = "Willkommen in ADAMANT";
 
@@ -372,6 +378,18 @@
 
 /* Alert "Report has been sent" */
 "Chats.ReportSent" = "Bericht wurde gesendet";
+
+/* Date "Today" */
+"Chats.Date.Today" = "Heute";
+
+/* Date "Just now" */
+"Chats.Date.JustNow" = "Gerade jetzt";
+
+/* Date "A minute ago" */
+"Chats.Date.MinAgo" = "Vor einer Minute";
+
+/* Date "Yesterday" */
+"Chats.Date.Yesterday" = "Gestern";
 
 /* Chat: inform user that he can't cancel transaction, that was sent */
 "ChatScene.Error.cancelError" = "Nachricht bereits versendet";

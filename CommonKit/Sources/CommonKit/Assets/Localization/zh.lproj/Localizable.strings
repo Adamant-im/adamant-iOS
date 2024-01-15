@@ -100,6 +100,12 @@
 /* Account tab: 'Currency' row */
 "AccountTab.Row.Currency" = "货币";
 
+/* Account tab: 'Language' row */
+"AccountTab.Row.Language" = "语言";
+
+/* Account tab: Language auto */
+"Language.Auto" = "自动";
+
 /* System accounts: ADAMANT Tokens */
 "Accounts.AdamantTokens" = "欢迎使用ADAMANT";
 
@@ -372,6 +378,18 @@
 
 /* Alert "Report has been sent" */
 "Chats.ReportSent" = "报告已发送";
+
+/* Date "Today" */
+"Chats.Date.Today" = "今天";
+
+/* Date "Just now" */
+"Chats.Date.JustNow" = "现在";
+
+/* Date "A minute ago" */
+"Chats.Date.MinAgo" = "一分钟前";
+
+/* Date "Yesterday" */
+"Chats.Date.Yesterday" = "昨天";
 
 /* Chat: inform user that he can't cancel transaction, that was sent */
 "ChatScene.Error.cancelError" = "消息已发送";

@@ -10,19 +10,16 @@ import UIKit
 import CommonKit
 
 extension String.adamant {
-    static let bitcoin = String.localized("AccountTab.Wallets.bitcoin_wallet", comment: "Account tab: Bitcoin wallet")
+    static var bitcoin: String {
+        String.localized("AccountTab.Wallets.bitcoin_wallet", comment: "Account tab: Bitcoin wallet")
+    }
     
-    static let sendBtc = String.localized("AccountTab.Row.SendBtc", comment: "Account tab: 'Send BTC tokens' button")
+    static var sendBtc: String {
+        String.localized("AccountTab.Row.SendBtc", comment: "Account tab: 'Send BTC tokens' button")
+    }
 }
 
 final class BtcWalletViewController: WalletViewControllerBase {
-    // MARK: Lifecycle
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        walletTitleLabel.text = String.adamant.bitcoin
-    }
     
     override func sendRowLocalizedLabel() -> NSAttributedString {
         return NSAttributedString(string: String.adamant.sendBtc)
@@ -30,5 +27,9 @@ final class BtcWalletViewController: WalletViewControllerBase {
     
     override func encodeForQr(address: String) -> String? {
         return "bitcoin:\(address)"
+    }
+    
+    override func setTitle() {
+        walletTitleLabel.text = String.adamant.bitcoin
     }
 }

@@ -231,6 +231,11 @@ struct AppAssembly: Assembly {
             service.accountService = r.resolve(AccountService.self)
         }
         
+        // MARK: LanguageStorageProtocol
+        container.register(LanguageStorageProtocol.self) { r in
+            LanguageStorageService()
+        }.inObjectScope(.container)
+        
         // MARK: - Data Providers
         // MARK: CoreData Stack
         container.register(CoreDataStack.self) { _ in
