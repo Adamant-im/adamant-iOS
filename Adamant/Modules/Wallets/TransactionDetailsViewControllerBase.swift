@@ -192,6 +192,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
         nil
     }
     
+    var feeCurrencySymbol: String? {
+        currencySymbol
+    }
+    
     var transactionStatus: TransactionStatus? {
         guard let richTransaction = richTransaction,
               let status = transaction?.transactionStatus
@@ -244,6 +248,12 @@ class TransactionDetailsViewControllerBase: FormViewController {
     var valueAtTimeTxn: String? {
         didSet {
             updateValueAtTimeRowValue()
+        }
+    }
+    
+    var feeAtTimeTxn: String? {
+        didSet {
+            updateFeeAtTimeRowValue()
         }
     }
     
@@ -494,12 +504,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.disabled = true
             $0.tag = Rows.fee.tag
             $0.title = Rows.fee.localized
-            
-            if let value = transaction?.feeValue {
-                $0.value = feeFormatter.string(from: value)
-            } else {
-                $0.value = TransactionDetailsViewControllerBase.awaitingValueString
-            }
+            $0.value = getFeeValue()
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
             cell.textLabel?.textColor = UIColor.adamant.textColor
@@ -509,11 +514,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = UIColor.adamant.textColor
-            if let value = self?.transaction?.feeValue, let formatter = self?.feeFormatter {
-                row.value = formatter.string(from: value)
-            } else {
-                row.value = TransactionDetailsViewControllerBase.awaitingValueString
-            }
+            row.value = self?.getFeeValue()
         }
             
         detailsSection.append(feeRow)
@@ -776,31 +777,41 @@ class TransactionDetailsViewControllerBase: FormViewController {
               let amount = transaction?.amountValue
         else { return }
         
-        self.isFiatSet = true
         let currentFiat = currencyInfo.currentCurrency.rawValue
         
-        currencyInfo.getHistory(
-            for: currencySymbol,
-            timestamp: date
-        ) { result in
-            Task { @MainActor [weak self] in
-                guard case .success(let tickers) = result else {
-                    self?.isFiatSet = false
-                    return
-                }
-                
-                self?.isFiatSet = true
-                
-                guard let tickers = tickers,
-                      let ticker = tickers["\(currencySymbol)/\(currentFiat)"]
-                else {
-                    return
-                }
-                
-                let totalFiat = amount * ticker
-                
-                self?.valueAtTimeTxn = self?.fiatFormatter.string(from: totalFiat)
+        Task {
+            var tickers = try await currencyInfo.getHistory(
+                for: currencySymbol,
+                timestamp: date
+            )
+            
+            isFiatSet = true
+            
+            guard var ticker = tickers["\(currencySymbol)/\(currentFiat)"] else {
+                return
             }
+            
+            let totalFiat = amount * ticker
+            valueAtTimeTxn = fiatFormatter.string(from: totalFiat)
+            
+            guard let fee = transaction?.feeValue else { return }
+            
+            if let feeCurrencySymbol = feeCurrencySymbol,
+               feeCurrencySymbol != currencySymbol {
+                tickers = try await currencyInfo.getHistory(
+                    for: feeCurrencySymbol,
+                    timestamp: date
+                )
+                
+                guard let feeTicker = tickers["\(feeCurrencySymbol)/\(currentFiat)"] else {
+                    return
+                }
+                
+                ticker = feeTicker
+            }
+            
+            let totalFeeFiat = fee * ticker
+            feeAtTimeTxn = fiatFormatter.string(from: totalFeeFiat)
         }
     }
     
@@ -850,6 +861,28 @@ class TransactionDetailsViewControllerBase: FormViewController {
         row.updateCell()
     }
     
+    @MainActor
+    private func updateFeeAtTimeRowValue() {
+        guard let row: LabelRow = form.rowBy(tag: Rows.fee.tag)
+        else { return }
+        
+        row.value = getFeeValue()
+        row.updateCell()
+    }
+    
+    func getFeeValue() -> String {
+        guard let value = transaction?.feeValue else {
+            return TransactionDetailsViewControllerBase.awaitingValueString
+        }
+        
+        let feeValueRaw = feeFormatter.string(from: value) ?? ""
+        
+        if let feeAtTimeTxn = feeAtTimeTxn {
+            return "\(feeValueRaw) ~\(feeAtTimeTxn)"
+        }
+        
+        return feeValueRaw
+    }
     // MARK: - Actions
     
     @objc func share(_ sender: UIBarButtonItem) {
