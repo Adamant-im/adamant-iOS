@@ -17,31 +17,41 @@ public extension Date {
     
     /// Returns readable date with time.
     func humanizedDateTime(withWeekday: Bool = true) -> String {
+        let formatter = defaultFormatter
+        
         if year == Date().year {
             let dateString: String
             if isToday {
-                dateString = NSLocalizedString("Today", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), comment: "")
+                dateString = String.localized("Chats.Date.Today")
             } else if daysAgo < 2 {
                 /*
                     We can't use 'self.timeAgoSinceNow' here, because after midnight, when it is already not 'isToday',
                     but less than 24 hours has passed, so it is technically not 'Yesterday' yet,
                     it will display something like '6 hours ago'
                 */
-                dateString = NSLocalizedString("Yesterday", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), comment: "")
+                dateString = String.localized("Chats.Date.Yesterday")
             } else if withWeekday && weeksAgo < 1 { // This week, show weekday, month and date
                 dateString = Date.formatterWeekDayMonth.string(from: self)
             } else { // This year, long ago: show month and date
                 dateString = Date.formatterDayMonth.string(from: self)
             }
             
-            return "\(dateString), \(DateFormatter.localizedString(from: self, dateStyle: .none, timeStyle: .short))"
-        } else {
-            return DateFormatter.localizedString(from: self, dateStyle: .medium, timeStyle: .short)
+            formatter.dateStyle = .none
+            formatter.timeStyle = .short
+            
+            return "\(dateString), \(formatter.string(from: self))"
         }
+        
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        return formatter.string(from: self)
     }
     
     func humanizedDateTimeFull() -> String {
-        return DateFormatter.localizedString(from: self, dateStyle: .long, timeStyle: .short)
+        let formatter = defaultFormatter
+        formatter.dateStyle = .long
+        formatter.timeStyle = .short
+        return formatter.string(from: self)
     }
     
     /// Returns readable day string. "Today, Yesterday, etc"
@@ -49,7 +59,7 @@ public extension Date {
         let dateString: String
         
         if isToday { // Today
-            dateString = NSLocalizedString("Today", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), comment: "")
+            dateString = String.localized("Chats.Date.Today")
         } else if daysAgo < 2 { // Yesterday
             dateString = self.timeAgoSinceNow
         } else if weeksAgo < 1 { // This week, show weekday, month and date
@@ -71,10 +81,10 @@ public extension Date {
         
         let seconds = secondsAgo
         if seconds < 30 {
-            timeString = NSLocalizedString("Just now", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), comment: "")
+            timeString = String.localized("Chats.Date.JustNow")
             expire = TimeInterval(30 - seconds)
         } else if seconds < 90 {
-            timeString = NSLocalizedString("A minute ago", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), comment: "")
+            timeString = String.localized("Chats.Date.MinAgo")
             expire = TimeInterval(60 - (seconds % 60))
         } else if minutesAgo < 5 {
             timeString = timeAgoSinceNow
@@ -90,15 +100,29 @@ public extension Date {
     
     // MARK: Formatters
     
-    private static let formatterWeekDayMonth: DateFormatter = {
+    private static var formatterWeekDayMonth: DateFormatter {
         let formatter = DateFormatter()
+        if let localeRaw = UserDefaults.standard.string(forKey: StoreKey.language.languageLocale) {
+            formatter.locale = Locale(identifier: localeRaw)
+        }
         formatter.setLocalizedDateFormatFromTemplate("MMMMEEEEd")
         return formatter
-    }()
+    }
     
-    private static let formatterDayMonth: DateFormatter = {
+    private static var formatterDayMonth: DateFormatter {
         let formatter = DateFormatter()
+        if let localeRaw = UserDefaults.standard.string(forKey: StoreKey.language.languageLocale) {
+            formatter.locale = Locale(identifier: localeRaw)
+        }
         formatter.setLocalizedDateFormatFromTemplate("MMMMd")
         return formatter
-    }()
+    }
+    
+    private var defaultFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        if let localeRaw = UserDefaults.standard.string(forKey: StoreKey.language.languageLocale) {
+            formatter.locale = Locale(identifier: localeRaw)
+        }
+        return formatter
+    }
 }

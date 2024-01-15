@@ -20,27 +20,46 @@ protocol TransferViewControllerDelegate: AnyObject {
 
 // MARK: - Localization
 extension String.adamant {
-    struct transfer {
-        static let addressPlaceholder = String.localized("TransferScene.Recipient.Placeholder", comment: "Transfer: recipient address placeholder")
-        static let amountPlaceholder = String.localized("TransferScene.Amount.Placeholder", comment: "Transfer: transfer amount placeholder")
-        
-        static let addressValidationError = String.localized("TransferScene.Error.InvalidAddress", comment: "Transfer: Address validation error")
-        static let amountZeroError = String.localized("TransferScene.Error.TooLittleMoney", comment: "Transfer: Amount is zero, or even negative notification")
-        static let notEnoughFeeError = String.localized("TransferScene.Error.TooLittleFee", comment: "Transfer: Not enough fee for send a transaction")
-        static let feeIsTooHigh = String.localized("TransferScene.Error.FeeIsTooHigh", comment: "Transfer: Fee is higher than usual")
-        static let amountTooHigh = String.localized("TransferScene.Error.notEnoughMoney", comment: "Transfer: Amount is hiegher that user's total money notification")
-        static let accountNotFound = String.localized("TransferScene.Error.AddressNotFound", comment: "Transfer: Address not found error")
-        
-        static let transferProcessingMessage = String.localized("TransferScene.SendingFundsProgress", comment: "Transfer: Processing message")
-        static let transferSuccess = String.localized("TransferScene.TransferSuccessMessage", comment: "Transfer: Tokens transfered successfully message")
-        
-        static let send = String.localized("TransferScene.Send", comment: "Transfer: Send button")
-        
-        static let cantUndo = String.localized("TransferScene.CantUndo", comment: "Transfer: Send button")
-        
-        static let useMaxToTransfer = String.localized("TransferScene.UseMaxToTransfer", comment: "Tranfser: Confirm using maximum available for transfer tokens as amount to transfer.")
-        
-        private init() { }
+    enum transfer {
+        static var addressPlaceholder: String {
+            String.localized("TransferScene.Recipient.Placeholder", comment: "Transfer: recipient address placeholder")
+        }
+        static var amountPlaceholder: String {
+            String.localized("TransferScene.Amount.Placeholder", comment: "Transfer: transfer amount placeholder")
+        }
+        static var addressValidationError: String {
+            String.localized("TransferScene.Error.InvalidAddress", comment: "Transfer: Address validation error")
+        }
+        static var amountZeroError: String {
+            String.localized("TransferScene.Error.TooLittleMoney", comment: "Transfer: Amount is zero, or even negative notification")
+        }
+        static var notEnoughFeeError: String {
+            String.localized("TransferScene.Error.TooLittleFee", comment: "Transfer: Not enough fee for send a transaction")
+        }
+        static var feeIsTooHigh: String {
+            String.localized("TransferScene.Error.FeeIsTooHigh", comment: "Transfer: Fee is higher than usual")
+        }
+        static var amountTooHigh: String {
+            String.localized("TransferScene.Error.notEnoughMoney", comment: "Transfer: Amount is hiegher that user's total money notification")
+        }
+        static var accountNotFound: String {
+            String.localized("TransferScene.Error.AddressNotFound", comment: "Transfer: Address not found error")
+        }
+        static var transferProcessingMessage: String {
+            String.localized("TransferScene.SendingFundsProgress", comment: "Transfer: Processing message")
+        }
+        static var transferSuccess: String {
+            String.localized("TransferScene.TransferSuccessMessage", comment: "Transfer: Tokens transfered successfully message")
+        }
+        static var send: String {
+            String.localized("TransferScene.Send", comment: "Transfer: Send button")
+        }
+        static var cantUndo: String {
+            String.localized("TransferScene.CantUndo", comment: "Transfer: Send button")
+        }
+        static var useMaxToTransfer: String {
+            String.localized("TransferScene.UseMaxToTransfer", comment: "Tranfser: Confirm using maximum available for transfer tokens as amount to transfer.")
+        }
     }
 }
 

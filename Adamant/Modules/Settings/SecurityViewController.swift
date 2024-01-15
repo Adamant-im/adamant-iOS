@@ -14,14 +14,20 @@ import CommonKit
 
 // MARK: - Localization
 extension String.adamant {
-    struct security {
-        static let title = String.localized("SecurityPage.Title", comment: "Security: scene title")
+    enum security {
+        static var title: String {
+            String.localized("SecurityPage.Title", comment: "Security: scene title")
+        }
         
-        static let stayInTurnOff = String.localized("SecurityPage.DoNotStayLoggedIn", comment: "Security: turn off 'Stay Logged In' confirmation")
-        static let biometryOnReason = String.localized("SecurityPage.UseBiometry", comment: "Security: Authorization reason for turning biometry on")
-        static let biometryOffReason = String.localized("SecurityPage.DoNotUseBiometry", comment: "Security: Authorization reason for turning biometry off")
-        
-        private init() {}
+        static var stayInTurnOff: String {
+            String.localized("SecurityPage.DoNotStayLoggedIn", comment: "Security: turn off 'Stay Logged In' confirmation")
+        }
+        static var biometryOnReason: String {
+            String.localized("SecurityPage.UseBiometry", comment: "Security: Authorization reason for turning biometry on")
+        }
+        static var biometryOffReason: String {
+            String.localized("SecurityPage.DoNotUseBiometry", comment: "Security: Authorization reason for turning biometry off")
+        }
     }
 }
 

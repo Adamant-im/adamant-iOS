@@ -13,10 +13,18 @@ import CommonKit
 
 extension String.adamant {
     enum search {
-        static let contacts = String.localized("SearchPage.Contacts", comment: "SearchPage: Contacts header")
-        static let messages = String.localized("SearchPage.Messages", comment: "SearchPage: Messages header")
-        static let newContactHeader = String.localized("SearchPage.Contact.New", comment: "SearchPage: Contacts header")
-        static let newContact = String.localized("SearchPage.Contact.Add.New", comment: "SearchPage: Contact new header")
+        static var contacts: String {
+            String.localized("SearchPage.Contacts", comment: "SearchPage: Contacts header")
+        }
+        static var messages: String {
+            String.localized("SearchPage.Messages", comment: "SearchPage: Messages header")
+        }
+        static var newContactHeader: String {
+            String.localized("SearchPage.Contact.New", comment: "SearchPage: Contacts header")
+        }
+        static var newContact: String {
+            String.localized("SearchPage.Contact.Add.New", comment: "SearchPage: Contact new header")
+        }
     }
 }
 
