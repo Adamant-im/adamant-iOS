@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CommonKit
 
 protocol LanguageStorageProtocol {
     func getLanguage() -> Language

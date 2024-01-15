@@ -12,9 +12,10 @@ public extension String {
     enum adamant {}
     
     static func localized(_ key: String, comment: String = .empty) -> String {
-        guard let language = UserDefaults.standard.string(forKey: StoreKey.language.language),
-              !language.isEmpty,
-              let path = Bundle.module.path(forResource: language, ofType: "lproj")
+        guard let languageRaw = UserDefaults.standard.string(forKey: StoreKey.language.language),
+              !languageRaw.isEmpty,
+              languageRaw != Language.auto.rawValue,
+              let path = Bundle.module.path(forResource: languageRaw, ofType: "lproj")
         else {
             return NSLocalizedString(key, bundle: .module, comment: comment)
         }
