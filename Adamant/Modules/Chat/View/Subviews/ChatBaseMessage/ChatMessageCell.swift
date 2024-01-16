@@ -358,12 +358,16 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         - reactionsContanerViewWidth / 2
         
         let minSpace = model.isFromCurrentSender
-        ? minReactionsContanerHorizontalSpace + reactionsContanerViewWidth
-        : minReactionsContanerHorizontalSpace
+        ? minReactionsSpacingToOwnBoundary + reactionsContanerViewWidth
+        : minReactionsSpacingToOwnBoundary
         
-        x = model.isFromCurrentSender
-        ? contentView.bounds.width - x > minSpace ? x : contentView.bounds.width - minSpace
-        : x > minSpace ? x : minSpace
+        if model.isFromCurrentSender {
+            x = min(x, contentView.bounds.width - minSpace)
+            x = max(x, minReactionsSpacingToOppositeBoundary)
+        } else {
+            x = max(x, minSpace)
+            x = min(x, contentView.bounds.width - minReactionsSpacingToOppositeBoundary - reactionsContanerViewWidth)
+        }
         
         reactionsContanerView.frame = CGRect(
             origin: .init(
@@ -525,4 +529,5 @@ extension ChatMessageCell {
 }
 
 private let reactionsContanerVerticalSpace: CGFloat = 10
-private let minReactionsContanerHorizontalSpace: CGFloat = 60
+private let minReactionsSpacingToOwnBoundary: CGFloat = 60
+private let minReactionsSpacingToOppositeBoundary: CGFloat = 15

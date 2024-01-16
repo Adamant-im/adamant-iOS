@@ -230,6 +230,11 @@ struct AppAssembly: Assembly {
             )
         }.inObjectScope(.container)
         
+        // MARK: LanguageStorageProtocol
+        container.register(LanguageStorageProtocol.self) { r in
+            LanguageStorageService()
+        }.inObjectScope(.container)
+        
         // MARK: - Data Providers
         // MARK: CoreData Stack
         container.register(CoreDataStack.self) { _ in

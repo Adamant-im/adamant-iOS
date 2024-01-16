@@ -13,9 +13,15 @@ import CommonKit
 // MARK: - Localization
 extension String.adamant {
     enum visibleWallets {
-        static let title = String.localized("VisibleWallets.Title", comment: "Visible Wallets page: scene title")
-        static let resetAlertTitle = String.localized("VisibleWallets.ResetListAlert", comment: "VisibleWallets: Reset wallets alert title")
-        static let reset = String.localized("NodesList.ResetButton", comment: "NodesList: 'Reset' button")
+        static var title: String {
+            String.localized("VisibleWallets.Title", comment: "Visible Wallets page: scene title")
+        }
+        static var resetAlertTitle: String {
+            String.localized("VisibleWallets.ResetListAlert", comment: "VisibleWallets: Reset wallets alert title")
+        }
+        static var reset: String {
+            String.localized("NodesList.ResetButton", comment: "NodesList: 'Reset' button")
+        }
     }
 }
 

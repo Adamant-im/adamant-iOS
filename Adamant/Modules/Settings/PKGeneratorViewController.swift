@@ -15,12 +15,16 @@ import CommonKit
 
 // MARK: - Localization
 extension String.adamant {
-    struct pkGenerator {
-        static let title = String.localized("PkGeneratorScene.Title", comment: "PrivateKeyGenerator: scene title")
-        static let alert = String.localized("PkGeneratorScene.Alert", comment: "PrivateKeyGenerator: Security alert. Keep your passphrase safe")
-        static let generateButton = String.localized("PkGeneratorScene.GenerateButton", comment: "PrivateKeyGenerator: Generate button")
-        
-        private init() {}
+    enum pkGenerator {
+        static var title: String {
+            String.localized("PkGeneratorScene.Title", comment: "PrivateKeyGenerator: scene title")
+        }
+        static var alert: String {
+            String.localized("PkGeneratorScene.Alert", comment: "PrivateKeyGenerator: Security alert. Keep your passphrase safe")
+        }
+        static var generateButton: String {
+            String.localized("PkGeneratorScene.GenerateButton", comment: "PrivateKeyGenerator: Generate button")
+        }
     }
 }
 

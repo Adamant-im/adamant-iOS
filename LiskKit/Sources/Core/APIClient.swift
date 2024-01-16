@@ -48,12 +48,18 @@ public struct APIClient {
         public static let testnet = APIClient(options: .Service.testnet)
     }
 
+    struct JSONResponse<R: Decodable>: Decodable {
+        let id: String
+        let jsonrpc: String
+        let result: R
+    }
+    
     // MARK: - Init
 
     public init(options: APIOptions = .mainnet) {
 
         // swiftlint:disable:next force_unwrapping
-        self.baseURL = URL(string: "\(options.node.origin)/api")!
+        self.baseURL = URL(string: "\(options.node.origin)")!
 
         self.headers = [
             "Accept": options.nethash.contentType,
@@ -99,10 +105,21 @@ public struct APIClient {
         return (request, task)
     }
 
+    public func request<R: Decodable>(
+        method: String,
+        params: [String: Any]
+    ) async throws -> R {
+        let request = try createRPCRequest(method: method, params: params)
+        let response: R = try await dataTask(request)
+        return response
+    }
+    
     // MARK: - Private
 
     /// Base url of all requests
     internal let baseURL: URL
+
+    private let rpcPath = "rpc"
 
     /// Headers to send on every request
     private let headers: [String: String]
@@ -110,6 +127,13 @@ public struct APIClient {
     /// Session to send http requests
     private let urlSession = URLSession(configuration: .ephemeral)
 
+    /// Create a json data task
+    private func dataTask<R: Decodable>(_ request: URLRequest) async throws -> R {
+        let data = try await urlSession.data(for: request)
+        let response: R = try processRequestCompletion(data.0, response: data.1)
+        return response
+    }
+    
     /// Create a json data task
     private func dataTask<R>(_ request: URLRequest, completionHandler: @escaping (Response<R>) -> Void) -> URLSessionDataTask {
         let task = urlSession.dataTask(with: request) { data, response, _ in
@@ -145,10 +169,30 @@ public struct APIClient {
                 request.httpBody = try? JSONSerialization.data(withJSONObject: options, options: [])
             }
         }
-
         return request
     }
 
+    func createRPCRequest(
+        method: String,
+        params: [String: Any]
+    ) throws -> URLRequest {
+        let url = baseURL.appendingPathComponent(rpcPath)
+        var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData)
+        
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let requestBody: [String: Any] = [
+            "jsonrpc": "2.0",
+            "id": "1",
+            "method": method,
+            "params": params
+        ]
+        
+        let jsonData = try JSONSerialization.data(withJSONObject: requestBody)
+        request.httpBody = jsonData
+        return request
+    }
     /// Converts a dict to url encoded query string
     private func urlEncodedQueryString(_ options: Any) -> String {
         guard let options = options as? RequestOptions else {
@@ -192,5 +236,34 @@ public struct APIClient {
         }
 
         return .success(response: result)
+    }
+    
+    /// Process a response
+    private func processRequestCompletion<R: Decodable>(
+        _ data: Data?,
+        response: URLResponse?
+    ) throws -> R {
+        let code = (response as? HTTPURLResponse)?.statusCode
+        
+        guard let data = data else {
+            throw APIError.unexpected(code: code)
+        }
+
+        guard let jsonResponse = try? JSONDecoder().decode(JSONResponse<R>.self, from: data) else {
+            if var error = try? JSONDecoder().decode(APIError.self, from: data) {
+                error.code = code
+                throw error
+            } else if
+                let error = try? JSONDecoder().decode(APIErrors.self, from: data),
+                var first = error.errors.first
+            {
+                first.code = code
+                throw first
+            }
+            
+            throw APIError.unknown(code: code)
+        }
+        
+        return jsonResponse.result
     }
 }

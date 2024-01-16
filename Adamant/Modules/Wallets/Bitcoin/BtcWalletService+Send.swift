@@ -14,7 +14,7 @@ extension BtcWalletService: WalletServiceTwoStepSend {
     typealias T = BitcoinKit.Transaction
     
     // MARK: Create & Send
-    func createTransaction(recipient: String, amount: Decimal) async throws -> BitcoinKit.Transaction {
+    func createTransaction(recipient: String, amount: Decimal, fee: Decimal) async throws -> BitcoinKit.Transaction {
         // MARK: 1. Prepare
         guard let wallet = self.btcWallet else {
             throw WalletServiceError.notLogged
@@ -27,7 +27,7 @@ extension BtcWalletService: WalletServiceTwoStepSend {
         }
         
         let rawAmount = NSDecimalNumber(decimal: amount * BtcWalletService.multiplier).uint64Value
-        let fee = NSDecimalNumber(decimal: self.transactionFee * BtcWalletService.multiplier).uint64Value
+        let fee = NSDecimalNumber(decimal: fee * BtcWalletService.multiplier).uint64Value
         
         // MARK: 2. Search for unspent transactions
 

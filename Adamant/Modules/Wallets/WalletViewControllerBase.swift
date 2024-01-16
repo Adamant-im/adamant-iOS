@@ -9,6 +9,7 @@
 import UIKit
 import Eureka
 import CommonKit
+import Combine
 
 extension String.adamant {
     struct wallets {
@@ -66,6 +67,8 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         return AdamantBalanceFormat.fiatFormatter(for: currencyInfoService.currentCurrency)
     }()
     
+    private var subscriptions = Set<AnyCancellable>()
+    
     // MARK: - IBOutlets
     
     @IBOutlet weak var walletTitleLabel: UILabel!
@@ -104,7 +107,8 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        setTitle()
+        addObservers()
         tableView.tableFooterView = UIView()
         
         let section = Section()
@@ -146,11 +150,13 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
             let height = row.value?.fiat != nil ? BalanceTableViewCell.fullHeight : BalanceTableViewCell.compactHeight
             
             cell.height = { height }
+            cell.titleLabel.text = BaseRows.balance.localized
         }
         
         balanceRow.cell.selectionStyle = .gray
         balanceRow.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
+            cell.titleLabel.text = BaseRows.balance.localized
         }.onCellSelection { [weak self] (_, _) in
             guard
                 let self = self,
@@ -349,8 +355,9 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
             if let wallet = service?.core.wallet {
                 $0.value = wallet.address
             }
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { (cell, row) in
             cell.accessoryType = .disclosureIndicator
+            row.title = BaseRows.address.localized
         }.onCellSelection { [weak self] (cell, row) in
             row.deselect()
             let completion = { [weak self] in
@@ -381,6 +388,8 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         }
         return addressRow
     }
+    
+    func setTitle() { }
     
     // MARK: - Other
     
@@ -459,6 +468,17 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
         initiatingActivityIndicator.color = .adamant.primary
+    }
+    
+    private func addObservers() {
+        NotificationCenter.default
+            .publisher(for: .LanguageStorageService.languageUpdated)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.tableView.reloadData()
+                self?.setTitle()
+            }
+            .store(in: &subscriptions)
     }
 }
 

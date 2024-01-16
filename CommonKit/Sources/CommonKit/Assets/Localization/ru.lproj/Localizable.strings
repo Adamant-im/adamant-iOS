@@ -220,6 +220,12 @@
 /* Account tab: 'Vote for delegates' button */
 "AccountTab.Row.VoteForDelegates" = "Голосовать за делегатов";
 
+/* Account tab: 'Language' row */
+"AccountTab.Row.Language" = "Язык";
+
+/* Account tab: Language auto */
+"Language.Auto" = "Автоматически";
+
 /* Account tab: Actions section title */
 "AccountTab.Section.Actions" = "Действия";
 
@@ -372,6 +378,18 @@
 
 /* Alert "Report has been sent" */
 "Chats.ReportSent" = "Запрос отправлен";
+
+/* Date "Today" */
+"Chats.Date.Today" = "Сегодня";
+
+/* Date "Just now" */
+"Chats.Date.JustNow" = "Только что";
+
+/* Date "A minute ago" */
+"Chats.Date.MinAgo" = "Минуту назад";
+
+/* Date "Yesterday" */
+"Chats.Date.Yesterday" = "Вчера";
 
 /* Chat: inform user that he can't cancel transaction, that was sent */
 "ChatScene.Error.cancelError" = "Сообщение уже отправлено";
@@ -1131,6 +1149,9 @@
 
 /* Welcome: Skip button" */
 "WelcomeScene.Description.SkipButton" = "Пропустить";
+
+/* Welcome: Description accept */
+"WelcomeScene.Description.Accept" = "Я принимаю";
 
 /* EULA */
 "EULA.Title" = "Условия использования";

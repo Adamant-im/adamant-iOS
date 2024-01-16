@@ -48,6 +48,17 @@ extension Transactions {
     public func submit(signedTransaction: RequestOptions, completionHandler: @escaping (Response<TransactionSubmitResponse>) -> Void) {
         client.post(path: "transactions", options: signedTransaction, completionHandler: completionHandler)
     }
+    
+    public func submit(transaction: TransactionEntity) async throws -> TransactionSubmitModel {
+        guard let hash = transaction.getTxHash() else {
+            throw APIError.unexpected(code: 0)
+        }
+        
+        return try await client.request(
+            method: "txpool_postTransaction",
+            params: ["transaction": hash]
+        )
+    }
 }
 
 // MARK: - Send

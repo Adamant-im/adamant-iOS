@@ -14,19 +14,28 @@ import Combine
 import CommonKit
 
 extension String.adamant {
-    struct chatList {
-        static let title = String.localized("ChatListPage.Title", comment: "ChatList: scene title")
-        static let sentMessagePrefix = String.localized("ChatListPage.SentMessagePrefix", comment: "ChatList: outgoing message prefix")
-        static let syncingChats = String.localized("ChatListPage.SyncingChats", comment: "ChatList: First syncronization is in progress")
-        static let searchPlaceholder = String.localized("ChatListPage.SearchBar.Placeholder", comment: "ChatList: SearchBar placeholder text")
-        
-        static let blockUser = String.localized("Chats.BlockUser", comment: "Block this user?")
-        
-        static let removedReaction = String.localized("ChatListPage.RemovedReaction", comment: "ChatList: Removed Reaction?")
-        
-        static let reacted = String.localized("ChatListPage.Reacted", comment: "ChatList: Reacted")
-        
-        private init() {}
+    enum chatList {
+        static var title: String {
+            String.localized("ChatListPage.Title", comment: "ChatList: scene title")
+        }
+        static var sentMessagePrefix: String {
+            String.localized("ChatListPage.SentMessagePrefix", comment: "ChatList: outgoing message prefix")
+        }
+        static var syncingChats: String {
+            String.localized("ChatListPage.SyncingChats", comment: "ChatList: First syncronization is in progress")
+        }
+        static var searchPlaceholder: String {
+            String.localized("ChatListPage.SearchBar.Placeholder", comment: "ChatList: SearchBar placeholder text")
+        }
+        static var blockUser: String {
+            String.localized("Chats.BlockUser", comment: "Block this user?")
+        }
+        static var removedReaction: String {
+            String.localized("ChatListPage.RemovedReaction", comment: "ChatList: Removed Reaction?")
+        }
+        static var reacted: String {
+            String.localized("ChatListPage.Reacted", comment: "ChatList: Reacted")
+        }
     }
 }
 
@@ -285,6 +294,19 @@ final class ChatListViewController: KeyboardObservingViewController {
             .sink { [weak self] notification in self?.animateUpdateIfNeeded(notification) }
             .store(in: &subscriptions)
         
+        NotificationCenter.default
+            .publisher(for: .LanguageStorageService.languageUpdated)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.updateUITitles()
+            }
+            .store(in: &subscriptions)
+    }
+    
+    private func updateUITitles() {
+        updatingIndicatorView.updateTitle(title:  String.adamant.chatList.title)
+        tableView.reloadData()
+        searchController?.searchBar.placeholder = String.adamant.chatList.searchPlaceholder
     }
     
     private func animateUpdateIfNeeded(_ notification: Notification) {

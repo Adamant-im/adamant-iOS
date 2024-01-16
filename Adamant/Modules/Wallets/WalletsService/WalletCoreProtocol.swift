@@ -231,9 +231,9 @@ protocol WalletViewController {
 
 // MARK: - Wallet Service
 protocol WalletCoreProtocol: AnyObject {
-	// MARK: Currency
-	static var currencySymbol: String { get }
-	static var currencyLogo: UIImage { get }
+    // MARK: Currency
+    static var currencySymbol: String { get }
+    static var currencyLogo: UIImage { get }
     static var qqPrefix: String { get }
     
     var tokenSymbol: String { get }
@@ -271,15 +271,15 @@ protocol WalletCoreProtocol: AnyObject {
     var newPendingAttempts: Int { get }
     var oldPendingAttempts: Int { get }
     
-	// MARK: Notifications
-	
-	/// Wallet updated.
-	/// UserInfo contains new wallet at AdamantUserInfoKey.WalletService.wallet
-	var walletUpdatedNotification: Notification.Name { get }
-	
-	/// Enabled state changed
-	var serviceEnabledChanged: Notification.Name { get }
-	
+    // MARK: Notifications
+    
+    /// Wallet updated.
+    /// UserInfo contains new wallet at AdamantUserInfoKey.WalletService.wallet
+    var walletUpdatedNotification: Notification.Name { get }
+    
+    /// Enabled state changed
+    var serviceEnabledChanged: Notification.Name { get }
+    
     /// State changed
     var serviceStateChanged: Notification.Name { get }
     
@@ -298,6 +298,7 @@ protocol WalletCoreProtocol: AnyObject {
     func loadTransactions(offset: Int, limit: Int) async throws -> Int
     func getLocalTransactionHistory() -> [TransactionDetails]
     func updateStatus(for id: String, status: TransactionStatus?)
+    func isExist(address: String) async throws -> Bool
     func statusInfoFor(transaction: CoinTransaction) async -> TransactionStatusInfo
     func initWallet(withPassphrase: String) async throws -> WalletAccount
     func setInitiationFailed(reason: String)
@@ -318,6 +319,11 @@ protocol WalletCoreProtocol: AnyObject {
     var isSupportIncreaseFee: Bool { get }
     var isIncreaseFeeEnabled: Bool { get }
     var defaultIncreaseFee: Decimal { get }
+    var additionalFee : Decimal { get }
+}
+
+extension WalletCoreProtocol {
+    func isExist(address: String) async throws -> Bool { return true }
 }
 
 extension WalletCoreProtocol {
@@ -345,6 +351,9 @@ extension WalletCoreProtocol {
     var defaultIncreaseFee: Decimal {
         return 1.5
     }
+    var additionalFee: Decimal {
+        .zero
+    }
 }
 
 protocol SwinjectDependentService: WalletCoreProtocol {
@@ -366,7 +375,12 @@ protocol WalletServiceSimpleSend: WalletCoreProtocol {
 protocol WalletServiceTwoStepSend: WalletCoreProtocol {
     associatedtype T: RawTransaction
     
-    func createTransaction(recipient: String, amount: Decimal) async throws -> T
+    func createTransaction(
+        recipient: String,
+        amount: Decimal,
+        fee: Decimal
+    ) async throws -> T
+    
     func sendTransaction(_ transaction: T) async throws
 }
 

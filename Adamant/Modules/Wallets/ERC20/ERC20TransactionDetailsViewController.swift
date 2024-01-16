@@ -24,6 +24,10 @@ final class ERC20TransactionDetailsViewController: TransactionDetailsViewControl
         return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: EthWalletService.currencySymbol)
     }
     
+    override var feeCurrencySymbol: String? {
+        EthWalletService.currencySymbol
+    }
+    
     private lazy var refreshControl: UIRefreshControl = {
         let control = UIRefreshControl()
         control.tintColor = .adamant.primary

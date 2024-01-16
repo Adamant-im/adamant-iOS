@@ -100,6 +100,12 @@
 /* Account tab: 'Currency' row */
 "AccountTab.Row.Currency" = "Currency";
 
+/* Account tab: 'Language' row */
+"AccountTab.Row.Language" = "Language";
+
+/* Account tab: Language auto */
+"Language.Auto" = "Automatically";
+
 /* System accounts: ADAMANT Tokens */
 "Accounts.AdamantTokens" = "Welcome to ADAMANT";
 
@@ -372,6 +378,18 @@
 
 /* Alert "Report has been sent" */
 "Chats.ReportSent" = "Report has been sent";
+
+/* Date "Today" */
+"Chats.Date.Today" = "Today";
+
+/* Date "Just now" */
+"Chats.Date.JustNow" = "Just now";
+
+/* Date "A minute ago" */
+"Chats.Date.MinAgo" = "A minute ago";
+
+/* Date "Yesterday" */
+"Chats.Date.Yesterday" = "Yesterday";
 
 /* Chat: inform user that he can't cancel transaction, that was sent */
 "ChatScene.Error.cancelError" = "Message is already sent";
@@ -1134,6 +1152,9 @@
 
 /* Welcome: Skip button */
 "WelcomeScene.Description.SkipButton" = "Skip";
+
+/* Welcome: Description accept */
+"WelcomeScene.Description.Accept" = "I accept";
 
 /* EULA */
 "EULA.Title" = "Terms of Service";

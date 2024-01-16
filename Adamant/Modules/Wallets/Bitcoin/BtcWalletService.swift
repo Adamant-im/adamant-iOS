@@ -57,7 +57,9 @@ struct BtcApiCommands {
 // MARK: - Localization
 extension String.adamant {
     enum BtcWalletService {
-        static let taprootNotSupported = String.localized("WalletServices.SharedErrors.BtcTaproot", comment: "")
+        static var taprootNotSupported: String {
+            String.localized("WalletServices.SharedErrors.BtcTaproot", comment: "")
+        }
     }
 }
 

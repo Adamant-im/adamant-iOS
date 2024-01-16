@@ -40,7 +40,11 @@ final class DogeTransferViewController: TransferViewControllerBase {
         Task {
             do {
                 // Create transaction
-                let transaction = try await service.createTransaction(recipient: recipient, amount: amount)
+                let transaction = try await service.createTransaction(
+                    recipient: recipient, 
+                    amount: amount,
+                    fee: transactionFee
+                )
                 
                 // Send adm report
                 if let reportRecipient = admReportRecipient,

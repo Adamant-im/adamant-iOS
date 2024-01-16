@@ -175,6 +175,24 @@ final class AdamantCurrencyInfoService: CurrencyInfoService {
         }
     }
     
+    func getHistory(
+        for coin: String,
+        timestamp: Date
+    ) async throws -> [String: Decimal] {
+        try await withUnsafeThrowingContinuation { continuation in
+            getHistory(
+                for: coin,
+                timestamp: timestamp) { completion in
+                    switch completion {
+                    case .success(let result):
+                        continuation.resume(returning: result ?? [:])
+                    case .failure(let error):
+                        continuation.resume(throwing: error)
+                    }
+                }
+        }
+    }
+    
     private func setupSecuredStore() {
         if
             let id: String = securedStore.get(StoreKey.CoinInfo.selectedCurrency),

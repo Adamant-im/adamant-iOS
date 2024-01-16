@@ -12,13 +12,21 @@ import Eureka
 import CommonKit
 
 extension String.adamant.wallets {
-    static let adamant = String.localized("AccountTab.Wallets.adamant_wallet", comment: "Account tab: Adamant wallet")
+    static var adamant: String {
+        String.localized("AccountTab.Wallets.adamant_wallet", comment: "Account tab: Adamant wallet")
+    }
     
-    static let sendAdm = String.localized("AccountTab.Row.SendAdm", comment: "Account tab: 'Send ADM tokens' button")
+    static var sendAdm: String {
+        String.localized("AccountTab.Row.SendAdm", comment: "Account tab: 'Send ADM tokens' button")
+    }
     
-    static let buyAdmTokens = String.localized("AccountTab.Row.AnonymouslyBuyADM", comment: "Account tab: Anonymously buy ADM tokens")
+    static var buyAdmTokens: String {
+        String.localized("AccountTab.Row.AnonymouslyBuyADM", comment: "Account tab: Anonymously buy ADM tokens")
+    }
 
-    static let exchangeInChatAdmTokens = String.localized("AccountTab.Row.ExchangeADMInChat", comment: "Account tab: Exchange ADM in chat")
+    static var exchangeInChatAdmTokens: String {
+        String.localized("AccountTab.Row.ExchangeADMInChat", comment: "Account tab: Exchange ADM in chat")
+    }
     // URLs
     static func getFreeTokensUrl(for address: String) -> String {
         return String.localizedStringWithFormat(.localized("AccountTab.FreeTokens.UrlFormat", comment: "Account tab: A full 'Get free tokens' link, with %@ as address"), address)
@@ -67,8 +75,6 @@ final class AdmWalletViewController: WalletViewControllerBase {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        walletTitleLabel.text = String.adamant.wallets.adamant
-        
         if let balance = service?.core.wallet?.balance {
             hideFreeTokensRow = balance > 0
         } else {
@@ -88,11 +94,12 @@ final class AdmWalletViewController: WalletViewControllerBase {
             $0.cell.imageView?.tintColor = UIColor.adamant.tableRowIcons
             $0.cell.selectionStyle = .gray
             $0.cell.backgroundColor = UIColor.adamant.cellColor
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { (cell, row) in
             cell.accessoryType = .disclosureIndicator
             if self.hideFreeTokensRow {
                 cell.separatorInset = .zero
             }
+            row.title = Rows.buyTokens.localized
         }.onCellSelection { [weak self] (_, row) in
             guard let self = self else { return }
             let vc = screensFactory.makeBuyAndSell()
@@ -116,9 +123,10 @@ final class AdmWalletViewController: WalletViewControllerBase {
                 return self?.hideFreeTokensRow ?? true
             })
             $0.cell.backgroundColor = UIColor.adamant.cellColor
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { (cell, row) in
             cell.accessoryType = .disclosureIndicator
             cell.separatorInset = .zero
+            row.title = Rows.freeTokens.localized
         }.onCellSelection { [weak self] (_, row) in
             row.deselect()
             if let address = self?.service?.core.wallet?.address {
@@ -177,8 +185,9 @@ final class AdmWalletViewController: WalletViewControllerBase {
             if let wallet = service?.core.wallet {
                 $0.value = wallet.address
             }
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { (cell, row) in
             cell.accessoryType = .disclosureIndicator
+            row.title = BaseRows.address.localized
         }.onCellSelection { [weak self] (cell, row) in
             row.deselect()
             let completion = { [weak self] in
@@ -205,6 +214,10 @@ final class AdmWalletViewController: WalletViewControllerBase {
             }
         }
         return addressRow
+    }
+    
+    override func setTitle() {
+        walletTitleLabel.text = String.adamant.wallets.adamant
     }
     
     func updateRows() {

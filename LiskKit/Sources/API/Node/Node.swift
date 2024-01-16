@@ -33,11 +33,7 @@ extension Node {
 extension Node {
 
     /// Retrieve the status of a Lisk Node
-    public func status(completionHandler: @escaping (Response<NodeStatusResponse>) -> Void) {
-        client.get(path: "node/status", completionHandler: completionHandler)
-    }
-    
-    public func info(completionHandler: @escaping (Response<NodeInfoResponse>) -> Void) {
-        client.get(path: "node/info", completionHandler: completionHandler)
+    public func info() async throws -> NodeInfoModel {
+        try await client.request(method: "system_getNodeInfo", params: [:])
     }
 }
