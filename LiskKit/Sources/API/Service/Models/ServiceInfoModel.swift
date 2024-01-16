@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct ServiceInfoModel: APIModel {
+public struct ServiceInfoModelDTO: APIModel {
     public let version: String
     public let networkNodeVersion: String
 }

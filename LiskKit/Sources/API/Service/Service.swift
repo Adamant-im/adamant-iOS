@@ -46,7 +46,7 @@ extension Service {
         )
     }
     
-    public func info() async throws -> ServiceInfoModel {
+    public func info() async throws -> ServiceInfoModelDTO {
         try await client.request(
             .get,
             path: "api/status",

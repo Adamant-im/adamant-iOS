@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct DogeNodeInfo: Decodable {
+struct DogeNodeInfoDTO: Decodable {
     struct Info: Decodable {
         let version: Int
         let protocolversion: Int

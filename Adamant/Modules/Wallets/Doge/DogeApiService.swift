@@ -26,13 +26,10 @@ final class DogeApiCore: BlockchainHealthCheckableService {
     func getStatusInfo(node: Node) async -> WalletServiceResult<NodeStatusInfo> {
         let startTimestamp = Date.now.timeIntervalSince1970
         
-        let response: WalletServiceResult<DogeNodeInfo> = await request(node: node) { core, node in
+        let response: WalletServiceResult<DogeNodeInfoDTO> = await request(node: node) { core, node in
             await core.sendRequestJsonResponse(
                 node: node,
-                path: DogeApiCommands.getInfo(),
-                method: .get,
-                parameters: [:] as [String: String],
-                encoding: .url
+                path: DogeApiCommands.getInfo()
             )
         }
         
