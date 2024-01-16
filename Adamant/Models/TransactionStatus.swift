@@ -9,14 +9,14 @@
 import Foundation
 import UIKit
 
-enum InconsistentReason: Int16 {
-    case time = 8
-    case duplicate = 9
-    case unknown = 10
-    case wrongTxHash = 11
-    case wrongAmount = 12
-    case senderCryptoAddressMismatch = 13
-    case recipientCryptoAddressMismatch = 14
+enum InconsistentReason: Codable {
+    case time
+    case duplicate
+    case unknown
+    case wrongTxHash
+    case wrongAmount
+    case senderCryptoAddressMismatch
+    case recipientCryptoAddressMismatch
     
     var localized: String {
         switch self {
@@ -38,7 +38,7 @@ enum InconsistentReason: Int16 {
     }
 }
 
-enum TransactionStatus: RawRepresentable, Equatable, Hashable {
+enum TransactionStatus: Codable, Equatable, Hashable {
     case notInitiated
     case pending
     case success
@@ -47,39 +47,6 @@ enum TransactionStatus: RawRepresentable, Equatable, Hashable {
     case inconsistent(InconsistentReason)
     case noNetwork
     case noNetworkFinal
-    
-    typealias RawValue = Int16
-    
-    var rawValue: RawValue {
-        switch self {
-        case .notInitiated: return 0
-        case .pending: return 1
-        case .success: return 2
-        case .failed: return 3
-        case .registered: return 4
-        case .inconsistent(let reason): return reason.rawValue
-        case .noNetwork: return 6
-        case .noNetworkFinal: return 7
-        }
-    }
-    
-    init?(rawValue: RawValue) {
-        switch rawValue {
-        case 0: self = .notInitiated
-        case 1: self = .pending
-        case 2: self = .success
-        case 3: self = .failed
-        case 4: self = .registered
-        case 6: self = .noNetwork
-        case 7: self = .noNetworkFinal
-        default:
-            if let reason = InconsistentReason(rawValue: rawValue) {
-                self = .inconsistent(reason)
-            } else {
-                return nil
-            }
-        }
-    }
     
     var localized: String {
         switch self {

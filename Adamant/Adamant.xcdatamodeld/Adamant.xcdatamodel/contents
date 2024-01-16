@@ -49,7 +49,7 @@
         <attribute name="recipientId" attributeType="String" defaultValueString=""/>
         <attribute name="senderId" attributeType="String" defaultValueString=""/>
         <attribute name="transactionId" attributeType="String" defaultValueString=""/>
-        <attribute name="transactionStatusRaw" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="transactionStatusRaw" attributeType="String" defaultValueString=""/>
         <uniquenessConstraints>
             <uniquenessConstraint>
                 <constraint value="transactionId"/>
