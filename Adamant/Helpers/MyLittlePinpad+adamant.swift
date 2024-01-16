@@ -10,9 +10,13 @@ import Foundation
 import MyLittlePinpad
 
 extension String.adamant {
-    struct pinpad {
-        static let createPin = String.localized("Pinpad.EnterNewPin", comment: "Pinpad: Ask user to create new pin")
-        static let reenterPin = String.localized("Pinpad.ReenterPin", comment: "Pinpad: Ask user to repeat new pin")
+    enum pinpad {
+        static var createPin: String {
+            String.localized("Pinpad.EnterNewPin", comment: "Pinpad: Ask user to create new pin")
+        }
+        static var reenterPin: String {
+            String.localized("Pinpad.ReenterPin", comment: "Pinpad: Ask user to repeat new pin")
+        }
     }
 }
 
