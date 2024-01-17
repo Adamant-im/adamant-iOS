@@ -25,7 +25,7 @@ public enum Language: String {
         switch self {
         case .ru: return "Русский"
         case .en: return "English"
-        case .de: return "Deutschland"
+        case .de: return "Deutsch"
         case .zh: return "中文"
         case .auto: return .localized("Language.Auto", comment: "Account tab: Language auto")
         }
