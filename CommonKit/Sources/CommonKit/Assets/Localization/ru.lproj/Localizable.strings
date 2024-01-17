@@ -911,7 +911,7 @@
 "TransactionStatus.Failed" = "Ошибка";
 
 /* Transaction status: inconsistent */
-"TransactionStatus.Inconsistent" = "Несогласованно";
+"TransactionStatus.Inconsistent" = "Несоответствие";
 
 /* Transaction status: inconsistent wrong timestamp */
 "TransactionStatus.Inconsistent.WrongTimestamp" = "Сообщение и транзакция имеют различное время. Это возможно, но лучше перепроверьте";
