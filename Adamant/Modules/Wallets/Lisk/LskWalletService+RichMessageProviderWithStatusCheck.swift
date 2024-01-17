@@ -61,14 +61,22 @@ private extension LskWalletService {
         
         // MARK: Check address
         
-        guard let realSenderAddress = try? await getWalletAddress(byAdamantAddress: transaction.senderAddress)
-        else {
-            return .inconsistent(.senderCryptoAddressUnavailable(tokenSymbol))
-        }
+        var realSenderAddress = lskTransaction.senderAddress
+        var realRecipientAddress = lskTransaction.recipientAddress
         
-        guard let realRecipientAddress = try? await getWalletAddress(byAdamantAddress: transaction.recipientAddress)
-        else {
-            return .inconsistent(.recipientCryptoAddressUnavailable(tokenSymbol))
+        if transaction is RichMessageTransaction {
+            guard let senderAddress = try? await getWalletAddress(byAdamantAddress: transaction.senderAddress)
+            else {
+                return .inconsistent(.senderCryptoAddressUnavailable(tokenSymbol))
+            }
+            
+            guard let recipientAddress = try? await getWalletAddress(byAdamantAddress: transaction.recipientAddress)
+            else {
+                return .inconsistent(.recipientCryptoAddressUnavailable(tokenSymbol))
+            }
+            
+            realSenderAddress = senderAddress
+            realRecipientAddress = recipientAddress
         }
         
         if transaction.isOutgoing {
