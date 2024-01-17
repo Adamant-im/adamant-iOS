@@ -136,6 +136,7 @@ final class ChatViewController: MessagesViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         inputBar.isUserInteractionEnabled = false
+        inputBar.inputTextView.resignFirstResponder()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
