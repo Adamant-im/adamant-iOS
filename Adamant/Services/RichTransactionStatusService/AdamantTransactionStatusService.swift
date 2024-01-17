@@ -180,7 +180,9 @@ private extension AdamantTransactionStatusService {
         guard transactions.count > 1 else { return }
         
         transactions.dropFirst().forEach {
-            setStatus(for: $0, status: .inconsistent(.duplicate))
+            if $0.transactionStatus?.isInconsistent != true {
+                setStatus(for: $0, status: .inconsistent(.duplicate))
+            }
         }
     }
 

@@ -50,7 +50,7 @@ extension EthWalletService {
             }.get()
         }
         
-        return .init(
+        return await .init(
             sentDate: sentDate,
             status: getStatus(details: details, transaction: transaction, receipt: receipt)
         )
@@ -98,25 +98,35 @@ private extension EthWalletService {
         details: Web3Core.TransactionDetails,
         transaction: CoinTransaction,
         receipt: TransactionReceipt
-    ) -> TransactionStatus {
+    ) async -> TransactionStatus {
         let status = receipt.status.asTransactionStatus()
         guard status == .success else { return status }
         
         let eth = details.transaction
         
         // MARK: Check addresses
+        
+        guard let realSenderAddress = try? await getWalletAddress(byAdamantAddress: transaction.senderAddress)
+        else {
+            return .inconsistent(.senderCryptoAddressUnavailable(tokenSymbol))
+        }
+        
+        guard let realRecipientAddress = try? await getWalletAddress(byAdamantAddress: transaction.recipientAddress)
+        else {
+            return .inconsistent(.recipientCryptoAddressUnavailable(tokenSymbol))
+        }
+        
         if transaction.isOutgoing {
-            guard let sender = eth.sender?.address,
-                  let id = self.ethWallet?.address,
-                  sender == id
+            guard realSenderAddress == eth.sender?.address,
+                  eth.sender?.address == ethWallet?.address
             else {
-                return .inconsistent(.senderCryptoAddressMismatch)
+                return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
             }
         } else {
-            guard let id = self.ethWallet?.address,
-                  eth.to.address == id
+            guard realRecipientAddress == eth.to.address,
+                  eth.to.address == ethWallet?.address
             else {
-                return .inconsistent(.recipientCryptoAddressMismatch)
+                return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
             }
         }
         

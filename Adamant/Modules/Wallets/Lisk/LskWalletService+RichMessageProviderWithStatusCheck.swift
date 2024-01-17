@@ -34,7 +34,7 @@ extension LskWalletService {
         
         lskTransaction.updateConfirmations(value: lastHeight)
         
-        return .init(
+        return await .init(
             sentDate: lskTransaction.sentDate,
             status: getStatus(
                 lskTransaction: lskTransaction,
@@ -48,7 +48,7 @@ private extension LskWalletService {
     func getStatus(
         lskTransaction: Transactions.TransactionModel,
         transaction: CoinTransaction
-    ) -> TransactionStatus {
+    ) async -> TransactionStatus {
         guard lskTransaction.blockId != nil else { return .registered }
         
         guard let status = lskTransaction.transactionStatus else {
@@ -60,13 +60,28 @@ private extension LskWalletService {
         }
         
         // MARK: Check address
+        
+        guard let realSenderAddress = try? await getWalletAddress(byAdamantAddress: transaction.senderAddress)
+        else {
+            return .inconsistent(.senderCryptoAddressUnavailable(tokenSymbol))
+        }
+        
+        guard let realRecipientAddress = try? await getWalletAddress(byAdamantAddress: transaction.recipientAddress)
+        else {
+            return .inconsistent(.recipientCryptoAddressUnavailable(tokenSymbol))
+        }
+        
         if transaction.isOutgoing {
-            guard lskTransaction.senderAddress == lskWallet?.address else {
-                return .inconsistent(.senderCryptoAddressMismatch)
+            guard realSenderAddress == lskTransaction.senderAddress,
+                  lskTransaction.senderAddress == lskWallet?.address
+            else {
+                return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
             }
         } else {
-            guard lskTransaction.recipientAddress == lskWallet?.address else {
-                return .inconsistent(.recipientCryptoAddressMismatch)
+            guard realRecipientAddress == lskTransaction.recipientAddress,
+                  lskTransaction.recipientAddress == lskWallet?.address
+            else {
+                return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
             }
         }
         

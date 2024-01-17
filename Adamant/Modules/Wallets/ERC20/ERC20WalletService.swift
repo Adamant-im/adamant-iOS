@@ -122,6 +122,7 @@ final class ERC20WalletService: WalletCoreProtocol {
     let token: ERC20Token
     @Atomic private(set) var enabled = true
     @Atomic private var subscriptions = Set<AnyCancellable>()
+    @Atomic private var cachedWalletAddress: [String: String] = [:]
     
     // MARK: - State
     @Atomic private (set) var state: WalletServiceState = .notInitiated
@@ -500,6 +501,10 @@ extension ERC20WalletService {
     }
     
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
+        if let address = cachedWalletAddress[address], !address.isEmpty {
+            return address
+        }
+        
         let result = try await apiService.get(key: EthWalletService.kvsAddress, sender: address)
             .mapError { $0.asWalletServiceError() }
             .get()
@@ -507,6 +512,8 @@ extension ERC20WalletService {
         guard let result = result else {
             throw WalletServiceError.walletNotInitiated
         }
+        
+        cachedWalletAddress[address] = result
         
         return result
     }

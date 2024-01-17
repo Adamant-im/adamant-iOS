@@ -202,19 +202,12 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     var transactionStatus: TransactionStatus? {
         guard let richTransaction = richTransaction,
-              let status = transaction?.transactionStatus
+              let status = richTransaction.transactionStatus
         else {
             return transaction?.transactionStatus
         }
         
-        return walletService?.statusWithFilters(
-            transaction: richTransaction,
-            oldPendingAttempts: 0,
-            info: .init(
-                sentDate: transaction?.dateValue,
-                status: status
-            )
-        )
+        return status
     }
     
     var refreshTask: Task<(), Never>?
@@ -336,7 +329,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.tag = Rows.from.tag
             $0.cell.titleLabel.text = Rows.from.localized
             
-            if let transaction = transaction {
+            if let transaction = self?.transaction {
                 if let name = self?.senderName {
                     $0.value = DoubleDetail(first: name, second: transaction.senderAddress)
                 } else {
@@ -393,7 +386,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.tag = Rows.to.tag
             $0.cell.titleLabel.text = Rows.to.localized
             
-            if let transaction = transaction {
+            if let transaction = self?.transaction {
                 if let recipientName = self?.recipientName?.checkAndReplaceSystemWallets() {
                     $0.value = DoubleDetail(first: recipientName, second: transaction.recipientAddress)
                 } else {
@@ -774,6 +767,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
         self.updateFiat()
         
         setColors()
+        
+        checkAddressesIfNeeded()
     }
     
     deinit {
@@ -893,6 +888,37 @@ class TransactionDetailsViewControllerBase: FormViewController {
         
         return feeValueRaw
     }
+    
+    @MainActor
+    func checkAddressesIfNeeded() {
+        Task {
+            guard let senderAddress = senderId,
+                  let recipientAddress = recipientId,
+                  transactionStatus?.isInconsistent == true
+            else {
+                return
+            }
+            
+            let realSenderAddress = try? await walletService?.core.getWalletAddress(
+                byAdamantAddress: senderAddress
+            )
+            
+            let realRecipientAddress = try? await walletService?.core.getWalletAddress(
+                byAdamantAddress: recipientAddress
+            )
+            
+            if realSenderAddress != transaction?.senderAddress {
+                senderName = nil
+            }
+            
+            if realRecipientAddress != transaction?.recipientAddress {
+                recipientName = nil
+            }
+            
+            tableView.reloadData()
+        }
+    }
+    
     // MARK: - Actions
     
     @objc func share(_ sender: UIBarButtonItem) {

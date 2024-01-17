@@ -926,10 +926,16 @@
 "TransactionStatus.Inconsistent.WrongAmount" = "Неверное количество. Остерегайтесь мошенников";
 
 /* Transaction status: inconsistent wrong mismatch */
-"TransactionStatus.Inconsistent.SenderCryptoAddressMismatch" = "Адрес отправителя не сходится. Остерегайтесь мошенников";
+"TransactionStatus.Inconsistent.SenderCryptoAddressMismatch" = "%@-адрес отправителя не сходится. Остерегайтесь мошенников";
 
 /* Transaction status: inconsistent wrong mismatch */
-"TransactionStatus.Inconsistent.RecipientCryptoAddressMismatch" = "Адрес получателя не сходится. Остерегайтесь мошенников";
+"TransactionStatus.Inconsistent.RecipientCryptoAddressMismatch" = "%@-адрес получателя не сходится. Остерегайтесь мошенников";
+
+/* Transaction status: inconsistent unable to retrieve */
+"TransactionStatus.Inconsistent.SenderCryptoAddressUnavailable" = "Нет %@-адреса отправителя";
+
+/* Transaction status: inconsistent unable to retrieve */
+"TransactionStatus.Inconsistent.RecipientCryptoAddressUnavailable" = "Нет %@-адреса получателя";
 
 /* Transaction status: inconsistent duplicate */
 "TransactionStatus.Inconsistent.Duplicate" = "Этот перевод уже встречался в чате ранее. Остерегайтесь мошенников";

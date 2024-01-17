@@ -33,7 +33,7 @@ extension ERC20WalletService {
             return .init(error: error)
         }
         
-        return .init(
+        return await .init(
             sentDate: erc20Transaction.date,
             status: getStatus(
                 erc20Transaction: erc20Transaction,
@@ -47,24 +47,33 @@ private extension ERC20WalletService {
     func getStatus(
         erc20Transaction: EthTransaction,
         transaction: CoinTransaction
-    ) -> TransactionStatus {
+    ) async -> TransactionStatus {
         let status = erc20Transaction.receiptStatus.asTransactionStatus()
         guard status == .success else { return status }
         
         // MARK: Check addresses
+        
+        guard let realSenderAddress = try? await getWalletAddress(byAdamantAddress: transaction.senderAddress)
+        else {
+            return .inconsistent(.senderCryptoAddressUnavailable(tokenSymbol))
+        }
+        
+        guard let realRecipientAddress = try? await getWalletAddress(byAdamantAddress: transaction.recipientAddress)
+        else {
+            return .inconsistent(.recipientCryptoAddressUnavailable(tokenSymbol))
+        }
+        
         if transaction.isOutgoing {
-            guard
-                let id = ethWallet?.address,
-                erc20Transaction.senderAddress == id
+            guard realSenderAddress == erc20Transaction.senderAddress,
+                  erc20Transaction.senderAddress == ethWallet?.address
             else {
-                return .inconsistent(.senderCryptoAddressMismatch)
+                return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
             }
         } else {
-            guard
-                let id = ethWallet?.address,
-                erc20Transaction.to == id
+            guard realRecipientAddress == erc20Transaction.recipientAddress,
+                  erc20Transaction.recipientAddress == ethWallet?.address
             else {
-                return .inconsistent(.recipientCryptoAddressMismatch)
+                return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
             }
         }
         

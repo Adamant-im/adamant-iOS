@@ -941,10 +941,16 @@
 "TransactionStatus.Inconsistent.WrongAmount" = "Falscher Betrag. Seien Sie sich vor Betrug bewusst";
 
 /* Transaction status: inconsistent wrong mismatch */
-"TransactionStatus.Inconsistent.SenderCryptoAddressMismatch" = "Die Adresse des Absenders weicht ab. Seien Sie sich vor Betrug bewusst";
+"TransactionStatus.Inconsistent.SenderCryptoAddressMismatch" = "Die %@-Adresse des Absenders weicht ab. Seien Sie sich vor Betrug bewusst";
 
 /* Transaction status: inconsistent wrong mismatch */
-"TransactionStatus.Inconsistent.RecipientCryptoAddressMismatch" = "Die Adresse des Empfängers weicht ab. Seien Sie sich vor Betrug bewusst";
+"TransactionStatus.Inconsistent.RecipientCryptoAddressMismatch" = "Die %@-Adresse des Empfängers weicht ab. Seien Sie sich vor Betrug bewusst";
+
+/* Transaction status: inconsistent unable to retrieve */
+"TransactionStatus.Inconsistent.SenderCryptoAddressUnavailable" = "Die %@-Adresse des Absenders kann nicht abgerufen werden";
+
+/* Transaction status: inconsistent unable to retrieve */
+"TransactionStatus.Inconsistent.RecipientCryptoAddressUnavailable" = "Die %@-Adresse des Empfängers kann nicht abgerufen werden";
 
 /* Transaction status: inconsistent duplicate */
 "TransactionStatus.Inconsistent.Duplicate" = "Diese Übertragung erschien zuvor im Chat. Seien Sie sich vor Betrug bewusst";

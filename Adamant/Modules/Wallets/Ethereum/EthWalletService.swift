@@ -140,7 +140,8 @@ final class EthWalletService: WalletCoreProtocol {
     public static let transactionsListApiSubpath = "ethtxs"
     @Atomic private(set) var enabled = true
     @Atomic private var subscriptions = Set<AnyCancellable>()
-
+    @Atomic private var cachedWalletAddress: [String: String] = [:]
+    
     @ObservableValue private(set) var historyTransactions: [TransactionDetails] = []
     @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
 
@@ -524,12 +525,18 @@ extension EthWalletService {
 	}
 	
 	func getWalletAddress(byAdamantAddress address: String) async throws -> String {
+        if let address = cachedWalletAddress[address], !address.isEmpty {
+            return address
+        }
+        
         do {
             let result = try await apiService.get(key: EthWalletService.kvsAddress, sender: address).get()
             
             guard let result = result else {
                 throw WalletServiceError.walletNotInitiated
             }
+            
+            cachedWalletAddress[address] = result
             
             return result
         } catch _ as ApiServiceError {

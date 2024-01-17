@@ -26,7 +26,7 @@ extension BtcWalletService {
         do {
             let btcTransaction = try await getTransaction(by: hash)
             
-            return .init(
+            return await .init(
                 sentDate: btcTransaction.dateValue,
                 status: getStatus(transaction: transaction, btcTransaction: btcTransaction)
             )
@@ -40,7 +40,7 @@ private extension BtcWalletService {
     func getStatus(
         transaction: CoinTransaction,
         btcTransaction: BtcTransaction
-    ) -> TransactionStatus {
+    ) async -> TransactionStatus {
         guard let status = btcTransaction.transactionStatus else {
             return .inconsistent(.unknown)
         }
@@ -51,13 +51,29 @@ private extension BtcWalletService {
         
         // MARK: Check address
         
-        if transaction.isOutgoing && btcTransaction.senderAddress != btcWallet?.address {
-            return .inconsistent(.senderCryptoAddressMismatch)
+        guard let realSenderAddress = try? await getWalletAddress(byAdamantAddress: transaction.senderAddress)
+        else {
+            return .inconsistent(.senderCryptoAddressUnavailable(tokenSymbol))
         }
         
-        if !transaction.isOutgoing && btcTransaction.recipientAddress != btcWallet?.address {
-            return .inconsistent(.recipientCryptoAddressMismatch)
+        guard let realRecipientAddress = try? await getWalletAddress(byAdamantAddress: transaction.recipientAddress)
+        else {
+            return .inconsistent(.recipientCryptoAddressUnavailable(tokenSymbol))
         }
+        
+        if transaction.isOutgoing {
+             guard realSenderAddress == btcTransaction.senderAddress,
+                   btcTransaction.senderAddress == btcWallet?.address
+             else {
+                 return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
+             }
+         } else {
+             guard realRecipientAddress == btcTransaction.recipientAddress,
+                   btcTransaction.recipientAddress == btcWallet?.address
+             else {
+                 return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
+             }
+         }
         
         // MARK: Check amount
         if let reported = reportedValue(for: transaction) {
