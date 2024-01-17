@@ -388,6 +388,42 @@
 /* Date "A minute ago" */
 "Chats.Date.MinAgo" = "Минуту назад";
 
+/* Y == 0 OR Y > 4 OR (XY > 10 AND XY < 15); */
+"%d days ago" = "%d дней назад";
+
+/* Y > 1 AND Y < 5 AND (XY < 10 OR XY > 20); */
+"%d _days ago" = "%d дня назад";
+
+/* Y == 1 AND XY != 11; */
+"%d __days ago" = "%d день назад";
+
+/* Y == 0 OR Y > 4 OR (XY > 10 AND XY < 15); */
+"%d hours ago" = "%d часов назад";
+
+/* Y > 1 AND Y < 5 AND (XY < 10 OR XY > 20); */
+"%d _hours ago" = "%d часа назад";
+
+/* Y == 1 AND XY != 11; */
+"%d __hours ago" = "%d час назад";
+
+/* Y == 0 OR Y > 4 OR (XY > 10 AND XY < 15); */
+"%d minutes ago" = "%d минут назад";
+
+/* Y > 1 AND Y < 5 AND (XY < 10 OR XY > 20); */
+"%d _minutes ago" = "%d минуты назад";
+
+/* Y == 1 AND XY != 11; */
+"%d __minutes ago" = "%d минуту назад";
+
+/* Y == 0 OR Y > 4 OR (XY > 10 AND XY < 15); */
+"%d seconds ago" = "%d секунд назад";
+
+/* Y > 1 AND Y < 5 AND (XY < 10 OR XY > 20); */
+"%d _seconds ago" = "%d секунды назад";
+
+/* Y == 1 AND XY != 11; */
+"%d __seconds ago" = "%d секунду назад";
+
 /* Date "Yesterday" */
 "Chats.Date.Yesterday" = "Вчера";
 

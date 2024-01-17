@@ -388,6 +388,48 @@
 /* Date "A minute ago" */
 "Chats.Date.MinAgo" = "Vor einer Minute";
 
+/* No comment provided by engineer. */
+"%d days ago" = "Vor %d Tagen";
+
+/* Y > 1 AND Y < 5 AND (XY < 10 OR XY > 20); */
+"%d _days ago" = "Vor %d Tagen";
+
+/* Y == 1 AND XY != 11; */
+"%d __days ago" = "Vor %d Tag";
+
+/* No comment provided by engineer. */
+"%d hours ago" = "Vor %d Stunden";
+
+/* Y > 1 AND Y < 5 AND (XY < 10 OR XY > 20); */
+"%d _hours ago" = "Vor %d Stunden";
+
+/* Y == 1 AND XY != 11; */
+"%d __hours ago" = "Vor %d Stunde";
+
+/* No comment provided by engineer. */
+"%d minutes ago" = "Vor %d Minuten";
+
+/* Y > 1 AND Y < 5 AND (XY < 10 OR XY > 20); */
+"%d _minutes ago" = "Vor %d Minuten";
+
+/* Y == 1 AND XY != 11; */
+"%d __minutes ago" = "Vor %d Minute";
+
+/* No comment provided by engineer. */
+"%d seconds ago" = "Vor %d Sekunden";
+
+/* Y > 1 AND Y < 5 AND (XY < 10 OR XY > 20); */
+"%d _seconds ago" = "Vor %d Sekunden";
+
+/* Y == 1 AND XY != 11; */
+"%d __seconds ago" = "Vor %d Sekunde";
+
+/* No comment provided by engineer. */
+"A minute ago" = "Vor einer Minute";
+
+/* No comment provided by engineer. */
+"An hour ago" = "Vor einer Stunde";
+
 /* Date "Yesterday" */
 "Chats.Date.Yesterday" = "Gestern";
 

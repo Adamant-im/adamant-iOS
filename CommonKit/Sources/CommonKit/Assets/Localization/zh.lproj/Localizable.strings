@@ -388,6 +388,18 @@
 /* Date "A minute ago" */
 "Chats.Date.MinAgo" = "一分钟前";
 
+/* No comment provided by engineer. */
+"%d days ago" = "%d天前";
+
+/* No comment provided by engineer. */
+"%d hours ago" = "%d小時前";
+
+/* No comment provided by engineer. */
+"%d minutes ago" = "%d分鐘前";
+
+/* No comment provided by engineer. */
+"%d seconds ago" = "%d秒鐘前";
+
 /* Date "Yesterday" */
 "Chats.Date.Yesterday" = "昨天";
 
