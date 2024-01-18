@@ -35,6 +35,7 @@
 		3AC76E3D2AB09118008042C4 /* ElegantEmojiPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 3AC76E3C2AB09118008042C4 /* ElegantEmojiPicker */; };
 		3AF08D5F2B4EB3A200EB82B1 /* LanguageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF08D5E2B4EB3A200EB82B1 /* LanguageService.swift */; };
 		3AF08D612B4EB3C400EB82B1 /* LanguageStorageProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF08D602B4EB3C400EB82B1 /* LanguageStorageProtocol.swift */; };
+		3AF53F8D2B3DCFA300B30312 /* NodeGroup+Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF53F8C2B3DCFA300B30312 /* NodeGroup+Constants.swift */; };
 		3C06931576393125C61FB8F6 /* Pods_Adamant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33975C0D891698AA7E74EBCC /* Pods_Adamant.framework */; };
 		41047B70294B5EE10039E956 /* VisibleWalletsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41047B6F294B5EE10039E956 /* VisibleWalletsViewController.swift */; };
 		41047B72294B5F210039E956 /* VisibleWalletsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41047B71294B5F210039E956 /* VisibleWalletsTableViewCell.swift */; };
@@ -675,6 +676,7 @@
 		3AF08D5D2B4E7FFC00EB82B1 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/Localizable.strings; sourceTree = "<group>"; };
 		3AF08D5E2B4EB3A200EB82B1 /* LanguageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageService.swift; sourceTree = "<group>"; };
 		3AF08D602B4EB3C400EB82B1 /* LanguageStorageProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageStorageProtocol.swift; sourceTree = "<group>"; };
+		3AF53F8C2B3DCFA300B30312 /* NodeGroup+Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NodeGroup+Constants.swift"; sourceTree = "<group>"; };
 		41047B6F294B5EE10039E956 /* VisibleWalletsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisibleWalletsViewController.swift; sourceTree = "<group>"; };
 		41047B71294B5F210039E956 /* VisibleWalletsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisibleWalletsTableViewCell.swift; sourceTree = "<group>"; };
 		41047B73294C61D10039E956 /* VisibleWalletsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisibleWalletsService.swift; sourceTree = "<group>"; };
@@ -2044,6 +2046,7 @@
 				93CCAE7F2B06E2D100EA5B94 /* ApiServiceError+Extension.swift */,
 				939FA3412B0D6F0000710EC6 /* SelfRemovableHostingController.swift */,
 				936658942B0AC15300BDB2D3 /* Node+UI.swift */,
+				3AF53F8C2B3DCFA300B30312 /* NodeGroup+Constants.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -3314,6 +3317,7 @@
 				E9B4E1A8210F079E007E77FC /* DoubleDetailsTableViewCell.swift in Sources */,
 				E9502740202E257E002C1098 /* RepeaterService.swift in Sources */,
 				E93D7AC02052CF63005D19DC /* AdamantNotificationService.swift in Sources */,
+				3AF53F8D2B3DCFA300B30312 /* NodeGroup+Constants.swift in Sources */,
 				411743002A39B1D2008CD98A /* ContributeFactory.swift in Sources */,
 				A5E04224282A830B0076CD13 /* BtcTransactionsViewController.swift in Sources */,
 				645938942378395E00A2BE7C /* EulaViewController.swift in Sources */,
