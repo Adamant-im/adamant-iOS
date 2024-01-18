@@ -32,9 +32,9 @@ extension Node {
             .joined(separator: " ")
         case .offline:
             return Strings.offline
-        case .notAllowed:
+        case .notAllowed(let reason):
             return [
-                Strings.outdated,
+                reason.text,
                 version
             ]
             .compactMap { $0 }
@@ -119,13 +119,6 @@ private extension Node {
                 comment: "NodesList.NodeCell: Node is disabled"
             )
         }
-        
-        static var outdated: String {
-            String.localized(
-                "NodesList.NodeCell.Outdated",
-                comment: "NodesList.NodeCell: Node is outdated"
-            )
-        }
     }
     
     var versionString: String? {
@@ -139,5 +132,15 @@ private extension Node {
     
     var heightString: String? {
         height.map { "▱ \($0)" }
+    }
+}
+
+extension Node {
+    static func stringToDouble(_ value: String?) -> Double? {
+        guard let minNodeVersion = value?.replacingOccurrences(of: ".", with: ""),
+              let versionNumber = Double(minNodeVersion)
+        else { return nil }
+        
+        return versionNumber
     }
 }

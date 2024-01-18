@@ -49,11 +49,22 @@ public struct Node: Equatable, Codable, Identifiable {
 }
 
 public extension Node {
+    enum RejectedReason: Codable, Equatable {
+        case outdatedApiVersion
+        
+        public var text: String {
+            switch self {
+            case .outdatedApiVersion:
+                return Strings.outdated
+            }
+        }
+    }
+    
     enum ConnectionStatus: Equatable, Codable {
         case offline
         case synchronizing
         case allowed
-        case notAllowed
+        case notAllowed(RejectedReason)
     }
     
     enum URLScheme: String, Codable {
@@ -111,5 +122,16 @@ private extension Node {
         }
 
         return components.url
+    }
+}
+
+private extension Node {
+    enum Strings {
+        static var outdated: String {
+            String.localized(
+                "NodesList.NodeCell.Outdated",
+                comment: "NodesList.NodeCell: Node is outdated"
+            )
+        }
     }
 }

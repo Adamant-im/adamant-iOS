@@ -134,13 +134,3 @@ public extension NSMutableAttributedString {
     }
 
 }
-
-extension String {
-    var nodeVersion: Double {
-        let minNodeVersion = self.replacingOccurrences(of: ".", with: "")
-        guard let versionNumber = Double(minNodeVersion)
-        else { return .zero }
-        
-        return versionNumber
-    }
-}

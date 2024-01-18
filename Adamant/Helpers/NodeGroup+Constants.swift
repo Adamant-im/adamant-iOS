@@ -104,7 +104,9 @@ public extension NodeGroup {
             minNodeVersion = DashWalletService.minNodeVersion
         }
         
-        guard let versionNumber = minNodeVersion?.nodeVersion else { return .zero }
+        guard let versionNumber = Node.stringToDouble(minNodeVersion) else {
+            return .zero
+        }
         
         return versionNumber
     }
