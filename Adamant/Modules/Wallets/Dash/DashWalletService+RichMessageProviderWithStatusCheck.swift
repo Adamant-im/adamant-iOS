@@ -31,7 +31,7 @@ extension DashWalletService {
             return .init(error: error)
         }
         
-        return .init(
+        return await .init(
             sentDate: dashTransaction.date,
             status: getStatus(dashTransaction: dashTransaction, transaction: transaction)
         )
@@ -42,7 +42,7 @@ private extension DashWalletService {
     func getStatus(
         dashTransaction: BTCRawTransaction,
         transaction: CoinTransaction
-    ) -> TransactionStatus {
+    ) async -> TransactionStatus {
         // MARK: Check confirmations
         
         guard let confirmations = dashTransaction.confirmations, let dashDate = dashTransaction.date, (confirmations > 0 || dashDate.timeIntervalSinceNow > -60 * 15) else {
@@ -61,8 +61,40 @@ private extension DashWalletService {
             return .inconsistent(.unknown)
         }
         
+        let readableTransaction = dashTransaction.asBtcTransaction(DashTransaction.self, for: walletAddress)
+        
+        var realSenderAddress = readableTransaction.senderAddress
+        var realRecipientAddress = readableTransaction.recipientAddress
+        
+        if transaction is RichMessageTransaction {
+            guard let senderAddress = try? await getWalletAddress(byAdamantAddress: transaction.senderAddress)
+            else {
+                return .inconsistent(.senderCryptoAddressUnavailable(tokenSymbol))
+            }
+            
+            guard let recipientAddress = try? await getWalletAddress(byAdamantAddress: transaction.recipientAddress)
+            else {
+                return .inconsistent(.recipientCryptoAddressUnavailable(tokenSymbol))
+            }
+            
+            realSenderAddress = senderAddress
+            realRecipientAddress = recipientAddress
+        }
+        
+        guard realSenderAddress == readableTransaction.senderAddress else {
+            return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
+        }
+        
+        guard realRecipientAddress == readableTransaction.recipientAddress else {
+            return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
+        }
+        
         var result: TransactionStatus = .inconsistent(.wrongAmount)
         if transaction.isOutgoing {
+            guard readableTransaction.senderAddress == walletAddress else {
+                return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
+            }
+            
             var totalIncome: Decimal = 0
             for output in dashTransaction.outputs {
                 guard !output.addresses.contains(walletAddress) else {
@@ -76,6 +108,10 @@ private extension DashWalletService {
                 result = .success
             }
         } else {
+            guard readableTransaction.recipientAddress == walletAddress else {
+                return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
+            }
+            
             var totalOutcome: Decimal = 0
             for output in dashTransaction.outputs {
                 guard output.addresses.contains(walletAddress) else {
