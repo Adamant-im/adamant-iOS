@@ -216,29 +216,13 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     var senderId: String? {
         didSet {
-            guard let id = senderId,
-                  let address = accountService.account?.address
-            else { return }
-            
-            if id.caseInsensitiveCompare(address) == .orderedSame {
-                senderName = String.adamant.transactionDetails.yourAddress
-            } else {
-                senderName = addressBookService.getName(for: id)
-            }
+            senderName = getName(by: senderId)
         }
     }
     
     var recipientId: String? {
         didSet {
-            guard let id = recipientId,
-                  let address = accountService.account?.address
-            else { return }
-            
-            if id.caseInsensitiveCompare(address) == .orderedSame {
-                recipientName = String.adamant.transactionDetails.yourAddress
-            } else {
-                recipientName = addressBookService.getName(for: id)
-            }
+            recipientName = getName(by: recipientId)
         }
     }
     
@@ -825,6 +809,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
         else { return }
         
         section.evaluateHidden()
+        
+        checkAddressesIfNeeded()
     }
     
     // MARK: - Other
@@ -909,14 +895,30 @@ class TransactionDetailsViewControllerBase: FormViewController {
             
             if realSenderAddress != transaction?.senderAddress {
                 senderName = nil
+            } else {
+                senderName = getName(by: senderId)
             }
             
             if realRecipientAddress != transaction?.recipientAddress {
                 recipientName = nil
+            } else {
+                recipientName = getName(by: recipientId)
             }
             
             tableView.reloadData()
         }
+    }
+    
+    func getName(by adamantAddress: String?) -> String? {
+        guard let id = adamantAddress,
+              let address = accountService.account?.address
+        else { return  nil }
+        
+        if id.caseInsensitiveCompare(address) == .orderedSame {
+            return String.adamant.transactionDetails.yourAddress
+        }
+        
+        return addressBookService.getName(for: id)
     }
     
     // MARK: - Actions
