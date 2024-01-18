@@ -15,7 +15,9 @@ import CommonKit
 // MARK: - Localization
 extension String.adamant {
     struct about {
-        static let title = String.localized("About.Title", comment: "About page: scene title")
+        static var title: String {
+            String.localized("About.Title", comment: "About page: scene title")
+        }
         
         private init() { }
     }

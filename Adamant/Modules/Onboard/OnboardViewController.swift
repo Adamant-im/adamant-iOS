@@ -21,12 +21,16 @@ private class OnboardingPageItem {
 }
 
 fileprivate extension String.adamant {
-    struct Onboard {
-        static let beginButton = String.localized("WelcomeScene.Description.BeginButton", comment: "Welcome: Last slide Begin button")
-        static let continueButton = String.localized("WelcomeScene.Description.ContinueButton", comment: "Welcome: Next screen button")
-        static let skipButton = String.localized("WelcomeScene.Description.SkipButton", comment: "Welcome: Skip button")
-        
-        private init() {}
+    enum Onboard {
+        static var beginButton: String {
+            String.localized("WelcomeScene.Description.BeginButton", comment: "Welcome: Last slide Begin button")
+        }
+        static var continueButton: String {
+            String.localized("WelcomeScene.Description.ContinueButton", comment: "Welcome: Next screen button")
+        }
+        static var skipButton: String {
+            String.localized("WelcomeScene.Description.SkipButton", comment: "Welcome: Skip button")
+        }
     }
 }
 

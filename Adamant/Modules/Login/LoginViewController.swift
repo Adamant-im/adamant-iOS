@@ -13,23 +13,34 @@ import CommonKit
 
 // MARK: - Localization
 extension String.adamant {
-    struct login {
-        static let loggingInProgressMessage = String.localized("LoginScene.LoggingInProgress", comment: "Login: notify user that we are trying to log in")
-        
-        static let loginIntoPrevAccount = String.localized("LoginScene.LoginIntoAdamant", comment: "Login: Login into previous account with biometry or pincode")
-        
-        static let wrongQrError = String.localized("LoginScene.Error.WrongQr", comment: "Login: Notify user that scanned QR doesn't contains a passphrase.")
-        static let noQrError = String.localized("LoginScene.Error.NoQrOnPhoto", comment: "Login: Notify user that picked photo doesn't contains a valid qr code with passphrase")
-        static let noNetworkError = String.localized("LoginScene.Error.NoInternet", comment: "Login: No network error.")
-        
-        static let cameraNotAuthorized = String.localized("LoginScene.Error.AuthorizeCamera", comment: "Login: Notify user, that he disabled camera in settings, and need to authorize application.")
-        static let cameraNotSupported = String.localized("LoginScene.Error.QrNotSupported", comment: "Login: Notify user that device not supported by QR reader")
-        
-        static let photolibraryNotAuthorized = String.localized("LoginScene.Error.AuthorizePhotolibrary", comment: "Login: User disabled access to photolibrary, he can authorize application in settings")
-        
-        static let emptyPassphraseAlert = String.localized("LoginScene.Error.NoPassphrase", comment: "Login: notify user that he is trying to login without a passphrase")
-        
-        private init() {}
+    enum login {
+        static var loggingInProgressMessage: String {
+            String.localized("LoginScene.LoggingInProgress", comment: "Login: notify user that we are trying to log in")
+        }
+        static var loginIntoPrevAccount: String {
+            String.localized("LoginScene.LoginIntoAdamant", comment: "Login: Login into previous account with biometry or pincode")
+        }
+        static var wrongQrError: String {
+            String.localized("LoginScene.Error.WrongQr", comment: "Login: Notify user that scanned QR doesn't contains a passphrase.")
+        }
+        static var noQrError: String {
+            String.localized("LoginScene.Error.NoQrOnPhoto", comment: "Login: Notify user that picked photo doesn't contains a valid qr code with passphrase")
+        }
+        static var noNetworkError: String {
+            String.localized("LoginScene.Error.NoInternet", comment: "Login: No network error.")
+        }
+        static var cameraNotAuthorized: String {
+            String.localized("LoginScene.Error.AuthorizeCamera", comment: "Login: Notify user, that he disabled camera in settings, and need to authorize application.")
+        }
+        static var cameraNotSupported: String {
+            String.localized("LoginScene.Error.QrNotSupported", comment: "Login: Notify user that device not supported by QR reader")
+        }
+        static var photolibraryNotAuthorized: String {
+            String.localized("LoginScene.Error.AuthorizePhotolibrary", comment: "Login: User disabled access to photolibrary, he can authorize application in settings")
+        }
+        static var emptyPassphraseAlert: String {
+            String.localized("LoginScene.Error.NoPassphrase", comment: "Login: notify user that he is trying to login without a passphrase")
+        }
     }
 }
 

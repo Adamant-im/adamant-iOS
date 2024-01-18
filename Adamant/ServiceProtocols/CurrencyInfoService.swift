@@ -47,6 +47,11 @@ protocol CurrencyInfoService: AnyObject {
     func getRate(for coin: String) -> Decimal?
     
     func getHistory(for coin: String, timestamp: Date, completion: @escaping (ApiServiceResult<[String:Decimal]?>) -> Void)
+    
+    func getHistory(
+        for coin: String,
+        timestamp: Date
+    ) async throws -> [String: Decimal]
 }
 
 // MARK: - AdamantBalanceFormat fiat formatter

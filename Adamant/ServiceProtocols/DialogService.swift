@@ -10,10 +10,18 @@ import UIKit
 import CommonKit
 
 extension String.adamant.alert {
-    static let copyToPasteboard = String.localized("Shared.CopyToPasteboard", comment: "Shared alert 'Copy' button. Used anywhere. Used for copy-paste info.")
-    static let share = String.localized("Shared.Share", comment: "Shared alert 'Share' button. Used anywhere for presenting standart iOS 'Share' menu.")
-    static let generateQr = String.localized("Shared.GenerateQRCode", comment: "Shared alert 'Generate QR' button. Used to generate QR codes with addresses and passphrases. Used with sharing and saving, anywhere.")
-    static let saveToPhotolibrary = String.localized("Shared.SaveToPhotolibrary", comment: "Shared alert 'Save to Photos'. Used with saving images to photolibrary")
+    static var copyToPasteboard: String {
+        String.localized("Shared.CopyToPasteboard", comment: "Shared alert 'Copy' button. Used anywhere. Used for copy-paste info.")
+    }
+    static var share: String {
+        String.localized("Shared.Share", comment: "Shared alert 'Share' button. Used anywhere for presenting standart iOS 'Share' menu.")
+    }
+    static var generateQr: String {
+        String.localized("Shared.GenerateQRCode", comment: "Shared alert 'Generate QR' button. Used to generate QR codes with addresses and passphrases. Used with sharing and saving, anywhere.")
+    }
+    static var saveToPhotolibrary: String {
+        String.localized("Shared.SaveToPhotolibrary", comment: "Shared alert 'Save to Photos'. Used with saving images to photolibrary")
+    }
 }
 
 enum AddressChatShareType {

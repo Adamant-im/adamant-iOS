@@ -14,10 +14,18 @@ import CommonKit
 
 // MARK: - Constants
 extension String.adamant {
-    struct tabItems {
-        static let account = String.localized("Tabs.Account", comment: "Main tab bar: Account page")
-        static let chats = String.localized("Tabs.Chats", comment: "Main tab bar: Chats page")
-        static let settings = String.localized("Tabs.Settings", comment: "Main tab bar: Settings page")
+    enum tabItems {
+        static var account: String {
+            String.localized("Tabs.Account", comment: "Main tab bar: Account page")
+        }
+        
+        static var chats: String {
+            String.localized("Tabs.Chats", comment: "Main tab bar: Chats page")
+        }
+        
+        static var settings: String {
+            String.localized("Tabs.Settings", comment: "Main tab bar: Settings page")
+        }
     }
     
     struct application {
@@ -564,6 +572,7 @@ extension AppDelegate {
             )
         }
         
+        // TODO: Figireout why we cant use AdamantContacts.adamantWelcomeWallet.address for senderId (chat is not shown)
         if let welcome = AdamantContacts.adamantWelcomeWallet.welcomeMessage {
             _ = try? await chatProvider.fakeReceived(
                 message: welcome.message,

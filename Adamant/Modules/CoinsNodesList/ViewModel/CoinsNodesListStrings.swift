@@ -10,19 +10,31 @@ import CommonKit
 
 extension String.adamant {
     enum coinsNodesList {
-        static let title = String.localized("CoinsNodesList.Title", comment: .empty)
-        static let serviceNode = String.localized("CoinsNodesList.ServiceNode", comment: .empty)
-        static let reset = String.localized("NodesList.ResetButton", comment: .empty)
-        static let resetAlert = String.localized("NodesList.ResetNodeListAlert", comment: .empty)
+        static var title: String {
+            String.localized("CoinsNodesList.Title", comment: .empty)
+        }
+        static var serviceNode: String {
+            String.localized("CoinsNodesList.ServiceNode", comment: .empty)
+        }
+        static var reset: String {
+            String.localized("NodesList.ResetButton", comment: .empty)
+        }
+        static var resetAlert: String {
+            String.localized("NodesList.ResetNodeListAlert", comment: .empty)
+        }
         
-        static let preferTheFastestNode = String.localized(
-            "NodesList.PreferTheFastestNode",
-            comment: .empty
-        )
+        static var preferTheFastestNode: String {
+            String.localized(
+                "NodesList.PreferTheFastestNode",
+                comment: .empty
+            )
+        }
         
-        static let fastestNodeTip = String.localized(
-            "NodesList.PreferTheFastestNode.Footer",
-            comment: .empty
-        )
+        static var fastestNodeTip: String {
+            String.localized(
+                "NodesList.PreferTheFastestNode.Footer",
+                comment: .empty
+            )
+        }
     }
 }
