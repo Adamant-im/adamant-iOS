@@ -124,16 +124,20 @@ private extension EthWalletService {
             realRecipientAddress = recipientAddress
         }
         
+        guard realSenderAddress == eth.sender?.address else {
+            return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
+        }
+        
+        guard realRecipientAddress == eth.to.address else {
+            return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
+        }
+        
         if transaction.isOutgoing {
-            guard realSenderAddress == eth.sender?.address,
-                  eth.sender?.address == ethWallet?.address
-            else {
+            guard eth.sender?.address == ethWallet?.address else {
                 return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
             }
         } else {
-            guard realRecipientAddress == eth.to.address,
-                  eth.to.address == ethWallet?.address
-            else {
+            guard eth.to.address == ethWallet?.address else {
                 return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
             }
         }

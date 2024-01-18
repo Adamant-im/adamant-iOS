@@ -71,16 +71,20 @@ private extension ERC20WalletService {
             realRecipientAddress = recipientAddress
         }
         
+        guard realSenderAddress == erc20Transaction.senderAddress else {
+            return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
+        }
+        
+        guard realRecipientAddress == erc20Transaction.recipientAddress else {
+            return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
+        }
+        
         if transaction.isOutgoing {
-            guard realSenderAddress == erc20Transaction.senderAddress,
-                  erc20Transaction.senderAddress == ethWallet?.address
-            else {
+            guard erc20Transaction.senderAddress == ethWallet?.address else {
                 return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
             }
         } else {
-            guard realRecipientAddress == erc20Transaction.recipientAddress,
-                  erc20Transaction.recipientAddress == ethWallet?.address
-            else {
+            guard erc20Transaction.recipientAddress == ethWallet?.address else {
                 return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
             }
         }

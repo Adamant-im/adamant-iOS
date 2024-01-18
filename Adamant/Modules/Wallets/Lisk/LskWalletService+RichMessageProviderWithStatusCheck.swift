@@ -79,16 +79,20 @@ private extension LskWalletService {
             realRecipientAddress = recipientAddress
         }
         
+        guard realSenderAddress == lskTransaction.senderAddress else {
+            return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
+        }
+        
+        guard realRecipientAddress == lskTransaction.recipientAddress else {
+            return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
+        }
+        
         if transaction.isOutgoing {
-            guard realSenderAddress == lskTransaction.senderAddress,
-                  lskTransaction.senderAddress == lskWallet?.address
-            else {
+            guard lskTransaction.senderAddress == lskWallet?.address else {
                 return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
             }
         } else {
-            guard realRecipientAddress == lskTransaction.recipientAddress,
-                  lskTransaction.recipientAddress == lskWallet?.address
-            else {
+            guard lskTransaction.recipientAddress == lskWallet?.address else {
                 return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
             }
         }
