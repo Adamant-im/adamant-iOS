@@ -87,9 +87,7 @@ class HealthCheckWrapper<Service, Error: HealthCheckableError> {
         ? Error.noEndpointsError(coin: nodeGroup.name)
         : nil
         
-        let nodesList = allowedNodes.isEmpty
-            ? nodes.filter { $0.isEnabled }.shuffled()
-            : fastestNodeMode
+        let nodesList = fastestNodeMode
                 ? allowedNodes
                 : allowedNodes.shuffled()
         

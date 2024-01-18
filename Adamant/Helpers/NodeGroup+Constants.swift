@@ -84,4 +84,28 @@ public extension NodeGroup {
             return DashWalletService.healthCheckParameters.normalUpdateInterval
         }
     }
+    
+    var minNodeVersion: Double {
+        var minNodeVersion: String?
+        switch self {
+        case .adm:
+            minNodeVersion = AdmWalletService.minNodeVersion
+        case .btc:
+            minNodeVersion = BtcWalletService.minNodeVersion
+        case .eth:
+            minNodeVersion = EthWalletService.minNodeVersion
+        case .lskNode:
+            minNodeVersion = LskWalletService.minNodeVersion
+        case .lskService:
+            minNodeVersion = LskWalletService.minNodeVersion
+        case .doge:
+            minNodeVersion = DogeWalletService.minNodeVersion
+        case .dash:
+            minNodeVersion = DashWalletService.minNodeVersion
+        }
+        
+        guard let versionNumber = minNodeVersion?.nodeVersion else { return .zero }
+        
+        return versionNumber
+    }
 }

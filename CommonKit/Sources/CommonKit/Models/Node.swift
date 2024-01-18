@@ -53,6 +53,7 @@ public extension Node {
         case offline
         case synchronizing
         case allowed
+        case notAllowed
     }
     
     enum URLScheme: String, Codable {

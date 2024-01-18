@@ -32,6 +32,13 @@ extension Node {
             .joined(separator: " ")
         case .offline:
             return Strings.offline
+        case .notAllowed:
+            return [
+                Strings.outdated,
+                version
+            ]
+            .compactMap { $0 }
+            .joined(separator: " ")
         case .none:
             return nil
         }
@@ -61,7 +68,7 @@ extension Node {
             return .adamant.good
         case .synchronizing:
             return .adamant.alert
-        case .offline:
+        case .offline, .notAllowed:
             return .adamant.danger
         case .none:
             return .adamant.inactive
@@ -110,6 +117,13 @@ private extension Node {
             String.localized(
                 "NodesList.NodeCell.Disabled",
                 comment: "NodesList.NodeCell: Node is disabled"
+            )
+        }
+        
+        static var outdated: String {
+            String.localized(
+                "NodesList.NodeCell.Outdated",
+                comment: "NodesList.NodeCell: Node is outdated"
             )
         }
     }
