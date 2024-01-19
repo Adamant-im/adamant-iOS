@@ -79,12 +79,52 @@ final class AdamantCoinStorageService: NSObject, CoinStorageService {
     }
     
     func updateStatus(for transactionId: String, status: TransactionStatus?) {
+        updateStatusForBaseTx(transactionId: transactionId, status: status)
+        updateStatusForRichTxIfNeeded(transactionId: transactionId, status: status)
+    }
+    
+    func updateStatusForBaseTx(
+        transactionId: String,
+        status: TransactionStatus?
+    ) {
         let privateContext = coreDataStack.container.viewContext
         
         guard let transaction = getTransactionFromDB(
             id: transactionId,
             context: privateContext
         ) else { return }
+        
+        transaction.transactionStatus = status
+        try? privateContext.save()
+    }
+    
+    func updateStatusForRichTxIfNeeded(
+        transactionId: String,
+        status: TransactionStatus?
+    ) {
+        guard let tx = getRichTransactionsFromDB(with: transactionId),
+              let status = status
+        else { return }
+
+        setStatus(for: tx, status: status)
+    }
+    
+    func setStatus(
+        for transaction: CoinTransaction,
+        status: TransactionStatus
+    ) {
+        let privateContext = NSManagedObjectContext(
+            concurrencyType: .privateQueueConcurrencyType
+        )
+
+        privateContext.parent = coreDataStack.container.viewContext
+        
+        let transaction = privateContext.object(with: transaction.objectID)
+            as? CoinTransaction
+        
+        guard let transaction = transaction else {
+            return
+        }
         
         transaction.transactionStatus = status
         try? privateContext.save()
@@ -159,6 +199,26 @@ private extension AdamantCoinStorageService {
         do {
             let result = try context.fetch(request)
             return result.first
+        } catch {
+            return nil
+        }
+    }
+    
+    func getRichTransactionsFromDB(with id: String) -> RichMessageTransaction? {
+        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        context.parent = coreDataStack.container.viewContext
+        
+        let request = NSFetchRequest<RichMessageTransaction>(entityName: RichMessageTransaction.entityName)
+        request.predicate = NSPredicate(format: "richTransferHash == %@", String(id))
+        
+        do {
+            let result = try context.fetch(request)
+            
+            let transaction = result.sorted(
+                by: { ($0.dateValue ?? Date()) < ($1.dateValue ?? Date()) }
+            ).first
+            
+            return transaction
         } catch {
             return nil
         }

@@ -935,7 +935,7 @@ extension AdamantChatsProvider {
         transaction.additionalType = additionalType
         transaction.richContentSerialized = richContentSerialized
         transaction.blockchainType = richType
-        transaction.richTransferHash = id
+        transaction.richTransferHash = richContent[RichContentKeys.hash] as? String
         
         transaction.transactionStatus = walletServiceCompose.getWallet(by: richType) != nil
         ? .notInitiated
