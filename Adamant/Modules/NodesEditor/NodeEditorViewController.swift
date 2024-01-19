@@ -13,9 +13,15 @@ import CommonKit
 // MARK: - Localization
 extension String.adamant {
     enum nodesEditor {
-        static let newNodeTitle = String.localized("NodesEditor.NewNodeTitle", comment: "NodesEditor: New node scene title")
-        static let deleteNodeAlert = String.localized("NodesEditor.DeleteNodeAlert", comment: "NodesEditor: Delete node confirmation message")
-        static let failedToBuildURL = String.localized("NodesEditor.FailedToBuildURL", comment: "NodesEditor: Failed to build URL alert")
+        static var newNodeTitle: String {
+            String.localized("NodesEditor.NewNodeTitle", comment: "NodesEditor: New node scene title")
+        }
+        static var deleteNodeAlert: String {
+            String.localized("NodesEditor.DeleteNodeAlert", comment: "NodesEditor: Delete node confirmation message")
+        }
+        static var failedToBuildURL: String {
+            String.localized("NodesEditor.FailedToBuildURL", comment: "NodesEditor: Failed to build URL alert")
+        }
     }
 }
 

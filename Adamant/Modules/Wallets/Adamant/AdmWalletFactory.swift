@@ -90,7 +90,8 @@ private extension AdmWalletFactory {
             screensFactory: screensFactory,
             dialogService: assembler.resolve(DialogService.self)!,
             currencyInfo: assembler.resolve(CurrencyInfoService.self)!,
-            addressBookService: assembler.resolve(AddressBookService.self)!
+            addressBookService: assembler.resolve(AddressBookService.self)!,
+            languageService: assembler.resolve(LanguageStorageProtocol.self)!
         )
     }
 }

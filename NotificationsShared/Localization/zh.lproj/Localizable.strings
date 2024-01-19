@@ -1,0 +1,26 @@
+/* Notifications: Something went wrong while registering remote notifications. %@ for description */
+"NotificationsService.Error.RegistrationRemotesFormat" = "在ANS中注册失败。请稍后再试。原因%@";
+
+/* Notifications: New message notification title */
+"NotificationsService.NewMessage.Title" = "新消息";
+
+/* Notifications: New single message notification body */
+"NotificationsService.NewMessage.BodySingle" = "您有一条新消息";
+
+/* Notifications: New transfer transaction title */
+"NotificationsService.NewTransfer.Title" = "新转移";
+
+/* Notifications: New single transfer transaction body */
+"NotificationsService.NewTransfer.BodySingle" = "您有新的转账";
+
+/* Notifications: User has disabled notifications. Head him into settings */
+"NotificationsService.NotificationsDisabled" = "通知已禁用。您可以在“设置”中启用通知";
+
+/* Notifications: Not stayed logged in */
+"NotificationsService.NotStayedLoggedIn" = "不保持登录状态就无法打开通知";
+
+/* Notifications: Reacted */
+"NotificationsService.Reacted" = "有反应";
+
+/* Notifications: Modified Reaction */
+"NotificationsService.ModifiedReaction" = "修改的反应";

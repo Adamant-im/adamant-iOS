@@ -9,6 +9,7 @@
 import Foundation
 import CoreData
 import CommonKit
+import Combine
 
 // MARK: - Provider
 @MainActor
@@ -46,6 +47,7 @@ final class AdamantAccountsProvider: AccountsProvider {
     
     // MARK: Properties
     private let knownContacts: [String:KnownContact]
+    private var subscriptions = Set<AnyCancellable>()
     
     // MARK: Lifecycle
     nonisolated init(
@@ -138,6 +140,31 @@ final class AdamantAccountsProvider: AccountsProvider {
                     }
                 }
             }
+        }
+        
+        Task {
+            await addObservers()
+        }
+    }
+    
+    private func addObservers() {
+        NotificationCenter.default
+            .publisher(for: .LanguageStorageService.languageUpdated)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                Task {
+                    await self?.updateSystemAccountsName()
+                }
+            }
+            .store(in: &subscriptions)
+    }
+    
+    private func updateSystemAccountsName() async {
+        for account in AdamantContacts.allCases {
+            let accountInDataBase = try? await getAccount(byAddress: account.address)
+            let newName = account.name.checkAndReplaceSystemWallets()
+            accountInDataBase?.name = newName
+            accountInDataBase?.chatroom?.title = newName
         }
     }
     
