@@ -718,7 +718,7 @@ class TransferViewControllerBase: FormViewController {
         }
         
         if admReportRecipient != nil,
-           !nodesStorage.isHaveActiveNode(in: .adm) {
+           !nodesStorage.haveActiveNode(in: .adm) {
             dialogService.showWarning(
                 withMessage: ApiServiceError.noEndpointsAvailable(
                     coin: NodeGroup.adm.name
@@ -728,7 +728,7 @@ class TransferViewControllerBase: FormViewController {
         }
         
         let groupsWithoutActiveNode = service.nodeGroups.filter {
-            !nodesStorage.isHaveActiveNode(in: $0)
+            !nodesStorage.haveActiveNode(in: $0)
         }
 
         if let group = groupsWithoutActiveNode.first {

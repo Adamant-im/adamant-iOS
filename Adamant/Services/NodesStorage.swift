@@ -89,7 +89,7 @@ final class NodesStorage: NodesStorageProtocol {
         }
     }
     
-    func isHaveActiveNode(in group: CommonKit.NodeGroup) -> Bool {
+    func haveActiveNode(in group: CommonKit.NodeGroup) -> Bool {
         let nodes = items.wrappedValue.filter { $0.group == group }.map { $0.node }
         let node = nodes.first(where: { $0.connectionStatus == .allowed && $0.isEnabled })
         return node != nil

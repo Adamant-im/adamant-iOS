@@ -23,7 +23,7 @@ protocol NodesStorageProtocol {
     func addNode(_ node: Node, group: NodeGroup)
     func resetNodes(group: NodeGroup)
     func removeNode(id: UUID)
-    func isHaveActiveNode(in group: NodeGroup) -> Bool
+    func haveActiveNode(in group: NodeGroup) -> Bool
     
     func updateNode(
         id: UUID,
