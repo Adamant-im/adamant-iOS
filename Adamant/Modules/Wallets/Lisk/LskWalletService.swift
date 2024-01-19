@@ -81,6 +81,10 @@ final class LskWalletService: WalletService {
         return Self.qqPrefix
     }
     
+    var additionalFee: Decimal {
+        0.05
+	}
+
     var nodeGroups: [NodeGroup] {
         [.lskNode, .lskService]
     }
@@ -204,6 +208,10 @@ final class LskWalletService: WalletService {
         
         setState(.updating)
         
+        if let nonce = try? await getNonce(address: wallet.address) {
+            wallet.nonce = nonce
+        }
+        
         if let result = try? await getFees() {
             self.lastHeight = result.lastHeight
             self.transactionFeeRaw = result.fee > LskWalletService.defaultFee
@@ -269,26 +277,46 @@ final class LskWalletService: WalletService {
             throw WalletServiceError.notLogged
         }
         
-        let value = try await lskServiceApiService.requestServiceApi { api, completion in
-            api.getFees(completionHandler: completion)
+        let minFeePerByte = try await lskNodeApiService.requestAccountsApi { api in
+            try await api.getFees().minFeePerByte
         }.get()
         
-        let tempTransaction = TransactionEntity(
+        let tempTransaction = TransactionEntity().createTx(
             amount: 100000000.0,
             fee: 0.00141,
-            nonce: wallet.nounce,
+            nonce: wallet.nonce,
             senderPublicKey: wallet.keyPair.publicKeyString,
-            recipientAddressBase32: wallet.address,
             recipientAddressBinary: wallet.binaryAddress
-        ).signed(
+        ).sign(
             with: wallet.keyPair,
-            for: self.netHash
+            for: Constants.chainID
         )
         
-        let feeValue = tempTransaction.getFee(with: value.data.minFeePerByte)
+        let feeValue = tempTransaction.getFee(with: minFeePerByte)
         let fee = BigUInt(feeValue)
         
-        return (fee: fee, lastHeight: value.meta.lastBlockHeight)
+        let lastBlock = try await lskNodeApiService.requestAccountsApi { api in
+            try await api.lastBlock()
+        }.get()
+        
+        let height = UInt64(lastBlock.header.height)
+        
+        return (fee: fee, lastHeight: height)
+    }
+    
+    func isExist(address: String) async throws -> Bool {
+        try await lskServiceApiService.requestServiceApi { api in
+            try await withUnsafeThrowingContinuation { continuation in
+                api.exist(address: address) { result in
+                    switch result {
+                    case .success(let response):
+                        continuation.resume(returning: response.data.isExists)
+                    case .error(let error):
+                        continuation.resume(throwing: error)
+                    }
+                }
+            }
+        }.get()
     }
 }
 
@@ -313,7 +341,12 @@ extension LskWalletService: InitiatedWithPassphraseService {
             let address = LiskKit.Crypto.address(fromPublicKey: keyPair.publicKeyString)
          
             // MARK: 3. Update
-            let wallet = LskWallet(address: address, keyPair: keyPair, nounce: "", isNewApi: true)
+            let wallet = LskWallet(
+                address: address,
+                keyPair: keyPair,
+                nonce: .zero,
+                isNewApi: true
+            )
             self.lskWallet = wallet
             
             NotificationCenter.default.post(
@@ -443,31 +476,26 @@ extension LskWalletService {
     }
     
     func getBalance(address: String) async throws -> Decimal {
-        guard let address = LiskKit.Crypto.getBinaryAddressFromBase32(address) else {
-            throw WalletServiceError.notLogged
-        }
-        
-        let result = await lskNodeApiService.requestAccountsApi { api, completion in
-            api.accounts(address: address, completionHandler: completion)
+        let result = await lskNodeApiService.requestAccountsApi { api in
+            let balanceRaw = try await api.balance(address: address)
+            let balance = BigUInt(balanceRaw?.availableBalance ?? "0") ?? .zero
+            return balance
         }
         
         switch result {
-        case let .success(response):
-            if lskWallet?.binaryAddress == address {
-                lskWallet?.nounce = response.data.nonce
-            }
-            
-            let balance = BigUInt(response.data.balance ?? "0") ?? BigUInt(0)
+        case let .success(balance):
             return balance.asDecimal(exponent: LskWalletService.currencyExponent)
         case let .failure(error):
-            guard
-                case let .remoteServiceError(_, lskError) = error,
-                let lskError = lskError as? APIError,
-                [404, 500].contains(lskError.code)
-            else { throw error }
-            
-            return .zero
+            throw error
         }
+    }
+    
+    func getNonce(address: String) async throws -> UInt64 {
+        let nonce = try await lskNodeApiService.requestAccountsApi { api in
+            try await api.nonce(address: address)
+        }.get()
+        
+        return UInt64(nonce) ?? .zero
     }
 
     func handleAccountSuccess(with balance: String?, completion: @escaping (WalletServiceResult<Decimal>) -> Void) {

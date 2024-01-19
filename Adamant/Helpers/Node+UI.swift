@@ -71,35 +71,47 @@ extension Node {
 
 private extension Node {
     enum Strings {
-        static let ping = String.localized(
-            "NodesList.NodeCell.Ping",
-            comment: "NodesList.NodeCell: Node ping"
-        )
+        static var ping: String {
+            String.localized(
+                "NodesList.NodeCell.Ping",
+                comment: "NodesList.NodeCell: Node ping"
+            )
+        }
         
-        static let milliseconds = String.localized(
-            "NodesList.NodeCell.Milliseconds",
-            comment: "NodesList.NodeCell: Milliseconds"
-        )
+        static var milliseconds: String {
+            String.localized(
+                "NodesList.NodeCell.Milliseconds",
+                comment: "NodesList.NodeCell: Milliseconds"
+            )
+        }
         
-        static let synchronizing = String.localized(
-            "NodesList.NodeCell.Synchronizing",
-            comment: "NodesList.NodeCell: Node is synchronizing"
-        )
+        static var synchronizing: String {
+            String.localized(
+                "NodesList.NodeCell.Synchronizing",
+                comment: "NodesList.NodeCell: Node is synchronizing"
+            )
+        }
         
-        static let offline = String.localized(
-            "NodesList.NodeCell.Offline",
-            comment: "NodesList.NodeCell: Node is offline"
-        )
+        static var offline: String {
+            String.localized(
+                "NodesList.NodeCell.Offline",
+                comment: "NodesList.NodeCell: Node is offline"
+            )
+        }
         
-        static let version = String.localized(
-            "NodesList.NodeCell.Version",
-            comment: "NodesList.NodeCell: Node version"
-        )
+        static var version: String {
+            String.localized(
+                "NodesList.NodeCell.Version",
+                comment: "NodesList.NodeCell: Node version"
+            )
+        }
         
-        static let disabled = String.localized(
-            "NodesList.NodeCell.Disabled",
-            comment: "NodesList.NodeCell: Node is disabled"
-        )
+        static var disabled: String {
+            String.localized(
+                "NodesList.NodeCell.Disabled",
+                comment: "NodesList.NodeCell: Node is disabled"
+            )
+        }
     }
     
     var versionString: String? {

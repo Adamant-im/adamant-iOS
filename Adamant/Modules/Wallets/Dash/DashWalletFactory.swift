@@ -140,7 +140,8 @@ private extension DashWalletFactory {
             currencyInfo: assembler.resolve(CurrencyInfoService.self)!,
             addressBookService: assembler.resolve(AddressBookService.self)!,
             accountService: assembler.resolve(AccountService.self)!,
-            walletService: service
+            walletService: service,
+            languageService: assembler.resolve(LanguageStorageProtocol.self)!
         )
         
         vc.service = service

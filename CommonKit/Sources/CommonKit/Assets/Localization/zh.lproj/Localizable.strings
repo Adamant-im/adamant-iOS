@@ -1,0 +1,1166 @@
+/* Notification content: error working with transaction */
+"content.error" = "出现问题！";
+
+/* Notification content: error format */
+"content.error.format" = "出现问题：%@";
+
+/* New transfer notification title */
+"transfer.notificationTitle" = "新转让";
+
+/* Transfer notification body format */
+"transfer.notificationBody.format" = "用户已将您%@";
+
+/* Transfer notification: 'Your address' */
+"transfer.notificationBody.yourAddress" = "您";
+
+/* About page: scene title */
+"About.Title" = "关于";
+
+/* About scene: 'Read about' section title. */
+"About.Section.About" = "关于ADAMANT";
+
+/* About scene: 'Contact us' section title. */
+"About.Section.ContactUs" = "联系我们";
+
+/* Contribute scene: 'Crashlytics' section title. */
+"Contribute.Section.Crashlytics" = "Crashlytics";
+
+/* Contribute scene: 'Crashlytics' section description. */
+"Contribute.Section.CrashlyticsDescription" = "发送匿名崩溃报告，使应用程序更加可靠。我们不收集使用统计信息。";
+
+/* Contribute scene: 'Run nodes' section title. */
+"Contribute.Section.RunNodes" = "运行ADAMANT节点";
+
+/* Contribute scene: 'Run nodes' section description. */
+"Contribute.Section.RunNodesDescription" = "支持去中心化，提高隐私级别";
+
+/* Contribute scene: 'Network delegate' section title. */
+"Contribute.Section.NetworkDelegate" = "成为网络代表";
+
+/* Contribute scene: 'Network delegate' section description. */
+"Contribute.Section.NetworkDelegateDescription" = "要成为代表，请支付注册费并获得选民的支持";
+
+/* Contribute scene: 'Code contribute' section title. */
+"Contribute.Section.CodeContribute" = "为代码贡献力量";
+
+/* Contribute scene: 'Code contribute' section description. */
+"Contribute.Section.CodeContributeDescription" = "如果您是开发人员，请加入我们的GitHub存储库";
+
+/* Contribute scene: 'Donate' section title. */
+"Contribute.Section.Donate" = "捐赠";
+
+/* Contribute scene: 'Donate' section description. */
+"Contribute.Section.DonateDescription" = "每一次捐赠都让ADAMANT变得更强大";
+
+/* Contribute scene: 'Rate' section title. */
+"Contribute.Section.Rate" = "在App Store中对应用进行评分";
+
+/* Contribute scene: 'Rate' section description. */
+"Contribute.Section.RateDescription" = "反馈越多，应用程序的可见性越好。突出显示您喜欢的功能";
+
+/* About scene: Website row */
+"About.Row.Website" = "网站";
+
+/* About scene: The Whitepaper row */
+"About.Row.Whitepaper" = "白皮书";
+
+/* About scene: Project's GitHub page row */
+"About.Row.GitHub" = "项目的GitHub页面";
+
+/* About scene: Write us row */
+"About.Row.WriteUs" = "电子邮件";
+
+/* About scene: Our blog row */
+"About.Row.Blog" = "我们的博客";
+
+/* About scene: Twitter row */
+"About.Row.Twitter" = "推特";
+
+/* "About scene: Website localized url" */
+"About.Row.Website.Url" = "https://adamant.im";
+
+/* "About scene: The Whitepaper localized url" */
+"About.Row.Whitepaper.Url" = "https://adamant.im/whitepaper/adamant-whitepaper-cn.pdf";
+
+/* "About scene: Project's GitHub page localized url" */
+"About.Row.GitHub.Url" = "https://github.com/Adamant-im";
+
+/* "About scene: Our blog localized url" */
+"About.Row.Blog.Url" = "https://medium.com/adamant-im";
+
+/* "About scene: Twitter localized url" */
+"About.Row.Twitter.Url" = "https://twitter.com/adamant_im";
+
+/* About scene: Write to Adamant row */
+"About.Row.Adamant" = "ADAMANT";
+
+/* About scene: Show Welcome screens */
+"About.Row.Welcome" = "欢迎屏幕";
+
+/* Account tab: 'Currency' row */
+"AccountTab.Row.Currency" = "货币";
+
+/* Account tab: 'Language' row */
+"AccountTab.Row.Language" = "语言";
+
+/* Account tab: Language auto */
+"Language.Auto" = "自动";
+
+/* System accounts: ADAMANT Tokens */
+"Accounts.AdamantTokens" = "欢迎使用ADAMANT";
+
+/* System accounts: PWA ADM Bounty bot */
+"Accounts.AdamantBountyBot" = "ADAMANT 赏金机器人";
+
+/* System accounts: ADAMANT Bounty */
+"Accounts.AdamantBounty" = "ADAMANT Bounty钱包";
+
+/* System accounts: ADAMANT Support */
+"Accounts.Support" = "ADAMANT 支持";
+
+/* System accounts: ADAMANT Exchange */
+"Accounts.AdamantExchange" = "ADAMANT 交流";
+
+/* System accounts: Bet on Bitcoin Price */
+"Accounts.BetOnBitcoin" = "押注比特币价格";
+
+/* System accounts: Adelina */
+"Accounts.Adelina" = "Adelina AI";
+
+/* System accounts: Donates ADAMANT Foundation */
+"Accounts.DonateADMFoundation" = "向ADAMANT基金会捐款";
+
+/* AccountsProvider: Address not valid error, %@ for address */
+"AccountsProvider.Error.AddressNotValidFormat" = "无效地址：%@";
+
+/* AccountService: Alert title. Changes in version 1.2 */
+"AccountService.update.v12.title" = "版本1.2更新：加密钱包";
+
+/* AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth & lsk wallets */
+"AccountService.update.v12.message" = "您需要重新登录才能启动以太坊钱包";
+
+/* AccountService: User must relogin into app to initiate wallets */
+"AccountService.reloginToInitiateWallets" = "重新登录以启动钱包";
+
+/* Login: user typed in invalid passphrase */
+"AccountServiceError.InvalidPassphrase" = "错误的密码短语";
+
+/* Login: user typed in wrong passphrase */
+"AccountServiceError.WrongPassphrase" = "错误的密码短语";
+
+/* Account tab: Confirm logout alert: Logout (Ok) button */
+"AccountTab.ConfirmLogout.Logout" = "注销";
+
+/* Account tab: Confirm logout alert */
+"AccountTab.ConfirmLogout.MessageFormat" = "从%@注销？";
+
+/* Account tab: A full 'Get free tokens' link, with %@ as address */
+"AccountTab.FreeTokens.UrlFormat" = "https://adamant.im/free-adm-tokens/?wallet=%@";
+
+/* Account tab: A full 'Buy tokens' link, with %@ as address */
+"AccountTab.BuyTokens.UrlFormat" = "https://adamant.im/buy-tokens/?wallet=%@";
+
+/* Account tab: Balance row title */
+"AccountTab.Row.Balance" = "余额";
+
+/* Account tab: 'Buy tokens' button */
+"AccountTab.Row.BuyTokens" = "交换代币";
+
+/* Account tab: 'Logout' button */
+"AccountTab.Row.Logout" = "注销";
+
+/* Account tab: 'Security' row */
+"AccountTab.Row.Security" = "安全性";
+
+/* Account tab: 'Send tokens' button */
+"AccountTab.Row.SendTokens" = "发送令牌";
+
+/* Account tab: 'Send ADM tokens' button */
+"AccountTab.Row.SendAdm" = "发送ADM";
+
+/* Account tab: 'Send ETH tokens' button */
+"AccountTab.Row.SendEth" = "发送ETH";
+
+/* Account tab: 'Send LSK tokens' button */
+"AccountTab.Row.SendLsk" = "发送LSK";
+
+/* Account tab: 'Send BTC tokens' button */
+"AccountTab.Row.SendBtc" = "发送BTC";
+
+/* Account tab: 'Send DOGE tokens' button */
+"AccountTab.Row.SendDoge" = "发送DOGE";
+
+/* Account tab: 'Send DASH tokens' button */
+"AccountTab.Row.SendDash" = "发送DASH";
+
+/* Account tab: 'Send ERC20 tokens' button */
+"AccountTab.Row.SendToken" = "发送%@";
+
+/* Account tab: Anonymously buy ADM tokens */
+"AccountTab.Row.AnonymouslyBuyADM" = "匿名更改ADM";
+
+/* Account tab: Exchange ADM tokens in chat */
+"AccountTab.Row.ExchangeADMInChat" = "聊天交流";
+
+/* Account tab: 'Address' row */
+"AccountTab.Row.Address" = "地址";
+
+/* Account tab: 'Get free tokens' button */
+"AccountTab.Row.FreeTokens" = "免费ADM令牌";
+
+/* Account tab: 'Theme' row */
+"AccountTab.Row.Theme" = "主题";
+
+/* Account tab: 'Theme' row value 'Light' */
+"AccountTab.Row.Theme.Light" = "灯光";
+
+/* Account tab: 'Theme' row value 'Dark' */
+"AccountTab.Row.Theme.Dark" = "黑暗";
+
+/* Account tab: 'About' row */
+"AccountTab.Row.About" = "关于";
+
+/* Account tab: 'Contribute' row */
+"AccountTab.Row.Contribute" = "投稿";
+
+/* Account tab: 'Vote for delegates' button */
+"AccountTab.Row.VoteForDelegates" = "为代表投票";
+
+/* Account tab: Actions section title */
+"AccountTab.Section.Actions" = "行动";
+
+/* Account tab: Application section title */
+"AccountTab.Section.Application" = "应用";
+
+/* Account tab: Adamant wallet */
+"AccountTab.Wallets.adamant_wallet" = "ADAMANT钱包";
+
+/* Account tab: Ethereum wallet */
+"AccountTab.Wallets.ethereum_wallet" = "以太坊钱包";
+
+/* Account tab: Lisk wallet */
+"AccountTab.Wallets.lisk_wallet" = "Lisk钱包";
+
+/* Account tab: Bitcoin wallet */
+"AccountTab.Wallets.bitcoin_wallet" = "比特币钱包";
+
+/* Account tab: Doge wallet */
+"AccountTab.Wallets.doge_wallet" = "狗狗钱包";
+
+/* Account tab: Dash wallet */
+"AccountTab.Wallets.dash_wallet" = "达世币钱包";
+
+/* Account tab: ERC20 wallet */
+"AccountTab.Wallets.erc20_wallet" = "%@钱包";
+
+/* Account page: scene title */
+"AccountTab.Title" = "帐户";
+
+/* Account tab: Delegates section title */
+"AccountTab.Section.Delegates" = "代理人";
+
+/* Product name */
+"ADAMANT" = "坚定不移";
+
+/* AddressBookService: Not enought money to save address into blockchain */
+"AddressBookService.Error.notEnoughMoney" = "没有足够的令牌在区块链中存储数据";
+
+/* Application: Failed to send deviceToken to ANS error format. %@ for error description */
+"Application.deviceTokenErrorFormat" = "无法在ANS:%@中注册";
+
+/* Serious internal error: Failed to build endpoint url */
+"ApiService.InternalError.EndpointBuildFailed" = "端点构建失败。报告错误";
+
+/* Serious internal error: Failed to sign transaction */
+"ApiService.InternalError.FailedTransactionSigning" = "事务失败";
+
+/* Serious internal error: Error parsing response */
+"ApiService.InternalError.PassingFailed" = "分析失败。报告错误";
+
+/* Serious internal error: No nodes available */
+"ApiService.InternalError.NoNodesAvailable" = "没有活动的%@节点。查看节点列表";
+
+/* Eureka forms Cancel button */
+"Cancel" = "取消";
+
+/* ChatList: outgoing message prefix */
+"ChatListPage.SentMessagePrefix" = "您：";
+
+/* ChatList: SearchBar placeholder text */
+"ChatListPage.SearchBar.Placeholder" = "搜索联系人或消息";
+
+/* SearchPage: Contacts header */
+"SearchPage.Contacts" = "联系人";
+
+/* SearchPage: Contacts header */
+"SearchPage.Contact.New" = "新联系人";
+
+/* SearchPage: Contact new header */
+"SearchPage.Contact.Add.New" = "[添加新联系人]";
+
+/* SearchPage: Messages header */
+"SearchPage.Messages" = "信息";
+
+/* ChatList: First syncronization is in progress */
+"ChatListPage.SyncingChats" = "正在同步聊天…";
+
+/* ChatList: Reacted */
+"ChatListPage.Reacted" = "达到";
+
+/* ChatList: Removed Reaction */
+"ChatListPage.RemovedReaction" = "已删除反应";
+
+/* ChatList: scene title */
+"ChatListPage.Title" = "聊天";
+
+/* ChatsProvider: Notify user that he doesn't have money to pay a message fee */
+"ChatsProvider.Error.notEnoughMoney" = "零余额。获得免费ADM代币";
+
+/* ChatsProvider: Transaction not found error. %@ for transaction's ID */
+"ChatsProvider.Error.TransactionNotFoundFormat" = "找不到id为%@的消息";
+
+/* ChatsProvider: Validation error: Message is empty */
+"ChatsProvider.Validation.MessageIsEmpty" = "消息为空";
+
+/* ChatsProvider: Validation error: Message is too long */
+"ChatsProvider.Validation.MessageTooLong" = "消息太长";
+
+/* Known contacts: Adamant ICO message. Markdown supported. */
+"Chats.IcoMessage" = "Null";
+
+/* Known contacts: Adamant pre ICO message */
+"Chats.PreIcoMessage" = "Null";
+
+/* Known contacts: Adamant welcome message. Markdown supported. */
+"Chats.WelcomeMessage" = "ADAMANT是一个真正的区块链信使，独立于政府、企业甚至开发商。这是由于去中心化的网络基础设施，完全开源，由用户运行。这就是为什么每一个动作，包括发送消息或保存联系人姓名，都有0.001 ADM的网络费用。\n\nBlockchain提供了卓越的安全性和隐私，这是典型的P2P和c集中的信使。此外，区块链提供了新的可能性。您可以在聊天中存储和传输密码，并完全控制您的私钥，使用ADAMANT作为2FA等。\n\nADAMANT中，没有人可以控制、阻止、停用、限制或审查帐户。用户对内容、消息、媒体以及使用Messenger的目标和意图承担全部责任。\n\n请注意，您的安全性和匿名性取决于您。不要关注你收到的链接，否则你的IP可能会被泄露。在设备上设置密码。了解有关安全性和匿名性的更多信息，请访问https://adamant.im/staysecured/.\n\n请确保已保存此帐户的密码短语--注销并再次登录。把你的通行证短语也写在纸上。只有**您对通行证短语的安全负责**。它无法恢复。如果其他人得到了它，你的代币就会被盗，信件也会被读取。把这个问题看得最重要，就好像你钱包里的代币在一段时间内会花费10亿美元一样。\n\n若要立即开始发送消息，请在\"帐户\"选项卡上**获得免费欢迎令牌**。然后创建新聊天并输入您朋友的ADM地址。建议您亲自分享ADM地址，不要使用其他信使。";
+
+/* Known contacts: Adamant Exchenge message. Markdown supported. */
+"Chats.Exchange.WelcomeMessage" = "嗨！😊 我是你的交换机器人。我即时匿名操作。键入* */help**看看我能做些什么。我要求的费用比我的机器人同伴高，所以我建议你以有竞争力的费用建立自己的机器人。ℹ️ 你可以在ADAMANT博客上了解更多信息。我非常可靠，但如果您有任何问题，请在这里留言U6386412615727665758。";
+
+/* Known contacts: Adamant Bet On Bitcoin message. Markdown supported. */
+"Chats.BetOnBitcoin.WelcomeMessage" = "嗨！😊 我是匿名的，区块链验证的投注机器人。我接受BTC费率的投注，并向中奖者支付奖励。ℹ️ 在ADAMANT的博客上了解更多信息，或键入* */help**开始下注。通过U63864126157276665758提供支持。";
+
+/* Known contacts: Adamant Adelina message. Markdown supported. */
+"Chats.Adelina.WelcomeMessage" = "你好，我是Adelina。让我们愉快地交谈一下！我可以做很多事情，比如：\n\n-起草电子邮件或其他文章\n-编写Python代码\n-回答关于一组文档的问题\n-支持对话\n-一系列主题的导师\n-翻译语言\n-写诗\n-模拟电子游戏中的角色等等";
+
+/* Known contacts: Adamant donate welcome message. Markdown supported. */
+"Chats.Donate.WelcomeMessage" = "感谢您的支持，我们开发了去中心化的ADAMANT Messenger——在此聊天中转移ADM、ETH和其他代币。有关其他捐赠钱包，请参阅adamant.im。";
+
+/* Alert 'Retry Or Delete' title. Used in caht for sending failed messages again or delete them */
+"Chats.RetryOrDelete.Title" = "重试还是删除？";
+
+/* Alert 'Retry Or Delete' body message. Used in chat for sending failed messages again or delete them */
+"Chats.RetryOrDelete.Body" = "尝试再次发送消息，还是删除它？";
+
+/* Button "Block" */
+"Chats.Block" = "区块链 区块";
+
+/* Alert "Block this user?" */
+"Chats.BlockUser" = "是否阻止此用户？";
+
+/* Button "Remove" */
+"Chats.Remove" = "删除";
+
+/* Alert "Delete this message?" */
+"Chats.RemoveMessage" = "是否删除此消息？";
+
+/* Button "Report" */
+"Chats.Report" = "报告";
+
+/* Button "Reply" */
+"Chats.Reply" = "回复";
+
+/* Button "Copy" */
+"Chats.Copy" = "复制";
+
+/* Alert "Report as inappropriate?" */
+"Chats.ReportMessage" = "是否报告为不合适？";
+
+/* Alert "Report has been sent" */
+"Chats.ReportSent" = "报告已发送";
+
+/* Date "Today" */
+"Chats.Date.Today" = "今天";
+
+/* Date "Just now" */
+"Chats.Date.JustNow" = "现在";
+
+/* Date "A minute ago" */
+"Chats.Date.MinAgo" = "一分钟前";
+
+/* Date "Yesterday" */
+"Chats.Date.Yesterday" = "昨天";
+
+/* Chat: inform user that he can't cancel transaction, that was sent */
+"ChatScene.Error.cancelError" = "消息已发送";
+
+/* Chat: message input placeholder */
+"ChatScene.NewMessage.Placeholder" = "新消息";
+
+/* Chat: Send message button */
+"ChatScene.Send" = "发送";
+
+/* Chat: 'Sent funds' bubble title */
+"ChatScene.Sent" = "已发送";
+
+/* Chat: 'Received funds' bubble title */
+"ChatScene.Received" = "已接收";
+
+/* Chat: 'Sent funds' buble 'Tap for details' tip */
+"ChatScene.tapForDetails" = "点击获取详细信息";
+
+/* Chat: status message for failed to send chat transaction */
+"ChatScene.MessageStatus.FailToSend" = "发送失败";
+
+/* Chat: status message for pending chat transaction */
+"ChatScene.MessageStatus.Pending" = "待定";
+
+/* Chat: status message for warning chat transaction */
+"ChatScene.MessageStatus.Warning" = "警告";
+
+/* Chat: Body for actions menu */
+"ChatScene.Actions.Body" = "%@的新名称";
+
+/* Chat: 'Rename' action in actions menu */
+"ChatScene.Actions.Rename" = "重命名";
+
+/* Chat: 'Name' field in actions menu */
+"ChatScene.Actions.NamePlaceholder" = "名称";
+
+/* Chat: 'Free Tokens' button */
+"ChatScene.FreeTokensAlert.FreeTokens" = "🎁 免费代币";
+
+/* Chat: 'Free Tokens' message */
+"ChatScene.FreeTokensAlert.Message" = "ADAMANT是一个独特的区块链信使，独立于政府、企业甚至其开发者。这是可能的，因为它是一个去中心化的网络，完全开源，由用户运行。这就是为什么每一个动作，包括发消息或保存新联系人，都要收取0.001 ADM.的网络费。要立即开始发消息，请获得免费的欢迎令牌。";
+
+/* Chat: warning message for opening email link without mail app configurated on device */
+"ChatScene.Warning.NoMailApp" = "无法发送电子邮件。请检查邮件应用程序配置。";
+
+/* Chat: warning message for opening unsupported url schemes */
+"ChatScene.Warning.UnsupportedUrl" = "不支持的url协议";
+
+/* Chat: Error scrolling to message, this message has been deleted and is no longer accessible */
+"ChatScene.Error.messageWasDeleted" = "很抱歉，此消息已被删除，无法再访问";
+
+/* Chat: Error message is too big */
+"ChatScene.Error.messageIsTooBig" = "消息太大。分部分发送。";
+
+/* Delegates page: scene title */
+"Delegates.Title" = "与会代表";
+
+/* Visible Wallets page: scene title */
+"VisibleWallets.Title" = "钱包列表";
+
+/* VisibleWallets: Reset wallets alert title */
+"VisibleWallets.ResetListAlert" = "是否将钱包列表重置为默认值？";
+
+/* Delegates tab: Message about 50 ADM fee for vote */
+"Delegates.NotEnoughtTokensForVote" = "没有足够的代币可以投票。您需要50个ADM";
+
+/* Delegates tab: Message about time out for new vote */
+"Delegates.timeOutBeforeNewVote" = "请等待上一次投票处理完毕";
+
+/* Delegate details: scene title */
+"DelegateDetails.Title" = "详细信息";
+
+/* Delegate Details Screen: Rows title for 'Username'" */
+"DelegateDetails.Row.Username" = "用户名";
+
+/* Delegate Details Screen: Rows title for 'Address'" */
+"DelegateDetails.Row.Address" = "地址";
+
+/* Delegate Details Screen: Rows title for 'Public Key'" */
+"DelegateDetails.Row.PublicKey" = "公钥";
+
+/* Delegate Details Screen: Rows title for 'Vote weight'" */
+"DelegateDetails.Row.VoteWeight" = "投票权重";
+
+/* Delegate Details Screen: Rows title for 'Produced blocks'" */
+"DelegateDetails.Row.ProducedBlocks" = "生产的块";
+
+/* Delegate Details Screen: Rows title for 'Missed blocks'" */
+"DelegateDetails.Row.MissedBlocks" = "错过的块";
+
+/* Delegate Details Screen: Rows title for 'Rate'" */
+"DelegateDetails.Row.Rate" = "费率";
+
+/* Delegate Details Screen: Rows title for 'Rank'" */
+"DelegateDetails.Row.Rank" = "等级";
+
+/* Delegate Details Screen: Rows title for 'Approval'" */
+"DelegateDetails.Row.Approval" = "审批";
+
+/* Delegate Details Screen: Rows title for 'Productivity'" */
+"DelegateDetails.Row.Productivity" = "生产率";
+
+/* Delegate Details Screen: Rows title for 'Forging time'" */
+"DelegateDetails.Row.ForgingTime" = "锻造时间";
+
+/* Delegate Details Screen: Rows title for 'Forged'" */
+"DelegateDetails.Row.Forged" = "伪造";
+
+/* Delegates: Message for Successfull voting */
+"Delegates.Vote.Success" = "您的投票已发送";
+
+/* Storybard - Delegate vote panel: 'Upvotes' label */
+"Delegates.VotePanel.Upvotes" = "向上投票:";
+
+/* Storybard - Delegate vote panel: 'Downvotes' label */
+"Delegates.VotePanel.Downvotes" = "反对票:";
+
+/* Storybard - Delegate vote panel: 'New' label */
+"Delegates.VotePanel.New" = "新:";
+
+/* Storybard - Delegate vote panel: 'Total' label */
+"Delegates.VotePanel.Total" = "总计：";
+
+/* Shared error: Account not found error. Using %@ for address. */
+"Error.AccountNotFoundFormat" = "找不到帐户：%@";
+
+/* Shared error: Account not initiated */
+"Error.AccountNotInitiated" = "帐户未启动";
+
+/* Shared error: Internal error format, %@ for message */
+"Error.InteralErrorFormat" = "内部错误：%@";
+
+/* Shared error: Base format, %@ for message */
+"Error.BaseErrorFormat" = "错误：%@";
+
+/* Error messge title for support email */
+"Error.Mail.Title" = "iOS应用程序中的错误";
+
+/* Error messge body for support email */
+"Error.Mail.Body" = "你好，\n\n我有这个错误：\n\n%@\n\n我的设备信息：\n\n%@";
+
+/* Error messge body for support email, with detailed error description. Where first %@ - error's short message, second %@ - detailed description, third %@ - deviceInfo */
+"Error.Mail.Body.Detailed" = "你好，\n\n我有这个错误：\n\n%@\n\n%@\n\n设备：\n\n%@";
+
+/* Shared error: Network problems. In most cases - no connection */
+"Error.NoNetwork" = "无连接";
+
+/* Shared error: Request cancelled */
+"Error.RequestCancelled" = "请求已取消";
+
+/* Shared error: Remote error format, %@ for message */
+"Error.RemoteServerErrorFormat" = "区块链节点错误：%@";
+
+/* Shared error: User not logged */
+"Error.UserNotLogged" = "用户未登录";
+
+/* Shared unknown error */
+"Error.UnknownError" = "未知错误。报告错误";
+
+/* Login: Notify user, that he disabled camera in settings, and need to authorize application. */
+"LoginScene.Error.AuthorizeCamera" = "您需要授权ADAMANT才能使用设备的摄像头";
+
+/* Login: User disabled access to photolibrary, he can authorize application in settings */
+"LoginScene.Error.AuthorizePhotolibrary" = "您需要授权ADAMANT才能使用您的照片库";
+
+/* Login: No network error. */
+"LoginScene.Error.NoInternet" = "没有连接到Internet";
+
+/* Login: notify user that he is trying to login without a passphrase */
+"LoginScene.Error.NoPassphrase" = "输入密码短语";
+
+/* Login: Notify user that picked photo doesn't contains a valid qr code with passphrase */
+"LoginScene.Error.NoQrOnPhoto" = "所选图像不包含有效的二维码";
+
+/* Login: Notify user that device not supported by QR reader */
+"LoginScene.Error.QrNotSupported" = "设备不支持读取二维码";
+
+/* Login: Notify user that scanned QR doesn't contains a passphrase. */
+"LoginScene.Error.WrongQr" = "二维码不包含有效的密码短语";
+
+/* Login: notify user that we are trying to log in */
+"LoginScene.LoggingInProgress" = "正在登录…";
+
+/* Login: Login into previous account with biometry or pincode */
+"LoginScene.LoginIntoAdamant" = "登录到ADAMANT";
+
+/* Login: generate new passphrase button */
+"LoginScene.Row.Generate" = "生成新密码短语";
+
+/* Login: Login button */
+"LoginScene.Row.Login" = "登录";
+
+/* Login: Passphrase placeholder */
+"LoginScene.Row.Passphrase.Placeholder" = "密码短语";
+
+/* Login: Login with pincode button */
+"LoginScene.Row.Pincode" = "使用PIN码登录";
+
+/* Login: Login with QR button. */
+"LoginScene.Row.Qr" = "使用二维码登录";
+
+/* Login: security alert, notify user that he must save his new passphrase. Markdown supported, center aligned. */
+"LoginScene.Row.SavePassphraseAlert" = "**保存新钱包和Messenger帐户的密码短语**。没有登录信息可以进入钱包，只需要密码短语。**如果丢失，无法恢复**。";
+
+/* Login: a small hint for a user, that he can tap on passphrase to save it */
+"LoginScene.Row.TapToSave" = "点击保存";
+
+/* Login: login with existing passphrase section */
+"LoginScene.Section.Login" = "登录";
+
+/* Login: Create new account section */
+"LoginScene.Section.NewAccount" = "新帐户";
+
+/* New chat: Recipient address placeholder. Note that address text field always shows U letter, so you can left this line blank. */
+"NewChatScene.Address.Placeholder" = "";
+
+/* New chat: Notify user that specified address (%@) not found. Using %@ for address */
+"NewChatScene.Error.AddressNotFoundFormat" = "未找到地址：%@";
+
+/* New chat: Notify user that he did enter invalid address */
+"NewChatScene.Error.InvalidAddress" = "输入有效地址";
+
+/* New chat: Notify user that he can't start chat with himself */
+"NewChatScene.Error.OwnAddress" = "你不需要加密的匿名聊天来与自己交谈";
+
+/* New Chat: Notify user that scanned QR doesn't contains an address */
+"NewChatScene.Error.WrongQr" = "二维码不包含有效地址";
+
+/* New chat: Scan QR with address button */
+"NewChatScene.ScanQr" = "扫描二维码";
+
+/* New chat: scene title */
+"NewChatScene.Title" = "新聊天";
+
+/* New chat: Show QR for my address button */
+"NewChatScene.MyQr" = "显示我的二维码";
+
+/* New Chat: 'What does it mean?', a help button for info about uninitialized accounts. */
+"NewChatScene.NotInitialized.HelpButton" = "这是什么意思？";
+
+/* NodesList: Button label */
+"NodesList.NodesList" = "ADM节点列表";
+
+/* NodesList: scene title */
+"NodesList.Title" = "ADM节点列表";
+
+/* NodesList: 'Add new node' button lable */
+"NodesList.AddNewNode" = "添加新节点";
+
+/* NodesList: Reset nodes alert title */
+"NodesList.ResetNodeListAlert" = "是否将节点列表重置为默认值？";
+
+/* NodesList: 'Reset' button */
+"NodesList.ResetButton" = "重置";
+
+/* NodesList: 'Prefer the fastest node' switch */
+"NodesList.PreferTheFastestNode" = "首选最快的节点";
+
+/* NodesList: 'Prefer the fastest node' switch */
+"NodesList.PreferTheFastestNode.Footer" = "处理请求更快，但可能会减少隐私";
+
+/* NodesList.NodeCell: Node ping */
+"NodesList.NodeCell.Ping" = "Ping";
+
+/* NodesList.NodeCell: Milliseconds */
+"NodesList.NodeCell.Milliseconds" = "ms";
+
+/* NodesList.NodeCell: Node is synchronizing */
+"NodesList.NodeCell.Synchronizing" = "正在同步";
+
+/* NodesList.NodeCell: Node is offline */
+"NodesList.NodeCell.Offline" = "离线";
+
+/* NodesList.NodeCell: Node is disabled */
+"NodesList.NodeCell.Disabled" = "已禁用";
+
+/* NodesList.NodeCell: Node version */
+"NodesList.NodeCell.Version" = "版本";
+
+/* NodeList: Inform that default nodes was loaded, if user deleted all nodes */
+"NodeList.DefaultNodesLoaded" = "已加载默认节点列表";
+
+/* CoinsNodesList: Title */
+"CoinsNodesList.Title" = "Coin和服务节点列表";
+
+/* CoinsNodesList: ServiceNode */
+"CoinsNodesList.ServiceNode" = "服务";
+
+/* NodesEditor: New node scene title */
+"NodesEditor.NewNodeTitle" = "新节点";
+
+/* NodesEditor: Delete node confirmation message */
+"NodesEditor.DeleteNodeAlert" = "是否删除此节点？";
+
+/* NodesEditor: Testing in progress */
+"NodesEditor.TestingInProgressMessage" = "正在检查连接…";
+
+/* NodesEditor: Scheme row */
+"NodesEditor.SchemeRow" = "计划";
+
+/* NodesEditor: Port row */
+"NodesEditor.PortRow" = "端口";
+
+/* NodesEditor: Host row */
+"NodesEditor.HostRow" = "主机";
+
+/* NodesEditor: Web sockets */
+"NodesEditor.WebSockets" = "Web套接字";
+
+/* NodesEditor: Web sockets are supported */
+"NodesEditor.WebSocketsSupported" = "支持";
+
+/* NodesEditor: Web sockets aren't supported */
+"NodesEditor.WebSocketsNotSupported" = "不支持";
+
+/* NodesEditor: Delete node button */
+"NodesEditor.DeleteNodeButton" = "删除";
+
+/* NodesEditor: Host row placeholder */
+"NodesEditor.HostRow.Placeholder" = "IP或主机名";
+
+/* NodesEditor: Failed to build URL alert */
+"NodesEditor.FailedToBuildURL" = "无效主机";
+
+/* Security: Notification modes description. Markdown supported. */
+"SecurityPage.Row.Notifications.ModesDescription" = "####通知模式\n\n####禁用\n无通知。\n\n####后台提取\n您的设备会自动提取新消息。没有外部调用。提取由iOS启动，实际时间由操作系统根据电池电量、蜂窝网络、应用程序使用模式等许多因素确定，无法预测。可以是20分钟、6小时，甚至可能是一天。不过，您仍然可以打开应用程序并查看新消息。\n\n####推送\n ADAMANT通知服务发送到您的设备的通知。在消息发送并获得区块链批准后，您几乎会立即收到通知——延迟几秒钟。但此模式要求您的设备在服务的数据库中注册其设备令牌。设备令牌是安全的，在大多数情况下建议使用此选项。\n\n您可以在ADAMANT的GitHub页面上阅读更多关于设备注册的信息。\n\n";
+
+/* Security: Selected notifications types */
+"SecurityPage.Section.NotificationsType" = "通知";
+
+/* Security: About Notification types */
+"SecurityPage.Section.AboutNotificationTypes" = "关于ANS";
+
+/* Security: Messages Notification sound */
+"SecurityPage.Section.Messages" = "信息";
+
+/* Security: Settings Notification */
+"SecurityPage.Section.Settings" = "设置";
+
+/* Notifications: Disable notifications */
+"Notifications.Mode.NotificationsDisabled" = "已禁用";
+
+/* Notifications: Use Background fetch notifications */
+"Notifications.Mode.BackgroundFetch" = "后台获取";
+
+/* Notifications: Use Apple Push notifications */
+"Notifications.Mode.ApplePush" = "推送";
+
+/* Security: Visit Github */
+"SecurityPage.Row.VisitGithub" = "访问GitHub";
+
+/* Notifications: Open system Settings */
+"Notifications.Settings.System" = "系统设置";
+
+/* Notifications: Select Sound */
+"Notifications.Sound.Name" = "声音";
+
+/* Notifications: Select Sounds */
+"Notifications.Sounds.Name" = "声音";
+
+/* Notifications: Select Alert Tones */
+"Notifications.Alert.Tones" = "警报音";
+
+/* Notifications: Select Alert Save */
+"Notifications.Alert.Save" = "保存";
+
+/* Notifications: Alerts Cancel */
+"Notifications.Alert.Cancel" = "取消";
+
+/* Pinpad: Ask user to create new pin */
+"Pinpad.EnterNewPin" = "输入新的PIN码";
+
+/* Pinpad: Ask user to repeat new pin */
+"Pinpad.ReenterPin" = "重新输入您的PIN码";
+
+/* QRGenerator: Bad Internal generator error message format. Using %@ for error description */
+"QrGeneratorScene.Error.InteralErrorFormat" = "内部错误：%@。报告错误";
+
+/* QRGenerator: user typed in invalid passphrase */
+"QrGeneratorScene.Error.InvalidPassphrase" = "输入有效的密码短语";
+
+/* QRGenerator: Passphrase textview placeholder */
+"QrGeneratorScene.Passphrase.Placeholder" = "密码短语";
+
+/* QRGenerator: small 'Tap to save' tooltip under generated QR */
+"QrGeneratorScene.TapToSave" = "点击保存";
+
+/* QRGenerator: scene title */
+"QrGeneratorScene.Title" = "QR生成器";
+
+/* PrivateKeyGenerator: scene title */
+"PkGeneratorScene.Title" = "私钥生成器";
+
+/* PrivateKeyGenerator: Security alert. Keep your passphrase safe */
+"PkGeneratorScene.Alert" = "ADAMANT帐户包括加密钱包。所有这些钱包都与您的密码连接，只有您可以访问这些钱包。您可以导出私钥以在其他应用程序中使用它们。将密钥存储在安全的地方。";
+
+/* PrivateKeyGenerator: Generate button */
+"PkGeneratorScene.GenerateButton" = "生成密钥";
+
+/* Security: scene title */
+"SecurityPage.Title" = "安全性";
+
+/* Security: turn off 'Stay Logged In' confirmation */
+"SecurityPage.DoNotStayLoggedIn" = "不保持登录状态";
+
+/* Config: Authorization reason for turning biometry off */
+"SecurityPage.DoNotUseBiometry" = "不使用biometry登录";
+
+/* Security: Generate QR with passphrase row */
+"SecurityPage.Row.GenerateQr" = "生成带有密码短语的QR";
+
+/* Security: Generate PrivateKey with passphrase row */
+"SecurityPage.Row.GeneratePk" = "导出私钥";
+
+/* Security: Show notifications */
+"SecurityPage.Row.Notifications" = "通知";
+
+/* Security: Stay logged row */
+"SecurityPage.Row.StayLoggedIn" = "保持登录状态";
+
+/* Security: Security section */
+"SecurityPage.Section.Security" = "安全性";
+
+/* Config: scene title */
+"SettingsPage.Title" = "设置";
+
+/* Security: Authorization reason for turning biometry on */
+"SecurityPage.UseBiometry" = "使用生物测量";
+
+/* Shared alert 'Cancel' button. Used anywhere */
+"Shared.Cancel" = "取消";
+
+/* Shared alert notification: message about item copied to pasteboard. */
+"Shared.CopiedToPasteboard" = "已复制到粘贴板";
+
+/* Shared alert 'Copy' button. Used anywhere. Used for copy-paste info. */
+"Shared.CopyToPasteboard" = "复制到粘贴板";
+
+/* Shared alert 'Chat With' button. Used to chat with recipient */
+"Shared.ChatWith" = "与聊天";
+
+/* Shared alert 'Send ADM To' button. Used to send ADM to recipient */
+"Shared.SendAdmTo" = "将ADM发送到";
+
+/* Shared alert Done message. Used anywhere */
+"Shared.Done" = "完成";
+
+/* Shared alert 'Error' title. Used anywhere */
+"Shared.Error" = "错误";
+
+/* Shared alert 'Generate QR' button. Used to generate QR codes with addresses and passphrases. Used with sharing and saving, anywhere. */
+"Shared.GenerateQRCode" = "生成二维码";
+
+/* Shared alert notification: title for no internet connection message. */
+"Shared.NoInternet.Title" = "无互联网连接";
+
+/* Shared alert notification: body message for no internet connection. */
+"Shared.NoInternet.Body" = "请检查您的互联网连接，然后重试";
+
+/* Shared alert notification: body message for no internet connection. */
+"Shared.Transfer.NoInternet.Body" = "您的网络连接似乎没有激活。请检查您的连接并重试。";
+
+/* Shared alert 'Ok' button. Used anywhere */
+"Shared.Ok" = "好的";
+
+/* Shared alert 'Save' button. Used anywhere */
+"Shared.Save" = "保存";
+
+/* Shared alert 'Save to Photos'. Used with saving images to photolibrary */
+"Shared.SaveToPhotolibrary" = "保存到照片";
+
+/* Shared alert 'Settings' button. Used to go to system Settings app, on application settings page. Should be same as Settings application title. */
+"Shared.Settings" = "设置";
+
+/* Shared alert 'Share' button. Used anywhere for presenting standart iOS 'Share' menu. */
+"Shared.Share" = "共享";
+
+/* Shared alert 'Retry' button. Used anywhere. */
+"Shared.Retry" = "重试";
+
+/* Shared alert 'Delete' button. Used anywhere. */
+"Shared.Delete" = "删除";
+
+/* ShareQR scene: User had not authorized access to write images to photolibrary */
+"ShareQR.photolibraryNotAuthorized" = "您需要授权ADAMANT才能使用您的照片库";
+
+/* Main tab bar: Account page */
+"Tabs.Account" = "帐户";
+
+/* Main tab bar: Chats page */
+"Tabs.Chats" = "聊天";
+
+/* Main tab bar: Settings page */
+"Tabs.Settings" = "设置";
+
+/* TransactionList: scene title */
+"TransactionListScene.Title" = "事务";
+
+/* TransactionList: To Chat button */
+"TransactionListScene.ToChat" = "聊天";
+
+/* TransactionList: Start Chat button */
+"TransactionListScene.StartChat" = "开始聊天";
+
+/* TransactionList: 'Transactions not found' message. */
+"TransactionListScene.Error.NotFound" = "未找到事务";
+
+/* TransactionList: 'No transactions yet' message. */
+"TransactionListScene.NoTransactionYet" = "还没有事务";
+
+/* TransactionList: 'Transactions not found' localize error message from API. */
+"No transactions found" = "未找到交易";
+
+/* Transaction send: recipient minimum remaining balance requirement */
+"TransactionSend.Minimum.Balance" = "收件人必须至少具有0.05 LSK--发送更多令牌";
+
+/* Transaction status: updating in progress */
+"TransactionStatus.Updating" = "正在更新…";
+
+/* Transaction status: transaction is pending */
+"TransactionStatus.Pending" = "待定";
+
+/* Transaction status: success */
+"TransactionStatus.Success" = "成功";
+
+/* Transaction status: transaction failed */
+"TransactionStatus.Failed" = "失败";
+
+/* Transaction status: inconsistent */
+"TransactionStatus.Inconsistent" = "不一致";
+
+/* Transaction status: inconsistent wrong timestamp */
+"TransactionStatus.Inconsistent.WrongTimestamp" = "消息和Tx有不同的时间戳。这是可能的，但要检查两次";
+
+/* Transaction status: inconsistent reason title */
+"TransactionStatus.Inconsistent.Reason.Title" = "不一致的原因";
+
+/* Transaction details: scene title */
+"TransactionDetailsScene.Title" = "详细信息";
+
+/* Transaction details: amount row. */
+"TransactionDetailsScene.Row.Amount" = "金额";
+
+/* Transaction details: Block id row. */
+"TransactionDetailsScene.Row.Block" = "区块链 区块";
+
+/* Transaction details: Transaction delivery status. */
+"TransactionDetailsScene.Row.Status" = "事务状态";
+
+/* Transaction details: confirmations row. */
+"TransactionDetailsScene.Row.Confirmations" = "确认";
+
+/* Transaction details: date row. */
+"TransactionDetailsScene.Row.Date" = "日期";
+
+/* Transaction details: 'Open transaction in explorer' row. */
+"TransactionDetailsScene.Row.Explorer" = "在资源管理器中打开";
+
+/* Transaction details: fee row. */
+"TransactionDetailsScene.Row.Fee" = "费用";
+
+/* Transaction details: sender row. */
+"TransactionDetailsScene.Row.From" = "来自";
+
+/* Transaction details: fiat value at the time */
+"TransactionDetailsScene.Row.HistoryFiat" = "Txn时的值";
+
+/* Transaction details: fiat value at the time */
+"TransactionDetailsScene.Row.CurrentFiat" = "当前值";
+
+/* Transaction details: Id row. */
+"TransactionDetailsScene.Row.Id" = "同上";
+
+/* Transaction details: recipient row. */
+"TransactionDetailsScene.Row.To" = "至";
+
+/* Export transaction: 'Share transaction summary' button */
+"TransactionDetailsScene.Share.Summary" = "摘要";
+
+/* Export transaction: 'Share transaction URL' button */
+"TransactionDetailsScene.Share.URL" = "网址";
+
+/* "Transaction details: 'Comments' section" */
+"TransactionDetailsScene.Section.Comment" = "评论";
+
+/* "Transaction details: 'Actions' section" */
+"TransactionDetailsScene.Section.Actions" = "行动";
+
+/* Transaction details: 'Requesting Data' progress message. */
+"TransactionDetailsScene.RequestingData" = "正在请求数据…";
+
+/* Transaction details: 'Your address' flag. */
+"TransactionDetailsScene.YourAddress" = "您";
+
+/* TransfersProvider: Transaction not found error. %@ for transaction's ID */
+"TransfersProvider.Error.TransactionNotFoundFormat" = "找不到ID为%@的事务";
+
+/* Transfer: Minimal transaction amount is 0.00001 */
+"TransferScene.Error.MinAmount" = "最低交易金额为0.00001";
+
+/* Transfer: transfer amount placeholder */
+"TransferScene.Amount.Placeholder" = "发送";
+
+/* Transfer: Address not found error */
+"TransferScene.Error.AddressNotFound" = "找不到地址";
+
+/* Transfer: Address validation error */
+"TransferScene.Error.InvalidAddress" = "输入有效地址";
+
+/* Transfer: Amount is hiegher that user's total money notification */
+"TransferScene.Error.notEnoughMoney" = "你没有那个标志";
+
+/* Transfer: Amount is zero, or even negative notification */
+"TransferScene.Error.TooLittleMoney" = "你应该发送更多的标志";
+
+/* Transfer: Not enough fee for send a transaction */
+"TransferScene.Error.TooLittleFee" = "费用不足";
+
+/* Transfer: Fee is higher than usual */
+"TransferScene.Error.FeeIsTooHigh" = "注意：tx费用高于常规费用";
+
+/* Transfer: Alert title: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address */
+"TransferScene.unsafeTransferAlert.title" = "无法验证%@";
+
+/* Transfer: Alert body: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address */
+"TransferScene.unsafeTransferAlert.body" = "找不到帐户，或未启动帐户。请仔细检查收件人地址并确认交易";
+
+/* Transfer: Alert body: Account is not initiated. It's not possible to start a chat, as the Blockchain doesn't store the account's public key to encrypt messages. */
+"TransferScene.unsafeChatAlert.body" = "帐户未启动。由于区块链不存储帐户的公钥来加密消息，因此无法启动聊天。";
+
+/* Transfer: recipient address placeholder */
+"TransferScene.Recipient.Placeholder" = "收件人的";
+
+/* Transfer: amount of adamant to transfer. */
+"TransferScene.Row.Amount" = "金额";
+
+/* Transfer: fiat value of crypto-amout */
+"TransferScene.Row.Fiat" = "价值";
+
+/* Transfer: logged user balance. */
+"TransferScene.Row.Balance" = "余额";
+
+/* Transfer: maximum amount to transfer: available account money substracting transfer fee */
+"TransferScene.Row.MaxToTransfer" = "要传输的最大值";
+
+/* Transfer: recipient address */
+"TransferScene.Row.RecipientAddress" = "地址";
+
+/* Transfer: recipient name */
+"TransferScene.Row.RecipientName" = "名称";
+
+/* Transfer: Send button */
+"TransferScene.Row.Send" = "发送";
+
+/* Transfer: total amount of transaction: money to transfer adding fee */
+"TransferScene.Row.Total" = "总计";
+
+/* Transfer: transfer fee */
+"TransferScene.Row.TransactionFee" = "费用";
+
+/* Transfer: comment for transfer in chat */
+"TransferScene.Row.Comments" = "评论";
+
+/* Transfer: transfer increase fee */
+"TransferScene.Row.IncreaseFee" = "增加费用";
+
+/* Transfer: 'Transfer info' section */
+"TransferScene.Section.TransferInfo" = "传输信息";
+
+/* Transfer: 'Your wallet' section */
+"TransferScene.Section.YourWallet" = "您的钱包";
+
+/* Transfer: 'Recipient info' section */
+"TransferScene.Section.Recipient" = "收件人";
+
+/* Transfer: Confirm transfer alert: Send tokens button */
+"TransferScene.Send" = "发送";
+
+/* Transfer: Confirm transfer alert: 'Can't Undo' message */
+"TransferScene.CantUndo" = "您将无法撤消此操作";
+
+/* Tranfser: Confirm using maximum available for transfer tokens as amount to transfer. */
+"TransferScene.UseMaxToTransfer" = "使用所有可用代币作为转账金额？";
+
+/* Tranfser: Dust error. */
+"TransferScene.Dust.Error" = "灰尘数量--发送更多代币";
+
+/* Transfer: Confirm transfer %1$@ tokens to %2$@ message. Note two variables: at runtime %1$@ will be amount (with ADM suffix), and %2$@ will be recipient address. You can use address before amount with this so called 'position tokens'. */
+"TransferScene.SendConfirmFormat" = "将%1$@发送到%2$@？";
+
+/* Transfer: Processing message */
+"TransferScene.SendingFundsProgress" = "正在发送令牌…";
+
+/* Transfer: Tokens transfered successfully message */
+"TransferScene.TransferSuccessMessage" = "完成！";
+
+/* Wallet Services: Shared error, user do not have enought money. */
+"WalletServices.SharedErrors.notEnoughMoney" = "代币不足";
+
+/* Wallet Services: Shared error, user has not yet initiated a specific wallet. */
+"WalletServices.SharedErrors.WalletNotInitiated" = "收款人的钱包尚未启动";
+
+/* Wallet Services: Shared error, invalid amount format. %@ for amount */
+"WalletServices.SharedErrors.InvalidAmountFormat" = "要发送的金额无效：%@";
+
+/* Wallet Services: Shared error, transaction not found */
+"WalletServices.SharedErrors.TransactionNotFound" = "未找到交易";
+
+/* Wallet Services: Shared error, BTC Taproot doesn't work */
+"WalletServices.SharedErrors.BtcTaproot" = "ADAMANT不支持Taproot比特币地址";
+
+/* Wallet Services: Wait until other transactions approved */
+"WalletServices.SharedErrors.walletFrezzed" = "等待其他交易获得批准";
+
+/* Wallet Services: Transaction unavailable */
+"WalletServices.SharedErrors.transactionUnavailable" = "交易不可用";
+
+/* Wallet Services: Cannot verify transaction */
+"WalletServices.SharedErrors.inconsistentTransaction" = "无法验证交易";
+
+/* Welcome: Skip button */
+"WelcomeScene.Skip" = "跳过";
+
+/* Welcome: Slide 1 Description */
+"WelcomeScene.Description.Slide1" = "欢迎来到ADAMANT，真正的**区块链**信使。";
+
+/* Welcome: Slide 2 Description */
+"WelcomeScene.Description.Slide2" = "ADAMANT是您的消息以及聊天加密货币传输工具的**匿名性**和**安全性**。\n\n[为什么其他消息不安全？](https://medium.com/adamant-im/adamant-security-features-e7cc836ff52c)";
+
+/* Welcome: Slide 3 Description */
+"WelcomeScene.Description.Slide3" = "ADAMANT基础设施不属于任何人，是**去中心化的**。\n\n它由ADM代币支付的消息维护。新帐户可能会收到免费代币用于测试。";
+
+/* Welcome: Slide 4 Description */
+"WelcomeScene.Description.Slide4" = "无需任何要求即可单击**创建帐户**（无需电子邮件/电话/任何内容）并邀请您的朋友。\n\n为了真正的安全起见，请亲自**共享您的ADAMANT地址。";
+
+/* Welcome: Slide 5 Description */
+"WelcomeScene.Description.Slide5" = "项目的源代码[完全开放](https://github.com/Adamant-im/).该应用程序正在开发中，我们不断添加新功能。\n\n如果您是开发人员，请加入我们的团队。";
+
+/* WelcomeScene.Description.BeginButton */
+"WelcomeScene.Description.BeginButton" = "启动安全消息";
+
+/* Welcome: Next screen button */
+"WelcomeScene.Description.ContinueButton" = "继续";
+
+/* Welcome: Skip button */
+"WelcomeScene.Description.SkipButton" = "跳过";
+
+/* Welcome: Description accept */
+"WelcomeScene.Description.Accept" = "我接受";
+
+/* EULA */
+"EULA.Title" = "服务条款";
+"EULA.Accept" = "接受";
+"EULA.Decline" = "拒绝";
+"EULA.Text" = "ADAMANT Messenger基于去中心化的区块链技术，因此：\n\n✓ ADAMANT Messenger不容忍令人反感的内容或辱骂用户\n✓ ADAMANT Messenger最初专注于通信的安全性和用户的隐私。\n✓ ADAMANT Messenger始终显示完全开源的代码，许可证为GPL-3.0。源代码可在GitHub:GitHub.com/stend-im上获得。\n✓ ADAMANT Messenger按\"原样\"提供，不提供任何担保。\n✓ 开发人员只是ADAMANT Messenger的贡献者和用户。\n✓ 开发人员不控制用户的任何操作。\n✓ 开发人员在ADAMANT Messenger中没有权限。\n✓ 开发人员不可能禁用或阻止ADAMANT Messenger中的任何帐户。\n✓ 开发人员不可能获得加密密钥或读取任何ADAMANT Messenger用户的通信或其他信息。\n✓ 如果丢失，开发人员不可能恢复对任何用户帐户的访问。用户有责任保护自己的帐户的安全。\n✓ 开发人员不对用户内容、消息、媒体以及使用ADAMANT Messenger的目标和意图负责。\n✓ 开发者不存储用户之间传输的任何信息（消息、多媒体），也不对其在区块链上/中的存储负责。\n✓ 开发者不可能访问，也不对连接到ADAMANT Messenger或通过ADAMANT信使发送的任何资产（包括但不限于：加密货币）负责。\n✓ ADAMANT Messenger利用元数据作为账户之间通信的事实，在其区块链中公开提供。\n✓ 开发者不与任何第三方或外部服务合作提供任何使用数据。\n✓ ADAMANT信使基础设施（区块链节点）属于其用户，由用户运行。\n✓ 开发人员不可能停用、停止或暂停ADAMANT Messenger。开发人员对ADAMANT Messenger的运行不提供任何保证。\n✓ 开发人员不承担与ADAMANT Messenger相关的可能风险、成本和故障。\n✓ ADAMANT Messenger的用户从此对其使用承担全部责任，包括但不限于：区块链和Messenger内应用的其他技术的合法性，使用匿名消息服务，以及其他管辖法律。\n\n通过使用ADAMANT Messenger，您从此接受这些服务条款。";
+
+/* Reply: Short unknown message error */
+"Reply.ShortUnknownMessageError" = "未知消息";
+
+/* Reply: Long unknown message error */
+"Reply.LongUnknownMessageError" = "我们没有找到此邮件";
+
+/* Reply: Failed message reply error */
+"Reply.failedMessageError" = "无法回复失败的消息";
+
+/* Pending message reply error */
+"Reply.pendingMessageError" = "您无法回复挂起的消息。请等待确认（估计1-2秒）";
+
+/* Include partner name */
+"PartnerQR.includePartnerName" = "包括联系人姓名";
+
+/* Include partner url */
+"PartnerQR.includePartnerURL" = "包括Web应用程序链接";

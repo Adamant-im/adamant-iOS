@@ -52,7 +52,15 @@ final class LskServiceApiService: WalletApiService {
         ) -> Void
     ) async -> WalletServiceResult<Output> {
         await requestClient { client, completion in
-            body(.init(client: client, version: .v2), completion)
+            body(.init(client: client, version: .v3), completion)
+        }
+    }
+    
+    func requestServiceApi<Output>(
+        _ request: @Sendable @escaping (LiskKit.Service) async throws -> Output
+    ) async -> WalletServiceResult<Output> {
+        await requestClient { client in
+            try await request(LiskKit.Service(client: client, version: .v3))
         }
     }
 }
@@ -66,6 +74,14 @@ private extension LskServiceApiService {
     ) async -> WalletServiceResult<Output> {
         await api.request { core, node in
             await core.request(node: node, body: body)
+        }
+    }
+    
+    func requestClient<Output>(
+        _ body: @Sendable @escaping (APIClient) async throws -> Output
+    ) async -> WalletServiceResult<Output> {
+        await api.request { core, node in
+            await core.request(node: node, body)
         }
     }
 }

@@ -285,6 +285,11 @@ protocol WalletService: AnyObject {
     func loadTransactions(offset: Int, limit: Int) async throws -> Int
     func getLocalTransactionHistory() -> [TransactionDetails]
     func updateStatus(for id: String, status: TransactionStatus?)
+    func isExist(address: String) async throws -> Bool
+}
+
+extension WalletService {
+    func isExist(address: String) async throws -> Bool { return true }
 }
 
 protocol SwinjectDependentService: WalletService {
@@ -314,6 +319,7 @@ protocol WalletServiceWithSend: WalletService {
     var isSupportIncreaseFee: Bool { get }
     var isIncreaseFeeEnabled: Bool { get }
     var defaultIncreaseFee: Decimal { get }
+    var additionalFee : Decimal { get }
 }
 
 extension WalletServiceWithSend {
@@ -341,6 +347,9 @@ extension WalletServiceWithSend {
     var defaultIncreaseFee: Decimal {
         return 1.5
     }
+    var additionalFee: Decimal {
+        .zero
+    }
 }
 
 protocol WalletServiceSimpleSend: WalletServiceWithSend {
@@ -355,7 +364,12 @@ protocol WalletServiceSimpleSend: WalletServiceWithSend {
 protocol WalletServiceTwoStepSend: WalletServiceWithSend {
     associatedtype T: RawTransaction
     
-    func createTransaction(recipient: String, amount: Decimal) async throws -> T
+    func createTransaction(
+        recipient: String,
+        amount: Decimal,
+        fee: Decimal
+    ) async throws -> T
+    
     func sendTransaction(_ transaction: T) async throws
 }
 

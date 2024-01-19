@@ -55,7 +55,7 @@ extension APIError: Decodable {
     }
 }
 
-extension APIError {
+public extension APIError {
     public static let noNetwork = Self.unexpected(code: nil)
     
     /// Describes an unexpected error

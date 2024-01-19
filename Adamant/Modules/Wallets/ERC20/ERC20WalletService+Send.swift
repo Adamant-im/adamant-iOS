@@ -16,7 +16,11 @@ extension ERC20WalletService: WalletServiceTwoStepSend {
     typealias T = CodableTransaction
     
     // MARK: Create & Send
-    func createTransaction(recipient: String, amount: Decimal) async throws -> CodableTransaction {
+    func createTransaction(
+        recipient: String,
+        amount: Decimal,
+        fee: Decimal
+    ) async throws -> CodableTransaction {
         guard let ethWallet = ethWallet else {
             throw WalletServiceError.notLogged
         }

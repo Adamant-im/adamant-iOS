@@ -49,7 +49,8 @@ final class AdmTransactionDetailsViewController: TransactionDetailsViewControlle
         screensFactory: ScreensFactory,
         dialogService: DialogService,
         currencyInfo: CurrencyInfoService,
-        addressBookService: AddressBookService
+        addressBookService: AddressBookService,
+        languageService: LanguageStorageProtocol
     ) {
         self.transfersProvider = transfersProvider
         self.screensFactory = screensFactory
@@ -59,7 +60,8 @@ final class AdmTransactionDetailsViewController: TransactionDetailsViewControlle
             currencyInfo: currencyInfo,
             addressBookService: addressBookService,
             accountService:  accountService,
-            walletService: nil
+            walletService: nil,
+            languageService: languageService
         )
     }
     

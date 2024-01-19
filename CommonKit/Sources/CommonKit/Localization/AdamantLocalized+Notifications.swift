@@ -9,10 +9,12 @@ public extension String.adamant {
     enum notifications {
         // MARK: - Content extensions error
         
-        public static let error = String.localized(
-            "content.error",
-            comment: "Notification content: error working with transaction"
-        )
+        public static var error: String {
+            String.localized(
+                "content.error",
+                comment: "Notification content: error working with transaction"
+            )
+        }
         
         public static func error(with message: String) -> String {
             String.localizedStringWithFormat(
@@ -26,10 +28,12 @@ public extension String.adamant {
         
         // MARK: - Transfer preview
         
-        public static let newTransfer = String.localized(
-            "transfer.notificationTitle",
-            comment: "New transfer notification title"
-        )
+        public static var newTransfer: String {
+            String.localized(
+                "transfer.notificationTitle",
+                comment: "New transfer notification title"
+            )
+        }
         
         public static func yourTransferBody(with amount: String) -> String {
             String.localizedStringWithFormat(
@@ -41,9 +45,11 @@ public extension String.adamant {
             )
         }
         
-        public static let yourAddress = String.localized(
-            "transfer.notificationBody.yourAddress",
-            comment: "Transfer notification: 'Your address'"
-        )
+        public static var yourAddress: String {
+            String.localized(
+                "transfer.notificationBody.yourAddress",
+                comment: "Transfer notification: 'Your address'"
+            )
+        }
     }
 }

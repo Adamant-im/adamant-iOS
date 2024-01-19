@@ -8,7 +8,16 @@ extension AdmWalletService {
     static let currencySymbol = "ADM"
     static let currencyExponent: Int = -8
     static let qqPrefix: String = "adm"
-    
+    static let healthCheckParameters = CoinHealthCheckParameters(
+        normalUpdateInterval: 300,
+        crucialUpdateInterval: 30,
+        onScreenUpdateInterval: 10,
+        threshold: 10,
+        normalServiceUpdateInterval: 300,
+        crucialServiceUpdateInterval: 30,
+        onScreenServiceUpdateInterval: 10
+    )
+        
     static var newPendingInterval: Int {
         4000
     }
@@ -46,7 +55,7 @@ extension AdmWalletService {
     }
     
     var minNodeVersion: String? {
-        "0.7.0"
+        "0.8.0"
     }
     
     static let explorerAddress = "https://explorer.adamant.im/tx/"
@@ -62,14 +71,15 @@ Node(url: URL(string: "https://debate.adamant.im")!, altUrl: URL(string: "http:/
 Node(url: URL(string: "http://78.47.205.206:36666")!),
 Node(url: URL(string: "http://5.161.53.74:36666")!),
 Node(url: URL(string: "http://184.94.215.92:45555")!),
-Node(url: URL(string: "https://node1.adamant.business")!),
+Node(url: URL(string: "https://node1.adamant.business")!, altUrl: URL(string: "http://194.233.75.29:45555")),
 Node(url: URL(string: "https://node2.blockchain2fa.io")!),
+Node(url: URL(string: "https://sunshine.adamant.im")!),
         ]
     }
     
     static var serviceNodes: [Node] {
         [
-            
+            Node(url: URL(string: "https://info.adamant.im")!),
         ]
     }
 }

@@ -26,7 +26,11 @@ extension LskWalletService: WalletServiceTwoStepSend {
     typealias T = TransactionEntity
     
     // MARK: Create & Send
-    func createTransaction(recipient: String, amount: Decimal) async throws -> TransactionEntity {
+    func createTransaction(
+        recipient: String,
+        amount: Decimal,
+        fee: Decimal
+    ) async throws -> TransactionEntity {
         // MARK: 1. Prepare
         guard let wallet = lskWallet, let binaryAddress = LiskKit.Crypto.getBinaryAddressFromBase32(recipient) else {
             throw WalletServiceError.notLogged
@@ -36,23 +40,21 @@ extension LskWalletService: WalletServiceTwoStepSend {
         
         // MARK: 2. Create local transaction
         
-        let transaction = TransactionEntity(
+        let transaction = TransactionEntity().createTx(
             amount: amount,
-            fee: self.transactionFee,
-            nonce: wallet.nounce,
+            fee: fee,
+            nonce: wallet.nonce,
             senderPublicKey: wallet.keyPair.publicKeyString,
-            recipientAddressBase32: recipient,
             recipientAddressBinary: binaryAddress
         )
         
-        var signedTransaction = transaction.signed(with: keys, for: self.netHash)
-        signedTransaction.id = signedTransaction.bytes().sha256().hexString()
+        let signedTransaction = transaction.sign(with: keys, for: Constants.chainID)
         return signedTransaction
     }
     
     func sendTransaction(_ transaction: TransactionEntity) async throws {
-        _ = try await lskNodeApiService.requestTransactionsApi { api, completion in
-            api.submit(signedTransaction: transaction.requestOptions, completionHandler: completion)
+        _ = try await lskNodeApiService.requestTransactionsApi { api in
+            try await api.submit(transaction: transaction)
         }.get()
     }
 }

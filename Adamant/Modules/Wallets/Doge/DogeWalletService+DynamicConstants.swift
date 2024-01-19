@@ -8,7 +8,16 @@ extension DogeWalletService {
     static let currencySymbol = "DOGE"
     static let currencyExponent: Int = -8
     static let qqPrefix: String = "doge"
-    
+    static let healthCheckParameters = CoinHealthCheckParameters(
+        normalUpdateInterval: 390,
+        crucialUpdateInterval: 30,
+        onScreenUpdateInterval: 10,
+        threshold: 3,
+        normalServiceUpdateInterval: 390,
+        crucialServiceUpdateInterval: 30,
+        onScreenServiceUpdateInterval: 10
+    )
+        
     static var newPendingInterval: Int {
         5000
     }
@@ -61,7 +70,7 @@ extension DogeWalletService {
     
     static var nodes: [Node] {
         [
-            Node(url: URL(string: "https://dogenode1.adamant.im")!),
+            Node(url: URL(string: "https://dogenode1.adamant.im")!, altUrl: URL(string: "http://5.9.99.62:44099")),
 Node(url: URL(string: "https://dogenode2.adamant.im")!, altUrl: URL(string: "http://176.9.32.126:44098")),
         ]
     }

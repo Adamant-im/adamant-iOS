@@ -98,8 +98,14 @@ final class NodesStorage: NodesStorageProtocol {
     init(securedStore: SecuredStore) {
         self.securedStore = securedStore
         
+        var nodes = securedStore.get(StoreKey.NodesStorage.nodes) ?? Self.defaultItems
+        let nodesToAdd = Self.defaultItems.filter { defaultNode in
+            !nodes.contains { $0.node.host == defaultNode.node.host }
+        }
+        nodes.append(contentsOf: nodesToAdd)
+        
         _items = .init(wrappedValue: .init(
-            wrappedValue: securedStore.get(StoreKey.NodesStorage.nodes) ?? Self.defaultItems
+            wrappedValue: nodes
         ))
         
         subscription = items.removeDuplicates().sink { [weak self] in
