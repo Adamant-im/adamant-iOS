@@ -168,7 +168,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             
             walletService?.core.updateStatus(
                 for: id,
-                status: transaction?.transactionStatus
+                status: transactionStatus
             )
         }
     }
