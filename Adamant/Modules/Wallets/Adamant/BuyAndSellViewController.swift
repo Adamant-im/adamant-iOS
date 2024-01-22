@@ -43,9 +43,9 @@ final class BuyAndSellViewController: FormViewController {
             case .azbit: return .asset(named: "azbit_logo")
             case .stakecube: return .asset(named: "row_stakecube")
             case .coinstore: return .asset(named: "row_coinstore")
-            case .fameEX: return .asset(named: "row_coinstore")
-            case .xeggeX: return .asset(named: "row_coinstore")
-            case .nonKYC: return .asset(named: "row_coinstore")
+            case .fameEX: return .asset(named: "row_fameex")
+            case .xeggeX: return .asset(named: "row_xeggex")
+            case .nonKYC: return .asset(named: "row_nonkyc")
             }
         }
         
