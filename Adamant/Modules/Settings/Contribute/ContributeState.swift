@@ -32,25 +32,25 @@ struct ContributeState {
             crashButtonTitle: "Simulate crash",
             linkRows: [
                 .init(
-                    image: .asset(named: "row_nodes") ?? .init(),
+                    image: .asset(named: "row_contribute_node") ?? .init(),
                     name: .localized("Contribute.Section.RunNodes", comment: .empty),
                     description: .localized("Contribute.Section.RunNodesDescription", comment: .empty),
                     link: URL(string: "https://news.adamant.im/how-to-run-your-adamant-node-on-ubuntu-990e391e8fcc")
                 ),
                 .init(
-                    image: .asset(named: "row_vote-delegates") ?? .init(),
+                    image: .asset(named: "row_delegate") ?? .init(),
                     name: .localized("Contribute.Section.NetworkDelegate", comment: .empty),
                     description: .localized("Contribute.Section.NetworkDelegateDescription", comment: .empty),
                     link: URL(string: "https://news.adamant.im/how-to-become-an-adamant-delegate-745f01d032f")
                 ),
                 .init(
-                    image: .asset(named: "row_github") ?? .init(),
+                    image: .asset(named: "row_contribute_to_code") ?? .init(),
                     name: .localized("Contribute.Section.CodeContribute", comment: .empty),
                     description: .localized("Contribute.Section.CodeContributeDescription", comment: .empty),
                     link: URL(string: "https://github.com/Adamant-im")
                 ),
                 .init(
-                    image: .asset(named: "row_buy-coins") ?? .init(),
+                    image: .asset(named: "row_donate") ?? .init(),
                     name: .localized("Contribute.Section.Donate", comment: .empty),
                     description: .localized("Contribute.Section.DonateDescription", comment: .empty),
                     link: URL(string: "https://adamant.im/donate")
