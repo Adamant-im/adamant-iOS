@@ -124,7 +124,7 @@ private extension Node {
     }
     
     var heightString: String? {
-        height.map { "❐ \(getFormattedHeight(from: $0))" }
+        height.map { " ❐ \(getFormattedHeight(from: $0))" }
     }
     
     var numberFormatter: NumberFormatter {
