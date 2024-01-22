@@ -86,17 +86,17 @@ private extension DogeWalletService {
             realRecipientAddress = recipientAddress
         }
         
-        guard realSenderAddress == readableTransaction.senderAddress else {
+        guard readableTransaction.senderAddress.caseInsensitiveCompare(realSenderAddress) == .orderedSame else {
             return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
         }
         
-        guard realRecipientAddress == readableTransaction.recipientAddress else {
+        guard readableTransaction.recipientAddress.caseInsensitiveCompare(realRecipientAddress) == .orderedSame else {
             return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
         }
         
         var result: TransactionStatus = .inconsistent(.wrongAmount)
         if transaction.isOutgoing {
-            guard readableTransaction.senderAddress == walletAddress else {
+            guard readableTransaction.senderAddress.caseInsensitiveCompare(walletAddress) == .orderedSame else {
                 return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
             }
             
@@ -113,7 +113,7 @@ private extension DogeWalletService {
                 result = .success
             }
         } else {
-            guard readableTransaction.recipientAddress == walletAddress else {
+            guard readableTransaction.recipientAddress.caseInsensitiveCompare(walletAddress) == .orderedSame else {
                 return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
             }
             

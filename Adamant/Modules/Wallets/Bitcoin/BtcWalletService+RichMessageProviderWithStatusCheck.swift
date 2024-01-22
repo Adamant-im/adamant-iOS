@@ -69,20 +69,20 @@ private extension BtcWalletService {
             realRecipientAddress = recipientAddress
         }
         
-        guard realSenderAddress == btcTransaction.senderAddress else {
+        guard btcTransaction.senderAddress.caseInsensitiveCompare(realSenderAddress) == .orderedSame else {
             return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
         }
         
-        guard realRecipientAddress == btcTransaction.recipientAddress else {
+        guard btcTransaction.recipientAddress.caseInsensitiveCompare(realRecipientAddress) == .orderedSame else {
             return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
         }
         
         if transaction.isOutgoing {
-             guard btcTransaction.senderAddress == btcWallet?.address else {
+             guard  btcWallet?.address.caseInsensitiveCompare(btcTransaction.senderAddress) == .orderedSame else {
                  return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
              }
          } else {
-             guard btcTransaction.recipientAddress == btcWallet?.address else {
+             guard btcWallet?.address.caseInsensitiveCompare(btcTransaction.recipientAddress) == .orderedSame else {
                  return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
              }
          }

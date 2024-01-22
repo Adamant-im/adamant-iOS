@@ -106,7 +106,7 @@ private extension EthWalletService {
         
         // MARK: Check addresses
         
-        var realSenderAddress = eth.sender?.address
+        var realSenderAddress = eth.sender?.address ?? ""
         var realRecipientAddress = eth.to.address
         
         if transaction is RichMessageTransaction {
@@ -124,20 +124,20 @@ private extension EthWalletService {
             realRecipientAddress = recipientAddress
         }
         
-        guard realSenderAddress == eth.sender?.address else {
+        guard eth.sender?.address.caseInsensitiveCompare(realSenderAddress) == .orderedSame else {
             return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
         }
         
-        guard realRecipientAddress == eth.to.address else {
+        guard eth.to.address.caseInsensitiveCompare(realRecipientAddress) == .orderedSame else {
             return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
         }
         
         if transaction.isOutgoing {
-            guard eth.sender?.address == ethWallet?.address else {
+            guard ethWallet?.address.caseInsensitiveCompare(eth.sender?.address ?? "") == .orderedSame else {
                 return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
             }
         } else {
-            guard eth.to.address == ethWallet?.address else {
+            guard ethWallet?.address.caseInsensitiveCompare(eth.to.address) == .orderedSame else {
                 return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
             }
         }
