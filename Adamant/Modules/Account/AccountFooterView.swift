@@ -11,7 +11,7 @@ import UIKit
 import SnapKit
 
 final class AccountFooterView: UIView {
-    let footerImageview = UIImageView(image: UIImage.asset(named: "avatar_bots"))
+    private let footerImageview = UIImageView(image: UIImage.asset(named: "avatar_bots"))
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -26,7 +26,7 @@ final class AccountFooterView: UIView {
         addSubview(footerImageview)
         
         footerImageview.snp.makeConstraints { make in
-            make.height.width.equalTo(50)
+            make.size.equalTo(50)
             make.top.centerX.equalToSuperview()
         }
     }
