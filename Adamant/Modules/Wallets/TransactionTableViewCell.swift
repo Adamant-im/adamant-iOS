@@ -46,12 +46,68 @@ final class TransactionTableViewCell: UITableViewCell {
     
     // MARK: - IBOutlets
     
-    @IBOutlet weak var topImageView: UIImageView!
-    @IBOutlet weak var bottomImageView: UIImageView!
-    @IBOutlet weak var accountLabel: UILabel!
-    @IBOutlet weak var addressLabel: UILabel!
-    @IBOutlet weak var ammountLabel: UILabel!
-    @IBOutlet weak var dateLabel: UILabel!
+    let topImageView = UIImageView(image: UIImage(named: "transfer-in_top"))
+    let bottomImageView = UIImageView(image: UIImage(named: "transfer-in_bot"))
+    
+    lazy var accountLabel: UILabel = {
+        let text = UILabel()
+        text.font = .systemFont(ofSize: 17)
+        text.translatesAutoresizingMaskIntoConstraints = false
+        text.widthAnchor.constraint(greaterThanOrEqualToConstant: 50).isActive = true
+        return text
+    }()
+    
+    lazy var addressLabel: UILabel = {
+        let text = UILabel()
+        let font = UIFont.preferredFont(forTextStyle: .footnote)
+        text.font = font.withSize(17)
+        text.textColor = .lightGray
+        return text
+    }()
+    
+    lazy var contactInfoView: UIView = {
+        let view = UIView()
+        view.addSubview(accountLabel)
+        view.addSubview(addressLabel)
+        
+        accountLabel.snp.makeConstraints { make in
+            make.leading.centerY.equalToSuperview()
+            make.trailing.equalTo(addressLabel.snp.leading).offset(-5)
+        }
+        
+        addressLabel.snp.makeConstraints { make in
+            make.trailing.centerY.equalToSuperview()
+            make.width.greaterThanOrEqualTo(80)
+        }
+        
+        view.snp.makeConstraints { make in
+            make.height.equalTo(30)
+        }
+        return view
+    }()
+
+    lazy var ammountLabel: UILabel = {
+        let text = UILabel()
+        return text
+    }()
+    
+    lazy var dateLabel: UILabel = {
+        let text = UILabel()
+        return text
+    }()
+    
+    lazy var informationStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.alignment = .leading
+        stackView.spacing = 3
+        
+        stackView.addArrangedSubview(contactInfoView)
+        stackView.addArrangedSubview(ammountLabel)
+        stackView.addArrangedSubview(dateLabel)
+        
+        return stackView
+    }()
     
     // MARK: - Properties
     
@@ -73,8 +129,42 @@ final class TransactionTableViewCell: UITableViewCell {
     
     // MARK: - Initializers
     
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
+        
+        setupView()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func awakeFromNib() {
         transactionType = .income
+    }
+    
+    private func setupView() {
+        addSubview(informationStackView)
+        addSubview(bottomImageView)
+        addSubview(topImageView)
+        
+        bottomImageView.snp.makeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.leading.equalToSuperview().offset(16)
+            make.size.equalTo(37)
+        }
+        
+        topImageView.snp.makeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.leading.equalToSuperview().offset(16)
+            make.size.equalTo(37)
+        }
+        
+        informationStackView.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(8)
+            make.leading.equalToSuperview().offset(70)
+            make.trailing.equalToSuperview().offset(-30)
+        }
     }
     
     func updateUI() {
@@ -126,11 +216,17 @@ final class TransactionTableViewCell: UITableViewCell {
             if addressLabel.isHidden {
                 addressLabel.isHidden = false
             }
+            addressLabel.snp.updateConstraints { make in
+                make.width.greaterThanOrEqualTo(80)
+            }
         } else {
             accountLabel.text = partnerId
             
             if !addressLabel.isHidden {
                 addressLabel.isHidden = true
+            }
+            addressLabel.snp.updateConstraints { make in
+                make.width.greaterThanOrEqualTo(0)
             }
         }
         

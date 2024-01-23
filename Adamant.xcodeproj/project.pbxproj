@@ -576,7 +576,6 @@
 		E9E7CDC02003AF6D00DFC4DB /* AdamantCellFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDBF2003AF6D00DFC4DB /* AdamantCellFactory.swift */; };
 		E9E7CDC22003F5A400DFC4DB /* TransactionsListViewControllerBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDC12003F5A400DFC4DB /* TransactionsListViewControllerBase.swift */; };
 		E9E7CDC72003F6D200DFC4DB /* TransactionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDC52003F6D200DFC4DB /* TransactionTableViewCell.swift */; };
-		E9E7CDC82003F6D200DFC4DB /* TransactionTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9E7CDC62003F6D200DFC4DB /* TransactionTableViewCell.xib */; };
 		E9EC342120052ABB00C0E546 /* TransferViewControllerBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9EC342020052ABB00C0E546 /* TransferViewControllerBase.swift */; };
 		E9EC344720066D4A00C0E546 /* AddressValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9EC344620066D4A00C0E546 /* AddressValidationTests.swift */; };
 		E9FAE5DA203DBFEF008D3A6B /* Comparable+clamped.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FAE5D9203DBFEF008D3A6B /* Comparable+clamped.swift */; };
@@ -1184,7 +1183,6 @@
 		E9E7CDBF2003AF6D00DFC4DB /* AdamantCellFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdamantCellFactory.swift; sourceTree = "<group>"; };
 		E9E7CDC12003F5A400DFC4DB /* TransactionsListViewControllerBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsListViewControllerBase.swift; sourceTree = "<group>"; };
 		E9E7CDC52003F6D200DFC4DB /* TransactionTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionTableViewCell.swift; sourceTree = "<group>"; };
-		E9E7CDC62003F6D200DFC4DB /* TransactionTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TransactionTableViewCell.xib; sourceTree = "<group>"; };
 		E9EC342020052ABB00C0E546 /* TransferViewControllerBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferViewControllerBase.swift; sourceTree = "<group>"; };
 		E9EC344420066D4A00C0E546 /* AdamantTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AdamantTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9EC344620066D4A00C0E546 /* AddressValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressValidationTests.swift; sourceTree = "<group>"; };
@@ -2177,7 +2175,6 @@
 				E94E7B0B205D5E4A0042B639 /* TransactionsListViewControllerBase.xib */,
 				64FA53D020E24941006783C9 /* TransactionDetailsViewControllerBase.swift */,
 				E9E7CDC52003F6D200DFC4DB /* TransactionTableViewCell.swift */,
-				E9E7CDC62003F6D200DFC4DB /* TransactionTableViewCell.xib */,
 				E9484B77227C617D008E10F0 /* BalanceTableViewCell.swift */,
 				E9484B78227C617E008E10F0 /* BalanceTableViewCell.xib */,
 			);
@@ -2786,7 +2783,6 @@
 				93E1232F2A6DF8EF004DF33B /* InfoPlist.strings in Resources */,
 				E90A4945204C6204009F6A65 /* PassphraseCell.xib in Resources */,
 				E941CCDF20E7B70200C96220 /* WalletCollectionViewCell.xib in Resources */,
-				E9E7CDC82003F6D200DFC4DB /* TransactionTableViewCell.xib in Resources */,
 				93496BB32A6CAED100DD062F /* Exo+2_500_normal.ttf in Resources */,
 				E926E034213EC454005E536B /* FullscreenAlertView.xib in Resources */,
 				E90EA5C321BA8BF400A2CE25 /* DelegateDetailsViewController.xib in Resources */,
