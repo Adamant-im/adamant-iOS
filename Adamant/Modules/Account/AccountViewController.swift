@@ -267,9 +267,9 @@ final class AccountViewController: FormViewController {
         
         tableView.refreshControl = self.refreshControl
         
-        if let footer = UINib(nibName: "AccountFooter", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
-            tableView.tableFooterView = footer
-        }
+        let footerView = AccountFooterView(frame: CGRect(x: .zero, y: .zero, width: self.view.frame.width, height: 100))
+        tableView.tableFooterView = footerView
+        
         
         // MARK: Wallet pages
         setupWalletsVC()
@@ -771,7 +771,6 @@ final class AccountViewController: FormViewController {
         
         if UIScreen.main.traitCollection.userInterfaceIdiom == .pad, !initiated {
             layoutTableHeaderView()
-            layoutTableFooterView()
             if !initiated {
                 initiated = true
             }
@@ -779,7 +778,7 @@ final class AccountViewController: FormViewController {
         
         pagingViewController?.indicatorColor = UIColor.adamant.primary
     }
-    
+
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
@@ -991,31 +990,6 @@ final class AccountViewController: FormViewController {
         view.frame = frame
 
         self.tableView.tableHeaderView = view
-    }
-    
-    func layoutTableFooterView() {
-        guard let view = tableView.tableFooterView else { return }
-        view.translatesAutoresizingMaskIntoConstraints = false
-
-        let width = view.bounds.size.width
-        let temporaryWidthConstraints = NSLayoutConstraint.constraints(withVisualFormat: "[footerView(width)]", options: NSLayoutConstraint.FormatOptions(rawValue: UInt(0)), metrics: ["width": width], views: ["footerView": view])
-
-        view.addConstraints(temporaryWidthConstraints)
-
-        view.setNeedsLayout()
-        view.layoutIfNeeded()
-
-        let size = view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
-        let height = size.height
-        var frame = view.frame
-
-        frame.size.height = height
-        view.frame = frame
-
-        self.tableView.tableFooterView = view
-
-        view.removeConstraints(temporaryWidthConstraints)
-        view.translatesAutoresizingMaskIntoConstraints = true
     }
     
     private func deselectWalletViewControllers() {

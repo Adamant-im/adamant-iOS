@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		269E13522B594B2D008D1CA7 /* AccountFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269E13512B594B2D008D1CA7 /* AccountFooterView.swift */; };
 		3A20D93B2AE7F316005475A6 /* AdamantTransactionDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A20D93A2AE7F316005475A6 /* AdamantTransactionDetails.swift */; };
 		3A2F55F92AC6F308000A3F26 /* CoinTransaction+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A2F55F72AC6F308000A3F26 /* CoinTransaction+CoreDataClass.swift */; };
 		3A2F55FA2AC6F308000A3F26 /* CoinTransaction+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A2F55F82AC6F308000A3F26 /* CoinTransaction+CoreDataProperties.swift */; };
@@ -645,6 +646,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		269E13512B594B2D008D1CA7 /* AccountFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountFooterView.swift; sourceTree = "<group>"; };
 		33975C0D891698AA7E74EBCC /* Pods_Adamant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Adamant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		36AB8CE9537B3B873972548B /* Pods_AdmCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AdmCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3A20D93A2AE7F316005475A6 /* AdamantTransactionDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantTransactionDetails.swift; sourceTree = "<group>"; };
@@ -2441,6 +2443,7 @@
 				E983AE2820E65F3200497E1A /* AccountViewController.swift */,
 				E908473A219707200095825D /* AccountViewController+StayIn.swift */,
 				E983AE2020E655C500497E1A /* AccountHeaderView.swift */,
+				269E13512B594B2D008D1CA7 /* AccountFooterView.swift */,
 				E941CCDA20E786D700C96220 /* AccountHeader.xib */,
 				E983AE2C20E6720D00497E1A /* AccountFooter.xib */,
 				E941CCDC20E7B70200C96220 /* WalletCollectionViewCell.swift */,
@@ -3162,6 +3165,7 @@
 				644793C32166314A00FC4CF5 /* OnboardPage.swift in Sources */,
 				9345769528FD0C34004E6C7A /* UIViewController+email.swift in Sources */,
 				64E1C831222E9617006C4DA7 /* DogeWalletService.swift in Sources */,
+				269E13522B594B2D008D1CA7 /* AccountFooterView.swift in Sources */,
 				E91947B22000246A001362F8 /* AdamantError.swift in Sources */,
 				3A4193912A580C85006A6B22 /* RichTransactionReactService.swift in Sources */,
 				93FC169B2B0197FD0062B507 /* BtcApiService.swift in Sources */,
