@@ -8,7 +8,16 @@ extension LskWalletService {
     static let currencySymbol = "LSK"
     static let currencyExponent: Int = -8
     static let qqPrefix: String = "lisk"
-    
+    static let healthCheckParameters = CoinHealthCheckParameters(
+        normalUpdateInterval: 270,
+        crucialUpdateInterval: 30,
+        onScreenUpdateInterval: 10,
+        threshold: 5,
+        normalServiceUpdateInterval: 330,
+        crucialServiceUpdateInterval: 30,
+        onScreenServiceUpdateInterval: 10
+    )
+        
     static var newPendingInterval: Int {
         3000
     }
