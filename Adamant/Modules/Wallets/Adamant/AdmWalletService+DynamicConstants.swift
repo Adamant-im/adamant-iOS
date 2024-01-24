@@ -8,6 +8,7 @@ extension AdmWalletService {
     static let currencySymbol = "ADM"
     static let currencyExponent: Int = -8
     static let qqPrefix: String = "adm"
+    static let cryptoTransferDecimals: Int = 8
     static let healthCheckParameters = CoinHealthCheckParameters(
         normalUpdateInterval: 300,
         crucialUpdateInterval: 30,

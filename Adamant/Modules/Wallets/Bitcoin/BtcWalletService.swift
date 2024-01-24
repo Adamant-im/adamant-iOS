@@ -101,6 +101,10 @@ final class BtcWalletService: WalletService {
         return increaseFeeService.isIncreaseFeeEnabled(for: tokenUnicID)
     }
     
+    var transferDecimals: Int {
+        Self.cryptoTransferDecimals
+    }
+    
     var wallet: WalletAccount? { return btcWallet }
     
     // MARK: RichMessageProvider properties

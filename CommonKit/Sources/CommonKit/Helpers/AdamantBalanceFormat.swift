@@ -24,6 +24,9 @@ public enum AdamantBalanceFormat {
     /// 2 digits after the decimal point
     case short
     
+    /// N digits after the decimal point
+    case custom(Int)
+    
     // MARK: Formatters
     
     public static func currencyFormatter(for format: AdamantBalanceFormat, currencySymbol symbol: String?) -> NumberFormatter {
@@ -32,7 +35,7 @@ public enum AdamantBalanceFormat {
         formatter.roundingMode = .floor
         formatter.minimumFractionDigits = 0
         
-        let positiveFormat: String
+        var positiveFormat: String
         
         switch format {
         case .full: positiveFormat = "#.########"
@@ -40,6 +43,11 @@ public enum AdamantBalanceFormat {
             formatter.roundingMode = .ceiling
             positiveFormat = "#.####"
         case .short: positiveFormat = "#.##"
+        case .custom(let digits):
+            positiveFormat = "#."
+            for _ in 1...digits  {
+                positiveFormat.append("#")
+            }
         }
         
         if let symbol = symbol {
@@ -62,6 +70,7 @@ public enum AdamantBalanceFormat {
         case .full: return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: nil)
         case .compact: return AdamantBalanceFormat.currencyFormatter(for: .compact, currencySymbol: nil)
         case .short: return AdamantBalanceFormat.currencyFormatter(for: .short, currencySymbol: nil)
+        case .custom(let decimals): return AdamantBalanceFormat.currencyFormatter(for: .custom(decimals), currencySymbol: nil)
         }
     }
     

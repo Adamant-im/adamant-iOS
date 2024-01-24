@@ -79,6 +79,10 @@ final class ERC20WalletService: WalletService {
         return increaseFeeService.isIncreaseFeeEnabled(for: tokenUnicID)
     }
     
+    var transferDecimals: Int {
+        token.transferDecimals
+    }
+    
     private (set) var blockchainSymbol: String = "ETH"
     private (set) var isDynamicFee: Bool = true
     private (set) var transactionFee: Decimal = 0.0

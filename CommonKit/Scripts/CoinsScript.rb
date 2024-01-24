@@ -82,7 +82,7 @@ class Coins
         symbol = json["symbol"]
         decimals = json["decimals"]
         explorerTx = json["explorerTx"]
-        
+        cryptoTransferDecimals = json["cryptoTransferDecimals"]
         nodes = ""
         nodesArray = json["nodes"]["list"]
         if nodesArray != nil
@@ -196,6 +196,7 @@ extension #{symbol.capitalize}WalletService {
     static let currencySymbol = \"#{symbol}\"
     static let currencyExponent: Int = -#{decimals}
     static let qqPrefix: String = \"#{qqPrefix}\"
+    static let cryptoTransferDecimals: Int = #{cryptoTransferDecimals}
     #{health_check_params ?
     health_check_params :
     emptyText

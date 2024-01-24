@@ -43,6 +43,10 @@ final class DashWalletService: WalletService {
         return Self.qqPrefix
     }
     
+    var transferDecimals: Int {
+        Self.cryptoTransferDecimals
+    }
+    
     var wallet: WalletAccount? { return dashWallet }
     
     // MARK: RichMessageProvider properties

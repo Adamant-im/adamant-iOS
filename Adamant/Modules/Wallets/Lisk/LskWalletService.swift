@@ -85,6 +85,10 @@ final class LskWalletService: WalletService {
         0.05
     }
     
+    var transferDecimals: Int {
+        Self.cryptoTransferDecimals
+    }
+    
 	// MARK: - Properties
 	let transferAvailable: Bool = true
     let netHash = Constants.Nethash.main

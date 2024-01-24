@@ -8,6 +8,7 @@ extension DashWalletService {
     static let currencySymbol = "DASH"
     static let currencyExponent: Int = -8
     static let qqPrefix: String = "dash"
+    static let cryptoTransferDecimals: Int = 8
     static let healthCheckParameters = CoinHealthCheckParameters(
         normalUpdateInterval: 210,
         crucialUpdateInterval: 30,

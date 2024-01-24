@@ -778,7 +778,10 @@ class TransferViewControllerBase: FormViewController {
     /// Override this to provide custom balance formatter
     var balanceFormatter: NumberFormatter {
         if let service = service {
-            return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: service.tokenSymbol)
+            return AdamantBalanceFormat.currencyFormatter(
+                for: .custom(service.transferDecimals),
+                currencySymbol: service.tokenSymbol
+            )
         } else {
             return AdamantBalanceFormat.full.defaultFormatter
         }

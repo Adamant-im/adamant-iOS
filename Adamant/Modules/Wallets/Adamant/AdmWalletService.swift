@@ -53,6 +53,10 @@ final class AdmWalletService: NSObject, WalletService {
         return Self.qqPrefix
     }
     
+    var transferDecimals: Int {
+        Self.cryptoTransferDecimals
+    }
+    
 	// MARK: - Dependencies
 	weak var accountService: AccountService?
 	var apiService: ApiService!

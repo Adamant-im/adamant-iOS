@@ -21,6 +21,7 @@ public struct ERC20Token {
     public let defaultGasPriceGwei: Int
     public let defaultGasLimit: Int
     public let warningGasPriceGwei: Int
+    public let transferDecimals: Int
     
     public var logo: UIImage {
         .asset(named: "\(symbol.lowercased())_wallet")
