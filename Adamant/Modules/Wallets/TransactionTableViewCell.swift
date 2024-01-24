@@ -211,6 +211,7 @@ final class TransactionTableViewCell: UITableViewCell {
         if let partnerName = transaction.partnerName {
             accountLabel.text = partnerName
             addressLabel.text = partnerId
+            accountLabel.lineBreakMode = .byTruncatingTail
             addressLabel.lineBreakMode = .byTruncatingMiddle
             
             if addressLabel.isHidden {
@@ -221,6 +222,7 @@ final class TransactionTableViewCell: UITableViewCell {
             }
         } else {
             accountLabel.text = partnerId
+            accountLabel.lineBreakMode = .byTruncatingMiddle
             
             if !addressLabel.isHidden {
                 addressLabel.isHidden = true
