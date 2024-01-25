@@ -34,7 +34,7 @@ extension LskWalletService {
         
         lskTransaction.updateConfirmations(value: lastHeight)
         
-        return .init(
+        return await .init(
             sentDate: lskTransaction.sentDate,
             status: getStatus(
                 lskTransaction: lskTransaction,
@@ -48,7 +48,7 @@ private extension LskWalletService {
     func getStatus(
         lskTransaction: Transactions.TransactionModel,
         transaction: CoinTransaction
-    ) -> TransactionStatus {
+    ) async -> TransactionStatus {
         guard lskTransaction.blockId != nil else { return .registered }
         
         guard let status = lskTransaction.transactionStatus else {
@@ -60,13 +60,40 @@ private extension LskWalletService {
         }
         
         // MARK: Check address
+        
+        var realSenderAddress = lskTransaction.senderAddress
+        var realRecipientAddress = lskTransaction.recipientAddress
+        
+        if transaction is RichMessageTransaction {
+            guard let senderAddress = try? await getWalletAddress(byAdamantAddress: transaction.senderAddress)
+            else {
+                return .inconsistent(.senderCryptoAddressUnavailable(tokenSymbol))
+            }
+            
+            guard let recipientAddress = try? await getWalletAddress(byAdamantAddress: transaction.recipientAddress)
+            else {
+                return .inconsistent(.recipientCryptoAddressUnavailable(tokenSymbol))
+            }
+            
+            realSenderAddress = senderAddress
+            realRecipientAddress = recipientAddress
+        }
+        
+        guard lskTransaction.senderAddress.caseInsensitiveCompare(realSenderAddress) == .orderedSame else {
+            return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
+        }
+        
+        guard lskTransaction.recipientAddress.caseInsensitiveCompare(realRecipientAddress) == .orderedSame else {
+            return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
+        }
+        
         if transaction.isOutgoing {
-            guard lskTransaction.senderAddress == lskWallet?.address else {
-                return .inconsistent(.senderCryptoAddressMismatch)
+            guard lskWallet?.address.caseInsensitiveCompare(lskTransaction.senderAddress) == .orderedSame else {
+                return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
             }
         } else {
-            guard lskTransaction.recipientAddress == lskWallet?.address else {
-                return .inconsistent(.recipientCryptoAddressMismatch)
+            guard lskWallet?.address.caseInsensitiveCompare(lskTransaction.recipientAddress) == .orderedSame else {
+                return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
             }
         }
         

@@ -932,10 +932,16 @@
 "TransactionStatus.Inconsistent.WrongAmount" = "Wrong amount. Be aware of fraud";
 
 /* Transaction status: inconsistent wrong mismatch */
-"TransactionStatus.Inconsistent.SenderCryptoAddressMismatch" = "Sender's address differs. Be aware of fraud";
+"TransactionStatus.Inconsistent.SenderCryptoAddressMismatch" = "The sender's %@ address differs. Be aware of fraud";
 
 /* Transaction status: inconsistent wrong mismatch */
-"TransactionStatus.Inconsistent.RecipientCryptoAddressMismatch" = "Recipient's address differs. Be aware of fraud";
+"TransactionStatus.Inconsistent.RecipientCryptoAddressMismatch" = "The recipient's %@ address differs. Be aware of fraud";
+
+/* Transaction status: inconsistent unable to retrieve */
+"TransactionStatus.Inconsistent.SenderCryptoAddressUnavailable" = "Unable to retrieve the sender's %@ address";
+
+/* Transaction status: inconsistent unable to retrieve */
+"TransactionStatus.Inconsistent.RecipientCryptoAddressUnavailable" = "Unable to retrieve the recipient's %@ address";
 
 /* Transaction status: inconsistent duplicate */
 "TransactionStatus.Inconsistent.Duplicate" = "This transfer appeared in chat earlier. Be aware of fraud";

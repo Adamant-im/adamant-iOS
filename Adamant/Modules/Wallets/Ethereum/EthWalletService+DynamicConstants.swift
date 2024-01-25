@@ -8,7 +8,16 @@ extension EthWalletService {
     static let currencySymbol = "ETH"
     static let currencyExponent: Int = -18
     static let qqPrefix: String = "ethereum"
-    
+    static let healthCheckParameters = CoinHealthCheckParameters(
+        normalUpdateInterval: 300,
+        crucialUpdateInterval: 30,
+        onScreenUpdateInterval: 10,
+        threshold: 5,
+        normalServiceUpdateInterval: 300,
+        crucialServiceUpdateInterval: 30,
+        onScreenServiceUpdateInterval: 10
+    )
+        
     static var newPendingInterval: Int {
         4000
     }

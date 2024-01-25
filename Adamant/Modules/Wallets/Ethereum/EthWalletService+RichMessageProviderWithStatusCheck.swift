@@ -50,7 +50,7 @@ extension EthWalletService {
             }.get()
         }
         
-        return .init(
+        return await .init(
             sentDate: sentDate,
             status: getStatus(details: details, transaction: transaction, receipt: receipt)
         )
@@ -98,25 +98,47 @@ private extension EthWalletService {
         details: Web3Core.TransactionDetails,
         transaction: CoinTransaction,
         receipt: TransactionReceipt
-    ) -> TransactionStatus {
+    ) async -> TransactionStatus {
         let status = receipt.status.asTransactionStatus()
         guard status == .success else { return status }
         
         let eth = details.transaction
         
         // MARK: Check addresses
-        if transaction.isOutgoing {
-            guard let sender = eth.sender?.address,
-                  let id = self.ethWallet?.address,
-                  sender == id
+        
+        var realSenderAddress = eth.sender?.address ?? ""
+        var realRecipientAddress = eth.to.address
+        
+        if transaction is RichMessageTransaction {
+            guard let senderAddress = try? await getWalletAddress(byAdamantAddress: transaction.senderAddress)
             else {
-                return .inconsistent(.senderCryptoAddressMismatch)
+                return .inconsistent(.senderCryptoAddressUnavailable(tokenSymbol))
+            }
+            
+            guard let recipientAddress = try? await getWalletAddress(byAdamantAddress: transaction.recipientAddress)
+            else {
+                return .inconsistent(.recipientCryptoAddressUnavailable(tokenSymbol))
+            }
+            
+            realSenderAddress = senderAddress
+            realRecipientAddress = recipientAddress
+        }
+        
+        guard eth.sender?.address.caseInsensitiveCompare(realSenderAddress) == .orderedSame else {
+            return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
+        }
+        
+        guard eth.to.address.caseInsensitiveCompare(realRecipientAddress) == .orderedSame else {
+            return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
+        }
+        
+        if transaction.isOutgoing {
+            guard ethWallet?.address.caseInsensitiveCompare(eth.sender?.address ?? "") == .orderedSame else {
+                return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
             }
         } else {
-            guard let id = self.ethWallet?.address,
-                  eth.to.address == id
-            else {
-                return .inconsistent(.recipientCryptoAddressMismatch)
+            guard ethWallet?.address.caseInsensitiveCompare(eth.to.address) == .orderedSame else {
+                return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
             }
         }
         

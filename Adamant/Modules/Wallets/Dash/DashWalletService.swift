@@ -117,6 +117,7 @@ final class DashWalletService: WalletCoreProtocol {
     @Atomic private (set) var dashWallet: DashWallet?
     @Atomic private (set) var enabled = true
     @Atomic public var network: Network
+    @Atomic private var cachedWalletAddress: [String: String] = [:]
     
     let defaultDispatchQueue = DispatchQueue(label: "im.adamant.dashWalletService", qos: .userInteractive, attributes: [.concurrent])
     
@@ -417,6 +418,14 @@ extension DashWalletService {
     }
 
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
+        if let address = cachedWalletAddress[address], !address.isEmpty {
+            return address
+        }
+        
+        if let address = cachedWalletAddress[address], !address.isEmpty {
+            return address
+        }
+        
         do {
             let result = try await apiService.get(key: DashWalletService.kvsAddress, sender: address).get()
             
@@ -424,6 +433,7 @@ extension DashWalletService {
                 throw WalletServiceError.walletNotInitiated
             }
             
+            cachedWalletAddress[address] = result
             return result
         } catch _ as ApiServiceError {
             throw WalletServiceError.remoteServiceError(

@@ -113,6 +113,7 @@ final class DogeWalletService: WalletCoreProtocol {
     @Atomic private(set) var dogeWallet: DogeWallet?
     @Atomic private(set) var enabled = true
     @Atomic public var network: Network
+    @Atomic private var cachedWalletAddress: [String: String] = [:]
     
     let defaultDispatchQueue = DispatchQueue(
         label: "im.adamant.dogeWalletService",
@@ -393,12 +394,19 @@ extension DogeWalletService {
     }
     
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
+        if let address = cachedWalletAddress[address], !address.isEmpty {
+            return address
+        }
+        
         do {
             let result = try await apiService.get(key: DogeWalletService.kvsAddress, sender: address).get()
             
             guard let result = result else {
                 throw WalletServiceError.walletNotInitiated
             }
+            
+            cachedWalletAddress[address] = result
+            
             return result
         } catch _ as ApiServiceError {
             throw WalletServiceError.remoteServiceError(
