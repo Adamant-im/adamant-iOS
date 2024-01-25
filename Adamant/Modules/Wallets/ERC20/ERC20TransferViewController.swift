@@ -91,7 +91,7 @@ final class ERC20TransferViewController: TransferViewControllerBase {
                     recipient: recipient,
                     comments: comments,
                     amount: amount,
-                    service: service
+                    service: walletService
                 )
             } catch {
                 dialogService.dismissProgress()
@@ -106,7 +106,7 @@ final class ERC20TransferViewController: TransferViewControllerBase {
         recipient: String,
         comments: String,
         amount: Decimal,
-        service: ERC20WalletService
+        service: WalletService
     ) {
         let transaction = SimpleTransactionDetails(
             txId: hash,
@@ -120,7 +120,7 @@ final class ERC20TransferViewController: TransferViewControllerBase {
             transactionStatus: nil
         )
         
-        service.coinStorage.append(transaction)
+        service.core.coinStorage.append(transaction)
 
 		let detailsVc = screensFactory.makeDetailsVC(service: service)
         detailsVc.transaction = transaction

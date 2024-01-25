@@ -11,7 +11,7 @@ import MessageKit
 import UIKit
 import CommonKit
 
-extension DogeWalletService: RichMessageProvider {
+extension DogeWalletService {
     var newPendingInterval: TimeInterval {
         .init(milliseconds: type(of: self).newPendingInterval)
     }

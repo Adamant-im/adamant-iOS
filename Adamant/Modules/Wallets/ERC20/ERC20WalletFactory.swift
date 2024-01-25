@@ -11,18 +11,20 @@ import CommonKit
 import UIKit
 
 struct ERC20WalletFactory: WalletFactory {
-    typealias Service = ERC20WalletService
+    typealias Service = WalletService
     
+    let typeSymbol: String = ERC20WalletService.richMessageType
     let assembler: Assembler
     
     func makeWalletVC(service: Service, screensFactory: ScreensFactory) -> WalletViewController {
-        let c = ERC20WalletViewController(nibName: "WalletViewControllerBase", bundle: nil)
-        c.dialogService = assembler.resolve(DialogService.self)
-        c.currencyInfoService = assembler.resolve(CurrencyInfoService.self)
-        c.accountService = assembler.resolve(AccountService.self)
-        c.service = service
-        c.screensFactory = screensFactory
-        return c
+        ERC20WalletViewController(
+            dialogService: assembler.resolve(DialogService.self)!,
+            currencyInfoService: assembler.resolve(CurrencyInfoService.self)!,
+            accountService: assembler.resolve(AccountService.self)!,
+            screensFactory: screensFactory,
+            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!,
+            service: service
+        )
     }
     
     func makeTransferListVC(service: Service, screensFactory: ScreensFactory) -> UIViewController {
@@ -30,12 +32,11 @@ struct ERC20WalletFactory: WalletFactory {
         vc.dialogService = assembler.resolve(DialogService.self)
         vc.screensFactory = screensFactory
         vc.walletService = service
-        vc.ercWalletService = service
         return vc
     }
     
     func makeTransferVC(service: Service, screensFactory: ScreensFactory) -> TransferViewControllerBase {
-        let vc = ERC20TransferViewController(
+        ERC20TransferViewController(
             chatsProvider: assembler.resolve(ChatsProvider.self)!,
             accountService: assembler.resolve(AccountService.self)!,
             accountsProvider: assembler.resolve(AccountsProvider.self)!,
@@ -43,11 +44,9 @@ struct ERC20WalletFactory: WalletFactory {
             screensFactory: screensFactory,
             currencyInfoService: assembler.resolve(CurrencyInfoService.self)!,
             increaseFeeService: assembler.resolve(IncreaseFeeService.self)!,
-            vibroService: assembler.resolve(VibroService.self)!
+            vibroService: assembler.resolve(VibroService.self)!, 
+            walletService: service
         )
-        
-        vc.service = service
-        return vc
     }
     
     func makeDetailsVC(service: Service, transaction: RichMessageTransaction) -> UIViewController? {
@@ -125,7 +124,7 @@ private extension ERC20WalletFactory {
     }
     
     func makeTransactionDetailsVC(service: Service) -> ERC20TransactionDetailsViewController {
-        let vc = ERC20TransactionDetailsViewController(
+        ERC20TransactionDetailsViewController(
             dialogService: assembler.resolve(DialogService.self)!,
             currencyInfo: assembler.resolve(CurrencyInfoService.self)!,
             addressBookService: assembler.resolve(AddressBookService.self)!,
@@ -133,8 +132,5 @@ private extension ERC20WalletFactory {
             walletService: service,
             languageService: assembler.resolve(LanguageStorageProtocol.self)!
         )
-        
-        vc.service = service
-        return vc
     }
 }

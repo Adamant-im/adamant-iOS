@@ -91,7 +91,7 @@ final class DogeTransferViewController: TransferViewControllerBase {
                 presentDetailTransactionVC(
                     transaction: transaction,
                     comments: comments,
-                    service: service
+                    service: walletService
                 )
             } catch {
                 dialogService.dismissProgress()
@@ -103,7 +103,7 @@ final class DogeTransferViewController: TransferViewControllerBase {
     private func presentDetailTransactionVC(
         transaction: BitcoinKit.Transaction,
         comments: String,
-        service: DogeWalletService
+        service: WalletService
     ) {
         let detailsVc = screensFactory.makeDetailsVC(service: service)
         detailsVc.transaction = transaction

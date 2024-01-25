@@ -144,16 +144,18 @@ final class AccountViewController: FormViewController {
     
     // MARK: - Dependencies
     
-    let visibleWalletsService: VisibleWalletsService
+    private let visibleWalletsService: VisibleWalletsService
+    private let screensFactory: ScreensFactory
+    private let notificationsService: NotificationsService
+    private let transfersProvider: TransfersProvider
+    private let avatarService: AvatarService
+    private let currencyInfoService: CurrencyInfoService
+    private let languageService: LanguageStorageProtocol
+    private let walletServiceCompose: WalletServiceCompose
+    
     let accountService: AccountService
     let dialogService: DialogService
-    let screensFactory: ScreensFactory
-    let notificationsService: NotificationsService
-    let transfersProvider: TransfersProvider
     let localAuth: LocalAuthentication
-    let avatarService: AvatarService
-    let currencyInfoService: CurrencyInfoService
-    let languageService: LanguageStorageProtocol
     
     // MARK: - Properties
     
@@ -205,7 +207,8 @@ final class AccountViewController: FormViewController {
         localAuth: LocalAuthentication,
         avatarService: AvatarService,
         currencyInfoService: CurrencyInfoService,
-        languageService: LanguageStorageProtocol
+        languageService: LanguageStorageProtocol,
+        walletServiceCompose: WalletServiceCompose
     ) {
         self.visibleWalletsService = visibleWalletsService
         self.accountService = accountService
@@ -217,6 +220,7 @@ final class AccountViewController: FormViewController {
         self.avatarService = avatarService
         self.currencyInfoService = currencyInfoService
         self.languageService = languageService
+        self.walletServiceCompose = walletServiceCompose
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -300,8 +304,13 @@ final class AccountViewController: FormViewController {
             self?.pagingViewController.reloadData()
         }
         
-        for walletService in accountService.wallets {
-            NotificationCenter.default.addObserver(forName: walletService.walletUpdatedNotification, object: nil, queue: OperationQueue.main, using: callback)
+        for walletService in walletServiceCompose.getWallets() {
+            NotificationCenter.default.addObserver(
+                forName: walletService.core.walletUpdatedNotification,
+                object: nil,
+                queue: OperationQueue.main,
+                using: callback
+            )
         }
         
         // MARK: Rows&Sections
@@ -668,6 +677,7 @@ final class AccountViewController: FormViewController {
             case .touchID: $0.cell.imageView?.image = .asset(named: "row_touchid.png")
             case .faceID: $0.cell.imageView?.image = .asset(named: "row_faceid.png")
             }
+            
             $0.hidden = Condition.function([], { [weak self] _ -> Bool in
                 guard let showBiometry = self?.showBiometryOptions else {
                     return true
@@ -882,7 +892,7 @@ final class AccountViewController: FormViewController {
         }
         
         for vc in walletViewControllers {
-            guard let service = vc.service else { return }
+            guard let service = vc.service?.core else { return }
             let notification = service.walletUpdatedNotification
             let callback: ((Notification) -> Void) = { [weak self] _ in
                 guard let self = self else { return }
@@ -935,7 +945,7 @@ final class AccountViewController: FormViewController {
     
     private func setupWalletsVC() {
         walletViewControllers.removeAll()
-        let availableServices: [WalletService] = visibleWalletsService.sorted(includeInvisible: false)
+        let availableServices = visibleWalletsService.sorted(includeInvisible: false)
         availableServices.forEach { walletService in
             walletViewControllers.append(screensFactory.makeWalletVC(service: walletService))
         }
@@ -1094,7 +1104,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
     }
 
     func pagingViewController(_: PagingViewController, pagingItemAt index: Int) -> PagingItem {
-        guard let service = walletViewControllers[index].service else {
+        guard let service = walletViewControllers[index].service?.core else {
             return WalletPagingItem(
                 index: index,
                 currencySymbol: "",

@@ -17,7 +17,7 @@ import Web3Core
 import Combine
 import CommonKit
 
-final class LskWalletService: WalletService {
+final class LskWalletService: WalletCoreProtocol {
     var wallet: WalletAccount? { return lskWallet }
     
     // MARK: - Notifications
@@ -90,6 +90,7 @@ final class LskWalletService: WalletService {
     let netHash = Constants.Nethash.main
     
     @Atomic private(set) var lskWallet: LskWallet?
+    @Atomic private var cachedWalletAddress: [String: String] = [:]
     
     let defaultDispatchQueue = DispatchQueue(
         label: "im.adamant.lskWalletService",
@@ -317,7 +318,7 @@ final class LskWalletService: WalletService {
 }
 
 // MARK: - WalletInitiatedWithPassphrase
-extension LskWalletService: InitiatedWithPassphraseService {
+extension LskWalletService {
     func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
         guard let adamant = accountService.account else {
             throw WalletServiceError.notLogged
@@ -518,12 +519,19 @@ extension LskWalletService {
     }
     
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
+        if let address = cachedWalletAddress[address], !address.isEmpty {
+            return address
+        }
+        
         do {
             let result = try await apiService.get(key: LskWalletService.kvsAddress, sender: address).get()
             
             guard let result = result else {
                 throw WalletServiceError.walletNotInitiated
             }
+            
+            cachedWalletAddress[address] = result
+            
             return result
         } catch _ as ApiServiceError {
             throw WalletServiceError.remoteServiceError(

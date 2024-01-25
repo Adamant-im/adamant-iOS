@@ -19,6 +19,7 @@ final class AdamantAccountService: AccountService {
     private let adamantCore: AdamantCore
     private let dialogService: DialogService
     private let securedStore: SecuredStore
+    private let walletServiceCompose: WalletServiceCompose
 
     weak var notificationsService: NotificationsService?
     weak var currencyInfoService: CurrencyInfoService?
@@ -36,31 +37,18 @@ final class AdamantAccountService: AccountService {
     @Atomic private var previousAppState: UIApplication.State?
     @Atomic private var subscriptions = Set<AnyCancellable>()
     
-    // MARK: Wallets
-    @Atomic var wallets: [WalletService] = {
-        var wallets: [WalletService] = [
-            AdmWalletService(),
-            BtcWalletService(),
-            EthWalletService(),
-            LskWalletService(),
-            DogeWalletService(),
-            DashWalletService()
-        ]
-        let erc20WalletServices = ERC20Token.supportedTokens.map { ERC20WalletService(token: $0) }
-        wallets.append(contentsOf: erc20WalletServices)
-        return wallets
-    }()
-    
     init(
         apiService: ApiService,
         adamantCore: AdamantCore,
         dialogService: DialogService,
-        securedStore: SecuredStore
+        securedStore: SecuredStore,
+        walletServiceCompose: WalletServiceCompose
     ) {
         self.apiService = apiService
         self.adamantCore = adamantCore
         self.dialogService = dialogService
         self.securedStore = securedStore
+        self.walletServiceCompose = walletServiceCompose
         
         NotificationCenter.default.addObserver(forName: .AdamantAccountService.forceUpdateBalance, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.update()
@@ -222,6 +210,8 @@ extension AdamantAccountService {
             return
         }
         
+        let wallets = walletServiceCompose.getWallets().map { $0.core }
+        
         Task {
             let result = await apiService.getAccount(byPublicKey: publicKey)
             
@@ -330,8 +320,8 @@ extension AdamantAccountService {
                          message: String.adamant.accountService.updateAlertMessageV12)
             }
             
-            for case let wallet as InitiatedWithPassphraseService in wallets {
-                wallet.setInitiationFailed(reason: String.adamant.accountService.reloginToInitiateWallets)
+            for wallet in walletServiceCompose.getWallets() {
+                wallet.core.setInitiationFailed(reason: .adamant.accountService.reloginToInitiateWallets)
             }
             
             return .success(account: account, alert: alert)
@@ -402,9 +392,11 @@ extension AdamantAccountService {
         }
         
         return await withTaskGroup(of: WalletAccount?.self) { group in
-            for case let wallet as InitiatedWithPassphraseService in wallets {
+            for wallet in walletServiceCompose.getWallets() {
                 group.addTask {
-                    let result = try? await wallet.initWallet(withPassphrase: passphrase)
+                    let result = try? await wallet.core.initWallet(
+                        withPassphrase: passphrase
+                    )
                     return result
                 }
             }

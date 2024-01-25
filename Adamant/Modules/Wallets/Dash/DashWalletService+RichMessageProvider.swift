@@ -11,7 +11,7 @@ import MessageKit
 import UIKit
 import CommonKit
 
-extension DashWalletService: RichMessageProvider {
+extension DashWalletService {
     var newPendingInterval: TimeInterval {
         .init(milliseconds: type(of: self).newPendingInterval)
     }

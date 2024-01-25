@@ -74,7 +74,8 @@ final class AdmWalletViewController: WalletViewControllerBase {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        if let balance = service?.wallet?.balance {
+        
+        if let balance = service?.core.wallet?.balance {
             hideFreeTokensRow = balance > 0
         } else {
             hideFreeTokensRow = true
@@ -128,7 +129,7 @@ final class AdmWalletViewController: WalletViewControllerBase {
             row.title = Rows.freeTokens.localized
         }.onCellSelection { [weak self] (_, row) in
             row.deselect()
-            if let address = self?.service?.wallet?.address {
+            if let address = self?.service?.core.wallet?.address {
                 let urlRaw = String.adamant.wallets.getFreeTokensUrl(for: address)
                 guard let url = URL(string: urlRaw) else {
                     self?.dialogService.showError(
@@ -151,10 +152,12 @@ final class AdmWalletViewController: WalletViewControllerBase {
         
          // Notifications
         if let service = service {
-            NotificationCenter.default.addObserver(forName: service.walletUpdatedNotification,
-                                                   object: service,
-                                                   queue: OperationQueue.main,
-                                                   using: { [weak self] _ in self?.updateRows() })
+            NotificationCenter.default.addObserver(
+                forName: service.core.walletUpdatedNotification,
+                object: service.core,
+                queue: OperationQueue.main,
+                using: { [weak self] _ in self?.updateRows() }
+            )
         }
         
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
@@ -179,7 +182,7 @@ final class AdmWalletViewController: WalletViewControllerBase {
             $0.title = BaseRows.address.localized
             $0.cell.selectionStyle = .gray
             $0.cell.backgroundColor = UIColor.adamant.cellColor
-            if let wallet = service?.wallet {
+            if let wallet = service?.core.wallet {
                 $0.value = wallet.address
             }
         }.cellUpdate { (cell, row) in
@@ -195,7 +198,7 @@ final class AdmWalletViewController: WalletViewControllerBase {
                 tableView.deselectRow(at: indexPath, animated: true)
             }
 
-            if let address = self?.service?.wallet?.address {
+            if let address = self?.service?.core.wallet?.address {
                 let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
                 self?.dialogService.presentShareAlertFor(stringForPasteboard: address,
                                                    stringForShare: encodedAddress,
@@ -218,7 +221,9 @@ final class AdmWalletViewController: WalletViewControllerBase {
     }
     
     func updateRows() {
-        guard let admService = service as? AdmWalletService, let wallet = admService.wallet as? AdmWallet else {
+        guard let admService = service?.core as? AdmWalletService,
+              let wallet = admService.wallet as? AdmWallet
+        else {
             return
         }
         
