@@ -144,16 +144,18 @@ final class AccountViewController: FormViewController {
     
     // MARK: - Dependencies
     
-    let visibleWalletsService: VisibleWalletsService
+    private let visibleWalletsService: VisibleWalletsService
+    private let screensFactory: ScreensFactory
+    private let notificationsService: NotificationsService
+    private let transfersProvider: TransfersProvider
+    private let avatarService: AvatarService
+    private let currencyInfoService: CurrencyInfoService
+    private let languageService: LanguageStorageProtocol
+    private let walletServiceCompose: WalletServiceCompose
+    
     let accountService: AccountService
     let dialogService: DialogService
-    let screensFactory: ScreensFactory
-    let notificationsService: NotificationsService
-    let transfersProvider: TransfersProvider
     let localAuth: LocalAuthentication
-    let avatarService: AvatarService
-    let currencyInfoService: CurrencyInfoService
-    let languageService: LanguageStorageProtocol
     
     // MARK: - Properties
     
@@ -205,7 +207,8 @@ final class AccountViewController: FormViewController {
         localAuth: LocalAuthentication,
         avatarService: AvatarService,
         currencyInfoService: CurrencyInfoService,
-        languageService: LanguageStorageProtocol
+        languageService: LanguageStorageProtocol,
+        walletServiceCompose: WalletServiceCompose
     ) {
         self.visibleWalletsService = visibleWalletsService
         self.accountService = accountService
@@ -217,6 +220,7 @@ final class AccountViewController: FormViewController {
         self.avatarService = avatarService
         self.currencyInfoService = currencyInfoService
         self.languageService = languageService
+        self.walletServiceCompose = walletServiceCompose
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -267,9 +271,9 @@ final class AccountViewController: FormViewController {
         
         tableView.refreshControl = self.refreshControl
         
-        if let footer = UINib(nibName: "AccountFooter", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
-            tableView.tableFooterView = footer
-        }
+        let footerView = AccountFooterView(frame: CGRect(x: .zero, y: .zero, width: self.view.frame.width, height: 100))
+        tableView.tableFooterView = footerView
+        
         
         // MARK: Wallet pages
         setupWalletsVC()
@@ -300,8 +304,13 @@ final class AccountViewController: FormViewController {
             self?.pagingViewController.reloadData()
         }
         
-        for walletService in accountService.wallets {
-            NotificationCenter.default.addObserver(forName: walletService.walletUpdatedNotification, object: nil, queue: OperationQueue.main, using: callback)
+        for walletService in walletServiceCompose.getWallets() {
+            NotificationCenter.default.addObserver(
+                forName: walletService.core.walletUpdatedNotification,
+                object: nil,
+                queue: OperationQueue.main,
+                using: callback
+            )
         }
         
         // MARK: Rows&Sections
@@ -668,6 +677,7 @@ final class AccountViewController: FormViewController {
             case .touchID: $0.cell.imageView?.image = .asset(named: "row_touchid.png")
             case .faceID: $0.cell.imageView?.image = .asset(named: "row_faceid.png")
             }
+            
             $0.hidden = Condition.function([], { [weak self] _ -> Bool in
                 guard let showBiometry = self?.showBiometryOptions else {
                     return true
@@ -771,7 +781,6 @@ final class AccountViewController: FormViewController {
         
         if UIScreen.main.traitCollection.userInterfaceIdiom == .pad, !initiated {
             layoutTableHeaderView()
-            layoutTableFooterView()
             if !initiated {
                 initiated = true
             }
@@ -779,7 +788,7 @@ final class AccountViewController: FormViewController {
         
         pagingViewController?.indicatorColor = UIColor.adamant.primary
     }
-    
+
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
@@ -883,7 +892,7 @@ final class AccountViewController: FormViewController {
         }
         
         for vc in walletViewControllers {
-            guard let service = vc.service else { return }
+            guard let service = vc.service?.core else { return }
             let notification = service.walletUpdatedNotification
             let callback: ((Notification) -> Void) = { [weak self] _ in
                 guard let self = self else { return }
@@ -936,7 +945,7 @@ final class AccountViewController: FormViewController {
     
     private func setupWalletsVC() {
         walletViewControllers.removeAll()
-        let availableServices: [WalletService] = visibleWalletsService.sorted(includeInvisible: false)
+        let availableServices = visibleWalletsService.sorted(includeInvisible: false)
         availableServices.forEach { walletService in
             walletViewControllers.append(screensFactory.makeWalletVC(service: walletService))
         }
@@ -991,31 +1000,6 @@ final class AccountViewController: FormViewController {
         view.frame = frame
 
         self.tableView.tableHeaderView = view
-    }
-    
-    func layoutTableFooterView() {
-        guard let view = tableView.tableFooterView else { return }
-        view.translatesAutoresizingMaskIntoConstraints = false
-
-        let width = view.bounds.size.width
-        let temporaryWidthConstraints = NSLayoutConstraint.constraints(withVisualFormat: "[footerView(width)]", options: NSLayoutConstraint.FormatOptions(rawValue: UInt(0)), metrics: ["width": width], views: ["footerView": view])
-
-        view.addConstraints(temporaryWidthConstraints)
-
-        view.setNeedsLayout()
-        view.layoutIfNeeded()
-
-        let size = view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
-        let height = size.height
-        var frame = view.frame
-
-        frame.size.height = height
-        view.frame = frame
-
-        self.tableView.tableFooterView = view
-
-        view.removeConstraints(temporaryWidthConstraints)
-        view.translatesAutoresizingMaskIntoConstraints = true
     }
     
     private func deselectWalletViewControllers() {
@@ -1120,7 +1104,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
     }
 
     func pagingViewController(_: PagingViewController, pagingItemAt index: Int) -> PagingItem {
-        guard let service = walletViewControllers[index].service else {
+        guard let service = walletViewControllers[index].service?.core else {
             return WalletPagingItem(
                 index: index,
                 currencySymbol: "",

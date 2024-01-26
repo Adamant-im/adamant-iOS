@@ -13,17 +13,17 @@ import CommonKit
 final class DogeTransactionsViewController: TransactionsListViewControllerBase {
     
     // MARK: - Dependencies
-    var dogeWalletService: DogeWalletService!
+    
     var screensFactory: ScreensFactory!
     
     // MARK: - UITableView
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let address = walletService.wallet?.address,
+        guard let address = walletService.core.wallet?.address,
               let transaction = transactions[safe: indexPath.row]
         else { return }
         
-        let controller = screensFactory.makeDetailsVC(service: dogeWalletService)
+        let controller = screensFactory.makeDetailsVC(service: walletService)
         controller.transaction = transaction
         
         if transaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {

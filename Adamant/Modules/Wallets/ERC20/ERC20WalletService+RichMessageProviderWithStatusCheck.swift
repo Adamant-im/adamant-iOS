@@ -11,7 +11,7 @@ import web3swift
 import struct BigInt.BigUInt
 import CommonKit
 
-extension ERC20WalletService: RichMessageProviderWithStatusCheck {
+extension ERC20WalletService {
     func statusInfoFor(transaction: CoinTransaction) async -> TransactionStatusInfo {
         let hash: String?
         
@@ -22,7 +22,7 @@ extension ERC20WalletService: RichMessageProviderWithStatusCheck {
         }
         
         guard let hash = hash else {
-            return .init(sentDate: nil, status: .inconsistent)
+            return .init(sentDate: nil, status: .inconsistent(.wrongTxHash))
         }
         
         let erc20Transaction: EthTransaction
@@ -33,7 +33,7 @@ extension ERC20WalletService: RichMessageProviderWithStatusCheck {
             return .init(error: error)
         }
         
-        return .init(
+        return await .init(
             sentDate: erc20Transaction.date,
             status: getStatus(
                 erc20Transaction: erc20Transaction,
@@ -47,37 +47,58 @@ private extension ERC20WalletService {
     func getStatus(
         erc20Transaction: EthTransaction,
         transaction: CoinTransaction
-    ) -> TransactionStatus {
+    ) async -> TransactionStatus {
         let status = erc20Transaction.receiptStatus.asTransactionStatus()
         guard status == .success else { return status }
         
         // MARK: Check addresses
-        if transaction.isOutgoing {
-            guard
-                let id = ethWallet?.address,
-                erc20Transaction.senderAddress == id
+        
+        var realSenderAddress = erc20Transaction.senderAddress
+        var realRecipientAddress = erc20Transaction.recipientAddress
+        
+        if transaction is RichMessageTransaction {
+            guard let senderAddress = try? await getWalletAddress(byAdamantAddress: transaction.senderAddress)
             else {
-                return .inconsistent
+                return .inconsistent(.senderCryptoAddressUnavailable(tokenSymbol))
+            }
+            
+            guard let recipientAddress = try? await getWalletAddress(byAdamantAddress: transaction.recipientAddress)
+            else {
+                return .inconsistent(.recipientCryptoAddressUnavailable(tokenSymbol))
+            }
+            
+            realSenderAddress = senderAddress
+            realRecipientAddress = recipientAddress
+        }
+        
+        guard erc20Transaction.senderAddress.caseInsensitiveCompare(realSenderAddress) == .orderedSame else {
+            return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
+        }
+        
+        guard erc20Transaction.recipientAddress.caseInsensitiveCompare(realRecipientAddress) == .orderedSame else {
+            return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
+        }
+        
+        if transaction.isOutgoing {
+            guard ethWallet?.address.caseInsensitiveCompare(erc20Transaction.senderAddress) == .orderedSame else {
+                return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
             }
         } else {
-            guard
-                let id = ethWallet?.address,
-                erc20Transaction.to == id
-            else {
-                return .inconsistent
+            guard ethWallet?.address.caseInsensitiveCompare(erc20Transaction.recipientAddress) == .orderedSame else {
+                return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
             }
         }
         
         // MARK: Compare amounts
         guard let reportedValue = reportedValue(for: transaction) else {
-            return .inconsistent
+            return .inconsistent(.wrongAmount)
         }
         
         let min = reportedValue - reportedValue*0.005
         let max = reportedValue + reportedValue*0.005
         
         guard (min...max).contains(erc20Transaction.value ?? 0) else {
-            return .inconsistent
+            return .inconsistent(.wrongAmount)
         }
         
         return .success

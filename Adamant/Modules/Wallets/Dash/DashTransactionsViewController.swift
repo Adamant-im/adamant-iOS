@@ -12,13 +12,13 @@ import ProcedureKit
 final class DashTransactionsViewController: TransactionsListViewControllerBase {
     
     // MARK: - Dependencies
+    
     var screensFactory: ScreensFactory!
-    var dashWalletService: DashWalletService!
     
     // MARK: - UITableView
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let address = walletService.wallet?.address,
+        guard let address = walletService.core.wallet?.address,
               let transaction = transactions[safe: indexPath.row]
         else { return }
 

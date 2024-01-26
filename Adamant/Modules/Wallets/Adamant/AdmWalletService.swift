@@ -14,8 +14,7 @@ import MessageKit
 import Combine
 import CommonKit
 
-final class AdmWalletService: NSObject, WalletService {
-    
+final class AdmWalletService: NSObject, WalletCoreProtocol {
     // MARK: - Constants
     let addressRegex = try! NSRegularExpression(pattern: "^U([0-9]{6,20})$")
     
@@ -193,6 +192,17 @@ final class AdmWalletService: NSObject, WalletService {
     func getLocalTransactionHistory() -> [TransactionDetails] { [] }
     
     func updateStatus(for id: String, status: TransactionStatus?) { }
+    
+    func statusInfoFor(transaction: CoinTransaction) async -> TransactionStatusInfo {
+        .init(sentDate: nil, status: .notInitiated)
+    }
+    
+    func initWallet(withPassphrase: String) async throws -> WalletAccount {
+        throw InternalAPIError.unknownError
+    }
+    
+    func setInitiationFailed(reason: String) { }
+    
 }
 
 // MARK: - NSFetchedResultsControllerDelegate

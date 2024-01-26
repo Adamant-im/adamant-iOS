@@ -113,7 +113,7 @@ final class LskTransferViewController: TransferViewControllerBase {
                 presentDetailTransactionVC(
                     transactionId: transaction.id,
                     transaction: transaction,
-                    service: service,
+                    service: walletService,
                     comments: comments
                 )
             } catch {
@@ -126,7 +126,7 @@ final class LskTransferViewController: TransferViewControllerBase {
     private func presentDetailTransactionVC(
         transactionId: String,
         transaction: TransactionEntity,
-        service: LskWalletService,
+        service: WalletService,
         comments: String
     ) {
         let detailsVc = screensFactory.makeDetailsVC(service: service)

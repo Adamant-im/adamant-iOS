@@ -925,6 +925,30 @@
 /* Transaction status: inconsistent wrong timestamp */
 "TransactionStatus.Inconsistent.WrongTimestamp" = "Message and Tx has different timestamps. It is possible, but check twice";
 
+/* Transaction status: inconsistent wrong unknown */
+"TransactionStatus.Inconsistent.Unknown" = "Failed to check Tx. Somethings went wrong";
+
+/* Transaction status: inconsistent wrong hash */
+"TransactionStatus.Inconsistent.WrongTxHash" = "Wrong Tx hash. Be aware of fraud";
+
+/* Transaction status: inconsistent wrong amount */
+"TransactionStatus.Inconsistent.WrongAmount" = "Wrong amount. Be aware of fraud";
+
+/* Transaction status: inconsistent wrong mismatch */
+"TransactionStatus.Inconsistent.SenderCryptoAddressMismatch" = "The sender's %@ address differs. Be aware of fraud";
+
+/* Transaction status: inconsistent wrong mismatch */
+"TransactionStatus.Inconsistent.RecipientCryptoAddressMismatch" = "The recipient's %@ address differs. Be aware of fraud";
+
+/* Transaction status: inconsistent unable to retrieve */
+"TransactionStatus.Inconsistent.SenderCryptoAddressUnavailable" = "Unable to retrieve the sender's %@ address";
+
+/* Transaction status: inconsistent unable to retrieve */
+"TransactionStatus.Inconsistent.RecipientCryptoAddressUnavailable" = "Unable to retrieve the recipient's %@ address";
+
+/* Transaction status: inconsistent duplicate */
+"TransactionStatus.Inconsistent.Duplicate" = "This transfer appeared in chat earlier. Be aware of fraud";
+
 /* Transaction status: inconsistent reason title */
 "TransactionStatus.Inconsistent.Reason.Title" = "Inconsistent reason";
 
