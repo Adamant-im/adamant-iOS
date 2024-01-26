@@ -109,9 +109,10 @@ private extension BlockchainHealthCheckWrapper {
         
         workingNodes.forEach { node in
             var status: Node.ConnectionStatus?
-            let actualNodeVersion = Node.stringToDouble(node.version) ?? .zero
+            let actualNodeVersion = Node.stringToDouble(node.version)
             
-            if actualNodeVersion < nodeGroup.minNodeVersion {
+            if let actualNodeVersion = actualNodeVersion,
+               actualNodeVersion < nodeGroup.minNodeVersion {
                 status = Node.ConnectionStatus.notAllowed(.outdatedApiVersion)
             } else {
                 status = node.height.map { height in
