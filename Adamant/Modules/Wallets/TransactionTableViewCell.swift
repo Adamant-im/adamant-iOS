@@ -46,18 +46,18 @@ final class TransactionTableViewCell: UITableViewCell {
     
     // MARK: - IBOutlets
     
-    let topImageView = UIImageView(image: UIImage(named: "transfer-in_top"))
-    let bottomImageView = UIImageView(image: UIImage(named: "transfer-in_bot"))
+    private let topImageView = UIImageView(image: UIImage(named: "transfer-in_top"))
+    private let bottomImageView = UIImageView(image: UIImage(named: "transfer-in_bot"))
+    private lazy var amountLabel = UILabel()
+    private lazy var dateLabel = UILabel()
     
-    lazy var accountLabel: UILabel = {
+    private lazy var accountLabel: UILabel = {
         let text = UILabel()
         text.font = .systemFont(ofSize: 17)
-        text.translatesAutoresizingMaskIntoConstraints = false
-        text.widthAnchor.constraint(greaterThanOrEqualToConstant: 50).isActive = true
         return text
     }()
     
-    lazy var addressLabel: UILabel = {
+    private lazy var addressLabel: UILabel = {
         let text = UILabel()
         let font = UIFont.preferredFont(forTextStyle: .footnote)
         text.font = font.withSize(17)
@@ -65,7 +65,7 @@ final class TransactionTableViewCell: UITableViewCell {
         return text
     }()
     
-    lazy var contactInfoView: UIView = {
+    private lazy var contactInfoView: UIView = {
         let view = UIView()
         view.addSubview(accountLabel)
         view.addSubview(addressLabel)
@@ -81,29 +81,19 @@ final class TransactionTableViewCell: UITableViewCell {
         }
         
         view.snp.makeConstraints { make in
-            make.height.equalTo(30)
+            make.height.equalTo(26)
         }
         return view
     }()
-
-    lazy var ammountLabel: UILabel = {
-        let text = UILabel()
-        return text
-    }()
     
-    lazy var dateLabel: UILabel = {
-        let text = UILabel()
-        return text
-    }()
-    
-    lazy var informationStackView: UIStackView = {
+    private lazy var informationStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.alignment = .leading
         stackView.spacing = 3
         
         stackView.addArrangedSubview(contactInfoView)
-        stackView.addArrangedSubview(ammountLabel)
+        stackView.addArrangedSubview(amountLabel)
         stackView.addArrangedSubview(dateLabel)
         
         return stackView
@@ -131,12 +121,12 @@ final class TransactionTableViewCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
-        
         setupView()
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        super.init(coder: coder)
+        setupView()
     }
     
     override func awakeFromNib() {
@@ -187,7 +177,7 @@ final class TransactionTableViewCell: UITableViewCell {
         
         backgroundColor = .clear
         accountLabel.tintColor = UIColor.adamant.primary
-        ammountLabel.tintColor = UIColor.adamant.primary
+        amountLabel.tintColor = UIColor.adamant.primary
         
         dateLabel.textColor = transaction.transactionStatus?.color ?? .adamant.secondary
         
@@ -233,7 +223,7 @@ final class TransactionTableViewCell: UITableViewCell {
         }
         
         let amount = transaction.amountValue ?? .zero
-        ammountLabel.text = AdamantBalanceFormat.full.format(amount, withCurrencySymbol: currencySymbol)
+        amountLabel.text = AdamantBalanceFormat.full.format(amount, withCurrencySymbol: currencySymbol)
     }
 }
 
