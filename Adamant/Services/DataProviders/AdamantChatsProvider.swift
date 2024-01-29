@@ -15,16 +15,17 @@ import CommonKit
 actor AdamantChatsProvider: ChatsProvider {
     
     // MARK: Dependencies
-    let accountService: AccountService
-    let apiService: ApiService
-    let socketService: SocketService
-    @MainActor let stack: CoreDataStack
-    let adamantCore: AdamantCore
-    let accountsProvider: AccountsProvider
-    let transactionService: ChatTransactionService
-    let securedStore: SecuredStore
     
-    private let richProviders: [String: RichMessageProviderWithStatusCheck]
+    private let socketService: SocketService
+    private let adamantCore: AdamantCore
+    private let transactionService: ChatTransactionService
+    private let walletServiceCompose: WalletServiceCompose
+    
+    let accountService: AccountService
+    let accountsProvider: AccountsProvider
+    let securedStore: SecuredStore
+    let apiService: ApiService
+    let stack: CoreDataStack
     
     // MARK: Properties
     @Published private var stateNotifier: State = .empty
@@ -78,7 +79,8 @@ actor AdamantChatsProvider: ChatsProvider {
         adamantCore: AdamantCore,
         accountsProvider: AccountsProvider,
         transactionService: ChatTransactionService,
-        securedStore: SecuredStore
+        securedStore: SecuredStore,
+        walletServiceCompose: WalletServiceCompose
     ) {
         self.accountService = accountService
         self.apiService = apiService
@@ -88,12 +90,7 @@ actor AdamantChatsProvider: ChatsProvider {
         self.accountsProvider = accountsProvider
         self.transactionService = transactionService
         self.securedStore = securedStore
-        
-        var richProviders = [String: RichMessageProviderWithStatusCheck]()
-        for case let provider as RichMessageProviderWithStatusCheck in accountService.wallets {
-            richProviders[provider.dynamicRichMessageType] = provider
-        }
-        self.richProviders = richProviders
+        self.walletServiceCompose = walletServiceCompose
         
         Task {
             await setupSecuredStore()
@@ -938,8 +935,11 @@ extension AdamantChatsProvider {
         transaction.additionalType = additionalType
         transaction.richContentSerialized = richContentSerialized
         transaction.blockchainType = richType
+        transaction.richTransferHash = id
         
-        transaction.transactionStatus = richProviders[richType] != nil ? .notInitiated : nil
+        transaction.transactionStatus = walletServiceCompose.getWallet(by: richType) != nil
+        ? .notInitiated
+        : nil
         
         if
             let c = chatroom,

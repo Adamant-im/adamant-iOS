@@ -13,7 +13,7 @@ import CommonKit
 final class BtcTransactionsViewController: TransactionsListViewControllerBase {
     
     // MARK: - Dependencies
-    var btcWalletService: BtcWalletService!
+    
     var screensFactory: ScreensFactory!
     var addressBook: AddressBookService!
     
@@ -21,11 +21,11 @@ final class BtcTransactionsViewController: TransactionsListViewControllerBase {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        guard let address = btcWalletService.wallet?.address,
+        guard let address = walletService.core.wallet?.address,
               let transaction = transactions[safe: indexPath.row]
         else { return }
         
-        let controller = screensFactory.makeDetailsVC(service: btcWalletService)
+        let controller = screensFactory.makeDetailsVC(service: walletService)
         
         controller.transaction = transaction
 

@@ -922,6 +922,27 @@
 /* Transaction status: inconsistent wrong timestamp */
 "TransactionStatus.Inconsistent.WrongTimestamp" = "消息和Tx有不同的时间戳。这是可能的，但要检查两次";
 
+/* Transaction status: inconsistent wrong unknown */
+"TransactionStatus.Inconsistent.Unknown" = "未检查 Tx。出错了";
+
+/* Transaction status: inconsistent wrong hash */
+"TransactionStatus.Inconsistent.WrongTxHash" = "错误的 Tx 哈希值。谨防欺诈";
+
+/* Transaction status: inconsistent wrong amount */
+"TransactionStatus.Inconsistent.WrongAmount" = "金额错误 谨防欺诈";
+
+/* Transaction status: inconsistent wrong mismatch */
+"TransactionStatus.Inconsistent.SenderCryptoAddressMismatch" = "发件人的 %@ 地址不同。谨防欺诈";
+
+/* Transaction status: inconsistent wrong mismatch */
+"TransactionStatus.Inconsistent.RecipientCryptoAddressMismatch" = "收件人的 %@ 地址不同。谨防欺诈";
+
+/* Transaction status: inconsistent unable to retrieve */
+"TransactionStatus.Inconsistent.SenderCryptoAddressUnavailable" = "无法检索发件人的 %@ 地址";
+
+/* Transaction status: inconsistent unable to retrieve */
+"TransactionStatus.Inconsistent.RecipientCryptoAddressUnavailable" = "无法检索收件人的 %@ 地址";
+
 /* Transaction status: inconsistent reason title */
 "TransactionStatus.Inconsistent.Reason.Title" = "不一致的原因";
 

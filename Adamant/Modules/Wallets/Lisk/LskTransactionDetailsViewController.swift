@@ -12,7 +12,9 @@ import CommonKit
 final class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies
     
-    weak var service: LskWalletService?
+    weak var service: LskWalletService? {
+        walletService?.core as? LskWalletService
+    }
     
     // MARK: - Properties
     
@@ -25,10 +27,6 @@ final class LskTransactionDetailsViewController: TransactionDetailsViewControlle
         control.addTarget(self, action: #selector(refresh), for: UIControl.Event.valueChanged)
         return control
     }()
-    
-    override var richProvider: RichMessageProviderWithStatusCheck? {
-        return service
-    }
     
     // MARK: - Lifecycle
     

@@ -142,7 +142,9 @@ extension Service {
                             amount: $0.amount,
                             fee: $0.fee,
                             signature: $0.signature,
-                            confirmations: $0.confirmations)
+                            confirmations: $0.confirmations,
+                            isOutgoing: $0.senderId.lowercased() == ownerAddress?.lowercased()
+                        )
                     }
                     completionHandler(.success(response: transaction))
                 case .error(response: let error):

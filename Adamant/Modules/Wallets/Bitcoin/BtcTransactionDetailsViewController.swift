@@ -12,7 +12,9 @@ import CommonKit
 final class BtcTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies
     
-    weak var service: BtcWalletService?
+    weak var service: BtcWalletService? {
+        walletService?.core as? BtcWalletService
+    }
     
     // MARK: - Properties
     
@@ -25,10 +27,6 @@ final class BtcTransactionDetailsViewController: TransactionDetailsViewControlle
         control.addTarget(self, action: #selector(refresh), for: UIControl.Event.valueChanged)
         return control
     }()
-    
-    override var richProvider: RichMessageProviderWithStatusCheck? {
-        return service
-    }
     
     // MARK: - Lifecycle
     

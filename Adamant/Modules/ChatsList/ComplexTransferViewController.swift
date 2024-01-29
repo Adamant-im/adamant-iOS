@@ -19,22 +19,42 @@ protocol ComplexTransferViewControllerDelegate: AnyObject {
 final class ComplexTransferViewController: UIViewController {
     // MARK: - Dependencies
     
-    var accountService: AccountService!
-    var visibleWalletsService: VisibleWalletsService!
-    var addressBookService: AddressBookService!
-    var screensFactory: ScreensFactory!
+    private let visibleWalletsService: VisibleWalletsService
+    private let addressBookService: AddressBookService
+    private let screensFactory: ScreensFactory
+    private let walletServiceCompose: WalletServiceCompose
     
     // MARK: - Properties
     var pagingViewController: PagingViewController!
     
     weak var transferDelegate: ComplexTransferViewControllerDelegate?
-    var services: [WalletServiceWithSend] = []
+    var services: [WalletService] = []
     var partner: CoreDataAccount? {
         didSet {
             navigationItem.title = partner?.chatroom?.getName(addressBookService: addressBookService)
         }
     }
     var replyToMessageId: String?
+    
+    // MARK: Init
+    
+    init(
+        visibleWalletsService: VisibleWalletsService,
+        addressBookService: AddressBookService,
+        screensFactory: ScreensFactory,
+        walletServiceCompose: WalletServiceCompose
+    ) {
+        self.visibleWalletsService = visibleWalletsService
+        self.addressBookService = addressBookService
+        self.screensFactory = screensFactory
+        self.walletServiceCompose = walletServiceCompose
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -73,7 +93,7 @@ final class ComplexTransferViewController: UIViewController {
     
     private func setupServices() {
         services.removeAll()
-        let availableServices: [WalletServiceWithSend] = visibleWalletsService.sorted(includeInvisible: false)
+        let availableServices: [WalletService] = visibleWalletsService.sorted(includeInvisible: false)
         services = availableServices
     }
     
@@ -110,12 +130,12 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
         v.replyToMessageId = replyToMessageId
         v.admReportRecipient = address
         v.recipientIsReadonly = true
-        v.commentsEnabled = service.commentsEnabledForRichMessages && partner?.isDummy != true
+        v.commentsEnabled = service.core.commentsEnabledForRichMessages && partner?.isDummy != true
         v.showProgressView(animated: false)
         
         Task {
             do {
-                let walletAddress = try await services[index]
+                let walletAddress = try await service.core
                     .getWalletAddress(
                         byAdamantAddress:
                             address
@@ -126,12 +146,13 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                 
                 if ERC20Token.supportedTokens.contains(
                     where: { token in
-                        return token.symbol == self.services[index].tokenSymbol
+                        return token.symbol == service.core.tokenSymbol
                     }
                 ) {
-                    let ethWallet = self.accountService.wallets.first { wallet in
-                        return wallet.tokenSymbol == "ETH"
-                    }
+                    let ethWallet = walletServiceCompose.getWallet(
+                        by: EthWalletService.richMessageType
+                    )?.core
+                    
                     v.rootCoinBalance = ethWallet?.wallet?.balance
                 }
             } catch let error as WalletServiceError {
@@ -153,7 +174,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
 	}
 	
     func pagingViewController(_: PagingViewController, pagingItemAt index: Int) -> PagingItem {
-		let service = services[index]
+        let service = services[index].core
 		
 		guard let wallet = service.wallet else {
             return WalletPagingItem(

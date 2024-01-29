@@ -13,25 +13,17 @@ struct ChatListFactory {
     let assembler: Assembler
     
     func makeChatListVC(screensFactory: ScreensFactory) -> UIViewController {
-        let c = ChatListViewController(nibName: "ChatListViewController", bundle: nil)
-        c.accountService = assembler.resolve(AccountService.self)
-        c.chatsProvider = assembler.resolve(ChatsProvider.self)
-        c.transfersProvider = assembler.resolve(TransfersProvider.self)
-        c.screensFactory = screensFactory
-        c.notificationsService = assembler.resolve(NotificationsService.self)
-        c.dialogService = assembler.resolve(DialogService.self)
-        c.addressBook = assembler.resolve(AddressBookService.self)
-        c.avatarService = assembler.resolve(AvatarService.self)
-        
-        // MARK: RichMessage handlers
-        // Transfer handlers from accountService' wallet services
-        if let accountService = assembler.resolve(AccountService.self) {
-            for case let provider as RichMessageProvider in accountService.wallets {
-                c.richMessageProviders[provider.dynamicRichMessageType] = provider
-            }
-        }
-        
-        return c
+        ChatListViewController(
+            accountService: assembler.resolve(AccountService.self)!,
+            chatsProvider: assembler.resolve(ChatsProvider.self)!,
+            transfersProvider: assembler.resolve(TransfersProvider.self)!,
+            screensFactory: screensFactory,
+            notificationsService: assembler.resolve(NotificationsService.self)!,
+            dialogService: assembler.resolve(DialogService.self)!,
+            addressBook: assembler.resolve(AddressBookService.self)!,
+            avatarService: assembler.resolve(AvatarService.self)!,
+            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!
+        )
     }
     
     func makeNewChatVC(screensFactory: ScreensFactory) -> NewChatViewController {
@@ -44,12 +36,12 @@ struct ChatListFactory {
     }
     
     func makeComplexTransferVC(screensFactory: ScreensFactory) -> UIViewController {
-        let c = ComplexTransferViewController()
-        c.accountService = assembler.resolve(AccountService.self)
-        c.visibleWalletsService = assembler.resolve(VisibleWalletsService.self)
-        c.addressBookService = assembler.resolve(AddressBookService.self)
-        c.screensFactory = screensFactory
-        return c
+        ComplexTransferViewController(
+            visibleWalletsService: assembler.resolve(VisibleWalletsService.self)!,
+            addressBookService: assembler.resolve(AddressBookService.self)!,
+            screensFactory: screensFactory,
+            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!
+        )
     }
     
     func makeSearchResultsViewController(screensFactory: ScreensFactory) -> SearchResultsViewController {

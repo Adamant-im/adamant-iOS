@@ -12,7 +12,9 @@ import CommonKit
 final class EthTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies
     
-    weak var service: EthWalletService?
+    weak var service: EthWalletService? {
+        walletService?.core as? EthWalletService
+    }
     
     // MARK: - Properties
     
@@ -25,10 +27,6 @@ final class EthTransactionDetailsViewController: TransactionDetailsViewControlle
         control.addTarget(self, action: #selector(refresh), for: UIControl.Event.valueChanged)
         return control
     }()
-    
-    override var richProvider: RichMessageProviderWithStatusCheck? {
-        return service
-    }
     
     // MARK: - Lifecycle
     

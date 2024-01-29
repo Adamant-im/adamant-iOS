@@ -47,7 +47,7 @@ struct DogeApiCommands {
     }
 }
 
-final class DogeWalletService: WalletService {
+final class DogeWalletService: WalletCoreProtocol {
     var wallet: WalletAccount? { return dogeWallet }
     
     // MARK: RichMessageProvider properties
@@ -61,6 +61,7 @@ final class DogeWalletService: WalletService {
     var addressConverter: AddressConverter!
     var vibroService: VibroService!
     var coreDataStack: CoreDataStack!
+    var chatsProvider: ChatsProvider!
     
     // MARK: - Constants
     static let currencyLogo = UIImage.asset(named: "doge_wallet") ?? .init()
@@ -116,6 +117,7 @@ final class DogeWalletService: WalletService {
     @Atomic private(set) var dogeWallet: DogeWallet?
     @Atomic private(set) var enabled = true
     @Atomic public var network: Network
+    @Atomic private var cachedWalletAddress: [String: String] = [:]
     
     let defaultDispatchQueue = DispatchQueue(
         label: "im.adamant.dogeWalletService",
@@ -272,7 +274,7 @@ final class DogeWalletService: WalletService {
 }
 
 // MARK: - WalletInitiatedWithPassphrase
-extension DogeWalletService: InitiatedWithPassphraseService {
+extension DogeWalletService {
     func setInitiationFailed(reason: String) {
         setState(.initiationFailed(reason: reason))
         dogeWallet = nil
@@ -360,6 +362,7 @@ extension DogeWalletService: SwinjectDependentService {
         dogeApiService = container.resolve(DogeApiService.self)
         vibroService = container.resolve(VibroService.self)
         coreDataStack = container.resolve(CoreDataStack.self)
+        chatsProvider = container.resolve(ChatsProvider.self)
         
         addTransactionObserver()
     }
@@ -395,12 +398,19 @@ extension DogeWalletService {
     }
     
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
+        if let address = cachedWalletAddress[address], !address.isEmpty {
+            return address
+        }
+        
         do {
             let result = try await apiService.get(key: DogeWalletService.kvsAddress, sender: address).get()
             
             guard let result = result else {
                 throw WalletServiceError.walletNotInitiated
             }
+            
+            cachedWalletAddress[address] = result
+            
             return result
         } catch _ as ApiServiceError {
             throw WalletServiceError.remoteServiceError(
@@ -631,7 +641,7 @@ extension DogeWalletService {
     }
     
     func getLocalTransactionHistory() -> [TransactionDetails] {
-        historyTransactions
+        return historyTransactions
     }
     
     func updateStatus(for id: String, status: TransactionStatus?) {
