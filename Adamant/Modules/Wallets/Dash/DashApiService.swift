@@ -26,33 +26,35 @@ final class DashApiCore: BlockchainHealthCheckableService {
     func getStatusInfo(node: Node) async -> WalletServiceResult<NodeStatusInfo> {
         let startTimestamp = Date.now.timeIntervalSince1970
         
-        let response: WalletServiceResult<DashBlockchainInfoDTO> = await request(node: node) { core, node in
-            let response: ApiServiceResult<DashResponseDTO<DashBlockchainInfoDTO>> = await core.sendRequestJsonResponse(
-                node: node,
-                path: .empty,
-                method: .post,
-                parameters: ["method": "getblockchaininfo"],
-                encoding: .json
-            )
-            
-            return response.flatMap { dto in
-                if let result = dto.result, dto.error == nil {
-                    return .success(result)
-                } else {
-                    return .failure(.serverError(error: dto.error?.localizedDescription ?? .empty))
-                }
-            }
+        let response = await apiCore.sendRequestRPCArrayResponse(
+            node: node,
+            path: .empty,
+            methods: [DashApiComand.networkInfoMethod, DashApiComand.blockchainInfoMethod]
+        )
+        
+        guard case let .success(data) = response else {
+            return .failure(.internalError(.parsingFailed))
         }
-
-        return response.map { data in
-            return .init(
-                ping: Date.now.timeIntervalSince1970 - startTimestamp,
-                height: data.blocks,
-                wsEnabled: false,
-                wsPort: nil,
-                version: nil
-            )
+        
+        let networkInfoData = data[DashApiComand.networkInfoMethod]
+        let blockchainInfoData = data[DashApiComand.blockchainInfoMethod]
+        
+        guard
+            let networkInfoData = networkInfoData,
+            let blockchainInfoData = blockchainInfoData,
+            let blockchainInfo = try? JSONDecoder().decode(DashBlockchainInfoDTO.self, from: blockchainInfoData),
+            let networkInfo = try? JSONDecoder().decode(DashNetworkInfoDTO.self, from: networkInfoData)
+        else {
+            return .failure(.internalError(.parsingFailed))
         }
+        
+        return .success(.init(
+            ping: Date.now.timeIntervalSince1970 - startTimestamp,
+            height: blockchainInfo.blocks,
+            wsEnabled: false,
+            wsPort: nil,
+            version: networkInfo.buildversion
+        ))
     }
 }
 
@@ -84,4 +86,9 @@ final class DashApiService: WalletApiService {
             await core.getStatusInfo(node: node)
         }
     }
+}
+
+private struct DashApiComand {
+    static let networkInfoMethod: String = "getnetworkinfo"
+    static let blockchainInfoMethod: String = "getblockchaininfo"
 }
