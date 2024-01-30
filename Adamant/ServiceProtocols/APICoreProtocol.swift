@@ -139,12 +139,12 @@ private extension APICoreProtocol {
         data: Data
     ) -> ApiServiceResult<[String: Data]> {
         do {
-            var result: [String: Data] = [:]
             let output = try JSONDecoder().decode([RPCResponseModel].self, from: data)
             
-            output.forEach { response in
-                result[response.id] = response.result
-            }
+            let result = Dictionary(
+                uniqueKeysWithValues: output.map { ($0.id, $0.result) }
+            )
+            
             return .success(result)
         } catch {
             return .failure(.internalError(error: InternalAPIError.parsingFailed))
