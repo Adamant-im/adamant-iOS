@@ -35,7 +35,10 @@ final class ERC20TransferViewController: TransferViewControllerBase {
             comments = ""
         }
         
-        guard let service = service as? ERC20WalletService, let recipient = recipientAddress, let amount = amount else {
+        guard let service = walletCore as? ERC20WalletService,
+              let recipient = recipientAddress,
+              let amount = amount
+        else {
             return
         }
         
@@ -157,7 +160,7 @@ final class ERC20TransferViewController: TransferViewControllerBase {
     
     override func validateRecipient(_ address: String) -> AddressValidationResult {
         let fixedAddress = address.addPrefixIfNeeded(prefix: prefix)
-        return service?.validate(address: fixedAddress) ?? .invalid(description: nil)
+        return walletCore.validate(address: fixedAddress)
     }
     
     override func recipientRow() -> BaseRow {
@@ -231,7 +234,7 @@ final class ERC20TransferViewController: TransferViewControllerBase {
     
     override func defaultSceneTitle() -> String? {
         let networkSymbol = ERC20WalletService.tokenNetworkSymbol
-        return String.adamant.wallets.erc20.sendToken(service?.tokenSymbol ?? "ERC20") + " (\(networkSymbol))"
+        return String.adamant.wallets.erc20.sendToken(walletCore.tokenSymbol) + " (\(networkSymbol))"
     }
     
     override func validateAmount(_ amount: Decimal, withFee: Bool = true) -> Bool {
@@ -239,13 +242,11 @@ final class ERC20TransferViewController: TransferViewControllerBase {
             return false
         }
         
-        guard let service = service,
-              let balance = service.wallet?.balance
-        else {
+        guard let balance = walletCore.wallet?.balance else {
             return false
         }
         
-        let minAmount = service.minAmount
+        let minAmount = walletCore.minAmount
 
         guard minAmount <= amount else {
             return false
@@ -258,10 +259,9 @@ final class ERC20TransferViewController: TransferViewControllerBase {
     }
     
     override func isEnoughFee() -> Bool {
-        guard let service = service,
-              let rootCoinBalance = rootCoinBalance,
-              rootCoinBalance >= service.diplayTransactionFee,
-              service.isTransactionFeeValid
+        guard let rootCoinBalance = rootCoinBalance,
+              rootCoinBalance >= walletCore.diplayTransactionFee,
+              walletCore.isTransactionFeeValid
         else {
             return false
         }

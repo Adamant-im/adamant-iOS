@@ -29,7 +29,10 @@ final class EthTransferViewController: TransferViewControllerBase {
             comments = ""
         }
         
-        guard let service = service as? EthWalletService, let recipient = recipientAddress, let amount = amount else {
+        guard let service = walletCore as? EthWalletService,
+              let recipient = recipientAddress,
+              let amount = amount
+        else {
             return
         }
         
@@ -149,7 +152,7 @@ final class EthTransferViewController: TransferViewControllerBase {
     
     override func validateRecipient(_ address: String) -> AddressValidationResult {
         let fixedAddress = address.addPrefixIfNeeded(prefix: prefix)
-        return service?.validate(address: fixedAddress) ?? .invalid(description: nil)
+        return walletCore.validate(address: fixedAddress)
     }
     
     override func recipientRow() -> BaseRow {

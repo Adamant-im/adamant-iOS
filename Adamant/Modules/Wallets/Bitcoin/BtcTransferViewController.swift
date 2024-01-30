@@ -14,14 +14,6 @@ final class BtcTransferViewController: TransferViewControllerBase {
     
     // MARK: Properties
     
-    override var balanceFormatter: NumberFormatter {
-        if let service = service {
-            return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: type(of: service).currencySymbol)
-        } else {
-            return AdamantBalanceFormat.currencyFormatterFull
-        }
-    }
-    
     private var skipValueChange: Bool = false
     
     // MARK: Send
@@ -35,7 +27,7 @@ final class BtcTransferViewController: TransferViewControllerBase {
             comments = ""
         }
         
-        guard let service = service as? BtcWalletService,
+        guard let service = walletCore as? BtcWalletService,
               let recipient = recipientAddress,
               let amount = amount,
               let wallet = service.wallet
@@ -144,10 +136,6 @@ final class BtcTransferViewController: TransferViewControllerBase {
     }
     
     // MARK: Overrides
-    
-    override func validateRecipient(_ address: String) -> AddressValidationResult {
-        service?.validate(address: address) ?? .invalid(description: nil)
-    }
     
     override func recipientRow() -> BaseRow {
         let row = TextRow {
