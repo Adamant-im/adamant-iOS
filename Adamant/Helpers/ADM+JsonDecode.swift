@@ -24,6 +24,18 @@ struct JSONCodingKeys: CodingKey {
 }
 
 extension KeyedDecodingContainer {
+    func decode(forKey key: K) throws -> Data {
+        if let stringValue = try? decode(String.self, forKey: key) {
+            return Data(stringValue.utf8)
+        } else if let nestedDictionary = try? decode(Dictionary<String, Any>.self, forKey: key) {
+            let container = try self.nestedContainer(keyedBy: JSONCodingKeys.self, forKey: key)
+            let dictionary = try container.decode([String: Any].self)
+            return try JSONSerialization.data(withJSONObject: dictionary, options: [])
+        }
+        
+        return Data()
+    }
+    
     func decode(_ type: Dictionary<String, Any>.Type, forKey key: K) throws -> [String: Any] {
         let container = try self.nestedContainer(keyedBy: JSONCodingKeys.self, forKey: key)
         return try container.decode(type)

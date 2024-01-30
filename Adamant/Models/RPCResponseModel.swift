@@ -20,12 +20,6 @@ struct RPCResponseModel: Codable {
      init(from decoder: Decoder) throws {
          let container = try decoder.container(keyedBy: CodingKeys.self)
          id = try container.decode(String.self, forKey: .id)
-         
-         if let stringValue = try? container.decode(String.self, forKey: .result) {
-             result = Data(stringValue.utf8)
-         } else {
-             let dictionary = try container.decode([String: Any].self, forKey: .result)
-             result = try JSONSerialization.data(withJSONObject: dictionary, options: [])
-         }
+         result = try container.decode(forKey: .result)
      }
 }
