@@ -44,19 +44,42 @@ actor EthApiCore {
 
 extension EthApiCore: BlockchainHealthCheckableService {
     func getStatusInfo(node: Node) async -> WalletServiceResult<NodeStatusInfo> {
-        await performRequest(node: node) { web3 in
-            let startTimestamp = Date.now.timeIntervalSince1970
-            let height = try await web3.eth.blockNumber()
-            let ping = Date.now.timeIntervalSince1970 - startTimestamp
-            
-            return .init(
-                ping: ping,
-                height: Int(height.asDouble()),
-                wsEnabled: false,
-                wsPort: nil,
-                version: nil
-            )
+        let startTimestamp = Date.now.timeIntervalSince1970
+        
+        let response = await apiCore.sendRequestRPCArrayResponse(
+            node: node,
+            path: .empty,
+            methods: [EthApiComand.blockNumberMethod, EthApiComand.clientVersionMethod]
+        )
+        
+        guard case let .success(data) = response else {
+            return .failure(.internalError(.parsingFailed))
         }
+        
+        let blockNumberData = data[EthApiComand.blockNumberMethod]
+        let clientVersionData = data[EthApiComand.clientVersionMethod]
+        
+        guard
+            let blockNumberData = blockNumberData,
+            let clientVersionData = clientVersionData
+        else {
+            return .failure(.internalError(.parsingFailed))
+        }
+        
+        let blockNumber = String(decoding: blockNumberData, as: UTF8.self)
+        let clientVersion = String(decoding: clientVersionData, as: UTF8.self)
+        
+        guard let height = hexStringToDouble(blockNumber) else {
+            return .failure(.internalError(.parsingFailed))
+        }
+        
+        return .success(.init(
+            ping: Date.now.timeIntervalSince1970 - startTimestamp,
+            height: Int(height),
+            wsEnabled: false,
+            wsPort: nil,
+            version: extractVersion(from: clientVersion)
+        ))
     }
 }
 
@@ -96,4 +119,32 @@ private func mapError(_ error: Error) -> WalletServiceError {
     } else {
         return .remoteServiceError(message: error.localizedDescription)
     }
+}
+
+private struct EthApiComand {
+    static let blockNumberMethod: String = "eth_blockNumber"
+    static let clientVersionMethod: String = "web3_clientVersion"
+}
+
+private func hexStringToDouble(_ hexString: String) -> UInt64? {
+    let cleanString = hexString.replacingOccurrences(of: "0x", with: "")
+    
+    if let hexValue = UInt64(cleanString, radix: 16) {
+        return hexValue
+    }
+    
+    return nil
+}
+
+private func extractVersion(from input: String) -> String? {
+    let pattern = #"^(.+?/v\d+\.\d+\.\d+).*?$"#
+    
+    let regex = try? NSRegularExpression(pattern: pattern, options: [])
+    if let match = regex?.firstMatch(in: input, options: [], range: NSRange(location: 0, length: input.utf16.count)) {
+        if let range = Range(match.range(at: 1), in: input) {
+            return String(input[range])
+        }
+    }
+
+    return nil
 }
