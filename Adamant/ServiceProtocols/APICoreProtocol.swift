@@ -29,6 +29,12 @@ protocol APICoreProtocol: Actor {
         method: HTTPMethod,
         jsonParameters: Any
     ) async -> APIResponseModel
+    
+    func sendRequestRPC(
+        node: Node,
+        path: String,
+        methods: [String]
+    ) async -> APIResponseModel
 }
 
 extension APICoreProtocol {
@@ -105,6 +111,18 @@ extension APICoreProtocol {
             jsonParameters: jsonParameters
         ).result.flatMap { parseJSON(data: $0) }
     }
+    
+    func sendRequestRPCArrayResponse(
+        node: Node,
+        path: String,
+        methods: [String]
+    ) async -> ApiServiceResult<[String: Data]> {
+        await sendRequestRPC(
+            node: node, 
+            path: path,
+            methods: methods
+        ).result.flatMap { parseRPCArray(data: $0) }
+    }
 }
 
 private extension APICoreProtocol {
@@ -112,6 +130,22 @@ private extension APICoreProtocol {
         do {
             let output = try JSONDecoder().decode(JSON.self, from: data)
             return .success(output)
+        } catch {
+            return .failure(.internalError(error: InternalAPIError.parsingFailed))
+        }
+    }
+    
+    func parseRPCArray(
+        data: Data
+    ) -> ApiServiceResult<[String: Data]> {
+        do {
+            var result: [String: Data] = [:]
+            let output = try JSONDecoder().decode([RPCResponseModel].self, from: data)
+            
+            output.forEach { response in
+                result[response.id] = response.result
+            }
+            return .success(result)
         } catch {
             return .failure(.internalError(error: InternalAPIError.parsingFailed))
         }

@@ -27,23 +27,32 @@ final class BtcApiCore: BlockchainHealthCheckableService {
         let startTimestamp = Date.now.timeIntervalSince1970
         
         let response = await request(node: node) { core, node in
-            await core.sendRequest(node: node, path: BtcApiCommands.getHeight())
+            await core.sendRequestRPCArrayResponse(
+                node: node,
+                path: BtcApiCommands.getRPC(),
+                methods: [BtcApiCommands.blockchainInfoMethod, BtcApiCommands.networkInfoMethod]
+            )
         }
 
         return response.flatMap { data in
+            let blockchainInfoData = data[BtcApiCommands.blockchainInfoMethod]
+            let networkInfoData = data[BtcApiCommands.networkInfoMethod]
+            
             guard
-                let raw = String(data: data, encoding: .utf8),
-                let height = Int(string: raw)
+                let blockchainInfoData = blockchainInfoData,
+                let networkInfoData = networkInfoData,
+                let blockchainInfo = try? JSONDecoder().decode(BtcBlockchainInfoDTO.self, from: blockchainInfoData),
+                let networkInfo = try? JSONDecoder().decode(BtcNetworkInfoDTO.self, from: networkInfoData)
             else {
                 return .failure(.internalError(.parsingFailed))
             }
             
             return .success(.init(
                 ping: Date.now.timeIntervalSince1970 - startTimestamp,
-                height: height,
+                height: blockchainInfo.blocks,
                 wsEnabled: false,
                 wsPort: nil,
-                version: nil
+                version: "\(networkInfo.version)"
             ))
         }
     }
