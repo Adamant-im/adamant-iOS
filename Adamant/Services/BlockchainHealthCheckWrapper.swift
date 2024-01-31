@@ -77,7 +77,15 @@ private extension BlockchainHealthCheckWrapper {
         nodesStorage.updateNodeStatus(id: node.id, statusInfo: try? statusInfo.get())
         
         switch statusInfo {
-        case .success:
+        case .success(let info):
+            if let versionNumber = Node.stringToDouble(info.version),
+               versionNumber < nodeGroup.minNodeVersion {
+                nodesStorage.updateNodeParams(
+                    id: node.id,
+                    connectionStatus: .notAllowed(.outdatedApiVersion)
+                )
+            }
+            
             updateNodesAvailability(forceInclude: node.id)
         case let .failure(error):
             guard !error.isRequestCancelledError else { return }
@@ -100,11 +108,19 @@ private extension BlockchainHealthCheckWrapper {
         )
         
         workingNodes.forEach { node in
-            let status: Node.ConnectionStatus? = node.height.map { height in
-                actualHeightsRange?.contains(height) ?? false
+            var status: Node.ConnectionStatus?
+            let actualNodeVersion = Node.stringToDouble(node.version)
+            
+            if let actualNodeVersion = actualNodeVersion,
+               actualNodeVersion < nodeGroup.minNodeVersion {
+                status = Node.ConnectionStatus.notAllowed(.outdatedApiVersion)
+            } else {
+                status = node.height.map { height in
+                    actualHeightsRange?.contains(height) ?? false
                     ? .allowed
                     : .synchronizing
-            } ?? .none
+                } ?? .none
+            }
             
             nodesStorage.updateNodeParams(
                 id: node.id,
@@ -119,7 +135,7 @@ private extension Node {
         switch connectionStatus {
         case .allowed, .synchronizing, .none:
             return isEnabled
-        case .offline:
+        case .offline, .notAllowed:
             return false
         }
     }

@@ -62,7 +62,7 @@ extension BtcWalletService {
         10
     }
     
-    var minNodeVersion: String? {
+    static var minNodeVersion: String? {
         nil
     }
     
