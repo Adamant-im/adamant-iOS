@@ -186,7 +186,7 @@ private extension ChatTransactionContentView {
     }
     
     func update() {
-        isHidden = model.isHidden
+        alpha = model.isHidden ? .zero : 1.0
         backgroundColor = model.backgroundColor.uiColor
         titleLabel.text = model.title
         iconView.image = model.icon
