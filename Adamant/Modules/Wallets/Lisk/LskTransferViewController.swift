@@ -22,12 +22,8 @@ final class LskTransferViewController: TransferViewControllerBase {
                 throw WalletServiceError.accountNotFound
             }
             
-            guard let service = service else {
-                throw WalletServiceError.walletNotInitiated
-            }
-            
-            let recepientBalance = try await service.getBalance(address: recipientAddress)
-            let minimumAmount = service.minBalance - recepientBalance
+            let recepientBalance = try await walletCore.getBalance(address: recipientAddress)
+            let minimumAmount = walletCore.minBalance - recepientBalance
             return try await max(super.minToTransfer, minimumAmount)
         }
     }
@@ -37,14 +33,13 @@ final class LskTransferViewController: TransferViewControllerBase {
     override func checkForAdditionalFee() {
         Task {
             guard let recipientAddress = recipientAddress,
-                  let service = service,
                   validateRecipient(recipientAddress).isValid
             else {
                 addAdditionalFee = false
                 return
             }
             
-            let exist = try await service.isExist(address: recipientAddress)
+            let exist = try await walletCore.isExist(address: recipientAddress)
             
             guard !exist else {
                 addAdditionalFee = false
@@ -66,7 +61,10 @@ final class LskTransferViewController: TransferViewControllerBase {
             comments = ""
         }
         
-        guard let service = service as? LskWalletService, let recipient = recipientAddress, let amount = amount else {
+        guard let service = walletCore as? LskWalletService,
+              let recipient = recipientAddress,
+              let amount = amount
+        else {
             return
         }
         
@@ -164,7 +162,7 @@ final class LskTransferViewController: TransferViewControllerBase {
     
     override func validateRecipient(_ address: String) -> AddressValidationResult {
         let fixedAddress = address.addPrefixIfNeeded(prefix: prefix)
-        return service?.validate(address: fixedAddress) ?? .invalid(description: nil)
+        return walletCore.validate(address: fixedAddress)
     }
     
     override func recipientRow() -> BaseRow {

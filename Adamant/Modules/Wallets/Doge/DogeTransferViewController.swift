@@ -24,7 +24,7 @@ final class DogeTransferViewController: TransferViewControllerBase {
             comments = ""
         }
         
-        guard let service = service as? DogeWalletService,
+        guard let service = walletCore as? DogeWalletService,
               let recipient = recipientAddress,
               let amount = amount
         else {
@@ -122,10 +122,6 @@ final class DogeTransferViewController: TransferViewControllerBase {
     }
     
     // MARK: Overrides
-    
-    override func validateRecipient(_ address: String) -> AddressValidationResult {
-        service?.validate(address: address) ?? .invalid(description: nil)
-    }
     
     override func recipientRow() -> BaseRow {
         let row = TextRow {

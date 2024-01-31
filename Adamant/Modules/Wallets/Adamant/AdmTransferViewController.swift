@@ -37,7 +37,10 @@ final class AdmTransferViewController: TransferViewControllerBase {
     
     @MainActor
     override func sendFunds() {
-        guard let service = service as? AdmWalletService, let recipient = recipientAddress, let amount = amount else {
+        guard let service = walletCore as? AdmWalletService,
+              let recipient = recipientAddress,
+              let amount = amount
+        else {
             return
         }
         
