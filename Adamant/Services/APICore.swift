@@ -78,43 +78,6 @@ actor APICore: APICoreProtocol {
             )
         }
     }
-    
-    func sendRequestRPC(
-        node: Node,
-        path: String,
-        methods: [String]
-    ) async -> APIResponseModel {
-        do {
-            var body: [[String: Any]] = []
-            methods.forEach { method in
-                let requestBody: [String: Any] = [
-                    "jsonrpc": "2.0",
-                    "id": method,
-                    "method": method,
-                    "params": []
-                ]
-                
-                body.append(requestBody)
-            }
-            
-            let data = try JSONSerialization.data(withJSONObject: body)
-            
-            var request = try URLRequest(
-                url: try buildUrl(node: node, path: path),
-                method: .post
-            )
-            
-            request.httpBody = data
-            request.headers.update(.contentType("application/json"))
-            return await sendRequest(request: AF.request(request))
-        } catch {
-            return .init(
-                result: .failure(.internalError(message: error.localizedDescription, error: error)),
-                data: nil,
-                code: nil
-            )
-        }
-    }
 }
 
 private extension APICore {

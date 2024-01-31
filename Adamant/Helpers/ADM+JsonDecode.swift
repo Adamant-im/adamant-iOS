@@ -27,7 +27,7 @@ extension KeyedDecodingContainer {
     func decode(forKey key: K) throws -> Data {
         if let stringValue = try? decode(String.self, forKey: key) {
             return Data(stringValue.utf8)
-        } else if let nestedDictionary = try? decode(Dictionary<String, Any>.self, forKey: key) {
+        } else if (try? decode(Dictionary<String, Any>.self, forKey: key)) != nil {
             let container = try self.nestedContainer(keyedBy: JSONCodingKeys.self, forKey: key)
             let dictionary = try container.decode([String: Any].self)
             return try JSONSerialization.data(withJSONObject: dictionary, options: [])

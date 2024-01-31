@@ -26,35 +26,41 @@ final class BtcApiCore: BlockchainHealthCheckableService {
     func getStatusInfo(node: Node) async -> WalletServiceResult<NodeStatusInfo> {
         let startTimestamp = Date.now.timeIntervalSince1970
         
-        let response = await request(node: node) { core, node in
-            await core.sendRequestRPCArrayResponse(
-                node: node,
-                path: BtcApiCommands.getRPC(),
-                methods: [BtcApiCommands.blockchainInfoMethod, BtcApiCommands.networkInfoMethod]
-            )
-        }
+        let response = await apiCore.sendRequestRPC(
+            node: node,
+            path: BtcApiCommands.getRPC(),
+            requests: [
+                .init(method: BtcApiCommands.blockchainInfoMethod),
+                .init(method: BtcApiCommands.networkInfoMethod)
+            ]
+        )
 
-        return response.flatMap { data in
-            let blockchainInfoData = data[BtcApiCommands.blockchainInfoMethod]
-            let networkInfoData = data[BtcApiCommands.networkInfoMethod]
-            
-            guard
-                let blockchainInfoData = blockchainInfoData,
-                let networkInfoData = networkInfoData,
-                let blockchainInfo = try? JSONDecoder().decode(BtcBlockchainInfoDTO.self, from: blockchainInfoData),
-                let networkInfo = try? JSONDecoder().decode(BtcNetworkInfoDTO.self, from: networkInfoData)
-            else {
-                return .failure(.internalError(.parsingFailed))
-            }
-            
-            return .success(.init(
-                ping: Date.now.timeIntervalSince1970 - startTimestamp,
-                height: blockchainInfo.blocks,
-                wsEnabled: false,
-                wsPort: nil,
-                version: "\(networkInfo.version)"
-            ))
+        guard case let .success(data) = response else {
+            return .failure(.internalError(.parsingFailed))
         }
+        
+        let networkInfoModel = data.first(
+            where: { $0.id == BtcApiCommands.networkInfoMethod }
+        )
+        
+        let blockchainInfoModel = data.first(
+            where: { $0.id == BtcApiCommands.blockchainInfoMethod }
+        )
+        
+        guard
+            let networkInfo: BtcNetworkInfoDTO = networkInfoModel?.serialize(),
+            let blockchainInfo: BtcBlockchainInfoDTO = blockchainInfoModel?.serialize()
+        else {
+            return .failure(.internalError(.parsingFailed))
+        }
+        
+        return .success(.init(
+            ping: Date.now.timeIntervalSince1970 - startTimestamp,
+            height: blockchainInfo.blocks,
+            wsEnabled: false,
+            wsPort: nil,
+            version: String(networkInfo.version)
+        ))
     }
 }
 

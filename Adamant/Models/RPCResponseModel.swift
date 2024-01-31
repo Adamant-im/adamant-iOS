@@ -13,13 +13,17 @@ struct RPCResponseModel: Codable {
     let result: Data
     
     private enum CodingKeys: String, CodingKey {
-         case id
-         case result
-     }
-
-     init(from decoder: Decoder) throws {
-         let container = try decoder.container(keyedBy: CodingKeys.self)
-         id = try container.decode(String.self, forKey: .id)
-         result = try container.decode(forKey: .result)
-     }
+        case id
+        case result
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        result = try container.decode(forKey: .result)
+    }
+    
+    func serialize<Response: Decodable>() -> Response? {
+        try? JSONDecoder().decode(Response.self, from: result)
+    }
 }

@@ -46,18 +46,25 @@ extension EthApiCore: BlockchainHealthCheckableService {
     func getStatusInfo(node: Node) async -> WalletServiceResult<NodeStatusInfo> {
         let startTimestamp = Date.now.timeIntervalSince1970
         
-        let response = await apiCore.sendRequestRPCArrayResponse(
+        let response = await apiCore.sendRequestRPC(
             node: node,
             path: .empty,
-            methods: [EthApiComand.blockNumberMethod, EthApiComand.clientVersionMethod]
+            requests: [
+                .init(method: EthApiComand.blockNumberMethod),
+                .init(method: EthApiComand.clientVersionMethod)
+            ]
         )
         
         guard case let .success(data) = response else {
             return .failure(.internalError(.parsingFailed))
         }
         
-        let blockNumberData = data[EthApiComand.blockNumberMethod]
-        let clientVersionData = data[EthApiComand.clientVersionMethod]
+        let blockNumberData = data.first(
+            where: { $0.id == EthApiComand.blockNumberMethod }
+        )
+        let clientVersionData = data.first(
+            where: { $0.id == EthApiComand.clientVersionMethod }
+        )
         
         guard
             let blockNumberData = blockNumberData,
@@ -66,8 +73,8 @@ extension EthApiCore: BlockchainHealthCheckableService {
             return .failure(.internalError(.parsingFailed))
         }
         
-        let blockNumber = String(decoding: blockNumberData, as: UTF8.self)
-        let clientVersion = String(decoding: clientVersionData, as: UTF8.self)
+        let blockNumber = String(decoding: blockNumberData.result, as: UTF8.self)
+        let clientVersion = String(decoding: clientVersionData.result, as: UTF8.self)
         
         guard let height = hexStringToDouble(blockNumber) else {
             return .failure(.internalError(.parsingFailed))

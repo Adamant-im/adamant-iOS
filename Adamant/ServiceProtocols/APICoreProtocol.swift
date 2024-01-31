@@ -29,12 +29,6 @@ protocol APICoreProtocol: Actor {
         method: HTTPMethod,
         jsonParameters: Any
     ) async -> APIResponseModel
-    
-    func sendRequestRPC(
-        node: Node,
-        path: String,
-        methods: [String]
-    ) async -> APIResponseModel
 }
 
 extension APICoreProtocol {
@@ -112,16 +106,34 @@ extension APICoreProtocol {
         ).result.flatMap { parseJSON(data: $0) }
     }
     
-    func sendRequestRPCArrayResponse(
+    func sendRequestRPC(
         node: Node,
         path: String,
-        methods: [String]
-    ) async -> ApiServiceResult<[String: Data]> {
-        await sendRequestRPC(
-            node: node, 
+        requests: [RpcRequest]
+    ) async -> ApiServiceResult<[RPCResponseModel]> {
+        let parameters: [Any] = requests.compactMap {
+            $0.asDictionary()
+        }
+        
+        return await sendRequestJsonResponse(
+            node: node,
             path: path,
-            methods: methods
-        ).result.flatMap { parseRPCArray(data: $0) }
+            method: .post,
+            jsonParameters: parameters
+        )
+    }
+    
+    func sendRequestRPC(
+        node: Node,
+        path: String,
+        request: RpcRequest
+    ) async -> ApiServiceResult<RPCResponseModel> {
+        await sendRequestJsonResponse(
+            node: node,
+            path: path,
+            method: .post,
+            jsonParameters: request.asDictionary() ?? [:]
+        )
     }
 }
 
@@ -130,22 +142,6 @@ private extension APICoreProtocol {
         do {
             let output = try JSONDecoder().decode(JSON.self, from: data)
             return .success(output)
-        } catch {
-            return .failure(.internalError(error: InternalAPIError.parsingFailed))
-        }
-    }
-    
-    func parseRPCArray(
-        data: Data
-    ) -> ApiServiceResult<[String: Data]> {
-        do {
-            let output = try JSONDecoder().decode([RPCResponseModel].self, from: data)
-            
-            let result = Dictionary(
-                uniqueKeysWithValues: output.map { ($0.id, $0.result) }
-            )
-            
-            return .success(result)
         } catch {
             return .failure(.internalError(error: InternalAPIError.parsingFailed))
         }

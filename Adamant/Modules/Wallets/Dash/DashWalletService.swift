@@ -13,6 +13,12 @@ import BitcoinKit
 import Combine
 import CommonKit
 
+struct DashApiComand {
+    static let networkInfoMethod: String = "getnetworkinfo"
+    static let blockchainInfoMethod: String = "getblockchaininfo"
+    static let rawTransactionMethod: String = "getrawtransaction"
+}
+
 final class DashWalletService: WalletCoreProtocol {
     
     var tokenSymbol: String {

@@ -26,24 +26,30 @@ final class DashApiCore: BlockchainHealthCheckableService {
     func getStatusInfo(node: Node) async -> WalletServiceResult<NodeStatusInfo> {
         let startTimestamp = Date.now.timeIntervalSince1970
         
-        let response = await apiCore.sendRequestRPCArrayResponse(
+        let response = await apiCore.sendRequestRPC(
             node: node,
             path: .empty,
-            methods: [DashApiComand.networkInfoMethod, DashApiComand.blockchainInfoMethod]
+            requests: [
+                .init(method: DashApiComand.networkInfoMethod),
+                .init(method: DashApiComand.blockchainInfoMethod)
+            ]
         )
         
         guard case let .success(data) = response else {
             return .failure(.internalError(.parsingFailed))
         }
         
-        let networkInfoData = data[DashApiComand.networkInfoMethod]
-        let blockchainInfoData = data[DashApiComand.blockchainInfoMethod]
+        let networkInfoModel = data.first(
+            where: { $0.id == DashApiComand.networkInfoMethod }
+        )
+        
+        let blockchainInfoModel = data.first(
+            where: { $0.id == DashApiComand.blockchainInfoMethod }
+        )
         
         guard
-            let networkInfoData = networkInfoData,
-            let blockchainInfoData = blockchainInfoData,
-            let blockchainInfo = try? JSONDecoder().decode(DashBlockchainInfoDTO.self, from: blockchainInfoData),
-            let networkInfo = try? JSONDecoder().decode(DashNetworkInfoDTO.self, from: networkInfoData)
+            let networkInfo: DashNetworkInfoDTO = networkInfoModel?.serialize(),
+            let blockchainInfo: DashBlockchainInfoDTO = blockchainInfoModel?.serialize()
         else {
             return .failure(.internalError(.parsingFailed))
         }
@@ -86,9 +92,4 @@ final class DashApiService: WalletApiService {
             await core.getStatusInfo(node: node)
         }
     }
-}
-
-private struct DashApiComand {
-    static let networkInfoMethod: String = "getnetworkinfo"
-    static let blockchainInfoMethod: String = "getblockchaininfo"
 }
