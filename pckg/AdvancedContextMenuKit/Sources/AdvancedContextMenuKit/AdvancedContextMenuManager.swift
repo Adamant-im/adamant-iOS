@@ -207,6 +207,7 @@ extension AdvancedContextMenuManager: OverlayViewDelegate {
         getPositionOnScreen = nil
         // Postpone window dismissal to the next iteration to allow the contentView to become visible
         Task {
+            await Task.sleep(interval: 0.1)
             window.rootViewController = nil
             window.isHidden = true
         }
