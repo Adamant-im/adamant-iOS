@@ -54,7 +54,7 @@ extension AdmWalletService {
         0
     }
     
-    var minNodeVersion: String? {
+    static var minNodeVersion: String? {
         "0.8.0"
     }
     

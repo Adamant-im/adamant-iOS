@@ -8,14 +8,10 @@
 
 public extension Collection where Element == Node {
     func getAllowedNodes(sortedBySpeedDescending: Bool, needWS: Bool) -> [Node] {
-        var allowedNodes = filter {
+        let allowedNodes = filter {
             $0.connectionStatus == .allowed
             && $0.isEnabled
             && (!needWS || $0.wsEnabled)
-        }
-        
-        if allowedNodes.isEmpty && !needWS {
-            allowedNodes = filter { $0.isEnabled }
         }
         
         return sortedBySpeedDescending

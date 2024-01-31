@@ -676,6 +676,9 @@
 /* NodesList.NodeCell: Node is disabled */
 "NodesList.NodeCell.Disabled" = "Deaktiviert";
 
+/* NodesList.NodeCell: Node is outdated */
+"NodesList.NodeCell.Outdated" = "Veraltete API-Version:";
+
 /* NodesList.NodeCell: Node version */
 "NodesList.NodeCell.Version" = "version";
 

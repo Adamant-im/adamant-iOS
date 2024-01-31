@@ -667,6 +667,9 @@
 /* NodesList.NodeCell: Node is disabled */
 "NodesList.NodeCell.Disabled" = "已禁用";
 
+/* NodesList.NodeCell: Node is outdated */
+"NodesList.NodeCell.Outdated" = "过时的 API 版本：";
+
 /* NodesList.NodeCell: Node version */
 "NodesList.NodeCell.Version" = "版本";
 

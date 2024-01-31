@@ -673,6 +673,9 @@
 /* NodesList.NodeCell: Node is disabled */
 "NodesList.NodeCell.Disabled" = "Отключена";
 
+/* NodesList.NodeCell: Node is outdated */
+"NodesList.NodeCell.Outdated" = "Устаревшая версия API:";
+
 /* CoinsNodesList: ServiceNode */
 "CoinsNodesList.ServiceNode" = "Сервис";
 
