@@ -70,13 +70,17 @@ extension LskWalletService {
     
     static var nodes: [Node] {
         [
-            Node(url: URL(string: "https://lisknode5.adamant.im")!, altUrl: URL(string: "http://38.242.243.29:44099")),
+            Node(url: URL(string: "https://lisknode3.adamant.im")!, altUrl: URL(string: "http://157.90.229.236:44099")),
+Node(url: URL(string: "https://lisknode4.adamant.im")!, altUrl: URL(string: "http://78.47.205.206:44099")),
+Node(url: URL(string: "https://lisknode5.adamant.im")!, altUrl: URL(string: "http://38.242.243.29:44099")),
         ]
     }
     
     static var serviceNodes: [Node] {
         [
-            Node(url: URL(string: "https://liskservice5.adamant.im")!),
+            Node(url: URL(string: "https://liskservice3.adamant.im")!),
+Node(url: URL(string: "https://liskservice4.adamant.im")!),
+Node(url: URL(string: "https://liskservice5.adamant.im")!),
         ]
     }
 }
