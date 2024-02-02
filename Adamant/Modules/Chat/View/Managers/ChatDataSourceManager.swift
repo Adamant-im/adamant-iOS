@@ -141,6 +141,7 @@ final class ChatDataSourceManager: MessagesDataSource {
         cell.transactionView.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
         cell.transactionView.model = model.value
         cell.transactionView.setSubscription(publisher: publisher, collection: messagesCollectionView)
+        cell.configure(with: message, at: indexPath, and: messagesCollectionView)
         return cell
     }
 }
