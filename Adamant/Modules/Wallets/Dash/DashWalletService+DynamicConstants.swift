@@ -62,7 +62,7 @@ extension DashWalletService {
         80
     }
     
-    var minNodeVersion: String? {
+    static var minNodeVersion: String? {
         nil
     }
     

@@ -11,7 +11,7 @@ import MessageKit
 import UIKit
 import CommonKit
 
-extension AdmWalletService: RichMessageProvider {
+extension AdmWalletService {
     var newPendingInterval: TimeInterval {
         .zero
     }

@@ -12,6 +12,8 @@ import UIKit
 protocol WalletFactory {
     associatedtype Service = WalletService
     
+    var typeSymbol: String { get }
+    
     func makeWalletVC(service: Service, screensFactory: ScreensFactory) -> WalletViewController
     func makeTransferListVC(service: Service, screensFactory: ScreensFactory) -> UIViewController
     func makeTransferVC(service: Service, screensFactory: ScreensFactory) -> TransferViewControllerBase

@@ -13,27 +13,19 @@ import CommonKit
 final class ERC20TransactionsViewController: TransactionsListViewControllerBase {
     
     // MARK: - Dependencies
-    var ercWalletService: ERC20WalletService! {
-        didSet {
-            ethAddress = ercWalletService.wallet?.address ?? ""
-        }
-    }
-    var screensFactory: ScreensFactory!
     
-    // MARK: - Properties
-
-    private var ethAddress: String = ""
+    var screensFactory: ScreensFactory!
     
     // MARK: - UITableView
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let address = walletService.wallet?.address,
+        guard let address = walletService.core.wallet?.address,
               let transaction = transactions[safe: indexPath.row]
         else { return }
         
         tableView.deselectRow(at: indexPath, animated: true)
                 
-        let vc = screensFactory.makeDetailsVC(service: ercWalletService)
+        let vc = screensFactory.makeDetailsVC(service: walletService)
         
         vc.transaction = transaction
         

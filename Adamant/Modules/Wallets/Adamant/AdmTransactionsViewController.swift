@@ -19,7 +19,6 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
     let stack: CoreDataStack
     let screensFactory: ScreensFactory
     let addressBookService: AddressBookService
-    let admService: AdmWalletService
     
     // MARK: - Properties
     
@@ -45,7 +44,7 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
         stack: CoreDataStack,
         screensFactory: ScreensFactory,
         addressBookService: AddressBookService,
-        admService: AdmWalletService
+        walletService: WalletService
     ) {
         self.accountService = accountService
         self.transfersProvider = transfersProvider
@@ -53,11 +52,10 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
         self.stack = stack
         self.screensFactory = screensFactory
         self.addressBookService = addressBookService
-        self.admService = admService
         
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         self.dialogService = dialogService
-        self.walletService = admService
+        self.walletService = walletService
     }
     
     required init?(coder: NSCoder) {

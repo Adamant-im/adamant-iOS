@@ -26,7 +26,3 @@ extension TransactionStatusInfo {
         }
     }
 }
-
-protocol RichMessageProviderWithStatusCheck: RichMessageProvider {
-    func statusInfoFor(transaction: CoinTransaction) async -> TransactionStatusInfo
-}

@@ -12,7 +12,7 @@ import UIKit
 import LiskKit
 import CommonKit
 
-extension LskWalletService: RichMessageProvider {
+extension LskWalletService {
     var newPendingInterval: TimeInterval {
         .init(milliseconds: type(of: self).newPendingInterval)
     }

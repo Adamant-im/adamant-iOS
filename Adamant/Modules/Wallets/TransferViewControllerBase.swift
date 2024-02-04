@@ -10,6 +10,7 @@ import UIKit
 import Eureka
 import QRCodeReader
 import CommonKit
+import Combine
 
 // MARK: - Transfer Delegate Protocol
 
@@ -157,10 +158,13 @@ class TransferViewControllerBase: FormViewController {
     var increaseFeeService: IncreaseFeeService
     var chatsProvider: ChatsProvider
     let vibroService: VibroService
+    let walletService: WalletService
+    let walletCore: WalletCoreProtocol
     
     // MARK: - Properties
     
     private var previousIsReadyToSend: Bool?
+    private var subscriptions: Set<AnyCancellable> = []
     
     var commentsEnabled: Bool = false
     var rootCoinBalance: Decimal?
@@ -173,39 +177,6 @@ class TransferViewControllerBase: FormViewController {
         ).inverted
     }()
     
-    var service: WalletServiceWithSend? {
-        didSet {
-            if let prev = oldValue {
-                NotificationCenter.default.removeObserver(self, name: prev.transactionFeeUpdated, object: prev)
-                NotificationCenter.default.removeObserver(self, name: prev.walletUpdatedNotification, object: prev)
-            }
-            
-            if let new = service {
-                NotificationCenter.default.addObserver(forName: new.transactionFeeUpdated, object: new, queue: OperationQueue.main) { [weak self] _ in
-                    guard let form = self?.form
-                    else {
-                        return
-                    }
-                    
-                    if let row: DoubleDetailsRow = form.rowBy(tag: BaseRows.fee.tag) {
-                        row.value = self?.getCellFeeValue()
-                        row.updateCell()
-                    }
-                    
-                    if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.maxToTransfer.tag) {
-                        row.updateCell()
-                    }
-                    
-                    self?.validateForm()
-                }
-                
-                NotificationCenter.default.addObserver(forName: new.walletUpdatedNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
-                    self?.reloadFormData()
-                }
-            }
-        }
-    }
-    
     weak var delegate: TransferViewControllerDelegate?
     
     var addAdditionalFee = false {
@@ -215,8 +186,8 @@ class TransferViewControllerBase: FormViewController {
     }
     
     var transactionFee: Decimal {
-        let baseFee = service?.transactionFee ?? .zero
-        let additionalyFee = service?.additionalFee ?? .zero
+        let baseFee = walletCore.transactionFee
+        let additionalyFee = walletCore.additionalFee
         return addAdditionalFee
         ? baseFee + additionalyFee
         : baseFee
@@ -257,9 +228,8 @@ class TransferViewControllerBase: FormViewController {
     
     var maxToTransfer: Decimal {
         guard
-            let service = service,
-            let balance = service.wallet?.balance,
-            balance > service.minBalance
+            let balance = walletCore.wallet?.balance,
+            balance > walletCore.minBalance
         else {
             return 0
         }
@@ -268,18 +238,14 @@ class TransferViewControllerBase: FormViewController {
         ? transactionFee
         : 0
         
-        let max = balance - fee - service.minBalance
+        let max = balance - fee - walletCore.minBalance
         
         return max >= 0 ? max : 0
     }
     
     var minToTransfer: Decimal {
         get async throws {
-            guard let service = service else {
-                throw WalletServiceError.walletNotInitiated
-            }
-            
-            return service.minAmount
+            return walletCore.minAmount
         }
     }
     
@@ -320,7 +286,8 @@ class TransferViewControllerBase: FormViewController {
         screensFactory: ScreensFactory,
         currencyInfoService: CurrencyInfoService,
         increaseFeeService: IncreaseFeeService,
-        vibroService: VibroService
+        vibroService: VibroService,
+        walletService: WalletService
     ) {
         self.accountService = accountService
         self.accountsProvider = accountsProvider
@@ -330,7 +297,9 @@ class TransferViewControllerBase: FormViewController {
         self.increaseFeeService = increaseFeeService
         self.chatsProvider = chatsProvider
         self.vibroService = vibroService
-		
+        self.walletService = walletService
+        self.walletCore = walletService.core
+        
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -368,29 +337,64 @@ class TransferViewControllerBase: FormViewController {
         }
         
         // MARK: Notifications
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantCurrencyInfoService.currencyRatesUpdated,
-                                               object: nil,
-                                               queue: OperationQueue.main,
-                                               using: { [weak self] _ in
-                                                guard let vc = self else {
-                                                    return
-                                                }
-                                                
-                                                vc.rate = vc.currencyInfoService.getRate(for: vc.currencyCode)
-                                                
-                                                if let row: SafeDecimalRow = vc.form.rowBy(tag: BaseRows.fiat.tag) {
-                                                    if let formatter = row.formatter as? NumberFormatter {
-                                                        formatter.currencyCode = vc.currencyInfoService.currentCurrency.rawValue
-                                                    }
-                                                    
-                                                    row.updateCell()
-                                                }
-        })
+        
+        addObservers()
         
         setColors()
     }
     
     // MARK: - Other
+    
+    private func addObservers() {
+        NotificationCenter.default
+            .publisher(for: walletCore.transactionFeeUpdated)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.feeUpdated()
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: walletCore.walletUpdatedNotification)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.reloadFormData()
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantCurrencyInfoService.currencyRatesUpdated)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.currencyRateUpdated()
+            }
+            .store(in: &subscriptions)
+    }
+    
+    private func feeUpdated() {
+        if let row: DoubleDetailsRow = form.rowBy(tag: BaseRows.fee.tag) {
+            row.value = getCellFeeValue()
+            row.updateCell()
+        }
+        
+        if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.maxToTransfer.tag) {
+            row.updateCell()
+        }
+        
+        validateForm()
+    }
+    
+    private func currencyRateUpdated() {
+        rate = currencyInfoService.getRate(for: currencyCode)
+        
+        if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.fiat.tag) {
+            if let formatter = row.formatter as? NumberFormatter {
+                formatter.currencyCode = currencyInfoService.currentCurrency.rawValue
+            }
+            
+            row.updateCell()
+        }
+    }
     
     private func isReadyToSend() -> Bool {
         validateAddress()
@@ -516,7 +520,7 @@ class TransferViewControllerBase: FormViewController {
         section.append(defaultRowFor(baseRow: .amount))
         section.append(defaultRowFor(baseRow: .fiat))
         
-        if service?.isSupportIncreaseFee == true {
+        if walletCore.isSupportIncreaseFee {
             section.append(defaultRowFor(baseRow: .increaseFee))
         }
         
@@ -551,7 +555,7 @@ class TransferViewControllerBase: FormViewController {
     }
     
     func validateForm(force: Bool = false) {
-        guard let service = service, let wallet = service.wallet else {
+        guard let wallet = walletCore.wallet else {
             return
         }
         
@@ -670,7 +674,7 @@ class TransferViewControllerBase: FormViewController {
         }
         
         if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.balance.tag) {
-            if let wallet = service?.wallet {
+            if let wallet = walletCore.wallet {
                 row.value = wallet.balance.doubleValue
             } else {
                 row.value = 0
@@ -731,7 +735,7 @@ class TransferViewControllerBase: FormViewController {
             return
         }
         
-        guard service?.isTransactionFeeValid ?? true else {
+        guard walletCore.isTransactionFeeValid else {
             return
         }
         
@@ -768,20 +772,15 @@ class TransferViewControllerBase: FormViewController {
     /// Currency code, used to get fiat rates
     /// Default implementation tries to get currency symbol from service. If no service present - its fails
     var currencyCode: String {
-        if let service = service {
-            return service.tokenSymbol
-        } else {
-            return ""
-        }
+        walletCore.tokenSymbol
     }
     
     /// Override this to provide custom balance formatter
     var balanceFormatter: NumberFormatter {
-        if let service = service {
-            return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: service.tokenSymbol)
-        } else {
-            return AdamantBalanceFormat.full.defaultFormatter
-        }
+        AdamantBalanceFormat.currencyFormatter(
+            for: .full,
+            currencySymbol: walletCore.tokenSymbol
+        )
     }
 
     var feeBalanceFormatter: NumberFormatter {
@@ -799,13 +798,11 @@ class TransferViewControllerBase: FormViewController {
             return false
         }
         
-        guard let service = service,
-              let balance = service.wallet?.balance
-        else {
+        guard let balance = walletCore.wallet?.balance else {
             return false
         }
         
-        let minAmount = service.minAmount
+        let minAmount = walletCore.minAmount
         
         guard minAmount <= amount else {
             return false
@@ -818,8 +815,7 @@ class TransferViewControllerBase: FormViewController {
     
     func formIsValid() -> Bool {
         guard
-            let service = service,
-            let wallet = service.wallet,
+            let wallet = walletCore.wallet,
             wallet.balance > transactionFee
         else {
             return false
@@ -828,7 +824,7 @@ class TransferViewControllerBase: FormViewController {
         guard
             let recipient = recipientAddress, validateRecipient(recipient).isValid,
             let amount = amount, validateAmount(amount),
-            service.isTransactionFeeValid,
+            walletCore.isTransactionFeeValid,
             isEnoughFee()
         else {
             return false
@@ -838,10 +834,9 @@ class TransferViewControllerBase: FormViewController {
     }
     
     func isEnoughFee() -> Bool {
-        guard let service = service,
-              let wallet = service.wallet,
+        guard let wallet = walletCore.wallet,
               wallet.balance > transactionFee,
-              service.isTransactionFeeValid
+              walletCore.isTransactionFeeValid
         else {
             return false
         }
@@ -864,18 +859,13 @@ class TransferViewControllerBase: FormViewController {
     /// - Parameter address: raw readed address
     /// - Returns: string was successfully handled
     func handleRawAddress(_ address: String) -> Bool {
-        //fatalError("You must implement raw address handling")
-        guard let service = service else {
-            return false
-        }
-        
         let parsedAddress = AdamantCoinTools.decode(
             uri: address,
-            qqPrefix: service.qqPrefix
+            qqPrefix: walletCore.qqPrefix
         )
         
         guard let parsedAddress = parsedAddress,
-              case .valid = service.validate(address: parsedAddress.address)
+              case .valid = walletCore.validate(address: parsedAddress.address)
         else { return false }
         
         recipientAddress = parsedAddress.address
@@ -899,9 +889,7 @@ class TransferViewControllerBase: FormViewController {
         comments: String,
         hash: String
     ) async throws {
-        guard let richMessageType = (service as? RichMessageProvider)?.dynamicRichMessageType else {
-            return
-        }
+        let richMessageType = walletCore.dynamicRichMessageType
         
         let message: AdamantMessage
         
@@ -944,9 +932,8 @@ class TransferViewControllerBase: FormViewController {
     }
     
     /// Validate recipient's address
-    /// You must override this method
     func validateRecipient(_ address: String) -> AddressValidationResult {
-        fatalError("You must implement recipient addres validation logic")
+        walletCore.validate(address: address)
     }
     
     func checkForAdditionalFee() { }
@@ -963,7 +950,7 @@ extension TransferViewControllerBase {
                 $0.disabled = true
                 $0.formatter = self?.balanceFormatter
                 
-                if let wallet = self?.service?.wallet {
+                if let wallet = self?.walletCore.wallet {
                     $0.value = wallet.balance.doubleValue
                 } else {
                     $0.value = 0
@@ -1058,7 +1045,7 @@ extension TransferViewControllerBase {
                 $0.tag = BaseRows.fiat.tag
                 $0.disabled = true
                 
-                $0.formatter = fiatFormatter
+                $0.formatter = self?.fiatFormatter
                 
                 if let rate = self?.rate, let amount = self?.amount {
                     $0.value = amount.doubleValue * rate.doubleValue
@@ -1072,14 +1059,14 @@ extension TransferViewControllerBase {
             return SwitchRow { [weak self] in
                 $0.tag = BaseRows.increaseFee.tag
                 $0.title = BaseRows.increaseFee.localized
-                $0.value = self?.service?.isIncreaseFeeEnabled ?? false
+                $0.value = self?.walletCore.isIncreaseFeeEnabled ?? false
             }.cellUpdate { [weak self] (cell, row) in
                 cell.switchControl.onTintColor = UIColor.adamant.active
                 cell.textLabel?.textColor = row.value == true
                 ? self?.activeBaseColor
                 : self?.inactiveBaseColor
             }.onChange { [weak self] row in
-                guard let id = self?.service?.tokenUnicID,
+                guard let id = self?.walletCore.tokenUnicID,
                       let value = row.value
                 else {
                     return
@@ -1090,11 +1077,13 @@ extension TransferViewControllerBase {
                 : self?.inactiveBaseColor
                 
                 self?.increaseFeeService.setIncreaseFeeEnabled(for: id, value: value)
-                self?.service?.update()
+                self?.walletCore.update()
             }
         case .fee:
             return DoubleDetailsRow { [weak self] in
-                let estimateSymbol = service?.isDynamicFee == true ? " ~" : ""
+                let estimateSymbol = self?.walletCore.isDynamicFee == true 
+                ? " ~"
+                : .empty
                 
                 $0.tag = BaseRows.fee.tag
                 $0.cell.titleLabel.text = ""
@@ -1113,7 +1102,7 @@ extension TransferViewControllerBase {
                 $0.disabled = true
                 $0.formatter = self?.balanceFormatter
                 
-                if let balance = self?.service?.wallet?.balance {
+                if let balance = self?.walletCore.wallet?.balance {
                     $0.add(rule: RuleSmallerOrEqualThan<Double>(max: balance.doubleValue))
                 }
             }
@@ -1141,16 +1130,12 @@ extension TransferViewControllerBase {
     }
     
     private func getCellFeeValue() -> DoubleDetail {
-        guard let service = service else {
-            return DoubleDetail(first: "0", second: nil)
-        }
-        
         let fee = transactionFee
-        let isWarningGasPrice = service.isWarningGasPrice
+        let isWarningGasPrice = walletCore.isWarningGasPrice
         
         var fiat: Double = 0.0
         
-        let rate = currencyInfoService.getRate(for: service.blockchainSymbol)
+        let rate = currencyInfoService.getRate(for: walletCore.blockchainSymbol)
         if let rate = rate {
             fiat = fee.doubleValue * rate.doubleValue
         }

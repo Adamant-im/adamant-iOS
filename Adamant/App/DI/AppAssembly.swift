@@ -51,7 +51,8 @@ struct AppAssembly: Assembly {
         container.register(VisibleWalletsService.self) { r in
             AdamantVisibleWalletsService(
                 securedStore: r.resolve(SecuredStore.self)!,
-                accountService: r.resolve(AccountService.self)!
+                accountService: r.resolve(AccountService.self)!,
+                walletsServiceCompose: r.resolve(WalletServiceCompose.self)!
             )
         }.inObjectScope(.container)
         
@@ -198,7 +199,8 @@ struct AppAssembly: Assembly {
                 apiService: r.resolve(ApiService.self)!,
                 adamantCore: r.resolve(AdamantCore.self)!,
                 dialogService: r.resolve(DialogService.self)!,
-                securedStore: r.resolve(SecuredStore.self)!
+                securedStore: r.resolve(SecuredStore.self)!,
+                walletServiceCompose: r.resolve(WalletServiceCompose.self)!
             )
         }.inObjectScope(.container).initCompleted { (r, c) in
             Task { @MainActor in
@@ -207,9 +209,6 @@ struct AppAssembly: Assembly {
                 service.pushNotificationsTokenService = r.resolve(PushNotificationsTokenService.self)!
                 service.currencyInfoService = r.resolve(CurrencyInfoService.self)!
                 service.visibleWalletService = r.resolve(VisibleWalletsService.self)!
-                for case let wallet as SwinjectDependentService in service.wallets {
-                    wallet.injectDependencies(from: container)
-                }
             }
         }
         
@@ -225,11 +224,11 @@ struct AppAssembly: Assembly {
         
         // MARK: CurrencyInfoService
         container.register(CurrencyInfoService.self) { r in
-            AdamantCurrencyInfoService(securedStore: r.resolve(SecuredStore.self)!)
-        }.inObjectScope(.container).initCompleted { (r, c) in
-            guard let service = c as? AdamantCurrencyInfoService else { return }
-            service.accountService = r.resolve(AccountService.self)
-        }
+            AdamantCurrencyInfoService(
+                securedStore: r.resolve(SecuredStore.self)!,
+                walletServiceCompose: r.resolve(WalletServiceCompose.self)!
+            )
+        }.inObjectScope(.container)
         
         // MARK: LanguageStorageProtocol
         container.register(LanguageStorageProtocol.self) { r in
@@ -275,7 +274,8 @@ struct AppAssembly: Assembly {
                 adamantCore: r.resolve(AdamantCore.self)!,
                 accountsProvider: r.resolve(AccountsProvider.self)!,
                 transactionService: r.resolve(ChatTransactionService.self)!,
-                securedStore: r.resolve(SecuredStore.self)!
+                securedStore: r.resolve(SecuredStore.self)!,
+                walletServiceCompose: r.resolve(WalletServiceCompose.self)!
             )
         }.inObjectScope(.container)
         
@@ -283,21 +283,15 @@ struct AppAssembly: Assembly {
         container.register(ChatTransactionService.self) { r in
             AdamantChatTransactionService(
                 adamantCore: r.resolve(AdamantCore.self)!,
-                accountService: r.resolve(AccountService.self)!
+                walletServiceCompose: r.resolve(WalletServiceCompose.self)!
             )
         }.inObjectScope(.container)
         
         // MARK: Rich transaction status service
         container.register(TransactionStatusService.self) { r in
-            let accountService = r.resolve(AccountService.self)!
-            
-            let richProviders = accountService.wallets
-                .compactMap { $0 as? RichMessageProviderWithStatusCheck }
-                .map { ($0.dynamicRichMessageType, $0) }
-            
-            return AdamantTransactionStatusService(
+            AdamantTransactionStatusService(
                 coreDataStack: r.resolve(CoreDataStack.self)!,
-                richProviders: Dictionary(uniqueKeysWithValues: richProviders),
+                walletServiceCompose: r.resolve(WalletServiceCompose.self)!,
                 nodesStorage: r.resolve(NodesStorageProtocol.self)!
             )
         }.inObjectScope(.container)
@@ -308,7 +302,8 @@ struct AppAssembly: Assembly {
                 coreDataStack: r.resolve(CoreDataStack.self)!,
                 apiService: r.resolve(ApiService.self)!,
                 adamantCore: r.resolve(AdamantCore.self)!,
-                accountService: r.resolve(AccountService.self)!
+                accountService: r.resolve(AccountService.self)!, 
+                walletServiceCompose: r.resolve(WalletServiceCompose.self)!
             )
         }.inObjectScope(.container)
         
@@ -326,5 +321,35 @@ struct AppAssembly: Assembly {
         container.register(AddressConverterFactory.self) { _ in
             AddressConverterFactory()
         }.inObjectScope(.container)
+        
+        // MARK: Wallet Service Compose
+        container.register(WalletServiceCompose.self) { r in
+            var wallets: [WalletCoreProtocol] = [
+                AdmWalletService(),
+                BtcWalletService(),
+                EthWalletService(),
+                LskWalletService(),
+                DogeWalletService(),
+                DashWalletService()
+            ]
+            
+            let erc20WalletServices = ERC20Token.supportedTokens.map {
+                ERC20WalletService(token: $0)
+            }
+            
+            wallets.append(contentsOf: erc20WalletServices)
+            
+            return AdamantWalletServiceCompose(
+                wallets: wallets,
+                coreDataStack: r.resolve(CoreDataStack.self)!
+            )
+        }.inObjectScope(.container).initCompleted { (_, c) in
+            Task { @MainActor in
+                guard let service = c as? AdamantWalletServiceCompose else { return }
+                for case let wallet as SwinjectDependentService in service.getWallets().map({ $0.core }) {
+                    wallet.injectDependencies(from: container)
+                }
+            }
+        }
     }
 }

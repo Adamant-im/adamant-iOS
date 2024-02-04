@@ -58,21 +58,16 @@ final class AdamantCurrencyInfoService: CurrencyInfoService {
     private var observerActive: NSObjectProtocol?
     
     // MARK: - Dependencies
-    private let securedStore: SecuredStore
     
-    weak var accountService: AccountService? {
-        didSet {
-            if let accountService = accountService {
-                rateCoins = accountService.wallets.map { s -> String in s.tokenSymbol }
-            } else {
-                rateCoins = nil
-            }
-        }
-    }
+    private let securedStore: SecuredStore
+    private let walletServiceCompose: WalletServiceCompose
     
     // MARK: - Init
-    init(securedStore: SecuredStore) {
+    
+    init(securedStore: SecuredStore, walletServiceCompose: WalletServiceCompose) {
         self.securedStore = securedStore
+        self.walletServiceCompose = walletServiceCompose
+        rateCoins = walletServiceCompose.getWallets().map { $0.core.tokenSymbol }
         addObservers()
         setupSecuredStore()
     }

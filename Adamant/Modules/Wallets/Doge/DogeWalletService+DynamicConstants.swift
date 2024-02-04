@@ -62,7 +62,7 @@ extension DogeWalletService {
         70
     }
     
-    var minNodeVersion: String? {
+    static var minNodeVersion: String? {
         nil
     }
     

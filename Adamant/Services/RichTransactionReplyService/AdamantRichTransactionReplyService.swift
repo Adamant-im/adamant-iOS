@@ -15,7 +15,7 @@ actor AdamantRichTransactionReplyService: NSObject, RichTransactionReplyService 
     private let apiService: ApiService
     private let adamantCore: AdamantCore
     private let accountService: AccountService
-    private var richMessageProvider: [String: RichMessageProvider] = [:]
+    private let walletServiceCompose: WalletServiceCompose
     
     private lazy var richController = getRichTransactionsController()
     private lazy var transferController = getTransferController()
@@ -25,15 +25,16 @@ actor AdamantRichTransactionReplyService: NSObject, RichTransactionReplyService 
         coreDataStack: CoreDataStack,
         apiService: ApiService,
         adamantCore: AdamantCore,
-        accountService: AccountService
+        accountService: AccountService,
+        walletServiceCompose: WalletServiceCompose
     ) {
         self.coreDataStack = coreDataStack
         self.apiService = apiService
         self.adamantCore = adamantCore
         self.accountService = accountService
-        super.init()
+        self.walletServiceCompose = walletServiceCompose
         
-        self.richMessageProvider = self.makeRichMessageProviders()
+        super.init()
     }
     
     func startObserving() {
@@ -44,15 +45,6 @@ actor AdamantRichTransactionReplyService: NSObject, RichTransactionReplyService 
         transferController.delegate = self
         try? transferController.performFetch()
         transferController.fetchedObjects?.forEach( update(transaction:) )
-    }
-    
-    func makeRichMessageProviders() -> [String: RichMessageProvider] {
-        .init(
-            uniqueKeysWithValues: accountService
-                .wallets
-                .compactMap { $0 as? RichMessageProvider }
-                .map { ($0.dynamicRichMessageType, $0) }
-        )
     }
 }
 
@@ -200,7 +192,10 @@ private extension AdamantRichTransactionReplyService {
                 let comment = !transfer.comments.isEmpty
                 ? ": \(transfer.comments)"
                 : ""
-                let humanType = richMessageProvider[transfer.type]?.tokenSymbol ?? transfer.type
+                
+                let humanType = walletServiceCompose.getWallet(
+                    by: transfer.type
+                )?.core.tokenSymbol ?? transfer.type
                 
                 message = "\(transactionStatus) \(transfer.amount) \(humanType)\(comment)"
                 break
@@ -254,7 +249,10 @@ private extension AdamantRichTransactionReplyService {
                 let comment = !transfer.comments.isEmpty
                 ? ": \(transfer.comments)"
                 : ""
-                let humanType = richMessageProvider[transfer.type]?.tokenSymbol ?? transfer.type
+                
+                let humanType = walletServiceCompose.getWallet(
+                    by: transfer.type
+                )?.core.tokenSymbol ?? transfer.type
                 
                 message = "\(transactionStatus) \(transfer.amount) \(humanType)\(comment)"
                 break
