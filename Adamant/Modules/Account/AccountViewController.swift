@@ -60,7 +60,7 @@ final class AccountViewController: FormViewController {
     
     enum Rows {
         case balance, sendTokens // Wallet
-        case security, nodes, coinsNodes, theme, currency, language, about, visibleWallets, contribute, vibration // Application
+        case security, nodes, coinsNodes, theme, currency, language, about, visibleWallets, contribute // Application
         case voteForDelegates, generateQr, generatePk, logout // Actions
         case stayIn, biometry, notifications // Security
         
@@ -82,7 +82,6 @@ final class AccountViewController: FormViewController {
             case .notifications: return "notifications"
             case .visibleWallets: return "visibleWallets"
             case .contribute: return "contribute"
-            case .vibration: return "vibration"
             case .coinsNodes: return "coinsNodes"
             case .language: return "language"
             }
@@ -106,7 +105,6 @@ final class AccountViewController: FormViewController {
             case .notifications: return SecurityViewController.Rows.notificationsMode.localized
             case .visibleWallets: return .localized("VisibleWallets.Title", comment: "Visible Wallets page: scene title")
             case .contribute: return .localized("AccountTab.Row.Contribute", comment: "Account tab: 'Contribute' row")
-            case .vibration: return "Vibrations"
             case .coinsNodes: return .adamant.coinsNodesList.title
             case .language: return .localized("AccountTab.Row.Language", comment: "Account tab: 'Language' row")
             }
@@ -132,7 +130,6 @@ final class AccountViewController: FormViewController {
             case .notifications: image = .asset(named: "row_Notifications.png")
             case .visibleWallets: image = .asset(named: "row_balance")
             case .contribute: image = .asset(named: "row_contribute")
-            case .vibration: image = .asset(named: "row_contribute")
             case .language: image = .asset(named: "row_language")
             }
             
@@ -905,13 +902,6 @@ final class AccountViewController: FormViewController {
                                                    queue: OperationQueue.main,
                                                    using: callback)
         }
-        
-        NotificationCenter.default
-            .publisher(for: .AdamantVibroService.presentVibrationRow)
-            .sink { [weak self] _ in
-                self?.addVibrationRow()
-            }
-            .store(in: &notificationsSet)
     }
     
     private func updateUI() {
@@ -1020,40 +1010,6 @@ final class AccountViewController: FormViewController {
         DispatchQueue.background.async {
             self.accountService.reloadWallets()
         }
-    }
-    
-    private func addVibrationRow() {
-        guard let appSection = form.sectionBy(tag: Sections.application.tag),
-              form.rowBy(tag: Rows.vibration.tag) == nil
-        else { return }
-        
-        let vibrationRow = LabelRow {
-            $0.title = Rows.vibration.localized
-            $0.tag = Rows.vibration.tag
-            $0.cell.imageView?.image = Rows.vibration.image
-            $0.cell.selectionStyle = .gray
-        }.cellUpdate { (cell, _) in
-            cell.accessoryType = .disclosureIndicator
-        }.onCellSelection { [weak self] (_, _) in
-            guard let vc = self?.screensFactory.makeVibrationSelection()
-            else {
-                return
-            }
-            
-            if let split = self?.splitViewController {
-                let details = UINavigationController(rootViewController:vc)
-                split.showDetailViewController(details, sender: self)
-            } else if let nav = self?.navigationController {
-                nav.pushViewController(vc, animated: true)
-            } else {
-                vc.modalPresentationStyle = .overFullScreen
-                self?.present(vc, animated: true, completion: nil)
-            }
-            
-            self?.deselectWalletViewControllers()
-        }
-        
-        appSection.append(vibrationRow)
     }
 }
 
