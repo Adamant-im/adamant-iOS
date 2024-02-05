@@ -63,7 +63,7 @@ extension String.adamant {
     }
 }
 
-final class BtcWalletService: WalletService {
+final class BtcWalletService: WalletCoreProtocol {
 
     var tokenSymbol: String {
         type(of: self).currencySymbol
@@ -128,6 +128,7 @@ final class BtcWalletService: WalletService {
     @Atomic private var feeRate: Decimal = 1
     @Atomic private(set) var transactionFee: Decimal = DefaultBtcTransferFee.medium.rawValue / multiplier
     @Atomic private(set) var isWarningGasPrice = false
+    @Atomic private var cachedWalletAddress: [String: String] = [:]
     
     static let kvsAddress = "btc:address"
     private let walletPath = "m/44'/0'/21'/0/0"
@@ -360,12 +361,18 @@ final class BtcWalletService: WalletService {
     }
     
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
+        if let address = cachedWalletAddress[address], !address.isEmpty {
+            return address
+        }
+        
         do {
             let result = try await apiService.get(key: BtcWalletService.kvsAddress, sender: address).get()
             
             guard let result = result else {
                 throw WalletServiceError.walletNotInitiated
             }
+            
+            cachedWalletAddress[address] = result
             
             return result
         } catch _ as ApiServiceError {
@@ -395,7 +402,7 @@ final class BtcWalletService: WalletService {
 }
 
 // MARK: - WalletInitiatedWithPassphrase
-extension BtcWalletService: InitiatedWithPassphraseService {
+extension BtcWalletService {
     func setInitiationFailed(reason: String) {
         setState(.initiationFailed(reason: reason))
         btcWallet = nil

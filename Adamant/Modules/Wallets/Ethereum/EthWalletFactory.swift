@@ -11,31 +11,32 @@ import UIKit
 import CommonKit
 
 struct EthWalletFactory: WalletFactory {
-    typealias Service = EthWalletService
+    typealias Service = WalletService
     
+    let typeSymbol: String = EthWalletService.richMessageType
     let assembler: Assembler
     
     func makeWalletVC(service: Service, screensFactory: ScreensFactory) -> WalletViewController {
-        let c = EthWalletViewController(nibName: "WalletViewControllerBase", bundle: nil)
-        c.dialogService = assembler.resolve(DialogService.self)
-        c.currencyInfoService = assembler.resolve(CurrencyInfoService.self)
-        c.accountService = assembler.resolve(AccountService.self)
-        c.service = service
-        c.screensFactory = screensFactory
-        return c
+        EthWalletViewController(
+            dialogService: assembler.resolve(DialogService.self)!,
+            currencyInfoService: assembler.resolve(CurrencyInfoService.self)!,
+            accountService: assembler.resolve(AccountService.self)!,
+            screensFactory: screensFactory,
+            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!,
+            service: service
+        )
     }
     
     func makeTransferListVC(service: Service, screensFactory: ScreensFactory) -> UIViewController {
         let c = EthTransactionsViewController(nibName: "TransactionsListViewControllerBase", bundle: nil)
         c.dialogService = assembler.resolve(DialogService.self)
-        c.ethWalletService = service
         c.screensFactory = screensFactory
         c.walletService = service
         return c
     }
     
     func makeTransferVC(service: Service, screensFactory: ScreensFactory) -> TransferViewControllerBase {
-        let vc = EthTransferViewController(
+        EthTransferViewController(
             chatsProvider: assembler.resolve(ChatsProvider.self)!,
             accountService: assembler.resolve(AccountService.self)!,
             accountsProvider: assembler.resolve(AccountsProvider.self)!,
@@ -43,13 +44,11 @@ struct EthWalletFactory: WalletFactory {
             screensFactory: screensFactory,
             currencyInfoService: assembler.resolve(CurrencyInfoService.self)!,
             increaseFeeService: assembler.resolve(IncreaseFeeService.self)!,
-            vibroService: assembler.resolve(VibroService.self)!,
+            vibroService: assembler.resolve(VibroService.self)!, 
+            walletService: service,
             reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
             nodesStorage: assembler.resolve(NodesStorageProtocol.self)!
         )
-        
-        vc.service = service
-        return vc
     }
     
     func makeDetailsVC(service: Service, transaction: RichMessageTransaction) -> UIViewController? {
@@ -125,7 +124,7 @@ private extension EthWalletFactory {
     }
     
     func makeTransactionDetailsVC(service: Service) -> EthTransactionDetailsViewController {
-        let vc = EthTransactionDetailsViewController(
+        EthTransactionDetailsViewController(
             dialogService: assembler.resolve(DialogService.self)!,
             currencyInfo: assembler.resolve(CurrencyInfoService.self)!,
             addressBookService: assembler.resolve(AddressBookService.self)!,
@@ -133,8 +132,5 @@ private extension EthWalletFactory {
             walletService: service,
             languageService: assembler.resolve(LanguageStorageProtocol.self)!
         )
-        
-        vc.service = service
-        return vc
     }
 }

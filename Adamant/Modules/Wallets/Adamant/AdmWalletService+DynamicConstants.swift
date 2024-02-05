@@ -14,8 +14,8 @@ extension AdmWalletService {
         onScreenUpdateInterval: 10,
         threshold: 10,
         normalServiceUpdateInterval: 300,
-        crucialServiceUpdateInterval: 30,
-        onScreenServiceUpdateInterval: 10
+        crucialServiceUpdateInterval: 300,
+        onScreenServiceUpdateInterval: 300
     )
         
     static var newPendingInterval: Int {
@@ -54,7 +54,7 @@ extension AdmWalletService {
         0
     }
     
-    var minNodeVersion: String? {
+    static var minNodeVersion: String? {
         "0.8.0"
     }
     

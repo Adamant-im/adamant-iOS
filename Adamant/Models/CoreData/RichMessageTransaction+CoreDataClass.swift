@@ -21,12 +21,18 @@ public class RichMessageTransaction: ChatTransaction {
     
     override var transactionStatus: TransactionStatus? {
         get {
-            TransactionStatus(rawValue: transactionStatusRaw)
+            let data = Data(transactionStatusRaw.utf8)
+            return try? JSONDecoder().decode(TransactionStatus.self, from: data)
         }
         set {
-            let raw = newValue?.rawValue ?? .zero
-            guard raw != transactionStatusRaw else { return }
-            transactionStatusRaw = newValue?.rawValue ?? .zero
+            guard let data = try? JSONEncoder().encode(newValue),
+                  let raw = String(data: data, encoding: .utf8)
+            else {
+                transactionStatusRaw = ""
+                return
+            }
+            
+            transactionStatusRaw = raw
         }
     }
     

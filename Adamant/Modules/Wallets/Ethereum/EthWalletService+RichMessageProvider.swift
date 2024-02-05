@@ -11,7 +11,7 @@ import MessageKit
 import UIKit
 import CommonKit
 
-extension EthWalletService: RichMessageProvider {
+extension EthWalletService {
     var newPendingInterval: TimeInterval {
         .init(milliseconds: type(of: self).newPendingInterval)
     }

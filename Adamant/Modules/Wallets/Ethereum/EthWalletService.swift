@@ -63,7 +63,7 @@ extension Web3Error {
     }
 }
 
-final class EthWalletService: WalletService {
+final class EthWalletService: WalletCoreProtocol {
 	// MARK: - Constants
 	let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")
 	
@@ -144,7 +144,8 @@ final class EthWalletService: WalletService {
     public static let transactionsListApiSubpath = "ethtxs"
     @Atomic private(set) var enabled = true
     @Atomic private var subscriptions = Set<AnyCancellable>()
-
+    @Atomic private var cachedWalletAddress: [String: String] = [:]
+    
     @ObservableValue private(set) var historyTransactions: [TransactionDetails] = []
     @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
 
@@ -361,7 +362,7 @@ final class EthWalletService: WalletService {
 }
 
 // MARK: - WalletInitiatedWithPassphrase
-extension EthWalletService: InitiatedWithPassphraseService {
+extension EthWalletService {
     func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
         guard let adamant = accountService?.account else {
             throw WalletServiceError.notLogged
@@ -528,12 +529,18 @@ extension EthWalletService {
 	}
 	
 	func getWalletAddress(byAdamantAddress address: String) async throws -> String {
+        if let address = cachedWalletAddress[address], !address.isEmpty {
+            return address
+        }
+        
         do {
             let result = try await apiService.get(key: EthWalletService.kvsAddress, sender: address).get()
             
             guard let result = result else {
                 throw WalletServiceError.walletNotInitiated
             }
+            
+            cachedWalletAddress[address] = result
             
             return result
         } catch _ as ApiServiceError {

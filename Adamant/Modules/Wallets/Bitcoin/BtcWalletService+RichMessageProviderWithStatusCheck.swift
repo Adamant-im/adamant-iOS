@@ -9,7 +9,7 @@
 import Foundation
 import CommonKit
 
-extension BtcWalletService: RichMessageProviderWithStatusCheck {
+extension BtcWalletService {
     func statusInfoFor(transaction: CoinTransaction) async -> TransactionStatusInfo {
         let hash: String?
         
@@ -20,13 +20,13 @@ extension BtcWalletService: RichMessageProviderWithStatusCheck {
         }
         
         guard let hash = hash else {
-            return .init(sentDate: nil, status: .inconsistent)
+            return .init(sentDate: nil, status: .inconsistent(.wrongTxHash))
         }
         
         do {
             let btcTransaction = try await getTransaction(by: hash)
             
-            return .init(
+            return await .init(
                 sentDate: btcTransaction.dateValue,
                 status: getStatus(transaction: transaction, btcTransaction: btcTransaction)
             )
@@ -40,9 +40,9 @@ private extension BtcWalletService {
     func getStatus(
         transaction: CoinTransaction,
         btcTransaction: BtcTransaction
-    ) -> TransactionStatus {
+    ) async -> TransactionStatus {
         guard let status = btcTransaction.transactionStatus else {
-            return .inconsistent
+            return .inconsistent(.unknown)
         }
         
         guard status == .success else {
@@ -50,15 +50,47 @@ private extension BtcWalletService {
         }
         
         // MARK: Check address
-        guard
-            transaction.isOutgoing && btcTransaction.senderAddress == btcWallet?.address
-                || btcTransaction.recipientAddress == btcWallet?.address
-        else { return .inconsistent }
+        
+        var realSenderAddress = btcTransaction.senderAddress
+        var realRecipientAddress = btcTransaction.recipientAddress
+        
+        if transaction is RichMessageTransaction {
+            guard let senderAddress = try? await getWalletAddress(byAdamantAddress: transaction.senderAddress)
+            else {
+                return .inconsistent(.senderCryptoAddressUnavailable(tokenSymbol))
+            }
+            
+            guard let recipientAddress = try? await getWalletAddress(byAdamantAddress: transaction.recipientAddress)
+            else {
+                return .inconsistent(.recipientCryptoAddressUnavailable(tokenSymbol))
+            }
+            
+            realSenderAddress = senderAddress
+            realRecipientAddress = recipientAddress
+        }
+        
+        guard btcTransaction.senderAddress.caseInsensitiveCompare(realSenderAddress) == .orderedSame else {
+            return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
+        }
+        
+        guard btcTransaction.recipientAddress.caseInsensitiveCompare(realRecipientAddress) == .orderedSame else {
+            return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
+        }
+        
+        if transaction.isOutgoing {
+             guard  btcWallet?.address.caseInsensitiveCompare(btcTransaction.senderAddress) == .orderedSame else {
+                 return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
+             }
+         } else {
+             guard btcWallet?.address.caseInsensitiveCompare(btcTransaction.recipientAddress) == .orderedSame else {
+                 return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
+             }
+         }
         
         // MARK: Check amount
         if let reported = reportedValue(for: transaction) {
             guard reported == btcTransaction.amountValue else {
-                return .inconsistent
+                return .inconsistent(.wrongAmount)
             }
         }
         

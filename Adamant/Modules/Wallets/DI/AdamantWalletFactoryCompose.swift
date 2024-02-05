@@ -152,10 +152,13 @@ private extension AdamantWalletFactoryCompose {
     }
     
     func tryExecuteFactoryMethod<Factory: WalletFactory, Result>(
-        factory _: Factory,
+        factory: Factory,
         service: WalletService,
         method: (Factory.Service) -> Result
     ) -> Result? {
-        (service as? Factory.Service).map { method($0) }
+        guard factory.typeSymbol == type(of: service.core).richMessageType else {
+            return nil
+        }
+        return (service as? Factory.Service).map { method($0) }
     }
 }

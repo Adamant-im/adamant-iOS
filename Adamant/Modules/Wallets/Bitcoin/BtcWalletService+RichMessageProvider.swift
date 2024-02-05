@@ -11,7 +11,7 @@ import MessageKit
 import UIKit
 import CommonKit
 
-extension BtcWalletService: RichMessageProvider {
+extension BtcWalletService {
     var newPendingInterval: TimeInterval {
         .init(milliseconds: type(of: self).newPendingInterval)
     }

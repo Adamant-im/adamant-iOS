@@ -48,18 +48,19 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     
     // MARK: - Dependencies
     
-    var dialogService: DialogService!
-    var currencyInfoService: CurrencyInfoService!
-    var accountService: AccountService!
-    var screensFactory: ScreensFactory!
+    private let currencyInfoService: CurrencyInfoService
+    private let accountService: AccountService
+    private let walletServiceCompose: WalletServiceCompose
     
+    let dialogService: DialogService
+    let screensFactory: ScreensFactory
+    var service: WalletService?
+
     // MARK: - Properties, WalletViewController
     
     var viewController: UIViewController { return self }
     var height: CGFloat { return tableView.frame.origin.y + tableView.contentSize.height }
-    
-    var service: WalletService?
-    
+        
     weak var delegate: WalletViewControllerDelegate?
     
     private lazy var fiatFormatter: NumberFormatter = {
@@ -78,6 +79,29 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     @IBOutlet weak var errorView: UIView!
     @IBOutlet weak var errorImageView: UIImageView!
     @IBOutlet weak var errorLabel: UILabel!
+    
+    // MARK: Init
+    
+    init(
+        dialogService: DialogService,
+        currencyInfoService: CurrencyInfoService,
+        accountService: AccountService,
+        screensFactory: ScreensFactory,
+        walletServiceCompose: WalletServiceCompose,
+        service: WalletService?
+    ) {
+        self.dialogService = dialogService
+        self.currencyInfoService = currencyInfoService
+        self.accountService = accountService
+        self.screensFactory = screensFactory
+        self.walletServiceCompose = walletServiceCompose
+        self.service = service
+        super.init(nibName: "WalletViewControllerBase", bundle: nil)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - Lifecycle
     
@@ -101,26 +125,26 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
             $0.alertBackgroundColor = UIColor.adamant.primary
             $0.alertTextColor = UIColor.adamant.cellAlertTextColor
             $0.cell.backgroundColor = UIColor.adamant.cellColor
-            let symbol = self?.service?.tokenSymbol ?? ""
+            let symbol = self?.service?.core.tokenSymbol ?? ""
             
             $0.value = self?.balanceRowValueFor(
-                balance: self?.service?.wallet?.balance ?? 0,
+                balance: self?.service?.core.wallet?.balance ?? 0,
                 symbol: symbol,
-                alert: self?.service?.wallet?.notifications,
-                isBalanceInitialized: self?.service?.wallet?.isBalanceInitialized ?? false
+                alert: self?.service?.core.wallet?.notifications,
+                isBalanceInitialized: self?.service?.core.wallet?.isBalanceInitialized ?? false
             )
             
             let height = $0.value?.fiat != nil ? BalanceTableViewCell.fullHeight : BalanceTableViewCell.compactHeight
             
             $0.cell.height = { height }
         }.cellUpdate { [weak self] (cell, row) in
-            let symbol = self?.service?.tokenSymbol ?? ""
+            let symbol = self?.service?.core.tokenSymbol ?? ""
             
             row.value = self?.balanceRowValueFor(
-                balance: self?.service?.wallet?.balance ?? 0,
+                balance: self?.service?.core.wallet?.balance ?? 0,
                 symbol: symbol,
-                alert: self?.service?.wallet?.notifications,
-                isBalanceInitialized: self?.service?.wallet?.isBalanceInitialized ?? false
+                alert: self?.service?.core.wallet?.notifications,
+                isBalanceInitialized: self?.service?.core.wallet?.isBalanceInitialized ?? false
             )
             
             let height = row.value?.fiat != nil ? BalanceTableViewCell.fullHeight : BalanceTableViewCell.compactHeight
@@ -156,64 +180,60 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         section.append(balanceRow)
         
         // MARK: Send
-        if service is WalletServiceWithSend {
-            let label = sendRowLocalizedLabel()
+        
+        let label = sendRowLocalizedLabel()
+        
+        let sendRow = LabelRow {
+            $0.tag = BaseRows.send.tag
+            var content = $0.cell.defaultContentConfiguration()
+            content.attributedText = label
+            $0.cell.contentConfiguration = content
+            $0.cell.selectionStyle = .gray
+            $0.cell.backgroundColor = UIColor.adamant.cellColor
+        }.cellUpdate { [weak self] (cell, _) in
+            cell.accessoryType = .disclosureIndicator
             
-            let sendRow = LabelRow {
-                $0.tag = BaseRows.send.tag
-                var content = $0.cell.defaultContentConfiguration()
-                content.attributedText = label
-                $0.cell.contentConfiguration = content
-                $0.cell.selectionStyle = .gray
-                $0.cell.backgroundColor = UIColor.adamant.cellColor
-            }.cellUpdate { [weak self] (cell, _) in
-                cell.accessoryType = .disclosureIndicator
+            cell.separatorInset = self?.service?.core is AdmWalletService
+            ? UITableView.defaultSeparatorInset
+            : .zero
+            
+            if #unavailable(iOS 14.0) {
+                cell.textLabel?.attributedText = label
+            }
+        }.onCellSelection { [weak self] (_, _) in
+            guard let self = self, let service = service else { return }
+            
+            let vc = screensFactory.makeTransferVC(service: service)
+            vc.delegate = self
+            if ERC20Token.supportedTokens.contains(where: { token in
+                return token.symbol == service.core.tokenSymbol
+            }) {
                 
-                cell.separatorInset = self?.service is AdmWalletService
-                ? UITableView.defaultSeparatorInset
-                : .zero
+                let ethWallet = walletServiceCompose.getWallet(
+                    by: EthWalletService.richMessageType
+                )?.core
                 
-                let label = self?.sendRowLocalizedLabel()
-                var content = cell.defaultContentConfiguration()
-                content.attributedText = label
-                cell.contentConfiguration = content
-                
-                if #unavailable(iOS 14.0) {
-                    cell.textLabel?.attributedText = label
-                }
-            }.onCellSelection { [weak self] (_, _) in
-                guard let self = self, let service = service else { return }
-                
-                let vc = screensFactory.makeTransferVC(service: service)
-                vc.delegate = self
-                if ERC20Token.supportedTokens.contains(where: { token in
-                    return token.symbol == service.tokenSymbol
-                }) {
-                    let ethWallet = accountService.wallets.first { wallet in
-                        return wallet.tokenSymbol == "ETH"
-                    }
-                    vc.rootCoinBalance = ethWallet?.wallet?.balance
-                }
-                
-                if let split = splitViewController {
-                    let details = UINavigationController(rootViewController:vc)
-                    split.showDetailViewController(details, sender: self)
+                vc.rootCoinBalance = ethWallet?.wallet?.balance
+            }
+            
+            if let split = splitViewController {
+                let details = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(details, sender: self)
+            } else {
+                if let nav = navigationController {
+                    nav.pushViewController(vc, animated: true)
                 } else {
-                    if let nav = navigationController {
-                        nav.pushViewController(vc, animated: true)
-                    } else {
-                        vc.modalPresentationStyle = .overFullScreen
-                        present(vc, animated: true)
-                    }
-                }
-                
-                if let delegate = delegate {
-                    delegate.walletViewControllerSelectedRow(self)
+                    vc.modalPresentationStyle = .overFullScreen
+                    present(vc, animated: true)
                 }
             }
             
-            section.append(sendRow)
+            if let delegate = delegate {
+                delegate.walletViewControllerSelectedRow(self)
+            }
         }
+        
+        section.append(sendRow)
         
         form.append(section)
         
@@ -222,14 +242,14 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
             // MARK: Wallet updated
             let walletUpdatedCallback = { [weak self] (_: Notification) in
                 if let row: LabelRow = self?.form.rowBy(tag: BaseRows.address.tag) {
-                    if let wallet = service.wallet {
+                    if let wallet = service.core.wallet {
                         row.value = wallet.address
                         row.updateCell()
                     }
                 }
                 
                 guard let service = self?.service,
-                      let wallet = service.wallet,
+                      let wallet = service.core.wallet,
                       let vc = self,
                       let row: BalanceRow = vc.form.rowBy(tag: BaseRows.balance.tag) else {
                     return
@@ -239,7 +259,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                     self?.fiatFormatter.currencyCode = currentCurrency.rawValue
                 }
                 
-                let symbol = service.tokenSymbol
+                let symbol = service.core.tokenSymbol
                 row.value = vc.balanceRowValueFor(
                     balance: wallet.balance,
                     symbol: symbol,
@@ -249,15 +269,19 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 row.updateCell()
             }
             
-            NotificationCenter.default.addObserver(forName: service.walletUpdatedNotification,
-                                                   object: service,
-                                                   queue: OperationQueue.main,
-                                                   using: walletUpdatedCallback)
+            NotificationCenter.default.addObserver(
+                forName: service.core.walletUpdatedNotification,
+                object: service.core,
+                queue: OperationQueue.main,
+                using: walletUpdatedCallback
+            )
             
-            NotificationCenter.default.addObserver(forName: Notification.Name.AdamantCurrencyInfoService.currencyRatesUpdated,
-                                                   object: nil,
-                                                   queue: OperationQueue.main,
-                                                   using: walletUpdatedCallback)
+            NotificationCenter.default.addObserver(
+                forName: Notification.Name.AdamantCurrencyInfoService.currencyRatesUpdated,
+                object: nil,
+                queue: OperationQueue.main,
+                using: walletUpdatedCallback
+            )
             
             // MARK: Wallet state updated
             let stateUpdatedCallback = { [weak self] (notification: Notification) in
@@ -268,13 +292,15 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 self?.setUiToWalletServiceState(newState)
             }
             
-            NotificationCenter.default.addObserver(forName: service.serviceStateChanged,
-                                                   object: service,
-                                                   queue: OperationQueue.main,
-                                                   using: stateUpdatedCallback)
+            NotificationCenter.default.addObserver(
+                forName: service.core.serviceStateChanged,
+                object: service,
+                queue: OperationQueue.main,
+                using: stateUpdatedCallback
+            )
         }
         
-        if let state = service?.state {
+        if let state = service?.core.state {
             switch state {
             case .updating:
                 setUiToWalletServiceState(.notInitiated)
@@ -326,7 +352,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
             $0.cell.selectionStyle = .gray
             $0.cell.backgroundColor = UIColor.adamant.cellColor
             $0.cell.detailTextLabel?.lineBreakMode = .byTruncatingMiddle
-            if let wallet = service?.wallet {
+            if let wallet = service?.core.wallet {
                 $0.value = wallet.address
             }
         }.cellUpdate { (cell, row) in
@@ -342,7 +368,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 tableView.deselectRow(at: indexPath, animated: true)
             }
             
-            if let address = self?.service?.wallet?.address {
+            if let address = self?.service?.core.wallet?.address {
                 let types: [ShareType]
                 let withLogo = self?.includeLogoInQR() ?? false
                 

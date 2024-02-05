@@ -676,6 +676,9 @@
 /* NodesList.NodeCell: Node is disabled */
 "NodesList.NodeCell.Disabled" = "Deaktiviert";
 
+/* NodesList.NodeCell: Node is outdated */
+"NodesList.NodeCell.Outdated" = "Veraltete API-Version:";
+
 /* NodesList.NodeCell: Node version */
 "NodesList.NodeCell.Version" = "version";
 
@@ -933,6 +936,30 @@
 
 /* Transaction status: inconsistent wrong timestamp */
 "TransactionStatus.Inconsistent.WrongTimestamp" = "Nachricht und Tx haben unterschiedliche Zeitstempel. Es ist möglich, aber überprüfen Sie es zweimal";
+
+/* Transaction status: inconsistent wrong unknown */
+"TransactionStatus.Inconsistent.Unknown" = "Tx konnte nicht überprüft werden. Etwas ist schief gelaufen";
+
+/* Transaction status: inconsistent wrong hash */
+"TransactionStatus.Inconsistent.WrongTxHash" = "Falscher Tx-Hash. Seien Sie sich vor Betrug bewusst";
+
+/* Transaction status: inconsistent wrong amount */
+"TransactionStatus.Inconsistent.WrongAmount" = "Falscher Betrag. Seien Sie sich vor Betrug bewusst";
+
+/* Transaction status: inconsistent wrong mismatch */
+"TransactionStatus.Inconsistent.SenderCryptoAddressMismatch" = "Die %@-Adresse des Absenders weicht ab. Seien Sie sich vor Betrug bewusst";
+
+/* Transaction status: inconsistent wrong mismatch */
+"TransactionStatus.Inconsistent.RecipientCryptoAddressMismatch" = "Die %@-Adresse des Empfängers weicht ab. Seien Sie sich vor Betrug bewusst";
+
+/* Transaction status: inconsistent unable to retrieve */
+"TransactionStatus.Inconsistent.SenderCryptoAddressUnavailable" = "Die %@-Adresse des Absenders kann nicht abgerufen werden";
+
+/* Transaction status: inconsistent unable to retrieve */
+"TransactionStatus.Inconsistent.RecipientCryptoAddressUnavailable" = "Die %@-Adresse des Empfängers kann nicht abgerufen werden";
+
+/* Transaction status: inconsistent duplicate */
+"TransactionStatus.Inconsistent.Duplicate" = "Diese Übertragung erschien zuvor im Chat. Seien Sie sich vor Betrug bewusst";
 
 /* Transaction status: inconsistent reason title */
 "TransactionStatus.Inconsistent.Reason.Title" = "Inkonsistenter Grund";

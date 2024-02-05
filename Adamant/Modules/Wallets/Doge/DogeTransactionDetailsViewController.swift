@@ -13,7 +13,9 @@ import CommonKit
 final class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies
     
-    weak var service: DogeWalletService?
+    weak var service: DogeWalletService? {
+        walletService?.core as? DogeWalletService
+    }
     
     // MARK: - Properties
     
@@ -28,10 +30,6 @@ final class DogeTransactionDetailsViewController: TransactionDetailsViewControll
         control.addTarget(self, action: #selector(refresh), for: UIControl.Event.valueChanged)
         return control
     }()
-    
-    override var richProvider: RichMessageProviderWithStatusCheck? {
-        return service
-    }
     
     // MARK: - Lifecycle
     
