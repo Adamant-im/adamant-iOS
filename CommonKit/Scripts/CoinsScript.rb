@@ -196,7 +196,7 @@ extension #{symbol.capitalize}WalletService {
     static let currencySymbol = \"#{symbol}\"
     static let currencyExponent: Int = -#{decimals}
     static let qqPrefix: String = \"#{qqPrefix}\"
-    static let cryptoTransferDecimals: Int = #{cryptoTransferDecimals}
+    
     #{health_check_params ?
     health_check_params :
     emptyText
@@ -278,6 +278,10 @@ extension #{symbol.capitalize}WalletService {
     
     var minNodeVersion: String? {
         #{minNodeVersion}
+    }
+    
+    var transferDecimals: Int {
+        #{cryptoTransferDecimals}
     }
     
     static let explorerAddress = \"#{explorerTx.sub! '${ID}', ''}\"

@@ -95,10 +95,6 @@ final class DogeWalletService: WalletService {
         return Self.qqPrefix
     }
     
-    var transferDecimals: Int {
-        Self.cryptoTransferDecimals
-    }
-    
     static let kvsAddress = "doge:address"
     
     @Atomic private(set) var isWarningGasPrice = false

@@ -8,7 +8,7 @@ extension LskWalletService {
     static let currencySymbol = "LSK"
     static let currencyExponent: Int = -8
     static let qqPrefix: String = "lisk"
-    static let cryptoTransferDecimals: Int = 8
+    
     static let healthCheckParameters = CoinHealthCheckParameters(
         normalUpdateInterval: 270,
         crucialUpdateInterval: 30,
@@ -65,6 +65,10 @@ extension LskWalletService {
     
     var minNodeVersion: String? {
         nil
+    }
+    
+    var transferDecimals: Int {
+        8
     }
     
     static let explorerAddress = "https://liskscan.com/transaction/"

@@ -8,7 +8,7 @@ extension DogeWalletService {
     static let currencySymbol = "DOGE"
     static let currencyExponent: Int = -8
     static let qqPrefix: String = "doge"
-    static let cryptoTransferDecimals: Int = 8
+    
     static let healthCheckParameters = CoinHealthCheckParameters(
         normalUpdateInterval: 390,
         crucialUpdateInterval: 30,
@@ -65,6 +65,10 @@ extension DogeWalletService {
     
     var minNodeVersion: String? {
         nil
+    }
+    
+    var transferDecimals: Int {
+        8
     }
     
     static let explorerAddress = "https://dogechain.info/tx/"
