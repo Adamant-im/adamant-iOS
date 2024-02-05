@@ -146,9 +146,8 @@ class TransactionsListViewControllerBase: UIViewController {
     }
     
     func configureTableView() {
-        let nib = UINib.init(nibName: "TransactionTableViewCell", bundle: nil)
-        tableView.register(nib, forCellReuseIdentifier: cellIdentifierFull)
-        tableView.register(nib, forCellReuseIdentifier: cellIdentifierCompact)
+        tableView.register(TransactionTableViewCell.self, forCellReuseIdentifier: cellIdentifierFull)
+        tableView.register(TransactionTableViewCell.self, forCellReuseIdentifier: cellIdentifierCompact)
         tableView.delegate = self
         tableView.refreshControl = refreshControl
         tableView.tableHeaderView = UIView()
