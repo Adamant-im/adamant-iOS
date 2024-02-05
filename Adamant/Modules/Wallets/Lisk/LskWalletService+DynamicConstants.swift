@@ -63,7 +63,7 @@ extension LskWalletService {
         60
     }
     
-    var minNodeVersion: String? {
+    static var minNodeVersion: String? {
         nil
     }
     

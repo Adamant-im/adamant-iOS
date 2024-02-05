@@ -60,7 +60,7 @@ final class AccountViewController: FormViewController {
     
     enum Rows {
         case balance, sendTokens // Wallet
-        case security, nodes, coinsNodes, theme, currency, language, about, visibleWallets, contribute, vibration // Application
+        case security, nodes, coinsNodes, theme, currency, language, about, visibleWallets, contribute // Application
         case voteForDelegates, generateQr, generatePk, logout // Actions
         case stayIn, biometry, notifications // Security
         
@@ -82,7 +82,6 @@ final class AccountViewController: FormViewController {
             case .notifications: return "notifications"
             case .visibleWallets: return "visibleWallets"
             case .contribute: return "contribute"
-            case .vibration: return "vibration"
             case .coinsNodes: return "coinsNodes"
             case .language: return "language"
             }
@@ -106,7 +105,6 @@ final class AccountViewController: FormViewController {
             case .notifications: return SecurityViewController.Rows.notificationsMode.localized
             case .visibleWallets: return .localized("VisibleWallets.Title", comment: "Visible Wallets page: scene title")
             case .contribute: return .localized("AccountTab.Row.Contribute", comment: "Account tab: 'Contribute' row")
-            case .vibration: return "Vibrations"
             case .coinsNodes: return .adamant.coinsNodesList.title
             case .language: return .localized("AccountTab.Row.Language", comment: "Account tab: 'Language' row")
             }
@@ -132,7 +130,6 @@ final class AccountViewController: FormViewController {
             case .notifications: image = .asset(named: "row_Notifications.png")
             case .visibleWallets: image = .asset(named: "row_balance")
             case .contribute: image = .asset(named: "row_contribute")
-            case .vibration: image = .asset(named: "row_contribute")
             case .language: image = .asset(named: "row_language")
             }
             
@@ -144,16 +141,18 @@ final class AccountViewController: FormViewController {
     
     // MARK: - Dependencies
     
-    let visibleWalletsService: VisibleWalletsService
+    private let visibleWalletsService: VisibleWalletsService
+    private let screensFactory: ScreensFactory
+    private let notificationsService: NotificationsService
+    private let transfersProvider: TransfersProvider
+    private let avatarService: AvatarService
+    private let currencyInfoService: CurrencyInfoService
+    private let languageService: LanguageStorageProtocol
+    private let walletServiceCompose: WalletServiceCompose
+    
     let accountService: AccountService
     let dialogService: DialogService
-    let screensFactory: ScreensFactory
-    let notificationsService: NotificationsService
-    let transfersProvider: TransfersProvider
     let localAuth: LocalAuthentication
-    let avatarService: AvatarService
-    let currencyInfoService: CurrencyInfoService
-    let languageService: LanguageStorageProtocol
     
     // MARK: - Properties
     
@@ -205,7 +204,8 @@ final class AccountViewController: FormViewController {
         localAuth: LocalAuthentication,
         avatarService: AvatarService,
         currencyInfoService: CurrencyInfoService,
-        languageService: LanguageStorageProtocol
+        languageService: LanguageStorageProtocol,
+        walletServiceCompose: WalletServiceCompose
     ) {
         self.visibleWalletsService = visibleWalletsService
         self.accountService = accountService
@@ -217,6 +217,7 @@ final class AccountViewController: FormViewController {
         self.avatarService = avatarService
         self.currencyInfoService = currencyInfoService
         self.languageService = languageService
+        self.walletServiceCompose = walletServiceCompose
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -300,8 +301,13 @@ final class AccountViewController: FormViewController {
             self?.pagingViewController.reloadData()
         }
         
-        for walletService in accountService.wallets {
-            NotificationCenter.default.addObserver(forName: walletService.walletUpdatedNotification, object: nil, queue: OperationQueue.main, using: callback)
+        for walletService in walletServiceCompose.getWallets() {
+            NotificationCenter.default.addObserver(
+                forName: walletService.core.walletUpdatedNotification,
+                object: nil,
+                queue: OperationQueue.main,
+                using: callback
+            )
         }
         
         // MARK: Rows&Sections
@@ -668,6 +674,7 @@ final class AccountViewController: FormViewController {
             case .touchID: $0.cell.imageView?.image = .asset(named: "row_touchid.png")
             case .faceID: $0.cell.imageView?.image = .asset(named: "row_faceid.png")
             }
+            
             $0.hidden = Condition.function([], { [weak self] _ -> Bool in
                 guard let showBiometry = self?.showBiometryOptions else {
                     return true
@@ -882,7 +889,7 @@ final class AccountViewController: FormViewController {
         }
         
         for vc in walletViewControllers {
-            guard let service = vc.service else { return }
+            guard let service = vc.service?.core else { return }
             let notification = service.walletUpdatedNotification
             let callback: ((Notification) -> Void) = { [weak self] _ in
                 guard let self = self else { return }
@@ -895,13 +902,6 @@ final class AccountViewController: FormViewController {
                                                    queue: OperationQueue.main,
                                                    using: callback)
         }
-        
-        NotificationCenter.default
-            .publisher(for: .AdamantVibroService.presentVibrationRow)
-            .sink { [weak self] _ in
-                self?.addVibrationRow()
-            }
-            .store(in: &notificationsSet)
     }
     
     private func updateUI() {
@@ -935,7 +935,7 @@ final class AccountViewController: FormViewController {
     
     private func setupWalletsVC() {
         walletViewControllers.removeAll()
-        let availableServices: [WalletService] = visibleWalletsService.sorted(includeInvisible: false)
+        let availableServices = visibleWalletsService.sorted(includeInvisible: false)
         availableServices.forEach { walletService in
             walletViewControllers.append(screensFactory.makeWalletVC(service: walletService))
         }
@@ -1011,40 +1011,6 @@ final class AccountViewController: FormViewController {
             self.accountService.reloadWallets()
         }
     }
-    
-    private func addVibrationRow() {
-        guard let appSection = form.sectionBy(tag: Sections.application.tag),
-              form.rowBy(tag: Rows.vibration.tag) == nil
-        else { return }
-        
-        let vibrationRow = LabelRow {
-            $0.title = Rows.vibration.localized
-            $0.tag = Rows.vibration.tag
-            $0.cell.imageView?.image = Rows.vibration.image
-            $0.cell.selectionStyle = .gray
-        }.cellUpdate { (cell, _) in
-            cell.accessoryType = .disclosureIndicator
-        }.onCellSelection { [weak self] (_, _) in
-            guard let vc = self?.screensFactory.makeVibrationSelection()
-            else {
-                return
-            }
-            
-            if let split = self?.splitViewController {
-                let details = UINavigationController(rootViewController:vc)
-                split.showDetailViewController(details, sender: self)
-            } else if let nav = self?.navigationController {
-                nav.pushViewController(vc, animated: true)
-            } else {
-                vc.modalPresentationStyle = .overFullScreen
-                self?.present(vc, animated: true, completion: nil)
-            }
-            
-            self?.deselectWalletViewControllers()
-        }
-        
-        appSection.append(vibrationRow)
-    }
 }
 
 // MARK: - AccountHeaderViewDelegate
@@ -1094,7 +1060,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
     }
 
     func pagingViewController(_: PagingViewController, pagingItemAt index: Int) -> PagingItem {
-        guard let service = walletViewControllers[index].service else {
+        guard let service = walletViewControllers[index].service?.core else {
             return WalletPagingItem(
                 index: index,
                 currencySymbol: "",

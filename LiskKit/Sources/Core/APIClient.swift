@@ -106,6 +106,16 @@ public struct APIClient {
     }
 
     public func request<R: Decodable>(
+        _ httpMethod: HTTPMethod,
+        path: String,
+        options: Any?
+    ) async throws -> R {
+        let request = urlRequest(httpMethod, path: path, options: options)
+        let response: R = try await dataTask(request)
+        return response
+    }
+    
+    public func request<R: Decodable>(
         method: String,
         params: [String: Any]
     ) async throws -> R {
@@ -249,21 +259,23 @@ public struct APIClient {
             throw APIError.unexpected(code: code)
         }
 
-        guard let jsonResponse = try? JSONDecoder().decode(JSONResponse<R>.self, from: data) else {
-            if var error = try? JSONDecoder().decode(APIError.self, from: data) {
-                error.code = code
-                throw error
-            } else if
-                let error = try? JSONDecoder().decode(APIErrors.self, from: data),
-                var first = error.errors.first
-            {
-                first.code = code
-                throw first
-            }
-            
-            throw APIError.unknown(code: code)
-        }
+        do {
+             if let jsonResponse = try? JSONDecoder().decode(JSONResponse<R>.self, from: data) {
+                 return jsonResponse.result
+             } else if let result = try? JSONDecoder().decode(R.self, from: data) {
+                 return result
+             } else if var error = try? JSONDecoder().decode(APIError.self, from: data) {
+                 error.code = code
+                 throw error
+             } else if let error = try? JSONDecoder().decode(APIErrors.self, from: data), var first = error.errors.first {
+                 first.code = code
+                 throw first
+             } else {
+                 throw APIError.unknown(code: code)
+             }
+         } catch {
+             throw error
+         }
         
-        return jsonResponse.result
     }
 }

@@ -230,10 +230,10 @@ protocol WalletViewController {
 }
 
 // MARK: - Wallet Service
-protocol WalletService: AnyObject {
-	// MARK: Currency
-	static var currencySymbol: String { get }
-	static var currencyLogo: UIImage { get }
+protocol WalletCoreProtocol: AnyObject {
+    // MARK: Currency
+    static var currencySymbol: String { get }
+    static var currencyLogo: UIImage { get }
     static var qqPrefix: String { get }
     
     var tokenSymbol: String { get }
@@ -248,6 +248,9 @@ protocol WalletService: AnyObject {
     var defaultVisibility: Bool { get }
     var defaultOrdinalLevel: Int? { get }
     var richMessageType: String { get }
+    var dynamicRichMessageType: String { get }
+    var coinStorage: CoinStorageService { get }
+    var nodeGroups: [NodeGroup] { get }
     var transferDecimals: Int { get }
     
     var transactionsPublisher: AnyObservable<[TransactionDetails]> {
@@ -258,15 +261,26 @@ protocol WalletService: AnyObject {
         get
     }
     
-	// MARK: Notifications
-	
-	/// Wallet updated.
-	/// UserInfo contains new wallet at AdamantUserInfoKey.WalletService.wallet
-	var walletUpdatedNotification: Notification.Name { get }
-	
-	/// Enabled state changed
-	var serviceEnabledChanged: Notification.Name { get }
-	
+    /// Lowercased!!
+    static var richMessageType: String { get }
+    
+    // MARK: Transactions fetch info
+    
+    var newPendingInterval: TimeInterval { get }
+    var oldPendingInterval: TimeInterval { get }
+    var registeredInterval: TimeInterval { get }
+    var newPendingAttempts: Int { get }
+    var oldPendingAttempts: Int { get }
+    
+    // MARK: Notifications
+    
+    /// Wallet updated.
+    /// UserInfo contains new wallet at AdamantUserInfoKey.WalletService.wallet
+    var walletUpdatedNotification: Notification.Name { get }
+    
+    /// Enabled state changed
+    var serviceEnabledChanged: Notification.Name { get }
+    
     /// State changed
     var serviceStateChanged: Notification.Name { get }
     
@@ -286,29 +300,16 @@ protocol WalletService: AnyObject {
     func getLocalTransactionHistory() -> [TransactionDetails]
     func updateStatus(for id: String, status: TransactionStatus?)
     func isExist(address: String) async throws -> Bool
-}
-
-extension WalletService {
-    func isExist(address: String) async throws -> Bool { return true }
-}
-
-protocol SwinjectDependentService: WalletService {
-    @MainActor
-    func injectDependencies(from container: Container)
-}
-
-protocol InitiatedWithPassphraseService: WalletService {
+    func statusInfoFor(transaction: CoinTransaction) async -> TransactionStatusInfo
     func initWallet(withPassphrase: String) async throws -> WalletAccount
     func setInitiationFailed(reason: String)
-}
-
-// MARK: Send
-
-protocol WalletServiceWithSend: WalletService {
+    func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString
+    
+    // MARK: Send
+    
     var transactionFeeUpdated: Notification.Name { get }
     
     var qqPrefix: String { get }
-    var richMessageType: String { get }
     var blockchainSymbol: String { get }
     var isDynamicFee : Bool { get }
     var diplayTransactionFee : Decimal { get }
@@ -322,7 +323,11 @@ protocol WalletServiceWithSend: WalletService {
     var additionalFee : Decimal { get }
 }
 
-extension WalletServiceWithSend {
+extension WalletCoreProtocol {
+    func isExist(address: String) async throws -> Bool { return true }
+}
+
+extension WalletCoreProtocol {
     var isTransactionFeeValid: Bool {
         return true
     }
@@ -352,7 +357,14 @@ extension WalletServiceWithSend {
     }
 }
 
-protocol WalletServiceSimpleSend: WalletServiceWithSend {
+protocol SwinjectDependentService: WalletCoreProtocol {
+    @MainActor
+    func injectDependencies(from container: Container)
+}
+
+// MARK: Send
+
+protocol WalletServiceSimpleSend: WalletCoreProtocol {
     func sendMoney(
         recipient: String,
         amount: Decimal,
@@ -361,7 +373,7 @@ protocol WalletServiceSimpleSend: WalletServiceWithSend {
     ) async throws -> AdamantTransactionDetails
 }
 
-protocol WalletServiceTwoStepSend: WalletServiceWithSend {
+protocol WalletServiceTwoStepSend: WalletCoreProtocol {
     associatedtype T: RawTransaction
     
     func createTransaction(

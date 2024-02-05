@@ -70,7 +70,7 @@ class TransactionsListViewControllerBase: UIViewController {
     
     private lazy var dataSource = TransactionsDiffableDataSource(tableView: tableView, cellProvider: makeCell)
     
-    var currencySymbol: String { walletService.tokenSymbol }
+    var currencySymbol: String { walletService.core.tokenSymbol }
     
     // MARK: - IBOutlets
     @IBOutlet weak var tableView: UITableView!
@@ -85,7 +85,7 @@ class TransactionsListViewControllerBase: UIViewController {
         navigationItem.title = String.adamant.transactionList.title
         emptyLabel.text = String.adamant.transactionList.noTransactionYet
         
-        update(walletService.getLocalTransactionHistory())
+        update(walletService.core.getLocalTransactionHistory())
         configureTableView()
         setColors()
         configureLayout()
@@ -131,14 +131,14 @@ class TransactionsListViewControllerBase: UIViewController {
             }
             .store(in: &subscriptions)
         
-        walletService.transactionsPublisher
+        walletService.core.transactionsPublisher
             .receive(on: OperationQueue.main)
             .sink { [weak self] transactions in
                 self?.update(transactions)
             }
             .store(in: &subscriptions)
         
-        walletService.hasMoreOldTransactionsPublisher
+        walletService.core.hasMoreOldTransactionsPublisher
             .sink { [weak self] isNeedToLoadMoore in
                 self?.isNeedToLoadMoore = isNeedToLoadMoore
             }
@@ -146,9 +146,8 @@ class TransactionsListViewControllerBase: UIViewController {
     }
     
     func configureTableView() {
-        let nib = UINib.init(nibName: "TransactionTableViewCell", bundle: nil)
-        tableView.register(nib, forCellReuseIdentifier: cellIdentifierFull)
-        tableView.register(nib, forCellReuseIdentifier: cellIdentifierCompact)
+        tableView.register(TransactionTableViewCell.self, forCellReuseIdentifier: cellIdentifierFull)
+        tableView.register(TransactionTableViewCell.self, forCellReuseIdentifier: cellIdentifierCompact)
         tableView.delegate = self
         tableView.refreshControl = refreshControl
         tableView.tableHeaderView = UIView()
@@ -221,7 +220,7 @@ class TransactionsListViewControllerBase: UIViewController {
         isBusy = true
         Task {
             do {
-                let count = try await walletService.loadTransactions(
+                let count = try await walletService.core.loadTransactions(
                     offset: offset,
                     limit: limit
                 )
@@ -278,6 +277,9 @@ class TransactionsListViewControllerBase: UIViewController {
               isNeedToLoadMoore,
               tableView.numberOfRows(inSection: .zero) - indexPath.row < 3
         else {
+            if tableView.tableFooterView == nil, isBusy {
+                bottomIndicatorView().startAnimating()
+            }
             return
         }
 
@@ -288,7 +290,7 @@ class TransactionsListViewControllerBase: UIViewController {
     @objc func handleRefresh() {
         presentLoadingViewIfNeeded()
         emptyLabel.isHidden = true
-        loadData(offset: .zero, silent: true)
+        loadData(offset: .zero, silent: false)
     }
     
     func reloadData() {

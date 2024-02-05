@@ -276,7 +276,7 @@ extension #{symbol.capitalize}WalletService {
         #{defaultOrdinalLevel}
     }
     
-    var minNodeVersion: String? {
+    static var minNodeVersion: String? {
         #{minNodeVersion}
     }
     

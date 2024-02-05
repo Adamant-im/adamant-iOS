@@ -24,7 +24,7 @@ final class DogeTransferViewController: TransferViewControllerBase {
             comments = ""
         }
         
-        guard let service = service as? DogeWalletService,
+        guard let service = walletCore as? DogeWalletService,
               let recipient = recipientAddress,
               let amount = amount
         else {
@@ -91,7 +91,7 @@ final class DogeTransferViewController: TransferViewControllerBase {
                 presentDetailTransactionVC(
                     transaction: transaction,
                     comments: comments,
-                    service: service
+                    service: walletService
                 )
             } catch {
                 dialogService.dismissProgress()
@@ -103,7 +103,7 @@ final class DogeTransferViewController: TransferViewControllerBase {
     private func presentDetailTransactionVC(
         transaction: BitcoinKit.Transaction,
         comments: String,
-        service: DogeWalletService
+        service: WalletService
     ) {
         let detailsVc = screensFactory.makeDetailsVC(service: service)
         detailsVc.transaction = transaction
@@ -122,10 +122,6 @@ final class DogeTransferViewController: TransferViewControllerBase {
     }
     
     // MARK: Overrides
-    
-    override func validateRecipient(_ address: String) -> AddressValidationResult {
-        service?.validate(address: address) ?? .invalid(description: nil)
-    }
     
     override func recipientRow() -> BaseRow {
         let row = TextRow {

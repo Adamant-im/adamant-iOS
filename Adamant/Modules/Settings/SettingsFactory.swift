@@ -30,19 +30,20 @@ struct SettingsFactory {
     }
     
     func makePKGeneratorVC() -> UIViewController {
-        let c = PKGeneratorViewController()
-        c.dialogService = assembler.resolve(DialogService.self)
-        c.accountService = assembler.resolve(AccountService.self)
-        return c
+        PKGeneratorViewController(
+            dialogService: assembler.resolve(DialogService.self)!,
+            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!
+        )
     }
     
     func makeAboutVC(screensFactory: ScreensFactory) -> UIViewController {
-        let c = AboutViewController()
-        c.accountService = assembler.resolve(AccountService.self)
-        c.accountsProvider = assembler.resolve(AccountsProvider.self)
-        c.dialogService = assembler.resolve(DialogService.self)
-        c.screensFactory = screensFactory
-        return c
+        AboutViewController(
+            accountService: assembler.resolve(AccountService.self)!,
+            accountsProvider: assembler.resolve(AccountsProvider.self)!,
+            dialogService: assembler.resolve(DialogService.self)!,
+            screensFactory: screensFactory,
+            vibroService: assembler.resolve(VibroService.self)!
+        )
     }
     
     func makeNotificationsVC() -> UIViewController {

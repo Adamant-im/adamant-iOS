@@ -17,7 +17,7 @@ actor AdamantChatTransactionService: ChatTransactionService {
     // MARK: Dependencies
     
     private let adamantCore: AdamantCore
-    private let richProviders: [String: RichMessageProviderWithStatusCheck]
+    private let walletServiceCompose: WalletServiceCompose
     
     private let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
     
@@ -29,14 +29,9 @@ actor AdamantChatTransactionService: ChatTransactionService {
     
     // MARK: Lifecycle
     
-    init(adamantCore: AdamantCore, accountService: AccountService) {
+    init(adamantCore: AdamantCore, walletServiceCompose: WalletServiceCompose) {
         self.adamantCore = adamantCore
-        
-        var richProviders = [String: RichMessageProviderWithStatusCheck]()
-        for case let provider as RichMessageProviderWithStatusCheck in accountService.wallets {
-            richProviders[provider.dynamicRichMessageType] = provider
-        }
-        self.richProviders = richProviders
+        self.walletServiceCompose = walletServiceCompose
     }
     
     /// Make operations serial
@@ -285,10 +280,13 @@ private extension AdamantChatTransactionService {
             insertInto: context
         )
         
+        trs.richTransferHash = richContent[RichContentKeys.hash] as? String
         trs.richContent = richContent
         trs.richType = type
         trs.blockchainType = type
-        trs.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
+        trs.transactionStatus = walletServiceCompose.getWallet(by: type) != nil
+        ? .notInitiated
+        : nil
         trs.additionalType = .base
         
         return trs
@@ -350,10 +348,13 @@ private extension AdamantChatTransactionService {
         let transferContent = richContent[RichContentKeys.reply.replyMessage] as? [String: String]
         let type = (transferContent?[RichContentKeys.type] as? String) ?? RichContentKeys.reply.reply
         
+        trs.richTransferHash = richContent[RichContentKeys.hash] as? String
         trs.richContent = richContent
         trs.richType = type
         trs.blockchainType = type
-        trs.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
+        trs.transactionStatus = walletServiceCompose.getWallet(by: type) != nil
+        ? .notInitiated
+        : nil
         trs.additionalType = .reply
         
         return trs
@@ -381,6 +382,7 @@ private extension AdamantChatTransactionService {
             insertInto: context
         )
         
+        trs.richTransferHash = richContent[RichContentKeys.hash] as? String
         trs.richContent = richContent
         trs.richType = RichContentKeys.react.react
         trs.transactionStatus = nil

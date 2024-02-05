@@ -26,33 +26,41 @@ final class DashApiCore: BlockchainHealthCheckableService {
     func getStatusInfo(node: Node) async -> WalletServiceResult<NodeStatusInfo> {
         let startTimestamp = Date.now.timeIntervalSince1970
         
-        let response: WalletServiceResult<DashBlockchainInfoDTO> = await request(node: node) { core, node in
-            let response: ApiServiceResult<DashResponseDTO<DashBlockchainInfoDTO>> = await core.sendRequestJsonResponse(
-                node: node,
-                path: .empty,
-                method: .post,
-                parameters: ["method": "getblockchaininfo"],
-                encoding: .json
-            )
-            
-            return response.flatMap { dto in
-                if let result = dto.result, dto.error == nil {
-                    return .success(result)
-                } else {
-                    return .failure(.serverError(error: dto.error?.localizedDescription ?? .empty))
-                }
-            }
+        let response = await apiCore.sendRequestRPC(
+            node: node,
+            path: .empty,
+            requests: [
+                .init(method: DashApiComand.networkInfoMethod),
+                .init(method: DashApiComand.blockchainInfoMethod)
+            ]
+        )
+        
+        guard case let .success(data) = response else {
+            return .failure(.internalError(.parsingFailed))
         }
-
-        return response.map { data in
-            return .init(
-                ping: Date.now.timeIntervalSince1970 - startTimestamp,
-                height: data.blocks,
-                wsEnabled: false,
-                wsPort: nil,
-                version: nil
-            )
+        
+        let networkInfoModel = data.first(
+            where: { $0.id == DashApiComand.networkInfoMethod }
+        )
+        
+        let blockchainInfoModel = data.first(
+            where: { $0.id == DashApiComand.blockchainInfoMethod }
+        )
+        
+        guard
+            let networkInfo: DashNetworkInfoDTO = networkInfoModel?.serialize(),
+            let blockchainInfo: DashBlockchainInfoDTO = blockchainInfoModel?.serialize()
+        else {
+            return .failure(.internalError(.parsingFailed))
         }
+        
+        return .success(.init(
+            ping: Date.now.timeIntervalSince1970 - startTimestamp,
+            height: blockchainInfo.blocks,
+            wsEnabled: false,
+            wsPort: nil,
+            version: networkInfo.buildversion
+        ))
     }
 }
 

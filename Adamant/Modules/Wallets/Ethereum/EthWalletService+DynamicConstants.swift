@@ -83,7 +83,7 @@ extension EthWalletService {
         20
     }
     
-    var minNodeVersion: String? {
+    static var minNodeVersion: String? {
         nil
     }
     

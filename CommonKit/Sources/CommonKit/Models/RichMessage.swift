@@ -30,6 +30,7 @@ extension RichMessage {
 
 public enum RichContentKeys {
     public static let type = "type"
+    public static let hash = "hash"
     
     public enum reply {
         public static let reply = "reply"

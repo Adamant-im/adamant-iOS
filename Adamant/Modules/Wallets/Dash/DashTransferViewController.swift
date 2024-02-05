@@ -28,7 +28,7 @@ final class DashTransferViewController: TransferViewControllerBase {
             comments = ""
         }
         
-        guard let service = service as? DashWalletService,
+        guard let service = walletCore as? DashWalletService,
               let recipient = recipientAddress,
               let amount = amount
         else {
@@ -100,7 +100,7 @@ final class DashTransferViewController: TransferViewControllerBase {
                 presentDetailTransactionVC(
                     transaction: transaction,
                     comments: comments,
-                    service: service
+                    service: walletService
                 )
             } catch {
                 dialogService.dismissProgress()
@@ -112,7 +112,7 @@ final class DashTransferViewController: TransferViewControllerBase {
     private func presentDetailTransactionVC(
         transaction: BitcoinKit.Transaction,
         comments: String,
-        service: DashWalletService
+        service: WalletService
     ) {
         let detailsVc = screensFactory.makeDetailsVC(service: service)
         detailsVc.transaction = transaction
@@ -131,10 +131,6 @@ final class DashTransferViewController: TransferViewControllerBase {
     }
     
     // MARK: Overrides
-    
-    override func validateRecipient(_ address: String) -> AddressValidationResult {
-        service?.validate(address: address) ?? .invalid(description: nil)
-    }
     
     override func recipientRow() -> BaseRow {
         let row = TextRow {

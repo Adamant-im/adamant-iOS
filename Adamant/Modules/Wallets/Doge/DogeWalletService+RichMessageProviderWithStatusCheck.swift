@@ -9,7 +9,7 @@
 import Foundation
 import CommonKit
 
-extension DogeWalletService: RichMessageProviderWithStatusCheck {
+extension DogeWalletService {
     func statusInfoFor(transaction: CoinTransaction) async -> TransactionStatusInfo {
         let hash: String?
         
@@ -20,7 +20,7 @@ extension DogeWalletService: RichMessageProviderWithStatusCheck {
         }
         
         guard let hash = hash else {
-            return .init(sentDate: nil, status: .inconsistent)
+            return .init(sentDate: nil, status: .inconsistent(.wrongTxHash))
         }
         
         let dogeTransaction: BTCRawTransaction
@@ -31,7 +31,7 @@ extension DogeWalletService: RichMessageProviderWithStatusCheck {
             return .init(error: error)
         }
         
-        return .init(
+        return await .init(
             sentDate: dogeTransaction.date,
             status: getStatus(
                 dogeTransaction: dogeTransaction,
@@ -45,7 +45,7 @@ private extension DogeWalletService {
     func getStatus(
         dogeTransaction: BTCRawTransaction,
         transaction: CoinTransaction
-    ) -> TransactionStatus {
+    ) async -> TransactionStatus {
         // MARK: Check confirmations
         guard let confirmations = dogeTransaction.confirmations,
               let dogeDate = dogeTransaction.date,
@@ -56,18 +56,50 @@ private extension DogeWalletService {
         
         // MARK: Check amount & address
         guard let reportedValue = reportedValue(for: transaction) else {
-            return .inconsistent
+            return .inconsistent(.wrongAmount)
         }
         
         let min = reportedValue - reportedValue*0.005
         let max = reportedValue + reportedValue*0.005
         
         guard let walletAddress = dogeWallet?.address else {
-            return .inconsistent
+            return .inconsistent(.unknown)
         }
         
-        var result: TransactionStatus = .inconsistent
+        let readableTransaction = dogeTransaction.asBtcTransaction(DogeTransaction.self, for: walletAddress)
+        
+        var realSenderAddress = readableTransaction.senderAddress
+        var realRecipientAddress = readableTransaction.recipientAddress
+        
+        if transaction is RichMessageTransaction {
+            guard let senderAddress = try? await getWalletAddress(byAdamantAddress: transaction.senderAddress)
+            else {
+                return .inconsistent(.senderCryptoAddressUnavailable(tokenSymbol))
+            }
+            
+            guard let recipientAddress = try? await getWalletAddress(byAdamantAddress: transaction.recipientAddress)
+            else {
+                return .inconsistent(.recipientCryptoAddressUnavailable(tokenSymbol))
+            }
+            
+            realSenderAddress = senderAddress
+            realRecipientAddress = recipientAddress
+        }
+        
+        guard readableTransaction.senderAddress.caseInsensitiveCompare(realSenderAddress) == .orderedSame else {
+            return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
+        }
+        
+        guard readableTransaction.recipientAddress.caseInsensitiveCompare(realRecipientAddress) == .orderedSame else {
+            return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
+        }
+        
+        var result: TransactionStatus = .inconsistent(.wrongAmount)
         if transaction.isOutgoing {
+            guard readableTransaction.senderAddress.caseInsensitiveCompare(walletAddress) == .orderedSame else {
+                return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
+            }
+            
             var totalIncome: Decimal = 0
             for output in dogeTransaction.outputs {
                 guard !output.addresses.contains(walletAddress) else {
@@ -81,6 +113,10 @@ private extension DogeWalletService {
                 result = .success
             }
         } else {
+            guard readableTransaction.recipientAddress.caseInsensitiveCompare(walletAddress) == .orderedSame else {
+                return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
+            }
+            
             var totalOutcome: Decimal = 0
             for output in dogeTransaction.outputs {
                 guard output.addresses.contains(walletAddress) else {

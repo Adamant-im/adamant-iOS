@@ -36,18 +36,25 @@ extension DashWalletService {
     }
 
     func getTransaction(by hash: String) async throws -> BTCRawTransaction {
-        let result: BTCRPCServerResponce<BTCRawTransaction> = try await dashApiService.request {
-            core, node in
-            await core.sendRequestJsonResponse(
+        let result: BTCRawTransaction? = try await dashApiService.request { core, node in
+            let response = await core.sendRequestRPC(
                 node: node,
                 path: .empty,
-                method: .post,
-                parameters: DashGetRawTransactionDTO(hash: hash),
-                encoding: .json
+                request: .init(
+                    method: DashApiComand.rawTransactionMethod,
+                    params: [.string(hash), .bool(true)]
+                )
             )
+            
+            guard case let .success(data) = response else {
+                return .failure(.accountNotFound)
+            }
+            
+            let tx: BTCRawTransaction? = data.serialize()
+            return .success(tx)
         }.get()
         
-        if let transaction = result.result {
+        if let transaction = result {
             return transaction
         } else {
             throw ApiServiceError.serverError(error: "Unaviable transaction")
@@ -58,22 +65,36 @@ extension DashWalletService {
         guard let address = wallet?.address else {
             throw ApiServiceError.notLogged
         }
-
-        let parameters: [Any] = hashes.compactMap {
-            DashGetRawTransactionDTO(hash: $0).asDictionary()
+        
+        let params: [RpcRequest] = hashes.compactMap {
+            .init(
+                method: DashApiComand.rawTransactionMethod,
+                params: [.string($0), .bool(true)]
+            )
         }
         
-        let result: [BTCRPCServerResponce<BTCRawTransaction>] = try await dashApiService.request {
-            core, node in
-            await core.sendRequestJsonResponse(
+        let result: [BTCRawTransaction] = try await dashApiService.request { core, node in
+            let response = await core.sendRequestRPC(
                 node: node,
                 path: .empty,
-                method: .post,
-                jsonParameters: parameters
+                requests: params
             )
+            
+            guard case let .success(data) = response else {
+                return .failure(.accountNotFound)
+            }
+            
+            let res: [BTCRawTransaction] = data.compactMap {
+                let tx: BTCRawTransaction? = $0.serialize()
+                return tx
+            }
+            
+            return .success(res)
         }.get()
         
-        return result.compactMap { $0.result?.asBtcTransaction(DashTransaction.self, for: address) }
+        return result.compactMap {
+            $0.asBtcTransaction(DashTransaction.self, for: address)
+        }
     }
     
     func getBlockId(by hash: String?) async throws -> String {

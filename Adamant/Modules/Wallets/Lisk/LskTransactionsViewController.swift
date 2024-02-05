@@ -16,18 +16,18 @@ import Combine
 final class LskTransactionsViewController: TransactionsListViewControllerBase {
     
     // MARK: - Dependencies
-    var lskWalletService: LskWalletService!
+    
     var screensFactory: ScreensFactory!
     
     // MARK: - UITableView
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        guard let address = lskWalletService.wallet?.address,
+        guard let address = walletService.core.wallet?.address,
               let transaction = transactions[safe: indexPath.row]
         else { return }
         
-        let controller = screensFactory.makeDetailsVC(service: lskWalletService)
+        let controller = screensFactory.makeDetailsVC(service: walletService)
         
         controller.transaction = transaction
         

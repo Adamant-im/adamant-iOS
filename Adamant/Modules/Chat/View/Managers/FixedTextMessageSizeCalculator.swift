@@ -73,8 +73,9 @@
          
          if case let .transaction(model) = getMessages()[indexPath.section].fullModel.content {
              let contentViewHeight = model.value.height(for: maxWidth)
-             messageContainerSize.width += messageInsets.horizontal
+             messageContainerSize.width = maxWidth
              messageContainerSize.height = contentViewHeight
+             messageContainerSize.height += messageInsets.vertical
          }
          
          return messageContainerSize
@@ -118,15 +119,24 @@
              : incomingMessageLabelInsets
      }
 
-     func labelSize(for attributedText: NSAttributedString, considering maxWidth: CGFloat) -> CGSize {
-         let constraintBox = CGSize(width: maxWidth, height: .greatestFiniteMagnitude)
-         var size = attributedText.boundingRect(
-             with: constraintBox,
-             options: [.usesLineFragmentOrigin, .usesFontLeading],
-             context: nil
-         ).integral.size
-         size.width += additionalWidth
-         return size
+     func labelSize(
+        for attributedText: NSAttributedString,
+        considering maxWidth: CGFloat
+     ) -> CGSize {
+         let textContainer = NSTextContainer(
+            size: CGSize(width: maxWidth, height: .greatestFiniteMagnitude)
+         )
+         let layoutManager = NSLayoutManager()
+         
+         layoutManager.addTextContainer(textContainer)
+         
+         let textStorage = NSTextStorage(attributedString: attributedText)
+         textStorage.addLayoutManager(layoutManager)
+         
+         let range = NSRange(location: 0, length: attributedText.length)
+         let rect = layoutManager.usedRect(for: textContainer)
+         
+         return rect.integral.size
      }
  }
 

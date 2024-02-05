@@ -32,6 +32,13 @@ extension Node {
             .joined(separator: " ")
         case .offline:
             return Strings.offline
+        case .notAllowed(let reason):
+            return [
+                reason.text,
+                version
+            ]
+            .compactMap { $0 }
+            .joined(separator: " ")
         case .none:
             return nil
         }
@@ -61,7 +68,7 @@ extension Node {
             return .adamant.good
         case .synchronizing:
             return .adamant.alert
-        case .offline:
+        case .offline, .notAllowed:
             return .adamant.danger
         case .none:
             return .adamant.inactive
@@ -136,5 +143,15 @@ private extension Node {
     
     func getFormattedHeight(from height: Int) -> String {
         numberFormatter.string(from: Decimal(height)) ?? String(height)
+    }
+}
+
+extension Node {
+    static func stringToDouble(_ value: String?) -> Double? {
+        guard let minNodeVersion = value?.replacingOccurrences(of: ".", with: ""),
+              let versionNumber = Double(minNodeVersion)
+        else { return nil }
+        
+        return versionNumber
     }
 }

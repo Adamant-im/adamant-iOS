@@ -24,8 +24,8 @@ final class ChatViewController: MessagesViewController {
     // MARK: Dependencies
     
     private let storedObjects: [AnyObject]
-    private let richMessageProviders: [String: RichMessageProvider]
-    private let admService: AdmWalletService
+    private let walletServiceCompose: WalletServiceCompose
+    private let admWalletService: WalletService?
     private let screensFactory: ScreensFactory
     
     let viewModel: ChatViewModel
@@ -73,16 +73,16 @@ final class ChatViewController: MessagesViewController {
     
     init(
         viewModel: ChatViewModel,
-        richMessageProviders: [String: RichMessageProvider],
+        walletServiceCompose: WalletServiceCompose,
         storedObjects: [AnyObject],
-        admService: AdmWalletService,
+        admWalletService: WalletService?,
         screensFactory: ScreensFactory,
         sendTransaction: @escaping SendTransaction
     ) {
         self.viewModel = viewModel
         self.storedObjects = storedObjects
-        self.richMessageProviders = richMessageProviders
-        self.admService = admService
+        self.walletServiceCompose = walletServiceCompose
+        self.admWalletService = admWalletService
         self.screensFactory = screensFactory
         super.init(nibName: nil, bundle: nil)
         inputBar.onAttachmentButtonTap = { [weak self] in
@@ -679,7 +679,7 @@ private extension ChatViewController {
     func didTapRichMessageTransaction(_ transaction: RichMessageTransaction) {
         guard
             let type = transaction.richType,
-            let provider = richMessageProviders[type],
+            let provider = walletServiceCompose.getWallet(by: type),
             let vc = screensFactory.makeDetailsVC(service: provider, transaction: transaction)
         else { return }
         
@@ -765,7 +765,8 @@ private extension ChatViewController {
     }
     
     func didTapAdmSend(to adm: AdamantAddress) {
-        let vc = screensFactory.makeTransferVC(service: admService)
+        guard let admWalletService = admWalletService else { return }
+        let vc = screensFactory.makeTransferVC(service: admWalletService)
         vc.recipientAddress = adm.address
         vc.recipientName = adm.name
         vc.delegate = self
