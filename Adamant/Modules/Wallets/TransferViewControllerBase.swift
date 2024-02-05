@@ -378,6 +378,7 @@ class TransferViewControllerBase: FormViewController {
         }
         
         if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.maxToTransfer.tag) {
+            row.value = maxToTransfer.doubleValue
             row.updateCell()
         }
         
