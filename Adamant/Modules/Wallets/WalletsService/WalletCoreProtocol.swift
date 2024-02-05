@@ -249,8 +249,8 @@ protocol WalletCoreProtocol: AnyObject {
     var defaultOrdinalLevel: Int? { get }
     var richMessageType: String { get }
     var dynamicRichMessageType: String { get }
-    
     var coinStorage: CoinStorageService { get }
+    var nodeGroups: [NodeGroup] { get }
     
     var transactionsPublisher: AnyObservable<[TransactionDetails]> {
         get

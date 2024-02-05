@@ -46,7 +46,9 @@ struct LskWalletFactory: WalletFactory {
             currencyInfoService: assembler.resolve(CurrencyInfoService.self)!,
             increaseFeeService: assembler.resolve(IncreaseFeeService.self)!,
             vibroService: assembler.resolve(VibroService.self)!,
-            walletService: service
+            walletService: service,
+            reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
+            nodesStorage: assembler.resolve(NodesStorageProtocol.self)!
         )
     }
     

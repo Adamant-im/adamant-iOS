@@ -101,6 +101,10 @@ final class BtcWalletService: WalletCoreProtocol {
         return increaseFeeService.isIncreaseFeeEnabled(for: tokenUnicID)
     }
     
+    var nodeGroups: [NodeGroup] {
+        [.btc]
+    }
+    
     var wallet: WalletAccount? { return btcWallet }
     
     // MARK: RichMessageProvider properties

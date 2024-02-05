@@ -160,6 +160,8 @@ class TransferViewControllerBase: FormViewController {
     let vibroService: VibroService
     let walletService: WalletService
     let walletCore: WalletCoreProtocol
+    let reachabilityMonitor: ReachabilityMonitor
+    let nodesStorage: NodesStorageProtocol
     
     // MARK: - Properties
     
@@ -287,7 +289,9 @@ class TransferViewControllerBase: FormViewController {
         currencyInfoService: CurrencyInfoService,
         increaseFeeService: IncreaseFeeService,
         vibroService: VibroService,
-        walletService: WalletService
+        walletService: WalletService,
+        reachabilityMonitor: ReachabilityMonitor,
+        nodesStorage: NodesStorageProtocol
     ) {
         self.accountService = accountService
         self.accountsProvider = accountsProvider
@@ -299,6 +303,8 @@ class TransferViewControllerBase: FormViewController {
         self.vibroService = vibroService
         self.walletService = walletService
         self.walletCore = walletService.core
+        self.reachabilityMonitor = reachabilityMonitor
+        self.nodesStorage = nodesStorage
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -694,7 +700,7 @@ class TransferViewControllerBase: FormViewController {
         dialogService.showProgress(withMessage: nil, userInteractionEnable: true)
         validateAddress()
         validateForm(force: true)
-
+        
         guard let recipientAddress = recipientAddress else {
             dialogService.showWarning(withMessage: .adamant.transfer.addressValidationError)
             return
@@ -742,6 +748,34 @@ class TransferViewControllerBase: FormViewController {
         
         if admReportRecipient != nil, let account = accountService.account, account.balance < 0.001 {
             dialogService.showWarning(withMessage: "Not enought money to send report")
+            return
+        }
+        
+        guard reachabilityMonitor.connection else {
+            dialogService.showWarning(withMessage: .adamant.alert.noInternetTransferBody)
+            return
+        }
+        
+        if admReportRecipient != nil,
+           !nodesStorage.haveActiveNode(in: .adm) {
+            dialogService.showWarning(
+                withMessage: ApiServiceError.noEndpointsAvailable(
+                    coin: NodeGroup.adm.name
+                ).localizedDescription
+            )
+            return
+        }
+        
+        let groupsWithoutActiveNode = walletCore.nodeGroups.filter {
+            !nodesStorage.haveActiveNode(in: $0)
+        }
+
+        if let group = groupsWithoutActiveNode.first {
+            dialogService.showWarning(
+                withMessage: ApiServiceError.noEndpointsAvailable(
+                    coin: group.name
+                ).localizedDescription
+            )
             return
         }
         

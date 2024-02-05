@@ -853,6 +853,9 @@
 /* Shared alert notification: body message for no internet connection. */
 "Shared.NoInternet.Body" = "请检查您的互联网连接，然后重试";
 
+/* Shared alert notification: body message for no internet connection. */
+"Shared.Transfer.NoInternet.Body" = "您的网络连接似乎没有激活。请检查您的连接并重试。";
+
 /* Shared alert 'Ok' button. Used anywhere */
 "Shared.Ok" = "好的";
 

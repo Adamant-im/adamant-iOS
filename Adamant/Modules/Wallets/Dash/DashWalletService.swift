@@ -43,6 +43,10 @@ final class DashWalletService: WalletCoreProtocol {
         return Self.qqPrefix
     }
     
+    var nodeGroups: [NodeGroup] {
+        [.dash]
+    }
+    
     var wallet: WalletAccount? { return dashWallet }
     
     // MARK: RichMessageProvider properties

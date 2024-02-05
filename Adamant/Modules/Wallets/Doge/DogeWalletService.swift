@@ -96,6 +96,10 @@ final class DogeWalletService: WalletCoreProtocol {
         return Self.qqPrefix
     }
     
+    var nodeGroups: [NodeGroup] {
+        [.doge]
+    }
+    
     static let kvsAddress = "doge:address"
     
     @Atomic private(set) var isWarningGasPrice = false

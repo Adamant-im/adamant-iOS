@@ -79,6 +79,10 @@ final class ERC20WalletService: WalletCoreProtocol {
         return increaseFeeService.isIncreaseFeeEnabled(for: tokenUnicID)
     }
     
+    var nodeGroups: [NodeGroup] {
+        [.eth]
+    }
+    
     private (set) var blockchainSymbol: String = "ETH"
     private (set) var isDynamicFee: Bool = true
     private (set) var transactionFee: Decimal = 0.0

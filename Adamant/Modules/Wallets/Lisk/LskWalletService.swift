@@ -83,6 +83,10 @@ final class LskWalletService: WalletCoreProtocol {
     
     var additionalFee: Decimal {
         0.05
+	}
+
+    var nodeGroups: [NodeGroup] {
+        [.lskNode, .lskService]
     }
     
 	// MARK: - Properties

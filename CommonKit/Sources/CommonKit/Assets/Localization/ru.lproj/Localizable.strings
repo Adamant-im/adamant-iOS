@@ -850,6 +850,9 @@
 /* Shared alert notification: body message for no internet connection. */
 "Shared.NoInternet.Body" = "Проверьте соединение и повторите попытку";
 
+/* Shared alert notification: body message for no internet connection. */
+"Shared.Transfer.NoInternet.Body" = "Похоже, у вас нет активного интернет-соединения. Пожалуйста, проверьте ваше подключение и повторите попытку";
+
 /* Shared alert 'Ok' button. Used anywhere */
 "Shared.Ok" = "OK";
 
