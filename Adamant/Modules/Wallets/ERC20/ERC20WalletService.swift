@@ -16,7 +16,7 @@ import Web3Core
 import Combine
 import CommonKit
 
-final class ERC20WalletService: WalletService {
+final class ERC20WalletService: WalletCoreProtocol {
     // MARK: - Constants
     let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")
     
@@ -79,6 +79,10 @@ final class ERC20WalletService: WalletService {
         return increaseFeeService.isIncreaseFeeEnabled(for: tokenUnicID)
     }
     
+    var nodeGroups: [NodeGroup] {
+        [.eth]
+    }
+    
     private (set) var blockchainSymbol: String = "ETH"
     private (set) var isDynamicFee: Bool = true
     private (set) var transactionFee: Decimal = 0.0
@@ -122,6 +126,7 @@ final class ERC20WalletService: WalletService {
     let token: ERC20Token
     @Atomic private(set) var enabled = true
     @Atomic private var subscriptions = Set<AnyCancellable>()
+    @Atomic private var cachedWalletAddress: [String: String] = [:]
     
     // MARK: - State
     @Atomic private (set) var state: WalletServiceState = .notInitiated
@@ -336,7 +341,7 @@ final class ERC20WalletService: WalletService {
 }
 
 // MARK: - WalletInitiatedWithPassphrase
-extension ERC20WalletService: InitiatedWithPassphraseService {
+extension ERC20WalletService {
     func initWallet(withPassphrase passphrase: String) async throws -> WalletAccount {
         
         // MARK: 1. Prepare
@@ -500,6 +505,10 @@ extension ERC20WalletService {
     }
     
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
+        if let address = cachedWalletAddress[address], !address.isEmpty {
+            return address
+        }
+        
         let result = try await apiService.get(key: EthWalletService.kvsAddress, sender: address)
             .mapError { $0.asWalletServiceError() }
             .get()
@@ -507,6 +516,8 @@ extension ERC20WalletService {
         guard let result = result else {
             throw WalletServiceError.walletNotInitiated
         }
+        
+        cachedWalletAddress[address] = result
         
         return result
     }

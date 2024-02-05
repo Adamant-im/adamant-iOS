@@ -8,7 +8,16 @@ extension DogeWalletService {
     static let currencySymbol = "DOGE"
     static let currencyExponent: Int = -8
     static let qqPrefix: String = "doge"
-    
+    static let healthCheckParameters = CoinHealthCheckParameters(
+        normalUpdateInterval: 390,
+        crucialUpdateInterval: 30,
+        onScreenUpdateInterval: 10,
+        threshold: 3,
+        normalServiceUpdateInterval: 390,
+        crucialServiceUpdateInterval: 30,
+        onScreenServiceUpdateInterval: 10
+    )
+        
     static var newPendingInterval: Int {
         5000
     }
@@ -53,7 +62,7 @@ extension DogeWalletService {
         70
     }
     
-    var minNodeVersion: String? {
+    static var minNodeVersion: String? {
         nil
     }
     

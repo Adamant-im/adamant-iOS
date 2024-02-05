@@ -12,7 +12,9 @@ import CommonKit
 final class ERC20TransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies
     
-    weak var service: ERC20WalletService?
+    weak var service: ERC20WalletService? {
+        walletService?.core as? ERC20WalletService
+    }
     
     // MARK: - Properties
     
@@ -22,16 +24,16 @@ final class ERC20TransactionDetailsViewController: TransactionDetailsViewControl
         return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: EthWalletService.currencySymbol)
     }
     
+    override var feeCurrencySymbol: String? {
+        EthWalletService.currencySymbol
+    }
+    
     private lazy var refreshControl: UIRefreshControl = {
         let control = UIRefreshControl()
         control.tintColor = .adamant.primary
         control.addTarget(self, action: #selector(refresh), for: UIControl.Event.valueChanged)
         return control
     }()
-    
-    override var richProvider: RichMessageProviderWithStatusCheck? {
-        return service
-    }
     
     // MARK: - Lifecycle
     

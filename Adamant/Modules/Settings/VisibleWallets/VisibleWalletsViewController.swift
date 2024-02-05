@@ -13,9 +13,15 @@ import CommonKit
 // MARK: - Localization
 extension String.adamant {
     enum visibleWallets {
-        static let title = String.localized("VisibleWallets.Title", comment: "Visible Wallets page: scene title")
-        static let resetAlertTitle = String.localized("VisibleWallets.ResetListAlert", comment: "VisibleWallets: Reset wallets alert title")
-        static let reset = String.localized("NodesList.ResetButton", comment: "NodesList: 'Reset' button")
+        static var title: String {
+            String.localized("VisibleWallets.Title", comment: "Visible Wallets page: scene title")
+        }
+        static var resetAlertTitle: String {
+            String.localized("VisibleWallets.ResetListAlert", comment: "VisibleWallets: Reset wallets alert title")
+        }
+        static var reset: String {
+            String.localized("NodesList.ResetButton", comment: "NodesList: 'Reset' button")
+        }
     }
 }
 
@@ -58,8 +64,8 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     
     private let cellIdentifier = "cell"
     private let cellResetIdentifier = "cellReset"
-    private var filteredWallets: [WalletService]?
-    private var wallets: [WalletService] = []
+    private var filteredWallets: [WalletCoreProtocol]?
+    private var wallets: [WalletCoreProtocol] = []
     private var previousAppState: UIApplication.State?
     
     // MARK: - Lifecycle
@@ -115,7 +121,7 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     }
     
     private func loadWallets() {
-        wallets = visibleWalletsService.sorted(includeInvisible: true)
+        wallets = visibleWalletsService.sorted(includeInvisible: true).map { $0.core }
     }
     
     @objc private func updateBalances() {
@@ -141,7 +147,7 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
         }
     }
     
-    private func isInvisible(_ wallet: WalletService) -> Bool {
+    private func isInvisible(_ wallet: WalletCoreProtocol) -> Bool {
         return visibleWalletsService.isInvisible(wallet)
     }
     
@@ -217,7 +223,7 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
             cell.separatorInset = .zero
         }
         
-        let wallet: WalletService
+        let wallet: WalletCoreProtocol
         if let filtered = filteredWallets {
             wallet = filtered[indexPath.row]
         } else {

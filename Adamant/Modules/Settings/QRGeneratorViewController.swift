@@ -14,16 +14,22 @@ import CommonKit
 
 // MARK: - Localization
 extension String.adamant {
-    struct qrGenerator {
-        static let title = String.localized("QrGeneratorScene.Title", comment: "QRGenerator: scene title")
-        
-        static let tapToSaveTip = String.localized("QrGeneratorScene.TapToSave", comment: "QRGenerator: small 'Tap to save' tooltip under generated QR")
-        static let passphrasePlaceholder = String.localized("QrGeneratorScene.Passphrase.Placeholder", comment: "QRGenerator: Passphrase textview placeholder")
-        
-        static let wrongPassphraseError = String.localized("QrGeneratorScene.Error.InvalidPassphrase", comment: "QRGenerator: user typed in invalid passphrase")
-        static let internalError = String.localized("QrGeneratorScene.Error.InternalErrorFormat", comment: "QRGenerator: Bad Internal generator error message format. Using %@ for error description")
-        
-        private init() {}
+    enum qrGenerator {
+        static var title: String {
+            String.localized("QrGeneratorScene.Title", comment: "QRGenerator: scene title")
+        }
+        static var tapToSaveTip: String {
+            String.localized("QrGeneratorScene.TapToSave", comment: "QRGenerator: small 'Tap to save' tooltip under generated QR")
+        }
+        static var passphrasePlaceholder: String {
+            String.localized("QrGeneratorScene.Passphrase.Placeholder", comment: "QRGenerator: Passphrase textview placeholder")
+        }
+        static var wrongPassphraseError: String {
+            String.localized("QrGeneratorScene.Error.InvalidPassphrase", comment: "QRGenerator: user typed in invalid passphrase")
+        }
+        static var internalError: String {
+            String.localized("QrGeneratorScene.Error.InternalErrorFormat", comment: "QRGenerator: Bad Internal generator error message format. Using %@ for error description")
+        }
     }
 }
 

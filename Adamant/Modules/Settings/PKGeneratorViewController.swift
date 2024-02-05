@@ -15,12 +15,16 @@ import CommonKit
 
 // MARK: - Localization
 extension String.adamant {
-    struct pkGenerator {
-        static let title = String.localized("PkGeneratorScene.Title", comment: "PrivateKeyGenerator: scene title")
-        static let alert = String.localized("PkGeneratorScene.Alert", comment: "PrivateKeyGenerator: Security alert. Keep your passphrase safe")
-        static let generateButton = String.localized("PkGeneratorScene.GenerateButton", comment: "PrivateKeyGenerator: Generate button")
-        
-        private init() {}
+    enum pkGenerator {
+        static var title: String {
+            String.localized("PkGeneratorScene.Title", comment: "PrivateKeyGenerator: scene title")
+        }
+        static var alert: String {
+            String.localized("PkGeneratorScene.Alert", comment: "PrivateKeyGenerator: Security alert. Keep your passphrase safe")
+        }
+        static var generateButton: String {
+            String.localized("PkGeneratorScene.GenerateButton", comment: "PrivateKeyGenerator: Generate button")
+        }
     }
 }
 
@@ -28,8 +32,9 @@ extension String.adamant {
 final class PKGeneratorViewController: FormViewController {
     
     // MARK: Dependencies
-    var accountService: AccountService!
-    var dialogService: DialogService!
+    
+    private let dialogService: DialogService
+    private let walletServiceCompose: WalletServiceCompose
     
     private enum Rows {
         case alert
@@ -59,6 +64,22 @@ final class PKGeneratorViewController: FormViewController {
     
     // MARK: - Properties
     private var showKeysSection = false
+    
+    // MARK: Init
+    
+    init(
+        dialogService: DialogService,
+        walletServiceCompose: WalletServiceCompose
+    ) {
+        self.dialogService = dialogService
+        self.walletServiceCompose = walletServiceCompose
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -157,7 +178,7 @@ final class PKGeneratorViewController: FormViewController {
         
         var index = 0
         var rows = [LabelRow]()
-        for case let generator as PrivateKeyGenerator in accountService.wallets {
+        for case let generator as PrivateKeyGenerator in walletServiceCompose.getWallets().map({ $0.core }) {
             guard let privateKey = generator.generatePrivateKeyFor(passphrase: passphraseLower) else {
                 continue
             }
@@ -182,18 +203,32 @@ final class PKGeneratorViewController: FormViewController {
                     return
                 }
                 
-                let encodedPassphrase = AdamantUriTools.encode(request: AdamantUri.passphrase(passphrase: passphrase))
-                dialogService.presentShareAlertFor(string: passphrase,
-                                                   types: [.copyToPasteboard,
-                                                           .share,
-                                                           .generateQr(encodedContent: encodedPassphrase, sharingTip: nil, withLogo: false)],
-                                                   excludedActivityTypes: ShareContentType.passphrase.excludedActivityTypes,
-                                                   animated: true, from: cell,
-                                                   completion: {
-                                                    if let indexPath = row.indexPath, let tableView = self?.tableView {
-                                                        tableView.deselectRow(at: indexPath, animated: true)
-                                                    }
-                                                    })
+                let encodedPassphrase = AdamantUriTools.encode(
+                    request: AdamantUri.passphrase(passphrase: passphrase)
+                )
+                
+                dialogService.presentShareAlertFor(
+                    string: passphrase,
+                    types: [
+                        .copyToPasteboard,
+                        .share,
+                        .generateQr(
+                            encodedContent: encodedPassphrase,
+                            sharingTip: nil,
+                            withLogo: false
+                        )
+                    ],
+                    excludedActivityTypes: ShareContentType.passphrase.excludedActivityTypes,
+                    animated: true,
+                    from: cell,
+                    completion: {
+                        guard let indexPath = row.indexPath,
+                              let tableView = self?.tableView
+                        else { return }
+                        
+                        tableView.deselectRow(at: indexPath, animated: true)
+                    }
+                )
             }
             
             rows.append(row)

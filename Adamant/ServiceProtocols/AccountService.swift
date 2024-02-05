@@ -49,12 +49,19 @@ extension Notification.Name {
 
 // MARK: - Localization
 extension String.adamant {
-    struct accountService {
-        static let updateAlertTitleV12 = String.localized("AccountService.update.v12.title", comment: "AccountService: Alert title. Changes in version 1.2")
-        static let updateAlertMessageV12 = String.localized("AccountService.update.v12.message", comment: "AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth & lsk wallets")
-        static let reloginToInitiateWallets = String.localized("AccountService.reloginToInitiateWallets", comment: "AccountService: User must relogin into app to initiate wallets")
+    enum accountService {
+        static var updateAlertTitleV12: String {
+            String.localized("AccountService.update.v12.title", comment: "AccountService: Alert title. Changes in version 1.2")
+        }
+        static var updateAlertMessageV12: String {
+            String.localized("AccountService.update.v12.message", comment: "AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth & lsk wallets")
+        }
+        static var reloginToInitiateWallets: String {
+            String.localized("AccountService.reloginToInitiateWallets", comment: "AccountService: User must relogin into app to initiate wallets")
+        }
     }
 }
+
 
 /// - loggedAccountAddress: Newly logged account's address
 extension AdamantUserInfoKey {
@@ -146,9 +153,6 @@ protocol AccountService: AnyObject {
     var state: AccountServiceState { get }
     var account: AdamantAccount? { get }
     var keypair: Keypair? { get }
-    
-    // MARK: Wallets
-    var wallets: [WalletService] { get }
     
     // MARK: Account functions
     

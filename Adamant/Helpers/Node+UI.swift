@@ -32,6 +32,13 @@ extension Node {
             .joined(separator: " ")
         case .offline:
             return Strings.offline
+        case .notAllowed(let reason):
+            return [
+                reason.text,
+                version
+            ]
+            .compactMap { $0 }
+            .joined(separator: " ")
         case .none:
             return nil
         }
@@ -61,7 +68,7 @@ extension Node {
             return .adamant.good
         case .synchronizing:
             return .adamant.alert
-        case .offline:
+        case .offline, .notAllowed:
             return .adamant.danger
         case .none:
             return .adamant.inactive
@@ -71,35 +78,47 @@ extension Node {
 
 private extension Node {
     enum Strings {
-        static let ping = String.localized(
-            "NodesList.NodeCell.Ping",
-            comment: "NodesList.NodeCell: Node ping"
-        )
+        static var ping: String {
+            String.localized(
+                "NodesList.NodeCell.Ping",
+                comment: "NodesList.NodeCell: Node ping"
+            )
+        }
         
-        static let milliseconds = String.localized(
-            "NodesList.NodeCell.Milliseconds",
-            comment: "NodesList.NodeCell: Milliseconds"
-        )
+        static var milliseconds: String {
+            String.localized(
+                "NodesList.NodeCell.Milliseconds",
+                comment: "NodesList.NodeCell: Milliseconds"
+            )
+        }
         
-        static let synchronizing = String.localized(
-            "NodesList.NodeCell.Synchronizing",
-            comment: "NodesList.NodeCell: Node is synchronizing"
-        )
+        static var synchronizing: String {
+            String.localized(
+                "NodesList.NodeCell.Synchronizing",
+                comment: "NodesList.NodeCell: Node is synchronizing"
+            )
+        }
         
-        static let offline = String.localized(
-            "NodesList.NodeCell.Offline",
-            comment: "NodesList.NodeCell: Node is offline"
-        )
+        static var offline: String {
+            String.localized(
+                "NodesList.NodeCell.Offline",
+                comment: "NodesList.NodeCell: Node is offline"
+            )
+        }
         
-        static let version = String.localized(
-            "NodesList.NodeCell.Version",
-            comment: "NodesList.NodeCell: Node version"
-        )
+        static var version: String {
+            String.localized(
+                "NodesList.NodeCell.Version",
+                comment: "NodesList.NodeCell: Node version"
+            )
+        }
         
-        static let disabled = String.localized(
-            "NodesList.NodeCell.Disabled",
-            comment: "NodesList.NodeCell: Node is disabled"
-        )
+        static var disabled: String {
+            String.localized(
+                "NodesList.NodeCell.Disabled",
+                comment: "NodesList.NodeCell: Node is disabled"
+            )
+        }
     }
     
     var versionString: String? {
@@ -112,6 +131,27 @@ private extension Node {
     }
     
     var heightString: String? {
-        height.map { "▱ \($0)" }
+        height.map { " ❐ \(getFormattedHeight(from: $0))" }
+    }
+    
+    var numberFormatter: NumberFormatter {
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .decimal
+        numberFormatter.groupingSeparator = ","
+        return numberFormatter
+    }
+    
+    func getFormattedHeight(from height: Int) -> String {
+        numberFormatter.string(from: Decimal(height)) ?? String(height)
+    }
+}
+
+extension Node {
+    static func stringToDouble(_ value: String?) -> Double? {
+        guard let minNodeVersion = value?.replacingOccurrences(of: ".", with: ""),
+              let versionNumber = Double(minNodeVersion)
+        else { return nil }
+        
+        return versionNumber
     }
 }

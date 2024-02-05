@@ -13,16 +13,18 @@ struct AccountFactory {
     let assembler: Assembler
     
     func makeViewController(screensFactory: ScreensFactory) -> UIViewController {
-        let c = AccountViewController()
-        c.accountService = assembler.resolve(AccountService.self)
-        c.dialogService = assembler.resolve(DialogService.self)
-        c.notificationsService = assembler.resolve(NotificationsService.self)
-        c.transfersProvider = assembler.resolve(TransfersProvider.self)
-        c.localAuth = assembler.resolve(LocalAuthentication.self)
-        c.avatarService = assembler.resolve(AvatarService.self)
-        c.currencyInfoService = assembler.resolve(CurrencyInfoService.self)
-        c.visibleWalletsService = assembler.resolve(VisibleWalletsService.self)
-        c.screensFactory = screensFactory
-        return c
+        AccountViewController(
+            visibleWalletsService: assembler.resolve(VisibleWalletsService.self)!,
+            accountService: assembler.resolve(AccountService.self)!,
+            dialogService: assembler.resolve(DialogService.self)!,
+            screensFactory: screensFactory,
+            notificationsService: assembler.resolve(NotificationsService.self)!,
+            transfersProvider: assembler.resolve(TransfersProvider.self)!,
+            localAuth: assembler.resolve(LocalAuthentication.self)!,
+            avatarService: assembler.resolve(AvatarService.self)!,
+            currencyInfoService: assembler.resolve(CurrencyInfoService.self)!,
+            languageService: assembler.resolve(LanguageStorageProtocol.self)!,
+            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!
+        )
     }
 }

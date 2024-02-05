@@ -8,7 +8,16 @@ extension DashWalletService {
     static let currencySymbol = "DASH"
     static let currencyExponent: Int = -8
     static let qqPrefix: String = "dash"
-    
+    static let healthCheckParameters = CoinHealthCheckParameters(
+        normalUpdateInterval: 210,
+        crucialUpdateInterval: 30,
+        onScreenUpdateInterval: 10,
+        threshold: 3,
+        normalServiceUpdateInterval: 210,
+        crucialServiceUpdateInterval: 30,
+        onScreenServiceUpdateInterval: 10
+    )
+        
     static var newPendingInterval: Int {
         5000
     }
@@ -53,7 +62,7 @@ extension DashWalletService {
         80
     }
     
-    var minNodeVersion: String? {
+    static var minNodeVersion: String? {
         nil
     }
     

@@ -14,19 +14,28 @@ import Combine
 import CommonKit
 
 extension String.adamant {
-    struct chatList {
-        static let title = String.localized("ChatListPage.Title", comment: "ChatList: scene title")
-        static let sentMessagePrefix = String.localized("ChatListPage.SentMessagePrefix", comment: "ChatList: outgoing message prefix")
-        static let syncingChats = String.localized("ChatListPage.SyncingChats", comment: "ChatList: First syncronization is in progress")
-        static let searchPlaceholder = String.localized("ChatListPage.SearchBar.Placeholder", comment: "ChatList: SearchBar placeholder text")
-        
-        static let blockUser = String.localized("Chats.BlockUser", comment: "Block this user?")
-        
-        static let removedReaction = String.localized("ChatListPage.RemovedReaction", comment: "ChatList: Removed Reaction?")
-        
-        static let reacted = String.localized("ChatListPage.Reacted", comment: "ChatList: Reacted")
-        
-        private init() {}
+    enum chatList {
+        static var title: String {
+            String.localized("ChatListPage.Title", comment: "ChatList: scene title")
+        }
+        static var sentMessagePrefix: String {
+            String.localized("ChatListPage.SentMessagePrefix", comment: "ChatList: outgoing message prefix")
+        }
+        static var syncingChats: String {
+            String.localized("ChatListPage.SyncingChats", comment: "ChatList: First syncronization is in progress")
+        }
+        static var searchPlaceholder: String {
+            String.localized("ChatListPage.SearchBar.Placeholder", comment: "ChatList: SearchBar placeholder text")
+        }
+        static var blockUser: String {
+            String.localized("Chats.BlockUser", comment: "Block this user?")
+        }
+        static var removedReaction: String {
+            String.localized("ChatListPage.RemovedReaction", comment: "ChatList: Removed Reaction?")
+        }
+        static var reacted: String {
+            String.localized("ChatListPage.Reacted", comment: "ChatList: Reacted")
+        }
     }
 }
 
@@ -38,16 +47,16 @@ final class ChatListViewController: KeyboardObservingViewController {
     let cellHeight: CGFloat = 76.0
     
     // MARK: Dependencies
-    var accountService: AccountService!
-    var chatsProvider: ChatsProvider!
-    var transfersProvider: TransfersProvider!
-    var screensFactory: ScreensFactory!
-    var notificationsService: NotificationsService!
-    var dialogService: DialogService!
-    var addressBook: AddressBookService!
-    var avatarService: AvatarService!
     
-    var richMessageProviders = [String:RichMessageProvider]()
+    private let accountService: AccountService
+    private let chatsProvider: ChatsProvider
+    private let transfersProvider: TransfersProvider
+    private let screensFactory: ScreensFactory
+    private let notificationsService: NotificationsService
+    private let dialogService: DialogService
+    private let addressBook: AddressBookService
+    private let avatarService: AvatarService
+    private let walletServiceCompose: WalletServiceCompose
     
     // MARK: IBOutlet
     @IBOutlet weak var tableView: UITableView!
@@ -125,7 +134,38 @@ final class ChatListViewController: KeyboardObservingViewController {
     private var loadNewChatTask: Task<(), Never>?
     private var subscriptions = Set<AnyCancellable>()
     
+    //MARK: Init
+    
+    init(
+        accountService: AccountService,
+        chatsProvider: ChatsProvider,
+        transfersProvider: TransfersProvider,
+        screensFactory: ScreensFactory,
+        notificationsService: NotificationsService,
+        dialogService: DialogService,
+        addressBook: AddressBookService,
+        avatarService: AvatarService,
+        walletServiceCompose: WalletServiceCompose
+    ) {
+        self.accountService = accountService
+        self.chatsProvider = chatsProvider
+        self.transfersProvider = transfersProvider
+        self.screensFactory = screensFactory
+        self.notificationsService = notificationsService
+        self.dialogService = dialogService
+        self.addressBook = addressBook
+        self.avatarService = avatarService
+        self.walletServiceCompose = walletServiceCompose
+        
+        super.init(nibName: "ChatListViewController", bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     // MARK: Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -254,6 +294,19 @@ final class ChatListViewController: KeyboardObservingViewController {
             .sink { [weak self] notification in self?.animateUpdateIfNeeded(notification) }
             .store(in: &subscriptions)
         
+        NotificationCenter.default
+            .publisher(for: .LanguageStorageService.languageUpdated)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.updateUITitles()
+            }
+            .store(in: &subscriptions)
+    }
+    
+    private func updateUITitles() {
+        updatingIndicatorView.updateTitle(title:  String.adamant.chatList.title)
+        tableView.reloadData()
+        searchController?.searchBar.placeholder = String.adamant.chatList.searchPlaceholder
     }
     
     private func animateUpdateIfNeeded(_ notification: Notification) {
@@ -498,7 +551,7 @@ extension ChatListViewController {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! ChatTableViewCell
         
-        cell.accessoryType = .disclosureIndicator
+        cell.accessoryType = .none
         cell.accountLabel.textColor = UIColor.adamant.primary
         cell.dateLabel.textColor = UIColor.adamant.secondary
         cell.avatarImageView.tintColor = UIColor.adamant.primary
@@ -875,16 +928,17 @@ extension ChatListViewController {
             return attributesText
             
         case let transfer as TransferTransaction:
-            if let admService = richMessageProviders[AdmWalletService.richMessageType] as? AdmWalletService {
+            if let admService = walletServiceCompose.getWallet(
+                by: AdmWalletService.richMessageType
+            )?.core as? AdmWalletService {
                 return markdownParser.parse(admService.shortDescription(for: transfer))
-            } else {
-                return nil
             }
             
+            return nil
         case let richMessage as RichMessageTransaction:
             if let type = richMessage.richType,
-               let provider = richMessageProviders[type] {
-                return provider.shortDescription(for: richMessage)
+               let provider = walletServiceCompose.getWallet(by: type) {
+                return provider.core.shortDescription(for: richMessage)
             }
             
             if richMessage.additionalType == .reply,
@@ -1107,7 +1161,7 @@ extension ChatListViewController {
             let rename = self.makeRenameAction(for: address)
             let cancel = self.makeCancelAction()
             
-            self.dialogService?.showAlert(
+            self.dialogService.showAlert(
                 title: nil,
                 message: nil,
                 style: UIAlertController.Style.actionSheet,

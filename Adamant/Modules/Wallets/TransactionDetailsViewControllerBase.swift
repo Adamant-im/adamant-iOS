@@ -23,8 +23,8 @@ private extension TransactionStatus {
     
     var descriptionLocalized: String? {
         switch self {
-        case .inconsistent:
-            return .localized("TransactionStatus.Inconsistent.WrongTimestamp", comment: "Transaction status: inconsistent wrong timestamp")
+        case .inconsistent(let reason):
+            return reason.localized
         default:
             return nil
         }
@@ -33,10 +33,16 @@ private extension TransactionStatus {
 
 // MARK: - Localization
 extension String.adamant {
-    struct transactionDetails {
-        static let title = String.localized("TransactionDetailsScene.Title", comment: "Transaction details: scene title")
-        static let yourAddress = String.adamant.notifications.yourAddress
-        static let requestingDataProgressMessage = String.localized("TransactionDetailsScene.RequestingData", comment: "Transaction details: 'Requesting Data' progress message.")
+    enum transactionDetails {
+        static var title: String {
+            String.localized("TransactionDetailsScene.Title", comment: "Transaction details: scene title")
+        }
+        static var yourAddress: String {
+            String.adamant.notifications.yourAddress
+        }
+        static var requestingDataProgressMessage: String {
+            String.localized("TransactionDetailsScene.RequestingData", comment: "Transaction details: 'Requesting Data' progress message.")
+        }
     }
 }
 
@@ -148,6 +154,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
     let addressBookService: AddressBookService
     let accountService: AccountService
     let walletService: WalletService?
+    let languageService: LanguageStorageProtocol
     
     // MARK: - Properties
     
@@ -159,7 +166,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             
             guard let id = transaction?.txId else { return }
             
-            walletService?.updateStatus(
+            walletService?.core.updateStatus(
                 for: id,
                 status: transaction?.transactionStatus
             )
@@ -169,6 +176,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .medium
         dateFormatter.timeStyle = .short
+        dateFormatter.locale = Locale(identifier: languageService.getLanguage().locale)
         return dateFormatter
     }()
     
@@ -188,25 +196,18 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     private var isFiatSet = false
     
-    var richProvider: RichMessageProviderWithStatusCheck? {
-        nil
+    var feeCurrencySymbol: String? {
+        currencySymbol
     }
     
     var transactionStatus: TransactionStatus? {
         guard let richTransaction = richTransaction,
-              let status = transaction?.transactionStatus
+              let status = richTransaction.transactionStatus
         else {
             return transaction?.transactionStatus
         }
         
-        return richProvider?.statusWithFilters(
-            transaction: richTransaction,
-            oldPendingAttempts: 0,
-            info: .init(
-                sentDate: transaction?.dateValue,
-                status: status
-            )
-        )
+        return status
     }
     
     var refreshTask: Task<(), Never>?
@@ -215,35 +216,25 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     var senderId: String? {
         didSet {
-            guard let id = senderId,
-                  let address = accountService.account?.address
-            else { return }
-            
-            if id.caseInsensitiveCompare(address) == .orderedSame {
-                senderName = String.adamant.transactionDetails.yourAddress
-            } else {
-                senderName = addressBookService.getName(for: id)
-            }
+            senderName = getName(by: senderId)
         }
     }
     
     var recipientId: String? {
         didSet {
-            guard let id = recipientId,
-                  let address = accountService.account?.address
-            else { return }
-            
-            if id.caseInsensitiveCompare(address) == .orderedSame {
-                recipientName = String.adamant.transactionDetails.yourAddress
-            } else {
-                recipientName = addressBookService.getName(for: id)
-            }
+            recipientName = getName(by: recipientId)
         }
     }
     
     var valueAtTimeTxn: String? {
         didSet {
             updateValueAtTimeRowValue()
+        }
+    }
+    
+    var feeAtTimeTxn: String? {
+        didSet {
+            updateFeeAtTimeRowValue()
         }
     }
     
@@ -254,13 +245,15 @@ class TransactionDetailsViewControllerBase: FormViewController {
         currencyInfo: CurrencyInfoService,
         addressBookService: AddressBookService,
         accountService: AccountService,
-        walletService: WalletService?
+        walletService: WalletService?,
+        languageService: LanguageStorageProtocol
     ) {
         self.dialogService = dialogService
         self.currencyInfo = currencyInfo
         self.addressBookService = addressBookService
         self.accountService = accountService
         self.walletService = walletService
+        self.languageService = languageService
         
         super.init(style: .grouped)
     }
@@ -320,7 +313,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.tag = Rows.from.tag
             $0.cell.titleLabel.text = Rows.from.localized
             
-            if let transaction = transaction {
+            if let transaction = self?.transaction {
                 if let name = self?.senderName {
                     $0.value = DoubleDetail(first: name, second: transaction.senderAddress)
                 } else {
@@ -377,7 +370,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.tag = Rows.to.tag
             $0.cell.titleLabel.text = Rows.to.localized
             
-            if let transaction = transaction {
+            if let transaction = self?.transaction {
                 if let recipientName = self?.recipientName?.checkAndReplaceSystemWallets() {
                     $0.value = DoubleDetail(first: recipientName, second: transaction.recipientAddress)
                 } else {
@@ -494,12 +487,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.disabled = true
             $0.tag = Rows.fee.tag
             $0.title = Rows.fee.localized
-            
-            if let value = transaction?.feeValue {
-                $0.value = feeFormatter.string(from: value)
-            } else {
-                $0.value = TransactionDetailsViewControllerBase.awaitingValueString
-            }
+            $0.value = getFeeValue()
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
             cell.textLabel?.textColor = UIColor.adamant.textColor
@@ -509,11 +497,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = UIColor.adamant.textColor
-            if let value = self?.transaction?.feeValue, let formatter = self?.feeFormatter {
-                row.value = formatter.string(from: value)
-            } else {
-                row.value = TransactionDetailsViewControllerBase.awaitingValueString
-            }
+            row.value = self?.getFeeValue()
         }
             
         detailsSection.append(feeRow)
@@ -694,7 +678,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
         let inconsistentReasonSection = Section(Sections.inconsistentReason.localized) {
             $0.tag = Sections.inconsistentReason.tag
             $0.hidden = Condition.function([], { [weak self] _ -> Bool in
-                return self?.transactionStatus != .inconsistent
+                if case .inconsistent = self?.transactionStatus {
+                    return false
+                }
+                return true
             })
         }
         
@@ -764,6 +751,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
         self.updateFiat()
         
         setColors()
+        
+        checkAddressesIfNeeded()
     }
     
     deinit {
@@ -776,40 +765,52 @@ class TransactionDetailsViewControllerBase: FormViewController {
               let amount = transaction?.amountValue
         else { return }
         
-        self.isFiatSet = true
         let currentFiat = currencyInfo.currentCurrency.rawValue
         
-        currencyInfo.getHistory(
-            for: currencySymbol,
-            timestamp: date
-        ) { result in
-            Task { @MainActor [weak self] in
-                guard case .success(let tickers) = result else {
-                    self?.isFiatSet = false
-                    return
-                }
-                
-                self?.isFiatSet = true
-                
-                guard let tickers = tickers,
-                      let ticker = tickers["\(currencySymbol)/\(currentFiat)"]
-                else {
-                    return
-                }
-                
-                let totalFiat = amount * ticker
-                
-                self?.valueAtTimeTxn = self?.fiatFormatter.string(from: totalFiat)
+        Task {
+            var tickers = try await currencyInfo.getHistory(
+                for: currencySymbol,
+                timestamp: date
+            )
+            
+            isFiatSet = true
+            
+            guard var ticker = tickers["\(currencySymbol)/\(currentFiat)"] else {
+                return
             }
+            
+            let totalFiat = amount * ticker
+            valueAtTimeTxn = fiatFormatter.string(from: totalFiat)
+            
+            guard let fee = transaction?.feeValue else { return }
+            
+            if let feeCurrencySymbol = feeCurrencySymbol,
+               feeCurrencySymbol != currencySymbol {
+                tickers = try await currencyInfo.getHistory(
+                    for: feeCurrencySymbol,
+                    timestamp: date
+                )
+                
+                guard let feeTicker = tickers["\(feeCurrencySymbol)/\(currentFiat)"] else {
+                    return
+                }
+                
+                ticker = feeTicker
+            }
+            
+            let totalFeeFiat = fee * ticker
+            feeAtTimeTxn = fiatFormatter.string(from: totalFeeFiat)
         }
     }
     
     func updateIncosinstentRowIfNeeded() {
-        guard transactionStatus == .inconsistent,
+        guard case .inconsistent = transactionStatus,
               let section = form.sectionBy(tag: Sections.inconsistentReason.tag)
         else { return }
         
         section.evaluateHidden()
+        
+        checkAddressesIfNeeded()
     }
     
     // MARK: - Other
@@ -839,6 +840,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         
         self.transaction = failedTransaction
         tableView.reloadData()
+        updateIncosinstentRowIfNeeded()
     }
 
     @MainActor
@@ -848,6 +850,75 @@ class TransactionDetailsViewControllerBase: FormViewController {
         
         row.value = valueAtTimeTxn
         row.updateCell()
+    }
+    
+    @MainActor
+    private func updateFeeAtTimeRowValue() {
+        guard let row: LabelRow = form.rowBy(tag: Rows.fee.tag)
+        else { return }
+        
+        row.value = getFeeValue()
+        row.updateCell()
+    }
+    
+    func getFeeValue() -> String {
+        guard let value = transaction?.feeValue else {
+            return TransactionDetailsViewControllerBase.awaitingValueString
+        }
+        
+        let feeValueRaw = feeFormatter.string(from: value) ?? ""
+        
+        if let feeAtTimeTxn = feeAtTimeTxn {
+            return "\(feeValueRaw) ~\(feeAtTimeTxn)"
+        }
+        
+        return feeValueRaw
+    }
+    
+    @MainActor
+    func checkAddressesIfNeeded() {
+        Task {
+            guard let senderAddress = senderId,
+                  let recipientAddress = recipientId,
+                  transactionStatus?.isInconsistent == true
+            else {
+                return
+            }
+            
+            let realSenderAddress = try? await walletService?.core.getWalletAddress(
+                byAdamantAddress: senderAddress
+            )
+            
+            let realRecipientAddress = try? await walletService?.core.getWalletAddress(
+                byAdamantAddress: recipientAddress
+            )
+            
+            if realSenderAddress != transaction?.senderAddress {
+                senderName = nil
+            } else {
+                senderName = getName(by: senderId)
+            }
+            
+            if realRecipientAddress != transaction?.recipientAddress {
+                recipientName = nil
+            } else {
+                recipientName = getName(by: recipientId)
+            }
+            
+            tableView.reloadData()
+        }
+    }
+    
+    func getName(by adamantAddress: String?) -> String? {
+        guard let id = adamantAddress,
+              let address = accountService.account?.address
+        else { return  nil }
+        
+        if id.caseInsensitiveCompare(address) == .orderedSame {
+            return String.adamant.transactionDetails.yourAddress
+        }
+        
+        return addressBookService.getName(for: id)
     }
     
     // MARK: - Actions

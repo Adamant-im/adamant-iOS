@@ -12,7 +12,7 @@ import MessageKit
 import CommonKit
 
 struct ChatMessageFactory {
-    private let richMessageProviders: [String: RichMessageProvider]
+    private let walletServiceCompose: WalletServiceCompose
     
     static let markdownParser = MarkdownParser(
         font: .adamantChatDefault,
@@ -62,8 +62,8 @@ struct ChatMessageFactory {
         ]
     )
     
-    init(richMessageProviders: [String: RichMessageProvider]) {
-        self.richMessageProviders = richMessageProviders
+    init(walletServiceCompose: WalletServiceCompose) {
+        self.walletServiceCompose = walletServiceCompose
     }
     
     func makeMessage(
@@ -253,6 +253,8 @@ private extension ChatMessageFactory {
         ? transaction.recipientAddress
         : transaction.senderAddress
         
+        let coreService = walletServiceCompose.getWallet(by: transfer.type)?.core
+        
         return .transaction(.init(value: .init(
             id: id,
             isFromCurrentSender: isFromCurrentSender,
@@ -261,9 +263,9 @@ private extension ChatMessageFactory {
                 title: isFromCurrentSender
                     ? .adamant.chat.transactionSent
                     : .adamant.chat.transactionReceived,
-                icon: richMessageProviders[transfer.type]?.tokenLogo ?? .init(),
+                icon: coreService?.tokenLogo ?? .init(),
                 amount: AdamantBalanceFormat.full.format(transfer.amount),
-                currency: richMessageProviders[transfer.type]?.tokenSymbol ?? "",
+                currency: coreService?.tokenSymbol ?? "",
                 date: transaction.sentDate?.humanizedDateTime(withWeekday: false) ?? "",
                 comment: transfer.comments,
                 backgroundColor: backgroundColor,

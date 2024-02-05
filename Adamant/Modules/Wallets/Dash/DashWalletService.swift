@@ -13,7 +13,13 @@ import BitcoinKit
 import Combine
 import CommonKit
 
-final class DashWalletService: WalletService {
+struct DashApiComand {
+    static let networkInfoMethod: String = "getnetworkinfo"
+    static let blockchainInfoMethod: String = "getblockchaininfo"
+    static let rawTransactionMethod: String = "getrawtransaction"
+}
+
+final class DashWalletService: WalletCoreProtocol {
     
     var tokenSymbol: String {
         return type(of: self).currencySymbol
@@ -41,6 +47,10 @@ final class DashWalletService: WalletService {
 
     var qqPrefix: String {
         return Self.qqPrefix
+    }
+    
+    var nodeGroups: [NodeGroup] {
+        [.dash]
     }
     
     var wallet: WalletAccount? { return dashWallet }
@@ -117,6 +127,7 @@ final class DashWalletService: WalletService {
     @Atomic private (set) var dashWallet: DashWallet?
     @Atomic private (set) var enabled = true
     @Atomic public var network: Network
+    @Atomic private var cachedWalletAddress: [String: String] = [:]
     
     let defaultDispatchQueue = DispatchQueue(label: "im.adamant.dashWalletService", qos: .userInteractive, attributes: [.concurrent])
     
@@ -274,7 +285,7 @@ final class DashWalletService: WalletService {
 }
 
 // MARK: - WalletInitiatedWithPassphrase
-extension DashWalletService: InitiatedWithPassphraseService {
+extension DashWalletService {
     func setInitiationFailed(reason: String) {
         setState(.initiationFailed(reason: reason))
         dashWallet = nil
@@ -417,6 +428,14 @@ extension DashWalletService {
     }
 
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
+        if let address = cachedWalletAddress[address], !address.isEmpty {
+            return address
+        }
+        
+        if let address = cachedWalletAddress[address], !address.isEmpty {
+            return address
+        }
+        
         do {
             let result = try await apiService.get(key: DashWalletService.kvsAddress, sender: address).get()
             
@@ -424,6 +443,7 @@ extension DashWalletService {
                 throw WalletServiceError.walletNotInitiated
             }
             
+            cachedWalletAddress[address] = result
             return result
         } catch _ as ApiServiceError {
             throw WalletServiceError.remoteServiceError(

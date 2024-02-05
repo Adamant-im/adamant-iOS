@@ -23,17 +23,9 @@ extension String.adamant.wallets {
 }
 
 final class ERC20WalletViewController: WalletViewControllerBase {
-    // MARK: Lifecycle
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        walletTitleLabel.text = String.adamant.wallets.erc20.tokenWallet(service?.tokenName ?? "")
-    }
-    
     override func sendRowLocalizedLabel() -> NSAttributedString {
         let networkSymbol = ERC20WalletService.tokenNetworkSymbol
-        let tokenSymbol = String.adamant.wallets.erc20.sendToken(service?.tokenSymbol ?? "")
+        let tokenSymbol = String.adamant.wallets.erc20.sendToken(service?.core.tokenSymbol ?? "")
         let currencyFont = UIFont.systemFont(ofSize: 17)
         let networkFont = currencyFont.withSize(8)
         let currencyAttributes: [NSAttributedString.Key: Any] = [.font: currencyFont]
@@ -55,5 +47,9 @@ final class ERC20WalletViewController: WalletViewControllerBase {
     
     override func encodeForQr(address: String) -> String? {
         return "ethereum:\(address)"
+    }
+    
+    override func setTitle() {
+        walletTitleLabel.text = String.adamant.wallets.erc20.tokenWallet(service?.core.tokenName ?? "")
     }
 }

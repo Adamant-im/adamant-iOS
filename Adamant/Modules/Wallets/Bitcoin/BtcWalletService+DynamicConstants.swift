@@ -8,7 +8,16 @@ extension BtcWalletService {
     static let currencySymbol = "BTC"
     static let currencyExponent: Int = -8
     static let qqPrefix: String = "bitcoin"
-    
+    static let healthCheckParameters = CoinHealthCheckParameters(
+        normalUpdateInterval: 360,
+        crucialUpdateInterval: 30,
+        onScreenUpdateInterval: 10,
+        threshold: 2,
+        normalServiceUpdateInterval: 360,
+        crucialServiceUpdateInterval: 30,
+        onScreenServiceUpdateInterval: 10
+    )
+        
     static var newPendingInterval: Int {
         10000
     }
@@ -53,7 +62,7 @@ extension BtcWalletService {
         10
     }
     
-    var minNodeVersion: String? {
+    static var minNodeVersion: String? {
         nil
     }
     

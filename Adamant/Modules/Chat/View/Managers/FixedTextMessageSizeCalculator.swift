@@ -118,15 +118,24 @@
              : incomingMessageLabelInsets
      }
 
-     func labelSize(for attributedText: NSAttributedString, considering maxWidth: CGFloat) -> CGSize {
-         let constraintBox = CGSize(width: maxWidth, height: .greatestFiniteMagnitude)
-         var size = attributedText.boundingRect(
-             with: constraintBox,
-             options: [.usesLineFragmentOrigin, .usesFontLeading],
-             context: nil
-         ).integral.size
-         size.width += additionalWidth
-         return size
+     func labelSize(
+        for attributedText: NSAttributedString,
+        considering maxWidth: CGFloat
+     ) -> CGSize {
+         let textContainer = NSTextContainer(
+            size: CGSize(width: maxWidth, height: .greatestFiniteMagnitude)
+         )
+         let layoutManager = NSLayoutManager()
+         
+         layoutManager.addTextContainer(textContainer)
+         
+         let textStorage = NSTextStorage(attributedString: attributedText)
+         textStorage.addLayoutManager(layoutManager)
+         
+         let range = NSRange(location: 0, length: attributedText.length)
+         let rect = layoutManager.usedRect(for: textContainer)
+         
+         return rect.integral.size
      }
  }
 

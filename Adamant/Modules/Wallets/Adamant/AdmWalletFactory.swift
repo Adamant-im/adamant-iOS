@@ -10,18 +10,20 @@ import Swinject
 import UIKit
 
 struct AdmWalletFactory: WalletFactory {
-    typealias Service = AdmWalletService
+    typealias Service = WalletService
     
+    let typeSymbol: String = AdmWalletService.richMessageType
     let assembler: Assembler
     
-    func makeWalletVC(service: AdmWalletService, screensFactory: ScreensFactory) -> WalletViewController {
-        let c = AdmWalletViewController(nibName: "WalletViewControllerBase", bundle: nil)
-        c.dialogService = assembler.resolve(DialogService.self)
-        c.currencyInfoService = assembler.resolve(CurrencyInfoService.self)
-        c.accountService = assembler.resolve(AccountService.self)
-        c.service = service
-        c.screensFactory = screensFactory
-        return c
+    func makeWalletVC(service: Service, screensFactory: ScreensFactory) -> WalletViewController {
+        AdmWalletViewController(
+            dialogService: assembler.resolve(DialogService.self)!,
+            currencyInfoService: assembler.resolve(CurrencyInfoService.self)!,
+            accountService: assembler.resolve(AccountService.self)!,
+            screensFactory: screensFactory,
+            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!,
+            service: service
+        )
     }
     
     func makeTransferListVC(service: Service, screensFactory: ScreensFactory) -> UIViewController {
@@ -35,12 +37,12 @@ struct AdmWalletFactory: WalletFactory {
             stack: assembler.resolve(CoreDataStack.self)!,
             screensFactory: screensFactory,
             addressBookService: assembler.resolve(AddressBookService.self)!,
-            admService: service
+            walletService: service
         )
     }
     
     func makeTransferVC(service: Service, screensFactory: ScreensFactory) -> TransferViewControllerBase {
-        let vc = AdmTransferViewController(
+        AdmTransferViewController(
             chatsProvider: assembler.resolve(ChatsProvider.self)!,
             accountService: assembler.resolve(AccountService.self)!,
             accountsProvider: assembler.resolve(AccountsProvider.self)!,
@@ -48,11 +50,11 @@ struct AdmWalletFactory: WalletFactory {
             screensFactory: screensFactory,
             currencyInfoService: assembler.resolve(CurrencyInfoService.self)!,
             increaseFeeService: assembler.resolve(IncreaseFeeService.self)!,
-            vibroService: assembler.resolve(VibroService.self)!
+            vibroService: assembler.resolve(VibroService.self)!,
+            walletService: service,
+            reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
+            nodesStorage: assembler.resolve(NodesStorageProtocol.self)!
         )
-        
-        vc.service = service
-        return vc
     }
     
     func makeDetailsVC(service: Service, transaction: RichMessageTransaction) -> UIViewController? { nil }
@@ -90,7 +92,8 @@ private extension AdmWalletFactory {
             screensFactory: screensFactory,
             dialogService: assembler.resolve(DialogService.self)!,
             currencyInfo: assembler.resolve(CurrencyInfoService.self)!,
-            addressBookService: assembler.resolve(AddressBookService.self)!
+            addressBookService: assembler.resolve(AddressBookService.self)!,
+            languageService: assembler.resolve(LanguageStorageProtocol.self)!
         )
     }
 }

@@ -14,14 +14,6 @@ final class BtcTransferViewController: TransferViewControllerBase {
     
     // MARK: Properties
     
-    override var balanceFormatter: NumberFormatter {
-        if let service = service {
-            return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: type(of: service).currencySymbol)
-        } else {
-            return AdamantBalanceFormat.currencyFormatterFull
-        }
-    }
-    
     private var skipValueChange: Bool = false
     
     // MARK: Send
@@ -35,7 +27,7 @@ final class BtcTransferViewController: TransferViewControllerBase {
             comments = ""
         }
         
-        guard let service = service as? BtcWalletService,
+        guard let service = walletCore as? BtcWalletService,
               let recipient = recipientAddress,
               let amount = amount,
               let wallet = service.wallet
@@ -99,7 +91,7 @@ final class BtcTransferViewController: TransferViewControllerBase {
                 processTransaction(
                     self,
                     localTransaction: detailTransaction,
-                    service: service,
+                    service: walletService,
                     comments: comments,
                     transaction: transaction
                 )
@@ -116,7 +108,7 @@ final class BtcTransferViewController: TransferViewControllerBase {
     private func processTransaction(
         _ vc: BtcTransferViewController,
         localTransaction: BtcTransaction?,
-        service: BtcWalletService,
+        service: WalletService,
         comments: String,
         transaction: TransactionDetails
     ) {
@@ -126,7 +118,7 @@ final class BtcTransferViewController: TransferViewControllerBase {
         detailsVc.transaction = localTransaction ?? transaction
         detailsVc.senderName = String.adamant.transactionDetails.yourAddress
         
-        if recipientAddress == service.wallet?.address {
+        if recipientAddress == service.core.wallet?.address {
             detailsVc.recipientName = String.adamant.transactionDetails.yourAddress
         } else {
             detailsVc.recipientName = self.recipientName
@@ -144,10 +136,6 @@ final class BtcTransferViewController: TransferViewControllerBase {
     }
     
     // MARK: Overrides
-    
-    override func validateRecipient(_ address: String) -> AddressValidationResult {
-        service?.validate(address: address) ?? .invalid(description: nil)
-    }
     
     override func recipientRow() -> BaseRow {
         let row = TextRow {

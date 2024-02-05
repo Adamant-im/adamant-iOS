@@ -8,7 +8,16 @@ extension EthWalletService {
     static let currencySymbol = "ETH"
     static let currencyExponent: Int = -18
     static let qqPrefix: String = "ethereum"
-    
+    static let healthCheckParameters = CoinHealthCheckParameters(
+        normalUpdateInterval: 300,
+        crucialUpdateInterval: 30,
+        onScreenUpdateInterval: 10,
+        threshold: 5,
+        normalServiceUpdateInterval: 300,
+        crucialServiceUpdateInterval: 30,
+        onScreenServiceUpdateInterval: 10
+    )
+        
     static var newPendingInterval: Int {
         4000
     }
@@ -73,7 +82,7 @@ extension EthWalletService {
         20
     }
     
-    var minNodeVersion: String? {
+    static var minNodeVersion: String? {
         nil
     }
     
@@ -83,6 +92,7 @@ extension EthWalletService {
         [
             Node(url: URL(string: "https://ethnode1.adamant.im")!, altUrl: URL(string: "http://95.216.41.106:44099")),
 Node(url: URL(string: "https://ethnode2.adamant.im")!, altUrl: URL(string: "http://95.216.114.252:44099")),
+Node(url: URL(string: "https://ethnode3.adamant.im")!, altUrl: URL(string: "http://46.4.37.157:44099")),
         ]
     }
     

@@ -13,7 +13,7 @@ import CommonKit
 actor TransactionStatusSubscription<StatusSubscriber: Subscriber>: Subscription where
     StatusSubscriber.Input == TransactionStatus,
     StatusSubscriber.Failure == Never {
-    private let provider: RichMessageProviderWithStatusCheck
+    private let provider: WalletService
     private let transaction: CoinTransaction
     private let taskManager = TaskManager()
     private var subscriber: StatusSubscriber?
@@ -25,7 +25,7 @@ actor TransactionStatusSubscription<StatusSubscriber: Subscriber>: Subscription 
     }
     
     init(
-        provider: RichMessageProviderWithStatusCheck,
+        provider: WalletService,
         transaction: CoinTransaction,
         oldPendingAttempts: ObservableValue<Int>,
         subscriber: StatusSubscriber
@@ -87,7 +87,7 @@ private extension TransactionStatusSubscription {
             let sentInterval = Date.now.timeIntervalSince1970 - sentDate.timeIntervalSince1970
             
             let oldTxInterval = TimeInterval(
-                provider.newPendingInterval * .init(provider.newPendingAttempts)
+                provider.core.newPendingInterval * .init(provider.core.newPendingAttempts)
             )
             
             return sentInterval < oldTxInterval
@@ -99,11 +99,11 @@ private extension TransactionStatusSubscription {
     var nextUpdateInterval: TimeInterval? {
         switch state {
         case .registered:
-            return provider.registeredInterval
+            return provider.core.registeredInterval
         case .new:
-            return provider.newPendingInterval
+            return provider.core.newPendingInterval
         case .old:
-            return provider.oldPendingInterval
+            return provider.core.oldPendingInterval
         case .final:
             return nil
         }

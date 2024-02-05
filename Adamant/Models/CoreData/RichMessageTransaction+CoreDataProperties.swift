@@ -17,6 +17,7 @@ extension RichMessageTransaction {
         return NSFetchRequest<RichMessageTransaction>(entityName: "RichMessageTransaction")
     }
 
+    @NSManaged public var richTransferHash: String?
     @NSManaged public var richContentSerialized: String?
     @NSManaged public var richContent: [String: Any]?
     @NSManaged public var richType: String?

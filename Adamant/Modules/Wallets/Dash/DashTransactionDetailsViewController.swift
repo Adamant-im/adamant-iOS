@@ -13,7 +13,9 @@ import CommonKit
 final class DashTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies
     
-    weak var service: DashWalletService?
+    weak var service: DashWalletService? {
+        walletService?.core as? DashWalletService
+    }
     
     // MARK: - Properties
     
@@ -28,10 +30,6 @@ final class DashTransactionDetailsViewController: TransactionDetailsViewControll
         control.addTarget(self, action: #selector(refresh), for: UIControl.Event.valueChanged)
         return control
     }()
-    
-    override var richProvider: RichMessageProviderWithStatusCheck? {
-        return service
-    }
     
     // MARK: - Lifecycle
     

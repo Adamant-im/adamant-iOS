@@ -220,6 +220,12 @@
 /* Account tab: 'Vote for delegates' button */
 "AccountTab.Row.VoteForDelegates" = "Голосовать за делегатов";
 
+/* Account tab: 'Language' row */
+"AccountTab.Row.Language" = "Язык";
+
+/* Account tab: Language auto */
+"Language.Auto" = "Автоматически";
+
 /* Account tab: Actions section title */
 "AccountTab.Section.Actions" = "Действия";
 
@@ -372,6 +378,18 @@
 
 /* Alert "Report has been sent" */
 "Chats.ReportSent" = "Запрос отправлен";
+
+/* Date "Today" */
+"Chats.Date.Today" = "Сегодня";
+
+/* Date "Just now" */
+"Chats.Date.JustNow" = "Только что";
+
+/* Date "A minute ago" */
+"Chats.Date.MinAgo" = "Минуту назад";
+
+/* Date "Yesterday" */
+"Chats.Date.Yesterday" = "Вчера";
 
 /* Chat: inform user that he can't cancel transaction, that was sent */
 "ChatScene.Error.cancelError" = "Сообщение уже отправлено";
@@ -655,6 +673,9 @@
 /* NodesList.NodeCell: Node is disabled */
 "NodesList.NodeCell.Disabled" = "Отключена";
 
+/* NodesList.NodeCell: Node is outdated */
+"NodesList.NodeCell.Outdated" = "Устаревшая версия API:";
+
 /* CoinsNodesList: ServiceNode */
 "CoinsNodesList.ServiceNode" = "Сервис";
 
@@ -829,6 +850,9 @@
 /* Shared alert notification: body message for no internet connection. */
 "Shared.NoInternet.Body" = "Проверьте соединение и повторите попытку";
 
+/* Shared alert notification: body message for no internet connection. */
+"Shared.Transfer.NoInternet.Body" = "Похоже, у вас нет активного интернет-соединения. Пожалуйста, проверьте ваше подключение и повторите попытку";
+
 /* Shared alert 'Ok' button. Used anywhere */
 "Shared.Ok" = "OK";
 
@@ -893,10 +917,34 @@
 "TransactionStatus.Failed" = "Ошибка";
 
 /* Transaction status: inconsistent */
-"TransactionStatus.Inconsistent" = "Несогласованно";
+"TransactionStatus.Inconsistent" = "Несоответствие";
 
 /* Transaction status: inconsistent wrong timestamp */
 "TransactionStatus.Inconsistent.WrongTimestamp" = "Сообщение и транзакция имеют различное время. Это возможно, но лучше перепроверьте";
+
+/* Transaction status: inconsistent wrong unknown */
+"TransactionStatus.Inconsistent.Unknown" = "Не удалось проверить транзакцию. Что-то пошло не так";
+
+/* Transaction status: inconsistent wrong hash */
+"TransactionStatus.Inconsistent.WrongTxHash" = "Неверный хэш транзакции. Остерегайтесь мошенников";
+
+/* Transaction status: inconsistent wrong amount */
+"TransactionStatus.Inconsistent.WrongAmount" = "Неверное количество. Остерегайтесь мошенников";
+
+/* Transaction status: inconsistent wrong mismatch */
+"TransactionStatus.Inconsistent.SenderCryptoAddressMismatch" = "%@-адрес отправителя не сходится. Остерегайтесь мошенников";
+
+/* Transaction status: inconsistent wrong mismatch */
+"TransactionStatus.Inconsistent.RecipientCryptoAddressMismatch" = "%@-адрес получателя не сходится. Остерегайтесь мошенников";
+
+/* Transaction status: inconsistent unable to retrieve */
+"TransactionStatus.Inconsistent.SenderCryptoAddressUnavailable" = "Нет %@-адреса отправителя";
+
+/* Transaction status: inconsistent unable to retrieve */
+"TransactionStatus.Inconsistent.RecipientCryptoAddressUnavailable" = "Нет %@-адреса получателя";
+
+/* Transaction status: inconsistent duplicate */
+"TransactionStatus.Inconsistent.Duplicate" = "Этот перевод уже встречался в чате ранее. Остерегайтесь мошенников";
 
 /* Transaction status: inconsistent reason title */
 "TransactionStatus.Inconsistent.Reason.Title" = "Противоречивая причина";
@@ -1113,6 +1161,9 @@
 
 /* Welcome: Skip button" */
 "WelcomeScene.Description.SkipButton" = "Пропустить";
+
+/* Welcome: Description accept */
+"WelcomeScene.Description.Accept" = "Я принимаю";
 
 /* EULA */
 "EULA.Title" = "Условия использования";

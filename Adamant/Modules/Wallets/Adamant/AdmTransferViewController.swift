@@ -18,9 +18,11 @@ extension String.adamant {
             return String.localizedStringWithFormat(.localized("TransferScene.unsafeTransferAlert.title", comment: "Transfer: Alert title: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address"), address)
         }
             
-        static let accountNotFoundAlertBody = String.localized("TransferScene.unsafeTransferAlert.body", comment: "Transfer: Alert body: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address")
+        static var accountNotFoundAlertBody: String { String.localized("TransferScene.unsafeTransferAlert.body", comment: "Transfer: Alert body: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address")
+        }
         
-        static let accountNotFoundChatAlertBody = String.localized("TransferScene.unsafeChatAlert.body", comment: "Transfer: Alert body: Account is not initiated. It's not possible to start a chat, as the Blockchain doesn't store the account's public key to encrypt messages.")
+        static var accountNotFoundChatAlertBody: String { String.localized("TransferScene.unsafeChatAlert.body", comment: "Transfer: Alert body: Account is not initiated. It's not possible to start a chat, as the Blockchain doesn't store the account's public key to encrypt messages.")
+        }
     }
 }
 
@@ -35,7 +37,10 @@ final class AdmTransferViewController: TransferViewControllerBase {
     
     @MainActor
     override func sendFunds() {
-        guard let service = service as? AdmWalletService, let recipient = recipientAddress, let amount = amount else {
+        guard let service = walletCore as? AdmWalletService,
+              let recipient = recipientAddress,
+              let amount = amount
+        else {
             return
         }
         

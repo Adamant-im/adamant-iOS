@@ -10,25 +10,25 @@ import UIKit
 import CommonKit
 
 extension String.adamant {
-    static let doge = String.localized("AccountTab.Wallets.doge_wallet", comment: "Account tab: Doge wallet")
+    static var doge: String {
+        String.localized("AccountTab.Wallets.doge_wallet", comment: "Account tab: Doge wallet")
+    }
     
-    static let sendDoge = String.localized("AccountTab.Row.SendDoge", comment: "Account tab: 'Send DOGE tokens' button")
+    static var sendDoge: String {
+        String.localized("AccountTab.Row.SendDoge", comment: "Account tab: 'Send DOGE tokens' button")
+    }
 }
 
 final class DogeWalletViewController: WalletViewControllerBase {
-    // MARK: Lifecycle
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        walletTitleLabel.text = String.adamant.doge
-    }
-    
     override func sendRowLocalizedLabel() -> NSAttributedString {
         return NSAttributedString(string: String.adamant.sendDoge)
     }
     
     override func encodeForQr(address: String) -> String? {
         return "doge:\(address)"
+    }
+    
+    override func setTitle() {
+        walletTitleLabel.text = String.adamant.doge
     }
 }
