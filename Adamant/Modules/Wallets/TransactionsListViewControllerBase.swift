@@ -291,7 +291,7 @@ class TransactionsListViewControllerBase: UIViewController {
     @objc func handleRefresh() {
         presentLoadingViewIfNeeded()
         emptyLabel.isHidden = true
-        loadData(offset: .zero, silent: true)
+        loadData(offset: .zero, silent: false)
     }
     
     func reloadData() {
