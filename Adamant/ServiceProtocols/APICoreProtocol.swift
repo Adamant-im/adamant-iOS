@@ -105,6 +105,36 @@ extension APICoreProtocol {
             jsonParameters: jsonParameters
         ).result.flatMap { parseJSON(data: $0) }
     }
+    
+    func sendRequestRPC(
+        node: Node,
+        path: String,
+        requests: [RpcRequest]
+    ) async -> ApiServiceResult<[RPCResponseModel]> {
+        let parameters: [Any] = requests.compactMap {
+            $0.asDictionary()
+        }
+        
+        return await sendRequestJsonResponse(
+            node: node,
+            path: path,
+            method: .post,
+            jsonParameters: parameters
+        )
+    }
+    
+    func sendRequestRPC(
+        node: Node,
+        path: String,
+        request: RpcRequest
+    ) async -> ApiServiceResult<RPCResponseModel> {
+        await sendRequestJsonResponse(
+            node: node,
+            path: path,
+            method: .post,
+            jsonParameters: request.asDictionary() ?? [:]
+        )
+    }
 }
 
 private extension APICoreProtocol {

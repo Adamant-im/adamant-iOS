@@ -30,6 +30,12 @@
 		3A96E37C2AED27F8001F5A52 /* PartnerQRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A96E37B2AED27F8001F5A52 /* PartnerQRService.swift */; };
 		3AA2D5F7280EADE3000ED971 /* SocketService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA2D5F6280EADE3000ED971 /* SocketService.swift */; };
 		3AA2D5FA280EAF5D000ED971 /* AdamantSocketService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA2D5F9280EAF5D000ED971 /* AdamantSocketService.swift */; };
+		3AA388032B67F47600125684 /* RPCResponseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA388022B67F47600125684 /* RPCResponseModel.swift */; };
+		3AA388052B67F4DD00125684 /* BtcBlockchainInfoDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA388042B67F4DD00125684 /* BtcBlockchainInfoDTO.swift */; };
+		3AA388072B67F53F00125684 /* BtcNetworkInfoDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA388062B67F53F00125684 /* BtcNetworkInfoDTO.swift */; };
+		3AA3880A2B69173500125684 /* DashNetworkInfoDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA388092B69173500125684 /* DashNetworkInfoDTO.swift */; };
+		3AA3880C2B69201B00125684 /* ADM+JsonDecode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA3880B2B69201B00125684 /* ADM+JsonDecode.swift */; };
+		3AA3880E2B6A356900125684 /* RpcRequestModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA3880D2B6A356900125684 /* RpcRequestModel.swift */; };
 		3AA50DEF2AEBE65D00C58FC8 /* PartnerQRView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA50DEE2AEBE65D00C58FC8 /* PartnerQRView.swift */; };
 		3AA50DF12AEBE66A00C58FC8 /* PartnerQRViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA50DF02AEBE66A00C58FC8 /* PartnerQRViewModel.swift */; };
 		3AA50DF32AEBE67C00C58FC8 /* PartnerQRFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA50DF22AEBE67C00C58FC8 /* PartnerQRFactory.swift */; };
@@ -37,6 +43,7 @@
 		3AF08D5F2B4EB3A200EB82B1 /* LanguageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF08D5E2B4EB3A200EB82B1 /* LanguageService.swift */; };
 		3AF08D612B4EB3C400EB82B1 /* LanguageStorageProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF08D602B4EB3C400EB82B1 /* LanguageStorageProtocol.swift */; };
 		3AF53F8D2B3DCFA300B30312 /* NodeGroup+Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF53F8C2B3DCFA300B30312 /* NodeGroup+Constants.swift */; };
+		3AF53F8F2B3EE0DA00B30312 /* DogeNodeInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF53F8E2B3EE0DA00B30312 /* DogeNodeInfo.swift */; };
 		3AFE7E412B18D88B00718739 /* WalletService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AFE7E402B18D88B00718739 /* WalletService.swift */; };
 		3AFE7E432B19E4D900718739 /* WalletServiceCompose.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AFE7E422B19E4D900718739 /* WalletServiceCompose.swift */; };
 		3AFE7E522B1F6B3400718739 /* WalletServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AFE7E512B1F6B3400718739 /* WalletServiceProtocol.swift */; };
@@ -295,7 +302,6 @@
 		93BF4A6629E4859900505CD0 /* DelegatesBottomPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93BF4A6529E4859900505CD0 /* DelegatesBottomPanel.swift */; };
 		93BF4A6C29E4B4BF00505CD0 /* DelegatesBottomPanel+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93BF4A6B29E4B4BF00505CD0 /* DelegatesBottomPanel+Model.swift */; };
 		93C794442B07725C00408826 /* DashGetAddressBalanceDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C794432B07725C00408826 /* DashGetAddressBalanceDTO.swift */; };
-		93C794462B07768F00408826 /* DashGetRawTransactionDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C794452B07768F00408826 /* DashGetRawTransactionDTO.swift */; };
 		93C794482B0778C700408826 /* DashGetBlockDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C794472B0778C700408826 /* DashGetBlockDTO.swift */; };
 		93C7944A2B077A1C00408826 /* DashGetUnspentTransactionsDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C794492B077A1C00408826 /* DashGetUnspentTransactionsDTO.swift */; };
 		93C7944C2B077B2700408826 /* DashGetAddressTransactionIds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C7944B2B077B2700408826 /* DashGetAddressTransactionIds.swift */; };
@@ -670,6 +676,12 @@
 		3A96E37B2AED27F8001F5A52 /* PartnerQRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnerQRService.swift; sourceTree = "<group>"; };
 		3AA2D5F6280EADE3000ED971 /* SocketService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocketService.swift; sourceTree = "<group>"; };
 		3AA2D5F9280EAF5D000ED971 /* AdamantSocketService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantSocketService.swift; sourceTree = "<group>"; };
+		3AA388022B67F47600125684 /* RPCResponseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPCResponseModel.swift; sourceTree = "<group>"; };
+		3AA388042B67F4DD00125684 /* BtcBlockchainInfoDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcBlockchainInfoDTO.swift; sourceTree = "<group>"; };
+		3AA388062B67F53F00125684 /* BtcNetworkInfoDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcNetworkInfoDTO.swift; sourceTree = "<group>"; };
+		3AA388092B69173500125684 /* DashNetworkInfoDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashNetworkInfoDTO.swift; sourceTree = "<group>"; };
+		3AA3880B2B69201B00125684 /* ADM+JsonDecode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ADM+JsonDecode.swift"; sourceTree = "<group>"; };
+		3AA3880D2B6A356900125684 /* RpcRequestModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RpcRequestModel.swift; sourceTree = "<group>"; };
 		3AA50DEE2AEBE65D00C58FC8 /* PartnerQRView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnerQRView.swift; sourceTree = "<group>"; };
 		3AA50DF02AEBE66A00C58FC8 /* PartnerQRViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnerQRViewModel.swift; sourceTree = "<group>"; };
 		3AA50DF22AEBE67C00C58FC8 /* PartnerQRFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnerQRFactory.swift; sourceTree = "<group>"; };
@@ -679,6 +691,7 @@
 		3AF08D5E2B4EB3A200EB82B1 /* LanguageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageService.swift; sourceTree = "<group>"; };
 		3AF08D602B4EB3C400EB82B1 /* LanguageStorageProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageStorageProtocol.swift; sourceTree = "<group>"; };
 		3AF53F8C2B3DCFA300B30312 /* NodeGroup+Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NodeGroup+Constants.swift"; sourceTree = "<group>"; };
+		3AF53F8E2B3EE0DA00B30312 /* DogeNodeInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeNodeInfo.swift; sourceTree = "<group>"; };
 		3AFE7E402B18D88B00718739 /* WalletService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletService.swift; sourceTree = "<group>"; };
 		3AFE7E422B19E4D900718739 /* WalletServiceCompose.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletServiceCompose.swift; sourceTree = "<group>"; };
 		3AFE7E512B1F6B3400718739 /* WalletServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletServiceProtocol.swift; sourceTree = "<group>"; };
@@ -927,7 +940,6 @@
 		93BF4A6529E4859900505CD0 /* DelegatesBottomPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelegatesBottomPanel.swift; sourceTree = "<group>"; };
 		93BF4A6B29E4B4BF00505CD0 /* DelegatesBottomPanel+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DelegatesBottomPanel+Model.swift"; sourceTree = "<group>"; };
 		93C794432B07725C00408826 /* DashGetAddressBalanceDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashGetAddressBalanceDTO.swift; sourceTree = "<group>"; };
-		93C794452B07768F00408826 /* DashGetRawTransactionDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashGetRawTransactionDTO.swift; sourceTree = "<group>"; };
 		93C794472B0778C700408826 /* DashGetBlockDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashGetBlockDTO.swift; sourceTree = "<group>"; };
 		93C794492B077A1C00408826 /* DashGetUnspentTransactionsDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashGetUnspentTransactionsDTO.swift; sourceTree = "<group>"; };
 		93C7944B2B077B2700408826 /* DashGetAddressTransactionIds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashGetAddressTransactionIds.swift; sourceTree = "<group>"; };
@@ -1734,10 +1746,10 @@
 			isa = PBXGroup;
 			children = (
 				93B28EC42B076E2C007F268B /* DashBlockchainInfoDTO.swift */,
+				3AA388092B69173500125684 /* DashNetworkInfoDTO.swift */,
 				93B28EC72B076E68007F268B /* DashResponseDTO.swift */,
 				93B28EC92B076E88007F268B /* DashErrorDTO.swift */,
 				93C794432B07725C00408826 /* DashGetAddressBalanceDTO.swift */,
-				93C794452B07768F00408826 /* DashGetRawTransactionDTO.swift */,
 				93C794472B0778C700408826 /* DashGetBlockDTO.swift */,
 				93C794492B077A1C00408826 /* DashGetUnspentTransactionsDTO.swift */,
 				93C7944B2B077B2700408826 /* DashGetAddressTransactionIds.swift */,
@@ -1778,6 +1790,7 @@
 			children = (
 				93CCAE7A2B06D9B500EA5B94 /* DogeBlocksDTO.swift */,
 				93CCAE7D2B06DA6C00EA5B94 /* DogeBlockDTO.swift */,
+				3AF53F8E2B3EE0DA00B30312 /* DogeNodeInfo.swift */,
 			);
 			path = DTO;
 			sourceTree = "<group>";
@@ -1835,6 +1848,8 @@
 				A5E04226282A8BDC0076CD13 /* BtcBalanceResponse.swift */,
 				A5E04228282A998C0076CD13 /* BtcTransactionResponse.swift */,
 				A5E0422A282AB18B0076CD13 /* BtcUnspentTransactionResponse.swift */,
+				3AA388042B67F4DD00125684 /* BtcBlockchainInfoDTO.swift */,
+				3AA388062B67F53F00125684 /* BtcNetworkInfoDTO.swift */,
 			);
 			path = DTO;
 			sourceTree = "<group>";
@@ -2020,6 +2035,8 @@
 				9338AE8E2AEF8131001D32DF /* InternalAPIError.swift */,
 				93E8EDCE2AF1CD9F003E163C /* NodeStatusInfo.swift */,
 				93B28EBF2B076667007F268B /* APIResponseModel.swift */,
+				3AA388022B67F47600125684 /* RPCResponseModel.swift */,
+				3AA3880D2B6A356900125684 /* RpcRequestModel.swift */,
 				936658902B0AB9DC00BDB2D3 /* NodeWithGroup.swift */,
 			);
 			path = Models;
@@ -2058,6 +2075,7 @@
 				939FA3412B0D6F0000710EC6 /* SelfRemovableHostingController.swift */,
 				936658942B0AC15300BDB2D3 /* Node+UI.swift */,
 				3AF53F8C2B3DCFA300B30312 /* NodeGroup+Constants.swift */,
+				3AA3880B2B69201B00125684 /* ADM+JsonDecode.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -3043,6 +3061,7 @@
 				41CA598C29A0D84F002BFDE4 /* TaskManager.swift in Sources */,
 				E9E7CD9120026FA100DFC4DB /* AppAssembly.swift in Sources */,
 				E96D64CA2295C4A800CA5587 /* WordList.swift in Sources */,
+				3AA3880C2B69201B00125684 /* ADM+JsonDecode.swift in Sources */,
 				64BD2B7520E2814B00E2CD36 /* EthTransaction.swift in Sources */,
 				93B28EC22B076D31007F268B /* DashApiService.swift in Sources */,
 				E908472B2196FEA80095825D /* RichMessageTransaction+CoreDataProperties.swift in Sources */,
@@ -3056,6 +3075,7 @@
 				93CC94C12B17EE73004842AC /* EthApiCore.swift in Sources */,
 				93FC169D2B019F440062B507 /* EthApiService.swift in Sources */,
 				9371130F2996EDA900F64CF9 /* ChatRefreshMock.swift in Sources */,
+				3AA388052B67F4DD00125684 /* BtcBlockchainInfoDTO.swift in Sources */,
 				93547BCA29E2262D00B0914B /* WelcomeViewController.swift in Sources */,
 				41047B74294C61D10039E956 /* VisibleWalletsService.swift in Sources */,
 				648CE3AC229AD2190070A2CC /* DashTransferViewController.swift in Sources */,
@@ -3112,6 +3132,7 @@
 				6403F5DB2272389800D58779 /* (null) in Sources */,
 				648DD7A62237DC4000B811FD /* DogeTransferViewController.swift in Sources */,
 				93E1234B2A6DFEF7004DF33B /* NotificationStrings.swift in Sources */,
+				3AA388072B67F53F00125684 /* BtcNetworkInfoDTO.swift in Sources */,
 				E9960B3421F5154300C840A8 /* BaseAccount+CoreDataProperties.swift in Sources */,
 				4153045929C09902000E4BEA /* AdamantIncreaseFeeService.swift in Sources */,
 				3AA50DEF2AEBE65D00C58FC8 /* PartnerQRView.swift in Sources */,
@@ -3153,6 +3174,7 @@
 				649D6BEA21B9627B009E727B /* LskWalletService+RichMessageProviderWithStatusCheck.swift in Sources */,
 				E940088B2114F63000CD2D67 /* NSRegularExpression+adamant.swift in Sources */,
 				932B34E92974AA4A002A75BA /* ChatPreservationDelegate.swift in Sources */,
+				3AA388032B67F47600125684 /* RPCResponseModel.swift in Sources */,
 				E9484B7F2285C016008E10F0 /* PKGeneratorViewController.swift in Sources */,
 				E9B3D3A9202082450019EB36 /* AdamantTransfersProvider.swift in Sources */,
 				6449BA71235CA0930033B936 /* ERC20WalletService+RichMessageProvider.swift in Sources */,
@@ -3182,6 +3204,7 @@
 				E95F85802008C8D70070534A /* ChatListFactory.swift in Sources */,
 				41A1994429D2D3CF0031AD75 /* MessageModel.swift in Sources */,
 				93775E462A674FA9009061AC /* Markdown+Adamant.swift in Sources */,
+				3AA3880E2B6A356900125684 /* RpcRequestModel.swift in Sources */,
 				93E8EDCD2AF1BD65003E163C /* AdamantApiCore.swift in Sources */,
 				6416B1A721B024B6006089AC /* LskWalletService+Send.swift in Sources */,
 				E9942B87203D9E5100C163AF /* EurekaQRRow.swift in Sources */,
@@ -3209,7 +3232,6 @@
 				93EE9C3329C2666200D9853F /* TransactionStatusSubscription.swift in Sources */,
 				E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */,
 				648CE3A222999CE70070A2CC /* BTCRawTransaction.swift in Sources */,
-				93C794462B07768F00408826 /* DashGetRawTransactionDTO.swift in Sources */,
 				648DD79E2236A0B500B811FD /* DogeTransactionsViewController.swift in Sources */,
 				64B5736F2209B892005DC968 /* BtcTransactionDetailsViewController.swift in Sources */,
 				938F7D612955C92B001915CA /* ChatDataSourceManager.swift in Sources */,
@@ -3272,6 +3294,7 @@
 				93A91FD329799298001DB1F8 /* ChatStartPosition.swift in Sources */,
 				3A2F55F92AC6F308000A3F26 /* CoinTransaction+CoreDataClass.swift in Sources */,
 				93A91FD1297972B7001DB1F8 /* ChatScrollDownButton.swift in Sources */,
+				3AA3880A2B69173500125684 /* DashNetworkInfoDTO.swift in Sources */,
 				41C1698C29E7F34900FEB3CB /* RichTransactionReplyService.swift in Sources */,
 				935F53D629BE8F7400779492 /* TransactionStatusPublisher.swift in Sources */,
 				935F53D629BE8F7400779492 /* TransactionStatusPublisher.swift in Sources */,
@@ -3304,6 +3327,7 @@
 				3A9015A72A614A62002A2464 /* AdamantEmojiService.swift in Sources */,
 				93ADE0722ACA66AF008ED641 /* VibrationSelectionView.swift in Sources */,
 				648C696F22915A12006645F5 /* DashTransaction.swift in Sources */,
+				3AF53F8F2B3EE0DA00B30312 /* DogeNodeInfo.swift in Sources */,
 				3A41939A2A5D554A006A6B22 /* Reaction.swift in Sources */,
 				93CCAE752B06CC3600EA5B94 /* LskNodeApiService.swift in Sources */,
 				6416B1A321AD7EA1006089AC /* LskTransactionDetailsViewController.swift in Sources */,

@@ -37,6 +37,22 @@ extension Service {
     public func getFees(completionHandler: @escaping (Response<ServiceFeeResponse>) -> Void) {
         client.get(path: "\(Version.v3.rawValue)/fees", completionHandler: completionHandler)
     }
+    
+    public func fees() async throws -> ServiceFeeResponse {
+        try await client.request(
+            .get,
+            path: "\(Version.v3.rawValue)/fees",
+            options: nil
+        )
+    }
+    
+    public func info() async throws -> ServiceInfoModelDTO {
+        try await client.request(
+            .get,
+            path: "api/status",
+            options: nil
+        )
+    }
 
     public func exist(address: String, completionHandler: @escaping (Response<ExistModel>) -> Void) {
         client.get(

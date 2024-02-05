@@ -21,6 +21,13 @@ enum DefaultBtcTransferFee: Decimal {
 
 struct BtcApiCommands {
 
+    static let blockchainInfoMethod: String = "getblockchaininfo"
+    static let networkInfoMethod: String = "getnetworkinfo"
+    
+    static func getRPC() -> String {
+        return "/bitcoind"
+    }
+    
     static func getHeight() -> String {
         return "/blocks/tip/height"
     }
