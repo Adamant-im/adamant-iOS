@@ -82,6 +82,10 @@ final class ERC20WalletService: WalletCoreProtocol {
     var nodeGroups: [NodeGroup] {
         [.eth]
     }
+
+    var transferDecimals: Int {
+        token.transferDecimals
+    }
     
     private (set) var blockchainSymbol: String = "ETH"
     private (set) var isDynamicFee: Bool = true

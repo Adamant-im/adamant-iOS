@@ -199,6 +199,7 @@ function appendTokenToBlockchainFile ()
     DEFAULT_GAS_PRICE_GWEI=${11}
     DEFAULT_GAS_LIMIT=${12}
     WARNING_GAS_PRICE_GWEI=${13}
+    TRANSFERS_DECIMALS=${14}
     
     DEFAULT_VISABILITY="${DEFAULT_VISABILITY_RAW:=false}"
     DEFAULT_ORDINAL_LEVEL="${DEFAULT_ORDINAL_LEVEL_RAW:=nil}"
@@ -217,7 +218,8 @@ function appendTokenToBlockchainFile ()
                    reliabilityGasLimitPercent: $RELIABILITY_GAS_LIMIT_PERCENT,
                    defaultGasPriceGwei: $DEFAULT_GAS_PRICE_GWEI,
                    defaultGasLimit: $DEFAULT_GAS_LIMIT,
-                   warningGasPriceGwei: $WARNING_GAS_PRICE_GWEI),
+                   warningGasPriceGwei: $WARNING_GAS_PRICE_GWEI,
+                   transferDecimals: $TRANSFERS_DECIMALS),
 __EOF__
 }
 
@@ -330,7 +332,7 @@ function setTokens ()
                 SYMBOL=$(perl -ne 'if (/"symbol": "(.*)"/) { print $1 . "\n" }' $WALLET_JSON)
                 CONTRACT=$(perl -ne 'if (/"contractId": "(.*)"/) { print $1 . "\n" }' $WALLET_JSON)
                 DECIMALS=$(perl -ne 'if (/"decimals": (.*)/) { print $1 . "\n" }' $WALLET_JSON)
-
+                
                 # get data from general dir
                 WALLET_GENERAL_JSON=$WALLETS_NAME_DIR/$WALLET_NAME/info.json
                 WALLET_GENERAL_BLOCKCHAIN_JSON=$WALLETS_NAME_DIR/$BLOCKCHAIN_NAME/info.json
@@ -345,8 +347,10 @@ function setTokens ()
                 DEFAULT_GAS_LIMIT=$(getFeeValue "defaultGasLimit" $WALLET_GENERAL_JSON $WALLET_GENERAL_BLOCKCHAIN_JSON $WALLET_BLOCKCHAIN_JSON)
                 WARNING_GAS_PRICE_GWEI=$(getFeeValue "warningGasPriceGwei" $WALLET_GENERAL_JSON $WALLET_GENERAL_BLOCKCHAIN_JSON $WALLET_BLOCKCHAIN_JSON)
                 
+                TRANSFERS_DECIMALS=$(getOverrideValue "cryptoTransferDecimals" $WALLET_GENERAL_JSON $WALLET_JSON)
+
                 # append token to blockchain file
-                appendTokenToBlockchainFile "$BLOCKCHAIN_NAME" "$NAME" "$SYMBOL" "$CONTRACT" "$DECIMALS"  "$DEFAULT_VISABILITY" "$DEFAULT_ORDINAL_LEVEL" "$BLOCKCHAIN_TYPE" "$RELIABILITY_GAS_PRICE_PERCENT" "$RELIABILITY_GAS_LIMIT_PERCENT" "$DEFAULT_GAS_PRICE_GWEI" "$DEFAULT_GAS_LIMIT" "$WARNING_GAS_PRICE_GWEI"
+                appendTokenToBlockchainFile "$BLOCKCHAIN_NAME" "$NAME" "$SYMBOL" "$CONTRACT" "$DECIMALS"  "$DEFAULT_VISABILITY" "$DEFAULT_ORDINAL_LEVEL" "$BLOCKCHAIN_TYPE" "$RELIABILITY_GAS_PRICE_PERCENT" "$RELIABILITY_GAS_LIMIT_PERCENT" "$DEFAULT_GAS_PRICE_GWEI" "$DEFAULT_GAS_LIMIT" "$WARNING_GAS_PRICE_GWEI" "$TRANSFERS_DECIMALS"
          done
 
         # Write end file

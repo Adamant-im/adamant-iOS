@@ -813,7 +813,7 @@ class TransferViewControllerBase: FormViewController {
     /// Override this to provide custom balance formatter
     var balanceFormatter: NumberFormatter {
         AdamantBalanceFormat.currencyFormatter(
-            for: .full,
+            for: .custom(walletCore.transferDecimals),
             currencySymbol: walletCore.tokenSymbol
         )
     }

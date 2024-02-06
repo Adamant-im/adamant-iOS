@@ -251,6 +251,7 @@ protocol WalletCoreProtocol: AnyObject {
     var dynamicRichMessageType: String { get }
     var coinStorage: CoinStorageService { get }
     var nodeGroups: [NodeGroup] { get }
+    var transferDecimals: Int { get }
     
     var transactionsPublisher: AnyObservable<[TransactionDetails]> {
         get
