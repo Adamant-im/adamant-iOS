@@ -33,19 +33,28 @@ final class ChatTransactionCell: MessageContentCell {
         }
     }
     
-    override func configure(with message: MessageType, at indexPath: IndexPath, and messagesCollectionView: MessagesCollectionView) {
+    override func configure(
+        with message: MessageType,
+        at indexPath: IndexPath,
+        and messagesCollectionView: MessagesCollectionView
+    ) {
         super.configure(with: message, at: indexPath, and: messagesCollectionView)
         messageContainerView.style = .none
         messageContainerView.backgroundColor = .clear
+    }
+    
+    override func layoutMessageContainerView(
+        with attributes: MessagesCollectionViewLayoutAttributes
+    ) {
+        super.layoutMessageContainerView(with: attributes)
+        transactionView.frame = messageContainerView.frame
+        transactionView.layoutIfNeeded()
     }
 }
 
 private extension ChatTransactionCell {
     func configure() {
-        messageContainerView.addSubview(transactionView)
-        
-        transactionView.snp.makeConstraints {
-            $0.directionalEdges.equalToSuperview()
-        }
+        contentView.addSubview(transactionView)
+        transactionView.frame = messageContainerView.frame
     }
 }
