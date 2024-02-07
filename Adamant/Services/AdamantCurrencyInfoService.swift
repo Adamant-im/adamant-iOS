@@ -130,7 +130,8 @@ final class AdamantCurrencyInfoService: CurrencyInfoService {
                 do {
                     let model: CoinInfoServiceResponseGet = try JSONDecoder().decode(CoinInfoServiceResponseGet.self, from: data)
                     if let result = model.result {
-                        completion(.success(result))
+                        let nonOptionalResult = result.compactMapValues { $0 }
+                        completion(.success(nonOptionalResult))
                     } else {
                         completion(.failure(.serverError(error: "Coin info API result: Parsing error")))
                     }
@@ -215,13 +216,13 @@ struct CoinInfoServiceResponseGet: Decodable {
     
     let success: Bool
     let date: Date
-    let result: [String: Decimal]?
+    let result: [String: Decimal?]?
     
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
         self.success = try container.decode(Bool.self, forKey: .success)
-        self.result = try? container.decode([String: Decimal].self, forKey: .result)
+        self.result = try? container.decode([String: Decimal?].self, forKey: .result)
         
         if let timeInterval = try? container.decode(TimeInterval.self, forKey: .date) {
             self.date = Date(timeIntervalSince1970: timeInterval)
