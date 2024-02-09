@@ -90,6 +90,5 @@ private func isNeedToDisplayDateHeader(
         let currentDate = transactions[index].sentDate
     else { return false }
     
-    let calendar = Calendar.current
-    return !calendar.isDate(currentDate, inSameDayAs: previousDate)
+    return !Calendar.current.isDate(currentDate, inSameDayAs: previousDate)
 }
