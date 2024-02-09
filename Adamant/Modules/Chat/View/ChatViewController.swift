@@ -142,6 +142,7 @@ final class ChatViewController: MessagesViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         viewModel.preserveMessage(inputBar.text)
+        viewModel.preserveReplayMessage()
         viewModel.saveChatOffset(
             isScrollPositionNearlyTheBottom
             ? nil

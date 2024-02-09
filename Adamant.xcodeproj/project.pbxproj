@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		265AA1622B74E6B900CF98B0 /* ChatPreservation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265AA1612B74E6B900CF98B0 /* ChatPreservation.swift */; };
 		269E13522B594B2D008D1CA7 /* AccountFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269E13512B594B2D008D1CA7 /* AccountFooterView.swift */; };
 		3A20D93B2AE7F316005475A6 /* AdamantTransactionDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A20D93A2AE7F316005475A6 /* AdamantTransactionDetails.swift */; };
 		3A2F55F92AC6F308000A3F26 /* CoinTransaction+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A2F55F72AC6F308000A3F26 /* CoinTransaction+CoreDataClass.swift */; };
@@ -215,7 +216,7 @@
 		93294B962AAD320B00911109 /* ScreensFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93294B952AAD320B00911109 /* ScreensFactory.swift */; };
 		93294B982AAD364F00911109 /* AdamantScreensFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93294B972AAD364F00911109 /* AdamantScreensFactory.swift */; };
 		93294B9A2AAD624100911109 /* WalletFactoryCompose.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93294B992AAD624100911109 /* WalletFactoryCompose.swift */; };
-		932B34E92974AA4A002A75BA /* ChatPreservationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 932B34E82974AA4A002A75BA /* ChatPreservationDelegate.swift */; };
+		932B34E92974AA4A002A75BA /* ChatPreservationProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 932B34E82974AA4A002A75BA /* ChatPreservationProtocol.swift */; };
 		932F77592989F999006D8801 /* ChatCellManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 932F77582989F999006D8801 /* ChatCellManager.swift */; };
 		9338AE7F2AEF43DA001D32DF /* NodesStorageProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9338AE7E2AEF43DA001D32DF /* NodesStorageProtocol.swift */; };
 		9338AE812AEF4B8E001D32DF /* NodesStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9338AE802AEF4B8E001D32DF /* NodesStorage.swift */; };
@@ -652,6 +653,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		265AA1612B74E6B900CF98B0 /* ChatPreservation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatPreservation.swift; sourceTree = "<group>"; };
 		269E13512B594B2D008D1CA7 /* AccountFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountFooterView.swift; sourceTree = "<group>"; };
 		33975C0D891698AA7E74EBCC /* Pods_Adamant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Adamant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		36AB8CE9537B3B873972548B /* Pods_AdmCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AdmCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -858,7 +860,7 @@
 		93294B952AAD320B00911109 /* ScreensFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreensFactory.swift; sourceTree = "<group>"; };
 		93294B972AAD364F00911109 /* AdamantScreensFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantScreensFactory.swift; sourceTree = "<group>"; };
 		93294B992AAD624100911109 /* WalletFactoryCompose.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletFactoryCompose.swift; sourceTree = "<group>"; };
-		932B34E82974AA4A002A75BA /* ChatPreservationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatPreservationDelegate.swift; sourceTree = "<group>"; };
+		932B34E82974AA4A002A75BA /* ChatPreservationProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatPreservationProtocol.swift; sourceTree = "<group>"; };
 		932F77582989F999006D8801 /* ChatCellManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatCellManager.swift; sourceTree = "<group>"; };
 		9338AE7E2AEF43DA001D32DF /* NodesStorageProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodesStorageProtocol.swift; sourceTree = "<group>"; };
 		9338AE802AEF4B8E001D32DF /* NodesStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodesStorage.swift; sourceTree = "<group>"; };
@@ -1687,7 +1689,7 @@
 			children = (
 				9322E87C2970435C00B8357C /* Models */,
 				938F7D682955C9EC001915CA /* ChatViewModel.swift */,
-				932B34E82974AA4A002A75BA /* ChatPreservationDelegate.swift */,
+				932B34E82974AA4A002A75BA /* ChatPreservationProtocol.swift */,
 				93A118522993241D00E144CC /* ChatMessagesListFactory.swift */,
 				9322E87A2970431200B8357C /* ChatMessageFactory.swift */,
 				9399F5EC29A85A48006C3E30 /* ChatCacheService.swift */,
@@ -1960,6 +1962,7 @@
 				3A2F55FB2AC6F885000A3F26 /* CoinStorage.swift */,
 				3A96E37B2AED27F8001F5A52 /* PartnerQRService.swift */,
 				3AF08D602B4EB3C400EB82B1 /* LanguageStorageProtocol.swift */,
+				265AA1612B74E6B900CF98B0 /* ChatPreservation.swift */,
 			);
 			path = ServiceProtocols;
 			sourceTree = "<group>";
@@ -3173,7 +3176,7 @@
 				6403F5DE22723C6800D58779 /* DashMainnet.swift in Sources */,
 				649D6BEA21B9627B009E727B /* LskWalletService+RichMessageProviderWithStatusCheck.swift in Sources */,
 				E940088B2114F63000CD2D67 /* NSRegularExpression+adamant.swift in Sources */,
-				932B34E92974AA4A002A75BA /* ChatPreservationDelegate.swift in Sources */,
+				932B34E92974AA4A002A75BA /* ChatPreservationProtocol.swift in Sources */,
 				3AA388032B67F47600125684 /* RPCResponseModel.swift in Sources */,
 				E9484B7F2285C016008E10F0 /* PKGeneratorViewController.swift in Sources */,
 				E9B3D3A9202082450019EB36 /* AdamantTransfersProvider.swift in Sources */,
@@ -3376,6 +3379,7 @@
 				9322E875297042F000B8357C /* ChatSender.swift in Sources */,
 				E94008852114EE7500CD2D67 /* LskWalletService.swift in Sources */,
 				E96E86B821679C120061F80A /* EthTransactionDetailsViewController.swift in Sources */,
+				265AA1622B74E6B900CF98B0 /* ChatPreservation.swift in Sources */,
 				4164A9D728F17D4000EEF16D /* ChatTransactionService.swift in Sources */,
 				E90A4943204C5ED6009F6A65 /* EurekaPassphraseRow.swift in Sources */,
 				E90847302196FEA80095825D /* ChatTransaction+CoreDataClass.swift in Sources */,
