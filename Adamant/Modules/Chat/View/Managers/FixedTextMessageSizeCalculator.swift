@@ -75,7 +75,8 @@
              let contentViewHeight = model.value.height(for: maxWidth)
              messageContainerSize.width = maxWidth
              messageContainerSize.height = contentViewHeight
-             messageContainerSize.height += messageInsets.vertical
+             + messageInsets.vertical
+             + additionalHeight
          }
          
          return messageContainerSize
@@ -170,3 +171,4 @@
 
  /// Additional width to fix incorrect size calculating
  private let additionalWidth: CGFloat = 5
+private let additionalHeight: CGFloat = 5
