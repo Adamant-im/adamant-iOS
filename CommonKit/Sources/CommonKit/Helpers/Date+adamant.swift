@@ -146,61 +146,35 @@ private extension Date {
         formatter.unitsStyle = .full
         
         if days > 0 {
-            let locale = getLocaleFormatUnderscoresWithValue(Double(days))
-            let format = String.init(format: "%%d %@days ago", locale)
-            let localized = String.localized(format)
-            let translate = String.init(format: localized, days)
-            
-            return translate
+            return String.adamant.dateChatList.days(days)
         } else if hours > 0 {
-            let locale = getLocaleFormatUnderscoresWithValue(Double(hours))
-            let format = String.init(format: "%%d %@hours ago", locale)
-            let localized = String.localized(format)
-            let translate = String.init(format: localized, hours)
-            
-            return translate
+            return String.adamant.dateChatList.hours(hours)
         } else if minutes > 0 {
-            let locale = getLocaleFormatUnderscoresWithValue(Double(minutes))
-            let format = String.init(format: "%%d %@minutes ago", locale)
-            let localized = String.localized(format)
-            let translate = String.init(format: localized, minutes)
-            
-            return translate
+            return String.adamant.dateChatList.minutes(minutes)
         } else {
-            let locale = getLocaleFormatUnderscoresWithValue(Double(seconds))
-            let format = String.init(format: "%%d %@seconds ago", locale)
-            let localized = String.localized(format)
-            let translate = String.init(format: localized, seconds)
-            
-            return translate
+            return String.adamant.dateChatList.seconds(seconds)
         }
     }
-    
-    func getLocaleFormatUnderscoresWithValue(_ value: Double) -> String {
-        let localCode = UserDefaults.standard.string(forKey: StoreKey.language.language)
-        
-        guard localCode == Language.ru.rawValue ||
-                localCode == Language.en.rawValue ||
-                localCode == Language.de.rawValue
-        else {
-            return ""
+}
+
+extension String.adamant {
+    struct dateChatList {
+        static func days(_ days: Int) -> String {
+            return String.localizedStringWithFormat(.localized("Chats.Date.For.Days", comment: "Date chats: Duration in days if longer than one."), days)
         }
         
-        let XY = Int(floor(value).truncatingRemainder(dividingBy: 100))
-        let Y = Int(floor(value).truncatingRemainder(dividingBy: 10))
-        
-        if (Y == 0 || Y > 4 || (XY > 10 && XY < 15)) {
-            return ""
+        static func hours(_ hours: Int) -> String {
+            return String.localizedStringWithFormat(.localized("Chats.Date.For.Hours", comment: "Date chats: Duration in hours if longer than one."), hours)
         }
         
-        if (Y > 1 && Y < 5 && (XY < 10 || XY > 20))  {
-            return "_"
+        static func minutes(_ minutes: Int) -> String {
+            return String.localizedStringWithFormat(.localized("Chats.Date.For.Minutes", comment: "Date chats: Duration in minutes if longer than one."), minutes)
         }
         
-        if (Y == 1 && XY != 11) {
-            return "__"
+        static func seconds(_ seconds: Int) -> String {
+            return String.localizedStringWithFormat(.localized("Chats.Date.For.Seconds", comment: "Date chats: Duration in seconds if longer than one."), seconds)
         }
         
-        return ""
+        private init() {}
     }
 }
