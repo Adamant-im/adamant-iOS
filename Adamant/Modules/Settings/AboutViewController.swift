@@ -101,7 +101,7 @@ final class AboutViewController: FormViewController {
             case .website: return .asset(named: "row_website")
             case .welcomeScreens: return .asset(named: "row_logo")
             case .twitter: return .asset(named: "row_twitter")
-            case .vibration: return .asset(named: "row_twitter")
+            case .vibration: return .asset(named: "row_vibration")
             }
         }
     }
