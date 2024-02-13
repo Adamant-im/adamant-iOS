@@ -46,6 +46,11 @@ extension String.adamant {
         static var accountNotFound: String {
             String.localized("TransferScene.Error.AddressNotFound", comment: "Transfer: Address not found error")
         }
+        
+        static var notEnoughAdmToSendTransfer: String {
+            String.localized("TransferScene.Error.notEnoughAdmToSendTransfer", comment: "Transfer: Not enough ADM to send in-chat transfer")
+        }
+       
         static var transferProcessingMessage: String {
             String.localized("TransferScene.SendingFundsProgress", comment: "Transfer: Processing message")
         }
@@ -747,7 +752,7 @@ class TransferViewControllerBase: FormViewController {
         }
         
         if admReportRecipient != nil, let account = accountService.account, account.balance < 0.001 {
-            dialogService.showWarning(withMessage: "Not enought money to send report")
+            dialogService.showWarning(withMessage: String.adamant.transfer.notEnoughAdmToSendTransfer)
             return
         }
         
