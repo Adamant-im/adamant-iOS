@@ -101,7 +101,7 @@ extension AdamantDialogService {
     func showCompactError(
         withMessage message: String,
         supportEmail: Bool,
-        error: Error
+        error: Error?
     ) {
         internalShowError(
             withMessage: message,

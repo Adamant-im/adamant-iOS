@@ -149,7 +149,7 @@ protocol DialogService: AnyObject {
     func showCompactError(
         withMessage message: String,
         supportEmail: Bool,
-        error: Error
+        error: Error?
     )
     
     // MARK: - Notifications

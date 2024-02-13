@@ -15,10 +15,6 @@ import Combine
 
 final class LskTransactionsViewController: TransactionsListViewControllerBase {
     
-    // MARK: - Dependencies
-    
-    var screensFactory: ScreensFactory!
-    
     // MARK: - UITableView
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
