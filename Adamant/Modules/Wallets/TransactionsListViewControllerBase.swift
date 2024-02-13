@@ -225,16 +225,18 @@ class TransactionsListViewControllerBase: UIViewController {
                     limit: limit
                 )
                 self.offset += count
+                emptyLabel.isHidden = self.transactions.count > 0
             } catch {
                 isNeedToLoadMoore = false
+                emptyLabel.isHidden = self.transactions.count > 0
                 
                 if !silent {
-                    dialogService.showRichError(error: error)
+                    dialogService.showCompactError(withMessage: error.localizedDescription, supportEmail: false, error: error)
+                    emptyLabel.isHidden = true
                 }
             }
             
             isBusy = false
-            emptyLabel.isHidden = self.transactions.count > 0
             stopBottomIndicator()
             refreshControl.endRefreshing()
             updateLoadingView(isHidden: true)

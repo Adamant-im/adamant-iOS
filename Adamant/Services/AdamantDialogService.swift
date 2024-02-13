@@ -98,15 +98,31 @@ extension AdamantDialogService {
         internalShowError(withMessage: message, supportEmail: supportEmail, error: error)
     }
     
+    func showCompactError(
+        withMessage message: String,
+        supportEmail: Bool,
+        error: Error
+    ) {
+        internalShowError(
+            withMessage: message,
+            supportEmail: supportEmail,
+            title: nil,
+            icon: warningImage,
+            error: error
+        )
+    }
+    
     private func internalShowError(
         withMessage message: String,
         supportEmail: Bool,
+        title: String? = .adamant.alert.error,
+        icon: UIImage? = .asset(named: "error"),
         error: Error? = nil
     ) {
         vibroService.applyVibration(.error)
         popupManager.showAdvancedAlert(model: .init(
-            icon: .asset(named: "error") ?? .init(),
-            title: .adamant.alert.error,
+            icon: icon ?? .init(),
+            title: title,
             text: message,
             secondaryButton: supportEmail
                 ? .init(
@@ -621,3 +637,8 @@ extension AdamantDialogService {
         }
     }
 }
+
+private let warningImage = UIImage(
+    systemName: "multiply.circle",
+    withConfiguration: UIImage.SymbolConfiguration(pointSize: 25, weight: .light)
+)!
