@@ -169,6 +169,8 @@ private extension ChatDataSourceManager {
             viewModel.reactAction(id, emoji: emoji)
         case let .presentMenu(arg):
             viewModel.presentMenu(arg: arg)
+        case .copyInPart(text: let text):
+            viewModel.copyTextInPartAction(text)
         }
     }
 }

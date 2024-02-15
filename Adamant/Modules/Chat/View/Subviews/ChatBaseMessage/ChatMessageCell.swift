@@ -457,11 +457,18 @@ extension ChatMessageCell {
             actionHandler(.copy(text: model.text.string))
         }
         
+        let copyInPart = AMenuItem.action(
+            title: .adamant.chat.selectText,
+            systemImageName: "selection.pin.in.out"
+        ) { [actionHandler, model] in
+            actionHandler(.copyInPart(text: model.text.string))
+        }
+        
         guard !model.isFake else {
             return AMenuSection([copy])
         }
         
-        return AMenuSection([reply, copy, report, remove])
+        return AMenuSection([reply, copyInPart, copy, report, remove])
     }
     
     @objc func tapReactionAction() {

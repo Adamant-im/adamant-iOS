@@ -77,6 +77,7 @@ final class ChatViewModel: NSObject {
     let updateChatRead = ObservableSender<Void>()
     let commitVibro = ObservableSender<Void>()
     let layoutIfNeeded = ObservableSender<Void>()
+    let didTapSelectText = ObservableSender<String>()
     
     @ObservableValue private(set) var isHeaderLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
@@ -487,6 +488,10 @@ final class ChatViewModel: NSObject {
     func copyMessageAction(_ text: String) {
         UIPasteboard.general.string = text
         dialog.send(.toast(.adamant.alert.copiedToPasteboardNotification))
+    }
+    
+    func copyTextInPartAction(_ text: String) {
+        didTapSelectText.send(text)
     }
     
     func reportMessageAction(_ id: String) {

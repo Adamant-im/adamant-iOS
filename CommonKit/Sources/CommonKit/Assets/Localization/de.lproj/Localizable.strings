@@ -367,6 +367,9 @@
 /* Button "Report" */
 "Chats.Report" = "Bericht";
 
+/* Button "Select Text" */
+"Chats.SelectText" = "Text auswählen";
+
 /* Button "Reply" */
 "Chats.Reply" = "Antwort";
 
