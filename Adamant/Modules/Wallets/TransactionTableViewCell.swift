@@ -74,12 +74,14 @@ final class TransactionTableViewCell: UITableViewCell {
             make.leading.centerY.equalToSuperview()
             make.trailing.equalTo(addressLabel.snp.leading).offset(-5)
         }
-        
+        accountLabel.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+
         addressLabel.snp.makeConstraints { make in
             make.trailing.centerY.equalToSuperview()
             make.width.greaterThanOrEqualTo(80)
         }
-        
+        addressLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+
         view.snp.makeConstraints { make in
             make.height.equalTo(26)
         }
@@ -207,7 +209,9 @@ final class TransactionTableViewCell: UITableViewCell {
             if addressLabel.isHidden {
                 addressLabel.isHidden = false
             }
-            addressLabel.snp.updateConstraints { make in
+            addressLabel.snp.removeConstraints()
+            addressLabel.snp.makeConstraints { make in
+                make.trailing.centerY.equalToSuperview()
                 make.width.greaterThanOrEqualTo(80)
             }
         } else {
@@ -217,8 +221,10 @@ final class TransactionTableViewCell: UITableViewCell {
             if !addressLabel.isHidden {
                 addressLabel.isHidden = true
             }
-            addressLabel.snp.updateConstraints { make in
-                make.width.greaterThanOrEqualTo(0)
+            addressLabel.snp.removeConstraints()
+            addressLabel.snp.makeConstraints { make in
+                make.trailing.centerY.equalToSuperview()
+                make.width.equalTo(0)
             }
         }
         
