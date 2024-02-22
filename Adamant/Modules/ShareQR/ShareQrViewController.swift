@@ -12,7 +12,8 @@ import Photos
 import CommonKit
 
 extension String.adamant.shared {
-    static let photolibraryNotAuthorized = String.localized("ShareQR.photolibraryNotAuthorized", comment: "ShareQR scene: User had not authorized access to write images to photolibrary")
+    static var photolibraryNotAuthorized: String { String.localized("ShareQR.photolibraryNotAuthorized", comment: "ShareQR scene: User had not authorized access to write images to photolibrary")
+    }
 }
 
 final class ShareQrViewController: FormViewController {

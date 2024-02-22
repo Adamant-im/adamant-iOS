@@ -1093,6 +1093,9 @@
 /* Transfer: Confirm transfer alert: Send tokens button */
 "TransferScene.Send" = "Отправить";
 
+/* Transfer: Ttitle for done button */
+"TransferScene.Done" = "Готово";
+
 /* Transfer: Confirm transfer alert: 'Can't Undo' message */
 "TransferScene.CantUndo" = "Вы не сможете отменить это действие";
 

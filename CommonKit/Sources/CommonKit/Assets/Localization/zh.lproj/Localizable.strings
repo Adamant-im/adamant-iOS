@@ -1093,6 +1093,9 @@
 /* Transfer: Confirm transfer alert: Send tokens button */
 "TransferScene.Send" = "发送";
 
+/* Transfer: Ttitle for done button */
+"TransferScene.Done" = "完成的";
+
 /* Transfer: Confirm transfer alert: 'Can't Undo' message */
 "TransferScene.CantUndo" = "您将无法撤消此操作";
 

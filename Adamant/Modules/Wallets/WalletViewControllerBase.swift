@@ -197,9 +197,10 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
             ? UITableView.defaultSeparatorInset
             : .zero
             
-            if #unavailable(iOS 14.0) {
-                cell.textLabel?.attributedText = label
-            }
+            let label = self?.sendRowLocalizedLabel()
+            var content = cell.defaultContentConfiguration()
+            content.attributedText = label
+            cell.contentConfiguration = content
         }.onCellSelection { [weak self] (_, _) in
             guard let self = self, let service = service else { return }
             

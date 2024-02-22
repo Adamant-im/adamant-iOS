@@ -55,6 +55,9 @@ extension String.adamant {
         static var send: String {
             String.localized("TransferScene.Send", comment: "Transfer: Send button")
         }
+        static var done: String {
+            String.localized("TransferScene.Done", comment: "Transfer: Done button")
+        }
         static var cantUndo: String {
             String.localized("TransferScene.CantUndo", comment: "Transfer: Send button")
         }
@@ -65,11 +68,14 @@ extension String.adamant {
 }
 
 fileprivate extension String.adamant.alert {
-    static let confirmSendMessageFormat = String.localized("TransferScene.SendConfirmFormat", comment: "Transfer: Confirm transfer %1$@ tokens to %2$@ message. Note two variables: at runtime %1$@ will be amount (with ADM suffix), and %2$@ will be recipient address. You can use address before amount with this so called 'position tokens'.")
+    static var confirmSendMessageFormat: String { String.localized("TransferScene.SendConfirmFormat", comment: "Transfer: Confirm transfer %1$@ tokens to %2$@ message. Note two variables: at runtime %1$@ will be amount (with ADM suffix), and %2$@ will be recipient address. You can use address before amount with this so called 'position tokens'.")
+    }
     static func confirmSendMessage(formattedAmount amount: String, recipient: String) -> String {
         return String.localizedStringWithFormat(String.adamant.alert.confirmSendMessageFormat, "\(amount)", recipient)
     }
-    static let send = String.localized("TransferScene.Send", comment: "Transfer: Confirm transfer alert: Send tokens button")
+    static var send: String {
+        String.localized("TransferScene.Send", comment: "Transfer: Confirm transfer alert: Send tokens button")
+    }
 }
 
 // MARK: -
@@ -445,7 +451,7 @@ class TransferViewControllerBase: FormViewController {
         }
         previousIsReadyToSend = isReadyToSend()
         
-        let doneBtn = UIBarButtonItem(barButtonSystemItem: .done, target: view, action: view.doneButton.action)
+        let doneBtn = UIBarButtonItem(title: String.adamant.transfer.done, style: .done, target: view, action: view.doneButton.action)
         let sendBtn = UIBarButtonItem(title: String.adamant.transfer.send, style: .done, target: view, action: view.doneButton.action)
         view.doneButton = isReadyToSend() ? sendBtn : doneBtn
         if (view.items?.count ?? 0) > 4 {
