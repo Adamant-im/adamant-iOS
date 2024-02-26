@@ -209,8 +209,7 @@ final class TransactionTableViewCell: UITableViewCell {
             if addressLabel.isHidden {
                 addressLabel.isHidden = false
             }
-            addressLabel.snp.removeConstraints()
-            addressLabel.snp.makeConstraints { make in
+            addressLabel.snp.remakeConstraints { make in
                 make.trailing.centerY.equalToSuperview()
                 make.width.greaterThanOrEqualTo(80)
             }
@@ -221,8 +220,7 @@ final class TransactionTableViewCell: UITableViewCell {
             if !addressLabel.isHidden {
                 addressLabel.isHidden = true
             }
-            addressLabel.snp.removeConstraints()
-            addressLabel.snp.makeConstraints { make in
+            addressLabel.snp.remakeConstraints { make in
                 make.trailing.centerY.equalToSuperview()
                 make.width.equalTo(0)
             }
