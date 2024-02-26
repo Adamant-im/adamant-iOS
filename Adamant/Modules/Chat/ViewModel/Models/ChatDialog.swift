@@ -35,4 +35,5 @@ enum ChatDialog {
     )
     case dismissMenu
     case renameAlert
+    case actionMenu
 }

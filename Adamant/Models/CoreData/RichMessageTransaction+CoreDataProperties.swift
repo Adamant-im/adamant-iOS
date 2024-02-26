@@ -40,4 +40,22 @@ extension RichMessageTransaction {
         
         return nil
     }
+    
+    func getRichValue<T>(for key: String) -> T? {
+        if let value = richContent?[key] as? T {
+            return value
+        }
+        
+        if let content = richContent?[RichContentKeys.reply.replyMessage] as? [String: String],
+           let value = content[key] as? T {
+            return value
+        }
+        
+        if let content = richContent?[RichContentKeys.file.files] as? [String: Any],
+           let value = content[key] as? T {
+            return value
+        }
+        
+        return nil
+    }
 }

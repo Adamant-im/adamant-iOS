@@ -852,17 +852,17 @@ extension AdamantChatsProvider {
             )
         }
         
-        let transaction = try await sendMessageToServer(
-            senderId: loggedAccount.address,
-            recipientId: recipientId,
-            transaction: transactionLocaly,
-            type: message.chatType,
-            keypair: keypair,
-            context: context,
-            from: chatroom
-        )
+//        let transaction = try await sendMessageToServer(
+//            senderId: loggedAccount.address,
+//            recipientId: recipientId,
+//            transaction: transactionLocaly,
+//            type: message.chatType,
+//            keypair: keypair,
+//            context: context,
+//            from: chatroom
+//        )
         
-        return transaction
+        return transactionLocaly
     }
     
     private func sendTextMessageLocaly(

@@ -45,6 +45,18 @@ public enum RichContentKeys {
         public static let react_message = "react_message"
         public static let reactions = "reactions"
     }
+    
+    public enum file {
+        public static let file = "file"
+        public static let files = "files"
+        public static let file_id = "file_id"
+        public static let comment = "comment"
+        public static let storage = "storage"
+        public static let file_size = "file_size"
+        public static let file_type = "file_type"
+        public static let preview_id = "preview_id"
+        public static let file_name = "file_name"
+    }
 }
 
 // MARK: - RichMessageReaction
@@ -71,6 +83,91 @@ public struct RichMessageReaction: RichMessage {
             RichContentKeys.react.reactto_id: reactto_id,
             RichContentKeys.react.react_message: react_message
         ]
+    }
+}
+
+// MARK: - RichMessageFile
+
+public struct RichMessageFile: RichMessage {
+    public struct File: Codable, Equatable, Hashable {
+        public var file_id: String
+        public var file_type: String?
+        public var file_size: Int64
+        public var preview_id: String?
+        public var file_name: String?
+        
+        public init(
+            file_id: String,
+            file_type: String? = nil,
+            file_size: Int64,
+            preview_id: String? = nil,
+            file_name: String? = nil
+        ) {
+            self.file_id = file_id
+            self.file_type = file_type
+            self.file_size = file_size
+            self.preview_id = preview_id
+            self.file_name = file_name
+        }
+        
+        public init(_ data: [String: Any]) {
+            self.file_id = (data[RichContentKeys.file.file_id] as? String) ?? ""
+            self.file_type = data[RichContentKeys.file.file_type] as? String
+            self.file_size = (data[RichContentKeys.file.file_size] as? Int64) ?? .zero
+            self.preview_id = data[RichContentKeys.file.preview_id] as? String
+            self.file_name = data[RichContentKeys.file.file_name] as? String
+        }
+        
+        public func content() -> [String: Any] {
+            var contentDict: [String : Any] =  [
+                RichContentKeys.file.file_id: file_id,
+                RichContentKeys.file.file_size: file_size
+            ]
+            
+            if let file_type = file_type, !file_type.isEmpty {
+                contentDict[RichContentKeys.file.file_type] = file_type
+            }
+            
+            if let preview_id = preview_id, !preview_id.isEmpty {
+                contentDict[RichContentKeys.file.preview_id] = preview_id
+            }
+            
+            if let file_name = file_name, !file_name.isEmpty {
+                contentDict[RichContentKeys.file.file_name] = file_name
+            }
+            
+            return contentDict
+        }
+    }
+    
+    public var type: String
+    public var additionalType: RichAdditionalType
+    public var files: [File]
+    public var storage: String
+    public var comment: String?
+    
+    public enum CodingKeys: String, CodingKey {
+        case files, storage, comment
+    }
+    
+    public init(files: [File], storage: String, comment: String?) {
+        self.type = RichContentKeys.file.file
+        self.files = files
+        self.storage = storage
+        self.comment = comment
+        self.additionalType = .file
+    }
+    
+    public func content() -> [String: Any] {
+        var contentDict: [String : Any] = [
+            RichContentKeys.file.files: files.map { $0.content() },
+            RichContentKeys.file.storage: storage
+        ]
+        
+        if let comment = comment, !comment.isEmpty {
+            contentDict[RichContentKeys.file.comment] = comment
+        }
+        return contentDict
     }
 }
 

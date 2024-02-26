@@ -12,6 +12,7 @@ import Combine
 import UIKit
 import SnapKit
 import CommonKit
+import FilesStorageKit
 
 @MainActor
 final class ChatViewController: MessagesViewController {
@@ -44,6 +45,9 @@ final class ChatViewController: MessagesViewController {
     private lazy var scrollDownButton = makeScrollDownButton()
     private lazy var chatMessagesCollectionView = makeChatMessagesCollectionView()
     private lazy var replyView = ReplyView()
+    private lazy var filesToolbarView = FilesToolbarView()
+    
+    private var sendTransaction: SendTransaction
     
     // swiftlint:disable unused_setter_value
     override var messageInputBar: InputBarAccessoryView {
@@ -84,10 +88,12 @@ final class ChatViewController: MessagesViewController {
         self.walletServiceCompose = walletServiceCompose
         self.admWalletService = admWalletService
         self.screensFactory = screensFactory
+        self.sendTransaction = sendTransaction
         super.init(nibName: nil, bundle: nil)
         inputBar.onAttachmentButtonTap = { [weak self] in
-            self.map { sendTransaction($0, viewModel.replyMessage?.id) }
-            self?.viewModel.clearReplyMessage()
+//            self.map { sendTransaction($0, viewModel.replyMessage?.id) }
+//            self?.viewModel.clearReplyMessage()
+            self?.viewModel.presentActionMenu()
         }
     }
     
@@ -105,6 +111,7 @@ final class ChatViewController: MessagesViewController {
         configureHeader()
         configureLayout()
         configureReplyView()
+        configureFilesToolbarView()
         configureGestures()
         setupObservers()
         viewModel.loadFirstMessagesIfNeeded()
@@ -327,6 +334,10 @@ private extension ChatViewController {
             .sink { [weak self] in self?.processSwipeMessage($0) }
             .store(in: &subscriptions)
         
+        viewModel.$filesPicked
+            .sink { [weak self] in self?.processFileToolbarView($0) }
+            .store(in: &subscriptions)
+        
         viewModel.$scrollToMessage
             .sink { [weak self] in
                 guard let toId = $0,
@@ -362,6 +373,15 @@ private extension ChatViewController {
         
         viewModel.didTapPartnerQR
             .sink { [weak self] in self?.didTapPartenerQR(partner: $0) }
+            .store(in: &subscriptions)
+        
+        viewModel.presentSendTokensVC
+            .sink { [weak self] in
+                guard let self = self else { return }
+                
+                sendTransaction(self, self.viewModel.replyMessage?.id)
+                self.viewModel.clearReplyMessage()
+            }
             .store(in: &subscriptions)
     }
 }
@@ -419,6 +439,20 @@ private extension ChatViewController {
         
         replyView.closeAction = { [weak self] in
             self?.viewModel.replyMessage = nil
+        }
+    }
+    
+    func configureFilesToolbarView() {
+        filesToolbarView.snp.makeConstraints { make in
+            make.height.equalTo(70)
+        }
+        
+        filesToolbarView.closeAction = { [weak self] in
+            self?.viewModel.filesPicked = nil
+        }
+        
+        filesToolbarView.updatedDataAction = { [weak self] data in
+            self?.viewModel.updateFiles(data)
         }
     }
     
@@ -521,6 +555,7 @@ private extension ChatViewController {
         collection.register(ChatTransactionCell.self)
         collection.register(ChatMessageCell.self)
         collection.register(ChatMessageReplyCell.self)
+        collection.register(ChatMediaCell.self)
         collection.register(
             SpinnerCell.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader
@@ -630,13 +665,24 @@ private extension ChatViewController {
         }
         
         if !messageInputBar.topStackView.subviews.contains(replyView) {
-            UIView.transition(
-                with: messageInputBar.topStackView,
-                duration: 0.25,
-                options: [.transitionCrossDissolve],
-                animations: {
-                    self.messageInputBar.topStackView.addArrangedSubview(self.replyView)
-                })
+            if messageInputBar.topStackView.arrangedSubviews.isEmpty {
+                UIView.transition(
+                    with: messageInputBar.topStackView,
+                    duration: 0.25,
+                    options: [.transitionCrossDissolve],
+                    animations: {
+                        self.messageInputBar.topStackView.insertArrangedSubview(
+                            self.replyView,
+                            at: .zero
+                        )
+                    })
+            } else {
+                messageInputBar.topStackView.insertArrangedSubview(
+                    replyView,
+                    at: .zero
+                )
+            }
+            
             messageInputBar.inputTextView.becomeFirstResponder()
         }
         
@@ -645,6 +691,35 @@ private extension ChatViewController {
     
     func closeReplyView() {
         replyView.removeFromSuperview()
+        messageInputBar.invalidateIntrinsicContentSize()
+        messageInputBar.layoutContainerViewIfNeeded()
+    }
+    
+    func processFileToolbarView(_ data: [FileResult]?) {
+        guard let data = data, !data.isEmpty else {
+            closeFileToolbarView()
+            return
+        }
+        
+        if !messageInputBar.topStackView.subviews.contains(filesToolbarView) {
+            UIView.transition(
+                with: messageInputBar.topStackView,
+                duration: 0.25,
+                options: [.transitionCrossDissolve],
+                animations: {
+                    self.messageInputBar.topStackView.insertArrangedSubview(
+                        self.filesToolbarView,
+                        at: self.messageInputBar.topStackView.arrangedSubviews.count
+                    )
+                })
+            messageInputBar.inputTextView.becomeFirstResponder()
+        }
+        
+        filesToolbarView.update(data)
+    }
+    
+    func closeFileToolbarView() {
+        filesToolbarView.removeFromSuperview()
         messageInputBar.invalidateIntrinsicContentSize()
         messageInputBar.layoutContainerViewIfNeeded()
     }

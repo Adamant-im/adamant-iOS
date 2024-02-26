@@ -11,6 +11,7 @@ import MessageKit
 import InputBarAccessoryView
 import Combine
 import Swinject
+import FilesStorageKit
 
 @MainActor
 struct ChatFactory {

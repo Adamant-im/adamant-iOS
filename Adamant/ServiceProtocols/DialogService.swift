@@ -44,6 +44,9 @@ enum ShareType {
     case generateQr(encodedContent: String?, sharingTip: String?, withLogo: Bool)
     case saveToPhotolibrary(image: UIImage)
     case partnerQR
+    case sendTokens
+    case uploadMedia
+    case uploadFile
     
     var localized: String {
         switch self {
@@ -58,6 +61,15 @@ enum ShareType {
             
         case .saveToPhotolibrary:
             return String.adamant.alert.saveToPhotolibrary
+        
+        case .sendTokens:
+            return "Send tokens"
+        
+        case .uploadMedia:
+            return "Upload media"
+            
+        case .uploadFile:
+            return "Upload file"
         }
     }
 }

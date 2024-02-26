@@ -10,6 +10,7 @@ import UIKit
 import MarkdownKit
 import MessageKit
 import CommonKit
+import FilesStorageKit
 
 struct ChatMessageFactory {
     private let walletServiceCompose: WalletServiceCompose
@@ -128,6 +129,15 @@ private extension ChatMessageFactory {
             if transaction.additionalType == .reply,
                !transaction.isTransferReply() {
                 return makeReplyContent(
+                    transaction,
+                    isFromCurrentSender: isFromCurrentSender,
+                    backgroundColor: backgroundColor
+                )
+            }
+            
+            if transaction.additionalType == .file,
+               !transaction.isTransferReply() {
+                return makeFileContent(
                     transaction,
                     isFromCurrentSender: isFromCurrentSender,
                     backgroundColor: backgroundColor
@@ -276,6 +286,49 @@ private extension ChatMessageFactory {
             ),
             status: transaction.transactionStatus ?? .notInitiated,
             reactions: reactions,
+            address: address,
+            opponentAddress: opponentAddress
+        )))
+    }
+    
+    func makeFileContent(
+        _ transaction: RichMessageTransaction,
+        isFromCurrentSender: Bool,
+        backgroundColor: ChatMessageBackgroundColor
+    ) -> ChatMessage.Content {
+        let id = transaction.chatMessageId ?? ""
+        
+        let decodedMessage = transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) ?? "..."
+        let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
+        let files: [[String: Any]] = transaction.getRichValue(for: RichContentKeys.file.files) ?? [[:]]
+        
+        let reactions = transaction.richContent?[RichContentKeys.react.reactions] as? Set<Reaction>
+        
+        let address = transaction.isOutgoing
+        ? transaction.senderAddress
+        : transaction.recipientAddress
+        
+        let opponentAddress = transaction.isOutgoing
+        ? transaction.recipientAddress
+        : transaction.senderAddress
+        
+        return .file(.init(value: .init(
+            id: id,
+            isFromCurrentSender: isFromCurrentSender,
+            reactions: reactions,
+            content: .init(
+                id: id,
+                files: files.map { ChatFile.init(
+                    file: RichMessageFile.File.init($0),
+                    previewData: FilesStorageKit.shared.getPreview(
+                        for: $0[RichContentKeys.file.file_id] as? String ?? "",
+                        type: $0[RichContentKeys.file.file_type] as? String ?? ""
+                    ),
+                    isDownloading: false,
+                    isCached: FilesStorageKit.shared.isCached($0[RichContentKeys.file.file_id] as? String ?? "")
+                )},
+                isHidden: false
+            ),
             address: address,
             opponentAddress: opponentAddress
         )))

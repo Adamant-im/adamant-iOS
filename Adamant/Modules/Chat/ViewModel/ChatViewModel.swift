@@ -13,6 +13,7 @@ import UIKit
 import CommonKit
 import AdvancedContextMenuKit
 import ElegantEmojiPicker
+import FilesStorageKit
 
 @MainActor
 final class ChatViewModel: NSObject {
@@ -77,6 +78,8 @@ final class ChatViewModel: NSObject {
     let updateChatRead = ObservableSender<Void>()
     let commitVibro = ObservableSender<Void>()
     let layoutIfNeeded = ObservableSender<Void>()
+    let presentFilePicker = ObservableSender<ShareType>()
+    let presentSendTokensVC = ObservableSender<Void>()
     
     @ObservableValue private(set) var isHeaderLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
@@ -91,6 +94,7 @@ final class ChatViewModel: NSObject {
     @ObservableValue var inputText = ""
     @ObservableValue var replyMessage: MessageModel?
     @ObservableValue var scrollToMessage: (toId: String?, fromId: String?)
+    @ObservableValue var filesPicked: [FileResult]?
     
     var startPosition: ChatStartPosition? {
         if let messageIdToShow = messageIdToShow {
@@ -118,6 +122,10 @@ final class ChatViewModel: NSObject {
     
     private var hiddenMessageID: String? {
         didSet { updateHiddenMessage(&messages) }
+    }
+    
+    private var downloadingFilesID: [String] = [] {
+        didSet { updateDownloadingFiles(&messages) }
     }
     
     init(
@@ -224,6 +232,11 @@ final class ChatViewModel: NSObject {
     }
     
     func sendMessage(text: String) {
+        if filesPicked?.count ?? .zero > .zero {
+            sendFile(text: text)
+            return
+        }
+        
         guard let partnerAddress = chatroom?.partner?.address else { return }
         
         guard chatroom?.partner?.isDummy != true else {
@@ -259,6 +272,47 @@ final class ChatViewModel: NSObject {
                 )
             } catch {
                 await handleMessageSendingError(error: error, sentText: text)
+            }
+        }.stored(in: tasksStorage)
+    }
+    
+    func sendFile(text: String) {
+        guard let partnerAddress = chatroom?.partner?.address,
+              let files = filesPicked
+        else { return }
+        
+        guard chatroom?.partner?.isDummy != true else {
+            dialog.send(.dummy(partnerAddress))
+            return
+        }
+        
+        Task {
+            let files: [RichMessageFile.File] = files.compactMap {
+                RichMessageFile.File.init(
+                    file_id: "https://i.ibb.co/YXcWnC4/IMG-5-FFA7-DBAE0-E7-1.jpg\(Int.random(in: 0...1000))",
+                    file_type: "jpg",
+                    file_size: $0.size,
+                    preview_id: "https://i.ibb.co/Jqvd61W/IMG-5-FFA7-DBAE0-E7-1.jpg",
+                    file_name: $0.name
+                )
+            }
+            let message: AdamantMessage = .richMessage(
+                payload: RichMessageFile(files: files, storage: "imgbb", comment: text)
+            )
+            
+            guard await validateSendingMessage(message: message) else { return }
+            
+            replyMessage = nil
+            filesPicked = nil
+            
+            do {
+                _ = try await chatsProvider.sendMessage(
+                    message,
+                    recipientId: partnerAddress,
+                    from: chatroom
+                )
+            } catch {
+                await handleMessageSendingError(error: error, sentText: "text")
             }
         }.stored(in: tasksStorage)
     }
@@ -594,6 +648,51 @@ final class ChatViewModel: NSObject {
         
         return true
     }
+    
+    func processFile(file: ChatFile) {
+        downloadingFilesID.append(file.file.file_id)
+    }
+    
+    func presentActionMenu() {
+        dialog.send(.actionMenu)
+    }
+    
+    func didSelectMenuAction(_ action: ShareType) {
+        if case(.sendTokens) = action {
+            presentSendTokensVC.send()
+            return
+        }
+        
+        Task {
+            do {
+                var result: [FileResult] = []
+               // dialog.send(.progress(true))
+                
+                if case(.uploadFile) = action {
+                    result = try await FilesStorageKit.shared.presentDocumentPicker()
+                }
+                if case(.uploadMedia) = action {
+                    result = try await FilesStorageKit.shared.presentImagePicker()
+                }
+                
+                presentFilePicker.send(action)
+//                if let image = result.first?.preview {
+//                    FilesStorageKit.shared.cacheImage(id: "1", image: image)
+//                }
+                
+                dialog.send(.progress(false))
+                filesPicked = result
+                print("data=\(result.count)")
+                if let data = result.first?.preview {
+                 //   try await FilesStorageKit.shared.uploadFile(data, type: .)
+                }
+            } catch {
+                dialog.send(.progress(false))
+                dialog.send(.alert(error.localizedDescription))
+                print("error=\(error)")
+            }
+        }
+    }
 }
 
 extension ChatViewModel {
@@ -636,6 +735,10 @@ extension ChatViewModel {
         guard isSendingAvailable else { return }
         
         dialog.send(.renameAlert)
+    }
+    
+    func updateFiles(_ data: [FileResult]) {
+        filesPicked = data
     }
 }
 
@@ -920,6 +1023,17 @@ private extension ChatViewModel {
         }
     }
     
+    func updateDownloadingFiles(_ messages: inout [ChatMessage]) {
+        messages.indices.forEach { index in
+            messages[index].getFiles().forEach { file in
+                messages[index].setDownloading(
+                    for: file.file.file_id,
+                    value: downloadingFilesID.contains(file.file.file_id)
+                )
+            }
+        }
+    }
+    
     func isNewReaction(old: [ChatTransaction], new: [ChatTransaction]) -> Bool {
         guard
             let processedDate = old.getMostRecentElementDate(),
@@ -940,6 +1054,8 @@ private extension ChatMessage {
                 return model.value.isHidden
             case let .transaction(model):
                 return model.value.content.isHidden
+            case let .file(model):
+                return model.value.content.isHidden
             }
         }
         
@@ -957,8 +1073,30 @@ private extension ChatMessage {
                 var model = model.value
                 model.content.isHidden = newValue
                 content = .transaction(.init(value: model))
+            case let .file(model):
+                var model = model.value
+                model.content.isHidden = newValue
+                content = .file(.init(value: model))
             }
         }
+    }
+    
+    func getFiles() -> [ChatFile] {
+        guard case let .file(model) = content else { return [] }
+        return model.value.content.files
+    }
+    
+    mutating func setDownloading(for fileId: String, value: Bool) {
+        guard case let .file(fileModel) = content else { return }
+        var model = fileModel.value
+        
+        guard let index = model.content.files.firstIndex(
+            where: { $0.file.file_id == fileId }
+        ) else { return }
+        
+        model.content.files[index].isDownloading = value
+        
+        content = .file(.init(value: model))
     }
 }
 

@@ -121,28 +121,50 @@ final class ChatDataSourceManager: MessagesDataSource {
         at indexPath: IndexPath,
         in messagesCollectionView: MessagesCollectionView
     ) -> UICollectionViewCell {
-        guard case let .transaction(model) = message.fullModel.content
-        else { return UICollectionViewCell() }
-        
-        let cell = messagesCollectionView.dequeueReusableCell(
-            ChatTransactionCell.self,
-            for: indexPath
-        )
-        
-        let publisher: any Observable<ChatTransactionContainerView.Model> = viewModel.$messages.compactMap {
-            let message = $0[safe: indexPath.section]
-            guard case let .transaction(model) = message?.fullModel.content
-            else { return nil }
+        if case let .transaction(model) = message.fullModel.content {
+            let cell = messagesCollectionView.dequeueReusableCell(
+                ChatTransactionCell.self,
+                for: indexPath
+            )
             
-            return model.value
+            let publisher: any Observable<ChatTransactionContainerView.Model> = viewModel.$messages.compactMap {
+                let message = $0[safe: indexPath.section]
+                guard case let .transaction(model) = message?.fullModel.content
+                else { return nil }
+                
+                return model.value
+            }
+            
+            cell.transactionView.actionHandler = { [weak self] in self?.handleAction($0) }
+            cell.transactionView.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
+            cell.transactionView.model = model.value
+            cell.transactionView.setSubscription(publisher: publisher, collection: messagesCollectionView)
+            cell.configure(with: message, at: indexPath, and: messagesCollectionView)
+            return cell
         }
-
-        cell.transactionView.actionHandler = { [weak self] in self?.handleAction($0) }
-        cell.transactionView.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
-        cell.transactionView.model = model.value
-        cell.transactionView.setSubscription(publisher: publisher, collection: messagesCollectionView)
-        cell.configure(with: message, at: indexPath, and: messagesCollectionView)
-        return cell
+        
+        if case let .file(model) = message.fullModel.content {
+            let cell = messagesCollectionView.dequeueReusableCell(
+                ChatMediaCell.self,
+                for: indexPath
+            )
+            
+            let publisher: any Observable<ChatMediaContainerView.Model> = viewModel.$messages.compactMap {
+                let message = $0[safe: indexPath.section]
+                guard case let .file(model) = message?.fullModel.content
+                else { return nil }
+                
+                return model.value
+            }
+            
+            cell.containerMediaView.actionHandler = { [weak self] in self?.handleAction($0) }
+            cell.containerMediaView.model = model.value
+            cell.containerMediaView.setSubscription(publisher: publisher, collection: messagesCollectionView)
+            cell.configure(with: message, at: indexPath, and: messagesCollectionView)
+            return cell
+        }
+        
+        return UICollectionViewCell()
     }
 }
 
@@ -169,6 +191,8 @@ private extension ChatDataSourceManager {
             viewModel.reactAction(id, emoji: emoji)
         case let .presentMenu(arg):
             viewModel.presentMenu(arg: arg)
+        case let .processFile(file: file):
+            viewModel.processFile(file: file)
         }
     }
 }
