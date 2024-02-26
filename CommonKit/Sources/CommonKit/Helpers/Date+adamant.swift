@@ -158,7 +158,7 @@ private extension Date {
 }
 
 extension String.adamant {
-    struct dateChatList {
+    enum dateChatList {
         static func days(_ days: Int) -> String {
             return String.localizedStringWithFormat(.localized("Chats.Date.For.Days", comment: "Date chats: Duration in days if longer than one."), days)
         }
@@ -174,7 +174,5 @@ extension String.adamant {
         static func seconds(_ seconds: Int) -> String {
             return String.localizedStringWithFormat(.localized("Chats.Date.For.Seconds", comment: "Date chats: Duration in seconds if longer than one."), seconds)
         }
-        
-        private init() {}
     }
 }
