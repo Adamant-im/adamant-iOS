@@ -7,22 +7,41 @@
 //
 
 import Foundation
+import CommonKit
+import Combine
 
 final class ChatPreservation: ChatPreservationProtocol {
-    private var preservedMessagess: [String: String] = [:]
-    private var replayMessage: [String: MessageModel] = [:]
+    @Atomic private var preservedMessages: [String: String] = [:]
+    @Atomic private var replayMessage: [String: MessageModel] = [:]
+    @Atomic private var notificationsSet: Set<AnyCancellable> = []
+    
+    init() {
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedOut)
+            .sink { [weak self] _ in
+                self?.clearPreservedMessages()
+            }
+            .store(in: &notificationsSet)
+    }
+    
+    // MARK: Notification actions
+    
+    private func clearPreservedMessages() {
+        preservedMessages = [:]
+        replayMessage = [:]
+    }
     
     func preserveMessage(_ message: String, forAddress address: String) {
-        preservedMessagess[address] = message
+        preservedMessages[address] = message
     }
     
     func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String? {
-        guard let message = preservedMessagess[address] else {
+        guard let message = preservedMessages[address] else {
             return nil
         }
 
         if thenRemoveIt {
-            preservedMessagess.removeValue(forKey: address)
+            preservedMessages.removeValue(forKey: address)
         }
 
         return message
@@ -38,7 +57,7 @@ final class ChatPreservation: ChatPreservationProtocol {
         }
         
         if thenRemoveIt {
-            preservedMessagess.removeValue(forKey: address)
+            preservedMessages.removeValue(forKey: address)
         }
         
         return replayMessage

@@ -378,24 +378,6 @@ extension AboutViewController: MFMailComposeViewControllerDelegate {
     }
 }
 
-// MARK: - ChatViewControllerDelegate
-
-//extension AboutViewController: ChatPreservationDelegate {
-//    func preserveMessage(_ message: String, forAddress address: String) {
-//        storedIOSSupportMessage = message
-//    }
-//
-//    func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String? {
-//        if thenRemoveIt {
-//            let message = storedIOSSupportMessage
-//            storedIOSSupportMessage = nil
-//            return message
-//        } else {
-//            return storedIOSSupportMessage
-//        }
-//    }
-//}
-
 private extension AboutViewController {
     @objc func tapAction() {
         numerOfTap += 1
