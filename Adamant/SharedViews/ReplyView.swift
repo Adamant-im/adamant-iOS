@@ -107,9 +107,25 @@ extension ReplyView {
         let text = model.makeReplyContent().resolveLinkColor()
         text.mutableString.replaceOccurrences(
             of: "\n",
-            with: " ",
+            with: "↵ ",
             range: .init(location: .zero, length: text.length)
         )
+        let raw = text.string
+        
+        var ranges: [Range<String.Index>] = []
+        var searchRange = raw.startIndex..<raw.endIndex
+        while let range = raw.range(of: "↵ ", options: [], range: searchRange) {
+            ranges.append(range)
+            searchRange = range.upperBound..<raw.endIndex
+        }
+        
+        for range in ranges {
+            text.addAttribute(
+                NSAttributedString.Key.foregroundColor,
+                value: UIColor.lightGray,
+                range: NSRange(range, in: raw)
+            )
+        }
         
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineBreakMode = .byTruncatingTail
