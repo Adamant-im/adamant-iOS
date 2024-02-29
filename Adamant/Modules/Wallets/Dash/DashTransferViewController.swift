@@ -12,7 +12,15 @@ import BitcoinKit
 import CommonKit
 
 extension String.adamant.transfer {
-        static let minAmountError = String.localized("TransferScene.Error.MinAmount", comment: "Transfer: Minimal transaction amount is 0.00001")
+    static var minAmountError: String { String.localized("TransferScene.Error.MinAmount", comment: "Transfer: Minimal transaction amount is 0.00001")
+    }
+    static func pendingTxError(coin: String) -> String {
+        let localizedString = String(
+            format: .localized("TransferScene.Error.Pending.Tx", comment: "Have a pending coin tx"), 
+            coin
+        )
+        return localizedString
+    }
 }
 
 final class DashTransferViewController: TransferViewControllerBase {
@@ -35,8 +43,35 @@ final class DashTransferViewController: TransferViewControllerBase {
             return
         }
         
+        let history = service.getLocalTransactionHistory()
+        var havePending = false
+        for transaction in history {
+            if case (.pending) = transaction.transactionStatus {
+                havePending = true
+            }
+            if case (.registered) = transaction.transactionStatus {
+                havePending = true
+            }
+        }
+        if havePending {
+            dialogService.showAlert(
+                title: nil,
+                message: String.adamant.transfer.pendingTxError(coin: DashWalletService.tokenNetworkSymbol),
+                style: AdamantAlertStyle.alert,
+                actions: nil,
+                from: nil
+            )
+            return
+        }
+        
         guard amount >= 0.00001 else {
-            dialogService.showAlert(title: nil, message: String.adamant.transfer.minAmountError, style: AdamantAlertStyle.alert, actions: nil, from: nil)
+            dialogService.showAlert(
+                title: nil,
+                message: String.adamant.transfer.minAmountError,
+                style: AdamantAlertStyle.alert,
+                actions: nil,
+                from: nil
+            )
             return
         }
         

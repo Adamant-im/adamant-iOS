@@ -1015,6 +1015,9 @@
 /* Transfer: Minimal transaction amount is 0.00001 */
 "TransferScene.Error.MinAmount" = "最低交易金额为0.00001";
 
+/* Transfer: Have a pending coin tx */
+"TransferScene.Error.Pending.Tx" = "您似乎有一个待处理的 %@ tx。等待区块链确认，然后再试一次";
+
 /* Transfer: transfer amount placeholder */
 "TransferScene.Amount.Placeholder" = "发送";
 

@@ -31,6 +31,27 @@ final class DogeTransferViewController: TransferViewControllerBase {
             return
         }
         
+        let history = service.getLocalTransactionHistory()
+        var havePending = false
+        for transaction in history {
+            if case (.pending) = transaction.transactionStatus {
+                havePending = true
+            }
+            if case (.registered) = transaction.transactionStatus {
+                havePending = true
+            }
+        }
+        if havePending {
+            dialogService.showAlert(
+                title: nil,
+                message: String.adamant.transfer.pendingTxError(coin: DogeWalletService.tokenNetworkSymbol),
+                style: AdamantAlertStyle.alert,
+                actions: nil,
+                from: nil
+            )
+            return
+        }
+        
         guard let wallet = service.wallet else {
             return
         }
