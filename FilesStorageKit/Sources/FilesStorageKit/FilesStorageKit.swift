@@ -14,7 +14,7 @@ public final class FilesStorageKit {
     private var cachedFiles: [String: URL] = [:]
     
     private let networkFileManager: NetworkFileManagerProtocol = NetworkFileManager()
-    private let imageExtensions = ["jpg", "png", "jpeg"]
+    private let imageExtensions = ["JPG", "JPEG", "PNG", "JPEG2000", "GIF", "WEBP", "TIF", "TIFF", "PSD", "RAW", "BMP", "HEIF", "INDD"]
     
     public init() {
         mediaPicker = MediaPickerService()
@@ -57,22 +57,9 @@ public final class FilesStorageKit {
         }
     }
     
-    public func cacheImage(id: String, image: UIImage) {
-        cachedImages[id] = image
-    }
-    
-    public func getCachedImage(id: String) -> UIImage? {
-        cachedImages[id]
-    }
-    
-    public func getCachedFile(id: String) -> URL? {
-        cachedFiles[id]
-    }
-    
-    public func getPreview(for id: String, type: String) -> Data {
-        guard let data = cachedImages[id]?.jpegData(compressionQuality: 1.0)
-        else {
-            return UIImage.asset(named: "file-default-box")?.jpegData(compressionQuality: 1.0) ?? Data()
+    public func getPreview(for id: String, type: String) -> UIImage {
+        guard let data = cachedImages[id] else {
+            return getPreview(for: type)
         }
         
         return data
@@ -88,13 +75,14 @@ public final class FilesStorageKit {
         let data = try Data(contentsOf: file.url)
         
         if imageExtensions.contains(file.extenstion?.lowercased() ?? .empty) {
-            cacheImage(id: file.url.absoluteString, image: UIImage(data: data) ?? UIImage())
+            cacheImage(id: file.url.absoluteString, image: UIImage(data: data))
         }
         
         let id = try await networkFileManager.uploadFiles(data, type: .uploadCareApi)
         
         if imageExtensions.contains(file.extenstion?.lowercased() ?? .empty) {
-            cacheImage(id: id, image: UIImage(data: data) ?? UIImage())
+            cacheImage(id: file.url.absoluteString, image: nil)
+            cacheImage(id: id, image: UIImage(data: data))
         }
         
         file.url.stopAccessingSecurityScopedResource()
@@ -108,8 +96,8 @@ public final class FilesStorageKit {
     ) async throws -> Data {
         let data = try await networkFileManager.downloadFile(id, type: storage)
         
-        if imageExtensions.contains(fileType?.lowercased() ?? defaultFileType) {
-            cacheImage(id: id, image: UIImage(data: data) ?? UIImage())
+        if imageExtensions.contains(fileType?.uppercased() ?? defaultFileType) {
+            cacheImage(id: id, image: UIImage(data: data))
         } else {
             try cacheFile(id: id, data: data)
         }
@@ -152,6 +140,23 @@ private extension FilesStorageKit {
         try data.write(to: fileURL, options: [.atomic, .completeFileProtection])
         
         cachedFiles[id] = fileURL
+    }
+    
+    func cacheImage(id: String, image: UIImage?) {
+        cachedImages[id] = image
+    }
+    
+    private func getPreview(for type: String) -> UIImage {
+        switch type.uppercased() {
+        case "JPG", "JPEG", "PNG", "JPEG2000", "GIF", "WEBP", "TIF", "TIFF", "PSD", "RAW", "BMP", "HEIF", "INDD":
+            return UIImage.asset(named: "file-image-box")!
+        case "ZIP":
+            return UIImage.asset(named: "file-zip-box")!
+        case "PDF":
+            return UIImage.asset(named: "file-pdf-box")!
+        default:
+            return UIImage.asset(named: "file-default-box")!
+        }
     }
 }
 

@@ -133,7 +133,7 @@ private extension ChatFileTableViewCell {
     }
     
     func update() {
-        iconImageView.image = UIImage(data: model.previewData)
+        iconImageView.image = model.previewData
         downloadImageView.isHidden = model.isCached || model.isDownloading || model.isUploading
         
         if model.isDownloading || model.isUploading {
@@ -145,7 +145,9 @@ private extension ChatFileTableViewCell {
         let fileType = model.file.file_type ?? ""
         let fileName = model.file.file_name ?? "UNKNWON"
         
-        nameLabel.text = "\(fileName.uppercased()).\(fileType.uppercased())"
+        nameLabel.text = fileName.contains(fileType)
+        ? fileName
+        : "\(fileName.uppercased()).\(fileType.uppercased())"
         sizeLabel.text = "\(model.file.file_size) kb"
     }
 }
