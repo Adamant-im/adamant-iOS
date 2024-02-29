@@ -30,6 +30,7 @@ extension CoinTransaction {
     @NSManaged public var isConfirmed: Bool
     @NSManaged public var blockchainType: String
     @NSManaged public var transactionStatusRaw: String
+    @NSManaged public var nonceRaw: String?
 }
 
 extension CoinTransaction : Identifiable {

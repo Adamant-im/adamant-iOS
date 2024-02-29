@@ -161,6 +161,10 @@ extension EthTransaction: TransactionDetails {
     var blockHeight: UInt64? {
         return nil
     }
+    
+    var nonceRaw: String? {
+        nil
+    }
 }
 
 // MARK: - From EthereumTransaction

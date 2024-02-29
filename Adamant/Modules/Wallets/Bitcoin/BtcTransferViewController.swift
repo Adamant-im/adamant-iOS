@@ -88,7 +88,8 @@ final class BtcTransferViewController: TransferViewControllerBase {
                             confirmationsValue: nil,
                             blockValue: nil,
                             isOutgoing: true,
-                            transactionStatus: nil
+                            transactionStatus: nil,
+                            nonceRaw: nil
                         )
                         
                         service.coinStorage.append(simpleTransaction)

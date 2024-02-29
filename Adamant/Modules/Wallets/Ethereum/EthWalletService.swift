@@ -753,7 +753,8 @@ extension EthWalletService {
                 confirmationsValue: nil,
                 blockValue: nil,
                 isOutgoing: isOutgoing,
-                transactionStatus: TransactionStatus.notInitiated
+                transactionStatus: TransactionStatus.notInitiated,
+                nonceRaw: nil
             )
         }
         

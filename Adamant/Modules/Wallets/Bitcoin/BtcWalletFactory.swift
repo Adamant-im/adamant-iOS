@@ -113,7 +113,8 @@ private extension BtcWalletFactory {
             confirmationsValue: nil,
             blockValue: nil,
             isOutgoing: richTransaction.isOutgoing,
-            transactionStatus: nil
+            transactionStatus: nil,
+            nonceRaw: nil
         )
         
         vc.senderId = senderId

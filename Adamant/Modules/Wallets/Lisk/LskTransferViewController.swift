@@ -78,6 +78,20 @@ final class LskTransferViewController: TransferViewControllerBase {
                     amount: amount,
                     fee: transactionFee
                 )
+
+                let nonces = service.getLocalTransactionHistory().map { $0.nonceRaw }
+                
+                if nonces.contains(String(transaction.nonce)) {
+                    dialogService.dismissProgress()
+                    dialogService.showAlert(
+                        title: nil,
+                        message: String.adamant.transfer.pendingTxError(coin: LskWalletService.tokenNetworkSymbol),
+                        style: AdamantAlertStyle.alert,
+                        actions: nil,
+                        from: nil
+                    )
+                    return
+                }
                 
                 // Send adm report
                 if let reportRecipient = admReportRecipient {
@@ -94,6 +108,7 @@ final class LskTransferViewController: TransferViewControllerBase {
                         service.coinStorage.append(transaction)
                         try await service.sendTransaction(transaction)
                     } catch {
+                        dialogService.dismissProgress()
                         dialogService.showRichError(error: error)
                         service.coinStorage.updateStatus(
                             for: transaction.id,

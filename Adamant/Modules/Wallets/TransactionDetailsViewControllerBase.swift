@@ -835,7 +835,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             confirmationsValue: transaction.confirmationsValue,
             blockValue: transaction.blockValue,
             isOutgoing: transaction.isOutgoing,
-            transactionStatus: richTransaction.transactionStatus
+            transactionStatus: richTransaction.transactionStatus,
+            nonceRaw: transaction.nonceRaw
         )
         
         self.transaction = failedTransaction
