@@ -61,16 +61,20 @@ private extension ChatMediaContentView {
     func makeCell(
         tableView: UITableView,
         indexPath: IndexPath,
-        model: ChatFile
+        fileModel: ChatFile
     ) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! ChatFileTableViewCell
-        cell.model = model
+        cell.model = fileModel
         cell.backgroundView?.backgroundColor = .clear
         cell.backgroundColor = .clear
         cell.contentView.backgroundColor = .clear
-        cell.buttonActionHandler = { [actionHandler, model] in
-            print("did select\(indexPath.row)")
-            actionHandler(.processFile(file: model))
+        cell.buttonActionHandler = { [actionHandler, fileModel, model] in
+            actionHandler(
+                .processFile(
+                    file: fileModel,
+                    isFromCurrentSender: model.isFromCurrentSender
+                )
+            )
         }
         return cell
     }

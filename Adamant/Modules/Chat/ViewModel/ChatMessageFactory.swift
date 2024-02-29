@@ -140,7 +140,6 @@ private extension ChatMessageFactory {
             
             if transaction.additionalType == .file,
                !transaction.isTransferReply() {
-                print("makeFileContent")
                 return makeFileContent(
                     transaction,
                     isFromCurrentSender: isFromCurrentSender,
@@ -330,7 +329,8 @@ private extension ChatMessageFactory {
                 isDownloading: false,
                 isUploading: uploadingFilesIDs.contains($0[RichContentKeys.file.file_id] as? String ?? .empty),
                 isCached: FilesStorageKit.shared.isCached($0[RichContentKeys.file.file_id] as? String ?? .empty),
-                storage: storage
+                storage: storage,
+                nonce: $0[RichContentKeys.file.nonce] as? String ?? .empty
             )
         }
         
@@ -341,7 +341,8 @@ private extension ChatMessageFactory {
             content: .init(
                 id: id,
                 files: chatFiles,
-                isHidden: false
+                isHidden: false,
+                isFromCurrentSender: isFromCurrentSender
             ),
             address: address,
             opponentAddress: opponentAddress

@@ -14,11 +14,13 @@ extension ChatMediaContentView {
         let id: String
         var files: [ChatFile]
         var isHidden: Bool
+        let isFromCurrentSender: Bool
         
         static let `default` = Self(
             id: "",
             files: [],
-            isHidden: false
+            isHidden: false,
+            isFromCurrentSender: false
         )
     }
 }

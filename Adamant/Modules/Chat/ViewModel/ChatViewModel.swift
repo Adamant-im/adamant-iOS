@@ -282,7 +282,8 @@ final class ChatViewModel: NSObject {
     
     func sendFile(text: String) {
         guard let partnerAddress = chatroom?.partner?.address,
-              let files = filesPicked
+              let files = filesPicked,
+              let keyPair = accountService.keypair
         else { return }
         
         guard chatroom?.partner?.isDummy != true else {
@@ -297,7 +298,8 @@ final class ChatViewModel: NSObject {
                     file_type: $0.extenstion,
                     file_size: $0.size,
                     preview_id: nil,
-                    file_name: $0.name
+                    file_name: $0.name,
+                    nonce: .empty
                 )
             }
             
@@ -326,16 +328,21 @@ final class ChatViewModel: NSObject {
                 }
                 
                 for file in files {
-                    let id = try await FilesStorageKit.shared.uploadFile(file)
+                    let result = try await FilesStorageKit.shared.uploadFile(
+                        file,
+                        recipientPublicKey: chatroom?.partner?.publicKey ?? "",
+                        senderPrivateKey: keyPair.privateKey
+                    )
                     
                     let oldId = file.url.absoluteString
                     uploadingFilesIDs.removeAll(where: { $0 == oldId })
-                    updateUploadingFileId(&messages, oldId: oldId, newId: id)
+                    updateUploadingFileId(&messages, oldId: oldId, newId: result.id)
                     
                     if let index = richFiles.firstIndex(
                         where: { $0.file_id == oldId }
                     ) {
-                        richFiles[index].file_id = id
+                        richFiles[index].file_id = result.id
+                        richFiles[index].nonce = result.nonce
                     }
                 }
                 
@@ -692,8 +699,9 @@ final class ChatViewModel: NSObject {
         return true
     }
     
-    func processFile(file: ChatFile) {
-        print("processFile=\(file)")
+    func processFile(file: ChatFile, isFromCurrentSender: Bool) {
+        guard let keyPair = accountService.keypair else { return }
+        
         Task {
             if !file.isCached {
                 defer {
@@ -702,19 +710,26 @@ final class ChatViewModel: NSObject {
                 downloadingFilesID.append(file.file.file_id)
                 
                 do {
-                    _ = try await FilesStorageKit.shared.cacheFile(
+                    let publicKey = isFromCurrentSender
+                    ? keyPair.publicKey
+                    : chatroom?.partner?.publicKey ?? .empty
+                    
+                    try await FilesStorageKit.shared.downloadFile(
                         id: file.file.file_id,
                         storage: file.storage,
-                        fileType: file.file.file_type ?? ""
+                        fileType: file.file.file_type ?? .empty,
+                        senderPublicKey: publicKey,
+                        recipientPrivateKey: keyPair.privateKey,
+                        nonce: file.nonce
                     )
                     
                     updatePreviewForFile(&messages, id: file.file.file_id)
                 } catch {
                     dialog.send(.alert(error.localizedDescription))
                 }
+                
                 return
             }
-            //
         }
     }
     

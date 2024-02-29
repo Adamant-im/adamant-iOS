@@ -56,6 +56,7 @@ public enum RichContentKeys {
         public static let file_type = "file_type"
         public static let preview_id = "preview_id"
         public static let file_name = "file_name"
+        public static let nonce = "nonce"
     }
 }
 
@@ -95,33 +96,38 @@ public struct RichMessageFile: RichMessage {
         public var file_size: Int64
         public var preview_id: String?
         public var file_name: String?
+        public var nonce: String
         
         public init(
             file_id: String,
             file_type: String? = nil,
             file_size: Int64,
             preview_id: String? = nil,
-            file_name: String? = nil
+            file_name: String? = nil,
+            nonce: String
         ) {
             self.file_id = file_id
             self.file_type = file_type
             self.file_size = file_size
             self.preview_id = preview_id
             self.file_name = file_name
+            self.nonce = nonce
         }
         
         public init(_ data: [String: Any]) {
-            self.file_id = (data[RichContentKeys.file.file_id] as? String) ?? ""
+            self.file_id = (data[RichContentKeys.file.file_id] as? String) ?? .empty
             self.file_type = data[RichContentKeys.file.file_type] as? String
             self.file_size = (data[RichContentKeys.file.file_size] as? Int64) ?? .zero
             self.preview_id = data[RichContentKeys.file.preview_id] as? String
             self.file_name = data[RichContentKeys.file.file_name] as? String
+            self.nonce = data[RichContentKeys.file.nonce] as? String ?? .empty
         }
         
         public func content() -> [String: Any] {
             var contentDict: [String : Any] =  [
                 RichContentKeys.file.file_id: file_id,
-                RichContentKeys.file.file_size: file_size
+                RichContentKeys.file.file_size: file_size,
+                RichContentKeys.file.nonce: nonce
             ]
             
             if let file_type = file_type, !file_type.isEmpty {

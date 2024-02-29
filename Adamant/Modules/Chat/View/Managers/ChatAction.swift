@@ -20,5 +20,5 @@ enum ChatAction {
     case remove(id: String)
     case react(id: String, emoji: String)
     case presentMenu(arg: ChatContextMenuArguments)
-    case processFile(file: ChatFile)
+    case processFile(file: ChatFile, isFromCurrentSender: Bool)
 }

@@ -7,6 +7,7 @@ import UIKit
 public final class FilesStorageKit {
     public static let shared = FilesStorageKit()
     
+    private let adamantCore = NativeAdamantCore()
     private let window = TransparentWindow(frame: UIScreen.main.bounds)
     private let mediaPicker: FilePickerProtocol
     private let documentPicker: FilePickerProtocol
@@ -69,40 +70,70 @@ public final class FilesStorageKit {
         cachedImages[id] != nil || cachedFiles[id] != nil
     }
     
-    public func uploadFile(_ file: FileResult) async throws -> String {
+    public func uploadFile(
+        _ file: FileResult,
+        recipientPublicKey: String,
+        senderPrivateKey: String
+    ) async throws -> (id: String, nonce: String) {
+        defer {
+            cacheImage(id: file.url.absoluteString, image: nil)
+        }
+        
         _ = file.url.startAccessingSecurityScopedResource()
         
         let data = try Data(contentsOf: file.url)
         
-        if imageExtensions.contains(file.extenstion?.lowercased() ?? .empty) {
-            cacheImage(id: file.url.absoluteString, image: UIImage(data: data))
+        let encodedResult = adamantCore.encodeData(
+            data,
+            recipientPublicKey: recipientPublicKey,
+            privateKey: senderPrivateKey
+        )
+        
+        guard let encodedData = encodedResult?.data,
+              let nonce = encodedResult?.nonce
+        else {
+            throw FileManagerError.cantEnctryptFile
         }
         
-        let id = try await networkFileManager.uploadFiles(data, type: .uploadCareApi)
+        if imageExtensions.contains(file.extenstion?.lowercased() ?? .empty) {
+            cacheImage(id: file.url.absoluteString, image: UIImage(data: encodedData))
+        }
+        
+        let id = try await networkFileManager.uploadFiles(encodedData, type: .uploadCareApi)
         
         if imageExtensions.contains(file.extenstion?.lowercased() ?? .empty) {
-            cacheImage(id: file.url.absoluteString, image: nil)
             cacheImage(id: id, image: UIImage(data: data))
         }
         
         file.url.stopAccessingSecurityScopedResource()
-        return id
+        return (id: id, nonce: nonce)
     }
     
-    public func cacheFile(
+    public func downloadFile(
         id: String,
         storage: String,
-        fileType: String?
-    ) async throws -> Data {
-        let data = try await networkFileManager.downloadFile(id, type: storage)
+        fileType: String?,
+        senderPublicKey: String,
+        recipientPrivateKey: String,
+        nonce: String
+    ) async throws {
+        let encodedData = try await networkFileManager.downloadFile(id, type: storage)
         
-        if imageExtensions.contains(fileType?.uppercased() ?? defaultFileType) {
-            cacheImage(id: id, image: UIImage(data: data))
-        } else {
-            try cacheFile(id: id, data: data)
+        guard let decodedData = adamantCore.decodeData(
+            encodedData,
+            rawNonce: nonce,
+            senderPublicKey: senderPublicKey,
+            privateKey: recipientPrivateKey
+        )
+        else {
+            throw FileValidationError.fileNotFound
         }
         
-        return data
+        if imageExtensions.contains(fileType?.uppercased() ?? defaultFileType) {
+            cacheImage(id: id, image: UIImage(data: decodedData))
+        } else {
+            try cacheFile(id: id, data: encodedData)
+        }
     }
 }
 

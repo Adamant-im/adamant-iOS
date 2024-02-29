@@ -27,6 +27,7 @@ public enum FileValidationError: Error, LocalizedError {
 public enum FileManagerError: Error, LocalizedError {
     case cantDownloadFile
     case cantUploadFile
+    case cantEnctryptFile
     
     public var errorDescription: String {
         switch self {
@@ -34,6 +35,8 @@ public enum FileManagerError: Error, LocalizedError {
             return "cant Download File"
         case .cantUploadFile:
             return "cant Upload File"
+        case .cantEnctryptFile:
+            return "cant encrypt file"
         }
     }
 }
