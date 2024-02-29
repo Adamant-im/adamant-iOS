@@ -852,17 +852,108 @@ extension AdamantChatsProvider {
             )
         }
         
-//        let transaction = try await sendMessageToServer(
-//            senderId: loggedAccount.address,
-//            recipientId: recipientId,
-//            transaction: transactionLocaly,
-//            type: message.chatType,
-//            keypair: keypair,
-//            context: context,
-//            from: chatroom
-//        )
+        let transaction = try await sendMessageToServer(
+            senderId: loggedAccount.address,
+            recipientId: recipientId,
+            transaction: transactionLocaly,
+            type: message.chatType,
+            keypair: keypair,
+            context: context,
+            from: chatroom
+        )
         
         return transactionLocaly
+    }
+    
+    func sendFileMessageLocally(
+        _ message: AdamantMessage,
+        recipientId: String,
+        from chatroom: Chatroom?
+    ) async throws -> (RichMessageTransaction, NSManagedObjectContext) {
+        guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
+            throw ChatsProviderError.notLogged
+        }
+        
+        guard loggedAccount.balance >= message.fee else {
+            throw ChatsProviderError.notEnoughMoneyToSend
+        }
+        
+        switch validateMessage(message) {
+        case .isValid:
+            break
+        case .empty:
+            throw ChatsProviderError.messageNotValid(.empty)
+        case .tooLong:
+            throw ChatsProviderError.messageNotValid(.tooLong)
+        }
+        
+        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        context.parent = stack.container.viewContext
+                
+        guard case let .richMessage(payload) = message else {
+            throw ChatsProviderError.messageNotValid(.empty)
+        }
+        
+        let transactionLocaly = try await sendRichMessageLocaly(
+            richContent: payload.content(),
+            richContentSerialized: payload.serialized(),
+            richType: payload.type,
+            additionalType: payload.additionalType,
+            senderId: loggedAccount.address,
+            recipientId: recipientId,
+            keypair: keypair,
+            context: context,
+            from: chatroom
+        )
+
+        return (transactionLocaly, context)
+    }
+    
+    func sendFileMessage(
+        _ message: AdamantMessage,
+        recipientId: String,
+        transactionLocaly: RichMessageTransaction,
+        context: NSManagedObjectContext,
+        from chatroom: Chatroom?
+    ) async throws -> ChatTransaction {
+        guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
+            throw ChatsProviderError.notLogged
+        }
+        
+        guard loggedAccount.balance >= message.fee else {
+            throw ChatsProviderError.notEnoughMoneyToSend
+        }
+        
+        switch validateMessage(message) {
+        case .isValid:
+            break
+        case .empty:
+            throw ChatsProviderError.messageNotValid(.empty)
+        case .tooLong:
+            throw ChatsProviderError.messageNotValid(.tooLong)
+        }
+        
+//        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+//        context.parent = stack.container.viewContext
+                
+        guard case let .richMessage(payload) = message else {
+            throw ChatsProviderError.messageNotValid(.empty)
+        }
+        
+        transactionLocaly.richContent = payload.content()
+        transactionLocaly.richContentSerialized = payload.serialized()
+        
+        let transaction = try await sendMessageToServer(
+            senderId: loggedAccount.address,
+            recipientId: recipientId,
+            transaction: transactionLocaly,
+            type: message.chatType,
+            keypair: keypair,
+            context: context,
+            from: chatroom
+        )
+        
+        return transaction
     }
     
     private func sendTextMessageLocaly(
@@ -919,7 +1010,7 @@ extension AdamantChatsProvider {
         keypair: Keypair,
         context: NSManagedObjectContext,
         from chatroom: Chatroom? = nil
-    ) async throws -> ChatTransaction {
+    ) async throws -> RichMessageTransaction {
         let type = ChatType.richMessage
         let id = UUID().uuidString
         let transaction = RichMessageTransaction(context: context)

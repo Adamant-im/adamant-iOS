@@ -11,6 +11,7 @@ import Swinject
 import CryptoSwift
 import CoreData
 import CommonKit
+import FilesStorageKit
 
 // MARK: - Constants
 extension String.adamant {
@@ -159,6 +160,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // MARK: 4. Setup dialog service
         dialogService.setup(window: window)
+        
+        _ = FilesStorageKit.shared.isCached("")
         
         // MARK: 5. Show login
         let login = screensFactory.makeLogin()

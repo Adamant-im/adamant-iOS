@@ -134,9 +134,9 @@ private extension ChatFileTableViewCell {
     
     func update() {
         iconImageView.image = UIImage(data: model.previewData)
-        downloadImageView.isHidden = model.isCached || model.isDownloading
+        downloadImageView.isHidden = model.isCached || model.isDownloading || model.isUploading
         
-        if model.isDownloading {
+        if model.isDownloading || model.isUploading {
             spinner.startAnimating()
         } else {
             spinner.stopAnimating()
@@ -152,5 +152,5 @@ private extension ChatFileTableViewCell {
 
 private let nameFont = UIFont.systemFont(ofSize: 15)
 private let sizeFont = UIFont.systemFont(ofSize: 13)
-private let imageSize: CGFloat = 90
+private let imageSize: CGFloat = 70
 private let stackSpacing: CGFloat = 12

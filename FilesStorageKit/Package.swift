@@ -15,7 +15,8 @@ let package = Package(
             targets: ["FilesStorageKit"]),
     ],
     dependencies: [
-        .package(path: "../CommonKit")
+        .package(path: "../CommonKit"),
+        .package(url: "https://github.com/uploadcare/uploadcare-swift.git", branch: "master")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -24,6 +25,7 @@ let package = Package(
             name: "FilesStorageKit",
             dependencies: [
                 "CommonKit",
+                .product(name: "Uploadcare", package: "uploadcare-swift")
             ]
         ),
         .testTarget(

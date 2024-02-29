@@ -13,12 +13,16 @@ struct ChatFile: Equatable, Hashable {
     var file: RichMessageFile.File
     var previewData: Data
     var isDownloading: Bool
+    var isUploading: Bool
     var isCached: Bool
+    var storage: String
     
     static let `default` = Self(
         file: .init([:]),
         previewData: Data(),
         isDownloading: false,
-        isCached: false
+        isUploading: false,
+        isCached: false,
+        storage: .empty
     )
 }

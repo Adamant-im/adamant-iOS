@@ -8,12 +8,12 @@
 import Foundation
 
 final class NetworkFileManager: NetworkFileManagerProtocol {
-    private let baseApi: ApiManagerProtocol = BaseApiManager()
+    private let uploadCareApi: ApiManagerProtocol = UploadCareApiManager()
     
     func uploadFiles(_ data: Data, type: NetworkFileProtocolType) async throws -> String {
         switch type {
-        case .base:
-            return try await baseApi.uploadFile(data: data)
+        case .uploadCareApi:
+            return try await uploadCareApi.uploadFile(data: data)
         }
     }
     
@@ -23,8 +23,8 @@ final class NetworkFileManager: NetworkFileManagerProtocol {
         }
         
         switch netwrokProtocol {
-        case .base:
-            return try await baseApi.downloadFile(id: id)
+        case .uploadCareApi:
+            return try await uploadCareApi.downloadFile(id: id)
         }
     }
 }

@@ -20,4 +20,5 @@ public struct FileResult {
     public let preview: UIImage?
     public let size: Int64
     public let name: String?
+    public let extenstion: String?
 }

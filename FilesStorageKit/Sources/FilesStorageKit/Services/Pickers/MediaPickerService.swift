@@ -64,7 +64,8 @@ private extension MediaPickerService {
                         type: .image,
                         preview: preview,
                         size: fileSize,
-                        name: itemProvider.suggestedName
+                        name: itemProvider.suggestedName, 
+                        extenstion: "JPG"
                     )
                 )
             }
@@ -76,12 +77,15 @@ private extension MediaPickerService {
                 
                 let preview = getThumbnailImage(forUrl: url)
                 
-                dataArray.append(.init(
-                    url: url,
-                    type: .video,
-                    preview: preview,
-                    size: fileSize,
-                    name: itemProvider.suggestedName)
+                dataArray.append(
+                    .init(
+                        url: url,
+                        type: .video,
+                        preview: preview,
+                        size: fileSize,
+                        name: itemProvider.suggestedName,
+                        extenstion: "JPG"
+                    )
                 )
             }
         }

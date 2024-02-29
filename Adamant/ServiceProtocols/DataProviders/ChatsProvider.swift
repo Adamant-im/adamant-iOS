@@ -217,6 +217,20 @@ protocol ChatsProvider: DataProvider, Actor {
     func sendMessage(_ message: AdamantMessage, recipientId: String, from chatroom: Chatroom?) async throws -> ChatTransaction
     func retrySendMessage(_ message: ChatTransaction) async throws
     
+    func sendFileMessageLocally(
+        _ message: AdamantMessage,
+        recipientId: String,
+        from chatroom: Chatroom?
+    ) async throws -> (RichMessageTransaction, NSManagedObjectContext)
+    
+    func sendFileMessage(
+        _ message: AdamantMessage,
+        recipientId: String,
+        transactionLocaly: RichMessageTransaction,
+        context: NSManagedObjectContext,
+        from chatroom: Chatroom?
+    ) async throws -> ChatTransaction
+    
     // MARK: - Delete local message
     func cancelMessage(_ message: ChatTransaction) async throws
     func isMessageDeleted(id: String) -> Bool
