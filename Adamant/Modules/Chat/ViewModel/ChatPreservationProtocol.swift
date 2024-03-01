@@ -9,6 +9,6 @@
 protocol ChatPreservationProtocol: AnyObject {
     func preserveMessage(_ message: String, forAddress address: String)
     func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String?
-    func setReplayMessage(_ message: MessageModel?, forAddress address: String)
-    func getReplayMessage(address: String, thenRemoveIt: Bool) -> MessageModel?
+    func setReplyMessage(_ message: MessageModel?, forAddress address: String)
+    func getReplyMessage(address: String, thenRemoveIt: Bool) -> MessageModel?
 }

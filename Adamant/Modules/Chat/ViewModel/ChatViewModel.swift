@@ -184,7 +184,7 @@ final class ChatViewModel: NSObject {
             messages = cachedMessages ?? []
             fullscreenLoading = cachedMessages == nil
             
-            replyMessage = chatPreservation.getReplayMessage(address: partnerAddress, thenRemoveIt: true)
+            replyMessage = chatPreservation.getReplyMessage(address: partnerAddress, thenRemoveIt: true)
         }
     }
     
@@ -283,7 +283,7 @@ final class ChatViewModel: NSObject {
     
     func preserveReplayMessage() {
         guard let partnerAddress = chatroom?.partner?.address else { return }
-        chatPreservation.setReplayMessage(replyMessage, forAddress: partnerAddress)
+        chatPreservation.setReplyMessage(replyMessage, forAddress: partnerAddress)
     }
     
     func blockChat() {

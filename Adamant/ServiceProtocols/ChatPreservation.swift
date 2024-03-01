@@ -47,11 +47,11 @@ final class ChatPreservation: ChatPreservationProtocol {
         return message
     }
     
-    func setReplayMessage(_ message: MessageModel?, forAddress address: String) {
+    func setReplyMessage(_ message: MessageModel?, forAddress address: String) {
         replayMessage[address] = message
     }
     
-    func getReplayMessage(address: String, thenRemoveIt: Bool) -> MessageModel? {
+    func getReplyMessage(address: String, thenRemoveIt: Bool) -> MessageModel? {
         guard let replayMessage = replayMessage[address] else {
             return nil
         }
