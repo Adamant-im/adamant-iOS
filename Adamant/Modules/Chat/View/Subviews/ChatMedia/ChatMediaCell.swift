@@ -39,8 +39,6 @@ final class ChatMediaCell: MessageContentCell {
         and messagesCollectionView: MessagesCollectionView
     ) {
         super.configure(with: message, at: indexPath, and: messagesCollectionView)
-//        messageContainerView.style = .none
-//        messageContainerView.backgroundColor = .clear
     }
     
     override func layoutMessageContainerView(

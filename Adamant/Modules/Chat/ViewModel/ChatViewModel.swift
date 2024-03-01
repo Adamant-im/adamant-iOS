@@ -710,15 +710,11 @@ final class ChatViewModel: NSObject {
                 downloadingFilesID.append(file.file.file_id)
                 
                 do {
-                    let publicKey = isFromCurrentSender
-                    ? keyPair.publicKey
-                    : chatroom?.partner?.publicKey ?? .empty
-                    
                     try await FilesStorageKit.shared.downloadFile(
                         id: file.file.file_id,
                         storage: file.storage,
                         fileType: file.file.file_type ?? .empty,
-                        senderPublicKey: publicKey,
+                        senderPublicKey: chatroom?.partner?.publicKey ?? .empty,
                         recipientPrivateKey: keyPair.privateKey,
                         nonce: file.nonce
                     )
