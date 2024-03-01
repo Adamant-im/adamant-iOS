@@ -22,6 +22,10 @@ public final class FilesStorageKit {
         documentPicker = DocumentPickerService()
     }
     
+    public func setup() {
+        try? loadCache()
+    }
+    
     @MainActor
     public func presentImagePicker() async throws -> [FileResult] {
         try await withUnsafeThrowingContinuation { continuation in
@@ -154,6 +158,39 @@ private extension FilesStorageKit {
                 throw FileValidationError.fileSizeExceedsLimit
             }
         }
+    }
+    
+    func loadCache() throws {
+        let folder = try FileManager.default.url(
+            for: .cachesDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        ).appendingPathComponent(cachePath)
+        
+        let files = getFiles(at: folder)
+        
+        files.forEach { url in
+            cachedFiles[url.lastPathComponent] = url
+        }
+    }
+    
+    func getFiles(at url: URL) -> [URL] {
+        let fileManager = FileManager.default
+        var isDirectory: ObjCBool = false
+        var subdirectoryNames: [URL] = []
+        
+        guard let contents = try? fileManager.contentsOfDirectory(at: url, includingPropertiesForKeys: nil) else {
+            return subdirectoryNames
+        }
+        
+        for item in contents {
+            if fileManager.fileExists(atPath: item.path, isDirectory: &isDirectory) && !isDirectory.boolValue {
+                subdirectoryNames.append(item)
+            }
+        }
+        
+        return subdirectoryNames
     }
     
     func cacheFile(id: String, data: Data) throws {

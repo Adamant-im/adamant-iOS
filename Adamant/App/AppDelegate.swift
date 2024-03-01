@@ -161,7 +161,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // MARK: 4. Setup dialog service
         dialogService.setup(window: window)
         
-        _ = FilesStorageKit.shared.isCached("")
+        FilesStorageKit.shared.setup()
         
         // MARK: 5. Show login
         let login = screensFactory.makeLogin()
