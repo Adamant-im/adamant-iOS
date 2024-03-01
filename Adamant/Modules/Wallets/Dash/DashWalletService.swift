@@ -335,7 +335,8 @@ extension DashWalletService {
                 }
             }
             
-            service.setState(.upToDate, silent: true)
+            service.setState(.upToDate)
+            
             Task {
                 service.update()
             }
