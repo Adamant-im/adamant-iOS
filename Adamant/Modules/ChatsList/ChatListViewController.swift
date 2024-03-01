@@ -68,7 +68,6 @@ final class ChatListViewController: KeyboardObservingViewController {
     var searchController: UISearchController?
     
     private var transactionsRequiringBalanceUpdate: [String] = []
-    private var preservedMessagess = [String:String]()
     
     let defaultAvatar = UIImage.asset(named: "avatar-chat-placeholder") ?? .init()
     
@@ -374,8 +373,7 @@ final class ChatListViewController: KeyboardObservingViewController {
         vc.viewModel.setup(
             account: accountService.account,
             chatroom: chatroom,
-            messageIdToShow: messageId,
-            preservationDelegate: self
+            messageIdToShow: messageId
         )
 
         return vc
@@ -813,26 +811,6 @@ extension ChatListViewController: NewChatViewControllerDelegate {
                 self?.tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
             }
         }
-    }
-}
-
-// MARK: - ChatPreservationDelegate
-
-extension ChatListViewController: ChatPreservationDelegate {
-    func preserveMessage(_ message: String, forAddress address: String) {
-        preservedMessagess[address] = message
-    }
-
-    func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String? {
-        guard let message = preservedMessagess[address] else {
-            return nil
-        }
-
-        if thenRemoveIt {
-            preservedMessagess.removeValue(forKey: address)
-        }
-
-        return message
     }
 }
 

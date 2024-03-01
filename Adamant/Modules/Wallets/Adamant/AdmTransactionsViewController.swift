@@ -274,8 +274,7 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
             vc.viewModel.setup(
                 account: account,
                 chatroom: chatroom,
-                messageIdToShow: nil,
-                preservationDelegate: nil
+                messageIdToShow: nil
             )
             
             if let nav = self.navigationController {
