@@ -1,5 +1,7 @@
 ROOT="$PWD"
-BRANCH_NAME="dev" #master #dev
+URL_NAME="feature/floki" #master #dev
+BRANCH_NAME="feature-floki" #master #dev
+ZIP_NAME="floki" #master #dev
 SCRIPTS_DIR="$ROOT/scripts"
 WALLETS_DIR="$ROOT/scripts/wallets"
 WALLETS_NAME_DIR="$ROOT/scripts/wallets/adamant-wallets-$BRANCH_NAME/assets/general"
@@ -10,8 +12,8 @@ function download ()
 {
     mkdir -p "$WALLETS_DIR"
     cd "$WALLETS_DIR"
-    curl -fSsOL https://github.com/Adamant-im/adamant-wallets/archive/refs/heads/$BRANCH_NAME.zip
-    tar xzf $BRANCH_NAME.zip
+    curl -fSsOL https://github.com/Adamant-im/adamant-wallets/archive/refs/heads/$URL_NAME.zip
+    tar xzf $ZIP_NAME.zip
 }
 
 # create Contents for the image
