@@ -103,7 +103,9 @@ final class DelegateDetailsViewController: UIViewController {
         formatter.allowedUnits = [ .hour, .minute, .second ]
         formatter.unitsStyle = .brief
         formatter.zeroFormattingBehavior = .dropLeading
-
+        if let localeRaw = UserDefaults.standard.string(forKey: StoreKey.language.languageLocale) {
+            formatter.calendar?.locale = Locale(identifier: localeRaw)
+        }
         return formatter
     }()
     

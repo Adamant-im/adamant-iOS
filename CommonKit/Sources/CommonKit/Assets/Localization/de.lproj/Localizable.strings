@@ -388,6 +388,12 @@
 /* Date "A minute ago" */
 "Chats.Date.MinAgo" = "Vor einer Minute";
 
+/* No comment provided by engineer. */
+"A minute ago" = "Vor einer Minute";
+
+/* No comment provided by engineer. */
+"An hour ago" = "Vor einer Stunde";
+
 /* Date "Yesterday" */
 "Chats.Date.Yesterday" = "Gestern";
 
