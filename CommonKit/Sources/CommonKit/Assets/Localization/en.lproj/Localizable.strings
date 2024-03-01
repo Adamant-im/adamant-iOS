@@ -455,7 +455,7 @@
 "VisibleWallets.ResetListAlert" = "Reset wallet list to default?";
 
 /* Delegates tab: Message about 50 ADM fee for vote */
-"Delegates.NotEnoughtTokensForVote" = "Not enought tokens to vote. You need 50 ADM";
+"Delegates.NotEnoughtTokensForVote" = "Not enough ADM to pay the voting blockchain fee";
 
 /* Delegates tab: Message about time out for new vote */
 "Delegates.timeOutBeforeNewVote" = "Please wait until previous vote will be processed";
@@ -1023,6 +1023,9 @@
 
 /* Transfer: Address not found error */
 "TransferScene.Error.AddressNotFound" = "Address not found";
+
+/* Transfer: Not enough ADM to send in-chat transfer error */
+"TransferScene.Error.notEnoughAdmToSendTransfer" = "Not enough ADM to send in-chat transfer";
 
 /* Transfer: Address validation error */
 "TransferScene.Error.InvalidAddress" = "Enter a valid address";

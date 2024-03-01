@@ -455,7 +455,7 @@
 "VisibleWallets.ResetListAlert" = "是否将钱包列表重置为默认值？";
 
 /* Delegates tab: Message about 50 ADM fee for vote */
-"Delegates.NotEnoughtTokensForVote" = "没有足够的代币可以投票。您需要50个ADM";
+"Delegates.NotEnoughtTokensForVote" = "没有足够的 ADM 来支付投票区块链费用";
 
 /* Delegates tab: Message about time out for new vote */
 "Delegates.timeOutBeforeNewVote" = "请等待上一次投票处理完毕";
@@ -1020,6 +1020,9 @@
 
 /* Transfer: Address not found error */
 "TransferScene.Error.AddressNotFound" = "找不到地址";
+
+/* Transfer: Not enough ADM to send in-chat transfer error */
+"TransferScene.Error.notEnoughAdmToSendTransfer" = "没有足够的 ADM 来发送聊天转移";
 
 /* Transfer: Address validation error */
 "TransferScene.Error.InvalidAddress" = "输入有效地址";
