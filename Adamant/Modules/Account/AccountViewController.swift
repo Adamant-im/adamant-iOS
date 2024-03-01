@@ -27,8 +27,10 @@ extension String.adamant {
 }
 
 extension String.adamant.alert {
-    static let logoutMessageFormat = String.localized("AccountTab.ConfirmLogout.MessageFormat", comment: "Account tab: Confirm logout alert")
-    static let logoutButton = String.localized("AccountTab.ConfirmLogout.Logout", comment: "Account tab: Confirm logout alert: Logout (Ok) button")
+    static var logoutMessageFormat: String { String.localized("AccountTab.ConfirmLogout.MessageFormat", comment: "Account tab: Confirm logout alert")
+    }
+    static var logoutButton: String { String.localized("AccountTab.ConfirmLogout.Logout", comment: "Account tab: Confirm logout alert: Logout (Ok) button")
+    }
 }
 
 // MARK: AccountViewController
@@ -918,7 +920,7 @@ final class AccountViewController: FormViewController {
         actionsSection?.header?.title = Sections.actions.localized
         
         tableView.reloadData()
-
+        
         tabBarController?.viewControllers?.first?.tabBarItem.title = .adamant.tabItems.chats
         tabBarController?.viewControllers?.last?.tabBarItem.title = .adamant.tabItems.account
         

@@ -12,7 +12,8 @@ import BitcoinKit
 import CommonKit
 
 extension String.adamant.transfer {
-        static let minAmountError = String.localized("TransferScene.Error.MinAmount", comment: "Transfer: Minimal transaction amount is 0.00001")
+    static var minAmountError: String { String.localized("TransferScene.Error.MinAmount", comment: "Transfer: Minimal transaction amount is 0.00001")
+    }
 }
 
 final class DashTransferViewController: TransferViewControllerBase {

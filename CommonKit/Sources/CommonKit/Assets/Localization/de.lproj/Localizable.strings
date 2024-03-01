@@ -1123,6 +1123,9 @@
 /* Transfer: Confirm transfer alert: Send tokens button */
 "TransferScene.Send" = "Senden";
 
+/* Transfer: Ttitle for done button */
+"TransferScene.Done" = "Fertig";
+
 /* Transfer: Confirm transfer alert: 'Can't Undo' message */
 "TransferScene.CantUndo" = "Sie können diese Aktion nicht rückgängig machen";
 
