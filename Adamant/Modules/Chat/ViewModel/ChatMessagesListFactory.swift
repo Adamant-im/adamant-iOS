@@ -90,8 +90,5 @@ private func isNeedToDisplayDateHeader(
         let currentDate = transactions[index].sentDate
     else { return false }
     
-    let timeIntervalFromLastMessage = currentDate.timeIntervalSince(previousDate)
-    return timeIntervalFromLastMessage >= dateHeaderTimeInterval
+    return !Calendar.current.isDate(currentDate, inSameDayAs: previousDate)
 }
-
-private let dateHeaderTimeInterval: TimeInterval = 3600
