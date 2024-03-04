@@ -28,13 +28,18 @@ extension RichMessageTransaction {
         return richContent?[RichContentKeys.reply.replyMessage] is [String: String]
     }
     
+    func isFileReply() -> Bool {
+        let replyMessage = richContent?[RichContentKeys.reply.replyMessage] as? [String: Any]
+        return replyMessage?[RichContentKeys.file.files] is [[String: Any]]
+    }
+    
     func getRichValue(for key: String) -> String? {
         if let value = richContent?[key] as? String {
             return value
         }
         
-        if let content = richContent?[RichContentKeys.reply.replyMessage] as? [String: String],
-           let value = content[key] {
+        if let content = richContent?[RichContentKeys.reply.replyMessage] as? [String: Any],
+           let value = content[key] as? String {
             return value
         }
         
@@ -46,12 +51,12 @@ extension RichMessageTransaction {
             return value
         }
         
-        if let content = richContent?[RichContentKeys.reply.replyMessage] as? [String: String],
+        if let content = richContent?[RichContentKeys.file.files] as? [String: Any],
            let value = content[key] as? T {
             return value
         }
         
-        if let content = richContent?[RichContentKeys.file.files] as? [String: Any],
+        if let content = richContent?[RichContentKeys.reply.replyMessage] as? [String: Any],
            let value = content[key] as? T {
             return value
         }

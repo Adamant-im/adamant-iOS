@@ -15,12 +15,20 @@ extension ChatMediaContentView {
         var files: [ChatFile]
         var isHidden: Bool
         let isFromCurrentSender: Bool
+        let isReply: Bool
+        let replyMessage: NSAttributedString
+        let replyId: String
+        let comment: NSAttributedString
         
         static let `default` = Self(
             id: "",
             files: [],
             isHidden: false,
-            isFromCurrentSender: false
+            isFromCurrentSender: false,
+            isReply: false,
+            replyMessage: NSAttributedString(string: .empty),
+            replyId: .empty,
+            comment: NSAttributedString(string: .empty)
         )
     }
 }

@@ -177,6 +177,31 @@ public struct RichMessageFile: RichMessage {
     }
 }
 
+public struct RichFileReply: RichMessage {
+    public var type: String
+    public var additionalType: RichAdditionalType
+    public var replyto_id: String
+    public var reply_message: RichMessageFile
+    
+    public enum CodingKeys: String, CodingKey {
+        case replyto_id, reply_message
+    }
+    
+    public init(replyto_id: String, reply_message: RichMessageFile) {
+        self.type = RichContentKeys.reply.reply
+        self.replyto_id = replyto_id
+        self.reply_message = reply_message
+        self.additionalType = .reply
+    }
+    
+    public func content() -> [String: Any] {
+        return [
+            RichContentKeys.reply.replyToId: replyto_id,
+            RichContentKeys.reply.replyMessage: reply_message
+        ]
+    }
+}
+
 // MARK: - RichMessageReply
 
 public struct RichMessageReply: RichMessage {

@@ -148,8 +148,10 @@ private extension FilesStorageKit {
         }
 
         for fileURL in fileURLs {
+            _ = fileURL.startAccessingSecurityScopedResource()
             let fileAttributes = try FileManager.default.attributesOfItem(atPath: fileURL.path)
             
+            fileURL.stopAccessingSecurityScopedResource()
             guard let fileSize = fileAttributes[.size] as? Int64 else {
                 throw FileValidationError.fileNotFound
             }

@@ -303,18 +303,30 @@ final class ChatViewModel: NSObject {
                 )
             }
             
-            let messageLocally: AdamantMessage = .richMessage(
-                payload: RichMessageFile(
-                    files: richFiles,
-                    storage: NetworkFileProtocolType.uploadCareApi.rawValue,
-                    comment: text
+            let messageLocally: AdamantMessage
+            
+            if let replyMessage = replyMessage {
+                messageLocally = .richMessage(
+                    payload: RichFileReply(
+                        replyto_id: replyMessage.id,
+                        reply_message: RichMessageFile(
+                            files: richFiles,
+                            storage: NetworkFileProtocolType.uploadCareApi.rawValue,
+                            comment: text
+                        )
+                    )
                 )
-            )
+            } else {
+                messageLocally = .richMessage(
+                    payload: RichMessageFile(
+                        files: richFiles,
+                        storage: NetworkFileProtocolType.uploadCareApi.rawValue,
+                        comment: text
+                    )
+                )
+            }
             
             guard await validateSendingMessage(message: messageLocally) else { return }
-            
-            replyMessage = nil
-            filesPicked = nil
             
             do {
                 let txLocally = try await chatsProvider.sendFileMessageLocally(
@@ -346,13 +358,31 @@ final class ChatViewModel: NSObject {
                     }
                 }
                 
-                let message: AdamantMessage = .richMessage(
-                    payload: RichMessageFile(
-                        files: richFiles,
-                        storage: NetworkFileProtocolType.uploadCareApi.rawValue,
-                        comment: text
+                let message: AdamantMessage
+                
+                if let replyMessage = replyMessage {
+                    message = .richMessage(
+                        payload: RichFileReply(
+                            replyto_id: replyMessage.id,
+                            reply_message: RichMessageFile(
+                                files: richFiles,
+                                storage: NetworkFileProtocolType.uploadCareApi.rawValue,
+                                comment: text
+                            )
+                        )
                     )
-                )
+                } else {
+                    message = .richMessage(
+                        payload: RichMessageFile(
+                            files: richFiles,
+                            storage: NetworkFileProtocolType.uploadCareApi.rawValue,
+                            comment: text
+                        )
+                    )
+                }
+                
+                replyMessage = nil
+                filesPicked = nil
                 
                 _ = try await chatsProvider.sendFileMessage(
                     message,

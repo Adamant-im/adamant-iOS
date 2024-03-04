@@ -130,7 +130,8 @@ private extension ChatMessageFactory {
             )
         case let transaction as RichMessageTransaction:
             if transaction.additionalType == .reply,
-               !transaction.isTransferReply() {
+               !transaction.isTransferReply(),
+               !transaction.isFileReply() {
                 return makeReplyContent(
                     transaction,
                     isFromCurrentSender: isFromCurrentSender,
@@ -138,8 +139,9 @@ private extension ChatMessageFactory {
                 )
             }
             
-            if transaction.additionalType == .file,
-               !transaction.isTransferReply() {
+            if transaction.additionalType == .file ||
+               (transaction.additionalType == .reply &&
+                transaction.isFileReply()) {
                 return makeFileContent(
                     transaction,
                     isFromCurrentSender: isFromCurrentSender,
@@ -303,12 +305,14 @@ private extension ChatMessageFactory {
     ) -> ChatMessage.Content {
         let id = transaction.chatMessageId ?? ""
         
-        let decodedMessage = transaction.getRichValue(for: RichContentKeys.file.comment) ?? .empty
+        let decodedMessage: String = transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) ?? "..."
         let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
         
         let files: [[String: Any]] = transaction.getRichValue(for: RichContentKeys.file.files) ?? [[:]]
         let storage: String = transaction.getRichValue(for: RichContentKeys.file.storage) ?? .empty
         
+        let comment: String = transaction.getRichValue(for: RichContentKeys.file.comment) ?? .empty
+        let replyId = transaction.getRichValue(for: RichContentKeys.reply.replyToId) ?? ""
         let reactions = transaction.richContent?[RichContentKeys.react.reactions] as? Set<Reaction>
         
         let address = transaction.isOutgoing
@@ -333,7 +337,7 @@ private extension ChatMessageFactory {
                 nonce: $0[RichContentKeys.file.nonce] as? String ?? .empty
             )
         }
-        
+        print("is reply=\(transaction.isFileReply()), richcontent=\(transaction.richContent)")
         return .file(.init(value: .init(
             id: id,
             isFromCurrentSender: isFromCurrentSender,
@@ -342,7 +346,11 @@ private extension ChatMessageFactory {
                 id: id,
                 files: chatFiles,
                 isHidden: false,
-                isFromCurrentSender: isFromCurrentSender
+                isFromCurrentSender: isFromCurrentSender,
+                isReply: transaction.isFileReply(),
+                replyMessage: decodedMessageMarkDown,
+                replyId: replyId,
+                comment: Self.markdownParser.parse(comment)
             ),
             address: address,
             opponentAddress: opponentAddress

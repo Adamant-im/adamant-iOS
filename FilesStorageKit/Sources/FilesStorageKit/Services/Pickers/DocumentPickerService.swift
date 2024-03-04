@@ -50,12 +50,14 @@ extension DocumentPickerService: UIDocumentPickerDelegate {
 
 private extension DocumentPickerService {
     func getFileSize(from fileURL: URL) throws -> Int64 {
+        _ = fileURL.startAccessingSecurityScopedResource()
         let fileAttributes = try FileManager.default.attributesOfItem(atPath: fileURL.path)
         
         guard let fileSize = fileAttributes[.size] as? Int64 else {
             throw FileValidationError.fileNotFound
         }
         
+        fileURL.stopAccessingSecurityScopedResource()
         return fileSize
     }
 }

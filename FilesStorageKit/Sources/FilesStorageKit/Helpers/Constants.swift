@@ -10,7 +10,7 @@ import UIKit
 
 final class Constants {
     static let maxFilesCount = 15
-    static let maxFileSize: Int64 = 8 * 1024 * 1024
+    static let maxFileSize: Int64 = 800 * 1024 * 1024
 }
 
 extension UIApplication {

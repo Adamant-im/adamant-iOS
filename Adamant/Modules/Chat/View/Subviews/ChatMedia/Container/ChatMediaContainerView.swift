@@ -50,7 +50,7 @@ extension ChatMediaContainerView {
         
         addSubview(contentView)
         contentView.snp.makeConstraints {
-            $0.top.bottom.equalToSuperview()
+            $0.top.bottom.equalToSuperview().inset(12)
             $0.leading.trailing.equalToSuperview().inset(12)
         }
         
