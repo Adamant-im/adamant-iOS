@@ -14,24 +14,35 @@ struct SelectTextView: View {
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
-        NavigationView {
-            VStack {
-                TextView(text: text)
-                    .accentColor(.blue)
-                    .padding()
-                
-                Spacer()
+        if #available(iOS 16.0, *) {
+            NavigationStack {
+                contentView()
             }
-            .navigationBarTitle(String.adamant.chat.selectText, displayMode: .inline)
-            .navigationBarItems(
-                trailing:
-                    Button(
-                        action: { dismiss() }
-                    ) {
-                        Image(systemName: "xmark")
-                    }
-            )
+        } else {
+            NavigationView {
+                contentView()
+            }
         }
+    }
+    
+    func contentView() -> some View {
+        VStack {
+            TextView(text: text)
+                .accentColor(.blue)
+                .padding()
+            
+            Spacer()
+        }
+        .navigationBarTitle(String.adamant.chat.selectText, displayMode: .inline)
+        .navigationBarItems(
+            trailing:
+                Button(
+                    action: { dismiss() }
+                ) {
+                    Image(systemName: "xmark")
+                }
+        )
+        .navigationViewStyle(.stack)
     }
 }
 
