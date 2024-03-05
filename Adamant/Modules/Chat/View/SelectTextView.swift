@@ -43,14 +43,11 @@ struct TextView: UIViewRepresentable {
         textView.isEditable = false
         textView.text = text
         textView.font = .systemFont(ofSize: 17)
+        textView.selectAll(nil)
         return textView
     }
 
     func updateUIView(_ textView: UITextView, context: Context) {
         textView.text = text
-        textView.selectedTextRange = textView.textRange(
-            from: textView.beginningOfDocument,
-            to: textView.endOfDocument
-        )
     }
 }
