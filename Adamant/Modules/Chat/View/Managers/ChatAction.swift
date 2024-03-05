@@ -16,6 +16,7 @@ enum ChatAction {
     case scrollTo(message: ChatMessageReplyCell.Model)
     case swipeState(state: SwipeableView.State)
     case copy(text: String)
+    case copyInPart(text:String)
     case report(id: String)
     case remove(id: String)
     case react(id: String, emoji: String)

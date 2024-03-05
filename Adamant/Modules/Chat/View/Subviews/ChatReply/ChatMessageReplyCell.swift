@@ -555,7 +555,14 @@ extension ChatMessageReplyCell {
             actionHandler(.copy(text: model.message.string))
         }
         
-        return AMenuSection([reply, copy, report, remove])
+        let copyInPart = AMenuItem.action(
+            title: .adamant.chat.selectText,
+            systemImageName: "selection.pin.in.out"
+        ) { [actionHandler, model] in
+            actionHandler(.copyInPart(text: model.message.string))
+        }
+        
+        return AMenuSection([reply, copyInPart, copy, report, remove])
     }
     
     @objc func tapReactionAction() {

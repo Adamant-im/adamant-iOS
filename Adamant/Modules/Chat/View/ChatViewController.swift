@@ -364,6 +364,12 @@ private extension ChatViewController {
         viewModel.didTapPartnerQR
             .sink { [weak self] in self?.didTapPartenerQR(partner: $0) }
             .store(in: &subscriptions)
+        
+        viewModel.didTapSelectText
+            .sink { [weak self] text in
+                self?.didTapSelectText(text: text)
+            }
+            .store(in: &subscriptions)
     }
 }
 
@@ -675,6 +681,11 @@ private extension ChatViewController {
     func didTapPartenerQR(partner: CoreDataAccount) {
         let vc = screensFactory.makePartnerQR(partner: partner)
         navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    func didTapSelectText(text: String) {
+        let vc = screensFactory.makeChatSelectTextView(text: text)
+        present(vc, animated: true)
     }
     
     func didTapRichMessageTransaction(_ transaction: RichMessageTransaction) {

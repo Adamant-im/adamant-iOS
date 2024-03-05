@@ -54,6 +54,9 @@ extension String.adamant {
         static var report: String {
             String.localized("Chats.Report", comment: "Report")
         }
+        static var selectText: String {
+            String.localized("Chats.SelectText", comment: "Select Text")
+        }
         static var reply: String {
             String.localized("Chats.Reply", comment: "Reply")
         }

@@ -33,6 +33,7 @@ protocol ScreensFactory {
     func makeNewChat() -> NewChatViewController
     func makeComplexTransfer() -> UIViewController
     func makeSearchResults() -> SearchResultsViewController
+    func makeChatSelectTextView(text: String) -> UIViewController
     
     // MARK: Delegates
     
