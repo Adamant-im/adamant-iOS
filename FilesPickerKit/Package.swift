@@ -4,34 +4,28 @@
 import PackageDescription
 
 let package = Package(
-    name: "FilesStorageKit",
+    name: "FilesPickerKit",
     platforms: [
         .iOS(.v15)
     ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "FilesStorageKit",
-            targets: ["FilesStorageKit"]),
+            name: "FilesPickerKit",
+            targets: ["FilesPickerKit"]),
     ],
     dependencies: [
-        .package(path: "../CommonKit"),
-        .package(url: "https://github.com/uploadcare/uploadcare-swift.git", branch: "master")
+        .package(path: "../CommonKit")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "FilesStorageKit",
-            dependencies: [
-                "CommonKit",
-                .product(name: "Uploadcare", package: "uploadcare-swift")
-            ]
+            name: "FilesPickerKit",
+            dependencies: ["CommonKit"]
         ),
         .testTarget(
-            name: "FilesStorageKitTests",
-            dependencies: [
-                "FilesStorageKit"
-            ]),
+            name: "FilesPickerKitTests",
+            dependencies: ["FilesPickerKit"]),
     ]
 )

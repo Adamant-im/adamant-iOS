@@ -1,8 +1,8 @@
 //
-//  File.swift
-//  
+//  Constants.swift
 //
-//  Created by Stanislav Jelezoglo on 19.02.2024.
+//
+//  Created by Stanislav Jelezoglo on 06.03.2024.
 //
 
 import Foundation

@@ -7,10 +7,8 @@
 
 import Foundation
 import UIKit
+import CommonKit
 
 protocol FilePickerProtocol {
-    func startPicker(
-        window: UIWindow,
-        completion: (([FileResult]) -> Void)?
-    )
+    func startPicker(completion: (([FileResult]) -> Void)?)
 }

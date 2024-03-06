@@ -8,8 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		269E13522B594B2D008D1CA7 /* AccountFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269E13512B594B2D008D1CA7 /* AccountFooterView.swift */; };
+		3A075C9E2B98A3B100714E3B /* FilesPickerKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3A075C9D2B98A3B100714E3B /* FilesPickerKit */; };
 		3A20D93B2AE7F316005475A6 /* AdamantTransactionDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A20D93A2AE7F316005475A6 /* AdamantTransactionDetails.swift */; };
-		3A299C652B83678F00B54C61 /* FilesStorageKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3A299C642B83678F00B54C61 /* FilesStorageKit */; };
 		3A299C692B838AA600B54C61 /* ChatMediaCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A299C682B838AA600B54C61 /* ChatMediaCell.swift */; };
 		3A299C6B2B838F2300B54C61 /* ChatMediaContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A299C6A2B838F2300B54C61 /* ChatMediaContainerView.swift */; };
 		3A299C6D2B838F8F00B54C61 /* ChatMediaContainerView+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A299C6C2B838F8F00B54C61 /* ChatMediaContainerView+Model.swift */; };
@@ -1250,7 +1250,6 @@
 			files = (
 				A5AC8DFF262E0B030053A7E2 /* SipHash in Frameworks */,
 				3A8875EF27BBF38D00436195 /* Parchment in Frameworks */,
-				3A299C652B83678F00B54C61 /* FilesStorageKit in Frameworks */,
 				3C06931576393125C61FB8F6 /* Pods_Adamant.framework in Frameworks */,
 				A50AEB0C262C81E300B37C22 /* QRCodeReader in Frameworks */,
 				416F5EA4290162EB00EF0400 /* SocketIO in Frameworks */,
@@ -1275,6 +1274,7 @@
 				4184F1712A33044E00D7B8B9 /* FirebaseCrashlytics in Frameworks */,
 				A5DBBAEE262C72EF004AC028 /* BitcoinKit in Frameworks */,
 				A57282CA262C94CD00C96FA8 /* DateToolsSwift in Frameworks */,
+				3A075C9E2B98A3B100714E3B /* FilesPickerKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2671,7 +2671,7 @@
 				4177E5E02A52DA7100C089FE /* AdvancedContextMenuKit */,
 				9342F6C12A6A35E300A9B39F /* CommonKit */,
 				3AC76E3C2AB09118008042C4 /* ElegantEmojiPicker */,
-				3A299C642B83678F00B54C61 /* FilesStorageKit */,
+				3A075C9D2B98A3B100714E3B /* FilesPickerKit */,
 			);
 			productName = Adamant;
 			productReference = E913C8EE1FFFA51D001A83F7 /* Adamant.app */;
@@ -4255,9 +4255,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		3A299C642B83678F00B54C61 /* FilesStorageKit */ = {
+		3A075C9D2B98A3B100714E3B /* FilesPickerKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = FilesStorageKit;
+			productName = FilesPickerKit;
 		};
 		3A8875EE27BBF38D00436195 /* Parchment */ = {
 			isa = XCSwiftPackageProductDependency;

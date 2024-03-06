@@ -23,20 +23,3 @@ public enum FileValidationError: Error, LocalizedError {
         }
     }
 }
-
-public enum FileManagerError: Error, LocalizedError {
-    case cantDownloadFile
-    case cantUploadFile
-    case cantEnctryptFile
-    
-    public var errorDescription: String {
-        switch self {
-        case .cantDownloadFile:
-            return "cant Download File"
-        case .cantUploadFile:
-            return "cant Upload File"
-        case .cantEnctryptFile:
-            return "cant encrypt file"
-        }
-    }
-}

@@ -14,6 +14,7 @@ import CommonKit
 import AdvancedContextMenuKit
 import ElegantEmojiPicker
 import FilesStorageKit
+import FilesPickerKit
 
 @MainActor
 final class ChatViewModel: NSObject {
@@ -775,21 +776,19 @@ final class ChatViewModel: NSObject {
                // dialog.send(.progress(true))
                 
                 if case(.uploadFile) = action {
-                    result = try await FilesStorageKit.shared.presentDocumentPicker()
+                    result = try await FilesPickerKit.shared.presentDocumentPicker()
                 }
                 if case(.uploadMedia) = action {
-                    result = try await FilesStorageKit.shared.presentImagePicker()
+                    result = try await FilesPickerKit.shared.presentImagePicker()
                 }
                 
                 presentFilePicker.send(action)
                 
                 dialog.send(.progress(false))
                 filesPicked = result
-                print("data=\(result.count)")
             } catch {
                 dialog.send(.progress(false))
                 dialog.send(.alert(error.localizedDescription))
-                print("error=\(error)")
             }
         }
     }

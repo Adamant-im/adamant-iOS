@@ -1,7 +1,7 @@
 import XCTest
-@testable import FilesStorageKit
+@testable import FilesPickerKit
 
-final class FilesStorageKitTests: XCTestCase {
+final class FilesPickerKitTests: XCTestCase {
     func testExample() throws {
         // XCTest Documentation
         // https://developer.apple.com/documentation/xctest

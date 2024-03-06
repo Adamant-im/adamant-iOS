@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import CommonKit
 
 final class DocumentPickerService: NSObject, FilePickerProtocol {
     let documentPicker = UIDocumentPickerViewController(
@@ -16,10 +17,7 @@ final class DocumentPickerService: NSObject, FilePickerProtocol {
 
     private var onPreparedDataCallback: (([FileResult]) -> Void)?
 
-    func startPicker(
-        window: UIWindow,
-        completion: (([FileResult]) -> Void)?
-    ) {
+    func startPicker(completion: (([FileResult]) -> Void)?) {
         onPreparedDataCallback = completion
         
         documentPicker.allowsMultipleSelection = true
