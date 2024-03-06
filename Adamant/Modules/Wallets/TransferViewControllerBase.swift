@@ -762,7 +762,7 @@ class TransferViewControllerBase: FormViewController {
         }
         
         guard reachabilityMonitor.connection else {
-            dialogService.showWarning(withMessage: .adamant.alert.noInternetTransferBody)
+            dialogService.showWarning(withMessage: .adamant.sharedErrors.networkError)
             return
         }
         
