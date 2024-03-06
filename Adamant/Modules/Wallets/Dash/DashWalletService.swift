@@ -453,8 +453,21 @@ extension DashWalletService {
     }
     
     func loadTransactions(offset: Int, limit: Int) async throws -> Int {
-        guard let address = wallet?.address else {
+        let trs = try await getTransactionsHistory(offset: offset, limit: limit)
+        
+        guard trs.count > 0 else {
+            hasMoreOldTransactions = false
             return .zero
+        }
+        
+        coinStorage.append(trs)
+        
+        return trs.count
+    }
+    
+    func getTransactionsHistory(offset: Int, limit: Int) async throws -> [TransactionDetails] {
+        guard let address = wallet?.address else {
+            return []
         }
         
         let allTransactionsIds = try await requestTransactionsIds(for: address).reversed()
@@ -471,14 +484,7 @@ extension DashWalletService {
         
         let trs = try await getTransactions(by: ids)
         
-        guard trs.count > 0 else {
-            hasMoreOldTransactions = false
-            return .zero
-        }
-        
-        coinStorage.append(trs)
-        
-        return trs.count
+        return trs
     }
     
     func getLocalTransactionHistory() -> [TransactionDetails] {

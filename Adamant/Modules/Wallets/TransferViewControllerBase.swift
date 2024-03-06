@@ -1205,4 +1205,36 @@ extension TransferViewControllerBase {
             }
         }
     }
+    
+    func readyToSendFunds() async -> Bool {
+        var history = walletCore.getLocalTransactionHistory()
+        
+        if history.isEmpty {
+            history = (try? await walletCore.getTransactionsHistory(
+                offset: .zero,
+                limit: 2)
+            ) ?? []
+        }
+        
+        let havePending = history.contains {
+            $0.transactionStatus == .pending || $0.transactionStatus == .registered || $0.transactionStatus == .notInitiated
+        }
+        
+        return !havePending
+    }
+    
+    func readyToSendFunds(with nonce: String) async -> Bool {
+        var history = walletCore.getLocalTransactionHistory()
+        
+        if history.isEmpty {
+            history = (try? await walletCore.getTransactionsHistory(
+                offset: .zero,
+                limit: 2)
+            ) ?? []
+        }
+        
+        let nonces = history.compactMap { $0.nonceRaw }
+        
+        return !nonces.contains(nonce)
+    }
 }

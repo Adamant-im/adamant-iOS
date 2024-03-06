@@ -35,27 +35,6 @@ final class BtcTransferViewController: TransferViewControllerBase {
             return
         }
         
-        let history = service.getLocalTransactionHistory()
-        var havePending = false
-        for transaction in history {
-            if case (.pending) = transaction.transactionStatus {
-                havePending = true
-            }
-            if case (.registered) = transaction.transactionStatus {
-                havePending = true
-            }
-        }
-        if havePending {
-            dialogService.showAlert(
-                title: nil,
-                message: String.adamant.transfer.pendingTxError(coin: BtcWalletService.tokenNetworkSymbol),
-                style: AdamantAlertStyle.alert,
-                actions: nil,
-                from: nil
-            )
-            return
-        }
-        
         dialogService.showProgress(withMessage: String.adamant.transfer.transferProcessingMessage, userInteractionEnable: false)
         
         Task {
@@ -65,6 +44,18 @@ final class BtcTransferViewController: TransferViewControllerBase {
                     amount: amount,
                     fee: transactionFee
                 )
+                
+                if await !readyToSendFunds() {
+                    dialogService.dismissProgress()
+                    dialogService.showAlert(
+                        title: nil,
+                        message: String.adamant.transfer.pendingTxError(coin: service.tokenSymbol),
+                        style: AdamantAlertStyle.alert,
+                        actions: nil,
+                        from: nil
+                    )
+                    return
+                }
                 
                 // Send adm report
                 if let reportRecipient = admReportRecipient,

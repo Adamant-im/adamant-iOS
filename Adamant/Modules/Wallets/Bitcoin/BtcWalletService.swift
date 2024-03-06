@@ -693,11 +693,7 @@ extension BtcWalletService {
     }
 
     func loadTransactions(offset: Int, limit: Int) async throws -> Int {
-        let txId = offset == .zero
-        ? transactions.first?.txId
-        : transactions.last?.txId
-        
-        let trs = try await getTransactions(fromTx: txId)
+        let trs = try await getTransactionsHistory(offset: offset, limit: limit)
         
         guard trs.count > 0 else {
             hasMoreOldTransactions = false
@@ -707,6 +703,14 @@ extension BtcWalletService {
         coinStorage.append(trs)
     
         return trs.count
+    }
+    
+    func getTransactionsHistory(offset: Int, limit: Int) async throws -> [TransactionDetails] {
+        let txId = offset == .zero
+        ? transactions.first?.txId
+        : transactions.last?.txId
+        
+        return try await getTransactions(fromTx: txId)
     }
     
     func getLocalTransactionHistory() -> [TransactionDetails] {
