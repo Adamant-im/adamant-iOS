@@ -56,6 +56,7 @@ struct EthTransaction {
     let blockNumber: String?
     let currencySymbol: String
     
+    var nonce: Int? = nil
     var isOutgoing: Bool = false
 }
 
@@ -163,7 +164,9 @@ extension EthTransaction: TransactionDetails {
     }
     
     var nonceRaw: String? {
-        nil
+        guard let nonce = nonce else { return nil }
+        
+        return String(nonce)
     }
 }
 
@@ -225,6 +228,7 @@ extension CodableTransaction {
             receiptStatus: receiptStatus,
             blockNumber: blockNumber,
             currencySymbol: token?.symbol ?? EthWalletService.currencySymbol,
+            nonce: Int(nonce),
             isOutgoing: isOutgoing
         )
     }

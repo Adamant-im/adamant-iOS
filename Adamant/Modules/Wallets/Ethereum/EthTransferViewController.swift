@@ -47,6 +47,21 @@ final class EthTransferViewController: TransferViewControllerBase {
                     fee: transactionFee
                 )
                 
+                if await !readyToSendFunds(
+                    with: Int(transaction.nonce),
+                    service: service
+                ) {
+                    dialogService.dismissProgress()
+                    dialogService.showAlert(
+                        title: nil,
+                        message: String.adamant.transfer.pendingTxError(coin: service.tokenSymbol),
+                        style: AdamantAlertStyle.alert,
+                        actions: nil,
+                        from: nil
+                    )
+                    return
+                }
+                
                 guard let txHash = transaction.txHash else {
                     throw WalletServiceError.internalError(
                         message: "Transaction making failure",
@@ -95,6 +110,25 @@ final class EthTransferViewController: TransferViewControllerBase {
                 dialogService.showRichError(error: error)
             }
         }
+    }
+    
+    private func readyToSendFunds(with nonce: Int, service: EthWalletService) async -> Bool {
+        var history = service.getLocalTransactionHistory()
+        
+        if history.isEmpty {
+            history = (try? await service.getTransactionsHistory(offset: .zero, limit: 2)) ?? []
+        }
+        
+        let pendingTx = history.filter {
+            $0.transactionStatus == .pending || $0.transactionStatus == .registered
+        }.first
+        
+        guard let pendingTx = pendingTx,
+              let detailTx = try? await service.getTransaction(by: pendingTx.txId) else {
+            return true
+        }
+        
+        return detailTx.nonce != nonce
     }
     
     private func presentDetailTransactionVC(
