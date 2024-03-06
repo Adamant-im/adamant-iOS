@@ -67,6 +67,64 @@ public final class NativeAdamantCore {
         return decrepted.utf8String
     }
     
+    public func encodeData(
+        _ data: Data,
+        recipientPublicKey publicKey: String,
+        privateKey privateKeyHex: String
+    ) -> (data: Data, nonce: String)? {
+        let message = data.bytes
+        let recipientKey = publicKey.hexBytes()
+        let privateKey = privateKeyHex.hexBytes()
+        
+        guard let publicKey = Crypto.ed2Curve.publicKey(recipientKey) else {
+            print("FAIL to create ed2curve publick key from SHA256")
+            return nil
+        }
+        
+        guard let secretKey = Crypto.ed2Curve.privateKey(privateKey) else {
+            print("FAIL to create ed2curve secret key from SHA256")
+            return nil
+        }
+        
+        guard let encrypted = Crypto.box.seal(message: message, recipientPublicKey: publicKey, senderSecretKey: secretKey) else {
+            print("FAIL to encrypt")
+            return nil
+        }
+        
+        let encryptedData = encrypted.authenticatedCipherText.toData()
+        let nonce = encrypted.nonce.hexString()
+        
+        return (data: encryptedData, nonce: nonce)
+    }
+    
+    public func decodeData(
+        _ data: Data,
+        rawNonce: String,
+        senderPublicKey senderKeyHex: String,
+        privateKey privateKeyHex: String
+    ) -> Data? {
+        let message = data.bytes
+        let nonce = rawNonce.hexBytes()
+        let senderKey = senderKeyHex.hexBytes()
+        let privateKey = privateKeyHex.hexBytes()
+        
+        guard let publicKey = Crypto.ed2Curve.publicKey(senderKey) else {
+            print("FAIL to create ed2curve publick key from SHA256")
+            return nil
+        }
+        
+        guard let secretKey = Crypto.ed2Curve.privateKey(privateKey) else {
+            print("FAIL to create ed2curve secret key from SHA256")
+            return nil
+        }
+        
+        guard let decrepted = Crypto.box.open(authenticatedCipherText: message, senderPublicKey: publicKey, recipientSecretKey: secretKey, nonce: nonce) else {
+            print("FAIL to decrypt")
+            return nil
+        }
+        
+        return decrepted.toData()
+    }
     // MARK: - Values
     
     public func encodeValue(_ value: [String: Any], privateKey privateKeyHex: String) -> (message: String, nonce: String)? {

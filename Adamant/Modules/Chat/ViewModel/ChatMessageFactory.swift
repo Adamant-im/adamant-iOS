@@ -10,6 +10,7 @@ import UIKit
 import MarkdownKit
 import MessageKit
 import CommonKit
+import FilesStorageKit
 
 struct ChatMessageFactory {
     private let walletServiceCompose: WalletServiceCompose
@@ -71,7 +72,8 @@ struct ChatMessageFactory {
         expireDate: inout Date?,
         currentSender: SenderType,
         dateHeaderOn: Bool,
-        topSpinnerOn: Bool
+        topSpinnerOn: Bool,
+        uploadingFilesIDs: [String]
     ) -> ChatMessage {
         let sentDate = transaction.sentDate ?? .now
         let senderModel = ChatSender(transaction: transaction)
@@ -95,7 +97,8 @@ struct ChatMessageFactory {
             content: makeContent(
                 transaction,
                 isFromCurrentSender: currentSender.senderId == senderModel.senderId,
-                backgroundColor: backgroundColor
+                backgroundColor: backgroundColor,
+                uploadingFilesIDs: uploadingFilesIDs
             ),
             backgroundColor: backgroundColor,
             bottomString: makeBottomString(
@@ -115,7 +118,8 @@ private extension ChatMessageFactory {
     func makeContent(
         _ transaction: ChatTransaction,
         isFromCurrentSender: Bool,
-        backgroundColor: ChatMessageBackgroundColor
+        backgroundColor: ChatMessageBackgroundColor,
+        uploadingFilesIDs: [String]
     ) -> ChatMessage.Content {
         switch transaction {
         case let transaction as MessageTransaction:
@@ -126,11 +130,23 @@ private extension ChatMessageFactory {
             )
         case let transaction as RichMessageTransaction:
             if transaction.additionalType == .reply,
-               !transaction.isTransferReply() {
+               !transaction.isTransferReply(),
+               !transaction.isFileReply() {
                 return makeReplyContent(
                     transaction,
                     isFromCurrentSender: isFromCurrentSender,
                     backgroundColor: backgroundColor
+                )
+            }
+            
+            if transaction.additionalType == .file ||
+               (transaction.additionalType == .reply &&
+                transaction.isFileReply()) {
+                return makeFileContent(
+                    transaction,
+                    isFromCurrentSender: isFromCurrentSender,
+                    backgroundColor: backgroundColor,
+                    uploadingFilesIDs: uploadingFilesIDs
                 )
             }
             
@@ -276,6 +292,66 @@ private extension ChatMessageFactory {
             ),
             status: transaction.transactionStatus ?? .notInitiated,
             reactions: reactions,
+            address: address,
+            opponentAddress: opponentAddress
+        )))
+    }
+    
+    func makeFileContent(
+        _ transaction: RichMessageTransaction,
+        isFromCurrentSender: Bool,
+        backgroundColor: ChatMessageBackgroundColor,
+        uploadingFilesIDs: [String]
+    ) -> ChatMessage.Content {
+        let id = transaction.chatMessageId ?? ""
+        
+        let decodedMessage: String = transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) ?? "..."
+        let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
+        
+        let files: [[String: Any]] = transaction.getRichValue(for: RichContentKeys.file.files) ?? [[:]]
+        let storage: String = transaction.getRichValue(for: RichContentKeys.file.storage) ?? .empty
+        
+        let comment: String = transaction.getRichValue(for: RichContentKeys.file.comment) ?? .empty
+        let replyId = transaction.getRichValue(for: RichContentKeys.reply.replyToId) ?? ""
+        let reactions = transaction.richContent?[RichContentKeys.react.reactions] as? Set<Reaction>
+        
+        let address = transaction.isOutgoing
+        ? transaction.senderAddress
+        : transaction.recipientAddress
+        
+        let opponentAddress = transaction.isOutgoing
+        ? transaction.recipientAddress
+        : transaction.senderAddress
+        
+        let chatFiles = files.map {
+            ChatFile.init(
+                file: RichMessageFile.File.init($0),
+                previewData: FilesStorageKit.shared.getPreview(
+                    for: $0[RichContentKeys.file.file_id] as? String ?? .empty,
+                    type: $0[RichContentKeys.file.file_type] as? String ?? .empty
+                ),
+                isDownloading: false,
+                isUploading: uploadingFilesIDs.contains($0[RichContentKeys.file.file_id] as? String ?? .empty),
+                isCached: FilesStorageKit.shared.isCached($0[RichContentKeys.file.file_id] as? String ?? .empty),
+                storage: storage,
+                nonce: $0[RichContentKeys.file.nonce] as? String ?? .empty
+            )
+        }
+        print("is reply=\(transaction.isFileReply()), richcontent=\(transaction.richContent)")
+        return .file(.init(value: .init(
+            id: id,
+            isFromCurrentSender: isFromCurrentSender,
+            reactions: reactions,
+            content: .init(
+                id: id,
+                files: chatFiles,
+                isHidden: false,
+                isFromCurrentSender: isFromCurrentSender,
+                isReply: transaction.isFileReply(),
+                replyMessage: decodedMessageMarkDown,
+                replyId: replyId,
+                comment: Self.markdownParser.parse(comment)
+            ),
             address: address,
             opponentAddress: opponentAddress
         )))

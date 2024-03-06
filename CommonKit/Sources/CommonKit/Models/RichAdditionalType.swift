@@ -11,4 +11,5 @@ import Foundation
     case reply = 0
     case reaction = 1
     case base = 2
+    case file = 3
 }

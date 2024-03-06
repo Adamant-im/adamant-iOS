@@ -13,6 +13,8 @@ import UIKit
 import CommonKit
 import AdvancedContextMenuKit
 import ElegantEmojiPicker
+import FilesStorageKit
+import FilesPickerKit
 
 @MainActor
 final class ChatViewModel: NSObject {
@@ -77,6 +79,8 @@ final class ChatViewModel: NSObject {
     let updateChatRead = ObservableSender<Void>()
     let commitVibro = ObservableSender<Void>()
     let layoutIfNeeded = ObservableSender<Void>()
+    let presentFilePicker = ObservableSender<ShareType>()
+    let presentSendTokensVC = ObservableSender<Void>()
     
     @ObservableValue private(set) var isHeaderLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
@@ -91,6 +95,7 @@ final class ChatViewModel: NSObject {
     @ObservableValue var inputText = ""
     @ObservableValue var replyMessage: MessageModel?
     @ObservableValue var scrollToMessage: (toId: String?, fromId: String?)
+    @ObservableValue var filesPicked: [FileResult]?
     
     var startPosition: ChatStartPosition? {
         if let messageIdToShow = messageIdToShow {
@@ -118,6 +123,14 @@ final class ChatViewModel: NSObject {
     
     private var hiddenMessageID: String? {
         didSet { updateHiddenMessage(&messages) }
+    }
+    
+    private var downloadingFilesID: [String] = [] {
+        didSet { updateDownloadingFiles(&messages) }
+    }
+    
+    private var uploadingFilesIDs: [String] = [] {
+        didSet { updateUploadingFiles(&messages) }
     }
     
     init(
@@ -226,6 +239,11 @@ final class ChatViewModel: NSObject {
     }
     
     func sendMessage(text: String) {
+        if filesPicked?.count ?? .zero > .zero {
+            sendFile(text: text)
+            return
+        }
+        
         guard let partnerAddress = chatroom?.partner?.address else { return }
         
         guard chatroom?.partner?.isDummy != true else {
@@ -257,6 +275,123 @@ final class ChatViewModel: NSObject {
                 _ = try await chatsProvider.sendMessage(
                     message,
                     recipientId: partnerAddress,
+                    from: chatroom
+                )
+            } catch {
+                await handleMessageSendingError(error: error, sentText: text)
+            }
+        }.stored(in: tasksStorage)
+    }
+    
+    func sendFile(text: String) {
+        guard let partnerAddress = chatroom?.partner?.address,
+              let files = filesPicked,
+              let keyPair = accountService.keypair
+        else { return }
+        
+        guard chatroom?.partner?.isDummy != true else {
+            dialog.send(.dummy(partnerAddress))
+            return
+        }
+        
+        Task {
+            var richFiles: [RichMessageFile.File] = files.compactMap {
+                RichMessageFile.File.init(
+                    file_id: $0.url.absoluteString,
+                    file_type: $0.extenstion,
+                    file_size: $0.size,
+                    preview_id: nil,
+                    file_name: $0.name,
+                    nonce: .empty
+                )
+            }
+            
+            let messageLocally: AdamantMessage
+            
+            if let replyMessage = replyMessage {
+                messageLocally = .richMessage(
+                    payload: RichFileReply(
+                        replyto_id: replyMessage.id,
+                        reply_message: RichMessageFile(
+                            files: richFiles,
+                            storage: NetworkFileProtocolType.uploadCareApi.rawValue,
+                            comment: text
+                        )
+                    )
+                )
+            } else {
+                messageLocally = .richMessage(
+                    payload: RichMessageFile(
+                        files: richFiles,
+                        storage: NetworkFileProtocolType.uploadCareApi.rawValue,
+                        comment: text
+                    )
+                )
+            }
+            
+            guard await validateSendingMessage(message: messageLocally) else { return }
+            
+            do {
+                let txLocally = try await chatsProvider.sendFileMessageLocally(
+                    messageLocally,
+                    recipientId: partnerAddress,
+                    from: chatroom
+                )
+                
+                richFiles.forEach { file in
+                    uploadingFilesIDs.append(file.file_id)
+                }
+                
+                for file in files {
+                    let result = try await FilesStorageKit.shared.uploadFile(
+                        file,
+                        recipientPublicKey: chatroom?.partner?.publicKey ?? "",
+                        senderPrivateKey: keyPair.privateKey
+                    )
+                    
+                    let oldId = file.url.absoluteString
+                    uploadingFilesIDs.removeAll(where: { $0 == oldId })
+                    updateUploadingFileId(&messages, oldId: oldId, newId: result.id)
+                    
+                    if let index = richFiles.firstIndex(
+                        where: { $0.file_id == oldId }
+                    ) {
+                        richFiles[index].file_id = result.id
+                        richFiles[index].nonce = result.nonce
+                    }
+                }
+                
+                let message: AdamantMessage
+                
+                if let replyMessage = replyMessage {
+                    message = .richMessage(
+                        payload: RichFileReply(
+                            replyto_id: replyMessage.id,
+                            reply_message: RichMessageFile(
+                                files: richFiles,
+                                storage: NetworkFileProtocolType.uploadCareApi.rawValue,
+                                comment: text
+                            )
+                        )
+                    )
+                } else {
+                    message = .richMessage(
+                        payload: RichMessageFile(
+                            files: richFiles,
+                            storage: NetworkFileProtocolType.uploadCareApi.rawValue,
+                            comment: text
+                        )
+                    )
+                }
+                
+                replyMessage = nil
+                filesPicked = nil
+                
+                _ = try await chatsProvider.sendFileMessage(
+                    message,
+                    recipientId: partnerAddress,
+                    transactionLocaly: txLocally.0,
+                    context: txLocally.1,
                     from: chatroom
                 )
             } catch {
@@ -601,6 +736,69 @@ final class ChatViewModel: NSObject {
         
         return true
     }
+    
+    func processFile(file: ChatFile, isFromCurrentSender: Bool) {
+        guard let keyPair = accountService.keypair else { return }
+        
+        Task {
+            if !file.isCached {
+                defer {
+                    downloadingFilesID.removeAll(where: { $0 == file.file.file_id })
+                }
+                downloadingFilesID.append(file.file.file_id)
+                
+                do {
+                    try await FilesStorageKit.shared.downloadFile(
+                        id: file.file.file_id,
+                        storage: file.storage,
+                        fileType: file.file.file_type ?? .empty,
+                        senderPublicKey: chatroom?.partner?.publicKey ?? .empty,
+                        recipientPrivateKey: keyPair.privateKey,
+                        nonce: file.nonce
+                    )
+                    
+                    updatePreviewForFile(&messages, id: file.file.file_id)
+                } catch {
+                    dialog.send(.alert(error.localizedDescription))
+                }
+                
+                return
+            }
+        }
+    }
+    
+    func presentActionMenu() {
+        dialog.send(.actionMenu)
+    }
+    
+    func didSelectMenuAction(_ action: ShareType) {
+        if case(.sendTokens) = action {
+            presentSendTokensVC.send()
+            return
+        }
+        
+        Task {
+            do {
+                var result: [FileResult] = []
+               // dialog.send(.progress(true))
+                
+                if case(.uploadFile) = action {
+                    result = try await FilesPickerKit.shared.presentDocumentPicker()
+                }
+                if case(.uploadMedia) = action {
+                    result = try await FilesPickerKit.shared.presentImagePicker()
+                }
+                
+                presentFilePicker.send(action)
+                
+                dialog.send(.progress(false))
+                filesPicked = result
+            } catch {
+                dialog.send(.progress(false))
+                dialog.send(.alert(error.localizedDescription))
+            }
+        }
+    }
 }
 
 extension ChatViewModel {
@@ -643,6 +841,10 @@ extension ChatViewModel {
         guard isSendingAvailable else { return }
         
         dialog.send(.renameAlert)
+    }
+    
+    func updateFiles(_ data: [FileResult]) {
+        filesPicked = data
     }
 }
 
@@ -718,7 +920,8 @@ private extension ChatViewModel {
                 transactions: chatTransactions,
                 sender: sender,
                 isNeedToLoadMoreMessages: isNeedToLoadMoreMessages,
-                expirationTimestamp: &expirationTimestamp
+                expirationTimestamp: &expirationTimestamp,
+                uploadingFilesIDs: uploadingFilesIDs
             )
             
             await setupNewMessages(
@@ -927,6 +1130,47 @@ private extension ChatViewModel {
         }
     }
     
+    func updateDownloadingFiles(_ messages: inout [ChatMessage]) {
+        messages.indices.forEach { index in
+            messages[index].getFiles().forEach { file in
+                messages[index].setDownloading(
+                    for: file.file.file_id,
+                    value: downloadingFilesID.contains(file.file.file_id)
+                )
+            }
+        }
+    }
+    
+    func updateUploadingFiles(_ messages: inout [ChatMessage]) {
+        messages.indices.forEach { index in
+            messages[index].getFiles().forEach { file in
+                messages[index].setUploading(
+                    for: file.file.file_id,
+                    value: uploadingFilesIDs.contains(file.file.file_id)
+                )
+            }
+        }
+    }
+    
+    func updateUploadingFileId(
+        _ messages: inout [ChatMessage],
+        oldId: String,
+        newId: String
+    ) {
+        messages.indices.forEach { index in
+            messages[index].updateID(old: oldId, new: newId)
+        }
+    }
+    
+    func updatePreviewForFile(
+        _ messages: inout [ChatMessage],
+        id: String
+    ) {
+        messages.indices.forEach { index in
+            messages[index].updatePreview(for: id)
+        }
+    }
+    
     func isNewReaction(old: [ChatTransaction], new: [ChatTransaction]) -> Bool {
         guard
             let processedDate = old.getMostRecentElementDate(),
@@ -947,6 +1191,8 @@ private extension ChatMessage {
                 return model.value.isHidden
             case let .transaction(model):
                 return model.value.content.isHidden
+            case let .file(model):
+                return model.value.content.isHidden
             }
         }
         
@@ -964,8 +1210,78 @@ private extension ChatMessage {
                 var model = model.value
                 model.content.isHidden = newValue
                 content = .transaction(.init(value: model))
+            case let .file(model):
+                var model = model.value
+                model.content.isHidden = newValue
+                content = .file(.init(value: model))
             }
         }
+    }
+    
+    func getFiles() -> [ChatFile] {
+        guard case let .file(model) = content else { return [] }
+        return model.value.content.files
+    }
+    
+    mutating func setDownloading(for fileId: String, value: Bool) {
+        guard case let .file(fileModel) = content else { return }
+        var model = fileModel.value
+        
+        guard let index = model.content.files.firstIndex(
+            where: { $0.file.file_id == fileId }
+        ) else { return }
+        
+        model.content.files[index].isDownloading = value
+        
+        content = .file(.init(value: model))
+    }
+    
+    mutating func setUploading(for fileId: String, value: Bool) {
+        guard case let .file(fileModel) = content else { return }
+        var model = fileModel.value
+        
+        guard let index = model.content.files.firstIndex(
+            where: { $0.file.file_id == fileId }
+        ) else { return }
+        
+        model.content.files[index].isUploading = value
+        
+        content = .file(.init(value: model))
+    }
+    
+    mutating func updateID(old oldId: String, new newId: String) {
+        guard case let .file(fileModel) = content else { return }
+        var model = fileModel.value
+        
+        guard let index = model.content.files.firstIndex(
+            where: { $0.file.file_id == oldId }
+        ) else { return }
+        
+        model.content.files[index].file.file_id = newId
+        model.content.files[index].previewData = FilesStorageKit.shared.getPreview(
+            for: newId,
+            type: model.content.files[index].file.file_type ?? ""
+        )
+        model.content.files[index].isCached = FilesStorageKit.shared.isCached(newId)
+
+        content = .file(.init(value: model))
+    }
+    
+    mutating func updatePreview(for id: String) {
+        guard case let .file(fileModel) = content else { return }
+        var model = fileModel.value
+        
+        guard let index = model.content.files.firstIndex(
+            where: { $0.file.file_id == id }
+        ) else { return }
+        
+        model.content.files[index].previewData = FilesStorageKit.shared.getPreview(
+            for: id,
+            type: model.content.files[index].file.file_type ?? ""
+        )
+        model.content.files[index].isCached = FilesStorageKit.shared.isCached(id)
+
+        content = .file(.init(value: model))
     }
 }
 

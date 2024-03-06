@@ -448,10 +448,10 @@ extension AdamantDialogService {
                 }
                 
                 alert.addAction(action)
-                
-            case .partnerQR:
+            
+            default:
                 let action = UIAlertAction(title: type.localized, style: .default) { [didSelect] _ in
-                    didSelect?(.partnerQR)
+                    didSelect?(type)
                 }
                 
                 alert.addAction(action)

@@ -106,6 +106,8 @@ private extension ChatDialogManager {
             dismissMenu()
         case .renameAlert:
             showRenameAlert()
+        case .actionMenu:
+            showActionMenu()
         }
     }
     
@@ -134,6 +136,26 @@ private extension ChatDialogManager {
                 makeCancelAction()
             ],
             from: .barButtonItem(sender)
+        )
+    }
+    
+    func showActionMenu() {
+        let didSelect: ((ShareType) -> Void)? = { [weak self] type in
+            self?.viewModel.didSelectMenuAction(type)
+        }
+        
+        dialogService.presentShareAlertFor(
+            string: .empty,
+            types: [
+                .sendTokens,
+                .uploadFile,
+                .uploadMedia
+            ],
+            excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+            animated: true,
+            from: nil,
+            completion: nil,
+            didSelect: didSelect
         )
     }
     
