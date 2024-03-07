@@ -29,7 +29,10 @@ final class ChatMediaCell: MessageContentCell {
     
     override var isSelected: Bool {
         didSet {
-            //containerView.isSelected = isSelected
+            messageContainerView.animateIsSelected(
+                isSelected,
+                originalColor: messageContainerView.backgroundColor
+            )
         }
     }
     

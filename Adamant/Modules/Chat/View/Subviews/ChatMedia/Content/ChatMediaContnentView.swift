@@ -36,6 +36,11 @@ final class ChatMediaContentView: UIView {
         view.layer.cornerRadius = 5
         view.clipsToBounds = true
         
+        view.addGestureRecognizer(UITapGestureRecognizer(
+            target: self,
+            action: #selector(didTap)
+        ))
+        
         view.addSubview(colorView)
         view.addSubview(replyMessageLabel)
         
@@ -140,6 +145,21 @@ private extension ChatMediaContentView {
                 )
             }
         }
+    }
+    
+    @objc func didTap() {
+        actionHandler(.scrollTo(message: .init(
+            id: model.id,
+            replyId: model.replyId,
+            message: NSAttributedString(string: .empty),
+            messageReply: NSAttributedString(string: .empty),
+            backgroundColor: .failed,
+            isFromCurrentSender: true,
+            reactions: nil,
+            address: .empty,
+            opponentAddress: .empty,
+            isHidden: false
+        )))
     }
 }
 
