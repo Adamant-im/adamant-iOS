@@ -326,6 +326,15 @@
         }
       },
       {
+        "package": "Uploadcare",
+        "repositoryURL": "https://github.com/uploadcare/uploadcare-swift.git",
+        "state": {
+          "branch": "master",
+          "revision": "3ab0706a726abcb9c935347add80f855c2a08f12",
+          "version": null
+        }
+      },
+      {
         "package": "Web3swift",
         "repositoryURL": "https://github.com/skywinder/web3swift.git",
         "state": {
