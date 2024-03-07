@@ -14,6 +14,7 @@ import CommonKit
 import AdvancedContextMenuKit
 import ElegantEmojiPicker
 import FilesPickerKit
+import FilesNetworkManagerKit
 
 @MainActor
 final class ChatViewModel: NSObject {
@@ -32,6 +33,7 @@ final class ChatViewModel: NSObject {
     private let walletServiceCompose: WalletServiceCompose
     private let avatarService: AvatarService
     private let emojiService: EmojiService
+    private let filesStorage: FilesStorageProtocol
     
     let chatMessagesListViewModel: ChatMessagesListViewModel
 
@@ -146,7 +148,8 @@ final class ChatViewModel: NSObject {
         walletServiceCompose: WalletServiceCompose,
         avatarService: AvatarService,
         chatMessagesListViewModel: ChatMessagesListViewModel,
-        emojiService: EmojiService
+        emojiService: EmojiService,
+        filesStorage: FilesStorageProtocol
     ) {
         self.chatsProvider = chatsProvider
         self.markdownParser = markdownParser
@@ -162,6 +165,8 @@ final class ChatViewModel: NSObject {
         self.avatarService = avatarService
         self.chatMessagesListViewModel = chatMessagesListViewModel
         self.emojiService = emojiService
+        self.filesStorage = filesStorage
+        
         super.init()
         setupObservers()
     }
@@ -340,7 +345,7 @@ final class ChatViewModel: NSObject {
                 }
                 
                 for file in files {
-                    let result = try await FilesStorageKit.shared.uploadFile(
+                    let result = try await filesStorage.uploadFile(
                         file,
                         recipientPublicKey: chatroom?.partner?.publicKey ?? "",
                         senderPrivateKey: keyPair.privateKey
@@ -348,7 +353,15 @@ final class ChatViewModel: NSObject {
                     
                     let oldId = file.url.absoluteString
                     uploadingFilesIDs.removeAll(where: { $0 == oldId })
-                    updateUploadingFileId(&messages, oldId: oldId, newId: result.id)
+                    
+                    let preview = filesStorage.getPreview(
+                        for: result.id,
+                        type: file.extenstion ?? ""
+                    )
+                    
+                    let cached = filesStorage.isCached(result.id)
+                    
+                    updateFileFields(&messages, id: oldId, newId: result.id, preview: preview, cached: cached)
                     
                     if let index = richFiles.firstIndex(
                         where: { $0.file_id == oldId }
@@ -740,7 +753,7 @@ final class ChatViewModel: NSObject {
                 downloadingFilesID.append(file.file.file_id)
                 
                 do {
-                    try await FilesStorageKit.shared.downloadFile(
+                    try await filesStorage.downloadFile(
                         id: file.file.file_id,
                         storage: file.storage,
                         fileType: file.file.file_type ?? .empty,
@@ -749,7 +762,14 @@ final class ChatViewModel: NSObject {
                         nonce: file.nonce
                     )
                     
-                    updatePreviewForFile(&messages, id: file.file.file_id)
+                    let preview = filesStorage.getPreview(
+                        for: file.file.file_id,
+                        type: file.file.file_type ?? ""
+                    )
+                    
+                    let cached = filesStorage.isCached(file.file.file_id)
+                    
+                    updateFileFields(&messages, id: file.file.file_id, preview: preview, cached: cached)
                 } catch {
                     dialog.send(.alert(error.localizedDescription))
                 }
@@ -1144,22 +1164,15 @@ private extension ChatViewModel {
         }
     }
     
-    func updateUploadingFileId(
+    func updateFileFields(
         _ messages: inout [ChatMessage],
-        oldId: String,
-        newId: String
+        id oldId: String,
+        newId: String? = nil,
+        preview: UIImage?,
+        cached: Bool
     ) {
         messages.indices.forEach { index in
-            messages[index].updateID(old: oldId, new: newId)
-        }
-    }
-    
-    func updatePreviewForFile(
-        _ messages: inout [ChatMessage],
-        id: String
-    ) {
-        messages.indices.forEach { index in
-            messages[index].updatePreview(for: id)
+            messages[index].updateFields(id: oldId, newId: newId, preview: preview, cached: cached)
         }
     }
     
@@ -1241,7 +1254,12 @@ private extension ChatMessage {
         content = .file(.init(value: model))
     }
     
-    mutating func updateID(old oldId: String, new newId: String) {
+    mutating func updateFields(
+        id oldId: String,
+        newId: String? = nil,
+        preview: UIImage?,
+        cached: Bool
+    ) {
         guard case let .file(fileModel) = content else { return }
         var model = fileModel.value
         
@@ -1249,29 +1267,11 @@ private extension ChatMessage {
             where: { $0.file.file_id == oldId }
         ) else { return }
         
-        model.content.files[index].file.file_id = newId
-        model.content.files[index].previewData = FilesStorageKit.shared.getPreview(
-            for: newId,
-            type: model.content.files[index].file.file_type ?? ""
-        )
-        model.content.files[index].isCached = FilesStorageKit.shared.isCached(newId)
-
-        content = .file(.init(value: model))
-    }
-    
-    mutating func updatePreview(for id: String) {
-        guard case let .file(fileModel) = content else { return }
-        var model = fileModel.value
-        
-        guard let index = model.content.files.firstIndex(
-            where: { $0.file.file_id == id }
-        ) else { return }
-        
-        model.content.files[index].previewData = FilesStorageKit.shared.getPreview(
-            for: id,
-            type: model.content.files[index].file.file_type ?? ""
-        )
-        model.content.files[index].isCached = FilesStorageKit.shared.isCached(id)
+        if let newId = newId {
+            model.content.files[index].file.file_id = newId
+        }
+        model.content.files[index].previewData = preview
+        model.content.files[index].isCached = cached
 
         content = .file(.init(value: model))
     }

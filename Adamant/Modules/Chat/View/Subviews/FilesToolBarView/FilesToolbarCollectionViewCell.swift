@@ -9,6 +9,7 @@
 import UIKit
 import SnapKit
 import FilesStorageKit
+import CommonKit
 
 final class FilesToolbarCollectionViewCell: UICollectionViewCell {
     private lazy var imageView = UIImageView(image: .init(systemName: "shareplay"))
