@@ -197,7 +197,7 @@ public struct RichFileReply: RichMessage {
     public func content() -> [String: Any] {
         return [
             RichContentKeys.reply.replyToId: replyto_id,
-            RichContentKeys.reply.replyMessage: reply_message
+            RichContentKeys.reply.replyMessage: reply_message.content()
         ]
     }
 }
