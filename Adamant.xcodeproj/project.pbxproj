@@ -32,6 +32,7 @@
 		3A7BD00E2AA9BCE80045AAB0 /* VibroService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7BD00D2AA9BCE80045AAB0 /* VibroService.swift */; };
 		3A7BD0102AA9BD030045AAB0 /* AdamantVibroService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7BD00F2AA9BD030045AAB0 /* AdamantVibroService.swift */; };
 		3A7BD0122AA9BD5A0045AAB0 /* AdamantVibroType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7BD0112AA9BD5A0045AAB0 /* AdamantVibroType.swift */; };
+		3A833C3A2B98B7EE00238F6A /* FilesNetworkManagerKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3A833C392B98B7EE00238F6A /* FilesNetworkManagerKit */; };
 		3A8875EF27BBF38D00436195 /* Parchment in Frameworks */ = {isa = PBXBuildFile; productRef = 3A8875EE27BBF38D00436195 /* Parchment */; };
 		3A9015A52A614A18002A2464 /* EmojiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A9015A42A614A18002A2464 /* EmojiService.swift */; };
 		3A9015A72A614A62002A2464 /* AdamantEmojiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A9015A62A614A62002A2464 /* AdamantEmojiService.swift */; };
@@ -1254,6 +1255,7 @@
 				A50AEB0C262C81E300B37C22 /* QRCodeReader in Frameworks */,
 				416F5EA4290162EB00EF0400 /* SocketIO in Frameworks */,
 				A5F92994262C855B00C3E60A /* MarkdownKit in Frameworks */,
+				3A833C3A2B98B7EE00238F6A /* FilesNetworkManagerKit in Frameworks */,
 				A50AEB04262C815200B37C22 /* EFQRCode in Frameworks */,
 				A544F0D4262C9878001F1A6D /* Eureka in Frameworks */,
 				3AC76E3D2AB09118008042C4 /* ElegantEmojiPicker in Frameworks */,
@@ -2672,6 +2674,7 @@
 				9342F6C12A6A35E300A9B39F /* CommonKit */,
 				3AC76E3C2AB09118008042C4 /* ElegantEmojiPicker */,
 				3A075C9D2B98A3B100714E3B /* FilesPickerKit */,
+				3A833C392B98B7EE00238F6A /* FilesNetworkManagerKit */,
 			);
 			productName = Adamant;
 			productReference = E913C8EE1FFFA51D001A83F7 /* Adamant.app */;
@@ -4258,6 +4261,10 @@
 		3A075C9D2B98A3B100714E3B /* FilesPickerKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = FilesPickerKit;
+		};
+		3A833C392B98B7EE00238F6A /* FilesNetworkManagerKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FilesNetworkManagerKit;
 		};
 		3A8875EE27BBF38D00436195 /* Parchment */ = {
 			isa = XCSwiftPackageProductDependency;
