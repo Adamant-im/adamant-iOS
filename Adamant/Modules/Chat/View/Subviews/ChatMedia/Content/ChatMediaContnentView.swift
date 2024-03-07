@@ -11,14 +11,6 @@ import UIKit
 import CommonKit
 
 final class ChatMediaContentView: UIView {
-    private lazy var tableView: UITableView = {
-        let tableView = UITableView()
-        tableView.register(ChatFileTableViewCell.self, forCellReuseIdentifier: "cell")
-        tableView.delegate = self
-        tableView.backgroundColor = .clear
-        return tableView
-    }()
-    
     private let commentLabel = UILabel(
         font: commentFont,
         textColor: .adamant.textColor,
@@ -65,13 +57,24 @@ final class ChatMediaContentView: UIView {
     }()
     
     private lazy var verticalStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [replyView, commentLabel, tableView])
+        let stack = UIStackView(arrangedSubviews: [replyView, commentLabel, filesStack])
         stack.axis = .vertical
-        stack.spacing = verticalStackSpacing
+        stack.spacing = .zero
         return stack
     }()
     
-    private lazy var dataSource = TransactionsDiffableDataSource(tableView: tableView, cellProvider: makeCell)
+    private lazy var filesStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.spacing = verticalStackSpacing
+        
+        for _ in 0...5 {
+            let view = ChatFileView()
+            view.snp.makeConstraints { $0.height.equalTo(imageSize) }
+            stack.addArrangedSubview(view)
+        }
+        return stack
+    }()
 
     var model: Model = .default {
         didSet {
@@ -115,43 +118,28 @@ private extension ChatMediaContentView {
         replyView.snp.updateConstraints { make in
             make.height.equalTo(replyViewDynamicHeight)
         }
-        
-        let list = model.files
-        var snapshot = NSDiffableDataSourceSnapshot<Int, ChatFile>()
-        snapshot.appendSections([.zero])
-        snapshot.appendItems(list)
-        snapshot.reconfigureItems(list)
-        dataSource.apply(snapshot, animatingDifferences: false)
+       
+        updateStackLayout()
     }
     
-    func makeCell(
-        tableView: UITableView,
-        indexPath: IndexPath,
-        fileModel: ChatFile
-    ) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! ChatFileTableViewCell
-        cell.model = fileModel
-        cell.backgroundView?.backgroundColor = .clear
-        cell.backgroundColor = .clear
-        cell.contentView.backgroundColor = .clear
-        cell.buttonActionHandler = { [actionHandler, fileModel, model] in
-            actionHandler(
-                .processFile(
-                    file: fileModel,
-                    isFromCurrentSender: model.isFromCurrentSender
+    func updateStackLayout() {
+        let fileList = model.files.prefix(5)
+        
+        filesStack.arrangedSubviews.forEach { $0.isHidden = true }
+        
+        for (index, file) in fileList.enumerated() {
+            let view = filesStack.arrangedSubviews[index] as? ChatFileView
+            view?.isHidden = false
+            view?.model = file
+            view?.buttonActionHandler = { [actionHandler, file, model] in
+                actionHandler(
+                    .processFile(
+                        file: file,
+                        isFromCurrentSender: model.isFromCurrentSender
+                    )
                 )
-            )
+            }
         }
-        return cell
-    }
-}
-
-extension ChatMediaContentView: UITableViewDelegate {
-    func tableView(
-        _ tableView: UITableView,
-        heightForRowAt indexPath: IndexPath
-    ) -> CGFloat {
-        imageSize
     }
 }
 
@@ -180,7 +168,6 @@ extension ChatMediaContentView.Model {
         let textStorage = NSTextStorage(attributedString: attributedText)
         textStorage.addLayoutManager(layoutManager)
         
-        let range = NSRange(location: 0, length: attributedText.length)
         let rect = layoutManager.usedRect(for: textContainer)
         
         return rect.integral.size

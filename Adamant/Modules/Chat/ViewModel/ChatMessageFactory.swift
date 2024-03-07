@@ -338,7 +338,8 @@ private extension ChatMessageFactory {
                 isUploading: uploadingFilesIDs.contains($0[RichContentKeys.file.file_id] as? String ?? .empty),
                 isCached: filesStorage.isCached($0[RichContentKeys.file.file_id] as? String ?? .empty),
                 storage: storage,
-                nonce: $0[RichContentKeys.file.nonce] as? String ?? .empty
+                nonce: $0[RichContentKeys.file.nonce] as? String ?? .empty,
+                isFromCurrentSender: isFromCurrentSender
             )
         }
         

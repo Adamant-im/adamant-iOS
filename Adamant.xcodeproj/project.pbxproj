@@ -17,7 +17,7 @@
 		3A299C732B83975D00B54C61 /* ChatMediaContnentView+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A299C722B83975D00B54C61 /* ChatMediaContnentView+Model.swift */; };
 		3A299C762B84CE4100B54C61 /* FilesToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A299C752B84CE4100B54C61 /* FilesToolbarView.swift */; };
 		3A299C782B84D11100B54C61 /* FilesToolbarCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A299C772B84D11100B54C61 /* FilesToolbarCollectionViewCell.swift */; };
-		3A299C7B2B85EABB00B54C61 /* ChatFileTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A299C7A2B85EABB00B54C61 /* ChatFileTableViewCell.swift */; };
+		3A299C7B2B85EABB00B54C61 /* ChatFileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A299C7A2B85EABB00B54C61 /* ChatFileView.swift */; };
 		3A299C7D2B85F98700B54C61 /* ChatFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A299C7C2B85F98700B54C61 /* ChatFile.swift */; };
 		3A2F55F92AC6F308000A3F26 /* CoinTransaction+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A2F55F72AC6F308000A3F26 /* CoinTransaction+CoreDataClass.swift */; };
 		3A2F55FA2AC6F308000A3F26 /* CoinTransaction+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A2F55F82AC6F308000A3F26 /* CoinTransaction+CoreDataProperties.swift */; };
@@ -676,7 +676,7 @@
 		3A299C722B83975D00B54C61 /* ChatMediaContnentView+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatMediaContnentView+Model.swift"; sourceTree = "<group>"; };
 		3A299C752B84CE4100B54C61 /* FilesToolbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilesToolbarView.swift; sourceTree = "<group>"; };
 		3A299C772B84D11100B54C61 /* FilesToolbarCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilesToolbarCollectionViewCell.swift; sourceTree = "<group>"; };
-		3A299C7A2B85EABB00B54C61 /* ChatFileTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatFileTableViewCell.swift; sourceTree = "<group>"; };
+		3A299C7A2B85EABB00B54C61 /* ChatFileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatFileView.swift; sourceTree = "<group>"; };
 		3A299C7C2B85F98700B54C61 /* ChatFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatFile.swift; sourceTree = "<group>"; };
 		3A2F55F72AC6F308000A3F26 /* CoinTransaction+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoinTransaction+CoreDataClass.swift"; sourceTree = "<group>"; };
 		3A2F55F82AC6F308000A3F26 /* CoinTransaction+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoinTransaction+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -1354,7 +1354,7 @@
 		3A299C6E2B83901000B54C61 /* Content */ = {
 			isa = PBXGroup;
 			children = (
-				3A299C792B85EAA900B54C61 /* Cell */,
+				3A299C792B85EAA900B54C61 /* Views */,
 				3A299C702B83975700B54C61 /* ChatMediaContnentView.swift */,
 				3A299C722B83975D00B54C61 /* ChatMediaContnentView+Model.swift */,
 			);
@@ -1379,12 +1379,12 @@
 			path = FilesToolBarView;
 			sourceTree = "<group>";
 		};
-		3A299C792B85EAA900B54C61 /* Cell */ = {
+		3A299C792B85EAA900B54C61 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				3A299C7A2B85EABB00B54C61 /* ChatFileTableViewCell.swift */,
+				3A299C7A2B85EABB00B54C61 /* ChatFileView.swift */,
 			);
-			path = Cell;
+			path = Views;
 			sourceTree = "<group>";
 		};
 		3A41938D2A580C3B006A6B22 /* RichTransactionReactService */ = {
@@ -3270,7 +3270,7 @@
 				E9E7CDB32002B9FB00DFC4DB /* LoginFactory.swift in Sources */,
 				E941CCDE20E7B70200C96220 /* WalletCollectionViewCell.swift in Sources */,
 				4186B33A294200F4006594A3 /* DashWalletService+DynamicConstants.swift in Sources */,
-				3A299C7B2B85EABB00B54C61 /* ChatFileTableViewCell.swift in Sources */,
+				3A299C7B2B85EABB00B54C61 /* ChatFileView.swift in Sources */,
 				3AF08D5F2B4EB3A200EB82B1 /* LanguageService.swift in Sources */,
 				E9AA8BFA212C166600F9249F /* EthWalletService+Send.swift in Sources */,
 				411743042A39B257008CD98A /* ContributeViewModel.swift in Sources */,
