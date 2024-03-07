@@ -27,6 +27,7 @@ struct ChatFactory {
     let avatarService: AvatarService
     let emojiService: EmojiService
     let walletServiceCompose: WalletServiceCompose
+    let filesStorage: FilesStorageProtocol
     
     nonisolated init(assembler: Assembler) {
         chatsProvider = assembler.resolve(ChatsProvider.self)!
@@ -40,6 +41,7 @@ struct ChatFactory {
         avatarService = assembler.resolve(AvatarService.self)!
         emojiService = assembler.resolve(EmojiService.self)!
         walletServiceCompose = assembler.resolve(WalletServiceCompose.self)!
+        filesStorage = assembler.resolve(FilesStorageProtocol.self)!
     }
     
     func makeViewController(screensFactory: ScreensFactory) -> ChatViewController {
@@ -97,7 +99,8 @@ private extension ChatFactory {
             markdownParser: .init(font: UIFont.systemFont(ofSize: UIFont.systemFontSize)),
             transfersProvider: transferProvider,
             chatMessagesListFactory: .init(chatMessageFactory: .init(
-                walletServiceCompose: walletServiceCompose
+                walletServiceCompose: walletServiceCompose,
+                filesStorage: filesStorage
             )),
             addressBookService: addressBookService,
             visibleWalletService: visibleWalletService,
@@ -111,7 +114,8 @@ private extension ChatFactory {
                 avatarService: avatarService,
                 emojiService: emojiService
             ),
-            emojiService: emojiService
+            emojiService: emojiService,
+            filesStorage: filesStorage
         )
     }
     

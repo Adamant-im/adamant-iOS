@@ -14,6 +14,7 @@ import FilesStorageKit
 
 struct ChatMessageFactory {
     private let walletServiceCompose: WalletServiceCompose
+    private let filesStorage: FilesStorageProtocol
     
     static let markdownParser = MarkdownParser(
         font: .adamantChatDefault,
@@ -63,8 +64,11 @@ struct ChatMessageFactory {
         ]
     )
     
-    init(walletServiceCompose: WalletServiceCompose) {
+    init(walletServiceCompose: WalletServiceCompose,
+         filesStorage: FilesStorageProtocol
+    ) {
         self.walletServiceCompose = walletServiceCompose
+        self.filesStorage = filesStorage
     }
     
     func makeMessage(
@@ -326,18 +330,18 @@ private extension ChatMessageFactory {
         let chatFiles = files.map {
             ChatFile.init(
                 file: RichMessageFile.File.init($0),
-                previewData: FilesStorageKit.shared.getPreview(
+                previewData: filesStorage.getPreview(
                     for: $0[RichContentKeys.file.file_id] as? String ?? .empty,
                     type: $0[RichContentKeys.file.file_type] as? String ?? .empty
                 ),
                 isDownloading: false,
                 isUploading: uploadingFilesIDs.contains($0[RichContentKeys.file.file_id] as? String ?? .empty),
-                isCached: FilesStorageKit.shared.isCached($0[RichContentKeys.file.file_id] as? String ?? .empty),
+                isCached: filesStorage.isCached($0[RichContentKeys.file.file_id] as? String ?? .empty),
                 storage: storage,
                 nonce: $0[RichContentKeys.file.nonce] as? String ?? .empty
             )
         }
-        print("is reply=\(transaction.isFileReply()), richcontent=\(transaction.richContent)")
+        
         return .file(.init(value: .init(
             id: id,
             isFromCurrentSender: isFromCurrentSender,

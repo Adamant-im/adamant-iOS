@@ -9,6 +9,7 @@
 import UIKit
 import SnapKit
 import FilesStorageKit
+import CommonKit
 
 final class FilesToolbarView: UIView {
     private lazy var collectionView: UICollectionView = {

@@ -9,12 +9,16 @@
 import Swinject
 import BitcoinKit
 import CommonKit
+import FilesStorageKit
 
 struct AppAssembly: Assembly {
     func assemble(container: Container) {
         // MARK: - Standalone services
         // MARK: AdamantCore
         container.register(AdamantCore.self) { _ in NativeAdamantCore() }.inObjectScope(.container)
+        
+        // MARK: AdamantCore
+        container.register(FilesStorageProtocol.self) { _ in FilesStorageKit() }.inObjectScope(.container)
         
         // MARK: CellFactory
         container.register(CellFactory.self) { _ in AdamantCellFactory() }.inObjectScope(.container)

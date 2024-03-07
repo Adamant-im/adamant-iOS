@@ -33,6 +33,8 @@
 		3A7BD0102AA9BD030045AAB0 /* AdamantVibroService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7BD00F2AA9BD030045AAB0 /* AdamantVibroService.swift */; };
 		3A7BD0122AA9BD5A0045AAB0 /* AdamantVibroType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7BD0112AA9BD5A0045AAB0 /* AdamantVibroType.swift */; };
 		3A833C3A2B98B7EE00238F6A /* FilesNetworkManagerKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3A833C392B98B7EE00238F6A /* FilesNetworkManagerKit */; };
+		3A833C3E2B99CCD600238F6A /* FilesStorageProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A833C3D2B99CCD600238F6A /* FilesStorageProtocol.swift */; };
+		3A833C402B99CDA000238F6A /* FilesStorageKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3A833C3F2B99CDA000238F6A /* FilesStorageKit */; };
 		3A8875EF27BBF38D00436195 /* Parchment in Frameworks */ = {isa = PBXBuildFile; productRef = 3A8875EE27BBF38D00436195 /* Parchment */; };
 		3A9015A52A614A18002A2464 /* EmojiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A9015A42A614A18002A2464 /* EmojiService.swift */; };
 		3A9015A72A614A62002A2464 /* AdamantEmojiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A9015A62A614A62002A2464 /* AdamantEmojiService.swift */; };
@@ -689,6 +691,7 @@
 		3A7BD00D2AA9BCE80045AAB0 /* VibroService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VibroService.swift; sourceTree = "<group>"; };
 		3A7BD00F2AA9BD030045AAB0 /* AdamantVibroService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantVibroService.swift; sourceTree = "<group>"; };
 		3A7BD0112AA9BD5A0045AAB0 /* AdamantVibroType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantVibroType.swift; sourceTree = "<group>"; };
+		3A833C3D2B99CCD600238F6A /* FilesStorageProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilesStorageProtocol.swift; sourceTree = "<group>"; };
 		3A9015A42A614A18002A2464 /* EmojiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiService.swift; sourceTree = "<group>"; };
 		3A9015A62A614A62002A2464 /* AdamantEmojiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantEmojiService.swift; sourceTree = "<group>"; };
 		3A9015A82A615893002A2464 /* ChatMessagesListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesListViewModel.swift; sourceTree = "<group>"; };
@@ -1255,6 +1258,7 @@
 				A50AEB0C262C81E300B37C22 /* QRCodeReader in Frameworks */,
 				416F5EA4290162EB00EF0400 /* SocketIO in Frameworks */,
 				A5F92994262C855B00C3E60A /* MarkdownKit in Frameworks */,
+				3A833C402B99CDA000238F6A /* FilesStorageKit in Frameworks */,
 				3A833C3A2B98B7EE00238F6A /* FilesNetworkManagerKit in Frameworks */,
 				A50AEB04262C815200B37C22 /* EFQRCode in Frameworks */,
 				A544F0D4262C9878001F1A6D /* Eureka in Frameworks */,
@@ -2031,6 +2035,7 @@
 				3A2F55FB2AC6F885000A3F26 /* CoinStorage.swift */,
 				3A96E37B2AED27F8001F5A52 /* PartnerQRService.swift */,
 				3AF08D602B4EB3C400EB82B1 /* LanguageStorageProtocol.swift */,
+				3A833C3D2B99CCD600238F6A /* FilesStorageProtocol.swift */,
 			);
 			path = ServiceProtocols;
 			sourceTree = "<group>";
@@ -2675,6 +2680,7 @@
 				3AC76E3C2AB09118008042C4 /* ElegantEmojiPicker */,
 				3A075C9D2B98A3B100714E3B /* FilesPickerKit */,
 				3A833C392B98B7EE00238F6A /* FilesNetworkManagerKit */,
+				3A833C3F2B99CDA000238F6A /* FilesStorageKit */,
 			);
 			productName = Adamant;
 			productReference = E913C8EE1FFFA51D001A83F7 /* Adamant.app */;
@@ -3417,6 +3423,7 @@
 				A50A41132822FC35006BDFE1 /* BtcWalletService+Send.swift in Sources */,
 				A5E04229282A998C0076CD13 /* BtcTransactionResponse.swift in Sources */,
 				4186B334294200C5006594A3 /* EthWalletService+DynamicConstants.swift in Sources */,
+				3A833C3E2B99CCD600238F6A /* FilesStorageProtocol.swift in Sources */,
 				93CCAE802B06E2D100EA5B94 /* ApiServiceError+Extension.swift in Sources */,
 				644EC34F20EFA77A00F40C73 /* Delegate.swift in Sources */,
 				64EAB37622463F680018D9B2 /* AdamantCurrencyInfoService.swift in Sources */,
@@ -4265,6 +4272,10 @@
 		3A833C392B98B7EE00238F6A /* FilesNetworkManagerKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = FilesNetworkManagerKit;
+		};
+		3A833C3F2B99CDA000238F6A /* FilesStorageKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FilesStorageKit;
 		};
 		3A8875EE27BBF38D00436195 /* Parchment */ = {
 			isa = XCSwiftPackageProductDependency;
