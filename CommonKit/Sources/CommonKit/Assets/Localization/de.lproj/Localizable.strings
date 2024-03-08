@@ -317,7 +317,7 @@
 "ChatListPage.Title" = "Chats";
 
 /* ChatsProvider: Notify user that he doesn't have money to pay a message fee */
-"ChatsProvider.Error.notEnoughMoney" = "Sie haben nicht genügend Tokens, um eine Nachricht zu senden";
+"ChatsProvider.Error.notEnoughMoney" = "Nicht genug ADM für die Blockchain-Gebühr für Nachrichten";
 
 /* ChatsProvider: Transaction not found error. %@ for transaction's ID */
 "ChatsProvider.Error.TransactionNotFoundFormat" = "Nachricht mit der ID %@ nicht gefunden";

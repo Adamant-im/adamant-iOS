@@ -314,7 +314,7 @@
 "ChatListPage.Title" = "Chats";
 
 /* ChatsProvider: Notify user that he doesn't have money to pay a message fee */
-"ChatsProvider.Error.notEnoughMoney" = "Zero balance. Get free ADM tokens";
+"ChatsProvider.Error.notEnoughMoney" = "Not enough ADM for the message blockchain fee";
 
 /* ChatsProvider: Transaction not found error. %@ for transaction's ID */
 "ChatsProvider.Error.TransactionNotFoundFormat" = "Message with id %@ not found";
