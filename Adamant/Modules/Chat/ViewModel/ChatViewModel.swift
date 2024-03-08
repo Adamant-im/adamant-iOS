@@ -189,7 +189,7 @@ final class ChatViewModel: NSObject {
         }
     }
     
-    func presentKeyboardIfNeeded() {
+    func presentKeyboardOnStartIfNeeded() {
         guard !inputText.isEmpty && replyMessage == nil else { return }
         presentKeyboard.send()
     }
