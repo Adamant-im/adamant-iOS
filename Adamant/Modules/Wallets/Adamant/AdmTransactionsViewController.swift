@@ -89,7 +89,7 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
     override func reloadData() {
         guard reachabilityMonitor.connection else {
             dialogService.showCompactError(
-                withMessage: .adamant.alert.noInternetTransferBody,
+                withMessage: .adamant.sharedErrors.networkError,
                 supportEmail: false,
                 error: nil
             )
