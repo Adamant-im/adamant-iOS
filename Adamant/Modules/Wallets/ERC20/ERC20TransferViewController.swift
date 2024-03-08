@@ -53,17 +53,12 @@ final class ERC20TransferViewController: TransferViewControllerBase {
                     fee: transactionFee
                 )
                 
-                if await !readyToSendFunds(
+                if await !doesNotContainSendingTx(
                     with: Int(transaction.nonce),
+                    id: transaction.txHash,
                     service: service
                 ) {
-                    dialogService.showAlert(
-                        title: nil,
-                        message: String.adamant.transfer.pendingTxError(coin: service.tokenSymbol),
-                        style: AdamantAlertStyle.alert,
-                        actions: nil,
-                        from: nil
-                    )
+                    presentSendingError()
                     return
                 }
                 
@@ -156,20 +151,30 @@ final class ERC20TransferViewController: TransferViewControllerBase {
         )
     }
     
-    private func readyToSendFunds(with nonce: Int, service: ERC20WalletService) async -> Bool {
+    private func doesNotContainSendingTx(
+        with nonce: Int,
+        id: String?,
+        service: ERC20WalletService
+    ) async -> Bool {
         var history = service.getLocalTransactionHistory()
         
         if history.isEmpty {
             history = (try? await service.getTransactionsHistory(offset: .zero, limit: 2)) ?? []
         }
         
-        let pendingTx = history.filter {
-            $0.transactionStatus == .pending || $0.transactionStatus == .registered
-        }.first
-        
-        guard let pendingTx = pendingTx,
-              let detailTx = try? await service.getTransaction(by: pendingTx.txId) else {
+        let pendingTx = history.first(where: {
+            $0.transactionStatus == .pending
+            || $0.transactionStatus == .registered
+            || $0.transactionStatus == .notInitiated
+            || $0.txId == id
+        })
+                
+        guard let pendingTx = pendingTx else {
             return true
+        }
+        
+        guard let detailTx = try? await service.getTransaction(by: pendingTx.txId) else {
+            return false
         }
         
         return detailTx.nonce != nonce

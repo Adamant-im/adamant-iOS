@@ -1206,7 +1206,7 @@ extension TransferViewControllerBase {
         }
     }
     
-    func readyToSendFunds() async -> Bool {
+    func doesNotContainSendingTx() async -> Bool {
         var history = walletCore.getLocalTransactionHistory()
         
         if history.isEmpty {
@@ -1223,7 +1223,7 @@ extension TransferViewControllerBase {
         return !havePending
     }
     
-    func readyToSendFunds(with nonce: String) async -> Bool {
+    func doesNotContainSendingTx(with nonce: String) async -> Bool {
         var history = walletCore.getLocalTransactionHistory()
         
         if history.isEmpty {
@@ -1236,5 +1236,16 @@ extension TransferViewControllerBase {
         let nonces = history.compactMap { $0.nonceRaw }
         
         return !nonces.contains(nonce)
+    }
+    
+    func presentSendingError() {
+        dialogService.dismissProgress()
+        dialogService.showAlert(
+            title: nil,
+            message: String.adamant.transfer.pendingTxError(coin: walletCore.tokenSymbol),
+            style: AdamantAlertStyle.alert,
+            actions: nil,
+            from: nil
+        )
     }
 }

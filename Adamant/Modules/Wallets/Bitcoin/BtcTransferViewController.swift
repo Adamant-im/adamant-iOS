@@ -45,15 +45,8 @@ final class BtcTransferViewController: TransferViewControllerBase {
                     fee: transactionFee
                 )
                 
-                if await !readyToSendFunds() {
-                    dialogService.dismissProgress()
-                    dialogService.showAlert(
-                        title: nil,
-                        message: String.adamant.transfer.pendingTxError(coin: service.tokenSymbol),
-                        style: AdamantAlertStyle.alert,
-                        actions: nil,
-                        from: nil
-                    )
+                if await !doesNotContainSendingTx() {
+                    presentSendingError()
                     return
                 }
                 

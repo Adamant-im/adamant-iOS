@@ -79,15 +79,8 @@ final class LskTransferViewController: TransferViewControllerBase {
                     fee: transactionFee
                 )
                 
-                if await !readyToSendFunds(with: String(transaction.nonce)) {
-                    dialogService.dismissProgress()
-                    dialogService.showAlert(
-                        title: nil,
-                        message: String.adamant.transfer.pendingTxError(coin: service.tokenSymbol),
-                        style: AdamantAlertStyle.alert,
-                        actions: nil,
-                        from: nil
-                    )
+                if await !doesNotContainSendingTx(with: String(transaction.nonce)) {
+                    presentSendingError()
                     return
                 }
                 

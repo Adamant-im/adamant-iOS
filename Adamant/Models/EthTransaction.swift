@@ -56,7 +56,7 @@ struct EthTransaction {
     let blockNumber: String?
     let currencySymbol: String
     
-    var nonce: Int? = nil
+    var nonce: Int?
     var isOutgoing: Bool = false
 }
 

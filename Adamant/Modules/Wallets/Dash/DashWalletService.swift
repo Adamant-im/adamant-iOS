@@ -467,7 +467,7 @@ extension DashWalletService {
     
     func getTransactionsHistory(offset: Int, limit: Int) async throws -> [TransactionDetails] {
         guard let address = wallet?.address else {
-            return []
+            throw WalletServiceError.accountNotFound
         }
         
         let allTransactionsIds = try await requestTransactionsIds(for: address).reversed()
