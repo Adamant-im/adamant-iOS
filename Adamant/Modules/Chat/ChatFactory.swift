@@ -26,6 +26,7 @@ struct ChatFactory {
     let avatarService: AvatarService
     let emojiService: EmojiService
     let walletServiceCompose: WalletServiceCompose
+    let chatPreservation: ChatPreservationProtocol
     
     nonisolated init(assembler: Assembler) {
         chatsProvider = assembler.resolve(ChatsProvider.self)!
@@ -39,6 +40,7 @@ struct ChatFactory {
         avatarService = assembler.resolve(AvatarService.self)!
         emojiService = assembler.resolve(EmojiService.self)!
         walletServiceCompose = assembler.resolve(WalletServiceCompose.self)!
+        chatPreservation = assembler.resolve(ChatPreservationProtocol.self)!
     }
     
     func makeViewController(screensFactory: ScreensFactory) -> ChatViewController {
@@ -110,7 +112,8 @@ private extension ChatFactory {
                 avatarService: avatarService,
                 emojiService: emojiService
             ),
-            emojiService: emojiService
+            emojiService: emojiService,
+            chatPreservation: chatPreservation
         )
     }
     

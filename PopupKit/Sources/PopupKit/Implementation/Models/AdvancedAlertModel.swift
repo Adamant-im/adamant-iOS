@@ -10,14 +10,14 @@ import CommonKit
 
 public struct AdvancedAlertModel: Equatable, Hashable {
     public let icon: UIImage
-    public let title: String
+    public let title: String?
     public let text: String
     public let secondaryButton: Button?
     public let primaryButton: Button
     
     public init(
         icon: UIImage,
-        title: String,
+        title: String?,
         text: String,
         secondaryButton: Button?,
         primaryButton: Button

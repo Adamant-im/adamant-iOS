@@ -323,7 +323,7 @@ extension DogeWalletService {
                 }
             }
             
-            service.setState(.upToDate, silent: true)
+            service.setState(.upToDate)
             
             Task {
                 await service.update()

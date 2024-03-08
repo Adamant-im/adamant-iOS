@@ -454,7 +454,8 @@ extension BtcWalletService {
                 throw WalletServiceError.accountNotFound
             }
             
-            service.setState(.upToDate, silent: true)
+            service.setState(.upToDate)
+            
             Task {
                 service.update()
             }

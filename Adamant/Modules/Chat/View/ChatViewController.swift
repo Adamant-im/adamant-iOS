@@ -108,6 +108,7 @@ final class ChatViewController: MessagesViewController {
         configureGestures()
         setupObservers()
         viewModel.loadFirstMessagesIfNeeded()
+        viewModel.presentKeyboardOnStartIfNeeded()
     }
     
     override func viewWillLayoutSubviews() {
@@ -142,6 +143,7 @@ final class ChatViewController: MessagesViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         viewModel.preserveMessage(inputBar.text)
+        viewModel.preserveReplayMessage()
         viewModel.saveChatOffset(
             isScrollPositionNearlyTheBottom
             ? nil
@@ -264,6 +266,12 @@ private extension ChatViewController {
         viewModel.$inputText
             .removeDuplicates()
             .assign(to: \.text, on: inputBar)
+            .store(in: &subscriptions)
+                
+        viewModel.presentKeyboard
+            .sink { [weak self] in
+                self?.messageInputBar.inputTextView.becomeFirstResponder()
+            }
             .store(in: &subscriptions)
         
         viewModel.$isSendingAvailable

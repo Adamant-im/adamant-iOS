@@ -16,18 +16,6 @@ final class LskTransferViewController: TransferViewControllerBase {
     
     // MARK: Properties
     
-    override var minToTransfer: Decimal {
-        get async throws {
-            guard let recipientAddress = recipientAddress else {
-                throw WalletServiceError.accountNotFound
-            }
-            
-            let recepientBalance = try await walletCore.getBalance(address: recipientAddress)
-            let minimumAmount = walletCore.minBalance - recepientBalance
-            return try await max(super.minToTransfer, minimumAmount)
-        }
-    }
-    
     private let prefix = "lsk"
     
     override func checkForAdditionalFee() {

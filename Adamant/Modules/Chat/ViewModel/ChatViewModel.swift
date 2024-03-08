@@ -31,13 +31,13 @@ final class ChatViewModel: NSObject {
     private let walletServiceCompose: WalletServiceCompose
     private let avatarService: AvatarService
     private let emojiService: EmojiService
-    
+    private let chatPreservation: ChatPreservationProtocol
+
     let chatMessagesListViewModel: ChatMessagesListViewModel
 
     // MARK: Properties
     
     private var tasksStorage = TaskManager()
-    private weak var preservationDelegate: ChatPreservationDelegate?
     private var controller: NSFetchedResultsController<ChatTransaction>?
     private var subscriptions = Set<AnyCancellable>()
     private var timerSubscription: AnyCancellable?
@@ -77,6 +77,7 @@ final class ChatViewModel: NSObject {
     let updateChatRead = ObservableSender<Void>()
     let commitVibro = ObservableSender<Void>()
     let layoutIfNeeded = ObservableSender<Void>()
+    let presentKeyboard = ObservableSender<Void>()
     
     @ObservableValue private(set) var isHeaderLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
@@ -134,7 +135,8 @@ final class ChatViewModel: NSObject {
         walletServiceCompose: WalletServiceCompose,
         avatarService: AvatarService,
         chatMessagesListViewModel: ChatMessagesListViewModel,
-        emojiService: EmojiService
+        emojiService: EmojiService,
+        chatPreservation: ChatPreservationProtocol
     ) {
         self.chatsProvider = chatsProvider
         self.markdownParser = markdownParser
@@ -150,6 +152,7 @@ final class ChatViewModel: NSObject {
         self.avatarService = avatarService
         self.chatMessagesListViewModel = chatMessagesListViewModel
         self.emojiService = emojiService
+        self.chatPreservation = chatPreservation
         super.init()
         setupObservers()
     }
@@ -157,12 +160,10 @@ final class ChatViewModel: NSObject {
     func setup(
         account: AdamantAccount?,
         chatroom: Chatroom,
-        messageIdToShow: String?,
-        preservationDelegate: ChatPreservationDelegate?
+        messageIdToShow: String?
     ) {
         assert(self.chatroom == nil, "Can't setup several times")
         self.chatroom = chatroom
-        self.preservationDelegate = preservationDelegate
         self.messageIdToShow = messageIdToShow
         controller = chatsProvider.getChatController(for: chatroom)
         controller?.delegate = self
@@ -175,7 +176,7 @@ final class ChatViewModel: NSObject {
         }
         
         if let partnerAddress = chatroom.partner?.address {
-            preservationDelegate?.getPreservedMessageFor(
+            chatPreservation.getPreservedMessageFor(
                 address: partnerAddress,
                 thenRemoveIt: true
             ).map { inputText = $0 }
@@ -183,7 +184,14 @@ final class ChatViewModel: NSObject {
             let cachedMessages = chatCacheService.getMessages(address: partnerAddress)
             messages = cachedMessages ?? []
             fullscreenLoading = cachedMessages == nil
+            
+            replyMessage = chatPreservation.getReplyMessage(address: partnerAddress, thenRemoveIt: true)
         }
+    }
+    
+    func presentKeyboardOnStartIfNeeded() {
+        guard !inputText.isEmpty && replyMessage == nil else { return }
+        presentKeyboard.send()
     }
     
     func loadFirstMessagesIfNeeded() {
@@ -276,7 +284,12 @@ final class ChatViewModel: NSObject {
     
     func preserveMessage(_ message: String) {
         guard let partnerAddress = chatroom?.partner?.address else { return }
-        preservationDelegate?.preserveMessage(message, forAddress: partnerAddress)
+        chatPreservation.preserveMessage(message, forAddress: partnerAddress)
+    }
+    
+    func preserveReplayMessage() {
+        guard let partnerAddress = chatroom?.partner?.address else { return }
+        chatPreservation.setReplyMessage(replyMessage, forAddress: partnerAddress)
     }
     
     func blockChat() {

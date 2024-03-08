@@ -29,11 +29,12 @@ struct LskWalletFactory: WalletFactory {
     }
     
     func makeTransferListVC(service: Service, screensFactory: ScreensFactory) -> UIViewController {
-        let c = LskTransactionsViewController(nibName: "TransactionsListViewControllerBase", bundle: nil)
-        c.dialogService = assembler.resolve(DialogService.self)
-        c.screensFactory = screensFactory
-        c.walletService = service
-        return c
+        LskTransactionsViewController(
+            walletService: service,
+            dialogService: assembler.resolve(DialogService.self)!,
+            reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
+            screensFactory: screensFactory
+        )
     }
     
     func makeTransferVC(service: Service, screensFactory: ScreensFactory) -> TransferViewControllerBase {

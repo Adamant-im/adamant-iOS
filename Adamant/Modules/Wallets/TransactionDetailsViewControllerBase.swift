@@ -47,8 +47,10 @@ extension String.adamant {
 }
 
 extension String.adamant.alert {
-    static let exportUrlButton = String.localized("TransactionDetailsScene.Share.URL", comment: "Export transaction: 'Share transaction URL' button")
-    static let exportSummaryButton = String.localized("TransactionDetailsScene.Share.Summary", comment: "Export transaction: 'Share transaction summary' button")
+    static var exportUrlButton: String { String.localized("TransactionDetailsScene.Share.URL", comment: "Export transaction: 'Share transaction URL' button")
+    }
+    static var exportSummaryButton: String { String.localized("TransactionDetailsScene.Share.Summary", comment: "Export transaction: 'Share transaction summary' button")
+    }
 }
 
 class TransactionDetailsViewControllerBase: FormViewController {

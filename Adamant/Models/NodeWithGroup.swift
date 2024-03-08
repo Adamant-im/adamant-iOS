@@ -33,4 +33,13 @@ extension NodeGroup {
             return AdmWalletService.tokenNetworkSymbol
         }
     }
+    
+    var includeVersionTitle: Bool {
+        switch self {
+        case .btc, .lskNode, .lskService, .doge, .adm:
+            return true
+        case .eth, .dash:
+            return false
+        }
+    }
 }

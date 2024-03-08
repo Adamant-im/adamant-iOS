@@ -380,7 +380,7 @@ extension LskWalletService {
                 }
             }
             
-            service.setState(.upToDate, silent: true)
+            service.setState(.upToDate)
             
             Task {
                 await service.update()

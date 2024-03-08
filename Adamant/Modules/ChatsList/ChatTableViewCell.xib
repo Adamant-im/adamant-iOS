@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22155" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22131"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -31,14 +31,14 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="C7l-tD-ej1">
-                        <rect key="frame" x="74" y="34" width="289" height="18"/>
+                        <rect key="frame" x="74" y="34" width="286" height="18"/>
                         <string key="text">⬅️ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</string>
                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Today, 20:24" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PP8-Tp-mvQ">
-                        <rect key="frame" x="287.5" y="54" width="75.5" height="14"/>
+                        <rect key="frame" x="284.5" y="54" width="75.5" height="14"/>
                         <fontDescription key="fontDescription" type="system" weight="medium" pointSize="12"/>
                         <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <nil key="highlightedColor"/>
@@ -60,7 +60,7 @@
                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="vtC-fH-ReF" secondAttribute="trailing" constant="12" id="9qX-Ut-vIf"/>
                     <constraint firstItem="C7l-tD-ej1" firstAttribute="leading" secondItem="SiC-bM-ZsH" secondAttribute="leading" id="GgP-A8-aEU"/>
                     <constraint firstItem="C7l-tD-ej1" firstAttribute="trailing" secondItem="PP8-Tp-mvQ" secondAttribute="trailing" id="cKX-oK-8dF"/>
-                    <constraint firstAttribute="trailing" secondItem="PP8-Tp-mvQ" secondAttribute="trailing" constant="12" id="dX6-xD-7WY"/>
+                    <constraint firstAttribute="trailing" secondItem="PP8-Tp-mvQ" secondAttribute="trailing" constant="15" id="dX6-xD-7WY"/>
                     <constraint firstAttribute="bottom" secondItem="PP8-Tp-mvQ" secondAttribute="bottom" constant="6" id="gB7-zA-C3o"/>
                     <constraint firstItem="SiC-bM-ZsH" firstAttribute="centerY" secondItem="vtC-fH-ReF" secondAttribute="centerY" id="ugp-j2-sbR"/>
                     <constraint firstItem="aVv-ww-kYa" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="14" id="xpk-tG-FaG"/>

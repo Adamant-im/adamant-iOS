@@ -12,10 +12,6 @@ import CommonKit
 
 final class DogeTransactionsViewController: TransactionsListViewControllerBase {
     
-    // MARK: - Dependencies
-    
-    var screensFactory: ScreensFactory!
-    
     // MARK: - UITableView
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
