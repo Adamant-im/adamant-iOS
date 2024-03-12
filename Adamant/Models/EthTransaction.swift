@@ -56,6 +56,7 @@ struct EthTransaction {
     let blockNumber: String?
     let currencySymbol: String
     
+    var nonce: Int?
     var isOutgoing: Bool = false
 }
 
@@ -161,6 +162,12 @@ extension EthTransaction: TransactionDetails {
     var blockHeight: UInt64? {
         return nil
     }
+    
+    var nonceRaw: String? {
+        guard let nonce = nonce else { return nil }
+        
+        return String(nonce)
+    }
 }
 
 // MARK: - From EthereumTransaction
@@ -221,6 +228,7 @@ extension CodableTransaction {
             receiptStatus: receiptStatus,
             blockNumber: blockNumber,
             currencySymbol: token?.symbol ?? EthWalletService.currencySymbol,
+            nonce: Int(nonce),
             isOutgoing: isOutgoing
         )
     }

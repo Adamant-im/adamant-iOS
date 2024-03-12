@@ -726,8 +726,21 @@ extension EthWalletService {
     }
     
     func loadTransactions(offset: Int, limit: Int) async throws -> Int {
+        let trs = try await getTransactionsHistory(offset: offset, limit: limit)
+        
+        guard trs.count > 0 else {
+            hasMoreOldTransactions = false
+            return .zero
+        }
+        
+        coinStorage.append(trs)
+        
+        return trs.count
+    }
+    
+    func getTransactionsHistory(offset: Int, limit: Int) async throws -> [TransactionDetails] {
         guard let address = wallet?.address else {
-            return . zero
+            throw WalletServiceError.accountNotFound
         }
         
         let trs = try await getTransactionsHistory(
@@ -737,11 +750,10 @@ extension EthWalletService {
         )
         
         guard trs.count > 0 else {
-            hasMoreOldTransactions = false
-            return .zero
+            return []
         }
         
-        let newTrs = trs.map { transaction in
+        return trs.map { transaction in
             let isOutgoing: Bool = transaction.from == address
             return SimpleTransactionDetails(
                 txId: transaction.hash,
@@ -753,13 +765,10 @@ extension EthWalletService {
                 confirmationsValue: nil,
                 blockValue: nil,
                 isOutgoing: isOutgoing,
-                transactionStatus: TransactionStatus.notInitiated
+                transactionStatus: TransactionStatus.notInitiated,
+                nonceRaw: nil
             )
         }
-        
-        coinStorage.append(newTrs)
-        
-        return trs.count
     }
     
     func getLocalTransactionHistory() -> [TransactionDetails] {

@@ -108,7 +108,7 @@ final class ChatViewController: MessagesViewController {
         configureGestures()
         setupObservers()
         viewModel.loadFirstMessagesIfNeeded()
-        viewModel.presentKeyboardIfNeeded()
+        viewModel.presentKeyboardOnStartIfNeeded()
     }
     
     override func viewWillLayoutSubviews() {

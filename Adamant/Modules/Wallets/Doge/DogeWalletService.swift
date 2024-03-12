@@ -644,6 +644,10 @@ extension DogeWalletService {
         return trs.count
     }
     
+    func getTransactionsHistory(offset: Int, limit: Int) async throws -> [TransactionDetails] {
+        try await getTransactions(from: offset).transactions
+    }
+    
     func getLocalTransactionHistory() -> [TransactionDetails] {
         return historyTransactions
     }

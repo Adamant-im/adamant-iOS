@@ -563,8 +563,21 @@ extension ERC20WalletService {
     }
     
     func loadTransactions(offset: Int, limit: Int) async throws -> Int {
-        guard let address = wallet?.address else {
+        let trs = try await getTransactionsHistory(offset: offset, limit: limit)
+        
+        guard trs.count > 0 else {
+            hasMoreOldTransactions = false
             return .zero
+        }
+        
+        coinStorage.append(trs)
+        
+        return trs.count
+    }
+    
+    func getTransactionsHistory(offset: Int, limit: Int) async throws -> [TransactionDetails] { 
+        guard let address = wallet?.address else {
+            throw WalletServiceError.accountNotFound
         }
         
         let trs = try await getTransactionsHistory(
@@ -575,7 +588,7 @@ extension ERC20WalletService {
         
         guard trs.count > 0 else {
             hasMoreOldTransactions = false
-            return .zero
+            return []
         }
         
         let newTrs = trs.map { transaction in
@@ -592,13 +605,12 @@ extension ERC20WalletService {
                 confirmationsValue: nil,
                 blockValue: nil,
                 isOutgoing: isOutgoing,
-                transactionStatus: TransactionStatus.notInitiated
+                transactionStatus: TransactionStatus.notInitiated,
+                nonceRaw: nil
             )
         }
         
-        coinStorage.append(newTrs)
-        
-        return trs.count
+        return newTrs
     }
     
     func getLocalTransactionHistory() -> [TransactionDetails] {

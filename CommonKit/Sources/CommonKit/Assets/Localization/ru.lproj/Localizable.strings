@@ -1039,6 +1039,9 @@
 /* Transfer: Minimal transaction amount is 0.00001 */
 "TransferScene.Error.MinAmount" = "Минимальная сумма перевода 0.00001";
 
+/* Transfer: Have a pending coin tx */
+"TransferScene.Error.Pending.Tx" = "Похоже, что у вас есть незавершенная транзакция %@. Подождите, пока блокчейн ее обработает, и попробуйте снова.";
+
 /* Transfer: Alert title: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address */
 "TransferScene.unsafeTransferAlert.title" = "Не удалось проверить адрес %@";
 

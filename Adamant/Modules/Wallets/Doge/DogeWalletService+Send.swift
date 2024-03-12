@@ -142,4 +142,8 @@ extension BitcoinKit.Transaction: TransactionDetails {
     var recipientAddress: String {
         return ""
     }
+    
+    var nonceRaw: String? {
+        nil
+    }
 }

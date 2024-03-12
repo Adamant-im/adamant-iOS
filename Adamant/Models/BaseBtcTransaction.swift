@@ -27,6 +27,10 @@ class BaseBtcTransaction: TransactionDetails {
     
     var blockHeight: UInt64?
     
+    var nonceRaw: String? {
+        nil
+    }
+    
     required init(txId: String, dateValue: Date?, blockValue: String?, senderAddress: String, recipientAddress: String, amountValue: Decimal, feeValue: Decimal?, confirmationsValue: String?, isOutgoing: Bool, transactionStatus: TransactionStatus?) {
         self.txId = txId
         self.dateValue = dateValue

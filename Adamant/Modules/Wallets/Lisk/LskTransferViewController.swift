@@ -67,6 +67,11 @@ final class LskTransferViewController: TransferViewControllerBase {
                     fee: transactionFee
                 )
                 
+                if await !doesNotContainSendingTx(with: String(transaction.nonce)) {
+                    presentSendingError()
+                    return
+                }
+                
                 // Send adm report
                 if let reportRecipient = admReportRecipient {
                     try await reportTransferTo(
@@ -82,6 +87,7 @@ final class LskTransferViewController: TransferViewControllerBase {
                         service.coinStorage.append(transaction)
                         try await service.sendTransaction(transaction)
                     } catch {
+                        dialogService.dismissProgress()
                         dialogService.showRichError(error: error)
                         service.coinStorage.updateStatus(
                             for: transaction.id,

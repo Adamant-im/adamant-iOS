@@ -1215,4 +1215,47 @@ extension TransferViewControllerBase {
             }
         }
     }
+    
+    func doesNotContainSendingTx() async -> Bool {
+        var history = walletCore.getLocalTransactionHistory()
+        
+        if history.isEmpty {
+            history = (try? await walletCore.getTransactionsHistory(
+                offset: .zero,
+                limit: 2)
+            ) ?? []
+        }
+        
+        let havePending = history.contains {
+            $0.transactionStatus == .pending || $0.transactionStatus == .registered || $0.transactionStatus == .notInitiated
+        }
+        
+        return !havePending
+    }
+    
+    func doesNotContainSendingTx(with nonce: String) async -> Bool {
+        var history = walletCore.getLocalTransactionHistory()
+        
+        if history.isEmpty {
+            history = (try? await walletCore.getTransactionsHistory(
+                offset: .zero,
+                limit: 2)
+            ) ?? []
+        }
+        
+        let nonces = history.compactMap { $0.nonceRaw }
+        
+        return !nonces.contains(nonce)
+    }
+    
+    func presentSendingError() {
+        dialogService.dismissProgress()
+        dialogService.showAlert(
+            title: nil,
+            message: String.adamant.transfer.pendingTxError(coin: walletCore.tokenSymbol),
+            style: AdamantAlertStyle.alert,
+            actions: nil,
+            from: nil
+        )
+    }
 }

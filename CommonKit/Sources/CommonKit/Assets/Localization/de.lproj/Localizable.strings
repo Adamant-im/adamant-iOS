@@ -1042,6 +1042,9 @@
 /* Transfer: Minimal transaction amount is 0.00001 */
 "TransferScene.Error.MinAmount" = "Minimum transaction amount is 0.00001";
 
+/* Transfer: Have a pending coin tx */
+"TransferScene.Error.Pending.Tx" = "Es scheint, dass Sie eine ausstehende %@ tx haben. Warten Sie, bis die Blockchain dies bestätigt, und versuchen Sie es erneut";
+
 /* Transfer: transfer amount placeholder */
 "TransferScene.Amount.Placeholder" = "senden";
 

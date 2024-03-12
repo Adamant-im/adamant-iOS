@@ -117,7 +117,9 @@ private extension LskWalletFactory {
             confirmationsValue: nil,
             blockValue: nil,
             isOutgoing: richTransaction.isOutgoing,
-            transactionStatus: nil)
+            transactionStatus: nil, 
+            nonceRaw: nil
+        )
 
         vc.transaction = transaction ?? failedTransaction
         vc.richTransaction = richTransaction
