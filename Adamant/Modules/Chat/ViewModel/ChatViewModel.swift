@@ -77,6 +77,7 @@ final class ChatViewModel: NSObject {
     let updateChatRead = ObservableSender<Void>()
     let commitVibro = ObservableSender<Void>()
     let layoutIfNeeded = ObservableSender<Void>()
+    let presentKeyboard = ObservableSender<Void>()
     
     @ObservableValue private(set) var isHeaderLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
@@ -186,6 +187,11 @@ final class ChatViewModel: NSObject {
             
             replyMessage = chatPreservation.getReplyMessage(address: partnerAddress, thenRemoveIt: true)
         }
+    }
+    
+    func presentKeyboardOnStartIfNeeded() {
+        guard !inputText.isEmpty && replyMessage == nil else { return }
+        presentKeyboard.send()
     }
     
     func loadFirstMessagesIfNeeded() {

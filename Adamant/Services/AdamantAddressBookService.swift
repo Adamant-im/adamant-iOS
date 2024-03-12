@@ -125,7 +125,7 @@ final class AdamantAddressBookService: AddressBookService {
             return nil
         }
         
-        return partner?.name?.checkAndReplaceSystemWallets() ?? getName(for: partenerAddress)
+        return getName(for: partenerAddress) ?? partner?.name?.checkAndReplaceSystemWallets()
     }
     
     func set(name: String, for address: String) async {

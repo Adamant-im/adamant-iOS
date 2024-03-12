@@ -317,7 +317,7 @@
 "ChatListPage.Title" = "Chats";
 
 /* ChatsProvider: Notify user that he doesn't have money to pay a message fee */
-"ChatsProvider.Error.notEnoughMoney" = "Sie haben nicht genügend Tokens, um eine Nachricht zu senden";
+"ChatsProvider.Error.notEnoughMoney" = "Nicht genug ADM für die Blockchain-Gebühr für Nachrichten";
 
 /* ChatsProvider: Transaction not found error. %@ for transaction's ID */
 "ChatsProvider.Error.TransactionNotFoundFormat" = "Nachricht mit der ID %@ nicht gefunden";
@@ -1041,6 +1041,9 @@
 
 /* Transfer: Minimal transaction amount is 0.00001 */
 "TransferScene.Error.MinAmount" = "Minimum transaction amount is 0.00001";
+
+/* Transfer: Have a pending coin tx */
+"TransferScene.Error.Pending.Tx" = "Es scheint, dass Sie eine ausstehende %@ tx haben. Warten Sie, bis die Blockchain dies bestätigt, und versuchen Sie es erneut";
 
 /* Transfer: transfer amount placeholder */
 "TransferScene.Amount.Placeholder" = "senden";

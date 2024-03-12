@@ -45,6 +45,11 @@ final class BtcTransferViewController: TransferViewControllerBase {
                     fee: transactionFee
                 )
                 
+                if await !doesNotContainSendingTx() {
+                    presentSendingError()
+                    return
+                }
+                
                 // Send adm report
                 if let reportRecipient = admReportRecipient,
                    let hash = transaction.txHash {
@@ -66,7 +71,8 @@ final class BtcTransferViewController: TransferViewControllerBase {
                         confirmationsValue: nil,
                         blockValue: nil,
                         isOutgoing: true,
-                        transactionStatus: nil
+                        transactionStatus: nil, 
+                        nonceRaw: nil
                     )
                     
                     service.coinStorage.append(simpleTransaction)

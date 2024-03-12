@@ -14,6 +14,13 @@ import CommonKit
 extension String.adamant.transfer {
     static var minAmountError: String { String.localized("TransferScene.Error.MinAmount", comment: "Transfer: Minimal transaction amount is 0.00001")
     }
+    static func pendingTxError(coin: String) -> String {
+        let localizedString = String(
+            format: .localized("TransferScene.Error.Pending.Tx", comment: "Have a pending coin tx"), 
+            coin
+        )
+        return localizedString
+    }
 }
 
 final class DashTransferViewController: TransferViewControllerBase {
@@ -37,7 +44,13 @@ final class DashTransferViewController: TransferViewControllerBase {
         }
         
         guard amount >= 0.00001 else {
-            dialogService.showAlert(title: nil, message: String.adamant.transfer.minAmountError, style: AdamantAlertStyle.alert, actions: nil, from: nil)
+            dialogService.showAlert(
+                title: nil,
+                message: String.adamant.transfer.minAmountError,
+                style: AdamantAlertStyle.alert,
+                actions: nil,
+                from: nil
+            )
             return
         }
         
@@ -55,6 +68,11 @@ final class DashTransferViewController: TransferViewControllerBase {
                     amount: amount,
                     fee: transactionFee
                 )
+                
+                if await !doesNotContainSendingTx() {
+                    presentSendingError()
+                    return
+                }
                 
                 // Send adm report
                 if let reportRecipient = admReportRecipient,
@@ -77,7 +95,8 @@ final class DashTransferViewController: TransferViewControllerBase {
                         confirmationsValue: nil,
                         blockValue: nil,
                         isOutgoing: true,
-                        transactionStatus: nil
+                        transactionStatus: nil,
+                        nonceRaw: nil
                     )
                     
                     service.coinStorage.append(simpleTransaction)

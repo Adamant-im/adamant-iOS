@@ -67,6 +67,11 @@ final class LskTransferViewController: TransferViewControllerBase {
                     fee: transactionFee
                 )
                 
+                if await !doesNotContainSendingTx(with: String(transaction.nonce)) {
+                    presentSendingError()
+                    return
+                }
+                
                 // Send adm report
                 if let reportRecipient = admReportRecipient {
                     try await reportTransferTo(

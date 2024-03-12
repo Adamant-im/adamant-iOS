@@ -314,7 +314,7 @@
 "ChatListPage.Title" = "聊天";
 
 /* ChatsProvider: Notify user that he doesn't have money to pay a message fee */
-"ChatsProvider.Error.notEnoughMoney" = "零余额。获得免费ADM代币";
+"ChatsProvider.Error.notEnoughMoney" = "信息区块链费用的 ADM 不足";
 
 /* ChatsProvider: Transaction not found error. %@ for transaction's ID */
 "ChatsProvider.Error.TransactionNotFoundFormat" = "找不到id为%@的消息";
@@ -1014,6 +1014,9 @@
 
 /* Transfer: Minimal transaction amount is 0.00001 */
 "TransferScene.Error.MinAmount" = "最低交易金额为0.00001";
+
+/* Transfer: Have a pending coin tx */
+"TransferScene.Error.Pending.Tx" = "您似乎有一个待处理的 %@ tx。等待区块链确认，然后再试一次";
 
 /* Transfer: transfer amount placeholder */
 "TransferScene.Amount.Placeholder" = "发送";

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="22225" systemVersion="23B74" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="22225" systemVersion="23B81" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="BaseAccount" representedClassName="BaseAccount" isAbstract="YES" syncable="YES">
         <attribute name="address" attributeType="String"/>
         <attribute name="avatar" optional="YES" attributeType="String"/>
@@ -46,6 +46,7 @@
         <attribute name="height" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="isConfirmed" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="isOutgoing" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="nonceRaw" optional="YES" attributeType="String"/>
         <attribute name="recipientId" attributeType="String" defaultValueString=""/>
         <attribute name="senderId" attributeType="String" defaultValueString=""/>
         <attribute name="transactionId" attributeType="String" defaultValueString=""/>

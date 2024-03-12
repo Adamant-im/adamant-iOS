@@ -53,6 +53,15 @@ final class ERC20TransferViewController: TransferViewControllerBase {
                     fee: transactionFee
                 )
                 
+                if await !doesNotContainSendingTx(
+                    with: Int(transaction.nonce),
+                    id: transaction.txHash,
+                    service: service
+                ) {
+                    presentSendingError()
+                    return
+                }
+                
                 guard let txHash = transaction.txHash else {
                     throw WalletServiceError.internalError(
                         message: "Transaction making failure",
@@ -121,7 +130,8 @@ final class ERC20TransferViewController: TransferViewControllerBase {
             confirmationsValue: nil,
             blockValue: nil,
             isOutgoing: true,
-            transactionStatus: nil
+            transactionStatus: nil, 
+            nonceRaw: nil
         )
         
         service.core.coinStorage.append(transaction)
@@ -140,6 +150,35 @@ final class ERC20TransferViewController: TransferViewControllerBase {
             didFinishWithTransfer: transaction,
             detailsViewController: detailsVc
         )
+    }
+    
+    private func doesNotContainSendingTx(
+        with nonce: Int,
+        id: String?,
+        service: ERC20WalletService
+    ) async -> Bool {
+        var history = service.getLocalTransactionHistory()
+        
+        if history.isEmpty {
+            history = (try? await service.getTransactionsHistory(offset: .zero, limit: 2)) ?? []
+        }
+        
+        let pendingTx = history.first(where: {
+            $0.transactionStatus == .pending
+            || $0.transactionStatus == .registered
+            || $0.transactionStatus == .notInitiated
+            || $0.txId == id
+        })
+                
+        guard let pendingTx = pendingTx else {
+            return true
+        }
+        
+        guard let detailTx = try? await service.getTransaction(by: pendingTx.txId) else {
+            return false
+        }
+        
+        return detailTx.nonce != nonce
     }
     
     // MARK: Overrides
