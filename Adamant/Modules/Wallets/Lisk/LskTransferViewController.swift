@@ -82,19 +82,19 @@ final class LskTransferViewController: TransferViewControllerBase {
                     )
                 }
                 
-                Task {
-                    do {
-                        service.coinStorage.append(transaction)
-                        try await service.sendTransaction(transaction)
-                    } catch {
-                        dialogService.dismissProgress()
-                        dialogService.showRichError(error: error)
-                        service.coinStorage.updateStatus(
-                            for: transaction.id,
-                            status: .failed
-                        )
-                    }
+                do {
+                    service.coinStorage.append(transaction)
+                    try await service.sendTransaction(transaction)
+                } catch {
+                    service.coinStorage.updateStatus(
+                        for: transaction.id,
+                        status: .failed
+                    )
                     
+                    throw error
+                }
+                
+                Task {
                     await service.update()
                 }
                 
