@@ -379,6 +379,7 @@ private extension ChatViewController {
                 
                 sendTransaction(self, self.viewModel.replyMessage?.id)
                 self.viewModel.clearReplyMessage()
+                self.viewModel.clearPickedFiles()
             }
             .store(in: &subscriptions)
     }

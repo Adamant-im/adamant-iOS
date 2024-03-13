@@ -680,6 +680,10 @@ final class ChatViewModel: NSObject {
         replyMessage = nil
     }
     
+    func clearPickedFiles() {
+        filesPicked = nil
+    }
+    
     func presentMenu(arg: ChatContextMenuArguments) {
         let didSelectEmojiAction: ChatDialogManager.DidSelectEmojiAction = { [weak self] emoji, messageId in
             self?.dialog.send(.dismissMenu)
