@@ -7,12 +7,14 @@
 
 import Foundation
 
-public enum FileManagerError: Error, LocalizedError {
+public enum FileManagerError: Error {
     case cantDownloadFile
     case cantUploadFile
     case cantEnctryptFile
-    
-    public var errorDescription: String {
+}
+
+extension FileManagerError: LocalizedError {
+    public var errorDescription: String? {
         switch self {
         case .cantDownloadFile:
             return "cant Download File"

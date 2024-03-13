@@ -7,12 +7,14 @@
 
 import Foundation
 
-public enum FileValidationError: Error, LocalizedError {
+public enum FileValidationError: Error {
     case tooManyFiles
     case fileSizeExceedsLimit
     case fileNotFound
-    
-    public var errorDescription: String {
+}
+
+extension FileValidationError: LocalizedError {
+    public var errorDescription: String? {
         switch self {
         case .tooManyFiles:
             return "too Many Files"
