@@ -3,6 +3,7 @@
 
 import CommonKit
 import UIKit
+import SwiftUI
 
 public final class FilesPickerKit {
     public static let shared = FilesPickerKit()
@@ -46,9 +47,30 @@ public final class FilesPickerKit {
             }
         }
     }
+    
+    public func openFile(data: Data, name: String, size: Int64) {
+        guard let uiImage = UIImage(data: data) else {
+            let viewModel = OtherViewerViewModel(caption: name, size: size, data: data)
+            let view = OtherViewer(viewModel: viewModel)
+            present(view: view)
+            return
+        }
+        
+        let view = ImageViewer(image: uiImage, caption: name)
+        present(view: view)
+    }
 }
 
 private extension FilesPickerKit {
+    func present(view: some View) {
+        let vc = UIHostingController(
+            rootView: view
+        )
+        vc.modalPresentationStyle = .overCurrentContext
+        vc.view.backgroundColor = .clear
+        UIApplication.shared.topViewController()?.present(vc, animated: false)
+    }
+    
     func validateFiles(_ files: [FileResult]) throws {
         guard files.count <= Constants.maxFilesCount else {
             throw FileValidationError.tooManyFiles

@@ -776,6 +776,19 @@ final class ChatViewModel: NSObject {
                 
                 return
             }
+            
+            let data = try filesStorage.getFileData(
+                with: file.file.file_id,
+                senderPublicKey: chatroom?.partner?.publicKey ?? .empty,
+                recipientPrivateKey: keyPair.privateKey,
+                nonce: file.nonce
+            )
+            
+            FilesPickerKit.shared.openFile(
+                data: data,
+                name: file.file.file_name ?? .empty,
+                size: file.file.file_size ?? .zero
+            )
         }
     }
     

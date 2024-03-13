@@ -15,14 +15,16 @@ let package = Package(
             targets: ["FilesNetworkManagerKit"]),
     ],
     dependencies: [
-             .package(url: "https://github.com/uploadcare/uploadcare-swift.git", branch: "master")
-         ],
+        .package(path: "../CommonKit"),
+        .package(url: "https://github.com/uploadcare/uploadcare-swift.git", branch: "master")
+    ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "FilesNetworkManagerKit",
             dependencies: [
+                "CommonKit",
                 .product(name: "Uploadcare", package: "uploadcare-swift")
             ]
         ),

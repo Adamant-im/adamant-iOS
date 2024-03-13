@@ -4,7 +4,6 @@
 import CommonKit
 import UIKit
 import FilesNetworkManagerKit
-import FilesPickerKit
 
 public final class FilesStorageKit {
     private let adamantCore = NativeAdamantCore()
@@ -28,6 +27,34 @@ public final class FilesStorageKit {
     
     public func isCached(_ id: String) -> Bool {
         cachedImages[id] != nil || cachedFiles[id] != nil
+    }
+    
+    public func getFileData(
+        with id: String,
+        senderPublicKey: String,
+        recipientPrivateKey: String,
+        nonce: String
+    ) throws -> Data {
+        if let image = cachedImages[id],
+           let data = image.jpegData(compressionQuality: 1.0) {
+            return data
+        }
+        
+        if let url = cachedFiles[id],
+           let encodedData = try? Data(contentsOf: url) {
+            guard let decodedData = adamantCore.decodeData(
+                encodedData,
+                rawNonce: nonce,
+                senderPublicKey: senderPublicKey,
+                privateKey: recipientPrivateKey
+            ) else {
+                throw FileValidationError.fileNotFound
+            }
+            
+            return decodedData
+        }
+        
+        throw FileValidationError.fileNotFound
     }
     
     public func uploadFile(
@@ -79,6 +106,12 @@ public final class FilesStorageKit {
     ) async throws {
         let encodedData = try await networkFileManager.downloadFile(id, type: storage)
         
+        let fileExtension = fileType?.uppercased() ?? defaultFileType
+        
+        guard imageExtensions.contains(fileExtension) else {
+            return try cacheFile(id: id, data: encodedData)
+        }
+        
         guard let decodedData = adamantCore.decodeData(
             encodedData,
             rawNonce: nonce,
@@ -89,11 +122,8 @@ public final class FilesStorageKit {
             throw FileValidationError.fileNotFound
         }
         
-        if imageExtensions.contains(fileType?.uppercased() ?? defaultFileType) {
-            cacheImage(id: id, image: UIImage(data: decodedData))
-        } else {
-            try cacheFile(id: id, data: encodedData)
-        }
+        cacheImage(id: id, image: UIImage(data: decodedData))
+        return
     }
 }
 

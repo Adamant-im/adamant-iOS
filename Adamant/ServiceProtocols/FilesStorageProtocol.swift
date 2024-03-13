@@ -16,6 +16,13 @@ protocol FilesStorageProtocol {
     
     func isCached(_ id: String) -> Bool
     
+    func getFileData(
+        with id: String,
+        senderPublicKey: String,
+        recipientPrivateKey: String,
+        nonce: String
+    ) throws -> Data
+    
     func uploadFile(
         _ file: FileResult,
         recipientPublicKey: String,
