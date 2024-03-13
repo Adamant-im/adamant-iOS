@@ -944,36 +944,7 @@ extension ChatListViewController {
             if richMessage.additionalType == .reply,
                let content = richMessage.richContent,
                let text = content[RichContentKeys.reply.replyMessage] as? String {
-                
-                let prefix = richMessage.isOutgoing
-                ? "\(String.adamant.chatList.sentMessagePrefix)"
-                : ""
-                
-                let replyImageAttachment = NSTextAttachment()
-                
-                replyImageAttachment.image = UIImage(
-                    systemName: "arrowshape.turn.up.left"
-                )?.withTintColor(.adamant.primary)
-                
-                replyImageAttachment.bounds = CGRect(
-                    x: .zero,
-                    y: -3,
-                    width: 23,
-                    height: 20
-                )
-                
-                let extraSpace = richMessage.isOutgoing ? "  " : ""
-                let imageString = NSAttributedString(attachment: replyImageAttachment)
-                
-                let markDownText = markdownParser.parse("\(extraSpace)\(text)").resolveLinkColor()
-                
-                let fullString = NSMutableAttributedString(string: prefix)
-                if richMessage.isOutgoing {
-                    fullString.append(imageString)
-                }
-                fullString.append(markDownText)
-                
-                return fullString
+                return getRawReplyPresentation(isOutgoing: richMessage.isOutgoing, text: text)
             }
             
             if richMessage.additionalType == .reaction,
@@ -988,6 +959,26 @@ extension ChatListViewController {
                 : NSMutableAttributedString(string: "\(prefix)\(String.adamant.chatList.reacted) \(reaction)")
                 
                 return text
+            }
+            
+            if richMessage.additionalType == .reply,
+               let content = richMessage.richContent,
+               richMessage.isFileReply() {
+                let text = getRawFilePresentation(content)
+                return getRawReplyPresentation(isOutgoing: richMessage.isOutgoing, text: text)
+            }
+            
+            if richMessage.additionalType == .file,
+               let content = richMessage.richContent {
+                let prefix = richMessage.isOutgoing
+                ? "\(String.adamant.chatList.sentMessagePrefix)"
+                : ""
+                
+                let fileText = getRawFilePresentation(content)
+                
+                let attributesText = markdownParser.parse(prefix + fileText).resolveLinkColor()
+                
+                return attributesText
             }
             
             if let serialized = richMessage.serializedMessage() {
@@ -1010,6 +1001,51 @@ extension ChatListViewController {
         default:
             return nil
         }
+    }
+    
+    private func getRawFilePresentation(_ richContent: [String: Any]) -> String {
+        let content = richContent[RichContentKeys.reply.replyMessage] as? [String: Any] ?? richContent
+        
+        let files = content[RichContentKeys.file.files] as? [[String: Any]] ?? []
+        
+        let rawComment: String = (content[RichContentKeys.file.comment] as? String) ?? .empty
+        let comment = !rawComment.isEmpty
+        ? ": \(rawComment)"
+        : ""
+        
+        return "[\(files.count) file(s)]\(comment)"
+    }
+    
+    private func getRawReplyPresentation(isOutgoing: Bool, text: String) -> NSMutableAttributedString {
+        let prefix = isOutgoing
+        ? "\(String.adamant.chatList.sentMessagePrefix)"
+        : ""
+        
+        let replyImageAttachment = NSTextAttachment()
+        
+        replyImageAttachment.image = UIImage(
+            systemName: "arrowshape.turn.up.left"
+        )?.withTintColor(.adamant.primary)
+        
+        replyImageAttachment.bounds = CGRect(
+            x: .zero,
+            y: -3,
+            width: 23,
+            height: 20
+        )
+        
+        let extraSpace = isOutgoing ? "  " : ""
+        let imageString = NSAttributedString(attachment: replyImageAttachment)
+        
+        let markDownText = markdownParser.parse("\(extraSpace)\(text)").resolveLinkColor()
+        
+        let fullString = NSMutableAttributedString(string: prefix)
+        if isOutgoing {
+            fullString.append(imageString)
+        }
+        fullString.append(markDownText)
+        
+        return fullString
     }
 }
 

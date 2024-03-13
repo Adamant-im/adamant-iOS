@@ -8,8 +8,8 @@
 import Foundation
 import UIKit
 
-final class Constants {
-    static let maxFilesCount = 5
+public final class FilesConstants {
+    public static let maxFilesCount = 5
     static let maxFileSize: Int64 = 10 * 1024 * 1024
 }
 

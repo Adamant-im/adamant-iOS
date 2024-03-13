@@ -9,6 +9,7 @@
 import SnapKit
 import UIKit
 import CommonKit
+import FilesPickerKit
 
 final class ChatMediaContentView: UIView {
     private let commentLabel = UILabel(
@@ -73,7 +74,7 @@ final class ChatMediaContentView: UIView {
         stack.axis = .vertical
         stack.spacing = verticalStackSpacing
         
-        for _ in 0...5 {
+        for _ in 0...FilesConstants.maxFilesCount {
             let view = ChatFileView()
             view.snp.makeConstraints { $0.height.equalTo(imageSize) }
             stack.addArrangedSubview(view)
@@ -128,7 +129,7 @@ private extension ChatMediaContentView {
     }
     
     func updateStackLayout() {
-        let fileList = model.files.prefix(5)
+        let fileList = model.files.prefix(FilesConstants.maxFilesCount)
         
         filesStack.arrangedSubviews.forEach { $0.isHidden = true }
         
@@ -166,9 +167,16 @@ private extension ChatMediaContentView {
 extension ChatMediaContentView.Model {
     func height() -> CGFloat {
         let replyViewDynamicHeight: CGFloat = isReply ? replyViewHeight : 0
-        let stackSpacingCount: CGFloat = isReply ? 4 : 3
         
-        return imageSize * CGFloat(files.count)
+        let filesCount = files.count > FilesConstants.maxFilesCount
+        ? FilesConstants.maxFilesCount
+        : files.count
+        
+        let stackSpacingCount: CGFloat = isReply 
+        ? CGFloat(filesCount) + 1
+        : CGFloat(filesCount)
+
+        return imageSize * CGFloat(filesCount)
         + stackSpacingCount * verticalStackSpacing
         + labelSize(for: comment, considering: 260).height
         + replyViewDynamicHeight

@@ -17,7 +17,7 @@ final class MediaPickerService: NSObject, FilePickerProtocol {
         onPreparedDataCallback = completion
         
         var phPickerConfig = PHPickerConfiguration(photoLibrary: .shared())
-        phPickerConfig.selectionLimit = Constants.maxFilesCount
+        phPickerConfig.selectionLimit = FilesConstants.maxFilesCount
         phPickerConfig.filter = PHPickerFilter.any(of: [.images, .videos])
         
         let phPickerVC = PHPickerViewController(configuration: phPickerConfig)

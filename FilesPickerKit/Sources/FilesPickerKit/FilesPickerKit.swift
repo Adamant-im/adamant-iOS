@@ -72,12 +72,12 @@ private extension FilesPickerKit {
     }
     
     func validateFiles(_ files: [FileResult]) throws {
-        guard files.count <= Constants.maxFilesCount else {
+        guard files.count <= FilesConstants.maxFilesCount else {
             throw FileValidationError.tooManyFiles
         }
         
         for file in files {
-            guard file.size <= Constants.maxFileSize else {
+            guard file.size <= FilesConstants.maxFileSize else {
                 throw FileValidationError.fileSizeExceedsLimit
             }
         }
