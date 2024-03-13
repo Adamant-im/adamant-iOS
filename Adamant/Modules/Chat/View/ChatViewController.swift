@@ -695,9 +695,12 @@ private extension ChatViewController {
     
     func processFileToolbarView(_ data: [FileResult]?) {
         guard let data = data, !data.isEmpty else {
+            inputBar.isForcedSendEnabled = false
             closeFileToolbarView()
             return
         }
+        
+        inputBar.isForcedSendEnabled = true
         
         if !messageInputBar.topStackView.subviews.contains(filesToolbarView) {
             UIView.transition(

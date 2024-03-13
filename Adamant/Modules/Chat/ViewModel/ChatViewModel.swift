@@ -285,7 +285,7 @@ final class ChatViewModel: NSObject {
         }.stored(in: tasksStorage)
     }
     
-    func sendFile(text: String) {
+    func sendFile(text: String?) {
         guard let partnerAddress = chatroom?.partner?.address,
               let files = filesPicked,
               let keyPair = accountService.keypair
@@ -407,7 +407,7 @@ final class ChatViewModel: NSObject {
                     from: chatroom
                 )
             } catch {
-                await handleMessageSendingError(error: error, sentText: text)
+                await handleMessageSendingError(error: error, sentText: text ?? .empty)
             }
         }.stored(in: tasksStorage)
     }
@@ -789,7 +789,7 @@ final class ChatViewModel: NSObject {
             FilesPickerKit.shared.openFile(
                 data: data,
                 name: file.file.file_name ?? .empty,
-                size: file.file.file_size ?? .zero
+                size: file.file.file_size
             )
         }
     }
