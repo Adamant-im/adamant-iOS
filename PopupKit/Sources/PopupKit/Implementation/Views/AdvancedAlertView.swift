@@ -18,8 +18,10 @@ struct AdvancedAlertView: View {
             VStack(spacing: .zero) {
                 iconView
                     .padding(.vertical, bigSpacing)
-                titleView
-                    .padding(.bottom, smallSpacing)
+                if let title = model.title {
+                    makeTitleView(title: title)
+                        .padding(.bottom, smallSpacing)
+                }
                 textView
                     .padding(.bottom, bigSpacing)
                 
@@ -58,8 +60,8 @@ private extension AdvancedAlertView {
             .frame(squareSize: 37)
     }
     
-    var titleView: some View {
-        Text(model.title)
+    func makeTitleView(title: String) -> some View {
+        Text(title)
             .font(.system(size: 17, weight: .bold))
     }
     

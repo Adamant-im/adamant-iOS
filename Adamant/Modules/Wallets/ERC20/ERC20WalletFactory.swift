@@ -28,11 +28,12 @@ struct ERC20WalletFactory: WalletFactory {
     }
     
     func makeTransferListVC(service: Service, screensFactory: ScreensFactory) -> UIViewController {
-        let vc = ERC20TransactionsViewController(nibName: "TransactionsListViewControllerBase", bundle: nil)
-        vc.dialogService = assembler.resolve(DialogService.self)
-        vc.screensFactory = screensFactory
-        vc.walletService = service
-        return vc
+        ERC20TransactionsViewController(
+            walletService: service,
+            dialogService: assembler.resolve(DialogService.self)!,
+            reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
+            screensFactory: screensFactory
+        )
     }
     
     func makeTransferVC(service: Service, screensFactory: ScreensFactory) -> TransferViewControllerBase {
@@ -45,7 +46,9 @@ struct ERC20WalletFactory: WalletFactory {
             currencyInfoService: assembler.resolve(CurrencyInfoService.self)!,
             increaseFeeService: assembler.resolve(IncreaseFeeService.self)!,
             vibroService: assembler.resolve(VibroService.self)!, 
-            walletService: service
+            walletService: service,
+            reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
+            nodesStorage: assembler.resolve(NodesStorageProtocol.self)!
         )
     }
     
@@ -112,7 +115,8 @@ private extension ERC20WalletFactory {
             confirmationsValue: nil,
             blockValue: nil,
             isOutgoing: richTransaction.isOutgoing,
-            transactionStatus: nil
+            transactionStatus: nil,
+            nonceRaw: nil
         )
         
         vc.senderId = senderId

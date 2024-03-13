@@ -314,7 +314,7 @@
 "ChatListPage.Title" = "聊天";
 
 /* ChatsProvider: Notify user that he doesn't have money to pay a message fee */
-"ChatsProvider.Error.notEnoughMoney" = "零余额。获得免费ADM代币";
+"ChatsProvider.Error.notEnoughMoney" = "信息区块链费用的 ADM 不足";
 
 /* ChatsProvider: Transaction not found error. %@ for transaction's ID */
 "ChatsProvider.Error.TransactionNotFoundFormat" = "找不到id为%@的消息";
@@ -455,7 +455,7 @@
 "VisibleWallets.ResetListAlert" = "是否将钱包列表重置为默认值？";
 
 /* Delegates tab: Message about 50 ADM fee for vote */
-"Delegates.NotEnoughtTokensForVote" = "没有足够的代币可以投票。您需要50个ADM";
+"Delegates.NotEnoughtTokensForVote" = "没有足够的 ADM 来支付投票区块链费用";
 
 /* Delegates tab: Message about time out for new vote */
 "Delegates.timeOutBeforeNewVote" = "请等待上一次投票处理完毕";
@@ -853,6 +853,9 @@
 /* Shared alert notification: body message for no internet connection. */
 "Shared.NoInternet.Body" = "请检查您的互联网连接，然后重试";
 
+/* Shared alert notification: body message for no internet connection. */
+"Shared.Transfer.NoInternet.Body" = "您的网络连接似乎没有激活。请检查您的连接并重试。";
+
 /* Shared alert 'Ok' button. Used anywhere */
 "Shared.Ok" = "好的";
 
@@ -1012,11 +1015,17 @@
 /* Transfer: Minimal transaction amount is 0.00001 */
 "TransferScene.Error.MinAmount" = "最低交易金额为0.00001";
 
+/* Transfer: Have a pending coin tx */
+"TransferScene.Error.Pending.Tx" = "您似乎有一个待处理的 %@ tx。等待区块链确认，然后再试一次";
+
 /* Transfer: transfer amount placeholder */
 "TransferScene.Amount.Placeholder" = "发送";
 
 /* Transfer: Address not found error */
 "TransferScene.Error.AddressNotFound" = "找不到地址";
+
+/* Transfer: Not enough ADM to send in-chat transfer error */
+"TransferScene.Error.notEnoughAdmToSendTransfer" = "没有足够的 ADM 来发送聊天转移";
 
 /* Transfer: Address validation error */
 "TransferScene.Error.InvalidAddress" = "输入有效地址";
@@ -1089,6 +1098,9 @@
 
 /* Transfer: Confirm transfer alert: Send tokens button */
 "TransferScene.Send" = "发送";
+
+/* Transfer: Ttitle for done button */
+"TransferScene.Done" = "完成的";
 
 /* Transfer: Confirm transfer alert: 'Can't Undo' message */
 "TransferScene.CantUndo" = "您将无法撤消此操作";

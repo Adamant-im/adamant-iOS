@@ -41,6 +41,10 @@ struct DogeApiCommands {
     static func sendTransaction() -> String {
         return "/api/tx/send"
     }
+    
+    static func getInfo() -> String {
+        return "/api/status"
+    }
 }
 
 final class DogeWalletService: WalletCoreProtocol {
@@ -94,6 +98,10 @@ final class DogeWalletService: WalletCoreProtocol {
 
     var qqPrefix: String {
         return Self.qqPrefix
+    }
+    
+    var nodeGroups: [NodeGroup] {
+        [.doge]
     }
     
     static let kvsAddress = "doge:address"
@@ -315,7 +323,7 @@ extension DogeWalletService {
                 }
             }
             
-            service.setState(.upToDate, silent: true)
+            service.setState(.upToDate)
             
             Task {
                 await service.update()
@@ -634,6 +642,10 @@ extension DogeWalletService {
         coinStorage.append(trs)
         
         return trs.count
+    }
+    
+    func getTransactionsHistory(offset: Int, limit: Int) async throws -> [TransactionDetails] {
+        try await getTransactions(from: offset).transactions
     }
     
     func getLocalTransactionHistory() -> [TransactionDetails] {

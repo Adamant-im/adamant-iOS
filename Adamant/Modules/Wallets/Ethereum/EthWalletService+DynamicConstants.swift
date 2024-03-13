@@ -8,6 +8,7 @@ extension EthWalletService {
     static let currencySymbol = "ETH"
     static let currencyExponent: Int = -18
     static let qqPrefix: String = "ethereum"
+    
     static let healthCheckParameters = CoinHealthCheckParameters(
         normalUpdateInterval: 300,
         crucialUpdateInterval: 30,
@@ -84,6 +85,10 @@ extension EthWalletService {
     
     static var minNodeVersion: String? {
         nil
+    }
+    
+    var transferDecimals: Int {
+        6
     }
     
     static let explorerAddress = "https://etherscan.io/tx/"

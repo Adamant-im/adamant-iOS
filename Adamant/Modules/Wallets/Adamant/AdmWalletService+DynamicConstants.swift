@@ -8,6 +8,7 @@ extension AdmWalletService {
     static let currencySymbol = "ADM"
     static let currencyExponent: Int = -8
     static let qqPrefix: String = "adm"
+    
     static let healthCheckParameters = CoinHealthCheckParameters(
         normalUpdateInterval: 300,
         crucialUpdateInterval: 30,
@@ -56,6 +57,10 @@ extension AdmWalletService {
     
     static var minNodeVersion: String? {
         "0.8.0"
+    }
+    
+    var transferDecimals: Int {
+        8
     }
     
     static let explorerAddress = "https://explorer.adamant.im/tx/"

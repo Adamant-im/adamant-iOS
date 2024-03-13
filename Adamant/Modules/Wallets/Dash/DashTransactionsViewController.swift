@@ -11,10 +11,6 @@ import ProcedureKit
 
 final class DashTransactionsViewController: TransactionsListViewControllerBase {
     
-    // MARK: - Dependencies
-    
-    var screensFactory: ScreensFactory!
-    
     // MARK: - UITableView
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

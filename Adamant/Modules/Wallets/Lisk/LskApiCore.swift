@@ -57,7 +57,7 @@ class LskApiCore: BlockchainHealthCheckableService {
                     height: model.height ?? .zero,
                     wsEnabled: false,
                     wsPort: nil,
-                    version: nil
+                    version: model.version
                 )
         }
     }

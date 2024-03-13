@@ -92,7 +92,8 @@ public struct ServiceTransactionModel: APIModel {
     public let sender: Sender
     public let params: Params
     public let executionStatus: ExecutionStatus
-
+    public let nonce: String
+    
     // MARK: - Hashable
 
     public static func == (lhs: ServiceTransactionModel, rhs: ServiceTransactionModel) -> Bool {

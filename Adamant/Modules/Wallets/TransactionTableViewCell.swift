@@ -46,12 +46,60 @@ final class TransactionTableViewCell: UITableViewCell {
     
     // MARK: - IBOutlets
     
-    @IBOutlet weak var topImageView: UIImageView!
-    @IBOutlet weak var bottomImageView: UIImageView!
-    @IBOutlet weak var accountLabel: UILabel!
-    @IBOutlet weak var addressLabel: UILabel!
-    @IBOutlet weak var ammountLabel: UILabel!
-    @IBOutlet weak var dateLabel: UILabel!
+    private let topImageView = UIImageView(image: UIImage(named: "transfer-in_top"))
+    private let bottomImageView = UIImageView(image: UIImage(named: "transfer-in_bot"))
+    private lazy var amountLabel = UILabel()
+    private lazy var dateLabel = UILabel()
+    
+    private lazy var accountLabel: UILabel = {
+        let text = UILabel()
+        text.font = .systemFont(ofSize: 17)
+        return text
+    }()
+    
+    private lazy var addressLabel: UILabel = {
+        let text = UILabel()
+        let font = UIFont.preferredFont(forTextStyle: .footnote)
+        text.font = font.withSize(17)
+        text.textColor = .lightGray
+        return text
+    }()
+    
+    private lazy var contactInfoView: UIView = {
+        let view = UIView()
+        view.addSubview(accountLabel)
+        view.addSubview(addressLabel)
+        
+        accountLabel.snp.makeConstraints { make in
+            make.leading.centerY.equalToSuperview()
+            make.trailing.equalTo(addressLabel.snp.leading).offset(-5)
+        }
+        accountLabel.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+
+        addressLabel.snp.makeConstraints { make in
+            make.trailing.centerY.equalToSuperview()
+            make.width.greaterThanOrEqualTo(80)
+        }
+        addressLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+
+        view.snp.makeConstraints { make in
+            make.height.equalTo(26)
+        }
+        return view
+    }()
+    
+    private lazy var informationStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.alignment = .leading
+        stackView.spacing = 3
+        
+        stackView.addArrangedSubview(contactInfoView)
+        stackView.addArrangedSubview(amountLabel)
+        stackView.addArrangedSubview(dateLabel)
+        
+        return stackView
+    }()
     
     // MARK: - Properties
     
@@ -73,8 +121,42 @@ final class TransactionTableViewCell: UITableViewCell {
     
     // MARK: - Initializers
     
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
+        setupView()
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setupView()
+    }
+    
     override func awakeFromNib() {
         transactionType = .income
+    }
+    
+    private func setupView() {
+        addSubview(informationStackView)
+        addSubview(bottomImageView)
+        addSubview(topImageView)
+        
+        bottomImageView.snp.makeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.leading.equalToSuperview().offset(16)
+            make.size.equalTo(37)
+        }
+        
+        topImageView.snp.makeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.leading.equalToSuperview().offset(16)
+            make.size.equalTo(37)
+        }
+        
+        informationStackView.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(8)
+            make.leading.equalToSuperview().offset(70)
+            make.trailing.equalToSuperview().offset(-30)
+        }
     }
     
     func updateUI() {
@@ -97,7 +179,7 @@ final class TransactionTableViewCell: UITableViewCell {
         
         backgroundColor = .clear
         accountLabel.tintColor = UIColor.adamant.primary
-        ammountLabel.tintColor = UIColor.adamant.primary
+        amountLabel.tintColor = UIColor.adamant.primary
         
         dateLabel.textColor = transaction.transactionStatus?.color ?? .adamant.secondary
         
@@ -121,21 +203,31 @@ final class TransactionTableViewCell: UITableViewCell {
         if let partnerName = transaction.partnerName {
             accountLabel.text = partnerName
             addressLabel.text = partnerId
+            accountLabel.lineBreakMode = .byTruncatingTail
             addressLabel.lineBreakMode = .byTruncatingMiddle
             
             if addressLabel.isHidden {
                 addressLabel.isHidden = false
             }
+            addressLabel.snp.remakeConstraints { make in
+                make.trailing.centerY.equalToSuperview()
+                make.width.greaterThanOrEqualTo(80)
+            }
         } else {
             accountLabel.text = partnerId
+            accountLabel.lineBreakMode = .byTruncatingMiddle
             
             if !addressLabel.isHidden {
                 addressLabel.isHidden = true
             }
+            addressLabel.snp.remakeConstraints { make in
+                make.trailing.centerY.equalToSuperview()
+                make.width.equalTo(0)
+            }
         }
         
         let amount = transaction.amountValue ?? .zero
-        ammountLabel.text = AdamantBalanceFormat.full.format(amount, withCurrencySymbol: currencySymbol)
+        amountLabel.text = AdamantBalanceFormat.full.format(amount, withCurrencySymbol: currencySymbol)
     }
 }
 

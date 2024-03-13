@@ -52,6 +52,10 @@ final class AdmWalletService: NSObject, WalletCoreProtocol {
         return Self.qqPrefix
     }
     
+    var nodeGroups: [NodeGroup] {
+        [.adm]
+    }
+    
 	// MARK: - Dependencies
 	weak var accountService: AccountService?
 	var apiService: ApiService!
@@ -188,6 +192,8 @@ final class AdmWalletService: NSObject, WalletCoreProtocol {
     }
     
     func loadTransactions(offset: Int, limit: Int) async throws -> Int { .zero }
+    
+    func getTransactionsHistory(offset: Int, limit: Int) async throws -> [TransactionDetails] { [] }
     
     func getLocalTransactionHistory() -> [TransactionDetails] { [] }
     

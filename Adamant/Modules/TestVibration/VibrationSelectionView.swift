@@ -29,28 +29,29 @@ struct VibrationSelectionView: View {
         .withoutListBackground()
         .background(Color(.adamant.secondBackgroundColor))
         .navigationTitle("Vibrations")
+        .navigationBarTitleDisplayMode(.inline)
     }
     
     private func vibrationTypeDescription(_ type: AdamantVibroType) -> String {
         switch type {
         case .light:
-            return "Single-Short-Light (1SL Vibartion)"
+            return "Light (-)"
         case .rigid:
-            return "Single-Short-Rigid (1SR Vibartion)"
+            return "Rigid (v-short)"
         case .heavy:
-            return "Single-Long-Rigid (1LR Vibartion)"
+            return "Heavy (Strong)"
         case .medium:
-            return "Single-Short-Medium (1SM Vibartion)"
+            return "Medium (Medium)"
         case .soft:
-            return "Single-Long-Soft (1LS Vibartion)"
+            return "Soft (Short)"
         case .selection:
-            return "Single-Short-Soft (1SS Vibartion)"
+            return "Selection (-)"
         case .success:
-            return "Double-Short-Medium (2SM Vibartion)"
+            return "Success (Double-v-Short)"
         case .warning:
-            return "Double-Long-Medium (2LM Vibartion)"
+            return "Warning (Double-Short)"
         case .error:
-            return "Tripple-Long-Medium (3LM Vibartion)"
+            return "Error (Triple-v-Short)"
         }
     }
 }

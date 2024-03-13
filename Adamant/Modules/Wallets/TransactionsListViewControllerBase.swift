@@ -51,8 +51,10 @@ class TransactionsListViewControllerBase: UIViewController {
     
     // MARK: - Dependencies
     
-    var walletService: WalletService!
-    var dialogService: DialogService!
+    let walletService: WalletService
+    let dialogService: DialogService
+    let reachabilityMonitor: ReachabilityMonitor
+    let screensFactory: ScreensFactory
     
     // MARK: - Proprieties
     
@@ -75,6 +77,26 @@ class TransactionsListViewControllerBase: UIViewController {
     // MARK: - IBOutlets
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var emptyLabel: UILabel!
+    
+    // MARK: - Init
+    
+    init(
+        walletService: WalletService,
+        dialogService: DialogService,
+        reachabilityMonitor: ReachabilityMonitor,
+        screensFactory: ScreensFactory
+    ) {
+        self.walletService = walletService
+        self.dialogService = dialogService
+        self.reachabilityMonitor = reachabilityMonitor
+        self.screensFactory = screensFactory
+        
+        super.init(nibName: String(describing: TransactionsListViewControllerBase.self), bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - Lifecycle
     
@@ -146,9 +168,8 @@ class TransactionsListViewControllerBase: UIViewController {
     }
     
     func configureTableView() {
-        let nib = UINib.init(nibName: "TransactionTableViewCell", bundle: nil)
-        tableView.register(nib, forCellReuseIdentifier: cellIdentifierFull)
-        tableView.register(nib, forCellReuseIdentifier: cellIdentifierCompact)
+        tableView.register(TransactionTableViewCell.self, forCellReuseIdentifier: cellIdentifierFull)
+        tableView.register(TransactionTableViewCell.self, forCellReuseIdentifier: cellIdentifierCompact)
         tableView.delegate = self
         tableView.refreshControl = refreshControl
         tableView.tableHeaderView = UIView()
@@ -218,6 +239,16 @@ class TransactionsListViewControllerBase: UIViewController {
     @MainActor
     func loadData(offset: Int, silent: Bool) {
         guard !isBusy else { return }
+        
+        guard reachabilityMonitor.connection else {
+            dialogService.showCompactError(
+                withMessage: .adamant.sharedErrors.networkError,
+                supportEmail: false,
+                error: nil
+            )
+            return
+        }
+        
         isBusy = true
         Task {
             do {
@@ -226,16 +257,18 @@ class TransactionsListViewControllerBase: UIViewController {
                     limit: limit
                 )
                 self.offset += count
+                emptyLabel.isHidden = self.transactions.count > 0
             } catch {
                 isNeedToLoadMoore = false
+                emptyLabel.isHidden = self.transactions.count > 0
                 
                 if !silent {
-                    dialogService.showRichError(error: error)
+                    dialogService.showCompactError(withMessage: error.localizedDescription, supportEmail: false, error: error)
+                    emptyLabel.isHidden = true
                 }
             }
             
             isBusy = false
-            emptyLabel.isHidden = self.transactions.count > 0
             stopBottomIndicator()
             refreshControl.endRefreshing()
             updateLoadingView(isHidden: true)
@@ -278,6 +311,9 @@ class TransactionsListViewControllerBase: UIViewController {
               isNeedToLoadMoore,
               tableView.numberOfRows(inSection: .zero) - indexPath.row < 3
         else {
+            if tableView.tableFooterView == nil, isBusy {
+                bottomIndicatorView().startAnimating()
+            }
             return
         }
 
@@ -288,7 +324,7 @@ class TransactionsListViewControllerBase: UIViewController {
     @objc func handleRefresh() {
         presentLoadingViewIfNeeded()
         emptyLabel.isHidden = true
-        loadData(offset: .zero, silent: true)
+        loadData(offset: .zero, silent: false)
     }
     
     func reloadData() {

@@ -16,15 +16,16 @@ final class LskServiceApiCore: LskApiCore {
     ) async -> WalletServiceResult<NodeStatusInfo> {
         let startTimestamp = Date.now.timeIntervalSince1970
         
-        return await request(node: node) { client, completion in
-            LiskKit.Service(client: client).getFees { completion($0) }
+        return await request(node: node) { client in
+            let service = LiskKit.Service(client: client)
+            return try await (fee: service.fees(), info: service.info())
         }.map { model in
             .init(
                 ping: Date.now.timeIntervalSince1970 - startTimestamp,
-                height: .init(model.meta.lastBlockHeight),
+                height: .init(model.fee.meta.lastBlockHeight),
                 wsEnabled: false,
                 wsPort: nil,
-                version: nil
+                version: model.info.version
             )
         }
     }

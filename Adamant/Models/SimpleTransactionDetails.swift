@@ -40,6 +40,8 @@ struct SimpleTransactionDetails: AdamantTransactionDetails, Hashable {
     var showToChat: Bool?
     var chatRoom: Chatroom?
     
+    var nonceRaw: String?
+    
     init(
         defaultCurrencySymbol: String? = nil,
         txId: String,
@@ -52,7 +54,8 @@ struct SimpleTransactionDetails: AdamantTransactionDetails, Hashable {
         blockValue: String? = nil,
         isOutgoing: Bool,
         transactionStatus: TransactionStatus? = nil,
-        partnerName: String? = nil
+        partnerName: String? = nil,
+        nonceRaw: String?
     ) {
         self.defaultCurrencySymbol = defaultCurrencySymbol
         self.txId = txId
@@ -66,6 +69,7 @@ struct SimpleTransactionDetails: AdamantTransactionDetails, Hashable {
         self.isOutgoing = isOutgoing
         self.transactionStatus = transactionStatus
         self.partnerName = partnerName
+        self.nonceRaw = nonceRaw
     }
     
     init(_ transaction: TransactionDetails) {
@@ -80,6 +84,7 @@ struct SimpleTransactionDetails: AdamantTransactionDetails, Hashable {
         self.blockValue = transaction.blockValue
         self.isOutgoing = transaction.isOutgoing
         self.transactionStatus = transaction.transactionStatus
+        self.nonceRaw = transaction.nonceRaw
     }
     
     init(_ transaction: TransferTransaction) {

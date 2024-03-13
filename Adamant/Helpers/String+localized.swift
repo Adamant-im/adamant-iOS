@@ -61,6 +61,8 @@ extension String.adamant {
         static var noInternetNotificationBoby: String {
             String.localized("Shared.NoInternet.Body", comment: "Shared alert notification: body message for no internet connection.")
         }
+        static var noInternetTransferBody: String { String.localized("Shared.Transfer.NoInternet.Body", comment: "Shared alert notification: body message for no internet connection.")
+        }
         
         static var emailErrorMessageTitle: String {
             String.localized("Error.Mail.Title", comment: "Error messge title for support email")

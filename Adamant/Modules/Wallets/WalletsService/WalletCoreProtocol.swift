@@ -249,8 +249,9 @@ protocol WalletCoreProtocol: AnyObject {
     var defaultOrdinalLevel: Int? { get }
     var richMessageType: String { get }
     var dynamicRichMessageType: String { get }
-    
     var coinStorage: CoinStorageService { get }
+    var nodeGroups: [NodeGroup] { get }
+    var transferDecimals: Int { get }
     
     var transactionsPublisher: AnyObservable<[TransactionDetails]> {
         get
@@ -297,6 +298,7 @@ protocol WalletCoreProtocol: AnyObject {
     func getBalance(address: String) async throws -> Decimal
     func loadTransactions(offset: Int, limit: Int) async throws -> Int
     func getLocalTransactionHistory() -> [TransactionDetails]
+    func getTransactionsHistory(offset: Int, limit: Int) async throws -> [TransactionDetails]
     func updateStatus(for id: String, status: TransactionStatus?)
     func isExist(address: String) async throws -> Bool
     func statusInfoFor(transaction: CoinTransaction) async -> TransactionStatusInfo

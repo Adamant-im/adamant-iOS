@@ -17,7 +17,6 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
     let transfersProvider: TransfersProvider
     let chatsProvider: ChatsProvider
     let stack: CoreDataStack
-    let screensFactory: ScreensFactory
     let addressBookService: AddressBookService
     
     // MARK: - Properties
@@ -35,8 +34,6 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
     // MARK: - Lifecycle
     
     init(
-        nibName nibNameOrNil: String?,
-        bundle nibBundleOrNil: Bundle?,
         accountService: AccountService,
         transfersProvider: TransfersProvider,
         chatsProvider: ChatsProvider,
@@ -44,18 +41,21 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
         stack: CoreDataStack,
         screensFactory: ScreensFactory,
         addressBookService: AddressBookService,
-        walletService: WalletService
+        walletService: WalletService,
+        reachabilityMonitor: ReachabilityMonitor
     ) {
         self.accountService = accountService
         self.transfersProvider = transfersProvider
         self.chatsProvider = chatsProvider
         self.stack = stack
-        self.screensFactory = screensFactory
         self.addressBookService = addressBookService
         
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        self.dialogService = dialogService
-        self.walletService = walletService
+        super.init(
+            walletService: walletService,
+            dialogService: dialogService,
+            reachabilityMonitor: reachabilityMonitor,
+            screensFactory: screensFactory
+        )
     }
     
     required init?(coder: NSCoder) {
@@ -87,6 +87,15 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
     
     @MainActor
     override func reloadData() {
+        guard reachabilityMonitor.connection else {
+            dialogService.showCompactError(
+                withMessage: .adamant.sharedErrors.networkError,
+                supportEmail: false,
+                error: nil
+            )
+            return
+        }
+        
         Task {
             controller = await transfersProvider.transfersController()
             
@@ -265,8 +274,7 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
             vc.viewModel.setup(
                 account: account,
                 chatroom: chatroom,
-                messageIdToShow: nil,
-                preservationDelegate: nil
+                messageIdToShow: nil
             )
             
             if let nav = self.navigationController {

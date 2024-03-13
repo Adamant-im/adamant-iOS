@@ -28,8 +28,6 @@ struct AdmWalletFactory: WalletFactory {
     
     func makeTransferListVC(service: Service, screensFactory: ScreensFactory) -> UIViewController {
         AdmTransactionsViewController(
-            nibName: "TransactionsListViewControllerBase",
-            bundle: nil,
             accountService: assembler.resolve(AccountService.self)!,
             transfersProvider: assembler.resolve(TransfersProvider.self)!,
             chatsProvider: assembler.resolve(ChatsProvider.self)!,
@@ -37,7 +35,8 @@ struct AdmWalletFactory: WalletFactory {
             stack: assembler.resolve(CoreDataStack.self)!,
             screensFactory: screensFactory,
             addressBookService: assembler.resolve(AddressBookService.self)!,
-            walletService: service
+            walletService: service,
+            reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!
         )
     }
     
@@ -51,7 +50,9 @@ struct AdmWalletFactory: WalletFactory {
             currencyInfoService: assembler.resolve(CurrencyInfoService.self)!,
             increaseFeeService: assembler.resolve(IncreaseFeeService.self)!,
             vibroService: assembler.resolve(VibroService.self)!,
-            walletService: service
+            walletService: service,
+            reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
+            nodesStorage: assembler.resolve(NodesStorageProtocol.self)!
         )
     }
     

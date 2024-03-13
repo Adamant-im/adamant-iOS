@@ -13,6 +13,12 @@ import BitcoinKit
 import Combine
 import CommonKit
 
+struct DashApiComand {
+    static let networkInfoMethod: String = "getnetworkinfo"
+    static let blockchainInfoMethod: String = "getblockchaininfo"
+    static let rawTransactionMethod: String = "getrawtransaction"
+}
+
 final class DashWalletService: WalletCoreProtocol {
     
     var tokenSymbol: String {
@@ -41,6 +47,10 @@ final class DashWalletService: WalletCoreProtocol {
 
     var qqPrefix: String {
         return Self.qqPrefix
+    }
+    
+    var nodeGroups: [NodeGroup] {
+        [.dash]
     }
     
     var wallet: WalletAccount? { return dashWallet }
@@ -325,7 +335,8 @@ extension DashWalletService {
                 }
             }
             
-            service.setState(.upToDate, silent: true)
+            service.setState(.upToDate)
+            
             Task {
                 service.update()
             }
@@ -443,8 +454,21 @@ extension DashWalletService {
     }
     
     func loadTransactions(offset: Int, limit: Int) async throws -> Int {
-        guard let address = wallet?.address else {
+        let trs = try await getTransactionsHistory(offset: offset, limit: limit)
+        
+        guard trs.count > 0 else {
+            hasMoreOldTransactions = false
             return .zero
+        }
+        
+        coinStorage.append(trs)
+        
+        return trs.count
+    }
+    
+    func getTransactionsHistory(offset: Int, limit: Int) async throws -> [TransactionDetails] {
+        guard let address = wallet?.address else {
+            throw WalletServiceError.accountNotFound
         }
         
         let allTransactionsIds = try await requestTransactionsIds(for: address).reversed()
@@ -461,14 +485,7 @@ extension DashWalletService {
         
         let trs = try await getTransactions(by: ids)
         
-        guard trs.count > 0 else {
-            hasMoreOldTransactions = false
-            return .zero
-        }
-        
-        coinStorage.append(trs)
-        
-        return trs.count
+        return trs
     }
     
     func getLocalTransactionHistory() -> [TransactionDetails] {
