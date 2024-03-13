@@ -91,8 +91,6 @@ final class ChatViewController: MessagesViewController {
         self.sendTransaction = sendTransaction
         super.init(nibName: nil, bundle: nil)
         inputBar.onAttachmentButtonTap = { [weak self] in
-//            self.map { sendTransaction($0, viewModel.replyMessage?.id) }
-//            self?.viewModel.clearReplyMessage()
             self?.viewModel.presentActionMenu()
         }
     }

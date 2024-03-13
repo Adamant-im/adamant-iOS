@@ -296,6 +296,11 @@ final class ChatViewModel: NSObject {
             return
         }
         
+        let replyMessage = replyMessage
+        
+        self.filesPicked = nil
+        self.replyMessage = nil
+        
         Task {
             var richFiles: [RichMessageFile.File] = files.compactMap {
                 RichMessageFile.File.init(
@@ -393,9 +398,6 @@ final class ChatViewModel: NSObject {
                         )
                     )
                 }
-                
-                replyMessage = nil
-                filesPicked = nil
                 
                 _ = try await chatsProvider.sendFileMessage(
                     message,
