@@ -330,7 +330,7 @@ private extension ChatMessageFactory {
         let chatFiles = files.map {
             ChatFile.init(
                 file: RichMessageFile.File.init($0),
-                previewData: filesStorage.getPreview(
+                previewDataURL: filesStorage.getPreview(
                     for: $0[RichContentKeys.file.file_id] as? String ?? .empty,
                     type: $0[RichContentKeys.file.file_type] as? String ?? .empty
                 ),

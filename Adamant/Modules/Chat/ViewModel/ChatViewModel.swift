@@ -783,17 +783,13 @@ final class ChatViewModel: NSObject {
                 return
             }
             
-            let data = try filesStorage.getFileData(
-                with: file.file.file_id,
-                senderPublicKey: chatroom?.partner?.publicKey ?? .empty,
-                recipientPrivateKey: keyPair.privateKey,
-                nonce: file.nonce
-            )
+            let data = try filesStorage.getFileURL(with: file.file.file_id)
             
             FilesPickerKit.shared.openFile(
-                data: data,
+                url: data,
                 name: file.file.file_name ?? .empty,
-                size: file.file.file_size
+                size: file.file.file_size,
+                ext: file.file.file_type ?? .empty
             )
         }
     }
@@ -1187,7 +1183,7 @@ private extension ChatViewModel {
         _ messages: inout [ChatMessage],
         id oldId: String,
         newId: String? = nil,
-        preview: UIImage?,
+        preview: URL?,
         cached: Bool
     ) {
         messages.indices.forEach { index in
@@ -1276,7 +1272,7 @@ private extension ChatMessage {
     mutating func updateFields(
         id oldId: String,
         newId: String? = nil,
-        preview: UIImage?,
+        preview: URL?,
         cached: Bool
     ) {
         guard case let .file(fileModel) = content else { return }
@@ -1289,7 +1285,7 @@ private extension ChatMessage {
         if let newId = newId {
             model.content.files[index].file.file_id = newId
         }
-        model.content.files[index].previewData = preview
+        model.content.files[index].previewDataURL = preview
         model.content.files[index].isCached = cached
 
         content = .file(.init(value: model))

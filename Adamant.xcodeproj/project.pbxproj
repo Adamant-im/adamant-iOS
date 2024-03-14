@@ -95,7 +95,6 @@
 		4186B338294200E8006594A3 /* DogeWalletService+DynamicConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4186B337294200E8006594A3 /* DogeWalletService+DynamicConstants.swift */; };
 		4186B33A294200F4006594A3 /* DashWalletService+DynamicConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4186B339294200F4006594A3 /* DashWalletService+DynamicConstants.swift */; };
 		418FDE502A25CA340055E3CD /* ChatMenuManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418FDE4F2A25CA340055E3CD /* ChatMenuManager.swift */; };
-		41935848287841E20083363B /* MacOSDeterminer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41935847287841E20083363B /* MacOSDeterminer.swift */; };
 		4193AE1629FBEFBF002F21BE /* NSAttributedText+Adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4193AE1529FBEFBF002F21BE /* NSAttributedText+Adamant.swift */; };
 		4197B9C92952FAFF004CAF64 /* VisibleWalletsCheckmarkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4197B9C82952FAFF004CAF64 /* VisibleWalletsCheckmarkView.swift */; };
 		4198D57B28C8B7DA009337F2 /* so-proud-notification.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4198D57A28C8B7DA009337F2 /* so-proud-notification.mp3 */; };
@@ -748,7 +747,6 @@
 		4186B337294200E8006594A3 /* DogeWalletService+DynamicConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DogeWalletService+DynamicConstants.swift"; sourceTree = "<group>"; };
 		4186B339294200F4006594A3 /* DashWalletService+DynamicConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DashWalletService+DynamicConstants.swift"; sourceTree = "<group>"; };
 		418FDE4F2A25CA340055E3CD /* ChatMenuManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMenuManager.swift; sourceTree = "<group>"; };
-		41935847287841E20083363B /* MacOSDeterminer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacOSDeterminer.swift; sourceTree = "<group>"; };
 		4193AE1529FBEFBF002F21BE /* NSAttributedText+Adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSAttributedText+Adamant.swift"; sourceTree = "<group>"; };
 		4197B9C82952FAFF004CAF64 /* VisibleWalletsCheckmarkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisibleWalletsCheckmarkView.swift; sourceTree = "<group>"; };
 		4198D57A28C8B7DA009337F2 /* so-proud-notification.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "so-proud-notification.mp3"; sourceTree = "<group>"; };
@@ -2137,7 +2135,6 @@
 				E9256F5E2034C21100DE86E9 /* String+localized.swift */,
 				E98FC34320F920BD00032D65 /* UIFont+adamant.swift */,
 				645AE06521E67D3300AD3623 /* UITextField+adamant.swift */,
-				41935847287841E20083363B /* MacOSDeterminer.swift */,
 				4E9EE86E28CE793D008359F7 /* SafeDecimalRow.swift */,
 				9345769428FD0C34004E6C7A /* UIViewController+email.swift */,
 				41CE1539297FF98200CC9254 /* Web3Swift+Adamant.swift */,
@@ -3469,7 +3466,6 @@
 				E90A4943204C5ED6009F6A65 /* EurekaPassphraseRow.swift in Sources */,
 				E90847302196FEA80095825D /* ChatTransaction+CoreDataClass.swift in Sources */,
 				E913C9081FFFA943001A83F7 /* AdamantCore.swift in Sources */,
-				41935848287841E20083363B /* MacOSDeterminer.swift in Sources */,
 				3A96E37A2AED27D7001F5A52 /* AdamantPartnerQRService.swift in Sources */,
 				E9EC342120052ABB00C0E546 /* TransferViewControllerBase.swift in Sources */,
 				9304F8C4292F8A3100173F18 /* AdamantPushNotificationsTokenService.swift in Sources */,

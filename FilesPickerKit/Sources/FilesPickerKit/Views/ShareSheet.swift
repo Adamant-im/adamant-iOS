@@ -10,17 +10,20 @@ import SwiftUI
 
 struct ShareSheet: View {
     let activityItems: [Any]
+    let completion: UIActivityViewController.CompletionWithItemsHandler?
     
     var body: some View {
-        ActivityView(activityItems: activityItems)
+        ActivityView(activityItems: activityItems, completion: completion)
     }
 }
 
 struct ActivityView: UIViewControllerRepresentable {
     let activityItems: [Any]
+    let completion: UIActivityViewController.CompletionWithItemsHandler?
     
     func makeUIViewController(context: Context) -> UIActivityViewController {
         let controller = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+        controller.completionWithItemsHandler = completion
         return controller
     }
     

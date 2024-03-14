@@ -122,7 +122,7 @@ private struct ViewerControls: View {
                 }
                 .padding()
                 .sheet(isPresented: $isShareSheetPresented) {
-                    ShareSheet(activityItems: [viewModel.uiImage])
+                    ShareSheet(activityItems: [viewModel.uiImage], completion: nil)
                 }
                 
                 Spacer()

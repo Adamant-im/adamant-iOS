@@ -12,16 +12,11 @@ import CommonKit
 import FilesStorageKit
 
 protocol FilesStorageProtocol {
-    func getPreview(for id: String, type: String) -> UIImage
+    func getPreview(for id: String, type: String) -> URL?
     
     func isCached(_ id: String) -> Bool
     
-    func getFileData(
-        with id: String,
-        senderPublicKey: String,
-        recipientPrivateKey: String,
-        nonce: String
-    ) throws -> Data
+    func getFileURL(with id: String) throws -> URL
     
     func uploadFile(
         _ file: FileResult,

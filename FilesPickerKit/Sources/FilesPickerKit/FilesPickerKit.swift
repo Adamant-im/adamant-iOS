@@ -5,15 +5,17 @@ import CommonKit
 import UIKit
 import SwiftUI
 
-public final class FilesPickerKit {
+public final class FilesPickerKit: NSObject {
     public static let shared = FilesPickerKit()
     
     private let mediaPicker: FilePickerProtocol
     private let documentPicker: FilePickerProtocol
+    private let documentInteration: DocumentInteractionProtocol
     
-    public init() {
+    public override init() {
         mediaPicker = MediaPickerService()
         documentPicker = DocumentPickerService()
+        documentInteration = DocumentInteractionService()
     }
     
     @MainActor
@@ -47,30 +49,28 @@ public final class FilesPickerKit {
             }
         }
     }
-    
-    public func openFile(data: Data, name: String, size: Int64) {
-        guard let uiImage = UIImage(data: data) else {
-            let viewModel = OtherViewerViewModel(caption: name, size: size, data: data)
-            let view = OtherViewer(viewModel: viewModel)
-            present(view: view)
-            return
+        
+    public func openFile(url: URL, name: String, size: Int64, ext: String) {
+        let fullName = name.contains(ext)
+        ? name
+        : "\(name).\(ext)"
+        
+        var copyURL = URL(fileURLWithPath: url.deletingLastPathComponent().path)
+        copyURL.appendPathComponent(fullName)
+        
+        if FileManager.default.fileExists(atPath: copyURL.path) {
+            try? FileManager.default.removeItem(at: copyURL)
         }
         
-        let view = ImageViewer(image: uiImage, caption: name)
-        present(view: view)
+        try? FileManager.default.copyItem(at: url, to: copyURL)
+        
+        documentInteration.open(url: copyURL, name: fullName) { [copyURL] in
+            try? FileManager.default.removeItem(at: copyURL)
+        }
     }
 }
 
 private extension FilesPickerKit {
-    func present(view: some View) {
-        let vc = UIHostingController(
-            rootView: view
-        )
-        vc.modalPresentationStyle = .overCurrentContext
-        vc.view.backgroundColor = .clear
-        UIApplication.shared.topViewController()?.present(vc, animated: false)
-    }
-    
     func validateFiles(_ files: [FileResult]) throws {
         guard files.count <= FilesConstants.maxFilesCount else {
             throw FileValidationError.tooManyFiles

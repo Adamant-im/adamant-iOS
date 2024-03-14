@@ -58,17 +58,13 @@ private struct ViewerContent: View {
     
     var dismissAction: () -> Void
     
-    @State private var isShareSheetPresented = false
-    
     var body: some View {
         VStack {
             HStack {
-                if let caption = viewModel.caption {
-                    Text(caption)
-                        .foregroundColor(.black)
-                        .multilineTextAlignment(.leading)
-                        .padding()
-                }
+                Text(viewModel.caption)
+                    .foregroundColor(.black)
+                    .multilineTextAlignment(.leading)
+                    .padding()
                 Spacer()
                 CloseButton(dismissAction: dismissAction, color: .black)
                     .padding()
@@ -81,7 +77,7 @@ private struct ViewerContent: View {
                 Spacer()
                 
                 Button {
-                    isShareSheetPresented.toggle()
+                    viewModel.shareAction()
                 } label: {
                     Image(systemName: "square.and.arrow.up")
                         .resizable()
@@ -89,8 +85,8 @@ private struct ViewerContent: View {
                         .tint(Color(UIColor.adamant.active))
                 }
                 .padding(EdgeInsets(top: 5, leading: .zero, bottom: 5, trailing: .zero))
-                .sheet(isPresented: $isShareSheetPresented) {
-                    ShareSheet(activityItems: [viewModel.data])
+                .sheet(isPresented: viewModel.$isShareSheetPresented) {
+                    shareView()
                 }
                 
                 Spacer()
@@ -98,6 +94,17 @@ private struct ViewerContent: View {
             .background(Color(UIColor.tertiarySystemGroupedBackground))
         }
         .background(Color.white)
+    }
+    
+    func shareView() -> some View {
+        if let copyURL = try? viewModel.getCopyOfFile() {
+            let completion: UIActivityViewController.CompletionWithItemsHandler = { [weak viewModel] (_, _, _, _) in
+                viewModel?.removeCopyOfFile()
+            }
+            return ShareSheet(activityItems: [copyURL], completion: completion)
+        }
+        
+        return ShareSheet(activityItems: [viewModel.fileUrl], completion: nil)
     }
 }
 
@@ -110,13 +117,11 @@ private struct Content: View {
                 .resizable()
                 .frame(width: 80, height: 90)
             
-            if let caption = viewModel.caption {
-                Text(caption)
-                    .font(.headline)
-                    .foregroundColor(.black)
-                    .multilineTextAlignment(.center)
-                    .padding()
-            }
+            Text(viewModel.caption)
+                .font(.headline)
+                .foregroundColor(.black)
+                .multilineTextAlignment(.center)
+                .padding()
             
             if let size = viewModel.size {
                 Text(viewModel.formatSize(size))
