@@ -68,8 +68,8 @@ final class FilesToolbarView: UIView {
         
         iv.tintColor = .adamant.active
         iv.snp.makeConstraints { make in
-            make.height.equalTo(30)
-            make.width.equalTo(27)
+            make.height.equalTo(27)
+            make.width.equalTo(24)
         }
         
         return iv
@@ -118,7 +118,7 @@ final class FilesToolbarView: UIView {
         addSubview(horizontalStack)
         horizontalStack.snp.makeConstraints {
             $0.top.bottom.equalToSuperview().inset(verticalInsets)
-            $0.leading.trailing.equalToSuperview().inset(15)
+            $0.leading.trailing.equalToSuperview().inset(horizontalInsets)
         }
     }
     
@@ -171,3 +171,4 @@ extension FilesToolbarView: UICollectionViewDelegate, UICollectionViewDataSource
 
 private let horizontalStackSpacing: CGFloat = 25
 private let verticalInsets: CGFloat = 8
+private let horizontalInsets: CGFloat = 12
