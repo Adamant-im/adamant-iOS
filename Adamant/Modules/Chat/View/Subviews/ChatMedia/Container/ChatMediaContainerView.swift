@@ -26,12 +26,74 @@ final class ChatMediaContainerView: UIView, ChatModelView {
         let stack = UIStackView()
         stack.alignment = .center
         stack.axis = .horizontal
+        stack.spacing = 12
+        return stack
+    }()
+    
+    private lazy var ownReactionLabel: UILabel = {
+        let label = UILabel()
+        label.text = getReaction(for: model.address)
+        label.backgroundColor = .adamant.pickedReactionBackground
+        label.layer.cornerRadius = ownReactionSize.height / 2
+        label.textAlignment = .center
+        label.layer.masksToBounds = true
+        
+        label.snp.makeConstraints { make in
+            make.width.equalTo(ownReactionSize.width)
+            make.height.equalTo(ownReactionSize.height)
+        }
+        
+        let tapGesture = UITapGestureRecognizer(
+            target: self,
+            action: #selector(tapReactionAction)
+        )
+        
+        label.addGestureRecognizer(tapGesture)
+        label.isUserInteractionEnabled = true
+        return label
+    }()
+    
+    private lazy var opponentReactionLabel: UILabel = {
+        let label = UILabel()
+        label.text = getReaction(for: model.opponentAddress)
+        label.textAlignment = .center
+        label.layer.masksToBounds = true
+        label.backgroundColor = .adamant.pickedReactionBackground
+        label.layer.cornerRadius = opponentReactionSize.height / 2
+        
+        label.snp.makeConstraints { make in
+            make.width.equalTo(opponentReactionSize.width)
+            make.height.equalTo(opponentReactionSize.height)
+        }
+        
+        let tapGesture = UITapGestureRecognizer(
+            target: self,
+            action: #selector(tapReactionAction)
+        )
+        
+        label.addGestureRecognizer(tapGesture)
+        label.isUserInteractionEnabled = true
+        return label
+    }()
+    
+    private lazy var reactionsStack: UIStackView = {
+        let stack = UIStackView()
+        stack.alignment = .center
+        stack.axis = .vertical
+        stack.spacing = 12
+
+        stack.addArrangedSubview(ownReactionLabel)
+        stack.addArrangedSubview(opponentReactionLabel)
         return stack
     }()
     
     private lazy var contentView = ChatMediaContentView()
     private lazy var chatMenuManager = ChatMenuManager(delegate: self)
 
+    // MARK: Dependencies
+    
+    var chatMessagesListViewModel: ChatMessagesListViewModel?
+    
     // MARK: Proprieties
     
     var subscription: AnyCancellable?
@@ -49,6 +111,12 @@ final class ChatMediaContainerView: UIView, ChatModelView {
             contentView.isSelected = isSelected
         }
     }
+    
+    private let ownReactionSize = CGSize(width: 40, height: 27)
+    private let opponentReactionSize = CGSize(width: 55, height: 27)
+    private let opponentReactionImageSize = CGSize(width: 12, height: 12)
+    
+    // MARK: - Init
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -91,10 +159,17 @@ extension ChatMediaContainerView {
         }
         
         updateLayout()
+        
+        reactionsStack.snp.makeConstraints { $0.width.equalTo(50) }
+        
+        ownReactionLabel.isHidden = getReaction(for: model.address) == nil
+        opponentReactionLabel.isHidden = getReaction(for: model.opponentAddress) == nil
+        updateOwnReaction()
+        updateOpponentReaction()
     }
     
     func updateLayout() {
-        var viewsList = [spacingView, contentView]
+        var viewsList = [spacingView, reactionsStack, contentView]
         
         viewsList = model.isFromCurrentSender
             ? viewsList
@@ -103,6 +178,64 @@ extension ChatMediaContainerView {
         guard horizontalStack.arrangedSubviews != viewsList else { return }
         horizontalStack.arrangedSubviews.forEach(horizontalStack.removeArrangedSubview)
         viewsList.forEach(horizontalStack.addArrangedSubview)
+    }
+    
+    func updateOwnReaction() {
+        ownReactionLabel.text = getReaction(for: model.address)
+        ownReactionLabel.backgroundColor = model.content.backgroundColor.uiColor.mixin(
+            infusion: .lightGray,
+            alpha: 0.15
+        )
+    }
+    
+    func updateOpponentReaction() {
+        guard let reaction = getReaction(for: model.opponentAddress),
+              let senderPublicKey = getSenderPublicKeyInReaction(for: model.opponentAddress)
+        else {
+            opponentReactionLabel.attributedText = nil
+            opponentReactionLabel.text = nil
+            return
+        }
+        
+        let fullString = NSMutableAttributedString(string: reaction)
+        
+        if let image = chatMessagesListViewModel?.avatarService.avatar(
+            for: senderPublicKey,
+            size: opponentReactionImageSize.width
+        ) {
+            let replyImageAttachment = NSTextAttachment()
+            replyImageAttachment.image = image
+            replyImageAttachment.bounds = .init(
+                origin: .init(x: .zero, y: -3),
+                size: opponentReactionImageSize
+            )
+            
+            let imageString = NSAttributedString(attachment: replyImageAttachment)
+            fullString.append(NSAttributedString(string: " "))
+            fullString.append(imageString)
+        }
+        
+        opponentReactionLabel.attributedText = fullString
+        opponentReactionLabel.backgroundColor = model.content.backgroundColor.uiColor.mixin(
+            infusion: .lightGray,
+            alpha: 0.15
+        )
+    }
+    
+    func getSenderPublicKeyInReaction(for senderAddress: String) -> String? {
+        model.reactions?.first(
+            where: { $0.sender == senderAddress }
+        )?.senderPublicKey
+    }
+    
+    func getReaction(for address: String) -> String? {
+        model.reactions?.first(
+            where: { $0.sender == address }
+        )?.reaction
+    }
+    
+    @objc func tapReactionAction() {
+        chatMenuManager.presentMenuProgrammatically(for: contentView)
     }
 }
 
@@ -125,7 +258,7 @@ extension ChatMediaContainerView: ChatMenuManagerDelegate {
             tapLocation: tapLocation,
             messageId: model.id,
             menu: makeContextMenu(),
-            selectedEmoji: nil,
+            selectedEmoji: getReaction(for: model.address),
             getPositionOnScreen: getPositionOnScreen
         )
         actionHandler(.presentMenu(arg: arguments))

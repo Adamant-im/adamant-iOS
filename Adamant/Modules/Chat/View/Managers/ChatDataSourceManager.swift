@@ -158,6 +158,7 @@ final class ChatDataSourceManager: MessagesDataSource {
             }
             
             cell.containerMediaView.actionHandler = { [weak self] in self?.handleAction($0) }
+            cell.containerMediaView.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
             cell.containerMediaView.model = model.value
             cell.containerMediaView.setSubscription(publisher: publisher, collection: messagesCollectionView)
             cell.configure(with: message, at: indexPath, and: messagesCollectionView)
