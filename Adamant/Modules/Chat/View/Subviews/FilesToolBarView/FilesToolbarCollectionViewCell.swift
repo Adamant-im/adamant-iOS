@@ -74,7 +74,9 @@ final class FilesToolbarCollectionViewCell: UICollectionViewCell {
     }
     
     func update(_ file: FileResult, tag: Int) {
-        imageView.image = file.preview ?? .asset(named: "file-jpg-box")
+        imageView.image = file.preview ?? defaultImage
         removeBtn.tag = tag
     }
 }
+
+private let defaultImage: UIImage? = .asset(named: "file-default-box")

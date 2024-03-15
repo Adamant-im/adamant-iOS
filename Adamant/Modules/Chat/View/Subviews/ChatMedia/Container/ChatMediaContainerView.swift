@@ -16,8 +16,22 @@ final class ChatMediaContainerView: UIView, ChatModelView {
         return view
     }()
     
-    private lazy var contentView = ChatMediaContentView()
+    private let spacingView: UIView = {
+        let view = UIView()
+        view.setContentCompressionResistancePriority(.dragThatCanResizeScene, for: .horizontal)
+        return view
+    }()
     
+    private let horizontalStack: UIStackView = {
+        let stack = UIStackView()
+        stack.alignment = .center
+        stack.axis = .horizontal
+        return stack
+    }()
+    
+    private lazy var contentView = ChatMediaContentView()
+    private lazy var chatMenuManager = ChatMenuManager(delegate: self)
+
     // MARK: Proprieties
     
     var subscription: AnyCancellable?
@@ -28,6 +42,12 @@ final class ChatMediaContainerView: UIView, ChatModelView {
     
     var actionHandler: (ChatAction) -> Void = { _ in } {
         didSet { contentView.actionHandler = actionHandler }
+    }
+    
+    var isSelected: Bool = false {
+        didSet {
+            contentView.isSelected = isSelected
+        }
     }
     
     override init(frame: CGRect) {
@@ -42,22 +62,25 @@ final class ChatMediaContainerView: UIView, ChatModelView {
 }
 
 extension ChatMediaContainerView {
-    func configure() {
+    func configure() {        
         addSubview(swipeView)
         swipeView.snp.makeConstraints { make in
             make.directionalEdges.equalToSuperview()
         }
         
-        addSubview(contentView)
-        contentView.snp.makeConstraints {
-            $0.top.bottom.equalToSuperview().inset(12)
-            $0.leading.trailing.equalToSuperview().inset(12)
+        addSubview(horizontalStack)
+        horizontalStack.snp.makeConstraints {
+            $0.verticalEdges.equalToSuperview()
+            $0.horizontalEdges.equalToSuperview().inset(4)
         }
         
         swipeView.swipeStateAction = { [actionHandler] state in
             actionHandler(.swipeState(state: state))
         }
-     //   chatMenuManager.setup(for: contentView)
+        
+        contentView.snp.makeConstraints { $0.width.equalTo(contentWidth) }
+        
+        chatMenuManager.setup(for: contentView)
     }
     
     func update() {
@@ -66,6 +89,82 @@ extension ChatMediaContainerView {
         swipeView.didSwipeAction = { [actionHandler, model] in
             actionHandler(.reply(message: model))
         }
+        
+        updateLayout()
+    }
+    
+    func updateLayout() {
+        var viewsList = [spacingView, contentView]
+        
+        viewsList = model.isFromCurrentSender
+            ? viewsList
+            : viewsList.reversed()
+        
+        guard horizontalStack.arrangedSubviews != viewsList else { return }
+        horizontalStack.arrangedSubviews.forEach(horizontalStack.removeArrangedSubview)
+        viewsList.forEach(horizontalStack.addArrangedSubview)
+    }
+}
+
+extension ChatMediaContainerView: ChatMenuManagerDelegate {
+    func getCopyView() -> UIView? {
+        copy(with: model)?.contentView
+    }
+    
+    func presentMenu(
+        copyView: UIView,
+        size: CGSize,
+        location: CGPoint,
+        tapLocation: CGPoint,
+        getPositionOnScreen: @escaping () -> CGPoint
+    ) {
+        let arguments = ChatContextMenuArguments.init(
+            copyView: copyView,
+            size: size,
+            location: location,
+            tapLocation: tapLocation,
+            messageId: model.id,
+            menu: makeContextMenu(),
+            selectedEmoji: nil,
+            getPositionOnScreen: getPositionOnScreen
+        )
+        actionHandler(.presentMenu(arg: arguments))
+    }
+}
+
+extension ChatMediaContainerView {
+    func makeContextMenu() -> AMenuSection {
+        let remove = AMenuItem.action(
+            title: .adamant.chat.remove,
+            systemImageName: "trash",
+            style: .destructive
+        ) { [actionHandler, model] in
+            actionHandler(.remove(id: model.id))
+        }
+        
+        let report = AMenuItem.action(
+            title: .adamant.chat.report,
+            systemImageName: "exclamationmark.bubble"
+        ) { [actionHandler, model] in
+            actionHandler(.report(id: model.id))
+        }
+        
+        let reply = AMenuItem.action(
+            title: .adamant.chat.reply,
+            systemImageName: "arrowshape.turn.up.left"
+        ) { [actionHandler, model] in
+            actionHandler(.reply(message: model))
+        }
+        
+        return AMenuSection([reply, report, remove])
+    }
+}
+
+extension ChatMediaContainerView {
+    func copy(with model: Model) -> ChatMediaContainerView? {
+        let view = ChatMediaContainerView(frame: frame)
+        view.contentView.model = model.content
+        return view
     }
 }
 
@@ -74,3 +173,5 @@ extension ChatMediaContainerView.Model {
         content.height()
     }
 }
+
+private let contentWidth: CGFloat = 260

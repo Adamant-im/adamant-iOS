@@ -65,7 +65,7 @@ final class ChatMediaContentView: UIView {
     private lazy var verticalStack: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [replyView, commentLabel, filesStack])
         stack.axis = .vertical
-        stack.spacing = .zero
+        stack.spacing = verticalStackSpacing
         return stack
     }()
     
@@ -74,7 +74,7 @@ final class ChatMediaContentView: UIView {
         stack.axis = .vertical
         stack.spacing = verticalStackSpacing
         
-        for _ in 0...FilesConstants.maxFilesCount {
+        for _ in 0..<FilesConstants.maxFilesCount {
             let view = ChatFileView()
             view.snp.makeConstraints { $0.height.equalTo(imageSize) }
             stack.addArrangedSubview(view)
@@ -86,6 +86,15 @@ final class ChatMediaContentView: UIView {
         didSet {
             guard oldValue != model else { return }
             update()
+        }
+    }
+    
+    var isSelected: Bool = false {
+        didSet {
+            animateIsSelected(
+                isSelected,
+                originalColor: model.backgroundColor.uiColor
+            )
         }
     }
     
@@ -104,13 +113,19 @@ final class ChatMediaContentView: UIView {
 
 private extension ChatMediaContentView {
     func configure() {
+        layer.cornerRadius = 16
+        
         addSubview(verticalStack)
         verticalStack.snp.makeConstraints { make in
-            make.directionalEdges.equalToSuperview()
+            make.verticalEdges.equalToSuperview().inset(8)
+            make.horizontalEdges.equalToSuperview().inset(12)
         }
     }
     
     func update() {
+        alpha = model.isHidden ? .zero : 1.0
+        backgroundColor = model.backgroundColor.uiColor
+        
         commentLabel.attributedText = model.comment
         commentLabel.isHidden = model.comment.string.isEmpty
         replyView.isHidden = !model.isReply
@@ -178,7 +193,7 @@ extension ChatMediaContentView.Model {
 
         return imageSize * CGFloat(filesCount)
         + stackSpacingCount * verticalStackSpacing
-        + labelSize(for: comment, considering: 260).height
+        + labelSize(for: comment, considering: contentWidth).height
         + replyViewDynamicHeight
     }
     
@@ -211,3 +226,4 @@ private let commentFont = UIFont.systemFont(ofSize: 14)
 private let verticalStackSpacing: CGFloat = 6
 private let verticalInsets: CGFloat = 8
 private let replyViewHeight: CGFloat = 25
+private let contentWidth: CGFloat = 260

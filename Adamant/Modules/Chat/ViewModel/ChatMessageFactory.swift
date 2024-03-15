@@ -355,7 +355,8 @@ private extension ChatMessageFactory {
                 isReply: transaction.isFileReply(),
                 replyMessage: decodedMessageMarkDown,
                 replyId: replyId,
-                comment: Self.markdownParser.parse(comment)
+                comment: Self.markdownParser.parse(comment),
+                backgroundColor: backgroundColor
             ),
             address: address,
             opponentAddress: opponentAddress

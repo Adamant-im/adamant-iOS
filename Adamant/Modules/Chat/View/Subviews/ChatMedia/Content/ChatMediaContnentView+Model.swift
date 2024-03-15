@@ -19,6 +19,7 @@ extension ChatMediaContentView {
         let replyMessage: NSAttributedString
         let replyId: String
         let comment: NSAttributedString
+        let backgroundColor: ChatMessageBackgroundColor
         
         static let `default` = Self(
             id: "",
@@ -28,7 +29,8 @@ extension ChatMediaContentView {
             isReply: false,
             replyMessage: NSAttributedString(string: .empty),
             replyId: .empty,
-            comment: NSAttributedString(string: .empty)
+            comment: NSAttributedString(string: .empty),
+            backgroundColor: .failed
         )
     }
 }

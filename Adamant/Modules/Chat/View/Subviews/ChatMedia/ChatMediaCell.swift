@@ -29,10 +29,7 @@ final class ChatMediaCell: MessageContentCell {
     
     override var isSelected: Bool {
         didSet {
-            messageContainerView.animateIsSelected(
-                isSelected,
-                originalColor: messageContainerView.backgroundColor
-            )
+            containerMediaView.isSelected = isSelected
         }
     }
     
@@ -42,12 +39,15 @@ final class ChatMediaCell: MessageContentCell {
         and messagesCollectionView: MessagesCollectionView
     ) {
         super.configure(with: message, at: indexPath, and: messagesCollectionView)
+        messageContainerView.style = .none
+        messageContainerView.backgroundColor = .clear
     }
     
     override func layoutMessageContainerView(
         with attributes: MessagesCollectionViewLayoutAttributes
     ) {
         super.layoutMessageContainerView(with: attributes)
+        
         containerMediaView.frame = messageContainerView.frame
         containerMediaView.layoutIfNeeded()
     }
