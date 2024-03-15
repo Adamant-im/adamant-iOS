@@ -36,6 +36,7 @@ extension DocumentPickerService: UIDocumentPickerDelegate {
                 url: $0,
                 type: .other,
                 preview: nil,
+                previewUrl: nil,
                 size: (try? getFileSize(from: $0)) ?? .zero,
                 name: $0.lastPathComponent,
                 extenstion: $0.pathExtension

@@ -55,11 +55,16 @@ private extension MediaPickerService {
                       let fileSize = try? getFileSize(from: url)
                 else { continue }
                 
+                let resizedPreview = self.resizeImage(image: preview, targetSize: .init(squareSize: 50))
+                
+                let previewUrl = try? getUrl(for: resizedPreview, name: url.lastPathComponent)
+                
                 dataArray.append(
                     .init(
                         url: url,
                         type: .image,
-                        preview: preview,
+                        preview: resizedPreview,
+                        previewUrl: previewUrl,
                         size: fileSize,
                         name: itemProvider.suggestedName, 
                         extenstion: "JPG"
@@ -73,15 +78,17 @@ private extension MediaPickerService {
                 else { continue }
                 
                 let preview = getThumbnailImage(forUrl: url)
+                let previewUrl = try? getUrl(for: preview, name: url.lastPathComponent)
                 
                 dataArray.append(
                     .init(
                         url: url,
                         type: .video,
                         preview: preview,
+                        previewUrl: previewUrl,
                         size: fileSize,
                         name: itemProvider.suggestedName,
-                        extenstion: "JPG"
+                        extenstion: url.pathExtension
                     )
                 )
             }
@@ -164,10 +171,56 @@ private extension MediaPickerService {
 
         do {
             let thumbnailImage = try imageGenerator.copyCGImage(at: CMTimeMake(value: 1, timescale: 60), actualTime: nil)
-            return UIImage(cgImage: thumbnailImage)
-        } catch let error {
-            print("error in thumbail=", error)
+            
+            let image = UIImage(cgImage: thumbnailImage)
+            let resizedImage = resizeImage(image: image, targetSize: .init(squareSize: 50))
+            return resizedImage
+        } catch {
             return nil
         }
+    }
+    
+    func getUrl(for image: UIImage?, name: String) throws -> URL {
+        guard let data = image?.jpegData(compressionQuality: 1.0) else {
+            throw FileValidationError.fileNotFound
+        }
+        
+        let folder = try FileManager.default.url(
+            for: .cachesDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        ).appendingPathComponent("cachePath")
+
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+
+        let fileURL = folder.appendingPathComponent(name)
+
+        try data.write(to: fileURL, options: [.atomic, .completeFileProtection])
+        
+        return fileURL
+    }
+    
+    func resizeImage(image: UIImage, targetSize: CGSize) -> UIImage {
+        let size = image.size
+        
+        let widthRatio  = targetSize.width  / size.width
+        let heightRatio = targetSize.height / size.height
+        
+        var newSize: CGSize
+        if(widthRatio > heightRatio) {
+            newSize = CGSize(width: size.width * heightRatio, height: size.height * heightRatio)
+        } else {
+            newSize = CGSize(width: size.width * widthRatio,  height: size.height * widthRatio)
+        }
+        
+        let rect = CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height)
+        
+        UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
+        image.draw(in: rect)
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return newImage!
     }
 }

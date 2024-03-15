@@ -22,7 +22,7 @@ protocol FilesStorageProtocol {
         _ file: FileResult,
         recipientPublicKey: String,
         senderPrivateKey: String
-    ) async throws -> (id: String, nonce: String)
+    ) async throws -> (id: String, nonce: String, idPreview: String?, noncePreview: String?)
     
     func downloadFile(
         id: String,
@@ -30,7 +30,9 @@ protocol FilesStorageProtocol {
         fileType: String?,
         senderPublicKey: String,
         recipientPrivateKey: String,
-        nonce: String
+        nonce: String,
+        previewId: String?,
+        previewNonce: String?
     ) async throws
 }
 

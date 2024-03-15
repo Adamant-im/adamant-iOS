@@ -16,6 +16,7 @@ public enum FileType {
 public struct FileResult {
     public let url: URL
     public let type: FileType
+    public let previewUrl: URL?
     public let preview: UIImage?
     public let size: Int64
     public let name: String?
@@ -25,15 +26,17 @@ public struct FileResult {
         url: URL,
         type: FileType,
         preview: UIImage?,
-        size: Int64, 
+        previewUrl: URL?,
+        size: Int64,
         name: String?,
         extenstion: String?
     ) {
         self.url = url
         self.type = type
-        self.preview = preview
+        self.previewUrl = previewUrl
         self.size = size
         self.name = name
         self.extenstion = extenstion
+        self.preview = preview
     }
 }

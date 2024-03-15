@@ -307,7 +307,8 @@ final class ChatViewModel: NSObject {
                     file_id: $0.url.absoluteString,
                     file_type: $0.extenstion,
                     file_size: $0.size,
-                    preview_id: nil,
+                    preview_id: $0.previewUrl?.absoluteString,
+                    preview_nonce: nil,
                     file_name: $0.name,
                     nonce: .empty
                 )
@@ -359,8 +360,15 @@ final class ChatViewModel: NSObject {
                     let oldId = file.url.absoluteString
                     uploadingFilesIDs.removeAll(where: { $0 == oldId })
                     
+                    let previewID: String
+                    if let id = result.idPreview {
+                        previewID = id
+                    } else {
+                        previewID = result.id
+                    }
+                    
                     let preview = filesStorage.getPreview(
-                        for: result.id,
+                        for: previewID,
                         type: file.extenstion ?? ""
                     )
                     
@@ -373,6 +381,8 @@ final class ChatViewModel: NSObject {
                     ) {
                         richFiles[index].file_id = result.id
                         richFiles[index].nonce = result.nonce
+                        richFiles[index].preview_id = result.idPreview
+                        richFiles[index].preview_nonce = result.noncePreview
                     }
                 }
                 
@@ -765,11 +775,20 @@ final class ChatViewModel: NSObject {
                         fileType: file.file.file_type ?? .empty,
                         senderPublicKey: chatroom?.partner?.publicKey ?? .empty,
                         recipientPrivateKey: keyPair.privateKey,
-                        nonce: file.nonce
+                        nonce: file.nonce,
+                        previewId: file.file.preview_id,
+                        previewNonce: file.file.preview_nonce
                     )
                     
+                    let previewID: String
+                    if let id = file.file.preview_id {
+                        previewID = id
+                    } else {
+                        previewID = file.file.file_id
+                    }
+                    
                     let preview = filesStorage.getPreview(
-                        for: file.file.file_id,
+                        for: previewID,
                         type: file.file.file_type ?? ""
                     )
                     
