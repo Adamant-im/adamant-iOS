@@ -10,33 +10,65 @@ import UIKit
 import CommonKit
 import SwiftUI
 import WebKit
+import QuickLook
 
 final class DocumentInteractionService: NSObject, DocumentInteractionProtocol {
     private var documentInteractionController: UIDocumentInteractionController?
     private var completion: (() -> Void)?
     
+    private var url: URL!
+    
     func open(url: URL, name: String, completion: (() -> Void)?) {
         self.completion = completion
+        self.url = url
         
-        documentInteractionController = UIDocumentInteractionController(url: url)
-        documentInteractionController?.delegate = self
-        
-        guard isMacOS else {
-            documentInteractionController?.presentPreview(animated: true)
-            return
-        }
+//        documentInteractionController = UIDocumentInteractionController(url: url)
+//        documentInteractionController?.delegate = self
+//        
+//        guard isMacOS else {
+//            documentInteractionController?.presentPreview(animated: true)
+//            return
+//        }
         
         let vc = UIApplication.shared.topViewController()!
         
-        guard let uiImage = UIImage(contentsOfFile: url.path) else {
-            documentInteractionController?.presentOpenInMenu(from: vc.view.frame, in: vc.view, animated: true)
-            return
-        }
+//        guard let uiImage = UIImage(contentsOfFile: url.path) else {
+//            documentInteractionController?.presentOpenInMenu(from: vc.view.frame, in: vc.view, animated: true)
+//            return
+//        }
         
-        let view = ImageViewer(image: uiImage, caption: name)
-        present(view: view)
+//        let view = ImageViewer(image: uiImage, caption: name)
+//        present(view: view)
+        
+        let quickVC = QLPreviewController()
+        quickVC.delegate = self
+        quickVC.dataSource = self
+        quickVC.modalPresentationStyle = .fullScreen
+        vc.present(quickVC, animated: true)
         
         documentInteractionController = nil
+    }
+}
+
+extension DocumentInteractionService: QLPreviewControllerDelegate, QLPreviewControllerDataSource {
+    func numberOfPreviewItems(in controller: QLPreviewController) -> Int {
+        1
+    }
+    
+    func previewController(_ controller: QLPreviewController, previewItemAt index: Int) -> QLPreviewItem {
+        QLPreviewItemEq(url: url)
+    }
+    
+    func previewControllerDidDismiss(_ controller: QLPreviewController) {
+        completion?()
+    }
+}
+
+final class QLPreviewItemEq: NSObject, QLPreviewItem {
+    let previewItemURL: URL?
+    
+    init(url: URL) {
+        previewItemURL = url
     }
 }
 
