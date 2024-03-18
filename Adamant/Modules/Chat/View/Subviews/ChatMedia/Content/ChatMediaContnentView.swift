@@ -219,11 +219,11 @@ extension ChatMediaContentView.Model {
 
 private let nameFont = UIFont.systemFont(ofSize: 15)
 private let sizeFont = UIFont.systemFont(ofSize: 13)
-private let imageSize: CGFloat = 90
+private let imageSize: CGFloat = 70
 private typealias TransactionsDiffableDataSource = UITableViewDiffableDataSource<Int, ChatFile>
 private let cellIdentifier = "cell"
 private let commentFont = UIFont.systemFont(ofSize: 14)
-private let verticalStackSpacing: CGFloat = 6
+private let verticalStackSpacing: CGFloat = 10
 private let verticalInsets: CGFloat = 8
 private let replyViewHeight: CGFloat = 25
 private let contentWidth: CGFloat = 260
