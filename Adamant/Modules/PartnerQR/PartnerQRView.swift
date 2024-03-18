@@ -83,6 +83,10 @@ private extension PartnerQRView {
     
     func buttonSection() -> some View {
         Section {
+            Button(viewModel.renameTitle) {
+                viewModel.renameContact()
+            }
+            
             Button(String.adamant.alert.saveToPhotolibrary) {
                 viewModel.saveToPhotos()
             }

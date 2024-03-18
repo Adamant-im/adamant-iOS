@@ -865,6 +865,12 @@
 /* Shared alert 'Save to Photos'. Used with saving images to photolibrary */
 "Shared.SaveToPhotolibrary" = "保存到照片";
 
+/* Partner screen 'Give contact a name' at first */
+"Shared.RenameContactInitial" = "给出联系人姓名";
+
+/* Partner screen 'Rename contact'. */
+"Shared.RenameContact" = "重新命名联系人";
+
 /* Shared alert 'Settings' button. Used to go to system Settings app, on application settings page. Should be same as Settings application title. */
 "Shared.Settings" = "设置";
 
