@@ -890,19 +890,32 @@ extension ChatListViewController {
     private func shortDescription(for transaction: ChatTransaction) -> NSAttributedString? {
         switch transaction {
         case let message as MessageTransaction:
-            guard let text = message.message else {
+            guard var text = message.message else {
                 return nil
             }
-            
-            let raw: String
+            text = text.replacingOccurrences(of: "\n", with: "↵ ")
+
+            var raw: String
             if message.isOutgoing {
                 raw = "\(String.adamant.chatList.sentMessagePrefix)\(text)"
             } else {
                 raw = text
             }
-            
+            var ranges: [Range<String.Index>] = []
+            var searchRange = raw.startIndex..<raw.endIndex
+            while let range = raw.range(of: "↵ ", options: [], range: searchRange) {
+                ranges.append(range)
+                searchRange = range.upperBound..<raw.endIndex
+            }
             let attributesText = markdownParser.parse(raw).resolveLinkColor()
             
+            for range in ranges {
+                attributesText.addAttribute(
+                    NSAttributedString.Key.foregroundColor,
+                    value: UIColor.lightGray,
+                    range: NSRange(range, in: raw)
+                )
+            }
             return attributesText
             
         case let transfer as TransferTransaction:
@@ -921,7 +934,8 @@ extension ChatListViewController {
             
             if richMessage.additionalType == .reply,
                let content = richMessage.richContent,
-               let text = content[RichContentKeys.reply.replyMessage] as? String {
+               var text = content[RichContentKeys.reply.replyMessage] as? String {
+                text = text.replacingOccurrences(of: "\n", with: "↵ ")
                 
                 let prefix = richMessage.isOutgoing
                 ? "\(String.adamant.chatList.sentMessagePrefix)"
@@ -951,6 +965,21 @@ extension ChatListViewController {
                 }
                 fullString.append(markDownText)
                 
+                let raw = fullString.string
+                var ranges: [Range<String.Index>] = []
+                var searchRange = raw.startIndex..<raw.endIndex
+                while let range = raw.range(of: "↵ ", options: [], range: searchRange) {
+                    ranges.append(range)
+                    searchRange = range.upperBound..<raw.endIndex
+                }
+                
+                for range in ranges {
+                    fullString.addAttribute(
+                        NSAttributedString.Key.foregroundColor,
+                        value: UIColor.lightGray,
+                        range: NSRange(range, in: raw)
+                    )
+                }
                 return fullString
             }
             
