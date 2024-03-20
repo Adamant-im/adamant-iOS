@@ -82,6 +82,9 @@ final class ChatViewModel: NSObject {
     let layoutIfNeeded = ObservableSender<Void>()
     let presentFilePicker = ObservableSender<ShareType>()
     let presentSendTokensVC = ObservableSender<Void>()
+    let presentMediaPickerVC = ObservableSender<Void>()
+    let presentDocumentPickerVC = ObservableSender<Void>()
+    let presentDocumentViewerVC = ObservableSender<(URL, ChatFile)>()
     
     @ObservableValue private(set) var isHeaderLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
@@ -762,54 +765,48 @@ final class ChatViewModel: NSObject {
         guard let keyPair = accountService.keypair else { return }
         
         Task {
-            if !file.isCached {
-                defer {
-                    downloadingFilesID.removeAll(where: { $0 == file.file.file_id })
-                }
-                downloadingFilesID.append(file.file.file_id)
-                
-                do {
-                    try await filesStorage.downloadFile(
-                        id: file.file.file_id,
-                        storage: file.storage,
-                        fileType: file.file.file_type ?? .empty,
-                        senderPublicKey: chatroom?.partner?.publicKey ?? .empty,
-                        recipientPrivateKey: keyPair.privateKey,
-                        nonce: file.nonce,
-                        previewId: file.file.preview_id,
-                        previewNonce: file.file.preview_nonce
-                    )
-                    
-                    let previewID: String
-                    if let id = file.file.preview_id {
-                        previewID = id
-                    } else {
-                        previewID = file.file.file_id
-                    }
-                    
-                    let preview = filesStorage.getPreview(
-                        for: previewID,
-                        type: file.file.file_type ?? ""
-                    )
-                    
-                    let cached = filesStorage.isCached(file.file.file_id)
-                    
-                    updateFileFields(&messages, id: file.file.file_id, preview: preview, cached: cached)
-                } catch {
-                    dialog.send(.alert(error.localizedDescription))
-                }
-                
+            guard !file.isCached else {
+                let url = try filesStorage.getFileURL(with: file.file.file_id)
+                presentDocumentViewerVC.send((url, file))
                 return
             }
             
-            let data = try filesStorage.getFileURL(with: file.file.file_id)
+            defer {
+                downloadingFilesID.removeAll(where: { $0 == file.file.file_id })
+            }
             
-            FilesPickerKit.shared.openFile(
-                url: data,
-                name: file.file.file_name ?? .empty,
-                size: file.file.file_size,
-                ext: file.file.file_type ?? .empty
-            )
+            downloadingFilesID.append(file.file.file_id)
+            
+            do {
+                try await filesStorage.downloadFile(
+                    id: file.file.file_id,
+                    storage: file.storage,
+                    fileType: file.file.file_type ?? .empty,
+                    senderPublicKey: chatroom?.partner?.publicKey ?? .empty,
+                    recipientPrivateKey: keyPair.privateKey,
+                    nonce: file.nonce,
+                    previewId: file.file.preview_id,
+                    previewNonce: file.file.preview_nonce
+                )
+                
+                let previewID: String
+                if let id = file.file.preview_id {
+                    previewID = id
+                } else {
+                    previewID = file.file.file_id
+                }
+                
+                let preview = filesStorage.getPreview(
+                    for: previewID,
+                    type: file.file.file_type ?? ""
+                )
+                
+                let cached = filesStorage.isCached(file.file.file_id)
+                
+                updateFileFields(&messages, id: file.file.file_id, preview: preview, cached: cached)
+            } catch {
+                dialog.send(.alert(error.localizedDescription))
+            }
         }
     }
     
@@ -820,30 +817,29 @@ final class ChatViewModel: NSObject {
     func didSelectMenuAction(_ action: ShareType) {
         if case(.sendTokens) = action {
             presentSendTokensVC.send()
-            return
         }
         
-        Task {
-            do {
-                var result: [FileResult] = []
-               // dialog.send(.progress(true))
-                
-                if case(.uploadFile) = action {
-                    result = try await FilesPickerKit.shared.presentDocumentPicker()
-                }
-                if case(.uploadMedia) = action {
-                    result = try await FilesPickerKit.shared.presentImagePicker()
-                }
-                
-                presentFilePicker.send(action)
-                
-                dialog.send(.progress(false))
-                filesPicked = result
-            } catch {
-                dialog.send(.progress(false))
-                dialog.send(.alert(error.localizedDescription))
-            }
+        if case(.uploadMedia) = action {
+            presentMediaPickerVC.send()
         }
+        
+        if case(.uploadFile) = action {
+            presentDocumentPickerVC.send()
+        }
+    }
+    
+    @MainActor
+    func processFileResult(_ result: Result<[FileResult], Error>) {
+        switch result {
+        case .success(let files):
+            filesPicked = files
+        case .failure(let error):
+            dialog.send(.alert(error.localizedDescription))
+        }
+    }
+    
+    func presentDialog(progress: Bool) {
+        dialog.send(.progress(progress))
     }
 }
 

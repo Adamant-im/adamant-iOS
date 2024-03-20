@@ -10,28 +10,23 @@ import UIKit
 import Photos
 import PhotosUI
 
-final class MediaPickerService: NSObject, FilePickerProtocol {
-    private var onPreparedDataCallback: (([FileResult]) -> Void)?
-
-    func startPicker(completion: (([FileResult]) -> Void)?) {
-        onPreparedDataCallback = completion
-        
-        var phPickerConfig = PHPickerConfiguration(photoLibrary: .shared())
-        phPickerConfig.selectionLimit = FilesConstants.maxFilesCount
-        phPickerConfig.filter = PHPickerFilter.any(of: [.images, .videos])
-        
-        let phPickerVC = PHPickerViewController(configuration: phPickerConfig)
-        phPickerVC.delegate = self
-        UIApplication.shared.topViewController()?.present(phPickerVC, animated: true)
-    }
+public final class MediaPickerService: NSObject, FilePickerProtocol {
+    private var helper = FilesPickerKitHelper()
+    
+    public var onPreparedDataCallback: ((Result<[FileResult], Error>) -> Void)?
+    public var onPreparingDataCallback: (() -> Void)?
+    
+    public override init() { }
 }
 
 extension MediaPickerService: PHPickerViewControllerDelegate {
-    func picker(
+    public func picker(
         _ picker: PHPickerViewController,
         didFinishPicking results: [PHPickerResult]
     ) {
         picker.dismiss(animated: true, completion: .none)
+        onPreparingDataCallback?()
+        
         Task {
             await processResults(results)
         }
@@ -55,9 +50,9 @@ private extension MediaPickerService {
                       let fileSize = try? getFileSize(from: url)
                 else { continue }
                 
-                let resizedPreview = self.resizeImage(image: preview, targetSize: .init(squareSize: 50))
+                let resizedPreview = helper.resizeImage(image: preview, targetSize: .init(squareSize: 50))
                 
-                let previewUrl = try? getUrl(for: resizedPreview, name: url.lastPathComponent)
+                let previewUrl = try? helper.getUrl(for: resizedPreview, name: url.lastPathComponent)
                 
                 dataArray.append(
                     .init(
@@ -78,7 +73,7 @@ private extension MediaPickerService {
                 else { continue }
                 
                 let preview = getThumbnailImage(forUrl: url)
-                let previewUrl = try? getUrl(for: preview, name: url.lastPathComponent)
+                let previewUrl = try? helper.getUrl(for: preview, name: url.lastPathComponent)
                 
                 dataArray.append(
                     .init(
@@ -94,7 +89,12 @@ private extension MediaPickerService {
             }
         }
         
-        onPreparedDataCallback?(dataArray)
+        do {
+            try helper.validateFiles(dataArray)
+            onPreparedDataCallback?(.success(dataArray))
+        } catch {
+            onPreparedDataCallback?(.failure(error))
+        }
     }
     
     func getFileSize(from fileURL: URL) throws -> Int64 {
@@ -173,54 +173,10 @@ private extension MediaPickerService {
             let thumbnailImage = try imageGenerator.copyCGImage(at: CMTimeMake(value: 1, timescale: 60), actualTime: nil)
             
             let image = UIImage(cgImage: thumbnailImage)
-            let resizedImage = resizeImage(image: image, targetSize: .init(squareSize: 50))
+            let resizedImage = helper.resizeImage(image: image, targetSize: .init(squareSize: 50))
             return resizedImage
         } catch {
             return nil
         }
-    }
-    
-    func getUrl(for image: UIImage?, name: String) throws -> URL {
-        guard let data = image?.jpegData(compressionQuality: 1.0) else {
-            throw FileValidationError.fileNotFound
-        }
-        
-        let folder = try FileManager.default.url(
-            for: .cachesDirectory,
-            in: .userDomainMask,
-            appropriateFor: nil,
-            create: true
-        ).appendingPathComponent("cachePath")
-
-        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
-
-        let fileURL = folder.appendingPathComponent(name)
-
-        try data.write(to: fileURL, options: [.atomic, .completeFileProtection])
-        
-        return fileURL
-    }
-    
-    func resizeImage(image: UIImage, targetSize: CGSize) -> UIImage {
-        let size = image.size
-        
-        let widthRatio  = targetSize.width  / size.width
-        let heightRatio = targetSize.height / size.height
-        
-        var newSize: CGSize
-        if(widthRatio > heightRatio) {
-            newSize = CGSize(width: size.width * heightRatio, height: size.height * heightRatio)
-        } else {
-            newSize = CGSize(width: size.width * widthRatio,  height: size.height * widthRatio)
-        }
-        
-        let rect = CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height)
-        
-        UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
-        image.draw(in: rect)
-        let newImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        
-        return newImage!
     }
 }

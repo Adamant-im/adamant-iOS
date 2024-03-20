@@ -10,5 +10,6 @@ import UIKit
 import CommonKit
 
 protocol FilePickerProtocol {
-    func startPicker(completion: (([FileResult]) -> Void)?)
+    var onPreparedDataCallback: ((Result<[FileResult], Error>) -> Void)? { get set }
+    var onPreparingDataCallback: (() -> Void)? { get set }
 }

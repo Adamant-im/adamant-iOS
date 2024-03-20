@@ -10,25 +10,17 @@ import UIKit
 import CommonKit
 import MobileCoreServices
 
-final class DocumentPickerService: NSObject, FilePickerProtocol {
-    let documentPicker = UIDocumentPickerViewController(
-        forOpeningContentTypes: [.data, .content],
-        asCopy: false
-    )
+public final class DocumentPickerService: NSObject, FilePickerProtocol {
+    private var helper = FilesPickerKitHelper()
 
-    private var onPreparedDataCallback: (([FileResult]) -> Void)?
-
-    func startPicker(completion: (([FileResult]) -> Void)?) {
-        onPreparedDataCallback = completion
-        
-        documentPicker.allowsMultipleSelection = true
-        documentPicker.delegate = self
-        UIApplication.shared.topViewController()?.present(documentPicker, animated: true)
-    }
+    public var onPreparedDataCallback: ((Result<[FileResult], Error>) -> Void)?
+    public var onPreparingDataCallback: (() -> Void)?
+    
+    public override init() { }
 }
 
 extension DocumentPickerService: UIDocumentPickerDelegate {
-    func documentPicker(
+    public func documentPicker(
         _ controller: UIDocumentPickerViewController,
         didPickDocumentsAt urls: [URL]
     ) {
@@ -46,7 +38,12 @@ extension DocumentPickerService: UIDocumentPickerDelegate {
             )
         }
         
-        onPreparedDataCallback?(files)
+        do {
+            try helper.validateFiles(files)
+            onPreparedDataCallback?(.success(files))
+        } catch {
+            onPreparedDataCallback?(.failure(error))
+        }
     }
 }
 
@@ -84,53 +81,9 @@ private extension DocumentPickerService {
             return (image: nil, url: nil)
         }
         
-        let resizedImage = resizeImage(image: image, targetSize: .init(squareSize: 50))
-        let imageURL = try? getUrl(for: resizedImage, name: url.lastPathComponent)
+        let resizedImage = helper.resizeImage(image: image, targetSize: .init(squareSize: 50))
+        let imageURL = try? helper.getUrl(for: resizedImage, name: url.lastPathComponent)
         
         return (image: resizedImage, url: imageURL)
-    }
-    
-    func getUrl(for image: UIImage?, name: String) throws -> URL {
-        guard let data = image?.jpegData(compressionQuality: 1.0) else {
-            throw FileValidationError.fileNotFound
-        }
-        
-        let folder = try FileManager.default.url(
-            for: .cachesDirectory,
-            in: .userDomainMask,
-            appropriateFor: nil,
-            create: true
-        ).appendingPathComponent("cachePath")
-
-        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
-
-        let fileURL = folder.appendingPathComponent(name)
-
-        try data.write(to: fileURL, options: [.atomic, .completeFileProtection])
-        
-        return fileURL
-    }
-    
-    func resizeImage(image: UIImage, targetSize: CGSize) -> UIImage {
-        let size = image.size
-        
-        let widthRatio  = targetSize.width  / size.width
-        let heightRatio = targetSize.height / size.height
-        
-        var newSize: CGSize
-        if(widthRatio > heightRatio) {
-            newSize = CGSize(width: size.width * heightRatio, height: size.height * heightRatio)
-        } else {
-            newSize = CGSize(width: size.width * widthRatio,  height: size.height * widthRatio)
-        }
-        
-        let rect = CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height)
-        
-        UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
-        image.draw(in: rect)
-        let newImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        
-        return newImage!
     }
 }

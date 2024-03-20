@@ -13,6 +13,9 @@ import UIKit
 import SnapKit
 import CommonKit
 import FilesStorageKit
+import PhotosUI
+import FilesPickerKit
+import QuickLook
 
 @MainActor
 final class ChatViewController: MessagesViewController {
@@ -75,6 +78,10 @@ final class ChatViewController: MessagesViewController {
         return data
     }()
     
+    private lazy var mediaPickerDelegate = MediaPickerService()
+    private lazy var documentPickerDelegate = DocumentPickerService()
+    private lazy var documentViewerService = DocumentInteractionService()
+
     init(
         viewModel: ChatViewModel,
         walletServiceCompose: WalletServiceCompose,
@@ -382,6 +389,24 @@ private extension ChatViewController {
                 self.viewModel.clearPickedFiles()
             }
             .store(in: &subscriptions)
+        
+        viewModel.presentMediaPickerVC
+            .sink { [weak self] in
+                self?.presentMediaPicker()
+            }
+            .store(in: &subscriptions)
+        
+        viewModel.presentDocumentPickerVC
+            .sink { [weak self] in
+                self?.presentDocumentPicker()
+            }
+            .store(in: &subscriptions)
+        
+        viewModel.presentDocumentViewerVC
+            .sink { [weak self] (url, file) in
+                self?.presentDocumentViewer(url: url, file: file)
+            }
+            .store(in: &subscriptions)
     }
 }
 
@@ -472,6 +497,72 @@ private extension ChatViewController {
         panGesture.delegate = self
         messagesCollectionView.addGestureRecognizer(panGesture)
         messagesCollectionView.clipsToBounds = false
+    }
+
+    func presentMediaPicker() {
+        mediaPickerDelegate.onPreparedDataCallback = { [weak self] result in
+            DispatchQueue.main.async {
+                self?.viewModel.presentDialog(progress: false)
+                self?.viewModel.processFileResult(result)
+            }
+        }
+        
+        mediaPickerDelegate.onPreparingDataCallback = { [weak self] in
+            DispatchQueue.main.async {
+                self?.viewModel.presentDialog(progress: true)
+            }
+        }
+        
+        var phPickerConfig = PHPickerConfiguration(photoLibrary: .shared())
+        phPickerConfig.selectionLimit = FilesConstants.maxFilesCount
+        phPickerConfig.filter = PHPickerFilter.any(of: [.images, .videos])
+        
+        let phPickerVC = PHPickerViewController(configuration: phPickerConfig)
+        phPickerVC.delegate = mediaPickerDelegate
+        present(phPickerVC, animated: true)
+    }
+    
+    func presentDocumentPicker() {
+        documentPickerDelegate.onPreparedDataCallback = { [weak self] result in
+            DispatchQueue.main.async {
+                self?.viewModel.presentDialog(progress: false)
+                self?.viewModel.processFileResult(result)
+            }
+        }
+        
+        documentPickerDelegate.onPreparingDataCallback = { [weak self] in
+            DispatchQueue.main.async {
+                self?.viewModel.presentDialog(progress: true)
+            }
+        }
+        
+        let documentPicker = UIDocumentPickerViewController(
+            forOpeningContentTypes: [.data, .content],
+            asCopy: false
+        )
+        documentPicker.allowsMultipleSelection = true
+        documentPicker.delegate = documentPickerDelegate
+        present(documentPicker, animated: true)
+    }
+    
+    func presentDocumentViewer(url: URL, file: ChatFile) {
+        documentViewerService.openFile(
+            url: url,
+            name: file.file.file_name ?? .empty,
+            size: file.file.file_size,
+            ext: file.file.file_type ?? .empty
+        )
+        
+        let quickVC = QLPreviewController()
+        quickVC.delegate = documentViewerService
+        quickVC.dataSource = documentViewerService
+        quickVC.modalPresentationStyle = .fullScreen
+        
+        if let splitViewController = splitViewController {
+            splitViewController.present(quickVC, animated: true)
+        } else {
+            present(quickVC, animated: true)
+        }
     }
 }
 
