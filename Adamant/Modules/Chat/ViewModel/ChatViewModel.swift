@@ -1259,18 +1259,18 @@ private extension ChatMessage {
     
     func getFiles() -> [ChatFile] {
         guard case let .file(model) = content else { return [] }
-        return model.value.content.files
+        return model.value.content.fileModel.files
     }
     
     mutating func setDownloading(for fileId: String, value: Bool) {
         guard case let .file(fileModel) = content else { return }
         var model = fileModel.value
         
-        guard let index = model.content.files.firstIndex(
+        guard let index = model.content.fileModel.files.firstIndex(
             where: { $0.file.file_id == fileId }
         ) else { return }
         
-        model.content.files[index].isDownloading = value
+        model.content.fileModel.files[index].isDownloading = value
         
         content = .file(.init(value: model))
     }
@@ -1279,11 +1279,11 @@ private extension ChatMessage {
         guard case let .file(fileModel) = content else { return }
         var model = fileModel.value
         
-        guard let index = model.content.files.firstIndex(
+        guard let index = model.content.fileModel.files.firstIndex(
             where: { $0.file.file_id == fileId }
         ) else { return }
         
-        model.content.files[index].isUploading = value
+        model.content.fileModel.files[index].isUploading = value
         
         content = .file(.init(value: model))
     }
@@ -1297,15 +1297,15 @@ private extension ChatMessage {
         guard case let .file(fileModel) = content else { return }
         var model = fileModel.value
         
-        guard let index = model.content.files.firstIndex(
+        guard let index = model.content.fileModel.files.firstIndex(
             where: { $0.file.file_id == oldId }
         ) else { return }
         
         if let newId = newId {
-            model.content.files[index].file.file_id = newId
+            model.content.fileModel.files[index].file.file_id = newId
         }
-        model.content.files[index].previewDataURL = preview
-        model.content.files[index].isCached = cached
+        model.content.fileModel.files[index].previewDataURL = preview
+        model.content.fileModel.files[index].isCached = cached
 
         content = .file(.init(value: model))
     }

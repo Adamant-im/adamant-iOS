@@ -63,25 +63,15 @@ final class ChatMediaContentView: UIView {
     }()
     
     private lazy var verticalStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [replyView, commentLabel, filesStack])
+        let stack = UIStackView(arrangedSubviews: [replyView, commentLabel])
         stack.axis = .vertical
         stack.spacing = verticalStackSpacing
         return stack
     }()
     
-    private lazy var filesStack: UIStackView = {
-        let stack = UIStackView()
-        stack.axis = .vertical
-        stack.spacing = verticalStackSpacing
-        
-        for _ in 0..<FilesConstants.maxFilesCount {
-            let view = ChatFileView()
-            view.snp.makeConstraints { $0.height.equalTo(imageSize) }
-            stack.addArrangedSubview(view)
-        }
-        return stack
-    }()
-
+    private lazy var mediaContainerView = MediaContainerView()
+    private lazy var fileContainerView = FileContainerView()
+    
     var model: Model = .default {
         didSet {
             guard oldValue != model else { return }
@@ -144,22 +134,28 @@ private extension ChatMediaContentView {
     }
     
     func updateStackLayout() {
-        let fileList = model.files.prefix(FilesConstants.maxFilesCount)
+        let viewsList: [UIView]
         
-        filesStack.arrangedSubviews.forEach { $0.isHidden = true }
+        if model.fileModel.isMediaFilesOnly {
+            viewsList = [replyView, commentLabel, mediaContainerView]
+            mediaContainerView.model = model.fileModel
+            mediaContainerView.actionHandler = actionHandler
+        } else {
+            viewsList = [replyView, commentLabel, fileContainerView]
+            fileContainerView.model = model.fileModel
+            fileContainerView.actionHandler = actionHandler
+        }
         
-        for (index, file) in fileList.enumerated() {
-            let view = filesStack.arrangedSubviews[index] as? ChatFileView
-            view?.isHidden = false
-            view?.model = file
-            view?.buttonActionHandler = { [actionHandler, file, model] in
-                actionHandler(
-                    .processFile(
-                        file: file,
-                        isFromCurrentSender: model.isFromCurrentSender
-                    )
-                )
-            }
+        guard verticalStack.arrangedSubviews != viewsList else { return }
+        verticalStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        viewsList.forEach(verticalStack.addArrangedSubview)
+        
+        if model.fileModel.isMediaFilesOnly {
+            mediaContainerView.model = model.fileModel
+            mediaContainerView.actionHandler = actionHandler
+        } else {
+            fileContainerView.model = model.fileModel
+            fileContainerView.actionHandler = actionHandler
         }
     }
     
@@ -183,16 +179,18 @@ extension ChatMediaContentView.Model {
     func height() -> CGFloat {
         let replyViewDynamicHeight: CGFloat = isReply ? replyViewHeight : 0
         
-        let filesCount = files.count > FilesConstants.maxFilesCount
-        ? FilesConstants.maxFilesCount
-        : files.count
+        var rowCount: CGFloat = 1
         
-        let stackSpacingCount: CGFloat = isReply 
-        ? CGFloat(filesCount) + 1
-        : CGFloat(filesCount)
-
-        return imageSize * CGFloat(filesCount)
-        + stackSpacingCount * verticalStackSpacing
+        if isReply {
+            rowCount += 1
+        }
+        
+        if !comment.string.isEmpty {
+            rowCount += 1
+        }
+        
+        return fileModel.height()
+        + rowCount * verticalStackSpacing
         + labelSize(for: comment, considering: contentWidth).height
         + replyViewDynamicHeight
     }

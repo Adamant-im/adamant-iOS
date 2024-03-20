@@ -48,14 +48,19 @@ final class ChatMediaCell: MessageContentCell {
     ) {
         super.layoutMessageContainerView(with: attributes)
         
-        containerMediaView.frame = messageContainerView.frame
-        containerMediaView.layoutIfNeeded()
+        containerMediaView.snp.remakeConstraints { make in
+            make.horizontalEdges.equalToSuperview()
+            make.top.equalTo(messageContainerView.frame.origin.y)
+            make.height.equalTo(messageContainerView.frame.height)
+        }
     }
 }
 
 private extension ChatMediaCell {
     func configure() {
         contentView.addSubview(containerMediaView)
-        containerMediaView.frame = messageContainerView.frame
+        containerMediaView.snp.makeConstraints { make in
+            make.directionalEdges.equalToSuperview()
+        }
     }
 }

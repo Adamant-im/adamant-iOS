@@ -343,13 +343,25 @@ private extension ChatMessageFactory {
             )
         }
         
+        let filesExtensions = chatFiles.map { $0.file.file_type }
+        let imageExtensions = ["JPG", "JPEG", "PNG", "JPEG2000", "GIF", "WEBP", "TIF", "TIFF", "RAW", "BMP", "HEIF", "INDD"]
+        
+        let isMediaFilesOnly = filesExtensions.allSatisfy { elementA in
+            guard let elementA = elementA else { return false }
+            return imageExtensions.contains(elementA)
+        }
+        
         return .file(.init(value: .init(
             id: id,
             isFromCurrentSender: isFromCurrentSender,
             reactions: reactions,
             content: .init(
                 id: id,
-                files: chatFiles,
+                fileModel: .init(
+                    files: chatFiles,
+                    isMediaFilesOnly: isMediaFilesOnly,
+                    isFromCurrentSender: isFromCurrentSender
+                ),
                 isHidden: false,
                 isFromCurrentSender: isFromCurrentSender,
                 isReply: transaction.isFileReply(),

@@ -52,6 +52,9 @@
 		3AA50DEF2AEBE65D00C58FC8 /* PartnerQRView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA50DEE2AEBE65D00C58FC8 /* PartnerQRView.swift */; };
 		3AA50DF12AEBE66A00C58FC8 /* PartnerQRViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA50DF02AEBE66A00C58FC8 /* PartnerQRViewModel.swift */; };
 		3AA50DF32AEBE67C00C58FC8 /* PartnerQRFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA50DF22AEBE67C00C58FC8 /* PartnerQRFactory.swift */; };
+		3AA6DF402BA9941E00EA2E16 /* MediaContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA6DF3F2BA9941E00EA2E16 /* MediaContainerView.swift */; };
+		3AA6DF442BA997C000EA2E16 /* FileContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA6DF432BA997C000EA2E16 /* FileContainerView.swift */; };
+		3AA6DF462BA9BEB700EA2E16 /* MediaContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA6DF452BA9BEB700EA2E16 /* MediaContentView.swift */; };
 		3AC76E3D2AB09118008042C4 /* ElegantEmojiPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 3AC76E3C2AB09118008042C4 /* ElegantEmojiPicker */; };
 		3AF08D5F2B4EB3A200EB82B1 /* LanguageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF08D5E2B4EB3A200EB82B1 /* LanguageService.swift */; };
 		3AF08D612B4EB3C400EB82B1 /* LanguageStorageProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF08D602B4EB3C400EB82B1 /* LanguageStorageProtocol.swift */; };
@@ -707,6 +710,9 @@
 		3AA50DEE2AEBE65D00C58FC8 /* PartnerQRView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnerQRView.swift; sourceTree = "<group>"; };
 		3AA50DF02AEBE66A00C58FC8 /* PartnerQRViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnerQRViewModel.swift; sourceTree = "<group>"; };
 		3AA50DF22AEBE67C00C58FC8 /* PartnerQRFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnerQRFactory.swift; sourceTree = "<group>"; };
+		3AA6DF3F2BA9941E00EA2E16 /* MediaContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaContainerView.swift; sourceTree = "<group>"; };
+		3AA6DF432BA997C000EA2E16 /* FileContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileContainerView.swift; sourceTree = "<group>"; };
+		3AA6DF452BA9BEB700EA2E16 /* MediaContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaContentView.swift; sourceTree = "<group>"; };
 		3AF08D5B2B4E7FFC00EB82B1 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		3AF08D5C2B4E7FFC00EB82B1 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = zh; path = zh.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		3AF08D5D2B4E7FFC00EB82B1 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -1380,7 +1386,8 @@
 		3A299C792B85EAA900B54C61 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				3A299C7A2B85EABB00B54C61 /* ChatFileView.swift */,
+				3AA6DF422BA9943500EA2E16 /* MediaContainerView */,
+				3AA6DF412BA9942300EA2E16 /* ChatFileContainerView */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1417,6 +1424,24 @@
 				3AA50DF02AEBE66A00C58FC8 /* PartnerQRViewModel.swift */,
 			);
 			path = PartnerQR;
+			sourceTree = "<group>";
+		};
+		3AA6DF412BA9942300EA2E16 /* ChatFileContainerView */ = {
+			isa = PBXGroup;
+			children = (
+				3A299C7A2B85EABB00B54C61 /* ChatFileView.swift */,
+				3AA6DF432BA997C000EA2E16 /* FileContainerView.swift */,
+			);
+			path = ChatFileContainerView;
+			sourceTree = "<group>";
+		};
+		3AA6DF422BA9943500EA2E16 /* MediaContainerView */ = {
+			isa = PBXGroup;
+			children = (
+				3AA6DF3F2BA9941E00EA2E16 /* MediaContainerView.swift */,
+				3AA6DF452BA9BEB700EA2E16 /* MediaContentView.swift */,
+			);
+			path = MediaContainerView;
 			sourceTree = "<group>";
 		};
 		3AFE7E502B1F6AFE00718739 /* WalletsService */ = {
@@ -3130,6 +3155,7 @@
 				9340078029AC341100A20622 /* ChatAction.swift in Sources */,
 				648DD7A02236A59200B811FD /* DogeTransactionDetailsViewController.swift in Sources */,
 				93ADC17D2B083C3B00F2DF77 /* NodesAdditionalParamsStorageProtocol.swift in Sources */,
+				3AA6DF402BA9941E00EA2E16 /* MediaContainerView.swift in Sources */,
 				938A46A42AE6103E00FC03DB /* HealthCheckWrapper.swift in Sources */,
 				557AC308287B1365004699D7 /* CheckmarkRowView.swift in Sources */,
 				9390C5052976B53000270CDF /* ChatDialog.swift in Sources */,
@@ -3295,6 +3321,7 @@
 				E90847332196FEA80095825D /* TransferTransaction+CoreDataProperties.swift in Sources */,
 				9366588D2B0AB6BD00BDB2D3 /* CoinsNodesListState.swift in Sources */,
 				E99818942120892F0018C84C /* WalletViewControllerBase.swift in Sources */,
+				3AA6DF462BA9BEB700EA2E16 /* MediaContentView.swift in Sources */,
 				E9B3D39E201F99F40019EB36 /* DataProvider.swift in Sources */,
 				93BF4A6C29E4B4BF00505CD0 /* DelegatesBottomPanel+Model.swift in Sources */,
 				93294B882AAD0E0A00911109 /* AdmWalletService.swift in Sources */,
@@ -3366,6 +3393,7 @@
 				93ADC17F2B083D7A00F2DF77 /* NodesAdditionalParamsStorage.swift in Sources */,
 				E9B1AA5B21283E0F00080A2A /* AdmTransferViewController.swift in Sources */,
 				648C697322916192006645F5 /* DashTransactionsViewController.swift in Sources */,
+				3AA6DF442BA997C000EA2E16 /* FileContainerView.swift in Sources */,
 				93E8EDCF2AF1CD9F003E163C /* NodeStatusInfo.swift in Sources */,
 				55E69E172868D7920025D82E /* CheckmarkView.swift in Sources */,
 				93B28EC02B076667007F268B /* APIResponseModel.swift in Sources */,

@@ -12,7 +12,7 @@ import CommonKit
 extension ChatMediaContentView {
     struct Model: Equatable {
         let id: String
-        var files: [ChatFile]
+        var fileModel: FileModel
         var isHidden: Bool
         let isFromCurrentSender: Bool
         let isReply: Bool
@@ -23,7 +23,7 @@ extension ChatMediaContentView {
         
         static let `default` = Self(
             id: "",
-            files: [],
+            fileModel: .default,
             isHidden: false,
             isFromCurrentSender: false,
             isReply: false,
@@ -31,6 +31,18 @@ extension ChatMediaContentView {
             replyId: .empty,
             comment: NSAttributedString(string: .empty),
             backgroundColor: .failed
+        )
+    }
+    
+    struct FileModel: Equatable {
+        var files: [ChatFile]
+        var isMediaFilesOnly: Bool
+        let isFromCurrentSender: Bool
+
+        static let `default` = Self(
+            files: [],
+            isMediaFilesOnly: false,
+            isFromCurrentSender: false
         )
     }
 }

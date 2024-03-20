@@ -203,14 +203,13 @@ private extension FilesStorageKit {
             if let url = url {
                 return url
             }
-            return getLocalImageUrl(by: "file-default-box", withExtension: "png")
+            return nil
         case "PDF":
             return getLocalImageUrl(by: "file-pdf-box", withExtension: "jpg")
         default:
-            return getLocalImageUrl(by: "file-default-box", withExtension: "png")
+            return nil
         }
     }
 }
 
-private let defaultFileType = ""
 private let cachePath = "downloads"

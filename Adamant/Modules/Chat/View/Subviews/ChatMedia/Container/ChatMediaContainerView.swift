@@ -26,7 +26,7 @@ final class ChatMediaContainerView: UIView, ChatModelView {
         let stack = UIStackView()
         stack.alignment = .center
         stack.axis = .horizontal
-        stack.spacing = 12
+        stack.spacing = horizontalStackSpace
         return stack
     }()
     
@@ -146,8 +146,7 @@ extension ChatMediaContainerView {
             actionHandler(.swipeState(state: state))
         }
         
-        contentView.snp.makeConstraints { $0.width.equalTo(contentWidth) }
-        
+        reactionsStack.snp.makeConstraints { $0.width.equalTo(reactionsWidth) }
         chatMenuManager.setup(for: contentView)
     }
     
@@ -159,8 +158,6 @@ extension ChatMediaContainerView {
         }
         
         updateLayout()
-        
-        reactionsStack.snp.makeConstraints { $0.width.equalTo(50) }
         
         ownReactionLabel.isHidden = getReaction(for: model.address) == nil
         opponentReactionLabel.isHidden = getReaction(for: model.opponentAddress) == nil
@@ -308,3 +305,5 @@ extension ChatMediaContainerView.Model {
 }
 
 private let contentWidth: CGFloat = 260
+private let reactionsWidth: CGFloat = 50
+private let horizontalStackSpace: CGFloat = 5

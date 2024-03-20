@@ -33,7 +33,8 @@ class ChatFileView: UIView {
     
     private let nameLabel = UILabel(font: nameFont, textColor: .adamant.textColor)
     private let sizeLabel = UILabel(font: sizeFont, textColor: .lightGray)
-    
+    private let additionalLabel = UILabel(font: additionalFont, textColor: .adamant.cellColor)
+
     private lazy var vStack: UIStackView = {
         let stack = UIStackView()
         stack.alignment = .leading
@@ -86,10 +87,6 @@ class ChatFileView: UIView {
         iconImageView.layer.cornerRadius = 5
     }
     
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        // Initialization code
-    }
     @objc func tapBtnAction() {
         buttonActionHandler?()
     }
@@ -104,6 +101,11 @@ private extension ChatFileView {
         
         iconImageView.snp.makeConstraints { make in
             make.size.equalTo(imageSize)
+        }
+        
+        addSubview(additionalLabel)
+        additionalLabel.snp.makeConstraints { make in
+            make.center.equalTo(iconImageView.snp.center)
         }
         
         addSubview(spinner)
@@ -128,12 +130,15 @@ private extension ChatFileView {
         iconImageView.layer.cornerRadius = 5
         iconImageView.layer.masksToBounds = true
         iconImageView.contentMode = .scaleAspectFill
+        additionalLabel.textAlignment = .center
     }
     
     func update() {
         if let url = model.previewDataURL {
             iconImageView.image = UIImage(contentsOfFile: url.path)
+            additionalLabel.isHidden = true
         } else {
+            additionalLabel.isHidden = false
             iconImageView.image = defaultImage
         }
         
@@ -153,6 +158,7 @@ private extension ChatFileView {
         : "\(fileName.uppercased()).\(fileType.uppercased())"
         
         sizeLabel.text = formatSize(model.file.file_size)
+        additionalLabel.text = fileType.uppercased()
     }
     
     func formatSize(_ bytes: Int64) -> String {
@@ -164,6 +170,7 @@ private extension ChatFileView {
     }
 }
 
+private let additionalFont = UIFont.boldSystemFont(ofSize: 15)
 private let nameFont = UIFont.systemFont(ofSize: 15)
 private let sizeFont = UIFont.systemFont(ofSize: 13)
 private let imageSize: CGFloat = 70
