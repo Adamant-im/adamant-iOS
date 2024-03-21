@@ -46,35 +46,6 @@ final class FilesToolbarView: UIView {
         return view
     }()
     
-    private lazy var iconView: UIView = {
-        let view = UIView()
-        view.addSubview(iconIV)
-        iconIV.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-        }
-        
-        view.snp.makeConstraints { make in
-            make.width.equalTo(27)
-        }
-        return view
-    }()
-    
-    private var iconIV: UIImageView = {
-        let iv = UIImageView(
-            image: UIImage(
-                systemName: "square.and.arrow.up"
-            )?.withTintColor(.adamant.active)
-        )
-        
-        iv.tintColor = .adamant.active
-        iv.snp.makeConstraints { make in
-            make.height.equalTo(27)
-            make.width.equalTo(24)
-        }
-        
-        return iv
-    }()
-    
     private lazy var closeBtn: UIButton = {
         let btn = UIButton()
         btn.setImage(
@@ -90,7 +61,7 @@ final class FilesToolbarView: UIView {
     }()
     
     private lazy var horizontalStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [iconView, containerView, closeBtn])
+        let stack = UIStackView(arrangedSubviews: [containerView, closeBtn])
         stack.axis = .horizontal
         stack.spacing = horizontalStackSpacing
         return stack
@@ -101,6 +72,7 @@ final class FilesToolbarView: UIView {
     private var data: [FileResult] = []
     var closeAction: (() -> Void)?
     var updatedDataAction: (([FileResult]) -> Void)?
+    var openFileAction: ((FileResult) -> Void)?
     
     // MARK: Init
     
@@ -142,7 +114,7 @@ extension FilesToolbarView {
     }
 }
 
-extension FilesToolbarView: UICollectionViewDelegate, UICollectionViewDataSource {
+extension FilesToolbarView: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
@@ -166,6 +138,18 @@ extension FilesToolbarView: UICollectionViewDelegate, UICollectionViewDataSource
             self?.removeFile(at: index)
         }
         return cell
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+    ) -> CGSize {
+        .init(width: self.frame.height - 10, height: self.frame.height - 10)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        openFileAction?(data[indexPath.row])
     }
 }
 

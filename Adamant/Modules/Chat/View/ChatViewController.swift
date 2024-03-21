@@ -468,7 +468,7 @@ private extension ChatViewController {
     
     func configureFilesToolbarView() {
         filesToolbarView.snp.makeConstraints { make in
-            make.height.equalTo(70)
+            make.height.equalTo(140)
         }
         
         filesToolbarView.closeAction = { [weak self] in
@@ -477,6 +477,10 @@ private extension ChatViewController {
         
         filesToolbarView.updatedDataAction = { [weak self] data in
             self?.viewModel.updateFiles(data)
+        }
+        
+        filesToolbarView.openFileAction = { [weak self] data in
+            self?.presentDocumentViewer(url: data.url)
         }
     }
     
@@ -552,6 +556,21 @@ private extension ChatViewController {
             size: file.file.file_size,
             ext: file.file.file_type ?? .empty
         )
+        
+        let quickVC = QLPreviewController()
+        quickVC.delegate = documentViewerService
+        quickVC.dataSource = documentViewerService
+        quickVC.modalPresentationStyle = .fullScreen
+        
+        if let splitViewController = splitViewController {
+            splitViewController.present(quickVC, animated: true)
+        } else {
+            present(quickVC, animated: true)
+        }
+    }
+    
+    func presentDocumentViewer(url: URL) {
+        documentViewerService.openFile(url: url)
         
         let quickVC = QLPreviewController()
         quickVC.delegate = documentViewerService
@@ -781,8 +800,10 @@ private extension ChatViewController {
     
     func closeReplyView() {
         replyView.removeFromSuperview()
-        messageInputBar.invalidateIntrinsicContentSize()
-        messageInputBar.layoutContainerViewIfNeeded()
+        
+        // TODO: Fix it later
+        // There's an issue: if the text in inputTextView is changed while replyView is positioned on the topStackView of the messageInputBar, removing it causes an incorrect height for the messageInputBar. Reinstalling the text will help recalculate the height.
+        messageInputBar.inputTextView.text = messageInputBar.inputTextView.text
     }
     
     func processFileToolbarView(_ data: [FileResult]?) {
@@ -813,8 +834,10 @@ private extension ChatViewController {
     
     func closeFileToolbarView() {
         filesToolbarView.removeFromSuperview()
-        messageInputBar.invalidateIntrinsicContentSize()
-        messageInputBar.layoutContainerViewIfNeeded()
+        
+        // TODO: Fix it later
+        // There's an issue: if the text in inputTextView is changed while filesToolbarView is positioned on the topStackView of the messageInputBar, removing it causes an incorrect height for the messageInputBar. Reinstalling the text will help recalculate the height.
+        messageInputBar.inputTextView.text = messageInputBar.inputTextView.text
     }
     
     func didTapTransfer(id: String) {

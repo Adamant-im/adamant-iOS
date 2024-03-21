@@ -14,6 +14,7 @@ import QuickLook
 
 public final class DocumentInteractionService: NSObject {
     private var url: URL!
+    private var needToDelete = false
     
     public func openFile(url: URL, name: String, size: Int64, ext: String) {
         let fullName = name.contains(ext)
@@ -29,7 +30,13 @@ public final class DocumentInteractionService: NSObject {
         
         try? FileManager.default.copyItem(at: url, to: copyURL)
         
-        self.url = copyURL        
+        self.url = copyURL 
+        needToDelete = true
+    }
+    
+    public func openFile(url: URL) {
+        self.url = url
+        needToDelete = false
     }
 }
 
@@ -43,6 +50,7 @@ extension DocumentInteractionService: QLPreviewControllerDelegate, QLPreviewCont
     }
     
     public func previewControllerDidDismiss(_ controller: QLPreviewController) {
+        guard needToDelete else { return }
         try? FileManager.default.removeItem(at: url)
     }
 }
