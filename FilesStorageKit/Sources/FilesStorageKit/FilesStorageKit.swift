@@ -194,12 +194,13 @@ private extension FilesStorageKit {
     
     private func getPreview(for type: String, url: URL?) -> URL? {
         switch type.uppercased() {
-        case "JPG", "JPEG", "PNG", "JPEG2000", "GIF", "WEBP", "TIF", "TIFF", "RAW", "BMP", "HEIF", "INDD":
+        case "JPG", "JPEG", "PNG", "GIF", "WEBP", "TIF", "TIFF", "BMP", "HEIF", "HEIC", "JP2":
             if let url = url {
                 return url
             }
+            
             return getLocalImageUrl(by: "file-image-box", withExtension: "jpg")
-        case "MOV", "MP4", "AVI", "WEBM":
+        case "MOV", "MP4":
             if let url = url {
                 return url
             }

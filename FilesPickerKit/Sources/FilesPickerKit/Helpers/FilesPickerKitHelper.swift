@@ -4,6 +4,7 @@
 import CommonKit
 import UIKit
 import SwiftUI
+import AVFoundation
 
 final class FilesPickerKitHelper {
     func validateFiles(_ files: [FileResult]) throws {
@@ -60,5 +61,23 @@ final class FilesPickerKitHelper {
         UIGraphicsEndImageContext()
         
         return newImage!
+    }
+    
+    func getThumbnailImage(forUrl url: URL) -> UIImage? {
+        let asset: AVAsset = AVAsset(url: url)
+        let imageGenerator = AVAssetImageGenerator(asset: asset)
+
+        do {
+            let thumbnailImage = try imageGenerator.copyCGImage(at: CMTimeMake(value: 1, timescale: 60), actualTime: nil)
+            
+            let image = UIImage(cgImage: thumbnailImage)
+            let resizedImage = resizeImage(
+                image: image,
+                targetSize: FilesConstants.previewSize
+            )
+            return resizedImage
+        } catch {
+            return nil
+        }
     }
 }

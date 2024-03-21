@@ -344,11 +344,10 @@ private extension ChatMessageFactory {
         }
         
         let filesExtensions = chatFiles.map { $0.file.file_type }
-        let imageExtensions = ["JPG", "JPEG", "PNG", "JPEG2000", "GIF", "WEBP", "TIF", "TIFF", "RAW", "BMP", "HEIF", "INDD"]
         
         let isMediaFilesOnly = filesExtensions.allSatisfy { elementA in
             guard let elementA = elementA else { return false }
-            return imageExtensions.contains(elementA)
+            return mediaExtensions.contains(elementA.uppercased())
         }
         
         return .file(.init(value: .init(
@@ -524,3 +523,5 @@ private extension ChatSender {
         )
     }
 }
+
+private let mediaExtensions = ["JPG", "JPEG", "PNG", "GIF", "WEBP", "TIF", "TIFF", "BMP", "HEIF", "HEIC", "JP2", "MOV", "MP4"]

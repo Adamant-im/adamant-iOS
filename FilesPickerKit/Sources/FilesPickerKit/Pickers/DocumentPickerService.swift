@@ -9,6 +9,7 @@ import Foundation
 import UIKit
 import CommonKit
 import MobileCoreServices
+import AVFoundation
 
 public final class DocumentPickerService: NSObject, FilePickerProtocol {
     private var helper = FilesPickerKitHelper()
@@ -60,12 +61,17 @@ private extension DocumentPickerService {
         return fileSize
     }
     
-    func isImage(atURL fileURL: URL) -> Bool {
-        guard let uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, fileURL.pathExtension as CFString, nil)?.takeRetainedValue() else {
-            return false
+    func isFileType(format: UTType, atURL fileURL: URL) -> Bool {
+        var mimeType: String?
+        
+        let pathExtension = fileURL.pathExtension
+        if let type = UTType(filenameExtension: pathExtension) {
+            mimeType = type.preferredMIMEType
         }
         
-        return UTTypeConformsTo(uti, kUTTypeImage)
+        guard let mimeType = mimeType else { return false }
+        
+        return UTType(mimeType: mimeType)?.conforms(to: format) ?? false
     }
     
     func getPreview(for url: URL) -> (image: UIImage?, url: URL?) {
@@ -75,9 +81,17 @@ private extension DocumentPickerService {
         
         _ = url.startAccessingSecurityScopedResource()
         
-        guard isImage(atURL: url),
-              let image = UIImage(contentsOfFile: url.path)
-        else {
+        var image: UIImage?
+        
+        if isFileType(format: .image, atURL: url) {
+            image = UIImage(contentsOfFile: url.path)
+        }
+        
+        if isFileType(format: .movie, atURL: url) {
+            image = helper.getThumbnailImage(forUrl: url)
+        }
+        
+        guard let image = image else {
             return (image: nil, url: nil)
         }
         
