@@ -50,7 +50,10 @@ private extension MediaPickerService {
                       let fileSize = try? getFileSize(from: url)
                 else { continue }
                 
-                let resizedPreview = helper.resizeImage(image: preview, targetSize: .init(squareSize: 50))
+                let resizedPreview = helper.resizeImage(
+                    image: preview,
+                    targetSize: FilesConstants.previewSize
+                )
                 
                 let previewUrl = try? helper.getUrl(for: resizedPreview, name: url.lastPathComponent)
                 
@@ -173,7 +176,10 @@ private extension MediaPickerService {
             let thumbnailImage = try imageGenerator.copyCGImage(at: CMTimeMake(value: 1, timescale: 60), actualTime: nil)
             
             let image = UIImage(cgImage: thumbnailImage)
-            let resizedImage = helper.resizeImage(image: image, targetSize: .init(squareSize: 50))
+            let resizedImage = helper.resizeImage(
+                image: image,
+                targetSize: FilesConstants.previewSize
+            )
             return resizedImage
         } catch {
             return nil

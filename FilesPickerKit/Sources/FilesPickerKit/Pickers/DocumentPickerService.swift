@@ -81,7 +81,10 @@ private extension DocumentPickerService {
             return (image: nil, url: nil)
         }
         
-        let resizedImage = helper.resizeImage(image: image, targetSize: .init(squareSize: 50))
+        let resizedImage = helper.resizeImage(
+            image: image,
+            targetSize: FilesConstants.previewSize
+        )
         let imageURL = try? helper.getUrl(for: resizedImage, name: url.lastPathComponent)
         
         return (image: resizedImage, url: imageURL)
