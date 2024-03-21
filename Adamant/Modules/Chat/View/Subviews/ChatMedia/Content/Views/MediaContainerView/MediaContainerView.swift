@@ -104,23 +104,16 @@ private extension MediaContainerView {
 }
 
 private let stackSpacing: CGFloat = 1
-private let rowHeight: CGFloat = 290
+private let rowHeight: CGFloat = 240
 private let stackWidth: CGFloat = 280
-
-extension Array {
-    func chunked(into size: Int) -> [[Element]] {
-        return stride(from: 0, to: count, by: size).map {
-            Array(self[$0 ..< Swift.min($0 + size, count)])
-        }
-    }
-}
 
 extension ChatMediaContentView.FileModel {
     func height() -> CGFloat {
         let fileList = Array(files.prefix(FilesConstants.maxFilesCount))
         
         guard isMediaFilesOnly else {
-            return 70 * CGFloat(fileList.count)
+            return FileContainerView.cellSize * CGFloat(fileList.count)
+            + FileContainerView.stackSpacing * CGFloat(fileList.count)
         }
         
         let rowCount = fileList.chunked(into: 2).count

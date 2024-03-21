@@ -16,17 +16,20 @@ final class FileContainerView: UIView {
     private lazy var filesStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
-        stack.spacing = stackSpacing
+        stack.spacing = Self.stackSpacing
         
         for _ in 0..<FilesConstants.maxFilesCount {
             let view = ChatFileView()
-            view.snp.makeConstraints { $0.height.equalTo(cellSize) }
+            view.snp.makeConstraints { $0.height.equalTo(Self.cellSize) }
             stack.addArrangedSubview(view)
         }
         return stack
     }()
     
     // MARK: Proprieties
+   
+    static let stackSpacing: CGFloat = 8
+    static let cellSize: CGFloat = 70
     
     var model: ChatMediaContentView.FileModel = .default {
         didSet { update() }
@@ -74,6 +77,3 @@ private extension FileContainerView {
         }
     }
 }
-
-private let stackSpacing: CGFloat = 8
-private let cellSize: CGFloat = 70
