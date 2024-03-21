@@ -35,11 +35,13 @@ extension ChatMediaContentView {
     }
     
     struct FileModel: Equatable {
+        let messageId: String
         var files: [ChatFile]
         var isMediaFilesOnly: Bool
         let isFromCurrentSender: Bool
 
         static let `default` = Self(
+            messageId: .empty,
             files: [],
             isMediaFilesOnly: false,
             isFromCurrentSender: false

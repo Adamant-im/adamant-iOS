@@ -192,8 +192,8 @@ private extension ChatDataSourceManager {
             viewModel.reactAction(id, emoji: emoji)
         case let .presentMenu(arg):
             viewModel.presentMenu(arg: arg)
-        case let .processFile(file, isFromCurrentSender):
-            viewModel.processFile(file: file, isFromCurrentSender: isFromCurrentSender)
+        case let .openFile(messageId, file, isFromCurrentSender):
+            viewModel.openFile(messageId: messageId, file: file, isFromCurrentSender: isFromCurrentSender)
         }
     }
 }

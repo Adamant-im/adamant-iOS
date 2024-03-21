@@ -761,8 +761,12 @@ final class ChatViewModel: NSObject {
         return true
     }
     
-    func processFile(file: ChatFile, isFromCurrentSender: Bool) {
-        guard let keyPair = accountService.keypair else { return }
+    func openFile(messageId: String, file: ChatFile, isFromCurrentSender: Bool) {
+        let tx = chatTransactions.first(where: { $0.txId == messageId })
+
+        guard let keyPair = accountService.keypair,
+              tx?.statusEnum == .delivered
+        else { return }
         
         Task {
             guard !file.isCached else {

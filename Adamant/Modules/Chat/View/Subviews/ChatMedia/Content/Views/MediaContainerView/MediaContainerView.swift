@@ -88,7 +88,8 @@ private extension MediaContainerView {
                     mediaView.model = file
                     mediaView.buttonActionHandler = { [actionHandler, file, model] in
                         actionHandler(
-                            .processFile(
+                            .openFile(
+                                messageId: model.messageId,
                                 file: file,
                                 isFromCurrentSender: model.isFromCurrentSender
                             )

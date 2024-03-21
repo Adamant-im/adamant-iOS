@@ -358,6 +358,7 @@ private extension ChatMessageFactory {
             content: .init(
                 id: id,
                 fileModel: .init(
+                    messageId: id,
                     files: chatFiles,
                     isMediaFilesOnly: isMediaFilesOnly,
                     isFromCurrentSender: isFromCurrentSender

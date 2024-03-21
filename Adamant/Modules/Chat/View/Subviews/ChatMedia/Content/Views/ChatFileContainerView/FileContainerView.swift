@@ -64,7 +64,8 @@ private extension FileContainerView {
             view?.model = file
             view?.buttonActionHandler = { [actionHandler, file, model] in
                 actionHandler(
-                    .processFile(
+                    .openFile(
+                        messageId: model.messageId,
                         file: file,
                         isFromCurrentSender: model.isFromCurrentSender
                     )
