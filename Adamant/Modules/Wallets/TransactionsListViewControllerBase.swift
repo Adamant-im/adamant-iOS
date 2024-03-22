@@ -241,7 +241,7 @@ class TransactionsListViewControllerBase: UIViewController {
         guard !isBusy else { return }
         
         guard reachabilityMonitor.connection else {
-            dialogService.showCompactError(
+            dialogService.showError(
                 withMessage: .adamant.sharedErrors.networkError,
                 supportEmail: false,
                 error: nil
@@ -263,7 +263,10 @@ class TransactionsListViewControllerBase: UIViewController {
                 emptyLabel.isHidden = self.transactions.count > 0
                 
                 if !silent {
-                    dialogService.showCompactError(withMessage: error.localizedDescription, supportEmail: false, error: error)
+                    dialogService.showError(
+                        withMessage: error.localizedDescription,
+                        supportEmail: false,
+                        error: error)
                     emptyLabel.isHidden = true
                 }
             }
