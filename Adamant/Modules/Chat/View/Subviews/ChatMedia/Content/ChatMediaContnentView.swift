@@ -9,16 +9,9 @@
 import SnapKit
 import UIKit
 import CommonKit
+import FilesPickerKit
 
 final class ChatMediaContentView: UIView {
-    private lazy var tableView: UITableView = {
-        let tableView = UITableView()
-        tableView.register(ChatFileTableViewCell.self, forCellReuseIdentifier: "cell")
-        tableView.delegate = self
-        tableView.backgroundColor = .clear
-        return tableView
-    }()
-    
     private let commentLabel = UILabel(
         font: commentFont,
         textColor: .adamant.textColor,
@@ -44,6 +37,11 @@ final class ChatMediaContentView: UIView {
         view.layer.cornerRadius = 5
         view.clipsToBounds = true
         
+        view.addGestureRecognizer(UITapGestureRecognizer(
+            target: self,
+            action: #selector(didTap)
+        ))
+        
         view.addSubview(colorView)
         view.addSubview(replyMessageLabel)
         
@@ -65,18 +63,28 @@ final class ChatMediaContentView: UIView {
     }()
     
     private lazy var verticalStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [replyView, commentLabel, tableView])
+        let stack = UIStackView(arrangedSubviews: [replyView, commentLabel])
         stack.axis = .vertical
         stack.spacing = verticalStackSpacing
         return stack
     }()
     
-    private lazy var dataSource = TransactionsDiffableDataSource(tableView: tableView, cellProvider: makeCell)
-
+    private lazy var mediaContainerView = MediaContainerView()
+    private lazy var fileContainerView = FileContainerView()
+    
     var model: Model = .default {
         didSet {
             guard oldValue != model else { return }
             update()
+        }
+    }
+    
+    var isSelected: Bool = false {
+        didSet {
+            animateIsSelected(
+                isSelected,
+                originalColor: model.backgroundColor.uiColor
+            )
         }
     }
     
@@ -95,13 +103,19 @@ final class ChatMediaContentView: UIView {
 
 private extension ChatMediaContentView {
     func configure() {
+        layer.cornerRadius = 16
+        
         addSubview(verticalStack)
         verticalStack.snp.makeConstraints { make in
-            make.directionalEdges.equalToSuperview()
+            make.verticalEdges.equalToSuperview().inset(8)
+            make.horizontalEdges.equalToSuperview().inset(12)
         }
     }
     
     func update() {
+        alpha = model.isHidden ? .zero : 1.0
+        backgroundColor = model.backgroundColor.uiColor
+        
         commentLabel.attributedText = model.comment
         commentLabel.isHidden = model.comment.string.isEmpty
         replyView.isHidden = !model.isReply
@@ -115,54 +129,69 @@ private extension ChatMediaContentView {
         replyView.snp.updateConstraints { make in
             make.height.equalTo(replyViewDynamicHeight)
         }
-        
-        let list = model.files
-        var snapshot = NSDiffableDataSourceSnapshot<Int, ChatFile>()
-        snapshot.appendSections([.zero])
-        snapshot.appendItems(list)
-        snapshot.reconfigureItems(list)
-        dataSource.apply(snapshot, animatingDifferences: false)
+       
+        updateStackLayout()
     }
     
-    func makeCell(
-        tableView: UITableView,
-        indexPath: IndexPath,
-        fileModel: ChatFile
-    ) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! ChatFileTableViewCell
-        cell.model = fileModel
-        cell.backgroundView?.backgroundColor = .clear
-        cell.backgroundColor = .clear
-        cell.contentView.backgroundColor = .clear
-        cell.buttonActionHandler = { [actionHandler, fileModel, model] in
-            actionHandler(
-                .processFile(
-                    file: fileModel,
-                    isFromCurrentSender: model.isFromCurrentSender
-                )
-            )
+    func updateStackLayout() {
+        let viewsList: [UIView]
+        
+        if model.fileModel.isMediaFilesOnly {
+            viewsList = [replyView, commentLabel, mediaContainerView]
+            mediaContainerView.model = model.fileModel
+            mediaContainerView.actionHandler = actionHandler
+        } else {
+            viewsList = [replyView, commentLabel, fileContainerView]
+            fileContainerView.model = model.fileModel
+            fileContainerView.actionHandler = actionHandler
         }
-        return cell
+        
+        guard verticalStack.arrangedSubviews != viewsList else { return }
+        verticalStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        viewsList.forEach(verticalStack.addArrangedSubview)
+        
+        if model.fileModel.isMediaFilesOnly {
+            mediaContainerView.model = model.fileModel
+            mediaContainerView.actionHandler = actionHandler
+        } else {
+            fileContainerView.model = model.fileModel
+            fileContainerView.actionHandler = actionHandler
+        }
     }
-}
-
-extension ChatMediaContentView: UITableViewDelegate {
-    func tableView(
-        _ tableView: UITableView,
-        heightForRowAt indexPath: IndexPath
-    ) -> CGFloat {
-        imageSize
+    
+    @objc func didTap() {
+        actionHandler(.scrollTo(message: .init(
+            id: model.id,
+            replyId: model.replyId,
+            message: NSAttributedString(string: .empty),
+            messageReply: NSAttributedString(string: .empty),
+            backgroundColor: .failed,
+            isFromCurrentSender: true,
+            reactions: nil,
+            address: .empty,
+            opponentAddress: .empty,
+            isHidden: false
+        )))
     }
 }
 
 extension ChatMediaContentView.Model {
     func height() -> CGFloat {
         let replyViewDynamicHeight: CGFloat = isReply ? replyViewHeight : 0
-        let stackSpacingCount: CGFloat = isReply ? 4 : 3
         
-        return imageSize * CGFloat(files.count)
-        + stackSpacingCount * verticalStackSpacing
-        + labelSize(for: comment, considering: 260).height
+        var rowCount: CGFloat = 1
+        
+        if isReply {
+            rowCount += 1
+        }
+        
+        if !comment.string.isEmpty {
+            rowCount += 1
+        }
+        
+        return fileModel.height()
+        + rowCount * verticalStackSpacing
+        + labelSize(for: comment, considering: contentWidth).height
         + replyViewDynamicHeight
     }
     
@@ -180,7 +209,6 @@ extension ChatMediaContentView.Model {
         let textStorage = NSTextStorage(attributedString: attributedText)
         textStorage.addLayoutManager(layoutManager)
         
-        let range = NSRange(location: 0, length: attributedText.length)
         let rect = layoutManager.usedRect(for: textContainer)
         
         return rect.integral.size
@@ -189,10 +217,11 @@ extension ChatMediaContentView.Model {
 
 private let nameFont = UIFont.systemFont(ofSize: 15)
 private let sizeFont = UIFont.systemFont(ofSize: 13)
-private let imageSize: CGFloat = 90
+private let imageSize: CGFloat = 70
 private typealias TransactionsDiffableDataSource = UITableViewDiffableDataSource<Int, ChatFile>
 private let cellIdentifier = "cell"
 private let commentFont = UIFont.systemFont(ofSize: 14)
-private let verticalStackSpacing: CGFloat = 6
+private let verticalStackSpacing: CGFloat = 10
 private let verticalInsets: CGFloat = 8
 private let replyViewHeight: CGFloat = 25
+private let contentWidth: CGFloat = 260

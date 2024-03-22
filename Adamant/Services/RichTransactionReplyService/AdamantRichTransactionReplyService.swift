@@ -290,7 +290,7 @@ private extension AdamantRichTransactionReplyService {
     func getRawFilePresentation(_ richContent: [String: Any]) -> String {
         let content = richContent[RichContentKeys.reply.replyMessage] as? [String: Any] ?? richContent
         
-        let files = richContent[RichContentKeys.file.files] as? [[String: Any]] ?? []
+        let files = content[RichContentKeys.file.files] as? [[String: Any]] ?? []
         
         let rawComment: String = (content[RichContentKeys.file.comment] as? String) ?? .empty
         let comment = !rawComment.isEmpty

@@ -22,6 +22,10 @@ final class ChatInputBar: InputBarAccessoryView {
         didSet { updateIsEnabled() }
     }
     
+    var isForcedSendEnabled = false {
+        didSet { updateSendIsEnabled() }
+    }
+    
     var isAttachmentButtonEnabled = true {
         didSet { updateIsAttachmentButtonEnabled() }
     }
@@ -51,7 +55,7 @@ final class ChatInputBar: InputBarAccessoryView {
     
     override func didMoveToWindow() {
         super.didMoveToWindow()
-        sendButton.isEnabled = !inputTextView.text.isEmpty
+        sendButton.isEnabled = (isEnabled && !inputTextView.text.isEmpty) || isForcedSendEnabled
     }
 }
 
@@ -76,6 +80,10 @@ private extension ChatInputBar {
         
         updateLayerColors()
         updateIsAttachmentButtonEnabled()
+    }
+    
+    func updateSendIsEnabled() {
+        sendButton.isEnabled = (isEnabled && !inputTextView.text.isEmpty) || isForcedSendEnabled
     }
     
     func updateIsAttachmentButtonEnabled() {

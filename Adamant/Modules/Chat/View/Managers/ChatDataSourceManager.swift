@@ -158,6 +158,7 @@ final class ChatDataSourceManager: MessagesDataSource {
             }
             
             cell.containerMediaView.actionHandler = { [weak self] in self?.handleAction($0) }
+            cell.containerMediaView.chatMessagesListViewModel = viewModel.chatMessagesListViewModel
             cell.containerMediaView.model = model.value
             cell.containerMediaView.setSubscription(publisher: publisher, collection: messagesCollectionView)
             cell.configure(with: message, at: indexPath, and: messagesCollectionView)
@@ -191,8 +192,8 @@ private extension ChatDataSourceManager {
             viewModel.reactAction(id, emoji: emoji)
         case let .presentMenu(arg):
             viewModel.presentMenu(arg: arg)
-        case let .processFile(file, isFromCurrentSender):
-            viewModel.processFile(file: file, isFromCurrentSender: isFromCurrentSender)
+        case let .openFile(messageId, file, isFromCurrentSender):
+            viewModel.openFile(messageId: messageId, file: file, isFromCurrentSender: isFromCurrentSender)
         }
     }
 }

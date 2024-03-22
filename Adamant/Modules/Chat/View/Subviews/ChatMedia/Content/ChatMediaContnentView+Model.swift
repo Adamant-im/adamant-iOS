@@ -12,23 +12,39 @@ import CommonKit
 extension ChatMediaContentView {
     struct Model: Equatable {
         let id: String
-        var files: [ChatFile]
+        var fileModel: FileModel
         var isHidden: Bool
         let isFromCurrentSender: Bool
         let isReply: Bool
         let replyMessage: NSAttributedString
         let replyId: String
         let comment: NSAttributedString
+        let backgroundColor: ChatMessageBackgroundColor
         
         static let `default` = Self(
             id: "",
-            files: [],
+            fileModel: .default,
             isHidden: false,
             isFromCurrentSender: false,
             isReply: false,
             replyMessage: NSAttributedString(string: .empty),
             replyId: .empty,
-            comment: NSAttributedString(string: .empty)
+            comment: NSAttributedString(string: .empty),
+            backgroundColor: .failed
+        )
+    }
+    
+    struct FileModel: Equatable {
+        let messageId: String
+        var files: [ChatFile]
+        var isMediaFilesOnly: Bool
+        let isFromCurrentSender: Bool
+
+        static let `default` = Self(
+            messageId: .empty,
+            files: [],
+            isMediaFilesOnly: false,
+            isFromCurrentSender: false
         )
     }
 }

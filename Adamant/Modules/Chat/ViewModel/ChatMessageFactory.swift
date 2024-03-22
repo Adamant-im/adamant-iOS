@@ -330,16 +330,24 @@ private extension ChatMessageFactory {
         let chatFiles = files.map {
             ChatFile.init(
                 file: RichMessageFile.File.init($0),
-                previewData: filesStorage.getPreview(
-                    for: $0[RichContentKeys.file.file_id] as? String ?? .empty,
+                previewDataURL: filesStorage.getPreview(
+                    for: $0[RichContentKeys.file.preview_id] as? String ?? .empty,
                     type: $0[RichContentKeys.file.file_type] as? String ?? .empty
                 ),
                 isDownloading: false,
                 isUploading: uploadingFilesIDs.contains($0[RichContentKeys.file.file_id] as? String ?? .empty),
                 isCached: filesStorage.isCached($0[RichContentKeys.file.file_id] as? String ?? .empty),
                 storage: storage,
-                nonce: $0[RichContentKeys.file.nonce] as? String ?? .empty
+                nonce: $0[RichContentKeys.file.nonce] as? String ?? .empty,
+                isFromCurrentSender: isFromCurrentSender
             )
+        }
+        
+        let filesExtensions = chatFiles.map { $0.file.file_type }
+        
+        let isMediaFilesOnly = filesExtensions.allSatisfy { elementA in
+            guard let elementA = elementA else { return false }
+            return mediaExtensions.contains(elementA.uppercased())
         }
         
         return .file(.init(value: .init(
@@ -348,13 +356,19 @@ private extension ChatMessageFactory {
             reactions: reactions,
             content: .init(
                 id: id,
-                files: chatFiles,
+                fileModel: .init(
+                    messageId: id,
+                    files: chatFiles,
+                    isMediaFilesOnly: isMediaFilesOnly,
+                    isFromCurrentSender: isFromCurrentSender
+                ),
                 isHidden: false,
                 isFromCurrentSender: isFromCurrentSender,
                 isReply: transaction.isFileReply(),
                 replyMessage: decodedMessageMarkDown,
                 replyId: replyId,
-                comment: Self.markdownParser.parse(comment)
+                comment: Self.markdownParser.parse(comment),
+                backgroundColor: backgroundColor
             ),
             address: address,
             opponentAddress: opponentAddress
@@ -509,3 +523,5 @@ private extension ChatSender {
         )
     }
 }
+
+private let mediaExtensions = ["JPG", "JPEG", "PNG", "GIF", "WEBP", "TIF", "TIFF", "BMP", "HEIF", "HEIC", "JP2", "MOV", "MP4"]

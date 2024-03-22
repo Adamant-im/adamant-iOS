@@ -10,28 +10,23 @@ import UIKit
 import Photos
 import PhotosUI
 
-final class MediaPickerService: NSObject, FilePickerProtocol {
-    private var onPreparedDataCallback: (([FileResult]) -> Void)?
-
-    func startPicker(completion: (([FileResult]) -> Void)?) {
-        onPreparedDataCallback = completion
-        
-        var phPickerConfig = PHPickerConfiguration(photoLibrary: .shared())
-        phPickerConfig.selectionLimit = Constants.maxFilesCount
-        phPickerConfig.filter = PHPickerFilter.any(of: [.images, .videos])
-        
-        let phPickerVC = PHPickerViewController(configuration: phPickerConfig)
-        phPickerVC.delegate = self
-        UIApplication.shared.topViewController()?.present(phPickerVC, animated: true)
-    }
+public final class MediaPickerService: NSObject, FilePickerProtocol {
+    private var helper = FilesPickerKitHelper()
+    
+    public var onPreparedDataCallback: ((Result<[FileResult], Error>) -> Void)?
+    public var onPreparingDataCallback: (() -> Void)?
+    
+    public override init() { }
 }
 
 extension MediaPickerService: PHPickerViewControllerDelegate {
-    func picker(
+    public func picker(
         _ picker: PHPickerViewController,
         didFinishPicking results: [PHPickerResult]
     ) {
         picker.dismiss(animated: true, completion: .none)
+        onPreparingDataCallback?()
+        
         Task {
             await processResults(results)
         }
@@ -55,14 +50,22 @@ private extension MediaPickerService {
                       let fileSize = try? getFileSize(from: url)
                 else { continue }
                 
+                let resizedPreview = helper.resizeImage(
+                    image: preview,
+                    targetSize: FilesConstants.previewSize
+                )
+                
+                let previewUrl = try? helper.getUrl(for: resizedPreview, name: url.lastPathComponent)
+                
                 dataArray.append(
                     .init(
                         url: url,
                         type: .image,
-                        preview: preview,
+                        preview: resizedPreview,
+                        previewUrl: previewUrl,
                         size: fileSize,
                         name: itemProvider.suggestedName, 
-                        extenstion: "JPG"
+                        extenstion: url.pathExtension
                     )
                 )
             }
@@ -72,22 +75,29 @@ private extension MediaPickerService {
                       let fileSize = try? getFileSize(from: url)
                 else { continue }
                 
-                let preview = getThumbnailImage(forUrl: url)
+                let preview = helper.getThumbnailImage(forUrl: url)
+                let previewUrl = try? helper.getUrl(for: preview, name: url.lastPathComponent)
                 
                 dataArray.append(
                     .init(
                         url: url,
                         type: .video,
                         preview: preview,
+                        previewUrl: previewUrl,
                         size: fileSize,
                         name: itemProvider.suggestedName,
-                        extenstion: "JPG"
+                        extenstion: url.pathExtension
                     )
                 )
             }
         }
         
-        onPreparedDataCallback?(dataArray)
+        do {
+            try helper.validateFiles(dataArray)
+            onPreparedDataCallback?(.success(dataArray))
+        } catch {
+            onPreparedDataCallback?(.failure(error))
+        }
     }
     
     func getFileSize(from fileURL: URL) throws -> Int64 {
@@ -155,19 +165,6 @@ private extension MediaPickerService {
                     continuation.resume(throwing: error)
                 }
             }
-        }
-    }
-    
-    func getThumbnailImage(forUrl url: URL) -> UIImage? {
-        let asset: AVAsset = AVAsset(url: url)
-        let imageGenerator = AVAssetImageGenerator(asset: asset)
-
-        do {
-            let thumbnailImage = try imageGenerator.copyCGImage(at: CMTimeMake(value: 1, timescale: 60), actualTime: nil)
-            return UIImage(cgImage: thumbnailImage)
-        } catch let error {
-            print("error in thumbail=", error)
-            return nil
         }
     }
 }

@@ -233,6 +233,37 @@ class NotificationService: UNNotificationServiceExtension {
                     )
                 }
                 
+                // rich file reply
+                if let data = message.data(using: String.Encoding.utf8),
+                   let richContent = RichMessageTools.richContent(from: data),
+                   let replyMessage = richContent[RichContentKeys.reply.replyMessage] as? [String: Any],
+                   replyMessage[RichContentKeys.file.files] is [[String: Any]] {
+                    
+                    let text = getRawFilePresentation(richContent)
+                    content = NotificationContent(
+                        title: partnerName ?? partnerAddress,
+                        subtitle: nil,
+                        body: MarkdownParser().parse(text).string,
+                        attachments: nil,
+                        categoryIdentifier: AdamantNotificationCategories.message
+                    )
+                }
+                
+                // rich file
+                if let data = message.data(using: String.Encoding.utf8),
+                   let richContent = RichMessageTools.richContent(from: data),
+                   richContent[RichContentKeys.file.files] is [[String: Any]] {
+                    
+                    let text = getRawFilePresentation(richContent)
+                    content = NotificationContent(
+                        title: partnerName ?? partnerAddress,
+                        subtitle: nil,
+                        body: MarkdownParser().parse(text).string,
+                        attachments: nil,
+                        categoryIdentifier: AdamantNotificationCategories.message
+                    )
+                }
+                
                 guard let content = content else {
                     break
                 }
@@ -279,6 +310,19 @@ class NotificationService: UNNotificationServiceExtension {
         if let contentHandler = contentHandler, let bestAttemptContent =  bestAttemptContent {
             contentHandler(bestAttemptContent)
         }
+    }
+    
+    private func getRawFilePresentation(_ richContent: [String: Any]) -> String {
+        let content = richContent[RichContentKeys.reply.replyMessage] as? [String: Any] ?? richContent
+        
+        let files = content[RichContentKeys.file.files] as? [[String: Any]] ?? []
+        
+        let rawComment: String = (content[RichContentKeys.file.comment] as? String) ?? .empty
+        let comment = !rawComment.isEmpty
+        ? ": \(rawComment)"
+        : ""
+        
+        return "[\(files.count) file(s)]\(comment)"
     }
     
     private func handleAdamantTransfer(

@@ -8,41 +8,43 @@
 import Foundation
 import UIKit
 import CommonKit
+import MobileCoreServices
+import AVFoundation
 
-final class DocumentPickerService: NSObject, FilePickerProtocol {
-    let documentPicker = UIDocumentPickerViewController(
-        forOpeningContentTypes: [.data, .content],
-        asCopy: false
-    )
+public final class DocumentPickerService: NSObject, FilePickerProtocol {
+    private var helper = FilesPickerKitHelper()
 
-    private var onPreparedDataCallback: (([FileResult]) -> Void)?
-
-    func startPicker(completion: (([FileResult]) -> Void)?) {
-        onPreparedDataCallback = completion
-        
-        documentPicker.allowsMultipleSelection = true
-        documentPicker.delegate = self
-        UIApplication.shared.topViewController()?.present(documentPicker, animated: true)
-    }
+    public var onPreparedDataCallback: ((Result<[FileResult], Error>) -> Void)?
+    public var onPreparingDataCallback: (() -> Void)?
+    
+    public override init() { }
 }
 
 extension DocumentPickerService: UIDocumentPickerDelegate {
-    func documentPicker(
+    public func documentPicker(
         _ controller: UIDocumentPickerViewController,
         didPickDocumentsAt urls: [URL]
     ) {
         let files = urls.compactMap {
-            FileResult.init(
+            let preview = getPreview(for: $0)
+            
+            return FileResult.init(
                 url: $0,
                 type: .other,
-                preview: nil,
+                preview: preview.image,
+                previewUrl: preview.url,
                 size: (try? getFileSize(from: $0)) ?? .zero,
                 name: $0.lastPathComponent,
                 extenstion: $0.pathExtension
             )
         }
         
-        onPreparedDataCallback?(files)
+        do {
+            try helper.validateFiles(files)
+            onPreparedDataCallback?(.success(files))
+        } catch {
+            onPreparedDataCallback?(.failure(error))
+        }
     }
 }
 
@@ -57,5 +59,48 @@ private extension DocumentPickerService {
         
         fileURL.stopAccessingSecurityScopedResource()
         return fileSize
+    }
+    
+    func isFileType(format: UTType, atURL fileURL: URL) -> Bool {
+        var mimeType: String?
+        
+        let pathExtension = fileURL.pathExtension
+        if let type = UTType(filenameExtension: pathExtension) {
+            mimeType = type.preferredMIMEType
+        }
+        
+        guard let mimeType = mimeType else { return false }
+        
+        return UTType(mimeType: mimeType)?.conforms(to: format) ?? false
+    }
+    
+    func getPreview(for url: URL) -> (image: UIImage?, url: URL?) {
+        defer {
+            url.stopAccessingSecurityScopedResource()
+        }
+        
+        _ = url.startAccessingSecurityScopedResource()
+        
+        var image: UIImage?
+        
+        if isFileType(format: .image, atURL: url) {
+            image = UIImage(contentsOfFile: url.path)
+        }
+        
+        if isFileType(format: .movie, atURL: url) {
+            image = helper.getThumbnailImage(forUrl: url)
+        }
+        
+        guard let image = image else {
+            return (image: nil, url: nil)
+        }
+        
+        let resizedImage = helper.resizeImage(
+            image: image,
+            targetSize: FilesConstants.previewSize
+        )
+        let imageURL = try? helper.getUrl(for: resizedImage, name: url.lastPathComponent)
+        
+        return (image: resizedImage, url: imageURL)
     }
 }

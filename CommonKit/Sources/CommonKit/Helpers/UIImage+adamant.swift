@@ -19,3 +19,7 @@ public extension UIImage {
         }
     }
 }
+
+public func getLocalImageUrl(by name: String, withExtension ext: String) -> URL? {
+    Bundle.module.url(forResource: name, withExtension: ext)
+}

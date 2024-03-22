@@ -23,18 +23,6 @@ public final class AdvancedContextMenuManager: NSObject {
     public var didPresentMenuAction: ((_ messageId: String) -> Void)?
     public var didDismissMenuAction: ((_ messageId: String) -> Void)?
     
-    var isiOSAppOnMac: Bool = {
-#if targetEnvironment(macCatalyst)
-        return true
-#else
-        if #available(iOS 14.0, *) {
-            return ProcessInfo.processInfo.isiOSAppOnMac
-        } else {
-            return false
-        }
-#endif
-    }()
-    
     // MARK: Public
     
     public func presentMenu(
@@ -53,7 +41,7 @@ public final class AdvancedContextMenuManager: NSObject {
             animationInDuration: animationOutDuration
         )
         
-        guard !isiOSAppOnMac else {
+        guard !isMacOS else {
             presentOverlayForMac(
                 contentView: containerCopyView,
                 contentViewSize: arg.size,

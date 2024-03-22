@@ -9,7 +9,7 @@
 import UIKit
 import CommonKit
 
-class ChatFileTableViewCell: UITableViewCell {
+class ChatFileView: UIView {
     private lazy var iconImageView: UIImageView = UIImageView()
     private lazy var downloadImageView = UIImageView(image: .asset(named: "downloadIcon"))
     
@@ -32,13 +32,14 @@ class ChatFileTableViewCell: UITableViewCell {
     }()
     
     private let nameLabel = UILabel(font: nameFont, textColor: .adamant.textColor)
-    private let sizeLabel = UILabel(font: sizeFont, textColor: .adamant.textColor)
-    
+    private let sizeLabel = UILabel(font: sizeFont, textColor: .lightGray)
+    private let additionalLabel = UILabel(font: additionalFont, textColor: .adamant.cellColor)
+
     private lazy var vStack: UIStackView = {
         let stack = UIStackView()
         stack.alignment = .leading
         stack.axis = .vertical
-        stack.spacing = stackSpacing
+        stack.spacing = verticalStackSpacing
         stack.backgroundColor = .clear
 
         stack.addArrangedSubview(nameLabel)
@@ -61,11 +62,16 @@ class ChatFileTableViewCell: UITableViewCell {
     
     var buttonActionHandler: (() -> Void)?
     
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
-        selectionStyle = .none
-        backgroundColor = nil
-        contentView.backgroundColor = nil
+    init(model: ChatFile) {
+        super.init(frame: .zero)
+        backgroundColor = .clear
+        configure()
+        self.model = model
+    }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        backgroundColor = .clear
         
         configure()
     }
@@ -81,25 +87,14 @@ class ChatFileTableViewCell: UITableViewCell {
         iconImageView.layer.cornerRadius = 5
     }
     
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        // Initialization code
-    }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
-    }
-    
     @objc func tapBtnAction() {
         buttonActionHandler?()
     }
 }
 
-private extension ChatFileTableViewCell {
+private extension ChatFileView {
     func configure() {
-        contentView.addSubview(horizontalStack)
+        addSubview(horizontalStack)
         horizontalStack.snp.makeConstraints { make in
             make.directionalEdges.equalToSuperview()
         }
@@ -108,18 +103,23 @@ private extension ChatFileTableViewCell {
             make.size.equalTo(imageSize)
         }
         
-        contentView.addSubview(spinner)
+        addSubview(additionalLabel)
+        additionalLabel.snp.makeConstraints { make in
+            make.center.equalTo(iconImageView.snp.center)
+        }
+        
+        addSubview(spinner)
         spinner.snp.makeConstraints { make in
             make.center.equalTo(iconImageView)
         }
         
-        contentView.addSubview(downloadImageView)
+        addSubview(downloadImageView)
         downloadImageView.snp.makeConstraints { make in
             make.center.equalTo(iconImageView)
             make.size.equalTo(imageSize / 1.3)
         }
         
-        contentView.addSubview(tapBtn)
+        addSubview(tapBtn)
         tapBtn.snp.makeConstraints { make in
             make.directionalEdges.equalToSuperview()
         }
@@ -130,10 +130,18 @@ private extension ChatFileTableViewCell {
         iconImageView.layer.cornerRadius = 5
         iconImageView.layer.masksToBounds = true
         iconImageView.contentMode = .scaleAspectFill
+        additionalLabel.textAlignment = .center
     }
     
     func update() {
-        iconImageView.image = model.previewData
+        if let url = model.previewDataURL {
+            iconImageView.image = UIImage(contentsOfFile: url.path)
+            additionalLabel.isHidden = true
+        } else {
+            additionalLabel.isHidden = false
+            iconImageView.image = defaultImage
+        }
+        
         downloadImageView.isHidden = model.isCached || model.isDownloading || model.isUploading
         
         if model.isDownloading || model.isUploading {
@@ -148,11 +156,24 @@ private extension ChatFileTableViewCell {
         nameLabel.text = fileName.contains(fileType)
         ? fileName
         : "\(fileName.uppercased()).\(fileType.uppercased())"
-        sizeLabel.text = "\(model.file.file_size) kb"
+        
+        sizeLabel.text = formatSize(model.file.file_size)
+        additionalLabel.text = fileType.uppercased()
+    }
+    
+    func formatSize(_ bytes: Int64) -> String {
+        let formatter = ByteCountFormatter()
+        formatter.allowedUnits = [.useMB, .useKB]
+        formatter.countStyle = .file
+
+        return formatter.string(fromByteCount: bytes)
     }
 }
 
+private let additionalFont = UIFont.boldSystemFont(ofSize: 15)
 private let nameFont = UIFont.systemFont(ofSize: 15)
 private let sizeFont = UIFont.systemFont(ofSize: 13)
 private let imageSize: CGFloat = 70
 private let stackSpacing: CGFloat = 12
+private let verticalStackSpacing: CGFloat = 3
+private let defaultImage: UIImage? = .asset(named: "file-default-box")

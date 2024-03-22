@@ -12,20 +12,22 @@ import UIKit
 
 struct ChatFile: Equatable, Hashable {
     var file: RichMessageFile.File
-    var previewData: UIImage?
+    var previewDataURL: URL?
     var isDownloading: Bool
     var isUploading: Bool
     var isCached: Bool
     var storage: String
     var nonce: String
+    var isFromCurrentSender: Bool
     
     static let `default` = Self(
         file: .init([:]),
-        previewData: nil,
+        previewDataURL: nil,
         isDownloading: false,
         isUploading: false,
         isCached: false,
         storage: .empty,
-        nonce: .empty
+        nonce: .empty,
+        isFromCurrentSender: false
     )
 }
