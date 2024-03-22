@@ -146,11 +146,6 @@ protocol DialogService: AnyObject {
     func showRichError(error: Error)
     func showNoConnectionNotification()
     func dissmisNoConnectionNotification()
-    func showCompactError(
-        withMessage message: String,
-        supportEmail: Bool,
-        error: Error?
-    )
     
     // MARK: - Notifications
     func showNotification(title: String?, message: String?, image: UIImage?, tapHandler: (() -> Void)?)
