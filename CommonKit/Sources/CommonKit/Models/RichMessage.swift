@@ -58,6 +58,7 @@ public enum RichContentKeys {
         public static let file_name = "file_name"
         public static let nonce = "nonce"
         public static let preview_nonce = "preview_nonce"
+        public static let file_resolution = "file_resolution"
     }
 }
 
@@ -99,6 +100,7 @@ public struct RichMessageFile: RichMessage {
         public var file_name: String?
         public var nonce: String
         public var preview_nonce: String?
+        public var file_resolution: CGSize?
         
         public init(
             file_id: String,
@@ -107,7 +109,8 @@ public struct RichMessageFile: RichMessage {
             preview_id: String? = nil,
             preview_nonce: String? = nil,
             file_name: String? = nil,
-            nonce: String
+            nonce: String,
+            file_resolution: CGSize? = nil
         ) {
             self.file_id = file_id
             self.file_type = file_type
@@ -116,6 +119,7 @@ public struct RichMessageFile: RichMessage {
             self.file_name = file_name
             self.nonce = nonce
             self.preview_nonce = preview_nonce
+            self.file_resolution = file_resolution
         }
         
         public init(_ data: [String: Any]) {
@@ -126,6 +130,16 @@ public struct RichMessageFile: RichMessage {
             self.file_name = data[RichContentKeys.file.file_name] as? String
             self.nonce = data[RichContentKeys.file.nonce] as? String ?? .empty
             self.preview_nonce = data[RichContentKeys.file.preview_nonce] as? String ?? .empty
+            if let resolution = data[RichContentKeys.file.file_resolution] as? [CGFloat] {
+                self.file_resolution = .init(
+                    width: resolution.first ?? .zero,
+                    height: resolution.last ?? .zero
+                )
+            } else if let resolution = data[RichContentKeys.file.file_resolution] as? CGSize {
+                self.file_resolution = resolution
+            } else {
+                self.file_resolution = nil
+            }
         }
         
         public func content() -> [String: Any] {
@@ -147,6 +161,10 @@ public struct RichMessageFile: RichMessage {
             
             if let file_name = file_name, !file_name.isEmpty {
                 contentDict[RichContentKeys.file.file_name] = file_name
+            }
+            
+            if let file_resolution = file_resolution {
+                contentDict[RichContentKeys.file.file_resolution] = file_resolution
             }
             
             return contentDict

@@ -71,11 +71,7 @@ final class FilesPickerKitHelper {
             let thumbnailImage = try imageGenerator.copyCGImage(at: CMTimeMake(value: 1, timescale: 60), actualTime: nil)
             
             let image = UIImage(cgImage: thumbnailImage)
-            let resizedImage = resizeImage(
-                image: image,
-                targetSize: FilesConstants.previewSize
-            )
-            return resizedImage
+            return image
         } catch {
             return nil
         }

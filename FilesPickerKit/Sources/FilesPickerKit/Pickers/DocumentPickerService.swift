@@ -35,7 +35,8 @@ extension DocumentPickerService: UIDocumentPickerDelegate {
                 previewUrl: preview.url,
                 size: (try? getFileSize(from: $0)) ?? .zero,
                 name: $0.lastPathComponent,
-                extenstion: $0.pathExtension
+                extenstion: $0.pathExtension, 
+                resolution: preview.resolution
             )
         }
         
@@ -74,7 +75,7 @@ private extension DocumentPickerService {
         return UTType(mimeType: mimeType)?.conforms(to: format) ?? false
     }
     
-    func getPreview(for url: URL) -> (image: UIImage?, url: URL?) {
+    func getPreview(for url: URL) -> (image: UIImage?, url: URL?, resolution: CGSize?) {
         defer {
             url.stopAccessingSecurityScopedResource()
         }
@@ -92,7 +93,7 @@ private extension DocumentPickerService {
         }
         
         guard let image = image else {
-            return (image: nil, url: nil)
+            return (image: nil, url: nil, resolution: nil)
         }
         
         let resizedImage = helper.resizeImage(
@@ -101,6 +102,6 @@ private extension DocumentPickerService {
         )
         let imageURL = try? helper.getUrl(for: resizedImage, name: url.lastPathComponent)
         
-        return (image: resizedImage, url: imageURL)
+        return (image: resizedImage, url: imageURL, resolution: image.size)
     }
 }

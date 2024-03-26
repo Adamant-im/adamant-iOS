@@ -313,7 +313,8 @@ final class ChatViewModel: NSObject {
                     preview_id: $0.previewUrl?.absoluteString,
                     preview_nonce: nil,
                     file_name: $0.name,
-                    nonce: .empty
+                    nonce: .empty,
+                    file_resolution: $0.resolution
                 )
             }
             

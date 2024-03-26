@@ -21,6 +21,7 @@ public struct FileResult {
     public let size: Int64
     public let name: String?
     public let extenstion: String?
+    public let resolution: CGSize?
     
     public init(
         url: URL,
@@ -29,7 +30,8 @@ public struct FileResult {
         previewUrl: URL?,
         size: Int64,
         name: String?,
-        extenstion: String?
+        extenstion: String?,
+        resolution: CGSize?
     ) {
         self.url = url
         self.type = type
@@ -38,5 +40,6 @@ public struct FileResult {
         self.name = name
         self.extenstion = extenstion
         self.preview = preview
+        self.resolution = resolution
     }
 }

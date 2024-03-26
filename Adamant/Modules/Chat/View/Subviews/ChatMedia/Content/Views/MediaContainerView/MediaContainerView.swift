@@ -24,9 +24,9 @@ final class MediaContainerView: UIView {
         for chunk in 0..<3 {
             let stackView = UIStackView()
             stackView.axis = .horizontal
-            stackView.spacing = 1
+            stackView.spacing = stackSpacing
             stackView.alignment = .fill
-            stackView.distribution = .fillEqually
+            stackView.distribution = .fill
             
             for file in 0..<2 {
                 let view = MediaContentView()
@@ -75,8 +75,11 @@ private extension MediaContainerView {
     
     func update() {
         let fileList = model.files.prefix(FilesConstants.maxFilesCount)
+        
         for (index, stackView) in filesStack.arrangedSubviews.enumerated() {
             guard let horizontalStackView = stackView as? UIStackView else { continue }
+            
+            var isHorizontal = false
             
             for (fileIndex, fileView) in horizontalStackView.arrangedSubviews.enumerated() {
                 guard let mediaView = fileView as? MediaContentView else { continue }
@@ -96,16 +99,87 @@ private extension MediaContainerView {
                             )
                         )
                     }
+
+                    if let resolution = file.file.file_resolution,
+                       resolution.width > resolution.height {
+                        isHorizontal = true
+                    }
                 } else {
                     mediaView.isHidden = true
                 }
             }
+            
+            updateCellsSize(
+                in: horizontalStackView,
+                isHorizontal: isHorizontal,
+                fileList: Array(fileList)
+            )
         }
+    }
+    
+    func updateCellsSize(
+        in horizontalStackView: UIStackView,
+        isHorizontal: Bool,
+        fileList: [ChatFile]
+    ) {
+        let filesStackWidth = filesStack.bounds.width == .zero
+            ? stackWidth
+            : filesStack.bounds.width
+
+        let minimumWidth = calculateMinimumWidth(availableWidth: filesStackWidth)
+        let maximumWidth = calculateMaximumWidth(availableWidth: filesStackWidth)
+        
+        let height: CGFloat = isHorizontal
+        ? rowHorizontalHeight
+        : fileList.count == 1 ? rowVerticalHeight * 2 : rowVerticalHeight
+
+        var totalWidthForEqualAspectRatio: CGFloat = 0.0
+        
+        for case let mediaView as MediaContentView in horizontalStackView.arrangedSubviews {
+            if let resolution = mediaView.model.file.file_resolution {
+                let aspectRatio = resolution.width / resolution.height
+                let widthForEqualAspectRatio = height * aspectRatio
+                totalWidthForEqualAspectRatio += widthForEqualAspectRatio
+            } else {
+                totalWidthForEqualAspectRatio += height
+            }
+        }
+
+        let scaleFactor = filesStackWidth / totalWidthForEqualAspectRatio
+
+        for case let mediaView as MediaContentView in horizontalStackView.arrangedSubviews {
+            if let resolution = mediaView.model.file.file_resolution {
+                let aspectRatio = resolution.width / resolution.height
+                let widthForEqualAspectRatio = height * aspectRatio
+                var width = max(widthForEqualAspectRatio * scaleFactor, minimumWidth)
+                width = min(width, maximumWidth)
+                
+                mediaView.snp.remakeConstraints {
+                    $0.width.equalTo(width)
+                    $0.height.equalTo(height)
+                }
+            } else {
+                mediaView.snp.remakeConstraints {
+                    $0.height.equalTo(height)
+                    $0.width.equalTo((filesStackWidth - stackSpacing) / 2)
+                }
+            }
+        }
+    }
+    
+    func calculateMinimumWidth(availableWidth: CGFloat) -> CGFloat {
+        return (availableWidth - stackSpacing) * 0.3
+    }
+    
+    func calculateMaximumWidth(availableWidth: CGFloat) -> CGFloat {
+        return (availableWidth - stackSpacing) * 0.7
     }
 }
 
 private let stackSpacing: CGFloat = 1
 private let rowHeight: CGFloat = 240
+private let rowVerticalHeight: CGFloat = 200
+private let rowHorizontalHeight: CGFloat = 150
 private let stackWidth: CGFloat = 280
 
 extension ChatMediaContentView.FileModel {
@@ -117,9 +191,26 @@ extension ChatMediaContentView.FileModel {
             + FileContainerView.stackSpacing * CGFloat(fileList.count)
         }
         
-        let rowCount = fileList.chunked(into: 2).count
+        let rows = fileList.chunked(into: 2)
+        var totalHeight: CGFloat = .zero
         
-        return rowHeight * CGFloat(rowCount)
-        + stackSpacing * CGFloat(rowCount)
+        for row in rows {
+            var isHorizontal = false
+            for row in row {
+                if let resolution = row.file.file_resolution,
+                   resolution.width > resolution.height {
+                    isHorizontal = true
+                }
+            }
+            
+            let height: CGFloat = isHorizontal
+            ? rowHorizontalHeight
+            : rows.count == 1 ? rowVerticalHeight * 2 : rowVerticalHeight
+            
+            totalHeight += height
+        }
+        
+        return totalHeight
+        + stackSpacing * CGFloat(rows.count)
     }
 }
