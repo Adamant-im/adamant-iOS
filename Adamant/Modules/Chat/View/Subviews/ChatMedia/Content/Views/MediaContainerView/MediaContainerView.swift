@@ -19,6 +19,7 @@ final class MediaContainerView: UIView {
         stack.alignment = .fill
         stack.distribution = .fill
         stack.layer.masksToBounds = true
+        stack.layer.cornerRadius = 7
         
         for chunk in 0..<3 {
             let stackView = UIStackView()

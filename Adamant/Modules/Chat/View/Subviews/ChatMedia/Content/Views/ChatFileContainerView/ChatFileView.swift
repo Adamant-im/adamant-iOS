@@ -12,7 +12,8 @@ import CommonKit
 class ChatFileView: UIView {
     private lazy var iconImageView: UIImageView = UIImageView()
     private lazy var downloadImageView = UIImageView(image: .asset(named: "downloadIcon"))
-    
+    private lazy var videoIconIV = UIImageView(image: .init(systemName: "play.circle"))
+
     private lazy var spinner: UIActivityIndicatorView = {
         let view = UIActivityIndicatorView(style: .medium)
         view.isHidden = true
@@ -119,6 +120,12 @@ private extension ChatFileView {
             make.size.equalTo(imageSize / 1.3)
         }
         
+        addSubview(videoIconIV)
+        videoIconIV.snp.makeConstraints { make in
+            make.center.equalTo(iconImageView)
+            make.size.equalTo(imageSize / 2)
+        }
+        
         addSubview(tapBtn)
         tapBtn.snp.makeConstraints { make in
             make.directionalEdges.equalToSuperview()
@@ -130,7 +137,11 @@ private extension ChatFileView {
         iconImageView.layer.cornerRadius = 5
         iconImageView.layer.masksToBounds = true
         iconImageView.contentMode = .scaleAspectFill
-        additionalLabel.textAlignment = .center
+        additionalLabel.textAlignment = .center        
+        videoIconIV.tintColor = .adamant.active
+        
+        videoIconIV.addShadow()
+        downloadImageView.addShadow()
     }
     
     func update() {
@@ -159,6 +170,11 @@ private extension ChatFileView {
         
         sizeLabel.text = formatSize(model.file.file_size)
         additionalLabel.text = fileType.uppercased()
+        
+        videoIconIV.isHidden = !(model.isCached
+        && !model.isDownloading
+        && !model.isUploading
+        && model.isVideo)
     }
     
     func formatSize(_ bytes: Int64) -> String {

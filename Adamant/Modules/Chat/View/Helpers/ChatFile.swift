@@ -19,6 +19,7 @@ struct ChatFile: Equatable, Hashable {
     var storage: String
     var nonce: String
     var isFromCurrentSender: Bool
+    var isVideo: Bool
     
     static let `default` = Self(
         file: .init([:]),
@@ -28,6 +29,7 @@ struct ChatFile: Equatable, Hashable {
         isCached: false,
         storage: .empty,
         nonce: .empty,
-        isFromCurrentSender: false
+        isFromCurrentSender: false,
+        isVideo: false
     )
 }

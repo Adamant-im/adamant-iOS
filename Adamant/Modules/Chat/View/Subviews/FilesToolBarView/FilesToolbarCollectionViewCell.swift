@@ -13,7 +13,7 @@ import CommonKit
 
 final class FilesToolbarCollectionViewCell: UICollectionViewCell {
     private lazy var imageView = UIImageView(image: .init(systemName: "shareplay"))
-    
+    private lazy var videoIconIV = UIImageView(image: .init(systemName: "play.circle"))
     private lazy var nameLabel = UILabel(font: nameFont, textColor: .adamant.textColor)
     private let additionalLabel = UILabel(font: additionalFont, textColor: .adamant.cellColor)
 
@@ -26,7 +26,8 @@ final class FilesToolbarCollectionViewCell: UICollectionViewCell {
         view.addSubview(imageView)
         view.addSubview(nameLabel)
         view.addSubview(additionalLabel)
-
+        view.addSubview(videoIconIV)
+        
         imageView.snp.makeConstraints { make in
             make.top.leading.trailing.equalToSuperview()
             make.bottom.equalTo(nameLabel.snp.top).offset(-7)
@@ -40,6 +41,11 @@ final class FilesToolbarCollectionViewCell: UICollectionViewCell {
         
         additionalLabel.snp.makeConstraints { make in
             make.center.equalTo(imageView.snp.center)
+        }
+        
+        videoIconIV.snp.makeConstraints { make in
+            make.center.equalTo(imageView.snp.center)
+            make.size.equalTo(30)
         }
         
         return view
@@ -91,6 +97,7 @@ final class FilesToolbarCollectionViewCell: UICollectionViewCell {
         additionalLabel.text = fileType.uppercased()
         additionalLabel.isHidden = file.preview != nil
         
+        videoIconIV.isHidden = file.type != .video
         layoutConstraints(file)
     }
 }
@@ -109,17 +116,15 @@ private extension FilesToolbarCollectionViewCell {
             make.size.equalTo(25)
         }
         
-        removeBtn.layer.shadowColor = UIColor.black.cgColor
-        removeBtn.layer.shadowOffset = .zero
-        removeBtn.layer.shadowOpacity = 0.45
-        removeBtn.layer.shadowRadius = 3.0
-        removeBtn.layer.masksToBounds = false
-        removeBtn.layer.cornerRadius = 4.0
-        
         imageView.layer.masksToBounds = true
         imageView.contentMode = .scaleAspectFill
         nameLabel.textAlignment = .center
         nameLabel.lineBreakMode = .byTruncatingMiddle
+        
+        removeBtn.addShadow()
+        
+        videoIconIV.tintColor = .adamant.active
+        videoIconIV.addShadow()
     }
     
     func layoutConstraints(_ file: FileResult) {

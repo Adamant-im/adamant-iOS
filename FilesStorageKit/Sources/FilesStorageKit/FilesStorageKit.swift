@@ -204,7 +204,8 @@ private extension FilesStorageKit {
             if let url = url {
                 return url
             }
-            return nil
+            
+            return getLocalImageUrl(by: "file-image-box", withExtension: "jpg")
         case "PDF":
             return getLocalImageUrl(by: "file-pdf-box", withExtension: "jpg")
         default:

@@ -89,8 +89,8 @@ final class ReplyView: UIView {
     func configure() {
         addSubview(horizontalStack)
         horizontalStack.snp.makeConstraints {
-            $0.top.bottom.equalToSuperview().inset(verticalInsets)
-            $0.leading.trailing.equalToSuperview().inset(15)
+            $0.verticalEdges.equalToSuperview().inset(verticalInsets)
+            $0.horizontalEdges.equalToSuperview().inset(horizontalInsets)
         }
     }
     
@@ -127,3 +127,4 @@ extension ReplyView {
 private let messageFont = UIFont.systemFont(ofSize: 14)
 private let horizontalStackSpacing: CGFloat = 25
 private let verticalInsets: CGFloat = 8
+private let horizontalInsets: CGFloat = 12

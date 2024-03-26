@@ -339,7 +339,8 @@ private extension ChatMessageFactory {
                 isCached: filesStorage.isCached($0[RichContentKeys.file.file_id] as? String ?? .empty),
                 storage: storage,
                 nonce: $0[RichContentKeys.file.nonce] as? String ?? .empty,
-                isFromCurrentSender: isFromCurrentSender
+                isFromCurrentSender: isFromCurrentSender, 
+                isVideo: videoExtensions.contains(($0[RichContentKeys.file.file_type] as? String)?.uppercased() ?? .empty)
             )
         }
         
@@ -525,3 +526,4 @@ private extension ChatSender {
 }
 
 private let mediaExtensions = ["JPG", "JPEG", "PNG", "GIF", "WEBP", "TIF", "TIFF", "BMP", "HEIF", "HEIC", "JP2", "MOV", "MP4"]
+private let videoExtensions = ["MOV", "MP4"]

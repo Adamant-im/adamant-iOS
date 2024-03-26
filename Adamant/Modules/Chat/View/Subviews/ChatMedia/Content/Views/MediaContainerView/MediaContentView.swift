@@ -13,6 +13,7 @@ import SnapKit
 final class MediaContentView: UIView {
     private lazy var imageView: UIImageView = UIImageView()
     private lazy var downloadImageView = UIImageView(image: .asset(named: "downloadIcon"))
+    private lazy var videoIconIV = UIImageView(image: .init(systemName: "play.circle"))
     
     private lazy var spinner: UIActivityIndicatorView = {
         let view = UIActivityIndicatorView(style: .medium)
@@ -55,12 +56,6 @@ final class MediaContentView: UIView {
         configure()
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        imageView.layer.cornerRadius = 5
-    }
-    
     @objc func tapBtnAction() {
         buttonActionHandler?()
     }
@@ -89,9 +84,18 @@ private extension MediaContentView {
             make.directionalEdges.equalToSuperview()
         }
         
-        imageView.layer.cornerRadius = 5
+        addSubview(videoIconIV)
+        videoIconIV.snp.makeConstraints { make in
+            make.center.equalTo(imageView)
+            make.size.equalTo(imageSize / 1.6)
+        }
+        
         imageView.layer.masksToBounds = true
         imageView.contentMode = .scaleAspectFill
+        videoIconIV.tintColor = .adamant.active
+
+        videoIconIV.addShadow()
+        downloadImageView.addShadow()
     }
     
     func update() {
@@ -102,6 +106,11 @@ private extension MediaContentView {
         }
         
         downloadImageView.isHidden = model.isCached || model.isDownloading || model.isUploading
+        
+        videoIconIV.isHidden = !(model.isCached
+        && !model.isDownloading
+        && !model.isUploading
+        && model.isVideo)
         
         if model.isDownloading || model.isUploading {
             spinner.startAnimating()

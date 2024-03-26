@@ -29,19 +29,10 @@ final class FilesToolbarView: UIView {
     
     private lazy var containerView: UIView = {
         let view = UIView()
-        let colorView = UIView()
-        colorView.backgroundColor = .adamant.active
-        
-        view.addSubview(colorView)
         view.addSubview(collectionView)
 
-        colorView.snp.makeConstraints {
-            $0.top.leading.bottom.equalToSuperview()
-            $0.width.equalTo(2)
-        }
         collectionView.snp.makeConstraints {
-            $0.top.bottom.trailing.equalToSuperview()
-            $0.leading.equalTo(colorView.snp.trailing).offset(5)
+            $0.directionalEdges.equalToSuperview()
         }
         return view
     }()
@@ -89,8 +80,8 @@ final class FilesToolbarView: UIView {
     func configure() {
         addSubview(horizontalStack)
         horizontalStack.snp.makeConstraints {
-            $0.top.bottom.equalToSuperview().inset(verticalInsets)
-            $0.leading.trailing.equalToSuperview().inset(horizontalInsets)
+            $0.verticalEdges.equalToSuperview().inset(verticalInsets)
+            $0.horizontalEdges.equalToSuperview().inset(horizontalInsets)
         }
     }
     
