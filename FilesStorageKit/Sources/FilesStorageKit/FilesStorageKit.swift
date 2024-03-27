@@ -118,6 +118,9 @@ private extension FilesStorageKit {
         recipientPublicKey: String,
         senderPrivateKey: String
     ) async throws -> UploadResult {
+        defer {
+            url.stopAccessingSecurityScopedResource()
+        }
         _ = url.startAccessingSecurityScopedResource()
         
         let data = try Data(contentsOf: url)
@@ -138,7 +141,6 @@ private extension FilesStorageKit {
         
         try cacheFile(id: id, data: data)
         
-        url.stopAccessingSecurityScopedResource()
         return (id: id, nonce: nonce)
     }
     

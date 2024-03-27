@@ -10,6 +10,7 @@ import UIKit
 import Photos
 import PhotosUI
 
+@MainActor
 public final class MediaPickerService: NSObject, FilePickerProtocol {
     private var helper = FilesPickerKitHelper()
     
@@ -45,9 +46,9 @@ private extension MediaPickerService {
             else { continue }
          
             if utType.conforms(to: .image) {
-                guard let url = try? await getUrl(from: itemProvider, typeIdentifier: typeIdentifier),
+                guard let url = try? await helper.getUrl(for: itemProvider),
                       let preview = try? await getPhoto(from: itemProvider),
-                      let fileSize = try? getFileSize(from: url)
+                      let fileSize = try? helper.getFileSize(from: url)
                 else { continue }
                 
                 let resizedPreview = helper.resizeImage(
@@ -72,8 +73,8 @@ private extension MediaPickerService {
             }
             
             if utType.conforms(to: .movie) {
-                guard let url = try? await getUrl(from: itemProvider, typeIdentifier: typeIdentifier),
-                      let fileSize = try? getFileSize(from: url)
+                guard let url = try? await helper.getUrl(for: itemProvider),
+                      let fileSize = try? helper.getFileSize(from: url)
                 else { continue }
                 
                 let thumbnailImage = helper.getThumbnailImage(forUrl: url)
@@ -112,16 +113,6 @@ private extension MediaPickerService {
         }
     }
     
-    func getFileSize(from fileURL: URL) throws -> Int64 {
-        let fileAttributes = try FileManager.default.attributesOfItem(atPath: fileURL.path)
-        
-        guard let fileSize = fileAttributes[.size] as? Int64 else {
-            throw FileValidationError.fileNotFound
-        }
-        
-        return fileSize
-    }
-    
     func getPhoto(from itemProvider: NSItemProvider) async throws -> UIImage {
         let objectType: NSItemProviderReading.Type = UIImage.self
         
@@ -142,40 +133,6 @@ private extension MediaPickerService {
                 }
                 
                 continuation.resume(returning: image)
-            }
-        }
-    }
-    
-    func getUrl(
-        from itemProvider: NSItemProvider,
-        typeIdentifier: String
-    ) async throws -> URL {
-        try await withUnsafeThrowingContinuation { continuation in
-            itemProvider.loadFileRepresentation(forTypeIdentifier: typeIdentifier) { url, error in
-                if let error = error {
-                    continuation.resume(throwing: error)
-                    return
-                }
-                
-                guard let url = url else {
-                    continuation.resume(throwing: FileValidationError.tooManyFiles)
-                    return
-                }
-                
-                let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
-                guard let targetURL = documentsDirectory?.appendingPathComponent(url.lastPathComponent) else { return }
-                
-                do {
-                    if FileManager.default.fileExists(atPath: targetURL.path) {
-                        try FileManager.default.removeItem(at: targetURL)
-                    }
-                    
-                    try FileManager.default.copyItem(at: url, to: targetURL)
-                    
-                    continuation.resume(returning: targetURL)
-                } catch {
-                    continuation.resume(throwing: error)
-                }
             }
         }
     }

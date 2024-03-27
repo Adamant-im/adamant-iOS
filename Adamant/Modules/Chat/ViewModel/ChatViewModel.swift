@@ -85,6 +85,7 @@ final class ChatViewModel: NSObject {
     let presentMediaPickerVC = ObservableSender<Void>()
     let presentDocumentPickerVC = ObservableSender<Void>()
     let presentDocumentViewerVC = ObservableSender<(URL, ChatFile)>()
+    let presentDropView = ObservableSender<Bool>()
     
     @ObservableValue private(set) var isHeaderLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
@@ -845,6 +846,10 @@ final class ChatViewModel: NSObject {
     
     func presentDialog(progress: Bool) {
         dialog.send(.progress(progress))
+    }
+    
+    func dropSessionUpdated(_ value: Bool) {
+        presentDropView.send(value)
     }
 }
 

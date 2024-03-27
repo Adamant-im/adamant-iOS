@@ -49,6 +49,7 @@ final class ChatViewController: MessagesViewController {
     private lazy var chatMessagesCollectionView = makeChatMessagesCollectionView()
     private lazy var replyView = ReplyView()
     private lazy var filesToolbarView = FilesToolbarView()
+    private lazy var chatDropView = ChatDropView()
     
     private var sendTransaction: SendTransaction
     
@@ -81,7 +82,8 @@ final class ChatViewController: MessagesViewController {
     private lazy var mediaPickerDelegate = MediaPickerService()
     private lazy var documentPickerDelegate = DocumentPickerService()
     private lazy var documentViewerService = DocumentInteractionService()
-
+    private lazy var dropInteractionService = DropInteractionService()
+    
     init(
         viewModel: ChatViewModel,
         walletServiceCompose: WalletServiceCompose,
@@ -118,6 +120,7 @@ final class ChatViewController: MessagesViewController {
         configureReplyView()
         configureFilesToolbarView()
         configureGestures()
+        configureDropFiles()
         setupObservers()
         viewModel.loadFirstMessagesIfNeeded()
     }
@@ -407,12 +410,44 @@ private extension ChatViewController {
                 self?.presentDocumentViewer(url: url, file: file)
             }
             .store(in: &subscriptions)
+        
+        viewModel.presentDropView
+            .sink { [weak self]  in self?.presentDropView($0) }
+            .store(in: &subscriptions)
     }
 }
 
 // MARK: Configuration
 
 private extension ChatViewController {
+    func configureDropFiles() {
+        chatDropView.alpha = .zero
+        view.addSubview(chatDropView)
+        chatDropView.snp.makeConstraints {
+            $0.directionalEdges.equalTo(view.safeAreaLayoutGuide).inset(5)
+        }
+        
+        view.addInteraction(UIDropInteraction(delegate: dropInteractionService))
+        
+        dropInteractionService.onPreparedDataCallback = { [weak self] result in
+            DispatchQueue.main.async {
+                self?.viewModel.dropSessionUpdated(false)
+                self?.viewModel.presentDialog(progress: false)
+                self?.viewModel.processFileResult(result)
+            }
+        }
+        
+        dropInteractionService.onPreparingDataCallback = { [weak self] in
+            DispatchQueue.main.async {
+                self?.viewModel.presentDialog(progress: true)
+            }
+        }
+        
+        dropInteractionService.onSessionCallback = { [weak self] fileOnScreen in
+            self?.viewModel.dropSessionUpdated(fileOnScreen)
+        }
+    }
+    
     func configureLayout() {
         view.addSubview(scrollDownButton)
         scrollDownButton.snp.makeConstraints { [unowned inputBar] in
@@ -581,6 +616,12 @@ private extension ChatViewController {
             splitViewController.present(quickVC, animated: true)
         } else {
             present(quickVC, animated: true)
+        }
+    }
+    
+    func presentDropView(_ value: Bool) {
+        UIView.animate(withDuration: 0.25) {
+            self.chatDropView.alpha = value ? 1.0 : .zero
         }
     }
 }

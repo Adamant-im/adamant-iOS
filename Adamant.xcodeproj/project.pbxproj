@@ -10,6 +10,7 @@
 		269E13522B594B2D008D1CA7 /* AccountFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269E13512B594B2D008D1CA7 /* AccountFooterView.swift */; };
 		3A075C9E2B98A3B100714E3B /* FilesPickerKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3A075C9D2B98A3B100714E3B /* FilesPickerKit */; };
 		3A20D93B2AE7F316005475A6 /* AdamantTransactionDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A20D93A2AE7F316005475A6 /* AdamantTransactionDetails.swift */; };
+		3A2478AE2BB42967009D89E9 /* ChatDropView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A2478AD2BB42967009D89E9 /* ChatDropView.swift */; };
 		3A299C692B838AA600B54C61 /* ChatMediaCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A299C682B838AA600B54C61 /* ChatMediaCell.swift */; };
 		3A299C6B2B838F2300B54C61 /* ChatMediaContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A299C6A2B838F2300B54C61 /* ChatMediaContainerView.swift */; };
 		3A299C6D2B838F8F00B54C61 /* ChatMediaContainerView+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A299C6C2B838F8F00B54C61 /* ChatMediaContainerView+Model.swift */; };
@@ -671,6 +672,7 @@
 		33975C0D891698AA7E74EBCC /* Pods_Adamant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Adamant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		36AB8CE9537B3B873972548B /* Pods_AdmCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AdmCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3A20D93A2AE7F316005475A6 /* AdamantTransactionDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantTransactionDetails.swift; sourceTree = "<group>"; };
+		3A2478AD2BB42967009D89E9 /* ChatDropView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatDropView.swift; sourceTree = "<group>"; };
 		3A299C682B838AA600B54C61 /* ChatMediaCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMediaCell.swift; sourceTree = "<group>"; };
 		3A299C6A2B838F2300B54C61 /* ChatMediaContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMediaContainerView.swift; sourceTree = "<group>"; };
 		3A299C6C2B838F8F00B54C61 /* ChatMediaContainerView+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatMediaContainerView+Model.swift"; sourceTree = "<group>"; };
@@ -1480,6 +1482,7 @@
 			children = (
 				41330F7529F1509400CB587C /* AdamantCellAnimation.swift */,
 				416380E02A51765F00F90E6D /* ChatReactionsView.swift */,
+				3A2478AD2BB42967009D89E9 /* ChatDropView.swift */,
 				3A299C7C2B85F98700B54C61 /* ChatFile.swift */,
 			);
 			path = Helpers;
@@ -3145,6 +3148,7 @@
 				4184F1772A33173100D7B8B9 /* ContributeView.swift in Sources */,
 				3A7BD0122AA9BD5A0045AAB0 /* AdamantVibroType.swift in Sources */,
 				E921597520611A6A0000CA5C /* AdamantReachability.swift in Sources */,
+				3A2478AE2BB42967009D89E9 /* ChatDropView.swift in Sources */,
 				E9960B3321F5154300C840A8 /* BaseAccount+CoreDataClass.swift in Sources */,
 				E9FCA1E6218334C00005E83D /* SimpleTransactionDetails.swift in Sources */,
 				41A1995829D5733D0031AD75 /* ChatMessageCell+Model.swift in Sources */,
