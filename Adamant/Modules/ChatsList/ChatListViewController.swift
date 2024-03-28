@@ -301,6 +301,19 @@ final class ChatListViewController: KeyboardObservingViewController {
                 self?.updateUITitles()
             }
             .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .Storage.storageClear)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                guard let splitVC = self?.tabBarController?.viewControllers?.first as? UISplitViewController,
+                      !splitVC.isCollapsed
+                else { return }
+                
+                splitVC.showDetailViewController(WelcomeViewController(), sender: nil)
+                
+            }
+            .store(in: &subscriptions)
     }
     
     private func updateUITitles() {

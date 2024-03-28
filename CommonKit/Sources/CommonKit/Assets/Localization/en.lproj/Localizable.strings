@@ -718,6 +718,15 @@
 /* NodesEditor: Failed to build URL alert */
 "NodesEditor.FailedToBuildURL" = "Invalid host";
 
+/* Storage usage: Clear Title */
+"StorageUsage.Clear.Title" = "Clear entire cache";
+
+/* Storage usage: Title */
+"StorageUsage.Title" = "Storage Usage";
+
+/* Storage usage: Description */
+"StorageUsage.Description" = "This field displays the total amount of space occupied on the device by data files associated with the application, such as images, videos, audio files, and documents";
+
 /* Security: Notification modes description. Markdown supported. */
 "SecurityPage.Row.Notifications.ModesDescription" = "#### Notification modes\n\n#### Disabled\nNo notifications.\n\n#### Background Fetch\nYour device fetchs for new messages by itself. No external calls. Fetch is initiated by iOS, the actual time determined by the operating system based on many factors like battery charge, cellular network, application usage patterns and cannot be predicted. It can be 20 minutes, or 6 hours, or maybe even a day. You still can open app and check for a new message though.\n\n#### Push\nNotifications sent to your device by ADAMANT Notification Service. You will receive notification almost instantly after a message was sent and approved by the Blockchain — a few seconds delay. But this mode requires your device to register it's Device Token in the Service's database. Device tokens are safe and secure, and this option is recommended in most cases.\n\nYou can read more about device registration on ADAMANT's Github page.\n\n";
 

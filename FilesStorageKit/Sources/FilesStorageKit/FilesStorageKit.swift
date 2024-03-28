@@ -87,6 +87,30 @@ public final class FilesStorageKit {
             nonce: nonce
         )
     }
+    
+    public func getCacheSize() throws -> Int64 {
+        let url = try FileManager.default.url(
+            for: .cachesDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        ).appendingPathComponent(cachePath)
+        
+        return try folderSize(at: url)
+    }
+    
+    public func clearCache() throws {
+        let url = try FileManager.default.url(
+            for: .cachesDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        ).appendingPathComponent(cachePath)
+        
+        try FileManager.default.removeItem(at: url)
+        
+        cachedFiles.removeAll()
+    }
 }
 
 private extension FilesStorageKit {
@@ -213,6 +237,31 @@ private extension FilesStorageKit {
         default:
             return nil
         }
+    }
+    
+    func folderSize(at url: URL) throws -> Int64 {
+        let fileManager = FileManager.default
+        
+        guard fileManager.fileExists(atPath: url.path) else {
+            throw FileValidationError.fileNotFound
+        }
+        
+        guard let enumerator = fileManager.enumerator(at: url, includingPropertiesForKeys: [.totalFileAllocatedSizeKey], options: [.skipsHiddenFiles, .skipsPackageDescendants]) else {
+            throw FileValidationError.fileNotFound
+        }
+        
+        var folderSize: Int64 = 0
+        
+        for case let fileURL as URL in enumerator {
+            do {
+                let attributes = try fileManager.attributesOfItem(atPath: fileURL.path)
+                if let fileSize = attributes[.size] as? Int64 {
+                    folderSize += fileSize
+                }
+            } catch { }
+        }
+        
+        return folderSize
     }
 }
 

@@ -676,6 +676,15 @@
 /* NodeList: Inform that default nodes was loaded, if user deleted all nodes */
 "NodeList.DefaultNodesLoaded" = "已加载默认节点列表";
 
+/* Storage usage: Clear Title */
+"StorageUsage.Clear.Title" = "清除整个缓存";
+
+/* Storage usage: Title */
+"StorageUsage.Title" = "存储使用";
+
+/* Storage usage: Description */
+"StorageUsage.Description" = "该字段显示与应用程序关联的数据文件（如图像、视频、音频文件和文档）在设备上占用的总空间量";
+
 /* CoinsNodesList: Title */
 "CoinsNodesList.Title" = "Coin和服务节点列表";
 
