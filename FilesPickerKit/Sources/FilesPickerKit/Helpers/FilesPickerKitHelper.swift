@@ -197,7 +197,10 @@ final class FilesPickerKitHelper {
             image: image,
             targetSize: FilesConstants.previewSize
         )
-        let imageURL = try? getUrl(for: resizedImage, name: url.lastPathComponent)
+        let imageURL = try? getUrl(
+            for: resizedImage,
+            name: FilesConstants.previewTag + url.lastPathComponent
+        )
         
         return (image: resizedImage, url: imageURL, resolution: image.size)
     }

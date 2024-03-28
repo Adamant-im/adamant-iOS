@@ -56,7 +56,10 @@ private extension MediaPickerService {
                     targetSize: FilesConstants.previewSize
                 )
                 
-                let previewUrl = try? helper.getUrl(for: resizedPreview, name: url.lastPathComponent)
+                let previewUrl = try? helper.getUrl(
+                    for: resizedPreview,
+                    name: FilesConstants.previewTag + url.lastPathComponent
+                )
                 
                 dataArray.append(
                     .init(
@@ -88,7 +91,10 @@ private extension MediaPickerService {
                     )
                 }
                 
-                let previewUrl = try? helper.getUrl(for: resizedPreviewImage, name: url.lastPathComponent)
+                let previewUrl = try? helper.getUrl(
+                    for: resizedPreviewImage,
+                    name: FilesConstants.previewTag + url.lastPathComponent
+                )
                 
                 dataArray.append(
                     .init(
