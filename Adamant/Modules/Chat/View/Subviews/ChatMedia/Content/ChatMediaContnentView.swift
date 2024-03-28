@@ -18,9 +18,11 @@ final class ChatMediaContentView: UIView {
         numberOfLines: .zero
     )
     
-    var replyViewDynamicHeight: CGFloat {
-        model.isReply ? replyViewHeight : 0
-    }
+    private let spacingView: UIView = {
+        let view = UIView()
+        view.snp.makeConstraints { $0.height.equalTo(verticalInsets) }
+        return view
+    }()
     
     private var replyMessageLabel = UILabel()
     
@@ -62,15 +64,74 @@ final class ChatMediaContentView: UIView {
         return view
     }()
     
+    private lazy var replyContainerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        
+        view.addSubview(replyView)
+        
+        replyView.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(verticalInsets)
+            make.horizontalEdges.equalToSuperview().inset(horizontalInsets)
+            make.bottom.equalToSuperview()
+        }
+        
+        view.snp.makeConstraints { make in
+            make.height.equalTo(replyContainerViewDynamicHeight)
+        }
+        return view
+    }()
+    
+    private lazy var listFileContainerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        
+        view.addSubview(fileContainerView)
+        
+        fileContainerView.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(verticalInsets)
+            make.horizontalEdges.equalToSuperview().inset(horizontalInsets)
+            make.bottom.equalToSuperview().offset(-verticalInsets)
+        }
+        
+        return view
+    }()
+    
+    private lazy var commentContainerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        
+        view.addSubview(commentLabel)
+        
+        commentLabel.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(verticalInsets)
+            make.horizontalEdges.equalToSuperview().inset(horizontalInsets)
+            make.bottom.equalToSuperview().offset(-verticalInsets)
+        }
+        
+        return view
+    }()
+    
     private lazy var verticalStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [replyView, commentLabel])
+        let stack = UIStackView(arrangedSubviews: [replyContainerView, commentContainerView])
         stack.axis = .vertical
-        stack.spacing = verticalStackSpacing
+        stack.spacing = .zero
+        stack.layer.masksToBounds = true
         return stack
     }()
     
     private lazy var mediaContainerView = MediaContainerView()
     private lazy var fileContainerView = FileContainerView()
+    
+    var replyViewDynamicHeight: CGFloat {
+        model.isReply ? replyViewHeight : .zero
+    }
+    
+    var replyContainerViewDynamicHeight: CGFloat {
+        model.isReply
+        ? replyViewHeight + verticalInsets
+        : .zero
+    }
     
     var model: Model = .default {
         didSet {
@@ -103,22 +164,26 @@ final class ChatMediaContentView: UIView {
 
 private extension ChatMediaContentView {
     func configure() {
+        layer.masksToBounds = true
         layer.cornerRadius = 16
+        layer.borderWidth = 2.5
         
         addSubview(verticalStack)
         verticalStack.snp.makeConstraints { make in
-            make.verticalEdges.equalToSuperview().inset(8)
-            make.horizontalEdges.equalToSuperview().inset(12)
+            make.directionalEdges.equalToSuperview()
         }
     }
     
     func update() {
         alpha = model.isHidden ? .zero : 1.0
         backgroundColor = model.backgroundColor.uiColor
+        layer.borderColor = model.backgroundColor.uiColor.cgColor
         
         commentLabel.attributedText = model.comment
         commentLabel.isHidden = model.comment.string.isEmpty
-        replyView.isHidden = !model.isReply
+        commentContainerView.isHidden = model.comment.string.isEmpty
+        replyContainerView.isHidden = !model.isReply
+        spacingView.isHidden = !model.fileModel.isMediaFilesOnly
         
         if model.isReply {
             replyMessageLabel.attributedText = model.replyMessage
@@ -126,10 +191,15 @@ private extension ChatMediaContentView {
             replyMessageLabel.attributedText = nil
         }
         
-        replyView.snp.updateConstraints { make in
-            make.height.equalTo(replyViewDynamicHeight)
+        replyContainerView.snp.updateConstraints { make in
+            make.height.equalTo(replyContainerViewDynamicHeight)
         }
-       
+        
+        let spaceHeight = model.fileModel.isMediaFilesOnly && model.isReply
+        ? verticalInsets
+        : .zero
+        spacingView.snp.remakeConstraints { $0.height.equalTo(spaceHeight) }
+        
         updateStackLayout()
     }
     
@@ -137,11 +207,11 @@ private extension ChatMediaContentView {
         let viewsList: [UIView]
         
         if model.fileModel.isMediaFilesOnly {
-            viewsList = [replyView, commentLabel, mediaContainerView]
+            viewsList = [replyContainerView, spacingView, mediaContainerView, commentContainerView]
             mediaContainerView.model = model.fileModel
             mediaContainerView.actionHandler = actionHandler
         } else {
-            viewsList = [replyView, commentLabel, fileContainerView]
+            viewsList = [replyContainerView, listFileContainerView, commentContainerView]
             fileContainerView.model = model.fileModel
             fileContainerView.actionHandler = actionHandler
         }
@@ -179,7 +249,7 @@ extension ChatMediaContentView.Model {
     func height() -> CGFloat {
         let replyViewDynamicHeight: CGFloat = isReply ? replyViewHeight : 0
         
-        var rowCount: CGFloat = 1
+        var rowCount: CGFloat = fileModel.isMediaFilesOnly ? .zero : 1
         
         if isReply {
             rowCount += 1
@@ -199,6 +269,8 @@ extension ChatMediaContentView.Model {
        for attributedText: NSAttributedString,
        considering maxWidth: CGFloat
     ) -> CGSize {
+        guard !attributedText.string.isEmpty else { return .zero }
+        
         let textContainer = NSTextContainer(
            size: CGSize(width: maxWidth, height: .greatestFiniteMagnitude)
         )
@@ -218,10 +290,9 @@ extension ChatMediaContentView.Model {
 private let nameFont = UIFont.systemFont(ofSize: 15)
 private let sizeFont = UIFont.systemFont(ofSize: 13)
 private let imageSize: CGFloat = 70
-private typealias TransactionsDiffableDataSource = UITableViewDiffableDataSource<Int, ChatFile>
-private let cellIdentifier = "cell"
 private let commentFont = UIFont.systemFont(ofSize: 14)
 private let verticalStackSpacing: CGFloat = 10
 private let verticalInsets: CGFloat = 8
+private let horizontalInsets: CGFloat = 12
 private let replyViewHeight: CGFloat = 25
-private let contentWidth: CGFloat = 260
+private let contentWidth: CGFloat = 280

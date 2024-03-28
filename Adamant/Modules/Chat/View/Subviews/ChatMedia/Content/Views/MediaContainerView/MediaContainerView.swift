@@ -19,7 +19,6 @@ final class MediaContainerView: UIView {
         stack.alignment = .fill
         stack.distribution = .fill
         stack.layer.masksToBounds = true
-        stack.layer.cornerRadius = 7
         
         for chunk in 0..<3 {
             let stackView = UIStackView()
@@ -66,6 +65,8 @@ final class MediaContainerView: UIView {
 
 private extension MediaContainerView {
     func configure() {
+        layer.masksToBounds = true
+        
         addSubview(filesStack)
         filesStack.snp.makeConstraints {
             $0.directionalEdges.equalToSuperview()
@@ -122,9 +123,7 @@ private extension MediaContainerView {
         isHorizontal: Bool,
         fileList: [ChatFile]
     ) {
-        let filesStackWidth = filesStack.bounds.width == .zero
-            ? stackWidth
-            : filesStack.bounds.width
+        let filesStackWidth = stackWidth
 
         let minimumWidth = calculateMinimumWidth(availableWidth: filesStackWidth)
         let maximumWidth = calculateMaximumWidth(availableWidth: filesStackWidth)
