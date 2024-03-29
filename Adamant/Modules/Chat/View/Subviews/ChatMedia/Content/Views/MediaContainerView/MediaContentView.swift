@@ -107,10 +107,12 @@ private extension MediaContentView {
         
         downloadImageView.isHidden = model.isCached || model.isDownloading || model.isUploading
         
-        videoIconIV.isHidden = !(model.isCached
-        && !model.isDownloading
-        && !model.isUploading
-        && model.isVideo)
+        videoIconIV.isHidden = !(
+            model.isCached
+            && !model.isDownloading
+            && !model.isUploading
+            && model.fileType == .video
+        )
         
         if model.isDownloading || model.isUploading {
             spinner.startAnimating()

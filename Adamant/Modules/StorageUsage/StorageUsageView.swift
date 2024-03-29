@@ -25,11 +25,19 @@ struct StorageUsageView: View {
                         content
                             .listRowBackground(Color(uiColor: .adamant.cellColor))
                     },
-                    footer: { Text(verbatim: description) }
+                    footer: { Text(verbatim: storageDescription) }
+                )
+                
+                Section(
+                    content: {
+                        previewContent
+                            .listRowBackground(Color(uiColor: .adamant.cellColor))
+                    },
+                    footer: { Text(verbatim: previewDescription) }
                 )
             }
             .listStyle(.insetGrouped)
-            .navigationTitle(title)
+            .navigationTitle(storageTitle)
             
             Spacer()
             
@@ -58,8 +66,8 @@ struct StorageUsageView: View {
 private extension StorageUsageView {
     var content: some View {
         HStack {
-            Image(uiImage: image)
-            Text(verbatim: title)
+            Image(uiImage: storageImage)
+            Text(verbatim: storageTitle)
             Spacer()
             if let storage = viewModel.storageUsedDescription {
                 Text(storage)
@@ -69,9 +77,25 @@ private extension StorageUsageView {
             }
         }
     }
+    
+    var previewContent: some View {
+        Toggle(isOn: $viewModel.autoDownloadPreview) {
+            HStack {
+                Image(uiImage: previewImage)
+                Text(previewTitle)
+            }
+            .onLongPressGesture {
+                viewModel.togglePreviewContent()
+            }
+        }
+        .tint(.init(uiColor: .adamant.active))
+    }
 }
 
-private let image: UIImage = .asset(named: "row_storage")!
-private let description: String = .localized("StorageUsage.Description")
-private let title: String = .localized("StorageUsage.Title")
+private let storageImage: UIImage = .asset(named: "row_storage")!
+private let storageDescription: String = .localized("StorageUsage.Description")
+private let storageTitle: String = .localized("StorageUsage.Title")
 private let clearTitle: String = .localized("StorageUsage.Clear.Title")
+private let previewImage: UIImage = .asset(named: "row_preview")!
+private let previewTitle: String = .localized("Storage.AutoDownloadPreview.Title")
+private let previewDescription: String = .localized("Storage.AutoDownloadPreview.Description")

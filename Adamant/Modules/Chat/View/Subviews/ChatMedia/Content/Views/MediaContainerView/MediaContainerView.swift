@@ -77,6 +77,14 @@ private extension MediaContainerView {
     func update() {
         let fileList = model.files.prefix(FilesConstants.maxFilesCount)
         
+        fileList.forEach { file in
+            actionHandler(.downloadPreviewIfNeeded(
+                messageId: model.messageId,
+                file: file,
+                isFromCurrentSender: model.isFromCurrentSender
+            ))
+        }
+        
         for (index, stackView) in filesStack.arrangedSubviews.enumerated() {
             guard let horizontalStackView = stackView as? UIStackView else { continue }
             

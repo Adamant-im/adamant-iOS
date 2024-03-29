@@ -171,10 +171,12 @@ private extension ChatFileView {
         sizeLabel.text = formatSize(model.file.file_size)
         additionalLabel.text = fileType.uppercased()
         
-        videoIconIV.isHidden = !(model.isCached
-        && !model.isDownloading
-        && !model.isUploading
-        && model.isVideo)
+        videoIconIV.isHidden = !(
+            model.isCached
+            && !model.isDownloading
+            && !model.isUploading
+            && model.fileType == .video
+        )
     }
     
     func formatSize(_ bytes: Int64) -> String {

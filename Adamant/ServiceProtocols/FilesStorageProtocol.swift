@@ -38,6 +38,15 @@ protocol FilesStorageProtocol {
     func getCacheSize() throws -> Int64
     
     func clearCache() throws
+    
+    func cachePreview(
+        storage: String,
+        fileType: String?,
+        senderPublicKey: String,
+        recipientPrivateKey: String,
+        previewId: String,
+        previewNonce: String
+    ) async throws
 }
 
 extension FilesStorageKit: FilesStorageProtocol { }

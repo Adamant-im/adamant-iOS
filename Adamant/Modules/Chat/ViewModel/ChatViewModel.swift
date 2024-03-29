@@ -767,7 +767,8 @@ final class ChatViewModel: NSObject {
         let tx = chatTransactions.first(where: { $0.txId == messageId })
 
         guard let keyPair = accountService.keypair,
-              tx?.statusEnum == .delivered
+              tx?.statusEnum == .delivered,
+              !downloadingFilesID.contains(file.file.file_id)
         else { return }
         
         Task {
@@ -813,6 +814,48 @@ final class ChatViewModel: NSObject {
             } catch {
                 dialog.send(.alert(error.localizedDescription))
             }
+        }
+    }
+    
+    func downloadPreviewIfNeeded(
+        messageId: String,
+        file: ChatFile,
+        isFromCurrentSender: Bool
+    ) {
+        let tx = chatTransactions.first(where: { $0.txId == messageId })
+
+        guard let keyPair = accountService.keypair,
+              tx?.statusEnum == .delivered,
+              !downloadingFilesID.contains(file.file.file_id),
+              let previewId = file.file.preview_id,
+              let previewNonce = file.file.preview_nonce,
+              !filesStorage.isCached(previewId)
+        else { return }
+        
+        downloadingFilesID.append(file.file.file_id)
+        
+        Task {
+            defer {
+                downloadingFilesID.removeAll(where: { $0 == file.file.file_id })
+            }
+            
+            try? await filesStorage.cachePreview(
+                storage: file.storage,
+                fileType: file.file.file_type ?? .empty,
+                senderPublicKey: chatroom?.partner?.publicKey ?? .empty,
+                recipientPrivateKey: keyPair.privateKey,
+                previewId: previewId,
+                previewNonce: previewNonce
+            )
+            
+            let preview = filesStorage.getPreview(
+                for: previewId,
+                type: file.file.file_type ?? .empty
+            )
+            
+            let cached = filesStorage.isCached(file.file.file_id)
+            
+            updateFileFields(&messages, id: file.file.file_id, preview: preview, cached: cached)
         }
     }
     
@@ -973,7 +1016,8 @@ private extension ChatViewModel {
                 sender: sender,
                 isNeedToLoadMoreMessages: isNeedToLoadMoreMessages,
                 expirationTimestamp: &expirationTimestamp,
-                uploadingFilesIDs: uploadingFilesIDs
+                uploadingFilesIDs: uploadingFilesIDs,
+                downloadingFilesIDs: downloadingFilesID
             )
             
             await setupNewMessages(

@@ -194,6 +194,8 @@ private extension ChatDataSourceManager {
             viewModel.presentMenu(arg: arg)
         case let .openFile(messageId, file, isFromCurrentSender):
             viewModel.openFile(messageId: messageId, file: file, isFromCurrentSender: isFromCurrentSender)
+        case let .downloadPreviewIfNeeded(messageId, file, isFromCurrentSender):
+            viewModel.downloadPreviewIfNeeded(messageId: messageId, file: file, isFromCurrentSender: isFromCurrentSender)
         }
     }
 }

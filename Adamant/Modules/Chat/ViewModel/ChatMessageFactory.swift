@@ -77,7 +77,8 @@ struct ChatMessageFactory {
         currentSender: SenderType,
         dateHeaderOn: Bool,
         topSpinnerOn: Bool,
-        uploadingFilesIDs: [String]
+        uploadingFilesIDs: [String],
+        downloadingFilesIDs: [String]
     ) -> ChatMessage {
         let sentDate = transaction.sentDate ?? .now
         let senderModel = ChatSender(transaction: transaction)
@@ -102,7 +103,8 @@ struct ChatMessageFactory {
                 transaction,
                 isFromCurrentSender: currentSender.senderId == senderModel.senderId,
                 backgroundColor: backgroundColor,
-                uploadingFilesIDs: uploadingFilesIDs
+                uploadingFilesIDs: uploadingFilesIDs,
+                downloadingFilesIDs: downloadingFilesIDs
             ),
             backgroundColor: backgroundColor,
             bottomString: makeBottomString(
@@ -123,7 +125,8 @@ private extension ChatMessageFactory {
         _ transaction: ChatTransaction,
         isFromCurrentSender: Bool,
         backgroundColor: ChatMessageBackgroundColor,
-        uploadingFilesIDs: [String]
+        uploadingFilesIDs: [String],
+        downloadingFilesIDs: [String]
     ) -> ChatMessage.Content {
         switch transaction {
         case let transaction as MessageTransaction:
@@ -150,7 +153,8 @@ private extension ChatMessageFactory {
                     transaction,
                     isFromCurrentSender: isFromCurrentSender,
                     backgroundColor: backgroundColor,
-                    uploadingFilesIDs: uploadingFilesIDs
+                    uploadingFilesIDs: uploadingFilesIDs,
+                    downloadingFilesIDs: downloadingFilesIDs
                 )
             }
             
@@ -305,7 +309,8 @@ private extension ChatMessageFactory {
         _ transaction: RichMessageTransaction,
         isFromCurrentSender: Bool,
         backgroundColor: ChatMessageBackgroundColor,
-        uploadingFilesIDs: [String]
+        uploadingFilesIDs: [String],
+        downloadingFilesIDs: [String]
     ) -> ChatMessage.Content {
         let id = transaction.chatMessageId ?? ""
         
@@ -334,21 +339,20 @@ private extension ChatMessageFactory {
                     for: $0[RichContentKeys.file.preview_id] as? String ?? .empty,
                     type: $0[RichContentKeys.file.file_type] as? String ?? .empty
                 ),
-                isDownloading: false,
+                isDownloading: downloadingFilesIDs.contains($0[RichContentKeys.file.file_id] as? String ?? .empty),
                 isUploading: uploadingFilesIDs.contains($0[RichContentKeys.file.file_id] as? String ?? .empty),
                 isCached: filesStorage.isCached($0[RichContentKeys.file.file_id] as? String ?? .empty),
                 storage: storage,
                 nonce: $0[RichContentKeys.file.nonce] as? String ?? .empty,
                 isFromCurrentSender: isFromCurrentSender, 
-                isVideo: videoExtensions.contains(($0[RichContentKeys.file.file_type] as? String)?.uppercased() ?? .empty)
+                fileType: FileType(raw: ($0[RichContentKeys.file.file_type] as? String ?? .empty)) ?? .other
             )
         }
         
-        let filesExtensions = chatFiles.map { $0.file.file_type }
+        let filesExtensions = chatFiles.map { $0.fileType }
         
-        let isMediaFilesOnly = filesExtensions.allSatisfy { elementA in
-            guard let elementA = elementA else { return false }
-            return mediaExtensions.contains(elementA.uppercased())
+        let isMediaFilesOnly = filesExtensions.allSatisfy { type in
+            return type == .image || type == .video
         }
         
         return .file(.init(value: .init(
@@ -524,6 +528,3 @@ private extension ChatSender {
         )
     }
 }
-
-private let mediaExtensions = ["JPG", "JPEG", "PNG", "GIF", "WEBP", "TIF", "TIFF", "BMP", "HEIF", "HEIC", "JP2", "MOV", "MP4"]
-private let videoExtensions = ["MOV", "MP4"]

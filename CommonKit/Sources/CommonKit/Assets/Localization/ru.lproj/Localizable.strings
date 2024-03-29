@@ -718,6 +718,12 @@
 /* NodesEditor: Failed to build URL alert */
 "NodesEditor.FailedToBuildURL" = "Некорректный адрес хоста";
 
+/* Storage: Auto download preview */
+"Storage.AutoDownloadPreview.Title" = "Автоматически загружать превью";
+
+/* Storage: Auto download preview */
+"Storage.AutoDownloadPreview.Description" = "Автоматическая загрузка превью для фотографий и видео: При включении этой опции приложение может автоматически загружать превью фотографий и видео. Это помогает быстро просматривать медиа-контент без необходимости ожидания полной загрузки файла";
+
 /* Storage usage: Clear Title */
 "StorageUsage.Clear.Title" = "Очистите весь кэш";
 

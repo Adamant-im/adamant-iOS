@@ -22,6 +22,7 @@ final class StorageUsageViewModel: ObservableObject {
     private let dialogService: DialogService
     
     @Published var storageUsedDescription: String?
+    @Published var autoDownloadPreview: Bool = false
     
     nonisolated init(
         filesStorage: FilesStorageProtocol,
@@ -56,6 +57,10 @@ final class StorageUsageViewModel: ObservableObject {
                 error: error
             )
         }
+    }
+    
+    func togglePreviewContent() {
+        
     }
 }
 

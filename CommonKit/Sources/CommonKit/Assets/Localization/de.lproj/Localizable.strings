@@ -727,6 +727,12 @@
 /* NodesEditor: Failed to build URL alert */
 "NodesEditor.FailedToBuildURL" = "Invalid host";
 
+/* Storage: Auto download preview */
+"Storage.AutoDownloadPreview.Title" = "Automatisches Herunterladen von Vorschaubildern";
+
+/* Storage: Auto download preview */
+"Storage.AutoDownloadPreview.Description" = "Automatisches Herunterladen von Vorschauen für Fotos und Videos: Wenn diese Option aktiviert ist, kann die Anwendung automatisch Vorschauen von Fotos und Videos herunterladen. Dies erleichtert das schnelle Anzeigen von Mediendateien, ohne auf den vollständigen Download der Datei warten zu müssen";
+
 /* Storage usage: Clear Title */
 "StorageUsage.Clear.Title" = "Clear entire cache";
 

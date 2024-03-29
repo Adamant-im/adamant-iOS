@@ -10,10 +10,33 @@ public final class FilesStorageKit {
 
     private let adamantCore = NativeAdamantCore()
     private let networkFileManager = FilesNetworkManager()
-    private var cachedFiles: [String: URL] = [:]
-        
+    private let networkService = NetworkService()
+    private let taskQueue = TaskQueue<Void>(maxTasks: 5)
+    
+    @Atomic private var cachedFiles: [String: URL] = [:]
+    
     public init() {
         try? loadCache()
+    }
+    
+    public func cachePreview(
+        storage: String,
+        fileType: String?,
+        senderPublicKey: String,
+        recipientPrivateKey: String,
+        previewId: String,
+        previewNonce: String
+    ) async throws {
+        await taskQueue.enqueue {
+            try? await self.downloadFile(
+                id: previewId,
+                storage: storage,
+                fileType: fileType,
+                senderPublicKey: senderPublicKey,
+                recipientPrivateKey: recipientPrivateKey,
+                nonce: previewNonce
+            )
+        }
     }
     
     public func getPreview(for id: String, type: String) -> URL? {
@@ -122,17 +145,14 @@ private extension FilesStorageKit {
         recipientPrivateKey: String,
         nonce: String
     ) async throws {
-        let encodedData = try await networkFileManager.downloadFile(id, type: storage)
-        
-        guard let decodedData = adamantCore.decodeData(
-            encodedData,
-            rawNonce: nonce,
+        let decodedData = try await networkService.downloadFile(
+            id: id,
+            storage: storage,
+            fileType: fileType,
             senderPublicKey: senderPublicKey,
-            privateKey: recipientPrivateKey
+            recipientPrivateKey: recipientPrivateKey,
+            nonce: nonce
         )
-        else {
-            throw FileValidationError.fileNotFound
-        }
         
         return try cacheFile(id: id, data: decodedData)
     }
@@ -142,30 +162,15 @@ private extension FilesStorageKit {
         recipientPublicKey: String,
         senderPrivateKey: String
     ) async throws -> UploadResult {
-        defer {
-            url.stopAccessingSecurityScopedResource()
-        }
-        _ = url.startAccessingSecurityScopedResource()
-        
-        let data = try Data(contentsOf: url)
-        
-        let encodedResult = adamantCore.encodeData(
-            data,
+        let result = try await networkService.uploadFile(
+            url: url,
             recipientPublicKey: recipientPublicKey,
-            privateKey: senderPrivateKey
+            senderPrivateKey: senderPrivateKey
         )
         
-        guard let encodedData = encodedResult?.data,
-              let nonce = encodedResult?.nonce
-        else {
-            throw FileManagerError.cantEnctryptFile
-        }
+        try cacheFile(id: result.id, data: result.data)
         
-        let id = try await networkFileManager.uploadFiles(encodedData, type: .uploadCareApi)
-        
-        try cacheFile(id: id, data: data)
-        
-        return (id: id, nonce: nonce)
+        return (id: result.id, nonce: result.nonce)
     }
     
     func loadCache() throws {
@@ -232,8 +237,6 @@ private extension FilesStorageKit {
             }
             
             return getLocalImageUrl(by: "file-image-box", withExtension: "jpg")
-        case "PDF":
-            return getLocalImageUrl(by: "file-pdf-box", withExtension: "jpg")
         default:
             return nil
         }

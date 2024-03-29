@@ -13,6 +13,18 @@ public enum FileType {
     case other
 }
 
+public extension FileType {
+    init?(raw: String) {
+        switch raw.uppercased() {
+        case "JPG", "JPEG", "PNG", "GIF", "WEBP", "TIF", "TIFF", "BMP", "HEIF", "HEIC", "JP2":
+            self = .image
+        case "MOV", "MP4":
+            self = .video
+        default: self = .other
+        }
+    }
+}
+
 public struct FileResult {
     public let url: URL
     public let type: FileType
