@@ -378,19 +378,6 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         }
     }
     
-    private func stringFor(balance: Decimal, symbol: String?) -> String {
-        var value = AdamantBalanceFormat.full.format(balance, withCurrencySymbol: symbol)
-        
-        if balance > 0, let symbol = symbol, let rate = currencyInfoService.getRate(for: symbol) {
-            let fiat = balance * rate
-            let fiatString = AdamantBalanceFormat.short.format(fiat, withCurrencySymbol: currencyInfoService.currentCurrency.symbol)
-            
-            value = "\(value) (\(fiatString))"
-        }
-        
-        return value
-    }
-    
     // MARK: - Other
     
     func setColors() {

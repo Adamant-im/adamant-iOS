@@ -39,7 +39,7 @@ class WalletCollectionViewCell: PagingCell {
         
         if let balance = item.balance, item.isBalanceInitialized {
             if balance < 1 {
-                balanceLabel.text = AdamantBalanceFormat.compact.format(balance)
+                balanceLabel.text = stringFor(balance: balance)
             } else {
                 balanceLabel.text = AdamantBalanceFormat.short.format(balance)
             }
@@ -51,6 +51,41 @@ class WalletCollectionViewCell: PagingCell {
             accessoryContainerView.setAccessory(AccessoryType.label(text: String(item.notifications)), at: .topRight)
         } else {
             accessoryContainerView.setAccessory(nil, at: .topRight)
+        }
+    }
+    
+    private func stringFor(balance: Decimal) -> String {
+        let significantDigits = 5
+        let balanceStr = "\(balance)"
+        
+        let minBalance: Decimal = Decimal(pow(10, -(Double(significantDigits - 1))))
+        
+        // Check if the number has a decimal part
+        if balanceStr.contains(".") || balanceStr.contains(",") {
+            let parts = balanceStr.split(separator: ".")
+            var wholePart = String(parts[0])
+            let decimalPart = String(parts[1])
+            
+            if balance < minBalance {
+                return "0.00…\(decimalPart.last ?? "0")"
+            }
+            
+            let additionalDigits = significantDigits - wholePart.count
+            
+            guard additionalDigits > .zero else { return wholePart }
+            
+            var formattedDecimal = ""
+            
+            for digit in decimalPart.prefix(additionalDigits) {
+                formattedDecimal.append(digit)
+            }
+            
+            var value = "\(wholePart).\(formattedDecimal)"
+            return value
+            
+        } else {
+            var value = AdamantBalanceFormat.compact.format(balance)
+            return "\(value)"
         }
     }
 }
