@@ -162,7 +162,7 @@ private extension MediaContainerView {
                 width = min(width, maximumWidth)
                 
                 mediaView.snp.remakeConstraints {
-                    $0.width.equalTo(width)
+                    $0.width.equalTo(width - stackSpacing)
                     $0.height.equalTo(height)
                 }
             } else {
@@ -212,7 +212,7 @@ extension ChatMediaContentView.FileModel {
             
             let height: CGFloat = isHorizontal
             ? rowHorizontalHeight
-            : rows.count == 1 ? rowVerticalHeight * 2 : rowVerticalHeight
+            : fileList.count == 1 ? rowVerticalHeight * 2 : rowVerticalHeight
             
             totalHeight += height
         }

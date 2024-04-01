@@ -12,7 +12,7 @@ import CommonKit
 import FilesStorageKit
 
 protocol FilesStorageProtocol {
-    func getPreview(for id: String, type: String) -> URL?
+    func getPreview(for id: String, type: String) -> UIImage?
     
     func isCached(_ id: String) -> Bool
     

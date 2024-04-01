@@ -145,12 +145,20 @@ private extension ChatFileView {
     }
     
     func update() {
-        if let url = model.previewDataURL {
-            iconImageView.image = UIImage(contentsOfFile: url.path)
+        let image: UIImage?
+        if let previewImage = model.previewImage {
+            image = previewImage
             additionalLabel.isHidden = true
         } else {
+            image = model.fileType == .image || model.fileType == .video 
+            ? defaultMediaImage
+            : defaultImage
+            
             additionalLabel.isHidden = false
-            iconImageView.image = defaultImage
+        }
+        
+        if iconImageView.image != image {
+            iconImageView.image = image
         }
         
         downloadImageView.isHidden = model.isCached || model.isDownloading || model.isUploading
@@ -195,3 +203,4 @@ private let imageSize: CGFloat = 70
 private let stackSpacing: CGFloat = 12
 private let verticalStackSpacing: CGFloat = 3
 private let defaultImage: UIImage? = .asset(named: "file-default-box")
+private let defaultMediaImage: UIImage? = .asset(named: "file-image-box")

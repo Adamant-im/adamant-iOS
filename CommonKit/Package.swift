@@ -60,11 +60,6 @@ let package = Package(
                 "MarkdownKit",
                 "KeychainAccess",
                 "RNCryptor"
-            ],
-            resources: [
-                .process("Assets/File-icons/file-default-box.png"),
-                .process("Assets/File-icons/file-image-box.jpg"),
-                .process("Assets/File-icons/file-pdf-box.jpg")
             ]
         ),
         .testTarget(

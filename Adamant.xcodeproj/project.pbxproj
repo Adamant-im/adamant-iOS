@@ -1447,8 +1447,8 @@
 		3AA6DF412BA9942300EA2E16 /* ChatFileContainerView */ = {
 			isa = PBXGroup;
 			children = (
-				3A299C7A2B85EABB00B54C61 /* ChatFileView.swift */,
 				3AA6DF432BA997C000EA2E16 /* FileContainerView.swift */,
+				3A299C7A2B85EABB00B54C61 /* ChatFileView.swift */,
 			);
 			path = ChatFileContainerView;
 			sourceTree = "<group>";

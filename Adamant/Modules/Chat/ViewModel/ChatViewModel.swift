@@ -1252,7 +1252,7 @@ private extension ChatViewModel {
         _ messages: inout [ChatMessage],
         id oldId: String,
         newId: String? = nil,
-        preview: URL?,
+        preview: UIImage?,
         cached: Bool
     ) {
         messages.indices.forEach { index in
@@ -1341,7 +1341,7 @@ private extension ChatMessage {
     mutating func updateFields(
         id oldId: String,
         newId: String? = nil,
-        preview: URL?,
+        preview: UIImage?,
         cached: Bool
     ) {
         guard case let .file(fileModel) = content else { return }
@@ -1354,7 +1354,7 @@ private extension ChatMessage {
         if let newId = newId {
             model.content.fileModel.files[index].file.file_id = newId
         }
-        model.content.fileModel.files[index].previewDataURL = preview
+        model.content.fileModel.files[index].previewImage = preview
         model.content.fileModel.files[index].isCached = cached
 
         content = .file(.init(value: model))

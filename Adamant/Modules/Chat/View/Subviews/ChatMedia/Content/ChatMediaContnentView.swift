@@ -113,7 +113,7 @@ final class ChatMediaContentView: UIView {
     }()
     
     private lazy var verticalStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [replyContainerView, commentContainerView])
+        let stack = UIStackView(arrangedSubviews: [replyContainerView, spacingView, mediaContainerView, listFileContainerView, commentContainerView])
         stack.axis = .vertical
         stack.spacing = .zero
         stack.layer.masksToBounds = true
@@ -204,21 +204,9 @@ private extension ChatMediaContentView {
     }
     
     func updateStackLayout() {
-        let viewsList: [UIView]
-        
-        if model.fileModel.isMediaFilesOnly {
-            viewsList = [replyContainerView, spacingView, mediaContainerView, commentContainerView]
-            mediaContainerView.model = model.fileModel
-            mediaContainerView.actionHandler = actionHandler
-        } else {
-            viewsList = [replyContainerView, listFileContainerView, commentContainerView]
-            fileContainerView.model = model.fileModel
-            fileContainerView.actionHandler = actionHandler
-        }
-        
-        guard verticalStack.arrangedSubviews != viewsList else { return }
-        verticalStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        viewsList.forEach(verticalStack.addArrangedSubview)
+        spacingView.isHidden = !model.fileModel.isMediaFilesOnly
+        mediaContainerView.isHidden = !model.fileModel.isMediaFilesOnly
+        listFileContainerView.isHidden = model.fileModel.isMediaFilesOnly
         
         if model.fileModel.isMediaFilesOnly {
             mediaContainerView.model = model.fileModel

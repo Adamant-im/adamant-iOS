@@ -25,12 +25,13 @@ extension MediaPickerService: PHPickerViewControllerDelegate {
         _ picker: PHPickerViewController,
         didFinishPicking results: [PHPickerResult]
     ) {
-        picker.dismiss(animated: true, completion: .none)
-        onPreparingDataCallback?()
-        
-        Task {
-            await processResults(results)
-        }
+        picker.dismiss(animated: true, completion: { [weak self] in
+            self?.onPreparingDataCallback?()
+            
+            Task {
+                await self?.processResults(results)
+            }
+        })
     }
 }
 

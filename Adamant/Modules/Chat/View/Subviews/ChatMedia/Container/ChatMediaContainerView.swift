@@ -22,7 +22,7 @@ final class ChatMediaContainerView: UIView, ChatModelView {
         return view
     }()
     
-    private let horizontalStack: UIStackView = {
+    private lazy var horizontalStack: UIStackView = {
         let stack = UIStackView()
         stack.alignment = .center
         stack.axis = .horizontal

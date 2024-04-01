@@ -13,7 +13,8 @@ public final class FilesStorageKit {
     private let networkService = NetworkService()
     private let taskQueue = TaskQueue<Void>(maxTasks: 5)
     
-    @Atomic private var cachedFiles: [String: URL] = [:]
+    @Atomic private var cachedFilesUrl: [String: URL] = [:]
+    private var cachedFiles: NSCache<NSString, UIImage> = NSCache()
     
     public init() {
         try? loadCache()
@@ -39,16 +40,26 @@ public final class FilesStorageKit {
         }
     }
     
-    public func getPreview(for id: String, type: String) -> URL? {
-        getPreview(for: type, url: cachedFiles[id])
+    public func getPreview(for id: String, type: String) -> UIImage? {
+        if let image = cachedFiles.object(forKey: id as NSString) {
+            return image
+        }
+        
+        guard let url = cachedFilesUrl[id],
+              let image = UIImage(contentsOfFile: url.path) else {
+            return nil
+        }
+        
+        cachedFiles.setObject(image, forKey: id as NSString)
+        return image
     }
     
     public func isCached(_ id: String) -> Bool {
-        cachedFiles[id] != nil
+        cachedFilesUrl[id] != nil
     }
     
     public func getFileURL(with id: String) throws -> URL {
-        guard let url = cachedFiles[id] else {
+        guard let url = cachedFilesUrl[id] else {
             throw FileValidationError.fileNotFound
         }
         
@@ -132,7 +143,8 @@ public final class FilesStorageKit {
         
         try FileManager.default.removeItem(at: url)
         
-        cachedFiles.removeAll()
+        cachedFiles.removeAllObjects()
+        cachedFilesUrl.removeAll()
     }
 }
 
@@ -184,7 +196,11 @@ private extension FilesStorageKit {
         let files = getFiles(at: folder)
 
         files.forEach { url in
-            cachedFiles[url.lastPathComponent] = url
+            cachedFilesUrl[url.lastPathComponent] = url
+            
+            if let data = UIImage(contentsOfFile: url.path) {
+                self.cachedFiles.setObject(data, forKey: url.lastPathComponent as NSString)
+            }
         }
     }
 
@@ -220,7 +236,10 @@ private extension FilesStorageKit {
 
         try data.write(to: fileURL, options: [.atomic, .completeFileProtection])
 
-        cachedFiles[id] = fileURL
+        cachedFilesUrl[id] = fileURL
+        if let uiImage = UIImage(data: data) {
+            cachedFiles.setObject(uiImage, forKey: id as NSString)
+        }
     }
     
     private func getPreview(for type: String, url: URL?) -> URL? {

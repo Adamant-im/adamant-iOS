@@ -99,10 +99,17 @@ private extension MediaContentView {
     }
     
     func update() {
-        if let url = model.previewDataURL {
-            imageView.image = UIImage(contentsOfFile: url.path)
+        let image: UIImage?
+        if let previewImage = model.previewImage {
+            image = previewImage
         } else {
-            imageView.image = defaultImage
+            image = model.fileType == .image || model.fileType == .video
+            ? defaultMediaImage
+            : defaultImage
+        }
+        
+        if imageView.image != image {
+            imageView.image = image
         }
         
         downloadImageView.isHidden = model.isCached || model.isDownloading || model.isUploading
@@ -126,3 +133,4 @@ private let imageSize: CGFloat = 70
 private let stackSpacing: CGFloat = 12
 private let verticalStackSpacing: CGFloat = 3
 private let defaultImage: UIImage? = .asset(named: "file-default-box")
+private let defaultMediaImage: UIImage? = .asset(named: "file-image-box")

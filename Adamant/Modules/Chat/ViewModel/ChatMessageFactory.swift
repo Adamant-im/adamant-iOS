@@ -314,14 +314,12 @@ private extension ChatMessageFactory {
     ) -> ChatMessage.Content {
         let id = transaction.chatMessageId ?? ""
         
-        let decodedMessage: String = transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) ?? "..."
-        let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
-        
         let files: [[String: Any]] = transaction.getRichValue(for: RichContentKeys.file.files) ?? [[:]]
-        let storage: String = transaction.getRichValue(for: RichContentKeys.file.storage) ?? .empty
         
-        let comment: String = transaction.getRichValue(for: RichContentKeys.file.comment) ?? .empty
-        let replyId = transaction.getRichValue(for: RichContentKeys.reply.replyToId) ?? ""
+        let decodedMessage = decodeMessage(transaction)
+        let storage = transaction.getRichValue(for: RichContentKeys.file.storage) ?? .empty
+        let comment = transaction.getRichValue(for: RichContentKeys.file.comment) ?? .empty
+        let replyId = transaction.getRichValue(for: RichContentKeys.reply.replyToId) ?? .empty
         let reactions = transaction.richContent?[RichContentKeys.react.reactions] as? Set<Reaction>
         
         let address = transaction.isOutgoing
@@ -332,28 +330,24 @@ private extension ChatMessageFactory {
         ? transaction.recipientAddress
         : transaction.senderAddress
         
-        let chatFiles = files.map {
-            ChatFile.init(
-                file: RichMessageFile.File.init($0),
-                previewDataURL: filesStorage.getPreview(
-                    for: $0[RichContentKeys.file.preview_id] as? String ?? .empty,
-                    type: $0[RichContentKeys.file.file_type] as? String ?? .empty
-                ),
-                isDownloading: downloadingFilesIDs.contains($0[RichContentKeys.file.file_id] as? String ?? .empty),
-                isUploading: uploadingFilesIDs.contains($0[RichContentKeys.file.file_id] as? String ?? .empty),
-                isCached: filesStorage.isCached($0[RichContentKeys.file.file_id] as? String ?? .empty),
-                storage: storage,
-                nonce: $0[RichContentKeys.file.nonce] as? String ?? .empty,
-                isFromCurrentSender: isFromCurrentSender, 
-                fileType: FileType(raw: ($0[RichContentKeys.file.file_type] as? String ?? .empty)) ?? .other
-            )
+        let chatFiles = makeChatFiles(
+            from: files,
+            uploadingFilesIDs: uploadingFilesIDs,
+            downloadingFilesIDs: downloadingFilesIDs,
+            isFromCurrentSender: isFromCurrentSender,
+            storage: storage
+        )
+        
+        let isMediaFilesOnly = chatFiles.allSatisfy {
+            $0.fileType == .image || $0.fileType == .video
         }
         
-        let filesExtensions = chatFiles.map { $0.fileType }
-        
-        let isMediaFilesOnly = filesExtensions.allSatisfy { type in
-            return type == .image || type == .video
-        }
+        let fileModel = ChatMediaContentView.FileModel(
+            messageId: id,
+            files: chatFiles,
+            isMediaFilesOnly: isMediaFilesOnly,
+            isFromCurrentSender: isFromCurrentSender
+        )
         
         return .file(.init(value: .init(
             id: id,
@@ -361,16 +355,11 @@ private extension ChatMessageFactory {
             reactions: reactions,
             content: .init(
                 id: id,
-                fileModel: .init(
-                    messageId: id,
-                    files: chatFiles,
-                    isMediaFilesOnly: isMediaFilesOnly,
-                    isFromCurrentSender: isFromCurrentSender
-                ),
+                fileModel: fileModel,
                 isHidden: false,
                 isFromCurrentSender: isFromCurrentSender,
                 isReply: transaction.isFileReply(),
-                replyMessage: decodedMessageMarkDown,
+                replyMessage: decodedMessage,
                 replyId: replyId,
                 comment: Self.markdownParser.parse(comment),
                 backgroundColor: backgroundColor
@@ -378,6 +367,37 @@ private extension ChatMessageFactory {
             address: address,
             opponentAddress: opponentAddress
         )))
+    }
+    
+    private func decodeMessage(_ transaction: RichMessageTransaction) -> NSMutableAttributedString {
+        let decodedMessage = transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) ?? "..."
+        return  Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
+    }
+    
+    private func makeChatFiles(
+        from files: [[String: Any]],
+        uploadingFilesIDs: [String],
+        downloadingFilesIDs: [String],
+        isFromCurrentSender: Bool,
+        storage: String
+    ) -> [ChatFile] {
+        return files.map {
+            let previewId = $0[RichContentKeys.file.preview_id] as? String ?? ""
+            let fileType = $0[RichContentKeys.file.file_type] as? String ?? ""
+            let fileId = $0[RichContentKeys.file.file_id] as? String ?? ""
+            
+            return ChatFile(
+                file: RichMessageFile.File($0),
+                previewImage: filesStorage.getPreview(for: previewId, type: fileType),
+                isDownloading: downloadingFilesIDs.contains(fileId),
+                isUploading: uploadingFilesIDs.contains(fileId),
+                isCached: filesStorage.isCached(fileId),
+                storage: storage,
+                nonce: $0[RichContentKeys.file.nonce] as? String ?? "",
+                isFromCurrentSender: isFromCurrentSender,
+                fileType: FileType(raw: fileType) ?? .other
+            )
+        }
     }
     
     func makeContent(

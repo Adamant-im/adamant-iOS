@@ -12,7 +12,7 @@ import UIKit
 
 struct ChatFile: Equatable, Hashable {
     var file: RichMessageFile.File
-    var previewDataURL: URL?
+    var previewImage: UIImage?
     var isDownloading: Bool
     var isUploading: Bool
     var isCached: Bool
@@ -23,7 +23,7 @@ struct ChatFile: Equatable, Hashable {
     
     static let `default` = Self(
         file: .init([:]),
-        previewDataURL: nil,
+        previewImage: nil,
         isDownloading: false,
         isUploading: false,
         isCached: false,
