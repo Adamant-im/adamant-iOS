@@ -13,7 +13,7 @@ import CommonKit
 
 final class FilesToolbarCollectionViewCell: UICollectionViewCell {
     private lazy var imageView = UIImageView(image: .init(systemName: "shareplay"))
-    private lazy var videoIconIV = UIImageView(image: .init(systemName: "play.circle"))
+    private lazy var videoIconIV = UIImageView(image: .asset(named: "playVideoIcon"))
     private lazy var nameLabel = UILabel(font: nameFont, textColor: .adamant.textColor)
     private let additionalLabel = UILabel(font: additionalFont, textColor: .adamant.cellColor)
 

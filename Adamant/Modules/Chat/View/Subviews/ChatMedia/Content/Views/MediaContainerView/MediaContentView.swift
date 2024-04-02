@@ -13,7 +13,7 @@ import SnapKit
 final class MediaContentView: UIView {
     private lazy var imageView: UIImageView = UIImageView()
     private lazy var downloadImageView = UIImageView(image: .asset(named: "downloadIcon"))
-    private lazy var videoIconIV = UIImageView(image: .init(systemName: "play.circle"))
+    private lazy var videoIconIV = UIImageView(image: .asset(named: "playVideoIcon"))
     
     private lazy var spinner: UIActivityIndicatorView = {
         let view = UIActivityIndicatorView(style: .medium)

@@ -209,11 +209,11 @@ private extension ChatMediaContentView {
         listFileContainerView.isHidden = model.fileModel.isMediaFilesOnly
         
         if model.fileModel.isMediaFilesOnly {
-            mediaContainerView.model = model.fileModel
             mediaContainerView.actionHandler = actionHandler
+            mediaContainerView.model = model.fileModel
         } else {
-            fileContainerView.model = model.fileModel
             fileContainerView.actionHandler = actionHandler
+            fileContainerView.model = model.fileModel
         }
     }
     
