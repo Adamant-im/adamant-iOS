@@ -17,7 +17,7 @@ struct AppAssembly: Assembly {
         // MARK: AdamantCore
         container.register(AdamantCore.self) { _ in NativeAdamantCore() }.inObjectScope(.container)
         
-        // MARK: AdamantCore
+        // MARK: FilesStorageProtocol
         container.register(FilesStorageProtocol.self) { _ in FilesStorageKit() }.inObjectScope(.container)
         
         // MARK: CellFactory
@@ -266,6 +266,14 @@ struct AppAssembly: Assembly {
                 transactionService: r.resolve(ChatTransactionService.self)!,
                 chatsProvider: r.resolve(ChatsProvider.self)!
             )
+        }.inObjectScope(.container)
+        
+        // MARK: ChatFileService
+        container.register(ChatFileProtocol.self) { r in
+        ChatFileService(
+            accountService: r.resolve(AccountService.self)!,
+            filesStorage: r.resolve(FilesStorageProtocol.self)!,
+            chatsProvider: r.resolve(ChatsProvider.self)!)
         }.inObjectScope(.container)
         
         // MARK: Chats

@@ -62,6 +62,7 @@
 		3AC76E3D2AB09118008042C4 /* ElegantEmojiPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 3AC76E3C2AB09118008042C4 /* ElegantEmojiPicker */; };
 		3AF08D5F2B4EB3A200EB82B1 /* LanguageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF08D5E2B4EB3A200EB82B1 /* LanguageService.swift */; };
 		3AF08D612B4EB3C400EB82B1 /* LanguageStorageProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF08D602B4EB3C400EB82B1 /* LanguageStorageProtocol.swift */; };
+		3AF0A6CA2BBAF5850019FF47 /* ChatFileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF0A6C92BBAF5850019FF47 /* ChatFileService.swift */; };
 		3AF53F8D2B3DCFA300B30312 /* NodeGroup+Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF53F8C2B3DCFA300B30312 /* NodeGroup+Constants.swift */; };
 		3AF53F8F2B3EE0DA00B30312 /* DogeNodeInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF53F8E2B3EE0DA00B30312 /* DogeNodeInfo.swift */; };
 		3AFE7E412B18D88B00718739 /* WalletService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AFE7E402B18D88B00718739 /* WalletService.swift */; };
@@ -726,6 +727,7 @@
 		3AF08D5D2B4E7FFC00EB82B1 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/Localizable.strings; sourceTree = "<group>"; };
 		3AF08D5E2B4EB3A200EB82B1 /* LanguageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageService.swift; sourceTree = "<group>"; };
 		3AF08D602B4EB3C400EB82B1 /* LanguageStorageProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageStorageProtocol.swift; sourceTree = "<group>"; };
+		3AF0A6C92BBAF5850019FF47 /* ChatFileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatFileService.swift; sourceTree = "<group>"; };
 		3AF53F8C2B3DCFA300B30312 /* NodeGroup+Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NodeGroup+Constants.swift"; sourceTree = "<group>"; };
 		3AF53F8E2B3EE0DA00B30312 /* DogeNodeInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeNodeInfo.swift; sourceTree = "<group>"; };
 		3AFE7E402B18D88B00718739 /* WalletService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletService.swift; sourceTree = "<group>"; };
@@ -1806,6 +1808,7 @@
 				93A118522993241D00E144CC /* ChatMessagesListFactory.swift */,
 				9322E87A2970431200B8357C /* ChatMessageFactory.swift */,
 				9399F5EC29A85A48006C3E30 /* ChatCacheService.swift */,
+				3AF0A6C92BBAF5850019FF47 /* ChatFileService.swift */,
 				3A9015A82A615893002A2464 /* ChatMessagesListViewModel.swift */,
 			);
 			path = ViewModel;
@@ -3380,6 +3383,7 @@
 				E90847392196FEF50095825D /* BaseTransaction+TransactionDetails.swift in Sources */,
 				649D6BF021BFF481009E727B /* AdamantChatsProvider+search.swift in Sources */,
 				E908473B219707200095825D /* AccountViewController+StayIn.swift in Sources */,
+				3AF0A6CA2BBAF5850019FF47 /* ChatFileService.swift in Sources */,
 				93C7944C2B077B2700408826 /* DashGetAddressTransactionIds.swift in Sources */,
 				E9204B5220C9762400F3B9AB /* MessageStatus.swift in Sources */,
 				3A770E4C2AE14F130008D98F /* SimpleTransactionDetails+Hashable.swift in Sources */,

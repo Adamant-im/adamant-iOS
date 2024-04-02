@@ -99,8 +99,8 @@ private extension MediaContainerView {
                     let file = fileList[fileOverallIndex]
                     mediaView.isHidden = false
                     mediaView.model = file
-                    mediaView.buttonActionHandler = { [actionHandler, file, model] in
-                        actionHandler(
+                    mediaView.buttonActionHandler = { [weak self, file, model] in
+                        self?.actionHandler(
                             .openFile(
                                 messageId: model.messageId,
                                 file: file,

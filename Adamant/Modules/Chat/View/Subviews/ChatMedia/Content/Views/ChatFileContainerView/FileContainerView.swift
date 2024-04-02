@@ -73,8 +73,8 @@ private extension FileContainerView {
             let view = filesStack.arrangedSubviews[index] as? ChatFileView
             view?.isHidden = false
             view?.model = file
-            view?.buttonActionHandler = { [actionHandler, file, model] in
-                actionHandler(
+            view?.buttonActionHandler = { [weak self, file, model] in
+                self?.actionHandler(
                     .openFile(
                         messageId: model.messageId,
                         file: file,
