@@ -41,6 +41,38 @@ final class FilesPickerKitHelper {
         return fileURL
     }
     
+    func copyFile(from url: URL) throws -> URL {
+        defer {
+            url.stopAccessingSecurityScopedResource()
+        }
+        
+        _ = url.startAccessingSecurityScopedResource()
+        
+        let folder = try FileManager.default.url(
+            for: .cachesDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        ).appendingPathComponent(cachePath)
+        
+        try FileManager.default.createDirectory(
+            at: folder,
+            withIntermediateDirectories: true
+        )
+        
+        let targetURL = folder.appendingPathComponent(url.lastPathComponent)
+        
+        guard targetURL != url else { return url }
+        
+        if FileManager.default.fileExists(atPath: targetURL.path) {
+            try FileManager.default.removeItem(at: targetURL)
+        }
+        
+        try FileManager.default.copyItem(at: url, to: targetURL)
+        
+        return targetURL
+    }
+    
     func resizeImage(image: UIImage, targetSize: CGSize) -> UIImage {
         let newSize = getPreviewSize(from: image.size)
         
@@ -109,16 +141,17 @@ final class FilesPickerKitHelper {
     }
     
     func getFileResult(for url: URL) throws -> FileResult {
-        let preview = getPreview(for: url)
-        let fileSize = try getFileSize(from: url)
+        let newUrl = try copyFile(from: url)
+        let preview = getPreview(for: newUrl)
+        let fileSize = try getFileSize(from: newUrl)
         return FileResult(
-            url: url,
+            url: newUrl,
             type: .other,
             preview: preview.image,
             previewUrl: preview.url,
             size: fileSize,
-            name: url.lastPathComponent,
-            extenstion: url.pathExtension,
+            name: newUrl.lastPathComponent,
+            extenstion: newUrl.pathExtension,
             resolution: preview.resolution
         )
     }
@@ -131,7 +164,7 @@ final class FilesPickerKitHelper {
         }
         
         return try await withUnsafeThrowingContinuation { continuation in
-            itemProvider.loadFileRepresentation(forTypeIdentifier: type) { url, error in
+            itemProvider.loadFileRepresentation(forTypeIdentifier: type) { [weak self] url, error in
                 if let error = error {
                     continuation.resume(throwing: error)
                     return
@@ -143,25 +176,10 @@ final class FilesPickerKitHelper {
                 }
                 
                 do {
-                    let folder = try FileManager.default.url(
-                        for: .cachesDirectory,
-                        in: .userDomainMask,
-                        appropriateFor: nil,
-                        create: true
-                    ).appendingPathComponent(cachePath)
-                    
-                    try FileManager.default.createDirectory(
-                        at: folder,
-                        withIntermediateDirectories: true
-                    )
-                    
-                    let targetURL = folder.appendingPathComponent(url.lastPathComponent)
-                    
-                    if FileManager.default.fileExists(atPath: targetURL.path) {
-                        try FileManager.default.removeItem(at: targetURL)
+                    guard let targetURL = try self?.copyFile(from: url) else {
+                        continuation.resume(throwing: FileValidationError.fileNotFound)
+                        return
                     }
-                    
-                    try FileManager.default.copyItem(at: url, to: targetURL)
                     
                     continuation.resume(returning: targetURL)
                 } catch {
