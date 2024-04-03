@@ -5,6 +5,7 @@ import CommonKit
 import UIKit
 import SwiftUI
 import AVFoundation
+import QuickLook
 
 final class FilesPickerKitHelper {
     func validateFiles(_ files: [FileResult]) throws {
@@ -41,17 +42,7 @@ final class FilesPickerKitHelper {
     }
     
     func resizeImage(image: UIImage, targetSize: CGSize) -> UIImage {
-        let size = image.size
-        
-        let widthRatio  = targetSize.width  / size.width
-        let heightRatio = targetSize.height / size.height
-        
-        var newSize: CGSize
-        if(widthRatio > heightRatio) {
-            newSize = CGSize(width: size.width * heightRatio, height: size.height * heightRatio)
-        } else {
-            newSize = CGSize(width: size.width * widthRatio,  height: size.height * widthRatio)
-        }
+        let newSize = getPreviewSize(from: image.size)
         
         let rect = CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height)
         
@@ -60,21 +51,42 @@ final class FilesPickerKitHelper {
         let newImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         
-        return newImage!
+        return newImage ?? image
     }
     
-    func getThumbnailImage(forUrl url: URL) -> UIImage? {
-        let asset: AVAsset = AVAsset(url: url)
-        let imageGenerator = AVAssetImageGenerator(asset: asset)
-
-        do {
-            let thumbnailImage = try imageGenerator.copyCGImage(at: CMTimeMake(value: 1, timescale: 60), actualTime: nil)
-            
-            let image = UIImage(cgImage: thumbnailImage)
-            return image
-        } catch {
-            return nil
+    func getOriginalSize(for url: URL) -> CGSize? {
+        guard let track = AVURLAsset(url: url).tracks(
+            withMediaType: AVMediaType.video
+        ).first
+        else { return nil }
+        
+        let naturalSize = track.naturalSize.applying(track.preferredTransform)
+        
+        return .init(width: abs(naturalSize.width), height: abs(naturalSize.height))
+    }
+    
+    func getThumbnailImage(
+        forUrl url: URL,
+        originalSize: CGSize?
+    ) async throws -> UIImage? {
+        var thumbnailSize: CGSize?
+        
+        if let size = originalSize {
+            thumbnailSize = getPreviewSize(from: size)
         }
+        
+        let request = QLThumbnailGenerator.Request(
+            fileAt: url,
+            size: thumbnailSize ?? FilesConstants.previewSize,
+            scale: 1.0,
+            representationTypes: .thumbnail
+        )
+        
+        let image = try await QLThumbnailGenerator.shared.generateBestRepresentation(
+            for: request
+        ).uiImage
+        
+        return image
     }
     
     func getFileSize(from fileURL: URL) throws -> Int64 {
@@ -158,6 +170,33 @@ final class FilesPickerKitHelper {
             }
         }
     }
+}
+
+private extension FilesPickerKitHelper {
+    func getPreviewSize(from originalSize: CGSize?) -> CGSize {
+        guard let size = originalSize else { return FilesConstants.previewSize }
+        
+        let width = abs(size.width)
+        let height = abs(size.height)
+        
+        let widthRatio  = FilesConstants.previewSize.width  / width
+        let heightRatio = FilesConstants.previewSize.height / height
+        
+        var newSize: CGSize
+        if(widthRatio > heightRatio) {
+            newSize = CGSize(
+                width: width * heightRatio,
+                height: height * heightRatio
+            )
+        } else {
+            newSize = CGSize(
+                width: width * widthRatio,
+                height: height * widthRatio
+            )
+        }
+        
+        return newSize
+    }
     
     func isFileType(format: UTType, atURL fileURL: URL) -> Bool {
         var mimeType: String?
@@ -203,5 +242,19 @@ final class FilesPickerKitHelper {
         )
         
         return (image: resizedImage, url: imageURL, resolution: image.size)
+    }
+    
+    func getThumbnailImage(forUrl url: URL) -> UIImage? {
+        let asset: AVAsset = AVAsset(url: url)
+        let imageGenerator = AVAssetImageGenerator(asset: asset)
+
+        do {
+            let thumbnailImage = try imageGenerator.copyCGImage(at: .zero, actualTime: nil)
+            
+            let image = UIImage(cgImage: thumbnailImage)
+            return image
+        } catch {
+            return nil
+        }
     }
 }

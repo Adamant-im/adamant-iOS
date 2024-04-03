@@ -81,19 +81,15 @@ private extension MediaPickerService {
                       let fileSize = try? helper.getFileSize(from: url)
                 else { continue }
                 
-                let thumbnailImage = helper.getThumbnailImage(forUrl: url)
+                let originalSize = helper.getOriginalSize(for: url)
                 
-                var resizedPreviewImage: UIImage?
-                
-                if let preview = thumbnailImage {
-                    resizedPreviewImage = helper.resizeImage(
-                        image: preview,
-                        targetSize: FilesConstants.previewSize
-                    )
-                }
+                let thumbnailImage = try? await helper.getThumbnailImage(
+                    forUrl: url, 
+                    originalSize: originalSize
+                )
                 
                 let previewUrl = try? helper.getUrl(
-                    for: resizedPreviewImage,
+                    for: thumbnailImage,
                     name: FilesConstants.previewTag + url.lastPathComponent
                 )
                 
@@ -101,12 +97,12 @@ private extension MediaPickerService {
                     .init(
                         url: url,
                         type: .video,
-                        preview: resizedPreviewImage,
+                        preview: thumbnailImage,
                         previewUrl: previewUrl,
                         size: fileSize,
                         name: itemProvider.suggestedName,
                         extenstion: url.pathExtension,
-                        resolution: thumbnailImage?.size
+                        resolution: originalSize
                     )
                 )
             }
