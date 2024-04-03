@@ -25,6 +25,8 @@ public final class FilesStorageKit {
         fileType: String?,
         senderPublicKey: String,
         recipientPrivateKey: String,
+        ownerId: String,
+        recipientId: String,
         previewId: String,
         previewNonce: String
     ) async throws {
@@ -35,7 +37,9 @@ public final class FilesStorageKit {
                 fileType: fileType,
                 senderPublicKey: senderPublicKey,
                 recipientPrivateKey: recipientPrivateKey,
-                nonce: previewNonce
+                nonce: previewNonce,
+                ownerId: ownerId,
+                recipientId: recipientId
             )
         }
     }
@@ -69,12 +73,16 @@ public final class FilesStorageKit {
     public func uploadFile(
         _ file: FileResult,
         recipientPublicKey: String,
-        senderPrivateKey: String
+        senderPrivateKey: String,
+        ownerId: String,
+        recipientId: String
     ) async throws -> (id: String, nonce: String, idPreview: String?, noncePreview: String?) {
         let result = try await uploadFile(
             url: file.url,
             recipientPublicKey: recipientPublicKey,
-            senderPrivateKey: senderPrivateKey
+            senderPrivateKey: senderPrivateKey,
+            ownerId: ownerId,
+            recipientId: recipientId
         )
         
         var resultPreview: UploadResult?
@@ -83,7 +91,9 @@ public final class FilesStorageKit {
             resultPreview = try? await uploadFile(
                 url: url,
                 recipientPublicKey: recipientPublicKey,
-                senderPrivateKey: senderPrivateKey
+                senderPrivateKey: senderPrivateKey,
+                ownerId: ownerId,
+                recipientId: recipientId
             )
         }
         
@@ -96,6 +106,8 @@ public final class FilesStorageKit {
         fileType: String?,
         senderPublicKey: String,
         recipientPrivateKey: String,
+        ownerId: String,
+        recipientId: String,
         nonce: String,
         previewId: String?,
         previewNonce: String?
@@ -108,7 +120,9 @@ public final class FilesStorageKit {
                 fileType: fileType,
                 senderPublicKey: senderPublicKey,
                 recipientPrivateKey: recipientPrivateKey,
-                nonce: previewNonce
+                nonce: previewNonce,
+                ownerId: ownerId,
+                recipientId: recipientId
             )
         }
         
@@ -118,7 +132,9 @@ public final class FilesStorageKit {
             fileType: fileType,
             senderPublicKey: senderPublicKey,
             recipientPrivateKey: recipientPrivateKey,
-            nonce: nonce
+            nonce: nonce,
+            ownerId: ownerId,
+            recipientId: recipientId
         )
     }
     
@@ -134,17 +150,38 @@ public final class FilesStorageKit {
     }
     
     public func clearCache() throws {
-        let url = try FileManager.default.url(
+        let cacheUrl = try FileManager.default.url(
             for: .cachesDirectory,
             in: .userDomainMask,
             appropriateFor: nil,
             create: true
         ).appendingPathComponent(cachePath)
         
-        try FileManager.default.removeItem(at: url)
+        if FileManager.default.fileExists(
+            atPath: cacheUrl.path
+        ) {
+            try FileManager.default.removeItem(at: cacheUrl)
+        }
+        
+        try clearTempCache()
         
         cachedFiles.removeAllObjects()
         cachedFilesUrl.removeAll()
+    }
+    
+    public func clearTempCache() throws {
+        let tempCacheUrl = try FileManager.default.url(
+            for: .cachesDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        ).appendingPathComponent(tempCachePath)
+        
+        guard FileManager.default.fileExists(
+            atPath: tempCacheUrl.path
+        ) else { return }
+        
+        try FileManager.default.removeItem(at: tempCacheUrl)
     }
 }
 
@@ -155,7 +192,9 @@ private extension FilesStorageKit {
         fileType: String?,
         senderPublicKey: String,
         recipientPrivateKey: String,
-        nonce: String
+        nonce: String,
+        ownerId: String,
+        recipientId: String
     ) async throws {
         let decodedData = try await networkService.downloadFile(
             id: id,
@@ -166,13 +205,20 @@ private extension FilesStorageKit {
             nonce: nonce
         )
         
-        return try cacheFile(id: id, data: decodedData)
+        return try cacheFile(
+            id: id,
+            data: decodedData,
+            ownerId: ownerId,
+            recipientId: recipientId
+        )
     }
     
     func uploadFile(
         url: URL,
         recipientPublicKey: String,
-        senderPrivateKey: String
+        senderPrivateKey: String,
+        ownerId: String,
+        recipientId: String
     ) async throws -> UploadResult {
         let result = try await networkService.uploadFile(
             url: url,
@@ -180,7 +226,12 @@ private extension FilesStorageKit {
             senderPrivateKey: senderPrivateKey
         )
         
-        try cacheFile(id: result.id, data: result.data)
+        try cacheFile(
+            id: result.id,
+            localUrl: url,
+            ownerId: ownerId,
+            recipientId: recipientId
+        )
         
         return (id: result.id, nonce: result.nonce)
     }
@@ -193,8 +244,8 @@ private extension FilesStorageKit {
             create: true
         ).appendingPathComponent(cachePath)
 
-        let files = getFiles(at: folder)
-
+        let files = getAllFiles(in: folder)
+        
         files.forEach { url in
             cachedFilesUrl[url.lastPathComponent] = url
             
@@ -204,60 +255,63 @@ private extension FilesStorageKit {
         }
     }
 
-    func getFiles(at url: URL) -> [URL] {
+    func getAllFiles(in directoryURL: URL) -> [URL] {
+        var fileURLs: [URL] = []
+        
         let fileManager = FileManager.default
-        var isDirectory: ObjCBool = false
-        var subdirectoryNames: [URL] = []
-
-        guard let contents = try? fileManager.contentsOfDirectory(at: url, includingPropertiesForKeys: nil) else {
-            return subdirectoryNames
-        }
-
-        for item in contents {
-            if fileManager.fileExists(atPath: item.path, isDirectory: &isDirectory) && !isDirectory.boolValue {
-                subdirectoryNames.append(item)
+        let enumerator = fileManager.enumerator(at: directoryURL, includingPropertiesForKeys: nil)
+        
+        while let fileURL = enumerator?.nextObject() as? URL {
+            var isDirectory: ObjCBool = false
+            let fileExist = fileManager.fileExists(
+                atPath: fileURL.path,
+                isDirectory: &isDirectory
+            )
+            
+            if fileExist && !isDirectory.boolValue {
+                fileURLs.append(fileURL)
+            } else if fileExist && isDirectory.boolValue {
+                fileURLs.append(contentsOf: getAllFiles(in: fileURL))
             }
         }
-
-        return subdirectoryNames
+        
+        return fileURLs
     }
-
-    func cacheFile(id: String, data: Data) throws {
+    
+    func cacheFile(
+        id: String,
+        data: Data? = nil,
+        localUrl: URL? = nil,
+        ownerId: String,
+        recipientId: String
+    ) throws {
         let folder = try FileManager.default.url(
             for: .cachesDirectory,
             in: .userDomainMask,
             appropriateFor: nil,
             create: true
-        ).appendingPathComponent(cachePath)
+        ).appendingPathComponent("\(cachePath)/\(ownerId)/\(recipientId)")
 
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
 
         let fileURL = folder.appendingPathComponent(id)
 
-        try data.write(to: fileURL, options: [.atomic, .completeFileProtection])
-
-        cachedFilesUrl[id] = fileURL
-        if let uiImage = UIImage(data: data) {
-            cachedFiles.setObject(uiImage, forKey: id as NSString)
+        if let data = data {
+            try data.write(to: fileURL, options: [.atomic, .completeFileProtection])
+            
+            cachedFilesUrl[id] = fileURL
+            if let uiImage = UIImage(data: data) {
+                cachedFiles.setObject(uiImage, forKey: id as NSString)
+            }
         }
-    }
-    
-    private func getPreview(for type: String, url: URL?) -> URL? {
-        switch type.uppercased() {
-        case "JPG", "JPEG", "PNG", "GIF", "WEBP", "TIF", "TIFF", "BMP", "HEIF", "HEIC", "JP2":
-            if let url = url {
-                return url
-            }
+        
+        if let url = localUrl {
+            try FileManager.default.moveItem(at: url, to: fileURL)
             
-            return getLocalImageUrl(by: "file-image-box", withExtension: "jpg")
-        case "MOV", "MP4":
-            if let url = url {
-                return url
+            cachedFilesUrl[id] = fileURL
+            if let uiImage = UIImage(contentsOfFile: fileURL.path) {
+                cachedFiles.setObject(uiImage, forKey: id as NSString)
             }
-            
-            return getLocalImageUrl(by: "file-image-box", withExtension: "jpg")
-        default:
-            return nil
         }
     }
     
@@ -288,3 +342,4 @@ private extension FilesStorageKit {
 }
 
 private let cachePath = "downloads"
+private let tempCachePath = "downloads/cache"

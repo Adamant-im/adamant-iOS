@@ -84,7 +84,8 @@ final class ChatFileService: ChatFileProtocol {
     ) async throws {
         guard let partnerAddress = chatroom?.partner?.address,
               let files = filesPicked,
-              let keyPair = accountService.keypair
+              let keyPair = accountService.keypair,
+              let ownerId = accountService.account?.address
         else { return }
         
         guard chatroom?.partner?.isDummy != true else {
@@ -143,7 +144,9 @@ final class ChatFileService: ChatFileProtocol {
             let result = try await filesStorage.uploadFile(
                 file,
                 recipientPublicKey: chatroom?.partner?.publicKey ?? "",
-                senderPrivateKey: keyPair.privateKey
+                senderPrivateKey: keyPair.privateKey,
+                ownerId: ownerId,
+                recipientId: partnerAddress
             )
             
             let oldId = file.url.absoluteString
@@ -217,7 +220,9 @@ final class ChatFileService: ChatFileProtocol {
         isFromCurrentSender: Bool,
         chatroom: Chatroom?
     ) async throws {
-        guard let keyPair = accountService.keypair
+        guard let keyPair = accountService.keypair,
+              let ownerId = accountService.account?.address,
+              let recipientId = chatroom?.partner?.address
         else { return }
         
         defer {
@@ -231,6 +236,8 @@ final class ChatFileService: ChatFileProtocol {
             fileType: file.file.file_type ?? .empty,
             senderPublicKey: chatroom?.partner?.publicKey ?? .empty,
             recipientPrivateKey: keyPair.privateKey,
+            ownerId: ownerId,
+            recipientId: recipientId,
             nonce: file.nonce,
             previewId: nil,
             previewNonce: nil
@@ -268,7 +275,9 @@ final class ChatFileService: ChatFileProtocol {
               !downloadingFilesIDsArray.contains(file.file.file_id),
               let previewId = file.file.preview_id,
               let previewNonce = file.file.preview_nonce,
-              !filesStorage.isCached(previewId)
+              !filesStorage.isCached(previewId),
+              let ownerId = accountService.account?.address,
+              let recipientId = chatroom?.partner?.address
         else { return }
         
         downloadingFilesIDsArray.append(file.file.file_id)
@@ -283,6 +292,8 @@ final class ChatFileService: ChatFileProtocol {
                 fileType: file.file.file_type ?? .empty,
                 senderPublicKey: chatroom?.partner?.publicKey ?? .empty,
                 recipientPrivateKey: keyPair.privateKey,
+                ownerId: ownerId,
+                recipientId: recipientId,
                 previewId: previewId,
                 previewNonce: previewNonce
             )

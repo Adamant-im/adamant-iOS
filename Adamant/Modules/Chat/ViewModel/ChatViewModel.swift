@@ -773,8 +773,12 @@ extension ChatViewModel {
         dialog.send(.renameAlert)
     }
     
-    func updateFiles(_ data: [FileResult]) {
+    func updateFiles(_ data: [FileResult]?) {
         filesPicked = data
+        
+        if (data?.count ?? .zero) == .zero {
+            try? filesStorage.clearTempCache()
+        }
     }
 }
 

@@ -507,7 +507,7 @@ private extension ChatViewController {
         }
         
         filesToolbarView.closeAction = { [weak self] in
-            self?.viewModel.filesPicked = nil
+            self?.viewModel.updateFiles(nil)
         }
         
         filesToolbarView.updatedDataAction = { [weak self] data in

@@ -21,7 +21,9 @@ protocol FilesStorageProtocol {
     func uploadFile(
         _ file: FileResult,
         recipientPublicKey: String,
-        senderPrivateKey: String
+        senderPrivateKey: String,
+        ownerId: String,
+        recipientId: String
     ) async throws -> (id: String, nonce: String, idPreview: String?, noncePreview: String?)
     
     func downloadFile(
@@ -30,6 +32,8 @@ protocol FilesStorageProtocol {
         fileType: String?,
         senderPublicKey: String,
         recipientPrivateKey: String,
+        ownerId: String,
+        recipientId: String,
         nonce: String,
         previewId: String?,
         previewNonce: String?
@@ -39,11 +43,15 @@ protocol FilesStorageProtocol {
     
     func clearCache() throws
     
+    func clearTempCache() throws
+    
     func cachePreview(
         storage: String,
         fileType: String?,
         senderPublicKey: String,
         recipientPrivateKey: String,
+        ownerId: String,
+        recipientId: String,
         previewId: String,
         previewNonce: String
     ) async throws

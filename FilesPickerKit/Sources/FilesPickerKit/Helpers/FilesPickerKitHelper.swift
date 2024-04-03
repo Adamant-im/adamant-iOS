@@ -30,7 +30,7 @@ final class FilesPickerKitHelper {
             in: .userDomainMask,
             appropriateFor: nil,
             create: true
-        ).appendingPathComponent("cachePath")
+        ).appendingPathComponent(cachePath)
 
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
 
@@ -148,7 +148,7 @@ final class FilesPickerKitHelper {
                         in: .userDomainMask,
                         appropriateFor: nil,
                         create: true
-                    ).appendingPathComponent("cachePath")
+                    ).appendingPathComponent(cachePath)
                     
                     try FileManager.default.createDirectory(
                         at: folder,
@@ -258,3 +258,5 @@ private extension FilesPickerKitHelper {
         }
     }
 }
+
+private let cachePath = "downloads/cache"
