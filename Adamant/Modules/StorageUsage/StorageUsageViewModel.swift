@@ -46,7 +46,7 @@ final class StorageUsageViewModel: ObservableObject {
             dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
             try filesStorage.clearCache()
             dialogService.dismissProgress()
-            dialogService.showSuccess(withMessage: .empty)
+            dialogService.showSuccess(withMessage: nil)
             updateCacheSize()
             NotificationCenter.default.post(name: .Storage.storageClear, object: nil)
         } catch {

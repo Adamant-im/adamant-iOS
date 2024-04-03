@@ -151,7 +151,7 @@ protocol DialogService: AnyObject {
     // MARK: - Indicators
     func showProgress(withMessage: String?, userInteractionEnable: Bool)
     func dismissProgress()
-    func showSuccess(withMessage: String)
+    func showSuccess(withMessage: String?)
     func showWarning(withMessage: String)
     func showError(withMessage: String, supportEmail: Bool, error: Error?)
     func showRichError(error: RichError)

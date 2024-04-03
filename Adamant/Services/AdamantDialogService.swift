@@ -84,7 +84,7 @@ extension AdamantDialogService {
         popupManager.dismissAlert()
     }
     
-    func showSuccess(withMessage message: String) {
+    func showSuccess(withMessage message: String?) {
         vibroService.applyVibration(.success)
         popupManager.showSuccessAlert(message: message)
     }
