@@ -309,8 +309,10 @@ private extension FilesStorageKit {
             try FileManager.default.moveItem(at: url, to: fileURL)
             
             cachedFilesUrl[id] = fileURL
+            cachedFilesUrl[url.absoluteString] = fileURL
             if let uiImage = UIImage(contentsOfFile: fileURL.path) {
                 cachedFiles.setObject(uiImage, forKey: id as NSString)
+                cachedFiles.setObject(uiImage, forKey: url.absoluteString as NSString)
             }
         }
     }

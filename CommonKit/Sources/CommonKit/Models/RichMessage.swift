@@ -153,9 +153,11 @@ public struct RichMessageFile: RichMessage {
                 contentDict[RichContentKeys.file.file_type] = file_type
             }
             
-            if let preview_id = preview_id, !preview_id.isEmpty,
-               let preview_nonce = preview_nonce, !preview_nonce.isEmpty {
+            if let preview_id = preview_id, !preview_id.isEmpty {
                 contentDict[RichContentKeys.file.preview_id] = preview_id
+            }
+            
+            if let preview_nonce = preview_nonce, !preview_nonce.isEmpty {
                 contentDict[RichContentKeys.file.preview_nonce] = preview_nonce
             }
             

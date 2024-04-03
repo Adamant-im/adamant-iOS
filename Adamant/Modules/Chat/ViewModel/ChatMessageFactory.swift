@@ -382,9 +382,9 @@ private extension ChatMessageFactory {
         storage: String
     ) -> [ChatFile] {
         return files.map {
-            let previewId = $0[RichContentKeys.file.preview_id] as? String ?? ""
-            let fileType = $0[RichContentKeys.file.file_type] as? String ?? ""
-            let fileId = $0[RichContentKeys.file.file_id] as? String ?? ""
+            let previewId = $0[RichContentKeys.file.preview_id] as? String ?? .empty
+            let fileType = $0[RichContentKeys.file.file_type] as? String ?? .empty
+            let fileId = $0[RichContentKeys.file.file_id] as? String ?? .empty
             
             return ChatFile(
                 file: RichMessageFile.File($0),
@@ -393,7 +393,7 @@ private extension ChatMessageFactory {
                 isUploading: uploadingFilesIDs.contains(fileId),
                 isCached: filesStorage.isCached(fileId),
                 storage: storage,
-                nonce: $0[RichContentKeys.file.nonce] as? String ?? "",
+                nonce: $0[RichContentKeys.file.nonce] as? String ?? .empty,
                 isFromCurrentSender: isFromCurrentSender,
                 fileType: FileType(raw: fileType) ?? .other
             )
