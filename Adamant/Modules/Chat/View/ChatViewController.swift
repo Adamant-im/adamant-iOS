@@ -847,10 +847,7 @@ private extension ChatViewController {
     
     func closeReplyView() {
         replyView.removeFromSuperview()
-        
-        // TODO: Fix it later
-        // There's an issue: if the text in inputTextView is changed while replyView is positioned on the topStackView of the messageInputBar, removing it causes an incorrect height for the messageInputBar. Reinstalling the text will help recalculate the height.
-        messageInputBar.inputTextView.text = messageInputBar.inputTextView.text
+        messageInputBar.invalidateIntrinsicContentSize()
     }
     
     func processFileToolbarView(_ data: [FileResult]?) {
@@ -881,10 +878,7 @@ private extension ChatViewController {
     
     func closeFileToolbarView() {
         filesToolbarView.removeFromSuperview()
-        
-        // TODO: Fix it later
-        // There's an issue: if the text in inputTextView is changed while filesToolbarView is positioned on the topStackView of the messageInputBar, removing it causes an incorrect height for the messageInputBar. Reinstalling the text will help recalculate the height.
-        messageInputBar.inputTextView.text = messageInputBar.inputTextView.text
+        messageInputBar.invalidateIntrinsicContentSize()
     }
     
     func didTapTransfer(id: String) {

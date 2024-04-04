@@ -57,6 +57,34 @@ final class ChatInputBar: InputBarAccessoryView {
         super.didMoveToWindow()
         sendButton.isEnabled = (isEnabled && !inputTextView.text.isEmpty) || isForcedSendEnabled
     }
+    
+    override func calculateIntrinsicContentSize() -> CGSize {
+        let superSize = super.calculateIntrinsicContentSize()
+        
+        // Calculate the required height
+        let superTopStackViewHeight = topStackView.arrangedSubviews.count > .zero
+        ? topStackView.bounds.height
+        : .zero
+        
+        let validTopStackViewHeight = topStackView.arrangedSubviews.map {
+            $0.frame.height
+        }.reduce(0, +)
+        
+        return .init(
+            width: superSize.width,
+            height: superSize.height
+            - superTopStackViewHeight
+            + validTopStackViewHeight
+        )
+    }
+    
+    override func inputTextViewDidChange() {
+        super.inputTextViewDidChange()
+        
+        sendButton.isEnabled = isForcedSendEnabled
+        ? true
+        : sendButton.isEnabled
+    }
 }
 
 private extension ChatInputBar {

@@ -27,7 +27,7 @@ extension ChatMediaContainerView {
         )
         
         func makeReplyContent() -> NSAttributedString {
-            return ChatMessageFactory.markdownParser.parse("File")
+            ChatMessageFactory.markdownParser.parse("[\(content.fileModel.files.count) File(s)]")
         }
     }
 }
