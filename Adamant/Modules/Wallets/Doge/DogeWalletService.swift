@@ -323,7 +323,7 @@ extension DogeWalletService {
                 }
             }
             
-            service.setState(.upToDate, silent: true)
+            service.setState(.upToDate)
             
             Task {
                 await service.update()
@@ -642,6 +642,10 @@ extension DogeWalletService {
         coinStorage.append(trs)
         
         return trs.count
+    }
+    
+    func getTransactionsHistory(offset: Int, limit: Int) async throws -> [TransactionDetails] {
+        try await getTransactions(from: offset).transactions
     }
     
     func getLocalTransactionHistory() -> [TransactionDetails] {

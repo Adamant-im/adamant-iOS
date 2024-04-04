@@ -15,10 +15,6 @@ import Combine
 
 final class LskTransactionsViewController: TransactionsListViewControllerBase {
     
-    // MARK: - Dependencies
-    
-    var screensFactory: ScreensFactory!
-    
     // MARK: - UITableView
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -44,6 +40,9 @@ final class LskTransactionsViewController: TransactionsListViewControllerBase {
 }
 
 extension Transactions.TransactionModel: TransactionDetails {
+    var nonceRaw: String? {
+        return self.nonce
+    }
     
     var defaultCurrencySymbol: String? { LskWalletService.currencySymbol }
     
@@ -169,6 +168,9 @@ extension LocalTransaction: TransactionDetails {
         return .notInitiated
     }
     
+    var nonceRaw: String? {
+        nil
+    }
 }
 
 extension TransactionEntity: TransactionDetails {
@@ -219,4 +221,7 @@ extension TransactionEntity: TransactionDetails {
         return .notInitiated
     }
     
+    var nonceRaw: String? {
+        String(nonce)
+    }
 }

@@ -14,8 +14,30 @@ final class BtcTransactionsViewController: TransactionsListViewControllerBase {
     
     // MARK: - Dependencies
     
-    var screensFactory: ScreensFactory!
-    var addressBook: AddressBookService!
+    private let addressBook: AddressBookService
+    
+    // MARK: - Init
+    
+    init(
+        walletService: WalletService,
+        dialogService: DialogService,
+        reachabilityMonitor: ReachabilityMonitor,
+        screensFactory: ScreensFactory,
+        addressBook: AddressBookService
+    ) {
+        self.addressBook = addressBook
+        
+        super.init(
+            walletService: walletService,
+            dialogService: dialogService,
+            reachabilityMonitor: reachabilityMonitor,
+            screensFactory: screensFactory
+        )
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - UITableView
     

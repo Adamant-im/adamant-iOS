@@ -45,6 +45,11 @@ final class BtcTransferViewController: TransferViewControllerBase {
                     fee: transactionFee
                 )
                 
+                if await !doesNotContainSendingTx() {
+                    presentSendingError()
+                    return
+                }
+                
                 // Send adm report
                 if let reportRecipient = admReportRecipient,
                    let hash = transaction.txHash {
@@ -56,30 +61,32 @@ final class BtcTransferViewController: TransferViewControllerBase {
                     )
                 }
                 
-                Task {
-                    do {
-                        let simpleTransaction = SimpleTransactionDetails(
-                            txId: transaction.txID,
-                            senderAddress: wallet.address,
-                            recipientAddress: recipient,
-                            amountValue: amount,
-                            feeValue: nil,
-                            confirmationsValue: nil,
-                            blockValue: nil,
-                            isOutgoing: true,
-                            transactionStatus: nil
-                        )
-                        
-                        service.coinStorage.append(simpleTransaction)
-                        try await service.sendTransaction(transaction)
-                    } catch {
-                        dialogService.showRichError(error: error)
-                        service.coinStorage.updateStatus(
-                            for: transaction.txId,
-                            status: .failed
-                        )
-                    }
+                do {
+                    let simpleTransaction = SimpleTransactionDetails(
+                        txId: transaction.txID,
+                        senderAddress: wallet.address,
+                        recipientAddress: recipient,
+                        amountValue: amount,
+                        feeValue: nil,
+                        confirmationsValue: nil,
+                        blockValue: nil,
+                        isOutgoing: true,
+                        transactionStatus: nil, 
+                        nonceRaw: nil
+                    )
                     
+                    service.coinStorage.append(simpleTransaction)
+                    try await service.sendTransaction(transaction)
+                } catch {
+                    service.coinStorage.updateStatus(
+                        for: transaction.txId,
+                        status: .failed
+                    )
+                    
+                    throw error
+                }
+                
+                Task {
                     await service.update()
                 }
                 

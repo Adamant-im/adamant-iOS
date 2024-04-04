@@ -314,7 +314,7 @@
 "ChatListPage.Title" = "Chats";
 
 /* ChatsProvider: Notify user that he doesn't have money to pay a message fee */
-"ChatsProvider.Error.notEnoughMoney" = "Zero balance. Get free ADM tokens";
+"ChatsProvider.Error.notEnoughMoney" = "Not enough ADM for the message blockchain fee";
 
 /* ChatsProvider: Transaction not found error. %@ for transaction's ID */
 "ChatsProvider.Error.TransactionNotFoundFormat" = "Message with id %@ not found";
@@ -455,7 +455,7 @@
 "VisibleWallets.ResetListAlert" = "Reset wallet list to default?";
 
 /* Delegates tab: Message about 50 ADM fee for vote */
-"Delegates.NotEnoughtTokensForVote" = "Not enought tokens to vote. You need 50 ADM";
+"Delegates.NotEnoughtTokensForVote" = "Not enough ADM to pay the voting blockchain fee";
 
 /* Delegates tab: Message about time out for new vote */
 "Delegates.timeOutBeforeNewVote" = "Please wait until previous vote will be processed";
@@ -1033,11 +1033,17 @@
 /* Transfer: Minimal transaction amount is 0.00001 */
 "TransferScene.Error.MinAmount" = "Minimum transaction amount is 0.00001";
 
+/* Transfer: Have a pending coin tx */
+"TransferScene.Error.Pending.Tx" = "It seems you have a pending %@ tx. Wait while the blockchain confirms it, and try again";
+
 /* Transfer: transfer amount placeholder */
 "TransferScene.Amount.Placeholder" = "to send";
 
 /* Transfer: Address not found error */
 "TransferScene.Error.AddressNotFound" = "Address not found";
+
+/* Transfer: Not enough ADM to send in-chat transfer error */
+"TransferScene.Error.notEnoughAdmToSendTransfer" = "Not enough ADM to send in-chat transfer";
 
 /* Transfer: Address validation error */
 "TransferScene.Error.InvalidAddress" = "Enter a valid address";
@@ -1110,6 +1116,9 @@
 
 /* Transfer: Confirm transfer alert: Send tokens button */
 "TransferScene.Send" = "Send";
+
+/* Transfer: Ttitle for done button */
+"TransferScene.Done" = "Done";
 
 /* Transfer: Confirm transfer alert: 'Can't Undo' message */
 "TransferScene.CantUndo" = "You'll unable to undo this action";

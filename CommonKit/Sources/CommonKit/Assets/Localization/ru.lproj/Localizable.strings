@@ -314,7 +314,7 @@
 "ChatListPage.Title" = "Чаты";
 
 /* ChatsProvider: Notify user that he doesn't have money to pay a message fee */
-"ChatsProvider.Error.notEnoughMoney" = "Баланс нулевой. Получите бесплатные ADM-токены";
+"ChatsProvider.Error.notEnoughMoney" = "Не хватает ADM для комиссии за сообщение в блокчейне";
 
 /* ChatsProvider: Transaction not found error. %@ for transaction's ID */
 "ChatsProvider.Error.TransactionNotFoundFormat" = "Сообщение с идентификатором %@ не найдено";
@@ -455,7 +455,7 @@
 "VisibleWallets.ResetListAlert" = "Сбросить список кошельков к списку по умолчанию?";
 
 /* Delegates tab: Message about 50 ADM fee for vote */
-"Delegates.NotEnoughtTokensForVote" = "Недостаточно токенов для голосования. Нужно 50 ADM";
+"Delegates.NotEnoughtTokensForVote" = "Недостаточно ADM, чтобы заплатить за блокчейн-голосование";
 
 /* Delegates tab: Message about time out for new vote */
 "Delegates.timeOutBeforeNewVote" = "Пожалуйста, подождите, пока будет обработан предыдущий голос";
@@ -1033,6 +1033,9 @@
 /* Transfer: Address not found error */
 "TransferScene.Error.AddressNotFound" = "Адрес не найден";
 
+/* Transfer: Not enough ADM to send in-chat transfer error */
+"TransferScene.Error.notEnoughAdmToSendTransfer" = "Недостаточно ADM для отправки перевода в чате";
+
 /* Transfer: Address validation error */
 "TransferScene.Error.InvalidAddress" = "Введите корректный адрес";
 
@@ -1050,6 +1053,9 @@
 
 /* Transfer: Minimal transaction amount is 0.00001 */
 "TransferScene.Error.MinAmount" = "Минимальная сумма перевода 0.00001";
+
+/* Transfer: Have a pending coin tx */
+"TransferScene.Error.Pending.Tx" = "Похоже, что у вас есть незавершенная транзакция %@. Подождите, пока блокчейн ее обработает, и попробуйте снова.";
 
 /* Transfer: Alert title: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address */
 "TransferScene.unsafeTransferAlert.title" = "Не удалось проверить адрес %@";
@@ -1107,6 +1113,9 @@
 
 /* Transfer: Confirm transfer alert: Send tokens button */
 "TransferScene.Send" = "Отправить";
+
+/* Transfer: Ttitle for done button */
+"TransferScene.Done" = "Готово";
 
 /* Transfer: Confirm transfer alert: 'Can't Undo' message */
 "TransferScene.CantUndo" = "Вы не сможете отменить это действие";

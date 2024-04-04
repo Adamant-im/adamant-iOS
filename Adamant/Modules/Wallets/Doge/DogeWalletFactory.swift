@@ -28,11 +28,12 @@ struct DogeWalletFactory: WalletFactory {
     }
     
     func makeTransferListVC(service: Service, screensFactory: ScreensFactory) -> UIViewController {
-        let vc = DogeTransactionsViewController(nibName: "TransactionsListViewControllerBase", bundle: nil)
-        vc.dialogService = assembler.resolve(DialogService.self)
-        vc.screensFactory = screensFactory
-        vc.walletService = service
-        return vc
+        DogeTransactionsViewController(
+            walletService: service,
+            dialogService: assembler.resolve(DialogService.self)!,
+            reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
+            screensFactory: screensFactory
+        )
     }
     
     func makeTransferVC(service: Service, screensFactory: ScreensFactory) -> TransferViewControllerBase {
@@ -115,7 +116,8 @@ private extension DogeWalletFactory {
             confirmationsValue: nil,
             blockValue: nil,
             isOutgoing: richTransaction.isOutgoing,
-            transactionStatus: nil
+            transactionStatus: nil, 
+            nonceRaw: nil
         )
 
         vc.transaction = transaction ?? failedTransaction

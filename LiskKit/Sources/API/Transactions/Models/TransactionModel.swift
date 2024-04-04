@@ -52,6 +52,8 @@ extension Transactions {
         public var confirmations: UInt64?
         
         public var isOutgoing: Bool = false
+        
+        public var nonce: String
 
         // MARK: - Hashable
 

@@ -380,7 +380,7 @@ extension LskWalletService {
                 }
             }
             
-            service.setState(.upToDate, silent: true)
+            service.setState(.upToDate)
             
             Task {
                 await service.update()
@@ -545,7 +545,7 @@ extension LskWalletService {
     }
     
     func loadTransactions(offset: Int, limit: Int) async throws -> Int {
-        let trs = try await getTransactions(offset: UInt(offset), limit: UInt(limit))
+        let trs = try await getTransactionsHistory(offset: offset, limit: limit)
         
         guard trs.count > 0 else {
             hasMoreOldTransactions = false
@@ -554,6 +554,10 @@ extension LskWalletService {
         
         coinStorage.append(trs)
         return trs.count
+    }
+    
+    func getTransactionsHistory(offset: Int, limit: Int) async throws -> [TransactionDetails] {
+        try await getTransactions(offset: UInt(offset), limit: UInt(limit))
     }
     
     func getLocalTransactionHistory() -> [TransactionDetails] {

@@ -27,6 +27,7 @@ struct ChatFactory {
     let avatarService: AvatarService
     let emojiService: EmojiService
     let walletServiceCompose: WalletServiceCompose
+    let chatPreservation: ChatPreservationProtocol
     let filesStorage: FilesStorageProtocol
     let chatFileService: ChatFileProtocol
     let filesStorageProprieties: FilesStorageProprietiesProtocol
@@ -43,6 +44,7 @@ struct ChatFactory {
         avatarService = assembler.resolve(AvatarService.self)!
         emojiService = assembler.resolve(EmojiService.self)!
         walletServiceCompose = assembler.resolve(WalletServiceCompose.self)!
+        chatPreservation = assembler.resolve(ChatPreservationProtocol.self)!
         filesStorage = assembler.resolve(FilesStorageProtocol.self)!
         chatFileService = assembler.resolve(ChatFileProtocol.self)!
         filesStorageProprieties = assembler.resolve(FilesStorageProprietiesProtocol.self)!
@@ -119,6 +121,7 @@ private extension ChatFactory {
                 emojiService: emojiService
             ),
             emojiService: emojiService,
+            chatPreservation: chatPreservation,
             filesStorage: filesStorage,
             chatFileService: chatFileService,
             filesStorageProprieties: filesStorageProprieties

@@ -46,6 +46,9 @@ extension String.adamant {
         static var accountNotFound: String {
             String.localized("TransferScene.Error.AddressNotFound", comment: "Transfer: Address not found error")
         }
+        static var notEnoughAdmToSendTransfer: String {
+            String.localized("TransferScene.Error.notEnoughAdmToSendTransfer", comment: "Transfer: Not enough ADM to send in-chat transfer")
+        }
         static var transferProcessingMessage: String {
             String.localized("TransferScene.SendingFundsProgress", comment: "Transfer: Processing message")
         }
@@ -54,6 +57,9 @@ extension String.adamant {
         }
         static var send: String {
             String.localized("TransferScene.Send", comment: "Transfer: Send button")
+        }
+        static var done: String {
+            String.localized("TransferScene.Done", comment: "Transfer: Done button")
         }
         static var cantUndo: String {
             String.localized("TransferScene.CantUndo", comment: "Transfer: Send button")
@@ -65,11 +71,14 @@ extension String.adamant {
 }
 
 fileprivate extension String.adamant.alert {
-    static let confirmSendMessageFormat = String.localized("TransferScene.SendConfirmFormat", comment: "Transfer: Confirm transfer %1$@ tokens to %2$@ message. Note two variables: at runtime %1$@ will be amount (with ADM suffix), and %2$@ will be recipient address. You can use address before amount with this so called 'position tokens'.")
+    static var confirmSendMessageFormat: String { String.localized("TransferScene.SendConfirmFormat", comment: "Transfer: Confirm transfer %1$@ tokens to %2$@ message. Note two variables: at runtime %1$@ will be amount (with ADM suffix), and %2$@ will be recipient address. You can use address before amount with this so called 'position tokens'.")
+    }
     static func confirmSendMessage(formattedAmount amount: String, recipient: String) -> String {
         return String.localizedStringWithFormat(String.adamant.alert.confirmSendMessageFormat, "\(amount)", recipient)
     }
-    static let send = String.localized("TransferScene.Send", comment: "Transfer: Confirm transfer alert: Send tokens button")
+    static var send: String {
+        String.localized("TransferScene.Send", comment: "Transfer: Confirm transfer alert: Send tokens button")
+    }
 }
 
 // MARK: -
@@ -445,7 +454,7 @@ class TransferViewControllerBase: FormViewController {
         }
         previousIsReadyToSend = isReadyToSend()
         
-        let doneBtn = UIBarButtonItem(barButtonSystemItem: .done, target: view, action: view.doneButton.action)
+        let doneBtn = UIBarButtonItem(title: String.adamant.transfer.done, style: .done, target: view, action: view.doneButton.action)
         let sendBtn = UIBarButtonItem(title: String.adamant.transfer.send, style: .done, target: view, action: view.doneButton.action)
         view.doneButton = isReadyToSend() ? sendBtn : doneBtn
         if (view.items?.count ?? 0) > 4 {
@@ -677,6 +686,7 @@ class TransferViewControllerBase: FormViewController {
         }
         
         if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.maxToTransfer.tag) {
+            row.value = maxToTransfer.doubleValue
             row.updateCell()
         }
         
@@ -747,12 +757,12 @@ class TransferViewControllerBase: FormViewController {
         }
         
         if admReportRecipient != nil, let account = accountService.account, account.balance < 0.001 {
-            dialogService.showWarning(withMessage: "Not enought money to send report")
+            dialogService.showWarning(withMessage: String.adamant.transfer.notEnoughAdmToSendTransfer)
             return
         }
         
         guard reachabilityMonitor.connection else {
-            dialogService.showWarning(withMessage: .adamant.alert.noInternetTransferBody)
+            dialogService.showWarning(withMessage: .adamant.sharedErrors.networkError)
             return
         }
         
@@ -1204,5 +1214,48 @@ extension TransferViewControllerBase {
                 tableView.deselectRow(at: indexPath, animated: true)
             }
         }
+    }
+    
+    func doesNotContainSendingTx() async -> Bool {
+        var history = walletCore.getLocalTransactionHistory()
+        
+        if history.isEmpty {
+            history = (try? await walletCore.getTransactionsHistory(
+                offset: .zero,
+                limit: 2)
+            ) ?? []
+        }
+        
+        let havePending = history.contains {
+            $0.transactionStatus == .pending || $0.transactionStatus == .registered || $0.transactionStatus == .notInitiated
+        }
+        
+        return !havePending
+    }
+    
+    func doesNotContainSendingTx(with nonce: String) async -> Bool {
+        var history = walletCore.getLocalTransactionHistory()
+        
+        if history.isEmpty {
+            history = (try? await walletCore.getTransactionsHistory(
+                offset: .zero,
+                limit: 2)
+            ) ?? []
+        }
+        
+        let nonces = history.compactMap { $0.nonceRaw }
+        
+        return !nonces.contains(nonce)
+    }
+    
+    func presentSendingError() {
+        dialogService.dismissProgress()
+        dialogService.showAlert(
+            title: nil,
+            message: String.adamant.transfer.pendingTxError(coin: walletCore.tokenSymbol),
+            style: AdamantAlertStyle.alert,
+            actions: nil,
+            from: nil
+        )
     }
 }
