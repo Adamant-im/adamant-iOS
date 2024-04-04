@@ -140,79 +140,92 @@ final class ChatFileService: ChatFileProtocol {
             uploadingFilesIDsArray.append(file.file_id)
         }
         
-        for file in files {
-            let result = try await filesStorage.uploadFile(
-                file,
-                recipientPublicKey: chatroom?.partner?.publicKey ?? "",
-                senderPrivateKey: keyPair.privateKey,
-                ownerId: ownerId,
-                recipientId: partnerAddress
-            )
+        do {
+            for file in files {
+                let result = try await filesStorage.uploadFile(
+                    file,
+                    recipientPublicKey: chatroom?.partner?.publicKey ?? "",
+                    senderPrivateKey: keyPair.privateKey,
+                    ownerId: ownerId,
+                    recipientId: partnerAddress
+                )
+                
+                let oldId = file.url.absoluteString
+                uploadingFilesIDsArray.removeAll(where: { $0 == oldId })
+                
+                let previewID: String
+                if let id = result.idPreview {
+                    previewID = id
+                } else {
+                    previewID = result.id
+                }
+                
+                let preview = filesStorage.getPreview(
+                    for: previewID,
+                    type: file.extenstion ?? ""
+                )
+                
+                let cached = filesStorage.isCached(result.id)
+                
+                updateFileFields.send((
+                    id: oldId,
+                    newId: result.id,
+                    preview: preview,
+                    cached: cached
+                ))
+                
+                if let index = richFiles.firstIndex(
+                    where: { $0.file_id == oldId }
+                ) {
+                    richFiles[index].file_id = result.id
+                    richFiles[index].nonce = result.nonce
+                    richFiles[index].preview_id = result.idPreview
+                    richFiles[index].preview_nonce = result.noncePreview
+                }
+            }
             
-            let oldId = file.url.absoluteString
-            uploadingFilesIDsArray.removeAll(where: { $0 == oldId })
+            let message: AdamantMessage
             
-            let previewID: String
-            if let id = result.idPreview {
-                previewID = id
+            if let replyMessage = replyMessage {
+                message = .richMessage(
+                    payload: RichFileReply(
+                        replyto_id: replyMessage.id,
+                        reply_message: RichMessageFile(
+                            files: richFiles,
+                            storage: NetworkFileProtocolType.uploadCareApi.rawValue,
+                            comment: text
+                        )
+                    )
+                )
             } else {
-                previewID = result.id
-            }
-            
-            let preview = filesStorage.getPreview(
-                for: previewID,
-                type: file.extenstion ?? ""
-            )
-            
-            let cached = filesStorage.isCached(result.id)
-                        
-            updateFileFields.send((
-                id: oldId,
-                newId: result.id,
-                preview: preview,
-                cached: cached
-            ))
-            
-            if let index = richFiles.firstIndex(
-                where: { $0.file_id == oldId }
-            ) {
-                richFiles[index].file_id = result.id
-                richFiles[index].nonce = result.nonce
-                richFiles[index].preview_id = result.idPreview
-                richFiles[index].preview_nonce = result.noncePreview
-            }
-        }
-        
-        let message: AdamantMessage
-        
-        if let replyMessage = replyMessage {
-            message = .richMessage(
-                payload: RichFileReply(
-                    replyto_id: replyMessage.id,
-                    reply_message: RichMessageFile(
+                message = .richMessage(
+                    payload: RichMessageFile(
                         files: richFiles,
                         storage: NetworkFileProtocolType.uploadCareApi.rawValue,
                         comment: text
                     )
                 )
+            }
+            
+            _ = try await chatsProvider.sendFileMessage(
+                message,
+                recipientId: partnerAddress,
+                transactionLocaly: txLocally.tx,
+                context: txLocally.context,
+                from: chatroom
             )
-        } else {
-            message = .richMessage(
-                payload: RichMessageFile(
-                    files: richFiles,
-                    storage: NetworkFileProtocolType.uploadCareApi.rawValue,
-                    comment: text
-                )
+        } catch {
+            richFiles.forEach { file in
+                uploadingFilesIDsArray.removeAll(where: { $0 == file.file_id })
+            }
+            
+            try? await chatsProvider.setTxMessageAsFailed(
+                transactionLocaly: txLocally.tx,
+                context: txLocally.context
             )
+            
+            throw error
         }
-        
-        _ = try await chatsProvider.sendFileMessage(
-            message,
-            recipientId: partnerAddress,
-            transactionLocaly: txLocally.0,
-            context: txLocally.1,
-            from: chatroom
-        )
     }
     
     func downloadFile(

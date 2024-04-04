@@ -869,7 +869,7 @@ extension AdamantChatsProvider {
         _ message: AdamantMessage,
         recipientId: String,
         from chatroom: Chatroom?
-    ) async throws -> (RichMessageTransaction, NSManagedObjectContext) {
+    ) async throws -> (tx: RichMessageTransaction, context: NSManagedObjectContext) {
         guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
             throw ChatsProviderError.notLogged
         }
@@ -933,9 +933,6 @@ extension AdamantChatsProvider {
             throw ChatsProviderError.messageNotValid(.tooLong)
         }
         
-//        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-//        context.parent = stack.container.viewContext
-                
         guard case let .richMessage(payload) = message else {
             throw ChatsProviderError.messageNotValid(.empty)
         }
@@ -954,6 +951,14 @@ extension AdamantChatsProvider {
         )
         
         return transaction
+    }
+    
+    func setTxMessageAsFailed(
+        transactionLocaly: RichMessageTransaction,
+        context: NSManagedObjectContext
+    ) throws {
+        transactionLocaly.statusEnum = .failed
+        try context.save()
     }
     
     private func sendTextMessageLocaly(

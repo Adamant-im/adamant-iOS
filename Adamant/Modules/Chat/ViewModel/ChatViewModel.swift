@@ -454,6 +454,12 @@ final class ChatViewModel: NSObject {
             guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
             else { return }
             
+            let message = messages.first(where: { $0.messageId == id })
+            
+            if case (.file) = message?.content {
+                return
+            }
+            
             do {
                 try await chatsProvider.retrySendMessage(transaction)
             } catch {

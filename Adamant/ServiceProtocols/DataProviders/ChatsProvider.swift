@@ -221,7 +221,7 @@ protocol ChatsProvider: DataProvider, Actor {
         _ message: AdamantMessage,
         recipientId: String,
         from chatroom: Chatroom?
-    ) async throws -> (RichMessageTransaction, NSManagedObjectContext)
+    ) async throws -> (tx: RichMessageTransaction, context: NSManagedObjectContext)
     
     func sendFileMessage(
         _ message: AdamantMessage,
@@ -230,6 +230,11 @@ protocol ChatsProvider: DataProvider, Actor {
         context: NSManagedObjectContext,
         from chatroom: Chatroom?
     ) async throws -> ChatTransaction
+    
+    func setTxMessageAsFailed(
+        transactionLocaly: RichMessageTransaction,
+        context: NSManagedObjectContext
+    ) throws
     
     // MARK: - Delete local message
     func cancelMessage(_ message: ChatTransaction) async throws
