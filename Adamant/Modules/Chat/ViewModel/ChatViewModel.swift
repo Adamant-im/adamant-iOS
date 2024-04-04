@@ -87,7 +87,7 @@ final class ChatViewModel: NSObject {
     let presentSendTokensVC = ObservableSender<Void>()
     let presentMediaPickerVC = ObservableSender<Void>()
     let presentDocumentPickerVC = ObservableSender<Void>()
-    let presentDocumentViewerVC = ObservableSender<(URL, ChatFile)>()
+    let presentDocumentViewerVC = ObservableSender<([FileResult], Int)>()
     let presentDropView = ObservableSender<Bool>()
     
     @ObservableValue private(set) var isHeaderLoading = false
@@ -664,15 +664,39 @@ final class ChatViewModel: NSObject {
     
     func openFile(messageId: String, file: ChatFile, isFromCurrentSender: Bool) {
         let tx = chatTransactions.first(where: { $0.txId == messageId })
-
+        let message = messages.first(where: { $0.messageId == messageId })
+        
         guard tx?.statusEnum == .delivered,
-              !downloadingFilesID.contains(file.file.file_id)
+              !downloadingFilesID.contains(file.file.file_id),
+              case let(.file(fileModel)) = message?.content,
+              let index = fileModel.value.content.fileModel.files.firstIndex(of: file)
         else { return }
         
         guard !file.isCached else {
             do {
-                let url = try filesStorage.getFileURL(with: file.file.file_id)
-                presentDocumentViewerVC.send((url, file))
+                _ = try filesStorage.getFileURL(with: file.file.file_id)
+
+                let chatFiles = fileModel.value.content.fileModel.files
+                
+                let files: [FileResult] = chatFiles.compactMap { file in
+                    guard file.isCached,
+                          let url = try? filesStorage.getFileURL(with: file.file.file_id) else {
+                        return nil
+                    }
+                    
+                    return FileResult.init(
+                        url: url,
+                        type: file.fileType,
+                        preview: nil,
+                        previewUrl: nil,
+                        size: file.file.file_size,
+                        name: file.file.file_name,
+                        extenstion: file.file.file_type,
+                        resolution: nil
+                    )
+                }
+                
+                presentDocumentViewerVC.send((files, index))
             } catch {
                 dialog.send(.alert(error.localizedDescription))
             }

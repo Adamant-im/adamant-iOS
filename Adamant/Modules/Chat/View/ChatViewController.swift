@@ -414,8 +414,8 @@ private extension ChatViewController {
             .store(in: &subscriptions)
         
         viewModel.presentDocumentViewerVC
-            .sink { [weak self] (url, file) in
-                self?.presentDocumentViewer(url: url, file: file)
+            .sink { [weak self] (files, index) in
+                self?.presentDocumentViewer(files: files, selectedIndex: index)
             }
             .store(in: &subscriptions)
         
@@ -592,18 +592,16 @@ private extension ChatViewController {
         present(documentPicker, animated: true)
     }
     
-    func presentDocumentViewer(url: URL, file: ChatFile) {
+    func presentDocumentViewer(files: [FileResult], selectedIndex: Int) {
         documentViewerService.openFile(
-            url: url,
-            name: file.file.file_name ?? .empty,
-            size: file.file.file_size,
-            ext: file.file.file_type ?? .empty
+            files: files
         )
         
         let quickVC = QLPreviewController()
         quickVC.delegate = documentViewerService
         quickVC.dataSource = documentViewerService
         quickVC.modalPresentationStyle = .fullScreen
+        quickVC.currentPreviewItemIndex = selectedIndex
         
         if let splitViewController = splitViewController {
             splitViewController.present(quickVC, animated: true)
