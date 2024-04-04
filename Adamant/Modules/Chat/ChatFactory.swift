@@ -29,6 +29,7 @@ struct ChatFactory {
     let walletServiceCompose: WalletServiceCompose
     let filesStorage: FilesStorageProtocol
     let chatFileService: ChatFileProtocol
+    let filesStorageProprieties: FilesStorageProprietiesProtocol
     
     nonisolated init(assembler: Assembler) {
         chatsProvider = assembler.resolve(ChatsProvider.self)!
@@ -44,6 +45,7 @@ struct ChatFactory {
         walletServiceCompose = assembler.resolve(WalletServiceCompose.self)!
         filesStorage = assembler.resolve(FilesStorageProtocol.self)!
         chatFileService = assembler.resolve(ChatFileProtocol.self)!
+        filesStorageProprieties = assembler.resolve(FilesStorageProprietiesProtocol.self)!
     }
     
     func makeViewController(screensFactory: ScreensFactory) -> ChatViewController {
@@ -118,7 +120,8 @@ private extension ChatFactory {
             ),
             emojiService: emojiService,
             filesStorage: filesStorage,
-            chatFileService: chatFileService
+            chatFileService: chatFileService,
+            filesStorageProprieties: filesStorageProprieties
         )
     }
     

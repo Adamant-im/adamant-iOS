@@ -276,6 +276,13 @@ struct AppAssembly: Assembly {
             chatsProvider: r.resolve(ChatsProvider.self)!)
         }.inObjectScope(.container)
         
+        // MARK: FilesStorageProprietiesService
+        container.register(FilesStorageProprietiesProtocol.self) { r in
+            FilesStorageProprietiesService(
+                securedStore: r.resolve(SecuredStore.self)!
+            )
+        }.inObjectScope(.container)
+        
         // MARK: Chats
         container.register(ChatsProvider.self) { r in
             AdamantChatsProvider(

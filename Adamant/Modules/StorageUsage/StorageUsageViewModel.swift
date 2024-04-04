@@ -13,6 +13,7 @@ import SwiftUI
 public extension Notification.Name {
     struct Storage {
         public static let storageClear = Notification.Name("adamant.storage.clear")
+        public static let storageProprietiesUpdated = Notification.Name("adamant.storage.ProprietiesUpdated")
     }
 }
 
@@ -20,25 +21,25 @@ public extension Notification.Name {
 final class StorageUsageViewModel: ObservableObject {
     private let filesStorage: FilesStorageProtocol
     private let dialogService: DialogService
+    private let filesStorageProprieties: FilesStorageProprietiesProtocol
     
     @Published var storageUsedDescription: String?
-    @Published var autoDownloadPreview: Bool = false
+    @Published var autoDownloadPreview: Bool = true
     
     nonisolated init(
         filesStorage: FilesStorageProtocol,
-        dialogService: DialogService
+        dialogService: DialogService,
+        filesStorageProprieties: FilesStorageProprietiesProtocol
     ) {
         self.filesStorage = filesStorage
         self.dialogService = dialogService
+        self.filesStorageProprieties = filesStorageProprieties
+        
     }
     
-    func updateCacheSize() {
-        DispatchQueue.global().async {
-            let size = (try? self.filesStorage.getCacheSize()) ?? .zero
-            DispatchQueue.main.async {
-                self.storageUsedDescription = self.formatSize(size)
-            }
-        }
+    func loadData() {
+        autoDownloadPreview = filesStorageProprieties.enabledAutoDownloadPreview()
+        updateCacheSize()
     }
     
     func clearStorage() {
@@ -60,11 +61,21 @@ final class StorageUsageViewModel: ObservableObject {
     }
     
     func togglePreviewContent() {
-        
+        filesStorageProprieties.setEnabledAutoDownloadPreview(autoDownloadPreview)
+        NotificationCenter.default.post(name: .Storage.storageProprietiesUpdated, object: nil)
     }
 }
 
 private extension StorageUsageViewModel {
+    func updateCacheSize() {
+        DispatchQueue.global().async {
+            let size = (try? self.filesStorage.getCacheSize()) ?? .zero
+            DispatchQueue.main.async {
+                self.storageUsedDescription = self.formatSize(size)
+            }
+        }
+    }
+    
     func formatSize(_ bytes: Int64) -> String {
         let formatter = ByteCountFormatter()
         formatter.allowedUnits = [.useGB, .useMB, .useKB]

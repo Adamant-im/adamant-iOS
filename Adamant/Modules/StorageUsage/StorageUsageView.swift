@@ -56,7 +56,7 @@ struct StorageUsageView: View {
             }
         }
         .onAppear(perform: {
-            viewModel.updateCacheSize()
+            viewModel.loadData()
         })
         .withoutListBackground()
         .background(Color(.adamant.secondBackgroundColor))
@@ -84,7 +84,7 @@ private extension StorageUsageView {
                 Image(uiImage: previewImage)
                 Text(previewTitle)
             }
-            .onLongPressGesture {
+            .onChange(of: viewModel.autoDownloadPreview) { value in
                 viewModel.togglePreviewContent()
             }
         }

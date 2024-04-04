@@ -60,6 +60,8 @@
 		3AA6DF442BA997C000EA2E16 /* FileContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA6DF432BA997C000EA2E16 /* FileContainerView.swift */; };
 		3AA6DF462BA9BEB700EA2E16 /* MediaContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA6DF452BA9BEB700EA2E16 /* MediaContentView.swift */; };
 		3AC76E3D2AB09118008042C4 /* ElegantEmojiPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 3AC76E3C2AB09118008042C4 /* ElegantEmojiPicker */; };
+		3ACD307E2BBD86B700ABF671 /* FilesStorageProprietiesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ACD307D2BBD86B700ABF671 /* FilesStorageProprietiesService.swift */; };
+		3ACD30802BBD86C800ABF671 /* FilesStorageProprietiesProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ACD307F2BBD86C800ABF671 /* FilesStorageProprietiesProtocol.swift */; };
 		3AF08D5F2B4EB3A200EB82B1 /* LanguageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF08D5E2B4EB3A200EB82B1 /* LanguageService.swift */; };
 		3AF08D612B4EB3C400EB82B1 /* LanguageStorageProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF08D602B4EB3C400EB82B1 /* LanguageStorageProtocol.swift */; };
 		3AF0A6CA2BBAF5850019FF47 /* ChatFileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF0A6C92BBAF5850019FF47 /* ChatFileService.swift */; };
@@ -722,6 +724,8 @@
 		3AA6DF3F2BA9941E00EA2E16 /* MediaContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaContainerView.swift; sourceTree = "<group>"; };
 		3AA6DF432BA997C000EA2E16 /* FileContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileContainerView.swift; sourceTree = "<group>"; };
 		3AA6DF452BA9BEB700EA2E16 /* MediaContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaContentView.swift; sourceTree = "<group>"; };
+		3ACD307D2BBD86B700ABF671 /* FilesStorageProprietiesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilesStorageProprietiesService.swift; sourceTree = "<group>"; };
+		3ACD307F2BBD86C800ABF671 /* FilesStorageProprietiesProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilesStorageProprietiesProtocol.swift; sourceTree = "<group>"; };
 		3AF08D5B2B4E7FFC00EB82B1 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		3AF08D5C2B4E7FFC00EB82B1 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = zh; path = zh.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		3AF08D5D2B4E7FFC00EB82B1 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -2081,6 +2085,7 @@
 				3A96E37B2AED27F8001F5A52 /* PartnerQRService.swift */,
 				3AF08D602B4EB3C400EB82B1 /* LanguageStorageProtocol.swift */,
 				3A833C3D2B99CCD600238F6A /* FilesStorageProtocol.swift */,
+				3ACD307F2BBD86C800ABF671 /* FilesStorageProprietiesProtocol.swift */,
 			);
 			path = ServiceProtocols;
 			sourceTree = "<group>";
@@ -2118,6 +2123,7 @@
 				3A2F55FD2AC6F90E000A3F26 /* AdamantCoinStorageService.swift */,
 				3A96E3792AED27D7001F5A52 /* AdamantPartnerQRService.swift */,
 				3AF08D5E2B4EB3A200EB82B1 /* LanguageService.swift */,
+				3ACD307D2BBD86B700ABF671 /* FilesStorageProprietiesService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -3159,6 +3165,7 @@
 				41C1698E29E7F36900FEB3CB /* AdamantRichTransactionReplyService.swift in Sources */,
 				649D6BF221C27D5C009E727B /* SearchResultsViewController.swift in Sources */,
 				E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */,
+				3ACD30802BBD86C800ABF671 /* FilesStorageProprietiesProtocol.swift in Sources */,
 				E9E7CDB72003994E00DFC4DB /* AdamantUtilities+extended.swift in Sources */,
 				3A2478B32BB461A7009D89E9 /* StorageUsageViewModel.swift in Sources */,
 				E9147B6320505C7500145913 /* QRCodeReader+adamant.swift in Sources */,
@@ -3341,6 +3348,7 @@
 				93E8EDCD2AF1BD65003E163C /* AdamantApiCore.swift in Sources */,
 				6416B1A721B024B6006089AC /* LskWalletService+Send.swift in Sources */,
 				E9942B87203D9E5100C163AF /* EurekaQRRow.swift in Sources */,
+				3ACD307E2BBD86B700ABF671 /* FilesStorageProprietiesService.swift in Sources */,
 				3AA50DF32AEBE67C00C58FC8 /* PartnerQRFactory.swift in Sources */,
 				E9AA8C02212C5BF500F9249F /* AdmWalletService+Send.swift in Sources */,
 				E90847332196FEA80095825D /* TransferTransaction+CoreDataProperties.swift in Sources */,

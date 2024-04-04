@@ -35,6 +35,7 @@ final class ChatViewModel: NSObject {
     private let emojiService: EmojiService
     private let filesStorage: FilesStorageProtocol
     private let chatFileService: ChatFileProtocol
+    private let filesStorageProprieties: FilesStorageProprietiesProtocol
     
     let chatMessagesListViewModel: ChatMessagesListViewModel
 
@@ -155,7 +156,8 @@ final class ChatViewModel: NSObject {
         chatMessagesListViewModel: ChatMessagesListViewModel,
         emojiService: EmojiService,
         filesStorage: FilesStorageProtocol,
-        chatFileService: ChatFileProtocol
+        chatFileService: ChatFileProtocol,
+        filesStorageProprieties: FilesStorageProprietiesProtocol
     ) {
         self.chatsProvider = chatsProvider
         self.markdownParser = markdownParser
@@ -173,6 +175,7 @@ final class ChatViewModel: NSObject {
         self.emojiService = emojiService
         self.filesStorage = filesStorage
         self.chatFileService = chatFileService
+        self.filesStorageProprieties = filesStorageProprieties
         
         super.init()
         setupObservers()
@@ -683,8 +686,12 @@ final class ChatViewModel: NSObject {
         isFromCurrentSender: Bool
     ) {
         let tx = chatTransactions.first(where: { $0.txId == messageId })
-
-        guard tx?.statusEnum == .delivered else { return }
+        let message = messages.first(where: { $0.messageId == messageId })
+        
+        guard let message = message,
+              tx?.statusEnum == .delivered || (message.status != .failed && message.status != .pending),
+            filesStorageProprieties.enabledAutoDownloadPreview()
+        else { return }
         
         chatFileService.downloadPreviewIfNeeded(
             messageId: messageId,

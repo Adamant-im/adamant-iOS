@@ -30,7 +30,8 @@ private struct StorageUsageAssembly: Assembly {
         container.register(StorageUsageViewModel.self) {
             StorageUsageViewModel(
                 filesStorage: $0.resolve(FilesStorageProtocol.self)!,
-                dialogService: $0.resolve(DialogService.self)!
+                dialogService: $0.resolve(DialogService.self)!, 
+                filesStorageProprieties: $0.resolve(FilesStorageProprietiesProtocol.self)!
             )
         }.inObjectScope(.weak)
     }

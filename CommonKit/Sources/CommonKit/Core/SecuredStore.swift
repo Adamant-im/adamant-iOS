@@ -56,6 +56,10 @@ public extension StoreKey {
         public static let language = "language"
         public static let languageLocale = "language.locale"
     }
+    
+    enum storage {
+        public static let autoDownloadPreviewEnabled = "autoDownloadPreviewEnabled"
+    }
 }
 
 public protocol SecuredStore: AnyObject {
