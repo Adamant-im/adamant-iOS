@@ -30,18 +30,16 @@ public final class FilesStorageKit {
         previewId: String,
         previewNonce: String
     ) async throws {
-        await taskQueue.enqueue {
-            try? await self.downloadFile(
-                id: previewId,
-                storage: storage,
-                fileType: fileType,
-                senderPublicKey: senderPublicKey,
-                recipientPrivateKey: recipientPrivateKey,
-                nonce: previewNonce,
-                ownerId: ownerId,
-                recipientId: recipientId
-            )
-        }
+        try await downloadFile(
+            id: previewId,
+            storage: storage,
+            fileType: fileType,
+            senderPublicKey: senderPublicKey,
+            recipientPrivateKey: recipientPrivateKey,
+            nonce: previewNonce,
+            ownerId: ownerId,
+            recipientId: recipientId
+        )
     }
     
     public func getPreview(for id: String, type: String) -> UIImage? {

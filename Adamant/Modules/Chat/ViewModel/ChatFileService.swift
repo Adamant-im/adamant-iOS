@@ -56,6 +56,9 @@ final class ChatFileService: ChatFileProtocol {
     @Published private var downloadingFilesIDsArray: [String] = []
     @Published private var uploadingFilesIDsArray: [String] = []
 
+    private var ignoreFilesIDsArray: [String] = []
+    private var subscriptions = Set<AnyCancellable>()
+    
     var downloadingFilesIDs: Published<[String]>.Publisher {
         $downloadingFilesIDsArray
     }
@@ -74,6 +77,8 @@ final class ChatFileService: ChatFileProtocol {
         self.accountService = accountService
         self.filesStorage = filesStorage
         self.chatsProvider = chatsProvider
+        
+        addObservers()
     }
     
     func sendFile(
@@ -286,6 +291,7 @@ final class ChatFileService: ChatFileProtocol {
     ) {
         guard let keyPair = accountService.keypair,
               !downloadingFilesIDsArray.contains(file.file.file_id),
+              !ignoreFilesIDsArray.contains(file.file.file_id),
               let previewId = file.file.preview_id,
               let previewNonce = file.file.preview_nonce,
               !filesStorage.isCached(previewId),
@@ -300,30 +306,50 @@ final class ChatFileService: ChatFileProtocol {
                 downloadingFilesIDsArray.removeAll(where: { $0 == file.file.file_id })
             }
             
-            try? await filesStorage.cachePreview(
-                storage: file.storage,
-                fileType: file.file.file_type ?? .empty,
-                senderPublicKey: chatroom?.partner?.publicKey ?? .empty,
-                recipientPrivateKey: keyPair.privateKey,
-                ownerId: ownerId,
-                recipientId: recipientId,
-                previewId: previewId,
-                previewNonce: previewNonce
-            )
-            
-            let preview = filesStorage.getPreview(
-                for: previewId,
-                type: file.file.file_type ?? .empty
-            )
-            
-            let cached = filesStorage.isCached(file.file.file_id)
-            
-            updateFileFields.send((
-                id: file.file.file_id,
-                newId: nil,
-                preview: preview,
-                cached: cached
-            ))
+            do {
+                try await filesStorage.cachePreview(
+                    storage: file.storage,
+                    fileType: file.file.file_type ?? .empty,
+                    senderPublicKey: chatroom?.partner?.publicKey ?? .empty,
+                    recipientPrivateKey: keyPair.privateKey,
+                    ownerId: ownerId,
+                    recipientId: recipientId,
+                    previewId: previewId,
+                    previewNonce: previewNonce
+                )
+                
+                let preview = filesStorage.getPreview(
+                    for: previewId,
+                    type: file.file.file_type ?? .empty
+                )
+                
+                let cached = filesStorage.isCached(file.file.file_id)
+                
+                updateFileFields.send((
+                    id: file.file.file_id,
+                    newId: nil,
+                    preview: preview,
+                    cached: cached
+                ))
+            } catch {
+                ignoreFilesIDsArray.append(file.file.file_id)
+            }
         }
+    }
+}
+
+private extension ChatFileService {
+    func addObservers() {
+        NotificationCenter.default
+            .publisher(for: .AdamantReachabilityMonitor.reachabilityChanged)
+            .receive(on: RunLoop.main)
+            .sink { [weak self] data in
+                let connection = data.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? Bool
+                
+                if connection == true {
+                    self?.ignoreFilesIDsArray.removeAll()
+                }
+            }
+            .store(in: &subscriptions)
     }
 }
