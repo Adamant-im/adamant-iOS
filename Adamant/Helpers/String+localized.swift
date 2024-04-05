@@ -106,6 +106,9 @@ extension String.adamant {
         static var unknownError: String {
             String.localized("Error.UnknownError", comment: "Shared unknown error")
         }
+        static func admNodeErrorMessage(_ coin: String) -> String {
+            String.localizedStringWithFormat(.localized("ApiService.InternalError.NoAdmNodesAvailable", comment: "No active ADM nodes to fetch the partner's %@ address"), coin)
+        }
         
         static var notEnoughMoney: String {
             String.localized("WalletServices.SharedErrors.notEnoughMoney", comment: "Wallet Services: Shared error, user do not have enought money.")

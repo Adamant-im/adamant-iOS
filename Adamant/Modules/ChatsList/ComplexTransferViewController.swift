@@ -23,6 +23,7 @@ final class ComplexTransferViewController: UIViewController {
     private let addressBookService: AddressBookService
     private let screensFactory: ScreensFactory
     private let walletServiceCompose: WalletServiceCompose
+    private let nodesStorage: NodesStorageProtocol
     
     // MARK: - Properties
     var pagingViewController: PagingViewController!
@@ -42,12 +43,14 @@ final class ComplexTransferViewController: UIViewController {
         visibleWalletsService: VisibleWalletsService,
         addressBookService: AddressBookService,
         screensFactory: ScreensFactory,
-        walletServiceCompose: WalletServiceCompose
+        walletServiceCompose: WalletServiceCompose,
+        nodesStorage: NodesStorageProtocol
     ) {
         self.visibleWalletsService = visibleWalletsService
         self.addressBookService = addressBookService
         self.screensFactory = screensFactory
         self.walletServiceCompose = walletServiceCompose
+        self.nodesStorage = nodesStorage
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -134,6 +137,27 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
         v.showProgressView(animated: false)
         
         Task {
+            let groupsWithoutActiveNode = service.core.nodeGroups.filter {
+                !nodesStorage.haveActiveNode(in: $0)
+            }
+
+            if let group = groupsWithoutActiveNode.first {
+                v.showAlertView(
+                    title: nil,
+                    message: ApiServiceError.noEndpointsAvailable(coin: group.name).errorDescription ?? String.adamant.sharedErrors.unknownError,
+                    animated: true
+                )
+                return
+            }
+            
+            if !nodesStorage.haveActiveNode(in: .adm) {
+                v.showAlertView(
+                    title: nil,
+                    message: String.adamant.sharedErrors.admNodeErrorMessage(service.core.tokenSymbol),
+                    animated: true
+                )
+                return
+            }
             do {
                 let walletAddress = try await service.core
                     .getWalletAddress(

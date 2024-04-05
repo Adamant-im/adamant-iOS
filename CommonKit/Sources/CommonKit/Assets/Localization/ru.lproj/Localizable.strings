@@ -280,6 +280,9 @@
 /* Serious internal error: No nodes available */
 "ApiService.InternalError.NoNodesAvailable" = "Нет доступных %@ нод. Просмотрите список узлов";
 
+/* Serious internal error: No ADM nodes available */
+"ApiService.InternalError.NoAdmNodesAvailable" = "Нет доступных ADM нод для получения адреса партнера %@";
+
 /* Eureka forms Cancel button */
 "Cancel" = "Отмена";
 

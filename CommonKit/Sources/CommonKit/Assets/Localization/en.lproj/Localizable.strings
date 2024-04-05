@@ -280,6 +280,9 @@
 /* Serious internal error: No nodes available */
 "ApiService.InternalError.NoNodesAvailable" = "No active %@ nodes. Review the node list";
 
+/* Serious internal error: No ADM nodes available */
+"ApiService.InternalError.NoAdmNodesAvailable" = "No active ADM nodes to fetch the partner's %@ address";
+
 /* Eureka forms Cancel button */
 "Cancel" = "Cancel";
 
