@@ -56,23 +56,52 @@ class WalletCollectionViewCell: PagingCell {
     
     private func stringFor(balance: Decimal) -> String {
         let significantDigits = 5
-        let balanceStr = "\(balance)"
+        let balanceStr = String(describing: balance)
         
         let minBalance: Decimal = Decimal(pow(10, -(Double(significantDigits - 1))))
         
         // Check if the number has a decimal part
-        if balanceStr.contains(".") || balanceStr.contains(",") {
+        if balanceStr.contains(".") {
             let parts = balanceStr.split(separator: ".")
-            var wholePart = String(parts[0])
-            let decimalPart = String(parts[1])
+            guard let wholePart = parts.first,
+                  let decimal = parts.last
+            else {
+                return AdamantBalanceFormat.compact.format(balance)
+            }
+            
+            let decimalPart = String(decimal)
             
             if balance < minBalance {
                 return "0.00…\(decimalPart.last ?? "0")"
             }
             
+            if balance > 1_000_000 {
+                let formatter = NumberFormatter()
+                formatter.numberStyle = .decimal
+                formatter.minimumFractionDigits = 0
+                formatter.maximumFractionDigits = 1
+                formatter.roundingMode = .down
+                
+                var whole: Double = minBalance.doubleValue
+                whole.round(.towardZero)
+                
+                var wholeString: String = ""
+                
+                if whole >= 1_000_000_000_000_000 {
+                    wholeString = "\(formatter.string(for: whole / 1_000_000_000_000_000) ?? "")Q"
+                } else if whole >= 1_000_000_000_000 {
+                    wholeString = "\(formatter.string(for: whole / 1_000_000_000_000) ?? "")T"
+                } else if whole >= 1_000_000_000 {
+                    wholeString = "\(formatter.string(for: whole / 1_000_000_000) ?? "")B"
+                } else {
+                    wholeString = "\(formatter.string(for: whole / 1_000_000) ?? "")M"
+                }
+                return wholeString
+            }
+            
             let additionalDigits = significantDigits - wholePart.count
             
-            guard additionalDigits > .zero else { return wholePart }
+            guard additionalDigits > .zero else { return String(wholePart) }
             
             var formattedDecimal = ""
             
