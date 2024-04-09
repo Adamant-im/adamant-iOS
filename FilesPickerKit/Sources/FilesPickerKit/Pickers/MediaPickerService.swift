@@ -37,6 +37,7 @@ extension MediaPickerService: PHPickerViewControllerDelegate {
 
 private extension MediaPickerService {
     func processResults(_ results: [PHPickerResult]) async {
+        do {
         var dataArray: [FileResult] = []
         
         for result in results {
@@ -44,13 +45,14 @@ private extension MediaPickerService {
             
             guard let typeIdentifier = itemProvider.registeredTypeIdentifiers.first,
                   let utType = UTType(typeIdentifier)
-            else { continue }
+            else {
+                throw FileValidationError.fileNotFound
+            }
          
             if utType.conforms(to: .image) {
-                guard let url = try? await helper.getUrl(for: itemProvider),
-                      let preview = try? await getPhoto(from: itemProvider),
-                      let fileSize = try? helper.getFileSize(from: url)
-                else { continue }
+                let url = try await helper.getUrl(for: itemProvider)
+                let preview = try getPhoto(from: url)
+                let fileSize = try helper.getFileSize(from: url)
                 
                 let resizedPreview = helper.resizeImage(
                     image: preview,
@@ -77,10 +79,8 @@ private extension MediaPickerService {
             }
             
             if utType.conforms(to: .movie) {
-                guard let url = try? await helper.getUrl(for: itemProvider),
-                      let fileSize = try? helper.getFileSize(from: url)
-                else { continue }
-                
+                let url = try await helper.getUrl(for: itemProvider)
+                let fileSize = try helper.getFileSize(from: url)
                 let originalSize = helper.getOriginalSize(for: url)
                 
                 let thumbnailImage = try? await helper.getThumbnailImage(
@@ -108,7 +108,6 @@ private extension MediaPickerService {
             }
         }
         
-        do {
             try helper.validateFiles(dataArray)
             onPreparedDataCallback?(.success(dataArray))
         } catch {
@@ -116,27 +115,11 @@ private extension MediaPickerService {
         }
     }
     
-    func getPhoto(from itemProvider: NSItemProvider) async throws -> UIImage {
-        let objectType: NSItemProviderReading.Type = UIImage.self
-        
-        guard itemProvider.canLoadObject(ofClass: objectType) else {
-            throw FileValidationError.tooManyFiles
+    func getPhoto(from url: URL) throws -> UIImage {
+        guard let image = UIImage(contentsOfFile: url.path) else {
+            throw FileValidationError.fileNotFound
         }
         
-        return try await withUnsafeThrowingContinuation { continuation in
-            itemProvider.loadObject(ofClass: objectType) { object, error in
-                if let error = error {
-                    continuation.resume(throwing: error)
-                    return
-                }
-                
-                guard let image = object as? UIImage else {
-                    continuation.resume(throwing: FileValidationError.tooManyFiles)
-                    return
-                }
-                
-                continuation.resume(returning: image)
-            }
-        }
+        return image
     }
 }

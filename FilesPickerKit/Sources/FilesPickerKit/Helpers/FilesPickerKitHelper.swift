@@ -158,7 +158,7 @@ final class FilesPickerKitHelper {
     
     @MainActor
     func getUrl(for itemProvider: NSItemProvider) async throws -> URL {
-        guard let type = itemProvider.registeredTypeIdentifiers.first
+        guard let type = itemProvider.registeredTypeIdentifiers.last
         else {
             throw FileValidationError.fileNotFound
         }
@@ -171,7 +171,7 @@ final class FilesPickerKitHelper {
                 }
                 
                 guard let url = url else {
-                    continuation.resume(throwing: FileValidationError.tooManyFiles)
+                    continuation.resume(throwing: FileValidationError.fileNotFound)
                     return
                 }
                 
