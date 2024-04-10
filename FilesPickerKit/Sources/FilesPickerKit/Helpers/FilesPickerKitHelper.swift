@@ -158,32 +158,34 @@ final class FilesPickerKitHelper {
     
     @MainActor
     func getUrl(for itemProvider: NSItemProvider) async throws -> URL {
-        guard let type = itemProvider.registeredTypeIdentifiers.last
-        else {
-            throw FileValidationError.fileNotFound
+        for type in itemProvider.registeredTypeIdentifiers {
+            do {
+                return try await getFileURL(by: type, itemProvider: itemProvider)
+            } catch {
+                continue
+            }
         }
         
-        return try await withUnsafeThrowingContinuation { continuation in
-            itemProvider.loadFileRepresentation(forTypeIdentifier: type) { [weak self] url, error in
+        throw FileValidationError.fileNotFound
+    }
+    
+    @MainActor
+    func getFileURL(
+        by type: String,
+        itemProvider: NSItemProvider
+    ) async throws -> URL {
+        try await withCheckedThrowingContinuation { continuation in
+            itemProvider.loadFileRepresentation(forTypeIdentifier: type) { url, error in
                 if let error = error {
                     continuation.resume(throwing: error)
-                    return
-                }
-                
-                guard let url = url else {
-                    continuation.resume(throwing: FileValidationError.fileNotFound)
-                    return
-                }
-                
-                do {
-                    guard let targetURL = try self?.copyFile(from: url) else {
+                } else if let url = url {
+                    if let targetURL = try? self.copyFile(from: url) {
+                        continuation.resume(returning: targetURL)
+                    } else {
                         continuation.resume(throwing: FileValidationError.fileNotFound)
-                        return
                     }
-                    
-                    continuation.resume(returning: targetURL)
-                } catch {
-                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume(throwing: FileValidationError.fileNotFound)
                 }
             }
         }
