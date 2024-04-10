@@ -1,20 +1,25 @@
 //
 //  FileManagerError.swift
-//  
+//  Adamant
 //
-//  Created by Stanislav Jelezoglo on 06.03.2024.
+//  Created by Stanislav Jelezoglo on 10.04.2024.
+//  Copyright © 2024 Adamant. All rights reserved.
 //
 
 import Foundation
 
-public enum FileManagerError: Error {
+enum NetworkFileProtocolType: String {
+    case ipfs
+}
+
+enum FileManagerError: Error {
     case cantDownloadFile
     case cantUploadFile
     case cantEnctryptFile
 }
 
 extension FileManagerError: LocalizedError {
-    public var errorDescription: String? {
+    var errorDescription: String? {
         switch self {
         case .cantDownloadFile:
             return "cant Download File"

@@ -18,43 +18,25 @@ protocol FilesStorageProtocol {
     
     func getFileURL(with id: String) throws -> URL
     
-    func uploadFile(
-        _ file: FileResult,
-        recipientPublicKey: String,
-        senderPrivateKey: String,
+    func cacheFile(
+        id: String,
+        url: URL,
         ownerId: String,
         recipientId: String
-    ) async throws -> (id: String, nonce: String, idPreview: String?, noncePreview: String?)
+    ) throws
     
-    func downloadFile(
+    func cacheFile(
         id: String,
-        storage: String,
-        fileType: String?,
-        senderPublicKey: String,
-        recipientPrivateKey: String,
+        data: Data,
         ownerId: String,
-        recipientId: String,
-        nonce: String,
-        previewId: String?,
-        previewNonce: String?
-    ) async throws
+        recipientId: String
+    ) throws
     
     func getCacheSize() throws -> Int64
     
     func clearCache() throws
     
     func clearTempCache() throws
-    
-    func cachePreview(
-        storage: String,
-        fileType: String?,
-        senderPublicKey: String,
-        recipientPrivateKey: String,
-        ownerId: String,
-        recipientId: String,
-        previewId: String,
-        previewNonce: String
-    ) async throws
 }
 
 extension FilesStorageKit: FilesStorageProtocol { }

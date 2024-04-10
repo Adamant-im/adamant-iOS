@@ -5,9 +5,6 @@
       location = "group:FilesStorageKit">
    </FileRef>
    <FileRef
-      location = "group:FilesNetworkManagerKit">
-   </FileRef>
-   <FileRef
       location = "group:FilesPickerKit">
    </FileRef>
    <FileRef

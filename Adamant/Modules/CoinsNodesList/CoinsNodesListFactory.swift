@@ -54,7 +54,8 @@ private struct CoinsNodesListAssembly: Assembly {
                     lskService: $0.resolve(LskServiceApiService.self)!,
                     doge: $0.resolve(DogeApiService.self)!,
                     dash: $0.resolve(DashApiService.self)!,
-                    adm: $0.resolve(ApiService.self)!
+                    adm: $0.resolve(ApiService.self)!,
+                    ipfs: $0.resolve(IPFSApiService.self)!
                 )
             )
         }.inObjectScope(.weak)

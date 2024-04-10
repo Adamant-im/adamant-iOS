@@ -25,6 +25,32 @@ actor APICore: APICoreProtocol {
         return Alamofire.Session.init(configuration: configuration)
     }()
     
+    func sendRequestMultipartFormData(
+        node: Node,
+        path: String,
+        data: [String: Data]
+    ) async -> APIResponseModel {
+        do {
+            let request = AF.upload(multipartFormData: { multipartFormData in
+                data.forEach { file in
+                    multipartFormData.append(
+                        file.value,
+                        withName: file.key,
+                        fileName: "file"
+                    )
+                }
+            }, to: try buildUrl(node: node, path: path))
+            
+            return await sendRequest(request: request)
+        } catch {
+            return .init(
+                result: .failure(.internalError(message: error.localizedDescription, error: error)),
+                data: nil,
+                code: nil
+            )
+        }
+    }
+    
     func sendRequestBasic<Parameters: Encodable>(
         node: Node,
         path: String,
@@ -82,6 +108,18 @@ actor APICore: APICoreProtocol {
 
 private extension APICore {
     func sendRequest(request: DataRequest) async -> APIResponseModel {
+        await withCheckedContinuation { continuation in
+            request.responseData(queue: responseQueue) { response in
+                continuation.resume(returning: .init(
+                    result: response.result.mapError { .init(error: $0) },
+                    data: response.data,
+                    code: response.response?.statusCode
+                ))
+            }
+        }
+    }
+    
+    func sendRequest(request: UploadRequest) async -> APIResponseModel {
         await withCheckedContinuation { continuation in
             request.responseData(queue: responseQueue) { response in
                 continuation.resume(returning: .init(

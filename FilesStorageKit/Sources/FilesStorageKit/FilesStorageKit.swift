@@ -3,43 +3,13 @@
 
 import CommonKit
 import UIKit
-import FilesNetworkManagerKit
 
 public final class FilesStorageKit {
-    typealias UploadResult = (id: String, nonce: String)
-
-    private let adamantCore = NativeAdamantCore()
-    private let networkFileManager = FilesNetworkManager()
-    private let networkService = NetworkService()
-    private let taskQueue = TaskQueue<Void>(maxTasks: 5)
-    
     @Atomic private var cachedFilesUrl: [String: URL] = [:]
     private var cachedFiles: NSCache<NSString, UIImage> = NSCache()
     
     public init() {
         try? loadCache()
-    }
-    
-    public func cachePreview(
-        storage: String,
-        fileType: String?,
-        senderPublicKey: String,
-        recipientPrivateKey: String,
-        ownerId: String,
-        recipientId: String,
-        previewId: String,
-        previewNonce: String
-    ) async throws {
-        try await downloadFile(
-            id: previewId,
-            storage: storage,
-            fileType: fileType,
-            senderPublicKey: senderPublicKey,
-            recipientPrivateKey: recipientPrivateKey,
-            nonce: previewNonce,
-            ownerId: ownerId,
-            recipientId: recipientId
-        )
     }
     
     public func getPreview(for id: String, type: String) -> UIImage? {
@@ -68,69 +38,29 @@ public final class FilesStorageKit {
         return url
     }
     
-    public func uploadFile(
-        _ file: FileResult,
-        recipientPublicKey: String,
-        senderPrivateKey: String,
+    public func cacheFile(
+        id: String,
+        url: URL,
         ownerId: String,
         recipientId: String
-    ) async throws -> (id: String, nonce: String, idPreview: String?, noncePreview: String?) {
-        let result = try await uploadFile(
-            url: file.url,
-            recipientPublicKey: recipientPublicKey,
-            senderPrivateKey: senderPrivateKey,
+    ) throws {
+        try cacheFile(
+            with: id,
+            localUrl: url,
             ownerId: ownerId,
             recipientId: recipientId
         )
-        
-        var resultPreview: UploadResult?
-        
-        if let url = file.previewUrl {
-            resultPreview = try? await uploadFile(
-                url: url,
-                recipientPublicKey: recipientPublicKey,
-                senderPrivateKey: senderPrivateKey,
-                ownerId: ownerId,
-                recipientId: recipientId
-            )
-        }
-        
-        return (id: result.id, nonce: result.nonce, idPreview: resultPreview?.id, noncePreview: resultPreview?.nonce)
     }
     
-    public func downloadFile(
+    public func cacheFile(
         id: String,
-        storage: String,
-        fileType: String?,
-        senderPublicKey: String,
-        recipientPrivateKey: String,
+        data: Data,
         ownerId: String,
-        recipientId: String,
-        nonce: String,
-        previewId: String?,
-        previewNonce: String?
-    ) async throws {
-        if let previewId = previewId,
-           let previewNonce = previewNonce {
-            try? await downloadFile(
-                id: previewId,
-                storage: storage,
-                fileType: fileType,
-                senderPublicKey: senderPublicKey,
-                recipientPrivateKey: recipientPrivateKey,
-                nonce: previewNonce,
-                ownerId: ownerId,
-                recipientId: recipientId
-            )
-        }
-        
-        return try await downloadFile(
-            id: id,
-            storage: storage,
-            fileType: fileType,
-            senderPublicKey: senderPublicKey,
-            recipientPrivateKey: recipientPrivateKey,
-            nonce: nonce,
+        recipientId: String
+    ) throws {
+        try cacheFile(
+            with: id,
+            data: data,
             ownerId: ownerId,
             recipientId: recipientId
         )
@@ -184,56 +114,6 @@ public final class FilesStorageKit {
 }
 
 private extension FilesStorageKit {
-    func downloadFile(
-        id: String,
-        storage: String,
-        fileType: String?,
-        senderPublicKey: String,
-        recipientPrivateKey: String,
-        nonce: String,
-        ownerId: String,
-        recipientId: String
-    ) async throws {
-        let decodedData = try await networkService.downloadFile(
-            id: id,
-            storage: storage,
-            fileType: fileType,
-            senderPublicKey: senderPublicKey,
-            recipientPrivateKey: recipientPrivateKey,
-            nonce: nonce
-        )
-        
-        return try cacheFile(
-            id: id,
-            data: decodedData,
-            ownerId: ownerId,
-            recipientId: recipientId
-        )
-    }
-    
-    func uploadFile(
-        url: URL,
-        recipientPublicKey: String,
-        senderPrivateKey: String,
-        ownerId: String,
-        recipientId: String
-    ) async throws -> UploadResult {
-        let result = try await networkService.uploadFile(
-            url: url,
-            recipientPublicKey: recipientPublicKey,
-            senderPrivateKey: senderPrivateKey
-        )
-        
-        try cacheFile(
-            id: result.id,
-            localUrl: url,
-            ownerId: ownerId,
-            recipientId: recipientId
-        )
-        
-        return (id: result.id, nonce: result.nonce)
-    }
-    
     func loadCache() throws {
         let folder = try FileManager.default.url(
             for: .cachesDirectory,
@@ -277,7 +157,7 @@ private extension FilesStorageKit {
     }
     
     func cacheFile(
-        id: String,
+        with id: String,
         data: Data? = nil,
         localUrl: URL? = nil,
         ownerId: String,

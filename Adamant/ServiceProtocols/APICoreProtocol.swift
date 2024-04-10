@@ -14,6 +14,12 @@ import UIKit
 enum ApiCommands {}
 
 protocol APICoreProtocol: Actor {
+    func sendRequestMultipartFormData(
+        node: Node,
+        path: String,
+        data: [String: Data]
+    ) async -> APIResponseModel
+    
     func sendRequestBasic<Parameters: Encodable>(
         node: Node,
         path: String,
@@ -103,6 +109,18 @@ extension APICoreProtocol {
             path: path,
             method: method,
             jsonParameters: jsonParameters
+        ).result.flatMap { parseJSON(data: $0) }
+    }
+    
+    func sendRequestMultipartFormDataJsonResponse<JSONOutput: Decodable>(
+        node: Node,
+        path: String,
+        data: [String: Data]
+    ) async -> ApiServiceResult<JSONOutput> {
+        await sendRequestMultipartFormData(
+            node: node,
+            path: path,
+            data: data
         ).result.flatMap { parseJSON(data: $0) }
     }
     

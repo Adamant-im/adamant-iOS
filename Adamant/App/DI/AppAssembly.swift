@@ -124,6 +124,24 @@ struct AppAssembly: Assembly {
             )
         }.inObjectScope(.container)
         
+        // MARK: IPFSApiService
+        container.register(IPFSApiService.self) { r in
+            IPFSApiService(
+                healthCheckWrapper: .init(
+                    service: .init(apiCore: r.resolve(APICoreProtocol.self)!),
+                    nodesStorage: r.resolve(NodesStorageProtocol.self)!,
+                    nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
+                    nodeGroup: .ipfs
+                )
+            )
+        }.inObjectScope(.container)
+        
+        
+        // MARK: FilesNetworkManagerProtocol
+        container.register(FilesNetworkManagerProtocol.self) { r in
+            FilesNetworkManager(ipfsService: r.resolve(IPFSApiService.self)!)
+        }.inObjectScope(.container)
+        
         // MARK: BtcApiService
         container.register(BtcApiService.self) { r in
             BtcApiService(api: .init(
@@ -270,10 +288,13 @@ struct AppAssembly: Assembly {
         
         // MARK: ChatFileService
         container.register(ChatFileProtocol.self) { r in
-        ChatFileService(
-            accountService: r.resolve(AccountService.self)!,
-            filesStorage: r.resolve(FilesStorageProtocol.self)!,
-            chatsProvider: r.resolve(ChatsProvider.self)!)
+            ChatFileService(
+                accountService: r.resolve(AccountService.self)!,
+                filesStorage: r.resolve(FilesStorageProtocol.self)!,
+                chatsProvider: r.resolve(ChatsProvider.self)!,
+                filesNetworkManager: r.resolve(FilesNetworkManagerProtocol.self)!,
+                adamantCore: r.resolve(AdamantCore.self)!
+            )
         }.inObjectScope(.container)
         
         // MARK: FilesStorageProprietiesService

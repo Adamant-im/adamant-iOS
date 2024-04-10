@@ -25,6 +25,8 @@ public extension NodeGroup {
             return DogeWalletService.healthCheckParameters.onScreenUpdateInterval
         case .dash:
             return DashWalletService.healthCheckParameters.onScreenUpdateInterval
+        case .ipfs:
+            return IPFSApiService.healthCheckParameters.onScreenUpdateInterval
         }
     }
 
@@ -44,6 +46,8 @@ public extension NodeGroup {
             return DogeWalletService.healthCheckParameters.crucialUpdateInterval
         case .dash:
             return DashWalletService.healthCheckParameters.crucialUpdateInterval
+        case .ipfs:
+            return IPFSApiService.healthCheckParameters.crucialUpdateInterval
         }
     }
 
@@ -63,6 +67,8 @@ public extension NodeGroup {
             return DogeWalletService.healthCheckParameters.threshold
         case .dash:
             return DashWalletService.healthCheckParameters.threshold
+        case .ipfs:
+            return IPFSApiService.healthCheckParameters.threshold
         }
     }
 
@@ -82,6 +88,8 @@ public extension NodeGroup {
             return DogeWalletService.healthCheckParameters.normalUpdateInterval
         case .dash:
             return DashWalletService.healthCheckParameters.normalUpdateInterval
+        case .ipfs:
+            return IPFSApiService.healthCheckParameters.normalUpdateInterval
         }
     }
     
@@ -102,6 +110,8 @@ public extension NodeGroup {
             minNodeVersion = DogeWalletService.minNodeVersion
         case .dash:
             minNodeVersion = DashWalletService.minNodeVersion
+        case .ipfs:
+            minNodeVersion = nil
         }
         
         guard let versionNumber = Node.stringToDouble(minNodeVersion) else {

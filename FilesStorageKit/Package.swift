@@ -15,15 +15,14 @@ let package = Package(
             targets: ["FilesStorageKit"]),
     ],
     dependencies: [
-        .package(path: "../CommonKit"),
-        .package(path: "../FilesNetworkManagerKit")
+        .package(path: "../CommonKit")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "FilesStorageKit",
-            dependencies: ["CommonKit", "FilesNetworkManagerKit"]),
+            dependencies: ["CommonKit"]),
         .testTarget(
             name: "FilesStorageKitTests",
             dependencies: ["FilesStorageKit"]),

@@ -14,7 +14,6 @@ import CommonKit
 import AdvancedContextMenuKit
 import ElegantEmojiPicker
 import FilesPickerKit
-import FilesNetworkManagerKit
 
 @MainActor
 final class ChatViewModel: NSObject {

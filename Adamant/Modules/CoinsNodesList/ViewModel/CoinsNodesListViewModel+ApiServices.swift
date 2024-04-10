@@ -17,6 +17,7 @@ extension CoinsNodesListViewModel {
         let doge: WalletApiService
         let dash: WalletApiService
         let adm: WalletApiService
+        let ipfs: WalletApiService
     }
 }
 
@@ -37,6 +38,8 @@ extension CoinsNodesListViewModel.ApiServices {
             return dash
         case .adm:
             return adm
+        case .ipfs:
+            return ipfs
         }
     }
 }
