@@ -547,6 +547,8 @@ private extension ChatViewController {
     }
 
     func presentMediaPicker() {
+        messageInputBar.inputTextView.resignFirstResponder()
+        
         mediaPickerDelegate.onPreparedDataCallback = { [weak self] result in
             DispatchQueue.main.async {
                 self?.viewModel.presentDialog(progress: false)
@@ -570,6 +572,8 @@ private extension ChatViewController {
     }
     
     func presentDocumentPicker() {
+        messageInputBar.inputTextView.resignFirstResponder()
+        
         documentPickerDelegate.onPreparedDataCallback = { [weak self] result in
             DispatchQueue.main.async {
                 self?.viewModel.presentDialog(progress: false)
