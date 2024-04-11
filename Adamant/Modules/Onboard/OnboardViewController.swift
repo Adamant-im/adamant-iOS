@@ -141,10 +141,7 @@ extension OnboardViewController: SwiftyOnboardDelegate, SwiftyOnboardDataSource 
         let view = OnboardPage(image: item.image, text: item.text)
         
         view.textView.delegate = self
-        
-        // Font & size logic moved to OnboardPage
-        view.rawRichText = item.text
-        
+       
         return view
     }
     

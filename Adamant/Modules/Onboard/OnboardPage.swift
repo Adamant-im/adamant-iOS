@@ -19,45 +19,19 @@ final class OnboardPage: SwiftyOnboardPage {
         let text = UITextView()
         text.textColor = UIColor.adamant.active
         text.text = self.text
-        text.font = UIFont.adamantPrimary(ofSize: 24)
         text.backgroundColor = .clear
         text.isEditable = false
+        
+        let attributedString = NSMutableAttributedString(
+            attributedString: MarkdownParser().parse(self.text)
+        )
+        
+        attributedString.apply(font: UIFont.adamantPrimary(ofSize: 18), alignment: .center)
+        text.attributedText = attributedString
+        text.linkTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor.adamant.active]
+
         return text
     }()
-    
-    private var didLayoutSubviews: Bool = false
-    
-    var rawRichText: String? {
-        didSet {
-            if didLayoutSubviews {
-                adjustTextView()
-            }
-        }
-    }
-    
-    var minFontSize: CGFloat = 12.0 {
-        didSet {
-            if didLayoutSubviews {
-                adjustTextView()
-            }
-        }
-    }
-    
-    var maxFontSize: CGFloat = 16.0 {
-        didSet {
-            if didLayoutSubviews {
-                adjustTextView()
-            }
-        }
-    }
-    
-    var fontName: String = "Exo2-Regular" {
-        didSet {
-            if didLayoutSubviews {
-                adjustTextView()
-            }
-        }
-    }
     
     private let image: UIImage?
     private let text: String
@@ -65,8 +39,8 @@ final class OnboardPage: SwiftyOnboardPage {
     init(image: UIImage?, text: String) {
         self.image = image
         self.text = text
-        self.rawRichText = text
         super.init(frame: .zero)
+        
         setupView()
     }
     
@@ -74,94 +48,22 @@ final class OnboardPage: SwiftyOnboardPage {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        didLayoutSubviews = true
-        adjustTextView()
-    }
-    
     private func setupView() {
         addSubview(mainImageView)
         addSubview(textView)
         
+        let space = UIScreen.main.bounds.height / 1.7
+        mainImageView.contentMode = .scaleAspectFit
         mainImageView.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.top.equalTo(safeAreaLayoutGuide).offset(70)
+            make.horizontalEdges.equalToSuperview().inset(20)
+            make.top.equalTo(safeAreaLayoutGuide).offset(50)
+            make.bottom.equalTo(safeAreaLayoutGuide).offset(-space)
         }
     
         textView.snp.makeConstraints { make in
-            make.top.equalTo(mainImageView.snp.bottom).offset(20)
-            make.leading.trailing.equalToSuperview().inset(32)
-            make.bottom.equalToSuperview().offset(-15)
-        }
-    }
-    
-    private func adjustTextView() {
-        guard
-            let rawRichText = rawRichText,
-            let defaultFont = UIFont(name: fontName, size: maxFontSize) else {
-            return
-        }
-        
-        let attributedString = NSMutableAttributedString(attributedString: MarkdownParser().parse(rawRichText))
-        
-        attributedString.apply(font: defaultFont, alignment: .center)
-        
-        let pureText = attributedString.string
-        textView.font = defaultFont
-        textView.text = pureText
-        adjustTextViewFontSize()
-        
-        let fontSize = textView.font!.pointSize
-        
-        guard maxFontSize != fontSize else {
-            textView.text = nil
-            textView.font = nil
-            textView.attributedText = attributedString.resolveLinkColor()
-            return
-        }
-
-        if let font = UIFont(name: fontName, size: fontSize) {
-            attributedString.apply(font: font, alignment: .center)
-            textView.text = nil
-            textView.font = nil
-            textView.attributedText = attributedString.resolveLinkColor()
-        }
-    }
-    
-    private func adjustTextViewFontSize() {
-        guard !textView.text.isEmpty && !textView.bounds.size.equalTo(CGSize.zero) else {
-            return
-        }
-        
-        let textViewSize = textView.frame.size
-        let fixedWidth = textViewSize.width
-        let expectSize = textView.sizeThatFits(CGSize(width: fixedWidth, height: CGFloat(MAXFLOAT)))
-        
-        var expectFont = textView.font
-        if (expectSize.height > textViewSize.height) {
-            while (textView.sizeThatFits(CGSize(width: fixedWidth, height: CGFloat(MAXFLOAT))).height > textViewSize.height) {
-                // Check min
-                if textView.font!.pointSize <= minFontSize {
-                    textView.font = textView.font!.withSize(minFontSize)
-                    return
-                }
-                
-                // Shrink it more
-                expectFont = textView.font!.withSize(textView.font!.pointSize - 1)
-                textView.font = expectFont
-            }
-        } else {
-            while (textView.sizeThatFits(CGSize(width: fixedWidth, height: CGFloat(MAXFLOAT))).height < textViewSize.height) {
-                if textView.font!.pointSize >= maxFontSize {
-                    textView.font = textView.font!.withSize(maxFontSize)
-                    return
-                }
-                
-                expectFont = textView.font
-                textView.font = textView.font!.withSize(textView.font!.pointSize + 1)
-            }
+            make.horizontalEdges.equalToSuperview().inset(20)
+            make.bottom.equalToSuperview().offset(-150)
+            make.height.equalTo(260)
         }
     }
 }
