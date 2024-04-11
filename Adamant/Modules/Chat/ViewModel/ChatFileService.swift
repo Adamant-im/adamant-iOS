@@ -432,7 +432,7 @@ private extension ChatFileService {
         guard let encodedData = encodedResult?.data,
               let nonce = encodedResult?.nonce
         else {
-            throw FileManagerError.cantEnctryptFile
+            throw FileManagerError.cantEncryptFile
         }
         
         let cid = try await filesNetworkManager.uploadFiles(encodedData, type: storageProtocol)
@@ -455,7 +455,7 @@ private extension ChatFileService {
             privateKey: recipientPrivateKey
         )
         else {
-            throw FileManagerError.cantDownloadFile
+            throw FileManagerError.cantDecryptFile
         }
         
         return decodedData

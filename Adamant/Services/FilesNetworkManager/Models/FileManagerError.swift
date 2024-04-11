@@ -15,18 +15,21 @@ enum NetworkFileProtocolType: String {
 enum FileManagerError: Error {
     case cantDownloadFile
     case cantUploadFile
-    case cantEnctryptFile
+    case cantEncryptFile
+    case cantDecryptFile
 }
 
 extension FileManagerError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .cantDownloadFile:
-            return "cant Download File"
+            return .localized("FileManagerError.CantDownloadFile")
         case .cantUploadFile:
-            return "cant Upload File"
-        case .cantEnctryptFile:
-            return "cant encrypt file"
+            return .localized("FileManagerError.CantUploadFile")
+        case .cantEncryptFile:
+            return .localized("FileManagerError.CantEncryptFile")
+        case .cantDecryptFile:
+            return .localized("FileManagerError.CantDecryptFile")
         }
     }
 }

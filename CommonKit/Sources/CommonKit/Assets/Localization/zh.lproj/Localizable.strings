@@ -880,6 +880,15 @@
 /* Shared alert 'Save to Photos'. Used with saving images to photolibrary */
 "Shared.SaveToPhotolibrary" = "保存到照片";
 
+/* Shared alert 'Send tokens' */
+"Shared.SendTokens" = "发送代币";
+
+/* Shared alert 'Upload file' */
+"Shared.UploadFile" = "上传文件";
+
+/* Shared alert 'Upload Media' */
+"Shared.UploadMedia" = "上传媒体";
+
 /* Shared alert 'Settings' button. Used to go to system Settings app, on application settings page. Should be same as Settings application title. */
 "Shared.Settings" = "设置";
 
@@ -1212,3 +1221,24 @@
 
 /* Include partner url */
 "PartnerQR.includePartnerURL" = "包括Web应用程序链接";
+
+/* FileManager error 'Can't download file' */
+"FileManagerError.CantDownloadFile" = "无法下载文件";
+
+/* FileManager error 'Can't upload file' */
+"FileManagerError.CantUploadFile" = "无法上传文件";
+
+/* FileManager error 'Can't encrypt file' */
+"FileManagerError.CantEncryptFile" = "无法加密文件";
+
+/* FileManager error 'Can't decrypt file' */
+"FileManagerError.CantDecryptFile" = "无法解密文件";
+
+/* File validation error 'Too many files' */
+"FileValidationError.TooManyFiles" = "文件太多。 最大允许：%lld";
+
+/* File validation error 'File size exceeds limit' */
+"FileValidationError.FileSizeExceedsLimit" = "文件大小超出限制。 最大允许：%lld MB";
+
+/* File validation error 'File not found' */
+"FileValidationError.FileNotFound" = "找不到文件";

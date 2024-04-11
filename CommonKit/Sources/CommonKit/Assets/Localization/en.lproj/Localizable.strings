@@ -880,6 +880,15 @@
 /* Shared alert 'Save to Photos'. Used with saving images to photolibrary */
 "Shared.SaveToPhotolibrary" = "Save to Photos";
 
+/* Shared alert 'Send tokens' */
+"Shared.SendTokens" = "Send tokens";
+
+/* Shared alert 'Upload file' */
+"Shared.UploadFile" = "Upload file";
+
+/* Shared alert 'Upload Media' */
+"Shared.UploadMedia" = "Upload media";
+
 /* Shared alert 'Settings' button. Used to go to system Settings app, on application settings page. Should be same as Settings application title. */
 "Shared.Settings" = "Settings";
 
@@ -1215,3 +1224,24 @@
 
 /* Include partner url */
 "PartnerQR.includePartnerURL" = "Include Web app link";
+
+/* FileManager error 'Can't download file' */
+"FileManagerError.CantDownloadFile" = "Can't download file";
+
+/* FileManager error 'Can't upload file' */
+"FileManagerError.CantUploadFile" = "Can't upload file";
+
+/* FileManager error 'Can't encrypt file' */
+"FileManagerError.CantEncryptFile" = "Can't encrypt file";
+
+/* FileManager error 'Can't decrypt file' */
+"FileManagerError.CantDecryptFile" = "Can't decrypt file";
+
+/* File validation error 'Too many files' */
+"FileValidationError.TooManyFiles" = "Too many files. Maximum allowed: %lld";
+
+/* File validation error 'File size exceeds limit' */
+"FileValidationError.FileSizeExceedsLimit" = "File size exceeds the limit. Maximum allowed: %lld MB";
+
+/* File validation error 'File not found' */
+"FileValidationError.FileNotFound" = "File not found";

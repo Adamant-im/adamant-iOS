@@ -895,6 +895,15 @@
 /* Shared alert 'Save to Photos'. Used with saving images to photolibrary */
 "Shared.SaveToPhotolibrary" = "Im Fotoalbum speichern";
 
+/* Shared alert 'Send tokens' */
+"Shared.SendTokens" = "Tokens senden";
+
+/* Shared alert 'Upload file' */
+"Shared.UploadFile" = "Datei hochladen";
+
+/* Shared alert 'Upload Media' */
+"Shared.UploadMedia" = "Medien hochladen";
+
 /* Shared alert 'Settings' button. Used to go to system Settings app, on application settings page. Should be same as Settings application title. */
 "Shared.Settings" = "Einstellungen";
 
@@ -1242,3 +1251,24 @@
 
 /* Include partner url */
 "PartnerQR.includePartnerURL" = "Koppeling naar webapp opnemen";
+
+/* FileManager error 'Can't download file' */
+"FileManagerError.CantDownloadFile" = "Datei kann nicht heruntergeladen werden";
+
+/* FileManager error 'Can't upload file' */
+"FileManagerError.CantUploadFile" = "Datei kann nicht hochgeladen werden";
+
+/* FileManager error 'Can't encrypt file' */
+"FileManagerError.CantEncryptFile" = "Datei kann nicht verschlüsselt werden";
+
+/* FileManager error 'Can't decrypt file' */
+"FileManagerError.CantDecryptFile" = "Datei kann nicht entschlüsselt werden";
+
+/* File validation error 'Too many files' */
+"FileValidationError.TooManyFiles" = "Zu viele Dateien. Höchstens erlaubt: %lld";
+
+/* File validation error 'File size exceeds limit' */
+"FileValidationError.FileSizeExceedsLimit" = "Dateigröße überschreitet das Limit. Maximal erlaubt: %lld MB";
+
+/* File validation error 'File not found' */
+"FileValidationError.FileNotFound" = "Datei nicht gefunden";

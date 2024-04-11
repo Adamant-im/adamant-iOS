@@ -84,7 +84,7 @@ private extension StorageUsageView {
                 Image(uiImage: previewImage)
                 Text(previewTitle)
             }
-            .onChange(of: viewModel.autoDownloadPreview) { value in
+            .onChange(of: viewModel.autoDownloadPreview) { _ in
                 viewModel.togglePreviewContent()
             }
         }
@@ -93,9 +93,9 @@ private extension StorageUsageView {
 }
 
 private let storageImage: UIImage = .asset(named: "row_storage")!
-private let storageDescription: String = .localized("StorageUsage.Description")
-private let storageTitle: String = .localized("StorageUsage.Title")
-private let clearTitle: String = .localized("StorageUsage.Clear.Title")
+private var storageDescription: String { .localized("StorageUsage.Description") }
+private var storageTitle: String { .localized("StorageUsage.Title") }
+private var clearTitle: String { .localized("StorageUsage.Clear.Title") }
 private let previewImage: UIImage = .asset(named: "row_preview")!
-private let previewTitle: String = .localized("Storage.AutoDownloadPreview.Title")
-private let previewDescription: String = .localized("Storage.AutoDownloadPreview.Description")
+private var previewTitle: String { .localized("Storage.AutoDownloadPreview.Title") }
+private var previewDescription: String { .localized("Storage.AutoDownloadPreview.Description") }

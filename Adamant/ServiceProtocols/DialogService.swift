@@ -22,6 +22,15 @@ extension String.adamant.alert {
     static var saveToPhotolibrary: String {
         String.localized("Shared.SaveToPhotolibrary", comment: "Shared alert 'Save to Photos'. Used with saving images to photolibrary")
     }
+    static var sendTokens: String {
+        String.localized("Shared.SendTokens", comment: "Shared alert 'Send tokens'")
+    }
+    static var uploadFile: String {
+        String.localized("Shared.UploadFile", comment: "Shared alert 'Upload File'")
+    }
+    static var uploadMedia: String {
+        String.localized("Shared.UploadMedia", comment: "Shared alert 'Upload Media'")
+    }
 }
 
 enum AddressChatShareType {
@@ -63,13 +72,13 @@ enum ShareType {
             return String.adamant.alert.saveToPhotolibrary
         
         case .sendTokens:
-            return "Send tokens"
+            return String.adamant.alert.sendTokens
         
         case .uploadMedia:
-            return "Upload media"
+            return String.adamant.alert.uploadMedia
             
         case .uploadFile:
-            return "Upload file"
+            return String.adamant.alert.uploadFile
         }
     }
 }

@@ -877,6 +877,15 @@
 /* Shared alert 'Save to Photos'. Used with saving images to photolibrary */
 "Shared.SaveToPhotolibrary" = "Сохранить в Фото";
 
+/* Shared alert 'Send tokens' */
+"Shared.SendTokens" = "Отправить токены";
+
+/* Shared alert 'Upload file' */
+"Shared.UploadFile" = "Отправить файл";
+
+/* Shared alert 'Upload Media' */
+"Shared.UploadMedia" = "Отправить медиа";
+
 /* Shared alert 'Settings' button. Used to go to system Settings app, on application settings page. Should be same as Settings application title. */
 "Shared.Settings" = "Настройки";
 
@@ -1212,3 +1221,24 @@
 
 /* Include partner url */
 "PartnerQR.includePartnerURL" = "Добавить ссылку на веб-приложение";
+
+/* FileManager error 'Can't download file' */
+"FileManagerError.CantDownloadFile" = "Не удалось загрузить файл";
+
+/* FileManager error 'Can't upload file' */
+"FileManagerError.CantUploadFile" = "Не удалось загрузить файл на сервер";
+
+/* FileManager error 'Can't encrypt file' */
+"FileManagerError.CantEncryptFile" = "Не удалось зашифровать файл";
+
+/* FileManager error 'Can't decrypt file' */
+"FileManagerError.CantDecryptFile" = "Не удалось расшифровать файл";
+
+/* File validation error 'Too many files' */
+"FileValidationError.TooManyFiles" = "Превышено максимально допустимое количество файлов (%lld)";
+
+/* File validation error 'File size exceeds limit' */
+"FileValidationError.FileSizeExceedsLimit" = "Превышен максимально допустимый размер файла (%lld МБ)";
+
+/* File validation error 'File not found' */
+"FileValidationError.FileNotFound" = "Файл не найден";
