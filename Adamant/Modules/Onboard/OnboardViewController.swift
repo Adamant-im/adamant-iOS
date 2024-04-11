@@ -138,12 +138,9 @@ extension OnboardViewController: SwiftyOnboardDelegate, SwiftyOnboardDataSource 
     func swiftyOnboardPageForIndex(_ swiftyOnboard: SwiftyOnboard, index: Int) -> SwiftyOnboardPage? {
         let item = items[index]
         
-        guard let view = OnboardPage.instanceFromNib() as? OnboardPage else {
-            return nil
-        }
+        let view = OnboardPage(image: item.image, text: item.text)
         
-        view.image.image = item.image
-        view.text.delegate = self
+        view.textView.delegate = self
         
         // Font & size logic moved to OnboardPage
         view.rawRichText = item.text

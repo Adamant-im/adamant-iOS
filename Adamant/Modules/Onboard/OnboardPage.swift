@@ -9,12 +9,21 @@
 import UIKit
 import MarkdownKit
 import CommonKit
+import SnapKit
 
 final class OnboardPage: SwiftyOnboardPage {
-
-    @IBOutlet weak var image: UIImageView!
-    @IBOutlet weak var text: UITextView!
-    @IBOutlet weak var bottomLabelConstraint: NSLayoutConstraint!
+    
+    private lazy var mainImageView = UIImageView(image: image)
+    
+    lazy var textView: UITextView = {
+        let text = UITextView()
+        text.textColor = UIColor.adamant.active
+        text.text = self.text
+        text.font = UIFont.adamantPrimary(ofSize: 24)
+        text.backgroundColor = .clear
+        text.isEditable = false
+        return text
+    }()
     
     private var didLayoutSubviews: Bool = false
     
@@ -50,13 +59,19 @@ final class OnboardPage: SwiftyOnboardPage {
         }
     }
     
-    class func instanceFromNib() -> UIView {
-        return UINib(nibName: "OnboardPage", bundle: nil).instantiate(withOwner: nil, options: nil)[0] as! UIView
+    private let image: UIImage?
+    private let text: String
+    
+    init(image: UIImage?, text: String) {
+        self.image = image
+        self.text = text
+        self.rawRichText = text
+        super.init(frame: .zero)
+        setupView()
     }
     
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        text.tintColor = UIColor.adamant.active
+    required public init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     override func layoutSubviews() {
@@ -64,6 +79,22 @@ final class OnboardPage: SwiftyOnboardPage {
         
         didLayoutSubviews = true
         adjustTextView()
+    }
+    
+    private func setupView() {
+        addSubview(mainImageView)
+        addSubview(textView)
+        
+        mainImageView.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.top.equalTo(safeAreaLayoutGuide).offset(70)
+        }
+    
+        textView.snp.makeConstraints { make in
+            make.top.equalTo(mainImageView.snp.bottom).offset(20)
+            make.leading.trailing.equalToSuperview().inset(32)
+            make.bottom.equalToSuperview().offset(-15)
+        }
     }
     
     private func adjustTextView() {
@@ -78,29 +109,29 @@ final class OnboardPage: SwiftyOnboardPage {
         attributedString.apply(font: defaultFont, alignment: .center)
         
         let pureText = attributedString.string
-        text.font = defaultFont
-        text.text = pureText
+        textView.font = defaultFont
+        textView.text = pureText
         adjustTextViewFontSize()
         
-        let fontSize = text.font!.pointSize
+        let fontSize = textView.font!.pointSize
         
         guard maxFontSize != fontSize else {
-            text.text = nil
-            text.font = nil
-            text.attributedText = attributedString
+            textView.text = nil
+            textView.font = nil
+            textView.attributedText = attributedString.resolveLinkColor()
             return
         }
 
         if let font = UIFont(name: fontName, size: fontSize) {
             attributedString.apply(font: font, alignment: .center)
-            text.text = nil
-            text.font = nil
-            text.attributedText = attributedString
+            textView.text = nil
+            textView.font = nil
+            textView.attributedText = attributedString.resolveLinkColor()
         }
     }
     
     private func adjustTextViewFontSize() {
-        guard let textView = text, !textView.text.isEmpty && !textView.bounds.size.equalTo(CGSize.zero) else {
+        guard !textView.text.isEmpty && !textView.bounds.size.equalTo(CGSize.zero) else {
             return
         }
         

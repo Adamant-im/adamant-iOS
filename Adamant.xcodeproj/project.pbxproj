@@ -130,7 +130,6 @@
 		6416B1A321AD7EA1006089AC /* LskTransactionDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6416B1A221AD7EA1006089AC /* LskTransactionDetailsViewController.swift */; };
 		6416B1A721B024B6006089AC /* LskWalletService+Send.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6416B1A621B024B6006089AC /* LskWalletService+Send.swift */; };
 		644793C32166314A00FC4CF5 /* OnboardPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644793C22166314A00FC4CF5 /* OnboardPage.swift */; };
-		644793C52166315900FC4CF5 /* OnboardPage.xib in Resources */ = {isa = PBXBuildFile; fileRef = 644793C42166315900FC4CF5 /* OnboardPage.xib */; };
 		6448C291235CA6E100F3F15B /* ERC20WalletService+RichMessageProviderWithStatusCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6449BA64235CA0930033B936 /* ERC20WalletService+RichMessageProviderWithStatusCheck.swift */; };
 		6449BA68235CA0930033B936 /* ERC20WalletService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6449BA5E235CA0930033B936 /* ERC20WalletService.swift */; };
 		6449BA69235CA0930033B936 /* ERC20TransferViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6449BA5F235CA0930033B936 /* ERC20TransferViewController.swift */; };
@@ -771,7 +770,6 @@
 		6416B1A221AD7EA1006089AC /* LskTransactionDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LskTransactionDetailsViewController.swift; sourceTree = "<group>"; };
 		6416B1A621B024B6006089AC /* LskWalletService+Send.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LskWalletService+Send.swift"; sourceTree = "<group>"; };
 		644793C22166314A00FC4CF5 /* OnboardPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardPage.swift; sourceTree = "<group>"; };
-		644793C42166315900FC4CF5 /* OnboardPage.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OnboardPage.xib; sourceTree = "<group>"; };
 		6449BA5E235CA0930033B936 /* ERC20WalletService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ERC20WalletService.swift; sourceTree = "<group>"; };
 		6449BA5F235CA0930033B936 /* ERC20TransferViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ERC20TransferViewController.swift; sourceTree = "<group>"; };
 		6449BA60235CA0930033B936 /* ERC20Wallet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ERC20Wallet.swift; sourceTree = "<group>"; };
@@ -2165,7 +2163,6 @@
 				645FEB32213E72C100D6BA2D /* OnboardViewController.swift */,
 				645FEB33213E72C100D6BA2D /* OnboardViewController.xib */,
 				644793C22166314A00FC4CF5 /* OnboardPage.swift */,
-				644793C42166315900FC4CF5 /* OnboardPage.xib */,
 				E96BBE3021F70F5E009AA738 /* ReadonlyTextView.swift */,
 			);
 			path = Onboard;
@@ -2803,7 +2800,6 @@
 				4198D57F28C8B834009337F2 /* short-success.mp3 in Resources */,
 				4198D57D28C8B7FA009337F2 /* relax-message-tone.mp3 in Resources */,
 				E983AE2D20E6720D00497E1A /* AccountFooter.xib in Resources */,
-				644793C52166315900FC4CF5 /* OnboardPage.xib in Resources */,
 				E95F85C8200A9B070070534A /* ChatTableViewCell.xib in Resources */,
 				E913C8F91FFFA51D001A83F7 /* Assets.xcassets in Resources */,
 				93496BB42A6CAED100DD062F /* Roboto_400_italic.ttf in Resources */,
