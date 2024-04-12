@@ -320,7 +320,8 @@ final class ChatFileService: ChatFileProtocol {
               let previewNonce = file.file.preview_nonce,
               !filesStorage.isCached(previewId),
               let ownerId = accountService.account?.address,
-              let recipientId = chatroom?.partner?.address
+              let recipientId = chatroom?.partner?.address,
+              NetworkFileProtocolType(rawValue: file.storage) != nil
         else { return }
         
         downloadingFilesIDsArray.append(file.file.file_id)
