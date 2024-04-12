@@ -129,7 +129,10 @@ final class ChatTransactionContentView: UIView {
 
 extension ChatTransactionContentView.Model {
     func height(for width: CGFloat) -> CGFloat {
-        let maxSize = CGSize(width: width, height: .infinity)
+        let maxSize = CGSize(
+                    width: width - 55 - (verticalStackSpacing * 2) - 24 - 24,
+                    height: .infinity
+                )
         let titleString = NSAttributedString(string: title, attributes: [.font: titleFont])
         let dateString = NSAttributedString(string: date, attributes: [.font: dateFont])
         
