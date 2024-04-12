@@ -17,7 +17,7 @@ class ChatFileView: UIView {
     private lazy var spinner: UIActivityIndicatorView = {
         let view = UIActivityIndicatorView(style: .medium)
         view.isHidden = true
-        view.color = .black
+        view.color = .white
         return view
     }()
     
@@ -142,6 +142,7 @@ private extension ChatFileView {
         
         videoIconIV.addShadow()
         downloadImageView.addShadow()
+        spinner.addShadow()
     }
     
     func update() {

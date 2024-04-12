@@ -31,7 +31,7 @@ final class MediaContainerView: UIView {
                 let view = MediaContentView()
                 view.layer.masksToBounds = true
                 view.snp.makeConstraints {
-                    $0.height.equalTo(rowHeight)
+                    $0.height.equalTo(rowVerticalHeight)
                 }
                 stackView.addArrangedSubview(view)
             }
@@ -49,6 +49,11 @@ final class MediaContainerView: UIView {
     }
     
     var actionHandler: (ChatAction) -> Void = { _ in }
+    
+    private var stackWidth: CGFloat {
+        guard !isMacOS else { return defaultStackWidth }
+        return UIScreen.main.bounds.width - screenSpace
+    }
     
     // MARK: - Init
     
@@ -183,12 +188,6 @@ private extension MediaContainerView {
     }
 }
 
-private let stackSpacing: CGFloat = 1
-private let rowHeight: CGFloat = 240
-private let rowVerticalHeight: CGFloat = 200
-private let rowHorizontalHeight: CGFloat = 150
-private let stackWidth: CGFloat = 280
-
 extension ChatMediaContentView.FileModel {
     func height() -> CGFloat {
         let fileList = Array(files.prefix(FilesConstants.maxFilesCount))
@@ -221,3 +220,9 @@ extension ChatMediaContentView.FileModel {
         + stackSpacing * CGFloat(rows.count)
     }
 }
+
+private let stackSpacing: CGFloat = 1
+private let rowVerticalHeight: CGFloat = 200
+private let rowHorizontalHeight: CGFloat = 150
+private let defaultStackWidth: CGFloat = 280
+private let screenSpace: CGFloat = 110
