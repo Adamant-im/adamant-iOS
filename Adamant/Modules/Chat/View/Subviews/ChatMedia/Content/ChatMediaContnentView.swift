@@ -13,7 +13,6 @@ import FilesPickerKit
 
 final class ChatMediaContentView: UIView {
     private let commentLabel = UILabel(
-        font: commentFont,
         textColor: .adamant.textColor,
         numberOfLines: .zero
     )
@@ -235,7 +234,7 @@ private extension ChatMediaContentView {
 
 extension ChatMediaContentView.Model {
     func height() -> CGFloat {
-        let replyViewDynamicHeight: CGFloat = isReply ? replyViewHeight : 0
+        let replyViewDynamicHeight: CGFloat = isReply ? replyViewHeight : .zero
         
         var rowCount: CGFloat = fileModel.isMediaFilesOnly ? .zero : 1
         
@@ -244,12 +243,14 @@ extension ChatMediaContentView.Model {
         }
         
         if !comment.string.isEmpty {
-            rowCount += 1
+            rowCount += 3
         }
+        
+        let stackWidth = MediaContainerView.stackWidth
         
         return fileModel.height()
         + rowCount * verticalStackSpacing
-        + labelSize(for: comment, considering: contentWidth).height
+        + labelSize(for: comment, considering: stackWidth - horizontalInsets).height
         + replyViewDynamicHeight
     }
     
@@ -275,12 +276,7 @@ extension ChatMediaContentView.Model {
     }
 }
 
-private let nameFont = UIFont.systemFont(ofSize: 15)
-private let sizeFont = UIFont.systemFont(ofSize: 13)
-private let imageSize: CGFloat = 70
-private let commentFont = UIFont.systemFont(ofSize: 14)
 private let verticalStackSpacing: CGFloat = 10
 private let verticalInsets: CGFloat = 8
 private let horizontalInsets: CGFloat = 12
 private let replyViewHeight: CGFloat = 25
-private let contentWidth: CGFloat = 280

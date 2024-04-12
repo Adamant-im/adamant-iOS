@@ -84,7 +84,6 @@
              messageContainerSize.width = maxWidth
              messageContainerSize.height = contentViewHeight
              + messageInsets.vertical
-             + additionalHeight
          }
          
          return messageContainerSize

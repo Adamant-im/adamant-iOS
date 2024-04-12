@@ -50,7 +50,7 @@ final class MediaContainerView: UIView {
     
     var actionHandler: (ChatAction) -> Void = { _ in }
     
-    private var stackWidth: CGFloat {
+    static var stackWidth: CGFloat {
         guard !isMacOS else { return defaultStackWidth }
         return UIScreen.main.bounds.width - screenSpace
     }
@@ -75,7 +75,7 @@ private extension MediaContainerView {
         addSubview(filesStack)
         filesStack.snp.makeConstraints {
             $0.directionalEdges.equalToSuperview()
-            $0.width.equalTo(stackWidth)
+            $0.width.equalTo(Self.stackWidth)
         }
     }
     
@@ -136,7 +136,7 @@ private extension MediaContainerView {
         isHorizontal: Bool,
         fileList: [ChatFile]
     ) {
-        let filesStackWidth = stackWidth
+        let filesStackWidth = Self.stackWidth
 
         let minimumWidth = calculateMinimumWidth(availableWidth: filesStackWidth)
         let maximumWidth = calculateMaximumWidth(availableWidth: filesStackWidth)
