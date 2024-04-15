@@ -7,6 +7,22 @@
 
 import Foundation
 
+public enum FilePickersError: Error {
+    case cantSelectFile(String)
+}
+
+extension FilePickersError: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case let .cantSelectFile(name):
+            return String.localizedStringWithFormat(.localized(
+                "FileValidationError.CantSelectFile",
+                comment: "File picker error 'Cant select file'"
+            ), name)
+        }
+    }
+}
+
 public enum FileValidationError: Error {
     case tooManyFiles
     case fileSizeExceedsLimit

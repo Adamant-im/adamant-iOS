@@ -38,76 +38,77 @@ extension MediaPickerService: PHPickerViewControllerDelegate {
 private extension MediaPickerService {
     func processResults(_ results: [PHPickerResult]) async {
         do {
-        var dataArray: [FileResult] = []
-        
-        for result in results {
-            let itemProvider = result.itemProvider
+            var dataArray: [FileResult] = []
             
-            guard let typeIdentifier = itemProvider.registeredTypeIdentifiers.first,
-                  let utType = UTType(typeIdentifier)
-            else {
-                throw FileValidationError.fileNotFound
-            }
-         
-            if utType.conforms(to: .image) {
-                let url = try await helper.getUrl(for: itemProvider)
-                let preview = try getPhoto(from: url)
-                let fileSize = try helper.getFileSize(from: url)
-                
-                let resizedPreview = helper.resizeImage(
-                    image: preview,
-                    targetSize: FilesConstants.previewSize
-                )
-                
-                let previewUrl = try? helper.getUrl(
-                    for: resizedPreview,
-                    name: FilesConstants.previewTag + url.lastPathComponent
-                )
-                
-                dataArray.append(
-                    .init(
-                        url: url,
-                        type: .image,
-                        preview: resizedPreview,
-                        previewUrl: previewUrl,
-                        size: fileSize,
-                        name: itemProvider.suggestedName, 
-                        extenstion: url.pathExtension, 
-                        resolution: preview.size
+            for result in results {
+                let itemProvider = result.itemProvider
+                if isConforms(to: .image, itemProvider.registeredTypeIdentifiers) {
+                    let url = try await helper.getUrlConforms(
+                        to: .image,
+                        for: itemProvider
                     )
-                )
+                    
+                    let preview = try getPhoto(from: url)
+                    let fileSize = try helper.getFileSize(from: url)
+                    
+                    let resizedPreview = helper.resizeImage(
+                        image: preview,
+                        targetSize: FilesConstants.previewSize
+                    )
+                    
+                    let previewUrl = try? helper.getUrl(
+                        for: resizedPreview,
+                        name: FilesConstants.previewTag + url.lastPathComponent
+                    )
+                    
+                    dataArray.append(
+                        .init(
+                            url: url,
+                            type: .image,
+                            preview: resizedPreview,
+                            previewUrl: previewUrl,
+                            size: fileSize,
+                            name: itemProvider.suggestedName,
+                            extenstion: url.pathExtension,
+                            resolution: preview.size
+                        )
+                    )
+                } else if isConforms(to: .movie, itemProvider.registeredTypeIdentifiers) {
+                    let url = try await helper.getUrlConforms(
+                        to: .movie,
+                        for: itemProvider
+                    )
+                    
+                    let fileSize = try helper.getFileSize(from: url)
+                    let originalSize = helper.getOriginalSize(for: url)
+                    
+                    let thumbnailImage = try? await helper.getThumbnailImage(
+                        forUrl: url,
+                        originalSize: originalSize
+                    )
+                    
+                    let previewUrl = try? helper.getUrl(
+                        for: thumbnailImage,
+                        name: FilesConstants.previewTag + url.lastPathComponent
+                    )
+                    
+                    dataArray.append(
+                        .init(
+                            url: url,
+                            type: .video,
+                            preview: thumbnailImage,
+                            previewUrl: previewUrl,
+                            size: fileSize,
+                            name: itemProvider.suggestedName,
+                            extenstion: url.pathExtension,
+                            resolution: originalSize
+                        )
+                    )
+                } else {
+                    throw FilePickersError.cantSelectFile(itemProvider.suggestedName ?? .empty)
+                }
             }
             
-            if utType.conforms(to: .movie) {
-                let url = try await helper.getUrl(for: itemProvider)
-                let fileSize = try helper.getFileSize(from: url)
-                let originalSize = helper.getOriginalSize(for: url)
-                
-                let thumbnailImage = try? await helper.getThumbnailImage(
-                    forUrl: url, 
-                    originalSize: originalSize
-                )
-                
-                let previewUrl = try? helper.getUrl(
-                    for: thumbnailImage,
-                    name: FilesConstants.previewTag + url.lastPathComponent
-                )
-                
-                dataArray.append(
-                    .init(
-                        url: url,
-                        type: .video,
-                        preview: thumbnailImage,
-                        previewUrl: previewUrl,
-                        size: fileSize,
-                        name: itemProvider.suggestedName,
-                        extenstion: url.pathExtension,
-                        resolution: originalSize
-                    )
-                )
-            }
-        }
-        
             try helper.validateFiles(dataArray)
             onPreparedDataCallback?(.success(dataArray))
         } catch {
@@ -117,9 +118,23 @@ private extension MediaPickerService {
     
     func getPhoto(from url: URL) throws -> UIImage {
         guard let image = UIImage(contentsOfFile: url.path) else {
-            throw FileValidationError.fileNotFound
+            throw FilePickersError.cantSelectFile(url.lastPathComponent)
         }
         
         return image
+    }
+    
+    func isConforms(to type: UTType, _ registeredTypeIdentifiers: [String]) -> Bool {
+        for identifier in registeredTypeIdentifiers {
+            guard !identifier.contains("private") else {
+                continue
+            }
+            
+            if let uiType = UTType(identifier), uiType.conforms(to: type) {
+                return true
+            }
+        }
+        
+        return false
     }
 }

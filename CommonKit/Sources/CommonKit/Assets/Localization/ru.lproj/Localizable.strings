@@ -1242,3 +1242,6 @@
 
 /* File validation error 'File not found' */
 "FileValidationError.FileNotFound" = "Файл не найден";
+
+/* File picker error 'Cant select file' */
+"FileValidationError.CantSelectFile" = "Невозможно выбрать файл: %@";

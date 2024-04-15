@@ -564,7 +564,7 @@ private extension ChatViewController {
         
         var phPickerConfig = PHPickerConfiguration(photoLibrary: .shared())
         phPickerConfig.selectionLimit = FilesConstants.maxFilesCount
-        phPickerConfig.filter = PHPickerFilter.any(of: [.images, .videos])
+        phPickerConfig.filter = PHPickerFilter.any(of: [.images, .videos, .livePhotos])
         
         let phPickerVC = PHPickerViewController(configuration: phPickerConfig)
         phPickerVC.delegate = mediaPickerDelegate

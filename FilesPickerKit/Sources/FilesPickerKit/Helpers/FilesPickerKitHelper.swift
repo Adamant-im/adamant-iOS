@@ -157,6 +157,26 @@ final class FilesPickerKitHelper {
     }
     
     @MainActor
+    func getUrlConforms(
+        to type: UTType,
+        for itemProvider: NSItemProvider
+    ) async throws -> URL {
+        for identifier in itemProvider.registeredTypeIdentifiers {
+            guard let utType = UTType(identifier), utType.conforms(to: type) else {
+                continue
+            }
+            
+            do {
+                return try await getFileURL(by: identifier, itemProvider: itemProvider)
+            } catch {
+                continue
+            }
+        }
+        
+        throw FilePickersError.cantSelectFile(itemProvider.suggestedName ?? .empty)
+    }
+    
+    @MainActor
     func getUrl(for itemProvider: NSItemProvider) async throws -> URL {
         for type in itemProvider.registeredTypeIdentifiers {
             do {
