@@ -562,9 +562,15 @@ private extension ChatViewController {
             }
         }
         
+        mediaPickerDelegate.preSelectedFiles = viewModel.filesPicked ?? []
+        
+        let assetIds = viewModel.filesPicked?.compactMap { $0.assetId } ?? []
+
         var phPickerConfig = PHPickerConfiguration(photoLibrary: .shared())
         phPickerConfig.selectionLimit = FilesConstants.maxFilesCount
         phPickerConfig.filter = PHPickerFilter.any(of: [.images, .videos, .livePhotos])
+        phPickerConfig.preselectedAssetIdentifiers = assetIds
+        phPickerConfig.selection = .ordered
         
         let phPickerVC = PHPickerViewController(configuration: phPickerConfig)
         phPickerVC.delegate = mediaPickerDelegate

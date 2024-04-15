@@ -26,6 +26,7 @@ public extension FileType {
 }
 
 public struct FileResult {
+    public let assetId: String?
     public let url: URL
     public let type: FileType
     public let previewUrl: URL?
@@ -36,6 +37,7 @@ public struct FileResult {
     public let resolution: CGSize?
     
     public init(
+        assetId: String? = nil,
         url: URL,
         type: FileType,
         preview: UIImage?,
@@ -45,6 +47,7 @@ public struct FileResult {
         extenstion: String?,
         resolution: CGSize?
     ) {
+        self.assetId = assetId
         self.url = url
         self.type = type
         self.previewUrl = previewUrl

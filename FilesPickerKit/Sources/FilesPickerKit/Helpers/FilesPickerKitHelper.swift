@@ -138,6 +138,7 @@ final class FilesPickerKitHelper {
         let preview = getPreview(for: newUrl)
         let fileSize = try getFileSize(from: newUrl)
         return FileResult(
+            assetId: url.absoluteString,
             url: newUrl,
             type: .other,
             preview: preview.image,

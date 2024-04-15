@@ -765,7 +765,20 @@ final class ChatViewModel: NSObject {
     func processFileResult(_ result: Result<[FileResult], Error>) {
         switch result {
         case .success(let files):
-            filesPicked = files
+            var oldFiles = filesPicked ?? []
+            
+            files.forEach { file in
+                if !oldFiles.contains(where: { $0.assetId == file.assetId }) {
+                    oldFiles.append(file)
+                }
+            }
+            
+            if oldFiles.count > FilesConstants.maxFilesCount {
+                let numberOfExtraElements = oldFiles.count - FilesConstants.maxFilesCount
+                oldFiles.removeFirst(numberOfExtraElements)
+            }
+            
+            filesPicked = oldFiles
         case .failure(let error):
             dialog.send(.alert(error.localizedDescription))
         }

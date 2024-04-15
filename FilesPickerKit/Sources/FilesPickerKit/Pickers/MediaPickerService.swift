@@ -16,6 +16,7 @@ public final class MediaPickerService: NSObject, FilePickerProtocol {
     
     public var onPreparedDataCallback: ((Result<[FileResult], Error>) -> Void)?
     public var onPreparingDataCallback: (() -> Void)?
+    public var preSelectedFiles: [FileResult] = []
     
     public override init() { }
 }
@@ -63,6 +64,7 @@ private extension MediaPickerService {
                     
                     dataArray.append(
                         .init(
+                            assetId: result.assetIdentifier,
                             url: url,
                             type: .image,
                             preview: resizedPreview,
@@ -94,6 +96,7 @@ private extension MediaPickerService {
                     
                     dataArray.append(
                         .init(
+                            assetId: result.assetIdentifier,
                             url: url,
                             type: .video,
                             preview: thumbnailImage,
@@ -105,7 +108,13 @@ private extension MediaPickerService {
                         )
                     )
                 } else {
-                    throw FilePickersError.cantSelectFile(itemProvider.suggestedName ?? .empty)
+                    if let file = preSelectedFiles.first(where: {
+                        $0.assetId == result.assetIdentifier
+                    }) {
+                        dataArray.append(file)
+                    } else {
+                        throw FilePickersError.cantSelectFile(itemProvider.suggestedName ?? .empty)
+                    }
                 }
             }
             
@@ -114,6 +123,8 @@ private extension MediaPickerService {
         } catch {
             onPreparedDataCallback?(.failure(error))
         }
+        
+        preSelectedFiles.removeAll()
     }
     
     func getPhoto(from url: URL) throws -> UIImage {
