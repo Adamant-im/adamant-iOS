@@ -32,6 +32,8 @@ protocol FilesStorageProtocol {
         recipientId: String
     ) throws
     
+    func cacheTemporaryFile(url: URL)
+    
     func getCacheSize() throws -> Int64
     
     func clearCache() throws

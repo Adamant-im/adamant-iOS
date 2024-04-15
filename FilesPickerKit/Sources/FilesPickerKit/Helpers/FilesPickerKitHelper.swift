@@ -60,7 +60,7 @@ final class FilesPickerKitHelper {
             withIntermediateDirectories: true
         )
         
-        let targetURL = folder.appendingPathComponent(url.lastPathComponent)
+        let targetURL = folder.appendingPathComponent(String.random(length: 6) + url.lastPathComponent)
         
         guard targetURL != url else { return url }
         
@@ -144,8 +144,8 @@ final class FilesPickerKitHelper {
             preview: preview.image,
             previewUrl: preview.url,
             size: fileSize,
-            name: newUrl.lastPathComponent,
-            extenstion: newUrl.pathExtension,
+            name: url.lastPathComponent,
+            extenstion: url.pathExtension,
             resolution: preview.resolution
         )
     }

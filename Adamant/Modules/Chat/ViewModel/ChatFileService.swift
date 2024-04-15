@@ -141,6 +141,10 @@ final class ChatFileService: ChatFileProtocol {
             )
         }
         
+        for url in files.compactMap({ $0.previewUrl }) {
+            filesStorage.cacheTemporaryFile(url: url)
+        }
+        
         let txLocally = try await chatsProvider.sendFileMessageLocally(
             messageLocally,
             recipientId: partnerAddress,

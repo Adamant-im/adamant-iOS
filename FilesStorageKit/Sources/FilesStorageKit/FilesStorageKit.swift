@@ -66,6 +66,10 @@ public final class FilesStorageKit {
         )
     }
     
+    public func cacheTemporaryFile(url: URL) {
+        cacheTemporaryFile(with: url)
+    }
+    
     public func getCacheSize() throws -> Int64 {
         let url = try FileManager.default.url(
             for: .cachesDirectory,
@@ -154,6 +158,13 @@ private extension FilesStorageKit {
         }
         
         return fileURLs
+    }
+    
+    func cacheTemporaryFile(with url: URL) {
+        cachedFilesUrl[url.absoluteString] = url
+        if let uiImage = UIImage(contentsOfFile: url.path) {
+            cachedFiles.setObject(uiImage, forKey: url.absoluteString as NSString)
+        }
     }
     
     func cacheFile(

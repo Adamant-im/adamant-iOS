@@ -49,7 +49,11 @@ private extension MediaPickerService {
                         for: itemProvider
                     )
                     
-                    let preview = try getPhoto(from: url)
+                    let preview = try getPhoto(
+                        from: url,
+                        name: itemProvider.suggestedName ?? .empty
+                    )
+                    
                     let fileSize = try helper.getFileSize(from: url)
                     
                     let resizedPreview = helper.resizeImage(
@@ -127,9 +131,9 @@ private extension MediaPickerService {
         preSelectedFiles.removeAll()
     }
     
-    func getPhoto(from url: URL) throws -> UIImage {
+    func getPhoto(from url: URL, name: String) throws -> UIImage {
         guard let image = UIImage(contentsOfFile: url.path) else {
-            throw FilePickersError.cantSelectFile(url.lastPathComponent)
+            throw FilePickersError.cantSelectFile(name)
         }
         
         return image
