@@ -39,6 +39,8 @@ protocol FilesStorageProtocol {
     func clearCache() throws
     
     func clearTempCache() throws
+    
+    func removeTempFiles(at urls: [URL])
 }
 
 extension FilesStorageKit: FilesStorageProtocol { }

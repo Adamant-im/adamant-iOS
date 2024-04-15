@@ -101,6 +101,16 @@ public final class FilesStorageKit {
         cachedFilesUrl.removeAll()
     }
     
+    public func removeTempFiles(at urls: [URL]) {
+        urls.forEach { url in
+            guard FileManager.default.fileExists(
+                atPath: url.path
+            ) else { return }
+            
+            try? FileManager.default.removeItem(at: url)
+        }
+    }
+    
     public func clearTempCache() throws {
         let tempCacheUrl = try FileManager.default.url(
             for: .cachesDirectory,

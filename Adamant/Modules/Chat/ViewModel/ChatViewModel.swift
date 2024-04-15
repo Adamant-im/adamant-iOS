@@ -836,11 +836,14 @@ extension ChatViewModel {
     }
     
     func updateFiles(_ data: [FileResult]?) {
-        filesPicked = data
-        
         if (data?.count ?? .zero) == .zero {
-            try? filesStorage.clearTempCache()
+            let previewUrls = filesPicked?.compactMap { $0.previewUrl } ?? []
+            let fileUrls = filesPicked?.compactMap { $0.url } ?? []
+            
+            filesStorage.removeTempFiles(at: previewUrls + fileUrls)
         }
+        
+        filesPicked = data
     }
 }
 
