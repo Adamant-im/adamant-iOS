@@ -12,4 +12,5 @@ public final class FilesConstants {
     public static let maxFileSize: Int64 = 250 * 1024 * 1024
     public static let previewSize: CGSize = .init(squareSize: 400)
     public static let previewTag: String = "preview_"
+    public static let previewCompressQuality: CGFloat = 0.8
 }

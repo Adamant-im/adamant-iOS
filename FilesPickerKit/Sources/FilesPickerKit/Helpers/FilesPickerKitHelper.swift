@@ -21,7 +21,7 @@ final class FilesPickerKitHelper {
     }
     
     func getUrl(for image: UIImage?, name: String) throws -> URL {
-        guard let data = image?.jpegData(compressionQuality: 1.0) else {
+        guard let data = image?.jpegData(compressionQuality: FilesConstants.previewCompressQuality) else {
             throw FileValidationError.fileNotFound
         }
         
@@ -76,14 +76,7 @@ final class FilesPickerKitHelper {
     func resizeImage(image: UIImage, targetSize: CGSize) -> UIImage {
         let newSize = getPreviewSize(from: image.size)
         
-        let rect = CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height)
-        
-        UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
-        image.draw(in: rect)
-        let newImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        
-        return newImage ?? image
+        return image.imageResized(to: newSize)
     }
     
     func getOriginalSize(for url: URL) -> CGSize? {
