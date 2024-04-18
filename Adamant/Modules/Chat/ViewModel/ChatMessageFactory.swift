@@ -180,17 +180,7 @@ private extension ChatMessageFactory {
         backgroundColor: ChatMessageBackgroundColor
     ) -> ChatMessage.Content {
         transaction.message.map {
-			let attributedString = Self.markdownParser.parse($0)
-            
-            let mutableAttributedString = NSMutableAttributedString(attributedString: attributedString)
-            let paragraphStyle = NSMutableParagraphStyle()
-            paragraphStyle.lineSpacing = 1.15
-            mutableAttributedString.addAttribute(
-                NSAttributedString.Key.paragraphStyle,
-                value: paragraphStyle,
-                range: NSRange(location: 0, length: attributedString.length)
-            )
-            
+            let text = makeAttributed($0)
             let reactions = transaction.reactions
             
             let address = transaction.isOutgoing
@@ -204,7 +194,7 @@ private extension ChatMessageFactory {
             return .message(.init(
                 value: .init(
                     id: transaction.txId,
-                    text: mutableAttributedString,
+                    text: text,
                     backgroundColor: backgroundColor,
                     isFromCurrentSender: isFromCurrentSender,
                     reactions: reactions,
@@ -223,11 +213,12 @@ private extension ChatMessageFactory {
         backgroundColor: ChatMessageBackgroundColor
     ) -> ChatMessage.Content {
         guard let replyId = transaction.getRichValue(for: RichContentKeys.reply.replyToId),
-              let replyMessage = transaction.getRichValue(for: RichContentKeys.reply.replyMessage)
+              let replyMessageRaw = transaction.getRichValue(for: RichContentKeys.reply.replyMessage)
         else {
             return .default
         }
         
+        let replyMessage = makeAttributed(replyMessageRaw)
         let decodedMessage = transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) ?? "..."
         let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
         let reactions = transaction.richContent?[RichContentKeys.react.reactions] as? Set<Reaction>
@@ -244,7 +235,7 @@ private extension ChatMessageFactory {
             value: .init(
                 id: transaction.txId,
                 replyId: replyId,
-                message: Self.markdownParser.parse(replyMessage),
+                message: replyMessage,
                 messageReply: decodedMessageMarkDown,
                 backgroundColor: backgroundColor,
                 isFromCurrentSender: isFromCurrentSender,
@@ -318,9 +309,10 @@ private extension ChatMessageFactory {
         
         let decodedMessage = decodeMessage(transaction)
         let storage = transaction.getRichValue(for: RichContentKeys.file.storage) ?? .empty
-        let comment = transaction.getRichValue(for: RichContentKeys.file.comment) ?? .empty
+        let commentRaw = transaction.getRichValue(for: RichContentKeys.file.comment) ?? .empty
         let replyId = transaction.getRichValue(for: RichContentKeys.reply.replyToId) ?? .empty
         let reactions = transaction.richContent?[RichContentKeys.react.reactions] as? Set<Reaction>
+        let comment = makeAttributed(commentRaw)
         
         let address = transaction.isOutgoing
         ? transaction.senderAddress
@@ -361,7 +353,7 @@ private extension ChatMessageFactory {
                 isReply: transaction.isFileReply(),
                 replyMessage: decodedMessage,
                 replyId: replyId,
-                comment: Self.markdownParser.parse(comment),
+                comment: comment,
                 backgroundColor: backgroundColor
             ),
             address: address,
@@ -369,12 +361,29 @@ private extension ChatMessageFactory {
         )))
     }
     
-    private func decodeMessage(_ transaction: RichMessageTransaction) -> NSMutableAttributedString {
-        let decodedMessage = transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) ?? "..."
-        return  Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
+    func makeAttributed(_ text: String) -> NSMutableAttributedString {
+        let attributedString = Self.markdownParser.parse(text)
+        
+        let mutableAttributedString = NSMutableAttributedString(attributedString: attributedString)
+        
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = lineSpacing
+        
+        mutableAttributedString.addAttribute(
+            NSAttributedString.Key.paragraphStyle,
+            value: paragraphStyle,
+            range: NSRange(location: .zero, length: attributedString.length)
+        )
+        
+        return mutableAttributedString
     }
     
-    private func makeChatFiles(
+    func decodeMessage(_ transaction: RichMessageTransaction) -> NSMutableAttributedString {
+        let decodedMessage = transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) ?? "..."
+        return Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
+    }
+    
+    func makeChatFiles(
         from files: [[String: Any]],
         uploadingFilesIDs: [String],
         downloadingFilesIDs: [String],
@@ -548,3 +557,5 @@ private extension ChatSender {
         )
     }
 }
+
+private let lineSpacing: CGFloat = 1.15

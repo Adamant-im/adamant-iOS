@@ -10,12 +10,10 @@ import SnapKit
 import UIKit
 import CommonKit
 import FilesPickerKit
+import MessageKit
 
 final class ChatMediaContentView: UIView {
-    private let commentLabel = UILabel(
-        textColor: .adamant.textColor,
-        numberOfLines: .zero
-    )
+    private let commentLabel = MessageLabel()
     
     private let spacingView: UIView = {
         let view = UIView()
@@ -88,9 +86,8 @@ final class ChatMediaContentView: UIView {
         view.addSubview(fileContainerView)
         
         fileContainerView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(verticalInsets)
+            make.verticalEdges.equalToSuperview().inset(verticalInsets)
             make.horizontalEdges.equalToSuperview().inset(horizontalInsets)
-            make.bottom.equalToSuperview().offset(-verticalInsets)
         }
         
         return view
@@ -103,9 +100,8 @@ final class ChatMediaContentView: UIView {
         view.addSubview(commentLabel)
         
         commentLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(verticalInsets)
+            make.verticalEdges.equalToSuperview().inset(verticalInsets)
             make.horizontalEdges.equalToSuperview().inset(horizontalInsets)
-            make.bottom.equalToSuperview().offset(-verticalInsets)
         }
         
         return view
@@ -171,6 +167,9 @@ private extension ChatMediaContentView {
         verticalStack.snp.makeConstraints { make in
             make.directionalEdges.equalToSuperview()
         }
+        
+        commentLabel.enabledDetectors = [.url]
+        commentLabel.setAttributes([.foregroundColor: UIColor.adamant.active], detector: .url)
     }
     
     func update() {
@@ -236,21 +235,21 @@ extension ChatMediaContentView.Model {
     func height() -> CGFloat {
         let replyViewDynamicHeight: CGFloat = isReply ? replyViewHeight : .zero
         
-        var rowCount: CGFloat = fileModel.isMediaFilesOnly ? .zero : 1
+        var spaceCount: CGFloat = fileModel.isMediaFilesOnly ? .zero : 1
         
         if isReply {
-            rowCount += 1
+            spaceCount += 2
         }
         
         if !comment.string.isEmpty {
-            rowCount += 3
+            spaceCount += 2
         }
         
         let stackWidth = MediaContainerView.stackWidth
         
         return fileModel.height()
-        + rowCount * verticalStackSpacing
-        + labelSize(for: comment, considering: stackWidth - horizontalInsets).height
+        + spaceCount * verticalInsets
+        + labelSize(for: comment, considering: stackWidth - horizontalInsets * 2).height
         + replyViewDynamicHeight
     }
     
@@ -272,11 +271,11 @@ extension ChatMediaContentView.Model {
         
         let rect = layoutManager.usedRect(for: textContainer)
         
-        return rect.integral.size
+        return .init(width: rect.width, height: rect.height + additionalHeight)
     }
 }
 
-private let verticalStackSpacing: CGFloat = 10
 private let verticalInsets: CGFloat = 8
 private let horizontalInsets: CGFloat = 12
 private let replyViewHeight: CGFloat = 25
+private let additionalHeight: CGFloat = 2

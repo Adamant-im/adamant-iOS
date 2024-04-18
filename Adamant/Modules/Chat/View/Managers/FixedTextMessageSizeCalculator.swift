@@ -83,7 +83,6 @@
              let contentViewHeight: CGFloat = model.value.height()
              messageContainerSize.width = maxWidth
              messageContainerSize.height = contentViewHeight
-             + messageInsets.vertical
          }
          
          return messageContainerSize

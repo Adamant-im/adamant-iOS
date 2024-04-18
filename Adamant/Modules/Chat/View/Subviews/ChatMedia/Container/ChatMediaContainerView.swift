@@ -286,7 +286,14 @@ extension ChatMediaContainerView {
             actionHandler(.reply(message: model))
         }
         
-        return AMenuSection([reply, report, remove])
+        let copy = AMenuItem.action(
+            title: .adamant.chat.copy,
+            systemImageName: "doc.on.doc"
+        ) { [actionHandler, model] in
+            actionHandler(.copy(text: model.content.comment.string))
+        }
+        
+        return AMenuSection([reply, copy, report, remove])
     }
 }
 
