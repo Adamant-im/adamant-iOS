@@ -775,6 +775,12 @@ final class ChatViewModel: NSObject {
             
             if oldFiles.count > FilesConstants.maxFilesCount {
                 let numberOfExtraElements = oldFiles.count - FilesConstants.maxFilesCount
+                let extraFilesToRemove = oldFiles.prefix(numberOfExtraElements)
+                for file in extraFilesToRemove {
+                    let urls = [file.url] + (file.previewUrl.map { [$0] } ?? [])
+                    filesStorage.removeTempFiles(at: urls)
+                }
+                
                 oldFiles.removeFirst(numberOfExtraElements)
             }
             
