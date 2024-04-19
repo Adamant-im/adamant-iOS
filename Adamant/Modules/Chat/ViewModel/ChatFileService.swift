@@ -171,6 +171,8 @@ final class ChatFileService: ChatFileProtocol {
                     recipientId: partnerAddress
                 )
                 
+                var preview: UIImage?
+                
                 if let previewUrl = file.previewUrl,
                    let previewId = result.preview?.cid {
                     try filesStorage.cacheFile(
@@ -179,22 +181,15 @@ final class ChatFileService: ChatFileProtocol {
                         ownerId: ownerId,
                         recipientId: partnerAddress
                     )
+                    
+                    preview = filesStorage.getPreview(
+                        for: previewId,
+                        type: file.extenstion ?? .empty
+                    )
                 }
                 
                 let oldId = file.url.absoluteString
                 uploadingFilesIDsArray.removeAll(where: { $0 == oldId })
-                
-                let previewID: String
-                if let id = result.preview?.cid {
-                    previewID = id
-                } else {
-                    previewID = result.file.cid
-                }
-                
-                let preview = filesStorage.getPreview(
-                    for: previewID,
-                    type: file.extenstion ?? ""
-                )
                 
                 let cached = filesStorage.isCached(result.file.cid)
                 
@@ -289,17 +284,31 @@ final class ChatFileService: ChatFileProtocol {
             recipientId: recipientId
         )
         
-        let previewID: String
-        if let id = file.file.preview_id {
-            previewID = id
-        } else {
-            previewID = file.file.file_id
-        }
+        var preview: UIImage?
         
-        let preview = filesStorage.getPreview(
-            for: previewID,
-            type: file.file.file_type ?? ""
-        )
+        if let previewId = file.file.preview_id,
+           let previewNonce = file.file.preview_nonce,
+           !filesStorage.isCached(previewId) {
+            let data = try await downloadFile(
+                id: previewId,
+                storage: file.storage,
+                senderPublicKey: chatroom?.partner?.publicKey ?? .empty,
+                recipientPrivateKey: keyPair.privateKey,
+                nonce: previewNonce
+            )
+            
+            try filesStorage.cacheFile(
+                id: previewId,
+                data: data,
+                ownerId: ownerId,
+                recipientId: recipientId
+            )
+            
+            preview = filesStorage.getPreview(
+                for: previewId,
+                type: file.file.file_type ?? .empty
+            )
+        }
         
         let cached = filesStorage.isCached(file.file.file_id)
         
