@@ -287,22 +287,23 @@ final class ChatFileService: ChatFileProtocol {
         var preview: UIImage?
         
         if let previewId = file.file.preview_id,
-           let previewNonce = file.file.preview_nonce,
-           !filesStorage.isCached(previewId) {
-            let data = try await downloadFile(
-                id: previewId,
-                storage: file.storage,
-                senderPublicKey: chatroom?.partner?.publicKey ?? .empty,
-                recipientPrivateKey: keyPair.privateKey,
-                nonce: previewNonce
-            )
-            
-            try filesStorage.cacheFile(
-                id: previewId,
-                data: data,
-                ownerId: ownerId,
-                recipientId: recipientId
-            )
+           let previewNonce = file.file.preview_nonce {
+            if !filesStorage.isCached(previewId) {
+                let data = try await downloadFile(
+                    id: previewId,
+                    storage: file.storage,
+                    senderPublicKey: chatroom?.partner?.publicKey ?? .empty,
+                    recipientPrivateKey: keyPair.privateKey,
+                    nonce: previewNonce
+                )
+                
+                try filesStorage.cacheFile(
+                    id: previewId,
+                    data: data,
+                    ownerId: ownerId,
+                    recipientId: recipientId
+                )
+            }
             
             preview = filesStorage.getPreview(
                 for: previewId,
