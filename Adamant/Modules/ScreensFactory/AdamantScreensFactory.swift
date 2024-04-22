@@ -43,7 +43,7 @@ struct AdamantScreensFactory: ScreensFactory {
         vibrationSelectionFactory = .init(parent: assembler)
         partnerQRFactory = .init(parent: assembler)
         coinsNodesListFactory = .init(parent: assembler)
-        chatSelectTextFactory = .init(parent: assembler)
+        chatSelectTextFactory = .init()
         
         walletFactoryCompose = AdamantWalletFactoryCompose(
             lskWalletFactory: .init(assembler: assembler),

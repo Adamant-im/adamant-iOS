@@ -12,12 +12,6 @@ import UIKit
 import SwiftUI
 
 struct ChatSelectTextViewFactory {
-    private let assembler: Assembler
-    
-    init(parent: Assembler) {
-        assembler = parent
-    }
-    
     @MainActor
     func makeViewController(text: String) -> UIViewController {
         let view = SelectTextView(text: text)

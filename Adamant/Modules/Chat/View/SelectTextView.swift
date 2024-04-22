@@ -10,22 +10,22 @@ import Foundation
 import SwiftUI
 
 struct SelectTextView: View {
-    var text: String
-    @Environment(\.dismiss) var dismiss
+    let text: String
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         if #available(iOS 16.0, *) {
             NavigationStack {
-                contentView()
+                contentView
             }
         } else {
             NavigationView {
-                contentView()
+                contentView
             }
         }
     }
     
-    func contentView() -> some View {
+    var contentView: some View {
         VStack {
             TextView(text: text)
                 .accentColor(.blue)
@@ -46,8 +46,8 @@ struct SelectTextView: View {
     }
 }
 
-struct TextView: UIViewRepresentable {
-    var text: String
+private struct TextView: UIViewRepresentable {
+    let text: String
 
     func makeUIView(context: Context) -> UITextView {
         let textView = UITextView()
