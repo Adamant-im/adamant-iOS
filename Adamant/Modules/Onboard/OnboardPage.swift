@@ -10,31 +10,34 @@ import UIKit
 import MarkdownKit
 import CommonKit
 import SnapKit
+import SafariServices
 
 final class OnboardPage: SwiftyOnboardPage {
     
     private lazy var mainImageView = UIImageView(image: image)
     
-    lazy var textView: UITextView = {
-        let text = UITextView()
-        text.textColor = UIColor.adamant.active
-        text.text = self.text
-        text.backgroundColor = .clear
-        text.isEditable = false
+    private lazy var textView: UITextView = {
+        let textView = UITextView()
+        textView.textColor = UIColor.adamant.active
+        textView.backgroundColor = .clear
+        textView.isEditable = false
+        textView.delegate = self
         
         let attributedString = NSMutableAttributedString(
             attributedString: MarkdownParser().parse(self.text)
         )
         
         attributedString.apply(font: UIFont.adamantPrimary(ofSize: 18), alignment: .center)
-        text.attributedText = attributedString
-        text.linkTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor.adamant.active]
-
-        return text
+        textView.attributedText = attributedString
+        textView.linkTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor.adamant.active]
+        
+        return textView
     }()
     
     private let image: UIImage?
     private let text: String
+    
+    var tapURLCompletion: ((URL) -> Void)?
     
     init(image: UIImage?, text: String) {
         self.image = image
@@ -65,5 +68,18 @@ final class OnboardPage: SwiftyOnboardPage {
             make.bottom.equalToSuperview().offset(-150)
             make.height.equalTo(260)
         }
+    }
+}
+
+// MARK: - UITextViewDelegate
+extension OnboardPage: UITextViewDelegate {
+    func textView(
+        _ textView: UITextView,
+        shouldInteractWith URL: URL,
+        in characterRange: NSRange,
+        interaction: UITextItemInteraction
+    ) -> Bool {
+        tapURLCompletion?(URL)
+        return false
     }
 }

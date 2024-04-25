@@ -26,8 +26,6 @@ open class SwiftyOnboardPage: UIView {
     }
     
     func set(style: SwiftyOnboardStyle) {
-//        title.textColor = style.color
-//        subTitle.textColor = style.color
     }
     
     func setUp() {
