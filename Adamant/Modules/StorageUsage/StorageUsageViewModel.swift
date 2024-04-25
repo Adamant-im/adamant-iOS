@@ -17,6 +17,23 @@ public extension Notification.Name {
     }
 }
 
+enum DownloadPolicy: String {
+    case everybody
+    case nobody
+    case contacts
+    
+    var title: String {
+        switch self {
+        case .everybody:
+            return .localized("Storage.DownloadPolicy.Everybody.Title")
+        case .nobody:
+            return .localized("Storage.DownloadPolicy.Nobody.Title")
+        case .contacts:
+            return .localized("Storage.DownloadPolicy.Contacts.Title")
+        }
+    }
+}
+
 @MainActor
 final class StorageUsageViewModel: ObservableObject {
     private let filesStorage: FilesStorageProtocol
@@ -24,7 +41,22 @@ final class StorageUsageViewModel: ObservableObject {
     private let filesStorageProprieties: FilesStorageProprietiesProtocol
     
     @Published var storageUsedDescription: String?
-    @Published var autoDownloadPreview: Bool = true
+    @Published var autoDownloadPreview: DownloadPolicy = .everybody
+    @Published var autoDownloadFullMedia: DownloadPolicy = .everybody
+    
+    enum AutoDownloadMediaType {
+        case preview
+        case fullMedia
+        
+        var title: String {
+            switch self {
+            case .preview:
+                return .localized("Storage.AutoDownloadPreview.Title")
+            case .fullMedia:
+                return .localized("Storage.AutoDownloadFullMedia.Title")
+            }
+        }
+    }
     
     nonisolated init(
         filesStorage: FilesStorageProtocol,
@@ -38,7 +70,8 @@ final class StorageUsageViewModel: ObservableObject {
     }
     
     func loadData() {
-        autoDownloadPreview = filesStorageProprieties.enabledAutoDownloadPreview()
+        autoDownloadPreview = filesStorageProprieties.autoDownloadPreviewPolicy()
+        autoDownloadFullMedia = filesStorageProprieties.autoDownloadFullMediaPolicy()
         updateCacheSize()
     }
     
@@ -60,9 +93,42 @@ final class StorageUsageViewModel: ObservableObject {
         }
     }
     
-    func togglePreviewContent() {
-        filesStorageProprieties.setEnabledAutoDownloadPreview(autoDownloadPreview)
-        NotificationCenter.default.post(name: .Storage.storageProprietiesUpdated, object: nil)
+    func presentPicker(for type: AutoDownloadMediaType) {
+        let action: ((DownloadPolicy) -> Void)? = { [weak self] policy in
+            guard let self = self else { return }
+            
+            switch type {
+            case .preview:
+                self.filesStorageProprieties.setAutoDownloadPreview(policy)
+                self.autoDownloadPreview = policy
+            case .fullMedia:
+                self.filesStorageProprieties.setAutoDownloadFullMedia(policy)
+                self.autoDownloadFullMedia = policy
+            }
+            NotificationCenter.default.post(name: .Storage.storageProprietiesUpdated, object: nil)
+        }
+        
+        dialogService.showAlert(
+            title: nil,
+            message: nil,
+            style: .actionSheet,
+            actions: [
+                makeAction(
+                    title: DownloadPolicy.everybody.title,
+                    action: { [action] _ in action?(.everybody) }
+                ),
+                makeAction(
+                    title: DownloadPolicy.contacts.title,
+                    action: { [action] _ in action?(.contacts) }
+                ),
+                makeAction(
+                    title: DownloadPolicy.nobody.title,
+                    action: { [action] _ in action?(.nobody) }
+                ),
+                makeCancelAction()
+            ],
+            from: nil
+        )
     }
 }
 
@@ -82,5 +148,19 @@ private extension StorageUsageViewModel {
         formatter.countStyle = .file
 
         return formatter.string(fromByteCount: bytes)
+    }
+}
+
+private extension StorageUsageViewModel {
+    func makeAction(title: String, action: ((UIAlertAction) -> Void)?) -> UIAlertAction {
+        .init(
+            title: title,
+            style: .default,
+            handler: action
+        )
+    }
+    
+    func makeCancelAction() -> UIAlertAction {
+        .init(title: .adamant.alert.cancel, style: .cancel, handler: nil)
     }
 }

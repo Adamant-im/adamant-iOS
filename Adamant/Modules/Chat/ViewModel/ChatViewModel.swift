@@ -66,7 +66,8 @@ final class ChatViewModel: NSObject {
     private let partnerImageSize: CGFloat = 25
     private let maxMessageLenght: Int = 10000
     private var previousArg: ChatContextMenuArguments?
-
+    private var havePartnerName: Bool = false
+    
     let minIndexForStartLoadNewMessages = 4
     let minOffsetForStartLoadNewMessages: CGFloat = 100
     var tempOffsets: [String] = []
@@ -368,6 +369,7 @@ final class ChatViewModel: NSObject {
         }.stored(in: tasksStorage)
         
         partnerName = newName
+        havePartnerName = !newName.isEmpty
     }
     
     func saveChatOffset(_ offset: CGFloat?) {
@@ -732,14 +734,17 @@ final class ChatViewModel: NSObject {
         
         guard let message = message,
               tx?.statusEnum == .delivered || (message.status != .failed && message.status != .pending),
-            filesStorageProprieties.enabledAutoDownloadPreview()
+              (filesStorageProprieties.autoDownloadPreviewPolicy() != .nobody ||
+                filesStorageProprieties.autoDownloadFullMediaPolicy() != .nobody)
         else { return }
         
-        chatFileService.downloadPreviewIfNeeded(
-            messageId: messageId,
+        chatFileService.autoDownload(
             file: file,
             isFromCurrentSender: isFromCurrentSender,
-            chatroom: chatroom
+            chatroom: chatroom,
+            havePartnerName: havePartnerName,
+            previewDownloadPolicy: filesStorageProprieties.autoDownloadPreviewPolicy(),
+            fullMediaDownloadPolicy: filesStorageProprieties.autoDownloadFullMediaPolicy()
         )
     }
     
@@ -1057,6 +1062,7 @@ private extension ChatViewModel {
         }
         
         partnerName = chatroom?.getName(addressBookService: addressBookService)
+        havePartnerName = chatroom?.havePartnerName(addressBookService: addressBookService) ?? false
         
         guard let avatarName = chatroom?.partner?.avatar,
               let avatar = UIImage.asset(named: avatarName)

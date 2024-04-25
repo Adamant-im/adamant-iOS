@@ -719,10 +719,25 @@
 "NodesEditor.FailedToBuildURL" = "Некорректный адрес хоста";
 
 /* Storage: Auto download preview */
-"Storage.AutoDownloadPreview.Title" = "Автоматически загружать превью";
+"Storage.AutoDownloadPreview.Title" = "Превью";
+
+/* Storage: Auto download full media */
+"Storage.AutoDownloadFullMedia.Title" = "Медиа полностью";
+
+/* Storage: Download policy */
+"Storage.DownloadPolicy.Everybody.Title" = "Все";
+
+/* Storage: Download policy */
+"Storage.DownloadPolicy.Nobody.Title" = "Никто";
+
+/* Storage: Download policy */
+"Storage.DownloadPolicy.Contacts.Title" = "Контакты";
 
 /* Storage: Auto download preview */
-"Storage.AutoDownloadPreview.Description" = "Автоматическая загрузка превью для фотографий и видео: При включении этой опции приложение может автоматически загружать превью фотографий и видео. Это помогает быстро просматривать медиа-контент без необходимости ожидания полной загрузки файла";
+"Storage.AutoDownloadPreview.Header" = "Автоматическая загрузка медиафайлов";
+
+/* Storage: Auto download preview */
+"Storage.AutoDownloadPreview.Description" = "Чтобы сохранить ADM-адрес в контакты, дайте ему имя";
 
 /* Storage usage: Clear Title */
 "StorageUsage.Clear.Title" = "Очистите весь кэш";

@@ -59,6 +59,7 @@ public extension StoreKey {
     
     enum storage {
         public static let autoDownloadPreviewEnabled = "autoDownloadPreviewEnabled"
+        public static let autoDownloadFullMediaEnabled = "autoDownloadFullMediaEnabled"
     }
 }
 

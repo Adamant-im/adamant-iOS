@@ -30,10 +30,13 @@ struct StorageUsageView: View {
                 
                 Section(
                     content: {
-                        previewContent
+                        autoDownloadContent(for: .preview)
+                            .listRowBackground(Color(uiColor: .adamant.cellColor))
+                        autoDownloadContent(for: .fullMedia)
                             .listRowBackground(Color(uiColor: .adamant.cellColor))
                     },
-                    footer: { Text(verbatim: previewDescription) }
+                    header: { Text(verbatim: autDownloadHeader) },
+                    footer: { Text(verbatim: autDownloadDescription) }
                 )
             }
             .listStyle(.insetGrouped)
@@ -78,17 +81,28 @@ private extension StorageUsageView {
         }
     }
     
-    var previewContent: some View {
-        Toggle(isOn: $viewModel.autoDownloadPreview) {
+    func autoDownloadContent(
+        for type: StorageUsageViewModel.AutoDownloadMediaType
+    ) -> some View {
+        Button {
+            viewModel.presentPicker(for: type)
+        } label: {
             HStack {
                 Image(uiImage: previewImage)
-                Text(previewTitle)
-            }
-            .onChange(of: viewModel.autoDownloadPreview) { _ in
-                viewModel.togglePreviewContent()
+                Text(type.title)
+                
+                Spacer()
+                
+                switch type {
+                case .preview:
+                    Text(viewModel.autoDownloadPreview.title)
+                case .fullMedia:
+                    Text(viewModel.autoDownloadFullMedia.title)
+                }
+                
+                NavigationLink(destination: { EmptyView() }, label: { EmptyView() }).fixedSize()
             }
         }
-        .tint(.init(uiColor: .adamant.active))
     }
 }
 
@@ -97,5 +111,5 @@ private var storageDescription: String { .localized("StorageUsage.Description") 
 private var storageTitle: String { .localized("StorageUsage.Title") }
 private var clearTitle: String { .localized("StorageUsage.Clear.Title") }
 private let previewImage: UIImage = .asset(named: "row_preview")!
-private var previewTitle: String { .localized("Storage.AutoDownloadPreview.Title") }
-private var previewDescription: String { .localized("Storage.AutoDownloadPreview.Description") }
+private var autDownloadHeader: String { .localized("Storage.AutoDownloadPreview.Header") }
+private var autDownloadDescription: String { .localized("Storage.AutoDownloadPreview.Description") }

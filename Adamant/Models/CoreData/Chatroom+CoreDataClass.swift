@@ -47,6 +47,21 @@ public class Chatroom: NSManagedObject {
         return result?.checkAndReplaceSystemWallets()
     }
     
+    @MainActor func havePartnerName(addressBookService: AddressBookService) -> Bool {
+        guard let partner = partner else { return false }
+        
+        if let address = partner.address,
+           let name = addressBookService.getName(for: address) {
+            return true
+        } else if let title = title {
+            return true
+        } else if let name = partner.name {
+            return true
+        }
+        
+        return false
+    }
+    
     private let semaphore = DispatchSemaphore(value: 1)
     
     func updateLastTransaction() {

@@ -9,6 +9,8 @@
 import Foundation
 
 protocol FilesStorageProprietiesProtocol {
-    func enabledAutoDownloadPreview() -> Bool
-    func setEnabledAutoDownloadPreview(_ value: Bool)
+    func autoDownloadPreviewPolicy() -> DownloadPolicy
+    func setAutoDownloadPreview(_ value: DownloadPolicy)
+    func autoDownloadFullMediaPolicy() -> DownloadPolicy
+    func setAutoDownloadFullMedia(_ value: DownloadPolicy)
 }

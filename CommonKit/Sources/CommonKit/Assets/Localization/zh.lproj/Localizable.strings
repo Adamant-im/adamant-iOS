@@ -677,10 +677,25 @@
 "NodeList.DefaultNodesLoaded" = "已加载默认节点列表";
 
 /* Storage: Auto download preview */
-"Storage.AutoDownloadPreview.Title" = "自动下载预览";
+"Storage.AutoDownloadPreview.Title" = "预览";
+
+/* Storage: Auto download full media */
+"Storage.AutoDownloadFullMedia.Title" = "完整媒体文件";
+
+/* Storage: Download policy */
+"Storage.DownloadPolicy.Everybody.Title" = "每个人";
+
+/* Storage: Download policy */
+"Storage.DownloadPolicy.Nobody.Title" = "没有人";
+
+/* Storage: Download policy */
+"Storage.DownloadPolicy.Contacts.Title" = "我的联系人";
 
 /* Storage: Auto download preview */
-"Storage.AutoDownloadPreview.Description" = "自动下载照片和视频预览：当启用此选项时，应用程序可以自动下载照片和视频的预览。这有助于快速预览媒体内容，而无需等待完整文件下载";
+"Storage.AutoDownloadPreview.Description" = "要创建联系人，请为ADM地址命名";
+
+/* Storage: Auto download preview */
+"Storage.AutoDownloadPreview.Header" = "自动下载媒体文件";
 
 /* Storage usage: Clear Title */
 "StorageUsage.Clear.Title" = "清除整个缓存";

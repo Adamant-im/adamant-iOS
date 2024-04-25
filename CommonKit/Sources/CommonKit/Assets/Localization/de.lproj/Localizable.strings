@@ -734,10 +734,25 @@
 "NodesEditor.FailedToBuildURL" = "Invalid host";
 
 /* Storage: Auto download preview */
-"Storage.AutoDownloadPreview.Title" = "Automatisches Herunterladen von Vorschaubildern";
+"Storage.AutoDownloadPreview.Title" = "Vorschau";
+
+/* Storage: Auto download full media */
+"Storage.AutoDownloadFullMedia.Title" = "Vollständige Medien";
+
+/* Storage: Download policy */
+"Storage.DownloadPolicy.Everybody.Title" = "Alle";
+
+/* Storage: Download policy */
+"Storage.DownloadPolicy.Nobody.Title" = "Niemand";
+
+/* Storage: Download policy */
+"Storage.DownloadPolicy.Contacts.Title" = "Meine Kontakte";
 
 /* Storage: Auto download preview */
-"Storage.AutoDownloadPreview.Description" = "Automatisches Herunterladen von Vorschauen für Fotos und Videos: Wenn diese Option aktiviert ist, kann die Anwendung automatisch Vorschauen von Fotos und Videos herunterladen. Dies erleichtert das schnelle Anzeigen von Mediendateien, ohne auf den vollständigen Download der Datei warten zu müssen";
+"Storage.AutoDownloadPreview.Description" = "Um einen Kontakt zu erstellen, geben Sie der ADM-Adresse einen Namen";
+
+/* Storage: Auto download preview */
+"Storage.AutoDownloadPreview.Header" = "Automatischer Download von Medien";
 
 /* Storage usage: Clear Title */
 "StorageUsage.Clear.Title" = "Clear entire cache";

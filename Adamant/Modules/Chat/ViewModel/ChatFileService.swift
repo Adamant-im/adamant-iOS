@@ -37,11 +37,13 @@ protocol ChatFileProtocol {
         chatroom: Chatroom?
     ) async throws
     
-    func downloadPreviewIfNeeded(
-        messageId: String,
+    func autoDownload(
         file: ChatFile,
         isFromCurrentSender: Bool,
-        chatroom: Chatroom?
+        chatroom: Chatroom?,
+        havePartnerName: Bool,
+        previewDownloadPolicy: DownloadPolicy,
+        fullMediaDownloadPolicy: DownloadPolicy
     )
 }
 
@@ -259,121 +261,68 @@ final class ChatFileService: ChatFileProtocol {
         isFromCurrentSender: Bool,
         chatroom: Chatroom?
     ) async throws {
-        guard let keyPair = accountService.keypair,
-              let ownerId = accountService.account?.address,
-              let recipientId = chatroom?.partner?.address
-        else { return }
-        
-        defer {
-            downloadingFilesIDsArray.removeAll(where: { $0 == file.file.file_id })
-        }
-        downloadingFilesIDsArray.append(file.file.file_id)
-        
-        let data = try await downloadFile(
-            id: file.file.file_id,
-            storage: file.storage,
-            senderPublicKey: chatroom?.partner?.publicKey ?? .empty,
-            recipientPrivateKey: keyPair.privateKey,
-            nonce: file.nonce
+        try await downloadFile(
+            file: file,
+            isFromCurrentSender: isFromCurrentSender,
+            chatroom: chatroom,
+            shouldDownloadOriginalFile: true,
+            shouldDownloadPreviewFile: true
         )
-        
-        try filesStorage.cacheFile(
-            id: file.file.file_id,
-            data: data,
-            ownerId: ownerId,
-            recipientId: recipientId
-        )
-        
-        var preview: UIImage?
-        
-        if let previewId = file.file.preview_id,
-           let previewNonce = file.file.preview_nonce {
-            if !filesStorage.isCached(previewId) {
-                let data = try await downloadFile(
-                    id: previewId,
-                    storage: file.storage,
-                    senderPublicKey: chatroom?.partner?.publicKey ?? .empty,
-                    recipientPrivateKey: keyPair.privateKey,
-                    nonce: previewNonce
-                )
-                
-                try filesStorage.cacheFile(
-                    id: previewId,
-                    data: data,
-                    ownerId: ownerId,
-                    recipientId: recipientId
-                )
-            }
-            
-            preview = filesStorage.getPreview(
-                for: previewId,
-                type: file.file.file_type ?? .empty
-            )
-        }
-        
-        let cached = filesStorage.isCached(file.file.file_id)
-        
-        updateFileFields.send((
-            id: file.file.file_id,
-            newId: nil,
-            preview: preview,
-            cached: cached
-        ))
     }
     
-    func downloadPreviewIfNeeded(
-        messageId: String,
+    func autoDownload(
         file: ChatFile,
         isFromCurrentSender: Bool,
-        chatroom: Chatroom?
+        chatroom: Chatroom?,
+        havePartnerName: Bool,
+        previewDownloadPolicy: DownloadPolicy,
+        fullMediaDownloadPolicy: DownloadPolicy
     ) {
-        guard let keyPair = accountService.keypair,
-              !downloadingFilesIDsArray.contains(file.file.file_id),
-              !ignoreFilesIDsArray.contains(file.file.file_id),
-              let previewId = file.file.preview_id,
-              let previewNonce = file.file.preview_nonce,
-              !filesStorage.isCached(previewId),
-              let ownerId = accountService.account?.address,
-              let recipientId = chatroom?.partner?.address,
-              NetworkFileProtocolType(rawValue: file.storage) != nil
-        else { return }
-        
-        downloadingFilesIDsArray.append(file.file.file_id)
+        guard !downloadingFilesIDsArray.contains(file.file.file_id),
+              !ignoreFilesIDsArray.contains(file.file.file_id)
+        else {
+            return
+        }
         
         Task {
-            defer {
-                downloadingFilesIDsArray.removeAll(where: { $0 == file.file.file_id })
+            let shouldDownloadPreviewFile: Bool
+            switch previewDownloadPolicy {
+            case .nobody:
+                shouldDownloadPreviewFile = false
+            case .everybody:
+                shouldDownloadPreviewFile = needsPreviewDownload(file: file)
+                ? true
+                : false
+            case .contacts:
+                shouldDownloadPreviewFile = needsPreviewDownload(file: file)
+                ? havePartnerName
+                : false
             }
             
+            let shouldDownloadOriginalFile: Bool
+            switch fullMediaDownloadPolicy {
+            case .nobody:
+                shouldDownloadOriginalFile = false
+            case .everybody:
+                shouldDownloadOriginalFile = !filesStorage.isCached(file.file.file_id)
+                ? true
+                : false
+            case .contacts:
+                shouldDownloadOriginalFile = !filesStorage.isCached(file.file.file_id)
+                ? havePartnerName
+                : false
+            }
+            
+            guard shouldDownloadOriginalFile || shouldDownloadPreviewFile else { return }
+            
             do {
-                let data = try await downloadFile(
-                    id: previewId,
-                    storage: file.storage,
-                    senderPublicKey: chatroom?.partner?.publicKey ?? .empty,
-                    recipientPrivateKey: keyPair.privateKey,
-                    nonce: previewNonce
+                try await downloadFile(
+                    file: file,
+                    isFromCurrentSender: isFromCurrentSender,
+                    chatroom: chatroom,
+                    shouldDownloadOriginalFile: shouldDownloadOriginalFile,
+                    shouldDownloadPreviewFile: shouldDownloadPreviewFile
                 )
-                
-                try filesStorage.cacheFile(
-                    id: previewId,
-                    data: data,
-                    ownerId: ownerId,
-                    recipientId: recipientId
-                )
-                
-                let preview = filesStorage.getPreview(
-                    for: previewId,
-                    type: file.file.file_type ?? .empty
-                )
-                
-                let cached = filesStorage.isCached(file.file.file_id)
-                
-                updateFileFields.send((
-                    id: file.file.file_id,
-                    newId: nil,
-                    preview: preview,
-                    cached: cached
-                ))
             } catch {
                 ignoreFilesIDsArray.append(file.file.file_id)
             }
@@ -398,6 +347,119 @@ private extension ChatFileService {
 }
 
 private extension ChatFileService {
+    func downloadFile(
+        file: ChatFile,
+        isFromCurrentSender: Bool,
+        chatroom: Chatroom?,
+        shouldDownloadOriginalFile: Bool,
+        shouldDownloadPreviewFile: Bool
+    ) async throws {
+        guard let keyPair = accountService.keypair,
+              let ownerId = accountService.account?.address,
+              let recipientId = chatroom?.partner?.address,
+              NetworkFileProtocolType(rawValue: file.storage) != nil,
+              (shouldDownloadOriginalFile || shouldDownloadPreviewFile)
+        else { return }
+        
+        defer {
+            downloadingFilesIDsArray.removeAll(where: { $0 == file.file.file_id })
+        }
+        downloadingFilesIDsArray.append(file.file.file_id)
+        
+        var preview: UIImage?
+        
+        if let previewId = file.file.preview_id,
+           let previewNonce = file.file.preview_nonce {
+            
+            if shouldDownloadPreviewFile,
+               !filesStorage.isCached(previewId) {
+                try await downloadAndCacheFile(
+                    id: previewId,
+                    nonce: previewNonce,
+                    storage: file.storage,
+                    publicKey: chatroom?.partner?.publicKey ?? .empty,
+                    privateKey: keyPair.privateKey,
+                    ownerId: ownerId,
+                    recipientId: recipientId
+                )
+            }
+            
+            preview = filesStorage.getPreview(
+                for: previewId,
+                type: file.file.file_type ?? .empty
+            )
+            
+            if shouldDownloadPreviewFile {
+                let cached = filesStorage.isCached(file.file.file_id)
+                
+                updateFileFields.send((
+                    id: file.file.file_id,
+                    newId: nil,
+                    preview: preview,
+                    cached: cached
+                ))
+            }
+        }
+        
+        if shouldDownloadOriginalFile,
+           !filesStorage.isCached(file.file.file_id) {
+            try await downloadAndCacheFile(
+                id: file.file.file_id,
+                nonce: file.nonce,
+                storage: file.storage,
+                publicKey: chatroom?.partner?.publicKey ?? .empty,
+                privateKey: keyPair.privateKey,
+                ownerId: ownerId,
+                recipientId: recipientId
+            )
+            
+            let cached = filesStorage.isCached(file.file.file_id)
+            
+            updateFileFields.send((
+                id: file.file.file_id,
+                newId: nil,
+                preview: preview,
+                cached: cached
+            ))
+        }
+    }
+    
+    func downloadAndCacheFile(
+        id: String,
+        nonce: String,
+        storage: String,
+        publicKey: String,
+        privateKey: String,
+        ownerId: String,
+        recipientId: String
+    ) async throws {
+        let data = try await downloadFile(
+            id: id,
+            storage: storage,
+            senderPublicKey: publicKey,
+            recipientPrivateKey: privateKey,
+            nonce: nonce
+        )
+        
+        try filesStorage.cacheFile(
+            id: id,
+            data: data,
+            ownerId: ownerId,
+            recipientId: recipientId
+        )
+    }
+    
+    func needsPreviewDownload(file: ChatFile) -> Bool {
+        if let previewId = file.file.preview_id,
+           file.file.preview_nonce != nil,
+           !ignoreFilesIDsArray.contains(previewId),
+           !filesStorage.isCached(previewId) {
+            return true
+        }
+        
+        return false
+    }
+    
     func uploadFileToServer(
         file: FileResult,
         recipientPublicKey: String,
