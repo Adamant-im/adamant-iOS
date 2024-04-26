@@ -20,43 +20,22 @@ struct StorageUsageView: View {
     var body: some View {
         VStack {
             List {
-                Section(
-                    content: {
-                        content
-                            .listRowBackground(Color(uiColor: .adamant.cellColor))
-                    },
-                    footer: { Text(verbatim: storageDescription) }
-                )
-                
-                Section(
-                    content: {
-                        autoDownloadContent(for: .preview)
-                            .listRowBackground(Color(uiColor: .adamant.cellColor))
-                        autoDownloadContent(for: .fullMedia)
-                            .listRowBackground(Color(uiColor: .adamant.cellColor))
-                    },
-                    header: { Text(verbatim: autDownloadHeader) },
-                    footer: { Text(verbatim: autDownloadDescription) }
-                )
+                storageSection
+                autoDownloadSection
             }
             .listStyle(.insetGrouped)
             .navigationTitle(storageTitle)
             
             Spacer()
             
-            HStack {
-                Button {
-                    viewModel.clearStorage()
-                } label: {
-                    Text(clearTitle)
-                        .foregroundColor(.white)
-                }
-                .frame(maxWidth: .infinity)
-                .frame(height: 50)
-                .background(Color(uiColor: UIColor.adamant.active))
-                .clipShape(.rect(cornerRadius: 8.0))
-                .padding()
-            }
+            makeClearButton()
+        }
+        .alert(
+            clearPopupTitle,
+            isPresented: $viewModel.isRemoveAlertShown
+        ) {
+            Button(String.adamant.alert.cancel, role: .cancel) {}
+            Button(clearTitle) { viewModel.clearStorage() }
         }
         .onAppear(perform: {
             viewModel.loadData()
@@ -67,10 +46,33 @@ struct StorageUsageView: View {
 }
 
 private extension StorageUsageView {
+    var storageSection: some View {
+        Section(
+            content: {
+                content
+                    .listRowBackground(Color(uiColor: .adamant.cellColor))
+            },
+            footer: { Text(verbatim: storageDescription) }
+        )
+    }
+    
+    var autoDownloadSection: some View {
+        Section(
+            content: {
+                autoDownloadContent(for: .preview)
+                    .listRowBackground(Color(uiColor: .adamant.cellColor))
+                autoDownloadContent(for: .fullMedia)
+                    .listRowBackground(Color(uiColor: .adamant.cellColor))
+            },
+            header: { Text(verbatim: autDownloadHeader) },
+            footer: { Text(verbatim: autDownloadDescription) }
+        )
+    }
+    
     var content: some View {
         HStack {
             Image(uiImage: storageImage)
-            Text(verbatim: storageTitle)
+            Text(verbatim: storageUsedTitle)
             Spacer()
             if let storage = viewModel.storageUsedDescription {
                 Text(storage)
@@ -104,11 +106,29 @@ private extension StorageUsageView {
             }
         }
     }
+    
+    func makeClearButton() -> some View {
+        Button(action: showClearAlert) {
+            Text(clearTitle)
+                .expanded(axes: .horizontal)
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 45)
+        .background(Color(uiColor: .adamant.cellColor))
+        .clipShape(.rect(cornerRadius: 8.0))
+        .padding()
+    }
+    
+    func showClearAlert() {
+        viewModel.isRemoveAlertShown = true
+    }
 }
 
+private var storageUsedTitle: String { .localized("StorageUsed.Title") }
 private let storageImage: UIImage = .asset(named: "row_storage")!
 private var storageDescription: String { .localized("StorageUsage.Description") }
 private var storageTitle: String { .localized("StorageUsage.Title") }
+private var clearPopupTitle: String { .localized("StorageUsage.Clear.Popup.Title") }
 private var clearTitle: String { .localized("StorageUsage.Clear.Title") }
 private let previewImage: UIImage = .asset(named: "row_preview")!
 private var autDownloadHeader: String { .localized("Storage.AutoDownloadPreview.Header") }

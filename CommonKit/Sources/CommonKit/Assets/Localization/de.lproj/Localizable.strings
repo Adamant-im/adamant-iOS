@@ -754,14 +754,20 @@
 /* Storage: Auto download preview */
 "Storage.AutoDownloadPreview.Header" = "Automatischer Download von Medien";
 
+/* Storage usage: Clear Popup Title */
+"StorageUsage.Clear.Popup.Title" = "Sind Sie sicher, dass Sie die Daten aus dem Speicher löschen möchten?";
+
 /* Storage usage: Clear Title */
-"StorageUsage.Clear.Title" = "Clear entire cache";
+"StorageUsage.Clear.Title" = "Klarer Speicher";
 
 /* Storage usage: Title */
-"StorageUsage.Title" = "Gesamten Cache löschen";
+"StorageUsage.Title" = "Speicherung und Daten";
+
+/* Storage used: Title */
+"StorageUsed.Title" = "Speicherung";
 
 /* Storage usage: Description */
-"StorageUsage.Description" = "Dieses Feld zeigt die Gesamtmenge an Platz auf dem Gerät, die von Daten-Dateien belegt wird, die mit der Anwendung verbunden sind, wie Bilder, Videos, Audiodateien und Dokumente";
+"StorageUsage.Description" = "Gesamtgröße der Dateien und Bilder im sicheren Speicher der App";
 
 /* Security: Notification modes description. Markdown supported. */
 "SecurityPage.Row.Notifications.ModesDescription" = "#### Benachrichtigungsmodi\n\n#### Deaktiviert\nKeine Benachrichtigungen.\n\n#### Hintergrundaktualisierung\nIhr Gerät erhält neue Nachrichteninformationen automatisch. Keine externen Aufrufe. Die Hintergrundaktualisierung wird von iOS verwaltet, die Zeit wird vom Betriebssystem bestimmt und ist von vielen Faktoren wie Akkustand, Netzwerkauslastung, Nutzungsmuster abhängig und kann nicht vorhergesagt werden. Es können 20 Minuten, 6 Stunden, oder ein Tag sein. Sie können die App trotzdem öffnen und nachschauen, ob eine Nachricht angekommen ist.\n\n#### Push\nBenachrichtigungen werden auf Ihr Gerät vom ADAMANT Benachrichtigungsservice gesendet. Sie erhalten eine Benachrichtigung umgehend, nachdem die Nachricht versendet und von der Blockchain bestätigt wurde - mit einer kleinen Verzögerung. Jedoch erfordert dieser Modus, dass der Gerätetoken Ihres Geräts in der Servicedatenbank registriert ist. Gerätetokens sind sicher, und diese Option ist zu empfehlen.\n\nSie können mehr über die Geräteregistrierung auf der ADAMANTs Github-Seite nachlesen.";
@@ -911,13 +917,13 @@
 "Shared.SaveToPhotolibrary" = "Im Fotoalbum speichern";
 
 /* Shared alert 'Send tokens' */
-"Shared.SendTokens" = "Tokens senden";
+"Shared.SendTokens" = "💸 Tokens senden";
 
 /* Shared alert 'Upload file' */
-"Shared.UploadFile" = "Datei hochladen";
+"Shared.UploadFile" = "📄 Datei hochladen";
 
 /* Shared alert 'Upload Media' */
-"Shared.UploadMedia" = "Medien hochladen";
+"Shared.UploadMedia" = "📸 Medien hochladen";
 
 /* Shared alert 'Settings' button. Used to go to system Settings app, on application settings page. Should be same as Settings application title. */
 "Shared.Settings" = "Einstellungen";

@@ -698,13 +698,19 @@
 "Storage.AutoDownloadPreview.Header" = "自动下载媒体文件";
 
 /* Storage usage: Clear Title */
-"StorageUsage.Clear.Title" = "清除整个缓存";
+"StorageUsage.Clear.Title" = "清晰的存储";
+
+/* Storage usage: Clear Popup Title */
+"StorageUsage.Clear.Popup.Title" = "您确定要从存储中删除数据吗？";
 
 /* Storage usage: Title */
-"StorageUsage.Title" = "存储使用";
+"StorageUsage.Title" = "存储和数据";
+
+/* Storage used: Title */
+"StorageUsed.Title" = "存储";
 
 /* Storage usage: Description */
-"StorageUsage.Description" = "该字段显示与应用程序关联的数据文件（如图像、视频、音频文件和文档）在设备上占用的总空间量";
+"StorageUsage.Description" = "应用程序安全存储中的文件和图像总大小";
 
 /* CoinsNodesList: Title */
 "CoinsNodesList.Title" = "Coin和服务节点列表";
@@ -896,13 +902,13 @@
 "Shared.SaveToPhotolibrary" = "保存到照片";
 
 /* Shared alert 'Send tokens' */
-"Shared.SendTokens" = "发送代币";
+"Shared.SendTokens" = "💸 发送代币";
 
 /* Shared alert 'Upload file' */
-"Shared.UploadFile" = "上传文件";
+"Shared.UploadFile" = "📄 上传文件";
 
 /* Shared alert 'Upload Media' */
-"Shared.UploadMedia" = "上传媒体";
+"Shared.UploadMedia" = "📸 上传媒体";
 
 /* Shared alert 'Settings' button. Used to go to system Settings app, on application settings page. Should be same as Settings application title. */
 "Shared.Settings" = "设置";

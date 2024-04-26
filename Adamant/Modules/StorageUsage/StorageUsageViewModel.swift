@@ -43,6 +43,7 @@ final class StorageUsageViewModel: ObservableObject {
     @Published var storageUsedDescription: String?
     @Published var autoDownloadPreview: DownloadPolicy = .everybody
     @Published var autoDownloadFullMedia: DownloadPolicy = .everybody
+    @Published var isRemoveAlertShown: Bool = false
     
     enum AutoDownloadMediaType {
         case preview
@@ -66,7 +67,6 @@ final class StorageUsageViewModel: ObservableObject {
         self.filesStorage = filesStorage
         self.dialogService = dialogService
         self.filesStorageProprieties = filesStorageProprieties
-        
     }
     
     func loadData() {
