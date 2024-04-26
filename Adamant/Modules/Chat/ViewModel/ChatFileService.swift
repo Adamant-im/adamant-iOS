@@ -299,16 +299,17 @@ final class ChatFileService: ChatFileProtocol {
                 : false
             }
             
+            let isMedia = file.fileType == .image || file.fileType == .video
             let shouldDownloadOriginalFile: Bool
             switch fullMediaDownloadPolicy {
             case .nobody:
                 shouldDownloadOriginalFile = false
             case .everybody:
-                shouldDownloadOriginalFile = !filesStorage.isCached(file.file.file_id)
+                shouldDownloadOriginalFile = !filesStorage.isCached(file.file.file_id) && isMedia
                 ? true
                 : false
             case .contacts:
-                shouldDownloadOriginalFile = !filesStorage.isCached(file.file.file_id)
+                shouldDownloadOriginalFile = !filesStorage.isCached(file.file.file_id) && isMedia
                 ? havePartnerName
                 : false
             }
