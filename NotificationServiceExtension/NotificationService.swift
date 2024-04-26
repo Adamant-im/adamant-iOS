@@ -141,7 +141,10 @@ class NotificationService: UNNotificationServiceExtension {
                     handleAdamantTransfer(notificationContent: bestAttemptContent, partnerAddress: partnerAddress, partnerName: partnerName, amount: transaction.amount, comment: message)
                 } else { // Message
                     bestAttemptContent.title = partnerName ?? partnerAddress
-                    bestAttemptContent.body = MarkdownParser().parse(message).string // Strip markdown
+                    var text = MarkdownParser().parse(message).string
+                    text = text.replacingOccurrences(of: "\n", with: "↵ ")
+                    
+                    bestAttemptContent.body = text
                     bestAttemptContent.categoryIdentifier = AdamantNotificationCategories.message
                 }
             
@@ -183,10 +186,12 @@ class NotificationService: UNNotificationServiceExtension {
                    let message = richContent[RichContentKeys.reply.replyMessage] as? String,
                    richContent[RichContentKeys.reply.replyToId] != nil,
                    transaction.amount <= 0 {
+                    var text = MarkdownParser().parse(message).string
+                    text = text.replacingOccurrences(of: "\n", with: "↵ ")
                     content = NotificationContent(
                         title: partnerName ?? partnerAddress,
                         subtitle: nil,
-                        body: MarkdownParser().parse(message).string,
+                        body: text,
                         attachments: nil,
                         categoryIdentifier: AdamantNotificationCategories.message
                     )
