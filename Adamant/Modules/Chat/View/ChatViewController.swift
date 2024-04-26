@@ -108,7 +108,6 @@ final class ChatViewController: MessagesViewController {
         configureGestures()
         setupObservers()
         viewModel.loadFirstMessagesIfNeeded()
-        viewModel.presentKeyboardOnStartIfNeeded()
     }
     
     override func viewWillLayoutSubviews() {
@@ -129,6 +128,10 @@ final class ChatViewController: MessagesViewController {
         defer { viewAppeared = true }
         inputBar.isUserInteractionEnabled = true
         chatMessagesCollectionView.fixedBottomOffset = nil
+        
+        if !viewAppeared {
+            viewModel.presentKeyboardOnStartIfNeeded()
+        }
         
         guard isMacOS, !viewAppeared else { return }
         focusInputBarWithoutAnimation()
