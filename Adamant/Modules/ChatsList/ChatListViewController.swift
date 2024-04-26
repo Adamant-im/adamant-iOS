@@ -966,7 +966,7 @@ extension ChatListViewController {
             if richMessage.additionalType == .reply,
                let content = richMessage.richContent,
                richMessage.isFileReply() {
-                let text = getRawFilePresentation(content)
+                let text = FilePresentationHelper.getFilePresentationText(content)
                 return getRawReplyPresentation(isOutgoing: richMessage.isOutgoing, text: text)
             }
             
@@ -976,7 +976,7 @@ extension ChatListViewController {
                 ? "\(String.adamant.chatList.sentMessagePrefix)"
                 : ""
                 
-                let fileText = getRawFilePresentation(content)
+                let fileText = FilePresentationHelper.getFilePresentationText(content)
                 
                 let attributesText = markdownParser.parse(prefix + fileText).resolveLinkColor()
                 
@@ -1003,19 +1003,6 @@ extension ChatListViewController {
         default:
             return nil
         }
-    }
-    
-    private func getRawFilePresentation(_ richContent: [String: Any]) -> String {
-        let content = richContent[RichContentKeys.reply.replyMessage] as? [String: Any] ?? richContent
-        
-        let files = content[RichContentKeys.file.files] as? [[String: Any]] ?? []
-        
-        let rawComment: String = (content[RichContentKeys.file.comment] as? String) ?? .empty
-        let comment = !rawComment.isEmpty
-        ? ": \(rawComment)"
-        : ""
-        
-        return "[\(files.count) file(s)]\(comment)"
     }
     
     private func getRawReplyPresentation(isOutgoing: Bool, text: String) -> NSMutableAttributedString {

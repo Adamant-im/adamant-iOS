@@ -239,7 +239,7 @@ class NotificationService: UNNotificationServiceExtension {
                    let replyMessage = richContent[RichContentKeys.reply.replyMessage] as? [String: Any],
                    replyMessage[RichContentKeys.file.files] is [[String: Any]] {
                     
-                    let text = getRawFilePresentation(richContent)
+                    let text = FilePresentationHelper.getFilePresentationText(richContent)
                     content = NotificationContent(
                         title: partnerName ?? partnerAddress,
                         subtitle: nil,
@@ -254,7 +254,7 @@ class NotificationService: UNNotificationServiceExtension {
                    let richContent = RichMessageTools.richContent(from: data),
                    richContent[RichContentKeys.file.files] is [[String: Any]] {
                     
-                    let text = getRawFilePresentation(richContent)
+                    let text = FilePresentationHelper.getFilePresentationText(richContent)
                     content = NotificationContent(
                         title: partnerName ?? partnerAddress,
                         subtitle: nil,
@@ -310,19 +310,6 @@ class NotificationService: UNNotificationServiceExtension {
         if let contentHandler = contentHandler, let bestAttemptContent =  bestAttemptContent {
             contentHandler(bestAttemptContent)
         }
-    }
-    
-    private func getRawFilePresentation(_ richContent: [String: Any]) -> String {
-        let content = richContent[RichContentKeys.reply.replyMessage] as? [String: Any] ?? richContent
-        
-        let files = content[RichContentKeys.file.files] as? [[String: Any]] ?? []
-        
-        let rawComment: String = (content[RichContentKeys.file.comment] as? String) ?? .empty
-        let comment = !rawComment.isEmpty
-        ? ": \(rawComment)"
-        : ""
-        
-        return "[\(files.count) file(s)]\(comment)"
     }
     
     private func handleAdamantTransfer(

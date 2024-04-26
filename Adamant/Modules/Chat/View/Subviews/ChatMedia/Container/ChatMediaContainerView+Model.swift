@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CommonKit
 
 extension ChatMediaContainerView {
     struct Model: ChatReusableViewModelProtocol, MessageModel {
@@ -27,7 +28,21 @@ extension ChatMediaContainerView {
         )
         
         func makeReplyContent() -> NSAttributedString {
-            ChatMessageFactory.markdownParser.parse("[\(content.fileModel.files.count) File(s)]")
+            let mediaFilesCount = content.fileModel.files.filter { file in
+                return file.fileType == .image || file.fileType == .video
+            }.count
+            
+            let otherFilesCount = content.fileModel.files.count - mediaFilesCount
+            
+            let comment = content.comment.string
+            
+            let text = FilePresentationHelper.getFilePresentationText(
+                mediaFilesCount: mediaFilesCount,
+                otherFilesCount: otherFilesCount,
+                comment: comment
+            )
+           
+            return ChatMessageFactory.markdownParser.parse(text)
         }
     }
 }

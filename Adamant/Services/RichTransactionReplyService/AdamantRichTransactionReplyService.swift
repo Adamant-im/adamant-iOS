@@ -213,14 +213,14 @@ private extension AdamantRichTransactionReplyService {
                let richContent = RichMessageTools.richContent(from: data),
                let replyMessage = richContent[RichContentKeys.reply.replyMessage] as? [String: Any],
                replyMessage[RichContentKeys.file.files] is [[String: Any]] {
-                message = getRawFilePresentation(richContent)
+                message = FilePresentationHelper.getFilePresentationText(richContent)
                 break
             }
             
             if let data = decodedMessage.data(using: String.Encoding.utf8),
                let richContent = RichMessageTools.richContent(from: data),
                richContent[RichContentKeys.file.files] is [[String: Any]] {
-                message = getRawFilePresentation(richContent)
+                message = FilePresentationHelper.getFilePresentationText(richContent)
                 break
             }
             
@@ -275,7 +275,7 @@ private extension AdamantRichTransactionReplyService {
             
             if let richContent = trs.richContent,
                let _: [[String: Any]] = trs.getRichValue(for: RichContentKeys.file.files) {
-                message = getRawFilePresentation(richContent)
+                message = FilePresentationHelper.getFilePresentationText(richContent)
                 break
             }
             
@@ -285,19 +285,6 @@ private extension AdamantRichTransactionReplyService {
         }
         
         return message
-    }
-    
-    func getRawFilePresentation(_ richContent: [String: Any]) -> String {
-        let content = richContent[RichContentKeys.reply.replyMessage] as? [String: Any] ?? richContent
-        
-        let files = content[RichContentKeys.file.files] as? [[String: Any]] ?? []
-        
-        let rawComment: String = (content[RichContentKeys.file.comment] as? String) ?? .empty
-        let comment = !rawComment.isEmpty
-        ? ": \(rawComment)"
-        : ""
-        
-        return "[\(files.count) file(s)]\(comment)"
     }
     
     func setReplyMessage(
