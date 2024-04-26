@@ -18,6 +18,7 @@ class ChatFileView: UIView {
         let view = UIActivityIndicatorView(style: .medium)
         view.isHidden = true
         view.color = .white
+        view.backgroundColor = .darkGray.withAlphaComponent(0.45)
         return view
     }()
     
@@ -112,6 +113,7 @@ private extension ChatFileView {
         addSubview(spinner)
         spinner.snp.makeConstraints { make in
             make.center.equalTo(iconImageView)
+            make.size.equalTo(imageSize / 2)
         }
         
         addSubview(downloadImageView)
@@ -142,7 +144,7 @@ private extension ChatFileView {
         
         videoIconIV.addShadow()
         downloadImageView.addShadow()
-        spinner.addShadow()
+        spinner.addShadow(shadowColor: .white)
     }
     
     func update() {
