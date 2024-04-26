@@ -107,7 +107,9 @@ private extension ContextMenuOverlayViewModel {
         
         if !shoudScroll() {
             return offset > UIScreen.main.bounds.height
-            ? UIScreen.main.bounds.height - menuSize.height - minBottomOffset
+            ? UIScreen.main.bounds.height 
+            - menuSize.height
+            - minBottomOffset
             : offset
         }
         
