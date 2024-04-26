@@ -192,7 +192,7 @@ private extension ChatFileView {
     
     func formatSize(_ bytes: Int64) -> String {
         let formatter = ByteCountFormatter()
-        formatter.allowedUnits = [.useMB, .useKB]
+        formatter.allowedUnits = [.useGB, .useMB, .useKB, .useBytes]
         formatter.countStyle = .file
 
         return formatter.string(fromByteCount: bytes)
