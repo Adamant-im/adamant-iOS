@@ -208,11 +208,14 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
         ) ?? ""
         
         var simple = SimpleTransactionDetails(transaction)
-        simple.partnerName = getPartnerName(for: partnerId)
+        simple.partnerName = getPartnerName(for: partnerId, tx: transaction)
         return simple
     }
     
-    func getPartnerName(for partnerId: String) -> String? {
+    func getPartnerName(
+        for partnerId: String,
+        tx: TransferTransaction
+    ) -> String? {
         var partnerName = addressBookService.getName(for: partnerId)
         
         if let address = accountService.account?.address,
@@ -220,7 +223,7 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
             partnerName = String.adamant.transactionDetails.yourAddress
         }
         
-        return partnerName
+        return partnerName ?? tx.partnerName
     }
     
     // MARK: - UITableView
