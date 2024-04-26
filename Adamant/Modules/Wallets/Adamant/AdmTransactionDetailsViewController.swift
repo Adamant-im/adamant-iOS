@@ -114,6 +114,11 @@ final class AdmTransactionDetailsViewController: TransactionDetailsViewControlle
         return URL(string: "\(AdmWalletService.explorerAddress)\(id)")
     }
     
+    override func getName(by adamantAddress: String?) -> String? {
+        let name = super.getName(by: adamantAddress)
+        return name ?? adamantTransaction?.partnerName
+    }
+    
     func goToChat() {
         guard let chatroom = adamantTransaction?.chatRoom else {
             dialogService.showError(withMessage: "AdmTransactionDetailsViewController: Failed to get chatroom for transaction.", supportEmail: true, error: nil)
@@ -130,8 +135,7 @@ final class AdmTransactionDetailsViewController: TransactionDetailsViewControlle
         vc.viewModel.setup(
             account: account,
             chatroom: chatroom,
-            messageIdToShow: nil,
-            preservationDelegate: nil
+            messageIdToShow: nil
         )
 
         if let nav = self.navigationController {

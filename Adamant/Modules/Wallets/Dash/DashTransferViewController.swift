@@ -12,7 +12,15 @@ import BitcoinKit
 import CommonKit
 
 extension String.adamant.transfer {
-        static let minAmountError = String.localized("TransferScene.Error.MinAmount", comment: "Transfer: Minimal transaction amount is 0.00001")
+    static var minAmountError: String { String.localized("TransferScene.Error.MinAmount", comment: "Transfer: Minimal transaction amount is 0.00001")
+    }
+    static func pendingTxError(coin: String) -> String {
+        let localizedString = String(
+            format: .localized("TransferScene.Error.Pending.Tx", comment: "Have a pending coin tx"), 
+            coin
+        )
+        return localizedString
+    }
 }
 
 final class DashTransferViewController: TransferViewControllerBase {
@@ -36,7 +44,13 @@ final class DashTransferViewController: TransferViewControllerBase {
         }
         
         guard amount >= 0.00001 else {
-            dialogService.showAlert(title: nil, message: String.adamant.transfer.minAmountError, style: AdamantAlertStyle.alert, actions: nil, from: nil)
+            dialogService.showAlert(
+                title: nil,
+                message: String.adamant.transfer.minAmountError,
+                style: AdamantAlertStyle.alert,
+                actions: nil,
+                from: nil
+            )
             return
         }
         
@@ -55,6 +69,11 @@ final class DashTransferViewController: TransferViewControllerBase {
                     fee: transactionFee
                 )
                 
+                if await !doesNotContainSendingTx() {
+                    presentSendingError()
+                    return
+                }
+                
                 // Send adm report
                 if let reportRecipient = admReportRecipient,
                    let hash = transaction.txHash {
@@ -66,30 +85,32 @@ final class DashTransferViewController: TransferViewControllerBase {
                     )
                 }
                 
-                Task {
-                    do {
-                        let simpleTransaction = SimpleTransactionDetails(
-                            txId: transaction.txID,
-                            senderAddress: wallet.address,
-                            recipientAddress: recipient,
-                            amountValue: amount,
-                            feeValue: nil,
-                            confirmationsValue: nil,
-                            blockValue: nil,
-                            isOutgoing: true,
-                            transactionStatus: nil
-                        )
-                        
-                        service.coinStorage.append(simpleTransaction)
-                        try await service.sendTransaction(transaction)
-                    } catch {
-                        dialogService.showRichError(error: error)
-                        service.coinStorage.updateStatus(
-                            for: transaction.txId,
-                            status: .failed
-                        )
-                    }
+                do {
+                    let simpleTransaction = SimpleTransactionDetails(
+                        txId: transaction.txID,
+                        senderAddress: wallet.address,
+                        recipientAddress: recipient,
+                        amountValue: amount,
+                        feeValue: nil,
+                        confirmationsValue: nil,
+                        blockValue: nil,
+                        isOutgoing: true,
+                        transactionStatus: nil,
+                        nonceRaw: nil
+                    )
                     
+                    service.coinStorage.append(simpleTransaction)
+                    try await service.sendTransaction(transaction)
+                } catch {
+                    service.coinStorage.updateStatus(
+                        for: transaction.txId,
+                        status: .failed
+                    )
+                    
+                    throw error
+                }
+                
+                Task {
                     await service.update()
                 }
                 

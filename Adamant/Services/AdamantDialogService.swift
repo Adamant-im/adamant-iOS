@@ -14,6 +14,7 @@ import CommonKit
 
 @MainActor
 final class AdamantDialogService: DialogService {
+    
     // MARK: Dependencies
     private let vibroService: VibroService
     private let popupManager = PopupManager()
@@ -95,18 +96,26 @@ extension AdamantDialogService {
     }
     
     func showError(withMessage message: String, supportEmail: Bool, error: Error? = nil) {
-        internalShowError(withMessage: message, supportEmail: supportEmail, error: error)
+        internalShowError(
+            withMessage: message,
+            supportEmail: supportEmail,
+            title: nil,
+            icon: warningImage,
+            error: error
+        )
     }
     
     private func internalShowError(
         withMessage message: String,
         supportEmail: Bool,
+        title: String? = .adamant.alert.error,
+        icon: UIImage? = .asset(named: "error"),
         error: Error? = nil
     ) {
         vibroService.applyVibration(.error)
         popupManager.showAdvancedAlert(model: .init(
-            icon: .asset(named: "error") ?? .init(),
-            title: .adamant.alert.error,
+            icon: icon ?? .init(),
+            title: title,
             text: message,
             secondaryButton: supportEmail
                 ? .init(
@@ -621,3 +630,8 @@ extension AdamantDialogService {
         }
     }
 }
+
+private let warningImage = UIImage(
+    systemName: "multiply.circle",
+    withConfiguration: UIImage.SymbolConfiguration(pointSize: 25, weight: .light)
+)!

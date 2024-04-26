@@ -281,7 +281,10 @@
 "ApiService.InternalError.ParsingFailed" = "Parsing fehlgeschlagen. Bericht senden";
 
 /* Serious internal error: No nodes available */
-"ApiService.InternalError.NoNodesAvailable" = "No active %@ nodes. Review the node list";
+"ApiService.InternalError.NoNodesAvailable" = "Keine aktiven %@ Knoten. Überprüfen Sie die Knotenliste.";
+
+/* Serious internal error: No ADM nodes available */
+"ApiService.InternalError.NoAdmNodesAvailable" = "Keine aktiven ADM Knoten zum Abrufen der %@ Adresse des Partners.";
 
 /* Eureka forms Cancel button */
 "Cancel" = "Abbrechen";
@@ -317,7 +320,7 @@
 "ChatListPage.Title" = "Chats";
 
 /* ChatsProvider: Notify user that he doesn't have money to pay a message fee */
-"ChatsProvider.Error.notEnoughMoney" = "Sie haben nicht genügend Tokens, um eine Nachricht zu senden";
+"ChatsProvider.Error.notEnoughMoney" = "Nicht genug ADM für die Blockchain-Gebühr für Nachrichten";
 
 /* ChatsProvider: Transaction not found error. %@ for transaction's ID */
 "ChatsProvider.Error.TransactionNotFoundFormat" = "Nachricht mit der ID %@ nicht gefunden";
@@ -391,6 +394,12 @@
 /* Date "A minute ago" */
 "Chats.Date.MinAgo" = "Vor einer Minute";
 
+/* No comment provided by engineer. */
+"A minute ago" = "Vor einer Minute";
+
+/* No comment provided by engineer. */
+"An hour ago" = "Vor einer Stunde";
+
 /* Date "Yesterday" */
 "Chats.Date.Yesterday" = "Gestern";
 
@@ -461,7 +470,7 @@
 "VisibleWallets.ResetListAlert" = "Brieftaschenliste auf Standard zurücksetzen?";
 
 /* Delegates tab: Message about 50 ADM fee for vote */
-"Delegates.NotEnoughtTokensForVote" = "Nicht genug Tokens für die Abstimmung. Sie brauchen mindestens 50 ADM auf Ihrem Konto";
+"Delegates.NotEnoughtTokensForVote" = "Nicht genug ADM, um die Gebühr für die Blockchain-Abstimmung zu bezahlen";
 
 /* Delegates tab: Message about time out for new vote */
 "Delegates.timeOutBeforeNewVote" = "Bitte warten Sie, bis die vorherige Abstimmung bearbeitet wird";
@@ -877,6 +886,12 @@
 /* Shared alert 'Save to Photos'. Used with saving images to photolibrary */
 "Shared.SaveToPhotolibrary" = "Im Fotoalbum speichern";
 
+/* Partner screen 'Give contact a name' at first */
+"Shared.RenameContactInitial" = "Kontakt einen Namen geben";
+
+/* Partner screen 'Rename contact'. */
+"Shared.RenameContact" = "Kontakt umbenennen";
+
 /* Shared alert 'Settings' button. Used to go to system Settings app, on application settings page. Should be same as Settings application title. */
 "Shared.Settings" = "Einstellungen";
 
@@ -1039,11 +1054,17 @@
 /* Transfer: Minimal transaction amount is 0.00001 */
 "TransferScene.Error.MinAmount" = "Minimum transaction amount is 0.00001";
 
+/* Transfer: Have a pending coin tx */
+"TransferScene.Error.Pending.Tx" = "Es scheint, dass Sie eine ausstehende %@ tx haben. Warten Sie, bis die Blockchain dies bestätigt, und versuchen Sie es erneut";
+
 /* Transfer: transfer amount placeholder */
 "TransferScene.Amount.Placeholder" = "senden";
 
 /* Transfer: Address not found error */
 "TransferScene.Error.AddressNotFound" = "Adresse nicht gefunden";
+
+/* Transfer: Not enough ADM to send in-chat transfer error */
+"TransferScene.Error.notEnoughAdmToSendTransfer" = "Nicht genug ADM zum Senden von Überweisungen im Chat";
 
 /* Transfer: Address validation error */
 "TransferScene.Error.InvalidAddress" = "Geben Sie eine gültige Adresse ein";
@@ -1119,6 +1140,9 @@
 
 /* Transfer: Confirm transfer alert: Send tokens button */
 "TransferScene.Send" = "Senden";
+
+/* Transfer: Ttitle for done button */
+"TransferScene.Done" = "Fertig";
 
 /* Transfer: Confirm transfer alert: 'Can't Undo' message */
 "TransferScene.CantUndo" = "Sie können diese Aktion nicht rückgängig machen";

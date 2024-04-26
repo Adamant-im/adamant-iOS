@@ -45,6 +45,8 @@ protocol TransactionDetails {
     
     var feeCurrencySymbol: String? { get }
     
+    var nonceRaw: String? { get }
+    
     func summary(
         with url: String?,
         currentValue: String?,

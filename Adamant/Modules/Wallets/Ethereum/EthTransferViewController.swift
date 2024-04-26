@@ -47,6 +47,15 @@ final class EthTransferViewController: TransferViewControllerBase {
                     fee: transactionFee
                 )
                 
+                if await !doesNotContainSendingTx(
+                    with: Int(transaction.nonce),
+                    id: transaction.txHash,
+                    service: service
+                ) {
+                    presentSendingError()
+                    return
+                }
+                
                 guard let txHash = transaction.txHash else {
                     throw WalletServiceError.internalError(
                         message: "Transaction making failure",
@@ -64,17 +73,18 @@ final class EthTransferViewController: TransferViewControllerBase {
                     )
                 }
                 
-                Task {
-                    do {
-                        try await service.sendTransaction(transaction)
-                    } catch {
-                        dialogService.showRichError(error: error)
-                        service.coinStorage.updateStatus(
-                            for: txHash,
-                            status: .failed
-                        )
-                    }
+                do {
+                    try await service.sendTransaction(transaction)
+                } catch {
+                    service.coinStorage.updateStatus(
+                        for: txHash,
+                        status: .failed
+                    )
                     
+                    throw error
+                }
+                
+                Task {
                     await service.update()
                 }
                 
@@ -97,6 +107,35 @@ final class EthTransferViewController: TransferViewControllerBase {
         }
     }
     
+    private func doesNotContainSendingTx(
+        with nonce: Int,
+        id: String?,
+        service: EthWalletService
+    ) async -> Bool {
+        var history = service.getLocalTransactionHistory()
+        
+        if history.isEmpty {
+            history = (try? await service.getTransactionsHistory(offset: .zero, limit: 2)) ?? []
+        }
+        
+        let pendingTx = history.first(where: {
+            $0.transactionStatus == .pending
+            || $0.transactionStatus == .registered
+            || $0.transactionStatus == .notInitiated
+            || $0.txId == id
+        })
+                
+        guard let pendingTx = pendingTx else {
+            return true
+        }
+        
+        guard let detailTx = try? await service.getTransaction(by: pendingTx.txId) else {
+            return false
+        }
+        
+        return detailTx.nonce != nonce
+    }
+    
     private func presentDetailTransactionVC(
         hash: String,
         transaction: CodableTransaction,
@@ -114,7 +153,8 @@ final class EthTransferViewController: TransferViewControllerBase {
             confirmationsValue: nil,
             blockValue: nil,
             isOutgoing: true,
-            transactionStatus: nil
+            transactionStatus: nil, 
+            nonceRaw: nil
         )
         
         service.core.coinStorage.append(transaction)

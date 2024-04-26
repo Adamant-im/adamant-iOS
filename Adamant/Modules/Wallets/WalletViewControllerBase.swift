@@ -197,9 +197,10 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
             ? UITableView.defaultSeparatorInset
             : .zero
             
-            if #unavailable(iOS 14.0) {
-                cell.textLabel?.attributedText = label
-            }
+            let label = self?.sendRowLocalizedLabel()
+            var content = cell.defaultContentConfiguration()
+            content.attributedText = label
+            cell.contentConfiguration = content
         }.onCellSelection { [weak self] (_, _) in
             guard let self = self, let service = service else { return }
             
@@ -237,77 +238,8 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         
         form.append(section)
         
-        // MARK: Notification
-        if let service = service {
-            // MARK: Wallet updated
-            let walletUpdatedCallback = { [weak self] (_: Notification) in
-                if let row: LabelRow = self?.form.rowBy(tag: BaseRows.address.tag) {
-                    if let wallet = service.core.wallet {
-                        row.value = wallet.address
-                        row.updateCell()
-                    }
-                }
-                
-                guard let service = self?.service,
-                      let wallet = service.core.wallet,
-                      let vc = self,
-                      let row: BalanceRow = vc.form.rowBy(tag: BaseRows.balance.tag) else {
-                    return
-                }
-                
-                if let currentCurrency = self?.currencyInfoService.currentCurrency {
-                    self?.fiatFormatter.currencyCode = currentCurrency.rawValue
-                }
-                
-                let symbol = service.core.tokenSymbol
-                row.value = vc.balanceRowValueFor(
-                    balance: wallet.balance,
-                    symbol: symbol,
-                    alert: wallet.notifications,
-                    isBalanceInitialized: wallet.isBalanceInitialized
-                )
-                row.updateCell()
-            }
-            
-            NotificationCenter.default.addObserver(
-                forName: service.core.walletUpdatedNotification,
-                object: service.core,
-                queue: OperationQueue.main,
-                using: walletUpdatedCallback
-            )
-            
-            NotificationCenter.default.addObserver(
-                forName: Notification.Name.AdamantCurrencyInfoService.currencyRatesUpdated,
-                object: nil,
-                queue: OperationQueue.main,
-                using: walletUpdatedCallback
-            )
-            
-            // MARK: Wallet state updated
-            let stateUpdatedCallback = { [weak self] (notification: Notification) in
-                guard let newState = notification.userInfo?[AdamantUserInfoKey.WalletService.walletState] as? WalletServiceState else {
-                    return
-                }
-                
-                self?.setUiToWalletServiceState(newState)
-            }
-            
-            NotificationCenter.default.addObserver(
-                forName: service.core.serviceStateChanged,
-                object: service,
-                queue: OperationQueue.main,
-                using: stateUpdatedCallback
-            )
-        }
-        
         if let state = service?.core.state {
-            switch state {
-            case .updating:
-                setUiToWalletServiceState(.notInitiated)
-                
-            default:
-                setUiToWalletServiceState(state)
-            }
+            setUiToWalletServiceState(state)
         } else {
             setUiToWalletServiceState(.notInitiated)
         }
@@ -401,10 +333,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         }
         
         switch state {
-        case .updating:
-            break
-            
-        case .upToDate:
+        case .upToDate, .updating:
             initiatingActivityIndicator.stopAnimating()
             tableView.isHidden = false
             errorView.isHidden = true
@@ -469,8 +398,39 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         tableView.backgroundColor = .clear
         initiatingActivityIndicator.color = .adamant.primary
     }
-    
-    private func addObservers() {
+}
+
+private extension WalletViewControllerBase {
+    func addObservers() {
+        guard let service = service else { return }
+        
+        NotificationCenter.default
+            .publisher(for: service.core.serviceStateChanged)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] notification in
+                guard let newState = notification.userInfo?[AdamantUserInfoKey.WalletService.walletState] as? WalletServiceState
+                else { return }
+                
+                self?.setUiToWalletServiceState(newState)
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: service.core.walletUpdatedNotification)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.updateWalletUI()
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantCurrencyInfoService.currencyRatesUpdated)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.updateWalletUI()
+            }
+            .store(in: &subscriptions)
+        
         NotificationCenter.default
             .publisher(for: .LanguageStorageService.languageUpdated)
             .receive(on: OperationQueue.main)
@@ -479,6 +439,32 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 self?.setTitle()
             }
             .store(in: &subscriptions)
+    }
+    
+    func updateWalletUI() {
+        guard let service = service else { return }
+        
+        if let row: LabelRow = form.rowBy(tag: BaseRows.address.tag) {
+            if let wallet = service.core.wallet {
+                row.value = wallet.address
+                row.updateCell()
+            }
+        }
+        
+        guard let wallet = service.core.wallet,
+              let row: BalanceRow = form.rowBy(tag: BaseRows.balance.tag)
+        else { return }
+        
+        fiatFormatter.currencyCode = currencyInfoService.currentCurrency.rawValue
+        
+        let symbol = service.core.tokenSymbol
+        row.value = balanceRowValueFor(
+            balance: wallet.balance,
+            symbol: symbol,
+            alert: wallet.notifications,
+            isBalanceInitialized: wallet.isBalanceInitialized
+        )
+        row.updateCell()
     }
 }
 

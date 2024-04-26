@@ -105,7 +105,8 @@ extension Service {
                             fee: $0.fee,
                             signature: $0.signature,
                             confirmations: $0.confirmations,
-                            isOutgoing: $0.senderId.lowercased() == ownerAddress?.lowercased()
+                            isOutgoing: $0.senderId.lowercased() == ownerAddress?.lowercased(), 
+                            nonce: $0.nonce
                         )
                     }
                     completionHandler(.success(response: transaction))
@@ -143,7 +144,8 @@ extension Service {
                             fee: $0.fee,
                             signature: $0.signature,
                             confirmations: $0.confirmations,
-                            isOutgoing: $0.senderId.lowercased() == ownerAddress?.lowercased()
+                            isOutgoing: $0.senderId.lowercased() == ownerAddress?.lowercased(), 
+                            nonce: $0.nonce
                         )
                     }
                     completionHandler(.success(response: transaction))

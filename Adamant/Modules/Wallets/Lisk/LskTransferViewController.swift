@@ -16,18 +16,6 @@ final class LskTransferViewController: TransferViewControllerBase {
     
     // MARK: Properties
     
-    override var minToTransfer: Decimal {
-        get async throws {
-            guard let recipientAddress = recipientAddress else {
-                throw WalletServiceError.accountNotFound
-            }
-            
-            let recepientBalance = try await walletCore.getBalance(address: recipientAddress)
-            let minimumAmount = walletCore.minBalance - recepientBalance
-            return try await max(super.minToTransfer, minimumAmount)
-        }
-    }
-    
     private let prefix = "lsk"
     
     override func checkForAdditionalFee() {
@@ -79,6 +67,11 @@ final class LskTransferViewController: TransferViewControllerBase {
                     fee: transactionFee
                 )
                 
+                if await !doesNotContainSendingTx(with: String(transaction.nonce)) {
+                    presentSendingError()
+                    return
+                }
+                
                 // Send adm report
                 if let reportRecipient = admReportRecipient {
                     try await reportTransferTo(
@@ -89,18 +82,19 @@ final class LskTransferViewController: TransferViewControllerBase {
                     )
                 }
                 
-                Task {
-                    do {
-                        service.coinStorage.append(transaction)
-                        try await service.sendTransaction(transaction)
-                    } catch {
-                        dialogService.showRichError(error: error)
-                        service.coinStorage.updateStatus(
-                            for: transaction.id,
-                            status: .failed
-                        )
-                    }
+                do {
+                    service.coinStorage.append(transaction)
+                    try await service.sendTransaction(transaction)
+                } catch {
+                    service.coinStorage.updateStatus(
+                        for: transaction.id,
+                        status: .failed
+                    )
                     
+                    throw error
+                }
+                
+                Task {
                     await service.update()
                 }
                 

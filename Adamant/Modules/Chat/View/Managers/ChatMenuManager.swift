@@ -44,7 +44,7 @@ final class ChatMenuManager: NSObject {
         self.delegate = delegate
     }
     
-    func setup(for contentView: UIView ) {
+    func setup(for contentView: UIView) {
         guard !isiOSAppOnMac else {
             let interaction = UIContextMenuInteraction(delegate: self)
             contentView.addInteraction(interaction)

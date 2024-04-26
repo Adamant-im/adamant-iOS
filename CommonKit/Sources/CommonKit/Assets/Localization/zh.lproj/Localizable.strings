@@ -280,6 +280,9 @@
 /* Serious internal error: No nodes available */
 "ApiService.InternalError.NoNodesAvailable" = "没有活动的%@节点。查看节点列表";
 
+/* Serious internal error: No ADM nodes available */
+"ApiService.InternalError.NoAdmNodesAvailable" = "没有活动的 ADM 节点来获取合作伙伴的 %@ 地址";
+
 /* Eureka forms Cancel button */
 "Cancel" = "取消";
 
@@ -314,7 +317,7 @@
 "ChatListPage.Title" = "聊天";
 
 /* ChatsProvider: Notify user that he doesn't have money to pay a message fee */
-"ChatsProvider.Error.notEnoughMoney" = "零余额。获得免费ADM代币";
+"ChatsProvider.Error.notEnoughMoney" = "信息区块链费用的 ADM 不足";
 
 /* ChatsProvider: Transaction not found error. %@ for transaction's ID */
 "ChatsProvider.Error.TransactionNotFoundFormat" = "找不到id为%@的消息";
@@ -458,7 +461,7 @@
 "VisibleWallets.ResetListAlert" = "是否将钱包列表重置为默认值？";
 
 /* Delegates tab: Message about 50 ADM fee for vote */
-"Delegates.NotEnoughtTokensForVote" = "没有足够的代币可以投票。您需要50个ADM";
+"Delegates.NotEnoughtTokensForVote" = "没有足够的 ADM 来支付投票区块链费用";
 
 /* Delegates tab: Message about time out for new vote */
 "Delegates.timeOutBeforeNewVote" = "请等待上一次投票处理完毕";
@@ -868,6 +871,12 @@
 /* Shared alert 'Save to Photos'. Used with saving images to photolibrary */
 "Shared.SaveToPhotolibrary" = "保存到照片";
 
+/* Partner screen 'Give contact a name' at first */
+"Shared.RenameContactInitial" = "给出联系人姓名";
+
+/* Partner screen 'Rename contact'. */
+"Shared.RenameContact" = "重新命名联系人";
+
 /* Shared alert 'Settings' button. Used to go to system Settings app, on application settings page. Should be same as Settings application title. */
 "Shared.Settings" = "设置";
 
@@ -1018,11 +1027,17 @@
 /* Transfer: Minimal transaction amount is 0.00001 */
 "TransferScene.Error.MinAmount" = "最低交易金额为0.00001";
 
+/* Transfer: Have a pending coin tx */
+"TransferScene.Error.Pending.Tx" = "您似乎有一个待处理的 %@ tx。等待区块链确认，然后再试一次";
+
 /* Transfer: transfer amount placeholder */
 "TransferScene.Amount.Placeholder" = "发送";
 
 /* Transfer: Address not found error */
 "TransferScene.Error.AddressNotFound" = "找不到地址";
+
+/* Transfer: Not enough ADM to send in-chat transfer error */
+"TransferScene.Error.notEnoughAdmToSendTransfer" = "没有足够的 ADM 来发送聊天转移";
 
 /* Transfer: Address validation error */
 "TransferScene.Error.InvalidAddress" = "输入有效地址";
@@ -1095,6 +1110,9 @@
 
 /* Transfer: Confirm transfer alert: Send tokens button */
 "TransferScene.Send" = "发送";
+
+/* Transfer: Ttitle for done button */
+"TransferScene.Done" = "完成的";
 
 /* Transfer: Confirm transfer alert: 'Can't Undo' message */
 "TransferScene.CantUndo" = "您将无法撤消此操作";

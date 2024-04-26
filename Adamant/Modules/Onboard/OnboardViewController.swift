@@ -138,16 +138,10 @@ extension OnboardViewController: SwiftyOnboardDelegate, SwiftyOnboardDataSource 
     func swiftyOnboardPageForIndex(_ swiftyOnboard: SwiftyOnboard, index: Int) -> SwiftyOnboardPage? {
         let item = items[index]
         
-        guard let view = OnboardPage.instanceFromNib() as? OnboardPage else {
-            return nil
+        let view = OnboardPage(image: item.image, text: item.text)
+        view.tapURLCompletion = { [weak self] url in
+            self?.openURL(url)
         }
-        
-        view.image.image = item.image
-        view.text.delegate = self
-        
-        // Font & size logic moved to OnboardPage
-        view.rawRichText = item.text
-        
         return view
     }
     
@@ -187,13 +181,11 @@ extension OnboardViewController: SwiftyOnboardDelegate, SwiftyOnboardDataSource 
     }
 }
 
-// MARK: - UITextViewDelegate
-extension OnboardViewController: UITextViewDelegate {
-    func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
-        let safari = SFSafariViewController(url: URL)
+private extension OnboardViewController {
+    func openURL(_ url: URL) {
+        let safari = SFSafariViewController(url: url)
         safari.preferredControlTintColor = UIColor.adamant.primary
         safari.modalPresentationStyle = .overFullScreen
         present(safari, animated: true, completion: nil)
-        return false
     }
 }

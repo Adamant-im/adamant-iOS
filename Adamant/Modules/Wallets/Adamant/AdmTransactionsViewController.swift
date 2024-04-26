@@ -17,7 +17,6 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
     let transfersProvider: TransfersProvider
     let chatsProvider: ChatsProvider
     let stack: CoreDataStack
-    let screensFactory: ScreensFactory
     let addressBookService: AddressBookService
     
     // MARK: - Properties
@@ -35,8 +34,6 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
     // MARK: - Lifecycle
     
     init(
-        nibName nibNameOrNil: String?,
-        bundle nibBundleOrNil: Bundle?,
         accountService: AccountService,
         transfersProvider: TransfersProvider,
         chatsProvider: ChatsProvider,
@@ -44,18 +41,21 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
         stack: CoreDataStack,
         screensFactory: ScreensFactory,
         addressBookService: AddressBookService,
-        walletService: WalletService
+        walletService: WalletService,
+        reachabilityMonitor: ReachabilityMonitor
     ) {
         self.accountService = accountService
         self.transfersProvider = transfersProvider
         self.chatsProvider = chatsProvider
         self.stack = stack
-        self.screensFactory = screensFactory
         self.addressBookService = addressBookService
         
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        self.dialogService = dialogService
-        self.walletService = walletService
+        super.init(
+            walletService: walletService,
+            dialogService: dialogService,
+            reachabilityMonitor: reachabilityMonitor,
+            screensFactory: screensFactory
+        )
     }
     
     required init?(coder: NSCoder) {
@@ -87,6 +87,15 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
     
     @MainActor
     override func reloadData() {
+        guard reachabilityMonitor.connection else {
+            dialogService.showError(
+                withMessage: .adamant.sharedErrors.networkError,
+                supportEmail: false,
+                error: nil
+            )
+            return
+        }
+        
         Task {
             controller = await transfersProvider.transfersController()
             
@@ -108,6 +117,14 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
     
     @MainActor
     override func handleRefresh() {
+        guard reachabilityMonitor.connection else {
+            dialogService.showCompactError(
+                withMessage: .adamant.sharedErrors.networkError,
+                supportEmail: false,
+                error: nil
+            )
+            return
+        }
         Task {
             self.isBusy = true
             self.emptyLabel.isHidden = true
@@ -199,11 +216,14 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
         ) ?? ""
         
         var simple = SimpleTransactionDetails(transaction)
-        simple.partnerName = getPartnerName(for: partnerId)
+        simple.partnerName = getPartnerName(for: partnerId, tx: transaction)
         return simple
     }
     
-    func getPartnerName(for partnerId: String) -> String? {
+    func getPartnerName(
+        for partnerId: String,
+        tx: TransferTransaction
+    ) -> String? {
         var partnerName = addressBookService.getName(for: partnerId)
         
         if let address = accountService.account?.address,
@@ -211,7 +231,7 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
             partnerName = String.adamant.transactionDetails.yourAddress
         }
         
-        return partnerName
+        return partnerName ?? tx.partnerName
     }
     
     // MARK: - UITableView
@@ -265,8 +285,7 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
             vc.viewModel.setup(
                 account: account,
                 chatroom: chatroom,
-                messageIdToShow: nil,
-                preservationDelegate: nil
+                messageIdToShow: nil
             )
             
             if let nav = self.navigationController {

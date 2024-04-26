@@ -28,11 +28,12 @@ struct EthWalletFactory: WalletFactory {
     }
     
     func makeTransferListVC(service: Service, screensFactory: ScreensFactory) -> UIViewController {
-        let c = EthTransactionsViewController(nibName: "TransactionsListViewControllerBase", bundle: nil)
-        c.dialogService = assembler.resolve(DialogService.self)
-        c.screensFactory = screensFactory
-        c.walletService = service
-        return c
+        EthTransactionsViewController(
+            walletService: service,
+            dialogService: assembler.resolve(DialogService.self)!,
+            reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
+            screensFactory: screensFactory
+        )
     }
     
     func makeTransferVC(service: Service, screensFactory: ScreensFactory) -> TransferViewControllerBase {
@@ -112,7 +113,8 @@ private extension EthWalletFactory {
             confirmationsValue: nil,
             blockValue: nil,
             isOutgoing: richTransaction.isOutgoing,
-            transactionStatus: nil
+            transactionStatus: nil, 
+            nonceRaw: nil
         )
         
         vc.senderId = senderId

@@ -322,6 +322,11 @@ struct AppAssembly: Assembly {
             AddressConverterFactory()
         }.inObjectScope(.container)
         
+        // MARK: Chat Preservation
+        container.register(ChatPreservationProtocol.self) { _ in
+            ChatPreservation()
+        }.inObjectScope(.container)
+        
         // MARK: Wallet Service Compose
         container.register(WalletServiceCompose.self) { r in
             var wallets: [WalletCoreProtocol] = [
