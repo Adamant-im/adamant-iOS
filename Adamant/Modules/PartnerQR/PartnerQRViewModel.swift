@@ -17,6 +17,7 @@ final class PartnerQRViewModel: NSObject, ObservableObject {
     @Published var image: UIImage?
     @Published var partnerImage: UIImage?
     @Published var partnerName: String = ""
+    @Published var renameTitle: String = ""
     @Published var includeWebAppLink = false
     @Published var includeContactsName = false
     
@@ -49,6 +50,13 @@ final class PartnerQRViewModel: NSObject, ObservableObject {
         self.partner = partner
         updatePartnerInfo()
         generateQR()
+    }
+    
+    func renameContact() {
+        guard let alert = self.makeRenameAlert(for: self.title) else { return }
+        self.dialogService.present(alert, animated: true) {
+            self.dialogService.selectAllTextFields(in: alert)
+        }
     }
     
     func saveToPhotos() {
@@ -131,10 +139,12 @@ private extension PartnerQRViewModel {
             partnerName = name
             includeContactsNameEnabled = true
             includeContactsName = partnerQRService.isIncludeNameEnabled()
+            renameTitle = .adamant.alert.renameContact
         } else {
             partnerName = address
             includeContactsNameEnabled = false
             includeContactsName = false
+            renameTitle = .adamant.alert.renameContactInitial
         }
         
         includeWebAppLink = partnerQRService.isIncludeURLEnabled()
@@ -202,5 +212,45 @@ private extension PartnerQRViewModel {
         }
         
         dialogService.showSuccess(withMessage: String.adamant.alert.done)
+    }
+
+    func makeRenameAlert(for address: String) -> UIAlertController? {
+        let alert = UIAlertController(
+            title: .init(format: .adamant.chat.actionsBody, address),
+            message: nil,
+            preferredStyleSafe: .alert,
+            source: nil
+        )
+        
+        alert.addTextField { [weak self] textField in
+            textField.placeholder = .adamant.chat.name
+            textField.autocapitalizationType = .words
+            textField.text = self?.addressBookService.getName(for: address)
+        }
+        
+        let renameAction = UIAlertAction(
+            title: .adamant.chat.rename,
+            style: .default
+        ) { [weak self] _ in
+            guard
+                let textField = alert.textFields?.first,
+                let newName = textField.text
+            else { return }
+            
+            Task {
+                self?.partnerName = newName
+                self?.renameTitle = .adamant.alert.renameContact
+                await self?.addressBookService.set(name: newName, for: address)
+            }
+        }
+        
+        alert.addAction(renameAction)
+        alert.addAction(makeCancelAction())
+        alert.modalPresentationStyle = .overFullScreen
+        return alert
+    }
+    
+    func makeCancelAction() -> UIAlertAction {
+        .init(title: .adamant.alert.cancel, style: .cancel, handler: nil)
     }
 }

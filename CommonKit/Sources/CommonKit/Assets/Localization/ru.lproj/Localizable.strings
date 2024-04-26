@@ -865,6 +865,12 @@
 /* Shared alert 'Save to Photos'. Used with saving images to photolibrary */
 "Shared.SaveToPhotolibrary" = "Сохранить в Фото";
 
+/* Partner screen 'Give contact a name' at first */
+"Shared.RenameContactInitial" = "Назвать контакт";
+
+/* Partner screen 'Rename contact'. */
+"Shared.RenameContact" = "Переименовать";
+
 /* Shared alert 'Settings' button. Used to go to system Settings app, on application settings page. Should be same as Settings application title. */
 "Shared.Settings" = "Настройки";
 
