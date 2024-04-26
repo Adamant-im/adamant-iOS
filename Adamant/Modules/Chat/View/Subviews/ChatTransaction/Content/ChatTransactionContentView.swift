@@ -129,7 +129,17 @@ final class ChatTransactionContentView: UIView {
 
 extension ChatTransactionContentView.Model {
     func height(for width: CGFloat) -> CGFloat {
-        let maxSize = CGSize(width: width, height: .infinity)
+        let opponentReactionWidth = ChatTransactionContainerView.opponentReactionWidth
+        let containerHorizontalOffset = ChatTransactionContainerView.horizontalStackSpacing * 2
+        let contentHorizontalOffset = horizontalInsets * 2
+        
+        let maxSize = CGSize(
+            width: width
+            - opponentReactionWidth
+            - containerHorizontalOffset
+            - contentHorizontalOffset,
+            height: .infinity
+        )
         let titleString = NSAttributedString(string: title, attributes: [.font: titleFont])
         let dateString = NSAttributedString(string: date, attributes: [.font: dateFont])
         
@@ -181,7 +191,7 @@ private extension ChatTransactionContentView {
         addSubview(verticalStack)
         verticalStack.snp.makeConstraints {
             $0.top.bottom.equalToSuperview().inset(verticalInsets)
-            $0.leading.trailing.equalToSuperview().inset(12)
+            $0.leading.trailing.equalToSuperview().inset(horizontalInsets)
         }
     }
     
@@ -237,4 +247,5 @@ private let commentFont = UIFont.systemFont(ofSize: 14)
 private let iconSize: CGFloat = 55
 private let verticalStackSpacing: CGFloat = 6
 private let verticalInsets: CGFloat = 8
+private let horizontalInsets: CGFloat = 12
 private let replyViewHeight: CGFloat = 25
