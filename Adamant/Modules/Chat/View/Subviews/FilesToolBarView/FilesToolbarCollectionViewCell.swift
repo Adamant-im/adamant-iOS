@@ -53,14 +53,7 @@ final class FilesToolbarCollectionViewCell: UICollectionViewCell {
     
     private lazy var removeBtn: UIButton = {
         let btn = UIButton()
-        let config = UIImage.SymbolConfiguration(pointSize: 30)
-        btn.setImage(
-            UIImage(
-                systemName: "checkmark.circle.fill",
-                withConfiguration: config
-            )?.withTintColor(.adamant.active),
-            for: .normal
-        )
+        btn.setImage(.asset(named: "checkMarkIcon"), for: .normal)
         btn.tintColor = .adamant.active
         btn.addTarget(self, action: #selector(didTapRemoveBtn), for: .touchUpInside)
         return btn
