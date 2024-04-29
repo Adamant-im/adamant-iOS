@@ -901,13 +901,16 @@ extension ChatListViewController {
             } else {
                 raw = text
             }
+            
+            let attributesText = markdownParser.parse(raw).resolveLinkColor()
+            raw = attributesText.string
+            
             var ranges: [Range<String.Index>] = []
             var searchRange = raw.startIndex..<raw.endIndex
             while let range = raw.range(of: "↵ ", options: [], range: searchRange) {
                 ranges.append(range)
                 searchRange = range.upperBound..<raw.endIndex
             }
-            let attributesText = markdownParser.parse(raw).resolveLinkColor()
             
             for range in ranges {
                 attributesText.addAttribute(

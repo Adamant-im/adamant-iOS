@@ -118,7 +118,7 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
     @MainActor
     override func handleRefresh() {
         guard reachabilityMonitor.connection else {
-            dialogService.showCompactError(
+            dialogService.showError(
                 withMessage: .adamant.sharedErrors.networkError,
                 supportEmail: false,
                 error: nil
