@@ -548,7 +548,7 @@
 "Error.RequestCancelled" = "Запрос отменён";
 
 /* Shared error: Remote error format, %@ for message */
-"Error.RemoteServerErrorFormat" = "Ошибка на узле блокчейна: %@";
+"Error.RemoteServerErrorFormat" = "%@";
 
 /* Shared error: User not logged */
 "Error.UserNotLogged" = "Не выполнен вход";

@@ -548,7 +548,7 @@
 "Error.RequestCancelled" = "请求已取消";
 
 /* Shared error: Remote error format, %@ for message */
-"Error.RemoteServerErrorFormat" = "区块链节点错误：%@";
+"Error.RemoteServerErrorFormat" = "%@";
 
 /* Shared error: User not logged */
 "Error.UserNotLogged" = "用户未登录";
