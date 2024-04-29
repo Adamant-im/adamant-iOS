@@ -655,6 +655,10 @@ extension ChatViewModel {
         
         dialog.send(.renameAlert)
     }
+    
+    func updatePartnerName() {
+        partnerName = chatroom?.getName(addressBookService: addressBookService)
+    }
 }
 
 extension ChatViewModel: NSFetchedResultsControllerDelegate {
