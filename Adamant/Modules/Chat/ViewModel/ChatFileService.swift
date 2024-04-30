@@ -63,6 +63,9 @@ final class ChatFileService: ChatFileProtocol {
 
     private var ignoreFilesIDsArray: [String] = []
     private var subscriptions = Set<AnyCancellable>()
+    private let maxDownloadAttemptsCount = 3
+    
+    @Atomic private var fileDownloadAttemptsCount: [String: Int] = [:]
     
     var downloadingFilesIDs: Published<[String]>.Publisher {
         $downloadingFilesIDsArray
@@ -291,34 +294,17 @@ final class ChatFileService: ChatFileProtocol {
         }
         
         Task {
-            let shouldDownloadPreviewFile: Bool
-            switch previewDownloadPolicy {
-            case .nobody:
-                shouldDownloadPreviewFile = false
-            case .everybody:
-                shouldDownloadPreviewFile = needsPreviewDownload(file: file)
-                ? true
-                : false
-            case .contacts:
-                shouldDownloadPreviewFile = needsPreviewDownload(file: file)
-                ? havePartnerName
-                : false
-            }
+            let shouldDownloadPreviewFile = shoudDownloadPreview(
+                file: file,
+                previewDownloadPolicy: previewDownloadPolicy,
+                havePartnerName: havePartnerName
+            )
             
-            let isMedia = file.fileType == .image || file.fileType == .video
-            let shouldDownloadOriginalFile: Bool
-            switch fullMediaDownloadPolicy {
-            case .nobody:
-                shouldDownloadOriginalFile = false
-            case .everybody:
-                shouldDownloadOriginalFile = !filesStorage.isCached(file.file.id) && isMedia
-                ? true
-                : false
-            case .contacts:
-                shouldDownloadOriginalFile = !filesStorage.isCached(file.file.id) && isMedia
-                ? havePartnerName
-                : false
-            }
+            let shouldDownloadOriginalFile = shoudDownloadOriginal(
+                file: file,
+                fullMediaDownloadPolicy: fullMediaDownloadPolicy,
+                havePartnerName: havePartnerName
+            )
             
             guard shouldDownloadOriginalFile || shouldDownloadPreviewFile else { return }
             
@@ -331,6 +317,21 @@ final class ChatFileService: ChatFileProtocol {
                     shouldDownloadPreviewFile: shouldDownloadPreviewFile
                 )
             } catch {
+                let count = fileDownloadAttemptsCount[file.file.id] ?? .zero
+                
+                guard count >= maxDownloadAttemptsCount else {
+                    fileDownloadAttemptsCount[file.file.id] = count + 1
+                    autoDownload(
+                        file: file,
+                        isFromCurrentSender: isFromCurrentSender,
+                        chatroom: chatroom,
+                        havePartnerName: havePartnerName,
+                        previewDownloadPolicy: previewDownloadPolicy,
+                        fullMediaDownloadPolicy: fullMediaDownloadPolicy
+                    )
+                    return
+                }
+                
                 ignoreFilesIDsArray.append(file.file.id)
             }
         }
@@ -458,6 +459,51 @@ private extension ChatFileService {
             ownerId: ownerId,
             recipientId: recipientId
         )
+    }
+    
+    func shoudDownloadOriginal(
+        file: ChatFile,
+        fullMediaDownloadPolicy: DownloadPolicy,
+        havePartnerName: Bool
+    ) -> Bool {
+        let isMedia = file.fileType == .image || file.fileType == .video
+        let shouldDownloadOriginalFile: Bool
+        switch fullMediaDownloadPolicy {
+        case .nobody:
+            shouldDownloadOriginalFile = false
+        case .everybody:
+            shouldDownloadOriginalFile = !filesStorage.isCached(file.file.id) && isMedia
+            ? true
+            : false
+        case .contacts:
+            shouldDownloadOriginalFile = !filesStorage.isCached(file.file.id) && isMedia
+            ? havePartnerName
+            : false
+        }
+        
+        return shouldDownloadOriginalFile
+    }
+    
+    func shoudDownloadPreview(
+        file: ChatFile,
+        previewDownloadPolicy: DownloadPolicy,
+        havePartnerName: Bool
+    ) -> Bool {
+        let shouldDownloadPreviewFile: Bool
+        switch previewDownloadPolicy {
+        case .nobody:
+            shouldDownloadPreviewFile = false
+        case .everybody:
+            shouldDownloadPreviewFile = needsPreviewDownload(file: file)
+            ? true
+            : false
+        case .contacts:
+            shouldDownloadPreviewFile = needsPreviewDownload(file: file)
+            ? havePartnerName
+            : false
+        }
+        
+        return shouldDownloadPreviewFile
     }
     
     func needsPreviewDownload(file: ChatFile) -> Bool {
