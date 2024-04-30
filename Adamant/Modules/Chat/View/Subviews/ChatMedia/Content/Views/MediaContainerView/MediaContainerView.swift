@@ -20,7 +20,7 @@ final class MediaContainerView: UIView {
         stack.distribution = .fill
         stack.layer.masksToBounds = true
         
-        for chunk in 0..<3 {
+        for chunk in 0..<(FilesConstants.maxFilesCount / 2) {
             let stackView = UIStackView()
             stackView.axis = .horizontal
             stackView.spacing = stackSpacing
