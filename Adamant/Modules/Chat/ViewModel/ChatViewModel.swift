@@ -675,8 +675,7 @@ final class ChatViewModel: NSObject {
         
         guard tx?.statusEnum == .delivered,
               !downloadingFilesID.contains(file.file.id),
-              case let(.file(fileModel)) = message?.content,
-              let index = fileModel.value.content.fileModel.files.firstIndex(of: file)
+              case let(.file(fileModel)) = message?.content
         else { return }
         
         guard !file.isCached else {
@@ -692,6 +691,7 @@ final class ChatViewModel: NSObject {
                     }
                     
                     return FileResult.init(
+                        assetId: file.file.id,
                         url: url,
                         type: file.fileType,
                         preview: nil,
@@ -702,7 +702,8 @@ final class ChatViewModel: NSObject {
                         resolution: nil
                     )
                 }
-                
+              
+                let index = files.firstIndex(where: { $0.assetId == file.file.id }) ?? .zero
                 presentDocumentViewerVC.send((files, index))
             } catch {
                 dialog.send(.alert(error.localizedDescription))
