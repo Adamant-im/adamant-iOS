@@ -366,7 +366,8 @@ private extension ChatFileService {
               let ownerId = accountService.account?.address,
               let recipientId = chatroom?.partner?.address,
               NetworkFileProtocolType(rawValue: file.storage) != nil,
-              (shouldDownloadOriginalFile || shouldDownloadPreviewFile)
+              (shouldDownloadOriginalFile || shouldDownloadPreviewFile),
+              !downloadingFilesIDsArray.contains(file.file.id)
         else { return }
         
         guard !file.file.id.isEmpty,
