@@ -308,7 +308,9 @@ private extension ChatMessageFactory {
         let files: [[String: Any]] = transaction.getRichValue(for: RichContentKeys.file.files) ?? [[:]]
         
         let decodedMessage = decodeMessage(transaction)
-        let storage = transaction.getRichValue(for: RichContentKeys.file.storage) ?? .empty
+        let storageData: [String: Any] = transaction.getRichValue(for: RichContentKeys.file.storage) ?? [:]
+        let storage = RichMessageFile.Storage(storageData).id
+        
         let commentRaw = transaction.getRichValue(for: RichContentKeys.file.comment) ?? .empty
         let replyId = transaction.getRichValue(for: RichContentKeys.reply.replyToId) ?? .empty
         let reactions = transaction.richContent?[RichContentKeys.react.reactions] as? Set<Reaction>
