@@ -108,15 +108,16 @@ final class ChatFileService: ChatFileProtocol {
         let replyMessage = replyMessage
         
         var richFiles: [RichMessageFile.File] = files.compactMap {
-            RichMessageFile.File.init(
-                file_id: $0.url.absoluteString,
-                file_type: $0.extenstion,
-                file_size: $0.size,
-                preview_id: $0.previewUrl?.absoluteString,
-                preview_nonce: nil,
-                file_name: $0.name,
+            .init(
+                id: $0.url.absoluteString,
+                size: $0.size,
                 nonce: .empty,
-                file_resolution: $0.resolution
+                name: $0.name,
+                type: $0.extenstion,
+                preview: $0.previewUrl.map { 
+                    RichMessageFile.Preview(id: $0.absoluteString, nonce: .empty)
+                },
+                resolution: $0.resolution
             )
         }
         
@@ -128,7 +129,7 @@ final class ChatFileService: ChatFileProtocol {
                     replyto_id: replyMessage.id,
                     reply_message: RichMessageFile(
                         files: richFiles,
-                        storage: storageProtocol.rawValue,
+                        storage: .init(id: storageProtocol.rawValue),
                         comment: text
                     )
                 )
@@ -137,7 +138,7 @@ final class ChatFileService: ChatFileProtocol {
             messageLocally = .richMessage(
                 payload: RichMessageFile(
                     files: richFiles,
-                    storage: storageProtocol.rawValue,
+                    storage: .init(id: storageProtocol.rawValue),
                     comment: text
                 )
             )
@@ -154,7 +155,7 @@ final class ChatFileService: ChatFileProtocol {
         )
         
         richFiles.forEach { file in
-            uploadingFilesIDsArray.append(file.file_id)
+            uploadingFilesIDsArray.append(file.id)
         }
         
         do {
@@ -202,13 +203,18 @@ final class ChatFileService: ChatFileProtocol {
                     cached: cached
                 ))
                 
+                var previewDTO: RichMessageFile.Preview?
+                if let cid = result.preview?.cid,
+                   let nonce = result.preview?.nonce {
+                    previewDTO = .init(id: cid, nonce: nonce)
+                }
+                
                 if let index = richFiles.firstIndex(
-                    where: { $0.file_id == oldId }
+                    where: { $0.id == oldId }
                 ) {
-                    richFiles[index].file_id = result.file.cid
+                    richFiles[index].id = result.file.cid
                     richFiles[index].nonce = result.file.nonce
-                    richFiles[index].preview_id = result.preview?.cid
-                    richFiles[index].preview_nonce = result.preview?.nonce
+                    richFiles[index].preview = previewDTO
                 }
             }
             
@@ -220,7 +226,7 @@ final class ChatFileService: ChatFileProtocol {
                         replyto_id: replyMessage.id,
                         reply_message: RichMessageFile(
                             files: richFiles,
-                            storage: NetworkFileProtocolType.ipfs.rawValue,
+                            storage: .init(id: NetworkFileProtocolType.ipfs.rawValue),
                             comment: text
                         )
                     )
@@ -229,7 +235,7 @@ final class ChatFileService: ChatFileProtocol {
                 message = .richMessage(
                     payload: RichMessageFile(
                         files: richFiles,
-                        storage: NetworkFileProtocolType.ipfs.rawValue,
+                        storage: .init(id: NetworkFileProtocolType.ipfs.rawValue),
                         comment: text
                     )
                 )
@@ -244,7 +250,7 @@ final class ChatFileService: ChatFileProtocol {
             )
         } catch {
             richFiles.forEach { file in
-                uploadingFilesIDsArray.removeAll(where: { $0 == file.file_id })
+                uploadingFilesIDsArray.removeAll(where: { $0 == file.id })
             }
             
             try? await chatsProvider.setTxMessageAsFailed(
@@ -278,8 +284,8 @@ final class ChatFileService: ChatFileProtocol {
         previewDownloadPolicy: DownloadPolicy,
         fullMediaDownloadPolicy: DownloadPolicy
     ) {
-        guard !downloadingFilesIDsArray.contains(file.file.file_id),
-              !ignoreFilesIDsArray.contains(file.file.file_id)
+        guard !downloadingFilesIDsArray.contains(file.file.id),
+              !ignoreFilesIDsArray.contains(file.file.id)
         else {
             return
         }
@@ -305,11 +311,11 @@ final class ChatFileService: ChatFileProtocol {
             case .nobody:
                 shouldDownloadOriginalFile = false
             case .everybody:
-                shouldDownloadOriginalFile = !filesStorage.isCached(file.file.file_id) && isMedia
+                shouldDownloadOriginalFile = !filesStorage.isCached(file.file.id) && isMedia
                 ? true
                 : false
             case .contacts:
-                shouldDownloadOriginalFile = !filesStorage.isCached(file.file.file_id) && isMedia
+                shouldDownloadOriginalFile = !filesStorage.isCached(file.file.id) && isMedia
                 ? havePartnerName
                 : false
             }
@@ -325,7 +331,7 @@ final class ChatFileService: ChatFileProtocol {
                     shouldDownloadPreviewFile: shouldDownloadPreviewFile
                 )
             } catch {
-                ignoreFilesIDsArray.append(file.file.file_id)
+                ignoreFilesIDsArray.append(file.file.id)
             }
         }
     }
@@ -362,21 +368,25 @@ private extension ChatFileService {
               (shouldDownloadOriginalFile || shouldDownloadPreviewFile)
         else { return }
         
-        defer {
-            downloadingFilesIDsArray.removeAll(where: { $0 == file.file.file_id })
+        guard !file.file.id.isEmpty,
+              !file.file.nonce.isEmpty
+        else {
+            throw FileManagerError.cantDownloadFile
         }
-        downloadingFilesIDsArray.append(file.file.file_id)
+        
+        defer {
+            downloadingFilesIDsArray.removeAll(where: { $0 == file.file.id })
+        }
+        downloadingFilesIDsArray.append(file.file.id)
         
         var preview: UIImage?
         
-        if let previewId = file.file.preview_id,
-           let previewNonce = file.file.preview_nonce {
-            
+        if let previewDTO = file.file.preview {
             if shouldDownloadPreviewFile,
-               !filesStorage.isCached(previewId) {
+               !filesStorage.isCached(previewDTO.id) {
                 try await downloadAndCacheFile(
-                    id: previewId,
-                    nonce: previewNonce,
+                    id: previewDTO.id,
+                    nonce: previewDTO.nonce,
                     storage: file.storage,
                     publicKey: chatroom?.partner?.publicKey ?? .empty,
                     privateKey: keyPair.privateKey,
@@ -386,15 +396,15 @@ private extension ChatFileService {
             }
             
             preview = filesStorage.getPreview(
-                for: previewId,
-                type: file.file.file_type ?? .empty
+                for: previewDTO.id,
+                type: file.file.type ?? .empty
             )
             
             if shouldDownloadPreviewFile {
-                let cached = filesStorage.isCached(file.file.file_id)
+                let cached = filesStorage.isCached(file.file.id)
                 
                 updateFileFields.send((
-                    id: file.file.file_id,
+                    id: file.file.id,
                     newId: nil,
                     preview: preview,
                     cached: cached
@@ -403,9 +413,9 @@ private extension ChatFileService {
         }
         
         if shouldDownloadOriginalFile,
-           !filesStorage.isCached(file.file.file_id) {
+           !filesStorage.isCached(file.file.id) {
             try await downloadAndCacheFile(
-                id: file.file.file_id,
+                id: file.file.id,
                 nonce: file.nonce,
                 storage: file.storage,
                 publicKey: chatroom?.partner?.publicKey ?? .empty,
@@ -414,10 +424,10 @@ private extension ChatFileService {
                 recipientId: recipientId
             )
             
-            let cached = filesStorage.isCached(file.file.file_id)
+            let cached = filesStorage.isCached(file.file.id)
             
             updateFileFields.send((
-                id: file.file.file_id,
+                id: file.file.id,
                 newId: nil,
                 preview: preview,
                 cached: cached
@@ -451,8 +461,8 @@ private extension ChatFileService {
     }
     
     func needsPreviewDownload(file: ChatFile) -> Bool {
-        if let previewId = file.file.preview_id,
-           file.file.preview_nonce != nil,
+        if let previewId = file.file.preview?.id,
+           file.file.preview?.nonce != nil,
            !ignoreFilesIDsArray.contains(previewId),
            !filesStorage.isCached(previewId) {
             return true

@@ -114,7 +114,7 @@ private extension MediaContainerView {
                         )
                     }
 
-                    if let resolution = file.file.file_resolution,
+                    if let resolution = file.file.resolution,
                        resolution.width > resolution.height {
                         isHorizontal = true
                     }
@@ -148,7 +148,7 @@ private extension MediaContainerView {
         var totalWidthForEqualAspectRatio: CGFloat = 0.0
         
         for case let mediaView as MediaContentView in horizontalStackView.arrangedSubviews {
-            if let resolution = mediaView.model.file.file_resolution {
+            if let resolution = mediaView.model.file.resolution {
                 let aspectRatio = resolution.width / resolution.height
                 let widthForEqualAspectRatio = height * aspectRatio
                 totalWidthForEqualAspectRatio += widthForEqualAspectRatio
@@ -160,7 +160,7 @@ private extension MediaContainerView {
         let scaleFactor = filesStackWidth / totalWidthForEqualAspectRatio
 
         for case let mediaView as MediaContentView in horizontalStackView.arrangedSubviews {
-            if let resolution = mediaView.model.file.file_resolution {
+            if let resolution = mediaView.model.file.resolution {
                 let aspectRatio = resolution.width / resolution.height
                 let widthForEqualAspectRatio = height * aspectRatio
                 var width = max(widthForEqualAspectRatio * scaleFactor, minimumWidth)
@@ -203,7 +203,7 @@ extension ChatMediaContentView.FileModel {
         for row in rows {
             var isHorizontal = false
             for row in row {
-                if let resolution = row.file.file_resolution,
+                if let resolution = row.file.resolution,
                    resolution.width > resolution.height {
                     isHorizontal = true
                 }

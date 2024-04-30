@@ -13,6 +13,8 @@ public final class FilesStorageKit {
     }
     
     public func getPreview(for id: String, type: String) -> UIImage? {
+        guard !id.isEmpty else { return nil }
+        
         if let image = cachedFiles.object(forKey: id as NSString) {
             return image
         }

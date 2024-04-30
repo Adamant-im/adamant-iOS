@@ -172,14 +172,14 @@ private extension ChatFileView {
             spinner.stopAnimating()
         }
         
-        let fileType = model.file.file_type ?? ""
-        let fileName = model.file.file_name ?? "UNKNWON"
+        let fileType = model.file.type.map { ".\($0)" } ?? .empty
+        let fileName = model.file.name ?? "UNKNWON"
         
         nameLabel.text = fileName.contains(fileType)
         ? fileName
-        : "\(fileName.uppercased()).\(fileType.uppercased())"
+        : "\(fileName.uppercased())\(fileType.uppercased())"
         
-        sizeLabel.text = formatSize(model.file.file_size)
+        sizeLabel.text = formatSize(model.file.size)
         additionalLabel.text = fileType.uppercased()
         
         videoIconIV.isHidden = !(

@@ -674,20 +674,20 @@ final class ChatViewModel: NSObject {
         let message = messages.first(where: { $0.messageId == messageId })
         
         guard tx?.statusEnum == .delivered,
-              !downloadingFilesID.contains(file.file.file_id),
+              !downloadingFilesID.contains(file.file.id),
               case let(.file(fileModel)) = message?.content,
               let index = fileModel.value.content.fileModel.files.firstIndex(of: file)
         else { return }
         
         guard !file.isCached else {
             do {
-                _ = try filesStorage.getFileURL(with: file.file.file_id)
+                _ = try filesStorage.getFileURL(with: file.file.id)
 
                 let chatFiles = fileModel.value.content.fileModel.files
                 
                 let files: [FileResult] = chatFiles.compactMap { file in
                     guard file.isCached,
-                          let url = try? filesStorage.getFileURL(with: file.file.file_id) else {
+                          let url = try? filesStorage.getFileURL(with: file.file.id) else {
                         return nil
                     }
                     
@@ -696,9 +696,9 @@ final class ChatViewModel: NSObject {
                         type: file.fileType,
                         preview: nil,
                         previewUrl: nil,
-                        size: file.file.file_size,
-                        name: file.file.file_name,
-                        extenstion: file.file.file_type,
+                        size: file.file.size,
+                        name: file.file.name,
+                        extenstion: file.file.type,
                         resolution: nil
                     )
                 }
@@ -1175,10 +1175,10 @@ private extension ChatViewModel {
         messages.indices.forEach { index in
             messages[index].getFiles().forEach { file in
                 messages[index].updateFields(
-                    id: file.file.file_id,
+                    id: file.file.id,
                     preview: nil,
                     needToUpdatePeview: false,
-                    isDownloading: downloadingFilesID.contains(file.file.file_id)
+                    isDownloading: downloadingFilesID.contains(file.file.id)
                 )
             }
         }
@@ -1188,10 +1188,10 @@ private extension ChatViewModel {
         messages.indices.forEach { index in
             messages[index].getFiles().forEach { file in
                 messages[index].updateFields(
-                    id: file.file.file_id,
+                    id: file.file.id,
                     preview: nil,
                     needToUpdatePeview: false,
-                    isUploading: uploadingFilesIDs.contains(file.file.file_id)
+                    isUploading: uploadingFilesIDs.contains(file.file.id)
                 )
             }
         }
@@ -1285,11 +1285,11 @@ private extension ChatMessage {
         var model = fileModel.value
         
         guard let index = model.content.fileModel.files.firstIndex(
-            where: { $0.file.file_id == oldId }
+            where: { $0.file.id == oldId }
         ) else { return }
         
         if let newId = newId {
-            model.content.fileModel.files[index].file.file_id = newId
+            model.content.fileModel.files[index].file.id = newId
         }
         if let value = cached {
             model.content.fileModel.files[index].isCached = value

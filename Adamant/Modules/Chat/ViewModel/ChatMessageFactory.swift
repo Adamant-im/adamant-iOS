@@ -391,13 +391,14 @@ private extension ChatMessageFactory {
         storage: String
     ) -> [ChatFile] {
         return files.map {
-            let previewId = $0[RichContentKeys.file.preview_id] as? String ?? .empty
-            let fileType = $0[RichContentKeys.file.file_type] as? String ?? .empty
-            let fileId = $0[RichContentKeys.file.file_id] as? String ?? .empty
+            let previewData = $0[RichContentKeys.file.preview] as? [String: Any] ?? [:]
+            let preview = RichMessageFile.Preview(previewData)
+            let fileType = $0[RichContentKeys.file.type] as? String ?? .empty
+            let fileId = $0[RichContentKeys.file.id] as? String ?? .empty
             
             return ChatFile(
                 file: RichMessageFile.File($0),
-                previewImage: filesStorage.getPreview(for: previewId, type: fileType),
+                previewImage: filesStorage.getPreview(for: preview.id, type: fileType),
                 isDownloading: downloadingFilesIDs.contains(fileId),
                 isUploading: uploadingFilesIDs.contains(fileId),
                 isCached: filesStorage.isCached(fileId),

@@ -52,13 +52,13 @@ public enum RichContentKeys {
         public static let file_id = "file_id"
         public static let comment = "comment"
         public static let storage = "storage"
-        public static let file_size = "file_size"
-        public static let file_type = "file_type"
-        public static let preview_id = "preview_id"
-        public static let file_name = "file_name"
         public static let nonce = "nonce"
-        public static let preview_nonce = "preview_nonce"
-        public static let file_resolution = "file_resolution"
+        public static let resolution = "resolution"
+        public static let id = "id"
+        public static let size = "size"
+        public static let type = "type"
+        public static let name = "name"
+        public static let preview = "preview"
     }
 }
 
@@ -92,82 +92,130 @@ public struct RichMessageReaction: RichMessage {
 // MARK: - RichMessageFile
 
 public struct RichMessageFile: RichMessage {
-    public struct File: Codable, Equatable, Hashable {
-        public var file_id: String
-        public var file_type: String?
-        public var file_size: Int64
-        public var preview_id: String?
-        public var file_name: String?
+    public struct Preview: Codable, Equatable, Hashable {
+        public var id: String
         public var nonce: String
-        public var preview_nonce: String?
-        public var file_resolution: CGSize?
         
         public init(
-            file_id: String,
-            file_type: String? = nil,
-            file_size: Int64,
-            preview_id: String? = nil,
-            preview_nonce: String? = nil,
-            file_name: String? = nil,
-            nonce: String,
-            file_resolution: CGSize? = nil
+            id: String,
+            nonce: String
         ) {
-            self.file_id = file_id
-            self.file_type = file_type
-            self.file_size = file_size
-            self.preview_id = preview_id
-            self.file_name = file_name
+            self.id = id
             self.nonce = nonce
-            self.preview_nonce = preview_nonce
-            self.file_resolution = file_resolution
         }
         
         public init(_ data: [String: Any]) {
-            self.file_id = (data[RichContentKeys.file.file_id] as? String) ?? .empty
-            self.file_type = data[RichContentKeys.file.file_type] as? String
-            self.file_size = (data[RichContentKeys.file.file_size] as? Int64) ?? .zero
-            self.preview_id = data[RichContentKeys.file.preview_id] as? String
-            self.file_name = data[RichContentKeys.file.file_name] as? String
+            self.id = (data[RichContentKeys.file.id] as? String) ?? .empty
             self.nonce = data[RichContentKeys.file.nonce] as? String ?? .empty
-            self.preview_nonce = data[RichContentKeys.file.preview_nonce] as? String ?? .empty
-            if let resolution = data[RichContentKeys.file.file_resolution] as? [CGFloat] {
-                self.file_resolution = .init(
+        }
+        
+        public func content() -> [String: Any] {
+            var contentDict: [String : Any] =  [:]
+            
+            if !id.isEmpty {
+                contentDict[RichContentKeys.file.id] = id
+            }
+            
+            if !nonce.isEmpty {
+                contentDict[RichContentKeys.file.nonce] = nonce
+            }
+            
+            return contentDict
+        }
+    }
+    
+    public struct File: Codable, Equatable, Hashable {
+        public var preview: Preview?
+        public var id: String
+        public var type: String?
+        public var size: Int64
+        public var nonce: String
+        public var resolution: CGSize?
+        public var name: String?
+        
+        public init(
+            id: String,
+            size: Int64,
+            nonce: String,
+            name: String?,
+            type: String? = nil,
+            preview: Preview? = nil,
+            resolution: CGSize? = nil
+        ) {
+            self.id = id
+            self.type = type
+            self.size = size
+            self.nonce = nonce
+            self.name = name
+            self.preview = preview
+            self.resolution = resolution
+        }
+        
+        public init(_ data: [String: Any]) {
+            self.id = (data[RichContentKeys.file.id] as? String) ?? .empty
+            self.type = data[RichContentKeys.file.type] as? String
+            self.size = (data[RichContentKeys.file.size] as? Int64) ?? .zero
+            self.name = data[RichContentKeys.file.name] as? String
+            self.nonce = data[RichContentKeys.file.nonce] as? String ?? .empty
+
+            if let previewData = data[RichContentKeys.file.preview] as? [String: Any] {
+                self.preview = Preview(previewData)
+            }
+            
+            if let resolution = data[RichContentKeys.file.resolution] as? [CGFloat] {
+                self.resolution = .init(
                     width: resolution.first ?? .zero,
                     height: resolution.last ?? .zero
                 )
-            } else if let resolution = data[RichContentKeys.file.file_resolution] as? CGSize {
-                self.file_resolution = resolution
+            } else if let resolution = data[RichContentKeys.file.resolution] as? CGSize {
+                self.resolution = resolution
             } else {
-                self.file_resolution = nil
+                self.resolution = nil
             }
         }
         
         public func content() -> [String: Any] {
             var contentDict: [String : Any] =  [
-                RichContentKeys.file.file_id: file_id,
-                RichContentKeys.file.file_size: file_size,
+                RichContentKeys.file.id: id,
+                RichContentKeys.file.size: size,
                 RichContentKeys.file.nonce: nonce
             ]
             
-            if let file_type = file_type, !file_type.isEmpty {
-                contentDict[RichContentKeys.file.file_type] = file_type
+            if let type = type, !type.isEmpty {
+                contentDict[RichContentKeys.file.type] = type
             }
             
-            if let preview_id = preview_id, !preview_id.isEmpty {
-                contentDict[RichContentKeys.file.preview_id] = preview_id
+            if let preview = preview {
+                contentDict[RichContentKeys.file.preview] = preview.content()
             }
             
-            if let preview_nonce = preview_nonce, !preview_nonce.isEmpty {
-                contentDict[RichContentKeys.file.preview_nonce] = preview_nonce
+            if let name = name, !name.isEmpty {
+                contentDict[RichContentKeys.file.name] = name
             }
             
-            if let file_name = file_name, !file_name.isEmpty {
-                contentDict[RichContentKeys.file.file_name] = file_name
+            if let resolution = resolution {
+                contentDict[RichContentKeys.file.resolution] = resolution
             }
             
-            if let file_resolution = file_resolution {
-                contentDict[RichContentKeys.file.file_resolution] = file_resolution
-            }
+            return contentDict
+        }
+    }
+    
+    public struct Storage: Codable, Equatable, Hashable {
+        public var id: String
+        
+        public init(id: String) {
+            self.id = id
+        }
+        
+        public init(_ data: [String: Any]) {
+            self.id = (data[RichContentKeys.file.id] as? String) ?? .empty
+        }
+        
+        public func content() -> [String: Any] {
+            let contentDict: [String : Any] =  [
+                RichContentKeys.file.id: id
+            ]
             
             return contentDict
         }
@@ -176,14 +224,14 @@ public struct RichMessageFile: RichMessage {
     public var type: String
     public var additionalType: RichAdditionalType
     public var files: [File]
-    public var storage: String
+    public var storage: Storage
     public var comment: String?
     
     public enum CodingKeys: String, CodingKey {
         case files, storage, comment
     }
     
-    public init(files: [File], storage: String, comment: String?) {
+    public init(files: [File], storage: Storage, comment: String?) {
         self.type = RichContentKeys.file.file
         self.files = files
         self.storage = storage
@@ -194,7 +242,7 @@ public struct RichMessageFile: RichMessage {
     public func content() -> [String: Any] {
         var contentDict: [String : Any] = [
             RichContentKeys.file.files: files.map { $0.content() },
-            RichContentKeys.file.storage: storage
+            RichContentKeys.file.storage: storage.content()
         ]
         
         if let comment = comment, !comment.isEmpty {
