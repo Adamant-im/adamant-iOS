@@ -13,8 +13,16 @@ public class FilePresentationHelper {
         otherFilesCount: Int,
         comment: String
     ) -> String {
-        let mediaText = mediaFilesCount > 0 ? "📸\(mediaFilesCount)" : .empty
-        let fileText = otherFilesCount > 0 ? "📄\(otherFilesCount)" : .empty
+        let mediaCountText = mediaFilesCount > 1
+        ? "\(mediaFilesCount)"
+        : .empty
+        
+        let otherFilesCountText = otherFilesCount > 1
+        ? "\(otherFilesCount)"
+        : .empty
+        
+        let mediaText = mediaFilesCount > 0 ? "📸\(mediaCountText)" : .empty
+        let fileText = otherFilesCount > 0 ? "📄\(otherFilesCountText)" : .empty
         
         let text = [mediaText, fileText, comment].filter {
             !$0.isEmpty

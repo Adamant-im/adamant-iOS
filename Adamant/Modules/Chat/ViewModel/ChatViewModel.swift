@@ -36,6 +36,8 @@ final class ChatViewModel: NSObject {
     private let filesStorage: FilesStorageProtocol
     private let chatFileService: ChatFileProtocol
     private let filesStorageProprieties: FilesStorageProprietiesProtocol
+    private let nodesStorage: NodesStorageProtocol
+    private let reachabilityMonitor: ReachabilityMonitor
     
     let chatMessagesListViewModel: ChatMessagesListViewModel
 
@@ -159,7 +161,9 @@ final class ChatViewModel: NSObject {
         chatPreservation: ChatPreservationProtocol,
         filesStorage: FilesStorageProtocol,
         chatFileService: ChatFileProtocol,
-        filesStorageProprieties: FilesStorageProprietiesProtocol
+        filesStorageProprieties: FilesStorageProprietiesProtocol,
+        nodesStorage: NodesStorageProtocol,
+        reachabilityMonitor: ReachabilityMonitor
     ) {
         self.chatsProvider = chatsProvider
         self.markdownParser = markdownParser
@@ -179,6 +183,8 @@ final class ChatViewModel: NSObject {
         self.filesStorage = filesStorage
         self.chatFileService = chatFileService
         self.filesStorageProprieties = filesStorageProprieties
+        self.nodesStorage = nodesStorage
+        self.reachabilityMonitor = reachabilityMonitor
         
         super.init()
         setupObservers()
@@ -271,7 +277,26 @@ final class ChatViewModel: NSObject {
             return
         }
         
+        guard reachabilityMonitor.connection else {
+            dialog.send(.alert(.adamant.sharedErrors.networkError))
+            return
+        }
+        
+        guard nodesStorage.haveActiveNode(in: .adm) else {
+            dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
+                coin: NodeGroup.adm.name
+            ).localizedDescription))
+            return
+        }
+        
         if filesPicked?.count ?? .zero > .zero {
+            guard nodesStorage.haveActiveNode(in: .ipfs) else {
+                dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
+                    coin: NodeGroup.ipfs.name
+                ).localizedDescription))
+                return
+            }
+            
             Task {
                 let replyMessage = replyMessage
                 let filesPicked = filesPicked
@@ -673,6 +698,13 @@ final class ChatViewModel: NSObject {
     func canSendMessage(withText text: String) -> Bool {
         guard text.count <= maxMessageLenght else {
             dialog.send(.alert(.adamant.chat.messageIsTooBig))
+            return false
+        }
+        
+        guard nodesStorage.haveActiveNode(in: .adm) else {
+            dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
+                coin: NodeGroup.adm.name
+            ).localizedDescription))
             return false
         }
         

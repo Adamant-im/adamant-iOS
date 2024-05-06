@@ -293,7 +293,11 @@ extension ChatMediaContainerView {
             actionHandler(.copy(text: model.content.comment.string))
         }
         
-        return AMenuSection([reply, copy, report, remove])
+        let actions: [AMenuItem] = model.content.comment.string.isEmpty
+        ? [reply, report, remove]
+        : [reply, copy, report, remove]
+        
+        return AMenuSection(actions)
     }
 }
 

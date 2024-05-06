@@ -743,7 +743,7 @@
 "StorageUsage.Clear.Title" = "Очистить хранилище";
 
 /* Storage usage: Clear Popup Title */
-"StorageUsage.Clear.Popup.Title" = "Вы уверены, что хотите удалить данные из хранилища ?";
+"StorageUsage.Clear.Popup.Title" = "Файлы и изображения придется скачивать повторно. Продолжить?";
 
 /* Storage usage: Title */
 "StorageUsage.Title" = "Память и данные";

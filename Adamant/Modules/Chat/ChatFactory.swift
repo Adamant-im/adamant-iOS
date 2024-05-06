@@ -31,7 +31,9 @@ struct ChatFactory {
     let filesStorage: FilesStorageProtocol
     let chatFileService: ChatFileProtocol
     let filesStorageProprieties: FilesStorageProprietiesProtocol
-    
+    let nodesStorage: NodesStorageProtocol
+    let reachabilityMonitor: ReachabilityMonitor
+   
     nonisolated init(assembler: Assembler) {
         chatsProvider = assembler.resolve(ChatsProvider.self)!
         dialogService = assembler.resolve(DialogService.self)!
@@ -48,6 +50,8 @@ struct ChatFactory {
         filesStorage = assembler.resolve(FilesStorageProtocol.self)!
         chatFileService = assembler.resolve(ChatFileProtocol.self)!
         filesStorageProprieties = assembler.resolve(FilesStorageProprietiesProtocol.self)!
+        nodesStorage = assembler.resolve(NodesStorageProtocol.self)!
+        reachabilityMonitor = assembler.resolve(ReachabilityMonitor.self)!
     }
     
     func makeViewController(screensFactory: ScreensFactory) -> ChatViewController {
@@ -124,7 +128,9 @@ private extension ChatFactory {
             chatPreservation: chatPreservation,
             filesStorage: filesStorage,
             chatFileService: chatFileService,
-            filesStorageProprieties: filesStorageProprieties
+            filesStorageProprieties: filesStorageProprieties,
+            nodesStorage: nodesStorage,
+            reachabilityMonitor: reachabilityMonitor
         )
     }
     

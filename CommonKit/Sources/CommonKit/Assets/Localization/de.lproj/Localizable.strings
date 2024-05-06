@@ -755,7 +755,7 @@
 "Storage.AutoDownloadPreview.Header" = "Automatischer Download von Medien";
 
 /* Storage usage: Clear Popup Title */
-"StorageUsage.Clear.Popup.Title" = "Sind Sie sicher, dass Sie die Daten aus dem Speicher löschen möchten?";
+"StorageUsage.Clear.Popup.Title" = "Sie werden erneut Dateien und Bilder herunterladen. Weiter?";
 
 /* Storage usage: Clear Title */
 "StorageUsage.Clear.Title" = "Klarer Speicher";

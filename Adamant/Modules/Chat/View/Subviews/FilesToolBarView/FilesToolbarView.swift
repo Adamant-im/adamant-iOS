@@ -102,6 +102,11 @@ extension FilesToolbarView {
     func update(_ data: [FileResult]) {
         self.data = data
         collectionView.reloadData()
+        collectionView.scrollToItem(
+            at: .init(row: data.count - 1, section: .zero),
+            at: .right,
+            animated: true
+        )
     }
 }
 
@@ -139,7 +144,10 @@ extension FilesToolbarView: UICollectionViewDelegate, UICollectionViewDataSource
         .init(width: self.frame.height - 10, height: self.frame.height - 10)
     }
     
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        didSelectItemAt indexPath: IndexPath
+    ) {
         openFileAction?(data[indexPath.row])
     }
 }

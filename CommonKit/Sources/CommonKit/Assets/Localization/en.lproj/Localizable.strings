@@ -743,7 +743,7 @@
 "StorageUsage.Clear.Title" = "Clear storage";
 
 /* Storage usage: Clear Popup Title */
-"StorageUsage.Clear.Popup.Title" = "Are you sure you want to delete the data from storage?";
+"StorageUsage.Clear.Popup.Title" = "You'll download files and images again. Continue?";
 
 /* Storage usage: Title */
 "StorageUsage.Title" = "Storage and data";

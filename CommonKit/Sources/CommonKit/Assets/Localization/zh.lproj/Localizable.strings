@@ -701,7 +701,7 @@
 "StorageUsage.Clear.Title" = "清晰的存储";
 
 /* Storage usage: Clear Popup Title */
-"StorageUsage.Clear.Popup.Title" = "您确定要从存储中删除数据吗？";
+"StorageUsage.Clear.Popup.Title" = "您将再次下载文件和图像。继续？";
 
 /* Storage usage: Title */
 "StorageUsage.Title" = "存储和数据";

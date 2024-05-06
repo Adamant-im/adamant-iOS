@@ -20,6 +20,8 @@ final class FilesStorageProprietiesService: FilesStorageProprietiesProtocol {
     @Atomic private var notificationsSet: Set<AnyCancellable> = []
     private var autoDownloadPreviewState: DownloadPolicy = .everybody
     private var autoDownloadFullMediaState: DownloadPolicy = .everybody
+    private let autoDownloadPreviewDefaultState: DownloadPolicy = .contacts
+    private let autoDownloadFullMediaDefaultState: DownloadPolicy = .contacts
 
     // MARK: Lifecycle
     
@@ -49,8 +51,8 @@ final class FilesStorageProprietiesService: FilesStorageProprietiesProtocol {
     }
     
     private func userLoggedOut() {
-        setAutoDownloadPreview(.everybody)
-        setAutoDownloadFullMedia(.everybody)
+        setAutoDownloadPreview(autoDownloadPreviewDefaultState)
+        setAutoDownloadFullMedia(autoDownloadFullMediaDefaultState)
     }
     
     // MARK: Update data
@@ -63,10 +65,10 @@ final class FilesStorageProprietiesService: FilesStorageProprietiesProtocol {
         guard let result: String = securedStore.get(
             StoreKey.storage.autoDownloadPreviewEnabled
         ) else {
-            return .everybody
+            return autoDownloadPreviewDefaultState
         }
         
-        return DownloadPolicy(rawValue: result) ?? .everybody
+        return DownloadPolicy(rawValue: result) ?? autoDownloadPreviewDefaultState
     }
     
     func setAutoDownloadPreview(_ value: DownloadPolicy) {
@@ -82,10 +84,10 @@ final class FilesStorageProprietiesService: FilesStorageProprietiesProtocol {
         guard let result: String = securedStore.get(
             StoreKey.storage.autoDownloadFullMediaEnabled
         ) else {
-            return .everybody
+            return autoDownloadFullMediaDefaultState
         }
         
-        return DownloadPolicy(rawValue: result) ?? .everybody
+        return DownloadPolicy(rawValue: result) ?? autoDownloadFullMediaDefaultState
     }
     
     func setAutoDownloadFullMedia(_ value: DownloadPolicy) {
