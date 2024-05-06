@@ -893,8 +893,8 @@ extension ChatListViewController {
             guard var text = message.message else {
                 return nil
             }
-            text = text.replacingOccurrences(of: "\n", with: "↵ ")
-
+            text = MessageProcessHelper.process(text)
+            
             var raw: String
             if message.isOutgoing {
                 raw = "\(String.adamant.chatList.sentMessagePrefix)\(text)"
@@ -902,24 +902,10 @@ extension ChatListViewController {
                 raw = text
             }
             
-            let attributesText = markdownParser.parse(raw).resolveLinkColor()
-            raw = attributesText.string
+            var attributedText = markdownParser.parse(raw).resolveLinkColor()
+            attributedText = MessageProcessHelper.process(attributedText: attributedText)
             
-            var ranges: [Range<String.Index>] = []
-            var searchRange = raw.startIndex..<raw.endIndex
-            while let range = raw.range(of: "↵ ", options: [], range: searchRange) {
-                ranges.append(range)
-                searchRange = range.upperBound..<raw.endIndex
-            }
-            
-            for range in ranges {
-                attributesText.addAttribute(
-                    NSAttributedString.Key.foregroundColor,
-                    value: UIColor.lightGray,
-                    range: NSRange(range, in: raw)
-                )
-            }
-            return attributesText
+            return attributedText
             
         case let transfer as TransferTransaction:
             if let admService = walletServiceCompose.getWallet(
@@ -938,7 +924,7 @@ extension ChatListViewController {
             if richMessage.additionalType == .reply,
                let content = richMessage.richContent,
                var text = content[RichContentKeys.reply.replyMessage] as? String {
-                text = text.replacingOccurrences(of: "\n", with: "↵ ")
+                text = MessageProcessHelper.process(text)
                 
                 let prefix = richMessage.isOutgoing
                 ? "\(String.adamant.chatList.sentMessagePrefix)"
@@ -962,27 +948,14 @@ extension ChatListViewController {
                 
                 let markDownText = markdownParser.parse("\(extraSpace)\(text)").resolveLinkColor()
                 
-                let fullString = NSMutableAttributedString(string: prefix)
+                var fullString = NSMutableAttributedString(string: prefix)
                 if richMessage.isOutgoing {
                     fullString.append(imageString)
                 }
                 fullString.append(markDownText)
                 
-                let raw = fullString.string
-                var ranges: [Range<String.Index>] = []
-                var searchRange = raw.startIndex..<raw.endIndex
-                while let range = raw.range(of: "↵ ", options: [], range: searchRange) {
-                    ranges.append(range)
-                    searchRange = range.upperBound..<raw.endIndex
-                }
+                fullString = MessageProcessHelper.process(attributedText: fullString)
                 
-                for range in ranges {
-                    fullString.addAttribute(
-                        NSAttributedString.Key.foregroundColor,
-                        value: UIColor.lightGray,
-                        range: NSRange(range, in: raw)
-                    )
-                }
                 return fullString
             }
             
