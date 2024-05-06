@@ -213,6 +213,11 @@ final class ChatViewModel: NSObject {
             fullscreenLoading = cachedMessages == nil
             
             replyMessage = chatPreservation.getReplyMessage(address: partnerAddress, thenRemoveIt: true)
+            
+            filesPicked = chatPreservation.getPreservedFiles(
+                for: partnerAddress,
+                thenRemoveIt: true
+            )
         }
     }
     
@@ -335,6 +340,11 @@ final class ChatViewModel: NSObject {
     func preserveMessage(_ message: String) {
         guard let partnerAddress = chatroom?.partner?.address else { return }
         chatPreservation.preserveMessage(message, forAddress: partnerAddress)
+    }
+    
+    func preserveFiles() {
+        guard let partnerAddress = chatroom?.partner?.address else { return }
+        chatPreservation.preserveFiles(filesPicked, forAddress: partnerAddress)
     }
     
     func preserveReplayMessage() {
