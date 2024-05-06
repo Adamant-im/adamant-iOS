@@ -123,6 +123,11 @@ final class ChatViewController: MessagesViewController {
         )
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        viewModel.updatePartnerName()
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         defer { viewAppeared = true }
