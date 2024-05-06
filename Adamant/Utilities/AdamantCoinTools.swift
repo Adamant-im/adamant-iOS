@@ -45,7 +45,7 @@ final class AdamantCoinTools {
         }
         
         guard let prefix = uri.split(separator: ":").first,
-              prefix == qqPrefix
+              prefix.caseInsensitiveCompare(qqPrefix) == .orderedSame
         else {
             return QQAddressInformation(address: raw, params: nil)
         }
