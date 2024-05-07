@@ -548,7 +548,7 @@
 "Error.RequestCancelled" = "Request cancelled";
 
 /* Shared error: Remote error format, %@ for message */
-"Error.RemoteServerErrorFormat" = "Blockchain node error: %@";
+"Error.RemoteServerErrorFormat" = "%@";
 
 /* Shared error: User not logged */
 "Error.UserNotLogged" = "User is not logged in";
