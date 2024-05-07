@@ -142,7 +142,7 @@ class NotificationService: UNNotificationServiceExtension {
                 } else { // Message
                     bestAttemptContent.title = partnerName ?? partnerAddress
                     var text = MarkdownParser().parse(message).string
-                    text = text.replacingOccurrences(of: "\n", with: "↵ ")
+                    text = MessageProcessHelper.process(text)
                     
                     bestAttemptContent.body = text
                     bestAttemptContent.categoryIdentifier = AdamantNotificationCategories.message
@@ -187,7 +187,7 @@ class NotificationService: UNNotificationServiceExtension {
                    richContent[RichContentKeys.reply.replyToId] != nil,
                    transaction.amount <= 0 {
                     var text = MarkdownParser().parse(message).string
-                    text = text.replacingOccurrences(of: "\n", with: "↵ ")
+                    text = MessageProcessHelper.process(text)
                     content = NotificationContent(
                         title: partnerName ?? partnerAddress,
                         subtitle: nil,
