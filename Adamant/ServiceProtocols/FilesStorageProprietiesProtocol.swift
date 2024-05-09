@@ -13,4 +13,6 @@ protocol FilesStorageProprietiesProtocol {
     func setAutoDownloadPreview(_ value: DownloadPolicy)
     func autoDownloadFullMediaPolicy() -> DownloadPolicy
     func setAutoDownloadFullMedia(_ value: DownloadPolicy)
+    func saveFileEncrypted() -> Bool
+    func setSaveFileEncrypted(_ value: Bool)
 }

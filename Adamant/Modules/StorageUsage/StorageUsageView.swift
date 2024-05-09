@@ -22,6 +22,7 @@ struct StorageUsageView: View {
             List {
                 storageSection
                 autoDownloadSection
+                saveEncryptedSection
             }
             .listStyle(.insetGrouped)
             .navigationTitle(storageTitle)
@@ -66,6 +67,24 @@ private extension StorageUsageView {
             },
             header: { Text(verbatim: autDownloadHeader) },
             footer: { Text(verbatim: autDownloadDescription) }
+        )
+    }
+    
+    var saveEncryptedSection: some View {
+        Section(
+            content: {
+                Toggle(
+                    saveEncryptedTitle,
+                    isOn: $viewModel.saveEncrypted
+                )
+                .onChange(of: viewModel.saveEncrypted) { value in
+                    print(value)
+                    viewModel.saveFileEncrypted(value)
+                }
+                .listRowBackground(Color(uiColor: .adamant.cellColor))
+                .tint(Color(uiColor: .adamant.active))
+            },
+            footer: { Text(verbatim: saveEncryptedDescription) }
         )
     }
     
@@ -133,3 +152,5 @@ private var clearTitle: String { .localized("StorageUsage.Clear.Title") }
 private let previewImage: UIImage = .asset(named: "row_preview")!
 private var autDownloadHeader: String { .localized("Storage.AutoDownloadPreview.Header") }
 private var autDownloadDescription: String { .localized("Storage.AutoDownloadPreview.Description") }
+private var saveEncryptedTitle: String { .localized("Storage.SaveEncrypted.Title") }
+private var saveEncryptedDescription: String { .localized("Storage.SaveEncrypted.Description") }

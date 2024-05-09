@@ -3,73 +3,112 @@
 
 import CommonKit
 import UIKit
+import Combine
 
 public final class FilesStorageKit {
-    @Atomic private var cachedFilesUrl: [String: URL] = [:]
-    private var cachedFiles: NSCache<NSString, UIImage> = NSCache()
+    public struct File {
+        public let id: String
+        public let isEncrypted: Bool
+        public let url: URL
+        public let fileType: FileType
+        public let isPreview: Bool
+    }
+    
+    @Atomic private var cachedFiles: [String: File] = [:]
+    private var cachedImages: NSCache<NSString, UIImage> = NSCache()
+    private let maxCachedFilesToLoad = 100
+    private let encryptedFileExtension = "encFhj"
+    private let previewFileExtension = "prvAIFE"
     
     public init() {
         try? loadCache()
     }
     
-    public func getPreview(for id: String, type: String) -> UIImage? {
+    public func getPreview(for id: String) -> UIImage? {
         guard !id.isEmpty else { return nil }
         
-        if let image = cachedFiles.object(forKey: id as NSString) {
+        if let image = cachedImages.object(forKey: id as NSString) {
             return image
         }
         
-        guard let url = cachedFilesUrl[id],
-              let image = UIImage(contentsOfFile: url.path) else {
+        return nil
+    }
+    
+    public func cacheImageToMemoryIfNeeded(id: String, data: Data) -> UIImage? {
+        guard let image = UIImage(data: data),
+              cachedImages.object(forKey: id as NSString) == nil
+        else {
             return nil
         }
         
-        cachedFiles.setObject(image, forKey: id as NSString)
+        cachedImages.setObject(image, forKey: id as NSString)
         return image
     }
     
-    public func isCached(_ id: String) -> Bool {
-        cachedFilesUrl[id] != nil
+    public func isCachedInMemory(_ id: String) -> Bool {
+        cachedImages.object(forKey: id as NSString) != nil
     }
     
-    public func getFileURL(with id: String) throws -> URL {
-        guard let url = cachedFilesUrl[id] else {
+    public func isCachedLocally(_ id: String) -> Bool {
+        cachedFiles[id] != nil
+    }
+    
+    public func getFile(with id: String) throws -> File {
+        guard let file = cachedFiles[id] else {
             throw FileValidationError.fileNotFound
         }
         
-        return url
+        return file
+    }
+    
+    public func getFileURL(with id: String) throws -> URL {
+        try getFile(with: id).url
     }
     
     public func cacheFile(
         id: String,
-        url: URL,
+        fileExtension: String,
+        url: URL?,
+        decodedData: Data,
+        encodedData: Data,
         ownerId: String,
-        recipientId: String
+        recipientId: String,
+        saveEncrypted: Bool,
+        fileType: FileType,
+        isPreview: Bool
     ) throws {
-        try cacheFile(
+        try saveFileLocally(
             with: id,
+            fileExtension: fileExtension,
+            data: saveEncrypted ? encodedData : decodedData,
             localUrl: url,
             ownerId: ownerId,
-            recipientId: recipientId
+            recipientId: recipientId,
+            isEncrypted: saveEncrypted,
+            fileType: fileType,
+            isPreview: isPreview
         )
+        
+        guard fileType == .image, isPreview else { return }
+        cacheFileToMemory(data: decodedData, id: id)
+        
+        if let url = url {
+            cacheFileToMemory(data: decodedData, id: url.absoluteString)
+        }
     }
     
-    public func cacheFile(
-        id: String,
-        data: Data,
-        ownerId: String,
-        recipientId: String
-    ) throws {
-        try cacheFile(
-            with: id,
-            data: data,
-            ownerId: ownerId,
-            recipientId: recipientId
+    public func cacheTemporaryFile(
+        url: URL,
+        isEncrypted: Bool,
+        fileType: FileType,
+        isPreview: Bool
+    ) {
+        cacheTemporaryFile(
+            with: url,
+            isEncrypted: isEncrypted,
+            fileType: fileType,
+            isPreview: isPreview
         )
-    }
-    
-    public func cacheTemporaryFile(url: URL) {
-        cacheTemporaryFile(with: url)
     }
     
     public func getCacheSize() throws -> Int64 {
@@ -99,8 +138,8 @@ public final class FilesStorageKit {
         
         try clearTempCache()
         
-        cachedFiles.removeAllObjects()
-        cachedFilesUrl.removeAll()
+        cachedImages.removeAllObjects()
+        cachedFiles.removeAll()
     }
     
     public func removeTempFiles(at urls: [URL]) {
@@ -140,11 +179,30 @@ private extension FilesStorageKit {
 
         let files = getAllFiles(in: folder)
         
+        var previewFiles: [File] = []
+        
         files.forEach { url in
-            cachedFilesUrl[url.lastPathComponent] = url
+            let result = fileNameAndExtension(from: url)
+            let isEncrypted = result.extensions.contains(encryptedFileExtension)
+            let isPreview = result.extensions.contains(previewFileExtension)
             
-            if let data = UIImage(contentsOfFile: url.path) {
-                self.cachedFiles.setObject(data, forKey: url.lastPathComponent as NSString)
+            let file = File(
+                id: result.name,
+                isEncrypted: isEncrypted,
+                url: url,
+                fileType: FileType(raw: result.extensions.first ?? .empty) ?? .other,
+                isPreview: isPreview
+            )
+            cachedFiles[result.name] = file
+            
+            if isPreview, !isEncrypted {
+                previewFiles.append(file)
+            }
+        }
+        
+        previewFiles.prefix(maxCachedFilesToLoad).forEach { file in
+            if let data = UIImage(contentsOfFile: file.url.path) {
+                cachedImages.setObject(data, forKey: file.id as NSString)
             }
         }
     }
@@ -172,19 +230,44 @@ private extension FilesStorageKit {
         return fileURLs
     }
     
-    func cacheTemporaryFile(with url: URL) {
-        cachedFilesUrl[url.absoluteString] = url
-        if let uiImage = UIImage(contentsOfFile: url.path) {
-            cachedFiles.setObject(uiImage, forKey: url.absoluteString as NSString)
+    func cacheTemporaryFile(
+        with url: URL,
+        isEncrypted: Bool,
+        fileType: FileType,
+        isPreview: Bool
+    ) {
+        let file = File(
+            id: url.absoluteString,
+            isEncrypted: isEncrypted,
+            url: url,
+            fileType: fileType,
+            isPreview: isPreview
+        )
+        cachedFiles[file.id] = file
+        
+        if fileType == .image,
+           isPreview,
+           let uiImage = UIImage(contentsOfFile: url.path) {
+            cachedImages.setObject(uiImage, forKey: file.id as NSString)
         }
     }
     
-    func cacheFile(
+    func cacheFileToMemory(data: Data, id: String) {
+        guard let uiImage = UIImage(data: data) else { return }
+        
+        cachedImages.setObject(uiImage, forKey: id as NSString)
+    }
+    
+    func saveFileLocally(
         with id: String,
+        fileExtension: String,
         data: Data? = nil,
         localUrl: URL? = nil,
         ownerId: String,
-        recipientId: String
+        recipientId: String,
+        isEncrypted: Bool,
+        fileType: FileType,
+        isPreview: Bool
     ) throws {
         let folder = try FileManager.default.url(
             for: .cachesDirectory,
@@ -195,27 +278,37 @@ private extension FilesStorageKit {
 
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
 
-        let fileURL = folder.appendingPathComponent(id)
-
+        let mainExtension = !fileExtension.isEmpty
+        ? ".\(fileExtension)"
+        : .empty
+        
+        let additionalExtension = isPreview
+        ? ".\(previewFileExtension)"
+        : .empty
+        
+        let fileName = isEncrypted
+        ? "\(id)\(mainExtension)\(additionalExtension).\(encryptedFileExtension)"
+        : "\(id)\(mainExtension)\(additionalExtension)"
+        
+        let fileURL = folder.appendingPathComponent(fileName)
+        let file = File(
+            id: id,
+            isEncrypted: isEncrypted,
+            url: fileURL,
+            fileType: fileType,
+            isPreview: isPreview
+        )
+        
         if let data = data {
             try data.write(to: fileURL, options: [.atomic, .completeFileProtection])
-            
-            cachedFilesUrl[id] = fileURL
-            if let uiImage = UIImage(data: data) {
-                cachedFiles.setObject(uiImage, forKey: id as NSString)
-            }
         }
         
         if let url = localUrl {
-            try FileManager.default.moveItem(at: url, to: fileURL)
-            
-            cachedFilesUrl[id] = fileURL
-            cachedFilesUrl[url.absoluteString] = fileURL
-            if let uiImage = UIImage(contentsOfFile: fileURL.path) {
-                cachedFiles.setObject(uiImage, forKey: id as NSString)
-                cachedFiles.setObject(uiImage, forKey: url.absoluteString as NSString)
-            }
+            try FileManager.default.removeItem(at: url)
+            cachedFiles[url.absoluteString] = file
         }
+        
+        cachedFiles[id] = file
     }
     
     func folderSize(at url: URL) throws -> Int64 {
@@ -241,6 +334,19 @@ private extension FilesStorageKit {
         }
         
         return folderSize
+    }
+    
+    func fileNameAndExtension(from url: URL) -> (name: String, extensions: [String]) {
+        let filename = url.lastPathComponent
+        let nameComponents = filename.components(separatedBy: ".")
+        
+        guard nameComponents.count > 1,
+              let name = nameComponents.first
+        else {
+            return (filename.replacingOccurrences(of: ".", with: ""), [])
+        }
+        
+        return (name, Array(nameComponents.dropFirst()))
     }
 }
 

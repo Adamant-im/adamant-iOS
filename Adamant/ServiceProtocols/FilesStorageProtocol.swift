@@ -10,29 +10,40 @@ import Foundation
 import UIKit
 import CommonKit
 import FilesStorageKit
+import Combine
 
 protocol FilesStorageProtocol {
-    func getPreview(for id: String, type: String) -> UIImage?
+    func cacheImageToMemoryIfNeeded(id: String, data: Data) -> UIImage?
     
-    func isCached(_ id: String) -> Bool
+    func getPreview(for id: String) -> UIImage?
+    
+    func isCachedLocally(_ id: String) -> Bool
+    
+    func isCachedInMemory(_ id: String) -> Bool
     
     func getFileURL(with id: String) throws -> URL
     
-    func cacheFile(
-        id: String,
+    func getFile(with id: String) throws -> FilesStorageKit.File
+    
+    func cacheTemporaryFile(
         url: URL,
-        ownerId: String,
-        recipientId: String
-    ) throws
+        isEncrypted: Bool,
+        fileType: FileType,
+        isPreview: Bool
+    )
     
     func cacheFile(
         id: String,
-        data: Data,
+        fileExtension: String,
+        url: URL?,
+        decodedData: Data,
+        encodedData: Data,
         ownerId: String,
-        recipientId: String
+        recipientId: String,
+        saveEncrypted: Bool,
+        fileType: FileType,
+        isPreview: Bool
     ) throws
-    
-    func cacheTemporaryFile(url: URL)
     
     func getCacheSize() throws -> Int64
     

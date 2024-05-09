@@ -718,6 +718,12 @@
 /* NodesEditor: Failed to build URL alert */
 "NodesEditor.FailedToBuildURL" = "Некорректный адрес хоста";
 
+/* Storage: Save Encrypted */
+"Storage.SaveEncrypted.Title" = "Хранить файлы зашифрованными";
+
+/* Storage: Save Encrypted */
+"Storage.SaveEncrypted.Description" = "Хранить файлы в зашифрованном виде в локальном хранилище (Может влиять на производительность)";
+
 /* Storage: Auto download preview */
 "Storage.AutoDownloadPreview.Title" = "Превью";
 

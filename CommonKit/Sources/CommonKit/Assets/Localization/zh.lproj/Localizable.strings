@@ -676,6 +676,12 @@
 /* NodeList: Inform that default nodes was loaded, if user deleted all nodes */
 "NodeList.DefaultNodesLoaded" = "已加载默认节点列表";
 
+/* Storage: Save Encrypted */
+"Storage.SaveEncrypted.Title" = "保持文件加密";
+
+/* Storage: Save Encrypted */
+"Storage.SaveEncrypted.Description" = " 在本地存储中以加密形式存储文件（可能会影响性能）";
+
 /* Storage: Auto download preview */
 "Storage.AutoDownloadPreview.Title" = "预览";
 

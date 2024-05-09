@@ -59,6 +59,7 @@ public enum RichContentKeys {
         public static let type = "type"
         public static let name = "name"
         public static let preview = "preview"
+        public static let `extension` = "extension"
     }
 }
 
@@ -95,18 +96,22 @@ public struct RichMessageFile: RichMessage {
     public struct Preview: Codable, Equatable, Hashable {
         public var id: String
         public var nonce: String
+        public var `extension`: String?
         
         public init(
             id: String,
-            nonce: String
+            nonce: String,
+            extension: String?
         ) {
             self.id = id
             self.nonce = nonce
+            self.extension = `extension`
         }
         
         public init(_ data: [String: Any]) {
             self.id = (data[RichContentKeys.file.id] as? String) ?? .empty
             self.nonce = data[RichContentKeys.file.nonce] as? String ?? .empty
+            self.extension = data[RichContentKeys.file.extension] as? String ?? .empty
         }
         
         public func content() -> [String: Any] {
@@ -118,6 +123,10 @@ public struct RichMessageFile: RichMessage {
             
             if !nonce.isEmpty {
                 contentDict[RichContentKeys.file.nonce] = nonce
+            }
+            
+            if !nonce.isEmpty {
+                contentDict[RichContentKeys.file.extension] = `extension`
             }
             
             return contentDict

@@ -22,7 +22,9 @@ final class FilesStorageProprietiesService: FilesStorageProprietiesProtocol {
     private var autoDownloadFullMediaState: DownloadPolicy = .everybody
     private let autoDownloadPreviewDefaultState: DownloadPolicy = .contacts
     private let autoDownloadFullMediaDefaultState: DownloadPolicy = .contacts
-
+    private var saveFileEncryptedValue = true
+    private let saveFileEncryptedDefault = true
+    
     // MARK: Lifecycle
     
     init(securedStore: SecuredStore) {
@@ -48,14 +50,35 @@ final class FilesStorageProprietiesService: FilesStorageProprietiesProtocol {
     private func userLoggedIn() {
         autoDownloadPreviewState = getAutoDownloadPreview()
         autoDownloadFullMediaState = getAutoDownloadFullMedia()
+        saveFileEncryptedValue = getSaveFileEncrypted()
     }
     
     private func userLoggedOut() {
         setAutoDownloadPreview(autoDownloadPreviewDefaultState)
         setAutoDownloadFullMedia(autoDownloadFullMediaDefaultState)
+        saveFileEncryptedValue = saveFileEncryptedDefault
     }
     
     // MARK: Update data
+    
+    func saveFileEncrypted() -> Bool {
+        saveFileEncryptedValue
+    }
+    
+    func getSaveFileEncrypted() -> Bool {
+        guard let result: Bool = securedStore.get(
+            StoreKey.storage.saveFileEncrypted
+        ) else {
+            return saveFileEncryptedDefault
+        }
+        
+        return result
+    }
+    
+    func setSaveFileEncrypted(_ value: Bool) {
+        securedStore.set(value, for: StoreKey.storage.saveFileEncrypted)
+        saveFileEncryptedValue = value
+    }
     
     func autoDownloadPreviewPolicy() -> DownloadPolicy {
         autoDownloadPreviewState
@@ -63,7 +86,7 @@ final class FilesStorageProprietiesService: FilesStorageProprietiesProtocol {
     
     func getAutoDownloadPreview() -> DownloadPolicy {
         guard let result: String = securedStore.get(
-            StoreKey.storage.autoDownloadPreviewEnabled
+            StoreKey.storage.autoDownloadPreview
         ) else {
             return autoDownloadPreviewDefaultState
         }
@@ -72,7 +95,7 @@ final class FilesStorageProprietiesService: FilesStorageProprietiesProtocol {
     }
     
     func setAutoDownloadPreview(_ value: DownloadPolicy) {
-        securedStore.set(value.rawValue, for: StoreKey.storage.autoDownloadPreviewEnabled)
+        securedStore.set(value.rawValue, for: StoreKey.storage.autoDownloadPreview)
         autoDownloadPreviewState = value
     }
     
@@ -82,7 +105,7 @@ final class FilesStorageProprietiesService: FilesStorageProprietiesProtocol {
     
     func getAutoDownloadFullMedia() -> DownloadPolicy {
         guard let result: String = securedStore.get(
-            StoreKey.storage.autoDownloadFullMediaEnabled
+            StoreKey.storage.autoDownloadFullMedia
         ) else {
             return autoDownloadFullMediaDefaultState
         }
@@ -91,7 +114,7 @@ final class FilesStorageProprietiesService: FilesStorageProprietiesProtocol {
     }
     
     func setAutoDownloadFullMedia(_ value: DownloadPolicy) {
-        securedStore.set(value.rawValue, for: StoreKey.storage.autoDownloadFullMediaEnabled)
+        securedStore.set(value.rawValue, for: StoreKey.storage.autoDownloadFullMedia)
         autoDownloadFullMediaState = value
     }
 }

@@ -33,7 +33,11 @@ public final class DocumentInteractionService: NSObject {
                 try? FileManager.default.removeItem(at: copyURL)
             }
             
-            try? FileManager.default.copyItem(at: file.url, to: copyURL)
+            if let data = file.data {
+                try? data.write(to: copyURL, options: [.atomic, .completeFileProtection])
+            } else {
+                try? FileManager.default.copyItem(at: file.url, to: copyURL)
+            }
             
             self.urls.append(copyURL)
         }

@@ -31,10 +31,12 @@ public struct FileResult {
     public let type: FileType
     public let previewUrl: URL?
     public let preview: UIImage?
+    public let previewExtension: String?
     public let size: Int64
     public let name: String?
     public let extenstion: String?
     public let resolution: CGSize?
+    public let data: Data?
     
     public init(
         assetId: String? = nil,
@@ -42,19 +44,23 @@ public struct FileResult {
         type: FileType,
         preview: UIImage?,
         previewUrl: URL?,
+        previewExtension: String?,
         size: Int64,
         name: String?,
         extenstion: String?,
-        resolution: CGSize?
+        resolution: CGSize?,
+        data: Data? = nil
     ) {
         self.assetId = assetId
         self.url = url
         self.type = type
         self.previewUrl = previewUrl
+        self.previewExtension = previewExtension
         self.size = size
         self.name = name
         self.extenstion = extenstion
         self.preview = preview
         self.resolution = resolution
+        self.data = data
     }
 }

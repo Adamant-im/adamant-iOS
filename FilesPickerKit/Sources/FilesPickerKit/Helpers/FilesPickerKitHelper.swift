@@ -8,6 +8,8 @@ import AVFoundation
 import QuickLook
 
 final class FilesPickerKitHelper {
+    var previewExtension = "jpeg"
+    
     func validateFiles(_ files: [FileResult]) throws {
         guard files.count <= FilesConstants.maxFilesCount else {
             throw FileValidationError.tooManyFiles
@@ -143,6 +145,7 @@ final class FilesPickerKitHelper {
             type: .other,
             preview: preview.image,
             previewUrl: preview.url,
+            previewExtension: previewExtension,
             size: fileSize,
             name: url.lastPathComponent,
             extenstion: url.pathExtension,

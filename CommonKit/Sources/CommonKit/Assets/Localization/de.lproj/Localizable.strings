@@ -733,6 +733,12 @@
 /* NodesEditor: Failed to build URL alert */
 "NodesEditor.FailedToBuildURL" = "Invalid host";
 
+/* Storage: Save Encrypted */
+"Storage.SaveEncrypted.Title" = "Die Datei verschlüsselt aufbewahren";
+
+/* Storage: Save Encrypted */
+"Storage.SaveEncrypted.Description" = "Die Datei verschlüsselt im lokalen Speicher aufbewahren (Kann die Leistung beeinträchtigen)";
+
 /* Storage: Auto download preview */
 "Storage.AutoDownloadPreview.Title" = "Vorschau";
 

@@ -400,10 +400,10 @@ private extension ChatMessageFactory {
             
             return ChatFile(
                 file: RichMessageFile.File($0),
-                previewImage: filesStorage.getPreview(for: preview.id, type: fileType),
+                previewImage: filesStorage.getPreview(for: preview.id),
                 isDownloading: downloadingFilesIDs.contains(fileId),
                 isUploading: uploadingFilesIDs.contains(fileId),
-                isCached: filesStorage.isCached(fileId),
+                isCached: filesStorage.isCachedLocally(fileId),
                 storage: storage,
                 nonce: $0[RichContentKeys.file.nonce] as? String ?? .empty,
                 isFromCurrentSender: isFromCurrentSender,

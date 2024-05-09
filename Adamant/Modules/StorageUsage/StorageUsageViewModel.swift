@@ -44,7 +44,8 @@ final class StorageUsageViewModel: ObservableObject {
     @Published var autoDownloadPreview: DownloadPolicy = .everybody
     @Published var autoDownloadFullMedia: DownloadPolicy = .everybody
     @Published var isRemoveAlertShown: Bool = false
-    
+    @Published var saveEncrypted: Bool = false
+
     enum AutoDownloadMediaType {
         case preview
         case fullMedia
@@ -72,7 +73,13 @@ final class StorageUsageViewModel: ObservableObject {
     func loadData() {
         autoDownloadPreview = filesStorageProprieties.autoDownloadPreviewPolicy()
         autoDownloadFullMedia = filesStorageProprieties.autoDownloadFullMediaPolicy()
+        saveEncrypted = filesStorageProprieties.saveFileEncrypted()
         updateCacheSize()
+    }
+    
+    func saveFileEncrypted(_ value: Bool) {
+        filesStorageProprieties.setSaveFileEncrypted(value)
+        saveEncrypted = value
     }
     
     func clearStorage() {

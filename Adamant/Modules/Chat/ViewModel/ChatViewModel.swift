@@ -135,11 +135,11 @@ final class ChatViewModel: NSObject {
         didSet { updateHiddenMessage(&messages) }
     }
     
-    private var downloadingFilesID: [String] = [] {
+    @Atomic private var downloadingFilesID: [String] = [] {
         didSet { updateDownloadingFiles(&messages) }
     }
     
-    private var uploadingFilesIDs: [String] = [] {
+    @Atomic private var uploadingFilesIDs: [String] = [] {
         didSet { updateUploadingFiles(&messages) }
     }
     
@@ -309,12 +309,12 @@ final class ChatViewModel: NSObject {
                         text: text,
                         chatroom: chatroom,
                         filesPicked: filesPicked,
-                        replyMessage: replyMessage
+                        replyMessage: replyMessage, 
+                        saveEncrypted: filesStorageProprieties.saveFileEncrypted()
                     )
                 } catch {
                     await handleMessageSendingError(error: error, sentText: text)
                 }
-                
             }
             return
         }
@@ -720,37 +720,13 @@ final class ChatViewModel: NSObject {
               case let(.file(fileModel)) = message?.content
         else { return }
         
-        guard !file.isCached else {
-            do {
-                _ = try filesStorage.getFileURL(with: file.file.id)
-
+        guard !file.isCached,
+              !filesStorage.isCachedLocally(file.file.id)
+        else {
+            Task {
                 let chatFiles = fileModel.value.content.fileModel.files
-                
-                let files: [FileResult] = chatFiles.compactMap { file in
-                    guard file.isCached,
-                          let url = try? filesStorage.getFileURL(with: file.file.id) else {
-                        return nil
-                    }
-                    
-                    return FileResult.init(
-                        assetId: file.file.id,
-                        url: url,
-                        type: file.fileType,
-                        preview: nil,
-                        previewUrl: nil,
-                        size: file.file.size,
-                        name: file.file.name,
-                        extenstion: file.file.type,
-                        resolution: nil
-                    )
-                }
-              
-                let index = files.firstIndex(where: { $0.assetId == file.file.id }) ?? .zero
-                presentDocumentViewerVC.send((files, index))
-            } catch {
-                dialog.send(.alert(error.localizedDescription))
+                self.presentFileInFullScreen(id: file.file.id, chatFiles: chatFiles)
             }
-            
             return
         }
         
@@ -759,7 +735,8 @@ final class ChatViewModel: NSObject {
                 try await self?.chatFileService.downloadFile(
                     file: file,
                     isFromCurrentSender: isFromCurrentSender,
-                    chatroom: self?.chatroom
+                    chatroom: self?.chatroom,
+                    saveEncrypted: self?.filesStorageProprieties.saveFileEncrypted() ?? true
                 )
             } catch {
                 self?.dialog.send(.alert(error.localizedDescription))
@@ -787,7 +764,8 @@ final class ChatViewModel: NSObject {
             chatroom: chatroom,
             havePartnerName: havePartnerName,
             previewDownloadPolicy: filesStorageProprieties.autoDownloadPreviewPolicy(),
-            fullMediaDownloadPolicy: filesStorageProprieties.autoDownloadFullMediaPolicy()
+            fullMediaDownloadPolicy: filesStorageProprieties.autoDownloadFullMediaPolicy(),
+            saveEncrypted: filesStorageProprieties.saveFileEncrypted()
         )
     }
     
@@ -1270,6 +1248,41 @@ private extension ChatViewModel {
         else { return false }
         
         return newLastReactionDate > processedDate
+    }
+    
+    func presentFileInFullScreen(id: String, chatFiles: [ChatFile]) {
+        dialog.send(.progress(true))
+        
+        let files: [FileResult] = chatFiles.compactMap { file in
+            guard file.isCached,
+                  let fileDTO = try? filesStorage.getFile(with: file.file.id) else {
+                return nil
+            }
+            
+            let data = try? chatFileService.getDecodedData(
+                file: fileDTO,
+                nonce: file.nonce,
+                chatroom: chatroom
+            )
+            
+            return FileResult.init(
+                assetId: file.file.id,
+                url: fileDTO.url,
+                type: file.fileType,
+                preview: nil,
+                previewUrl: nil,
+                previewExtension: nil,
+                size: file.file.size,
+                name: file.file.name,
+                extenstion: file.file.type,
+                resolution: nil,
+                data: data
+            )
+        }
+      
+        dialog.send(.progress(false))
+        let index = files.firstIndex(where: { $0.assetId == id }) ?? .zero
+        presentDocumentViewerVC.send((files, index))
     }
 }
 
