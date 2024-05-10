@@ -226,3 +226,51 @@ final class MarkdownCodeAdamant: MarkdownCommonElement {
         addAttributes(attributedString, range: match.range)
     }
 }
+
+// MARK: Detect file emoji & count
+// - ex: 📄2
+final class MarkdownFileRaw: MarkdownElement {
+    private let emoji: String
+    private let matchFont: UIFont
+    
+    init(
+        emoji: String,
+        font: UIFont
+    ) {
+        self.emoji = emoji
+        self.matchFont = font
+    }
+    
+    var regex: String {
+        return "\(emoji)\\d?"
+    }
+    
+    func regularExpression() throws -> NSRegularExpression {
+        try NSRegularExpression(pattern: regex, options: .dotMatchesLineSeparators)
+    }
+    
+    func match(_ match: NSTextCheckingResult, attributedString: NSMutableAttributedString) {
+        let attributesColor: [NSAttributedString.Key : Any] = [
+            .foregroundColor: UIColor.lightGray,
+            .font: matchFont,
+            .baselineOffset: -3.0
+        ]
+        
+        let nsString = (attributedString.string as NSString)
+        let matchText = nsString.substring(with: match.range)
+        
+        let textWithoutEmoji = matchText.replacingOccurrences(of: emoji, with: "")
+        let countRange = (matchText as NSString).range(of: textWithoutEmoji)
+        let emojiRange = (matchText as NSString).range(of: emoji)
+        
+        let range = NSRange(
+            location: match.range.location + emojiRange.length,
+            length: countRange.length
+        )
+        
+        attributedString.addAttributes(
+            attributesColor,
+            range: range
+        )
+    }
+}

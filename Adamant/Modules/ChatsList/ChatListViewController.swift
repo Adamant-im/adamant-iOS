@@ -102,7 +102,9 @@ final class ChatListViewController: KeyboardObservingViewController {
                     font: .adamantCodeDefault,
                     textHighlightColor: .adamant.codeBlockText,
                     textBackgroundColor: .adamant.codeBlock
-                )
+                ),
+                MarkdownFileRaw(emoji: "📸", font: .adamantChatFileRawDefault),
+                MarkdownFileRaw(emoji: "📄", font: .adamantChatFileRawDefault)
             ]
         )
         
@@ -133,7 +135,7 @@ final class ChatListViewController: KeyboardObservingViewController {
     private var loadNewChatTask: Task<(), Never>?
     private var subscriptions = Set<AnyCancellable>()
     
-    //MARK: Init
+    // MARK: Init
     
     init(
         accountService: AccountService,

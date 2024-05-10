@@ -461,7 +461,6 @@ private extension ChatFileService {
         nonce: String,
         chatroom: Chatroom?
     ) throws -> UIImage? {
-        print("try to cache \(id), is main thread = \(Thread.isMainThread), file=\(file)")
         let data = try Data(contentsOf: file.url)
         
         guard file.isEncrypted else {

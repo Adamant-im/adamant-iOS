@@ -38,7 +38,9 @@ struct ChatMessageFactory {
                 font: .adamantCodeDefault,
                 textHighlightColor: .adamant.codeBlockText,
                 textBackgroundColor: .adamant.codeBlock
-            )
+            ),
+            MarkdownFileRaw(emoji: "📸", font: .adamantChatFileRawDefault),
+            MarkdownFileRaw(emoji: "📄", font: .adamantChatFileRawDefault)
         ]
     )
     
@@ -60,7 +62,9 @@ struct ChatMessageFactory {
             MarkdownAdvancedAdm(
                 font: .adamantChatDefault,
                 color: .adamant.active
-            )
+            ),
+            MarkdownFileRaw(emoji: "📸", font: .adamantChatFileRawDefault),
+            MarkdownFileRaw(emoji: "📄", font: .adamantChatFileRawDefault)
         ]
     )
     
