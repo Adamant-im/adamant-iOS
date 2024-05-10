@@ -269,6 +269,15 @@ private extension ChatViewController {
             .sink { [weak self] _ in self?.inputTextUpdated() }
             .store(in: &subscriptions)
         
+        NotificationCenter.default
+            .publisher(for: UIApplication.didBecomeActiveNotification)
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                let indexes = self.messagesCollectionView.indexPathsForVisibleItems
+                self.viewModel.updatePreviewFor(indexes: indexes)
+            }
+            .store(in: &subscriptions)
+        
         viewModel.$messages
             .removeDuplicates()
             .sink { [weak self] _ in self?.updateMessages() }

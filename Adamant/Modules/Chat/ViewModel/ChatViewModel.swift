@@ -823,6 +823,22 @@ final class ChatViewModel: NSObject {
     func dropSessionUpdated(_ value: Bool) {
         presentDropView.send(value)
     }
+    
+    func updatePreviewFor(indexes: [IndexPath]) {
+        indexes.forEach { index in
+            guard let message = messages[safe: index.section],
+                  case let .file(model) = message.content
+            else { return }
+            
+            model.value.content.fileModel.files.forEach { file in
+                downloadPreviewIfNeeded(
+                    messageId: message.messageId,
+                    file: file,
+                    isFromCurrentSender: file.isFromCurrentSender
+                )
+            }
+        }
+    }
 }
 
 extension ChatViewModel {

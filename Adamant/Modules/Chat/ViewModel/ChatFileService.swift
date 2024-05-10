@@ -455,6 +455,7 @@ private extension ChatFileService {
             cached: nil
         ))
     }
+    
     func cacheFileToMemory(
         id: String,
         file: FilesStorageKit.File,
