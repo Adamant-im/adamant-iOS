@@ -11,9 +11,9 @@ import CommonKit
 
 enum IPFSApiCommands {
     static let file = (
-        upload: "file/upload",
-        download: "file/",
-        field: "files"
+        upload: "api/file/upload",
+        download: "api/file/",
+        field: "api/files"
     )
 }
 
