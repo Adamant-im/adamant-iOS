@@ -78,6 +78,7 @@ final class ChatViewModel: NSObject {
     let commitVibro = ObservableSender<Void>()
     let layoutIfNeeded = ObservableSender<Void>()
     let presentKeyboard = ObservableSender<Void>()
+    let didTapSelectText = ObservableSender<String>()
     
     @ObservableValue private(set) var isHeaderLoading = false
     @ObservableValue private(set) var fullscreenLoading = false
@@ -502,6 +503,10 @@ final class ChatViewModel: NSObject {
         dialog.send(.toast(.adamant.alert.copiedToPasteboardNotification))
     }
     
+    func copyTextInPartAction(_ text: String) {
+        didTapSelectText.send(text)
+    }
+    
     func reportMessageAction(_ id: String) {
         dialog.send(.reportMessageAlert(id: id))
     }
@@ -649,6 +654,10 @@ extension ChatViewModel {
         guard isSendingAvailable else { return }
         
         dialog.send(.renameAlert)
+    }
+    
+    func updatePartnerName() {
+        partnerName = chatroom?.getName(addressBookService: addressBookService)
     }
 }
 

@@ -281,7 +281,10 @@
 "ApiService.InternalError.ParsingFailed" = "Parsing fehlgeschlagen. Bericht senden";
 
 /* Serious internal error: No nodes available */
-"ApiService.InternalError.NoNodesAvailable" = "No active %@ nodes. Review the node list";
+"ApiService.InternalError.NoNodesAvailable" = "Keine aktiven %@ Knoten. Überprüfen Sie die Knotenliste.";
+
+/* Serious internal error: No ADM nodes available */
+"ApiService.InternalError.NoAdmNodesAvailable" = "Keine aktiven ADM Knoten zum Abrufen der %@ Adresse des Partners.";
 
 /* Eureka forms Cancel button */
 "Cancel" = "Abbrechen";
@@ -366,6 +369,9 @@
 
 /* Button "Report" */
 "Chats.Report" = "Bericht";
+
+/* Button "Select Text" */
+"Chats.SelectText" = "Text auswählen";
 
 /* Button "Reply" */
 "Chats.Reply" = "Antwort";
@@ -551,7 +557,7 @@
 "Error.RequestCancelled" = "Request cancelled";
 
 /* Shared error: Remote error format, %@ for message */
-"Error.RemoteServerErrorFormat" = "Blockchain-Node Fehler: %@";
+"Error.RemoteServerErrorFormat" = "%@";
 
 /* Shared error: User not logged */
 "Error.UserNotLogged" = "Sie sind nicht eingeloggt";
@@ -879,6 +885,12 @@
 
 /* Shared alert 'Save to Photos'. Used with saving images to photolibrary */
 "Shared.SaveToPhotolibrary" = "Im Fotoalbum speichern";
+
+/* Partner screen 'Give contact a name' at first */
+"Shared.RenameContactInitial" = "Kontakt einen Namen geben";
+
+/* Partner screen 'Rename contact'. */
+"Shared.RenameContact" = "Kontakt umbenennen";
 
 /* Shared alert 'Settings' button. Used to go to system Settings app, on application settings page. Should be same as Settings application title. */
 "Shared.Settings" = "Einstellungen";

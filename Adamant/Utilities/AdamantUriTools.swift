@@ -52,8 +52,6 @@ enum AdamantAddressParam {
 }
 
 final class AdamantUriTools {
-    static let AdamantProtocol = "adm"
-    
     static func encode(request: AdamantUri) -> String {
         switch request {
         case .passphrase(passphrase: let passphrase):
@@ -115,9 +113,9 @@ final class AdamantUriTools {
         }
         
         let request = uri.split(separator: ":")
-        if request.count > 2 || request[0] != AdamantProtocol {
-            return nil
-        }
+        guard request.count == 2,
+              request[0].caseInsensitiveCompare(AdmWalletService.qqPrefix) == .orderedSame
+        else { return nil }
         
         let addressAndParams = request[1].split(separator: "?")
         guard let addressRaw = addressAndParams.first else {

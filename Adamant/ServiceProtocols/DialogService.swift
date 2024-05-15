@@ -22,6 +22,14 @@ extension String.adamant.alert {
     static var saveToPhotolibrary: String {
         String.localized("Shared.SaveToPhotolibrary", comment: "Shared alert 'Save to Photos'. Used with saving images to photolibrary")
     }
+    
+    static var renameContact: String {
+        String.localized("Shared.RenameContact", comment: "Partner screen 'Rename contact'")
+    }
+    
+    static var renameContactInitial: String {
+        String.localized("Shared.RenameContactInitial", comment: "Partner screen 'Give contact a name' at first")
+    }
 }
 
 enum AddressChatShareType {
@@ -146,11 +154,6 @@ protocol DialogService: AnyObject {
     func showRichError(error: Error)
     func showNoConnectionNotification()
     func dissmisNoConnectionNotification()
-    func showCompactError(
-        withMessage message: String,
-        supportEmail: Bool,
-        error: Error?
-    )
     
     // MARK: - Notifications
     func showNotification(title: String?, message: String?, image: UIImage?, tapHandler: (() -> Void)?)

@@ -28,13 +28,17 @@ struct PartnerQRView: View {
 
 private extension PartnerQRView {
     func toolbar() -> some View {
-        HStack {
-            if let uiImage = viewModel.partnerImage {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .frame(squareSize: viewModel.partnerImageSize)
+        Button(action: {
+            viewModel.renameContact()
+        }) {
+            HStack {
+                if let uiImage = viewModel.partnerImage {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .frame(squareSize: viewModel.partnerImageSize)
+                }
+                Text(viewModel.partnerName).font(.headline)
             }
-            Text(viewModel.partnerName).font(.headline)
         }
     }
     
@@ -83,6 +87,10 @@ private extension PartnerQRView {
     
     func buttonSection() -> some View {
         Section {
+            Button(viewModel.renameTitle) {
+                viewModel.renameContact()
+            }
+            
             Button(String.adamant.alert.saveToPhotolibrary) {
                 viewModel.saveToPhotos()
             }

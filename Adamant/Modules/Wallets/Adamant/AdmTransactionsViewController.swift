@@ -88,7 +88,7 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
     @MainActor
     override func reloadData() {
         guard reachabilityMonitor.connection else {
-            dialogService.showCompactError(
+            dialogService.showError(
                 withMessage: .adamant.sharedErrors.networkError,
                 supportEmail: false,
                 error: nil
@@ -117,6 +117,14 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
     
     @MainActor
     override func handleRefresh() {
+        guard reachabilityMonitor.connection else {
+            dialogService.showError(
+                withMessage: .adamant.sharedErrors.networkError,
+                supportEmail: false,
+                error: nil
+            )
+            return
+        }
         Task {
             self.isBusy = true
             self.emptyLabel.isHidden = true
@@ -208,11 +216,14 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
         ) ?? ""
         
         var simple = SimpleTransactionDetails(transaction)
-        simple.partnerName = getPartnerName(for: partnerId)
+        simple.partnerName = getPartnerName(for: partnerId, tx: transaction)
         return simple
     }
     
-    func getPartnerName(for partnerId: String) -> String? {
+    func getPartnerName(
+        for partnerId: String,
+        tx: TransferTransaction
+    ) -> String? {
         var partnerName = addressBookService.getName(for: partnerId)
         
         if let address = accountService.account?.address,
@@ -220,7 +231,7 @@ final class AdmTransactionsViewController: TransactionsListViewControllerBase {
             partnerName = String.adamant.transactionDetails.yourAddress
         }
         
-        return partnerName
+        return partnerName ?? tx.partnerName
     }
     
     // MARK: - UITableView

@@ -40,7 +40,8 @@ struct ChatListFactory {
             visibleWalletsService: assembler.resolve(VisibleWalletsService.self)!,
             addressBookService: assembler.resolve(AddressBookService.self)!,
             screensFactory: screensFactory,
-            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!
+            walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!, 
+            nodesStorage: assembler.resolve(NodesStorageProtocol.self)!
         )
     }
     

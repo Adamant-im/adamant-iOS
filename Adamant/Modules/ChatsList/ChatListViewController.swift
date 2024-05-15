@@ -890,20 +890,22 @@ extension ChatListViewController {
     private func shortDescription(for transaction: ChatTransaction) -> NSAttributedString? {
         switch transaction {
         case let message as MessageTransaction:
-            guard let text = message.message else {
+            guard var text = message.message else {
                 return nil
             }
+            text = MessageProcessHelper.process(text)
             
-            let raw: String
+            var raw: String
             if message.isOutgoing {
                 raw = "\(String.adamant.chatList.sentMessagePrefix)\(text)"
             } else {
                 raw = text
             }
             
-            let attributesText = markdownParser.parse(raw).resolveLinkColor()
+            var attributedText = markdownParser.parse(raw).resolveLinkColor()
+            attributedText = MessageProcessHelper.process(attributedText: attributedText)
             
-            return attributesText
+            return attributedText
             
         case let transfer as TransferTransaction:
             if let admService = walletServiceCompose.getWallet(
@@ -921,7 +923,8 @@ extension ChatListViewController {
             
             if richMessage.additionalType == .reply,
                let content = richMessage.richContent,
-               let text = content[RichContentKeys.reply.replyMessage] as? String {
+               var text = content[RichContentKeys.reply.replyMessage] as? String {
+                text = MessageProcessHelper.process(text)
                 
                 let prefix = richMessage.isOutgoing
                 ? "\(String.adamant.chatList.sentMessagePrefix)"
@@ -945,11 +948,13 @@ extension ChatListViewController {
                 
                 let markDownText = markdownParser.parse("\(extraSpace)\(text)").resolveLinkColor()
                 
-                let fullString = NSMutableAttributedString(string: prefix)
+                var fullString = NSMutableAttributedString(string: prefix)
                 if richMessage.isOutgoing {
                     fullString.append(imageString)
                 }
                 fullString.append(markDownText)
+                
+                fullString = MessageProcessHelper.process(attributedText: fullString)
                 
                 return fullString
             }

@@ -48,7 +48,7 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
         let stack = UIStackView()
         stack.alignment = .center
         stack.axis = .horizontal
-        stack.spacing = 12
+        stack.spacing = horizontalStackSpacing
         return stack
     }()
     
@@ -57,7 +57,7 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
         stack.alignment = .center
         stack.axis = .vertical
         stack.spacing = 12
-
+        
         stack.addArrangedSubview(statusButton)
         stack.addArrangedSubview(ownReactionLabel)
         stack.addArrangedSubview(opponentReactionLabel)
@@ -118,8 +118,11 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
     private lazy var chatMenuManager = ChatMenuManager(delegate: self)
     
     private let ownReactionSize = CGSize(width: 40, height: 27)
-    private let opponentReactionSize = CGSize(width: 55, height: 27)
+    private let opponentReactionSize = CGSize(width: opponentReactionWidth, height: 27)
     private let opponentReactionImageSize = CGSize(width: 12, height: 12)
+    
+    static let opponentReactionWidth: CGFloat = 55
+    static let horizontalStackSpacing: CGFloat = 12
     
     var isSelected: Bool = false {
         didSet {
@@ -154,7 +157,7 @@ private extension ChatTransactionContainerView {
         addSubview(horizontalStack)
         horizontalStack.snp.makeConstraints {
             $0.top.bottom.equalToSuperview()
-            $0.leading.trailing.equalToSuperview().inset(12)
+            $0.horizontalEdges.equalToSuperview()
         }
         
         swipeView.swipeStateAction = { [actionHandler] state in
