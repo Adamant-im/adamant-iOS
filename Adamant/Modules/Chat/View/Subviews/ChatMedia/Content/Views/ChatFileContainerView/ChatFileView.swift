@@ -164,9 +164,9 @@ private extension ChatFileView {
             iconImageView.image = image
         }
         
-        downloadImageView.isHidden = model.isCached || model.isDownloading || model.isUploading
+        downloadImageView.isHidden = model.isCached || model.isBusy
         
-        if model.isDownloading || model.isUploading {
+        if model.isBusy {
             spinner.startAnimating()
         } else {
             spinner.stopAnimating()
@@ -184,8 +184,7 @@ private extension ChatFileView {
         
         videoIconIV.isHidden = !(
             model.isCached
-            && !model.isDownloading
-            && !model.isUploading
+            && !model.isBusy
             && model.fileType == .video
         )
     }

@@ -21,6 +21,10 @@ struct ChatFile: Equatable, Hashable {
     var isFromCurrentSender: Bool
     var fileType: FileType
     
+    var isBusy: Bool {
+        return isDownloading || isUploading
+    }
+    
     static let `default` = Self(
         file: .init([:]),
         previewImage: nil,

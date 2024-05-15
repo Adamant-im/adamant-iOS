@@ -136,7 +136,6 @@ struct AppAssembly: Assembly {
             )
         }.inObjectScope(.container)
         
-        
         // MARK: FilesNetworkManagerProtocol
         container.register(FilesNetworkManagerProtocol.self) { r in
             FilesNetworkManager(ipfsService: r.resolve(IPFSApiService.self)!)

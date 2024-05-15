@@ -135,14 +135,6 @@ final class ChatViewModel: NSObject {
         didSet { updateHiddenMessage(&messages) }
     }
     
-    @Atomic private var downloadingFilesID: [String] = [] {
-        didSet { updateDownloadingFiles(&messages) }
-    }
-    
-    @Atomic private var uploadingFilesIDs: [String] = [] {
-        didSet { updateUploadingFiles(&messages) }
-    }
-    
     init(
         chatsProvider: ChatsProvider,
         markdownParser: MarkdownParser,
@@ -716,7 +708,7 @@ final class ChatViewModel: NSObject {
         let message = messages.first(where: { $0.messageId == messageId })
         
         guard tx?.statusEnum == .delivered,
-              !downloadingFilesID.contains(file.file.id),
+              !chatFileService.downloadingFiles.contains(file.file.id),
               case let(.file(fileModel)) = message?.content
         else { return }
         
@@ -739,6 +731,7 @@ final class ChatViewModel: NSObject {
                     saveEncrypted: self?.filesStorageProprieties.saveFileEncrypted() ?? true
                 )
             } catch {
+                print("debug downloadFile error=\(error), localized=\(error.localizedDescription)")
                 self?.dialog.send(.alert(error.localizedDescription))
             }
         }
@@ -755,18 +748,21 @@ final class ChatViewModel: NSObject {
         guard let message = message,
               tx?.statusEnum == .delivered || (message.status != .failed && message.status != .pending),
               (filesStorageProprieties.autoDownloadPreviewPolicy() != .nobody ||
-                filesStorageProprieties.autoDownloadFullMediaPolicy() != .nobody)
+                filesStorageProprieties.autoDownloadFullMediaPolicy() != .nobody),
+              file.fileType == .image || file.fileType == .video
         else { return }
         
-        chatFileService.autoDownload(
-            file: file,
-            isFromCurrentSender: isFromCurrentSender,
-            chatroom: chatroom,
-            havePartnerName: havePartnerName,
-            previewDownloadPolicy: filesStorageProprieties.autoDownloadPreviewPolicy(),
-            fullMediaDownloadPolicy: filesStorageProprieties.autoDownloadFullMediaPolicy(),
-            saveEncrypted: filesStorageProprieties.saveFileEncrypted()
-        )
+        Task {
+            await chatFileService.autoDownload(
+                file: file,
+                isFromCurrentSender: isFromCurrentSender,
+                chatroom: chatroom,
+                havePartnerName: havePartnerName,
+                previewDownloadPolicy: filesStorageProprieties.autoDownloadPreviewPolicy(),
+                fullMediaDownloadPolicy: filesStorageProprieties.autoDownloadFullMediaPolicy(),
+                saveEncrypted: filesStorageProprieties.saveFileEncrypted()
+            )
+        }
     }
     
     func presentActionMenu() {
@@ -908,20 +904,6 @@ private extension ChatViewModel {
             .sink { [weak self] _ in self?.inputTextUpdated() }
             .store(in: &subscriptions)
         
-        chatFileService.downloadingFilesIDs
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] data in
-                self?.downloadingFilesID = data
-            }
-            .store(in: &subscriptions)
-        
-        chatFileService.uploadingFilesIDs
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] data in
-                self?.uploadingFilesIDs = data
-            }
-            .store(in: &subscriptions)
-        
         chatFileService.updateFileFields
             .receive(on: DispatchQueue.main)
             .sink { [weak self] data in
@@ -931,8 +913,10 @@ private extension ChatViewModel {
                     &self.messages,
                     id: data.id,
                     preview: data.preview,
-                    needToUpdatePeview: true,
-                    cached: data.cached
+                    needToUpdatePreview: data.needUpdatePreview,
+                    cached: data.cached,
+                    isUploading: data.uploading,
+                    isDownloading: data.downloading
                 )
             }
             .store(in: &subscriptions)
@@ -997,8 +981,8 @@ private extension ChatViewModel {
                 sender: sender,
                 isNeedToLoadMoreMessages: isNeedToLoadMoreMessages,
                 expirationTimestamp: &expirationTimestamp,
-                uploadingFilesIDs: uploadingFilesIDs,
-                downloadingFilesIDs: downloadingFilesID
+                uploadingFilesIDs: chatFileService.uploadingFiles,
+                downloadingFilesIDs: chatFileService.downloadingFiles
             )
             
             await setupNewMessages(
@@ -1208,48 +1192,30 @@ private extension ChatViewModel {
         }
     }
     
-    func updateDownloadingFiles(_ messages: inout [ChatMessage]) {
-        messages.indices.forEach { index in
-            messages[index].getFiles().forEach { file in
-                messages[index].updateFields(
-                    id: file.file.id,
-                    preview: nil,
-                    needToUpdatePeview: false,
-                    isDownloading: downloadingFilesID.contains(file.file.id)
-                )
-            }
-        }
-    }
-    
-    func updateUploadingFiles(_ messages: inout [ChatMessage]) {
-        messages.indices.forEach { index in
-            messages[index].getFiles().forEach { file in
-                messages[index].updateFields(
-                    id: file.file.id,
-                    preview: nil,
-                    needToUpdatePeview: false,
-                    isUploading: uploadingFilesIDs.contains(file.file.id)
-                )
-            }
-        }
-    }
-    
     func updateFileFields(
         _ messages: inout [ChatMessage],
         id oldId: String,
         newId: String? = nil,
         preview: UIImage?,
-        needToUpdatePeview: Bool,
+        needToUpdatePreview: Bool,
         cached: Bool? = nil,
         isUploading: Bool? = nil,
         isDownloading: Bool? = nil
     ) {
-        messages.indices.forEach { index in
+        let indexes = messages.indices.filter {
+            messages[$0].getFiles().contains { $0.file.id == oldId }
+        }
+        
+        guard !indexes.isEmpty else {
+            return
+        }
+        
+        indexes.forEach { index in
             messages[index].updateFields(
                 id: oldId,
                 newId: newId,
-                preview: preview, 
-                needToUpdatePeview: needToUpdatePeview,
+                preview: preview,
+                needToUpdatePeview: needToUpdatePreview,
                 cached: cached,
                 isUploading: isUploading,
                 isDownloading: isDownloading

@@ -34,8 +34,8 @@ enum ApiServiceError: LocalizedError, Error {
             let message = error?.localizedDescription ?? msg
             return String.adamant.sharedErrors.internalError(message: message)
             
-        case .networkError(error: _):
-            return String.adamant.sharedErrors.networkError
+        case let .networkError(error):
+            return error.localizedDescription
             
         case .requestCancelled:
             return String.adamant.sharedErrors.requestCancelled
