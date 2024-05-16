@@ -17,7 +17,7 @@ protocol APICoreProtocol: Actor {
     func sendRequestMultipartFormData(
         node: Node,
         path: String,
-        data: [String: Data]
+        models: [MultipartFormDataModel]
     ) async -> APIResponseModel
     
     func sendRequestBasic<Parameters: Encodable>(
@@ -115,12 +115,12 @@ extension APICoreProtocol {
     func sendRequestMultipartFormDataJsonResponse<JSONOutput: Decodable>(
         node: Node,
         path: String,
-        data: [String: Data]
+        models: [MultipartFormDataModel]
     ) async -> ApiServiceResult<JSONOutput> {
         await sendRequestMultipartFormData(
             node: node,
             path: path,
-            data: data
+            models: models
         ).result.flatMap { parseJSON(data: $0) }
     }
     

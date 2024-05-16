@@ -13,7 +13,7 @@ enum IPFSApiCommands {
     static let file = (
         upload: "api/file/upload",
         download: "api/file/",
-        field: "api/files"
+        fieldName: "files"
     )
 }
 
@@ -35,11 +35,18 @@ final class IPFSApiService: FileApiServiceProtocol {
     }
     
     func uploadFile(data: Data) async throws -> String {
+        let model: MultipartFormDataModel = .init(
+            keyName: IPFSApiCommands.file.fieldName,
+            fileName: defaultFileName,
+            data: data
+        )
+        
         let result: IpfsDTO = try await request { core, node in
             await core.sendRequestMultipartFormDataJsonResponse(
                 node: node,
                 path: IPFSApiCommands.file.upload,
-                data: [IPFSApiCommands.file.field: data])
+                models: [model]
+            )
         }.get()
         
         guard let cid = result.cids.first else {
@@ -60,3 +67,5 @@ final class IPFSApiService: FileApiServiceProtocol {
         return result
     }
 }
+
+private let defaultFileName = "fileName"

@@ -59,6 +59,7 @@
 		3AA6DF402BA9941E00EA2E16 /* MediaContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA6DF3F2BA9941E00EA2E16 /* MediaContainerView.swift */; };
 		3AA6DF442BA997C000EA2E16 /* FileContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA6DF432BA997C000EA2E16 /* FileContainerView.swift */; };
 		3AA6DF462BA9BEB700EA2E16 /* MediaContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA6DF452BA9BEB700EA2E16 /* MediaContentView.swift */; };
+		3AB87CD62BF6237100AE8743 /* MultipartFormDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AB87CD52BF6237100AE8743 /* MultipartFormDataModel.swift */; };
 		3AC76E3D2AB09118008042C4 /* ElegantEmojiPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 3AC76E3C2AB09118008042C4 /* ElegantEmojiPicker */; };
 		3ACD307E2BBD86B700ABF671 /* FilesStorageProprietiesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ACD307D2BBD86B700ABF671 /* FilesStorageProprietiesService.swift */; };
 		3ACD30802BBD86C800ABF671 /* FilesStorageProprietiesProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ACD307F2BBD86C800ABF671 /* FilesStorageProprietiesProtocol.swift */; };
@@ -733,6 +734,7 @@
 		3AA6DF3F2BA9941E00EA2E16 /* MediaContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaContainerView.swift; sourceTree = "<group>"; };
 		3AA6DF432BA997C000EA2E16 /* FileContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileContainerView.swift; sourceTree = "<group>"; };
 		3AA6DF452BA9BEB700EA2E16 /* MediaContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaContentView.swift; sourceTree = "<group>"; };
+		3AB87CD52BF6237100AE8743 /* MultipartFormDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultipartFormDataModel.swift; sourceTree = "<group>"; };
 		3ACD307D2BBD86B700ABF671 /* FilesStorageProprietiesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilesStorageProprietiesService.swift; sourceTree = "<group>"; };
 		3ACD307F2BBD86C800ABF671 /* FilesStorageProprietiesProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilesStorageProprietiesProtocol.swift; sourceTree = "<group>"; };
 		3AE0A4272BC6A64900BF7125 /* FilesNetworkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilesNetworkManager.swift; sourceTree = "<group>"; };
@@ -2206,6 +2208,7 @@
 				3AA388022B67F47600125684 /* RPCResponseModel.swift */,
 				3AA3880D2B6A356900125684 /* RpcRequestModel.swift */,
 				936658902B0AB9DC00BDB2D3 /* NodeWithGroup.swift */,
+				3AB87CD52BF6237100AE8743 /* MultipartFormDataModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -3372,6 +3375,7 @@
 				E9AA8BFA212C166600F9249F /* EthWalletService+Send.swift in Sources */,
 				411743042A39B257008CD98A /* ContributeViewModel.swift in Sources */,
 				93E5D4DB293000BE00439298 /* UnregisteredTransaction.swift in Sources */,
+				3AB87CD62BF6237100AE8743 /* MultipartFormDataModel.swift in Sources */,
 				411DB8332A14D01F006AB158 /* ChatKeyboardManager.swift in Sources */,
 				6449BA68235CA0930033B936 /* ERC20WalletService.swift in Sources */,
 				93B28ECA2B076E88007F268B /* DashErrorDTO.swift in Sources */,
@@ -3948,7 +3952,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.6.0;
+				MARKETING_VERSION = 3.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3979,7 +3983,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.6.0;
+				MARKETING_VERSION = 3.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

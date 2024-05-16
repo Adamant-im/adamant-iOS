@@ -28,15 +28,15 @@ actor APICore: APICoreProtocol {
     func sendRequestMultipartFormData(
         node: Node,
         path: String,
-        data: [String: Data]
+        models: [MultipartFormDataModel]
     ) async -> APIResponseModel {
         do {
             let request = AF.upload(multipartFormData: { multipartFormData in
-                data.forEach { file in
+                models.forEach { file in
                     multipartFormData.append(
-                        file.value,
-                        withName: file.key,
-                        fileName: "file"
+                        file.data,
+                        withName: file.keyName,
+                        fileName: file.fileName
                     )
                 }
             }, to: try buildUrl(node: node, path: path))
