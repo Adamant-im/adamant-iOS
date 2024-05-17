@@ -14,12 +14,22 @@ import Parchment
 import SnapKit
 import CommonKit
 import Combine
+import Instructions
 
 // MARK: - Localization
 extension String.adamant {
     enum account {
         static var title: String {
             String.localized("AccountTab.Title", comment: "Account page: scene title")
+        }
+        static var guideSetPIN: String {
+            String.localized("VisualGuide.HintLabel.SetPIN", comment: "Visual Guide: Description for hint - How to set PIN code for login")
+        }
+        static var guideSetBiometry: String {
+            String.localized("VisualGuide.HintLabel.SetBiometry", comment: "Visual Guide: Description for hint - How to set face ID for login")
+        }
+        static var guideGetFreeTokens: String {
+            String.localized("VisualGuide.HintLabel.GetFreeTokens", comment: "Visual Guide: Inform users that they can receive free tokens")
         }
         
         static let updatingBalance = "…"
@@ -175,6 +185,15 @@ final class AccountViewController: FormViewController {
         return accountService.hasStayInAccount
     }
     
+    let stayInRow: SwitchRow = SwitchRow {
+        $0.tag = Rows.stayIn.tag
+        $0.title = Rows.stayIn.localized
+        $0.cell.imageView?.image = Rows.stayIn.image
+    }
+    
+    let coachMarksController = CoachMarksController()
+    var useInvisibleOverlay: Bool = false
+    
     var showBiometryOptions: Bool {
         switch localAuth.biometryType {
         case .none:
@@ -242,6 +261,23 @@ final class AccountViewController: FormViewController {
         let statusBarView = UIView(frame: UIApplication.shared.statusBarFrame)
         statusBarView.backgroundColor = UIColor.adamant.backgroundColor
         view.addSubview(statusBarView)
+        
+        
+        self.coachMarksController.dataSource = self
+        
+        let skipView = SkipView()
+        skipView.backgroundColor = UIColor.adamant.pickedReactionBackground
+        skipView.layer.cornerRadius = 10
+        skipView.setTitle(.adamant.login.guideSkipButton, for: .normal)
+        skipView.setTitleColor(UIColor.adamant.textColor, for: .normal)
+        skipView.setTitle(.adamant.login.guideSkipButton, for: .normal)
+        
+        self.coachMarksController.skipView = skipView
+        
+        if useInvisibleOverlay {
+            self.coachMarksController.overlay.areTouchEventsForwarded = true
+            self.coachMarksController.overlay.backgroundColor = .clear
+        }
         
         // MARK: Transfers controller
         Task {
@@ -645,13 +681,9 @@ final class AccountViewController: FormViewController {
         }
         
         // Stay in
-        
-        let stayInRow = SwitchRow {
-            $0.tag = Rows.stayIn.tag
-            $0.title = Rows.stayIn.localized
-            $0.cell.imageView?.image = Rows.stayIn.image
-            $0.value = accountService.hasStayInAccount
-        }.cellUpdate { (cell, row) in
+        stayInRow.value = accountService.hasStayInAccount
+
+        stayInRow.cellUpdate { (cell, row) in
             cell.switchControl.onTintColor = UIColor.adamant.active
             row.title = Rows.stayIn.localized
         }.onChange { [weak self] row in
@@ -761,6 +793,7 @@ final class AccountViewController: FormViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         navigationController?.setNavigationBarHidden(false, animated: animated)
+        self.coachMarksController.stop(immediately: true)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -769,6 +802,7 @@ final class AccountViewController: FormViewController {
         if !initiated {
             initiated = true
         }
+        coachMarksController.start(in: .viewController(self))
     }
     
     override func viewDidLayoutSubviews() {
@@ -1146,5 +1180,42 @@ extension AccountViewController: WalletViewControllerDelegate {
                 tableView.deselectRow(at: indexPath, animated: true)
             }
         }
+    }
+}
+
+extension AccountViewController: CoachMarksControllerDataSource {
+    func coachMarksController(
+        _ coachMarksController: Instructions.CoachMarksController,
+        coachMarkViewsAt index: Int,
+        madeFrom coachMark: Instructions.CoachMark) -> (bodyView: (UIView & Instructions.CoachMarkBodyView), arrowView: (UIView & Instructions.CoachMarkArrowView)?) {
+            let coachViews = coachMarksController.helper.makeDefaultCoachViews(
+                withArrow: true,
+                withNextText: false,
+                arrowOrientation: coachMark.arrowOrientation
+            )
+            
+            let backgroundColor = UIColor.adamant.pickedReactionBackground
+            coachViews.bodyView.hintLabel.textColor = UIColor.adamant.textColor
+            coachViews.bodyView.background.borderColor = backgroundColor
+            coachViews.bodyView.background.innerColor = backgroundColor
+            coachViews.arrowView?.background.innerColor = backgroundColor
+            coachViews.arrowView?.background.borderColor = backgroundColor
+            
+            if index == 0 {
+                coachViews.bodyView.hintLabel.text = .adamant.account.guideSetPIN
+            }
+            if index == 1 {
+                coachViews.bodyView.hintLabel.text = .adamant.account.guideSetBiometry
+            }
+
+            return (bodyView: coachViews.bodyView, arrowView: coachViews.arrowView)
+    }
+    
+    func coachMarksController(_ coachMarksController: Instructions.CoachMarksController, coachMarkAt index: Int) -> Instructions.CoachMark {
+        return coachMarksController.helper.makeCoachMark(for: stayInRow.cell)
+    }
+    
+    func numberOfCoachMarks(for coachMarksController: Instructions.CoachMarksController) -> Int {
+        1
     }
 }
