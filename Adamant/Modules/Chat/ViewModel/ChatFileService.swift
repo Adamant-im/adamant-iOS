@@ -39,14 +39,12 @@ protocol ChatFileProtocol {
     
     func downloadFile(
         file: ChatFile,
-        isFromCurrentSender: Bool,
         chatroom: Chatroom?,
         saveEncrypted: Bool
     ) async throws
     
     func autoDownload(
         file: ChatFile,
-        isFromCurrentSender: Bool,
         chatroom: Chatroom?,
         havePartnerName: Bool,
         previewDownloadPolicy: DownloadPolicy,
@@ -82,11 +80,11 @@ final class ChatFileService: ChatFileProtocol {
     private let maxDownloadAttemptsCount = 3
         
     var uploadingFiles: [String] {
-        uploadingFilesIDsArray
+        $uploadingFilesIDsArray.wrappedValue
     }
     
     var downloadingFiles: [String] {
-        downloadingFilesIDsArray
+        $downloadingFilesIDsArray.wrappedValue
     }
     
     let updateFileFields = ObservableSender<(
@@ -191,7 +189,7 @@ final class ChatFileService: ChatFileProtocol {
         )
         
         richFiles.forEach { file in
-            uploadingFilesIDsArray.append(file.id)
+            $uploadingFilesIDsArray.mutate { $0.append(file.id) }
             sendUpdate(for: [file.id], downloading: nil, uploading: true)
         }
         
@@ -238,8 +236,9 @@ final class ChatFileService: ChatFileProtocol {
                 }
                 
                 let oldId = file.url.absoluteString
-                uploadingFilesIDsArray.removeAll(where: { $0 == oldId })
-                
+                $uploadingFilesIDsArray.mutate {
+                    $0.removeAll(where: { $0 == oldId })
+                }
                 let cached = filesStorage.isCachedLocally(result.file.cid)
                 
                 updateFileFields.send((
@@ -304,7 +303,9 @@ final class ChatFileService: ChatFileProtocol {
             )
         } catch {
             richFiles.forEach { file in
-                uploadingFilesIDsArray.removeAll(where: { $0 == file.id })
+                $uploadingFilesIDsArray.mutate {
+                    $0.removeAll(where: { $0 == file.id })
+                }
                 sendUpdate(for: [file.id], downloading: nil, uploading: false)
             }
             
@@ -319,13 +320,11 @@ final class ChatFileService: ChatFileProtocol {
     
     func downloadFile(
         file: ChatFile,
-        isFromCurrentSender: Bool,
         chatroom: Chatroom?,
         saveEncrypted: Bool
     ) async throws {
         try await downloadFile(
             file: file,
-            isFromCurrentSender: isFromCurrentSender,
             chatroom: chatroom,
             shouldDownloadOriginalFile: true,
             shouldDownloadPreviewFile: true,
@@ -335,29 +334,27 @@ final class ChatFileService: ChatFileProtocol {
     
     func autoDownload(
         file: ChatFile,
-        isFromCurrentSender: Bool,
         chatroom: Chatroom?,
         havePartnerName: Bool,
         previewDownloadPolicy: DownloadPolicy,
         fullMediaDownloadPolicy: DownloadPolicy,
         saveEncrypted: Bool
     ) async {
-        guard !downloadingFilesIDsArray.contains(file.file.id),
-              !ignoreFilesIDsArray.contains(file.file.id),
-              !busyFilesIDs.contains(file.file.id)
+        guard !downloadingFiles.contains(file.file.id),
+              !$ignoreFilesIDsArray.wrappedValue.contains(file.file.id),
+              !$busyFilesIDs.wrappedValue.contains(file.file.id)
         else {
             return
         }
         
         defer {
-            busyFilesIDs.removeAll(where: { $0 == file.file.id })
+            $busyFilesIDs.mutate { $0.removeAll(where: { $0 == file.file.id }) }
         }
         
-        busyFilesIDs.append(file.file.id)
+        $busyFilesIDs.mutate { $0.append(file.file.id) }
         
         await handleAutoDownload(
             file: file,
-            isFromCurrentSender: isFromCurrentSender,
             chatroom: chatroom,
             havePartnerName: havePartnerName,
             previewDownloadPolicy: previewDownloadPolicy,
@@ -412,7 +409,6 @@ private extension ChatFileService {
 private extension ChatFileService {
     func handleAutoDownload(
         file: ChatFile,
-        isFromCurrentSender: Bool,
         chatroom: Chatroom?,
         havePartnerName: Bool,
         previewDownloadPolicy: DownloadPolicy,
@@ -439,7 +435,6 @@ private extension ChatFileService {
         do {
             try await downloadFile(
                 file: file,
-                isFromCurrentSender: isFromCurrentSender,
                 chatroom: chatroom,
                 shouldDownloadOriginalFile: shouldDownloadOriginalFile,
                 shouldDownloadPreviewFile: shouldDownloadPreviewFile,
@@ -448,7 +443,6 @@ private extension ChatFileService {
         } catch {
             await handleDownloadError(
                 file: file,
-                isFromCurrentSender: isFromCurrentSender,
                 chatroom: chatroom,
                 havePartnerName: havePartnerName,
                 previewDownloadPolicy: previewDownloadPolicy,
@@ -460,25 +454,23 @@ private extension ChatFileService {
     
     func handleDownloadError(
         file: ChatFile,
-        isFromCurrentSender: Bool,
         chatroom: Chatroom?,
         havePartnerName: Bool,
         previewDownloadPolicy: DownloadPolicy,
         fullMediaDownloadPolicy: DownloadPolicy,
         saveEncrypted: Bool
     ) async {
-        let count = fileDownloadAttemptsCount[file.file.id] ?? .zero
+        let count = $fileDownloadAttemptsCount.wrappedValue[file.file.id] ?? .zero
         
         guard count < maxDownloadAttemptsCount else {
-            ignoreFilesIDsArray.append(file.file.id)
+            $ignoreFilesIDsArray.mutate { $0.append(file.file.id) }
             return
         }
         
-        fileDownloadAttemptsCount[file.file.id] = count + 1
+        $fileDownloadAttemptsCount.mutate { $0[file.file.id] = count + 1 }
         
         await handleAutoDownload(
             file: file,
-            isFromCurrentSender: isFromCurrentSender,
             chatroom: chatroom,
             havePartnerName: havePartnerName,
             previewDownloadPolicy: previewDownloadPolicy,
@@ -542,7 +534,6 @@ private extension ChatFileService {
     
     func downloadFile(
         file: ChatFile,
-        isFromCurrentSender: Bool,
         chatroom: Chatroom?,
         shouldDownloadOriginalFile: Bool,
         shouldDownloadPreviewFile: Bool,
@@ -553,7 +544,7 @@ private extension ChatFileService {
               let recipientId = chatroom?.partner?.address,
               NetworkFileProtocolType(rawValue: file.storage) != nil,
               (shouldDownloadOriginalFile || shouldDownloadPreviewFile),
-              !downloadingFilesIDsArray.contains(file.file.id)
+              !downloadingFiles.contains(file.file.id)
         else { return }
         
         guard !file.file.id.isEmpty,
@@ -563,11 +554,11 @@ private extension ChatFileService {
         }
         
         defer {
-            downloadingFilesIDsArray.removeAll(where: { $0 == file.file.id })
+            $downloadingFilesIDsArray.mutate { $0.removeAll(where: { $0 == file.file.id }) }
             sendUpdate(for: [file.file.id], downloading: false, uploading: nil)
         }
         
-        downloadingFilesIDsArray.append(file.file.id)
+        $downloadingFilesIDsArray.mutate { $0.append(file.file.id) }
         sendUpdate(for: [file.file.id], downloading: true, uploading: nil)
         
         if let previewDTO = file.file.preview {
@@ -719,7 +710,7 @@ private extension ChatFileService {
     func needsPreviewDownload(file: ChatFile) -> Bool {
         if let previewId = file.file.preview?.id,
            file.file.preview?.nonce != nil,
-           !ignoreFilesIDsArray.contains(previewId),
+           !$ignoreFilesIDsArray.wrappedValue.contains(previewId),
            !filesStorage.isCachedLocally(previewId) {
             return true
         }

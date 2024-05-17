@@ -733,7 +733,6 @@ final class ChatViewModel: NSObject {
             do {
                 try await self?.chatFileService.downloadFile(
                     file: file,
-                    isFromCurrentSender: isFromCurrentSender,
                     chatroom: self?.chatroom,
                     saveEncrypted: self?.filesStorageProprieties.saveFileEncrypted() ?? true
                 )
@@ -745,8 +744,7 @@ final class ChatViewModel: NSObject {
     
     func downloadPreviewIfNeeded(
         messageId: String,
-        file: ChatFile,
-        isFromCurrentSender: Bool
+        files: [ChatFile]
     ) {
         let tx = chatTransactions.first(where: { $0.txId == messageId })
         let message = messages.first(where: { $0.messageId == messageId })
@@ -754,20 +752,24 @@ final class ChatViewModel: NSObject {
         guard let message = message,
               tx?.statusEnum == .delivered || (message.status != .failed && message.status != .pending),
               (filesStorageProprieties.autoDownloadPreviewPolicy() != .nobody ||
-                filesStorageProprieties.autoDownloadFullMediaPolicy() != .nobody),
-              file.fileType == .image || file.fileType == .video
+                filesStorageProprieties.autoDownloadFullMediaPolicy() != .nobody)
         else { return }
         
-        Task {
-            await chatFileService.autoDownload(
-                file: file,
-                isFromCurrentSender: isFromCurrentSender,
-                chatroom: chatroom,
-                havePartnerName: havePartnerName,
-                previewDownloadPolicy: filesStorageProprieties.autoDownloadPreviewPolicy(),
-                fullMediaDownloadPolicy: filesStorageProprieties.autoDownloadFullMediaPolicy(),
-                saveEncrypted: filesStorageProprieties.saveFileEncrypted()
-            )
+        let chatFiles = files.filter {
+            $0.fileType == .image || $0.fileType == .video
+        }
+        
+        chatFiles.forEach { file in
+            Task {
+                await chatFileService.autoDownload(
+                    file: file,
+                    chatroom: chatroom,
+                    havePartnerName: havePartnerName,
+                    previewDownloadPolicy: filesStorageProprieties.autoDownloadPreviewPolicy(),
+                    fullMediaDownloadPolicy: filesStorageProprieties.autoDownloadFullMediaPolicy(),
+                    saveEncrypted: filesStorageProprieties.saveFileEncrypted()
+                )
+            }
         }
     }
     
@@ -832,13 +834,10 @@ final class ChatViewModel: NSObject {
                   case let .file(model) = message.content
             else { return }
             
-            model.value.content.fileModel.files.forEach { file in
-                downloadPreviewIfNeeded(
-                    messageId: message.messageId,
-                    file: file,
-                    isFromCurrentSender: file.isFromCurrentSender
-                )
-            }
+            downloadPreviewIfNeeded(
+                messageId: message.messageId,
+                files: model.value.content.fileModel.files
+            )
         }
     }
 }

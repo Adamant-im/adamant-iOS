@@ -59,13 +59,11 @@ private extension FileContainerView {
     func update() {
         let fileList = model.files.prefix(FilesConstants.maxFilesCount)
         
-        fileList.forEach { file in
-            actionHandler(.downloadPreviewIfNeeded(
-                messageId: model.messageId,
-                file: file,
-                isFromCurrentSender: model.isFromCurrentSender
-            ))
-        }
+        actionHandler(.downloadPreviewIfNeeded(
+            messageId: model.messageId,
+            files: Array(fileList),
+            isFromCurrentSender: model.isFromCurrentSender
+        ))
         
         filesStack.arrangedSubviews.forEach { $0.isHidden = true }
 

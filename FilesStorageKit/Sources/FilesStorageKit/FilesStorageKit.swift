@@ -243,7 +243,7 @@ private extension FilesStorageKit {
             fileType: fileType,
             isPreview: isPreview
         )
-        cachedFiles[file.id] = file
+        $cachedFiles.mutate { $0[file.id] = file }
         
         if fileType == .image,
            isPreview,
@@ -305,10 +305,10 @@ private extension FilesStorageKit {
         
         if let url = localUrl {
             try FileManager.default.removeItem(at: url)
-            cachedFiles[url.absoluteString] = file
+            $cachedFiles.mutate { $0[url.absoluteString] = file }
         }
         
-        cachedFiles[id] = file
+        $cachedFiles.mutate { $0[id] = file }
     }
     
     func folderSize(at url: URL) throws -> Int64 {
