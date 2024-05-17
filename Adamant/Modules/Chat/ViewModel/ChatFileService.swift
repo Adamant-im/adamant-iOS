@@ -19,6 +19,7 @@ protocol ChatFileProtocol {
     var updateFileFields: PassthroughSubject<(
         id: String,
         newId: String?,
+        fileNonce: String?,
         preview: UIImage?,
         needUpdatePreview: Bool,
         cached: Bool?,
@@ -91,6 +92,7 @@ final class ChatFileService: ChatFileProtocol {
     let updateFileFields = ObservableSender<(
         id: String,
         newId: String?,
+        fileNonce: String?,
         preview: UIImage?,
         needUpdatePreview: Bool,
         cached: Bool?,
@@ -237,18 +239,18 @@ final class ChatFileService: ChatFileProtocol {
                 
                 let oldId = file.url.absoluteString
                 uploadingFilesIDsArray.removeAll(where: { $0 == oldId })
-                sendUpdate(for: [oldId], downloading: nil, uploading: false)
                 
                 let cached = filesStorage.isCachedLocally(result.file.cid)
                 
                 updateFileFields.send((
                     id: oldId,
                     newId: result.file.cid,
+                    fileNonce: result.file.nonce,
                     preview: preview,
                     needUpdatePreview: true,
                     cached: cached,
                     downloading: nil,
-                    uploading: nil
+                    uploading: false
                 ))
                 
                 var previewDTO: RichMessageFile.Preview?
@@ -508,6 +510,7 @@ private extension ChatFileService {
         updateFileFields.send((
             id: file.file.id,
             newId: nil,
+            fileNonce: nil,
             preview: image,
             needUpdatePreview: true,
             cached: nil,
@@ -589,6 +592,7 @@ private extension ChatFileService {
                 updateFileFields.send((
                     id: file.file.id,
                     newId: nil,
+                    fileNonce: nil,
                     preview: preview,
                     needUpdatePreview: true,
                     cached: nil,
@@ -621,6 +625,7 @@ private extension ChatFileService {
             updateFileFields.send((
                 id: file.file.id,
                 newId: nil,
+                fileNonce: nil,
                 preview: nil,
                 needUpdatePreview: false,
                 cached: cached,
@@ -807,6 +812,7 @@ private extension ChatFileService {
             updateFileFields.send((
                 id: id,
                 newId: nil,
+                fileNonce: nil,
                 preview: nil,
                 needUpdatePreview: false,
                 cached: nil,

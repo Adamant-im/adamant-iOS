@@ -707,8 +707,8 @@ final class ChatViewModel: NSObject {
         let tx = chatTransactions.first(where: { $0.txId == messageId })
         let message = messages.first(where: { $0.messageId == messageId })
         
-        guard tx?.statusEnum == .delivered,
-              !chatFileService.downloadingFiles.contains(file.file.id),
+        guard !chatFileService.downloadingFiles.contains(file.file.id),
+              !chatFileService.uploadingFiles.contains(file.file.id),
               case let(.file(fileModel)) = message?.content
         else { return }
         
@@ -722,6 +722,8 @@ final class ChatViewModel: NSObject {
             return
         }
         
+        guard tx?.statusEnum == .delivered else { return }
+        
         Task { [weak self] in
             do {
                 try await self?.chatFileService.downloadFile(
@@ -731,7 +733,6 @@ final class ChatViewModel: NSObject {
                     saveEncrypted: self?.filesStorageProprieties.saveFileEncrypted() ?? true
                 )
             } catch {
-                print("debug downloadFile error=\(error), localized=\(error.localizedDescription)")
                 self?.dialog.send(.alert(error.localizedDescription))
             }
         }
@@ -912,6 +913,8 @@ private extension ChatViewModel {
                 self.updateFileFields(
                     &self.messages,
                     id: data.id,
+                    newId: data.newId,
+                    fileNonce: data.fileNonce,
                     preview: data.preview,
                     needToUpdatePreview: data.needUpdatePreview,
                     cached: data.cached,
@@ -1196,6 +1199,7 @@ private extension ChatViewModel {
         _ messages: inout [ChatMessage],
         id oldId: String,
         newId: String? = nil,
+        fileNonce: String? = nil,
         preview: UIImage?,
         needToUpdatePreview: Bool,
         cached: Bool? = nil,
@@ -1214,6 +1218,7 @@ private extension ChatViewModel {
             messages[index].updateFields(
                 id: oldId,
                 newId: newId,
+                fileNonce: fileNonce,
                 preview: preview,
                 needToUpdatePeview: needToUpdatePreview,
                 cached: cached,
@@ -1237,13 +1242,14 @@ private extension ChatViewModel {
         
         let files: [FileResult] = chatFiles.compactMap { file in
             guard file.isCached,
+                  !file.isBusy,
                   let fileDTO = try? filesStorage.getFile(with: file.file.id) else {
                 return nil
             }
             
             let data = try? chatFileService.getDecodedData(
                 file: fileDTO,
-                nonce: file.nonce,
+                nonce: file.file.nonce,
                 chatroom: chatroom
             )
             
@@ -1313,6 +1319,7 @@ private extension ChatMessage {
     mutating func updateFields(
         id oldId: String,
         newId: String? = nil,
+        fileNonce: String? = nil,
         preview: UIImage?,
         needToUpdatePeview: Bool,
         cached: Bool? = nil,
@@ -1328,6 +1335,9 @@ private extension ChatMessage {
         
         if let newId = newId {
             model.content.fileModel.files[index].file.id = newId
+        }
+        if let fileNonce = fileNonce {
+            model.content.fileModel.files[index].file.nonce = fileNonce
         }
         if let value = cached {
             model.content.fileModel.files[index].isCached = value
