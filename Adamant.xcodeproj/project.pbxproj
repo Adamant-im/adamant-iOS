@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2606374C2BED81BA00929634 /* Instructions in Frameworks */ = {isa = PBXBuildFile; productRef = 2606374B2BED81BA00929634 /* Instructions */; };
 		265AA1622B74E6B900CF98B0 /* ChatPreservation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265AA1612B74E6B900CF98B0 /* ChatPreservation.swift */; };
 		269E13522B594B2D008D1CA7 /* AccountFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269E13512B594B2D008D1CA7 /* AccountFooterView.swift */; };
 		26A975FF2B7E843E0095C367 /* SelectTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A975FE2B7E843E0095C367 /* SelectTextView.swift */; };
@@ -1249,6 +1250,7 @@
 				A5DBBABD262C7221004AC028 /* Clibsodium in Frameworks */,
 				A50AEB14262C837900B37C22 /* Alamofire in Frameworks */,
 				938F7D582955C1DA001915CA /* MessageKit in Frameworks */,
+				2606374C2BED81BA00929634 /* Instructions in Frameworks */,
 				A530B0D82842110D003F0210 /* (null) in Frameworks */,
 				A5DBBADC262C729B004AC028 /* CryptoSwift in Frameworks */,
 				4177E5E12A52DA7100C089FE /* AdvancedContextMenuKit in Frameworks */,
@@ -2608,6 +2610,7 @@
 				4177E5E02A52DA7100C089FE /* AdvancedContextMenuKit */,
 				9342F6C12A6A35E300A9B39F /* CommonKit */,
 				3AC76E3C2AB09118008042C4 /* ElegantEmojiPicker */,
+				2606374B2BED81BA00929634 /* Instructions */,
 			);
 			productName = Adamant;
 			productReference = E913C8EE1FFFA51D001A83F7 /* Adamant.app */;
@@ -2772,6 +2775,7 @@
 				938F7D562955C1DA001915CA /* XCRemoteSwiftPackageReference "MessageKit" */,
 				4184F16F2A33044E00D7B8B9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				3AC76E3B2AB09118008042C4 /* XCRemoteSwiftPackageReference "Elegant-Emoji-Picker" */,
+				2606374A2BED81BA00929634 /* XCRemoteSwiftPackageReference "Instructions" */,
 			);
 			productRefGroup = E913C8EF1FFFA51D001A83F7 /* Products */;
 			projectDirPath = "";
@@ -4029,6 +4033,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		2606374A2BED81BA00929634 /* XCRemoteSwiftPackageReference "Instructions" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ephread/Instructions";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.3.0;
+			};
+		};
 		3A8875ED27BBF38D00436195 /* XCRemoteSwiftPackageReference "Parchment" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/rechsteiner/Parchment";
@@ -4184,6 +4196,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		2606374B2BED81BA00929634 /* Instructions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2606374A2BED81BA00929634 /* XCRemoteSwiftPackageReference "Instructions" */;
+			productName = Instructions;
+		};
 		3A8875EE27BBF38D00436195 /* Parchment */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 3A8875ED27BBF38D00436195 /* XCRemoteSwiftPackageReference "Parchment" */;

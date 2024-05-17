@@ -174,6 +174,16 @@ protocol DialogService: AnyObject {
         didSelect: ((ShareType) -> Void)?
     )
     
+    func presentShareAlertFor(
+        string: String,
+        types: [ShareType],
+        excludedActivityTypes: [UIActivity.ActivityType]?,
+        animated: Bool,
+        from: UIView?,
+        completion: (() -> Void)?,
+        didSelect: ((ShareType) -> Void)?
+    )
+    
     func presentGoToSettingsAlert(title: String?, message: String?)
     
     func presentDummyAlert(

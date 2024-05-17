@@ -146,6 +146,15 @@
         }
       },
       {
+        "package": "Instructions",
+        "repositoryURL": "https://github.com/ephread/Instructions",
+        "state": {
+          "branch": null,
+          "revision": "54f50ec058a118107178f641f7475db353080c6d",
+          "version": "2.3.0"
+        }
+      },
+      {
         "package": "KeychainAccess",
         "repositoryURL": "https://github.com/kishikawakatsumi/KeychainAccess.git",
         "state": {
