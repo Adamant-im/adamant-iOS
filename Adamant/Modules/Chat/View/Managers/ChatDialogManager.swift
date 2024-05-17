@@ -236,7 +236,7 @@ private extension ChatDialogManager {
         )
     }
     
-    func showFailedMessageAlert(id: String, sender: UIAlertController.SourceView) {
+    func showFailedMessageAlert(id: String, sender: UIAlertController.SourceView?) {
         dialogService.showAlert(
             title: .adamant.alert.retryOrDeleteTitle,
             message: .adamant.alert.retryOrDeleteBody,

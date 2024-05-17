@@ -712,6 +712,11 @@ final class ChatViewModel: NSObject {
         let tx = chatTransactions.first(where: { $0.txId == messageId })
         let message = messages.first(where: { $0.messageId == messageId })
         
+        if tx?.statusEnum == .failed {
+            dialog.send(.failedMessageAlert(id: messageId, sender: nil))
+            return
+        }
+        
         guard !chatFileService.downloadingFiles.contains(file.file.id),
               !chatFileService.uploadingFiles.contains(file.file.id),
               case let(.file(fileModel)) = message?.content
