@@ -14,6 +14,7 @@ import CommonKit
 
 @MainActor
 final class AdamantDialogService: DialogService {
+    
     // MARK: Dependencies
     private let vibroService: VibroService
     private let popupManager = PopupManager()
@@ -95,14 +96,6 @@ extension AdamantDialogService {
     }
     
     func showError(withMessage message: String, supportEmail: Bool, error: Error? = nil) {
-        internalShowError(withMessage: message, supportEmail: supportEmail, error: error)
-    }
-    
-    func showCompactError(
-        withMessage message: String,
-        supportEmail: Bool,
-        error: Error?
-    ) {
         internalShowError(
             withMessage: message,
             supportEmail: supportEmail,

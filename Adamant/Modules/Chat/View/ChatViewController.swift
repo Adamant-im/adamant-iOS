@@ -123,7 +123,6 @@ final class ChatViewController: MessagesViewController {
         configureDropFiles()
         setupObservers()
         viewModel.loadFirstMessagesIfNeeded()
-        viewModel.presentKeyboardOnStartIfNeeded()
     }
     
     override func viewWillLayoutSubviews() {
@@ -139,11 +138,20 @@ final class ChatViewController: MessagesViewController {
         )
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        viewModel.updatePartnerName()
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         defer { viewAppeared = true }
         inputBar.isUserInteractionEnabled = true
         chatMessagesCollectionView.fixedBottomOffset = nil
+        
+        if !viewAppeared {
+            viewModel.presentKeyboardOnStartIfNeeded()
+        }
         
         guard isMacOS, !viewAppeared else { return }
         focusInputBarWithoutAnimation()
@@ -431,6 +439,12 @@ private extension ChatViewController {
         
         viewModel.presentDropView
             .sink { [weak self]  in self?.presentDropView($0) }
+            .store(in: &subscriptions)
+
+        viewModel.didTapSelectText
+            .sink { [weak self] text in
+                self?.didTapSelectText(text: text)
+            }
             .store(in: &subscriptions)
     }
 }
@@ -926,6 +940,11 @@ private extension ChatViewController {
     func didTapPartenerQR(partner: CoreDataAccount) {
         let vc = screensFactory.makePartnerQR(partner: partner)
         navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    func didTapSelectText(text: String) {
+        let vc = screensFactory.makeChatSelectTextView(text: text)
+        present(vc, animated: true)
     }
     
     func didTapRichMessageTransaction(_ transaction: RichMessageTransaction) {

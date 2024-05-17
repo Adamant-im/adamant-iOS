@@ -192,6 +192,8 @@ private extension ChatDataSourceManager {
             viewModel.reactAction(id, emoji: emoji)
         case let .presentMenu(arg):
             viewModel.presentMenu(arg: arg)
+        case .copyInPart(text: let text):
+            viewModel.copyTextInPartAction(text)
         case let .openFile(messageId, file, isFromCurrentSender):
             viewModel.openFile(messageId: messageId, file: file, isFromCurrentSender: isFromCurrentSender)
         case let .downloadPreviewIfNeeded(messageId, file, isFromCurrentSender):

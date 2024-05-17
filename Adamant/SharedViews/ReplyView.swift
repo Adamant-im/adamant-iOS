@@ -104,12 +104,8 @@ final class ReplyView: UIView {
 extension ReplyView {
     func update(with model: MessageModel) {
         backgroundColor = .clear
-        let text = model.makeReplyContent().resolveLinkColor()
-        text.mutableString.replaceOccurrences(
-            of: "\n",
-            with: " ",
-            range: .init(location: .zero, length: text.length)
-        )
+        var text = model.makeReplyContent().resolveLinkColor()
+        text = MessageProcessHelper.process(attributedText: text)
         
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineBreakMode = .byTruncatingTail

@@ -85,6 +85,7 @@ final class ChatViewModel: NSObject {
     let commitVibro = ObservableSender<Void>()
     let layoutIfNeeded = ObservableSender<Void>()
     let presentKeyboard = ObservableSender<Void>()
+    let didTapSelectText = ObservableSender<String>()
     let presentFilePicker = ObservableSender<ShareType>()
     let presentSendTokensVC = ObservableSender<Void>()
     let presentMediaPickerVC = ObservableSender<Void>()
@@ -586,6 +587,10 @@ final class ChatViewModel: NSObject {
         dialog.send(.toast(.adamant.alert.copiedToPasteboardNotification))
     }
     
+    func copyTextInPartAction(_ text: String) {
+        didTapSelectText.send(text)
+    }
+    
     func reportMessageAction(_ id: String) {
         dialog.send(.reportMessageAlert(id: id))
     }
@@ -880,6 +885,10 @@ extension ChatViewModel {
         dialog.send(.renameAlert)
     }
     
+    func updatePartnerName() {
+        partnerName = chatroom?.getName(addressBookService: addressBookService)
+	}
+
     func updateFiles(_ data: [FileResult]?) {
         if (data?.count ?? .zero) == .zero {
             let previewUrls = filesPicked?.compactMap { $0.previewUrl } ?? []

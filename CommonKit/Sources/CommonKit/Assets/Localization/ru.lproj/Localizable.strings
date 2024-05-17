@@ -280,6 +280,9 @@
 /* Serious internal error: No nodes available */
 "ApiService.InternalError.NoNodesAvailable" = "Нет доступных %@ нод. Просмотрите список узлов";
 
+/* Serious internal error: No ADM nodes available */
+"ApiService.InternalError.NoAdmNodesAvailable" = "Нет доступных ADM нод для получения адреса партнера %@";
+
 /* Eureka forms Cancel button */
 "Cancel" = "Отмена";
 
@@ -366,6 +369,9 @@
 
 /* Button "Report" */
 "Chats.Report" = "Пожаловаться";
+
+/* Button "Select Text" */
+"Chats.SelectText" = "Выбрать текст";
 
 /* Button "Reply" */
 "Chats.Reply" = "Ответить";
@@ -542,7 +548,7 @@
 "Error.RequestCancelled" = "Запрос отменён";
 
 /* Shared error: Remote error format, %@ for message */
-"Error.RemoteServerErrorFormat" = "Ошибка на узле блокчейна: %@";
+"Error.RemoteServerErrorFormat" = "%@";
 
 /* Shared error: User not logged */
 "Error.UserNotLogged" = "Не выполнен вход";
@@ -903,6 +909,12 @@
 
 /* Shared alert 'Save to Photos'. Used with saving images to photolibrary */
 "Shared.SaveToPhotolibrary" = "Сохранить в Фото";
+
+/* Partner screen 'Give contact a name' at first */
+"Shared.RenameContactInitial" = "Назвать контакт";
+
+/* Partner screen 'Rename contact'. */
+"Shared.RenameContact" = "Переименовать";
 
 /* Shared alert 'Send tokens' */
 "Shared.SendTokens" = "💸 Перевести крипту";

@@ -280,6 +280,9 @@
 /* Serious internal error: No nodes available */
 "ApiService.InternalError.NoNodesAvailable" = "没有活动的%@节点。查看节点列表";
 
+/* Serious internal error: No ADM nodes available */
+"ApiService.InternalError.NoAdmNodesAvailable" = "没有活动的 ADM 节点来获取合作伙伴的 %@ 地址";
+
 /* Eureka forms Cancel button */
 "Cancel" = "取消";
 
@@ -366,6 +369,9 @@
 
 /* Button "Report" */
 "Chats.Report" = "报告";
+
+/* Button "Select Text" */
+"Chats.SelectText" = "选择文本";
 
 /* Button "Reply" */
 "Chats.Reply" = "回复";
@@ -542,7 +548,7 @@
 "Error.RequestCancelled" = "请求已取消";
 
 /* Shared error: Remote error format, %@ for message */
-"Error.RemoteServerErrorFormat" = "区块链节点错误：%@";
+"Error.RemoteServerErrorFormat" = "%@";
 
 /* Shared error: User not logged */
 "Error.UserNotLogged" = "用户未登录";
@@ -906,6 +912,12 @@
 
 /* Shared alert 'Save to Photos'. Used with saving images to photolibrary */
 "Shared.SaveToPhotolibrary" = "保存到照片";
+
+/* Partner screen 'Give contact a name' at first */
+"Shared.RenameContactInitial" = "给出联系人姓名";
+
+/* Partner screen 'Rename contact'. */
+"Shared.RenameContact" = "重新命名联系人";
 
 /* Shared alert 'Send tokens' */
 "Shared.SendTokens" = "💸 发送代币";

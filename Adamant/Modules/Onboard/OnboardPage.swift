@@ -9,128 +9,77 @@
 import UIKit
 import MarkdownKit
 import CommonKit
+import SnapKit
+import SafariServices
 
 final class OnboardPage: SwiftyOnboardPage {
+    
+    private lazy var mainImageView = UIImageView(image: image)
+    
+    private lazy var textView: UITextView = {
+        let textView = UITextView()
+        textView.textColor = UIColor.adamant.active
+        textView.backgroundColor = .clear
+        textView.isEditable = false
+        textView.delegate = self
+        
+        let attributedString = NSMutableAttributedString(
+            attributedString: MarkdownParser().parse(self.text)
+        )
+        
+        attributedString.apply(font: UIFont.adamantPrimary(ofSize: 18), alignment: .center)
+        textView.attributedText = attributedString
+        textView.linkTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor.adamant.active]
+        
+        return textView
+    }()
+    
+    private let image: UIImage?
+    private let text: String
+    
+    var tapURLCompletion: ((URL) -> Void)?
+    
+    init(image: UIImage?, text: String) {
+        self.image = image
+        self.text = text
+        super.init(frame: .zero)
+        
+        setupView()
+    }
+    
+    required public init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func setupView() {
+        addSubview(mainImageView)
+        addSubview(textView)
+        
+        let space = UIScreen.main.bounds.height / 1.7
+        mainImageView.contentMode = .scaleAspectFit
+        mainImageView.snp.makeConstraints { make in
+            make.horizontalEdges.equalToSuperview().inset(20)
+            make.top.equalTo(safeAreaLayoutGuide).offset(50)
+            make.bottom.equalTo(safeAreaLayoutGuide).offset(-space)
+        }
+    
+        textView.snp.makeConstraints { make in
+            make.horizontalEdges.equalToSuperview().inset(20)
+            make.bottom.equalToSuperview().offset(-150)
+            make.height.equalTo(260)
+        }
+    }
+}
 
-    @IBOutlet weak var image: UIImageView!
-    @IBOutlet weak var text: UITextView!
-    @IBOutlet weak var bottomLabelConstraint: NSLayoutConstraint!
-    
-    private var didLayoutSubviews: Bool = false
-    
-    var rawRichText: String? {
-        didSet {
-            if didLayoutSubviews {
-                adjustTextView()
-            }
-        }
-    }
-    
-    var minFontSize: CGFloat = 12.0 {
-        didSet {
-            if didLayoutSubviews {
-                adjustTextView()
-            }
-        }
-    }
-    
-    var maxFontSize: CGFloat = 16.0 {
-        didSet {
-            if didLayoutSubviews {
-                adjustTextView()
-            }
-        }
-    }
-    
-    var fontName: String = "Exo2-Regular" {
-        didSet {
-            if didLayoutSubviews {
-                adjustTextView()
-            }
-        }
-    }
-    
-    class func instanceFromNib() -> UIView {
-        return UINib(nibName: "OnboardPage", bundle: nil).instantiate(withOwner: nil, options: nil)[0] as! UIView
-    }
-    
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        text.tintColor = UIColor.adamant.active
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        didLayoutSubviews = true
-        adjustTextView()
-    }
-    
-    private func adjustTextView() {
-        guard
-            let rawRichText = rawRichText,
-            let defaultFont = UIFont(name: fontName, size: maxFontSize) else {
-            return
-        }
-        
-        let attributedString = NSMutableAttributedString(attributedString: MarkdownParser().parse(rawRichText))
-        
-        attributedString.apply(font: defaultFont, alignment: .center)
-        
-        let pureText = attributedString.string
-        text.font = defaultFont
-        text.text = pureText
-        adjustTextViewFontSize()
-        
-        let fontSize = text.font!.pointSize
-        
-        guard maxFontSize != fontSize else {
-            text.text = nil
-            text.font = nil
-            text.attributedText = attributedString
-            return
-        }
-
-        if let font = UIFont(name: fontName, size: fontSize) {
-            attributedString.apply(font: font, alignment: .center)
-            text.text = nil
-            text.font = nil
-            text.attributedText = attributedString
-        }
-    }
-    
-    private func adjustTextViewFontSize() {
-        guard let textView = text, !textView.text.isEmpty && !textView.bounds.size.equalTo(CGSize.zero) else {
-            return
-        }
-        
-        let textViewSize = textView.frame.size
-        let fixedWidth = textViewSize.width
-        let expectSize = textView.sizeThatFits(CGSize(width: fixedWidth, height: CGFloat(MAXFLOAT)))
-        
-        var expectFont = textView.font
-        if (expectSize.height > textViewSize.height) {
-            while (textView.sizeThatFits(CGSize(width: fixedWidth, height: CGFloat(MAXFLOAT))).height > textViewSize.height) {
-                // Check min
-                if textView.font!.pointSize <= minFontSize {
-                    textView.font = textView.font!.withSize(minFontSize)
-                    return
-                }
-                
-                // Shrink it more
-                expectFont = textView.font!.withSize(textView.font!.pointSize - 1)
-                textView.font = expectFont
-            }
-        } else {
-            while (textView.sizeThatFits(CGSize(width: fixedWidth, height: CGFloat(MAXFLOAT))).height < textViewSize.height) {
-                if textView.font!.pointSize >= maxFontSize {
-                    textView.font = textView.font!.withSize(maxFontSize)
-                    return
-                }
-                
-                expectFont = textView.font
-                textView.font = textView.font!.withSize(textView.font!.pointSize + 1)
-            }
-        }
+// MARK: - UITextViewDelegate
+extension OnboardPage: UITextViewDelegate {
+    func textView(
+        _ textView: UITextView,
+        shouldInteractWith URL: URL,
+        in characterRange: NSRange,
+        interaction: UITextItemInteraction
+    ) -> Bool {
+        tapURLCompletion?(URL)
+        return false
     }
 }

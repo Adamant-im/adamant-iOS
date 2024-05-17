@@ -202,8 +202,8 @@ private extension AdamantRichTransactionReplyService {
             }
             
             if let data = decodedMessage.data(using: String.Encoding.utf8),
-                      let richContent = RichMessageTools.richContent(from: data),
-                      let replyMessage = richContent[RichContentKeys.reply.replyMessage] as? String {
+               let richContent = RichMessageTools.richContent(from: data),
+               let replyMessage = richContent[RichContentKeys.reply.replyMessage] as? String {
                 
                 message = replyMessage
                 break
@@ -227,7 +227,7 @@ private extension AdamantRichTransactionReplyService {
             message = decodedMessage
         }
         
-        return message
+        return MessageProcessHelper.process(message)
     }
     
     func getReplyMessage(from transaction: BaseTransaction) throws -> String {
@@ -284,7 +284,7 @@ private extension AdamantRichTransactionReplyService {
             message = unknownErrorMessage
         }
         
-        return message
+        return MessageProcessHelper.process(message)
     }
     
     func setReplyMessage(

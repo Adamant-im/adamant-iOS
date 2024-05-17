@@ -105,9 +105,15 @@ private extension ContextMenuOverlayViewModel {
         + contentViewSize.height
         + minContentsSpace
         
-        return offset > UIScreen.main.bounds.height
-        ? UIScreen.main.bounds.height - menuSize.height - minBottomOffset
-        : offset
+        if !shoudScroll() {
+            return offset > UIScreen.main.bounds.height
+            ? UIScreen.main.bounds.height 
+            - menuSize.height
+            - minBottomOffset
+            : offset
+        }
+        
+        return UIScreen.main.bounds.height - menuSize.height - minBottomOffset
     }
     
     func calculateLeadingOffset(for width: CGFloat) -> CGFloat {
@@ -137,7 +143,7 @@ private extension ContextMenuOverlayViewModel {
     
     func calculateOffsetForContentView() -> CGFloat {
         guard !shoudScroll() else {
-            return minBottomOffset
+            return minBottomOffset + upperContentSize.height + minContentsSpace
         }
         
         if isNeedToMoveFromBottom(
@@ -156,7 +162,9 @@ private extension ContextMenuOverlayViewModel {
     func shoudScroll() -> Bool {
         guard contentViewSize.height
                 + menuSize.height
-                + minBottomOffset
+                + minBottomOffset * 2
+                + upperContentSize.height
+                + minContentsSpace * 2
                 < UIScreen.main.bounds.height
         else {
             return true
