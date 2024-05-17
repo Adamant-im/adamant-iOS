@@ -1181,10 +1181,43 @@
 "WelcomeScene.Description.ContinueButton" = "继续";
 
 /* Welcome: Skip button */
-"WelcomeScene.Description.SkipButton" = "跳过";
+"WelcomeScene.Description.SkipButton" = " 跳过 ";
 
 /* Welcome: Description accept */
 "WelcomeScene.Description.Accept" = "我接受";
+
+/* Visual Guide: Skip button */
+"VisualGuide.SkipButton" = "跳过指南";
+
+/* Visual Guide: Description for hint "Create a new account" */
+"VisualGuide.HintLabel.CreateAccount" = "只需轻点一下，即可创建新的 ADM 账户.";
+
+/* Visual Guide: Description for hint "Persuade a user to treat passphrase serious" */
+"VisualGuide.HintLabel.Passphrase" = "认真对待。ADAMANT 是去中心化的，只有您才有责任保护密码的安全.";
+
+/* Visual Guide: Description for hint "How to enter an account" */
+"VisualGuide.HintLabel.EnterAnAccount" = "粘贴密码以进入您的账户. 它是独一无二的，您无需输入登录名.";
+
+/* Visual Guide: Description for hint "How to set PIN code for login" */
+"VisualGuide.HintLabel.SetPIN" = "设置 PIN 码登录，这样就不必总是输入密码. 这样既方便又安全.";
+
+/* Visual Guide: Description for hint "How to set face ID for login" */
+"VisualGuide.HintLabel.SetBiometry" = "启用生物识别登录，获得更流畅的体验.";
+
+/* Visual Guide: Inform users that they can receive free tokens */
+"VisualGuide.HintLabel.GetFreeTokens" = "与其他聊天工具不同，ADAMANT 是真正去中心化的。您可以免费获得 ADM 代币来支付信息费用.";
+
+/* Visual Guide: Description for hint "User's unique address" */
+"VisualGuide.HintLabel.UserAddress" = "您独一无二的 ADM 地址是他人给您写信或传输加密货币的地方. 点击分享.";
+
+/* Visual Guide: Description for hint "How to add a new contact" */
+"VisualGuide.HintLabel.AddNewContact" = "输入对方的 ADM 地址或扫描对方的 QR 代码，开始新的聊天.";
+
+/* Visual Guide: Description for hint "Ask a user to donate" */
+"VisualGuide.HintLabel.Donate" = "ADAMANT 是一个非营利组织，致力于保护您的隐私. 您的捐款使该项目能够独立于 “老大哥 ”组织.";
+
+/* Visual Guide: Description for hint "How to enable push notifications" */
+"VisualGuide.HintLabel.PushNotifications" = " ";
 
 /* EULA */
 "EULA.Title" = "服务条款";

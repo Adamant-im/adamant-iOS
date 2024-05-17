@@ -1186,6 +1186,39 @@
 /* Welcome: Description accept */
 "WelcomeScene.Description.Accept" = "Я принимаю";
 
+/* Visual Guide: Skip button */
+"VisualGuide.SkipButton" = " Пропустить ";
+
+/* Visual Guide: Description for hint "Create a new account" */
+"VisualGuide.HintLabel.CreateAccount" = "Создайте новый ADM-аккаунт в одно касание.";
+
+/* Visual Guide: Description for hint "Persuade a user to treat passphrase serious" */
+"VisualGuide.HintLabel.Passphrase" = "Отнеситесь серьезно. АДАМАНТ децентрализован — только вы несете ответственность за безопасность своей парольной фразы.";
+
+/* Visual Guide: Description for hint "How to enter an account" */
+"VisualGuide.HintLabel.EnterAnAccount" = "Вставьте парольную фразу, чтобы войти в учетную запись. Пассфраза уникальна — логин вы не указываете.";
+
+/* Visual Guide: Description for hint "How to set PIN code for login" */
+"VisualGuide.HintLabel.SetPIN" = "Установите PIN-код для входа, чтобы не приходилось каждый раз вводить пассфразу. Это и удобнее, и безопаснее.";
+
+/* Visual Guide: Description for hint "How to set face ID for login" */
+"VisualGuide.HintLabel.SetBiometry" = "Еще удобнее — включить вход по биометрии.";
+
+/* Visual Guide: Inform users that they can receive free tokens */
+"VisualGuide.HintLabel.GetFreeTokens" = "В отличие от других мессенджеров, АДАМАНТ децентрализован. Чтобы платить комиссии за сообщения, получите бесплатные приветственные токены ADM.";
+
+/* Visual Guide: Description for hint "User's unique address" */
+"VisualGuide.HintLabel.UserAddress" = "Это ваш уникальный ADM-адрес, по которому вам могут написать или перевести крипту. Нажмите, чтобы скопировать.";
+
+/* Visual Guide: Description for hint "How to add a new contact" */
+"VisualGuide.HintLabel.AddNewContact" = "Чтобы начать новый чат, введите ADM-адрес собеседника или отсканируйте его QR-код";
+
+/* Visual Guide: Description for hint "Ask a user to donate" */
+"VisualGuide.HintLabel.Donate" = "АДАМАНТ — некоммерческая организация на защите вашей приватности. Ваши пожертвования позволяют проекту не зависеть от Большого брата.";
+
+/* Visual Guide: Description for hint "How to enable push notifications" */
+"VisualGuide.HintLabel.PushNotifications" = " ";
+
 /* EULA */
 "EULA.Title" = "Условия использования";
 "EULA.Accept" = "Принять";

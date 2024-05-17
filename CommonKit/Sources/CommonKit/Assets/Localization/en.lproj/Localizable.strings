@@ -1189,6 +1189,39 @@
 /* Welcome: Description accept */
 "WelcomeScene.Description.Accept" = "I accept";
 
+/* Visual Guide: Skip button */
+"VisualGuide.SkipButton" = " Skip the guide ";
+
+/* Visual Guide: Description for hint "Create a new account" */
+"VisualGuide.HintLabel.CreateAccount" = "Create a new ADM account in a single tap.";
+
+/* Visual Guide: Description for hint "Persuade a user to treat passphrase serious" */
+"VisualGuide.HintLabel.Passphrase" = "Take it seriously. ADAMANT is decentralized — only you are responsible for keeping your passphrase safe.";
+
+/* Visual Guide: Description for hint "How to enter an account" */
+"VisualGuide.HintLabel.EnterAnAccount" = "Paste the passphrase to enter your account. It's unique — you don't input a login.";
+
+/* Visual Guide: Description for hint "How to set PIN code for login" */
+"VisualGuide.HintLabel.SetPIN" = "Set a PIN code to log in, so you don't always have to enter a passphrase. It is both more convenient and safer.";
+
+/* Visual Guide: Description for hint "How to set face ID for login" */
+"VisualGuide.HintLabel.SetBiometry" = "For an even smoother experience, enable biometric login.";
+
+/* Visual Guide: Inform users that they can receive free tokens */
+"VisualGuide.HintLabel.GetFreeTokens" = "ADAMANT is truly decentralized, unlike other messengers. To pay messaging fees, you can get free welcoming ADM tokens.";
+
+/* Visual Guide: Description for hint "User's unique address" */
+"VisualGuide.HintLabel.UserAddress" = "Your unique ADM address is where others can write to you or transfer crypto. Tap to share it.";
+
+/* Visual Guide: Description for hint "How to add a new contact" */
+"VisualGuide.HintLabel.AddNewContact" = "Enter a partner's ADM address or scan their QR code to start a new chat.";
+
+/* Visual Guide: Description for hint "Ask a user to donate" */
+"VisualGuide.HintLabel.Donate" = "ADAMANT is a non-profit organization dedicated to protecting your privacy. Your donations allow the project to be independent from the Big Brother.";
+
+/* Visual Guide: Description for hint "How to enable push notifications" */
+"VisualGuide.HintLabel.PushNotifications" = " ";
+
 /* EULA */
 "EULA.Title" = "Terms of Service";
 "EULA.Accept" = "Accept";

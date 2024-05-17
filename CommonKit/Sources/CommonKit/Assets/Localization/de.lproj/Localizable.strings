@@ -1216,6 +1216,39 @@
 /* Welcome: Description accept */
 "WelcomeScene.Description.Accept" = "Ik accepteer";
 
+/* Visual Guide: Skip button */
+"VisualGuide.SkipButton" = " Überspringen ";
+
+/* Visual Guide: Description for hint "Create a new account" */
+"VisualGuide.HintLabel.CreateAccount" = "Erstellen Sie ein neues ADM-Konto mit einem einzigen Fingertipp.";
+
+/* Visual Guide: Description for hint "Persuade a user to treat passphrase serious" */
+"VisualGuide.HintLabel.Passphrase" = "Nehmen Sie es ernst. ADAMANT ist dezentralisiert - nur Sie sind für die Sicherheit Ihrer Passphrase verantwortlich.";
+
+/* Visual Guide: Description for hint "How to enter an account" */
+"VisualGuide.HintLabel.EnterAnAccount" = "Geben Sie die Passphrase ein, um Ihr Konto zu öffnen. Sie ist einmalig - Sie geben kein Login ein.";
+
+/* Visual Guide: Description for hint "How to set PIN code for login" */
+"VisualGuide.HintLabel.SetPIN" = "Legen Sie einen PIN-Code für die Anmeldung fest, damit Sie nicht immer eine Passphrase eingeben müssen. Das ist nicht nur bequemer, sondern auch sicherer.";
+
+/* Visual Guide: Description for hint "How to set face ID for login" */
+"VisualGuide.HintLabel.SetBiometry" = "Für ein noch reibungsloseres Erlebnis sollten Sie die biometrische Anmeldung aktivieren.";
+
+/* Visual Guide: Inform users that they can receive free tokens */
+"VisualGuide.HintLabel.GetFreeTokens" = "ADAMANT ist im Gegensatz zu anderen Messengern wirklich dezentralisiert. Um Messaging-Gebühren zu bezahlen, können Sie kostenlose ADM-Token erhalten.";
+
+/* Visual Guide: Description for hint "User's unique address" */
+"VisualGuide.HintLabel.UserAddress" = "Ihre einzigartige ADM-Adresse ist der Ort, an dem andere Ihnen schreiben oder Kryptowährungen überweisen können. Tippen Sie auf , um sie zu teilen.";
+
+/* Visual Guide: Description for hint "How to add a new contact" */
+"VisualGuide.HintLabel.AddNewContact" = "Geben Sie die ADM-Adresse eines Partners ein oder scannen Sie seinen QR-Code, um einen neuen Chat zu beginnen.";
+
+/* Visual Guide: Description for hint "Ask a user to donate" */
+"VisualGuide.HintLabel.Donate" = "ADAMANT ist eine Non-Profit-Organisation, die sich dem Schutz Ihrer Privatsphäre verschrieben hat. Ihre Spenden ermöglichen es dem Projekt, unabhängig vom Großen Bruder zu sein.";
+
+/* Visual Guide: Description for hint "How to enable push notifications" */
+"VisualGuide.HintLabel.PushNotifications" = " ";
+
 /* EULA */
 "EULA.Title" = "Geschäftsbedingungen";
 "EULA.Accept" = "Akzeptieren";
