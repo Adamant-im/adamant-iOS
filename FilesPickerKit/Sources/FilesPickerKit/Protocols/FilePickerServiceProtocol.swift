@@ -10,7 +10,7 @@ import UIKit
 import CommonKit
 
 @MainActor
-protocol FilePickerProtocol {
+protocol FilePickerServiceProtocol {
     var onPreparedDataCallback: ((Result<[FileResult], Error>) -> Void)? { get set }
     var onPreparingDataCallback: (() -> Void)? { get set }
 }

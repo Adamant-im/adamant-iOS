@@ -11,14 +11,17 @@ import UIKit
 import UniformTypeIdentifiers
 
 @MainActor
-public final class DropInteractionService: NSObject {
-    private var helper = FilesPickerKitHelper()
+public final class DropInteractionService: NSObject, FilePickerServiceProtocol {
+    private var helper: FilesPickerProtocol
 
     public var onPreparedDataCallback: ((Result<[FileResult], Error>) -> Void)?
     public var onSessionCallback: ((Bool) -> Void)?
     public var onPreparingDataCallback: (() -> Void)?
 
-    public override init() { }
+    public init(helper: FilesPickerProtocol) {
+        self.helper = helper
+        super.init()
+    }
 }
 
 extension DropInteractionService: UIDropInteractionDelegate {

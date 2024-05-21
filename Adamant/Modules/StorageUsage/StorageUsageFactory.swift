@@ -8,6 +8,7 @@
 
 import Swinject
 import SwiftUI
+import FilesStorageKit
 
 struct StorageUsageFactory {
     private let assembler: Assembler

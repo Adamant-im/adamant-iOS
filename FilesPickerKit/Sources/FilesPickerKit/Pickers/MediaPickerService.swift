@@ -11,14 +11,17 @@ import Photos
 import PhotosUI
 
 @MainActor
-public final class MediaPickerService: NSObject, FilePickerProtocol {
-    private var helper = FilesPickerKitHelper()
+public final class MediaPickerService: NSObject, FilePickerServiceProtocol {
+    private var helper: FilesPickerProtocol
     
     public var onPreparedDataCallback: ((Result<[FileResult], Error>) -> Void)?
     public var onPreparingDataCallback: (() -> Void)?
     public var preSelectedFiles: [FileResult] = []
     
-    public override init() { }
+    public init(helper: FilesPickerProtocol) {
+        self.helper = helper
+        super.init()
+    }
 }
 
 extension MediaPickerService: PHPickerViewControllerDelegate {

@@ -9,6 +9,7 @@
 import Foundation
 import CommonKit
 import SwiftUI
+import FilesStorageKit
 
 public extension Notification.Name {
     struct Storage {

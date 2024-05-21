@@ -12,6 +12,7 @@ import InputBarAccessoryView
 import Combine
 import Swinject
 import FilesStorageKit
+import FilesPickerKit
 
 @MainActor
 struct ChatFactory {
@@ -33,6 +34,7 @@ struct ChatFactory {
     let filesStorageProprieties: FilesStorageProprietiesProtocol
     let nodesStorage: NodesStorageProtocol
     let reachabilityMonitor: ReachabilityMonitor
+    let filesPickerKit: FilesPickerProtocol
    
     nonisolated init(assembler: Assembler) {
         chatsProvider = assembler.resolve(ChatsProvider.self)!
@@ -52,6 +54,7 @@ struct ChatFactory {
         filesStorageProprieties = assembler.resolve(FilesStorageProprietiesProtocol.self)!
         nodesStorage = assembler.resolve(NodesStorageProtocol.self)!
         reachabilityMonitor = assembler.resolve(ReachabilityMonitor.self)!
+        filesPickerKit = assembler.resolve(FilesPickerProtocol.self)!
     }
     
     func makeViewController(screensFactory: ScreensFactory) -> ChatViewController {
@@ -130,7 +133,8 @@ private extension ChatFactory {
             chatFileService: chatFileService,
             filesStorageProprieties: filesStorageProprieties,
             nodesStorage: nodesStorage,
-            reachabilityMonitor: reachabilityMonitor
+            reachabilityMonitor: reachabilityMonitor, 
+            filesPicker: filesPickerKit
         )
     }
     

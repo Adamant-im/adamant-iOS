@@ -10,6 +10,7 @@ import Swinject
 import BitcoinKit
 import CommonKit
 import FilesStorageKit
+import FilesPickerKit
 
 struct AppAssembly: Assembly {
     func assemble(container: Container) {
@@ -19,6 +20,10 @@ struct AppAssembly: Assembly {
         
         // MARK: FilesStorageProtocol
         container.register(FilesStorageProtocol.self) { _ in FilesStorageKit() }.inObjectScope(.container)
+        
+        container.register(FilesPickerProtocol.self) { r in
+            FilesPickerKit(storageKit: r.resolve(FilesStorageProtocol.self)!)
+        }
         
         // MARK: CellFactory
         container.register(CellFactory.self) { _ in AdamantCellFactory() }.inObjectScope(.container)

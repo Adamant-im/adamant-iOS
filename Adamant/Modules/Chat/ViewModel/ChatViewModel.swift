@@ -14,6 +14,7 @@ import CommonKit
 import AdvancedContextMenuKit
 import ElegantEmojiPicker
 import FilesPickerKit
+import FilesStorageKit
 
 @MainActor
 final class ChatViewModel: NSObject {
@@ -38,6 +39,7 @@ final class ChatViewModel: NSObject {
     private let filesStorageProprieties: FilesStorageProprietiesProtocol
     private let nodesStorage: NodesStorageProtocol
     private let reachabilityMonitor: ReachabilityMonitor
+    private let filesPicker: FilesPickerProtocol
     
     let chatMessagesListViewModel: ChatMessagesListViewModel
 
@@ -136,6 +138,11 @@ final class ChatViewModel: NSObject {
         didSet { updateHiddenMessage(&messages) }
     }
     
+    lazy var mediaPickerDelegate = MediaPickerService(helper: filesPicker)
+    lazy var documentPickerDelegate = DocumentPickerService(helper: filesPicker)
+    lazy var documentViewerService = DocumentInteractionService()
+    lazy var dropInteractionService = DropInteractionService(helper: filesPicker)
+    
     init(
         chatsProvider: ChatsProvider,
         markdownParser: MarkdownParser,
@@ -156,7 +163,8 @@ final class ChatViewModel: NSObject {
         chatFileService: ChatFileProtocol,
         filesStorageProprieties: FilesStorageProprietiesProtocol,
         nodesStorage: NodesStorageProtocol,
-        reachabilityMonitor: ReachabilityMonitor
+        reachabilityMonitor: ReachabilityMonitor,
+        filesPicker: FilesPickerProtocol
     ) {
         self.chatsProvider = chatsProvider
         self.markdownParser = markdownParser
@@ -178,6 +186,7 @@ final class ChatViewModel: NSObject {
         self.filesStorageProprieties = filesStorageProprieties
         self.nodesStorage = nodesStorage
         self.reachabilityMonitor = reachabilityMonitor
+        self.filesPicker = filesPicker
         
         super.init()
         setupObservers()
@@ -951,6 +960,50 @@ private extension ChatViewModel {
                 }
                 .store(in: &subscriptions)
         }.stored(in: tasksStorage)
+        
+        dropInteractionService.onPreparedDataCallback = { [weak self] result in
+            DispatchQueue.onMainAsync {
+                self?.dropSessionUpdated(false)
+                self?.presentDialog(progress: false)
+                self?.processFileResult(result)
+            }
+        }
+        
+        dropInteractionService.onPreparingDataCallback = { [weak self] in
+            DispatchQueue.onMainAsync {
+                self?.presentDialog(progress: true)
+            }
+        }
+        
+        dropInteractionService.onSessionCallback = { [weak self] fileOnScreen in
+            self?.dropSessionUpdated(fileOnScreen)
+        }
+        
+        mediaPickerDelegate.onPreparedDataCallback = { [weak self] result in
+            DispatchQueue.onMainAsync {
+                self?.presentDialog(progress: false)
+                self?.processFileResult(result)
+            }
+        }
+        
+        mediaPickerDelegate.onPreparingDataCallback = { [weak self] in
+            DispatchQueue.onMainAsync {
+                self?.presentDialog(progress: true)
+            }
+        }
+        
+        documentPickerDelegate.onPreparedDataCallback = { [weak self] result in
+            DispatchQueue.onMainAsync {
+                self?.presentDialog(progress: false)
+                self?.processFileResult(result)
+            }
+        }
+        
+        documentPickerDelegate.onPreparingDataCallback = { [weak self] in
+            DispatchQueue.onMainAsync {
+                self?.presentDialog(progress: true)
+            }
+        }
     }
     
     func loadMessages(address: String, offset: Int) async {

@@ -11,13 +11,16 @@ import CommonKit
 import MobileCoreServices
 import AVFoundation
 
-public final class DocumentPickerService: NSObject, FilePickerProtocol {
-    private var helper = FilesPickerKitHelper()
+public final class DocumentPickerService: NSObject, FilePickerServiceProtocol {
+    private var helper: FilesPickerProtocol
 
     public var onPreparedDataCallback: ((Result<[FileResult], Error>) -> Void)?
     public var onPreparingDataCallback: (() -> Void)?
     
-    public override init() { }
+    public init(helper: FilesPickerProtocol) {
+        self.helper = helper
+        super.init()
+    }
 }
 
 extension DocumentPickerService: UIDocumentPickerDelegate {

@@ -6,11 +6,25 @@ import UIKit
 import SwiftUI
 import AVFoundation
 import QuickLook
+import FilesStorageKit
 
-final class FilesPickerKitHelper {
-    var previewExtension = "jpeg"
+public final class FilesPickerKit: FilesPickerProtocol {
+    private let storageKit: FilesStorageProtocol
+    public var previewExtension: String { "jpeg" }
     
-    func validateFiles(_ files: [FileResult]) throws {
+    public init(storageKit: FilesStorageProtocol) {
+        self.storageKit = storageKit
+    }
+    
+    public func getFileSize(from url: URL) throws -> Int64 {
+        try storageKit.getFileSize(from: url)
+    }
+    
+    public func getUrl(for image: UIImage?, name: String) throws -> URL {
+        try storageKit.getTempUrl(for: image, name: name)
+    }
+    
+    public func validateFiles(_ files: [FileResult]) throws {
         guard files.count <= FilesConstants.maxFilesCount else {
             throw FileValidationError.tooManyFiles
         }
@@ -22,66 +36,13 @@ final class FilesPickerKitHelper {
         }
     }
     
-    func getUrl(for image: UIImage?, name: String) throws -> URL {
-        guard let data = image?.jpegData(compressionQuality: FilesConstants.previewCompressQuality) else {
-            throw FileValidationError.fileNotFound
-        }
-        
-        let folder = try FileManager.default.url(
-            for: .cachesDirectory,
-            in: .userDomainMask,
-            appropriateFor: nil,
-            create: true
-        ).appendingPathComponent(cachePath)
-
-        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
-
-        let fileURL = folder.appendingPathComponent(name)
-
-        try data.write(to: fileURL, options: [.atomic, .completeFileProtection])
-        
-        return fileURL
-    }
-    
-    func copyFile(from url: URL) throws -> URL {
-        defer {
-            url.stopAccessingSecurityScopedResource()
-        }
-        
-        _ = url.startAccessingSecurityScopedResource()
-        
-        let folder = try FileManager.default.url(
-            for: .cachesDirectory,
-            in: .userDomainMask,
-            appropriateFor: nil,
-            create: true
-        ).appendingPathComponent(cachePath)
-        
-        try FileManager.default.createDirectory(
-            at: folder,
-            withIntermediateDirectories: true
-        )
-        
-        let targetURL = folder.appendingPathComponent(String.random(length: 6) + url.lastPathComponent)
-        
-        guard targetURL != url else { return url }
-        
-        if FileManager.default.fileExists(atPath: targetURL.path) {
-            try FileManager.default.removeItem(at: targetURL)
-        }
-        
-        try FileManager.default.copyItem(at: url, to: targetURL)
-        
-        return targetURL
-    }
-    
-    func resizeImage(image: UIImage, targetSize: CGSize) -> UIImage {
+    public func resizeImage(image: UIImage, targetSize: CGSize) -> UIImage {
         let newSize = getPreviewSize(from: image.size)
         
         return image.imageResized(to: newSize)
     }
     
-    func getOriginalSize(for url: URL) -> CGSize? {
+    public func getOriginalSize(for url: URL) -> CGSize? {
         guard let track = AVURLAsset(url: url).tracks(
             withMediaType: AVMediaType.video
         ).first
@@ -92,7 +53,7 @@ final class FilesPickerKitHelper {
         return .init(width: abs(naturalSize.width), height: abs(naturalSize.height))
     }
     
-    func getThumbnailImage(
+    public func getThumbnailImage(
         forUrl url: URL,
         originalSize: CGSize?
     ) async throws -> UIImage? {
@@ -116,29 +77,10 @@ final class FilesPickerKitHelper {
         return image
     }
     
-    func getFileSize(from fileURL: URL) throws -> Int64 {
-        defer {
-            fileURL.stopAccessingSecurityScopedResource()
-        }
-        
-        _ = fileURL.startAccessingSecurityScopedResource()
-        do {
-            let fileAttributes = try FileManager.default.attributesOfItem(atPath: fileURL.path)
-            
-            guard let fileSize = fileAttributes[.size] as? Int64 else {
-                throw FileValidationError.fileNotFound
-            }
-            
-            return fileSize
-        } catch {
-            throw error
-        }
-    }
-    
-    func getFileResult(for url: URL) throws -> FileResult {
-        let newUrl = try copyFile(from: url)
+    public func getFileResult(for url: URL) throws -> FileResult {
+        let newUrl = try storageKit.copyFileToTempCache(from: url)
         let preview = getPreview(for: newUrl)
-        let fileSize = try getFileSize(from: newUrl)
+        let fileSize = try storageKit.getFileSize(from: newUrl)
         return FileResult(
             assetId: url.absoluteString,
             url: newUrl,
@@ -154,7 +96,7 @@ final class FilesPickerKitHelper {
     }
     
     @MainActor
-    func getUrlConforms(
+    public func getUrlConforms(
         to type: UTType,
         for itemProvider: NSItemProvider
     ) async throws -> URL {
@@ -174,7 +116,7 @@ final class FilesPickerKitHelper {
     }
     
     @MainActor
-    func getUrl(for itemProvider: NSItemProvider) async throws -> URL {
+    public func getUrl(for itemProvider: NSItemProvider) async throws -> URL {
         for type in itemProvider.registeredTypeIdentifiers {
             do {
                 return try await getFileURL(by: type, itemProvider: itemProvider)
@@ -187,16 +129,16 @@ final class FilesPickerKitHelper {
     }
     
     @MainActor
-    func getFileURL(
+    public func getFileURL(
         by type: String,
         itemProvider: NSItemProvider
     ) async throws -> URL {
         try await withCheckedThrowingContinuation { continuation in
-            itemProvider.loadFileRepresentation(forTypeIdentifier: type) { url, error in
+            itemProvider.loadFileRepresentation(forTypeIdentifier: type) { [weak self] url, error in
                 if let error = error {
                     continuation.resume(throwing: error)
                 } else if let url = url {
-                    if let targetURL = try? self.copyFile(from: url) {
+                    if let targetURL = try? self?.storageKit.copyFileToTempCache(from: url) {
                         continuation.resume(returning: targetURL)
                     } else {
                         continuation.resume(throwing: FileValidationError.fileNotFound)
@@ -209,7 +151,7 @@ final class FilesPickerKitHelper {
     }
 }
 
-private extension FilesPickerKitHelper {
+private extension FilesPickerKit {
     func getPreviewSize(from originalSize: CGSize?) -> CGSize {
         guard let size = originalSize else { return FilesConstants.previewSize }
         
@@ -273,7 +215,7 @@ private extension FilesPickerKitHelper {
             image: image,
             targetSize: FilesConstants.previewSize
         )
-        let imageURL = try? getUrl(
+        let imageURL = try? storageKit.getTempUrl(
             for: resizedImage,
             name: FilesConstants.previewTag + url.lastPathComponent
         )
@@ -295,5 +237,3 @@ private extension FilesPickerKitHelper {
         }
     }
 }
-
-private let cachePath = "downloads/cache"

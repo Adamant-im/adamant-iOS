@@ -5,7 +5,7 @@ import CommonKit
 import UIKit
 import Combine
 
-public final class FilesStorageKit {
+public final class FilesStorageKit: FilesStorageProtocol {
     public struct File {
         public let id: String
         public let isEncrypted: Bool
@@ -165,6 +165,78 @@ public final class FilesStorageKit {
         ) else { return }
         
         try FileManager.default.removeItem(at: tempCacheUrl)
+    }
+    
+    public func getTempUrl(for image: UIImage?, name: String) throws -> URL {
+        guard let data = image?.jpegData(compressionQuality: FilesConstants.previewCompressQuality) else {
+            throw FileValidationError.fileNotFound
+        }
+        
+        let folder = try FileManager.default.url(
+            for: .cachesDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        ).appendingPathComponent(tempCachePath)
+
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+
+        let fileURL = folder.appendingPathComponent(name)
+
+        try data.write(to: fileURL, options: [.atomic, .completeFileProtection])
+        
+        return fileURL
+    }
+    
+    public func copyFileToTempCache(from url: URL) throws -> URL {
+        defer {
+            url.stopAccessingSecurityScopedResource()
+        }
+        
+        _ = url.startAccessingSecurityScopedResource()
+        
+        let folder = try FileManager.default.url(
+            for: .cachesDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        ).appendingPathComponent(tempCachePath)
+        
+        try FileManager.default.createDirectory(
+            at: folder,
+            withIntermediateDirectories: true
+        )
+        
+        let targetURL = folder.appendingPathComponent(String.random(length: 6) + url.lastPathComponent)
+        
+        guard targetURL != url else { return url }
+        
+        if FileManager.default.fileExists(atPath: targetURL.path) {
+            try FileManager.default.removeItem(at: targetURL)
+        }
+        
+        try FileManager.default.copyItem(at: url, to: targetURL)
+        
+        return targetURL
+    }
+    
+    public func getFileSize(from fileURL: URL) throws -> Int64 {
+        defer {
+            fileURL.stopAccessingSecurityScopedResource()
+        }
+        
+        _ = fileURL.startAccessingSecurityScopedResource()
+        do {
+            let fileAttributes = try FileManager.default.attributesOfItem(atPath: fileURL.path)
+            
+            guard let fileSize = fileAttributes[.size] as? Int64 else {
+                throw FileValidationError.fileNotFound
+            }
+            
+            return fileSize
+        } catch {
+            throw error
+        }
     }
 }
 

@@ -1,18 +1,14 @@
 //
 //  FilesStorageProtocol.swift
-//  Adamant
 //
-//  Created by Stanislav Jelezoglo on 07.03.2024.
-//  Copyright © 2024 Adamant. All rights reserved.
+//
+//  Created by Stanislav Jelezoglo on 21.05.2024.
 //
 
-import Foundation
 import UIKit
 import CommonKit
-import FilesStorageKit
-import Combine
 
-protocol FilesStorageProtocol {
+public protocol FilesStorageProtocol {
     func cacheImageToMemoryIfNeeded(id: String, data: Data) -> UIImage?
     
     func getPreview(for id: String) -> UIImage?
@@ -52,6 +48,10 @@ protocol FilesStorageProtocol {
     func clearTempCache() throws
     
     func removeTempFiles(at urls: [URL])
+    
+    func getTempUrl(for image: UIImage?, name: String) throws -> URL
+    
+    func copyFileToTempCache(from url: URL) throws -> URL
+    
+    func getFileSize(from fileURL: URL) throws -> Int64
 }
-
-extension FilesStorageKit: FilesStorageProtocol { }

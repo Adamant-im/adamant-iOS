@@ -79,11 +79,6 @@ final class ChatViewController: MessagesViewController {
         return data
     }()
     
-    private lazy var mediaPickerDelegate = MediaPickerService()
-    private lazy var documentPickerDelegate = DocumentPickerService()
-    private lazy var documentViewerService = DocumentInteractionService()
-    private lazy var dropInteractionService = DropInteractionService()
-    
     init(
         viewModel: ChatViewModel,
         walletServiceCompose: WalletServiceCompose,
@@ -459,25 +454,7 @@ private extension ChatViewController {
             $0.directionalEdges.equalTo(view.safeAreaLayoutGuide).inset(5)
         }
         
-        view.addInteraction(UIDropInteraction(delegate: dropInteractionService))
-        
-        dropInteractionService.onPreparedDataCallback = { [weak self] result in
-            DispatchQueue.main.async {
-                self?.viewModel.dropSessionUpdated(false)
-                self?.viewModel.presentDialog(progress: false)
-                self?.viewModel.processFileResult(result)
-            }
-        }
-        
-        dropInteractionService.onPreparingDataCallback = { [weak self] in
-            DispatchQueue.main.async {
-                self?.viewModel.presentDialog(progress: true)
-            }
-        }
-        
-        dropInteractionService.onSessionCallback = { [weak self] fileOnScreen in
-            self?.viewModel.dropSessionUpdated(fileOnScreen)
-        }
+        view.addInteraction(UIDropInteraction(delegate: viewModel.dropInteractionService))
     }
     
     func configureLayout() {
@@ -573,20 +550,7 @@ private extension ChatViewController {
     func presentMediaPicker() {
         messageInputBar.inputTextView.resignFirstResponder()
         
-        mediaPickerDelegate.onPreparedDataCallback = { [weak self] result in
-            DispatchQueue.main.async {
-                self?.viewModel.presentDialog(progress: false)
-                self?.viewModel.processFileResult(result)
-            }
-        }
-        
-        mediaPickerDelegate.onPreparingDataCallback = { [weak self] in
-            DispatchQueue.main.async {
-                self?.viewModel.presentDialog(progress: true)
-            }
-        }
-        
-        mediaPickerDelegate.preSelectedFiles = viewModel.filesPicked ?? []
+        viewModel.mediaPickerDelegate.preSelectedFiles = viewModel.filesPicked ?? []
         
         let assetIds = viewModel.filesPicked?.compactMap { $0.assetId } ?? []
 
@@ -597,43 +561,30 @@ private extension ChatViewController {
         phPickerConfig.selection = .ordered
         
         let phPickerVC = PHPickerViewController(configuration: phPickerConfig)
-        phPickerVC.delegate = mediaPickerDelegate
+        phPickerVC.delegate = viewModel.mediaPickerDelegate
         present(phPickerVC, animated: true)
     }
     
     func presentDocumentPicker() {
         messageInputBar.inputTextView.resignFirstResponder()
         
-        documentPickerDelegate.onPreparedDataCallback = { [weak self] result in
-            DispatchQueue.main.async {
-                self?.viewModel.presentDialog(progress: false)
-                self?.viewModel.processFileResult(result)
-            }
-        }
-        
-        documentPickerDelegate.onPreparingDataCallback = { [weak self] in
-            DispatchQueue.main.async {
-                self?.viewModel.presentDialog(progress: true)
-            }
-        }
-        
         let documentPicker = UIDocumentPickerViewController(
             forOpeningContentTypes: [.data, .content],
             asCopy: false
         )
         documentPicker.allowsMultipleSelection = true
-        documentPicker.delegate = documentPickerDelegate
+        documentPicker.delegate = viewModel.documentPickerDelegate
         present(documentPicker, animated: true)
     }
     
     func presentDocumentViewer(files: [FileResult], selectedIndex: Int) {
-        documentViewerService.openFile(
+        viewModel.documentViewerService.openFile(
             files: files
         )
         
         let quickVC = QLPreviewController()
-        quickVC.delegate = documentViewerService
-        quickVC.dataSource = documentViewerService
+        quickVC.delegate = viewModel.documentViewerService
+        quickVC.dataSource = viewModel.documentViewerService
         quickVC.modalPresentationStyle = .fullScreen
         quickVC.currentPreviewItemIndex = selectedIndex
         
@@ -645,11 +596,11 @@ private extension ChatViewController {
     }
     
     func presentDocumentViewer(url: URL) {
-        documentViewerService.openFile(url: url)
+        viewModel.documentViewerService.openFile(url: url)
         
         let quickVC = QLPreviewController()
-        quickVC.delegate = documentViewerService
-        quickVC.dataSource = documentViewerService
+        quickVC.delegate = viewModel.documentViewerService
+        quickVC.dataSource = viewModel.documentViewerService
         quickVC.modalPresentationStyle = .fullScreen
         
         if let splitViewController = splitViewController {
