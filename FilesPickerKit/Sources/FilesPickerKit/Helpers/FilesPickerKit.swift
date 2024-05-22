@@ -95,6 +95,24 @@ public final class FilesPickerKit: FilesPickerProtocol {
         )
     }
     
+    public func getFileResult(for image: UIImage) throws -> FileResult {
+        let fileName = "image.\(previewExtension)"
+        let newUrl = try storageKit.getTempUrl(for: image, name: fileName)
+        let preview = getPreview(for: newUrl)
+        let fileSize = try storageKit.getFileSize(from: newUrl)
+        return FileResult(
+            url: newUrl,
+            type: .other,
+            preview: preview.image,
+            previewUrl: preview.url,
+            previewExtension: previewExtension,
+            size: fileSize,
+            name: fileName,
+            extenstion: previewExtension,
+            resolution: preview.resolution
+        )
+    }
+    
     @MainActor
     public func getUrlConforms(
         to type: UTType,

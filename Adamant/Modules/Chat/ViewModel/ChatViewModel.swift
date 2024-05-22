@@ -952,6 +952,24 @@ private extension ChatViewModel {
             .sink { [weak self] _ in self?.updateAttachmentButtonAvailability() }
             .store(in: &subscriptions)
         
+        NotificationCenter.default
+            .publisher(for: .AdamantInputText.pastedImage)
+            .sink { [weak self] data in
+                guard let image = data.object as? UIImage else {
+                    return
+                }
+                
+                do {
+                    guard let file = try self?.filesPicker.getFileResult(for: image)
+                    else { return }
+                    
+                    self?.processFileResult(.success([file]))
+                } catch {
+                    self?.processFileResult(.failure(error))
+                }
+            }
+            .store(in: &subscriptions)
+        
         Task {
             await chatsProvider.stateObserver
                 .receive(on: DispatchQueue.main)

@@ -39,4 +39,6 @@ public protocol FilesPickerProtocol {
         by type: String,
         itemProvider: NSItemProvider
     ) async throws -> URL
+    
+    func getFileResult(for image: UIImage) throws -> FileResult 
 }

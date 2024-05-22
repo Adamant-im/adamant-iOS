@@ -225,6 +225,25 @@ private extension ChatInputBar {
     }
 }
 
+extension InputTextView {
+    open override func canPerformAction(
+        _ action: Selector,
+        withSender sender: Any?
+    ) -> Bool {
+        if action == #selector(paste(_:)) && UIPasteboard.general.image != nil {
+            return true
+        }
+        return super.canPerformAction(action, withSender: sender)
+    }
+    
+    open override func paste(_ sender: Any?) {
+        super.paste(sender)
+        
+        guard let image = UIPasteboard.general.image else { return }
+        NotificationCenter.default.post(name: .AdamantInputText.pastedImage, object: image)
+    }
+}
+
 private let attachmentButtonSize: CGFloat = 36
 private let baseInsetSize: CGFloat = 6
 private let buttonHeight: CGFloat = 36

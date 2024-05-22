@@ -121,11 +121,14 @@ enum AdamantNotificationType {
 
 // MARK: - Notifications
 extension Notification.Name {
-    struct AdamantNotificationService {
+    enum AdamantNotificationService {
         /// Raised when user has logged out.
         static let notificationsModeChanged = Notification.Name("adamant.notificationService.notificationsMode")
         static let notificationsSoundChanged = Notification.Name("adamant.notificationService.notificationsSound")
-        private init() {}
+    }
+    
+    enum AdamantInputText {
+        static let pastedImage = Notification.Name("pastedImage")
     }
 }
 
