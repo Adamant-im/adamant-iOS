@@ -13,51 +13,19 @@ import Combine
 import FilesStorageKit
 import CoreData
 
-protocol ChatFileProtocol {
-    var downloadingFiles: [String] { get }
-    var uploadingFiles: [String] { get }
-    
-    var updateFileFields: PassthroughSubject<(
-        id: String,
-        newId: String?,
-        fileNonce: String?,
-        preview: UIImage?,
-        needUpdatePreview: Bool,
-        cached: Bool?,
-        downloading: Bool?,
-        uploading: Bool?
-    ), Never> {
-        get
-    }
-    
-    func sendFile(
-        text: String?,
-        chatroom: Chatroom?,
-        filesPicked: [FileResult]?,
-        replyMessage: MessageModel?,
-        saveEncrypted: Bool
-    ) async throws
-    
-    func downloadFile(
-        file: ChatFile,
-        chatroom: Chatroom?,
-        saveEncrypted: Bool
-    ) async throws
-    
-    func autoDownload(
-        file: ChatFile,
-        chatroom: Chatroom?,
-        havePartnerName: Bool,
-        previewDownloadPolicy: DownloadPolicy,
-        fullMediaDownloadPolicy: DownloadPolicy,
-        saveEncrypted: Bool
-    ) async
-    
-    func getDecodedData(
-        file: FilesStorageKit.File,
-        nonce: String,
-        chatroom: Chatroom?
-    ) throws -> Data
+private struct FileUpload {
+    let file: FileResult
+    var isUploaded: Bool
+    var serverFileID: String?
+    var fileNonce: String?
+    var preview: RichMessageFile.Preview?
+}
+
+private struct FileMessage {
+    var files: [FileUpload]
+    var message: String?
+    var tx: RichMessageTransaction?
+    var context: NSManagedObjectContext?
 }
 
 final class ChatFileService: ChatFileProtocol {
@@ -76,6 +44,7 @@ final class ChatFileService: ChatFileProtocol {
     @Atomic private var ignoreFilesIDsArray: [String] = []
     @Atomic private var busyFilesIDs: [String] = []
     @Atomic private var fileDownloadAttemptsCount: [String: Int] = [:]
+    @Atomic private var uploadingFilesDictionary: [String: FileMessage] = [:]
 
     private var subscriptions = Set<AnyCancellable>()
     private let maxDownloadAttemptsCount = 3
@@ -122,68 +91,46 @@ final class ChatFileService: ChatFileProtocol {
         replyMessage: MessageModel?,
         saveEncrypted: Bool
     ) async throws {
-        guard let partnerAddress = chatroom?.partner?.address,
-              let files = filesPicked,
-              let keyPair = accountService.keypair,
-              let ownerId = accountService.account?.address,
-              chatroom?.partner?.isDummy != true
+        guard let filesPicked = filesPicked else { return }
+        
+        let files = filesPicked.map {
+            FileUpload(
+                file: $0,
+                isUploaded: false,
+                serverFileID: nil,
+                fileNonce: nil,
+                preview: nil
+            )
+        }
+        
+        let fileMessage = FileMessage.init(files: files)
+        
+        try await sendFile(
+            text: text,
+            chatroom: chatroom,
+            fileMessage: fileMessage,
+            replyMessage: replyMessage,
+            saveEncrypted: saveEncrypted
+        )
+    }
+    
+    func resendMessage(
+        with id: String,
+        text: String?,
+        chatroom: Chatroom?,
+        replyMessage: MessageModel?,
+        saveEncrypted: Bool
+    ) async throws {
+        guard let fileMessage = $uploadingFilesDictionary.wrappedValue[id]
         else { return }
         
-        let storageProtocol = NetworkFileProtocolType.ipfs
-        var richFiles = createRichFiles(from: files)
-        
-        let messageLocally = createAdamantMessage(
-            with: richFiles,
+        try await sendFile(
             text: text,
+            chatroom: chatroom,
+            fileMessage: fileMessage,
             replyMessage: replyMessage,
-            storageProtocol: storageProtocol
+            saveEncrypted: saveEncrypted
         )
-        
-        cachePreviewFiles(files)
-        
-        let txLocally = try await chatsProvider.sendFileMessageLocally(
-            messageLocally,
-            recipientId: partnerAddress,
-            from: chatroom
-        )
-        
-        updateUploadingFilesIDs(with: richFiles.map { $0.id }, uploading: true)
-        
-        do {
-            try await processFilesUpload(
-                files: files,
-                chatroom: chatroom,
-                keyPair: keyPair,
-                storageProtocol: storageProtocol,
-                ownerId: ownerId,
-                partnerAddress: partnerAddress,
-                saveEncrypted: saveEncrypted,
-                richFiles: &richFiles
-            )
-            
-            let message = createAdamantMessage(
-                with: richFiles,
-                text: text,
-                replyMessage: replyMessage,
-                storageProtocol: storageProtocol
-            )
-            
-            _ = try await chatsProvider.sendFileMessage(
-                message,
-                recipientId: partnerAddress,
-                transactionLocaly: txLocally.tx,
-                context: txLocally.context,
-                from: chatroom
-            )
-        } catch {
-            await handleUploadError(
-                for: richFiles, 
-                tx: txLocally.tx,
-                context: txLocally.context
-            )
-            
-            throw error
-        }
     }
     
     func downloadFile(
@@ -628,22 +575,110 @@ private extension ChatFileService {
 
 // MARK: Upload
 private extension ChatFileService {
-    func createRichFiles(from files: [FileResult]) -> [RichMessageFile.File] {
+    func sendFile(
+        text: String?,
+        chatroom: Chatroom?,
+        fileMessage: FileMessage?,
+        replyMessage: MessageModel?,
+        saveEncrypted: Bool
+    ) async throws {
+        guard let partnerAddress = chatroom?.partner?.address,
+              let keyPair = accountService.keypair,
+              let ownerId = accountService.account?.address,
+              var fileMessage = fileMessage,
+              chatroom?.partner?.isDummy != true
+        else { return }
+        
+        let storageProtocol = NetworkFileProtocolType.ipfs
+        let files = fileMessage.files
+        var richFiles = createRichFiles(from: files)
+        
+        let messageLocally = createAdamantMessage(
+            with: richFiles,
+            text: text,
+            replyMessage: replyMessage,
+            storageProtocol: storageProtocol
+        )
+        
+        cachePreviewFiles(files)
+        
+        let txLocaly = try await sendMessageLocallyIfNeeded(
+            fileMessage: fileMessage,
+            partnerAddress: partnerAddress,
+            chatroom: chatroom,
+            messageLocally: messageLocally
+        )
+        
+        fileMessage.tx = txLocaly.tx
+        fileMessage.context = txLocaly.context
+        
+        let txId = txLocaly.tx.txId
+
+        let needToLoadFiles = richFiles.filter { $0.nonce.isEmpty }
+        updateUploadingFilesIDs(with: needToLoadFiles.map { $0.id }, uploading: true)
+        
+        $uploadingFilesDictionary.mutate {
+            $0[txId] = fileMessage
+        }
+
+        do {
+            try await processFilesUpload(
+                fileMessage: &fileMessage,
+                chatroom: chatroom,
+                keyPair: keyPair,
+                storageProtocol: storageProtocol,
+                ownerId: ownerId,
+                partnerAddress: partnerAddress,
+                saveEncrypted: saveEncrypted, 
+                txId: txId,
+                richFiles: &richFiles
+            )
+            
+            let message = createAdamantMessage(
+                with: richFiles,
+                text: text,
+                replyMessage: replyMessage,
+                storageProtocol: storageProtocol
+            )
+            
+            _ = try await chatsProvider.sendFileMessage(
+                message,
+                recipientId: partnerAddress,
+                transactionLocaly: txLocaly.tx,
+                context: txLocaly.context,
+                from: chatroom
+            )
+            
+            $uploadingFilesDictionary.mutate {
+                $0[txId] = nil
+            }
+        } catch {
+            await handleUploadError(
+                for: needToLoadFiles,
+                tx: txLocaly.tx,
+                context: txLocaly.context
+            )
+            
+            throw error
+        }
+    }
+    
+    func createRichFiles(from files: [FileUpload]) -> [RichMessageFile.File] {
         files.compactMap {
             .init(
-                id: $0.url.absoluteString,
-                size: $0.size,
-                nonce: .empty,
-                name: $0.name,
-                type: $0.extenstion,
-                preview: $0.previewUrl.map {
+                id: $0.serverFileID ?? $0.file.url.absoluteString,
+                size: $0.file.size,
+                nonce: $0.fileNonce ?? .empty,
+                name: $0.file.name,
+                type: $0.file.extenstion,
+                preview: $0.preview ?? $0.file.previewUrl.map {
                     RichMessageFile.Preview(
                         id: $0.absoluteString,
                         nonce: .empty,
                         extension: .empty
                     )
                 },
-                resolution: $0.resolution
+                resolution: $0.file.resolution
             )
         }
     }
@@ -676,8 +711,9 @@ private extension ChatFileService {
         )
     }
     
-    func cachePreviewFiles(_ files: [FileResult]) {
-        for url in files.compactMap({ $0.previewUrl }) {
+    func cachePreviewFiles(_ files: [FileUpload]) {
+        let needToCache = files.filter { !$0.isUploaded }
+        for url in needToCache.compactMap({ $0.file.previewUrl }) {
             filesStorage.cacheTemporaryFile(
                 url: url,
                 isEncrypted: false,
@@ -685,6 +721,32 @@ private extension ChatFileService {
                 isPreview: true
             )
         }
+    }
+    
+    func sendMessageLocallyIfNeeded(
+        fileMessage: FileMessage,
+        partnerAddress: String,
+        chatroom: Chatroom?,
+        messageLocally: AdamantMessage
+    ) async throws -> (tx: RichMessageTransaction, context: NSManagedObjectContext) {
+        let tx: RichMessageTransaction
+        let context: NSManagedObjectContext
+        
+        if let transaction = fileMessage.tx,
+           let txContext = fileMessage.context {
+            tx = transaction
+            context = txContext
+        } else {
+            let txLocally = try await chatsProvider.sendFileMessageLocally(
+                messageLocally,
+                recipientId: partnerAddress,
+                from: chatroom
+            )
+            tx = txLocally.tx
+            context = txLocally.context
+        }
+        
+        return (tx, context)
     }
     
     func updateUploadingFilesIDs(with ids: [String], uploading: Bool) {
@@ -701,16 +763,21 @@ private extension ChatFileService {
     }
     
     func processFilesUpload(
-        files: [FileResult],
+        fileMessage: inout FileMessage,
         chatroom: Chatroom?,
         keyPair: Keypair,
         storageProtocol: NetworkFileProtocolType,
         ownerId: String,
         partnerAddress: String,
         saveEncrypted: Bool,
+        txId: String,
         richFiles: inout [RichMessageFile.File]
     ) async throws {
-        for file in files {
+        let files = fileMessage.files
+        
+        for i in files.indices where !files[i].isUploaded {
+            let file = files[i].file
+            
             let result = try await uploadFileToServer(
                 file: file,
                 recipientPublicKey: chatroom?.partner?.publicKey ?? .empty,
@@ -731,8 +798,10 @@ private extension ChatFileService {
                 oldId: file.url.absoluteString,
                 fileResult: result.file,
                 previewResult: result.preview,
+                fileMessage: &fileMessage,
                 richFiles: &richFiles,
-                file: file
+                file: file,
+                txId: txId
             )
         }
     }
@@ -779,8 +848,10 @@ private extension ChatFileService {
         oldId: String,
         fileResult: UploadResult,
         previewResult: UploadResult?,
+        fileMessage: inout FileMessage,
         richFiles: inout [RichMessageFile.File],
-        file: FileResult
+        file: FileResult,
+        txId: String
     ) {
         let cached = filesStorage.isCachedLocally(fileResult.cid)
         
@@ -809,6 +880,19 @@ private extension ChatFileService {
             richFiles[index].id = fileResult.cid
             richFiles[index].nonce = fileResult.nonce
             richFiles[index].preview = previewDTO
+        }
+        
+        if let index = fileMessage.files.firstIndex(where: {
+            $0.file.url.absoluteString == oldId
+        }) {
+            fileMessage.files[index].isUploaded = true
+            fileMessage.files[index].serverFileID = fileResult.cid
+            fileMessage.files[index].fileNonce = fileResult.nonce
+            fileMessage.files[index].preview = previewDTO
+            
+            $uploadingFilesDictionary.mutate {
+                $0[txId] = fileMessage
+            }
         }
     }
     
@@ -880,5 +964,4 @@ private extension ChatFileService {
         let cid = try await filesNetworkManager.uploadFiles(encodedData, type: storageProtocol)
         return (data, encodedData, nonce, cid)
     }
-    
 }

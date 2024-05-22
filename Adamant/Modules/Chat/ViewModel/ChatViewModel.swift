@@ -494,7 +494,18 @@ final class ChatViewModel: NSObject {
             
             let message = messages.first(where: { $0.messageId == id })
             
-            if case (.file) = message?.content {
+            if case let .file(model) = message?.content {
+                do {
+                    try await chatFileService.resendMessage(
+                        with: id,
+                        text: model.value.content.comment.string,
+                        chatroom: chatroom,
+                        replyMessage: nil,
+                        saveEncrypted: filesStorageProprieties.saveFileEncrypted()
+                    )
+                } catch {
+                    dialog.send(.error(error.localizedDescription, supportEmail: false))
+                }
                 return
             }
             
@@ -761,10 +772,8 @@ final class ChatViewModel: NSObject {
         files: [ChatFile]
     ) {
         let tx = chatTransactions.first(where: { $0.txId == messageId })
-        let message = messages.first(where: { $0.messageId == messageId })
         
-        guard let message = message,
-              tx?.statusEnum == .delivered || (message.status != .failed && message.status != .pending),
+        guard tx?.statusEnum == .delivered,
               (filesStorageProprieties.autoDownloadPreviewPolicy() != .nobody ||
                 filesStorageProprieties.autoDownloadFullMediaPolicy() != .nobody)
         else { return }

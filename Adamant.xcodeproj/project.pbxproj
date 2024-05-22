@@ -77,6 +77,7 @@
 		3AF0A6CA2BBAF5850019FF47 /* ChatFileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF0A6C92BBAF5850019FF47 /* ChatFileService.swift */; };
 		3AF53F8D2B3DCFA300B30312 /* NodeGroup+Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF53F8C2B3DCFA300B30312 /* NodeGroup+Constants.swift */; };
 		3AF53F8F2B3EE0DA00B30312 /* DogeNodeInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF53F8E2B3EE0DA00B30312 /* DogeNodeInfo.swift */; };
+		3AF9DF0B2BFE306C009A43A8 /* ChatFileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF9DF0A2BFE306C009A43A8 /* ChatFileProtocol.swift */; };
 		3AFE7E412B18D88B00718739 /* WalletService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AFE7E402B18D88B00718739 /* WalletService.swift */; };
 		3AFE7E432B19E4D900718739 /* WalletServiceCompose.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AFE7E422B19E4D900718739 /* WalletServiceCompose.swift */; };
 		3AFE7E522B1F6B3400718739 /* WalletServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AFE7E512B1F6B3400718739 /* WalletServiceProtocol.swift */; };
@@ -754,6 +755,7 @@
 		3AF0A6C92BBAF5850019FF47 /* ChatFileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatFileService.swift; sourceTree = "<group>"; };
 		3AF53F8C2B3DCFA300B30312 /* NodeGroup+Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NodeGroup+Constants.swift"; sourceTree = "<group>"; };
 		3AF53F8E2B3EE0DA00B30312 /* DogeNodeInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeNodeInfo.swift; sourceTree = "<group>"; };
+		3AF9DF0A2BFE306C009A43A8 /* ChatFileProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatFileProtocol.swift; sourceTree = "<group>"; };
 		3AFE7E402B18D88B00718739 /* WalletService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletService.swift; sourceTree = "<group>"; };
 		3AFE7E422B19E4D900718739 /* WalletServiceCompose.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletServiceCompose.swift; sourceTree = "<group>"; };
 		3AFE7E512B1F6B3400718739 /* WalletServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletServiceProtocol.swift; sourceTree = "<group>"; };
@@ -2129,6 +2131,7 @@
 				3ACD307F2BBD86C800ABF671 /* FilesStorageProprietiesProtocol.swift */,
 				3AE0A4322BC6A9EB00BF7125 /* FileApiServiceProtocol.swift */,
 				3AE0A4362BC6AA6000BF7125 /* FilesNetworkManagerProtocol.swift */,
+				3AF9DF0A2BFE306C009A43A8 /* ChatFileProtocol.swift */,
 			);
 			path = ServiceProtocols;
 			sourceTree = "<group>";
@@ -3177,6 +3180,7 @@
 				E9CAE8D22018AA7700345E76 /* AdamantApi+Accounts.swift in Sources */,
 				936658A32B0ADE4400BDB2D3 /* CoinsNodesListView+Row.swift in Sources */,
 				648CE3A6229AD1CD0070A2CC /* DashWalletService+Send.swift in Sources */,
+				3AF9DF0B2BFE306C009A43A8 /* ChatFileProtocol.swift in Sources */,
 				E987024920C2B1F700E393F4 /* AdamantChatsProvider+fakeMessages.swift in Sources */,
 				6403F5E222723F7500D58779 /* DashWallet.swift in Sources */,
 				26A975FF2B7E843E0095C367 /* SelectTextView.swift in Sources */,
