@@ -37,9 +37,14 @@ private extension PartnerQRView {
                         .resizable()
                         .frame(squareSize: viewModel.partnerImageSize)
                 }
-                Text(viewModel.partnerName).font(.headline)
+                Text(viewModel.partnerName)
+                    .font(.headline)
+                    .minimumScaleFactor(0.7)
+                    .lineLimit(1)
             }
+            .frame(maxWidth: UIScreen.main.bounds.width - 150)
         }
+        .frame(maxWidth: UIScreen.main.bounds.width - 150)
     }
     
     func infoSection() -> some View {
