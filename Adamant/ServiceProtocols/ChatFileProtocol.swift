@@ -24,7 +24,8 @@ protocol ChatFileProtocol {
         needUpdatePreview: Bool,
         cached: Bool?,
         downloading: Bool?,
-        uploading: Bool?
+        uploading: Bool?,
+        progress: Int?
     ), Never> {
         get
     }

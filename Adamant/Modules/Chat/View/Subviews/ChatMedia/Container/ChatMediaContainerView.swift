@@ -82,9 +82,16 @@ final class ChatMediaContainerView: UIView, ChatModelView {
         stack.axis = .vertical
         stack.spacing = 12
 
+        stack.addArrangedSubview(statusButton)
         stack.addArrangedSubview(ownReactionLabel)
         stack.addArrangedSubview(opponentReactionLabel)
         return stack
+    }()
+    
+    private lazy var statusButton: UIButton = {
+        let button = UIButton()
+        button.addTarget(self, action: #selector(onStatusButtonTap), for: .touchUpInside)
+        return button
     }()
     
     private lazy var contentView = ChatMediaContentView()
@@ -127,6 +134,18 @@ final class ChatMediaContainerView: UIView, ChatModelView {
         super.init(coder: coder)
         configure()
     }
+    
+    @objc func onStatusButtonTap() {
+        guard model.status == .needToDownload else { return }
+        
+        let fileModel = model.content.fileModel
+        let fileList = Array(fileModel.files.prefix(FilesConstants.maxFilesCount))
+        
+        actionHandler(.forceDownloadAllFiles(
+            messageId: fileModel.messageId,
+            files: fileList
+        ))
+    }
 }
 
 extension ChatMediaContainerView {
@@ -163,6 +182,13 @@ extension ChatMediaContainerView {
         opponentReactionLabel.isHidden = getReaction(for: model.opponentAddress) == nil
         updateOwnReaction()
         updateOpponentReaction()
+        updateStatus(model.status)
+    }
+    
+    func updateStatus(_ status: FileMessageStatus) {
+        statusButton.setImage(status.image, for: .normal)
+        statusButton.tintColor = status.imageTintColor
+        statusButton.isHidden = status == .success || status == .failed
     }
     
     func updateLayout() {

@@ -17,22 +17,30 @@ final class FilesNetworkManager: FilesNetworkManagerProtocol {
     
     func uploadFiles(
         _ data: Data,
-        type: NetworkFileProtocolType
+        type: NetworkFileProtocolType,
+        uploadProgress: @escaping ((Progress) -> Void)
     ) async throws -> String {
         switch type {
         case .ipfs:
-            return try await ipfsService.uploadFile(data: data)
+            return try await ipfsService.uploadFile(data: data, uploadProgress: uploadProgress)
         }
     }
     
-    func downloadFile(_ id: String, type: String) async throws -> Data {
+    func downloadFile(
+        _ id: String,
+        type: String,
+        downloadProgress: @escaping ((Progress) -> Void)
+    ) async throws -> Data {
         guard let netwrokProtocol = NetworkFileProtocolType(rawValue: type) else {
             throw FileManagerError.cantDownloadFile
         }
         
         switch netwrokProtocol {
         case .ipfs:
-            return try await ipfsService.downloadFile(id: id)
+            return try await ipfsService.downloadFile(
+                id: id,
+                downloadProgress: downloadProgress
+            )
         }
     }
 }

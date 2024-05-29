@@ -15,6 +15,7 @@ import FilesStorageKit
 struct ChatMessageFactory {
     private let walletServiceCompose: WalletServiceCompose
     private let filesStorage: FilesStorageProtocol
+    private let filesStorageProprieties: FilesStorageProprietiesProtocol
     
     static let markdownParser = MarkdownParser(
         font: .adamantChatDefault,
@@ -69,10 +70,12 @@ struct ChatMessageFactory {
     )
     
     init(walletServiceCompose: WalletServiceCompose,
-         filesStorage: FilesStorageProtocol
+         filesStorage: FilesStorageProtocol,
+         filesStorageProprieties: FilesStorageProprietiesProtocol
     ) {
         self.walletServiceCompose = walletServiceCompose
         self.filesStorage = filesStorage
+        self.filesStorageProprieties = filesStorageProprieties
     }
     
     func makeMessage(
@@ -82,7 +85,8 @@ struct ChatMessageFactory {
         dateHeaderOn: Bool,
         topSpinnerOn: Bool,
         uploadingFilesIDs: [String],
-        downloadingFilesIDs: [String]
+        downloadingFilesIDs: [String],
+        havePartnerName: Bool
     ) -> ChatMessage {
         let sentDate = transaction.sentDate ?? .now
         let senderModel = ChatSender(transaction: transaction)
@@ -108,7 +112,8 @@ struct ChatMessageFactory {
                 isFromCurrentSender: currentSender.senderId == senderModel.senderId,
                 backgroundColor: backgroundColor,
                 uploadingFilesIDs: uploadingFilesIDs,
-                downloadingFilesIDs: downloadingFilesIDs
+                downloadingFilesIDs: downloadingFilesIDs,
+                havePartnerName: havePartnerName
             ),
             backgroundColor: backgroundColor,
             bottomString: makeBottomString(
@@ -130,7 +135,8 @@ private extension ChatMessageFactory {
         isFromCurrentSender: Bool,
         backgroundColor: ChatMessageBackgroundColor,
         uploadingFilesIDs: [String],
-        downloadingFilesIDs: [String]
+        downloadingFilesIDs: [String],
+        havePartnerName: Bool
     ) -> ChatMessage.Content {
         switch transaction {
         case let transaction as MessageTransaction:
@@ -158,7 +164,8 @@ private extension ChatMessageFactory {
                     isFromCurrentSender: isFromCurrentSender,
                     backgroundColor: backgroundColor,
                     uploadingFilesIDs: uploadingFilesIDs,
-                    downloadingFilesIDs: downloadingFilesIDs
+                    downloadingFilesIDs: downloadingFilesIDs,
+                    havePartnerName: havePartnerName
                 )
             }
             
@@ -305,7 +312,8 @@ private extension ChatMessageFactory {
         isFromCurrentSender: Bool,
         backgroundColor: ChatMessageBackgroundColor,
         uploadingFilesIDs: [String],
-        downloadingFilesIDs: [String]
+        downloadingFilesIDs: [String],
+        havePartnerName: Bool
     ) -> ChatMessage.Content {
         let id = transaction.chatMessageId ?? ""
         
@@ -328,12 +336,15 @@ private extension ChatMessageFactory {
         ? transaction.recipientAddress
         : transaction.senderAddress
         
+        let isPreviewDownloadAllowed = isPreviewDownloadAllowed(havePartnerName)
+        
         let chatFiles = makeChatFiles(
             from: files,
             uploadingFilesIDs: uploadingFilesIDs,
             downloadingFilesIDs: downloadingFilesIDs,
             isFromCurrentSender: isFromCurrentSender,
-            storage: storage
+            storage: storage, 
+            isPreviewDownloadAllowed: isPreviewDownloadAllowed
         )
         
         let isMediaFilesOnly = chatFiles.allSatisfy {
@@ -363,8 +374,21 @@ private extension ChatMessageFactory {
                 backgroundColor: backgroundColor
             ),
             address: address,
-            opponentAddress: opponentAddress
+            opponentAddress: opponentAddress, 
+            txStatus: transaction.statusEnum
         )))
+    }
+    
+    func isPreviewDownloadAllowed(_ havePartnerName: Bool) -> Bool {
+        let policy = filesStorageProprieties.autoDownloadPreviewPolicy()
+        switch policy {
+        case .everybody:
+            return true
+        case .nobody:
+            return false
+        case .contacts:
+            return havePartnerName
+        }
     }
     
     func makeAttributed(_ text: String) -> NSMutableAttributedString {
@@ -394,7 +418,8 @@ private extension ChatMessageFactory {
         uploadingFilesIDs: [String],
         downloadingFilesIDs: [String],
         isFromCurrentSender: Bool,
-        storage: String
+        storage: String,
+        isPreviewDownloadAllowed: Bool
     ) -> [ChatFile] {
         return files.map {
             let previewData = $0[RichContentKeys.file.preview] as? [String: Any] ?? [:]
@@ -411,7 +436,9 @@ private extension ChatMessageFactory {
                 storage: storage,
                 nonce: $0[RichContentKeys.file.nonce] as? String ?? .empty,
                 isFromCurrentSender: isFromCurrentSender,
-                fileType: FileType(raw: fileType) ?? .other
+                fileType: FileType(raw: fileType) ?? .other, 
+                progress: .zero, 
+                isPreviewDownloadAllowed: isPreviewDownloadAllowed
             )
         }
     }

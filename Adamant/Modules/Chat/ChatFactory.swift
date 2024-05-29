@@ -113,7 +113,8 @@ private extension ChatFactory {
             transfersProvider: transferProvider,
             chatMessagesListFactory: .init(chatMessageFactory: .init(
                 walletServiceCompose: walletServiceCompose,
-                filesStorage: filesStorage
+                filesStorage: filesStorage, 
+                filesStorageProprieties: filesStorageProprieties
             )),
             addressBookService: addressBookService,
             visibleWalletService: visibleWalletService,

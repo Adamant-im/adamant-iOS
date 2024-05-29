@@ -8,6 +8,7 @@
 
 import UIKit
 import CommonKit
+import SwiftUI
 
 class ChatFileView: UIView {
     private lazy var iconImageView: UIImageView = UIImageView()
@@ -36,7 +37,12 @@ class ChatFileView: UIView {
     private let nameLabel = UILabel(font: nameFont, textColor: .adamant.textColor)
     private let sizeLabel = UILabel(font: sizeFont, textColor: .lightGray)
     private let additionalLabel = UILabel(font: additionalFont, textColor: .adamant.cellColor)
-
+    
+    private lazy var previewDownloadNotAllowedLabel = UILabel(
+        font: previewDownloadNotAllowedFont,
+        textColor: .adamant.textColor.withAlphaComponent(0.4)
+    )
+    
     private lazy var vStack: UIStackView = {
         let stack = UIStackView()
         stack.alignment = .leading
@@ -45,7 +51,21 @@ class ChatFileView: UIView {
         stack.backgroundColor = .clear
 
         stack.addArrangedSubview(nameLabel)
+        stack.addArrangedSubview(additionalDataStack)
+        return stack
+    }()
+    
+    private lazy var additionalDataStack: UIStackView = {
+        let stack = UIStackView()
+        stack.alignment = .center
+        stack.axis = .horizontal
+        stack.spacing = stackSpacing
+        
+        let controller = UIHostingController(rootView: progressBar.environmentObject(progressState))
+        controller.view.backgroundColor = .clear
+        
         stack.addArrangedSubview(sizeLabel)
+        stack.addArrangedSubview(controller.view)
         return stack
     }()
     
@@ -53,6 +73,17 @@ class ChatFileView: UIView {
         let btn = UIButton()
         btn.addTarget(self, action: #selector(tapBtnAction), for: .touchUpInside)
         return btn
+    }()
+    
+    private lazy var progressBar = CircularProgressView()
+    private lazy var progressState: CircularProgressState = {
+        .init(
+            lineWidth: 2.0,
+            backgroundColor: .white,
+            progressColor: .lightGray,
+            progress: .zero,
+            hidden: true
+        )
     }()
     
     var model: ChatFile = .default {
@@ -128,11 +159,20 @@ private extension ChatFileView {
             make.size.equalTo(imageSize / 2)
         }
         
+        addSubview(previewDownloadNotAllowedLabel)
+        previewDownloadNotAllowedLabel.snp.makeConstraints { make in
+            make.centerY.equalTo(iconImageView.snp.centerY)
+            make.horizontalEdges.equalTo(iconImageView).inset(5)
+        }
+        
         addSubview(tapBtn)
         tapBtn.snp.makeConstraints { make in
             make.directionalEdges.equalToSuperview()
         }
         
+        previewDownloadNotAllowedLabel.text = previewDownloadNotAllowedText
+        previewDownloadNotAllowedLabel.numberOfLines = .zero
+        previewDownloadNotAllowedLabel.textAlignment = .center
         nameLabel.lineBreakMode = .byTruncatingMiddle
         nameLabel.textAlignment = .left
         sizeLabel.textAlignment = .left
@@ -145,6 +185,7 @@ private extension ChatFileView {
         videoIconIV.addShadow()
         downloadImageView.addShadow()
         spinner.addShadow(shadowColor: .white)
+        previewDownloadNotAllowedLabel.addShadow()
     }
     
     func update() {
@@ -152,12 +193,17 @@ private extension ChatFileView {
         if let previewImage = model.previewImage {
             image = previewImage
             additionalLabel.isHidden = true
+            previewDownloadNotAllowedLabel.isHidden = true
         } else {
             image = model.fileType == .image || model.fileType == .video 
             ? defaultMediaImage
             : defaultImage
             
-            additionalLabel.isHidden = false
+            previewDownloadNotAllowedLabel.isHidden = model.isPreviewDownloadAllowed
+            || model.isBusy
+            || !(model.fileType == .image || model.fileType == .video)
+            
+            additionalLabel.isHidden = !previewDownloadNotAllowedLabel.isHidden
         }
         
         if iconImageView.image != image {
@@ -168,8 +214,12 @@ private extension ChatFileView {
         
         if model.isBusy {
             spinner.startAnimating()
+            progressState.hidden = false
+            progressState.progress = Double(model.progress) / 100
         } else {
             spinner.stopAnimating()
+            progressState.hidden = true
+            progressState.progress = .zero
         }
         
         let fileType = model.file.type.map { ".\($0)" } ?? .empty
@@ -204,5 +254,7 @@ private let sizeFont = UIFont.systemFont(ofSize: 13)
 private let imageSize: CGFloat = 70
 private let stackSpacing: CGFloat = 12
 private let verticalStackSpacing: CGFloat = 3
-private let defaultImage: UIImage? = .asset(named: "file-default-box")
-private let defaultMediaImage: UIImage? = .asset(named: "file-image-box")
+private let defaultImage: UIImage? = .asset(named: "defaultFileIcon")
+private let defaultMediaImage: UIImage? = .asset(named: "defaultMediaBlur")
+private let previewDownloadNotAllowedFont = UIFont.systemFont(ofSize: 6)
+private var previewDownloadNotAllowedText: String { .localized("Chats.AutoDownloadPreview.Disabled") }

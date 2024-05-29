@@ -137,6 +137,6 @@ private extension FilesToolbarCollectionViewCell {
     }
 }
 
-private let defaultImage: UIImage? = .asset(named: "file-default-box")
+private let defaultImage: UIImage? = .asset(named: "defaultFileIcon")
 private let nameFont = UIFont.systemFont(ofSize: 13)
 private let additionalFont = UIFont.boldSystemFont(ofSize: 15)

@@ -9,6 +9,13 @@
 import Foundation
 
 protocol FileApiServiceProtocol: WalletApiService {
-    func uploadFile(data: Data) async throws -> String
-    func downloadFile(id: String) async throws -> Data
+    func uploadFile(
+        data: Data,
+        uploadProgress: @escaping ((Progress) -> Void)
+    ) async throws -> String
+    
+    func downloadFile(
+        id: String,
+        downloadProgress: @escaping ((Progress) -> Void)
+    ) async throws -> Data
 }

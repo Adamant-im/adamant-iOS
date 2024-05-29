@@ -155,6 +155,12 @@ final class ChatMediaContentView: UIView {
         super.init(coder: coder)
         configure()
     }
+    
+    override func traitCollectionDidChange(
+        _ previousTraitCollection: UITraitCollection?
+    ) {
+        layer.borderColor = model.backgroundColor.uiColor.cgColor
+    }
 }
 
 private extension ChatMediaContentView {

@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import SnapKit
+import SwiftUI
 
 final class MediaContentView: UIView {
     private lazy var imageView: UIImageView = UIImageView()
@@ -27,6 +28,22 @@ final class MediaContentView: UIView {
         let btn = UIButton()
         btn.addTarget(self, action: #selector(tapBtnAction), for: .touchUpInside)
         return btn
+    }()
+    
+    private lazy var previewDownloadNotAllowedLabel = UILabel(
+        font: previewDownloadNotAllowedFont,
+        textColor: .adamant.textColor.withAlphaComponent(0.4)
+    )
+
+    private lazy var progressBar = CircularProgressView()
+    private lazy var progressState: CircularProgressState = {
+        .init(
+            lineWidth: 2.0,
+            backgroundColor: .white,
+            progressColor: .lightGray,
+            progress: .zero,
+            hidden: true
+        )
     }()
     
     var model: ChatFile = .default {
@@ -92,25 +109,42 @@ private extension MediaContentView {
             make.size.equalTo(imageSize / 1.6)
         }
         
+        addSubview(previewDownloadNotAllowedLabel)
+        previewDownloadNotAllowedLabel.snp.makeConstraints { make in
+            make.centerY.equalTo(imageView.snp.centerY)
+            make.horizontalEdges.equalTo(imageView).inset(5)
+        }
+        
+        let controller = UIHostingController(rootView: progressBar.environmentObject(progressState))
+        
+        controller.view.backgroundColor = .clear
+        addSubview(controller.view)
+        controller.view.snp.makeConstraints { make in
+            make.top.trailing.equalToSuperview().inset(15)
+            make.size.equalTo(15)
+        }
+        
         imageView.layer.masksToBounds = true
         imageView.contentMode = .scaleAspectFill
         videoIconIV.tintColor = .adamant.active
-
+        previewDownloadNotAllowedLabel.text = previewDownloadNotAllowedText
+        previewDownloadNotAllowedLabel.numberOfLines = .zero
+        previewDownloadNotAllowedLabel.textAlignment = .center
+        
         videoIconIV.addShadow()
         downloadImageView.addShadow()
         spinner.addShadow(shadowColor: .white)
+        controller.view.addShadow()
+        previewDownloadNotAllowedLabel.addShadow()
     }
     
     func update() {
-        let image: UIImage?
-        if let previewImage = model.previewImage {
-            image = previewImage
-        } else {
-            image = model.fileType == .image || model.fileType == .video
+        let image = model.previewImage
+        ?? (model.fileType == .image || model.fileType == .video
             ? defaultMediaImage
             : defaultImage
-        }
-        
+        )
+
         if imageView.image != image {
             imageView.image = image
         }
@@ -125,14 +159,24 @@ private extension MediaContentView {
         
         if model.isBusy {
             spinner.startAnimating()
+            progressState.hidden = false
+            progressState.progress = Double(model.progress) / 100
         } else {
             spinner.stopAnimating()
+            progressState.hidden = true
+            progressState.progress = .zero
         }
+        
+        previewDownloadNotAllowedLabel.isHidden = model.isPreviewDownloadAllowed
+        || model.isBusy
+        || model.previewImage != nil
     }
 }
 
 private let imageSize: CGFloat = 70
 private let stackSpacing: CGFloat = 12
 private let verticalStackSpacing: CGFloat = 3
-private let defaultImage: UIImage? = .asset(named: "file-default-box")
-private let defaultMediaImage: UIImage? = .asset(named: "file-image-box")
+private let defaultImage: UIImage? = .asset(named: "defaultFileIcon")
+private let defaultMediaImage: UIImage? = .asset(named: "defaultMediaBlur")
+private let previewDownloadNotAllowedFont = UIFont.systemFont(ofSize: 8)
+private var previewDownloadNotAllowedText: String { .localized("Chats.AutoDownloadPreview.Disabled") }

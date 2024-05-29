@@ -9,6 +9,15 @@
 import Foundation
 
 protocol FilesNetworkManagerProtocol {
-    func uploadFiles(_ data: Data, type: NetworkFileProtocolType) async throws -> String
-    func downloadFile(_ id: String, type: String) async throws -> Data
+    func uploadFiles(
+        _ data: Data,
+        type: NetworkFileProtocolType,
+        uploadProgress: @escaping ((Progress) -> Void)
+    ) async throws -> String
+    
+    func downloadFile(
+        _ id: String,
+        type: String,
+        downloadProgress: @escaping ((Progress) -> Void)
+    ) async throws -> Data
 }

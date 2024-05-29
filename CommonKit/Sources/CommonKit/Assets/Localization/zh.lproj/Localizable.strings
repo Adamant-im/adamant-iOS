@@ -724,6 +724,9 @@
 /* Storage usage: Description */
 "StorageUsage.Description" = "应用程序安全存储中的文件和图像总大小";
 
+/* Chats: Auto preview download is disabled */
+"Chats.AutoDownloadPreview.Disabled" = "自动预览下载已禁用";
+
 /* CoinsNodesList: Title */
 "CoinsNodesList.Title" = "Coin和服务节点列表";
 

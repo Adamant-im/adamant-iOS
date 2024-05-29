@@ -61,8 +61,7 @@ private extension FileContainerView {
         
         actionHandler(.downloadPreviewIfNeeded(
             messageId: model.messageId,
-            files: Array(fileList),
-            isFromCurrentSender: model.isFromCurrentSender
+            files: Array(fileList)
         ))
         
         filesStack.arrangedSubviews.forEach { $0.isHidden = true }
@@ -75,8 +74,7 @@ private extension FileContainerView {
                 self?.actionHandler(
                     .openFile(
                         messageId: model.messageId,
-                        file: file,
-                        isFromCurrentSender: model.isFromCurrentSender
+                        file: file
                     )
                 )
             }

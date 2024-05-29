@@ -231,9 +231,10 @@ protocol ChatsProvider: DataProvider, Actor {
         from chatroom: Chatroom?
     ) async throws -> ChatTransaction
     
-    func setTxMessageAsFailed(
+    func setTxMessageStatus(
         transactionLocaly: RichMessageTransaction,
-        context: NSManagedObjectContext
+        context: NSManagedObjectContext,
+        status: MessageStatus
     ) throws
     
     // MARK: - Delete local message

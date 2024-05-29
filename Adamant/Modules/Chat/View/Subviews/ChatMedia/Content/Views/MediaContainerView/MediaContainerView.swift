@@ -84,8 +84,7 @@ private extension MediaContainerView {
         
         actionHandler(.downloadPreviewIfNeeded(
             messageId: model.messageId,
-            files: Array(fileList),
-            isFromCurrentSender: model.isFromCurrentSender
+            files: Array(fileList)
         ))
         
         for (index, stackView) in filesStack.arrangedSubviews.enumerated() {
@@ -106,8 +105,7 @@ private extension MediaContainerView {
                         self?.actionHandler(
                             .openFile(
                                 messageId: model.messageId,
-                                file: file,
-                                isFromCurrentSender: model.isFromCurrentSender
+                                file: file
                             )
                         )
                     }

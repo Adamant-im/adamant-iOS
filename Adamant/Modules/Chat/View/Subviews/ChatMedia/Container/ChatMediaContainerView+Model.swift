@@ -17,6 +17,29 @@ extension ChatMediaContainerView {
         var content: ChatMediaContentView.Model
         let address: String
         let opponentAddress: String
+        let txStatus: MessageStatus
+        
+        var status: FileMessageStatus {
+            if txStatus == .failed {
+                return .failed
+            }
+            
+            if content.fileModel.files.first(where: { $0.isBusy }) != nil {
+                return .busy
+            }
+            
+            if content.fileModel.files.contains(where: {
+                !$0.isCached ||
+                ($0.isCached
+                 && $0.file.preview != nil
+                 && $0.previewImage == nil
+                 && ($0.fileType == .image || $0.fileType == .video))
+            }) {
+                return .needToDownload
+            }
+            
+            return .success
+        }
         
         static let `default` = Self(
             id: "",
@@ -24,7 +47,8 @@ extension ChatMediaContainerView {
             reactions: nil,
             content: .default,
             address: "",
-            opponentAddress: ""
+            opponentAddress: "",
+            txStatus: .failed
         )
         
         func makeReplyContent() -> NSAttributedString {

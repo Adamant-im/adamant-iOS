@@ -34,7 +34,10 @@ final class IPFSApiService: FileApiServiceProtocol {
         }
     }
     
-    func uploadFile(data: Data) async throws -> String {
+    func uploadFile(
+        data: Data,
+        uploadProgress: @escaping ((Progress) -> Void)
+    ) async throws -> String {
         let model: MultipartFormDataModel = .init(
             keyName: IPFSApiCommands.file.fieldName,
             fileName: defaultFileName,
@@ -45,7 +48,8 @@ final class IPFSApiService: FileApiServiceProtocol {
             await core.sendRequestMultipartFormDataJsonResponse(
                 node: node,
                 path: IPFSApiCommands.file.upload,
-                models: [model]
+                models: [model],
+                uploadProgress: uploadProgress
             )
         }.get()
         
@@ -56,11 +60,15 @@ final class IPFSApiService: FileApiServiceProtocol {
         return cid
     }
     
-    func downloadFile(id: String) async throws -> Data {
+    func downloadFile(
+        id: String,
+        downloadProgress: @escaping ((Progress) -> Void)
+    ) async throws -> Data {
         let result: Data = try await request { core, node in
             await core.sendRequest(
                 node: node,
-                path: "\(IPFSApiCommands.file.download)\(id)"
+                path: "\(IPFSApiCommands.file.download)\(id)",
+                downloadProgress: downloadProgress
             )
         }.get()
         

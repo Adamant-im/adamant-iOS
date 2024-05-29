@@ -65,7 +65,8 @@ final class ChatFileService: ChatFileProtocol {
         needUpdatePreview: Bool,
         cached: Bool?,
         downloading: Bool?,
-        uploading: Bool?
+        uploading: Bool?,
+        progress: Int?
     )>()
     
     init(
@@ -138,11 +139,14 @@ final class ChatFileService: ChatFileProtocol {
         chatroom: Chatroom?,
         saveEncrypted: Bool
     ) async throws {
+        let isCachedOriginal = filesStorage.isCachedLocally(file.file.id)
+        let isCachedPreview = filesStorage.isCachedInMemory(file.file.preview?.id ?? .empty) 
+        
         try await downloadFile(
             file: file,
             chatroom: chatroom,
-            shouldDownloadOriginalFile: true,
-            shouldDownloadPreviewFile: true,
+            shouldDownloadOriginalFile: !isCachedOriginal,
+            shouldDownloadPreviewFile: !isCachedPreview,
             saveEncrypted: saveEncrypted
         )
     }
@@ -322,7 +326,8 @@ private extension ChatFileService {
             needUpdatePreview: true,
             cached: nil,
             downloading: nil,
-            uploading: nil
+            uploading: nil,
+            progress: nil
         ))
     }
     
@@ -369,16 +374,50 @@ private extension ChatFileService {
         }
         
         defer {
-            $downloadingFilesIDsArray.mutate { $0.removeAll(where: { $0 == file.file.id }) }
+            $downloadingFilesIDsArray.mutate { 
+                $0.removeAll(where: { $0 == file.file.id })
+            }
             sendUpdate(for: [file.file.id], downloading: false, uploading: nil)
         }
         
         $downloadingFilesIDsArray.mutate { $0.append(file.file.id) }
-        sendUpdate(for: [file.file.id], downloading: true, uploading: nil)
+        sendUpdate(
+            for: [file.file.id],
+            downloading: true,
+            uploading: nil,
+            progress: .zero
+        )
+        
+        let downloadFile = shouldDownloadOriginalFile
+        && !filesStorage.isCachedLocally(file.file.id)
+        
+        let downloadPreview = file.file.preview != nil
+        && shouldDownloadPreviewFile
+        && !filesStorage.isCachedLocally(file.file.preview?.id ?? .empty)
+        
+        let totalProgress = Progress(totalUnitCount: 100)
+        var previewWeight: Int64 = .zero
+        var fileWeight: Int64 = .zero
+        
+        if downloadPreview && downloadFile {
+            previewWeight = 10
+            fileWeight = 90
+        } else if downloadPreview && !downloadFile {
+            previewWeight = 100
+            fileWeight = .zero
+        } else if !downloadPreview && downloadFile {
+            previewWeight = .zero
+            fileWeight = 100
+        }
+        
+        let previewProgress = Progress(totalUnitCount: previewWeight)
+        totalProgress.addChild(previewProgress, withPendingUnitCount: previewWeight)
+        
+        let fileProgress = Progress(totalUnitCount: fileWeight)
+        totalProgress.addChild(fileProgress, withPendingUnitCount: fileWeight)
         
         if let previewDTO = file.file.preview {
-            if shouldDownloadPreviewFile,
-               !filesStorage.isCachedLocally(previewDTO.id) {
+            if downloadPreview {
                 try await downloadAndCacheFile(
                     id: previewDTO.id,
                     nonce: previewDTO.nonce,
@@ -390,7 +429,15 @@ private extension ChatFileService {
                     saveEncrypted: saveEncrypted,
                     fileType: .image,
                     fileExtension: previewDTO.extension ?? .empty,
-                    isPreview: true
+                    isPreview: true,
+                    downloadProgress: { [weak self] value in
+                        previewProgress.completedUnitCount = Int64(value.fractionCompleted * Double(previewWeight))
+                        
+                        self?.sendProgress(
+                            for: file.file.id,
+                            progress: Int(totalProgress.fractionCompleted * 100)
+                        )
+                    }
                 )
                 
                 let preview = filesStorage.getPreview(for: previewDTO.id)
@@ -403,15 +450,15 @@ private extension ChatFileService {
                     needUpdatePreview: true,
                     cached: nil,
                     downloading: nil,
-                    uploading: nil
+                    uploading: nil,
+                    progress: nil
                 ))
             } else if !filesStorage.isCachedInMemory(previewDTO.id) {
                 cacheFileToMemoryIfNeeded(file: file, chatroom: chatroom)
             }
         }
         
-        if shouldDownloadOriginalFile,
-           !filesStorage.isCachedLocally(file.file.id) {
+        if downloadFile {
             try await downloadAndCacheFile(
                 id: file.file.id,
                 nonce: file.nonce,
@@ -423,7 +470,15 @@ private extension ChatFileService {
                 saveEncrypted: saveEncrypted,
                 fileType: file.fileType,
                 fileExtension: file.file.type ?? .empty,
-                isPreview: false
+                isPreview: false,
+                downloadProgress: { [weak self] value in
+                    fileProgress.completedUnitCount = Int64(value.fractionCompleted * Double(fileWeight))
+                    
+                    self?.sendProgress(
+                        for: file.file.id, 
+                        progress: Int(totalProgress.fractionCompleted * 100)
+                    )
+                }
             )
             
             let cached = filesStorage.isCachedLocally(file.file.id)
@@ -436,7 +491,8 @@ private extension ChatFileService {
                 needUpdatePreview: false,
                 cached: cached,
                 downloading: nil,
-                uploading: nil
+                uploading: nil,
+                progress: nil
             ))
         }
     }
@@ -452,7 +508,8 @@ private extension ChatFileService {
         saveEncrypted: Bool,
         fileType: FileType,
         fileExtension: String,
-        isPreview: Bool
+        isPreview: Bool,
+        downloadProgress: @escaping ((Progress) -> Void)
     ) async throws {
         let result = try await downloadFile(
             id: id,
@@ -460,7 +517,8 @@ private extension ChatFileService {
             senderPublicKey: publicKey,
             recipientPrivateKey: privateKey,
             nonce: nonce,
-            saveEncrypted: saveEncrypted
+            saveEncrypted: saveEncrypted,
+            downloadProgress: downloadProgress
         )
         
         try filesStorage.cacheFile(
@@ -539,9 +597,14 @@ private extension ChatFileService {
         senderPublicKey: String,
         recipientPrivateKey: String,
         nonce: String,
-        saveEncrypted: Bool
+        saveEncrypted: Bool,
+        downloadProgress: @escaping ((Progress) -> Void)
     ) async throws -> (decodedData: Data, encodedData: Data) {
-        let encodedData = try await filesNetworkManager.downloadFile(id, type: storage)
+        let encodedData = try await filesNetworkManager.downloadFile(
+            id,
+            type: storage,
+            downloadProgress: downloadProgress
+        )
         
         guard let decodedData = adamantCore.decodeData(
             encodedData,
@@ -557,7 +620,12 @@ private extension ChatFileService {
 }
 
 private extension ChatFileService {
-    func sendUpdate(for files: [String], downloading: Bool?, uploading: Bool?) {
+    func sendUpdate(
+        for files: [String],
+        downloading: Bool?,
+        uploading: Bool?,
+        progress: Int? = nil
+    ) {
         files.forEach { id in
             updateFileFields.send((
                 id: id,
@@ -567,9 +635,24 @@ private extension ChatFileService {
                 needUpdatePreview: false,
                 cached: nil,
                 downloading: downloading,
-                uploading: uploading
+                uploading: uploading,
+                progress: progress
             ))
         }
+    }
+    
+    func sendProgress(for fileId: String, progress: Int) {
+        updateFileFields.send((
+            id: fileId,
+            newId: nil,
+            fileNonce: nil,
+            preview: nil,
+            needUpdatePreview: false,
+            cached: nil,
+            downloading: nil,
+            uploading: nil,
+            progress: progress
+        ))
     }
 }
 
@@ -736,6 +819,12 @@ private extension ChatFileService {
            let txContext = fileMessage.context {
             tx = transaction
             context = txContext
+            
+            try? await chatsProvider.setTxMessageStatus(
+                transactionLocaly: tx,
+                context: context,
+                status: .pending
+            )
         } else {
             let txLocally = try await chatsProvider.sendFileMessageLocally(
                 messageLocally,
@@ -778,11 +867,19 @@ private extension ChatFileService {
         for i in files.indices where !files[i].isUploaded {
             let file = files[i].file
             
+            let uploadProgress: ((Int) -> Void) = { [weak self, file] value in
+                self?.sendProgress(
+                    for: file.url.absoluteString,
+                    progress: value
+                )
+            }
+            
             let result = try await uploadFileToServer(
                 file: file,
                 recipientPublicKey: chatroom?.partner?.publicKey ?? .empty,
                 senderPrivateKey: keyPair.privateKey,
-                storageProtocol: storageProtocol
+                storageProtocol: storageProtocol, 
+                progress: uploadProgress
             )
             
             try cacheUploadedFile(
@@ -855,6 +952,8 @@ private extension ChatFileService {
     ) {
         let cached = filesStorage.isCachedLocally(fileResult.cid)
         
+        $uploadingFilesIDsArray.mutate { $0.removeAll { $0 == oldId } }
+        
         updateFileFields.send((
             id: oldId,
             newId: fileResult.cid,
@@ -863,7 +962,8 @@ private extension ChatFileService {
             needUpdatePreview: true,
             cached: cached,
             downloading: nil,
-            uploading: false
+            uploading: false,
+            progress: nil
         ))
         
         var previewDTO: RichMessageFile.Preview?
@@ -903,9 +1003,10 @@ private extension ChatFileService {
     ) async {
         updateUploadingFilesIDs(with: richFiles.map { $0.id }, uploading: false)
         
-        try? await chatsProvider.setTxMessageAsFailed(
+        try? await chatsProvider.setTxMessageStatus(
             transactionLocaly: tx,
-            context: context
+            context: context,
+            status: .failed
         )
     }
     
@@ -913,13 +1014,33 @@ private extension ChatFileService {
         file: FileResult,
         recipientPublicKey: String,
         senderPrivateKey: String,
-        storageProtocol: NetworkFileProtocolType
+        storageProtocol: NetworkFileProtocolType,
+        progress: @escaping ((Int) -> Void)
     ) async throws -> (file: UploadResult, preview: UploadResult?) {
+        let totalProgress = Progress(totalUnitCount: 100)
+        var previewWeight: Int64 = .zero
+        var fileWeight: Int64 = 100
+        
+        if file.previewUrl != nil {
+            previewWeight = 10
+            fileWeight = 90
+        }
+        
+        let previewProgress = Progress(totalUnitCount: previewWeight)
+        totalProgress.addChild(previewProgress, withPendingUnitCount: previewWeight)
+        
+        let fileProgress = Progress(totalUnitCount: fileWeight)
+        totalProgress.addChild(fileProgress, withPendingUnitCount: fileWeight)
+        
         let result = try await uploadFile(
             url: file.url,
             recipientPublicKey: recipientPublicKey,
             senderPrivateKey: senderPrivateKey,
-            storageProtocol: storageProtocol
+            storageProtocol: storageProtocol,
+            uploadProgress: { value in
+                fileProgress.completedUnitCount = Int64(value.fractionCompleted * Double(fileWeight))
+                progress(Int(totalProgress.fractionCompleted * 100))
+            }
         )
         
         var preview: UploadResult?
@@ -929,7 +1050,11 @@ private extension ChatFileService {
                 url: url,
                 recipientPublicKey: recipientPublicKey,
                 senderPrivateKey: senderPrivateKey,
-                storageProtocol: storageProtocol
+                storageProtocol: storageProtocol,
+                uploadProgress: { value in
+                    previewProgress.completedUnitCount = Int64(value.fractionCompleted * Double(previewWeight))
+                    progress(Int(totalProgress.fractionCompleted * 100))
+                }
             )
         }
         
@@ -940,7 +1065,8 @@ private extension ChatFileService {
         url: URL,
         recipientPublicKey: String,
         senderPrivateKey: String,
-        storageProtocol: NetworkFileProtocolType
+        storageProtocol: NetworkFileProtocolType,
+        uploadProgress: @escaping ((Progress) -> Void)
     ) async throws -> UploadResult {
         defer {
             url.stopAccessingSecurityScopedResource()
@@ -961,7 +1087,11 @@ private extension ChatFileService {
             throw FileManagerError.cantEncryptFile
         }
         
-        let cid = try await filesNetworkManager.uploadFiles(encodedData, type: storageProtocol)
+        let cid = try await filesNetworkManager.uploadFiles(
+            encodedData,
+            type: storageProtocol,
+            uploadProgress: uploadProgress
+        )
         return (data, encodedData, nonce, cid)
     }
 }

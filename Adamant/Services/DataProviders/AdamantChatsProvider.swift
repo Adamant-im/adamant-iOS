@@ -953,11 +953,12 @@ extension AdamantChatsProvider {
         return transaction
     }
     
-    func setTxMessageAsFailed(
+    func setTxMessageStatus(
         transactionLocaly: RichMessageTransaction,
-        context: NSManagedObjectContext
+        context: NSManagedObjectContext,
+        status: MessageStatus
     ) throws {
-        transactionLocaly.statusEnum = .failed
+        transactionLocaly.statusEnum = status
         try context.save()
     }
     

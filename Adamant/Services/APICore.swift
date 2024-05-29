@@ -28,7 +28,8 @@ actor APICore: APICoreProtocol {
     func sendRequestMultipartFormData(
         node: Node,
         path: String,
-        models: [MultipartFormDataModel]
+        models: [MultipartFormDataModel],
+        uploadProgress: @escaping ((Progress) -> Void)
     ) async -> APIResponseModel {
         do {
             let request = AF.upload(multipartFormData: { multipartFormData in
@@ -40,6 +41,7 @@ actor APICore: APICoreProtocol {
                     )
                 }
             }, to: try buildUrl(node: node, path: path))
+                .uploadProgress(queue: .global(), closure: uploadProgress)
             
             return await sendRequest(request: request)
         } catch {
@@ -56,7 +58,8 @@ actor APICore: APICoreProtocol {
         path: String,
         method: HTTPMethod,
         parameters: Parameters,
-        encoding: APIParametersEncoding
+        encoding: APIParametersEncoding,
+        downloadProgress: @escaping ((Progress) -> Void)
     ) async -> APIResponseModel {
         do {
             let request = session.request(
@@ -65,7 +68,7 @@ actor APICore: APICoreProtocol {
                 parameters: parameters.asDictionary(),
                 encoding: encoding.parametersEncoding,
                 headers: HTTPHeaders(["Content-Type": "application/json"])
-            )
+            ).downloadProgress(closure: downloadProgress)
             
             return await sendRequest(request: request)
         } catch {

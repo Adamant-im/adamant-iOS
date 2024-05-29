@@ -46,7 +46,9 @@ public final class FilesStorageKit: FilesStorageProtocol {
     }
     
     public func isCachedInMemory(_ id: String) -> Bool {
-        cachedImages.object(forKey: id as NSString) != nil
+        guard !id.isEmpty else { return false }
+        
+        return cachedImages.object(forKey: id as NSString) != nil
     }
     
     public func isCachedLocally(_ id: String) -> Bool {

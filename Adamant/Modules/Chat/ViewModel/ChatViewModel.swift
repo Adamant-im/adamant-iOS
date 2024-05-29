@@ -728,7 +728,7 @@ final class ChatViewModel: NSObject {
         return true
     }
     
-    func openFile(messageId: String, file: ChatFile, isFromCurrentSender: Bool) {
+    func openFile(messageId: String, file: ChatFile) {
         let tx = chatTransactions.first(where: { $0.txId == messageId })
         let message = messages.first(where: { $0.messageId == messageId })
         
@@ -754,17 +754,7 @@ final class ChatViewModel: NSObject {
         
         guard tx?.statusEnum == .delivered else { return }
         
-        Task { [weak self] in
-            do {
-                try await self?.chatFileService.downloadFile(
-                    file: file,
-                    chatroom: self?.chatroom,
-                    saveEncrypted: self?.filesStorageProprieties.saveFileEncrypted() ?? true
-                )
-            } catch {
-                self?.dialog.send(.alert(error.localizedDescription))
-            }
-        }
+        downloadFile(file: file)
     }
     
     func downloadPreviewIfNeeded(
@@ -773,7 +763,7 @@ final class ChatViewModel: NSObject {
     ) {
         let tx = chatTransactions.first(where: { $0.txId == messageId })
         
-        guard tx?.statusEnum == .delivered,
+        guard tx?.statusEnum == .delivered || tx?.statusEnum == nil,
               (filesStorageProprieties.autoDownloadPreviewPolicy() != .nobody ||
                 filesStorageProprieties.autoDownloadFullMediaPolicy() != .nobody)
         else { return }
@@ -792,6 +782,33 @@ final class ChatViewModel: NSObject {
                     fullMediaDownloadPolicy: filesStorageProprieties.autoDownloadFullMediaPolicy(),
                     saveEncrypted: filesStorageProprieties.saveFileEncrypted()
                 )
+            }
+        }
+    }
+    
+    func forceDownloadAllFiles(messageId: String, files: [ChatFile]) {
+        let needToDownload = files.filter {
+            !$0.isCached ||
+            ($0.isCached
+             && ($0.fileType == .image || $0.fileType == .video)
+             && $0.previewImage == nil)
+        }
+        
+        needToDownload.forEach { file in
+            downloadFile(file: file)
+        }
+    }
+    
+    func downloadFile(file: ChatFile) {
+        Task { [weak self] in
+            do {
+                try await self?.chatFileService.downloadFile(
+                    file: file,
+                    chatroom: self?.chatroom,
+                    saveEncrypted: self?.filesStorageProprieties.saveFileEncrypted() ?? true
+                )
+            } catch {
+                self?.dialog.send(.alert(error.localizedDescription))
             }
         }
     }
@@ -950,7 +967,8 @@ private extension ChatViewModel {
                     needToUpdatePreview: data.needUpdatePreview,
                     cached: data.cached,
                     isUploading: data.uploading,
-                    isDownloading: data.downloading
+                    isDownloading: data.downloading,
+                    progress: data.progress
                 )
             }
             .store(in: &subscriptions)
@@ -1078,7 +1096,8 @@ private extension ChatViewModel {
                 isNeedToLoadMoreMessages: isNeedToLoadMoreMessages,
                 expirationTimestamp: &expirationTimestamp,
                 uploadingFilesIDs: chatFileService.uploadingFiles,
-                downloadingFilesIDs: chatFileService.downloadingFiles
+                downloadingFilesIDs: chatFileService.downloadingFiles,
+                havePartnerName: havePartnerName
             )
             
             await setupNewMessages(
@@ -1297,7 +1316,8 @@ private extension ChatViewModel {
         needToUpdatePreview: Bool,
         cached: Bool? = nil,
         isUploading: Bool? = nil,
-        isDownloading: Bool? = nil
+        isDownloading: Bool? = nil,
+        progress: Int? = nil
     ) {
         let indexes = messages.indices.filter {
             messages[$0].getFiles().contains { $0.file.id == oldId }
@@ -1316,7 +1336,8 @@ private extension ChatViewModel {
                 needToUpdatePeview: needToUpdatePreview,
                 cached: cached,
                 isUploading: isUploading,
-                isDownloading: isDownloading
+                isDownloading: isDownloading,
+                progress: progress
             )
         }
     }
@@ -1417,7 +1438,8 @@ private extension ChatMessage {
         needToUpdatePeview: Bool,
         cached: Bool? = nil,
         isUploading: Bool? = nil,
-        isDownloading: Bool? = nil
+        isDownloading: Bool? = nil,
+        progress: Int? = nil
     ) {
         guard case let .file(fileModel) = content else { return }
         var model = fileModel.value
@@ -1443,6 +1465,9 @@ private extension ChatMessage {
         }
         if needToUpdatePeview {
             model.content.fileModel.files[index].previewImage = preview
+        }
+        if let progress = progress {
+            model.content.fileModel.files[index].progress = progress
         }
 
         guard model != fileModel.value else {
