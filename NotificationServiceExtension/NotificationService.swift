@@ -121,10 +121,12 @@ class NotificationService: UNNotificationServiceExtension {
         // MARK: Messages
         case .chatMessage:
             guard let chat = transaction.asset.chat,
-                let message = core.decodeMessage(rawMessage: chat.message,
-                                                 rawNonce: chat.ownMessage,
-                                                 senderPublicKey: partnerPublicKey,
-                                                 privateKey: keypair.privateKey) else {
+                  let message = core.decodeMessage(
+                    rawMessage: chat.message,
+                    rawNonce: chat.ownMessage,
+                    senderPublicKey: partnerPublicKey,
+                    privateKey: keypair.privateKey
+                  ) else {
                 break
             }
             
