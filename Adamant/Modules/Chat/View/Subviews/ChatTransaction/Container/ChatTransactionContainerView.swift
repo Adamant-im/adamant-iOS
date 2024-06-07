@@ -205,10 +205,7 @@ private extension ChatTransactionContainerView {
     
     func updateOwnReaction() {
         ownReactionLabel.text = getReaction(for: model.address)
-        ownReactionLabel.backgroundColor = model.content.backgroundColor.uiColor.mixin(
-            infusion: .lightGray,
-            alpha: 0.15
-        )
+        ownReactionLabel.backgroundColor = .adamant.pickedReactionBackground
     }
     
     func updateOpponentReaction() {
@@ -239,10 +236,7 @@ private extension ChatTransactionContainerView {
         }
         
         opponentReactionLabel.attributedText = fullString
-        opponentReactionLabel.backgroundColor = model.content.backgroundColor.uiColor.mixin(
-            infusion: .lightGray,
-            alpha: 0.15
-        )
+        opponentReactionLabel.backgroundColor = .adamant.pickedReactionBackground
     }
     
     func getSenderPublicKeyInReaction(for senderAddress: String) -> String? {
