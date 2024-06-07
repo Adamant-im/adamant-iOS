@@ -12,25 +12,25 @@ struct PartnerQRView: View {
     @ObservedObject var viewModel: PartnerQRViewModel
     
     var body: some View {
-        Form {
-            infoSection()
-            toggleSection() 
-            buttonSection()
-        }
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                toolbar()
+        GeometryReader { geometry in
+            Form {
+                infoSection()
+                toggleSection()
+                buttonSection()
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    toolbar(maxWidth: geometry.size.width)
+                }
             }
         }
     }
 }
 
 private extension PartnerQRView {
-    func toolbar() -> some View {
-        Button(action: {
-            viewModel.renameContact()
-        }) {
+    func toolbar(maxWidth: CGFloat) -> some View {
+        Button(action: viewModel.renameContact) {
             HStack {
                 if let uiImage = viewModel.partnerImage {
                     Image(uiImage: uiImage)
@@ -42,9 +42,8 @@ private extension PartnerQRView {
                     .minimumScaleFactor(0.7)
                     .lineLimit(1)
             }
-            .frame(maxWidth: UIScreen.main.bounds.width - 150)
+            .frame(maxWidth: maxWidth - toolbarSpace, alignment: .center)
         }
-        .frame(maxWidth: UIScreen.main.bounds.width - 150)
     }
     
     func infoSection() -> some View {
@@ -106,3 +105,5 @@ private extension PartnerQRView {
         }
     }
 }
+
+private let toolbarSpace: CGFloat = 150
