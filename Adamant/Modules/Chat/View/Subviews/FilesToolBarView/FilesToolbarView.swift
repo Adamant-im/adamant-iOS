@@ -102,11 +102,13 @@ extension FilesToolbarView {
     func update(_ data: [FileResult]) {
         self.data = data
         collectionView.reloadData()
-        collectionView.scrollToItem(
-            at: .init(row: data.count - 1, section: .zero),
-            at: .right,
-            animated: true
-        )
+        Task {
+            collectionView.scrollToItem(
+                at: .init(row: data.count - 1, section: .zero),
+                at: .right,
+                animated: true
+            )
+        }
     }
 }
 
