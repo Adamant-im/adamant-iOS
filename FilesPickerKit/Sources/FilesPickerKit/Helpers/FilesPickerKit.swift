@@ -96,11 +96,12 @@ public final class FilesPickerKit: FilesPickerProtocol {
     }
     
     public func getFileResult(for image: UIImage) throws -> FileResult {
-        let fileName = "image.\(previewExtension)"
+        let fileName = "image\(String.random(length: 4)).\(previewExtension)"
         let newUrl = try storageKit.getTempUrl(for: image, name: fileName)
         let preview = getPreview(for: newUrl)
         let fileSize = try storageKit.getFileSize(from: newUrl)
         return FileResult(
+            assetId: newUrl.absoluteString,
             url: newUrl,
             type: .other,
             preview: preview.image,
