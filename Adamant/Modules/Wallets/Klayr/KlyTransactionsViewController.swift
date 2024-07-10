@@ -1,9 +1,9 @@
 //
-//  LskTransactionsViewController
+//  KlyTransactionsViewController.swift
 //  Adamant
 //
-//  Created by Anton Boyarkin on 17/07/2018.
-//  Copyright © 2018 Adamant. All rights reserved.
+//  Created by Stanislav Jelezoglo on 09.07.2024.
+//  Copyright © 2024 Adamant. All rights reserved.
 //
 
 import UIKit
@@ -13,11 +13,11 @@ import BigInt
 import CommonKit
 import Combine
 
-final class LskTransactionsViewController: TransactionsListViewControllerBase {
-    
-    // MARK: - UITableView
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+final class KlyTransactionsViewController: TransactionsListViewControllerBase {
+    func tableView(
+        _ tableView: UITableView,
+        didSelectRowAt indexPath: IndexPath
+    ) {
         tableView.deselectRow(at: indexPath, animated: true)
         guard let address = walletService.core.wallet?.address,
               let transaction = transactions[safe: indexPath.row]
@@ -44,7 +44,7 @@ extension Transactions.TransactionModel: TransactionDetails {
         return self.nonce
     }
     
-    var defaultCurrencySymbol: String? { LskWalletService.currencySymbol }
+    var defaultCurrencySymbol: String? { KlyWalletService.currencySymbol }
     
     var txId: String {
         return id
@@ -57,18 +57,21 @@ extension Transactions.TransactionModel: TransactionDetails {
     var amountValue: Decimal? {
         let value = BigUInt(self.amount) ?? BigUInt(0)
         
-        return value.asDecimal(exponent: LskWalletService.currencyExponent)
+        return value.asDecimal(exponent: KlyWalletService.currencyExponent)
     }
     
     var feeValue: Decimal? {
         let value = BigUInt(self.fee) ?? BigUInt(0)
         
-        return value.asDecimal(exponent: LskWalletService.currencyExponent)
+        return value.asDecimal(exponent: KlyWalletService.currencyExponent)
     }
     
     var confirmationsValue: String? {
-        guard let confirmations = confirmations, let height = height else { return "0" }
-        if confirmations < height { return "0" }
+        guard let confirmations = confirmations,
+              let height = height,
+              confirmations >= height
+        else { return "0" }
+        
         if confirmations > 0 {
             return "\(confirmations - height + 1)"
         }
@@ -91,6 +94,10 @@ extension Transactions.TransactionModel: TransactionDetails {
         else { return .notInitiated }
         
         if confirmations < height { return .registered }
+        
+        guard executionStatus != .failed else {
+            return .failed
+        }
         
         if confirmations > 0 && height > 0 {
             let conf = (confirmations - height) + 1
@@ -118,7 +125,7 @@ extension Transactions.TransactionModel: TransactionDetails {
 
 extension LocalTransaction: TransactionDetails {
 
-    var defaultCurrencySymbol: String? { LskWalletService.currencySymbol }
+    var defaultCurrencySymbol: String? { KlyWalletService.currencySymbol }
     
     var txId: String {
         return id ?? ""
@@ -139,13 +146,13 @@ extension LocalTransaction: TransactionDetails {
     var amountValue: Decimal? {
         let value = BigUInt(self.amount)
         
-        return value.asDecimal(exponent: LskWalletService.currencyExponent)
+        return value.asDecimal(exponent: KlyWalletService.currencyExponent)
     }
     
     var feeValue: Decimal? {
         let value = BigUInt(self.fee)
         
-        return value.asDecimal(exponent: LskWalletService.currencyExponent)
+        return value.asDecimal(exponent: KlyWalletService.currencyExponent)
     }
     
     var confirmationsValue: String? {
@@ -175,7 +182,7 @@ extension LocalTransaction: TransactionDetails {
 
 extension TransactionEntity: TransactionDetails {
     
-    var defaultCurrencySymbol: String? { LskWalletService.currencySymbol }
+    var defaultCurrencySymbol: String? { KlyWalletService.currencySymbol }
     
     var txId: String {
         return id
@@ -192,13 +199,13 @@ extension TransactionEntity: TransactionDetails {
     var amountValue: Decimal? {
         let value = BigUInt(self.params.amount)
         
-        return value.asDecimal(exponent: LskWalletService.currencyExponent)
+        return value.asDecimal(exponent: KlyWalletService.currencyExponent)
     }
     
     var feeValue: Decimal? {
         let value = BigUInt(self.fee)
         
-        return value.asDecimal(exponent: LskWalletService.currencyExponent)
+        return value.asDecimal(exponent: KlyWalletService.currencyExponent)
     }
     
     var confirmationsValue: String? {

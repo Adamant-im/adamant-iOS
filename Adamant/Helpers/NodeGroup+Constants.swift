@@ -17,10 +17,10 @@ public extension NodeGroup {
             return BtcWalletService.healthCheckParameters.onScreenUpdateInterval
         case .eth:
             return EthWalletService.healthCheckParameters.onScreenUpdateInterval
-        case .lskNode:
-            return LskWalletService.healthCheckParameters.onScreenUpdateInterval
-        case .lskService:
-            return LskWalletService.healthCheckParameters.onScreenServiceUpdateInterval
+        case .klyNode:
+            return KlyWalletService.healthCheckParameters.onScreenUpdateInterval
+        case .klyService:
+            return KlyWalletService.healthCheckParameters.onScreenServiceUpdateInterval
         case .doge:
             return DogeWalletService.healthCheckParameters.onScreenUpdateInterval
         case .dash:
@@ -36,10 +36,10 @@ public extension NodeGroup {
             return BtcWalletService.healthCheckParameters.crucialUpdateInterval
         case .eth:
             return EthWalletService.healthCheckParameters.crucialUpdateInterval
-        case .lskNode:
-            return LskWalletService.healthCheckParameters.crucialUpdateInterval
-        case .lskService:
-            return LskWalletService.healthCheckParameters.crucialServiceUpdateInterval
+        case .klyNode:
+            return KlyWalletService.healthCheckParameters.crucialUpdateInterval
+        case .klyService:
+            return KlyWalletService.healthCheckParameters.crucialServiceUpdateInterval
         case .doge:
             return DogeWalletService.healthCheckParameters.crucialUpdateInterval
         case .dash:
@@ -55,10 +55,10 @@ public extension NodeGroup {
             return BtcWalletService.healthCheckParameters.threshold
         case .eth:
             return EthWalletService.healthCheckParameters.threshold
-        case .lskNode:
-            return LskWalletService.healthCheckParameters.threshold
-        case .lskService:
-            return LskWalletService.healthCheckParameters.threshold
+        case .klyNode:
+            return KlyWalletService.healthCheckParameters.threshold
+        case .klyService:
+            return KlyWalletService.healthCheckParameters.threshold
         case .doge:
             return DogeWalletService.healthCheckParameters.threshold
         case .dash:
@@ -74,10 +74,10 @@ public extension NodeGroup {
             return BtcWalletService.healthCheckParameters.normalUpdateInterval
         case .eth:
             return EthWalletService.healthCheckParameters.normalUpdateInterval
-        case .lskNode:
-            return LskWalletService.healthCheckParameters.normalUpdateInterval
-        case .lskService:
-            return LskWalletService.healthCheckParameters.normalServiceUpdateInterval
+        case .klyNode:
+            return KlyWalletService.healthCheckParameters.normalUpdateInterval
+        case .klyService:
+            return KlyWalletService.healthCheckParameters.normalServiceUpdateInterval
         case .doge:
             return DogeWalletService.healthCheckParameters.normalUpdateInterval
         case .dash:
@@ -94,10 +94,10 @@ public extension NodeGroup {
             minNodeVersion = BtcWalletService.minNodeVersion
         case .eth:
             minNodeVersion = EthWalletService.minNodeVersion
-        case .lskNode:
-            minNodeVersion = LskWalletService.minNodeVersion
-        case .lskService:
-            minNodeVersion = LskWalletService.minNodeVersion
+        case .klyNode:
+            minNodeVersion = KlyWalletService.minNodeVersion
+        case .klyService:
+            minNodeVersion = KlyWalletService.minNodeVersion
         case .doge:
             minNodeVersion = DogeWalletService.minNodeVersion
         case .dash:

@@ -54,6 +54,8 @@ extension Transactions {
         public var isOutgoing: Bool = false
         
         public var nonce: String
+        
+        public var executionStatus: ExecutionStatus
 
         // MARK: - Hashable
 

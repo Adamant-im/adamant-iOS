@@ -67,6 +67,9 @@ extension String.adamant {
         static var useMaxToTransfer: String {
             String.localized("TransferScene.UseMaxToTransfer", comment: "Tranfser: Confirm using maximum available for transfer tokens as amount to transfer.")
         }
+        static var unknownToken: String {
+            String.localized("Transaction.UnknownTokenTitle", comment: "Transaction: Unknown token")
+        }
     }
 }
 

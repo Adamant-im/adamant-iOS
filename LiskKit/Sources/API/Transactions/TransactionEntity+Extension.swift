@@ -88,7 +88,7 @@ private extension TransactionEntity {
             return ""
         }
         
-        let tagBytes: [UInt8] = Array("LSK_TX_".utf8)
+        let tagBytes: [UInt8] = Array("KLY_TX_".utf8)
         let chainBytes: [UInt8] = chainID.allHexBytes()
         let allBytes = tagBytes
         + chainBytes

@@ -1,9 +1,9 @@
 //
-//  LskTransferViewController.swift
+//  KlyTransferViewController.swift
 //  Adamant
 //
-//  Created by Anton Boyarkin on 27/11/2018.
-//  Copyright © 2018 Adamant. All rights reserved.
+//  Created by Stanislav Jelezoglo on 09.07.2024.
+//  Copyright © 2024 Adamant. All rights reserved.
 //
 
 import UIKit
@@ -12,11 +12,11 @@ import LiskKit
 import CommonKit
 
 @MainActor
-final class LskTransferViewController: TransferViewControllerBase {
+final class KlyTransferViewController: TransferViewControllerBase {
     
     // MARK: Properties
     
-    private let prefix = "lsk"
+    private let prefix = "kly"
     
     override func checkForAdditionalFee() {
         Task {
@@ -49,7 +49,7 @@ final class LskTransferViewController: TransferViewControllerBase {
             comments = ""
         }
         
-        guard let service = walletCore as? LskWalletService,
+        guard let service = walletCore as? KlyWalletService,
               let recipient = recipientAddress,
               let amount = amount
         else {
@@ -94,9 +94,7 @@ final class LskTransferViewController: TransferViewControllerBase {
                     throw error
                 }
                 
-                Task {
-                    await service.update()
-                }
+                service.update()
                 
                 dialogService.dismissProgress()
                 dialogService.showSuccess(withMessage: String.adamant.transfer.transferSuccess)
@@ -221,6 +219,6 @@ final class LskTransferViewController: TransferViewControllerBase {
     }
     
     override func defaultSceneTitle() -> String? {
-        return String.adamant.sendLsk
+        return String.adamant.sendKly
     }
 }

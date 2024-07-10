@@ -181,8 +181,8 @@
 /* Account tab: 'Send ETH tokens' button */
 "AccountTab.Row.SendEth" = "发送ETH";
 
-/* Account tab: 'Send LSK tokens' button */
-"AccountTab.Row.SendLsk" = "发送LSK";
+/* Account tab: 'Send KLY tokens' button */
+"AccountTab.Row.SendKly" = "发送KLY";
 
 /* Account tab: 'Send BTC tokens' button */
 "AccountTab.Row.SendBtc" = "发送BTC";
@@ -238,8 +238,8 @@
 /* Account tab: Ethereum wallet */
 "AccountTab.Wallets.ethereum_wallet" = "以太坊钱包";
 
-/* Account tab: Lisk wallet */
-"AccountTab.Wallets.lisk_wallet" = "Lisk钱包";
+/* Account tab: Klayr wallet */
+"AccountTab.Wallets.kly_wallet" = "Klayr钱包";
 
 /* Account tab: Bitcoin wallet */
 "AccountTab.Wallets.bitcoin_wallet" = "比特币钱包";
@@ -1209,3 +1209,6 @@
 
 /* Include partner url */
 "PartnerQR.includePartnerURL" = "包括Web应用程序链接";
+
+/* Transaction: Unknown token */
+"Transaction.UnknownTokenTitle" = "未知";
