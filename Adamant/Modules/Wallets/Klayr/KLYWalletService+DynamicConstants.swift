@@ -84,7 +84,6 @@ Node(url: URL(string: "https://klynode2.adamant.im")!, altUrl: URL(string: "http
         [
             Node(url: URL(string: "https://klyservice1.adamant.im")!),
 Node(url: URL(string: "https://klyservice2.adamant.im")!),
-Node(url: URL(string: "https://service.klayr.xyz")!),
         ]
     }
 }

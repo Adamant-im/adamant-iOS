@@ -12,7 +12,6 @@
 		26A975FF2B7E843E0095C367 /* SelectTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A975FE2B7E843E0095C367 /* SelectTextView.swift */; };
 		26A976012B7E852E0095C367 /* ChatSelectTextViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A976002B7E852E0095C367 /* ChatSelectTextViewFactory.swift */; };
 		3A20D93B2AE7F316005475A6 /* AdamantTransactionDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A20D93A2AE7F316005475A6 /* AdamantTransactionDetails.swift */; };
-		3A26D9332C3C1B90003AD832 /* KlyWalletService+DynamicConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A26D9322C3C1B90003AD832 /* KlyWalletService+DynamicConstants.swift */; };
 		3A26D9352C3C1BE2003AD832 /* KlyWalletService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A26D9342C3C1BE2003AD832 /* KlyWalletService.swift */; };
 		3A26D9372C3C1C01003AD832 /* KlyWallet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A26D9362C3C1C01003AD832 /* KlyWallet.swift */; };
 		3A26D9392C3C1C62003AD832 /* KlyWalletFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A26D9382C3C1C62003AD832 /* KlyWalletFactory.swift */; };
@@ -45,6 +44,7 @@
 		3A9015A52A614A18002A2464 /* EmojiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A9015A42A614A18002A2464 /* EmojiService.swift */; };
 		3A9015A72A614A62002A2464 /* AdamantEmojiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A9015A62A614A62002A2464 /* AdamantEmojiService.swift */; };
 		3A9015A92A615893002A2464 /* ChatMessagesListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A9015A82A615893002A2464 /* ChatMessagesListViewModel.swift */; };
+		3A9365A92C41332F0073D9A7 /* KLYWalletService+DynamicConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A9365A82C41332F0073D9A7 /* KLYWalletService+DynamicConstants.swift */; };
 		3A96E37A2AED27D7001F5A52 /* AdamantPartnerQRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A96E3792AED27D7001F5A52 /* AdamantPartnerQRService.swift */; };
 		3A96E37C2AED27F8001F5A52 /* PartnerQRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A96E37B2AED27F8001F5A52 /* PartnerQRService.swift */; };
 		3AA2D5F7280EADE3000ED971 /* SocketService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA2D5F6280EADE3000ED971 /* SocketService.swift */; };
@@ -663,7 +663,6 @@
 		33975C0D891698AA7E74EBCC /* Pods_Adamant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Adamant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		36AB8CE9537B3B873972548B /* Pods_AdmCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AdmCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3A20D93A2AE7F316005475A6 /* AdamantTransactionDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantTransactionDetails.swift; sourceTree = "<group>"; };
-		3A26D9322C3C1B90003AD832 /* KlyWalletService+DynamicConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KlyWalletService+DynamicConstants.swift"; sourceTree = "<group>"; };
 		3A26D9342C3C1BE2003AD832 /* KlyWalletService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KlyWalletService.swift; sourceTree = "<group>"; };
 		3A26D9362C3C1C01003AD832 /* KlyWallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KlyWallet.swift; sourceTree = "<group>"; };
 		3A26D9382C3C1C62003AD832 /* KlyWalletFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KlyWalletFactory.swift; sourceTree = "<group>"; };
@@ -695,6 +694,7 @@
 		3A9015A42A614A18002A2464 /* EmojiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiService.swift; sourceTree = "<group>"; };
 		3A9015A62A614A62002A2464 /* AdamantEmojiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantEmojiService.swift; sourceTree = "<group>"; };
 		3A9015A82A615893002A2464 /* ChatMessagesListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesListViewModel.swift; sourceTree = "<group>"; };
+		3A9365A82C41332F0073D9A7 /* KLYWalletService+DynamicConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "KLYWalletService+DynamicConstants.swift"; sourceTree = "<group>"; };
 		3A96E3792AED27D7001F5A52 /* AdamantPartnerQRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantPartnerQRService.swift; sourceTree = "<group>"; };
 		3A96E37B2AED27F8001F5A52 /* PartnerQRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnerQRService.swift; sourceTree = "<group>"; };
 		3AA2D5F6280EADE3000ED971 /* SocketService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocketService.swift; sourceTree = "<group>"; };
@@ -1329,6 +1329,7 @@
 				3A26D94E2C3D3983003AD832 /* WalletService */,
 				3A26D9362C3C1C01003AD832 /* KlyWallet.swift */,
 				3A26D9382C3C1C62003AD832 /* KlyWalletFactory.swift */,
+				3A9365A82C41332F0073D9A7 /* KLYWalletService+DynamicConstants.swift */,
 				3A26D93A2C3C1C97003AD832 /* KlyApiCore.swift */,
 				3A26D93C2C3C1CC3003AD832 /* KlyNodeApiService.swift */,
 				3A26D93E2C3C1CED003AD832 /* KlyServiceApiService.swift */,
@@ -1345,7 +1346,6 @@
 			children = (
 				3A26D9342C3C1BE2003AD832 /* KlyWalletService.swift */,
 				3A26D94F2C3D3A5A003AD832 /* KlyWalletService+WalletCore.swift */,
-				3A26D9322C3C1B90003AD832 /* KlyWalletService+DynamicConstants.swift */,
 				3A26D9402C3C2DC4003AD832 /* KlyWalletService+Send.swift */,
 				3A26D9422C3C2E19003AD832 /* KlyWalletService+StatusCheck.swift */,
 				3A26D9442C3D336A003AD832 /* KlyWalletService+RichMessageProvider.swift */,
@@ -3093,7 +3093,6 @@
 				93C794442B07725C00408826 /* DashGetAddressBalanceDTO.swift in Sources */,
 				6449BA69235CA0930033B936 /* ERC20TransferViewController.swift in Sources */,
 				93684A2A29EFA28A00F9EFFE /* FixedTextMessageSizeCalculator.swift in Sources */,
-				3A26D9332C3C1B90003AD832 /* KlyWalletService+DynamicConstants.swift in Sources */,
 				E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */,
 				41E3C9CC2A0E20F500AF0985 /* AdamantCoinTools.swift in Sources */,
 				93ADE0712ACA66AF008ED641 /* VibrationSelectionViewModel.swift in Sources */,
@@ -3219,6 +3218,7 @@
 				93E5D4DB293000BE00439298 /* UnregisteredTransaction.swift in Sources */,
 				411DB8332A14D01F006AB158 /* ChatKeyboardManager.swift in Sources */,
 				6449BA68235CA0930033B936 /* ERC20WalletService.swift in Sources */,
+				3A9365A92C41332F0073D9A7 /* KLYWalletService+DynamicConstants.swift in Sources */,
 				93B28ECA2B076E88007F268B /* DashErrorDTO.swift in Sources */,
 				644793C32166314A00FC4CF5 /* OnboardPage.swift in Sources */,
 				9345769528FD0C34004E6C7A /* UIViewController+email.swift in Sources */,
