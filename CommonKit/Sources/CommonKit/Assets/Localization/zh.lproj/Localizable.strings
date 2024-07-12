@@ -1096,6 +1096,9 @@
 /* Transfer: comment for transfer in chat */
 "TransferScene.Row.Comments" = "评论";
 
+/* Transfer: Blockchain comment for transfer in chat */
+"TransferScene.Row.Blockchain.Comments" = "区块链 %@ 中的公开信息";
+
 /* Transfer: transfer increase fee */
 "TransferScene.Row.IncreaseFee" = "增加费用";
 

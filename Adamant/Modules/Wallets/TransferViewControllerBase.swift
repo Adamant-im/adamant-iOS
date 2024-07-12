@@ -101,6 +101,7 @@ class TransferViewControllerBase: FormViewController {
         case total
         case comments
         case sendButton
+        case blockchainComments(coin: String)
         
         var tag: String {
             switch self {
@@ -115,6 +116,7 @@ class TransferViewControllerBase: FormViewController {
             case .total: return "total"
             case .comments: return "comments"
             case .sendButton: return "send"
+            case .blockchainComments: return "blockchainComments"
             }
         }
         
@@ -129,6 +131,11 @@ class TransferViewControllerBase: FormViewController {
             case .fee: return .localized("TransferScene.Row.TransactionFee", comment: "Transfer: transfer fee")
             case .total: return .localized("TransferScene.Row.Total", comment: "Transfer: total amount of transaction: money to transfer adding fee")
             case .comments: return .localized("TransferScene.Row.Comments", comment: "Transfer: transfer comment")
+            case let .blockchainComments(coin):
+                return String.localizedStringWithFormat(.localized(
+                    "TransferScene.Row.Blockchain.Comments",
+                    comment: "Transfer: Blockchain transfer comment"
+                ), coin)
             case .sendButton: return String.adamant.transfer.send
             case .increaseFee: return .localized("TransferScene.Row.IncreaseFee", comment: "Transfer: transfer increase fee")
             }
@@ -140,6 +147,7 @@ class TransferViewControllerBase: FormViewController {
         case recipient
         case transferInfo
         case comments
+        case blockchainComments(coin: String)
         
         var tag: String {
             switch self {
@@ -147,6 +155,7 @@ class TransferViewControllerBase: FormViewController {
             case .recipient: return "rcp"
             case .transferInfo: return "trsfr"
             case .comments: return "cmmnt"
+            case .blockchainComments: return "blockchainComments"
             }
         }
         
@@ -156,6 +165,11 @@ class TransferViewControllerBase: FormViewController {
             case .recipient: return .localized("TransferScene.Section.Recipient", comment: "Transfer: 'Recipient info' section")
             case .transferInfo: return .localized("TransferScene.Section.TransferInfo", comment: "Transfer: 'Transfer info' section")
             case .comments: return .localized("TransferScene.Row.Comments", comment: "Transfer: transfer comment")
+            case let .blockchainComments(coin):
+                return String.localizedStringWithFormat(.localized(
+                    "TransferScene.Row.Blockchain.Comments",
+                    comment: "Transfer: Blockchain transfer comment"
+                ), coin)
             }
         }
     }
@@ -184,6 +198,8 @@ class TransferViewControllerBase: FormViewController {
     var rootCoinBalance: Decimal?
     var isNeedAddFee: Bool { true }
     var replyToMessageId: String?
+    var blockchainCommentsEnabled: Bool { false }
+    var maxBlockchainCommentLenght: Int { 64 }
     
     static let invalidCharacters: CharacterSet = {
         CharacterSet(
@@ -343,6 +359,10 @@ class TransferViewControllerBase: FormViewController {
         
         if commentsEnabled {
             form.append(commentsSection())
+        }
+        
+        if blockchainCommentsEnabled {
+            form.append(blockchainCommentsSection())
         }
         
         // MARK: Button section
@@ -559,6 +579,17 @@ class TransferViewControllerBase: FormViewController {
         return section
     }
 
+    func blockchainCommentsSection() -> Section {
+        let commentSection = Sections.blockchainComments(coin: walletCore.tokenName)
+        let section = Section(commentSection.localized) {
+            $0.tag = commentSection.tag
+        }
+        
+        section.append(defaultRowFor(baseRow: .blockchainComments(coin: walletCore.tokenName)))
+        
+        return section
+    }
+    
     // MARK: - Tools
 
     @discardableResult
@@ -1161,6 +1192,21 @@ extension TransferViewControllerBase {
                 $0.textAreaHeight = .dynamic(initialTextViewHeight: 44)
             }.onChange { [weak self] row in
                 self?.updateToolbar(for: row)
+            }.cellUpdate { (cell, _) in
+                cell.textView?.backgroundColor = UIColor.clear
+            }
+            
+            return row
+            
+        case .blockchainComments:
+            let row = TextAreaRow {
+                $0.tag = BaseRows.blockchainComments(coin: walletCore.tokenName).tag
+                $0.textAreaHeight = .dynamic(initialTextViewHeight: 44)
+                $0.useFormatterDuringInput = true
+                $0.formatter = StringMaxLengthFormatter(maxLength: maxBlockchainCommentLenght)
+            }.onChange { [weak self] row in
+                self?.updateToolbar(for: row)
+                self?.updateFeeCell()
             }.cellUpdate { (cell, _) in
                 cell.textView?.backgroundColor = UIColor.clear
             }

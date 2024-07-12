@@ -18,6 +18,25 @@ final class KlyTransferViewController: TransferViewControllerBase {
     
     private let prefix = "kly"
     
+    override var blockchainCommentsEnabled: Bool {
+        !commentsEnabled
+    }
+    
+    override var transactionFee: Decimal {
+        let blockchainComment: String = (form.rowBy(
+            tag: BaseRows.blockchainComments(
+                coin: walletCore.tokenName
+            ).tag
+        ) as? TextAreaRow)?.value ?? .empty
+        
+        let baseFee = walletCore.getFee(comment: blockchainComment)
+        let additionalyFee = walletCore.additionalFee
+        
+        return addAdditionalFee
+        ? baseFee + additionalyFee
+        : baseFee
+    }
+    
     override func checkForAdditionalFee() {
         Task {
             guard let recipientAddress = recipientAddress,
@@ -49,6 +68,12 @@ final class KlyTransferViewController: TransferViewControllerBase {
             comments = ""
         }
         
+        let blockchainComment: String? = (form.rowBy(
+            tag: BaseRows.blockchainComments(
+                coin: walletCore.tokenName
+            ).tag
+        ) as? TextAreaRow)?.value
+        
         guard let service = walletCore as? KlyWalletService,
               let recipient = recipientAddress,
               let amount = amount
@@ -64,7 +89,8 @@ final class KlyTransferViewController: TransferViewControllerBase {
                 let transaction = try await service.createTransaction(
                     recipient: recipient,
                     amount: amount,
-                    fee: transactionFee
+                    fee: transactionFee, 
+                    comment: blockchainComment
                 )
                 
                 if await !doesNotContainSendingTx(

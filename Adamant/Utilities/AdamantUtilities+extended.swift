@@ -79,6 +79,11 @@ extension AdamantUtilities {
     /// - No -$%èçïäł- caracters
     /// - 12 words, splitted by a single whitespace
     /// - a-z
+    
+    static func validateAdamantPassphrase(_ passphrase: String) -> Bool {
+        validateAdamantPassphrase(passphrase: passphrase)
+    }
+    
     static func validateAdamantPassphrase(passphrase: String) -> Bool {
         guard validate(string: passphrase, with: passphraseRegex) else {
             return false

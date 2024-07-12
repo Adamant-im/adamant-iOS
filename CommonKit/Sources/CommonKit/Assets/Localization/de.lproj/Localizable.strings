@@ -1126,6 +1126,9 @@
 /* Transfer: comment for transfer in chat */
 "TransferScene.Row.Comments" = "Bemerkungen";
 
+/* Transfer: Blockchain comment for transfer in chat */
+"TransferScene.Row.Blockchain.Comments" = "Öffentliche Nachricht in %@ Blockchain";
+
 /* Transfer: transfer increase fee */
 "TransferScene.Row.IncreaseFee" = "Gebühr erhöhen";
 

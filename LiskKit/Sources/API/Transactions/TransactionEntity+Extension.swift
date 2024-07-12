@@ -29,7 +29,8 @@ public extension TransactionEntity {
         fee: Decimal,
         nonce: UInt64,
         senderPublicKey: String,
-        recipientAddressBinary: String
+        recipientAddressBinary: String,
+        comment: String
     ) -> TransactionEntity {
         let amount = Crypto.fixedPoint(amount: amount)
         let fee = Crypto.fixedPoint(amount: fee)
@@ -44,7 +45,7 @@ public extension TransactionEntity {
                 $0.tokenID = Data(Constants.tokenID.allHexBytes())
                 $0.amount = amount
                 $0.recipientAddressBinary = Data(recipientAddressBinary.allHexBytes())
-                $0.data = ""
+                $0.data = comment
             }
             $0.signatures = []
         }

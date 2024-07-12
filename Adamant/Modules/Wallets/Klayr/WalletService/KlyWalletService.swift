@@ -44,6 +44,7 @@ final class KlyWalletService: WalletCoreProtocol {
     @Atomic private(set) var isWarningGasPrice = false
     @Atomic private(set) var state: WalletServiceState = .notInitiated
     @Atomic private(set) var lastHeight: UInt64 = .zero
+    @Atomic private(set) var lastMinFeePerByte: UInt64 = .zero
     
     @ObservableValue private(set) var transactions: [TransactionDetails] = []
     @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
@@ -53,7 +54,9 @@ final class KlyWalletService: WalletCoreProtocol {
         coreDataStack: coreDataStack,
         blockchainType: richMessageType
     )
-       
+    
+    let salt = "adm"
+    
     // MARK: Notifications
     
     let walletUpdatedNotification = Notification.Name("adamant.klyWallet.walletUpdated")
@@ -94,8 +97,17 @@ final class KlyWalletService: WalletCoreProtocol {
         try await getBalance(for: address)
     }
     
-    func getCurrentFee() async throws -> (fee: BigUInt, lastHeight: UInt64) {
-        try await getFees()
+    func getCurrentFee() async throws -> (fee: BigUInt, lastHeight: UInt64, minFeePerByte: UInt64) {
+        try await getFees(comment: .empty)
+    }
+    
+    func getFee(comment: String) -> Decimal {
+        let fee = try? getFee(
+            minFeePerByte: lastMinFeePerByte,
+            comment: comment
+        ).asDecimal(exponent: Self.currencyExponent)
+        
+        return fee ?? transactionFee
     }
     
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
@@ -214,11 +226,12 @@ private extension KlyWalletService {
             wallet.nonce = nonce
         }
         
-        if let result = try? await getFees() {
+        if let result = try? await getFees(comment: .empty) {
             self.lastHeight = result.lastHeight
             self.transactionFeeRaw = result.fee > KlyWalletService.defaultFee
             ? result.fee
             : KlyWalletService.defaultFee
+            self.lastMinFeePerByte = result.minFeePerByte
         }
         
         if let balance = try? await getBalance() {
@@ -286,7 +299,7 @@ private extension KlyWalletService {
         return UInt64(nonce) ?? .zero
     }
 
-    func getFees() async throws -> (fee: BigUInt, lastHeight: UInt64) {
+    func getFees(comment: String) async throws -> (fee: BigUInt, lastHeight: UInt64, minFeePerByte: UInt64) {
         guard let wallet = klyWallet else {
             throw WalletServiceError.notLogged
         }
@@ -300,7 +313,8 @@ private extension KlyWalletService {
             fee: 0.00141,
             nonce: wallet.nonce,
             senderPublicKey: wallet.keyPair.publicKeyString,
-            recipientAddressBinary: wallet.binaryAddress
+            recipientAddressBinary: wallet.binaryAddress,
+            comment: comment
         ).sign(
             with: wallet.keyPair,
             for: Constants.chainID
@@ -315,7 +329,30 @@ private extension KlyWalletService {
         
         let height = UInt64(lastBlock.header.height)
         
-        return (fee: fee, lastHeight: height)
+        return (fee: fee, lastHeight: height, minFeePerByte: minFeePerByte)
+    }
+    
+    func getFee(minFeePerByte: UInt64, comment: String) throws -> BigUInt {
+        guard let wallet = klyWallet else {
+            throw WalletServiceError.notLogged
+        }
+        
+        let tempTransaction = TransactionEntity().createTx(
+            amount: 100000000.0,
+            fee: 0.00141,
+            nonce: wallet.nonce,
+            senderPublicKey: wallet.keyPair.publicKeyString,
+            recipientAddressBinary: wallet.binaryAddress,
+            comment: comment
+        ).sign(
+            with: wallet.keyPair,
+            for: Constants.chainID
+        )
+        
+        let feeValue = tempTransaction.getFee(with: minFeePerByte)
+        let fee = BigUInt(feeValue)
+        
+        return fee
     }
     
     func setState(_ newState: WalletServiceState, silent: Bool = false) {
@@ -352,7 +389,7 @@ private extension KlyWalletService {
         do {
             let keyPair = try LiskKit.Crypto.keyPair(
                 fromPassphrase: passphrase,
-                salt: "adm"
+                salt: salt
             )
             
             let address = LiskKit.Crypto.address(fromPublicKey: keyPair.publicKeyString)

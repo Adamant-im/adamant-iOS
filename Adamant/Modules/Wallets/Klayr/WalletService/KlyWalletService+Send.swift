@@ -17,7 +17,8 @@ extension KlyWalletService: WalletServiceTwoStepSend {
     func createTransaction(
         recipient: String,
         amount: Decimal,
-        fee: Decimal
+        fee: Decimal,
+        comment: String?
     ) async throws -> TransactionEntity {
         // MARK: 1. Prepare
         guard let wallet = klyWallet,
@@ -35,7 +36,8 @@ extension KlyWalletService: WalletServiceTwoStepSend {
             fee: fee,
             nonce: wallet.nonce,
             senderPublicKey: wallet.keyPair.publicKeyString,
-            recipientAddressBinary: binaryAddress
+            recipientAddressBinary: binaryAddress,
+            comment: comment ?? .empty
         )
         
         let signedTransaction = transaction.sign(with: keys, for: Constants.chainID)
