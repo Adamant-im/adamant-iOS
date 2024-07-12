@@ -1236,7 +1236,10 @@ extension TransferViewControllerBase {
         return !havePending
     }
     
-    func doesNotContainSendingTx(with nonce: String) async -> Bool {
+    func doesNotContainSendingTx(
+        with nonce: String,
+        senderAddress: String
+    ) async -> Bool {
         var history = walletCore.getLocalTransactionHistory()
         
         if history.isEmpty {
@@ -1246,7 +1249,10 @@ extension TransferViewControllerBase {
             ) ?? []
         }
         
-        let nonces = history.compactMap { $0.nonceRaw }
+        let nonces = history.filter {
+            $0.senderAddress == senderAddress 
+            && $0.transactionStatus != .failed
+        }.compactMap { $0.nonceRaw }
         
         return !nonces.contains(nonce)
     }

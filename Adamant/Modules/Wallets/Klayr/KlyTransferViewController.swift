@@ -67,7 +67,10 @@ final class KlyTransferViewController: TransferViewControllerBase {
                     fee: transactionFee
                 )
                 
-                if await !doesNotContainSendingTx(with: String(transaction.nonce)) {
+                if await !doesNotContainSendingTx(
+                    with: String(transaction.nonce),
+                    senderAddress: transaction.senderAddress
+                ) {
                     presentSendingError()
                     return
                 }
