@@ -8,6 +8,7 @@
 
 import UIKit
 import CommonKit
+import LiskKit
 
 extension KlyWalletService {
     var wallet: WalletAccount? {
@@ -60,5 +61,28 @@ extension KlyWalletService {
     
     var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
         $hasMoreOldTransactions.eraseToAnyPublisher()
+    }
+}
+
+extension KlyWalletService: PrivateKeyGenerator {
+    var rowTitle: String {
+        tokenName
+    }
+    
+    var rowImage: UIImage? {
+        .asset(named: "klayr_wallet_row")
+    }
+    
+    func generatePrivateKeyFor(passphrase: String) -> String? {
+        guard AdamantUtilities.validateAdamantPassphrase(passphrase),
+              let keypair = try? LiskKit.Crypto.keyPair(
+                fromPassphrase: passphrase,
+                salt: salt
+              )
+        else {
+            return nil
+        }
+        
+        return keypair.privateKeyString
     }
 }
