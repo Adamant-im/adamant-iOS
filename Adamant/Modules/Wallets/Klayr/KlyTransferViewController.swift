@@ -227,9 +227,15 @@ final class KlyTransferViewController: TransferViewControllerBase {
                 label.textColor = UIColor.adamant.primary
             }
         }.onChange { [weak self] row in
-            var trimmed = row.value?.components(
+            defer {
+                self?.updateToolbar(for: row)
+            }
+            
+            guard let text = row.value else { return }
+            
+            var trimmed = text.components(
                 separatedBy: TransferViewControllerBase.invalidCharacters
-            ).joined() ?? ""
+            ).joined()
             
             if let prefix = self?.prefix,
                trimmed.starts(with: prefix) {
@@ -237,9 +243,12 @@ final class KlyTransferViewController: TransferViewControllerBase {
                 trimmed = String(trimmed[i...])
             }
             
-            row.value = trimmed
-            row.updateCell()
-            self?.updateToolbar(for: row)
+            if text != trimmed {
+                DispatchQueue.main.async {
+                    row.value = trimmed
+                    row.updateCell()
+                }
+            }
         }.onCellSelection { [weak self] (cell, _) in
             self?.shareValue(self?.recipientAddress, from: cell)
         }
@@ -248,6 +257,6 @@ final class KlyTransferViewController: TransferViewControllerBase {
     }
     
     override func defaultSceneTitle() -> String? {
-        return String.adamant.sendKly
+        String.adamant.sendKly
     }
 }
