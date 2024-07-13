@@ -62,7 +62,8 @@ final class ChatViewModel: NSObject {
     private let partnerImageSize: CGFloat = 25
     private let maxMessageLenght: Int = 10000
     private var previousArg: ChatContextMenuArguments?
-
+    private var lastDateHeaderUpdate: Date = Date()
+    
     let minIndexForStartLoadNewMessages = 4
     let minOffsetForStartLoadNewMessages: CGFloat = 100
     var tempOffsets: [String] = []
@@ -611,6 +612,17 @@ final class ChatViewModel: NSObject {
         }
         
         return true
+    }
+    
+    /// If the user opens the app from the background
+    /// update messages to refresh the header dates.
+    func refreshDateHeadersIfNeeded() {
+        guard !Calendar.current.isDate(Date(), inSameDayAs: lastDateHeaderUpdate) else {
+            return
+        }
+        
+        lastDateHeaderUpdate = Date()
+        updateMessages(resetLoadingProperty: false)
     }
 }
 

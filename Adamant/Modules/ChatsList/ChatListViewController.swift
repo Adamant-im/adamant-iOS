@@ -127,6 +127,7 @@ final class ChatListViewController: KeyboardObservingViewController {
     
     private var onMessagesLoadedActions = [() -> Void]()
     private var areMessagesLoaded = false
+    private var lastDatesUpdate: Date = Date()
     
     // MARK: Tasks
     
@@ -321,7 +322,22 @@ final class ChatListViewController: KeyboardObservingViewController {
         
         if case .updating = newState {
             updatingIndicatorView.startAnimate()
+            refreshDatesIfNeeded()
         }
+    }
+    
+    /// If the user opens the app from the background and new chats are not loaded,
+    /// update specific rows in the tableView to refresh the dates.
+    private func refreshDatesIfNeeded() {
+        guard !Calendar.current.isDate(Date(), inSameDayAs: lastDatesUpdate),
+              !isBusy,
+              let indexPaths = tableView.indexPathsForVisibleRows
+        else {
+            return
+        }
+        
+        lastDatesUpdate = Date()
+        tableView.reloadRows(at: indexPaths, with: .none)
     }
     
     private func updateChats() {
