@@ -278,7 +278,7 @@ private extension TransactionStatus {
         case .notInitiated: return .adamant.secondary
         case .pending, .registered, .noNetwork, .noNetworkFinal: return .adamant.primary
         case .success: return .adamant.active
-        case .failed, .inconsistent: return .adamant.alert
+        case .failed, .inconsistent: return .adamant.attention
         }
     }
 }
