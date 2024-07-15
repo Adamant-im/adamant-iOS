@@ -79,9 +79,9 @@ Node(url: URL(string: "http://184.94.215.92:45555")!),
 Node(url: URL(string: "https://node1.adamant.business")!, altUrl: URL(string: "http://194.233.75.29:45555")),
 Node(url: URL(string: "https://node2.blockchain2fa.io")!),
 Node(url: URL(string: "https://phecda.adm.im")!, altUrl: URL(string: "http://46.250.234.248:36666")),
-Node(url: URL(string: "https://tegmine.adm.im")!, altUrl: URL(string: "http://5.104.87.219:36666")),
+Node(url: URL(string: "https://tegmine.adm.im")!),
 Node(url: URL(string: "https://tauri.adm.im")!, altUrl: URL(string: "http://154.26.159.245:36666")),
-Node(url: URL(string: "https://dschubba.adm.im")!, altUrl: URL(string: "http://85.239.234.17:36666")),
+Node(url: URL(string: "https://dschubba.adm.im")!),
         ]
     }
     

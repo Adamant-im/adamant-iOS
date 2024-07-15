@@ -1,16 +1,16 @@
 //
-//  LskApiCore.swift
+//  KlyApiCore.swift
 //  Adamant
 //
-//  Created by Andrew G on 13.11.2023.
-//  Copyright © 2023 Adamant. All rights reserved.
+//  Created by Stanislav Jelezoglo on 08.07.2024.
+//  Copyright © 2024 Adamant. All rights reserved.
 //
 
 import CommonKit
 import Foundation
 import LiskKit
 
-class LskApiCore: BlockchainHealthCheckableService {
+class KlyApiCore: BlockchainHealthCheckableService {
     func makeClient(node: CommonKit.Node) -> APIClient {
         .init(options: .init(
             nodes: [.init(origin: node.asString())],

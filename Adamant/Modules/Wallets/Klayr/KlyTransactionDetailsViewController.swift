@@ -1,19 +1,19 @@
 //
-//  LskTransactionDetailsViewController.swift
+//  KlyTransactionDetailsViewController.swift
 //  Adamant
 //
-//  Created by Anton Boyarkin on 27/11/2018.
-//  Copyright © 2018 Adamant. All rights reserved.
+//  Created by Stanislav Jelezoglo on 09.07.2024.
+//  Copyright © 2024 Adamant. All rights reserved.
 //
 
 import UIKit
 import CommonKit
 
-final class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase {
+final class KlyTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies
     
-    weak var service: LskWalletService? {
-        walletService?.core as? LskWalletService
+    weak var service: KlyWalletService? {
+        walletService?.core as? KlyWalletService
     }
     
     // MARK: - Properties
@@ -31,7 +31,7 @@ final class LskTransactionDetailsViewController: TransactionDetailsViewControlle
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
-        currencySymbol = LskWalletService.currencySymbol
+        currencySymbol = KlyWalletService.currencySymbol
         
         super.viewDidLoad()
         
@@ -55,7 +55,7 @@ final class LskTransactionDetailsViewController: TransactionDetailsViewControlle
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
         let id = transaction.txId
         
-        return URL(string: "\(LskWalletService.explorerAddress)\(id)")
+        return URL(string: "\(KlyWalletService.explorerAddress)\(id)")
     }
     
     @MainActor
@@ -70,7 +70,7 @@ final class LskTransactionDetailsViewController: TransactionDetailsViewControlle
             
             do {
                 var trs = try await service.getTransaction(by: id)
-                let result = try await service.getFees()
+                let result = try await service.getCurrentFee()
                 
                 let lastHeight = result.lastHeight
                 trs.updateConfirmations(value: lastHeight)

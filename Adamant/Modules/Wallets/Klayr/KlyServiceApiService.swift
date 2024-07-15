@@ -1,16 +1,16 @@
 //
-//  LskServiceApiService.swift
+//  KlyServiceApiService.swift
 //  Adamant
 //
-//  Created by Andrew G on 17.11.2023.
-//  Copyright © 2023 Adamant. All rights reserved.
+//  Created by Stanislav Jelezoglo on 08.07.2024.
+//  Copyright © 2024 Adamant. All rights reserved.
 //
 
 import LiskKit
 import Foundation
 import CommonKit
 
-final class LskServiceApiCore: LskApiCore {
+final class KlyServiceApiCore: KlyApiCore {
     override func getStatusInfo(
         node: CommonKit.Node
     ) async -> WalletServiceResult<NodeStatusInfo> {
@@ -31,14 +31,14 @@ final class LskServiceApiCore: LskApiCore {
     }
 }
 
-final class LskServiceApiService: WalletApiService {
-    let api: BlockchainHealthCheckWrapper<LskServiceApiCore>
+final class KlyServiceApiService: WalletApiService {
+    let api: BlockchainHealthCheckWrapper<KlyServiceApiCore>
     
     var preferredNodeIds: [UUID] {
         api.preferredNodeIds
     }
     
-    init(api: BlockchainHealthCheckWrapper<LskServiceApiCore>) {
+    init(api: BlockchainHealthCheckWrapper<KlyServiceApiCore>) {
         self.api = api
     }
     
@@ -66,7 +66,7 @@ final class LskServiceApiService: WalletApiService {
     }
 }
 
-private extension LskServiceApiService {
+private extension KlyServiceApiService {
     func requestClient<Output>(
         body: @escaping @Sendable (
             _ client: APIClient,

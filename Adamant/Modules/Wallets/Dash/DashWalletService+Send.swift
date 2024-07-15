@@ -19,7 +19,8 @@ extension DashWalletService: WalletServiceTwoStepSend {
             return try await createTransaction(
                 recipient: recipient,
                 amount: amount,
-                fee: transactionFee
+                fee: transactionFee,
+                comment: nil
             )
         }
         
@@ -34,14 +35,16 @@ extension DashWalletService: WalletServiceTwoStepSend {
         return try await createTransaction(
             recipient: recipient,
             amount: amount,
-            fee: transactionFee
+            fee: transactionFee,
+            comment: nil
         )
     }
     
     func createTransaction(
         recipient: String,
         amount: Decimal,
-        fee: Decimal
+        fee: Decimal,
+        comment: String?
     ) async throws -> BitcoinKit.Transaction {
         // MARK: 1. Prepare
         guard let wallet = self.dashWallet else {
