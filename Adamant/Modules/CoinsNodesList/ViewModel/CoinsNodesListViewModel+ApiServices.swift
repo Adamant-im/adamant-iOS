@@ -12,8 +12,8 @@ extension CoinsNodesListViewModel {
     struct ApiServices {
         let btc: WalletApiService
         let eth: WalletApiService
-        let lskNode: WalletApiService
-        let lskService: WalletApiService
+        let klyNode: WalletApiService
+        let klyService: WalletApiService
         let doge: WalletApiService
         let dash: WalletApiService
         let adm: WalletApiService
@@ -27,10 +27,10 @@ extension CoinsNodesListViewModel.ApiServices {
             return btc
         case .eth:
             return eth
-        case .lskNode:
-            return lskNode
-        case .lskService:
-            return lskService
+        case .klyNode:
+            return klyNode
+        case .klyService:
+            return klyService
         case .doge:
             return doge
         case .dash:

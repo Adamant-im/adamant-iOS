@@ -1,9 +1,9 @@
 //
-//  LskTransferViewController.swift
+//  KlyTransferViewController.swift
 //  Adamant
 //
-//  Created by Anton Boyarkin on 27/11/2018.
-//  Copyright © 2018 Adamant. All rights reserved.
+//  Created by Stanislav Jelezoglo on 09.07.2024.
+//  Copyright © 2024 Adamant. All rights reserved.
 //
 
 import UIKit
@@ -12,11 +12,30 @@ import LiskKit
 import CommonKit
 
 @MainActor
-final class LskTransferViewController: TransferViewControllerBase {
+final class KlyTransferViewController: TransferViewControllerBase {
     
     // MARK: Properties
     
-    private let prefix = "lsk"
+    private let prefix = "kly"
+    
+    override var blockchainCommentsEnabled: Bool {
+        !commentsEnabled
+    }
+    
+    override var transactionFee: Decimal {
+        let blockchainComment: String = (form.rowBy(
+            tag: BaseRows.blockchainComments(
+                coin: walletCore.tokenName
+            ).tag
+        ) as? TextAreaRow)?.value ?? .empty
+        
+        let baseFee = walletCore.getFee(comment: blockchainComment)
+        let additionalyFee = walletCore.additionalFee
+        
+        return addAdditionalFee
+        ? baseFee + additionalyFee
+        : baseFee
+    }
     
     override func checkForAdditionalFee() {
         Task {
@@ -49,7 +68,13 @@ final class LskTransferViewController: TransferViewControllerBase {
             comments = ""
         }
         
-        guard let service = walletCore as? LskWalletService,
+        let blockchainComment: String? = (form.rowBy(
+            tag: BaseRows.blockchainComments(
+                coin: walletCore.tokenName
+            ).tag
+        ) as? TextAreaRow)?.value
+        
+        guard let service = walletCore as? KlyWalletService,
               let recipient = recipientAddress,
               let amount = amount
         else {
@@ -64,10 +89,14 @@ final class LskTransferViewController: TransferViewControllerBase {
                 let transaction = try await service.createTransaction(
                     recipient: recipient,
                     amount: amount,
-                    fee: transactionFee
+                    fee: transactionFee, 
+                    comment: blockchainComment
                 )
                 
-                if await !doesNotContainSendingTx(with: String(transaction.nonce)) {
+                if await !doesNotContainSendingTx(
+                    with: String(transaction.nonce),
+                    senderAddress: transaction.senderAddress
+                ) {
                     presentSendingError()
                     return
                 }
@@ -94,9 +123,7 @@ final class LskTransferViewController: TransferViewControllerBase {
                     throw error
                 }
                 
-                Task {
-                    await service.update()
-                }
+                service.update()
                 
                 dialogService.dismissProgress()
                 dialogService.showSuccess(withMessage: String.adamant.transfer.transferSuccess)
@@ -200,9 +227,15 @@ final class LskTransferViewController: TransferViewControllerBase {
                 label.textColor = UIColor.adamant.primary
             }
         }.onChange { [weak self] row in
-            var trimmed = row.value?.components(
+            defer {
+                self?.updateToolbar(for: row)
+            }
+            
+            guard let text = row.value else { return }
+            
+            var trimmed = text.components(
                 separatedBy: TransferViewControllerBase.invalidCharacters
-            ).joined() ?? ""
+            ).joined()
             
             if let prefix = self?.prefix,
                trimmed.starts(with: prefix) {
@@ -210,9 +243,12 @@ final class LskTransferViewController: TransferViewControllerBase {
                 trimmed = String(trimmed[i...])
             }
             
-            row.value = trimmed
-            row.updateCell()
-            self?.updateToolbar(for: row)
+            if text != trimmed {
+                DispatchQueue.main.async {
+                    row.value = trimmed
+                    row.updateCell()
+                }
+            }
         }.onCellSelection { [weak self] (cell, _) in
             self?.shareValue(self?.recipientAddress, from: cell)
         }
@@ -221,6 +257,6 @@ final class LskTransferViewController: TransferViewControllerBase {
     }
     
     override func defaultSceneTitle() -> String? {
-        return String.adamant.sendLsk
+        String.adamant.sendKly
     }
 }

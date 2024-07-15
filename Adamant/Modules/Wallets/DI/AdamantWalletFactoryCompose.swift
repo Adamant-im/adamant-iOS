@@ -12,7 +12,7 @@ struct AdamantWalletFactoryCompose: WalletFactoryCompose {
     private let factories: [any WalletFactory]
     
     init(
-        lskWalletFactory: LskWalletFactory,
+        klyWalletFactory: KlyWalletFactory,
         dogeWalletFactory: DogeWalletFactory,
         dashWalletFactory: DashWalletFactory,
         btcWalletFactory: BtcWalletFactory,
@@ -21,7 +21,7 @@ struct AdamantWalletFactoryCompose: WalletFactoryCompose {
         admWalletFactory: AdmWalletFactory
     ) {
         factories = [
-            lskWalletFactory,
+            klyWalletFactory,
             dogeWalletFactory,
             dashWalletFactory,
             btcWalletFactory,

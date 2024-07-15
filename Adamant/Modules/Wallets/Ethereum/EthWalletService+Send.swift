@@ -25,7 +25,8 @@ extension EthWalletService: WalletServiceTwoStepSend {
     func createTransaction(
         recipient: String,
         amount: Decimal,
-        fee: Decimal
+        fee: Decimal,
+        comment: String?
     ) async throws -> CodableTransaction {
         try await ethApiService.requestWeb3 { [weak self] web3 in
             guard let self = self else { throw WalletServiceError.internalError(.unknownError) }

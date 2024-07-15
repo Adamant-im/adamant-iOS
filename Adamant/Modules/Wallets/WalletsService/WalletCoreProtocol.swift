@@ -305,6 +305,7 @@ protocol WalletCoreProtocol: AnyObject {
     func initWallet(withPassphrase: String) async throws -> WalletAccount
     func setInitiationFailed(reason: String)
     func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString
+    func getFee(comment: String) -> Decimal
     
     // MARK: Send
     
@@ -326,6 +327,7 @@ protocol WalletCoreProtocol: AnyObject {
 
 extension WalletCoreProtocol {
     func isExist(address: String) async throws -> Bool { return true }
+    func getFee(comment: String) -> Decimal { transactionFee }
 }
 
 extension WalletCoreProtocol {
@@ -380,7 +382,8 @@ protocol WalletServiceTwoStepSend: WalletCoreProtocol {
     func createTransaction(
         recipient: String,
         amount: Decimal,
-        fee: Decimal
+        fee: Decimal,
+        comment: String?
     ) async throws -> T
     
     func sendTransaction(_ transaction: T) async throws

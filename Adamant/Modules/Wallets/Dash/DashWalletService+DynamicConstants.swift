@@ -60,7 +60,7 @@ extension DashWalletService {
     }
     
     var defaultOrdinalLevel: Int? {
-        80
+        70
     }
     
     static var minNodeVersion: String? {

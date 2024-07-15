@@ -1,16 +1,15 @@
 //
-//  LskWalletService+RichMessageProviderWithStatusCheck.swift
+//  KlyWalletService+StatusCheck.swift
 //  Adamant
 //
-//  Created by Anton Boyarkin on 06/12/2018.
-//  Copyright © 2018 Adamant. All rights reserved.
+//  Created by Stanislav Jelezoglo on 08.07.2024.
+//  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Foundation
 import LiskKit
 import CommonKit
 
-extension LskWalletService {
+extension KlyWalletService {
     func statusInfoFor(transaction: CoinTransaction) async -> TransactionStatusInfo {
         let hash: String?
         
@@ -24,34 +23,38 @@ extension LskWalletService {
             return .init(sentDate: nil, status: .inconsistent(.wrongTxHash))
         }
         
-        var lskTransaction: Transactions.TransactionModel
+        var klyTransaction: Transactions.TransactionModel
         
         do {
-            lskTransaction = try await getTransaction(by: hash)
+            klyTransaction = try await getTransaction(by: hash)
         } catch {
             return .init(error: error)
         }
         
-        lskTransaction.updateConfirmations(value: lastHeight)
+        klyTransaction.updateConfirmations(value: lastHeight)
         
         return await .init(
-            sentDate: lskTransaction.sentDate,
+            sentDate: klyTransaction.sentDate,
             status: getStatus(
-                lskTransaction: lskTransaction,
+                klyTransaction: klyTransaction,
                 transaction: transaction
             )
         )
     }
 }
 
-private extension LskWalletService {
+private extension KlyWalletService {
     func getStatus(
-        lskTransaction: Transactions.TransactionModel,
+        klyTransaction: Transactions.TransactionModel,
         transaction: CoinTransaction
     ) async -> TransactionStatus {
-        guard lskTransaction.blockId != nil else { return .registered }
+        guard klyTransaction.blockId != nil else { return .registered }
         
-        guard let status = lskTransaction.transactionStatus else {
+        guard klyTransaction.executionStatus != .failed else {
+            return .failed
+        }
+        
+        guard let status = klyTransaction.transactionStatus else {
             return .inconsistent(.unknown)
         }
         
@@ -61,8 +64,8 @@ private extension LskWalletService {
         
         // MARK: Check address
         
-        var realSenderAddress = lskTransaction.senderAddress
-        var realRecipientAddress = lskTransaction.recipientAddress
+        var realSenderAddress = klyTransaction.senderAddress
+        var realRecipientAddress = klyTransaction.recipientAddress
         
         if transaction is RichMessageTransaction {
             guard let senderAddress = try? await getWalletAddress(byAdamantAddress: transaction.senderAddress)
@@ -79,20 +82,20 @@ private extension LskWalletService {
             realRecipientAddress = recipientAddress
         }
         
-        guard lskTransaction.senderAddress.caseInsensitiveCompare(realSenderAddress) == .orderedSame else {
+        guard klyTransaction.senderAddress.caseInsensitiveCompare(realSenderAddress) == .orderedSame else {
             return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
         }
         
-        guard lskTransaction.recipientAddress.caseInsensitiveCompare(realRecipientAddress) == .orderedSame else {
+        guard klyTransaction.recipientAddress.caseInsensitiveCompare(realRecipientAddress) == .orderedSame else {
             return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
         }
         
         if transaction.isOutgoing {
-            guard lskWallet?.address.caseInsensitiveCompare(lskTransaction.senderAddress) == .orderedSame else {
+            guard klyWallet?.address.caseInsensitiveCompare(klyTransaction.senderAddress) == .orderedSame else {
                 return .inconsistent(.senderCryptoAddressMismatch(tokenSymbol))
             }
         } else {
-            guard lskWallet?.address.caseInsensitiveCompare(lskTransaction.recipientAddress) == .orderedSame else {
+            guard klyWallet?.address.caseInsensitiveCompare(klyTransaction.recipientAddress) == .orderedSame else {
                 return .inconsistent(.recipientCryptoAddressMismatch(tokenSymbol))
             }
         }
@@ -100,7 +103,7 @@ private extension LskWalletService {
         // MARK: Check amount
         guard isAmountCorrect(
             transaction: transaction,
-            lskTransaction: lskTransaction
+            klyTransaction: klyTransaction
         ) else { return .inconsistent(.wrongAmount) }
         
         return .success
@@ -108,7 +111,7 @@ private extension LskWalletService {
     
     func isAmountCorrect(
         transaction: CoinTransaction,
-        lskTransaction: Transactions.TransactionModel
+        klyTransaction: Transactions.TransactionModel
     ) -> Bool {
         if let transaction = transaction as? RichMessageTransaction,
            let raw = transaction.getRichValue(for: RichContentKeys.transfer.amount),
@@ -116,10 +119,10 @@ private extension LskWalletService {
             let min = reported - reported*0.005
             let max = reported + reported*0.005
             
-            let amount = lskTransaction.amountValue ?? 0
+            let amount = klyTransaction.amountValue ?? 0
             return amount <= max && amount >= min
         }
         
-        return transaction.amountValue == lskTransaction.amountValue
+        return transaction.amountValue == klyTransaction.amountValue
     }
 }

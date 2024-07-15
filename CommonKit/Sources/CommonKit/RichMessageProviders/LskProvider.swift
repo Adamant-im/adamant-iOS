@@ -8,20 +8,20 @@
 
 import UIKit
 
-public final class LskProvider: TransferBaseProvider {
+public final class KlyProvider: TransferBaseProvider {
     public override class var richMessageType: String {
-        return "lsk_transaction"
+        return "kly_transaction"
     }
     
     public override var currencyLogoUrl: URL? {
-        return Bundle.main.url(forResource: "lsk_notificationContent", withExtension: "png")
+        return Bundle.main.url(forResource: "klayr_notificationContent", withExtension: "png")
     }
     
     public override var currencySymbol: String {
-        return "LSK"
+        return "KLY"
     }
     
     public override var currencyLogoLarge: UIImage {
-        return .asset(named: "lisk_notification") ?? .init()
+        return .asset(named: "klayr_notification") ?? .init()
     }
 }

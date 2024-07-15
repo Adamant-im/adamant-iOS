@@ -19,7 +19,8 @@ extension ERC20WalletService: WalletServiceTwoStepSend {
     func createTransaction(
         recipient: String,
         amount: Decimal,
-        fee: Decimal
+        fee: Decimal,
+        comment: String?
     ) async throws -> CodableTransaction {
         guard let ethWallet = ethWallet else {
             throw WalletServiceError.notLogged

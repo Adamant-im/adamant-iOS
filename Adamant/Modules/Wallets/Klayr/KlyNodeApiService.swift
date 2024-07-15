@@ -1,22 +1,22 @@
 //
-//  LskNodeApiService.swift
+//  KlyNodeApiService.swift
 //  Adamant
 //
-//  Created by Andrew G on 17.11.2023.
-//  Copyright © 2023 Adamant. All rights reserved.
+//  Created by Stanislav Jelezoglo on 08.07.2024.
+//  Copyright © 2024 Adamant. All rights reserved.
 //
 
 import LiskKit
 import Foundation
 
-final class LskNodeApiService: WalletApiService {
-    let api: BlockchainHealthCheckWrapper<LskApiCore>
+final class KlyNodeApiService: WalletApiService {
+    let api: BlockchainHealthCheckWrapper<KlyApiCore>
     
     var preferredNodeIds: [UUID] {
         api.preferredNodeIds
     }
     
-    init(api: BlockchainHealthCheckWrapper<LskApiCore>) {
+    init(api: BlockchainHealthCheckWrapper<KlyApiCore>) {
         self.api = api
     }
     
@@ -58,7 +58,7 @@ final class LskNodeApiService: WalletApiService {
     }
 }
 
-private extension LskNodeApiService {
+private extension KlyNodeApiService {
     func requestClient<Output>(
         body: @escaping @Sendable (
             _ client: APIClient,

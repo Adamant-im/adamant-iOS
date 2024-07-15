@@ -254,6 +254,7 @@ private extension ChatMessageFactory {
         : transaction.senderAddress
         
         let coreService = walletServiceCompose.getWallet(by: transfer.type)?.core
+        let defaultIcon: UIImage = .asset(named: "no-token") ?? .init()
         
         return .transaction(.init(value: .init(
             id: id,
@@ -263,9 +264,9 @@ private extension ChatMessageFactory {
                 title: isFromCurrentSender
                     ? .adamant.chat.transactionSent
                     : .adamant.chat.transactionReceived,
-                icon: coreService?.tokenLogo ?? .init(),
+                icon: coreService?.tokenLogo ?? defaultIcon,
                 amount: AdamantBalanceFormat.full.format(transfer.amount),
-                currency: coreService?.tokenSymbol ?? "",
+                currency: coreService?.tokenSymbol ?? .adamant.transfer.unknownToken,
                 date: transaction.sentDate?.humanizedDateTime(withWeekday: false) ?? "",
                 comment: transfer.comments,
                 backgroundColor: backgroundColor,
