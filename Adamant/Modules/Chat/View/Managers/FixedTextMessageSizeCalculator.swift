@@ -133,6 +133,8 @@
          let textContainer = NSTextContainer(
             size: CGSize(width: maxWidth, height: .greatestFiniteMagnitude)
          )
+         textContainer.lineFragmentPadding = .zero
+         
          let layoutManager = NSLayoutManager()
          
          layoutManager.addTextContainer(textContainer)
@@ -140,7 +142,6 @@
          let textStorage = NSTextStorage(attributedString: attributedText)
          textStorage.addLayoutManager(layoutManager)
          
-         let range = NSRange(location: 0, length: attributedText.length)
          let rect = layoutManager.usedRect(for: textContainer)
          
          return rect.integral.size
@@ -176,5 +177,5 @@
  private let messageLabelFont = UIFont.preferredFont(forTextStyle: .body)
 
  /// Additional width to fix incorrect size calculating
- private let additionalWidth: CGFloat = 5
+private let additionalWidth: CGFloat = 5
 private let additionalHeight: CGFloat = 5

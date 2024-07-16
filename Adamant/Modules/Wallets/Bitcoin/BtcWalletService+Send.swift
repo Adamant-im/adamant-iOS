@@ -14,7 +14,12 @@ extension BtcWalletService: WalletServiceTwoStepSend {
     typealias T = BitcoinKit.Transaction
     
     // MARK: Create & Send
-    func createTransaction(recipient: String, amount: Decimal, fee: Decimal) async throws -> BitcoinKit.Transaction {
+    func createTransaction(
+        recipient: String,
+        amount: Decimal,
+        fee: Decimal,
+        comment: String?
+    ) async throws -> BitcoinKit.Transaction {
         // MARK: 1. Prepare
         guard let wallet = self.btcWallet else {
             throw WalletServiceError.notLogged

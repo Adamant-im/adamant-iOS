@@ -184,8 +184,8 @@
 /* Account tab: 'Send ETH tokens' button */
 "AccountTab.Row.SendEth" = "ETH senden";
 
-/* Account tab: 'Send LSK tokens' button */
-"AccountTab.Row.SendLsk" = "LSK senden";
+/* Account tab: 'Send KLY tokens' button */
+"AccountTab.Row.SendKly" = "KLY senden";
 
 /* Account tab: 'Send BTC tokens' button */
 "AccountTab.Row.SendBtc" = "BTC ";
@@ -241,8 +241,8 @@
 /* Account tab: Ethereum wallet */
 "AccountTab.Wallets.ethereum_wallet" = "Ethereum Wallet";
 
-/* Account tab: Lisk wallet */
-"AccountTab.Wallets.lisk_wallet" = "Lisk Wallet";
+/* Account tab: Klayr wallet */
+"AccountTab.Wallets.kly_wallet" = "Klayr Wallet";
 
 /* Account tab: Bitcoin wallet */
 "AccountTab.Wallets.bitcoin_wallet" = "Bitcoin Wallet";
@@ -1180,6 +1180,9 @@
 /* Transfer: comment for transfer in chat */
 "TransferScene.Row.Comments" = "Bemerkungen";
 
+/* Transfer: Blockchain comment for transfer in chat */
+"TransferScene.Row.Blockchain.Comments" = "Öffentliche Nachricht in %@ Blockchain";
+
 /* Transfer: transfer increase fee */
 "TransferScene.Row.IncreaseFee" = "Gebühr erhöhen";
 
@@ -1294,6 +1297,8 @@
 /* Include partner url */
 "PartnerQR.includePartnerURL" = "Koppeling naar webapp opnemen";
 
+/* Transaction: Unknown token */
+"Transaction.UnknownTokenTitle" = "Unbekannt";
 /* FileManager error 'Can't download file' */
 "FileManagerError.CantDownloadFile" = "Datei kann nicht heruntergeladen werden";
 

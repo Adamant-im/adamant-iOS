@@ -1,18 +1,16 @@
 //
-//  LskWalletService+RichMessageProvider.swift
+//  KlyWalletService+RichMessageProvider.swift
 //  Adamant
 //
-//  Created by Anton Boyarkin on 06/12/2018.
-//  Copyright © 2018 Adamant. All rights reserved.
+//  Created by Stanislav Jelezoglo on 09.07.2024.
+//  Copyright © 2024 Adamant. All rights reserved.
 //
 
 import Foundation
-import MessageKit
-import UIKit
 import LiskKit
 import CommonKit
 
-extension LskWalletService {
+extension KlyWalletService {
     var newPendingInterval: TimeInterval {
         .init(milliseconds: type(of: self).newPendingInterval)
     }
@@ -44,7 +42,7 @@ extension LskWalletService {
         
         guard let raw = transaction.getRichValue(for: RichContentKeys.transfer.amount)
         else {
-            return NSAttributedString(string: "⬅️  \(LskWalletService.currencySymbol)")
+            return NSAttributedString(string: "⬅️  \(KlyWalletService.currencySymbol)")
         }
         
         if let decimal = Decimal(string: raw) {
@@ -55,9 +53,9 @@ extension LskWalletService {
         
         let string: String
         if transaction.isOutgoing {
-            string = "⬅️  \(amount) \(LskWalletService.currencySymbol)"
+            string = "⬅️  \(amount) \(KlyWalletService.currencySymbol)"
         } else {
-            string = "➡️  \(amount) \(LskWalletService.currencySymbol)"
+            string = "➡️  \(amount) \(KlyWalletService.currencySymbol)"
         }
         
         return NSAttributedString(string: string)

@@ -48,7 +48,7 @@ struct AdamantScreensFactory: ScreensFactory {
         storageUsageFactory = .init(parent: assembler)
         
         walletFactoryCompose = AdamantWalletFactoryCompose(
-            lskWalletFactory: .init(assembler: assembler),
+            klyWalletFactory: .init(assembler: assembler),
             dogeWalletFactory: .init(assembler: assembler),
             dashWalletFactory: .init(assembler: assembler),
             btcWalletFactory: .init(assembler: assembler),

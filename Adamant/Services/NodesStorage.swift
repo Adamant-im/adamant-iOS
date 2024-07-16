@@ -122,10 +122,10 @@ private extension NodesStorage {
             return BtcWalletService.nodes.map { .init(group: .btc, node: $0) }
         case .eth:
             return EthWalletService.nodes.map { .init(group: .eth, node: $0) }
-        case .lskNode:
-            return LskWalletService.nodes.map { .init(group: .lskNode, node: $0) }
-        case .lskService:
-            return LskWalletService.serviceNodes.map { .init(group: .lskService, node: $0) }
+        case .klyNode:
+            return KlyWalletService.nodes.map { .init(group: .klyNode, node: $0) }
+        case .klyService:
+            return KlyWalletService.serviceNodes.map { .init(group: .klyService, node: $0) }
         case .doge:
             return DogeWalletService.nodes.map { .init(group: .doge, node: $0) }
         case .dash:

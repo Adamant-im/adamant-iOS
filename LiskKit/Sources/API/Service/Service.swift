@@ -106,7 +106,8 @@ extension Service {
                             signature: $0.signature,
                             confirmations: $0.confirmations,
                             isOutgoing: $0.senderId.lowercased() == ownerAddress?.lowercased(), 
-                            nonce: $0.nonce
+                            nonce: $0.nonce,
+                            executionStatus: $0.executionStatus
                         )
                     }
                     completionHandler(.success(response: transaction))
@@ -145,7 +146,8 @@ extension Service {
                             signature: $0.signature,
                             confirmations: $0.confirmations,
                             isOutgoing: $0.senderId.lowercased() == ownerAddress?.lowercased(), 
-                            nonce: $0.nonce
+                            nonce: $0.nonce,
+                            executionStatus: $0.executionStatus
                         )
                     }
                     completionHandler(.success(response: transaction))

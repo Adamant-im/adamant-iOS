@@ -824,7 +824,9 @@ private extension ChatViewController {
                 )
             }
             
-            messageInputBar.inputTextView.becomeFirstResponder()
+            if viewAppeared {
+                messageInputBar.inputTextView.becomeFirstResponder()
+            }
         }
         
         replyView.update(with: message)

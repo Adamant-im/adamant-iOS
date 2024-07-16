@@ -42,7 +42,7 @@ public struct Crypto {
         return "\(identifier)L"
     }
 
-    static let PREFIX_LISK = "lsk"
+    static let PREFIX_KLY = "kly"
     static let CHARSET = Array("zxvcpmbn3465o978uyrtkqew2adsjhfg")
     static let GENERATOR: [UInt] = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3]
 
@@ -55,7 +55,7 @@ public struct Crypto {
         let uint5Address = convertUIntArray(binaryAddress.map { UInt($0) }, 8, 5)
         let uint5Checksum = createChecksum(uint5Address)
         let identifier = convertUInt5ToBase32(uint5Address + uint5Checksum)
-        return "\(PREFIX_LISK)\(identifier)"
+        return "\(PREFIX_KLY)\(identifier)"
     }
 
     public static func getBase32Address(binaryAddress: String) -> String {
@@ -63,13 +63,13 @@ public struct Crypto {
         let uint5Address = convertUIntArray(binaryAddress.map { UInt($0) }, 8, 5)
         let uint5Checksum = createChecksum(uint5Address)
         let identifier = convertUInt5ToBase32(uint5Address + uint5Checksum)
-        return "\(PREFIX_LISK)\(identifier)"
+        return "\(PREFIX_KLY)\(identifier)"
     }
     
     public static func getBinaryAddressFromBase32(_ base32Address: String) -> String? {
         guard isValidBase32(address: base32Address) else { return nil }
 
-        let addressArray = Array(base32Address)[PREFIX_LISK.count..<(base32Address.count - 6)]
+        let addressArray = Array(base32Address)[PREFIX_KLY.count..<(base32Address.count - 6)]
         let integerSequence = addressArray.compactMap { CHARSET.firstIndex(of: $0) }.map { UInt($0) }
 
         guard integerSequence.count == 32 else { return nil }
@@ -78,7 +78,7 @@ public struct Crypto {
     }
 
     public static func isValidBase32(address: String) -> Bool {
-        guard address.prefix(3) == "lsk", address.count == 41 else { return false }
+        guard address.prefix(3) == PREFIX_KLY, address.count == 41 else { return false }
 
         let content = String(address.suffix(38))
         let bytes = covertBase32toUInt5(content)

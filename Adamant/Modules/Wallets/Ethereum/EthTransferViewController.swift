@@ -44,7 +44,8 @@ final class EthTransferViewController: TransferViewControllerBase {
                 let transaction = try await service.createTransaction(
                     recipient: recipient,
                     amount: amount,
-                    fee: transactionFee
+                    fee: transactionFee,
+                    comment: nil
                 )
                 
                 if await !doesNotContainSendingTx(

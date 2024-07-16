@@ -177,22 +177,22 @@ struct AppAssembly: Assembly {
         }.inObjectScope(.container)
         
         // MARK: LskNodeApiService
-        container.register(LskNodeApiService.self) { r in
-            LskNodeApiService(api: .init(
+        container.register(KlyNodeApiService.self) { r in
+            KlyNodeApiService(api: .init(
                 service: .init(),
                 nodesStorage: r.resolve(NodesStorageProtocol.self)!,
                 nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
-                nodeGroup: .lskNode
+                nodeGroup: .klyNode
             ))
         }.inObjectScope(.container)
         
-        // MARK: LskServiceApiService
-        container.register(LskServiceApiService.self) { r in
-            LskServiceApiService(api: .init(
+        // MARK: KlyServiceApiService
+        container.register(KlyServiceApiService.self) { r in
+            KlyServiceApiService(api: .init(
                 service: .init(),
                 nodesStorage: r.resolve(NodesStorageProtocol.self)!,
                 nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
-                nodeGroup: .lskService
+                nodeGroup: .klyService
             ))
         }.inObjectScope(.container)
         
@@ -257,7 +257,7 @@ struct AppAssembly: Assembly {
         }.inObjectScope(.container)
         
         // MARK: LanguageStorageProtocol
-        container.register(LanguageStorageProtocol.self) { r in
+        container.register(LanguageStorageProtocol.self) { _ in
             LanguageStorageService()
         }.inObjectScope(.container)
         
@@ -377,7 +377,7 @@ struct AppAssembly: Assembly {
                 AdmWalletService(),
                 BtcWalletService(),
                 EthWalletService(),
-                LskWalletService(),
+                KlyWalletService(),
                 DogeWalletService(),
                 DashWalletService()
             ]
