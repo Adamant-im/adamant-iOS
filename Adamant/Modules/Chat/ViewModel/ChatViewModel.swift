@@ -230,7 +230,11 @@ final class ChatViewModel: NSObject {
     }
     
     func presentKeyboardOnStartIfNeeded() {
-        guard !inputText.isEmpty || replyMessage != nil else { return }
+        guard !inputText.isEmpty
+                || replyMessage != nil
+                || (filesPicked?.count ?? .zero) > .zero
+        else { return }
+        
         presentKeyboard.send()
     }
     

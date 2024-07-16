@@ -857,7 +857,9 @@ private extension ChatViewController {
                         at: self.messageInputBar.topStackView.arrangedSubviews.count
                     )
                 })
-            messageInputBar.inputTextView.becomeFirstResponder()
+            if viewAppeared {
+                messageInputBar.inputTextView.becomeFirstResponder()
+            }
         }
         
         filesToolbarView.update(data)
