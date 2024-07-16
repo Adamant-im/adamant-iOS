@@ -136,6 +136,12 @@ final class ChatMediaContainerView: UIView, ChatModelView {
     }
     
     @objc func onStatusButtonTap() {
+        if model.status == .failed,
+           let file = model.content.fileModel.files.first {
+            actionHandler(.openFile(messageId: model.id, file: file))
+            return
+        }
+        
         guard model.status == .needToDownload else { return }
         
         let fileModel = model.content.fileModel
@@ -188,7 +194,7 @@ extension ChatMediaContainerView {
     func updateStatus(_ status: FileMessageStatus) {
         statusButton.setImage(status.image, for: .normal)
         statusButton.tintColor = status.imageTintColor
-        statusButton.isHidden = status == .success || status == .failed
+        statusButton.isHidden = status == .success
     }
     
     func updateLayout() {

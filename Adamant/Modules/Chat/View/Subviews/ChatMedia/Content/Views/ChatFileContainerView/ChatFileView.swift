@@ -38,11 +38,6 @@ class ChatFileView: UIView {
     private let sizeLabel = UILabel(font: sizeFont, textColor: .lightGray)
     private let additionalLabel = UILabel(font: additionalFont, textColor: .adamant.cellColor)
     
-    private lazy var previewDownloadNotAllowedLabel = UILabel(
-        font: previewDownloadNotAllowedFont,
-        textColor: .adamant.textColor.withAlphaComponent(0.4)
-    )
-    
     private lazy var vStack: UIStackView = {
         let stack = UIStackView()
         stack.alignment = .leading
@@ -159,20 +154,11 @@ private extension ChatFileView {
             make.size.equalTo(imageSize / 2)
         }
         
-        addSubview(previewDownloadNotAllowedLabel)
-        previewDownloadNotAllowedLabel.snp.makeConstraints { make in
-            make.centerY.equalTo(iconImageView.snp.centerY)
-            make.horizontalEdges.equalTo(iconImageView).inset(5)
-        }
-        
         addSubview(tapBtn)
         tapBtn.snp.makeConstraints { make in
             make.directionalEdges.equalToSuperview()
         }
         
-        previewDownloadNotAllowedLabel.text = previewDownloadNotAllowedText
-        previewDownloadNotAllowedLabel.numberOfLines = .zero
-        previewDownloadNotAllowedLabel.textAlignment = .center
         nameLabel.lineBreakMode = .byTruncatingMiddle
         nameLabel.textAlignment = .left
         sizeLabel.textAlignment = .left
@@ -185,7 +171,6 @@ private extension ChatFileView {
         videoIconIV.addShadow()
         downloadImageView.addShadow()
         spinner.addShadow(shadowColor: .white)
-        previewDownloadNotAllowedLabel.addShadow()
     }
     
     func update() {
@@ -193,17 +178,12 @@ private extension ChatFileView {
         if let previewImage = model.previewImage {
             image = previewImage
             additionalLabel.isHidden = true
-            previewDownloadNotAllowedLabel.isHidden = true
         } else {
-            image = model.fileType == .image || model.fileType == .video 
+            image = model.fileType.isMedia
             ? defaultMediaImage
             : defaultImage
             
-            previewDownloadNotAllowedLabel.isHidden = model.isPreviewDownloadAllowed
-            || model.isBusy
-            || !(model.fileType == .image || model.fileType == .video)
-            
-            additionalLabel.isHidden = !previewDownloadNotAllowedLabel.isHidden
+            additionalLabel.isHidden = model.fileType.isMedia
         }
         
         if iconImageView.image != image {
@@ -212,12 +192,25 @@ private extension ChatFileView {
         
         downloadImageView.isHidden = model.isCached || model.isBusy
         
-        if model.isBusy {
-            spinner.startAnimating()
-            progressState.hidden = false
-            progressState.progress = Double(model.progress) / 100
+        if model.isDownloading {
+            if model.previewImage == nil || !model.isFullMediaDownloadAllowed {
+                spinner.startAnimating()
+            } else {
+                spinner.stopAnimating()
+            }
         } else {
             spinner.stopAnimating()
+        }
+        
+        if model.isBusy {
+            if model.isUploading {
+                progressState.hidden = false
+            } else {
+                progressState.hidden = !model.isFullMediaDownloadAllowed
+            }
+            
+            progressState.progress = Double(model.progress) / 100
+        } else {
             progressState.hidden = true
             progressState.progress = .zero
         }

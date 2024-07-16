@@ -137,16 +137,18 @@ final class ChatFileService: ChatFileProtocol {
     func downloadFile(
         file: ChatFile,
         chatroom: Chatroom?,
-        saveEncrypted: Bool
+        saveEncrypted: Bool,
+        previewDownloadAllowed: Bool,
+        fullMediaDownloadAllowed: Bool
     ) async throws {
         let isCachedOriginal = filesStorage.isCachedLocally(file.file.id)
-        let isCachedPreview = filesStorage.isCachedInMemory(file.file.preview?.id ?? .empty) 
+        let isCachedPreview = filesStorage.isCachedInMemory(file.file.preview?.id ?? .empty)
         
         try await downloadFile(
             file: file,
             chatroom: chatroom,
-            shouldDownloadOriginalFile: !isCachedOriginal,
-            shouldDownloadPreviewFile: !isCachedPreview,
+            shouldDownloadOriginalFile: !isCachedOriginal && fullMediaDownloadAllowed,
+            shouldDownloadPreviewFile: !isCachedPreview && previewDownloadAllowed,
             saveEncrypted: saveEncrypted
         )
     }

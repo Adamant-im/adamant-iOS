@@ -301,7 +301,7 @@ private extension FilesStorageKit {
             }
         }
         
-        return fileURLs
+        return Array(Set(fileURLs))
     }
     
     func cacheTemporaryFile(

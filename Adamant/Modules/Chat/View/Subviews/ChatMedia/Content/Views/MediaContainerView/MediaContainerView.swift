@@ -42,6 +42,11 @@ final class MediaContainerView: UIView {
         return stack
     }()
     
+    private lazy var previewDownloadNotAllowedLabel = EdgeInsetLabel(
+        font: previewDownloadNotAllowedFont,
+        textColor: .adamant.textColor.withAlphaComponent(0.4)
+    )
+    
     // MARK: Proprieties
     
     var model: ChatMediaContentView.FileModel = .default {
@@ -77,6 +82,21 @@ private extension MediaContainerView {
             $0.directionalEdges.equalToSuperview()
             $0.width.equalTo(Self.stackWidth)
         }
+        
+        addSubview(previewDownloadNotAllowedLabel)
+        previewDownloadNotAllowedLabel.snp.makeConstraints { make in
+            make.center.equalTo(filesStack.snp.center)
+        }
+        
+        previewDownloadNotAllowedLabel.textInsets = previewTextInsets
+        previewDownloadNotAllowedLabel.text = previewDownloadNotAllowedText
+        previewDownloadNotAllowedLabel.numberOfLines = .zero
+        previewDownloadNotAllowedLabel.textAlignment = .center
+        previewDownloadNotAllowedLabel.backgroundColor = .adamant.moreReactionsBackground.withAlphaComponent(0.2)
+        previewDownloadNotAllowedLabel.layer.cornerRadius = 6
+        previewDownloadNotAllowedLabel.addShadow(shadowColor: .adamant.primary)
+        previewDownloadNotAllowedLabel.clipsToBounds = true
+        previewDownloadNotAllowedLabel.sizeToFit()
     }
     
     func update() {
@@ -86,6 +106,8 @@ private extension MediaContainerView {
             messageId: model.messageId,
             files: Array(fileList)
         ))
+        
+        updatePreviewDownloadLabel(files: Array(fileList))
         
         for (index, stackView) in filesStack.arrangedSubviews.enumerated() {
             guard let horizontalStackView = stackView as? UIStackView else { continue }
@@ -176,11 +198,31 @@ private extension MediaContainerView {
     }
     
     func calculateMinimumWidth(availableWidth: CGFloat) -> CGFloat {
-        return (availableWidth - stackSpacing) * 0.3
+        (availableWidth - stackSpacing) * 0.3
     }
     
     func calculateMaximumWidth(availableWidth: CGFloat) -> CGFloat {
-        return (availableWidth - stackSpacing) * 0.7
+        (availableWidth - stackSpacing) * 0.7
+    }
+    
+    func updatePreviewDownloadLabel(files: [ChatFile]) {
+        guard let firstFile = files.first else {
+            previewDownloadNotAllowedLabel.isHidden = true
+            return
+        }
+
+        let isPreviewDownloadAllowed = firstFile.isPreviewDownloadAllowed
+        let haveNoPreview = files.contains {
+            $0.fileType.isMedia 
+            && $0.previewImage == nil
+            && $0.file.preview != nil
+        }
+
+        if !isPreviewDownloadAllowed && haveNoPreview {
+            previewDownloadNotAllowedLabel.isHidden = false
+        } else {
+            previewDownloadNotAllowedLabel.isHidden = true
+        }
     }
 }
 
@@ -222,3 +264,6 @@ private let rowVerticalHeight: CGFloat = 200
 private let rowHorizontalHeight: CGFloat = 150
 private let defaultStackWidth: CGFloat = 280
 private let screenSpace: CGFloat = 110
+private let previewDownloadNotAllowedFont = UIFont.systemFont(ofSize: 12)
+private let previewTextInsets: UIEdgeInsets = .init(top: 5, left: 5, bottom: 5, right: 5)
+private var previewDownloadNotAllowedText: String { .localized("Chats.AutoDownloadPreview.Disabled") }

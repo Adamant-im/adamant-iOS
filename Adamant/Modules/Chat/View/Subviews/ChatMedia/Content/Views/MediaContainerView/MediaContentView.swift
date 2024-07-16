@@ -30,11 +30,6 @@ final class MediaContentView: UIView {
         return btn
     }()
     
-    private lazy var previewDownloadNotAllowedLabel = UILabel(
-        font: previewDownloadNotAllowedFont,
-        textColor: .adamant.textColor.withAlphaComponent(0.4)
-    )
-
     private lazy var progressBar = CircularProgressView()
     private lazy var progressState: CircularProgressState = {
         .init(
@@ -109,12 +104,6 @@ private extension MediaContentView {
             make.size.equalTo(imageSize / 1.6)
         }
         
-        addSubview(previewDownloadNotAllowedLabel)
-        previewDownloadNotAllowedLabel.snp.makeConstraints { make in
-            make.centerY.equalTo(imageView.snp.centerY)
-            make.horizontalEdges.equalTo(imageView).inset(5)
-        }
-        
         let controller = UIHostingController(rootView: progressBar.environmentObject(progressState))
         
         controller.view.backgroundColor = .clear
@@ -127,23 +116,15 @@ private extension MediaContentView {
         imageView.layer.masksToBounds = true
         imageView.contentMode = .scaleAspectFill
         videoIconIV.tintColor = .adamant.active
-        previewDownloadNotAllowedLabel.text = previewDownloadNotAllowedText
-        previewDownloadNotAllowedLabel.numberOfLines = .zero
-        previewDownloadNotAllowedLabel.textAlignment = .center
         
         videoIconIV.addShadow()
         downloadImageView.addShadow()
         spinner.addShadow(shadowColor: .white)
         controller.view.addShadow()
-        previewDownloadNotAllowedLabel.addShadow()
     }
     
     func update() {
-        let image = model.previewImage
-        ?? (model.fileType == .image || model.fileType == .video
-            ? defaultMediaImage
-            : defaultImage
-        )
+        let image = model.previewImage ?? defaultMediaImage
 
         if imageView.image != image {
             imageView.image = image
@@ -157,19 +138,28 @@ private extension MediaContentView {
             && model.fileType == .video
         )
         
-        if model.isBusy {
-            spinner.startAnimating()
-            progressState.hidden = false
-            progressState.progress = Double(model.progress) / 100
+        if model.isDownloading {
+            if model.previewImage == nil || !model.isFullMediaDownloadAllowed {
+                spinner.startAnimating()
+            } else {
+                spinner.stopAnimating()
+            }
         } else {
             spinner.stopAnimating()
+        }
+        
+        if model.isBusy {
+            if model.isUploading {
+                progressState.hidden = false
+            } else {
+                progressState.hidden = !model.isFullMediaDownloadAllowed
+            }
+            
+            progressState.progress = Double(model.progress) / 100
+        } else {
             progressState.hidden = true
             progressState.progress = .zero
         }
-        
-        previewDownloadNotAllowedLabel.isHidden = model.isPreviewDownloadAllowed
-        || model.isBusy
-        || model.previewImage != nil
     }
 }
 
@@ -178,5 +168,3 @@ private let stackSpacing: CGFloat = 12
 private let verticalStackSpacing: CGFloat = 3
 private let defaultImage: UIImage? = .asset(named: "defaultFileIcon")
 private let defaultMediaImage: UIImage? = .asset(named: "defaultMediaBlur")
-private let previewDownloadNotAllowedFont = UIFont.systemFont(ofSize: 8)
-private var previewDownloadNotAllowedText: String { .localized("Chats.AutoDownloadPreview.Disabled") }

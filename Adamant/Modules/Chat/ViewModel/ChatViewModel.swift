@@ -754,7 +754,11 @@ final class ChatViewModel: NSObject {
         
         guard tx?.statusEnum == .delivered else { return }
         
-        downloadFile(file: file)
+        downloadFile(
+            file: file,
+            previewDownloadAllowed: true,
+            fullMediaDownloadAllowed: true
+        )
     }
     
     func downloadPreviewIfNeeded(
@@ -763,10 +767,7 @@ final class ChatViewModel: NSObject {
     ) {
         let tx = chatTransactions.first(where: { $0.txId == messageId })
         
-        guard tx?.statusEnum == .delivered || tx?.statusEnum == nil,
-              (filesStorageProprieties.autoDownloadPreviewPolicy() != .nobody ||
-                filesStorageProprieties.autoDownloadFullMediaPolicy() != .nobody)
-        else { return }
+        guard tx?.statusEnum == .delivered || tx?.statusEnum == nil else { return }
         
         let chatFiles = files.filter {
             $0.fileType == .image || $0.fileType == .video
@@ -787,25 +788,104 @@ final class ChatViewModel: NSObject {
     }
     
     func forceDownloadAllFiles(messageId: String, files: [ChatFile]) {
-        let needToDownload = files.filter {
-            !$0.isCached ||
-            ($0.isCached
-             && ($0.fileType == .image || $0.fileType == .video)
-             && $0.previewImage == nil)
+        let isPreviewDownloadAllowed = isDownloadAllowed(
+            policy: filesStorageProprieties.autoDownloadPreviewPolicy(),
+            havePartnerName: havePartnerName
+        )
+        
+        let isFullMediaDownloadAllowed = isDownloadAllowed(
+            policy: filesStorageProprieties.autoDownloadFullMediaPolicy(),
+            havePartnerName: havePartnerName
+        )
+        
+        let needToDownload: [ChatFile]
+        
+        let shouldDownloadFile: (ChatFile) -> Bool = { file in
+            if !file.isCached {
+                return true
+            }
+            
+            if file.fileType.isMedia && file.previewImage == nil {
+                return isPreviewDownloadAllowed
+            }
+            
+            return false
+        }
+        
+        let previewFiles = files.filter { file in
+            (file.fileType == .image || file.fileType == .video) && file.previewImage == nil
+        }
+        
+        let notCachedFiles = files.filter { !$0.isCached }
+        
+        let downloadPreview: Bool
+        let downloadFullMedia: Bool
+        
+        switch (isPreviewDownloadAllowed, isFullMediaDownloadAllowed) {
+        case (true, true):
+            needToDownload = files.filter(shouldDownloadFile)
+            downloadPreview = true
+            downloadFullMedia = true
+        case (true, false):
+            needToDownload = previewFiles.isEmpty 
+            ? notCachedFiles
+            : previewFiles
+            
+            downloadPreview = previewFiles.isEmpty
+            ? false
+            : true
+            
+            downloadFullMedia = previewFiles.isEmpty
+            ? true
+            : false
+        case (false, true):
+            needToDownload = notCachedFiles.isEmpty 
+            ? previewFiles
+            : notCachedFiles
+            
+            downloadPreview = notCachedFiles.isEmpty
+            ? true
+            : false
+            
+            downloadFullMedia = notCachedFiles.isEmpty
+            ? false
+            : true
+        case (false, false):
+            needToDownload = previewFiles.isEmpty 
+            ? notCachedFiles
+            : previewFiles
+            
+            downloadPreview = previewFiles.isEmpty
+            ? false
+            : true
+            
+            downloadFullMedia = previewFiles.isEmpty
+            ? true
+            : false
         }
         
         needToDownload.forEach { file in
-            downloadFile(file: file)
+            downloadFile(
+                file: file,
+                previewDownloadAllowed: downloadPreview,
+                fullMediaDownloadAllowed: downloadFullMedia
+            )
         }
     }
     
-    func downloadFile(file: ChatFile) {
+    func downloadFile(
+        file: ChatFile,
+        previewDownloadAllowed: Bool,
+        fullMediaDownloadAllowed: Bool
+    ) {
         Task { [weak self] in
             do {
                 try await self?.chatFileService.downloadFile(
                     file: file,
                     chatroom: self?.chatroom,
-                    saveEncrypted: self?.filesStorageProprieties.saveFileEncrypted() ?? true
+                    saveEncrypted: self?.filesStorageProprieties.saveFileEncrypted() ?? true,
+                    previewDownloadAllowed: previewDownloadAllowed,
+                    fullMediaDownloadAllowed: fullMediaDownloadAllowed
                 )
             } catch {
                 self?.dialog.send(.alert(error.localizedDescription))
@@ -1385,6 +1465,20 @@ private extension ChatViewModel {
         dialog.send(.progress(false))
         let index = files.firstIndex(where: { $0.assetId == id }) ?? .zero
         presentDocumentViewerVC.send((files, index))
+    }
+    
+    func isDownloadAllowed(
+        policy: DownloadPolicy,
+        havePartnerName: Bool
+    ) -> Bool {
+        switch policy {
+        case .everybody:
+            return true
+        case .nobody:
+            return false
+        case .contacts:
+            return havePartnerName
+        }
     }
 }
 

@@ -336,7 +336,15 @@ private extension ChatMessageFactory {
         ? transaction.recipientAddress
         : transaction.senderAddress
         
-        let isPreviewDownloadAllowed = isPreviewDownloadAllowed(havePartnerName)
+        let isPreviewDownloadAllowed = isDownloadAllowed(
+            policy: filesStorageProprieties.autoDownloadPreviewPolicy(),
+            havePartnerName: havePartnerName
+        )
+        
+        let isFullMediaDownloadAllowed = isDownloadAllowed(
+            policy: filesStorageProprieties.autoDownloadFullMediaPolicy(),
+            havePartnerName: havePartnerName
+        )
         
         let chatFiles = makeChatFiles(
             from: files,
@@ -344,7 +352,8 @@ private extension ChatMessageFactory {
             downloadingFilesIDs: downloadingFilesIDs,
             isFromCurrentSender: isFromCurrentSender,
             storage: storage, 
-            isPreviewDownloadAllowed: isPreviewDownloadAllowed
+            isPreviewDownloadAllowed: isPreviewDownloadAllowed,
+            isFullMediaDownloadAllowed: isFullMediaDownloadAllowed
         )
         
         let isMediaFilesOnly = chatFiles.allSatisfy {
@@ -379,8 +388,10 @@ private extension ChatMessageFactory {
         )))
     }
     
-    func isPreviewDownloadAllowed(_ havePartnerName: Bool) -> Bool {
-        let policy = filesStorageProprieties.autoDownloadPreviewPolicy()
+    func isDownloadAllowed(
+        policy: DownloadPolicy,
+        havePartnerName: Bool
+    ) -> Bool {
         switch policy {
         case .everybody:
             return true
@@ -419,7 +430,8 @@ private extension ChatMessageFactory {
         downloadingFilesIDs: [String],
         isFromCurrentSender: Bool,
         storage: String,
-        isPreviewDownloadAllowed: Bool
+        isPreviewDownloadAllowed: Bool,
+        isFullMediaDownloadAllowed: Bool
     ) -> [ChatFile] {
         return files.map {
             let previewData = $0[RichContentKeys.file.preview] as? [String: Any] ?? [:]
@@ -438,7 +450,8 @@ private extension ChatMessageFactory {
                 isFromCurrentSender: isFromCurrentSender,
                 fileType: FileType(raw: fileType) ?? .other, 
                 progress: .zero, 
-                isPreviewDownloadAllowed: isPreviewDownloadAllowed
+                isPreviewDownloadAllowed: isPreviewDownloadAllowed,
+                isFullMediaDownloadAllowed: isFullMediaDownloadAllowed
             )
         }
     }

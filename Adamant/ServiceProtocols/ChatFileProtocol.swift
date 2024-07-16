@@ -41,7 +41,9 @@ protocol ChatFileProtocol {
     func downloadFile(
         file: ChatFile,
         chatroom: Chatroom?,
-        saveEncrypted: Bool
+        saveEncrypted: Bool,
+        previewDownloadAllowed: Bool,
+        fullMediaDownloadAllowed: Bool
     ) async throws
     
     func autoDownload(

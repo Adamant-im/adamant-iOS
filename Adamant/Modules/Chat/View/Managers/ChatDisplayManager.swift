@@ -90,6 +90,11 @@ final class ChatDisplayManager: MessagesDisplayDelegate {
         switch message.fullModel.status {
         case .failed:
             guard accessoryView.subviews.isEmpty else { break }
+            
+            if case .file = message.fullModel.content {
+                break
+            }
+            
             let icon = UIImageView(frame: CGRect(x: -28, y: -10, width: 20, height: 20))
             icon.contentMode = .scaleAspectFit
             icon.tintColor = .adamant.secondary

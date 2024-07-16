@@ -11,6 +11,10 @@ public enum FileType {
     case image
     case video
     case other
+    
+    public var isMedia: Bool {
+        self == FileType.image || self == FileType.video
+    }
 }
 
 public extension FileType {
