@@ -221,19 +221,22 @@ protocol ChatsProvider: DataProvider, Actor {
         _ message: AdamantMessage,
         recipientId: String,
         from chatroom: Chatroom?
-    ) async throws -> (tx: RichMessageTransaction, context: NSManagedObjectContext)
+    ) async throws -> String
     
     func sendFileMessage(
         _ message: AdamantMessage,
         recipientId: String,
-        transactionLocaly: RichMessageTransaction,
-        context: NSManagedObjectContext,
+        transactionLocalyId: String,
         from chatroom: Chatroom?
     ) async throws -> ChatTransaction
     
+    func updateTxMessageContent(
+        txId: String,
+        richMessage: RichMessage
+    ) throws
+    
     func setTxMessageStatus(
-        transactionLocaly: RichMessageTransaction,
-        context: NSManagedObjectContext,
+        txId: String,
         status: MessageStatus
     ) throws
     

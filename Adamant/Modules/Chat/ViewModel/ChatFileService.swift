@@ -24,8 +24,7 @@ private struct FileUpload {
 private struct FileMessage {
     var files: [FileUpload]
     var message: String?
-    var tx: RichMessageTransaction?
-    var context: NSManagedObjectContext?
+    var txId: String?
 }
 
 final class ChatFileService: ChatFileProtocol {
@@ -687,18 +686,15 @@ private extension ChatFileService {
         
         cachePreviewFiles(files)
         
-        let txLocaly = try await sendMessageLocallyIfNeeded(
+        let txId = try await sendMessageLocallyIfNeeded(
             fileMessage: fileMessage,
             partnerAddress: partnerAddress,
             chatroom: chatroom,
             messageLocally: messageLocally
         )
         
-        fileMessage.tx = txLocaly.tx
-        fileMessage.context = txLocaly.context
+        fileMessage.txId = txId
         
-        let txId = txLocaly.tx.txId
-
         let needToLoadFiles = richFiles.filter { $0.nonce.isEmpty }
         updateUploadingFilesIDs(with: needToLoadFiles.map { $0.id }, uploading: true)
         
@@ -716,7 +712,8 @@ private extension ChatFileService {
                 partnerAddress: partnerAddress,
                 saveEncrypted: saveEncrypted, 
                 txId: txId,
-                richFiles: &richFiles
+                richFiles: &richFiles,
+                messageLocally: messageLocally
             )
             
             let message = createAdamantMessage(
@@ -729,8 +726,7 @@ private extension ChatFileService {
             _ = try await chatsProvider.sendFileMessage(
                 message,
                 recipientId: partnerAddress,
-                transactionLocaly: txLocaly.tx,
-                context: txLocaly.context,
+                transactionLocalyId: txId,
                 from: chatroom
             )
             
@@ -740,8 +736,7 @@ private extension ChatFileService {
         } catch {
             await handleUploadError(
                 for: needToLoadFiles,
-                tx: txLocaly.tx,
-                context: txLocaly.context
+                txId: txId
             )
             
             throw error
@@ -813,31 +808,26 @@ private extension ChatFileService {
         partnerAddress: String,
         chatroom: Chatroom?,
         messageLocally: AdamantMessage
-    ) async throws -> (tx: RichMessageTransaction, context: NSManagedObjectContext) {
-        let tx: RichMessageTransaction
-        let context: NSManagedObjectContext
+    ) async throws -> String {
+        let txId: String
         
-        if let transaction = fileMessage.tx,
-           let txContext = fileMessage.context {
-            tx = transaction
-            context = txContext
+        if let transactionId = fileMessage.txId {
+            txId = transactionId
             
             try? await chatsProvider.setTxMessageStatus(
-                transactionLocaly: tx,
-                context: context,
+                txId: txId,
                 status: .pending
             )
         } else {
-            let txLocally = try await chatsProvider.sendFileMessageLocally(
+            let txLocallyId = try await chatsProvider.sendFileMessageLocally(
                 messageLocally,
                 recipientId: partnerAddress,
                 from: chatroom
             )
-            tx = txLocally.tx
-            context = txLocally.context
+            txId = txLocallyId
         }
         
-        return (tx, context)
+        return txId
     }
     
     func updateUploadingFilesIDs(with ids: [String], uploading: Bool) {
@@ -862,7 +852,8 @@ private extension ChatFileService {
         partnerAddress: String,
         saveEncrypted: Bool,
         txId: String,
-        richFiles: inout [RichMessageFile.File]
+        richFiles: inout [RichMessageFile.File],
+        messageLocally: AdamantMessage
     ) async throws {
         let files = fileMessage.files
         
@@ -893,14 +884,15 @@ private extension ChatFileService {
                 saveEncrypted: saveEncrypted
             )
             
-            updateRichFile(
+            await updateRichFile(
                 oldId: file.url.absoluteString,
                 fileResult: result.file,
                 previewResult: result.preview,
                 fileMessage: &fileMessage,
                 richFiles: &richFiles,
                 file: file,
-                txId: txId
+                txId: txId,
+                messageLocally: messageLocally
             )
         }
     }
@@ -950,8 +942,9 @@ private extension ChatFileService {
         fileMessage: inout FileMessage,
         richFiles: inout [RichMessageFile.File],
         file: FileResult,
-        txId: String
-    ) {
+        txId: String,
+        messageLocally: AdamantMessage
+    ) async {
         let cached = filesStorage.isCachedLocally(fileResult.cid)
         
         $uploadingFilesIDsArray.mutate { $0.removeAll { $0 == oldId } }
@@ -996,18 +989,27 @@ private extension ChatFileService {
                 $0[txId] = fileMessage
             }
         }
+        
+        guard case let .richMessage(payload) = messageLocally,
+              var richMessage = payload as? RichMessageFile
+        else { return }
+        
+        richMessage.files = richFiles
+        
+        try? await chatsProvider.updateTxMessageContent(
+            txId: txId,
+            richMessage: richMessage
+        )
     }
     
     func handleUploadError(
         for richFiles: [RichMessageFile.File],
-        tx: RichMessageTransaction,
-        context: NSManagedObjectContext
+        txId: String
     ) async {
         updateUploadingFilesIDs(with: richFiles.map { $0.id }, uploading: false)
         
         try? await chatsProvider.setTxMessageStatus(
-            transactionLocaly: tx,
-            context: context,
+            txId: txId,
             status: .failed
         )
     }

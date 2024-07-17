@@ -13,6 +13,10 @@
 		26A976012B7E852E0095C367 /* ChatSelectTextViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A976002B7E852E0095C367 /* ChatSelectTextViewFactory.swift */; };
 		3A075C9E2B98A3B100714E3B /* FilesPickerKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3A075C9D2B98A3B100714E3B /* FilesPickerKit */; };
 		3A20D93B2AE7F316005475A6 /* AdamantTransactionDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A20D93A2AE7F316005475A6 /* AdamantTransactionDetails.swift */; };
+		3A2478AE2BB42967009D89E9 /* ChatDropView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A2478AD2BB42967009D89E9 /* ChatDropView.swift */; };
+		3A2478B12BB45DF8009D89E9 /* StorageUsageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A2478B02BB45DF8009D89E9 /* StorageUsageView.swift */; };
+		3A2478B32BB461A7009D89E9 /* StorageUsageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A2478B22BB461A7009D89E9 /* StorageUsageViewModel.swift */; };
+		3A2478B52BB46617009D89E9 /* StorageUsageFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A2478B42BB46617009D89E9 /* StorageUsageFactory.swift */; };
 		3A26D9352C3C1BE2003AD832 /* KlyWalletService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A26D9342C3C1BE2003AD832 /* KlyWalletService.swift */; };
 		3A26D9372C3C1C01003AD832 /* KlyWallet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A26D9362C3C1C01003AD832 /* KlyWallet.swift */; };
 		3A26D9392C3C1C62003AD832 /* KlyWalletFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A26D9382C3C1C62003AD832 /* KlyWalletFactory.swift */; };
@@ -28,10 +32,6 @@
 		3A26D94D2C3D387B003AD832 /* KlyTransactionDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A26D94C2C3D387B003AD832 /* KlyTransactionDetailsViewController.swift */; };
 		3A26D9502C3D3A5A003AD832 /* KlyWalletService+WalletCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A26D94F2C3D3A5A003AD832 /* KlyWalletService+WalletCore.swift */; };
 		3A26D9522C3E7F1E003AD832 /* klayr_notificationContent.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A26D9512C3E7F1D003AD832 /* klayr_notificationContent.png */; };
-		3A2478AE2BB42967009D89E9 /* ChatDropView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A2478AD2BB42967009D89E9 /* ChatDropView.swift */; };
-		3A2478B12BB45DF8009D89E9 /* StorageUsageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A2478B02BB45DF8009D89E9 /* StorageUsageView.swift */; };
-		3A2478B32BB461A7009D89E9 /* StorageUsageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A2478B22BB461A7009D89E9 /* StorageUsageViewModel.swift */; };
-		3A2478B52BB46617009D89E9 /* StorageUsageFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A2478B42BB46617009D89E9 /* StorageUsageFactory.swift */; };
 		3A299C692B838AA600B54C61 /* ChatMediaCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A299C682B838AA600B54C61 /* ChatMediaCell.swift */; };
 		3A299C6B2B838F2300B54C61 /* ChatMediaContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A299C6A2B838F2300B54C61 /* ChatMediaContainerView.swift */; };
 		3A299C6D2B838F8F00B54C61 /* ChatMediaContainerView+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A299C6C2B838F8F00B54C61 /* ChatMediaContainerView+Model.swift */; };
@@ -696,6 +696,10 @@
 		33975C0D891698AA7E74EBCC /* Pods_Adamant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Adamant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		36AB8CE9537B3B873972548B /* Pods_AdmCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AdmCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3A20D93A2AE7F316005475A6 /* AdamantTransactionDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantTransactionDetails.swift; sourceTree = "<group>"; };
+		3A2478AD2BB42967009D89E9 /* ChatDropView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatDropView.swift; sourceTree = "<group>"; };
+		3A2478B02BB45DF8009D89E9 /* StorageUsageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageUsageView.swift; sourceTree = "<group>"; };
+		3A2478B22BB461A7009D89E9 /* StorageUsageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageUsageViewModel.swift; sourceTree = "<group>"; };
+		3A2478B42BB46617009D89E9 /* StorageUsageFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageUsageFactory.swift; sourceTree = "<group>"; };
 		3A26D9342C3C1BE2003AD832 /* KlyWalletService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KlyWalletService.swift; sourceTree = "<group>"; };
 		3A26D9362C3C1C01003AD832 /* KlyWallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KlyWallet.swift; sourceTree = "<group>"; };
 		3A26D9382C3C1C62003AD832 /* KlyWalletFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KlyWalletFactory.swift; sourceTree = "<group>"; };
@@ -711,10 +715,6 @@
 		3A26D94C2C3D387B003AD832 /* KlyTransactionDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KlyTransactionDetailsViewController.swift; sourceTree = "<group>"; };
 		3A26D94F2C3D3A5A003AD832 /* KlyWalletService+WalletCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KlyWalletService+WalletCore.swift"; sourceTree = "<group>"; };
 		3A26D9512C3E7F1D003AD832 /* klayr_notificationContent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = klayr_notificationContent.png; sourceTree = "<group>"; };
-		3A2478AD2BB42967009D89E9 /* ChatDropView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatDropView.swift; sourceTree = "<group>"; };
-		3A2478B02BB45DF8009D89E9 /* StorageUsageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageUsageView.swift; sourceTree = "<group>"; };
-		3A2478B22BB461A7009D89E9 /* StorageUsageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageUsageViewModel.swift; sourceTree = "<group>"; };
-		3A2478B42BB46617009D89E9 /* StorageUsageFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageUsageFactory.swift; sourceTree = "<group>"; };
 		3A299C682B838AA600B54C61 /* ChatMediaCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMediaCell.swift; sourceTree = "<group>"; };
 		3A299C6A2B838F2300B54C61 /* ChatMediaContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMediaContainerView.swift; sourceTree = "<group>"; };
 		3A299C6C2B838F8F00B54C61 /* ChatMediaContainerView+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatMediaContainerView+Model.swift"; sourceTree = "<group>"; };
@@ -1389,6 +1389,16 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
+		3A2478AF2BB45DE2009D89E9 /* StorageUsage */ = {
+			isa = PBXGroup;
+			children = (
+				3A2478B42BB46617009D89E9 /* StorageUsageFactory.swift */,
+				3A2478B02BB45DF8009D89E9 /* StorageUsageView.swift */,
+				3A2478B22BB461A7009D89E9 /* StorageUsageViewModel.swift */,
+			);
+			path = StorageUsage;
+			sourceTree = "<group>";
+		};
 		3A26D9312C3C1B55003AD832 /* Klayr */ = {
 			isa = PBXGroup;
 			children = (
@@ -1417,16 +1427,6 @@
 				3A26D9442C3D336A003AD832 /* KlyWalletService+RichMessageProvider.swift */,
 			);
 			path = WalletService;
-			sourceTree = "<group>";
-		};
-		3A2478AF2BB45DE2009D89E9 /* StorageUsage */ = {
-			isa = PBXGroup;
-			children = (
-				3A2478B42BB46617009D89E9 /* StorageUsageFactory.swift */,
-				3A2478B02BB45DF8009D89E9 /* StorageUsageView.swift */,
-				3A2478B22BB461A7009D89E9 /* StorageUsageViewModel.swift */,
-			);
-			path = StorageUsage;
 			sourceTree = "<group>";
 		};
 		3A299C672B838A7800B54C61 /* ChatMedia */ = {
@@ -3984,7 +3984,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.7.0;
+				MARKETING_VERSION = 3.8.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -4015,7 +4015,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.7.0;
+				MARKETING_VERSION = 3.8.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

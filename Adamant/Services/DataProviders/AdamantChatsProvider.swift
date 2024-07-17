@@ -869,7 +869,7 @@ extension AdamantChatsProvider {
         _ message: AdamantMessage,
         recipientId: String,
         from chatroom: Chatroom?
-    ) async throws -> (tx: RichMessageTransaction, context: NSManagedObjectContext) {
+    ) async throws -> String {
         guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
             throw ChatsProviderError.notLogged
         }
@@ -906,14 +906,13 @@ extension AdamantChatsProvider {
             from: chatroom
         )
 
-        return (transactionLocaly, context)
+        return transactionLocaly.transactionId
     }
     
     func sendFileMessage(
         _ message: AdamantMessage,
         recipientId: String,
-        transactionLocaly: RichMessageTransaction,
-        context: NSManagedObjectContext,
+        transactionLocalyId: String,
         from chatroom: Chatroom?
     ) async throws -> ChatTransaction {
         guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
@@ -931,6 +930,17 @@ extension AdamantChatsProvider {
             throw ChatsProviderError.messageNotValid(.empty)
         case .tooLong:
             throw ChatsProviderError.messageNotValid(.tooLong)
+        }
+        
+        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        context.parent = stack.container.viewContext
+        
+        guard let transactionLocaly = getBaseTransactionFromDB(
+            id: transactionLocalyId,
+            context: context
+        ) as? RichMessageTransaction
+        else {
+            throw ChatsProviderError.transactionNotFound(id: transactionLocalyId)
         }
         
         guard case let .richMessage(payload) = message else {
@@ -954,11 +964,38 @@ extension AdamantChatsProvider {
     }
     
     func setTxMessageStatus(
-        transactionLocaly: RichMessageTransaction,
-        context: NSManagedObjectContext,
+        txId: String,
         status: MessageStatus
     ) throws {
-        transactionLocaly.statusEnum = status
+        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        context.parent = stack.container.viewContext
+        
+        guard let transaction = getBaseTransactionFromDB(
+            id: txId,
+            context: context
+        ) as? RichMessageTransaction
+        else {
+            throw ChatsProviderError.transactionNotFound(id: txId)
+        }
+        
+        transaction.statusEnum = status
+        try context.save()
+    }
+    
+    func updateTxMessageContent(txId: String, richMessage: RichMessage) throws {
+        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        context.parent = stack.container.viewContext
+        
+        guard let transaction = getBaseTransactionFromDB(
+            id: txId,
+            context: context
+        ) as? RichMessageTransaction
+        else {
+            throw ChatsProviderError.transactionNotFound(id: txId)
+        }
+        
+        transaction.richContent = richMessage.content()
+        transaction.richContentSerialized = richMessage.serialized()
         try context.save()
     }
     
