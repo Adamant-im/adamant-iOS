@@ -481,7 +481,7 @@ private extension ChatDialogManager {
     }
     
     func getUpperContentViewSize() -> CGSize {
-        .init(width: 310, height: 50)
+        .init(width: 335, height: 50)
     }
     
     func getUpperContentView(
