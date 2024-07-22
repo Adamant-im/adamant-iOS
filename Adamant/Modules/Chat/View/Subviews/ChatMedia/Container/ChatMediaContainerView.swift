@@ -142,7 +142,9 @@ final class ChatMediaContainerView: UIView, ChatModelView {
             return
         }
         
-        guard model.status == .needToDownload else { return }
+        guard case .needToDownload = model.status else {
+            return
+        }
         
         let fileModel = model.content.fileModel
         let fileList = Array(fileModel.files.prefix(FilesConstants.maxFilesCount))

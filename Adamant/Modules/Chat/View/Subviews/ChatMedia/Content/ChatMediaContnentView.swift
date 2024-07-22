@@ -115,6 +115,8 @@ final class ChatMediaContentView: UIView {
         return stack
     }()
     
+    private lazy var uploadImageView = UIImageView(image: .asset(named: "downloadIcon"))
+    
     private lazy var mediaContainerView = MediaContainerView()
     private lazy var fileContainerView = FileContainerView()
     
@@ -174,6 +176,14 @@ private extension ChatMediaContentView {
             make.directionalEdges.equalToSuperview()
         }
         
+        addSubview(uploadImageView)
+        uploadImageView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.size.equalTo(imageSize)
+        }
+        
+        uploadImageView.transform = CGAffineTransform(rotationAngle: .pi)
+        
         commentLabel.enabledDetectors = [.url]
         commentLabel.setAttributes([.foregroundColor: UIColor.adamant.active], detector: .url)
     }
@@ -182,6 +192,8 @@ private extension ChatMediaContentView {
         alpha = model.isHidden ? .zero : 1.0
         backgroundColor = model.backgroundColor.uiColor
         layer.borderColor = model.backgroundColor.uiColor.cgColor
+        
+        uploadImageView.isHidden = model.fileModel.txStatus != .failed
         
         commentLabel.attributedText = model.comment
         commentLabel.isHidden = model.comment.string.isEmpty
@@ -285,3 +297,4 @@ private let verticalInsets: CGFloat = 8
 private let horizontalInsets: CGFloat = 12
 private let replyViewHeight: CGFloat = 25
 private let additionalHeight: CGFloat = 2
+private let imageSize: CGFloat = 70

@@ -122,7 +122,10 @@ private extension MediaContainerView {
                 if fileOverallIndex < fileList.count {
                     let file = fileList[fileOverallIndex]
                     mediaView.isHidden = false
-                    mediaView.model = file
+                    mediaView.model = .init(
+                        chatFile: file,
+                        txStatus: model.txStatus
+                    )
                     mediaView.buttonActionHandler = { [weak self, file, model] in
                         self?.actionHandler(
                             .openFile(
@@ -166,7 +169,7 @@ private extension MediaContainerView {
         var totalWidthForEqualAspectRatio: CGFloat = 0.0
         
         for case let mediaView as MediaContentView in horizontalStackView.arrangedSubviews {
-            if let resolution = mediaView.model.file.resolution {
+            if let resolution = mediaView.model.chatFile.file.resolution {
                 let aspectRatio = resolution.width / resolution.height
                 let widthForEqualAspectRatio = height * aspectRatio
                 totalWidthForEqualAspectRatio += widthForEqualAspectRatio
@@ -178,7 +181,7 @@ private extension MediaContainerView {
         let scaleFactor = filesStackWidth / totalWidthForEqualAspectRatio
 
         for case let mediaView as MediaContentView in horizontalStackView.arrangedSubviews {
-            if let resolution = mediaView.model.file.resolution {
+            if let resolution = mediaView.model.chatFile.file.resolution {
                 let aspectRatio = resolution.width / resolution.height
                 let widthForEqualAspectRatio = height * aspectRatio
                 var width = max(widthForEqualAspectRatio * scaleFactor, minimumWidth)

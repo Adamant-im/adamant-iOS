@@ -34,14 +34,14 @@ final class MediaContentView: UIView {
     private lazy var progressState: CircularProgressState = {
         .init(
             lineWidth: 2.0,
-            backgroundColor: .white,
-            progressColor: .lightGray,
+            backgroundColor: .lightGray,
+            progressColor: .white,
             progress: .zero,
             hidden: true
         )
     }()
     
-    var model: ChatFile = .default {
+    var model: ChatMediaContentView.FileContentModel = .default {
         didSet {
             update()
         }
@@ -49,7 +49,7 @@ final class MediaContentView: UIView {
     
     var buttonActionHandler: (() -> Void)?
     
-    init(model: ChatFile) {
+    init(model: ChatMediaContentView.FileContentModel) {
         super.init(frame: .zero)
         backgroundColor = .clear
         configure()
@@ -110,7 +110,7 @@ private extension MediaContentView {
         addSubview(controller.view)
         controller.view.snp.makeConstraints { make in
             make.top.trailing.equalToSuperview().inset(15)
-            make.size.equalTo(15)
+            make.size.equalTo(progressSize)
         }
         
         imageView.layer.masksToBounds = true
@@ -124,22 +124,28 @@ private extension MediaContentView {
     }
     
     func update() {
-        let image = model.previewImage ?? defaultMediaImage
-
+        let chatFile = model.chatFile
+        
+        let image = chatFile.previewImage ?? defaultMediaImage
+        
         if imageView.image != image {
             imageView.image = image
         }
         
-        downloadImageView.isHidden = model.isCached || model.isBusy
+        downloadImageView.isHidden = chatFile.isCached
+        || chatFile.isBusy
+        || model.txStatus == .failed
         
         videoIconIV.isHidden = !(
-            model.isCached
-            && !model.isBusy
-            && model.fileType == .video
+            chatFile.isCached
+            && !chatFile.isBusy
+            && chatFile.fileType == .video
         )
         
-        if model.isDownloading {
-            if model.previewImage == nil || !model.isFullMediaDownloadAllowed {
+        if chatFile.isDownloading {
+            if chatFile.previewImage == nil,
+               chatFile.file.preview != nil,
+               chatFile.downloadStatus.isPreviewDownloading {
                 spinner.startAnimating()
             } else {
                 spinner.stopAnimating()
@@ -148,22 +154,24 @@ private extension MediaContentView {
             spinner.stopAnimating()
         }
         
-        if model.isBusy {
-            if model.isUploading {
+        if chatFile.isBusy {
+            if chatFile.isUploading {
                 progressState.hidden = false
             } else {
-                progressState.hidden = !model.isFullMediaDownloadAllowed
+                progressState.hidden = !chatFile.downloadStatus.isOriginalDownloading
             }
-            
-            progressState.progress = Double(model.progress) / 100
         } else {
-            progressState.hidden = true
-            progressState.progress = .zero
+            progressState.hidden = chatFile.progress == 100
+            || chatFile.progress == nil
         }
+        
+        let progress = chatFile.progress ?? .zero
+        progressState.progress = Double(progress) / 100
     }
 }
 
 private let imageSize: CGFloat = 70
+private let progressSize: CGFloat = 15
 private let stackSpacing: CGFloat = 12
 private let verticalStackSpacing: CGFloat = 3
 private let defaultImage: UIImage? = .asset(named: "defaultFileIcon")

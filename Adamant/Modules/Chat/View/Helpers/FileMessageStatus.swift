@@ -10,9 +10,9 @@ import Foundation
 import UIKit
 import CommonKit
 
-enum FileMessageStatus {
+enum FileMessageStatus: Equatable {
     case busy
-    case needToDownload
+    case needToDownload(failed: Bool)
     case failed
     case success
     
@@ -21,7 +21,11 @@ enum FileMessageStatus {
         case .busy: return .asset(named: "status_pending") ?? .init()
         case .success: return .asset(named: "status_success") ?? .init()
         case .failed: return .asset(named: "status_failed") ?? .init()
-        case .needToDownload: return .asset(named: "download-circular") ?? .init()
+        case let .needToDownload(failed):
+            guard !failed else {
+                return .asset(named: "download-circular-error") ?? .init()
+            }
+            return .asset(named: "download-circular") ?? .init()
         }
     }
     

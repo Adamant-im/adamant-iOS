@@ -35,7 +35,12 @@ extension ChatMediaContainerView {
                  && $0.previewImage == nil
                  && ($0.fileType == .image || $0.fileType == .video))
             }) {
-                return .needToDownload
+                let failed = content.fileModel.files.contains(where: {
+                    guard let progress = $0.progress else { return false }
+                    return progress < 100
+                })
+                
+                return .needToDownload(failed: failed)
             }
             
             return .success

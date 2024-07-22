@@ -74,23 +74,22 @@ class ChatFileView: UIView {
     private lazy var progressState: CircularProgressState = {
         .init(
             lineWidth: 2.0,
-            backgroundColor: .white,
-            progressColor: .lightGray,
+            backgroundColor: .lightGray,
+            progressColor: .white,
             progress: .zero,
             hidden: true
         )
     }()
     
-    var model: ChatFile = .default {
+    var model: ChatMediaContentView.FileContentModel = .default {
         didSet {
-            guard oldValue != model else { return }
             update()
         }
     }
     
     var buttonActionHandler: (() -> Void)?
     
-    init(model: ChatFile) {
+    init(model: ChatMediaContentView.FileContentModel) {
         super.init(frame: .zero)
         backgroundColor = .clear
         configure()
@@ -174,26 +173,32 @@ private extension ChatFileView {
     }
     
     func update() {
+        let chatFile = model.chatFile
+        
         let image: UIImage?
-        if let previewImage = model.previewImage {
+        if let previewImage = chatFile.previewImage {
             image = previewImage
             additionalLabel.isHidden = true
         } else {
-            image = model.fileType.isMedia
+            image = chatFile.fileType.isMedia
             ? defaultMediaImage
             : defaultImage
             
-            additionalLabel.isHidden = model.fileType.isMedia
+            additionalLabel.isHidden = chatFile.fileType.isMedia
         }
         
         if iconImageView.image != image {
             iconImageView.image = image
         }
         
-        downloadImageView.isHidden = model.isCached || model.isBusy
+        downloadImageView.isHidden = chatFile.isCached 
+        || chatFile.isBusy
+        || model.txStatus == .failed
         
-        if model.isDownloading {
-            if model.previewImage == nil || !model.isFullMediaDownloadAllowed {
+        if chatFile.isDownloading {
+            if chatFile.previewImage == nil,
+               chatFile.file.preview != nil,
+               chatFile.downloadStatus.isPreviewDownloading {
                 spinner.startAnimating()
             } else {
                 spinner.stopAnimating()
@@ -202,33 +207,34 @@ private extension ChatFileView {
             spinner.stopAnimating()
         }
         
-        if model.isBusy {
-            if model.isUploading {
+        if chatFile.isBusy {
+            if chatFile.isUploading {
                 progressState.hidden = false
             } else {
-                progressState.hidden = !model.isFullMediaDownloadAllowed
+                progressState.hidden = !chatFile.downloadStatus.isOriginalDownloading
             }
-            
-            progressState.progress = Double(model.progress) / 100
         } else {
-            progressState.hidden = true
-            progressState.progress = .zero
+            progressState.hidden = chatFile.progress == 100
+            || chatFile.progress == nil
         }
         
-        let fileType = model.file.type.map { ".\($0)" } ?? .empty
-        let fileName = model.file.name ?? "UNKNWON"
+        let progress = chatFile.progress ?? .zero
+        progressState.progress = Double(progress) / 100
+        
+        let fileType = chatFile.file.type.map { ".\($0)" } ?? .empty
+        let fileName = chatFile.file.name ?? "UNKNWON"
         
         nameLabel.text = fileName.contains(fileType)
         ? fileName
         : "\(fileName.uppercased())\(fileType.uppercased())"
         
-        sizeLabel.text = formatSize(model.file.size)
+        sizeLabel.text = formatSize(chatFile.file.size)
         additionalLabel.text = fileType.uppercased()
         
         videoIconIV.isHidden = !(
-            model.isCached
-            && !model.isBusy
-            && model.fileType == .video
+            chatFile.isCached
+            && !chatFile.isBusy
+            && chatFile.fileType == .video
         )
     }
     

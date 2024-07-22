@@ -39,12 +39,24 @@ extension ChatMediaContentView {
         var files: [ChatFile]
         var isMediaFilesOnly: Bool
         let isFromCurrentSender: Bool
-
+        let txStatus: MessageStatus
+        
         static let `default` = Self(
             messageId: .empty,
             files: [],
             isMediaFilesOnly: false,
-            isFromCurrentSender: false
+            isFromCurrentSender: false,
+            txStatus: .failed
+        )
+    }
+    
+    struct FileContentModel {
+        let chatFile: ChatFile
+        let txStatus: MessageStatus
+        
+        static let `default` = Self(
+            chatFile: .default,
+            txStatus: .failed
         )
     }
 }

@@ -499,17 +499,13 @@ final class ChatViewModel: NSObject {
             let message = messages.first(where: { $0.messageId == id })
             
             if case let .file(model) = message?.content {
-                do {
-                    try await chatFileService.resendMessage(
-                        with: id,
-                        text: model.value.content.comment.string,
-                        chatroom: chatroom,
-                        replyMessage: nil,
-                        saveEncrypted: filesStorageProprieties.saveFileEncrypted()
-                    )
-                } catch {
-                    dialog.send(.error(error.localizedDescription, supportEmail: false))
-                }
+                try? await chatFileService.resendMessage(
+                    with: id,
+                    text: model.value.content.comment.string,
+                    chatroom: chatroom,
+                    replyMessage: nil,
+                    saveEncrypted: filesStorageProprieties.saveFileEncrypted()
+                )
                 return
             }
             
@@ -741,7 +737,7 @@ final class ChatViewModel: NSObject {
             return
         }
         
-        guard !chatFileService.downloadingFiles.contains(file.file.id),
+        guard !chatFileService.downloadingFiles.keys.contains(file.file.id),
               !chatFileService.uploadingFiles.contains(file.file.id),
               case let(.file(fileModel)) = message?.content
         else { return }
@@ -883,17 +879,13 @@ final class ChatViewModel: NSObject {
         fullMediaDownloadAllowed: Bool
     ) {
         Task { [weak self] in
-            do {
-                try await self?.chatFileService.downloadFile(
-                    file: file,
-                    chatroom: self?.chatroom,
-                    saveEncrypted: self?.filesStorageProprieties.saveFileEncrypted() ?? true,
-                    previewDownloadAllowed: previewDownloadAllowed,
-                    fullMediaDownloadAllowed: fullMediaDownloadAllowed
-                )
-            } catch {
-                self?.dialog.send(.alert(error.localizedDescription))
-            }
+            try? await self?.chatFileService.downloadFile(
+                file: file,
+                chatroom: self?.chatroom,
+                saveEncrypted: self?.filesStorageProprieties.saveFileEncrypted() ?? true,
+                previewDownloadAllowed: previewDownloadAllowed,
+                fullMediaDownloadAllowed: fullMediaDownloadAllowed
+            )
         }
     }
     
@@ -1051,7 +1043,7 @@ private extension ChatViewModel {
                     needToUpdatePreview: data.needUpdatePreview,
                     cached: data.cached,
                     isUploading: data.uploading,
-                    isDownloading: data.downloading,
+                    downloadStatus: data.downloadStatus,
                     progress: data.progress
                 )
             }
@@ -1181,7 +1173,8 @@ private extension ChatViewModel {
                 expirationTimestamp: &expirationTimestamp,
                 uploadingFilesIDs: chatFileService.uploadingFiles,
                 downloadingFilesIDs: chatFileService.downloadingFiles,
-                havePartnerName: havePartnerName
+                havePartnerName: havePartnerName,
+                filesLoadingProgress: chatFileService.filesLoadingProgress
             )
             
             await setupNewMessages(
@@ -1258,8 +1251,6 @@ private extension ChatViewModel {
         case .accountNotFound, .accountNotInitiated, .dependencyError, .internalError, .networkError, .notLogged, .requestCancelled, .serverError, .transactionNotFound, .invalidTransactionStatus, .none:
             break
         }
-        
-        dialog.send(.richError(error))
     }
     
     func inputTextUpdated() {
@@ -1400,7 +1391,7 @@ private extension ChatViewModel {
         needToUpdatePreview: Bool,
         cached: Bool? = nil,
         isUploading: Bool? = nil,
-        isDownloading: Bool? = nil,
+        downloadStatus: DownloadStatus? = nil,
         progress: Int? = nil
     ) {
         let indexes = messages.indices.filter {
@@ -1420,7 +1411,7 @@ private extension ChatViewModel {
                 needToUpdatePeview: needToUpdatePreview,
                 cached: cached,
                 isUploading: isUploading,
-                isDownloading: isDownloading,
+                downloadStatus: downloadStatus,
                 progress: progress
             )
         }
@@ -1536,7 +1527,7 @@ private extension ChatMessage {
         needToUpdatePeview: Bool,
         cached: Bool? = nil,
         isUploading: Bool? = nil,
-        isDownloading: Bool? = nil,
+        downloadStatus: DownloadStatus? = nil,
         progress: Int? = nil
     ) {
         guard case let .file(fileModel) = content else { return }
@@ -1558,8 +1549,8 @@ private extension ChatMessage {
         if let value = isUploading {
             model.content.fileModel.files[index].isUploading = value
         }
-        if let value = isDownloading {
-            model.content.fileModel.files[index].isDownloading = value
+        if let value = downloadStatus {
+            model.content.fileModel.files[index].downloadStatus = value
         }
         if needToUpdatePeview {
             model.content.fileModel.files[index].previewImage = preview

@@ -13,8 +13,9 @@ import UIKit
 import FilesStorageKit
 
 protocol ChatFileProtocol {
-    var downloadingFiles: [String] { get }
+    var downloadingFiles: [String: DownloadStatus] { get }
     var uploadingFiles: [String] { get }
+    var filesLoadingProgress: [String: Int] { get }
     
     var updateFileFields: PassthroughSubject<(
         id: String,
@@ -23,7 +24,7 @@ protocol ChatFileProtocol {
         preview: UIImage?,
         needUpdatePreview: Bool,
         cached: Bool?,
-        downloading: Bool?,
+        downloadStatus: DownloadStatus?,
         uploading: Bool?,
         progress: Int?
     ), Never> {

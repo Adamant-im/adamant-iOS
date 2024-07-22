@@ -69,7 +69,10 @@ private extension FileContainerView {
         for (index, file) in fileList.enumerated() {
             let view = filesStack.arrangedSubviews[index] as? ChatFileView
             view?.isHidden = false
-            view?.model = file
+            view?.model = .init(
+                chatFile: file,
+                txStatus: model.txStatus
+            )
             view?.buttonActionHandler = { [weak self, file, model] in
                 self?.actionHandler(
                     .openFile(

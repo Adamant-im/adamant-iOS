@@ -725,10 +725,10 @@
 "NodesEditor.FailedToBuildURL" = "Invalid host";
 
 /* Storage: Save Encrypted */
-"Storage.SaveEncrypted.Title" = "Keep the files encrypted";
+"Storage.SaveEncrypted.Title" = "Store files encrypted";
 
 /* Storage: Save Encrypted */
-"Storage.SaveEncrypted.Description" = "Store the files in encrypted form in local storage (May impact performance)";
+"Storage.SaveEncrypted.Description" = "Store files in the local storage encrypted (May impact performance)";
 
 /* Storage: Auto download preview */
 "Storage.AutoDownloadPreview.Title" = "Preview";

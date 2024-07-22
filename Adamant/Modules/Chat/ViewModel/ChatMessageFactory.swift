@@ -85,8 +85,9 @@ struct ChatMessageFactory {
         dateHeaderOn: Bool,
         topSpinnerOn: Bool,
         uploadingFilesIDs: [String],
-        downloadingFilesIDs: [String],
-        havePartnerName: Bool
+        downloadingFilesIDs: [String: DownloadStatus],
+        havePartnerName: Bool,
+        filesLoadingProgress: [String: Int]
     ) -> ChatMessage {
         let sentDate = transaction.sentDate ?? .now
         let senderModel = ChatSender(transaction: transaction)
@@ -113,7 +114,8 @@ struct ChatMessageFactory {
                 backgroundColor: backgroundColor,
                 uploadingFilesIDs: uploadingFilesIDs,
                 downloadingFilesIDs: downloadingFilesIDs,
-                havePartnerName: havePartnerName
+                havePartnerName: havePartnerName,
+                filesLoadingProgress: filesLoadingProgress
             ),
             backgroundColor: backgroundColor,
             bottomString: makeBottomString(
@@ -135,8 +137,9 @@ private extension ChatMessageFactory {
         isFromCurrentSender: Bool,
         backgroundColor: ChatMessageBackgroundColor,
         uploadingFilesIDs: [String],
-        downloadingFilesIDs: [String],
-        havePartnerName: Bool
+        downloadingFilesIDs: [String: DownloadStatus],
+        havePartnerName: Bool,
+        filesLoadingProgress: [String: Int]
     ) -> ChatMessage.Content {
         switch transaction {
         case let transaction as MessageTransaction:
@@ -165,7 +168,8 @@ private extension ChatMessageFactory {
                     backgroundColor: backgroundColor,
                     uploadingFilesIDs: uploadingFilesIDs,
                     downloadingFilesIDs: downloadingFilesIDs,
-                    havePartnerName: havePartnerName
+                    havePartnerName: havePartnerName,
+                    filesLoadingProgress: filesLoadingProgress
                 )
             }
             
@@ -313,8 +317,9 @@ private extension ChatMessageFactory {
         isFromCurrentSender: Bool,
         backgroundColor: ChatMessageBackgroundColor,
         uploadingFilesIDs: [String],
-        downloadingFilesIDs: [String],
-        havePartnerName: Bool
+        downloadingFilesIDs: [String: DownloadStatus],
+        havePartnerName: Bool,
+        filesLoadingProgress: [String: Int]
     ) -> ChatMessage.Content {
         let id = transaction.chatMessageId ?? ""
         
@@ -354,7 +359,8 @@ private extension ChatMessageFactory {
             isFromCurrentSender: isFromCurrentSender,
             storage: storage, 
             isPreviewDownloadAllowed: isPreviewDownloadAllowed,
-            isFullMediaDownloadAllowed: isFullMediaDownloadAllowed
+            isFullMediaDownloadAllowed: isFullMediaDownloadAllowed,
+            filesLoadingProgress: filesLoadingProgress
         )
         
         let isMediaFilesOnly = chatFiles.allSatisfy {
@@ -365,7 +371,8 @@ private extension ChatMessageFactory {
             messageId: id,
             files: chatFiles,
             isMediaFilesOnly: isMediaFilesOnly,
-            isFromCurrentSender: isFromCurrentSender
+            isFromCurrentSender: isFromCurrentSender,
+            txStatus: transaction.statusEnum
         )
         
         return .file(.init(value: .init(
@@ -428,29 +435,31 @@ private extension ChatMessageFactory {
     func makeChatFiles(
         from files: [[String: Any]],
         uploadingFilesIDs: [String],
-        downloadingFilesIDs: [String],
+        downloadingFilesIDs: [String: DownloadStatus],
         isFromCurrentSender: Bool,
         storage: String,
         isPreviewDownloadAllowed: Bool,
-        isFullMediaDownloadAllowed: Bool
+        isFullMediaDownloadAllowed: Bool,
+        filesLoadingProgress: [String: Int]
     ) -> [ChatFile] {
         return files.map {
             let previewData = $0[RichContentKeys.file.preview] as? [String: Any] ?? [:]
             let preview = RichMessageFile.Preview(previewData)
             let fileType = $0[RichContentKeys.file.type] as? String ?? .empty
             let fileId = $0[RichContentKeys.file.id] as? String ?? .empty
+            let progress = filesLoadingProgress[fileId]
             
             return ChatFile(
                 file: RichMessageFile.File($0),
                 previewImage: filesStorage.getPreview(for: preview.id),
-                isDownloading: downloadingFilesIDs.contains(fileId),
+                downloadStatus: downloadingFilesIDs[fileId] ?? .default,
                 isUploading: uploadingFilesIDs.contains(fileId),
                 isCached: filesStorage.isCachedLocally(fileId),
                 storage: storage,
                 nonce: $0[RichContentKeys.file.nonce] as? String ?? .empty,
                 isFromCurrentSender: isFromCurrentSender,
                 fileType: FileType(raw: fileType) ?? .other, 
-                progress: .zero, 
+                progress: progress,
                 isPreviewDownloadAllowed: isPreviewDownloadAllowed,
                 isFullMediaDownloadAllowed: isFullMediaDownloadAllowed
             )

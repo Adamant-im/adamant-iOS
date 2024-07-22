@@ -38,13 +38,14 @@ final class ChatFileService: ChatFileProtocol {
     private let filesNetworkManager: FilesNetworkManagerProtocol
     private let adamantCore: AdamantCore
     
-    @Atomic private var downloadingFilesIDsArray: [String] = []
+    @Atomic private var downloadingFilesIDsArray: [String: DownloadStatus] = [:]
     @Atomic private var uploadingFilesIDsArray: [String] = []
     @Atomic private var ignoreFilesIDsArray: [String] = []
     @Atomic private var busyFilesIDs: [String] = []
     @Atomic private var fileDownloadAttemptsCount: [String: Int] = [:]
     @Atomic private var uploadingFilesDictionary: [String: FileMessage] = [:]
-
+    @Atomic private var fileProgressValue: [String: Int] = [:]
+    
     private var subscriptions = Set<AnyCancellable>()
     private let maxDownloadAttemptsCount = 3
         
@@ -52,8 +53,12 @@ final class ChatFileService: ChatFileProtocol {
         $uploadingFilesIDsArray.wrappedValue
     }
     
-    var downloadingFiles: [String] {
+    var downloadingFiles: [String: DownloadStatus] {
         $downloadingFilesIDsArray.wrappedValue
+    }
+    
+    var filesLoadingProgress: [String: Int] {
+        $fileProgressValue.wrappedValue
     }
     
     let updateFileFields = ObservableSender<(
@@ -63,7 +68,7 @@ final class ChatFileService: ChatFileProtocol {
         preview: UIImage?,
         needUpdatePreview: Bool,
         cached: Bool?,
-        downloading: Bool?,
+        downloadStatus: DownloadStatus?,
         uploading: Bool?,
         progress: Int?
     )>()
@@ -160,7 +165,7 @@ final class ChatFileService: ChatFileProtocol {
         fullMediaDownloadPolicy: DownloadPolicy,
         saveEncrypted: Bool
     ) async {
-        guard !downloadingFiles.contains(file.file.id),
+        guard !downloadingFiles.keys.contains(file.file.id),
               !$ignoreFilesIDsArray.wrappedValue.contains(file.file.id),
               !$busyFilesIDs.wrappedValue.contains(file.file.id)
         else {
@@ -221,6 +226,16 @@ private extension ChatFileService {
                 
                 guard connection == true else { return }
                 self?.ignoreFilesIDsArray.removeAll()
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .Storage.storageClear)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.ignoreFilesIDsArray.removeAll()
+                self?.fileProgressValue.removeAll()
+                self?.fileDownloadAttemptsCount.removeAll()
             }
             .store(in: &subscriptions)
     }
@@ -326,7 +341,7 @@ private extension ChatFileService {
             preview: image,
             needUpdatePreview: true,
             cached: nil,
-            downloading: nil,
+            downloadStatus: nil,
             uploading: nil,
             progress: nil
         ))
@@ -365,7 +380,7 @@ private extension ChatFileService {
               let recipientId = chatroom?.partner?.address,
               NetworkFileProtocolType(rawValue: file.storage) != nil,
               (shouldDownloadOriginalFile || shouldDownloadPreviewFile),
-              !downloadingFiles.contains(file.file.id)
+              !downloadingFiles.keys.contains(file.file.id)
         else { return }
         
         guard !file.file.id.isEmpty,
@@ -375,20 +390,19 @@ private extension ChatFileService {
         }
         
         defer {
-            $downloadingFilesIDsArray.mutate { 
-                $0.removeAll(where: { $0 == file.file.id })
+            $downloadingFilesIDsArray.mutate {
+                $0[file.file.id] = nil
             }
-            sendUpdate(for: [file.file.id], downloading: false, uploading: nil)
+            sendUpdate(
+                for: [file.file.id],
+                downloadStatus: .init(
+                    isPreviewDownloading: false,
+                    isOriginalDownloading: false
+                ),
+                uploading: nil
+            )
         }
-        
-        $downloadingFilesIDsArray.mutate { $0.append(file.file.id) }
-        sendUpdate(
-            for: [file.file.id],
-            downloading: true,
-            uploading: nil,
-            progress: .zero
-        )
-        
+                
         let downloadFile = shouldDownloadOriginalFile
         && !filesStorage.isCachedLocally(file.file.id)
         
@@ -396,20 +410,33 @@ private extension ChatFileService {
         && shouldDownloadPreviewFile
         && !filesStorage.isCachedLocally(file.file.preview?.id ?? .empty)
         
-        let totalProgress = Progress(totalUnitCount: 100)
-        var previewWeight: Int64 = .zero
-        var fileWeight: Int64 = .zero
+        let downloadStatus: DownloadStatus = .init(
+            isPreviewDownloading: downloadPreview,
+            isOriginalDownloading: downloadFile
+        )
         
-        if downloadPreview && downloadFile {
-            previewWeight = 10
-            fileWeight = 90
-        } else if downloadPreview && !downloadFile {
-            previewWeight = 100
-            fileWeight = .zero
-        } else if !downloadPreview && downloadFile {
-            previewWeight = .zero
-            fileWeight = 100
-        }
+        $downloadingFilesIDsArray.mutate { $0[file.file.id] = downloadStatus }
+
+        // Here we start showing progress from the last saved value (fileProgressValue) instead of zero because in the UI we need to show progress when the download is frozen. We have N attempts to download, and the progress is overridden.
+        // So we start from the last saved progress and override it with 'downloadProgress' upon successful start of the download.
+        sendUpdate(
+            for: [file.file.id],
+            downloadStatus: .init(
+                isPreviewDownloading: downloadPreview,
+                isOriginalDownloading: downloadFile
+            ),
+            uploading: nil,
+            progress: downloadFile 
+            ? $fileProgressValue.wrappedValue[file.file.id] ?? .zero
+            : nil
+        )
+        
+        let totalProgress = Progress(totalUnitCount: 100)
+        
+        let (previewWeight, fileWeight) = getProgressWeights(
+            downloadPreview: false,
+            downloadFile: downloadFile
+        )
         
         let previewProgress = Progress(totalUnitCount: previewWeight)
         totalProgress.addChild(previewProgress, withPendingUnitCount: previewWeight)
@@ -431,13 +458,8 @@ private extension ChatFileService {
                     fileType: .image,
                     fileExtension: previewDTO.extension ?? .empty,
                     isPreview: true,
-                    downloadProgress: { [weak self] value in
+                    downloadProgress: { value in
                         previewProgress.completedUnitCount = Int64(value.fractionCompleted * Double(previewWeight))
-                        
-                        self?.sendProgress(
-                            for: file.file.id,
-                            progress: Int(totalProgress.fractionCompleted * 100)
-                        )
                     }
                 )
                 
@@ -450,7 +472,7 @@ private extension ChatFileService {
                     preview: preview,
                     needUpdatePreview: true,
                     cached: nil,
-                    downloading: nil,
+                    downloadStatus: nil,
                     uploading: nil,
                     progress: nil
                 ))
@@ -491,11 +513,32 @@ private extension ChatFileService {
                 preview: nil,
                 needUpdatePreview: false,
                 cached: cached,
-                downloading: nil,
+                downloadStatus: nil,
                 uploading: nil,
                 progress: nil
             ))
         }
+    }
+    
+    func getProgressWeights(
+        downloadPreview: Bool,
+        downloadFile: Bool
+    ) -> (previewWeight: Int64, fileWeight: Int64) {
+        var previewWeight: Int64 = .zero
+        var fileWeight: Int64 = .zero
+        
+        if downloadPreview && downloadFile {
+            previewWeight = 10
+            fileWeight = 90
+        } else if downloadPreview && !downloadFile {
+            previewWeight = 100
+            fileWeight = .zero
+        } else if !downloadPreview && downloadFile {
+            previewWeight = .zero
+            fileWeight = 100
+        }
+        
+        return (previewWeight, fileWeight)
     }
     
     func downloadAndCacheFile(
@@ -623,7 +666,7 @@ private extension ChatFileService {
 private extension ChatFileService {
     func sendUpdate(
         for files: [String],
-        downloading: Bool?,
+        downloadStatus: DownloadStatus?,
         uploading: Bool?,
         progress: Int? = nil
     ) {
@@ -635,14 +678,22 @@ private extension ChatFileService {
                 preview: nil,
                 needUpdatePreview: false,
                 cached: nil,
-                downloading: downloading,
+                downloadStatus: downloadStatus,
                 uploading: uploading,
                 progress: progress
             ))
+            
+            if progress != nil {
+                $fileProgressValue.mutate {
+                    $0[id] = progress
+                }
+            }
         }
     }
     
     func sendProgress(for fileId: String, progress: Int) {
+        guard $fileProgressValue.wrappedValue[fileId] != progress else { return }
+        
         updateFileFields.send((
             id: fileId,
             newId: nil,
@@ -650,10 +701,14 @@ private extension ChatFileService {
             preview: nil,
             needUpdatePreview: false,
             cached: nil,
-            downloading: nil,
+            downloadStatus: nil,
             uploading: nil,
             progress: progress
         ))
+        
+        $fileProgressValue.mutate {
+            $0[fileId] = progress
+        }
     }
 }
 
@@ -840,7 +895,13 @@ private extension ChatFileService {
                 }
             }
         }
-        sendUpdate(for: ids, downloading: nil, uploading: uploading)
+        
+        sendUpdate(
+            for: ids,
+            downloadStatus: nil,
+            uploading: uploading,
+            progress: uploading ? .zero : nil
+        )
     }
     
     func processFilesUpload(
@@ -873,6 +934,11 @@ private extension ChatFileService {
                 senderPrivateKey: keyPair.privateKey,
                 storageProtocol: storageProtocol, 
                 progress: uploadProgress
+            )
+            
+            sendProgress(
+                for: result.file.cid,
+                progress: 100
             )
             
             try cacheUploadedFile(
@@ -956,7 +1022,7 @@ private extension ChatFileService {
             preview: filesStorage.getPreview(for: previewResult?.cid ?? .empty),
             needUpdatePreview: true,
             cached: cached,
-            downloading: nil,
+            downloadStatus: nil,
             uploading: false,
             progress: nil
         ))
