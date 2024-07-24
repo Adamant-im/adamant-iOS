@@ -161,6 +161,30 @@ final class LoginViewController: FormViewController {
     private var hideNewPassphrase: Bool = true
     private var firstTimeActive: Bool = true
     internal var hidingImagePicker: Bool = false
+    private let instructionsService = InstructionsService()
+    
+    private lazy var instructions: [[Instruction]] = [
+        [
+            .init(
+                hint: .adamant.login.guideCreateAccount,
+                view: generateBtnRow.cell
+            ),
+            .init(
+                hint: .adamant.login.guidePassphrase,
+                view: passphraseRow.cell
+            ),
+            .init(
+                hint: .adamant.login.guideEnterAnAccount,
+                view: passwordRow.cell
+            )
+        ],
+        [
+            .init(
+                hint: .adamant.login.guideEnterAnAccount,
+                view: passwordRow.cell
+            )
+        ]
+    ]
     
     /// On launch, request user biometry (TouchID/FaceID) if has an account with biometry active
     var requestBiometryOnFirstTimeActive: Bool = true
@@ -189,18 +213,18 @@ final class LoginViewController: FormViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    let generateBtnRow = ButtonRow {
+    lazy var generateBtnRow = ButtonRow {
         $0.tag = Rows.generateNewPassphraseButton.tag
         $0.title = Rows.generateNewPassphraseButton.localized
     }
     
-    let passphraseRow = PassphraseRow {
+    lazy var passphraseRow = PassphraseRow {
         $0.tag = Rows.newPassphrase.tag
         $0.cell.tip = Rows.tapToSaveHint.localized
         $0.cell.height = {96.0}
     }
     
-    let passwordRow = PasswordRow {
+    lazy var passwordRow = PasswordRow {
         $0.tag = Rows.passphrase.tag
         $0.placeholder = Rows.passphrase.localized
         $0.placeholderColor = UIColor.adamant.secondary
@@ -208,30 +232,11 @@ final class LoginViewController: FormViewController {
         $0.keyboardReturnType = KeyboardReturnTypeConfiguration(nextKeyboardType: .go, defaultKeyboardType: .go)
     }
     
-    let coachMarksController = CoachMarksController()
-    var useInvisibleOverlay: Bool = false
-    var fromCopy = false
-    
     // MARK: Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationOptions = RowNavigationOptions.Disabled
-        
-        coachMarksController.dataSource = self
-        coachMarksController.delegate = self
-        
-        let skipView = SkipView()
-        skipView.backgroundColor = UIColor.adamant.pickedReactionBackground
-        skipView.layer.cornerRadius = 10
-        skipView.setTitle(.adamant.login.guideSkipButton, for: .normal)
-        skipView.setTitleColor(UIColor.adamant.textColor, for: .normal)
-        self.coachMarksController.skipView = skipView
-        
-        if useInvisibleOverlay {
-            self.coachMarksController.overlay.areTouchEventsForwarded = true
-            self.coachMarksController.overlay.backgroundColor = .clear
-        }
         
         // MARK: Header & Footer
         if let header = UINib(nibName: "LogoFullHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
@@ -282,9 +287,8 @@ final class LoginViewController: FormViewController {
             }()
         }
         
-        // Passphrase row
-        passwordRow.onCellSelection { [weak self] _, _ in
-            self?.coachMarksController.stop()
+        passwordRow.onCellHighlightChanged { [weak self] _, _ in
+            self?.instructionsService.stop()
         }
         
         loginSection.append(passwordRow)
@@ -364,7 +368,7 @@ final class LoginViewController: FormViewController {
                 tableView.deselectRow(at: indexPath, animated: true)
             }
             
-            self?.coachMarksController.stop()
+            self?.instructionsService.stop()
             
             let encodedPassphrase = AdamantUriTools.encode(request: AdamantUri.passphrase(passphrase: passphrase))
             dialogService.presentShareAlertFor(
@@ -375,9 +379,14 @@ final class LoginViewController: FormViewController {
                 from: cell,
                 completion: nil,
                 didSelect: { [weak self] type in
-                    guard let self = self else { return }
-                    self.fromCopy = true
-                    self.coachMarksController.start(in: .viewController(self))
+                    guard let self = self,
+                          case .copyToPasteboard = type
+                    else { return }
+                    
+                    self.instructionsService.display(
+                        instructions: self.instructions[1],
+                        from: self
+                    )
                 }
             )
         })
@@ -387,7 +396,7 @@ final class LoginViewController: FormViewController {
         generateBtnRow
             .onCellSelection { [weak self] (_, _) in
                 self?.generateNewPassphrase()
-                self?.coachMarksController.flow.showNext()
+                self?.instructionsService.showNext()
             }
         
         newAccountSection.append(generateBtnRow)
@@ -459,17 +468,16 @@ final class LoginViewController: FormViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        self.coachMarksController.stop(immediately: true)
+        self.instructionsService.stop()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        self.coachMarksController.overlay.areTouchEventsForwarded = true
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            self.tableView.scrollToBottom(animated: true)
-            self.coachMarksController.start(in: .viewController(self))
-        }
+        self.tableView.scrollToBottom(animated: true)
+        self.instructionsService.display(
+            instructions: self.instructions[0],
+            from: self
+        )
     }
     
     // MARK: - Other
@@ -566,73 +574,3 @@ extension LoginViewController: ButtonsStripeViewDelegate {
     }
 }
 
-extension LoginViewController: CoachMarksControllerDataSource, CoachMarksControllerDelegate {
-    func coachMarksController(_ coachMarksController: CoachMarksController, didTapCoachMarkAt index: Int) {
-        if !fromCopy, index == 0 {
-            generateNewPassphrase()
-        }
-    }
-    
-    func coachMarksController(
-        _ coachMarksController: Instructions.CoachMarksController,
-        coachMarkViewsAt index: Int,
-        madeFrom coachMark: Instructions.CoachMark
-    ) -> (bodyView: (UIView & Instructions.CoachMarkBodyView), arrowView: (UIView & Instructions.CoachMarkArrowView)?) {
-            let coachViews = coachMarksController.helper.makeDefaultCoachViews(
-                withArrow: true,
-                withNextText: false,
-                arrowOrientation: coachMark.arrowOrientation
-            )
-            
-        let backgroundColor = UIColor.adamant.pickedReactionBackground
-        coachViews.bodyView.hintLabel.textColor = UIColor.adamant.textColor
-        coachViews.bodyView.background.borderColor = backgroundColor
-        coachViews.bodyView.background.innerColor = backgroundColor
-        coachViews.arrowView?.background.innerColor = backgroundColor
-        coachViews.arrowView?.background.borderColor = backgroundColor
-        
-        if fromCopy, index == 0 {
-            coachViews.bodyView.hintLabel.text = .adamant.login.guideEnterAnAccount
-        }
-        
-        if index == 0 {
-            coachViews.bodyView.hintLabel.text = .adamant.login.guideCreateAccount
-        }
-        if index == 1 {
-            coachViews.bodyView.hintLabel.text = .adamant.login.guidePassphrase
-        }
-        if index == 2 {
-            coachViews.bodyView.hintLabel.text = .adamant.login.guideEnterAnAccount
-        }
-        
-        return (bodyView: coachViews.bodyView, arrowView: coachViews.arrowView)
-    }
-    
-    func coachMarksController(_ coachMarksController: Instructions.CoachMarksController, coachMarkAt index: Int) -> Instructions.CoachMark {
-        if fromCopy, index == 0 {
-            return coachMarksController.helper.makeCoachMark(for: passwordRow.cell)
-        }
-        
-        if index == 0 {
-            return coachMarksController.helper.makeCoachMark(for: generateBtnRow.cell)
-        }
-        if index == 1 {
-            return coachMarksController.helper.makeCoachMark(for: passphraseRow.cell)
-        }
-        
-        return coachMarksController.helper.makeCoachMark(for: passwordRow.cell)
-    }
-    
-    func numberOfCoachMarks(for coachMarksController: Instructions.CoachMarksController) -> Int {
-        if fromCopy { return 1 }
-        
-        return 3
-    }
-}
-
-public class SkipView: UIButton, CoachMarkSkipView {
-    // MARK: Public properties
-    public var skipControl: UIControl? {
-        return self
-    }
-}

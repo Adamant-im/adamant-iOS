@@ -64,6 +64,8 @@
 		3AF08D612B4EB3C400EB82B1 /* LanguageStorageProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF08D602B4EB3C400EB82B1 /* LanguageStorageProtocol.swift */; };
 		3AF53F8D2B3DCFA300B30312 /* NodeGroup+Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF53F8C2B3DCFA300B30312 /* NodeGroup+Constants.swift */; };
 		3AF53F8F2B3EE0DA00B30312 /* DogeNodeInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF53F8E2B3EE0DA00B30312 /* DogeNodeInfo.swift */; };
+		3AF8FEBD2C50F36A0025BCE5 /* InstructionsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF8FEBC2C50F36A0025BCE5 /* InstructionsService.swift */; };
+		3AF8FEBF2C5124790025BCE5 /* InstructionsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF8FEBE2C5124790025BCE5 /* InstructionsProtocol.swift */; };
 		3AFE7E412B18D88B00718739 /* WalletService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AFE7E402B18D88B00718739 /* WalletService.swift */; };
 		3AFE7E432B19E4D900718739 /* WalletServiceCompose.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AFE7E422B19E4D900718739 /* WalletServiceCompose.swift */; };
 		3AFE7E522B1F6B3400718739 /* WalletServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AFE7E512B1F6B3400718739 /* WalletServiceProtocol.swift */; };
@@ -716,6 +718,8 @@
 		3AF08D602B4EB3C400EB82B1 /* LanguageStorageProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageStorageProtocol.swift; sourceTree = "<group>"; };
 		3AF53F8C2B3DCFA300B30312 /* NodeGroup+Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NodeGroup+Constants.swift"; sourceTree = "<group>"; };
 		3AF53F8E2B3EE0DA00B30312 /* DogeNodeInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeNodeInfo.swift; sourceTree = "<group>"; };
+		3AF8FEBC2C50F36A0025BCE5 /* InstructionsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstructionsService.swift; sourceTree = "<group>"; };
+		3AF8FEBE2C5124790025BCE5 /* InstructionsProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstructionsProtocol.swift; sourceTree = "<group>"; };
 		3AFE7E402B18D88B00718739 /* WalletService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletService.swift; sourceTree = "<group>"; };
 		3AFE7E422B19E4D900718739 /* WalletServiceCompose.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletServiceCompose.swift; sourceTree = "<group>"; };
 		3AFE7E512B1F6B3400718739 /* WalletServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletServiceProtocol.swift; sourceTree = "<group>"; };
@@ -2003,6 +2007,7 @@
 				3A96E37B2AED27F8001F5A52 /* PartnerQRService.swift */,
 				3AF08D602B4EB3C400EB82B1 /* LanguageStorageProtocol.swift */,
 				265AA1612B74E6B900CF98B0 /* ChatPreservation.swift */,
+				3AF8FEBE2C5124790025BCE5 /* InstructionsProtocol.swift */,
 			);
 			path = ServiceProtocols;
 			sourceTree = "<group>";
@@ -2040,6 +2045,7 @@
 				3A2F55FD2AC6F90E000A3F26 /* AdamantCoinStorageService.swift */,
 				3A96E3792AED27D7001F5A52 /* AdamantPartnerQRService.swift */,
 				3AF08D5E2B4EB3A200EB82B1 /* LanguageService.swift */,
+				3AF8FEBC2C50F36A0025BCE5 /* InstructionsService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -3245,6 +3251,7 @@
 				E99818942120892F0018C84C /* WalletViewControllerBase.swift in Sources */,
 				E9B3D39E201F99F40019EB36 /* DataProvider.swift in Sources */,
 				93BF4A6C29E4B4BF00505CD0 /* DelegatesBottomPanel+Model.swift in Sources */,
+				3AF8FEBF2C5124790025BCE5 /* InstructionsProtocol.swift in Sources */,
 				93294B882AAD0E0A00911109 /* AdmWalletService.swift in Sources */,
 				648DD7A82239147800B811FD /* DogeWalletService+RichMessageProvider.swift in Sources */,
 				E9E7CDC02003AF6D00DFC4DB /* AdamantCellFactory.swift in Sources */,
@@ -3324,6 +3331,7 @@
 				E9FAE5DA203DBFEF008D3A6B /* Comparable+clamped.swift in Sources */,
 				93A91FD329799298001DB1F8 /* ChatStartPosition.swift in Sources */,
 				3A2F55F92AC6F308000A3F26 /* CoinTransaction+CoreDataClass.swift in Sources */,
+				3AF8FEBD2C50F36A0025BCE5 /* InstructionsService.swift in Sources */,
 				93A91FD1297972B7001DB1F8 /* ChatScrollDownButton.swift in Sources */,
 				3AA3880A2B69173500125684 /* DashNetworkInfoDTO.swift in Sources */,
 				41C1698C29E7F34900FEB3CB /* RichTransactionReplyService.swift in Sources */,
