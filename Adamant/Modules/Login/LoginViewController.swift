@@ -10,6 +10,7 @@ import UIKit
 import Eureka
 import MarkdownKit
 import CommonKit
+import Instructions
 
 // MARK: - Localization
 extension String.adamant {
@@ -40,6 +41,20 @@ extension String.adamant {
         }
         static var emptyPassphraseAlert: String {
             String.localized("LoginScene.Error.NoPassphrase", comment: "Login: notify user that he is trying to login without a passphrase")
+        }
+        static var guideSkipButton: String {
+            String.localized("VisualGuide.SkipButton", comment: "Visual Guide: Skip button")
+        }
+        static var guideCreateAccount: String {
+            String.localized("VisualGuide.HintLabel.CreateAccount", comment: "Visual Guide: Description for hint - Create a new account")
+        }
+        
+        static var guidePassphrase: String {
+            String.localized("VisualGuide.HintLabel.Passphrase", comment: "Visual Guide: Description for hint - Persuade a user to treat passphrase serious")
+        }
+        
+        static var guideEnterAnAccount: String {
+            String.localized("VisualGuide.HintLabel.EnterAnAccount", comment: "Visual Guide: Description for hint - How to enter an account")
         }
     }
 }
@@ -146,6 +161,30 @@ final class LoginViewController: FormViewController {
     private var hideNewPassphrase: Bool = true
     private var firstTimeActive: Bool = true
     internal var hidingImagePicker: Bool = false
+    private let instructionsService = InstructionsService()
+    
+    private lazy var instructions: [[Instruction]] = [
+        [
+            .init(
+                hint: .adamant.login.guideCreateAccount,
+                view: generateBtnRow.cell
+            ),
+            .init(
+                hint: .adamant.login.guidePassphrase,
+                view: passphraseRow.cell
+            ),
+            .init(
+                hint: .adamant.login.guideEnterAnAccount,
+                view: passwordRow.cell
+            )
+        ],
+        [
+            .init(
+                hint: .adamant.login.guideEnterAnAccount,
+                view: passwordRow.cell
+            )
+        ]
+    ]
     
     /// On launch, request user biometry (TouchID/FaceID) if has an account with biometry active
     var requestBiometryOnFirstTimeActive: Bool = true
@@ -174,6 +213,25 @@ final class LoginViewController: FormViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    lazy var generateBtnRow = ButtonRow {
+        $0.tag = Rows.generateNewPassphraseButton.tag
+        $0.title = Rows.generateNewPassphraseButton.localized
+    }
+    
+    lazy var passphraseRow = PassphraseRow {
+        $0.tag = Rows.newPassphrase.tag
+        $0.cell.tip = Rows.tapToSaveHint.localized
+        $0.cell.height = {96.0}
+    }
+    
+    lazy var passwordRow = PasswordRow {
+        $0.tag = Rows.passphrase.tag
+        $0.placeholder = Rows.passphrase.localized
+        $0.placeholderColor = UIColor.adamant.secondary
+        $0.cell.textField.enablePasswordToggle()
+        $0.keyboardReturnType = KeyboardReturnTypeConfiguration(nextKeyboardType: .go, defaultKeyboardType: .go)
+    }
+    
     // MARK: Lifecycle
     
     override func viewDidLoad() {
@@ -199,7 +257,7 @@ final class LoginViewController: FormViewController {
         }
         
         // MARK: Login section
-        form +++ Section(Sections.login.localized) {
+        let loginSection = Section(Sections.login.localized) {
             $0.tag = Sections.login.tag
             
             $0.footer = { [weak self] in
@@ -229,17 +287,14 @@ final class LoginViewController: FormViewController {
             }()
         }
         
-        // Passphrase row
-        <<< PasswordRow {
-            $0.tag = Rows.passphrase.tag
-            $0.placeholder = Rows.passphrase.localized
-            $0.placeholderColor = UIColor.adamant.secondary
-            $0.cell.textField.enablePasswordToggle()
-            $0.keyboardReturnType = KeyboardReturnTypeConfiguration(nextKeyboardType: .go, defaultKeyboardType: .go)
-            }
+        passwordRow.onCellHighlightChanged { [weak self] _, _ in
+            self?.instructionsService.stop()
+        }
+        
+        loginSection.append(passwordRow)
             
         // Login with passphrase row
-        <<< ButtonRow {
+        let buttonRow = ButtonRow {
             $0.tag = Rows.loginButton.tag
             $0.title = Rows.loginButton.localized
             $0.disabled = Condition.function([Rows.passphrase.tag], { form -> Bool in
@@ -256,13 +311,18 @@ final class LoginViewController: FormViewController {
             self?.loginWith(passphrase: passphrase)
         }
         
+        loginSection.append(buttonRow)
+        
+        form.append(loginSection)
+
         // MARK: New account section
-        form +++ Section(Sections.newAccount.localized) {
+
+        let newAccountSection = Section(Sections.newAccount.localized) {
             $0.tag = Sections.newAccount.tag
         }
         
         // Alert
-        <<< TextAreaRow {
+        let textAreaRow = TextAreaRow {
             $0.tag = Rows.saveYourPassphraseAlert.tag
             $0.textAreaHeight = .dynamic(initialTextViewHeight: 44)
             $0.hidden = Condition.function([], { [weak self] _ -> Bool in
@@ -284,15 +344,14 @@ final class LoginViewController: FormViewController {
             cell.textView.attributedText = mutableText
         }
         
+        newAccountSection.append(textAreaRow)
+
         // New genegated passphrase
-        <<< PassphraseRow {
-            $0.tag = Rows.newPassphrase.tag
-            $0.cell.tip = Rows.tapToSaveHint.localized
-            $0.cell.height = {96.0}
-            $0.hidden = Condition.function([], { [weak self] _ -> Bool in
-                return self?.hideNewPassphrase ?? true
-            })
-        }.cellUpdate({ (cell, _) in
+        passphraseRow.hidden = Condition.function([], { [weak self] _ -> Bool in
+            return self?.hideNewPassphrase ?? true
+        })
+        
+        passphraseRow.cellUpdate({ (cell, _) in
             cell.passphraseLabel.font = UIFont.systemFont(ofSize: 19)
             cell.passphraseLabel.textColor = UIColor.adamant.primary
             cell.passphraseLabel.textAlignment = .center
@@ -309,20 +368,38 @@ final class LoginViewController: FormViewController {
                 tableView.deselectRow(at: indexPath, animated: true)
             }
             
+            self?.instructionsService.stop()
+            
             let encodedPassphrase = AdamantUriTools.encode(request: AdamantUri.passphrase(passphrase: passphrase))
-            dialogService.presentShareAlertFor(string: passphrase,
-                                               types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedPassphrase, sharingTip: nil, withLogo: false)],
-                                               excludedActivityTypes: ShareContentType.passphrase.excludedActivityTypes,
-                                               animated: true, from: cell,
-                                               completion: nil)
+            dialogService.presentShareAlertFor(
+                string: passphrase,
+                types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedPassphrase, sharingTip: nil, withLogo: false)],
+                excludedActivityTypes: ShareContentType.passphrase.excludedActivityTypes,
+                animated: true,
+                from: cell,
+                completion: nil,
+                didSelect: { [weak self] type in
+                    guard let self = self,
+                          case .copyToPasteboard = type
+                    else { return }
+                    
+                    self.instructionsService.display(
+                        instructions: self.instructions[1],
+                        from: self
+                    )
+                }
+            )
         })
         
-        <<< ButtonRow {
-            $0.tag = Rows.generateNewPassphraseButton.tag
-            $0.title = Rows.generateNewPassphraseButton.localized
-        }.onCellSelection { [weak self] (_, _) in
-            self?.generateNewPassphrase()
-        }
+        newAccountSection.append(passphraseRow)
+
+        generateBtnRow
+            .onCellSelection { [weak self] (_, _) in
+                self?.generateNewPassphrase()
+                self?.instructionsService.showNext()
+            }
+        
+        newAccountSection.append(generateBtnRow)
         
         // MARK: Nodes list settings
         form +++ Section()
@@ -357,6 +434,8 @@ final class LoginViewController: FormViewController {
             present(nav, animated: true, completion: nil)
         }
         
+        form.append(newAccountSection)
+        
         // MARK: tableView position tuning
         if let row: PasswordRow = form.rowBy(tag: Rows.passphrase.tag) {
             NotificationCenter.default.addObserver(forName: UITextField.textDidBeginEditingNotification, object: row.cell.textField, queue: nil) { [weak self] _ in
@@ -385,6 +464,20 @@ final class LoginViewController: FormViewController {
         }
         
         setColors()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.instructionsService.stop()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.tableView.scrollToBottom(animated: true)
+        self.instructionsService.display(
+            instructions: self.instructions[0],
+            from: self
+        )
     }
     
     // MARK: - Other
@@ -480,3 +573,4 @@ extension LoginViewController: ButtonsStripeViewDelegate {
         }
     }
 }
+

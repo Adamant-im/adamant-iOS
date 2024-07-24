@@ -14,12 +14,22 @@ import Parchment
 import SnapKit
 import CommonKit
 import Combine
+import Instructions
 
 // MARK: - Localization
 extension String.adamant {
     enum account {
         static var title: String {
             String.localized("AccountTab.Title", comment: "Account page: scene title")
+        }
+        static var guideSetPIN: String {
+            String.localized("VisualGuide.HintLabel.SetPIN", comment: "Visual Guide: Description for hint - How to set PIN code for login")
+        }
+        static var guideSetBiometry: String {
+            String.localized("VisualGuide.HintLabel.SetBiometry", comment: "Visual Guide: Description for hint - How to set face ID for login")
+        }
+        static var guideGetFreeTokens: String {
+            String.localized("VisualGuide.HintLabel.GetFreeTokens", comment: "Visual Guide: Inform users that they can receive free tokens")
         }
         
         static let updatingBalance = "…"
@@ -175,6 +185,33 @@ final class AccountViewController: FormViewController {
         return accountService.hasStayInAccount
     }
     
+    private lazy var stayInRow: SwitchRow = SwitchRow {
+        $0.tag = Rows.stayIn.tag
+        $0.title = Rows.stayIn.localized
+        $0.cell.imageView?.image = Rows.stayIn.image
+    }
+    
+    private lazy var biometryRow = SwitchRow { [weak self] in
+        guard let self = self else { return }
+        $0.tag = Rows.biometry.tag
+        $0.title = localAuth.biometryType.localized
+        $0.value = accountService.useBiometry
+        
+        switch localAuth.biometryType {
+        case .none: $0.cell.imageView?.image = nil
+        case .touchID: $0.cell.imageView?.image = .asset(named: "row_touchid.png")
+        case .faceID: $0.cell.imageView?.image = .asset(named: "row_faceid.png")
+        }
+        
+        $0.hidden = Condition.function([], { [weak self] _ -> Bool in
+            guard let showBiometry = self?.showBiometryOptions else {
+                return true
+            }
+            
+            return !showBiometry
+        })
+    }
+    
     var showBiometryOptions: Bool {
         switch localAuth.biometryType {
         case .none:
@@ -193,6 +230,23 @@ final class AccountViewController: FormViewController {
         refreshControl.addTarget(self, action: #selector(self.handleRefresh(_:)), for: UIControl.Event.valueChanged)
         return refreshControl
     }()
+    
+    private let instructionsService = InstructionsService()
+    
+    private lazy var instructions: [[Instruction]] = [
+        [
+            .init(
+                hint: .adamant.account.guideSetPIN,
+                view: stayInRow.cell
+            )
+        ],
+        [
+            .init(
+                hint: .adamant.account.guideSetBiometry,
+                view: biometryRow.cell
+            )
+        ]
+    ]
     
     // MARK: - Init
     
@@ -272,7 +326,6 @@ final class AccountViewController: FormViewController {
         
         let footerView = AccountFooterView(frame: CGRect(x: .zero, y: .zero, width: self.view.frame.width, height: 100))
         tableView.tableFooterView = footerView
-        
         
         // MARK: Wallet pages
         setupWalletsVC()
@@ -645,13 +698,9 @@ final class AccountViewController: FormViewController {
         }
         
         // Stay in
-        
-        let stayInRow = SwitchRow {
-            $0.tag = Rows.stayIn.tag
-            $0.title = Rows.stayIn.localized
-            $0.cell.imageView?.image = Rows.stayIn.image
-            $0.value = accountService.hasStayInAccount
-        }.cellUpdate { (cell, row) in
+        stayInRow.value = accountService.hasStayInAccount
+
+        stayInRow.cellUpdate { (cell, row) in
             cell.switchControl.onTintColor = UIColor.adamant.active
             row.title = Rows.stayIn.localized
         }.onChange { [weak self] row in
@@ -660,36 +709,25 @@ final class AccountViewController: FormViewController {
             }
             
             self?.setStayLoggedIn(enabled: enabled)
+            
+            guard enabled else { return }
+            
+            self?.instructionsService.stop()
         }
         
         securitySection.append(stayInRow)
         
         // Biometry
-        let biometryRow = SwitchRow { [weak self] in
-            guard let self = self else { return }
-            $0.tag = Rows.biometry.tag
-            $0.title = localAuth.biometryType.localized
-            $0.value = accountService.useBiometry
-            
-            switch localAuth.biometryType {
-            case .none: $0.cell.imageView?.image = nil
-            case .touchID: $0.cell.imageView?.image = .asset(named: "row_touchid.png")
-            case .faceID: $0.cell.imageView?.image = .asset(named: "row_faceid.png")
-            }
-            
-            $0.hidden = Condition.function([], { [weak self] _ -> Bool in
-                guard let showBiometry = self?.showBiometryOptions else {
-                    return true
-                }
-                
-                return !showBiometry
-            })
-        }.cellUpdate { [weak self] (cell, row) in
+        biometryRow.value = accountService.useBiometry
+        biometryRow.cellUpdate { [weak self] (cell, row) in
             cell.switchControl.onTintColor = UIColor.adamant.active
             row.title = self?.localAuth.biometryType.localized
         }.onChange { [weak self] row in
-            let value = row.value ?? false
-            self?.setBiometry(enabled: value)
+            let enabled = row.value ?? false
+            self?.setBiometry(enabled: enabled)
+            
+            guard enabled else { return }
+            self?.instructionsService.stop()
         }
         
         securitySection.append(biometryRow)
@@ -761,6 +799,8 @@ final class AccountViewController: FormViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         navigationController?.setNavigationBarHidden(false, animated: animated)
+        
+        instructionsService.stop()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -769,6 +809,14 @@ final class AccountViewController: FormViewController {
         if !initiated {
             initiated = true
         }
+        
+        guard let instructions = instructions[safe: 0]
+        else { return }
+        
+        instructionsService.display(
+            instructions: instructions,
+            from: self
+        )
     }
     
     override func viewDidLayoutSubviews() {
@@ -832,7 +880,10 @@ final class AccountViewController: FormViewController {
         }
         
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.stayInChanged, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            guard let form = self?.form, let accountService = self?.accountService else {
+            guard let form = self?.form,
+                  let accountService = self?.accountService,
+                  let self = self
+            else {
                 return
             }
             
@@ -845,6 +896,14 @@ final class AccountViewController: FormViewController {
                 row.value = accountService.hasStayInAccount && accountService.useBiometry
                 row.evaluateHidden()
                 row.updateCell()
+                
+                if accountService.hasStayInAccount,
+                   let instructions = self.instructions[safe: 1] {
+                    self.instructionsService.display(
+                        instructions: instructions,
+                        from: self
+                    )
+                }
             }
             
             if let row = form.rowBy(tag: Rows.notifications.tag) {
