@@ -16,7 +16,7 @@ public final class ExtensionsApi {
     
     public private(set) lazy var nodes: [Node] = {
         let nodes = keychainStore.get(nodesStoreKey) ?? AdamantResources.nodes
-        return nodes.getAllowedNodes(sortedBySpeedDescending: true, needWS: false).reversed()
+        return nodes.filter { $0.isEnabled }.shuffled()
     }()
     
     private var currentNode: Node?

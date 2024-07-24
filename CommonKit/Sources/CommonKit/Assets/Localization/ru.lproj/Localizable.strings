@@ -172,8 +172,8 @@
 /* Account tab: 'Send ETH tokens' button */
 "AccountTab.Row.SendEth" = "Отправить ETH";
 
-/* Account tab: 'Send LSK tokens' button */
-"AccountTab.Row.SendLsk" = "Отправить LSK";
+/* Account tab: 'Send KLY tokens' button */
+"AccountTab.Row.SendKly" = "Отправить KLY";
 
 /* Account tab: 'Send BTC tokens' button */
 "AccountTab.Row.SendBtc" = "Отправить BTC";
@@ -238,8 +238,8 @@
 /* Account tab: Ethereum wallet */
 "AccountTab.Wallets.ethereum_wallet" = "Кошелек Ethereum";
 
-/* Account tab: Lisk wallet */
-"AccountTab.Wallets.lisk_wallet" = "Кошелек Lisk";
+/* Account tab: Klayr wallet */
+"AccountTab.Wallets.kly_wallet" = "Кошелек Klayr";
 
 /* Account tab: Bitcoin wallet */
 "AccountTab.Wallets.bitcoin_wallet" = "Кошелек Bitcoin";
@@ -1096,6 +1096,9 @@
 /* Transfer: comment for transfer in chat */
 "TransferScene.Row.Comments" = "Комментарии";
 
+/* Transfer: Blockchain comment for transfer in chat */
+"TransferScene.Row.Blockchain.Comments" = "Публичное сообщение в %@ блокчейне";
+
 /* Transfer: transfer increase fee */
 "TransferScene.Row.IncreaseFee" = "Увеличить комиссию";
 
@@ -1242,3 +1245,6 @@
 
 /* Include partner url */
 "PartnerQR.includePartnerURL" = "Добавить ссылку на веб-приложение";
+
+/* Transaction: Unknown token */
+"Transaction.UnknownTokenTitle" = "Unknown";

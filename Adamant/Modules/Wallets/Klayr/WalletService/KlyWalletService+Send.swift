@@ -1,38 +1,29 @@
 //
-//  LskWalletService+Send.swift
+//  KlyWalletService+Send.swift
 //  Adamant
 //
-//  Created by Anton Boyarkin on 29/11/2018.
-//  Copyright © 2018 Adamant. All rights reserved.
+//  Created by Stanislav Jelezoglo on 08.07.2024.
+//  Copyright © 2024 Adamant. All rights reserved.
 //
 
 import UIKit
 import LiskKit
 import CommonKit
 
-extension LocalTransaction: RawTransaction {
-    var txHash: String? {
-        return id
-    }
-}
-
-extension TransactionEntity: RawTransaction {
-    var txHash: String? {
-        return id
-    }
-}
-
-extension LskWalletService: WalletServiceTwoStepSend {
+extension KlyWalletService: WalletServiceTwoStepSend {
     typealias T = TransactionEntity
     
     // MARK: Create & Send
     func createTransaction(
         recipient: String,
         amount: Decimal,
-        fee: Decimal
+        fee: Decimal,
+        comment: String?
     ) async throws -> TransactionEntity {
         // MARK: 1. Prepare
-        guard let wallet = lskWallet, let binaryAddress = LiskKit.Crypto.getBinaryAddressFromBase32(recipient) else {
+        guard let wallet = klyWallet,
+                let binaryAddress = LiskKit.Crypto.getBinaryAddressFromBase32(recipient)
+        else {
             throw WalletServiceError.notLogged
         }
         
@@ -45,7 +36,8 @@ extension LskWalletService: WalletServiceTwoStepSend {
             fee: fee,
             nonce: wallet.nonce,
             senderPublicKey: wallet.keyPair.publicKeyString,
-            recipientAddressBinary: binaryAddress
+            recipientAddressBinary: binaryAddress,
+            comment: comment ?? .empty
         )
         
         let signedTransaction = transaction.sign(with: keys, for: Constants.chainID)
@@ -53,8 +45,20 @@ extension LskWalletService: WalletServiceTwoStepSend {
     }
     
     func sendTransaction(_ transaction: TransactionEntity) async throws {
-        _ = try await lskNodeApiService.requestTransactionsApi { api in
+        _ = try await klyNodeApiService.requestTransactionsApi { api in
             try await api.submit(transaction: transaction)
         }.get()
+    }
+}
+
+extension LocalTransaction: RawTransaction {
+    var txHash: String? {
+        return id
+    }
+}
+
+extension TransactionEntity: RawTransaction {
+    var txHash: String? {
+        return id
     }
 }

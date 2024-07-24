@@ -1,9 +1,9 @@
 //
-//  LskWalletFactory.swift
+//  KlyWalletFactory.swift
 //  Adamant
 //
-//  Created by Anton Boyarkin on 27/11/2018.
-//  Copyright © 2018 Adamant. All rights reserved.
+//  Created by Stanislav Jelezoglo on 08.07.2024.
+//  Copyright © 2024 Adamant. All rights reserved.
 //
 
 import Swinject
@@ -11,14 +11,14 @@ import UIKit
 import CommonKit
 import LiskKit
 
-struct LskWalletFactory: WalletFactory {
+struct KlyWalletFactory: WalletFactory {
     typealias Service = WalletService
     
-    let typeSymbol: String = LskWalletService.richMessageType
+    let typeSymbol: String = KlyWalletService.richMessageType
     let assembler: Assembler
     
     func makeWalletVC(service: Service, screensFactory: ScreensFactory) -> WalletViewController {
-        LskWalletViewController(
+        KlyWalletViewController(
             dialogService: assembler.resolve(DialogService.self)!,
             currencyInfoService: assembler.resolve(CurrencyInfoService.self)!,
             accountService: assembler.resolve(AccountService.self)!,
@@ -29,7 +29,7 @@ struct LskWalletFactory: WalletFactory {
     }
     
     func makeTransferListVC(service: Service, screensFactory: ScreensFactory) -> UIViewController {
-        LskTransactionsViewController(
+        KlyTransactionsViewController(
             walletService: service,
             dialogService: assembler.resolve(DialogService.self)!,
             reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
@@ -38,7 +38,7 @@ struct LskWalletFactory: WalletFactory {
     }
     
     func makeTransferVC(service: Service, screensFactory: ScreensFactory) -> TransferViewControllerBase {
-        LskTransferViewController(
+        KlyTransferViewController(
             chatsProvider: assembler.resolve(ChatsProvider.self)!,
             accountService: assembler.resolve(AccountService.self)!,
             accountsProvider: assembler.resolve(AccountsProvider.self)!,
@@ -82,7 +82,7 @@ struct LskWalletFactory: WalletFactory {
     }
 }
 
-private extension LskWalletFactory {
+private extension KlyWalletFactory {
     private func makeTransactionDetailsVC(
         hash: String,
         senderId: String?,
@@ -117,7 +117,7 @@ private extension LskWalletFactory {
             confirmationsValue: nil,
             blockValue: nil,
             isOutgoing: richTransaction.isOutgoing,
-            transactionStatus: nil, 
+            transactionStatus: nil,
             nonceRaw: nil
         )
 
@@ -126,8 +126,8 @@ private extension LskWalletFactory {
         return vc
     }
     
-    func makeTransactionDetailsVC(service: Service) -> LskTransactionDetailsViewController {
-        LskTransactionDetailsViewController(
+    func makeTransactionDetailsVC(service: Service) -> KlyTransactionDetailsViewController {
+        KlyTransactionDetailsViewController(
             dialogService: assembler.resolve(DialogService.self)!,
             currencyInfo: assembler.resolve(CurrencyInfoService.self)!,
             addressBookService: assembler.resolve(AddressBookService.self)!,

@@ -2,12 +2,12 @@ import Foundation
 import BigInt
 import CommonKit
     
-extension LskWalletService {
+extension KlyWalletService {
     // MARK: - Constants
     static let fixedFee: Decimal = 0.00164
-    static let currencySymbol = "LSK"
+    static let currencySymbol = "KLY"
     static let currencyExponent: Int = -8
-    static let qqPrefix: String = "lisk"
+    static let qqPrefix: String = "klayr"
     
     static let healthCheckParameters = CoinHealthCheckParameters(
         normalUpdateInterval: 270,
@@ -40,7 +40,7 @@ extension LskWalletService {
     }
         
     var tokenName: String {
-        "Lisk"
+        "Klayr"
     }
     
     var consistencyMaxTime: Double {
@@ -60,7 +60,7 @@ extension LskWalletService {
     }
     
     var defaultOrdinalLevel: Int? {
-        60
+        50
     }
     
     static var minNodeVersion: String? {
@@ -71,21 +71,19 @@ extension LskWalletService {
         8
     }
     
-    static let explorerAddress = "https://liskscan.com/transaction/"
+    static let explorerAddress = "https://explorer.klayr.xyz/transaction/"
     
     static var nodes: [Node] {
         [
-            Node(url: URL(string: "https://lisknode3.adamant.im")!, altUrl: URL(string: "http://157.90.229.236:44099")),
-Node(url: URL(string: "https://lisknode4.adamant.im")!, altUrl: URL(string: "http://78.47.205.206:44099")),
-Node(url: URL(string: "https://lisknode5.adamant.im")!, altUrl: URL(string: "http://38.242.243.29:44099")),
+            Node(url: URL(string: "https://klynode1.adamant.im")!, altUrl: URL(string: "http://195.26.255.137:44099")),
+Node(url: URL(string: "https://klynode2.adamant.im")!, altUrl: URL(string: "http://109.176.199.130:44099")),
         ]
     }
     
     static var serviceNodes: [Node] {
         [
-            Node(url: URL(string: "https://liskservice3.adamant.im")!),
-Node(url: URL(string: "https://liskservice4.adamant.im")!),
-Node(url: URL(string: "https://liskservice5.adamant.im")!),
+            Node(url: URL(string: "https://klyservice1.adamant.im")!),
+Node(url: URL(string: "https://klyservice2.adamant.im")!),
         ]
     }
 }

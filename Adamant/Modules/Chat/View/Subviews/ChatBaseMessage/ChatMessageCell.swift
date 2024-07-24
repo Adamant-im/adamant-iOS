@@ -172,10 +172,7 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
     
     func updateOwnReaction() {
         ownReactionLabel.text = getReaction(for: model.address)
-        ownReactionLabel.backgroundColor = model.backgroundColor.uiColor.mixin(
-            infusion: .lightGray,
-            alpha: 0.15
-        )
+        ownReactionLabel.backgroundColor = .adamant.pickedReactionBackground
     }
     
     func updateOpponentReaction() {
@@ -206,10 +203,7 @@ final class ChatMessageCell: TextMessageCell, ChatModelView {
         }
         
         opponentReactionLabel.attributedText = fullString
-        opponentReactionLabel.backgroundColor = model.backgroundColor.uiColor.mixin(
-            infusion: .lightGray,
-            alpha: 0.15
-        )
+        opponentReactionLabel.backgroundColor = .adamant.pickedReactionBackground
     }
     
     func getSenderPublicKeyInReaction(for senderAddress: String) -> String? {

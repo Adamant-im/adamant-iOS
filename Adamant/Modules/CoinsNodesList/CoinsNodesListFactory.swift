@@ -50,8 +50,8 @@ private struct CoinsNodesListAssembly: Assembly {
                 apiServices: .init(
                     btc: $0.resolve(BtcApiService.self)!,
                     eth: $0.resolve(EthApiService.self)!,
-                    lskNode: $0.resolve(LskNodeApiService.self)!,
-                    lskService: $0.resolve(LskServiceApiService.self)!,
+                    klyNode: $0.resolve(KlyNodeApiService.self)!,
+                    klyService: $0.resolve(KlyServiceApiService.self)!,
                     doge: $0.resolve(DogeApiService.self)!,
                     dash: $0.resolve(DashApiService.self)!,
                     adm: $0.resolve(ApiService.self)!
