@@ -23,6 +23,11 @@ public class Chatroom: NSManagedObject {
         lastTransaction?.isUnread = false
     }
     
+    func markAsUnread() {
+        hasUnreadMessages = true
+        lastTransaction?.isUnread = true
+    }
+    
     func getFirstUnread() -> ChatTransaction? {
         if let trs = transactions as? Set<ChatTransaction> {
             return trs.filter { $0.isUnread }.map { $0 }.first
