@@ -37,7 +37,10 @@ public final class FilesPickerKit: FilesPickerProtocol {
     }
     
     public func resizeImage(image: UIImage, targetSize: CGSize) -> UIImage {
-        let newSize = getPreviewSize(from: image.size)
+        let newSize = getPreviewSize(
+            from: image.size,
+            previewSize: FilesConstants.previewSize
+        )
         
         return image.imageResized(to: newSize)
     }
@@ -60,12 +63,15 @@ public final class FilesPickerKit: FilesPickerProtocol {
         var thumbnailSize: CGSize?
         
         if let size = originalSize {
-            thumbnailSize = getPreviewSize(from: size)
+            thumbnailSize = getPreviewSize(
+                from: size,
+                previewSize: FilesConstants.previewVideoSize
+            )
         }
         
         let request = QLThumbnailGenerator.Request(
             fileAt: url,
-            size: thumbnailSize ?? FilesConstants.previewSize,
+            size: thumbnailSize ?? FilesConstants.previewVideoSize,
             scale: 1.0,
             representationTypes: .thumbnail
         )
