@@ -242,7 +242,7 @@ final class MarkdownFileRaw: MarkdownElement {
     }
     
     var regex: String {
-        return "\(emoji)\\d?"
+        return "\(emoji)\\d{0,2}"
     }
     
     func regularExpression() throws -> NSRegularExpression {
