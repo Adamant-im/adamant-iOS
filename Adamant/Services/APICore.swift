@@ -19,8 +19,8 @@ actor APICore: APICoreProtocol {
     private lazy var session: Session = {
         let configuration = AF.sessionConfiguration
         configuration.waitsForConnectivity = true
-        configuration.timeoutIntervalForRequest = timeoutInterval
-        configuration.timeoutIntervalForResource = timeoutInterval
+        configuration.timeoutIntervalForRequest = timeoutIntervalForRequest
+        configuration.timeoutIntervalForResource = timeoutIntervalForResource
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         return Alamofire.Session.init(configuration: configuration)
     }()
@@ -32,7 +32,7 @@ actor APICore: APICoreProtocol {
         uploadProgress: @escaping ((Progress) -> Void)
     ) async -> APIResponseModel {
         do {
-            let request = AF.upload(multipartFormData: { multipartFormData in
+            let request = session.upload(multipartFormData: { multipartFormData in
                 models.forEach { file in
                     multipartFormData.append(
                         file.data,
@@ -113,22 +113,19 @@ private extension APICore {
     func sendRequest(request: DataRequest) async -> APIResponseModel {
         await withCheckedContinuation { continuation in
             request.responseData(queue: responseQueue) { response in
+                let code = response.response?.statusCode
+                let result: ApiServiceResult<Data>
+                
+                if let code = code, code == 502 || code == 504 {
+                    result = .failure(.serverError(error: "unknown"))
+                } else {
+                    result = response.result.mapError { .init(error: $0) }
+                }
+                
                 continuation.resume(returning: .init(
-                    result: response.result.mapError { .init(error: $0) },
+                    result: result,
                     data: response.data,
-                    code: response.response?.statusCode
-                ))
-            }
-        }
-    }
-    
-    func sendRequest(request: UploadRequest) async -> APIResponseModel {
-        await withCheckedContinuation { continuation in
-            request.responseData(queue: responseQueue) { response in
-                continuation.resume(returning: .init(
-                    result: response.result.mapError { .init(error: $0) },
-                    data: response.data,
-                    code: response.response?.statusCode
+                    code: code
                 ))
             }
         }
@@ -141,4 +138,5 @@ private extension APICore {
     }
 }
 
-private let timeoutInterval: TimeInterval = 15
+private let timeoutIntervalForRequest: TimeInterval = 15
+private let timeoutIntervalForResource: TimeInterval = 24 * 3600

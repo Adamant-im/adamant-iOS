@@ -84,39 +84,22 @@ public final class FilesPickerKit: FilesPickerProtocol {
     }
     
     public func getFileResult(for url: URL) throws -> FileResult {
-        let newUrl = try storageKit.copyFileToTempCache(from: url)
-        let preview = getPreview(for: newUrl)
-        let fileSize = try storageKit.getFileSize(from: newUrl)
-        return FileResult(
-            assetId: url.absoluteString,
-            url: newUrl,
-            type: .other,
-            preview: preview.image,
-            previewUrl: preview.url,
-            previewExtension: previewExtension,
-            size: fileSize,
+        try createFileResult(
+            from: url,
             name: url.lastPathComponent,
-            extenstion: url.pathExtension,
-            resolution: preview.resolution
+            extension: url.pathExtension
         )
     }
-    
+
     public func getFileResult(for image: UIImage) throws -> FileResult {
-        let fileName = "image\(String.random(length: 4)).\(previewExtension)"
+        let fileName = "\(imagePrefix)\(String.random(length: 4)).\(previewExtension)"
+        
         let newUrl = try storageKit.getTempUrl(for: image, name: fileName)
-        let preview = getPreview(for: newUrl)
-        let fileSize = try storageKit.getFileSize(from: newUrl)
-        return FileResult(
-            assetId: newUrl.absoluteString,
-            url: newUrl,
-            type: .other,
-            preview: preview.image,
-            previewUrl: preview.url,
-            previewExtension: previewExtension,
-            size: fileSize,
+        
+        return try createFileResult(
+            from: newUrl,
             name: fileName,
-            extenstion: previewExtension,
-            resolution: preview.resolution
+            extension: previewExtension
         )
     }
     
@@ -174,17 +157,69 @@ public final class FilesPickerKit: FilesPickerProtocol {
             }
         }
     }
+    
+    public func getVideoDuration(from url: URL) -> Float64? {
+        guard isFileType(format: .movie, atURL: url) else { return nil }
+        
+        let asset = AVAsset(url: url)
+        
+        let duration = asset.duration
+        let durationTime = CMTimeGetSeconds(duration)
+        
+        return durationTime
+    }
+    
+    public func getMimeType(for url: URL) -> String? {
+        var mimeType: String?
+        
+        let pathExtension = url.pathExtension
+        if let type = UTType(filenameExtension: pathExtension) {
+            mimeType = type.preferredMIMEType
+        }
+        
+        return mimeType
+    }
 }
 
 private extension FilesPickerKit {
-    func getPreviewSize(from originalSize: CGSize?) -> CGSize {
+    func createFileResult(
+        from url: URL,
+        name: String,
+        extension: String
+    ) throws -> FileResult {
+        let newUrl = try storageKit.copyFileToTempCache(from: url)
+        let preview = getPreview(for: newUrl)
+        let fileSize = try storageKit.getFileSize(from: newUrl)
+        let duration = getVideoDuration(from: newUrl)
+        let mimeType = getMimeType(for: newUrl)
+        
+        return FileResult(
+            assetId: url.absoluteString,
+            url: newUrl,
+            type: .other,
+            preview: preview.image,
+            previewUrl: preview.url,
+            previewExtension: previewExtension,
+            size: fileSize,
+            name: name,
+            extenstion: `extension`,
+            resolution: preview.resolution,
+            duration: duration,
+            mimeType: mimeType
+        )
+    }
+    
+    func getPreviewSize(
+        from originalSize: CGSize?,
+        previewSize: CGSize
+    ) -> CGSize {
         guard let size = originalSize else { return FilesConstants.previewSize }
         
         let width = abs(size.width)
         let height = abs(size.height)
         
-        let widthRatio  = FilesConstants.previewSize.width  / width
-        let heightRatio = FilesConstants.previewSize.height / height
+        let widthRatio  = previewSize.width  / width
+        let heightRatio = previewSize.height / height
         
         var newSize: CGSize
         if(widthRatio > heightRatio) {
@@ -203,14 +238,7 @@ private extension FilesPickerKit {
     }
     
     func isFileType(format: UTType, atURL fileURL: URL) -> Bool {
-        var mimeType: String?
-        
-        let pathExtension = fileURL.pathExtension
-        if let type = UTType(filenameExtension: pathExtension) {
-            mimeType = type.preferredMIMEType
-        }
-        
-        guard let mimeType = mimeType else { return false }
+        guard let mimeType = getMimeType(for: fileURL) else { return false }
         
         return UTType(mimeType: mimeType)?.conforms(to: format) ?? false
     }
@@ -262,3 +290,5 @@ private extension FilesPickerKit {
         }
     }
 }
+
+private let imagePrefix = "image"

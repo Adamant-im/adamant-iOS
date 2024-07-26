@@ -221,7 +221,7 @@ private extension ChatFileView {
         let progress = chatFile.progress ?? .zero
         progressState.progress = Double(progress) / 100
         
-        let fileType = chatFile.file.type.map { ".\($0)" } ?? .empty
+        let fileType = chatFile.file.extension.map { ".\($0)" } ?? .empty
         let fileName = chatFile.file.name ?? "UNKNWON"
         
         nameLabel.text = fileName.contains(fileType)

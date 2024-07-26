@@ -41,6 +41,8 @@ public struct FileResult {
     public let extenstion: String?
     public let resolution: CGSize?
     public let data: Data?
+    public let duration: Float64?
+    public let mimeType: String?
     
     public init(
         assetId: String? = nil,
@@ -53,7 +55,9 @@ public struct FileResult {
         name: String?,
         extenstion: String?,
         resolution: CGSize?,
-        data: Data? = nil
+        data: Data? = nil,
+        duration: Float64? = nil,
+        mimeType: String? = nil
     ) {
         self.assetId = assetId
         self.url = url
@@ -66,5 +70,7 @@ public struct FileResult {
         self.preview = preview
         self.resolution = resolution
         self.data = data
+        self.duration = duration
+        self.mimeType = mimeType
     }
 }

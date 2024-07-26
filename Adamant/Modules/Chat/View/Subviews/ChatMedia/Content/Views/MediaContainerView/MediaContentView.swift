@@ -41,6 +41,8 @@ final class MediaContentView: UIView {
         )
     }()
     
+    private let durationLabel = UILabel(font: durationFont, textColor: .white)
+    
     var model: ChatMediaContentView.FileContentModel = .default {
         didSet {
             update()
@@ -93,6 +95,11 @@ private extension MediaContentView {
             make.size.equalTo(imageSize / 1.3)
         }
         
+        addSubview(durationLabel)
+        durationLabel.snp.makeConstraints { make in
+            make.bottom.trailing.equalToSuperview().offset(-10)
+        }
+        
         addSubview(tapBtn)
         tapBtn.snp.makeConstraints { make in
             make.directionalEdges.equalToSuperview()
@@ -120,6 +127,7 @@ private extension MediaContentView {
         videoIconIV.addShadow()
         downloadImageView.addShadow()
         spinner.addShadow(shadowColor: .white)
+        durationLabel.addShadow()
         controller.view.addShadow()
     }
     
@@ -167,6 +175,25 @@ private extension MediaContentView {
         
         let progress = chatFile.progress ?? .zero
         progressState.progress = Double(progress) / 100
+        
+        durationLabel.isHidden = chatFile.fileType != .video
+        if let duration = chatFile.file.duration {
+            durationLabel.text = formatTime(seconds: Int(duration))
+        } else {
+            durationLabel.text = "-:-"
+        }
+    }
+    
+    func formatTime(seconds: Int) -> String {
+        let hours = seconds / 3600
+        let minutes = (seconds % 3600) / 60
+        let seconds = seconds % 60
+        
+        if hours > 0 {
+            return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+        } else {
+            return String(format: "%02d:%02d", minutes, seconds)
+        }
     }
 }
 
@@ -176,3 +203,4 @@ private let stackSpacing: CGFloat = 12
 private let verticalStackSpacing: CGFloat = 3
 private let defaultImage: UIImage? = .asset(named: "defaultFileIcon")
 private let defaultMediaImage: UIImage? = .asset(named: "defaultMediaBlur")
+private let durationFont = UIFont.systemFont(ofSize: 13)

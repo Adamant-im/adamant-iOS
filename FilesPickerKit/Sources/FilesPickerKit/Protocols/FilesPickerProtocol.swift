@@ -40,5 +40,7 @@ public protocol FilesPickerProtocol {
         itemProvider: NSItemProvider
     ) async throws -> URL
     
-    func getFileResult(for image: UIImage) throws -> FileResult 
+    func getFileResult(for image: UIImage) throws -> FileResult
+    func getVideoDuration(from url: URL) -> Float64?
+    func getMimeType(for url: URL) -> String? 
 }

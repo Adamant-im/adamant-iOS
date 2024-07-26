@@ -1451,7 +1451,7 @@ private extension ChatViewModel {
                 previewExtension: nil,
                 size: file.file.size,
                 name: file.file.name,
-                extenstion: file.file.type,
+                extenstion: file.file.extension,
                 resolution: nil,
                 data: data
             )

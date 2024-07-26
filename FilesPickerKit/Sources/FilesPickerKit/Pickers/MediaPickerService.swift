@@ -68,7 +68,8 @@ private extension MediaPickerService {
                         for: resizedPreview,
                         name: FilesConstants.previewTag + url.lastPathComponent
                     )
-                    
+                    let mimeType = helper.getMimeType(for: url)
+
                     dataArray.append(
                         .init(
                             assetId: result.assetIdentifier,
@@ -80,7 +81,8 @@ private extension MediaPickerService {
                             size: fileSize,
                             name: itemProvider.suggestedName,
                             extenstion: url.pathExtension,
-                            resolution: preview.size
+                            resolution: preview.size,
+                            mimeType: mimeType
                         )
                     )
                 } else if isConforms(to: .movie, itemProvider.registeredTypeIdentifiers) {
@@ -91,6 +93,8 @@ private extension MediaPickerService {
                     
                     let fileSize = try helper.getFileSize(from: url)
                     let originalSize = helper.getOriginalSize(for: url)
+                    let duration = helper.getVideoDuration(from: url)
+                    let mimeType = helper.getMimeType(for: url)
                     
                     let thumbnailImage = try? await helper.getThumbnailImage(
                         forUrl: url,
@@ -113,7 +117,9 @@ private extension MediaPickerService {
                             size: fileSize,
                             name: itemProvider.suggestedName,
                             extenstion: url.pathExtension,
-                            resolution: originalSize
+                            resolution: originalSize,
+                            duration: duration,
+                            mimeType: mimeType
                         )
                     )
                 } else {

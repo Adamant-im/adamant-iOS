@@ -444,21 +444,28 @@ private extension ChatMessageFactory {
     ) -> [ChatFile] {
         return files.map {
             let previewData = $0[RichContentKeys.file.preview] as? [String: Any] ?? [:]
-            let preview = RichMessageFile.Preview(previewData)
-            let fileType = $0[RichContentKeys.file.type] as? String ?? .empty
-            let fileId = $0[RichContentKeys.file.id] as? String ?? .empty
+            let file = RichMessageFile.File($0)
+            let fileId = file.id
+            let fileType = FileType(raw: file.extension ?? .empty) ?? .other
+            
+            let previewImage = (file.preview?.id).flatMap {
+                !$0.isEmpty
+                ? filesStorage.getPreview(for: $0)
+                : nil
+            }
+            
             let progress = filesLoadingProgress[fileId]
             
             return ChatFile(
-                file: RichMessageFile.File($0),
-                previewImage: filesStorage.getPreview(for: preview.id),
+                file: file,
+                previewImage: previewImage,
                 downloadStatus: downloadingFilesIDs[fileId] ?? .default,
                 isUploading: uploadingFilesIDs.contains(fileId),
                 isCached: filesStorage.isCachedLocally(fileId),
                 storage: storage,
-                nonce: $0[RichContentKeys.file.nonce] as? String ?? .empty,
+                nonce: file.nonce,
                 isFromCurrentSender: isFromCurrentSender,
-                fileType: FileType(raw: fileType) ?? .other, 
+                fileType: fileType,
                 progress: progress,
                 isPreviewDownloadAllowed: isPreviewDownloadAllowed,
                 isFullMediaDownloadAllowed: isFullMediaDownloadAllowed

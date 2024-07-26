@@ -492,7 +492,7 @@ private extension ChatFileService {
                 recipientId: recipientId,
                 saveEncrypted: saveEncrypted,
                 fileType: file.fileType,
-                fileExtension: file.file.type ?? .empty,
+                fileExtension: file.file.extension ?? .empty,
                 isPreview: false,
                 downloadProgress: { [weak self] value in
                     fileProgress.completedUnitCount = Int64(value.fractionCompleted * Double(fileWeight))
@@ -805,7 +805,8 @@ private extension ChatFileService {
                 size: $0.file.size,
                 nonce: $0.fileNonce ?? .empty,
                 name: $0.file.name,
-                type: $0.file.extenstion,
+                extension: $0.file.extenstion,
+                mimeType: $0.file.mimeType,
                 preview: $0.preview ?? $0.file.previewUrl.map {
                     RichMessageFile.Preview(
                         id: $0.absoluteString,
@@ -813,7 +814,8 @@ private extension ChatFileService {
                         extension: .empty
                     )
                 },
-                resolution: $0.file.resolution
+                resolution: $0.file.resolution,
+                duration: $0.file.duration
             )
         }
     }

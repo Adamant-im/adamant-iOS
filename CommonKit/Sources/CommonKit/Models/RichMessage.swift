@@ -60,6 +60,8 @@ public enum RichContentKeys {
         public static let name = "name"
         public static let preview = "preview"
         public static let `extension` = "extension"
+        public static let duration = "duration"
+        public static let mimeType = "mimeType"
     }
 }
 
@@ -136,37 +138,46 @@ public struct RichMessageFile: RichMessage {
     public struct File: Codable, Equatable, Hashable {
         public var preview: Preview?
         public var id: String
-        public var type: String?
+        public var `extension`: String?
+        public var mimeType: String?
         public var size: Int64
         public var nonce: String
         public var resolution: CGSize?
         public var name: String?
+        public var duration: Float64?
         
         public init(
             id: String,
             size: Int64,
             nonce: String,
             name: String?,
-            type: String? = nil,
+            `extension`: String? = nil,
+            mimeType: String? = nil,
             preview: Preview? = nil,
-            resolution: CGSize? = nil
+            resolution: CGSize? = nil,
+            duration: Float64? = nil
         ) {
             self.id = id
-            self.type = type
+            self.extension = `extension`
+            self.mimeType = mimeType
             self.size = size
             self.nonce = nonce
             self.name = name
             self.preview = preview
             self.resolution = resolution
+            self.duration = duration
         }
         
         public init(_ data: [String: Any]) {
             self.id = (data[RichContentKeys.file.id] as? String) ?? .empty
-            self.type = data[RichContentKeys.file.type] as? String
+            self.`extension` = data[RichContentKeys.file.extension] as? String
+            ?? data[RichContentKeys.file.type] as? String
             self.size = (data[RichContentKeys.file.size] as? Int64) ?? .zero
             self.name = data[RichContentKeys.file.name] as? String
             self.nonce = data[RichContentKeys.file.nonce] as? String ?? .empty
-
+            self.duration = data[RichContentKeys.file.duration] as? Float64
+            self.mimeType = data[RichContentKeys.file.mimeType] as? String
+            
             if let previewData = data[RichContentKeys.file.preview] as? [String: Any] {
                 self.preview = Preview(previewData)
             }
@@ -190,8 +201,8 @@ public struct RichMessageFile: RichMessage {
                 RichContentKeys.file.nonce: nonce
             ]
             
-            if let type = type, !type.isEmpty {
-                contentDict[RichContentKeys.file.type] = type
+            if let value = `extension`, !value.isEmpty {
+                contentDict[RichContentKeys.file.extension] = value
             }
             
             if let preview = preview {
@@ -204,6 +215,14 @@ public struct RichMessageFile: RichMessage {
             
             if let resolution = resolution {
                 contentDict[RichContentKeys.file.resolution] = resolution
+            }
+            
+            if let duration = duration {
+                contentDict[RichContentKeys.file.duration] = duration
+            }
+            
+            if let mimeType = mimeType {
+                contentDict[RichContentKeys.file.mimeType] = mimeType
             }
             
             return contentDict
