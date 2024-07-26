@@ -155,7 +155,7 @@
 "AccountTab.Row.Balance" = "Баланс";
 
 /* Account tab: 'Buy tokens' button */
-"AccountTab.Row.BuyTokens" = "Обменять токены";
+"AccountTab.Row.BuyTokens" = "Купить или продать монеты";
 
 /* Account tab: 'Logout' button */
 "AccountTab.Row.Logout" = "Выход";
@@ -192,6 +192,12 @@
 
 /* Account tab: Exchange ADM tokens in chat */
 "AccountTab.Row.ExchangeADMInChat" = "Обменник в чате";
+
+/* Account tab: Exchanges on CMC */
+"AccountTab.Row.ExchangesOnCoinMarketCap" = "Биржи на CoinMarketCap";
+
+/* Account tab: Exchanges on CoinGecko */
+"AccountTab.Row.ExchangesOnCoinGecko" = "Биржи на CoinGecko";
 
 /* Account tab: 'Address' row */
 "AccountTab.Row.Address" = "Адрес";

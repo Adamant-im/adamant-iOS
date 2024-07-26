@@ -202,6 +202,12 @@
 /* Account tab: Exchange ADM tokens in chat */
 "AccountTab.Row.ExchangeADMInChat" = "聊天交流";
 
+/* Account tab: Exchanges on CMC */
+"AccountTab.Row.ExchangesOnCoinMarketCap" = "CoinMarketCap 上的交易所";
+
+/* Account tab: Exchanges on CoinGecko */
+"AccountTab.Row.ExchangesOnCoinGecko" = "CoinGecko 上的交易所";
+
 /* Account tab: 'Address' row */
 "AccountTab.Row.Address" = "地址";
 
