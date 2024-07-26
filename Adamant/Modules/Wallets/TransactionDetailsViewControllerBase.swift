@@ -71,6 +71,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         case historyFiat
         case currentFiat
         case inconsistentReason
+        case txRecordData
         
         var tag: String {
             switch self {
@@ -89,6 +90,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             case .historyFiat: return "hfiat"
             case .currentFiat: return "cfiat"
             case .inconsistentReason: return "incReason"
+            case .txRecordData: return "data"
             }
         }
         
@@ -110,6 +112,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             case .currentFiat: return .localized("TransactionDetailsScene.Row.CurrentFiat", comment: "Transaction details: current fiat value")
             case .inconsistentReason:
                 return .localized("TransactionStatus.Inconsistent.Reason.Title", comment: "Transaction status: inconsistent reason title")
+            case .txRecordData:
+                return
+                    .localized("TransactionStatus.Inconsistent.RecordData.Title", comment: "Transaction details: Tx data record")
             }
         }
         
@@ -159,6 +164,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
     let languageService: LanguageStorageProtocol
     
     // MARK: - Properties
+    
+    var showTxRecordData: Bool {
+        false
+    }
     
     var transaction: TransactionDetails? {
         didSet {
@@ -591,6 +600,40 @@ class TransactionDetailsViewControllerBase: FormViewController {
         }
         
         detailsSection.append(statusRow)
+        
+        // MARK: Tx data record
+        let txRecordData = LabelRow {
+            $0.disabled = true
+            $0.tag = Rows.txRecordData.tag
+            $0.title = Rows.txRecordData.localized
+            
+            if let value = transaction?.txRecordData {
+                $0.value = value
+            } else {
+                $0.value = TransactionDetailsViewControllerBase.awaitingValueString
+            }
+            
+            $0.cell.detailTextLabel?.textAlignment = .right
+            $0.cell.detailTextLabel?.lineBreakMode = .byTruncatingMiddle
+        }.cellSetup { (cell, _) in
+            cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
+        }.onCellSelection { [weak self] (cell, row) in
+            if let text = row.value {
+                self?.shareValue(text, from: cell)
+            }
+        }.cellUpdate { [weak self] (cell, row) in
+            cell.textLabel?.textColor = UIColor.adamant.textColor
+            if let value = self?.transaction?.txRecordData {
+                row.value = value
+            } else {
+                row.value = TransactionDetailsViewControllerBase.awaitingValueString
+            }
+        }
+        
+        if showTxRecordData {
+            detailsSection.append(txRecordData)
+        }
         
         // MARK: Current Fiat
         let currentFiatRow = LabelRow {

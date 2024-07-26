@@ -121,6 +121,10 @@ extension Transactions.TransactionModel: TransactionDetails {
     var sentDate: Date? {
         timestamp.map { Date(timeIntervalSince1970: TimeInterval($0)) }
     }
+    
+    var txRecordData: String? {
+        txData
+    }
 }
 
 extension LocalTransaction: TransactionDetails {

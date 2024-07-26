@@ -28,6 +28,9 @@ final class KlyTransactionDetailsViewController: TransactionDetailsViewControlle
         return control
     }()
     
+    override var showTxRecordData: Bool {
+        true
+    }
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
