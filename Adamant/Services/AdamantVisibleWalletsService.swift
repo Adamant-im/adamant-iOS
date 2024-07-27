@@ -222,7 +222,12 @@ final class AdamantVisibleWalletsService: VisibleWalletsService {
             }
             
             let wallet = availableServices.remove(at: index)
-            availableServices.insert(wallet, at: newIndex)
+            
+            if (0 ... availableServices.count).contains(newIndex) {
+                availableServices.insert(wallet, at: newIndex)
+            } else {
+                availableServices.append(wallet)
+            }
         }
         
         return availableServices
