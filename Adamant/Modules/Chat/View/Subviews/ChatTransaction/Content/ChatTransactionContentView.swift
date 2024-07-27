@@ -125,6 +125,12 @@ final class ChatTransactionContentView: UIView {
         super.init(coder: coder)
         configure()
     }
+    
+    func setFixWidth(width: CGFloat) {
+        snp.remakeConstraints {
+            $0.width.lessThanOrEqualTo(width)
+        }
+    }
 }
 
 extension ChatTransactionContentView.Model {

@@ -61,6 +61,10 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
         stack.addArrangedSubview(statusButton)
         stack.addArrangedSubview(ownReactionLabel)
         stack.addArrangedSubview(opponentReactionLabel)
+        
+        stack.snp.makeConstraints {
+            $0.width.equalTo(Self.opponentReactionWidth)
+        }
         return stack
     }()
     
@@ -343,6 +347,7 @@ extension ChatTransactionContainerView {
         view.contentView.model = model.content
         view.updateStatus(model.status)
         view.updateLayout()
+        view.contentView.setFixWidth(width: contentView.frame.width)
         return view
     }
 }
