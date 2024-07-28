@@ -662,6 +662,7 @@ extension ChatListViewController {
     
     @MainActor
     private func loadNewChats() {
+        loadNewChatTask?.cancel()
         loadNewChatTask = Task {
             do {
                 guard let roomsLoadedCount = await chatsProvider.roomsLoadedCount,
