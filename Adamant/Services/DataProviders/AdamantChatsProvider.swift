@@ -152,7 +152,7 @@ actor AdamantChatsProvider: ChatsProvider {
             .receive(on: OperationQueue.main)
             .sink { _ in
                 Task { [weak self] in
-                    await self?.getChatRooms(offset: nil)
+                    try? await self?.getChatRooms(offset: nil)
                 }
             }
             .store(in: &subscriptions)
@@ -347,7 +347,7 @@ extension AdamantChatsProvider {
         setState(.empty, previous: prevState, notify: notify)
     }
     
-    func getChatRooms(offset: Int?) async {
+    func getChatRooms(offset: Int?) async throws {
         guard let address = accountService.account?.address,
               let privateKey = accountService.keypair?.privateKey
         else {
@@ -359,7 +359,13 @@ extension AdamantChatsProvider {
         
         // MARK: 3. Get transactions
         
-        let chatrooms = try? await apiGetChatrooms(address: address, offset: offset)
+        let chatrooms: ChatRooms?
+        do {
+            chatrooms = try await apiGetChatrooms(address: address, offset: offset)
+        } catch {
+            setState(.failedToUpdate(error), previous: prevState)
+            throw error
+        }
         
         guard let chatrooms = chatrooms else {
             if !isInitiallySynced {
@@ -411,12 +417,16 @@ extension AdamantChatsProvider {
     }
     
     func apiGetChatrooms(address: String, offset: Int?) async throws -> ChatRooms? {
+        if !isConnectedToTheInternet {
+            let message = String.adamant.sharedErrors.networkError
+            throw ApiServiceError.commonError(message: message)
+        }
         do {
             let chatrooms = try await apiService.getChatRooms(address: address, offset: offset).get()
             return chatrooms
         } catch let error as ApiServiceError {
             guard case .networkError = error else {
-                return nil
+                throw error
             }
             
             await Task.sleep(interval: requestRepeatDelay)

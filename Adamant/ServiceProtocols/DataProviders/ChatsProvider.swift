@@ -196,7 +196,7 @@ protocol ChatsProvider: DataProvider, Actor {
     func getChatroom(for adm: String) -> Chatroom?
     func getChatroomsController() -> NSFetchedResultsController<Chatroom>
     @MainActor func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction>
-    func getChatRooms(offset: Int?) async
+    func getChatRooms(offset: Int?) async throws
     func getChatMessages(with addressRecipient: String, offset: Int?) async
     func isChatLoading(with addressRecipient: String) -> Bool
     func isChatLoaded(with addressRecipient: String) -> Bool

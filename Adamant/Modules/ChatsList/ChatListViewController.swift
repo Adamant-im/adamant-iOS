@@ -583,21 +583,7 @@ extension ChatListViewController {
             }
         }
         
-        Task { @MainActor in
-            guard let roomsLoadedCount = await chatsProvider.roomsLoadedCount,
-                  let roomsMaxCount = await chatsProvider.roomsMaxCount,
-                  roomsLoadedCount < roomsMaxCount,
-                  roomsMaxCount > 0,
-                  !isBusy,
-                  tableView.numberOfRows(inSection: .zero) - indexPath.row < 3
-            else {
-                return
-            }
-            
-            isBusy = true
-            insertReloadRow()
-            loadNewChats(offset: roomsLoadedCount)
-        }
+        checkLoadNewChats(indexPath: indexPath)
     }
     
     private func configureCell(_ cell: SpinnerCell) {
@@ -646,17 +632,34 @@ extension ChatListViewController {
         }
     }
     
-    private func insertReloadRow() {
-        lastSystemChatPositionRow = getBottomSystemChatIndex()
-        tableView.reloadData()
+    private func checkLoadNewChats(indexPath: IndexPath) {
+        Task { @MainActor in
+            guard let roomsLoadedCount = await chatsProvider.roomsLoadedCount,
+                  let roomsMaxCount = await chatsProvider.roomsMaxCount,
+                  roomsLoadedCount < roomsMaxCount,
+                  roomsMaxCount > 0,
+                  !isBusy,
+                  tableView.numberOfRows(inSection: .zero) - indexPath.row < 3
+            else {
+                return
+            }
+            loadNewChats(offset: roomsLoadedCount)
+        }
     }
     
     @MainActor
     private func loadNewChats(offset: Int) {
+        isBusy = true
+        lastSystemChatPositionRow = getBottomSystemChatIndex()
+        tableView.reloadData()
         loadNewChatTask = Task {
-            await chatsProvider.getChatRooms(offset: offset)
-            isBusy = false
-            tableView.reloadData()
+            do {
+                try await chatsProvider.getChatRooms(offset: offset)
+                isBusy = false
+                tableView.reloadData()
+            } catch {
+                dialogService.showRichError(error: error)
+            }
         }
     }
 }
