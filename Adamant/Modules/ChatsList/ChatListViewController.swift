@@ -300,6 +300,16 @@ final class ChatListViewController: KeyboardObservingViewController {
                 self?.updateUITitles()
             }
             .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantReachabilityMonitor.reachabilityChanged, object: nil)
+            .compactMap {
+                $0.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? Bool
+            }
+            .removeDuplicates()
+            .filter { $0 == true }
+            .sink { [weak self] _ in self?.handleInternetConnectionRestored() }
+            .store(in: &subscriptions)
     }
     
     private func updateUITitles() {
@@ -632,31 +642,44 @@ extension ChatListViewController {
         }
     }
     
-    private func checkLoadNewChats(indexPath: IndexPath) {
-        Task { @MainActor in
-            guard let roomsLoadedCount = await chatsProvider.roomsLoadedCount,
-                  let roomsMaxCount = await chatsProvider.roomsMaxCount,
-                  roomsLoadedCount < roomsMaxCount,
-                  roomsMaxCount > 0,
-                  !isBusy,
-                  tableView.numberOfRows(inSection: .zero) - indexPath.row < 3
-            else {
-                return
-            }
-            loadNewChats(offset: roomsLoadedCount)
+    private func handleInternetConnectionRestored() {
+        guard isBusy,
+              loadNewChatTask != nil
+        else {
+            return
         }
+        loadNewChats()
+    }
+    
+    private func checkLoadNewChats(indexPath: IndexPath) {
+        guard !isBusy,
+              tableView.numberOfRows(inSection: .zero) - indexPath.row < 3
+        else {
+            return
+        }
+        loadNewChats()
     }
     
     @MainActor
-    private func loadNewChats(offset: Int) {
-        isBusy = true
-        lastSystemChatPositionRow = getBottomSystemChatIndex()
-        tableView.reloadData()
+    private func loadNewChats() {
         loadNewChatTask = Task {
             do {
-                try await chatsProvider.getChatRooms(offset: offset)
+                guard let roomsLoadedCount = await chatsProvider.roomsLoadedCount,
+                      let roomsMaxCount = await chatsProvider.roomsMaxCount,
+                      roomsLoadedCount < roomsMaxCount,
+                      roomsMaxCount > 0
+                else {
+                    return
+                }
+                if !isBusy {
+                    isBusy = true
+                    lastSystemChatPositionRow = getBottomSystemChatIndex()
+                    tableView.reloadData()
+                }
+                try await chatsProvider.getChatRooms(offset: roomsLoadedCount)
                 isBusy = false
                 tableView.reloadData()
+                loadNewChatTask = nil
             } catch {
                 dialogService.showRichError(error: error)
             }
