@@ -31,9 +31,9 @@ final class BuyAndSellViewController: FormViewController {
         var image: UIImage? {
             switch self {
             case .adamantMessage: return .asset(named: "row_logo")
-            case .adamantSite: return .asset(named: "row_logo")
-            case .coinMarketCap: return .asset(named: "row_logo")
-            case .coinGecko: return .asset(named: "row_logo")
+            case .adamantSite: return .asset(named: "exch_anon")
+            case .coinMarketCap: return .asset(named: "row_coinmarket")
+            case .coinGecko: return .asset(named: "row_coingecko")
             }
         }
         
