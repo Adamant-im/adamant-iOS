@@ -157,6 +157,9 @@
 /* Account tab: 'Buy tokens' button */
 "AccountTab.Row.BuyTokens" = "Обменять токены";
 
+/* Account tab: 'Stake ADM' button */
+"AccountTab.Row.StakeAdm" = "Застейкать и заработать";
+
 /* Account tab: 'Logout' button */
 "AccountTab.Row.Logout" = "Выход";
 
@@ -453,6 +456,9 @@
 
 /* Delegates page: scene title */
 "Delegates.Title" = "Делегаты";
+
+/* Delegates page: header text */
+"Delegates.HeaderText" = "Чтобы застейкать ADM и получать вознаграждения, проголосуйте за активный форжинг-пул, которому вы доверяете. Подробнее читайте в [блоге АДАМАНТа](https://news.adamant.im/hodl-list-of-adamant-pools-join-in-and-get-rewards-491a98610f4b).";
 
 /* Visible Wallets page: scene title */
 "VisibleWallets.Title" = "Кошельки";
