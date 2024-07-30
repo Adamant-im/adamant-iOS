@@ -18,6 +18,16 @@ public enum FileType {
 }
 
 public extension FileType {
+    init?(mimeType: String) {
+        if mimeType.hasPrefix("image/") {
+            self = .image
+        } else if mimeType.hasPrefix("video/") {
+            self = .video
+        } else {
+            self = .other
+        }
+    }
+    
     init?(raw: String) {
         switch raw.uppercased() {
         case "JPG", "JPEG", "PNG", "GIF", "WEBP", "TIF", "TIFF", "BMP", "HEIF", "HEIC", "JP2":

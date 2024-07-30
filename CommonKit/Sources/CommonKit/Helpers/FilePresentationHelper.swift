@@ -37,8 +37,8 @@ public class FilePresentationHelper {
         let files = content[RichContentKeys.file.files] as? [[String: Any]] ?? []
         
         let mediaFilesCount = files.filter { file in
-            let fileTypeRaw = file[RichContentKeys.file.type] as? String ?? .empty
-            let fileType = FileType(raw: fileTypeRaw) ?? .other
+            let mimeType = file[RichContentKeys.file.mimeType] as? String ?? .empty
+            let fileType = FileType(mimeType: mimeType) ?? .other
             return fileType == .image || fileType == .video
         }.count
         
