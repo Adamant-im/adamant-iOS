@@ -8,6 +8,7 @@
 
 import CommonKit
 
+// TODO: Remove after a few updates (it's used for migration)
 struct OldNodeWithGroupDTO: Codable {
     let group: NodeGroup
     let node: OldNodeDTO

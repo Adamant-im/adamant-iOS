@@ -7,6 +7,7 @@
 
 import Foundation
 
+// TODO: Remove after a few updates (it's used for migration)
 public struct OldNodeDTO: Codable {
     public let id: UUID
     public let scheme: URLScheme
