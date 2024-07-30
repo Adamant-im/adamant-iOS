@@ -15,7 +15,10 @@ public final class ExtensionsApi {
     public let keychainStore: KeychainStore
     
     public private(set) lazy var nodes: [Node] = {
-        let nodes = keychainStore.get(nodesStoreKey) ?? AdamantResources.nodes
+        let nodesDto: [NodeDTO]? = keychainStore.get(nodesStoreKey)
+        let nodes = nodesDto.map { $0.map { $0.mapToModel() } }
+            ?? AdamantResources.nodes
+        
         return nodes.filter { $0.isEnabled }.shuffled()
     }()
     

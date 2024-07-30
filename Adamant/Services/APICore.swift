@@ -26,7 +26,7 @@ actor APICore: APICoreProtocol {
     }()
     
     func sendRequestBasic<Parameters: Encodable>(
-        node: Node,
+        origin: NodeOrigin,
         path: String,
         method: HTTPMethod,
         parameters: Parameters,
@@ -34,7 +34,7 @@ actor APICore: APICoreProtocol {
     ) async -> APIResponseModel {
         do {
             let request = session.request(
-                try buildUrl(node: node, path: path),
+                try buildUrl(origin: origin, path: path),
                 method: method,
                 parameters: parameters.asDictionary(),
                 encoding: encoding.parametersEncoding,
@@ -52,7 +52,7 @@ actor APICore: APICoreProtocol {
     }
     
     func sendRequestBasic(
-        node: Node,
+        origin: NodeOrigin,
         path: String,
         method: HTTPMethod,
         jsonParameters: Any
@@ -63,7 +63,7 @@ actor APICore: APICoreProtocol {
             )
             
             var request = try URLRequest(
-                url: try buildUrl(node: node, path: path),
+                url: try buildUrl(origin: origin, path: path),
                 method: method
             )
             
@@ -93,8 +93,8 @@ private extension APICore {
         }
     }
     
-    func buildUrl(node: Node, path: String) throws -> URL {
-        guard let url = node.asURL()?.appendingPathComponent(path, conformingTo: .url)
+    func buildUrl(origin: NodeOrigin, path: String) throws -> URL {
+        guard let url = origin.asURL()?.appendingPathComponent(path, conformingTo: .url)
         else { throw InternalAPIError.endpointBuildFailed }
         return url
     }

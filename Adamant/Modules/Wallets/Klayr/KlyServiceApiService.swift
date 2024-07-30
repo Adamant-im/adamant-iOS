@@ -12,11 +12,11 @@ import CommonKit
 
 final class KlyServiceApiCore: KlyApiCore {
     override func getStatusInfo(
-        node: CommonKit.Node
+        origin: NodeOrigin
     ) async -> WalletServiceResult<NodeStatusInfo> {
         let startTimestamp = Date.now.timeIntervalSince1970
         
-        return await request(node: node) { client in
+        return await request(origin: origin) { client in
             let service = LiskKit.Service(client: client)
             return try await (fee: service.fees(), info: service.info())
         }.map { model in
@@ -73,16 +73,16 @@ private extension KlyServiceApiService {
             _ completion: @escaping @Sendable (LiskKit.Result<Output>) -> Void
         ) -> Void
     ) async -> WalletServiceResult<Output> {
-        await api.request { core, node in
-            await core.request(node: node, body: body)
+        await api.request { core, origin in
+            await core.request(origin: origin, body: body)
         }
     }
     
     func requestClient<Output>(
         _ body: @Sendable @escaping (APIClient) async throws -> Output
     ) async -> WalletServiceResult<Output> {
-        await api.request { core, node in
-            await core.request(node: node, body)
+        await api.request { core, origin in
+            await core.request(origin: origin, body)
         }
     }
 }

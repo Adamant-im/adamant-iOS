@@ -22,10 +22,10 @@ final class AdamantApiService {
     }
     
     func request<Output>(
-        _ request: @Sendable (APICoreProtocol, Node) async -> ApiServiceResult<Output>
+        _ request: @Sendable (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
     ) async -> ApiServiceResult<Output> {
-        await service.request { admApiCore, node in
-            await request(admApiCore.apiCore, node)
+        await service.request { admApiCore, origin in
+            await request(admApiCore.apiCore, origin)
         }
     }
 }

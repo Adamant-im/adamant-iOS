@@ -15,7 +15,7 @@ enum ApiCommands {}
 
 protocol APICoreProtocol: Actor {
     func sendRequestBasic<Parameters: Encodable>(
-        node: Node,
+        origin: NodeOrigin,
         path: String,
         method: HTTPMethod,
         parameters: Parameters,
@@ -24,7 +24,7 @@ protocol APICoreProtocol: Actor {
     
     /// jsonParameters - arrays and dictionaries are allowed only
     func sendRequestBasic(
-        node: Node,
+        origin: NodeOrigin,
         path: String,
         method: HTTPMethod,
         jsonParameters: Any
@@ -35,14 +35,14 @@ extension APICoreProtocol {
     var emptyParameters: [String: Bool] { [:] }
     
     func sendRequest<Parameters: Encodable>(
-        node: Node,
+        origin: NodeOrigin,
         path: String,
         method: HTTPMethod,
         parameters: Parameters,
         encoding: APIParametersEncoding
     ) async -> ApiServiceResult<Data> {
         await sendRequestBasic(
-            node: node,
+            origin: origin,
             path: path,
             method: method,
             parameters: parameters,
@@ -51,14 +51,14 @@ extension APICoreProtocol {
     }
     
     func sendRequestJsonResponse<Parameters: Encodable, JSONOutput: Decodable>(
-        node: Node,
+        origin: NodeOrigin,
         path: String,
         method: HTTPMethod,
         parameters: Parameters,
         encoding: APIParametersEncoding
     ) async -> ApiServiceResult<JSONOutput> {
         await sendRequest(
-            node: node,
+            origin: origin,
             path: path,
             method: method,
             parameters: parameters,
@@ -67,11 +67,11 @@ extension APICoreProtocol {
     }
     
     func sendRequestJsonResponse<JSONOutput: Decodable>(
-        node: Node,
+        origin: NodeOrigin,
         path: String
     ) async -> ApiServiceResult<JSONOutput> {
         await sendRequestJsonResponse(
-            node: node,
+            origin: origin,
             path: path,
             method: .get,
             parameters: emptyParameters,
@@ -80,11 +80,11 @@ extension APICoreProtocol {
     }
     
     func sendRequest(
-        node: Node,
+        origin: NodeOrigin,
         path: String
     ) async -> ApiServiceResult<Data> {
         await sendRequest(
-            node: node,
+            origin: origin,
             path: path,
             method: .get,
             parameters: emptyParameters,
@@ -93,13 +93,13 @@ extension APICoreProtocol {
     }
     
     func sendRequestJsonResponse<JSONOutput: Decodable>(
-        node: Node,
+        origin: NodeOrigin,
         path: String,
         method: HTTPMethod,
         jsonParameters: Any
     ) async -> ApiServiceResult<JSONOutput> {
         await sendRequestBasic(
-            node: node,
+            origin: origin,
             path: path,
             method: method,
             jsonParameters: jsonParameters
@@ -107,7 +107,7 @@ extension APICoreProtocol {
     }
     
     func sendRequestRPC(
-        node: Node,
+        origin: NodeOrigin,
         path: String,
         requests: [RpcRequest]
     ) async -> ApiServiceResult<[RPCResponseModel]> {
@@ -116,7 +116,7 @@ extension APICoreProtocol {
         }
         
         return await sendRequestJsonResponse(
-            node: node,
+            origin: origin,
             path: path,
             method: .post,
             jsonParameters: parameters
@@ -124,12 +124,12 @@ extension APICoreProtocol {
     }
     
     func sendRequestRPC(
-        node: Node,
+        origin: NodeOrigin,
         path: String,
         request: RpcRequest
     ) async -> ApiServiceResult<RPCResponseModel> {
         await sendRequestJsonResponse(
-            node: node,
+            origin: origin,
             path: path,
             method: .post,
             jsonParameters: request.asDictionary() ?? [:]

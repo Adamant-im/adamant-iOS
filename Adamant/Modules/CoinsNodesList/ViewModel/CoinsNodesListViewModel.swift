@@ -37,7 +37,7 @@ final class CoinsNodesListViewModel: ObservableObject {
     }
     
     func setIsEnabled(id: UUID, value: Bool) {
-        nodesStorage.updateNodeParams(id: id, isEnabled: value)
+        nodesStorage.updateNode(id: id) { $0.isEnabled = value }
     }
     
     func reset() {

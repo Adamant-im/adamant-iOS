@@ -8,130 +8,85 @@
 
 import Foundation
 
-public struct Node: Equatable, Codable, Identifiable {
+public struct Node: Equatable, Identifiable {
     public let id: UUID
-    public var scheme: URLScheme
-    public var host: String
-    public var isEnabled: Bool
+    public var mainOrigin: NodeOrigin
+    public var altOrigin: NodeOrigin?
     public var wsEnabled: Bool
-    public var port: Int?
-    public var wsPort: Int?
     public var version: String?
     public var height: Int?
     public var ping: TimeInterval?
-    public var connectionStatus: ConnectionStatus?
+    public var connectionStatus: NodeConnectionStatus?
+    public var preferMainOrigin: Bool?
+    
+    public var isEnabled: Bool {
+        didSet {
+            guard !isEnabled else { return }
+            connectionStatus = nil
+        }
+    }
     
     public init(
-        id: UUID = .init(),
-        scheme: URLScheme,
-        host: String,
+        id: UUID,
         isEnabled: Bool,
         wsEnabled: Bool,
-        port: Int? = nil,
-        wsPort: Int? = nil,
-        version: String? = nil,
-        height: Int? = nil,
-        ping: TimeInterval? = nil,
-        connectionStatus: ConnectionStatus? = nil
+        mainOrigin: NodeOrigin,
+        altOrigin: NodeOrigin?,
+        version: String?,
+        height: Int?,
+        ping: TimeInterval?,
+        connectionStatus: NodeConnectionStatus?,
+        preferMainOrigin: Bool?
     ) {
         self.id = id
-        self.scheme = scheme
-        self.host = host
+        self.mainOrigin = mainOrigin
+        self.altOrigin = altOrigin
         self.isEnabled = isEnabled
         self.wsEnabled = wsEnabled
-        self.port = port
-        self.wsPort = wsPort
         self.version = version
         self.height = height
         self.ping = ping
         self.connectionStatus = connectionStatus
+        self.preferMainOrigin = preferMainOrigin
     }
 }
 
 public extension Node {
-    enum RejectedReason: Codable, Equatable {
-        case outdatedApiVersion
-        
-        public var text: String {
-            switch self {
-            case .outdatedApiVersion:
-                return Strings.outdated
-            }
-        }
+    var preferredOrigin: NodeOrigin {
+        preferMainOrigin ?? true
+            ? mainOrigin
+            : altOrigin ?? mainOrigin
     }
-    
-    enum ConnectionStatus: Equatable, Codable {
-        case offline
-        case synchronizing
-        case allowed
-        case notAllowed(RejectedReason)
-    }
-    
-    enum URLScheme: String, Codable {
-        case http, https
 
-        public static let `default`: URLScheme = .https
-
-        public var defaultPort: Int {
-            switch self {
-            case .http: return 36666
-            case .https: return 443
-            }
-        }
-    }
-    
-    init(url: URL, altUrl _: URL? = nil) {
+    init(url: URL, altUrl: URL? = nil) {
         self.init(
-            scheme: URLScheme(rawValue: url.scheme ?? .empty) ?? .https,
-            host: url.host ?? .empty,
+            id: .init(),
             isEnabled: true,
             wsEnabled: false,
-            port: url.port
+            mainOrigin: .init(url: url),
+            altOrigin: altUrl.map { .init(url: $0) },
+            version: nil,
+            height: nil,
+            ping: nil,
+            connectionStatus: nil,
+            preferMainOrigin: nil
         )
     }
     
     func asString() -> String {
-        if let url = asURL(forcePort: scheme != .https) {
-            return url.absoluteString
-        } else {
-            return host
-        }
+        preferredOrigin.asString()
     }
     
     func asSocketURL() -> URL? {
-        asURL(forcePort: false, useWsPort: true)
+        preferredOrigin.asSocketURL()
     }
 
     func asURL() -> URL? {
-        asURL(forcePort: true)
+        preferredOrigin.asURL()
     }
-}
-
-private extension Node {
-    func asURL(forcePort: Bool, useWsPort: Bool = false) -> URL? {
-        var components = URLComponents()
-        components.scheme = scheme.rawValue
-        components.host = host
-
-        let usePort = useWsPort ? wsPort : port
-
-        if let port = usePort, scheme == .http {
-            components.port = port
-        } else if forcePort {
-            components.port = usePort ?? scheme.defaultPort
-        }
-
-        return components.url
-    }
-}
-
-private extension Node {
-    enum Strings {
-        static var outdated: String {
-            String.localized(
-                "NodesList.NodeCell.Outdated",
-                comment: "NodesList.NodeCell: Node is outdated"
-            )
-        }
+    
+    mutating func updateWsPort(_ wsPort: Int?) {
+        mainOrigin.wsPort = wsPort
+        altOrigin?.wsPort = wsPort
     }
 }

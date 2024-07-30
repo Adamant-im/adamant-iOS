@@ -33,9 +33,9 @@ extension AdamantApiService {
         currentDelegates: [Delegate]
     ) async -> ApiServiceResult<[Delegate]> {
         let response: ApiServiceResult<ServerCollectionResponse<Delegate>>
-        response = await request { core, node in
+        response = await request { core, origin in
             await core.sendRequestJsonResponse(
-                node: node,
+                origin: origin,
                 path: ApiCommands.Delegates.getDelegates,
                 method: .get,
                 parameters: ["limit": String(limit), "offset": String(offset)],
@@ -82,9 +82,9 @@ extension AdamantApiService {
     }
     
     func getForgedByAccount(publicKey: String) async -> ApiServiceResult<DelegateForgeDetails> {
-        await request { core, node in
+        await request { core, origin in
             await core.sendRequestJsonResponse(
-                node: node,
+                origin: origin,
                 path: ApiCommands.Delegates.getForgedByAccount,
                 method: .get,
                 parameters: ["generatorPublicKey": publicKey],
@@ -104,18 +104,18 @@ extension AdamantApiService {
     }
     
     private func getDelegatesCount() async -> ApiServiceResult<DelegatesCountResult> {
-        await request { core, node in
+        await request { core, origin in
             await core.sendRequestJsonResponse(
-                node: node,
+                origin: origin,
                 path: ApiCommands.Delegates.getDelegatesCount
             )
         }
     }
     
     private func getNextForgers() async -> ApiServiceResult<NextForgersResult> {
-        await request { core, node in
+        await request { core, origin in
             await core.sendRequestJsonResponse(
-                node: node,
+                origin: origin,
                 path: ApiCommands.Delegates.getNextForgers,
                 method: .get,
                 parameters: ["limit": "\(101)"],
@@ -126,9 +126,9 @@ extension AdamantApiService {
     
     func getVotes(for address: String) async -> ApiServiceResult<[Delegate]> {
         let response: ApiServiceResult<ServerCollectionResponse<Delegate>>
-        response = await request { core, node in
+        response = await request { core, origin in
             await core.sendRequestJsonResponse(
-                node: node,
+                origin: origin,
                 path: ApiCommands.Delegates.votes,
                 method: .get,
                 parameters: ["address": address],
@@ -183,9 +183,9 @@ extension AdamantApiService {
     // MARK: - Private methods
     
     private func getBlocks() async -> ApiServiceResult<[Block]> {
-        let response: ApiServiceResult<ServerCollectionResponse<Block>> = await request { core, node in
+        let response: ApiServiceResult<ServerCollectionResponse<Block>> = await request { core, origin in
             await core.sendRequestJsonResponse(
-                node: node,
+                origin: origin,
                 path: ApiCommands.Delegates.getBlocks,
                 method: .get,
                 parameters: ["orderBy": "height:desc", "limit": "\(101)"],

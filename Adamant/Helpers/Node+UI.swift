@@ -46,7 +46,7 @@ extension Node {
     
     func indicatorString(isRest: Bool, isWs: Bool) -> String {
         let connections = [
-            isRest ? scheme.rawValue : nil,
+            isRest ? preferredOrigin.scheme.rawValue : nil,
             isWs ? "ws" : nil
         ].compactMap { $0 }
         

@@ -429,7 +429,7 @@ extension NodesListViewController {
             statusString: node.statusString(showVersion: true) ?? .empty,
             isEnabled: node.isEnabled,
             nodeUpdateAction: .init(id: node.id.uuidString) { [nodesStorage] isEnabled in
-                nodesStorage.updateNodeParams(id: node.id, isEnabled: isEnabled)
+                nodesStorage.updateNode(id: node.id) { $0.isEnabled = isEnabled }
             }
         )
     }

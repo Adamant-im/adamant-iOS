@@ -226,6 +226,7 @@
 		93294B9A2AAD624100911109 /* WalletFactoryCompose.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93294B992AAD624100911109 /* WalletFactoryCompose.swift */; };
 		932B34E92974AA4A002A75BA /* ChatPreservationProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 932B34E82974AA4A002A75BA /* ChatPreservationProtocol.swift */; };
 		932F77592989F999006D8801 /* ChatCellManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 932F77582989F999006D8801 /* ChatCellManager.swift */; };
+		9332DBCD2C58C398000EC872 /* OldNodeWithGroupDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9332DBCC2C58C398000EC872 /* OldNodeWithGroupDTO.swift */; };
 		9338AE7F2AEF43DA001D32DF /* NodesStorageProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9338AE7E2AEF43DA001D32DF /* NodesStorageProtocol.swift */; };
 		9338AE812AEF4B8E001D32DF /* NodesStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9338AE802AEF4B8E001D32DF /* NodesStorage.swift */; };
 		9338AE842AEF5EFA001D32DF /* APICoreProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9338AE832AEF5EFA001D32DF /* APICoreProtocol.swift */; };
@@ -322,6 +323,8 @@
 		93CCAE7B2B06D9B500EA5B94 /* DogeBlocksDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CCAE7A2B06D9B500EA5B94 /* DogeBlocksDTO.swift */; };
 		93CCAE7E2B06DA6C00EA5B94 /* DogeBlockDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CCAE7D2B06DA6C00EA5B94 /* DogeBlockDTO.swift */; };
 		93CCAE802B06E2D100EA5B94 /* ApiServiceError+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CCAE7F2B06E2D100EA5B94 /* ApiServiceError+Extension.swift */; };
+		93D02C802C564EF90011D819 /* NodeWithGroupDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93D02C7F2C564EF90011D819 /* NodeWithGroupDTO.swift */; };
+		93D02C822C564F710011D819 /* NodeWithGroup+NodeWithGroupDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93D02C812C564F710011D819 /* NodeWithGroup+NodeWithGroupDTO.swift */; };
 		93E1232F2A6DF8EF004DF33B /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 93E123312A6DF8EF004DF33B /* InfoPlist.strings */; };
 		93E123382A6DFD15004DF33B /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 93E1233A2A6DFD15004DF33B /* Localizable.strings */; };
 		93E1233F2A6DFE24004DF33B /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 93E123412A6DFE24004DF33B /* Localizable.stringsdict */; };
@@ -873,6 +876,7 @@
 		93294B992AAD624100911109 /* WalletFactoryCompose.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletFactoryCompose.swift; sourceTree = "<group>"; };
 		932B34E82974AA4A002A75BA /* ChatPreservationProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatPreservationProtocol.swift; sourceTree = "<group>"; };
 		932F77582989F999006D8801 /* ChatCellManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatCellManager.swift; sourceTree = "<group>"; };
+		9332DBCC2C58C398000EC872 /* OldNodeWithGroupDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OldNodeWithGroupDTO.swift; sourceTree = "<group>"; };
 		9338AE7E2AEF43DA001D32DF /* NodesStorageProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodesStorageProtocol.swift; sourceTree = "<group>"; };
 		9338AE802AEF4B8E001D32DF /* NodesStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodesStorage.swift; sourceTree = "<group>"; };
 		9338AE832AEF5EFA001D32DF /* APICoreProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APICoreProtocol.swift; sourceTree = "<group>"; };
@@ -964,6 +968,8 @@
 		93CCAE7A2B06D9B500EA5B94 /* DogeBlocksDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeBlocksDTO.swift; sourceTree = "<group>"; };
 		93CCAE7D2B06DA6C00EA5B94 /* DogeBlockDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeBlockDTO.swift; sourceTree = "<group>"; };
 		93CCAE7F2B06E2D100EA5B94 /* ApiServiceError+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ApiServiceError+Extension.swift"; sourceTree = "<group>"; };
+		93D02C7F2C564EF90011D819 /* NodeWithGroupDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeWithGroupDTO.swift; sourceTree = "<group>"; };
+		93D02C812C564F710011D819 /* NodeWithGroup+NodeWithGroupDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NodeWithGroup+NodeWithGroupDTO.swift"; sourceTree = "<group>"; };
 		93E123302A6DF8EF004DF33B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		93E123322A6DF8F1004DF33B /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		93E123332A6DF8F2004DF33B /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -1835,6 +1841,15 @@
 			path = DTO;
 			sourceTree = "<group>";
 		};
+		93D02C7E2C564DEE0011D819 /* Keychain */ = {
+			isa = PBXGroup;
+			children = (
+				93D02C7F2C564EF90011D819 /* NodeWithGroupDTO.swift */,
+				9332DBCC2C58C398000EC872 /* OldNodeWithGroupDTO.swift */,
+			);
+			path = Keychain;
+			sourceTree = "<group>";
+		};
 		93E123342A6DFCA6004DF33B /* NotificationsShared */ = {
 			isa = PBXGroup;
 			children = (
@@ -2045,6 +2060,7 @@
 		E913C9091FFFA95A001A83F7 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				93D02C7E2C564DEE0011D819 /* Keychain */,
 				E91947B72000326B001362F8 /* ServerResponses */,
 				E95F859220094B8E0070534A /* CoreData */,
 				E91947B320002809001362F8 /* AdamantAccount.swift */,
@@ -2117,6 +2133,7 @@
 				936658942B0AC15300BDB2D3 /* Node+UI.swift */,
 				3AF53F8C2B3DCFA300B30312 /* NodeGroup+Constants.swift */,
 				3AA3880B2B69201B00125684 /* ADM+JsonDecode.swift */,
+				93D02C812C564F710011D819 /* NodeWithGroup+NodeWithGroupDTO.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -3059,6 +3076,7 @@
 				E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */,
 				E9E7CDB72003994E00DFC4DB /* AdamantUtilities+extended.swift in Sources */,
 				E9147B6320505C7500145913 /* QRCodeReader+adamant.swift in Sources */,
+				9332DBCD2C58C398000EC872 /* OldNodeWithGroupDTO.swift in Sources */,
 				E90055F720EC200900D0CB2D /* SecurityViewController.swift in Sources */,
 				939FA3422B0D6F0000710EC6 /* SelfRemovableHostingController.swift in Sources */,
 				644EC35E20F34F1E00F40C73 /* DelegateDetailsViewController.swift in Sources */,
@@ -3132,6 +3150,7 @@
 				E9E7CD932002740500DFC4DB /* AdamantAccountService.swift in Sources */,
 				41330F7629F1509400CB587C /* AdamantCellAnimation.swift in Sources */,
 				64FA53CD20E1300B006783C9 /* EthTransactionsViewController.swift in Sources */,
+				93D02C822C564F710011D819 /* NodeWithGroup+NodeWithGroupDTO.swift in Sources */,
 				6449BA6A235CA0930033B936 /* ERC20Wallet.swift in Sources */,
 				E9147B612050599000145913 /* LoginViewController+QR.swift in Sources */,
 				9399F5ED29A85A48006C3E30 /* ChatCacheService.swift in Sources */,
@@ -3190,6 +3209,7 @@
 				648BCA6D213D384F00875EB5 /* AvatarService.swift in Sources */,
 				E95F856F2007B61D0070534A /* GetPublicKeyResponse.swift in Sources */,
 				3A26D94B2C3D3838003AD832 /* KlyTransactionsViewController.swift in Sources */,
+				93D02C802C564EF90011D819 /* NodeWithGroupDTO.swift in Sources */,
 				936658992B0AD32600BDB2D3 /* CoinsNodesListViewModel+ApiServices.swift in Sources */,
 				644EC34D20EFA60900F40C73 /* AdamantApi+Delegates.swift in Sources */,
 				E940088F2119A9E800CD2D67 /* BigInt+Decimal.swift in Sources */,

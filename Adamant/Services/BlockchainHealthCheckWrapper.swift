@@ -12,7 +12,7 @@ import Foundation
 protocol BlockchainHealthCheckableService {
     associatedtype Error: HealthCheckableError
     
-    func getStatusInfo(node: Node) async -> Result<NodeStatusInfo, Error>
+    func getStatusInfo(origin: NodeOrigin) async -> Result<NodeStatusInfo, Error>
 }
 
 final class BlockchainHealthCheckWrapper<
@@ -57,8 +57,7 @@ final class BlockchainHealthCheckWrapper<
             await withTaskGroup(of: Void.self, returning: Void.self) { group in
                 nodes.filter { $0.isEnabled }.forEach { node in
                     group.addTask { [weak self] in
-                        guard let self = self, !currentRequests.contains(node.id) else { return }
-                        await updateNodeStatusInfo(node: node)
+                        await self?.updateNodeStatusInfo(node: node)
                     }
                 }
                 
@@ -70,27 +69,90 @@ final class BlockchainHealthCheckWrapper<
 
 private extension BlockchainHealthCheckWrapper {
     func updateNodeStatusInfo(node: Node) async {
+        guard !currentRequests.contains(node.id) else { return }
         currentRequests.insert(node.id)
-        defer { currentRequests.remove(node.id) }
+        var forceInclude: UUID?
         
-        let statusInfo = await service.getStatusInfo(node: node)
-        nodesStorage.updateNodeStatus(id: node.id, statusInfo: try? statusInfo.get())
+        defer {
+            currentRequests.remove(node.id)
+            updateNodesAvailability(forceInclude: forceInclude)
+        }
         
-        switch statusInfo {
-        case .success(let info):
-            if let versionNumber = Node.stringToDouble(info.version),
-               versionNumber < nodeGroup.minNodeVersion {
-                nodesStorage.updateNodeParams(
-                    id: node.id,
-                    connectionStatus: .notAllowed(.outdatedApiVersion)
-                )
+        guard node.preferMainOrigin == nil else {
+            switch await updateNodeStatusInfo(
+                id: node.id,
+                origin: node.preferredOrigin,
+                markAsOfflineIfFailed: true
+            ) {
+            case .success:
+                forceInclude = node.id
+            case .failure, .none:
+                break
             }
             
-            updateNodesAvailability(forceInclude: node.id)
+            return
+        }
+        
+        switch await updateNodeStatusInfo(
+            id: node.id,
+            origin: node.mainOrigin,
+            markAsOfflineIfFailed: false
+        ) {
+        case .success:
+            nodesStorage.updateNode(id: node.id) { $0.preferMainOrigin = true }
+            forceInclude = node.id
+        case .failure:
+            switch await updateNodeStatusInfo(
+                id: node.id,
+                origin: node.mainOrigin,
+                markAsOfflineIfFailed: true
+            ) {
+            case .success:
+                nodesStorage.updateNode(id: node.id) { $0.preferMainOrigin = false }
+                forceInclude = node.id
+            case .failure, .none:
+                break
+            }
+        case .none:
+            break
+        }
+    }
+    
+    @discardableResult
+    func updateNodeStatusInfo(
+        id: UUID,
+        origin: NodeOrigin,
+        markAsOfflineIfFailed: Bool
+    ) async -> Result<Void, Error>? {
+        switch await service.getStatusInfo(origin: origin) {
+        case let .success(info):
+            applyStatusInfo(id: id, info: info)
+            return .success(())
         case let .failure(error):
-            guard !error.isRequestCancelledError else { return }
-            nodesStorage.updateNodeParams(id: node.id, connectionStatus: .offline)
-            updateNodesAvailability()
+            guard !error.isRequestCancelledError else { return nil }
+            
+            if markAsOfflineIfFailed {
+                nodesStorage.updateNode(id: id) { $0.connectionStatus = .offline }
+            }
+            
+            return .failure(error)
+        }
+    }
+    
+    func applyStatusInfo(id: UUID, info: NodeStatusInfo) {
+        nodesStorage.updateNode(id: id) { node in
+            node.wsEnabled = info.wsEnabled
+            node.updateWsPort(info.wsPort)
+            node.version = info.version
+            node.height = info.height
+            node.ping = info.ping
+            
+            guard
+                let versionNumber = Node.stringToDouble(info.version),
+                versionNumber < nodeGroup.minNodeVersion
+            else { return }
+            
+            node.connectionStatus = .notAllowed(.outdatedApiVersion)
         }
     }
     
@@ -108,12 +170,12 @@ private extension BlockchainHealthCheckWrapper {
         )
         
         workingNodes.forEach { node in
-            var status: Node.ConnectionStatus?
+            var status: NodeConnectionStatus?
             let actualNodeVersion = Node.stringToDouble(node.version)
             
             if let actualNodeVersion = actualNodeVersion,
                actualNodeVersion < nodeGroup.minNodeVersion {
-                status = Node.ConnectionStatus.notAllowed(.outdatedApiVersion)
+                status = .notAllowed(.outdatedApiVersion)
             } else {
                 status = node.height.map { height in
                     actualHeightsRange?.contains(height) ?? false
@@ -122,10 +184,7 @@ private extension BlockchainHealthCheckWrapper {
                 } ?? .none
             }
             
-            nodesStorage.updateNodeParams(
-                id: node.id,
-                connectionStatus: status
-            )
+            nodesStorage.updateNode(id: node.id) { $0.connectionStatus = status }
         }
     }
 }

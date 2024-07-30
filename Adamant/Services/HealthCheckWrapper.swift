@@ -95,7 +95,7 @@ class HealthCheckWrapper<Service, Error: HealthCheckableError> {
     }
     
     func request<Output>(
-        _ request: @Sendable (Service, Node) async -> Result<Output, Error>
+        _ request: @Sendable (Service, NodeOrigin) async -> Result<Output, Error>
     ) async -> Result<Output, Error> {
         var lastConnectionError = allowedNodes.isEmpty
         ? Error.noEndpointsError(coin: nodeGroup.name)
@@ -106,7 +106,7 @@ class HealthCheckWrapper<Service, Error: HealthCheckableError> {
                 : allowedNodes.shuffled()
         
         for node in nodesList {
-            let response = await request(service, node)
+            let response = await request(service, node.preferredOrigin)
             
             switch response {
             case .success:
@@ -154,10 +154,9 @@ private extension HealthCheckWrapper {
 
 private extension Node {
     func doesNeedHealthCheck(_ node: Node) -> Bool {
-        scheme != node.scheme ||
-        host != node.host ||
-        isEnabled != node.isEnabled ||
-        port != node.port
+        mainOrigin != node.mainOrigin ||
+        altOrigin != node.altOrigin ||
+        isEnabled != node.isEnabled
     }
 }
 

@@ -17,18 +17,18 @@ final class DogeApiCore: BlockchainHealthCheckableService {
     }
     
     func request<Output>(
-        node: Node,
-        _ request: @Sendable @escaping (APICoreProtocol, Node) async -> ApiServiceResult<Output>
+        origin: NodeOrigin,
+        _ request: @Sendable @escaping (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
     ) async -> WalletServiceResult<Output> {
-        await request(apiCore, node).mapError { $0.asWalletServiceError() }
+        await request(apiCore, origin).mapError { $0.asWalletServiceError() }
     }
 
-    func getStatusInfo(node: Node) async -> WalletServiceResult<NodeStatusInfo> {
+    func getStatusInfo(origin: NodeOrigin) async -> WalletServiceResult<NodeStatusInfo> {
         let startTimestamp = Date.now.timeIntervalSince1970
         
-        let response: WalletServiceResult<DogeNodeInfoDTO> = await request(node: node) { core, node in
+        let response: WalletServiceResult<DogeNodeInfoDTO> = await request(origin: origin) { core, origin in
             await core.sendRequestJsonResponse(
-                node: node,
+                origin: origin,
                 path: DogeApiCommands.getInfo()
             )
         }
@@ -61,16 +61,16 @@ final class DogeApiService: WalletApiService {
     }
     
     func request<Output>(
-        _ request: @Sendable @escaping (APICoreProtocol, Node) async -> ApiServiceResult<Output>
+        _ request: @Sendable @escaping (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
     ) async -> WalletServiceResult<Output> {
-        await api.request { core, node in
-            await core.request(node: node, request)
+        await api.request { core, origin in
+            await core.request(origin: origin, request)
         }
     }
     
     func getStatusInfo() async -> WalletServiceResult<NodeStatusInfo> {
-        await api.request { core, node in
-            await core.getStatusInfo(node: node)
+        await api.request { core, origin in
+            await core.getStatusInfo(origin: origin)
         }
     }
 }

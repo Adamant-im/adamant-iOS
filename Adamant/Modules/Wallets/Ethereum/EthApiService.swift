@@ -33,22 +33,22 @@ class EthApiService: WalletApiService {
     func requestWeb3<Output>(
         _ request: @Sendable @escaping (Web3) async throws -> Output
     ) async -> WalletServiceResult<Output> {
-        await api.request { core, node in
-            await core.performRequest(node: node, request)
+        await api.request { core, origin in
+            await core.performRequest(origin: origin, request)
         }
     }
     
     func requestApiCore<Output>(
-        _ request: @Sendable @escaping (APICoreProtocol, Node) async -> ApiServiceResult<Output>
+        _ request: @Sendable @escaping (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
     ) async -> WalletServiceResult<Output> {
-        await api.request { core, node in
-            await request(core.apiCore, node).mapError { $0.asWalletServiceError() }
+        await api.request { core, origin in
+            await request(core.apiCore, origin).mapError { $0.asWalletServiceError() }
         }
     }
     
     func getStatusInfo() async -> WalletServiceResult<NodeStatusInfo> {
-        await api.request { core, node in
-            await core.getStatusInfo(node: node)
+        await api.request { core, origin in
+            await core.getStatusInfo(origin: origin)
         }
     }
     

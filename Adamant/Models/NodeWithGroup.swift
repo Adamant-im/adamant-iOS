@@ -8,7 +8,7 @@
 
 import CommonKit
 
-struct NodeWithGroup: Codable, Equatable {
+struct NodeWithGroup: Equatable {
     let group: NodeGroup
     var node: Node
 }

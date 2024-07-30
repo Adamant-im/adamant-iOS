@@ -516,16 +516,16 @@ extension BtcWalletService {
     }
     
     func getBalance(address: String) async throws -> Decimal {
-        let response: BtcBalanceResponse = try await btcApiService.request { api, node in
-            await api.sendRequestJsonResponse(node: node, path: BtcApiCommands.balance(for: address))
+        let response: BtcBalanceResponse = try await btcApiService.request { api, origin in
+            await api.sendRequestJsonResponse(origin: origin, path: BtcApiCommands.balance(for: address))
         }.get()
 
         return response.value / BtcWalletService.multiplier
     }
 
     func getFeeRate() async throws -> Decimal {
-        let response: [String: Decimal] = try await btcApiService.request { api, node in
-            await api.sendRequestJsonResponse(node: node, path: BtcApiCommands.getFeeRate())
+        let response: [String: Decimal] = try await btcApiService.request { api, origin in
+            await api.sendRequestJsonResponse(origin: origin, path: BtcApiCommands.getFeeRate())
         }.get()
         
         return response["2"] ?? 1
@@ -663,9 +663,9 @@ extension BtcWalletService {
         for address: String,
         fromTx: String? = nil
     ) async throws -> [RawBtcTransactionResponse] {
-        return try await btcApiService.request { api, node in
+        return try await btcApiService.request { api, origin in
             await api.sendRequestJsonResponse(
-                node: node,
+                origin: origin,
                 path: BtcApiCommands.getTransactions(
                     for: address,
                     fromTx: fromTx
@@ -679,9 +679,9 @@ extension BtcWalletService {
             throw WalletServiceError.notLogged
         }
         
-        let rawTransaction: RawBtcTransactionResponse = try await btcApiService.request { api, node in
+        let rawTransaction: RawBtcTransactionResponse = try await btcApiService.request { api, origin in
             await api.sendRequestJsonResponse(
-                node: node,
+                origin: origin,
                 path: BtcApiCommands.getTransaction(by: hash)
             )
         }.get()

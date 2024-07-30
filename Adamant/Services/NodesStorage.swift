@@ -38,43 +38,17 @@ final class NodesStorage: NodesStorageProtocol {
         }
     }
     
-    func updateNode(
-        id: UUID,
-        scheme: CommonKit.Node.URLScheme?,
-        host: String?,
-        isEnabled: Bool?,
-        wsEnabled: Bool?,
-        port: Int??,
-        wsPort: Int??,
-        version: String??,
-        height: Int??,
-        ping: TimeInterval??,
-        connectionStatus: CommonKit.Node.ConnectionStatus??
-    ) {
+    func updateNode(id: UUID, mutate: (inout Node) -> Void) {
         $items.mutate { items in
             guard
                 let index = items.wrappedValue.getIndex(id: id),
                 var node = items.wrappedValue[safe: index]?.node
             else { return }
             
-            scheme.map { node.scheme = $0 }
-            host.map { node.host = $0 }
-            wsEnabled.map { node.wsEnabled = $0 }
-            port.map { node.port = $0 }
-            wsPort.map { node.wsPort = $0 }
-            version.map { node.version = $0 }
-            height.map { node.height = $0 }
-            ping.map { node.ping = $0 }
-            connectionStatus.map { node.connectionStatus = $0 }
+            let previousValue = node
+            mutate(&node)
             
-            if let isEnabled = isEnabled {
-                node.isEnabled = isEnabled
-                
-                if !isEnabled {
-                    node.connectionStatus = nil
-                }
-            }
-            
+            guard node != previousValue else { return }
             items.wrappedValue[index].node = node
         }
     }
@@ -97,10 +71,19 @@ final class NodesStorage: NodesStorageProtocol {
     
     init(securedStore: SecuredStore) {
         self.securedStore = securedStore
+        var nodesDto: [NodeWithGroupDTO]? = securedStore.get(StoreKey.NodesStorage.nodes)
         
-        var nodes = securedStore.get(StoreKey.NodesStorage.nodes) ?? Self.defaultItems
+        if nodesDto == nil {
+            let oldNodesDto: SafeDecodingArray<OldNodeWithGroupDTO>? = securedStore.get(
+                StoreKey.NodesStorage.nodes
+            )
+            
+            nodesDto = oldNodesDto?.values.map { $0.mapToModernDto() }
+        }
+        
+        var nodes = nodesDto.map { $0.map { $0.mapToModel() } } ?? Self.defaultItems
         let nodesToAdd = Self.defaultItems.filter { defaultNode in
-            !nodes.contains { $0.node.host == defaultNode.node.host }
+            !nodes.contains { $0.node.mainOrigin.host == defaultNode.node.mainOrigin.host }
         }
         nodes.append(contentsOf: nodesToAdd)
         
@@ -140,7 +123,8 @@ private extension NodesStorage {
     }
     
     func saveNodes(nodes: [NodeWithGroup]) {
-        securedStore.set(nodes, for: StoreKey.NodesStorage.nodes)
+        let nodesDto = nodes.map { $0.mapToDto() }
+        securedStore.set(nodesDto, for: StoreKey.NodesStorage.nodes)
     }
 }
 

@@ -23,9 +23,9 @@ extension AdamantApiService {
         path: String,
         transaction: UnregisteredTransaction
     ) async -> ApiServiceResult<UInt64> {
-        let response: ApiServiceResult<TransactionIdResponse> = await request { core, node in
+        let response: ApiServiceResult<TransactionIdResponse> = await request { core, origin in
             await core.sendRequestJsonResponse(
-                node: node,
+                origin: origin,
                 path: path,
                 method: .post,
                 parameters: ["transaction": transaction],
@@ -40,9 +40,9 @@ extension AdamantApiService {
         path: String,
         transaction: UnregisteredTransaction
     ) async -> ApiServiceResult<Bool> {
-        let response: ApiServiceResult<ServerResponse> = await request { core, node in
+        let response: ApiServiceResult<ServerResponse> = await request { core, origin in
             await core.sendRequestJsonResponse(
-                node: node,
+                origin: origin,
                 path: path,
                 method: .post,
                 parameters: transaction,
@@ -62,9 +62,9 @@ extension AdamantApiService {
     
     func getTransaction(id: UInt64, withAsset: Bool) async -> ApiServiceResult<Transaction> {
         let response: ApiServiceResult<ServerModelResponse<Transaction>>
-        response = await request { core, node in
+        response = await request { core, origin in
             await core.sendRequestJsonResponse(
-                node: node,
+                origin: origin,
                 path: ApiCommands.Transactions.getTransaction,
                 method: .get,
                 parameters: [
@@ -129,9 +129,9 @@ extension AdamantApiService {
         }
         
         let response: ApiServiceResult<ServerCollectionResponse<Transaction>>
-        response = await request { [queryItems] core, node in
+        response = await request { [queryItems] core, origin in
             await core.sendRequestJsonResponse(
-                node: node,
+                origin: origin,
                 path: ApiCommands.Transactions.root,
                 method: .get,
                 parameters: core.emptyParameters,

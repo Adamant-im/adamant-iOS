@@ -22,18 +22,18 @@ final class AdamantApiCore {
         self.apiCore = apiCore
     }
     
-    func getNodeStatus(node: Node) async -> ApiServiceResult<NodeStatus> {
+    func getNodeStatus(origin: NodeOrigin) async -> ApiServiceResult<NodeStatus> {
         await apiCore.sendRequestJsonResponse(
-            node: node,
+            origin: origin,
             path: ApiCommands.status
         )
     }
 }
 
 extension AdamantApiCore: BlockchainHealthCheckableService {
-    func getStatusInfo(node: Node) async -> ApiServiceResult<NodeStatusInfo> {
+    func getStatusInfo(origin: NodeOrigin) async -> ApiServiceResult<NodeStatusInfo> {
         let startTimestamp = Date.now.timeIntervalSince1970
-        let statusResponse = await getNodeStatus(node: node)
+        let statusResponse = await getNodeStatus(origin: origin)
         let ping = Date.now.timeIntervalSince1970 - startTimestamp
         
         return statusResponse.map { statusDto in

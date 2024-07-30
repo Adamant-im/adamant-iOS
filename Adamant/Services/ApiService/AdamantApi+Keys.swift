@@ -11,9 +11,9 @@ import CommonKit
 
 extension AdamantApiService {
     func getPublicKey(byAddress address: String) async -> ApiServiceResult<String> {
-        let response: ApiServiceResult<GetPublicKeyResponse> = await request { service, node in
+        let response: ApiServiceResult<GetPublicKeyResponse> = await request { service, origin in
             await service.sendRequestJsonResponse(
-                node: node,
+                origin: origin,
                 path: ApiCommands.Accounts.getPublicKey,
                 method: .get,
                 parameters: ["address": address],
