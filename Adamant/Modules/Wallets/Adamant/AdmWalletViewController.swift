@@ -63,7 +63,7 @@ final class AdmWalletViewController: WalletViewControllerBase {
         
         var image: UIImage? {
             switch self {
-            case .stakeAdm: return .asset(named: "row_buy-coins")
+            case .stakeAdm: return .asset(named: "row_stake")
             case .buyTokens: return .asset(named: "row_buy-coins")
             case .freeTokens: return .asset(named: "row_free-tokens")
             }
