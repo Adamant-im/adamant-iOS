@@ -417,10 +417,6 @@ extension AdamantChatsProvider {
     }
     
     func apiGetChatrooms(address: String, offset: Int?) async throws -> ChatRooms? {
-        if !isConnectedToTheInternet {
-            let message = String.adamant.sharedErrors.networkError
-            throw ApiServiceError.commonError(message: message)
-        }
         do {
             let chatrooms = try await apiService.getChatRooms(address: address, offset: offset).get()
             return chatrooms

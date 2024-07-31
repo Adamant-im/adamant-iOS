@@ -302,13 +302,24 @@ final class ChatListViewController: KeyboardObservingViewController {
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantReachabilityMonitor.reachabilityChanged, object: nil)
+            .publisher(for: .AdamantReachabilityMonitor.reachabilityChanged)
             .compactMap {
                 $0.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? Bool
             }
             .removeDuplicates()
             .filter { $0 == true }
-            .sink { [weak self] _ in self?.handleInternetConnectionRestored() }
+            .sink { [weak self] _ in self?.handleConnectionRestored() }
+            .store(in: &subscriptions)
+
+        NotificationCenter.default
+            .publisher(for: Notification.Name.SocketService.currentNodeUpdate)
+            .compactMap {
+                $0.object as? SocketService
+            }
+            .filter { $0.currentNode != nil }
+            .sink { [weak self] _ in
+                self?.handleConnectionRestored()
+            }
             .store(in: &subscriptions)
     }
     
@@ -642,7 +653,7 @@ extension ChatListViewController {
         }
     }
     
-    private func handleInternetConnectionRestored() {
+    private func handleConnectionRestored() {
         guard isBusy,
               loadNewChatTask != nil
         else {
@@ -664,19 +675,19 @@ extension ChatListViewController {
     private func loadNewChats() {
         loadNewChatTask?.cancel()
         loadNewChatTask = Task {
+            guard let roomsLoadedCount = await chatsProvider.roomsLoadedCount,
+                  let roomsMaxCount = await chatsProvider.roomsMaxCount,
+                  roomsLoadedCount < roomsMaxCount,
+                  roomsMaxCount > 0
+            else {
+                return
+            }
+            if !isBusy {
+                isBusy = true
+                lastSystemChatPositionRow = getBottomSystemChatIndex()
+                tableView.reloadData()
+            }
             do {
-                guard let roomsLoadedCount = await chatsProvider.roomsLoadedCount,
-                      let roomsMaxCount = await chatsProvider.roomsMaxCount,
-                      roomsLoadedCount < roomsMaxCount,
-                      roomsMaxCount > 0
-                else {
-                    return
-                }
-                if !isBusy {
-                    isBusy = true
-                    lastSystemChatPositionRow = getBottomSystemChatIndex()
-                    tableView.reloadData()
-                }
                 try await chatsProvider.getChatRooms(offset: roomsLoadedCount)
                 isBusy = false
                 tableView.reloadData()
