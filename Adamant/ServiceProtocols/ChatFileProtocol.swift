@@ -69,4 +69,6 @@ protocol ChatFileProtocol {
         replyMessage: MessageModel?,
         saveEncrypted: Bool
     ) async throws
+    
+    func isDownloadPreviewLimitReached(for fileId: String) -> Bool
 }

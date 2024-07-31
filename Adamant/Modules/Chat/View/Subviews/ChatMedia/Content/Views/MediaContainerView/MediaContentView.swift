@@ -143,6 +143,7 @@ private extension MediaContentView {
         downloadImageView.isHidden = chatFile.isCached
         || chatFile.isBusy
         || model.txStatus == .failed
+        || chatFile.previewImage == nil
         
         videoIconIV.isHidden = !(
             chatFile.isCached

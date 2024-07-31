@@ -45,9 +45,11 @@ final class ChatFileService: ChatFileProtocol {
     @Atomic private var fileDownloadAttemptsCount: [String: Int] = [:]
     @Atomic private var uploadingFilesDictionary: [String: FileMessage] = [:]
     @Atomic private var fileProgressValue: [String: Int] = [:]
+    @Atomic private var previewDownloadsAttemps: [String: Int] = [:]
     
     private var subscriptions = Set<AnyCancellable>()
     private let maxDownloadAttemptsCount = 3
+    private let maxDownloadPreivewAttemptsCount = 2
         
     var uploadingFiles: [String] {
         $uploadingFilesIDsArray.wrappedValue
@@ -213,6 +215,14 @@ final class ChatFileService: ChatFileProtocol {
         }
         
         return decodedData
+    }
+    
+    func isDownloadPreviewLimitReached(for fileId: String) -> Bool {
+        let count = $previewDownloadsAttemps.wrappedValue[fileId] ?? .zero
+        guard count < maxDownloadPreivewAttemptsCount else { return true }
+        
+        $previewDownloadsAttemps.mutate { $0[fileId] = count + 1 }
+        return false
     }
 }
 
@@ -1118,7 +1128,7 @@ private extension ChatFileService {
         var preview: UploadResult?
         
         if let url = file.previewUrl {
-            preview = try? await uploadFile(
+            preview = try await uploadFile(
                 url: url,
                 recipientPublicKey: recipientPublicKey,
                 senderPrivateKey: senderPrivateKey,

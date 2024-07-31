@@ -151,10 +151,26 @@ private extension StorageUsageViewModel {
     }
     
     func formatSize(_ bytes: Int64) -> String {
+        if #available(iOS 16.0, *) {
+            let count = Measurement(
+                value: Double(bytes),
+                unit: UnitInformationStorage.bytes
+            )
+            
+            let style = Measurement.FormatStyle.ByteCount(
+                style: .file,
+                allowedUnits: .all,
+                spellsOutZero: true,
+                includesActualByteCount: false,
+                locale: String.locale()
+            )
+            
+            return style.format(count)
+        }
+        
         let formatter = ByteCountFormatter()
-        formatter.allowedUnits = [.useGB, .useMB, .useKB]
+        formatter.allowedUnits = .useAll
         formatter.countStyle = .file
-
         return formatter.string(fromByteCount: bytes)
     }
 }

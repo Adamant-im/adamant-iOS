@@ -194,6 +194,7 @@ private extension ChatFileView {
         downloadImageView.isHidden = chatFile.isCached 
         || chatFile.isBusy
         || model.txStatus == .failed
+        || chatFile.previewImage == nil
         
         if chatFile.isDownloading {
             if chatFile.previewImage == nil,

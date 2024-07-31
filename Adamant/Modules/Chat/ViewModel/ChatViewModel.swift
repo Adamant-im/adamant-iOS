@@ -319,7 +319,11 @@ final class ChatViewModel: NSObject {
                         saveEncrypted: filesStorageProprieties.saveFileEncrypted()
                     )
                 } catch {
-                    await handleMessageSendingError(error: error, sentText: text)
+                    await handleMessageSendingError(
+                        error: error,
+                        sentText: text,
+                        filesPicked: filesPicked
+                    )
                 }
             }
             return
@@ -742,11 +746,20 @@ final class ChatViewModel: NSObject {
               case let(.file(fileModel)) = message?.content
         else { return }
         
+        let chatFiles = fileModel.value.content.fileModel.files
+        
+        if filesStorageProprieties.autoDownloadPreviewPolicy() == .nobody,
+           file.previewImage == nil,
+           file.file.preview != nil,
+           !chatFileService.isDownloadPreviewLimitReached(for: file.file.id) {
+            forceDownloadAllFiles(messageId: messageId, files: chatFiles)
+            return
+        }
+        
         guard !file.isCached,
               !filesStorage.isCachedLocally(file.file.id)
         else {
             Task {
-                let chatFiles = fileModel.value.content.fileModel.files
                 self.presentFileInFullScreen(id: file.file.id, chatFiles: chatFiles)
             }
             return
@@ -1238,12 +1251,17 @@ private extension ChatViewModel {
         }
     }
     
-    func handleMessageSendingError(error: Error, sentText: String) async {
+    func handleMessageSendingError(
+        error: Error,
+        sentText: String,
+        filesPicked: [FileResult]? = nil
+    ) async {
         switch error as? ChatsProviderError {
         case .messageNotValid:
             inputText = sentText
         case .notEnoughMoneyToSend:
             inputText = sentText
+            self.filesPicked = filesPicked
             guard await transfersProvider.hasTransactions else {
                 dialog.send(.freeTokenAlert)
                 return

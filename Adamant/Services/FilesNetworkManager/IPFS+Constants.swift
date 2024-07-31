@@ -24,9 +24,18 @@ extension IPFSApiService {
     
     static var nodes: [Node] {
         [
-            Node(url: URL(string: "https://ipfs1test.adamant.im")!),
-            Node(url: URL(string: "https://ipfs2test.adamant.im")!),
-            Node(url: URL(string: "https://ipfs3test.adamant.im")!)
+            Node(
+                url: URL(string: "https://ipfs4.adm.im")!,
+                altUrl: URL(string: "http://95.216.45.88:44099")!
+            ),
+            Node(
+                url: URL(string: "https://ipfs5.adamant.im")!,
+                altUrl: URL(string: "http://62.72.43.99:44099")!
+            ),
+            Node(
+                url: URL(string: "https://ipfs6.adamant.business")!,
+                altUrl: URL(string: "http://75.119.138.235:44099")!
+            )
         ]
     }
     
