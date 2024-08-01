@@ -119,54 +119,51 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
     @MainActor
     func pagingViewController(_ pagingViewController: PagingViewController, viewControllerAt index: Int) -> UIViewController {
         let service = services[index]
-        
+        let admService = services.first { $0.core.nodeGroups.contains(.adm) }
         let vc = screensFactory.makeTransferVC(service: service)
         
-        guard let v = vc as? TransferViewControllerBase else { return vc }
-        
-        v.delegate = self
+        vc.delegate = self
         
         guard let address = partner?.address else { return vc }
         
         let name = partner?.chatroom?.getName(addressBookService: addressBookService)
         
-        v.replyToMessageId = replyToMessageId
-        v.admReportRecipient = address
-        v.recipientIsReadonly = true
-        v.commentsEnabled = service.core.commentsEnabledForRichMessages && partner?.isDummy != true
-        v.showProgressView(animated: false)
+        vc.replyToMessageId = replyToMessageId
+        vc.admReportRecipient = address
+        vc.recipientIsReadonly = true
+        vc.commentsEnabled = service.core.commentsEnabledForRichMessages && partner?.isDummy != true
+        vc.showProgressView(animated: false)
         
         Task {
-            let groupsWithoutActiveNode = service.core.nodeGroups.filter {
-                !nodesStorage.haveActiveNode(in: $0)
-            }
-
-            if let group = groupsWithoutActiveNode.first {
-                v.showAlertView(
+            guard service.core.hasActiveNode else {
+                vc.showAlertView(
                     title: nil,
-                    message: ApiServiceError.noEndpointsAvailable(coin: group.name).errorDescription ?? String.adamant.sharedErrors.unknownError,
+                    message: ApiServiceError.noEndpointsAvailable(
+                        coin: service.core.tokenName
+                    ).errorDescription ?? .adamant.sharedErrors.unknownError,
                     animated: true
                 )
                 return
             }
             
-            if !nodesStorage.haveActiveNode(in: .adm) {
-                v.showAlertView(
+            guard admService?.core.hasActiveNode ?? false else {
+                vc.showAlertView(
                     title: nil,
-                    message: String.adamant.sharedErrors.admNodeErrorMessage(service.core.tokenSymbol),
+                    message: .adamant.sharedErrors.admNodeErrorMessage(service.core.tokenSymbol),
                     animated: true
                 )
                 return
             }
+            
             do {
                 let walletAddress = try await service.core
                     .getWalletAddress(
                         byAdamantAddress:
                             address
                     )
-                v.recipientAddress = walletAddress
-                v.recipientName = name
-                v.hideProgress(animated: true)
+                vc.recipientAddress = walletAddress
+                vc.recipientName = name
+                vc.hideProgress(animated: true)
                 
                 if ERC20Token.supportedTokens.contains(
                     where: { token in
@@ -177,16 +174,16 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                         by: EthWalletService.richMessageType
                     )?.core
                     
-                    v.rootCoinBalance = ethWallet?.wallet?.balance
+                    vc.rootCoinBalance = ethWallet?.wallet?.balance
                 }
             } catch let error as WalletServiceError {
-                v.showAlertView(
+                vc.showAlertView(
                     title: nil,
                     message: error.message,
                     animated: true
                 )
             } catch {
-                v.showAlertView(
+                vc.showAlertView(
                     title: nil,
                     message: String.adamant.sharedErrors.unknownError,
                     animated: true

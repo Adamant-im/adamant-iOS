@@ -6,7 +6,7 @@
 //
 
 public extension Node {
-    func mapToDto() -> NodeDTO {
+    func mapToDto() -> NodeKeychainDTO {
         .init(
             mainOrigin: mainOrigin,
             altOrigin: altOrigin,
@@ -15,12 +15,13 @@ public extension Node {
             version: version,
             height: height,
             ping: ping,
-            connectionStatus: connectionStatus
+            connectionStatus: connectionStatus,
+            type: type
         )
     }
 }
 
-public extension NodeDTO {
+public extension NodeKeychainDTO {
     func mapToModel() -> Node {
         .init(
             id: .init(),
@@ -32,7 +33,8 @@ public extension NodeDTO {
             height: height,
             ping: ping,
             connectionStatus: connectionStatus,
-            preferMainOrigin: nil
+            preferMainOrigin: nil,
+            type: type
         )
     }
 }

@@ -166,6 +166,10 @@ final class ERC20WalletService: WalletCoreProtocol {
         $hasMoreOldTransactions.eraseToAnyPublisher()
     }
     
+    var hasActiveNode: Bool {
+        apiService.hasActiveNode
+    }
+    
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUnicID,
         coreDataStack: coreDataStack,

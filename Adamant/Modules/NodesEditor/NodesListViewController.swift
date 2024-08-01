@@ -93,7 +93,7 @@ final class NodesListViewController: FormViewController {
     
     @ObservableValue private var nodesList = [Node]()
     @ObservableValue private var currentSocketsNodeId: UUID?
-    @ObservableValue private var currentRestNodesIds = [UUID]()
+    @ObservableValue private var chosenFastestNodeId: UUID?
     
     private var nodesHaveBeenDisplayed = false
     private var timerSubsctiption: AnyCancellable?
@@ -221,7 +221,7 @@ final class NodesListViewController: FormViewController {
     
     private func setNewNodesList(_ newNodes: [Node]) {
         nodesList = newNodes
-        currentRestNodesIds = apiService.preferredNodeIds
+        chosenFastestNodeId = apiService.chosenFastestNodeId
         
         if !nodesHaveBeenDisplayed {
             UIView.performWithoutAnimation {
@@ -250,7 +250,7 @@ extension NodesListViewController {
         guard let index = getNodeIndex(nodeId: nodeId) else { return }
         
         getNodesSection()?.remove(at: index)
-        nodesStorage.removeNode(id: nodeId)
+        nodesStorage.removeNode(id: nodeId, group: .adm)
     }
     
     func getNodeIndex(nodeId: UUID) -> Int? {
@@ -422,14 +422,14 @@ extension NodesListViewController {
             id: node.id,
             title: node.asString(),
             indicatorString: node.indicatorString(
-                isRest: currentRestNodesIds.contains(node.id),
+                isRest: chosenFastestNodeId == node.id,
                 isWs: currentSocketsNodeId == node.id
             ),
             indicatorColor: node.indicatorColor,
             statusString: node.statusString(showVersion: true) ?? .empty,
             isEnabled: node.isEnabled,
             nodeUpdateAction: .init(id: node.id.uuidString) { [nodesStorage] isEnabled in
-                nodesStorage.updateNode(id: node.id) { $0.isEnabled = isEnabled }
+                nodesStorage.updateNode(id: node.id, group: .adm) { $0.isEnabled = isEnabled }
             }
         )
     }
@@ -437,7 +437,7 @@ extension NodesListViewController {
     private func makeNodeCellPublisher(nodeId: UUID) -> some Observable<NodeCell.Model> {
         $nodesList.combineLatest(
             $currentSocketsNodeId,
-            $currentRestNodesIds
+            $chosenFastestNodeId
         ).compactMap { [weak self] tuple in
             let nodes = tuple.0
             

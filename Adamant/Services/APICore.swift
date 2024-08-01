@@ -69,7 +69,7 @@ actor APICore: APICoreProtocol {
             
             request.httpBody = data
             request.headers.update(.contentType("application/json"))
-            return await sendRequest(request: AF.request(request))
+            return await sendRequest(request: session.request(request))
         } catch {
             return .init(
                 result: .failure(.internalError(message: error.localizedDescription, error: error)),
@@ -82,15 +82,20 @@ actor APICore: APICoreProtocol {
 
 private extension APICore {
     func sendRequest(request: DataRequest) async -> APIResponseModel {
-        await withCheckedContinuation { continuation in
-            request.responseData(queue: responseQueue) { response in
-                continuation.resume(returning: .init(
-                    result: response.result.mapError { .init(error: $0) },
-                    data: response.data,
-                    code: response.response?.statusCode
-                ))
-            }
-        }
+        await withTaskCancellationHandler(
+            operation: {
+                await withCheckedContinuation { continuation in
+                    request.responseData(queue: responseQueue) { response in
+                        continuation.resume(returning: .init(
+                            result: response.result.mapError { .init(error: $0) },
+                            data: response.data,
+                            code: response.response?.statusCode
+                        ))
+                    }
+                }
+            },
+            onCancel: { request.cancel() }
+        )
     }
     
     func buildUrl(origin: NodeOrigin, path: String) throws -> URL {

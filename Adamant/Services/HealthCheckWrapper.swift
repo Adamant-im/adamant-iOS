@@ -13,7 +13,6 @@ import UIKit
 
 protocol HealthCheckableError: Error {
     var isNetworkError: Bool { get }
-    var isRequestCancelledError: Bool { get }
     
     static func noEndpointsError(coin: String) -> Self
 }
@@ -33,11 +32,11 @@ class HealthCheckWrapper<Service, Error: HealthCheckableError> {
     @Atomic private var previousAppState: UIApplication.State?
     @Atomic private var lastUpdateTime = Date()
     
-    @ObservableValue private var allowedNodes: [Node] = .init()
+    @ObservableValue private(set) var sortedAllowedNodes: [Node] = .init()
     
     var preferredNodeIds: [UUID] {
         fastestNodeMode
-            ? [allowedNodes.first?.id].compactMap { $0 }
+            ? [sortedAllowedNodes.first?.id].compactMap { $0 }
             : []
     }
     
@@ -60,14 +59,14 @@ class HealthCheckWrapper<Service, Error: HealthCheckableError> {
         $nodes
             .removeDuplicates()
             .sink { [weak self] in
-                self?.allowedNodes = $0.getAllowedNodes(
+                self?.sortedAllowedNodes = $0.getAllowedNodes(
                     sortedBySpeedDescending: true,
                     needWS: false
                 )
             }
             .store(in: &subscriptions)
         
-        $allowedNodes
+        $sortedAllowedNodes
             .map { $0.isEmpty }
             .removeDuplicates()
             .sink { [weak self] _ in self?.updateHealthCheckTimerSubscription() }
@@ -97,13 +96,13 @@ class HealthCheckWrapper<Service, Error: HealthCheckableError> {
     func request<Output>(
         _ request: @Sendable (Service, NodeOrigin) async -> Result<Output, Error>
     ) async -> Result<Output, Error> {
-        var lastConnectionError = allowedNodes.isEmpty
-        ? Error.noEndpointsError(coin: nodeGroup.name)
-        : nil
+        var lastConnectionError = sortedAllowedNodes.isEmpty
+            ? Error.noEndpointsError(coin: nodeGroup.name)
+            : nil
         
         let nodesList = fastestNodeMode
-                ? allowedNodes
-                : allowedNodes.shuffled()
+            ? sortedAllowedNodes
+            : sortedAllowedNodes.shuffled()
         
         for node in nodesList {
             let response = await request(service, node.preferredOrigin)
@@ -129,7 +128,7 @@ class HealthCheckWrapper<Service, Error: HealthCheckableError> {
 private extension HealthCheckWrapper {
     func updateHealthCheckTimerSubscription() {
         healthCheckTimerSubscription = Timer.publish(
-            every: allowedNodes.isEmpty
+            every: sortedAllowedNodes.isEmpty
                 ? crucialUpdateInterval
                 : normalUpdateInterval,
             on: .main,

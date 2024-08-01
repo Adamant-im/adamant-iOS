@@ -15,7 +15,7 @@ public final class ExtensionsApi {
     public let keychainStore: KeychainStore
     
     public private(set) lazy var nodes: [Node] = {
-        let nodesDto: [NodeDTO]? = keychainStore.get(nodesStoreKey)
+        let nodesDto: [NodeKeychainDTO]? = keychainStore.get(nodesStoreKey)
         let nodes = nodesDto.map { $0.map { $0.mapToModel() } }
             ?? AdamantResources.nodes
         

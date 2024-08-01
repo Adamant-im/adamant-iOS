@@ -31,11 +31,15 @@ final class AdamantApiService {
 }
 
 extension AdamantApiService: ApiService {
-    var preferredNodeIds: [UUID] {
-        service.preferredNodeIds
+    var chosenFastestNodeId: UUID? {
+        service.chosenFastestNodeId
     }
     
     func healthCheck() {
         service.healthCheck()
+    }
+    
+    var hasActiveNode: Bool {
+        !service.sortedAllowedNodes.isEmpty
     }
 }

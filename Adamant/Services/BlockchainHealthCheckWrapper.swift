@@ -99,7 +99,7 @@ private extension BlockchainHealthCheckWrapper {
             markAsOfflineIfFailed: false
         ) {
         case .success:
-            nodesStorage.updateNode(id: node.id) { $0.preferMainOrigin = true }
+            nodesStorage.updateNode(id: node.id, group: nodeGroup) { $0.preferMainOrigin = true }
             forceInclude = node.id
         case .failure:
             switch await updateNodeStatusInfo(
@@ -108,7 +108,7 @@ private extension BlockchainHealthCheckWrapper {
                 markAsOfflineIfFailed: true
             ) {
             case .success:
-                nodesStorage.updateNode(id: node.id) { $0.preferMainOrigin = false }
+                nodesStorage.updateNode(id: node.id, group: nodeGroup) { $0.preferMainOrigin = false }
                 forceInclude = node.id
             case .failure, .none:
                 break
@@ -129,10 +129,8 @@ private extension BlockchainHealthCheckWrapper {
             applyStatusInfo(id: id, info: info)
             return .success(())
         case let .failure(error):
-            guard !error.isRequestCancelledError else { return nil }
-            
             if markAsOfflineIfFailed {
-                nodesStorage.updateNode(id: id) { $0.connectionStatus = .offline }
+                nodesStorage.updateNode(id: id, group: nodeGroup) { $0.connectionStatus = .offline }
             }
             
             return .failure(error)
@@ -140,7 +138,7 @@ private extension BlockchainHealthCheckWrapper {
     }
     
     func applyStatusInfo(id: UUID, info: NodeStatusInfo) {
-        nodesStorage.updateNode(id: id) { node in
+        nodesStorage.updateNode(id: id, group: nodeGroup) { node in
             node.wsEnabled = info.wsEnabled
             node.updateWsPort(info.wsPort)
             node.version = info.version
@@ -184,7 +182,7 @@ private extension BlockchainHealthCheckWrapper {
                 } ?? .none
             }
             
-            nodesStorage.updateNode(id: node.id) { $0.connectionStatus = status }
+            nodesStorage.updateNode(id: node.id, group: nodeGroup) { $0.connectionStatus = status }
         }
     }
 }

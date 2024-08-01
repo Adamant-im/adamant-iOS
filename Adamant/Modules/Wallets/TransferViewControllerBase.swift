@@ -188,6 +188,7 @@ class TransferViewControllerBase: FormViewController {
     let walletCore: WalletCoreProtocol
     let reachabilityMonitor: ReachabilityMonitor
     let nodesStorage: NodesStorageProtocol
+    let isActiveAdmNode: () -> Bool
     
     // MARK: - Properties
     
@@ -319,7 +320,8 @@ class TransferViewControllerBase: FormViewController {
         vibroService: VibroService,
         walletService: WalletService,
         reachabilityMonitor: ReachabilityMonitor,
-        nodesStorage: NodesStorageProtocol
+        nodesStorage: NodesStorageProtocol,
+        isActiveAdmNode: @escaping () -> Bool
     ) {
         self.accountService = accountService
         self.accountsProvider = accountsProvider
@@ -333,7 +335,7 @@ class TransferViewControllerBase: FormViewController {
         self.walletCore = walletService.core
         self.reachabilityMonitor = reachabilityMonitor
         self.nodesStorage = nodesStorage
-        
+        self.isActiveAdmNode = isActiveAdmNode
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -800,8 +802,7 @@ class TransferViewControllerBase: FormViewController {
             return
         }
         
-        if admReportRecipient != nil,
-           !nodesStorage.haveActiveNode(in: .adm) {
+        guard isActiveAdmNode() || admReportRecipient == nil else {
             dialogService.showWarning(
                 withMessage: ApiServiceError.noEndpointsAvailable(
                     coin: NodeGroup.adm.name
@@ -810,14 +811,10 @@ class TransferViewControllerBase: FormViewController {
             return
         }
         
-        let groupsWithoutActiveNode = walletCore.nodeGroups.filter {
-            !nodesStorage.haveActiveNode(in: $0)
-        }
-
-        if let group = groupsWithoutActiveNode.first {
+        guard walletCore.hasActiveNode else {
             dialogService.showWarning(
                 withMessage: ApiServiceError.noEndpointsAvailable(
-                    coin: group.name
+                    coin: walletCore.tokenName
                 ).localizedDescription
             )
             return

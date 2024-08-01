@@ -9,7 +9,8 @@
 import Foundation
 
 protocol WalletApiService {
-    var preferredNodeIds: [UUID] { get }
+    var chosenFastestNodeId: UUID? { get }
+    var hasActiveNode: Bool { get }
     
     func healthCheck()
 }

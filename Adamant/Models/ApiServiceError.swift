@@ -126,15 +126,6 @@ extension ApiServiceError: HealthCheckableError {
         }
     }
     
-    var isRequestCancelledError: Bool {
-        switch self {
-        case .requestCancelled:
-            return true
-        default:
-            return false
-        }
-    }
-    
     static func noEndpointsError(coin: String) -> ApiServiceError {
         .noEndpointsAvailable(coin: coin)
     }

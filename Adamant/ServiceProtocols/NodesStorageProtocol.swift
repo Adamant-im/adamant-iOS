@@ -17,12 +17,11 @@ extension StoreKey {
 }
 
 protocol NodesStorageProtocol {
-    var nodesWithGroupsPublisher: AnyObservable<[NodeWithGroup]> { get }
+    var nodesPublisher: AnyObservable<[NodeGroup: [Node]]> { get }
     
     func getNodesPublisher(group: NodeGroup) -> AnyObservable<[Node]>
     func addNode(_ node: Node, group: NodeGroup)
     func resetNodes(group: NodeGroup)
-    func removeNode(id: UUID)
-    func haveActiveNode(in group: NodeGroup) -> Bool
-    func updateNode(id: UUID, mutate: (inout Node) -> Void)
+    func removeNode(id: UUID, group: NodeGroup)
+    func updateNode(id: UUID, group: NodeGroup, mutate: (inout Node) -> Void)
 }

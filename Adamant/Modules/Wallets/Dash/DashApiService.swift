@@ -67,8 +67,12 @@ final class DashApiCore: BlockchainHealthCheckableService {
 final class DashApiService: WalletApiService {
     let api: BlockchainHealthCheckWrapper<DashApiCore>
     
-    var preferredNodeIds: [UUID] {
-        api.preferredNodeIds
+    var chosenFastestNodeId: UUID? {
+        api.chosenFastestNodeId
+    }
+    
+    var hasActiveNode: Bool {
+        !api.sortedAllowedNodes.isEmpty
     }
     
     init(api: BlockchainHealthCheckWrapper<DashApiCore>) {

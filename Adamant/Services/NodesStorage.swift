@@ -11,129 +11,169 @@ import Foundation
 import Combine
 
 final class NodesStorage: NodesStorageProtocol {
-    @Atomic private var items: ObservableValue<[NodeWithGroup]>
+    @Atomic private var items: ObservableValue<[NodeGroup: [Node]]> = .init(wrappedValue: .init())
     
-    var nodesWithGroupsPublisher: AnyObservable<[NodeWithGroup]> {
-        items.removeDuplicates().eraseToAnyPublisher()
+    var nodesPublisher: AnyObservable<[NodeGroup: [Node]]> {
+        items
+            .map { $0.mapValues { $0.filter { !$0.isHidden } } }
+            .removeDuplicates()
+            .eraseToAnyPublisher()
     }
     
     private var subscription: AnyCancellable?
     private let securedStore: SecuredStore
+    private let nodesMergingService: NodesMergingService
     
     func getNodesPublisher(group: NodeGroup) -> AnyObservable<[Node]> {
-        items
-            .map { $0.filter { $0.group == group }.map { $0.node } }
+        nodesPublisher
+            .map { $0[group] ?? .init() }
             .removeDuplicates()
             .eraseToAnyPublisher()
     }
     
     func addNode(_ node: Node, group: NodeGroup) {
-        items.wrappedValue.append(.init(group: group, node: node))
-    }
-    
-    func removeNode(id: UUID) {
         $items.mutate { items in
-            guard let index = items.wrappedValue.getIndex(id: id) else { return }
-            items.wrappedValue.remove(at: index)
+            if items.wrappedValue[group] == nil {
+                items.wrappedValue[group] = [node]
+            } else {
+                items.wrappedValue[group]?.append(node)
+            }
         }
     }
     
-    func updateNode(id: UUID, mutate: (inout Node) -> Void) {
+    func removeNode(id: UUID, group: NodeGroup) {
         $items.mutate { items in
             guard
-                let index = items.wrappedValue.getIndex(id: id),
-                var node = items.wrappedValue[safe: index]?.node
+                let index = items.wrappedValue[group]?.firstIndex(where: { $0.id == id })
+            else { return }
+            
+            switch items.wrappedValue[group]?[safe: index]?.type {
+            case .default:
+                items.wrappedValue[group]?[index].type = .default(isHidden: true)
+            case .custom:
+                items.wrappedValue[group]?.remove(at: index)
+            case .none:
+                break
+            }
+        }
+    }
+    
+    func updateNode(id: UUID, group: NodeGroup, mutate: (inout Node) -> Void) {
+        $items.mutate { items in
+            guard
+                let index = items.wrappedValue[group]?.firstIndex(where: { $0.id == id }),
+                var node = items.wrappedValue[group]?[safe: index]
             else { return }
             
             let previousValue = node
             mutate(&node)
             
+            if !node.isEnabled {
+                node.connectionStatus = nil
+            }
+            
+            switch node.type {
+            case .default:
+                guard !previousValue.isSame(node) else { break }
+                node.type = .custom
+            case .custom:
+                break
+            }
+            
             guard node != previousValue else { return }
-            items.wrappedValue[index].node = node
+            items.wrappedValue[group]?[index] = node
         }
     }
     
     func resetNodes(group: NodeGroup) {
-        $items.mutate { items in
-            items.wrappedValue = items.wrappedValue.filter {
-                $0.group != group
-            }
-            
-            items.wrappedValue += Self.defaultItems(group: group)
-        }
+        items.wrappedValue[group] = Self.defaultItems(group: group)
     }
     
-    func haveActiveNode(in group: CommonKit.NodeGroup) -> Bool {
-        let nodes = items.wrappedValue.filter { $0.group == group }.map { $0.node }
-        let node = nodes.first(where: { $0.connectionStatus == .allowed && $0.isEnabled })
-        return node != nil
-    }
-    
-    init(securedStore: SecuredStore) {
+    init(securedStore: SecuredStore, nodesMergingService: NodesMergingService) {
         self.securedStore = securedStore
-        var nodesDto: [NodeWithGroupDTO]? = securedStore.get(StoreKey.NodesStorage.nodes)
-        
-        if nodesDto == nil {
-            let oldNodesDto: SafeDecodingArray<OldNodeWithGroupDTO>? = securedStore.get(
-                StoreKey.NodesStorage.nodes
-            )
-            
-            nodesDto = oldNodesDto?.values.map { $0.mapToModernDto() }
-        }
-        
-        var nodes = nodesDto.map { $0.map { $0.mapToModel() } } ?? Self.defaultItems
-        let nodesToAdd = Self.defaultItems.filter { defaultNode in
-            !nodes.contains { $0.node.mainOrigin.host == defaultNode.node.mainOrigin.host }
-        }
-        nodes.append(contentsOf: nodesToAdd)
-        
-        _items = .init(wrappedValue: .init(
-            wrappedValue: nodes
-        ))
-        
-        subscription = items.removeDuplicates().sink { [weak self] in
-            guard let self = self, subscription != nil else { return }
-            saveNodes(nodes: $0)
-        }
+        self.nodesMergingService = nodesMergingService
+        setupNodes()
     }
 }
 
 private extension NodesStorage {
-    static func defaultItems(group: NodeGroup) -> [NodeWithGroup] {
+    static func defaultItems(group: NodeGroup) -> [Node] {
         switch group {
         case .btc:
-            return BtcWalletService.nodes.map { .init(group: .btc, node: $0) }
+            return BtcWalletService.nodes
         case .eth:
-            return EthWalletService.nodes.map { .init(group: .eth, node: $0) }
+            return EthWalletService.nodes
         case .klyNode:
-            return KlyWalletService.nodes.map { .init(group: .klyNode, node: $0) }
+            return KlyWalletService.nodes
         case .klyService:
-            return KlyWalletService.serviceNodes.map { .init(group: .klyService, node: $0) }
+            return KlyWalletService.serviceNodes
         case .doge:
-            return DogeWalletService.nodes.map { .init(group: .doge, node: $0) }
+            return DogeWalletService.nodes
         case .dash:
-            return DashWalletService.nodes.map { .init(group: .dash, node: $0) }
+            return DashWalletService.nodes
         case .adm:
-            return AdmWalletService.nodes.map { .init(group: .adm, node: $0) }
+            return AdmWalletService.nodes
         }
     }
     
-    static var defaultItems: [NodeWithGroup] {
-        NodeGroup.allCases.flatMap { Self.defaultItems(group: $0) }
+    static var defaultItems: [NodeGroup: [Node]] {
+        .init(
+            uniqueKeysWithValues: NodeGroup.allCases.map {
+                ($0, defaultItems(group: $0))
+            }
+        )
     }
     
-    func saveNodes(nodes: [NodeWithGroup]) {
-        let nodesDto = nodes.map { $0.mapToDto() }
+    func saveNodes(nodes: [NodeGroup: [Node]]) {
+        let nodesDto = nodes.mapValues { $0.map { $0.mapToDto() } }
         securedStore.set(nodesDto, for: StoreKey.NodesStorage.nodes)
+    }
+    
+    func setupNodes() {
+        let dto: SafeDecodingDictionary<
+            NodeGroup,
+            SafeDecodingArray<NodeKeychainDTO>
+        >? = securedStore.get(StoreKey.NodesStorage.nodes)
+        
+        let savedNodes = dto?.values.mapValues { $0.map { $0.mapToModel() } }
+            ?? migrateOldNodesData()
+            ?? .init()
+        
+        items.wrappedValue = nodesMergingService.merge(
+            savedNodes: savedNodes,
+            defaultNodes: Self.defaultItems
+        )
+        
+        subscription = items.removeDuplicates().sink { [weak self] in
+            guard let self = self else { return }
+            saveNodes(nodes: $0)
+        }
+    }
+    
+    func migrateOldNodesData() -> [NodeGroup: [Node]]? {
+        let dto: SafeDecodingArray<OldNodeKeychainDTO>? = securedStore.get(StoreKey.NodesStorage.nodes)
+        guard let dto = dto else { return nil }
+        var result: [NodeGroup: [Node]] = [:]
+        
+        dto.forEach {
+            if result[$0.group] == nil {
+                result[$0.group] = []
+            }
+            
+            result[$0.group]?.append($0.node.mapToModernDto().mapToModel())
+        }
+        
+        return result
     }
 }
 
-private extension Array where Element == NodeWithGroup {
-    func getNode(id: UUID) -> Node? {
-        first { $0.node.id == id }?.node
-    }
-    
-    func getIndex(id: UUID) -> Int? {
-        firstIndex { $0.node.id == id }
+private extension Node {
+    var isHidden: Bool {
+        switch type {
+        case let .default(isHidden):
+            return isHidden
+        case .custom:
+            return false
+        }
     }
 }

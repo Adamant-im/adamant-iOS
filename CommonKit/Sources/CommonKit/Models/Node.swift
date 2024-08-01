@@ -5,6 +5,8 @@
 //  Created by Anokhov Pavel on 20.06.2018.
 //  Copyright © 2018 Adamant. All rights reserved.
 //
+//  Check AdamantNodesMergingService when the structure is changed
+//
 
 import Foundation
 
@@ -18,13 +20,8 @@ public struct Node: Equatable, Identifiable {
     public var ping: TimeInterval?
     public var connectionStatus: NodeConnectionStatus?
     public var preferMainOrigin: Bool?
-    
-    public var isEnabled: Bool {
-        didSet {
-            guard !isEnabled else { return }
-            connectionStatus = nil
-        }
-    }
+    public var isEnabled: Bool
+    public var type: NodeType
     
     public init(
         id: UUID,
@@ -36,7 +33,8 @@ public struct Node: Equatable, Identifiable {
         height: Int?,
         ping: TimeInterval?,
         connectionStatus: NodeConnectionStatus?,
-        preferMainOrigin: Bool?
+        preferMainOrigin: Bool?,
+        type: NodeType
     ) {
         self.id = id
         self.mainOrigin = mainOrigin
@@ -48,6 +46,7 @@ public struct Node: Equatable, Identifiable {
         self.ping = ping
         self.connectionStatus = connectionStatus
         self.preferMainOrigin = preferMainOrigin
+        self.type = type
     }
 }
 
@@ -57,9 +56,9 @@ public extension Node {
             ? mainOrigin
             : altOrigin ?? mainOrigin
     }
-
-    init(url: URL, altUrl: URL? = nil) {
-        self.init(
+    
+    static func makeDefaultNode(url: URL, altUrl: URL? = nil) -> Self {
+        .init(
             id: .init(),
             isEnabled: true,
             wsEnabled: false,
@@ -69,7 +68,8 @@ public extension Node {
             height: nil,
             ping: nil,
             connectionStatus: nil,
-            preferMainOrigin: nil
+            preferMainOrigin: nil,
+            type: .default(isHidden: false)
         )
     }
     
@@ -83,6 +83,10 @@ public extension Node {
 
     func asURL() -> URL? {
         preferredOrigin.asURL()
+    }
+    
+    func isSame(_ node: Node) -> Bool {
+        mainOrigin.host == node.mainOrigin.host
     }
     
     mutating func updateWsPort(_ wsPort: Int?) {

@@ -94,7 +94,10 @@ struct AppAssembly: Assembly {
         
         // MARK: NodesStorage
         container.register(NodesStorageProtocol.self) { r in
-            NodesStorage(securedStore: r.resolve(SecuredStore.self)!)
+            NodesStorage(
+                securedStore: r.resolve(SecuredStore.self)!,
+                nodesMergingService: r.resolve(NodesMergingService.self)!
+            )
         }.inObjectScope(.container)
         
         // MARK: NodesAdditionalParamsStorage
@@ -356,5 +359,10 @@ struct AppAssembly: Assembly {
                 }
             }
         }
+        
+        // MARK: NodesMergingService
+        container.register(NodesMergingService.self) { r in
+            AdamantNodesMergingService()
+        }.inObjectScope(.transient)
     }
 }
