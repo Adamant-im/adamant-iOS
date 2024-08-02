@@ -601,40 +601,6 @@ class TransactionDetailsViewControllerBase: FormViewController {
         
         detailsSection.append(statusRow)
         
-        // MARK: Tx data record
-        let txRecordData = LabelRow {
-            $0.disabled = true
-            $0.tag = Rows.txRecordData.tag
-            $0.title = Rows.txRecordData.localized
-            
-            if let value = transaction?.txRecordData {
-                $0.value = value
-            } else {
-                $0.value = TransactionDetailsViewControllerBase.awaitingValueString
-            }
-            
-            $0.cell.detailTextLabel?.textAlignment = .right
-            $0.cell.detailTextLabel?.lineBreakMode = .byTruncatingMiddle
-        }.cellSetup { (cell, _) in
-            cell.selectionStyle = .gray
-            cell.textLabel?.textColor = UIColor.adamant.textColor
-        }.onCellSelection { [weak self] (cell, row) in
-            if let text = row.value {
-                self?.shareValue(text, from: cell)
-            }
-        }.cellUpdate { [weak self] (cell, row) in
-            cell.textLabel?.textColor = UIColor.adamant.textColor
-            if let value = self?.transaction?.txRecordData {
-                row.value = value
-            } else {
-                row.value = TransactionDetailsViewControllerBase.awaitingValueString
-            }
-        }
-        
-        if showTxRecordData {
-            detailsSection.append(txRecordData)
-        }
-        
         // MARK: Current Fiat
         let currentFiatRow = LabelRow {
             $0.disabled = true
@@ -689,6 +655,52 @@ class TransactionDetailsViewControllerBase: FormViewController {
         }
         
         detailsSection.append(fiatRow)
+        
+        // MARK: Tx data record
+        let txRecordData = LabelRow {
+            $0.disabled = true
+            $0.tag = Rows.txRecordData.tag
+            $0.title = Rows.txRecordData.localized
+            
+            if let value = transaction?.txRecordData {
+                $0.value = value
+            } else {
+                $0.value = TransactionDetailsViewControllerBase.awaitingValueString
+            }
+            
+            $0.cell.detailTextLabel?.textAlignment = .right
+            $0.cell.detailTextLabel?.lineBreakMode = .byTruncatingMiddle
+            
+            $0.hidden = Condition.function([], { [weak self] _ -> Bool in
+                guard let value = self?.transaction?.txRecordData else {
+                    return false
+                }
+                
+                if value.isEmpty {
+                    return true
+                }
+                return false
+            })
+            
+        }.cellSetup { (cell, _) in
+            cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
+        }.onCellSelection { [weak self] (cell, row) in
+            if let text = row.value {
+                self?.shareValue(text, from: cell)
+            }
+        }.cellUpdate { [weak self] (cell, row) in
+            cell.textLabel?.textColor = UIColor.adamant.textColor
+            if let value = self?.transaction?.txRecordData {
+                row.value = value
+            } else {
+                row.value = TransactionDetailsViewControllerBase.awaitingValueString
+            }
+        }
+        
+        if showTxRecordData {
+            detailsSection.append(txRecordData)
+        }
         
         // MARK: Comments section
         
@@ -856,6 +868,11 @@ class TransactionDetailsViewControllerBase: FormViewController {
         section.evaluateHidden()
         
         checkAddressesIfNeeded()
+    }
+    
+    func updateTxDataRow() {
+        let row = form.rowBy(tag: Rows.txRecordData.tag)
+        row?.evaluateHidden()
     }
     
     // MARK: - Other

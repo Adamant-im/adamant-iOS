@@ -79,6 +79,7 @@ final class KlyTransactionDetailsViewController: TransactionDetailsViewControlle
                 trs.updateConfirmations(value: lastHeight)
                 transaction = trs
                 updateIncosinstentRowIfNeeded()
+                updateTxDataRow()
                 tableView.reloadData()
                 refreshControl.endRefreshing()
             } catch {
