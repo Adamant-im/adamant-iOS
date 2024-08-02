@@ -66,7 +66,20 @@ final class DelegatesListViewController: KeyboardObservingViewController {
         textView.delegate = self
         
         let attributedString = NSMutableAttributedString(
-            attributedString: MarkdownParser(color: .adamant.chatPlaceholderTextColor).parse(self.text)
+            attributedString: MarkdownParser(
+                font: UIFont.preferredFont(forTextStyle: .subheadline),
+                color: .adamant.chatPlaceholderTextColor 
+            ).parse(self.text)
+        )
+        
+        let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.firstLineHeadIndent = 10
+            paragraphStyle.headIndent = 10
+       
+        attributedString.addAttribute(
+            .paragraphStyle,
+            value: paragraphStyle,
+            range: .init(location: .zero, length: attributedString.length)
         )
         
         textView.attributedText = attributedString
