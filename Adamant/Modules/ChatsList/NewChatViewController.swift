@@ -333,11 +333,9 @@ final class NewChatViewController: FormViewController {
         case .address(address: let addr, params: let params):
             if let params = params?.first {
                 switch params {
-                case .address:
-                    break
                 case .label(label: let label):
                     startNewChat(with: addr, name: label, message: nil)
-                case .message:
+                case .address, .message, .amount:
                     break
                 }
             } else {
