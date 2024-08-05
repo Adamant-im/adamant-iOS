@@ -41,11 +41,7 @@ struct CoinsNodesListFactory {
 private struct CoinsNodesListAssembly: Assembly {
     func assemble(container: Container) {
         container.register(CoinsNodesListViewModel.self) {
-            let processedGroups = NodeGroup.allCases.compactMap {
-                $0 == .adm
-                    ? nil
-                    : $0
-            }
+            let processedGroups = NodeGroup.allCases.filter { $0 != .adm }
             
             return .init(
                 mapper: .init(processedGroups: processedGroups),
