@@ -34,12 +34,6 @@ class HealthCheckWrapper<Service, Error: HealthCheckableError> {
     
     @ObservableValue private(set) var sortedAllowedNodes: [Node] = .init()
     
-    var preferredNodeIds: [UUID] {
-        fastestNodeMode
-            ? [sortedAllowedNodes.first?.id].compactMap { $0 }
-            : []
-    }
-    
     init(
         service: Service,
         normalUpdateInterval: TimeInterval,
