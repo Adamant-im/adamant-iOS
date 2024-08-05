@@ -12,7 +12,7 @@ public final class ExtensionsApi {
     // MARK: Properties
     private let addressBookKey = "contact_list"
     private let nodesStoreKey = "nodesSource.nodes"
-    public let keychainStore: KeychainStore
+    public let keychainStore: SecuredStore
     
     public private(set) lazy var nodes: [Node] = {
         let nodes = keychainStore.get(nodesStoreKey) ?? AdamantResources.nodes
@@ -26,7 +26,7 @@ public final class ExtensionsApi {
     }
     
     // MARK: Cotr
-    public init(keychainStore: KeychainStore) {
+    public init(keychainStore: SecuredStore) {
         self.keychainStore = keychainStore
     }
     

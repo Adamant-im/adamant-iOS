@@ -9,12 +9,14 @@
 import Foundation
 import KeychainAccess
 import RNCryptor
+import CryptoKit
 
 public final class KeychainStore: SecuredStore {
     // MARK: - Properties
     private static let keychain = Keychain(service: "\(AdamantSecret.appIdentifierPrefix).im.adamant.messenger")
     
-    private let secureStorage: SecureStorageProtocol = AdamantSecureStorage()
+    private let secureStorage: SecureStorageProtocol
+    
     private let keychainStoreIdAlias = "com.adamant.messenger.id"
     private var keychainPassword: String?
     
@@ -22,7 +24,9 @@ public final class KeychainStore: SecuredStore {
     private let migrationKey = "migrated"
     private let migrationValue = "2"
     
-    public init() {
+    public init(secureStorage: SecureStorageProtocol) {
+        self.secureStorage = secureStorage
+        
         configure()
         migrateIfNeeded()
     }
@@ -76,13 +80,15 @@ private extension KeychainStore {
             return
         }
         
-        let randomID = String.random(length: 32)
+        let keychainRandomKey = SymmetricKey(size: .bits256)
+            .withUnsafeBytes { Data($0) }
+            .base64EncodedString()
         
-        guard let data = randomID.data(using: .utf8),
+        guard let data = keychainRandomKey.data(using: .utf8),
               let encryptedData = secureStorage.encrypt(data: data, publicKey: publicKey)
         else { return }
         
-        keychainPassword = randomID
+        keychainPassword = keychainRandomKey
         setData(encryptedData, for: keychainStoreIdAlias)
     }
     

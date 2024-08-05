@@ -18,6 +18,10 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
     private let passphraseStoreKey = "accountService.passphrase"
     private let sizeWithoutMessageLabel: CGFloat = 123.0
     
+    private lazy var securedStore: SecuredStore = {
+        KeychainStore(secureStorage: AdamantSecureStorage())
+    }()
+    
     // MARK: - IBOutlets
     
     @IBOutlet weak var senderAvatarImageView: UIImageView!
@@ -42,7 +46,6 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
     func didReceive(_ notification: UNNotification) {
         // MARK: 0. Necessary services
         let avatarService = AdamantAvatarService()
-        var keychainStore: KeychainStore?
         var extensionApi: ExtensionsApi?
         var nativeCore: NativeAdamantCore?
         var keypair: Keypair?
@@ -57,11 +60,9 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
                 return
             }
             
-            let store = KeychainStore()
-            let api = ExtensionsApi(keychainStore: store)
+            let api = ExtensionsApi(keychainStore: securedStore)
             trs = api.getTransaction(by: id)
             
-            keychainStore = store
             extensionApi = api
         }
         
@@ -76,16 +77,18 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         if let raw = notification.request.content.userInfo[AdamantNotificationUserInfoKeys.decodedMessage] as? String {
             message = raw
         } else {
-            let keychainStore = keychainStore ?? KeychainStore()
             nativeCore = NativeAdamantCore()
             
-            guard let passphrase: String = keychainStore.get(passphraseStoreKey),
-                let keys = nativeCore!.createKeypairFor(passphrase: passphrase),
-                let chat = transaction.asset.chat,
-                let raw = nativeCore!.decodeMessage(rawMessage: chat.message,
-                                                    rawNonce: chat.ownMessage,
-                                                    senderPublicKey: transaction.senderPublicKey,
-                                                    privateKey: keys.privateKey) else {
+            guard let passphrase: String = securedStore.get(passphraseStoreKey),
+                  let keys = nativeCore!.createKeypairFor(passphrase: passphrase),
+                  let chat = transaction.asset.chat,
+                  let raw = nativeCore!.decodeMessage(
+                    rawMessage: chat.message,
+                    rawNonce: chat.ownMessage,
+                    senderPublicKey: transaction.senderPublicKey,
+                    privateKey: keys.privateKey
+                  )
+            else {
                 showError()
                 return
             }
@@ -107,14 +110,14 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         }
         // No name, no flag - something broke. Check sender name, if we have a recipient address
         else if let recipient = notification.request.content.userInfo[AdamantNotificationUserInfoKeys.pushRecipient] as? String {
-            let keychain = keychainStore ?? KeychainStore()
             let core = nativeCore ?? NativeAdamantCore()
-            let api: ExtensionsApi = extensionApi ?? ExtensionsApi(keychainStore: keychain)
+            let api: ExtensionsApi = extensionApi ?? ExtensionsApi(keychainStore: securedStore)
             
             let key: Keypair?
             if let keypair = keypair {
                 key = keypair
-            } else if let passphrase: String = keychain.get(passphraseStoreKey), let keypair = core.createKeypairFor(passphrase: passphrase) {
+            } else if let passphrase: String = securedStore.get(passphraseStoreKey),
+                      let keypair = core.createKeypairFor(passphrase: passphrase) {
                 key = keypair
             } else {
                 key = nil

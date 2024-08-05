@@ -18,6 +18,10 @@ class NotificationService: UNNotificationServiceExtension {
         return AdamantProvider()
     }()
     
+    private lazy var securedStore: SecuredStore = {
+        KeychainStore(secureStorage: AdamantSecureStorage())
+    }()
+
     /// Lazy constructors
     private lazy var richMessageProviders: [String: TransferNotificationContentProvider] = {
         var providers: [String: TransferNotificationContentProvider] = [
@@ -59,7 +63,6 @@ class NotificationService: UNNotificationServiceExtension {
         }
         
         // MARK: 1. Getting services
-        let securedStore = KeychainStore()
         let core = NativeAdamantCore()
         let api = ExtensionsApi(keychainStore: securedStore)
         

@@ -7,45 +7,35 @@
 
 import Foundation
 
-final class AdamantSecureStorage: SecureStorageProtocol {
-    let tag = "com.adamant.keys.id".data(using: .utf8)!
+public struct AdamantSecureStorage: SecureStorageProtocol {
+    private let tag = "com.adamant.keys.id".data(using: .utf8)!
     
-    func getPrivateKey() -> SecKey? {
-        guard let existingKey = loadPrivateKey() else {
-            return createAndStorePrivateKey()
-        }
-        
-        return existingKey
+    public init() { }
+    
+    public func getPrivateKey() -> SecKey? {
+        loadPrivateKey() ?? createAndStorePrivateKey()
     }
     
-    func getPublicKey(privateKey: SecKey) -> SecKey? {
+    public func getPublicKey(privateKey: SecKey) -> SecKey? {
         SecKeyCopyPublicKey(privateKey)
     }
     
-    func encrypt(data: Data, publicKey: SecKey) -> Data? {
-        guard let encryptedData = SecKeyCreateEncryptedData(
+    public func encrypt(data: Data, publicKey: SecKey) -> Data? {
+        SecKeyCreateEncryptedData(
             publicKey,
             .eciesEncryptionCofactorX963SHA256AESGCM,
             data as CFData,
             nil
-        ) else {
-            return nil
-        }
-        
-        return encryptedData as Data
+        ).map { $0 as Data }
     }
     
-    func decrypt(data: Data, privateKey: SecKey) -> Data? {
-        guard let decryptedData = SecKeyCreateDecryptedData(
+    public func decrypt(data: Data, privateKey: SecKey) -> Data? {
+        SecKeyCreateDecryptedData(
             privateKey,
             .eciesEncryptionCofactorX963SHA256AESGCM,
             data as CFData,
             nil
-        ) else {
-            return nil
-        }
-        
-        return decryptedData as Data
+        ).map { $0 as Data }
     }
 }
 
@@ -61,11 +51,9 @@ private extension AdamantSecureStorage {
         var item: CFTypeRef?
         let status = SecItemCopyMatching(query as CFDictionary, &item)
         
-        if status == errSecSuccess {
-            return (item as! SecKey)
-        }
-        
-        return nil
+        return status == errSecSuccess
+        ? (item as! SecKey)
+        : nil
     }
     
     func createAndStorePrivateKey() -> SecKey? {
@@ -87,10 +75,6 @@ private extension AdamantSecureStorage {
             ]
         ]
         
-        guard let privateKey = SecKeyCreateRandomKey(attributes as CFDictionary, nil) else {
-            return nil
-        }
-        
-        return privateKey
+        return SecKeyCreateRandomKey(attributes as CFDictionary, nil)
     }
 }

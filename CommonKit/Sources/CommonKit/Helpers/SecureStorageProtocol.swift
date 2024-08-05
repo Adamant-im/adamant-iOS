@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol SecureStorageProtocol {
+public protocol SecureStorageProtocol {
     func getPrivateKey() -> SecKey?
     func getPublicKey(privateKey: SecKey) -> SecKey?
     func encrypt(data: Data, publicKey: SecKey) -> Data?
