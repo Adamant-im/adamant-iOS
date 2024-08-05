@@ -101,7 +101,7 @@ final class AdamantUriTools {
                 case .message(let value):
                     components.queryItems?.append(.init(name: "message", value: value))
                 case .amount(let value):
-                    components.queryItems?.append(.init(name: "message", value: String(value)))
+                    components.queryItems?.append(.init(name: "amount", value: String(value)))
                 }
             }
             
