@@ -34,24 +34,24 @@ public final class KeychainStore: SecuredStore {
     // MARK: - SecuredStore
     
     public func get<T: Decodable>(_ key: String) -> T? {
-        guard !(T.self == String.self) else { return getString(key) as? T }
+        guard let data = getValue(key) else { return nil }
         
-        guard
-            let raw = getString(key),
-            let data = raw.data(using: .utf8)
-        else { return nil }
+        guard !(T.self == String.self) else {
+            return String(data: data, encoding: .utf8) as? T
+        }
         
         return try? JSONDecoder().decode(T.self, from: data)
     }
     
     public func set<T: Encodable>(_ value: T, for key: String) {
-        if let string = value as? String {
-            setString(string, for: key)
+        if let string = value as? String,
+           let data = string.data(using: .utf8) {
+            setValue(data, for: key)
             return
         }
         
         guard let data = try? JSONEncoder().encode(value) else { return }
-        String(data: data, encoding: .utf8).map { setString($0, for: key) }
+        setValue(data, for: key)
     }
     
     public func remove(_ key: String) {
@@ -74,49 +74,47 @@ private extension KeychainStore {
             let decryptedData = secureStorage.decrypt(
                 data: savedKey,
                 privateKey: privateKey
-            ) ?? Data()
+            )
             
-            keychainPassword = String(data: decryptedData, encoding: .utf8)
+            keychainPassword = decryptedData?.base64EncodedString()
             return
         }
         
-        let keychainRandomKey = SymmetricKey(size: .bits256)
+        let keychainRandomKeyData = SymmetricKey(size: .bits256)
             .withUnsafeBytes { Data($0) }
-            .base64EncodedString()
+        let keychainRandomKey = keychainRandomKeyData.base64EncodedString()
         
-        guard let data = keychainRandomKey.data(using: .utf8),
-              let encryptedData = secureStorage.encrypt(data: data, publicKey: publicKey)
-        else { return }
+        guard let encryptedData = secureStorage.encrypt(
+            data: keychainRandomKeyData,
+            publicKey: publicKey
+        ) else { return }
         
         keychainPassword = keychainRandomKey
         setData(encryptedData, for: keychainStoreIdAlias)
     }
     
-    func getString(_ key: String) -> String? {
+    func getValue(_ key: String) -> Data? {
         guard let keychainPassword = keychainPassword,
-              let value = KeychainStore.keychain[key] else {
-            return nil
-        }
+              let data = getData(for: key)
+        else { return nil}
         
-        let decryptedValue = decrypt(
-            string: value,
+        return decrypt(
+            data: data,
             password: keychainPassword
         )
-        
-        return decryptedValue
     }
     
-    func setString(_ value: String, for key: String) {
-        guard let keychainPassword = keychainPassword,
-              let encryptedValue = encrypt(
-                string: value,
-                password: keychainPassword
-              )
-        else {
+    func setValue(_ value: Data, for key: String) {
+        guard let keychainPassword = keychainPassword else {
             return
         }
         
-        try? KeychainStore.keychain.set(encryptedValue, key: key)
+        let encryptedValue = encrypt(
+            data: value,
+            password: keychainPassword
+        )
+        
+        setData(encryptedValue, for: key)
     }
     
     func getData(for key: String) -> Data? {
@@ -128,32 +126,30 @@ private extension KeychainStore {
     }
     
     func encrypt(
-        string: String,
-        password: String,
-        encoding: String.Encoding = .utf8
-    ) -> String? {
-        guard let data = string.data(using: encoding) else {
-            return nil
-        }
-        
-        return RNCryptor.encrypt(
+        data: Data,
+        password: String
+    ) -> Data {
+        RNCryptor.encrypt(
             data: data,
             withPassword: password
-        ).base64EncodedString()
+        )
     }
     
     func decrypt(
+        data: Data,
+        password: String
+    ) -> Data? {
+        try? RNCryptor.decrypt(data: data, withPassword: password)
+    }
+    
+    func decryptOld(
         string: String,
-        password: String,
-        encoding: String.Encoding = .utf8
-    ) -> String? {
-        if let encryptedData = Data(base64Encoded: string),
-            let data = try? RNCryptor.decrypt(data: encryptedData, withPassword: password),
-            let string = String(data: data, encoding: encoding) {
-            return string
+        password: String
+    ) -> Data? {
+        guard let encryptedData = Data(base64Encoded: string) else {
+            return nil
         }
-        
-        return nil
+        return try? RNCryptor.decrypt(data: encryptedData, withPassword: password)
     }
 }
 
@@ -167,7 +163,7 @@ private extension KeychainStore {
     func migrateIfNeeded() {
         let migrated = KeychainStore.keychain[migrationKey]
         
-        guard let keychainPassword = keychainPassword,
+        guard keychainPassword != nil,
               migrated != migrationValue
         else { return }
         
@@ -175,14 +171,12 @@ private extension KeychainStore {
         
         migrate(
             keychain: oldKeychain,
-            oldPassword: AdamantSecret.oldKeychainPass,
-            newPassword: keychainPassword
+            oldPassword: AdamantSecret.oldKeychainPass
         )
         
         migrate(
             keychain: KeychainStore.keychain,
-            oldPassword: AdamantSecret.keychainValuePassword,
-            newPassword: keychainPassword
+            oldPassword: AdamantSecret.keychainValuePassword
         )
         
         try? KeychainStore.keychain.set(migrationValue, key: migrationKey)
@@ -191,23 +185,19 @@ private extension KeychainStore {
     
     func migrate(
         keychain: Keychain,
-        oldPassword: String,
-        newPassword: String
+        oldPassword: String
     ) {
         for key in keychain.allKeys() {
             guard key != keychainStoreIdAlias,
                   let oldEncryptedValue = keychain[key],
-                  let value = decrypt(
+                  let value = decryptOld(
                     string: oldEncryptedValue,
                     password: oldPassword
-                  ),
-                  let encryptedValue = encrypt(
-                      string: value,
-                      password: newPassword
                   )
             else { continue }
             
-            try? KeychainStore.keychain.set(encryptedValue, key: key)
+            try? KeychainStore.keychain.remove(key)
+            setValue(value, for: key)
         }
     }
 }
