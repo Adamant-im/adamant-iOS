@@ -112,9 +112,7 @@ private extension ChatFactory {
             markdownParser: .init(font: UIFont.systemFont(ofSize: UIFont.systemFontSize)),
             transfersProvider: transferProvider,
             chatMessagesListFactory: .init(chatMessageFactory: .init(
-                walletServiceCompose: walletServiceCompose,
-                filesStorage: filesStorage, 
-                filesStorageProprieties: filesStorageProprieties
+                walletServiceCompose: walletServiceCompose 
             )),
             addressBookService: addressBookService,
             visibleWalletService: visibleWalletService,

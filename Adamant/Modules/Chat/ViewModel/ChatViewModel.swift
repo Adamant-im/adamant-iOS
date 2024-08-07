@@ -748,7 +748,12 @@ final class ChatViewModel: NSObject {
         
         let chatFiles = fileModel.value.content.fileModel.files
         
-        if filesStorageProprieties.autoDownloadPreviewPolicy() == .nobody,
+        let isPreviewAutoDownloadAllowed = isDownloadAllowed(
+            policy: filesStorageProprieties.autoDownloadPreviewPolicy(),
+            havePartnerName: havePartnerName
+        )
+        
+        if !isPreviewAutoDownloadAllowed,
            file.previewImage == nil,
            file.file.preview != nil,
            !chatFileService.isDownloadPreviewLimitReached(for: file.file.id) {
@@ -1179,16 +1184,14 @@ private extension ChatViewModel {
             defer { completion() }
             var expirationTimestamp: TimeInterval?
 
-            let messages = await chatMessagesListFactory.makeMessages(
+            var messages = await chatMessagesListFactory.makeMessages(
                 transactions: chatTransactions,
                 sender: sender,
                 isNeedToLoadMoreMessages: isNeedToLoadMoreMessages,
-                expirationTimestamp: &expirationTimestamp,
-                uploadingFilesIDs: chatFileService.uploadingFiles,
-                downloadingFilesIDs: chatFileService.downloadingFiles,
-                havePartnerName: havePartnerName,
-                filesLoadingProgress: chatFileService.filesLoadingProgress
+                expirationTimestamp: &expirationTimestamp
             )
+            
+            postProcess(messages: &messages)
             
             await setupNewMessages(
                 newMessages: messages,
@@ -1202,6 +1205,62 @@ private extension ChatViewModel {
                 updateChatRead.send()
             }
         }
+    }
+    
+    @MainActor
+    func postProcess(messages: inout[ChatMessage]) {
+        let indexes = messages.indices.filter {
+            messages[$0].getFiles().count > .zero
+        }
+        
+        indexes.forEach { index in
+            guard case let .file(model) = messages[index].content else { return }
+            
+            model.value.content.fileModel.files.forEach { file in
+                setupFileFields(file, messages: &messages, index: index)
+            }
+        }
+    }
+    
+    func setupFileFields(
+        _ file: ChatFile,
+        messages: inout[ChatMessage],
+        index: Int
+    ) {
+        let fileId = file.file.id
+        
+        let previewImage = (file.file.preview?.id).flatMap {
+            !$0.isEmpty
+            ? filesStorage.getPreview(for: $0)
+            : nil
+        }
+        
+        let progress = chatFileService.filesLoadingProgress[fileId]
+        let downloadStatus = chatFileService.downloadingFiles[fileId] ?? .default
+        let cached = filesStorage.isCachedLocally(fileId)
+        let isUploading = chatFileService.uploadingFiles.contains(fileId)
+        
+        let isPreviewDownloadAllowed = isDownloadAllowed(
+            policy: filesStorageProprieties.autoDownloadPreviewPolicy(),
+            havePartnerName: havePartnerName
+        )
+        
+        let isFullMediaDownloadAllowed = isDownloadAllowed(
+            policy: filesStorageProprieties.autoDownloadFullMediaPolicy(),
+            havePartnerName: havePartnerName
+        )
+        
+        messages[index].updateFields(
+            id: file.file.id,
+            preview: previewImage,
+            needToUpdatePeview: true,
+            cached: cached,
+            isUploading: isUploading,
+            downloadStatus: downloadStatus,
+            progress: progress,
+            isPreviewDownloadAllowed: isPreviewDownloadAllowed,
+            isFullMediaDownloadAllowed: isFullMediaDownloadAllowed
+        )
     }
     
     func setupNewMessages(
@@ -1546,7 +1605,9 @@ private extension ChatMessage {
         cached: Bool? = nil,
         isUploading: Bool? = nil,
         downloadStatus: DownloadStatus? = nil,
-        progress: Int? = nil
+        progress: Int? = nil,
+        isPreviewDownloadAllowed: Bool? = nil,
+        isFullMediaDownloadAllowed: Bool? = nil
     ) {
         guard case let .file(fileModel) = content else { return }
         var model = fileModel.value
@@ -1576,7 +1637,13 @@ private extension ChatMessage {
         if let progress = progress {
             model.content.fileModel.files[index].progress = progress
         }
-
+        if let value = isPreviewDownloadAllowed {
+            model.content.fileModel.files[index].isPreviewDownloadAllowed = value
+        }
+        if let value = isFullMediaDownloadAllowed {
+            model.content.fileModel.files[index].isFullMediaDownloadAllowed = value
+        }
+        
         guard model != fileModel.value else {
             return
         }

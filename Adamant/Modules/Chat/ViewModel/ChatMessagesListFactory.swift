@@ -22,11 +22,7 @@ actor ChatMessagesListFactory {
         transactions: [ChatTransaction],
         sender: ChatSender,
         isNeedToLoadMoreMessages: Bool,
-        expirationTimestamp minExpTimestamp: inout TimeInterval?,
-        uploadingFilesIDs: [String],
-        downloadingFilesIDs: [String: DownloadStatus],
-        havePartnerName: Bool,
-        filesLoadingProgress: [String: Int]
+        expirationTimestamp minExpTimestamp: inout TimeInterval?
     ) -> [ChatMessage] {
         assert(!Thread.isMainThread, "Do not process messages on main thread")
         
@@ -48,11 +44,7 @@ actor ChatMessagesListFactory {
                     transactions: transactionsWithoutReact
                 ),
                 topSpinnerOn: isNeedToLoadMoreMessages && index == .zero,
-                willExpireAfter: &expTimestamp,
-                uploadingFilesIDs: uploadingFilesIDs,
-                downloadingFilesIDs: downloadingFilesIDs,
-                havePartnerName: havePartnerName,
-                filesLoadingProgress: filesLoadingProgress
+                willExpireAfter: &expTimestamp
             )
             
             if let timestamp = expTimestamp, timestamp < minExpTimestamp ?? .greatestFiniteMagnitude {
@@ -70,11 +62,7 @@ private extension ChatMessagesListFactory {
         sender: SenderType,
         dateHeaderOn: Bool,
         topSpinnerOn: Bool,
-        willExpireAfter: inout TimeInterval?,
-        uploadingFilesIDs: [String],
-        downloadingFilesIDs: [String: DownloadStatus],
-        havePartnerName: Bool,
-        filesLoadingProgress: [String: Int]
+        willExpireAfter: inout TimeInterval?
     ) -> ChatMessage {
         var expireDate: Date?
         let message = chatMessageFactory.makeMessage(
@@ -82,11 +70,7 @@ private extension ChatMessagesListFactory {
             expireDate: &expireDate,
             currentSender: sender,
             dateHeaderOn: dateHeaderOn,
-            topSpinnerOn: topSpinnerOn,
-            uploadingFilesIDs: uploadingFilesIDs,
-            downloadingFilesIDs: downloadingFilesIDs,
-            havePartnerName: havePartnerName,
-            filesLoadingProgress: filesLoadingProgress
+            topSpinnerOn: topSpinnerOn
         )
         
         willExpireAfter = expireDate?.timeIntervalSince1970

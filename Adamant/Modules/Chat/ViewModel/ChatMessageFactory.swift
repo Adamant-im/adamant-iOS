@@ -14,8 +14,6 @@ import FilesStorageKit
 
 struct ChatMessageFactory {
     private let walletServiceCompose: WalletServiceCompose
-    private let filesStorage: FilesStorageProtocol
-    private let filesStorageProprieties: FilesStorageProprietiesProtocol
     
     static let markdownParser = MarkdownParser(
         font: .adamantChatDefault,
@@ -69,13 +67,8 @@ struct ChatMessageFactory {
         ]
     )
     
-    init(walletServiceCompose: WalletServiceCompose,
-         filesStorage: FilesStorageProtocol,
-         filesStorageProprieties: FilesStorageProprietiesProtocol
-    ) {
+    init(walletServiceCompose: WalletServiceCompose) {
         self.walletServiceCompose = walletServiceCompose
-        self.filesStorage = filesStorage
-        self.filesStorageProprieties = filesStorageProprieties
     }
     
     func makeMessage(
@@ -83,11 +76,7 @@ struct ChatMessageFactory {
         expireDate: inout Date?,
         currentSender: SenderType,
         dateHeaderOn: Bool,
-        topSpinnerOn: Bool,
-        uploadingFilesIDs: [String],
-        downloadingFilesIDs: [String: DownloadStatus],
-        havePartnerName: Bool,
-        filesLoadingProgress: [String: Int]
+        topSpinnerOn: Bool
     ) -> ChatMessage {
         let sentDate = transaction.sentDate ?? .now
         let senderModel = ChatSender(transaction: transaction)
@@ -111,11 +100,7 @@ struct ChatMessageFactory {
             content: makeContent(
                 transaction,
                 isFromCurrentSender: currentSender.senderId == senderModel.senderId,
-                backgroundColor: backgroundColor,
-                uploadingFilesIDs: uploadingFilesIDs,
-                downloadingFilesIDs: downloadingFilesIDs,
-                havePartnerName: havePartnerName,
-                filesLoadingProgress: filesLoadingProgress
+                backgroundColor: backgroundColor
             ),
             backgroundColor: backgroundColor,
             bottomString: makeBottomString(
@@ -135,11 +120,7 @@ private extension ChatMessageFactory {
     func makeContent(
         _ transaction: ChatTransaction,
         isFromCurrentSender: Bool,
-        backgroundColor: ChatMessageBackgroundColor,
-        uploadingFilesIDs: [String],
-        downloadingFilesIDs: [String: DownloadStatus],
-        havePartnerName: Bool,
-        filesLoadingProgress: [String: Int]
+        backgroundColor: ChatMessageBackgroundColor
     ) -> ChatMessage.Content {
         switch transaction {
         case let transaction as MessageTransaction:
@@ -165,11 +146,7 @@ private extension ChatMessageFactory {
                 return makeFileContent(
                     transaction,
                     isFromCurrentSender: isFromCurrentSender,
-                    backgroundColor: backgroundColor,
-                    uploadingFilesIDs: uploadingFilesIDs,
-                    downloadingFilesIDs: downloadingFilesIDs,
-                    havePartnerName: havePartnerName,
-                    filesLoadingProgress: filesLoadingProgress
+                    backgroundColor: backgroundColor
                 )
             }
             
@@ -315,11 +292,7 @@ private extension ChatMessageFactory {
     func makeFileContent(
         _ transaction: RichMessageTransaction,
         isFromCurrentSender: Bool,
-        backgroundColor: ChatMessageBackgroundColor,
-        uploadingFilesIDs: [String],
-        downloadingFilesIDs: [String: DownloadStatus],
-        havePartnerName: Bool,
-        filesLoadingProgress: [String: Int]
+        backgroundColor: ChatMessageBackgroundColor
     ) -> ChatMessage.Content {
         let id = transaction.chatMessageId ?? ""
         
@@ -342,25 +315,10 @@ private extension ChatMessageFactory {
         ? transaction.recipientAddress
         : transaction.senderAddress
         
-        let isPreviewDownloadAllowed = isDownloadAllowed(
-            policy: filesStorageProprieties.autoDownloadPreviewPolicy(),
-            havePartnerName: havePartnerName
-        )
-        
-        let isFullMediaDownloadAllowed = isDownloadAllowed(
-            policy: filesStorageProprieties.autoDownloadFullMediaPolicy(),
-            havePartnerName: havePartnerName
-        )
-        
         let chatFiles = makeChatFiles(
             from: files,
-            uploadingFilesIDs: uploadingFilesIDs,
-            downloadingFilesIDs: downloadingFilesIDs,
             isFromCurrentSender: isFromCurrentSender,
-            storage: storage, 
-            isPreviewDownloadAllowed: isPreviewDownloadAllowed,
-            isFullMediaDownloadAllowed: isFullMediaDownloadAllowed,
-            filesLoadingProgress: filesLoadingProgress
+            storage: storage
         )
         
         let isMediaFilesOnly = chatFiles.allSatisfy {
@@ -396,20 +354,6 @@ private extension ChatMessageFactory {
         )))
     }
     
-    func isDownloadAllowed(
-        policy: DownloadPolicy,
-        havePartnerName: Bool
-    ) -> Bool {
-        switch policy {
-        case .everybody:
-            return true
-        case .nobody:
-            return false
-        case .contacts:
-            return havePartnerName
-        }
-    }
-    
     func makeAttributed(_ text: String) -> NSMutableAttributedString {
         let attributedString = Self.markdownParser.parse(text)
         
@@ -434,41 +378,26 @@ private extension ChatMessageFactory {
     
     func makeChatFiles(
         from files: [[String: Any]],
-        uploadingFilesIDs: [String],
-        downloadingFilesIDs: [String: DownloadStatus],
         isFromCurrentSender: Bool,
-        storage: String,
-        isPreviewDownloadAllowed: Bool,
-        isFullMediaDownloadAllowed: Bool,
-        filesLoadingProgress: [String: Int]
+        storage: String
     ) -> [ChatFile] {
         return files.map {
-            let previewData = $0[RichContentKeys.file.preview] as? [String: Any] ?? [:]
             let file = RichMessageFile.File($0)
-            let fileId = file.id
             let fileType = FileType(raw: file.extension ?? .empty) ?? .other
-            
-            let previewImage = (file.preview?.id).flatMap {
-                !$0.isEmpty
-                ? filesStorage.getPreview(for: $0)
-                : nil
-            }
-            
-            let progress = filesLoadingProgress[fileId]
             
             return ChatFile(
                 file: file,
-                previewImage: previewImage,
-                downloadStatus: downloadingFilesIDs[fileId] ?? .default,
-                isUploading: uploadingFilesIDs.contains(fileId),
-                isCached: filesStorage.isCachedLocally(fileId),
+                previewImage: nil,
+                downloadStatus: .default,
+                isUploading: false,
+                isCached: false,
                 storage: storage,
                 nonce: file.nonce,
                 isFromCurrentSender: isFromCurrentSender,
                 fileType: fileType,
-                progress: progress,
-                isPreviewDownloadAllowed: isPreviewDownloadAllowed,
-                isFullMediaDownloadAllowed: isFullMediaDownloadAllowed
+                progress: nil,
+                isPreviewDownloadAllowed: false,
+                isFullMediaDownloadAllowed: false
             )
         }
     }
