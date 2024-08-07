@@ -41,7 +41,10 @@ final class MediaContentView: UIView {
         )
     }()
     
-    private let durationLabel = UILabel(font: durationFont, textColor: .white)
+    private lazy var durationLabel = EdgeInsetLabel(
+        font: durationFont,
+        textColor: .white.withAlphaComponent(0.8)
+    )
     
     var model: ChatMediaContentView.FileContentModel = .default {
         didSet {
@@ -127,8 +130,15 @@ private extension MediaContentView {
         videoIconIV.addShadow()
         downloadImageView.addShadow()
         spinner.addShadow(shadowColor: .white)
-        durationLabel.addShadow()
         controller.view.addShadow()
+        
+        durationLabel.textInsets = durationTextInsets
+        durationLabel.numberOfLines = .zero
+        durationLabel.textAlignment = .center
+        durationLabel.backgroundColor = .black.withAlphaComponent(0.1)
+        durationLabel.layer.cornerRadius = 6
+        durationLabel.addShadow()
+        durationLabel.clipsToBounds = true
     }
     
     func update() {
@@ -178,6 +188,7 @@ private extension MediaContentView {
         progressState.progress = Double(progress) / 100
         
         durationLabel.isHidden = chatFile.fileType != .video
+        
         if let duration = chatFile.file.duration {
             durationLabel.text = formatTime(seconds: Int(duration))
         } else {
@@ -204,4 +215,5 @@ private let stackSpacing: CGFloat = 12
 private let verticalStackSpacing: CGFloat = 3
 private let defaultImage: UIImage? = .asset(named: "defaultFileIcon")
 private let defaultMediaImage: UIImage? = .asset(named: "defaultMediaBlur")
-private let durationFont = UIFont.systemFont(ofSize: 13)
+private let durationFont = UIFont.systemFont(ofSize: 10)
+private let durationTextInsets: UIEdgeInsets = .init(top: 3, left: 3, bottom: 3, right: 3)
