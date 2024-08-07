@@ -403,7 +403,7 @@ extension AdamantChatsProvider {
         array.prefix(preLoadChatsCount).forEach { transaction in
             let recipientAddress = transaction.recipientId == address ? transaction.senderId : transaction.recipientId
             Task {
-                let isChatLoading = isChatLoading(with: address)
+                let isChatLoading = isChatLoading(with: recipientAddress)
                 guard !isChatLoading else { return }
                 await getChatMessages(with: recipientAddress, offset: nil)
             }
