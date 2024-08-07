@@ -65,11 +65,16 @@ final class IPFSApiService: FileApiServiceProtocol {
         downloadProgress: @escaping ((Progress) -> Void)
     ) async throws -> Data {
         let result: Data = try await request { core, node in
-            await core.sendRequest(
+            let result: APIResponseModel = await core.sendRequest(
                 node: node,
                 path: "\(IPFSApiCommands.file.download)\(id)",
                 downloadProgress: downloadProgress
             )
+            
+            if let code = result.code, code == 502 || code == 504 || code == 404 {
+                return .failure(.serverError(error: "unknown"))
+            }
+            return result.result
         }.get()
         
         return result

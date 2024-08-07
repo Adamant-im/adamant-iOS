@@ -77,6 +77,24 @@ extension APICoreProtocol {
         ).result
     }
     
+    func sendRequest<Parameters: Encodable>(
+        node: Node,
+        path: String,
+        method: HTTPMethod,
+        parameters: Parameters,
+        encoding: APIParametersEncoding,
+        downloadProgress: @escaping ((Progress) -> Void)
+    ) async -> APIResponseModel {
+        await sendRequestBasic(
+            node: node,
+            path: path,
+            method: method,
+            parameters: parameters,
+            encoding: encoding,
+            downloadProgress: downloadProgress
+        )
+    }
+    
     func sendRequestJsonResponse<Parameters: Encodable, JSONOutput: Decodable>(
         node: Node,
         path: String,
@@ -124,6 +142,21 @@ extension APICoreProtocol {
         path: String,
         downloadProgress: @escaping ((Progress) -> Void)
     ) async -> ApiServiceResult<Data> {
+        await sendRequest(
+            node: node,
+            path: path,
+            method: .get,
+            parameters: emptyParameters,
+            encoding: .url,
+            downloadProgress: downloadProgress
+        )
+    }
+    
+    func sendRequest(
+        node: Node,
+        path: String,
+        downloadProgress: @escaping ((Progress) -> Void)
+    ) async -> APIResponseModel {
         await sendRequest(
             node: node,
             path: path,

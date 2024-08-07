@@ -22,6 +22,7 @@ actor APICore: APICoreProtocol {
         configuration.timeoutIntervalForRequest = timeoutIntervalForRequest
         configuration.timeoutIntervalForResource = timeoutIntervalForResource
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        configuration.httpMaximumConnectionsPerHost = 100
         return Alamofire.Session.init(configuration: configuration)
     }()
     
@@ -113,19 +114,10 @@ private extension APICore {
     func sendRequest(request: DataRequest) async -> APIResponseModel {
         await withCheckedContinuation { continuation in
             request.responseData(queue: responseQueue) { response in
-                let code = response.response?.statusCode
-                let result: ApiServiceResult<Data>
-                
-                if let code = code, code == 502 || code == 504 {
-                    result = .failure(.serverError(error: "unknown"))
-                } else {
-                    result = response.result.mapError { .init(error: $0) }
-                }
-                
                 continuation.resume(returning: .init(
-                    result: result,
+                    result: response.result.mapError { .init(error: $0) },
                     data: response.data,
-                    code: code
+                    code: response.response?.statusCode
                 ))
             }
         }
