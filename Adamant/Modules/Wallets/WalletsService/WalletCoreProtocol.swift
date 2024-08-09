@@ -124,8 +124,8 @@ extension WalletServiceError: HealthCheckableError {
         }
     }
     
-    static func noEndpointsError(coin: String) -> WalletServiceError {
-        .apiError(.noEndpointsError(coin: coin))
+    static func noEndpointsError(nodeGroupName: String) -> WalletServiceError {
+        .apiError(.noEndpointsError(nodeGroupName: nodeGroupName))
     }
 }
 

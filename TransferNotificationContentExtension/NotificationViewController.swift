@@ -122,7 +122,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         let keychain = KeychainStore()
         let core = NativeAdamantCore()
         let avatarService = AdamantAvatarService()
-        var api: ExtensionsApi?
+        let api = ExtensionsApiFactory(core: core, securedStore: keychain).make()
         
         guard let passphrase: String = keychain.get(passphraseStoreKey), let keypair = core.createKeypairFor(passphrase: passphrase) else {
             showError()
@@ -139,8 +139,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
                 return
             }
             
-            api = ExtensionsApi(keychainStore: keychain)
-            trs = api!.getTransaction(by: id)
+            trs = api.getTransaction(by: id)
         }
         
         guard let transaction = trs else {
@@ -233,8 +232,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         else if let flag = notification.request.content.userInfo[AdamantNotificationUserInfoKeys.partnerNoDislpayNameKey] as? String, flag == AdamantNotificationUserInfoKeys.partnerNoDisplayNameValue {
             senderName = nil
         } else {
-            let _api = api ?? ExtensionsApi(keychainStore: keychain)
-            checkName(of: transaction.senderId, for: transaction.recipientId, api: _api, core: core, keypair: keypair)
+            checkName(of: transaction.senderId, for: transaction.recipientId, api: api, core: core, keypair: keypair)
             senderName = nil
         }
         

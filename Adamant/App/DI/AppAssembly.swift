@@ -96,7 +96,8 @@ struct AppAssembly: Assembly {
         container.register(NodesStorageProtocol.self) { r in
             NodesStorage(
                 securedStore: r.resolve(SecuredStore.self)!,
-                nodesMergingService: r.resolve(NodesMergingService.self)!
+                nodesMergingService: r.resolve(NodesMergingService.self)!,
+                defaultNodes: r.resolve(DefaultNodesProvider.self)!.nodes
             )
         }.inObjectScope(.container)
         
@@ -117,7 +118,9 @@ struct AppAssembly: Assembly {
                     service: .init(apiCore: r.resolve(APICoreProtocol.self)!),
                     nodesStorage: r.resolve(NodesStorageProtocol.self)!,
                     nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
-                    nodeGroup: .adm
+                    isActive: true,
+                    params: NodeGroup.adm.blockchainHealthCheckParams,
+                    connection: r.resolve(ReachabilityMonitor.self)!.connectionPublisher
                 ),
                 adamantCore: r.resolve(AdamantCore.self)!
             )
@@ -129,7 +132,9 @@ struct AppAssembly: Assembly {
                 service: .init(apiCore: r.resolve(APICoreProtocol.self)!),
                 nodesStorage: r.resolve(NodesStorageProtocol.self)!,
                 nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
-                nodeGroup: .btc
+                isActive: true,
+                params: NodeGroup.btc.blockchainHealthCheckParams,
+                connection: r.resolve(ReachabilityMonitor.self)!.connectionPublisher
             ))
         }.inObjectScope(.container)
         
@@ -139,7 +144,9 @@ struct AppAssembly: Assembly {
                 service: .init(apiCore: r.resolve(APICoreProtocol.self)!),
                 nodesStorage: r.resolve(NodesStorageProtocol.self)!,
                 nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
-                nodeGroup: .doge
+                isActive: true,
+                params: NodeGroup.doge.blockchainHealthCheckParams,
+                connection: r.resolve(ReachabilityMonitor.self)!.connectionPublisher
             ))
         }.inObjectScope(.container)
         
@@ -149,7 +156,9 @@ struct AppAssembly: Assembly {
                 service: .init(apiCore: r.resolve(APICoreProtocol.self)!),
                 nodesStorage: r.resolve(NodesStorageProtocol.self)!,
                 nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
-                nodeGroup: .dash
+                isActive: true,
+                params: NodeGroup.dash.blockchainHealthCheckParams,
+                connection: r.resolve(ReachabilityMonitor.self)!.connectionPublisher
             ))
         }.inObjectScope(.container)
         
@@ -159,7 +168,9 @@ struct AppAssembly: Assembly {
                 service: .init(),
                 nodesStorage: r.resolve(NodesStorageProtocol.self)!,
                 nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
-                nodeGroup: .klyNode
+                isActive: true,
+                params: NodeGroup.klyNode.blockchainHealthCheckParams,
+                connection: r.resolve(ReachabilityMonitor.self)!.connectionPublisher
             ))
         }.inObjectScope(.container)
         
@@ -169,7 +180,9 @@ struct AppAssembly: Assembly {
                 service: .init(),
                 nodesStorage: r.resolve(NodesStorageProtocol.self)!,
                 nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
-                nodeGroup: .klyService
+                isActive: true,
+                params: NodeGroup.klyService.blockchainHealthCheckParams,
+                connection: r.resolve(ReachabilityMonitor.self)!.connectionPublisher
             ))
         }.inObjectScope(.container)
         
@@ -184,7 +197,9 @@ struct AppAssembly: Assembly {
                 service: .init(apiCore: r.resolve(APICoreProtocol.self)!),
                 nodesStorage: r.resolve(NodesStorageProtocol.self)!,
                 nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
-                nodeGroup: .eth
+                isActive: true,
+                params: NodeGroup.eth.blockchainHealthCheckParams,
+                connection: r.resolve(ReachabilityMonitor.self)!.connectionPublisher
             ))
         }.inObjectScope(.container)
         
@@ -363,6 +378,11 @@ struct AppAssembly: Assembly {
         // MARK: NodesMergingService
         container.register(NodesMergingService.self) { r in
             AdamantNodesMergingService()
+        }.inObjectScope(.transient)
+        
+        // MARK: DefaultNodesProvider
+        container.register(DefaultNodesProvider.self) { r in
+            DefaultNodesProvider()
         }.inObjectScope(.transient)
     }
 }

@@ -16,7 +16,7 @@ import Foundation
 /// results or crashes.
 /// In order to ensure you've acquired the lock for a certain amount of time use the `mutate` method.
 @propertyWrapper
-public final class Atomic<Value> {
+public final class Atomic<Value>: @unchecked Sendable {
     private var value: Value
     private let lock = NSLock()
     

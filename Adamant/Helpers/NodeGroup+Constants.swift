@@ -8,7 +8,7 @@
 import Foundation
 import CommonKit
 
-public extension NodeGroup {
+extension NodeGroup {
     var onScreenUpdateInterval: TimeInterval {
         switch self {
         case .adm:
@@ -104,7 +104,7 @@ public extension NodeGroup {
             minNodeVersion = DashWalletService.minNodeVersion
         }
         
-        guard let versionNumber = Node.stringToDouble(minNodeVersion) else {
+        guard let versionNumber = Node.versionToDouble(minNodeVersion) else {
             return .zero
         }
         
@@ -138,5 +138,16 @@ public extension NodeGroup {
         case .eth, .dash:
             return false
         }
+    }
+    
+    var blockchainHealthCheckParams: BlockchainHealthCheckParams {
+        .init(
+            group: self,
+            name: name,
+            normalUpdateInterval: normalUpdateInterval,
+            crucialUpdateInterval: crucialUpdateInterval,
+            minNodeVersion: minNodeVersion,
+            nodeHeightEpsilon: nodeHeightEpsilon
+        )
     }
 }

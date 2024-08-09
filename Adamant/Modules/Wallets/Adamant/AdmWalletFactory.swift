@@ -8,6 +8,7 @@
 
 import Swinject
 import UIKit
+import CommonKit
 
 struct AdmWalletFactory: WalletFactory {
     typealias Service = WalletService

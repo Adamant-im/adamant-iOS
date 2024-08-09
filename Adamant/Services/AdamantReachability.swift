@@ -13,9 +13,13 @@ import CommonKit
 
 // MARK: - AdamantReachability wrapper
 final class AdamantReachability: ReachabilityMonitor {
+    @ObservableValue private(set) var connection = true
+    
     private let monitor = NWPathMonitor()
     
-    @Atomic private(set) var connection = true
+    var connectionPublisher: AnyObservable<Bool> {
+        $connection.eraseToAnyPublisher()
+    }
     
     func start() {
         monitor.pathUpdateHandler = { [weak self] _ in

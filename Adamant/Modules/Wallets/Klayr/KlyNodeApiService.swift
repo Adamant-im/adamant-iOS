@@ -8,6 +8,7 @@
 
 import LiskKit
 import Foundation
+import CommonKit
 
 final class KlyNodeApiService: WalletApiService {
     let api: BlockchainHealthCheckWrapper<KlyApiCore>
