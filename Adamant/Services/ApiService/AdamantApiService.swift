@@ -21,6 +21,14 @@ final class AdamantApiService {
         self.adamantCore = adamantCore
     }
     
+    func waitingRequest<Output>(
+        _ request: @Sendable @escaping (APICoreProtocol, Node) async -> ApiServiceResult<Output>
+    ) async -> ApiServiceResult<Output> {
+        await service.waitingRequest { admApiCore, node in
+            await request(admApiCore.apiCore, node)
+        }
+    }
+    
     func request<Output>(
         _ request: @Sendable (APICoreProtocol, Node) async -> ApiServiceResult<Output>
     ) async -> ApiServiceResult<Output> {

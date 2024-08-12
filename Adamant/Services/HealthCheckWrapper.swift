@@ -94,16 +94,45 @@ class HealthCheckWrapper<Service, Error: HealthCheckableError> {
             .store(in: &subscriptions)
     }
     
+    func waitingRequest<Output>(
+        _ requestAction: @Sendable @escaping (Service, Node) async -> Result<Output, Error>
+    ) async -> Result<Output, Error> {
+        guard allowedNodes.isEmpty else {
+            return await request(requestAction)
+        }
+        
+        return await withCheckedContinuation { [weak self] continuation in
+            guard let self = self else {
+                return
+            }
+            let cancellable = $allowedNodes
+                .filter { !$0.isEmpty }
+                .prefix(1)
+                .sink { [weak self] nodes in
+                    guard let self = self else {
+                        continuation.resume(returning: .failure(.noEndpointsError(coin: NodeGroup.adm.name)))
+                        return
+                    }
+                    Task {
+                        let result = await self.request(nodesList: nodes, requestAction)
+                        continuation.resume(returning: result)
+                    }
+                }
+            self.subscriptions.insert(cancellable)
+        }
+    }
+    
     func request<Output>(
+        nodesList: [Node]? = nil,
         _ request: @Sendable (Service, Node) async -> Result<Output, Error>
     ) async -> Result<Output, Error> {
         var lastConnectionError = allowedNodes.isEmpty
         ? Error.noEndpointsError(coin: nodeGroup.name)
         : nil
         
-        let nodesList = fastestNodeMode
-                ? allowedNodes
-                : allowedNodes.shuffled()
+        let nodesList = nodesList ?? (fastestNodeMode
+                                      ? allowedNodes
+                                      : allowedNodes.shuffled())
         
         for node in nodesList {
             let response = await request(service, node)
