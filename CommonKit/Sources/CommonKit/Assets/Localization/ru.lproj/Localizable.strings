@@ -1292,3 +1292,6 @@
 
 /* File picker error 'Cant select file' */
 "FileValidationError.CantSelectFile" = "Невозможно выбрать файл: %@";
+
+/* Chat drop view title */
+"Chat.Drop.Title" = "Перетащите файлы сюда";

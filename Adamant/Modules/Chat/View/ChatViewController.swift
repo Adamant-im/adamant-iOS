@@ -512,7 +512,7 @@ private extension ChatViewController {
     
     func configureFilesToolbarView() {
         filesToolbarView.snp.makeConstraints { make in
-            make.height.equalTo(140)
+            make.height.equalTo(filesToolbarViewHeight)
         }
         
         filesToolbarView.closeAction = { [weak self] in
@@ -1028,3 +1028,4 @@ private let messagePadding: CGFloat = 12
 private var replyAction: Bool = false
 private var canReplyVibrate: Bool = true
 private var oldContentOffset: CGPoint?
+private let filesToolbarViewHeight: CGFloat = 140

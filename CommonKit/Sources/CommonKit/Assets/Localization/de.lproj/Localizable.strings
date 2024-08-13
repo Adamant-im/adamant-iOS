@@ -1322,3 +1322,6 @@
 
 /* File picker error 'Cant select file' */
 "FileValidationError.CantSelectFile" = "Datei kann nicht ausgewählt werden: %@";
+
+/* Chat drop view title */
+"Chat.Drop.Title" = "Dateien hier ablegen";

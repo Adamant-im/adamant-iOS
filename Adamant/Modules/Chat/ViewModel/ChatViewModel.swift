@@ -1453,6 +1453,7 @@ private extension ChatViewModel {
         }
     }
     
+    // TODO: Post process
     func updateHiddenMessage(_ messages: inout [ChatMessage]) {
         messages.indices.forEach {
             messages[$0].isHidden = messages[$0].id == hiddenMessageID

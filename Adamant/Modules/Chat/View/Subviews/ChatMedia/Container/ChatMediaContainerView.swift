@@ -80,7 +80,7 @@ final class ChatMediaContainerView: UIView, ChatModelView {
         let stack = UIStackView()
         stack.alignment = .center
         stack.axis = .vertical
-        stack.spacing = 12
+        stack.spacing = reactionsStackSpace
 
         stack.addArrangedSubview(statusButton)
         stack.addArrangedSubview(ownReactionLabel)
@@ -118,10 +118,6 @@ final class ChatMediaContainerView: UIView, ChatModelView {
             contentView.isSelected = isSelected
         }
     }
-    
-    private let ownReactionSize = CGSize(width: 40, height: 27)
-    private let opponentReactionSize = CGSize(width: 55, height: 27)
-    private let opponentReactionImageSize = CGSize(width: 12, height: 12)
     
     // MARK: - Init
     
@@ -352,3 +348,7 @@ extension ChatMediaContainerView.Model {
 private let contentWidth: CGFloat = 260
 private let reactionsWidth: CGFloat = 50
 private let horizontalStackSpace: CGFloat = 5
+private let reactionsStackSpace: CGFloat = 12
+private let ownReactionSize = CGSize(width: 40, height: 27)
+private let opponentReactionSize = CGSize(width: 55, height: 27)
+private let opponentReactionImageSize = CGSize(width: 12, height: 12)

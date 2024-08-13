@@ -32,7 +32,7 @@ private extension ChatDropView {
         layer.borderColor = UIColor.adamant.active.cgColor
         backgroundColor = .systemBackground
         
-        titleLabel.text = "Drop files here"
+        titleLabel.text = dropTitle
         imageView.tintColor = .lightGray
         
         addSubview(imageView)
@@ -52,3 +52,4 @@ private extension ChatDropView {
 }
 
 private let titleFont = UIFont.systemFont(ofSize: 20)
+private var dropTitle: String { .localized("Chat.Drop.Title") }

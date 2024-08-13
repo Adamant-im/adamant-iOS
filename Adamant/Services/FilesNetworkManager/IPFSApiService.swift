@@ -71,13 +71,29 @@ final class IPFSApiService: FileApiServiceProtocol {
                 downloadProgress: downloadProgress
             )
             
-            if let code = result.code, code == 502 || code == 504 || code == 404 {
-                return .failure(.serverError(error: "unknown"))
+            if let error = handleError(result) {
+                return .failure(error)
             }
+            
             return result.result
         }.get()
         
         return result
+    }
+}
+
+private extension IPFSApiService {
+    func handleError(_ result: APIResponseModel) -> ApiServiceError? {
+        guard let code = result.code,
+              !(200 ... 299).contains(code)
+        else { return nil }
+        
+        let serverError = ApiServiceError.serverError(error: "\(code)")
+        let error = code == 500 || code == 502 || code == 504
+        ? .networkError(error: serverError)
+        : serverError
+        
+        return error
     }
 }
 

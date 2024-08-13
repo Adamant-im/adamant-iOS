@@ -22,7 +22,7 @@ actor APICore: APICoreProtocol {
         configuration.timeoutIntervalForRequest = timeoutIntervalForRequest
         configuration.timeoutIntervalForResource = timeoutIntervalForResource
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
-        configuration.httpMaximumConnectionsPerHost = 100
+        configuration.httpMaximumConnectionsPerHost = maximumConnectionsPerHost
         return Alamofire.Session.init(configuration: configuration)
     }()
     
@@ -132,3 +132,4 @@ private extension APICore {
 
 private let timeoutIntervalForRequest: TimeInterval = 15
 private let timeoutIntervalForResource: TimeInterval = 24 * 3600
+private let maximumConnectionsPerHost = 100

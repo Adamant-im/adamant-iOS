@@ -1,5 +1,5 @@
 //
-//  ChatFileTableViewCell.swift
+//  FileListContentView.swift
 //  Adamant
 //
 //  Created by Stanislav Jelezoglo on 21.02.2024.
@@ -10,7 +10,7 @@ import UIKit
 import CommonKit
 import SwiftUI
 
-class ChatFileView: UIView {
+final class FileListContentView: UIView {
     private lazy var iconImageView: UIImageView = UIImageView()
     private lazy var downloadImageView = UIImageView(image: .asset(named: "downloadIcon"))
     private lazy var videoIconIV = UIImageView(image: .asset(named: "playVideoIcon"))
@@ -119,7 +119,7 @@ class ChatFileView: UIView {
     }
 }
 
-private extension ChatFileView {
+private extension FileListContentView {
     func configure() {
         addSubview(horizontalStack)
         horizontalStack.snp.makeConstraints { make in

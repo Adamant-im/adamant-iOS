@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class EdgeInsetLabel: UILabel {
+final class EdgeInsetLabel: UILabel {
     var textInsets = UIEdgeInsets.zero {
         didSet { invalidateIntrinsicContentSize() }
     }

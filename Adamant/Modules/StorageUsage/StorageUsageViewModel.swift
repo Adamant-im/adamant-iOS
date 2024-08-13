@@ -11,30 +11,6 @@ import CommonKit
 import SwiftUI
 import FilesStorageKit
 
-public extension Notification.Name {
-    struct Storage {
-        public static let storageClear = Notification.Name("adamant.storage.clear")
-        public static let storageProprietiesUpdated = Notification.Name("adamant.storage.ProprietiesUpdated")
-    }
-}
-
-enum DownloadPolicy: String {
-    case everybody
-    case nobody
-    case contacts
-    
-    var title: String {
-        switch self {
-        case .everybody:
-            return .localized("Storage.DownloadPolicy.Everybody.Title")
-        case .nobody:
-            return .localized("Storage.DownloadPolicy.Nobody.Title")
-        case .contacts:
-            return .localized("Storage.DownloadPolicy.Contacts.Title")
-        }
-    }
-}
-
 @MainActor
 final class StorageUsageViewModel: ObservableObject {
     private let filesStorage: FilesStorageProtocol

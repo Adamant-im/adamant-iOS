@@ -39,7 +39,7 @@
 		3A299C732B83975D00B54C61 /* ChatMediaContnentView+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A299C722B83975D00B54C61 /* ChatMediaContnentView+Model.swift */; };
 		3A299C762B84CE4100B54C61 /* FilesToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A299C752B84CE4100B54C61 /* FilesToolbarView.swift */; };
 		3A299C782B84D11100B54C61 /* FilesToolbarCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A299C772B84D11100B54C61 /* FilesToolbarCollectionViewCell.swift */; };
-		3A299C7B2B85EABB00B54C61 /* ChatFileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A299C7A2B85EABB00B54C61 /* ChatFileView.swift */; };
+		3A299C7B2B85EABB00B54C61 /* FileListContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A299C7A2B85EABB00B54C61 /* FileListContentView.swift */; };
 		3A299C7D2B85F98700B54C61 /* ChatFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A299C7C2B85F98700B54C61 /* ChatFile.swift */; };
 		3A2F55F92AC6F308000A3F26 /* CoinTransaction+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A2F55F72AC6F308000A3F26 /* CoinTransaction+CoreDataClass.swift */; };
 		3A2F55FA2AC6F308000A3F26 /* CoinTransaction+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A2F55F82AC6F308000A3F26 /* CoinTransaction+CoreDataProperties.swift */; };
@@ -50,6 +50,7 @@
 		3A41938F2A580C57006A6B22 /* AdamantRichTransactionReactService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A41938E2A580C57006A6B22 /* AdamantRichTransactionReactService.swift */; };
 		3A4193912A580C85006A6B22 /* RichTransactionReactService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4193902A580C85006A6B22 /* RichTransactionReactService.swift */; };
 		3A41939A2A5D554A006A6B22 /* Reaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4193992A5D554A006A6B22 /* Reaction.swift */; };
+		3A53BD462C6B7AF100BB1EE6 /* DownloadPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A53BD452C6B7AF100BB1EE6 /* DownloadPolicy.swift */; };
 		3A5DF1792C4698EC0005369D /* EdgeInsetLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A5DF1782C4698EC0005369D /* EdgeInsetLabel.swift */; };
 		3A770E4C2AE14F130008D98F /* SimpleTransactionDetails+Hashable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A770E4B2AE14F130008D98F /* SimpleTransactionDetails+Hashable.swift */; };
 		3A7BD00E2AA9BCE80045AAB0 /* VibroService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7BD00D2AA9BCE80045AAB0 /* VibroService.swift */; };
@@ -76,7 +77,7 @@
 		3AA50DF12AEBE66A00C58FC8 /* PartnerQRViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA50DF02AEBE66A00C58FC8 /* PartnerQRViewModel.swift */; };
 		3AA50DF32AEBE67C00C58FC8 /* PartnerQRFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA50DF22AEBE67C00C58FC8 /* PartnerQRFactory.swift */; };
 		3AA6DF402BA9941E00EA2E16 /* MediaContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA6DF3F2BA9941E00EA2E16 /* MediaContainerView.swift */; };
-		3AA6DF442BA997C000EA2E16 /* FileContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA6DF432BA997C000EA2E16 /* FileContainerView.swift */; };
+		3AA6DF442BA997C000EA2E16 /* FileListContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA6DF432BA997C000EA2E16 /* FileListContainerView.swift */; };
 		3AA6DF462BA9BEB700EA2E16 /* MediaContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA6DF452BA9BEB700EA2E16 /* MediaContentView.swift */; };
 		3AB87CD62BF6237100AE8743 /* MultipartFormDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AB87CD52BF6237100AE8743 /* MultipartFormDataModel.swift */; };
 		3AC76E3D2AB09118008042C4 /* ElegantEmojiPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 3AC76E3C2AB09118008042C4 /* ElegantEmojiPicker */; };
@@ -722,7 +723,7 @@
 		3A299C722B83975D00B54C61 /* ChatMediaContnentView+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatMediaContnentView+Model.swift"; sourceTree = "<group>"; };
 		3A299C752B84CE4100B54C61 /* FilesToolbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilesToolbarView.swift; sourceTree = "<group>"; };
 		3A299C772B84D11100B54C61 /* FilesToolbarCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilesToolbarCollectionViewCell.swift; sourceTree = "<group>"; };
-		3A299C7A2B85EABB00B54C61 /* ChatFileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatFileView.swift; sourceTree = "<group>"; };
+		3A299C7A2B85EABB00B54C61 /* FileListContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileListContentView.swift; sourceTree = "<group>"; };
 		3A299C7C2B85F98700B54C61 /* ChatFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatFile.swift; sourceTree = "<group>"; };
 		3A2F55F72AC6F308000A3F26 /* CoinTransaction+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoinTransaction+CoreDataClass.swift"; sourceTree = "<group>"; };
 		3A2F55F82AC6F308000A3F26 /* CoinTransaction+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoinTransaction+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -733,6 +734,7 @@
 		3A41938E2A580C57006A6B22 /* AdamantRichTransactionReactService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantRichTransactionReactService.swift; sourceTree = "<group>"; };
 		3A4193902A580C85006A6B22 /* RichTransactionReactService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichTransactionReactService.swift; sourceTree = "<group>"; };
 		3A4193992A5D554A006A6B22 /* Reaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reaction.swift; sourceTree = "<group>"; };
+		3A53BD452C6B7AF100BB1EE6 /* DownloadPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadPolicy.swift; sourceTree = "<group>"; };
 		3A5DF1782C4698EC0005369D /* EdgeInsetLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EdgeInsetLabel.swift; sourceTree = "<group>"; };
 		3A770E4B2AE14F130008D98F /* SimpleTransactionDetails+Hashable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SimpleTransactionDetails+Hashable.swift"; sourceTree = "<group>"; };
 		3A7BD00D2AA9BCE80045AAB0 /* VibroService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VibroService.swift; sourceTree = "<group>"; };
@@ -757,7 +759,7 @@
 		3AA50DF02AEBE66A00C58FC8 /* PartnerQRViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnerQRViewModel.swift; sourceTree = "<group>"; };
 		3AA50DF22AEBE67C00C58FC8 /* PartnerQRFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnerQRFactory.swift; sourceTree = "<group>"; };
 		3AA6DF3F2BA9941E00EA2E16 /* MediaContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaContainerView.swift; sourceTree = "<group>"; };
-		3AA6DF432BA997C000EA2E16 /* FileContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileContainerView.swift; sourceTree = "<group>"; };
+		3AA6DF432BA997C000EA2E16 /* FileListContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileListContainerView.swift; sourceTree = "<group>"; };
 		3AA6DF452BA9BEB700EA2E16 /* MediaContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaContentView.swift; sourceTree = "<group>"; };
 		3AB87CD52BF6237100AE8743 /* MultipartFormDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultipartFormDataModel.swift; sourceTree = "<group>"; };
 		3ACD307D2BBD86B700ABF671 /* FilesStorageProprietiesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilesStorageProprietiesService.swift; sourceTree = "<group>"; };
@@ -1513,8 +1515,8 @@
 		3AA6DF412BA9942300EA2E16 /* ChatFileContainerView */ = {
 			isa = PBXGroup;
 			children = (
-				3AA6DF432BA997C000EA2E16 /* FileContainerView.swift */,
-				3A299C7A2B85EABB00B54C61 /* ChatFileView.swift */,
+				3AA6DF432BA997C000EA2E16 /* FileListContainerView.swift */,
+				3A299C7A2B85EABB00B54C61 /* FileListContentView.swift */,
 			);
 			path = ChatFileContainerView;
 			sourceTree = "<group>";
@@ -2255,6 +2257,7 @@
 				3AA3880D2B6A356900125684 /* RpcRequestModel.swift */,
 				936658902B0AB9DC00BDB2D3 /* NodeWithGroup.swift */,
 				3AB87CD52BF6237100AE8743 /* MultipartFormDataModel.swift */,
+				3A53BD452C6B7AF100BB1EE6 /* DownloadPolicy.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -3267,6 +3270,7 @@
 				6455E9F321075D8000B2E94C /* AdamantAddressBookService.swift in Sources */,
 				3A26D9472C3D37B5003AD832 /* KlyWalletViewController.swift in Sources */,
 				9324C75E297170600022D7EA /* TransactionStatusService.swift in Sources */,
+				3A53BD462C6B7AF100BB1EE6 /* DownloadPolicy.swift in Sources */,
 				9304F8BE292F88F900173F18 /* ANSPayload.swift in Sources */,
 				41CA598C29A0D84F002BFDE4 /* TaskManager.swift in Sources */,
 				E9E7CD9120026FA100DFC4DB /* AppAssembly.swift in Sources */,
@@ -3403,7 +3407,7 @@
 				E9E7CDB32002B9FB00DFC4DB /* LoginFactory.swift in Sources */,
 				E941CCDE20E7B70200C96220 /* WalletCollectionViewCell.swift in Sources */,
 				4186B33A294200F4006594A3 /* DashWalletService+DynamicConstants.swift in Sources */,
-				3A299C7B2B85EABB00B54C61 /* ChatFileView.swift in Sources */,
+				3A299C7B2B85EABB00B54C61 /* FileListContentView.swift in Sources */,
 				3AF08D5F2B4EB3A200EB82B1 /* LanguageService.swift in Sources */,
 				E9AA8BFA212C166600F9249F /* EthWalletService+Send.swift in Sources */,
 				411743042A39B257008CD98A /* ContributeViewModel.swift in Sources */,
@@ -3514,7 +3518,7 @@
 				E9B1AA5B21283E0F00080A2A /* AdmTransferViewController.swift in Sources */,
 				3A26D94D2C3D387B003AD832 /* KlyTransactionDetailsViewController.swift in Sources */,
 				648C697322916192006645F5 /* DashTransactionsViewController.swift in Sources */,
-				3AA6DF442BA997C000EA2E16 /* FileContainerView.swift in Sources */,
+				3AA6DF442BA997C000EA2E16 /* FileListContainerView.swift in Sources */,
 				93E8EDCF2AF1CD9F003E163C /* NodeStatusInfo.swift in Sources */,
 				55E69E172868D7920025D82E /* CheckmarkView.swift in Sources */,
 				93B28EC02B076667007F268B /* APIResponseModel.swift in Sources */,

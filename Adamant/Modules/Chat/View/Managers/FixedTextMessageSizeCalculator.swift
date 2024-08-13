@@ -67,7 +67,8 @@
              )
              
              messageContainerSize = size
-             messageContainerSize.width += messageInsets.horizontal
+             messageContainerSize.width += messageInsets.horizontal 
+             + additionalWidth
              messageContainerSize.height = contentViewHeight
          }
          

@@ -118,7 +118,7 @@ final class ChatMediaContentView: UIView {
     private lazy var uploadImageView = UIImageView(image: .asset(named: "downloadIcon"))
     
     private lazy var mediaContainerView = MediaContainerView()
-    private lazy var fileContainerView = FileContainerView()
+    private lazy var fileContainerView = FileListContainerView()
     
     var replyViewDynamicHeight: CGFloat {
         model.isReply ? replyViewHeight : .zero
@@ -201,11 +201,9 @@ private extension ChatMediaContentView {
         replyContainerView.isHidden = !model.isReply
         spacingView.isHidden = !model.fileModel.isMediaFilesOnly
         
-        if model.isReply {
-            replyMessageLabel.attributedText = model.replyMessage
-        } else {
-            replyMessageLabel.attributedText = nil
-        }
+        replyMessageLabel.attributedText = model.isReply
+        ? model.replyMessage
+        : nil
         
         replyContainerView.snp.updateConstraints { make in
             make.height.equalTo(replyContainerViewDynamicHeight)

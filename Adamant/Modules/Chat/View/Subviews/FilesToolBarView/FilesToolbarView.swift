@@ -19,7 +19,8 @@ final class FilesToolbarView: UIView {
         flow.scrollDirection = .horizontal
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: flow)
-        collectionView.register(FilesToolbarCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+        collectionView.register(FilesToolbarCollectionViewCell.self, forCellWithReuseIdentifier: String(describing: FilesToolbarCollectionViewCell.self)
+        )
         collectionView.backgroundColor = .clear
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -125,7 +126,7 @@ extension FilesToolbarView: UICollectionViewDelegate, UICollectionViewDataSource
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: "cell",
+            withReuseIdentifier: String(describing: FilesToolbarCollectionViewCell.self),
             for: indexPath
         ) as? FilesToolbarCollectionViewCell else {
             return UICollectionViewCell()
@@ -143,7 +144,10 @@ extension FilesToolbarView: UICollectionViewDelegate, UICollectionViewDataSource
         layout collectionViewLayout: UICollectionViewLayout,
         sizeForItemAt indexPath: IndexPath
     ) -> CGSize {
-        .init(width: self.frame.height - 10, height: self.frame.height - 10)
+        .init(
+            width: self.frame.height - itemOffset,
+            height: self.frame.height - itemOffset
+        )
     }
     
     func collectionView(
@@ -157,3 +161,4 @@ extension FilesToolbarView: UICollectionViewDelegate, UICollectionViewDataSource
 private let horizontalStackSpacing: CGFloat = 25
 private let verticalInsets: CGFloat = 8
 private let horizontalInsets: CGFloat = 12
+private let itemOffset: CGFloat = 10

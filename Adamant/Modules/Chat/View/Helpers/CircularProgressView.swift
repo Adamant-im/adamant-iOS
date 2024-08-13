@@ -9,7 +9,7 @@
 import SwiftUI
 import UIKit
 
-class CircularProgressState: ObservableObject {
+final class CircularProgressState: ObservableObject {
     @Published var lineWidth: CGFloat = 6
     @Published var backgroundColor: UIColor = .lightGray
     @Published var progressColor: UIColor = .blue

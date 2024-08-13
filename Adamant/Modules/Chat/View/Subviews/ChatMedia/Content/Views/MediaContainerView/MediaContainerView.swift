@@ -234,8 +234,8 @@ extension ChatMediaContentView.FileModel {
         let fileList = Array(files.prefix(FilesConstants.maxFilesCount))
         
         guard isMediaFilesOnly else {
-            return FileContainerView.cellSize * CGFloat(fileList.count)
-            + FileContainerView.stackSpacing * CGFloat(fileList.count)
+            return FileListContainerView.cellSize * CGFloat(fileList.count)
+            + FileListContainerView.stackSpacing * CGFloat(fileList.count)
         }
         
         let rows = fileList.chunked(into: 2)
