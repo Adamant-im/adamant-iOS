@@ -105,7 +105,7 @@ class HealthCheckWrapper<Service, Error: HealthCheckableError> {
             guard let self = self else {
                 return
             }
-            let cancellable = $allowedNodes
+            $allowedNodes
                 .filter { !$0.isEmpty }
                 .prefix(1)
                 .sink { [weak self] nodes in
@@ -118,7 +118,7 @@ class HealthCheckWrapper<Service, Error: HealthCheckableError> {
                         continuation.resume(returning: result)
                     }
                 }
-            self.subscriptions.insert(cancellable)
+                .store(in: &subscriptions)
         }
     }
     
@@ -130,9 +130,9 @@ class HealthCheckWrapper<Service, Error: HealthCheckableError> {
         ? Error.noEndpointsError(coin: nodeGroup.name)
         : nil
         
-        let nodesList = nodesList ?? (fastestNodeMode
-                                      ? allowedNodes
-                                      : allowedNodes.shuffled())
+        let nodesList = fastestNodeMode
+            ? (nodesList ?? allowedNodes)
+            : (nodesList?.shuffled() ?? allowedNodes.shuffled())
         
         for node in nodesList {
             let response = await request(service, node)

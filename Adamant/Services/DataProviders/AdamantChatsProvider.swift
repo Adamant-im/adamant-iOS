@@ -412,15 +412,16 @@ extension AdamantChatsProvider {
     
     func apiGetChatrooms(address: String, offset: Int?) async throws -> ChatRooms? {
         do {
-            let chatrooms = try await apiService.getChatRooms(address: address, offset: offset).get()
+            let chatrooms = try await apiService.getChatRooms(waitActiveNodes: false, address: address, offset: offset).get()
             return chatrooms
         } catch let error as ApiServiceError {
-            guard case .networkError = error else {
-                return nil
+            switch error {
+            case .networkError:
+                await Task.sleep(interval: requestRepeatDelay)
+                return try await apiGetChatrooms(address: address, offset: offset)
+            default:
+                return try await apiService.getChatRooms(waitActiveNodes: true, address: address, offset: offset).get()
             }
-            
-            await Task.sleep(interval: requestRepeatDelay)
-            return try await apiGetChatrooms(address: address, offset: offset)
         }
     }
     
