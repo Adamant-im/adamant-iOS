@@ -20,7 +20,8 @@ final class AdamantAccountService: AccountService {
     private let dialogService: DialogService
     private let securedStore: SecuredStore
     private let walletServiceCompose: WalletServiceCompose
-
+    private let codeEntryService: CodeEntryProtocol
+    
     weak var notificationsService: NotificationsService?
     weak var currencyInfoService: CurrencyInfoService?
     weak var pushNotificationsTokenService: PushNotificationsTokenService?
@@ -37,18 +38,28 @@ final class AdamantAccountService: AccountService {
     @Atomic private var previousAppState: UIApplication.State?
     @Atomic private var subscriptions = Set<AnyCancellable>()
     
+    var remainingAttemptsPublisher: Published<Int>.Publisher {
+        codeEntryService.remainingAttemptsPublisher
+    }
+    
+    var remainingTimePublisher: Published<TimeInterval>.Publisher {
+        codeEntryService.remainingTimePublisher
+    }
+    
     init(
         apiService: ApiService,
         adamantCore: AdamantCore,
         dialogService: DialogService,
         securedStore: SecuredStore,
-        walletServiceCompose: WalletServiceCompose
+        walletServiceCompose: WalletServiceCompose,
+        codeEntryService: CodeEntryProtocol
     ) {
         self.apiService = apiService
         self.adamantCore = adamantCore
         self.dialogService = dialogService
         self.securedStore = securedStore
         self.walletServiceCompose = walletServiceCompose
+        self.codeEntryService = codeEntryService
         
         NotificationCenter.default.addObserver(forName: .AdamantAccountService.forceUpdateBalance, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.update()
@@ -105,7 +116,11 @@ extension AdamantAccountService {
         completion(.success(account: account, alert: nil))
     }
     
-    func validatePin(_ pin: String) -> Bool {
+    func validatePin(_ pin: String) throws -> Bool {
+        guard codeEntryService.attemptCodeEntry() else {
+            throw AccountServiceError.codeEntryLimitReached
+        }
+        
         guard let savedPin = securedStore.get(.pin) else {
             return false
         }

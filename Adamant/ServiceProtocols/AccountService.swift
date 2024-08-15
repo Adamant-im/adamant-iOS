@@ -94,6 +94,7 @@ enum AccountServiceError: Error {
     case userNotLogged
     case invalidPassphrase
     case wrongPassphrase
+    case codeEntryLimitReached
     case apiError(error: ApiServiceError)
     case internalError(message: String, error: Error?)
     
@@ -107,7 +108,10 @@ enum AccountServiceError: Error {
             
         case .wrongPassphrase:
             return .localized("AccountServiceError.WrongPassphrase", comment: "Login: user typed in wrong passphrase")
-        
+            
+        case .codeEntryLimitReached:
+            return "codeEntryLimitReached"
+            
         case .apiError(let error):
             return error.localizedDescription
         
@@ -134,7 +138,7 @@ extension AccountServiceError: RichError {
     
     var level: ErrorLevel {
         switch self {
-        case .wrongPassphrase, .userNotLogged, .invalidPassphrase:
+        case .wrongPassphrase, .userNotLogged, .invalidPassphrase, .codeEntryLimitReached:
             return .warning
             
         case .apiError(let error):
@@ -153,6 +157,14 @@ protocol AccountService: AnyObject {
     var state: AccountServiceState { get }
     var account: AdamantAccount? { get }
     var keypair: Keypair? { get }
+    
+    var remainingAttemptsPublisher: Published<Int>.Publisher {
+        get
+    }
+    
+    var remainingTimePublisher: Published<TimeInterval>.Publisher {
+        get
+    }
     
     // MARK: Account functions
     
@@ -191,7 +203,7 @@ protocol AccountService: AnyObject {
     func dropSavedAccount()
     
     /// If we have stored data with pin, validate it. If no data saved, always returns false.
-    func validatePin(_ pin: String) -> Bool
+    func validatePin(_ pin: String) throws -> Bool
     
     /// Update use TouchID or FaceID to log in
     func updateUseBiometry(_ newValue: Bool)
