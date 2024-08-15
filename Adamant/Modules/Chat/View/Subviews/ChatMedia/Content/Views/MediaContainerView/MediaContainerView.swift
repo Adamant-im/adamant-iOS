@@ -102,10 +102,24 @@ private extension MediaContainerView {
     func update() {
         let fileList = model.files.prefix(FilesConstants.maxFilesCount)
         
-        actionHandler(.downloadPreviewIfNeeded(
-            messageId: model.messageId,
-            files: Array(fileList)
-        ))
+        let filesToDownload = fileList.filter {
+            $0.fileType.isMedia
+            && (
+                (!$0.isCached && $0.isFullMediaDownloadAllowed)
+                || (
+                    $0.previewImage == nil
+                    && $0.file.preview != nil
+                    && $0.isPreviewDownloadAllowed
+                )
+            )
+        }
+        
+        if !filesToDownload.isEmpty {
+            actionHandler(.downloadContentIfNeeded(
+                messageId: model.messageId,
+                files: filesToDownload
+            ))
+        }
         
         updatePreviewDownloadLabel(files: Array(fileList))
         

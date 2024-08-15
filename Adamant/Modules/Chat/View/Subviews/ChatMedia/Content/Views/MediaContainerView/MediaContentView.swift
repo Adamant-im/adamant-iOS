@@ -30,7 +30,7 @@ final class MediaContentView: UIView {
         return btn
     }()
     
-    private lazy var progressBar = CircularProgressView()
+    private lazy var progressBar = CircularProgressView(state: progressState)
     private lazy var progressState: CircularProgressState = {
         .init(
             lineWidth: 2.0,
@@ -114,7 +114,7 @@ private extension MediaContentView {
             make.size.equalTo(imageSize / 1.6)
         }
         
-        let controller = UIHostingController(rootView: progressBar.environmentObject(progressState))
+        let controller = UIHostingController(rootView: progressBar)
         
         controller.view.backgroundColor = .clear
         addSubview(controller.view)

@@ -50,16 +50,9 @@ public class Chatroom: NSManagedObject {
     @MainActor func havePartnerName(addressBookService: AddressBookService) -> Bool {
         guard let partner = partner else { return false }
         
-        if let address = partner.address,
-           let name = addressBookService.getName(for: address) {
-            return true
-        } else if let title = title {
-            return true
-        } else if let name = partner.name {
-            return true
-        }
-        
-        return false
+        return partner.address.flatMap { addressBookService.getName(for: $0) } != nil
+        || title != nil
+        || partner.name != nil
     }
     
     private let semaphore = DispatchSemaphore(value: 1)

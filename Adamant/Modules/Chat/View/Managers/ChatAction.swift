@@ -22,6 +22,6 @@ enum ChatAction {
     case react(id: String, emoji: String)
     case presentMenu(arg: ChatContextMenuArguments)
     case openFile(messageId: String, file: ChatFile)
-    case downloadPreviewIfNeeded(messageId: String, files: [ChatFile])
+    case downloadContentIfNeeded(messageId: String, files: [ChatFile])
     case forceDownloadAllFiles(messageId: String, files: [ChatFile])
 }

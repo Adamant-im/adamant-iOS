@@ -13,7 +13,8 @@ import CommonKit
 
 final class ChatInputBar: InputBarAccessoryView {
     var onAttachmentButtonTap: (() -> Void)?
-    
+    var onImagePasted: ((UIImage) -> Void)?
+
     var fee = "" {
         didSet { updateFeeLabel() }
     }
@@ -239,8 +240,11 @@ extension InputTextView {
     open override func paste(_ sender: Any?) {
         super.paste(sender)
         
-        guard let image = UIPasteboard.general.image else { return }
-        NotificationCenter.default.post(name: .AdamantInputText.pastedImage, object: image)
+        guard let view = inputBarAccessoryView as? ChatInputBar,
+              let image = UIPasteboard.general.image
+        else { return }
+        
+        view.onImagePasted?(image)
     }
 }
 

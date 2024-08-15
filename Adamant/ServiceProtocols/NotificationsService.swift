@@ -126,10 +126,6 @@ extension Notification.Name {
         static let notificationsModeChanged = Notification.Name("adamant.notificationService.notificationsMode")
         static let notificationsSoundChanged = Notification.Name("adamant.notificationService.notificationsSound")
     }
-    
-    enum AdamantInputText {
-        static let pastedImage = Notification.Name("pastedImage")
-    }
 }
 
 extension AdamantUserInfoKey {

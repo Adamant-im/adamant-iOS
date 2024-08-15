@@ -10,7 +10,7 @@ import Foundation
 import CommonKit
 import UIKit
 
-struct DownloadStatus: Equatable, Hashable {
+struct DownloadStatus: Hashable {
     var isPreviewDownloading: Bool
     var isOriginalDownloading: Bool
     

@@ -97,6 +97,9 @@ final class ChatViewController: MessagesViewController {
         inputBar.onAttachmentButtonTap = { [weak self] in
             self?.viewModel.presentActionMenu()
         }
+        inputBar.onImagePasted = { [weak self] image in
+            self?.viewModel.handlePastedImage(image)
+        }
     }
     
     required init?(coder: NSCoder) {

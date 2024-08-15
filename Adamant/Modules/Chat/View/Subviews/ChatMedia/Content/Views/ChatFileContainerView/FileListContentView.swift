@@ -56,7 +56,7 @@ final class FileListContentView: UIView {
         stack.axis = .horizontal
         stack.spacing = stackSpacing
         
-        let controller = UIHostingController(rootView: progressBar.environmentObject(progressState))
+        let controller = UIHostingController(rootView: progressBar)
         controller.view.backgroundColor = .clear
         
         stack.addArrangedSubview(sizeLabel)
@@ -70,7 +70,7 @@ final class FileListContentView: UIView {
         return btn
     }()
     
-    private lazy var progressBar = CircularProgressView()
+    private lazy var progressBar = CircularProgressView(state: progressState)
     private lazy var progressState: CircularProgressState = {
         .init(
             lineWidth: 2.0,
@@ -194,7 +194,7 @@ private extension FileListContentView {
         downloadImageView.isHidden = chatFile.isCached 
         || chatFile.isBusy
         || model.txStatus == .failed
-        || chatFile.previewImage == nil
+        || (chatFile.fileType.isMedia && chatFile.previewImage == nil)
         
         if chatFile.isDownloading {
             if chatFile.previewImage == nil,

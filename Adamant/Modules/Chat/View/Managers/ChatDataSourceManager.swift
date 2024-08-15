@@ -196,8 +196,8 @@ private extension ChatDataSourceManager {
             viewModel.copyTextInPartAction(text)
         case let .openFile(messageId, file):
             viewModel.openFile(messageId: messageId, file: file)
-        case let .downloadPreviewIfNeeded(messageId, files):
-            viewModel.downloadPreviewIfNeeded(
+        case let .downloadContentIfNeeded(messageId, files):
+            viewModel.downloadContentIfNeeded(
                 messageId: messageId,
                 files: files
             )

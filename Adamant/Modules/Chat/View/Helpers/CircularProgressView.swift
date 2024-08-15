@@ -10,16 +10,16 @@ import SwiftUI
 import UIKit
 
 final class CircularProgressState: ObservableObject {
-    @Published var lineWidth: CGFloat = 6
-    @Published var backgroundColor: UIColor = .lightGray
-    @Published var progressColor: UIColor = .blue
+    let lineWidth: CGFloat
+    let backgroundColor: UIColor
+    let progressColor: UIColor
     @Published var progress: Double = 0
     @Published var hidden: Bool = false
     
     init(
-        lineWidth: CGFloat,
-        backgroundColor: UIColor,
-        progressColor: UIColor,
+        lineWidth: CGFloat = 6,
+        backgroundColor: UIColor = .lightGray,
+        progressColor: UIColor = .blue,
         progress: Double,
         hidden: Bool
     ) {
@@ -32,7 +32,11 @@ final class CircularProgressState: ObservableObject {
 }
 
 struct CircularProgressView: View {
-    @EnvironmentObject private var state: CircularProgressState
+    @StateObject private var state: CircularProgressState
+    
+    init(state: CircularProgressState) {
+        _state = .init(wrappedValue: state)
+    }
     
     var body: some View {
         ZStack {
