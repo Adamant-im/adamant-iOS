@@ -148,7 +148,7 @@ extension SecurityViewController: PinpadViewControllerDelegate {
             
         // MARK: Users want to turn off the pin. Validate and turn off.
         case .turnOffPin?:
-            guard accountService.validatePin(pin) else {
+            guard (try? accountService.validatePin(pin)) == true else {
                 pinpad.playWrongPinAnimation()
                 pinpad.clearPin()
                 break
@@ -160,7 +160,7 @@ extension SecurityViewController: PinpadViewControllerDelegate {
             
         // MARK: User wants to turn on biometry
         case .turnOnBiometry?:
-            guard accountService.validatePin(pin) else {
+            guard (try? accountService.validatePin(pin)) == true else {
                 pinpad.playWrongPinAnimation()
                 pinpad.clearPin()
                 break
@@ -171,7 +171,7 @@ extension SecurityViewController: PinpadViewControllerDelegate {
             
         // MARK: User wants to turn off biometry
         case .turnOffBiometry?:
-            guard accountService.validatePin(pin) else {
+            guard (try? accountService.validatePin(pin)) == true else {
                 pinpad.playWrongPinAnimation()
                 pinpad.clearPin()
                 break

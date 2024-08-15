@@ -200,7 +200,8 @@ struct AppAssembly: Assembly {
                 adamantCore: r.resolve(AdamantCore.self)!,
                 dialogService: r.resolve(DialogService.self)!,
                 securedStore: r.resolve(SecuredStore.self)!,
-                walletServiceCompose: r.resolve(WalletServiceCompose.self)!
+                walletServiceCompose: r.resolve(WalletServiceCompose.self)!,
+                codeEntryService: CodeEntryService()
             )
         }.inObjectScope(.container).initCompleted { (r, c) in
             Task { @MainActor in

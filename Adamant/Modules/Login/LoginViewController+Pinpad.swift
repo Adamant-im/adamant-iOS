@@ -13,25 +13,14 @@ import CommonKit
 extension LoginViewController {
     /// Shows pinpad in main.async queue
     func loginWithPinpad() {
-        let button: PinpadBiometryButtonType = accountService.useBiometry ? localAuth.biometryType.pinpadButtonType : .hidden
-        
-        DispatchQueue.main.async { [weak self] in
-            let pinpad = PinpadViewController.adamantPinpad(biometryButton: button)
-            pinpad.commentLabel.text = String.adamant.login.loginIntoPrevAccount
-            pinpad.commentLabel.isHidden = false
-            pinpad.delegate = self
-            pinpad.modalPresentationStyle = .overFullScreen
-            pinpad.backgroundView.backgroundColor = UIColor.adamant.backgroundColor
-            pinpad.buttonsBackgroundColor = UIColor.adamant.backgroundColor
-            pinpad.view.subviews.forEach { view in
-                view.subviews.forEach { _view in
-                    if _view.backgroundColor == .white {
-                        _view.backgroundColor = UIColor.adamant.backgroundColor
-                    }
-                }
+        DispatchQueue.onMainAsync {
+            let successAction: (() -> Void)? = { [weak self] in
+                self?.loginIntoSavedAccount()
             }
-            pinpad.commentLabel.backgroundColor = UIColor.adamant.backgroundColor
-            self?.present(pinpad, animated: true, completion: nil)
+            
+            let pinpad = self.screensFactory.makePinpad(successAction: successAction)
+            pinpad.modalPresentationStyle = .fullScreen
+            self.present(pinpad, animated: true, completion: nil)
         }
     }
     
@@ -110,38 +99,5 @@ extension LoginViewController {
                 pinpad.clearPin()
             }
         }
-    }
-}
-
-// MARK: - PinpadViewControllerDelegate
-extension LoginViewController: PinpadViewControllerDelegate {
-    func pinpad(_ pinpad: PinpadViewController, didEnterPin pin: String) {
-        guard accountService.hasStayInAccount else {
-            return
-        }
-        
-        guard accountService.validatePin(pin) else {
-            pinpad.clearPin()
-            pinpad.playWrongPinAnimation()
-            return
-        }
-        
-        loginIntoSavedAccount()
-    }
-    
-    func pinpadDidTapBiometryButton(_ pinpad: PinpadViewController) {
-        localAuth.authorizeUser(reason: String.adamant.login.loginIntoPrevAccount, completion: { [weak self] result in
-            switch result {
-            case .success:
-                self?.loginIntoSavedAccount()
-                
-            case .fallback, .cancel, .failed:
-                break
-            }
-        })
-    }
-    
-    func pinpadDidCancel(_ pinpad: PinpadViewController) {
-        pinpad.dismiss(animated: true, completion: nil)
     }
 }

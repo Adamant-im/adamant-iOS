@@ -62,4 +62,5 @@ protocol ScreensFactory {
     func makeLogin() -> LoginViewController
     func makeVibrationSelection() -> UIViewController
     func makePartnerQR(partner: CoreDataAccount) -> UIViewController
+    func makePinpad(successAction: (() -> Void)?) -> UIViewController
 }
