@@ -1341,7 +1341,7 @@ private extension ChatViewModel {
         }
         
         partnerName = chatroom?.getName(addressBookService: addressBookService)
-        havePartnerName = chatroom?.havePartnerName(addressBookService: addressBookService) ?? false
+        havePartnerName = chatroom?.hasPartnerName(addressBookService: addressBookService) ?? false
         
         guard let avatarName = chatroom?.partner?.avatar,
               let avatar = UIImage.asset(named: avatarName)
@@ -1636,11 +1636,40 @@ private extension ChatMessage {
             model.content.fileModel.files[index].isFullMediaDownloadAllowed = value
         }
         
+        model.status = getStatus(from: model)
+        
         guard model != fileModel.value else {
             return
         }
         
         content = .file(.init(value: model))
+    }
+    
+    func getStatus(from model: ChatMediaContainerView.Model) -> FileMessageStatus {
+        if model.txStatus == .failed {
+            return .failed
+        }
+        
+        if model.content.fileModel.files.first(where: { $0.isBusy }) != nil {
+            return .busy
+        }
+        
+        if model.content.fileModel.files.contains(where: {
+            !$0.isCached ||
+            ($0.isCached
+             && $0.file.preview != nil
+             && $0.previewImage == nil
+             && ($0.fileType == .image || $0.fileType == .video))
+        }) {
+            let failed = model.content.fileModel.files.contains(where: {
+                guard let progress = $0.progress else { return false }
+                return progress < 100
+            })
+            
+            return .needToDownload(failed: failed)
+        }
+        
+        return .success
     }
 }
 

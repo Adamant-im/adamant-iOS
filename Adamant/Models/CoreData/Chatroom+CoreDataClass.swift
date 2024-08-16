@@ -47,7 +47,7 @@ public class Chatroom: NSManagedObject {
         return result?.checkAndReplaceSystemWallets()
     }
     
-    @MainActor func havePartnerName(addressBookService: AddressBookService) -> Bool {
+    @MainActor func hasPartnerName(addressBookService: AddressBookService) -> Bool {
         guard let partner = partner else { return false }
         
         return partner.address.flatMap { addressBookService.getName(for: $0) } != nil

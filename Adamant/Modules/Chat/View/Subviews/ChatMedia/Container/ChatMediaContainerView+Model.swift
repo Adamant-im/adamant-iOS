@@ -18,33 +18,7 @@ extension ChatMediaContainerView {
         let address: String
         let opponentAddress: String
         let txStatus: MessageStatus
-        
-        var status: FileMessageStatus {
-            if txStatus == .failed {
-                return .failed
-            }
-            
-            if content.fileModel.files.first(where: { $0.isBusy }) != nil {
-                return .busy
-            }
-            
-            if content.fileModel.files.contains(where: {
-                !$0.isCached ||
-                ($0.isCached
-                 && $0.file.preview != nil
-                 && $0.previewImage == nil
-                 && ($0.fileType == .image || $0.fileType == .video))
-            }) {
-                let failed = content.fileModel.files.contains(where: {
-                    guard let progress = $0.progress else { return false }
-                    return progress < 100
-                })
-                
-                return .needToDownload(failed: failed)
-            }
-            
-            return .success
-        }
+        var status: FileMessageStatus
         
         static let `default` = Self(
             id: "",
@@ -53,7 +27,8 @@ extension ChatMediaContainerView {
             content: .default,
             address: "",
             opponentAddress: "",
-            txStatus: .failed
+            txStatus: .failed,
+            status: .failed
         )
         
         func makeReplyContent() -> NSAttributedString {

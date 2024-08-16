@@ -350,7 +350,8 @@ private extension ChatMessageFactory {
             ),
             address: address,
             opponentAddress: opponentAddress, 
-            txStatus: transaction.statusEnum
+            txStatus: transaction.statusEnum,
+            status: .failed
         )))
     }
     
