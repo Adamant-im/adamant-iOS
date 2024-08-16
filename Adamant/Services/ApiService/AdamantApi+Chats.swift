@@ -63,7 +63,6 @@ extension AdamantApiService {
     }
     
     func getChatRooms(
-        waitActiveNodes: Bool,
         address: String,
         offset: Int?
     ) async -> ApiServiceResult<ChatRooms> {
@@ -73,17 +72,7 @@ extension AdamantApiService {
             parameters["offset"] = String(offset)
         }
         
-        return waitActiveNodes
-        ? await waitingRequest { [parameters] service, node in
-            await service.sendRequestJsonResponse(
-                node: node,
-                path: ApiCommands.Chats.getChatRooms + "/\(address)",
-                method: .get,
-                parameters: parameters,
-                encoding: .url
-            )
-        }
-        : await request { [parameters] service, node in
+        return await waitingRequest { [parameters] service, node in
             await service.sendRequestJsonResponse(
                 node: node,
                 path: ApiCommands.Chats.getChatRooms + "/\(address)",

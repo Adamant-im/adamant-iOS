@@ -45,7 +45,6 @@ protocol ApiService: WalletApiService {
     // MARK: - Chats Rooms
     
     func getChatRooms(
-        waitActiveNodes: Bool,
         address: String,
         offset: Int?
     ) async -> ApiServiceResult<ChatRooms>
