@@ -98,8 +98,7 @@ class HealthCheckWrapper<Service, Error: HealthCheckableError> {
         _ requestAction: @Sendable @escaping (Service, Node) async -> Result<Output, Error>
     ) async -> Result<Output, Error> {
         guard allowedNodes.isEmpty else {
-            let result = await request(requestAction)
-            return await handleResult(result: result, requestAction: requestAction)
+            return await handleRequest(requestAction: requestAction)
         }
         
         return await withCheckedContinuation { [weak self] continuation in
@@ -115,26 +114,12 @@ class HealthCheckWrapper<Service, Error: HealthCheckableError> {
                         return
                     }
                     Task {
-                        let result = await self.request(requestAction)
-                        let handleResult = await self.handleResult(result: result,
-                                                                   requestAction: requestAction)
-                        continuation.resume(returning: handleResult)
+                        let result = await self.handleRequest(requestAction: requestAction)
+                        continuation.resume(returning: result)
                     }
                 }
                 .store(in: &subscriptions)
         }
-    }
-    
-    private func handleResult<Output>(
-        result: Result<Output, Error>,
-        requestAction: @Sendable @escaping (Service, Node) async -> Result<Output, Error>
-    ) async -> Result<Output, Error> {
-        guard case .failure(let failure) = result,
-              let apiServiceError = failure as? ApiServiceError,
-              apiServiceError.isNetworkError || apiServiceError == .noEndpointsError(coin: nodeGroup.name) else {
-            return result
-        }
-        return await waitingRequest(requestAction)
     }
     
     func request<Output>(
@@ -144,7 +129,7 @@ class HealthCheckWrapper<Service, Error: HealthCheckableError> {
             ? allowedNodes
             : allowedNodes.shuffled()
         
-        var lastConnectionError = allowedNodes.isEmpty
+        var lastConnectionError = nodesList.isEmpty
         ? Error.noEndpointsError(coin: nodeGroup.name)
         : nil
         
@@ -192,6 +177,25 @@ private extension HealthCheckWrapper {
         
         healthCheck()
         lastUpdateTime = Date()
+    }
+    
+    private func handleRequest<Output>(
+        requestAction: @Sendable @escaping (Service, Node) async -> Result<Output, Error>
+    ) async -> Result<Output, Error> {
+        let result = await request(requestAction)
+        return await handleResult(result: result, requestAction: requestAction)
+    }
+    
+    private func handleResult<Output>(
+        result: Result<Output, Error>,
+        requestAction: @Sendable @escaping (Service, Node) async -> Result<Output, Error>
+    ) async -> Result<Output, Error> {
+        guard case .failure(let failure) = result,
+              let apiServiceError = failure as? ApiServiceError,
+              apiServiceError.isNetworkError || apiServiceError == .noEndpointsError(coin: nodeGroup.name) else {
+            return result
+        }
+        return await waitingRequest(requestAction)
     }
 }
 

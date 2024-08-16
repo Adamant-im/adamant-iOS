@@ -359,7 +359,7 @@ extension AdamantChatsProvider {
         
         // MARK: 3. Get transactions
         
-        let chatrooms = try? await apiGetChatrooms(address: address, offset: offset)
+        let chatrooms = try? await apiService.getChatRooms(address: address, offset: offset).get()
         
         guard let chatrooms = chatrooms else {
             if !isInitiallySynced {
@@ -407,15 +407,6 @@ extension AdamantChatsProvider {
                 guard !isChatLoading else { return }
                 await getChatMessages(with: recipientAddress, offset: nil)
             }
-        }
-    }
-    
-    func apiGetChatrooms(address: String, offset: Int?) async throws -> ChatRooms? {
-        do {
-            return try await apiService.getChatRooms(address: address, offset: offset).get()
-        } catch {
-            await Task.sleep(interval: requestRepeatDelay)
-            return try await apiGetChatrooms(address: address, offset: offset)
         }
     }
     
