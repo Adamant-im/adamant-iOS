@@ -87,5 +87,8 @@ extension String.adamant {
         static var messageIsTooBig: String {
             String.localized("ChatScene.Error.messageIsTooBig", comment: "Chat: Error message is too big")
         }
+        static var unknownTitle: String {
+            String.localized("Chat.unknown.title", comment: "Chat unknown")
+        }
     }
 }

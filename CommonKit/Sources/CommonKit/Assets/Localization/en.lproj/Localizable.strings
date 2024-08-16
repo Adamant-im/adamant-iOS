@@ -1298,3 +1298,6 @@
 
 /* Chat drop view title */
 "Chat.Drop.Title" = "Drop files here";
+
+/* Chat unknown */
+"Chat.unknown.title" = "Unknown";

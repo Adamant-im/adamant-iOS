@@ -223,7 +223,7 @@ private extension FileListContentView {
         progressState.progress = Double(progress) / 100
         
         let fileType = chatFile.file.extension.map { ".\($0)" } ?? .empty
-        let fileName = chatFile.file.name ?? "UNKNWON"
+        let fileName = chatFile.file.name ?? .adamant.chat.unknownTitle.uppercased()
         
         nameLabel.text = fileName.contains(fileType)
         ? fileName
