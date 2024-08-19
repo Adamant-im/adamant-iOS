@@ -126,9 +126,9 @@ extension ApiServiceError: HealthCheckableError {
         }
     }
     
-    var isRequestCancelledError: Bool {
+    var isNoEndpointsError: Bool {
         switch self {
-        case .requestCancelled:
+        case .noEndpointsAvailable:
             return true
         default:
             return false

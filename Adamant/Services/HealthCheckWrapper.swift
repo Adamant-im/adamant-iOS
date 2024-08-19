@@ -13,7 +13,7 @@ import UIKit
 
 protocol HealthCheckableError: Error {
     var isNetworkError: Bool { get }
-    var isRequestCancelledError: Bool { get }
+    var isNoEndpointsError: Bool { get }
     
     static func noEndpointsError(coin: String) -> Self
 }
@@ -97,29 +97,22 @@ class HealthCheckWrapper<Service, Error: HealthCheckableError> {
     func waitingRequest<Output>(
         _ requestAction: @Sendable @escaping (Service, Node) async -> Result<Output, Error>
     ) async -> Result<Output, Error> {
-        guard allowedNodes.isEmpty else {
-            return await handleRequest(requestAction: requestAction)
+        for await _ in $allowedNodes.filter({ !$0.isEmpty}).prefix(1).values {
+            break
         }
         
-        return await withCheckedContinuation { [weak self] continuation in
-            guard let self = self else {
-                return
+        let result = await request(requestAction)
+        
+        switch result {
+        case .success:
+            return result
+        case .failure(let error):
+            guard error.isNetworkError || error.isNoEndpointsError else {
+                return result
             }
-            $allowedNodes
-                .filter { !$0.isEmpty }
-                .prefix(1)
-                .sink { [weak self] _ in
-                    guard let self = self else {
-                        continuation.resume(returning: .failure(.noEndpointsError(coin: NodeGroup.adm.name)))
-                        return
-                    }
-                    Task {
-                        let result = await self.handleRequest(requestAction: requestAction)
-                        continuation.resume(returning: result)
-                    }
-                }
-                .store(in: &subscriptions)
         }
+        
+        return await waitingRequest(requestAction)
     }
     
     func request<Output>(
@@ -177,25 +170,6 @@ private extension HealthCheckWrapper {
         
         healthCheck()
         lastUpdateTime = Date()
-    }
-    
-    private func handleRequest<Output>(
-        requestAction: @Sendable @escaping (Service, Node) async -> Result<Output, Error>
-    ) async -> Result<Output, Error> {
-        let result = await request(requestAction)
-        return await handleResult(result: result, requestAction: requestAction)
-    }
-    
-    private func handleResult<Output>(
-        result: Result<Output, Error>,
-        requestAction: @Sendable @escaping (Service, Node) async -> Result<Output, Error>
-    ) async -> Result<Output, Error> {
-        guard case .failure(let failure) = result,
-              let apiServiceError = failure as? ApiServiceError,
-              apiServiceError.isNetworkError || apiServiceError == .noEndpointsError(coin: nodeGroup.name) else {
-            return result
-        }
-        return await waitingRequest(requestAction)
     }
 }
 

@@ -124,9 +124,9 @@ extension WalletServiceError: HealthCheckableError {
         }
     }
     
-    var isRequestCancelledError: Bool {
+    var isNoEndpointsError: Bool {
         switch self {
-        case .requestCancelled:
+        case .apiError(.noEndpointsAvailable):
             return true
         default:
             return false

@@ -88,7 +88,6 @@ private extension BlockchainHealthCheckWrapper {
             
             updateNodesAvailability(forceInclude: node.id)
         case let .failure(error):
-            guard !error.isRequestCancelledError else { return }
             nodesStorage.updateNodeParams(id: node.id, connectionStatus: .offline)
             updateNodesAvailability()
         }
