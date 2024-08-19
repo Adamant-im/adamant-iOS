@@ -6,7 +6,6 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Foundation
 import UIKit
 import SnapKit
 import SwiftUI
@@ -30,7 +29,6 @@ final class MediaContentView: UIView {
         return btn
     }()
     
-    private lazy var progressBar = CircularProgressView(state: progressState)
     private lazy var progressState: CircularProgressState = {
         .init(
             lineWidth: 2.0,
@@ -114,6 +112,10 @@ private extension MediaContentView {
             make.size.equalTo(imageSize / 1.6)
         }
         
+        let progressBar = CircularProgressView { [weak self] in
+            guard let self = self else { return .init(progress: .zero, hidden: true) }
+            return self.progressState
+        }
         let controller = UIHostingController(rootView: progressBar)
         
         controller.view.backgroundColor = .clear

@@ -19,9 +19,9 @@ struct StorageUsageFactory {
     
     func makeViewController() -> UIViewController {
         UIHostingController(
-            rootView: StorageUsageView(
-                viewModel: assembler.resolve(StorageUsageViewModel.self)!
-            )
+            rootView: StorageUsageView {
+                assembler.resolve(StorageUsageViewModel.self)!
+            }
         )
     }
 }

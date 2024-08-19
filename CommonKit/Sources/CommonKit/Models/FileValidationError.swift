@@ -27,6 +27,7 @@ public enum FileValidationError: Error {
     case tooManyFiles
     case fileSizeExceedsLimit
     case fileNotFound
+    case unknownError(Error)
 }
 
 extension FileValidationError: LocalizedError {
@@ -44,6 +45,8 @@ extension FileValidationError: LocalizedError {
             ), Int(FilesConstants.maxFileSize / (1024 * 1024)))
         case .fileNotFound:
             return .localized("FileValidationError.FileNotFound")
+        case let .unknownError(error):
+            return error.localizedDescription
         }
     }
 }

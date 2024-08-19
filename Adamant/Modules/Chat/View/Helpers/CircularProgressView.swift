@@ -34,8 +34,8 @@ final class CircularProgressState: ObservableObject {
 struct CircularProgressView: View {
     @StateObject private var state: CircularProgressState
     
-    init(state: CircularProgressState) {
-        _state = .init(wrappedValue: state)
+    init(state: @escaping () -> CircularProgressState) {
+        _state = .init(wrappedValue: state())
     }
     
     var body: some View {

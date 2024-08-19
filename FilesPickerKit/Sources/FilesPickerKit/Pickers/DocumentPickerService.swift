@@ -5,7 +5,6 @@
 //  Created by Stanislav Jelezoglo on 21.02.2024.
 //
 
-import Foundation
 import UIKit
 import CommonKit
 import MobileCoreServices

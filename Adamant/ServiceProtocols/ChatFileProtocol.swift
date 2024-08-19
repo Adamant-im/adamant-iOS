@@ -12,22 +12,25 @@ import Combine
 import UIKit
 import FilesStorageKit
 
+struct FileUpdateProperties {
+    let id: String
+    let newId: String?
+    let fileNonce: String?
+    let preview: UIImage??
+    let cached: Bool?
+    let downloadStatus: DownloadStatus?
+    let uploading: Bool?
+    let progress: Int?
+    let isPreviewDownloadAllowed: Bool?
+    let isFullMediaDownloadAllowed: Bool?
+}
+
 protocol ChatFileProtocol {
     var downloadingFiles: [String: DownloadStatus] { get }
     var uploadingFiles: [String] { get }
     var filesLoadingProgress: [String: Int] { get }
     
-    var updateFileFields: PassthroughSubject<(
-        id: String,
-        newId: String?,
-        fileNonce: String?,
-        preview: UIImage?,
-        needUpdatePreview: Bool,
-        cached: Bool?,
-        downloadStatus: DownloadStatus?,
-        uploading: Bool?,
-        progress: Int?
-    ), Never> {
+    var updateFileFields: PassthroughSubject<FileUpdateProperties, Never> {
         get
     }
     

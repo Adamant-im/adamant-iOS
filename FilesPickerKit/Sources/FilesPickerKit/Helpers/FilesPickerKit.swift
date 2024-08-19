@@ -17,7 +17,7 @@ public final class FilesPickerKit: FilesPickerProtocol {
     }
     
     public func getFileSize(from url: URL) throws -> Int64 {
-        try storageKit.getFileSize(from: url)
+        try storageKit.getFileSize(from: url).get()
     }
     
     public func getUrl(for image: UIImage?, name: String) throws -> URL {
@@ -189,7 +189,7 @@ private extension FilesPickerKit {
     ) throws -> FileResult {
         let newUrl = try storageKit.copyFileToTempCache(from: url)
         let preview = getPreview(for: newUrl)
-        let fileSize = try storageKit.getFileSize(from: newUrl)
+        let fileSize = try storageKit.getFileSize(from: newUrl).get()
         let duration = getVideoDuration(from: newUrl)
         let mimeType = getMimeType(for: newUrl)
         

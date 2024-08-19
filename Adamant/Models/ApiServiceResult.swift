@@ -7,3 +7,4 @@
 //
 
 typealias ApiServiceResult<Success> = Result<Success, ApiServiceError>
+typealias FileApiServiceResult<Success> = Result<Success, FileManagerError>

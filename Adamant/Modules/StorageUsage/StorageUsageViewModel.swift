@@ -119,7 +119,7 @@ final class StorageUsageViewModel: ObservableObject {
 private extension StorageUsageViewModel {
     func updateCacheSize() {
         DispatchQueue.global().async {
-            let size = (try? self.filesStorage.getCacheSize()) ?? .zero
+            let size = (try? self.filesStorage.getCacheSize().get()) ?? .zero
             DispatchQueue.main.async {
                 self.storageUsedDescription = self.formatSize(size)
             }

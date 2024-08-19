@@ -6,7 +6,6 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Foundation
 import UIKit
 import CommonKit
 

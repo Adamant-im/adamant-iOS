@@ -5,6 +5,8 @@ import CommonKit
 import UIKit
 import Combine
 
+public typealias FileStorageServiceResult<Success> = Result<Success, FileValidationError>
+
 public final class FilesStorageKit: FilesStorageProtocol {
     public struct File {
         public let id: String
@@ -55,16 +57,16 @@ public final class FilesStorageKit: FilesStorageProtocol {
         cachedFiles[id] != nil
     }
     
-    public func getFile(with id: String) throws -> File {
+    public func getFile(with id: String) -> FileStorageServiceResult<File> {
         guard let file = cachedFiles[id] else {
-            throw FileValidationError.fileNotFound
+            return .failure(.fileNotFound)
         }
         
-        return file
+        return .success(file)
     }
     
-    public func getFileURL(with id: String) throws -> URL {
-        try getFile(with: id).url
+    public func getFileURL(with id: String) -> FileStorageServiceResult<URL> {
+        getFile(with: id).flatMap { .success($0.url) }
     }
     
     public func cacheFile(
@@ -113,15 +115,16 @@ public final class FilesStorageKit: FilesStorageProtocol {
         )
     }
     
-    public func getCacheSize() throws -> Int64 {
-        let url = try FileManager.default.url(
+    public func getCacheSize() -> FileStorageServiceResult<Int64> {
+        guard let url = try? FileManager.default.url(
             for: .cachesDirectory,
             in: .userDomainMask,
             appropriateFor: nil,
             create: true
         ).appendingPathComponent(cachePath)
+        else { return .failure(.fileNotFound) }
         
-        return try folderSize(at: url)
+        return folderSize(at: url)
     }
     
     public func clearCache() throws {
@@ -222,7 +225,7 @@ public final class FilesStorageKit: FilesStorageProtocol {
         return targetURL
     }
     
-    public func getFileSize(from fileURL: URL) throws -> Int64 {
+    public func getFileSize(from fileURL: URL) -> FileStorageServiceResult<Int64> {
         defer {
             fileURL.stopAccessingSecurityScopedResource()
         }
@@ -235,9 +238,9 @@ public final class FilesStorageKit: FilesStorageProtocol {
                 throw FileValidationError.fileNotFound
             }
             
-            return fileSize
+            return .success(fileSize)
         } catch {
-            throw error
+            return .failure(.unknownError(error))
         }
     }
 }
@@ -385,15 +388,15 @@ private extension FilesStorageKit {
         $cachedFiles.mutate { $0[id] = file }
     }
     
-    func folderSize(at url: URL) throws -> Int64 {
+    func folderSize(at url: URL) -> FileStorageServiceResult<Int64> {
         let fileManager = FileManager.default
         
         guard fileManager.fileExists(atPath: url.path) else {
-            throw FileValidationError.fileNotFound
+            return .failure(.fileNotFound)
         }
         
         guard let enumerator = fileManager.enumerator(at: url, includingPropertiesForKeys: [.totalFileAllocatedSizeKey], options: [.skipsHiddenFiles, .skipsPackageDescendants]) else {
-            throw FileValidationError.fileNotFound
+            return .failure(.fileNotFound)
         }
         
         var folderSize: Int64 = 0
@@ -407,7 +410,7 @@ private extension FilesStorageKit {
             } catch { }
         }
         
-        return folderSize
+        return .success(folderSize)
     }
     
     func fileNameAndExtension(from url: URL) -> (name: String, extensions: [String]) {

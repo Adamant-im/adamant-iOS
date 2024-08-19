@@ -17,9 +17,9 @@ public protocol FilesStorageProtocol {
     
     func isCachedInMemory(_ id: String) -> Bool
     
-    func getFileURL(with id: String) throws -> URL
+    func getFileURL(with id: String) -> FileStorageServiceResult<URL>
     
-    func getFile(with id: String) throws -> FilesStorageKit.File
+    func getFile(with id: String) -> FileStorageServiceResult<FilesStorageKit.File>
     
     func cacheTemporaryFile(
         url: URL,
@@ -41,7 +41,7 @@ public protocol FilesStorageProtocol {
         isPreview: Bool
     ) throws
     
-    func getCacheSize() throws -> Int64
+    func getCacheSize() -> FileStorageServiceResult<Int64>
     
     func clearCache() throws
     
@@ -53,5 +53,5 @@ public protocol FilesStorageProtocol {
     
     func copyFileToTempCache(from url: URL) throws -> URL
     
-    func getFileSize(from fileURL: URL) throws -> Int64
+    func getFileSize(from fileURL: URL) -> FileStorageServiceResult<Int64>
 }

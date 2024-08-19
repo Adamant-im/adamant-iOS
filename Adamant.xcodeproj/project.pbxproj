@@ -96,6 +96,7 @@
 		3AF0A6CA2BBAF5850019FF47 /* ChatFileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF0A6C92BBAF5850019FF47 /* ChatFileService.swift */; };
 		3AF53F8D2B3DCFA300B30312 /* NodeGroup+Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF53F8C2B3DCFA300B30312 /* NodeGroup+Constants.swift */; };
 		3AF53F8F2B3EE0DA00B30312 /* DogeNodeInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF53F8E2B3EE0DA00B30312 /* DogeNodeInfo.swift */; };
+		3AF8D9E92C73ADFA007A7CBC /* IPFSNodeStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF8D9E82C73ADFA007A7CBC /* IPFSNodeStatus.swift */; };
 		3AF9DF0B2BFE306C009A43A8 /* ChatFileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF9DF0A2BFE306C009A43A8 /* ChatFileProtocol.swift */; };
 		3AF9DF0D2C049161009A43A8 /* CircularProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF9DF0C2C049161009A43A8 /* CircularProgressView.swift */; };
 		3AFE7E412B18D88B00718739 /* WalletService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AFE7E402B18D88B00718739 /* WalletService.swift */; };
@@ -780,6 +781,7 @@
 		3AF0A6C92BBAF5850019FF47 /* ChatFileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatFileService.swift; sourceTree = "<group>"; };
 		3AF53F8C2B3DCFA300B30312 /* NodeGroup+Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NodeGroup+Constants.swift"; sourceTree = "<group>"; };
 		3AF53F8E2B3EE0DA00B30312 /* DogeNodeInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeNodeInfo.swift; sourceTree = "<group>"; };
+		3AF8D9E82C73ADFA007A7CBC /* IPFSNodeStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPFSNodeStatus.swift; sourceTree = "<group>"; };
 		3AF9DF0A2BFE306C009A43A8 /* ChatFileProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatFileProtocol.swift; sourceTree = "<group>"; };
 		3AF9DF0C2C049161009A43A8 /* CircularProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircularProgressView.swift; sourceTree = "<group>"; };
 		3AFE7E402B18D88B00718739 /* WalletService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletService.swift; sourceTree = "<group>"; };
@@ -2238,6 +2240,7 @@
 				E95F85682006AB9D0070534A /* NormalizedTransaction.swift */,
 				93E5D4DA293000BE00439298 /* UnregisteredTransaction.swift */,
 				5558A437282AB9390024DDD6 /* NodeStatus.swift */,
+				3AF8D9E82C73ADFA007A7CBC /* IPFSNodeStatus.swift */,
 				E9FCA1E5218334C00005E83D /* SimpleTransactionDetails.swift */,
 				E971591921681D6900A5F904 /* TransactionStatus.swift */,
 				648C696E22915A12006645F5 /* DashTransaction.swift */,
@@ -3597,6 +3600,7 @@
 				3A33F9FA2A7A53DA002B8003 /* EmojiUpdateType.swift in Sources */,
 				936658932B0AC03700BDB2D3 /* CoinsNodesListStrings.swift in Sources */,
 				3A5DF1792C4698EC0005369D /* EdgeInsetLabel.swift in Sources */,
+				3AF8D9E92C73ADFA007A7CBC /* IPFSNodeStatus.swift in Sources */,
 				E993302021354B1800CD5200 /* AdmWalletFactory.swift in Sources */,
 				E9332B8921F1FA4400D56E72 /* OnboardFactory.swift in Sources */,
 				938F7D722955CE72001915CA /* ChatFactory.swift in Sources */,

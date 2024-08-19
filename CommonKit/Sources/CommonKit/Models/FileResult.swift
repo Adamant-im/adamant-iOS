@@ -13,7 +13,12 @@ public enum FileType {
     case other
     
     public var isMedia: Bool {
-        self == FileType.image || self == FileType.video
+        switch self {
+        case .image, .video:
+            return true
+        case .other:
+            return false
+        }
     }
 }
 

@@ -37,34 +37,38 @@ final class IPFSApiService: FileApiServiceProtocol {
     func uploadFile(
         data: Data,
         uploadProgress: @escaping ((Progress) -> Void)
-    ) async throws -> String {
+    ) async -> FileApiServiceResult<String> {
         let model: MultipartFormDataModel = .init(
             keyName: IPFSApiCommands.file.fieldName,
             fileName: defaultFileName,
             data: data
         )
         
-        let result: IpfsDTO = try await request { core, node in
+        let result: Result<IpfsDTO, ApiServiceError> = await request { core, node in
             await core.sendRequestMultipartFormDataJsonResponse(
                 node: node,
                 path: IPFSApiCommands.file.upload,
                 models: [model],
                 uploadProgress: uploadProgress
             )
-        }.get()
-        
-        guard let cid = result.cids.first else {
-            throw FileManagerError.cantUploadFile
         }
         
-        return cid
+        return result.flatMap { result in
+            guard let cid = result.cids.first else {
+                return .failure(
+                    .serverError(error: FileManagerError.cantUploadFile.localizedDescription)
+                )
+            }
+            
+            return .success(cid)
+        }.mapError { .apiError(error: $0) }
     }
     
     func downloadFile(
         id: String,
         downloadProgress: @escaping ((Progress) -> Void)
-    ) async throws -> Data {
-        let result: Data = try await request { core, node in
+    ) async -> FileApiServiceResult<Data> {
+        let result: Result<Data, ApiServiceError> = await request { core, node in
             let result: APIResponseModel = await core.sendRequest(
                 node: node,
                 path: "\(IPFSApiCommands.file.download)\(id)",
@@ -76,9 +80,10 @@ final class IPFSApiService: FileApiServiceProtocol {
             }
             
             return result.result
-        }.get()
+        }
         
-        return result
+        return result.flatMap { .success($0) }
+            .mapError { .apiError(error: $0) }
     }
 }
 

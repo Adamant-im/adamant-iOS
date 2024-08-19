@@ -13,11 +13,11 @@ protocol FilesNetworkManagerProtocol {
         _ data: Data,
         type: NetworkFileProtocolType,
         uploadProgress: @escaping ((Progress) -> Void)
-    ) async throws -> String
+    ) async -> FileApiServiceResult<String>
     
     func downloadFile(
         _ id: String,
         type: String,
         downloadProgress: @escaping ((Progress) -> Void)
-    ) async throws -> Data
+    ) async -> FileApiServiceResult<Data>
 }

@@ -12,10 +12,10 @@ protocol FileApiServiceProtocol: WalletApiService {
     func uploadFile(
         data: Data,
         uploadProgress: @escaping ((Progress) -> Void)
-    ) async throws -> String
+    ) async -> FileApiServiceResult<String>
     
     func downloadFile(
         id: String,
         downloadProgress: @escaping ((Progress) -> Void)
-    ) async throws -> Data
+    ) async -> FileApiServiceResult<Data>
 }

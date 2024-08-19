@@ -9,6 +9,10 @@
 import Foundation
 import CommonKit
 
+extension IPFSApiCommands {
+    static let status = "/api/node/info"
+}
+
 final class IPFSApiCore {
     let apiCore: APICoreProtocol
     
@@ -16,15 +20,11 @@ final class IPFSApiCore {
         self.apiCore = apiCore
     }
     
-    func getNodeStatus(node: Node) async -> ApiServiceResult<NodeStatus> {
-        await Task.sleep(interval: Double.random(in: 0.1...1))
-        return .success(.init(
-            success: true,
-            nodeTimestamp: Date().timeIntervalSince1970,
-            network: nil,
-            version: nil,
-            wsClient: nil
-        ))
+    func getNodeStatus(node: Node) async -> ApiServiceResult<IPFSNodeStatus> {
+        await apiCore.sendRequestJsonResponse(
+            node: node,
+            path: IPFSApiCommands.status
+        )
     }
 }
 

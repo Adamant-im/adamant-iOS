@@ -1329,6 +1329,14 @@ extension AdamantChatsProvider {
         do {
             let id = try await apiService.sendMessageTransaction(transaction: signedTransaction).get()
             
+            print("sendMessageTransaction id=\(id), transaction=\(transaction.height)")
+//            do {
+//                await Task.sleep(interval: 10)
+//                let id = try await apiService.sendMessageTransaction(transaction: signedTransaction).get()
+//                print("sendMessageTransaction id=\(id)")
+//            } catch {
+//                print("sendMessageTransaction error=\(error)")
+//            }
             // Update ID with recieved, add to unconfirmed transactions.
             transaction.transactionId = String(id)
             transaction.chatMessageId = String(id)
@@ -1706,6 +1714,7 @@ extension AdamantChatsProvider {
                 transactionInProgress.append(trs.transaction.id)
                 if let objectId = unconfirmedTransactions[trs.transaction.id],
                    let unconfirmed = context.object(with: objectId) as? ChatTransaction {
+                    print("confirmTransaction tr=\(trs.transaction.id)")
                     confirmTransaction(
                         unconfirmed,
                         id: trs.transaction.id,
@@ -1723,6 +1732,7 @@ extension AdamantChatsProvider {
                 
                 // if transaction in pending status then ignore it
                 if unconfirmedTransactionsBySignature.contains(trs.transaction.signature) {
+                    print("ignore tr=\(trs.transaction.id)")
                     continue
                 }
                 

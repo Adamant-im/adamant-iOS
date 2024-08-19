@@ -13,8 +13,8 @@ import Charts
 struct StorageUsageView: View {
     @StateObject private var viewModel: StorageUsageViewModel
     
-    init(viewModel: StorageUsageViewModel) {
-        _viewModel = .init(wrappedValue: viewModel)
+    init(viewModel: @escaping () -> StorageUsageViewModel) {
+        _viewModel = .init(wrappedValue: viewModel())
     }
     
     var body: some View {

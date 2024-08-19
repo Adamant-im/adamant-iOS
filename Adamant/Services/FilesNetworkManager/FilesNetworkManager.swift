@@ -19,10 +19,10 @@ final class FilesNetworkManager: FilesNetworkManagerProtocol {
         _ data: Data,
         type: NetworkFileProtocolType,
         uploadProgress: @escaping ((Progress) -> Void)
-    ) async throws -> String {
+    ) async -> FileApiServiceResult<String> {
         switch type {
         case .ipfs:
-            return try await ipfsService.uploadFile(data: data, uploadProgress: uploadProgress)
+            return await ipfsService.uploadFile(data: data, uploadProgress: uploadProgress)
         }
     }
     
@@ -30,14 +30,14 @@ final class FilesNetworkManager: FilesNetworkManagerProtocol {
         _ id: String,
         type: String,
         downloadProgress: @escaping ((Progress) -> Void)
-    ) async throws -> Data {
+    ) async -> FileApiServiceResult<Data> {
         guard let netwrokProtocol = NetworkFileProtocolType(rawValue: type) else {
-            throw FileManagerError.cantDownloadFile
+            return .failure(.cantDownloadFile)
         }
         
         switch netwrokProtocol {
         case .ipfs:
-            return try await ipfsService.downloadFile(
+            return await ipfsService.downloadFile(
                 id: id,
                 downloadProgress: downloadProgress
             )

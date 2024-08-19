@@ -6,7 +6,6 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import Foundation
 import UIKit
 
 public extension UIColor {

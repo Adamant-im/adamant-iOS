@@ -138,10 +138,10 @@ final class ChatViewModel: NSObject {
         didSet { updateHiddenMessage(&messages) }
     }
     
-    lazy var mediaPickerDelegate = MediaPickerService(helper: filesPicker)
-    lazy var documentPickerDelegate = DocumentPickerService(helper: filesPicker)
-    lazy var documentViewerService = DocumentInteractionService()
-    lazy var dropInteractionService = DropInteractionService(helper: filesPicker)
+    lazy private(set) var mediaPickerDelegate = MediaPickerService(helper: filesPicker)
+    lazy private(set) var documentPickerDelegate = DocumentPickerService(helper: filesPicker)
+    lazy private(set) var documentViewerService = DocumentInteractionService()
+    lazy private(set) var dropInteractionService = DropInteractionService(helper: filesPicker)
     
     init(
         chatsProvider: ChatsProvider,
@@ -295,29 +295,10 @@ final class ChatViewModel: NSObject {
             return
         }
         
-        if filesPicked?.count ?? .zero > .zero {
-            guard nodesStorage.haveActiveNode(in: .ipfs) else {
-                dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
-                    coin: NodeGroup.ipfs.name
-                ).localizedDescription))
-                return
-            }
-            
+        if !(filesPicked?.isEmpty ?? true) {
             Task {
-                let replyMessage = replyMessage
-                let filesPicked = filesPicked
-                
-                self.replyMessage = nil
-                self.filesPicked = nil
-                
                 do {
-                    try await chatFileService.sendFile(
-                        text: text,
-                        chatroom: chatroom,
-                        filesPicked: filesPicked,
-                        replyMessage: replyMessage, 
-                        saveEncrypted: filesStorageProprieties.saveFileEncrypted()
-                    )
+                    try await sendFiles(with: text)
                 } catch {
                     await handleMessageSendingError(
                         error: error,
@@ -736,7 +717,9 @@ final class ChatViewModel: NSObject {
         let tx = chatTransactions.first(where: { $0.txId == messageId })
         let message = messages.first(where: { $0.messageId == messageId })
         
-        if tx?.statusEnum == .failed {
+        guard let tx = tx,
+              tx.statusEnum != .failed
+        else {
             dialog.send(.failedMessageAlert(id: messageId, sender: nil))
             return
         }
@@ -770,7 +753,7 @@ final class ChatViewModel: NSObject {
             return
         }
         
-        guard tx?.statusEnum == .delivered else { return }
+        guard tx.statusEnum == .delivered else { return }
         
         downloadFile(
             file: file,
@@ -819,15 +802,7 @@ final class ChatViewModel: NSObject {
         let needToDownload: [ChatFile]
         
         let shouldDownloadFile: (ChatFile) -> Bool = { file in
-            if !file.isCached {
-                return true
-            }
-            
-            if file.fileType.isMedia && file.previewImage == nil {
-                return isPreviewDownloadAllowed
-            }
-            
-            return false
+            !file.isCached || (file.fileType.isMedia && file.previewImage == nil && isPreviewDownloadAllowed)
         }
         
         let previewFiles = files.filter { file in
@@ -1050,6 +1025,29 @@ extension ChatViewModel: NSFetchedResultsControllerDelegate {
 }
 
 private extension ChatViewModel {
+    func sendFiles(with text: String) async throws {
+        guard nodesStorage.haveActiveNode(in: .ipfs) else {
+            dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
+                coin: NodeGroup.ipfs.name
+            ).localizedDescription))
+            return
+        }
+        
+        let replyMessage = replyMessage
+        let filesPicked = filesPicked
+        
+        self.replyMessage = nil
+        self.filesPicked = nil
+        
+        try await chatFileService.sendFile(
+            text: text,
+            chatroom: chatroom,
+            filesPicked: filesPicked,
+            replyMessage: replyMessage,
+            saveEncrypted: filesStorageProprieties.saveFileEncrypted()
+        )
+    }
+    
     func setupObservers() {
         $inputText
             .removeDuplicates()
@@ -1061,17 +1059,22 @@ private extension ChatViewModel {
             .sink { [weak self] data in
                 guard let self = self else { return }
                 
-                self.updateFileFields(
-                    &self.messages,
+                let fileProprieties = FileUpdateProperties(
                     id: data.id,
                     newId: data.newId,
                     fileNonce: data.fileNonce,
                     preview: data.preview,
-                    needToUpdatePreview: data.needUpdatePreview,
                     cached: data.cached,
-                    isUploading: data.uploading,
                     downloadStatus: data.downloadStatus,
-                    progress: data.progress
+                    uploading: data.uploading,
+                    progress: data.progress,
+                    isPreviewDownloadAllowed: nil,
+                    isFullMediaDownloadAllowed: nil
+                )
+                
+                self.updateFileFields(
+                    &self.messages,
+                    fileProprieties: fileProprieties
                 )
             }
             .store(in: &subscriptions)
@@ -1092,7 +1095,7 @@ private extension ChatViewModel {
         }.stored(in: tasksStorage)
         
         dropInteractionService.onPreparedDataCallback = { [weak self] result in
-            DispatchQueue.onMainAsync {
+            Task { @MainActor in
                 self?.dropSessionUpdated(false)
                 self?.presentDialog(progress: false)
                 self?.processFileResult(result)
@@ -1100,7 +1103,7 @@ private extension ChatViewModel {
         }
         
         dropInteractionService.onPreparingDataCallback = { [weak self] in
-            DispatchQueue.onMainAsync {
+            Task { @MainActor in
                 self?.presentDialog(progress: true)
             }
         }
@@ -1110,27 +1113,27 @@ private extension ChatViewModel {
         }
         
         mediaPickerDelegate.onPreparedDataCallback = { [weak self] result in
-            DispatchQueue.onMainAsync {
+            Task { @MainActor in
                 self?.presentDialog(progress: false)
                 self?.processFileResult(result)
             }
         }
         
         mediaPickerDelegate.onPreparingDataCallback = { [weak self] in
-            DispatchQueue.onMainAsync {
+            Task { @MainActor in
                 self?.presentDialog(progress: true)
             }
         }
         
         documentPickerDelegate.onPreparedDataCallback = { [weak self] result in
-            DispatchQueue.onMainAsync {
+            Task { @MainActor in
                 self?.presentDialog(progress: false)
                 self?.processFileResult(result)
             }
         }
         
         documentPickerDelegate.onPreparingDataCallback = { [weak self] in
-            DispatchQueue.onMainAsync {
+            Task { @MainActor in
                 self?.presentDialog(progress: true)
             }
         }
@@ -1241,17 +1244,20 @@ private extension ChatViewModel {
             havePartnerName: havePartnerName
         )
         
-        messages[index].updateFields(
+        let fileProprieties = FileUpdateProperties(
             id: file.file.id,
-            preview: previewImage,
-            needToUpdatePeview: true,
+            newId: nil,
+            fileNonce: nil,
+            preview: .some(previewImage),
             cached: cached,
-            isUploading: isUploading,
             downloadStatus: downloadStatus,
+            uploading: isUploading,
             progress: progress,
             isPreviewDownloadAllowed: isPreviewDownloadAllowed,
             isFullMediaDownloadAllowed: isFullMediaDownloadAllowed
         )
+        
+        updateFileMessageFields(for: &messages[index], fileProprieties: fileProprieties)
     }
     
     func setupNewMessages(
@@ -1453,18 +1459,10 @@ private extension ChatViewModel {
     
     func updateFileFields(
         _ messages: inout [ChatMessage],
-        id oldId: String,
-        newId: String? = nil,
-        fileNonce: String? = nil,
-        preview: UIImage?,
-        needToUpdatePreview: Bool,
-        cached: Bool? = nil,
-        isUploading: Bool? = nil,
-        downloadStatus: DownloadStatus? = nil,
-        progress: Int? = nil
+        fileProprieties: FileUpdateProperties
     ) {
         let indexes = messages.indices.filter {
-            messages[$0].getFiles().contains { $0.file.id == oldId }
+            messages[$0].getFiles().contains { $0.file.id == fileProprieties.id }
         }
         
         guard !indexes.isEmpty else {
@@ -1472,18 +1470,56 @@ private extension ChatViewModel {
         }
         
         indexes.forEach { index in
-            messages[index].updateFields(
-                id: oldId,
-                newId: newId,
-                fileNonce: fileNonce,
-                preview: preview,
-                needToUpdatePeview: needToUpdatePreview,
-                cached: cached,
-                isUploading: isUploading,
-                downloadStatus: downloadStatus,
-                progress: progress
-            )
+            updateFileMessageFields(for: &messages[index], fileProprieties: fileProprieties)
         }
+    }
+    
+    func updateFileMessageFields(
+        for message: inout ChatMessage,
+        fileProprieties: FileUpdateProperties
+    ) {
+        message.updateFileFields(
+            id: fileProprieties.id
+        ) { file in
+            fileProprieties.newId.map { file.file.id = $0 }
+            fileProprieties.fileNonce.map { file.file.nonce = $0 }
+            fileProprieties.preview.map { file.previewImage = $0 }
+            fileProprieties.cached.map { file.isCached = $0 }
+            fileProprieties.uploading.map { file.isUploading = $0 }
+            fileProprieties.downloadStatus.map { file.downloadStatus = $0 }
+            fileProprieties.progress.map { file.progress = $0 }
+            fileProprieties.isPreviewDownloadAllowed.map { file.isPreviewDownloadAllowed = $0 }
+            fileProprieties.isFullMediaDownloadAllowed.map { file.isFullMediaDownloadAllowed = $0 }
+        } mutateModel: { model in
+            model.status = getStatus(from: model)
+        }
+    }
+    
+    func getStatus(from model: ChatMediaContainerView.Model) -> FileMessageStatus {
+        if model.txStatus == .failed {
+            return .failed
+        }
+        
+        if model.content.fileModel.files.first(where: { $0.isBusy }) != nil {
+            return .busy
+        }
+        
+        if model.content.fileModel.files.contains(where: {
+            !$0.isCached ||
+            ($0.isCached
+             && $0.file.preview != nil
+             && $0.previewImage == nil
+             && ($0.fileType == .image || $0.fileType == .video))
+        }) {
+            let failed = model.content.fileModel.files.contains(where: {
+                guard let progress = $0.progress else { return false }
+                return progress < 100
+            })
+            
+            return .needToDownload(failed: failed)
+        }
+        
+        return .success
     }
     
     func isNewReaction(old: [ChatTransaction], new: [ChatTransaction]) -> Bool {
@@ -1501,7 +1537,8 @@ private extension ChatViewModel {
         let files: [FileResult] = chatFiles.compactMap { file in
             guard file.isCached,
                   !file.isBusy,
-                  let fileDTO = try? filesStorage.getFile(with: file.file.id) else {
+                  let fileDTO = try? filesStorage.getFile(with: file.file.id).get()
+            else {
                 return nil
             }
             
@@ -1588,88 +1625,28 @@ private extension ChatMessage {
         return model.value.content.fileModel.files
     }
     
-    mutating func updateFields(
-        id oldId: String,
-        newId: String? = nil,
-        fileNonce: String? = nil,
-        preview: UIImage?,
-        needToUpdatePeview: Bool,
-        cached: Bool? = nil,
-        isUploading: Bool? = nil,
-        downloadStatus: DownloadStatus? = nil,
-        progress: Int? = nil,
-        isPreviewDownloadAllowed: Bool? = nil,
-        isFullMediaDownloadAllowed: Bool? = nil
+    mutating func updateFileFields(
+        id: String,
+        mutateFile: (inout ChatFile) -> Void,
+        mutateModel: (inout ChatMediaContainerView.Model) -> Void
     ) {
         guard case let .file(fileModel) = content else { return }
         var model = fileModel.value
         
         guard let index = model.content.fileModel.files.firstIndex(
-            where: { $0.file.id == oldId }
+            where: { $0.file.id == id }
         ) else { return }
         
-        if let newId = newId {
-            model.content.fileModel.files[index].file.id = newId
-        }
-        if let fileNonce = fileNonce {
-            model.content.fileModel.files[index].file.nonce = fileNonce
-        }
-        if let value = cached {
-            model.content.fileModel.files[index].isCached = value
-        }
-        if let value = isUploading {
-            model.content.fileModel.files[index].isUploading = value
-        }
-        if let value = downloadStatus {
-            model.content.fileModel.files[index].downloadStatus = value
-        }
-        if needToUpdatePeview {
-            model.content.fileModel.files[index].previewImage = preview
-        }
-        if let progress = progress {
-            model.content.fileModel.files[index].progress = progress
-        }
-        if let value = isPreviewDownloadAllowed {
-            model.content.fileModel.files[index].isPreviewDownloadAllowed = value
-        }
-        if let value = isFullMediaDownloadAllowed {
-            model.content.fileModel.files[index].isFullMediaDownloadAllowed = value
-        }
+        let previousValue = model
         
-        model.status = getStatus(from: model)
+        mutateFile(&model.content.fileModel.files[index])
+        mutateModel(&model)
         
-        guard model != fileModel.value else {
+        guard model != previousValue else {
             return
         }
         
         content = .file(.init(value: model))
-    }
-    
-    func getStatus(from model: ChatMediaContainerView.Model) -> FileMessageStatus {
-        if model.txStatus == .failed {
-            return .failed
-        }
-        
-        if model.content.fileModel.files.first(where: { $0.isBusy }) != nil {
-            return .busy
-        }
-        
-        if model.content.fileModel.files.contains(where: {
-            !$0.isCached ||
-            ($0.isCached
-             && $0.file.preview != nil
-             && $0.previewImage == nil
-             && ($0.fileType == .image || $0.fileType == .video))
-        }) {
-            let failed = model.content.fileModel.files.contains(where: {
-                guard let progress = $0.progress else { return false }
-                return progress < 100
-            })
-            
-            return .needToDownload(failed: failed)
-        }
-        
-        return .success
     }
 }
 

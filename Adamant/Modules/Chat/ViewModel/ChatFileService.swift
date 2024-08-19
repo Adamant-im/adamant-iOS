@@ -6,7 +6,6 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import Foundation
 import CommonKit
 import UIKit
 import Combine
@@ -63,17 +62,7 @@ final class ChatFileService: ChatFileProtocol {
         $fileProgressValue.wrappedValue
     }
     
-    let updateFileFields = ObservableSender<(
-        id: String,
-        newId: String?,
-        fileNonce: String?,
-        preview: UIImage?,
-        needUpdatePreview: Bool,
-        cached: Bool?,
-        downloadStatus: DownloadStatus?,
-        uploading: Bool?,
-        progress: Int?
-    )>()
+    let updateFileFields = ObservableSender<FileUpdateProperties>()
     
     init(
         accountService: AccountService,
@@ -330,7 +319,7 @@ private extension ChatFileService {
     ) {
         guard let id = file.file.preview?.id,
               let nonce = file.file.preview?.nonce,
-              let fileDTO = try? filesStorage.getFile(with: id),
+              let fileDTO = try? filesStorage.getFile(with: id).get(),
               fileDTO.isPreview,
               filesStorage.isCachedLocally(id),
               !filesStorage.isCachedInMemory(id),
@@ -344,17 +333,18 @@ private extension ChatFileService {
             return
         }
         
-        updateFileFields.send((
+        updateFileFields.send(.init(
             id: file.file.id,
             newId: nil,
             fileNonce: nil,
-            preview: image,
-            needUpdatePreview: true,
+            preview: .some(image),
             cached: nil,
             downloadStatus: nil,
             uploading: nil,
-            progress: nil
-        ))
+            progress: nil,
+            isPreviewDownloadAllowed: nil,
+            isFullMediaDownloadAllowed: nil)
+        )
     }
     
     func cacheFileToMemory(
@@ -475,16 +465,17 @@ private extension ChatFileService {
                 
                 let preview = filesStorage.getPreview(for: previewDTO.id)
                 
-                updateFileFields.send((
+                updateFileFields.send(.init(
                     id: file.file.id,
                     newId: nil,
                     fileNonce: nil,
-                    preview: preview,
-                    needUpdatePreview: true,
+                    preview: .some(preview),
                     cached: nil,
                     downloadStatus: nil,
                     uploading: nil,
-                    progress: nil
+                    progress: nil,
+                    isPreviewDownloadAllowed: nil,
+                    isFullMediaDownloadAllowed: nil
                 ))
             } else if !filesStorage.isCachedInMemory(previewDTO.id) {
                 cacheFileToMemoryIfNeeded(file: file, chatroom: chatroom)
@@ -516,17 +507,18 @@ private extension ChatFileService {
             
             let cached = filesStorage.isCachedLocally(file.file.id)
             
-            updateFileFields.send((
+            updateFileFields.send(.init(
                 id: file.file.id,
                 newId: nil,
                 fileNonce: nil,
                 preview: nil,
-                needUpdatePreview: false,
                 cached: cached,
                 downloadStatus: nil,
                 uploading: nil,
-                progress: nil
-            ))
+                progress: nil,
+                isPreviewDownloadAllowed: nil,
+                isFullMediaDownloadAllowed: nil)
+            )
         }
     }
     
@@ -658,7 +650,7 @@ private extension ChatFileService {
             id,
             type: storage,
             downloadProgress: downloadProgress
-        )
+        ).get()
         
         guard let decodedData = adamantCore.decodeData(
             encodedData,
@@ -681,16 +673,17 @@ private extension ChatFileService {
         progress: Int? = nil
     ) {
         files.forEach { id in
-            updateFileFields.send((
+            updateFileFields.send(.init(
                 id: id,
                 newId: nil,
                 fileNonce: nil,
                 preview: nil,
-                needUpdatePreview: false,
                 cached: nil,
                 downloadStatus: downloadStatus,
                 uploading: uploading,
-                progress: progress
+                progress: progress,
+                isPreviewDownloadAllowed: nil,
+                isFullMediaDownloadAllowed: nil
             ))
             
             if progress != nil {
@@ -704,16 +697,17 @@ private extension ChatFileService {
     func sendProgress(for fileId: String, progress: Int) {
         guard $fileProgressValue.wrappedValue[fileId] != progress else { return }
         
-        updateFileFields.send((
+        updateFileFields.send(.init(
             id: fileId,
             newId: nil,
             fileNonce: nil,
             preview: nil,
-            needUpdatePreview: false,
             cached: nil,
             downloadStatus: nil,
             uploading: nil,
-            progress: progress
+            progress: progress,
+            isPreviewDownloadAllowed: nil,
+            isFullMediaDownloadAllowed: nil
         ))
         
         $fileProgressValue.mutate {
@@ -1027,16 +1021,17 @@ private extension ChatFileService {
         
         $uploadingFilesIDsArray.mutate { $0.removeAll { $0 == oldId } }
         
-        updateFileFields.send((
+        updateFileFields.send(.init(
             id: oldId,
             newId: fileResult.cid,
             fileNonce: fileResult.nonce,
-            preview: filesStorage.getPreview(for: previewResult?.cid ?? .empty),
-            needUpdatePreview: true,
+            preview: .some(filesStorage.getPreview(for: previewResult?.cid ?? .empty)),
             cached: cached,
             downloadStatus: nil,
             uploading: false,
-            progress: nil
+            progress: nil,
+            isPreviewDownloadAllowed: nil,
+            isFullMediaDownloadAllowed: nil
         ))
         
         var previewDTO: RichMessageFile.Preview?
@@ -1173,7 +1168,8 @@ private extension ChatFileService {
             encodedData,
             type: storageProtocol,
             uploadProgress: uploadProgress
-        )
+        ).get()
+        
         return (data, encodedData, nonce, cid)
     }
 }

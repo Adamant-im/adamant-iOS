@@ -17,6 +17,7 @@ enum FileManagerError: Error {
     case cantUploadFile
     case cantEncryptFile
     case cantDecryptFile
+    case apiError(error: ApiServiceError)
 }
 
 extension FileManagerError: LocalizedError {
@@ -30,6 +31,8 @@ extension FileManagerError: LocalizedError {
             return .localized("FileManagerError.CantEncryptFile")
         case .cantDecryptFile:
             return .localized("FileManagerError.CantDecryptFile")
+        case let .apiError(error: error):
+            return error.localizedDescription
         }
     }
 }

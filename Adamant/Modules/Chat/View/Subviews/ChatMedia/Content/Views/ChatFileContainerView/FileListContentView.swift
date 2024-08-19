@@ -56,6 +56,10 @@ final class FileListContentView: UIView {
         stack.axis = .horizontal
         stack.spacing = stackSpacing
         
+        let progressBar = CircularProgressView { [weak self] in
+            guard let self = self else { return .init(progress: .zero, hidden: true) }
+            return self.progressState
+        }
         let controller = UIHostingController(rootView: progressBar)
         controller.view.backgroundColor = .clear
         
@@ -70,7 +74,6 @@ final class FileListContentView: UIView {
         return btn
     }()
     
-    private lazy var progressBar = CircularProgressView(state: progressState)
     private lazy var progressState: CircularProgressState = {
         .init(
             lineWidth: 2.0,
