@@ -84,7 +84,7 @@ private extension NotificationsView {
                 }
             })
         } header: {
-            Text(soundHeader)
+            Text(messagesHeader)
         }
     }
     
@@ -109,17 +109,17 @@ private extension NotificationsView {
     func inAppNotificationsSection() -> some View {
         Section {
             Toggle(isOn: $viewModel.inAppSounds) {
-                Text("Sounds")
+                Text(soundsTitle)
             }
             .tint(.init(uiColor: .adamant.active))
             
             Toggle(isOn: $viewModel.inAppVibrate) {
-                Text("Vibrate")
+                Text(vibrateTitle)
             }
             .tint(.init(uiColor: .adamant.active))
             
             Toggle(isOn: $viewModel.inAppToasts) {
-                Text("Toasts")
+                Text(toastsTitle)
             }
             .tint(.init(uiColor: .adamant.active))
         } header: {
@@ -167,10 +167,9 @@ private extension NotificationsView {
     }
 }
 
-
 private let toolbarSpace: CGFloat = 150
 
-private var soundHeader: String {
+private var messagesHeader: String {
     .localized("SecurityPage.Section.Messages")
 }
 
@@ -191,9 +190,21 @@ private var visitGithub: String {
 }
 
 private var reactionsHeader: String {
-    "Reactions"
+    .localized("Notifications.Reactions.Header")
 }
 
 private var inAppNotifications: String {
-    "In-app notifications"
+    .localized("Notifications.InAppNotifications.Header")
+}
+
+private var soundsTitle: String {
+    .localized("Notifications.Sounds.Name")
+}
+
+private var vibrateTitle: String {
+    .localized("Notifications.Vibrate.Title")
+}
+
+private var toastsTitle: String {
+    .localized("Notifications.Toasts.Title")
 }

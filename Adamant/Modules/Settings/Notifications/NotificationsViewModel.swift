@@ -143,7 +143,10 @@ final class NotificationsViewModel: ObservableObject {
     }
     
     func parseMarkdown(_ text: String) -> NSAttributedString? {
-        let parser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize), color: UIColor.adamant.textColor)
+        let parser = MarkdownParser(
+            font: UIFont.systemFont(ofSize: UIFont.systemFontSize),
+            color: UIColor.adamant.textColor
+        )
         parser.link.color = UIColor.adamant.secondary
         return parser.parse(text)
     }
@@ -168,6 +171,10 @@ private extension NotificationsViewModel {
     }
     
     func makeCancelAction() -> UIAlertAction {
-        .init(title: .adamant.alert.cancel, style: .cancel, handler: nil)
+        .init(
+            title: .adamant.alert.cancel,
+            style: .cancel,
+            handler: nil
+        )
     }
 }

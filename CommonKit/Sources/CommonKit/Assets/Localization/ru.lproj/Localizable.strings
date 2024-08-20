@@ -760,6 +760,18 @@
 /* Notifications: Select Sounds */
 "Notifications.Sounds.Name" = "Звуки";
 
+/* Notifications: Vibrate title */
+"Notifications.Vibrate.Title" = "Вибрация";
+
+/* Notifications: Toasts title */
+"Notifications.Toasts.Title" = "Превью";
+
+/* Notifications: Reactions header */
+"Notifications.Reactions.Header" = "Реакции";
+
+/* Notifications: In-App notifications header */
+"Notifications.InAppNotifications.Header" = "В приложении";
+
 /* Notifications: Select Alert Tones */
 "Notifications.Alert.Tones" = "ЗВУКИ УВЕДОМЛЕНИЙ";
 
