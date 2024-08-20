@@ -63,14 +63,6 @@ class NotificationService: UNNotificationServiceExtension {
         let core = NativeAdamantCore()
         let api = ExtensionsApi(keychainStore: securedStore)
         
-        if let sound: String = securedStore.get(StoreKey.notificationsService.notificationsSound) {
-            if sound.isEmpty {
-                bestAttemptContent.sound = nil
-            } else {
-                bestAttemptContent.sound = UNNotificationSound(named: UNNotificationSoundName(sound))
-            }
-        }
-        
         // No passphrase - no point of trying to get and decode
         guard
             let passphrase: String = securedStore.get(passphraseStoreKey),
@@ -115,6 +107,8 @@ class NotificationService: UNNotificationServiceExtension {
         }
         
         var shouldIgnoreNotification = false
+        
+        var isReaction = false
         
         // MARK: 5. Content
         switch transaction.type {
@@ -238,6 +232,8 @@ class NotificationService: UNNotificationServiceExtension {
                         attachments: nil,
                         categoryIdentifier: AdamantNotificationCategories.message
                     )
+                    
+                    isReaction = true
                 }
                 
                 guard let content = content else {
@@ -268,6 +264,11 @@ class NotificationService: UNNotificationServiceExtension {
             return
         }
         
+        bestAttemptContent.sound = getSound(
+            securedStore: securedStore,
+            isReaction: isReaction
+        )
+        
         // MARK: 6. Other configurations
         bestAttemptContent.threadIdentifier = partnerAddress
         
@@ -286,6 +287,22 @@ class NotificationService: UNNotificationServiceExtension {
         if let contentHandler = contentHandler, let bestAttemptContent =  bestAttemptContent {
             contentHandler(bestAttemptContent)
         }
+    }
+    
+    private func getSound(securedStore: KeychainStore, isReaction: Bool) -> UNNotificationSound? {
+        guard isReaction else {
+            let sound: String = securedStore.get(StoreKey.notificationsService.notificationsSound) ?? .empty
+            
+            return !sound.isEmpty
+            ? UNNotificationSound(named: UNNotificationSoundName(sound))
+            : nil
+        }
+    
+        let sound: String = securedStore.get(StoreKey.notificationsService.notificationsReactionSound) ?? .empty
+        
+        return !sound.isEmpty
+        ? UNNotificationSound(named: UNNotificationSoundName(sound))
+        : nil
     }
     
     private func handleAdamantTransfer(

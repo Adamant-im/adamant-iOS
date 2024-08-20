@@ -760,6 +760,9 @@
 /* Notifications: Select Sounds */
 "Notifications.Sounds.Name" = "Звуки";
 
+/* Notifications: Select Alert Tones */
+"Notifications.Alert.Tones" = "ЗВУКИ УВЕДОМЛЕНИЙ";
+
 /* Notifications: Select Alert Save */
 "Notifications.Alert.Save" = "Сохранить";
 

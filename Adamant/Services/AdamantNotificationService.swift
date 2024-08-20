@@ -26,6 +26,20 @@ extension NotificationsMode {
     }
 }
 
+enum NotificationTarget: CaseIterable {
+    case baseMessage
+    case reaction
+    
+    var storeId: String {
+        switch self {
+        case .baseMessage:
+            return StoreKey.notificationsService.notificationsSound
+        case .reaction:
+            return StoreKey.notificationsService.notificationsReactionSound
+        }
+    }
+}
+
 @MainActor
 final class AdamantNotificationsService: NotificationsService {
     // MARK: Dependencies
@@ -33,9 +47,13 @@ final class AdamantNotificationsService: NotificationsService {
     weak var accountService: AccountService?
     
     // MARK: Properties
+    private let defaultNotificationsSound: NotificationSound = .inputDefault
+    private let defaultNotificationsReactionSound: NotificationSound = .none
+    
     private(set) var notificationsMode: NotificationsMode = .disabled
     private(set) var customBadgeNumber = 0
     private(set) var notificationsSound: NotificationSound = .inputDefault
+    private(set) var notificationsReactionSound: NotificationSound = .none
     private var isBackgroundSession = false
     private var backgroundNotifications = 0
     private var subscriptions = Set<AnyCancellable>()
@@ -79,11 +97,11 @@ final class AdamantNotificationsService: NotificationsService {
             setNotificationsMode(.disabled, completion: nil)
         }
         
-        if let raw: String = securedStore.get(StoreKey.notificationsService.notificationsSound),
-            let sound = NotificationSound(fileName: raw) {
-            setNotificationSound(sound)
-        } else {
-            setNotificationsMode(.disabled, completion: nil)
+        NotificationTarget.allCases.forEach { target in
+            if let raw: String = securedStore.get(target.storeId),
+                let sound = NotificationSound(fileName: raw) {
+                setNotificationSound(sound, for: target)
+            }
         }
         
         preservedBadgeNumber = nil
@@ -91,7 +109,8 @@ final class AdamantNotificationsService: NotificationsService {
     
     private func onUserLoggedOut() {
         setNotificationsMode(.disabled, completion: nil)
-        setNotificationSound(.inputDefault)
+        setNotificationSound(defaultNotificationsSound, for: .baseMessage)
+        setNotificationSound(defaultNotificationsReactionSound, for: .reaction)
         securedStore.remove(StoreKey.notificationsService.notificationsMode)
         securedStore.remove(StoreKey.notificationsService.notificationsSound)
         preservedBadgeNumber = nil
@@ -109,12 +128,27 @@ final class AdamantNotificationsService: NotificationsService {
 
 // MARK: - Notifications Sound {
 extension AdamantNotificationsService {
-    func setNotificationSound(_ sound: NotificationSound) {
-        notificationsSound = sound
-        securedStore.set(sound.fileName, for: StoreKey.notificationsService.notificationsSound)
-        NotificationCenter.default.post(name: Notification.Name.AdamantNotificationService.notificationsSoundChanged,
-                                        object: self,
-                                        userInfo: nil)
+    func setNotificationSound(
+        _ sound: NotificationSound,
+        for target: NotificationTarget
+    ) {
+        switch target {
+        case .baseMessage:
+            notificationsSound = sound
+        case .reaction:
+            notificationsReactionSound = sound
+        }
+        
+        securedStore.set(
+            sound.fileName,
+            for: target.storeId
+        )
+        
+        NotificationCenter.default.post(
+            name: .AdamantNotificationService.notificationsSoundChanged,
+            object: self,
+            userInfo: nil
+        )
     }
 }
 

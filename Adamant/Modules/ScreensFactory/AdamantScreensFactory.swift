@@ -27,6 +27,7 @@ struct AdamantScreensFactory: ScreensFactory {
     private let partnerQRFactory: PartnerQRFactory
     private let coinsNodesListFactory: CoinsNodesListFactory
     private let chatSelectTextFactory: ChatSelectTextViewFactory
+    private let notificasionsFactory: NotificationsFactory
     
     init(assembler: Assembler) {
         admWalletFactory = .init(assembler: assembler)
@@ -44,6 +45,7 @@ struct AdamantScreensFactory: ScreensFactory {
         partnerQRFactory = .init(parent: assembler)
         coinsNodesListFactory = .init(parent: assembler)
         chatSelectTextFactory = .init()
+        notificasionsFactory = .init(parent: assembler)
         
         walletFactoryCompose = AdamantWalletFactoryCompose(
             klyWalletFactory: .init(assembler: assembler),
@@ -157,7 +159,7 @@ struct AdamantScreensFactory: ScreensFactory {
     }
     
     func makeNotifications() -> UIViewController {
-        settingsFactory.makeNotificationsVC()
+        notificasionsFactory.makeViewController()
     }
     
     func makeVisibleWallets() -> UIViewController {

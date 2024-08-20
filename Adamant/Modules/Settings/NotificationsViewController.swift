@@ -127,8 +127,8 @@ final class NotificationsViewController: FormViewController {
         }.onCellSelection { [weak self] _, row in
             guard let self = self else { return }
             row.deselect()
-            let soundsVC = NotificationSoundsViewController()
-            soundsVC.notificationsService = self.notificationsService
+            let soundsVC = NotificationSoundsViewController(notificationsService: notificationsService, target: .baseMessage)
+//            soundsVC.notificationsService = self.notificationsService
             let navigationController = UINavigationController(rootViewController: soundsVC)
             self.present(navigationController, animated: true)
         }
