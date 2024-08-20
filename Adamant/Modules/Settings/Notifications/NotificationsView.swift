@@ -21,7 +21,6 @@ struct NotificationsView: View {
                 inAppNotificationsSection()
                 settingsSection()
                 moreDetailsSection()
-                messageReactionsSection()
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

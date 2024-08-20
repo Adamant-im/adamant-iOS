@@ -60,7 +60,7 @@ final class NotificationSoundsViewController: FormViewController {
         
         section = SelectableSection<ListCheckRow<NotificationSound>>(Sections.alerts.localized, selectionType: .singleSelection(enableDeselection: false))
 
-        let sounds: [NotificationSound] = [.none, .noteDefault, .inputDefault, .proud, .relax, .success]
+        let sounds: [NotificationSound] = [.none, .noteDefault, .inputDefault, .proud, .relax, .success, .note, .antic, .cheers, .chord, .droplet, .handoff, .milestone, .passage, .portal, .rattle, .rebound, .slide, .welcome]
         for sound in sounds {
             section <<< ListCheckRow<NotificationSound> { listRow in
                 listRow.title = sound.localized
