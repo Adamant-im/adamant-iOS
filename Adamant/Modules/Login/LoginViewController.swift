@@ -419,7 +419,7 @@ extension LoginViewController {
     }
     
     func generateNewPassphrase() {
-        let passphrase = adamantCore.generateNewPassphrase()
+        let passphrase = (try? Mnemonic.generate().joined(separator: " ")) ?? .empty
         
         hideNewPassphrase = false
         

@@ -75,15 +75,15 @@ extension KlyWalletService {
     
     static var nodes: [Node] {
         [
-            Node(url: URL(string: "https://klynode1.adamant.im")!, altUrl: URL(string: "http://195.26.255.137:44099")),
-Node(url: URL(string: "https://klynode2.adamant.im")!, altUrl: URL(string: "http://109.176.199.130:44099")),
+            Node.makeDefaultNode(url: URL(string: "https://klynode1.adamant.im")!, altUrl: URL(string: "http://195.26.255.137:44099")),
+Node.makeDefaultNode(url: URL(string: "https://klynode2.adamant.im")!, altUrl: URL(string: "http://109.176.199.130:44099")),
         ]
     }
     
     static var serviceNodes: [Node] {
         [
-            Node(url: URL(string: "https://klyservice1.adamant.im")!),
-Node(url: URL(string: "https://klyservice2.adamant.im")!),
+            Node.makeDefaultNode(url: URL(string: "https://klyservice1.adamant.im")!),
+Node.makeDefaultNode(url: URL(string: "https://klyservice2.adamant.im")!),
         ]
     }
 }

@@ -149,13 +149,3 @@ private extension Node {
         return version.map { "(v\($0))" }
     }
 }
-
-extension Node {
-    static func stringToDouble(_ value: String?) -> Double? {
-        guard let minNodeVersion = value?.replacingOccurrences(of: ".", with: ""),
-              let versionNumber = Double(minNodeVersion)
-        else { return nil }
-        
-        return versionNumber
-    }
-}

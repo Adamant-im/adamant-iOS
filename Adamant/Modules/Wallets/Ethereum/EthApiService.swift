@@ -18,8 +18,12 @@ class EthApiService: WalletApiService {
         get async { await api.service.keystoreManager }
     }
     
-    var preferredNodeIds: [UUID] {
-        api.preferredNodeIds
+    var chosenFastestNodeId: UUID? {
+        api.chosenFastestNodeId
+    }
+    
+    var hasActiveNode: Bool {
+        !api.sortedAllowedNodes.isEmpty
     }
     
     init(api: BlockchainHealthCheckWrapper<EthApiCore>) {

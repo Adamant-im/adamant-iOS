@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreData
+import CommonKit
 
 final class InMemoryCoreDataStack: CoreDataStack {
     let container: NSPersistentContainer

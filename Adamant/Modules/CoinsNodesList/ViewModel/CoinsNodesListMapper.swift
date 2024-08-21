@@ -10,25 +10,13 @@ import CommonKit
 import SwiftUI
 
 struct CoinsNodesListMapper {
-    let processedGroups: Set<NodeGroup>
+    let processedGroups: [NodeGroup]
     
-    func map(items: [NodeWithGroup], restNodeIds: [UUID]) -> [CoinsNodesListState.Section] {
-        var nodesDict = [NodeGroup: [Node]]()
-        
-        items.forEach { item in
-            guard processedGroups.contains(item.group) else { return }
-            
-            if nodesDict[item.group] == nil {
-                nodesDict[item.group] = [item.node]
-            } else {
-                nodesDict[item.group]?.append(item.node)
-            }
-        }
-        
-        return nodesDict.keys.map {
+    func map(items: [NodeGroup: [Node]], restNodeIds: [UUID]) -> [CoinsNodesListState.Section] {
+        processedGroups.map {
             map(
                 group: $0,
-                nodes: nodesDict[$0] ?? .init(),
+                nodes: items[$0] ?? .init(),
                 restNodeIds: restNodeIds
             )
         }.sorted { $0.title < $1.title }
@@ -45,26 +33,29 @@ private extension CoinsNodesListMapper {
             id: group,
             title: group.name,
             rows: nodes.map {
-                map(node: $0, restNodeIds: restNodeIds, includeVersionTitle: group.includeVersionTitle)
+                map(
+                    node: $0,
+                    group: group,
+                    isRest: restNodeIds.contains($0.id),
+                    includeVersionTitle: group.includeVersionTitle
+                )
             }
         )
     }
     
     func map(
         node: Node,
-        restNodeIds: [UUID],
+        group: NodeGroup,
+        isRest: Bool,
         includeVersionTitle: Bool
     ) -> CoinsNodesListState.Section.Row {
-        let indicatorString = node.indicatorString(
-            isRest: restNodeIds.contains(node.id),
-            isWs: false
-        )
-        
+        let indicatorString = node.indicatorString(isRest: isRest, isWs: false)
         var indicatorAttrString = AttributedString(stringLiteral: indicatorString)
         indicatorAttrString.foregroundColor = .init(uiColor: node.indicatorColor)
         
         return .init(
             id: node.id,
+            group: group,
             isEnabled: node.isEnabled,
             title: node.asString(),
             connectionStatus: indicatorAttrString,

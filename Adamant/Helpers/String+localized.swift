@@ -10,12 +10,6 @@ import Foundation
 import CommonKit
 
 extension String.adamant {
-    enum shared {
-        static var productName: String {
-            String.localized("ADAMANT", comment: "Product name")
-        }
-    }
-    
     enum alert {
         // MARK: Buttons
         static var cancel: String {
@@ -72,70 +66,6 @@ extension String.adamant {
         }
         static var emailErrorMessageBodyWithDescription: String {
             String.localized("Error.Mail.Body.Detailed", comment: "Error messge body for support email, with detailed error description. Where first %@ - error's short message, second %@ - detailed description, third %@ - deviceInfo")
-        }
-    }
-    
-    enum sharedErrors {
-        static var userNotLogged: String {
-            String.localized("Error.UserNotLogged", comment: "Shared error: User not logged")
-        }
-        static var networkError: String {
-            String.localized("Error.NoNetwork", comment: "Shared error: Network problems. In most cases - no connection")
-        }
-        static var requestCancelled: String {
-            String.localized("Error.RequestCancelled", comment: "Shared error: Request cancelled")
-        }
-        static func commonError(_ text: String) -> String {
-            String.localizedStringWithFormat(
-                .localized(
-                    "Error.BaseErrorFormat",
-                    comment: "Shared error: Base format, %@"
-                ),
-                text
-            )
-        }
-        
-        static func accountNotFound(_ account: String) -> String {
-            String.localizedStringWithFormat(.localized("Error.AccountNotFoundFormat", comment: "Shared error: Account not found error. Using %@ for address."), account)
-        }
-        
-        static var accountNotInitiated: String {
-            String.localized("Error.AccountNotInitiated", comment: "Shared error: Account not initiated")
-        }
-        
-        static var unknownError: String {
-            String.localized("Error.UnknownError", comment: "Shared unknown error")
-        }
-        static func admNodeErrorMessage(_ coin: String) -> String {
-            String.localizedStringWithFormat(.localized("ApiService.InternalError.NoAdmNodesAvailable", comment: "No active ADM nodes to fetch the partner's %@ address"), coin)
-        }
-        
-        static var notEnoughMoney: String {
-            String.localized("WalletServices.SharedErrors.notEnoughMoney", comment: "Wallet Services: Shared error, user do not have enought money.")
-        }
-        
-        static var dustError: String {
-            String.localized("TransferScene.Dust.Error", comment: "Tranfser: Dust error.")
-        }
-        
-        static var transactionUnavailable: String {
-            String.localized("WalletServices.SharedErrors.transactionUnavailable", comment: "Wallet Services: Transaction unavailable")
-        }
-        
-        static var inconsistentTransaction: String {
-            String.localized("WalletServices.SharedErrors.inconsistentTransaction", comment: "Wallet Services: Cannot verify transaction")
-        }
-        
-        static var walletFrezzed: String {
-            String.localized("WalletServices.SharedErrors.walletFrezzed", comment: "Wallet Services: Wait until other transactions approved")
-        }
-        
-        static func internalError(message: String) -> String {
-            String.localizedStringWithFormat(.localized("Error.InternalErrorFormat", comment: "Shared error: Internal error format, %@ for message"), message)
-        }
-        
-        static func remoteServerError(message: String) -> String {
-            String.localizedStringWithFormat(.localized("Error.RemoteServerErrorFormat", comment: "Shared error: Remote error format, %@ for message"), message)
         }
     }
     

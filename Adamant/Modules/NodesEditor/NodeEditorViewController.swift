@@ -243,7 +243,7 @@ extension NodeEditorViewController {
         
         let result: NodeEditorResult
         if let node = node {
-            nodesStorage.updateNode(id: node.id) { node in
+            nodesStorage.updateNode(id: node.id, group: .adm) { node in
                 node.mainOrigin.scheme = scheme
                 node.mainOrigin.host = host
                 node.mainOrigin.port = port
@@ -265,7 +265,8 @@ extension NodeEditorViewController {
                 height: nil,
                 ping: nil,
                 connectionStatus: nil,
-                preferMainOrigin: nil
+                preferMainOrigin: nil,
+                type: .custom
             ))
         }
         

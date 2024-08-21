@@ -48,7 +48,10 @@ struct ERC20WalletFactory: WalletFactory {
             vibroService: assembler.resolve(VibroService.self)!, 
             walletService: service,
             reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
-            nodesStorage: assembler.resolve(NodesStorageProtocol.self)!
+            nodesStorage: assembler.resolve(NodesStorageProtocol.self)!,
+            isActiveAdmNode: { [admApi = assembler.resolve(ApiService.self)!] in
+                admApi.hasActiveNode
+            }
         )
     }
     

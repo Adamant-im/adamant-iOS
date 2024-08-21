@@ -75,8 +75,8 @@ extension DashWalletService {
     
     static var nodes: [Node] {
         [
-            Node(url: URL(string: "https://dashnode1.adamant.im")!, altUrl: URL(string: "http://45.85.147.224:44099")),
-Node(url: URL(string: "https://dashnode2.adamant.im")!, altUrl: URL(string: "http://207.180.210.95:44099")),
+            Node.makeDefaultNode(url: URL(string: "https://dashnode1.adamant.im")!, altUrl: URL(string: "http://45.85.147.224:44099")),
+Node.makeDefaultNode(url: URL(string: "https://dashnode2.adamant.im")!, altUrl: URL(string: "http://207.180.210.95:44099")),
         ]
     }
     

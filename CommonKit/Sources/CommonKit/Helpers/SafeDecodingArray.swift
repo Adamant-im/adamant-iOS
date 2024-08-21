@@ -13,10 +13,19 @@ public struct SafeDecodingArray<T: Codable> {
     }
 }
 
+extension SafeDecodingArray: Sequence {
+    public typealias Element = T
+    public typealias Iterator = IndexingIterator<Array<Element>>
+    
+    public func makeIterator() -> Iterator {
+        values.makeIterator()
+    }
+}
+
 extension SafeDecodingArray: Encodable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
-        try container.encode(self.values)
+        try container.encode(values)
     }
 }
 

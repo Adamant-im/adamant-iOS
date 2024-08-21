@@ -48,8 +48,12 @@ final class DogeApiCore: BlockchainHealthCheckableService {
 final class DogeApiService: WalletApiService {
     let api: BlockchainHealthCheckWrapper<DogeApiCore>
     
-    var preferredNodeIds: [UUID] {
-        api.preferredNodeIds
+    var chosenFastestNodeId: UUID? {
+        api.chosenFastestNodeId
+    }
+    
+    var hasActiveNode: Bool {
+        !api.sortedAllowedNodes.isEmpty
     }
     
     init(api: BlockchainHealthCheckWrapper<DogeApiCore>) {

@@ -67,8 +67,12 @@ final class BtcApiCore: BlockchainHealthCheckableService {
 final class BtcApiService: WalletApiService {
     let api: BlockchainHealthCheckWrapper<BtcApiCore>
     
-    var preferredNodeIds: [UUID] {
-        api.preferredNodeIds
+    var chosenFastestNodeId: UUID? {
+        api.chosenFastestNodeId
+    }
+    
+    var hasActiveNode: Bool {
+        !api.sortedAllowedNodes.isEmpty
     }
     
     init(api: BlockchainHealthCheckWrapper<BtcApiCore>) {
