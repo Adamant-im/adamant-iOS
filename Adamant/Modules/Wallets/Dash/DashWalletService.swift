@@ -114,6 +114,10 @@ final class DashWalletService: WalletCoreProtocol {
         }
     }
     
+    var hasActiveNode: Bool {
+        apiService.hasActiveNode
+    }
+    
     // MARK: - Notifications
     let walletUpdatedNotification = Notification.Name("adamant.dashWallet.walletUpdated")
     let serviceEnabledChanged = Notification.Name("adamant.dashWallet.enabledChanged")
@@ -396,9 +400,9 @@ extension DashWalletService {
     }
     
     func getBalance(address: String) async throws -> Decimal {
-        let data: Data = try await dashApiService.request { core, node in
+        let data: Data = try await dashApiService.request { core, origin in
             await core.sendRequest(
-                node: node,
+                origin: origin,
                 path: .empty,
                 method: .post,
                 parameters: DashGetAddressBalanceDTO(address: address),

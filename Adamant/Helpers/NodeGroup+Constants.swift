@@ -8,7 +8,7 @@
 import Foundation
 import CommonKit
 
-public extension NodeGroup {
+extension NodeGroup {
     var onScreenUpdateInterval: TimeInterval {
         switch self {
         case .adm:
@@ -104,10 +104,50 @@ public extension NodeGroup {
             minNodeVersion = DashWalletService.minNodeVersion
         }
         
-        guard let versionNumber = Node.stringToDouble(minNodeVersion) else {
+        guard let versionNumber = Node.versionToDouble(minNodeVersion) else {
             return .zero
         }
         
         return versionNumber
+    }
+    
+    var name: String {
+        switch self {
+        case .btc:
+            return BtcWalletService.tokenNetworkSymbol
+        case .eth:
+            return EthWalletService.tokenNetworkSymbol
+        case .klyNode:
+            return KlyWalletService.tokenNetworkSymbol
+        case .klyService:
+            return KlyWalletService.tokenNetworkSymbol
+            + " " + .adamant.coinsNodesList.serviceNode
+        case .doge:
+            return DogeWalletService.tokenNetworkSymbol
+        case .dash:
+            return DashWalletService.tokenNetworkSymbol
+        case .adm:
+            return AdmWalletService.tokenNetworkSymbol
+        }
+    }
+    
+    var includeVersionTitle: Bool {
+        switch self {
+        case .btc, .klyNode, .klyService, .doge, .adm:
+            return true
+        case .eth, .dash:
+            return false
+        }
+    }
+    
+    var blockchainHealthCheckParams: BlockchainHealthCheckParams {
+        .init(
+            group: self,
+            name: name,
+            normalUpdateInterval: normalUpdateInterval,
+            crucialUpdateInterval: crucialUpdateInterval,
+            minNodeVersion: minNodeVersion,
+            nodeHeightEpsilon: nodeHeightEpsilon
+        )
     }
 }

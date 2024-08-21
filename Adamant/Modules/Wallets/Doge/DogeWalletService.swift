@@ -143,6 +143,10 @@ final class DogeWalletService: WalletCoreProtocol {
         $hasMoreOldTransactions.eraseToAnyPublisher()
     }
     
+    var hasActiveNode: Bool {
+        apiService.hasActiveNode
+    }
+    
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUnicID,
         coreDataStack: coreDataStack,
@@ -383,9 +387,9 @@ extension DogeWalletService {
     }
     
     func getBalance(address: String) async throws -> Decimal {
-        let data: Data = try await dogeApiService.request { core, node in
+        let data: Data = try await dogeApiService.request { core, origin in
             await core.sendRequest(
-                node: node,
+                origin: origin,
                 path: DogeApiCommands.balance(for: address)
             )
         }.get()
@@ -525,9 +529,9 @@ extension DogeWalletService {
             "to": to
         ]
         
-        return try await dogeApiService.request { core, node in
+        return try await dogeApiService.request { core, origin in
             await core.sendRequestJsonResponse(
-                node: node,
+                origin: origin,
                 path: DogeApiCommands.getTransactions(for: address),
                 method: .get,
                 parameters: parameters,
@@ -548,9 +552,9 @@ extension DogeWalletService {
         ]
         
         // MARK: Sending request
-        let data = try await dogeApiService.request { core, node in
+        let data = try await dogeApiService.request { core, origin in
             await core.sendRequest(
-                node: node,
+                origin: origin,
                 path: DogeApiCommands.getUnspentTransactions(for: address),
                 method: .get,
                 parameters: parameters,
@@ -597,17 +601,17 @@ extension DogeWalletService {
     }
     
     func getTransaction(by hash: String) async throws -> BTCRawTransaction {
-        try await dogeApiService.request { core, node in
+        try await dogeApiService.request { core, origin in
             await core.sendRequestJsonResponse(
-                node: node,
+                origin: origin,
                 path: DogeApiCommands.getTransaction(by: hash)
             )
         }.get()
     }
     
     func getBlockId(by hash: String) async throws -> String {
-        let data = try await dogeApiService.request { core, node in
-            await core.sendRequest(node: node, path: DogeApiCommands.getBlock(by: hash))
+        let data = try await dogeApiService.request { core, origin in
+            await core.sendRequest(origin: origin, path: DogeApiCommands.getBlock(by: hash))
         }.get()
         
         let json = try? JSONSerialization.jsonObject(

@@ -85,9 +85,9 @@ extension DashWalletService: WalletServiceTwoStepSend {
     func sendTransaction(_ transaction: BitcoinKit.Transaction) async throws {
         let txHex = transaction.serialized().hex
         
-        let response: BTCRPCServerResponce<String> = try await dashApiService.request { core, node in
+        let response: BTCRPCServerResponce<String> = try await dashApiService.request { core, origin in
             await core.sendRequestJsonResponse(
-                node: node,
+                origin: origin,
                 path: .empty,
                 method: .post,
                 parameters: DashSendRawTransactionDTO(txHex: txHex),

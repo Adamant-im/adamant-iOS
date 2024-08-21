@@ -157,6 +157,10 @@ final class EthWalletService: WalletCoreProtocol {
         $hasMoreOldTransactions.eraseToAnyPublisher()
     }
     
+    var hasActiveNode: Bool {
+        apiService.hasActiveNode
+    }
+    
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUnicID,
         coreDataStack: coreDataStack,
@@ -701,9 +705,9 @@ extension EthWalletService {
             "contract_to": "eq."
         ]
         
-        let transactionsFrom: [EthTransactionShort] = try await ethApiService.requestApiCore { core, node in
+        let transactionsFrom: [EthTransactionShort] = try await ethApiService.requestApiCore { core, origin in
             await core.sendRequestJsonResponse(
-                node: node,
+                origin: origin,
                 path: EthWalletService.transactionsListApiSubpath,
                 method: .get,
                 parameters: txFromQueryParameters,
@@ -711,9 +715,9 @@ extension EthWalletService {
             )
         }.get()
         
-        let transactionsTo: [EthTransactionShort] = try await ethApiService.requestApiCore { core, node in
+        let transactionsTo: [EthTransactionShort] = try await ethApiService.requestApiCore { core, origin in
             await core.sendRequestJsonResponse(
-                node: node,
+                origin: origin,
                 path: EthWalletService.transactionsListApiSubpath,
                 method: .get,
                 parameters: txToQueryParameters,

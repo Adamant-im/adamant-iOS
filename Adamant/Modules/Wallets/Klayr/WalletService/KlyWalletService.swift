@@ -32,6 +32,10 @@ final class KlyWalletService: WalletCoreProtocol {
     static let currencyLogo = UIImage.asset(named: "klayr_wallet") ?? .init()
     static let kvsAddress = "kly:address"
     static let defaultFee: BigUInt = 141000
+    
+    var hasActiveNode: Bool {
+        apiService.hasActiveNode
+    }
 
     @Atomic var transactionFeeRaw: BigUInt = BigUInt(integerLiteral: 141000)
 

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CommonKit
 
 extension Notification.Name {
     struct AdamantReachabilityMonitor {
@@ -26,6 +27,7 @@ extension AdamantUserInfoKey {
 }
 
 protocol ReachabilityMonitor {
+    var connectionPublisher: AnyObservable<Bool> { get }
     var connection: Bool { get }
     
     func start()

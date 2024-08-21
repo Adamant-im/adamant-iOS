@@ -166,6 +166,10 @@ final class ERC20WalletService: WalletCoreProtocol {
         $hasMoreOldTransactions.eraseToAnyPublisher()
     }
     
+    var hasActiveNode: Bool {
+        apiService.hasActiveNode
+    }
+    
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUnicID,
         coreDataStack: coreDataStack,
@@ -548,9 +552,9 @@ extension ERC20WalletService {
             "order": "time.desc"
         ]
         
-        var transactions: [EthTransactionShort] = try await erc20ApiService.requestApiCore { core, node in
+        var transactions: [EthTransactionShort] = try await erc20ApiService.requestApiCore { core, origin in
             await core.sendRequestJsonResponse(
-                node: node,
+                origin: origin,
                 path: EthWalletService.transactionsListApiSubpath,
                 method: .get,
                 parameters: txQueryParameters,

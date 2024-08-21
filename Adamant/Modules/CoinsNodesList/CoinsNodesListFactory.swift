@@ -16,14 +16,17 @@ enum CoinsNodesListContext {
 }
 
 struct CoinsNodesListFactory {
-    private let assembler: Assembler
+    private let parent: Assembler
+    private let assemblies = [CoinsNodesListAssembly()]
     
     init(parent: Assembler) {
-        assembler = .init([CoinsNodesListAssembly()], parent: parent)
+        self.parent = parent
     }
     
+    @MainActor
     func makeViewController(context: CoinsNodesListContext) -> UIViewController {
-        let viewModel = assembler.resolve(CoinsNodesListViewModel.self)!
+        let assembler = Assembler(assemblies, parent: parent)
+        let viewModel = { assembler.resolver.resolve(CoinsNodesListViewModel.self)! }
         let view = CoinsNodesListView(viewModel: viewModel)
         
         switch context {
@@ -38,7 +41,7 @@ struct CoinsNodesListFactory {
 private struct CoinsNodesListAssembly: Assembly {
     func assemble(container: Container) {
         container.register(CoinsNodesListViewModel.self) {
-            let processedGroups = Set(NodeGroup.allCases).subtracting([.adm])
+            let processedGroups = NodeGroup.allCases.filter { $0 != .adm }
             
             return .init(
                 mapper: .init(processedGroups: processedGroups),
@@ -57,6 +60,6 @@ private struct CoinsNodesListAssembly: Assembly {
                     adm: $0.resolve(ApiService.self)!
                 )
             )
-        }.inObjectScope(.weak)
+        }.inObjectScope(.transient)
     }
 }

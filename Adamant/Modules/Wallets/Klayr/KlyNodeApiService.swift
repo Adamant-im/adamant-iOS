@@ -8,12 +8,17 @@
 
 import LiskKit
 import Foundation
+import CommonKit
 
 final class KlyNodeApiService: WalletApiService {
     let api: BlockchainHealthCheckWrapper<KlyApiCore>
     
-    var preferredNodeIds: [UUID] {
-        api.preferredNodeIds
+    var chosenFastestNodeId: UUID? {
+        api.chosenFastestNodeId
+    }
+    
+    var hasActiveNode: Bool {
+        !api.sortedAllowedNodes.isEmpty
     }
     
     init(api: BlockchainHealthCheckWrapper<KlyApiCore>) {
@@ -52,8 +57,8 @@ final class KlyNodeApiService: WalletApiService {
     }
     
     func getStatusInfo() async -> WalletServiceResult<NodeStatusInfo> {
-        await api.request { core, node in
-            await core.getStatusInfo(node: node)
+        await api.request { core, origin in
+            await core.getStatusInfo(origin: origin)
         }
     }
 }
@@ -65,16 +70,16 @@ private extension KlyNodeApiService {
             _ completion: @escaping @Sendable (LiskKit.Result<Output>) -> Void
         ) -> Void
     ) async -> WalletServiceResult<Output> {
-        await api.request { core, node in
-            await core.request(node: node, body: body)
+        await api.request { core, origin in
+            await core.request(origin: origin, body: body)
         }
     }
     
     func requestClient<Output>(
         _ body: @Sendable @escaping (APIClient) async throws -> Output
     ) async -> WalletServiceResult<Output> {
-        await api.request { core, node in
-            await core.request(node: node, body)
+        await api.request { core, origin in
+            await core.request(origin: origin, body)
         }
     }
 }
