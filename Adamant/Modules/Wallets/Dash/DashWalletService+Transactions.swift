@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import Alamofire
+import CommonKit
 import BitcoinKit
 
 struct DashTransactionsPointer {

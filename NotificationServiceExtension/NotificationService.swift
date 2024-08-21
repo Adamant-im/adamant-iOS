@@ -61,7 +61,7 @@ class NotificationService: UNNotificationServiceExtension {
         // MARK: 1. Getting services
         let securedStore = KeychainStore()
         let core = NativeAdamantCore()
-        let api = ExtensionsApi(keychainStore: securedStore)
+        let api = ExtensionsApiFactory(core: core, securedStore: securedStore).make()
         
         if let sound: String = securedStore.get(StoreKey.notificationsService.notificationsSound) {
             if sound.isEmpty {

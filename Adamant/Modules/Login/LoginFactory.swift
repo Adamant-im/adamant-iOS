@@ -8,6 +8,7 @@
 
 import UIKit
 import Swinject
+import CommonKit
 
 struct LoginFactory {
     let assembler: Assembler

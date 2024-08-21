@@ -139,7 +139,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                 vc.showAlertView(
                     title: nil,
                     message: ApiServiceError.noEndpointsAvailable(
-                        coin: service.core.tokenName
+                        nodeGroupName: service.core.tokenName
                     ).errorDescription ?? .adamant.sharedErrors.unknownError,
                     animated: true
                 )
