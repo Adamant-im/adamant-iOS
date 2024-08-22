@@ -747,9 +747,7 @@ final class ChatViewModel: NSObject {
         guard !file.isCached,
               !filesStorage.isCachedLocally(file.file.id)
         else {
-            Task {
-                self.presentFileInFullScreen(id: file.file.id, chatFiles: chatFiles)
-            }
+            self.presentFileInFullScreen(id: file.file.id, chatFiles: chatFiles)
             return
         }
         
