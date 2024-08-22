@@ -21,6 +21,17 @@ extension String: Localizable {
 public extension String {
     enum adamant {}
     
+    static func locale() -> Locale {
+        guard let languageRaw = UserDefaults.standard.string(forKey: StoreKey.language.language),
+              !languageRaw.isEmpty,
+              languageRaw != Language.auto.rawValue
+        else {
+            return .current
+        }
+        
+        return Locale(identifier: languageRaw)
+    }
+    
     static func localized(_ key: String, comment: String = .empty) -> String {
         guard let languageRaw = UserDefaults.standard.string(forKey: StoreKey.language.language),
               !languageRaw.isEmpty,

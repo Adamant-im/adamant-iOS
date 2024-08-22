@@ -9,12 +9,21 @@
 import Swinject
 import BitcoinKit
 import CommonKit
+import FilesStorageKit
+import FilesPickerKit
 
 struct AppAssembly: Assembly {
     func assemble(container: Container) {
         // MARK: - Standalone services
         // MARK: AdamantCore
         container.register(AdamantCore.self) { _ in NativeAdamantCore() }.inObjectScope(.container)
+        
+        // MARK: FilesStorageProtocol
+        container.register(FilesStorageProtocol.self) { _ in FilesStorageKit() }.inObjectScope(.container)
+        
+        container.register(FilesPickerProtocol.self) { r in
+            FilesPickerKit(storageKit: r.resolve(FilesStorageProtocol.self)!)
+        }
         
         // MARK: CellFactory
         container.register(CellFactory.self) { _ in AdamantCellFactory() }.inObjectScope(.container)
@@ -124,6 +133,23 @@ struct AppAssembly: Assembly {
                 ),
                 adamantCore: r.resolve(AdamantCore.self)!
             )
+        }.inObjectScope(.container)
+        
+        // MARK: IPFSApiService
+        container.register(IPFSApiService.self) { r in
+            IPFSApiService(healthCheckWrapper: .init(
+                service: .init(apiCore: r.resolve(APICoreProtocol.self)!),
+                nodesStorage: r.resolve(NodesStorageProtocol.self)!,
+                nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
+                isActive: true,
+                params: NodeGroup.ipfs.blockchainHealthCheckParams,
+                connection: r.resolve(ReachabilityMonitor.self)!.connectionPublisher
+            ))
+        }.inObjectScope(.container)
+        
+        // MARK: FilesNetworkManagerProtocol
+        container.register(FilesNetworkManagerProtocol.self) { r in
+            FilesNetworkManager(ipfsService: r.resolve(IPFSApiService.self)!)
         }.inObjectScope(.container)
         
         // MARK: BtcApiService
@@ -282,6 +308,24 @@ struct AppAssembly: Assembly {
             )
         }.inObjectScope(.container)
         
+        // MARK: ChatFileService
+        container.register(ChatFileProtocol.self) { r in
+            ChatFileService(
+                accountService: r.resolve(AccountService.self)!,
+                filesStorage: r.resolve(FilesStorageProtocol.self)!,
+                chatsProvider: r.resolve(ChatsProvider.self)!,
+                filesNetworkManager: r.resolve(FilesNetworkManagerProtocol.self)!,
+                adamantCore: r.resolve(AdamantCore.self)!
+            )
+        }.inObjectScope(.container)
+        
+        // MARK: FilesStorageProprietiesService
+        container.register(FilesStorageProprietiesProtocol.self) { r in
+            FilesStorageProprietiesService(
+                securedStore: r.resolve(SecuredStore.self)!
+            )
+        }.inObjectScope(.container)
+        
         // MARK: Chats
         container.register(ChatsProvider.self) { r in
             AdamantChatsProvider(
@@ -374,6 +418,20 @@ struct AppAssembly: Assembly {
                 }
             }
         }
+        
+        // MARK: Wallet Service Compose
+        container.register(WalletApiServiceComposeProtocol.self) {
+            WalletApiServiceCompose(
+                btc: $0.resolve(BtcApiService.self)!,
+                eth: $0.resolve(EthApiService.self)!,
+                klyNode: $0.resolve(KlyNodeApiService.self)!,
+                klyService: $0.resolve(KlyServiceApiService.self)!,
+                doge: $0.resolve(DogeApiService.self)!,
+                dash: $0.resolve(DashApiService.self)!,
+                adm: $0.resolve(ApiService.self)!,
+                ipfs: $0.resolve(IPFSApiService.self)!
+            )
+        }.inObjectScope(.transient)
         
         // MARK: NodesMergingService
         container.register(NodesMergingService.self) { r in

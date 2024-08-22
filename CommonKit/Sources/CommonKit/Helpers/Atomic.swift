@@ -2,7 +2,7 @@
 //  Atomic.swift
 //  
 //
-//  Created by Andrey Golubenko on 21.08.2023.
+//  Created by Andrew on 21.08.2023.
 //
 
 import Foundation

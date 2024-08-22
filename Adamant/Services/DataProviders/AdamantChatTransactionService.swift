@@ -178,6 +178,15 @@ actor AdamantChatTransactionService: ChatTransactionService {
                         break
                     }
                     
+                    if let trs = fileTransaction(
+                        decodedMessage,
+                        transaction: transaction,
+                        context: context
+                    ) {
+                        messageTransaction = trs
+                        break
+                    }
+                    
                     let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
                     trs.message = decodedMessage
                     messageTransaction = trs
@@ -272,7 +281,9 @@ private extension AdamantChatTransactionService {
               let richContent = RichMessageTools.richContent(from: data),
               let type = richContent[RichContentKeys.type] as? String,
               type != RichContentKeys.reply.reply,
-              richContent[RichContentKeys.reply.replyToId] == nil
+              type != RichContentKeys.file.file,
+              richContent[RichContentKeys.reply.replyToId] == nil,
+              richContent[RichContentKeys.file.files] == nil
         else { return nil }
         
         let trs = RichMessageTransaction(
@@ -387,6 +398,37 @@ private extension AdamantChatTransactionService {
         trs.richType = RichContentKeys.react.react
         trs.transactionStatus = nil
         trs.additionalType = .reaction
+        
+        return trs
+    }
+    
+    func fileTransaction(
+        _ decodedMessage: String,
+        transaction: Transaction,
+        context: NSManagedObjectContext
+    ) -> ChatTransaction? {
+        guard let data = decodedMessage.data(using: String.Encoding.utf8),
+              let richContent = RichMessageTools.richContent(from: data),
+              richContent[RichContentKeys.file.files] != nil
+        else { return nil }
+        
+        if let trs = getChatTransactionFromDB(
+            id: String(transaction.id),
+            context: context
+        ) {
+            return trs
+        }
+        
+        let trs = RichMessageTransaction(
+            entity: RichMessageTransaction.entity(),
+            insertInto: context
+        )
+        
+        trs.richTransferHash = richContent[RichContentKeys.hash] as? String
+        trs.richContent = richContent
+        trs.richType = RichContentKeys.file.file
+        trs.transactionStatus = nil
+        trs.additionalType = .file
         
         return trs
     }

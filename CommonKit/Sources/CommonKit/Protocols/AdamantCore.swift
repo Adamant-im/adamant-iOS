@@ -21,6 +21,19 @@ public protocol AdamantCore: AnyObject {
     func decodeMessage(rawMessage: String, rawNonce: String, senderPublicKey: String, privateKey: String) -> String?
     func encodeValue(_ value: [String: Any], privateKey: String) -> (message: String, nonce: String)?
     func decodeValue(rawMessage: String, rawNonce: String, privateKey: String) -> String?
+    
+    func encodeData(
+        _ data: Data,
+        recipientPublicKey publicKey: String,
+        privateKey privateKeyHex: String
+    ) -> (data: Data, nonce: String)?
+    
+    func decodeData(
+        _ data: Data,
+        rawNonce: String,
+        senderPublicKey senderKeyHex: String,
+        privateKey privateKeyHex: String
+    ) -> Data?
 }
 
 public protocol SignableTransaction {

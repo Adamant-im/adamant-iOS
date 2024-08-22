@@ -12,12 +12,20 @@ import Alamofire
 public enum ApiCommands {}
 
 public protocol APICoreProtocol: Actor {
+    func sendRequestMultipartFormData(
+        origin: NodeOrigin,
+        path: String,
+        models: [MultipartFormDataModel],
+        uploadProgress: @escaping ((Progress) -> Void)
+    ) async -> APIResponseModel
+    
     func sendRequestBasic<Parameters: Encodable>(
         origin: NodeOrigin,
         path: String,
         method: HTTPMethod,
         parameters: Parameters,
-        encoding: APIParametersEncoding
+        encoding: APIParametersEncoding,
+        downloadProgress: @escaping ((Progress) -> Void)
     ) async -> APIResponseModel
     
     /// jsonParameters - arrays and dictionaries are allowed only
@@ -44,8 +52,45 @@ public extension APICoreProtocol {
             path: path,
             method: method,
             parameters: parameters,
-            encoding: encoding
+            encoding: encoding, 
+            downloadProgress: { _ in }
         ).result
+    }
+    
+    func sendRequest<Parameters: Encodable>(
+        origin: NodeOrigin,
+        path: String,
+        method: HTTPMethod,
+        parameters: Parameters,
+        encoding: APIParametersEncoding,
+        downloadProgress: @escaping ((Progress) -> Void)
+    ) async -> ApiServiceResult<Data> {
+        await sendRequestBasic(
+            origin: origin,
+            path: path,
+            method: method,
+            parameters: parameters,
+            encoding: encoding,
+            downloadProgress: downloadProgress
+        ).result
+    }
+    
+    func sendRequest<Parameters: Encodable>(
+        origin: NodeOrigin,
+        path: String,
+        method: HTTPMethod,
+        parameters: Parameters,
+        encoding: APIParametersEncoding,
+        downloadProgress: @escaping ((Progress) -> Void)
+    ) async -> APIResponseModel {
+        await sendRequestBasic(
+            origin: origin,
+            path: path,
+            method: method,
+            parameters: parameters,
+            encoding: encoding,
+            downloadProgress: downloadProgress
+        )
     }
     
     func sendRequestJsonResponse<Parameters: Encodable, JSONOutput: Decodable>(
@@ -90,6 +135,36 @@ public extension APICoreProtocol {
         )
     }
     
+    func sendRequest(
+        origin: NodeOrigin,
+        path: String,
+        downloadProgress: @escaping ((Progress) -> Void)
+    ) async -> ApiServiceResult<Data> {
+        await sendRequest(
+            origin: origin,
+            path: path,
+            method: .get,
+            parameters: emptyParameters,
+            encoding: .url,
+            downloadProgress: downloadProgress
+        )
+    }
+    
+    func sendRequest(
+        origin: NodeOrigin,
+        path: String,
+        downloadProgress: @escaping ((Progress) -> Void)
+    ) async -> APIResponseModel {
+        await sendRequest(
+            origin: origin,
+            path: path,
+            method: .get,
+            parameters: emptyParameters,
+            encoding: .url,
+            downloadProgress: downloadProgress
+        )
+    }
+    
     func sendRequestJsonResponse<JSONOutput: Decodable>(
         origin: NodeOrigin,
         path: String,
@@ -101,6 +176,20 @@ public extension APICoreProtocol {
             path: path,
             method: method,
             jsonParameters: jsonParameters
+        ).result.flatMap { parseJSON(data: $0) }
+    }
+    
+    func sendRequestMultipartFormDataJsonResponse<JSONOutput: Decodable>(
+        origin: NodeOrigin,
+        path: String,
+        models: [MultipartFormDataModel],
+        uploadProgress: @escaping ((Progress) -> Void)
+    ) async -> ApiServiceResult<JSONOutput> {
+        await sendRequestMultipartFormData(
+            origin: origin,
+            path: path,
+            models: models,
+            uploadProgress: uploadProgress
         ).result.flatMap { parseJSON(data: $0) }
     }
     

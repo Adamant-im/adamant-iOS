@@ -25,6 +25,8 @@ extension NodeGroup {
             return DogeWalletService.healthCheckParameters.onScreenUpdateInterval
         case .dash:
             return DashWalletService.healthCheckParameters.onScreenUpdateInterval
+        case .ipfs:
+            return IPFSApiService.healthCheckParameters.onScreenUpdateInterval
         }
     }
 
@@ -44,6 +46,8 @@ extension NodeGroup {
             return DogeWalletService.healthCheckParameters.crucialUpdateInterval
         case .dash:
             return DashWalletService.healthCheckParameters.crucialUpdateInterval
+        case .ipfs:
+            return IPFSApiService.healthCheckParameters.crucialUpdateInterval
         }
     }
 
@@ -63,6 +67,8 @@ extension NodeGroup {
             return DogeWalletService.healthCheckParameters.threshold
         case .dash:
             return DashWalletService.healthCheckParameters.threshold
+        case .ipfs:
+            return IPFSApiService.healthCheckParameters.threshold
         }
     }
 
@@ -82,33 +88,32 @@ extension NodeGroup {
             return DogeWalletService.healthCheckParameters.normalUpdateInterval
         case .dash:
             return DashWalletService.healthCheckParameters.normalUpdateInterval
+        case .ipfs:
+            return IPFSApiService.healthCheckParameters.normalUpdateInterval
         }
     }
     
     var minNodeVersion: Double {
-        var minNodeVersion: String?
-        switch self {
+        let minNodeVersion: String? = switch self {
         case .adm:
-            minNodeVersion = AdmWalletService.minNodeVersion
+            AdmWalletService.minNodeVersion
         case .btc:
-            minNodeVersion = BtcWalletService.minNodeVersion
+            BtcWalletService.minNodeVersion
         case .eth:
-            minNodeVersion = EthWalletService.minNodeVersion
+            EthWalletService.minNodeVersion
         case .klyNode:
-            minNodeVersion = KlyWalletService.minNodeVersion
+            KlyWalletService.minNodeVersion
         case .klyService:
-            minNodeVersion = KlyWalletService.minNodeVersion
+            KlyWalletService.minNodeVersion
         case .doge:
-            minNodeVersion = DogeWalletService.minNodeVersion
+            DogeWalletService.minNodeVersion
         case .dash:
-            minNodeVersion = DashWalletService.minNodeVersion
+            DashWalletService.minNodeVersion
+        case .ipfs:
+            nil
         }
         
-        guard let versionNumber = Node.versionToDouble(minNodeVersion) else {
-            return .zero
-        }
-        
-        return versionNumber
+        return Node.versionToDouble(minNodeVersion) ?? .zero
     }
     
     var name: String {
@@ -128,6 +133,8 @@ extension NodeGroup {
             return DashWalletService.tokenNetworkSymbol
         case .adm:
             return AdmWalletService.tokenNetworkSymbol
+        case .ipfs:
+            return IPFSApiService.symbol
         }
     }
     
@@ -135,7 +142,7 @@ extension NodeGroup {
         switch self {
         case .btc, .klyNode, .klyService, .doge, .adm:
             return true
-        case .eth, .dash:
+        case .eth, .dash, .ipfs:
             return false
         }
     }

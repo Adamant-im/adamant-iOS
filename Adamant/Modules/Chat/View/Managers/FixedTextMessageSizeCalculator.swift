@@ -67,7 +67,8 @@
              )
              
              messageContainerSize = size
-             messageContainerSize.width += messageInsets.horizontal
+             messageContainerSize.width += messageInsets.horizontal 
+             + additionalWidth
              messageContainerSize.height = contentViewHeight
          }
          
@@ -77,6 +78,12 @@
              messageContainerSize.height = contentViewHeight
              + messageInsets.vertical
              + additionalHeight
+         }
+         
+         if case let .file(model) = getMessages()[indexPath.section].fullModel.content {
+             let contentViewHeight: CGFloat = model.value.height()
+             messageContainerSize.width = maxWidth
+             messageContainerSize.height = contentViewHeight
          }
          
          return messageContainerSize

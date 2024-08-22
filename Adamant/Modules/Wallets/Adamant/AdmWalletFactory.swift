@@ -54,9 +54,7 @@ struct AdmWalletFactory: WalletFactory {
             walletService: service,
             reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
             nodesStorage: assembler.resolve(NodesStorageProtocol.self)!,
-            isActiveAdmNode: { [admApi = assembler.resolve(ApiService.self)!] in
-                admApi.hasActiveNode
-            }
+            walletApiServiceCompose: assembler.resolve(WalletApiServiceComposeProtocol.self)!
         )
     }
     

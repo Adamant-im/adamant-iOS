@@ -188,7 +188,7 @@ class TransferViewControllerBase: FormViewController {
     let walletCore: WalletCoreProtocol
     let reachabilityMonitor: ReachabilityMonitor
     let nodesStorage: NodesStorageProtocol
-    let isActiveAdmNode: () -> Bool
+    let walletApiServiceCompose: WalletApiServiceComposeProtocol
     
     // MARK: - Properties
     
@@ -321,7 +321,7 @@ class TransferViewControllerBase: FormViewController {
         walletService: WalletService,
         reachabilityMonitor: ReachabilityMonitor,
         nodesStorage: NodesStorageProtocol,
-        isActiveAdmNode: @escaping () -> Bool
+        walletApiServiceCompose: WalletApiServiceComposeProtocol
     ) {
         self.accountService = accountService
         self.accountsProvider = accountsProvider
@@ -335,7 +335,7 @@ class TransferViewControllerBase: FormViewController {
         self.walletCore = walletService.core
         self.reachabilityMonitor = reachabilityMonitor
         self.nodesStorage = nodesStorage
-        self.isActiveAdmNode = isActiveAdmNode
+        self.walletApiServiceCompose = walletApiServiceCompose
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -802,7 +802,9 @@ class TransferViewControllerBase: FormViewController {
             return
         }
         
-        guard isActiveAdmNode() || admReportRecipient == nil else {
+        guard
+            walletApiServiceCompose.hasActiveNode(group: .adm) || admReportRecipient == nil
+        else {
             dialogService.showWarning(
                 withMessage: ApiServiceError.noEndpointsAvailable(
                     nodeGroupName: NodeGroup.adm.name

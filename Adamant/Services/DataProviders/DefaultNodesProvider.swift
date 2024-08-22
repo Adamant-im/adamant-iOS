@@ -33,6 +33,8 @@ private extension DefaultNodesProvider {
             return DashWalletService.nodes
         case .adm:
             return AdmWalletService.nodes
+        case .ipfs:
+            return IPFSApiService.nodes
         }
     }
 }

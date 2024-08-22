@@ -18,7 +18,7 @@ final class CoinsNodesListViewModel: ObservableObject {
     private let nodesStorage: NodesStorageProtocol
     private let nodesAdditionalParamsStorage: NodesAdditionalParamsStorageProtocol
     private let processedGroups: [NodeGroup]
-    private let apiServices: ApiServices
+    private let walletApiServiceCompose: WalletApiServiceComposeProtocol
     private var subscriptions = Set<AnyCancellable>()
     
     nonisolated init(
@@ -26,13 +26,13 @@ final class CoinsNodesListViewModel: ObservableObject {
         nodesStorage: NodesStorageProtocol,
         nodesAdditionalParamsStorage: NodesAdditionalParamsStorageProtocol,
         processedGroups: [NodeGroup],
-        apiServices: ApiServices
+        walletApiServiceCompose: WalletApiServiceComposeProtocol
     ) {
         self.mapper = mapper
         self.nodesStorage = nodesStorage
         self.nodesAdditionalParamsStorage = nodesAdditionalParamsStorage
         self.processedGroups = processedGroups
-        self.apiServices = apiServices
+        self.walletApiServiceCompose = walletApiServiceCompose
         Task { @MainActor in setup() }
     }
     
@@ -80,7 +80,7 @@ private extension CoinsNodesListViewModel {
         state.sections = mapper.map(
             items: items,
             restNodeIds: processedGroups.compactMap {
-                apiServices.getApiService(group: $0).chosenFastestNodeId
+                walletApiServiceCompose.chosenFastestNodeId(group: $0)
             }
         )
     }
@@ -94,7 +94,7 @@ private extension CoinsNodesListViewModel {
     
     func healthCheck() {
         processedGroups.forEach {
-            apiServices.getApiService(group: $0).healthCheck()
+            walletApiServiceCompose.healthCheck(group: $0)
         }
     }
 }

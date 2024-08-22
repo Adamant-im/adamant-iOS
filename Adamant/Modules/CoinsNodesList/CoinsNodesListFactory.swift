@@ -50,15 +50,9 @@ private struct CoinsNodesListAssembly: Assembly {
                     NodesAdditionalParamsStorageProtocol.self
                 )!,
                 processedGroups: processedGroups,
-                apiServices: .init(
-                    btc: $0.resolve(BtcApiService.self)!,
-                    eth: $0.resolve(EthApiService.self)!,
-                    klyNode: $0.resolve(KlyNodeApiService.self)!,
-                    klyService: $0.resolve(KlyServiceApiService.self)!,
-                    doge: $0.resolve(DogeApiService.self)!,
-                    dash: $0.resolve(DashApiService.self)!,
-                    adm: $0.resolve(ApiService.self)!
-                )
+                walletApiServiceCompose: $0.resolve(
+                    WalletApiServiceComposeProtocol.self
+                )!
             )
         }.inObjectScope(.transient)
     }
