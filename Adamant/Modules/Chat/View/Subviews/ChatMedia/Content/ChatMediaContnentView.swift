@@ -249,7 +249,9 @@ private extension ChatMediaContentView {
 
 extension ChatMediaContentView.FileModel {
     func width() -> CGFloat {
-        guard !isMacOS else { return defaultStackWidth }
+        guard UIDevice.current.userInterfaceIdiom == .phone else {
+            return defaultStackWidth
+        }
         return UIScreen.main.bounds.width - screenSpace
     }
 }
