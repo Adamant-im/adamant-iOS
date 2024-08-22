@@ -739,6 +739,51 @@
 /* NodesEditor: Failed to build URL alert */
 "NodesEditor.FailedToBuildURL" = "Invalid host";
 
+/* Storage: Save Encrypted */
+"Storage.SaveEncrypted.Title" = "Die Datei verschlüsselt aufbewahren";
+
+/* Storage: Save Encrypted */
+"Storage.SaveEncrypted.Description" = "Die Datei verschlüsselt im lokalen Speicher aufbewahren (Kann die Leistung beeinträchtigen)";
+
+/* Storage: Auto download preview */
+"Storage.AutoDownloadPreview.Title" = "Vorschau";
+
+/* Storage: Auto download full media */
+"Storage.AutoDownloadFullMedia.Title" = "Vollständige Medien";
+
+/* Storage: Download policy */
+"Storage.DownloadPolicy.Everybody.Title" = "Alle";
+
+/* Storage: Download policy */
+"Storage.DownloadPolicy.Nobody.Title" = "Niemand";
+
+/* Storage: Download policy */
+"Storage.DownloadPolicy.Contacts.Title" = "Meine Kontakte";
+
+/* Storage: Auto download preview */
+"Storage.AutoDownloadPreview.Description" = "Um einen Kontakt zu erstellen, geben Sie der ADM-Adresse einen Namen";
+
+/* Storage: Auto download preview */
+"Storage.AutoDownloadPreview.Header" = "Automatischer Download von Medien";
+
+/* Storage usage: Clear Popup Title */
+"StorageUsage.Clear.Popup.Title" = "Sie werden erneut Dateien und Bilder herunterladen. Weiter?";
+
+/* Storage usage: Clear Title */
+"StorageUsage.Clear.Title" = "Klarer Speicher";
+
+/* Storage usage: Title */
+"StorageUsage.Title" = "Speicherung und Daten";
+
+/* Storage used: Title */
+"StorageUsed.Title" = "Speicherung";
+
+/* Storage usage: Description */
+"StorageUsage.Description" = "Gesamtgröße der Dateien und Bilder im sicheren Speicher der App";
+
+/* Chats: Auto preview download is disabled */
+"Chats.AutoDownloadPreview.Disabled" = "Automatischer Vorschau-Download ist deaktiviert";
+
 /* Security: Notification modes description. Markdown supported. */
 "SecurityPage.Row.Notifications.ModesDescription" = "#### Benachrichtigungsmodi\n\n#### Deaktiviert\nKeine Benachrichtigungen.\n\n#### Hintergrundaktualisierung\nIhr Gerät erhält neue Nachrichteninformationen automatisch. Keine externen Aufrufe. Die Hintergrundaktualisierung wird von iOS verwaltet, die Zeit wird vom Betriebssystem bestimmt und ist von vielen Faktoren wie Akkustand, Netzwerkauslastung, Nutzungsmuster abhängig und kann nicht vorhergesagt werden. Es können 20 Minuten, 6 Stunden, oder ein Tag sein. Sie können die App trotzdem öffnen und nachschauen, ob eine Nachricht angekommen ist.\n\n#### Push\nBenachrichtigungen werden auf Ihr Gerät vom ADAMANT Benachrichtigungsservice gesendet. Sie erhalten eine Benachrichtigung umgehend, nachdem die Nachricht versendet und von der Blockchain bestätigt wurde - mit einer kleinen Verzögerung. Jedoch erfordert dieser Modus, dass der Gerätetoken Ihres Geräts in der Servicedatenbank registriert ist. Gerätetokens sind sicher, und diese Option ist zu empfehlen.\n\nSie können mehr über die Geräteregistrierung auf der ADAMANTs Github-Seite nachlesen.";
 
@@ -891,6 +936,15 @@
 
 /* Partner screen 'Rename contact'. */
 "Shared.RenameContact" = "Kontakt umbenennen";
+
+/* Shared alert 'Send tokens' */
+"Shared.SendTokens" = "💸 Tokens senden";
+
+/* Shared alert 'Upload file' */
+"Shared.UploadFile" = "📄 Datei hochladen";
+
+/* Shared alert 'Upload Media' */
+"Shared.UploadMedia" = "📸 Medien hochladen";
 
 /* Shared alert 'Settings' button. Used to go to system Settings app, on application settings page. Should be same as Settings application title. */
 "Shared.Settings" = "Einstellungen";
@@ -1245,3 +1299,32 @@
 
 /* Transaction: Unknown token */
 "Transaction.UnknownTokenTitle" = "Unbekannt";
+/* FileManager error 'Can't download file' */
+"FileManagerError.CantDownloadFile" = "Datei kann nicht heruntergeladen werden";
+
+/* FileManager error 'Can't upload file' */
+"FileManagerError.CantUploadFile" = "Datei kann nicht hochgeladen werden";
+
+/* FileManager error 'Can't encrypt file' */
+"FileManagerError.CantEncryptFile" = "Datei kann nicht verschlüsselt werden";
+
+/* FileManager error 'Can't decrypt file' */
+"FileManagerError.CantDecryptFile" = "Datei kann nicht entschlüsselt werden";
+
+/* File validation error 'Too many files' */
+"FileValidationError.TooManyFiles" = "Zu viele Dateien. Höchstens erlaubt: %lld";
+
+/* File validation error 'File size exceeds limit' */
+"FileValidationError.FileSizeExceedsLimit" = "Dateigröße überschreitet das Limit. Maximal erlaubt: %lld MB";
+
+/* File validation error 'File not found' */
+"FileValidationError.FileNotFound" = "Datei nicht gefunden";
+
+/* File picker error 'Cant select file' */
+"FileValidationError.CantSelectFile" = "Datei kann nicht ausgewählt werden: %@";
+
+/* Chat drop view title */
+"Chat.Drop.Title" = "Dateien hier ablegen";
+
+/* Chat unknown */
+"Chat.unknown.title" = "Unbekannt";

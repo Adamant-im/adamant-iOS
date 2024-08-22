@@ -403,7 +403,7 @@ extension AdamantChatsProvider {
         array.prefix(preLoadChatsCount).forEach { transaction in
             let recipientAddress = transaction.recipientId == address ? transaction.senderId : transaction.recipientId
             Task {
-                let isChatLoading = isChatLoading(with: address)
+                let isChatLoading = isChatLoading(with: recipientAddress)
                 guard !isChatLoading else { return }
                 await getChatMessages(with: recipientAddress, offset: nil)
             }
@@ -862,7 +862,141 @@ extension AdamantChatsProvider {
             from: chatroom
         )
         
+        return transactionLocaly
+    }
+    
+    func sendFileMessageLocally(
+        _ message: AdamantMessage,
+        recipientId: String,
+        from chatroom: Chatroom?
+    ) async throws -> String {
+        guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
+            throw ChatsProviderError.notLogged
+        }
+        
+        guard loggedAccount.balance >= message.fee else {
+            throw ChatsProviderError.notEnoughMoneyToSend
+        }
+        
+        switch validateMessage(message) {
+        case .isValid:
+            break
+        case .empty:
+            throw ChatsProviderError.messageNotValid(.empty)
+        case .tooLong:
+            throw ChatsProviderError.messageNotValid(.tooLong)
+        }
+        
+        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        context.parent = stack.container.viewContext
+                
+        guard case let .richMessage(payload) = message else {
+            throw ChatsProviderError.messageNotValid(.empty)
+        }
+        
+        let transactionLocaly = try await sendRichMessageLocaly(
+            richContent: payload.content(),
+            richContentSerialized: payload.serialized(),
+            richType: payload.type,
+            additionalType: payload.additionalType,
+            senderId: loggedAccount.address,
+            recipientId: recipientId,
+            keypair: keypair,
+            context: context,
+            from: chatroom
+        )
+
+        return transactionLocaly.transactionId
+    }
+    
+    func sendFileMessage(
+        _ message: AdamantMessage,
+        recipientId: String,
+        transactionLocalyId: String,
+        from chatroom: Chatroom?
+    ) async throws -> ChatTransaction {
+        guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
+            throw ChatsProviderError.notLogged
+        }
+        
+        guard loggedAccount.balance >= message.fee else {
+            throw ChatsProviderError.notEnoughMoneyToSend
+        }
+        
+        switch validateMessage(message) {
+        case .isValid:
+            break
+        case .empty:
+            throw ChatsProviderError.messageNotValid(.empty)
+        case .tooLong:
+            throw ChatsProviderError.messageNotValid(.tooLong)
+        }
+        
+        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        context.parent = stack.container.viewContext
+        
+        guard let transactionLocaly = getBaseTransactionFromDB(
+            id: transactionLocalyId,
+            context: context
+        ) as? RichMessageTransaction
+        else {
+            throw ChatsProviderError.transactionNotFound(id: transactionLocalyId)
+        }
+        
+        guard case let .richMessage(payload) = message else {
+            throw ChatsProviderError.messageNotValid(.empty)
+        }
+        
+        transactionLocaly.richContent = payload.content()
+        transactionLocaly.richContentSerialized = payload.serialized()
+        
+        let transaction = try await sendMessageToServer(
+            senderId: loggedAccount.address,
+            recipientId: recipientId,
+            transaction: transactionLocaly,
+            type: message.chatType,
+            keypair: keypair,
+            context: context,
+            from: chatroom
+        )
+        
         return transaction
+    }
+    
+    func setTxMessageStatus(
+        txId: String,
+        status: MessageStatus
+    ) throws {
+        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        context.parent = stack.container.viewContext
+        
+        guard let transaction = getBaseTransactionFromDB(
+            id: txId,
+            context: context
+        ) as? RichMessageTransaction
+        else {
+            throw ChatsProviderError.transactionNotFound(id: txId)
+        }
+        
+        transaction.statusEnum = status
+        try context.save()
+    }
+    
+    func updateTxMessageContent(txId: String, richMessage: RichMessage) throws {
+        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        context.parent = stack.container.viewContext
+        
+        guard let transaction = getBaseTransactionFromDB(
+            id: txId,
+            context: context
+        ) as? RichMessageTransaction
+        else {
+            throw ChatsProviderError.transactionNotFound(id: txId)
+        }
+        
+        transaction.richContent = richMessage.content()
+        transaction.richContentSerialized = richMessage.serialized()
+        try context.save()
     }
     
     private func sendTextMessageLocaly(
@@ -919,7 +1053,7 @@ extension AdamantChatsProvider {
         keypair: Keypair,
         context: NSManagedObjectContext,
         from chatroom: Chatroom? = nil
-    ) async throws -> ChatTransaction {
+    ) async throws -> RichMessageTransaction {
         let type = ChatType.richMessage
         let id = UUID().uuidString
         let transaction = RichMessageTransaction(context: context)
@@ -1195,6 +1329,14 @@ extension AdamantChatsProvider {
         do {
             let id = try await apiService.sendMessageTransaction(transaction: signedTransaction).get()
             
+            print("sendMessageTransaction id=\(id), transaction=\(transaction.height)")
+//            do {
+//                await Task.sleep(interval: 10)
+//                let id = try await apiService.sendMessageTransaction(transaction: signedTransaction).get()
+//                print("sendMessageTransaction id=\(id)")
+//            } catch {
+//                print("sendMessageTransaction error=\(error)")
+//            }
             // Update ID with recieved, add to unconfirmed transactions.
             transaction.transactionId = String(id)
             transaction.chatMessageId = String(id)
@@ -1572,6 +1714,7 @@ extension AdamantChatsProvider {
                 transactionInProgress.append(trs.transaction.id)
                 if let objectId = unconfirmedTransactions[trs.transaction.id],
                    let unconfirmed = context.object(with: objectId) as? ChatTransaction {
+                    print("confirmTransaction tr=\(trs.transaction.id)")
                     confirmTransaction(
                         unconfirmed,
                         id: trs.transaction.id,
@@ -1589,6 +1732,7 @@ extension AdamantChatsProvider {
                 
                 // if transaction in pending status then ignore it
                 if unconfirmedTransactionsBySignature.contains(trs.transaction.signature) {
+                    print("ignore tr=\(trs.transaction.id)")
                     continue
                 }
                 

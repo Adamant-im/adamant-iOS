@@ -59,6 +59,7 @@ protocol ScreensFactory {
     func makeNotifications() -> UIViewController
     func makeVisibleWallets() -> UIViewController
     func makeContribute() -> UIViewController
+    func makeStorageUsage() -> UIViewController
     func makeLogin() -> LoginViewController
     func makeVibrationSelection() -> UIViewController
     func makePartnerQR(partner: CoreDataAccount) -> UIViewController

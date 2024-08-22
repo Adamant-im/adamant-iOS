@@ -132,6 +132,8 @@ private extension NodesStorage {
             return DashWalletService.nodes.map { .init(group: .dash, node: $0) }
         case .adm:
             return AdmWalletService.nodes.map { .init(group: .adm, node: $0) }
+        case .ipfs:
+            return IPFSApiService.nodes.map { .init(group: .ipfs, node: $0) }
         }
     }
     

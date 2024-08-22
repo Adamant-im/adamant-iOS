@@ -13,13 +13,18 @@ import CommonKit
 
 final class ChatInputBar: InputBarAccessoryView {
     var onAttachmentButtonTap: (() -> Void)?
-    
+    var onImagePasted: ((UIImage) -> Void)?
+
     var fee = "" {
         didSet { updateFeeLabel() }
     }
     
     var isEnabled = true {
         didSet { updateIsEnabled() }
+    }
+    
+    var isForcedSendEnabled = false {
+        didSet { updateSendIsEnabled() }
     }
     
     var isAttachmentButtonEnabled = true {
@@ -51,7 +56,35 @@ final class ChatInputBar: InputBarAccessoryView {
     
     override func didMoveToWindow() {
         super.didMoveToWindow()
-        sendButton.isEnabled = !inputTextView.text.isEmpty
+        sendButton.isEnabled = (isEnabled && !inputTextView.text.isEmpty) || isForcedSendEnabled
+    }
+    
+    override func calculateIntrinsicContentSize() -> CGSize {
+        let superSize = super.calculateIntrinsicContentSize()
+        
+        // Calculate the required height
+        let superTopStackViewHeight = topStackView.arrangedSubviews.count > .zero
+        ? topStackView.bounds.height
+        : .zero
+        
+        let validTopStackViewHeight = topStackView.arrangedSubviews.map {
+            $0.frame.height
+        }.reduce(0, +)
+        
+        return .init(
+            width: superSize.width,
+            height: superSize.height
+            - superTopStackViewHeight
+            + validTopStackViewHeight
+        )
+    }
+    
+    override func inputTextViewDidChange() {
+        super.inputTextViewDidChange()
+        
+        sendButton.isEnabled = isForcedSendEnabled
+        ? true
+        : sendButton.isEnabled
     }
 }
 
@@ -76,6 +109,10 @@ private extension ChatInputBar {
         
         updateLayerColors()
         updateIsAttachmentButtonEnabled()
+    }
+    
+    func updateSendIsEnabled() {
+        sendButton.isEnabled = (isEnabled && !inputTextView.text.isEmpty) || isForcedSendEnabled
     }
     
     func updateIsAttachmentButtonEnabled() {
@@ -186,6 +223,28 @@ private extension ChatInputBar {
         feeLabel.isEnabled = false
         feeLabel.titleLabel?.font = .systemFont(ofSize: 12)
         return feeLabel
+    }
+}
+
+extension InputTextView {
+    open override func canPerformAction(
+        _ action: Selector,
+        withSender sender: Any?
+    ) -> Bool {
+        if action == #selector(paste(_:)) && UIPasteboard.general.image != nil {
+            return true
+        }
+        return super.canPerformAction(action, withSender: sender)
+    }
+    
+    open override func paste(_ sender: Any?) {
+        super.paste(sender)
+        
+        guard let view = inputBarAccessoryView as? ChatInputBar,
+              let image = UIPasteboard.general.image
+        else { return }
+        
+        view.onImagePasted?(image)
     }
 }
 

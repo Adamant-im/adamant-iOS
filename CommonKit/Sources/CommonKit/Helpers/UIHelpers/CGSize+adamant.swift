@@ -13,3 +13,10 @@ public extension CGSize {
         self.init(width: squareSize, height: squareSize)
     }
 }
+
+extension CGSize: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(width)
+        hasher.combine(height)
+    }
+}

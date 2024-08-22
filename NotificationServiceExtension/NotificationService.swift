@@ -240,6 +240,37 @@ class NotificationService: UNNotificationServiceExtension {
                     )
                 }
                 
+                // rich file reply
+                if let data = message.data(using: String.Encoding.utf8),
+                   let richContent = RichMessageTools.richContent(from: data),
+                   let replyMessage = richContent[RichContentKeys.reply.replyMessage] as? [String: Any],
+                   replyMessage[RichContentKeys.file.files] is [[String: Any]] {
+                    
+                    let text = FilePresentationHelper.getFilePresentationText(richContent)
+                    content = NotificationContent(
+                        title: partnerName ?? partnerAddress,
+                        subtitle: nil,
+                        body: MarkdownParser().parse(text).string,
+                        attachments: nil,
+                        categoryIdentifier: AdamantNotificationCategories.message
+                    )
+                }
+                
+                // rich file
+                if let data = message.data(using: String.Encoding.utf8),
+                   let richContent = RichMessageTools.richContent(from: data),
+                   richContent[RichContentKeys.file.files] is [[String: Any]] {
+                    
+                    let text = FilePresentationHelper.getFilePresentationText(richContent)
+                    content = NotificationContent(
+                        title: partnerName ?? partnerAddress,
+                        subtitle: nil,
+                        body: MarkdownParser().parse(text).string,
+                        attachments: nil,
+                        categoryIdentifier: AdamantNotificationCategories.message
+                    )
+                }
+                
                 guard let content = content else {
                     break
                 }

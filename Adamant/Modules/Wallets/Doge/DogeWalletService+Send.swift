@@ -75,7 +75,8 @@ extension DogeWalletService: WalletServiceTwoStepSend {
                 path: DogeApiCommands.sendTransaction(),
                 method: .post,
                 parameters: ["rawtx": txHex],
-                encoding: .json
+                encoding: .json,
+                downloadProgress: { _ in }
             )
             
             guard
