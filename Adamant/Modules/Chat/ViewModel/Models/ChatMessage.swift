@@ -51,6 +51,7 @@ extension ChatMessage {
         case message(EqualWrapper<ChatMessageCell.Model>)
         case transaction(EqualWrapper<ChatTransactionContainerView.Model>)
 		case reply(EqualWrapper<ChatMessageReplyCell.Model>)
+        case file(EqualWrapper<ChatMediaContainerView.Model>)
         
         static let `default` = Self.message(.init(value: .default))
     }
@@ -71,6 +72,8 @@ extension ChatMessage: MessageType {
             ? model.value.message
             : model.value.messageReply
             return .attributedText(message)
+        case let .file(model):
+            return .custom(model)
         }
     }
 }

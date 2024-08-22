@@ -5,7 +5,6 @@
 //  Created by Yana Silosieva on 29.04.2024.
 //
 
-import Foundation
 import UIKit
 
 public final class MessageProcessHelper {

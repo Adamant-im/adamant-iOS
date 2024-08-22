@@ -11,6 +11,7 @@ import Swinject
 import CryptoSwift
 import CoreData
 import CommonKit
+import FilesStorageKit
 
 // MARK: - Constants
 extension String.adamant {

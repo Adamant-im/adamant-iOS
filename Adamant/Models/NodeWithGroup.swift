@@ -31,6 +31,8 @@ extension NodeGroup {
             return DashWalletService.tokenNetworkSymbol
         case .adm:
             return AdmWalletService.tokenNetworkSymbol
+        case .ipfs:
+            return IPFSApiService.symbol
         }
     }
     
@@ -38,7 +40,7 @@ extension NodeGroup {
         switch self {
         case .btc, .klyNode, .klyService, .doge, .adm:
             return true
-        case .eth, .dash:
+        case .eth, .dash, .ipfs:
             return false
         }
     }

@@ -26,26 +26,14 @@ protocol ChatMenuManagerDelegate: AnyObject {
 final class ChatMenuManager: NSObject {
     weak var delegate: ChatMenuManagerDelegate?
     
-    var isiOSAppOnMac: Bool = {
-#if targetEnvironment(macCatalyst)
-        return true
-#else
-        if #available(iOS 14.0, *) {
-            return ProcessInfo.processInfo.isiOSAppOnMac
-        } else {
-            return false
-        }
-#endif
-    }()
-    
     // MARK: Init
     
     init(delegate: ChatMenuManagerDelegate?) {
         self.delegate = delegate
     }
     
-    func setup(for contentView: UIView) {
-        guard !isiOSAppOnMac else {
+    func setup(for contentView: UIView ) {
+        guard !isMacOS else {
             let interaction = UIContextMenuInteraction(delegate: self)
             contentView.addInteraction(interaction)
             return
@@ -83,7 +71,7 @@ final class ChatMenuManager: NSObject {
     }
     
     @objc func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
-        guard !isiOSAppOnMac else { return }
+        guard !isMacOS else { return }
         
         guard gesture.state == .began,
               let contentView = gesture.view
