@@ -247,7 +247,18 @@ private extension ChatMediaContentView {
     }
 }
 
+extension ChatMediaContentView.FileModel {
+    func width() -> CGFloat {
+        guard !isMacOS else { return defaultStackWidth }
+        return UIScreen.main.bounds.width - screenSpace
+    }
+}
+
 extension ChatMediaContentView.Model {
+    func width() -> CGFloat {
+        fileModel.width()
+    }
+    
     func height() -> CGFloat {
         let replyViewDynamicHeight: CGFloat = isReply ? replyViewHeight : .zero
         
@@ -258,41 +269,18 @@ extension ChatMediaContentView.Model {
         }
         
         if !comment.string.isEmpty {
-            spaceCount += 2
+            spaceCount += 3
         }
-        
-        let stackWidth = MediaContainerView.stackWidth
         
         return fileModel.height()
         + spaceCount * verticalInsets
-        + labelSize(for: comment, considering: stackWidth - horizontalInsets * 2).height
         + replyViewDynamicHeight
-    }
-    
-    func labelSize(
-       for attributedText: NSAttributedString,
-       considering maxWidth: CGFloat
-    ) -> CGSize {
-        guard !attributedText.string.isEmpty else { return .zero }
-        
-        let textContainer = NSTextContainer(
-           size: CGSize(width: maxWidth, height: .greatestFiniteMagnitude)
-        )
-        let layoutManager = NSLayoutManager()
-        
-        layoutManager.addTextContainer(textContainer)
-        
-        let textStorage = NSTextStorage(attributedString: attributedText)
-        textStorage.addLayoutManager(layoutManager)
-        
-        let rect = layoutManager.usedRect(for: textContainer)
-        
-        return .init(width: rect.width, height: rect.height + additionalHeight)
     }
 }
 
 private let verticalInsets: CGFloat = 8
 private let horizontalInsets: CGFloat = 12
 private let replyViewHeight: CGFloat = 25
-private let additionalHeight: CGFloat = 2
 private let imageSize: CGFloat = 70
+private let defaultStackWidth: CGFloat = 280
+private let screenSpace: CGFloat = 110
