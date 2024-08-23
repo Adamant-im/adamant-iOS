@@ -10,6 +10,7 @@ import UIKit
 import Eureka
 import MarkdownKit
 import CommonKit
+import Combine
 
 // MARK: - Localization
 extension String.adamant {
@@ -146,6 +147,7 @@ final class LoginViewController: FormViewController {
     private var hideNewPassphrase: Bool = true
     private var firstTimeActive: Bool = true
     internal var hidingImagePicker: Bool = false
+    private var subscriptions = Set<AnyCancellable>()
     
     /// On launch, request user biometry (TouchID/FaceID) if has an account with biometry active
     var requestBiometryOnFirstTimeActive: Bool = true
@@ -203,29 +205,7 @@ final class LoginViewController: FormViewController {
             $0.tag = Sections.login.tag
             
             $0.footer = { [weak self] in
-                var footer = HeaderFooterView<UIView>(.callback {
-                    let view = ButtonsStripeView.adamantConfigured()
-                    
-                    var stripe: [StripeButtonType] = [.qrCameraReader, .qrPhotoReader]
-                    
-                    if let accountService = self?.accountService,
-                       accountService.hasStayInAccount {
-                        stripe.append(.pinpad)
-                        if accountService.useBiometry,
-                           let button = self?.localAuth.biometryType.stripeButtonType {
-                            stripe.append(button)
-                        }
-                    }
-                    
-                    view.stripe = stripe
-                    view.delegate = self
-                    
-                    return view
-                })
-                
-                footer.height = { ButtonsStripeView.adamantDefaultHeight }
-                
-                return footer
+                self?.configureFooter()
             }()
         }
         
@@ -385,6 +365,7 @@ final class LoginViewController: FormViewController {
         }
         
         setColors()
+        addObservers()
     }
     
     // MARK: - Other
@@ -478,5 +459,52 @@ extension LoginViewController: ButtonsStripeViewDelegate {
         case .qrPhotoReader:
             loginWithQrFromLibrary()
         }
+    }
+}
+
+private extension LoginViewController {
+    func addObservers() {
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.stayInChanged)
+            .sink { [weak self] _ in
+                self?.updateFooter()
+            }
+            .store(in: &subscriptions)
+    }
+    
+    func updateFooter() {
+        let section = form.sectionBy(tag: Sections.login.tag)
+        
+        section?.footer = { [weak self] in
+            self?.configureFooter()
+        }()
+        
+        section?.reload()
+    }
+    
+    func configureFooter() -> HeaderFooterView<UIView> {
+        var footer = HeaderFooterView<UIView>(.callback { [weak self] in
+            let view = ButtonsStripeView.adamantConfigured()
+            
+            var stripe: [StripeButtonType] = [.qrCameraReader, .qrPhotoReader]
+            
+            if let accountService = self?.accountService,
+               accountService.hasStayInAccount {
+                stripe.append(.pinpad)
+                if accountService.useBiometry,
+                   let button = self?.localAuth.biometryType.stripeButtonType {
+                    stripe.append(button)
+                }
+            }
+            
+            view.stripe = stripe
+            view.delegate = self
+            
+            return view
+        })
+        
+        footer.height = { ButtonsStripeView.adamantDefaultHeight }
+        
+        return footer
     }
 }

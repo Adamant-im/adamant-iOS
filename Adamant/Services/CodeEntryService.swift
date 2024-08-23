@@ -8,67 +8,77 @@
 
 import Combine
 import UIKit
+import CommonKit
 
 protocol CodeEntryProtocol {
-    func attemptCodeEntry() -> Bool
+    func attemptCodeEntry()
+    func canCodeEntry() -> Bool
     
     var remainingAttemptsPublisher: Published<Int>.Publisher {
-        get
-    }
-    
-    var remainingTimePublisher: Published<TimeInterval>.Publisher {
         get
     }
 }
 
 final class CodeEntryService: CodeEntryProtocol {
+    // MARK: Dependencies
+    
+    let securedStore: SecuredStore
+    
     private let maxAttempts: Int = 5
-    private let stepInterval: TimeInterval = 1
-    private var resetInterval: TimeInterval = 120
-    private var timer: Timer?
     private var cancellables = Set<AnyCancellable>()
     
     @Published private var remainingAttempts: Int = 5
-    @Published private var remainingTime: TimeInterval = 0
+    @Atomic private var notificationsSet: Set<AnyCancellable> = []
     
     var remainingAttemptsPublisher: Published<Int>.Publisher {
         $remainingAttempts
     }
     
-    var remainingTimePublisher: Published<TimeInterval>.Publisher {
-        $remainingTime
+    init(securedStore: SecuredStore) {
+        self.securedStore = securedStore
+        self.remainingAttempts = getRemainingAttempts()
+        
+        addObservers()
     }
     
-    func attemptCodeEntry() -> Bool {
-        guard remainingAttempts > .zero else { return false }
+    func canCodeEntry() -> Bool {
+        remainingAttempts > .zero
+    }
+    
+    func attemptCodeEntry() {
+        guard canCodeEntry() else { return }
         
         remainingAttempts -= 1
-        
-        guard remainingAttempts <= 0 else {
-            return true
-        }
-        
-        startTimer()
-        return false
+        setRemainingAttempts(value: remainingAttempts)
     }
 }
 
 private extension CodeEntryService {
-    func startTimer() {
-        remainingTime = resetInterval
-        timer = Timer.scheduledTimer(withTimeInterval: stepInterval, repeats: true) { [weak self] _ in
-            guard let self = self else { return }
-            self.remainingTime -= stepInterval
-            if self.remainingTime <= .zero {
-                self.resetAttempts()
+    func addObservers() {
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedIn)
+            .sink { [weak self] _ in
+                guard self?.remainingAttempts != self?.maxAttempts else { return }
+                self?.resetRemainingAttempts()
             }
-        }
+            .store(in: &notificationsSet)
     }
     
-    func resetAttempts() {
-        remainingAttempts = maxAttempts
-        remainingTime = .zero
-        timer?.invalidate()
-        timer = nil
+    func getRemainingAttempts() -> Int {
+        guard let result: Int = securedStore.get(
+            StoreKey.login.remainingAttempts
+        ) else {
+            return maxAttempts
+        }
+        
+        return result
+    }
+    
+    func setRemainingAttempts(value: Int) {
+        securedStore.set(value, for: StoreKey.login.remainingAttempts)
+    }
+    
+    func resetRemainingAttempts() {
+        setRemainingAttempts(value: maxAttempts)
     }
 }

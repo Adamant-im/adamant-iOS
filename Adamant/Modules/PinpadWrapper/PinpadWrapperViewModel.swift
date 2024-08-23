@@ -42,20 +42,13 @@ private extension PinpadWrapperViewModel {
         accountService.remainingAttemptsPublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] value in
-                self?.pinpad.commentLabel.text = "\(String.adamant.login.loginIntoPrevAccount)\nAttempts remaining: \(value)"
+                let text = value > .zero
+                ? "You have \(value) attempts left before access is reset"
+                : "Your attempts are left. Access is reset"
+                
+                self?.pinpad.commentLabel.text = "\(String.adamant.login.loginIntoPrevAccount)\n\(text)"
                 
                 self?.pinpadEnable.send(value > .zero)
-            }
-            .store(in: &subscriptions)
-        
-        accountService.remainingTimePublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] value in
-                let time = value > .zero
-                ? "\nEntering the code unlocks after \(Int(value)) seconds"
-                : .empty
-                
-                self?.pinpad.commentLabel.text = "\(String.adamant.login.loginIntoPrevAccount)\(time)"
             }
             .store(in: &subscriptions)
     }
@@ -67,7 +60,7 @@ extension PinpadWrapperViewModel: PinpadViewControllerDelegate {
             return
         }
         
-        guard (try? accountService.validatePin(pin)) == true else {
+        guard accountService.validatePin(pin, isInitialLoginAttempt: true) else {
             pinpad.clearPin()
             pinpad.playWrongPinAnimation()
             return

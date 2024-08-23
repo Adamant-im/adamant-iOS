@@ -219,6 +219,11 @@ struct AppAssembly: Assembly {
             )
         }.inObjectScope(.container)
         
+        // MARK: SocketService
+        container.register(CodeEntryProtocol.self) { r in
+            CodeEntryService(securedStore: r.resolve(SecuredStore.self)!)
+        }.inObjectScope(.container)
+        
         // MARK: AccountService
         container.register(AccountService.self) { r in
             AdamantAccountService(
@@ -227,7 +232,7 @@ struct AppAssembly: Assembly {
                 dialogService: r.resolve(DialogService.self)!,
                 securedStore: r.resolve(SecuredStore.self)!,
                 walletServiceCompose: r.resolve(WalletServiceCompose.self)!,
-                codeEntryService: CodeEntryService()
+                codeEntryService: r.resolve(CodeEntryProtocol.self)!
             )
         }.inObjectScope(.container).initCompleted { (r, c) in
             Task { @MainActor in

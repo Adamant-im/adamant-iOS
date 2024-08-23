@@ -62,6 +62,10 @@ public extension StoreKey {
         public static let autoDownloadFullMedia = "autoDownloadFullMediaEnabled"
         public static let saveFileEncrypted = "saveFileEncrypted"
     }
+    
+    enum login {
+        public static let remainingAttempts = "remainingAttempts"
+    }
 }
 
 public protocol SecuredStore: AnyObject {

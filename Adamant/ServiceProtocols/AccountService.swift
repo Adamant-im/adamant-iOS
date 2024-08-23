@@ -162,10 +162,6 @@ protocol AccountService: AnyObject {
         get
     }
     
-    var remainingTimePublisher: Published<TimeInterval>.Publisher {
-        get
-    }
-    
     // MARK: Account functions
     
     /// Update logged account info
@@ -203,7 +199,7 @@ protocol AccountService: AnyObject {
     func dropSavedAccount()
     
     /// If we have stored data with pin, validate it. If no data saved, always returns false.
-    func validatePin(_ pin: String) throws -> Bool
+    func validatePin(_ pin: String, isInitialLoginAttempt: Bool) -> Bool
     
     /// Update use TouchID or FaceID to log in
     func updateUseBiometry(_ newValue: Bool)

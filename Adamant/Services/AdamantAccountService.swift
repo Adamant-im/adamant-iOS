@@ -42,10 +42,6 @@ final class AdamantAccountService: AccountService {
         codeEntryService.remainingAttemptsPublisher
     }
     
-    var remainingTimePublisher: Published<TimeInterval>.Publisher {
-        codeEntryService.remainingTimePublisher
-    }
-    
     init(
         apiService: ApiService,
         adamantCore: AdamantCore,
@@ -116,16 +112,28 @@ extension AdamantAccountService {
         completion(.success(account: account, alert: nil))
     }
     
-    func validatePin(_ pin: String) throws -> Bool {
-        guard codeEntryService.attemptCodeEntry() else {
-            throw AccountServiceError.codeEntryLimitReached
-        }
-        
-        guard let savedPin = securedStore.get(.pin) else {
+    func validatePin(_ pin: String, isInitialLoginAttempt: Bool) -> Bool {
+        guard codeEntryService.canCodeEntry() else {
+            handleFailedLogin(isInitialLoginAttempt: isInitialLoginAttempt)
             return false
         }
         
-        return pin == savedPin
+        guard let savedPin = securedStore.get(.pin),
+              pin == savedPin
+        else {
+            handleFailedLogin(isInitialLoginAttempt: isInitialLoginAttempt)
+            return false
+        }
+        
+        return true
+    }
+    
+    private func handleFailedLogin(isInitialLoginAttempt: Bool) {
+        guard isInitialLoginAttempt else { return }
+        
+        codeEntryService.attemptCodeEntry()
+        guard !codeEntryService.canCodeEntry() else { return }
+        logout()
     }
     
     private func getSavedKeypair() -> Keypair? {
