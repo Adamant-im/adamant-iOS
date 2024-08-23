@@ -86,7 +86,7 @@ final class NodesListViewController: FormViewController {
     private let screensFactory: ScreensFactory
     private let nodesStorage: NodesStorageProtocol
     private let nodesAdditionalParamsStorage: NodesAdditionalParamsStorageProtocol
-    private let apiService: ApiService
+    private let apiService: AdamantApiServiceProtocol
     private let socketService: SocketService
     
     // Properties
@@ -107,7 +107,7 @@ final class NodesListViewController: FormViewController {
         screensFactory: ScreensFactory,
         nodesStorage: NodesStorageProtocol,
         nodesAdditionalParamsStorage: NodesAdditionalParamsStorageProtocol,
-        apiService: ApiService,
+        apiService: AdamantApiServiceProtocol,
         socketService: SocketService
     ) {
         self.dialogService = dialogService

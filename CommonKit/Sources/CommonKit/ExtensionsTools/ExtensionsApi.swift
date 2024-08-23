@@ -11,10 +11,10 @@ import Foundation
 public final class ExtensionsApi {
     // MARK: Properties
     private let addressBookKey = "contact_list"
-    private let apiService: ApiService
+    private let apiService: AdamantApiServiceProtocol
     
     // MARK: Cotr
-    public init(apiService: ApiService) {
+    public init(apiService: AdamantApiServiceProtocol) {
         self.apiService = apiService
     }
     

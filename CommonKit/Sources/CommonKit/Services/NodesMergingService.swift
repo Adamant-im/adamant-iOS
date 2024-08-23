@@ -6,7 +6,7 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-public struct AdamantNodesMergingService: NodesMergingService {
+public struct NodesMergingService: NodesMergingServiceProtocol {
     public func merge(
         savedNodes: [NodeGroup: [Node]],
         defaultNodes: [NodeGroup: [Node]]
@@ -29,7 +29,7 @@ public struct AdamantNodesMergingService: NodesMergingService {
     public init() {}
 }
 
-private extension AdamantNodesMergingService {
+private extension NodesMergingService {
     func merge(savedNodes: [Node], defaultNodes: [Node]) -> [Node] {
         var resultNodes = savedNodes
         var defaultNodes = defaultNodes

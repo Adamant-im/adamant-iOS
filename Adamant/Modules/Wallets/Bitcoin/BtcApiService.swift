@@ -64,7 +64,7 @@ final class BtcApiCore: BlockchainHealthCheckableService {
     }
 }
 
-final class BtcApiService: WalletApiService {
+final class BtcApiService: ApiServiceProtocol {
     let api: BlockchainHealthCheckWrapper<BtcApiCore>
     
     var chosenFastestNodeId: UUID? {

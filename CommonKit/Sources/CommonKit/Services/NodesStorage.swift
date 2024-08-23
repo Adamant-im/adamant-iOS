@@ -21,7 +21,7 @@ public final class NodesStorage: NodesStorageProtocol {
     
     private var subscription: AnyCancellable?
     private let securedStore: SecuredStore
-    private let nodesMergingService: NodesMergingService
+    private let nodesMergingService: NodesMergingServiceProtocol
     private let defaultNodes: [NodeGroup: [Node]]
     
     public func getNodesPublisher(group: NodeGroup) -> AnyObservable<[Node]> {
@@ -91,7 +91,7 @@ public final class NodesStorage: NodesStorageProtocol {
     
     public init(
         securedStore: SecuredStore,
-        nodesMergingService: NodesMergingService,
+        nodesMergingService: NodesMergingServiceProtocol,
         defaultNodes: [NodeGroup: [Node]]
     ) {
         self.securedStore = securedStore

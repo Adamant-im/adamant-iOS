@@ -15,7 +15,7 @@ final class AdamantAccountService: AccountService {
     
     // MARK: Dependencies
     
-    private let apiService: ApiService
+    private let apiService: AdamantApiServiceProtocol
     private let adamantCore: AdamantCore
     private let dialogService: DialogService
     private let securedStore: SecuredStore
@@ -38,7 +38,7 @@ final class AdamantAccountService: AccountService {
     @Atomic private var subscriptions = Set<AnyCancellable>()
     
     init(
-        apiService: ApiService,
+        apiService: AdamantApiServiceProtocol,
         adamantCore: AdamantCore,
         dialogService: DialogService,
         securedStore: SecuredStore,

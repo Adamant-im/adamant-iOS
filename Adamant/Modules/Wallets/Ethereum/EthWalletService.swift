@@ -123,7 +123,7 @@ final class EthWalletService: WalletCoreProtocol {
     
     // MARK: - Dependencies
     weak var accountService: AccountService?
-    var apiService: ApiService!
+    var apiService: AdamantApiServiceProtocol!
     var ethApiService: EthApiService!
     var dialogService: DialogService!
     var increaseFeeService: IncreaseFeeService!
@@ -503,7 +503,7 @@ extension EthWalletService: SwinjectDependentService {
     @MainActor
     func injectDependencies(from container: Container) {
         accountService = container.resolve(AccountService.self)
-        apiService = container.resolve(ApiService.self)
+        apiService = container.resolve(AdamantApiServiceProtocol.self)
         dialogService = container.resolve(DialogService.self)
         increaseFeeService = container.resolve(IncreaseFeeService.self)
         ethApiService = container.resolve(EthApiService.self)

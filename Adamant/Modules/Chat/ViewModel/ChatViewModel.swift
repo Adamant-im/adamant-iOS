@@ -37,7 +37,7 @@ final class ChatViewModel: NSObject {
     private let filesStorage: FilesStorageProtocol
     private let chatFileService: ChatFileProtocol
     private let filesStorageProprieties: FilesStorageProprietiesProtocol
-    private let walletApiServiceCompose: WalletApiServiceComposeProtocol
+    private let apiServiceCompose: ApiServiceComposeProtocol
     private let reachabilityMonitor: ReachabilityMonitor
     private let filesPicker: FilesPickerProtocol
     
@@ -162,7 +162,7 @@ final class ChatViewModel: NSObject {
         filesStorage: FilesStorageProtocol,
         chatFileService: ChatFileProtocol,
         filesStorageProprieties: FilesStorageProprietiesProtocol,
-        walletApiServiceCompose: WalletApiServiceComposeProtocol,
+        apiServiceCompose: ApiServiceComposeProtocol,
         reachabilityMonitor: ReachabilityMonitor,
         filesPicker: FilesPickerProtocol
     ) {
@@ -184,7 +184,7 @@ final class ChatViewModel: NSObject {
         self.filesStorage = filesStorage
         self.chatFileService = chatFileService
         self.filesStorageProprieties = filesStorageProprieties
-        self.walletApiServiceCompose = walletApiServiceCompose
+        self.apiServiceCompose = apiServiceCompose
         self.reachabilityMonitor = reachabilityMonitor
         self.filesPicker = filesPicker
         
@@ -288,7 +288,7 @@ final class ChatViewModel: NSObject {
             return
         }
         
-        guard walletApiServiceCompose.hasActiveNode(group: .adm) else {
+        guard apiServiceCompose.hasActiveNode(group: .adm) else {
             dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
                 nodeGroupName: NodeGroup.adm.name
             ).localizedDescription))
@@ -703,7 +703,7 @@ final class ChatViewModel: NSObject {
             return false
         }
         
-        guard walletApiServiceCompose.hasActiveNode(group: .adm) else {
+        guard apiServiceCompose.hasActiveNode(group: .adm) else {
             dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
                 nodeGroupName: NodeGroup.adm.name
             ).localizedDescription))
@@ -1026,7 +1026,7 @@ extension ChatViewModel: NSFetchedResultsControllerDelegate {
 
 private extension ChatViewModel {
     func sendFiles(with text: String) async throws {
-        guard walletApiServiceCompose.hasActiveNode(group: .ipfs) else {
+        guard apiServiceCompose.hasActiveNode(group: .ipfs) else {
             dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
                 nodeGroupName: NodeGroup.ipfs.name
             ).localizedDescription))

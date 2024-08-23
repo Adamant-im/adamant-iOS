@@ -54,7 +54,7 @@ final class DogeWalletService: WalletCoreProtocol {
     static let richMessageType = "doge_transaction"
     
     // MARK: - Dependencies
-    var apiService: ApiService!
+    var apiService: AdamantApiServiceProtocol!
     var dogeApiService: DogeApiService!
     var accountService: AccountService!
     var dialogService: DialogService!
@@ -363,7 +363,7 @@ extension DogeWalletService {
 extension DogeWalletService: SwinjectDependentService {
     func injectDependencies(from container: Container) {
         accountService = container.resolve(AccountService.self)
-        apiService = container.resolve(ApiService.self)
+        apiService = container.resolve(AdamantApiServiceProtocol.self)
         dialogService = container.resolve(DialogService.self)
         addressConverter = container.resolve(AddressConverterFactory.self)?
             .make(network: network)

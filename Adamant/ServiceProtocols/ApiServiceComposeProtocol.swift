@@ -1,5 +1,5 @@
 //
-//  WalletApiServiceComposeProtocol.swift
+//  ApiServiceComposeProtocol.swift
 //  Adamant
 //
 //  Created by Andrew G on 21.08.2024.
@@ -9,7 +9,7 @@
 import Foundation
 import CommonKit
 
-protocol WalletApiServiceComposeProtocol {
+protocol ApiServiceComposeProtocol {
     func chosenFastestNodeId(group: NodeGroup) -> UUID?
     func hasActiveNode(group: NodeGroup) -> Bool
     func healthCheck(group: NodeGroup)

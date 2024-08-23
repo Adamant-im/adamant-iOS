@@ -31,7 +31,7 @@ final class KlyServiceApiCore: KlyApiCore {
     }
 }
 
-final class KlyServiceApiService: WalletApiService {
+final class KlyServiceApiService: ApiServiceProtocol {
     let api: BlockchainHealthCheckWrapper<KlyServiceApiCore>
     
     var chosenFastestNodeId: UUID? {

@@ -33,7 +33,7 @@ struct ChatFactory {
     let filesStorage: FilesStorageProtocol
     let chatFileService: ChatFileProtocol
     let filesStorageProprieties: FilesStorageProprietiesProtocol
-    let walletApiServiceCompose: WalletApiServiceComposeProtocol
+    let apiServiceCompose: ApiServiceComposeProtocol
     let reachabilityMonitor: ReachabilityMonitor
     let filesPickerKit: FilesPickerProtocol
    
@@ -53,7 +53,7 @@ struct ChatFactory {
         filesStorage = assembler.resolve(FilesStorageProtocol.self)!
         chatFileService = assembler.resolve(ChatFileProtocol.self)!
         filesStorageProprieties = assembler.resolve(FilesStorageProprietiesProtocol.self)!
-        walletApiServiceCompose = assembler.resolve(WalletApiServiceComposeProtocol.self)!
+        apiServiceCompose = assembler.resolve(ApiServiceComposeProtocol.self)!
         reachabilityMonitor = assembler.resolve(ReachabilityMonitor.self)!
         filesPickerKit = assembler.resolve(FilesPickerProtocol.self)!
     }
@@ -132,7 +132,7 @@ private extension ChatFactory {
             filesStorage: filesStorage,
             chatFileService: chatFileService,
             filesStorageProprieties: filesStorageProprieties,
-            walletApiServiceCompose: walletApiServiceCompose,
+            apiServiceCompose: apiServiceCompose,
             reachabilityMonitor: reachabilityMonitor,
             filesPicker: filesPickerKit
         )

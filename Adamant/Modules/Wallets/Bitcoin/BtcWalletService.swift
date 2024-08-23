@@ -118,7 +118,7 @@ final class BtcWalletService: WalletCoreProtocol {
     static let richMessageType = "btc_transaction"
     
     // MARK: - Dependencies
-    var apiService: ApiService!
+    var apiService: AdamantApiServiceProtocol!
     var btcApiService: BtcApiService!
     var accountService: AccountService!
     var dialogService: DialogService!
@@ -497,7 +497,7 @@ extension BtcWalletService: SwinjectDependentService {
     @MainActor
     func injectDependencies(from container: Container) {
         accountService = container.resolve(AccountService.self)
-        apiService = container.resolve(ApiService.self)
+        apiService = container.resolve(AdamantApiServiceProtocol.self)
         dialogService = container.resolve(DialogService.self)
         increaseFeeService = container.resolve(IncreaseFeeService.self)
         addressConverter = container.resolve(AddressConverterFactory.self)?.make(network: network)

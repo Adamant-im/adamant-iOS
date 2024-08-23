@@ -9,7 +9,7 @@
 import Foundation
 import Alamofire
 
-public protocol ApiService: WalletApiService {
+public protocol AdamantApiServiceProtocol: ApiServiceProtocol {
     // MARK: - Accounts
     func getAccount(byPassphrase passphrase: String) async -> ApiServiceResult<AdamantAccount>
     func getAccount(byPublicKey publicKey: String) async -> ApiServiceResult<AdamantAccount>

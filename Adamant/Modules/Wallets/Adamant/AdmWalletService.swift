@@ -58,7 +58,7 @@ final class AdmWalletService: NSObject, WalletCoreProtocol {
     
 	// MARK: - Dependencies
 	weak var accountService: AccountService?
-	var apiService: ApiService!
+	var apiService: AdamantApiServiceProtocol!
 	var transfersProvider: TransfersProvider!
     var coreDataStack: CoreDataStack!
     var vibroService: VibroService!
@@ -234,7 +234,7 @@ extension AdmWalletService: SwinjectDependentService {
     @MainActor
     func injectDependencies(from container: Container) {
         accountService = container.resolve(AccountService.self)
-        apiService = container.resolve(ApiService.self)
+        apiService = container.resolve(AdamantApiServiceProtocol.self)
         transfersProvider = container.resolve(TransfersProvider.self)
         coreDataStack = container.resolve(CoreDataStack.self)
         vibroService = container.resolve(VibroService.self)

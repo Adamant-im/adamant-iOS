@@ -45,7 +45,7 @@ final class DogeApiCore: BlockchainHealthCheckableService {
     }
 }
 
-final class DogeApiService: WalletApiService {
+final class DogeApiService: ApiServiceProtocol {
     let api: BlockchainHealthCheckWrapper<DogeApiCore>
     
     var chosenFastestNodeId: UUID? {

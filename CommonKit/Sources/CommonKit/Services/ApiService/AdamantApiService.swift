@@ -29,7 +29,7 @@ public final class AdamantApiService {
     }
 }
 
-extension AdamantApiService: ApiService {
+extension AdamantApiService: AdamantApiServiceProtocol {
     public var chosenFastestNodeId: UUID? {
         service.chosenFastestNodeId
     }

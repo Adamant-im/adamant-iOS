@@ -50,8 +50,8 @@ private struct CoinsNodesListAssembly: Assembly {
                     NodesAdditionalParamsStorageProtocol.self
                 )!,
                 processedGroups: processedGroups,
-                walletApiServiceCompose: $0.resolve(
-                    WalletApiServiceComposeProtocol.self
+                apiServiceCompose: $0.resolve(
+                    ApiServiceComposeProtocol.self
                 )!
             )
         }.inObjectScope(.transient)

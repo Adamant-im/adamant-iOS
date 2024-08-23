@@ -20,7 +20,7 @@ public struct ExtensionsApiFactory {
                 service: AdamantApiCore(apiCore: APICore()),
                 nodesStorage: NodesStorage(
                     securedStore: securedStore,
-                    nodesMergingService: AdamantNodesMergingService(),
+                    nodesMergingService: NodesMergingService(),
                     defaultNodes: .init()
                 ),
                 nodesAdditionalParamsStorage: NodesAdditionalParamsStorage(

@@ -15,7 +15,7 @@ struct DelegatesFactory {
     
     func makeDelegatesListVC(screensFactory: ScreensFactory) -> UIViewController {
         DelegatesListViewController(
-            apiService: assembler.resolve(ApiService.self)!,
+            apiService: assembler.resolve(AdamantApiServiceProtocol.self)!,
             accountService: assembler.resolve(AccountService.self)!,
             dialogService: assembler.resolve(DialogService.self)!,
             screensFactory: screensFactory
@@ -24,7 +24,7 @@ struct DelegatesFactory {
     
     func makeDelegateDetails() -> DelegateDetailsViewController {
         let c = DelegateDetailsViewController(nibName: "DelegateDetailsViewController", bundle: nil)
-        c.apiService = assembler.resolve(ApiService.self)
+        c.apiService = assembler.resolve(AdamantApiServiceProtocol.self)
         c.accountService = assembler.resolve(AccountService.self)
         c.dialogService = assembler.resolve(DialogService.self)
         return c

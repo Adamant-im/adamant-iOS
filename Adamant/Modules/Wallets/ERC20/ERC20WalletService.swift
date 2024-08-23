@@ -106,7 +106,7 @@ final class ERC20WalletService: WalletCoreProtocol {
     
     // MARK: - Dependencies
     weak var accountService: AccountService?
-    var apiService: ApiService!
+    var apiService: AdamantApiServiceProtocol!
     var erc20ApiService: ERC20ApiService!
     var dialogService: DialogService!
     var increaseFeeService: IncreaseFeeService!
@@ -411,7 +411,7 @@ extension ERC20WalletService: SwinjectDependentService {
     @MainActor
     func injectDependencies(from container: Container) {
         accountService = container.resolve(AccountService.self)
-        apiService = container.resolve(ApiService.self)
+        apiService = container.resolve(AdamantApiServiceProtocol.self)
         dialogService = container.resolve(DialogService.self)
         increaseFeeService = container.resolve(IncreaseFeeService.self)
         erc20ApiService = container.resolve(ERC20ApiService.self)

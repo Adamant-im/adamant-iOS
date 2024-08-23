@@ -50,7 +50,7 @@ struct KlyWalletFactory: WalletFactory {
             walletService: service,
             reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
             nodesStorage: assembler.resolve(NodesStorageProtocol.self)!,
-            walletApiServiceCompose: assembler.resolve(WalletApiServiceComposeProtocol.self)!
+            apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!
         )
     }
     

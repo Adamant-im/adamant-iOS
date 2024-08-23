@@ -18,7 +18,7 @@ final class KlyWalletService: WalletCoreProtocol {
     
     // MARK: Dependencies
     
-    var apiService: ApiService!
+    var apiService: AdamantApiServiceProtocol!
     var klyNodeApiService: KlyNodeApiService!
     var klyServiceApiService: KlyServiceApiService!
     var accountService: AccountService!
@@ -157,7 +157,7 @@ extension KlyWalletService: SwinjectDependentService {
     @MainActor
     func injectDependencies(from container: Container) {
         accountService = container.resolve(AccountService.self)
-        apiService = container.resolve(ApiService.self)
+        apiService = container.resolve(AdamantApiServiceProtocol.self)
         dialogService = container.resolve(DialogService.self)
         klyServiceApiService = container.resolve(KlyServiceApiService.self)
         klyNodeApiService = container.resolve(KlyNodeApiService.self)

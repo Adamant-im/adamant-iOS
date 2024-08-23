@@ -11,7 +11,7 @@ import Foundation
 import web3swift
 import Web3Core
 
-class EthApiService: WalletApiService {
+class EthApiService: ApiServiceProtocol {
     let api: BlockchainHealthCheckWrapper<EthApiCore>
     
     var keystoreManager: KeystoreManager? {

@@ -93,7 +93,7 @@ final class NodeEditorViewController: FormViewController {
     
     // MARK: - Dependencies
     var dialogService: DialogService!
-    var apiService: ApiService!
+    var apiService: AdamantApiServiceProtocol!
     var nodesStorage: NodesStorageProtocol!
     
     // MARK: - Properties

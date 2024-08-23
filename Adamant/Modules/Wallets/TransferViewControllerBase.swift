@@ -188,7 +188,7 @@ class TransferViewControllerBase: FormViewController {
     let walletCore: WalletCoreProtocol
     let reachabilityMonitor: ReachabilityMonitor
     let nodesStorage: NodesStorageProtocol
-    let walletApiServiceCompose: WalletApiServiceComposeProtocol
+    let apiServiceCompose: ApiServiceComposeProtocol
     
     // MARK: - Properties
     
@@ -321,7 +321,7 @@ class TransferViewControllerBase: FormViewController {
         walletService: WalletService,
         reachabilityMonitor: ReachabilityMonitor,
         nodesStorage: NodesStorageProtocol,
-        walletApiServiceCompose: WalletApiServiceComposeProtocol
+        apiServiceCompose: ApiServiceComposeProtocol
     ) {
         self.accountService = accountService
         self.accountsProvider = accountsProvider
@@ -335,7 +335,7 @@ class TransferViewControllerBase: FormViewController {
         self.walletCore = walletService.core
         self.reachabilityMonitor = reachabilityMonitor
         self.nodesStorage = nodesStorage
-        self.walletApiServiceCompose = walletApiServiceCompose
+        self.apiServiceCompose = apiServiceCompose
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -803,7 +803,7 @@ class TransferViewControllerBase: FormViewController {
         }
         
         guard
-            walletApiServiceCompose.hasActiveNode(group: .adm) || admReportRecipient == nil
+            apiServiceCompose.hasActiveNode(group: .adm) || admReportRecipient == nil
         else {
             dialogService.showWarning(
                 withMessage: ApiServiceError.noEndpointsAvailable(

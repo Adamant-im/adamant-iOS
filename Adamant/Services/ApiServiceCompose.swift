@@ -1,5 +1,5 @@
 //
-//  WalletApiServiceCompose.swift
+//  ApiServiceCompose.swift
 //  Adamant
 //
 //  Created by Andrew G on 21.08.2024.
@@ -9,15 +9,15 @@
 import Foundation
 import CommonKit
 
-struct WalletApiServiceCompose: WalletApiServiceComposeProtocol {
-    let btc: WalletApiService
-    let eth: WalletApiService
-    let klyNode: WalletApiService
-    let klyService: WalletApiService
-    let doge: WalletApiService
-    let dash: WalletApiService
-    let adm: WalletApiService
-    let ipfs: WalletApiService
+struct ApiServiceCompose: ApiServiceComposeProtocol {
+    let btc: ApiServiceProtocol
+    let eth: ApiServiceProtocol
+    let klyNode: ApiServiceProtocol
+    let klyService: ApiServiceProtocol
+    let doge: ApiServiceProtocol
+    let dash: ApiServiceProtocol
+    let adm: ApiServiceProtocol
+    let ipfs: ApiServiceProtocol
     
     func chosenFastestNodeId(group: NodeGroup) -> UUID? {
         getApiService(group: group).chosenFastestNodeId
@@ -32,8 +32,8 @@ struct WalletApiServiceCompose: WalletApiServiceComposeProtocol {
     }
 }
 
-private extension WalletApiServiceCompose {
-    func getApiService(group: NodeGroup) -> WalletApiService {
+private extension ApiServiceCompose {
+    func getApiService(group: NodeGroup) -> ApiServiceProtocol {
         switch group {
         case .btc:
             return btc

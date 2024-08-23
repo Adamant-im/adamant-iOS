@@ -1,5 +1,5 @@
 //
-//  WalletApiService.swift
+//  ApiServiceProtocol.swift
 //  Adamant
 //
 //  Created by Andrew G on 20.11.2023.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-public protocol WalletApiService {
+public protocol ApiServiceProtocol {
     var chosenFastestNodeId: UUID? { get }
     var hasActiveNode: Bool { get }
     

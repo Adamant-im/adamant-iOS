@@ -10,7 +10,7 @@ import LiskKit
 import Foundation
 import CommonKit
 
-final class KlyNodeApiService: WalletApiService {
+final class KlyNodeApiService: ApiServiceProtocol {
     let api: BlockchainHealthCheckWrapper<KlyApiCore>
     
     var chosenFastestNodeId: UUID? {
