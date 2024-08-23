@@ -32,7 +32,7 @@ public struct ExtensionsApiFactory {
                     name: "ADM",
                     normalUpdateInterval: .infinity,
                     crucialUpdateInterval: .infinity,
-                    minNodeVersion: .zero,
+                    minNodeVersion: nil,
                     nodeHeightEpsilon: .zero
                 ),
                 connection: nil

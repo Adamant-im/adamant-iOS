@@ -12,7 +12,7 @@ public struct BlockchainHealthCheckParams {
     public let name: String
     public let normalUpdateInterval: TimeInterval
     public let crucialUpdateInterval: TimeInterval
-    public let minNodeVersion: Double
+    public let minNodeVersion: Version?
     public let nodeHeightEpsilon: Int
     
     public init(
@@ -20,7 +20,7 @@ public struct BlockchainHealthCheckParams {
         name: String,
         normalUpdateInterval: TimeInterval,
         crucialUpdateInterval: TimeInterval,
-        minNodeVersion: Double,
+        minNodeVersion: Version?,
         nodeHeightEpsilon: Int
     ) {
         self.group = group

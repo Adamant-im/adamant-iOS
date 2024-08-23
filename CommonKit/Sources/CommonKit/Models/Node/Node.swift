@@ -93,12 +93,4 @@ public extension Node {
         mainOrigin.wsPort = wsPort
         altOrigin?.wsPort = wsPort
     }
-    
-    static func versionToDouble(_ value: String?) -> Double? {
-        guard let minNodeVersion = value?.replacingOccurrences(of: ".", with: ""),
-              let versionNumber = Double(minNodeVersion)
-        else { return nil }
-        
-        return versionNumber
-    }
 }
