@@ -151,8 +151,7 @@ private extension BlockchainHealthCheckWrapper {
             node.ping = info.ping
             
             guard
-                let versionString = info.version,
-                let version = Version(versionString),
+                let version = info.version,
                 let minNodeVersion = params.minNodeVersion,
                 version < minNodeVersion
             else { return }
@@ -179,8 +178,7 @@ private extension BlockchainHealthCheckWrapper {
             var status: NodeConnectionStatus?
             
             if
-                let versionString = node.version,
-                let version = Version(versionString),
+                let version = node.version,
                 let minNodeVersion = params.minNodeVersion,
                 version < minNodeVersion
             {

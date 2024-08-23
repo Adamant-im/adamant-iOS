@@ -59,7 +59,7 @@ final class BtcApiCore: BlockchainHealthCheckableService {
             height: blockchainInfo.blocks,
             wsEnabled: false,
             wsPort: nil,
-            version: String(networkInfo.version)
+            version: .init(String(networkInfo.version))
         ))
     }
 }

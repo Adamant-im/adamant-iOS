@@ -35,7 +35,7 @@ extension Node {
         case .notAllowed(let reason):
             return [
                 reason.text,
-                version
+                version?.string
             ]
             .compactMap { $0 }
             .joined(separator: " ")

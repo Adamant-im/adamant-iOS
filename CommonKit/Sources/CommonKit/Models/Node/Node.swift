@@ -15,7 +15,7 @@ public struct Node: Equatable, Identifiable {
     public var mainOrigin: NodeOrigin
     public var altOrigin: NodeOrigin?
     public var wsEnabled: Bool
-    public var version: String?
+    public var version: Version?
     public var height: Int?
     public var ping: TimeInterval?
     public var connectionStatus: NodeConnectionStatus?
@@ -29,7 +29,7 @@ public struct Node: Equatable, Identifiable {
         wsEnabled: Bool,
         mainOrigin: NodeOrigin,
         altOrigin: NodeOrigin?,
-        version: String?,
+        version: Version?,
         height: Int?,
         ping: TimeInterval?,
         connectionStatus: NodeConnectionStatus?,

@@ -51,6 +51,8 @@ private extension ApiServiceCompose {
             return adm
         case .ipfs:
             return ipfs
+        case .infoService:
+            return ipfs
         }
     }
 }

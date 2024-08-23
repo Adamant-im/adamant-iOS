@@ -27,6 +27,8 @@ extension NodeGroup {
             return DashWalletService.healthCheckParameters.onScreenUpdateInterval
         case .ipfs:
             return IPFSApiService.healthCheckParameters.onScreenUpdateInterval
+        case .infoService:
+            return 1000
         }
     }
 
@@ -48,6 +50,8 @@ extension NodeGroup {
             return DashWalletService.healthCheckParameters.crucialUpdateInterval
         case .ipfs:
             return IPFSApiService.healthCheckParameters.crucialUpdateInterval
+        case .infoService:
+            return 1000
         }
     }
 
@@ -69,6 +73,8 @@ extension NodeGroup {
             return DashWalletService.healthCheckParameters.threshold
         case .ipfs:
             return IPFSApiService.healthCheckParameters.threshold
+        case .infoService:
+            return 1000
         }
     }
 
@@ -90,6 +96,8 @@ extension NodeGroup {
             return DashWalletService.healthCheckParameters.normalUpdateInterval
         case .ipfs:
             return IPFSApiService.healthCheckParameters.normalUpdateInterval
+        case .infoService:
+            return 1000
         }
     }
     
@@ -110,7 +118,7 @@ extension NodeGroup {
             DogeWalletService.minNodeVersion
         case .dash:
             DashWalletService.minNodeVersion
-        case .ipfs:
+        case .ipfs, .infoService:
             nil
         } else { return nil }
         
@@ -136,12 +144,14 @@ extension NodeGroup {
             return AdmWalletService.tokenNetworkSymbol
         case .ipfs:
             return IPFSApiService.symbol
+        case .infoService:
+            return "INFO SERVICE"
         }
     }
     
     var includeVersionTitle: Bool {
         switch self {
-        case .btc, .klyNode, .klyService, .doge, .adm:
+        case .btc, .klyNode, .klyService, .doge, .adm, .infoService:
             return true
         case .eth, .dash, .ipfs:
             return false

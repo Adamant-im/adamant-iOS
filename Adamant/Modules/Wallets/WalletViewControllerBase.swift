@@ -48,7 +48,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     
     // MARK: - Dependencies
     
-    private let currencyInfoService: CurrencyInfoService
+    private let currencyInfoService: InfoServiceProtocol
     private let accountService: AccountService
     private let walletServiceCompose: WalletServiceCompose
     
@@ -84,7 +84,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     
     init(
         dialogService: DialogService,
-        currencyInfoService: CurrencyInfoService,
+        currencyInfoService: InfoServiceProtocol,
         accountService: AccountService,
         screensFactory: ScreensFactory,
         walletServiceCompose: WalletServiceCompose,

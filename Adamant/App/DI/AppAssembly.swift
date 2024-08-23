@@ -251,7 +251,7 @@ struct AppAssembly: Assembly {
                 guard let service = c as? AdamantAccountService else { return }
                 service.notificationsService = r.resolve(NotificationsService.self)!
                 service.pushNotificationsTokenService = r.resolve(PushNotificationsTokenService.self)!
-                service.currencyInfoService = r.resolve(CurrencyInfoService.self)!
+                service.currencyInfoService = r.resolve(InfoServiceProtocol.self)!
                 service.visibleWalletService = r.resolve(VisibleWalletsService.self)!
             }
         }
@@ -266,9 +266,9 @@ struct AppAssembly: Assembly {
             )
         }.inObjectScope(.container)
         
-        // MARK: CurrencyInfoService
-        container.register(CurrencyInfoService.self) { r in
-            AdamantCurrencyInfoService(
+        // MARK: InfoServiceProtocol
+        container.register(InfoServiceProtocol.self) { r in
+            AdamantInfoServiceProtocol(
                 securedStore: r.resolve(SecuredStore.self)!,
                 walletServiceCompose: r.resolve(WalletServiceCompose.self)!
             )

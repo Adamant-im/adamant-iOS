@@ -1,5 +1,5 @@
 //
-//  AdamantCurrencyInfoService.swift
+//  AdamantInfoServiceProtocol.swift
 //  Adamant
 //
 //  Created by Anton Boyarkin on 23/03/2019.
@@ -18,7 +18,7 @@ extension StoreKey {
 }
 
 // MARK: - Service
-final class AdamantCurrencyInfoService: CurrencyInfoService {
+final class AdamantInfoServiceProtocol: InfoServiceProtocol {
     // MARK: - API
     private lazy var infoServiceUrl: URL = {
         return URL(string: AdamantResources.coinsInfoSrvice)!
@@ -115,6 +115,7 @@ final class AdamantCurrencyInfoService: CurrencyInfoService {
     }
     
     private func loadRates(for coins: [String], completion: @escaping (ApiServiceResult<[String: Decimal]>) -> Void) {
+        print("--debug loadRates start")
         guard let url = url(for: .get, with: [URLQueryItem(name: "coin", value: coins.joined(separator: ","))]) else {
             completion(.failure(.internalError(message: "Failed to build URL", error: nil)))
             return
@@ -128,6 +129,7 @@ final class AdamantCurrencyInfoService: CurrencyInfoService {
             switch response.result {
             case .success(let data):
                 do {
+                    print("--debug try (success)")
                     let model: CoinInfoServiceResponseGet = try JSONDecoder().decode(CoinInfoServiceResponseGet.self, from: data)
                     if let result = model.result {
                         let nonOptionalResult = result.compactMapValues { $0 }
@@ -136,16 +138,19 @@ final class AdamantCurrencyInfoService: CurrencyInfoService {
                         completion(.failure(.serverError(error: "Coin info API result: Parsing error")))
                     }
                 } catch {
+                    print("--debug loadRates catch error")
                     completion(.failure(.serverError(error: "Coin info API result: Parsing error")))
                 }
                 
             case .failure(let error):
+                print("--debug loadRates failure")
                 completion(.failure(.networkError(error: error)))
             }
         }
     }
     
     func getHistory(for coin: String, timestamp: Date, completion: @escaping (ApiServiceResult<[String:Decimal]?>) -> Void) {
+        print("--debug getHistory start")
         guard let url = url(for: .history, with: [URLQueryItem(name: "timestamp", value: String(format: "%.0f", timestamp.timeIntervalSince1970)), URLQueryItem(name: "coin", value: coin)]) else {
             completion(.failure(.internalError(message: "Failed to build URL", error: nil)))
             return
@@ -159,18 +164,22 @@ final class AdamantCurrencyInfoService: CurrencyInfoService {
             switch response.result {
             case .success(let data):
                 do {
+                    print("--debug getHistory try (success)")
                     let model: CoinInfoServiceResponseHistory = try JSONDecoder().decode(CoinInfoServiceResponseHistory.self, from: data)
-                    guard let result = model.result?.first, abs(timestamp.timeIntervalSince(result.date)) < AdamantCurrencyInfoService.historyThreshold else {   // Разница в датах не должна превышать суток
+                    guard let result = model.result?.first, abs(timestamp.timeIntervalSince(result.date)) < AdamantInfoServiceProtocol.historyThreshold else {   // Разница в датах не должна превышать суток
+                        print("--debug Разница в датах не должна превышать суток")
                         completion(.success(nil))
                         return
                     }
                     
                     completion(.success(result.tickers))
                 } catch {
+                    print("--debug getHistory catch error")
                     completion(.failure(.serverError(error: "Coin info API result: Parsing error")))
                 }
                 
             case .failure(let error):
+                print("--debug getHistory failure")
                 completion(.failure(.networkError(error: error)))
             }
         }

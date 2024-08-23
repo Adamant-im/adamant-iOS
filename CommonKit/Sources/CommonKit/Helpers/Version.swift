@@ -14,6 +14,8 @@ public struct Version {
 }
 
 public extension Version {
+    static var zero: Self { .init([.zero]) }
+    
     var string: String {
         versions.map { String($0) }.joined(separator: ".")
     }

@@ -152,7 +152,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
     // MARK: - Dependencies
     
     let dialogService: DialogService
-    let currencyInfo: CurrencyInfoService
+    let currencyInfo: InfoServiceProtocol
     let addressBookService: AddressBookService
     let accountService: AccountService
     let walletService: WalletService?
@@ -244,7 +244,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     init(
         dialogService: DialogService,
-        currencyInfo: CurrencyInfoService,
+        currencyInfo: InfoServiceProtocol,
         addressBookService: AddressBookService,
         accountService: AccountService,
         walletService: WalletService?,

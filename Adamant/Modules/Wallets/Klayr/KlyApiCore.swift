@@ -57,7 +57,7 @@ class KlyApiCore: BlockchainHealthCheckableService {
                     height: model.height ?? .zero,
                     wsEnabled: false,
                     wsPort: nil,
-                    version: model.version
+                    version: .init(model.version)
                 )
         }
     }

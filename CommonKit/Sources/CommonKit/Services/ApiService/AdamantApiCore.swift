@@ -45,7 +45,7 @@ extension AdamantApiCore: BlockchainHealthCheckableService {
                 height: statusDto.network?.height ?? .zero,
                 wsEnabled: statusDto.wsClient?.enabled ?? false,
                 wsPort: statusDto.wsClient?.port,
-                version: statusDto.version?.version
+                version: statusDto.version?.version.flatMap { .init($0) }
             )
         }
     }

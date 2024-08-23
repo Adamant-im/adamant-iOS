@@ -22,7 +22,7 @@ final class AdamantAccountService: AccountService {
     private let walletServiceCompose: WalletServiceCompose
 
     weak var notificationsService: NotificationsService?
-    weak var currencyInfoService: CurrencyInfoService?
+    weak var currencyInfoService: InfoServiceProtocol?
     weak var pushNotificationsTokenService: PushNotificationsTokenService?
     weak var visibleWalletService: VisibleWalletsService?
     

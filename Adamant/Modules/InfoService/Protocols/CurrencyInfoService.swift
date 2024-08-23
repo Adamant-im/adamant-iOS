@@ -1,5 +1,5 @@
 //
-//  CurrencyInfoService.swift
+//  InfoServiceProtocol.swift
 //  Adamant
 //
 //  Created by Anton Boyarkin on 23/03/2019.
@@ -37,7 +37,7 @@ enum Currency: String {
 }
 
 // MARK: - protocol
-protocol CurrencyInfoService: AnyObject {
+protocol InfoServiceProtocol: AnyObject {
     var currentCurrency: Currency { get set }
     
     // Check rates for list of coins

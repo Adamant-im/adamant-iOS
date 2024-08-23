@@ -59,7 +59,7 @@ final class DashApiCore: BlockchainHealthCheckableService {
             height: blockchainInfo.blocks,
             wsEnabled: false,
             wsPort: nil,
-            version: networkInfo.buildversion
+            version: .init(networkInfo.buildversion)
         ))
     }
 }
