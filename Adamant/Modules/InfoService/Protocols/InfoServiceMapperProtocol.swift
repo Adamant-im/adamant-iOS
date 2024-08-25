@@ -12,9 +12,9 @@ import CommonKit
 protocol InfoServiceMapperProtocol {
     func mapToModel(_ dto: InfoServiceStatusDTO) -> InfoServiceStatus
     
-    func mapToModel(
-        _ dto: InfoServiceResponseDTO<[String: Double]>
-    ) -> InfoServiceApiResult<[String: Double]>
+    func mapRatesToModel(
+        _ dto: InfoServiceResponseDTO<[String: String]>
+    ) -> InfoServiceApiResult<[InfoServiceTicker: Decimal]>
     
     func mapToModel(
         _ dto: InfoServiceResponseDTO<[InfoServiceHistoryItemDTO]>
@@ -24,4 +24,11 @@ protocol InfoServiceMapperProtocol {
         ping: TimeInterval,
         status: InfoServiceStatus
     ) -> NodeStatusInfo
+    
+    func mapToRatesRequestDTO(_ coins: [String]) -> InfoServiceRatesRequestDTO
+    
+    func mapToHistoryRequestDTO(
+        date: Date,
+        coin: String
+    ) -> InfoServiceHistoryRequestDTO
 }

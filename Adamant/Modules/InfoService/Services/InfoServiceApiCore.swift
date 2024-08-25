@@ -9,18 +9,10 @@
 import Foundation
 import CommonKit
 
-final class InfoServiceApiCore {
-    private let apiCore: APICoreProtocol
-    private let mapper: InfoServiceMapperProtocol
-    
-    init(
-        apiCore: APICoreProtocol,
-        mapper: InfoServiceMapperProtocol
-    ) {
-        self.apiCore = apiCore
-        self.mapper = mapper
-    }
-    
+struct InfoServiceApiCore {
+    let apiCore: APICoreProtocol
+    let mapper: InfoServiceMapperProtocol
+
     func getNodeStatus(
         origin: NodeOrigin
     ) async -> ApiServiceResult<InfoServiceStatusDTO> {

@@ -19,10 +19,10 @@ struct InfoServiceMapper: InfoServiceMapperProtocol {
         )
     }
     
-    func mapToModel(
-        _ dto: InfoServiceResponseDTO<[String: Double]>
-    ) -> InfoServiceApiResult<[String: Double]> {
-        mapResponseDTO(dto)
+    func mapRatesToModel(
+        _ dto: InfoServiceResponseDTO<[String: String]>
+    ) -> InfoServiceApiResult<[InfoServiceTicker: Decimal]> {
+        mapResponseDTO(dto).map { mapToTickers($0) }
     }
     
     func mapToModel(
@@ -31,14 +31,12 @@ struct InfoServiceMapper: InfoServiceMapperProtocol {
         mapResponseDTO(dto).flatMap {
             guard
                 let item = $0.first,
-                let ticker = item.tickers?.first?.key,
-                let price = item.tickers?.first?.value
+                let tickers = item.tickers
             else { return .failure(.parsingError) }
             
             return .success(.init(
                 date: .init(timeIntervalSince1970: .init(milliseconds: item.date)),
-                ticker: ticker,
-                price: price
+                tickers: mapToTickers(tickers)
             ))
         }
     }
@@ -55,9 +53,46 @@ struct InfoServiceMapper: InfoServiceMapperProtocol {
             version: status.version
         )
     }
+    
+    func mapToRatesRequestDTO(_ coins: [String]) -> InfoServiceRatesRequestDTO {
+        .init(coin: coins.joined(separator: ","))
+    }
+    
+    func mapToHistoryRequestDTO(
+        date: Date,
+        coin: String
+    ) -> InfoServiceHistoryRequestDTO {
+        .init(
+            timestamp: .init(format: "%.0f", date.timeIntervalSince1970),
+            coin: coin
+        )
+    }
 }
 
 private extension InfoServiceMapper {
+    func mapToTickers(_ rawTickers: [String: String]) -> [InfoServiceTicker: Decimal] {
+        .init(uniqueKeysWithValues: rawTickers.compactMap { key, value in
+            guard
+                let ticker = mapToTicker(key),
+                let price = Decimal(string: value)
+            else { return nil }
+            
+            return (ticker, price)
+        })
+    }
+    
+    func mapToTicker(_ string: String) -> InfoServiceTicker? {
+        let list: [String] = string.split(separator: "/").map { .init($0) }
+        
+        guard
+            list.count == 2,
+            let crypto = list.first,
+            let fiat = list.last
+        else { return nil }
+        
+        return .init(crypto: crypto, fiat: fiat)
+    }
+    
     func mapResponseDTO<Body: Codable>(
         _ dto: InfoServiceResponseDTO<Body>
     ) -> InfoServiceApiResult<Body> {

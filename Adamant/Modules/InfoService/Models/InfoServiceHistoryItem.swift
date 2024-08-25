@@ -10,6 +10,5 @@ import Foundation
 
 struct InfoServiceHistoryItem {
     let date: Date
-    let ticker: String
-    let price: Double
+    let tickers: [InfoServiceTicker: Decimal]
 }

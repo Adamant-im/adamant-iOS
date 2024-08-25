@@ -772,14 +772,17 @@ class TransactionDetailsViewControllerBase: FormViewController {
         Task {
             var tickers = try await currencyInfo.getHistory(
                 for: currencySymbol,
-                timestamp: date
-            )
+                date: date
+            ).get()
             
             isFiatSet = true
             
-            guard var ticker = tickers["\(currencySymbol)/\(currentFiat)"] else {
-                return
-            }
+            guard
+                var ticker = tickers[.init(
+                    crypto: currencySymbol,
+                    fiat: currentFiat
+                )]
+            else { return }
             
             let totalFiat = amount * ticker
             valueAtTimeTxn = fiatFormatter.string(from: totalFiat)
@@ -790,12 +793,15 @@ class TransactionDetailsViewControllerBase: FormViewController {
                feeCurrencySymbol != currencySymbol {
                 tickers = try await currencyInfo.getHistory(
                     for: feeCurrencySymbol,
-                    timestamp: date
-                )
+                    date: date
+                ).get()
                 
-                guard let feeTicker = tickers["\(feeCurrencySymbol)/\(currentFiat)"] else {
-                    return
-                }
+                guard
+                    let feeTicker = tickers[.init(
+                        crypto: feeCurrencySymbol,
+                        fiat: currentFiat
+                    )]
+                else { return }
                 
                 ticker = feeTicker
             }

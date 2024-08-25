@@ -9,5 +9,5 @@
 struct InfoServiceHistoryItemDTO: Codable {
     let _id: String
     let date: Int
-    let tickers: [String: Double]?
+    let tickers: [String: String]?
 }

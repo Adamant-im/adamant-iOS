@@ -15,6 +15,12 @@ extension Notification.Name {
     }
 }
 
+extension StoreKey {
+    struct CoinInfo {
+        static let selectedCurrency = "coinInfo.selectedCurrency"
+    }
+}
+
 // MARK: - Currencies
 enum Currency: String {
     case RUB = "RUB"
@@ -46,12 +52,10 @@ protocol InfoServiceProtocol: AnyObject {
     // Get rate for pair Crypto / Fiat currencies
     func getRate(for coin: String) -> Decimal?
     
-    func getHistory(for coin: String, timestamp: Date, completion: @escaping (ApiServiceResult<[String:Decimal]?>) -> Void)
-    
     func getHistory(
         for coin: String,
-        timestamp: Date
-    ) async throws -> [String: Decimal]
+        date: Date
+    ) async -> InfoServiceApiResult<[InfoServiceTicker: Decimal]>
 }
 
 // MARK: - AdamantBalanceFormat fiat formatter
