@@ -12,7 +12,8 @@ import Combine
 
 final class ChatPreservation: ChatPreservationProtocol {
     @Atomic private var preservedMessages: [String: String] = [:]
-    @Atomic private var replayMessage: [String: MessageModel] = [:]
+    @Atomic private var preservedReplayMessage: [String: MessageModel] = [:]
+    @Atomic private var preservedFiles: [String: [FileResult]] = [:]
     @Atomic private var notificationsSet: Set<AnyCancellable> = []
     
     init() {
@@ -28,7 +29,8 @@ final class ChatPreservation: ChatPreservationProtocol {
     
     private func clearPreservedMessages() {
         preservedMessages = [:]
-        replayMessage = [:]
+        preservedReplayMessage = [:]
+        preservedFiles = [:]
     }
     
     func preserveMessage(_ message: String, forAddress address: String) {
@@ -48,11 +50,11 @@ final class ChatPreservation: ChatPreservationProtocol {
     }
     
     func setReplyMessage(_ message: MessageModel?, forAddress address: String) {
-        replayMessage[address] = message
+        preservedReplayMessage[address] = message
     }
     
     func getReplyMessage(address: String, thenRemoveIt: Bool) -> MessageModel? {
-        guard let replayMessage = replayMessage[address] else {
+        guard let replayMessage = preservedReplayMessage[address] else {
             return nil
         }
         
@@ -61,5 +63,24 @@ final class ChatPreservation: ChatPreservationProtocol {
         }
         
         return replayMessage
+    }
+    
+    func preserveFiles(_ files: [FileResult]?, forAddress address: String) {
+        preservedFiles[address] = files
+    }
+    
+    func getPreservedFiles(
+        for address: String,
+        thenRemoveIt: Bool
+    ) -> [FileResult]? {
+        guard let files = preservedFiles[address] else {
+            return nil
+        }
+
+        if thenRemoveIt {
+            preservedFiles.removeValue(forKey: address)
+        }
+
+        return files
     }
 }

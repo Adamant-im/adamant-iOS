@@ -102,7 +102,9 @@ final class ChatListViewController: KeyboardObservingViewController {
                     font: .adamantCodeDefault,
                     textHighlightColor: .adamant.codeBlockText,
                     textBackgroundColor: .adamant.codeBlock
-                )
+                ),
+                MarkdownFileRaw(emoji: "📸", font: .adamantChatFileRawDefault),
+                MarkdownFileRaw(emoji: "📄", font: .adamantChatFileRawDefault)
             ]
         )
         
@@ -133,7 +135,7 @@ final class ChatListViewController: KeyboardObservingViewController {
     private var loadNewChatTask: Task<(), Never>?
     private var subscriptions = Set<AnyCancellable>()
     
-    //MARK: Init
+    // MARK: Init
     
     init(
         accountService: AccountService,
@@ -300,6 +302,30 @@ final class ChatListViewController: KeyboardObservingViewController {
                 self?.updateUITitles()
             }
             .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .Storage.storageClear)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.closeDetailVC()
+            }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .Storage.storageProprietiesUpdated)
+            .receive(on: OperationQueue.main)
+            .sink { [weak self] _ in
+                self?.closeDetailVC()
+            }
+            .store(in: &subscriptions)
+    }
+    
+    private func closeDetailVC() {
+        guard let splitVC = tabBarController?.viewControllers?.first as? UISplitViewController,
+              !splitVC.isCollapsed
+        else { return }
+        
+        splitVC.showDetailViewController(WelcomeViewController(), sender: nil)
     }
     
     private func updateUITitles() {
@@ -923,40 +949,8 @@ extension ChatListViewController {
             
             if richMessage.additionalType == .reply,
                let content = richMessage.richContent,
-               var text = content[RichContentKeys.reply.replyMessage] as? String {
-                text = MessageProcessHelper.process(text)
-                
-                let prefix = richMessage.isOutgoing
-                ? "\(String.adamant.chatList.sentMessagePrefix)"
-                : ""
-                
-                let replyImageAttachment = NSTextAttachment()
-                
-                replyImageAttachment.image = UIImage(
-                    systemName: "arrowshape.turn.up.left"
-                )?.withTintColor(.adamant.primary)
-                
-                replyImageAttachment.bounds = CGRect(
-                    x: .zero,
-                    y: -3,
-                    width: 23,
-                    height: 20
-                )
-                
-                let extraSpace = richMessage.isOutgoing ? "  " : ""
-                let imageString = NSAttributedString(attachment: replyImageAttachment)
-                
-                let markDownText = markdownParser.parse("\(extraSpace)\(text)").resolveLinkColor()
-                
-                var fullString = NSMutableAttributedString(string: prefix)
-                if richMessage.isOutgoing {
-                    fullString.append(imageString)
-                }
-                fullString.append(markDownText)
-                
-                fullString = MessageProcessHelper.process(attributedText: fullString)
-                
-                return fullString
+               let text = content[RichContentKeys.reply.replyMessage] as? String {
+                return getRawReplyPresentation(isOutgoing: richMessage.isOutgoing, text: text)
             }
             
             if richMessage.additionalType == .reaction,
@@ -971,6 +965,26 @@ extension ChatListViewController {
                 : NSMutableAttributedString(string: "\(prefix)\(String.adamant.chatList.reacted) \(reaction)")
                 
                 return text
+            }
+            
+            if richMessage.additionalType == .reply,
+               let content = richMessage.richContent,
+               richMessage.isFileReply() {
+                let text = FilePresentationHelper.getFilePresentationText(content)
+                return getRawReplyPresentation(isOutgoing: richMessage.isOutgoing, text: text)
+            }
+            
+            if richMessage.additionalType == .file,
+               let content = richMessage.richContent {
+                let prefix = richMessage.isOutgoing
+                ? "\(String.adamant.chatList.sentMessagePrefix)"
+                : ""
+                
+                let fileText = FilePresentationHelper.getFilePresentationText(content)
+                
+                let attributesText = markdownParser.parse(prefix + fileText).resolveLinkColor()
+                
+                return attributesText
             }
             
             if let serialized = richMessage.serializedMessage() {
@@ -993,6 +1007,38 @@ extension ChatListViewController {
         default:
             return nil
         }
+    }
+    
+    private func getRawReplyPresentation(isOutgoing: Bool, text: String) -> NSMutableAttributedString {
+        let prefix = isOutgoing
+        ? "\(String.adamant.chatList.sentMessagePrefix)"
+        : ""
+        
+        let replyImageAttachment = NSTextAttachment()
+        
+        replyImageAttachment.image = UIImage(
+            systemName: "arrowshape.turn.up.left"
+        )?.withTintColor(.adamant.primary)
+        
+        replyImageAttachment.bounds = CGRect(
+            x: .zero,
+            y: -3,
+            width: 23,
+            height: 20
+        )
+        
+        let extraSpace = isOutgoing ? "  " : ""
+        let imageString = NSAttributedString(attachment: replyImageAttachment)
+        
+        let markDownText = markdownParser.parse("\(extraSpace)\(text)").resolveLinkColor()
+        
+        let fullString = NSMutableAttributedString(string: prefix)
+        if isOutgoing {
+            fullString.append(imageString)
+        }
+        fullString.append(markDownText)
+        
+        return MessageProcessHelper.process(attributedText: fullString)
     }
 }
 

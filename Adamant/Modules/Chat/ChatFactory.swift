@@ -11,6 +11,8 @@ import MessageKit
 import InputBarAccessoryView
 import Combine
 import Swinject
+import FilesStorageKit
+import FilesPickerKit
 
 @MainActor
 struct ChatFactory {
@@ -27,7 +29,13 @@ struct ChatFactory {
     let emojiService: EmojiService
     let walletServiceCompose: WalletServiceCompose
     let chatPreservation: ChatPreservationProtocol
-    
+    let filesStorage: FilesStorageProtocol
+    let chatFileService: ChatFileProtocol
+    let filesStorageProprieties: FilesStorageProprietiesProtocol
+    let nodesStorage: NodesStorageProtocol
+    let reachabilityMonitor: ReachabilityMonitor
+    let filesPickerKit: FilesPickerProtocol
+   
     nonisolated init(assembler: Assembler) {
         chatsProvider = assembler.resolve(ChatsProvider.self)!
         dialogService = assembler.resolve(DialogService.self)!
@@ -41,6 +49,12 @@ struct ChatFactory {
         emojiService = assembler.resolve(EmojiService.self)!
         walletServiceCompose = assembler.resolve(WalletServiceCompose.self)!
         chatPreservation = assembler.resolve(ChatPreservationProtocol.self)!
+        filesStorage = assembler.resolve(FilesStorageProtocol.self)!
+        chatFileService = assembler.resolve(ChatFileProtocol.self)!
+        filesStorageProprieties = assembler.resolve(FilesStorageProprietiesProtocol.self)!
+        nodesStorage = assembler.resolve(NodesStorageProtocol.self)!
+        reachabilityMonitor = assembler.resolve(ReachabilityMonitor.self)!
+        filesPickerKit = assembler.resolve(FilesPickerProtocol.self)!
     }
     
     func makeViewController(screensFactory: ScreensFactory) -> ChatViewController {
@@ -98,7 +112,7 @@ private extension ChatFactory {
             markdownParser: .init(font: UIFont.systemFont(ofSize: UIFont.systemFontSize)),
             transfersProvider: transferProvider,
             chatMessagesListFactory: .init(chatMessageFactory: .init(
-                walletServiceCompose: walletServiceCompose
+                walletServiceCompose: walletServiceCompose 
             )),
             addressBookService: addressBookService,
             visibleWalletService: visibleWalletService,
@@ -113,7 +127,13 @@ private extension ChatFactory {
                 emojiService: emojiService
             ),
             emojiService: emojiService,
-            chatPreservation: chatPreservation
+            chatPreservation: chatPreservation,
+            filesStorage: filesStorage,
+            chatFileService: chatFileService,
+            filesStorageProprieties: filesStorageProprieties,
+            nodesStorage: nodesStorage,
+            reachabilityMonitor: reachabilityMonitor, 
+            filesPicker: filesPickerKit
         )
     }
     
