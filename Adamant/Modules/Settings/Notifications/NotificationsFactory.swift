@@ -17,10 +17,13 @@ struct NotificationsFactory {
     }
     
     @MainActor
-    func makeViewController() -> UIViewController {
+    func makeViewController(screensFactory: ScreensFactory) -> UIViewController {
         let viewModel = assembler.resolve(NotificationsViewModel.self)!
         
-        let view = NotificationsView(viewModel: viewModel)
+        let view = NotificationsView(
+            viewModel: viewModel,
+            screensFactory: screensFactory
+        )
         
         return UIHostingController(
             rootView: view

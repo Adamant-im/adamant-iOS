@@ -11,7 +11,8 @@ import CommonKit
 
 struct NotificationsView: View {
     @ObservedObject var viewModel: NotificationsViewModel
-    
+    var screensFactory: ScreensFactory
+
     var body: some View {
         GeometryReader { geometry in
             Form {
@@ -29,10 +30,14 @@ struct NotificationsView: View {
                 }
             }
             .sheet(isPresented: $viewModel.presentSoundsPicker, content: {
-                NotificationSoundsPickerView(notificationService: viewModel.notificationsService, target: .baseMessage)
+                NavigationView(content: {
+                    screensFactory.makeNotificationSounds(target: .baseMessage)
+                })
             })
             .sheet(isPresented: $viewModel.presentReactionSoundsPicker, content: {
-                NotificationSoundsPickerView(notificationService: viewModel.notificationsService, target: .reaction)
+                NavigationView(content: {
+                    screensFactory.makeNotificationSounds(target: .reaction)
+                })
             })
             .fullScreenCover(isPresented: $viewModel.openSafariURL) {
                 SafariWebView(url: viewModel.safariURL).ignoresSafeArea()
