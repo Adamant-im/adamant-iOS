@@ -47,6 +47,9 @@ final class NotificationsViewModel: ObservableObject {
         notificationsMode = notificationsService.notificationsMode
         notificationSound = notificationsService.notificationsSound
         notificationReactionSound = notificationsService.notificationsReactionSound
+        inAppSounds = notificationsService.inAppSound
+        inAppVibrate = notificationsService.inAppVibrate
+        inAppToasts = notificationsService.inAppToasts
     }
     
     func presentNotificationSoundsPicker() {
@@ -59,6 +62,18 @@ final class NotificationsViewModel: ObservableObject {
     
     func presentSafariURL() {
         openSafariURL = true
+    }
+    
+    func applyInAppSounds(value: Bool) {
+        notificationsService.setInAppSound(value)
+    }
+    
+    func applyInAppVibrate(value: Bool) {
+        notificationsService.setInAppVibrate(value)
+    }
+    
+    func applyInAppToasts(value: Bool) {
+        notificationsService.setInAppToasts(value)
     }
     
     func showAlert() {

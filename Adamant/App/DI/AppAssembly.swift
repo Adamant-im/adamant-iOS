@@ -34,7 +34,10 @@ struct AppAssembly: Assembly {
         // MARK: - Services with dependencies
         // MARK: DialogService
         container.register(DialogService.self) { r in
-            AdamantDialogService(vibroService: r.resolve(VibroService.self)!)
+            AdamantDialogService(
+                vibroService: r.resolve(VibroService.self)!,
+                notificationsService: r.resolve(NotificationsService.self)!
+            )
         }.inObjectScope(.container)
         
         // MARK: Notifications

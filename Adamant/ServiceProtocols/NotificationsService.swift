@@ -243,6 +243,13 @@ protocol NotificationsService: AnyObject {
     var notificationsMode: NotificationsMode { get }
     var notificationsSound: NotificationSound { get }
     var notificationsReactionSound: NotificationSound { get }
+    var inAppSound: Bool { get }
+    var inAppVibrate: Bool { get }
+    var inAppToasts: Bool { get }
+    
+    func setInAppSound(_ value: Bool)
+    func setInAppVibrate(_ value: Bool)
+    func setInAppToasts(_ value: Bool)
     
     func setNotificationSound(
         _ sound: NotificationSound,

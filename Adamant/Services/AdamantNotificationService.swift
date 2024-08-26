@@ -49,11 +49,18 @@ final class AdamantNotificationsService: NotificationsService {
     // MARK: Properties
     private let defaultNotificationsSound: NotificationSound = .inputDefault
     private let defaultNotificationsReactionSound: NotificationSound = .none
+    private let defaultInAppSound: Bool = false
+    private let defaultInAppVibrate: Bool = true
+    private let defaultInAppToasts: Bool = true
     
     private(set) var notificationsMode: NotificationsMode = .disabled
     private(set) var customBadgeNumber = 0
     private(set) var notificationsSound: NotificationSound = .inputDefault
     private(set) var notificationsReactionSound: NotificationSound = .none
+    private(set) var inAppSound: Bool = false
+    private(set) var inAppVibrate: Bool = true
+    private(set) var inAppToasts: Bool = true
+    
     private var isBackgroundSession = false
     private var backgroundNotifications = 0
     private var subscriptions = Set<AnyCancellable>()
@@ -104,6 +111,10 @@ final class AdamantNotificationsService: NotificationsService {
             }
         }
         
+        inAppSound = getValue(for: StoreKey.notificationsService.inAppSounds) ?? defaultInAppSound
+        inAppVibrate = getValue(for: StoreKey.notificationsService.inAppVibrate) ?? defaultInAppVibrate
+        inAppToasts = getValue(for: StoreKey.notificationsService.inAppToasts) ?? defaultInAppToasts
+        
         preservedBadgeNumber = nil
     }
     
@@ -113,6 +124,10 @@ final class AdamantNotificationsService: NotificationsService {
         setNotificationSound(defaultNotificationsReactionSound, for: .reaction)
         securedStore.remove(StoreKey.notificationsService.notificationsMode)
         securedStore.remove(StoreKey.notificationsService.notificationsSound)
+        securedStore.remove(StoreKey.notificationsService.notificationsReactionSound)
+        securedStore.remove(StoreKey.notificationsService.inAppSounds)
+        securedStore.remove(StoreKey.notificationsService.inAppVibrate)
+        securedStore.remove(StoreKey.notificationsService.inAppToasts)
         preservedBadgeNumber = nil
     }
     
@@ -123,6 +138,21 @@ final class AdamantNotificationsService: NotificationsService {
             preservedBadgeNumber = nil
             setBadge(number: nil, force: true)
         }
+    }
+    
+    func setInAppSound(_ value: Bool) {
+        setValue(for: StoreKey.notificationsService.inAppSounds, value: value)
+        inAppSound = value
+    }
+    
+    func setInAppVibrate(_ value: Bool) {
+        setValue(for: StoreKey.notificationsService.inAppVibrate, value: value)
+        inAppVibrate = value
+    }
+    
+    func setInAppToasts(_ value: Bool) {
+        setValue(for: StoreKey.notificationsService.inAppToasts, value: value)
+        inAppToasts = value
     }
 }
 
@@ -316,6 +346,14 @@ extension AdamantNotificationsService {
     func removeAllDeliveredNotifications() {
         UNUserNotificationCenter.current().removeAllDeliveredNotifications()
         UIApplication.shared.applicationIconBadgeNumber = customBadgeNumber
+    }
+    
+    func setValue(for key: String, value: Bool) {
+        securedStore.set(value, for: key)
+    }
+    
+    func getValue<T: Decodable>(for key: String) -> T? {
+        securedStore.get(key)
     }
 }
 

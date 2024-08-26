@@ -112,16 +112,25 @@ private extension NotificationsView {
                 Text(soundsTitle)
             }
             .tint(.init(uiColor: .adamant.active))
+            .onChange(of: viewModel.inAppSounds) { value in
+                viewModel.applyInAppSounds(value: value)
+            }
             
             Toggle(isOn: $viewModel.inAppVibrate) {
                 Text(vibrateTitle)
             }
             .tint(.init(uiColor: .adamant.active))
+            .onChange(of: viewModel.inAppVibrate) { value in
+                viewModel.applyInAppVibrate(value: value)
+            }
             
             Toggle(isOn: $viewModel.inAppToasts) {
                 Text(toastsTitle)
             }
             .tint(.init(uiColor: .adamant.active))
+            .onChange(of: viewModel.inAppToasts) { value in
+                viewModel.applyInAppToasts(value: value)
+            }
         } header: {
             Text(inAppNotifications)
         }

@@ -26,6 +26,9 @@ public extension StoreKey {
         public static let customBadgeNumber = "notifications.number"
         public static let notificationsSound = "notifications.sound"
         public static let notificationsReactionSound = "notifications.reaction.sound"
+        public static let inAppSounds = "notifications.inAppSounds"
+        public static let inAppVibrate = "notifications.inAppVibrate"
+        public static let inAppToasts = "notifications.inAppToasts"
     }
     
     enum visibleWallets {
