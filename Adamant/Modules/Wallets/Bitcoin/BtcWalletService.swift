@@ -429,7 +429,11 @@ extension BtcWalletService {
         
         let privateKeyData = passphrase.data(using: .utf8)!.sha256()
         let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
-        let eWallet = try BtcWallet(privateKey: privateKey, addressConverter: addressConverter)
+        let eWallet = try BtcWallet(
+            unicId: tokenUnicID,
+            privateKey: privateKey,
+            addressConverter: addressConverter
+        )
         self.btcWallet = eWallet
         
         NotificationCenter.default.post(

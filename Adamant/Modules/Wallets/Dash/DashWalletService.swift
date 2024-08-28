@@ -308,6 +308,7 @@ extension DashWalletService {
         let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
         
         let eWallet = try DashWallet(
+            unicId: tokenUnicID,
             privateKey: privateKey,
             addressConverter: addressConverter
         )

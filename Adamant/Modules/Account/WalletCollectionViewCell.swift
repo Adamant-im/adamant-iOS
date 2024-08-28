@@ -10,6 +10,7 @@ import UIKit
 import FreakingSimpleRoundImageView
 import Parchment
 import CommonKit
+import Combine
 
 class WalletCollectionViewCell: PagingCell {
     @IBOutlet weak var currencyImageView: UIImageView!
@@ -17,11 +18,35 @@ class WalletCollectionViewCell: PagingCell {
     @IBOutlet weak var currencySymbolLabel: UILabel!
     @IBOutlet weak var accessoryContainerView: AccessoryContainerView!
     
-    override func setPagingItem(_ pagingItem: PagingItem, selected: Bool, options: PagingOptions) {
-        guard let item = pagingItem as? WalletPagingItem else {
+    private var cancellables = Set<AnyCancellable>()
+    
+    override func prepareForReuse() {
+        cancellables.removeAll()
+    }
+    
+    override func setPagingItem(
+        _ pagingItem: PagingItem,
+        selected: Bool,
+        options: PagingOptions
+    ) {
+        guard let item = pagingItem as? WalletItemModel else {
             return
         }
+        update(item: item.model)
         
+        cancellables.removeAll()
+        
+        item.$model
+            .removeDuplicates()
+            .sink { [weak self] item in
+                self?.update(item: item)
+            }
+            .store(in: &cancellables)
+    }
+}
+
+private extension WalletCollectionViewCell {
+    func update(item: WalletItem) {
         currencyImageView.image = item.currencyImage
         if item.currencyNetwork.isEmpty {
             currencySymbolLabel.text = item.currencySymbol

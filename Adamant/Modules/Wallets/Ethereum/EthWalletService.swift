@@ -18,13 +18,19 @@ import CommonKit
 
 struct EthWalletStorage {
     let keystore: BIP32Keystore
-
+    let unicId: String
+    
     func getWallet() -> EthWallet? {
         guard let ethAddress = keystore.addresses?.first else {
             return nil
         }
         
-        return EthWallet(address: ethAddress.address, ethAddress: ethAddress, keystore: keystore)
+        return EthWallet(
+            unicId: unicId,
+            address: ethAddress.address,
+            ethAddress: ethAddress,
+            keystore: keystore
+        )
     }
 }
 
@@ -387,7 +393,7 @@ extension EthWalletService {
                 throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: nil)
             }
             
-            walletStorage = .init(keystore: store)
+            walletStorage = .init(keystore: store, unicId: tokenUnicID)
             await ethApiService.setKeystoreManager(.init([store]))
         } catch {
             throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: error)
