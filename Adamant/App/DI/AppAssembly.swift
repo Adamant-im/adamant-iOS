@@ -421,7 +421,8 @@ struct AppAssembly: Assembly {
                 doge: $0.resolve(DogeApiService.self)!,
                 dash: $0.resolve(DashApiService.self)!,
                 adm: $0.resolve(AdamantApiServiceProtocol.self)!,
-                ipfs: $0.resolve(IPFSApiService.self)!
+                ipfs: $0.resolve(IPFSApiService.self)!,
+                infoService: $0.resolve(InfoServiceApiServiceProtocol.self)!
             )
         }.inObjectScope(.transient)
         

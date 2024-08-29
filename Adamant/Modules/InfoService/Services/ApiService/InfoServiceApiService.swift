@@ -9,7 +9,7 @@
 import Foundation
 import CommonKit
 
-struct InfoServiceApiService {
+final class InfoServiceApiService {
     let core: BlockchainHealthCheckWrapper<InfoServiceApiCore>
     
     func request<Output>(
@@ -21,5 +21,9 @@ struct InfoServiceApiService {
         await core.request { core, origin in
             await request(core.apiCore, origin)
         }.mapError { .apiError($0) }
+    }
+    
+    init(core: BlockchainHealthCheckWrapper<InfoServiceApiCore>) {
+        self.core = core
     }
 }

@@ -28,7 +28,7 @@ extension NodeGroup {
         case .ipfs:
             return IPFSApiService.healthCheckParameters.onScreenUpdateInterval
         case .infoService:
-            return 1000
+            return InfoService.healthCheckParameters.onScreenUpdateInterval
         }
     }
 
@@ -51,7 +51,7 @@ extension NodeGroup {
         case .ipfs:
             return IPFSApiService.healthCheckParameters.crucialUpdateInterval
         case .infoService:
-            return 1000
+            return InfoService.healthCheckParameters.crucialUpdateInterval
         }
     }
 
@@ -74,7 +74,7 @@ extension NodeGroup {
         case .ipfs:
             return IPFSApiService.healthCheckParameters.threshold
         case .infoService:
-            return 1000
+            return InfoService.healthCheckParameters.threshold
         }
     }
 
@@ -97,7 +97,7 @@ extension NodeGroup {
         case .ipfs:
             return IPFSApiService.healthCheckParameters.normalUpdateInterval
         case .infoService:
-            return 1000
+            return InfoService.healthCheckParameters.normalUpdateInterval
         }
     }
     
@@ -145,7 +145,16 @@ extension NodeGroup {
         case .ipfs:
             return IPFSApiService.symbol
         case .infoService:
-            return "INFO SERVICE"
+            return InfoService.symbol
+        }
+    }
+    
+    var useDateHeight: Bool {
+        switch self {
+        case .btc, .eth, .klyNode, .klyService, .doge, .dash, .adm, .ipfs:
+            false
+        case .infoService:
+            true
         }
     }
     

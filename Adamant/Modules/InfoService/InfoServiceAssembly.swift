@@ -30,7 +30,7 @@ struct InfoServiceAssembly: Assembly {
                 params: NodeGroup.infoService.blockchainHealthCheckParams,
                 connection: r.resolve(ReachabilityMonitor.self)!.connectionPublisher
             ))
-        }.inObjectScope(.transient)
+        }.inObjectScope(.container)
         
         container.register(InfoServiceMapperProtocol.self) { _ in
             InfoServiceMapper()

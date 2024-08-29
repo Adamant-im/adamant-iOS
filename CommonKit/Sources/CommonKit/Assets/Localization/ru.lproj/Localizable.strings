@@ -640,6 +640,9 @@
 /* NodesList: Button label */
 "NodesList.NodesList" = "Список нод ADM";
 
+/* Info Service: Info Service */
+"InfoService.InfoService" = "Инфо Сервис";
+
 /* NodesList: scene title */
 "NodesList.Title" = "Список нод ADM";
 

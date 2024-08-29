@@ -301,6 +301,7 @@
 		936658A52B0AE67A00BDB2D3 /* CoinsNodesListFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 936658A42B0AE67A00BDB2D3 /* CoinsNodesListFactory.swift */; };
 		93684A2A29EFA28A00F9EFFE /* FixedTextMessageSizeCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93684A2929EFA28A00F9EFFE /* FixedTextMessageSizeCalculator.swift */; };
 		9371130F2996EDA900F64CF9 /* ChatRefreshMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9371130E2996EDA900F64CF9 /* ChatRefreshMock.swift */; };
+		937173F52C8049E0009D5191 /* InfoService+Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937173F42C8049E0009D5191 /* InfoService+Constants.swift */; };
 		9371E561295CD53100438F2C /* ChatLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9371E560295CD53100438F2C /* ChatLocalization.swift */; };
 		93760BD72C656CF8002507C3 /* DefaultNodesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93760BD62C656CF8002507C3 /* DefaultNodesProvider.swift */; };
 		93760BDF2C65A284002507C3 /* WordList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93760BDE2C65A284002507C3 /* WordList.swift */; };
@@ -952,6 +953,7 @@
 		936658A42B0AE67A00BDB2D3 /* CoinsNodesListFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinsNodesListFactory.swift; sourceTree = "<group>"; };
 		93684A2929EFA28A00F9EFFE /* FixedTextMessageSizeCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedTextMessageSizeCalculator.swift; sourceTree = "<group>"; };
 		9371130E2996EDA900F64CF9 /* ChatRefreshMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatRefreshMock.swift; sourceTree = "<group>"; };
+		937173F42C8049E0009D5191 /* InfoService+Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InfoService+Constants.swift"; sourceTree = "<group>"; };
 		9371E560295CD53100438F2C /* ChatLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatLocalization.swift; sourceTree = "<group>"; };
 		93760BD62C656CF8002507C3 /* DefaultNodesProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultNodesProvider.swift; sourceTree = "<group>"; };
 		93760BDD2C65A1FA002507C3 /* english.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = english.txt; sourceTree = "<group>"; };
@@ -1767,6 +1769,7 @@
 				934FD9A12C783CAC00336841 /* Protocols */,
 				934FD9A02C783CA700336841 /* Services */,
 				931224B02C7ACFE6009E0ED0 /* InfoServiceAssembly.swift */,
+				937173F42C8049E0009D5191 /* InfoService+Constants.swift */,
 			);
 			path = InfoService;
 			sourceTree = "<group>";
@@ -3553,6 +3556,7 @@
 				E90847302196FEA80095825D /* ChatTransaction+CoreDataClass.swift in Sources */,
 				3A96E37A2AED27D7001F5A52 /* AdamantPartnerQRService.swift in Sources */,
 				E9EC342120052ABB00C0E546 /* TransferViewControllerBase.swift in Sources */,
+				937173F52C8049E0009D5191 /* InfoService+Constants.swift in Sources */,
 				931224B32C7AD5DD009E0ED0 /* InfoServiceTicker.swift in Sources */,
 				9304F8C4292F8A3100173F18 /* AdamantPushNotificationsTokenService.swift in Sources */,
 				9300F94629D0149100FEDDB8 /* RichMessageProviderWithStatusCheck.swift in Sources */,
