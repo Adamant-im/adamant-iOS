@@ -21,7 +21,11 @@ public extension Version {
     }
     
     init?(_ string: String) {
-        let versions = string.split(separator: ".").compactMap { Int($0) }
+        let versions = string
+            .filter { $0.isNumber || $0 == "." }
+            .split(separator: ".")
+            .compactMap { Int($0) }
+        
         guard !versions.isEmpty else { return nil }
         self.versions = versions
     }

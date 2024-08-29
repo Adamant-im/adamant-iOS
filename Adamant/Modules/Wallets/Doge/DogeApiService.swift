@@ -39,7 +39,7 @@ final class DogeApiCore: BlockchainHealthCheckableService {
                 height: data.info.blocks,
                 wsEnabled: false,
                 wsPort: nil,
-                version: .init("\(data.info.version)")
+                version: .init([data.info.version])
             )
         }
     }
