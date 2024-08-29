@@ -454,7 +454,7 @@ extension AdamantTransfersProvider {
         transaction.isOutgoing = true
         transaction.showsChatroom = true
         transaction.chatMessageId = UUID().uuidString
-        transaction.statusEnum = MessageStatus.pending
+        transaction.status = MessageStatus.pending
         transaction.comment = comment
         transaction.fee = Self.transferFee as NSDecimalNumber
         transaction.partner = partner
@@ -545,7 +545,7 @@ extension AdamantTransfersProvider {
                 )
             }
         } catch {
-            transaction.statusEnum = MessageStatus.failed
+            transaction.status = MessageStatus.failed(nil)
             try? context.save()
             
             throw TransfersProviderError.serverError(error)
@@ -649,7 +649,7 @@ extension AdamantTransfersProvider {
         transaction.transactionId = locallyID
         transaction.blockId = nil
         transaction.chatMessageId = locallyID
-        transaction.statusEnum = MessageStatus.pending
+        transaction.status = MessageStatus.pending
         
         // MARK: 3. Chatroom
         backgroundAccount.addToTransfers(transaction)
@@ -1008,7 +1008,7 @@ extension AdamantTransfersProvider {
                 transaction.height = t.height
                 transaction.blockId = t.blockId
                 transaction.confirmations = t.confirmations
-                transaction.statusEnum = .delivered
+                transaction.status = .delivered
                 transaction.fee = t.fee as NSDecimalNumber
                 
                 unconfirmedTransactions.removeValue(forKey: t.id)

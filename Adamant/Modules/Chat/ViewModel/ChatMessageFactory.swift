@@ -83,7 +83,7 @@ struct ChatMessageFactory {
         let isFromCurrentSender = currentSender.senderId == senderModel.senderId
 
         let status = ChatMessage.Status(
-            messageStatus: transaction.statusEnum,
+            messageStatus: transaction.status ?? .failed(nil),
             blockId: transaction.blockId
         )
         
@@ -330,7 +330,7 @@ private extension ChatMessageFactory {
             files: chatFiles,
             isMediaFilesOnly: isMediaFilesOnly,
             isFromCurrentSender: isFromCurrentSender,
-            txStatus: transaction.statusEnum
+            txStatus: transaction.status ?? .failed(nil)
         )
         
         return .file(.init(value: .init(
@@ -350,7 +350,7 @@ private extension ChatMessageFactory {
             ),
             address: address,
             opponentAddress: opponentAddress, 
-            txStatus: transaction.statusEnum,
+            txStatus: transaction.status ?? .failed(nil),
             status: .failed
         )))
     }
@@ -444,7 +444,7 @@ private extension ChatMessageFactory {
                 replyId: replyId,
                 isHidden: false
             ),
-            status: transaction.statusEnum.toTransactionStatus(),
+            status: transaction.status?.toTransactionStatus() ?? .failed,
             reactions: reactions,
             address: address,
             opponentAddress: opponentAddress
@@ -537,8 +537,8 @@ private extension ChatMessage.Status {
             self = .pending
         case .delivered:
             self = .delivered(blockchain: !(blockId?.isEmpty ?? true))
-        case .failed:
-            self = .failed
+        case let .failed(reason):
+            self = .failed(reason: reason)
         }
     }
 }

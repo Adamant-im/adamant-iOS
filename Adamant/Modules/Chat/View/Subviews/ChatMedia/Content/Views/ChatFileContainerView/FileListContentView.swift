@@ -196,7 +196,7 @@ private extension FileListContentView {
         
         downloadImageView.isHidden = chatFile.isCached 
         || chatFile.isBusy
-        || model.txStatus == .failed
+        || (model.txStatus != .delivered && model.txStatus != .pending)
         || (chatFile.fileType.isMedia && chatFile.previewImage == nil)
         
         if chatFile.isDownloading {

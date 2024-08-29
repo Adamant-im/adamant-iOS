@@ -978,7 +978,7 @@ extension AdamantChatsProvider {
             throw ChatsProviderError.transactionNotFound(id: txId)
         }
         
-        transaction.statusEnum = status
+        transaction.status = status
         try context.save()
     }
     
@@ -1027,7 +1027,7 @@ extension AdamantChatsProvider {
             let chatroom = context.object(with: c.objectID) as? Chatroom,
             let partner = chatroom.partner
         {
-            transaction.statusEnum = MessageStatus.pending
+            transaction.status = MessageStatus.pending
             transaction.partner = context.object(with: partner.objectID) as? BaseAccount
             
             chatroom.addToTransactions(transaction)
@@ -1080,7 +1080,7 @@ extension AdamantChatsProvider {
             let chatroom = context.object(with: c.objectID) as? Chatroom,
             let partner = chatroom.partner
         {
-            transaction.statusEnum = MessageStatus.pending
+            transaction.status = MessageStatus.pending
             transaction.partner = context.object(with: partner.objectID) as? BaseAccount
             
             chatroom.addToTransactions(transaction)
@@ -1148,7 +1148,7 @@ extension AdamantChatsProvider {
             
             // MARK: 3. Prepare transaction
             
-            transaction.statusEnum = MessageStatus.pending
+            transaction.status = MessageStatus.pending
             transaction.partner = context.object(with: recipientAccount.objectID) as? BaseAccount
             
             if isAdded {
@@ -1197,10 +1197,10 @@ extension AdamantChatsProvider {
     
     func retrySendMessage(_ message: ChatTransaction) async throws {
         // MARK: 0. Prepare
-        switch message.statusEnum {
+        switch message.status {
         case .delivered, .pending:
            return
-        case .failed:
+        case .failed, .none:
             break
         }
         
@@ -1222,7 +1222,7 @@ extension AdamantChatsProvider {
         
         // MARK: 2. Update transaction
         transaction.date = Date() as NSDate
-        transaction.statusEnum = .pending
+        transaction.status = .pending
         
         if let chatroom = transaction.chatroom {
             if let lastTransaction = chatroom.lastTransaction {
@@ -1252,11 +1252,11 @@ extension AdamantChatsProvider {
     // MARK: - Delete local message
     func cancelMessage(_ message: ChatTransaction)  async throws {
         // MARK: 0. Prepare
-        switch message.statusEnum {
+        switch message.status {
         case .delivered, .pending:
             // We can't cancel sent transactions
             throw ChatsProviderError.invalidTransactionStatus
-        case .failed:
+        case .failed, .none:
             break
         }
         
@@ -1336,7 +1336,7 @@ extension AdamantChatsProvider {
             // Update ID with recieved, add to unconfirmed transactions.
             transaction.transactionId = String(id)
             transaction.chatMessageId = String(id)
-            transaction.statusEnum = .pending
+            transaction.status = .pending
             
             removeTxFromUnconfirmed(
                 signature: signedTransaction.signature,
@@ -1350,11 +1350,11 @@ extension AdamantChatsProvider {
                   text.contains("Transaction is already confirmed")
                     || text.contains("Transaction is already processed")
             else {
-                transaction.statusEnum = .failed
+                transaction.status = .failed(error.shortDescription())
                 throw handleTransactionError(error, recipientId: recipientId)
             }
             
-            transaction.statusEnum = .pending
+            transaction.status = .pending
             
             removeTxFromUnconfirmed(
                 signature: signedTransaction.signature,
@@ -1817,14 +1817,14 @@ extension AdamantChatsProvider {
                     
                     if transactionExist == nil {
                         if (chatTransaction.blockId?.isEmpty ?? true) && (chatTransaction.amountValue ?? 0.0 > 0.0) {
-                            chatTransaction.statusEnum = .pending
+                            chatTransaction.status = .pending
                         }
                         messages.insert(chatTransaction)
                     } else {
                         transactionExist?.height = chatTransaction.height
                         transactionExist?.blockId = chatTransaction.blockId
                         transactionExist?.confirmations = chatTransaction.confirmations
-                        transactionExist?.statusEnum = .delivered
+                        transactionExist?.status = .delivered
                     }
                 }
             }
@@ -1954,14 +1954,14 @@ extension AdamantChatsProvider {
         transaction.confirmations = confirmations
         
         if blockId.isEmpty {
-            transaction.statusEnum = .delivered
+            transaction.status = .delivered
         } else {
             self.unconfirmedTransactions.removeValue(forKey: id)
         }
         
         if let lastHeight = receivedLastHeight, lastHeight < height {
             self.receivedLastHeight = height
-            transaction.statusEnum = .delivered
+            transaction.status = .delivered
             transaction.isConfirmed = true
         }
     }

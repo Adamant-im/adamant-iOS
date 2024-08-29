@@ -560,13 +560,14 @@ final class ChatViewModel: NSObject {
         guard isSendingAvailable, tx?.isFake == false else { return }
         
         let message = messages.first(where: { $0.messageId == messageModel?.id })
-        guard message?.status != .failed else {
-            dialog.send(.warning(String.adamant.reply.failedMessageError))
-            return
-        }
         
-        guard message?.status != .pending else {
-            dialog.send(.warning(String.adamant.reply.pendingMessageError))
+        guard case .delivered = message?.status else {
+            if case .pending = message?.status {
+                dialog.send(.warning(String.adamant.reply.pendingMessageError))
+                return
+            }
+            
+            dialog.send(.warning(String.adamant.reply.failedMessageError))
             return
         }
         
@@ -676,7 +677,7 @@ final class ChatViewModel: NSObject {
         previousArg = arg
         
         let tx = chatTransactions.first(where: { $0.txId == arg.messageId })
-        guard tx?.statusEnum == .delivered else { return }
+        guard tx?.status == .delivered else { return }
         
         let amount = tx?.amountValue ?? .zero
         if !amount.isZero && !isSendingAvailable {
@@ -718,7 +719,7 @@ final class ChatViewModel: NSObject {
         let message = messages.first(where: { $0.messageId == messageId })
         
         guard let tx = tx,
-              tx.statusEnum != .failed
+              tx.status == .delivered || tx.status == .pending
         else {
             dialog.send(.failedMessageAlert(id: messageId, sender: nil))
             return
@@ -751,7 +752,7 @@ final class ChatViewModel: NSObject {
             return
         }
         
-        guard tx.statusEnum == .delivered else { return }
+        guard tx.status == .delivered else { return }
         
         downloadFile(
             file: file,
@@ -766,7 +767,7 @@ final class ChatViewModel: NSObject {
     ) {
         let tx = chatTransactions.first(where: { $0.txId == messageId })
         
-        guard tx?.statusEnum == .delivered || tx?.statusEnum == nil else { return }
+        guard tx?.status == .delivered || tx?.status == nil else { return }
         
         let chatFiles = files.filter {
             $0.fileType == .image || $0.fileType == .video
@@ -1494,7 +1495,7 @@ private extension ChatViewModel {
     }
     
     func getStatus(from model: ChatMediaContainerView.Model) -> FileMessageStatus {
-        if model.txStatus == .failed {
+        if case .failed = model.txStatus {
             return .failed
         }
         

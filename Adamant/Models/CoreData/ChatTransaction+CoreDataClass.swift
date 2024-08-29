@@ -12,9 +12,21 @@ import CoreData
 
 @objc(ChatTransaction)
 public class ChatTransaction: BaseTransaction {
-    var statusEnum: MessageStatus {
-        get { return MessageStatus(rawValue: self.status) ?? .failed }
-        set { self.status = newValue.rawValue }
+    var status: MessageStatus? {
+        get {
+            let data = Data(statusRaw.utf8)
+            return try? JSONDecoder().decode(MessageStatus.self, from: data)
+        }
+        set {
+            guard let data = try? JSONEncoder().encode(newValue),
+                  let raw = String(data: data, encoding: .utf8)
+            else {
+                statusRaw = ""
+                return
+            }
+            
+            statusRaw = raw
+        }
     }
     
     func serializedMessage() -> String? {

@@ -145,7 +145,7 @@ extension AdamantChatsProvider {
         
         if let trs = privateContext.object(with: transaction.objectID) as? MessageTransaction {
             trs.date = Date() as NSDate
-            trs.status = status.rawValue
+            trs.status = status
         } else {
             completion(.failure(.internalError(AdamantError(message: "CoreData changed"))))
             return
@@ -181,7 +181,7 @@ extension AdamantChatsProvider {
         transaction.message = text
         transaction.isUnread = false
         transaction.isMarkdown = markdown
-        transaction.status = status.rawValue
+        transaction.status = status
         transaction.showsChatroom = showsChatroom
         transaction.partner = privateContext.object(with: recipient.objectID) as? BaseAccount
         
@@ -231,7 +231,7 @@ extension AdamantChatsProvider {
         transaction.isUnread = unread
         transaction.silentNotification = silent
         transaction.isMarkdown = markdown
-        transaction.status = MessageStatus.delivered.rawValue
+        transaction.status = .delivered
         transaction.showsChatroom = showsChatroom
         transaction.partner = privateContext.object(with: sender.objectID) as? BaseAccount
         

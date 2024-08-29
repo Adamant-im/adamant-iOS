@@ -8,8 +8,8 @@
 
 import Foundation
 
-public enum MessageStatus: Int16, Codable {
-    case pending = 0
-    case delivered = 1
-    case failed = 2
+public enum MessageStatus: Codable, Equatable {
+    case pending
+    case delivered
+    case failed(String?)
 }
