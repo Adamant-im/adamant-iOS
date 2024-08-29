@@ -193,7 +193,12 @@ private extension ChatMediaContentView {
         backgroundColor = model.backgroundColor.uiColor
         layer.borderColor = model.backgroundColor.uiColor.cgColor
         
-        uploadImageView.isHidden = model.fileModel.txStatus != .failed
+        if model.fileModel.txStatus == .delivered
+            || model.fileModel.txStatus == .pending {
+            uploadImageView.isHidden = true
+        } else {
+            uploadImageView.isHidden = false
+        }
         
         commentLabel.attributedText = model.comment
         commentLabel.isHidden = model.comment.string.isEmpty

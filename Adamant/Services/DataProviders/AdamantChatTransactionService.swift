@@ -219,7 +219,7 @@ actor AdamantChatTransactionService: ChatTransactionService {
         messageTransaction.confirmations = transaction.confirmations
         messageTransaction.chatMessageId = String(transaction.id)
         messageTransaction.fee = transaction.fee as NSDecimalNumber
-        messageTransaction.statusEnum = MessageStatus.delivered
+        messageTransaction.status = MessageStatus.delivered
         messageTransaction.partner = partner
         messageTransaction.senderPublicKey = transaction.senderPublicKey
         
@@ -242,7 +242,7 @@ actor AdamantChatTransactionService: ChatTransactionService {
             if transfer.confirmations < transaction.confirmations {
                 transfer.confirmations = transaction.confirmations
             }
-            transfer.statusEnum = .delivered
+            transfer.status = .delivered
             transfer.blockId = transaction.blockId
         } else {
             transfer = TransferTransaction(context: context)
@@ -260,7 +260,7 @@ actor AdamantChatTransactionService: ChatTransactionService {
             transfer.confirmations = transaction.confirmations
             transfer.chatMessageId = String(transaction.id)
             transfer.fee = transaction.fee as NSDecimalNumber
-            transfer.statusEnum = MessageStatus.delivered
+            transfer.status = .delivered
             transfer.partner = partner
         }
         

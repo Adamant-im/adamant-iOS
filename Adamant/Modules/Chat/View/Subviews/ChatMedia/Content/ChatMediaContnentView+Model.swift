@@ -46,7 +46,7 @@ extension ChatMediaContentView {
             files: [],
             isMediaFilesOnly: false,
             isFromCurrentSender: false,
-            txStatus: .failed
+            txStatus: .failed(nil)
         )
     }
     
@@ -56,7 +56,7 @@ extension ChatMediaContentView {
         
         static let `default` = Self(
             chatFile: .default,
-            txStatus: .failed
+            txStatus: .failed(nil)
         )
     }
 }

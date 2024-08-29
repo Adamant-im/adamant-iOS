@@ -38,10 +38,11 @@ final class ChatDataSourceManager: MessagesDataSource {
         for message: MessageType,
         at _: IndexPath
     ) -> NSAttributedString? {
-        guard message.fullModel.status == .failed else { return nil }
+        guard case let(.failed(details)) = message.fullModel.status 
+        else { return nil }
         
         return .init(
-            string: .adamant.chat.failToSend,
+            string: .adamant.chat.failToSend(details: details),
             attributes: [
                 .font: UIFont.boldSystemFont(ofSize: 10),
                 .foregroundColor: UIColor.adamant.primary

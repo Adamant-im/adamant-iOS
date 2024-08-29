@@ -39,9 +39,11 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
         at _: IndexPath,
         in _: MessagesCollectionView
     ) -> CGFloat {
-        message.fullModel.status == .failed
-            ? labelHeight
-            : .zero
+        guard case .failed = message.fullModel.status else {
+            return .zero
+        }
+        
+        return labelHeight
     }
     
     func messageBottomLabelHeight(

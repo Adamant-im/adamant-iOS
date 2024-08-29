@@ -424,6 +424,9 @@
 /* Chat: status message for failed to send chat transaction */
 "ChatScene.MessageStatus.FailToSend" = "Fehler beim Senden";
 
+/* Chat: status message for failed to send chat transaction */
+"ChatScene.MessageStatus.FailToSend.Details" = "Fehler beim Senden: %@";
+
 /* Chat: status message for pending chat transaction */
 "ChatScene.MessageStatus.Pending" = "Ausstehend";
 

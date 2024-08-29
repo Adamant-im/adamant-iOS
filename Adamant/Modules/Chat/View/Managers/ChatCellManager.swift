@@ -26,7 +26,7 @@ final class ChatCellManager: MessageCellDelegate {
         guard
             let id = getMessageId?(cell),
             let message = viewModel.messages.first(where: { $0.id == id }),
-            message.status == .failed
+            case .failed = message.status
         else { return }
         
         viewModel.dialog.send(.failedMessageAlert(id: id, sender: .view(cell)))

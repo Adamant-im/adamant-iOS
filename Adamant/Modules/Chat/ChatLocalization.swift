@@ -21,8 +21,13 @@ extension String.adamant {
         static var cancelError: String {
             String.localized("ChatScene.Error.cancelError", comment: "Chat: inform user that he can't cancel transaction, that was sent")
         }
-        static var failToSend: String {
-            String.localized("ChatScene.MessageStatus.FailToSend", comment: "Chat: status message for failed to send chat transaction")
+        static func failToSend(details: String?) -> String {
+            guard let details = details else {
+                return String.localized("ChatScene.MessageStatus.FailToSend", comment: "Chat: status message for failed to send chat transaction")
+            }
+            
+            return .localizedStringWithFormat(
+                .localized("ChatScene.MessageStatus.FailToSend.Details", comment: "Chat: status message for failed to send chat transaction"), details)
         }
         static var pending: String {
             String.localized("ChatScene.MessageStatus.Pending", comment: "Chat: status message for pending chat transaction")

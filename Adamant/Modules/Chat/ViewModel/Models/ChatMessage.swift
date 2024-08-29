@@ -25,7 +25,7 @@ struct ChatMessage: Identifiable, Equatable {
         id: "",
         sentDate: .init(),
         senderModel: .default,
-        status: .failed,
+        status: .failed(reason: nil),
         content: .default,
         backgroundColor: .failed,
         bottomString: nil,
@@ -44,7 +44,7 @@ extension ChatMessage {
     enum Status: Equatable {
         case delivered(blockchain: Bool)
         case pending
-        case failed
+        case failed(reason: String?)
     }
     
     enum Content: Equatable {

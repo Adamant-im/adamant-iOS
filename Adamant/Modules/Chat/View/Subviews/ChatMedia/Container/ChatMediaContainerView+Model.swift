@@ -27,7 +27,7 @@ extension ChatMediaContainerView {
             content: .default,
             address: "",
             opponentAddress: "",
-            txStatus: .failed,
+            txStatus: .failed(nil),
             status: .failed
         )
         

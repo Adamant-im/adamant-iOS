@@ -21,7 +21,7 @@ extension ChatTransaction {
     @NSManaged public var isUnread: Bool
     @NSManaged public var showsChatroom: Bool
     @NSManaged public var silentNotification: Bool
-    @NSManaged public var status: Int16
+    @NSManaged public var statusRaw: String
     @NSManaged public var chatroom: Chatroom?
     @NSManaged public var lastIn: Chatroom?
     @NSManaged public var isFake: Bool

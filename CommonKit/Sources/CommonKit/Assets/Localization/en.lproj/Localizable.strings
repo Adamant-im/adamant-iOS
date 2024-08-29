@@ -418,6 +418,9 @@
 /* Chat: status message for failed to send chat transaction */
 "ChatScene.MessageStatus.FailToSend" = "Failed to send";
 
+/* Chat: status message for failed to send chat transaction */
+"ChatScene.MessageStatus.FailToSend.Details" = "Failed to send: %@";
+
 /* Chat: status message for pending chat transaction */
 "ChatScene.MessageStatus.Pending" = "Pending";
 

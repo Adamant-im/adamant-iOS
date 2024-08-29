@@ -1083,7 +1083,7 @@ private extension ChatFileService {
         
         try? await chatsProvider.setTxMessageStatus(
             txId: txId,
-            status: .failed
+            status: .failed(nil)
         )
     }
     
