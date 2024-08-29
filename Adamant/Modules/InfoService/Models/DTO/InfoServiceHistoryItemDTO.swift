@@ -6,8 +6,10 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
+import Foundation
+
 struct InfoServiceHistoryItemDTO: Codable {
     let _id: String
     let date: Int
-    let tickers: [String: String]?
+    let tickers: [String: Decimal]?
 }

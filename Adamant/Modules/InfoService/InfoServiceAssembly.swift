@@ -35,5 +35,12 @@ struct InfoServiceAssembly: Assembly {
         container.register(InfoServiceMapperProtocol.self) { _ in
             InfoServiceMapper()
         }.inObjectScope(.transient)
+        
+        container.register(InfoServiceApiCore.self) { r in
+            InfoServiceApiCore(
+                apiCore: r.resolve(APICoreProtocol.self)!,
+                mapper: r.resolve(InfoServiceMapperProtocol.self)!
+            )
+        }.inObjectScope(.transient)
     }
 }

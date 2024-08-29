@@ -20,7 +20,7 @@ struct InfoServiceMapper: InfoServiceMapperProtocol {
     }
     
     func mapRatesToModel(
-        _ dto: InfoServiceResponseDTO<[String: String]>
+        _ dto: InfoServiceResponseDTO<[String: Decimal]>
     ) -> InfoServiceApiResult<[InfoServiceTicker: Decimal]> {
         mapResponseDTO(dto).map { mapToTickers($0) }
     }
@@ -70,14 +70,9 @@ struct InfoServiceMapper: InfoServiceMapperProtocol {
 }
 
 private extension InfoServiceMapper {
-    func mapToTickers(_ rawTickers: [String: String]) -> [InfoServiceTicker: Decimal] {
+    func mapToTickers(_ rawTickers: [String: Decimal]) -> [InfoServiceTicker: Decimal] {
         .init(uniqueKeysWithValues: rawTickers.compactMap { key, value in
-            guard
-                let ticker = mapToTicker(key),
-                let price = Decimal(string: value)
-            else { return nil }
-            
-            return (ticker, price)
+            mapToTicker(key).map { ($0, value) }
         })
     }
     

@@ -13,7 +13,7 @@ protocol InfoServiceMapperProtocol {
     func mapToModel(_ dto: InfoServiceStatusDTO) -> InfoServiceStatus
     
     func mapRatesToModel(
-        _ dto: InfoServiceResponseDTO<[String: String]>
+        _ dto: InfoServiceResponseDTO<[String: Decimal]>
     ) -> InfoServiceApiResult<[InfoServiceTicker: Decimal]>
     
     func mapToModel(
