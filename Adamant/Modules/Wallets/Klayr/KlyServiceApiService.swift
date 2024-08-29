@@ -25,7 +25,7 @@ final class KlyServiceApiCore: KlyApiCore {
                 height: .init(model.fee.meta.lastBlockHeight),
                 wsEnabled: false,
                 wsPort: nil,
-                version: model.info.version
+                version: .init(model.info.version)
             )
         }
     }

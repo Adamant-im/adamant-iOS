@@ -139,15 +139,6 @@ extension NodeGroup {
         }
     }
     
-    var includeVersionTitle: Bool {
-        switch self {
-        case .btc, .klyNode, .klyService, .doge, .adm:
-            return true
-        case .eth, .dash, .ipfs:
-            return false
-        }
-    }
-    
     var blockchainHealthCheckParams: BlockchainHealthCheckParams {
         .init(
             group: self,
