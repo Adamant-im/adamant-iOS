@@ -12,6 +12,7 @@ import CommonKit
 enum InfoServiceApiError: Error {
     case unknown
     case parsingError
+    case inconsistentData
     case apiError(ApiServiceError)
 }
 
@@ -21,10 +22,9 @@ extension InfoServiceApiError: RichError {
         case .unknown:
             .adamant.sharedErrors.unknownError
         case .parsingError:
-            .localized(
-                "ApiService.InternalError.ParsingFailed",
-                comment: "Serious internal error: Error parsing response"
-            )
+            .localized("ApiService.InternalError.ParsingFailed")
+        case .inconsistentData:
+            .localized("InfoService.InconsistentData")
         case let .apiError(error):
             error.message
         }
@@ -32,7 +32,7 @@ extension InfoServiceApiError: RichError {
     
     var internalError: Error? {
         switch self {
-        case .unknown, .parsingError:
+        case .unknown, .parsingError, .inconsistentData:
             nil
         case let .apiError(error):
             error
@@ -41,7 +41,7 @@ extension InfoServiceApiError: RichError {
     
     var level: ErrorLevel {
         switch self {
-        case .unknown, .parsingError:
+        case .unknown, .parsingError, .inconsistentData:
             .error
         case let .apiError(error):
             error.level

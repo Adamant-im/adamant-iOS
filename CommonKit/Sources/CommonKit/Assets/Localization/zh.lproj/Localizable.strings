@@ -640,6 +640,9 @@
 /* Info Service: Info Service */
 "InfoService.InfoService" = "Info Service";
 
+/* Info Service: inconsistent data */
+"InfoService.InconsistentData" = "Inconsistent data";
+
 /* NodesList: Button label */
 "NodesList.NodesList" = "ADM节点列表";
 

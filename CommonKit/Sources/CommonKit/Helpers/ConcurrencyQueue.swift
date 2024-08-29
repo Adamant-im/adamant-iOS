@@ -7,41 +7,40 @@
 
 import Foundation
 
-public actor ConcurrencyQueue {
-    private var isPerforming = false
-    private var actions = [@Sendable () async -> Void]()
+public actor ConcurrencyQueue<Output> {
+    private var inputCounter: Int = .zero
+    private var outputCounter: Int = .zero
+    private var queue: [Int: () -> Void] = .init()
     
-    public func add(_ action: @Sendable @escaping () async -> Void) {
-        actions.append(action)
-        guard !isPerforming else { return }
-        isPerforming = true
-        Task { await perform() }
+    public func perform(action: @escaping () async -> Output) async -> Output {
+        inputCounter += 1
+        let id = inputCounter
+        let result = await action()
+        
+        return await withTaskCancellationHandler(
+            operation: {
+                await withCheckedContinuation { continuation in
+                    enqueue(id: id) { continuation.resume(returning: result) }
+                }
+            },
+            onCancel: {
+                Task { await enqueue(id: id, action: {}) }
+            }
+        )
     }
     
     public init() {}
 }
 
-public extension ConcurrencyQueue {
-    nonisolated func syncAdd(_ action: @Sendable @escaping () async -> Void) {
-        let semaphore = DispatchSemaphore(value: .zero)
-        
-        Task {
-            await add(action)
-            semaphore.signal()
-        }
-        
-        semaphore.wait()
-    }
-}
-
 private extension ConcurrencyQueue {
-    func perform() async {
-        while !actions.isEmpty {
-            // Now it's O(n). It's possible to achieve O(1). But we will not do it.
-            // "Premature optimization is the root of all evil." ~ Donald Knuth
-            await actions.removeFirst()()
-        }
+    func enqueue(id: Int, action: @escaping () -> Void) {
+        guard id == outputCounter + 1 else { return queue[id] = action }
+        action()
+        outputCounter += 1
         
-        isPerforming = false
+        while let action = queue.removeValue(forKey: outputCounter + 1) {
+            action()
+            outputCounter += 1
+        }
     }
 }
