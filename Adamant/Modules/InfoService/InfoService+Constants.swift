@@ -22,4 +22,8 @@ extension InfoService {
     static var symbol: String {
         .localized("InfoService.InfoService")
     }
+    
+    static var nodes: [Node] {
+        [.makeDefaultNode(url: .init(string: "https://info2.adm.im")!)]
+    }
 }

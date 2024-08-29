@@ -8,9 +8,7 @@
 
 import Foundation
 
-public enum AdamantResources {
-    public static let coinsInfoService = "https://info2.adm.im"
-    
+public enum AdamantResources {    
     // MARK: ADAMANT Addresses
     public static let supportEmail = "business@adamant.im"
     public static let ansReadmeUrl = "https://github.com/Adamant-im/adamant-notificationService"

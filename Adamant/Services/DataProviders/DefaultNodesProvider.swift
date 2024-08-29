@@ -36,7 +36,7 @@ private extension DefaultNodesProvider {
         case .ipfs:
             return IPFSApiService.nodes
         case .infoService:
-            return [.makeDefaultNode(url: .init(string: AdamantResources.coinsInfoService)!)]
+            return InfoService.nodes
         }
     }
 }
