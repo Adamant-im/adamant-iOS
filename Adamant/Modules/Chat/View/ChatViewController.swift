@@ -50,6 +50,11 @@ final class ChatViewController: MessagesViewController {
     private lazy var replyView = ReplyView()
     private lazy var filesToolbarView = FilesToolbarView()
     private lazy var chatDropView = ChatDropView()
+    private lazy var dateHeaderLabel = EdgeInsetLabel(
+        font: .adamantPrimary(ofSize: 13),
+        textColor: .adamant.textColor,
+        numberOfLines: 1
+    )
     
     private var sendTransaction: SendTransaction
     
@@ -189,10 +194,28 @@ final class ChatViewController: MessagesViewController {
         super.collectionView(collectionView, willDisplay: cell, forItemAt: indexPath)
     }
     
+    override func scrollViewDidEndDragging(_: UIScrollView, willDecelerate _: Bool) {
+        viewModel.didEndScroll()
+    }
+    
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         super.scrollViewDidScroll(scrollView)
         updateIsScrollPositionNearlyTheBottom()
         updateScrollDownButtonVisibility()
+        
+        let targetY: CGFloat = 20 + view.safeAreaInsets.top
+        guard let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems.sorted(by: {
+            $0.row < $1.row
+        }) as [IndexPath]? else { return }
+        for indexPath in visibleIndexPaths {
+            if let cell = messagesCollectionView.cellForItem(at: indexPath) {
+                let cellRect = messagesCollectionView.convert(cell.frame, to: self.view)
+                if cellRect.minY <= targetY && cellRect.maxY >= targetY {
+                    viewModel.checkTopMessage(indexPath: indexPath)
+                    break
+                }
+            }
+        }
         
         guard
             viewAppeared,
@@ -391,6 +414,16 @@ private extension ChatViewController {
             .sink { [weak self] in self?.animateScroll(isStarted: $0) }
             .store(in: &subscriptions)
         
+        viewModel.$dateHeader
+            .removeDuplicates()
+            .sink { [weak self] in self?.dateHeaderLabel.text = $0 }
+            .store(in: &subscriptions)
+        
+        viewModel.$dateHeaderHidden
+            .removeDuplicates()
+            .sink { [weak self] in self?.dateHeaderLabel.isHidden = $0 }
+            .store(in: &subscriptions)
+        
         viewModel.updateChatRead
             .sink { [weak self] in self?.checkIsChatWasRead() }
             .store(in: &subscriptions)
@@ -492,6 +525,16 @@ private extension ChatViewController {
         
         navigationItem.titleView?.addGestureRecognizer(tapGesture)
         navigationItem.titleView?.addGestureRecognizer(longPressGesture)
+        
+        view.addSubview(dateHeaderLabel)
+        dateHeaderLabel.backgroundColor = .adamant.chatSenderBackground
+        dateHeaderLabel.textInsets = .init(top: 4, left: 7, bottom: 4, right: 7)
+        dateHeaderLabel.layer.cornerRadius = 10
+        dateHeaderLabel.clipsToBounds = true
+        dateHeaderLabel.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(10)
+            make.centerX.equalToSuperview()
+        }
     }
     
     func configureHeaderRightButton() {

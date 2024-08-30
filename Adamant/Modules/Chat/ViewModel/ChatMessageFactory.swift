@@ -108,10 +108,9 @@ struct ChatMessageFactory {
                 status: status,
                 expireDate: &expireDate
             ).map { .init(string: $0) },
-            dateHeader: dateHeaderOn
-                ? makeDateHeader(sentDate: sentDate)
-                : nil,
-            topSpinnerOn: topSpinnerOn
+            dateHeader: makeDateHeader(sentDate: sentDate),
+            topSpinnerOn: topSpinnerOn, 
+            dateHeaderIsHidden: !dateHeaderOn
         )
     }
 }
