@@ -47,7 +47,7 @@ protocol TransactionDetails {
     
     var nonceRaw: String? { get }
     
-    var txRecordData: String? { get }
+    var txBlockchainComment: String? { get }
     
     func summary(
         with url: String?,
@@ -59,7 +59,7 @@ protocol TransactionDetails {
 extension TransactionDetails {
     var feeCurrencySymbol: String? { defaultCurrencySymbol }
     
-    var txRecordData: String? { nil }
+    var txBlockchainComment: String? { nil }
     
     func summary(
         with url: String? = nil,

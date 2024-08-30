@@ -122,7 +122,7 @@ extension Transactions.TransactionModel: TransactionDetails {
         timestamp.map { Date(timeIntervalSince1970: TimeInterval($0)) }
     }
     
-    var txRecordData: String? {
+    var txBlockchainComment: String? {
         txData
     }
 }

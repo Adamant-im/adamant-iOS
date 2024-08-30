@@ -28,7 +28,7 @@ final class KlyTransactionDetailsViewController: TransactionDetailsViewControlle
         return control
     }()
     
-    override var showTxRecordData: Bool {
+    override var showTxBlockchainComment: Bool {
         true
     }
     // MARK: - Lifecycle
