@@ -14,6 +14,10 @@ import CoreData
 public class Chatroom: NSManagedObject {
     static let entityName = "Chatroom"
     
+    var hasUnread: Bool {
+        return hasUnreadMessages || (lastTransaction?.isUnread ?? false)
+    }
+    
     func markAsReaded() {
         hasUnreadMessages = false
        

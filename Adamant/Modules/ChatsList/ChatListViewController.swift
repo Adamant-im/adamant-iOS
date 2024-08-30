@@ -1086,7 +1086,7 @@ extension ChatListViewController {
             style: .normal,
             title: "👀"
         ) { (_, _, completionHandler) in
-            if chatroom.hasUnreadMessages || (chatroom.lastTransaction?.isUnread ?? false) {
+            if chatroom.hasUnread {
                 chatroom.markAsReaded()
             } else {
                 chatroom.markAsUnread()
