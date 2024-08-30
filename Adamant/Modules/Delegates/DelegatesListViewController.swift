@@ -69,7 +69,7 @@ final class DelegatesListViewController: KeyboardObservingViewController {
             attributedString: MarkdownParser(
                 font: UIFont.preferredFont(forTextStyle: .subheadline),
                 color: .adamant.chatPlaceholderTextColor 
-            ).parse(self.text)
+            ).parse(.localized("Delegates.HeaderText"))
         )
         
         let paragraphStyle = NSMutableParagraphStyle()
@@ -88,10 +88,6 @@ final class DelegatesListViewController: KeyboardObservingViewController {
         textView.sizeToFit()
         
         return textView
-    }
-    
-    var text: String {
-        .localized("Delegates.HeaderText")
     }
     
     private lazy var tableView: UITableView = {
@@ -234,12 +230,6 @@ final class DelegatesListViewController: KeyboardObservingViewController {
         safari.preferredControlTintColor = UIColor.adamant.primary
         safari.modalPresentationStyle = .overFullScreen
         present(safari, animated: true, completion: nil)
-    }
-    
-    private func calculateHeightForHeader() -> CGFloat {
-        headerTextView.sizeToFit()
-        let height = headerTextView.contentSize.height
-        return height
     }
     
     private func setupViews() {
