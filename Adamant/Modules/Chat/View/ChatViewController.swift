@@ -646,6 +646,7 @@ private extension ChatViewController {
     
     func updateMessages() {
         defer { checkIsChatWasRead() }
+        updateScrollDownButtonCounter()
         chatMessagesCollectionView.reloadData(newIds: viewModel.messages.map { $0.id })
         scrollDownOnNewMessageIfNeeded(previousBottomMessageId: bottomMessageId)
         bottomMessageId = viewModel.messages.last?.messageId
@@ -668,6 +669,11 @@ private extension ChatViewController {
     
     func updateScrollDownButtonVisibility() {
         scrollDownButton.isHidden = isScrollPositionNearlyTheBottom
+    }
+    
+    func updateScrollDownButtonCounter() {
+        let count = viewModel.chatroom?.getUnreadCount() ?? 0
+        scrollDownButton.updateCounter(count: count)
     }
 }
 
@@ -736,6 +742,7 @@ private extension ChatViewController {
     func checkIsChatWasRead() {
         guard isScrollPositionNearlyTheBottom, messagesLoaded else { return }
         viewModel.entireChatWasRead()
+        updateScrollDownButtonCounter()
     }
     
     @MainActor

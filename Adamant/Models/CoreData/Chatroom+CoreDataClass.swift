@@ -23,6 +23,14 @@ public class Chatroom: NSManagedObject {
         lastTransaction?.isUnread = false
     }
     
+    func getUnreadCount() -> Int {
+        var rv = 0
+        if let trs = transactions as? Set<ChatTransaction> {
+            trs.filter { $0.isUnread }.forEach { _ in rv += 1 }
+        }
+        return rv
+    }
+    
     func getFirstUnread() -> ChatTransaction? {
         if let trs = transactions as? Set<ChatTransaction> {
             return trs.filter { $0.isUnread }.map { $0 }.first
