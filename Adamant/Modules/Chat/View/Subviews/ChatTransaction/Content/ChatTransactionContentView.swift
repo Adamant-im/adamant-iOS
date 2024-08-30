@@ -135,7 +135,7 @@ final class ChatTransactionContentView: UIView {
 
 extension ChatTransactionContentView.Model {
     func height(for width: CGFloat) -> CGFloat {
-        let opponentReactionWidth = ChatTransactionContainerView.opponentReactionWidth
+        let opponentReactionWidth = ChatTransactionContainerView.maxVStackWidth
         let containerHorizontalOffset = ChatTransactionContainerView.horizontalStackSpacing * 2
         let contentHorizontalOffset = horizontalInsets * 2
         

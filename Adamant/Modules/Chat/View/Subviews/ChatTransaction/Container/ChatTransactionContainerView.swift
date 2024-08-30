@@ -63,7 +63,7 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
         stack.addArrangedSubview(opponentReactionLabel)
         
         stack.snp.makeConstraints {
-            $0.width.equalTo(Self.opponentReactionWidth)
+            $0.width.equalTo(Self.maxVStackWidth)
         }
         return stack
     }()
@@ -122,11 +122,11 @@ final class ChatTransactionContainerView: UIView, ChatModelView {
     private lazy var chatMenuManager = ChatMenuManager(delegate: self)
     
     private let ownReactionSize = CGSize(width: 40, height: 27)
-    private let opponentReactionSize = CGSize(width: opponentReactionWidth, height: 27)
+    private let opponentReactionSize = CGSize(width: maxVStackWidth, height: 27)
     private let opponentReactionImageSize = CGSize(width: 12, height: 12)
     
-    static let opponentReactionWidth: CGFloat = 55
     static let horizontalStackSpacing: CGFloat = 12
+    static let maxVStackWidth: CGFloat = 55
     
     var isSelected: Bool = false {
         didSet {
