@@ -45,7 +45,6 @@ final class OnboardPage: SwiftyOnboardPage {
         super.init(frame: .zero)
         
         setupView()
-        layoutScreen()
     }
     
     required public init?(coder aDecoder: NSCoder) {
@@ -68,14 +67,7 @@ final class OnboardPage: SwiftyOnboardPage {
             make.horizontalEdges.equalToSuperview().inset(20)
             make.bottom.equalToSuperview().offset(-150)
             make.height.equalTo(260)
-        }
-    }
-    
-    private func layoutScreen() {
-        if UIScreen.main.bounds.height == 667 {
-            textView.snp.updateConstraints { make in
-                make.bottom.equalToSuperview().offset(-120)
-            }
+            make.top.greaterThanOrEqualTo(mainImageView.snp.bottom).offset(20)
         }
     }
 }
