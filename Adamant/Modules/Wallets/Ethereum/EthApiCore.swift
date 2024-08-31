@@ -85,7 +85,7 @@ extension EthApiCore: BlockchainHealthCheckableService {
             height: Int(height),
             wsEnabled: false,
             wsPort: nil,
-            version: extractVersion(from: clientVersion)
+            version: extractVersion(from: clientVersion).flatMap { .init($0) }
         ))
     }
 }

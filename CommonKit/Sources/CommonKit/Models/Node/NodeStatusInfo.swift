@@ -13,14 +13,14 @@ public struct NodeStatusInfo: Equatable {
     public let height: Int
     public let wsEnabled: Bool
     public let wsPort: Int?
-    public let version: String?
+    public let version: Version?
     
     public init(
         ping: TimeInterval,
         height: Int,
         wsEnabled: Bool,
         wsPort: Int?,
-        version: String?
+        version: Version?
     ) {
         self.ping = ping
         self.height = height

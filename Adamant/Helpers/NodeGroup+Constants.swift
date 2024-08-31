@@ -93,8 +93,9 @@ extension NodeGroup {
         }
     }
     
-    var minNodeVersion: Double {
-        let minNodeVersion: String? = switch self {
+    // swiftlint:disable switch_case_alignment
+    var minNodeVersion: Version? {
+        guard let version = switch self {
         case .adm:
             AdmWalletService.minNodeVersion
         case .btc:
@@ -111,9 +112,9 @@ extension NodeGroup {
             DashWalletService.minNodeVersion
         case .ipfs:
             nil
-        }
+        } else { return nil }
         
-        return Node.versionToDouble(minNodeVersion) ?? .zero
+        return .init(version)
     }
     
     var name: String {
@@ -135,15 +136,6 @@ extension NodeGroup {
             return AdmWalletService.tokenNetworkSymbol
         case .ipfs:
             return IPFSApiService.symbol
-        }
-    }
-    
-    var includeVersionTitle: Bool {
-        switch self {
-        case .btc, .klyNode, .klyService, .doge, .adm:
-            return true
-        case .eth, .dash, .ipfs:
-            return false
         }
     }
     

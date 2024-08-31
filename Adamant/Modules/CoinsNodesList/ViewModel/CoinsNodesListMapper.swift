@@ -33,12 +33,7 @@ private extension CoinsNodesListMapper {
             id: group,
             title: group.name,
             rows: nodes.map {
-                map(
-                    node: $0,
-                    group: group,
-                    isRest: restNodeIds.contains($0.id),
-                    includeVersionTitle: group.includeVersionTitle
-                )
+                map(node: $0, group: group, isRest: restNodeIds.contains($0.id))
             }
         )
     }
@@ -46,8 +41,7 @@ private extension CoinsNodesListMapper {
     func map(
         node: Node,
         group: NodeGroup,
-        isRest: Bool,
-        includeVersionTitle: Bool
+        isRest: Bool
     ) -> CoinsNodesListState.Section.Row {
         let indicatorString = node.indicatorString(isRest: isRest, isWs: false)
         var indicatorAttrString = AttributedString(stringLiteral: indicatorString)
@@ -59,10 +53,7 @@ private extension CoinsNodesListMapper {
             isEnabled: node.isEnabled,
             title: node.asString(),
             connectionStatus: indicatorAttrString,
-            description: node.statusString(
-                showVersion: true,
-                includeVersionTitle: includeVersionTitle
-            ) ?? .empty
+            description: node.statusString(showVersion: true) ?? .empty
         )
     }
 }

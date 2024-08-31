@@ -10,14 +10,14 @@ import CommonKit
 import UIKit
 
 extension Node {
-    func statusString(showVersion: Bool, includeVersionTitle: Bool = true) -> String? {
+    func statusString(showVersion: Bool) -> String? {
         guard isEnabled else { return Strings.disabled }
         
         switch connectionStatus {
         case .allowed:
             return [
                 pingString,
-                showVersion ? versionString(includeVersionTitle: includeVersionTitle) : nil,
+                showVersion ? versionString : nil,
                 heightString
             ]
             .compactMap { $0 }
@@ -25,7 +25,7 @@ extension Node {
         case .synchronizing:
             return [
                 Strings.synchronizing,
-                showVersion ? versionString(includeVersionTitle: includeVersionTitle) : nil,
+                showVersion ? versionString : nil,
                 heightString
             ]
             .compactMap { $0 }
@@ -35,7 +35,7 @@ extension Node {
         case .notAllowed(let reason):
             return [
                 reason.text,
-                version
+                version?.string
             ]
             .compactMap { $0 }
             .joined(separator: " ")
@@ -130,6 +130,10 @@ private extension Node {
         height.map { " ❐ \(getFormattedHeight(from: $0))" }
     }
     
+    var versionString: String? {
+        version.map { "(v\($0.string))" }
+    }
+    
     var numberFormatter: NumberFormatter {
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = .decimal
@@ -139,13 +143,5 @@ private extension Node {
     
     func getFormattedHeight(from height: Int) -> String {
         numberFormatter.string(from: Decimal(height)) ?? String(height)
-    }
-    
-    func versionString(includeVersionTitle: Bool) -> String? {
-        guard includeVersionTitle else {
-            return version.map { "(\($0))" }
-        }
-        
-        return version.map { "(v\($0))" }
     }
 }
