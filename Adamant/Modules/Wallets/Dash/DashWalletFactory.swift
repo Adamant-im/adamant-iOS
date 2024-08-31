@@ -48,7 +48,6 @@ struct DashWalletFactory: WalletFactory {
             vibroService: assembler.resolve(VibroService.self)!, 
             walletService: service,
             reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
-            nodesStorage: assembler.resolve(NodesStorageProtocol.self)!,
             apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!
         )
     }

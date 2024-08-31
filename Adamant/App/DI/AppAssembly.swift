@@ -411,7 +411,7 @@ struct AppAssembly: Assembly {
             }
         }
         
-        // MARK: Wallet Service Compose
+        // MARK: ApiService Compose
         container.register(ApiServiceComposeProtocol.self) {
             ApiServiceCompose(
                 btc: $0.resolve(BtcApiService.self)!,

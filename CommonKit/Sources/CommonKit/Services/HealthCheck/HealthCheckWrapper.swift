@@ -70,6 +70,12 @@ open class HealthCheckWrapper<Service, Error: HealthCheckableError> {
             }
             .store(in: &subscriptions)
         
+        $sortedAllowedNodes
+            .map { $0.isEmpty }
+            .removeDuplicates()
+            .sink { [weak self] _ in self?.updateHealthCheckTimerSubscription() }
+            .store(in: &subscriptions)
+        
         connection?
             .filter { $0 == true }
             .sink { [weak self] _ in self?.healthCheck() }
@@ -136,21 +142,13 @@ private extension HealthCheckWrapper {
     func didBecomeActiveAction() {
         defer { previousAppState = .active }
         
-        switch previousAppState {
-        case .background:
-            guard
-                isActive,
-                let timeToUpdate = lastUpdateTime?
-                    .addingTimeInterval(normalUpdateInterval / 3),
-                Date.now > timeToUpdate
-            else { break }
-            
-            healthCheck()
-        case .inactive, .active, .none:
-            break
-        @unknown default:
-            break
-        }
+        guard
+            previousAppState == .background,
+            let timeToUpdate = lastUpdateTime?.addingTimeInterval(normalUpdateInterval / 3),
+            Date.now > timeToUpdate
+        else { return }
+        
+        healthCheck()
     }
 }
 
@@ -163,7 +161,9 @@ private extension Node {
 }
 
 private extension Sequence where Element == Node {
-    func doesNeedHealthCheck<Nodes: Sequence>(_ nodes: Nodes) -> Bool where Nodes.Element == Self.Element {
+    func doesNeedHealthCheck<Nodes: Sequence>(
+        _ nodes: Nodes
+    ) -> Bool where Nodes.Element == Self.Element {
         let firstNodes = Dictionary(uniqueKeysWithValues: map { ($0.id, $0) })
         let secondNodes = Dictionary(uniqueKeysWithValues: nodes.map { ($0.id, $0) })
         

@@ -187,7 +187,6 @@ class TransferViewControllerBase: FormViewController {
     let walletService: WalletService
     let walletCore: WalletCoreProtocol
     let reachabilityMonitor: ReachabilityMonitor
-    let nodesStorage: NodesStorageProtocol
     let apiServiceCompose: ApiServiceComposeProtocol
     
     // MARK: - Properties
@@ -320,7 +319,6 @@ class TransferViewControllerBase: FormViewController {
         vibroService: VibroService,
         walletService: WalletService,
         reachabilityMonitor: ReachabilityMonitor,
-        nodesStorage: NodesStorageProtocol,
         apiServiceCompose: ApiServiceComposeProtocol
     ) {
         self.accountService = accountService
@@ -334,7 +332,6 @@ class TransferViewControllerBase: FormViewController {
         self.walletService = walletService
         self.walletCore = walletService.core
         self.reachabilityMonitor = reachabilityMonitor
-        self.nodesStorage = nodesStorage
         self.apiServiceCompose = apiServiceCompose
         super.init(nibName: nil, bundle: nil)
     }
