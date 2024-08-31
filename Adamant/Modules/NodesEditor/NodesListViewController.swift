@@ -426,7 +426,7 @@ extension NodesListViewController {
                 isWs: currentSocketsNodeId == node.id
             ),
             indicatorColor: node.indicatorColor,
-            statusString: node.statusString(showVersion: true) ?? .empty,
+            statusString: node.statusString(showVersion: true, dateHeight: false) ?? .empty,
             isEnabled: node.isEnabled,
             nodeUpdateAction: .init(id: node.id.uuidString) { [nodesStorage] isEnabled in
                 nodesStorage.updateNode(id: node.id, group: .adm) { $0.isEnabled = isEnabled }

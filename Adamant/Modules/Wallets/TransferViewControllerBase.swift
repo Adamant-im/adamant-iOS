@@ -180,7 +180,7 @@ class TransferViewControllerBase: FormViewController {
     let accountsProvider: AccountsProvider
     let dialogService: DialogService
     let screensFactory: ScreensFactory
-    let currencyInfoService: CurrencyInfoService
+    let currencyInfoService: InfoServiceProtocol
     var increaseFeeService: IncreaseFeeService
     var chatsProvider: ChatsProvider
     let vibroService: VibroService
@@ -315,7 +315,7 @@ class TransferViewControllerBase: FormViewController {
         accountsProvider: AccountsProvider,
         dialogService: DialogService,
         screensFactory: ScreensFactory,
-        currencyInfoService: CurrencyInfoService,
+        currencyInfoService: InfoServiceProtocol,
         increaseFeeService: IncreaseFeeService,
         vibroService: VibroService,
         walletService: WalletService,

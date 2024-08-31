@@ -27,6 +27,8 @@ extension NodeGroup {
             return DashWalletService.healthCheckParameters.onScreenUpdateInterval
         case .ipfs:
             return IPFSApiService.healthCheckParameters.onScreenUpdateInterval
+        case .infoService:
+            return InfoService.healthCheckParameters.onScreenUpdateInterval
         }
     }
 
@@ -48,6 +50,8 @@ extension NodeGroup {
             return DashWalletService.healthCheckParameters.crucialUpdateInterval
         case .ipfs:
             return IPFSApiService.healthCheckParameters.crucialUpdateInterval
+        case .infoService:
+            return InfoService.healthCheckParameters.crucialUpdateInterval
         }
     }
 
@@ -69,6 +73,8 @@ extension NodeGroup {
             return DashWalletService.healthCheckParameters.threshold
         case .ipfs:
             return IPFSApiService.healthCheckParameters.threshold
+        case .infoService:
+            return InfoService.healthCheckParameters.threshold
         }
     }
 
@@ -90,6 +96,8 @@ extension NodeGroup {
             return DashWalletService.healthCheckParameters.normalUpdateInterval
         case .ipfs:
             return IPFSApiService.healthCheckParameters.normalUpdateInterval
+        case .infoService:
+            return InfoService.healthCheckParameters.normalUpdateInterval
         }
     }
     
@@ -110,7 +118,7 @@ extension NodeGroup {
             DogeWalletService.minNodeVersion
         case .dash:
             DashWalletService.minNodeVersion
-        case .ipfs:
+        case .ipfs, .infoService:
             nil
         } else { return nil }
         
@@ -136,6 +144,17 @@ extension NodeGroup {
             return AdmWalletService.tokenNetworkSymbol
         case .ipfs:
             return IPFSApiService.symbol
+        case .infoService:
+            return InfoService.symbol
+        }
+    }
+    
+    var useDateHeight: Bool {
+        switch self {
+        case .btc, .eth, .klyNode, .klyService, .doge, .dash, .adm, .ipfs:
+            false
+        case .infoService:
+            true
         }
     }
     

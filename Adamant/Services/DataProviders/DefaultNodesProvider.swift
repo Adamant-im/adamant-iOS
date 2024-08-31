@@ -35,6 +35,8 @@ private extension DefaultNodesProvider {
             return AdmWalletService.nodes
         case .ipfs:
             return IPFSApiService.nodes
+        case .infoService:
+            return InfoService.nodes
         }
     }
 }

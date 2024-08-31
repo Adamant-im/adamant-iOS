@@ -637,6 +637,12 @@
 /* New Chat: 'What does it mean?', a help button for info about uninitialized accounts. */
 "NewChatScene.NotInitialized.HelpButton" = "What does it mean?";
 
+/* Info Service: Info Service */
+"InfoService.InfoService" = "Info Service";
+
+/* Info Service: inconsistent data */
+"InfoService.InconsistentData" = "Inconsistent data";
+
 /* NodesList: Button label */
 "NodesList.NodesList" = "ADM node list";
 

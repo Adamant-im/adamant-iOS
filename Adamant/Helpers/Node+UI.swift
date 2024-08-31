@@ -10,38 +10,30 @@ import CommonKit
 import UIKit
 
 extension Node {
-    func statusString(showVersion: Bool) -> String? {
-        guard isEnabled else { return Strings.disabled }
+    func statusString(showVersion: Bool, dateHeight: Bool) -> String? {
+        guard
+            isEnabled,
+            let connectionStatus = connectionStatus
+        else { return Strings.disabled }
         
-        switch connectionStatus {
+        let statusTitle = switch connectionStatus {
         case .allowed:
-            return [
-                pingString,
-                showVersion ? versionString : nil,
-                heightString
-            ]
-            .compactMap { $0 }
-            .joined(separator: " ")
+            pingString
         case .synchronizing:
-            return [
-                Strings.synchronizing,
-                showVersion ? versionString : nil,
-                heightString
-            ]
-            .compactMap { $0 }
-            .joined(separator: " ")
+            Strings.synchronizing
         case .offline:
-            return Strings.offline
+            Strings.offline
         case .notAllowed(let reason):
-            return [
-                reason.text,
-                version?.string
-            ]
-            .compactMap { $0 }
-            .joined(separator: " ")
-        case .none:
-            return nil
+            reason.text
         }
+        
+        return [
+            statusTitle,
+            showVersion ? versionString : nil,
+            dateHeight ? dateHeightString : heightString
+        ]
+        .compactMap { $0 }
+        .joined(separator: " ")
     }
     
     func indicatorString(isRest: Bool, isWs: Bool) -> String {
@@ -128,6 +120,10 @@ private extension Node {
     
     var heightString: String? {
         height.map { " ❐ \(getFormattedHeight(from: $0))" }
+    }
+    
+    var dateHeightString: String? {
+        height.map { Date(timeIntervalSince1970: .init($0)).humanizedTime().string }
     }
     
     var versionString: String? {

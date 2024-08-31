@@ -244,14 +244,14 @@ struct AppAssembly: Assembly {
                 adamantCore: r.resolve(AdamantCore.self)!,
                 dialogService: r.resolve(DialogService.self)!,
                 securedStore: r.resolve(SecuredStore.self)!,
-                walletServiceCompose: r.resolve(WalletServiceCompose.self)!
+                walletServiceCompose: r.resolve(WalletServiceCompose.self)!,
+                currencyInfoService: r.resolve(InfoServiceProtocol.self)!
             )
         }.inObjectScope(.container).initCompleted { (r, c) in
             Task { @MainActor in
                 guard let service = c as? AdamantAccountService else { return }
                 service.notificationsService = r.resolve(NotificationsService.self)!
                 service.pushNotificationsTokenService = r.resolve(PushNotificationsTokenService.self)!
-                service.currencyInfoService = r.resolve(CurrencyInfoService.self)!
                 service.visibleWalletService = r.resolve(VisibleWalletsService.self)!
             }
         }
@@ -263,14 +263,6 @@ struct AppAssembly: Assembly {
                 adamantCore: r.resolve(AdamantCore.self)!,
                 accountService: r.resolve(AccountService.self)!,
                 dialogService: r.resolve(DialogService.self)!
-            )
-        }.inObjectScope(.container)
-        
-        // MARK: CurrencyInfoService
-        container.register(CurrencyInfoService.self) { r in
-            AdamantCurrencyInfoService(
-                securedStore: r.resolve(SecuredStore.self)!,
-                walletServiceCompose: r.resolve(WalletServiceCompose.self)!
             )
         }.inObjectScope(.container)
         
@@ -429,7 +421,8 @@ struct AppAssembly: Assembly {
                 doge: $0.resolve(DogeApiService.self)!,
                 dash: $0.resolve(DashApiService.self)!,
                 adm: $0.resolve(AdamantApiServiceProtocol.self)!,
-                ipfs: $0.resolve(IPFSApiService.self)!
+                ipfs: $0.resolve(IPFSApiService.self)!,
+                infoService: $0.resolve(InfoServiceApiServiceProtocol.self)!
             )
         }.inObjectScope(.transient)
         

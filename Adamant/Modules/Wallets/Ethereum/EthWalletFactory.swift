@@ -19,7 +19,7 @@ struct EthWalletFactory: WalletFactory {
     func makeWalletVC(service: Service, screensFactory: ScreensFactory) -> WalletViewController {
         EthWalletViewController(
             dialogService: assembler.resolve(DialogService.self)!,
-            currencyInfoService: assembler.resolve(CurrencyInfoService.self)!,
+            currencyInfoService: assembler.resolve(InfoServiceProtocol.self)!,
             accountService: assembler.resolve(AccountService.self)!,
             screensFactory: screensFactory,
             walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!,
@@ -43,7 +43,7 @@ struct EthWalletFactory: WalletFactory {
             accountsProvider: assembler.resolve(AccountsProvider.self)!,
             dialogService: assembler.resolve(DialogService.self)!,
             screensFactory: screensFactory,
-            currencyInfoService: assembler.resolve(CurrencyInfoService.self)!,
+            currencyInfoService: assembler.resolve(InfoServiceProtocol.self)!,
             increaseFeeService: assembler.resolve(IncreaseFeeService.self)!,
             vibroService: assembler.resolve(VibroService.self)!, 
             walletService: service,
@@ -129,7 +129,7 @@ private extension EthWalletFactory {
     func makeTransactionDetailsVC(service: Service) -> EthTransactionDetailsViewController {
         EthTransactionDetailsViewController(
             dialogService: assembler.resolve(DialogService.self)!,
-            currencyInfo: assembler.resolve(CurrencyInfoService.self)!,
+            currencyInfo: assembler.resolve(InfoServiceProtocol.self)!,
             addressBookService: assembler.resolve(AddressBookService.self)!,
             accountService:  assembler.resolve(AccountService.self)!,
             walletService: service,

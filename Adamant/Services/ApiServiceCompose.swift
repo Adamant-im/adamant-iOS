@@ -18,6 +18,7 @@ struct ApiServiceCompose: ApiServiceComposeProtocol {
     let dash: ApiServiceProtocol
     let adm: ApiServiceProtocol
     let ipfs: ApiServiceProtocol
+    let infoService: ApiServiceProtocol
     
     func chosenFastestNodeId(group: NodeGroup) -> UUID? {
         getApiService(group: group).chosenFastestNodeId
@@ -51,6 +52,8 @@ private extension ApiServiceCompose {
             return adm
         case .ipfs:
             return ipfs
+        case .infoService:
+            return infoService
         }
     }
 }

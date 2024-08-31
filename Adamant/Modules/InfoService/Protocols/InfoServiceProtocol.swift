@@ -1,5 +1,5 @@
 //
-//  CurrencyInfoService.swift
+//  InfoServiceProtocol.swift
 //  Adamant
 //
 //  Created by Anton Boyarkin on 23/03/2019.
@@ -12,6 +12,12 @@ import CommonKit
 extension Notification.Name {
     struct AdamantCurrencyInfoService {
         static let currencyRatesUpdated = Notification.Name("adamant.currencyInfo.rateUpdated")
+    }
+}
+
+extension StoreKey {
+    struct CoinInfo {
+        static let selectedCurrency = "coinInfo.selectedCurrency"
     }
 }
 
@@ -37,7 +43,7 @@ enum Currency: String {
 }
 
 // MARK: - protocol
-protocol CurrencyInfoService: AnyObject {
+protocol InfoServiceProtocol: AnyObject {
     var currentCurrency: Currency { get set }
     
     // Check rates for list of coins
@@ -46,12 +52,10 @@ protocol CurrencyInfoService: AnyObject {
     // Get rate for pair Crypto / Fiat currencies
     func getRate(for coin: String) -> Decimal?
     
-    func getHistory(for coin: String, timestamp: Date, completion: @escaping (ApiServiceResult<[String:Decimal]?>) -> Void)
-    
     func getHistory(
         for coin: String,
-        timestamp: Date
-    ) async throws -> [String: Decimal]
+        date: Date
+    ) async -> InfoServiceApiResult<[InfoServiceTicker: Decimal]>
 }
 
 // MARK: - AdamantBalanceFormat fiat formatter
