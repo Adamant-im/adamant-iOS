@@ -32,13 +32,13 @@ final class BadgeViewLabel: UILabel {
 
 private extension BadgeViewLabel {
     func configure() {
-        layer.cornerRadius = 8
+        layer.cornerRadius = cornerRadius
         layer.masksToBounds = true
         backgroundColor = .systemRed
         numberOfLines = 0
         lineBreakMode = .byWordWrapping
         textAlignment = .center
-        font = .systemFont(ofSize: 12)
+        font = .systemFont(ofSize: fontSize)
         textColor = .white
         text = .empty
         translatesAutoresizingMaskIntoConstraints = false
@@ -65,3 +65,6 @@ private extension BadgeViewLabel {
         }
     }
 }
+
+fileprivate let cornerRadius: CGFloat = 8
+fileprivate let fontSize: CGFloat = 12

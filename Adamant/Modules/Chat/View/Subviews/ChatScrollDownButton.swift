@@ -45,8 +45,8 @@ private extension ChatScrollDownButton {
             $0.directionalEdges.equalToSuperview()
         }
         badgeView.snp.makeConstraints { make in
-            make.height.equalTo(16)
-            make.width.greaterThanOrEqualTo(16)
+            make.height.equalTo(counterMinSize)
+            make.width.greaterThanOrEqualTo(counterMinSize)
             make.centerY.equalTo(button.snp.top)
             make.centerX.equalTo(button.snp.centerX)
         }
@@ -56,3 +56,5 @@ private extension ChatScrollDownButton {
         action?()
     }
 }
+
+fileprivate let counterMinSize: CGFloat = 16
