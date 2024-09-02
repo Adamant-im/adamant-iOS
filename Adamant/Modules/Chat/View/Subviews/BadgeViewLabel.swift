@@ -25,7 +25,7 @@ final class BadgeViewLabel: UILabel {
     @MainActor
     func updateCounter(count: Int) {
         isHidden = count == 0
-        let formatText = formatNumber(count)
+        let formatText: String = count > 99 ? "99+" : "\(count)"
         text = formatText
     }
 }
@@ -42,27 +42,6 @@ private extension BadgeViewLabel {
         textColor = .white
         text = .empty
         translatesAutoresizingMaskIntoConstraints = false
-    }
-    
-    func formatNumber(_ number: Int) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.minimumFractionDigits = 0
-        formatter.maximumFractionDigits = 1
-
-        switch number {
-        case 1_000_000_000...:
-            let formatted = formatter.string(from: NSNumber(value: Double(number) / 1_000_000_000)) ?? "\(number)"
-            return "\(formatted)B"
-        case 1_000_000...:
-            let formatted = formatter.string(from: NSNumber(value: Double(number) / 1_000_000)) ?? "\(number)"
-            return "\(formatted)M"
-        case 1_000...:
-            let formatted = formatter.string(from: NSNumber(value: Double(number) / 1_000)) ?? "\(number)"
-            return "\(formatted)K"
-        default:
-            return "\(number)"
-        }
     }
 }
 
