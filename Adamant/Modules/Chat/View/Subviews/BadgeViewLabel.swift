@@ -10,23 +10,7 @@ import Foundation
 import UIKit
 import SnapKit
 
-class BadgeView: UIView {
-    private lazy var counterLabel: UILabel = {
-        let rv = UILabel()
-        rv.numberOfLines = 0
-        rv.lineBreakMode = .byWordWrapping
-        rv.font = .systemFont(ofSize: 12)
-        rv.textColor = labelColor
-        rv.text = String.empty
-        rv.translatesAutoresizingMaskIntoConstraints = false
-        return rv
-    }()
-    
-    private var labelColor: UIColor {
-        UIColor { traits -> UIColor in
-            return traits.userInterfaceStyle == .dark ? UIColor.adamant.first : UIColor.adamant.fourth
-        }
-    }
+final class BadgeViewLabel: UILabel {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -40,28 +24,24 @@ class BadgeView: UIView {
     
     @MainActor
     func updateCounter(count: Int) {
-        self.isHidden = count == 0
+        isHidden = count == 0
         let formatText = formatNumber(count)
-        counterLabel.text = formatText
+        text = formatText
     }
 }
 
-private extension BadgeView {
+private extension BadgeViewLabel {
     func configure() {
-        backgroundColor = UIColor.adamant.primary
         layer.cornerRadius = 8
-        addSubview(counterLabel)
-        let padding: CGFloat = 4
-        self.snp.makeConstraints { make in
-            make.height.equalTo(16)
-            make.width.greaterThanOrEqualTo(16)
-        }
-        counterLabel.snp.makeConstraints { make in
-            make.leading.greaterThanOrEqualToSuperview().offset(padding)
-            make.trailing.lessThanOrEqualToSuperview().offset(-padding)
-            make.centerX.equalToSuperview()
-            make.centerY.equalToSuperview()
-        }
+        layer.masksToBounds = true
+        backgroundColor = .systemRed
+        numberOfLines = 0
+        lineBreakMode = .byWordWrapping
+        textAlignment = .center
+        font = .systemFont(ofSize: 12)
+        textColor = .white
+        text = .empty
+        translatesAutoresizingMaskIntoConstraints = false
     }
     
     func formatNumber(_ number: Int) -> String {

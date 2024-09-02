@@ -18,7 +18,7 @@ final class ChatScrollDownButton: UIView {
         return button
     }()
     
-    private let counter = BadgeView()
+    private let badgeView = BadgeViewLabel()
     
     var action: (() -> Void)?
     
@@ -33,18 +33,20 @@ final class ChatScrollDownButton: UIView {
     }
     
     func updateCounter(count: Int) {
-        counter.updateCounter(count: count)
+        badgeView.updateCounter(count: count)
     }
 }
 
 private extension ChatScrollDownButton {
     func configure() {
         addSubview(button)
-        addSubview(counter)
+        addSubview(badgeView)
         button.snp.makeConstraints {
             $0.directionalEdges.equalToSuperview()
         }
-        counter.snp.makeConstraints { make in
+        badgeView.snp.makeConstraints { make in
+            make.height.equalTo(16)
+            make.width.greaterThanOrEqualTo(16)
             make.centerY.equalTo(button.snp.top)
             make.centerX.equalTo(button.snp.centerX)
         }
