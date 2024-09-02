@@ -57,4 +57,4 @@ private extension ChatScrollDownButton {
     }
 }
 
-fileprivate let counterMinSize: CGFloat = 16
+private let counterMinSize: CGFloat = 16

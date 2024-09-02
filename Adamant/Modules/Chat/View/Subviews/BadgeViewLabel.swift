@@ -66,5 +66,5 @@ private extension BadgeViewLabel {
     }
 }
 
-fileprivate let cornerRadius: CGFloat = 8
-fileprivate let fontSize: CGFloat = 12
+private let cornerRadius: CGFloat = 8
+private let fontSize: CGFloat = 12
