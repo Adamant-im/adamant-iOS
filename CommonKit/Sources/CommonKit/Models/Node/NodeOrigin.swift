@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct NodeOrigin: Codable, Equatable {
+public struct NodeOrigin: Codable, Equatable, Hashable {
     public var scheme: URLScheme
     public var host: String
     public var port: Int?

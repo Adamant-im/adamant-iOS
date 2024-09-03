@@ -5,6 +5,8 @@
 //  Created by Andrew G on 08.08.2024.
 //
 
+import Combine
+
 public struct ExtensionsApiFactory {
     public let core: AdamantCore
     public let securedStore: SecuredStore
@@ -35,7 +37,7 @@ public struct ExtensionsApiFactory {
                     minNodeVersion: nil,
                     nodeHeightEpsilon: .zero
                 ),
-                connection: nil
+                connection: Just(true).eraseToAnyPublisher()
             ),
             adamantCore: core
         ))

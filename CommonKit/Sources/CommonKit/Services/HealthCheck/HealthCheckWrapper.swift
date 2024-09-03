@@ -17,7 +17,8 @@ public protocol HealthCheckableError: Error {
 }
 
 open class HealthCheckWrapper<Service, Error: HealthCheckableError> {
-    @ObservableValue public var nodes: [Node] = .init()
+    @ObservableValue public private(set) var nodes: [Node] = .init()
+    @ObservableValue public private(set) var sortedAllowedNodes: [Node] = .init()
     
     public let service: Service
     public let isActive: Bool
@@ -33,8 +34,6 @@ open class HealthCheckWrapper<Service, Error: HealthCheckableError> {
     @Atomic private var previousAppState: UIApplication.State?
     @Atomic private var lastUpdateTime: Date?
     
-    @ObservableValue public private(set) var sortedAllowedNodes: [Node] = .init()
-    
     public var chosenFastestNodeId: UUID? {
         fastestNodeMode
             ? sortedAllowedNodes.first?.id
@@ -47,7 +46,8 @@ open class HealthCheckWrapper<Service, Error: HealthCheckableError> {
         name: String,
         normalUpdateInterval: TimeInterval,
         crucialUpdateInterval: TimeInterval,
-        connection: AnyObservable<Bool>?
+        connection: AnyObservable<Bool>,
+        nodes: AnyObservable<[Node]>
     ) {
         self.service = service
         self.isActive = isActive
@@ -55,30 +55,25 @@ open class HealthCheckWrapper<Service, Error: HealthCheckableError> {
         self.normalUpdateInterval = normalUpdateInterval
         self.crucialUpdateInterval = crucialUpdateInterval
         
-        $nodes
+        let connection = connection
+            .removeDuplicates()
+            .filter { $0 }
+        
+        nodes
             .removeDuplicates { !$0.doesNeedHealthCheck($1) }
+            .combineLatest(connection)
             .sink { [weak self] _ in self?.healthCheck() }
             .store(in: &subscriptions)
         
-        $nodes
+        nodes
             .removeDuplicates()
-            .sink { [weak self] in
-                self?.sortedAllowedNodes = $0.getAllowedNodes(
-                    sortedBySpeedDescending: true,
-                    needWS: false
-                )
-            }
+            .sink { [weak self] in self?.updateNodes($0) }
             .store(in: &subscriptions)
         
         $sortedAllowedNodes
             .map { $0.isEmpty }
             .removeDuplicates()
             .sink { [weak self] _ in self?.updateHealthCheckTimerSubscription() }
-            .store(in: &subscriptions)
-        
-        connection?
-            .filter { $0 == true }
-            .sink { [weak self] _ in self?.healthCheck() }
             .store(in: &subscriptions)
         
         NotificationCenter.default
@@ -150,13 +145,14 @@ private extension HealthCheckWrapper {
         
         healthCheck()
     }
-}
-
-private extension Node {
-    func doesNeedHealthCheck(_ node: Node) -> Bool {
-        mainOrigin != node.mainOrigin ||
-        altOrigin != node.altOrigin ||
-        isEnabled != node.isEnabled
+    
+    func updateNodes(_ newNodes: [Node]) {
+        nodes = newNodes
+        
+        sortedAllowedNodes = newNodes.getAllowedNodes(
+            sortedBySpeedDescending: true,
+            needWS: false
+        )
     }
 }
 
@@ -164,13 +160,19 @@ private extension Sequence where Element == Node {
     func doesNeedHealthCheck<Nodes: Sequence>(
         _ nodes: Nodes
     ) -> Bool where Nodes.Element == Self.Element {
-        let firstNodes = Dictionary(uniqueKeysWithValues: map { ($0.id, $0) })
-        let secondNodes = Dictionary(uniqueKeysWithValues: nodes.map { ($0.id, $0) })
-        
-        guard Set(firstNodes.keys) == Set(secondNodes.keys) else { return true }
-        
-        return firstNodes.contains { id, firstNode in
-            secondNodes[id]?.doesNeedHealthCheck(firstNode) ?? true
-        }
+        Set(self.map { NodeComparisonInfo(node: $0) })
+            != Set(nodes.map { NodeComparisonInfo(node: $0) })
+    }
+}
+
+private struct NodeComparisonInfo: Hashable {
+    let mainOrigin: NodeOrigin
+    let altOrigin: NodeOrigin?
+    let isEnabled: Bool
+    
+    init(node: Node) {
+        mainOrigin = node.mainOrigin
+        altOrigin = node.altOrigin
+        isEnabled = node.isEnabled
     }
 }

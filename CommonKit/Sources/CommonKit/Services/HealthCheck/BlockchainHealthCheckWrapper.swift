@@ -29,7 +29,7 @@ public final class BlockchainHealthCheckWrapper<
         nodesAdditionalParamsStorage: NodesAdditionalParamsStorageProtocol,
         isActive: Bool,
         params: BlockchainHealthCheckParams,
-        connection: AnyObservable<Bool>?
+        connection: AnyObservable<Bool>
     ) {
         self.nodesStorage = nodesStorage
         self.params = params
@@ -40,13 +40,9 @@ public final class BlockchainHealthCheckWrapper<
             name: params.name,
             normalUpdateInterval: params.normalUpdateInterval,
             crucialUpdateInterval: params.crucialUpdateInterval,
-            connection: connection
+            connection: connection,
+            nodes: nodesStorage.getNodesPublisher(group: params.group)
         )
-        
-        nodesStorage
-            .getNodesPublisher(group: params.group)
-            .sink { [weak self] in self?.nodes = $0 }
-            .store(in: &subscriptions)
         
         nodesAdditionalParamsStorage
             .fastestNodeMode(group: params.group)
