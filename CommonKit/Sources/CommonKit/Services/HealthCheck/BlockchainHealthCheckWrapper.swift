@@ -52,6 +52,7 @@ public final class BlockchainHealthCheckWrapper<
     
     public override func healthCheck() {
         super.healthCheck()
+        guard isActive else { return }
         
         Task {
             updateNodesAvailability()
