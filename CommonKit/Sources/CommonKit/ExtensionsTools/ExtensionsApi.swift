@@ -22,7 +22,7 @@ public final class ExtensionsApi {
     
     // MARK: Transactions
     public func getTransaction(by id: UInt64) -> Transaction? {
-        syncRequest { [apiService] in
+        Task.sync { [apiService] in
             try? await apiService.getTransaction(id: id).get()
         }
     }
@@ -34,7 +34,7 @@ public final class ExtensionsApi {
         core: NativeAdamantCore,
         keypair: Keypair
     ) -> [String:ContactDescription]? {
-        let addressBookString = syncRequest { [apiService, addressBookKey] in
+        let addressBookString = Task.sync { [apiService, addressBookKey] in
             try? await apiService.get(key: addressBookKey, sender: address).get()
         }
         
@@ -72,20 +72,5 @@ public final class ExtensionsApi {
         } else {
             return nil
         }
-    }
-    
-    private func syncRequest<T: Sendable>(
-        _ request: @Sendable @escaping () async -> T?
-    ) -> T? {
-        let result = Atomic<T?>(wrappedValue: nil)
-        let semaphore = DispatchSemaphore(value: .zero)
-        
-        Task.detached {
-            result.wrappedValue = await request()
-            semaphore.signal()
-        }
-        
-        semaphore.wait()
-        return result.wrappedValue
     }
 }

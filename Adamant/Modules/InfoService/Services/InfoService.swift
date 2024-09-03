@@ -10,24 +10,25 @@ import Combine
 import CommonKit
 import UIKit
 
+@MainActor
 final class InfoService: InfoServiceProtocol {
     typealias Rates = [InfoServiceTicker: Decimal]
     
     private let securedStore: SecuredStore
     private let api: InfoServiceApiServiceProtocol
     private let rateCoins: [String]
-    private let queue = ConcurrencyQueue<Rates?>()
     
-    @Atomic private var rates = Rates()
-    @Atomic private var currentCurrencyValue: Currency = .default
-    @Atomic private var subscriptions = Set<AnyCancellable>()
+    private var rates = Rates()
+    private var currentCurrencyValue: Currency = .default
+    private var subscriptions = Set<AnyCancellable>()
+    private var isUpdating = false
     
     var currentCurrency: Currency {
         get { currentCurrencyValue }
         set { updateCurrency(newValue) }
     }
     
-    init(
+    nonisolated init(
         securedStore: SecuredStore,
         walletServiceCompose: WalletServiceCompose,
         api: InfoServiceApiServiceProtocol
@@ -35,19 +36,16 @@ final class InfoService: InfoServiceProtocol {
         self.securedStore = securedStore
         self.api = api
         rateCoins = walletServiceCompose.getWallets().map { $0.core.tokenSymbol }
-        setupCurrency()
-        setupObservers()
+        Task { @MainActor in configure() }
     }
     
     func update() {
-        Task { [weak self, rateCoins] in
-            let rates = await self?.queue.perform {
-                try? await self?.api.loadRates(coins: rateCoins).get()
-            }
-            
-            guard let rates = rates else { return }
-            self?.rates = rates
-            self?.sendRatesChangedNotification()
+        Task {
+            guard !isUpdating else { return }
+            defer { isUpdating = false }
+            guard let newRates = try? await api.loadRates(coins: rateCoins).get() else { return }
+            rates = newRates
+            sendRatesChangedNotification()
         }
     }
     
@@ -68,6 +66,15 @@ final class InfoService: InfoServiceProtocol {
 }
 
 private extension InfoService {
+    func configure() {
+        setupCurrency()
+        
+        NotificationCenter.default
+            .publisher(for: UIApplication.didBecomeActiveNotification)
+            .sink { _ in Task { [weak self] in self?.update() } }
+            .store(in: &subscriptions)
+    }
+    
     func sendRatesChangedNotification() {
         NotificationCenter.default.post(
             name: .AdamantCurrencyInfoService.currencyRatesUpdated,
@@ -76,19 +83,10 @@ private extension InfoService {
     }
     
     func updateCurrency(_ newValue: Currency) {
-        $currentCurrencyValue.mutate { value in
-            guard newValue != value else { return }
-            value = newValue
-            securedStore.set(value.rawValue, for: StoreKey.CoinInfo.selectedCurrency)
-            sendRatesChangedNotification()
-        }
-    }
-    
-    func setupObservers() {
-        NotificationCenter.default
-            .publisher(for: UIApplication.didBecomeActiveNotification)
-            .sink { [weak self] _ in self?.update() }
-            .store(in: &subscriptions)
+        guard newValue != currentCurrencyValue else { return }
+        currentCurrencyValue = newValue
+        securedStore.set(currentCurrencyValue.rawValue, for: StoreKey.CoinInfo.selectedCurrency)
+        sendRatesChangedNotification()
     }
     
     func setupCurrency() {

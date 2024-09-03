@@ -43,6 +43,7 @@ enum Currency: String {
 }
 
 // MARK: - protocol
+@MainActor
 protocol InfoServiceProtocol: AnyObject {
     var currentCurrency: Currency { get set }
     

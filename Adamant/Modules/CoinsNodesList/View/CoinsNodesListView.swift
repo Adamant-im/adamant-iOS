@@ -75,6 +75,7 @@ private extension CoinsNodesListView {
         Section {
             Button(action: showResetAlert) {
                 Text(String.adamant.coinsNodesList.reset)
+                    .foregroundStyle(Color(uiColor: .adamant.textColor))
                     .expanded(axes: .horizontal)
             }.listRowBackground(Color(uiColor: .adamant.cellColor))
         }

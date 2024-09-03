@@ -95,13 +95,13 @@ open class HealthCheckWrapper<Service, Error: HealthCheckableError> {
     public func request<Output>(
         _ request: @Sendable (Service, NodeOrigin) async -> Result<Output, Error>
     ) async -> Result<Output, Error> {
-        var lastConnectionError = sortedAllowedNodes.isEmpty
-            ? Error.noEndpointsError(nodeGroupName: name)
-            : nil
-        
         let nodesList = fastestNodeMode
             ? sortedAllowedNodes
             : sortedAllowedNodes.shuffled()
+        
+        var lastConnectionError = nodesList.isEmpty
+            ? Error.noEndpointsError(nodeGroupName: name)
+            : nil
         
         for node in nodesList {
             let response = await request(service, node.preferredOrigin)

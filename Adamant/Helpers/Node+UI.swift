@@ -10,6 +10,7 @@ import CommonKit
 import UIKit
 
 extension Node {
+    // swiftlint:disable switch_case_alignment
     func statusString(showVersion: Bool, dateHeight: Bool) -> String? {
         guard
             isEnabled,
@@ -123,7 +124,7 @@ private extension Node {
     }
     
     var dateHeightString: String? {
-        height.map { Date(timeIntervalSince1970: .init($0)).humanizedTime().string }
+        height.map { " ❐ \(Date(timeIntervalSince1970: .init($0)).humanizedTime().string)" }
     }
     
     var versionString: String? {

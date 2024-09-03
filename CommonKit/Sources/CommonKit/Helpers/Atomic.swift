@@ -49,14 +49,8 @@ public final class Atomic<Value>: @unchecked Sendable {
     }
 
     /// Synchronises mutation to ensure the value doesn't get changed by another thread during this mutation.
-    public func mutate(_ mutation: (inout Value) -> Void) {
-        lock.lock()
-        defer { lock.unlock() }
-        mutation(&_value)
-    }
-
-    /// Synchronises mutation to ensure the value doesn't get changed by another thread during this mutation.
     /// This method returns a value specified in the `mutation` closure.
+    @discardableResult
     public func mutate<T>(_ mutation: (inout Value) -> T) -> T {
         lock.lock()
         defer { lock.unlock() }
