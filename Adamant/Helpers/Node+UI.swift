@@ -67,6 +67,10 @@ extension Node {
             return .adamant.inactive
         }
     }
+    
+    var title: String {
+        mainOrigin.asString()
+    }
 }
 
 private extension Node {

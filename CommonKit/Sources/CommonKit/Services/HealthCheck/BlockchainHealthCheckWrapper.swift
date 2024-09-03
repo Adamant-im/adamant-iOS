@@ -79,7 +79,10 @@ private extension BlockchainHealthCheckWrapper {
             updateNodesAvailability(forceInclude: forceInclude)
         }
         
-        guard node.preferMainOrigin == nil else {
+        guard
+            node.preferMainOrigin == nil,
+            let altOrigin = node.altOrigin
+        else {
             switch await updateNodeStatusInfo(
                 id: node.id,
                 origin: node.preferredOrigin,
@@ -105,7 +108,7 @@ private extension BlockchainHealthCheckWrapper {
         case .failure:
             switch await updateNodeStatusInfo(
                 id: node.id,
-                origin: node.mainOrigin,
+                origin: altOrigin,
                 markAsOfflineIfFailed: true
             ) {
             case .success:

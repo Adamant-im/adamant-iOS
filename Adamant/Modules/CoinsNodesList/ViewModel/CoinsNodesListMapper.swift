@@ -51,7 +51,7 @@ private extension CoinsNodesListMapper {
             id: node.id,
             group: group,
             isEnabled: node.isEnabled,
-            title: node.asString(),
+            title: node.title,
             connectionStatus: indicatorAttrString,
             description: node.statusString(
                 showVersion: true,
