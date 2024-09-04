@@ -1058,15 +1058,25 @@ extension ChatListViewController {
         let more = makeMooreContextualAction(for: chatroom)
         actions.append(more)
         
-        // Mark as read
-        if chatroom.hasUnreadMessages || (chatroom.lastTransaction?.isUnread ?? false) {
-            let markAsRead = makeMarkAsReadContextualAction(for: chatroom)
-            actions.append(markAsRead)
-        }
-        
         // Block
         let block = makeBlockContextualAction(for: chatroom)
         actions.append(block)
+        
+        return UISwipeActionsConfiguration(actions: actions)
+    }
+    
+    func tableView(
+        _ tableView: UITableView,
+        leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath
+    ) -> UISwipeActionsConfiguration? {
+        guard let chatroom = chatsController?.fetchedObjects?[safe: indexPath.row] else {
+            return nil
+        }
+        
+        var actions: [UIContextualAction] = []
+      
+        let markAsRead = makeMarkAsReadContextualAction(for: chatroom)
+        actions.append(markAsRead)
         
         return UISwipeActionsConfiguration(actions: actions)
     }
@@ -1121,15 +1131,18 @@ extension ChatListViewController {
     private func makeMarkAsReadContextualAction(for chatroom: Chatroom) -> UIContextualAction {
         let markAsRead = UIContextualAction(
             style: .normal,
-            title: nil
+            title: "👀"
         ) { (_, _, completionHandler) in
-            chatroom.markAsReaded()
+            if chatroom.hasUnread {
+                chatroom.markAsReaded()
+            } else {
+                chatroom.markAsUnread()
+            }
             try? chatroom.managedObjectContext?.save()
             completionHandler(true)
         }
-        
-        markAsRead.image = .asset(named: "swipe_mark-as-read")
-        markAsRead.backgroundColor = UIColor.adamant.primary
+
+        markAsRead.backgroundColor = UIColor.adamant.contextMenuDefaultBackgroundColor
         return markAsRead
     }
     
