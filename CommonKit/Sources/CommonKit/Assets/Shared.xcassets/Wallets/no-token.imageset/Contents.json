@@ -6,12 +6,12 @@
       "scale" : "1x"
     },
     {
-      "filename" : "no-token@2x.png",
+      "filename" : "no-token@2x_white.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "no-token@3x.png",
+      "filename" : "no-token@3x_white.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

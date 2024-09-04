@@ -260,7 +260,7 @@ private extension ChatMessageFactory {
         : transaction.senderAddress
         
         let coreService = walletServiceCompose.getWallet(by: transfer.type)?.core
-        let defaultIcon: UIImage = .asset(named: "no-token") ?? .init()
+        let defaultIcon: UIImage = .asset(named: "no-token")?.withTintColor(.adamant.primary) ?? .init()
         
         return .transaction(.init(value: .init(
             id: id,
