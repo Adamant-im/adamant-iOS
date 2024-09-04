@@ -18,6 +18,10 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
     private let passphraseStoreKey = "accountService.passphrase"
     private let sizeWithoutMessageLabel: CGFloat = 123.0
     
+    private lazy var securedStore: SecuredStore = {
+        KeychainStore(secureStorage: AdamantSecureStorage())
+    }()
+    
     // MARK: - IBOutlets
     
     @IBOutlet weak var senderAvatarImageView: UIImageView!

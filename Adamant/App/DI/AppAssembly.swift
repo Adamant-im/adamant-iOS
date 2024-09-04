@@ -29,7 +29,9 @@ struct AppAssembly: Assembly {
         container.register(CellFactory.self) { _ in AdamantCellFactory() }.inObjectScope(.container)
         
         // MARK: Secured Store
-        container.register(SecuredStore.self) { _ in KeychainStore() }.inObjectScope(.container)
+        container.register(SecuredStore.self) { _ in
+            KeychainStore(secureStorage: AdamantSecureStorage())
+        }.inObjectScope(.container)
         
         // MARK: LocalAuthentication
         container.register(LocalAuthentication.self) { _ in AdamantAuthentication() }.inObjectScope(.container)

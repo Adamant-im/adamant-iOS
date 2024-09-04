@@ -22,6 +22,10 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         return AdamantProvider()
     }()
     
+    private lazy var securedStore: SecuredStore = {
+        KeychainStore(secureStorage: AdamantSecureStorage())
+    }()
+    
     /// Lazy contstructors
     private lazy var richMessageProviders: [String: TransferNotificationContentProvider] = {
         var providers: [String: TransferNotificationContentProvider] = [
@@ -119,12 +123,13 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
     
     func didReceive(_ notification: UNNotification) {
         // MARK: 0. Services
-        let keychain = KeychainStore()
         let core = NativeAdamantCore()
         let avatarService = AdamantAvatarService()
         let api = ExtensionsApiFactory(core: core, securedStore: keychain).make()
         
-        guard let passphrase: String = keychain.get(passphraseStoreKey), let keypair = core.createKeypairFor(passphrase: passphrase) else {
+        guard let passphrase: String = securedStore.get(passphraseStoreKey),
+              let keypair = core.createKeypairFor(passphrase: passphrase)
+        else {
             showError()
             return
         }
