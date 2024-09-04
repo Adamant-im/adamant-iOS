@@ -149,6 +149,17 @@ extension UIColor {
         public static var tableRowIcons: UIColor {
             let colorWhiteTheme = UIColor(red: 0.45, green: 0.45, blue: 0.45, alpha: 1)
             let colorDarkTheme  = UIColor(red: 0.878, green: 0.878, blue: 0.878, alpha: 1)
+        
+        /// Chat list, swipe color
+        public static var swipeMoreColor: UIColor {
+            let colorWhiteTheme = #colorLiteral(red: 0.8784313725, green: 0.8784313725, blue: 0.8784313725, alpha: 1) //E0E0E0
+            let colorDarkTheme = #colorLiteral(red: 0.3294117647, green: 0.3294117647, blue: 0.3294117647, alpha: 1) //545454
+            return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
+        }
+        
+        public static var swipeBlockColor: UIColor {
+            let colorWhiteTheme = #colorLiteral(red: 0.9254901961, green: 0.9254901961, blue: 0.9254901961, alpha: 1) //ECECEC
+            let colorDarkTheme = #colorLiteral(red: 0.2705882353, green: 0.2705882353, blue: 0.2705882353, alpha: 1) //474747
             return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
         }
         

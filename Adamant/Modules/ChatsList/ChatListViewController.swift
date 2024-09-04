@@ -1112,7 +1112,8 @@ extension ChatListViewController {
             )
         }
         
-        block.image = .asset(named: "swipe_block")
+        block.image = .asset(named: "swipe_block")?.withTintColor(.adamant.warning, renderingMode: .alwaysOriginal)
+        block.backgroundColor = .adamant.swipeBlockColor
         
         return block
     }
@@ -1202,7 +1203,7 @@ extension ChatListViewController {
         }
         
         more.image = .asset(named: "swipe_more")
-        more.backgroundColor = .adamant.secondary
+        more.backgroundColor = .adamant.swipeMoreColor
         return more
     }
     
