@@ -81,9 +81,16 @@
          }
          
          if case let .file(model) = getMessages()[indexPath.section].fullModel.content {
-             let contentViewHeight: CGFloat = model.value.height()
+             let messageSize = labelSize(
+                for: model.value.content.comment,
+                considering: model.value.content.width() 
+                - commenthorizontalInsets * 2
+             )
+             
+             let contentViewHeight = model.value.height()
              messageContainerSize.width = maxWidth
              messageContainerSize.height = contentViewHeight
+             + messageSize.height
          }
          
          return messageContainerSize
@@ -131,6 +138,8 @@
         for attributedText: NSAttributedString,
         considering maxWidth: CGFloat
      ) -> CGSize {
+         guard !attributedText.string.isEmpty else { return .zero }
+         
          let textContainer = NSTextContainer(
             size: CGSize(width: maxWidth, height: .greatestFiniteMagnitude)
          )
@@ -180,3 +189,4 @@
  /// Additional width to fix incorrect size calculating
 private let additionalWidth: CGFloat = 5
 private let additionalHeight: CGFloat = 5
+private let commenthorizontalInsets: CGFloat = 12
