@@ -160,7 +160,7 @@ final class AdmWalletService: NSObject, WalletCoreProtocol {
             }
             wallet.isBalanceInitialized = true
         } else {
-            let wallet = AdmWallet(address: account.address)
+            let wallet = AdmWallet(unicId: tokenUnicID, address: account.address)
             wallet.isBalanceInitialized = true
             wallet.balance = account.balance
             
@@ -188,7 +188,11 @@ final class AdmWalletService: NSObject, WalletCoreProtocol {
     }
     
     private func postUpdateNotification(with wallet: WalletAccount) {
-        NotificationCenter.default.post(name: walletUpdatedNotification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
+        NotificationCenter.default.post(
+            name: walletUpdatedNotification,
+            object: self,
+            userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
+        )
     }
     
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {

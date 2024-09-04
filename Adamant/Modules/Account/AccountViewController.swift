@@ -169,7 +169,12 @@ final class AccountViewController: FormViewController {
     
     private var initiated = false
     
-    private var walletViewControllers = [WalletViewController]()
+    private var walletViewControllers: [WalletViewController] = [] {
+        didSet {
+            makeWalletModels()
+        }
+    }
+    
     private var notificationsSet: Set<AnyCancellable> = []
     
     // MARK: StayIn
@@ -196,6 +201,8 @@ final class AccountViewController: FormViewController {
         refreshControl.addTarget(self, action: #selector(self.handleRefresh(_:)), for: UIControl.Event.valueChanged)
         return refreshControl
     }()
+    
+    private var walletModels: [String: WalletItemModel] = [:]
     
     // MARK: - Init
     
@@ -276,12 +283,11 @@ final class AccountViewController: FormViewController {
         let footerView = AccountFooterView(frame: CGRect(x: .zero, y: .zero, width: self.view.frame.width, height: 100))
         tableView.tableFooterView = footerView
         
-        
         // MARK: Wallet pages
         setupWalletsVC()
         
         pagingViewController = PagingViewController()
-        pagingViewController.register(UINib(nibName: "WalletCollectionViewCell", bundle: nil), for: WalletPagingItem.self)
+        pagingViewController.register(UINib(nibName: "WalletCollectionViewCell", bundle: nil), for: WalletItemModel.self)
         pagingViewController.menuItemSize = .fixed(width: 110, height: 110)
         pagingViewController.indicatorColor = UIColor.adamant.primary
         pagingViewController.indicatorOptions = .visible(height: 2, zIndex: Int.max, spacing: UIEdgeInsets.zero, insets: UIEdgeInsets.zero)
@@ -302,8 +308,18 @@ final class AccountViewController: FormViewController {
         
         pagingViewController.borderColor = UIColor.clear
         
-        let callback: ((Notification) -> Void) = { [weak self] _ in
-            self?.pagingViewController.reloadData()
+        let callback: ((Notification) -> Void) = { [weak self] data in
+            guard let account = data.userInfo?[AdamantUserInfoKey.WalletService.wallet] as? WalletAccount
+            else {
+                return
+            }
+            
+            var model = self?.walletModels[account.unicId]?.model
+            model?.balance = account.balance
+            model?.isBalanceInitialized = account.isBalanceInitialized
+            model?.notifications = account.notifications
+            
+            self?.walletModels[account.unicId]?.model = model ?? .default
         }
         
         for walletService in walletServiceCompose.getWallets() {
@@ -1094,35 +1110,10 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
 
     func pagingViewController(_: PagingViewController, pagingItemAt index: Int) -> PagingItem {
         guard let service = walletViewControllers[index].service?.core else {
-            return WalletPagingItem(
-                index: index,
-                currencySymbol: "",
-                currencyImage: .asset(named: "adamant_wallet") ?? .init(),
-                isBalanceInitialized: false)
+            return WalletItemModel(model: .default)
         }
         
-        var network = ""
-        if ERC20Token.supportedTokens.contains(where: { token in
-            return token.symbol == service.tokenSymbol
-        }) {
-            network = type(of: service).tokenNetworkSymbol
-        }
-        
-        let item = WalletPagingItem(
-            index: index,
-            currencySymbol: service.tokenSymbol,
-            currencyImage: service.tokenLogo,
-            isBalanceInitialized: service.wallet?.isBalanceInitialized,
-            currencyNetwork: network)
-        
-        if let wallet = service.wallet {
-            item.balance = wallet.balance
-            item.notifications = wallet.notifications
-        } else {
-            item.balance = nil
-        }
-        
-        return item
+        return walletModels[service.tokenUnicID] ?? WalletItemModel(model: .default)
     }
     
     func pagingViewController(_ pagingViewController: PagingViewController, didScrollToItem pagingItem: PagingItem, startingViewController: UIViewController?, destinationViewController: UIViewController, transitionSuccessful: Bool) {
@@ -1176,6 +1167,41 @@ extension AccountViewController: WalletViewControllerDelegate {
             if let tableView = vc.tableView, let indexPath = tableView.indexPathForSelectedRow {
                 tableView.deselectRow(at: indexPath, animated: true)
             }
+        }
+    }
+}
+
+private extension AccountViewController {
+    func makeWalletModels() {
+        for (index, wallet) in walletViewControllers.enumerated() {
+            guard let service = wallet.service?.core else {
+                continue
+            }
+            
+            var network = ""
+            if ERC20Token.supportedTokens.contains(where: { token in
+                return token.symbol == service.tokenSymbol
+            }) {
+                network = type(of: service).tokenNetworkSymbol
+            }
+            
+            var item = WalletItem(
+                index: index,
+                currencySymbol: service.tokenSymbol,
+                currencyImage: service.tokenLogo,
+                isBalanceInitialized: service.wallet?.isBalanceInitialized,
+                currencyNetwork: network
+            )
+            
+            if let wallet = service.wallet {
+                item.balance = wallet.balance
+                item.notifications = wallet.notifications
+            } else {
+                item.balance = nil
+            }
+            
+            let model = WalletItemModel(model: item)
+            walletModels[service.tokenUnicID] = model
         }
     }
 }

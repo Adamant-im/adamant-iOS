@@ -379,7 +379,12 @@ extension ERC20WalletService {
         }
         
         // MARK: 3. Update
-        let eWallet = EthWallet(address: ethAddress.address, ethAddress: ethAddress, keystore: keystore)
+        let eWallet = EthWallet(
+            unicId: tokenUnicID,
+            address: ethAddress.address,
+            ethAddress: ethAddress,
+            keystore: keystore
+        )
         ethWallet = eWallet
         
         if !enabled {

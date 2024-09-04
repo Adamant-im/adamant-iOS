@@ -9,6 +9,7 @@
 import Foundation
 
 final class AdmWallet: WalletAccount {
+    var unicId: String
     let address: String
     var balance: Decimal = 0
     var notifications: Int = 0
@@ -16,7 +17,8 @@ final class AdmWallet: WalletAccount {
     var minAmount: Decimal = 0
     var isBalanceInitialized: Bool = false
     
-    init(address: String) {
+    init(unicId: String, address: String) {
+        self.unicId = unicId
         self.address = address
     }
 }

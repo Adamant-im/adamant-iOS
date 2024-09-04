@@ -11,6 +11,7 @@ import CommonKit
 import LiskKit
 
 final class KlyWallet: WalletAccount {
+    var unicId: String
     let legacyAddress: String
     let kly32Address: String
     let keyPair: KeyPair
@@ -33,11 +34,13 @@ final class KlyWallet: WalletAccount {
     }
 
     init(
+        unicId: String,
         address: String,
         keyPair: KeyPair,
         nonce: UInt64,
         isNewApi: Bool
     ) {
+        self.unicId = unicId
         self.legacyAddress = address
         self.keyPair = keyPair
         self.isNewApi = isNewApi

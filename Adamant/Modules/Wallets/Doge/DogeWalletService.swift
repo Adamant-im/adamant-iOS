@@ -303,7 +303,11 @@ extension DogeWalletService {
         let privateKeyData = passphrase.data(using: .utf8)!.sha256()
         let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
         
-        let eWallet = try DogeWallet(privateKey: privateKey, addressConverter: addressConverter)
+        let eWallet = try DogeWallet(
+            unicId: tokenUnicID,
+            privateKey: privateKey,
+            addressConverter: addressConverter
+        )
         self.dogeWallet = eWallet
         
         NotificationCenter.default.post(

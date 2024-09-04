@@ -399,6 +399,7 @@ private extension KlyWalletService {
             let address = LiskKit.Crypto.address(fromPublicKey: keyPair.publicKeyString)
          
             let wallet = KlyWallet(
+                unicId: tokenUnicID,
                 address: address,
                 keyPair: keyPair,
                 nonce: .zero,

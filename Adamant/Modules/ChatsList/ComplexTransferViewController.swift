@@ -68,7 +68,7 @@ final class ComplexTransferViewController: UIViewController {
         
         // MARK: PagingViewController
         pagingViewController = PagingViewController()
-        pagingViewController.register(UINib(nibName: "WalletCollectionViewCell", bundle: nil), for: WalletPagingItem.self)
+        pagingViewController.register(UINib(nibName: "WalletCollectionViewCell", bundle: nil), for: WalletItemModel.self)
         pagingViewController.menuItemSize = .fixed(width: 110, height: 114)
         pagingViewController.indicatorColor = UIColor.adamant.primary
         pagingViewController.indicatorOptions = .visible(height: 2, zIndex: Int.max, spacing: UIEdgeInsets.zero, insets: UIEdgeInsets.zero)
@@ -198,11 +198,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
         let service = services[index].core
 		
 		guard let wallet = service.wallet else {
-            return WalletPagingItem(
-                index: index,
-                currencySymbol: "",
-                currencyImage: .asset(named: "adamant_wallet") ?? .init(),
-                isBalanceInitialized: false)
+            return WalletItemModel(model: .default)
 		}
         
         var network = ""
@@ -212,16 +208,16 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
             network = type(of: service).tokenNetworkSymbol
         }
 		
-		let item = WalletPagingItem(
+        let item = WalletItem(
             index: index,
             currencySymbol: service.tokenSymbol,
             currencyImage: service.tokenLogo,
             isBalanceInitialized: wallet.isBalanceInitialized,
-            currencyNetwork: network)
-        
-		item.balance = wallet.balance
+            currencyNetwork: network,
+            balance: wallet.balance
+        )
 		
-		return item
+		return WalletItemModel(model: item)
 	}
 }
 
