@@ -379,6 +379,7 @@ private extension ChatViewController {
             .sink { [weak self] in
                 if $0 {
                     self?.updatingIndicatorView.startAnimate()
+                    self?.viewModel.refreshDateHeadersIfNeeded()
                 } else {
                     self?.updatingIndicatorView.stopAnimate()
                 }
