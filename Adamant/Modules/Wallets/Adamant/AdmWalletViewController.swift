@@ -27,6 +27,15 @@ extension String.adamant.wallets {
     static var exchangeInChatAdmTokens: String {
         String.localized("AccountTab.Row.ExchangeADMInChat", comment: "Account tab: Exchange ADM in chat")
     }
+    
+    static var exchangesOnCoinMarketCap: String {
+        String.localized("AccountTab.Row.ExchangesOnCoinMarketCap", comment: "Account tab: Exchanges on CMC")
+    }
+    
+    static var exchangesOnCoinGecko: String {
+        String.localized("AccountTab.Row.ExchangesOnCoinGecko", comment: "Account tab: Exchanges on CoinGecko")
+    }
+    
     // URLs
     static func getFreeTokensUrl(for address: String) -> String {
         return String.localizedStringWithFormat(.localized("AccountTab.FreeTokens.UrlFormat", comment: "Account tab: A full 'Get free tokens' link, with %@ as address"), address)

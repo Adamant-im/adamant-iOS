@@ -167,7 +167,7 @@
 "AccountTab.Row.Balance" = "Kontostand";
 
 /* Account tab: 'Buy tokens' button */
-"AccountTab.Row.BuyTokens" = "Token tauschen";
+"AccountTab.Row.BuyTokens" = "Coin tauschen";
 
 /* Account tab: 'Stake ADM' button */
 "AccountTab.Row.StakeAdm" = "Setzen und verdienen";
@@ -207,6 +207,12 @@
 
 /* Account tab: Exchange ADM tokens in chat */
 "AccountTab.Row.ExchangeADMInChat" = "Austauscher im Chat";
+
+/* Account tab: Exchanges on CMC */
+"AccountTab.Row.ExchangesOnCoinMarketCap" = "Börsen auf CoinMarketCap";
+
+/* Account tab: Exchanges on CoinGecko */
+"AccountTab.Row.ExchangesOnCoinGecko" = "Börsen auf CoinGecko";
 
 /* Account tab: 'Address' row */
 "AccountTab.Row.Address" = "Addresse";
