@@ -19,6 +19,7 @@ enum AdamantAddressParam {
     case address(String)
     case label(String)
     case message(String)
+    case amount(Double)
     
     init?(raw: String) {
         let keyValue = raw.split(separator: "=")
@@ -33,7 +34,9 @@ enum AdamantAddressParam {
             self = AdamantAddressParam.label(keyValue[1].replacingOccurrences(of: "+", with: " ").replacingOccurrences(of: "%20", with: " "))
         case "message":
             self = AdamantAddressParam.message(keyValue[1].replacingOccurrences(of: "+", with: " ").replacingOccurrences(of: "%20", with: " "))
-        
+        case "amount":
+            guard let amount = Double(keyValue[1]) else { return nil }
+            self = AdamantAddressParam.amount(amount)
         default:
             return nil
         }
@@ -47,6 +50,8 @@ enum AdamantAddressParam {
             return "label=\(value.replacingOccurrences(of: " ", with: "+"))"
         case .message(let value):
             return "message=\(value.replacingOccurrences(of: " ", with: "+"))"
+        case .amount(let value):
+            return "amount=\(String(value).replacingOccurrences(of: " ", with: "+"))"
         }
     }
 }
@@ -73,6 +78,8 @@ final class AdamantUriTools {
                     components.queryItems?.append(.init(name: "label", value: value))
                 case .message(let value):
                     components.queryItems?.append(.init(name: "message", value: value))
+                case .amount(let value):
+                    components.queryItems?.append(.init(name: "amount", value: String(value)))
                 }
             }
             
@@ -93,6 +100,8 @@ final class AdamantUriTools {
                     components.queryItems?.append(.init(name: "label", value: value))
                 case .message(let value):
                     components.queryItems?.append(.init(name: "message", value: value))
+                case .amount(let value):
+                    components.queryItems?.append(.init(name: "amount", value: String(value)))
                 }
             }
             
