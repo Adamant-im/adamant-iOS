@@ -1030,6 +1030,9 @@
 /* Transaction status: inconsistent reason title */
 "TransactionStatus.Inconsistent.Reason.Title" = "不一致的原因";
 
+/* Transaction status: inconsistent data title */
+"TransactionStatus.Inconsistent.RecordData.Title" = "Tx数据记录";
+
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "详细信息";
 

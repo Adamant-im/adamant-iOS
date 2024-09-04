@@ -1033,6 +1033,9 @@
 /* Transaction status: inconsistent reason title */
 "TransactionStatus.Inconsistent.Reason.Title" = "Inconsistent reason";
 
+/* Transaction status: inconsistent data title */
+"TransactionStatus.Inconsistent.RecordData.Title" = "Tx data record";
+
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "Details";
 

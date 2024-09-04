@@ -71,6 +71,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         case historyFiat
         case currentFiat
         case inconsistentReason
+        case txBlockchainComment
         
         var tag: String {
             switch self {
@@ -89,6 +90,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             case .historyFiat: return "hfiat"
             case .currentFiat: return "cfiat"
             case .inconsistentReason: return "incReason"
+            case .txBlockchainComment: return "data"
             }
         }
         
@@ -110,6 +112,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             case .currentFiat: return .localized("TransactionDetailsScene.Row.CurrentFiat", comment: "Transaction details: current fiat value")
             case .inconsistentReason:
                 return .localized("TransactionStatus.Inconsistent.Reason.Title", comment: "Transaction status: inconsistent reason title")
+            case .txBlockchainComment:
+                return
+                    .localized("TransactionStatus.Inconsistent.RecordData.Title", comment: "Transaction details: Tx data record")
             }
         }
         
@@ -159,6 +164,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
     let languageService: LanguageStorageProtocol
     
     // MARK: - Properties
+    
+    var showTxBlockchainComment: Bool {
+        false
+    }
     
     var transaction: TransactionDetails? {
         didSet {
@@ -647,6 +656,52 @@ class TransactionDetailsViewControllerBase: FormViewController {
         
         detailsSection.append(fiatRow)
         
+        // MARK: Tx blockchain comment
+        let txBlockchainComment = LabelRow {
+            $0.disabled = true
+            $0.tag = Rows.txBlockchainComment.tag
+            $0.title = Rows.txBlockchainComment.localized
+            
+            if let value = transaction?.txBlockchainComment {
+                $0.value = value
+            } else {
+                $0.value = TransactionDetailsViewControllerBase.awaitingValueString
+            }
+            
+            $0.cell.detailTextLabel?.textAlignment = .right
+            $0.cell.detailTextLabel?.lineBreakMode = .byTruncatingMiddle
+            
+            $0.hidden = Condition.function([], { [weak self] _ -> Bool in
+                guard let value = self?.transaction?.txBlockchainComment else {
+                    return false
+                }
+                
+                if value.isEmpty {
+                    return true
+                }
+                return false
+            })
+            
+        }.cellSetup { (cell, _) in
+            cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
+        }.onCellSelection { [weak self] (cell, row) in
+            if let text = row.value {
+                self?.shareValue(text, from: cell)
+            }
+        }.cellUpdate { [weak self] (cell, row) in
+            cell.textLabel?.textColor = UIColor.adamant.textColor
+            if let value = self?.transaction?.txBlockchainComment {
+                row.value = value
+            } else {
+                row.value = TransactionDetailsViewControllerBase.awaitingValueString
+            }
+        }
+        
+        if showTxBlockchainComment {
+            detailsSection.append(txBlockchainComment)
+        }
+        
         // MARK: Comments section
         
         if let comment = comment {
@@ -819,6 +874,11 @@ class TransactionDetailsViewControllerBase: FormViewController {
         section.evaluateHidden()
         
         checkAddressesIfNeeded()
+    }
+    
+    func updateTxDataRow() {
+        let row = form.rowBy(tag: Rows.txBlockchainComment.tag)
+        row?.evaluateHidden()
     }
     
     // MARK: - Other

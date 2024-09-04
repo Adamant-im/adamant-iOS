@@ -1027,6 +1027,9 @@
 /* Transaction status: inconsistent reason title */
 "TransactionStatus.Inconsistent.Reason.Title" = "Противоречивая причина";
 
+/* Transaction status: inconsistent data title */
+"TransactionStatus.Inconsistent.RecordData.Title" = "Данные транзакции";
+
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "Подробности";
 
