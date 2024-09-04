@@ -1953,17 +1953,18 @@ extension AdamantChatsProvider {
         transaction.blockId = blockId
         transaction.confirmations = confirmations
         
-        if blockId.isEmpty {
-            transaction.statusEnum = .delivered
-        } else {
+        if !blockId.isEmpty {
             self.unconfirmedTransactions.removeValue(forKey: id)
         }
         
         if let lastHeight = receivedLastHeight, lastHeight < height {
             self.receivedLastHeight = height
-            transaction.statusEnum = .delivered
+        }
+        
+        if height != .zero {
             transaction.isConfirmed = true
         }
+        transaction.statusEnum = .delivered
     }
     
     func blockChat(with address: String) {
