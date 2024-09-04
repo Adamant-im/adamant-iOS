@@ -58,11 +58,11 @@ extension Node {
         
         switch connectionStatus {
         case .allowed:
-            return .adamant.good
+            return .adamant.success
         case .synchronizing:
-            return .adamant.alert
+            return .adamant.attention
         case .offline, .notAllowed:
-            return .adamant.danger
+            return .adamant.warning
         case .none:
             return .adamant.inactive
         }

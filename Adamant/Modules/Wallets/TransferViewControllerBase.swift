@@ -681,7 +681,7 @@ class TransferViewControllerBase: FormViewController {
     func markRow(_ row: BaseRowType, valid: Bool) {
         row.baseCell.textLabel?.textColor = valid
         ? getBaseColor(for: row.tag)
-        : UIColor.adamant.alert
+        : UIColor.adamant.attention
     }
     
     func getBaseColor(for tag: String?) -> UIColor {
@@ -702,13 +702,13 @@ class TransferViewControllerBase: FormViewController {
         }
         
         if let label = recipientSection.header?.viewForSection(recipientSection, type: .header), let label = label as? UILabel {
-            label.textColor = isValid ? UIColor.adamant.primary : UIColor.adamant.alert
+            label.textColor = isValid ? UIColor.adamant.primary : UIColor.adamant.attention
         }
         
-        recipientRow.cell.textField.textColor = isValid ? UIColor.adamant.primary : UIColor.adamant.alert
+        recipientRow.cell.textField.textColor = isValid ? UIColor.adamant.primary : UIColor.adamant.attention
         recipientRow.cell.textField.leftView?.subviews.forEach { view in
             guard let label = view as? UILabel else { return }
-            label.textColor = isValid ? UIColor.adamant.primary : UIColor.adamant.alert
+            label.textColor = isValid ? UIColor.adamant.primary : UIColor.adamant.attention
         }
     }
 
@@ -1165,7 +1165,7 @@ extension TransferViewControllerBase {
                 $0.disabled = true
                 $0.title = BaseRows.fee.localized + estimateSymbol
                 $0.cell.titleLabel.textColor = .adamant.active
-                $0.cell.secondDetailsLabel.textColor = .adamant.alert
+                $0.cell.secondDetailsLabel.textColor = .adamant.attention
                 $0.value = self?.getCellFeeValue()
             }
             
