@@ -5,7 +5,7 @@ public extension AdamantResources {
     static var nodes: [Node] {
         [
             Node.makeDefaultNode(url: URL(string: "https://clown.adamant.im")!),
-            Node.makeDefaultNode(url: URL(string: "https://lake.adamant.im")!),
+Node.makeDefaultNode(url: URL(string: "https://lake.adamant.im")!),
 Node.makeDefaultNode(url: URL(string: "https://endless.adamant.im")!, altUrl: URL(string: "http://149.102.157.15:36666")),
 Node.makeDefaultNode(url: URL(string: "https://bid.adamant.im")!),
 Node.makeDefaultNode(url: URL(string: "https://unusual.adamant.im")!),

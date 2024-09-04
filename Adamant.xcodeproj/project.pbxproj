@@ -3090,7 +3090,6 @@
 				E9484B7A227CA93B008E10F0 /* BalanceTableViewCell.xib in Resources */,
 				6406D74A21C7F06000196713 /* SearchResultsViewController.xib in Resources */,
 				269B832E2C74B4EC002AA1D7 /* milestone.mp3 in Resources */,
-				E96D64CE2295C7F500CA5587 /* english.txt in Resources */,
 				E9B4E1AA210F1803007E77FC /* DoubleDetailsTableViewCell.xib in Resources */,
 				269B832C2C74B4EC002AA1D7 /* rebound.mp3 in Resources */,
 				6458548C211B3AB1004C5909 /* WelcomeViewController.xib in Resources */,
@@ -4057,7 +4056,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.8.0;
+				MARKETING_VERSION = 3.9.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -4088,7 +4087,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.8.0;
+				MARKETING_VERSION = 3.9.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

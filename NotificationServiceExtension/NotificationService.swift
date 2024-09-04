@@ -323,7 +323,7 @@ class NotificationService: UNNotificationServiceExtension {
         }
     }
     
-    private func getSound(securedStore: KeychainStore, isReaction: Bool) -> UNNotificationSound? {
+    private func getSound(securedStore: SecuredStore, isReaction: Bool) -> UNNotificationSound? {
         guard isReaction else {
             let sound: String = securedStore.get(StoreKey.notificationsService.notificationsSound) ?? .empty
             

@@ -103,24 +103,26 @@ extension NodeGroup {
     
     // swiftlint:disable switch_case_alignment
     var minNodeVersion: Version? {
-        guard let version = switch self {
+        let version: String?
+        switch self {
         case .adm:
-            AdmWalletService.minNodeVersion
+            version = AdmWalletService.minNodeVersion
         case .btc:
-            BtcWalletService.minNodeVersion
+            version = BtcWalletService.minNodeVersion
         case .eth:
-            EthWalletService.minNodeVersion
+            version = EthWalletService.minNodeVersion
         case .klyNode:
-            KlyWalletService.minNodeVersion
+            version = KlyWalletService.minNodeVersion
         case .klyService:
-            KlyWalletService.minNodeVersion
+            version = KlyWalletService.minNodeVersion
         case .doge:
-            DogeWalletService.minNodeVersion
+            version = DogeWalletService.minNodeVersion
         case .dash:
-            DashWalletService.minNodeVersion
+            version = DashWalletService.minNodeVersion
         case .ipfs, .infoService:
-            nil
-        } else { return nil }
+            version = nil
+        }
+        guard let version = version  else { return nil }
         
         return .init(version)
     }

@@ -22,7 +22,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         return AdamantProvider()
     }()
     
-    private lazy var securedStore: SecuredStore = {
+    private lazy var keychain: SecuredStore = {
         KeychainStore(secureStorage: AdamantSecureStorage())
     }()
     
@@ -127,7 +127,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         let avatarService = AdamantAvatarService()
         let api = ExtensionsApiFactory(core: core, securedStore: keychain).make()
         
-        guard let passphrase: String = securedStore.get(passphraseStoreKey),
+        guard let passphrase: String = keychain.get(passphraseStoreKey),
               let keypair = core.createKeypairFor(passphrase: passphrase)
         else {
             showError()
