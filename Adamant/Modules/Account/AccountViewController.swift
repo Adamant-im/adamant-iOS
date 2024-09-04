@@ -151,7 +151,7 @@ final class AccountViewController: FormViewController {
     private let notificationsService: NotificationsService
     private let transfersProvider: TransfersProvider
     private let avatarService: AvatarService
-    private let currencyInfoService: CurrencyInfoService
+    private let currencyInfoService: InfoServiceProtocol
     private let languageService: LanguageStorageProtocol
     private let walletServiceCompose: WalletServiceCompose
     
@@ -208,7 +208,7 @@ final class AccountViewController: FormViewController {
         transfersProvider: TransfersProvider,
         localAuth: LocalAuthentication,
         avatarService: AvatarService,
-        currencyInfoService: CurrencyInfoService,
+        currencyInfoService: InfoServiceProtocol,
         languageService: LanguageStorageProtocol,
         walletServiceCompose: WalletServiceCompose
     ) {

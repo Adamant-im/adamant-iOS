@@ -124,17 +124,8 @@ extension WalletServiceError: HealthCheckableError {
         }
     }
     
-    var isRequestCancelledError: Bool {
-        switch self {
-        case .requestCancelled:
-            return true
-        default:
-            return false
-        }
-    }
-    
-    static func noEndpointsError(coin: String) -> WalletServiceError {
-        .apiError(.noEndpointsError(coin: coin))
+    static func noEndpointsError(nodeGroupName: String) -> WalletServiceError {
+        .apiError(.noEndpointsError(nodeGroupName: nodeGroupName))
     }
 }
 
@@ -290,6 +281,7 @@ protocol WalletCoreProtocol: AnyObject {
     var enabled: Bool { get }
     
     // MARK: Logic
+    var hasActiveNode: Bool { get }
     func update()
     
     // MARK: Tools

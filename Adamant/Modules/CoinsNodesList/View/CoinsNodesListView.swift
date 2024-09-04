@@ -31,8 +31,8 @@ struct CoinsNodesListView: View {
         .navigationTitle(String.adamant.coinsNodesList.title)
     }
     
-    init(viewModel: CoinsNodesListViewModel) {
-        _viewModel = .init(wrappedValue: viewModel)
+    init(viewModel: @escaping () -> CoinsNodesListViewModel) {
+        _viewModel = .init(wrappedValue: viewModel())
     }
 }
 
@@ -44,7 +44,13 @@ private extension CoinsNodesListView {
                 ForEach(model.rows) { row in
                     Row(
                         model: row,
-                        setIsEnabled: { viewModel.setIsEnabled(id: row.id, value: $0) }
+                        setIsEnabled: {
+                            viewModel.setIsEnabled(
+                                id: row.id,
+                                group: row.group,
+                                value: $0
+                            )
+                        }
                     ).listRowBackground(Color(uiColor: .adamant.cellColor))
                 }
             }
@@ -69,6 +75,7 @@ private extension CoinsNodesListView {
         Section {
             Button(action: showResetAlert) {
                 Text(String.adamant.coinsNodesList.reset)
+                    .foregroundStyle(Color(uiColor: .adamant.textColor))
                     .expanded(axes: .horizontal)
             }.listRowBackground(Color(uiColor: .adamant.cellColor))
         }

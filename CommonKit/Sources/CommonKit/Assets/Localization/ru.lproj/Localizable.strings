@@ -640,6 +640,12 @@
 /* NodesList: Button label */
 "NodesList.NodesList" = "Список нод ADM";
 
+/* Info Service: Info Service */
+"InfoService.InfoService" = "Инфо Сервис";
+
+/* Info Service: inconsistent data */
+"InfoService.InconsistentData" = "Несоответствие в данных";
+
 /* NodesList: scene title */
 "NodesList.Title" = "Список нод ADM";
 

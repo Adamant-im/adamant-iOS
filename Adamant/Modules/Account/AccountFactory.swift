@@ -22,7 +22,7 @@ struct AccountFactory {
             transfersProvider: assembler.resolve(TransfersProvider.self)!,
             localAuth: assembler.resolve(LocalAuthentication.self)!,
             avatarService: assembler.resolve(AvatarService.self)!,
-            currencyInfoService: assembler.resolve(CurrencyInfoService.self)!,
+            currencyInfoService: assembler.resolve(InfoServiceProtocol.self)!,
             languageService: assembler.resolve(LanguageStorageProtocol.self)!,
             walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!
         )

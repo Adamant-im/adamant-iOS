@@ -24,7 +24,7 @@ actor AdamantChatsProvider: ChatsProvider {
     let accountService: AccountService
     let accountsProvider: AccountsProvider
     let securedStore: SecuredStore
-    let apiService: ApiService
+    let apiService: AdamantApiServiceProtocol
     let stack: CoreDataStack
     
     // MARK: Properties
@@ -73,7 +73,7 @@ actor AdamantChatsProvider: ChatsProvider {
     // MARK: Lifecycle
     init(
         accountService: AccountService,
-        apiService: ApiService,
+        apiService: AdamantApiServiceProtocol,
         socketService: SocketService,
         stack: CoreDataStack,
         adamantCore: AdamantCore,

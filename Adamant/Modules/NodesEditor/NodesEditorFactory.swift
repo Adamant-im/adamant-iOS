@@ -20,7 +20,7 @@ struct NodesEditorFactory {
             screensFactory: screensFactory,
             nodesStorage: assembler.resolve(NodesStorageProtocol.self)!,
             nodesAdditionalParamsStorage: assembler.resolve(NodesAdditionalParamsStorageProtocol.self)!,
-            apiService: assembler.resolve(ApiService.self)!,
+            apiService: assembler.resolve(AdamantApiServiceProtocol.self)!,
             socketService: assembler.resolve(SocketService.self)!
         )
     }
@@ -28,7 +28,7 @@ struct NodesEditorFactory {
     func makeNodeEditorVC() -> NodeEditorViewController {
         let c = NodeEditorViewController()
         c.dialogService = assembler.resolve(DialogService.self)
-        c.apiService = assembler.resolve(ApiService.self)
+        c.apiService = assembler.resolve(AdamantApiServiceProtocol.self)
         c.nodesStorage = assembler.resolve(NodesStorageProtocol.self)
         return c
     }

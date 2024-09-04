@@ -16,14 +16,17 @@ enum CoinsNodesListContext {
 }
 
 struct CoinsNodesListFactory {
-    private let assembler: Assembler
+    private let parent: Assembler
+    private let assemblies = [CoinsNodesListAssembly()]
     
     init(parent: Assembler) {
-        assembler = .init([CoinsNodesListAssembly()], parent: parent)
+        self.parent = parent
     }
     
+    @MainActor
     func makeViewController(context: CoinsNodesListContext) -> UIViewController {
-        let viewModel = assembler.resolve(CoinsNodesListViewModel.self)!
+        let assembler = Assembler(assemblies, parent: parent)
+        let viewModel = { assembler.resolver.resolve(CoinsNodesListViewModel.self)! }
         let view = CoinsNodesListView(viewModel: viewModel)
         
         switch context {
@@ -38,7 +41,7 @@ struct CoinsNodesListFactory {
 private struct CoinsNodesListAssembly: Assembly {
     func assemble(container: Container) {
         container.register(CoinsNodesListViewModel.self) {
-            let processedGroups = Set(NodeGroup.allCases).subtracting([.adm])
+            let processedGroups = NodeGroup.allCases.filter { $0 != .adm }
             
             return .init(
                 mapper: .init(processedGroups: processedGroups),
@@ -47,17 +50,10 @@ private struct CoinsNodesListAssembly: Assembly {
                     NodesAdditionalParamsStorageProtocol.self
                 )!,
                 processedGroups: processedGroups,
-                apiServices: .init(
-                    btc: $0.resolve(BtcApiService.self)!,
-                    eth: $0.resolve(EthApiService.self)!,
-                    klyNode: $0.resolve(KlyNodeApiService.self)!,
-                    klyService: $0.resolve(KlyServiceApiService.self)!,
-                    doge: $0.resolve(DogeApiService.self)!,
-                    dash: $0.resolve(DashApiService.self)!,
-                    adm: $0.resolve(ApiService.self)!,
-                    ipfs: $0.resolve(IPFSApiService.self)!
-                )
+                apiServiceCompose: $0.resolve(
+                    ApiServiceComposeProtocol.self
+                )!
             )
-        }.inObjectScope(.weak)
+        }.inObjectScope(.transient)
     }
 }

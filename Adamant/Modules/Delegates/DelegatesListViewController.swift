@@ -42,7 +42,7 @@ final class DelegatesListViewController: KeyboardObservingViewController {
     
     // MARK: - Dependencies
     
-    private let apiService: ApiService
+    private let apiService: AdamantApiServiceProtocol
     private let accountService: AccountService
     private let dialogService: DialogService
     private let screensFactory: ScreensFactory
@@ -99,7 +99,7 @@ final class DelegatesListViewController: KeyboardObservingViewController {
     // MARK: - Lifecycle
     
     init(
-        apiService: ApiService,
+        apiService: AdamantApiServiceProtocol,
         accountService: AccountService,
         dialogService: DialogService,
         screensFactory: ScreensFactory

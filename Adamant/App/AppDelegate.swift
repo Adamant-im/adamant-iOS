@@ -263,11 +263,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             dialogService.showError(withMessage: "Failed to register AddressBookService autoupdate. Please, report a bug", supportEmail: true, error: nil)
         }
         
-        if let currencyInfoService = container.resolve(CurrencyInfoService.self) {
+        if let currencyInfoService = container.resolve(InfoServiceProtocol.self) {
             currencyInfoService.update() // Initial update
             repeater.registerForegroundCall(label: "currencyInfoService", interval: 60, queue: .global(qos: .utility), callback: currencyInfoService.update)
         } else {
-            dialogService.showError(withMessage: "Failed to register CurrencyInfoService autoupdate. Please, report a bug", supportEmail: true, error: nil)
+            dialogService.showError(withMessage: "Failed to register InfoServiceProtocol autoupdate. Please, report a bug", supportEmail: true, error: nil)
         }
         
         // MARK: 7. Logout reset

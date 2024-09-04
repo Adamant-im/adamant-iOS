@@ -180,14 +180,14 @@ class TransferViewControllerBase: FormViewController {
     let accountsProvider: AccountsProvider
     let dialogService: DialogService
     let screensFactory: ScreensFactory
-    let currencyInfoService: CurrencyInfoService
+    let currencyInfoService: InfoServiceProtocol
     var increaseFeeService: IncreaseFeeService
     var chatsProvider: ChatsProvider
     let vibroService: VibroService
     let walletService: WalletService
     let walletCore: WalletCoreProtocol
     let reachabilityMonitor: ReachabilityMonitor
-    let nodesStorage: NodesStorageProtocol
+    let apiServiceCompose: ApiServiceComposeProtocol
     
     // MARK: - Properties
     
@@ -314,12 +314,12 @@ class TransferViewControllerBase: FormViewController {
         accountsProvider: AccountsProvider,
         dialogService: DialogService,
         screensFactory: ScreensFactory,
-        currencyInfoService: CurrencyInfoService,
+        currencyInfoService: InfoServiceProtocol,
         increaseFeeService: IncreaseFeeService,
         vibroService: VibroService,
         walletService: WalletService,
         reachabilityMonitor: ReachabilityMonitor,
-        nodesStorage: NodesStorageProtocol
+        apiServiceCompose: ApiServiceComposeProtocol
     ) {
         self.accountService = accountService
         self.accountsProvider = accountsProvider
@@ -332,8 +332,7 @@ class TransferViewControllerBase: FormViewController {
         self.walletService = walletService
         self.walletCore = walletService.core
         self.reachabilityMonitor = reachabilityMonitor
-        self.nodesStorage = nodesStorage
-        
+        self.apiServiceCompose = apiServiceCompose
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -800,24 +799,21 @@ class TransferViewControllerBase: FormViewController {
             return
         }
         
-        if admReportRecipient != nil,
-           !nodesStorage.haveActiveNode(in: .adm) {
+        guard
+            apiServiceCompose.hasActiveNode(group: .adm) || admReportRecipient == nil
+        else {
             dialogService.showWarning(
                 withMessage: ApiServiceError.noEndpointsAvailable(
-                    coin: NodeGroup.adm.name
+                    nodeGroupName: NodeGroup.adm.name
                 ).localizedDescription
             )
             return
         }
         
-        let groupsWithoutActiveNode = walletCore.nodeGroups.filter {
-            !nodesStorage.haveActiveNode(in: $0)
-        }
-
-        if let group = groupsWithoutActiveNode.first {
+        guard walletCore.hasActiveNode else {
             dialogService.showWarning(
                 withMessage: ApiServiceError.noEndpointsAvailable(
-                    coin: group.name
+                    nodeGroupName: walletCore.tokenName
                 ).localizedDescription
             )
             return

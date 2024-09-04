@@ -9,7 +9,10 @@
 import Swinject
 
 struct AppContainer {
-    let assembler = Assembler([AppAssembly()])
+    let assembler = Assembler([
+        AppAssembly(),
+        InfoServiceAssembly()
+    ])
 
     func resolve<T>(_ type: T.Type) -> T? {
         assembler.resolve(T.self)

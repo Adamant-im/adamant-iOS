@@ -15,14 +15,14 @@ final class AdamantAccountService: AccountService {
     
     // MARK: Dependencies
     
-    private let apiService: ApiService
+    private let apiService: AdamantApiServiceProtocol
     private let adamantCore: AdamantCore
     private let dialogService: DialogService
     private let securedStore: SecuredStore
     private let walletServiceCompose: WalletServiceCompose
+    private let currencyInfoService: InfoServiceProtocol
 
     weak var notificationsService: NotificationsService?
-    weak var currencyInfoService: CurrencyInfoService?
     weak var pushNotificationsTokenService: PushNotificationsTokenService?
     weak var visibleWalletService: VisibleWalletsService?
     
@@ -38,17 +38,19 @@ final class AdamantAccountService: AccountService {
     @Atomic private var subscriptions = Set<AnyCancellable>()
     
     init(
-        apiService: ApiService,
+        apiService: AdamantApiServiceProtocol,
         adamantCore: AdamantCore,
         dialogService: DialogService,
         securedStore: SecuredStore,
-        walletServiceCompose: WalletServiceCompose
+        walletServiceCompose: WalletServiceCompose,
+        currencyInfoService: InfoServiceProtocol
     ) {
         self.apiService = apiService
         self.adamantCore = adamantCore
         self.dialogService = dialogService
         self.securedStore = securedStore
         self.walletServiceCompose = walletServiceCompose
+        self.currencyInfoService = currencyInfoService
         
         NotificationCenter.default.addObserver(forName: .AdamantAccountService.forceUpdateBalance, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.update()

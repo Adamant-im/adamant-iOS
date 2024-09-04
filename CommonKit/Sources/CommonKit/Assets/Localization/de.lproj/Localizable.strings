@@ -649,6 +649,12 @@
 /* NodesList: Button label */
 "NodesList.NodesList" = "ADM Node-Liste";
 
+/* Info Service: Info Service */
+"InfoService.InfoService" = "Info Service";
+
+/* Info Service: inconsistent data */
+"InfoService.InconsistentData" = "Inconsistent data";
+
 /* NodesList: scene title */
 "NodesList.Title" = "Liste der benutzten ADM Nodes";
 

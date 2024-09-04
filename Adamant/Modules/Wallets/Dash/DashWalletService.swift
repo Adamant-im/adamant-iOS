@@ -59,7 +59,7 @@ final class DashWalletService: WalletCoreProtocol {
     static let richMessageType = "dash_transaction"
     
     // MARK: - Dependencies
-    var apiService: ApiService!
+    var apiService: AdamantApiServiceProtocol!
     var dashApiService: DashApiService!
     var accountService: AccountService!
     var securedStore: SecuredStore!
@@ -112,6 +112,10 @@ final class DashWalletService: WalletCoreProtocol {
                 self.securedStore.remove("lastDashTransactionId")
             }
         }
+    }
+    
+    var hasActiveNode: Bool {
+        apiService.hasActiveNode
     }
     
     // MARK: - Notifications
@@ -372,7 +376,7 @@ extension DashWalletService: SwinjectDependentService {
     @MainActor
     func injectDependencies(from container: Container) {
         accountService = container.resolve(AccountService.self)
-        apiService = container.resolve(ApiService.self)
+        apiService = container.resolve(AdamantApiServiceProtocol.self)
         securedStore = container.resolve(SecuredStore.self)
         dialogService = container.resolve(DialogService.self)
         addressConverter = container.resolve(AddressConverterFactory.self)?
@@ -396,9 +400,9 @@ extension DashWalletService {
     }
     
     func getBalance(address: String) async throws -> Decimal {
-        let data: Data = try await dashApiService.request { core, node in
+        let data: Data = try await dashApiService.request { core, origin in
             await core.sendRequest(
-                node: node,
+                origin: origin,
                 path: .empty,
                 method: .post,
                 parameters: DashGetAddressBalanceDTO(address: address),
