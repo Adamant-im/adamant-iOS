@@ -11,19 +11,26 @@ import MessageUI
 import PopupKit
 import SafariServices
 import CommonKit
+import AVFoundation
 
 @MainActor
 final class AdamantDialogService: DialogService {
     
     // MARK: Dependencies
+    private let notificationsService: NotificationsService
     private let vibroService: VibroService
     private let popupManager = PopupManager()
     private let mailDelegate = MailDelegate()
     
     private weak var window: UIWindow?
+    private var audioPlayer: AVAudioPlayer?
     
-    nonisolated init(vibroService: VibroService) {
+    nonisolated init(
+        vibroService: VibroService,
+        notificationsService: NotificationsService
+    ) {
         self.vibroService = vibroService
+        self.notificationsService = notificationsService
     }
     
     func setup(window: UIWindow) {
@@ -207,6 +214,16 @@ extension AdamantDialogService {
 // MARK: - Notifications
 extension AdamantDialogService {
     func showNotification(title: String?, message: String?, image: UIImage?, tapHandler: (() -> Void)?) {
+        if notificationsService.inAppVibrate {
+            vibroService.applyVibration(.medium)
+        }
+        
+        if notificationsService.inAppSound {
+            playSound(by: notificationsService.notificationsSound.fileName)
+        }
+        
+        guard notificationsService.inAppToasts else { return }
+        
         popupManager.showNotification(
             icon: image,
             title: title,
@@ -218,6 +235,22 @@ extension AdamantDialogService {
     
     func dismissNotification() {
         popupManager.dismissNotification()
+    }
+    
+    private func playSound(by fileName: String) {
+        guard let url = Bundle.main.url(forResource: fileName.replacingOccurrences(of: ".mp3", with: ""), withExtension: "mp3") else {
+            return
+        }
+
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback)
+            try AVAudioSession.sharedInstance().setActive(true)
+            audioPlayer = try AVAudioPlayer(contentsOf: url, fileTypeHint: AVFileType.mp3.rawValue)
+            audioPlayer?.volume = 1.0
+            audioPlayer?.play()
+        } catch let error as NSError {
+            print("error: \(error.localizedDescription)")
+        }
     }
 }
 

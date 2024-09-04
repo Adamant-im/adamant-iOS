@@ -823,6 +823,18 @@
 /* Notifications: Select Sounds */
 "Notifications.Sounds.Name" = "声音";
 
+/* Notifications: Vibrate title */
+"Notifications.Vibrate.Title" = "振动";
+
+/* Notifications: Toasts title */
+"Notifications.Toasts.Title" = "祝酒词";
+
+/* Notifications: Reactions header */
+"Notifications.Reactions.Header" = "反应";
+
+/* Notifications: In-App notifications header */
+"Notifications.InAppNotifications.Header" = "应用程序内通知";
+
 /* Notifications: Select Alert Tones */
 "Notifications.Alert.Tones" = "警报音";
 

@@ -30,20 +30,37 @@ final class NotificationSoundsViewController: FormViewController {
         }
     }
     
-    var notificationsService: NotificationsService!
-    private var selectSound:NotificationSound = .inputDefault
+    private let notificationsService: NotificationsService
+    private let notificationTarget: NotificationTarget
+    
+    private var selectSound: NotificationSound = .inputDefault
     private var section = SelectableSection<ListCheckRow<NotificationSound>>()
-    var audioPlayer: AVAudioPlayer!
+    private var audioPlayer: AVAudioPlayer?
+    
+    init(notificationsService: NotificationsService, target: NotificationTarget) {
+        self.notificationsService = notificationsService
+        self.notificationTarget = target
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = .localized("Notifications.Sounds.Name", comment: "Notifications: Select Sounds")
         
-        selectSound = notificationsService.notificationsSound
+        switch notificationTarget {
+        case .baseMessage:
+            selectSound = notificationsService.notificationsSound
+        case .reaction:
+            selectSound = notificationsService.notificationsReactionSound
+        }
         
         section = SelectableSection<ListCheckRow<NotificationSound>>(Sections.alerts.localized, selectionType: .singleSelection(enableDeselection: false))
 
-        let sounds: [NotificationSound] = [.none, .noteDefault, .inputDefault, .proud, .relax, .success]
+        let sounds: [NotificationSound] = [.none, .noteDefault, .inputDefault, .proud, .relax, .success, .note, .antic, .cheers, .chord, .droplet, .handoff, .milestone, .passage, .portal, .rattle, .rebound, .slide, .welcome]
         for sound in sounds {
             section <<< ListCheckRow<NotificationSound> { listRow in
                 listRow.title = sound.localized
@@ -92,7 +109,7 @@ final class NotificationSoundsViewController: FormViewController {
     }
     
     private func setNotificationSound(_ sound: NotificationSound) {
-        notificationsService.setNotificationSound(sound)
+        notificationsService.setNotificationSound(sound, for: notificationTarget)
     }
     
     private func playSound(_ sound: NotificationSound) {
@@ -112,9 +129,9 @@ final class NotificationSoundsViewController: FormViewController {
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback)
             try AVAudioSession.sharedInstance().setActive(true)
-            self.audioPlayer = try AVAudioPlayer(contentsOf: url, fileTypeHint: AVFileType.mp3.rawValue)
-            audioPlayer.volume = 1.0
-            audioPlayer.play()
+            audioPlayer = try AVAudioPlayer(contentsOf: url, fileTypeHint: AVFileType.mp3.rawValue)
+            audioPlayer?.volume = 1.0
+            audioPlayer?.play()
         } catch let error as NSError {
             print("error: \(error.localizedDescription)")
         }
