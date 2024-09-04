@@ -2,6 +2,12 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:FilesStorageKit">
+   </FileRef>
+   <FileRef
+      location = "group:FilesPickerKit">
+   </FileRef>
+   <FileRef
       location = "group:CommonKit">
    </FileRef>
    <FileRef

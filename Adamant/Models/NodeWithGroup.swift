@@ -20,10 +20,10 @@ extension NodeGroup {
             return BtcWalletService.tokenNetworkSymbol
         case .eth:
             return EthWalletService.tokenNetworkSymbol
-        case .lskNode:
-            return LskWalletService.tokenNetworkSymbol
-        case .lskService:
-            return LskWalletService.tokenNetworkSymbol
+        case .klyNode:
+            return KlyWalletService.tokenNetworkSymbol
+        case .klyService:
+            return KlyWalletService.tokenNetworkSymbol
             + " " + .adamant.coinsNodesList.serviceNode
         case .doge:
             return DogeWalletService.tokenNetworkSymbol
@@ -31,14 +31,16 @@ extension NodeGroup {
             return DashWalletService.tokenNetworkSymbol
         case .adm:
             return AdmWalletService.tokenNetworkSymbol
+        case .ipfs:
+            return IPFSApiService.symbol
         }
     }
     
     var includeVersionTitle: Bool {
         switch self {
-        case .btc, .lskNode, .lskService, .doge, .adm:
+        case .btc, .klyNode, .klyService, .doge, .adm:
             return true
-        case .eth, .dash:
+        case .eth, .dash, .ipfs:
             return false
         }
     }

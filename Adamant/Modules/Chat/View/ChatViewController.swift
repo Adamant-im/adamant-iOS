@@ -12,6 +12,10 @@ import Combine
 import UIKit
 import SnapKit
 import CommonKit
+import FilesStorageKit
+import PhotosUI
+import FilesPickerKit
+import QuickLook
 
 @MainActor
 final class ChatViewController: MessagesViewController {
@@ -44,6 +48,10 @@ final class ChatViewController: MessagesViewController {
     private lazy var scrollDownButton = makeScrollDownButton()
     private lazy var chatMessagesCollectionView = makeChatMessagesCollectionView()
     private lazy var replyView = ReplyView()
+    private lazy var filesToolbarView = FilesToolbarView()
+    private lazy var chatDropView = ChatDropView()
+    
+    private var sendTransaction: SendTransaction
     
     // swiftlint:disable unused_setter_value
     override var messageInputBar: InputBarAccessoryView {
@@ -84,10 +92,13 @@ final class ChatViewController: MessagesViewController {
         self.walletServiceCompose = walletServiceCompose
         self.admWalletService = admWalletService
         self.screensFactory = screensFactory
+        self.sendTransaction = sendTransaction
         super.init(nibName: nil, bundle: nil)
         inputBar.onAttachmentButtonTap = { [weak self] in
-            self.map { sendTransaction($0, viewModel.replyMessage?.id) }
-            self?.viewModel.clearReplyMessage()
+            self?.viewModel.presentActionMenu()
+        }
+        inputBar.onImagePasted = { [weak self] image in
+            self?.viewModel.handlePastedImage(image)
         }
     }
     
@@ -105,7 +116,9 @@ final class ChatViewController: MessagesViewController {
         configureHeader()
         configureLayout()
         configureReplyView()
+        configureFilesToolbarView()
         configureGestures()
+        configureDropFiles()
         setupObservers()
         viewModel.loadFirstMessagesIfNeeded()
     }
@@ -150,6 +163,7 @@ final class ChatViewController: MessagesViewController {
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
+        viewModel.preserveFiles()
         viewModel.preserveMessage(inputBar.text)
         viewModel.preserveReplayMessage()
         viewModel.saveChatOffset(
@@ -261,6 +275,15 @@ private extension ChatViewController {
             .sink { [weak self] _ in self?.inputTextUpdated() }
             .store(in: &subscriptions)
         
+        NotificationCenter.default
+            .publisher(for: UIApplication.didBecomeActiveNotification)
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                let indexes = self.messagesCollectionView.indexPathsForVisibleItems
+                self.viewModel.updatePreviewFor(indexes: indexes)
+            }
+            .store(in: &subscriptions)
+        
         viewModel.$messages
             .removeDuplicates()
             .sink { [weak self] _ in self?.updateMessages() }
@@ -344,6 +367,10 @@ private extension ChatViewController {
             .sink { [weak self] in self?.processSwipeMessage($0) }
             .store(in: &subscriptions)
         
+        viewModel.$filesPicked
+            .sink { [weak self] in self?.processFileToolbarView($0) }
+            .store(in: &subscriptions)
+        
         viewModel.$scrollToMessage
             .sink { [weak self] in
                 guard let toId = $0,
@@ -381,6 +408,38 @@ private extension ChatViewController {
             .sink { [weak self] in self?.didTapPartenerQR(partner: $0) }
             .store(in: &subscriptions)
         
+        viewModel.presentSendTokensVC
+            .sink { [weak self] in
+                guard let self = self else { return }
+                
+                sendTransaction(self, self.viewModel.replyMessage?.id)
+                self.viewModel.clearReplyMessage()
+                self.viewModel.clearPickedFiles()
+            }
+            .store(in: &subscriptions)
+        
+        viewModel.presentMediaPickerVC
+            .sink { [weak self] in
+                self?.presentMediaPicker()
+            }
+            .store(in: &subscriptions)
+        
+        viewModel.presentDocumentPickerVC
+            .sink { [weak self] in
+                self?.presentDocumentPicker()
+            }
+            .store(in: &subscriptions)
+        
+        viewModel.presentDocumentViewerVC
+            .sink { [weak self] (files, index) in
+                self?.presentDocumentViewer(files: files, selectedIndex: index)
+            }
+            .store(in: &subscriptions)
+        
+        viewModel.presentDropView
+            .sink { [weak self]  in self?.presentDropView($0) }
+            .store(in: &subscriptions)
+
         viewModel.didTapSelectText
             .sink { [weak self] text in
                 self?.didTapSelectText(text: text)
@@ -392,6 +451,16 @@ private extension ChatViewController {
 // MARK: Configuration
 
 private extension ChatViewController {
+    func configureDropFiles() {
+        chatDropView.alpha = .zero
+        view.addSubview(chatDropView)
+        chatDropView.snp.makeConstraints {
+            $0.directionalEdges.equalTo(view.safeAreaLayoutGuide).inset(5)
+        }
+        
+        view.addInteraction(UIDropInteraction(delegate: viewModel.dropInteractionService))
+    }
+    
     func configureLayout() {
         view.addSubview(scrollDownButton)
         scrollDownButton.snp.makeConstraints { [unowned inputBar] in
@@ -445,6 +514,24 @@ private extension ChatViewController {
         }
     }
     
+    func configureFilesToolbarView() {
+        filesToolbarView.snp.makeConstraints { make in
+            make.height.equalTo(filesToolbarViewHeight)
+        }
+        
+        filesToolbarView.closeAction = { [weak self] in
+            self?.viewModel.updateFiles(nil)
+        }
+        
+        filesToolbarView.updatedDataAction = { [weak self] data in
+            self?.viewModel.updateFiles(data)
+        }
+        
+        filesToolbarView.openFileAction = { [weak self] data in
+            self?.presentDocumentViewer(url: data.url)
+        }
+    }
+    
     func configureGestures() {
         /// Replaces the delegate of the pan gesture recognizer used in the input bar control of MessageKit.
         /// This gesture controls the position of the input bar when the keyboard is open and the user swipes it to dismiss.
@@ -462,6 +549,75 @@ private extension ChatViewController {
         panGesture.delegate = self
         messagesCollectionView.addGestureRecognizer(panGesture)
         messagesCollectionView.clipsToBounds = false
+    }
+
+    func presentMediaPicker() {
+        messageInputBar.inputTextView.resignFirstResponder()
+        
+        viewModel.mediaPickerDelegate.preSelectedFiles = viewModel.filesPicked ?? []
+        
+        let assetIds = viewModel.filesPicked?.compactMap { $0.assetId } ?? []
+
+        var phPickerConfig = PHPickerConfiguration(photoLibrary: .shared())
+        phPickerConfig.selectionLimit = FilesConstants.maxFilesCount
+        phPickerConfig.filter = PHPickerFilter.any(of: [.images, .videos, .livePhotos])
+        phPickerConfig.preselectedAssetIdentifiers = assetIds
+        phPickerConfig.selection = .ordered
+        
+        let phPickerVC = PHPickerViewController(configuration: phPickerConfig)
+        phPickerVC.delegate = viewModel.mediaPickerDelegate
+        present(phPickerVC, animated: true)
+    }
+    
+    func presentDocumentPicker() {
+        messageInputBar.inputTextView.resignFirstResponder()
+        
+        let documentPicker = UIDocumentPickerViewController(
+            forOpeningContentTypes: [.data, .content],
+            asCopy: false
+        )
+        documentPicker.allowsMultipleSelection = true
+        documentPicker.delegate = viewModel.documentPickerDelegate
+        present(documentPicker, animated: true)
+    }
+    
+    func presentDocumentViewer(files: [FileResult], selectedIndex: Int) {
+        viewModel.documentViewerService.openFile(
+            files: files
+        )
+        
+        let quickVC = QLPreviewController()
+        quickVC.delegate = viewModel.documentViewerService
+        quickVC.dataSource = viewModel.documentViewerService
+        quickVC.modalPresentationStyle = .fullScreen
+        quickVC.currentPreviewItemIndex = selectedIndex
+        
+        if let splitViewController = splitViewController {
+            splitViewController.present(quickVC, animated: true)
+        } else {
+            present(quickVC, animated: true)
+        }
+    }
+    
+    func presentDocumentViewer(url: URL) {
+        viewModel.documentViewerService.openFile(url: url)
+        
+        let quickVC = QLPreviewController()
+        quickVC.delegate = viewModel.documentViewerService
+        quickVC.dataSource = viewModel.documentViewerService
+        quickVC.modalPresentationStyle = .fullScreen
+        
+        if let splitViewController = splitViewController {
+            splitViewController.present(quickVC, animated: true)
+        } else {
+            present(quickVC, animated: true)
+        }
+    }
+    
+    func presentDropView(_ value: Bool) {
+        UIView.animate(withDuration: 0.25) {
+            self.chatDropView.alpha = value ? 1.0 : .zero
+        }
     }
 }
 
@@ -544,6 +700,7 @@ private extension ChatViewController {
         collection.register(ChatTransactionCell.self)
         collection.register(ChatMessageCell.self)
         collection.register(ChatMessageReplyCell.self)
+        collection.register(ChatMediaCell.self)
         collection.register(
             SpinnerCell.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader
@@ -653,13 +810,24 @@ private extension ChatViewController {
         }
         
         if !messageInputBar.topStackView.subviews.contains(replyView) {
-            UIView.transition(
-                with: messageInputBar.topStackView,
-                duration: 0.25,
-                options: [.transitionCrossDissolve],
-                animations: {
-                    self.messageInputBar.topStackView.addArrangedSubview(self.replyView)
-                })
+            if messageInputBar.topStackView.arrangedSubviews.isEmpty {
+                UIView.transition(
+                    with: messageInputBar.topStackView,
+                    duration: 0.25,
+                    options: [.transitionCrossDissolve],
+                    animations: {
+                        self.messageInputBar.topStackView.insertArrangedSubview(
+                            self.replyView,
+                            at: .zero
+                        )
+                    })
+            } else {
+                messageInputBar.topStackView.insertArrangedSubview(
+                    replyView,
+                    at: .zero
+                )
+            }
+            
             if viewAppeared {
                 messageInputBar.inputTextView.becomeFirstResponder()
             }
@@ -671,7 +839,39 @@ private extension ChatViewController {
     func closeReplyView() {
         replyView.removeFromSuperview()
         messageInputBar.invalidateIntrinsicContentSize()
-        messageInputBar.layoutContainerViewIfNeeded()
+    }
+    
+    func processFileToolbarView(_ data: [FileResult]?) {
+        guard let data = data, !data.isEmpty else {
+            inputBar.isForcedSendEnabled = false
+            closeFileToolbarView()
+            return
+        }
+        
+        inputBar.isForcedSendEnabled = true
+        
+        if !messageInputBar.topStackView.subviews.contains(filesToolbarView) {
+            UIView.transition(
+                with: messageInputBar.topStackView,
+                duration: 0.25,
+                options: [.transitionCrossDissolve],
+                animations: {
+                    self.messageInputBar.topStackView.insertArrangedSubview(
+                        self.filesToolbarView,
+                        at: self.messageInputBar.topStackView.arrangedSubviews.count
+                    )
+                })
+            if viewAppeared {
+                messageInputBar.inputTextView.becomeFirstResponder()
+            }
+        }
+        
+        filesToolbarView.update(data)
+    }
+    
+    func closeFileToolbarView() {
+        filesToolbarView.removeFromSuperview()
+        messageInputBar.invalidateIntrinsicContentSize()
     }
     
     func didTapTransfer(id: String) {
@@ -832,3 +1032,4 @@ private let messagePadding: CGFloat = 12
 private var replyAction: Bool = false
 private var canReplyVibrate: Bool = true
 private var oldContentOffset: CGPoint?
+private let filesToolbarViewHeight: CGFloat = 140

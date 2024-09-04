@@ -10,6 +10,7 @@ import UIKit
 import MarkdownKit
 import MessageKit
 import CommonKit
+import FilesStorageKit
 
 struct ChatMessageFactory {
     private let walletServiceCompose: WalletServiceCompose
@@ -36,7 +37,9 @@ struct ChatMessageFactory {
                 font: .adamantCodeDefault,
                 textHighlightColor: .adamant.codeBlockText,
                 textBackgroundColor: .adamant.codeBlock
-            )
+            ),
+            MarkdownFileRaw(emoji: "📸", font: .adamantChatFileRawDefault),
+            MarkdownFileRaw(emoji: "📄", font: .adamantChatFileRawDefault)
         ]
     )
     
@@ -58,7 +61,9 @@ struct ChatMessageFactory {
             MarkdownAdvancedAdm(
                 font: .adamantChatDefault,
                 color: .adamant.active
-            )
+            ),
+            MarkdownFileRaw(emoji: "📸", font: .adamantChatFileRawDefault),
+            MarkdownFileRaw(emoji: "📄", font: .adamantChatFileRawDefault)
         ]
     )
     
@@ -126,8 +131,19 @@ private extension ChatMessageFactory {
             )
         case let transaction as RichMessageTransaction:
             if transaction.additionalType == .reply,
-               !transaction.isTransferReply() {
+               !transaction.isTransferReply(),
+               !transaction.isFileReply() {
                 return makeReplyContent(
+                    transaction,
+                    isFromCurrentSender: isFromCurrentSender,
+                    backgroundColor: backgroundColor
+                )
+            }
+            
+            if transaction.additionalType == .file ||
+               (transaction.additionalType == .reply &&
+                transaction.isFileReply()) {
+                return makeFileContent(
                     transaction,
                     isFromCurrentSender: isFromCurrentSender,
                     backgroundColor: backgroundColor
@@ -156,17 +172,7 @@ private extension ChatMessageFactory {
         backgroundColor: ChatMessageBackgroundColor
     ) -> ChatMessage.Content {
         transaction.message.map {
-			let attributedString = Self.markdownParser.parse($0)
-            
-            let mutableAttributedString = NSMutableAttributedString(attributedString: attributedString)
-            let paragraphStyle = NSMutableParagraphStyle()
-            paragraphStyle.lineSpacing = 1.15
-            mutableAttributedString.addAttribute(
-                NSAttributedString.Key.paragraphStyle,
-                value: paragraphStyle,
-                range: NSRange(location: 0, length: attributedString.length)
-            )
-            
+            let text = makeAttributed($0)
             let reactions = transaction.reactions
             
             let address = transaction.isOutgoing
@@ -180,7 +186,7 @@ private extension ChatMessageFactory {
             return .message(.init(
                 value: .init(
                     id: transaction.txId,
-                    text: mutableAttributedString,
+                    text: text,
                     backgroundColor: backgroundColor,
                     isFromCurrentSender: isFromCurrentSender,
                     reactions: reactions,
@@ -199,11 +205,12 @@ private extension ChatMessageFactory {
         backgroundColor: ChatMessageBackgroundColor
     ) -> ChatMessage.Content {
         guard let replyId = transaction.getRichValue(for: RichContentKeys.reply.replyToId),
-              let replyMessage = transaction.getRichValue(for: RichContentKeys.reply.replyMessage)
+              let replyMessageRaw = transaction.getRichValue(for: RichContentKeys.reply.replyMessage)
         else {
             return .default
         }
         
+        let replyMessage = makeAttributed(replyMessageRaw)
         let decodedMessage = transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) ?? "..."
         let decodedMessageMarkDown = Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
         let reactions = transaction.richContent?[RichContentKeys.react.reactions] as? Set<Reaction>
@@ -220,7 +227,7 @@ private extension ChatMessageFactory {
             value: .init(
                 id: transaction.txId,
                 replyId: replyId,
-                message: Self.markdownParser.parse(replyMessage),
+                message: replyMessage,
                 messageReply: decodedMessageMarkDown,
                 backgroundColor: backgroundColor,
                 isFromCurrentSender: isFromCurrentSender,
@@ -254,6 +261,7 @@ private extension ChatMessageFactory {
         : transaction.senderAddress
         
         let coreService = walletServiceCompose.getWallet(by: transfer.type)?.core
+        let defaultIcon: UIImage = .asset(named: "no-token") ?? .init()
         
         return .transaction(.init(value: .init(
             id: id,
@@ -263,9 +271,9 @@ private extension ChatMessageFactory {
                 title: isFromCurrentSender
                     ? .adamant.chat.transactionSent
                     : .adamant.chat.transactionReceived,
-                icon: coreService?.tokenLogo ?? .init(),
+                icon: coreService?.tokenLogo ?? defaultIcon,
                 amount: AdamantBalanceFormat.full.format(transfer.amount),
-                currency: coreService?.tokenSymbol ?? "",
+                currency: coreService?.tokenSymbol ?? .adamant.transfer.unknownToken,
                 date: transaction.sentDate?.humanizedDateTime(withWeekday: false) ?? "",
                 comment: transfer.comments,
                 backgroundColor: backgroundColor,
@@ -279,6 +287,120 @@ private extension ChatMessageFactory {
             address: address,
             opponentAddress: opponentAddress
         )))
+    }
+    
+    func makeFileContent(
+        _ transaction: RichMessageTransaction,
+        isFromCurrentSender: Bool,
+        backgroundColor: ChatMessageBackgroundColor
+    ) -> ChatMessage.Content {
+        let id = transaction.chatMessageId ?? ""
+        
+        let files: [[String: Any]] = transaction.getRichValue(for: RichContentKeys.file.files) ?? [[:]]
+        
+        let decodedMessage = decodeMessage(transaction)
+        let storageData: [String: Any] = transaction.getRichValue(for: RichContentKeys.file.storage) ?? [:]
+        let storage = RichMessageFile.Storage(storageData).id
+        
+        let commentRaw = transaction.getRichValue(for: RichContentKeys.file.comment) ?? .empty
+        let replyId = transaction.getRichValue(for: RichContentKeys.reply.replyToId) ?? .empty
+        let reactions = transaction.richContent?[RichContentKeys.react.reactions] as? Set<Reaction>
+        let comment = makeAttributed(commentRaw)
+        
+        let address = transaction.isOutgoing
+        ? transaction.senderAddress
+        : transaction.recipientAddress
+        
+        let opponentAddress = transaction.isOutgoing
+        ? transaction.recipientAddress
+        : transaction.senderAddress
+        
+        let chatFiles = makeChatFiles(
+            from: files,
+            isFromCurrentSender: isFromCurrentSender,
+            storage: storage
+        )
+        
+        let isMediaFilesOnly = chatFiles.allSatisfy {
+            $0.fileType == .image || $0.fileType == .video
+        }
+        
+        let fileModel = ChatMediaContentView.FileModel(
+            messageId: id,
+            files: chatFiles,
+            isMediaFilesOnly: isMediaFilesOnly,
+            isFromCurrentSender: isFromCurrentSender,
+            txStatus: transaction.statusEnum
+        )
+        
+        return .file(.init(value: .init(
+            id: id,
+            isFromCurrentSender: isFromCurrentSender,
+            reactions: reactions,
+            content: .init(
+                id: id,
+                fileModel: fileModel,
+                isHidden: false,
+                isFromCurrentSender: isFromCurrentSender,
+                isReply: transaction.isFileReply(),
+                replyMessage: decodedMessage,
+                replyId: replyId,
+                comment: comment,
+                backgroundColor: backgroundColor
+            ),
+            address: address,
+            opponentAddress: opponentAddress, 
+            txStatus: transaction.statusEnum,
+            status: .failed
+        )))
+    }
+    
+    func makeAttributed(_ text: String) -> NSMutableAttributedString {
+        let attributedString = Self.markdownParser.parse(text)
+        
+        let mutableAttributedString = NSMutableAttributedString(attributedString: attributedString)
+        
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = lineSpacing
+        
+        mutableAttributedString.addAttribute(
+            NSAttributedString.Key.paragraphStyle,
+            value: paragraphStyle,
+            range: NSRange(location: .zero, length: attributedString.length)
+        )
+        
+        return mutableAttributedString
+    }
+    
+    func decodeMessage(_ transaction: RichMessageTransaction) -> NSMutableAttributedString {
+        let decodedMessage = transaction.getRichValue(for: RichContentKeys.reply.decodedReplyMessage) ?? "..."
+        return Self.markdownReplyParser.parse(decodedMessage).resolveLinkColor()
+    }
+    
+    func makeChatFiles(
+        from files: [[String: Any]],
+        isFromCurrentSender: Bool,
+        storage: String
+    ) -> [ChatFile] {
+        return files.map {
+            let file = RichMessageFile.File($0)
+            let fileType = FileType(raw: file.extension ?? .empty) ?? .other
+            
+            return ChatFile(
+                file: file,
+                previewImage: nil,
+                downloadStatus: .default,
+                isUploading: false,
+                isCached: false,
+                storage: storage,
+                nonce: file.nonce,
+                isFromCurrentSender: isFromCurrentSender,
+                fileType: fileType,
+                progress: nil,
+                isPreviewDownloadAllowed: false,
+                isFullMediaDownloadAllowed: false
+            )
+        }
     }
     
     func makeContent(
@@ -375,7 +497,7 @@ private extension ChatMessageFactory {
     func makePendingMessageString() -> NSAttributedString {
         let attachment = NSTextAttachment()
         attachment.image = .asset(named: "status_pending")
-        attachment.bounds = CGRect(x: .zero, y: -1, width: 7, height: 7)
+        attachment.bounds = CGRect(x: .zero, y: -1, width: 10, height: 10)
         return NSAttributedString(attachment: attachment)
     }
     
@@ -429,3 +551,5 @@ private extension ChatSender {
         )
     }
 }
+
+private let lineSpacing: CGFloat = 1.15

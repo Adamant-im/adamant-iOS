@@ -9,12 +9,21 @@
 import Swinject
 import BitcoinKit
 import CommonKit
+import FilesStorageKit
+import FilesPickerKit
 
 struct AppAssembly: Assembly {
     func assemble(container: Container) {
         // MARK: - Standalone services
         // MARK: AdamantCore
         container.register(AdamantCore.self) { _ in NativeAdamantCore() }.inObjectScope(.container)
+        
+        // MARK: FilesStorageProtocol
+        container.register(FilesStorageProtocol.self) { _ in FilesStorageKit() }.inObjectScope(.container)
+        
+        container.register(FilesPickerProtocol.self) { r in
+            FilesPickerKit(storageKit: r.resolve(FilesStorageProtocol.self)!)
+        }
         
         // MARK: CellFactory
         container.register(CellFactory.self) { _ in AdamantCellFactory() }.inObjectScope(.container)
@@ -120,6 +129,23 @@ struct AppAssembly: Assembly {
             )
         }.inObjectScope(.container)
         
+        // MARK: IPFSApiService
+        container.register(IPFSApiService.self) { r in
+            IPFSApiService(
+                healthCheckWrapper: .init(
+                    service: .init(apiCore: r.resolve(APICoreProtocol.self)!),
+                    nodesStorage: r.resolve(NodesStorageProtocol.self)!,
+                    nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
+                    nodeGroup: .ipfs
+                )
+            )
+        }.inObjectScope(.container)
+        
+        // MARK: FilesNetworkManagerProtocol
+        container.register(FilesNetworkManagerProtocol.self) { r in
+            FilesNetworkManager(ipfsService: r.resolve(IPFSApiService.self)!)
+        }.inObjectScope(.container)
+        
         // MARK: BtcApiService
         container.register(BtcApiService.self) { r in
             BtcApiService(api: .init(
@@ -151,22 +177,22 @@ struct AppAssembly: Assembly {
         }.inObjectScope(.container)
         
         // MARK: LskNodeApiService
-        container.register(LskNodeApiService.self) { r in
-            LskNodeApiService(api: .init(
+        container.register(KlyNodeApiService.self) { r in
+            KlyNodeApiService(api: .init(
                 service: .init(),
                 nodesStorage: r.resolve(NodesStorageProtocol.self)!,
                 nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
-                nodeGroup: .lskNode
+                nodeGroup: .klyNode
             ))
         }.inObjectScope(.container)
         
-        // MARK: LskServiceApiService
-        container.register(LskServiceApiService.self) { r in
-            LskServiceApiService(api: .init(
+        // MARK: KlyServiceApiService
+        container.register(KlyServiceApiService.self) { r in
+            KlyServiceApiService(api: .init(
                 service: .init(),
                 nodesStorage: r.resolve(NodesStorageProtocol.self)!,
                 nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
-                nodeGroup: .lskService
+                nodeGroup: .klyService
             ))
         }.inObjectScope(.container)
         
@@ -231,7 +257,7 @@ struct AppAssembly: Assembly {
         }.inObjectScope(.container)
         
         // MARK: LanguageStorageProtocol
-        container.register(LanguageStorageProtocol.self) { r in
+        container.register(LanguageStorageProtocol.self) { _ in
             LanguageStorageService()
         }.inObjectScope(.container)
         
@@ -261,6 +287,24 @@ struct AppAssembly: Assembly {
                 securedStore: r.resolve(SecuredStore.self)!,
                 transactionService: r.resolve(ChatTransactionService.self)!,
                 chatsProvider: r.resolve(ChatsProvider.self)!
+            )
+        }.inObjectScope(.container)
+        
+        // MARK: ChatFileService
+        container.register(ChatFileProtocol.self) { r in
+            ChatFileService(
+                accountService: r.resolve(AccountService.self)!,
+                filesStorage: r.resolve(FilesStorageProtocol.self)!,
+                chatsProvider: r.resolve(ChatsProvider.self)!,
+                filesNetworkManager: r.resolve(FilesNetworkManagerProtocol.self)!,
+                adamantCore: r.resolve(AdamantCore.self)!
+            )
+        }.inObjectScope(.container)
+        
+        // MARK: FilesStorageProprietiesService
+        container.register(FilesStorageProprietiesProtocol.self) { r in
+            FilesStorageProprietiesService(
+                securedStore: r.resolve(SecuredStore.self)!
             )
         }.inObjectScope(.container)
         
@@ -333,7 +377,7 @@ struct AppAssembly: Assembly {
                 AdmWalletService(),
                 BtcWalletService(),
                 EthWalletService(),
-                LskWalletService(),
+                KlyWalletService(),
                 DogeWalletService(),
                 DashWalletService()
             ]

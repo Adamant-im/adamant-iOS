@@ -8,9 +8,10 @@
 public enum NodeGroup: Codable, CaseIterable, Hashable {
     case btc
     case eth
-    case lskNode
-    case lskService
+    case klyNode
+    case klyService
     case doge
     case dash
     case adm
+    case ipfs
 }
