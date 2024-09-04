@@ -71,6 +71,7 @@ final class ChatViewModel: NSObject {
     private let maxMessageLenght: Int = 10000
     private var previousArg: ChatContextMenuArguments?
     private var havePartnerName: Bool = false
+    private var dateTimer: Timer?
     
     let minIndexForStartLoadNewMessages = 4
     let minOffsetForStartLoadNewMessages: CGFloat = 100
@@ -104,6 +105,8 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var partnerName: String?
     @ObservableValue private(set) var partnerImage: UIImage?
     @ObservableValue private(set) var isNeedToAnimateScroll = false
+    @ObservableValue private(set) var dateHeader: String?
+    @ObservableValue private(set) var dateHeaderHidden: Bool = true
     @ObservableValue var swipeState: SwipeableView.State = .ended
     @ObservableValue var inputText = ""
     @ObservableValue var replyMessage: MessageModel?
@@ -1014,6 +1017,17 @@ extension ChatViewModel {
             processFileResult(.failure(error))
         }
     }
+    
+    func checkTopMessage(indexPath: IndexPath) {
+        guard let message = messages[safe: indexPath.section],
+              let date = message.dateHeader?.string.string
+        else { return }
+        dateHeader = date
+        dateHeaderHidden = false
+    }
+    func didEndScroll() {
+        startHideDateTimer()
+    }
 }
 
 extension ChatViewModel: NSFetchedResultsControllerDelegate {
@@ -1023,6 +1037,13 @@ extension ChatViewModel: NSFetchedResultsControllerDelegate {
 }
 
 private extension ChatViewModel {
+    func startHideDateTimer() {
+        dateTimer?.invalidate()
+        dateTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { [weak self] _ in
+            self?.dateHeaderHidden = true
+        }
+    }
+    
     func sendFiles(with text: String) async throws {
         guard apiServiceCompose.hasActiveNode(group: .ipfs) else {
             dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
