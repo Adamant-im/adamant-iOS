@@ -13,4 +13,5 @@ public enum NodeGroup: Codable, CaseIterable, Hashable {
     case doge
     case dash
     case adm
+    case ipfs
 }

@@ -31,7 +31,8 @@ struct AdamantScreensFactory: ScreensFactory {
     private let chatSelectTextFactory: ChatSelectTextViewFactory
     private let notificasionsFactory: NotificationsFactory
     private let notificationSounds: NotificationSoundsFactory
-    
+    private let storageUsageFactory: StorageUsageFactory
+        
     init(assembler: Assembler) {
         admWalletFactory = .init(assembler: assembler)
         chatListFactory = .init(assembler: assembler)
@@ -50,6 +51,7 @@ struct AdamantScreensFactory: ScreensFactory {
         chatSelectTextFactory = .init()
         notificasionsFactory = .init(parent: assembler)
         notificationSounds = .init(parent: assembler)
+        storageUsageFactory = .init(parent: assembler)
         
         walletFactoryCompose = AdamantWalletFactoryCompose(
             klyWalletFactory: .init(assembler: assembler),
@@ -176,6 +178,10 @@ struct AdamantScreensFactory: ScreensFactory {
     
     func makeContribute() -> UIViewController {
         contributeFactory.makeViewController()
+    }
+    
+    func makeStorageUsage() -> UIViewController {
+        storageUsageFactory.makeViewController()
     }
     
     func makeLogin() -> LoginViewController {

@@ -682,6 +682,51 @@
 /* NodeList: Inform that default nodes was loaded, if user deleted all nodes */
 "NodeList.DefaultNodesLoaded" = "已加载默认节点列表";
 
+/* Storage: Save Encrypted */
+"Storage.SaveEncrypted.Title" = "保持文件加密";
+
+/* Storage: Save Encrypted */
+"Storage.SaveEncrypted.Description" = " 在本地存储中以加密形式存储文件（可能会影响性能）";
+
+/* Storage: Auto download preview */
+"Storage.AutoDownloadPreview.Title" = "预览";
+
+/* Storage: Auto download full media */
+"Storage.AutoDownloadFullMedia.Title" = "完整媒体文件";
+
+/* Storage: Download policy */
+"Storage.DownloadPolicy.Everybody.Title" = "每个人";
+
+/* Storage: Download policy */
+"Storage.DownloadPolicy.Nobody.Title" = "没有人";
+
+/* Storage: Download policy */
+"Storage.DownloadPolicy.Contacts.Title" = "我的联系人";
+
+/* Storage: Auto download preview */
+"Storage.AutoDownloadPreview.Description" = "要创建联系人，请为ADM地址命名";
+
+/* Storage: Auto download preview */
+"Storage.AutoDownloadPreview.Header" = "自动下载媒体文件";
+
+/* Storage usage: Clear Title */
+"StorageUsage.Clear.Title" = "清晰的存储";
+
+/* Storage usage: Clear Popup Title */
+"StorageUsage.Clear.Popup.Title" = "您将再次下载文件和图像。继续？";
+
+/* Storage usage: Title */
+"StorageUsage.Title" = "存储和数据";
+
+/* Storage used: Title */
+"StorageUsed.Title" = "存储";
+
+/* Storage usage: Description */
+"StorageUsage.Description" = "应用程序安全存储中的文件和图像总大小";
+
+/* Chats: Auto preview download is disabled */
+"Chats.AutoDownloadPreview.Disabled" = "自动预览下载已禁用";
+
 /* CoinsNodesList: Title */
 "CoinsNodesList.Title" = "Coin和服务节点列表";
 
@@ -888,6 +933,15 @@
 
 /* Partner screen 'Rename contact'. */
 "Shared.RenameContact" = "重新命名联系人";
+
+/* Shared alert 'Send tokens' */
+"Shared.SendTokens" = "💸 发送代币";
+
+/* Shared alert 'Upload file' */
+"Shared.UploadFile" = "📄 上传文件";
+
+/* Shared alert 'Upload Media' */
+"Shared.UploadMedia" = "📸 上传媒体";
 
 /* Shared alert 'Settings' button. Used to go to system Settings app, on application settings page. Should be same as Settings application title. */
 "Shared.Settings" = "设置";
@@ -1227,3 +1281,33 @@
 
 /* Transaction: Unknown token */
 "Transaction.UnknownTokenTitle" = "未知";
+
+/* FileManager error 'Can't download file' */
+"FileManagerError.CantDownloadFile" = "无法下载文件";
+
+/* FileManager error 'Can't upload file' */
+"FileManagerError.CantUploadFile" = "无法上传文件";
+
+/* FileManager error 'Can't encrypt file' */
+"FileManagerError.CantEncryptFile" = "无法加密文件";
+
+/* FileManager error 'Can't decrypt file' */
+"FileManagerError.CantDecryptFile" = "无法解密文件";
+
+/* File validation error 'Too many files' */
+"FileValidationError.TooManyFiles" = "文件太多。 最大允许：%lld";
+
+/* File validation error 'File size exceeds limit' */
+"FileValidationError.FileSizeExceedsLimit" = "文件大小超出限制。 最大允许：%lld MB";
+
+/* File validation error 'File not found' */
+"FileValidationError.FileNotFound" = "找不到文件";
+
+/* File picker error 'Cant select file' */
+"FileValidationError.CantSelectFile" = "无法选择文件: %@";
+
+/* Chat drop view title */
+"Chat.Drop.Title" = "将文件拖到这里";
+
+/* Chat unknown */
+"Chat.unknown.title" = "未知";

@@ -19,18 +19,48 @@ actor APICore: APICoreProtocol {
     private lazy var session: Session = {
         let configuration = AF.sessionConfiguration
         configuration.waitsForConnectivity = true
-        configuration.timeoutIntervalForRequest = timeoutInterval
-        configuration.timeoutIntervalForResource = timeoutInterval
+        configuration.timeoutIntervalForRequest = timeoutIntervalForRequest
+        configuration.timeoutIntervalForResource = timeoutIntervalForResource
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        configuration.httpMaximumConnectionsPerHost = maximumConnectionsPerHost
         return Alamofire.Session.init(configuration: configuration)
     }()
+    
+    func sendRequestMultipartFormData(
+        node: Node,
+        path: String,
+        models: [MultipartFormDataModel],
+        uploadProgress: @escaping ((Progress) -> Void)
+    ) async -> APIResponseModel {
+        do {
+            let request = session.upload(multipartFormData: { multipartFormData in
+                models.forEach { file in
+                    multipartFormData.append(
+                        file.data,
+                        withName: file.keyName,
+                        fileName: file.fileName
+                    )
+                }
+            }, to: try buildUrl(node: node, path: path))
+                .uploadProgress(queue: .global(), closure: uploadProgress)
+            
+            return await sendRequest(request: request)
+        } catch {
+            return .init(
+                result: .failure(.internalError(message: error.localizedDescription, error: error)),
+                data: nil,
+                code: nil
+            )
+        }
+    }
     
     func sendRequestBasic<Parameters: Encodable>(
         node: Node,
         path: String,
         method: HTTPMethod,
         parameters: Parameters,
-        encoding: APIParametersEncoding
+        encoding: APIParametersEncoding,
+        downloadProgress: @escaping ((Progress) -> Void)
     ) async -> APIResponseModel {
         do {
             let request = session.request(
@@ -39,7 +69,7 @@ actor APICore: APICoreProtocol {
                 parameters: parameters.asDictionary(),
                 encoding: encoding.parametersEncoding,
                 headers: HTTPHeaders(["Content-Type": "application/json"])
-            )
+            ).downloadProgress(closure: downloadProgress)
             
             return await sendRequest(request: request)
         } catch {
@@ -100,4 +130,6 @@ private extension APICore {
     }
 }
 
-private let timeoutInterval: TimeInterval = 15
+private let timeoutIntervalForRequest: TimeInterval = 15
+private let timeoutIntervalForResource: TimeInterval = 24 * 3600
+private let maximumConnectionsPerHost = 100

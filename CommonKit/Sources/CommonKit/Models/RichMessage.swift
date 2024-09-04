@@ -45,6 +45,24 @@ public enum RichContentKeys {
         public static let react_message = "react_message"
         public static let reactions = "reactions"
     }
+    
+    public enum file {
+        public static let file = "file"
+        public static let files = "files"
+        public static let file_id = "file_id"
+        public static let comment = "comment"
+        public static let storage = "storage"
+        public static let nonce = "nonce"
+        public static let resolution = "resolution"
+        public static let id = "id"
+        public static let size = "size"
+        public static let type = "type"
+        public static let name = "name"
+        public static let preview = "preview"
+        public static let `extension` = "extension"
+        public static let duration = "duration"
+        public static let mimeType = "mimeType"
+    }
 }
 
 // MARK: - RichMessageReaction
@@ -70,6 +88,219 @@ public struct RichMessageReaction: RichMessage {
         return [
             RichContentKeys.react.reactto_id: reactto_id,
             RichContentKeys.react.react_message: react_message
+        ]
+    }
+}
+
+// MARK: - RichMessageFile
+
+public struct RichMessageFile: RichMessage {
+    public struct Preview: Codable, Equatable, Hashable {
+        public var id: String
+        public var nonce: String
+        public var `extension`: String?
+        
+        public init(
+            id: String,
+            nonce: String,
+            extension: String?
+        ) {
+            self.id = id
+            self.nonce = nonce
+            self.extension = `extension`
+        }
+        
+        public init(_ data: [String: Any]) {
+            self.id = (data[RichContentKeys.file.id] as? String) ?? .empty
+            self.nonce = data[RichContentKeys.file.nonce] as? String ?? .empty
+            self.extension = data[RichContentKeys.file.extension] as? String ?? .empty
+        }
+        
+        public func content() -> [String: Any] {
+            var contentDict: [String : Any] =  [:]
+            
+            if !id.isEmpty {
+                contentDict[RichContentKeys.file.id] = id
+            }
+            
+            if !nonce.isEmpty {
+                contentDict[RichContentKeys.file.nonce] = nonce
+            }
+            
+            if !nonce.isEmpty {
+                contentDict[RichContentKeys.file.extension] = `extension`
+            }
+            
+            return contentDict
+        }
+    }
+    
+    public struct File: Codable, Equatable, Hashable {
+        public var preview: Preview?
+        public var id: String
+        public var `extension`: String?
+        public var mimeType: String?
+        public var size: Int64
+        public var nonce: String
+        public var resolution: CGSize?
+        public var name: String?
+        public var duration: Float64?
+        
+        public init(
+            id: String,
+            size: Int64,
+            nonce: String,
+            name: String?,
+            `extension`: String? = nil,
+            mimeType: String? = nil,
+            preview: Preview? = nil,
+            resolution: CGSize? = nil,
+            duration: Float64? = nil
+        ) {
+            self.id = id
+            self.extension = `extension`
+            self.mimeType = mimeType
+            self.size = size
+            self.nonce = nonce
+            self.name = name
+            self.preview = preview
+            self.resolution = resolution
+            self.duration = duration
+        }
+        
+        public init(_ data: [String: Any]) {
+            self.id = (data[RichContentKeys.file.id] as? String) ?? .empty
+            self.`extension` = data[RichContentKeys.file.extension] as? String
+            ?? data[RichContentKeys.file.type] as? String
+            self.size = (data[RichContentKeys.file.size] as? Int64) ?? .zero
+            self.name = data[RichContentKeys.file.name] as? String
+            self.nonce = data[RichContentKeys.file.nonce] as? String ?? .empty
+            self.duration = data[RichContentKeys.file.duration] as? Float64
+            self.mimeType = data[RichContentKeys.file.mimeType] as? String
+            
+            if let previewData = data[RichContentKeys.file.preview] as? [String: Any] {
+                self.preview = Preview(previewData)
+            }
+            
+            if let resolution = data[RichContentKeys.file.resolution] as? [CGFloat] {
+                self.resolution = .init(
+                    width: resolution.first ?? .zero,
+                    height: resolution.last ?? .zero
+                )
+            } else if let resolution = data[RichContentKeys.file.resolution] as? CGSize {
+                self.resolution = resolution
+            } else {
+                self.resolution = nil
+            }
+        }
+        
+        public func content() -> [String: Any] {
+            var contentDict: [String : Any] =  [
+                RichContentKeys.file.id: id,
+                RichContentKeys.file.size: size,
+                RichContentKeys.file.nonce: nonce
+            ]
+            
+            if let value = `extension`, !value.isEmpty {
+                contentDict[RichContentKeys.file.extension] = value
+            }
+            
+            if let preview = preview {
+                contentDict[RichContentKeys.file.preview] = preview.content()
+            }
+            
+            if let name = name, !name.isEmpty {
+                contentDict[RichContentKeys.file.name] = name
+            }
+            
+            if let resolution = resolution {
+                contentDict[RichContentKeys.file.resolution] = resolution
+            }
+            
+            if let duration = duration {
+                contentDict[RichContentKeys.file.duration] = duration
+            }
+            
+            if let mimeType = mimeType {
+                contentDict[RichContentKeys.file.mimeType] = mimeType
+            }
+            
+            return contentDict
+        }
+    }
+    
+    public struct Storage: Codable, Equatable, Hashable {
+        public var id: String
+        
+        public init(id: String) {
+            self.id = id
+        }
+        
+        public init(_ data: [String: Any]) {
+            self.id = (data[RichContentKeys.file.id] as? String) ?? .empty
+        }
+        
+        public func content() -> [String: Any] {
+            let contentDict: [String : Any] =  [
+                RichContentKeys.file.id: id
+            ]
+            
+            return contentDict
+        }
+    }
+    
+    public var type: String
+    public var additionalType: RichAdditionalType
+    public var files: [File]
+    public var storage: Storage
+    public var comment: String?
+    
+    public enum CodingKeys: String, CodingKey {
+        case files, storage, comment
+    }
+    
+    public init(files: [File], storage: Storage, comment: String?) {
+        self.type = RichContentKeys.file.file
+        self.files = files
+        self.storage = storage
+        self.comment = comment
+        self.additionalType = .file
+    }
+    
+    public func content() -> [String: Any] {
+        var contentDict: [String : Any] = [
+            RichContentKeys.file.files: files.map { $0.content() },
+            RichContentKeys.file.storage: storage.content()
+        ]
+        
+        if let comment = comment, !comment.isEmpty {
+            contentDict[RichContentKeys.file.comment] = comment
+        }
+        return contentDict
+    }
+}
+
+public struct RichFileReply: RichMessage {
+    public var type: String
+    public var additionalType: RichAdditionalType
+    public var replyto_id: String
+    public var reply_message: RichMessageFile
+    
+    public enum CodingKeys: String, CodingKey {
+        case replyto_id, reply_message
+    }
+    
+    public init(replyto_id: String, reply_message: RichMessageFile) {
+        self.type = RichContentKeys.reply.reply
+        self.replyto_id = replyto_id
+        self.reply_message = reply_message
+        self.additionalType = .reply
+    }
+    
+    public func content() -> [String: Any] {
+        return [
+            RichContentKeys.reply.replyToId: replyto_id,
+            RichContentKeys.reply.replyMessage: reply_message.content()
         ]
     }
 }

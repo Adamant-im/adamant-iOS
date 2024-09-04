@@ -29,6 +29,16 @@ extension String.adamant.alert {
     
     static var renameContactInitial: String {
         String.localized("Shared.RenameContactInitial", comment: "Partner screen 'Give contact a name' at first")
+	}
+
+    static var sendTokens: String {
+        String.localized("Shared.SendTokens", comment: "Shared alert 'Send tokens'")
+    }
+    static var uploadFile: String {
+        String.localized("Shared.UploadFile", comment: "Shared alert 'Upload File'")
+    }
+    static var uploadMedia: String {
+        String.localized("Shared.UploadMedia", comment: "Shared alert 'Upload Media'")
     }
 }
 
@@ -52,6 +62,9 @@ enum ShareType {
     case generateQr(encodedContent: String?, sharingTip: String?, withLogo: Bool)
     case saveToPhotolibrary(image: UIImage)
     case partnerQR
+    case sendTokens
+    case uploadMedia
+    case uploadFile
     
     var localized: String {
         switch self {
@@ -66,6 +79,15 @@ enum ShareType {
             
         case .saveToPhotolibrary:
             return String.adamant.alert.saveToPhotolibrary
+        
+        case .sendTokens:
+            return String.adamant.alert.sendTokens
+        
+        case .uploadMedia:
+            return String.adamant.alert.uploadMedia
+            
+        case .uploadFile:
+            return String.adamant.alert.uploadFile
         }
     }
 }
@@ -147,7 +169,7 @@ protocol DialogService: AnyObject {
     // MARK: - Indicators
     func showProgress(withMessage: String?, userInteractionEnable: Bool)
     func dismissProgress()
-    func showSuccess(withMessage: String)
+    func showSuccess(withMessage: String?)
     func showWarning(withMessage: String)
     func showError(withMessage: String, supportEmail: Bool, error: Error?)
     func showRichError(error: RichError)

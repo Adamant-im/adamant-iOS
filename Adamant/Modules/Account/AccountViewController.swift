@@ -62,7 +62,7 @@ final class AccountViewController: FormViewController {
     
     enum Rows {
         case balance, sendTokens // Wallet
-        case security, nodes, coinsNodes, theme, currency, language, about, visibleWallets, contribute // Application
+        case security, nodes, coinsNodes, theme, currency, language, about, visibleWallets, contribute, storage // Application
         case voteForDelegates, generateQr, generatePk, logout // Actions
         case stayIn, biometry, notifications // Security
         
@@ -86,6 +86,7 @@ final class AccountViewController: FormViewController {
             case .contribute: return "contribute"
             case .coinsNodes: return "coinsNodes"
             case .language: return "language"
+            case .storage: return "storage"
             }
         }
         
@@ -109,6 +110,7 @@ final class AccountViewController: FormViewController {
             case .contribute: return .localized("AccountTab.Row.Contribute", comment: "Account tab: 'Contribute' row")
             case .coinsNodes: return .adamant.coinsNodesList.title
             case .language: return .localized("AccountTab.Row.Language", comment: "Account tab: 'Language' row")
+            case .storage: return .localized("StorageUsage.Title", comment: "Storage Usage: Title")
             }
         }
         
@@ -133,6 +135,7 @@ final class AccountViewController: FormViewController {
             case .visibleWallets: image = .asset(named: "row_balance")
             case .contribute: image = .asset(named: "row_contribute")
             case .language: image = .asset(named: "row_language")
+            case .storage: image = .asset(named: "row_storage")
             }
             
             return image?
@@ -478,6 +481,34 @@ final class AccountViewController: FormViewController {
         }
         
         appSection.append(contributeRow)
+        
+        // Storage Usage
+        let storageRow = LabelRow {
+            $0.title = Rows.storage.localized
+            $0.tag = Rows.storage.tag
+            $0.cell.imageView?.image = Rows.storage.image
+            $0.cell.selectionStyle = .gray
+        }.cellUpdate { (cell, row) in
+            cell.accessoryType = .disclosureIndicator
+            row.title = Rows.storage.localized
+        }.onCellSelection { [weak self] (_, _) in
+            guard let self = self else { return }
+            let vc = screensFactory.makeStorageUsage()
+            
+            if let split = splitViewController {
+                let details = UINavigationController(rootViewController: vc)
+                split.showDetailViewController(details, sender: self)
+            } else if let nav = navigationController {
+                nav.pushViewController(vc, animated: true)
+            } else {
+                vc.modalPresentationStyle = .overFullScreen
+                present(vc, animated: true, completion: nil)
+            }
+            
+            deselectWalletViewControllers()
+        }
+        
+        appSection.append(storageRow)
         
         // About
         let aboutRow = LabelRow {

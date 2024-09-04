@@ -92,7 +92,7 @@ extension AdamantDialogService {
         popupManager.dismissAlert()
     }
     
-    func showSuccess(withMessage message: String) {
+    func showSuccess(withMessage message: String?) {
         vibroService.applyVibration(.success)
         popupManager.showSuccessAlert(message: message)
     }
@@ -474,10 +474,10 @@ extension AdamantDialogService {
                 }
                 
                 alert.addAction(action)
-                
-            case .partnerQR:
+            
+            default:
                 let action = UIAlertAction(title: type.localized, style: .default) { [didSelect] _ in
-                    didSelect?(.partnerQR)
+                    didSelect?(type)
                 }
                 
                 alert.addAction(action)

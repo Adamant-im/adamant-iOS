@@ -1,14 +1,13 @@
 //
 //  MacOSDeterminer.swift
-//  Adamant
 //
-//  Created by Stanislav Jelezoglo on 08.07.2022.
-//  Copyright © 2022 Adamant. All rights reserved.
+//
+//  Created by Stanislav Jelezoglo on 14.03.2024.
 //
 
 import Foundation
 
-var isMacOS: Bool = {
+public var isMacOS: Bool = {
     #if targetEnvironment(macCatalyst)
     true
     #else

@@ -19,7 +19,7 @@ final class NodeCell: Cell<NodeCell.Model>, CellType {
     private var model: Model = .default {
         didSet {
             guard model != oldValue else { return }
-            baseRow.baseValue = model
+            baseRow?.baseValue = model
             update()
         }
     }

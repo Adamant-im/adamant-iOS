@@ -724,6 +724,51 @@
 /* NodesEditor: Failed to build URL alert */
 "NodesEditor.FailedToBuildURL" = "Invalid host";
 
+/* Storage: Save Encrypted */
+"Storage.SaveEncrypted.Title" = "Store files encrypted";
+
+/* Storage: Save Encrypted */
+"Storage.SaveEncrypted.Description" = "Store files in the local storage encrypted (May impact performance)";
+
+/* Storage: Auto download preview */
+"Storage.AutoDownloadPreview.Title" = "Preview";
+
+/* Storage: Auto download full media */
+"Storage.AutoDownloadFullMedia.Title" = "Full Media";
+
+/* Storage: Download policy */
+"Storage.DownloadPolicy.Everybody.Title" = "Everybody";
+
+/* Storage: Download policy */
+"Storage.DownloadPolicy.Nobody.Title" = "Nobody";
+
+/* Storage: Download policy */
+"Storage.DownloadPolicy.Contacts.Title" = "My contacts";
+
+/* Storage: Auto download preview */
+"Storage.AutoDownloadPreview.Header" = "Auto-download media";
+
+/* Storage: Auto download preview */
+"Storage.AutoDownloadPreview.Description" = "To create a contact, give ADM address a name";
+
+/* Storage usage: Clear Title */
+"StorageUsage.Clear.Title" = "Clear storage";
+
+/* Storage usage: Clear Popup Title */
+"StorageUsage.Clear.Popup.Title" = "You'll download files and images again. Continue?";
+
+/* Storage usage: Title */
+"StorageUsage.Title" = "Storage and data";
+
+/* Storage used: Title */
+"StorageUsed.Title" = "Storage";
+
+/* Storage usage: Description */
+"StorageUsage.Description" = "Total file and image size in the app's secure storage";
+
+/* Chats: Auto preview download is disabled */
+"Chats.AutoDownloadPreview.Disabled" = "Auto download is disabled";
+
 /* Security: Notification modes description. Markdown supported. */
 "SecurityPage.Row.Notifications.ModesDescription" = "#### Notification modes\n\n#### Disabled\nNo notifications.\n\n#### Background Fetch\nYour device fetchs for new messages by itself. No external calls. Fetch is initiated by iOS, the actual time determined by the operating system based on many factors like battery charge, cellular network, application usage patterns and cannot be predicted. It can be 20 minutes, or 6 hours, or maybe even a day. You still can open app and check for a new message though.\n\n#### Push\nNotifications sent to your device by ADAMANT Notification Service. You will receive notification almost instantly after a message was sent and approved by the Blockchain — a few seconds delay. But this mode requires your device to register it's Device Token in the Service's database. Device tokens are safe and secure, and this option is recommended in most cases.\n\nYou can read more about device registration on ADAMANT's Github page.\n\n";
 
@@ -888,6 +933,15 @@
 
 /* Partner screen 'Rename contact'. */
 "Shared.RenameContact" = "Rename contact";
+
+/* Shared alert 'Send tokens' */
+"Shared.SendTokens" = "💸 Transfer crypto";
+
+/* Shared alert 'Upload file' */
+"Shared.UploadFile" = "📄 Send file";
+
+/* Shared alert 'Upload Media' */
+"Shared.UploadMedia" = "📸 Send media";
 
 /* Shared alert 'Settings' button. Used to go to system Settings app, on application settings page. Should be same as Settings application title. */
 "Shared.Settings" = "Settings";
@@ -1230,3 +1284,32 @@
 
 /* Transaction: Unknown token */
 "Transaction.UnknownTokenTitle" = "Unknown";
+/* FileManager error 'Can't download file' */
+"FileManagerError.CantDownloadFile" = "Can't download file";
+
+/* FileManager error 'Can't upload file' */
+"FileManagerError.CantUploadFile" = "Can't upload file";
+
+/* FileManager error 'Can't encrypt file' */
+"FileManagerError.CantEncryptFile" = "Can't encrypt file";
+
+/* FileManager error 'Can't decrypt file' */
+"FileManagerError.CantDecryptFile" = "Can't decrypt file";
+
+/* File validation error 'Too many files' */
+"FileValidationError.TooManyFiles" = "Too many files. Maximum allowed: %lld";
+
+/* File validation error 'File size exceeds limit' */
+"FileValidationError.FileSizeExceedsLimit" = "Send files up to %lld MB";
+
+/* File validation error 'File not found' */
+"FileValidationError.FileNotFound" = "File not found";
+
+/* File picker error 'Cant select file' */
+"FileValidationError.CantSelectFile" = "Can't select file: %@";
+
+/* Chat drop view title */
+"Chat.Drop.Title" = "Drop files here";
+
+/* Chat unknown */
+"Chat.unknown.title" = "Unknown";
