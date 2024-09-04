@@ -169,6 +169,9 @@
 /* Account tab: 'Buy tokens' button */
 "AccountTab.Row.BuyTokens" = "Token tauschen";
 
+/* Account tab: 'Stake ADM' button */
+"AccountTab.Row.StakeAdm" = "Setzen und verdienen";
+
 /* Account tab: 'Logout' button */
 "AccountTab.Row.Logout" = "Ausloggen";
 
@@ -462,6 +465,9 @@
 
 /* Delegates page: scene title */
 "Delegates.Title" = "Delegierte";
+
+/* Delegates page: header text */
+"Delegates.HeaderText" = "Wenn Sie ADM einsetzen und Belohnungen erhalten möchten, stimmen Sie für einen aktiven Schmiedepool Ihres Vertrauens. Lesen Sie mehr im [ADAMANT Blog](https://news.adamant.im/hodl-list-of-adamant-pools-join-in-and-get-rewards-491a98610f4b).";
 
 /* Visible Wallets page: scene title */
 "VisibleWallets.Title" = "Wallet-Liste";

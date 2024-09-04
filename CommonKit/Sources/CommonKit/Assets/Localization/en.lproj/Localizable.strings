@@ -166,6 +166,9 @@
 /* Account tab: 'Buy tokens' button */
 "AccountTab.Row.BuyTokens" = "Exchange tokens";
 
+/* Account tab: 'Stake ADM' button */
+"AccountTab.Row.StakeAdm" = "Stake and earn";
+
 /* Account tab: 'Logout' button */
 "AccountTab.Row.Logout" = "Logout";
 
@@ -453,6 +456,9 @@
 
 /* Delegates page: scene title */
 "Delegates.Title" = "Delegates";
+
+/* Delegates page: header text */
+"Delegates.HeaderText" = "To stake ADM and get rewards, vote for an active forging pool you trust. Read more in the [ADAMANT blog](https://news.adamant.im/hodl-list-of-adamant-pools-join-in-and-get-rewards-491a98610f4b).";
 
 /* Visible Wallets page: scene title */
 "VisibleWallets.Title" = "Wallet list";

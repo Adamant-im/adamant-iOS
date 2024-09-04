@@ -166,6 +166,9 @@
 /* Account tab: 'Buy tokens' button */
 "AccountTab.Row.BuyTokens" = "交换代币";
 
+/* Account tab: 'Stake ADM' button */
+"AccountTab.Row.StakeAdm" = "赌注和收入";
+
 /* Account tab: 'Logout' button */
 "AccountTab.Row.Logout" = "注销";
 
@@ -453,6 +456,9 @@
 
 /* Delegates page: scene title */
 "Delegates.Title" = "与会代表";
+
+/* Delegates page: header text */
+"Delegates.HeaderText" = "要入股 ADM 并获得奖励，请为您信任的活跃锻造池投票。在 [ADAMANT 博客](https://news.adamant.im/hodl-list-of-adamant-pools-join-in-and-get-rewards-491a98610f4b) 阅读更多内容.";
 
 /* Visible Wallets page: scene title */
 "VisibleWallets.Title" = "钱包列表";

@@ -9,6 +9,8 @@
 import UIKit
 import SnapKit
 import CommonKit
+import MarkdownKit
+import SafariServices
 
 // MARK: - Localization
 extension String.adamant {
@@ -57,8 +59,39 @@ final class DelegatesListViewController: KeyboardObservingViewController {
     
     // MARK: - Properties
     
+    private var headerTextView: UITextView {
+        let textView = UITextView()
+        textView.backgroundColor = .clear
+        textView.isEditable = false
+        textView.delegate = self
+        
+        let attributedString = NSMutableAttributedString(
+            attributedString: MarkdownParser(
+                font: UIFont.preferredFont(forTextStyle: .subheadline),
+                color: .adamant.chatPlaceholderTextColor 
+            ).parse(.localized("Delegates.HeaderText"))
+        )
+        
+        let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.firstLineHeadIndent = 10
+            paragraphStyle.headIndent = 10
+       
+        attributedString.addAttribute(
+            .paragraphStyle,
+            value: paragraphStyle,
+            range: .init(location: .zero, length: attributedString.length)
+        )
+        
+        textView.attributedText = attributedString
+        textView.linkTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor.adamant.active]
+        
+        textView.sizeToFit()
+        
+        return textView
+    }
+    
     private lazy var tableView: UITableView = {
-        let tableView = UITableView()
+        let tableView = UITableView(frame: .zero, style: .grouped)
         tableView.register(AdamantDelegateCell.self, forCellReuseIdentifier: cellIdentifier)
         tableView.rowHeight = 50
         tableView.backgroundColor = .clear
@@ -192,6 +225,13 @@ final class DelegatesListViewController: KeyboardObservingViewController {
         )
     }
     
+    private func openURL(_ url: URL) {
+        let safari = SFSafariViewController(url: url)
+        safari.preferredControlTintColor = UIColor.adamant.primary
+        safari.modalPresentationStyle = .overFullScreen
+        present(safari, animated: true, completion: nil)
+    }
+    
     private func setupViews() {
         view.addSubview(tableView)
         view.addSubview(bottomPanel)
@@ -222,19 +262,11 @@ extension DelegatesListViewController: UITableViewDataSource, UITableViewDelegat
     }
     
     func tableView(_: UITableView, viewForHeaderInSection _: Int) -> UIView? {
-        UIView()
-    }
-    
-    func tableView(_: UITableView, viewForFooterInSection _: Int) -> UIView? {
-        UIView()
+        return self.headerTextView
     }
     
     func tableView(_: UITableView, heightForHeaderInSection _: Int) -> CGFloat {
-        .zero
-    }
-    
-    func tableView(_: UITableView, heightForFooterInSection _: Int) -> CGFloat {
-        .zero
+        return UITableView.automaticDimension
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -449,5 +481,18 @@ private extension DelegatesListViewController {
                 loadingView = nil
             }
         )
+    }
+}
+
+// MARK: - UITextViewDelegate
+extension DelegatesListViewController: UITextViewDelegate {
+    func textView(
+        _ textView: UITextView,
+        shouldInteractWith URL: URL,
+        in characterRange: NSRange,
+        interaction: UITextItemInteraction
+    ) -> Bool {
+        openURL(URL)
+        return false
     }
 }
