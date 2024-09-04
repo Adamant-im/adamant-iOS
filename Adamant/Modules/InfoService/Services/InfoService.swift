@@ -42,7 +42,9 @@ final class InfoService: InfoServiceProtocol {
     func update() {
         Task {
             guard !isUpdating else { return }
+            isUpdating = true
             defer { isUpdating = false }
+            
             guard let newRates = try? await api.loadRates(coins: rateCoins).get() else { return }
             rates = newRates
             sendRatesChangedNotification()
