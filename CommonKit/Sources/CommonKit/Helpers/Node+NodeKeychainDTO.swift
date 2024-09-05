@@ -5,7 +5,7 @@
 //  Created by Andrew G on 28.07.2024.
 //
 
-public extension Node {
+extension Node {
     func mapToDto() -> NodeKeychainDTO {
         .init(
             mainOrigin: mainOrigin,
@@ -21,7 +21,7 @@ public extension Node {
     }
 }
 
-public extension NodeKeychainDTO {
+extension NodeKeychainDTO {
     func mapToModel() -> Node {
         .init(
             id: .init(),

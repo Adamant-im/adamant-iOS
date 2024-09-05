@@ -8,28 +8,28 @@
 import Foundation
 
 // TODO: delete after a few updates. It's used for migration.
-public struct OldNodeKeychainDTO: Codable {
-    public let group: NodeGroup
-    public let node: NodeData
+struct OldNodeKeychainDTO: Codable {
+    let group: NodeGroup
+    let node: NodeData
 }
 
-public extension OldNodeKeychainDTO {
+extension OldNodeKeychainDTO {
     struct NodeData: Codable {
-        public let id: UUID
-        public let scheme: URLScheme
-        public let host: String
-        public let isEnabled: Bool
-        public let wsEnabled: Bool
-        public let port: Int?
-        public let wsPort: Int?
-        public let version: String?
-        public let height: Int?
-        public let ping: TimeInterval?
-        public let connectionStatus: ConnectionStatus?
+        let id: UUID
+        let scheme: URLScheme
+        let host: String
+        let isEnabled: Bool
+        let wsEnabled: Bool
+        let port: Int?
+        let wsPort: Int?
+        let version: String?
+        let height: Int?
+        let ping: TimeInterval?
+        let connectionStatus: ConnectionStatus?
     }
 }
 
-public extension OldNodeKeychainDTO.NodeData {
+extension OldNodeKeychainDTO.NodeData {
     enum RejectedReason: Codable, Equatable {
         case outdatedApiVersion
     }

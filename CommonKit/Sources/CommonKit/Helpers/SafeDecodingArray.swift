@@ -15,7 +15,7 @@ public struct SafeDecodingArray<T: Codable> {
 
 extension SafeDecodingArray: Sequence {
     public typealias Element = T
-    public typealias Iterator = IndexingIterator<Array<Element>>
+    public typealias Iterator = IndexingIterator<[Element]>
     
     public func makeIterator() -> Iterator {
         values.makeIterator()

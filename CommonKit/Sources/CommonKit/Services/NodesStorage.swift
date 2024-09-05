@@ -96,12 +96,9 @@ public final class NodesStorage: NodesStorageProtocol {
         self.securedStore = securedStore
         self.defaultNodes = defaultNodes
         
-        let dto: SafeDecodingDictionary<
-            NodeGroup,
-            SafeDecodingArray<NodeKeychainDTO>
-        >? = securedStore.get(StoreKey.NodesStorage.nodes)
+        let dto: NodesKeychainDTO? = securedStore.get(StoreKey.NodesStorage.nodes)
         
-        let savedNodes = dto?.values.mapValues { $0.map { $0.mapToModel() } }
+        let savedNodes = dto?.data.values.mapValues { $0.map { $0.mapToModel() } }
             ?? migrateOldNodesData(securedStore: securedStore)
             ?? .init()
         
@@ -119,7 +116,7 @@ public final class NodesStorage: NodesStorageProtocol {
 
 private extension NodesStorage {
     func saveNodes(nodes: [NodeGroup: [Node]]) {
-        let nodesDto = nodes.mapValues { $0.map { $0.mapToDto() } }
+        let nodesDto = NodesKeychainDTO(nodes.mapValues { $0.map { $0.mapToDto() } })
         securedStore.set(nodesDto, for: StoreKey.NodesStorage.nodes)
     }
 }
