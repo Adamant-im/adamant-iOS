@@ -300,22 +300,35 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 tableView.deselectRow(at: indexPath, animated: true)
             }
             
-            if let address = self?.service?.core.wallet?.address {
+            if let address = self?.service?.core.wallet?.address,
+               let explorerAddress = self?.service?.core.explorerAddress,
+            let explorerAddressUrl = URL(string: explorerAddress + address) {
                 let types: [ShareType]
                 let withLogo = self?.includeLogoInQR() ?? false
                 
                 if let encodedAddress = self?.encodeForQr(address: address) {
-                    types = [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: withLogo)]
+                    types = [
+                        .copyToPasteboard,
+                        .share,
+                        .generateQr(
+                            encodedContent: encodedAddress,
+                            sharingTip: address,
+                            withLogo: withLogo
+                        ),
+                        .openInExplorer(url: explorerAddressUrl)
+                    ]
                 } else {
                     types = [.copyToPasteboard, .share]
                 }
                 
-                self?.dialogService.presentShareAlertFor(string: address,
-                                                         types: types,
-                                                         excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-                                                         animated: true,
-                                                         from: cell,
-                                                         completion: completion)
+                self?.dialogService.presentShareAlertFor(
+                    string: address,
+                    types: types,
+                    excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+                    animated: true,
+                    from: cell,
+                    completion: completion
+                )
             }
         }
         return addressRow

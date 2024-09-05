@@ -433,6 +433,20 @@ extension AdamantDialogService {
                         )
                     }
                 })
+            case .openInExplorer(let url):
+                let action = UIAlertAction(
+                    title: String.adamant.alert.openInExplorer,
+                    style: .default
+                ) { [weak self] _ in
+                    didSelect?(.openInExplorer(url: url))
+                    
+                    let safari = SFSafariViewController(url: url)
+                    safari.preferredControlTintColor = UIColor.adamant.primary
+                    safari.modalPresentationStyle = .overFullScreen
+                    self?.present(safari, animated: true, completion: completion)
+                }
+                
+                alert.addAction(action)
                 
             case .saveToPhotolibrary(let image):
                 let action = UIAlertAction(title: type.localized, style: .default) { [weak self] _ in

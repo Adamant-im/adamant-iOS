@@ -71,8 +71,8 @@ extension DashWalletService {
         8
     }
     
-    static let explorerAddress = "https://dashblockexplorer.com/tx/"
-    
+    static let explorerTx = "https://dashblockexplorer.com/tx/"
+    static let explorerAddress = "https://dashblockexplorer.com/address/"
     static var nodes: [Node] {
         [
             Node(url: URL(string: "https://dashnode1.adamant.im")!, altUrl: URL(string: "http://45.85.147.224:44099")),

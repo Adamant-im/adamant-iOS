@@ -95,7 +95,11 @@ final class DogeWalletService: WalletCoreProtocol {
     var richMessageType: String {
         return Self.richMessageType
 	}
-
+    
+    var explorerAddress: String {
+        Self.explorerAddress
+    }
+    
     var qqPrefix: String {
         return Self.qqPrefix
     }

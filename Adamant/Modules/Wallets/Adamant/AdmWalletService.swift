@@ -56,6 +56,10 @@ final class AdmWalletService: NSObject, WalletCoreProtocol {
         [.adm]
     }
     
+    var explorerAddress: String {
+        Self.explorerAddress
+    }
+    
 	// MARK: - Dependencies
 	weak var accountService: AccountService?
 	var apiService: ApiService!

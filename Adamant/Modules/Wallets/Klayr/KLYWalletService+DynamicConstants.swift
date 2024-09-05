@@ -71,8 +71,8 @@ extension KlyWalletService {
         8
     }
     
-    static let explorerAddress = "https://explorer.klayr.xyz/transaction/"
-    
+    static let explorerTx = "https://explorer.klayr.xyz/transaction/"
+    static let explorerAddress = "https://explorer.klayr.xyz/account/"
     static var nodes: [Node] {
         [
             Node(url: URL(string: "https://klynode1.adamant.im")!, altUrl: URL(string: "http://195.26.255.137:44099")),

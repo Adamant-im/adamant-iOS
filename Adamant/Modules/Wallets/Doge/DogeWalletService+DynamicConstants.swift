@@ -71,8 +71,8 @@ extension DogeWalletService {
         8
     }
     
-    static let explorerAddress = "https://dogechain.info/tx/"
-    
+    static let explorerTx = "https://dogechain.info/tx/"
+    static let explorerAddress = "https://dogechain.info/address/"
     static var nodes: [Node] {
         [
             Node(url: URL(string: "https://dogenode1.adamant.im")!, altUrl: URL(string: "http://5.9.99.62:44099")),
