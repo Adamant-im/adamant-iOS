@@ -73,38 +73,28 @@ struct InfoServiceMapper: InfoServiceMapperProtocol {
 
 private extension InfoServiceMapper {
     func mapToTickers(_ rawTickers: [String: Decimal]) -> [InfoServiceTicker: Decimal] {
-        // TODO: info service server is so messed up so we have to do this dirty hack
-        
-        var dict = [InfoServiceTicker: (Decimal, maybeMessedUp: Bool)]()
+        var dict = [InfoServiceTicker: Decimal]()
         
         for raw in rawTickers {
-            guard
-                let ticker = mapToTicker(raw.key),
-                dict[ticker.ticker]?.maybeMessedUp ?? true
-            else { continue }
-            
-            dict[ticker.ticker] = (raw.value, maybeMessedUp: ticker.maybeMessedUp)
+            guard let ticker = mapToTicker(raw.key) else { continue }
+            dict[ticker] = raw.value
         }
         
-        return dict.mapValues { $0.0 }
+        return dict
     }
     
-    func mapToTicker(_ string: String) -> (maybeMessedUp: Bool, ticker: InfoServiceTicker)? {
-        // TODO: info service server is so messed up so we have to do this dirty hack
-        
+    func mapToTicker(_ string: String) -> InfoServiceTicker? {
         let list: [String] = string.split(separator: "/").map { .init($0) }
         
         guard
             list.count == 2,
-            let first = list.first,
-            let last = list.last
+            let crypto = list.first,
+            let fiat = list.last
         else { return nil }
         
-        return currencies.contains(last)
-            ? (maybeMessedUp: false, .init(crypto: first, fiat: last))
-            : currencies.contains(first)
-                ? (maybeMessedUp: true, .init(crypto: last, fiat: first))
-                : nil
+        return currencies.contains(fiat)
+            ? .init(crypto: crypto, fiat: fiat)
+            : nil
     }
     
     func mapResponseDTO<Body: Codable>(
