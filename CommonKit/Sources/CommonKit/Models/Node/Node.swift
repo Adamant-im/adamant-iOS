@@ -73,10 +73,6 @@ public extension Node {
         )
     }
     
-    func asString() -> String {
-        preferredOrigin.asString()
-    }
-    
     func asSocketURL() -> URL? {
         preferredOrigin.asSocketURL()
     }

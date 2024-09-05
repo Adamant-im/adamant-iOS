@@ -29,7 +29,7 @@ public final class BlockchainHealthCheckWrapper<
         nodesAdditionalParamsStorage: NodesAdditionalParamsStorageProtocol,
         isActive: Bool,
         params: BlockchainHealthCheckParams,
-        connection: AnyObservable<Bool>?
+        connection: AnyObservable<Bool>
     ) {
         self.nodesStorage = nodesStorage
         self.params = params
@@ -40,13 +40,9 @@ public final class BlockchainHealthCheckWrapper<
             name: params.name,
             normalUpdateInterval: params.normalUpdateInterval,
             crucialUpdateInterval: params.crucialUpdateInterval,
-            connection: connection
+            connection: connection,
+            nodes: nodesStorage.getNodesPublisher(group: params.group)
         )
-        
-        nodesStorage
-            .getNodesPublisher(group: params.group)
-            .sink { [weak self] in self?.nodes = $0 }
-            .store(in: &subscriptions)
         
         nodesAdditionalParamsStorage
             .fastestNodeMode(group: params.group)
@@ -56,13 +52,20 @@ public final class BlockchainHealthCheckWrapper<
     
     public override func healthCheck() {
         super.healthCheck()
+        guard isActive else { return }
         
         Task {
-            updateNodesAvailability()
+            updateNodesAvailability(update: nil)
+            
             await withTaskGroup(of: Void.self, returning: Void.self) { group in
                 nodes.filter { $0.isEnabled }.forEach { node in
                     group.addTask { [weak self] in
-                        await self?.updateNodeStatusInfo(node: node)
+                        guard
+                            let self = self,
+                            let update = await updateNodeStatusInfo(node: node)
+                        else { return }
+                        
+                        updateNodesAvailability(update: update)
                     }
                 }
                 
@@ -73,77 +76,60 @@ public final class BlockchainHealthCheckWrapper<
 }
 
 private extension BlockchainHealthCheckWrapper {
-    func updateNodeStatusInfo(node: Node) async {
-        guard !currentRequests.contains(node.id) else { return }
+    struct NodeUpdate {
+        let id: UUID
+        let info: NodeStatusInfo?
+        let preferMainOrigin: Bool?
+    }
+    
+    func updateNodeStatusInfo(node: Node) async -> NodeUpdate? {
+        guard !currentRequests.contains(node.id) else { return nil }
         currentRequests.insert(node.id)
-        var forceInclude: UUID?
+        defer { currentRequests.remove(node.id) }
         
-        defer {
-            currentRequests.remove(node.id)
-            updateNodesAvailability(forceInclude: forceInclude)
-        }
-        
-        guard node.preferMainOrigin == nil else {
-            switch await updateNodeStatusInfo(
+        guard
+            node.preferMainOrigin == nil,
+            let altOrigin = node.altOrigin
+        else {
+            return .init(
                 id: node.id,
-                origin: node.preferredOrigin,
-                markAsOfflineIfFailed: true
-            ) {
-            case .success:
-                forceInclude = node.id
-            case .failure, .none:
-                break
-            }
-            
-            return
+                info: try? await service.getStatusInfo(origin: node.preferredOrigin).get(),
+                preferMainOrigin: nil
+            )
         }
         
-        switch await updateNodeStatusInfo(
-            id: node.id,
-            origin: node.mainOrigin,
-            markAsOfflineIfFailed: false
-        ) {
-        case .success:
-            nodesStorage.updateNode(id: node.id, group: params.group) { $0.preferMainOrigin = true }
-            forceInclude = node.id
-        case .failure:
-            switch await updateNodeStatusInfo(
-                id: node.id,
-                origin: node.mainOrigin,
-                markAsOfflineIfFailed: true
-            ) {
-            case .success:
-                nodesStorage.updateNode(id: node.id, group: params.group) { $0.preferMainOrigin = false }
-                forceInclude = node.id
-            case .failure, .none:
-                break
-            }
-        case .none:
-            break
-        }
-    }
-    
-    @discardableResult
-    func updateNodeStatusInfo(
-        id: UUID,
-        origin: NodeOrigin,
-        markAsOfflineIfFailed: Bool
-    ) async -> Result<Void, Error>? {
-        switch await service.getStatusInfo(origin: origin) {
+        switch await service.getStatusInfo(origin: node.mainOrigin) {
         case let .success(info):
-            applyStatusInfo(id: id, info: info)
-            return .success(())
-        case let .failure(error):
-            if markAsOfflineIfFailed {
-                updateNode(id: id) { $0.connectionStatus = .offline }
+            return .init(
+                id: node.id,
+                info: info,
+                preferMainOrigin: true
+            )
+        case .failure:
+            switch await service.getStatusInfo(origin: altOrigin) {
+            case let .success(info):
+                return .init(
+                    id: node.id,
+                    info: info,
+                    preferMainOrigin: false
+                )
+            case .failure:
+                return .init(
+                    id: node.id,
+                    info: nil,
+                    preferMainOrigin: nil
+                )
             }
-            
-            return .failure(error)
         }
     }
     
-    func applyStatusInfo(id: UUID, info: NodeStatusInfo) {
-        updateNode(id: id) { node in
+    func applyUpdate(update: NodeUpdate) {
+        updateNode(id: update.id) { node in
+            if let preferMainOrigin = update.preferMainOrigin {
+                node.preferMainOrigin = preferMainOrigin
+            }
+            
+            guard let info = update.info else { return node.connectionStatus = .offline }
             node.wsEnabled = info.wsEnabled
             node.updateWsPort(info.wsPort)
             node.version = info.version
@@ -160,12 +146,16 @@ private extension BlockchainHealthCheckWrapper {
         }
     }
     
-    func updateNodesAvailability(forceInclude: UUID? = nil) {
+    func updateNodesAvailability(update: NodeUpdate?) {
         updateNodesAvailabilityLock.lock()
         defer { updateNodesAvailabilityLock.unlock() }
         
+        if let update = update {
+            applyUpdate(update: update)
+        }
+        
         let workingNodes = nodes.filter {
-            $0.isEnabled && ($0.isWorkingStatus || $0.id == forceInclude)
+            $0.isEnabled && ($0.isWorkingStatus)
         }
         
         let actualHeightsRange = getActualNodeHeightsRange(

@@ -23,7 +23,7 @@ public final class ExtensionsApi {
     // MARK: Transactions
     public func getTransaction(by id: UInt64) -> Transaction? {
         Task.sync { [apiService] in
-            try? await apiService.getTransaction(id: id).get()
+            try? await apiService.getTransaction(id: id, withAsset: true).get()
         }
     }
     

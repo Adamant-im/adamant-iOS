@@ -22,7 +22,7 @@ extension StoreKey {
 }
 
 // MARK: - Currencies
-enum Currency: String {
+enum Currency: String, CaseIterable {
     case RUB = "RUB"
     case USD = "USD"
     case EUR = "EUR"

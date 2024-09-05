@@ -414,13 +414,9 @@ extension NodesListViewController {
     }
     
     private func makeNodeCellModel(node: Node) -> NodeCell.Model {
-        let connectionStatus = node.isEnabled
-            ? node.connectionStatus
-            : .none
-        
-        return .init(
+        .init(
             id: node.id,
-            title: node.asString(),
+            title: node.title,
             indicatorString: node.indicatorString(
                 isRest: chosenFastestNodeId == node.id,
                 isWs: currentSocketsNodeId == node.id

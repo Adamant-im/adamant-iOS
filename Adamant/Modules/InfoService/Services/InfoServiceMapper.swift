@@ -10,6 +10,8 @@ import Foundation
 import CommonKit
 
 struct InfoServiceMapper: InfoServiceMapperProtocol {
+    private let currencies = Set(Currency.allCases.map { $0.rawValue })
+    
     func mapToModel(_ dto: InfoServiceStatusDTO) -> InfoServiceStatus {
         .init(
             lastUpdated: dto.last_updated.map {
@@ -71,21 +73,38 @@ struct InfoServiceMapper: InfoServiceMapperProtocol {
 
 private extension InfoServiceMapper {
     func mapToTickers(_ rawTickers: [String: Decimal]) -> [InfoServiceTicker: Decimal] {
-        .init(uniqueKeysWithValues: rawTickers.compactMap { key, value in
-            mapToTicker(key).map { ($0, value) }
-        })
+        // TODO: info service server is so messed up so we have to do this dirty hack
+        
+        var dict = [InfoServiceTicker: (Decimal, maybeMessedUp: Bool)]()
+        
+        for raw in rawTickers {
+            guard
+                let ticker = mapToTicker(raw.key),
+                dict[ticker.ticker]?.maybeMessedUp ?? true
+            else { continue }
+            
+            dict[ticker.ticker] = (raw.value, maybeMessedUp: ticker.maybeMessedUp)
+        }
+        
+        return dict.mapValues { $0.0 }
     }
     
-    func mapToTicker(_ string: String) -> InfoServiceTicker? {
+    func mapToTicker(_ string: String) -> (maybeMessedUp: Bool, ticker: InfoServiceTicker)? {
+        // TODO: info service server is so messed up so we have to do this dirty hack
+        
         let list: [String] = string.split(separator: "/").map { .init($0) }
         
         guard
             list.count == 2,
-            let crypto = list.first,
-            let fiat = list.last
+            let first = list.first,
+            let last = list.last
         else { return nil }
         
-        return .init(crypto: crypto, fiat: fiat)
+        return currencies.contains(last)
+            ? (maybeMessedUp: false, .init(crypto: first, fiat: last))
+            : currencies.contains(first)
+                ? (maybeMessedUp: true, .init(crypto: last, fiat: first))
+                : nil
     }
     
     func mapResponseDTO<Body: Codable>(

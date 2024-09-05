@@ -10,7 +10,7 @@ import Foundation
 import Combine
 
 public final class NodesStorage: NodesStorageProtocol {
-    @Atomic private var items: ObservableValue<[NodeGroup: [Node]]> = .init(wrappedValue: .init())
+    @Atomic private var items: ObservableValue<[NodeGroup: [Node]]>
     
     public var nodesPublisher: AnyObservable<[NodeGroup: [Node]]> {
         items
@@ -21,7 +21,6 @@ public final class NodesStorage: NodesStorageProtocol {
     
     private var subscription: AnyCancellable?
     private let securedStore: SecuredStore
-    private let nodesMergingService: NodesMergingServiceProtocol
     private let defaultNodes: [NodeGroup: [Node]]
     
     public func getNodesPublisher(group: NodeGroup) -> AnyObservable<[Node]> {
@@ -95,9 +94,26 @@ public final class NodesStorage: NodesStorageProtocol {
         defaultNodes: [NodeGroup: [Node]]
     ) {
         self.securedStore = securedStore
-        self.nodesMergingService = nodesMergingService
         self.defaultNodes = defaultNodes
-        setupNodes()
+        
+        let dto: SafeDecodingDictionary<
+            NodeGroup,
+            SafeDecodingArray<NodeKeychainDTO>
+        >? = securedStore.get(StoreKey.NodesStorage.nodes)
+        
+        let savedNodes = dto?.values.mapValues { $0.map { $0.mapToModel() } }
+            ?? migrateOldNodesData(securedStore: securedStore)
+            ?? .init()
+        
+        _items = .init(.init(wrappedValue: nodesMergingService.merge(
+            savedNodes: savedNodes,
+            defaultNodes: defaultNodes
+        )))
+        
+        subscription = items.removeDuplicates().sink { [weak self] in
+            guard let self = self else { return }
+            saveNodes(nodes: $0)
+        }
     }
 }
 
@@ -106,43 +122,22 @@ private extension NodesStorage {
         let nodesDto = nodes.mapValues { $0.map { $0.mapToDto() } }
         securedStore.set(nodesDto, for: StoreKey.NodesStorage.nodes)
     }
+}
+
+private func migrateOldNodesData(securedStore: SecuredStore) -> [NodeGroup: [Node]]? {
+    let dto: SafeDecodingArray<OldNodeKeychainDTO>? = securedStore.get(StoreKey.NodesStorage.nodes)
+    guard let dto = dto else { return nil }
+    var result: [NodeGroup: [Node]] = [:]
     
-    func setupNodes() {
-        let dto: SafeDecodingDictionary<
-            NodeGroup,
-            SafeDecodingArray<NodeKeychainDTO>
-        >? = securedStore.get(StoreKey.NodesStorage.nodes)
-        
-        let savedNodes = dto?.values.mapValues { $0.map { $0.mapToModel() } }
-            ?? migrateOldNodesData()
-            ?? .init()
-        
-        items.wrappedValue = nodesMergingService.merge(
-            savedNodes: savedNodes,
-            defaultNodes: defaultNodes
-        )
-        
-        subscription = items.removeDuplicates().sink { [weak self] in
-            guard let self = self else { return }
-            saveNodes(nodes: $0)
-        }
-    }
-    
-    func migrateOldNodesData() -> [NodeGroup: [Node]]? {
-        let dto: SafeDecodingArray<OldNodeKeychainDTO>? = securedStore.get(StoreKey.NodesStorage.nodes)
-        guard let dto = dto else { return nil }
-        var result: [NodeGroup: [Node]] = [:]
-        
-        dto.forEach {
-            if result[$0.group] == nil {
-                result[$0.group] = []
-            }
-            
-            result[$0.group]?.append($0.node.mapToModernDto().mapToModel())
+    dto.forEach {
+        if result[$0.group] == nil {
+            result[$0.group] = []
         }
         
-        return result
+        result[$0.group]?.append($0.node.mapToModernDto().mapToModel())
     }
+    
+    return result
 }
 
 private extension Node {
