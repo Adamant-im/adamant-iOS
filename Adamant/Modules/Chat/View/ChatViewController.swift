@@ -187,6 +187,7 @@ final class ChatViewController: MessagesViewController {
         }
         
         super.collectionView(collectionView, willDisplay: cell, forItemAt: indexPath)
+        viewModel.messageWasRead(index: indexPath.section)
     }
     
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {

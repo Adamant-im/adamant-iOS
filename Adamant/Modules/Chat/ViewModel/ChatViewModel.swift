@@ -403,6 +403,15 @@ final class ChatViewModel: NSObject {
         chatsProvider.setChatPositon(for: address, position: offset.map { Double.init($0) })
     }
     
+    func messageWasRead(index: Int) {
+        guard let message = messages[safe: index],
+              message.isUnread,
+              let chatroom = chatroom else {return}
+        Task {
+            await chatsProvider.markMessageAsRead(chatroom: chatroom, id: message.id)
+        }
+    }
+    
     func entireChatWasRead() {
         Task {
             guard

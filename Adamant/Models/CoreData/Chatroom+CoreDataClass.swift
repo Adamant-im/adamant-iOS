@@ -14,6 +14,20 @@ import CoreData
 public class Chatroom: NSManagedObject {
     static let entityName = "Chatroom"
     
+    func markMessageAsRead(id: String) {
+        guard let trs = transactions as? Set<ChatTransaction> else { return }
+
+        var unreadCount = 0
+        trs.forEach { tr in
+            if tr.txId == id {
+                tr.isUnread = false
+            }
+            unreadCount += tr.isUnread ? 1 : 0
+        }
+
+        hasUnreadMessages = unreadCount != 0
+    }
+    
     func markAsReaded() {
         hasUnreadMessages = false
        

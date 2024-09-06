@@ -1956,6 +1956,13 @@ extension AdamantChatsProvider {
         }
     }
     
+    func markMessageAsRead(chatroom: Chatroom, id: String) {
+        chatroom.managedObjectContext?.perform {
+            chatroom.markMessageAsRead(id: id)
+            try? chatroom.managedObjectContext?.save()
+        }
+    }
+    
     func markChatAsRead(chatroom: Chatroom) {
         chatroom.managedObjectContext?.perform {
             chatroom.markAsReaded()

@@ -248,6 +248,7 @@ protocol ChatsProvider: DataProvider, Actor {
     func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult
     func blockChat(with address: String)
     func removeMessage(with id: String)
+    func markMessageAsRead(chatroom: Chatroom, id: String)
     func markChatAsRead(chatroom: Chatroom)
     
     @MainActor func removeChatPositon(for address: String)

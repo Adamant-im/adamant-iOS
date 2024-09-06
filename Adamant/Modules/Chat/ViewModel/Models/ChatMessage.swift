@@ -16,6 +16,7 @@ struct ChatMessage: Identifiable, Equatable {
     let senderModel: ChatSender
     let status: Status
     var content: Content
+    var isUnread: Bool
     let backgroundColor: ChatMessageBackgroundColor
     let bottomString: ComparableAttributedString?
     let dateHeader: ComparableAttributedString?
@@ -27,6 +28,7 @@ struct ChatMessage: Identifiable, Equatable {
         senderModel: .default,
         status: .failed,
         content: .default,
+        isUnread: true,
         backgroundColor: .failed,
         bottomString: nil,
         dateHeader: nil,

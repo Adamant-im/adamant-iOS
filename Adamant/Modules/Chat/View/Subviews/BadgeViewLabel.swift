@@ -22,6 +22,16 @@ final class BadgeViewLabel: UILabel {
         configure()
     }
     
+    override func drawText(in rect: CGRect) {
+        super.drawText(in: rect.inset(by: textInsets))
+    }
+    
+    override var intrinsicContentSize: CGSize {
+        let size = super.intrinsicContentSize
+        return CGSize(width: size.width + textInsets.left + textInsets.right,
+                      height: size.height + textInsets.top + textInsets.bottom)
+    }
+    
     @MainActor
     func updateCounter(count: Int) {
         isHidden = count == 0
@@ -45,5 +55,6 @@ private extension BadgeViewLabel {
     }
 }
 
+private let textInsets = UIEdgeInsets(top: 2, left: 2, bottom: 2, right: 2)
 private let cornerRadius: CGFloat = 8
 private let fontSize: CGFloat = 12
