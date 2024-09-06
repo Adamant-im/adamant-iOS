@@ -255,8 +255,7 @@ extension AdamantAccountsProvider {
                     account.isDummy = true
                     let coreAccount = createAndSaveCoreDataAccount(
                         from: account,
-                        dummy: dummy,
-                        in: stack.container.viewContext
+                        dummy: dummy
                     )
                     
                     return coreAccount
@@ -264,8 +263,7 @@ extension AdamantAccountsProvider {
                 
                 let coreAccount = createAndSaveCoreDataAccount(
                     from: account,
-                    dummy: dummy,
-                    in: stack.container.viewContext
+                    dummy: dummy
                 )
                 
                 return coreAccount
@@ -386,15 +384,17 @@ extension AdamantAccountsProvider {
     
     private func createAndSaveCoreDataAccount(
         from account: AdamantAccount,
-        dummy: DummyAccount?,
-        in context: NSManagedObjectContext
+        dummy: DummyAccount?
     ) -> CoreDataAccount {
         let result = getAccount(byPredicate: NSPredicate(format: "address == %@", account.address))
         if case .core(let account) = result {
             return account
         }
         
-        let coreAccount = createCoreDataAccount(from: account, context: context)
+        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        privateContext.parent = stack.container.viewContext
+        
+        let coreAccount = createCoreDataAccount(from: account, context: privateContext)
         
         coreAccount.isDummy = account.isDummy
         
@@ -410,10 +410,10 @@ extension AdamantAccountsProvider {
                     chatroom.updateLastTransaction()
                 }
             }
-            context.delete(dummy)
+            privateContext.delete(dummy)
         }
         
-        try? context.save()
+        try? privateContext.save()
         return coreAccount
     }
     
