@@ -102,7 +102,7 @@ private extension NotificationSoundsView {
                             Spacer()
                             if viewModel.selectedSound == sound {
                                 Image(systemName: "checkmark")
-                                    .foregroundColor(.black)
+                                    .foregroundColor(Color(uiColor: .adamant.textColor))
                                     .frame(width: 30, height: 30)
                             }
                         }

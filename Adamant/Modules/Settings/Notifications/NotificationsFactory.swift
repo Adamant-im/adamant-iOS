@@ -10,15 +10,17 @@ import Swinject
 import SwiftUI
 
 struct NotificationsFactory {
-    private let assembler: Assembler
+    private let parent: Assembler
+    private let assemblies = [NotificationsAssembly()]
     
     init(parent: Assembler) {
-        assembler = .init([NotificationsAssembly()], parent: parent)
+        self.parent = parent
     }
     
     @MainActor
     func makeViewController(screensFactory: ScreensFactory) -> UIViewController {
-        let viewModel = assembler.resolve(NotificationsViewModel.self)!
+        let assembler = Assembler(assemblies, parent: parent)
+        let viewModel = { assembler.resolver.resolve(NotificationsViewModel.self)! }
         
         let view = NotificationsView(
             viewModel: viewModel,
@@ -38,6 +40,6 @@ private struct NotificationsAssembly: Assembly {
                 dialogService: r.resolve(DialogService.self)!,
                 notificationsService: r.resolve(NotificationsService.self)!
             )
-        }.inObjectScope(.weak)
+        }.inObjectScope(.transient)
     }
 }

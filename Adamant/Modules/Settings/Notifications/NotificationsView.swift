@@ -10,9 +10,17 @@ import SwiftUI
 import CommonKit
 
 struct NotificationsView: View {
-    @ObservedObject var viewModel: NotificationsViewModel
+    @StateObject var viewModel: NotificationsViewModel
     var screensFactory: ScreensFactory
-
+    
+    init(
+        viewModel: @escaping () -> NotificationsViewModel,
+        screensFactory: ScreensFactory
+    ) {
+        _viewModel = .init(wrappedValue: viewModel())
+        self.screensFactory = screensFactory
+    }
+    
     var body: some View {
         GeometryReader { geometry in
             Form {
@@ -23,6 +31,8 @@ struct NotificationsView: View {
                 settingsSection()
                 moreDetailsSection()
             }
+            .withoutListBackground()
+            .background(Color(.adamant.secondBackgroundColor))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
