@@ -48,7 +48,7 @@ final class AdmTransactionDetailsViewController: TransactionDetailsViewControlle
         transfersProvider: TransfersProvider,
         screensFactory: ScreensFactory,
         dialogService: DialogService,
-        currencyInfo: CurrencyInfoService,
+        currencyInfo: InfoServiceProtocol,
         addressBookService: AddressBookService,
         languageService: LanguageStorageProtocol
     ) {

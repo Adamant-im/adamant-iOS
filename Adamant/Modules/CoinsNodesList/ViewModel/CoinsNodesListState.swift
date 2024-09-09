@@ -32,6 +32,7 @@ extension CoinsNodesListState {
 extension CoinsNodesListState.Section {
     struct Row: Equatable, Identifiable {
         let id: UUID
+        let group: NodeGroup
         let isEnabled: Bool
         let title: String
         let connectionStatus: AttributedString

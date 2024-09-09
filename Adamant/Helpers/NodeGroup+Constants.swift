@@ -8,7 +8,7 @@
 import Foundation
 import CommonKit
 
-public extension NodeGroup {
+extension NodeGroup {
     var onScreenUpdateInterval: TimeInterval {
         switch self {
         case .adm:
@@ -27,6 +27,8 @@ public extension NodeGroup {
             return DashWalletService.healthCheckParameters.onScreenUpdateInterval
         case .ipfs:
             return IPFSApiService.healthCheckParameters.onScreenUpdateInterval
+        case .infoService:
+            return InfoService.healthCheckParameters.onScreenUpdateInterval
         }
     }
 
@@ -48,6 +50,8 @@ public extension NodeGroup {
             return DashWalletService.healthCheckParameters.crucialUpdateInterval
         case .ipfs:
             return IPFSApiService.healthCheckParameters.crucialUpdateInterval
+        case .infoService:
+            return InfoService.healthCheckParameters.crucialUpdateInterval
         }
     }
 
@@ -69,6 +73,8 @@ public extension NodeGroup {
             return DashWalletService.healthCheckParameters.threshold
         case .ipfs:
             return IPFSApiService.healthCheckParameters.threshold
+        case .infoService:
+            return InfoService.healthCheckParameters.threshold
         }
     }
 
@@ -90,34 +96,78 @@ public extension NodeGroup {
             return DashWalletService.healthCheckParameters.normalUpdateInterval
         case .ipfs:
             return IPFSApiService.healthCheckParameters.normalUpdateInterval
+        case .infoService:
+            return InfoService.healthCheckParameters.normalUpdateInterval
         }
     }
     
-    var minNodeVersion: Double {
-        var minNodeVersion: String?
+    // swiftlint:disable switch_case_alignment
+    var minNodeVersion: Version? {
+        let version: String?
         switch self {
         case .adm:
-            minNodeVersion = AdmWalletService.minNodeVersion
+            version = AdmWalletService.minNodeVersion
         case .btc:
-            minNodeVersion = BtcWalletService.minNodeVersion
+            version = BtcWalletService.minNodeVersion
         case .eth:
-            minNodeVersion = EthWalletService.minNodeVersion
+            version = EthWalletService.minNodeVersion
         case .klyNode:
-            minNodeVersion = KlyWalletService.minNodeVersion
+            version = KlyWalletService.minNodeVersion
         case .klyService:
-            minNodeVersion = KlyWalletService.minNodeVersion
+            version = KlyWalletService.minNodeVersion
         case .doge:
-            minNodeVersion = DogeWalletService.minNodeVersion
+            version = DogeWalletService.minNodeVersion
         case .dash:
-            minNodeVersion = DashWalletService.minNodeVersion
+            version = DashWalletService.minNodeVersion
+        case .ipfs, .infoService:
+            version = nil
+        }
+        guard let version = version  else { return nil }
+        
+        return .init(version)
+    }
+    
+    var name: String {
+        switch self {
+        case .btc:
+            return BtcWalletService.tokenNetworkSymbol
+        case .eth:
+            return EthWalletService.tokenNetworkSymbol
+        case .klyNode:
+            return KlyWalletService.tokenNetworkSymbol
+        case .klyService:
+            return KlyWalletService.tokenNetworkSymbol
+            + " " + .adamant.coinsNodesList.serviceNode
+        case .doge:
+            return DogeWalletService.tokenNetworkSymbol
+        case .dash:
+            return DashWalletService.tokenNetworkSymbol
+        case .adm:
+            return AdmWalletService.tokenNetworkSymbol
         case .ipfs:
-            minNodeVersion = nil
+            return IPFSApiService.symbol
+        case .infoService:
+            return InfoService.symbol
         }
-        
-        guard let versionNumber = Node.stringToDouble(minNodeVersion) else {
-            return .zero
+    }
+    
+    var useDateHeight: Bool {
+        switch self {
+        case .btc, .eth, .klyNode, .klyService, .doge, .dash, .adm, .ipfs:
+            false
+        case .infoService:
+            true
         }
-        
-        return versionNumber
+    }
+    
+    var blockchainHealthCheckParams: BlockchainHealthCheckParams {
+        .init(
+            group: self,
+            name: name,
+            normalUpdateInterval: normalUpdateInterval,
+            crucialUpdateInterval: crucialUpdateInterval,
+            minNodeVersion: minNodeVersion,
+            nodeHeightEpsilon: nodeHeightEpsilon
+        )
     }
 }

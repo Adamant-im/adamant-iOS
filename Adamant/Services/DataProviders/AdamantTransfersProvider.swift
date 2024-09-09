@@ -16,7 +16,7 @@ actor AdamantTransfersProvider: TransfersProvider {
     static let transferFee: Decimal = Decimal(sign: .plus, exponent: -1, significand: 5)
     
     // MARK: Dependencies
-    let apiService: ApiService
+    let apiService: AdamantApiServiceProtocol
     private let stack: CoreDataStack
     private let adamantCore: AdamantCore
     private let accountService: AccountService
@@ -61,7 +61,7 @@ actor AdamantTransfersProvider: TransfersProvider {
     
     // MARK: Lifecycle
     init(
-        apiService: ApiService,
+        apiService: AdamantApiServiceProtocol,
         stack: CoreDataStack,
         adamantCore: AdamantCore,
         accountService: AccountService,

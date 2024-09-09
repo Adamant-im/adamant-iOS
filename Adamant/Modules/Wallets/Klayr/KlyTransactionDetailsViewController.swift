@@ -28,6 +28,9 @@ final class KlyTransactionDetailsViewController: TransactionDetailsViewControlle
         return control
     }()
     
+    override var showTxBlockchainComment: Bool {
+        true
+    }
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -76,6 +79,7 @@ final class KlyTransactionDetailsViewController: TransactionDetailsViewControlle
                 trs.updateConfirmations(value: lastHeight)
                 transaction = trs
                 updateIncosinstentRowIfNeeded()
+                updateTxDataRow()
                 tableView.reloadData()
                 refreshControl.endRefreshing()
             } catch {

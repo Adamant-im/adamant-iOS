@@ -35,6 +35,19 @@ enum NotificationSound: String {
     case proud
     case relax
     case success
+    case note
+    case antic
+    case cheers
+    case chord
+    case droplet
+    case handoff
+    case milestone
+    case passage
+    case portal
+    case rattle
+    case rebound
+    case slide
+    case welcome
     
     var tag: String {
         switch self {
@@ -44,6 +57,19 @@ enum NotificationSound: String {
         case .proud: return "pr"
         case .relax: return "rl"
         case .success: return "sh"
+        case .note: return "note"
+        case .antic: return "antic"
+        case .cheers: return "chrs"
+        case .chord: return "chord"
+        case .droplet: return "droplet"
+        case .handoff: return "hnoff"
+        case .milestone: return "mlst"
+        case .passage: return "psg"
+        case .portal: return "portal"
+        case .rattle: return "rattle"
+        case .rebound: return "rbnd"
+        case .slide: return "slide"
+        case .welcome: return "welcome"
         }
     }
     
@@ -55,6 +81,19 @@ enum NotificationSound: String {
         case .proud: return "so-proud-notification.mp3"
         case .relax: return "relax-message-tone.mp3"
         case .success: return "short-success.mp3"
+        case .note: return "note.mp3"
+        case .antic: return "antic.mp3"
+        case .cheers: return "cheers.mp3"
+        case .chord: return "chord.mp3"
+        case .droplet: return "droplet.mp3"
+        case .handoff: return "handoff.mp3"
+        case .milestone: return "milestone.mp3"
+        case .passage: return "passage.mp3"
+        case .portal: return "portal.mp3"
+        case .rattle: return "rattle.mp3"
+        case .rebound: return "rebound.mp3"
+        case .slide: return "slide.mp3"
+        case .welcome: return "welcome.mp3"
         }
     }
     
@@ -66,6 +105,19 @@ enum NotificationSound: String {
         case .proud: return "Proud"
         case .relax: return "Relax"
         case .success: return "Success"
+        case .note: return "Note"
+        case .antic: return "Antic"
+        case .cheers: return "Cheers"
+        case .chord: return "Chord"
+        case .droplet: return "Droplet"
+        case .handoff: return "Handoff"
+        case .milestone: return "Milestone"
+        case .passage: return "Passage"
+        case .portal: return "Portal"
+        case .rattle: return "Rattle"
+        case .rebound: return "Rebound"
+        case .slide: return "Slide"
+        case .welcome: return "Welcome"
         }
     }
     
@@ -76,6 +128,19 @@ enum NotificationSound: String {
         case "so-proud-notification.mp3": self = .proud
         case "relax-message-tone.mp3": self = .relax
         case "short-success.mp3": self = .success
+        case "note.mp3": self = .note
+        case "antic.mp3": self = .antic
+        case "cheers.mp3": self = .cheers
+        case "chord.mp3": self = .chord
+        case "droplet.mp3": self = .droplet
+        case "handoff.mp3": self = .handoff
+        case "milestone.mp3": self = .milestone
+        case "passage.mp3": self = .passage
+        case "portal.mp3": self = .portal
+        case "rattle.mp3": self = .rattle
+        case "rebound.mp3": self = .rebound
+        case "slide.mp3": self = .slide
+        case "welcome.mp3": self = .welcome
         case "": self = .none
         default: self = .inputDefault
         }
@@ -176,8 +241,19 @@ extension NotificationsServiceError: RichError {
 protocol NotificationsService: AnyObject {
     var notificationsMode: NotificationsMode { get }
     var notificationsSound: NotificationSound { get }
+    var notificationsReactionSound: NotificationSound { get }
+    var inAppSound: Bool { get }
+    var inAppVibrate: Bool { get }
+    var inAppToasts: Bool { get }
     
-    func setNotificationSound(_ sound: NotificationSound)
+    func setInAppSound(_ value: Bool)
+    func setInAppVibrate(_ value: Bool)
+    func setInAppToasts(_ value: Bool)
+    
+    func setNotificationSound(
+        _ sound: NotificationSound,
+        for target: NotificationTarget
+    )
     func setNotificationsMode(_ mode: NotificationsMode, completion: ((NotificationsServiceResult) -> Void)?)
     
     func showNotification(title: String, body: String, type: AdamantNotificationType)

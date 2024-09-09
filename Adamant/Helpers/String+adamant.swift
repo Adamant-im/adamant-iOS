@@ -41,6 +41,7 @@ extension String {
         let address: String?
         var name: String?
         var message: String?
+        var amount: Double?
         
         let newUrl = self.replacingOccurrences(of: "//", with: "")
         
@@ -57,6 +58,8 @@ extension String {
                             name = label
                         case .message(let urlMessage):
                             message = urlMessage
+                        case .amount(let value):
+                            amount = value
                         }
                     }
                 }
@@ -71,6 +74,8 @@ extension String {
                             name = label
                         case .message(let urlMessage):
                             message = urlMessage
+                        case .amount(let value):
+                            amount = value
                         }
                     }
                 }
@@ -88,10 +93,15 @@ extension String {
         }
         
         if let address = address {
-            return AdamantAddress(address: address, name: name, amount: nil, message: message)
-        } else {
-            return nil
-        }
+            return AdamantAddress(
+                address: address,
+                name: name, 
+                amount: amount,
+                message: message
+            )
+        } 
+        
+        return nil
     }
     
     func addPrefixIfNeeded(prefix: String) -> String {

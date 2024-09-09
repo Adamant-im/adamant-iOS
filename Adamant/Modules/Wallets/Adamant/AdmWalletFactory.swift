@@ -8,6 +8,7 @@
 
 import Swinject
 import UIKit
+import CommonKit
 
 struct AdmWalletFactory: WalletFactory {
     typealias Service = WalletService
@@ -18,7 +19,7 @@ struct AdmWalletFactory: WalletFactory {
     func makeWalletVC(service: Service, screensFactory: ScreensFactory) -> WalletViewController {
         AdmWalletViewController(
             dialogService: assembler.resolve(DialogService.self)!,
-            currencyInfoService: assembler.resolve(CurrencyInfoService.self)!,
+            currencyInfoService: assembler.resolve(InfoServiceProtocol.self)!,
             accountService: assembler.resolve(AccountService.self)!,
             screensFactory: screensFactory,
             walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!,
@@ -47,12 +48,12 @@ struct AdmWalletFactory: WalletFactory {
             accountsProvider: assembler.resolve(AccountsProvider.self)!,
             dialogService: assembler.resolve(DialogService.self)!,
             screensFactory: screensFactory,
-            currencyInfoService: assembler.resolve(CurrencyInfoService.self)!,
+            currencyInfoService: assembler.resolve(InfoServiceProtocol.self)!,
             increaseFeeService: assembler.resolve(IncreaseFeeService.self)!,
             vibroService: assembler.resolve(VibroService.self)!,
             walletService: service,
             reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
-            nodesStorage: assembler.resolve(NodesStorageProtocol.self)!
+            apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!
         )
     }
     
@@ -90,7 +91,7 @@ private extension AdmWalletFactory {
             transfersProvider: assembler.resolve(TransfersProvider.self)!,
             screensFactory: screensFactory,
             dialogService: assembler.resolve(DialogService.self)!,
-            currencyInfo: assembler.resolve(CurrencyInfoService.self)!,
+            currencyInfo: assembler.resolve(InfoServiceProtocol.self)!,
             addressBookService: assembler.resolve(AddressBookService.self)!,
             languageService: assembler.resolve(LanguageStorageProtocol.self)!
         )

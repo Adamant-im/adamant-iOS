@@ -118,7 +118,7 @@ final class BtcWalletService: WalletCoreProtocol {
     static let richMessageType = "btc_transaction"
     
     // MARK: - Dependencies
-    var apiService: ApiService!
+    var apiService: AdamantApiServiceProtocol!
     var btcApiService: BtcApiService!
     var accountService: AccountService!
     var dialogService: DialogService!
@@ -173,6 +173,10 @@ final class BtcWalletService: WalletCoreProtocol {
     
     var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
         $hasMoreOldTransactions.eraseToAnyPublisher()
+    }
+    
+    var hasActiveNode: Bool {
+        apiService.hasActiveNode
     }
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
@@ -429,7 +433,11 @@ extension BtcWalletService {
         
         let privateKeyData = passphrase.data(using: .utf8)!.sha256()
         let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
-        let eWallet = try BtcWallet(privateKey: privateKey, addressConverter: addressConverter)
+        let eWallet = try BtcWallet(
+            unicId: tokenUnicID,
+            privateKey: privateKey,
+            addressConverter: addressConverter
+        )
         self.btcWallet = eWallet
         
         NotificationCenter.default.post(
@@ -493,7 +501,7 @@ extension BtcWalletService: SwinjectDependentService {
     @MainActor
     func injectDependencies(from container: Container) {
         accountService = container.resolve(AccountService.self)
-        apiService = container.resolve(ApiService.self)
+        apiService = container.resolve(AdamantApiServiceProtocol.self)
         dialogService = container.resolve(DialogService.self)
         increaseFeeService = container.resolve(IncreaseFeeService.self)
         addressConverter = container.resolve(AddressConverterFactory.self)?.make(network: network)
@@ -516,16 +524,16 @@ extension BtcWalletService {
     }
     
     func getBalance(address: String) async throws -> Decimal {
-        let response: BtcBalanceResponse = try await btcApiService.request { api, node in
-            await api.sendRequestJsonResponse(node: node, path: BtcApiCommands.balance(for: address))
+        let response: BtcBalanceResponse = try await btcApiService.request { api, origin in
+            await api.sendRequestJsonResponse(origin: origin, path: BtcApiCommands.balance(for: address))
         }.get()
 
         return response.value / BtcWalletService.multiplier
     }
 
     func getFeeRate() async throws -> Decimal {
-        let response: [String: Decimal] = try await btcApiService.request { api, node in
-            await api.sendRequestJsonResponse(node: node, path: BtcApiCommands.getFeeRate())
+        let response: [String: Decimal] = try await btcApiService.request { api, origin in
+            await api.sendRequestJsonResponse(origin: origin, path: BtcApiCommands.getFeeRate())
         }.get()
         
         return response["2"] ?? 1
@@ -663,9 +671,9 @@ extension BtcWalletService {
         for address: String,
         fromTx: String? = nil
     ) async throws -> [RawBtcTransactionResponse] {
-        return try await btcApiService.request { api, node in
+        return try await btcApiService.request { api, origin in
             await api.sendRequestJsonResponse(
-                node: node,
+                origin: origin,
                 path: BtcApiCommands.getTransactions(
                     for: address,
                     fromTx: fromTx
@@ -679,9 +687,9 @@ extension BtcWalletService {
             throw WalletServiceError.notLogged
         }
         
-        let rawTransaction: RawBtcTransactionResponse = try await btcApiService.request { api, node in
+        let rawTransaction: RawBtcTransactionResponse = try await btcApiService.request { api, origin in
             await api.sendRequestJsonResponse(
-                node: node,
+                origin: origin,
                 path: BtcApiCommands.getTransaction(by: hash)
             )
         }.get()

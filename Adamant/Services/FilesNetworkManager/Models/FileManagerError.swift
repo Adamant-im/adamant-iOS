@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CommonKit
 
 enum NetworkFileProtocolType: String {
     case ipfs

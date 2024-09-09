@@ -13,6 +13,7 @@ import Combine
 import Swinject
 import FilesStorageKit
 import FilesPickerKit
+import CommonKit
 
 @MainActor
 struct ChatFactory {
@@ -32,7 +33,7 @@ struct ChatFactory {
     let filesStorage: FilesStorageProtocol
     let chatFileService: ChatFileProtocol
     let filesStorageProprieties: FilesStorageProprietiesProtocol
-    let nodesStorage: NodesStorageProtocol
+    let apiServiceCompose: ApiServiceComposeProtocol
     let reachabilityMonitor: ReachabilityMonitor
     let filesPickerKit: FilesPickerProtocol
    
@@ -52,7 +53,7 @@ struct ChatFactory {
         filesStorage = assembler.resolve(FilesStorageProtocol.self)!
         chatFileService = assembler.resolve(ChatFileProtocol.self)!
         filesStorageProprieties = assembler.resolve(FilesStorageProprietiesProtocol.self)!
-        nodesStorage = assembler.resolve(NodesStorageProtocol.self)!
+        apiServiceCompose = assembler.resolve(ApiServiceComposeProtocol.self)!
         reachabilityMonitor = assembler.resolve(ReachabilityMonitor.self)!
         filesPickerKit = assembler.resolve(FilesPickerProtocol.self)!
     }
@@ -131,8 +132,8 @@ private extension ChatFactory {
             filesStorage: filesStorage,
             chatFileService: chatFileService,
             filesStorageProprieties: filesStorageProprieties,
-            nodesStorage: nodesStorage,
-            reachabilityMonitor: reachabilityMonitor, 
+            apiServiceCompose: apiServiceCompose,
+            reachabilityMonitor: reachabilityMonitor,
             filesPicker: filesPickerKit
         )
     }

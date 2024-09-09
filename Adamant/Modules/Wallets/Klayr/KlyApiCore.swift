@@ -11,33 +11,33 @@ import Foundation
 import LiskKit
 
 class KlyApiCore: BlockchainHealthCheckableService {
-    func makeClient(node: CommonKit.Node) -> APIClient {
+    func makeClient(origin: NodeOrigin) -> APIClient {
         .init(options: .init(
-            nodes: [.init(origin: node.asString())],
+            nodes: [.init(origin: origin.asString())],
             nethash: .mainnet,
             randomNode: false
         ))
     }
     
     func request<Output>(
-        node: CommonKit.Node,
+        origin: NodeOrigin,
         body: @escaping @Sendable (
             _ client: APIClient,
             _ completion: @escaping @Sendable (LiskKit.Result<Output>) -> Void
         ) -> Void
     ) async -> WalletServiceResult<Output> {
         await withCheckedContinuation { continuation in
-            body(makeClient(node: node)) { result in
+            body(makeClient(origin: origin)) { result in
                 continuation.resume(returning: result.asWalletServiceResult())
             }
         }
     }
     
     func request<Output>(
-        node: CommonKit.Node,
+        origin: NodeOrigin,
         _ body: @Sendable @escaping (APIClient) async throws -> Output
     ) async -> WalletServiceResult<Output> {
-        let client = makeClient(node: node)
+        let client = makeClient(origin: origin)
         
         do {
             return .success(try await body(client))
@@ -46,10 +46,10 @@ class KlyApiCore: BlockchainHealthCheckableService {
         }
     }
     
-    func getStatusInfo(node: CommonKit.Node) async -> WalletServiceResult<NodeStatusInfo> {
+    func getStatusInfo(origin: NodeOrigin) async -> WalletServiceResult<NodeStatusInfo> {
         let startTimestamp = Date.now.timeIntervalSince1970
         
-        return await request(node: node) { client in
+        return await request(origin: origin) { client in
             try await LiskKit.Node(client: client).info()
         }.map { model in
                 .init(
@@ -57,7 +57,7 @@ class KlyApiCore: BlockchainHealthCheckableService {
                     height: model.height ?? .zero,
                     wsEnabled: false,
                     wsPort: nil,
-                    version: model.version
+                    version: .init(model.version)
                 )
         }
     }

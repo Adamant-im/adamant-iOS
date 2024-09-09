@@ -73,7 +73,7 @@ final class DelegateDetailsViewController: UIViewController {
     }
     
     // MARK: - Dependencies
-    var apiService: ApiService!
+    var apiService: AdamantApiServiceProtocol!
     var accountService: AccountService!
     var dialogService: DialogService!
     

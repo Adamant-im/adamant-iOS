@@ -57,6 +57,8 @@ extension Transactions {
         
         public var executionStatus: ExecutionStatus
 
+        public var txData: String?
+        
         // MARK: - Hashable
 
         public static func == (lhs: TransactionModel, rhs: TransactionModel) -> Bool {

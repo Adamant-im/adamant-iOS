@@ -18,13 +18,19 @@ import CommonKit
 
 struct EthWalletStorage {
     let keystore: BIP32Keystore
-
+    let unicId: String
+    
     func getWallet() -> EthWallet? {
         guard let ethAddress = keystore.addresses?.first else {
             return nil
         }
         
-        return EthWallet(address: ethAddress.address, ethAddress: ethAddress, keystore: keystore)
+        return EthWallet(
+            unicId: unicId,
+            address: ethAddress.address,
+            ethAddress: ethAddress,
+            keystore: keystore
+        )
     }
 }
 
@@ -123,7 +129,7 @@ final class EthWalletService: WalletCoreProtocol {
     
     // MARK: - Dependencies
     weak var accountService: AccountService?
-    var apiService: ApiService!
+    var apiService: AdamantApiServiceProtocol!
     var ethApiService: EthApiService!
     var dialogService: DialogService!
     var increaseFeeService: IncreaseFeeService!
@@ -155,6 +161,10 @@ final class EthWalletService: WalletCoreProtocol {
     
     var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
         $hasMoreOldTransactions.eraseToAnyPublisher()
+    }
+    
+    var hasActiveNode: Bool {
+        apiService.hasActiveNode
     }
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
@@ -387,7 +397,7 @@ extension EthWalletService {
                 throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: nil)
             }
             
-            walletStorage = .init(keystore: store)
+            walletStorage = .init(keystore: store, unicId: tokenUnicID)
             await ethApiService.setKeystoreManager(.init([store]))
         } catch {
             throw WalletServiceError.internalError(message: "ETH Wallet: failed to create Keystore", error: error)
@@ -499,7 +509,7 @@ extension EthWalletService: SwinjectDependentService {
     @MainActor
     func injectDependencies(from container: Container) {
         accountService = container.resolve(AccountService.self)
-        apiService = container.resolve(ApiService.self)
+        apiService = container.resolve(AdamantApiServiceProtocol.self)
         dialogService = container.resolve(DialogService.self)
         increaseFeeService = container.resolve(IncreaseFeeService.self)
         ethApiService = container.resolve(EthApiService.self)
@@ -701,9 +711,9 @@ extension EthWalletService {
             "contract_to": "eq."
         ]
         
-        let transactionsFrom: [EthTransactionShort] = try await ethApiService.requestApiCore { core, node in
+        let transactionsFrom: [EthTransactionShort] = try await ethApiService.requestApiCore { core, origin in
             await core.sendRequestJsonResponse(
-                node: node,
+                origin: origin,
                 path: EthWalletService.transactionsListApiSubpath,
                 method: .get,
                 parameters: txFromQueryParameters,
@@ -711,9 +721,9 @@ extension EthWalletService {
             )
         }.get()
         
-        let transactionsTo: [EthTransactionShort] = try await ethApiService.requestApiCore { core, node in
+        let transactionsTo: [EthTransactionShort] = try await ethApiService.requestApiCore { core, origin in
             await core.sendRequestJsonResponse(
-                node: node,
+                origin: origin,
                 path: EthWalletService.transactionsListApiSubpath,
                 method: .get,
                 parameters: txToQueryParameters,

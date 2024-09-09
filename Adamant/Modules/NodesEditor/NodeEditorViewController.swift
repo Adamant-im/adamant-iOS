@@ -93,7 +93,7 @@ final class NodeEditorViewController: FormViewController {
     
     // MARK: - Dependencies
     var dialogService: DialogService!
-    var apiService: ApiService!
+    var apiService: AdamantApiServiceProtocol!
     var nodesStorage: NodesStorageProtocol!
     
     // MARK: - Properties
@@ -114,7 +114,7 @@ final class NodeEditorViewController: FormViewController {
         super.viewDidLoad()
         
         if let node = node {
-            self.navigationItem.title = node.host
+            self.navigationItem.title = node.mainOrigin.host
         } else {
             self.navigationItem.title = String.adamant.nodesEditor.newNodeTitle
         }
@@ -131,7 +131,7 @@ final class NodeEditorViewController: FormViewController {
             $0.tag = Rows.host.tag
             $0.placeholder = Rows.host.placeholder
             
-            $0.value = node?.host
+            $0.value = node?.mainOrigin.host
         }
             
         // Port
@@ -140,18 +140,18 @@ final class NodeEditorViewController: FormViewController {
             $0.tag = Rows.port.tag
             
             if let node = node {
-                $0.value = node.port
-                $0.placeholder = String(node.scheme.defaultPort)
+                $0.value = node.mainOrigin.port
+                $0.placeholder = String(node.mainOrigin.scheme.defaultPort)
             } else {
-                $0.placeholder = String(Node.URLScheme.default.defaultPort)
+                $0.placeholder = String(NodeOrigin.URLScheme.default.defaultPort)
             }
         }
         
         // Scheme
-        <<< PickerInlineRow<Node.URLScheme> {
+        <<< PickerInlineRow<NodeOrigin.URLScheme> {
             $0.title = Rows.scheme.localized
             $0.tag = Rows.scheme.tag
-            $0.value = node?.scheme ?? Node.URLScheme.default
+            $0.value = node?.mainOrigin.scheme ?? NodeOrigin.URLScheme.default
             $0.options = [.https, .http]
             $0.baseCell.detailTextLabel?.textColor = .adamant.textColor
         }.onExpandInlineRow { (cell, _, inlineRow) in
@@ -161,7 +161,7 @@ final class NodeEditorViewController: FormViewController {
                 if let scheme = row.value {
                     portRow.placeholder = String(scheme.defaultPort)
                 } else {
-                    portRow.placeholder = String(Node.URLScheme.default.defaultPort)
+                    portRow.placeholder = String(NodeOrigin.URLScheme.default.defaultPort)
                 }
                 
                 portRow.updateCell()
@@ -223,11 +223,11 @@ extension NodeEditorViewController {
         }
         
         let host = rawUrl.trimmingCharacters(in: .whitespaces)
-        let scheme: Node.URLScheme
+        let scheme: NodeOrigin.URLScheme
         
         if
             let row = form.rowBy(tag: Rows.scheme.tag),
-            let value = row.baseValue as? Node.URLScheme
+            let value = row.baseValue as? NodeOrigin.URLScheme
         {
             scheme = value
         } else {
@@ -243,21 +243,30 @@ extension NodeEditorViewController {
         
         let result: NodeEditorResult
         if let node = node {
-            nodesStorage.updateNodeParams(
-                id: node.id,
-                scheme: scheme,
-                host: host,
-                port: port
-            )
+            nodesStorage.updateNode(id: node.id, group: .adm) { node in
+                node.mainOrigin.scheme = scheme
+                node.mainOrigin.host = host
+                node.mainOrigin.port = port
+            }
             
             result = .nodeUpdated
         } else {
-            result = .new(node: Node(
-                scheme: scheme,
-                host: host,
+            result = .new(node: .init(
+                id: .init(),
                 isEnabled: true,
                 wsEnabled: false,
-                port: port
+                mainOrigin: .init(
+                    scheme: scheme,
+                    host: host,
+                    port: port
+                ),
+                altOrigin: nil,
+                version: nil,
+                height: nil,
+                ping: nil,
+                connectionStatus: nil,
+                preferMainOrigin: nil,
+                type: .custom
             ))
         }
         

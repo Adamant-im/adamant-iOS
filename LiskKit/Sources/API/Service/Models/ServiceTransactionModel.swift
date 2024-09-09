@@ -84,6 +84,7 @@ public struct ServiceTransactionModel: APIModel {
     public struct Params: APIModel {
         public let amount: String
         public let recipientAddress: String
+        public let data: String?
     }
 
     public let id: String

@@ -20,18 +20,18 @@ final class IPFSApiCore {
         self.apiCore = apiCore
     }
     
-    func getNodeStatus(node: Node) async -> ApiServiceResult<IPFSNodeStatus> {
+    func getNodeStatus(origin: NodeOrigin) async -> ApiServiceResult<IPFSNodeStatus> {
         await apiCore.sendRequestJsonResponse(
-            node: node,
+            origin: origin,
             path: IPFSApiCommands.status
         )
     }
 }
 
 extension IPFSApiCore: BlockchainHealthCheckableService {
-    func getStatusInfo(node: Node) async -> ApiServiceResult<NodeStatusInfo> {
+    func getStatusInfo(origin: NodeOrigin) async -> ApiServiceResult<NodeStatusInfo> {
         let startTimestamp = Date.now.timeIntervalSince1970
-        let statusResponse = await getNodeStatus(node: node)
+        let statusResponse = await getNodeStatus(origin: origin)
         let ping = Date.now.timeIntervalSince1970 - startTimestamp
         
         return statusResponse.map { _ in

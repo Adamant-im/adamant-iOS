@@ -7,8 +7,9 @@
 //
 
 import Foundation
+import CommonKit
 
-protocol FileApiServiceProtocol: WalletApiService {
+protocol FileApiServiceProtocol: ApiServiceProtocol {
     func uploadFile(
         data: Data,
         uploadProgress: @escaping ((Progress) -> Void)

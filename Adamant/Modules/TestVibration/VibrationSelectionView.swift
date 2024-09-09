@@ -12,8 +12,8 @@ import CommonKit
 struct VibrationSelectionView: View {
     @StateObject var viewModel: VibrationSelectionViewModel
     
-    init(viewModel: VibrationSelectionViewModel) {
-        _viewModel = .init(wrappedValue: viewModel)
+    init(viewModel: @escaping () -> VibrationSelectionViewModel) {
+        _viewModel = .init(wrappedValue: viewModel())
     }
     
     var body: some View {

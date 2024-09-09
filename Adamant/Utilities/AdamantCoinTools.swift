@@ -38,18 +38,27 @@ final class AdamantCoinTools {
         let url = URLComponents(string: uri)
         
         guard !uri.isEmpty,
-              let url = url,
-              let raw = url.string
+              let url = url
         else {
             return nil
         }
         
-        guard let prefix = uri.split(separator: ":").first,
-              prefix.caseInsensitiveCompare(qqPrefix) == .orderedSame
+        let array = uri.split(separator: ":")
+        
+        guard array.count > 1,
+              let prefix = array.first 
         else {
-            return QQAddressInformation(address: raw, params: nil)
+            return parseAdress(url: url)
         }
         
+        guard prefix.caseInsensitiveCompare(qqPrefix) == .orderedSame else {
+            return nil
+        }
+        
+        return parseAdress(url: url)
+    }
+    
+    private class func parseAdress(url: URLComponents) -> QQAddressInformation {
         let addressRaw = url.path
         
         let params = url.queryItems?.compactMap {

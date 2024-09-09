@@ -10,6 +10,7 @@ import Foundation
 import BitcoinKit
 
 final class BtcWallet: WalletAccount {
+    var unicId: String
     let addressEntity: Address
     let privateKey: PrivateKey
     let publicKey: PublicKey
@@ -21,7 +22,12 @@ final class BtcWallet: WalletAccount {
     
     var address: String { addressEntity.stringValue }
     
-    init(privateKey: PrivateKey, addressConverter: AddressConverter) throws {
+    init(
+        unicId: String,
+        privateKey: PrivateKey,
+        addressConverter: AddressConverter
+    ) throws {
+        self.unicId = unicId
         self.privateKey = privateKey
         self.publicKey = privateKey.publicKey()
         self.addressEntity = try addressConverter.convert(publicKey: publicKey, type: .p2pkh)
