@@ -555,6 +555,7 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
                 let chat = UINavigationController(rootViewController:vc)
                 split.showDetailViewController(chat, sender: self)
             } else if let nav = navigationController {
+                navigationItem.backButtonDisplayMode = .minimal
                 nav.pushViewController(vc, animated: true)
             } else {
                 vc.modalPresentationStyle = .overFullScreen

@@ -46,6 +46,7 @@ final class ChatViewController: MessagesViewController {
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
     private lazy var scrollDownButton = makeScrollDownButton()
+    private var unreadChatsCounter: BadgeViewLabel?
     private lazy var chatMessagesCollectionView = makeChatMessagesCollectionView()
     private lazy var replyView = ReplyView()
     private lazy var filesToolbarView = FilesToolbarView()
@@ -144,6 +145,9 @@ final class ChatViewController: MessagesViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         defer { viewAppeared = true }
+        
+        unreadChatsCounter?.isHidden = false
+        
         inputBar.isUserInteractionEnabled = true
         chatMessagesCollectionView.fixedBottomOffset = nil
         
@@ -157,12 +161,16 @@ final class ChatViewController: MessagesViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        unreadChatsCounter?.isHidden = true
         inputBar.isUserInteractionEnabled = false
         inputBar.inputTextView.resignFirstResponder()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
+        
+        unreadChatsCounter?.isHidden = true
+        
         viewModel.preserveFiles()
         viewModel.preserveMessage(inputBar.text)
         viewModel.preserveReplayMessage()
@@ -493,6 +501,18 @@ private extension ChatViewController {
         
         navigationItem.titleView?.addGestureRecognizer(tapGesture)
         navigationItem.titleView?.addGestureRecognizer(longPressGesture)
+        
+        guard let navBar = navigationController?.navigationBar,
+              self.splitViewController == nil else {
+            return
+        }
+        unreadChatsCounter = BadgeViewLabel()
+        updateUnreadChatsCounter()
+        navBar.addSubview(unreadChatsCounter!)
+        NSLayoutConstraint.activate([
+            unreadChatsCounter!.leadingAnchor.constraint(equalTo: navBar.leadingAnchor, constant: 23),
+            unreadChatsCounter!.centerYAnchor.constraint(equalTo: navBar.centerYAnchor)
+        ])
     }
     
     func configureHeaderRightButton() {
@@ -675,6 +695,10 @@ private extension ChatViewController {
     func updateScrollDownButtonCounter() {
         let count = viewModel.chatroom?.getUnreadCount() ?? 0
         scrollDownButton.updateCounter(count: count)
+    }
+    
+    func updateUnreadChatsCounter() {
+        
     }
 }
 

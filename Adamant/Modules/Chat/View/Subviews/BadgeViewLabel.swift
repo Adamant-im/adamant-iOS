@@ -52,9 +52,14 @@ private extension BadgeViewLabel {
         textColor = .white
         text = .empty
         translatesAutoresizingMaskIntoConstraints = false
+        self.snp.makeConstraints { make in
+            make.height.equalTo(size)
+            make.width.greaterThanOrEqualTo(size)
+        }
     }
 }
 
+private let size: CGFloat = 16
 private let textInsets = UIEdgeInsets(top: 2, left: 2, bottom: 2, right: 2)
 private let cornerRadius: CGFloat = 8
 private let fontSize: CGFloat = 12
