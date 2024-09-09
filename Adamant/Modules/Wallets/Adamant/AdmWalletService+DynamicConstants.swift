@@ -15,8 +15,8 @@ extension AdmWalletService {
         onScreenUpdateInterval: 10,
         threshold: 10,
         normalServiceUpdateInterval: 300,
-        crucialServiceUpdateInterval: 300,
-        onScreenServiceUpdateInterval: 300
+        crucialServiceUpdateInterval: 30,
+        onScreenServiceUpdateInterval: 10
     )
         
     static var newPendingInterval: Int {
@@ -88,6 +88,7 @@ Node.makeDefaultNode(url: URL(string: "https://dschubba.adm.im")!),
     static var serviceNodes: [Node] {
         [
             Node.makeDefaultNode(url: URL(string: "https://info.adamant.im")!),
+Node.makeDefaultNode(url: URL(string: "https://info2.adm.im")!),
         ]
     }
 }
