@@ -507,12 +507,12 @@ private extension ChatViewController {
             return
         }
         unreadChatsCounter = BadgeViewLabel()
-        updateUnreadChatsCounter()
         navBar.addSubview(unreadChatsCounter!)
-        NSLayoutConstraint.activate([
-            unreadChatsCounter!.leadingAnchor.constraint(equalTo: navBar.leadingAnchor, constant: 23),
-            unreadChatsCounter!.centerYAnchor.constraint(equalTo: navBar.centerYAnchor)
-        ])
+        unreadChatsCounter?.snp.makeConstraints { make in
+            make.leading.equalTo(navBar.snp.leading).offset(unreadChatsCounterLeadingOffset)
+            make.centerY.equalTo(navBar.snp.centerY)
+        }
+        updateUnreadChatsCounter()
     }
     
     func configureHeaderRightButton() {
@@ -1064,3 +1064,4 @@ private var replyAction: Bool = false
 private var canReplyVibrate: Bool = true
 private var oldContentOffset: CGPoint?
 private let filesToolbarViewHeight: CGFloat = 140
+private let unreadChatsCounterLeadingOffset: CGFloat = 23

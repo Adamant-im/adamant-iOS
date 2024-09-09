@@ -42,6 +42,7 @@ final class BadgeViewLabel: UILabel {
 
 private extension BadgeViewLabel {
     func configure() {
+        isHidden = true
         layer.cornerRadius = cornerRadius
         layer.masksToBounds = true
         backgroundColor = .systemRed
