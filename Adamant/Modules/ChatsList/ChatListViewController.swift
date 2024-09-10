@@ -1223,7 +1223,7 @@ extension ChatListViewController {
             )
             
             let rename = self.makeRenameAction(for: address, completion: closeAction)
-            let cancel = self.makeCancelAction()
+            let cancel = self.makeCancelAction(completion: closeAction)
             
             self.dialogService.showAlert(
                 title: nil,
@@ -1320,8 +1320,13 @@ extension ChatListViewController {
         return alert
     }
     
-    private func makeCancelAction() -> UIAlertAction {
-        .init(title: .adamant.alert.cancel, style: .cancel, handler: nil)
+    private func makeCancelAction(completion: (() -> Void)? = nil) -> UIAlertAction {
+        .init(
+            title: .adamant.alert.cancel,
+            style: .cancel
+        ) { _ in
+            completion?()
+        }
     }
 }
 
