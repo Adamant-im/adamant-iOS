@@ -47,6 +47,7 @@ final class ChatViewModel: NSObject {
     
     private var tasksStorage = TaskManager()
     private var controller: NSFetchedResultsController<ChatTransaction>?
+    private var unreadChatsController: NSFetchedResultsController<Chatroom>?
     private var subscriptions = Set<AnyCancellable>()
     private var timerSubscription: AnyCancellable?
     private var messageIdToShow: String?
@@ -109,6 +110,7 @@ final class ChatViewModel: NSObject {
     @ObservableValue var replyMessage: MessageModel?
     @ObservableValue var scrollToMessage: (toId: String?, fromId: String?)
     @ObservableValue var filesPicked: [FileResult]?
+    @ObservableValue private(set) var unreadChatsCount: Int = 0
     
     var startPosition: ChatStartPosition? {
         if let messageIdToShow = messageIdToShow {
@@ -200,8 +202,14 @@ final class ChatViewModel: NSObject {
         assert(self.chatroom == nil, "Can't setup several times")
         self.chatroom = chatroom
         self.messageIdToShow = messageIdToShow
+        
         controller = chatsProvider.getChatController(for: chatroom)
         controller?.delegate = self
+        
+        unreadChatsController = chatsProvider.getUnreadChatsController(currentChatRoom: chatroom)
+        unreadChatsController?.delegate = self
+        updateUnreadChatsCount()
+        
         isSendingAvailable = !chatroom.isReadonly
         updatePartnerInformation()
         updateAttachmentButtonAvailability()
@@ -1026,8 +1034,16 @@ extension ChatViewModel {
 }
 
 extension ChatViewModel: NSFetchedResultsControllerDelegate {
-    func controllerDidChangeContent(_: NSFetchedResultsController<NSFetchRequestResult>) {
-        updateTransactions(performFetch: false)
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        switch controller {
+        case let c where c == self.controller:
+            updateTransactions(performFetch: false)
+        case let c where c == self.unreadChatsController:
+            updateUnreadChatsCount()
+            
+        default:
+            break
+        }
     }
 }
 
@@ -1173,6 +1189,11 @@ private extension ChatViewModel {
                 ? { [commitVibro] in commitVibro.send() }
                 : {}
         )
+    }
+    
+    func updateUnreadChatsCount() {
+        try? unreadChatsController?.performFetch()
+        unreadChatsCount = unreadChatsController?.fetchedObjects?.count ?? .zero
     }
     
     func updateMessages(

@@ -46,7 +46,7 @@ final class ChatViewController: MessagesViewController {
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
     private lazy var scrollDownButton = makeScrollDownButton()
-    private var unreadChatsCounter: BadgeViewLabel?
+    private var unreadChatsCounter = BadgeViewLabel()
     private lazy var chatMessagesCollectionView = makeChatMessagesCollectionView()
     private lazy var replyView = ReplyView()
     private lazy var filesToolbarView = FilesToolbarView()
@@ -146,7 +146,7 @@ final class ChatViewController: MessagesViewController {
         super.viewDidAppear(animated)
         defer { viewAppeared = true }
         
-        unreadChatsCounter?.isHidden = false
+        unreadChatsCounter.updateCounter(count: viewModel.unreadChatsCount)
         
         inputBar.isUserInteractionEnabled = true
         chatMessagesCollectionView.fixedBottomOffset = nil
@@ -161,7 +161,7 @@ final class ChatViewController: MessagesViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        unreadChatsCounter?.isHidden = true
+        unreadChatsCounter.isHidden = true
         inputBar.isUserInteractionEnabled = false
         inputBar.inputTextView.resignFirstResponder()
     }
@@ -169,7 +169,7 @@ final class ChatViewController: MessagesViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         
-        unreadChatsCounter?.isHidden = true
+        unreadChatsCounter.isHidden = true
         
         viewModel.preserveFiles()
         viewModel.preserveMessage(inputBar.text)
@@ -453,6 +453,12 @@ private extension ChatViewController {
                 self?.didTapSelectText(text: text)
             }
             .store(in: &subscriptions)
+        
+        viewModel.$unreadChatsCount
+            .sink { [weak self] count in
+                self?.unreadChatsCounter.updateCounter(count: count)
+            }
+            .store(in: &subscriptions)
     }
 }
 
@@ -507,12 +513,12 @@ private extension ChatViewController {
             return
         }
         unreadChatsCounter = BadgeViewLabel()
-        navBar.addSubview(unreadChatsCounter!)
-        unreadChatsCounter?.snp.makeConstraints { make in
+        navBar.addSubview(unreadChatsCounter)
+        unreadChatsCounter.snp.makeConstraints { make in
             make.leading.equalTo(navBar.snp.leading).offset(unreadChatsCounterLeadingOffset)
             make.centerY.equalTo(navBar.snp.centerY)
         }
-        updateUnreadChatsCounter()
+        unreadChatsCounter.updateCounter(count: viewModel.unreadChatsCount)
     }
     
     func configureHeaderRightButton() {
@@ -695,10 +701,6 @@ private extension ChatViewController {
     func updateScrollDownButtonCounter() {
         let count = viewModel.chatroom?.getUnreadCount() ?? 0
         scrollDownButton.updateCounter(count: count)
-    }
-    
-    func updateUnreadChatsCounter() {
-        
     }
 }
 
