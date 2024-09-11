@@ -1033,7 +1033,8 @@ extension ChatViewModel {
     
     func checkTopMessage(indexPath: IndexPath) {
         guard let message = messages[safe: indexPath.section],
-              let date = message.dateHeader?.string.string
+              let date = message.dateHeader?.string.string,
+              message.sentDate != .adamantNullDate
         else { return }
         dateHeader = date
         dateHeaderHidden = false
