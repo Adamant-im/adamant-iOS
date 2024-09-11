@@ -18,8 +18,6 @@ final class NotificationsViewModel: ObservableObject {
     @Published var notificationsMode: NotificationsMode = .disabled
     @Published var notificationSound: NotificationSound = .inputDefault
     @Published var notificationReactionSound: NotificationSound = .none
-    @Published var githubRowImage: UIImage = .asset(named: "row_github") ?? UIImage()
-    @Published var notificationsTitle: String = .localized("SecurityPage.Row.Notifications")
     @Published var presentSoundsPicker: Bool = false
     @Published var presentReactionSoundsPicker: Bool = false
     @Published var openSafariURL: Bool = false
@@ -27,7 +25,9 @@ final class NotificationsViewModel: ObservableObject {
     @Published var inAppVibrate: Bool = true
     @Published var inAppToasts: Bool = true
     
-    var safariURL = URL(string: "https://github.com/Adamant-im")!
+    let notificationsTitle: String = .localized("SecurityPage.Row.Notifications")
+    let safariURL = URL(string: "https://github.com/Adamant-im")!
+    let githubRowImage: UIImage = .asset(named: "row_github") ?? UIImage()
     
     private let dialogService: DialogService
     let notificationsService: NotificationsService
@@ -41,15 +41,6 @@ final class NotificationsViewModel: ObservableObject {
             await addObservers()
             await configure()
         }
-    }
-    
-    func configure() {
-        notificationsMode = notificationsService.notificationsMode
-        notificationSound = notificationsService.notificationsSound
-        notificationReactionSound = notificationsService.notificationsReactionSound
-        inAppSounds = notificationsService.inAppSound
-        inAppVibrate = notificationsService.inAppVibrate
-        inAppToasts = notificationsService.inAppToasts
     }
     
     func presentNotificationSoundsPicker() {
@@ -106,26 +97,6 @@ final class NotificationsViewModel: ObservableObject {
         )
     }
     
-    private func presentNotificationsDeniedError() {
-        dialogService.showAlert(
-            title: nil,
-            message: NotificationStrings.notificationsDisabled,
-            style: .alert,
-            actions: [
-                makeAction(
-                    title: .adamant.alert.settings,
-                    action: { _ in
-                        self.openAppSettings()
-                    }),
-                makeAction(
-                    title: String.adamant.alert.cancel,
-                    action: nil
-                )
-            ],
-            from: nil
-        )
-    }
-    
     func setNotificationMode(_ mode: NotificationsMode) {
         guard mode != notificationsService.notificationsMode else {
             return
@@ -174,6 +145,15 @@ private extension NotificationsViewModel {
             .sink { [weak self] _ in self?.configure() }
             .store(in: &subscriptions)
     }
+    
+    func configure() {
+        notificationsMode = notificationsService.notificationsMode
+        notificationSound = notificationsService.notificationsSound
+        notificationReactionSound = notificationsService.notificationsReactionSound
+        inAppSounds = notificationsService.inAppSound
+        inAppVibrate = notificationsService.inAppVibrate
+        inAppToasts = notificationsService.inAppToasts
+    }
 }
 
 private extension NotificationsViewModel {
@@ -190,6 +170,26 @@ private extension NotificationsViewModel {
             title: .adamant.alert.cancel,
             style: .cancel,
             handler: nil
+        )
+    }
+    
+    func presentNotificationsDeniedError() {
+        dialogService.showAlert(
+            title: nil,
+            message: NotificationStrings.notificationsDisabled,
+            style: .alert,
+            actions: [
+                makeAction(
+                    title: .adamant.alert.settings,
+                    action: { _ in
+                        self.openAppSettings()
+                    }),
+                makeAction(
+                    title: String.adamant.alert.cancel,
+                    action: nil
+                )
+            ],
+            from: nil
         )
     }
 }

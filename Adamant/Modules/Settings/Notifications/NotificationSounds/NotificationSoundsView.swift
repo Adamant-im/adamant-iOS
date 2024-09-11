@@ -10,7 +10,7 @@ import SwiftUI
 import CommonKit
 
 struct NotificationSoundsView: View {
-    @ObservedObject var viewModel: NotificationSoundsViewModel
+    @StateObject var viewModel: NotificationSoundsViewModel
     
     @Environment(\.dismiss) var dismiss
     

@@ -11,7 +11,7 @@ import CommonKit
 
 struct NotificationsView: View {
     @StateObject var viewModel: NotificationsViewModel
-    var screensFactory: ScreensFactory
+    let screensFactory: ScreensFactory
     
     init(
         viewModel: @escaping () -> NotificationsViewModel,

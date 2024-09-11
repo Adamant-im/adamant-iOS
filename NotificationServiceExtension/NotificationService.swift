@@ -321,19 +321,15 @@ class NotificationService: UNNotificationServiceExtension {
     }
     
     private func getSound(securedStore: KeychainStore, isReaction: Bool) -> UNNotificationSound? {
-        guard isReaction else {
-            let sound: String = securedStore.get(StoreKey.notificationsService.notificationsSound) ?? .empty
-            
-            return !sound.isEmpty
-            ? UNNotificationSound(named: UNNotificationSoundName(sound))
-            : nil
-        }
-    
-        let sound: String = securedStore.get(StoreKey.notificationsService.notificationsReactionSound) ?? .empty
+        let key = isReaction 
+        ? StoreKey.notificationsService.notificationsReactionSound
+        : StoreKey.notificationsService.notificationsSound
         
-        return !sound.isEmpty
-        ? UNNotificationSound(named: UNNotificationSoundName(sound))
-        : nil
+        let sound: String = securedStore.get(key) ?? .empty
+        
+        return sound.isEmpty 
+        ? nil
+        : UNNotificationSound(named: UNNotificationSoundName(sound))
     }
     
     private func handleAdamantTransfer(
