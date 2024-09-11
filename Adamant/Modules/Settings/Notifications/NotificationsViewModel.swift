@@ -51,7 +51,6 @@ final class NotificationsViewModel: ObservableObject {
         Task {
             await addObservers()
             await configure()
-            await setupSwitchHandlers()
         }
     }
     
