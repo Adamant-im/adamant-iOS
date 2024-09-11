@@ -95,8 +95,8 @@ extension EthWalletService {
     
     static var nodes: [Node] {
         [
-            Node(url: URL(string: "https://ethnode2.adamant.im")!, altUrl: URL(string: "http://95.216.114.252:44099")),
-Node(url: URL(string: "https://ethnode3.adamant.im")!, altUrl: URL(string: "http://46.4.37.157:44099")),
+            Node.makeDefaultNode(url: URL(string: "https://ethnode2.adamant.im")!, altUrl: URL(string: "http://95.216.114.252:44099")),
+Node.makeDefaultNode(url: URL(string: "https://ethnode3.adamant.im")!, altUrl: URL(string: "http://46.4.37.157:44099")),
         ]
     }
     

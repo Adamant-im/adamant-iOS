@@ -39,8 +39,8 @@ struct ContributeView: View {
         }
     }
     
-    init(viewModel: ContributeViewModel) {
-        _viewModel = .init(wrappedValue: viewModel)
+    init(viewModel: @escaping () -> ContributeViewModel) {
+        _viewModel = .init(wrappedValue: viewModel())
     }
 }
 

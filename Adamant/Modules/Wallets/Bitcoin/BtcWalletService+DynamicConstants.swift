@@ -75,8 +75,8 @@ extension BtcWalletService {
     
     static var nodes: [Node] {
         [
-            Node(url: URL(string: "https://btcnode1.adamant.im")!, altUrl: URL(string: "http://176.9.38.204:44099")),
-Node(url: URL(string: "https://btcnode3.adamant.im")!, altUrl: URL(string: "http://195.201.242.108:44099")),
+            Node.makeDefaultNode(url: URL(string: "https://btcnode1.adamant.im")!, altUrl: URL(string: "http://176.9.38.204:44099")),
+Node.makeDefaultNode(url: URL(string: "https://btcnode3.adamant.im")!, altUrl: URL(string: "http://195.201.242.108:44099")),
         ]
     }
     

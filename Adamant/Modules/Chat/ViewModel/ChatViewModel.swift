@@ -37,7 +37,7 @@ final class ChatViewModel: NSObject {
     private let filesStorage: FilesStorageProtocol
     private let chatFileService: ChatFileProtocol
     private let filesStorageProprieties: FilesStorageProprietiesProtocol
-    private let nodesStorage: NodesStorageProtocol
+    private let apiServiceCompose: ApiServiceComposeProtocol
     private let reachabilityMonitor: ReachabilityMonitor
     private let filesPicker: FilesPickerProtocol
     
@@ -70,7 +70,9 @@ final class ChatViewModel: NSObject {
     private let partnerImageSize: CGFloat = 25
     private let maxMessageLenght: Int = 10000
     private var previousArg: ChatContextMenuArguments?
+    private var lastDateHeaderUpdate: Date = Date()
     private var havePartnerName: Bool = false
+    private var dateTimer: Timer?
     
     let minIndexForStartLoadNewMessages = 4
     let minOffsetForStartLoadNewMessages: CGFloat = 100
@@ -104,6 +106,8 @@ final class ChatViewModel: NSObject {
     @ObservableValue private(set) var partnerName: String?
     @ObservableValue private(set) var partnerImage: UIImage?
     @ObservableValue private(set) var isNeedToAnimateScroll = false
+    @ObservableValue private(set) var dateHeader: String?
+    @ObservableValue private(set) var dateHeaderHidden: Bool = true
     @ObservableValue var swipeState: SwipeableView.State = .ended
     @ObservableValue var inputText = ""
     @ObservableValue var replyMessage: MessageModel?
@@ -162,7 +166,7 @@ final class ChatViewModel: NSObject {
         filesStorage: FilesStorageProtocol,
         chatFileService: ChatFileProtocol,
         filesStorageProprieties: FilesStorageProprietiesProtocol,
-        nodesStorage: NodesStorageProtocol,
+        apiServiceCompose: ApiServiceComposeProtocol,
         reachabilityMonitor: ReachabilityMonitor,
         filesPicker: FilesPickerProtocol
     ) {
@@ -184,7 +188,7 @@ final class ChatViewModel: NSObject {
         self.filesStorage = filesStorage
         self.chatFileService = chatFileService
         self.filesStorageProprieties = filesStorageProprieties
-        self.nodesStorage = nodesStorage
+        self.apiServiceCompose = apiServiceCompose
         self.reachabilityMonitor = reachabilityMonitor
         self.filesPicker = filesPicker
         
@@ -288,9 +292,9 @@ final class ChatViewModel: NSObject {
             return
         }
         
-        guard nodesStorage.haveActiveNode(in: .adm) else {
+        guard apiServiceCompose.hasActiveNode(group: .adm) else {
             dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
-                coin: NodeGroup.adm.name
+                nodeGroupName: NodeGroup.adm.name
             ).localizedDescription))
             return
         }
@@ -703,9 +707,9 @@ final class ChatViewModel: NSObject {
             return false
         }
         
-        guard nodesStorage.haveActiveNode(in: .adm) else {
+        guard apiServiceCompose.hasActiveNode(group: .adm) else {
             dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
-                coin: NodeGroup.adm.name
+                nodeGroupName: NodeGroup.adm.name
             ).localizedDescription))
             return false
         }
@@ -713,6 +717,17 @@ final class ChatViewModel: NSObject {
         return true
     }
     
+    /// If the user opens the app from the background
+    /// update messages to refresh the header dates.
+    func refreshDateHeadersIfNeeded() {
+        guard !Calendar.current.isDate(Date(), inSameDayAs: lastDateHeaderUpdate) else {
+            return
+        }
+        
+        lastDateHeaderUpdate = Date()
+        updateMessages(resetLoadingProperty: false)
+    }
+
     func openFile(messageId: String, file: ChatFile) {
         let tx = chatTransactions.first(where: { $0.txId == messageId })
         let message = messages.first(where: { $0.messageId == messageId })
@@ -1014,6 +1029,17 @@ extension ChatViewModel {
             processFileResult(.failure(error))
         }
     }
+    
+    func checkTopMessage(indexPath: IndexPath) {
+        guard let message = messages[safe: indexPath.section],
+              let date = message.dateHeader?.string.string
+        else { return }
+        dateHeader = date
+        dateHeaderHidden = false
+    }
+    func didEndScroll() {
+        startHideDateTimer()
+    }
 }
 
 extension ChatViewModel: NSFetchedResultsControllerDelegate {
@@ -1023,10 +1049,17 @@ extension ChatViewModel: NSFetchedResultsControllerDelegate {
 }
 
 private extension ChatViewModel {
+    func startHideDateTimer() {
+        dateTimer?.invalidate()
+        dateTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { [weak self] _ in
+            self?.dateHeaderHidden = true
+        }
+    }
+    
     func sendFiles(with text: String) async throws {
-        guard nodesStorage.haveActiveNode(in: .ipfs) else {
+        guard apiServiceCompose.hasActiveNode(group: .ipfs) else {
             dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
-                coin: NodeGroup.ipfs.name
+                nodeGroupName: NodeGroup.ipfs.name
             ).localizedDescription))
             return
         }

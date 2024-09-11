@@ -10,43 +10,36 @@ import CommonKit
 import UIKit
 
 extension Node {
-    func statusString(showVersion: Bool, includeVersionTitle: Bool = true) -> String? {
-        guard isEnabled else { return Strings.disabled }
+    // swiftlint:disable switch_case_alignment
+    func statusString(showVersion: Bool, dateHeight: Bool) -> String? {
+        guard
+            isEnabled,
+            let connectionStatus = connectionStatus
+        else { return Strings.disabled }
         
-        switch connectionStatus {
+        let statusTitle = switch connectionStatus {
         case .allowed:
-            return [
-                pingString,
-                showVersion ? versionString(includeVersionTitle: includeVersionTitle) : nil,
-                heightString
-            ]
-            .compactMap { $0 }
-            .joined(separator: " ")
+            pingString
         case .synchronizing:
-            return [
-                Strings.synchronizing,
-                showVersion ? versionString(includeVersionTitle: includeVersionTitle) : nil,
-                heightString
-            ]
-            .compactMap { $0 }
-            .joined(separator: " ")
+            Strings.synchronizing
         case .offline:
-            return Strings.offline
+            Strings.offline
         case .notAllowed(let reason):
-            return [
-                reason.text,
-                version
-            ]
-            .compactMap { $0 }
-            .joined(separator: " ")
-        case .none:
-            return nil
+            reason.text
         }
+        
+        return [
+            statusTitle,
+            showVersion ? versionString : nil,
+            dateHeight ? dateHeightString : heightString
+        ]
+        .compactMap { $0 }
+        .joined(separator: " ")
     }
     
     func indicatorString(isRest: Bool, isWs: Bool) -> String {
         let connections = [
-            isRest ? scheme.rawValue : nil,
+            isRest ? preferredOrigin.scheme.rawValue : nil,
             isWs ? "ws" : nil
         ].compactMap { $0 }
         
@@ -65,14 +58,18 @@ extension Node {
         
         switch connectionStatus {
         case .allowed:
-            return .adamant.good
+            return .adamant.success
         case .synchronizing:
-            return .adamant.alert
+            return .adamant.attention
         case .offline, .notAllowed:
-            return .adamant.danger
+            return .adamant.warning
         case .none:
             return .adamant.inactive
         }
+    }
+    
+    var title: String {
+        mainOrigin.asString()
     }
 }
 
@@ -130,6 +127,14 @@ private extension Node {
         height.map { " ❐ \(getFormattedHeight(from: $0))" }
     }
     
+    var dateHeightString: String? {
+        height.map { " ❐ \(Date(timeIntervalSince1970: .init($0)).humanizedTime().string)" }
+    }
+    
+    var versionString: String? {
+        version.map { "(v\($0.string))" }
+    }
+    
     var numberFormatter: NumberFormatter {
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = .decimal
@@ -139,23 +144,5 @@ private extension Node {
     
     func getFormattedHeight(from height: Int) -> String {
         numberFormatter.string(from: Decimal(height)) ?? String(height)
-    }
-    
-    func versionString(includeVersionTitle: Bool) -> String? {
-        guard includeVersionTitle else {
-            return version.map { "(\($0))" }
-        }
-        
-        return version.map { "(v\($0))" }
-    }
-}
-
-extension Node {
-    static func stringToDouble(_ value: String?) -> Double? {
-        guard let minNodeVersion = value?.replacingOccurrences(of: ".", with: ""),
-              let versionNumber = Double(minNodeVersion)
-        else { return nil }
-        
-        return versionNumber
     }
 }

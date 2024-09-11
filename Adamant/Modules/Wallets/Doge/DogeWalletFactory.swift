@@ -19,7 +19,7 @@ struct DogeWalletFactory: WalletFactory {
     func makeWalletVC(service: Service, screensFactory: ScreensFactory) -> WalletViewController {
         DogeWalletViewController(
             dialogService: assembler.resolve(DialogService.self)!,
-            currencyInfoService: assembler.resolve(CurrencyInfoService.self)!,
+            currencyInfoService: assembler.resolve(InfoServiceProtocol.self)!,
             accountService: assembler.resolve(AccountService.self)!,
             screensFactory: screensFactory,
             walletServiceCompose: assembler.resolve(WalletServiceCompose.self)!,
@@ -43,12 +43,12 @@ struct DogeWalletFactory: WalletFactory {
             accountsProvider: assembler.resolve(AccountsProvider.self)!,
             dialogService: assembler.resolve(DialogService.self)!,
             screensFactory: screensFactory,
-            currencyInfoService: assembler.resolve(CurrencyInfoService.self)!,
+            currencyInfoService: assembler.resolve(InfoServiceProtocol.self)!,
             increaseFeeService: assembler.resolve(IncreaseFeeService.self)!,
             vibroService: assembler.resolve(VibroService.self)!,
             walletService: service,
             reachabilityMonitor: assembler.resolve(ReachabilityMonitor.self)!,
-            nodesStorage: assembler.resolve(NodesStorageProtocol.self)!
+            apiServiceCompose: assembler.resolve(ApiServiceComposeProtocol.self)!
         )
     }
     
@@ -128,7 +128,7 @@ private extension DogeWalletFactory {
     func makeTransactionDetailsVC(service: Service) -> DogeTransactionDetailsViewController {
         DogeTransactionDetailsViewController(
             dialogService: assembler.resolve(DialogService.self)!,
-            currencyInfo: assembler.resolve(CurrencyInfoService.self)!,
+            currencyInfo: assembler.resolve(InfoServiceProtocol.self)!,
             addressBookService: assembler.resolve(AddressBookService.self)!,
             accountService: assembler.resolve(AccountService.self)!,
             walletService: service,

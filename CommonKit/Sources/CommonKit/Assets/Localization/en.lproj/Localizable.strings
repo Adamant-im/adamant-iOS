@@ -164,7 +164,10 @@
 "AccountTab.Row.Balance" = "Balance";
 
 /* Account tab: 'Buy tokens' button */
-"AccountTab.Row.BuyTokens" = "Exchange tokens";
+"AccountTab.Row.BuyTokens" = "Exchange coins";
+
+/* Account tab: 'Stake ADM' button */
+"AccountTab.Row.StakeAdm" = "Stake and earn";
 
 /* Account tab: 'Logout' button */
 "AccountTab.Row.Logout" = "Logout";
@@ -201,6 +204,12 @@
 
 /* Account tab: Exchange ADM tokens in chat */
 "AccountTab.Row.ExchangeADMInChat" = "In-chat Exchanger";
+
+/* Account tab: Exchanges on CMC */
+"AccountTab.Row.ExchangesOnCoinMarketCap" = "Exchanges on CoinMarketCap";
+
+/* Account tab: Exchanges on CoinGecko */
+"AccountTab.Row.ExchangesOnCoinGecko" = "Exchanges on CoinGecko";
 
 /* Account tab: 'Address' row */
 "AccountTab.Row.Address" = "Address";
@@ -454,6 +463,9 @@
 /* Delegates page: scene title */
 "Delegates.Title" = "Delegates";
 
+/* Delegates page: header text */
+"Delegates.HeaderText" = "To stake ADM and get rewards, vote for an active forging pool you trust. Read more in the [ADAMANT blog](https://news.adamant.im/hodl-list-of-adamant-pools-join-in-and-get-rewards-491a98610f4b).";
+
 /* Visible Wallets page: scene title */
 "VisibleWallets.Title" = "Wallet list";
 
@@ -636,6 +648,12 @@
 
 /* New Chat: 'What does it mean?', a help button for info about uninitialized accounts. */
 "NewChatScene.NotInitialized.HelpButton" = "What does it mean?";
+
+/* Info Service: Info Service */
+"InfoService.InfoService" = "Info Service";
+
+/* Info Service: inconsistent data */
+"InfoService.InconsistentData" = "Inconsistent data";
 
 /* NodesList: Button label */
 "NodesList.NodesList" = "ADM node list";
@@ -1032,6 +1050,9 @@
 
 /* Transaction status: inconsistent reason title */
 "TransactionStatus.Inconsistent.Reason.Title" = "Inconsistent reason";
+
+/* Transaction status: inconsistent data title */
+"TransactionStatus.Inconsistent.RecordData.Title" = "Tx data record";
 
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "Details";

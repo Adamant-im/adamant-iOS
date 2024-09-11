@@ -166,6 +166,9 @@
 /* Account tab: 'Buy tokens' button */
 "AccountTab.Row.BuyTokens" = "交换代币";
 
+/* Account tab: 'Stake ADM' button */
+"AccountTab.Row.StakeAdm" = "赌注和收入";
+
 /* Account tab: 'Logout' button */
 "AccountTab.Row.Logout" = "注销";
 
@@ -201,6 +204,12 @@
 
 /* Account tab: Exchange ADM tokens in chat */
 "AccountTab.Row.ExchangeADMInChat" = "聊天交流";
+
+/* Account tab: Exchanges on CMC */
+"AccountTab.Row.ExchangesOnCoinMarketCap" = "CoinMarketCap 上的交易所";
+
+/* Account tab: Exchanges on CoinGecko */
+"AccountTab.Row.ExchangesOnCoinGecko" = "CoinGecko 上的交易所";
 
 /* Account tab: 'Address' row */
 "AccountTab.Row.Address" = "地址";
@@ -454,6 +463,9 @@
 /* Delegates page: scene title */
 "Delegates.Title" = "与会代表";
 
+/* Delegates page: header text */
+"Delegates.HeaderText" = "要入股 ADM 并获得奖励，请为您信任的活跃锻造池投票。在 [ADAMANT 博客](https://news.adamant.im/hodl-list-of-adamant-pools-join-in-and-get-rewards-491a98610f4b) 阅读更多内容.";
+
 /* Visible Wallets page: scene title */
 "VisibleWallets.Title" = "钱包列表";
 
@@ -636,6 +648,12 @@
 
 /* New Chat: 'What does it mean?', a help button for info about uninitialized accounts. */
 "NewChatScene.NotInitialized.HelpButton" = "这是什么意思？";
+
+/* Info Service: Info Service */
+"InfoService.InfoService" = "Info Service";
+
+/* Info Service: inconsistent data */
+"InfoService.InconsistentData" = "Inconsistent data";
 
 /* NodesList: Button label */
 "NodesList.NodesList" = "ADM节点列表";
@@ -1029,6 +1047,9 @@
 
 /* Transaction status: inconsistent reason title */
 "TransactionStatus.Inconsistent.Reason.Title" = "不一致的原因";
+
+/* Transaction status: inconsistent data title */
+"TransactionStatus.Inconsistent.RecordData.Title" = "Tx数据记录";
 
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "详细信息";

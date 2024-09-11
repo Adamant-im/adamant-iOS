@@ -11,24 +11,24 @@ import SwiftUI
 import CommonKit
 
 struct PartnerQRFactory {
-    private let assembler: Assembler
+    private let parent: Assembler
+    private let assemblies = [PartnerQRAssembly()]
     
     init(parent: Assembler) {
-        assembler = .init([PartnerQRAssembly()], parent: parent)
+        self.parent = parent
     }
     
     @MainActor
     func makeViewController(partner: CoreDataAccount) -> UIViewController {
-        let viewModel = assembler.resolve(PartnerQRViewModel.self)!
-        viewModel.setup(partner: partner)
+        let assembler = Assembler(assemblies, parent: parent)
         
-        let view = PartnerQRView(
-            viewModel: viewModel
-        )
+        let viewModel = {
+            let viewModel = assembler.resolver.resolve(PartnerQRViewModel.self)!
+            viewModel.setup(partner: partner)
+            return viewModel
+        }
         
-        return UIHostingController(
-            rootView: view
-        )
+        return UIHostingController(rootView: PartnerQRView(viewModel: viewModel))
     }
 }
 
@@ -47,6 +47,6 @@ private struct PartnerQRAssembly: Assembly {
                 avatarService: $0.resolve(AvatarService.self)!,
                 partnerQRService: $0.resolve(PartnerQRService.self)!
             )
-        }.inObjectScope(.weak)
+        }.inObjectScope(.transient)
     }
 }

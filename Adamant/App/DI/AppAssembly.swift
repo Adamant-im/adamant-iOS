@@ -29,7 +29,9 @@ struct AppAssembly: Assembly {
         container.register(CellFactory.self) { _ in AdamantCellFactory() }.inObjectScope(.container)
         
         // MARK: Secured Store
-        container.register(SecuredStore.self) { _ in KeychainStore() }.inObjectScope(.container)
+        container.register(SecuredStore.self) { _ in
+            KeychainStore(secureStorage: AdamantSecureStorage())
+        }.inObjectScope(.container)
         
         // MARK: LocalAuthentication
         container.register(LocalAuthentication.self) { _ in AdamantAuthentication() }.inObjectScope(.container)
@@ -98,7 +100,7 @@ struct AppAssembly: Assembly {
         container.register(PushNotificationsTokenService.self) { r in
             AdamantPushNotificationsTokenService(
                 securedStore: r.resolve(SecuredStore.self)!,
-                apiService: r.resolve(ApiService.self)!,
+                apiService: r.resolve(AdamantApiServiceProtocol.self)!,
                 adamantCore: r.resolve(AdamantCore.self)!,
                 accountService: r.resolve(AccountService.self)!
             )
@@ -106,7 +108,11 @@ struct AppAssembly: Assembly {
         
         // MARK: NodesStorage
         container.register(NodesStorageProtocol.self) { r in
-            NodesStorage(securedStore: r.resolve(SecuredStore.self)!)
+            NodesStorage(
+                securedStore: r.resolve(SecuredStore.self)!,
+                nodesMergingService: r.resolve(NodesMergingServiceProtocol.self)!,
+                defaultNodes: r.resolve(DefaultNodesProvider.self)!.nodes
+            )
         }.inObjectScope(.container)
         
         // MARK: NodesAdditionalParamsStorage
@@ -120,13 +126,15 @@ struct AppAssembly: Assembly {
         }.inObjectScope(.container)
         
         // MARK: ApiService
-        container.register(ApiService.self) { r in
+        container.register(AdamantApiServiceProtocol.self) { r in
             AdamantApiService(
                 healthCheckWrapper: .init(
                     service: .init(apiCore: r.resolve(APICoreProtocol.self)!),
                     nodesStorage: r.resolve(NodesStorageProtocol.self)!,
                     nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
-                    nodeGroup: .adm
+                    isActive: true,
+                    params: NodeGroup.adm.blockchainHealthCheckParams,
+                    connection: r.resolve(ReachabilityMonitor.self)!.connectionPublisher
                 ),
                 adamantCore: r.resolve(AdamantCore.self)!
             )
@@ -134,14 +142,14 @@ struct AppAssembly: Assembly {
         
         // MARK: IPFSApiService
         container.register(IPFSApiService.self) { r in
-            IPFSApiService(
-                healthCheckWrapper: .init(
-                    service: .init(apiCore: r.resolve(APICoreProtocol.self)!),
-                    nodesStorage: r.resolve(NodesStorageProtocol.self)!,
-                    nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
-                    nodeGroup: .ipfs
-                )
-            )
+            IPFSApiService(healthCheckWrapper: .init(
+                service: .init(apiCore: r.resolve(APICoreProtocol.self)!),
+                nodesStorage: r.resolve(NodesStorageProtocol.self)!,
+                nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
+                isActive: true,
+                params: NodeGroup.ipfs.blockchainHealthCheckParams,
+                connection: r.resolve(ReachabilityMonitor.self)!.connectionPublisher
+            ))
         }.inObjectScope(.container)
         
         // MARK: FilesNetworkManagerProtocol
@@ -155,7 +163,9 @@ struct AppAssembly: Assembly {
                 service: .init(apiCore: r.resolve(APICoreProtocol.self)!),
                 nodesStorage: r.resolve(NodesStorageProtocol.self)!,
                 nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
-                nodeGroup: .btc
+                isActive: true,
+                params: NodeGroup.btc.blockchainHealthCheckParams,
+                connection: r.resolve(ReachabilityMonitor.self)!.connectionPublisher
             ))
         }.inObjectScope(.container)
         
@@ -165,7 +175,9 @@ struct AppAssembly: Assembly {
                 service: .init(apiCore: r.resolve(APICoreProtocol.self)!),
                 nodesStorage: r.resolve(NodesStorageProtocol.self)!,
                 nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
-                nodeGroup: .doge
+                isActive: true,
+                params: NodeGroup.doge.blockchainHealthCheckParams,
+                connection: r.resolve(ReachabilityMonitor.self)!.connectionPublisher
             ))
         }.inObjectScope(.container)
         
@@ -175,7 +187,9 @@ struct AppAssembly: Assembly {
                 service: .init(apiCore: r.resolve(APICoreProtocol.self)!),
                 nodesStorage: r.resolve(NodesStorageProtocol.self)!,
                 nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
-                nodeGroup: .dash
+                isActive: true,
+                params: NodeGroup.dash.blockchainHealthCheckParams,
+                connection: r.resolve(ReachabilityMonitor.self)!.connectionPublisher
             ))
         }.inObjectScope(.container)
         
@@ -185,7 +199,9 @@ struct AppAssembly: Assembly {
                 service: .init(),
                 nodesStorage: r.resolve(NodesStorageProtocol.self)!,
                 nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
-                nodeGroup: .klyNode
+                isActive: true,
+                params: NodeGroup.klyNode.blockchainHealthCheckParams,
+                connection: r.resolve(ReachabilityMonitor.self)!.connectionPublisher
             ))
         }.inObjectScope(.container)
         
@@ -195,7 +211,9 @@ struct AppAssembly: Assembly {
                 service: .init(),
                 nodesStorage: r.resolve(NodesStorageProtocol.self)!,
                 nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
-                nodeGroup: .klyService
+                isActive: true,
+                params: NodeGroup.klyService.blockchainHealthCheckParams,
+                connection: r.resolve(ReachabilityMonitor.self)!.connectionPublisher
             ))
         }.inObjectScope(.container)
         
@@ -210,7 +228,9 @@ struct AppAssembly: Assembly {
                 service: .init(apiCore: r.resolve(APICoreProtocol.self)!),
                 nodesStorage: r.resolve(NodesStorageProtocol.self)!,
                 nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
-                nodeGroup: .eth
+                isActive: true,
+                params: NodeGroup.eth.blockchainHealthCheckParams,
+                connection: r.resolve(ReachabilityMonitor.self)!.connectionPublisher
             ))
         }.inObjectScope(.container)
         
@@ -225,18 +245,18 @@ struct AppAssembly: Assembly {
         // MARK: AccountService
         container.register(AccountService.self) { r in
             AdamantAccountService(
-                apiService: r.resolve(ApiService.self)!,
+                apiService: r.resolve(AdamantApiServiceProtocol.self)!,
                 adamantCore: r.resolve(AdamantCore.self)!,
                 dialogService: r.resolve(DialogService.self)!,
                 securedStore: r.resolve(SecuredStore.self)!,
-                walletServiceCompose: r.resolve(WalletServiceCompose.self)!
+                walletServiceCompose: r.resolve(WalletServiceCompose.self)!,
+                currencyInfoService: r.resolve(InfoServiceProtocol.self)!
             )
         }.inObjectScope(.container).initCompleted { (r, c) in
             Task { @MainActor in
                 guard let service = c as? AdamantAccountService else { return }
                 service.notificationsService = r.resolve(NotificationsService.self)!
                 service.pushNotificationsTokenService = r.resolve(PushNotificationsTokenService.self)!
-                service.currencyInfoService = r.resolve(CurrencyInfoService.self)!
                 service.visibleWalletService = r.resolve(VisibleWalletsService.self)!
             }
         }
@@ -244,18 +264,10 @@ struct AppAssembly: Assembly {
         // MARK: AddressBookServeice
         container.register(AddressBookService.self) { r in
             AdamantAddressBookService(
-                apiService: r.resolve(ApiService.self)!,
+                apiService: r.resolve(AdamantApiServiceProtocol.self)!,
                 adamantCore: r.resolve(AdamantCore.self)!,
                 accountService: r.resolve(AccountService.self)!,
                 dialogService: r.resolve(DialogService.self)!
-            )
-        }.inObjectScope(.container)
-        
-        // MARK: CurrencyInfoService
-        container.register(CurrencyInfoService.self) { r in
-            AdamantCurrencyInfoService(
-                securedStore: r.resolve(SecuredStore.self)!,
-                walletServiceCompose: r.resolve(WalletServiceCompose.self)!
             )
         }.inObjectScope(.container)
         
@@ -274,7 +286,7 @@ struct AppAssembly: Assembly {
         container.register(AccountsProvider.self) { r in
             AdamantAccountsProvider(
                 stack: r.resolve(CoreDataStack.self)!,
-                apiService: r.resolve(ApiService.self)!,
+                apiService: r.resolve(AdamantApiServiceProtocol.self)!,
                 addressBookService: r.resolve(AddressBookService.self)!
             )
         }.inObjectScope(.container)
@@ -282,7 +294,7 @@ struct AppAssembly: Assembly {
         // MARK: Transfers
         container.register(TransfersProvider.self) { r in
             AdamantTransfersProvider(
-                apiService: r.resolve(ApiService.self)!,
+                apiService: r.resolve(AdamantApiServiceProtocol.self)!,
                 stack: r.resolve(CoreDataStack.self)!,
                 adamantCore: r.resolve(AdamantCore.self)!,
                 accountService: r.resolve(AccountService.self)!,
@@ -315,7 +327,7 @@ struct AppAssembly: Assembly {
         container.register(ChatsProvider.self) { r in
             AdamantChatsProvider(
                 accountService: r.resolve(AccountService.self)!,
-                apiService: r.resolve(ApiService.self)!,
+                apiService: r.resolve(AdamantApiServiceProtocol.self)!,
                 socketService: r.resolve(SocketService.self)!,
                 stack: r.resolve(CoreDataStack.self)!,
                 adamantCore: r.resolve(AdamantCore.self)!,
@@ -347,7 +359,7 @@ struct AppAssembly: Assembly {
         container.register(RichTransactionReplyService.self) { r in
             AdamantRichTransactionReplyService(
                 coreDataStack: r.resolve(CoreDataStack.self)!,
-                apiService: r.resolve(ApiService.self)!,
+                apiService: r.resolve(AdamantApiServiceProtocol.self)!,
                 adamantCore: r.resolve(AdamantCore.self)!,
                 accountService: r.resolve(AccountService.self)!, 
                 walletServiceCompose: r.resolve(WalletServiceCompose.self)!
@@ -358,7 +370,7 @@ struct AppAssembly: Assembly {
         container.register(RichTransactionReactService.self) { r in
             AdamantRichTransactionReactService(
                 coreDataStack: r.resolve(CoreDataStack.self)!,
-                apiService: r.resolve(ApiService.self)!,
+                apiService: r.resolve(AdamantApiServiceProtocol.self)!,
                 adamantCore: r.resolve(AdamantCore.self)!,
                 accountService: r.resolve(AccountService.self)!
             )
@@ -403,5 +415,30 @@ struct AppAssembly: Assembly {
                 }
             }
         }
+        
+        // MARK: ApiService Compose
+        container.register(ApiServiceComposeProtocol.self) {
+            ApiServiceCompose(
+                btc: $0.resolve(BtcApiService.self)!,
+                eth: $0.resolve(EthApiService.self)!,
+                klyNode: $0.resolve(KlyNodeApiService.self)!,
+                klyService: $0.resolve(KlyServiceApiService.self)!,
+                doge: $0.resolve(DogeApiService.self)!,
+                dash: $0.resolve(DashApiService.self)!,
+                adm: $0.resolve(AdamantApiServiceProtocol.self)!,
+                ipfs: $0.resolve(IPFSApiService.self)!,
+                infoService: $0.resolve(InfoServiceApiServiceProtocol.self)!
+            )
+        }.inObjectScope(.transient)
+        
+        // MARK: NodesMergingService
+        container.register(NodesMergingServiceProtocol.self) { _ in
+            NodesMergingService()
+        }.inObjectScope(.transient)
+        
+        // MARK: DefaultNodesProvider
+        container.register(DefaultNodesProvider.self) { _ in
+            DefaultNodesProvider()
+        }.inObjectScope(.transient)
     }
 }

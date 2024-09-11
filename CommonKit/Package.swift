@@ -45,7 +45,12 @@ let package = Package(
         .package(
             url: "https://github.com/RNCryptor/RNCryptor.git",
             .upToNextMinor(from: "5.1.0")
-        )
+        ),
+        .package(
+            url: "https://github.com/Alamofire/Alamofire.git",
+            .upToNextMinor(from: "5.4.2")
+        ),
+        .package(path: "../BitcoinKit")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -59,12 +64,14 @@ let package = Package(
                 "SnapKit",
                 "MarkdownKit",
                 "KeychainAccess",
-                "RNCryptor"
+                "RNCryptor",
+                "Alamofire",
+                "BitcoinKit"
             ]
         ),
         .testTarget(
             name: "CommonKitTests",
             dependencies: ["CommonKit"]
-        ),
+        )
     ]
 )

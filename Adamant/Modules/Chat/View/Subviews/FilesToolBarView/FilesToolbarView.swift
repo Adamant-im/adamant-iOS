@@ -41,7 +41,7 @@ final class FilesToolbarView: UIView {
     private lazy var closeBtn: UIButton = {
         let btn = UIButton()
         btn.setImage(
-            UIImage(systemName: "xmark")?.withTintColor(.adamant.alert),
+            UIImage(systemName: "xmark")?.withTintColor(.adamant.attention),
             for: .normal
         )
         btn.addTarget(self, action: #selector(didTapCloseBtn), for: .touchUpInside)

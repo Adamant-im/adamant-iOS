@@ -139,7 +139,7 @@ final class LoginViewController: FormViewController {
     let adamantCore: AdamantCore
     let localAuth: LocalAuthentication
     let screensFactory: ScreensFactory
-    let apiService: ApiService
+    let apiService: AdamantApiServiceProtocol
     let dialogService: DialogService
     
     // MARK: Properties
@@ -158,7 +158,7 @@ final class LoginViewController: FormViewController {
         dialogService: DialogService,
         localAuth: LocalAuthentication,
         screensFactory: ScreensFactory,
-        apiService: ApiService
+        apiService: AdamantApiServiceProtocol
     ) {
         self.accountService = accountService
         self.adamantCore = adamantCore
@@ -419,7 +419,7 @@ extension LoginViewController {
     }
     
     func generateNewPassphrase() {
-        let passphrase = adamantCore.generateNewPassphrase()
+        let passphrase = (try? Mnemonic.generate().joined(separator: " ")) ?? .empty
         
         hideNewPassphrase = false
         

@@ -17,7 +17,7 @@ protocol ChatReactionsViewDelegate: AnyObject {
 
 struct ChatReactionsView: View {
     private let emojis: [String]
-    private let defaultEmojis = ["😂", "🤔", "😁", "👍", "👌"]
+    private let defaultEmojis = ["😂", "🤔", "😁", "👍", "👌", "🤝"]
     private let selectedEmoji: String?
     private let messageId: String
     
@@ -37,8 +37,8 @@ struct ChatReactionsView: View {
     var body: some View {
         HStack(spacing: 10) {
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
-                    ForEach(emojis, id: \.self) { emoji in
+                HStack(spacing: 5) {
+                    ForEach(emojis.prefix(6), id: \.self) { emoji in
                         ChatReactionButton(
                             emoji: emoji
                         )

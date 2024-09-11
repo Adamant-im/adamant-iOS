@@ -49,8 +49,8 @@ final class NotificationsViewModel: ObservableObject {
         self.notificationsService = notificationsService
         
         Task {
-            await addObservers()
             await configure()
+            await addObservers()
         }
     }
     
