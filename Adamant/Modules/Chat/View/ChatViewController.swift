@@ -705,9 +705,7 @@ private extension ChatViewController {
         guard viewAppeared else { return }
         
         let targetY: CGFloat = targetYOffset + view.safeAreaInsets.top
-        guard let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems.sorted(by: {
-            $0.row < $1.row
-        }) as [IndexPath]? else { return }
+        let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems
         
         for indexPath in visibleIndexPaths {
             guard let cell = messagesCollectionView.cellForItem(at: indexPath)
