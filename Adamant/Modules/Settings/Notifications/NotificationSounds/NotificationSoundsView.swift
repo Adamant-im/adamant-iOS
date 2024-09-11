@@ -14,6 +14,10 @@ struct NotificationSoundsView: View {
     
     @Environment(\.dismiss) var dismiss
     
+    init(viewModel: @escaping () -> NotificationSoundsViewModel) {
+        _viewModel = .init(wrappedValue: viewModel())
+    }
+    
     var body: some View {
         GeometryReader { _ in
             Form {

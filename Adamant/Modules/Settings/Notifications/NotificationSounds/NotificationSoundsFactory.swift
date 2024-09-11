@@ -21,10 +21,9 @@ struct NotificationSoundsFactory {
     func makeView(target: NotificationTarget) -> NotificationSoundsView {
         let assembler = Assembler(assemblies, parent: parent)
         let viewModel = {
-            assembler.resolver.resolve(NotificationSoundsViewModel.self)!
-        }()
+            assembler.resolver.resolve(NotificationSoundsViewModel.self, argument: target)!
+        }
         
-        viewModel.setup(notificationTarget: target)
         let view = NotificationSoundsView(viewModel: viewModel)
         
         return view
@@ -33,10 +32,10 @@ struct NotificationSoundsFactory {
 
 private struct NotificationSoundAssembly: Assembly {
     func assemble(container: Container) {
-        container.register(NotificationSoundsViewModel.self) { r in
+        container.register(NotificationSoundsViewModel.self) { (r, target: NotificationTarget) in
             NotificationSoundsViewModel(
                 notificationsService: r.resolve(NotificationsService.self)!,
-                target: .baseMessage,
+                target: target,
                 dialogService: r.resolve(DialogService.self)!
             )
         }.inObjectScope(.transient)

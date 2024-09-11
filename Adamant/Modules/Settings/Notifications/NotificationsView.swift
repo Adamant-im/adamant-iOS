@@ -11,60 +11,57 @@ import CommonKit
 
 struct NotificationsView: View {
     @StateObject var viewModel: NotificationsViewModel
-    let screensFactory: ScreensFactory
+    private let baseSoundsView: NotificationSoundsView
+    private let reactionSoundsView: NotificationSoundsView
     
     init(
         viewModel: @escaping () -> NotificationsViewModel,
-        screensFactory: ScreensFactory
+        baseSoundsView: @escaping () -> NotificationSoundsView,
+        reactionSoundsView: @escaping () -> NotificationSoundsView
     ) {
         _viewModel = .init(wrappedValue: viewModel())
-        self.screensFactory = screensFactory
+        self.baseSoundsView = baseSoundsView()
+        self.reactionSoundsView = reactionSoundsView()
     }
     
     var body: some View {
-        GeometryReader { geometry in
-            Form {
-                notificationsSection()
-                messageSoundSection()
-                messageReactionsSection()
-                inAppNotificationsSection()
-                settingsSection()
-                moreDetailsSection()
+        Form {
+            notificationsSection()
+            messageSoundSection()
+            messageReactionsSection()
+            inAppNotificationsSection()
+            settingsSection()
+            moreDetailsSection()
+        }
+        .withoutListBackground()
+        .background(Color(.adamant.secondBackgroundColor))
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                toolbar()
             }
-            .withoutListBackground()
-            .background(Color(.adamant.secondBackgroundColor))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    toolbar(maxWidth: geometry.size.width)
-                }
-            }
-            .sheet(isPresented: $viewModel.presentSoundsPicker, content: {
-                NavigationView(content: {
-                    screensFactory.makeNotificationSounds(target: .baseMessage)
-                })
-            })
-            .sheet(isPresented: $viewModel.presentReactionSoundsPicker, content: {
-                NavigationView(content: {
-                    screensFactory.makeNotificationSounds(target: .reaction)
-                })
-            })
-            .fullScreenCover(isPresented: $viewModel.openSafariURL) {
-                SafariWebView(url: viewModel.safariURL).ignoresSafeArea()
-            }
+        }
+        .sheet(isPresented: $viewModel.presentSoundsPicker, content: {
+            NavigationView(content: { baseSoundsView })
+        })
+        .sheet(isPresented: $viewModel.presentReactionSoundsPicker, content: {
+            NavigationView(content: { reactionSoundsView })
+        })
+        .fullScreenCover(isPresented: $viewModel.openSafariURL) {
+            SafariWebView(url: viewModel.safariURL).ignoresSafeArea()
         }
     }
 }
 
 private extension NotificationsView {
-    func toolbar(maxWidth: CGFloat) -> some View {
+    func toolbar() -> some View {
         HStack {
             Text(viewModel.notificationsTitle)
                 .font(.headline)
                 .minimumScaleFactor(0.7)
                 .lineLimit(1)
         }
-        .frame(maxWidth: maxWidth - toolbarSpace, alignment: .center)
+        .frame(alignment: .center)
     }
     
     func notificationsSection() -> some View {
@@ -127,25 +124,16 @@ private extension NotificationsView {
                 Text(soundsTitle)
             }
             .tint(.init(uiColor: .adamant.active))
-            .onChange(of: viewModel.inAppSounds) { value in
-                viewModel.applyInAppSounds(value: value)
-            }
-            
+          
             Toggle(isOn: $viewModel.inAppVibrate) {
                 Text(vibrateTitle)
             }
             .tint(.init(uiColor: .adamant.active))
-            .onChange(of: viewModel.inAppVibrate) { value in
-                viewModel.applyInAppVibrate(value: value)
-            }
             
             Toggle(isOn: $viewModel.inAppToasts) {
                 Text(toastsTitle)
             }
             .tint(.init(uiColor: .adamant.active))
-            .onChange(of: viewModel.inAppToasts) { value in
-                viewModel.applyInAppToasts(value: value)
-            }
         } header: {
             Text(inAppNotifications)
         }
@@ -169,20 +157,16 @@ private extension NotificationsView {
     
     func moreDetailsSection() -> some View {
         Section {
-            if let attributedString = viewModel.parseMarkdown(descriptionText) {
-                Text(AttributedString(attributedString))
+            if let description = viewModel.parsedMarkdownDescription {
+                Text(description)
             }
-            
             Button(action: {
                 viewModel.presentSafariURL()
             }, label: {
                 HStack {
                     Image(uiImage: viewModel.githubRowImage)
-                    
                     Text(visitGithub)
-                    
                     Spacer()
-                    
                     NavigationLink(destination: { EmptyView() }, label: { EmptyView() }).fixedSize()
                 }
                 .padding()
@@ -203,10 +187,6 @@ private var soundTitle: String {
 
 private var settingsHeader: String {
     .localized("Notifications.Settings.System")
-}
-
-private var descriptionText: String {
-    .localized("SecurityPage.Row.Notifications.ModesDescription")
 }
 
 private var visitGithub: String {

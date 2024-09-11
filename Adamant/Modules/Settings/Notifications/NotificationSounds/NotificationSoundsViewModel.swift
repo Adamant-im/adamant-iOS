@@ -86,10 +86,9 @@ private extension NotificationSoundsViewModel {
         } catch {
             dialogService.showError(
                 withMessage: error.localizedDescription,
-                supportEmail: false,
+                supportEmail: true,
                 error: error
             )
         }
     }
 }
-

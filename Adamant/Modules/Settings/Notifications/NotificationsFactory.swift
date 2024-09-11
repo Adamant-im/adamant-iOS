@@ -18,13 +18,17 @@ struct NotificationsFactory {
     }
     
     @MainActor
-    func makeViewController(screensFactory: ScreensFactory) -> UIViewController {
+    func makeViewController(
+        baseSoundsView: @escaping () -> NotificationSoundsView,
+        reactionSoundsView: @escaping () -> NotificationSoundsView
+    ) -> UIViewController {
         let assembler = Assembler(assemblies, parent: parent)
         let viewModel = { assembler.resolver.resolve(NotificationsViewModel.self)! }
         
         let view = NotificationsView(
             viewModel: viewModel,
-            screensFactory: screensFactory
+            baseSoundsView: baseSoundsView,
+            reactionSoundsView: reactionSoundsView
         )
         
         return UIHostingController(

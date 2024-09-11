@@ -29,9 +29,20 @@ final class NotificationsViewModel: ObservableObject {
     let safariURL = URL(string: "https://github.com/Adamant-im")!
     let githubRowImage: UIImage = .asset(named: "row_github") ?? UIImage()
     
+    private let descriptionText: String = .localized("SecurityPage.Row.Notifications.ModesDescription")
+    
     private let dialogService: DialogService
-    let notificationsService: NotificationsService
+    private let notificationsService: NotificationsService
+    
     private var subscriptions = Set<AnyCancellable>()
+    private var cancellables = Set<AnyCancellable>()
+    
+    var parsedMarkdownDescription: AttributedString? {
+        guard let attributedString = parseMarkdown(descriptionText) else {
+            return nil
+        }
+        return AttributedString(attributedString)
+    }
     
     nonisolated init(dialogService: DialogService, notificationsService: NotificationsService) {
         self.dialogService = dialogService
@@ -40,6 +51,7 @@ final class NotificationsViewModel: ObservableObject {
         Task {
             await addObservers()
             await configure()
+            await setupSwitchHandlers()
         }
     }
     
@@ -144,6 +156,24 @@ private extension NotificationsViewModel {
             .publisher(for: .AdamantNotificationService.notificationsSoundChanged)
             .sink { [weak self] _ in self?.configure() }
             .store(in: &subscriptions)
+        
+        $inAppSounds
+            .sink { [weak self] value in
+                self?.applyInAppSounds(value: value)
+            }
+            .store(in: &cancellables)
+        
+        $inAppVibrate
+            .sink { [weak self] value in
+                self?.applyInAppVibrate(value: value)
+            }
+            .store(in: &cancellables)
+        
+        $inAppToasts
+            .sink { [weak self] value in
+                self?.applyInAppToasts(value: value)
+            }
+            .store(in: &cancellables)
     }
     
     func configure() {

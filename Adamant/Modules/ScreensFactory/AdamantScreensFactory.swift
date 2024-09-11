@@ -29,8 +29,8 @@ struct AdamantScreensFactory: ScreensFactory {
     private let partnerQRFactory: PartnerQRFactory
     private let coinsNodesListFactory: CoinsNodesListFactory
     private let chatSelectTextFactory: ChatSelectTextViewFactory
-    private let notificasionsFactory: NotificationsFactory
-    private let notificationSounds: NotificationSoundsFactory
+    private let notificationsFactory: NotificationsFactory
+    private let notificationSoundsFactory: NotificationSoundsFactory
     private let storageUsageFactory: StorageUsageFactory
         
     init(assembler: Assembler) {
@@ -49,8 +49,8 @@ struct AdamantScreensFactory: ScreensFactory {
         partnerQRFactory = .init(parent: assembler)
         coinsNodesListFactory = .init(parent: assembler)
         chatSelectTextFactory = .init()
-        notificasionsFactory = .init(parent: assembler)
-        notificationSounds = .init(parent: assembler)
+        notificationsFactory = .init(parent: assembler)
+        notificationSoundsFactory = .init(parent: assembler)
         storageUsageFactory = .init(parent: assembler)
         
         walletFactoryCompose = AdamantWalletFactoryCompose(
@@ -165,11 +165,18 @@ struct AdamantScreensFactory: ScreensFactory {
     }
     
     func makeNotifications() -> UIViewController {
-        notificasionsFactory.makeViewController(screensFactory: self)
+        notificationsFactory.makeViewController(
+            baseSoundsView: {
+                notificationSoundsFactory.makeView(target: .baseMessage)
+            },
+            reactionSoundsView: {
+                notificationSoundsFactory.makeView(target: .reaction)
+            }
+        )
     }
     
     func makeNotificationSounds(target: NotificationTarget) -> NotificationSoundsView {
-        notificationSounds.makeView(target: target)
+        notificationSoundsFactory.makeView(target: target)
     }
     
     func makeVisibleWallets() -> UIViewController {
