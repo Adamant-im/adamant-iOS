@@ -17,7 +17,7 @@ final class NotificationSoundsViewModel: ObservableObject {
     private var notificationTarget: NotificationTarget
     private let dialogService: DialogService
     
-    private(set) var dismissAction = PassthroughSubject<Void,Never>()
+    let dismissAction = PassthroughSubject<Void,Never>()
     @Published var isPresented: Bool = false
     @Published var selectedSound: NotificationSound = .inputDefault
     @Published var sounds: [NotificationSound] = [.none, .noteDefault, .inputDefault, .proud, .relax, .success, .note, .antic, .cheers, .chord, .droplet, .handoff, .milestone, .passage, .portal, .rattle, .rebound, .slide, .welcome]

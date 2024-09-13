@@ -66,17 +66,14 @@ private extension NotificationsView {
     
     func notificationsSection() -> some View {
         Section {
-            Button(action: {
-                viewModel.showAlert()
-            }, label: {
+            NavigationButton(action: { viewModel.showAlert() }) {
                 HStack {
                     Text(viewModel.notificationsTitle)
                     Spacer()
                     Text(viewModel.notificationsMode.localized)
                         .foregroundColor(.gray)
-                    NavigationLink(destination: { EmptyView() }, label: { EmptyView() }).fixedSize()
                 }
-            })
+            }.listRowBackground(Color(uiColor: .adamant.cellColor))
         } header: {
             Text(viewModel.notificationsTitle)
         }
@@ -84,17 +81,14 @@ private extension NotificationsView {
     
     func messageSoundSection() -> some View {
         Section {
-            Button(action: {
-                viewModel.presentNotificationSoundsPicker()
-            }, label: {
+            NavigationButton(action: { viewModel.presentNotificationSoundsPicker() }) {
                 HStack {
                     Text(soundTitle)
                     Spacer()
                     Text(viewModel.notificationSound.localized)
                         .foregroundColor(.gray)
-                    NavigationLink(destination: { EmptyView() }, label: { EmptyView() }).fixedSize()
                 }
-            })
+            }
         } header: {
             Text(messagesHeader)
         }
@@ -102,17 +96,14 @@ private extension NotificationsView {
     
     func messageReactionsSection() -> some View {
         Section {
-            Button(action: {
-                viewModel.presentReactionNotificationSoundsPicker()
-            }, label: {
+            NavigationButton(action: { viewModel.presentReactionNotificationSoundsPicker() }) {
                 HStack {
                     Text(soundTitle)
                     Spacer()
                     Text(viewModel.notificationReactionSound.localized)
                         .foregroundColor(.gray)
-                    NavigationLink(destination: { EmptyView() }, label: { EmptyView() }).fixedSize()
                 }
-            })
+            }
         } header: {
             Text(reactionsHeader)
         }
@@ -124,7 +115,7 @@ private extension NotificationsView {
                 Text(soundsTitle)
             }
             .tint(.init(uiColor: .adamant.active))
-          
+            
             Toggle(isOn: $viewModel.inAppVibrate) {
                 Text(vibrateTitle)
             }
@@ -141,15 +132,12 @@ private extension NotificationsView {
     
     func settingsSection() -> some View {
         Section {
-            Button(action: {
-                viewModel.openAppSettings()
-            }, label: {
+            NavigationButton(action: { viewModel.openAppSettings() }) {
                 HStack {
                     Text(settingsHeader)
                     Spacer()
-                    NavigationLink(destination: { EmptyView() }, label: { EmptyView() }).fixedSize()
                 }
-            })
+            }
         } header: {
             Text(settingsHeader)
         }
@@ -160,22 +148,16 @@ private extension NotificationsView {
             if let description = viewModel.parsedMarkdownDescription {
                 Text(description)
             }
-            Button(action: {
-                viewModel.presentSafariURL()
-            }, label: {
+            NavigationButton(action: { viewModel.presentSafariURL() }) {
                 HStack {
                     Image(uiImage: viewModel.githubRowImage)
                     Text(visitGithub)
                     Spacer()
-                    NavigationLink(destination: { EmptyView() }, label: { EmptyView() }).fixedSize()
                 }
-                .padding()
-            })
+            }
         }
     }
 }
-
-private let toolbarSpace: CGFloat = 150
 
 private var messagesHeader: String {
     .localized("SecurityPage.Section.Messages")
