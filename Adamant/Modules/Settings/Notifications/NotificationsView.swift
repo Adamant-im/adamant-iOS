@@ -11,17 +11,17 @@ import CommonKit
 
 struct NotificationsView: View {
     @StateObject var viewModel: NotificationsViewModel
-    private let baseSoundsView: NotificationSoundsView
-    private let reactionSoundsView: NotificationSoundsView
+    private let baseSoundsView: () -> AnyView
+    private let reactionSoundsView: () -> AnyView
     
     init(
         viewModel: @escaping () -> NotificationsViewModel,
-        baseSoundsView: @escaping () -> NotificationSoundsView,
-        reactionSoundsView: @escaping () -> NotificationSoundsView
+        baseSoundsView: @escaping () -> AnyView,
+        reactionSoundsView: @escaping () -> AnyView
     ) {
         _viewModel = .init(wrappedValue: viewModel())
-        self.baseSoundsView = baseSoundsView()
-        self.reactionSoundsView = reactionSoundsView()
+        self.baseSoundsView = baseSoundsView
+        self.reactionSoundsView = reactionSoundsView
     }
     
     var body: some View {
@@ -42,10 +42,10 @@ struct NotificationsView: View {
             }
         }
         .sheet(isPresented: $viewModel.presentSoundsPicker, content: {
-            NavigationView(content: { baseSoundsView })
+            NavigationView(content: { baseSoundsView() })
         })
         .sheet(isPresented: $viewModel.presentReactionSoundsPicker, content: {
-            NavigationView(content: { reactionSoundsView })
+            NavigationView(content: { reactionSoundsView() })
         })
         .fullScreenCover(isPresented: $viewModel.openSafariURL) {
             SafariWebView(url: viewModel.safariURL).ignoresSafeArea()

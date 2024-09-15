@@ -165,14 +165,7 @@ struct AdamantScreensFactory: ScreensFactory {
     }
     
     func makeNotifications() -> UIViewController {
-        notificationsFactory.makeViewController(
-            baseSoundsView: {
-                notificationSoundsFactory.makeView(target: .baseMessage)
-            },
-            reactionSoundsView: {
-                notificationSoundsFactory.makeView(target: .reaction)
-            }
-        )
+        notificationsFactory.makeViewController()
     }
     
     func makeNotificationSounds(target: NotificationTarget) -> NotificationSoundsView {
