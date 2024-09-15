@@ -718,8 +718,8 @@ private extension ChatViewController {
 // MARK: Making entities
 
 private extension ChatViewController {
-    func makeScrollDownButton() -> ChatScrollDownButton {
-        let button = ChatScrollDownButton()
+    func makeScrollDownButton() -> ChatScrollButton {
+        let button = ChatScrollButton(position: .down)
         button.action = { [weak self] in
             guard let id = self?.viewModel.getTempOffset(visibleIndex: self?.messagesCollectionView.indexPathsForVisibleItems.last?.section)
             else {
