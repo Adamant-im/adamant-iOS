@@ -88,18 +88,17 @@ open class HealthCheckWrapper<Service, Error: HealthCheckableError> {
     }
     
     public func request<Output>(
-        _ request: @Sendable (Service, NodeOrigin) async -> Result<Output, Error>
+        waitsForConnectivity: Bool = false,
+        _ requestAction: @Sendable (Service, NodeOrigin) async -> Result<Output, Error>
     ) async -> Result<Output, Error> {
-        let nodesList = fastestNodeMode
-            ? sortedAllowedNodes
-            : sortedAllowedNodes.shuffled()
+        let nodesList = await nodesForRequest(waitsForConnectivity: waitsForConnectivity)
         
         var lastConnectionError = nodesList.isEmpty
             ? Error.noEndpointsError(nodeGroupName: name)
             : nil
         
         for node in nodesList {
-            let response = await request(service, node.preferredOrigin)
+            let response = await requestAction(service, node.preferredOrigin)
             
             switch response {
             case .success:
@@ -111,7 +110,10 @@ open class HealthCheckWrapper<Service, Error: HealthCheckableError> {
         }
         
         if lastConnectionError != nil { healthCheck() }
-        return .failure(lastConnectionError ?? .noEndpointsError(nodeGroupName: name))
+        
+        return await waitsForConnectivity
+            ? request(waitsForConnectivity: waitsForConnectivity, requestAction)
+            : .failure(lastConnectionError ?? .noEndpointsError(nodeGroupName: name))
     }
     
     open func healthCheck() {
@@ -122,6 +124,13 @@ open class HealthCheckWrapper<Service, Error: HealthCheckableError> {
 }
 
 private extension HealthCheckWrapper {
+    func nodesForRequest(waitsForConnectivity: Bool) async -> [Node] {
+        await $sortedAllowedNodes.compactMap { [fastestNodeMode = $fastestNodeMode] in
+            guard !waitsForConnectivity || !$0.isEmpty else { return nil }
+            return fastestNodeMode.value ? $0 : $0.shuffled()
+        }.values.first { _ in true } ?? .init()
+    }
+    
     func updateHealthCheckTimerSubscription() {
         healthCheckTimerSubscription = Timer.publish(
             every: sortedAllowedNodes.isEmpty
