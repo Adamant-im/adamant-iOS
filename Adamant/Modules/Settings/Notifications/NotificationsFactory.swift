@@ -10,19 +10,28 @@ import Swinject
 import SwiftUI
 
 struct NotificationsFactory {
-    private let assembler: Assembler
+    private let parent: Assembler
+    private let assemblies = [NotificationsAssembly()]
     
     init(parent: Assembler) {
-        assembler = .init([NotificationsAssembly()], parent: parent)
+        self.parent = parent
     }
     
     @MainActor
-    func makeViewController(screensFactory: ScreensFactory) -> UIViewController {
-        let viewModel = assembler.resolve(NotificationsViewModel.self)!
+    func makeViewController() -> UIViewController {
+        let assembler = Assembler(assemblies, parent: parent)
+        let viewModel = { assembler.resolver.resolve(NotificationsViewModel.self)! }
+        
+        let baseSoundsFactory = NotificationSoundsFactory(parent: assembler)
+        let reactionSoundsFactory = NotificationSoundsFactory(parent: assembler)
+        
+        let baseSoundsView = { baseSoundsFactory.makeView(target: .baseMessage).eraseToAnyView() }
+        let reactionSoundsView = { reactionSoundsFactory.makeView(target: .reaction).eraseToAnyView() }
         
         let view = NotificationsView(
             viewModel: viewModel,
-            screensFactory: screensFactory
+            baseSoundsView: baseSoundsView,
+            reactionSoundsView: reactionSoundsView
         )
         
         return UIHostingController(
@@ -38,6 +47,6 @@ private struct NotificationsAssembly: Assembly {
                 dialogService: r.resolve(DialogService.self)!,
                 notificationsService: r.resolve(NotificationsService.self)!
             )
-        }.inObjectScope(.weak)
+        }.inObjectScope(.transient)
     }
 }

@@ -111,9 +111,9 @@ final class AdamantNotificationsService: NotificationsService {
             }
         }
         
-        inAppSound = getValue(for: StoreKey.notificationsService.inAppSounds) ?? defaultInAppSound
-        inAppVibrate = getValue(for: StoreKey.notificationsService.inAppVibrate) ?? defaultInAppVibrate
-        inAppToasts = getValue(for: StoreKey.notificationsService.inAppToasts) ?? defaultInAppToasts
+        inAppSound = securedStore.get(StoreKey.notificationsService.inAppSounds) ?? defaultInAppSound
+        inAppVibrate = securedStore.get(StoreKey.notificationsService.inAppVibrate) ?? defaultInAppVibrate
+        inAppToasts = securedStore.get(StoreKey.notificationsService.inAppToasts) ?? defaultInAppToasts
         
         preservedBadgeNumber = nil
     }
@@ -350,10 +350,6 @@ extension AdamantNotificationsService {
     
     func setValue(for key: String, value: Bool) {
         securedStore.set(value, for: key)
-    }
-    
-    func getValue<T: Decodable>(for key: String) -> T? {
-        securedStore.get(key)
     }
 }
 

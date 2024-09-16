@@ -10,66 +10,70 @@ import SwiftUI
 import CommonKit
 
 struct NotificationsView: View {
-    @ObservedObject var viewModel: NotificationsViewModel
-    var screensFactory: ScreensFactory
-
+    @StateObject var viewModel: NotificationsViewModel
+    private let baseSoundsView: () -> AnyView
+    private let reactionSoundsView: () -> AnyView
+    
+    init(
+        viewModel: @escaping () -> NotificationsViewModel,
+        baseSoundsView: @escaping () -> AnyView,
+        reactionSoundsView: @escaping () -> AnyView
+    ) {
+        _viewModel = .init(wrappedValue: viewModel())
+        self.baseSoundsView = baseSoundsView
+        self.reactionSoundsView = reactionSoundsView
+    }
+    
     var body: some View {
-        GeometryReader { geometry in
-            Form {
-                notificationsSection()
-                messageSoundSection()
-                messageReactionsSection()
-                inAppNotificationsSection()
-                settingsSection()
-                moreDetailsSection()
+        Form {
+            notificationsSection()
+            messageSoundSection()
+            messageReactionsSection()
+            inAppNotificationsSection()
+            settingsSection()
+            moreDetailsSection()
+        }
+        .withoutListBackground()
+        .background(Color(.adamant.secondBackgroundColor))
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                toolbar()
             }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    toolbar(maxWidth: geometry.size.width)
-                }
-            }
-            .sheet(isPresented: $viewModel.presentSoundsPicker, content: {
-                NavigationView(content: {
-                    screensFactory.makeNotificationSounds(target: .baseMessage)
-                })
-            })
-            .sheet(isPresented: $viewModel.presentReactionSoundsPicker, content: {
-                NavigationView(content: {
-                    screensFactory.makeNotificationSounds(target: .reaction)
-                })
-            })
-            .fullScreenCover(isPresented: $viewModel.openSafariURL) {
-                SafariWebView(url: viewModel.safariURL).ignoresSafeArea()
-            }
+        }
+        .sheet(isPresented: $viewModel.presentSoundsPicker, content: {
+            NavigationView(content: { baseSoundsView() })
+        })
+        .sheet(isPresented: $viewModel.presentReactionSoundsPicker, content: {
+            NavigationView(content: { reactionSoundsView() })
+        })
+        .fullScreenCover(isPresented: $viewModel.openSafariURL) {
+            SafariWebView(url: viewModel.safariURL).ignoresSafeArea()
         }
     }
 }
 
 private extension NotificationsView {
-    func toolbar(maxWidth: CGFloat) -> some View {
+    func toolbar() -> some View {
         HStack {
             Text(viewModel.notificationsTitle)
                 .font(.headline)
                 .minimumScaleFactor(0.7)
                 .lineLimit(1)
         }
-        .frame(maxWidth: maxWidth - toolbarSpace, alignment: .center)
+        .frame(alignment: .center)
     }
     
     func notificationsSection() -> some View {
         Section {
-            Button(action: {
-                viewModel.showAlert()
-            }, label: {
+            NavigationButton(action: { viewModel.showAlert() }) {
                 HStack {
                     Text(viewModel.notificationsTitle)
                     Spacer()
                     Text(viewModel.notificationsMode.localized)
                         .foregroundColor(.gray)
-                    NavigationLink(destination: { EmptyView() }, label: { EmptyView() }).fixedSize()
                 }
-            })
+            }.listRowBackground(Color(uiColor: .adamant.cellColor))
         } header: {
             Text(viewModel.notificationsTitle)
         }
@@ -77,17 +81,14 @@ private extension NotificationsView {
     
     func messageSoundSection() -> some View {
         Section {
-            Button(action: {
-                viewModel.presentNotificationSoundsPicker()
-            }, label: {
+            NavigationButton(action: { viewModel.presentNotificationSoundsPicker() }) {
                 HStack {
                     Text(soundTitle)
                     Spacer()
                     Text(viewModel.notificationSound.localized)
                         .foregroundColor(.gray)
-                    NavigationLink(destination: { EmptyView() }, label: { EmptyView() }).fixedSize()
                 }
-            })
+            }
         } header: {
             Text(messagesHeader)
         }
@@ -95,17 +96,14 @@ private extension NotificationsView {
     
     func messageReactionsSection() -> some View {
         Section {
-            Button(action: {
-                viewModel.presentReactionNotificationSoundsPicker()
-            }, label: {
+            NavigationButton(action: { viewModel.presentReactionNotificationSoundsPicker() }) {
                 HStack {
                     Text(soundTitle)
                     Spacer()
                     Text(viewModel.notificationReactionSound.localized)
                         .foregroundColor(.gray)
-                    NavigationLink(destination: { EmptyView() }, label: { EmptyView() }).fixedSize()
                 }
-            })
+            }
         } header: {
             Text(reactionsHeader)
         }
@@ -117,25 +115,16 @@ private extension NotificationsView {
                 Text(soundsTitle)
             }
             .tint(.init(uiColor: .adamant.active))
-            .onChange(of: viewModel.inAppSounds) { value in
-                viewModel.applyInAppSounds(value: value)
-            }
             
             Toggle(isOn: $viewModel.inAppVibrate) {
                 Text(vibrateTitle)
             }
             .tint(.init(uiColor: .adamant.active))
-            .onChange(of: viewModel.inAppVibrate) { value in
-                viewModel.applyInAppVibrate(value: value)
-            }
             
             Toggle(isOn: $viewModel.inAppToasts) {
                 Text(toastsTitle)
             }
             .tint(.init(uiColor: .adamant.active))
-            .onChange(of: viewModel.inAppToasts) { value in
-                viewModel.applyInAppToasts(value: value)
-            }
         } header: {
             Text(inAppNotifications)
         }
@@ -143,15 +132,12 @@ private extension NotificationsView {
     
     func settingsSection() -> some View {
         Section {
-            Button(action: {
-                viewModel.openAppSettings()
-            }, label: {
+            NavigationButton(action: { viewModel.openAppSettings() }) {
                 HStack {
                     Text(settingsHeader)
                     Spacer()
-                    NavigationLink(destination: { EmptyView() }, label: { EmptyView() }).fixedSize()
                 }
-            })
+            }
         } header: {
             Text(settingsHeader)
         }
@@ -159,29 +145,19 @@ private extension NotificationsView {
     
     func moreDetailsSection() -> some View {
         Section {
-            if let attributedString = viewModel.parseMarkdown(descriptionText) {
-                Text(AttributedString(attributedString))
+            if let description = viewModel.parsedMarkdownDescription {
+                Text(description)
             }
-            
-            Button(action: {
-                viewModel.presentSafariURL()
-            }, label: {
+            NavigationButton(action: { viewModel.presentSafariURL() }) {
                 HStack {
                     Image(uiImage: viewModel.githubRowImage)
-                    
                     Text(visitGithub)
-                    
                     Spacer()
-                    
-                    NavigationLink(destination: { EmptyView() }, label: { EmptyView() }).fixedSize()
                 }
-                .padding()
-            })
+            }
         }
     }
 }
-
-private let toolbarSpace: CGFloat = 150
 
 private var messagesHeader: String {
     .localized("SecurityPage.Section.Messages")
@@ -193,10 +169,6 @@ private var soundTitle: String {
 
 private var settingsHeader: String {
     .localized("Notifications.Settings.System")
-}
-
-private var descriptionText: String {
-    .localized("SecurityPage.Row.Notifications.ModesDescription")
 }
 
 private var visitGithub: String {
