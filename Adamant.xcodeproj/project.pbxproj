@@ -373,7 +373,7 @@
 		93A118532993241D00E144CC /* ChatMessagesListFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A118522993241D00E144CC /* ChatMessagesListFactory.swift */; };
 		93A18C862AAEACC100D0AB98 /* AdamantWalletFactoryCompose.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A18C852AAEACC100D0AB98 /* AdamantWalletFactoryCompose.swift */; };
 		93A18C892AAEAE7700D0AB98 /* WalletFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A18C882AAEAE7700D0AB98 /* WalletFactory.swift */; };
-		93A91FD1297972B7001DB1F8 /* ChatScrollDownButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A91FD0297972B7001DB1F8 /* ChatScrollDownButton.swift */; };
+		93A91FD1297972B7001DB1F8 /* ChatScrollButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A91FD0297972B7001DB1F8 /* ChatScrollButton.swift */; };
 		93A91FD329799298001DB1F8 /* ChatStartPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A91FD229799298001DB1F8 /* ChatStartPosition.swift */; };
 		93ADE0712ACA66AF008ED641 /* VibrationSelectionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93ADE06E2ACA66AF008ED641 /* VibrationSelectionViewModel.swift */; };
 		93ADE0722ACA66AF008ED641 /* VibrationSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93ADE06F2ACA66AF008ED641 /* VibrationSelectionView.swift */; };
@@ -1041,7 +1041,7 @@
 		93A118522993241D00E144CC /* ChatMessagesListFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesListFactory.swift; sourceTree = "<group>"; };
 		93A18C852AAEACC100D0AB98 /* AdamantWalletFactoryCompose.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantWalletFactoryCompose.swift; sourceTree = "<group>"; };
 		93A18C882AAEAE7700D0AB98 /* WalletFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletFactory.swift; sourceTree = "<group>"; };
-		93A91FD0297972B7001DB1F8 /* ChatScrollDownButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatScrollDownButton.swift; sourceTree = "<group>"; };
+		93A91FD0297972B7001DB1F8 /* ChatScrollButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatScrollButton.swift; sourceTree = "<group>"; };
 		93A91FD229799298001DB1F8 /* ChatStartPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatStartPosition.swift; sourceTree = "<group>"; };
 		93ADE06E2ACA66AF008ED641 /* VibrationSelectionViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VibrationSelectionViewModel.swift; sourceTree = "<group>"; };
 		93ADE06F2ACA66AF008ED641 /* VibrationSelectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VibrationSelectionView.swift; sourceTree = "<group>"; };
@@ -2034,7 +2034,7 @@
 				413AD21A29CDDD750025F255 /* ChatReply */,
 				9377FBE0296C2AB700C9211B /* ChatTransaction */,
 				938F7D652955C966001915CA /* ChatInputBar.swift */,
-				93A91FD0297972B7001DB1F8 /* ChatScrollDownButton.swift */,
+				93A91FD0297972B7001DB1F8 /* ChatScrollButton.swift */,
 				9371130E2996EDA900F64CF9 /* ChatRefreshMock.swift */,
 				93996A962968209C008D080B /* ChatMessagesCollection.swift */,
 				9382F61229DEC0A3005E6216 /* ChatModelView.swift */,
@@ -3592,7 +3592,7 @@
 				E9FAE5DA203DBFEF008D3A6B /* Comparable+clamped.swift in Sources */,
 				93A91FD329799298001DB1F8 /* ChatStartPosition.swift in Sources */,
 				3A2F55F92AC6F308000A3F26 /* CoinTransaction+CoreDataClass.swift in Sources */,
-				93A91FD1297972B7001DB1F8 /* ChatScrollDownButton.swift in Sources */,
+				93A91FD1297972B7001DB1F8 /* ChatScrollButton.swift in Sources */,
 				3AA3880A2B69173500125684 /* DashNetworkInfoDTO.swift in Sources */,
 				41C1698C29E7F34900FEB3CB /* RichTransactionReplyService.swift in Sources */,
 				935F53D629BE8F7400779492 /* TransactionStatusPublisher.swift in Sources */,
