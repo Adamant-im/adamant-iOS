@@ -9,21 +9,9 @@
 import CommonKit
 
 extension InfoService {
-    nonisolated static let healthCheckParameters = CoinHealthCheckParameters(
-        normalUpdateInterval: 210,
-        crucialUpdateInterval: 30,
-        onScreenUpdateInterval: 10,
-        threshold: 1800,
-        normalServiceUpdateInterval: .infinity,
-        crucialServiceUpdateInterval: .infinity,
-        onScreenServiceUpdateInterval: .infinity
-    )
+    static let threshold = 1800
     
-    nonisolated static var symbol: String {
+    nonisolated static var name: String {
         .localized("InfoService.InfoService")
-    }
-    
-    nonisolated static var nodes: [Node] {
-        [.makeDefaultNode(url: .init(string: "https://info2.adm.im")!)]
     }
 }

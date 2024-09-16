@@ -65,6 +65,7 @@ final class ChatViewModel: NSObject {
     private(set) var chatroom: Chatroom?
     private(set) var chatTransactions: [ChatTransaction] = []
     private var tempCancellables = Set<AnyCancellable>()
+    private var timerCancellable: AnyCancellable?
     private let minDiffCountForOffset = 5
     private let minDiffCountForAnimateScroll = 20
     private let partnerImageSize: CGFloat = 25
@@ -72,7 +73,7 @@ final class ChatViewModel: NSObject {
     private var previousArg: ChatContextMenuArguments?
     private var lastDateHeaderUpdate: Date = Date()
     private var havePartnerName: Bool = false
-    private var dateTimer: Timer?
+    private let delayHideHeaderInSeconds: Double = 2.0
     
     let minIndexForStartLoadNewMessages = 4
     let minOffsetForStartLoadNewMessages: CGFloat = 100
@@ -1032,11 +1033,13 @@ extension ChatViewModel {
     
     func checkTopMessage(indexPath: IndexPath) {
         guard let message = messages[safe: indexPath.section],
-              let date = message.dateHeader?.string.string
+              let date = message.dateHeader?.string.string,
+              message.sentDate != .adamantNullDate
         else { return }
         dateHeader = date
         dateHeaderHidden = false
     }
+    
     func didEndScroll() {
         startHideDateTimer()
     }
@@ -1050,10 +1053,14 @@ extension ChatViewModel: NSFetchedResultsControllerDelegate {
 
 private extension ChatViewModel {
     func startHideDateTimer() {
-        dateTimer?.invalidate()
-        dateTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { [weak self] _ in
-            self?.dateHeaderHidden = true
-        }
+        timerCancellable?.cancel()
+        timerCancellable = Timer
+            .publish(every: delayHideHeaderInSeconds, on: .main, in: .common)
+            .autoconnect()
+            .first()
+            .sink { [weak self] _ in
+                self?.dateHeaderHidden = true
+            }
     }
     
     func sendFiles(with text: String) async throws {

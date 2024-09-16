@@ -149,13 +149,14 @@ private extension BlockchainHealthCheckWrapper {
     func updateNodesAvailability(update: NodeUpdate?) {
         updateNodesAvailabilityLock.lock()
         defer { updateNodesAvailabilityLock.unlock() }
+        let forceIncludeId = update?.info != nil ? update?.id : nil
         
         if let update = update {
             applyUpdate(update: update)
         }
         
         let workingNodes = nodes.filter {
-            $0.isEnabled && ($0.isWorkingStatus)
+            $0.isEnabled && ($0.isWorkingStatus) || $0.id == forceIncludeId
         }
         
         let actualHeightsRange = getActualNodeHeightsRange(

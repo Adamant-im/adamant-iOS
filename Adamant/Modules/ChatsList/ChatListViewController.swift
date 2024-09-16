@@ -355,8 +355,7 @@ final class ChatListViewController: KeyboardObservingViewController {
     /// If the user opens the app from the background and new chats are not loaded,
     /// update specific rows in the tableView to refresh the dates.
     private func refreshDatesIfNeeded() {
-        guard !Calendar.current.isDate(Date(), inSameDayAs: lastDatesUpdate),
-              !isBusy,
+        guard !isBusy,
               let indexPaths = tableView.indexPathsForVisibleRows
         else {
             return
