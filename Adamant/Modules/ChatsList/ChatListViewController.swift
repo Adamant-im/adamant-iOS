@@ -1210,14 +1210,19 @@ extension ChatListViewController {
                 return
             }
             
+            let closeAction: (() -> Void)? = { [completionHandler] in
+                completionHandler(true)
+            }
+            
             let share = self.makeShareAction(
                 for: address,
                 encodedAddress: encodedAddress,
-                sender: view
+                sender: view,
+                completion: closeAction
             )
             
-            let rename = self.makeRenameAction(for: address)
-            let cancel = self.makeCancelAction()
+            let rename = self.makeRenameAction(for: address, completion: closeAction)
+            let cancel = self.makeCancelAction(completion: closeAction)
             
             self.dialogService.showAlert(
                 title: nil,
@@ -1226,8 +1231,6 @@ extension ChatListViewController {
                 actions: [share, rename, cancel],
                 from: .view(view)
             )
-            
-            completionHandler(true)
         }
         
         more.image = .asset(named: "swipe_more")
@@ -1238,7 +1241,8 @@ extension ChatListViewController {
     private func makeShareAction(
         for address: String,
         encodedAddress: String,
-        sender: UIView
+        sender: UIView,
+        completion: (() -> Void)? = nil
     ) -> UIAlertAction {
         .init(
             title: ShareType.share.localized,
@@ -1260,12 +1264,15 @@ extension ChatListViewController {
                 excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
                 animated: true,
                 from: sender,
-                completion: nil
+                completion: completion
             )
         }
     }
     
-    private func makeRenameAction(for address: String) -> UIAlertAction {
+    private func makeRenameAction(
+        for address: String,
+        completion: (() -> Void)? = nil
+    ) -> UIAlertAction {
         .init(
             title: .adamant.chat.rename,
             style: .default
@@ -1273,6 +1280,7 @@ extension ChatListViewController {
             guard let alert = self?.makeRenameAlert(for: address) else { return }
             self?.dialogService.present(alert, animated: true) {
                 self?.dialogService.selectAllTextFields(in: alert)
+                completion?()
             }
         }
     }
@@ -1311,8 +1319,13 @@ extension ChatListViewController {
         return alert
     }
     
-    private func makeCancelAction() -> UIAlertAction {
-        .init(title: .adamant.alert.cancel, style: .cancel, handler: nil)
+    private func makeCancelAction(completion: (() -> Void)? = nil) -> UIAlertAction {
+        .init(
+            title: .adamant.alert.cancel,
+            style: .cancel
+        ) { _ in
+            completion?()
+        }
     }
 }
 
