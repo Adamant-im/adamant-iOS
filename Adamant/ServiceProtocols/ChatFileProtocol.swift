@@ -74,4 +74,6 @@ protocol ChatFileProtocol {
     ) async throws
     
     func isDownloadPreviewLimitReached(for fileId: String) -> Bool
+    
+    func cancelUpload(messageId: String, fileId: String) async
 }

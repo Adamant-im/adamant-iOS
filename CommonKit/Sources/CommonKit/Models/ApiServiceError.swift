@@ -75,6 +75,9 @@ extension ApiServiceError: Equatable {
             
         case (.networkError, .networkError):
             return true
+          
+        case (.requestCancelled, .requestCancelled):
+            return true
             
         default:
             return false

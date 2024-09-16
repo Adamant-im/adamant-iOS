@@ -943,18 +943,18 @@ extension AdamantChatsProvider {
             throw ChatsProviderError.transactionNotFound(id: transactionLocalyId)
         }
         
-        guard case let .richMessage(payload) = message else {
-            throw ChatsProviderError.messageNotValid(.empty)
-        }
+//        guard case let .richMessage(payload) = message else {
+//            throw ChatsProviderError.messageNotValid(.empty)
+//        }
         
-        transactionLocaly.richContent = payload.content()
-        transactionLocaly.richContentSerialized = payload.serialized()
+//        transactionLocaly.richContent = payload.content()
+//        transactionLocaly.richContentSerialized = payload.serialized()
         
         let transaction = try await sendMessageToServer(
             senderId: loggedAccount.address,
             recipientId: recipientId,
             transaction: transactionLocaly,
-            type: message.chatType,
+            type: .richMessage,
             keypair: keypair,
             context: context,
             from: chatroom
@@ -1978,6 +1978,21 @@ extension AdamantChatsProvider {
     }
     
     func removeMessage(with id: String) {
+        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        context.parent = stack.container.viewContext
+        
+        guard let transaction = getBaseTransactionFromDB(
+            id: id,
+            context: context
+        ) as? ChatTransaction else {
+            return
+        }
+        
+        transaction.isHidden = true
+        try? context.save()
+        
+        transaction.chatroom?.updateLastTransaction()
+        
         if !self.removedMessages.contains(id) {
             self.removedMessages.append(id)
             

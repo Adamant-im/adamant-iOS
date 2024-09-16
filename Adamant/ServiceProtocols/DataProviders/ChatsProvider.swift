@@ -224,7 +224,7 @@ protocol ChatsProvider: DataProvider, Actor {
     ) async throws -> String
     
     func sendFileMessage(
-        _ message: AdamantMessage,
+       _ message: AdamantMessage,
         recipientId: String,
         transactionLocalyId: String,
         from chatroom: Chatroom?
