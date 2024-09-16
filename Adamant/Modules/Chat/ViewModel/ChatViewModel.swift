@@ -110,6 +110,7 @@ final class ChatViewModel: NSObject {
     @ObservableValue var replyMessage: MessageModel?
     @ObservableValue var scrollToMessage: (toId: String?, fromId: String?)
     @ObservableValue var filesPicked: [FileResult]?
+    @ObservableValue private(set) var needShowUnreadChatsCounter = false
     @ObservableValue private(set) var unreadChatsCount: Int = 0
     
     var startPosition: ChatStartPosition? {
@@ -1031,6 +1032,14 @@ extension ChatViewModel {
             processFileResult(.failure(error))
         }
     }
+    
+    func viewControllerPresentedDidChange(isPresented: Bool) {
+        if isPresented {
+            needShowUnreadChatsCounter = unreadChatsCount != 0
+        } else {
+            needShowUnreadChatsCounter = false
+        }
+    }
 }
 
 extension ChatViewModel: NSFetchedResultsControllerDelegate {
@@ -1194,6 +1203,7 @@ private extension ChatViewModel {
     func updateUnreadChatsCount() {
         try? unreadChatsController?.performFetch()
         unreadChatsCount = unreadChatsController?.fetchedObjects?.count ?? .zero
+        needShowUnreadChatsCounter = unreadChatsCount != 0
     }
     
     func updateMessages(

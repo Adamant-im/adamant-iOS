@@ -32,9 +32,7 @@ final class BadgeViewLabel: UILabel {
                       height: size.height + textInsets.top + textInsets.bottom)
     }
     
-    @MainActor
     func updateCounter(count: Int) {
-        isHidden = count == 0
         let formatText: String = count > 99 ? "99+" : "\(count)"
         text = formatText
     }
@@ -42,7 +40,6 @@ final class BadgeViewLabel: UILabel {
 
 private extension BadgeViewLabel {
     func configure() {
-        isHidden = true
         layer.cornerRadius = cornerRadius
         layer.masksToBounds = true
         backgroundColor = .systemRed

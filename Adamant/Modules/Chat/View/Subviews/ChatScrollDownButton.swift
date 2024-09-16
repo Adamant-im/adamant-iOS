@@ -32,7 +32,9 @@ final class ChatScrollDownButton: UIView {
         configure()
     }
     
+    @MainActor
     func updateCounter(count: Int) {
+        badgeView.isHidden = count == 0
         badgeView.updateCounter(count: count)
     }
 }

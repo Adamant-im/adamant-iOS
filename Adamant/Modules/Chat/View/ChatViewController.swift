@@ -46,7 +46,7 @@ final class ChatViewController: MessagesViewController {
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
     private lazy var scrollDownButton = makeScrollDownButton()
-    private var unreadChatsCounter = BadgeViewLabel()
+    private lazy var unreadChatsCounter: BadgeViewLabel? = nil
     private lazy var chatMessagesCollectionView = makeChatMessagesCollectionView()
     private lazy var replyView = ReplyView()
     private lazy var filesToolbarView = FilesToolbarView()
@@ -146,7 +146,9 @@ final class ChatViewController: MessagesViewController {
         super.viewDidAppear(animated)
         defer { viewAppeared = true }
         
-        unreadChatsCounter.updateCounter(count: viewModel.unreadChatsCount)
+        if viewAppeared {
+            viewModel.viewControllerPresentedDidChange(isPresented: true)
+        }
         
         inputBar.isUserInteractionEnabled = true
         chatMessagesCollectionView.fixedBottomOffset = nil
@@ -161,7 +163,6 @@ final class ChatViewController: MessagesViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        unreadChatsCounter.isHidden = true
         inputBar.isUserInteractionEnabled = false
         inputBar.inputTextView.resignFirstResponder()
     }
@@ -169,7 +170,7 @@ final class ChatViewController: MessagesViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         
-        unreadChatsCounter.isHidden = true
+        viewModel.viewControllerPresentedDidChange(isPresented: false)
         
         viewModel.preserveFiles()
         viewModel.preserveMessage(inputBar.text)
@@ -454,9 +455,20 @@ private extension ChatViewController {
             }
             .store(in: &subscriptions)
         
+        guard navigationController != nil,
+              splitViewController == nil else {
+            return
+        }
         viewModel.$unreadChatsCount
             .sink { [weak self] count in
-                self?.unreadChatsCounter.updateCounter(count: count)
+                self?.unreadChatsCounter?.updateCounter(count: count)
+            }
+            .store(in: &subscriptions)
+        
+        viewModel.$needShowUnreadChatsCounter
+            .removeDuplicates()
+            .sink { [weak self] needShow in
+                self?.configureUnreadChatsCounter(needShow: needShow)
             }
             .store(in: &subscriptions)
     }
@@ -507,18 +519,24 @@ private extension ChatViewController {
         
         navigationItem.titleView?.addGestureRecognizer(tapGesture)
         navigationItem.titleView?.addGestureRecognizer(longPressGesture)
-        
-        guard let navBar = navigationController?.navigationBar,
-              self.splitViewController == nil else {
-            return
+    }
+    
+    func configureUnreadChatsCounter(needShow: Bool) {
+        if needShow {
+            if unreadChatsCounter == nil,
+               let navBar = navigationController?.navigationBar {
+                unreadChatsCounter = BadgeViewLabel()
+                navBar.addSubview(unreadChatsCounter!)
+                unreadChatsCounter!.snp.makeConstraints { make in
+                    make.leading.equalToSuperview().offset(unreadChatsCounterLeadingOffset)
+                    make.centerY.equalToSuperview()
+                }
+            }
+            unreadChatsCounter?.updateCounter(count: viewModel.unreadChatsCount)
+        } else {
+            unreadChatsCounter?.removeFromSuperview()
+            unreadChatsCounter = nil
         }
-        unreadChatsCounter = BadgeViewLabel()
-        navBar.addSubview(unreadChatsCounter)
-        unreadChatsCounter.snp.makeConstraints { make in
-            make.leading.equalTo(navBar.snp.leading).offset(unreadChatsCounterLeadingOffset)
-            make.centerY.equalTo(navBar.snp.centerY)
-        }
-        unreadChatsCounter.updateCounter(count: viewModel.unreadChatsCount)
     }
     
     func configureHeaderRightButton() {
