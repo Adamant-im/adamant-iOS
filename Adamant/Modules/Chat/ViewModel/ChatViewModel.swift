@@ -420,14 +420,7 @@ final class ChatViewModel: NSObject {
     
     func hideMessage(id: String) {
         Task {
-            guard let transaction = chatTransactions.first(where: { $0.chatMessageId == id })
-            else { return }
-            
-            transaction.isHidden = true
-            try? transaction.managedObjectContext?.save()
-            
-            chatroom?.updateLastTransaction()
-            await chatsProvider.removeMessage(with: transaction.transactionId)
+            await chatsProvider.removeMessage(with: id)
         }
     }
     
@@ -736,6 +729,14 @@ final class ChatViewModel: NSObject {
               tx.statusEnum != .failed
         else {
             dialog.send(.failedMessageAlert(id: messageId, sender: nil))
+            return
+        }
+        
+        guard !chatFileService.uploadingFiles.contains(file.file.id) else {
+            print("start cancel=\(file.file.id)")
+            Task {
+                await chatFileService.cancelUpload(messageId: messageId, fileId: file.file.id)
+            }
             return
         }
         
