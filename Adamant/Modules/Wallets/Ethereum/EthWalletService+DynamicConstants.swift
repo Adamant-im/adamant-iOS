@@ -14,7 +14,7 @@ extension EthWalletService {
         crucialUpdateInterval: 30,
         onScreenUpdateInterval: 10,
         threshold: 5,
-        normalServiceUpdateInterval: 300,
+        normalServiceUpdateInterval: 330,
         crucialServiceUpdateInterval: 30,
         onScreenServiceUpdateInterval: 10
     )
@@ -48,7 +48,7 @@ extension EthWalletService {
     }
         
     var defaultGasPriceGwei: BigUInt {
-        30
+        10
     }
         
     var defaultGasLimit: BigUInt {
@@ -56,7 +56,7 @@ extension EthWalletService {
     }
         
     var warningGasPriceGwei: BigUInt {
-        70
+        25
     }
         
     var tokenName: String {

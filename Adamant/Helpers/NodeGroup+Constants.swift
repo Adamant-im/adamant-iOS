@@ -28,7 +28,7 @@ extension NodeGroup {
         case .ipfs:
             return IPFSApiService.healthCheckParameters.onScreenUpdateInterval
         case .infoService:
-            return InfoService.healthCheckParameters.onScreenUpdateInterval
+            return AdmWalletService.healthCheckParameters.onScreenServiceUpdateInterval
         }
     }
 
@@ -51,7 +51,7 @@ extension NodeGroup {
         case .ipfs:
             return IPFSApiService.healthCheckParameters.crucialUpdateInterval
         case .infoService:
-            return InfoService.healthCheckParameters.crucialUpdateInterval
+            return AdmWalletService.healthCheckParameters.crucialServiceUpdateInterval
         }
     }
 
@@ -74,7 +74,7 @@ extension NodeGroup {
         case .ipfs:
             return IPFSApiService.healthCheckParameters.threshold
         case .infoService:
-            return InfoService.healthCheckParameters.threshold
+            return InfoService.threshold
         }
     }
 
@@ -97,11 +97,10 @@ extension NodeGroup {
         case .ipfs:
             return IPFSApiService.healthCheckParameters.normalUpdateInterval
         case .infoService:
-            return InfoService.healthCheckParameters.normalUpdateInterval
+            return AdmWalletService.healthCheckParameters.normalServiceUpdateInterval
         }
     }
     
-    // swiftlint:disable switch_case_alignment
     var minNodeVersion: Version? {
         let version: String?
         switch self {
@@ -147,7 +146,7 @@ extension NodeGroup {
         case .ipfs:
             return IPFSApiService.symbol
         case .infoService:
-            return InfoService.symbol
+            return InfoService.name
         }
     }
     

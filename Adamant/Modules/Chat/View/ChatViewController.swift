@@ -202,20 +202,7 @@ final class ChatViewController: MessagesViewController {
         super.scrollViewDidScroll(scrollView)
         updateIsScrollPositionNearlyTheBottom()
         updateScrollDownButtonVisibility()
-        
-        let targetY: CGFloat = 20 + view.safeAreaInsets.top
-        guard let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems.sorted(by: {
-            $0.row < $1.row
-        }) as [IndexPath]? else { return }
-        for indexPath in visibleIndexPaths {
-            if let cell = messagesCollectionView.cellForItem(at: indexPath) {
-                let cellRect = messagesCollectionView.convert(cell.frame, to: self.view)
-                if cellRect.minY <= targetY && cellRect.maxY >= targetY {
-                    viewModel.checkTopMessage(indexPath: indexPath)
-                    break
-                }
-            }
-        }
+        updateDateHeaderIfNeeded()
         
         guard
             viewAppeared,
@@ -713,6 +700,27 @@ private extension ChatViewController {
     func updateScrollDownButtonVisibility() {
         scrollDownButton.isHidden = isScrollPositionNearlyTheBottom
     }
+    
+    func updateDateHeaderIfNeeded() {
+        guard viewAppeared else { return }
+        
+        let targetY: CGFloat = targetYOffset + view.safeAreaInsets.top
+        let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems
+        
+        for indexPath in visibleIndexPaths {
+            guard let cell = messagesCollectionView.cellForItem(at: indexPath)
+            else { continue }
+            
+            let cellRect = messagesCollectionView.convert(cell.frame, to: self.view)
+            
+            guard cellRect.minY <= targetY && cellRect.maxY >= targetY else {
+                continue
+            }
+            
+            viewModel.checkTopMessage(indexPath: indexPath)
+            break
+        }
+    }
 }
 
 // MARK: Making entities
@@ -1076,3 +1084,4 @@ private var replyAction: Bool = false
 private var canReplyVibrate: Bool = true
 private var oldContentOffset: CGPoint?
 private let filesToolbarViewHeight: CGFloat = 140
+private let targetYOffset: CGFloat = 20

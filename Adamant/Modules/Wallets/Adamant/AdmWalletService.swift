@@ -153,7 +153,7 @@ final class AdmWalletService: NSObject, WalletCoreProtocol {
             if wallet.balance != account.balance {
                 wallet.balance = account.balance
                 notify = true
-            } else if wallet.isBalanceInitialized {
+            } else if !wallet.isBalanceInitialized {
                 notify = true
             } else {
                 notify = false
