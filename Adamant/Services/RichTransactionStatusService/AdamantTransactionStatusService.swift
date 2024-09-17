@@ -86,8 +86,8 @@ private extension AdamantTransactionStatusService {
     
     func makeNodesAvailabilitySubscription() -> some Observable<[UUID]> {
         nodesStorage
-            .nodesWithGroupsPublisher
-            .map { $0.compactMap { $0.node.isEnabled ? $0.node.id : nil } }
+            .nodesPublisher
+            .map { $0.values.flatMap { $0.compactMap { $0.isEnabled ? $0.id : nil } } }
             .removeDuplicates()
     }
         

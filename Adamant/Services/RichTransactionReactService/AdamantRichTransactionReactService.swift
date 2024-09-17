@@ -12,7 +12,7 @@ import CommonKit
 
 actor AdamantRichTransactionReactService: NSObject, RichTransactionReactService {
     private let coreDataStack: CoreDataStack
-    private let apiService: ApiService
+    private let apiService: AdamantApiServiceProtocol
     private let adamantCore: AdamantCore
     private let accountService: AccountService
     
@@ -25,7 +25,7 @@ actor AdamantRichTransactionReactService: NSObject, RichTransactionReactService 
 
     init(
         coreDataStack: CoreDataStack,
-        apiService: ApiService,
+        apiService: AdamantApiServiceProtocol,
         adamantCore: AdamantCore,
         accountService: AccountService
     ) {

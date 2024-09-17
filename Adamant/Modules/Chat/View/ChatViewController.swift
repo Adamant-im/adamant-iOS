@@ -51,6 +51,11 @@ final class ChatViewController: MessagesViewController {
     private lazy var replyView = ReplyView()
     private lazy var filesToolbarView = FilesToolbarView()
     private lazy var chatDropView = ChatDropView()
+    private lazy var dateHeaderLabel = EdgeInsetLabel(
+        font: .adamantPrimary(ofSize: 13),
+        textColor: .adamant.textColor,
+        numberOfLines: 1
+    )
     
     private var sendTransaction: SendTransaction
     
@@ -199,10 +204,15 @@ final class ChatViewController: MessagesViewController {
         viewModel.messageWasRead(index: indexPath.section)
     }
     
+    override func scrollViewDidEndDragging(_: UIScrollView, willDecelerate _: Bool) {
+        viewModel.didEndScroll()
+    }
+    
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         super.scrollViewDidScroll(scrollView)
         updateIsScrollPositionNearlyTheBottom()
         updateScrollDownButtonVisibility()
+        updateDateHeaderIfNeeded()
         
         guard
             viewAppeared,
@@ -366,6 +376,7 @@ private extension ChatViewController {
             .sink { [weak self] in
                 if $0 {
                     self?.updatingIndicatorView.startAnimate()
+                    self?.viewModel.refreshDateHeadersIfNeeded()
                 } else {
                     self?.updatingIndicatorView.stopAnimate()
                 }
@@ -399,6 +410,16 @@ private extension ChatViewController {
         
         viewModel.$isNeedToAnimateScroll
             .sink { [weak self] in self?.animateScroll(isStarted: $0) }
+            .store(in: &subscriptions)
+        
+        viewModel.$dateHeader
+            .removeDuplicates()
+            .sink { [weak self] in self?.dateHeaderLabel.text = $0 }
+            .store(in: &subscriptions)
+        
+        viewModel.$dateHeaderHidden
+            .removeDuplicates()
+            .sink { [weak self] in self?.dateHeaderLabel.isHidden = $0 }
             .store(in: &subscriptions)
         
         viewModel.updateChatRead
@@ -519,6 +540,16 @@ private extension ChatViewController {
         
         navigationItem.titleView?.addGestureRecognizer(tapGesture)
         navigationItem.titleView?.addGestureRecognizer(longPressGesture)
+        
+        view.addSubview(dateHeaderLabel)
+        dateHeaderLabel.backgroundColor = .adamant.chatSenderBackground
+        dateHeaderLabel.textInsets = .init(top: 4, left: 7, bottom: 4, right: 7)
+        dateHeaderLabel.layer.cornerRadius = 10
+        dateHeaderLabel.clipsToBounds = true
+        dateHeaderLabel.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(10)
+            make.centerX.equalToSuperview()
+        }
     }
     
     func configureUnreadChatsCounter(needShow: Bool) {
@@ -719,6 +750,27 @@ private extension ChatViewController {
     func updateScrollDownButtonCounter() {
         let count = viewModel.chatroom?.getUnreadCount() ?? 0
         scrollDownButton.updateCounter(count: count)
+    }
+    
+    func updateDateHeaderIfNeeded() {
+        guard viewAppeared else { return }
+        
+        let targetY: CGFloat = targetYOffset + view.safeAreaInsets.top
+        let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems
+        
+        for indexPath in visibleIndexPaths {
+            guard let cell = messagesCollectionView.cellForItem(at: indexPath)
+            else { continue }
+            
+            let cellRect = messagesCollectionView.convert(cell.frame, to: self.view)
+            
+            guard cellRect.minY <= targetY && cellRect.maxY >= targetY else {
+                continue
+            }
+            
+            viewModel.checkTopMessage(indexPath: indexPath)
+            break
+        }
     }
 }
 
@@ -1084,4 +1136,5 @@ private var replyAction: Bool = false
 private var canReplyVibrate: Bool = true
 private var oldContentOffset: CGPoint?
 private let filesToolbarViewHeight: CGFloat = 140
+private let targetYOffset: CGFloat = 20
 private let unreadChatsCounterLeadingOffset: CGFloat = 23

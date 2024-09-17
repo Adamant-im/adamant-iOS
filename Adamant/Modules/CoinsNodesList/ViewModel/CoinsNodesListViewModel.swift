@@ -17,27 +17,27 @@ final class CoinsNodesListViewModel: ObservableObject {
     private let mapper: CoinsNodesListMapper
     private let nodesStorage: NodesStorageProtocol
     private let nodesAdditionalParamsStorage: NodesAdditionalParamsStorageProtocol
-    private let processedGroups: Set<NodeGroup>
-    private let apiServices: ApiServices
+    private let processedGroups: [NodeGroup]
+    private let apiServiceCompose: ApiServiceComposeProtocol
     private var subscriptions = Set<AnyCancellable>()
     
     nonisolated init(
         mapper: CoinsNodesListMapper,
         nodesStorage: NodesStorageProtocol,
         nodesAdditionalParamsStorage: NodesAdditionalParamsStorageProtocol,
-        processedGroups: Set<NodeGroup>,
-        apiServices: ApiServices
+        processedGroups: [NodeGroup],
+        apiServiceCompose: ApiServiceComposeProtocol
     ) {
         self.mapper = mapper
         self.nodesStorage = nodesStorage
         self.nodesAdditionalParamsStorage = nodesAdditionalParamsStorage
         self.processedGroups = processedGroups
-        self.apiServices = apiServices
+        self.apiServiceCompose = apiServiceCompose
         Task { @MainActor in setup() }
     }
     
-    func setIsEnabled(id: UUID, value: Bool) {
-        nodesStorage.updateNodeParams(id: id, isEnabled: value)
+    func setIsEnabled(id: UUID, group: NodeGroup, value: Bool) {
+        nodesStorage.updateNode(id: id, group: group) { $0.isEnabled = value }
     }
     
     func reset() {
@@ -61,7 +61,7 @@ private extension CoinsNodesListViewModel {
         
         guard let someGroup = processedGroups.first else { return }
         
-        nodesStorage.nodesWithGroupsPublisher
+        nodesStorage.nodesPublisher
             .combineLatest(nodesAdditionalParamsStorage.fastestNodeMode(group: someGroup))
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in self?.updateSections(items: $0.0) }
@@ -76,25 +76,25 @@ private extension CoinsNodesListViewModel {
         healthCheck()
     }
     
-    func updateSections(items: [NodeWithGroup]) {
+    func updateSections(items: [NodeGroup: [Node]]) {
         state.sections = mapper.map(
             items: items,
-            restNodeIds: processedGroups.flatMap {
-                apiServices.getApiService(group: $0).preferredNodeIds
+            restNodeIds: processedGroups.compactMap {
+                apiServiceCompose.chosenFastestNodeId(group: $0)
             }
         )
     }
     
     func saveFastestNodeMode(_ value: Bool) {
         nodesAdditionalParamsStorage.setFastestNodeMode(
-            groups: processedGroups,
+            groups: .init(processedGroups),
             value: value
         )
     }
     
     func healthCheck() {
         processedGroups.forEach {
-            apiServices.getApiService(group: $0).healthCheck()
+            apiServiceCompose.healthCheck(group: $0)
         }
     }
 }

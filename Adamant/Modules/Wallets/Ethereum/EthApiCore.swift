@@ -17,10 +17,10 @@ actor EthApiCore {
     private var web3Cache: [URL: Web3] = .init()
     
     func performRequest<Success>(
-        node: Node,
+        origin: NodeOrigin,
         _ body: @escaping @Sendable (_ web3: Web3) async throws -> Success
     ) async -> WalletServiceResult<Success> {
-        switch await getWeb3(node: node) {
+        switch await getWeb3(origin: origin) {
         case let .success(web3):
             do {
                 return .success(try await body(web3))
@@ -43,11 +43,11 @@ actor EthApiCore {
 }
 
 extension EthApiCore: BlockchainHealthCheckableService {
-    func getStatusInfo(node: Node) async -> WalletServiceResult<NodeStatusInfo> {
+    func getStatusInfo(origin: NodeOrigin) async -> WalletServiceResult<NodeStatusInfo> {
         let startTimestamp = Date.now.timeIntervalSince1970
         
         let response = await apiCore.sendRequestRPC(
-            node: node,
+            origin: origin,
             path: .empty,
             requests: [
                 .init(method: EthApiComand.blockNumberMethod),
@@ -85,14 +85,14 @@ extension EthApiCore: BlockchainHealthCheckableService {
             height: Int(height),
             wsEnabled: false,
             wsPort: nil,
-            version: extractVersion(from: clientVersion)
+            version: extractVersion(from: clientVersion).flatMap { .init($0) }
         ))
     }
 }
 
 private extension EthApiCore {
-    func getWeb3(node: Node) async -> WalletServiceResult<Web3> {
-        guard let url = node.asURL() else {
+    func getWeb3(origin: NodeOrigin) async -> WalletServiceResult<Web3> {
+        guard let url = origin.asURL() else {
             return .failure(.internalError(.endpointBuildFailed))
         }
         

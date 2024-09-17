@@ -58,7 +58,7 @@ final class AdmWalletService: NSObject, WalletCoreProtocol {
     
 	// MARK: - Dependencies
 	weak var accountService: AccountService?
-	var apiService: ApiService!
+	var apiService: AdamantApiServiceProtocol!
 	var transfersProvider: TransfersProvider!
     var coreDataStack: CoreDataStack!
     var vibroService: VibroService!
@@ -88,6 +88,10 @@ final class AdmWalletService: NSObject, WalletCoreProtocol {
     
     var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
         $hasMoreOldTransactions.eraseToAnyPublisher()
+    }
+    
+    var hasActiveNode: Bool {
+        apiService.hasActiveNode
     }
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
@@ -149,14 +153,14 @@ final class AdmWalletService: NSObject, WalletCoreProtocol {
             if wallet.balance != account.balance {
                 wallet.balance = account.balance
                 notify = true
-            } else if wallet.isBalanceInitialized {
+            } else if !wallet.isBalanceInitialized {
                 notify = true
             } else {
                 notify = false
             }
             wallet.isBalanceInitialized = true
         } else {
-            let wallet = AdmWallet(address: account.address)
+            let wallet = AdmWallet(unicId: tokenUnicID, address: account.address)
             wallet.isBalanceInitialized = true
             wallet.balance = account.balance
             
@@ -184,7 +188,11 @@ final class AdmWalletService: NSObject, WalletCoreProtocol {
     }
     
     private func postUpdateNotification(with wallet: WalletAccount) {
-        NotificationCenter.default.post(name: walletUpdatedNotification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
+        NotificationCenter.default.post(
+            name: walletUpdatedNotification,
+            object: self,
+            userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet]
+        )
     }
     
     func getWalletAddress(byAdamantAddress address: String) async throws -> String {
@@ -230,7 +238,7 @@ extension AdmWalletService: SwinjectDependentService {
     @MainActor
     func injectDependencies(from container: Container) {
         accountService = container.resolve(AccountService.self)
-        apiService = container.resolve(ApiService.self)
+        apiService = container.resolve(AdamantApiServiceProtocol.self)
         transfersProvider = container.resolve(TransfersProvider.self)
         coreDataStack = container.resolve(CoreDataStack.self)
         vibroService = container.resolve(VibroService.self)

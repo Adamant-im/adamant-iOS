@@ -109,10 +109,9 @@ struct ChatMessageFactory {
                 status: status,
                 expireDate: &expireDate
             ).map { .init(string: $0) },
-            dateHeader: dateHeaderOn
-                ? makeDateHeader(sentDate: sentDate)
-                : nil,
-            topSpinnerOn: topSpinnerOn
+            dateHeader: makeDateHeader(sentDate: sentDate),
+            topSpinnerOn: topSpinnerOn, 
+            dateHeaderIsHidden: !dateHeaderOn
         )
     }
 }
@@ -262,7 +261,7 @@ private extension ChatMessageFactory {
         : transaction.senderAddress
         
         let coreService = walletServiceCompose.getWallet(by: transfer.type)?.core
-        let defaultIcon: UIImage = .asset(named: "no-token") ?? .init()
+        let defaultIcon: UIImage = .asset(named: "no-token")?.withTintColor(.adamant.primary) ?? .init()
         
         return .transaction(.init(value: .init(
             id: id,

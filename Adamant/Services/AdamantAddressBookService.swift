@@ -18,7 +18,7 @@ final class AdamantAddressBookService: AddressBookService {
     
     // MARK: - Dependencies
     
-    private let apiService: ApiService
+    private let apiService: AdamantApiServiceProtocol
     private let adamantCore: AdamantCore
     private let accountService: AccountService
     private let dialogService: DialogService
@@ -38,7 +38,7 @@ final class AdamantAddressBookService: AddressBookService {
     
     // MARK: - Lifecycle
     nonisolated init(
-        apiService: ApiService,
+        apiService: AdamantApiServiceProtocol,
         adamantCore: AdamantCore,
         accountService: AccountService,
         dialogService: DialogService

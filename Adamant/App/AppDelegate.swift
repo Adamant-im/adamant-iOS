@@ -62,10 +62,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     // MARK: - Lifecycle
     
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // MARK: 0. Migrate keychain if needed
-        KeychainStore.migrateIfNeeded()
-        
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {        
         // MARK: 1. Initiating Swinject
         container = AppContainer()
         screensFactory = AdamantScreensFactory(assembler: container.assembler)
@@ -263,11 +260,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             dialogService.showError(withMessage: "Failed to register AddressBookService autoupdate. Please, report a bug", supportEmail: true, error: nil)
         }
         
-        if let currencyInfoService = container.resolve(CurrencyInfoService.self) {
+        if let currencyInfoService = container.resolve(InfoServiceProtocol.self) {
             currencyInfoService.update() // Initial update
             repeater.registerForegroundCall(label: "currencyInfoService", interval: 60, queue: .global(qos: .utility), callback: currencyInfoService.update)
         } else {
-            dialogService.showError(withMessage: "Failed to register CurrencyInfoService autoupdate. Please, report a bug", supportEmail: true, error: nil)
+            dialogService.showError(withMessage: "Failed to register InfoServiceProtocol autoupdate. Please, report a bug", supportEmail: true, error: nil)
         }
         
         // MARK: 7. Logout reset

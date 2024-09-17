@@ -167,7 +167,10 @@
 "AccountTab.Row.Balance" = "Kontostand";
 
 /* Account tab: 'Buy tokens' button */
-"AccountTab.Row.BuyTokens" = "Token tauschen";
+"AccountTab.Row.BuyTokens" = "Coin tauschen";
+
+/* Account tab: 'Stake ADM' button */
+"AccountTab.Row.StakeAdm" = "Setzen und verdienen";
 
 /* Account tab: 'Logout' button */
 "AccountTab.Row.Logout" = "Ausloggen";
@@ -204,6 +207,12 @@
 
 /* Account tab: Exchange ADM tokens in chat */
 "AccountTab.Row.ExchangeADMInChat" = "Austauscher im Chat";
+
+/* Account tab: Exchanges on CMC */
+"AccountTab.Row.ExchangesOnCoinMarketCap" = "Börsen auf CoinMarketCap";
+
+/* Account tab: Exchanges on CoinGecko */
+"AccountTab.Row.ExchangesOnCoinGecko" = "Börsen auf CoinGecko";
 
 /* Account tab: 'Address' row */
 "AccountTab.Row.Address" = "Addresse";
@@ -463,6 +472,9 @@
 /* Delegates page: scene title */
 "Delegates.Title" = "Delegierte";
 
+/* Delegates page: header text */
+"Delegates.HeaderText" = "Wenn Sie ADM einsetzen und Belohnungen erhalten möchten, stimmen Sie für einen aktiven Schmiedepool Ihres Vertrauens. Lesen Sie mehr im [ADAMANT Blog](https://news.adamant.im/hodl-list-of-adamant-pools-join-in-and-get-rewards-491a98610f4b).";
+
 /* Visible Wallets page: scene title */
 "VisibleWallets.Title" = "Wallet-Liste";
 
@@ -649,6 +661,12 @@
 /* NodesList: Button label */
 "NodesList.NodesList" = "ADM Node-Liste";
 
+/* Info Service: Info Service */
+"InfoService.InfoService" = "Info Service";
+
+/* Info Service: inconsistent data */
+"InfoService.InconsistentData" = "Inconsistent data";
+
 /* NodesList: scene title */
 "NodesList.Title" = "Liste der benutzten ADM Nodes";
 
@@ -819,6 +837,22 @@
 
 /* Notifications: Select Sounds */
 "Notifications.Sounds.Name" = "Geräusche";
+
+/* Notifications: Vibrate title */
+"Notifications.Vibrate.Title" = "Vibrieren Sie";
+
+/* Notifications: Toasts title */
+"Notifications.Toasts.Title" = "Toasts";
+
+/* Notifications: Reactions header */
+"Notifications.Reactions.Header" = "Reaktionen";
+
+/* Notifications: In-App notifications header */
+"Notifications.InAppNotifications.Header" = "In-App-Benachrichtigungen";
+
+
+/* Notifications: Select Alert Tones */
+"Notifications.Alert.Tones" = "ALERT-TÖNE";
 
 /* Notifications: Select Alert Save */
 "Notifications.Alert.Save" = "Speichern";
@@ -1035,6 +1069,9 @@
 
 /* Transaction status: inconsistent reason title */
 "TransactionStatus.Inconsistent.Reason.Title" = "Inkonsistenter Grund";
+
+/* Transaction status: inconsistent data title */
+"TransactionStatus.Inconsistent.RecordData.Title" = "Tx-Datensatz";
 
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "Details";

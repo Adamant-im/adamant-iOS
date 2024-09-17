@@ -129,6 +129,7 @@ final class ChatListViewController: KeyboardObservingViewController {
     
     private var onMessagesLoadedActions = [() -> Void]()
     private var areMessagesLoaded = false
+    private var lastDatesUpdate: Date = Date()
     
     // MARK: Tasks
     
@@ -347,7 +348,21 @@ final class ChatListViewController: KeyboardObservingViewController {
         
         if case .updating = newState {
             updatingIndicatorView.startAnimate()
+            refreshDatesIfNeeded()
         }
+    }
+    
+    /// If the user opens the app from the background and new chats are not loaded,
+    /// update specific rows in the tableView to refresh the dates.
+    private func refreshDatesIfNeeded() {
+        guard !isBusy,
+              let indexPaths = tableView.indexPathsForVisibleRows
+        else {
+            return
+        }
+        
+        lastDatesUpdate = Date()
+        tableView.reloadRows(at: indexPaths, with: .none)
     }
     
     private func updateChats() {
@@ -1059,15 +1074,25 @@ extension ChatListViewController {
         let more = makeMooreContextualAction(for: chatroom)
         actions.append(more)
         
-        // Mark as read
-        if chatroom.hasUnreadMessages || (chatroom.lastTransaction?.isUnread ?? false) {
-            let markAsRead = makeMarkAsReadContextualAction(for: chatroom)
-            actions.append(markAsRead)
-        }
-        
         // Block
         let block = makeBlockContextualAction(for: chatroom)
         actions.append(block)
+        
+        return UISwipeActionsConfiguration(actions: actions)
+    }
+    
+    func tableView(
+        _ tableView: UITableView,
+        leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath
+    ) -> UISwipeActionsConfiguration? {
+        guard let chatroom = chatsController?.fetchedObjects?[safe: indexPath.row] else {
+            return nil
+        }
+        
+        var actions: [UIContextualAction] = []
+      
+        let markAsRead = makeMarkAsReadContextualAction(for: chatroom)
+        actions.append(markAsRead)
         
         return UISwipeActionsConfiguration(actions: actions)
     }
@@ -1113,7 +1138,8 @@ extension ChatListViewController {
             )
         }
         
-        block.image = .asset(named: "swipe_block")
+        block.image = .asset(named: "swipe_block")?.withTintColor(.adamant.warning, renderingMode: .alwaysOriginal)
+        block.backgroundColor = .adamant.swipeBlockColor
         
         return block
     }
@@ -1121,15 +1147,18 @@ extension ChatListViewController {
     private func makeMarkAsReadContextualAction(for chatroom: Chatroom) -> UIContextualAction {
         let markAsRead = UIContextualAction(
             style: .normal,
-            title: nil
+            title: "👀"
         ) { (_, _, completionHandler) in
-            chatroom.markAsReaded()
+            if chatroom.hasUnread {
+                chatroom.markAsReaded()
+            } else {
+                chatroom.markAsUnread()
+            }
             try? chatroom.managedObjectContext?.save()
             completionHandler(true)
         }
-        
-        markAsRead.image = .asset(named: "swipe_mark-as-read")
-        markAsRead.backgroundColor = UIColor.adamant.primary
+
+        markAsRead.backgroundColor = UIColor.adamant.contextMenuDefaultBackgroundColor
         return markAsRead
     }
     
@@ -1182,14 +1211,19 @@ extension ChatListViewController {
                 return
             }
             
+            let closeAction: (() -> Void)? = { [completionHandler] in
+                completionHandler(true)
+            }
+            
             let share = self.makeShareAction(
                 for: address,
                 encodedAddress: encodedAddress,
-                sender: view
+                sender: view,
+                completion: closeAction
             )
             
-            let rename = self.makeRenameAction(for: address)
-            let cancel = self.makeCancelAction()
+            let rename = self.makeRenameAction(for: address, completion: closeAction)
+            let cancel = self.makeCancelAction(completion: closeAction)
             
             self.dialogService.showAlert(
                 title: nil,
@@ -1198,19 +1232,18 @@ extension ChatListViewController {
                 actions: [share, rename, cancel],
                 from: .view(view)
             )
-            
-            completionHandler(true)
         }
         
         more.image = .asset(named: "swipe_more")
-        more.backgroundColor = .adamant.secondary
+        more.backgroundColor = .adamant.swipeMoreColor
         return more
     }
     
     private func makeShareAction(
         for address: String,
         encodedAddress: String,
-        sender: UIView
+        sender: UIView,
+        completion: (() -> Void)? = nil
     ) -> UIAlertAction {
         .init(
             title: ShareType.share.localized,
@@ -1232,12 +1265,15 @@ extension ChatListViewController {
                 excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
                 animated: true,
                 from: sender,
-                completion: nil
+                completion: completion
             )
         }
     }
     
-    private func makeRenameAction(for address: String) -> UIAlertAction {
+    private func makeRenameAction(
+        for address: String,
+        completion: (() -> Void)? = nil
+    ) -> UIAlertAction {
         .init(
             title: .adamant.chat.rename,
             style: .default
@@ -1245,6 +1281,7 @@ extension ChatListViewController {
             guard let alert = self?.makeRenameAlert(for: address) else { return }
             self?.dialogService.present(alert, animated: true) {
                 self?.dialogService.selectAllTextFields(in: alert)
+                completion?()
             }
         }
     }
@@ -1283,8 +1320,13 @@ extension ChatListViewController {
         return alert
     }
     
-    private func makeCancelAction() -> UIAlertAction {
-        .init(title: .adamant.alert.cancel, style: .cancel, handler: nil)
+    private func makeCancelAction(completion: (() -> Void)? = nil) -> UIAlertAction {
+        .init(
+            title: .adamant.alert.cancel,
+            style: .cancel
+        ) { _ in
+            completion?()
+        }
     }
 }
 

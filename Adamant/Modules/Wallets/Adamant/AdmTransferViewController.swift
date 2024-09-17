@@ -294,6 +294,11 @@ final class AdmTransferViewController: TransferViewControllerBase {
             return true
         } else if let admAddress = address.getLegacyAdamantAddress() {
             recipientAddress = admAddress.address
+            if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.amount.tag) {
+                row.value = admAddress.amount
+                row.updateCell()
+                reloadFormData()
+            }
             return true
         }
         

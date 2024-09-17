@@ -8,9 +8,11 @@
 
 import UIKit
 import Swinject
+import SwiftUI
 
 @MainActor
 struct AdamantScreensFactory: ScreensFactory {
+
     private let walletFactoryCompose: WalletFactoryCompose
     private let admWalletFactory: AdmWalletFactory
     private let chatListFactory: ChatListFactory
@@ -27,8 +29,10 @@ struct AdamantScreensFactory: ScreensFactory {
     private let partnerQRFactory: PartnerQRFactory
     private let coinsNodesListFactory: CoinsNodesListFactory
     private let chatSelectTextFactory: ChatSelectTextViewFactory
+    private let notificasionsFactory: NotificationsFactory
+    private let notificationSounds: NotificationSoundsFactory
     private let storageUsageFactory: StorageUsageFactory
-    
+        
     init(assembler: Assembler) {
         admWalletFactory = .init(assembler: assembler)
         chatListFactory = .init(assembler: assembler)
@@ -45,6 +49,8 @@ struct AdamantScreensFactory: ScreensFactory {
         partnerQRFactory = .init(parent: assembler)
         coinsNodesListFactory = .init(parent: assembler)
         chatSelectTextFactory = .init()
+        notificasionsFactory = .init(parent: assembler)
+        notificationSounds = .init(parent: assembler)
         storageUsageFactory = .init(parent: assembler)
         
         walletFactoryCompose = AdamantWalletFactoryCompose(
@@ -159,7 +165,11 @@ struct AdamantScreensFactory: ScreensFactory {
     }
     
     func makeNotifications() -> UIViewController {
-        settingsFactory.makeNotificationsVC()
+        notificasionsFactory.makeViewController(screensFactory: self)
+    }
+    
+    func makeNotificationSounds(target: NotificationTarget) -> NotificationSoundsView {
+        notificationSounds.makeView(target: target)
     }
     
     func makeVisibleWallets() -> UIViewController {
