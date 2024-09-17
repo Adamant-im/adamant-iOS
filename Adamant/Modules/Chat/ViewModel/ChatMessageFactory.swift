@@ -520,7 +520,7 @@ private extension ChatMessageFactory {
     
     func makeDateHeader(sentDate: Date) -> ComparableAttributedString {
         .init(string: .init(
-            string: sentDate.humanizedDay(),
+            string: sentDate.humanizedDay(useTimeFormat: false),
             attributes: [
                 .font: UIFont.boldSystemFont(ofSize: 10),
                 .foregroundColor: UIColor.adamant.secondary

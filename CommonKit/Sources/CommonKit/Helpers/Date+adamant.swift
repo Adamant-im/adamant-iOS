@@ -55,13 +55,17 @@ public extension Date {
     }
     
     /// Returns readable day string. "Today, Yesterday, etc"
-    func humanizedDay() -> String {
+    func humanizedDay(useTimeFormat: Bool) -> String {
         let dateString: String
         if isToday { // Today
-            let formatter = defaultFormatter
-            formatter.dateStyle = .none
-            formatter.timeStyle = .short
-            dateString = formatter.string(from: self)
+            if useTimeFormat {
+                let formatter = defaultFormatter
+                formatter.dateStyle = .none
+                formatter.timeStyle = .short
+                dateString = formatter.string(from: self)
+            } else {
+                dateString = String.localized("Chats.Date.Today")
+            }
         } else if daysAgo < 2 { // Yesterday
             dateString = elapsedTime(from: self)
         } else if weeksAgo < 1 { // This week, show weekday, month and date
