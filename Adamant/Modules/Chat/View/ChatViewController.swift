@@ -201,7 +201,6 @@ final class ChatViewController: MessagesViewController {
         }
         
         super.collectionView(collectionView, willDisplay: cell, forItemAt: indexPath)
-        viewModel.messageWasRead(index: indexPath.section)
     }
     
     override func scrollViewDidEndDragging(_: UIScrollView, willDecelerate _: Bool) {
@@ -212,7 +211,7 @@ final class ChatViewController: MessagesViewController {
         super.scrollViewDidScroll(scrollView)
         updateIsScrollPositionNearlyTheBottom()
         updateScrollDownButtonVisibility()
-        updateDateHeaderIfNeeded()
+        updateDateHeaderAndMarkMessageAsRead()
         
         guard
             viewAppeared,
@@ -752,24 +751,35 @@ private extension ChatViewController {
         scrollDownButton.updateCounter(count: count)
     }
     
-    func updateDateHeaderIfNeeded() {
+    func updateDateHeaderAndMarkMessageAsRead() {
         guard viewAppeared else { return }
         
-        let targetY: CGFloat = targetYOffset + view.safeAreaInsets.top
+        let targetYHeader: CGFloat = targetYOffset + view.safeAreaInsets.top
+        let targetYRead: CGFloat = inputContainerView.frame.minY - targetYOffset
+        
         let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems
         
+        var dateHeaderUpdated = false
+        var messageMarkedAsRead = false
+        
         for indexPath in visibleIndexPaths {
-            guard let cell = messagesCollectionView.cellForItem(at: indexPath)
-            else { continue }
+            guard let cell = messagesCollectionView.cellForItem(at: indexPath) else { continue }
             
             let cellRect = messagesCollectionView.convert(cell.frame, to: self.view)
             
-            guard cellRect.minY <= targetY && cellRect.maxY >= targetY else {
-                continue
+            if !dateHeaderUpdated && cellRect.minY <= targetYHeader && cellRect.maxY >= targetYHeader {
+                viewModel.checkTopMessage(indexPath: indexPath)
+                dateHeaderUpdated = true
             }
             
-            viewModel.checkTopMessage(indexPath: indexPath)
-            break
+            if !messageMarkedAsRead && cellRect.minY <= targetYRead && cellRect.maxY >= targetYRead {
+                viewModel.messageWasRead(index: indexPath.section)
+                messageMarkedAsRead = true
+            }
+            
+            if dateHeaderUpdated && messageMarkedAsRead {
+                break
+            }
         }
     }
 }
