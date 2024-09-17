@@ -163,15 +163,15 @@ final class ChatViewController: MessagesViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        
+        viewModel.viewControllerPresentedDidChange(isPresented: false)
+        
         inputBar.isUserInteractionEnabled = false
         inputBar.inputTextView.resignFirstResponder()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        
-        viewModel.viewControllerPresentedDidChange(isPresented: false)
-        
         viewModel.preserveFiles()
         viewModel.preserveMessage(inputBar.text)
         viewModel.preserveReplayMessage()

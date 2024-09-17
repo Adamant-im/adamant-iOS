@@ -415,7 +415,9 @@ final class ChatViewModel: NSObject {
     func messageWasRead(index: Int) {
         guard let message = messages[safe: index],
               message.isUnread,
-              let chatroom = chatroom else {return}
+              let chatroom = chatroom else {
+            return
+        }
         Task {
             await chatsProvider.markMessageAsRead(chatroom: chatroom, id: message.id)
         }
