@@ -73,7 +73,7 @@ private extension NotificationsView {
                     Text(viewModel.notificationsMode.localized)
                         .foregroundColor(.gray)
                 }
-            }.listRowBackground(Color(uiColor: .adamant.cellColor))
+            }
         } header: {
             Text(viewModel.notificationsTitle)
         }
@@ -150,7 +150,7 @@ private extension NotificationsView {
             }
             NavigationButton(action: { viewModel.presentSafariURL() }) {
                 HStack {
-                    Image(uiImage: viewModel.githubRowImage)
+                    Image(uiImage: githubRowImage)
                     Text(visitGithub)
                     Spacer()
                 }
@@ -158,6 +158,8 @@ private extension NotificationsView {
         }
     }
 }
+
+private let githubRowImage: UIImage = .asset(named: "row_github") ?? UIImage()
 
 private var messagesHeader: String {
     .localized("SecurityPage.Section.Messages")

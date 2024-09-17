@@ -27,7 +27,6 @@ final class NotificationsViewModel: ObservableObject {
     
     let notificationsTitle: String = .localized("SecurityPage.Row.Notifications")
     let safariURL = URL(string: "https://github.com/Adamant-im")!
-    let githubRowImage: UIImage = .asset(named: "row_github") ?? UIImage()
     
     private let descriptionText: String = .localized("SecurityPage.Row.Notifications.ModesDescription")
     
