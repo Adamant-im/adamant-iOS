@@ -14,7 +14,7 @@ extension BtcWalletService {
         crucialUpdateInterval: 30,
         onScreenUpdateInterval: 10,
         threshold: 2,
-        normalServiceUpdateInterval: 360,
+        normalServiceUpdateInterval: 330,
         crucialServiceUpdateInterval: 30,
         onScreenServiceUpdateInterval: 10
     )
@@ -75,8 +75,8 @@ extension BtcWalletService {
     
     static var nodes: [Node] {
         [
-            Node.makeDefaultNode(url: URL(string: "https://btcnode1.adamant.im")!, altUrl: URL(string: "http://176.9.38.204:44099")),
-Node.makeDefaultNode(url: URL(string: "https://btcnode3.adamant.im")!, altUrl: URL(string: "http://195.201.242.108:44099")),
+            Node.makeDefaultNode(url: URL(string: "https://btcnode1.adamant.im/bitcoind")!, altUrl: URL(string: "http://176.9.38.204:44099/bitcoind")),
+Node.makeDefaultNode(url: URL(string: "https://btcnode3.adamant.im/bitcoind")!, altUrl: URL(string: "http://195.201.242.108:44099/bitcoind")),
         ]
     }
     
