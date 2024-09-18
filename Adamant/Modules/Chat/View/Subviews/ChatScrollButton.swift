@@ -20,7 +20,7 @@ final class ChatScrollButton: UIView {
         button.alpha = 0.5
         switch position {
         case .up:
-            button.setImage(.asset(named: "ScrollUp"), for: .normal)
+            button.setImage(.asset(named: "scrollUp"), for: .normal)
         case .down:
             button.setImage(.asset(named: "ScrollDown"), for: .normal)
         }
