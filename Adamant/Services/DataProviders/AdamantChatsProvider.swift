@@ -1468,6 +1468,16 @@ extension AdamantChatsProvider {
         return controller
     }
     
+    func getUnreadChatsController(currentChatRoom: Chatroom) -> NSFetchedResultsController<Chatroom> {
+        let request: NSFetchRequest<Chatroom> = NSFetchRequest(entityName: Chatroom.entityName)
+        request.sortDescriptors = []
+        request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "hasUnreadMessages == true"),
+            NSPredicate(format: "SELF != %@", currentChatRoom)])
+        let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+        return controller
+    }
+    
     /// Search transaction in local storage
     ///
     /// - Parameter id: Transacton ID
@@ -1984,6 +1994,13 @@ extension AdamantChatsProvider {
             if self.accountService.hasStayInAccount {
                 self.securedStore.set(removedMessages, for: StoreKey.accountService.removedMessages)
             }
+        }
+    }
+    
+    func markMessageAsRead(chatroom: Chatroom, id: String) {
+        chatroom.managedObjectContext?.perform {
+            chatroom.markMessageAsRead(id: id)
+            try? chatroom.managedObjectContext?.save()
         }
     }
     

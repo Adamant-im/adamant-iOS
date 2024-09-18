@@ -102,6 +102,7 @@ struct ChatMessageFactory {
                 isFromCurrentSender: currentSender.senderId == senderModel.senderId,
                 backgroundColor: backgroundColor
             ),
+            isUnread: transaction.isUnread,
             backgroundColor: backgroundColor,
             bottomString: makeBottomString(
                 sentDate: sentDate,

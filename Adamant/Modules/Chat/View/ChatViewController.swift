@@ -46,6 +46,7 @@ final class ChatViewController: MessagesViewController {
     private lazy var inputBar = ChatInputBar()
     private lazy var loadingView = LoadingView()
     private lazy var scrollDownButton = makeScrollDownButton()
+    private lazy var unreadChatsCounter: BadgeViewLabel? = nil
     private lazy var chatMessagesCollectionView = makeChatMessagesCollectionView()
     private lazy var replyView = ReplyView()
     private lazy var filesToolbarView = FilesToolbarView()
@@ -149,6 +150,11 @@ final class ChatViewController: MessagesViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         defer { viewAppeared = true }
+        
+        if viewAppeared {
+            viewModel.viewControllerPresentedDidChange(isPresented: true)
+        }
+        
         inputBar.isUserInteractionEnabled = true
         chatMessagesCollectionView.fixedBottomOffset = nil
         
@@ -162,6 +168,9 @@ final class ChatViewController: MessagesViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        
+        viewModel.viewControllerPresentedDidChange(isPresented: false)
+        
         inputBar.isUserInteractionEnabled = false
         inputBar.inputTextView.resignFirstResponder()
     }
@@ -202,7 +211,7 @@ final class ChatViewController: MessagesViewController {
         super.scrollViewDidScroll(scrollView)
         updateIsScrollPositionNearlyTheBottom()
         updateScrollDownButtonVisibility()
-        updateDateHeaderIfNeeded()
+        updateDateHeaderAndMarkMessageAsRead()
         
         guard
             viewAppeared,
@@ -465,6 +474,30 @@ private extension ChatViewController {
                 self?.didTapSelectText(text: text)
             }
             .store(in: &subscriptions)
+        
+        viewModel.$unreadMessagesCount
+            .removeDuplicates()
+            .sink { [weak self] count in
+                self?.scrollDownButton.updateCounter(count: count)
+            }
+            .store(in: &subscriptions)
+        
+        guard navigationController != nil,
+              splitViewController == nil else {
+            return
+        }
+        viewModel.$unreadChatsCount
+            .sink { [weak self] count in
+                self?.unreadChatsCounter?.updateCounter(count: count)
+            }
+            .store(in: &subscriptions)
+        
+        viewModel.$needShowUnreadChatsCounter
+            .removeDuplicates()
+            .sink { [weak self] needShow in
+                self?.configureUnreadChatsCounter(needShow: needShow)
+            }
+            .store(in: &subscriptions)
     }
 }
 
@@ -522,6 +555,24 @@ private extension ChatViewController {
         dateHeaderLabel.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide).offset(10)
             make.centerX.equalToSuperview()
+        }
+    }
+    
+    func configureUnreadChatsCounter(needShow: Bool) {
+        if needShow {
+            if unreadChatsCounter == nil,
+               let navBar = navigationController?.navigationBar {
+                unreadChatsCounter = BadgeViewLabel()
+                navBar.addSubview(unreadChatsCounter!)
+                unreadChatsCounter!.snp.makeConstraints { make in
+                    make.leading.equalToSuperview().offset(unreadChatsCounterLeadingOffset)
+                    make.centerY.equalToSuperview()
+                }
+            }
+            unreadChatsCounter?.updateCounter(count: viewModel.unreadChatsCount)
+        } else {
+            unreadChatsCounter?.removeFromSuperview()
+            unreadChatsCounter = nil
         }
     }
     
@@ -701,24 +752,35 @@ private extension ChatViewController {
         scrollDownButton.isHidden = isScrollPositionNearlyTheBottom
     }
     
-    func updateDateHeaderIfNeeded() {
+    func updateDateHeaderAndMarkMessageAsRead() {
         guard viewAppeared else { return }
         
-        let targetY: CGFloat = targetYOffset + view.safeAreaInsets.top
+        let targetYHeader: CGFloat = targetYOffset + view.safeAreaInsets.top
+        let targetYRead: CGFloat = inputContainerView.frame.minY - targetYOffset
+        
         let visibleIndexPaths = messagesCollectionView.indexPathsForVisibleItems
         
+        var dateHeaderUpdated = false
+        var messageMarkedAsRead = false
+        
         for indexPath in visibleIndexPaths {
-            guard let cell = messagesCollectionView.cellForItem(at: indexPath)
-            else { continue }
+            guard let cell = messagesCollectionView.cellForItem(at: indexPath) else { continue }
             
             let cellRect = messagesCollectionView.convert(cell.frame, to: self.view)
             
-            guard cellRect.minY <= targetY && cellRect.maxY >= targetY else {
-                continue
+            if !dateHeaderUpdated && cellRect.minY <= targetYHeader && cellRect.maxY >= targetYHeader {
+                viewModel.checkTopMessage(indexPath: indexPath)
+                dateHeaderUpdated = true
             }
             
-            viewModel.checkTopMessage(indexPath: indexPath)
-            break
+            if !messageMarkedAsRead && cellRect.minY <= targetYRead && cellRect.maxY >= targetYRead {
+                viewModel.messageWasRead(index: indexPath.section)
+                messageMarkedAsRead = true
+            }
+            
+            if dateHeaderUpdated && messageMarkedAsRead {
+                break
+            }
         }
     }
 }
@@ -741,6 +803,7 @@ private extension ChatViewController {
             }
             self?.scrollToPosition(.messageId(id), animated: true)
         }
+        button.updateCounter(count: viewModel.unreadMessagesCount)
         
         return button
     }
@@ -1085,3 +1148,4 @@ private var canReplyVibrate: Bool = true
 private var oldContentOffset: CGPoint?
 private let filesToolbarViewHeight: CGFloat = 140
 private let targetYOffset: CGFloat = 20
+private let unreadChatsCounterLeadingOffset: CGFloat = 23

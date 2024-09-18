@@ -18,6 +18,20 @@ public class Chatroom: NSManagedObject {
         return hasUnreadMessages || (lastTransaction?.isUnread ?? false)
     }
     
+    func markMessageAsRead(id: String) {
+        guard let trs = transactions as? Set<ChatTransaction> else { return }
+
+        var unreadCount = 0
+        trs.forEach { tr in
+            if tr.txId == id {
+                tr.isUnread = false
+            }
+            unreadCount += tr.isUnread ? 1 : 0
+        }
+
+        hasUnreadMessages = unreadCount != 0
+    }
+    
     func markAsReaded() {
         hasUnreadMessages = false
        
@@ -30,6 +44,10 @@ public class Chatroom: NSManagedObject {
     func markAsUnread() {
         hasUnreadMessages = true
         lastTransaction?.isUnread = true
+    }
+    
+    func getUnreadCount() -> Int {
+        (transactions as? Set<ChatTransaction>)?.filter { $0.isUnread }.count ?? .zero
     }
     
     func getFirstUnread() -> ChatTransaction? {

@@ -47,6 +47,7 @@ final class ChatViewModel: NSObject {
     
     private var tasksStorage = TaskManager()
     private var controller: NSFetchedResultsController<ChatTransaction>?
+    private var unreadChatsController: NSFetchedResultsController<Chatroom>?
     private var subscriptions = Set<AnyCancellable>()
     private var timerSubscription: AnyCancellable?
     private var messageIdToShow: String?
@@ -114,6 +115,9 @@ final class ChatViewModel: NSObject {
     @ObservableValue var replyMessage: MessageModel?
     @ObservableValue var scrollToMessage: (toId: String?, fromId: String?)
     @ObservableValue var filesPicked: [FileResult]?
+    @ObservableValue private(set) var needShowUnreadChatsCounter = false
+    @ObservableValue private(set) var unreadChatsCount: Int = 0
+    @ObservableValue private(set) var unreadMessagesCount: Int = 0
     
     var startPosition: ChatStartPosition? {
         if let messageIdToShow = messageIdToShow {
@@ -205,8 +209,14 @@ final class ChatViewModel: NSObject {
         assert(self.chatroom == nil, "Can't setup several times")
         self.chatroom = chatroom
         self.messageIdToShow = messageIdToShow
+        
         controller = chatsProvider.getChatController(for: chatroom)
         controller?.delegate = self
+        
+        unreadChatsController = chatsProvider.getUnreadChatsController(currentChatRoom: chatroom)
+        unreadChatsController?.delegate = self
+        updateUnreadChatsCount()
+        
         isSendingAvailable = !chatroom.isReadonly
         updatePartnerInformation()
         updateAttachmentButtonAvailability()
@@ -408,6 +418,18 @@ final class ChatViewModel: NSObject {
         chatsProvider.setChatPositon(for: address, position: offset.map { Double.init($0) })
     }
     
+    func messageWasRead(index: Int) {
+        guard let message = messages[safe: index],
+              message.isUnread,
+              let chatroom = chatroom else {
+            return
+        }
+        
+        Task {
+            await chatsProvider.markMessageAsRead(chatroom: chatroom, id: message.id)
+        }
+    }
+    
     func entireChatWasRead() {
         Task {
             guard
@@ -415,6 +437,7 @@ final class ChatViewModel: NSObject {
                 chatroom.hasUnreadMessages == true || chatroom.lastTransaction?.isUnread == true
             else { return }
             
+            unreadMessagesCount = 0
             await chatsProvider.markChatAsRead(chatroom: chatroom)
         }
     }
@@ -1031,6 +1054,14 @@ extension ChatViewModel {
         }
     }
     
+    func viewControllerPresentedDidChange(isPresented: Bool) {
+        if isPresented {
+            needShowUnreadChatsCounter = unreadChatsCount != 0
+        } else {
+            needShowUnreadChatsCounter = false
+        }
+    }
+    
     func checkTopMessage(indexPath: IndexPath) {
         guard let message = messages[safe: indexPath.section],
               let date = message.dateHeader?.string.string,
@@ -1046,8 +1077,16 @@ extension ChatViewModel {
 }
 
 extension ChatViewModel: NSFetchedResultsControllerDelegate {
-    func controllerDidChangeContent(_: NSFetchedResultsController<NSFetchRequestResult>) {
-        updateTransactions(performFetch: false)
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        switch controller {
+        case let c where c == self.controller:
+            updateTransactions(performFetch: false)
+        case let c where c == self.unreadChatsController:
+            updateUnreadChatsCount()
+            
+        default:
+            break
+        }
     }
 }
 
@@ -1204,6 +1243,14 @@ private extension ChatViewModel {
                 ? { [commitVibro] in commitVibro.send() }
                 : {}
         )
+        
+        unreadMessagesCount = chatroom?.getUnreadCount() ?? .zero
+    }
+    
+    func updateUnreadChatsCount() {
+        try? unreadChatsController?.performFetch()
+        unreadChatsCount = unreadChatsController?.fetchedObjects?.count ?? .zero
+        needShowUnreadChatsCounter = unreadChatsCount != 0
     }
     
     func updateMessages(
