@@ -272,7 +272,7 @@ final class ChatListViewController: KeyboardObservingViewController {
         }
         
         scrollUpButton.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(50)
+            make.trailing.equalToSuperview().offset(-20)
             make.top.equalTo(view.safeAreaLayoutGuide).offset(20)
             make.size.equalTo(30)
         }
@@ -599,7 +599,8 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        scrollUpButton.isHidden = scrollView.contentOffset.y < view.frame.height * 0.5
+        let offsetY = scrollView.contentOffset.y + scrollView.safeAreaInsets.top
+        scrollUpButton.isHidden = offsetY < cellHeight * 0.75
     }
 }
 
