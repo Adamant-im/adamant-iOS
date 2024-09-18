@@ -117,6 +117,7 @@ final class ChatViewModel: NSObject {
     @ObservableValue var filesPicked: [FileResult]?
     @ObservableValue private(set) var needShowUnreadChatsCounter = false
     @ObservableValue private(set) var unreadChatsCount: Int = 0
+    @ObservableValue private(set) var unreadMessagesCount: Int = 0
     
     var startPosition: ChatStartPosition? {
         if let messageIdToShow = messageIdToShow {
@@ -423,6 +424,7 @@ final class ChatViewModel: NSObject {
               let chatroom = chatroom else {
             return
         }
+        
         Task {
             await chatsProvider.markMessageAsRead(chatroom: chatroom, id: message.id)
         }
@@ -435,6 +437,7 @@ final class ChatViewModel: NSObject {
                 chatroom.hasUnreadMessages == true || chatroom.lastTransaction?.isUnread == true
             else { return }
             
+            unreadMessagesCount = 0
             await chatsProvider.markChatAsRead(chatroom: chatroom)
         }
     }
@@ -1240,6 +1243,8 @@ private extension ChatViewModel {
                 ? { [commitVibro] in commitVibro.send() }
                 : {}
         )
+        
+        unreadMessagesCount = chatroom?.getUnreadCount() ?? .zero
     }
     
     func updateUnreadChatsCount() {
