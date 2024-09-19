@@ -14,12 +14,20 @@ import CommonKit
 
 // MARK: - Localization
 extension String.adamant {
-    struct about {
+    enum about {
         static var title: String {
             String.localized("About.Title", comment: "About page: scene title")
         }
         
-        private init() { }
+        static func commit(_ commit: String) -> String {
+            String.localizedStringWithFormat(
+                String.localized(
+                    "About.Version.Commit",
+                    comment: "Commit Hash"
+                ),
+                commit
+            )
+        }
     }
 }
 
@@ -168,7 +176,13 @@ final class AboutViewController: FormViewController {
         
         if let footer = UINib(nibName: "VersionFooter", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
             if let label = footer.viewWithTag(555) as? UILabel {
-                label.text = AdamantUtilities.applicationVersion
+                label.text = [
+                    AdamantUtilities.applicationVersion,
+                    AdamantUtilities.Git.commitHash.map { 
+                        .adamant.about.commit(.init($0.prefix(20)))
+                    }
+                ].compactMap { $0 }.joined(separator: "\n\n")
+                
                 label.textColor = UIColor.adamant.primary
                 tableView.tableFooterView = footer
             }
