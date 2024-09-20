@@ -354,6 +354,7 @@
 		93775E462A674FA9009061AC /* Markdown+Adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93775E452A674FA9009061AC /* Markdown+Adamant.swift */; };
 		9377FBDF296C2A2F00C9211B /* ChatTransactionContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9377FBDE296C2A2F00C9211B /* ChatTransactionContentView.swift */; };
 		9377FBE2296C2ACA00C9211B /* ChatTransactionContentView+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9377FBE1296C2ACA00C9211B /* ChatTransactionContentView+Model.swift */; };
+		937EDFC02C9CF6B300F219BB /* VersionFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937EDFBF2C9CF6B300F219BB /* VersionFooterView.swift */; };
 		9382F61329DEC0A3005E6216 /* ChatModelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9382F61229DEC0A3005E6216 /* ChatModelView.swift */; };
 		938F7D582955C1DA001915CA /* MessageKit in Frameworks */ = {isa = PBXBuildFile; productRef = 938F7D572955C1DA001915CA /* MessageKit */; };
 		938F7D5B2955C8DA001915CA /* ChatDisplayManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 938F7D5A2955C8DA001915CA /* ChatDisplayManager.swift */; };
@@ -536,7 +537,6 @@
 		E9484B7F2285C016008E10F0 /* PKGeneratorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9484B7E2285C016008E10F0 /* PKGeneratorViewController.swift */; };
 		E94883E7203F07CD00F6E1B0 /* PassphraseValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E94883E6203F07CD00F6E1B0 /* PassphraseValidation.swift */; };
 		E948E03B20235E2300975D6B /* SettingsFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E948E03A20235E2300975D6B /* SettingsFactory.swift */; };
-		E948E0482024F02700975D6B /* VersionFooter.xib in Resources */ = {isa = PBXBuildFile; fileRef = E948E0472024F02700975D6B /* VersionFooter.xib */; };
 		E94E7B01205D3F090042B639 /* ChatListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E94E7B00205D3F090042B639 /* ChatListViewController.xib */; };
 		E94E7B08205D4CB80042B639 /* ShareQRFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E94E7B07205D4CB80042B639 /* ShareQRFactory.swift */; };
 		E94E7B0C205D5E4A0042B639 /* TransactionsListViewControllerBase.xib in Resources */ = {isa = PBXBuildFile; fileRef = E94E7B0B205D5E4A0042B639 /* TransactionsListViewControllerBase.xib */; };
@@ -1023,6 +1023,7 @@
 		93775E452A674FA9009061AC /* Markdown+Adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Markdown+Adamant.swift"; sourceTree = "<group>"; };
 		9377FBDE296C2A2F00C9211B /* ChatTransactionContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTransactionContentView.swift; sourceTree = "<group>"; };
 		9377FBE1296C2ACA00C9211B /* ChatTransactionContentView+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatTransactionContentView+Model.swift"; sourceTree = "<group>"; };
+		937EDFBF2C9CF6B300F219BB /* VersionFooterView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersionFooterView.swift; sourceTree = "<group>"; };
 		9382F61229DEC0A3005E6216 /* ChatModelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatModelView.swift; sourceTree = "<group>"; };
 		938F7D5A2955C8DA001915CA /* ChatDisplayManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatDisplayManager.swift; sourceTree = "<group>"; };
 		938F7D5C2955C8F9001915CA /* ChatLayoutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatLayoutManager.swift; sourceTree = "<group>"; };
@@ -1179,7 +1180,6 @@
 		E9484B7E2285C016008E10F0 /* PKGeneratorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PKGeneratorViewController.swift; sourceTree = "<group>"; };
 		E94883E6203F07CD00F6E1B0 /* PassphraseValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassphraseValidation.swift; sourceTree = "<group>"; };
 		E948E03A20235E2300975D6B /* SettingsFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsFactory.swift; sourceTree = "<group>"; };
-		E948E0472024F02700975D6B /* VersionFooter.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VersionFooter.xib; sourceTree = "<group>"; };
 		E94E7B00205D3F090042B639 /* ChatListViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ChatListViewController.xib; sourceTree = "<group>"; };
 		E94E7B07205D4CB80042B639 /* ShareQRFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareQRFactory.swift; sourceTree = "<group>"; };
 		E94E7B0B205D5E4A0042B639 /* TransactionsListViewControllerBase.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TransactionsListViewControllerBase.xib; sourceTree = "<group>"; };
@@ -2743,7 +2743,6 @@
 				93496B9F2A6CAE9300DD062F /* LogoFullHeader.xib */,
 				E9942B86203D9E5100C163AF /* EurekaQRRow.swift */,
 				E9942B88203D9ECA00C163AF /* QrCell.xib */,
-				E948E0472024F02700975D6B /* VersionFooter.xib */,
 				E921534C20EE1E8700C0843F /* EurekaAlertLabelRow.swift */,
 				E921534D20EE1E8700C0843F /* AlertLabelCell.xib */,
 				E926E031213EC43B005E536B /* FullscreenAlertView.swift */,
@@ -2752,6 +2751,7 @@
 				E9B4E1A9210F08BE007E77FC /* DoubleDetailsTableViewCell.xib */,
 				649D6BEB21BD5A53009E727B /* UISuffixTextField.swift */,
 				55E69E162868D7920025D82E /* CheckmarkView.swift */,
+				937EDFBF2C9CF6B300F219BB /* VersionFooterView.swift */,
 				557AC307287B1365004699D7 /* CheckmarkRowView.swift */,
 				551F66E528959A5200DE5D69 /* LoadingView.swift */,
 				93F3914F2962F5D400BFD6AE /* SpinnerView.swift */,
@@ -3103,7 +3103,6 @@
 				E9A174B920587B84003667CD /* notification.mp3 in Resources */,
 				93760BE22C65A424002507C3 /* english.txt in Resources */,
 				645FEB35213E72C100D6BA2D /* OnboardViewController.xib in Resources */,
-				E948E0482024F02700975D6B /* VersionFooter.xib in Resources */,
 				E9FAE5E3203ED1AE008D3A6B /* ShareQrViewController.xib in Resources */,
 				93496BB02A6CAED100DD062F /* Exo+2_300_normal.ttf in Resources */,
 				E921534F20EE1E8700C0843F /* AlertLabelCell.xib in Resources */,
@@ -3401,6 +3400,7 @@
 				3AE0A42A2BC6A64900BF7125 /* FilesNetworkManager.swift in Sources */,
 				648CE3AC229AD2190070A2CC /* DashTransferViewController.swift in Sources */,
 				3A7BD0102AA9BD030045AAB0 /* AdamantVibroService.swift in Sources */,
+				937EDFC02C9CF6B300F219BB /* VersionFooterView.swift in Sources */,
 				A5E04227282A8BDC0076CD13 /* BtcBalanceResponse.swift in Sources */,
 				64F085D920E2D7600006DE68 /* AdmTransactionsViewController.swift in Sources */,
 				9322E87B2970431200B8357C /* ChatMessageFactory.swift in Sources */,

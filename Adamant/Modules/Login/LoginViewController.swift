@@ -147,6 +147,8 @@ final class LoginViewController: FormViewController {
     private var firstTimeActive: Bool = true
     internal var hidingImagePicker: Bool = false
     
+    private lazy var versionFooterView = VersionFooterView()
+    
     /// On launch, request user biometry (TouchID/FaceID) if has an account with biometry active
     var requestBiometryOnFirstTimeActive: Bool = true
     
@@ -179,6 +181,8 @@ final class LoginViewController: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationOptions = RowNavigationOptions.Disabled
+        tableView.tableFooterView = versionFooterView
+        setVersion()
         
         // MARK: Header & Footer
         if let header = UINib(nibName: "LogoFullHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
@@ -187,14 +191,6 @@ final class LoginViewController: FormViewController {
             if let label = header.viewWithTag(888) as? UILabel {
                 label.text = String.adamant.shared.productName
                 label.textColor = UIColor.adamant.primary
-            }
-        }
-        
-        if let footer = UINib(nibName: "VersionFooter", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
-            if let label = footer.viewWithTag(555) as? UILabel {
-                label.text = AdamantUtilities.applicationVersion
-                label.textColor = UIColor.adamant.primary
-                tableView.tableFooterView = footer
             }
         }
         
@@ -387,11 +383,23 @@ final class LoginViewController: FormViewController {
         setColors()
     }
     
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        versionFooterView.sizeToFit()
+    }
+    
     // MARK: - Other
     
     private func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
+    }
+    
+    private func setVersion() {
+        versionFooterView.model = .init(
+            version: AdamantUtilities.applicationVersion,
+            commit: nil
+        )
     }
 }
 
