@@ -60,14 +60,11 @@ open class HealthCheckWrapper<Service, Error: HealthCheckableError> {
             .filter { $0 }
         
         nodes
+            .removeDuplicates()
+            .handleEvents(receiveOutput: { [weak self] in self?.updateNodes($0) })
             .removeDuplicates { !$0.doesNeedHealthCheck($1) }
             .combineLatest(connection)
             .sink { [weak self] _ in self?.healthCheck() }
-            .store(in: &subscriptions)
-        
-        nodes
-            .removeDuplicates()
-            .sink { [weak self] in self?.updateNodes($0) }
             .store(in: &subscriptions)
         
         $sortedAllowedNodes
@@ -166,13 +163,25 @@ private extension Sequence where Element == Node {
 }
 
 private struct NodeComparisonInfo: Hashable {
-    let mainOrigin: NodeOrigin
-    let altOrigin: NodeOrigin?
+    let mainOrigin: NodeOriginComparisonInfo
+    let altOrigin: NodeOriginComparisonInfo?
     let isEnabled: Bool
     
     init(node: Node) {
-        mainOrigin = node.mainOrigin
-        altOrigin = node.altOrigin
+        mainOrigin = .init(origin: node.mainOrigin)
+        altOrigin = node.altOrigin.map { .init(origin: $0) }
         isEnabled = node.isEnabled
+    }
+}
+
+private struct NodeOriginComparisonInfo: Hashable {
+    let scheme: NodeOrigin.URLScheme
+    let host: String
+    let port: Int?
+    
+    init(origin: NodeOrigin) {
+        scheme = origin.scheme
+        host = origin.host
+        port = origin.port
     }
 }
