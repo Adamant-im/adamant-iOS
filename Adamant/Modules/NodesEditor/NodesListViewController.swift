@@ -281,7 +281,7 @@ extension NodesListViewController {
     
     func resetToDefault(silent: Bool = false) {
         if silent {
-            nodesStorage.resetNodes(group: nodeGroup)
+            nodesStorage.resetNodes([nodeGroup])
             return
         }
         
@@ -290,7 +290,7 @@ extension NodesListViewController {
         alert.addAction(UIAlertAction(
             title: Rows.reset.localized,
             style: .destructive,
-            handler: { [weak self] _ in self?.nodesStorage.resetNodes(group: nodeGroup) }
+            handler: { [weak self] _ in self?.nodesStorage.resetNodes([nodeGroup]) }
         ))
         alert.modalPresentationStyle = .overFullScreen
         present(alert, animated: true, completion: nil)
@@ -335,7 +335,7 @@ extension NodesListViewController: NodeEditorDelegate {
 
 extension NodesListViewController {
     func loadDefaultNodes(showAlert: Bool) {
-        nodesStorage.resetNodes(group: nodeGroup)
+        nodesStorage.resetNodes([nodeGroup])
         
         if showAlert {
             dialogService.showSuccess(withMessage: String.adamant.nodesList.defaultNodesWasLoaded)

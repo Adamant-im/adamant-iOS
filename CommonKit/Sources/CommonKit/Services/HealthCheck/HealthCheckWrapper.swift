@@ -163,11 +163,13 @@ private extension Sequence where Element == Node {
 }
 
 private struct NodeComparisonInfo: Hashable {
+    let id: UUID
     let mainOrigin: NodeOriginComparisonInfo
     let altOrigin: NodeOriginComparisonInfo?
     let isEnabled: Bool
     
     init(node: Node) {
+        id = node.id
         mainOrigin = .init(origin: node.mainOrigin)
         altOrigin = node.altOrigin.map { .init(origin: $0) }
         isEnabled = node.isEnabled
