@@ -46,7 +46,7 @@ extension OldNodeKeychainDTO.NodeData {
         case https
     }
     
-    func mapToModernDto() -> NodeKeychainDTO {
+    func mapToModernDto(group: NodeGroup) -> NodeKeychainDTO {
         .init(
             mainOrigin: .init(
                 scheme: scheme.map(),
@@ -61,7 +61,7 @@ extension OldNodeKeychainDTO.NodeData {
             height: height,
             ping: ping,
             connectionStatus: connectionStatus?.map(),
-            type: oldDefaultHosts.contains(host)
+            type: oldDefaultAdmHosts.contains(host) || group != .adm
                 ? .default(isHidden: false)
                 : .custom
         )
@@ -103,17 +103,7 @@ private extension OldNodeKeychainDTO.NodeData.RejectedReason {
     }
 }
 
-private let oldDefaultHosts: [String] = [
-    "btcnode1.adamant.im",
-    "btcnode3.adamant.im",
-    "ethnode2.adamant.im",
-    "ethnode3.adamant.im",
-    "klyservice1.adamant.im",
-    "klyservice2.adamant.im",
-    "dogenode1.adamant.im",
-    "dogenode2.adamant.im",
-    "dashnode1.adamant.im",
-    "dashnode2.adamant.im",
+private let oldDefaultAdmHosts: [String] = [
     "clown.adamant.im",
     "lake.adamant.im",
     "endless.adamant.im",
@@ -128,7 +118,5 @@ private let oldDefaultHosts: [String] = [
     "phecda.adm.im",
     "tegmine.adm.im",
     "tauri.adm.im",
-    "dschubba.adm.im",
-    "klynode1.adamant.im",
-    "klynode2.adamant.im"
+    "dschubba.adm.im"
 ]
