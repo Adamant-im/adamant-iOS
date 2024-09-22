@@ -11,11 +11,17 @@ import Alamofire
 
 public enum ApiCommands {}
 
+public enum TimeoutSize: CaseIterable, Hashable {
+    case common
+    case extended
+}
+
 public protocol APICoreProtocol: Actor {
     func sendRequestMultipartFormData(
         origin: NodeOrigin,
         path: String,
         models: [MultipartFormDataModel],
+        timeout: TimeoutSize,
         uploadProgress: @escaping ((Progress) -> Void)
     ) async -> APIResponseModel
     
@@ -25,6 +31,7 @@ public protocol APICoreProtocol: Actor {
         method: HTTPMethod,
         parameters: Parameters,
         encoding: APIParametersEncoding,
+        timeout: TimeoutSize,
         downloadProgress: @escaping ((Progress) -> Void)
     ) async -> APIResponseModel
     
@@ -33,7 +40,8 @@ public protocol APICoreProtocol: Actor {
         origin: NodeOrigin,
         path: String,
         method: HTTPMethod,
-        jsonParameters: Any
+        jsonParameters: Any,
+        timeout: TimeoutSize
     ) async -> APIResponseModel
 }
 
@@ -52,26 +60,9 @@ public extension APICoreProtocol {
             path: path,
             method: method,
             parameters: parameters,
-            encoding: encoding, 
-            downloadProgress: { _ in }
-        ).result
-    }
-    
-    func sendRequest<Parameters: Encodable>(
-        origin: NodeOrigin,
-        path: String,
-        method: HTTPMethod,
-        parameters: Parameters,
-        encoding: APIParametersEncoding,
-        downloadProgress: @escaping ((Progress) -> Void)
-    ) async -> ApiServiceResult<Data> {
-        await sendRequestBasic(
-            origin: origin,
-            path: path,
-            method: method,
-            parameters: parameters,
             encoding: encoding,
-            downloadProgress: downloadProgress
+            timeout: .common,
+            downloadProgress: { _ in }
         ).result
     }
     
@@ -89,6 +80,7 @@ public extension APICoreProtocol {
             method: method,
             parameters: parameters,
             encoding: encoding,
+            timeout: .extended,
             downloadProgress: downloadProgress
         )
     }
@@ -147,7 +139,7 @@ public extension APICoreProtocol {
             parameters: emptyParameters,
             encoding: .url,
             downloadProgress: downloadProgress
-        )
+        ).result
     }
     
     func sendRequest(
@@ -175,7 +167,8 @@ public extension APICoreProtocol {
             origin: origin,
             path: path,
             method: method,
-            jsonParameters: jsonParameters
+            jsonParameters: jsonParameters,
+            timeout: .common
         ).result.flatMap { parseJSON(data: $0) }
     }
     
@@ -189,6 +182,7 @@ public extension APICoreProtocol {
             origin: origin,
             path: path,
             models: models,
+            timeout: .extended,
             uploadProgress: uploadProgress
         ).result.flatMap { parseJSON(data: $0) }
     }
