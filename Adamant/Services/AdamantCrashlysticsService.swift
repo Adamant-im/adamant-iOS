@@ -50,13 +50,7 @@ final class AdamantCrashlyticsService: CrashlyticsService {
     }
     
     func isCrashlyticsEnabled() -> Bool {
-        guard let result: Bool = securedStore.get(
-            StoreKey.crashlytic.crashlyticEnabled
-        ) else {
-            return false
-        }
-        
-        return result
+        true
     }
     
     @MainActor

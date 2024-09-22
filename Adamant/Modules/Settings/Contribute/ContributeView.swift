@@ -55,6 +55,7 @@ private extension ContributeView {
                 viewModel.enableCrashButton()
             }
         }
+        .disabled(true)
         .tint(.init(uiColor: .adamant.active))
     }
     

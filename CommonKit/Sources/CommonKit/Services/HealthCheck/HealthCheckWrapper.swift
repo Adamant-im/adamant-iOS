@@ -130,9 +130,7 @@ private extension HealthCheckWrapper {
     
     func updateHealthCheckTimerSubscription() {
         healthCheckTimerSubscription = Timer.publish(
-            every: sortedAllowedNodes.isEmpty
-                ? crucialUpdateInterval
-                : normalUpdateInterval,
+            every: 1,
             on: .main,
             in: .default
         ).autoconnect().sink { [weak self] _ in

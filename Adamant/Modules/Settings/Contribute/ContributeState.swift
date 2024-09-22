@@ -24,7 +24,7 @@ struct ContributeState {
     static var initial: ContributeState {
         Self(
             isCrashlyticsOn: false,
-            isCrashButtonOn: false,
+            isCrashButtonOn: true,
             name: .localized("AccountTab.Row.Contribute", comment: .empty),
             crashliticsRowImage: .asset(named: "row_crashlytics") ?? .init(),
             crashliticsRowName: .localized("Contribute.Section.Crashlytics", comment: .empty),
