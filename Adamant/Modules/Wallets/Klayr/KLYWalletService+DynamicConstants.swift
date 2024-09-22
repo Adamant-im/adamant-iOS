@@ -14,7 +14,7 @@ extension KlyWalletService {
         crucialUpdateInterval: 30,
         onScreenUpdateInterval: 10,
         threshold: 5,
-        normalServiceUpdateInterval: 330,
+        normalServiceUpdateInterval: 270,
         crucialServiceUpdateInterval: 30,
         onScreenServiceUpdateInterval: 10
     )
@@ -75,15 +75,14 @@ extension KlyWalletService {
     
     static var nodes: [Node] {
         [
-            Node.makeDefaultNode(url: URL(string: "https://klynode1.adamant.im")!, altUrl: URL(string: "http://195.26.255.137:44099")),
-Node.makeDefaultNode(url: URL(string: "https://klynode2.adamant.im")!, altUrl: URL(string: "http://109.176.199.130:44099")),
+            Node.makeDefaultNode(url: URL(string: "https://klynode2.adamant.im")!, altUrl: URL(string: "http://109.176.199.130:44099")),
+Node.makeDefaultNode(url: URL(string: "https://klynode3.adm.im")!, altUrl: URL(string: "http://37.27.205.78:44099")),
         ]
     }
     
     static var serviceNodes: [Node] {
         [
-            Node.makeDefaultNode(url: URL(string: "https://klyservice1.adamant.im")!),
-Node.makeDefaultNode(url: URL(string: "https://klyservice2.adamant.im")!),
+            
         ]
     }
 }

@@ -24,6 +24,10 @@ extension Node {
             Strings.synchronizing
         case .offline:
             Strings.offline
+        case .processing:
+            "Processing response"
+        case .requesting:
+            "Waiting for server response"
         case .notAllowed(let reason):
             reason.text
         }
@@ -63,6 +67,10 @@ extension Node {
             return .adamant.attention
         case .offline, .notAllowed:
             return .adamant.warning
+        case .processing:
+            return .blue
+        case .requesting:
+            return .yellow
         case .none:
             return .adamant.inactive
         }

@@ -14,7 +14,7 @@ extension BtcWalletService {
         crucialUpdateInterval: 30,
         onScreenUpdateInterval: 10,
         threshold: 2,
-        normalServiceUpdateInterval: 330,
+        normalServiceUpdateInterval: 360,
         crucialServiceUpdateInterval: 30,
         onScreenServiceUpdateInterval: 10
     )

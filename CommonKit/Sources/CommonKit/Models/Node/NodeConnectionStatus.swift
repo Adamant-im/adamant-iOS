@@ -7,11 +7,13 @@
 
 import Foundation
 
-public enum NodeConnectionStatus: Equatable, Codable {
+public indirect enum NodeConnectionStatus: Equatable, Codable {
     case offline
     case synchronizing
     case allowed
     case notAllowed(RejectedReason)
+    case requesting(NodeConnectionStatus?)
+    case processing(NodeConnectionStatus?)
 }
 
 public extension NodeConnectionStatus {

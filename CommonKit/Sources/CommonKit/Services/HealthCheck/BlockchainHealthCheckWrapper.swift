@@ -71,6 +71,8 @@ public final class BlockchainHealthCheckWrapper<
                 
                 await group.waitForAll()
             }
+            
+            healthCheck()
         }
     }
 }
@@ -87,10 +89,24 @@ private extension BlockchainHealthCheckWrapper {
         currentRequests.insert(node.id)
         defer { currentRequests.remove(node.id) }
         
+        let actionStart = { [self] in
+            updateNode(id: node.id) { node in
+                node.connectionStatus = .requesting(node.connectionStatus)
+            }
+        }
+        
+        let actionFinish = { [self] in
+            updateNode(id: node.id) { node in
+                node.connectionStatus = .processing(node.connectionStatus)
+            }
+        }
+        
         guard
             node.preferMainOrigin == nil,
             let altOrigin = node.altOrigin
         else {
+            actionStart()
+            defer { actionFinish() }
             return .init(
                 id: node.id,
                 info: try? await service.getStatusInfo(origin: node.preferredOrigin).get(),
@@ -98,22 +114,28 @@ private extension BlockchainHealthCheckWrapper {
             )
         }
         
+        actionStart()
         switch await service.getStatusInfo(origin: node.mainOrigin) {
         case let .success(info):
+            actionFinish()
             return .init(
                 id: node.id,
                 info: info,
                 preferMainOrigin: true
             )
         case .failure:
+            actionFinish()
+            actionStart()
             switch await service.getStatusInfo(origin: altOrigin) {
             case let .success(info):
+                actionFinish()
                 return .init(
                     id: node.id,
                     info: info,
                     preferMainOrigin: false
                 )
             case .failure:
+                actionFinish()
                 return .init(
                     id: node.id,
                     info: nil,
@@ -200,6 +222,13 @@ private extension Node {
         switch connectionStatus {
         case .allowed, .synchronizing, .none:
             return isEnabled
+        case let .requesting(status), let .processing(status):
+            switch status {
+            case .allowed, .synchronizing, .none:
+                return true
+            default:
+                return false
+            }
         case .offline, .notAllowed:
             return false
         }

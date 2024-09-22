@@ -14,7 +14,7 @@ extension EthWalletService {
         crucialUpdateInterval: 30,
         onScreenUpdateInterval: 10,
         threshold: 5,
-        normalServiceUpdateInterval: 330,
+        normalServiceUpdateInterval: 300,
         crucialServiceUpdateInterval: 30,
         onScreenServiceUpdateInterval: 10
     )
