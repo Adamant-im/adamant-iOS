@@ -38,7 +38,6 @@ extension StoreKey {
     struct application {
         static let welcomeScreensIsShown = "app.welcomeScreensIsShown"
         static let eulaAccepted = "app.eulaAccepted"
-        static let firstRun = "app.firstRun"
         
         private init() {}
     }
@@ -78,17 +77,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         container
             .resolve(CrashlyticsService.self)?
             .configureIfNeeded()
-        
-        // MARK: 1.2 First run flag
-        let firstRun = UserDefaults.standard.bool(forKey: StoreKey.application.firstRun)
-
-        if !firstRun {
-            UserDefaults.standard.set(true, forKey: StoreKey.application.firstRun)
-
-            if let securedStore = container.resolve(SecuredStore.self) {
-                securedStore.purgeStore()
-            }
-        }
         
         // MARK: 2. Init UI
         let window = UIWindow(frame: UIScreen.main.bounds)

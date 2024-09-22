@@ -27,6 +27,7 @@ public final class KeychainStore: SecuredStore {
     public init(secureStorage: SecureStorageProtocol) {
         self.secureStorage = secureStorage
         
+        clearIfNeeded()
         configure()
         migrateIfNeeded()
     }
@@ -57,11 +58,6 @@ public final class KeychainStore: SecuredStore {
     public func remove(_ key: String) {
         try? KeychainStore.keychain.remove(key)
     }
-    
-    public func purgeStore() {
-        try? KeychainStore.keychain.removeAll()
-        NotificationCenter.default.post(name: Notification.Name.SecuredStore.securedStorePurged, object: self)
-    }
 }
 
 private extension KeychainStore {
@@ -91,6 +87,16 @@ private extension KeychainStore {
         
         keychainPassword = keychainRandomKey
         setData(encryptedData, for: keychainStoreIdAlias)
+    }
+    
+    func clearIfNeeded() {
+        let isFirstRun = !UserDefaults.standard.bool(forKey: firstRun)
+        
+        guard isFirstRun else { return }
+        
+        UserDefaults.standard.set(true, forKey: firstRun)
+        
+        purgeStore()
     }
     
     func getValue(_ key: String) -> Data? {
@@ -151,6 +157,11 @@ private extension KeychainStore {
         }
         return try? RNCryptor.decrypt(data: encryptedData, withPassword: password)
     }
+    
+    func purgeStore() {
+        try? KeychainStore.keychain.removeAll()
+        NotificationCenter.default.post(name: Notification.Name.SecuredStore.securedStorePurged, object: self)
+    }
 }
 
 private extension KeychainStore {
@@ -201,3 +212,5 @@ private extension KeychainStore {
         }
     }
 }
+
+private let firstRun = "app.firstRun"
