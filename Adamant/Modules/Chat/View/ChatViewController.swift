@@ -203,17 +203,16 @@ final class ChatViewController: MessagesViewController {
         updateIsScrollPositionNearlyTheBottom()
         updateScrollDownButtonVisibility()
         
+        if scrollView.isTracking || scrollView.isDragging {
+            updateDateHeaderIfNeeded()
+        }
+        
         guard
             viewAppeared,
             scrollView.contentOffset.y <= viewModel.minOffsetForStartLoadNewMessages
         else { return }
         
         viewModel.loadMoreMessagesIfNeeded()
-    }
-    
-    override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        super.scrollViewWillBeginDragging(scrollView)
-        updateDateHeaderIfNeeded()
     }
 }
 
