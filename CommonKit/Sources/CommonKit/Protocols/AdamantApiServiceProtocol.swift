@@ -45,7 +45,8 @@ public protocol AdamantApiServiceProtocol: ApiServiceProtocol {
     
     func getChatRooms(
         address: String,
-        offset: Int?
+        offset: Int?,
+        waitsForConnectivity: Bool
     ) async -> ApiServiceResult<ChatRooms>
     
     func getChatMessages(
