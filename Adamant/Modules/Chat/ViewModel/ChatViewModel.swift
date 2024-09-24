@@ -1038,20 +1038,10 @@ extension ChatViewModel {
         else { return }
         dateHeader = date
         dateHeaderHidden = false
+        hideHeaderTimer?.cancel()
+        hideHeaderTimer = nil
     }
     
-    func didEndScroll() {
-        startHideDateTimer()
-    }
-}
-
-extension ChatViewModel: NSFetchedResultsControllerDelegate {
-    func controllerDidChangeContent(_: NSFetchedResultsController<NSFetchRequestResult>) {
-        updateTransactions(performFetch: false)
-    }
-}
-
-private extension ChatViewModel {
     func startHideDateTimer() {
         hideHeaderTimer?.cancel()
         hideHeaderTimer = Timer
@@ -1062,7 +1052,15 @@ private extension ChatViewModel {
                 self?.dateHeaderHidden = true
             }
     }
-    
+}
+
+extension ChatViewModel: NSFetchedResultsControllerDelegate {
+    func controllerDidChangeContent(_: NSFetchedResultsController<NSFetchRequestResult>) {
+        updateTransactions(performFetch: false)
+    }
+}
+
+private extension ChatViewModel {
     func sendFiles(with text: String) async throws {
         guard apiServiceCompose.hasActiveNode(group: .ipfs) else {
             dialog.send(.alert(ApiServiceError.noEndpointsAvailable(
