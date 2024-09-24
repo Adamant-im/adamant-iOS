@@ -72,6 +72,7 @@ public extension APICoreProtocol {
         method: HTTPMethod,
         parameters: Parameters,
         encoding: APIParametersEncoding,
+        timeout: TimeoutSize,
         downloadProgress: @escaping ((Progress) -> Void)
     ) async -> APIResponseModel {
         await sendRequestBasic(
@@ -80,7 +81,7 @@ public extension APICoreProtocol {
             method: method,
             parameters: parameters,
             encoding: encoding,
-            timeout: .extended,
+            timeout: timeout,
             downloadProgress: downloadProgress
         )
     }
@@ -130,6 +131,7 @@ public extension APICoreProtocol {
     func sendRequest(
         origin: NodeOrigin,
         path: String,
+        timeout: TimeoutSize,
         downloadProgress: @escaping ((Progress) -> Void)
     ) async -> ApiServiceResult<Data> {
         await sendRequest(
@@ -138,6 +140,7 @@ public extension APICoreProtocol {
             method: .get,
             parameters: emptyParameters,
             encoding: .url,
+            timeout: timeout,
             downloadProgress: downloadProgress
         ).result
     }
@@ -145,6 +148,7 @@ public extension APICoreProtocol {
     func sendRequest(
         origin: NodeOrigin,
         path: String,
+        timeout: TimeoutSize,
         downloadProgress: @escaping ((Progress) -> Void)
     ) async -> APIResponseModel {
         await sendRequest(
@@ -153,6 +157,7 @@ public extension APICoreProtocol {
             method: .get,
             parameters: emptyParameters,
             encoding: .url,
+            timeout: timeout,
             downloadProgress: downloadProgress
         )
     }
@@ -176,13 +181,14 @@ public extension APICoreProtocol {
         origin: NodeOrigin,
         path: String,
         models: [MultipartFormDataModel],
+        timeout: TimeoutSize,
         uploadProgress: @escaping ((Progress) -> Void)
     ) async -> ApiServiceResult<JSONOutput> {
         await sendRequestMultipartFormData(
             origin: origin,
             path: path,
             models: models,
-            timeout: .extended,
+            timeout: timeout,
             uploadProgress: uploadProgress
         ).result.flatMap { parseJSON(data: $0) }
     }
