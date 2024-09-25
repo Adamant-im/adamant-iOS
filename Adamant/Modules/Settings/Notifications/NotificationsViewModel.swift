@@ -209,9 +209,8 @@ private extension NotificationsViewModel {
             actions: [
                 makeAction(
                     title: .adamant.alert.settings,
-                    action: { _ in
-                        self.openAppSettings()
-                    }),
+                    action: { [weak self] _ in self?.openAppSettings() }
+                ),
                 makeAction(
                     title: String.adamant.alert.cancel,
                     action: nil
