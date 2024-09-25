@@ -681,7 +681,7 @@ extension ChatListViewController {
         }
                 
         if let date = chatroom.updatedAt as Date?, date != .adamantNullDate {
-            cell.dateLabel.text = date.humanizedDay()
+            cell.dateLabel.text = date.humanizedDay(useTimeFormat: true)
         } else {
             cell.dateLabel.text = nil
         }

@@ -20,7 +20,7 @@ public protocol NodesStorageProtocol {
     
     func getNodesPublisher(group: NodeGroup) -> AnyObservable<[Node]>
     func addNode(_ node: Node, group: NodeGroup)
-    func resetNodes(group: NodeGroup)
+    func resetNodes(_ groups: Set<NodeGroup>)
     func removeNode(id: UUID, group: NodeGroup)
     func updateNode(id: UUID, group: NodeGroup, mutate: (inout Node) -> Void)
 }

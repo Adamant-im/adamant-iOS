@@ -194,15 +194,18 @@ final class ChatViewController: MessagesViewController {
         super.collectionView(collectionView, willDisplay: cell, forItemAt: indexPath)
     }
     
-    override func scrollViewDidEndDragging(_: UIScrollView, willDecelerate _: Bool) {
-        viewModel.didEndScroll()
+    override func scrollViewDidEndDecelerating(_: UIScrollView) {
+        viewModel.startHideDateTimer()
     }
     
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         super.scrollViewDidScroll(scrollView)
         updateIsScrollPositionNearlyTheBottom()
         updateScrollDownButtonVisibility()
-        updateDateHeaderIfNeeded()
+        
+        if scrollView.isTracking || scrollView.isDragging {
+            updateDateHeaderIfNeeded()
+        }
         
         guard
             viewAppeared,

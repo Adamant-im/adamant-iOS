@@ -22,6 +22,9 @@
 /* About scene: 'Contact us' section title. */
 "About.Section.ContactUs" = "Пишите нам";
 
+/* Commit Hash */
+"About.Version.Commit" = "Коммит: %@";
+
 /* About scene: Website row */
 "About.Row.Website" = "Вебсайт";
 

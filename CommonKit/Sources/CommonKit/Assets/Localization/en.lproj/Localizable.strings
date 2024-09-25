@@ -22,6 +22,9 @@
 /* About scene: 'Contact us' section title. */
 "About.Section.ContactUs" = "Contact us";
 
+/* Commit Hash */
+"About.Version.Commit" = "Commit: %@";
+
 /* Contribute scene: 'Crashlytics' section title. */
 "Contribute.Section.Crashlytics" = "Crashlytics";
 
