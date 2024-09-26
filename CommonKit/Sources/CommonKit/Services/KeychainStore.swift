@@ -23,10 +23,12 @@ public final class KeychainStore: SecuredStore {
     private let oldKeychainService = "im.adamant"
     private let migrationKey = "migrated"
     private let migrationValue = "2"
+    private lazy var userDefaults = UserDefaults(suiteName: sharedGroup)
     
     public init(secureStorage: SecureStorageProtocol) {
         self.secureStorage = secureStorage
         
+        migrateUserDefaultsIfNeeded()
         clearIfNeeded()
         configure()
         migrateIfNeeded()
@@ -90,11 +92,13 @@ private extension KeychainStore {
     }
     
     func clearIfNeeded() {
-        let isFirstRun = !UserDefaults.standard.bool(forKey: firstRun)
+        guard let userDefaults = userDefaults else { return }
+        
+        let isFirstRun = !userDefaults.bool(forKey: firstRun)
         
         guard isFirstRun else { return }
         
-        UserDefaults.standard.set(true, forKey: firstRun)
+        userDefaults.set(true, forKey: firstRun)
         
         purgeStore()
     }
@@ -211,6 +215,15 @@ private extension KeychainStore {
             setValue(value, for: key)
         }
     }
+    
+    func migrateUserDefaultsIfNeeded() {
+        let migrated = KeychainStore.keychain[migrationKey]
+        guard migrated != migrationValue else { return }
+        
+        let value = UserDefaults.standard.bool(forKey: firstRun)
+        userDefaults?.set(value, forKey: firstRun)
+    }
 }
 
 private let firstRun = "app.firstRun"
+private let sharedGroup = "group.adamant.adamant-messenger"
