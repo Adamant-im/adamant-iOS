@@ -87,8 +87,14 @@ Node.makeDefaultNode(url: URL(string: "https://dschubba.adm.im")!),
     
     static var serviceNodes: [Node] {
         [
-            Node.makeDefaultNode(url: URL(string: "https://info.adamant.im")!),
-Node.makeDefaultNode(url: URL(string: "https://info2.adm.im")!),
+            Node.makeDefaultNode(
+                url: URL(string: "https://info.adamant.im")!,
+                altUrl: URL(string: "http://88.198.156.44:44099")!
+            ),
+            Node.makeDefaultNode(
+                url: URL(string: "https://info2.adm.im")!,
+                altUrl: URL(string: "http://207.180.210.95:33088")!
+            )
         ]
     }
 }

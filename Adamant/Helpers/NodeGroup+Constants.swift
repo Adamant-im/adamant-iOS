@@ -26,7 +26,7 @@ extension NodeGroup {
         case .dash:
             return DashWalletService.healthCheckParameters.onScreenUpdateInterval
         case .ipfs:
-            return IPFSApiService.healthCheckParameters.onScreenUpdateInterval
+            return 10 // TODO: Fix the adamant-wallets script and the repo itself
         case .infoService:
             return AdmWalletService.healthCheckParameters.onScreenServiceUpdateInterval
         }
@@ -72,7 +72,7 @@ extension NodeGroup {
         case .dash:
             return DashWalletService.healthCheckParameters.threshold
         case .ipfs:
-            return IPFSApiService.healthCheckParameters.threshold
+            return IPFSApiService.healthCheckParameters.nodeHeightEpsilon
         case .infoService:
             return InfoService.threshold
         }

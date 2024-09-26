@@ -2814,7 +2814,6 @@
 				629616F00016639A2AFC5FC7 /* [CP] Embed Pods Frameworks */,
 				E96D64E62295CD4700CA5587 /* Embed App Extensions */,
 				A5AC8E01262E0B030053A7E2 /* Embed Frameworks */,
-				418BBB14293752F800CAB719 /* Run Script - Load wallets */,
 				41079EBC28AE974300C32DAF /* Run Script - SwiftLint */,
 			);
 			buildRules = (
@@ -3181,26 +3180,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/SwiftLint/swiftlint\"\n";
-		};
-		418BBB14293752F800CAB719 /* Run Script - Load wallets */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 8;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"$(SRCROOT)/CommonKit/Scripts/UpdateWalletsScript.sh",
-				"$(SRCROOT)/CommonKit/Scripts/CoinsScript.rb",
-			);
-			name = "Run Script - Load wallets";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-			shellPath = /bin/sh;
-			shellScript = "$SCRIPT_INPUT_FILE_0 xcode\n$SCRIPT_INPUT_FILE_1 xcode\n\nrm -r $PWD/scripts\n";
 		};
 		47866E9AB7D201F2CED0064C /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;

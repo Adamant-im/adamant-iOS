@@ -43,13 +43,12 @@ extension IPFSApiService {
         ]
     }
     
-    static let healthCheckParameters = CoinHealthCheckParameters(
-        normalUpdateInterval: 210,
+    static let healthCheckParameters = BlockchainHealthCheckParams(
+        group: .ipfs,
+        name: symbol,
+        normalUpdateInterval: 300,
         crucialUpdateInterval: 30,
-        onScreenUpdateInterval: 10,
-        threshold: 3,
-        normalServiceUpdateInterval: 210,
-        crucialServiceUpdateInterval: 30,
-        onScreenServiceUpdateInterval: 10
+        minNodeVersion: nil,
+        nodeHeightEpsilon: .zero
     )
 }
