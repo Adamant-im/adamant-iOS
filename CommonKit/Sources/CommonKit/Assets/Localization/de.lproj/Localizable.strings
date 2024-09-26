@@ -824,7 +824,7 @@
 "Notifications.Mode.NotificationsDisabled" = "Deaktiviert";
 
 /* Notifications: Use Background fetch notifications */
-"Notifications.Mode.BackgroundFetch" = "Hintergrundaktualisierung";
+"Notifications.Mode.BackgroundFetch" = "Hintergrund Fetch";
 
 /* Notifications: Use Apple Push notifications */
 "Notifications.Mode.ApplePush" = "Push";

@@ -10,16 +10,20 @@ import Swinject
 import SwiftUI
 
 struct NotificationSoundsFactory {
-    private let assembler: Assembler
+    private let parent: Assembler
+    private let assemblies = [NotificationSoundAssembly()]
     
     init(parent: Assembler) {
-        assembler = .init([NotificationSoundAssembly()], parent: parent)
+        self.parent = parent
     }
     
     @MainActor
     func makeView(target: NotificationTarget) -> NotificationSoundsView {
-        let viewModel = assembler.resolve(NotificationSoundsViewModel.self)!
-        viewModel.setup(notificationTarget: target)
+        let assembler = Assembler(assemblies, parent: parent)
+        let viewModel = {
+            assembler.resolver.resolve(NotificationSoundsViewModel.self, argument: target)!
+        }
+        
         let view = NotificationSoundsView(viewModel: viewModel)
         
         return view
@@ -28,11 +32,12 @@ struct NotificationSoundsFactory {
 
 private struct NotificationSoundAssembly: Assembly {
     func assemble(container: Container) {
-        container.register(NotificationSoundsViewModel.self) { r in
+        container.register(NotificationSoundsViewModel.self) { (r, target: NotificationTarget) in
             NotificationSoundsViewModel(
                 notificationsService: r.resolve(NotificationsService.self)!,
-                target: .baseMessage
+                target: target,
+                dialogService: r.resolve(DialogService.self)!
             )
-        }
+        }.inObjectScope(.transient)
     }
 }

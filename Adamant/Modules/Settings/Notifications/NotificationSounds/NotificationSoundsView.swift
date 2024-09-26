@@ -10,9 +10,13 @@ import SwiftUI
 import CommonKit
 
 struct NotificationSoundsView: View {
-    @ObservedObject var viewModel: NotificationSoundsViewModel
+    @StateObject var viewModel: NotificationSoundsViewModel
     
     @Environment(\.dismiss) var dismiss
+    
+    init(viewModel: @escaping () -> NotificationSoundsViewModel) {
+        _viewModel = .init(wrappedValue: viewModel())
+    }
     
     var body: some View {
         GeometryReader { _ in
@@ -102,7 +106,7 @@ private extension NotificationSoundsView {
                             Spacer()
                             if viewModel.selectedSound == sound {
                                 Image(systemName: "checkmark")
-                                    .foregroundColor(.black)
+                                    .foregroundColor(Color(uiColor: .adamant.textColor))
                                     .frame(width: 30, height: 30)
                             }
                         }
