@@ -49,6 +49,6 @@ extension IPFSApiService {
         normalUpdateInterval: 300,
         crucialUpdateInterval: 30,
         minNodeVersion: nil,
-        nodeHeightEpsilon: .zero
+        nodeHeightEpsilon: 1
     )
 }
