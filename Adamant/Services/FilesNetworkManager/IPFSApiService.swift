@@ -49,6 +49,7 @@ final class IPFSApiService: FileApiServiceProtocol {
                 origin: origin,
                 path: IPFSApiCommands.file.upload,
                 models: [model],
+                timeout: .extended,
                 uploadProgress: uploadProgress
             )
         }
@@ -72,6 +73,7 @@ final class IPFSApiService: FileApiServiceProtocol {
             let result: APIResponseModel = await core.sendRequest(
                 origin: origin,
                 path: "\(IPFSApiCommands.file.download)\(id)",
+                timeout: .extended,
                 downloadProgress: downloadProgress
             )
             

@@ -15,24 +15,17 @@ public actor APICore: APICoreProtocol {
         qos: .userInteractive
     )
     
-    private lazy var session: Session = {
-        let configuration = AF.sessionConfiguration
-        configuration.waitsForConnectivity = true
-        configuration.timeoutIntervalForRequest = timeoutIntervalForRequest
-        configuration.timeoutIntervalForResource = timeoutIntervalForResource
-        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
-        configuration.httpMaximumConnectionsPerHost = maximumConnectionsPerHost
-        return Alamofire.Session.init(configuration: configuration)
-    }()
+    private var sessions: [TimeoutSize: Session] = .init()
     
     public func sendRequestMultipartFormData(
         origin: NodeOrigin,
         path: String,
         models: [MultipartFormDataModel],
+        timeout: TimeoutSize,
         uploadProgress: @escaping ((Progress) -> Void)
     ) async -> APIResponseModel {
         do {
-            let request = session.upload(
+            let request = getSession(timeout).upload(
                 multipartFormData: { multipartFormData in
                     models.forEach { file in
                         multipartFormData.append(
@@ -61,10 +54,11 @@ public actor APICore: APICoreProtocol {
         method: HTTPMethod,
         parameters: Parameters,
         encoding: APIParametersEncoding,
+        timeout: TimeoutSize,
         downloadProgress: @escaping ((Progress) -> Void)
     ) async -> APIResponseModel {
         do {
-            let request = session.request(
+            let request = getSession(timeout).request(
                 try buildUrl(origin: origin, path: path),
                 method: method,
                 parameters: parameters.asDictionary(),
@@ -86,7 +80,8 @@ public actor APICore: APICoreProtocol {
         origin: NodeOrigin,
         path: String,
         method: HTTPMethod,
-        jsonParameters: Any
+        jsonParameters: Any,
+        timeout: TimeoutSize
     ) async -> APIResponseModel {
         do {
             let data = try JSONSerialization.data(
@@ -100,7 +95,7 @@ public actor APICore: APICoreProtocol {
             
             request.httpBody = data
             request.headers.update(.contentType("application/json"))
-            return await sendRequest(request: session.request(request))
+            return await sendRequest(request: getSession(timeout).request(request))
         } catch {
             return .init(
                 result: .failure(.internalError(message: error.localizedDescription, error: error)),
@@ -136,8 +131,32 @@ private extension APICore {
         else { throw InternalAPIError.endpointBuildFailed }
         return url
     }
+    
+    func getSession(_ timeout: TimeoutSize) -> Session {
+        if let session = sessions[timeout] {
+            return session
+        }
+        
+        let configuration = AF.sessionConfiguration
+        configuration.waitsForConnectivity = true
+        configuration.timeoutIntervalForRequest = requestTimeout
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        configuration.httpMaximumConnectionsPerHost = maximumConnectionsPerHost
+        
+        configuration.timeoutIntervalForResource = switch timeout {
+        case .common:
+            resourceTimeout
+        case .extended:
+            extendedResourceTimeout
+        }
+        
+        let session = Alamofire.Session.init(configuration: configuration)
+        sessions[timeout] = session
+        return session
+    }
 }
 
-private let timeoutIntervalForRequest: TimeInterval = 15
-private let timeoutIntervalForResource: TimeInterval = 24 * 3600
+private let requestTimeout: TimeInterval = 15
+private let resourceTimeout: TimeInterval = 15
+private let extendedResourceTimeout: TimeInterval = 24 * 3600
 private let maximumConnectionsPerHost = 100
