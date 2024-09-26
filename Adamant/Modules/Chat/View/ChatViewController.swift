@@ -203,7 +203,7 @@ final class ChatViewController: MessagesViewController {
         updateIsScrollPositionNearlyTheBottom()
         updateScrollDownButtonVisibility()
         
-        if scrollView.isTracking || scrollView.isDragging {
+        if scrollView.isTracking || scrollView.isDragging || scrollView.isDecelerating {
             updateDateHeaderIfNeeded()
         }
         
