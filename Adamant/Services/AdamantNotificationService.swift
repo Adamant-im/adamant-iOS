@@ -401,7 +401,7 @@ private extension AdamantNotificationsService {
             return
         }
 
-        try? AVAudioSession.sharedInstance().setCategory(.playback)
+        try? AVAudioSession.sharedInstance().setCategory(.soloAmbient)
         try? AVAudioSession.sharedInstance().setActive(true)
         audioPlayer = try? AVAudioPlayer(contentsOf: url, fileTypeHint: AVFileType.mp3.rawValue)
         audioPlayer?.volume = 1.0
