@@ -195,7 +195,12 @@ final class ChatViewController: MessagesViewController {
     }
     
     override func scrollViewDidEndDecelerating(_: UIScrollView) {
-        viewModel.startHideDateTimer()
+        scrollDidStop()
+    }
+    
+    override func scrollViewDidEndDragging(_: UIScrollView, willDecelerate: Bool) {
+        guard !willDecelerate else { return }
+        scrollDidStop()
     }
     
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -282,6 +287,10 @@ extension ChatViewController {
 // MARK: Observers
 
 private extension ChatViewController {
+    func scrollDidStop() {
+        viewModel.startHideDateTimer()
+    }
+    
     func setupObservers() {
         NotificationCenter.default
             .publisher(for: UITextView.textDidChangeNotification, object: inputBar.inputTextView)
