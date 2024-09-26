@@ -139,7 +139,7 @@ private func migrateOldNodesData(securedStore: SecuredStore) -> [NodeGroup: [Nod
             result[$0.group] = []
         }
         
-        result[$0.group]?.append($0.node.mapToModernDto().mapToModel())
+        result[$0.group]?.append($0.node.mapToModernDto(group: $0.group).mapToModel())
     }
     
     return result
