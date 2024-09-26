@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/Alamofire/Alamofire.git",
         "state": {
           "branch": null,
-          "revision": "d120af1e8638c7da36c8481fd61a66c0c08dc4fc",
-          "version": "5.4.4"
+          "revision": "bc268c28fb170f494de9e9927c371b8342979ece",
+          "version": "5.7.1"
         }
       },
       {
@@ -60,7 +60,7 @@
         "repositoryURL": "https://github.com/EFPrefix/EFQRCode.git",
         "state": {
           "branch": null,
-          "revision": "97f66a5800dc272206be453ad19604548ff0e0e0",
+          "revision": "3a6c5012f1a0df404a92e55bb01b4b685ff5a2d1",
           "version": "6.2.2"
         }
       },

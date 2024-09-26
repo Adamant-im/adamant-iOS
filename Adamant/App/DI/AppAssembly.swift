@@ -111,7 +111,9 @@ struct AppAssembly: Assembly {
             NodesStorage(
                 securedStore: r.resolve(SecuredStore.self)!,
                 nodesMergingService: r.resolve(NodesMergingServiceProtocol.self)!,
-                defaultNodes: r.resolve(DefaultNodesProvider.self)!.nodes
+                defaultNodes: { [provider = r.resolve(DefaultNodesProvider.self)!] groups in
+                    provider.get(groups)
+                }
             )
         }.inObjectScope(.container)
         

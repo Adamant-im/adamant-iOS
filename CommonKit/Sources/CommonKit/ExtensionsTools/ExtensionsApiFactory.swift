@@ -23,7 +23,7 @@ public struct ExtensionsApiFactory {
                 nodesStorage: NodesStorage(
                     securedStore: securedStore,
                     nodesMergingService: NodesMergingService(),
-                    defaultNodes: .init()
+                    defaultNodes: { _ in .init() }
                 ),
                 nodesAdditionalParamsStorage: NodesAdditionalParamsStorage(
                     securedStore: securedStore
