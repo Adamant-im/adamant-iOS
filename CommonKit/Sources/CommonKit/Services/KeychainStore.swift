@@ -23,10 +23,13 @@ public final class KeychainStore: SecuredStore {
     private let oldKeychainService = "im.adamant"
     private let migrationKey = "migrated"
     private let migrationValue = "2"
+    private lazy var userDefaults = UserDefaults(suiteName: sharedGroup)
     
     public init(secureStorage: SecureStorageProtocol) {
         self.secureStorage = secureStorage
         
+        migrateUserDefaultsIfNeeded()
+        clearIfNeeded()
         configure()
         migrateIfNeeded()
     }
@@ -57,11 +60,6 @@ public final class KeychainStore: SecuredStore {
     public func remove(_ key: String) {
         try? KeychainStore.keychain.remove(key)
     }
-    
-    public func purgeStore() {
-        try? KeychainStore.keychain.removeAll()
-        NotificationCenter.default.post(name: Notification.Name.SecuredStore.securedStorePurged, object: self)
-    }
 }
 
 private extension KeychainStore {
@@ -91,6 +89,18 @@ private extension KeychainStore {
         
         keychainPassword = keychainRandomKey
         setData(encryptedData, for: keychainStoreIdAlias)
+    }
+    
+    func clearIfNeeded() {
+        guard let userDefaults = userDefaults else { return }
+        
+        let isFirstRun = !userDefaults.bool(forKey: firstRun)
+        
+        guard isFirstRun else { return }
+        
+        userDefaults.set(true, forKey: firstRun)
+        
+        purgeStore()
     }
     
     func getValue(_ key: String) -> Data? {
@@ -151,6 +161,11 @@ private extension KeychainStore {
         }
         return try? RNCryptor.decrypt(data: encryptedData, withPassword: password)
     }
+    
+    func purgeStore() {
+        try? KeychainStore.keychain.removeAll()
+        NotificationCenter.default.post(name: Notification.Name.SecuredStore.securedStorePurged, object: self)
+    }
 }
 
 private extension KeychainStore {
@@ -200,4 +215,15 @@ private extension KeychainStore {
             setValue(value, for: key)
         }
     }
+    
+    func migrateUserDefaultsIfNeeded() {
+        let migrated = KeychainStore.keychain[migrationKey]
+        guard migrated != migrationValue else { return }
+        
+        let value = UserDefaults.standard.bool(forKey: firstRun)
+        userDefaults?.set(value, forKey: firstRun)
+    }
 }
+
+private let firstRun = "app.firstRun"
+private let sharedGroup = "group.adamant.adamant-messenger"

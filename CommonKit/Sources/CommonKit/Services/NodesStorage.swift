@@ -10,6 +10,8 @@ import Foundation
 import Combine
 
 public final class NodesStorage: NodesStorageProtocol {
+    public typealias DefaultNodesGetter = @Sendable (Set<NodeGroup>) -> [NodeGroup: [Node]]
+    
     @Atomic private var items: ObservableValue<[NodeGroup: [Node]]>
     
     public var nodesPublisher: AnyObservable<[NodeGroup: [Node]]> {
@@ -21,7 +23,7 @@ public final class NodesStorage: NodesStorageProtocol {
     
     private var subscription: AnyCancellable?
     private let securedStore: SecuredStore
-    private let defaultNodes: [NodeGroup: [Node]]
+    private let defaultNodes: DefaultNodesGetter
     
     public func getNodesPublisher(group: NodeGroup) -> AnyObservable<[Node]> {
         nodesPublisher
@@ -84,14 +86,20 @@ public final class NodesStorage: NodesStorageProtocol {
         }
     }
     
-    public func resetNodes(group: NodeGroup) {
-        items.wrappedValue[group] = defaultNodes[group] ?? .init()
+    public func resetNodes(_ groups: Set<NodeGroup>) {
+        let defaultNodes = defaultNodes(groups)
+        
+        $items.mutate { items in
+            for group in groups {
+                items.wrappedValue[group] = defaultNodes[group] ?? .init()
+            }
+        }
     }
     
     public init(
         securedStore: SecuredStore,
         nodesMergingService: NodesMergingServiceProtocol,
-        defaultNodes: [NodeGroup: [Node]]
+        defaultNodes: @escaping DefaultNodesGetter
     ) {
         self.securedStore = securedStore
         self.defaultNodes = defaultNodes
@@ -104,7 +112,7 @@ public final class NodesStorage: NodesStorageProtocol {
         
         _items = .init(.init(wrappedValue: nodesMergingService.merge(
             savedNodes: savedNodes,
-            defaultNodes: defaultNodes
+            defaultNodes: defaultNodes(.init(NodeGroup.allCases))
         )))
         
         subscription = items.removeDuplicates().sink { [weak self] in
@@ -131,7 +139,7 @@ private func migrateOldNodesData(securedStore: SecuredStore) -> [NodeGroup: [Nod
             result[$0.group] = []
         }
         
-        result[$0.group]?.append($0.node.mapToModernDto().mapToModel())
+        result[$0.group]?.append($0.node.mapToModernDto(group: $0.group).mapToModel())
     }
     
     return result

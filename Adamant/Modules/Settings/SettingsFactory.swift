@@ -46,13 +46,6 @@ struct SettingsFactory {
         )
     }
     
-    func makeNotificationsVC() -> UIViewController {
-        let c = NotificationsViewController()
-        c.notificationsService = assembler.resolve(NotificationsService.self)
-        c.dialogService = assembler.resolve(DialogService.self)
-        return c
-    }
-    
     func makeVisibleWalletsVC() -> UIViewController {
         VisibleWalletsViewController(
             visibleWalletsService: assembler.resolve(VisibleWalletsService.self)!,

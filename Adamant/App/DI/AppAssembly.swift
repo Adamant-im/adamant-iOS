@@ -53,11 +53,15 @@ struct AppAssembly: Assembly {
         
         // MARK: Notifications
         container.register(NotificationsService.self) { r in
-            AdamantNotificationsService(securedStore: r.resolve(SecuredStore.self)!)
+            AdamantNotificationsService(
+                securedStore: r.resolve(SecuredStore.self)!,
+                vibroService: r.resolve(VibroService.self)!
+            )
         }.initCompleted { (r, c) in    // Weak reference
             Task { @MainActor in
                 guard let service = c as? AdamantNotificationsService else { return }
                 service.accountService = r.resolve(AccountService.self)
+                service.chatsProvider = r.resolve(ChatsProvider.self)
             }
         }.inObjectScope(.container)
         
@@ -111,7 +115,9 @@ struct AppAssembly: Assembly {
             NodesStorage(
                 securedStore: r.resolve(SecuredStore.self)!,
                 nodesMergingService: r.resolve(NodesMergingServiceProtocol.self)!,
-                defaultNodes: r.resolve(DefaultNodesProvider.self)!.nodes
+                defaultNodes: { [provider = r.resolve(DefaultNodesProvider.self)!] groups in
+                    provider.get(groups)
+                }
             )
         }.inObjectScope(.container)
         

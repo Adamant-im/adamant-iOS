@@ -11,11 +11,17 @@ import Alamofire
 
 public enum ApiCommands {}
 
+public enum TimeoutSize: CaseIterable, Hashable {
+    case common
+    case extended
+}
+
 public protocol APICoreProtocol: Actor {
     func sendRequestMultipartFormData(
         origin: NodeOrigin,
         path: String,
         models: [MultipartFormDataModel],
+        timeout: TimeoutSize,
         uploadProgress: @escaping ((Progress) -> Void)
     ) async -> APIResponseModel
     
@@ -25,6 +31,7 @@ public protocol APICoreProtocol: Actor {
         method: HTTPMethod,
         parameters: Parameters,
         encoding: APIParametersEncoding,
+        timeout: TimeoutSize,
         downloadProgress: @escaping ((Progress) -> Void)
     ) async -> APIResponseModel
     
@@ -33,7 +40,8 @@ public protocol APICoreProtocol: Actor {
         origin: NodeOrigin,
         path: String,
         method: HTTPMethod,
-        jsonParameters: Any
+        jsonParameters: Any,
+        timeout: TimeoutSize
     ) async -> APIResponseModel
 }
 
@@ -52,7 +60,8 @@ public extension APICoreProtocol {
             path: path,
             method: method,
             parameters: parameters,
-            encoding: encoding, 
+            encoding: encoding,
+            timeout: .common,
             downloadProgress: { _ in }
         ).result
     }
@@ -63,24 +72,7 @@ public extension APICoreProtocol {
         method: HTTPMethod,
         parameters: Parameters,
         encoding: APIParametersEncoding,
-        downloadProgress: @escaping ((Progress) -> Void)
-    ) async -> ApiServiceResult<Data> {
-        await sendRequestBasic(
-            origin: origin,
-            path: path,
-            method: method,
-            parameters: parameters,
-            encoding: encoding,
-            downloadProgress: downloadProgress
-        ).result
-    }
-    
-    func sendRequest<Parameters: Encodable>(
-        origin: NodeOrigin,
-        path: String,
-        method: HTTPMethod,
-        parameters: Parameters,
-        encoding: APIParametersEncoding,
+        timeout: TimeoutSize,
         downloadProgress: @escaping ((Progress) -> Void)
     ) async -> APIResponseModel {
         await sendRequestBasic(
@@ -89,6 +81,7 @@ public extension APICoreProtocol {
             method: method,
             parameters: parameters,
             encoding: encoding,
+            timeout: timeout,
             downloadProgress: downloadProgress
         )
     }
@@ -138,6 +131,7 @@ public extension APICoreProtocol {
     func sendRequest(
         origin: NodeOrigin,
         path: String,
+        timeout: TimeoutSize,
         downloadProgress: @escaping ((Progress) -> Void)
     ) async -> ApiServiceResult<Data> {
         await sendRequest(
@@ -146,13 +140,15 @@ public extension APICoreProtocol {
             method: .get,
             parameters: emptyParameters,
             encoding: .url,
+            timeout: timeout,
             downloadProgress: downloadProgress
-        )
+        ).result
     }
     
     func sendRequest(
         origin: NodeOrigin,
         path: String,
+        timeout: TimeoutSize,
         downloadProgress: @escaping ((Progress) -> Void)
     ) async -> APIResponseModel {
         await sendRequest(
@@ -161,6 +157,7 @@ public extension APICoreProtocol {
             method: .get,
             parameters: emptyParameters,
             encoding: .url,
+            timeout: timeout,
             downloadProgress: downloadProgress
         )
     }
@@ -175,7 +172,8 @@ public extension APICoreProtocol {
             origin: origin,
             path: path,
             method: method,
-            jsonParameters: jsonParameters
+            jsonParameters: jsonParameters,
+            timeout: .common
         ).result.flatMap { parseJSON(data: $0) }
     }
     
@@ -183,12 +181,14 @@ public extension APICoreProtocol {
         origin: NodeOrigin,
         path: String,
         models: [MultipartFormDataModel],
+        timeout: TimeoutSize,
         uploadProgress: @escaping ((Progress) -> Void)
     ) async -> ApiServiceResult<JSONOutput> {
         await sendRequestMultipartFormData(
             origin: origin,
             path: path,
             models: models,
+            timeout: timeout,
             uploadProgress: uploadProgress
         ).result.flatMap { parseJSON(data: $0) }
     }

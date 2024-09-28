@@ -22,6 +22,9 @@
 /* About scene: 'Contact us' section title. */
 "About.Section.ContactUs" = "Kontaktieren Sie uns";
 
+/* Commit Hash */
+"About.Version.Commit" = "Commit: %@";
+
 /* About scene: Website row */
 "About.Row.Website" = "Webseite";
 
@@ -821,7 +824,7 @@
 "Notifications.Mode.NotificationsDisabled" = "Deaktiviert";
 
 /* Notifications: Use Background fetch notifications */
-"Notifications.Mode.BackgroundFetch" = "Hintergrundaktualisierung";
+"Notifications.Mode.BackgroundFetch" = "Hintergrund Fetch";
 
 /* Notifications: Use Apple Push notifications */
 "Notifications.Mode.ApplePush" = "Push";

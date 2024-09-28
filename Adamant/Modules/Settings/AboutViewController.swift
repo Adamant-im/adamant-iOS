@@ -14,12 +14,20 @@ import CommonKit
 
 // MARK: - Localization
 extension String.adamant {
-    struct about {
+    enum about {
         static var title: String {
             String.localized("About.Title", comment: "About page: scene title")
         }
         
-        private init() { }
+        static func commit(_ commit: String) -> String {
+            String.localizedStringWithFormat(
+                String.localized(
+                    "About.Version.Commit",
+                    comment: "Commit Hash"
+                ),
+                commit
+            )
+        }
     }
 }
 
@@ -120,6 +128,8 @@ final class AboutViewController: FormViewController {
     private var numerOfTap = 0
     private let maxNumerOfTap = 10
     
+    private lazy var versionFooterView = VersionFooterView()
+    
     // MARK: Init
     
     init(
@@ -149,6 +159,8 @@ final class AboutViewController: FormViewController {
         
         navigationItem.largeTitleDisplayMode = .always
         navigationItem.title = String.adamant.about.title
+        tableView.tableFooterView = versionFooterView
+        setVersion()
         
         // MARK: Header & Footer
         if let header = UINib(nibName: "LogoFullHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
@@ -163,14 +175,6 @@ final class AboutViewController: FormViewController {
             
             if let label = header.viewWithTag(888) as? UILabel {
                 label.text = String.adamant.shared.productName
-            }
-        }
-        
-        if let footer = UINib(nibName: "VersionFooter", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
-            if let label = footer.viewWithTag(555) as? UILabel {
-                label.text = AdamantUtilities.applicationVersion
-                label.textColor = UIColor.adamant.primary
-                tableView.tableFooterView = footer
             }
         }
         
@@ -279,6 +283,11 @@ final class AboutViewController: FormViewController {
         if let indexPath = tableView.indexPathForSelectedRow {
             tableView.deselectRow(at: indexPath, animated: animated)
         }
+    }
+    
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        versionFooterView.sizeToFit()
     }
     
     // MARK: - Other
@@ -420,5 +429,14 @@ private extension AboutViewController {
         }
         
         appSection.append(vibrationRow)
+    }
+    
+    func setVersion() {
+        versionFooterView.model = .init(
+            version: AdamantUtilities.applicationVersion,
+            commit: AdamantUtilities.Git.commitHash.map {
+                .adamant.about.commit(.init($0.prefix(20)))
+            }
+        )
     }
 }

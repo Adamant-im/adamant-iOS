@@ -73,7 +73,4 @@ public protocol SecuredStore: AnyObject {
     func set<T: Encodable>(_ value: T, for key: String)
 
     func remove(_ key: String)
-    
-    /// Remove everything
-    func purgeStore()
 }

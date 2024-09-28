@@ -8,9 +8,9 @@
 
 import CommonKit
 
-struct DefaultNodesProvider {
-    var nodes: [NodeGroup: [Node]] {
-        .init(uniqueKeysWithValues: NodeGroup.allCases.map {
+struct DefaultNodesProvider: Sendable {
+    func get(_ groups: Set<NodeGroup>) -> [NodeGroup: [Node]] {
+        .init(uniqueKeysWithValues: groups.map {
             ($0, defaultItems(group: $0))
         })
     }
