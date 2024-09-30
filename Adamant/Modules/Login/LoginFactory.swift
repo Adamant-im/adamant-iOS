@@ -8,6 +8,7 @@
 
 import UIKit
 import Swinject
+import CommonKit
 
 struct LoginFactory {
     let assembler: Assembler
@@ -19,7 +20,7 @@ struct LoginFactory {
             dialogService: assembler.resolve(DialogService.self)!,
             localAuth: assembler.resolve(LocalAuthentication.self)!,
             screensFactory: screenFactory,
-            apiService: assembler.resolve(ApiService.self)!
+            apiService: assembler.resolve(AdamantApiServiceProtocol.self)!
         )
     }
 }

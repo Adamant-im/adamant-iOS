@@ -113,7 +113,7 @@ class AdamantHealthCheckServiceTests: XCTestCase {
     
     // MARK: - Helpers
     
-    private func makeTestNode(connectionStatus: Node.ConnectionStatus = .synchronizing) -> Node {
+    private func makeTestNode(connectionStatus: NodeConnectionStatus = .synchronizing) -> Node {
         let node = Node(scheme: .default, host: "", port: nil)
         node.connectionStatus = connectionStatus
         return node

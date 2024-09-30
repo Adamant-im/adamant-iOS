@@ -8,14 +8,15 @@
 
 import UIKit
 import Parchment
+import CommonKit
+import Combine
 
-class WalletPagingItem: PagingItem, Hashable, Comparable {
-    let index: Int
-    let currencySymbol: String
-    let currencyImage: UIImage
-    let currencyNetwork: String
-    let isBalanceInitialized: Bool
-    
+struct WalletItem: Equatable {
+    var index: Int
+    var currencySymbol: String
+    var currencyImage: UIImage
+    var currencyNetwork: String
+    var isBalanceInitialized: Bool
     var balance: Decimal?
     var notifications: Int = 0
     
@@ -24,31 +25,45 @@ class WalletPagingItem: PagingItem, Hashable, Comparable {
         currencySymbol symbol: String,
         currencyImage image: UIImage,
         isBalanceInitialized: Bool?,
-        currencyNetwork network: String = ""
+        currencyNetwork network: String = .empty,
+        balance: Decimal? = nil
     ) {
         self.index = index
         self.isBalanceInitialized = isBalanceInitialized ?? false
         self.currencySymbol = symbol
         self.currencyImage = image
         self.currencyNetwork = network
+        self.balance = balance
+    }
+    
+    static let `default` = Self(
+        index: .zero,
+        currencySymbol: .empty,
+        currencyImage: .init(),
+        isBalanceInitialized: nil
+    )
+}
+
+final class WalletItemModel: ObservableObject, PagingItem, Hashable, Comparable {
+    @Published var model: WalletItem = .default
+    
+    init(model: WalletItem) {
+        self.model = model
     }
     
     // MARK: Hashable, Comparable
-    var hashValue: Int {
-        return index.hashValue &+ currencySymbol.hashValue
-    }
     
     func hash(into hasher: inout Hasher) {
-        hasher.combine(index)
-        hasher.combine(currencySymbol)
+        hasher.combine(model.index)
+        hasher.combine(model.currencySymbol)
     }
     
-    static func < (lhs: WalletPagingItem, rhs: WalletPagingItem) -> Bool {
-        return lhs.index < rhs.index
+    static func < (lhs: WalletItemModel, rhs: WalletItemModel) -> Bool {
+        lhs.model.index < rhs.model.index
     }
     
-    static func == (lhs: WalletPagingItem, rhs: WalletPagingItem) -> Bool {
-        return lhs.index == rhs.index &&
-                lhs.currencySymbol == rhs.currencySymbol
+    static func == (lhs: WalletItemModel, rhs: WalletItemModel) -> Bool {
+        lhs.model.index == rhs.model.index &&
+        lhs.model.currencySymbol == rhs.model.currencySymbol
     }
 }

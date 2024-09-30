@@ -42,7 +42,7 @@ final class AdamantAccountsProvider: AccountsProvider {
     
     // MARK: Dependencies
     @MainActor private let stack: CoreDataStack
-    private let apiService: ApiService
+    private let apiService: AdamantApiServiceProtocol
     private let addressBookService: AddressBookService
     
     // MARK: Properties
@@ -52,7 +52,7 @@ final class AdamantAccountsProvider: AccountsProvider {
     // MARK: Lifecycle
     nonisolated init(
         stack: CoreDataStack,
-        apiService: ApiService,
+        apiService: AdamantApiServiceProtocol,
         addressBookService: AddressBookService
     ) {
         self.stack = stack

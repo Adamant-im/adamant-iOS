@@ -11,19 +11,25 @@ import MessageUI
 import PopupKit
 import SafariServices
 import CommonKit
+import AVFoundation
 
 @MainActor
 final class AdamantDialogService: DialogService {
     
     // MARK: Dependencies
+    private let notificationsService: NotificationsService
     private let vibroService: VibroService
     private let popupManager = PopupManager()
     private let mailDelegate = MailDelegate()
     
     private weak var window: UIWindow?
     
-    nonisolated init(vibroService: VibroService) {
+    nonisolated init(
+        vibroService: VibroService,
+        notificationsService: NotificationsService
+    ) {
         self.vibroService = vibroService
+        self.notificationsService = notificationsService
     }
     
     func setup(window: UIWindow) {
@@ -207,6 +213,8 @@ extension AdamantDialogService {
 // MARK: - Notifications
 extension AdamantDialogService {
     func showNotification(title: String?, message: String?, image: UIImage?, tapHandler: (() -> Void)?) {
+        guard notificationsService.inAppToasts else { return }
+        
         popupManager.showNotification(
             icon: image,
             title: title,

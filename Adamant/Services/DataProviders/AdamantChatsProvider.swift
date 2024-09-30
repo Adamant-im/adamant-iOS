@@ -24,7 +24,7 @@ actor AdamantChatsProvider: ChatsProvider {
     let accountService: AccountService
     let accountsProvider: AccountsProvider
     let securedStore: SecuredStore
-    let apiService: ApiService
+    let apiService: AdamantApiServiceProtocol
     let stack: CoreDataStack
     
     // MARK: Properties
@@ -73,7 +73,7 @@ actor AdamantChatsProvider: ChatsProvider {
     // MARK: Lifecycle
     init(
         accountService: AccountService,
-        apiService: ApiService,
+        apiService: AdamantApiServiceProtocol,
         socketService: SocketService,
         stack: CoreDataStack,
         adamantCore: AdamantCore,
@@ -359,7 +359,11 @@ extension AdamantChatsProvider {
         
         // MARK: 3. Get transactions
         
-        let chatrooms = try? await apiGetChatrooms(address: address, offset: offset)
+        let chatrooms = try? await apiService.getChatRooms(
+            address: address,
+            offset: offset,
+            waitsForConnectivity: true
+        ).get()
         
         guard let chatrooms = chatrooms else {
             if !isInitiallySynced {
@@ -407,20 +411,6 @@ extension AdamantChatsProvider {
                 guard !isChatLoading else { return }
                 await getChatMessages(with: recipientAddress, offset: nil)
             }
-        }
-    }
-    
-    func apiGetChatrooms(address: String, offset: Int?) async throws -> ChatRooms? {
-        do {
-            let chatrooms = try await apiService.getChatRooms(address: address, offset: offset).get()
-            return chatrooms
-        } catch let error as ApiServiceError {
-            guard case .networkError = error else {
-                return nil
-            }
-            
-            await Task.sleep(interval: requestRepeatDelay)
-            return try await apiGetChatrooms(address: address, offset: offset)
         }
     }
     
@@ -1327,6 +1317,10 @@ extension AdamantChatsProvider {
         // MARK: 3. Send
         
         do {
+            let locallyID = signedTransaction.generateId() ?? UUID().uuidString
+            transaction.transactionId = locallyID
+            transaction.chatMessageId = locallyID
+            
             let id = try await apiService.sendMessageTransaction(transaction: signedTransaction).get()
             
             // Update ID with recieved, add to unconfirmed transactions.
@@ -1334,38 +1328,66 @@ extension AdamantChatsProvider {
             transaction.chatMessageId = String(id)
             transaction.statusEnum = .pending
             
-            if let index = unconfirmedTransactionsBySignature.firstIndex(
-                of: signedTransaction.signature
-            ) {
-                unconfirmedTransactionsBySignature.remove(at: index)
-            }
-            
-            unconfirmedTransactions[id] = transaction.objectID
+            removeTxFromUnconfirmed(
+                signature: signedTransaction.signature,
+                transaction: transaction
+            )
                         
             return transaction
         } catch {
-            transaction.statusEnum = .failed
-            
-            switch error as? ApiServiceError {
-            case .networkError:
-                throw ChatsProviderError.networkError
-            case .accountNotFound:
-                throw ChatsProviderError.accountNotFound(recipientId)
-            case .notLogged:
-                throw ChatsProviderError.notLogged
-            case .serverError(let e), .commonError(let e):
-                throw ChatsProviderError.serverError(AdamantError(message: e))
-            case .noEndpointsAvailable:
-                throw ChatsProviderError.serverError(AdamantError(
-                    message: error.localizedDescription
-                ))
-            case .internalError(let message, _):
-                throw ChatsProviderError.internalError(AdamantError(message: message))
-            case .requestCancelled:
-                throw ChatsProviderError.requestCancelled
-            case .none:
-                throw ChatsProviderError.serverError(error)
+            guard case let(apiError) = (error as? ApiServiceError),
+                  case let(.serverError(text)) = apiError,
+                  text.contains("Transaction is already confirmed")
+                    || text.contains("Transaction is already processed")
+            else {
+                transaction.statusEnum = .failed
+                throw handleTransactionError(error, recipientId: recipientId)
             }
+            
+            transaction.statusEnum = .pending
+            
+            removeTxFromUnconfirmed(
+                signature: signedTransaction.signature,
+                transaction: transaction
+            )
+            
+            return transaction
+        }
+    }
+    
+    func removeTxFromUnconfirmed(
+        signature: String,
+        transaction: ChatTransaction
+    ) {
+        if let index = unconfirmedTransactionsBySignature.firstIndex(
+            of: signature
+        ) {
+            unconfirmedTransactionsBySignature.remove(at: index)
+        }
+        
+        unconfirmedTransactions[UInt64(transaction.transactionId) ?? .zero] = transaction.objectID
+    }
+    
+    func handleTransactionError(_ error: Error, recipientId: String) -> Error {
+        switch error as? ApiServiceError {
+        case .networkError:
+            return ChatsProviderError.networkError
+        case .accountNotFound:
+            return ChatsProviderError.accountNotFound(recipientId)
+        case .notLogged:
+            return ChatsProviderError.notLogged
+        case .serverError(let e), .commonError(let e):
+            return ChatsProviderError.serverError(AdamantError(message: e))
+        case .noEndpointsAvailable:
+            return ChatsProviderError.serverError(AdamantError(
+                message: error.localizedDescription
+            ))
+        case .internalError(let message, _):
+            return ChatsProviderError.internalError(AdamantError(message: message))
+        case .requestCancelled:
+            return ChatsProviderError.requestCancelled
+        case .none:
+            return ChatsProviderError.serverError(error)
         }
     }
 }
@@ -1706,7 +1728,6 @@ extension AdamantChatsProvider {
                 transactionInProgress.append(trs.transaction.id)
                 if let objectId = unconfirmedTransactions[trs.transaction.id],
                    let unconfirmed = context.object(with: objectId) as? ChatTransaction {
-                    print("confirmTransaction tr=\(trs.transaction.id)")
                     confirmTransaction(
                         unconfirmed,
                         id: trs.transaction.id,
@@ -1724,7 +1745,6 @@ extension AdamantChatsProvider {
                 
                 // if transaction in pending status then ignore it
                 if unconfirmedTransactionsBySignature.contains(trs.transaction.signature) {
-                    print("ignore tr=\(trs.transaction.id)")
                     continue
                 }
                 
@@ -1923,17 +1943,18 @@ extension AdamantChatsProvider {
         transaction.blockId = blockId
         transaction.confirmations = confirmations
         
-        if blockId.isEmpty {
-            transaction.statusEnum = .delivered
-        } else {
+        if !blockId.isEmpty {
             self.unconfirmedTransactions.removeValue(forKey: id)
         }
         
         if let lastHeight = receivedLastHeight, lastHeight < height {
             self.receivedLastHeight = height
-            transaction.statusEnum = .delivered
+        }
+        
+        if height != .zero {
             transaction.isConfirmed = true
         }
+        transaction.statusEnum = .delivered
     }
     
     func blockChat(with address: String) {

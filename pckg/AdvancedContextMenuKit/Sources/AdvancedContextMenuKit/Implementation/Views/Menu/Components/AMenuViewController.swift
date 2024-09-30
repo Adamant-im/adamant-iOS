@@ -246,7 +246,7 @@ extension AMenuViewController: UITableViewDelegate, UITableViewDataSource {
         
         cell.configure(
             with: menuItem,
-            accentColor: .adamant.contextMenuTextColor,
+            accentColor: .adamant.textColor,
             backgroundColor: .adamant.contextMenuDefaultBackgroundColor,
             font: font,
             rowPosition: rowPosition

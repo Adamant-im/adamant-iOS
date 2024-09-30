@@ -29,7 +29,7 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
         at indexPath: IndexPath,
         in _: MessagesCollectionView
     ) -> CGFloat {
-        message.fullModel.dateHeader == nil
+        message.fullModel.dateHeaderIsHidden
             ? .zero
             : labelHeight
     }

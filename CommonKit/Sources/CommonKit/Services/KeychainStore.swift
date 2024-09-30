@@ -9,116 +9,221 @@
 import Foundation
 import KeychainAccess
 import RNCryptor
+import CryptoKit
 
 public final class KeychainStore: SecuredStore {
     // MARK: - Properties
     private static let keychain = Keychain(service: "\(AdamantSecret.appIdentifierPrefix).im.adamant.messenger")
     
-    public init() {}
+    private let secureStorage: SecureStorageProtocol
+    
+    private let keychainStoreIdAlias = "com.adamant.messenger.id"
+    private var keychainPassword: String?
+    
+    private let oldKeychainService = "im.adamant"
+    private let migrationKey = "migrated"
+    private let migrationValue = "2"
+    private lazy var userDefaults = UserDefaults(suiteName: sharedGroup)
+    
+    public init(secureStorage: SecureStorageProtocol) {
+        self.secureStorage = secureStorage
+        
+        migrateUserDefaultsIfNeeded()
+        clearIfNeeded()
+        configure()
+        migrateIfNeeded()
+    }
     
     // MARK: - SecuredStore
     
     public func get<T: Decodable>(_ key: String) -> T? {
-        guard !(T.self == String.self) else { return getString(key) as? T }
+        guard let data = getValue(key) else { return nil }
         
-        guard
-            let raw = getString(key),
-            let data = raw.data(using: .utf8)
-        else { return nil }
+        guard !(T.self == String.self) else {
+            return String(data: data, encoding: .utf8) as? T
+        }
         
         return try? JSONDecoder().decode(T.self, from: data)
     }
     
     public func set<T: Encodable>(_ value: T, for key: String) {
-        if let string = value as? String {
-            setString(string, for: key)
+        if let string = value as? String,
+           let data = string.data(using: .utf8) {
+            setValue(data, for: key)
             return
         }
         
         guard let data = try? JSONEncoder().encode(value) else { return }
-        String(data: data, encoding: .utf8).map { setString($0, for: key) }
+        setValue(data, for: key)
     }
     
     public func remove(_ key: String) {
         try? KeychainStore.keychain.remove(key)
     }
+}
+
+private extension KeychainStore {
+    func configure() {
+        guard let privateKey = secureStorage.getPrivateKey(),
+              let publicKey = secureStorage.getPublicKey(privateKey: privateKey)
+        else { return }
+                
+        if let savedKey = getData(for: keychainStoreIdAlias) {
+            let decryptedData = secureStorage.decrypt(
+                data: savedKey,
+                privateKey: privateKey
+            )
+            
+            keychainPassword = decryptedData?.base64EncodedString()
+            return
+        }
+        
+        let keychainRandomKeyData = SymmetricKey(size: .bits256)
+            .withUnsafeBytes { Data($0) }
+        let keychainRandomKey = keychainRandomKeyData.base64EncodedString()
+        
+        guard let encryptedData = secureStorage.encrypt(
+            data: keychainRandomKeyData,
+            publicKey: publicKey
+        ) else { return }
+        
+        keychainPassword = keychainRandomKey
+        setData(encryptedData, for: keychainStoreIdAlias)
+    }
     
-    public func purgeStore() {
+    func clearIfNeeded() {
+        guard let userDefaults = userDefaults else { return }
+        
+        let isFirstRun = !userDefaults.bool(forKey: firstRun)
+        
+        guard isFirstRun else { return }
+        
+        userDefaults.set(true, forKey: firstRun)
+        
+        purgeStore()
+    }
+    
+    func getValue(_ key: String) -> Data? {
+        guard let keychainPassword = keychainPassword,
+              let data = getData(for: key)
+        else { return nil}
+        
+        return decrypt(
+            data: data,
+            password: keychainPassword
+        )
+    }
+    
+    func setValue(_ value: Data, for key: String) {
+        guard let keychainPassword = keychainPassword else {
+            return
+        }
+        
+        let encryptedValue = encrypt(
+            data: value,
+            password: keychainPassword
+        )
+        
+        setData(encryptedValue, for: key)
+    }
+    
+    func getData(for key: String) -> Data? {
+        try? KeychainStore.keychain.getData(key)
+    }
+    
+    func setData(_ value: Data, for key: String) {
+        try? KeychainStore.keychain.set(value, key: key)
+    }
+    
+    func encrypt(
+        data: Data,
+        password: String
+    ) -> Data {
+        RNCryptor.encrypt(
+            data: data,
+            withPassword: password
+        )
+    }
+    
+    func decrypt(
+        data: Data,
+        password: String
+    ) -> Data? {
+        try? RNCryptor.decrypt(data: data, withPassword: password)
+    }
+    
+    func decryptOld(
+        string: String,
+        password: String
+    ) -> Data? {
+        guard let encryptedData = Data(base64Encoded: string) else {
+            return nil
+        }
+        return try? RNCryptor.decrypt(data: encryptedData, withPassword: password)
+    }
+    
+    func purgeStore() {
         try? KeychainStore.keychain.removeAll()
         NotificationCenter.default.post(name: Notification.Name.SecuredStore.securedStorePurged, object: self)
     }
-    
-    // MARK: - Tools
-    
-    private func getString(_ key: String) -> String? {
-        guard let encryptedValue = KeychainStore.keychain[key],
-            let decryptedValue = KeychainStore.decrypt(string: encryptedValue, password: AdamantSecret.keychainValuePassword) else {
-                return nil
-        }
+}
 
-        return decryptedValue
-    }
-
-    private func setString(_ value: String, for key: String) {
-        guard let encryptedValue = KeychainStore.encrypt(string: value, password: AdamantSecret.keychainValuePassword) else {
-            return
-        }
-
-        try? KeychainStore.keychain.set(encryptedValue, key: key)
-    }
-    
-    private static func encrypt(string: String, password: String, encoding: String.Encoding = .utf8) -> String? {
-        guard let data = string.data(using: encoding) else {
-            return nil
-        }
-        
-        return RNCryptor.encrypt(data: data, withPassword: password).base64EncodedString()
-    }
-    
-    private static func decrypt(string: String, password: String, encoding: String.Encoding = .utf8) -> String? {
-        if let encryptedData = Data(base64Encoded: string),
-            let data = try? RNCryptor.decrypt(data: encryptedData, withPassword: password),
-            let string = String(data: data, encoding: encoding) {
-            return string
-        }
-        
-        return nil
-    }
-    
+private extension KeychainStore {
     // MARK: - Migration
     
     /*
      * Long time ago, we didn't use shared keychain. Now we do. We need to move all items from old keychain to new. And drop old one.
      */
-    private static let oldKeychainService = "im.adamant"
-    private static let migrationKey = "migrated"
-    private static let migrationValue = "1"
     
-    public static func migrateIfNeeded() {
-        // Check flag
-        if let migrated = KeychainStore.keychain[migrationKey], migrated == migrationValue {
-            return
-        }
+    func migrateIfNeeded() {
+        let migrated = KeychainStore.keychain[migrationKey]
         
-        // Get old keychain
-        let oldKeychain = Keychain(service: KeychainStore.oldKeychainService)
-        for key in oldKeychain.allKeys() {
-            // Get value, decode with old pass
-            guard let oldEncryptedValue = oldKeychain[key], let value = decrypt(string: oldEncryptedValue, password: AdamantSecret.oldKeychainPass) else {
-                continue
-            }
-            
-            // Encode value and key with new pass
-            guard let encryptedValue = encrypt(string: value, password: AdamantSecret.keychainValuePassword) else {
-                continue
-            }
-            
-            try? KeychainStore.keychain.set(encryptedValue, key: key)
-        }
+        guard keychainPassword != nil,
+              migrated != migrationValue
+        else { return }
         
-        // Set flag
+        let oldKeychain = Keychain(service: oldKeychainService)
+        
+        migrate(
+            keychain: oldKeychain,
+            oldPassword: AdamantSecret.oldKeychainPass
+        )
+        
+        migrate(
+            keychain: KeychainStore.keychain,
+            oldPassword: AdamantSecret.keychainValuePassword
+        )
+        
         try? KeychainStore.keychain.set(migrationValue, key: migrationKey)
-        // Drop old keychain
         try? oldKeychain.removeAll()
     }
+    
+    func migrate(
+        keychain: Keychain,
+        oldPassword: String
+    ) {
+        for key in keychain.allKeys() {
+            guard key != keychainStoreIdAlias,
+                  let oldEncryptedValue = keychain[key],
+                  let value = decryptOld(
+                    string: oldEncryptedValue,
+                    password: oldPassword
+                  )
+            else { continue }
+            
+            try? KeychainStore.keychain.remove(key)
+            setValue(value, for: key)
+        }
+    }
+    
+    func migrateUserDefaultsIfNeeded() {
+        let migrated = KeychainStore.keychain[migrationKey]
+        guard migrated != migrationValue else { return }
+        
+        let value = UserDefaults.standard.bool(forKey: firstRun)
+        userDefaults?.set(value, forKey: firstRun)
+    }
 }
+
+private let firstRun = "app.firstRun"
+private let sharedGroup = "group.adamant.adamant-messenger"

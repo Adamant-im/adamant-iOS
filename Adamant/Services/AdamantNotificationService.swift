@@ -11,6 +11,8 @@ import UIKit
 import UserNotifications
 import CommonKit
 import Combine
+import CoreData
+import AVFoundation
 
 extension NotificationsMode {
     func toRaw() -> String {
@@ -26,25 +28,60 @@ extension NotificationsMode {
     }
 }
 
+enum NotificationTarget: CaseIterable {
+    case baseMessage
+    case reaction
+    
+    var storeId: String {
+        switch self {
+        case .baseMessage:
+            return StoreKey.notificationsService.notificationsSound
+        case .reaction:
+            return StoreKey.notificationsService.notificationsReactionSound
+        }
+    }
+}
+
 @MainActor
-final class AdamantNotificationsService: NotificationsService {
+final class AdamantNotificationsService: NSObject, NotificationsService {
     // MARK: Dependencies
     private let securedStore: SecuredStore
+    private let vibroService: VibroService
     weak var accountService: AccountService?
+    weak var chatsProvider: ChatsProvider?
     
     // MARK: Properties
+    private let defaultNotificationsSound: NotificationSound = .inputDefault
+    private let defaultNotificationsReactionSound: NotificationSound = .none
+    private let defaultInAppSound: Bool = false
+    private let defaultInAppVibrate: Bool = true
+    private let defaultInAppToasts: Bool = true
+    
     private(set) var notificationsMode: NotificationsMode = .disabled
     private(set) var customBadgeNumber = 0
     private(set) var notificationsSound: NotificationSound = .inputDefault
+    private(set) var notificationsReactionSound: NotificationSound = .none
+    private(set) var inAppSound: Bool = false
+    private(set) var inAppVibrate: Bool = true
+    private(set) var inAppToasts: Bool = true
+    
     private var isBackgroundSession = false
     private var backgroundNotifications = 0
     private var subscriptions = Set<AnyCancellable>()
     
     private var preservedBadgeNumber: Int?
+    private var audioPlayer: AVAudioPlayer?
+    private var unreadController: NSFetchedResultsController<ChatTransaction>?
     
     // MARK: Lifecycle
-    nonisolated init(securedStore: SecuredStore) {
+    nonisolated init(
+        securedStore: SecuredStore,
+        vibroService: VibroService
+    ) {
         self.securedStore = securedStore
+        self.vibroService = vibroService
+        
+        super.init()
         
         Task { @MainActor in
             NotificationCenter.default
@@ -68,53 +105,45 @@ final class AdamantNotificationsService: NotificationsService {
         }
     }
     
-    private func onUserLoggedIn() {
-        UNUserNotificationCenter.current().removeAllDeliveredNotifications()
-        UIApplication.shared.applicationIconBadgeNumber = 0
-        
-        if let raw: String = securedStore.get(StoreKey.notificationsService.notificationsMode),
-            let mode = NotificationsMode(string: raw) {
-            setNotificationsMode(mode, completion: nil)
-        } else {
-            setNotificationsMode(.disabled, completion: nil)
-        }
-        
-        if let raw: String = securedStore.get(StoreKey.notificationsService.notificationsSound),
-            let sound = NotificationSound(fileName: raw) {
-            setNotificationSound(sound)
-        } else {
-            setNotificationsMode(.disabled, completion: nil)
-        }
-        
-        preservedBadgeNumber = nil
+    func setInAppSound(_ value: Bool) {
+        setValue(for: StoreKey.notificationsService.inAppSounds, value: value)
+        inAppSound = value
     }
     
-    private func onUserLoggedOut() {
-        setNotificationsMode(.disabled, completion: nil)
-        setNotificationSound(.inputDefault)
-        securedStore.remove(StoreKey.notificationsService.notificationsMode)
-        securedStore.remove(StoreKey.notificationsService.notificationsSound)
-        preservedBadgeNumber = nil
+    func setInAppVibrate(_ value: Bool) {
+        setValue(for: StoreKey.notificationsService.inAppVibrate, value: value)
+        inAppVibrate = value
     }
     
-    private func onStayInChanged(_ stayIn: Bool) {
-        if stayIn {
-            setBadge(number: preservedBadgeNumber, force: false)
-        } else {
-            preservedBadgeNumber = nil
-            setBadge(number: nil, force: true)
-        }
+    func setInAppToasts(_ value: Bool) {
+        setValue(for: StoreKey.notificationsService.inAppToasts, value: value)
+        inAppToasts = value
     }
 }
 
 // MARK: - Notifications Sound {
 extension AdamantNotificationsService {
-    func setNotificationSound(_ sound: NotificationSound) {
-        notificationsSound = sound
-        securedStore.set(sound.fileName, for: StoreKey.notificationsService.notificationsSound)
-        NotificationCenter.default.post(name: Notification.Name.AdamantNotificationService.notificationsSoundChanged,
-                                        object: self,
-                                        userInfo: nil)
+    func setNotificationSound(
+        _ sound: NotificationSound,
+        for target: NotificationTarget
+    ) {
+        switch target {
+        case .baseMessage:
+            notificationsSound = sound
+        case .reaction:
+            notificationsReactionSound = sound
+        }
+        
+        securedStore.set(
+            sound.fileName,
+            for: target.storeId
+        )
+        
+        NotificationCenter.default.post(
+            name: .AdamantNotificationService.notificationsSoundChanged,
+            object: self,
+            userInfo: nil
+        )
     }
 }
 
@@ -283,6 +312,10 @@ extension AdamantNotificationsService {
         UNUserNotificationCenter.current().removeAllDeliveredNotifications()
         UIApplication.shared.applicationIconBadgeNumber = customBadgeNumber
     }
+    
+    func setValue(for key: String, value: Bool) {
+        securedStore.set(value, for: key)
+    }
 }
 
 // MARK: - Background batch notifications
@@ -295,5 +328,110 @@ extension AdamantNotificationsService {
     func stopBackgroundBatchNotifications() {
         isBackgroundSession = false
         backgroundNotifications = 0
+    }
+}
+
+private extension AdamantNotificationsService {
+    func onUserLoggedIn() {
+        UNUserNotificationCenter.current().removeAllDeliveredNotifications()
+        UIApplication.shared.applicationIconBadgeNumber = 0
+        
+        if let raw: String = securedStore.get(StoreKey.notificationsService.notificationsMode),
+            let mode = NotificationsMode(string: raw) {
+            setNotificationsMode(mode, completion: nil)
+        } else {
+            setNotificationsMode(.disabled, completion: nil)
+        }
+        
+        NotificationTarget.allCases.forEach { target in
+            if let raw: String = securedStore.get(target.storeId),
+                let sound = NotificationSound(fileName: raw) {
+                setNotificationSound(sound, for: target)
+            }
+        }
+        
+        inAppSound = securedStore.get(StoreKey.notificationsService.inAppSounds) ?? defaultInAppSound
+        inAppVibrate = securedStore.get(StoreKey.notificationsService.inAppVibrate) ?? defaultInAppVibrate
+        inAppToasts = securedStore.get(StoreKey.notificationsService.inAppToasts) ?? defaultInAppToasts
+        
+        preservedBadgeNumber = nil
+        
+        Task {
+            await setupUnreadController()
+        }
+    }
+    
+    func onUserLoggedOut() {
+        setNotificationsMode(.disabled, completion: nil)
+        setNotificationSound(defaultNotificationsSound, for: .baseMessage)
+        setNotificationSound(defaultNotificationsReactionSound, for: .reaction)
+        securedStore.remove(StoreKey.notificationsService.notificationsMode)
+        securedStore.remove(StoreKey.notificationsService.notificationsSound)
+        securedStore.remove(StoreKey.notificationsService.notificationsReactionSound)
+        securedStore.remove(StoreKey.notificationsService.inAppSounds)
+        securedStore.remove(StoreKey.notificationsService.inAppVibrate)
+        securedStore.remove(StoreKey.notificationsService.inAppToasts)
+        preservedBadgeNumber = nil
+        
+        resetUnreadController()
+    }
+    
+    func onStayInChanged(_ stayIn: Bool) {
+        if stayIn {
+            setBadge(number: preservedBadgeNumber, force: false)
+        } else {
+            preservedBadgeNumber = nil
+            setBadge(number: nil, force: true)
+        }
+    }
+    
+    func setupUnreadController() async {
+        unreadController = await chatsProvider?.getUnreadMessagesController()
+        unreadController?.delegate = self
+        try? unreadController?.performFetch()
+    }
+    
+    func resetUnreadController() {
+        unreadController = nil
+        unreadController?.delegate = nil
+    }
+    
+    func playSound(by fileName: String) {
+        guard let url = Bundle.main.url(forResource: fileName.replacingOccurrences(of: ".mp3", with: ""), withExtension: "mp3") else {
+            return
+        }
+
+        try? AVAudioSession.sharedInstance().setCategory(.soloAmbient)
+        try? AVAudioSession.sharedInstance().setActive(true)
+        audioPlayer = try? AVAudioPlayer(contentsOf: url, fileTypeHint: AVFileType.mp3.rawValue)
+        audioPlayer?.volume = 1.0
+        audioPlayer?.play()
+    }
+}
+
+extension AdamantNotificationsService: NSFetchedResultsControllerDelegate {
+    func controller(
+        _ controller: NSFetchedResultsController<NSFetchRequestResult>, 
+        didChange anObject: Any,
+        at indexPath: IndexPath?,
+        for type: NSFetchedResultsChangeType,
+        newIndexPath: IndexPath?
+    ) {
+        guard let transaction = anObject as? ChatTransaction,
+              type == .insert
+        else { return }
+        
+        if inAppVibrate {
+            vibroService.applyVibration(.medium)
+        }
+        
+        if inAppSound {
+            switch transaction {
+            case let tx as RichMessageTransaction where tx.additionalType == .reaction:
+                playSound(by: notificationsReactionSound.fileName)
+            default:
+                playSound(by: notificationsSound.fileName)
+            }
+        }
     }
 }

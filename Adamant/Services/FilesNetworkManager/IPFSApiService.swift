@@ -27,7 +27,7 @@ final class IPFSApiService: FileApiServiceProtocol {
     }
     
     func request<Output>(
-        _ request: @Sendable (APICoreProtocol, Node) async -> ApiServiceResult<Output>
+        _ request: @Sendable (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
     ) async -> ApiServiceResult<Output> {
         await service.request { admApiCore, node in
             await request(admApiCore.apiCore, node)
@@ -44,11 +44,12 @@ final class IPFSApiService: FileApiServiceProtocol {
             data: data
         )
         
-        let result: Result<IpfsDTO, ApiServiceError> = await request { core, node in
+        let result: Result<IpfsDTO, ApiServiceError> = await request { core, origin in
             await core.sendRequestMultipartFormDataJsonResponse(
-                node: node,
+                origin: origin,
                 path: IPFSApiCommands.file.upload,
                 models: [model],
+                timeout: .extended,
                 uploadProgress: uploadProgress
             )
         }
@@ -68,10 +69,11 @@ final class IPFSApiService: FileApiServiceProtocol {
         id: String,
         downloadProgress: @escaping ((Progress) -> Void)
     ) async -> FileApiServiceResult<Data> {
-        let result: Result<Data, ApiServiceError> = await request { core, node in
+        let result: Result<Data, ApiServiceError> = await request { core, origin in
             let result: APIResponseModel = await core.sendRequest(
-                node: node,
+                origin: origin,
                 path: "\(IPFSApiCommands.file.download)\(id)",
+                timeout: .extended,
                 downloadProgress: downloadProgress
             )
             

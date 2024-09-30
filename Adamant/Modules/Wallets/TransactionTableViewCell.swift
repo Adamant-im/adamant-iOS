@@ -236,9 +236,9 @@ private extension TransactionStatus {
     var color: UIColor {
         switch self {
         case .failed:
-            return .adamant.danger
+            return .adamant.warning
         case .pending, .registered:
-            return .adamant.alert
+            return .adamant.attention
         default:
             return .adamant.secondary
         }

@@ -55,11 +55,6 @@ final class MediaContainerView: UIView {
     
     var actionHandler: (ChatAction) -> Void = { _ in }
     
-    static var stackWidth: CGFloat {
-        guard !isMacOS else { return defaultStackWidth }
-        return UIScreen.main.bounds.width - screenSpace
-    }
-    
     // MARK: - Init
     
     override init(frame: CGRect) {
@@ -80,7 +75,7 @@ private extension MediaContainerView {
         addSubview(filesStack)
         filesStack.snp.makeConstraints {
             $0.directionalEdges.equalToSuperview()
-            $0.width.equalTo(Self.stackWidth)
+            $0.width.equalTo(model.width())
         }
         
         addSubview(previewDownloadNotAllowedLabel)
@@ -171,7 +166,7 @@ private extension MediaContainerView {
         isHorizontal: Bool,
         fileList: [ChatFile]
     ) {
-        let filesStackWidth = Self.stackWidth
+        let filesStackWidth = model.width()
 
         let minimumWidth = calculateMinimumWidth(availableWidth: filesStackWidth)
         let maximumWidth = calculateMaximumWidth(availableWidth: filesStackWidth)

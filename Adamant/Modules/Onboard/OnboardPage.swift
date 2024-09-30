@@ -67,6 +67,7 @@ final class OnboardPage: SwiftyOnboardPage {
             make.horizontalEdges.equalToSuperview().inset(20)
             make.bottom.equalToSuperview().offset(-150)
             make.height.equalTo(260)
+            make.top.greaterThanOrEqualTo(mainImageView.snp.bottom).offset(20)
         }
     }
 }

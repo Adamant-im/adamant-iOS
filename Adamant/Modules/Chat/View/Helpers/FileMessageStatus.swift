@@ -31,7 +31,7 @@ enum FileMessageStatus: Equatable {
     var imageTintColor: UIColor {
         switch self {
         case .busy, .needToDownload, .success: return .adamant.primary
-        case .failed: return .adamant.alert
+        case .failed: return .adamant.attention
         }
     }
 }

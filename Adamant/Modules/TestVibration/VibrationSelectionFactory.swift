@@ -10,18 +10,18 @@ import Swinject
 import SwiftUI
 
 struct VibrationSelectionFactory {
-    private let assembler: Assembler
+    private let parent: Assembler
+    private let assemblies = [VibrationSelectionAssembly()]
     
     init(parent: Assembler) {
-        assembler = .init([VibrationSelectionAssembly()], parent: parent)
+        self.parent = parent
     }
     
+    @MainActor
     func makeViewController() -> UIViewController {
-        UIHostingController(
-            rootView: VibrationSelectionView(
-                viewModel: assembler.resolve(VibrationSelectionViewModel.self)!
-            )
-        )
+        let assembler = Assembler(assemblies, parent: parent)
+        let viewModel = { assembler.resolver.resolve(VibrationSelectionViewModel.self)! }
+        return UIHostingController(rootView: VibrationSelectionView(viewModel: viewModel))
     }
 }
 
@@ -31,6 +31,6 @@ private struct VibrationSelectionAssembly: Assembly {
             VibrationSelectionViewModel(
                 vibroService: $0.resolve(VibroService.self)!
             )
-        }.inObjectScope(.weak)
+        }.inObjectScope(.transient)
     }
 }

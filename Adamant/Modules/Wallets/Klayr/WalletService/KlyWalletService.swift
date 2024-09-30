@@ -18,7 +18,7 @@ final class KlyWalletService: WalletCoreProtocol {
     
     // MARK: Dependencies
     
-    var apiService: ApiService!
+    var apiService: AdamantApiServiceProtocol!
     var klyNodeApiService: KlyNodeApiService!
     var klyServiceApiService: KlyServiceApiService!
     var accountService: AccountService!
@@ -32,6 +32,10 @@ final class KlyWalletService: WalletCoreProtocol {
     static let currencyLogo = UIImage.asset(named: "klayr_wallet") ?? .init()
     static let kvsAddress = "kly:address"
     static let defaultFee: BigUInt = 141000
+    
+    var hasActiveNode: Bool {
+        apiService.hasActiveNode
+    }
 
     @Atomic var transactionFeeRaw: BigUInt = BigUInt(integerLiteral: 141000)
 
@@ -153,7 +157,7 @@ extension KlyWalletService: SwinjectDependentService {
     @MainActor
     func injectDependencies(from container: Container) {
         accountService = container.resolve(AccountService.self)
-        apiService = container.resolve(ApiService.self)
+        apiService = container.resolve(AdamantApiServiceProtocol.self)
         dialogService = container.resolve(DialogService.self)
         klyServiceApiService = container.resolve(KlyServiceApiService.self)
         klyNodeApiService = container.resolve(KlyNodeApiService.self)
@@ -395,6 +399,7 @@ private extension KlyWalletService {
             let address = LiskKit.Crypto.address(fromPublicKey: keyPair.publicKeyString)
          
             let wallet = KlyWallet(
+                unicId: tokenUnicID,
                 address: address,
                 keyPair: keyPair,
                 nonce: .zero,

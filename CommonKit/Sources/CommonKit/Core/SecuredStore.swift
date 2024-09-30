@@ -25,6 +25,10 @@ public extension StoreKey {
         public static let notificationsMode = "notifications.mode"
         public static let customBadgeNumber = "notifications.number"
         public static let notificationsSound = "notifications.sound"
+        public static let notificationsReactionSound = "notifications.reaction.sound"
+        public static let inAppSounds = "notifications.inAppSounds"
+        public static let inAppVibrate = "notifications.inAppVibrate"
+        public static let inAppToasts = "notifications.inAppToasts"
     }
     
     enum visibleWallets {
@@ -69,7 +73,4 @@ public protocol SecuredStore: AnyObject {
     func set<T: Encodable>(_ value: T, for key: String)
 
     func remove(_ key: String)
-    
-    /// Remove everything
-    func purgeStore()
 }

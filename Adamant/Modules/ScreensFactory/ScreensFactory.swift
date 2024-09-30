@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 @MainActor
 protocol ScreensFactory {
@@ -63,4 +64,5 @@ protocol ScreensFactory {
     func makeLogin() -> LoginViewController
     func makeVibrationSelection() -> UIViewController
     func makePartnerQR(partner: CoreDataAccount) -> UIViewController
+    func makeNotificationSounds(target: NotificationTarget) -> NotificationSoundsView
 }

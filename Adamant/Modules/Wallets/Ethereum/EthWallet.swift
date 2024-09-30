@@ -11,6 +11,7 @@ import web3swift
 import Web3Core
 
 final class EthWallet: WalletAccount {
+    var unicId: String
     let address: String
     let ethAddress: EthereumAddress
     let keystore: BIP32Keystore
@@ -21,7 +22,13 @@ final class EthWallet: WalletAccount {
     var minAmount: Decimal = 0
     var isBalanceInitialized: Bool = false
     
-    init(address: String, ethAddress: EthereumAddress, keystore: BIP32Keystore) {
+    init(
+        unicId: String,
+        address: String,
+        ethAddress: EthereumAddress,
+        keystore: BIP32Keystore
+    ) {
+        self.unicId = unicId
         self.address = address
         self.ethAddress = ethAddress
         self.keystore = keystore

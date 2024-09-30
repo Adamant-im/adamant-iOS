@@ -375,9 +375,9 @@ extension TransactionsListViewControllerBase: UITableViewDelegate {
 private extension TransactionStatus {
     var color: UIColor {
         switch self {
-        case .failed: return .adamant.danger
+        case .failed: return .adamant.warning
         case .notInitiated, .inconsistent, .noNetwork, .noNetworkFinal, .pending, .registered:
-            return .adamant.alert
+            return .adamant.attention
         case .success: return .adamant.secondary
         }
     }

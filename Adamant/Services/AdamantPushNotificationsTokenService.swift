@@ -11,7 +11,7 @@ import CommonKit
 
 final class AdamantPushNotificationsTokenService: PushNotificationsTokenService {
     private let securedStore: SecuredStore
-    private let apiService: ApiService
+    private let apiService: AdamantApiServiceProtocol
     private let adamantCore: AdamantCore
     private let accountService: AccountService
     
@@ -21,7 +21,7 @@ final class AdamantPushNotificationsTokenService: PushNotificationsTokenService 
     
     init(
         securedStore: SecuredStore,
-        apiService: ApiService,
+        apiService: AdamantApiServiceProtocol,
         adamantCore: AdamantCore,
         accountService: AccountService
     ) {

@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "row_faceid.png",
+      "filename" : "face-id@3x.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "row_faceid@2x.png",
+      "filename" : "face-id@3x-2.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "row_faceid@3x.png",
+      "filename" : "face-id@3x-3.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

@@ -22,6 +22,9 @@
 /* About scene: 'Contact us' section title. */
 "About.Section.ContactUs" = "Пишите нам";
 
+/* Commit Hash */
+"About.Version.Commit" = "Коммит: %@";
+
 /* About scene: Website row */
 "About.Row.Website" = "Вебсайт";
 
@@ -155,7 +158,10 @@
 "AccountTab.Row.Balance" = "Баланс";
 
 /* Account tab: 'Buy tokens' button */
-"AccountTab.Row.BuyTokens" = "Обменять токены";
+"AccountTab.Row.BuyTokens" = "Купить или продать монеты";
+
+/* Account tab: 'Stake ADM' button */
+"AccountTab.Row.StakeAdm" = "Застейкать и заработать";
 
 /* Account tab: 'Logout' button */
 "AccountTab.Row.Logout" = "Выход";
@@ -192,6 +198,12 @@
 
 /* Account tab: Exchange ADM tokens in chat */
 "AccountTab.Row.ExchangeADMInChat" = "Обменник в чате";
+
+/* Account tab: Exchanges on CMC */
+"AccountTab.Row.ExchangesOnCoinMarketCap" = "Биржи на CoinMarketCap";
+
+/* Account tab: Exchanges on CoinGecko */
+"AccountTab.Row.ExchangesOnCoinGecko" = "Биржи на CoinGecko";
 
 /* Account tab: 'Address' row */
 "AccountTab.Row.Address" = "Адрес";
@@ -454,6 +466,9 @@
 /* Delegates page: scene title */
 "Delegates.Title" = "Делегаты";
 
+/* Delegates page: header text */
+"Delegates.HeaderText" = "Чтобы застейкать ADM и получать вознаграждения, проголосуйте за активный форжинг-пул, которому вы доверяете. Подробнее читайте в [блоге АДАМАНТа](https://news.adamant.im/hodl-list-of-adamant-pools-join-in-and-get-rewards-491a98610f4b).";
+
 /* Visible Wallets page: scene title */
 "VisibleWallets.Title" = "Кошельки";
 
@@ -640,6 +655,12 @@
 /* NodesList: Button label */
 "NodesList.NodesList" = "Список нод ADM";
 
+/* Info Service: Info Service */
+"InfoService.InfoService" = "Инфо Сервис";
+
+/* Info Service: inconsistent data */
+"InfoService.InconsistentData" = "Несоответствие в данных";
+
 /* NodesList: scene title */
 "NodesList.Title" = "Список нод ADM";
 
@@ -804,6 +825,21 @@
 
 /* Notifications: Select Sounds */
 "Notifications.Sounds.Name" = "Звуки";
+
+/* Notifications: Vibrate title */
+"Notifications.Vibrate.Title" = "Вибрация";
+
+/* Notifications: Toasts title */
+"Notifications.Toasts.Title" = "Превью";
+
+/* Notifications: Reactions header */
+"Notifications.Reactions.Header" = "Реакции";
+
+/* Notifications: In-App notifications header */
+"Notifications.InAppNotifications.Header" = "В приложении";
+
+/* Notifications: Select Alert Tones */
+"Notifications.Alert.Tones" = "ЗВУКИ УВЕДОМЛЕНИЙ";
 
 /* Notifications: Select Alert Save */
 "Notifications.Alert.Save" = "Сохранить";
@@ -1014,6 +1050,9 @@
 
 /* Transaction status: inconsistent reason title */
 "TransactionStatus.Inconsistent.Reason.Title" = "Противоречивая причина";
+
+/* Transaction status: inconsistent data title */
+"TransactionStatus.Inconsistent.RecordData.Title" = "Данные транзакции";
 
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "Подробности";

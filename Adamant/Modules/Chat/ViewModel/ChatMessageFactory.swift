@@ -108,10 +108,9 @@ struct ChatMessageFactory {
                 status: status,
                 expireDate: &expireDate
             ).map { .init(string: $0) },
-            dateHeader: dateHeaderOn
-                ? makeDateHeader(sentDate: sentDate)
-                : nil,
-            topSpinnerOn: topSpinnerOn
+            dateHeader: makeDateHeader(sentDate: sentDate),
+            topSpinnerOn: topSpinnerOn, 
+            dateHeaderIsHidden: !dateHeaderOn
         )
     }
 }
@@ -261,7 +260,7 @@ private extension ChatMessageFactory {
         : transaction.senderAddress
         
         let coreService = walletServiceCompose.getWallet(by: transfer.type)?.core
-        let defaultIcon: UIImage = .asset(named: "no-token") ?? .init()
+        let defaultIcon: UIImage = .asset(named: "no-token")?.withTintColor(.adamant.primary) ?? .init()
         
         return .transaction(.init(value: .init(
             id: id,
@@ -521,7 +520,7 @@ private extension ChatMessageFactory {
     
     func makeDateHeader(sentDate: Date) -> ComparableAttributedString {
         .init(string: .init(
-            string: sentDate.humanizedDay(),
+            string: sentDate.humanizedDay(useTimeFormat: false),
             attributes: [
                 .font: UIFont.boldSystemFont(ofSize: 10),
                 .foregroundColor: UIColor.adamant.secondary
