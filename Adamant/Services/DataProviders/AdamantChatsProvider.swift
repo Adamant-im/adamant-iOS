@@ -20,6 +20,7 @@ actor AdamantChatsProvider: ChatsProvider {
     private let adamantCore: AdamantCore
     private let transactionService: ChatTransactionService
     private let walletServiceCompose: WalletServiceCompose
+    private let readedHeightService: ReadedHeightProvider
     
     let accountService: AccountService
     let accountsProvider: AccountsProvider
@@ -80,7 +81,8 @@ actor AdamantChatsProvider: ChatsProvider {
         accountsProvider: AccountsProvider,
         transactionService: ChatTransactionService,
         securedStore: SecuredStore,
-        walletServiceCompose: WalletServiceCompose
+        walletServiceCompose: WalletServiceCompose,
+        readedHeightService: ReadedHeightProvider
     ) {
         self.accountService = accountService
         self.apiService = apiService
@@ -91,6 +93,7 @@ actor AdamantChatsProvider: ChatsProvider {
         self.transactionService = transactionService
         self.securedStore = securedStore
         self.walletServiceCompose = walletServiceCompose
+        self.readedHeightService = readedHeightService
         
         Task {
             await setupSecuredStore()

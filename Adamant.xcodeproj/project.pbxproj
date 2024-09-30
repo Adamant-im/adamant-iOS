@@ -454,6 +454,8 @@
 		A5F929AF262C857D00C3E60A /* MarkdownKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5F929AE262C857D00C3E60A /* MarkdownKit */; };
 		A5F929B6262C858700C3E60A /* MarkdownKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5F929B5262C858700C3E60A /* MarkdownKit */; };
 		A5F929B8262C858F00C3E60A /* MarkdownKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5F929B7262C858F00C3E60A /* MarkdownKit */; };
+		E33C4B362CAA70A100508BD4 /* ReadedHeightProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E33C4B352CAA70A100508BD4 /* ReadedHeightProvider.swift */; };
+		E33C4B382CAA727B00508BD4 /* ReadedHeightService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E33C4B372CAA727B00508BD4 /* ReadedHeightService.swift */; };
 		E90055F520EBF5DA00D0CB2D /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F420EBF5DA00D0CB2D /* AboutViewController.swift */; };
 		E90055F720EC200900D0CB2D /* SecurityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F620EC200900D0CB2D /* SecurityViewController.swift */; };
 		E90055F920ECD86800D0CB2D /* SecurityViewController+StayIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F820ECD86800D0CB2D /* SecurityViewController+StayIn.swift */; };
@@ -1088,6 +1090,8 @@
 		A5E0422A282AB18B0076CD13 /* BtcUnspentTransactionResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcUnspentTransactionResponse.swift; sourceTree = "<group>"; };
 		AD258997F050B24C0051CC8D /* Pods-Adamant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.release.xcconfig"; path = "Target Support Files/Pods-Adamant/Pods-Adamant.release.xcconfig"; sourceTree = "<group>"; };
 		ADDFD2FA17E41CCBD11A1733 /* Pods-Adamant.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.debug.xcconfig"; path = "Target Support Files/Pods-Adamant/Pods-Adamant.debug.xcconfig"; sourceTree = "<group>"; };
+		E33C4B352CAA70A100508BD4 /* ReadedHeightProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadedHeightProvider.swift; sourceTree = "<group>"; };
+		E33C4B372CAA727B00508BD4 /* ReadedHeightService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadedHeightService.swift; sourceTree = "<group>"; };
 		E90055F420EBF5DA00D0CB2D /* AboutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
 		E90055F620EC200900D0CB2D /* SecurityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityViewController.swift; sourceTree = "<group>"; };
 		E90055F820ECD86800D0CB2D /* SecurityViewController+StayIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityViewController+StayIn.swift"; sourceTree = "<group>"; };
@@ -2283,6 +2287,7 @@
 				E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */,
 				E93D7ABF2052CF63005D19DC /* AdamantNotificationService.swift */,
 				41047B75294C62710039E956 /* AdamantVisibleWalletsService.swift */,
+				E33C4B372CAA727B00508BD4 /* ReadedHeightService.swift */,
 				4153045829C09902000E4BEA /* AdamantIncreaseFeeService.swift */,
 				4184F1722A33102800D7B8B9 /* AdamantCrashlysticsService.swift */,
 				3A9015A62A614A62002A2464 /* AdamantEmojiService.swift */,
@@ -2685,6 +2690,7 @@
 			children = (
 				E9B3D399201F90570019EB36 /* AccountsProvider.swift */,
 				E93B0D732028B21400126346 /* ChatsProvider.swift */,
+				E33C4B352CAA70A100508BD4 /* ReadedHeightProvider.swift */,
 				E9722065201F42BB004F2AAD /* CoreDataStack.swift */,
 				E9B3D39D201F99F40019EB36 /* DataProvider.swift */,
 				E972206A201F44CA004F2AAD /* TransfersProvider.swift */,
@@ -3405,6 +3411,7 @@
 				9399F5ED29A85A48006C3E30 /* ChatCacheService.swift in Sources */,
 				3A9015A92A615893002A2464 /* ChatMessagesListViewModel.swift in Sources */,
 				936658952B0AC15300BDB2D3 /* Node+UI.swift in Sources */,
+				E33C4B382CAA727B00508BD4 /* ReadedHeightService.swift in Sources */,
 				26A976012B7E852E0095C367 /* ChatSelectTextViewFactory.swift in Sources */,
 				41A1995429D56E340031AD75 /* ChatMessageReplyCell.swift in Sources */,
 				93294B872AAD0E0A00911109 /* AdmWallet.swift in Sources */,
@@ -3448,6 +3455,7 @@
 				E9A03FD220DBC0F2007653A1 /* NodeEditorViewController.swift in Sources */,
 				E9393FAA2055D03300EE6F30 /* AdamantMessage.swift in Sources */,
 				938F7D692955C9EC001915CA /* ChatViewModel.swift in Sources */,
+				E33C4B362CAA70A100508BD4 /* ReadedHeightProvider.swift in Sources */,
 				E90A494D204DA932009F6A65 /* LocalAuthentication.swift in Sources */,
 				3A26D9352C3C1BE2003AD832 /* KlyWalletService.swift in Sources */,
 				41047B70294B5EE10039E956 /* VisibleWalletsViewController.swift in Sources */,
