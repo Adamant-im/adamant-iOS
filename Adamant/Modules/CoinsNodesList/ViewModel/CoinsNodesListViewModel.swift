@@ -41,9 +41,7 @@ final class CoinsNodesListViewModel: ObservableObject {
     }
     
     func reset() {
-        processedGroups.forEach {
-            nodesStorage.resetNodes(group: $0)
-        }
+        nodesStorage.resetNodes(.init(processedGroups))
     }
 }
 

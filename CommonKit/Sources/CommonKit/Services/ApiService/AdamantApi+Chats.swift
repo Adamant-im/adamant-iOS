@@ -63,7 +63,8 @@ extension AdamantApiService {
     
     public func getChatRooms(
         address: String,
-        offset: Int?
+        offset: Int?,
+        waitsForConnectivity: Bool
     ) async -> ApiServiceResult<ChatRooms> {
         var parameters = ["limit": "20"]
         
@@ -71,7 +72,8 @@ extension AdamantApiService {
             parameters["offset"] = String(offset)
         }
         
-        return await request { [parameters] service, origin in
+        return await request(waitsForConnectivity: waitsForConnectivity) {
+            [parameters] service, origin in
             await service.sendRequestJsonResponse(
                 origin: origin,
                 path: ApiCommands.Chats.getChatRooms + "/\(address)",

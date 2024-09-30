@@ -65,7 +65,7 @@ final class ChatViewModel: NSObject {
     private(set) var chatroom: Chatroom?
     private(set) var chatTransactions: [ChatTransaction] = []
     private var tempCancellables = Set<AnyCancellable>()
-    private var timerCancellable: AnyCancellable?
+    private var hideHeaderTimer: AnyCancellable?
     private let minDiffCountForOffset = 5
     private let minDiffCountForAnimateScroll = 20
     private let partnerImageSize: CGFloat = 25
@@ -1038,10 +1038,19 @@ extension ChatViewModel {
         else { return }
         dateHeader = date
         dateHeaderHidden = false
+        hideHeaderTimer?.cancel()
+        hideHeaderTimer = nil
     }
     
-    func didEndScroll() {
-        startHideDateTimer()
+    func startHideDateTimer() {
+        hideHeaderTimer?.cancel()
+        hideHeaderTimer = Timer
+            .publish(every: delayHideHeaderInSeconds, on: .main, in: .common)
+            .autoconnect()
+            .first()
+            .sink { [weak self] _ in
+                self?.dateHeaderHidden = true
+            }
     }
 }
 
@@ -1052,17 +1061,6 @@ extension ChatViewModel: NSFetchedResultsControllerDelegate {
 }
 
 private extension ChatViewModel {
-    func startHideDateTimer() {
-        timerCancellable?.cancel()
-        timerCancellable = Timer
-            .publish(every: delayHideHeaderInSeconds, on: .main, in: .common)
-            .autoconnect()
-            .first()
-            .sink { [weak self] _ in
-                self?.dateHeaderHidden = true
-            }
-    }
-    
     func sendFiles(with text: String) async throws {
         guard apiServiceCompose.hasActiveNode(group: .ipfs) else {
             dialog.send(.alert(ApiServiceError.noEndpointsAvailable(

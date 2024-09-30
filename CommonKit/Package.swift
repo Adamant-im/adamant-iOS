@@ -15,7 +15,7 @@ let package = Package(
         .library(
             name: "CommonKit",
             targets: ["CommonKit"]
-        ),
+        )
     ],
     dependencies: [
         .package(
@@ -48,7 +48,7 @@ let package = Package(
         ),
         .package(
             url: "https://github.com/Alamofire/Alamofire.git",
-            .upToNextMinor(from: "5.4.2")
+            .upToNextMinor(from: "5.7.1")
         ),
         .package(path: "../BitcoinKit")
     ],
@@ -67,6 +67,9 @@ let package = Package(
                 "RNCryptor",
                 "Alamofire",
                 "BitcoinKit"
+            ],
+            resources: [
+                .process("./Assets/GitData.plist")
             ]
         ),
         .testTarget(

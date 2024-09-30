@@ -76,6 +76,7 @@ extension DogeWalletService: WalletServiceTwoStepSend {
                 method: .post,
                 parameters: ["rawtx": txHex],
                 encoding: .json,
+                timeout: .common,
                 downloadProgress: { _ in }
             )
             

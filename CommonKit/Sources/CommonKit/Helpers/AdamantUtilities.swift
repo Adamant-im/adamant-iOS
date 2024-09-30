@@ -10,6 +10,8 @@ import Foundation
 import os
 
 public enum AdamantUtilities {
+    public enum Git {}
+    
     public static let admCurrencyExponent: Int = -8
     
     // MARK: - Dates
@@ -57,4 +59,11 @@ public enum AdamantUtilities {
         let message = args.joined(separator: separator)
         os_log("adamant-console-log %{public}@", message)
     }
+}
+
+public extension AdamantUtilities.Git {
+    static let commitHash = Bundle.module.url(
+        forResource: "GitData",
+        withExtension: "plist"
+    ).flatMap { NSDictionary(contentsOf: $0)?.value(forKey: "CommitHash") as? String }
 }

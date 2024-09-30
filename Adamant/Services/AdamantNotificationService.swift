@@ -11,6 +11,8 @@ import UIKit
 import UserNotifications
 import CommonKit
 import Combine
+import CoreData
+import AVFoundation
 
 extension NotificationsMode {
     func toRaw() -> String {
@@ -41,10 +43,12 @@ enum NotificationTarget: CaseIterable {
 }
 
 @MainActor
-final class AdamantNotificationsService: NotificationsService {
+final class AdamantNotificationsService: NSObject, NotificationsService {
     // MARK: Dependencies
     private let securedStore: SecuredStore
+    private let vibroService: VibroService
     weak var accountService: AccountService?
+    weak var chatsProvider: ChatsProvider?
     
     // MARK: Properties
     private let defaultNotificationsSound: NotificationSound = .inputDefault
@@ -66,10 +70,18 @@ final class AdamantNotificationsService: NotificationsService {
     private var subscriptions = Set<AnyCancellable>()
     
     private var preservedBadgeNumber: Int?
+    private var audioPlayer: AVAudioPlayer?
+    private var unreadController: NSFetchedResultsController<ChatTransaction>?
     
     // MARK: Lifecycle
-    nonisolated init(securedStore: SecuredStore) {
+    nonisolated init(
+        securedStore: SecuredStore,
+        vibroService: VibroService
+    ) {
         self.securedStore = securedStore
+        self.vibroService = vibroService
+        
+        super.init()
         
         Task { @MainActor in
             NotificationCenter.default
@@ -90,53 +102,6 @@ final class AdamantNotificationsService: NotificationsService {
                 .compactMap { $0.userInfo?[AdamantUserInfoKey.AccountService.newStayInState] as? Bool }
                 .sink { [weak self] in self?.onStayInChanged($0) }
                 .store(in: &subscriptions)
-        }
-    }
-    
-    private func onUserLoggedIn() {
-        UNUserNotificationCenter.current().removeAllDeliveredNotifications()
-        UIApplication.shared.applicationIconBadgeNumber = 0
-        
-        if let raw: String = securedStore.get(StoreKey.notificationsService.notificationsMode),
-            let mode = NotificationsMode(string: raw) {
-            setNotificationsMode(mode, completion: nil)
-        } else {
-            setNotificationsMode(.disabled, completion: nil)
-        }
-        
-        NotificationTarget.allCases.forEach { target in
-            if let raw: String = securedStore.get(target.storeId),
-                let sound = NotificationSound(fileName: raw) {
-                setNotificationSound(sound, for: target)
-            }
-        }
-        
-        inAppSound = getValue(for: StoreKey.notificationsService.inAppSounds) ?? defaultInAppSound
-        inAppVibrate = getValue(for: StoreKey.notificationsService.inAppVibrate) ?? defaultInAppVibrate
-        inAppToasts = getValue(for: StoreKey.notificationsService.inAppToasts) ?? defaultInAppToasts
-        
-        preservedBadgeNumber = nil
-    }
-    
-    private func onUserLoggedOut() {
-        setNotificationsMode(.disabled, completion: nil)
-        setNotificationSound(defaultNotificationsSound, for: .baseMessage)
-        setNotificationSound(defaultNotificationsReactionSound, for: .reaction)
-        securedStore.remove(StoreKey.notificationsService.notificationsMode)
-        securedStore.remove(StoreKey.notificationsService.notificationsSound)
-        securedStore.remove(StoreKey.notificationsService.notificationsReactionSound)
-        securedStore.remove(StoreKey.notificationsService.inAppSounds)
-        securedStore.remove(StoreKey.notificationsService.inAppVibrate)
-        securedStore.remove(StoreKey.notificationsService.inAppToasts)
-        preservedBadgeNumber = nil
-    }
-    
-    private func onStayInChanged(_ stayIn: Bool) {
-        if stayIn {
-            setBadge(number: preservedBadgeNumber, force: false)
-        } else {
-            preservedBadgeNumber = nil
-            setBadge(number: nil, force: true)
         }
     }
     
@@ -351,10 +316,6 @@ extension AdamantNotificationsService {
     func setValue(for key: String, value: Bool) {
         securedStore.set(value, for: key)
     }
-    
-    func getValue<T: Decodable>(for key: String) -> T? {
-        securedStore.get(key)
-    }
 }
 
 // MARK: - Background batch notifications
@@ -367,5 +328,110 @@ extension AdamantNotificationsService {
     func stopBackgroundBatchNotifications() {
         isBackgroundSession = false
         backgroundNotifications = 0
+    }
+}
+
+private extension AdamantNotificationsService {
+    func onUserLoggedIn() {
+        UNUserNotificationCenter.current().removeAllDeliveredNotifications()
+        UIApplication.shared.applicationIconBadgeNumber = 0
+        
+        if let raw: String = securedStore.get(StoreKey.notificationsService.notificationsMode),
+            let mode = NotificationsMode(string: raw) {
+            setNotificationsMode(mode, completion: nil)
+        } else {
+            setNotificationsMode(.disabled, completion: nil)
+        }
+        
+        NotificationTarget.allCases.forEach { target in
+            if let raw: String = securedStore.get(target.storeId),
+                let sound = NotificationSound(fileName: raw) {
+                setNotificationSound(sound, for: target)
+            }
+        }
+        
+        inAppSound = securedStore.get(StoreKey.notificationsService.inAppSounds) ?? defaultInAppSound
+        inAppVibrate = securedStore.get(StoreKey.notificationsService.inAppVibrate) ?? defaultInAppVibrate
+        inAppToasts = securedStore.get(StoreKey.notificationsService.inAppToasts) ?? defaultInAppToasts
+        
+        preservedBadgeNumber = nil
+        
+        Task {
+            await setupUnreadController()
+        }
+    }
+    
+    func onUserLoggedOut() {
+        setNotificationsMode(.disabled, completion: nil)
+        setNotificationSound(defaultNotificationsSound, for: .baseMessage)
+        setNotificationSound(defaultNotificationsReactionSound, for: .reaction)
+        securedStore.remove(StoreKey.notificationsService.notificationsMode)
+        securedStore.remove(StoreKey.notificationsService.notificationsSound)
+        securedStore.remove(StoreKey.notificationsService.notificationsReactionSound)
+        securedStore.remove(StoreKey.notificationsService.inAppSounds)
+        securedStore.remove(StoreKey.notificationsService.inAppVibrate)
+        securedStore.remove(StoreKey.notificationsService.inAppToasts)
+        preservedBadgeNumber = nil
+        
+        resetUnreadController()
+    }
+    
+    func onStayInChanged(_ stayIn: Bool) {
+        if stayIn {
+            setBadge(number: preservedBadgeNumber, force: false)
+        } else {
+            preservedBadgeNumber = nil
+            setBadge(number: nil, force: true)
+        }
+    }
+    
+    func setupUnreadController() async {
+        unreadController = await chatsProvider?.getUnreadMessagesController()
+        unreadController?.delegate = self
+        try? unreadController?.performFetch()
+    }
+    
+    func resetUnreadController() {
+        unreadController = nil
+        unreadController?.delegate = nil
+    }
+    
+    func playSound(by fileName: String) {
+        guard let url = Bundle.main.url(forResource: fileName.replacingOccurrences(of: ".mp3", with: ""), withExtension: "mp3") else {
+            return
+        }
+
+        try? AVAudioSession.sharedInstance().setCategory(.soloAmbient)
+        try? AVAudioSession.sharedInstance().setActive(true)
+        audioPlayer = try? AVAudioPlayer(contentsOf: url, fileTypeHint: AVFileType.mp3.rawValue)
+        audioPlayer?.volume = 1.0
+        audioPlayer?.play()
+    }
+}
+
+extension AdamantNotificationsService: NSFetchedResultsControllerDelegate {
+    func controller(
+        _ controller: NSFetchedResultsController<NSFetchRequestResult>, 
+        didChange anObject: Any,
+        at indexPath: IndexPath?,
+        for type: NSFetchedResultsChangeType,
+        newIndexPath: IndexPath?
+    ) {
+        guard let transaction = anObject as? ChatTransaction,
+              type == .insert
+        else { return }
+        
+        if inAppVibrate {
+            vibroService.applyVibration(.medium)
+        }
+        
+        if inAppSound {
+            switch transaction {
+            case let tx as RichMessageTransaction where tx.additionalType == .reaction:
+                playSound(by: notificationsReactionSound.fileName)
+            default:
+                playSound(by: notificationsSound.fileName)
+            }
+        }
     }
 }

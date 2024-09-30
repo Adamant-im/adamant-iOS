@@ -15,8 +15,9 @@ import AVFoundation
 final class NotificationSoundsViewModel: ObservableObject {
     private let notificationsService: NotificationsService
     private var notificationTarget: NotificationTarget
+    private let dialogService: DialogService
     
-    private(set) var dismissAction = PassthroughSubject<Void,Never>()
+    let dismissAction = PassthroughSubject<Void,Never>()
     @Published var isPresented: Bool = false
     @Published var selectedSound: NotificationSound = .inputDefault
     @Published var sounds: [NotificationSound] = [.none, .noteDefault, .inputDefault, .proud, .relax, .success, .note, .antic, .cheers, .chord, .droplet, .handoff, .milestone, .passage, .portal, .rattle, .rebound, .slide, .welcome]
@@ -25,10 +26,12 @@ final class NotificationSoundsViewModel: ObservableObject {
     
     nonisolated init(
         notificationsService: NotificationsService,
-        target: NotificationTarget
+        target: NotificationTarget,
+        dialogService: DialogService
     ) {
         self.notificationsService = notificationsService
         self.notificationTarget = target
+        self.dialogService = dialogService
         
         Task { @MainActor in
             switch notificationTarget {
@@ -59,27 +62,33 @@ final class NotificationSoundsViewModel: ObservableObject {
     }
     
     func playSound(_ sound: NotificationSound) {
-            switch sound {
-            case .none:
-                break
-            default:
-                playSound(by: sound.fileName)
-            }
+        switch sound {
+        case .none:
+            break
+        default:
+            playSound(by: sound.fileName)
         }
-    
-    private func playSound(by fileName: String) {
+    }
+}
+
+private extension NotificationSoundsViewModel {
+    func playSound(by fileName: String) {
         guard let url = Bundle.main.url(forResource: fileName.replacingOccurrences(of: ".mp3", with: ""), withExtension: "mp3") else {
             return
         }
-
+        
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback)
             try AVAudioSession.sharedInstance().setActive(true)
             audioPlayer = try AVAudioPlayer(contentsOf: url, fileTypeHint: AVFileType.mp3.rawValue)
             audioPlayer?.volume = 1.0
             audioPlayer?.play()
-        } catch let error as NSError {
-            print("error: \(error.localizedDescription)")
+        } catch {
+            dialogService.showError(
+                withMessage: error.localizedDescription,
+                supportEmail: true,
+                error: error
+            )
         }
     }
 }

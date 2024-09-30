@@ -35,6 +35,7 @@ private extension NodesMergingService {
         var defaultNodes = defaultNodes
         var removedNodesIndexes: [Int] = .init()
         
+        // Merging default nodes
         resultNodes.enumerated().forEach { index, node in
             switch node.type {
             case .default:
@@ -44,6 +45,8 @@ private extension NodesMergingService {
                     resultNodes[index].merge(defaultNodes[defaultNodeIndex])
                     defaultNodes.remove(at: defaultNodeIndex)
                 } else {
+                    // If the default node saved, but not persists in the defaultNodes list,
+                    // it has to be removed
                     removedNodesIndexes.append(index)
                 }
             case .custom:
@@ -55,8 +58,11 @@ private extension NodesMergingService {
             resultNodes.remove(at: $0)
         }
         
-        resultNodes.append(contentsOf: defaultNodes)
-        return resultNodes
+        // We are filtering default nodes to avoid duplications.
+        // Maybe a new default node is a user's old custom node
+        return resultNodes + defaultNodes.filter { defaultNode in
+            !resultNodes.contains { $0.isSame(defaultNode) }
+        }
     }
 }
 
