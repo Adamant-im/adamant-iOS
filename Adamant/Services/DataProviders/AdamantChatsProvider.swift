@@ -20,7 +20,7 @@ actor AdamantChatsProvider: ChatsProvider {
     private let adamantCore: AdamantCore
     private let transactionService: ChatTransactionService
     private let walletServiceCompose: WalletServiceCompose
-    private let readedHeightService: ReadedHeightProvider
+    private let readedHeightService: ReadedHeightServiceProtocol
     
     let accountService: AccountService
     let accountsProvider: AccountsProvider
@@ -82,7 +82,7 @@ actor AdamantChatsProvider: ChatsProvider {
         transactionService: ChatTransactionService,
         securedStore: SecuredStore,
         walletServiceCompose: WalletServiceCompose,
-        readedHeightService: ReadedHeightProvider
+        readedHeightService: ReadedHeightServiceProtocol
     ) {
         self.accountService = accountService
         self.apiService = apiService

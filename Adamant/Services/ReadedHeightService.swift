@@ -9,7 +9,7 @@
 import Foundation
 import CommonKit
 
-final class ReadedHeightService {
+actor ReadedHeightService {
     
     private var chatsReadHeight: [String: Int] {
         get {
@@ -23,12 +23,12 @@ final class ReadedHeightService {
     
 }
 
-extension ReadedHeightService: ReadedHeightProvider {
+extension ReadedHeightService: ReadedHeightServiceProtocol {
     func markMessageAsRead() {}
     
     func markChatAsRead() {}
     
-    func getLastReadedHeight(adress: String) -> UInt64 {
-        return UInt64(chatsReadHeight[adress] ?? .max)
+    func getLastReadedHeight(adress: String) -> Int {
+        return chatsReadHeight[adress] ?? .max
     }
 }

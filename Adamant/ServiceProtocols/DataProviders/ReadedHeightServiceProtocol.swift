@@ -8,8 +8,8 @@
 
 import Foundation
 
-protocol ReadedHeightProvider {
-    func markMessageAsRead()
-    func markChatAsRead()
-    func getLastReadedHeight(adress: String) -> UInt64
+protocol ReadedHeightServiceProtocol {
+    func markMessageAsRead() async
+    func markChatAsRead() async
+    func getLastReadedHeight(adress: String) async -> Int
 }
