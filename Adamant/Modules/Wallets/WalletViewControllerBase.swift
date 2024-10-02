@@ -59,7 +59,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     // MARK: - Properties, WalletViewController
     
     var viewController: UIViewController { return self }
-    var height: CGFloat { tableView.contentSize.height }
+    var height: CGFloat { tableView.contentSize.height + additionalSpace }
         
     weak var delegate: WalletViewControllerDelegate?
     
@@ -69,6 +69,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     
     private var subscriptions = Set<AnyCancellable>()
     private let headerHeight: CGFloat = 2
+    private let additionalSpace: CGFloat = 5
     
     // MARK: - IBOutlets
     
