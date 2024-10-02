@@ -231,7 +231,7 @@ final class AccountViewController: FormViewController {
         self.languageService = languageService
         self.walletServiceCompose = walletServiceCompose
         
-        super.init(nibName: nil, bundle: nil)
+        super.init(style: .insetGrouped)
     }
     
     required init?(coder aDecoder: NSCoder) {
