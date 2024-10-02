@@ -27,7 +27,7 @@ extension String.adamant {
 
 final class VisibleWalletsViewController: KeyboardObservingViewController {
     private lazy var tableView: UITableView = {
-        let tableView = UITableView()
+        let tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.register(VisibleWalletsTableViewCell.self, forCellReuseIdentifier: cellIdentifier)
         tableView.register(VisibleWalletsResetTableViewCell.self, forCellReuseIdentifier: cellResetIdentifier)
         tableView.rowHeight = 50
@@ -194,13 +194,13 @@ extension VisibleWalletsViewController: UITableViewDataSource, UITableViewDelega
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return .zero
+        return cellSpacing
     }
     
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         section == sectionsCount - 1
             ? UITableView.automaticDimension
-            : .zero
+            : cellSpacing
     }
     
     // MARK: Cells
@@ -337,3 +337,4 @@ extension VisibleWalletsViewController: UISearchResultsUpdating {
 }
 
 private let sectionsCount = 2
+private let cellSpacing: CGFloat = 10
