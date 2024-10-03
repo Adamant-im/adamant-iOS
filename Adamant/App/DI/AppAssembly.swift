@@ -329,6 +329,11 @@ struct AppAssembly: Assembly {
             )
         }.inObjectScope(.container)
         
+        // MARK: ReadedHeightService
+        container.register(ReadedHeightService.self) { _ in
+            ReadedHeightService()
+        }.inObjectScope(.container)
+        
         // MARK: Chats
         container.register(ChatsProvider.self) { r in
             AdamantChatsProvider(
@@ -340,7 +345,8 @@ struct AppAssembly: Assembly {
                 accountsProvider: r.resolve(AccountsProvider.self)!,
                 transactionService: r.resolve(ChatTransactionService.self)!,
                 securedStore: r.resolve(SecuredStore.self)!,
-                walletServiceCompose: r.resolve(WalletServiceCompose.self)!
+                walletServiceCompose: r.resolve(WalletServiceCompose.self)!,
+                readedHeightService: r.resolve(ReadedHeightService.self)!
             )
         }.inObjectScope(.container)
         
