@@ -465,7 +465,7 @@
 		E9079A7D229DEF9C0022CA0D /* UserNotificationsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E957E112229B04280019732A /* UserNotificationsUI.framework */; };
 		E9079A80229DEF9C0022CA0D /* NotificationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9079A7F229DEF9C0022CA0D /* NotificationViewController.swift */; };
 		E9079A83229DEF9C0022CA0D /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9079A81229DEF9C0022CA0D /* MainInterface.storyboard */; };
-		E9079A87229DEF9C0022CA0D /* MessageNotificationContentExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E9079A7B229DEF9C0022CA0D /* MessageNotificationContentExtension.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E9079A87229DEF9C0022CA0D /* MessageNotificationContentExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E9079A7B229DEF9C0022CA0D /* MessageNotificationContentExtension.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E908471B2196FE590095825D /* Adamant.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = E90847192196FE590095825D /* Adamant.xcdatamodeld */; };
 		E908472A2196FEA80095825D /* RichMessageTransaction+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = E908471C2196FEA80095825D /* RichMessageTransaction+CoreDataClass.swift */; };
 		E908472B2196FEA80095825D /* RichMessageTransaction+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = E908471D2196FEA80095825D /* RichMessageTransaction+CoreDataProperties.swift */; };
@@ -548,7 +548,7 @@
 		E957E12F229B10F80019732A /* UserNotificationsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E957E112229B04280019732A /* UserNotificationsUI.framework */; };
 		E957E132229B10F80019732A /* NotificationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E131229B10F80019732A /* NotificationViewController.swift */; };
 		E957E135229B10F80019732A /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E957E133229B10F80019732A /* MainInterface.storyboard */; };
-		E957E139229B10F80019732A /* TransferNotificationContentExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E957E12D229B10F80019732A /* TransferNotificationContentExtension.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E957E139229B10F80019732A /* TransferNotificationContentExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E957E12D229B10F80019732A /* TransferNotificationContentExtension.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E95F85712007D98D0070534A /* CurrencyFormatterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85702007D98D0070534A /* CurrencyFormatterTests.swift */; };
 		E95F85752007E4790070534A /* HexAndBytesUtilitiesTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85742007E4790070534A /* HexAndBytesUtilitiesTest.swift */; };
 		E95F85802008C8D70070534A /* ChatListFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F857E2008C8D60070534A /* ChatListFactory.swift */; };
@@ -571,7 +571,7 @@
 		E96D64D12295C82B00CA5587 /* TransactionChat.json in Resources */ = {isa = PBXBuildFile; fileRef = E95F85BD200A503A0070534A /* TransactionChat.json */; };
 		E96D64D22295C82B00CA5587 /* TransactionSend.json in Resources */ = {isa = PBXBuildFile; fileRef = E95F85B9200A4DC90070534A /* TransactionSend.json */; };
 		E96D64DE2295CD4700CA5587 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96D64DD2295CD4700CA5587 /* NotificationService.swift */; };
-		E96D64E22295CD4700CA5587 /* NotificationServiceExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E96D64DB2295CD4700CA5587 /* NotificationServiceExtension.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E96D64E22295CD4700CA5587 /* NotificationServiceExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E96D64DB2295CD4700CA5587 /* NotificationServiceExtension.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E96E86B821679C120061F80A /* EthTransactionDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96E86B721679C120061F80A /* EthTransactionDetailsViewController.swift */; };
 		E971591A21681D6900A5F904 /* TransactionStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = E971591921681D6900A5F904 /* TransactionStatus.swift */; };
 		E971591C2168209800A5F904 /* EthWalletService+RichMessageProviderWithStatusCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = E971591B2168209800A5F904 /* EthWalletService+RichMessageProviderWithStatusCheck.swift */; };
@@ -684,17 +684,17 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		E96D64E62295CD4700CA5587 /* Embed App Extensions */ = {
+		E96D64E62295CD4700CA5587 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				E957E139229B10F80019732A /* TransferNotificationContentExtension.appex in Embed App Extensions */,
-				E9079A87229DEF9C0022CA0D /* MessageNotificationContentExtension.appex in Embed App Extensions */,
-				E96D64E22295CD4700CA5587 /* NotificationServiceExtension.appex in Embed App Extensions */,
+				E957E139229B10F80019732A /* TransferNotificationContentExtension.appex in Embed Foundation Extensions */,
+				E9079A87229DEF9C0022CA0D /* MessageNotificationContentExtension.appex in Embed Foundation Extensions */,
+				E96D64E22295CD4700CA5587 /* NotificationServiceExtension.appex in Embed Foundation Extensions */,
 			);
-			name = "Embed App Extensions";
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -2806,13 +2806,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E913C9001FFFA51E001A83F7 /* Build configuration list for PBXNativeTarget "Adamant" */;
 			buildPhases = (
-				47866E9AB7D201F2CED0064C /* [CP] Check Pods Manifest.lock */,
 				9372E0412C9BC178006DF0B3 /* Run Script - Git Data */,
+				47866E9AB7D201F2CED0064C /* [CP] Check Pods Manifest.lock */,
 				E913C8EA1FFFA51D001A83F7 /* Sources */,
 				E913C8EB1FFFA51D001A83F7 /* Frameworks */,
 				E913C8EC1FFFA51D001A83F7 /* Resources */,
 				629616F00016639A2AFC5FC7 /* [CP] Embed Pods Frameworks */,
-				E96D64E62295CD4700CA5587 /* Embed App Extensions */,
+				E96D64E62295CD4700CA5587 /* Embed Foundation Extensions */,
 				A5AC8E01262E0B030053A7E2 /* Embed Frameworks */,
 				41079EBC28AE974300C32DAF /* Run Script - SwiftLint */,
 			);
@@ -2928,8 +2928,9 @@
 		E913C8E61FFFA51D001A83F7 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1010;
-				LastUpgradeCheck = 0940;
+				LastUpgradeCheck = 1600;
 				ORGANIZATIONNAME = Adamant;
 				TargetAttributes = {
 					E9079A7A229DEF9C0022CA0D = {
@@ -3517,7 +3518,6 @@
 				A50A41092822F8CE006BDFE1 /* BtcWalletViewController.swift in Sources */,
 				E9722066201F42BB004F2AAD /* CoreDataStack.swift in Sources */,
 				93EE9C3329C2666200D9853F /* TransactionStatusSubscription.swift in Sources */,
-				93EE9C3329C2666200D9853F /* TransactionStatusSubscription.swift in Sources */,
 				E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */,
 				648CE3A222999CE70070A2CC /* BTCRawTransaction.swift in Sources */,
 				648DD79E2236A0B500B811FD /* DogeTransactionsViewController.swift in Sources */,
@@ -3583,7 +3583,6 @@
 				93A91FD1297972B7001DB1F8 /* ChatScrollDownButton.swift in Sources */,
 				3AA3880A2B69173500125684 /* DashNetworkInfoDTO.swift in Sources */,
 				41C1698C29E7F34900FEB3CB /* RichTransactionReplyService.swift in Sources */,
-				935F53D629BE8F7400779492 /* TransactionStatusPublisher.swift in Sources */,
 				935F53D629BE8F7400779492 /* TransactionStatusPublisher.swift in Sources */,
 				9390C5032976B42800270CDF /* ChatDialogManager.swift in Sources */,
 				E926E02E213EAABF005E536B /* TransferViewControllerBase+Alert.swift in Sources */,
@@ -3899,7 +3898,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SWIFT_COMPILATION_MODE = singlefile;
+				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
@@ -3933,6 +3932,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -3944,6 +3944,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -3995,6 +3996,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -4006,6 +4008,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -4080,7 +4083,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTS_MACCATALYST = NO;
-				SWIFT_COMPILATION_MODE = singlefile;
+				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -4140,7 +4143,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SWIFT_COMPILATION_MODE = singlefile;
+				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
@@ -4201,7 +4204,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SWIFT_COMPILATION_MODE = singlefile;
+				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
@@ -4400,7 +4403,7 @@
 			repositoryURL = "https://github.com/skywinder/web3swift.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 3.0.0;
+				minimumVersion = 3.2.2;
 			};
 		};
 		A5AC8DFD262E0B030053A7E2 /* XCRemoteSwiftPackageReference "SipHash" */ = {

@@ -57,6 +57,9 @@ extension Web3Error {
              .dataError,
              .walletError,
              .unknownError,
+             .rpcError,
+             .revert,
+             .revertCustom,
              .typeError:
             return .internalError(message: "Unknown error", error: nil)
         case .valueError(desc: let desc):
