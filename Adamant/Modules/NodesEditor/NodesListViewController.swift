@@ -117,7 +117,7 @@ final class NodesListViewController: FormViewController {
         self.nodesAdditionalParamsStorage = nodesAdditionalParamsStorage
         self.apiService = apiService
         self.socketService = socketService
-        super.init(nibName: nil, bundle: nil)
+        super.init(style: .insetGrouped)
     }
     
     required init?(coder aDecoder: NSCoder) {
