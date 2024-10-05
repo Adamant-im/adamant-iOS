@@ -9,29 +9,43 @@
 import UIKit
 import SnapKit
 
-final class ChatScrollDownButton: UIView {
+enum Position {
+    case up
+    case down
+}
+
+final class ChatScrollButton: UIView {
     private lazy var button: UIButton = {
         let button = UIButton(type: .custom)
-        button.setImage(.asset(named: "ScrollDown"), for: .normal)
         button.alpha = 0.5
+        switch position {
+        case .up:
+            button.setImage(.asset(named: "scrollUp"), for: .normal)
+        case .down:
+            button.setImage(.asset(named: "ScrollDown"), for: .normal)
+        }
         button.addTarget(self, action: #selector(onTap), for: .touchUpInside)
         return button
     }()
     
+    private let position: Position
+    
     var action: (() -> Void)?
     
-    override init(frame: CGRect) {
+    init(frame: CGRect = .zero, position: Position) {
+        self.position = position
         super.init(frame: frame)
         configure()
     }
     
     required init?(coder: NSCoder) {
+        self.position = .down
         super.init(coder: coder)
         configure()
     }
 }
 
-private extension ChatScrollDownButton {
+private extension ChatScrollButton {
     func configure() {
         addSubview(button)
         button.snp.makeConstraints {

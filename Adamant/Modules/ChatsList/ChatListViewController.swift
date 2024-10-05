@@ -62,6 +62,8 @@ final class ChatListViewController: KeyboardObservingViewController {
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var newChatButton: UIBarButtonItem!
     
+    private lazy var scrollUpButton = ChatScrollButton(position: .up)
+
     // MARK: Properties
     var chatsController: NSFetchedResultsController<Chatroom>?
     var unreadController: NSFetchedResultsController<ChatTransaction>?
@@ -187,7 +189,8 @@ final class ChatListViewController: KeyboardObservingViewController {
         busyIndicatorView.layer.cornerRadius = 14
         busyIndicatorView.clipsToBounds = true
         
-        addObservers()        
+        configureScrollUpButton()
+        addObservers()
         setColors()
     }
     
@@ -257,6 +260,22 @@ final class ChatListViewController: KeyboardObservingViewController {
         tableView.refreshControl = refreshControl
         tableView.backgroundColor = .clear
         tableView.tableHeaderView = UIView()
+    }
+    
+    func configureScrollUpButton() {
+        view.addSubview(scrollUpButton)
+        
+        scrollUpButton.isHidden = true
+        
+        scrollUpButton.action = { [weak self] in
+            self?.tableView.scrollToRow(at: IndexPath(row: .zero, section: .zero), at: .top, animated: true)
+        }
+        
+        scrollUpButton.snp.makeConstraints { make in
+            make.trailing.equalToSuperview().offset(-20)
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(20)
+            make.size.equalTo(30)
+        }
     }
     
     // MARK: Add Observers
@@ -576,6 +595,11 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
                 present(vc, animated: true)
             }
         }
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y + scrollView.safeAreaInsets.top
+        scrollUpButton.isHidden = offsetY < cellHeight * 0.75
     }
 }
 
