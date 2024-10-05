@@ -71,7 +71,8 @@ extension BtcWalletService {
         8
     }
     
-    static let explorerAddress = "https://explorer.btc.com/btc/transaction/"
+    static let explorerTx = "https://explorer.btc.com/btc/transaction/"
+    static let explorerAddress = "https://explorer.btc.com/btc/address/"
     
     static var nodes: [Node] {
         [

@@ -82,6 +82,7 @@ class Coins
         symbol = json["symbol"]
         decimals = json["decimals"]
         explorerTx = json["explorerTx"]
+        explorerAddress = json["explorerAddress"]
         cryptoTransferDecimals = json["cryptoTransferDecimals"]
         nodes = ""
         nodesArray = json["nodes"]["list"]
@@ -284,8 +285,9 @@ extension #{symbol.capitalize}WalletService {
         #{cryptoTransferDecimals}
     }
     
-    static let explorerAddress = \"#{explorerTx.sub! '${ID}', ''}\"
-    
+    static let explorerTx = \"#{explorerTx.sub! '${ID}', ''}\"
+    static let explorerAddress = \"#{explorerAddress.sub! '${ID}', ''}\"
+
     static var nodes: [Node] {
         [
             #{nodes}

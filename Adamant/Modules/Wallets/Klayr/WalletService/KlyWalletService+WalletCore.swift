@@ -62,6 +62,10 @@ extension KlyWalletService {
     var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
         $hasMoreOldTransactions.eraseToAnyPublisher()
     }
+    
+    var explorerAddress: String {
+        Self.explorerAddress
+    }
 }
 
 extension KlyWalletService: PrivateKeyGenerator {

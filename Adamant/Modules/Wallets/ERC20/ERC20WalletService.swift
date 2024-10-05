@@ -87,6 +87,10 @@ final class ERC20WalletService: WalletCoreProtocol {
         token.transferDecimals
     }
     
+    var explorerAddress: String {
+        EthWalletService.explorerAddress
+    }
+    
     private (set) var blockchainSymbol: String = "ETH"
     private (set) var isDynamicFee: Bool = true
     private (set) var transactionFee: Decimal = 0.0

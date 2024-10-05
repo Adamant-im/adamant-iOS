@@ -91,8 +91,8 @@ extension EthWalletService {
         6
     }
     
-    static let explorerAddress = "https://etherscan.io/tx/"
-    
+    static let explorerTx = "https://etherscan.io/tx/"
+    static let explorerAddress = "https://etherscan.io/address/"
     static var nodes: [Node] {
         [
             Node.makeDefaultNode(url: URL(string: "https://ethnode2.adamant.im")!, altUrl: URL(string: "http://95.216.114.252:44099")),
