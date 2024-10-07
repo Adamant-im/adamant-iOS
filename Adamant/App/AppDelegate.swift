@@ -182,12 +182,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
                 
                 if connection {
-                    DispatchQueue.onMainSync {
+                    DispatchQueue.onMainThreadSyncSafe {
                         self?.dialogService.dissmisNoConnectionNotification()
                     }
                     repeater.resumeAll()
                 } else {
-                    DispatchQueue.onMainSync {
+                    DispatchQueue.onMainThreadSyncSafe {
                         self?.dialogService.showNoConnectionNotification()
                     }
                     repeater.pauseAll()

@@ -181,7 +181,7 @@ final class AdamantAccountsProvider: AccountsProvider {
         if let context = context {
             // viewContext only on MainThread
             if context == stack.container.viewContext {
-                DispatchQueue.onMainSync {
+                DispatchQueue.onMainThreadSyncSafe {
                     acc = (try? context.fetch(request))?.first
                 }
             } else {
@@ -189,7 +189,7 @@ final class AdamantAccountsProvider: AccountsProvider {
             }
         } else {
             // viewContext only on MainThread
-            DispatchQueue.onMainSync {
+            DispatchQueue.onMainThreadSyncSafe {
                 acc = (try? stack.container.viewContext.fetch(request))?.first
             }
         }

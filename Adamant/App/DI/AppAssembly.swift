@@ -12,8 +12,8 @@ import CommonKit
 import FilesStorageKit
 import FilesPickerKit
 
-struct AppAssembly: Assembly {
-    func assemble(container: Container) {
+struct AppAssembly: MainThreadAssembly {
+    func assembleOnMainThread(container: Container) {
         // MARK: - Standalone services
         // MARK: AdamantCore
         container.register(AdamantCore.self) { _ in NativeAdamantCore() }.inObjectScope(.container)
@@ -58,11 +58,9 @@ struct AppAssembly: Assembly {
                 vibroService: r.resolve(VibroService.self)!
             )
         }.initCompleted { (r, c) in    // Weak reference
-            Task { @MainActor in
-                guard let service = c as? AdamantNotificationsService else { return }
-                service.accountService = r.resolve(AccountService.self)
-                service.chatsProvider = r.resolve(ChatsProvider.self)
-            }
+            guard let service = c as? AdamantNotificationsService else { return }
+            service.accountService = r.resolve(AccountService.self)
+            service.chatsProvider = r.resolve(ChatsProvider.self)
         }.inObjectScope(.container)
         
         // MARK: VisibleWalletsService
@@ -259,12 +257,10 @@ struct AppAssembly: Assembly {
                 currencyInfoService: r.resolve(InfoServiceProtocol.self)!
             )
         }.inObjectScope(.container).initCompleted { (r, c) in
-            Task { @MainActor in
-                guard let service = c as? AdamantAccountService else { return }
-                service.notificationsService = r.resolve(NotificationsService.self)!
-                service.pushNotificationsTokenService = r.resolve(PushNotificationsTokenService.self)!
-                service.visibleWalletService = r.resolve(VisibleWalletsService.self)!
-            }
+            guard let service = c as? AdamantAccountService else { return }
+            service.notificationsService = r.resolve(NotificationsService.self)!
+            service.pushNotificationsTokenService = r.resolve(PushNotificationsTokenService.self)!
+            service.visibleWalletService = r.resolve(VisibleWalletsService.self)!
         }
         
         // MARK: AddressBookServeice
@@ -414,11 +410,11 @@ struct AppAssembly: Assembly {
                 coreDataStack: r.resolve(CoreDataStack.self)!
             )
         }.inObjectScope(.container).initCompleted { (_, c) in
-            Task { @MainActor in
-                guard let service = c as? AdamantWalletServiceCompose else { return }
-                for case let wallet as SwinjectDependentService in service.getWallets().map({ $0.core }) {
-                    wallet.injectDependencies(from: container)
-                }
+            guard let service = c as? AdamantWalletServiceCompose else { return }
+            let wallets = service.getWallets().map { $0.core }
+            
+            for case let wallet as SwinjectDependentService in wallets {
+                wallet.injectDependencies(from: container)
             }
         }
         

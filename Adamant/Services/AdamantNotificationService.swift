@@ -255,7 +255,7 @@ extension AdamantNotificationsService {
         }
 
         if let number = type.badge {
-            DispatchQueue.onMainSync {
+            DispatchQueue.onMainThreadSyncSafe {
                 content.badge = NSNumber(value: UIApplication.shared.applicationIconBadgeNumber + backgroundNotifications + number)
             }
 

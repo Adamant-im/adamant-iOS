@@ -10,6 +10,7 @@ import Swinject
 import SwiftUI
 import CommonKit
 
+@MainActor
 struct PartnerQRFactory {
     private let parent: Assembler
     private let assemblies = [PartnerQRAssembly()]
@@ -32,8 +33,8 @@ struct PartnerQRFactory {
     }
 }
 
-private struct PartnerQRAssembly: Assembly {
-    func assemble(container: Container) {
+private struct PartnerQRAssembly: MainThreadAssembly {
+    func assembleOnMainThread(container: Container) {
         container.register(PartnerQRService.self) { r in
             AdamantPartnerQRService(
                 securedStore: r.resolve(SecuredStore.self)!

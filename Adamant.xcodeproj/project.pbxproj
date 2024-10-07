@@ -372,6 +372,7 @@
 		93A118532993241D00E144CC /* ChatMessagesListFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A118522993241D00E144CC /* ChatMessagesListFactory.swift */; };
 		93A18C862AAEACC100D0AB98 /* AdamantWalletFactoryCompose.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A18C852AAEACC100D0AB98 /* AdamantWalletFactoryCompose.swift */; };
 		93A18C892AAEAE7700D0AB98 /* WalletFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A18C882AAEAE7700D0AB98 /* WalletFactory.swift */; };
+		93A2A8602CB4733800DBC75E /* MainThreadAssembly.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A2A85F2CB4733800DBC75E /* MainThreadAssembly.swift */; };
 		93A91FD1297972B7001DB1F8 /* ChatScrollDownButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A91FD0297972B7001DB1F8 /* ChatScrollDownButton.swift */; };
 		93A91FD329799298001DB1F8 /* ChatStartPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A91FD229799298001DB1F8 /* ChatStartPosition.swift */; };
 		93ADE0712ACA66AF008ED641 /* VibrationSelectionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93ADE06E2ACA66AF008ED641 /* VibrationSelectionViewModel.swift */; };
@@ -1037,6 +1038,7 @@
 		93A118522993241D00E144CC /* ChatMessagesListFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesListFactory.swift; sourceTree = "<group>"; };
 		93A18C852AAEACC100D0AB98 /* AdamantWalletFactoryCompose.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantWalletFactoryCompose.swift; sourceTree = "<group>"; };
 		93A18C882AAEAE7700D0AB98 /* WalletFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletFactory.swift; sourceTree = "<group>"; };
+		93A2A85F2CB4733800DBC75E /* MainThreadAssembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainThreadAssembly.swift; sourceTree = "<group>"; };
 		93A91FD0297972B7001DB1F8 /* ChatScrollDownButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatScrollDownButton.swift; sourceTree = "<group>"; };
 		93A91FD229799298001DB1F8 /* ChatStartPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatStartPosition.swift; sourceTree = "<group>"; };
 		93ADE06E2ACA66AF008ED641 /* VibrationSelectionViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VibrationSelectionViewModel.swift; sourceTree = "<group>"; };
@@ -2347,6 +2349,7 @@
 				4E9EE86E28CE793D008359F7 /* SafeDecimalRow.swift */,
 				9345769428FD0C34004E6C7A /* UIViewController+email.swift */,
 				41CE1539297FF98200CC9254 /* Web3Swift+Adamant.swift */,
+				93A2A85F2CB4733800DBC75E /* MainThreadAssembly.swift */,
 				41CA598B29A0D84F002BFDE4 /* TaskManager.swift */,
 				4133AF232A1CE1A3001A0A1E /* UITableView+Adamant.swift */,
 				41A1994129D2D3920031AD75 /* SwipePanGestureRecognizer.swift */,
@@ -3419,6 +3422,7 @@
 				E9FAE5E2203ED1AE008D3A6B /* ShareQrViewController.swift in Sources */,
 				E983AE2120E655C500497E1A /* AccountHeaderView.swift in Sources */,
 				E971591C2168209800A5F904 /* EthWalletService+RichMessageProviderWithStatusCheck.swift in Sources */,
+				93A2A8602CB4733800DBC75E /* MainThreadAssembly.swift in Sources */,
 				644EC35220EFA9A300F40C73 /* DelegatesFactory.swift in Sources */,
 				3A26D9492C3D3804003AD832 /* KlyTransferViewController.swift in Sources */,
 				E96BBE3121F70F5E009AA738 /* ReadonlyTextView.swift in Sources */,

@@ -9,14 +9,14 @@
 import Foundation
 
 public extension DispatchQueue {
-    static func onMainSync(_ action: () -> Void) {
-        guard Thread.isMainThread else {
-            DispatchQueue.main.sync(execute: action)
-            return
-        }
-        action()
+    @discardableResult
+    static func onMainThreadSyncSafe<T: Sendable>(_ action: @MainActor () -> T) -> T {
+        Thread.isMainThread
+            ? MainActor.assumeIsolated(action)
+            : DispatchQueue.main.sync(execute: action)
     }
     
+    /// Do not use it anymore. It makes unclear in which order code is executed.
     static func onMainAsync(_ action: @escaping () -> Void) {
         guard Thread.isMainThread else {
             DispatchQueue.main.async(execute: action)
