@@ -24,11 +24,15 @@ actor ReadedHeightService {
 }
 
 extension ReadedHeightService: ReadedHeightServiceProtocol {
-    func markMessageAsRead() {}
-    
-    func markChatAsRead() {}
-    
     func getLastReadedHeight(adress: String) -> Int {
         return chatsReadHeight[adress] ?? .max
+    }
+    
+    func setLastReadedHeight(address: String?, height: Int64?) {
+        guard let address = address,
+              let height = height else {
+            return
+        }
+        chatsReadHeight[address] = Int(height)
     }
 }

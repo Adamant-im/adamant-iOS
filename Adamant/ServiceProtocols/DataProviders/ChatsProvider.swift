@@ -168,7 +168,7 @@ extension StoreKey {
     struct chatProvider {
         static let address = "chatProvider.address"
         static let receivedLastHeight = "chatProvider.receivedLastHeight"
-        static let readedLastHeight = "chatProvider.readedLastHeight"
+//        static let readedLastHeight = "chatProvider.readedLastHeight"
         static let readedHeights = "chatProvider.readedHeights"
         static let notifiedLastHeight = "chatProvider.notifiedLastHeight"
         static let notifiedMessagesCount = "chatProvider.notifiedCount"
@@ -179,7 +179,7 @@ extension StoreKey {
 protocol ChatsProvider: DataProvider, Actor {
     // MARK: - Properties
     var receivedLastHeight: Int64? { get }
-    var readedLastHeight: Int64? { get }
+//    var readedLastHeight: Int64? { get }
     var isInitiallySynced: Bool { get }
     var blockList: [String] { get }
     
