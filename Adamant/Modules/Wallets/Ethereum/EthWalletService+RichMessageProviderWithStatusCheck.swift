@@ -8,7 +8,7 @@
 
 import Foundation
 import web3swift
-import Web3Core
+@preconcurrency import Web3Core
 import CommonKit
 
 extension EthWalletService {
@@ -58,12 +58,12 @@ extension EthWalletService {
 }
 
 private extension EthWalletService {
-    struct EthTransactionInfo {
+    struct EthTransactionInfo: Sendable {
         var details: Web3Core.TransactionDetails?
         var receipt: TransactionReceipt?
     }
 
-    enum EthTransactionInfoElement {
+    enum EthTransactionInfoElement: Sendable {
         case details(Web3Core.TransactionDetails)
         case receipt(TransactionReceipt)
     }

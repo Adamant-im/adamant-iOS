@@ -37,7 +37,7 @@ struct ChatFactory {
     let reachabilityMonitor: ReachabilityMonitor
     let filesPickerKit: FilesPickerProtocol
    
-    nonisolated init(assembler: Assembler) {
+    init(assembler: Assembler) {
         chatsProvider = assembler.resolve(ChatsProvider.self)!
         dialogService = assembler.resolve(DialogService.self)!
         transferProvider = assembler.resolve(TransfersProvider.self)!

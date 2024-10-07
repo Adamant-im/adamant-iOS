@@ -268,25 +268,39 @@ final class SecurityViewController: FormViewController {
         form.append(ansSection)
         
         // MARK: Notifications
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            self?.reloadForm()
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name.AdamantAccountService.userLoggedIn,
+            object: nil,
+            queue: OperationQueue.main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.reloadForm() }
         }
         
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.stayInChanged, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            self?.reloadForm()
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name.AdamantAccountService.stayInChanged,
+            object: nil,
+            queue: OperationQueue.main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.reloadForm() }
         }
         
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantNotificationService.notificationsModeChanged, object: nil, queue: OperationQueue.main) { [weak self] notification in
-            guard let newMode = notification.userInfo?[AdamantUserInfoKey.NotificationsService.newNotificationsMode] as? NotificationsMode else {
-                return
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name.AdamantNotificationService.notificationsModeChanged,
+            object: nil,
+            queue: OperationQueue.main
+        ) { [weak self] notification in
+            MainActor.assumeIsolated {
+                guard let newMode = notification.userInfo?[AdamantUserInfoKey.NotificationsService.newNotificationsMode] as? NotificationsMode else {
+                    return
+                }
+                
+                guard let row: ActionSheetRow<NotificationsMode> = self?.form.rowBy(tag: Rows.notificationsMode.tag) else {
+                    return
+                }
+                
+                row.value = newMode
+                row.updateCell()
             }
-            
-            guard let row: ActionSheetRow<NotificationsMode> = self?.form.rowBy(tag: Rows.notificationsMode.tag) else {
-                return
-            }
-            
-            row.value = newMode
-            row.updateCell()
         }
     }
     

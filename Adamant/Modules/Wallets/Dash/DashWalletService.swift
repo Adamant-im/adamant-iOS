@@ -19,7 +19,7 @@ struct DashApiComand {
     static let rawTransactionMethod: String = "getrawtransaction"
 }
 
-final class DashWalletService: WalletCoreProtocol {
+final class DashWalletService: WalletCoreProtocol, @unchecked Sendable {
     
     var tokenSymbol: String {
         return type(of: self).currencySymbol
@@ -77,7 +77,7 @@ final class DashWalletService: WalletCoreProtocol {
         return DashWalletService.fixedFee
     }
     
-    @Atomic private (set) var isWarningGasPrice = false
+    @Atomic private(set) var isWarningGasPrice = false
     
     static let kvsAddress = "dash:address"
     
@@ -128,8 +128,8 @@ final class DashWalletService: WalletCoreProtocol {
     @Atomic private var balanceObserver: NSObjectProtocol?
     
     // MARK: - Properties
-    @Atomic private (set) var dashWallet: DashWallet?
-    @Atomic private (set) var enabled = true
+    @Atomic private(set) var dashWallet: DashWallet?
+    @Atomic private(set) var enabled = true
     @Atomic public var network: Network
     @Atomic private var cachedWalletAddress: [String: String] = [:]
     
@@ -156,7 +156,7 @@ final class DashWalletService: WalletCoreProtocol {
     )
     
     // MARK: - State
-    @Atomic private (set) var state: WalletServiceState = .notInitiated
+    @Atomic private(set) var state: WalletServiceState = .notInitiated
     
     private func setState(_ newState: WalletServiceState, silent: Bool = false) {
         guard newState != state else {

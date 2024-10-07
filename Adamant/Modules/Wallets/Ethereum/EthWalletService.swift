@@ -12,7 +12,7 @@ import web3swift
 import Swinject
 import Alamofire
 import BigInt
-import Web3Core
+@preconcurrency import Web3Core
 import Combine
 import CommonKit
 
@@ -72,7 +72,7 @@ extension Web3Error {
     }
 }
 
-final class EthWalletService: WalletCoreProtocol {
+final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
 	// MARK: - Constants
 	let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")
 	

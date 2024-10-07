@@ -12,7 +12,7 @@ import Swinject
 import web3swift
 import Alamofire
 import struct BigInt.BigUInt
-import Web3Core
+@preconcurrency import Web3Core
 import Combine
 import CommonKit
 
@@ -20,9 +20,9 @@ final class ERC20WalletService: WalletCoreProtocol {
     // MARK: - Constants
     let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")
     
-    static var currencySymbol: String = ""
-    static var currencyLogo: UIImage = UIImage()
-    static var qqPrefix: String = ""
+    static let currencySymbol: String = ""
+    static let currencyLogo: UIImage = UIImage()
+    static let qqPrefix: String = ""
     
     var minBalance: Decimal = 0
     var minAmount: Decimal = 0
@@ -87,12 +87,12 @@ final class ERC20WalletService: WalletCoreProtocol {
         token.transferDecimals
     }
     
-    private (set) var blockchainSymbol: String = "ETH"
-    private (set) var isDynamicFee: Bool = true
-    private (set) var transactionFee: Decimal = 0.0
-    private (set) var gasPrice: BigUInt = 0
-    private (set) var gasLimit: BigUInt = 0
-    private (set) var isWarningGasPrice = false
+    private(set) var blockchainSymbol: String = "ETH"
+    private(set) var isDynamicFee: Bool = true
+    private(set) var transactionFee: Decimal = 0.0
+    private(set) var gasPrice: BigUInt = 0
+    private(set) var gasLimit: BigUInt = 0
+    private(set) var isWarningGasPrice = false
     
     var isTransactionFeeValid: Bool {
         return ethWallet?.balance ?? 0 > transactionFee
@@ -133,7 +133,7 @@ final class ERC20WalletService: WalletCoreProtocol {
     @Atomic private var cachedWalletAddress: [String: String] = [:]
     
     // MARK: - State
-    @Atomic private (set) var state: WalletServiceState = .notInitiated
+    @Atomic private(set) var state: WalletServiceState = .notInitiated
     
     private func setState(_ newState: WalletServiceState, silent: Bool = false) {
         guard newState != state else {
@@ -151,7 +151,7 @@ final class ERC20WalletService: WalletCoreProtocol {
         }
     }
     
-    private (set) var ethWallet: EthWallet?
+    private(set) var ethWallet: EthWallet?
     var wallet: WalletAccount? { return ethWallet }
     private var balanceObserver: NSObjectProtocol?
     

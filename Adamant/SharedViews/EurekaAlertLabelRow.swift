@@ -11,8 +11,8 @@ import Eureka
 import FreakingSimpleRoundImageView
 
 public final class AlertLabelCell: Cell<String>, CellType {
-    var inCellAccessoryView: UIView!
-    private (set) var alertLabel: RoundedLabel!
+    var inCellAccessoryView: UIView?
+    private(set) var alertLabel: RoundedLabel?
     
     required public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)

@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct RpcRequest: Encodable {
+public struct RpcRequest: Encodable, Sendable {
     public let method: String
     public let id: String
     public let params: [Parameter]
@@ -34,7 +34,7 @@ public struct RpcRequest: Encodable {
 }
 
 public extension RpcRequest {
-    enum Parameter {
+    enum Parameter: Sendable {
         case string(String)
         case bool(Bool)
     }

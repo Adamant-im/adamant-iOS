@@ -18,6 +18,7 @@ extension String.adamant {
     }
 }
 
+@MainActor
 protocol WalletViewControllerDelegate: AnyObject {
     func walletViewControllerSelectedRow(_ viewController: WalletViewControllerBase)
 }

@@ -14,7 +14,7 @@ import MessageKit
 import Combine
 import CommonKit
 
-final class AdmWalletService: NSObject, WalletCoreProtocol {
+final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable {
     // MARK: - Constants
     let addressRegex = try! NSRegularExpression(pattern: "^U([0-9]{6,20})$")
     

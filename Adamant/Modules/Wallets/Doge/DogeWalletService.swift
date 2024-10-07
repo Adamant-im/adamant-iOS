@@ -47,7 +47,7 @@ struct DogeApiCommands {
     }
 }
 
-final class DogeWalletService: WalletCoreProtocol {
+final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
     var wallet: WalletAccount? { return dogeWallet }
     
     // MARK: RichMessageProvider properties
@@ -154,7 +154,7 @@ final class DogeWalletService: WalletCoreProtocol {
     )
     
     // MARK: - State
-    @Atomic private (set) var state: WalletServiceState = .notInitiated
+    @Atomic private(set) var state: WalletServiceState = .notInitiated
     
     private func setState(_ newState: WalletServiceState, silent: Bool = false) {
         guard newState != state else {

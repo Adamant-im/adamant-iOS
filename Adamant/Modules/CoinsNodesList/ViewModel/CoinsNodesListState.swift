@@ -14,11 +14,13 @@ struct CoinsNodesListState: Equatable {
     var fastestNodeMode: Bool
     var isAlertShown: Bool
     
-    static let `default` = Self(
-        sections: .init(),
-        fastestNodeMode: false,
-        isAlertShown: false
-    )
+    static var `default`: Self {
+        Self(
+            sections: .init(),
+            fastestNodeMode: false,
+            isAlertShown: false
+        )
+    }
 }
 
 extension CoinsNodesListState {

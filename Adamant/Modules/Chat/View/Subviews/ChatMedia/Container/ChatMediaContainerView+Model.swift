@@ -20,16 +20,18 @@ extension ChatMediaContainerView {
         let txStatus: MessageStatus
         var status: FileMessageStatus
         
-        static let `default` = Self(
-            id: "",
-            isFromCurrentSender: true,
-            reactions: nil,
-            content: .default,
-            address: "",
-            opponentAddress: "",
-            txStatus: .failed,
-            status: .failed
-        )
+        static var `default`: Self {
+            Self(
+                id: "",
+                isFromCurrentSender: true,
+                reactions: nil,
+                content: .default,
+                address: "",
+                opponentAddress: "",
+                txStatus: .failed,
+                status: .failed
+            )
+        }
         
         func makeReplyContent() -> NSAttributedString {
             let mediaFilesCount = content.fileModel.files.filter { file in

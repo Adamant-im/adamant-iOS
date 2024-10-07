@@ -214,6 +214,7 @@ extension Notification.Name {
     }
 }
 
+@MainActor
 protocol WalletViewController {
     var viewController: UIViewController { get }
     var height: CGFloat { get }
@@ -221,7 +222,7 @@ protocol WalletViewController {
 }
 
 // MARK: - Wallet Service
-protocol WalletCoreProtocol: AnyObject {
+protocol WalletCoreProtocol: AnyObject, Sendable {
     // MARK: Currency
     static var currencySymbol: String { get }
     static var currencyLogo: UIImage { get }

@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import MarkdownKit
+@preconcurrency import MarkdownKit
 import MessageKit
 import CommonKit
 import FilesStorageKit

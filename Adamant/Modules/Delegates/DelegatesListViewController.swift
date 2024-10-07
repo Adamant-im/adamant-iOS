@@ -119,7 +119,7 @@ final class DelegatesListViewController: KeyboardObservingViewController {
     
     private lazy var bottomPanel = DelegatesBottomPanel()
     
-    private (set) var delegates: [CheckedDelegate] = [CheckedDelegate]()
+    private(set) var delegates: [CheckedDelegate] = [CheckedDelegate]()
     private var filteredDelegates: [Int]?
     private var forcedUpdateTimer: Timer?
     private var loadingView: LoadingView?

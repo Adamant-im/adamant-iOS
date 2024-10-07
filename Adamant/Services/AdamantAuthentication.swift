@@ -31,7 +31,7 @@ final class AdamantAuthentication: LocalAuthentication {
         
         if available {
             switch context.biometryType {
-            case .none:
+            case .none, .opticID:
                 return .none
                 
             case .touchID:

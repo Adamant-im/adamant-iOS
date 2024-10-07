@@ -9,6 +9,7 @@
 import Swinject
 import UIKit
 
+@MainActor
 struct ShareQRFactory {
     let assembler: Assembler
     

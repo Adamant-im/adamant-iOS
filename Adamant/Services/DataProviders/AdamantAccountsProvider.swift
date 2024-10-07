@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import CoreData
+@preconcurrency import CoreData
 import CommonKit
 import Combine
 
@@ -50,7 +50,7 @@ final class AdamantAccountsProvider: AccountsProvider {
     private var subscriptions = Set<AnyCancellable>()
     
     // MARK: Lifecycle
-    nonisolated init(
+    init(
         stack: CoreDataStack,
         apiService: AdamantApiServiceProtocol,
         addressBookService: AddressBookService
@@ -94,49 +94,55 @@ final class AdamantAccountsProvider: AccountsProvider {
             AdamantContacts.adelina.name: adelina
         ]
         
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAddressBookService.addressBookUpdated, object: nil, queue: nil) { [weak self] notification in
-            guard let changes = notification.userInfo?[AdamantUserInfoKey.AddressBook.changes] as? [AddressBookChange],
-                let viewContext = self?.stack.container.viewContext else {
-                return
-            }
-            
-            DispatchQueue.global(qos: .utility).async {
-                let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-                context.parent = viewContext
-                
-                let requestSingle = NSFetchRequest<CoreDataAccount>(entityName: CoreDataAccount.entityName)
-                requestSingle.fetchLimit = 1
-                
-                // Process changes
-                for change in changes {
-                    switch change {
-                    case .newName(let address, let name), .updated(let address, let name):
-                        let predicate = NSPredicate(format: "address == %@", address)
-                        requestSingle.predicate = predicate
-                        
-                        guard let result = try? context.fetch(requestSingle), let account = result.first else {
-                            continue
-                        }
-                        
-                        account.name = name
-                        account.chatroom?.title = name
-                        
-                    case .removed(let address):
-                        let predicate = NSPredicate(format: "address == %@", address)
-                        requestSingle.predicate = predicate
-                        
-                        guard let result = try? context.fetch(requestSingle), let account = result.first else {
-                            continue
-                        }
-                        
-                        account.name = nil
-                        account.chatroom?.title = nil
-                    }
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name.AdamantAddressBookService.addressBookUpdated,
+            object: nil,
+            queue: OperationQueue.main
+        ) { [weak self] notification in
+            MainActor.assumeIsolated {
+                guard let changes = notification.userInfo?[AdamantUserInfoKey.AddressBook.changes] as? [AddressBookChange],
+                    let viewContext = self?.stack.container.viewContext else {
+                    return
                 }
                 
-                if context.hasChanges {
-                    DispatchQueue.main.async {
-                        try? context.save()
+                DispatchQueue.global(qos: .utility).async {
+                    let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+                    context.parent = viewContext
+                    
+                    let requestSingle = NSFetchRequest<CoreDataAccount>(entityName: CoreDataAccount.entityName)
+                    requestSingle.fetchLimit = 1
+                    
+                    // Process changes
+                    for change in changes {
+                        switch change {
+                        case .newName(let address, let name), .updated(let address, let name):
+                            let predicate = NSPredicate(format: "address == %@", address)
+                            requestSingle.predicate = predicate
+                            
+                            guard let result = try? context.fetch(requestSingle), let account = result.first else {
+                                continue
+                            }
+                            
+                            account.name = name
+                            account.chatroom?.title = name
+                            
+                        case .removed(let address):
+                            let predicate = NSPredicate(format: "address == %@", address)
+                            requestSingle.predicate = predicate
+                            
+                            guard let result = try? context.fetch(requestSingle), let account = result.first else {
+                                continue
+                            }
+                            
+                            account.name = nil
+                            account.chatroom?.title = nil
+                        }
+                    }
+                    
+                    if context.hasChanges {
+                        DispatchQueue.main.async {
+                            try? context.save()
+                        }
                     }
                 }
             }

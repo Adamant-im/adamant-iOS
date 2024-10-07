@@ -85,7 +85,7 @@ enum AccountServiceState {
     case notLogged, isLoggingIn, loggedIn, updating
 }
 
-enum AccountServiceResult {
+enum AccountServiceResult: Sendable {
     case success(account: AdamantAccount, alert: (title: String, message: String)?)
     case failure(AccountServiceError)
 }
@@ -147,7 +147,7 @@ extension AccountServiceError: RichError {
 }
 
 // MARK: - Protocol
-protocol AccountService: AnyObject {
+protocol AccountService: AnyObject, Sendable {
     // MARK: State
     
     var state: AccountServiceState { get }

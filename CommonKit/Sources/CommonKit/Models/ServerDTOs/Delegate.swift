@@ -8,7 +8,7 @@
 
 import Foundation
 
-public final class Delegate: Decodable {
+public final class Delegate: Decodable, @unchecked Sendable {
     public let username: String
     public let address: String
     public let publicKey: String
@@ -21,7 +21,7 @@ public final class Delegate: Decodable {
     public let approval: Double
     public let productivity: Double
     
-    public var voted: Bool = false
+    @Atomic public var voted: Bool = false
     
     public enum CodingKeys: String, CodingKey {
         case username

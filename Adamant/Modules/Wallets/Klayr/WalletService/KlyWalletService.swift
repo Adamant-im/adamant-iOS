@@ -11,10 +11,10 @@ import Swinject
 import UIKit
 import CommonKit
 import Combine
-import struct BigInt.BigUInt
+@preconcurrency import struct BigInt.BigUInt
 import LiskKit
 
-final class KlyWalletService: WalletCoreProtocol {
+final class KlyWalletService: WalletCoreProtocol, @unchecked Sendable {
     
     // MARK: Dependencies
     

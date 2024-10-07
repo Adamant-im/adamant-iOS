@@ -48,6 +48,7 @@ enum AccountsProviderDummyAccountError: Error {
     case internalError(Error)
 }
 
+@MainActor
 protocol AccountsProvider {
     
     /// Search for fetched account, if not found, asks server for account.

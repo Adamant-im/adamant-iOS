@@ -21,18 +21,20 @@ extension ChatMessageReplyCell {
         let opponentAddress: String
         var isHidden: Bool
         
-        static let `default` = Self(
-            id: "",
-            replyId: "",
-            message: NSAttributedString(string: ""),
-            messageReply: NSAttributedString(string: ""),
-            backgroundColor: .failed,
-            isFromCurrentSender: false,
-            reactions: nil,
-            address: "",
-            opponentAddress: "",
-            isHidden: false
-        )
+        static var `default`: Self {
+            Self(
+                id: "",
+                replyId: "",
+                message: NSAttributedString(string: ""),
+                messageReply: NSAttributedString(string: ""),
+                backgroundColor: .failed,
+                isFromCurrentSender: false,
+                reactions: nil,
+                address: "",
+                opponentAddress: "",
+                isHidden: false
+            )
+        }
         
         func makeReplyContent() -> NSAttributedString {
             return message
@@ -41,6 +43,7 @@ extension ChatMessageReplyCell {
 }
 
 extension ChatMessageReplyCell.Model {
+    @MainActor
     func contentHeight(for width: CGFloat) -> CGFloat {
         let maxSize = CGSize(width: width, height: .infinity)
         

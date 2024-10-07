@@ -43,7 +43,7 @@ extension AdmWalletService {
     }
     
     // MARK: Short description
-    private static var formatter: NumberFormatter = {
+    private static let formatter: NumberFormatter = {
         return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: currencySymbol)
     }()
     
