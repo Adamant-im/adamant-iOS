@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import KeychainAccess
+@preconcurrency import KeychainAccess
 import RNCryptor
 import CryptoKit
 

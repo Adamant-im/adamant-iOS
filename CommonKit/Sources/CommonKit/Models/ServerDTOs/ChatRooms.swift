@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct ChatRooms : Codable {
+public struct ChatRooms : Codable, Sendable {
     public let chats: [ChatRoomsChats]?
     public let messages: [Transaction]?
     public let count: Int?

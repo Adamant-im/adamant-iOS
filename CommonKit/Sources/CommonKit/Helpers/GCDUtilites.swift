@@ -17,11 +17,12 @@ public extension DispatchQueue {
     }
     
     /// Do not use it anymore. It makes unclear in which order code is executed.
-    static func onMainAsync(_ action: @escaping () -> Void) {
+    static func onMainAsync(_ action: @escaping @MainActor () -> Void) {
         guard Thread.isMainThread else {
             DispatchQueue.main.async(execute: action)
             return
         }
-        action()
+        
+        MainActor.assumeIsolated(action)
     }
 }

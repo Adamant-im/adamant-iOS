@@ -16,7 +16,7 @@ public protocol BlockchainHealthCheckableService {
 
 public final class BlockchainHealthCheckWrapper<
     Service: BlockchainHealthCheckableService
->: HealthCheckWrapper<Service, Service.Error> {
+>: HealthCheckWrapper<Service, Service.Error>, @unchecked Sendable {
     private let nodesStorage: NodesStorageProtocol
     private let updateNodesAvailabilityLock = NSLock()
     private let params: BlockchainHealthCheckParams
@@ -59,7 +59,7 @@ public final class BlockchainHealthCheckWrapper<
             
             await withTaskGroup(of: Void.self, returning: Void.self) { group in
                 nodes.filter { $0.isEnabled }.forEach { node in
-                    group.addTask { [weak self] in
+                    group.addTask { @Sendable [weak self] in
                         guard
                             let self = self,
                             let update = await updateNodeStatusInfo(node: node)

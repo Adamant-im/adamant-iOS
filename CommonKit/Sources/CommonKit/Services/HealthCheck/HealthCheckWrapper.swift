@@ -16,7 +16,7 @@ public protocol HealthCheckableError: Error {
     static func noEndpointsError(nodeGroupName: String) -> Self
 }
 
-open class HealthCheckWrapper<Service, Error: HealthCheckableError> {
+open class HealthCheckWrapper<Service, Error: HealthCheckableError>: @unchecked Sendable {
     @ObservableValue public private(set) var nodes: [Node] = .init()
     @ObservableValue public private(set) var sortedAllowedNodes: [Node] = .init()
     

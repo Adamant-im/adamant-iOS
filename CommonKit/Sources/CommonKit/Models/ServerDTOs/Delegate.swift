@@ -74,7 +74,7 @@ extension Delegate: WrappableCollection {
     public static let CollectionKey = "delegates"
 }
 
-public struct DelegateForgeDetails: Decodable {
+public struct DelegateForgeDetails: Decodable, Sendable {
     public let nodeTimestamp: Date
     public let fees: Decimal
     public let rewards: Decimal
@@ -107,12 +107,12 @@ public struct DelegateForgeDetails: Decodable {
     }
 }
 
-public struct DelegatesCountResult: Decodable {
+public struct DelegatesCountResult: Decodable, Sendable {
     public let nodeTimestamp: UInt64
     public let count: UInt
 }
 
-public struct NextForgersResult: Decodable {
+public struct NextForgersResult: Decodable, Sendable {
     public let nodeTimestamp: Date
     public let currentBlock: UInt64
     public let currentBlockSlot: UInt64
