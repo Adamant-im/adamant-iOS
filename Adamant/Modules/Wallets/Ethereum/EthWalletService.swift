@@ -11,7 +11,7 @@ import UIKit
 import web3swift
 import Swinject
 import Alamofire
-import BigInt
+@preconcurrency import BigInt
 @preconcurrency import Web3Core
 import Combine
 import CommonKit
@@ -492,7 +492,7 @@ extension EthWalletService {
                         return
                     }
                     
-                    self?.save(ethAddress: ethAddress) { result in
+                    self?.save(ethAddress: ethAddress) { [weak self] result in
                         self?.kvsSaveCompletionRecursion(ethAddress: ethAddress, result: result)
                     }
                 }
@@ -570,7 +570,7 @@ extension EthWalletService {
     ///   - ethAddress: Ethereum address to save into KVS
     ///   - adamantAddress: Owner of Ethereum address
     ///   - completion: success
-    private func save(ethAddress: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
+    private func save(ethAddress: String, completion: @escaping @Sendable (WalletServiceSimpleResult) -> Void) {
         guard let adamant = accountService?.account, let keypair = accountService?.keypair else {
             completion(.failure(error: .notLogged))
             return

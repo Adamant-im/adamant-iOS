@@ -39,7 +39,7 @@ enum Currency: String, CaseIterable {
         }
     }
     
-    static var `default` = Currency.USD
+    static let `default` = Currency.USD
 }
 
 // MARK: - protocol

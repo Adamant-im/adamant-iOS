@@ -258,7 +258,7 @@ final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
             wallet.isBalanceInitialized = true
             
             if isRaised {
-                vibroService.applyVibration(.success)
+                await vibroService.applyVibration(.success)
             }
             
             if let notification = notification {
@@ -438,7 +438,7 @@ extension DogeWalletService {
     ///   - dogeAddress: DOGE address to save into KVS
     ///   - adamantAddress: Owner of Doge address
     ///   - completion: success
-    private func save(dogeAddress: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
+    private func save(dogeAddress: String, completion: @escaping @Sendable (WalletServiceSimpleResult) -> Void) {
         guard let adamant = accountService.account, let keypair = accountService.keypair else {
             completion(.failure(error: .notLogged))
             return
@@ -449,7 +449,7 @@ extension DogeWalletService {
             return
         }
         
-        Task {
+        Task { @Sendable in
             let result = await apiService.store(
                 key: DogeWalletService.kvsAddress,
                 value: dogeAddress,
@@ -488,7 +488,7 @@ extension DogeWalletService {
                         return
                     }
                     
-                    self?.save(dogeAddress: dogeAddress) { result in
+                    self?.save(dogeAddress: dogeAddress) { [weak self] result in
                         self?.kvsSaveCompletionRecursion(dogeAddress: dogeAddress, result: result)
                     }
                 }

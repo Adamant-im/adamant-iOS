@@ -1092,8 +1092,5 @@ extension ChatViewController {
 
 private let scrollDownButtonInset: CGFloat = 20
 private let messagePadding: CGFloat = 12
-private var replyAction: Bool = false
-private var canReplyVibrate: Bool = true
-private var oldContentOffset: CGPoint?
 private let filesToolbarViewHeight: CGFloat = 140
 private let targetYOffset: CGFloat = 20

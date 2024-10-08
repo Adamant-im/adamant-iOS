@@ -9,6 +9,7 @@
 import UIKit
 import Eureka
 import CommonKit
+import Combine
 
 final class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies
@@ -22,7 +23,7 @@ final class DogeTransactionDetailsViewController: TransactionDetailsViewControll
     private var cachedBlockInfo: (hash: String, height: String)?
     
     private let autoupdateInterval: TimeInterval = 5.0
-    weak var timer: Timer?
+    private var timerSubscription: AnyCancellable?
     
     private lazy var refreshControl: UIRefreshControl = {
         let control = UIRefreshControl()
@@ -45,10 +46,6 @@ final class DogeTransactionDetailsViewController: TransactionDetailsViewControll
         if transaction != nil {
             startUpdate()
         }
-    }
-    
-    deinit {
-        stopUpdate()
     }
     
     // MARK: - Overrides
@@ -78,16 +75,13 @@ final class DogeTransactionDetailsViewController: TransactionDetailsViewControll
     // MARK: Autoupdate
     
     func startUpdate() {
-        timer?.invalidate()
         refresh(silent: true)
-        timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            self?.refresh(silent: true) // Silent, without errors
-        }
-        
-    }
-    
-    func stopUpdate() {
-        timer?.invalidate()
+        timerSubscription = Timer
+            .publish(every: autoupdateInterval, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                self?.refresh(silent: true)
+            }
     }
     
     // MARK: Updating methods

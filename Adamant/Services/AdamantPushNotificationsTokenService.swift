@@ -120,7 +120,7 @@ private extension AdamantPushNotificationsTokenService {
             self?.sendMessageToANS(
                 keypair: keypair,
                 encodedPayload: encodedPayload
-            ) { success in
+            ) { [weak self] success in
                 defer { completion() }
                 guard success else { return }
                 self?.setTokenToStorage(newToken)
@@ -140,14 +140,14 @@ private extension AdamantPushNotificationsTokenService {
         
         setTokenToStorage(nil)
         
-        var transaction: UnregisteredTransaction?
+        let transaction = Atomic<UnregisteredTransaction?>(nil)
         
-        transaction = sendMessageToANS(
+        transaction.value = sendMessageToANS(
             keypair: keypair,
             encodedPayload: encodedPayload
         ) { [weak self] success in
             defer { completion() }
-            guard !success, let self = self, let transaction = transaction else { return }
+            guard !success, let self = self, let transaction = transaction.value else { return }
             self.addTokenDeletionTransaction(transaction)
         }
     }

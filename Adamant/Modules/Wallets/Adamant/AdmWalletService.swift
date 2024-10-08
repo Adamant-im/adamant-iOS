@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 import Swinject
-import CoreData
+@preconcurrency import CoreData
 import MessageKit
 import Combine
 import CommonKit
@@ -170,7 +170,7 @@ final class AdmWalletService: NSObject, WalletCoreProtocol, @unchecked Sendable 
         }
         
         if isRaised {
-            vibroService.applyVibration(.success)
+            Task { @MainActor in vibroService.applyVibration(.success) }
         }
         if notify, let wallet = wallet {
             postUpdateNotification(with: wallet)

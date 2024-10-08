@@ -7,7 +7,7 @@
 
 import UIKit
 
-public enum FileType {
+public enum FileType: Sendable {
     case image
     case video
     case other
@@ -44,7 +44,7 @@ public extension FileType {
     }
 }
 
-public struct FileResult {
+public struct FileResult: Sendable {
     public let assetId: String?
     public let url: URL
     public let type: FileType

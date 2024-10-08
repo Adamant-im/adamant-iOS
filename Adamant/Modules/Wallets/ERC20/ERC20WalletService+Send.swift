@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import web3swift
+@preconcurrency import web3swift
 import struct BigInt.BigUInt
 @preconcurrency import Web3Core
 import CommonKit

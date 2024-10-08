@@ -20,11 +20,11 @@ enum WalletServiceSimpleResult {
     case failure(error: WalletServiceError)
 }
 
-typealias WalletServiceResult<T> = Result<T, WalletServiceError>
+typealias WalletServiceResult<T: Sendable> = Result<T, WalletServiceError>
 
 // MARK: - Errors
 
-enum WalletServiceError: Error {
+enum WalletServiceError: Error, Sendable {
     case notLogged
     case notEnoughMoney
     case networkError

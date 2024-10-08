@@ -8,7 +8,7 @@
 
 import CommonKit
 import Foundation
-import LiskKit
+@preconcurrency import LiskKit
 
 class KlyApiCore: BlockchainHealthCheckableService {
     func makeClient(origin: NodeOrigin) -> APIClient {

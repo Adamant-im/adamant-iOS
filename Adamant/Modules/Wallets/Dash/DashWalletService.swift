@@ -261,7 +261,7 @@ final class DashWalletService: WalletCoreProtocol, @unchecked Sendable {
             wallet.isBalanceInitialized = true
             
             if isRaised {
-                vibroService.applyVibration(.success)
+                await vibroService.applyVibration(.success)
             }
             
             if let notification = notification {
@@ -508,7 +508,7 @@ extension DashWalletService {
     ///   - dashAddress: DASH address to save into KVS
     ///   - adamantAddress: Owner of Dash address
     ///   - completion: success
-    private func save(dashAddress: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
+    private func save(dashAddress: String, completion: @escaping @Sendable (WalletServiceSimpleResult) -> Void) {
         guard let adamant = accountService.account, let keypair = accountService.keypair else {
             completion(.failure(error: .notLogged))
             return
@@ -519,7 +519,7 @@ extension DashWalletService {
             return
         }
 
-        Task {
+        Task { @Sendable in
             let result = await apiService.store(
                 key: DashWalletService.kvsAddress,
                 value: dashAddress,
@@ -558,7 +558,7 @@ extension DashWalletService {
                         return
                     }
 
-                    self?.save(dashAddress: dashAddress) { result in
+                    self?.save(dashAddress: dashAddress) { [weak self] result in
                         self?.kvsSaveCompletionRecursion(dashAddress: dashAddress, result: result)
                     }
                 }

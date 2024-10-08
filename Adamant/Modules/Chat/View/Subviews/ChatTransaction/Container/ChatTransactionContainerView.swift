@@ -199,8 +199,8 @@ private extension ChatTransactionContainerView {
             : viewsList.reversed()
         
         guard horizontalStack.arrangedSubviews != viewsList else { return }
-        horizontalStack.arrangedSubviews.forEach(horizontalStack.removeArrangedSubview)
-        viewsList.forEach(horizontalStack.addArrangedSubview)
+        horizontalStack.arrangedSubviews.forEach { horizontalStack.removeArrangedSubview($0) }
+        viewsList.forEach { horizontalStack.addArrangedSubview($0) }
     }
     
     @objc func onStatusButtonTap() {
@@ -261,6 +261,7 @@ private extension ChatTransactionContainerView {
 }
 
 extension ChatTransactionContainerView.Model {
+    @MainActor
     func height(for width: CGFloat) -> CGFloat {
         content.height(for: width)
     }

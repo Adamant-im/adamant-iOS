@@ -18,12 +18,12 @@ struct DashTransactionsPointer {
 
 extension DashWalletService {
 
-    func getNextTransaction(completion: @escaping (ApiServiceResult<DashTransactionsPointer>) -> Void) {
+    func getNextTransaction(completion: @escaping @Sendable (ApiServiceResult<DashTransactionsPointer>) -> Void) {
         guard let id = transatrionsIds.last else {
             completion(.success(.init(total: transatrionsIds.count, transactions: [], hasMore: false)))
             return
         }
-        Task {
+        Task { @Sendable in
             do {
                 let transaction = try await getTransaction(by: id)
                 handleTransactionResponse(id: id, .success(transaction), completion)
@@ -155,7 +155,10 @@ extension DashWalletService {
 
 private extension DashWalletService {
 
-    func handleTransactionsResponse(_ response: ApiServiceResult<[String]>, _ completion: @escaping (ApiServiceResult<DashTransactionsPointer>) -> Void) {
+    func handleTransactionsResponse(
+        _ response: ApiServiceResult<[String]>,
+        _ completion: @escaping @Sendable (ApiServiceResult<DashTransactionsPointer>) -> Void
+    ) {
         switch response {
         case .success(let ids):
             transatrionsIds = ids

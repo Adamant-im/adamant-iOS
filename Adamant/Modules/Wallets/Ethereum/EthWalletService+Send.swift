@@ -7,9 +7,9 @@
 //
 
 import UIKit
-import web3swift
+@preconcurrency import web3swift
 import struct BigInt.BigUInt
-import Web3Core
+@preconcurrency import Web3Core
 import CommonKit
 
 extension CodableTransaction: RawTransaction {

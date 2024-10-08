@@ -11,12 +11,12 @@ import UIKit
 import Swinject
 import web3swift
 import Alamofire
-import struct BigInt.BigUInt
+@preconcurrency import struct BigInt.BigUInt
 @preconcurrency import Web3Core
 import Combine
 import CommonKit
 
-final class ERC20WalletService: WalletCoreProtocol {
+final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
     // MARK: - Constants
     let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")
     
@@ -267,7 +267,7 @@ final class ERC20WalletService: WalletCoreProtocol {
             wallet.isBalanceInitialized = true
             
             if isRaised {
-                vibroService.applyVibration(.success)
+                await vibroService.applyVibration(.success)
             }
             
             if let notification = notification {

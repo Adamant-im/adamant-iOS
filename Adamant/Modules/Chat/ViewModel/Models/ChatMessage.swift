@@ -22,18 +22,20 @@ struct ChatMessage: Identifiable, Equatable {
     let topSpinnerOn: Bool
     let dateHeaderIsHidden: Bool
     
-    static let `default` = Self(
-        id: "",
-        sentDate: .init(),
-        senderModel: .default,
-        status: .failed,
-        content: .default,
-        backgroundColor: .failed,
-        bottomString: nil,
-        dateHeader: nil,
-        topSpinnerOn: false, 
-        dateHeaderIsHidden: true
-    )
+    static var `default`: Self {
+        Self(
+            id: "",
+            sentDate: .init(),
+            senderModel: .default,
+            status: .failed,
+            content: .default,
+            backgroundColor: .failed,
+            bottomString: nil,
+            dateHeader: nil,
+            topSpinnerOn: false,
+            dateHeaderIsHidden: true
+        )
+    }
 }
 
 extension ChatMessage {
@@ -55,7 +57,9 @@ extension ChatMessage {
 		case reply(EqualWrapper<ChatMessageReplyCell.Model>)
         case file(EqualWrapper<ChatMediaContainerView.Model>)
         
-        static let `default` = Self.message(.init(value: .default))
+        static var `default`: Self {
+            Self.message(.init(value: .default))
+        }
     }
 }
 

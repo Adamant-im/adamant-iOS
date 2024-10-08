@@ -10,6 +10,7 @@ import UIKit
 import Swinject
 import CommonKit
 
+@MainActor
 struct LoginFactory {
     let assembler: Assembler
     

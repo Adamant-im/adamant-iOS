@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import web3swift
+@preconcurrency import web3swift
 @preconcurrency import Web3Core
 import CommonKit
 
@@ -73,11 +73,11 @@ private extension EthWalletService {
             of: EthTransactionInfoElement.self,
             returning: Atomic<EthTransactionInfo>.self
         ) { group in
-            group.addTask(priority: .userInitiated) {
+            group.addTask(priority: .userInitiated) { @Sendable in
                 .details(try await web3.eth.transactionDetails(hash))
             }
             
-            group.addTask(priority: .userInitiated) {
+            group.addTask(priority: .userInitiated) { @Sendable in
                 .receipt(try await web3.eth.transactionReceipt(hash))
             }
             

@@ -10,7 +10,7 @@ import Combine
 import Foundation
 import CommonKit
 
-actor TransactionStatusSubscription<StatusSubscriber: Subscriber>: Subscription where
+final class TransactionStatusSubscription<StatusSubscriber: Subscriber>: Subscription, @unchecked Sendable where
     StatusSubscriber.Input == TransactionStatus,
     StatusSubscriber.Failure == Never {
     private let provider: WalletService
@@ -38,7 +38,7 @@ actor TransactionStatusSubscription<StatusSubscriber: Subscriber>: Subscription 
     }
     
     nonisolated func cancel() {
-        Task { await reset() }
+        reset()
     }
     
     nonisolated func request(_: Subscribers.Demand) {}
@@ -60,7 +60,7 @@ actor TransactionStatusSubscription<StatusSubscriber: Subscriber>: Subscription 
             info: await provider.statusInfoFor(transaction: transaction)
         )
         
-        Task {
+        Task { @Sendable in
             guard let interval = nextUpdateInterval else { return reset() }
             await Task.sleep(interval: interval)
             await update()

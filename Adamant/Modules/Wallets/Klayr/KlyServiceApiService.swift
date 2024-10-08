@@ -6,7 +6,7 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-import LiskKit
+@preconcurrency import LiskKit
 import Foundation
 import CommonKit
 

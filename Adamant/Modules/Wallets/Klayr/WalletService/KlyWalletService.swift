@@ -15,6 +15,11 @@ import Combine
 import LiskKit
 
 final class KlyWalletService: WalletCoreProtocol, @unchecked Sendable {
+    struct CurrentFee: Sendable {
+        let fee: BigUInt
+        let lastHeight: UInt64
+        let minFeePerByte: UInt64
+    }
     
     // MARK: Dependencies
     
@@ -101,7 +106,7 @@ final class KlyWalletService: WalletCoreProtocol, @unchecked Sendable {
         try await getBalance(for: address)
     }
     
-    func getCurrentFee() async throws -> (fee: BigUInt, lastHeight: UInt64, minFeePerByte: UInt64) {
+    func getCurrentFee() async throws -> CurrentFee {
         try await getFees(comment: .empty)
     }
     
@@ -303,7 +308,7 @@ private extension KlyWalletService {
         return UInt64(nonce) ?? .zero
     }
 
-    func getFees(comment: String) async throws -> (fee: BigUInt, lastHeight: UInt64, minFeePerByte: UInt64) {
+    func getFees(comment: String) async throws -> CurrentFee {
         guard let wallet = klyWallet else {
             throw WalletServiceError.notLogged
         }
@@ -333,7 +338,7 @@ private extension KlyWalletService {
         
         let height = UInt64(lastBlock.header.height)
         
-        return (fee: fee, lastHeight: height, minFeePerByte: minFeePerByte)
+        return .init(fee: fee, lastHeight: height, minFeePerByte: minFeePerByte)
     }
     
     func getFee(minFeePerByte: UInt64, comment: String) throws -> BigUInt {

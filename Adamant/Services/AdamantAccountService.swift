@@ -11,7 +11,7 @@ import UIKit
 import Combine
 import CommonKit
 
-final class AdamantAccountService: AccountService {
+final class AdamantAccountService: AccountService, @unchecked Sendable {
     
     // MARK: Dependencies
     
@@ -82,7 +82,7 @@ final class AdamantAccountService: AccountService {
 
 // MARK: - Saved data
 extension AdamantAccountService {
-    func setStayLoggedIn(pin: String, completion: @escaping (AccountServiceResult) -> Void) {
+    func setStayLoggedIn(pin: String, completion: @escaping @Sendable (AccountServiceResult) -> Void) {
         guard let account = account, let keypair = keypair else {
             completion(.failure(.userNotLogged))
             return
@@ -192,11 +192,11 @@ extension AdamantAccountService {
         update(nil, updateOnlyVisible: false)
     }
     
-    func update(_ completion: ((AccountServiceResult) -> Void)?) {
+    func update(_ completion: (@Sendable (AccountServiceResult) -> Void)?) {
         update(completion, updateOnlyVisible: true)
     }
     
-    func update(_ completion: ((AccountServiceResult) -> Void)?, updateOnlyVisible: Bool) {
+    func update(_ completion: (@Sendable (AccountServiceResult) -> Void)?, updateOnlyVisible: Bool) {
         switch state {
         case .notLogged, .isLoggingIn, .updating:
             return
@@ -214,7 +214,7 @@ extension AdamantAccountService {
         
         let wallets = walletServiceCompose.getWallets().map { $0.core }
         
-        Task {
+        Task { @Sendable in
             let result = await apiService.getAccount(byPublicKey: publicKey)
             
             switch result {

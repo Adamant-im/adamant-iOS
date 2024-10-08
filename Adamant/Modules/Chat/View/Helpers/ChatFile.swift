@@ -19,7 +19,7 @@ struct DownloadStatus: Hashable {
     )
 }
 
-struct ChatFile: Equatable, Hashable {
+struct ChatFile: Equatable, Hashable, @unchecked Sendable {
     var file: RichMessageFile.File
     var previewImage: UIImage?
     var downloadStatus: DownloadStatus

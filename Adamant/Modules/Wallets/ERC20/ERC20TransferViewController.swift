@@ -8,7 +8,7 @@
 
 import UIKit
 import Eureka
-import Web3Core
+@preconcurrency import Web3Core
 import CommonKit
 
 final class ERC20TransferViewController: TransferViewControllerBase {

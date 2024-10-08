@@ -9,7 +9,7 @@
 import Foundation
 import CommonKit
 
-struct InfoServiceTicker: Hashable {
+struct InfoServiceTicker: Hashable, Sendable {
     let crypto: String
     let fiat: String
 }

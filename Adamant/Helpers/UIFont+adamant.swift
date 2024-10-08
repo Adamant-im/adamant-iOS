@@ -40,8 +40,8 @@ extension UIFont {
         return UIFont(name: name, size: size) ?? .systemFont(ofSize: size, weight: weight)
     }
     
-    static var adamantChatFileRawDefault = UIFont.systemFont(ofSize: 8)
-    static var adamantChatDefault = UIFont.systemFont(ofSize: 17)
-    static var adamantCodeDefault = UIFont.adamantMono(ofSize: 15, weight: .regular)
-    static var adamantChatReplyDefault = UIFont.systemFont(ofSize: 14)
+    static let adamantChatFileRawDefault = UIFont.systemFont(ofSize: 8)
+    static let adamantChatDefault = UIFont.systemFont(ofSize: 17)
+    static let adamantCodeDefault = UIFont.adamantMono(ofSize: 15, weight: .regular)
+    static let adamantChatReplyDefault = UIFont.systemFont(ofSize: 14)
 }

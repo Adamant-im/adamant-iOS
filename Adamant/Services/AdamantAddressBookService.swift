@@ -37,7 +37,7 @@ final class AdamantAddressBookService: AddressBookService {
     private var notificationsSet: Set<AnyCancellable> = []
     
     // MARK: - Lifecycle
-    nonisolated init(
+    init(
         apiService: AdamantApiServiceProtocol,
         adamantCore: AdamantCore,
         accountService: AccountService,
@@ -47,10 +47,7 @@ final class AdamantAddressBookService: AddressBookService {
         self.adamantCore = adamantCore
         self.accountService = accountService
         self.dialogService = dialogService
-        
-        Task {
-            await addObservers()
-        }
+        addObservers()
     }
     
     // MARK: Observers
@@ -291,13 +288,8 @@ final class AdamantAddressBookService: AddressBookService {
             ).get()
             
             return id
-        } catch let error as ApiServiceError {
+        } catch let error {
             throw AddressBookServiceError.apiServiceError(error: error)
-        } catch {
-            throw AddressBookServiceError.internalError(
-                message: error.localizedDescription,
-                error: error
-            )
         }
     }
     

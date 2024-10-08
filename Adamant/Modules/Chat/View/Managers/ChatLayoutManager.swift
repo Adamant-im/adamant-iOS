@@ -6,7 +6,7 @@
 //  Copyright © 2022 Adamant. All rights reserved.
 //
 
-import MessageKit
+@preconcurrency import MessageKit
 import UIKit
 import Combine
 
@@ -18,13 +18,13 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
         self.viewModel = viewModel
     }
     
-    func avatarSize(
+    nonisolated func avatarSize(
         for _: MessageType,
         at _: IndexPath,
         in _: MessagesCollectionView
     ) -> CGSize? { .zero }
     
-    func cellTopLabelHeight(
+    nonisolated func cellTopLabelHeight(
         for message: MessageType,
         at indexPath: IndexPath,
         in _: MessagesCollectionView
@@ -34,7 +34,7 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
             : labelHeight
     }
     
-    func messageTopLabelHeight(
+    nonisolated func messageTopLabelHeight(
         for message: MessageType,
         at _: IndexPath,
         in _: MessagesCollectionView
@@ -44,7 +44,7 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
             : .zero
     }
     
-    func messageBottomLabelHeight(
+    nonisolated func messageBottomLabelHeight(
         for message: MessageType,
         at _: IndexPath,
         in _: MessagesCollectionView
@@ -54,71 +54,83 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
             : labelHeight
     }
     
-    func messageTopLabelAlignment(
+    nonisolated func messageTopLabelAlignment(
         for message: MessageType,
         at _: IndexPath,
         in _: MessagesCollectionView
     ) -> LabelAlignment? {
-        .init(
-            textAlignment: textAlignment(for: message),
-            textInsets: topBottomLabelInsets
-        )
+        MainActor.assumeIsolated {
+            .init(
+                textAlignment: textAlignment(for: message),
+                textInsets: topBottomLabelInsets
+            )
+        }
     }
     
-    func messageBottomLabelAlignment(
+    nonisolated func messageBottomLabelAlignment(
         for message: MessageType,
         at _: IndexPath,
         in _: MessagesCollectionView
     ) -> LabelAlignment? {
-        .init(
-            textAlignment: textAlignment(for: message),
-            textInsets: topBottomLabelInsets
-        )
+        MainActor.assumeIsolated {
+            .init(
+                textAlignment: textAlignment(for: message),
+                textInsets: topBottomLabelInsets
+            )
+        }
     }
     
-    func textCellSizeCalculator(
+    nonisolated func textCellSizeCalculator(
         for _: MessageType,
         at _: IndexPath,
         in messagesCollectionView: MessagesCollectionView
     ) -> CellSizeCalculator? {
-        FixedTextMessageSizeCalculator(
-            layout: messagesCollectionView.messagesCollectionViewFlowLayout,
-            getCurrentSender: { [sender = viewModel.sender] in sender },
-            getMessages: { [messages = viewModel.messages] in messages }
-        )
+        MainActor.assumeIsolated {
+            FixedTextMessageSizeCalculator(
+                layout: messagesCollectionView.messagesCollectionViewFlowLayout,
+                getCurrentSender: { [sender = viewModel.sender] in sender },
+                getMessages: { [messages = viewModel.messages] in messages }
+            )
+        }
     }
     
-    func customCellSizeCalculator(
+    nonisolated func customCellSizeCalculator(
         for _: MessageType,
         at _: IndexPath,
         in messagesCollectionView: MessagesCollectionView
     ) -> CellSizeCalculator {
-        FixedTextMessageSizeCalculator(
-            layout: messagesCollectionView.messagesCollectionViewFlowLayout,
-            getCurrentSender: { [sender = viewModel.sender] in sender },
-            getMessages: { [messages = viewModel.messages] in messages }
-        )
+        MainActor.assumeIsolated {
+            FixedTextMessageSizeCalculator(
+                layout: messagesCollectionView.messagesCollectionViewFlowLayout,
+                getCurrentSender: { [sender = viewModel.sender] in sender },
+                getMessages: { [messages = viewModel.messages] in messages }
+            )
+        }
     }
     
-    func headerViewSize(
+    nonisolated func headerViewSize(
         for section: Int,
         in messagesCollectionView: MessagesCollectionView
     ) -> CGSize {
-        viewModel.messages[section].topSpinnerOn
-            ? SpinnerView.size
-            : .zero
+        MainActor.assumeIsolated {
+            viewModel.messages[section].topSpinnerOn
+                ? SpinnerView.size
+                : .zero
+        }
     }
     
-    func attributedTextCellSizeCalculator(
+    nonisolated func attributedTextCellSizeCalculator(
         for message: MessageType,
         at indexPath: IndexPath,
         in messagesCollectionView: MessagesCollectionView
     ) -> CellSizeCalculator? {
-        FixedTextMessageSizeCalculator(
-            layout: messagesCollectionView.messagesCollectionViewFlowLayout,
-            getCurrentSender: { [sender = viewModel.sender] in sender },
-            getMessages: { [messages = viewModel.messages] in messages }
-        )
+        MainActor.assumeIsolated {
+            FixedTextMessageSizeCalculator(
+                layout: messagesCollectionView.messagesCollectionViewFlowLayout,
+                getCurrentSender: { [sender = viewModel.sender] in sender },
+                getMessages: { [messages = viewModel.messages] in messages }
+            )
+        }
     }
 }
 
