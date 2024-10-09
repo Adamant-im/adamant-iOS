@@ -44,7 +44,7 @@ enum Currency: String, CaseIterable {
 
 // MARK: - protocol
 @MainActor
-protocol InfoServiceProtocol: AnyObject {
+protocol InfoServiceProtocol: AnyObject, Sendable {
     var currentCurrency: Currency { get set }
     
     // Check rates for list of coins

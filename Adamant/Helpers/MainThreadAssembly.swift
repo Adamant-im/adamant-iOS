@@ -17,10 +17,9 @@ protocol MainThreadAssembly: Assembly, Sendable {
 
 extension MainThreadAssembly {
     nonisolated func assemble(container: Container) {
-        MainActor.assertIsolated()
         let sendable = Atomic(container)
         
-        DispatchQueue.onMainThreadSyncSafe {
+        MainActor.assumeIsolatedSafe {
             assembleOnMainThread(container: sendable.value)
         }
     }

@@ -14,9 +14,9 @@ final class RepeaterService {
         let interval: TimeInterval
         let queue: DispatchQueue?
         var timer: Timer?
-        let callback: () -> Void
+        let callback: @Sendable () -> Void
         
-        init(interval: TimeInterval, queue: DispatchQueue?, callback: @escaping () -> Void) {
+        init(interval: TimeInterval, queue: DispatchQueue?, callback: @escaping @Sendable () -> Void) {
             self.interval = interval
             self.queue = queue
             self.callback = callback
@@ -24,7 +24,7 @@ final class RepeaterService {
     }
     
     // MARK: Properties
-    @Atomic private var foregroundTimers = [String:Client]()
+    @Atomic private var foregroundTimers = [String: Client]()
     @Atomic private(set) var isPaused = false
     
     private let pauseLock = NSLock()
@@ -44,7 +44,7 @@ final class RepeaterService {
     ///   - interval: Time interval (in seconds)
     ///   - queue: Queue for call. Default is main
     ///   - call: function to call
-    func registerForegroundCall(label: String, interval: TimeInterval, queue: DispatchQueue?, callback: @escaping () -> Void) {
+    func registerForegroundCall(label: String, interval: TimeInterval, queue: DispatchQueue?, callback: @escaping @Sendable () -> Void) {
         let client = Client(interval: interval, queue: queue, callback: callback)
         
         if let t = foregroundTimers[label]?.timer {

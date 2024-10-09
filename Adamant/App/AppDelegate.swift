@@ -252,7 +252,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         if let currencyInfoService = container.resolve(InfoServiceProtocol.self) {
             currencyInfoService.update() // Initial update
-            repeater.registerForegroundCall(label: "currencyInfoService", interval: 60, queue: .global(qos: .utility), callback: currencyInfoService.update)
+            repeater.registerForegroundCall(
+                label: "currencyInfoService",
+                interval: 60,
+                queue: .global(qos: .utility)
+            ) {
+                Task {
+                    await currencyInfoService.update()
+                }
+            }
         } else {
             dialogService.showError(withMessage: "Failed to register InfoServiceProtocol autoupdate. Please, report a bug", supportEmail: true, error: nil)
         }
