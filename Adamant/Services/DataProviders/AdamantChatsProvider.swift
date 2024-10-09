@@ -34,7 +34,7 @@ actor AdamantChatsProvider: ChatsProvider {
     
     private(set) var state: State = .empty
     private(set) var receivedLastHeight: Int64?
-//    private(set) var readedLastHeight: Int64?
+    private(set) var readedLastHeight: Int64?
     private let apiTransactions = 100
     private let chatTransactionsLimit = 50
     private var unconfirmedTransactions: [UInt64:NSManagedObjectID] = [:]
@@ -173,22 +173,19 @@ actor AdamantChatsProvider: ChatsProvider {
         guard let loggedAddress = notification.userInfo?[AdamantUserInfoKey.AccountService.loggedAccountAddress] as? String else {
             store.remove(StoreKey.chatProvider.address)
             store.remove(StoreKey.chatProvider.receivedLastHeight)
-            // TODO: 1
-//            store.remove(StoreKey.chatProvider.readedLastHeight)
+            store.remove(StoreKey.chatProvider.readedLastHeight)
             self.dropStateData()
             return
         }
         
-        // TODO: 1
         if let savedAddress: String = store.get(StoreKey.chatProvider.address), savedAddress == loggedAddress {
-//            if let raw: String = store.get(StoreKey.chatProvider.readedLastHeight),
-//               let h = Int64(raw) {
-//                self.readedLastHeight = h
-//            }
+            if let raw: String = store.get(StoreKey.chatProvider.readedLastHeight),
+               let h = Int64(raw) {
+                self.readedLastHeight = h
+            }
         } else {
             store.remove(StoreKey.chatProvider.receivedLastHeight)
-            // TODO: 1
-//            store.remove(StoreKey.chatProvider.readedLastHeight)
+            store.remove(StoreKey.chatProvider.readedLastHeight)
             self.dropStateData()
             store.set(loggedAddress, for: StoreKey.chatProvider.address)
         }
@@ -323,8 +320,7 @@ extension AdamantChatsProvider {
         
         // Drop props
         receivedLastHeight = nil
-        // TODO: 1
-//        readedLastHeight = nil
+        readedLastHeight = nil
         roomsMaxCount = nil
         roomsLoadedCount = nil
         chatLoadingStatusDictionary.removeAll()
@@ -334,8 +330,7 @@ extension AdamantChatsProvider {
         // Drop store
         securedStore.remove(StoreKey.chatProvider.address)
         securedStore.remove(StoreKey.chatProvider.receivedLastHeight)
-        // TODO: 1
-//        securedStore.remove(StoreKey.chatProvider.readedLastHeight)
+        securedStore.remove(StoreKey.chatProvider.readedLastHeight)
         
         // Drop CoreData
 //        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
@@ -632,22 +627,20 @@ extension AdamantChatsProvider {
                 )
             }
             
-            // TODO: 1
-//            if let h = receivedLastHeight {
-//                readedLastHeight = h
-//            } else {
-//                readedLastHeight = 0
-//            }
+            if let h = receivedLastHeight {
+                readedLastHeight = h
+            } else {
+                readedLastHeight = 0
+            }
             
             if let h = receivedLastHeight {
                 securedStore.set(String(h), for: StoreKey.chatProvider.receivedLastHeight)
             }
             
-            // TODO: 1
-//            if let h = readedLastHeight,
-//               h > 0 {
-//                securedStore.set(String(h), for: StoreKey.chatProvider.readedLastHeight)
-//            }
+            if let h = readedLastHeight,
+               h > 0 {
+                securedStore.set(String(h), for: StoreKey.chatProvider.readedLastHeight)
+            }
             
             if !isInitiallySynced {
                 isInitiallySynced = true
@@ -1789,7 +1782,6 @@ extension AdamantChatsProvider {
                     
                     if !trs.isOut {
                         if transactionExist == nil {
-                            print("AAAA +++ \(chatTransaction.height)")
                             newMessageTransactions.append(chatTransaction)
                         }
                         
@@ -1840,12 +1832,7 @@ extension AdamantChatsProvider {
         }
         
         // MARK: 4. Unread messagess
-        for (account, _) in partners {
-            guard let chatroom = account.chatroom,
-                  let address = chatroom.partner?.address else { continue }
-            
-            let readedLastHeight = await readedHeightService.getLastReadedHeight(adress: address)
-            
+        if let readedLastHeight = readedLastHeight {
             var unreadTransactions = newMessageTransactions.filter { $0.height > readedLastHeight }
             if unreadTransactions.count == 0 {
                 unreadTransactions = newMessageTransactions.filter { $0.height == 0 }
@@ -1859,21 +1846,6 @@ extension AdamantChatsProvider {
                 trs.forEach { $0.isUnread = true }
             }
         }
-        // TODO: 1
-//        if let readedLastHeight = readedLastHeight {
-//            var unreadTransactions = newMessageTransactions.filter { $0.height > readedLastHeight }
-//            if unreadTransactions.count == 0 {
-//                unreadTransactions = newMessageTransactions.filter { $0.height == 0 }
-//            }
-//            let chatrooms = Dictionary(grouping: unreadTransactions, by: ({ (t: ChatTransaction) -> Chatroom in t.chatroom! }))
-//            for (chatroom, trs) in chatrooms {
-//                if let address = chatroom.partner?.address {
-//                    chatroom.isHidden = self.blockList.contains(address)
-//                }
-//                chatroom.hasUnreadMessages = true
-//                trs.forEach { $0.isUnread = true }
-//            }
-//        }
         
         // MARK: 5. Dump new transactions
         if privateContext.hasChanges {
@@ -2010,10 +1982,7 @@ extension AdamantChatsProvider {
     
     func markChatAsRead(chatroom: Chatroom) {
         chatroom.managedObjectContext?.perform {
-            let readedHeight = chatroom.markAsReaded()
-            Task {
-                await self.readedHeightService.setLastReadedHeight(address: chatroom.partner?.address, height: readedHeight)
-            }
+            chatroom.markAsReaded()
             try? chatroom.managedObjectContext?.save()
         }
     }

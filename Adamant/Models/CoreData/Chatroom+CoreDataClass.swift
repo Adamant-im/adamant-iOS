@@ -18,22 +18,13 @@ public class Chatroom: NSManagedObject {
         return hasUnreadMessages || (lastTransaction?.isUnread ?? false)
     }
     
-    func markAsReaded() -> Int64? {
-        var maxUnreadHeight: Int64 = 0
-        
+    func markAsReaded() {
         hasUnreadMessages = false
        
         if let trs = transactions as? Set<ChatTransaction> {
-            trs.filter { $0.isUnread }.forEach {
-                $0.isUnread = false
-                if $0.height > maxUnreadHeight {
-                    maxUnreadHeight = $0.height
-                }
-            }
+            trs.filter { $0.isUnread }.forEach { $0.isUnread = false }
         }
         lastTransaction?.isUnread = false
-        
-        return maxUnreadHeight == 0 ? nil : maxUnreadHeight
     }
     
     func markAsUnread() {
