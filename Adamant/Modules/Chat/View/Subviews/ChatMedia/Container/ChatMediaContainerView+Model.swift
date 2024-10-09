@@ -10,7 +10,7 @@ import Foundation
 import CommonKit
 
 extension ChatMediaContainerView {
-    struct Model: ChatReusableViewModelProtocol, MessageModel {
+    struct Model: ChatReusableViewModelProtocol, MessageModel, @unchecked Sendable {
         let id: String
         let isFromCurrentSender: Bool
         let reactions: Set<Reaction>?

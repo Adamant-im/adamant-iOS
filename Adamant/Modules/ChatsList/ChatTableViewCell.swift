@@ -23,7 +23,7 @@ final class ChatTableViewCell: UITableViewCell {
     @IBOutlet weak var badgeView: UIView!
     
     override func awakeFromNib() {
-        badgeView.layer.cornerRadius = badgeView.bounds.height / 2
+        Task { @MainActor in badgeView.layer.cornerRadius = badgeView.bounds.height / 2 }
     }
     
     var avatarImage: UIImage? {

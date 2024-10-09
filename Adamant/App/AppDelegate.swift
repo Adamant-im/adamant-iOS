@@ -383,57 +383,57 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
-        Task { @MainActor in
-            var chatListNav: UINavigationController?
-            var chatListVC: ChatListViewController?
-            
-            let userInfo = response.notification.request.content.userInfo
-            
-            guard let transactionID = userInfo[AdamantNotificationUserInfoKeys.transactionId] as? String,
-                  let transactionRaw = userInfo[AdamantNotificationUserInfoKeys.transaction] as? String,
-                  let data = transactionRaw.data(using: .utf8),
-                  let trs = try? JSONDecoder().decode(Transaction.self, from: data),
-                  let tabbar = window?.rootViewController as? UITabBarController
-            else {
-                completionHandler()
-                return
-            }
-            
-            if let split = tabbar.viewControllers?.first as? UISplitViewController,
-               let navigation = split.viewControllers.first as? UINavigationController,
-               let vc = navigation.viewControllers.first as? ChatListViewController {
-                chatListNav = navigation
-                chatListVC = vc
-            }
-            
-            if let navigation = tabbar.viewControllers?.first as? UINavigationController,
-               let vc = navigation.viewControllers.first as? ChatListViewController {
-                chatListNav = navigation
-                chatListVC = vc
-            }
-            
-            guard let chatListVC = chatListVC,
-                  let chatListNav = chatListNav
-            else {
-                completionHandler()
-                return
-            }
-            
-            chatListVC.performOnMessagesLoaded { [weak self] in
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    self?.dialogService.dismissProgress()
-                    self?.openDialog(
-                        chatListNav: chatListNav,
-                        tabbar: tabbar,
-                        chatListVC: chatListVC,
-                        transactionID: transactionID,
-                        senderAddress: trs.senderId
-                    )
-                }
-            }
-            
-            completionHandler()
-        }
+//        Task { @MainActor [weak self] in
+//            var chatListNav: UINavigationController?
+//            var chatListVC: ChatListViewController?
+//            
+//            let userInfo = response.notification.request.content.userInfo
+//            
+//            guard let transactionID = userInfo[AdamantNotificationUserInfoKeys.transactionId] as? String,
+//                  let transactionRaw = userInfo[AdamantNotificationUserInfoKeys.transaction] as? String,
+//                  let data = transactionRaw.data(using: .utf8),
+//                  let trs = try? JSONDecoder().decode(Transaction.self, from: data),
+//                  let tabbar = self?.window?.rootViewController as? UITabBarController
+//            else {
+//                completionHandler()
+//                return
+//            }
+//            
+//            if let split = tabbar.viewControllers?.first as? UISplitViewController,
+//               let navigation = split.viewControllers.first as? UINavigationController,
+//               let vc = navigation.viewControllers.first as? ChatListViewController {
+//                chatListNav = navigation
+//                chatListVC = vc
+//            }
+//            
+//            if let navigation = tabbar.viewControllers?.first as? UINavigationController,
+//               let vc = navigation.viewControllers.first as? ChatListViewController {
+//                chatListNav = navigation
+//                chatListVC = vc
+//            }
+//            
+//            guard let chatListVC = chatListVC,
+//                  let chatListNav = chatListNav
+//            else {
+//                completionHandler()
+//                return
+//            }
+//            
+//            chatListVC.performOnMessagesLoaded { [weak self] in
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+//                    self?.dialogService.dismissProgress()
+//                    self?.openDialog(
+//                        chatListNav: chatListNav,
+//                        tabbar: tabbar,
+//                        chatListVC: chatListVC,
+//                        transactionID: transactionID,
+//                        senderAddress: trs.senderId
+//                    )
+//                }
+//            }
+//            
+//            completionHandler()
+//        }
     }
 }
 

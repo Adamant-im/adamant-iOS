@@ -70,7 +70,10 @@ class TransactionsListViewControllerBase: UIViewController {
     private var limit = 25
     private var offset = 0
     
-    private lazy var dataSource = TransactionsDiffableDataSource(tableView: tableView, cellProvider: makeCell)
+    private lazy var dataSource = TransactionsDiffableDataSource(
+        tableView: tableView,
+        cellProvider: { [weak self] in self?.makeCell(tableView: $0, indexPath: $1, model: $2) }
+    )
     
     var currencySymbol: String { walletService.core.tokenSymbol }
     

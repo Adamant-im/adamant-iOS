@@ -8,13 +8,13 @@
 
 import Foundation
 
-protocol WalletServiceCompose {
+protocol WalletServiceCompose: Sendable {
     func getWallet(by type: String) -> WalletService?
     func getWallets() -> [WalletService]
 }
 
 struct AdamantWalletServiceCompose: WalletServiceCompose {
-    private var wallets: [String: WalletService] = [:]
+    private let wallets: [String: WalletService]
     
     init(wallets: [WalletCoreProtocol], coreDataStack: CoreDataStack) {
         self.wallets = Dictionary(uniqueKeysWithValues: wallets.map { wallet in

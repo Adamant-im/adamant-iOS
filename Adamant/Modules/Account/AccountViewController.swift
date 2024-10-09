@@ -9,7 +9,7 @@
 import UIKit
 import Eureka
 import FreakingSimpleRoundImageView
-import CoreData
+@preconcurrency import CoreData
 @preconcurrency import Parchment
 import SnapKit
 import CommonKit

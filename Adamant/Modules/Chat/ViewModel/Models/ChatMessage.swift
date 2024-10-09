@@ -10,7 +10,7 @@ import MessageKit
 import UIKit
 import CommonKit
 
-struct ChatMessage: Identifiable, Equatable {
+struct ChatMessage: Identifiable, Equatable, Sendable {
     let id: String
     let sentDate: Date
     let senderModel: ChatSender
@@ -39,7 +39,7 @@ struct ChatMessage: Identifiable, Equatable {
 }
 
 extension ChatMessage {
-    struct EqualWrapper<Value>: Equatable {
+    struct EqualWrapper<Value: Sendable>: Equatable {
         let value: Value
         
         static func == (lhs: Self, rhs: Self) -> Bool { true }
@@ -51,7 +51,7 @@ extension ChatMessage {
         case failed
     }
     
-    enum Content: Equatable {
+    enum Content: Equatable, Sendable {
         case message(EqualWrapper<ChatMessageCell.Model>)
         case transaction(EqualWrapper<ChatTransactionContainerView.Model>)
 		case reply(EqualWrapper<ChatMessageReplyCell.Model>)

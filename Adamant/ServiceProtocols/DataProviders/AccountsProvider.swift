@@ -49,7 +49,7 @@ enum AccountsProviderDummyAccountError: Error {
 }
 
 @MainActor
-protocol AccountsProvider {
+protocol AccountsProvider: Sendable {
     
     /// Search for fetched account, if not found, asks server for account.
     ///

@@ -9,7 +9,7 @@
 import UIKit
 import AVFoundation
 import Photos
-import QRCodeReader
+@preconcurrency import QRCodeReader
 import EFQRCode
 import CommonKit
 
@@ -64,21 +64,25 @@ extension LoginViewController {
 
 // MARK: - QRCodeReaderViewControllerDelegate
 extension LoginViewController: QRCodeReaderViewControllerDelegate {
-    func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
-        guard AdamantUtilities.validateAdamantPassphrase(passphrase: result.value) else {
-            dialogService.showWarning(withMessage: String.adamant.login.wrongQrError)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                reader.startScanning()
+    nonisolated func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
+        MainActor.assumeIsolated {
+            guard AdamantUtilities.validateAdamantPassphrase(passphrase: result.value) else {
+                dialogService.showWarning(withMessage: String.adamant.login.wrongQrError)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    reader.startScanning()
+                }
+                return
             }
-            return
+            
+            reader.dismiss(animated: true, completion: nil)
+            loginWith(passphrase: result.value)
         }
-        
-        reader.dismiss(animated: true, completion: nil)
-        loginWith(passphrase: result.value)
     }
     
-    func readerDidCancel(_ reader: QRCodeReaderViewController) {
-        reader.dismiss(animated: true, completion: nil)
+    nonisolated func readerDidCancel(_ reader: QRCodeReaderViewController) {
+        MainActor.assumeIsolated {
+            reader.dismiss(animated: true, completion: nil)
+        }
     }
 }
 

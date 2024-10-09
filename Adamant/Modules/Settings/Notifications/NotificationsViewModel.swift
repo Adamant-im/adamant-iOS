@@ -43,14 +43,11 @@ final class NotificationsViewModel: ObservableObject {
         return AttributedString(attributedString)
     }
     
-    nonisolated init(dialogService: DialogService, notificationsService: NotificationsService) {
+    init(dialogService: DialogService, notificationsService: NotificationsService) {
         self.dialogService = dialogService
         self.notificationsService = notificationsService
-        
-        Task {
-            await configure()
-            await addObservers()
-        }
+        configure()
+        addObservers()
     }
     
     func presentNotificationSoundsPicker() {

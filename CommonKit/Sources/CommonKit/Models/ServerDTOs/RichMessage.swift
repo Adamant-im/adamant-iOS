@@ -10,7 +10,7 @@ import Foundation
 
 // MARK: - RichMessage
 
-public protocol RichMessage: Encodable {
+public protocol RichMessage: Encodable, Sendable {
     var type: String { get }
     var additionalType: RichAdditionalType { get }
     
@@ -67,7 +67,7 @@ public enum RichContentKeys {
 
 // MARK: - RichMessageReaction
 
-public struct RichMessageReaction: RichMessage {
+public struct RichMessageReaction: RichMessage, @unchecked Sendable {
     public var type: String
     public var additionalType: RichAdditionalType
     public var reactto_id: String
@@ -94,7 +94,7 @@ public struct RichMessageReaction: RichMessage {
 
 // MARK: - RichMessageFile
 
-public struct RichMessageFile: RichMessage {
+public struct RichMessageFile: RichMessage, @unchecked Sendable {
     public struct Preview: Codable, Equatable, Hashable {
         public var id: String
         public var nonce: String
@@ -280,7 +280,7 @@ public struct RichMessageFile: RichMessage {
     }
 }
 
-public struct RichFileReply: RichMessage {
+public struct RichFileReply: RichMessage, @unchecked Sendable {
     public var type: String
     public var additionalType: RichAdditionalType
     public var replyto_id: String
@@ -307,7 +307,7 @@ public struct RichFileReply: RichMessage {
 
 // MARK: - RichMessageReply
 
-public struct RichMessageReply: RichMessage {
+public struct RichMessageReply: RichMessage, @unchecked Sendable {
     public var type: String
     public var additionalType: RichAdditionalType
     public var replyto_id: String
@@ -332,7 +332,7 @@ public struct RichMessageReply: RichMessage {
     }
 }
 
-public struct RichTransferReply: RichMessage {
+public struct RichTransferReply: RichMessage, @unchecked Sendable {
     public var type: String
     public var additionalType: RichAdditionalType
     public var replyto_id: String
@@ -370,7 +370,7 @@ public struct RichTransferReply: RichMessage {
 
 // MARK: - RichMessageTransfer
 
-public struct RichMessageTransfer: RichMessage {
+public struct RichMessageTransfer: RichMessage, @unchecked Sendable {
     public let type: String
     public let amount: Decimal
     public let hash: String

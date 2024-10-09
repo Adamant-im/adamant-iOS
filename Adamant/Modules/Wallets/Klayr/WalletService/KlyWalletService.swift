@@ -12,7 +12,7 @@ import UIKit
 import CommonKit
 import Combine
 @preconcurrency import struct BigInt.BigUInt
-import LiskKit
+@preconcurrency import LiskKit
 
 final class KlyWalletService: WalletCoreProtocol, @unchecked Sendable {
     struct CurrentFee: Sendable {
@@ -260,7 +260,7 @@ private extension KlyWalletService {
             wallet.isBalanceInitialized = true
             
             if isRaised {
-                vibroService.applyVibration(.success)
+                await vibroService.applyVibration(.success)
             }
             
             if let notification = notification {

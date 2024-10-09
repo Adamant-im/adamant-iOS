@@ -11,7 +11,7 @@ import Foundation
 import RNCryptor
 import CryptoKit
 
-public final class KeychainStore: SecuredStore {
+public final class KeychainStore: SecuredStore, @unchecked Sendable {
     // MARK: - Properties
     private static let keychain = Keychain(service: "\(AdamantSecret.appIdentifierPrefix).im.adamant.messenger")
     

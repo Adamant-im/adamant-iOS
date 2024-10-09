@@ -9,7 +9,7 @@
 import UIKit
 
 extension ChatMessageReplyCell {
-    struct Model: ChatReusableViewModelProtocol, MessageModel {
+    struct Model: ChatReusableViewModelProtocol, MessageModel, @unchecked Sendable {
         let id: String
         let replyId: String
         let message: NSAttributedString

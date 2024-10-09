@@ -9,7 +9,7 @@
 import Foundation
 
 extension ChatTransactionContainerView {
-    struct Model: ChatReusableViewModelProtocol, MessageModel {
+    struct Model: ChatReusableViewModelProtocol, MessageModel, @unchecked Sendable {
         let id: String
         let isFromCurrentSender: Bool
         var content: ChatTransactionContentView.Model

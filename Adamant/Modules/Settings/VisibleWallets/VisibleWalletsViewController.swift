@@ -96,27 +96,41 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
     private func addObservers() {
         for wallet in wallets {
             let notification = wallet.walletUpdatedNotification
-            let callback: ((Notification) -> Void) = { [weak self] _ in
-                guard let self = self else { return }
-                self.tableView.reloadData()
-            }
             
-            NotificationCenter.default.addObserver(forName: notification,
-                                                   object: wallet,
-                                                   queue: OperationQueue.main,
-                                                   using: callback)
-        }
-        
-        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            if let previousAppState = self?.previousAppState,
-               previousAppState == .background {
-                self?.previousAppState = .active
-                self?.updateBalances()
+            NotificationCenter.default.addObserver(
+                forName: notification,
+                object: wallet,
+                queue: OperationQueue.main
+            ) { [weak self] _ in
+                MainActor.assumeIsolated {
+                    guard let self = self else { return }
+                    self.tableView.reloadData()
+                }
             }
         }
         
-        NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            self?.previousAppState = .background
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.didBecomeActiveNotification,
+            object: nil,
+            queue: OperationQueue.main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                if let previousAppState = self?.previousAppState,
+                   previousAppState == .background {
+                    self?.previousAppState = .active
+                    self?.updateBalances()
+                }
+            }
+        }
+        
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.willResignActiveNotification,
+            object: nil,
+            queue: OperationQueue.main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.previousAppState = .background
+            }
         }
     }
     

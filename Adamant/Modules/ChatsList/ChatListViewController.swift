@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import CoreData
+@preconcurrency import CoreData
 import MarkdownKit
 import MessageKit
 import Combine
@@ -704,100 +704,112 @@ extension ChatListViewController {
 
 // MARK: - NSFetchedResultsControllerDelegate
 extension ChatListViewController: NSFetchedResultsControllerDelegate {
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        if isBusy { return }
-        if controller == chatsController {
-            tableView.beginUpdates()
-            updatingIndicatorView.startAnimate()
+    nonisolated func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        Task { @MainActor in
+            if isBusy { return }
+            if controller == chatsController {
+                tableView.beginUpdates()
+                updatingIndicatorView.startAnimate()
+            }
         }
     }
     
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        if isBusy { return }
-        switch controller {
-        case let c where c == chatsController:
-            tableView.endUpdates()
-            updatingIndicatorView.stopAnimate()
-            
-        case let c where c == unreadController:
-            setBadgeValue(controller.fetchedObjects?.count)
-            
-        default:
-            break
+    nonisolated func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        Task { @MainActor in
+            if isBusy { return }
+            switch controller {
+            case let c where c == chatsController:
+                tableView.endUpdates()
+                updatingIndicatorView.stopAnimate()
+                
+            case let c where c == unreadController:
+                setBadgeValue(controller.fetchedObjects?.count)
+                
+            default:
+                break
+            }
         }
     }
     
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        if isBusy { return }
-        switch controller {
-        // MARK: Chats controller
-        case let c where c == chatsController:
-            switch type {
-            case .insert:
-                if let newIndexPath = newIndexPath {
-                    tableView.insertRows(at: [newIndexPath], with: .automatic)
-                }
-                
-            case .delete:
-                if let indexPath = indexPath {
-                    tableView.deleteRows(at: [indexPath], with: .automatic)
-                }
-                
-            case .update:
-                if let indexPath = indexPath,
-                   let cell = self.tableView.cellForRow(at: indexPath) as? ChatTableViewCell,
-                   let chatroom = anObject as? Chatroom {
-                    configureCell(cell, for: chatroom)
-                }
-                
-            case .move:
-                if let indexPath = indexPath, let newIndexPath = newIndexPath {
-                    if let cell = tableView.cellForRow(at: indexPath) as? ChatTableViewCell, let chatroom = anObject as? Chatroom {
-                        configureCell(cell, for: chatroom)
-                    }
-                    tableView.moveRow(at: indexPath, to: newIndexPath)
-                }
-            @unknown default:
-                break
-            }
-            
-        // MARK: Unread controller
-            
-        case let c where c == unreadController:
-            guard let transaction = anObject as? ChatTransaction else { break }
-            
-            if self.view.window == nil,
-               type == .insert {
-                showNotification(for: transaction)
-            }
-            
-            let shouldForceUpdate = anObject is TransferTransaction
-            || anObject is RichMessageTransaction
-            
-            if shouldForceUpdate, type == .insert {
-                transactionsRequiringBalanceUpdate.append(transaction.txId)
-            }
-            
-            guard shouldForceUpdate,
-                  let blockId = transaction.blockId,
-                  !blockId.isEmpty,
-                  transactionsRequiringBalanceUpdate.contains(transaction.txId)
-            else {
-                break
-            }
-            
-            if let index = transactionsRequiringBalanceUpdate.firstIndex(of: transaction.txId) {
-                transactionsRequiringBalanceUpdate.remove(at: index)
-            }
-            
-            NotificationCenter.default.post(
-                name: .AdamantAccountService.forceUpdateBalance,
-                object: nil
-            )
-            
-        default:
-            break
-        }
+    nonisolated func controller(
+        _ controller: NSFetchedResultsController<NSFetchRequestResult>,
+        didChange anObject: Any,
+        at indexPath: IndexPath?,
+        for type: NSFetchedResultsChangeType,
+        newIndexPath: IndexPath?
+    ) {
+//        Task { @MainActor in
+//            if isBusy { return }
+//            switch controller {
+//            // MARK: Chats controller
+//            case let c where c == chatsController:
+//                switch type {
+//                case .insert:
+//                    if let newIndexPath = newIndexPath {
+//                        tableView.insertRows(at: [newIndexPath], with: .automatic)
+//                    }
+//                    
+//                case .delete:
+//                    if let indexPath = indexPath {
+//                        tableView.deleteRows(at: [indexPath], with: .automatic)
+//                    }
+//                    
+//                case .update:
+//                    if let indexPath = indexPath,
+//                       let cell = self.tableView.cellForRow(at: indexPath) as? ChatTableViewCell,
+//                       let chatroom = anObject as? Chatroom {
+//                        configureCell(cell, for: chatroom)
+//                    }
+//                    
+//                case .move:
+//                    if let indexPath = indexPath, let newIndexPath = newIndexPath {
+//                        if let cell = tableView.cellForRow(at: indexPath) as? ChatTableViewCell, let chatroom = anObject as? Chatroom {
+//                            configureCell(cell, for: chatroom)
+//                        }
+//                        tableView.moveRow(at: indexPath, to: newIndexPath)
+//                    }
+//                @unknown default:
+//                    break
+//                }
+//                
+//            // MARK: Unread controller
+//                
+//            case let c where c == unreadController:
+//                guard let transaction = anObject as? ChatTransaction else { break }
+//                
+//                if self.view.window == nil,
+//                   type == .insert {
+//                    showNotification(for: transaction)
+//                }
+//                
+//                let shouldForceUpdate = anObject is TransferTransaction
+//                || anObject is RichMessageTransaction
+//                
+//                if shouldForceUpdate, type == .insert {
+//                    transactionsRequiringBalanceUpdate.append(transaction.txId)
+//                }
+//                
+//                guard shouldForceUpdate,
+//                      let blockId = transaction.blockId,
+//                      !blockId.isEmpty,
+//                      transactionsRequiringBalanceUpdate.contains(transaction.txId)
+//                else {
+//                    break
+//                }
+//                
+//                if let index = transactionsRequiringBalanceUpdate.firstIndex(of: transaction.txId) {
+//                    transactionsRequiringBalanceUpdate.remove(at: index)
+//                }
+//                
+//                NotificationCenter.default.post(
+//                    name: .AdamantAccountService.forceUpdateBalance,
+//                    object: nil
+//                )
+//                
+//            default:
+//                break
+//            }
+//        }
     }
 }
 

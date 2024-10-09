@@ -8,4 +8,5 @@
 
 import Foundation
 
+extension NSAttributedString: @unchecked @retroactive Sendable {}
 extension Notification: @unchecked @retroactive Sendable {}

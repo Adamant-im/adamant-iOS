@@ -70,7 +70,7 @@ extension String.adamant {
     }
 }
 
-final class BtcWalletService: WalletCoreProtocol {
+final class BtcWalletService: WalletCoreProtocol, @unchecked Sendable {
 
     var tokenSymbol: String {
         type(of: self).currencySymbol
@@ -289,7 +289,7 @@ final class BtcWalletService: WalletCoreProtocol {
             wallet.isBalanceInitialized = true
             
             if isRaised {
-                vibroService.applyVibration(.success)
+                await vibroService.applyVibration(.success)
             }
             
             if let notification = notification {
@@ -551,7 +551,7 @@ extension BtcWalletService {
     ///   - btcAddress: Bitcoin address to save into KVS
     ///   - adamantAddress: Owner of BTC address
     ///   - completion: success
-    private func save(btcAddress: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
+    private func save(btcAddress: String, completion: @escaping @Sendable (WalletServiceSimpleResult) -> Void) {
         guard let adamant = accountService.account, let keypair = accountService.keypair else {
             completion(.failure(error: .notLogged))
             return
@@ -601,7 +601,7 @@ extension BtcWalletService {
                         return
                     }
                     
-                    self?.save(btcAddress: btcAddress) { result in
+                    self?.save(btcAddress: btcAddress) { [weak self] result in
                         self?.kvsSaveCompletionRecursion(btcAddress: btcAddress, result: result)
                     }
                 }

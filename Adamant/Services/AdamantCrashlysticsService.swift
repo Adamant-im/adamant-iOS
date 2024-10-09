@@ -11,6 +11,7 @@ import Combine
 import Firebase
 import CommonKit
 
+@MainActor
 final class AdamantCrashlyticsService: CrashlyticsService {
     
     // MARK: Dependencies
@@ -59,7 +60,6 @@ final class AdamantCrashlyticsService: CrashlyticsService {
         return result
     }
     
-    @MainActor
     func configureIfNeeded() {
         guard !isConfigured && isCrashlyticsEnabled() else { return }
         
@@ -68,9 +68,7 @@ final class AdamantCrashlyticsService: CrashlyticsService {
     }
     
     private func updateCrashlyticSDK(isEnabled: Bool) {
-        Task {
-            await self.configureIfNeeded()
-            Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(isEnabled)
-        }
+        configureIfNeeded()
+        Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(isEnabled)
     }
 }

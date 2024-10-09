@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import CoreData
+@preconcurrency import CoreData
 import Combine
 import CommonKit
 

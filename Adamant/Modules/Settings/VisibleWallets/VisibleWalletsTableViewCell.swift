@@ -10,6 +10,7 @@ import UIKit
 import SnapKit
 
 // MARK: Cell's Delegate
+@MainActor
 protocol AdamantVisibleWalletsCellDelegate: AnyObject {
     func delegateCell(_ cell: VisibleWalletsTableViewCell, didChangeCheckedStateTo state: Bool)
 }

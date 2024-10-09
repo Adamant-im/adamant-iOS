@@ -261,11 +261,11 @@ extension CodableTransaction {
 
 // MARK: - Adamant ETH API transactions
 
-struct EthTransactionShort: Sendable {
+struct EthTransactionShort: @unchecked Sendable {
     let date: Date
     let hash: String
     let from: String
-    let to: String
+    var to: String
     let gasUsed: Decimal
     let gasPrice: Decimal
     let value: Decimal

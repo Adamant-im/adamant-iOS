@@ -11,7 +11,7 @@ import UIKit
 import UserNotifications
 import CommonKit
 import Combine
-import CoreData
+@preconcurrency import CoreData
 import AVFoundation
 
 extension NotificationsMode {
@@ -74,35 +74,32 @@ final class AdamantNotificationsService: NSObject, NotificationsService {
     private var unreadController: NSFetchedResultsController<ChatTransaction>?
     
     // MARK: Lifecycle
-    nonisolated init(
+    init(
         securedStore: SecuredStore,
         vibroService: VibroService
     ) {
         self.securedStore = securedStore
         self.vibroService = vibroService
-        
         super.init()
         
-        Task { @MainActor in
-            NotificationCenter.default
-                .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
-                .receive(on: DispatchQueue.main)
-                .sink { [weak self] _ in self?.onUserLoggedIn() }
-                .store(in: &subscriptions)
-            
-            NotificationCenter.default
-                .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
-                .receive(on: DispatchQueue.main)
-                .sink { [weak self] _ in self?.onUserLoggedOut() }
-                .store(in: &subscriptions)
-            
-            NotificationCenter.default
-                .publisher(for: .AdamantAccountService.stayInChanged, object: nil)
-                .receive(on: DispatchQueue.main)
-                .compactMap { $0.userInfo?[AdamantUserInfoKey.AccountService.newStayInState] as? Bool }
-                .sink { [weak self] in self?.onStayInChanged($0) }
-                .store(in: &subscriptions)
-        }
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.onUserLoggedIn() }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.onUserLoggedOut() }
+            .store(in: &subscriptions)
+        
+        NotificationCenter.default
+            .publisher(for: .AdamantAccountService.stayInChanged, object: nil)
+            .receive(on: DispatchQueue.main)
+            .compactMap { $0.userInfo?[AdamantUserInfoKey.AccountService.newStayInState] as? Bool }
+            .sink { [weak self] in self?.onStayInChanged($0) }
+            .store(in: &subscriptions)
     }
     
     func setInAppSound(_ value: Bool) {
@@ -410,28 +407,31 @@ private extension AdamantNotificationsService {
 }
 
 extension AdamantNotificationsService: NSFetchedResultsControllerDelegate {
-    func controller(
-        _ controller: NSFetchedResultsController<NSFetchRequestResult>, 
+    nonisolated func controller(
+        _ controller: NSFetchedResultsController<NSFetchRequestResult>,
         didChange anObject: Any,
         at indexPath: IndexPath?,
         for type: NSFetchedResultsChangeType,
         newIndexPath: IndexPath?
     ) {
-        guard let transaction = anObject as? ChatTransaction,
-              type == .insert
-        else { return }
-        
-        if inAppVibrate {
-            vibroService.applyVibration(.medium)
-        }
-        
-        if inAppSound {
-            switch transaction {
-            case let tx as RichMessageTransaction where tx.additionalType == .reaction:
-                playSound(by: notificationsReactionSound.fileName)
-            default:
-                playSound(by: notificationsSound.fileName)
-            }
-        }
+//        Task { @MainActor in
+//            guard
+//                let transaction = anObject as? ChatTransaction,
+//                type == .insert
+//            else { return }
+//            
+//            if inAppVibrate {
+//                vibroService.applyVibration(.medium)
+//            }
+//            
+//            if inAppSound {
+//                switch transaction {
+//                case let tx as RichMessageTransaction where tx.additionalType == .reaction:
+//                    playSound(by: notificationsReactionSound.fileName)
+//                default:
+//                    playSound(by: notificationsSound.fileName)
+//                }
+//            }
+//        }
     }
 }

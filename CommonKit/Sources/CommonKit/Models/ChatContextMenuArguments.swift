@@ -7,7 +7,7 @@
 
 import UIKit
 
-public struct ChatContextMenuArguments {
+public struct ChatContextMenuArguments: @unchecked Sendable {
     public let copyView: UIView
     public let size: CGSize
     public let location: CGPoint

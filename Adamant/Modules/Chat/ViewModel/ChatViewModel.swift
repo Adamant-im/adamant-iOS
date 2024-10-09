@@ -6,13 +6,13 @@
 //  Copyright © 2022 Adamant. All rights reserved.
 //
 
-import Combine
+@preconcurrency import Combine
 import CoreData
 import MarkdownKit
 import UIKit
 import CommonKit
 import AdvancedContextMenuKit
-import ElegantEmojiPicker
+@preconcurrency import ElegantEmojiPicker
 import FilesPickerKit
 import FilesStorageKit
 
@@ -1055,8 +1055,8 @@ extension ChatViewModel {
 }
 
 extension ChatViewModel: NSFetchedResultsControllerDelegate {
-    func controllerDidChangeContent(_: NSFetchedResultsController<NSFetchRequestResult>) {
-        updateTransactions(performFetch: false)
+    nonisolated func controllerDidChangeContent(_: NSFetchedResultsController<NSFetchRequestResult>) {
+        Task { @MainActor in updateTransactions(performFetch: false) }
     }
 }
 
@@ -1199,7 +1199,7 @@ private extension ChatViewModel {
         updateMessages(
             resetLoadingProperty: performFetch,
             completion: isNewReaction
-                ? { [commitVibro] in commitVibro.send() }
+                ? { @Sendable [commitVibro] in commitVibro.send() }
                 : {}
         )
     }
@@ -1471,11 +1471,12 @@ private extension ChatViewModel {
     func waitForChatLoading(with address: String) async {
         await withUnsafeContinuation { continuation in
             Task {
-                await chatsProvider.chatLoadingStatusPublisher
-                    .filter { $0.contains(
-                        where: {
+                let publisher = await chatsProvider.chatLoadingStatusPublisher
+                publisher
+                    .filter { dict in
+                        dict.contains {
                             $0.key == address && $0.value == .loaded
-                        })
+                        }
                     }
                     .receive(on: DispatchQueue.main)
                     .sink { [weak self] _ in
@@ -1704,24 +1705,26 @@ private extension Sequence where Element == ChatTransaction {
 }
 
 extension ChatViewModel: ElegantEmojiPickerDelegate {
-    func emojiPicker(_ picker: ElegantEmojiPicker, didSelectEmoji emoji: Emoji?) {
-        dialog.send(.dismissMenu)
-        
-        guard let previousArg = previousArg else { return }
-        
-        let emoji = emoji?.emoji == previousArg.selectedEmoji
-        ? ""
-        : (emoji?.emoji ?? "")
-        
-        let type: EmojiUpdateType = emoji.isEmpty
-        ? .decrement
-        : .increment
-        
-        emojiService.updateFrequentlySelectedEmojis(
-            selectedEmoji: emoji,
-            type: type
-        )
-        
-        reactAction(previousArg.messageId, emoji: emoji)
+    nonisolated func emojiPicker(_ picker: ElegantEmojiPicker, didSelectEmoji emoji: Emoji?) {
+//        MainActor.assumeIsolated {
+//            dialog.send(.dismissMenu)
+//            
+//            guard let previousArg = previousArg else { return }
+//            
+//            let emoji = emoji?.emoji == previousArg.selectedEmoji
+//            ? ""
+//            : (emoji?.emoji ?? "")
+//            
+//            let type: EmojiUpdateType = emoji.isEmpty
+//            ? .decrement
+//            : .increment
+//            
+//            emojiService.updateFrequentlySelectedEmojis(
+//                selectedEmoji: emoji,
+//                type: type
+//            )
+//            
+//            reactAction(previousArg.messageId, emoji: emoji)
+//        }
     }
 }

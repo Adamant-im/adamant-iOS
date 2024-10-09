@@ -21,7 +21,7 @@ final class CoinsNodesListViewModel: ObservableObject {
     private let apiServiceCompose: ApiServiceComposeProtocol
     private var subscriptions = Set<AnyCancellable>()
     
-    nonisolated init(
+    init(
         mapper: CoinsNodesListMapper,
         nodesStorage: NodesStorageProtocol,
         nodesAdditionalParamsStorage: NodesAdditionalParamsStorageProtocol,
@@ -33,7 +33,7 @@ final class CoinsNodesListViewModel: ObservableObject {
         self.nodesAdditionalParamsStorage = nodesAdditionalParamsStorage
         self.processedGroups = processedGroups
         self.apiServiceCompose = apiServiceCompose
-        Task { @MainActor in setup() }
+        setup()
     }
     
     func setIsEnabled(id: UUID, group: NodeGroup, value: Bool) {
