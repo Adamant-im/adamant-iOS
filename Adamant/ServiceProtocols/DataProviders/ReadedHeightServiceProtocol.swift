@@ -9,7 +9,6 @@
 import Foundation
 
 protocol ReadedHeightServiceProtocol {
-    func markMessageAsRead() async
-    func markChatAsRead() async
-    func getLastReadedHeight(adress: String) async -> Int
+    func getLastReadedTimeStamp(adress: String) async -> Double?
+    func setFirstReadedTimeStamp(adress: String, transactions: Set<ChatTransaction>) async
 }

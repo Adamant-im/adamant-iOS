@@ -1832,16 +1832,27 @@ extension AdamantChatsProvider {
         }
         
         // MARK: 4. Unread messagess
-        if let readedLastHeight = readedLastHeight {
-            var unreadTransactions = newMessageTransactions.filter { $0.height > readedLastHeight }
+        // TODO: NB
+        for (account, _) in partners {
+            guard let chatroom = account.chatroom,
+                  let address = chatroom.partner?.address else { continue }
+            
+            var readedMinimumTimeStamp = await readedHeightService.getLastReadedTimeStamp(adress: address)
+            if readedMinimumTimeStamp == nil {
+                if let trs = chatroom.transactions as? Set<ChatTransaction> {
+                    await readedHeightService.setFirstReadedTimeStamp(adress: address, transactions: trs)
+                }
+            }
+            readedMinimumTimeStamp = await readedHeightService.getLastReadedTimeStamp(adress: address) ?? Double.greatestFiniteMagnitude
+            let transactionDate = Date(timeIntervalSince1970: readedMinimumTimeStamp!)
+            var unreadTransactions = newMessageTransactions
+                .filter { $0.dateValue != nil && $0.dateValue! > transactionDate }
             if unreadTransactions.count == 0 {
                 unreadTransactions = newMessageTransactions.filter { $0.height == 0 }
             }
             let chatrooms = Dictionary(grouping: unreadTransactions, by: ({ (t: ChatTransaction) -> Chatroom in t.chatroom! }))
             for (chatroom, trs) in chatrooms {
-                if let address = chatroom.partner?.address {
-                    chatroom.isHidden = self.blockList.contains(address)
-                }
+                chatroom.isHidden = self.blockList.contains(address)
                 chatroom.hasUnreadMessages = true
                 trs.forEach { $0.isUnread = true }
             }

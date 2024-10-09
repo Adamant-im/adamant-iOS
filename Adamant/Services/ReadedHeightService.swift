@@ -9,26 +9,48 @@
 import Foundation
 import CommonKit
 
+struct ReadedHeight: Codable {
+    let timeStamp: Double
+    var unreadTransactions: [String]
+}
+
 actor ReadedHeightService {
     
-    private var chatsReadHeight: [String: Int] {
+    private var chatsReadHeight: [String: ReadedHeight] {
         get {
-            let rv = UserDefaults.standard.dictionary(forKey: StoreKey.chatProvider.readedHeights) as? [String: Int]
-            return rv ?? [:]
+            guard let data = UserDefaults.standard.data(forKey: StoreKey.chatProvider.readedHeights),
+                  let rv = try? JSONDecoder().decode([String: ReadedHeight].self, from: data) else {
+                return [:]
+            }
+            return rv
         }
         set {
-            UserDefaults.standard.set(newValue, forKey: StoreKey.chatProvider.readedHeights)
+            if let data = try? JSONEncoder().encode(newValue) {
+                UserDefaults.standard.set(data, forKey: StoreKey.chatProvider.readedHeights)
+            }
         }
     }
     
 }
 
 extension ReadedHeightService: ReadedHeightServiceProtocol {
-    func markMessageAsRead() {}
+    func getLastReadedTimeStamp(adress: String) -> Double? {
+        return chatsReadHeight[adress]?.timeStamp
+    }
     
-    func markChatAsRead() {}
-    
-    func getLastReadedHeight(adress: String) -> Int {
-        return chatsReadHeight[adress] ?? .max
+    func setFirstReadedTimeStamp(adress: String, transactions: Set<ChatTransaction>) {
+        let trs = transactions.compactMap { $0.dateValue }
+        
+        guard let maxReadedDate = trs.max() else { return }
+        let maxReadedTimeStamp = maxReadedDate.timeIntervalSince1970
+        
+        var readedHeight = ReadedHeight(timeStamp: maxReadedTimeStamp, unreadTransactions: [])
+        
+        for tr in transactions where tr.dateValue == maxReadedDate {
+            readedHeight.unreadTransactions.append(tr.txId)
+        }
+        
+        print("AAAA set timeStamp \(adress) \(readedHeight.timeStamp)")
+        chatsReadHeight[adress] = readedHeight
     }
 }
