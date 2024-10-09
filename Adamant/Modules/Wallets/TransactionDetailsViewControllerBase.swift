@@ -436,6 +436,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         detailsSection.append(recipientRow)
         
         // MARK: Date
+        // TODOLATER
 //        let dateRow = LabelRow { [weak self] in
 //            $0.disabled = true
 //            $0.tag = Rows.date.tag

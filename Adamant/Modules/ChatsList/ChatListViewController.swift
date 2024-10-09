@@ -738,6 +738,7 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
         for type: NSFetchedResultsChangeType,
         newIndexPath: IndexPath?
     ) {
+        // TODOLATER
 //        Task { @MainActor in
 //            if isBusy { return }
 //            switch controller {

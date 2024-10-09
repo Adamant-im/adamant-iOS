@@ -45,7 +45,7 @@ extension StoreKey {
 
 // MARK: - Application
 @main
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, @unchecked Sendable {
     var window: UIWindow?
     var repeater: RepeaterService!
     var container: AppContainer!
@@ -383,7 +383,10 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
-//        Task { @MainActor [weak self] in
+        // TODOLATER
+        let completionHandler = UnsafeSendableAction(completionHandler).perform
+        
+        Task { @MainActor in
 //            var chatListNav: UINavigationController?
 //            var chatListVC: ChatListViewController?
 //            
@@ -393,7 +396,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 //                  let transactionRaw = userInfo[AdamantNotificationUserInfoKeys.transaction] as? String,
 //                  let data = transactionRaw.data(using: .utf8),
 //                  let trs = try? JSONDecoder().decode(Transaction.self, from: data),
-//                  let tabbar = self?.window?.rootViewController as? UITabBarController
+//                  let tabbar = window?.rootViewController as? UITabBarController
 //            else {
 //                completionHandler()
 //                return
@@ -433,7 +436,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 //            }
 //            
 //            completionHandler()
-//        }
+        }
     }
 }
 

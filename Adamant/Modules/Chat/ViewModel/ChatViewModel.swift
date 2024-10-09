@@ -1706,6 +1706,7 @@ private extension Sequence where Element == ChatTransaction {
 
 extension ChatViewModel: ElegantEmojiPickerDelegate {
     nonisolated func emojiPicker(_ picker: ElegantEmojiPicker, didSelectEmoji emoji: Emoji?) {
+        // TODOLATER
 //        MainActor.assumeIsolated {
 //            dialog.send(.dismissMenu)
 //            

@@ -414,6 +414,7 @@ extension AdamantNotificationsService: NSFetchedResultsControllerDelegate {
         for type: NSFetchedResultsChangeType,
         newIndexPath: IndexPath?
     ) {
+        // TOTOLATER
 //        Task { @MainActor in
 //            guard
 //                let transaction = anObject as? ChatTransaction,
