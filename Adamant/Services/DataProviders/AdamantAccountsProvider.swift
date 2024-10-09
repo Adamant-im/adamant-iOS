@@ -99,7 +99,7 @@ final class AdamantAccountsProvider: AccountsProvider {
             object: nil,
             queue: OperationQueue.main
         ) { [weak self] notification in
-            MainActor.assumeIsolated {
+            MainActor.assumeIsolatedSafe {
                 guard let changes = notification.userInfo?[AdamantUserInfoKey.AddressBook.changes] as? [AddressBookChange],
                     let viewContext = self?.stack.container.viewContext else {
                     return

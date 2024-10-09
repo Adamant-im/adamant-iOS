@@ -328,7 +328,7 @@ final class AccountViewController: FormViewController {
                 object: nil,
                 queue: OperationQueue.main,
                 using: { notification in
-                    MainActor.assumeIsolated {
+                    MainActor.assumeIsolatedSafe {
                         callback(notification)
                     }
                 }
@@ -861,7 +861,7 @@ final class AccountViewController: FormViewController {
             object: nil,
             queue: OperationQueue.main
         ) { [weak self] _ in
-            MainActor.assumeIsolated {
+            MainActor.assumeIsolatedSafe {
                 guard let self = self else { return }
                 
                 self.updateAccountInfo()
@@ -886,7 +886,7 @@ final class AccountViewController: FormViewController {
             object: nil,
             queue: OperationQueue.main
         ) { [weak self] _ in
-            MainActor.assumeIsolated {
+            MainActor.assumeIsolatedSafe {
                 self?.updateAccountInfo()
             }
         }
@@ -896,7 +896,7 @@ final class AccountViewController: FormViewController {
             object: nil,
             queue: OperationQueue.main
         ) { [weak self] _ in
-            MainActor.assumeIsolated {
+            MainActor.assumeIsolatedSafe {
                 self?.updateAccountInfo()
             }
         }
@@ -906,7 +906,7 @@ final class AccountViewController: FormViewController {
             object: nil,
             queue: OperationQueue.main
         ) { [weak self] _ in
-            MainActor.assumeIsolated {
+            MainActor.assumeIsolatedSafe {
                 guard let form = self?.form, let accountService = self?.accountService else {
                     return
                 }
@@ -933,7 +933,7 @@ final class AccountViewController: FormViewController {
             object: nil,
             queue: OperationQueue.main
         ) { [weak self] notification in
-            MainActor.assumeIsolated {
+            MainActor.assumeIsolatedSafe {
                 guard let newMode = notification.userInfo?[AdamantUserInfoKey.NotificationsService.newNotificationsMode] as? NotificationsMode else {
                     return
                 }
@@ -952,7 +952,7 @@ final class AccountViewController: FormViewController {
             object: nil,
             queue: OperationQueue.main
         ) { [weak self] notification in
-            MainActor.assumeIsolated {
+            MainActor.assumeIsolatedSafe {
                 guard
                     let vc = notification.object as? WalletViewController,
                     let cvc = self?.pagingViewController.pageViewController.selectedViewController,
@@ -972,7 +972,7 @@ final class AccountViewController: FormViewController {
             object: nil,
             queue: OperationQueue.main
         ) { [weak self] _ in
-            MainActor.assumeIsolated {
+            MainActor.assumeIsolatedSafe {
                 guard let self = self else { return }
                 
                 self.setupWalletsVC()
@@ -990,7 +990,7 @@ final class AccountViewController: FormViewController {
             let notification = service.walletUpdatedNotification
             
             let callback: @Sendable (Notification) -> Void = { [weak self] _ in
-                MainActor.assumeIsolated {
+                MainActor.assumeIsolatedSafe {
                     guard let self = self else { return }
                     let collectionView = self.pagingViewController.collectionView
                     collectionView.reloadData()

@@ -65,7 +65,7 @@ extension LoginViewController {
 // MARK: - QRCodeReaderViewControllerDelegate
 extension LoginViewController: QRCodeReaderViewControllerDelegate {
     nonisolated func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
-        MainActor.assumeIsolated {
+        MainActor.assumeIsolatedSafe {
             guard AdamantUtilities.validateAdamantPassphrase(passphrase: result.value) else {
                 dialogService.showWarning(withMessage: String.adamant.login.wrongQrError)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -80,7 +80,7 @@ extension LoginViewController: QRCodeReaderViewControllerDelegate {
     }
     
     nonisolated func readerDidCancel(_ reader: QRCodeReaderViewController) {
-        MainActor.assumeIsolated {
+        MainActor.assumeIsolatedSafe {
             reader.dismiss(animated: true, completion: nil)
         }
     }

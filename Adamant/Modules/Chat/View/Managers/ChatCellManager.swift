@@ -19,13 +19,13 @@ final class ChatCellManager: MessageCellDelegate {
     }
     
     nonisolated func didSelectURL(_ url: URL) {
-        MainActor.assumeIsolated {
+        MainActor.assumeIsolatedSafe {
             viewModel.didSelectURL(url)
         }
     }
     
     nonisolated func didTapMessage(in cell: MessageCollectionViewCell) {
-        MainActor.assumeIsolated {
+        MainActor.assumeIsolatedSafe {
             guard
                 let id = getMessageId?(cell),
                 let message = viewModel.messages.first(where: { $0.id == id }),

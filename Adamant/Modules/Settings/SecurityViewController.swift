@@ -273,7 +273,7 @@ final class SecurityViewController: FormViewController {
             object: nil,
             queue: OperationQueue.main
         ) { [weak self] _ in
-            MainActor.assumeIsolated { self?.reloadForm() }
+            MainActor.assumeIsolatedSafe { self?.reloadForm() }
         }
         
         NotificationCenter.default.addObserver(
@@ -281,7 +281,7 @@ final class SecurityViewController: FormViewController {
             object: nil,
             queue: OperationQueue.main
         ) { [weak self] _ in
-            MainActor.assumeIsolated { self?.reloadForm() }
+            MainActor.assumeIsolatedSafe { self?.reloadForm() }
         }
         
         NotificationCenter.default.addObserver(
@@ -289,7 +289,7 @@ final class SecurityViewController: FormViewController {
             object: nil,
             queue: OperationQueue.main
         ) { [weak self] notification in
-            MainActor.assumeIsolated {
+            MainActor.assumeIsolatedSafe {
                 guard let newMode = notification.userInfo?[AdamantUserInfoKey.NotificationsService.newNotificationsMode] as? NotificationsMode else {
                     return
                 }

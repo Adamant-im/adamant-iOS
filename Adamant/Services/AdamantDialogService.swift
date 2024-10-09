@@ -629,7 +629,7 @@ private class MailDelegate: NSObject, MFMailComposeViewControllerDelegate {
         didFinishWith result: MFMailComposeResult,
         error: Error?
     ) {
-        MainActor.assumeIsolated {
+        MainActor.assumeIsolatedSafe {
             controller.dismiss(animated: true, completion: nil)
         }
     }

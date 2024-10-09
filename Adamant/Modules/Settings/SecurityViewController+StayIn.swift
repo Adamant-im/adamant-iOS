@@ -102,7 +102,7 @@ extension SecurityViewController {
 // MARK: - PinpadViewControllerDelegate
 extension SecurityViewController: PinpadViewControllerDelegate {
     nonisolated func pinpad(_ pinpad: PinpadViewController, didEnterPin pin: String) {
-        MainActor.assumeIsolated {
+        MainActor.assumeIsolatedSafe {
             switch pinpadRequest {
                 
             // MARK: User has entered new pin first time. Request re-enter pin
@@ -188,7 +188,7 @@ extension SecurityViewController: PinpadViewControllerDelegate {
     }
     
     nonisolated func pinpadDidTapBiometryButton(_ pinpad: PinpadViewController) {
-        MainActor.assumeIsolated {
+        MainActor.assumeIsolatedSafe {
             switch pinpadRequest {
                 
             // MARK: User wants to turn of StayIn with his face. Or finger.
@@ -225,7 +225,7 @@ extension SecurityViewController: PinpadViewControllerDelegate {
     }
     
     nonisolated func pinpadDidCancel(_ pinpad: PinpadViewController) {
-        MainActor.assumeIsolated {
+        MainActor.assumeIsolatedSafe {
             switch pinpadRequest {
                 
             // MARK: User canceled turning on StayIn

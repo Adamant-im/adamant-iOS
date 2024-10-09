@@ -36,7 +36,7 @@ final class FixedTextMessageSizeCalculator: MessageSizeCalculator, @unchecked Se
      }
 
      override func messageContainerSize(for message: MessageType, at indexPath: IndexPath) -> CGSize {
-         MainActor.assumeIsolated {
+         MainActor.assumeIsolatedSafe {
              let maxWidth = messageContainerMaxWidth(for: message, at: indexPath)
 
              var messageContainerSize: CGSize = .zero
@@ -100,7 +100,7 @@ final class FixedTextMessageSizeCalculator: MessageSizeCalculator, @unchecked Se
 
      override func configure(attributes: UICollectionViewLayoutAttributes) {
          super.configure(attributes: attributes)
-         MainActor.assumeIsolated {
+         MainActor.assumeIsolatedSafe {
              guard let attributes = attributes as? MessagesCollectionViewLayoutAttributes else { return }
 
              let dataSource = messagesLayout.messagesDataSource
@@ -131,7 +131,7 @@ final class FixedTextMessageSizeCalculator: MessageSizeCalculator, @unchecked Se
 
  private extension FixedTextMessageSizeCalculator {
      func messageLabelInsets(for message: MessageType) -> UIEdgeInsets {
-         MainActor.assumeIsolated {
+         MainActor.assumeIsolatedSafe {
              let dataSource = messagesLayout.messagesDataSource
              let isFromCurrentSender = dataSource.isFromCurrentSender(message: message)
              return isFromCurrentSender

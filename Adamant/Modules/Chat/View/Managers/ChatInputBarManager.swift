@@ -18,7 +18,7 @@ final class ChatInputBarManager: InputBarAccessoryViewDelegate {
     }
     
     nonisolated func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
-        MainActor.assumeIsolated {
+        MainActor.assumeIsolatedSafe {
             guard viewModel.canSendMessage(withText: text) else { return }
             inputBar.inputTextView.text = ""
             viewModel.sendMessage(text: text)

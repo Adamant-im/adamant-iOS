@@ -180,7 +180,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 object: reachability,
                 queue: OperationQueue.main
             ) { [weak self] notification in
-                MainActor.assumeIsolated {
+                MainActor.assumeIsolatedSafe {
                     guard let connection = notification.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? Bool,
                         let repeater = self?.repeater else {
                             return
@@ -263,7 +263,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             object: nil,
             queue: OperationQueue.main
         ) { _ in
-            MainActor.assumeIsolated {
+            MainActor.assumeIsolatedSafe {
                 resetScreensAction()
             }
         }

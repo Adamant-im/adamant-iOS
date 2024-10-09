@@ -411,7 +411,7 @@ extension NewChatViewController {
 // MARK: - QRCodeReaderViewControllerDelegate
 extension NewChatViewController: QRCodeReaderViewControllerDelegate {
     nonisolated func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
-        MainActor.assumeIsolated {
+        MainActor.assumeIsolatedSafe {
             if let admAddress = result.value.getAdamantAddress() {
                 startNewChat(with: admAddress.address, name: admAddress.name, message: admAddress.message)
                 dismiss(animated: true, completion: nil)
@@ -428,7 +428,7 @@ extension NewChatViewController: QRCodeReaderViewControllerDelegate {
     }
     
     nonisolated func readerDidCancel(_ reader: QRCodeReaderViewController) {
-        MainActor.assumeIsolated {
+        MainActor.assumeIsolatedSafe {
             reader.dismiss(animated: true, completion: nil)
         }
     }

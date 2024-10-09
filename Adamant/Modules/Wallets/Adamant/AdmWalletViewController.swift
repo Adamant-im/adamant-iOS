@@ -193,7 +193,7 @@ final class AdmWalletViewController: WalletViewControllerBase {
                 forName: service.core.walletUpdatedNotification,
                 object: service.core,
                 queue: OperationQueue.main,
-                using: { [weak self] _ in MainActor.assumeIsolated { self?.updateRows() } }
+                using: { [weak self] _ in MainActor.assumeIsolatedSafe { self?.updateRows() } }
             )
         }
         
@@ -202,7 +202,7 @@ final class AdmWalletViewController: WalletViewControllerBase {
             object: nil,
             queue: OperationQueue.main
         ) { [weak self] _ in
-            MainActor.assumeIsolated {
+            MainActor.assumeIsolatedSafe {
                 self?.updateRows()
                 self?.tableView.reloadData()
             }

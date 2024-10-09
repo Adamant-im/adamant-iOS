@@ -360,7 +360,7 @@ final class LoginViewController: FormViewController {
                 object: row.cell.textField,
                 queue: OperationQueue.main
             ) { [weak self] _ in
-                MainActor.assumeIsolated {
+                MainActor.assumeIsolatedSafe {
                     guard let tableView = self?.tableView, let indexPath = self?.form.rowBy(tag: Rows.loginButton.tag)?.indexPath else {
                         return
                     }
@@ -376,7 +376,7 @@ final class LoginViewController: FormViewController {
             object: nil,
             queue: OperationQueue.main
         ) { [weak self] _ in
-            MainActor.assumeIsolated {
+            MainActor.assumeIsolatedSafe {
                 guard let vc = self,
                     vc.firstTimeActive,
                     vc.requestBiometryOnFirstTimeActive,

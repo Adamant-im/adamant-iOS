@@ -102,7 +102,7 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
                 object: wallet,
                 queue: OperationQueue.main
             ) { [weak self] _ in
-                MainActor.assumeIsolated {
+                MainActor.assumeIsolatedSafe {
                     guard let self = self else { return }
                     self.tableView.reloadData()
                 }
@@ -114,7 +114,7 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
             object: nil,
             queue: OperationQueue.main
         ) { [weak self] _ in
-            MainActor.assumeIsolated {
+            MainActor.assumeIsolatedSafe {
                 if let previousAppState = self?.previousAppState,
                    previousAppState == .background {
                     self?.previousAppState = .active
@@ -128,7 +128,7 @@ final class VisibleWalletsViewController: KeyboardObservingViewController {
             object: nil,
             queue: OperationQueue.main
         ) { [weak self] _ in
-            MainActor.assumeIsolated {
+            MainActor.assumeIsolatedSafe {
                 self?.previousAppState = .background
             }
         }

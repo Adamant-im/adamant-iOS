@@ -59,7 +59,7 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
         at _: IndexPath,
         in _: MessagesCollectionView
     ) -> LabelAlignment? {
-        MainActor.assumeIsolated {
+        MainActor.assumeIsolatedSafe {
             .init(
                 textAlignment: textAlignment(for: message),
                 textInsets: topBottomLabelInsets
@@ -72,7 +72,7 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
         at _: IndexPath,
         in _: MessagesCollectionView
     ) -> LabelAlignment? {
-        MainActor.assumeIsolated {
+        MainActor.assumeIsolatedSafe {
             .init(
                 textAlignment: textAlignment(for: message),
                 textInsets: topBottomLabelInsets
@@ -85,7 +85,7 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
         at _: IndexPath,
         in messagesCollectionView: MessagesCollectionView
     ) -> CellSizeCalculator? {
-        MainActor.assumeIsolated {
+        MainActor.assumeIsolatedSafe {
             FixedTextMessageSizeCalculator(
                 layout: messagesCollectionView.messagesCollectionViewFlowLayout,
                 getCurrentSender: { [sender = viewModel.sender] in sender },
@@ -99,7 +99,7 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
         at _: IndexPath,
         in messagesCollectionView: MessagesCollectionView
     ) -> CellSizeCalculator {
-        MainActor.assumeIsolated {
+        MainActor.assumeIsolatedSafe {
             FixedTextMessageSizeCalculator(
                 layout: messagesCollectionView.messagesCollectionViewFlowLayout,
                 getCurrentSender: { [sender = viewModel.sender] in sender },
@@ -112,7 +112,7 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
         for section: Int,
         in messagesCollectionView: MessagesCollectionView
     ) -> CGSize {
-        MainActor.assumeIsolated {
+        MainActor.assumeIsolatedSafe {
             viewModel.messages[section].topSpinnerOn
                 ? SpinnerView.size
                 : .zero
@@ -124,7 +124,7 @@ final class ChatLayoutManager: MessagesLayoutDelegate {
         at indexPath: IndexPath,
         in messagesCollectionView: MessagesCollectionView
     ) -> CellSizeCalculator? {
-        MainActor.assumeIsolated {
+        MainActor.assumeIsolatedSafe {
             FixedTextMessageSizeCalculator(
                 layout: messagesCollectionView.messagesCollectionViewFlowLayout,
                 getCurrentSender: { [sender = viewModel.sender] in sender },

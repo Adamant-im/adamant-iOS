@@ -1708,7 +1708,7 @@ extension ChatViewModel: ElegantEmojiPickerDelegate {
     nonisolated func emojiPicker(_ picker: ElegantEmojiPicker, didSelectEmoji emoji: Emoji?) {
         let sendableEmoji = Atomic(emoji)
         
-        MainActor.assumeIsolated {
+        MainActor.assumeIsolatedSafe {
             dialog.send(.dismissMenu)
             
             guard let previousArg = previousArg else { return }

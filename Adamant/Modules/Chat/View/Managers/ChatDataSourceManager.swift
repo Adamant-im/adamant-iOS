@@ -16,7 +16,7 @@ final class ChatDataSourceManager: MessagesDataSource {
     private let viewModel: ChatViewModel
     
     nonisolated var currentSender: SenderType {
-        MainActor.assumeIsolated {
+        MainActor.assumeIsolatedSafe {
             viewModel.sender
         }
     }
@@ -26,21 +26,21 @@ final class ChatDataSourceManager: MessagesDataSource {
     }
     
     nonisolated func numberOfSections(in messagesCollectionView: MessagesCollectionView) -> Int {
-        MainActor.assumeIsolated { viewModel.messages.count }
+        MainActor.assumeIsolatedSafe { viewModel.messages.count }
     }
     
     nonisolated func messageForItem(
         at indexPath: IndexPath,
         in messagesCollectionView: MessagesCollectionView
     ) -> MessageType {
-        MainActor.assumeIsolated { viewModel.messages[indexPath.section] }
+        MainActor.assumeIsolatedSafe { viewModel.messages[indexPath.section] }
     }
     
     nonisolated func messageTopLabelAttributedText(
         for message: MessageType,
         at _: IndexPath
     ) -> NSAttributedString? {
-        MainActor.assumeIsolated {
+        MainActor.assumeIsolatedSafe {
             guard message.fullModel.status == .failed else { return nil }
             
             return .init(
@@ -72,7 +72,7 @@ final class ChatDataSourceManager: MessagesDataSource {
         at indexPath: IndexPath,
         in messagesCollectionView: MessagesCollectionView
     ) -> UICollectionViewCell? {
-        MainActor.assumeIsolated {
+        MainActor.assumeIsolatedSafe {
             if case let .message(model) = message.fullModel.content {
                 let cell = messagesCollectionView.dequeueReusableCell(
                     ChatMessageCell.self,
@@ -126,7 +126,7 @@ final class ChatDataSourceManager: MessagesDataSource {
         at indexPath: IndexPath,
         in messagesCollectionView: MessagesCollectionView
     ) -> UICollectionViewCell {
-        MainActor.assumeIsolated {
+        MainActor.assumeIsolatedSafe {
             if case let .transaction(model) = message.fullModel.content {
                 let cell = messagesCollectionView.dequeueReusableCell(
                     ChatTransactionCell.self,
