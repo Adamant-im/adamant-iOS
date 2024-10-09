@@ -383,7 +383,10 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
-        let completionHandler = UnsafeSendableAction(completionHandler).perform
+        let completionHandler: @Sendable () -> Void = {
+            [atomicCompletionHandler = Atomic(completionHandler)] in
+            atomicCompletionHandler.isolated { $0() }
+        }
         
         Task { @MainActor in
             var chatListNav: UINavigationController?
