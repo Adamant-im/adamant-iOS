@@ -436,35 +436,34 @@ class TransactionDetailsViewControllerBase: FormViewController {
         detailsSection.append(recipientRow)
         
         // MARK: Date
-        // TODOLATER
-//        let dateRow = LabelRow { [weak self] in
-//            $0.disabled = true
-//            $0.tag = Rows.date.tag
-//            $0.title = Rows.date.localized
-//            
-//            if let raw = transaction?.dateValue, let value = self?.dateFormatter.string(from: raw) {
-//                $0.value = value
-//            } else {
-//                $0.value = TransactionDetailsViewControllerBase.awaitingValueString
-//            }
-//        }.cellSetup { (cell, _) in
-//            cell.selectionStyle = .gray
-//            cell.textLabel?.textColor = UIColor.adamant.textColor
-//        }.onCellSelection { [weak self] (cell, _) in
-//            if let value = self?.transaction?.dateValue {
-//                let text = value.humanizedDateTimeFull()
-//                self?.shareValue(text, from: cell)
-//            }
-//        }.cellUpdate { [weak self] (cell, row) in
-//            cell.textLabel?.textColor = UIColor.adamant.textColor
-//            if let raw = self?.transaction?.dateValue, let value = self?.dateFormatter.string(from: raw) {
-//                row.value = value
-//            } else {
-//                row.value = TransactionDetailsViewControllerBase.awaitingValueString
-//            }
-//        }
+        let dateRow = LabelRow {
+            $0.disabled = true
+            $0.tag = Rows.date.tag
+            $0.title = Rows.date.localized
             
-//        detailsSection.append(dateRow)
+            if let raw = transaction?.dateValue {
+                $0.value = dateFormatter.string(from: raw)
+            } else {
+                $0.value = TransactionDetailsViewControllerBase.awaitingValueString
+            }
+        }.cellSetup { (cell, _) in
+            cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
+        }.onCellSelection { [weak self] (cell, _) in
+            if let value = self?.transaction?.dateValue {
+                let text = value.humanizedDateTimeFull()
+                self?.shareValue(text, from: cell)
+            }
+        }.cellUpdate { [weak self] (cell, row) in
+            cell.textLabel?.textColor = UIColor.adamant.textColor
+            if let raw = self?.transaction?.dateValue, let value = self?.dateFormatter.string(from: raw) {
+                row.value = value
+            } else {
+                row.value = TransactionDetailsViewControllerBase.awaitingValueString
+            }
+        }
+            
+        detailsSection.append(dateRow)
         
         // MARK: Amount
         let amountRow = LabelRow {

@@ -1706,26 +1706,27 @@ private extension Sequence where Element == ChatTransaction {
 
 extension ChatViewModel: ElegantEmojiPickerDelegate {
     nonisolated func emojiPicker(_ picker: ElegantEmojiPicker, didSelectEmoji emoji: Emoji?) {
-        // TODOLATER
-//        MainActor.assumeIsolated {
-//            dialog.send(.dismissMenu)
-//            
-//            guard let previousArg = previousArg else { return }
-//            
-//            let emoji = emoji?.emoji == previousArg.selectedEmoji
-//            ? ""
-//            : (emoji?.emoji ?? "")
-//            
-//            let type: EmojiUpdateType = emoji.isEmpty
-//            ? .decrement
-//            : .increment
-//            
-//            emojiService.updateFrequentlySelectedEmojis(
-//                selectedEmoji: emoji,
-//                type: type
-//            )
-//            
-//            reactAction(previousArg.messageId, emoji: emoji)
-//        }
+        let sendableEmoji = UnsafeSendable(emoji)
+        
+        MainActor.assumeIsolated {
+            dialog.send(.dismissMenu)
+            
+            guard let previousArg = previousArg else { return }
+            
+            let emoji = sendableEmoji.value?.emoji == previousArg.selectedEmoji
+            ? ""
+            : (sendableEmoji.value?.emoji ?? "")
+            
+            let type: EmojiUpdateType = emoji.isEmpty
+            ? .decrement
+            : .increment
+            
+            emojiService.updateFrequentlySelectedEmojis(
+                selectedEmoji: emoji,
+                type: type
+            )
+            
+            reactAction(previousArg.messageId, emoji: emoji)
+        }
     }
 }
