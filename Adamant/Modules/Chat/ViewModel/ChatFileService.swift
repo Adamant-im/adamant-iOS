@@ -218,9 +218,8 @@ final class ChatFileService: ChatFileProtocol, @unchecked Sendable {
 private extension ChatFileService {
     func addObservers() {
         NotificationCenter.default
-            .publisher(for: .AdamantReachabilityMonitor.reachabilityChanged)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] data in
+            .notifications(named: .AdamantReachabilityMonitor.reachabilityChanged)
+            .sink { @MainActor [weak self] data in
                 let connection = data.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? Bool
                 
                 guard connection == true else { return }
@@ -229,9 +228,8 @@ private extension ChatFileService {
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .Storage.storageClear)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .Storage.storageClear)
+            .sink { @MainActor [weak self] _ in
                 self?.ignoreFilesIDsArray.removeAll()
                 self?.fileProgressValue.removeAll()
                 self?.fileDownloadAttemptsCount.removeAll()

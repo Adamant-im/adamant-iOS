@@ -56,7 +56,7 @@ final class AdamantAddressBookService: AddressBookService {
         // Update on login
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn)
+            .notifications(named: .AdamantAccountService.userLoggedIn)
             .sink { _ in
                 Task { [weak self] in
                     _ = await self?.update()
@@ -67,7 +67,7 @@ final class AdamantAddressBookService: AddressBookService {
         // Save on logout
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userWillLogOut)
+            .notifications(named: .AdamantAccountService.userWillLogOut)
             .sink { _ in
                 Task { [weak self] in
                     _ = await self?.userWillLogOut()
@@ -78,7 +78,7 @@ final class AdamantAddressBookService: AddressBookService {
         // Clean on logout
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut)
+            .notifications(named: .AdamantAccountService.userLoggedOut)
             .sink { _ in
                 Task { [weak self] in
                     _ = await self?.userLoggedOut()

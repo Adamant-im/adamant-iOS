@@ -14,6 +14,7 @@ actor AdamantTransactionStatusService: NSObject, TransactionStatusService {
     private let walletServiceCompose: WalletServiceCompose
     private let coreDataStack: CoreDataStack
     private let nodesStorage: NodesStorageProtocol
+    private let reachability: ReachabilityMonitor
 
     private lazy var controller = getRichTransactionsController()
     private var networkSubscription: AnyCancellable?
@@ -23,11 +24,13 @@ actor AdamantTransactionStatusService: NSObject, TransactionStatusService {
     init(
         coreDataStack: CoreDataStack,
         walletServiceCompose: WalletServiceCompose,
-        nodesStorage: NodesStorageProtocol
+        nodesStorage: NodesStorageProtocol,
+        reachability: ReachabilityMonitor
     ) {
         self.coreDataStack = coreDataStack
         self.walletServiceCompose = walletServiceCompose
         self.nodesStorage = nodesStorage
+        self.reachability = reachability
         super.init()
         Task { await setupNetworkSubscription() }
     }
@@ -73,9 +76,7 @@ extension AdamantTransactionStatusService: NSFetchedResultsControllerDelegate {
 
 private extension AdamantTransactionStatusService {
     func setupNetworkSubscription() {
-        networkSubscription = NotificationCenter.default
-            .publisher(for: .AdamantReachabilityMonitor.reachabilityChanged)
-            .compactMap { $0.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? Bool }
+        networkSubscription = reachability.connectionPublisher
             .combineLatest(makeNodesAvailabilitySubscription())
             .removeDuplicates { $0.0 == $1.0 && $0.1 == $1.1 }
             .filter { $0.0 }

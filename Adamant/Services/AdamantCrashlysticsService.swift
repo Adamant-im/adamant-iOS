@@ -29,9 +29,9 @@ final class AdamantCrashlyticsService: CrashlyticsService {
         self.securedStore = securedStore
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut)
+            .notifications(named: .AdamantAccountService.userLoggedOut)
             .sink { [weak self] _ in
-                self?.userLoggedOut()
+                await self?.userLoggedOut()
             }
             .store(in: &notificationsSet)
     }

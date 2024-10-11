@@ -353,7 +353,8 @@ struct AppAssembly: MainThreadAssembly {
             AdamantTransactionStatusService(
                 coreDataStack: r.resolve(CoreDataStack.self)!,
                 walletServiceCompose: r.resolve(WalletServiceCompose.self)!,
-                nodesStorage: r.resolve(NodesStorageProtocol.self)!
+                nodesStorage: r.resolve(NodesStorageProtocol.self)!,
+                reachability: r.resolve(ReachabilityMonitor.self)!
             )
         }.inObjectScope(.container)
         

@@ -148,8 +148,8 @@ final class NotificationsViewModel: ObservableObject {
 private extension NotificationsViewModel {
     func addObservers() {
         NotificationCenter.default
-            .publisher(for: .AdamantNotificationService.notificationsSoundChanged)
-            .sink { [weak self] _ in self?.configure() }
+            .notifications(named: .AdamantNotificationService.notificationsSoundChanged)
+            .sink { [weak self] _ in await self?.configure() }
             .store(in: &subscriptions)
         
         $inAppSounds

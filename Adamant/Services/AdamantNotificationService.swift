@@ -83,22 +83,19 @@ final class AdamantNotificationsService: NSObject, NotificationsService {
         super.init()
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in self?.onUserLoggedIn() }
+            .notifications(named: .AdamantAccountService.userLoggedIn, object: nil)
+            .sink { @MainActor [weak self] _ in self?.onUserLoggedIn() }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in self?.onUserLoggedOut() }
+            .notifications(named: .AdamantAccountService.userLoggedOut, object: nil)
+            .sink { @MainActor [weak self] _ in self?.onUserLoggedOut() }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.stayInChanged, object: nil)
-            .receive(on: DispatchQueue.main)
+            .notifications(named: .AdamantAccountService.stayInChanged, object: nil)
             .compactMap { $0.userInfo?[AdamantUserInfoKey.AccountService.newStayInState] as? Bool }
-            .sink { [weak self] in self?.onStayInChanged($0) }
+            .sink { @MainActor [weak self] in self?.onStayInChanged($0) }
             .store(in: &subscriptions)
     }
     

@@ -7,6 +7,13 @@
 //
 
 import Foundation
+import Combine
+
+public extension Task {
+    func eraseToAnyCancellable() -> AnyCancellable {
+        AnyCancellable(cancel)
+    }
+}
 
 public extension Task where Success == Never, Failure == Never {
     static func sleep(interval: TimeInterval) async {

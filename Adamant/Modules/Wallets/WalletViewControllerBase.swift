@@ -406,9 +406,8 @@ private extension WalletViewControllerBase {
         guard let service = service else { return }
         
         NotificationCenter.default
-            .publisher(for: service.core.serviceStateChanged)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] notification in
+            .notifications(named: service.core.serviceStateChanged)
+            .sink { @MainActor [weak self] notification in
                 guard let newState = notification.userInfo?[AdamantUserInfoKey.WalletService.walletState] as? WalletServiceState
                 else { return }
                 
@@ -417,25 +416,22 @@ private extension WalletViewControllerBase {
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: service.core.walletUpdatedNotification)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: service.core.walletUpdatedNotification)
+            .sink { @MainActor [weak self] _ in
                 self?.updateWalletUI()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantCurrencyInfoService.currencyRatesUpdated)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantCurrencyInfoService.currencyRatesUpdated)
+            .sink { @MainActor [weak self] _ in
                 self?.updateWalletUI()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .LanguageStorageService.languageUpdated)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .LanguageStorageService.languageUpdated)
+            .sink { @MainActor [weak self] _ in
                 self?.tableView.reloadData()
                 self?.setTitle()
             }

@@ -148,19 +148,14 @@ final class AdamantAccountsProvider: AccountsProvider {
             }
         }
         
-        Task {
-            await addObservers()
-        }
+        addObservers()
     }
     
     private func addObservers() {
         NotificationCenter.default
-            .publisher(for: .LanguageStorageService.languageUpdated)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
-                Task {
-                    await self?.updateSystemAccountsName()
-                }
+            .notifications(named: .LanguageStorageService.languageUpdated)
+            .sink { @MainActor [weak self] _ in
+                await self?.updateSystemAccountsName()
             }
             .store(in: &subscriptions)
     }

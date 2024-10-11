@@ -184,25 +184,22 @@ extension KlyWalletService: SwinjectDependentService {
 private extension KlyWalletService {
     func addObservers() {
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedIn, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.accountDataUpdated, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.accountDataUpdated, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedOut, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.klyWallet = nil
                 
                 if let balanceObserver = self?.balanceObserver {
@@ -491,7 +488,8 @@ private extension KlyWalletService {
         
         balanceObserver?.cancel()
         
-        balanceObserver = NotificationCenter.default.publisher(for: .AdamantAccountService.accountDataUpdated)
+        balanceObserver = NotificationCenter.default
+            .notifications(named: .AdamantAccountService.accountDataUpdated)
             .compactMap { [weak self] _ in
                 self?.accountService.account?.balance
             }

@@ -1116,9 +1116,8 @@ private extension ChatViewModel {
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantVisibleWalletsService.visibleWallets)
-            .receive(on: RunLoop.main)
-            .sink { [weak self] _ in self?.updateAttachmentButtonAvailability() }
+            .notifications(named: .AdamantVisibleWalletsService.visibleWallets)
+            .sink { @MainActor [weak self] _ in self?.updateAttachmentButtonAvailability() }
             .store(in: &subscriptions)
         
         Task {

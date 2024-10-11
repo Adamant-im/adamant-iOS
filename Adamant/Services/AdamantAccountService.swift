@@ -61,9 +61,8 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
         }
         
         NotificationCenter.default
-            .publisher(for: UIApplication.didBecomeActiveNotification, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: UIApplication.didBecomeActiveNotification, object: nil)
+            .sink { @MainActor [weak self] _ in
                 guard self?.previousAppState == .background else { return }
                 self?.previousAppState = .active
                 self?.update()
@@ -71,9 +70,8 @@ final class AdamantAccountService: AccountService, @unchecked Sendable {
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: UIApplication.willResignActiveNotification, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in self?.previousAppState = .background }
+            .notifications(named: UIApplication.willResignActiveNotification, object: nil)
+            .sink { @MainActor [weak self] _ in self?.previousAppState = .background }
             .store(in: &subscriptions)
         
         setupSecuredStore()

@@ -264,26 +264,23 @@ final class ChatListViewController: KeyboardObservingViewController {
     private func addObservers() {
         // Login/Logout
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedIn, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.initFetchedRequestControllers(provider: self?.chatsProvider)
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedOut, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.initFetchedRequestControllers(provider: nil)
                 self?.areMessagesLoaded = false
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantChatsProvider.initiallySyncedChanged, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { notification in
+            .notifications(named: .AdamantChatsProvider.initiallySyncedChanged, object: nil)
+            .sink { @MainActor notification in
                 Task { [weak self] in
                     await self?.handleInitiallySyncedNotification(notification)
                 }
@@ -291,31 +288,27 @@ final class ChatListViewController: KeyboardObservingViewController {
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantTransfersProvider.stateChanged, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] notification in self?.animateUpdateIfNeeded(notification) }
+            .notifications(named: .AdamantTransfersProvider.stateChanged, object: nil)
+            .sink { @MainActor [weak self] notification in self?.animateUpdateIfNeeded(notification) }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .LanguageStorageService.languageUpdated)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .LanguageStorageService.languageUpdated)
+            .sink { @MainActor [weak self] _ in
                 self?.updateUITitles()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .Storage.storageClear)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .Storage.storageClear)
+            .sink { @MainActor [weak self] _ in
                 self?.closeDetailVC()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .Storage.storageProprietiesUpdated)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .Storage.storageProprietiesUpdated)
+            .sink { @MainActor [weak self] _ in
                 self?.closeDetailVC()
             }
             .store(in: &subscriptions)

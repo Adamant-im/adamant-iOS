@@ -72,8 +72,8 @@ private extension InfoService {
         setupCurrency()
         
         NotificationCenter.default
-            .publisher(for: UIApplication.didBecomeActiveNotification)
-            .sink { _ in Task { [weak self] in self?.update() } }
+            .notifications(named: UIApplication.didBecomeActiveNotification)
+            .sink { [weak self] _ in await self?.update() }
             .store(in: &subscriptions)
     }
     
