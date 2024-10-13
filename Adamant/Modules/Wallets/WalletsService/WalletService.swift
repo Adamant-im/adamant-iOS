@@ -33,11 +33,7 @@ final class WalletService: WalletServiceProtocol {
             return pendingAttemptsCountFilter(oldPendingAttempts: oldPendingAttempts, status: info.status)
                 ? info.status
                 : .failed
-        case .noNetwork:
-            return pendingAttemptsCountFilter(oldPendingAttempts: oldPendingAttempts, status: info.status)
-                ? info.status
-                : .noNetworkFinal
-        case .failed, .inconsistent, .registered, .notInitiated, .noNetworkFinal:
+        case .failed, .inconsistent, .registered, .notInitiated:
             return info.status
         }
     }

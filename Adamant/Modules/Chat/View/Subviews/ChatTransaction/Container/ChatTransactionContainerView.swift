@@ -271,7 +271,7 @@ private extension TransactionStatus {
     var image: UIImage {
         switch self {
         case .notInitiated: return .asset(named: "status_updating") ?? .init()
-        case .pending, .registered, .noNetwork, .noNetworkFinal: return .asset(named: "status_pending") ?? .init()
+        case .pending, .registered: return .asset(named: "status_pending") ?? .init()
         case .success: return .asset(named: "status_success") ?? .init()
         case .failed: return .asset(named: "status_failed") ?? .init()
         case .inconsistent: return .asset(named: "status_warning") ?? .init()
@@ -281,7 +281,7 @@ private extension TransactionStatus {
     var imageTintColor: UIColor {
         switch self {
         case .notInitiated: return .adamant.secondary
-        case .pending, .registered, .noNetwork, .noNetworkFinal: return .adamant.primary
+        case .pending, .registered: return .adamant.primary
         case .success: return .adamant.active
         case .failed, .inconsistent: return .adamant.attention
         }

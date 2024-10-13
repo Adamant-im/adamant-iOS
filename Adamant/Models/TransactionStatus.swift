@@ -51,8 +51,6 @@ enum TransactionStatus: Codable, Equatable, Hashable {
     case failed
     case registered
     case inconsistent(InconsistentReason)
-    case noNetwork
-    case noNetworkFinal
     
     var localized: String {
         switch self {
@@ -66,8 +64,6 @@ enum TransactionStatus: Codable, Equatable, Hashable {
             return .localized("TransactionStatus.Failed", comment: "Transaction status: transaction failed")
         case .inconsistent:
             return .localized("TransactionStatus.Inconsistent", comment: "Transaction status: transaction warning")
-        case .noNetwork, .noNetworkFinal:
-            return .localized("Error.NoNetwork", comment: "Shared error: Network problems. In most cases - no connection")
         }
     }
 }

@@ -16,7 +16,7 @@ private extension TransactionStatus {
     var color: UIColor {
         switch self {
         case .failed: return .adamant.warning
-        case .notInitiated, .inconsistent, .noNetwork, .noNetworkFinal, .pending, .registered: return .adamant.attention
+        case .notInitiated, .inconsistent, .pending, .registered: return .adamant.attention
         case .success: return .adamant.success
         }
     }

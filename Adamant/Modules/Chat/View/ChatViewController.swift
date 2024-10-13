@@ -985,7 +985,7 @@ private extension ChatViewController {
             }
             
             navigationController?.pushViewController(vc, animated: true)
-        case .notInitiated, .pending, .success, .none, .inconsistent, .registered, .noNetwork, .noNetworkFinal:
+        case .notInitiated, .pending, .success, .none, .inconsistent, .registered:
             navigationController?.pushViewController(vc, animated: true)
         }
     }
