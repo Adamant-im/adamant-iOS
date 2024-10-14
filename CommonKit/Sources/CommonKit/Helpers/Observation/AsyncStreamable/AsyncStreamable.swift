@@ -7,9 +7,9 @@
 
 import Foundation
 
-public protocol AsyncStreamable: Sendable {
+public protocol AsyncStreamable<Element>: Sendable {
     associatedtype Element: Sendable
-    associatedtype ProducedSequence: AsyncSequence where ProducedSequence.Element == Element
+    associatedtype ProducedSequence: AsyncSequence & Sendable where ProducedSequence.Element == Element
     
     func makeSequence() -> ProducedSequence
 }

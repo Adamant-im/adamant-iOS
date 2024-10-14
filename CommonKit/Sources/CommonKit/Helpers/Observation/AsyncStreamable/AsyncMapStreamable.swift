@@ -8,22 +8,22 @@
 import Foundation
 
 public struct AsyncMapStreamable<
-    WrappedStreamable: AsyncStreamable,
-    NewProducedSequence: AsyncSequence
+    Wrapped: AsyncStreamable,
+    NewProducedSequence: AsyncSequence & Sendable
 >: AsyncStreamable where NewProducedSequence.Element: Sendable {
-    private let wrappedStreamable: WrappedStreamable
-    private let transformation: @Sendable (WrappedStreamable.ProducedSequence) -> NewProducedSequence
+    private let wrapped: Wrapped
+    private let transformation: @Sendable (Wrapped.ProducedSequence) -> NewProducedSequence
     
     public init(
-        wrappedStreamable: WrappedStreamable,
-        transformation: @escaping @Sendable (WrappedStreamable.ProducedSequence) -> NewProducedSequence
+        wrapped: Wrapped,
+        transformation: @escaping @Sendable (Wrapped.ProducedSequence) -> NewProducedSequence
     ) {
-        self.wrappedStreamable = wrappedStreamable
+        self.wrapped = wrapped
         self.transformation = transformation
     }
     
     public func makeSequence() -> NewProducedSequence {
-        transformation(wrappedStreamable.makeSequence())
+        transformation(wrapped.makeSequence())
     }
 }
 
@@ -31,6 +31,6 @@ public extension AsyncStreamable {
     func map<NewProducedSequence>(
         _ transformation: @escaping @Sendable (ProducedSequence) -> NewProducedSequence
     ) -> AsyncMapStreamable<Self, NewProducedSequence> {
-        .init(wrappedStreamable: self, transformation: transformation)
+        .init(wrapped: self, transformation: transformation)
     }
 }

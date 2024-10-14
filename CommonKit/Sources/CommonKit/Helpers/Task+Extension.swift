@@ -11,7 +11,15 @@ import Combine
 
 public extension Task {
     func eraseToAnyCancellable() -> AnyCancellable {
-        AnyCancellable(cancel)
+        .init(cancel)
+    }
+    
+    func store<C>(in collection: inout C) where C: RangeReplaceableCollection, C.Element == AnyCancellable {
+        eraseToAnyCancellable().store(in: &collection)
+    }
+
+    func store(in set: inout Set<AnyCancellable>) {
+        eraseToAnyCancellable().store(in: &set)
     }
 }
 
@@ -29,14 +37,14 @@ public extension Task where Success == Never, Failure == Never {
 
 @discardableResult
 private func _sync<T: Sendable>(_ action: @Sendable @escaping () async -> T) -> T {
-    let result = Atomic<T?>(wrappedValue: nil)
+    var result: T?
     let semaphore = DispatchSemaphore(value: .zero)
     
     Task {
-        result.value = await action()
+        result = await action()
         semaphore.signal()
     }
     
     semaphore.wait()
-    return result.value!
+    return result!
 }
