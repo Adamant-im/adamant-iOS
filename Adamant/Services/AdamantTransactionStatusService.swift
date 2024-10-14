@@ -72,12 +72,26 @@ private extension AdamantTransactionStatusService {
         let blockchain: String
     }
 
-    struct RichTransferData {
+    final class RichTransferData {
         let provider: WalletService
         var status: TransactionStatus
         var transactions: [String: RichMessageTransaction]
         var oldPendingAttempts: Int
         var subscription: AnyCancellable?
+        
+        init(
+            provider: WalletService,
+            status: TransactionStatus,
+            transactions: [String: RichMessageTransaction],
+            oldPendingAttempts: Int,
+            subscription: AnyCancellable? = nil
+        ) {
+            self.provider = provider
+            self.status = status
+            self.transactions = transactions
+            self.oldPendingAttempts = oldPendingAttempts
+            self.subscription = subscription
+        }
     }
 
     enum TransactionStatusState {
