@@ -30,18 +30,18 @@ public extension Task where Success == Never, Failure == Never {
     
     /// Avoid using it. It lowers performance due to changing threads.
     @discardableResult
-    static func sync<T: Sendable>(_ action: @Sendable @escaping () async -> T) -> T {
-        _sync(action)
+    static func sync<T: Sendable>(_ action: @Sendable @escaping () async throws -> T) rethrows -> T {
+        try _sync(action)
     }
 }
 
 @discardableResult
-private func _sync<T: Sendable>(_ action: @Sendable @escaping () async -> T) -> T {
+private func _sync<T: Sendable>(_ action: @Sendable @escaping () async throws -> T) rethrows -> T {
     var result: T?
     let semaphore = DispatchSemaphore(value: .zero)
     
     Task {
-        result = await action()
+        result = try await action()
         semaphore.signal()
     }
     

@@ -28,8 +28,8 @@ actor AdamantChatsProvider: ChatsProvider {
     let stack: CoreDataStack
     
     // MARK: Properties
-    @ObservableValue private var stateNotifier: State = .empty
-    var stateObserver: AnyObservable<State> { $stateNotifier.eraseToAnyPublisher() }
+    private let stateNotifier = SendablePublisher(ObservableValue(State.empty))
+    var stateObserver: AnyAsyncStreamable<State> { stateNotifier.eraseToAnyAsyncStreamable() }
     
     private(set) var state: State = .empty
     private(set) var receivedLastHeight: Int64?
@@ -43,9 +43,12 @@ actor AdamantChatsProvider: ChatsProvider {
     private(set) var blockList: [String] = []
     private(set) var removedMessages: [String] = []
     
-    @ObservableValue private var chatLoadingStatusDictionary: [String: ChatRoomLoadingStatus] = [:]
-    var chatLoadingStatusPublisher: AnyObservable<[String: ChatRoomLoadingStatus]> {
-        $chatLoadingStatusDictionary.eraseToAnyPublisher()
+    private let chatLoadingStatusDictionary = SendablePublisher(ObservableValue(
+        [String: ChatRoomLoadingStatus]()
+    ))
+    
+    var chatLoadingStatus: AnyAsyncStreamable<[String: ChatRoomLoadingStatus]> {
+        chatLoadingStatusDictionary.eraseToAnyAsyncStreamable()
     }
     
     var chatMaxMessages: [String : Int] = [:]
@@ -243,7 +246,10 @@ actor AdamantChatsProvider: ChatsProvider {
                 ]
             )
             
-            stateNotifier = state
+            // TODO: Remove Task.sync
+            Task.sync { [weak self] in
+                await self?.stateNotifier.isolated { $0.publisher.value = state }
+            }
             return
         }
         
@@ -258,7 +264,10 @@ actor AdamantChatsProvider: ChatsProvider {
             ]
         )
         
-        stateNotifier = state
+        // TODO: Remove Task.sync
+        Task.sync { [weak self] in
+            await self?.stateNotifier.isolated { $0.publisher.value = state }
+        }
     }
     
     private func setupSecuredStore() {
@@ -297,9 +306,12 @@ extension AdamantChatsProvider {
         readedLastHeight = nil
         roomsMaxCount = nil
         roomsLoadedCount = nil
-        chatLoadingStatusDictionary.removeAll()
         chatMaxMessages.removeAll()
         chatLoadedMessages.removeAll()
+        
+        Task.sync { [self] in
+            await chatLoadingStatusDictionary.isolated { $0.publisher.value.removeAll() }
+        }
         
         // Drop store
         securedStore.remove(StoreKey.chatProvider.address)
@@ -510,7 +522,7 @@ extension AdamantChatsProvider {
                 limit: limit
             ).get()
             return chatrooms
-        } catch let error as ApiServiceError {
+        } catch let error {
             guard case .networkError = error else {
                 return nil
             }
@@ -656,19 +668,27 @@ extension AdamantChatsProvider {
     }
     
     func isChatLoading(with addressRecipient: String) -> Bool {
-        chatLoadingStatusDictionary[addressRecipient] == .loading
+        Task.sync { [self] in
+            await chatLoadingStatusDictionary.isolated { $0.publisher.value[addressRecipient] == .loading }
+        }
     }
     
     func isChatLoaded(with addressRecipient: String) -> Bool {
-        chatLoadingStatusDictionary[addressRecipient] == .loaded
+        Task.sync { [self] in
+            await chatLoadingStatusDictionary.isolated { $0.publisher.value[addressRecipient] == .loaded }
+        }
     }
     
     func getChatStatus(for recipient: String) -> ChatRoomLoadingStatus {
-        chatLoadingStatusDictionary[recipient] ?? .none
+        Task.sync { [self] in
+            await chatLoadingStatusDictionary.isolated { $0.publisher.value[recipient] ?? .none }
+        }
     }
     
     func setChatStatus(for recipient: String, status: ChatRoomLoadingStatus) {
-        chatLoadingStatusDictionary[recipient] = status
+        Task.sync { [self] in
+            await chatLoadingStatusDictionary.isolated { $0.publisher.value[recipient] = status }
+        }
     }
 }
 
@@ -819,7 +839,7 @@ extension AdamantChatsProvider {
             )
         }
         
-        let transaction = try await sendMessageToServer(
+        _ = try await sendMessageToServer(
             senderId: loggedAccount.address,
             recipientId: recipientId,
             transaction: transactionLocaly,
@@ -1312,7 +1332,7 @@ extension AdamantChatsProvider {
                         
             return transaction
         } catch {
-            guard case let(apiError) = (error as? ApiServiceError),
+            guard case let(apiError) = (error as ApiServiceError),
                   case let(.serverError(text)) = apiError,
                   text.contains("Transaction is already confirmed")
                     || text.contains("Transaction is already processed")

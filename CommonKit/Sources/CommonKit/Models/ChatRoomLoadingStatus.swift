@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum ChatRoomLoadingStatus {
+public enum ChatRoomLoadingStatus: Sendable {
     case loaded
     case loading
     case none

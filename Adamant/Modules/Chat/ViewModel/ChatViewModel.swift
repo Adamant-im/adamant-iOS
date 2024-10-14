@@ -6,7 +6,7 @@
 //  Copyright © 2022 Adamant. All rights reserved.
 //
 
-@preconcurrency import Combine
+import Combine
 import CoreData
 import MarkdownKit
 import UIKit
@@ -1122,8 +1122,8 @@ private extension ChatViewModel {
         
         Task {
             await chatsProvider.stateObserver
-                .receive(on: DispatchQueue.main)
-                .sink { [weak self] state in
+                .makeSequence()
+                .sink { @MainActor [weak self] state in
                     self?.isHeaderLoading = state == .updating ? true : false
                 }
                 .store(in: &subscriptions)
@@ -1198,7 +1198,7 @@ private extension ChatViewModel {
         updateMessages(
             resetLoadingProperty: performFetch,
             completion: isNewReaction
-                ? { @Sendable [commitVibro] in commitVibro.send() }
+                ? { @MainActor [commitVibro] in commitVibro.send() }
                 : {}
         )
     }
@@ -1468,22 +1468,11 @@ private extension ChatViewModel {
     }
     
     func waitForChatLoading(with address: String) async {
-        await withUnsafeContinuation { continuation in
-            Task {
-                let publisher = await chatsProvider.chatLoadingStatusPublisher
-                publisher
-                    .filter { dict in
-                        dict.contains {
-                            $0.key == address && $0.value == .loaded
-                        }
-                    }
-                    .receive(on: DispatchQueue.main)
-                    .sink { [weak self] _ in
-                        self?.tempCancellables.removeAll()
-                        continuation.resume()
-                    }.store(in: &tempCancellables)
-            }
-        }
+        _ = await chatsProvider.chatLoadingStatus.makeSequence()
+            .filter { $0.contains { $0.key == address && $0.value == .loaded } }
+            .first
+        
+        tempCancellables.removeAll()
     }
     
     // TODO: Post process

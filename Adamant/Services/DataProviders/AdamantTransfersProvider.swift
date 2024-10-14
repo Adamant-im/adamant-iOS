@@ -24,9 +24,18 @@ actor AdamantTransfersProvider: TransfersProvider {
     let securedStore: SecuredStore
     private let transactionService: ChatTransactionService
     weak var chatsProvider: ChatsProvider?
+    private let statePublisher = SendablePublisher(ObservableValue(State.empty))
     
-    @ObservableValue private(set) var state: State = .empty
-    var stateObserver: AnyObservable<State> { $state.eraseToAnyPublisher() }
+    var state: State {
+        Task.sync { [self] in
+            await statePublisher.isolated { $0.publisher.value }
+        }
+    }
+    
+    var stateObserver: AnyAsyncStreamable<State> {
+        statePublisher.eraseToAnyAsyncStreamable()
+    }
+    
     private(set) var isInitiallySynced: Bool = false
     private(set) var receivedLastHeight: Int64?
     private(set) var readedLastHeight: Int64?
@@ -42,7 +51,9 @@ actor AdamantTransfersProvider: TransfersProvider {
     
     /// Free stateSemaphore before calling this method, or you will deadlock.
     private func setState(_ state: State, previous prevState: State, notify: Bool = false) {
-        self.state = state
+        Task.sync { [weak self] in
+            await self?.statePublisher.isolated { $0.publisher.value = state }
+        }
         
         if notify {
             switch prevState {
@@ -188,7 +199,9 @@ extension AdamantTransfersProvider {
         }
         
         let prevState = state
-        state = .updating
+        Task.sync { [weak self] in
+            await self?.statePublisher.isolated { $0.publisher.value = .updating }
+        }
         
         guard let address = accountService.account?.address else {
             self.setState(.failedToUpdate(TransfersProviderError.notLogged), previous: prevState)
