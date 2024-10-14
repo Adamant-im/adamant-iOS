@@ -373,7 +373,6 @@
 		93A18C892AAEAE7700D0AB98 /* WalletFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A18C882AAEAE7700D0AB98 /* WalletFactory.swift */; };
 		93A2A8602CB4733800DBC75E /* MainThreadAssembly.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A2A85F2CB4733800DBC75E /* MainThreadAssembly.swift */; };
 		93A2A8662CB4A1EE00DBC75E /* UnsafeSendableExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A2A8652CB4A1EE00DBC75E /* UnsafeSendableExtensions.swift */; };
-		93A91FD1297972B7001DB1F8 /* ChatScrollDownButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A91FD0297972B7001DB1F8 /* ChatScrollDownButton.swift */; };
 		93A91FD1297972B7001DB1F8 /* ChatScrollButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A91FD0297972B7001DB1F8 /* ChatScrollButton.swift */; };
 		93A91FD329799298001DB1F8 /* ChatStartPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A91FD229799298001DB1F8 /* ChatStartPosition.swift */; };
 		93ADE0712ACA66AF008ED641 /* VibrationSelectionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93ADE06E2ACA66AF008ED641 /* VibrationSelectionViewModel.swift */; };
@@ -1039,7 +1038,6 @@
 		93A18C882AAEAE7700D0AB98 /* WalletFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletFactory.swift; sourceTree = "<group>"; };
 		93A2A85F2CB4733800DBC75E /* MainThreadAssembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainThreadAssembly.swift; sourceTree = "<group>"; };
 		93A2A8652CB4A1EE00DBC75E /* UnsafeSendableExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnsafeSendableExtensions.swift; sourceTree = "<group>"; };
-		93A91FD0297972B7001DB1F8 /* ChatScrollDownButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatScrollDownButton.swift; sourceTree = "<group>"; };
 		93A91FD0297972B7001DB1F8 /* ChatScrollButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatScrollButton.swift; sourceTree = "<group>"; };
 		93A91FD229799298001DB1F8 /* ChatStartPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatStartPosition.swift; sourceTree = "<group>"; };
 		93ADE06E2ACA66AF008ED641 /* VibrationSelectionViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VibrationSelectionViewModel.swift; sourceTree = "<group>"; };
@@ -3855,7 +3853,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.3.0;
+				MARKETING_VERSION = 3.10.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.MessageNotificationContentExtension";
@@ -3885,7 +3883,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.3.0;
+				MARKETING_VERSION = 3.10.0;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.MessageNotificationContentExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -4041,7 +4039,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.9.0;
+				MARKETING_VERSION = 3.10.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -4072,7 +4070,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.9.0;
+				MARKETING_VERSION = 3.10.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -4100,7 +4098,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.3.0;
+				MARKETING_VERSION = 3.10.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.TransferNotificationContentExtension";
@@ -4130,7 +4128,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.3.0;
+				MARKETING_VERSION = 3.10.0;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.TransferNotificationContentExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -4161,7 +4159,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.3.0;
+				MARKETING_VERSION = 3.10.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.NotificationServiceExtension";
@@ -4191,7 +4189,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.3.0;
+				MARKETING_VERSION = 3.10.0;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.NotificationServiceExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
