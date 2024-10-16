@@ -18,7 +18,7 @@ enum State {
 
 protocol DataProvider: AnyObject, Actor {
     var state: State { get }
-    var stateObserver: AnyAsyncStreamable<State> { get }
+    var stateObserver: AnyObservable<State> { get }
     var isInitiallySynced: Bool { get }
     
     func reload() async

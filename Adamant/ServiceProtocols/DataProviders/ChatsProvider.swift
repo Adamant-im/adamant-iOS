@@ -185,7 +185,7 @@ protocol ChatsProvider: DataProvider, Actor {
     var roomsMaxCount: Int? { get }
     var roomsLoadedCount: Int? { get }
     
-    var chatLoadingStatus: AnyAsyncStreamable<[String: ChatRoomLoadingStatus]> {
+    var chatLoadingStatusPublisher: AnyObservable<[String: ChatRoomLoadingStatus]> {
         get
     }
     
