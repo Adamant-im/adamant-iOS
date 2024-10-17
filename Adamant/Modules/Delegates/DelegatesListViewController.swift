@@ -243,7 +243,7 @@ final class DelegatesListViewController: KeyboardObservingViewController {
         
         bottomPanel.snp.makeConstraints {
             $0.bottom.equalTo(view.safeAreaLayoutGuide)
-            $0.leading.trailing.equalToSuperview().inset(10)
+            $0.horizontalEdges.equalToSuperview()
         }
     }
 }
