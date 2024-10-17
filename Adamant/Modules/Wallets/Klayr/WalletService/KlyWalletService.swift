@@ -55,8 +55,8 @@ final class KlyWalletService: WalletCoreProtocol, @unchecked Sendable {
     @Atomic private(set) var lastHeight: UInt64 = .zero
     @Atomic private(set) var lastMinFeePerByte: UInt64 = .zero
     
-    @ObservableValue private(set) var transactions: [TransactionDetails] = []
-    @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
+    @AtomicObservableValue private(set) var transactions: [TransactionDetails] = []
+    @AtomicObservableValue private(set) var hasMoreOldTransactions: Bool = true
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(
         coinId: tokenUnicID,

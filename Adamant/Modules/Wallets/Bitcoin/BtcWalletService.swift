@@ -164,15 +164,15 @@ final class BtcWalletService: WalletCoreProtocol, @unchecked Sendable {
     
     @Atomic private var subscriptions = Set<AnyCancellable>()
     
-    @ObservableValue private(set) var transactions: [TransactionDetails] = []
-    @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
+    @AtomicObservableValue private(set) var transactions: [TransactionDetails] = []
+    @AtomicObservableValue private(set) var hasMoreOldTransactions: Bool = true
 
-    var transactionsPublisher: AnyObservable<[TransactionDetails]> {
-        $transactions.eraseToAnyPublisher()
+    var transactionsPublisher: AnyAsyncStreamable<[TransactionDetails]> {
+        $transactions.eraseToAnyAsyncStreamable()
     }
     
-    var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
-        $hasMoreOldTransactions.eraseToAnyPublisher()
+    var hasMoreOldTransactionsPublisher: AnyAsyncStreamable<Bool> {
+        $hasMoreOldTransactions.eraseToAnyAsyncStreamable()
     }
     
     var hasActiveNode: Bool {

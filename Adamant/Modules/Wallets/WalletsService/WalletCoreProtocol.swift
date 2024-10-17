@@ -245,11 +245,11 @@ protocol WalletCoreProtocol: AnyObject, Sendable {
     var nodeGroups: [NodeGroup] { get }
     var transferDecimals: Int { get }
     
-    var transactionsPublisher: AnyObservable<[TransactionDetails]> {
+    var transactionsPublisher: AnyAsyncStreamable<[TransactionDetails]> {
         get
     }
     
-    var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
+    var hasMoreOldTransactionsPublisher: AnyAsyncStreamable<Bool> {
         get
     }
     

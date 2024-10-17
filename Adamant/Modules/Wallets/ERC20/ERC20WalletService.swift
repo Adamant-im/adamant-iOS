@@ -155,15 +155,15 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
     var wallet: WalletAccount? { return ethWallet }
     private var balanceObserver: NSObjectProtocol?
     
-    @ObservableValue private(set) var historyTransactions: [TransactionDetails] = []
-    @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
+    @AtomicObservableValue private(set) var historyTransactions: [TransactionDetails] = []
+    @AtomicObservableValue private(set) var hasMoreOldTransactions: Bool = true
 
-    var transactionsPublisher: AnyObservable<[TransactionDetails]> {
-        $historyTransactions.eraseToAnyPublisher()
+    var transactionsPublisher: AnyAsyncStreamable<[TransactionDetails]> {
+        $historyTransactions.eraseToAnyAsyncStreamable()
     }
     
-    var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
-        $hasMoreOldTransactions.eraseToAnyPublisher()
+    var hasMoreOldTransactionsPublisher: AnyAsyncStreamable<Bool> {
+        $hasMoreOldTransactions.eraseToAnyAsyncStreamable()
     }
     
     var hasActiveNode: Bool {

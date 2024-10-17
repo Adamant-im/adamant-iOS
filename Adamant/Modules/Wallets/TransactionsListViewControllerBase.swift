@@ -154,14 +154,15 @@ class TransactionsListViewControllerBase: UIViewController {
             .store(in: &subscriptions)
         
         walletService.core.transactionsPublisher
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] transactions in
+            .makeSequence()
+            .sink { @MainActor [weak self] transactions in
                 self?.update(transactions)
             }
             .store(in: &subscriptions)
         
         walletService.core.hasMoreOldTransactionsPublisher
-            .sink { [weak self] isNeedToLoadMoore in
+            .makeSequence()
+            .sink { @MainActor [weak self] isNeedToLoadMoore in
                 self?.isNeedToLoadMoore = isNeedToLoadMoore
             }
             .store(in: &subscriptions)

@@ -55,12 +55,12 @@ extension KlyWalletService {
         Self.richMessageType
     }
     
-    var transactionsPublisher: AnyObservable<[TransactionDetails]> {
-        $transactions.eraseToAnyPublisher()
+    var transactionsPublisher: AnyAsyncStreamable<[TransactionDetails]> {
+        $transactions.eraseToAnyAsyncStreamable()
     }
     
-    var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
-        $hasMoreOldTransactions.eraseToAnyPublisher()
+    var hasMoreOldTransactionsPublisher: AnyAsyncStreamable<Bool> {
+        $hasMoreOldTransactions.eraseToAnyAsyncStreamable()
     }
 }
 

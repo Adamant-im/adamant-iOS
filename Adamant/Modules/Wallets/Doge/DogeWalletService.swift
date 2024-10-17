@@ -132,15 +132,15 @@ final class DogeWalletService: WalletCoreProtocol, @unchecked Sendable {
     private static let jsonDecoder = JSONDecoder()
     @Atomic private var subscriptions = Set<AnyCancellable>()
 
-    @ObservableValue private(set) var historyTransactions: [TransactionDetails] = []
-    @ObservableValue private(set) var hasMoreOldTransactions: Bool = true
+    @AtomicObservableValue private(set) var historyTransactions: [TransactionDetails] = []
+    @AtomicObservableValue private(set) var hasMoreOldTransactions: Bool = true
 
-    var transactionsPublisher: AnyObservable<[TransactionDetails]> {
-        $historyTransactions.eraseToAnyPublisher()
+    var transactionsPublisher: AnyAsyncStreamable<[TransactionDetails]> {
+        $historyTransactions.eraseToAnyAsyncStreamable()
     }
     
-    var hasMoreOldTransactionsPublisher: AnyObservable<Bool> {
-        $hasMoreOldTransactions.eraseToAnyPublisher()
+    var hasMoreOldTransactionsPublisher: AnyAsyncStreamable<Bool> {
+        $hasMoreOldTransactions.eraseToAnyAsyncStreamable()
     }
     
     var hasActiveNode: Bool {
