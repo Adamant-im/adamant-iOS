@@ -11,18 +11,18 @@ import UIKit
 import Swinject
 import web3swift
 import Alamofire
-import struct BigInt.BigUInt
-import Web3Core
+@preconcurrency import struct BigInt.BigUInt
+@preconcurrency import Web3Core
 import Combine
 import CommonKit
 
-final class ERC20WalletService: WalletCoreProtocol {
+final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
     // MARK: - Constants
     let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")
     
-    static var currencySymbol: String = ""
-    static var currencyLogo: UIImage = UIImage()
-    static var qqPrefix: String = ""
+    static let currencySymbol: String = ""
+    static let currencyLogo: UIImage = UIImage()
+    static let qqPrefix: String = ""
     
     var minBalance: Decimal = 0
     var minAmount: Decimal = 0
@@ -87,12 +87,12 @@ final class ERC20WalletService: WalletCoreProtocol {
         token.transferDecimals
     }
     
-    private (set) var blockchainSymbol: String = "ETH"
-    private (set) var isDynamicFee: Bool = true
-    private (set) var transactionFee: Decimal = 0.0
-    private (set) var gasPrice: BigUInt = 0
-    private (set) var gasLimit: BigUInt = 0
-    private (set) var isWarningGasPrice = false
+    private(set) var blockchainSymbol: String = "ETH"
+    private(set) var isDynamicFee: Bool = true
+    private(set) var transactionFee: Decimal = 0.0
+    private(set) var gasPrice: BigUInt = 0
+    private(set) var gasLimit: BigUInt = 0
+    private(set) var isWarningGasPrice = false
     
     var isTransactionFeeValid: Bool {
         return ethWallet?.balance ?? 0 > transactionFee
@@ -133,7 +133,7 @@ final class ERC20WalletService: WalletCoreProtocol {
     @Atomic private var cachedWalletAddress: [String: String] = [:]
     
     // MARK: - State
-    @Atomic private (set) var state: WalletServiceState = .notInitiated
+    @Atomic private(set) var state: WalletServiceState = .notInitiated
     
     private func setState(_ newState: WalletServiceState, silent: Bool = false) {
         guard newState != state else {
@@ -151,7 +151,7 @@ final class ERC20WalletService: WalletCoreProtocol {
         }
     }
     
-    private (set) var ethWallet: EthWallet?
+    private(set) var ethWallet: EthWallet?
     var wallet: WalletAccount? { return ethWallet }
     private var balanceObserver: NSObjectProtocol?
     
@@ -191,25 +191,22 @@ final class ERC20WalletService: WalletCoreProtocol {
     
     func addObservers() {
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedIn, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.accountDataUpdated, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.accountDataUpdated, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedOut, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.ethWallet = nil
                 if let balanceObserver = self?.balanceObserver {
                     NotificationCenter.default.removeObserver(balanceObserver)
@@ -267,7 +264,7 @@ final class ERC20WalletService: WalletCoreProtocol {
             wallet.isBalanceInitialized = true
             
             if isRaised {
-                vibroService.applyVibration(.success)
+                await vibroService.applyVibration(.success)
             }
             
             if let notification = notification {

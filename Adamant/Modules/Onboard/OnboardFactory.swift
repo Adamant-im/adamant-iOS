@@ -9,6 +9,7 @@
 import UIKit
 import Swinject
 
+@MainActor
 struct OnboardFactory {
     func makeOnboardVC() -> UIViewController {
         OnboardViewController(nibName: "OnboardViewController", bundle: nil)

@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import Alamofire
+@preconcurrency import Alamofire
 
 public actor APICore: APICoreProtocol {
     private let responseQueue = DispatchQueue(

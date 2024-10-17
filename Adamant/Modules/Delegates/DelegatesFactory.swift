@@ -10,6 +10,7 @@ import UIKit
 import Swinject
 import CommonKit
 
+@MainActor
 struct DelegatesFactory {
     let assembler: Assembler
     

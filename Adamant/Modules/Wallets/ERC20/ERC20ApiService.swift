@@ -7,7 +7,7 @@
 //
 
 import web3swift
-import Web3Core
+@preconcurrency import Web3Core
 import CommonKit
 
 final class ERC20ApiService: EthApiService {

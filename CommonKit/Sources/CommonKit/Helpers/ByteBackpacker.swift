@@ -9,7 +9,7 @@ public typealias Byte = UInt8
 /// ByteOrder
 ///
 /// Byte order can be either big or little endian.
-public enum ByteOrder {
+public enum ByteOrder: Sendable {
     case bigEndian
     case littleEndian
     

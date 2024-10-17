@@ -5,7 +5,7 @@
 //  Created by Andrew G on 22.08.2024.
 //
 
-public struct Version {
+public struct Version: Sendable {
     public let versions: [Int]
     
     public init(_ versions: [Int]) {

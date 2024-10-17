@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct Keypair: Equatable {
+public struct Keypair: Equatable, Sendable {
     public let publicKey: String
     public let privateKey: String
     

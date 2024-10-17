@@ -384,25 +384,22 @@ class TransferViewControllerBase: FormViewController {
     
     private func addObservers() {
         NotificationCenter.default
-            .publisher(for: walletCore.transactionFeeUpdated)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: walletCore.transactionFeeUpdated)
+            .sink { @MainActor [weak self] _ in
                 self?.feeUpdated()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: walletCore.walletUpdatedNotification)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: walletCore.walletUpdatedNotification)
+            .sink { @MainActor [weak self] _ in
                 self?.reloadFormData()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantCurrencyInfoService.currencyRatesUpdated)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantCurrencyInfoService.currencyRatesUpdated)
+            .sink { @MainActor [weak self] _ in
                 self?.currencyRateUpdated()
             }
             .store(in: &subscriptions)

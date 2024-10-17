@@ -8,6 +8,7 @@
 
 import UIKit
 
+@MainActor
 public protocol SwiftyOnboardDataSource: AnyObject {
     
     func swiftyOnboardBackgroundColorFor(_ swiftyOnboard: SwiftyOnboard, atIndex index: Int) -> UIColor?

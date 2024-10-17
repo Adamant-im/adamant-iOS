@@ -10,7 +10,7 @@ import Foundation
 import Combine
 import CommonKit
 
-final class FilesStorageProprietiesService: FilesStorageProprietiesProtocol {
+final class FilesStorageProprietiesService: FilesStorageProprietiesProtocol, @unchecked Sendable {
     // MARK: Dependencies
     
     let securedStore: SecuredStore
@@ -18,11 +18,11 @@ final class FilesStorageProprietiesService: FilesStorageProprietiesProtocol {
     // MARK: Proprieties
     
     @Atomic private var notificationsSet: Set<AnyCancellable> = []
-    private var autoDownloadPreviewState: DownloadPolicy = .everybody
-    private var autoDownloadFullMediaState: DownloadPolicy = .everybody
+    @Atomic private var autoDownloadPreviewState: DownloadPolicy = .everybody
+    @Atomic private var autoDownloadFullMediaState: DownloadPolicy = .everybody
     private let autoDownloadPreviewDefaultState: DownloadPolicy = .contacts
     private let autoDownloadFullMediaDefaultState: DownloadPolicy = .contacts
-    private var saveFileEncryptedValue = true
+    @Atomic private var saveFileEncryptedValue = true
     private let saveFileEncryptedDefault = true
     
     // MARK: Lifecycle
@@ -31,14 +31,14 @@ final class FilesStorageProprietiesService: FilesStorageProprietiesProtocol {
         self.securedStore = securedStore
                 
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn)
+            .notifications(named: .AdamantAccountService.userLoggedIn)
             .sink { [weak self] _ in
                 self?.userLoggedIn()
             }
             .store(in: &notificationsSet)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut)
+            .notifications(named: .AdamantAccountService.userLoggedOut)
             .sink { [weak self] _ in
                 self?.userLoggedOut()
             }

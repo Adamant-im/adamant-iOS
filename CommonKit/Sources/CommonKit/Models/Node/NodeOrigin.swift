@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct NodeOrigin: Codable, Equatable, Hashable {
+public struct NodeOrigin: Codable, Equatable, Hashable, @unchecked Sendable {
     public var scheme: URLScheme
     public var host: String
     public var port: Int?
@@ -27,7 +27,7 @@ public struct NodeOrigin: Codable, Equatable, Hashable {
 }
 
 public extension NodeOrigin {
-    enum URLScheme: String, Codable {
+    enum URLScheme: String, Codable, Sendable {
         case http, https
 
         public static let `default`: URLScheme = .https

@@ -15,7 +15,7 @@ public extension StoreKey {
     }
 }
 
-public protocol NodesStorageProtocol {
+public protocol NodesStorageProtocol: Sendable {
     var nodesPublisher: AnyObservable<[NodeGroup: [Node]]> { get }
     
     func getNodesPublisher(group: NodeGroup) -> AnyObservable<[Node]>

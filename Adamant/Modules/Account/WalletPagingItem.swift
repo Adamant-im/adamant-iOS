@@ -44,7 +44,7 @@ struct WalletItem: Equatable {
     )
 }
 
-final class WalletItemModel: ObservableObject, PagingItem, Hashable, Comparable {
+final class WalletItemModel: ObservableObject, PagingItem, Hashable, Comparable, @unchecked Sendable {
     @Published var model: WalletItem = .default
     
     init(model: WalletItem) {

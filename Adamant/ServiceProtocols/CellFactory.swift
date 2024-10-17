@@ -20,6 +20,7 @@ struct SharedCell: Equatable, Hashable {
     }
 }
 
+@MainActor
 protocol CellFactory: AnyObject {
     func nib(for sharedCell: SharedCell) -> UINib?
     func cellInstance(for sharedCell: SharedCell) -> UITableViewCell?

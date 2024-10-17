@@ -11,10 +11,15 @@ import Swinject
 import UIKit
 import CommonKit
 import Combine
-import struct BigInt.BigUInt
-import LiskKit
+@preconcurrency import struct BigInt.BigUInt
+@preconcurrency import LiskKit
 
-final class KlyWalletService: WalletCoreProtocol {
+final class KlyWalletService: WalletCoreProtocol, @unchecked Sendable {
+    struct CurrentFee: Sendable {
+        let fee: BigUInt
+        let lastHeight: UInt64
+        let minFeePerByte: UInt64
+    }
     
     // MARK: Dependencies
     
@@ -101,7 +106,7 @@ final class KlyWalletService: WalletCoreProtocol {
         try await getBalance(for: address)
     }
     
-    func getCurrentFee() async throws -> (fee: BigUInt, lastHeight: UInt64, minFeePerByte: UInt64) {
+    func getCurrentFee() async throws -> CurrentFee {
         try await getFees(comment: .empty)
     }
     
@@ -179,25 +184,22 @@ extension KlyWalletService: SwinjectDependentService {
 private extension KlyWalletService {
     func addObservers() {
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedIn, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.accountDataUpdated, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.accountDataUpdated, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedOut, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.klyWallet = nil
                 
                 if let balanceObserver = self?.balanceObserver {
@@ -255,7 +257,7 @@ private extension KlyWalletService {
             wallet.isBalanceInitialized = true
             
             if isRaised {
-                vibroService.applyVibration(.success)
+                await vibroService.applyVibration(.success)
             }
             
             if let notification = notification {
@@ -303,7 +305,7 @@ private extension KlyWalletService {
         return UInt64(nonce) ?? .zero
     }
 
-    func getFees(comment: String) async throws -> (fee: BigUInt, lastHeight: UInt64, minFeePerByte: UInt64) {
+    func getFees(comment: String) async throws -> CurrentFee {
         guard let wallet = klyWallet else {
             throw WalletServiceError.notLogged
         }
@@ -333,7 +335,7 @@ private extension KlyWalletService {
         
         let height = UInt64(lastBlock.header.height)
         
-        return (fee: fee, lastHeight: height, minFeePerByte: minFeePerByte)
+        return .init(fee: fee, lastHeight: height, minFeePerByte: minFeePerByte)
     }
     
     func getFee(minFeePerByte: UInt64, comment: String) throws -> BigUInt {
@@ -486,7 +488,8 @@ private extension KlyWalletService {
         
         balanceObserver?.cancel()
         
-        balanceObserver = NotificationCenter.default.publisher(for: .AdamantAccountService.accountDataUpdated)
+        balanceObserver = NotificationCenter.default
+            .notifications(named: .AdamantAccountService.accountDataUpdated)
             .compactMap { [weak self] _ in
                 self?.accountService.account?.balance
             }

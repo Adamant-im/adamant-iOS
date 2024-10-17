@@ -16,6 +16,7 @@ extension Notification.Name {
     }
 }
 
+@MainActor
 protocol VibroService: AnyObject {
     func applyVibration(_ type: AdamantVibroType)
 }

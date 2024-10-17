@@ -36,6 +36,7 @@ extension AMenuItem {
 // MARK: - Internal
 
 public extension AMenuItem.Style {
+    @MainActor
     func configure(
         titleLabel: UILabel,
         icon: UIImageView?,

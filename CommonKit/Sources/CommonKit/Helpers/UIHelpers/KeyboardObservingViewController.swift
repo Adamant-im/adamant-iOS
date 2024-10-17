@@ -38,8 +38,8 @@ private extension KeyboardObservingViewController {
     
     func makeKeyboardSubscription() -> AnyCancellable {
         NotificationCenter.default
-            .publisher(for: UIResponder.keyboardWillChangeFrameNotification, object: nil)
-            .sink { [weak self] in self?.onKeyboardFrameChange($0) }
+            .notifications(named: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+            .sink { @MainActor [weak self] in self?.onKeyboardFrameChange($0) }
     }
     
     func onKeyboardFrameChange(_ notification: Notification) {

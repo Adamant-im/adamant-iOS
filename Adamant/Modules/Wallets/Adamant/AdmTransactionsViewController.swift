@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import CoreData
+@preconcurrency import CoreData
 import CommonKit
 
 final class AdmTransactionsViewController: TransactionsListViewControllerBase {

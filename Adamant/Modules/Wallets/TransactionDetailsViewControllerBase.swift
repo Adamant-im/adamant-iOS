@@ -16,7 +16,7 @@ private extension TransactionStatus {
     var color: UIColor {
         switch self {
         case .failed: return .adamant.warning
-        case .notInitiated, .inconsistent, .noNetwork, .noNetworkFinal, .pending, .registered: return .adamant.attention
+        case .notInitiated, .inconsistent, .pending, .registered: return .adamant.attention
         case .success: return .adamant.success
         }
     }
@@ -436,13 +436,13 @@ class TransactionDetailsViewControllerBase: FormViewController {
         detailsSection.append(recipientRow)
         
         // MARK: Date
-        let dateRow = LabelRow { [weak self] in
+        let dateRow = LabelRow {
             $0.disabled = true
             $0.tag = Rows.date.tag
             $0.title = Rows.date.localized
             
-            if let raw = transaction?.dateValue, let value = self?.dateFormatter.string(from: raw) {
-                $0.value = value
+            if let raw = transaction?.dateValue {
+                $0.value = dateFormatter.string(from: raw)
             } else {
                 $0.value = TransactionDetailsViewControllerBase.awaitingValueString
             }

@@ -9,6 +9,7 @@
 import Swinject
 import SwiftUI
 
+@MainActor
 struct NotificationsFactory {
     private let parent: Assembler
     private let assemblies = [NotificationsAssembly()]
@@ -40,8 +41,8 @@ struct NotificationsFactory {
     }
 }
 
-private struct NotificationsAssembly: Assembly {
-    func assemble(container: Container) {
+private struct NotificationsAssembly: MainThreadAssembly {
+    func assembleOnMainThread(container: Container) {
         container.register(NotificationsViewModel.self) { r in
             NotificationsViewModel(
                 dialogService: r.resolve(DialogService.self)!,

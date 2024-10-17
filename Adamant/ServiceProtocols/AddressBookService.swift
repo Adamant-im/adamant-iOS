@@ -82,7 +82,7 @@ extension AddressBookServiceError: RichError {
 }
 
 @MainActor
-protocol AddressBookService: AnyObject {
+protocol AddressBookService: AnyObject, Sendable {
     // MARK: Work with Address book
     func set(name: String, for: String) async
     func getName(for key: String) -> String?

@@ -17,9 +17,9 @@ final class ContributeViewModel: ObservableObject {
     
     @Published var state: ContributeState = .initial
     
-    nonisolated init(crashliticsService: CrashlyticsService) {
+    init(crashliticsService: CrashlyticsService) {
         self.crashliticsService = crashliticsService
-        Task { await setup() }
+        setup()
     }
     
     func enableCrashButton() {

@@ -10,7 +10,7 @@ import Foundation
 import Combine
 import CommonKit
 
-final class AdamantVisibleWalletsService: VisibleWalletsService {
+final class AdamantVisibleWalletsService: VisibleWalletsService, @unchecked Sendable {
     
     // MARK: Dependencies
     let securedStore: SecuredStore
@@ -46,14 +46,14 @@ final class AdamantVisibleWalletsService: VisibleWalletsService {
         self.walletsServiceCompose = walletsServiceCompose
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut)
+            .notifications(named: .AdamantAccountService.userLoggedOut)
             .sink { [weak self] _ in
                 self?.userLoggedOut()
             }
             .store(in: &notificationsSet)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn)
+            .notifications(named: .AdamantAccountService.userLoggedIn)
             .sink { [weak self] _ in
                 self?.userLoggedIn()
             }

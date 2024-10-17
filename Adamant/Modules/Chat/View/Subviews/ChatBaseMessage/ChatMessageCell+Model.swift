@@ -9,7 +9,7 @@
 import UIKit
 
 extension ChatMessageCell {
-    struct Model: ChatReusableViewModelProtocol, MessageModel {
+    struct Model: ChatReusableViewModelProtocol, MessageModel, @unchecked Sendable {
         let id: String
         let text: NSAttributedString
         let backgroundColor: ChatMessageBackgroundColor
@@ -20,17 +20,19 @@ extension ChatMessageCell {
         let isFake: Bool
         var isHidden: Bool
         
-        static let `default` = Self(
-            id: "",
-            text: NSAttributedString(string: ""),
-            backgroundColor: .failed,
-            isFromCurrentSender: false,
-            reactions: nil,
-            address: "",
-            opponentAddress: "",
-            isFake: false,
-            isHidden: false
-        )
+        static var `default`: Self {
+            Self(
+                id: "",
+                text: NSAttributedString(string: ""),
+                backgroundColor: .failed,
+                isFromCurrentSender: false,
+                reactions: nil,
+                address: "",
+                opponentAddress: "",
+                isFake: false,
+                isHidden: false
+            )
+        }
         
         func makeReplyContent() -> NSAttributedString {
             return text

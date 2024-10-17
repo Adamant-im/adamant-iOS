@@ -34,7 +34,7 @@ final class PartnerQRViewModel: NSObject, ObservableObject {
         partner?.address ?? ""
     }
     
-    nonisolated init(
+    init(
         dialogService: DialogService,
         addressBookService: AddressBookService,
         avatarService: AvatarService,

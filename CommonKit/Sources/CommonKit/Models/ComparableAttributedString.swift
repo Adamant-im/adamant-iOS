@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct ComparableAttributedString: Equatable {
+public struct ComparableAttributedString: Equatable, @unchecked Sendable {
     public let string: NSAttributedString
     
     public init(string: NSAttributedString) {

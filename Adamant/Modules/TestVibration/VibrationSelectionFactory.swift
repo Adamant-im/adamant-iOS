@@ -9,6 +9,7 @@
 import Swinject
 import SwiftUI
 
+@MainActor
 struct VibrationSelectionFactory {
     private let parent: Assembler
     private let assemblies = [VibrationSelectionAssembly()]
@@ -25,8 +26,8 @@ struct VibrationSelectionFactory {
     }
 }
 
-private struct VibrationSelectionAssembly: Assembly {
-    func assemble(container: Container) {
+private struct VibrationSelectionAssembly: MainThreadAssembly {
+    func assembleOnMainThread(container: Container) {
         container.register(VibrationSelectionViewModel.self) {
             VibrationSelectionViewModel(
                 vibroService: $0.resolve(VibroService.self)!

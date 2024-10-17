@@ -9,7 +9,7 @@
 import Foundation
 import Combine
 
-public final class NodesStorage: NodesStorageProtocol {
+public final class NodesStorage: NodesStorageProtocol, @unchecked Sendable {
     public typealias DefaultNodesGetter = @Sendable (Set<NodeGroup>) -> [NodeGroup: [Node]]
     
     @Atomic private var items: ObservableValue<[NodeGroup: [Node]]>

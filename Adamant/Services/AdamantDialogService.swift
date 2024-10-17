@@ -24,7 +24,7 @@ final class AdamantDialogService: DialogService {
     
     private weak var window: UIWindow?
     
-    nonisolated init(
+    init(
         vibroService: VibroService,
         notificationsService: NotificationsService
     ) {
@@ -581,6 +581,7 @@ fileprivate extension AdamantAlertStyle {
 }
 
 fileprivate extension AdamantAlertAction {
+    @MainActor
     func asUIAlertAction() -> UIAlertAction {
         let handler = self.handler
         return UIAlertAction(title: self.title, style: self.style, handler: { _ in handler?() })
@@ -623,8 +624,14 @@ extension AdamantDialogService {
 }
 
 private class MailDelegate: NSObject, MFMailComposeViewControllerDelegate {
-    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
-        controller.dismiss(animated: true, completion: nil)
+    nonisolated func mailComposeController(
+        _ controller: MFMailComposeViewController,
+        didFinishWith result: MFMailComposeResult,
+        error: Error?
+    ) {
+        MainActor.assumeIsolatedSafe {
+            controller.dismiss(animated: true, completion: nil)
+        }
     }
 }
 

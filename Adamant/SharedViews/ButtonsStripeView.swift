@@ -56,6 +56,7 @@ extension BiometryType {
 typealias Stripe = [StripeButtonType]
 
 // MARK: - Delegate
+@MainActor
 protocol ButtonsStripeViewDelegate: AnyObject {
     func buttonsStripe(didTapButton button: StripeButtonType)
 }

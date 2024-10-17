@@ -10,7 +10,7 @@ import Foundation
 import CommonKit
 import Combine
 
-final class ChatPreservation: ChatPreservationProtocol {
+final class ChatPreservation: ChatPreservationProtocol, @unchecked Sendable {
     @Atomic private var preservedMessages: [String: String] = [:]
     @Atomic private var preservedReplayMessage: [String: MessageModel] = [:]
     @Atomic private var preservedFiles: [String: [FileResult]] = [:]
@@ -18,7 +18,7 @@ final class ChatPreservation: ChatPreservationProtocol {
     
     init() {
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut)
+            .notifications(named: .AdamantAccountService.userLoggedOut)
             .sink { [weak self] _ in
                 self?.clearPreservedMessages()
             }

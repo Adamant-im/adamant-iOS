@@ -9,6 +9,6 @@
 import Foundation
 import CoreData
 
-protocol CoreDataStack {
+protocol CoreDataStack: Sendable {
     var container: NSPersistentContainer { get }
 }

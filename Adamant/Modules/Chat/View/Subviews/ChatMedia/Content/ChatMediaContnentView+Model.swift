@@ -21,17 +21,19 @@ extension ChatMediaContentView {
         let comment: NSAttributedString
         let backgroundColor: ChatMessageBackgroundColor
         
-        static let `default` = Self(
-            id: "",
-            fileModel: .default,
-            isHidden: false,
-            isFromCurrentSender: false,
-            isReply: false,
-            replyMessage: NSAttributedString(string: .empty),
-            replyId: .empty,
-            comment: NSAttributedString(string: .empty),
-            backgroundColor: .failed
-        )
+        static var `default`: Self {
+            Self(
+                id: "",
+                fileModel: .default,
+                isHidden: false,
+                isFromCurrentSender: false,
+                isReply: false,
+                replyMessage: NSAttributedString(string: .empty),
+                replyId: .empty,
+                comment: NSAttributedString(string: .empty),
+                backgroundColor: .failed
+            )
+        }
     }
     
     struct FileModel: Equatable {
@@ -41,22 +43,26 @@ extension ChatMediaContentView {
         let isFromCurrentSender: Bool
         let txStatus: MessageStatus
         
-        static let `default` = Self(
-            messageId: .empty,
-            files: [],
-            isMediaFilesOnly: false,
-            isFromCurrentSender: false,
-            txStatus: .failed
-        )
+        static var `default`: Self {
+            Self(
+                messageId: .empty,
+                files: [],
+                isMediaFilesOnly: false,
+                isFromCurrentSender: false,
+                txStatus: .failed
+            )
+        }
     }
     
     struct FileContentModel {
         let chatFile: ChatFile
         let txStatus: MessageStatus
         
-        static let `default` = Self(
-            chatFile: .default,
-            txStatus: .failed
-        )
+        static var `default`: Self {
+            Self(
+                chatFile: .default,
+                txStatus: .failed
+            )
+        }
     }
 }

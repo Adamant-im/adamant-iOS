@@ -8,6 +8,7 @@
 
 import UIKit
 
+@MainActor
 func WelcomeViewController() -> UIViewController {
     UIViewController(
         nibName: "WelcomeViewController",

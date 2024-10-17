@@ -9,6 +9,7 @@
 import Swinject
 import SwiftUI
 
+@MainActor
 struct ContributeFactory {
     private let parent: Assembler
     private let assemblies = [ContributeAssembly()]
@@ -24,8 +25,8 @@ struct ContributeFactory {
     }
 }
 
-private struct ContributeAssembly: Assembly {
-    func assemble(container: Container) {
+private struct ContributeAssembly: MainThreadAssembly {
+    func assembleOnMainThread(container: Container) {
         container.register(ContributeViewModel.self) {
             ContributeViewModel(
                 crashliticsService: $0.resolve(CrashlyticsService.self)!

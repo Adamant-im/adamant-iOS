@@ -248,6 +248,7 @@ private extension ChatMediaContentView {
 }
 
 extension ChatMediaContentView.FileModel {
+    @MainActor
     func width() -> CGFloat {
         guard UIDevice.current.userInterfaceIdiom == .phone else {
             return defaultStackWidth
@@ -257,10 +258,12 @@ extension ChatMediaContentView.FileModel {
 }
 
 extension ChatMediaContentView.Model {
+    @MainActor
     func width() -> CGFloat {
         fileModel.width()
     }
     
+    @MainActor
     func height() -> CGFloat {
         let replyViewDynamicHeight: CGFloat = isReply ? replyViewHeight : .zero
         

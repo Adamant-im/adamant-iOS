@@ -10,7 +10,7 @@ import Foundation
 import Combine
 import CommonKit
 
-final class AdamantEmojiService: EmojiService {
+final class AdamantEmojiService: EmojiService, @unchecked Sendable {
     // MARK: Dependencies
     
     let securedStore: SecuredStore
@@ -29,14 +29,14 @@ final class AdamantEmojiService: EmojiService {
         self.securedStore = securedStore
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn)
+            .notifications(named: .AdamantAccountService.userLoggedIn)
             .sink { [weak self] _ in
                 self?.userLoggedIn()
             }
             .store(in: &notificationsSet)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut)
+            .notifications(named: .AdamantAccountService.userLoggedOut)
             .sink { [weak self] _ in
                 self?.userLoggedOut()
             }

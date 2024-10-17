@@ -190,7 +190,7 @@ private extension AdvancedContextMenuManager {
 // MARK: Delegate
 
 extension AdvancedContextMenuManager: OverlayViewDelegate {
-    @MainActor func didDissmis() {
+    func didDissmis() {
         didDismissMenuAction?(messageId)
         getPositionOnScreen = nil
         // Postpone window dismissal to the next iteration to allow the contentView to become visible
@@ -202,7 +202,7 @@ extension AdvancedContextMenuManager: OverlayViewDelegate {
         }
     }
     
-    @MainActor func didAppear() {
+    func didAppear() {
         if let newPosition = getPositionOnScreen?(),
            newPosition != locationOnScreen {
             viewModel?.update(locationOnScreen: newPosition)

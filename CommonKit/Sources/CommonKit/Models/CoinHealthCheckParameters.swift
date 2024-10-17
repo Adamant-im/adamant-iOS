@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct CoinHealthCheckParameters {
+public struct CoinHealthCheckParameters: Sendable {
     public let normalUpdateInterval: TimeInterval
     public let crucialUpdateInterval: TimeInterval
     public let onScreenUpdateInterval: TimeInterval

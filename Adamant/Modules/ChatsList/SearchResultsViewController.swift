@@ -28,6 +28,7 @@ extension String.adamant {
     }
 }
 
+@MainActor
 protocol SearchResultDelegate: AnyObject {
     func didSelected(_ message: MessageTransaction)
     func didSelected(_ chatroom: Chatroom)

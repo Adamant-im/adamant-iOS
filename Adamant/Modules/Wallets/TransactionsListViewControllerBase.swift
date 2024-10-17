@@ -70,7 +70,10 @@ class TransactionsListViewControllerBase: UIViewController {
     private var limit = 25
     private var offset = 0
     
-    private lazy var dataSource = TransactionsDiffableDataSource(tableView: tableView, cellProvider: makeCell)
+    private lazy var dataSource = TransactionsDiffableDataSource(
+        tableView: tableView,
+        cellProvider: { [weak self] in self?.makeCell(tableView: $0, indexPath: $1, model: $2) }
+    )
     
     var currencySymbol: String { walletService.core.tokenSymbol }
     
@@ -130,25 +133,22 @@ class TransactionsListViewControllerBase: UIViewController {
     
     func addObservers() {
         NotificationCenter.default
-            .publisher(for: .AdamantAddressBookService.addressBookUpdated, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAddressBookService.addressBookUpdated, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.reloadData()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedOut, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.reloadData()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedIn, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.reloadData()
             }
             .store(in: &subscriptions)
@@ -376,7 +376,7 @@ private extension TransactionStatus {
     var color: UIColor {
         switch self {
         case .failed: return .adamant.warning
-        case .notInitiated, .inconsistent, .noNetwork, .noNetworkFinal, .pending, .registered:
+        case .notInitiated, .inconsistent, .pending, .registered:
             return .adamant.attention
         case .success: return .adamant.secondary
         }

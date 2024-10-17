@@ -26,7 +26,7 @@ private struct FileMessage {
     var txId: String?
 }
 
-final class ChatFileService: ChatFileProtocol {
+final class ChatFileService: ChatFileProtocol, @unchecked Sendable {
     typealias UploadResult = (decodedData: Data, encodedData: Data, nonce: String, cid: String)
     
     // MARK: Dependencies
@@ -218,9 +218,8 @@ final class ChatFileService: ChatFileProtocol {
 private extension ChatFileService {
     func addObservers() {
         NotificationCenter.default
-            .publisher(for: .AdamantReachabilityMonitor.reachabilityChanged)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] data in
+            .notifications(named: .AdamantReachabilityMonitor.reachabilityChanged)
+            .sink { @MainActor [weak self] data in
                 let connection = data.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? Bool
                 
                 guard connection == true else { return }
@@ -229,9 +228,8 @@ private extension ChatFileService {
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .Storage.storageClear)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .Storage.storageClear)
+            .sink { @MainActor [weak self] _ in
                 self?.ignoreFilesIDsArray.removeAll()
                 self?.fileProgressValue.removeAll()
                 self?.fileDownloadAttemptsCount.removeAll()
@@ -555,7 +553,7 @@ private extension ChatFileService {
         fileType: FileType,
         fileExtension: String,
         isPreview: Bool,
-        downloadProgress: @escaping ((Progress) -> Void)
+        downloadProgress: @escaping @Sendable (Progress) -> Void
     ) async throws {
         let result = try await downloadFile(
             id: id,
@@ -644,7 +642,7 @@ private extension ChatFileService {
         recipientPrivateKey: String,
         nonce: String,
         saveEncrypted: Bool,
-        downloadProgress: @escaping ((Progress) -> Void)
+        downloadProgress: @escaping @Sendable (Progress) -> Void
     ) async throws -> (decodedData: Data, encodedData: Data) {
         let encodedData = try await filesNetworkManager.downloadFile(
             id,
@@ -927,7 +925,7 @@ private extension ChatFileService {
         for i in files.indices where !files[i].isUploaded {
             let file = files[i].file
             
-            let uploadProgress: ((Int) -> Void) = { [weak self, file] value in
+            let uploadProgress: @Sendable (Int) -> Void = { [weak self, file] value in
                 self?.sendProgress(
                     for: file.url.absoluteString,
                     progress: value
@@ -1092,7 +1090,7 @@ private extension ChatFileService {
         recipientPublicKey: String,
         senderPrivateKey: String,
         storageProtocol: NetworkFileProtocolType,
-        progress: @escaping ((Int) -> Void)
+        progress: @escaping @Sendable (Int) -> Void
     ) async throws -> (file: UploadResult, preview: UploadResult?) {
         let totalProgress = Progress(totalUnitCount: 100)
         var previewWeight: Int64 = .zero
@@ -1114,7 +1112,7 @@ private extension ChatFileService {
             recipientPublicKey: recipientPublicKey,
             senderPrivateKey: senderPrivateKey,
             storageProtocol: storageProtocol,
-            uploadProgress: { value in
+            uploadProgress: { [fileWeight] value in
                 fileProgress.completedUnitCount = Int64(value.fractionCompleted * Double(fileWeight))
                 progress(Int(totalProgress.fractionCompleted * 100))
             }
@@ -1128,7 +1126,7 @@ private extension ChatFileService {
                 recipientPublicKey: recipientPublicKey,
                 senderPrivateKey: senderPrivateKey,
                 storageProtocol: storageProtocol,
-                uploadProgress: { value in
+                uploadProgress: { [previewWeight] value in
                     previewProgress.completedUnitCount = Int64(value.fractionCompleted * Double(previewWeight))
                     progress(Int(totalProgress.fractionCompleted * 100))
                 }
@@ -1143,7 +1141,7 @@ private extension ChatFileService {
         recipientPublicKey: String,
         senderPrivateKey: String,
         storageProtocol: NetworkFileProtocolType,
-        uploadProgress: @escaping ((Progress) -> Void)
+        uploadProgress: @escaping @Sendable (Progress) -> Void
     ) async throws -> UploadResult {
         defer {
             url.stopAccessingSecurityScopedResource()

@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol IncreaseFeeService: AnyObject {
+protocol IncreaseFeeService: AnyObject, Sendable {
     func isIncreaseFeeEnabled(for tokenUnicID: String) -> Bool
     func setIncreaseFeeEnabled(for tokenUnicID: String, value: Bool)
 }

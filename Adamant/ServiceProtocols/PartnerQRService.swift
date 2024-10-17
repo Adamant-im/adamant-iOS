@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol PartnerQRService: AnyObject {
+protocol PartnerQRService: AnyObject, Sendable {
     func setIncludeNameEnabled(_ value: Bool)
     func isIncludeNameEnabled() -> Bool
     func setIncludeURLEnabled(_ value: Bool)

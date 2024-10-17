@@ -10,18 +10,19 @@ import Foundation
 import CommonKit
 import LiskKit
 
-final class KlyWallet: WalletAccount {
-    var unicId: String
+final class KlyWallet: WalletAccount, @unchecked Sendable {
+    let unicId: String
     let legacyAddress: String
     let kly32Address: String
     let keyPair: KeyPair
-    var balance: Decimal = 0.0
-    var notifications: Int = 0
-    var isNewApi: Bool = true
-    var nonce: UInt64
-    var minBalance: Decimal = 0.05
-    var minAmount: Decimal = 0
-    var isBalanceInitialized: Bool = false
+    
+    @Atomic var balance: Decimal = 0.0
+    @Atomic var notifications: Int = 0
+    @Atomic var isNewApi: Bool = true
+    @Atomic var nonce: UInt64
+    @Atomic var minBalance: Decimal = 0.05
+    @Atomic var minAmount: Decimal = 0
+    @Atomic var isBalanceInitialized: Bool = false
     
     var address: String {
         return isNewApi ? kly32Address : legacyAddress

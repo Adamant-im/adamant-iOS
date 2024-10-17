@@ -8,7 +8,7 @@
 
 import UIKit
 import Eureka
-import BitcoinKit
+@preconcurrency import BitcoinKit
 import CommonKit
 
 final class DogeTransferViewController: TransferViewControllerBase {

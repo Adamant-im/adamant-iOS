@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct ChatRoomsChats : Codable {
+public struct ChatRoomsChats : Codable, Sendable {
     public let lastTransaction : Transaction?
     
     public enum CodingKeys: String, CodingKey {

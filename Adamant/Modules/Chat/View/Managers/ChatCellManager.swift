@@ -18,17 +18,21 @@ final class ChatCellManager: MessageCellDelegate {
         self.viewModel = viewModel
     }
     
-    func didSelectURL(_ url: URL) {
-        viewModel.didSelectURL(url)
+    nonisolated func didSelectURL(_ url: URL) {
+        MainActor.assumeIsolatedSafe {
+            viewModel.didSelectURL(url)
+        }
     }
     
-    func didTapMessage(in cell: MessageCollectionViewCell) {
-        guard
-            let id = getMessageId?(cell),
-            let message = viewModel.messages.first(where: { $0.id == id }),
-            message.status == .failed
-        else { return }
-        
-        viewModel.dialog.send(.failedMessageAlert(id: id, sender: .view(cell)))
+    nonisolated func didTapMessage(in cell: MessageCollectionViewCell) {
+        MainActor.assumeIsolatedSafe {
+            guard
+                let id = getMessageId?(cell),
+                let message = viewModel.messages.first(where: { $0.id == id }),
+                message.status == .failed
+            else { return }
+            
+            viewModel.dialog.send(.failedMessageAlert(id: id, sender: .view(cell)))
+        }
     }
 }

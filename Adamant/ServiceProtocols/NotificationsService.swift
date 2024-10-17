@@ -238,7 +238,7 @@ extension NotificationsServiceError: RichError {
 }
 
 @MainActor
-protocol NotificationsService: AnyObject {
+protocol NotificationsService: AnyObject, Sendable {
     var notificationsMode: NotificationsMode { get }
     var notificationsSound: NotificationSound { get }
     var notificationsReactionSound: NotificationSound { get }

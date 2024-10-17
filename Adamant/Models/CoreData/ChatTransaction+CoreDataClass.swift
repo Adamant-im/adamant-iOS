@@ -11,7 +11,7 @@ import Foundation
 import CoreData
 
 @objc(ChatTransaction)
-public class ChatTransaction: BaseTransaction {
+public class ChatTransaction: BaseTransaction, @unchecked Sendable {
     var statusEnum: MessageStatus {
         get { return MessageStatus(rawValue: self.status) ?? .failed }
         set { self.status = newValue.rawValue }

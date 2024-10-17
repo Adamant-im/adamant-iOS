@@ -115,33 +115,39 @@ extension LoginViewController {
 
 // MARK: - PinpadViewControllerDelegate
 extension LoginViewController: PinpadViewControllerDelegate {
-    func pinpad(_ pinpad: PinpadViewController, didEnterPin pin: String) {
-        guard accountService.hasStayInAccount else {
-            return
-        }
-        
-        guard accountService.validatePin(pin) else {
-            pinpad.clearPin()
-            pinpad.playWrongPinAnimation()
-            return
-        }
-        
-        loginIntoSavedAccount()
-    }
-    
-    func pinpadDidTapBiometryButton(_ pinpad: PinpadViewController) {
-        localAuth.authorizeUser(reason: String.adamant.login.loginIntoPrevAccount, completion: { [weak self] result in
-            switch result {
-            case .success:
-                self?.loginIntoSavedAccount()
-                
-            case .fallback, .cancel, .failed:
-                break
+    nonisolated func pinpad(_ pinpad: PinpadViewController, didEnterPin pin: String) {
+        Task { @MainActor in
+            guard accountService.hasStayInAccount else {
+                return
             }
-        })
+            
+            guard accountService.validatePin(pin) else {
+                pinpad.clearPin()
+                pinpad.playWrongPinAnimation()
+                return
+            }
+            
+            loginIntoSavedAccount()
+        }
     }
     
-    func pinpadDidCancel(_ pinpad: PinpadViewController) {
-        pinpad.dismiss(animated: true, completion: nil)
+    nonisolated func pinpadDidTapBiometryButton(_ pinpad: PinpadViewController) {
+        Task { @MainActor in
+            localAuth.authorizeUser(reason: String.adamant.login.loginIntoPrevAccount, completion: { [weak self] result in
+                switch result {
+                case .success:
+                    self?.loginIntoSavedAccount()
+                    
+                case .fallback, .cancel, .failed:
+                    break
+                }
+            })
+        }
+    }
+    
+    nonisolated func pinpadDidCancel(_ pinpad: PinpadViewController) {
+        Task { @MainActor in
+            pinpad.dismiss(animated: true, completion: nil)
+        }
     }
 }

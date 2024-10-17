@@ -8,8 +8,8 @@
 
 import Foundation
 
-public struct NodeStatus: Codable {
-    public struct Network: Codable {
+public struct NodeStatus: Codable, Sendable {
+    public struct Network: Codable, Sendable {
         public let broadhash: String?
         public let epoch: String?
         public let height: Int?
@@ -20,13 +20,13 @@ public struct NodeStatus: Codable {
         public let supply: Int?
     }
     
-    public struct Version: Codable {
+    public struct Version: Codable, Sendable {
         public let build: String?
         public let commit: String?
         public let version: String?
     }
     
-    public struct WsClient: Codable {
+    public struct WsClient: Codable, Sendable {
         public let enabled: Bool?
         public let port: Int?
     }

@@ -9,7 +9,7 @@
 import CommonKit
 
 extension InfoService {
-    static let threshold = 1800
+    nonisolated static let threshold = 1800
     
     nonisolated static var name: String {
         .localized("InfoService.InfoService")

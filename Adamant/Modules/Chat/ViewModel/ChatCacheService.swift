@@ -30,8 +30,8 @@ final class ChatCacheService {
 private extension ChatCacheService {
     func setup() {
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut)
-            .sink { [weak self] _ in self?.messages = .init() }
+            .notifications(named: .AdamantAccountService.userLoggedOut)
+            .sink { @MainActor [weak self] _ in self?.messages = .init() }
             .store(in: &subscriptions)
     }
 }

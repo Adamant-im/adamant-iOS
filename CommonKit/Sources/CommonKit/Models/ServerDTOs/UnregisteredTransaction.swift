@@ -9,7 +9,7 @@
 import Foundation
 import BigInt
 
-public struct UnregisteredTransaction: Hashable {
+public struct UnregisteredTransaction: Hashable, Sendable {
     public let type: TransactionType
     public let timestamp: UInt64
     public let senderPublicKey: String

@@ -6,7 +6,7 @@
 //  Copyright © 2024 Adamant. All rights reserved.
 //
 
-struct InfoServiceStatusDTO: Codable {
+struct InfoServiceStatusDTO: Codable, Sendable {
     let success: Bool
     let date: Int
     let ready: Bool

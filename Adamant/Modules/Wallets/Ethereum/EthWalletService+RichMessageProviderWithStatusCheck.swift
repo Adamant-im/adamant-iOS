@@ -7,8 +7,8 @@
 //
 
 import Foundation
-import web3swift
-import Web3Core
+@preconcurrency import web3swift
+@preconcurrency import Web3Core
 import CommonKit
 
 extension EthWalletService {
@@ -58,12 +58,12 @@ extension EthWalletService {
 }
 
 private extension EthWalletService {
-    struct EthTransactionInfo {
+    struct EthTransactionInfo: Sendable {
         var details: Web3Core.TransactionDetails?
         var receipt: TransactionReceipt?
     }
 
-    enum EthTransactionInfoElement {
+    enum EthTransactionInfoElement: Sendable {
         case details(Web3Core.TransactionDetails)
         case receipt(TransactionReceipt)
     }
@@ -73,11 +73,11 @@ private extension EthWalletService {
             of: EthTransactionInfoElement.self,
             returning: Atomic<EthTransactionInfo>.self
         ) { group in
-            group.addTask(priority: .userInitiated) {
+            group.addTask(priority: .userInitiated) { @Sendable in
                 .details(try await web3.eth.transactionDetails(hash))
             }
             
-            group.addTask(priority: .userInitiated) {
+            group.addTask(priority: .userInitiated) { @Sendable in
                 .receipt(try await web3.eth.transactionReceipt(hash))
             }
             

@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct InfoServiceHistoryRequestDTO: Codable {
+struct InfoServiceHistoryRequestDTO: Codable, Sendable {
     let timestamp: String
     let coin: String
 }

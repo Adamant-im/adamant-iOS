@@ -92,6 +92,8 @@ extension DogeWalletService: WalletServiceTwoStepSend {
     }
 }
 
+extension BitcoinKit.Transaction: @retroactive @unchecked Sendable {}
+
 extension BitcoinKit.Transaction: TransactionDetails {
     var defaultCurrencySymbol: String? { DogeWalletService.currencySymbol }
     

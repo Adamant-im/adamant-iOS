@@ -8,7 +8,7 @@
 
 import Foundation
 
-public final class ExtensionsApi {
+public final class ExtensionsApi: Sendable {
     // MARK: Properties
     private let addressBookKey = "contact_list"
     private let apiService: AdamantApiServiceProtocol

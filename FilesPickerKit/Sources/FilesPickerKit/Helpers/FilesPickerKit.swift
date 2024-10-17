@@ -5,9 +5,10 @@ import CommonKit
 import UIKit
 import SwiftUI
 import AVFoundation
-import QuickLook
+@preconcurrency import QuickLook
 import FilesStorageKit
 
+@MainActor
 public final class FilesPickerKit: FilesPickerProtocol {
     private let storageKit: FilesStorageProtocol
     public var previewExtension: String { "jpeg" }
@@ -103,7 +104,6 @@ public final class FilesPickerKit: FilesPickerProtocol {
         )
     }
     
-    @MainActor
     public func getUrlConforms(
         to type: UTType,
         for itemProvider: NSItemProvider
@@ -123,7 +123,6 @@ public final class FilesPickerKit: FilesPickerProtocol {
         throw FilePickersError.cantSelectFile(itemProvider.suggestedName ?? .empty)
     }
     
-    @MainActor
     public func getUrl(for itemProvider: NSItemProvider) async throws -> URL {
         for type in itemProvider.registeredTypeIdentifiers {
             do {
@@ -136,25 +135,26 @@ public final class FilesPickerKit: FilesPickerProtocol {
         throw FileValidationError.fileNotFound
     }
     
-    @MainActor
     public func getFileURL(
         by type: String,
         itemProvider: NSItemProvider
     ) async throws -> URL {
-        try await withCheckedThrowingContinuation { continuation in
-            itemProvider.loadFileRepresentation(forTypeIdentifier: type) { [weak self] url, error in
+        let url: URL = try await withCheckedThrowingContinuation { continuation in
+            itemProvider.loadFileRepresentation(forTypeIdentifier: type) { url, error in
                 if let error = error {
                     continuation.resume(throwing: error)
                 } else if let url = url {
-                    if let targetURL = try? self?.storageKit.copyFileToTempCache(from: url) {
-                        continuation.resume(returning: targetURL)
-                    } else {
-                        continuation.resume(throwing: FileValidationError.fileNotFound)
-                    }
+                    continuation.resume(returning: url)
                 } else {
                     continuation.resume(throwing: FileValidationError.fileNotFound)
                 }
             }
+        }
+        
+        do {
+            return try storageKit.copyFileToTempCache(from: url)
+        } catch {
+            throw FileValidationError.fileNotFound
         }
     }
     

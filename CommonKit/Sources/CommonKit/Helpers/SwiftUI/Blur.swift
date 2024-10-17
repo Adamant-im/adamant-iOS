@@ -90,9 +90,8 @@ final class BlurEffectView: UIVisualEffectView {
     
     func addObservers() {
         NotificationCenter.default
-            .publisher(for: UIApplication.willEnterForegroundNotification, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: UIApplication.willEnterForegroundNotification, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.setupBlur()
             }
             .store(in: &subscriptions)

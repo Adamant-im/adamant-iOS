@@ -10,34 +10,38 @@ import UIKit
 import CommonKit
 
 extension UITextField {
-    
-    private struct UITextField_AssociatedKeys {
-        static var clearButtonTint = "uitextfield_clearButtonTint"
-        static var originalImage = "uitextfield_originalImage"
+
+    private final class UITextField_AssociatedKeys: @unchecked Sendable {
+        var clearButtonTint = "uitextfield_clearButtonTint"
+        var originalImage = "uitextfield_originalImage"
+        
+        private init() {}
+        
+        static let shared: UITextField_AssociatedKeys = .init()
     }
     
     private var originalImage: UIImage? {
         get {
-            if let cl = objc_getAssociatedObject(self, &UITextField_AssociatedKeys.originalImage) as? Wrapper<UIImage> {
+            if let cl = objc_getAssociatedObject(self, &UITextField_AssociatedKeys.shared.originalImage) as? Wrapper<UIImage> {
                 return cl.underlying
             }
             return nil
         }
         set {
-            objc_setAssociatedObject(self, &UITextField_AssociatedKeys.originalImage, Wrapper<UIImage>(newValue), .OBJC_ASSOCIATION_RETAIN)
+            objc_setAssociatedObject(self, &UITextField_AssociatedKeys.shared.originalImage, Wrapper<UIImage>(newValue), .OBJC_ASSOCIATION_RETAIN)
         }
     }
     
     var clearButtonTint: UIColor? {
         get {
-            if let cl = objc_getAssociatedObject(self, &UITextField_AssociatedKeys.clearButtonTint) as? Wrapper<UIColor> {
+            if let cl = objc_getAssociatedObject(self, &UITextField_AssociatedKeys.shared.clearButtonTint) as? Wrapper<UIColor> {
                 return cl.underlying
             }
             return nil
         }
         set {
             UITextField.runOnce
-            objc_setAssociatedObject(self, &UITextField_AssociatedKeys.clearButtonTint, Wrapper<UIColor>(newValue), .OBJC_ASSOCIATION_RETAIN)
+            objc_setAssociatedObject(self, &UITextField_AssociatedKeys.shared.clearButtonTint, Wrapper<UIColor>(newValue), .OBJC_ASSOCIATION_RETAIN)
             applyClearButtonTint()
         }
     }

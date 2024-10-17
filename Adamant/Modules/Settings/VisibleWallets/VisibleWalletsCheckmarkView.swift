@@ -141,12 +141,14 @@ final class VisibleWalletsCheckmarkRowView: UIView {
     }
 }
 
+@MainActor
 private func makeTitleLabel() -> UILabel {
     let label = UILabel()
     label.font = .systemFont(ofSize: 17, weight: .regular)
     return label
 }
 
+@MainActor
 private func makeSubtitleLabel() -> UILabel {
     let label = UILabel()
     label.font = .preferredFont(forTextStyle: .caption1)
@@ -154,6 +156,7 @@ private func makeSubtitleLabel() -> UILabel {
     return label
 }
 
+@MainActor
 private func makeCaptionLabel() -> UILabel {
     let label = UILabel()
     label.font = .systemFont(ofSize: 12, weight: .regular)
@@ -162,6 +165,7 @@ private func makeCaptionLabel() -> UILabel {
     return label
 }
 
+@MainActor
 private func makeAdditionalLabel() -> UILabel {
     let label = UILabel()
     label.font = .systemFont(ofSize: 17, weight: .regular)

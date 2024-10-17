@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 
 final class AdamantVibroService: VibroService {
+    @MainActor
     func applyVibration(_ type: AdamantVibroType) {
         switch type {
         case .light:

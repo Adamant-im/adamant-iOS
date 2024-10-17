@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol MessageModel {
+protocol MessageModel: Sendable {
     var id: String { get }
     
     func makeReplyContent() -> NSAttributedString

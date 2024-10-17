@@ -10,6 +10,7 @@ import UIKit
 import CommonKit
 import Swinject
 
+@MainActor
 struct SettingsFactory {
     let assembler: Assembler
     

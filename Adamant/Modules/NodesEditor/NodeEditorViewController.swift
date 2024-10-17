@@ -33,6 +33,7 @@ enum NodeEditorResult {
     case delete(node: Node)
 }
 
+@MainActor
 protocol NodeEditorDelegate: AnyObject {
     func nodeEditorViewController(_ editor: NodeEditorViewController, didFinishEditingWithResult result: NodeEditorResult)
 }

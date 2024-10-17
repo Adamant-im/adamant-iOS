@@ -25,7 +25,7 @@ struct FileUpdateProperties {
     let isFullMediaDownloadAllowed: Bool?
 }
 
-protocol ChatFileProtocol {
+protocol ChatFileProtocol: Sendable {
     var downloadingFiles: [String: DownloadStatus] { get }
     var uploadingFiles: [String] { get }
     var filesLoadingProgress: [String: Int] { get }

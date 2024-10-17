@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum ApiServiceError: LocalizedError {
+public enum ApiServiceError: LocalizedError, Sendable {
     case notLogged
     case accountNotFound
     case serverError(error: String)

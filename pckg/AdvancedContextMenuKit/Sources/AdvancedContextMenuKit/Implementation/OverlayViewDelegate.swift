@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 protocol OverlayViewDelegate: AnyObject {
     func didDissmis()
     func didAppear()

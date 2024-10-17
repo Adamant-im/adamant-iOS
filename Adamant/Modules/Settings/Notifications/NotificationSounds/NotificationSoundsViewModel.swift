@@ -24,7 +24,7 @@ final class NotificationSoundsViewModel: ObservableObject {
     
     private var audioPlayer: AVAudioPlayer?
     
-    nonisolated init(
+    init(
         notificationsService: NotificationsService,
         target: NotificationTarget,
         dialogService: DialogService
@@ -33,13 +33,11 @@ final class NotificationSoundsViewModel: ObservableObject {
         self.notificationTarget = target
         self.dialogService = dialogService
         
-        Task { @MainActor in
-            switch notificationTarget {
-            case .baseMessage:
-                self.selectedSound = notificationsService.notificationsSound
-            case .reaction:
-                self.selectedSound = notificationsService.notificationsReactionSound
-            }
+        switch notificationTarget {
+        case .baseMessage:
+            self.selectedSound = notificationsService.notificationsSound
+        case .reaction:
+            self.selectedSound = notificationsService.notificationsReactionSound
         }
     }
     

@@ -19,7 +19,7 @@ struct DownloadStatus: Hashable {
     )
 }
 
-struct ChatFile: Equatable, Hashable {
+struct ChatFile: Equatable, Hashable, @unchecked Sendable {
     var file: RichMessageFile.File
     var previewImage: UIImage?
     var downloadStatus: DownloadStatus
@@ -43,18 +43,20 @@ struct ChatFile: Equatable, Hashable {
         || downloadStatus.isPreviewDownloading
     }
     
-    static let `default` = Self(
-        file: .init([:]),
-        previewImage: nil,
-        downloadStatus: .default,
-        isUploading: false,
-        isCached: false,
-        storage: .empty,
-        nonce: .empty,
-        isFromCurrentSender: false,
-        fileType: .other,
-        progress: .zero,
-        isPreviewDownloadAllowed: false,
-        isFullMediaDownloadAllowed: false
-    )
+    static var `default`: Self {
+        Self(
+            file: .init([:]),
+            previewImage: nil,
+            downloadStatus: .default,
+            isUploading: false,
+            isCached: false,
+            storage: .empty,
+            nonce: .empty,
+            isFromCurrentSender: false,
+            fileType: .other,
+            progress: .zero,
+            isPreviewDownloadAllowed: false,
+            isFullMediaDownloadAllowed: false
+        )
+    }
 }

@@ -36,7 +36,7 @@ final class IPFSApiService: FileApiServiceProtocol {
     
     func uploadFile(
         data: Data,
-        uploadProgress: @escaping ((Progress) -> Void)
+        uploadProgress: @escaping @Sendable (Progress) -> Void
     ) async -> FileApiServiceResult<String> {
         let model: MultipartFormDataModel = .init(
             keyName: IPFSApiCommands.file.fieldName,
@@ -67,7 +67,7 @@ final class IPFSApiService: FileApiServiceProtocol {
     
     func downloadFile(
         id: String,
-        downloadProgress: @escaping ((Progress) -> Void)
+        downloadProgress: @escaping @Sendable (Progress) -> Void
     ) async -> FileApiServiceResult<Data> {
         let result: Result<Data, ApiServiceError> = await request { core, origin in
             let result: APIResponseModel = await core.sendRequest(

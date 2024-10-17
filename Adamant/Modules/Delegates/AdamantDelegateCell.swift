@@ -10,6 +10,7 @@ import UIKit
 import SnapKit
 
 // MARK: Cell's Delegate
+@MainActor
 protocol AdamantDelegateCellDelegate: AnyObject {
     func delegateCell(_ cell: AdamantDelegateCell, didChangeCheckedStateTo state: Bool)
 }

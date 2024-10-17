@@ -16,7 +16,7 @@ public protocol HealthCheckableError: Error {
     static func noEndpointsError(nodeGroupName: String) -> Self
 }
 
-open class HealthCheckWrapper<Service, Error: HealthCheckableError> {
+open class HealthCheckWrapper<Service, Error: HealthCheckableError>: @unchecked Sendable {
     @ObservableValue public private(set) var nodes: [Node] = .init()
     @ObservableValue public private(set) var sortedAllowedNodes: [Node] = .init()
     
@@ -74,12 +74,12 @@ open class HealthCheckWrapper<Service, Error: HealthCheckableError> {
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: UIApplication.didBecomeActiveNotification, object: nil)
+            .notifications(named: UIApplication.didBecomeActiveNotification, object: nil)
             .sink { [weak self] _ in self?.didBecomeActiveAction() }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: UIApplication.willResignActiveNotification, object: nil)
+            .notifications(named: UIApplication.willResignActiveNotification, object: nil)
             .sink { [weak self] _ in self?.previousAppState = .background }
             .store(in: &subscriptions)
     }

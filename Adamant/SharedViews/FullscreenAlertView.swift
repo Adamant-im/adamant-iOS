@@ -44,12 +44,15 @@ final class FullscreenAlertView: UIView {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        alertBackgroundView.layer.cornerRadius = 14
-        titleLabel.isHidden = true
-        messageLabel.isHidden = true
-        alertBackgroundView.backgroundColor = .adamant.background
-        titleLabel.textColor = .adamant.primary
-        messageLabel.textColor = .adamant.primary
-        imageView.tintColor = .adamant.primary
+        
+        Task { @MainActor in
+            alertBackgroundView.layer.cornerRadius = 14
+            titleLabel.isHidden = true
+            messageLabel.isHidden = true
+            alertBackgroundView.backgroundColor = .adamant.background
+            titleLabel.textColor = .adamant.primary
+            messageLabel.textColor = .adamant.primary
+            imageView.tintColor = .adamant.primary
+        }
     }
 }

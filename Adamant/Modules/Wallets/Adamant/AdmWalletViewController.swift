@@ -193,13 +193,19 @@ final class AdmWalletViewController: WalletViewControllerBase {
                 forName: service.core.walletUpdatedNotification,
                 object: service.core,
                 queue: OperationQueue.main,
-                using: { [weak self] _ in self?.updateRows() }
+                using: { [weak self] _ in MainActor.assumeIsolatedSafe { self?.updateRows() } }
             )
         }
         
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            self?.updateRows()
-            self?.tableView.reloadData()
+        NotificationCenter.default.addObserver(
+            forName: .AdamantAccountService.userLoggedIn,
+            object: nil,
+            queue: OperationQueue.main
+        ) { [weak self] _ in
+            MainActor.assumeIsolatedSafe {
+                self?.updateRows()
+                self?.tableView.reloadData()
+            }
         }
         
         setColors()

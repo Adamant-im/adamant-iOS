@@ -239,6 +239,7 @@ private extension MediaContainerView {
 }
 
 extension ChatMediaContentView.FileModel {
+    @MainActor
     func height() -> CGFloat {
         let fileList = Array(files.prefix(FilesConstants.maxFilesCount))
         

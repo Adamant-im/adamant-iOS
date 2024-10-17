@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol FilesStorageProprietiesProtocol {
+protocol FilesStorageProprietiesProtocol: Sendable {
     func autoDownloadPreviewPolicy() -> DownloadPolicy
     func setAutoDownloadPreview(_ value: DownloadPolicy)
     func autoDownloadFullMediaPolicy() -> DownloadPolicy

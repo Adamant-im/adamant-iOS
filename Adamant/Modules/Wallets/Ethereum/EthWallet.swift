@@ -8,19 +8,20 @@
 
 import Foundation
 import web3swift
-import Web3Core
+import CommonKit
+@preconcurrency import Web3Core
 
-final class EthWallet: WalletAccount {
-    var unicId: String
+final class EthWallet: WalletAccount, @unchecked Sendable {
+    let unicId: String
     let address: String
     let ethAddress: EthereumAddress
     let keystore: BIP32Keystore
     
-    var balance: Decimal = 0
-    var notifications: Int = 0
-    var minBalance: Decimal = 0
-    var minAmount: Decimal = 0
-    var isBalanceInitialized: Bool = false
+    @Atomic var balance: Decimal = 0
+    @Atomic var notifications: Int = 0
+    @Atomic var minBalance: Decimal = 0
+    @Atomic var minAmount: Decimal = 0
+    @Atomic var isBalanceInitialized: Bool = false
     
     init(
         unicId: String,

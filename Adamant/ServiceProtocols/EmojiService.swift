@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol EmojiService: AnyObject {
+protocol EmojiService: AnyObject, Sendable {
     func getFrequentlySelectedEmojis() -> [String]
     func updateFrequentlySelectedEmojis(
         selectedEmoji: String,

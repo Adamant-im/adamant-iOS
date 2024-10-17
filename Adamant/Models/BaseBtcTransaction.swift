@@ -8,7 +8,7 @@
 
 import Foundation
 
-class BaseBtcTransaction: TransactionDetails {
+class BaseBtcTransaction: TransactionDetails, @unchecked Sendable {
     var defaultCurrencySymbol: String? { return "" }
     
     let txId: String

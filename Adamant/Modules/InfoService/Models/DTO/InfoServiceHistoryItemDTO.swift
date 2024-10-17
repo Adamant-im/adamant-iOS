@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct InfoServiceHistoryItemDTO: Codable {
+struct InfoServiceHistoryItemDTO: Codable, Sendable {
     let _id: String
     let date: Int
     let tickers: [String: Decimal]?

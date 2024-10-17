@@ -11,8 +11,8 @@ import UIKit
 import web3swift
 import Swinject
 import Alamofire
-import BigInt
-import Web3Core
+@preconcurrency import BigInt
+@preconcurrency import Web3Core
 import Combine
 import CommonKit
 
@@ -57,6 +57,9 @@ extension Web3Error {
              .dataError,
              .walletError,
              .unknownError,
+             .rpcError,
+             .revert,
+             .revertCustom,
              .typeError:
             return .internalError(message: "Unknown error", error: nil)
         case .valueError(desc: let desc):
@@ -69,7 +72,7 @@ extension Web3Error {
     }
 }
 
-final class EthWalletService: WalletCoreProtocol {
+final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
 	// MARK: - Constants
 	let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")
 	
@@ -208,25 +211,22 @@ final class EthWalletService: WalletCoreProtocol {
     
     func addObservers() {
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedIn, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedIn, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.accountDataUpdated, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.accountDataUpdated, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.update()
             }
             .store(in: &subscriptions)
         
         NotificationCenter.default
-            .publisher(for: .AdamantAccountService.userLoggedOut, object: nil)
-            .receive(on: OperationQueue.main)
-            .sink { [weak self] _ in
+            .notifications(named: .AdamantAccountService.userLoggedOut, object: nil)
+            .sink { @MainActor [weak self] _ in
                 self?.ethWallet = nil
                 if let balanceObserver = self?.balanceObserver {
                     NotificationCenter.default.removeObserver(balanceObserver)
@@ -489,7 +489,7 @@ extension EthWalletService {
                         return
                     }
                     
-                    self?.save(ethAddress: ethAddress) { result in
+                    self?.save(ethAddress: ethAddress) { [weak self] result in
                         self?.kvsSaveCompletionRecursion(ethAddress: ethAddress, result: result)
                     }
                 }
@@ -567,7 +567,7 @@ extension EthWalletService {
     ///   - ethAddress: Ethereum address to save into KVS
     ///   - adamantAddress: Owner of Ethereum address
     ///   - completion: success
-    private func save(ethAddress: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
+    private func save(ethAddress: String, completion: @escaping @Sendable (WalletServiceSimpleResult) -> Void) {
         guard let adamant = accountService?.account, let keypair = accountService?.keypair else {
             completion(.failure(error: .notLogged))
             return

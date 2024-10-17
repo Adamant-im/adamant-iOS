@@ -26,7 +26,7 @@ extension AdamantUserInfoKey {
     }
 }
 
-protocol ReachabilityMonitor {
+protocol ReachabilityMonitor: Sendable {
     var connectionPublisher: AnyObservable<Bool> { get }
     var connection: Bool { get }
     

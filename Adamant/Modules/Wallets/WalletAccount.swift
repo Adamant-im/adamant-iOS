@@ -9,7 +9,7 @@
 import Foundation
 
 // MARK: - Wallet Account
-protocol WalletAccount {
+protocol WalletAccount: Sendable {
     // MARK: Account
     var unicId: String { get }
     var address: String { get }

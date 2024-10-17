@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct RPCResponseModel: Codable {
+public struct RPCResponseModel: Codable, Sendable {
     public let id: String
     public let result: Data
     

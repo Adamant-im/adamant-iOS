@@ -9,7 +9,7 @@
 import Foundation
 import CommonKit
 
-enum InfoServiceApiError: Error {
+enum InfoServiceApiError: Error, Sendable {
     case unknown
     case parsingError
     case inconsistentData

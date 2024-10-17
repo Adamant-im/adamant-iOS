@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import LiskKit
+@preconcurrency import LiskKit
 import CommonKit
 
 extension KlyWalletService: WalletServiceTwoStepSend {

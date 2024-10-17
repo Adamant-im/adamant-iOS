@@ -8,7 +8,7 @@
 import UIKit
 import CommonKit
 
-public protocol FilesStorageProtocol {
+public protocol FilesStorageProtocol: Sendable {
     func cacheImageToMemoryIfNeeded(id: String, data: Data) -> UIImage?
     
     func getPreview(for id: String) -> UIImage?

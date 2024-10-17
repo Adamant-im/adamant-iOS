@@ -18,7 +18,7 @@ final class FilesNetworkManager: FilesNetworkManagerProtocol {
     func uploadFiles(
         _ data: Data,
         type: NetworkFileProtocolType,
-        uploadProgress: @escaping ((Progress) -> Void)
+        uploadProgress: @escaping @Sendable (Progress) -> Void
     ) async -> FileApiServiceResult<String> {
         switch type {
         case .ipfs:
@@ -29,7 +29,7 @@ final class FilesNetworkManager: FilesNetworkManagerProtocol {
     func downloadFile(
         _ id: String,
         type: String,
-        downloadProgress: @escaping ((Progress) -> Void)
+        downloadProgress: @escaping @Sendable (Progress) -> Void
     ) async -> FileApiServiceResult<Data> {
         guard let netwrokProtocol = NetworkFileProtocolType(rawValue: type) else {
             return .failure(.cantDownloadFile)

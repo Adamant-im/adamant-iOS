@@ -101,161 +101,167 @@ extension SecurityViewController {
 
 // MARK: - PinpadViewControllerDelegate
 extension SecurityViewController: PinpadViewControllerDelegate {
-    func pinpad(_ pinpad: PinpadViewController, didEnterPin pin: String) {
-        switch pinpadRequest {
-            
-        // MARK: User has entered new pin first time. Request re-enter pin
-        case .createPin?:
-            pinpadRequest = .reenterPin(pin: pin)
-            pinpad.commentLabel.text = String.adamant.pinpad.reenterPin
-            pinpad.clearPin()
-            return
-            
-        // MARK: User has reentered pin. Save pin.
-        case .reenterPin(let pinToVerify)?:
-            guard pin == pinToVerify else {
-                pinpad.playWrongPinAnimation()
+    nonisolated func pinpad(_ pinpad: PinpadViewController, didEnterPin pin: String) {
+        MainActor.assumeIsolatedSafe {
+            switch pinpadRequest {
+                
+            // MARK: User has entered new pin first time. Request re-enter pin
+            case .createPin?:
+                pinpadRequest = .reenterPin(pin: pin)
+                pinpad.commentLabel.text = String.adamant.pinpad.reenterPin
                 pinpad.clearPin()
-                break
-            }
-            
-            accountService.setStayLoggedIn(pin: pin) { [weak self] result in
-                switch result {
-                case .success:
-                    self?.pinpadRequest = nil
-                    DispatchQueue.main.async {
-                        if let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {
-                            row.value = false
-                            row.updateCell()
-                            row.evaluateHidden()
-                        }
-                        
-                        if let section = self?.form.sectionBy(tag: Sections.notifications.tag) {
-                            section.evaluateHidden()
-                        }
-                        
-                        if let section = self?.form.sectionBy(tag: Sections.aboutNotificationTypes.tag) {
-                            section.evaluateHidden()
-                        }
-                        
-                        pinpad.dismiss(animated: true, completion: nil)
-                    }
-                    
-                case .failure(let error):
-                    self?.dialogService.showRichError(error: error)
+                return
+                
+            // MARK: User has reentered pin. Save pin.
+            case .reenterPin(let pinToVerify)?:
+                guard pin == pinToVerify else {
+                    pinpad.playWrongPinAnimation()
+                    pinpad.clearPin()
+                    break
                 }
+                
+                accountService.setStayLoggedIn(pin: pin) { [weak self] result in
+                    Task { @MainActor in
+                        switch result {
+                        case .success:
+                            self?.pinpadRequest = nil
+                            if let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {
+                                row.value = false
+                                row.updateCell()
+                                row.evaluateHidden()
+                            }
+                            
+                            if let section = self?.form.sectionBy(tag: Sections.notifications.tag) {
+                                section.evaluateHidden()
+                            }
+                            
+                            if let section = self?.form.sectionBy(tag: Sections.aboutNotificationTypes.tag) {
+                                section.evaluateHidden()
+                            }
+                            
+                            pinpad.dismiss(animated: true, completion: nil)
+                            
+                        case .failure(let error):
+                            self?.dialogService.showRichError(error: error)
+                        }
+                    }
+                }
+                
+            // MARK: Users want to turn off the pin. Validate and turn off.
+            case .turnOffPin?:
+                guard accountService.validatePin(pin) else {
+                    pinpad.playWrongPinAnimation()
+                    pinpad.clearPin()
+                    break
+                }
+                
+                accountService.dropSavedAccount()
+                
+                pinpad.dismiss(animated: true, completion: nil)
+                
+            // MARK: User wants to turn on biometry
+            case .turnOnBiometry?:
+                guard accountService.validatePin(pin) else {
+                    pinpad.playWrongPinAnimation()
+                    pinpad.clearPin()
+                    break
+                }
+                
+                accountService.updateUseBiometry(true)
+                pinpad.dismiss(animated: true, completion: nil)
+                
+            // MARK: User wants to turn off biometry
+            case .turnOffBiometry?:
+                guard accountService.validatePin(pin) else {
+                    pinpad.playWrongPinAnimation()
+                    pinpad.clearPin()
+                    break
+                }
+                
+                accountService.updateUseBiometry(false)
+                pinpad.dismiss(animated: true, completion: nil)
+                
+            default:
+                pinpad.dismiss(animated: true, completion: nil)
             }
-            
-        // MARK: Users want to turn off the pin. Validate and turn off.
-        case .turnOffPin?:
-            guard accountService.validatePin(pin) else {
-                pinpad.playWrongPinAnimation()
-                pinpad.clearPin()
-                break
-            }
-            
-            accountService.dropSavedAccount()
-            
-            pinpad.dismiss(animated: true, completion: nil)
-            
-        // MARK: User wants to turn on biometry
-        case .turnOnBiometry?:
-            guard accountService.validatePin(pin) else {
-                pinpad.playWrongPinAnimation()
-                pinpad.clearPin()
-                break
-            }
-            
-            accountService.updateUseBiometry(true)
-            pinpad.dismiss(animated: true, completion: nil)
-            
-        // MARK: User wants to turn off biometry
-        case .turnOffBiometry?:
-            guard accountService.validatePin(pin) else {
-                pinpad.playWrongPinAnimation()
-                pinpad.clearPin()
-                break
-            }
-            
-            accountService.updateUseBiometry(false)
-            pinpad.dismiss(animated: true, completion: nil)
-            
-        default:
-            pinpad.dismiss(animated: true, completion: nil)
         }
     }
     
-    func pinpadDidTapBiometryButton(_ pinpad: PinpadViewController) {
-        switch pinpadRequest {
-            
-        // MARK: User wants to turn of StayIn with his face. Or finger.
-        case .turnOffPin?:
-            localAuth.authorizeUser(reason: String.adamant.security.stayInTurnOff, completion: { [weak self] result in
-                switch result {
-                case .success:
-                    self?.accountService.dropSavedAccount()
-                    
-                    DispatchQueue.main.async {
-                        if let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {
-                            row.value = false
-                            row.updateCell()
-                            row.evaluateHidden()
+    nonisolated func pinpadDidTapBiometryButton(_ pinpad: PinpadViewController) {
+        MainActor.assumeIsolatedSafe {
+            switch pinpadRequest {
+                
+            // MARK: User wants to turn of StayIn with his face. Or finger.
+            case .turnOffPin?:
+                localAuth.authorizeUser(reason: String.adamant.security.stayInTurnOff, completion: { [weak self] result in
+                    switch result {
+                    case .success:
+                        self?.accountService.dropSavedAccount()
+                        
+                        DispatchQueue.main.async {
+                            if let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {
+                                row.value = false
+                                row.updateCell()
+                                row.evaluateHidden()
+                            }
+                            
+                            if let section = self?.form.sectionBy(tag: Sections.notifications.tag) {
+                                section.evaluateHidden()
+                            }
+                            
+                            pinpad.dismiss(animated: true, completion: nil)
                         }
                         
-                        if let section = self?.form.sectionBy(tag: Sections.notifications.tag) {
-                            section.evaluateHidden()
-                        }
-                        
-                        pinpad.dismiss(animated: true, completion: nil)
+                    case .cancel: break
+                    case .fallback: break
+                    case .failed: break
                     }
-                    
-                case .cancel: break
-                case .fallback: break
-                case .failed: break
-                }
-            })
-            
-        default:
-            return
+                })
+                
+            default:
+                return
+            }
         }
     }
     
-    func pinpadDidCancel(_ pinpad: PinpadViewController) {
-        switch pinpadRequest {
-            
-        // MARK: User canceled turning on StayIn
-        case .createPin?, .reenterPin(pin: _)?:
-            if let row: SwitchRow = form.rowBy(tag: Rows.stayIn.tag) {
-                row.value = false
-                row.updateCell()
+    nonisolated func pinpadDidCancel(_ pinpad: PinpadViewController) {
+        MainActor.assumeIsolatedSafe {
+            switch pinpadRequest {
+                
+            // MARK: User canceled turning on StayIn
+            case .createPin?, .reenterPin(pin: _)?:
+                if let row: SwitchRow = form.rowBy(tag: Rows.stayIn.tag) {
+                    row.value = false
+                    row.updateCell()
+                }
+                
+            // MARK: User canceled turning off StayIn
+            case .turnOffPin?:
+                if let row: SwitchRow = form.rowBy(tag: Rows.stayIn.tag) {
+                    row.value = true
+                    row.updateCell()
+                }
+                
+            // MARK: User canceled Biometry On
+            case .turnOnBiometry?:
+                if let row: SwitchRow = form.rowBy(tag: Rows.biometry.tag) {
+                    row.value = false
+                    row.updateCell()
+                }
+                
+            // MARK: User canceled Biometry Off
+            case .turnOffBiometry?:
+                if let row: SwitchRow = form.rowBy(tag: Rows.biometry.tag) {
+                    row.value = true
+                    row.updateCell()
+                }
+                
+            default:
+                break
             }
             
-        // MARK: User canceled turning off StayIn
-        case .turnOffPin?:
-            if let row: SwitchRow = form.rowBy(tag: Rows.stayIn.tag) {
-                row.value = true
-                row.updateCell()
-            }
-            
-        // MARK: User canceled Biometry On
-        case .turnOnBiometry?:
-            if let row: SwitchRow = form.rowBy(tag: Rows.biometry.tag) {
-                row.value = false
-                row.updateCell()
-            }
-            
-        // MARK: User canceled Biometry Off
-        case .turnOffBiometry?:
-            if let row: SwitchRow = form.rowBy(tag: Rows.biometry.tag) {
-                row.value = true
-                row.updateCell()
-            }
-            
-        default:
-            break
+            pinpadRequest = nil
+            pinpad.dismiss(animated: true, completion: nil)
         }
-        
-        pinpadRequest = nil
-        pinpad.dismiss(animated: true, completion: nil)
     }
 }

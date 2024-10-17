@@ -9,7 +9,7 @@
 import Foundation
 import CommonKit
 
-final class InfoServiceApiService {
+final class InfoServiceApiService: Sendable {
     let core: BlockchainHealthCheckWrapper<InfoServiceApiCore>
     
     func request<Output>(

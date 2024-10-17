@@ -8,7 +8,7 @@
 
 import CommonKit
 
-protocol ChatPreservationProtocol: AnyObject {
+protocol ChatPreservationProtocol: AnyObject, Sendable {
     func preserveMessage(_ message: String, forAddress address: String)
     func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String?
     func setReplyMessage(_ message: MessageModel?, forAddress address: String)

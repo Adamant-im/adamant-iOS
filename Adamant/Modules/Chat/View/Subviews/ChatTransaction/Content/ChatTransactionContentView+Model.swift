@@ -23,19 +23,21 @@ extension ChatTransactionContentView {
         var replyId: String
         var isHidden: Bool
         
-        static let `default` = Self(
-            id: "",
-            title: "",
-            icon: .init(),
-            amount: "",
-            currency: "",
-            date: .init(),
-            comment: nil,
-            backgroundColor: .failed,
-            isReply: false,
-            replyMessage: NSAttributedString(string: ""),
-            replyId: "",
-            isHidden: false
-        )
+        static var `default`: Self {
+            Self(
+                id: "",
+                title: "",
+                icon: .init(),
+                amount: "",
+                currency: "",
+                date: .init(),
+                comment: nil,
+                backgroundColor: .failed,
+                isReply: false,
+                replyMessage: NSAttributedString(string: ""),
+                replyId: "",
+                isHidden: false
+            )
+        }
     }
 }

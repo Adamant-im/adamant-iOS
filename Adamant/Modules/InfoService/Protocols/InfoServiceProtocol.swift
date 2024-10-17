@@ -39,12 +39,12 @@ enum Currency: String, CaseIterable {
         }
     }
     
-    static var `default` = Currency.USD
+    static let `default` = Currency.USD
 }
 
 // MARK: - protocol
 @MainActor
-protocol InfoServiceProtocol: AnyObject {
+protocol InfoServiceProtocol: AnyObject, Sendable {
     var currentCurrency: Currency { get set }
     
     // Check rates for list of coins

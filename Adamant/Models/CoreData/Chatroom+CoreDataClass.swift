@@ -11,7 +11,7 @@ import Foundation
 import CoreData
 
 @objc(Chatroom)
-public class Chatroom: NSManagedObject {
+public class Chatroom: NSManagedObject, @unchecked Sendable {
     static let entityName = "Chatroom"
     
     var hasUnread: Bool {
