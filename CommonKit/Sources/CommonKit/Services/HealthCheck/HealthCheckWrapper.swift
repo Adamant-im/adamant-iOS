@@ -17,8 +17,8 @@ public protocol HealthCheckableError: Error {
 }
 
 open class HealthCheckWrapper<Service, Error: HealthCheckableError>: @unchecked Sendable {
-    @ObservableValue public private(set) var nodes: [Node] = .init()
-    @ObservableValue public private(set) var sortedAllowedNodes: [Node] = .init()
+    @AtomicObservableValue public private(set) var nodes: [Node] = .init()
+    @AtomicObservableValue public private(set) var sortedAllowedNodes: [Node] = .init()
     
     public let service: Service
     public let isActive: Bool
@@ -68,6 +68,7 @@ open class HealthCheckWrapper<Service, Error: HealthCheckableError>: @unchecked 
             .store(in: &subscriptions)
         
         $sortedAllowedNodes
+            .makeSequence()
             .map { $0.isEmpty }
             .removeDuplicates()
             .sink { [weak self] _ in self?.updateHealthCheckTimerSubscription() }
@@ -122,7 +123,7 @@ open class HealthCheckWrapper<Service, Error: HealthCheckableError>: @unchecked 
 
 private extension HealthCheckWrapper {
     func nodesForRequest(waitsForConnectivity: Bool) async -> [Node] {
-        await $sortedAllowedNodes.compactMap { [fastestNodeMode = $fastestNodeMode] in
+        await $sortedAllowedNodes.makeSequence().compactMap { [fastestNodeMode = $fastestNodeMode] in
             guard !waitsForConnectivity || !$0.isEmpty else { return nil }
             return fastestNodeMode.value ? $0 : $0.shuffled()
         }.values.first { _ in true } ?? .init()

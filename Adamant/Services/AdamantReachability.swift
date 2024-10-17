@@ -13,12 +13,12 @@ import CommonKit
 
 // MARK: - AdamantReachability wrapper
 final class AdamantReachability: ReachabilityMonitor, @unchecked Sendable {
-    @ObservableValue private(set) var connection = true
+    @AtomicObservableValue private(set) var connection = true
     
     private let monitor = NWPathMonitor()
     
-    var connectionPublisher: AnyObservable<Bool> {
-        $connection.eraseToAnyPublisher()
+    var connectionPublisher: AnyAsyncStreamable<Bool> {
+        $connection.eraseToAnyAsyncStreamable()
     }
     
     func start() {
