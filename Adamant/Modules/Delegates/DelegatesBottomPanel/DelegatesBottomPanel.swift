@@ -75,7 +75,8 @@ private extension DelegatesBottomPanel {
         
         addSubview(horizontalStack)
         horizontalStack.snp.makeConstraints {
-            $0.directionalEdges.equalToSuperview().inset(spacing)
+            $0.verticalEdges.equalToSuperview().inset(spacing)
+            $0.horizontalEdges.equalToSuperview().inset(horizontalSpacing)
         }
         
         update()
@@ -133,3 +134,4 @@ private let totalPrefix = String.localized(
 )
 
 private let spacing: CGFloat = 8
+private let horizontalSpacing: CGFloat = 15
