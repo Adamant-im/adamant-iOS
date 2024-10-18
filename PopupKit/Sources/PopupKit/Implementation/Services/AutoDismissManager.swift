@@ -20,21 +20,21 @@ final class AutoDismissManager {
     }
     
     func dismissNotification() {
-        notificationDismissSubscription = setTimer { [weak self] in
+        notificationDismissSubscription = setTimer(interval: autoDismissTimeInterval) { [weak self] in
             self?.notificationDismissSubscription = nil
             self?.popupCoordinatorModel.notification = nil
         }
     }
     
     func dismissAlert() {
-        alertDismissSubscription = setTimer { [weak self] in
+        alertDismissSubscription = setTimer(interval: autoDismissTimeInterval) { [weak self] in
             self?.alertDismissSubscription = nil
             self?.popupCoordinatorModel.alert = nil
         }
     }
     
     func dismissToast() {
-        toastDismissSubscription = setTimer { [weak self] in
+        toastDismissSubscription = setTimer(interval: autoDismissToastTimeInterval) { [weak self] in
             self?.toastDismissSubscription = nil
             self?.popupCoordinatorModel.toastMessage = nil
         }
@@ -42,11 +42,15 @@ final class AutoDismissManager {
 }
 
 private extension AutoDismissManager {
-    func setTimer(handler: @escaping () -> Void) -> AnyCancellable {
-        Timer.publish(every: autoDismissTimeInterval, on: .main, in: .common)
+    func setTimer(
+        interval: TimeInterval,
+        handler: @escaping () -> Void
+    ) -> AnyCancellable {
+        Timer.publish(every: interval, on: .main, in: .common)
             .autoconnect()
             .sink { _ in handler() }
     }
 }
 
 private let autoDismissTimeInterval: TimeInterval = 4
+private let autoDismissToastTimeInterval: TimeInterval = 1.5
