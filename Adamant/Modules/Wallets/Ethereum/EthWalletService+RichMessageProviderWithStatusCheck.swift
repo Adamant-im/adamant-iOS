@@ -28,7 +28,9 @@ extension EthWalletService {
         let transactionInfo: EthTransactionInfo
         
         do {
-            transactionInfo = try await ethApiService.requestWeb3 { [weak self] web3 in
+            transactionInfo = try await ethApiService.requestWeb3(
+                waitsForConnectivity: true
+            ) { [weak self] web3 in
                 guard let self = self else { throw WalletServiceError.internalError(.unknownError) }
                 return try await getTransactionInfo(hash: hash, web3: web3)
             }.get()
@@ -45,7 +47,7 @@ extension EthWalletService {
         
         var sentDate: Date?
         if let blockHash = details.blockHash {
-            sentDate = try? await ethApiService.requestWeb3 { web3 in
+            sentDate = try? await ethApiService.requestWeb3(waitsForConnectivity: true) { web3 in
                 try await web3.eth.block(by: blockHash).timestamp
             }.get()
         }

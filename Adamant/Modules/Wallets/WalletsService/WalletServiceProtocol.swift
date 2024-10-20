@@ -8,13 +8,4 @@
 
 import Foundation
 
-protocol WalletServiceProtocol: Sendable {
-    func statusWithFilters(
-        transaction: RichMessageTransaction?,
-        oldPendingAttempts: Int,
-        info: TransactionStatusInfo
-    ) -> TransactionStatus
-    
-    func statusInfoFor(transaction: CoinTransaction) async -> TransactionStatusInfo
-    func getAllRichTransactionsFromDB(with id: String) -> [RichMessageTransaction]
-}
+protocol WalletServiceProtocol: Sendable {}

@@ -26,7 +26,7 @@ extension DashWalletService {
         let dashTransaction: BTCRawTransaction
         
         do {
-            dashTransaction = try await getTransaction(by: hash)
+            dashTransaction = try await getTransaction(by: hash, waitsForConnectivity: true)
         } catch {
             return .init(error: error)
         }

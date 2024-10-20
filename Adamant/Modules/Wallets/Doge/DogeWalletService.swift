@@ -388,7 +388,7 @@ extension DogeWalletService {
     }
     
     func getBalance(address: String) async throws -> Decimal {
-        let data: Data = try await dogeApiService.request { core, origin in
+        let data: Data = try await dogeApiService.request(waitsForConnectivity: false) { core, origin in
             await core.sendRequest(
                 origin: origin,
                 path: DogeApiCommands.balance(for: address)
@@ -530,7 +530,7 @@ extension DogeWalletService {
             "to": to
         ]
         
-        return try await dogeApiService.request { core, origin in
+        return try await dogeApiService.request(waitsForConnectivity: false) { core, origin in
             await core.sendRequestJsonResponse(
                 origin: origin,
                 path: DogeApiCommands.getTransactions(for: address),
@@ -553,7 +553,7 @@ extension DogeWalletService {
         ]
         
         // MARK: Sending request
-        let data = try await dogeApiService.request { core, origin in
+        let data = try await dogeApiService.request(waitsForConnectivity: false) { core, origin in
             await core.sendRequest(
                 origin: origin,
                 path: DogeApiCommands.getUnspentTransactions(for: address),
@@ -601,8 +601,8 @@ extension DogeWalletService {
         return utxos
     }
     
-    func getTransaction(by hash: String) async throws -> BTCRawTransaction {
-        try await dogeApiService.request { core, origin in
+    func getTransaction(by hash: String, waitsForConnectivity: Bool) async throws -> BTCRawTransaction {
+        try await dogeApiService.request(waitsForConnectivity: waitsForConnectivity) { core, origin in
             await core.sendRequestJsonResponse(
                 origin: origin,
                 path: DogeApiCommands.getTransaction(by: hash)
@@ -611,7 +611,7 @@ extension DogeWalletService {
     }
     
     func getBlockId(by hash: String) async throws -> String {
-        let data = try await dogeApiService.request { core, origin in
+        let data = try await dogeApiService.request(waitsForConnectivity: false) { core, origin in
             await core.sendRequest(origin: origin, path: DogeApiCommands.getBlock(by: hash))
         }.get()
         

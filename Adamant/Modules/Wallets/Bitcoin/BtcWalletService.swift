@@ -521,7 +521,7 @@ extension BtcWalletService {
     }
     
     func getBalance(address: String) async throws -> Decimal {
-        let response: BtcBalanceResponse = try await btcApiService.request { api, origin in
+        let response: BtcBalanceResponse = try await btcApiService.request(waitsForConnectivity: false) { api, origin in
             await api.sendRequestJsonResponse(origin: origin, path: BtcApiCommands.balance(for: address))
         }.get()
 
@@ -529,7 +529,7 @@ extension BtcWalletService {
     }
 
     func getFeeRate() async throws -> Decimal {
-        let response: [String: Decimal] = try await btcApiService.request { api, origin in
+        let response: [String: Decimal] = try await btcApiService.request(waitsForConnectivity: false) { api, origin in
             await api.sendRequestJsonResponse(origin: origin, path: BtcApiCommands.getFeeRate())
         }.get()
         
@@ -668,7 +668,7 @@ extension BtcWalletService {
         for address: String,
         fromTx: String? = nil
     ) async throws -> [RawBtcTransactionResponse] {
-        return try await btcApiService.request { api, origin in
+        return try await btcApiService.request(waitsForConnectivity: false) { api, origin in
             await api.sendRequestJsonResponse(
                 origin: origin,
                 path: BtcApiCommands.getTransactions(
@@ -679,12 +679,14 @@ extension BtcWalletService {
         }.get()
     }
 
-    func getTransaction(by hash: String) async throws -> BtcTransaction {
+    func getTransaction(by hash: String, waitsForConnectivity: Bool) async throws -> BtcTransaction {
         guard let address = self.wallet?.address else {
             throw WalletServiceError.notLogged
         }
         
-        let rawTransaction: RawBtcTransactionResponse = try await btcApiService.request { api, origin in
+        let rawTransaction: RawBtcTransactionResponse = try await btcApiService.request(
+            waitsForConnectivity: waitsForConnectivity
+        ) { api, origin in
             await api.sendRequestJsonResponse(
                 origin: origin,
                 path: BtcApiCommands.getTransaction(by: hash)

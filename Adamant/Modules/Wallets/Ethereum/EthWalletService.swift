@@ -354,7 +354,7 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
 	}
 	
 	func getGasPrices() async throws -> BigUInt {
-        try await ethApiService.requestWeb3 { web3 in
+        try await ethApiService.requestWeb3(waitsForConnectivity: false) { web3 in
             try await web3.eth.gasPrice()
         }.get()
 	}
@@ -365,7 +365,7 @@ final class EthWalletService: WalletCoreProtocol, @unchecked Sendable {
         transaction.from = ethWallet.ethAddress
         transaction.to = address ?? ethWallet.ethAddress
         
-        return try await ethApiService.requestWeb3 { [transaction] web3 in
+        return try await ethApiService.requestWeb3(waitsForConnectivity: false) { [transaction] web3 in
             try await web3.eth.estimateGas(for: transaction)
         }.get()
     }
@@ -531,7 +531,7 @@ extension EthWalletService {
     }
     
 	func getBalance(forAddress address: EthereumAddress) async throws -> Decimal {
-        let balance = try await ethApiService.requestWeb3 { web3 in
+        let balance = try await ethApiService.requestWeb3(waitsForConnectivity: false) { web3 in
             try await web3.eth.getBalance(for: address)
         }.get()
         
@@ -604,7 +604,7 @@ extension EthWalletService {
         let sender = wallet?.address
         
         // MARK: 1. Transaction details
-        let details = try await ethApiService.requestWeb3 { web3 in
+        let details = try await ethApiService.requestWeb3(waitsForConnectivity: false) { web3 in
             try await web3.eth.transactionDetails(hash)
         }.get()
         
@@ -617,7 +617,7 @@ extension EthWalletService {
         
         // MARK: 2. Transaction receipt
         do {
-            let receipt = try await ethApiService.requestWeb3 { web3 in
+            let receipt = try await ethApiService.requestWeb3(waitsForConnectivity: false) { web3 in
                 try await web3.eth.transactionReceipt(hash)
             }.get()
             
@@ -638,11 +638,11 @@ extension EthWalletService {
             }
             
             // MARK: 4. Block timestamp & confirmations
-            let currentBlock = try await ethApiService.requestWeb3 { web3 in
+            let currentBlock = try await ethApiService.requestWeb3(waitsForConnectivity: false) { web3 in
                 try await web3.eth.blockNumber()
             }.get()
             
-            let block = try await ethApiService.requestWeb3 { web3 in
+            let block = try await ethApiService.requestWeb3(waitsForConnectivity: false) { web3 in
                 try await web3.eth.block(by: receipt.blockHash)
             }.get()
             
@@ -711,7 +711,7 @@ extension EthWalletService {
             "contract_to": "eq."
         ]
         
-        let transactionsFrom: [EthTransactionShort] = try await ethApiService.requestApiCore { core, origin in
+        let transactionsFrom: [EthTransactionShort] = try await ethApiService.requestApiCore(waitsForConnectivity: false) { core, origin in
             await core.sendRequestJsonResponse(
                 origin: origin,
                 path: EthWalletService.transactionsListApiSubpath,
@@ -721,7 +721,7 @@ extension EthWalletService {
             )
         }.get()
         
-        let transactionsTo: [EthTransactionShort] = try await ethApiService.requestApiCore { core, origin in
+        let transactionsTo: [EthTransactionShort] = try await ethApiService.requestApiCore(waitsForConnectivity: false) { core, origin in
             await core.sendRequestJsonResponse(
                 origin: origin,
                 path: EthWalletService.transactionsListApiSubpath,

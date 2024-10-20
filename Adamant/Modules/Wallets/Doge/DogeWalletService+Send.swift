@@ -69,7 +69,7 @@ extension DogeWalletService: WalletServiceTwoStepSend {
     func sendTransaction(_ transaction: BitcoinKit.Transaction) async throws {
         let txHex = transaction.serialized().hex
         
-        _ = try await dogeApiService.api.request { core, origin in
+        _ = try await dogeApiService.api.request(waitsForConnectivity: false) { core, origin in
             let response: APIResponseModel = await core.apiCore.sendRequestBasic(
                 origin: origin,
                 path: DogeApiCommands.sendTransaction(),

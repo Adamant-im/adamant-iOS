@@ -16,9 +16,9 @@ protocol WalletServiceCompose: Sendable {
 struct AdamantWalletServiceCompose: WalletServiceCompose {
     private let wallets: [String: WalletService]
     
-    init(wallets: [WalletCoreProtocol], coreDataStack: CoreDataStack) {
+    init(wallets: [WalletCoreProtocol]) {
         self.wallets = Dictionary(uniqueKeysWithValues: wallets.map { wallet in
-            (wallet.dynamicRichMessageType, WalletService(core: wallet, coreDataStack: coreDataStack))
+            (wallet.dynamicRichMessageType, WalletService(core: wallet))
         })
     }
     

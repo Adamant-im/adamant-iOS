@@ -404,10 +404,7 @@ struct AppAssembly: MainThreadAssembly {
             
             wallets.append(contentsOf: erc20WalletServices)
             
-            return AdamantWalletServiceCompose(
-                wallets: wallets,
-                coreDataStack: r.resolve(CoreDataStack.self)!
-            )
+            return AdamantWalletServiceCompose(wallets: wallets)
         }.inObjectScope(.container).initCompleted { (_, c) in
             guard let service = c as? AdamantWalletServiceCompose else { return }
             let wallets = service.getWallets().map { $0.core }

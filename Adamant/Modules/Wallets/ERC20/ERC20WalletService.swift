@@ -321,7 +321,7 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
     }
     
     func getGasPrices() async throws -> BigUInt {
-        try await erc20ApiService.requestWeb3 { web3 in
+        try await erc20ApiService.requestWeb3(waitsForConnectivity: false) { web3 in
             try await web3.eth.gasPrice()
         }.get()
     }
@@ -339,7 +339,7 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
             ).transaction
         }.get()
         
-        return try await erc20ApiService.requestWeb3 { web3 in
+        return try await erc20ApiService.requestWeb3(waitsForConnectivity: false) { web3 in
             try await web3.eth.estimateGas(for: transaction)
         }.get()
     }
@@ -426,17 +426,20 @@ extension ERC20WalletService: SwinjectDependentService {
 
 // MARK: - Balances & addresses
 extension ERC20WalletService {
-    func getTransaction(by hash: String) async throws -> EthTransaction {
+    func getTransaction(by hash: String, waitsForConnectivity: Bool) async throws -> EthTransaction {
         let sender = wallet?.address
         let isOutgoing: Bool
         
         // MARK: 1. Transaction details
-        let details: Web3Core.TransactionDetails = try await erc20ApiService.requestWeb3 {
-            web3 in
+        let details: Web3Core.TransactionDetails = try await erc20ApiService.requestWeb3(
+            waitsForConnectivity: waitsForConnectivity
+        ) { web3 in
             try await web3.eth.transactionDetails(hash)
         }.get()
         
-        let receipt = try await erc20ApiService.requestWeb3 { web3 in
+        let receipt = try await erc20ApiService.requestWeb3(
+            waitsForConnectivity: waitsForConnectivity
+        ) { web3 in
             try await web3.eth.transactionReceipt(hash)
         }.get()
         
@@ -457,11 +460,15 @@ extension ERC20WalletService {
         }
         
         // MARK: 4. Block timestamp & confirmations
-        let currentBlock = try await erc20ApiService.requestWeb3 { web3 in
+        let currentBlock = try await erc20ApiService.requestWeb3(
+            waitsForConnectivity: waitsForConnectivity
+        ) { web3 in
             try await web3.eth.blockNumber()
         }.get()
         
-        let block = try await erc20ApiService.requestWeb3 { web3 in
+        let block = try await erc20ApiService.requestWeb3(
+            waitsForConnectivity: waitsForConnectivity
+        ) { web3 in
             try await web3.eth.block(by: receipt.blockHash)
         }.get()
         
@@ -554,7 +561,7 @@ extension ERC20WalletService {
             "order": "time.desc"
         ]
         
-        var transactions: [EthTransactionShort] = try await erc20ApiService.requestApiCore { core, origin in
+        var transactions: [EthTransactionShort] = try await erc20ApiService.requestApiCore(waitsForConnectivity: false) { core, origin in
             await core.sendRequestJsonResponse(
                 origin: origin,
                 path: EthWalletService.transactionsListApiSubpath,

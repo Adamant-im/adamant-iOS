@@ -18,7 +18,7 @@ final class InfoServiceApiService: Sendable {
             NodeOrigin
         ) async -> ApiServiceResult<Output>
     ) async -> InfoServiceApiResult<Output> {
-        await core.request { core, origin in
+        await core.request(waitsForConnectivity: false) { core, origin in
             await request(core.apiCore, origin)
         }.mapError { .apiError($0) }
     }

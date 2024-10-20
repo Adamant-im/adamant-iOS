@@ -69,7 +69,7 @@ final class KlyTransactionDetailsViewController: TransactionDetailsViewControlle
             }
             
             do {
-                var trs = try await service.getTransaction(by: id)
+                var trs = try await service.getTransaction(by: id, waitsForConnectivity: false)
                 let result = try await service.getCurrentFee()
                 
                 let lastHeight = result.lastHeight

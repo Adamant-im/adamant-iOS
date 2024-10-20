@@ -398,7 +398,7 @@ extension DashWalletService {
     }
     
     func getBalance(address: String) async throws -> Decimal {
-        let data: Data = try await dashApiService.request { core, origin in
+        let data: Data = try await dashApiService.request(waitsForConnectivity: false) { core, origin in
             await core.sendRequest(
                 origin: origin,
                 path: .empty,

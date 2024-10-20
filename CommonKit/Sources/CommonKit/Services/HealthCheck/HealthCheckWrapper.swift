@@ -85,7 +85,7 @@ open class HealthCheckWrapper<Service, Error: HealthCheckableError>: @unchecked 
     }
     
     public func request<Output>(
-        waitsForConnectivity: Bool = false,
+        waitsForConnectivity: Bool,
         _ requestAction: @Sendable (Service, NodeOrigin) async -> Result<Output, Error>
     ) async -> Result<Output, Error> {
         let nodesList = await nodesForRequest(waitsForConnectivity: waitsForConnectivity)

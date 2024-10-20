@@ -147,9 +147,10 @@ final class KlyWalletService: WalletCoreProtocol, @unchecked Sendable {
     }
     
     func getTransaction(
-        by hash: String
+        by hash: String,
+        waitsForConnectivity: Bool
     ) async throws -> Transactions.TransactionModel {
-        try await getTransaction(hash: hash)
+        try await getTransaction(hash: hash, waitsForConnectivity: waitsForConnectivity)
     }
     
     func isExist(address: String) async throws -> Bool {
@@ -570,7 +571,7 @@ private extension KlyWalletService {
             throw WalletServiceError.internalError(message: "KLY Wallet: not found", error: nil)
         }
         
-        return try await klyServiceApiService.requestServiceApi { api, completion in
+        return try await klyServiceApiService.requestServiceApi(waitsForConnectivity: false) { api, completion in
             api.transactions(
                 ownerAddress: address,
                 senderIdOrRecipientId: address,
@@ -582,14 +583,16 @@ private extension KlyWalletService {
         }.get()
     }
     
-    func getTransaction(hash: String) async throws -> Transactions.TransactionModel {
+    func getTransaction(hash: String, waitsForConnectivity: Bool) async throws -> Transactions.TransactionModel {
         guard !hash.isEmpty else {
             throw ApiServiceError.internalError(message: "No hash", error: nil)
         }
         
         let ownerAddress = klyWallet?.address
         
-        let result = try await klyServiceApiService.requestServiceApi { api, completion in
+        let result = try await klyServiceApiService.requestServiceApi(
+            waitsForConnectivity: waitsForConnectivity
+        ) { api, completion in
             api.transactions(
                 ownerAddress: ownerAddress,
                 id: hash,
@@ -607,7 +610,7 @@ private extension KlyWalletService {
     }
     
     func isAccountExist(with address: String) async throws -> Bool {
-        try await klyServiceApiService.requestServiceApi { api in
+        try await klyServiceApiService.requestServiceApi(waitsForConnectivity: false) { api in
             try await withUnsafeThrowingContinuation { continuation in
                 api.exist(address: address) { result in
                     switch result {

@@ -29,7 +29,7 @@ final class IPFSApiService: FileApiServiceProtocol {
     func request<Output>(
         _ request: @Sendable (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
     ) async -> ApiServiceResult<Output> {
-        await service.request { admApiCore, node in
+        await service.request(waitsForConnectivity: false) { admApiCore, node in
             await request(admApiCore.apiCore, node)
         }
     }

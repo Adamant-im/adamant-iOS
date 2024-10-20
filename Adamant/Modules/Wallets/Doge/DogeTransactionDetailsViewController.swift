@@ -95,7 +95,7 @@ final class DogeTransactionDetailsViewController: TransactionDetailsViewControll
             return
         }
 
-        let trs = try await service.getTransaction(by: id)
+        let trs = try await service.getTransaction(by: id, waitsForConnectivity: false)
         
         if let blockInfo = cachedBlockInfo,
            blockInfo.hash == trs.blockHash {

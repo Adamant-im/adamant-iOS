@@ -175,7 +175,7 @@ final class ERC20TransferViewController: TransferViewControllerBase {
             return true
         }
         
-        guard let detailTx = try? await service.getTransaction(by: pendingTx.txId) else {
+        guard let detailTx = try? await service.getTransaction(by: pendingTx.txId, waitsForConnectivity: false) else {
             return false
         }
         

@@ -68,7 +68,7 @@ final class DashTransactionDetailsViewController: TransactionDetailsViewControll
             }
         
             do {
-                let trs = try await service.getTransaction(by: id)
+                let trs = try await service.getTransaction(by: id, waitsForConnectivity: false)
                 if let blockInfo = self?.cachedBlockInfo,
                    blockInfo.hash == trs.blockHash {
                     self?.transaction = trs.asBtcTransaction(DashTransaction.self, for: address, blockId: blockInfo.height)

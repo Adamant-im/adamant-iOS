@@ -25,7 +25,7 @@ extension DashWalletService {
         }
         Task { @Sendable in
             do {
-                let transaction = try await getTransaction(by: id)
+                let transaction = try await getTransaction(by: id, waitsForConnectivity: false)
                 handleTransactionResponse(id: id, .success(transaction), completion)
             } catch {
                 let error = error as? WalletServiceError
@@ -35,8 +35,10 @@ extension DashWalletService {
         }
     }
 
-    func getTransaction(by hash: String) async throws -> BTCRawTransaction {
-        let result: BTCRawTransaction? = try await dashApiService.request { core, origin in
+    func getTransaction(by hash: String, waitsForConnectivity: Bool) async throws -> BTCRawTransaction {
+        let result: BTCRawTransaction? = try await dashApiService.request(
+            waitsForConnectivity: waitsForConnectivity
+        ) { core, origin in
             let response = await core.sendRequestRPC(
                 origin: origin,
                 path: .empty,
@@ -73,7 +75,7 @@ extension DashWalletService {
             )
         }
         
-        let result: [BTCRawTransaction] = try await dashApiService.request { core, origin in
+        let result: [BTCRawTransaction] = try await dashApiService.request(waitsForConnectivity: false) { core, origin in
             let response = await core.sendRequestRPC(
                 origin: origin,
                 path: .empty,
@@ -102,7 +104,7 @@ extension DashWalletService {
             throw WalletServiceError.internalError(message: "Hash is empty", error: nil)
         }
         
-        let result: BTCRPCServerResponce<BtcBlock> = try await dashApiService.request { core, origin in
+        let result: BTCRPCServerResponce<BtcBlock> = try await dashApiService.request(waitsForConnectivity: false) { core, origin in
             await core.sendRequestJsonResponse(
                 origin: origin,
                 path: .empty,
@@ -124,7 +126,7 @@ extension DashWalletService {
             throw WalletServiceError.internalError(message: "DASH Wallet not found", error: nil)
         }
         
-        let response: BTCRPCServerResponce<[DashUnspentTransaction]> = try await dashApiService.request {
+        let response: BTCRPCServerResponce<[DashUnspentTransaction]> = try await dashApiService.request(waitsForConnectivity: false) {
             core, origin in
             await core.sendRequestJsonResponse(
                 origin: origin,
@@ -192,7 +194,7 @@ private extension DashWalletService {
 
 extension DashWalletService {
     func requestTransactionsIds(for address: String) async throws -> [String] {
-        let response: BTCRPCServerResponce<[String]> = try await dashApiService.request {
+        let response: BTCRPCServerResponce<[String]> = try await dashApiService.request(waitsForConnectivity: false) {
             core, origin in
             await core.sendRequestJsonResponse(
                 origin: origin,

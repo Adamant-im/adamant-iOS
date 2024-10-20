@@ -61,7 +61,7 @@ final class BtcTransactionDetailsViewController: TransactionDetailsViewControlle
             }
             
             do {
-                let trs = try await service.getTransaction(by: id)
+                let trs = try await service.getTransaction(by: id, waitsForConnectivity: false)
                 transaction = trs
                 
                 updateIncosinstentRowIfNeeded()

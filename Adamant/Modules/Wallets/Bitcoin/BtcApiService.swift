@@ -84,15 +84,16 @@ final class BtcApiService: ApiServiceProtocol {
     }
     
     func request<Output>(
+        waitsForConnectivity: Bool,
         _ request: @Sendable @escaping (APICoreProtocol, NodeOrigin) async -> ApiServiceResult<Output>
     ) async -> WalletServiceResult<Output> {
-        await api.request { core, origin in
+        await api.request(waitsForConnectivity: waitsForConnectivity) { core, origin in
             await core.request(origin: origin, request)
         }
     }
     
     func getStatusInfo() async -> WalletServiceResult<NodeStatusInfo> {
-        await api.request { core, origin in
+        await api.request(waitsForConnectivity: false) { core, origin in
             await core.getStatusInfo(origin: origin)
         }
     }
