@@ -349,8 +349,8 @@ struct AppAssembly: MainThreadAssembly {
         }.inObjectScope(.container)
         
         // MARK: Rich transaction status service
-        container.register(TransactionStatusService.self) { r in
-            AdamantTransactionStatusService(
+        container.register(TransactionsStatusServiceComposeProtocol.self) { r in
+            TransactionsStatusServiceCompose(
                 coreDataStack: r.resolve(CoreDataStack.self)!,
                 walletServiceCompose: r.resolve(WalletServiceCompose.self)!
             )

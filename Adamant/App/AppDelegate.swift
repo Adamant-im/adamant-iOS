@@ -198,7 +198,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         // Setup transactions statuses observing
-        if let service = container.resolve(TransactionStatusService.self) {
+        if let service = container.resolve(TransactionsStatusServiceComposeProtocol.self) {
             Task { await service.startObserving() }
         }
         
