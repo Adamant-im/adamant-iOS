@@ -11,7 +11,7 @@ import CommonKit
 
 @globalActor
 actor TransactionsStatusActor: GlobalActor {
-    private static let executor = GlobalActorSerialExecutor()
+    private static let executor = GlobalActorSerialExecutor(TransactionsStatusActor.self)
     
     static let shared = TransactionsStatusActor()
     static let sharedUnownedExecutor = TransactionsStatusActor.executor.asUnownedSerialExecutor()

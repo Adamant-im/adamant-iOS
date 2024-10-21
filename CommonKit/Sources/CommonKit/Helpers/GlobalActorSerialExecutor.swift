@@ -8,7 +8,7 @@
 import Foundation
 
 public final class GlobalActorSerialExecutor: SerialExecutor {
-    private let queue = DispatchQueue(label: .init(describing: GlobalActorSerialExecutor.self))
+    private let queue: DispatchQueue
     
     public func enqueue(_ job: UnownedJob) {
         queue.async { [self] in
@@ -20,5 +20,7 @@ public final class GlobalActorSerialExecutor: SerialExecutor {
         .init(ordinary: self)
     }
     
-    public init() {}
+    public init<T>(_ type: T.Type) {
+        queue = .init(label: .init(describing: T.self))
+    }
 }
