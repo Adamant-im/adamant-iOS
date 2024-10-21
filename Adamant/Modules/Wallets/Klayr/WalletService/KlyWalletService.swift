@@ -39,7 +39,7 @@ final class KlyWalletService: WalletCoreProtocol, @unchecked Sendable {
     static let defaultFee: BigUInt = 141000
     
     var hasActiveNode: Bool {
-        apiService.hasActiveNode
+        get async { await apiService.hasActiveNode }
     }
 
     @Atomic var transactionFeeRaw: BigUInt = BigUInt(integerLiteral: 141000)

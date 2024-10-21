@@ -9,7 +9,7 @@
 import CommonKit
 import Foundation
 
-final class BtcApiCore: BlockchainHealthCheckableService {
+final class BtcApiCore: BlockchainHealthCheckableService, Sendable {
     let apiCore: APICoreProtocol
 
     init(apiCore: APICoreProtocol) {
@@ -68,11 +68,11 @@ final class BtcApiService: ApiServiceProtocol {
     let api: BlockchainHealthCheckWrapper<BtcApiCore>
     
     var chosenFastestNodeId: UUID? {
-        api.chosenFastestNodeId
+        get async { await api.chosenNodeId }
     }
     
     var hasActiveNode: Bool {
-        !api.sortedAllowedNodes.isEmpty
+        get async { await !api.sortedAllowedNodes.isEmpty }
     }
     
     init(api: BlockchainHealthCheckWrapper<BtcApiCore>) {
@@ -80,7 +80,7 @@ final class BtcApiService: ApiServiceProtocol {
     }
     
     func healthCheck() {
-        api.healthCheck()
+        Task { await api.healthCheck() }
     }
     
     func request<Output>(

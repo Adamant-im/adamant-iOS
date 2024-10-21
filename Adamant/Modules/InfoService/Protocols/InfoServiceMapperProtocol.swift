@@ -9,7 +9,7 @@
 import Foundation
 import CommonKit
 
-protocol InfoServiceMapperProtocol {
+protocol InfoServiceMapperProtocol: Sendable {
     func mapToModel(_ dto: InfoServiceStatusDTO) -> InfoServiceStatus
     
     func mapRatesToModel(

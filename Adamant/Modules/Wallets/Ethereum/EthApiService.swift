@@ -19,11 +19,11 @@ class EthApiService: ApiServiceProtocol, @unchecked Sendable {
     }
     
     var chosenFastestNodeId: UUID? {
-        api.chosenFastestNodeId
+        get async { await api.chosenNodeId }
     }
     
     var hasActiveNode: Bool {
-        !api.sortedAllowedNodes.isEmpty
+        get async { await !api.sortedAllowedNodes.isEmpty }
     }
     
     init(api: BlockchainHealthCheckWrapper<EthApiCore>) {
@@ -31,7 +31,7 @@ class EthApiService: ApiServiceProtocol, @unchecked Sendable {
     }
     
     func healthCheck() {
-        api.healthCheck()
+        Task { await api.healthCheck() }
     }
     
     func requestWeb3<Output>(

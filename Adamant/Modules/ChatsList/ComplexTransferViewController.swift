@@ -144,7 +144,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
             vc.showProgressView(animated: false)
             
             Task {
-                guard service.core.hasActiveNode else {
+                guard await service.core.hasActiveNode else {
                     vc.showAlertView(
                         title: nil,
                         message: ApiServiceError.noEndpointsAvailable(
@@ -155,7 +155,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                     return
                 }
                 
-                guard admService?.core.hasActiveNode ?? false else {
+                guard await admService?.core.hasActiveNode ?? false else {
                     vc.showAlertView(
                         title: nil,
                         message: .adamant.sharedErrors.admNodeErrorMessage(service.core.tokenSymbol),

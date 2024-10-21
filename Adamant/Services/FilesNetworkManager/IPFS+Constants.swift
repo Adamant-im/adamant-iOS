@@ -11,15 +11,15 @@ import CommonKit
 
 extension IPFSApiService {
     var chosenFastestNodeId: UUID? {
-        service.chosenFastestNodeId
+        get async { await service.chosenNodeId }
     }
     
     var hasActiveNode: Bool {
-        !service.sortedAllowedNodes.isEmpty
+        get async { await !service.sortedAllowedNodes.isEmpty }
     }
     
     func healthCheck() {
-        service.healthCheck()
+        Task { await service.healthCheck() }
     }
     
     static var symbol: String {

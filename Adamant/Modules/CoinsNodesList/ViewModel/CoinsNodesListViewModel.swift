@@ -75,12 +75,18 @@ private extension CoinsNodesListViewModel {
     }
     
     func updateSections(items: [NodeGroup: [Node]]) {
-        state.sections = mapper.map(
-            items: items,
-            restNodeIds: processedGroups.compactMap {
-                apiServiceCompose.chosenFastestNodeId(group: $0)
+        Task {
+            var restNodeIds: [UUID] = .init()
+            
+            for group in processedGroups {
+                await apiServiceCompose.chosenFastestNodeId(group: group).map { restNodeIds.append($0) }
             }
-        )
+            
+            state.sections = mapper.map(
+                items: items,
+                restNodeIds: restNodeIds
+            )
+        }
     }
     
     func saveFastestNodeMode(_ value: Bool) {

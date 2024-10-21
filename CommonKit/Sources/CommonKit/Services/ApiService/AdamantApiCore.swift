@@ -14,7 +14,7 @@ public extension ApiCommands {
     static let version = "/api/peers/version"
 }
 
-public final class AdamantApiCore {
+public final class AdamantApiCore: Sendable {
     public let apiCore: APICoreProtocol
     
     public init(apiCore: APICoreProtocol) {

@@ -167,7 +167,7 @@ final class ERC20WalletService: WalletCoreProtocol, @unchecked Sendable {
     }
     
     var hasActiveNode: Bool {
-        apiService.hasActiveNode
+        get async { await apiService.hasActiveNode }
     }
     
     private(set) lazy var coinStorage: CoinStorageService = AdamantCoinStorageService(

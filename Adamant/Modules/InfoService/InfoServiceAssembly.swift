@@ -20,16 +20,19 @@ struct InfoServiceAssembly: MainThreadAssembly {
         }.inObjectScope(.container)
         
         container.register(InfoServiceApiServiceProtocol.self) { r in
-            InfoServiceApiService(core: .init(
-                service: .init(
-                    apiCore: r.resolve(APICoreProtocol.self)!,
-                    mapper: r.resolve(InfoServiceMapperProtocol.self)!),
-                nodesStorage: r.resolve(NodesStorageProtocol.self)!,
-                nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
-                isActive: true,
-                params: NodeGroup.infoService.blockchainHealthCheckParams,
-                connection: r.resolve(ReachabilityMonitor.self)!.connectionPublisher
-            ))
+            InfoServiceApiService(
+                core: .init(
+                    service: .init(
+                        apiCore: r.resolve(APICoreProtocol.self)!,
+                        mapper: r.resolve(InfoServiceMapperProtocol.self)!),
+                    nodesStorage: r.resolve(NodesStorageProtocol.self)!,
+                    nodesAdditionalParamsStorage: r.resolve(NodesAdditionalParamsStorageProtocol.self)!,
+                    isActive: true,
+                    params: NodeGroup.infoService.blockchainHealthCheckParams,
+                    connection: r.resolve(ReachabilityMonitor.self)!.connectionPublisher
+                ),
+                mapper: r.resolve(InfoServiceMapperProtocol.self)!
+            )
         }.inObjectScope(.container)
         
         container.register(InfoServiceMapperProtocol.self) { _ in

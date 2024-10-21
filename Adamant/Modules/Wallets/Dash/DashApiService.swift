@@ -9,7 +9,7 @@
 import CommonKit
 import Foundation
 
-final class DashApiCore: BlockchainHealthCheckableService {
+final class DashApiCore: BlockchainHealthCheckableService, Sendable {
     let apiCore: APICoreProtocol
 
     init(apiCore: APICoreProtocol) {
@@ -68,11 +68,11 @@ final class DashApiService: ApiServiceProtocol {
     let api: BlockchainHealthCheckWrapper<DashApiCore>
     
     var chosenFastestNodeId: UUID? {
-        api.chosenFastestNodeId
+        get async { await api.chosenNodeId }
     }
     
     var hasActiveNode: Bool {
-        !api.sortedAllowedNodes.isEmpty
+        get async { await !api.sortedAllowedNodes.isEmpty }
     }
     
     init(api: BlockchainHealthCheckWrapper<DashApiCore>) {
@@ -80,7 +80,7 @@ final class DashApiService: ApiServiceProtocol {
     }
     
     func healthCheck() {
-        api.healthCheck()
+        Task { await api.healthCheck() }
     }
     
     func request<Output>(
