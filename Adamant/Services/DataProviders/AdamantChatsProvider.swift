@@ -1326,7 +1326,7 @@ extension AdamantChatsProvider {
             // Update ID with recieved, add to unconfirmed transactions.
             transaction.transactionId = String(id)
             transaction.chatMessageId = String(id)
-            transaction.statusEnum = .pending
+            transaction.statusEnum = .delivered
             
             removeTxFromUnconfirmed(
                 signature: signedTransaction.signature,
