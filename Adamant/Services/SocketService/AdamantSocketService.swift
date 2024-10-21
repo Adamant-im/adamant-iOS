@@ -134,7 +134,11 @@ final class AdamantSocketService: SocketService, @unchecked Sendable {
             return
         }
         
-        guard currentNode.map({ !allowedNodes.contains($0) }) ?? true else { return }
-        currentNode = allowedNodes.randomElement()
+        guard let previousNode = currentNode else {
+            currentNode = allowedNodes.randomElement()
+            return
+        }
+        
+        currentNode = allowedNodes.first { $0.isSame(previousNode) } ?? allowedNodes.randomElement()
     }
 }
