@@ -21,7 +21,9 @@ extension Node {
         case .allowed:
             pingString
         case .synchronizing:
-            Strings.synchronizing
+            isUpdating
+                ? Strings.updating
+                : Strings.synchronizing
         case .offline:
             Strings.offline
         case .notAllowed(let reason):
@@ -60,7 +62,9 @@ extension Node {
         case .allowed:
             return .adamant.success
         case .synchronizing:
-            return .adamant.attention
+            return isUpdating
+                ? .adamant.inactive
+                : .adamant.attention
         case .offline, .notAllowed:
             return .adamant.warning
         case .none:
@@ -93,6 +97,13 @@ private extension Node {
             String.localized(
                 "NodesList.NodeCell.Synchronizing",
                 comment: "NodesList.NodeCell: Node is synchronizing"
+            )
+        }
+        
+        static var updating: String {
+            String.localized(
+                "NodesList.NodeCell.Updating",
+                comment: "NodesList.NodeCell: Node is updating"
             )
         }
         
