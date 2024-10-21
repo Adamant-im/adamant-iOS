@@ -421,11 +421,29 @@ extension LoginViewController {
                 loginIntoExistingAccount(passphrase: passphrase)
                 
             case .failure(let error):
-                dialogService.showRichError(error: error)
+                handleError(error)
             }
         }
     }
     
+    func handleError(_ error: ApiServiceError) {
+        guard case .noEndpointsAvailable = error else {
+            dialogService.showRichError(error: error)
+            return
+        }
+        
+        dialogService.showNoActiveNodesAlert(
+            nodeName: NodeGroup.adm.name
+        ) { [weak self] in
+            guard let self = self else { return }
+            
+            let vc = self.screensFactory.makeNodesList()
+            let nav = UINavigationController(rootViewController: vc)
+            nav.modalPresentationStyle = .pageSheet
+            
+            self.present(nav, animated: true, completion: nil)
+        }
+    }
     func generateNewPassphrase() {
         let passphrase = (try? Mnemonic.generate().joined(separator: " ")) ?? .empty
         
