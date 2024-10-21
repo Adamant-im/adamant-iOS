@@ -8,20 +8,29 @@
 import Foundation
 import Combine
 
-public actor SendablePublisher<P: Publisher> where P.Output: Sendable, P.Failure: Sendable {
+public actor SendablePublisher<
+    P: Publisher
+>: StreamSendableActor where P.Output: Sendable, P.Failure: Sendable {
+    public var streamSubscription: AnyCancellable?
+    
+    nonisolated public let streamSender: AsyncStreamSender<
+        @Sendable (isolated SendablePublisher<P>) -> Void
+    > = .init()
+    
     private var subscriptions = [UUID: AnyCancellable]()
     
     public let publisher: P
     
     public init(_ publisher: @autoclosure @Sendable () -> P) {
         self.publisher = publisher()
+        Task { await configureStream() }
     }
 }
 
 extension SendablePublisher: AsyncStreamable {
     public nonisolated func makeSequence() -> AsyncThrowingStream<P.Output, any Error> {
         .init { continuation in
-            Task { await subscribe(continuation) }
+            task { $0.subscribe(continuation) }
         }
     }
 }
